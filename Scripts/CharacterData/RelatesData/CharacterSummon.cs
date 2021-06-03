@@ -10,6 +10,7 @@ namespace MultiplayerARPG
         None,
         Skill,
         PetItem,
+        Companion
     }
 
     [System.Serializable]
@@ -20,16 +21,18 @@ namespace MultiplayerARPG
         public int dataId;
         public float summonRemainsDuration;
         public uint objectId;
-        // For save / load
         public short level;
-        public short Level { get { return CacheEntity != null ? CacheEntity.Level : level; } }
         public int exp;
-        public int Exp { get { return CacheEntity != null ? CacheEntity.Exp : exp; } }
         public int currentHp;
-        public int CurrentHp { get { return CacheEntity != null ? CacheEntity.CurrentHp : currentHp; } }
         public int currentMp;
+        // Properties for save / load
+        public short Level { get { return CacheEntity != null ? CacheEntity.Level : level; } }
+        public int Exp { get { return CacheEntity != null ? CacheEntity.Exp : exp; } }
+        public int CurrentHp { get { return CacheEntity != null ? CacheEntity.CurrentHp : currentHp; } }
         public int CurrentMp { get { return CacheEntity != null ? CacheEntity.CurrentMp : currentMp; } }
 
+        [System.NonSerialized]
+        private SummonType dirtyType;
         [System.NonSerialized]
         private int dirtyDataId;
 
@@ -37,6 +40,8 @@ namespace MultiplayerARPG
         private BaseSkill cacheSkill;
         [System.NonSerialized]
         private BaseItem cachePetItem;
+        [System.NonSerialized]
+        private Companion cacheCompanion;
         [System.NonSerialized]
         private BaseMonsterCharacterEntity cachePrefab;
         [System.NonSerialized]
@@ -62,7 +67,7 @@ namespace MultiplayerARPG
         {
             get
             {
-                if (!cacheEntity && BaseGameNetworkManager.Singleton)
+                if (!cacheEntity && objectId > 0)
                     BaseGameNetworkManager.Singleton.Assets.TryGetSpawnedObject(objectId, out cacheEntity);
                 return cacheEntity;
             }
@@ -70,8 +75,9 @@ namespace MultiplayerARPG
 
         private void MakeCache()
         {
-            if (dirtyDataId != dataId)
+            if (dirtyType != type || dirtyDataId != dataId)
             {
+                dirtyType = type;
                 dirtyDataId = dataId;
                 cacheSkill = null;
                 cachePetItem = null;
@@ -94,6 +100,10 @@ namespace MultiplayerARPG
                         if (GameInstance.Items.TryGetValue(dataId, out cachePetItem) && cachePetItem is IPetItem)
                             cachePrefab = (cachePetItem as IPetItem).PetEntity;
                         break;
+                    case SummonType.Companion:
+                        if (GameInstance.Companions.TryGetValue(dataId, out cacheCompanion))
+                            cachePrefab = cacheCompanion.CompanionEntity;
+                        break;
                 }
                 if (cachePrefab != null && cachePrefab.CharacterDatabase != null)
                 {
@@ -108,24 +118,6 @@ namespace MultiplayerARPG
                     cacheIncreaseDamages = cacheSummonerBuff.GetIncreaseDamages(level);
                 }
             }
-        }
-
-        public BaseSkill GetSkill()
-        {
-            MakeCache();
-            return cacheSkill;
-        }
-
-        public BaseItem GetPetItem()
-        {
-            MakeCache();
-            return cachePetItem;
-        }
-
-        public BaseMonsterCharacterEntity GetPrefab()
-        {
-            MakeCache();
-            return cachePrefab;
         }
 
         public void Summon(BaseCharacterEntity summoner, short summonLevel, float duration)
@@ -169,6 +161,30 @@ namespace MultiplayerARPG
 
             if (CacheEntity)
                 CacheEntity.UnSummon();
+        }
+
+        public BaseSkill GetSkill()
+        {
+            MakeCache();
+            return cacheSkill;
+        }
+
+        public BaseItem GetPetItem()
+        {
+            MakeCache();
+            return cachePetItem;
+        }
+
+        public Companion GetCompanion()
+        {
+            MakeCache();
+            return cacheCompanion;
+        }
+
+        public BaseMonsterCharacterEntity GetPrefab()
+        {
+            MakeCache();
+            return cachePrefab;
         }
 
         public CharacterStats GetIncreaseStats()
@@ -242,7 +258,7 @@ namespace MultiplayerARPG
             writer.Put((byte)type);
             if (type != SummonType.None)
             {
-                writer.Put(dataId);
+                writer.PutPackedInt(dataId);
                 switch (type)
                 {
                     case SummonType.Skill:
@@ -262,7 +278,7 @@ namespace MultiplayerARPG
             type = (SummonType)reader.GetByte();
             if (type != SummonType.None)
             {
-                dataId = reader.GetInt();
+                dataId = reader.GetPackedInt();
                 switch (type)
                 {
                     case SummonType.Skill:

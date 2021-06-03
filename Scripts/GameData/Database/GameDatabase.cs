@@ -23,6 +23,7 @@ namespace MultiplayerARPG
         [Header("Game Data")]
         public Attribute[] attributes;
         public Currency[] currencies;
+        public Companion[] companions;
         public DamageElement[] damageElements;
         public BaseItem[] items;
         public ItemCraftFormula[] itemCraftFormulas;
@@ -45,6 +46,7 @@ namespace MultiplayerARPG
             GameInstance.AddVehicleEntities(vehicleEntities);
             GameInstance.AddAttributes(attributes);
             GameInstance.AddCurrencies(currencies);
+            GameInstance.AddCompanions(companions);
             GameInstance.AddDamageElements(damageElements);
             GameInstance.AddItems(items);
             GameInstance.AddItemCraftFormulas(0, itemCraftFormulas);
@@ -71,6 +73,7 @@ namespace MultiplayerARPG
             GameInstance.AddVehicleEntities(vehicleEntities);
             GameInstance.AddAttributes(attributes);
             GameInstance.AddCurrencies(currencies);
+            GameInstance.AddCompanions(companions);
             GameInstance.AddDamageElements(damageElements);
             GameInstance.AddItems(items);
             GameInstance.AddItemCraftFormulas(0, itemCraftFormulas);
@@ -93,6 +96,10 @@ namespace MultiplayerARPG
             List<Currency> tempCurrencies = new List<Currency>(GameInstance.Currencies.Values);
             tempCurrencies.Sort();
             currencies = tempCurrencies.ToArray();
+
+            List<Companion> tempCompanions = new List<Companion>(GameInstance.Companions.Values);
+            tempCompanions.Sort();
+            companions = tempCompanions.ToArray();
 
             List<DamageElement> tempDamageElements = new List<DamageElement>(GameInstance.DamageElements.Values);
             tempDamageElements.Sort();

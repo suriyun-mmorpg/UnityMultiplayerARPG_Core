@@ -69,6 +69,7 @@ namespace MultiplayerARPG
 
         public static readonly Dictionary<int, Attribute> Attributes = new Dictionary<int, Attribute>();
         public static readonly Dictionary<int, Currency> Currencies = new Dictionary<int, Currency>();
+        public static readonly Dictionary<int, Companion> Companions = new Dictionary<int, Companion>();
         public static readonly Dictionary<int, BaseItem> Items = new Dictionary<int, BaseItem>();
         public static readonly Dictionary<int, Dictionary<int, BaseItem>> ItemsByAmmoType = new Dictionary<int, Dictionary<int, BaseItem>>();
         public static readonly Dictionary<int, ItemCraftFormula> ItemCraftFormulas = new Dictionary<int, ItemCraftFormula>();
@@ -495,6 +496,7 @@ namespace MultiplayerARPG
         {
             Attributes.Clear();
             Currencies.Clear();
+            Companions.Clear();
             Items.Clear();
             ItemsByAmmoType.Clear();
             ItemCraftFormulas.Clear();
@@ -781,6 +783,16 @@ namespace MultiplayerARPG
             {
                 AddGameData(Currencies, currencyAmount.currency);
             }
+        }
+
+        public static void AddCompanions(params Companion[] companions)
+        {
+            AddCompanions((IEnumerable<Companion>)companions);
+        }
+
+        public static void AddCompanions(IEnumerable<Companion> companions)
+        {
+            AddManyGameData(Companions, companions);
         }
 
         public static void AddItems(params ItemAmount[] itemAmounts)
