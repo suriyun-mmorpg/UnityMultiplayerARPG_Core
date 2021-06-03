@@ -540,7 +540,7 @@ namespace MultiplayerARPG
             character.FillEmptySlots();
             // Clear all summoned pets
             CharacterSummon tempSummon;
-            for (int i = 0; i < character.Summons.Count; ++i)
+            for (int i = character.Summons.Count - 1; i >= 0; --i)
             {
                 tempSummon = character.Summons[i];
                 if (tempSummon.type != SummonType.PetItem)
