@@ -39,7 +39,7 @@ namespace MultiplayerARPG
                     }
                     else
                     {
-                        summon.Update(updatingTime);
+                        summon.Update(Entity, updatingTime);
                         Entity.Summons[i] = summon;
                     }
                 }
@@ -57,32 +57,6 @@ namespace MultiplayerARPG
                         Entity.SkillUsages[i] = skillUsage;
                     }
                 }
-                // Removing non-equip items if it should
-                count = Entity.NonEquipItems.Count;
-                bool hasRemovedItem = false;
-                CharacterItem nonEquipItem;
-                for (int i = count - 1; i >= 0; --i)
-                {
-                    nonEquipItem = Entity.NonEquipItems[i];
-                    if (nonEquipItem.ShouldRemove())
-                    {
-                        if (CurrentGameInstance.IsLimitInventorySlot)
-                            Entity.NonEquipItems[i] = CharacterItem.Empty;
-                        else
-                            Entity.NonEquipItems.RemoveAt(i);
-                        hasRemovedItem = true;
-                    }
-                    else
-                    {
-                        if (nonEquipItem.IsLock())
-                        {
-                            nonEquipItem.Update(updatingTime);
-                            Entity.NonEquipItems[i] = nonEquipItem;
-                        }
-                    }
-                }
-                if (hasRemovedItem)
-                    Entity.FillEmptySlots();
                 // Removing buffs if it should
                 count = Entity.Buffs.Count;
                 CharacterBuff buff;

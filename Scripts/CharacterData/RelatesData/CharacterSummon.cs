@@ -67,7 +67,7 @@ namespace MultiplayerARPG
         {
             get
             {
-                if (!cacheEntity && objectId > 0)
+                if (cacheEntity == null && objectId > 0)
                     BaseGameNetworkManager.Singleton.Assets.TryGetSpawnedObject(objectId, out cacheEntity);
                 return cacheEntity;
             }
@@ -154,17 +154,18 @@ namespace MultiplayerARPG
                     // Return to character as a pet item
                     CharacterItem newItem = CharacterItem.Create(dataId, Level, 1);
                     newItem.exp = Exp;
-                    if (CacheEntity && CacheEntity.CurrentHp <= 0)
-                        newItem.Lock(GameInstance.Singleton.petDeadLockDuration);
-                    else
-                        newItem.Lock(GameInstance.Singleton.petUnSummonLockDuration);
+                    newItem.Lock(CurrentHp <= 0 ?
+                        GameInstance.Singleton.petDeadLockDuration :
+                        GameInstance.Singleton.petUnSummonLockDuration);
                     summoner.AddOrSetNonEquipItems(newItem);
                     break;
                 case SummonType.Companion:
-                    // Save companion data
+                    // Update companion data
                     if (summoner is BasePlayerCharacterEntity)
                     {
-                        
+                        (summoner as BasePlayerCharacterEntity).UnSummonCompanion(Level, Exp, CurrentHp <= 0 ?
+                            GameInstance.Singleton.companionDeadLockDuration :
+                            GameInstance.Singleton.companionUnSummonLockDuration);
                     }
                     break;
             }
@@ -244,10 +245,22 @@ namespace MultiplayerARPG
             return (CacheEntity && CacheEntity.CurrentHp <= 0) || (type == SummonType.Skill && summonRemainsDuration <= 0f);
         }
 
-        public void Update(float deltaTime)
+        public void Update(BaseCharacterEntity entity, float deltaTime)
         {
-            if (type == SummonType.Skill)
-                summonRemainsDuration -= deltaTime;
+            switch (type)
+            {
+                case SummonType.Skill:
+                    // Update remains duration when it reached 0 it will be unsummoned
+                    summonRemainsDuration -= deltaTime;
+                    break;
+                case SummonType.Companion:
+                    // Update companion data
+                    if (entity is BasePlayerCharacterEntity)
+                    {
+                        (entity as BasePlayerCharacterEntity).UpdateCompanion(Level, Exp);
+                    }
+                    break;
+            }
             // Makes update in main thread to collects data to use in other threads (save to database thread)
             level = Level;
             exp = Exp;

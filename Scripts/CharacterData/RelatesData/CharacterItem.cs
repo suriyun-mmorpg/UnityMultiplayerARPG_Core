@@ -250,12 +250,6 @@ namespace MultiplayerARPG
             lockRemainsDuration = duration;
         }
 
-        public bool ShouldRemove()
-        {
-            // TODO: have expire date to remove
-            return false;
-        }
-
         public void Update(float deltaTime)
         {
             lockRemainsDuration -= deltaTime;

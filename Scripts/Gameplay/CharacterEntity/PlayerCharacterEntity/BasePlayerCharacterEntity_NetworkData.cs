@@ -157,6 +157,7 @@ namespace MultiplayerARPG
             }
             set { }
         }
+        public int CompanionDataId { get; set; }
         public int LastDeadTime { get { return lastDeadTime.Value; } set { lastDeadTime.Value = value; } }
         public int LastUpdate { get; set; }
 

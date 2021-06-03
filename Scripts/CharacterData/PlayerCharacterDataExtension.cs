@@ -52,6 +52,7 @@ namespace MultiplayerARPG
             to.RespawnMapName = from.RespawnMapName;
             to.RespawnPosition = from.RespawnPosition;
             to.MountDataId = from.MountDataId;
+            to.CompanionDataId = from.CompanionDataId;
             to.LastDeadTime = from.LastDeadTime;
             to.LastUpdate = from.LastUpdate;
             to.SelectableWeaponSets = new List<EquipWeapons>(from.SelectableWeaponSets);
@@ -429,6 +430,7 @@ namespace MultiplayerARPG
                 writer.Put(characterData.RespawnPosition.z);
             }
             writer.PutPackedInt(characterData.MountDataId);
+            writer.PutPackedInt(characterData.CompanionDataId);
             writer.PutPackedInt(characterData.LastDeadTime);
             writer.PutPackedInt(characterData.LastUpdate);
             // Attributes
@@ -593,6 +595,7 @@ namespace MultiplayerARPG
                 characterData.RespawnPosition = new Vector3(reader.GetFloat(), reader.GetFloat(), reader.GetFloat());
             }
             characterData.MountDataId = reader.GetPackedInt();
+            characterData.CompanionDataId = reader.GetPackedInt();
             characterData.LastDeadTime = reader.GetPackedInt();
             characterData.LastUpdate = reader.GetPackedInt();
             int count;
