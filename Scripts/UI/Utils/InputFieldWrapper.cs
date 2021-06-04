@@ -11,7 +11,7 @@ public class InputFieldWrapper : MonoBehaviour
 #if USE_TEXT_MESH_PRO
     public TMP_InputField textMeshInputField;
 #endif
-    private string _textValue;
+    private string _textValue = null;
     public virtual string text
     {
         get
@@ -293,7 +293,8 @@ public class InputFieldWrapper : MonoBehaviour
 #if USE_TEXT_MESH_PRO
         if (textMeshInputField == null) textMeshInputField = GetComponent<TMP_InputField>();
 #endif
-        text = _textValue;
+        if (_textValue != null)
+            text = _textValue;
     }
 
     public void SetGameObjectActive(bool isActive)
