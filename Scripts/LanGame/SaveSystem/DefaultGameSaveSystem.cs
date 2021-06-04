@@ -1,4 +1,5 @@
 ﻿using Cysharp.Threading.Tasks;
+using LiteNetLib;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -9,7 +10,9 @@ namespace MultiplayerARPG
     public class DefaultGameSaveSystem : BaseGameSaveSystem
     {
         private readonly WorldSaveData worldSaveData = new WorldSaveData();
-        private readonly StorageSaveData storageSaveData = new StorageSaveData();
+        private readonly StorageSaveData hostStorageSaveData = new StorageSaveData();
+        private readonly StorageSaveData playerStorageSaveData = new StorageSaveData();
+        private readonly Dictionary<StorageId, List<CharacterItem>> playerStorageItems = new Dictionary<StorageId, List<CharacterItem>>();
         private bool isReadyToSave;
 
         public override void OnServerStart()
@@ -30,9 +33,9 @@ namespace MultiplayerARPG
                     BaseGameNetworkManager.Singleton.CreateBuildingEntity(building, true);
                 }
                 // Load storage data
-                storageSaveData.LoadPersistentData(hostPlayerCharacterData.Id);
+                hostStorageSaveData.LoadPersistentData(hostPlayerCharacterData.Id);
                 StorageId storageId;
-                foreach (StorageCharacterItem storageItem in storageSaveData.storageItems)
+                foreach (StorageCharacterItem storageItem in hostStorageSaveData.storageItems)
                 {
                     storageId = new StorageId(storageItem.storageType, storageItem.storageOwnerId);
                     if (!storageItems.ContainsKey(storageId))
@@ -54,25 +57,77 @@ namespace MultiplayerARPG
             return PlayerCharacterDataExtension.LoadAllPersistentCharacterData();
         }
 
+        public override List<CharacterItem> LoadPlayerStorage(IPlayerCharacterData playerCharacterData)
+        {
+            List<CharacterItem> result = new List<CharacterItem>();
+            playerStorageItems.Clear();
+            if (playerCharacterData != null && !string.IsNullOrEmpty(playerCharacterData.Id))
+            {
+                // Load storage data
+                playerStorageSaveData.LoadPersistentData(playerCharacterData.Id);
+                StorageId storageId;
+                foreach (StorageCharacterItem storageItem in playerStorageSaveData.storageItems)
+                {
+                    storageId = new StorageId(storageItem.storageType, storageItem.storageOwnerId);
+                    if (!playerStorageItems.ContainsKey(storageId))
+                        playerStorageItems[storageId] = new List<CharacterItem>();
+                    playerStorageItems[storageId].Add(storageItem.characterItem);
+                }
+                storageId = new StorageId(StorageType.Player, playerCharacterData.Id);
+                if (playerStorageItems.ContainsKey(storageId))
+                {
+                    // Result is storage items for the character only
+                    result = playerStorageItems[storageId];
+                }
+            }
+            return result;
+        }
+
         public override void SaveStorage(IPlayerCharacterData hostPlayerCharacterData, IDictionary<StorageId, List<CharacterItem>> storageItems)
         {
             if (!isReadyToSave)
                 return;
-            
-            storageSaveData.storageItems.Clear();
-            foreach (StorageId key in storageItems.Keys)
+
+            hostStorageSaveData.storageItems.Clear();
+            foreach (StorageId storageId in storageItems.Keys)
             {
-                foreach (CharacterItem item in storageItems[key])
+                if (storageId.storageType == StorageType.Player &&
+                    !storageId.storageOwnerId.Equals(hostPlayerCharacterData.Id))
                 {
-                    storageSaveData.storageItems.Add(new StorageCharacterItem()
+                    // Non-host player's storage will be saved in `SavePlayerStorage` function
+                    continue;
+                }
+                foreach (CharacterItem storageItem in storageItems[storageId])
+                {
+                    hostStorageSaveData.storageItems.Add(new StorageCharacterItem()
                     {
-                        storageType = key.storageType,
-                        storageOwnerId = key.storageOwnerId,
-                        characterItem = item,
+                        storageType = storageId.storageType,
+                        storageOwnerId = storageId.storageOwnerId,
+                        characterItem = storageItem,
                     });
                 }
             }
-            storageSaveData.SavePersistentData(hostPlayerCharacterData.Id);
+            hostStorageSaveData.SavePersistentData(hostPlayerCharacterData.Id);
+        }
+
+        public override void SavePlayerStorage(IPlayerCharacterData playerCharacterData, List<CharacterItem> storageItems)
+        {
+            for (int i = playerStorageSaveData.storageItems.Count - 1; i >= 0; --i)
+            {
+                if (playerStorageSaveData.storageItems[i].storageType == StorageType.Player &&
+                    playerStorageSaveData.storageItems[i].storageOwnerId.Equals(playerCharacterData.Id))
+                    playerStorageSaveData.storageItems.RemoveAt(i);
+            }
+            foreach (CharacterItem storageItem in storageItems)
+            {
+                playerStorageSaveData.storageItems.Add(new StorageCharacterItem()
+                {
+                    storageType = StorageType.Player,
+                    storageOwnerId = playerCharacterData.Id,
+                    characterItem = storageItem,
+                });
+            }
+            playerStorageSaveData.SavePersistentData(playerCharacterData.Id);
         }
 
         public override void SaveWorld(IPlayerCharacterData hostPlayerCharacterData, IEnumerable<IBuildingSaveData> buildings)

@@ -26,6 +26,7 @@ namespace MultiplayerARPG
         public float autoSaveDuration = 2f;
         public GameStartType startType;
         public PlayerCharacterData selectedCharacter;
+        public List<CharacterItem> selectedCharacterStorageItems;
         public EnableGmCommandType enableGmCommands;
         private float lastSaveTime;
         private Vector3? teleportPosition;
@@ -115,6 +116,31 @@ namespace MultiplayerARPG
             SaveSystem.OnServerStart();
         }
 
+        public override void OnClientConnected()
+        {
+            base.OnClientConnected();
+            ClientStorageActions.onNotifyStorageItemsUpdated += NotifyStorageItemsUpdated;
+        }
+
+        public override void OnStopHost()
+        {
+            base.OnStopHost();
+            // Stop both client and server
+            CacheDiscovery.StopClient();
+            CacheDiscovery.StopServer();
+        }
+
+        public override void OnClientDisconnected(DisconnectInfo disconnectInfo)
+        {
+            base.OnClientDisconnected(disconnectInfo);
+            ClientStorageActions.onNotifyStorageItemsUpdated -= NotifyStorageItemsUpdated;
+        }
+
+        private void NotifyStorageItemsUpdated(List<CharacterItem> storageItems)
+        {
+            selectedCharacterStorageItems = storageItems;
+        }
+
         protected override void HandleServerSceneChange(MessageHandlerData messageHandler)
         {
             BasePlayerCharacterEntity owningCharacter = GameInstance.PlayingCharacterEntity;
@@ -129,14 +155,6 @@ namespace MultiplayerARPG
         protected override async UniTask PreSpawnEntities()
         {
             await SaveSystem.PreSpawnEntities(selectedCharacter, ServerStorageHandlers.GetAllStorageItems());
-        }
-
-        public override void OnStopHost()
-        {
-            base.OnStopHost();
-            // Stop both client and server
-            CacheDiscovery.StopClient();
-            CacheDiscovery.StopServer();
         }
 
         protected override void FixedUpdate()
@@ -154,6 +172,10 @@ namespace MultiplayerARPG
                     {
                         SaveSystem.SaveWorld(owningCharacter, ServerBuildingHandlers.GetBuildings());
                         SaveSystem.SaveStorage(owningCharacter, ServerStorageHandlers.GetAllStorageItems());
+                    }
+                    else
+                    {
+                        SaveSystem.SavePlayerStorage(owningCharacter, selectedCharacterStorageItems);
                     }
                 }
                 Profiler.EndSample();
@@ -185,24 +207,27 @@ namespace MultiplayerARPG
         {
             GameInstance.SelectedCharacterId = selectedCharacter.Id;
             GameInstance.PlayingCharacter = selectedCharacter;
+            selectedCharacterStorageItems = SaveSystem.LoadPlayerStorage(selectedCharacter);
             selectedCharacter.SerializeCharacterData(writer);
+            writer.PutList(selectedCharacterStorageItems);
         }
 
         public override async UniTask<bool> DeserializeClientReadyData(LiteNetLibIdentity playerIdentity, long connectionId, NetDataReader reader)
         {
             await UniTask.Yield();
-
+            PlayerCharacterData playerCharacterData = new PlayerCharacterData().DeserializeCharacterData(reader);
+            List<CharacterItem> playerStorageItems = reader.GetList<CharacterItem>();
+            ServerStorageHandlers.SetStorageItems(new StorageId(StorageType.Player, playerCharacterData.Id), playerStorageItems);
             if (!isReadyToInstantiatePlayers)
             {
                 // Not ready to instantiate objects, add spawning player character to pending dictionary
                 if (LogDev) Logging.Log("[LanRpgNetworkManager] Not ready to deserializing client ready extra");
                 if (!pendingSpawnPlayerCharacters.ContainsKey(connectionId))
-                    pendingSpawnPlayerCharacters.Add(connectionId, new PlayerCharacterData().DeserializeCharacterData(reader));
+                    pendingSpawnPlayerCharacters.Add(connectionId, playerCharacterData);
                 return false;
             }
-
             if (LogDev) Logging.Log("[LanRpgNetworkManager] Deserializing client ready extra");
-            SpawnPlayerCharacter(connectionId, new PlayerCharacterData().DeserializeCharacterData(reader));
+            SpawnPlayerCharacter(connectionId, playerCharacterData);
             return true;
         }
 
