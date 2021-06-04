@@ -63,8 +63,6 @@ namespace MultiplayerARPG
         string RespawnMapName { get; set; }
         Vector3 RespawnPosition { get; set; }
         int MountDataId { get; set; }
-        int CompanionDataId { get; set; }
-        float CompanionLockRemainsDuration { get; set; }
         int LastDeadTime { get; set; }
         int LastUpdate { get; set; }
         IList<CharacterHotkey> Hotkeys { get; set; }

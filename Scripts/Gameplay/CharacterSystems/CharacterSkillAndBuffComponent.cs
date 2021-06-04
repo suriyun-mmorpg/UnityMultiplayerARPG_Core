@@ -36,13 +36,6 @@ namespace MultiplayerARPG
             updatingTime += deltaTime;
             if (updatingTime >= SKILL_BUFF_UPDATE_DURATION)
             {
-                // Decrease companion lock duration
-                if (isPlayerCharacterEntity && playerCharacterEnity.CompanionLockRemainsDuration > 0f)
-                {
-                    playerCharacterEnity.CompanionLockRemainsDuration -= updatingTime;
-                    if (playerCharacterEnity.CompanionLockRemainsDuration < 0f)
-                        playerCharacterEnity.CompanionLockRemainsDuration = 0f;
-                }
                 // Removing summons if it should
                 int count = Entity.Summons.Count;
                 CharacterSummon summon;
@@ -56,7 +49,7 @@ namespace MultiplayerARPG
                     }
                     else
                     {
-                        summon.Update(Entity, updatingTime);
+                        summon.Update(updatingTime);
                         Entity.Summons[i] = summon;
                     }
                 }

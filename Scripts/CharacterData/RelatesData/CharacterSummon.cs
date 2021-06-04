@@ -10,7 +10,7 @@ namespace MultiplayerARPG
         None,
         Skill,
         PetItem,
-        Companion
+        Custom = byte.MaxValue
     }
 
     [System.Serializable]
@@ -40,8 +40,6 @@ namespace MultiplayerARPG
         private BaseSkill cacheSkill;
         [System.NonSerialized]
         private BaseItem cachePetItem;
-        [System.NonSerialized]
-        private Companion cacheCompanion;
         [System.NonSerialized]
         private BaseMonsterCharacterEntity cachePrefab;
         [System.NonSerialized]
@@ -100,10 +98,6 @@ namespace MultiplayerARPG
                         if (GameInstance.Items.TryGetValue(dataId, out cachePetItem) && cachePetItem is IPetItem)
                             cachePrefab = (cachePetItem as IPetItem).PetEntity;
                         break;
-                    case SummonType.Companion:
-                        if (GameInstance.Companions.TryGetValue(dataId, out cacheCompanion))
-                            cachePrefab = cacheCompanion.CompanionEntity;
-                        break;
                 }
                 if (cachePrefab != null && cachePrefab.CharacterDatabase != null)
                 {
@@ -159,15 +153,6 @@ namespace MultiplayerARPG
                         GameInstance.Singleton.petUnSummonLockDuration);
                     summoner.AddOrSetNonEquipItems(newItem);
                     break;
-                case SummonType.Companion:
-                    // Update companion data
-                    if (summoner is BasePlayerCharacterEntity)
-                    {
-                        (summoner as BasePlayerCharacterEntity).UnSummonCompanion(Level, Exp, CurrentHp <= 0 ?
-                            GameInstance.Singleton.companionDeadLockDuration :
-                            GameInstance.Singleton.companionUnSummonLockDuration);
-                    }
-                    break;
             }
 
             if (CacheEntity)
@@ -184,12 +169,6 @@ namespace MultiplayerARPG
         {
             MakeCache();
             return cachePetItem;
-        }
-
-        public Companion GetCompanion()
-        {
-            MakeCache();
-            return cacheCompanion;
         }
 
         public BaseMonsterCharacterEntity GetPrefab()
@@ -245,20 +224,13 @@ namespace MultiplayerARPG
             return (CacheEntity && CacheEntity.CurrentHp <= 0) || (type == SummonType.Skill && summonRemainsDuration <= 0f);
         }
 
-        public void Update(BaseCharacterEntity entity, float deltaTime)
+        public void Update(float deltaTime)
         {
             switch (type)
             {
                 case SummonType.Skill:
                     // Update remains duration when it reached 0 it will be unsummoned
                     summonRemainsDuration -= deltaTime;
-                    break;
-                case SummonType.Companion:
-                    // Update companion data
-                    if (entity is BasePlayerCharacterEntity)
-                    {
-                        (entity as BasePlayerCharacterEntity).UpdateCompanion(Level, Exp);
-                    }
                     break;
             }
             // Makes update in main thread to collects data to use in other threads (save to database thread)

@@ -182,7 +182,7 @@ namespace MultiplayerARPG
 
             CharacterSummon summon = Summons[index];
             if (summon.type != SummonType.PetItem &&
-                summon.type != SummonType.Companion)
+                summon.type != SummonType.Custom)
                 return;
 
             Summons.RemoveAt(index);

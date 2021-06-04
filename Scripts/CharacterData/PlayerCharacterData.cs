@@ -28,8 +28,6 @@ namespace MultiplayerARPG
         public string RespawnMapName { get; set; }
         public Vector3 RespawnPosition { get; set; }
         public int MountDataId { get; set; }
-        public int CompanionDataId { get; set; }
-        public float CompanionLockRemainsDuration { get; set; }
         public int LastDeadTime { get; set; }
         public int LastUpdate { get; set; }
 

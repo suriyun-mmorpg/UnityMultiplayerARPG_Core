@@ -27,7 +27,6 @@ namespace MultiplayerARPG
         [Header("Events")]
         public UnityEvent onTypeIsSkill;
         public UnityEvent onTypeIsPet;
-        public UnityEvent onTypeIsCompanion;
         public UnityEvent onStackEntriesEmpty;
         public UnityEvent onStackEntriesNotEmpty;
 
@@ -86,9 +85,6 @@ namespace MultiplayerARPG
                 case SummonType.PetItem:
                     onTypeIsPet.Invoke();
                     tempSummonData = Data.GetPetItem();
-                    break;
-                case SummonType.Companion:
-                    onTypeIsCompanion.Invoke();
                     break;
             }
 
@@ -164,7 +160,7 @@ namespace MultiplayerARPG
         public void OnClickUnSummon()
         {
             if (CharacterSummon.type == SummonType.PetItem ||
-                CharacterSummon.type == SummonType.Companion)
+                CharacterSummon.type == SummonType.Custom)
                 GameInstance.PlayingCharacterEntity.CallServerUnSummon(CharacterSummon.objectId);
         }
     }

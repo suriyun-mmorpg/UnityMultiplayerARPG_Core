@@ -34,10 +34,6 @@ namespace MultiplayerARPG
             respawnPosition.syncMode = LiteNetLibSyncField.SyncMode.ServerToOwnerClient;
             isWarping.deliveryMethod = DeliveryMethod.Unreliable;
             isWarping.syncMode = LiteNetLibSyncField.SyncMode.ServerToOwnerClient;
-            companionDataId.deliveryMethod = DeliveryMethod.ReliableOrdered;
-            companionDataId.syncMode = LiteNetLibSyncField.SyncMode.ServerToOwnerClient;
-            companionLockRemainsDuration.deliveryMethod = DeliveryMethod.Sequenced;
-            companionLockRemainsDuration.syncMode = LiteNetLibSyncField.SyncMode.ServerToOwnerClient;
             lastDeadTime.deliveryMethod = DeliveryMethod.Sequenced;
             lastDeadTime.syncMode = LiteNetLibSyncField.SyncMode.ServerToOwnerClient;
             pitch.deliveryMethod = DeliveryMethod.Sequenced;

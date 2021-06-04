@@ -104,8 +104,5 @@
         public const ushort GetFriendRequests = 175;
         public const ushort GetGuildRequests = 176;
         public const ushort FindGuilds = 177;
-        // 1.66
-        public const ushort GetCompanions = 178;
-        public const ushort SelectCompanion = 179;
     }
 }
