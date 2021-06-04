@@ -59,6 +59,10 @@ namespace MultiplayerARPG
         public UILocaleKeySetting formatKeyMount = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_ITEM_MOUNT);
         [Tooltip("Format => {0} = {Skill Title}")]
         public UILocaleKeySetting formatKeySkill = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_ITEM_SKILL);
+        [Tooltip("Format => {0} = {Cooldown Duration}")]
+        public UILocaleKeySetting formatKeyCoolDownDuration = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_SKILL_COOLDOWN_DURATION);
+        [Tooltip("Format => {0} = {Cooldown Remains Duration}")]
+        public UILocaleKeySetting formatKeyCoolDownRemainsDuration = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_SIMPLE);
         [Tooltip("Format => {0} = {Item Type Title}")]
         public UILocaleKeySetting formatKeyItemType = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_ITEM_TYPE);
 
@@ -77,7 +81,11 @@ namespace MultiplayerARPG
         public TextWrapper uiTextWeight;
         public TextWrapper uiTextExp;
         public UIGageValue uiGageExp;
+
+        [Header("Item Locking")]
         public TextWrapper uiTextLockRemainsDuration;
+        public GameObject[] lockObjects;
+        public GameObject[] noLockObjects;
 
         [Header("Equipment - UI Elements")]
         public UIEquipmentItemRequirement uiRequirement;
@@ -126,6 +134,11 @@ namespace MultiplayerARPG
 
         [Header("Skill - UI Elements")]
         public TextWrapper uiTextSkill;
+        public TextWrapper uiTextCoolDownDuration;
+        public TextWrapper uiTextCoolDownRemainsDuration;
+        public Image imageCoolDownGage;
+        public GameObject[] countDownObjects;
+        public GameObject[] noCountDownObjects;
 
         [Header("Events")]
         public UnityEvent onSetLevelZeroData = new UnityEvent();
@@ -164,14 +177,17 @@ namespace MultiplayerARPG
         public bool dontAppendRefineLevelToTitle;
         public bool dontShowComparingEquipments;
 
-        private bool isSellItemDialogAppeared;
-        private bool isRefineItemDialogAppeared;
-        private bool isDismantleItemDialogAppeared;
-        private bool isRepairItemDialogAppeared;
-        private bool isEnhanceSocketItemDialogAppeared;
-        private bool isStorageDialogAppeared;
-        private bool isDealingStateEntered;
-        private float lockRemainsDuration;
+        protected bool isSellItemDialogAppeared;
+        protected bool isRefineItemDialogAppeared;
+        protected bool isDismantleItemDialogAppeared;
+        protected bool isRepairItemDialogAppeared;
+        protected bool isEnhanceSocketItemDialogAppeared;
+        protected bool isStorageDialogAppeared;
+        protected bool isDealingStateEntered;
+        protected float lockRemainsDuration;
+        protected bool dirtyIsLock;
+        protected float coolDownRemainsDuration;
+        protected bool dirtyIsCountDown;
 
         public bool IsSetupAsEquipSlot { get; private set; }
         public string EquipPosition { get; private set; }
@@ -194,6 +210,18 @@ namespace MultiplayerARPG
         {
             base.Update();
 
+            float deltaTime = Time.deltaTime;
+            UpdateLockRemainsDuration(deltaTime);
+
+            ISkillItem skillItem = SkillItem;
+            if (skillItem != null)
+            {
+                UpdateSkillCoolDownRemainsDuration(skillItem.UsingSkill, deltaTime);
+            }
+        }
+
+        private void UpdateLockRemainsDuration(float deltaTime)
+        {
             if (lockRemainsDuration <= 0f)
             {
                 lockRemainsDuration = CharacterItem != null ? CharacterItem.lockRemainsDuration : 0f;
@@ -203,12 +231,14 @@ namespace MultiplayerARPG
 
             if (lockRemainsDuration > 0f)
             {
-                lockRemainsDuration -= Time.deltaTime;
+                lockRemainsDuration -= deltaTime;
                 if (lockRemainsDuration <= 0f)
                     lockRemainsDuration = 0f;
             }
             else
+            {
                 lockRemainsDuration = 0f;
+            }
 
             if (uiTextLockRemainsDuration != null)
             {
@@ -216,6 +246,98 @@ namespace MultiplayerARPG
                 uiTextLockRemainsDuration.text = string.Format(
                     LanguageManager.GetText(formatKeyLockRemainsDuration),
                     lockRemainsDuration.ToString("N0"));
+            }
+
+            bool isLock = lockRemainsDuration > 0f;
+            if (dirtyIsLock != isLock)
+            {
+                dirtyIsLock = isLock;
+                if (lockObjects != null)
+                {
+                    foreach (GameObject obj in lockObjects)
+                    {
+                        obj.SetActive(isLock);
+                    }
+                }
+                if (noLockObjects != null)
+                {
+                    foreach (GameObject obj in noLockObjects)
+                    {
+                        obj.SetActive(!isLock);
+                    }
+                }
+            }
+        }
+
+        private void UpdateSkillCoolDownRemainsDuration(BaseSkill skill, float deltaTime)
+        {
+            if (coolDownRemainsDuration <= 0f)
+            {
+                if (Character != null && skill != null)
+                {
+                    int indexOfSkillUsage = Character.IndexOfSkillUsage(skill.DataId, SkillUsageType.Skill);
+                    if (indexOfSkillUsage >= 0)
+                    {
+                        coolDownRemainsDuration = Character.SkillUsages[indexOfSkillUsage].coolDownRemainsDuration;
+                        if (coolDownRemainsDuration <= 1f)
+                            coolDownRemainsDuration = 0f;
+                    }
+                }
+            }
+
+            if (coolDownRemainsDuration > 0f)
+            {
+                coolDownRemainsDuration -= deltaTime;
+                if (coolDownRemainsDuration <= 0f)
+                    coolDownRemainsDuration = 0f;
+            }
+            else
+            {
+                coolDownRemainsDuration = 0f;
+            }
+
+            // Update UIs
+            float coolDownDuration = skill.GetCoolDownDuration(Level);
+
+            if (uiTextCoolDownDuration != null)
+            {
+                uiTextCoolDownDuration.SetGameObjectActive(skill.IsActive() && coolDownDuration > 0f);
+                uiTextCoolDownDuration.text = string.Format(
+                    LanguageManager.GetText(formatKeyCoolDownDuration),
+                    coolDownDuration.ToString("N0"));
+            }
+
+            if (uiTextCoolDownRemainsDuration != null)
+            {
+                uiTextCoolDownRemainsDuration.SetGameObjectActive(skill.IsActive() && coolDownRemainsDuration > 0);
+                uiTextCoolDownRemainsDuration.text = string.Format(
+                    LanguageManager.GetText(formatKeyCoolDownRemainsDuration),
+                    coolDownRemainsDuration.ToString("N0"));
+            }
+
+            if (imageCoolDownGage != null)
+            {
+                imageCoolDownGage.fillAmount = coolDownDuration <= 0 ? 0 : coolDownRemainsDuration / coolDownDuration;
+            }
+
+            bool isCountDown = coolDownRemainsDuration > 0f;
+            if (dirtyIsCountDown != isCountDown)
+            {
+                dirtyIsCountDown = isCountDown;
+                if (countDownObjects != null)
+                {
+                    foreach (GameObject obj in countDownObjects)
+                    {
+                        obj.SetActive(isCountDown);
+                    }
+                }
+                if (noCountDownObjects != null)
+                {
+                    foreach (GameObject obj in noCountDownObjects)
+                    {
+                        obj.SetActive(!isCountDown);
+                    }
+                }
             }
         }
 
