@@ -106,7 +106,10 @@ namespace MultiplayerARPG
                     break;
             }
             tempRotation = tempRotation * Quaternion.Euler(rotateOffset);
-            pitchRotation = Quaternion.Lerp(pitchRotation, tempRotation, lerpDamping * Time.deltaTime);
+            if (lerpDamping > 0f)
+                pitchRotation = Quaternion.Lerp(pitchRotation, tempRotation, lerpDamping * Time.deltaTime);
+            else
+                pitchRotation = tempRotation;
         }
 
         private void OnAnimatorIK(int layerIndex)
