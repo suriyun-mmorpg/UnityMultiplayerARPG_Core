@@ -4,7 +4,7 @@ namespace MultiplayerARPG
 {
     public static class DamageInfoExtensions
     {
-        public static void GetDamagePositionAndRotation(this IDamageInfo damageInfo, BaseCharacterEntity attacker, bool isLeftHand, bool forEffect, AimPosition aimPosition, Vector3 stagger, out Vector3 position, out Vector3 direction, out Quaternion rotation)
+        public static void GetDamagePositionAndRotation(this IDamageInfo damageInfo, BaseCharacterEntity attacker, bool isLeftHand, AimPosition aimPosition, Vector3 stagger, out Vector3 position, out Vector3 direction, out Quaternion rotation)
         {
             if (aimPosition.type == AimPositionType.Direction)
             {
@@ -15,7 +15,7 @@ namespace MultiplayerARPG
             else
             {
                 // NOTE: Allow aim position type `None` here, may change it later
-                Transform damageTransform = forEffect ? damageInfo.GetDamageEffectTransform(attacker, isLeftHand) : damageInfo.GetDamageTransform(attacker, isLeftHand);
+                Transform damageTransform = damageInfo.GetDamageTransform(attacker, isLeftHand);
                 position = damageTransform.position;
                 if (GameInstance.Singleton.DimensionType == DimensionType.Dimension2D)
                 {

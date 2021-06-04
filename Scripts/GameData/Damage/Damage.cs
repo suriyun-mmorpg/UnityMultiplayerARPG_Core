@@ -89,25 +89,6 @@ namespace MultiplayerARPG
 
         public Transform GetDamageTransform(BaseCharacterEntity attacker, bool isLeftHand)
         {
-            switch (damageType)
-            {
-                case DamageType.Melee:
-                    // Use melee damage transform for distance calculation
-                    return attacker.MeleeDamageTransform;
-                case DamageType.Missile:
-                case DamageType.Raycast:
-                case DamageType.Throwable:
-                    // Always use missile transform for distance calculation
-                    // custom transforms (set via `EquipmentEntity`) will be used for muzzle effects and fake shot effects only
-                    return attacker.MissileDamageTransform;
-                case DamageType.Custom:
-                    return customDamageInfo.GetDamageTransform(attacker, isLeftHand);
-            }
-            return attacker.MeleeDamageTransform;
-        }
-
-        public Transform GetDamageEffectTransform(BaseCharacterEntity attacker, bool isLeftHand)
-        {
             Transform transform = null;
             switch (damageType)
             {
@@ -138,7 +119,7 @@ namespace MultiplayerARPG
                     }
                     break;
                 case DamageType.Custom:
-                    transform = customDamageInfo.GetDamageEffectTransform(attacker, isLeftHand);
+                    transform = customDamageInfo.GetDamageTransform(attacker, isLeftHand);
                     break;
             }
             return transform;
@@ -218,13 +199,7 @@ namespace MultiplayerARPG
             Vector3 damagePosition;
             Vector3 damageDirection;
             Quaternion damageRotation;
-            this.GetDamagePositionAndRotation(attacker, isLeftHand, false, aimPosition, stagger, out damagePosition, out damageDirection, out damageRotation);
-
-            // Damage effect transform data
-            Vector3 damageEffectPosition;
-            Vector3 damageEffectDirection;
-            Quaternion damageEffectRotation;
-            this.GetDamagePositionAndRotation(attacker, isLeftHand, true, aimPosition, stagger, out damageEffectPosition, out damageEffectDirection, out damageEffectRotation);
+            this.GetDamagePositionAndRotation(attacker, isLeftHand, aimPosition, stagger, out damagePosition, out damageDirection, out damageRotation);
 #if UNITY_EDITOR
             attacker.SetDebugDamage(damagePosition, damageDirection, damageRotation);
 #endif
@@ -405,7 +380,7 @@ namespace MultiplayerARPG
                             if (!attacker.TryGetTargetEntity(out tempDamageableHitBox))
                                 tempDamageableHitBox = null;
                         }
-                        PoolSystem.GetInstance(missileDamageEntity, damageEffectPosition, damageEffectRotation)
+                        PoolSystem.GetInstance(missileDamageEntity, damagePosition, damageRotation)
                             .Setup(instigator, weapon, damageAmounts, skill, skillLevel, missileDistance, missileSpeed, tempDamageableHitBox);
                     }
                     break;
@@ -491,14 +466,14 @@ namespace MultiplayerARPG
                     // Spawn projectile effect, it will move to target but it won't apply damage because it is just effect
                     if (isClient && projectileEffect != null)
                     {
-                        PoolSystem.GetInstance(projectileEffect, damageEffectPosition, damageEffectRotation)
+                        PoolSystem.GetInstance(projectileEffect, damagePosition, damageRotation)
                             .Setup(minDistance, missileSpeed);
                     }
                     break;
                 case DamageType.Throwable:
                     if (throwableDamageEntity != null)
                     {
-                        PoolSystem.GetInstance(throwableDamageEntity, damageEffectPosition, damageEffectRotation)
+                        PoolSystem.GetInstance(throwableDamageEntity, damagePosition, damageRotation)
                             .Setup(instigator, weapon, damageAmounts, skill, skillLevel, throwForce, throwableLifeTime);
                     }
                     break;
