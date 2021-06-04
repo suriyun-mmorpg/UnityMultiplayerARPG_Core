@@ -36,6 +36,11 @@ namespace MultiplayerARPG
         protected bool isLeftHandAttacking;
         protected float lastSetDestinationTime;
 
+        public bool IsAggressiveWhileSummonerIdle()
+        {
+            return (isAggressiveWhileSummonerIdle || Entity.Characteristic == MonsterCharacteristic.Aggressive) && Entity.Characteristic != MonsterCharacteristic.NoHarm;
+        }
+
         public override void EntityUpdate()
         {
             if (!Entity.IsServer || Entity.Identity.CountSubscribers() == 0 || CharacterDatabase == null)
@@ -71,7 +76,7 @@ namespace MultiplayerARPG
                     {
                         // Follow summoner
                         FollowSummoner();
-                        startedAggressive = isAggressiveWhileSummonerIdle;
+                        startedAggressive = IsAggressiveWhileSummonerIdle();
                     }
                     else
                     {
@@ -81,7 +86,7 @@ namespace MultiplayerARPG
                         {
                             randomedWanderElasped = 0f;
                             RandomWanderDestination();
-                            startedAggressive = isAggressiveWhileSummonerIdle;
+                            startedAggressive = IsAggressiveWhileSummonerIdle();
                         }
                     }
                     startedFollowEnemy = false;
@@ -310,7 +315,7 @@ namespace MultiplayerARPG
                     CharacterDatabase.VisualRange,
                     false, /* Don't find an allies */
                     true,  /* Always find an enemies */
-                    Entity.IsSummoned && isAggressiveWhileSummonerIdle /* Find enemy while summoned and aggresively */);
+                    Entity.IsSummoned && IsAggressiveWhileSummonerIdle() /* Find enemy while summoned and aggresively */);
                 foreach (BaseCharacterEntity characterEntity in characterEntities)
                 {
                     // Attack target settings
