@@ -6,12 +6,22 @@ namespace MultiplayerARPG
 {
     public class CharacterSkillAndBuffComponent : BaseGameEntityComponent<BaseCharacterEntity>
     {
-        public const float SKILL_BUFF_UPDATE_DURATION = 0.5f;
+        public const float SKILL_BUFF_UPDATE_DURATION = 1f;
 
         private float updatingTime;
         private float deltaTime;
         private CharacterRecoveryData nonApplierRecoveryBuff;
         private readonly Dictionary<string, CharacterRecoveryData> recoveryBuffs = new Dictionary<string, CharacterRecoveryData>();
+        private bool isPlayerCharacterEntity;
+        private BasePlayerCharacterEntity playerCharacterEnity;
+
+        public override void EntityAwake()
+        {
+            base.EntityAwake();
+            isPlayerCharacterEntity = Entity is BasePlayerCharacterEntity;
+            if (isPlayerCharacterEntity)
+                playerCharacterEnity = Entity as BasePlayerCharacterEntity;
+        }
 
         public override sealed void EntityUpdate()
         {
@@ -26,6 +36,13 @@ namespace MultiplayerARPG
             updatingTime += deltaTime;
             if (updatingTime >= SKILL_BUFF_UPDATE_DURATION)
             {
+                // Decrease companion lock duration
+                if (isPlayerCharacterEntity && playerCharacterEnity.CompanionLockRemainsDuration > 0f)
+                {
+                    playerCharacterEnity.CompanionLockRemainsDuration -= updatingTime;
+                    if (playerCharacterEnity.CompanionLockRemainsDuration < 0f)
+                        playerCharacterEnity.CompanionLockRemainsDuration = 0f;
+                }
                 // Removing summons if it should
                 int count = Entity.Summons.Count;
                 CharacterSummon summon;
@@ -50,7 +67,9 @@ namespace MultiplayerARPG
                 {
                     skillUsage = Entity.SkillUsages[i];
                     if (skillUsage.ShouldRemove())
+                    {
                         Entity.SkillUsages.RemoveAt(i);
+                    }
                     else
                     {
                         skillUsage.Update(updatingTime);
@@ -66,7 +85,9 @@ namespace MultiplayerARPG
                     buff = Entity.Buffs[i];
                     duration = buff.GetDuration();
                     if (buff.ShouldRemove())
+                    {
                         Entity.Buffs.RemoveAt(i);
+                    }
                     else
                     {
                         buff.Update(updatingTime);

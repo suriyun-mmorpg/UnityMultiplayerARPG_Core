@@ -1,6 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 using LiteNetLib;
 using LiteNetLibManager;
 
@@ -30,12 +28,18 @@ namespace MultiplayerARPG
             partyId.syncMode = LiteNetLibSyncField.SyncMode.ServerToClients;
             guildId.deliveryMethod = DeliveryMethod.ReliableOrdered;
             guildId.syncMode = LiteNetLibSyncField.SyncMode.ServerToClients;
-            isWarping.deliveryMethod = DeliveryMethod.ReliableOrdered;
-            isWarping.syncMode = LiteNetLibSyncField.SyncMode.ServerToOwnerClient;
             respawnMapName.deliveryMethod = DeliveryMethod.ReliableOrdered;
-            respawnMapName.syncMode = LiteNetLibSyncField.SyncMode.ServerToClients;
+            respawnMapName.syncMode = LiteNetLibSyncField.SyncMode.ServerToOwnerClient;
             respawnPosition.deliveryMethod = DeliveryMethod.ReliableOrdered;
-            respawnPosition.syncMode = LiteNetLibSyncField.SyncMode.ServerToClients;
+            respawnPosition.syncMode = LiteNetLibSyncField.SyncMode.ServerToOwnerClient;
+            isWarping.deliveryMethod = DeliveryMethod.Unreliable;
+            isWarping.syncMode = LiteNetLibSyncField.SyncMode.ServerToOwnerClient;
+            companionDataId.deliveryMethod = DeliveryMethod.ReliableOrdered;
+            companionDataId.syncMode = LiteNetLibSyncField.SyncMode.ServerToOwnerClient;
+            companionLockRemainsDuration.deliveryMethod = DeliveryMethod.Sequenced;
+            companionLockRemainsDuration.syncMode = LiteNetLibSyncField.SyncMode.ServerToOwnerClient;
+            lastDeadTime.deliveryMethod = DeliveryMethod.Sequenced;
+            lastDeadTime.syncMode = LiteNetLibSyncField.SyncMode.ServerToOwnerClient;
             pitch.deliveryMethod = DeliveryMethod.Sequenced;
             pitch.syncMode = LiteNetLibSyncField.SyncMode.ClientMulticast;
             targetEntityId.deliveryMethod = DeliveryMethod.ReliableOrdered;

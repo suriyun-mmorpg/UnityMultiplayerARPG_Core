@@ -32,6 +32,10 @@ namespace MultiplayerARPG
         [SerializeField]
         protected SyncFieldVector3 respawnPosition = new SyncFieldVector3();
         [SerializeField]
+        protected SyncFieldInt companionDataId = new SyncFieldInt();
+        [SerializeField]
+        protected SyncFieldFloat companionLockRemainsDuration = new SyncFieldFloat();
+        [SerializeField]
         protected SyncFieldInt lastDeadTime = new SyncFieldInt();
         [SerializeField]
         protected SyncFieldBool isWarping = new SyncFieldBool();
@@ -157,7 +161,8 @@ namespace MultiplayerARPG
             }
             set { }
         }
-        public int CompanionDataId { get; set; }
+        public int CompanionDataId { get { return companionDataId.Value; } set { companionDataId.Value = value; } }
+        public float CompanionLockRemainsDuration { get { return companionLockRemainsDuration.Value; } set { companionLockRemainsDuration.Value = value; } }
         public int LastDeadTime { get { return lastDeadTime.Value; } set { lastDeadTime.Value = value; } }
         public int LastUpdate { get; set; }
 
