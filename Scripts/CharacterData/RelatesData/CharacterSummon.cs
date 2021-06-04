@@ -98,6 +98,9 @@ namespace MultiplayerARPG
                         if (GameInstance.Items.TryGetValue(dataId, out cachePetItem) && cachePetItem is IPetItem)
                             cachePrefab = (cachePetItem as IPetItem).PetEntity;
                         break;
+                    case SummonType.Custom:
+                        cachePrefab = GameInstance.CustomSummonManager.GetPrefab(dataId);
+                        break;
                 }
                 if (cachePrefab != null && cachePrefab.CharacterDatabase != null)
                 {
@@ -152,6 +155,9 @@ namespace MultiplayerARPG
                         GameInstance.Singleton.petDeadLockDuration :
                         GameInstance.Singleton.petUnSummonLockDuration);
                     summoner.AddOrSetNonEquipItems(newItem);
+                    break;
+                case SummonType.Custom:
+                    GameInstance.CustomSummonManager.UnSummon(this);
                     break;
             }
 
