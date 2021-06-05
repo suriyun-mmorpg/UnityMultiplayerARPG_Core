@@ -8,7 +8,7 @@ namespace MultiplayerARPG
         public static bool IsGameEntityInDistance<T>(this IPhysicFunctions functions, T targetEntity, Vector3 position, float distance, bool includeUnHittable)
             where T : class, IGameEntity
         {
-            int tempOverlapSize = functions.OverlapObjects(position, distance, 1 << targetEntity.GetGameObject().layer);
+            int tempOverlapSize = functions.OverlapObjects(position, distance, 1 << targetEntity.GetGameObject().layer, queryTriggerInteraction: QueryTriggerInteraction.Collide);
             if (tempOverlapSize == 0)
                 return false;
             IGameEntity tempBaseEntity;
@@ -27,7 +27,7 @@ namespace MultiplayerARPG
             where T : class, IGameEntity
         {
             List<T> result = new List<T>();
-            int tempOverlapSize = functions.OverlapObjects(position, distance, layerMask);
+            int tempOverlapSize = functions.OverlapObjects(position, distance, layerMask, queryTriggerInteraction: QueryTriggerInteraction.Collide);
             if (tempOverlapSize == 0)
                 return result;
             IGameEntity tempBaseEntity;
