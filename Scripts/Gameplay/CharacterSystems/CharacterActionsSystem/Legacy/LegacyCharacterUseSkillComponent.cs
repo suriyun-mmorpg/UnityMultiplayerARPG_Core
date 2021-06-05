@@ -20,6 +20,9 @@ namespace MultiplayerARPG
         public float CastingSkillCountDown { get; protected set; }
         public float MoveSpeedRateWhileUsingSkill { get; protected set; }
 
+        protected int simulatingHitIndex = 0;
+        protected int simulatingTriggerLength = 0;
+
         public override void EntityUpdate()
         {
             // Update casting skill count down, will show gage at clients
@@ -240,6 +243,10 @@ namespace MultiplayerARPG
 
             // Get cast duration. Then if cast duration more than 0, it will play cast skill animation.
             CastingSkillDuration = CastingSkillCountDown = skill.GetCastDuration(skillLevel);
+
+            // Get simulate seed for simulation validating
+            int simulateSeed = Random.Range(int.MinValue, int.MaxValue);
+            simulatingHitIndex = 0;
             try
             {
                 // Play special effect
@@ -311,16 +318,15 @@ namespace MultiplayerARPG
                     // Apply skill buffs, summons and attack damages
                     if (IsServer)
                     {
-                        int randomSeed = Random.Range(0, 255);
-                        skill.ApplySkill(Entity, skillLevel, isLeftHand, weapon, hitIndex, damageAmounts, targetObjectId, aimPosition, randomSeed, null);
+                        int useSkillSeed = unchecked(simulateSeed + (hitIndex * 16));
+                        skill.ApplySkill(Entity, skillLevel, isLeftHand, weapon, hitIndex, damageAmounts, targetObjectId, aimPosition, useSkillSeed, null);
                         SimulateLaunchDamageEntityData simulateData = new SimulateLaunchDamageEntityData();
                         if (isLeftHand)
                             simulateData.state |= SimulateLaunchDamageEntityState.IsLeftHand;
                         simulateData.state |= SimulateLaunchDamageEntityState.IsSkill;
-                        simulateData.randomSeed = (byte)randomSeed;
+                        simulateData.randomSeed = simulateSeed;
                         simulateData.skillDataId = skill.DataId;
                         simulateData.skillLevel = skillLevel;
-                        simulateData.hitIndex = hitIndex;
                         simulateData.targetObjectId = targetObjectId;
                         simulateData.aimPosition = aimPosition;
                         CallAllSimulateLaunchDamageEntity(simulateData);
@@ -347,6 +353,8 @@ namespace MultiplayerARPG
             {
                 skillCancellationTokenSource.Dispose();
                 skillCancellationTokenSources.Remove(skillCancellationTokenSource);
+                // Clear simulate validating data
+                simulatingTriggerLength = 0;
             }
             // Clear action states at clients and server
             Entity.ClearActionStates();
@@ -442,7 +450,9 @@ namespace MultiplayerARPG
         {
             if (IsServer)
                 return;
-
+            if (simulatingHitIndex >= simulatingTriggerLength)
+                return;
+            simulatingHitIndex++;
             bool isLeftHand = data.state.HasFlag(SimulateLaunchDamageEntityState.IsLeftHand);
             if (data.state.HasFlag(SimulateLaunchDamageEntityState.IsSkill))
             {
@@ -451,7 +461,8 @@ namespace MultiplayerARPG
                 {
                     CharacterItem weapon = Entity.GetAvailableWeapon(ref isLeftHand);
                     Dictionary<DamageElement, MinMaxFloat> damageAmounts = skill.GetAttackDamages(Entity, data.skillLevel, isLeftHand);
-                    skill.ApplySkill(Entity, data.skillLevel, isLeftHand, weapon, data.hitIndex, damageAmounts, data.targetObjectId, data.aimPosition, data.randomSeed, null);
+                    int useSkillSeed = unchecked(data.randomSeed + (simulatingHitIndex * 16));
+                    skill.ApplySkill(Entity, data.skillLevel, isLeftHand, weapon, simulatingHitIndex, damageAmounts, data.targetObjectId, data.aimPosition, useSkillSeed, null);
                 }
             }
         }

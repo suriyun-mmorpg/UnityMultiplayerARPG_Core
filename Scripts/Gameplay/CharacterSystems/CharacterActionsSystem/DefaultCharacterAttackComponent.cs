@@ -14,6 +14,9 @@ namespace MultiplayerARPG
         public bool IsAttacking { get; protected set; }
         public float MoveSpeedRateWhileAttacking { get; protected set; }
 
+        protected int simulatingHitIndex = 0;
+        protected int simulatingTriggerLength = 0;
+
         protected virtual void SetAttackActionStates(AnimActionType animActionType, int animActionDataId)
         {
             Entity.ClearActionStates();
@@ -82,6 +85,10 @@ namespace MultiplayerARPG
 
             // Get play speed multiplier will use it to play animation faster or slower based on attack speed stats
             animSpeedRate *= Entity.GetAnimSpeedRate(Entity.AnimActionType);
+
+            // Get simulate seed for simulation validating
+            int simulateSeed = Random.Range(int.MinValue, int.MaxValue);
+            simulatingHitIndex = 0;
             try
             {
                 // Animations will plays on clients only
@@ -96,6 +103,7 @@ namespace MultiplayerARPG
 
                 float remainsDuration = totalDuration;
                 float tempTriggerDuration;
+                simulatingTriggerLength = triggerDurations.Length;
                 for (int hitIndex = 0; hitIndex < triggerDurations.Length; ++hitIndex)
                 {
                     // Play special effects after trigger duration
@@ -136,13 +144,13 @@ namespace MultiplayerARPG
                         // Apply attack damages
                         if (IsOwnerClientOrOwnedByServer)
                         {
-                            int randomSeed = Random.Range(0, 255);
                             long time = BaseGameNetworkManager.Singleton.ServerTimestamp;
-                            ApplyAttack(isLeftHand, weapon, damageInfo, damageAmounts, Entity.AimPosition, randomSeed, time);
+                            int attackSeed = unchecked(simulateSeed + (hitIndex * 16));
+                            ApplyAttack(isLeftHand, weapon, damageInfo, damageAmounts, Entity.AimPosition, attackSeed, time);
                             SimulateLaunchDamageEntityData simulateData = new SimulateLaunchDamageEntityData();
                             if (isLeftHand)
                                 simulateData.state |= SimulateLaunchDamageEntityState.IsLeftHand;
-                            simulateData.randomSeed = (byte)randomSeed;
+                            simulateData.randomSeed = simulateSeed;
                             simulateData.aimPosition = Entity.AimPosition;
                             simulateData.time = time;
                             CallAllSimulateLaunchDamageEntity(simulateData);
@@ -185,6 +193,8 @@ namespace MultiplayerARPG
             {
                 attackCancellationTokenSource.Dispose();
                 attackCancellationTokenSources.Remove(attackCancellationTokenSource);
+                // Clear simulate validating data
+                simulatingTriggerLength = 0;
             }
             // Clear action states at clients and server
             Entity.ClearActionStates();
@@ -245,14 +255,17 @@ namespace MultiplayerARPG
         {
             if (IsOwnerClientOrOwnedByServer)
                 return;
-
+            if (simulatingHitIndex >= simulatingTriggerLength)
+                return;
+            simulatingHitIndex++;
             bool isLeftHand = data.state.HasFlag(SimulateLaunchDamageEntityState.IsLeftHand);
             if (!data.state.HasFlag(SimulateLaunchDamageEntityState.IsSkill))
             {
                 CharacterItem weapon = Entity.GetAvailableWeapon(ref isLeftHand);
                 DamageInfo damageInfo = Entity.GetWeaponDamageInfo(weapon.GetWeaponItem());
                 Dictionary<DamageElement, MinMaxFloat> damageAmounts = Entity.GetWeaponDamagesWithBuffs(weapon);
-                ApplyAttack(isLeftHand, weapon, damageInfo, damageAmounts, data.aimPosition, data.randomSeed, data.time);
+                int attackSeed = unchecked(data.randomSeed + (simulatingHitIndex * 16));
+                ApplyAttack(isLeftHand, weapon, damageInfo, damageAmounts, data.aimPosition, attackSeed, data.time);
             }
         }
 

@@ -7,8 +7,7 @@ namespace MultiplayerARPG
         public SimulateLaunchDamageEntityState state;
         public int skillDataId;
         public short skillLevel;
-        public byte randomSeed;
-        public int hitIndex;
+        public int randomSeed;
         public uint targetObjectId;
         public AimPosition aimPosition;
         public long time;
@@ -16,12 +15,11 @@ namespace MultiplayerARPG
         public void Serialize(NetDataWriter writer)
         {
             writer.Put((byte)state);
-            writer.Put(randomSeed);
+            writer.PutPackedInt(randomSeed);
             if (state.HasFlag(SimulateLaunchDamageEntityState.IsSkill))
             {
                 writer.PutPackedInt(skillDataId);
                 writer.PutPackedShort(skillLevel);
-                writer.PutPackedInt(hitIndex);
                 writer.PutPackedUInt(targetObjectId);
             }
             writer.PutValue(aimPosition);
@@ -31,12 +29,11 @@ namespace MultiplayerARPG
         public void Deserialize(NetDataReader reader)
         {
             state = (SimulateLaunchDamageEntityState)reader.GetByte();
-            randomSeed = reader.GetByte();
+            randomSeed = reader.GetPackedInt();
             if (state.HasFlag(SimulateLaunchDamageEntityState.IsSkill))
             {
                 skillDataId = reader.GetPackedInt();
                 skillLevel = reader.GetPackedShort();
-                hitIndex = reader.GetPackedInt();
                 targetObjectId = reader.GetPackedUInt();
             }
             aimPosition = reader.GetValue<AimPosition>();
