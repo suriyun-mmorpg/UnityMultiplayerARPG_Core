@@ -741,7 +741,7 @@ namespace MultiplayerARPG
             Vector3 position = damageInfo.GetDamageTransform(this, isLeftHand).position;
             Vector3 direction = CacheTransform.forward;
             BaseGameEntity targetEntity = GetTargetEntity();
-            if (targetEntity)
+            if (targetEntity && targetEntity != Entity)
             {
                 if (targetEntity is DamageableEntity)
                 {
