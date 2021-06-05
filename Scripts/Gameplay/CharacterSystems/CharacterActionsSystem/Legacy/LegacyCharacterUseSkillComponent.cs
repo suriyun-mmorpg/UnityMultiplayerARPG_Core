@@ -245,7 +245,7 @@ namespace MultiplayerARPG
             CastingSkillDuration = CastingSkillCountDown = skill.GetCastDuration(skillLevel);
 
             // Get simulate seed for simulation validating
-            int simulateSeed = Random.Range(int.MinValue, int.MaxValue);
+            byte simulateSeed = (byte)Random.Range(byte.MinValue, byte.MaxValue);
             simulatingHitIndex = 0;
             try
             {
