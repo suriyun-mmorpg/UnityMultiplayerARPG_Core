@@ -14,6 +14,7 @@ namespace MultiplayerARPG
         // Error - Generic Error
         UI_ERROR_UNKNOW,
         UI_ERROR_SERVICE_NOT_AVAILABLE,
+        UI_ERROR_CONTENT_NOT_AVAILABLE,
         UI_ERROR_REQUEST_TIMEOUT,
         UI_ERROR_KICKED_FROM_SERVER,
         UI_ERROR_CONNECTION_FAILED,
@@ -1115,6 +1116,7 @@ namespace MultiplayerARPG
             Texts.Add(UIFormatKeys.UI_FORMAT_CRAFT_DURATION.ToString(), "Duration: {0}");
             // Error - Generic Error
             Texts.Add(UITextKeys.UI_ERROR_SERVICE_NOT_AVAILABLE.ToString(), "Service is not available");
+            Texts.Add(UITextKeys.UI_ERROR_CONTENT_NOT_AVAILABLE.ToString(), "Content is not available");
             Texts.Add(UITextKeys.UI_ERROR_REQUEST_TIMEOUT.ToString(), "Request timeout");
             Texts.Add(UITextKeys.UI_ERROR_KICKED_FROM_SERVER.ToString(), "You have been kicked from server");
             Texts.Add(UITextKeys.UI_ERROR_CONNECTION_FAILED.ToString(), "Cannot connect to the server");
