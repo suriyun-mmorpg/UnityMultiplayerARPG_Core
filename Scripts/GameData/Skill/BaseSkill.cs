@@ -661,6 +661,18 @@ namespace MultiplayerARPG
                 return false;
             }
 
+            if (!HasEnoughItems(character, out _, out _))
+            {
+                gameMessage = UITextKeys.UI_ERROR_NOT_ENOUGH_ITEMS;
+                return false;
+            }
+
+            if (!HasEnoughAmmos(character, isLeftHand, out _, out _))
+            {
+                gameMessage = UITextKeys.UI_ERROR_NO_AMMO;
+                return false;
+            }
+
             if (RequiredTarget())
             {
                 BaseCharacterEntity targetEntity;
@@ -674,18 +686,6 @@ namespace MultiplayerARPG
                     gameMessage = UITextKeys.UI_ERROR_CHARACTER_IS_TOO_FAR;
                     return false;
                 }
-            }
-
-            if (!HasEnoughItems(character, out _, out _))
-            {
-                gameMessage = UITextKeys.UI_ERROR_NOT_ENOUGH_ITEMS;
-                return false;
-            }
-
-            if (!HasEnoughAmmos(character, isLeftHand, out _, out _))
-            {
-                gameMessage = UITextKeys.UI_ERROR_NO_AMMO;
-                return false;
             }
 
             return true;
