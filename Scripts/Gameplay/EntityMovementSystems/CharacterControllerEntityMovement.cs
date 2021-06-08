@@ -510,16 +510,15 @@ namespace MultiplayerARPG
                     tempSqrMagnitude = (tempTargetPosition - tempCurrentPosition).sqrMagnitude;
                     tempPredictPosition = tempCurrentPosition + (Vector3.up * tempMoveDirection.y * tempCurrentMoveSpeed * deltaTime);
                     tempPredictSqrMagnitude = (tempPredictPosition - tempCurrentPosition).sqrMagnitude;
-                    if (HasNavPaths)
-                    {
-                        // Check `tempSqrMagnitude` against the `tempPredictSqrMagnitude`
-                        // if `tempPredictSqrMagnitude` is greater than `tempSqrMagnitude`,
-                        // rigidbody will reaching target and character is moving pass it,
-                        // so adjust move speed by distance and time (with physic formula: v=s/t)
-                        if (tempPredictSqrMagnitude >= tempSqrMagnitude)
-                            tempCurrentMoveSpeed *= tempTargetDistance / deltaTime / tempCurrentMoveSpeed;
-                    }
+                    // Check `tempSqrMagnitude` against the `tempPredictSqrMagnitude`
+                    // if `tempPredictSqrMagnitude` is greater than `tempSqrMagnitude`,
+                    // rigidbody will reaching target and character is moving pass it,
+                    // so adjust move speed by distance and time (with physic formula: v=s/t)
+                    if (tempPredictSqrMagnitude >= tempSqrMagnitude)
+                        tempCurrentMoveSpeed *= tempTargetDistance / deltaTime / tempCurrentMoveSpeed;
                     // Swim up to surface
+                    if (tempCurrentMoveSpeed < 0.01f)
+                        tempMoveDirection.y = 0f;
                     tempMoveVelocity.y = tempMoveDirection.y * tempCurrentMoveSpeed;
                     if (!HasNavPaths)
                         currentInput = this.SetInputYPosition(currentInput, tempPredictPosition.y);

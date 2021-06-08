@@ -513,16 +513,16 @@ namespace MultiplayerARPG
                     tempTargetDistance = Vector3.Distance(tempTargetPosition, tempCurrentPosition);
                     tempSqrMagnitude = (tempTargetPosition - tempCurrentPosition).sqrMagnitude;
                     tempPredictPosition = tempCurrentPosition + (Vector3.up * tempCurrentMoveSpeed * deltaTime);
-                    tempPredictSqrMagnitude = (tempPredictPosition - tempCurrentPosition).sqrMagnitude; if (HasNavPaths)
-                    {
-                        // Check `tempSqrMagnitude` against the `tempPredictSqrMagnitude`
-                        // if `tempPredictSqrMagnitude` is greater than `tempSqrMagnitude`,
-                        // rigidbody will reaching target and character is moving pass it,
-                        // so adjust move speed by distance and time (with physic formula: v=s/t)
-                        if (tempPredictSqrMagnitude >= tempSqrMagnitude)
-                            tempCurrentMoveSpeed *= tempTargetDistance / deltaTime / tempCurrentMoveSpeed;
-                    }
+                    tempPredictSqrMagnitude = (tempPredictPosition - tempCurrentPosition).sqrMagnitude;
+                    // Check `tempSqrMagnitude` against the `tempPredictSqrMagnitude`
+                    // if `tempPredictSqrMagnitude` is greater than `tempSqrMagnitude`,
+                    // rigidbody will reaching target and character is moving pass it,
+                    // so adjust move speed by distance and time (with physic formula: v=s/t)
+                    if (tempPredictSqrMagnitude >= tempSqrMagnitude)
+                        tempCurrentMoveSpeed *= tempTargetDistance / deltaTime / tempCurrentMoveSpeed;
                     // Swim up to surface
+                    if (tempCurrentMoveSpeed < 0.01f)
+                        tempMoveDirection.y = 0f;
                     CacheRigidbody.velocity = new Vector3(CacheRigidbody.velocity.x, tempCurrentMoveSpeed, CacheRigidbody.velocity.z);
                     if (!HasNavPaths)
                         currentInput = this.SetInputYPosition(currentInput, tempPredictPosition.y);
