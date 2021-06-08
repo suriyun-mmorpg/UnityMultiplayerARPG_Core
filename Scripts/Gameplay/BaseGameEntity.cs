@@ -909,12 +909,11 @@ namespace MultiplayerARPG
             vehicle.SetPassenger(seatIndex, this);
 
             // Set mount info
-            PassengingVehicle passengingVehicle = new PassengingVehicle()
+            PassengingVehicle = new PassengingVehicle()
             {
                 objectId = vehicle.Entity.ObjectId,
                 seatIndex = seatIndex,
             };
-            PassengingVehicle = passengingVehicle;
 
             return true;
         }
