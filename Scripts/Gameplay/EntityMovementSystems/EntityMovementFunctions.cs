@@ -6,6 +6,8 @@ namespace MultiplayerARPG
 {
     public static class EntityMovementFunctions
     {
+        public const byte MOVEMENT_DATA_CHANNEL = 2;
+
         #region Generic Functions
         public static bool CanPredictMovement(this IEntityMovement movement)
         {
@@ -18,7 +20,7 @@ namespace MultiplayerARPG
         {
             if (!movement.Entity.IsOwnerClient)
                 return;
-            movement.Entity.ClientSendPacket(0, DeliveryMethod.ReliableOrdered, GameNetworkingConsts.MovementInput, (writer) =>
+            movement.Entity.ClientSendPacket(MOVEMENT_DATA_CHANNEL, DeliveryMethod.ReliableOrdered, GameNetworkingConsts.MovementInput, (writer) =>
             {
                 writer.PutPackedInt((int)inputState);
                 writer.PutPackedInt((int)movementState);
@@ -34,7 +36,7 @@ namespace MultiplayerARPG
         {
             if (!movement.Entity.IsServer)
                 return;
-            movement.Entity.ServerSendPacketToSubscribers(0, DeliveryMethod.Unreliable, GameNetworkingConsts.SyncTransform, (writer) =>
+            movement.Entity.ServerSendPacketToSubscribers(MOVEMENT_DATA_CHANNEL, DeliveryMethod.Unreliable, GameNetworkingConsts.SyncTransform, (writer) =>
             {
                 writer.PutPackedUInt(movement.Entity.ObjectId);
                 writer.PutVector3(movement.Entity.CacheTransform.position);
@@ -47,7 +49,7 @@ namespace MultiplayerARPG
         {
             if (!movement.Entity.IsOwnerClient)
                 return;
-            movement.Entity.ClientSendPacket(0, DeliveryMethod.Unreliable, GameNetworkingConsts.SyncTransform, (writer) =>
+            movement.Entity.ClientSendPacket(MOVEMENT_DATA_CHANNEL, DeliveryMethod.Unreliable, GameNetworkingConsts.SyncTransform, (writer) =>
             {
                 writer.PutVector3(movement.Entity.CacheTransform.position);
                 writer.PutPackedInt(GetCompressedAngle(movement.Entity.CacheTransform.eulerAngles.y));
@@ -59,7 +61,7 @@ namespace MultiplayerARPG
         {
             if (!movement.Entity.IsServer)
                 return;
-            movement.Entity.ServerSendPacketToSubscribers(0, DeliveryMethod.ReliableUnordered, GameNetworkingConsts.Teleport, (writer) =>
+            movement.Entity.ServerSendPacketToSubscribers(MOVEMENT_DATA_CHANNEL, DeliveryMethod.ReliableUnordered, GameNetworkingConsts.Teleport, (writer) =>
             {
                 writer.PutPackedUInt(movement.Entity.ObjectId);
                 writer.PutVector3(position);
@@ -72,7 +74,7 @@ namespace MultiplayerARPG
         {
             if (!movement.Entity.IsOwnerClient)
                 return;
-            movement.Entity.ClientSendPacket(0, DeliveryMethod.ReliableOrdered, GameNetworkingConsts.StopMove, (writer) =>
+            movement.Entity.ClientSendPacket(MOVEMENT_DATA_CHANNEL, DeliveryMethod.ReliableOrdered, GameNetworkingConsts.StopMove, (writer) =>
             {
                 writer.PutPackedLong(movement.Entity.Manager.ServerTimestamp);
             });
@@ -82,7 +84,7 @@ namespace MultiplayerARPG
         {
             if (!movement.Entity.IsServer)
                 return;
-            movement.Entity.ServerSendPacketToSubscribers(0, DeliveryMethod.ReliableUnordered, GameNetworkingConsts.Jump, (writer) =>
+            movement.Entity.ServerSendPacketToSubscribers(MOVEMENT_DATA_CHANNEL, DeliveryMethod.ReliableUnordered, GameNetworkingConsts.Jump, (writer) =>
             {
                 writer.PutPackedUInt(movement.Entity.ObjectId);
                 writer.PutPackedLong(movement.Entity.Manager.ServerTimestamp);
@@ -93,7 +95,7 @@ namespace MultiplayerARPG
         {
             if (!movement.Entity.IsOwnerClient)
                 return;
-            movement.Entity.ClientSendPacket(0, DeliveryMethod.ReliableOrdered, GameNetworkingConsts.Jump, (writer) =>
+            movement.Entity.ClientSendPacket(MOVEMENT_DATA_CHANNEL, DeliveryMethod.ReliableOrdered, GameNetworkingConsts.Jump, (writer) =>
             {
                 writer.PutPackedLong(movement.Entity.Manager.ServerTimestamp);
             });
@@ -142,7 +144,7 @@ namespace MultiplayerARPG
         {
             if (!movement.Entity.IsOwnerClient)
                 return;
-            movement.Entity.ClientSendPacket(0, DeliveryMethod.ReliableOrdered, GameNetworkingConsts.MovementInput, (writer) =>
+            movement.Entity.ClientSendPacket(MOVEMENT_DATA_CHANNEL, DeliveryMethod.ReliableOrdered, GameNetworkingConsts.MovementInput, (writer) =>
             {
                 writer.PutVector2(position);
                 writer.PutPackedLong(movement.Entity.Manager.ServerTimestamp);
@@ -153,7 +155,7 @@ namespace MultiplayerARPG
         {
             if (!movement.Entity.IsServer)
                 return;
-            movement.Entity.ServerSendPacketToSubscribers(0, DeliveryMethod.Unreliable, GameNetworkingConsts.SyncTransform, (writer) =>
+            movement.Entity.ServerSendPacketToSubscribers(MOVEMENT_DATA_CHANNEL, DeliveryMethod.Unreliable, GameNetworkingConsts.SyncTransform, (writer) =>
             {
                 writer.PutPackedUInt(movement.Entity.ObjectId);
                 writer.PutVector2(movement.Entity.CacheTransform.position);
@@ -165,7 +167,7 @@ namespace MultiplayerARPG
         {
             if (!movement.Entity.IsOwnerClient)
                 return;
-            movement.Entity.ClientSendPacket(0, DeliveryMethod.Unreliable, GameNetworkingConsts.SyncTransform, (writer) =>
+            movement.Entity.ClientSendPacket(MOVEMENT_DATA_CHANNEL, DeliveryMethod.Unreliable, GameNetworkingConsts.SyncTransform, (writer) =>
             {
                 writer.PutVector2(movement.Entity.CacheTransform.position);
                 writer.PutPackedLong(movement.Entity.Manager.ServerTimestamp);
@@ -176,7 +178,7 @@ namespace MultiplayerARPG
         {
             if (!movement.Entity.IsServer)
                 return;
-            movement.Entity.ServerSendPacketToSubscribers(0, DeliveryMethod.ReliableUnordered, GameNetworkingConsts.Teleport, (writer) =>
+            movement.Entity.ServerSendPacketToSubscribers(MOVEMENT_DATA_CHANNEL, DeliveryMethod.ReliableUnordered, GameNetworkingConsts.Teleport, (writer) =>
             {
                 writer.PutPackedUInt(movement.Entity.ObjectId);
                 writer.PutVector2(position);
