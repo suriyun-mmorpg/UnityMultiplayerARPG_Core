@@ -1,9 +1,5 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.Serialization;
-#if UNITY_EDITOR
-using UnityEditor;
-#endif
 
 namespace MultiplayerARPG
 {
@@ -493,6 +489,10 @@ namespace MultiplayerARPG
             GameInstance.AddDamageElements(damageAmount);
             GameInstance.AddSkills(increaseSkillLevels);
             GameInstance.AddSkills(skillLevel);
+            GameInstance.AddStatusEffects(selfStatusEffectsWhenAttacking);
+            GameInstance.AddStatusEffects(enemyStatusEffectsWhenAttacking);
+            GameInstance.AddStatusEffects(selfStatusEffectsWhenAttacked);
+            GameInstance.AddStatusEffects(enemyStatusEffectsWhenAttacked);
             GameInstance.AddEquipmentSets(equipmentSet);
             GameInstance.AddPoolingWeaponLaunchEffects(equipmentModels);
             GameInstance.AddPoolingWeaponLaunchEffects(subEquipmentModels);

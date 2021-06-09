@@ -155,6 +155,10 @@ namespace MultiplayerARPG
             GameInstance.AddDamageElements(IncreaseArmors);
             GameInstance.AddDamageElements(IncreaseDamages);
             GameInstance.AddSkills(IncreaseSkillLevels);
+            GameInstance.AddStatusEffects(SelfStatusEffectsWhenAttacking);
+            GameInstance.AddStatusEffects(EnemyStatusEffectsWhenAttacking);
+            GameInstance.AddStatusEffects(SelfStatusEffectsWhenAttacked);
+            GameInstance.AddStatusEffects(EnemyStatusEffectsWhenAttacked);
             GameInstance.AddEquipmentSets(EquipmentSet);
             GameInstance.AddPoolingWeaponLaunchEffects(EquipmentModels);
         }

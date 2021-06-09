@@ -950,6 +950,21 @@ namespace MultiplayerARPG
             AddManyGameData(GuildSkills, guildSkills);
         }
 
+        public static void AddStatusEffects(params StatusEffectApplying[] statusEffects)
+        {
+            AddStatusEffects((IEnumerable<StatusEffectApplying>)statusEffects);
+        }
+
+        public static void AddStatusEffects(IEnumerable<StatusEffectApplying> statusEffects)
+        {
+            if (statusEffects == null)
+                return;
+            foreach (StatusEffectApplying statusEffect in statusEffects)
+            {
+                AddStatusEffects(statusEffect.statusEffect);
+            }
+        }
+
         public static void AddStatusEffects(params StatusEffect[] statusEffects)
         {
             AddStatusEffects((IEnumerable<StatusEffect>)statusEffects);
