@@ -42,7 +42,7 @@ namespace MultiplayerARPG
                 if (cacheEquipItemSlots == null)
                 {
                     cacheEquipItemSlots = new Dictionary<string, UICharacterItem>();
-                    CacheItemSelectionManager.Clear();
+                    CacheSelectionManager.Clear();
                     // Weapons
                     MigrateUIWeaponSlots();
                     foreach (UIEquipWeaponsPair currentEquipWeaponSlots in equipWeaponSlots)
@@ -66,7 +66,7 @@ namespace MultiplayerARPG
                             if (dragHandler != null)
                                 dragHandler.SetupForEquipItems(otherEquipSlot.ui);
                             cacheEquipItemSlots.Add(tempEquipPosition, otherEquipSlot.ui);
-                            CacheItemSelectionManager.Add(otherEquipSlot.ui);
+                            CacheSelectionManager.Add(otherEquipSlot.ui);
                         }
                     }
                 }
@@ -74,26 +74,26 @@ namespace MultiplayerARPG
             }
         }
 
-        private UICharacterItemSelectionManager cacheItemSelectionManager;
-        public UICharacterItemSelectionManager CacheItemSelectionManager
+        private UICharacterItemSelectionManager cacheSelectionManager;
+        public UICharacterItemSelectionManager CacheSelectionManager
         {
             get
             {
-                if (cacheItemSelectionManager == null)
-                    cacheItemSelectionManager = gameObject.GetOrAddComponent<UICharacterItemSelectionManager>();
-                cacheItemSelectionManager.selectionMode = UISelectionMode.SelectSingle;
-                return cacheItemSelectionManager;
+                if (cacheSelectionManager == null)
+                    cacheSelectionManager = gameObject.GetOrAddComponent<UICharacterItemSelectionManager>();
+                cacheSelectionManager.selectionMode = UISelectionMode.SelectSingle;
+                return cacheSelectionManager;
             }
         }
 
         protected virtual void OnEnable()
         {
-            CacheItemSelectionManager.eventOnSelected.RemoveListener(OnSelectCharacterItem);
-            CacheItemSelectionManager.eventOnSelected.AddListener(OnSelectCharacterItem);
-            CacheItemSelectionManager.eventOnDeselected.RemoveListener(OnDeselectCharacterItem);
-            CacheItemSelectionManager.eventOnDeselected.AddListener(OnDeselectCharacterItem);
+            CacheSelectionManager.eventOnSelected.RemoveListener(OnSelect);
+            CacheSelectionManager.eventOnSelected.AddListener(OnSelect);
+            CacheSelectionManager.eventOnDeselected.RemoveListener(OnDeselect);
+            CacheSelectionManager.eventOnDeselected.AddListener(OnDeselect);
             if (uiItemDialog != null)
-                uiItemDialog.onHide.AddListener(OnItemDialogHide);
+                uiItemDialog.onHide.AddListener(OnDialogHide);
             UpdateOwningCharacterData();
             RegisterOwningCharacterEvents();
         }
@@ -101,8 +101,8 @@ namespace MultiplayerARPG
         protected virtual void OnDisable()
         {
             if (uiItemDialog != null)
-                uiItemDialog.onHide.RemoveListener(OnItemDialogHide);
-            CacheItemSelectionManager.DeselectSelectedUI();
+                uiItemDialog.onHide.RemoveListener(OnDialogHide);
+            CacheSelectionManager.DeselectSelectedUI();
             UnregisterOwningCharacterEvents();
         }
 
@@ -171,40 +171,40 @@ namespace MultiplayerARPG
             return hasChanges;
         }
 
-        protected void OnItemDialogHide()
+        protected virtual void OnDialogHide()
         {
-            CacheItemSelectionManager.DeselectSelectedUI();
+            CacheSelectionManager.DeselectSelectedUI();
         }
 
-        protected void OnSelectCharacterItem(UICharacterItem ui)
+        protected virtual void OnSelect(UICharacterItem ui)
         {
             if (ui.Data.characterItem.IsEmptySlot())
             {
-                CacheItemSelectionManager.DeselectSelectedUI();
+                CacheSelectionManager.DeselectSelectedUI();
                 return;
             }
             if (uiItemDialog != null)
             {
-                uiItemDialog.selectionManager = CacheItemSelectionManager;
+                uiItemDialog.selectionManager = CacheSelectionManager;
                 uiItemDialog.Setup(ui.Data, character, ui.IndexOfData);
                 uiItemDialog.Show();
             }
         }
 
-        protected void OnDeselectCharacterItem(UICharacterItem ui)
+        protected virtual void OnDeselect(UICharacterItem ui)
         {
             if (uiItemDialog != null)
             {
-                uiItemDialog.onHide.RemoveListener(OnItemDialogHide);
+                uiItemDialog.onHide.RemoveListener(OnDialogHide);
                 uiItemDialog.Hide();
-                uiItemDialog.onHide.AddListener(OnItemDialogHide);
+                uiItemDialog.onHide.AddListener(OnDialogHide);
             }
         }
 
-        public void UpdateData(ICharacterData character)
+        public virtual void UpdateData(ICharacterData character)
         {
             this.character = character;
-            string selectedId = CacheItemSelectionManager.SelectedUI != null ? CacheItemSelectionManager.SelectedUI.CharacterItem.id : string.Empty;
+            string selectedId = CacheSelectionManager.SelectedUI != null ? CacheSelectionManager.SelectedUI.CharacterItem.id : string.Empty;
             // Clear slots data
             UICharacterItem equipSlot;
             foreach (string equipPosition in CacheEquipItemSlots.Keys)
@@ -237,7 +237,7 @@ namespace MultiplayerARPG
             }
             if (selectedUI == null)
             {
-                CacheItemSelectionManager.DeselectSelectedUI();
+                CacheSelectionManager.DeselectSelectedUI();
             }
             else
             {
@@ -271,7 +271,7 @@ namespace MultiplayerARPG
             if (dragHandler != null)
                 dragHandler.SetupForEquipItems(slot);
             cacheEquipItemSlots.Add(GetEquipPosition(isLeftHand ? GameDataConst.EQUIP_POSITION_LEFT_HAND : GameDataConst.EQUIP_POSITION_RIGHT_HAND, equipWeaponSet), slot);
-            CacheItemSelectionManager.Add(slot);
+            CacheSelectionManager.Add(slot);
         }
 
         private void SetEquipWeapons(string selectedId, EquipWeapons equipWeapons, byte equipWeaponSet)

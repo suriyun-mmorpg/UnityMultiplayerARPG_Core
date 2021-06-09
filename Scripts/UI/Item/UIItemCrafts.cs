@@ -16,30 +16,30 @@ namespace MultiplayerARPG
         [FormerlySerializedAs("uiCraftItemContainer")]
         public Transform uiContainer;
 
-        private UIList cacheItemList;
-        public UIList CacheItemList
+        private UIList cacheList;
+        public UIList CacheList
         {
             get
             {
-                if (cacheItemList == null)
+                if (cacheList == null)
                 {
-                    cacheItemList = gameObject.AddComponent<UIList>();
-                    cacheItemList.uiPrefab = uiPrefab.gameObject;
-                    cacheItemList.uiContainer = uiContainer;
+                    cacheList = gameObject.AddComponent<UIList>();
+                    cacheList.uiPrefab = uiPrefab.gameObject;
+                    cacheList.uiContainer = uiContainer;
                 }
-                return cacheItemList;
+                return cacheList;
             }
         }
 
-        private UIItemCraftSelectionManager cacheItemSelectionManager;
-        public UIItemCraftSelectionManager CacheItemSelectionManager
+        private UIItemCraftSelectionManager cacheSelectionManager;
+        public UIItemCraftSelectionManager CacheSelectionManager
         {
             get
             {
-                if (cacheItemSelectionManager == null)
-                    cacheItemSelectionManager = gameObject.GetOrAddComponent<UIItemCraftSelectionManager>();
-                cacheItemSelectionManager.selectionMode = UISelectionMode.SelectSingle;
-                return cacheItemSelectionManager;
+                if (cacheSelectionManager == null)
+                    cacheSelectionManager = gameObject.GetOrAddComponent<UIItemCraftSelectionManager>();
+                cacheSelectionManager.selectionMode = UISelectionMode.SelectSingle;
+                return cacheSelectionManager;
             }
         }
 
@@ -75,59 +75,59 @@ namespace MultiplayerARPG
 
         protected virtual void OnEnable()
         {
-            CacheItemSelectionManager.eventOnSelected.RemoveListener(OnSelectCraftItem);
-            CacheItemSelectionManager.eventOnSelected.AddListener(OnSelectCraftItem);
-            CacheItemSelectionManager.eventOnDeselected.RemoveListener(OnDeselectCraftItem);
-            CacheItemSelectionManager.eventOnDeselected.AddListener(OnDeselectCraftItem);
+            CacheSelectionManager.eventOnSelected.RemoveListener(OnSelect);
+            CacheSelectionManager.eventOnSelected.AddListener(OnSelect);
+            CacheSelectionManager.eventOnDeselected.RemoveListener(OnDeselect);
+            CacheSelectionManager.eventOnDeselected.AddListener(OnDeselect);
             if (uiDialog != null)
-                uiDialog.onHide.AddListener(OnItemDialogHide);
+                uiDialog.onHide.AddListener(OnDialogHide);
         }
 
         protected virtual void OnDisable()
         {
             if (uiDialog != null)
-                uiDialog.onHide.RemoveListener(OnItemDialogHide);
-            CacheItemSelectionManager.DeselectSelectedUI();
+                uiDialog.onHide.RemoveListener(OnDialogHide);
+            CacheSelectionManager.DeselectSelectedUI();
         }
 
-        protected void OnItemDialogHide()
+        protected virtual void OnDialogHide()
         {
-            CacheItemSelectionManager.DeselectSelectedUI();
+            CacheSelectionManager.DeselectSelectedUI();
         }
 
-        protected void OnSelectCraftItem(UIItemCraft ui)
+        protected virtual void OnSelect(UIItemCraft ui)
         {
             if (uiDialog != null)
             {
-                uiDialog.selectionManager = CacheItemSelectionManager;
+                uiDialog.selectionManager = CacheSelectionManager;
                 uiDialog.Setup(CrafterType, TargetEntity, ui.Data);
                 uiDialog.Show();
             }
         }
 
-        protected void OnDeselectCraftItem(UIItemCraft ui)
+        protected virtual void OnDeselect(UIItemCraft ui)
         {
             if (uiDialog != null)
             {
-                uiDialog.onHide.RemoveListener(OnItemDialogHide);
+                uiDialog.onHide.RemoveListener(OnDialogHide);
                 uiDialog.Hide();
-                uiDialog.onHide.AddListener(OnItemDialogHide);
+                uiDialog.onHide.AddListener(OnDialogHide);
             }
         }
 
-        protected void UpdateData(IList<ItemCraft> itemCrafts)
+        protected virtual void UpdateData(IList<ItemCraft> itemCrafts)
         {
-            int selectedIdx = CacheItemSelectionManager.SelectedUI != null ? CacheItemSelectionManager.IndexOf(CacheItemSelectionManager.SelectedUI) : -1;
-            CacheItemSelectionManager.DeselectSelectedUI();
-            CacheItemSelectionManager.Clear();
+            int selectedIdx = CacheSelectionManager.SelectedUI != null ? CacheSelectionManager.IndexOf(CacheSelectionManager.SelectedUI) : -1;
+            CacheSelectionManager.DeselectSelectedUI();
+            CacheSelectionManager.Clear();
 
             UIItemCraft tempUiCraftItem;
-            CacheItemList.Generate(itemCrafts, (index, craftItem, ui) =>
+            CacheList.Generate(itemCrafts, (index, craftItem, ui) =>
             {
                 tempUiCraftItem = ui.GetComponent<UIItemCraft>();
                 tempUiCraftItem.Setup(CrafterType, TargetEntity, craftItem);
                 tempUiCraftItem.Show();
-                CacheItemSelectionManager.Add(tempUiCraftItem);
+                CacheSelectionManager.Add(tempUiCraftItem);
                 if (selectedIdx == index)
                     tempUiCraftItem.OnClickSelect();
             });

@@ -17,30 +17,30 @@ namespace MultiplayerARPG
 
         public ICraftingQueueSource Source { get; set; }
 
-        private UIList cacheItemList;
-        public UIList CacheItemList
+        private UIList cacheList;
+        public UIList CacheList
         {
             get
             {
-                if (cacheItemList == null)
+                if (cacheList == null)
                 {
-                    cacheItemList = gameObject.AddComponent<UIList>();
-                    cacheItemList.uiPrefab = uiPrefab.gameObject;
-                    cacheItemList.uiContainer = uiContainer;
+                    cacheList = gameObject.AddComponent<UIList>();
+                    cacheList.uiPrefab = uiPrefab.gameObject;
+                    cacheList.uiContainer = uiContainer;
                 }
-                return cacheItemList;
+                return cacheList;
             }
         }
 
-        private UICraftingQueueItemSelectionManager cacheItemSelectionManager;
-        public UICraftingQueueItemSelectionManager CacheItemSelectionManager
+        private UICraftingQueueItemSelectionManager cacheSelectionManager;
+        public UICraftingQueueItemSelectionManager CacheSelectionManager
         {
             get
             {
-                if (cacheItemSelectionManager == null)
-                    cacheItemSelectionManager = gameObject.GetOrAddComponent<UICraftingQueueItemSelectionManager>();
-                cacheItemSelectionManager.selectionMode = UISelectionMode.SelectSingle;
-                return cacheItemSelectionManager;
+                if (cacheSelectionManager == null)
+                    cacheSelectionManager = gameObject.GetOrAddComponent<UICraftingQueueItemSelectionManager>();
+                cacheSelectionManager.selectionMode = UISelectionMode.SelectSingle;
+                return cacheSelectionManager;
             }
         }
 
@@ -52,13 +52,13 @@ namespace MultiplayerARPG
 
         protected virtual void OnEnable()
         {
-            CacheItemSelectionManager.eventOnSelected.RemoveListener(OnSelectCraftingItem);
-            CacheItemSelectionManager.eventOnSelected.AddListener(OnSelectCraftingItem);
-            CacheItemSelectionManager.eventOnDeselected.RemoveListener(OnDeselectCraftingItem);
-            CacheItemSelectionManager.eventOnDeselected.AddListener(OnDeselectCraftingItem);
+            CacheSelectionManager.eventOnSelected.RemoveListener(OnSelect);
+            CacheSelectionManager.eventOnSelected.AddListener(OnSelect);
+            CacheSelectionManager.eventOnDeselected.RemoveListener(OnDeselect);
+            CacheSelectionManager.eventOnDeselected.AddListener(OnDeselect);
             if (uiDialog != null)
             {
-                uiDialog.onHide.AddListener(OnItemDialogHide);
+                uiDialog.onHide.AddListener(OnDialogHide);
                 uiDialog.CraftingQueueManager = this;
             }
             if (uiFormulas != null)
@@ -76,8 +76,8 @@ namespace MultiplayerARPG
         protected virtual void OnDisable()
         {
             if (uiDialog != null)
-                uiDialog.onHide.RemoveListener(OnItemDialogHide);
-            CacheItemSelectionManager.DeselectSelectedUI();
+                uiDialog.onHide.RemoveListener(OnDialogHide);
+            CacheSelectionManager.DeselectSelectedUI();
             if (Source != null)
             {
                 Source.QueueItems.onOperation -= OnCraftingQueueItemsOperation;
@@ -85,28 +85,28 @@ namespace MultiplayerARPG
             }
         }
 
-        protected void OnItemDialogHide()
+        protected virtual void OnDialogHide()
         {
-            CacheItemSelectionManager.DeselectSelectedUI();
+            CacheSelectionManager.DeselectSelectedUI();
         }
 
-        protected void OnSelectCraftingItem(UICraftingQueueItem ui)
+        protected virtual void OnSelect(UICraftingQueueItem ui)
         {
             if (uiDialog != null)
             {
-                uiDialog.selectionManager = CacheItemSelectionManager;
+                uiDialog.selectionManager = CacheSelectionManager;
                 uiDialog.Data = ui.Data;
                 uiDialog.Show();
             }
         }
 
-        protected void OnDeselectCraftingItem(UICraftingQueueItem ui)
+        protected virtual void OnDeselect(UICraftingQueueItem ui)
         {
             if (uiDialog != null)
             {
-                uiDialog.onHide.RemoveListener(OnItemDialogHide);
+                uiDialog.onHide.RemoveListener(OnDialogHide);
                 uiDialog.Hide();
-                uiDialog.onHide.AddListener(OnItemDialogHide);
+                uiDialog.onHide.AddListener(OnDialogHide);
             }
         }
 
@@ -115,20 +115,20 @@ namespace MultiplayerARPG
             UpdateData();
         }
 
-        protected void UpdateData()
+        protected virtual void UpdateData()
         {
-            int selectedIdx = CacheItemSelectionManager.SelectedUI != null ? CacheItemSelectionManager.IndexOf(CacheItemSelectionManager.SelectedUI) : -1;
-            CacheItemSelectionManager.DeselectSelectedUI();
-            CacheItemSelectionManager.Clear();
+            int selectedIdx = CacheSelectionManager.SelectedUI != null ? CacheSelectionManager.IndexOf(CacheSelectionManager.SelectedUI) : -1;
+            CacheSelectionManager.DeselectSelectedUI();
+            CacheSelectionManager.Clear();
 
             UICraftingQueueItem tempUI;
-            CacheItemList.Generate(Source.QueueItems, (index, craftingItem, ui) =>
+            CacheList.Generate(Source.QueueItems, (index, craftingItem, ui) =>
             {
                 tempUI = ui.GetComponent<UICraftingQueueItem>();
                 tempUI.CraftingQueueManager = this;
                 tempUI.Setup(craftingItem, GameInstance.PlayingCharacterEntity, index);
                 tempUI.Show();
-                CacheItemSelectionManager.Add(tempUI);
+                CacheSelectionManager.Add(tempUI);
                 if (selectedIdx == index)
                     tempUI.OnClickSelect();
             });

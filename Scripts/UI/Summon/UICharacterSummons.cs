@@ -11,41 +11,41 @@ namespace MultiplayerARPG
         public UICharacterSummon uiCharacterSummonPrefab;
         public Transform uiCharacterSummonContainer;
 
-        private UIList cacheSummonList;
-        public UIList CacheSummonList
+        private UIList cacheList;
+        public UIList CacheList
         {
             get
             {
-                if (cacheSummonList == null)
+                if (cacheList == null)
                 {
-                    cacheSummonList = gameObject.AddComponent<UIList>();
-                    cacheSummonList.uiPrefab = uiCharacterSummonPrefab.gameObject;
-                    cacheSummonList.uiContainer = uiCharacterSummonContainer;
+                    cacheList = gameObject.AddComponent<UIList>();
+                    cacheList.uiPrefab = uiCharacterSummonPrefab.gameObject;
+                    cacheList.uiContainer = uiCharacterSummonContainer;
                 }
-                return cacheSummonList;
+                return cacheList;
             }
         }
 
-        private UICharacterSummonSelectionManager cacheSummonSelectionManager;
-        public UICharacterSummonSelectionManager CacheSummonSelectionManager
+        private UICharacterSummonSelectionManager cacheSelectionManager;
+        public UICharacterSummonSelectionManager CacheSelectionManager
         {
             get
             {
-                if (cacheSummonSelectionManager == null)
-                    cacheSummonSelectionManager = gameObject.GetOrAddComponent<UICharacterSummonSelectionManager>();
-                cacheSummonSelectionManager.selectionMode = UISelectionMode.SelectSingle;
-                return cacheSummonSelectionManager;
+                if (cacheSelectionManager == null)
+                    cacheSelectionManager = gameObject.GetOrAddComponent<UICharacterSummonSelectionManager>();
+                cacheSelectionManager.selectionMode = UISelectionMode.SelectSingle;
+                return cacheSelectionManager;
             }
         }
 
         protected virtual void OnEnable()
         {
-            CacheSummonSelectionManager.eventOnSelect.RemoveListener(OnSelectCharacterSummon);
-            CacheSummonSelectionManager.eventOnSelect.AddListener(OnSelectCharacterSummon);
-            CacheSummonSelectionManager.eventOnDeselect.RemoveListener(OnDeselectCharacterSummon);
-            CacheSummonSelectionManager.eventOnDeselect.AddListener(OnDeselectCharacterSummon);
+            CacheSelectionManager.eventOnSelect.RemoveListener(OnSelect);
+            CacheSelectionManager.eventOnSelect.AddListener(OnSelect);
+            CacheSelectionManager.eventOnDeselect.RemoveListener(OnDeselect);
+            CacheSelectionManager.eventOnDeselect.AddListener(OnDeselect);
             if (uiSummonDialog != null)
-                uiSummonDialog.onHide.AddListener(OnSummonDialogHide);
+                uiSummonDialog.onHide.AddListener(OnDialogHide);
             UpdateOwningCharacterData();
             if (!GameInstance.PlayingCharacterEntity) return;
             GameInstance.PlayingCharacterEntity.onSummonsOperation += OnSummonsOperation;
@@ -54,8 +54,8 @@ namespace MultiplayerARPG
         protected virtual void OnDisable()
         {
             if (uiSummonDialog != null)
-                uiSummonDialog.onHide.RemoveListener(OnSummonDialogHide);
-            CacheSummonSelectionManager.DeselectSelectedUI();
+                uiSummonDialog.onHide.RemoveListener(OnDialogHide);
+            CacheSelectionManager.DeselectSelectedUI();
             if (!GameInstance.PlayingCharacterEntity) return;
             GameInstance.PlayingCharacterEntity.onSummonsOperation -= OnSummonsOperation;
         }
@@ -71,41 +71,41 @@ namespace MultiplayerARPG
             UpdateData(GameInstance.PlayingCharacter);
         }
 
-        protected void OnSummonDialogHide()
+        protected virtual void OnDialogHide()
         {
-            CacheSummonSelectionManager.DeselectSelectedUI();
+            CacheSelectionManager.DeselectSelectedUI();
         }
 
-        protected void OnSelectCharacterSummon(UICharacterSummon ui)
+        protected virtual void OnSelect(UICharacterSummon ui)
         {
             if (uiSummonDialog != null)
             {
-                uiSummonDialog.selectionManager = CacheSummonSelectionManager;
+                uiSummonDialog.selectionManager = CacheSelectionManager;
                 uiSummonDialog.Setup(ui.Data, character, ui.IndexOfData);
                 uiSummonDialog.Show();
             }
         }
 
-        protected void OnDeselectCharacterSummon(UICharacterSummon ui)
+        protected virtual void OnDeselect(UICharacterSummon ui)
         {
             if (uiSummonDialog != null)
             {
-                uiSummonDialog.onHide.RemoveListener(OnSummonDialogHide);
+                uiSummonDialog.onHide.RemoveListener(OnDialogHide);
                 uiSummonDialog.Hide();
-                uiSummonDialog.onHide.AddListener(OnSummonDialogHide);
+                uiSummonDialog.onHide.AddListener(OnDialogHide);
             }
         }
 
-        public void UpdateData(ICharacterData character)
+        public virtual void UpdateData(ICharacterData character)
         {
             this.character = character;
-            uint selectedSummonObjectId = CacheSummonSelectionManager.SelectedUI != null ? CacheSummonSelectionManager.SelectedUI.CharacterSummon.objectId : 0;
-            CacheSummonSelectionManager.DeselectSelectedUI();
-            CacheSummonSelectionManager.Clear();
+            uint selectedSummonObjectId = CacheSelectionManager.SelectedUI != null ? CacheSelectionManager.SelectedUI.CharacterSummon.objectId : 0;
+            CacheSelectionManager.DeselectSelectedUI();
+            CacheSelectionManager.Clear();
 
             Dictionary<int, UICharacterSummon> stackingSkillSummons = new Dictionary<int, UICharacterSummon>();
             UICharacterSummon tempUiCharacterSummon;
-            CacheSummonList.Generate(character.Summons, (index, characterSummon, ui) =>
+            CacheList.Generate(character.Summons, (index, characterSummon, ui) =>
             {
                 if (characterSummon.type == SummonType.Skill && stackingSkillSummons.ContainsKey(characterSummon.dataId))
                 {
@@ -126,7 +126,7 @@ namespace MultiplayerARPG
                             ui.transform.SetAsFirstSibling();
                             break;
                     }
-                    CacheSummonSelectionManager.Add(tempUiCharacterSummon);
+                    CacheSelectionManager.Add(tempUiCharacterSummon);
                     if (selectedSummonObjectId == characterSummon.objectId)
                         tempUiCharacterSummon.OnClickSelect();
                 }

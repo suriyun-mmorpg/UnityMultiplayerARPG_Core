@@ -24,7 +24,7 @@ namespace MultiplayerARPG
         public GameObject[] leftHandNoRequireAmmoSymbols;
         public UIGageValue gageLeftHandAmmo;
 
-        private void OnEnable()
+        protected virtual void OnEnable()
         {
             UpdateOwningCharacterData();
             if (!GameInstance.PlayingCharacterEntity) return;
@@ -34,7 +34,7 @@ namespace MultiplayerARPG
             GameInstance.PlayingCharacterEntity.onNonEquipItemsOperation += OnNonEquipItemsOperation;
         }
 
-        private void OnDisable()
+        protected virtual void OnDisable()
         {
             if (!GameInstance.PlayingCharacterEntity) return;
             GameInstance.PlayingCharacterEntity.onEquipItemsOperation -= OnEquipItemsOperation;
@@ -76,7 +76,7 @@ namespace MultiplayerARPG
             UpdateUI(uiLeftHandAmmoRoot, uiTextLeftHandCurrentAmmo, uiTextLeftHandReserveAmmo, uiTextLeftHandSumAmmo, leftHandRequireAmmoSymbols, leftHandNoRequireAmmoSymbols, gageLeftHandAmmo, character.EquipWeapons.leftHand);
         }
 
-        private void UpdateUI(GameObject root, TextWrapper textCurrentAmmo, TextWrapper textReserveAmmo, TextWrapper textSumAmmo, GameObject[] requireAmmoSymbols, GameObject[] noRequireAmmoSymbols, UIGageValue gageAmmo, CharacterItem characterItem)
+        protected virtual void UpdateUI(GameObject root, TextWrapper textCurrentAmmo, TextWrapper textReserveAmmo, TextWrapper textSumAmmo, GameObject[] requireAmmoSymbols, GameObject[] noRequireAmmoSymbols, UIGageValue gageAmmo, CharacterItem characterItem)
         {
             IWeaponItem weaponItem = characterItem.GetWeaponItem();
             bool isActive = weaponItem != null && weaponItem.WeaponType.RequireAmmoType != null;

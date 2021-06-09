@@ -43,27 +43,27 @@ namespace MultiplayerARPG
         protected virtual void OnEnable()
         {
             CacheSelectionManager.selectionMode = UISelectionMode.SelectSingle;
-            CacheSelectionManager.eventOnSelected.RemoveListener(OnSelectCharacterItem);
-            CacheSelectionManager.eventOnSelected.AddListener(OnSelectCharacterItem);
-            CacheSelectionManager.eventOnDeselected.RemoveListener(OnDeselectCharacterItem);
-            CacheSelectionManager.eventOnDeselected.AddListener(OnDeselectCharacterItem);
+            CacheSelectionManager.eventOnSelected.RemoveListener(OnSelect);
+            CacheSelectionManager.eventOnSelected.AddListener(OnSelect);
+            CacheSelectionManager.eventOnDeselected.RemoveListener(OnDeselect);
+            CacheSelectionManager.eventOnDeselected.AddListener(OnDeselect);
             if (uiCurrencyDialog != null)
-                uiCurrencyDialog.onHide.AddListener(OnItemDialogHide);
+                uiCurrencyDialog.onHide.AddListener(OnDialogHide);
         }
 
         protected virtual void OnDisable()
         {
             if (uiCurrencyDialog != null)
-                uiCurrencyDialog.onHide.RemoveListener(OnItemDialogHide);
+                uiCurrencyDialog.onHide.RemoveListener(OnDialogHide);
             CacheSelectionManager.DeselectSelectedUI();
         }
 
-        protected virtual void OnItemDialogHide()
+        protected virtual void OnDialogHide()
         {
             CacheSelectionManager.DeselectSelectedUI();
         }
 
-        protected virtual void OnSelectCharacterItem(UICharacterCurrency ui)
+        protected virtual void OnSelect(UICharacterCurrency ui)
         {
             if (ui.Data.characterCurrency.GetCurrency() == null)
             {
@@ -78,13 +78,13 @@ namespace MultiplayerARPG
             }
         }
 
-        protected virtual void OnDeselectCharacterItem(UICharacterCurrency ui)
+        protected virtual void OnDeselect(UICharacterCurrency ui)
         {
             if (uiCurrencyDialog != null && CacheSelectionManager.selectionMode == UISelectionMode.SelectSingle)
             {
-                uiCurrencyDialog.onHide.RemoveListener(OnItemDialogHide);
+                uiCurrencyDialog.onHide.RemoveListener(OnDialogHide);
                 uiCurrencyDialog.Hide();
-                uiCurrencyDialog.onHide.AddListener(OnItemDialogHide);
+                uiCurrencyDialog.onHide.AddListener(OnDialogHide);
             }
         }
 
@@ -121,9 +121,9 @@ namespace MultiplayerARPG
                 dirtySelectionMode = CacheSelectionManager.selectionMode;
                 if (uiCurrencyDialog != null)
                 {
-                    uiCurrencyDialog.onHide.RemoveListener(OnItemDialogHide);
+                    uiCurrencyDialog.onHide.RemoveListener(OnDialogHide);
                     uiCurrencyDialog.Hide();
-                    uiCurrencyDialog.onHide.AddListener(OnItemDialogHide);
+                    uiCurrencyDialog.onHide.AddListener(OnDialogHide);
                 }
             }
         }

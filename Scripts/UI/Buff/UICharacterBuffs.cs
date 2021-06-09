@@ -10,97 +10,97 @@ namespace MultiplayerARPG
         public UICharacterBuff uiCharacterBuffPrefab;
         public Transform uiCharacterBuffContainer;
 
-        private UIList cacheBuffList;
-        public UIList CacheBuffList
+        private UIList cacheList;
+        public UIList CacheList
         {
             get
             {
-                if (cacheBuffList == null)
+                if (cacheList == null)
                 {
-                    cacheBuffList = gameObject.AddComponent<UIList>();
-                    cacheBuffList.uiPrefab = uiCharacterBuffPrefab.gameObject;
-                    cacheBuffList.uiContainer = uiCharacterBuffContainer;
+                    cacheList = gameObject.AddComponent<UIList>();
+                    cacheList.uiPrefab = uiCharacterBuffPrefab.gameObject;
+                    cacheList.uiContainer = uiCharacterBuffContainer;
                 }
-                return cacheBuffList;
+                return cacheList;
             }
         }
 
-        private UICharacterBuffSelectionManager cacheBuffSelectionManager;
-        public UICharacterBuffSelectionManager CacheBuffSelectionManager
+        private UICharacterBuffSelectionManager cacheSelectionManager;
+        public UICharacterBuffSelectionManager CacheSelectionManager
         {
             get
             {
-                if (cacheBuffSelectionManager == null)
-                    cacheBuffSelectionManager = gameObject.GetOrAddComponent<UICharacterBuffSelectionManager>();
-                cacheBuffSelectionManager.selectionMode = UISelectionMode.SelectSingle;
-                return cacheBuffSelectionManager;
+                if (cacheSelectionManager == null)
+                    cacheSelectionManager = gameObject.GetOrAddComponent<UICharacterBuffSelectionManager>();
+                cacheSelectionManager.selectionMode = UISelectionMode.SelectSingle;
+                return cacheSelectionManager;
             }
         }
 
         protected virtual void OnEnable()
         {
-            CacheBuffSelectionManager.eventOnSelect.RemoveListener(OnSelectCharacterBuff);
-            CacheBuffSelectionManager.eventOnSelect.AddListener(OnSelectCharacterBuff);
-            CacheBuffSelectionManager.eventOnDeselect.RemoveListener(OnDeselectCharacterBuff);
-            CacheBuffSelectionManager.eventOnDeselect.AddListener(OnDeselectCharacterBuff);
+            CacheSelectionManager.eventOnSelect.RemoveListener(OnSelect);
+            CacheSelectionManager.eventOnSelect.AddListener(OnSelect);
+            CacheSelectionManager.eventOnDeselect.RemoveListener(OnDeselect);
+            CacheSelectionManager.eventOnDeselect.AddListener(OnDeselect);
             if (uiBuffDialog != null)
-                uiBuffDialog.onHide.AddListener(OnBuffDialogHide);
+                uiBuffDialog.onHide.AddListener(OnDialogHide);
         }
 
         protected virtual void OnDisable()
         {
             if (uiBuffDialog != null)
-                uiBuffDialog.onHide.RemoveListener(OnBuffDialogHide);
-            CacheBuffSelectionManager.DeselectSelectedUI();
+                uiBuffDialog.onHide.RemoveListener(OnDialogHide);
+            CacheSelectionManager.DeselectSelectedUI();
         }
 
-        protected void OnBuffDialogHide()
+        protected virtual void OnDialogHide()
         {
-            CacheBuffSelectionManager.DeselectSelectedUI();
+            CacheSelectionManager.DeselectSelectedUI();
         }
 
-        protected void OnSelectCharacterBuff(UICharacterBuff ui)
+        protected virtual void OnSelect(UICharacterBuff ui)
         {
             if (uiBuffDialog != null)
             {
-                uiBuffDialog.selectionManager = CacheBuffSelectionManager;
+                uiBuffDialog.selectionManager = CacheSelectionManager;
                 uiBuffDialog.Setup(ui.Data, character, ui.IndexOfData);
                 uiBuffDialog.Show();
             }
         }
 
-        protected void OnDeselectCharacterBuff(UICharacterBuff ui)
+        protected virtual void OnDeselect(UICharacterBuff ui)
         {
             if (uiBuffDialog != null)
             {
-                uiBuffDialog.onHide.RemoveListener(OnBuffDialogHide);
+                uiBuffDialog.onHide.RemoveListener(OnDialogHide);
                 uiBuffDialog.Hide();
-                uiBuffDialog.onHide.AddListener(OnBuffDialogHide);
+                uiBuffDialog.onHide.AddListener(OnDialogHide);
             }
         }
 
-        public void UpdateData(ICharacterData character)
+        public virtual void UpdateData(ICharacterData character)
         {
             this.character = character;
-            string selectedBuffKey = CacheBuffSelectionManager.SelectedUI != null ? CacheBuffSelectionManager.SelectedUI.CharacterBuff.GetKey() : string.Empty;
-            CacheBuffSelectionManager.DeselectSelectedUI();
-            CacheBuffSelectionManager.Clear();
+            string selectedBuffKey = CacheSelectionManager.SelectedUI != null ? CacheSelectionManager.SelectedUI.CharacterBuff.GetKey() : string.Empty;
+            CacheSelectionManager.DeselectSelectedUI();
+            CacheSelectionManager.Clear();
 
             if (character == null)
             {
-                CacheBuffList.HideAll();
+                CacheList.HideAll();
                 return;
             }
 
             UICharacterBuff tempUiCharacterBuff;
-            CacheBuffList.Generate(character.Buffs, (index, characterBuff, ui) =>
+            CacheList.Generate(character.Buffs, (index, characterBuff, ui) =>
             {
                 tempUiCharacterBuff = ui.GetComponent<UICharacterBuff>();
                 if (characterBuff.buffRemainsDuration > 0)
                 {
                     tempUiCharacterBuff.Setup(characterBuff, character, index);
                     tempUiCharacterBuff.Show();
-                    CacheBuffSelectionManager.Add(tempUiCharacterBuff);
+                    CacheSelectionManager.Add(tempUiCharacterBuff);
                     if (selectedBuffKey.Equals(characterBuff.GetKey()))
                         tempUiCharacterBuff.OnClickSelect();
                 }

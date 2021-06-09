@@ -59,12 +59,12 @@ namespace MultiplayerARPG
             CacheSelectionManager.DeselectSelectedUI();
         }
 
-        protected void OnDialogHide()
+        protected virtual void OnDialogHide()
         {
             CacheSelectionManager.DeselectSelectedUI();
         }
 
-        protected void OnSelect(UIMailListEntry ui)
+        protected virtual void OnSelect(UIMailListEntry ui)
         {
             if (uiDialog != null && ui.Data != null)
             {
@@ -76,7 +76,7 @@ namespace MultiplayerARPG
             }
         }
 
-        protected void OnDeselect(UIMailListEntry ui)
+        protected virtual void OnDeselect(UIMailListEntry ui)
         {
             if (uiDialog != null)
             {
@@ -94,7 +94,7 @@ namespace MultiplayerARPG
             }, MailListCallback);
         }
 
-        private void MailListCallback(ResponseHandlerData requestHandler, AckResponseCode responseCode, ResponseMailListMessage response)
+        protected virtual void MailListCallback(ResponseHandlerData requestHandler, AckResponseCode responseCode, ResponseMailListMessage response)
         {
             ClientMailActions.ResponseMailList(requestHandler, responseCode, response);
             string selectedId = CacheSelectionManager.SelectedUI != null ? CacheSelectionManager.SelectedUI.Data.Id : string.Empty;

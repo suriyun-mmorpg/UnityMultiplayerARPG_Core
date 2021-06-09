@@ -19,42 +19,42 @@ namespace MultiplayerARPG
 
         public UICraftingQueueItems CraftingQueueManager { get; set; }
 
-        private UIList cacheItemList;
-        public UIList CacheItemList
+        private UIList cacheList;
+        public UIList CacheList
         {
             get
             {
-                if (cacheItemList == null)
+                if (cacheList == null)
                 {
-                    cacheItemList = gameObject.AddComponent<UIList>();
-                    cacheItemList.uiPrefab = uiPrefab.gameObject;
-                    cacheItemList.uiContainer = uiContainer;
+                    cacheList = gameObject.AddComponent<UIList>();
+                    cacheList.uiPrefab = uiPrefab.gameObject;
+                    cacheList.uiContainer = uiContainer;
                 }
-                return cacheItemList;
+                return cacheList;
             }
         }
 
-        private UIItemCraftFormulaSelectionManager cacheItemSelectionManager;
-        public UIItemCraftFormulaSelectionManager CacheItemSelectionManager
+        private UIItemCraftFormulaSelectionManager cacheSelectionManager;
+        public UIItemCraftFormulaSelectionManager CacheSelectionManager
         {
             get
             {
-                if (cacheItemSelectionManager == null)
-                    cacheItemSelectionManager = gameObject.GetOrAddComponent<UIItemCraftFormulaSelectionManager>();
-                cacheItemSelectionManager.selectionMode = UISelectionMode.SelectSingle;
-                return cacheItemSelectionManager;
+                if (cacheSelectionManager == null)
+                    cacheSelectionManager = gameObject.GetOrAddComponent<UIItemCraftFormulaSelectionManager>();
+                cacheSelectionManager.selectionMode = UISelectionMode.SelectSingle;
+                return cacheSelectionManager;
             }
         }
 
         protected virtual void OnEnable()
         {
-            CacheItemSelectionManager.eventOnSelected.RemoveListener(OnSelectItemCraftFormula);
-            CacheItemSelectionManager.eventOnSelected.AddListener(OnSelectItemCraftFormula);
-            CacheItemSelectionManager.eventOnDeselected.RemoveListener(OnDeselectItemCraftFormula);
-            CacheItemSelectionManager.eventOnDeselected.AddListener(OnDeselectItemCraftFormula);
+            CacheSelectionManager.eventOnSelected.RemoveListener(OnSelect);
+            CacheSelectionManager.eventOnSelected.AddListener(OnSelect);
+            CacheSelectionManager.eventOnDeselected.RemoveListener(OnDeselect);
+            CacheSelectionManager.eventOnDeselected.AddListener(OnDeselect);
             if (uiDialog != null)
             {
-                uiDialog.onHide.AddListener(OnItemDialogHide);
+                uiDialog.onHide.AddListener(OnDialogHide);
                 uiDialog.CraftFormulaManager = this;
             }
             UpdateData();
@@ -63,45 +63,45 @@ namespace MultiplayerARPG
         protected virtual void OnDisable()
         {
             if (uiDialog != null)
-                uiDialog.onHide.RemoveListener(OnItemDialogHide);
-            CacheItemSelectionManager.DeselectSelectedUI();
+                uiDialog.onHide.RemoveListener(OnDialogHide);
+            CacheSelectionManager.DeselectSelectedUI();
         }
 
-        protected void OnItemDialogHide()
+        protected virtual void OnDialogHide()
         {
-            CacheItemSelectionManager.DeselectSelectedUI();
+            CacheSelectionManager.DeselectSelectedUI();
         }
 
-        protected void OnSelectItemCraftFormula(UIItemCraftFormula ui)
+        protected virtual void OnSelect(UIItemCraftFormula ui)
         {
             if (uiDialog != null)
             {
-                uiDialog.selectionManager = CacheItemSelectionManager;
+                uiDialog.selectionManager = CacheSelectionManager;
                 uiDialog.Data = ui.Data;
                 uiDialog.Show();
             }
         }
 
-        protected void OnDeselectItemCraftFormula(UIItemCraftFormula ui)
+        protected virtual void OnDeselect(UIItemCraftFormula ui)
         {
             if (uiDialog != null)
             {
-                uiDialog.onHide.RemoveListener(OnItemDialogHide);
+                uiDialog.onHide.RemoveListener(OnDialogHide);
                 uiDialog.Hide();
-                uiDialog.onHide.AddListener(OnItemDialogHide);
+                uiDialog.onHide.AddListener(OnDialogHide);
             }
         }
 
-        protected void UpdateData()
+        protected virtual void UpdateData()
         {
-            int selectedIdx = CacheItemSelectionManager.SelectedUI != null ? CacheItemSelectionManager.IndexOf(CacheItemSelectionManager.SelectedUI) : -1;
-            CacheItemSelectionManager.DeselectSelectedUI();
-            CacheItemSelectionManager.Clear();
+            int selectedIdx = CacheSelectionManager.SelectedUI != null ? CacheSelectionManager.IndexOf(CacheSelectionManager.SelectedUI) : -1;
+            CacheSelectionManager.DeselectSelectedUI();
+            CacheSelectionManager.Clear();
 
             int sourceId = CraftingQueueManager != null && CraftingQueueManager.Source != null ? CraftingQueueManager.Source.SourceId : 0;
             int showingCount = 0;
             UIItemCraftFormula tempUI;
-            CacheItemList.Generate(GameInstance.ItemCraftFormulas.Values.Where(o => o.SourceId == sourceId), (index, formula, ui) =>
+            CacheList.Generate(GameInstance.ItemCraftFormulas.Values.Where(o => o.SourceId == sourceId), (index, formula, ui) =>
             {
                 tempUI = ui.GetComponent<UIItemCraftFormula>();
                 if (string.IsNullOrEmpty(formula.category) ||
@@ -111,7 +111,7 @@ namespace MultiplayerARPG
                     tempUI.CraftFormulaManager = this;
                     tempUI.Data = formula;
                     tempUI.Show();
-                    CacheItemSelectionManager.Add(tempUI);
+                    CacheSelectionManager.Add(tempUI);
                     if (selectedIdx == index)
                         tempUI.OnClickSelect();
                     showingCount++;

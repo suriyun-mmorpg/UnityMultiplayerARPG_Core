@@ -178,7 +178,7 @@ namespace MultiplayerARPG
             base.Hide();
         }
 
-        public void UpdateData(IPlayerCharacterData character)
+        public virtual void UpdateData(IPlayerCharacterData character)
         {
             this.character = character;
             InitCaches();

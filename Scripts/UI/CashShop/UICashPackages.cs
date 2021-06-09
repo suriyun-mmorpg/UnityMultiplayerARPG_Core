@@ -59,28 +59,28 @@ namespace MultiplayerARPG
 
         protected virtual void OnEnable()
         {
-            CacheSelectionManager.eventOnSelect.RemoveListener(OnSelectCashPackage);
-            CacheSelectionManager.eventOnSelect.AddListener(OnSelectCashPackage);
-            CacheSelectionManager.eventOnDeselect.RemoveListener(OnDeselectCashPackage);
-            CacheSelectionManager.eventOnDeselect.AddListener(OnDeselectCashPackage);
+            CacheSelectionManager.eventOnSelect.RemoveListener(OnSelect);
+            CacheSelectionManager.eventOnSelect.AddListener(OnSelect);
+            CacheSelectionManager.eventOnDeselect.RemoveListener(OnDeselect);
+            CacheSelectionManager.eventOnDeselect.AddListener(OnDeselect);
             if (uiDialog != null)
-                uiDialog.onHide.AddListener(OnCashPackageDialogHide);
+                uiDialog.onHide.AddListener(OnDialogHide);
             RefreshCashPackageInfo();
         }
 
         protected virtual void OnDisable()
         {
             if (uiDialog != null)
-                uiDialog.onHide.RemoveListener(OnCashPackageDialogHide);
+                uiDialog.onHide.RemoveListener(OnDialogHide);
             CacheSelectionManager.DeselectSelectedUI();
         }
 
-        protected void OnCashPackageDialogHide()
+        protected virtual void OnDialogHide()
         {
             CacheSelectionManager.DeselectSelectedUI();
         }
 
-        protected void OnSelectCashPackage(UICashPackage ui)
+        protected virtual void OnSelect(UICashPackage ui)
         {
             if (uiDialog != null && ui.Data != null)
             {
@@ -90,13 +90,13 @@ namespace MultiplayerARPG
             }
         }
 
-        protected void OnDeselectCashPackage(UICashPackage ui)
+        protected virtual void OnDeselect(UICashPackage ui)
         {
             if (uiDialog != null)
             {
-                uiDialog.onHide.RemoveListener(OnCashPackageDialogHide);
+                uiDialog.onHide.RemoveListener(OnDialogHide);
                 uiDialog.Hide();
-                uiDialog.onHide.AddListener(OnCashPackageDialogHide);
+                uiDialog.onHide.AddListener(OnDialogHide);
             }
         }
 
@@ -116,7 +116,7 @@ namespace MultiplayerARPG
             RefreshCashPackageInfo();
         }
 
-        private void ResponseCashPackageInfo(ResponseHandlerData requestHandler, AckResponseCode responseCode, ResponseCashPackageInfoMessage response)
+        protected virtual void ResponseCashPackageInfo(ResponseHandlerData requestHandler, AckResponseCode responseCode, ResponseCashPackageInfoMessage response)
         {
             ClientCashShopActions.ResponseCashPackageInfo(requestHandler, responseCode, response);
             if (responseCode.ShowUnhandledResponseMessageDialog(response.message)) return;

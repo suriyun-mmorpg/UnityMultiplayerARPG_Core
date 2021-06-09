@@ -40,7 +40,7 @@ namespace MultiplayerARPG
 
         protected void OnDialogHide()
         {
-            CacheItemSelectionManager.DeselectSelectedUI();
+            CacheSelectionManager.DeselectSelectedUI();
         }
 
         protected virtual void OnItemsOperation(LiteNetLibSyncList.Operation operation, int index)
@@ -57,7 +57,7 @@ namespace MultiplayerARPG
 
         public void OnClickPickUpSelectedItem()
         {
-            int selectedIndex = CacheItemSelectionManager.SelectedUI != null ? CacheItemSelectionManager.SelectedUI.IndexOfData : -1;
+            int selectedIndex = CacheSelectionManager.SelectedUI != null ? CacheSelectionManager.SelectedUI.IndexOfData : -1;
             if (selectedIndex < 0)
                 return;
             GameInstance.PlayingCharacterEntity.CallServerPickupItemFromContainer(TargetEntity.ObjectId, selectedIndex);
@@ -71,17 +71,17 @@ namespace MultiplayerARPG
             UpdateData(TargetEntity.Items);
         }
 
-        public void UpdateData(IList<CharacterItem> characterItems)
+        public virtual void UpdateData(IList<CharacterItem> characterItems)
         {
             readyToPickUp = false;
-            string selectedId = CacheItemSelectionManager.SelectedUI != null ? CacheItemSelectionManager.SelectedUI.Data.characterItem.id : string.Empty;
-            CacheItemSelectionManager.Clear();
+            string selectedId = CacheSelectionManager.SelectedUI != null ? CacheSelectionManager.SelectedUI.Data.characterItem.id : string.Empty;
+            CacheSelectionManager.Clear();
 
             if (characterItems == null || characterItems.Count == 0)
             {
                 if (uiDialog != null)
                     uiDialog.Hide();
-                CacheItemList.HideAll();
+                CacheList.HideAll();
                 if (listEmptyObject != null)
                     listEmptyObject.SetActive(true);
                 return;
@@ -89,7 +89,7 @@ namespace MultiplayerARPG
 
             UICharacterItem selectedUI = null;
             UICharacterItem tempUI;
-            CacheItemList.Generate(characterItems, (index, characterItem, ui) =>
+            CacheList.Generate(characterItems, (index, characterItem, ui) =>
             {
                 tempUI = ui.GetComponent<UICharacterItem>();
                 tempUI.Setup(new UICharacterItemData(characterItem, InventoryType.Unknow), GameInstance.PlayingCharacter, index);
@@ -97,7 +97,7 @@ namespace MultiplayerARPG
                 UICharacterItemDragHandler dragHandler = tempUI.GetComponentInChildren<UICharacterItemDragHandler>();
                 if (dragHandler != null)
                     dragHandler.SetupForStorageItems(tempUI);
-                CacheItemSelectionManager.Add(tempUI);
+                CacheSelectionManager.Add(tempUI);
                 if (!string.IsNullOrEmpty(selectedId) && selectedId.Equals(characterItem.id))
                     selectedUI = tempUI;
             });
@@ -105,7 +105,7 @@ namespace MultiplayerARPG
                 listEmptyObject.SetActive(false);
             if (selectedUI == null)
             {
-                CacheItemSelectionManager.DeselectSelectedUI();
+                CacheSelectionManager.DeselectSelectedUI();
             }
             else
             {

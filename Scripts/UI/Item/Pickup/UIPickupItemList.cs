@@ -13,7 +13,7 @@
 
         public void OnClickPickUpSelectedItem()
         {
-            string selectedId = CacheItemSelectionManager.SelectedUI != null ? CacheItemSelectionManager.SelectedUI.CharacterItem.id : string.Empty;
+            string selectedId = CacheSelectionManager.SelectedUI != null ? CacheSelectionManager.SelectedUI.CharacterItem.id : string.Empty;
             if (string.IsNullOrEmpty(selectedId))
                 return;
             GameInstance.PlayingCharacterEntity.CallServerPickupItem(uint.Parse(selectedId));

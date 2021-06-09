@@ -22,19 +22,19 @@ namespace MultiplayerARPG
 
         private void OnDisable()
         {
-            uiNonEquipItems.CacheItemSelectionManager.selectionMode = UISelectionMode.SelectSingle;
+            uiNonEquipItems.CacheSelectionManager.selectionMode = UISelectionMode.SelectSingle;
         }
 
         private void Update()
         {
-            uiNonEquipItems.CacheItemSelectionManager.selectionMode = UISelectionMode.SelectMultiple;
+            uiNonEquipItems.CacheSelectionManager.selectionMode = UISelectionMode.SelectMultiple;
         }
 
         private void LateUpdate()
         {
             int returnGold = 0;
             CharacterItem tempCharacterItem;
-            List<UICharacterItem> selectedUIs = uiNonEquipItems.CacheItemSelectionManager.GetSelectedUIs();
+            List<UICharacterItem> selectedUIs = uiNonEquipItems.CacheSelectionManager.GetSelectedUIs();
             foreach (UICharacterItem selectedUI in selectedUIs)
             {
                 tempCharacterItem = selectedUI.Data.characterItem;
@@ -55,7 +55,7 @@ namespace MultiplayerARPG
         {
             List<short> indexes = new List<short>();
             CharacterItem tempCharacterItem;
-            List<UICharacterItem> selectedUIs = uiNonEquipItems.CacheItemSelectionManager.GetSelectedUIs();
+            List<UICharacterItem> selectedUIs = uiNonEquipItems.CacheSelectionManager.GetSelectedUIs();
             foreach (UICharacterItem selectedUI in selectedUIs)
             {
                 tempCharacterItem = selectedUI.Data.characterItem;

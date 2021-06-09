@@ -98,7 +98,7 @@ namespace MultiplayerARPG
                 uiMailList.Refresh();
         }
 
-        private void UpdateData(Mail mail)
+        protected virtual void UpdateData(Mail mail)
         {
             if (textSenderName != null)
             {

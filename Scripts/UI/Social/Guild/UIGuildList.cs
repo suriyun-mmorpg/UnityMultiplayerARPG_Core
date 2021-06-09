@@ -57,12 +57,12 @@ namespace MultiplayerARPG
             CacheSelectionManager.DeselectSelectedUI();
         }
 
-        protected void OnDialogHide()
+        protected virtual void OnDialogHide()
         {
             CacheSelectionManager.DeselectSelectedUI();
         }
 
-        protected void OnSelect(UIGuildListEntry ui)
+        protected virtual void OnSelect(UIGuildListEntry ui)
         {
             if (uiDialog != null && ui.Data != null)
             {
@@ -71,7 +71,7 @@ namespace MultiplayerARPG
             }
         }
 
-        protected void OnDeselect(UIGuildListEntry ui)
+        protected virtual void OnDeselect(UIGuildListEntry ui)
         {
             if (uiDialog != null)
             {
@@ -81,7 +81,7 @@ namespace MultiplayerARPG
             }
         }
 
-        private void UpdateFoundGuildsUIs(GuildListEntry[] foundGuilds)
+        protected virtual void UpdateFoundGuildsUIs(GuildListEntry[] foundGuilds)
         {
             if (foundGuilds == null)
                 return;

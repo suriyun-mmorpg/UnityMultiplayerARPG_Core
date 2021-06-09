@@ -12,10 +12,10 @@ namespace MultiplayerARPG
         {
             get
             {
-                if (uiSocketEnhancerItems.CacheItemSelectionManager != null &&
-                    uiSocketEnhancerItems.CacheItemSelectionManager.SelectedUI != null &&
-                    uiSocketEnhancerItems.CacheItemSelectionManager.SelectedUI.SocketEnhancerItem != null)
-                    return uiSocketEnhancerItems.CacheItemSelectionManager.SelectedUI.SocketEnhancerItem.DataId;
+                if (uiSocketEnhancerItems.CacheSelectionManager != null &&
+                    uiSocketEnhancerItems.CacheSelectionManager.SelectedUI != null &&
+                    uiSocketEnhancerItems.CacheSelectionManager.SelectedUI.SocketEnhancerItem != null)
+                    return uiSocketEnhancerItems.CacheSelectionManager.SelectedUI.SocketEnhancerItem.DataId;
                 return 0;
             }
         }
@@ -24,9 +24,9 @@ namespace MultiplayerARPG
         {
             get
             {
-                if (uiAppliedSocketEnhancerItems.CacheItemSelectionManager != null &&
-                    uiAppliedSocketEnhancerItems.CacheItemSelectionManager.SelectedUI != null)
-                    return uiAppliedSocketEnhancerItems.CacheItemSelectionManager.SelectedUI.IndexOfData;
+                if (uiAppliedSocketEnhancerItems.CacheSelectionManager != null &&
+                    uiAppliedSocketEnhancerItems.CacheSelectionManager.SelectedUI != null)
+                    return uiAppliedSocketEnhancerItems.CacheSelectionManager.SelectedUI.IndexOfData;
                 return -1;
             }
         }
