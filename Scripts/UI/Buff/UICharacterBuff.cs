@@ -91,6 +91,9 @@ namespace MultiplayerARPG
                 case BuffType.GuildSkillBuff:
                     tempGameData = Data.GetGuildSkill();
                     break;
+                case BuffType.StatusEffect:
+                    tempGameData = Data.GetStatusEffect();
+                    break;
             }
 
             if (uiTextTitle != null)

@@ -10,7 +10,7 @@ namespace MultiplayerARPG
         SkillDebuff,
         PotionBuff,
         GuildSkillBuff,
-        SpawnBuff,
+        StatusEffect,
     }
 
     [System.Serializable]
@@ -35,6 +35,8 @@ namespace MultiplayerARPG
         private BaseItem cacheItem;
         [System.NonSerialized]
         private GuildSkill cacheGuildSkill;
+        [System.NonSerialized]
+        private StatusEffect cacheStatusEffect;
         [System.NonSerialized]
         private Buff cacheBuff;
         [System.NonSerialized]
@@ -108,6 +110,10 @@ namespace MultiplayerARPG
                         if (GameInstance.GuildSkills.TryGetValue(dataId, out cacheGuildSkill) && cacheGuildSkill != null)
                             cacheBuff = cacheGuildSkill.GetBuff();
                         break;
+                    case BuffType.StatusEffect:
+                        if (GameInstance.StatusEffects.TryGetValue(dataId, out cacheStatusEffect) && cacheStatusEffect != null)
+                            cacheBuff = cacheStatusEffect.GetBuff();
+                        break;
                 }
                 cacheDuration = cacheBuff.GetDuration(level);
                 cacheRecoveryHp = cacheBuff.GetRecoveryHp(level);
@@ -142,6 +148,12 @@ namespace MultiplayerARPG
         {
             MakeCache();
             return cacheGuildSkill;
+        }
+
+        public StatusEffect GetStatusEffect()
+        {
+            MakeCache();
+            return cacheStatusEffect;
         }
 
         public Buff GetBuff()
