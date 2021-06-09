@@ -792,7 +792,7 @@ namespace MultiplayerARPG
                         yRotation = yAngle;
                     }
                 }
-                acceptedJump = inputState.HasFlag(InputState.IsJump);
+                isJumping = inputState.HasFlag(InputState.IsJump);
             }
         }
 
