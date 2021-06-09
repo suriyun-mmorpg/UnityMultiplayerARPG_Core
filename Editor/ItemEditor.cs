@@ -26,6 +26,10 @@ namespace MultiplayerARPG
             ShowOnEnum(nameof(cacheItem.itemType), nameof(Item.LegacyItemType.Armor), nameof(cacheItem.increaseArmors));
             ShowOnEnum(nameof(cacheItem.itemType), nameof(Item.LegacyItemType.Armor), nameof(cacheItem.increaseDamages));
             ShowOnEnum(nameof(cacheItem.itemType), nameof(Item.LegacyItemType.Armor), nameof(cacheItem.increaseSkillLevels));
+            ShowOnEnum(nameof(cacheItem.itemType), nameof(Item.LegacyItemType.Armor), nameof(cacheItem.selfStatusEffectsWhenAttacking));
+            ShowOnEnum(nameof(cacheItem.itemType), nameof(Item.LegacyItemType.Armor), nameof(cacheItem.enemyStatusEffectsWhenAttacking));
+            ShowOnEnum(nameof(cacheItem.itemType), nameof(Item.LegacyItemType.Armor), nameof(cacheItem.selfStatusEffectsWhenAttacked));
+            ShowOnEnum(nameof(cacheItem.itemType), nameof(Item.LegacyItemType.Armor), nameof(cacheItem.enemyStatusEffectsWhenAttacked));
             ShowOnEnum(nameof(cacheItem.itemType), nameof(Item.LegacyItemType.Armor), nameof(cacheItem.equipmentSet));
             ShowOnEnum(nameof(cacheItem.itemType), nameof(Item.LegacyItemType.Armor), nameof(cacheItem.armorType));
             ShowOnEnum(nameof(cacheItem.itemType), nameof(Item.LegacyItemType.Armor), nameof(cacheItem.armorAmount));
@@ -47,6 +51,10 @@ namespace MultiplayerARPG
             ShowOnEnum(nameof(cacheItem.itemType), nameof(Item.LegacyItemType.Weapon), nameof(cacheItem.increaseArmors));
             ShowOnEnum(nameof(cacheItem.itemType), nameof(Item.LegacyItemType.Weapon), nameof(cacheItem.increaseDamages));
             ShowOnEnum(nameof(cacheItem.itemType), nameof(Item.LegacyItemType.Weapon), nameof(cacheItem.increaseSkillLevels));
+            ShowOnEnum(nameof(cacheItem.itemType), nameof(Item.LegacyItemType.Weapon), nameof(cacheItem.selfStatusEffectsWhenAttacking));
+            ShowOnEnum(nameof(cacheItem.itemType), nameof(Item.LegacyItemType.Weapon), nameof(cacheItem.enemyStatusEffectsWhenAttacking));
+            ShowOnEnum(nameof(cacheItem.itemType), nameof(Item.LegacyItemType.Weapon), nameof(cacheItem.selfStatusEffectsWhenAttacked));
+            ShowOnEnum(nameof(cacheItem.itemType), nameof(Item.LegacyItemType.Weapon), nameof(cacheItem.enemyStatusEffectsWhenAttacked));
             ShowOnEnum(nameof(cacheItem.itemType), nameof(Item.LegacyItemType.Weapon), nameof(cacheItem.equipmentSet));
             ShowOnEnum(nameof(cacheItem.itemType), nameof(Item.LegacyItemType.Weapon), nameof(cacheItem.weaponType));
             ShowOnEnum(nameof(cacheItem.itemType), nameof(Item.LegacyItemType.Weapon), nameof(cacheItem.damageAmount));
@@ -74,6 +82,10 @@ namespace MultiplayerARPG
             ShowOnEnum(nameof(cacheItem.itemType), nameof(Item.LegacyItemType.Shield), nameof(cacheItem.increaseArmors));
             ShowOnEnum(nameof(cacheItem.itemType), nameof(Item.LegacyItemType.Shield), nameof(cacheItem.increaseDamages));
             ShowOnEnum(nameof(cacheItem.itemType), nameof(Item.LegacyItemType.Shield), nameof(cacheItem.increaseSkillLevels));
+            ShowOnEnum(nameof(cacheItem.itemType), nameof(Item.LegacyItemType.Shield), nameof(cacheItem.selfStatusEffectsWhenAttacking));
+            ShowOnEnum(nameof(cacheItem.itemType), nameof(Item.LegacyItemType.Shield), nameof(cacheItem.enemyStatusEffectsWhenAttacking));
+            ShowOnEnum(nameof(cacheItem.itemType), nameof(Item.LegacyItemType.Shield), nameof(cacheItem.selfStatusEffectsWhenAttacked));
+            ShowOnEnum(nameof(cacheItem.itemType), nameof(Item.LegacyItemType.Shield), nameof(cacheItem.enemyStatusEffectsWhenAttacked));
             ShowOnEnum(nameof(cacheItem.itemType), nameof(Item.LegacyItemType.Shield), nameof(cacheItem.equipmentSet));
             ShowOnEnum(nameof(cacheItem.itemType), nameof(Item.LegacyItemType.Shield), nameof(cacheItem.armorAmount));
             ShowOnEnum(nameof(cacheItem.itemType), nameof(Item.LegacyItemType.Shield), nameof(cacheItem.maxDurability));
