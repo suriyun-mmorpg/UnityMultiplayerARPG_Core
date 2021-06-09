@@ -118,6 +118,34 @@ namespace MultiplayerARPG
             get { return increaseSkillLevels; }
         }
 
+        [SerializeField]
+        private StatusEffectApplying[] selfStatusEffectsWhenAttacking;
+        public StatusEffectApplying[] SelfStatusEffectsWhenAttacking
+        {
+            get { return selfStatusEffectsWhenAttacking; }
+        }
+
+        [SerializeField]
+        private StatusEffectApplying[] enemyStatusEffectsWhenAttacking;
+        public StatusEffectApplying[] EnemyStatusEffectsWhenAttacking
+        {
+            get { return enemyStatusEffectsWhenAttacking; }
+        }
+
+        [SerializeField]
+        private StatusEffectApplying[] selfStatusEffectsWhenAttacked;
+        public StatusEffectApplying[] SelfStatusEffectsWhenAttacked
+        {
+            get { return selfStatusEffectsWhenAttacked; }
+        }
+
+        [SerializeField]
+        private StatusEffectApplying[] enemyStatusEffectsWhenAttacked;
+        public StatusEffectApplying[] EnemyStatusEffectsWhenAttacked
+        {
+            get { return enemyStatusEffectsWhenAttacked; }
+        }
+
         public override void PrepareRelatesData()
         {
             base.PrepareRelatesData();

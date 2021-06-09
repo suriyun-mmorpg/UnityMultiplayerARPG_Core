@@ -520,6 +520,48 @@ namespace MultiplayerARPG
                     damageReceiver.CurrentStamina -= leechAmount;
                     damageReceiver.CurrentStamina = Mathf.Clamp(damageReceiver.CurrentStamina, 0, damageReceiver.MaxStamina);
                 }
+                // Applies status effects
+                IEquipmentItem tempEquipmentItem;
+                EntityInfo attackerInfo = attacker.GetInfo();
+                EntityInfo damageReceiverInfo = damageReceiver.GetInfo();
+                // Attacker
+                foreach (CharacterItem item in attacker.EquipItems)
+                {
+                    tempEquipmentItem = item.GetEquipmentItem();
+                    tempEquipmentItem.ApplySelfStatusEffectsWhenAttacking(item.level, attackerInfo, attacker);
+                    tempEquipmentItem.ApplyEnemyStatusEffectsWhenAttacking(item.level, attackerInfo, damageReceiver);
+                }
+                tempEquipmentItem = attacker.EquipWeapons.GetRightHandEquipmentItem();
+                if (tempEquipmentItem != null)
+                {
+                    tempEquipmentItem.ApplySelfStatusEffectsWhenAttacking(attacker.EquipWeapons.rightHand.level, attackerInfo, attacker);
+                    tempEquipmentItem.ApplyEnemyStatusEffectsWhenAttacking(attacker.EquipWeapons.rightHand.level, attackerInfo, damageReceiver);
+                }
+                tempEquipmentItem = attacker.EquipWeapons.GetLeftHandEquipmentItem();
+                if (tempEquipmentItem != null)
+                {
+                    tempEquipmentItem.ApplySelfStatusEffectsWhenAttacking(attacker.EquipWeapons.leftHand.level, attackerInfo, attacker);
+                    tempEquipmentItem.ApplyEnemyStatusEffectsWhenAttacking(attacker.EquipWeapons.leftHand.level, attackerInfo, damageReceiver);
+                }
+                // Damage Receiver
+                foreach (CharacterItem item in damageReceiver.EquipItems)
+                {
+                    tempEquipmentItem = item.GetEquipmentItem();
+                    tempEquipmentItem.ApplySelfStatusEffectsWhenAttacked(item.level, damageReceiverInfo, damageReceiver);
+                    tempEquipmentItem.ApplyEnemyStatusEffectsWhenAttacked(item.level, damageReceiverInfo, attacker);
+                }
+                tempEquipmentItem = damageReceiver.EquipWeapons.GetRightHandEquipmentItem();
+                if (tempEquipmentItem != null)
+                {
+                    tempEquipmentItem.ApplySelfStatusEffectsWhenAttacked(damageReceiver.EquipWeapons.rightHand.level, damageReceiverInfo, damageReceiver);
+                    tempEquipmentItem.ApplyEnemyStatusEffectsWhenAttacked(damageReceiver.EquipWeapons.rightHand.level, damageReceiverInfo, attacker);
+                }
+                tempEquipmentItem = damageReceiver.EquipWeapons.GetLeftHandEquipmentItem();
+                if (tempEquipmentItem != null)
+                {
+                    tempEquipmentItem.ApplySelfStatusEffectsWhenAttacked(damageReceiver.EquipWeapons.leftHand.level, damageReceiverInfo, damageReceiver);
+                    tempEquipmentItem.ApplyEnemyStatusEffectsWhenAttacked(damageReceiver.EquipWeapons.leftHand.level, damageReceiverInfo, attacker);
+                }
             }
             // Decrease Shield Durability
             DecreaseEquipShieldsDurability(damageReceiver, decreaseShieldDurability);

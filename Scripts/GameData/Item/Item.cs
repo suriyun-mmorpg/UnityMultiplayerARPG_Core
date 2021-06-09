@@ -93,6 +93,14 @@ namespace MultiplayerARPG
         public DamageIncremental[] increaseDamages;
         [ArrayElementTitle("skill")]
         public SkillLevel[] increaseSkillLevels;
+        [ArrayElementTitle("statusEffect")]
+        public StatusEffectApplying[] selfStatusEffectsWhenAttacking;
+        [ArrayElementTitle("statusEffect")]
+        public StatusEffectApplying[] enemyStatusEffectsWhenAttacking;
+        [ArrayElementTitle("statusEffect")]
+        public StatusEffectApplying[] selfStatusEffectsWhenAttacked;
+        [ArrayElementTitle("statusEffect")]
+        public StatusEffectApplying[] enemyStatusEffectsWhenAttacked;
 
         [Header("Fire Configs")]
         public FireType fireType;
@@ -293,6 +301,26 @@ namespace MultiplayerARPG
         public SkillLevel[] IncreaseSkillLevels
         {
             get { return increaseSkillLevels; }
+        }
+
+        public StatusEffectApplying[] SelfStatusEffectsWhenAttacking
+        {
+            get { return selfStatusEffectsWhenAttacking; }
+        }
+
+        public StatusEffectApplying[] EnemyStatusEffectsWhenAttacking
+        {
+            get { return enemyStatusEffectsWhenAttacking; }
+        }
+
+        public StatusEffectApplying[] SelfStatusEffectsWhenAttacked
+        {
+            get { return selfStatusEffectsWhenAttacked; }
+        }
+
+        public StatusEffectApplying[] EnemyStatusEffectsWhenAttacked
+        {
+            get { return enemyStatusEffectsWhenAttacked; }
         }
         #endregion
 

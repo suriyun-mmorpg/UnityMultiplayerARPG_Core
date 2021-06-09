@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using UnityEngine;
 
 namespace MultiplayerARPG
 {
@@ -21,7 +22,7 @@ namespace MultiplayerARPG
         public static bool IsUsable<T>(this T item)
             where T : IItem
         {
-            return item.IsPotion() || item.IsBuilding() || item.IsPet() || item.IsMount() || item.IsSkill() ;
+            return item.IsPotion() || item.IsBuilding() || item.IsPet() || item.IsMount() || item.IsSkill();
         }
 
         public static bool IsJunk<T>(this T item)
@@ -170,6 +171,53 @@ namespace MultiplayerARPG
             if (equipmentItem != null && equipmentItem.IsEquipment())
                 result = GameDataHelpers.CombineSkills(equipmentItem.IncreaseSkillLevels, result);
             return result;
+        }
+
+        public static void ApplySelfStatusEffectsWhenAttacking<T>(this T equipmentItem, short level, EntityInfo applier, BaseCharacterEntity target)
+            where T : IEquipmentItem
+        {
+            if (level <= 0 || target == null || equipmentItem == null || !equipmentItem.IsEquipment())
+                return;
+            ApplyStatusEffect(equipmentItem.SelfStatusEffectsWhenAttacking, level, applier, target);
+        }
+
+        public static void ApplyEnemyStatusEffectsWhenAttacking<T>(this T equipmentItem, short level, EntityInfo applier, BaseCharacterEntity target)
+            where T : IEquipmentItem
+        {
+            if (level <= 0 || target == null || equipmentItem == null || !equipmentItem.IsEquipment())
+                return;
+            ApplyStatusEffect(equipmentItem.EnemyStatusEffectsWhenAttacking, level, applier, target);
+        }
+
+        public static void ApplySelfStatusEffectsWhenAttacked<T>(this T equipmentItem, short level, EntityInfo applier, BaseCharacterEntity target)
+            where T : IEquipmentItem
+        {
+            if (level <= 0 || target == null || equipmentItem == null || !equipmentItem.IsEquipment())
+                return;
+            ApplyStatusEffect(equipmentItem.SelfStatusEffectsWhenAttacked, level, applier, target);
+        }
+
+        public static void ApplyEnemyStatusEffectsWhenAttacked<T>(this T equipmentItem, short level, EntityInfo applier, BaseCharacterEntity target)
+            where T : IEquipmentItem
+        {
+            if (level <= 0 || target == null || equipmentItem == null || !equipmentItem.IsEquipment())
+                return;
+            ApplyStatusEffect(equipmentItem.EnemyStatusEffectsWhenAttacked, level, applier, target);
+        }
+
+        private static void ApplyStatusEffect(StatusEffectApplying[] statusEffects, short level, EntityInfo applier, BaseCharacterEntity target)
+        {
+            if (level <= 0 || target == null || statusEffects == null || statusEffects.Length == 0)
+                return;
+            foreach (StatusEffectApplying effect in statusEffects)
+            {
+                if (effect.statusEffect == null) continue;
+                if (Random.value <= effect.chance.GetAmount(level))
+                {
+                    // Apply buffs
+                    target.ApplyBuff(effect.statusEffect.DataId, BuffType.StatusEffect, effect.buffLevel.GetAmount(level), applier);
+                }
+            }
         }
         #endregion
 
