@@ -1,9 +1,6 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
 using LiteNetLibManager;
-#if UNITY_EDITOR
-using UnityEditor;
-#endif
 
 namespace MultiplayerARPG
 {
@@ -13,10 +10,6 @@ namespace MultiplayerARPG
 
         [Header("UI Elements")]
         public UICharacterItem uiItemDialog;
-        [HideInInspector] // TODO: This is deprecated, it will be removed later
-        public UICharacterItem rightHandSlot;
-        [HideInInspector] // TODO: This is deprecated, it will be removed later
-        public UICharacterItem leftHandSlot;
         public UIEquipWeaponsPair[] equipWeaponSlots;
         public UIEquipItemPair[] otherEquipSlots;
 
@@ -44,7 +37,6 @@ namespace MultiplayerARPG
                     cacheEquipItemSlots = new Dictionary<string, UICharacterItem>();
                     CacheSelectionManager.Clear();
                     // Weapons
-                    MigrateUIWeaponSlots();
                     foreach (UIEquipWeaponsPair currentEquipWeaponSlots in equipWeaponSlots)
                     {
                         CacheEquipWeaponSlots(currentEquipWeaponSlots.rightHandSlot, currentEquipWeaponSlots.leftHandSlot, currentEquipWeaponSlots.equipWeaponSetIndex);
@@ -142,33 +134,6 @@ namespace MultiplayerARPG
         {
             if (notForOwningCharacter || GameInstance.PlayingCharacter == null) return;
             UpdateData(GameInstance.PlayingCharacter);
-        }
-
-        private void OnValidate()
-        {
-#if UNITY_EDITOR
-            if (MigrateUIWeaponSlots())
-                EditorUtility.SetDirty(this);
-#endif
-        }
-
-        private bool MigrateUIWeaponSlots()
-        {
-            bool hasChanges = false;
-            if (equipWeaponSlots == null || equipWeaponSlots.Length == 0)
-            {
-                equipWeaponSlots = new UIEquipWeaponsPair[]
-                {
-                    new UIEquipWeaponsPair()
-                    {
-                        equipWeaponSetIndex = 0,
-                        rightHandSlot = rightHandSlot,
-                        leftHandSlot = leftHandSlot,
-                    },
-                };
-                hasChanges = true;
-            }
-            return hasChanges;
         }
 
         protected virtual void OnDialogHide()

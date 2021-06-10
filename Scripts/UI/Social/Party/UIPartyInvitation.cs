@@ -1,8 +1,5 @@
 ﻿using UnityEngine;
 using LiteNetLibManager;
-#if UNITY_EDITOR
-using UnityEditor;
-#endif
 
 namespace MultiplayerARPG
 {
@@ -14,32 +11,9 @@ namespace MultiplayerARPG
         [Tooltip("Format => {0} = {Level}")]
         public UILocaleKeySetting formatKeyLevel = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_LEVEL);
 
-        // TODO: `uiAnotherCharacter` will be deprecated, still keep it for migration
-        [HideInInspector]
-        public UICharacter uiAnotherCharacter;
-
         [Header("UI Elements")]
         public TextWrapper uiTextName;
         public TextWrapper uiTextLevel;
-
-        protected override void Awake()
-        {
-            base.Awake();
-            OnValidate();
-        }
-
-        private void OnValidate()
-        {
-            if (uiAnotherCharacter != null)
-            {
-                uiTextName = uiAnotherCharacter.uiTextName;
-                uiTextLevel = uiAnotherCharacter.uiTextLevel;
-                uiAnotherCharacter = null;
-#if UNITY_EDITOR
-                EditorUtility.SetDirty(this);
-#endif
-            }
-        }
 
         protected override void UpdateData()
         {
