@@ -7,6 +7,7 @@ namespace MultiplayerARPG
 {
     [RequireComponent(typeof(Rigidbody))]
     [RequireComponent(typeof(CapsuleCollider))]
+    [System.Obsolete("This is deprecated, but still keep it for backward compatibilities. Use `RigidBodyEntityMovement` or `CharacterControllerEntityMovement` instead")]
     public class LegacyRigidBodyEntityMovement : BaseNetworkedGameEntityComponent<BaseGameEntity>, IEntityMovementComponent
     {
         protected static readonly RaycastHit[] findGroundRaycastHits = new RaycastHit[25];
