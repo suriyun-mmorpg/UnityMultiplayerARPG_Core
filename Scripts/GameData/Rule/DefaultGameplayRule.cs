@@ -73,7 +73,7 @@ namespace MultiplayerARPG
         public bool recoverWaterWhenLevelUp;
         public bool recoverStaminaWhenLevelUp;
 
-        public override bool RandomAttackHitOccurs(BaseCharacterEntity attacker, BaseCharacterEntity damageReceiver, out bool isCritical, out bool isBlocked)
+        public override bool RandomAttackHitOccurs(BaseCharacterEntity attacker, BaseCharacterEntity damageReceiver, Dictionary<DamageElement, MinMaxFloat> damageAmounts, CharacterItem weapon, BaseSkill skill, short skillLevel, int randomSeed, out bool isCritical, out bool isBlocked)
         {
             bool isHit = false;
             isCritical = false;

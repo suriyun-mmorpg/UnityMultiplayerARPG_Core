@@ -442,7 +442,7 @@ namespace MultiplayerARPG
                 // Notify enemy spotted when damage taken to enemy
                 attackerCharacter.NotifyEnemySpottedToAllies(this);
 
-                if (!CurrentGameInstance.GameplayRule.RandomAttackHitOccurs(attackerCharacter, this, out isCritical, out isBlocked))
+                if (!CurrentGameInstance.GameplayRule.RandomAttackHitOccurs(attackerCharacter, this, damageAmounts, weapon, skill, skillLevel, randomSeed, out isCritical, out isBlocked))
                 {
                     // Don't hit (Miss)
                     combatAmountType = CombatAmountType.Miss;

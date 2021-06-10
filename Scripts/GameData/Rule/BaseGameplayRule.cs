@@ -6,7 +6,7 @@ namespace MultiplayerARPG
 {
     public abstract partial class BaseGameplayRule : ScriptableObject
     {
-        public abstract bool RandomAttackHitOccurs(BaseCharacterEntity attacker, BaseCharacterEntity damageReceiver, out bool isCritical, out bool isBlocked);
+        public abstract bool RandomAttackHitOccurs(BaseCharacterEntity attacker, BaseCharacterEntity damageReceiver, Dictionary<DamageElement, MinMaxFloat> damageAmounts, CharacterItem weapon, BaseSkill skill, short skillLevel, int randomSeed, out bool isCritical, out bool isBlocked);
         public abstract float GetHitChance(BaseCharacterEntity attacker, BaseCharacterEntity damageReceiver);
         public abstract float GetCriticalChance(BaseCharacterEntity attacker, BaseCharacterEntity damageReceiver);
         public abstract float GetCriticalDamage(BaseCharacterEntity attacker, BaseCharacterEntity damageReceiver, float damage);
