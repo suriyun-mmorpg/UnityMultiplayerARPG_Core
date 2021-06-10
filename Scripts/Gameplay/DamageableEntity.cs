@@ -240,8 +240,10 @@ namespace MultiplayerARPG
         /// <param name="skillLevel">Skill level which used to attack</param>
         public virtual void ReceivingDamage(Vector3 fromPosition, EntityInfo instigator, Dictionary<DamageElement, MinMaxFloat> damageAmounts, CharacterItem weapon, BaseSkill skill, short skillLevel)
         {
-            IGameEntity attacker;
-            if (onReceiveDamage != null && instigator.TryGetEntity(out attacker))
+            IGameEntity attacker = null;
+            if (instigator != null)
+                instigator.TryGetEntity(out attacker);
+            if (onReceiveDamage != null)
                 onReceiveDamage.Invoke(fromPosition, attacker, damageAmounts, weapon, skill, skillLevel);
         }
 
@@ -299,8 +301,10 @@ namespace MultiplayerARPG
                 }
             }
             CallAllReceivedDamageFeedback(combatAmountType, damageSource, dataId, totalDamage);
-            IGameEntity attacker;
-            if (onReceivedDamage != null && instigator.TryGetEntity(out attacker))
+            IGameEntity attacker = null;
+            if (instigator != null)
+                instigator.TryGetEntity(out attacker);
+            if (onReceivedDamage != null)
                 onReceivedDamage.Invoke(fromPosition, attacker, combatAmountType, totalDamage, weapon, skill, skillLevel);
         }
 
