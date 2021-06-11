@@ -1,15 +1,19 @@
 ﻿using LiteNetLibManager;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace MultiplayerARPG
 {
     public partial class UICharacterSummons : UIBase
     {
         public ICharacterData character { get; protected set; }
-        public UICharacterSummon uiSummonDialog;
-        public UICharacterSummon uiCharacterSummonPrefab;
-        public Transform uiCharacterSummonContainer;
+        [FormerlySerializedAs("uiSummonDialog")]
+        public UICharacterSummon uiDialog;
+        [FormerlySerializedAs("uiCharacterSummonPrefab")]
+        public UICharacterSummon uiPrefab;
+        [FormerlySerializedAs("uiCharacterSummonContainer")]
+        public Transform uiContainer;
 
         private UIList cacheList;
         public UIList CacheList
@@ -19,8 +23,8 @@ namespace MultiplayerARPG
                 if (cacheList == null)
                 {
                     cacheList = gameObject.AddComponent<UIList>();
-                    cacheList.uiPrefab = uiCharacterSummonPrefab.gameObject;
-                    cacheList.uiContainer = uiCharacterSummonContainer;
+                    cacheList.uiPrefab = uiPrefab.gameObject;
+                    cacheList.uiContainer = uiContainer;
                 }
                 return cacheList;
             }
@@ -44,8 +48,8 @@ namespace MultiplayerARPG
             CacheSelectionManager.eventOnSelect.AddListener(OnSelect);
             CacheSelectionManager.eventOnDeselect.RemoveListener(OnDeselect);
             CacheSelectionManager.eventOnDeselect.AddListener(OnDeselect);
-            if (uiSummonDialog != null)
-                uiSummonDialog.onHide.AddListener(OnDialogHide);
+            if (uiDialog != null)
+                uiDialog.onHide.AddListener(OnDialogHide);
             UpdateOwningCharacterData();
             if (!GameInstance.PlayingCharacterEntity) return;
             GameInstance.PlayingCharacterEntity.onSummonsOperation += OnSummonsOperation;
@@ -53,8 +57,8 @@ namespace MultiplayerARPG
 
         protected virtual void OnDisable()
         {
-            if (uiSummonDialog != null)
-                uiSummonDialog.onHide.RemoveListener(OnDialogHide);
+            if (uiDialog != null)
+                uiDialog.onHide.RemoveListener(OnDialogHide);
             CacheSelectionManager.DeselectSelectedUI();
             if (!GameInstance.PlayingCharacterEntity) return;
             GameInstance.PlayingCharacterEntity.onSummonsOperation -= OnSummonsOperation;
@@ -78,21 +82,21 @@ namespace MultiplayerARPG
 
         protected virtual void OnSelect(UICharacterSummon ui)
         {
-            if (uiSummonDialog != null)
+            if (uiDialog != null)
             {
-                uiSummonDialog.selectionManager = CacheSelectionManager;
-                uiSummonDialog.Setup(ui.Data, character, ui.IndexOfData);
-                uiSummonDialog.Show();
+                uiDialog.selectionManager = CacheSelectionManager;
+                uiDialog.Setup(ui.Data, character, ui.IndexOfData);
+                uiDialog.Show();
             }
         }
 
         protected virtual void OnDeselect(UICharacterSummon ui)
         {
-            if (uiSummonDialog != null)
+            if (uiDialog != null)
             {
-                uiSummonDialog.onHide.RemoveListener(OnDialogHide);
-                uiSummonDialog.Hide();
-                uiSummonDialog.onHide.AddListener(OnDialogHide);
+                uiDialog.onHide.RemoveListener(OnDialogHide);
+                uiDialog.Hide();
+                uiDialog.onHide.AddListener(OnDialogHide);
             }
         }
 

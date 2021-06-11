@@ -1,6 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using LiteNetLibManager;
+using System.Collections.Generic;
 using UnityEngine;
-using LiteNetLibManager;
+using UnityEngine.Serialization;
 
 namespace MultiplayerARPG
 {
@@ -9,7 +10,8 @@ namespace MultiplayerARPG
         public ICharacterData character { get; protected set; }
 
         [Header("UI Elements")]
-        public UICharacterItem uiItemDialog;
+        [FormerlySerializedAs("uiItemDialog")]
+        public UICharacterItem uiDialog;
         public UIEquipWeaponsPair[] equipWeaponSlots;
         public UIEquipItemPair[] otherEquipSlots;
 
@@ -84,16 +86,16 @@ namespace MultiplayerARPG
             CacheSelectionManager.eventOnSelected.AddListener(OnSelect);
             CacheSelectionManager.eventOnDeselected.RemoveListener(OnDeselect);
             CacheSelectionManager.eventOnDeselected.AddListener(OnDeselect);
-            if (uiItemDialog != null)
-                uiItemDialog.onHide.AddListener(OnDialogHide);
+            if (uiDialog != null)
+                uiDialog.onHide.AddListener(OnDialogHide);
             UpdateOwningCharacterData();
             RegisterOwningCharacterEvents();
         }
 
         protected virtual void OnDisable()
         {
-            if (uiItemDialog != null)
-                uiItemDialog.onHide.RemoveListener(OnDialogHide);
+            if (uiDialog != null)
+                uiDialog.onHide.RemoveListener(OnDialogHide);
             CacheSelectionManager.DeselectSelectedUI();
             UnregisterOwningCharacterEvents();
         }
@@ -148,21 +150,21 @@ namespace MultiplayerARPG
                 CacheSelectionManager.DeselectSelectedUI();
                 return;
             }
-            if (uiItemDialog != null)
+            if (uiDialog != null)
             {
-                uiItemDialog.selectionManager = CacheSelectionManager;
-                uiItemDialog.Setup(ui.Data, character, ui.IndexOfData);
-                uiItemDialog.Show();
+                uiDialog.selectionManager = CacheSelectionManager;
+                uiDialog.Setup(ui.Data, character, ui.IndexOfData);
+                uiDialog.Show();
             }
         }
 
         protected virtual void OnDeselect(UICharacterItem ui)
         {
-            if (uiItemDialog != null)
+            if (uiDialog != null)
             {
-                uiItemDialog.onHide.RemoveListener(OnDialogHide);
-                uiItemDialog.Hide();
-                uiItemDialog.onHide.AddListener(OnDialogHide);
+                uiDialog.onHide.RemoveListener(OnDialogHide);
+                uiDialog.Hide();
+                uiDialog.onHide.AddListener(OnDialogHide);
             }
         }
 
@@ -206,12 +208,12 @@ namespace MultiplayerARPG
             }
             else
             {
-                bool defaultDontShowComparingEquipments = uiItemDialog != null ? uiItemDialog.dontShowComparingEquipments : false;
-                if (uiItemDialog != null)
-                    uiItemDialog.dontShowComparingEquipments = true;
+                bool defaultDontShowComparingEquipments = uiDialog != null ? uiDialog.dontShowComparingEquipments : false;
+                if (uiDialog != null)
+                    uiDialog.dontShowComparingEquipments = true;
                 selectedUI.OnClickSelect();
-                if (uiItemDialog != null)
-                    uiItemDialog.dontShowComparingEquipments = defaultDontShowComparingEquipments;
+                if (uiDialog != null)
+                    uiDialog.dontShowComparingEquipments = defaultDontShowComparingEquipments;
             }
 
             for (i = 0; i < character.SelectableWeaponSets.Count; ++i)

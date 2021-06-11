@@ -1,14 +1,17 @@
-﻿using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace MultiplayerARPG
 {
     public partial class UICharacterBuffs : UIBase
     {
         public ICharacterData character { get; protected set; }
-        public UICharacterBuff uiBuffDialog;
-        public UICharacterBuff uiCharacterBuffPrefab;
-        public Transform uiCharacterBuffContainer;
+        [FormerlySerializedAs("uiBuffDialog")]
+        public UICharacterBuff uiDialog;
+        [FormerlySerializedAs("uiCharacterBuffPrefab")]
+        public UICharacterBuff uiPrefab;
+        [FormerlySerializedAs("uiCharacterBuffContainer")]
+        public Transform uiContainer;
 
         private UIList cacheList;
         public UIList CacheList
@@ -18,8 +21,8 @@ namespace MultiplayerARPG
                 if (cacheList == null)
                 {
                     cacheList = gameObject.AddComponent<UIList>();
-                    cacheList.uiPrefab = uiCharacterBuffPrefab.gameObject;
-                    cacheList.uiContainer = uiCharacterBuffContainer;
+                    cacheList.uiPrefab = uiPrefab.gameObject;
+                    cacheList.uiContainer = uiContainer;
                 }
                 return cacheList;
             }
@@ -43,14 +46,14 @@ namespace MultiplayerARPG
             CacheSelectionManager.eventOnSelect.AddListener(OnSelect);
             CacheSelectionManager.eventOnDeselect.RemoveListener(OnDeselect);
             CacheSelectionManager.eventOnDeselect.AddListener(OnDeselect);
-            if (uiBuffDialog != null)
-                uiBuffDialog.onHide.AddListener(OnDialogHide);
+            if (uiDialog != null)
+                uiDialog.onHide.AddListener(OnDialogHide);
         }
 
         protected virtual void OnDisable()
         {
-            if (uiBuffDialog != null)
-                uiBuffDialog.onHide.RemoveListener(OnDialogHide);
+            if (uiDialog != null)
+                uiDialog.onHide.RemoveListener(OnDialogHide);
             CacheSelectionManager.DeselectSelectedUI();
         }
 
@@ -61,21 +64,21 @@ namespace MultiplayerARPG
 
         protected virtual void OnSelect(UICharacterBuff ui)
         {
-            if (uiBuffDialog != null)
+            if (uiDialog != null)
             {
-                uiBuffDialog.selectionManager = CacheSelectionManager;
-                uiBuffDialog.Setup(ui.Data, character, ui.IndexOfData);
-                uiBuffDialog.Show();
+                uiDialog.selectionManager = CacheSelectionManager;
+                uiDialog.Setup(ui.Data, character, ui.IndexOfData);
+                uiDialog.Show();
             }
         }
 
         protected virtual void OnDeselect(UICharacterBuff ui)
         {
-            if (uiBuffDialog != null)
+            if (uiDialog != null)
             {
-                uiBuffDialog.onHide.RemoveListener(OnDialogHide);
-                uiBuffDialog.Hide();
-                uiBuffDialog.onHide.AddListener(OnDialogHide);
+                uiDialog.onHide.RemoveListener(OnDialogHide);
+                uiDialog.Hide();
+                uiDialog.onHide.AddListener(OnDialogHide);
             }
         }
 
