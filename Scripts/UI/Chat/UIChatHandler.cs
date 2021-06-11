@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
+using UnityEngine.Serialization;
 using UnityEngine.UI;
 
 namespace MultiplayerARPG
@@ -9,27 +10,47 @@ namespace MultiplayerARPG
     public partial class UIChatHandler : UIBase
     {
         public static readonly List<ChatMessage> ChatMessages = new List<ChatMessage>();
+        public static readonly Dictionary<ChatChannel, List<ChatMessage>> ChannelBasedChatMessages = new Dictionary<ChatChannel, List<ChatMessage>>();
         
+        [Header("Configs")]
+        [Tooltip("Message channel to send without channel commands, if `showingMessagesFromAllChannels` is `FALSE` it will show messages from this channel only")]
+        public ChatChannel chatChannel = ChatChannel.Local;
+        public bool showingMessagesFromAllChannels = true;
+        public KeyCode enterChatKey = KeyCode.Return;
+        public int chatEntrySize = 30;
+
+        [Header("Channel Commands")]
         public string globalCommand = "/a";
         public string whisperCommand = "/w";
         public string partyCommand = "/p";
         public string guildCommand = "/g";
         public string systemCommand = "/s";
-        public KeyCode enterChatKey = KeyCode.Return;
-        public int chatEntrySize = 30;
+
+        [Header("UIs")]
+        [Tooltip("These game objects will be activated while entering chat message")]
         public GameObject[] enterChatActiveObjects;
-        public InputFieldWrapper uiEnterChatField;
-        public UIChatMessage uiChatMessagePrefab;
-        public Transform uiChatMessageContainer;
+        public InputFieldWrapper uiReceiverField;
+        [FormerlySerializedAs("uiEnterChatField")]
+        public InputFieldWrapper uiMessageField;
+        [FormerlySerializedAs("uiChatMessagePrefab")]
+        public UIChatMessage uiPrefab;
+        [FormerlySerializedAs("uiChatMessageContainer")]
+        public Transform uiContainer;
         public ScrollRect scrollRect;
         public bool clearPreviousChatMessageOnStart;
         
         public bool EnterChatFieldVisible { get; private set; }
 
+        public string EnterChatReceiver
+        {
+            get { return uiReceiverField == null ? string.Empty : uiReceiverField.text; }
+            set { if (uiReceiverField != null) uiReceiverField.text = value; }
+        }
+
         public string EnterChatMessage
         {
-            get { return uiEnterChatField == null ? string.Empty : uiEnterChatField.text; }
-            set { if (uiEnterChatField != null) uiEnterChatField.text = value; }
+            get { return uiMessageField == null ? string.Empty : uiMessageField.text; }
+            set { if (uiMessageField != null) uiMessageField.text = value; }
         }
 
         private UIList cacheList;
@@ -40,38 +61,34 @@ namespace MultiplayerARPG
                 if (cacheList == null)
                 {
                     cacheList = gameObject.AddComponent<UIList>();
-                    cacheList.uiPrefab = uiChatMessagePrefab.gameObject;
-                    cacheList.uiContainer = uiChatMessageContainer;
+                    cacheList.uiPrefab = uiPrefab.gameObject;
+                    cacheList.uiContainer = uiContainer;
                 }
                 return cacheList;
             }
         }
 
         private bool movingToEnd;
+        private ChatChannel dirtyChatChannel;
 
         private void Start()
         {
             if (clearPreviousChatMessageOnStart)
             {
                 ChatMessages.Clear();
+                ChannelBasedChatMessages.Clear();
+                StartCoroutine(VerticalScroll(0f));
             }
             else
             {
-                CacheList.Generate(ChatMessages, (index, message, ui) =>
-                {
-                    UIChatMessage uiChatMessage = ui.GetComponent<UIChatMessage>();
-                    uiChatMessage.uiChatHandler = this;
-                    uiChatMessage.Data = message;
-                    uiChatMessage.Show();
-                });
+                FillChatMessages();
             }
-            StartCoroutine(VerticalScroll(0f));
             
             HideEnterChatField();
-            if (uiEnterChatField != null)
+            if (uiMessageField != null)
             {
-                uiEnterChatField.onValueChanged.RemoveListener(OnInputFieldValueChange);
-                uiEnterChatField.onValueChanged.AddListener(OnInputFieldValueChange);
+                uiMessageField.onValueChanged.RemoveListener(OnMessageFieldValueChange);
+                uiMessageField.onValueChanged.AddListener(OnMessageFieldValueChange);
             }
         }
 
@@ -87,10 +104,16 @@ namespace MultiplayerARPG
 
         private void Update()
         {
+            if (dirtyChatChannel != chatChannel)
+            {
+                dirtyChatChannel = chatChannel;
+                if (!showingMessagesFromAllChannels)
+                    FillChatMessages();
+            }
             if (movingToEnd)
             {
                 movingToEnd = false;
-                uiEnterChatField.MoveTextEnd(false);
+                uiMessageField.MoveTextEnd(false);
             }
             if (Input.GetKeyUp(enterChatKey))
             {
@@ -116,10 +139,10 @@ namespace MultiplayerARPG
                 if (enterChatActiveObject != null)
                     enterChatActiveObject.SetActive(true);
             }
-            if (uiEnterChatField != null)
+            if (uiMessageField != null)
             {
-                uiEnterChatField.ActivateInputField();
-                EventSystem.current.SetSelectedGameObject(uiEnterChatField.gameObject);
+                uiMessageField.ActivateInputField();
+                EventSystem.current.SetSelectedGameObject(uiMessageField.gameObject);
                 movingToEnd = true;
             }
             EnterChatFieldVisible = true;
@@ -132,9 +155,9 @@ namespace MultiplayerARPG
                 if (enterChatActiveObject != null)
                     enterChatActiveObject.SetActive(false);
             }
-            if (uiEnterChatField != null)
+            if (uiMessageField != null)
             {
-                uiEnterChatField.DeactivateInputField();
+                uiMessageField.DeactivateInputField();
                 EventSystem.current.SetSelectedGameObject(null);
             }
             EnterChatFieldVisible = false;
@@ -150,33 +173,46 @@ namespace MultiplayerARPG
                 return;
 
             EnterChatMessage = string.Empty;
-            ChatChannel channel = ChatChannel.Local;
+            ChatChannel channel = chatChannel;
             string message = trimText;
             string sender = GameInstance.PlayingCharacter.CharacterName;
             string receiver = string.Empty;
+            // Set chat channel by command
             string[] splitedText = trimText.Split(' ');
             if (splitedText.Length > 0)
             {
                 string cmd = splitedText[0];
-                if (cmd == whisperCommand && splitedText.Length > 2)
+                if (cmd.Equals(whisperCommand) && 
+                    splitedText.Length > 2)
                 {
                     channel = ChatChannel.Whisper;
                     receiver = splitedText[1];
                     message = trimText.Substring(cmd.Length + receiver.Length + 2); // +2 for space
                     EnterChatMessage = trimText.Substring(0, cmd.Length + receiver.Length + 2); // +2 for space
                 }
-                if ((cmd == globalCommand || cmd == partyCommand || cmd == guildCommand || cmd == systemCommand) && splitedText.Length > 1)
+                if ((cmd.Equals(globalCommand) || 
+                    cmd.Equals(partyCommand) || 
+                    cmd.Equals(guildCommand) || 
+                    cmd.Equals(systemCommand)) 
+                    && splitedText.Length > 1)
                 {
-                    if (cmd == globalCommand)
+                    if (cmd.Equals(globalCommand))
                         channel = ChatChannel.Global;
-                    if (cmd == partyCommand)
+                    if (cmd.Equals(partyCommand))
                         channel = ChatChannel.Party;
-                    if (cmd == guildCommand)
+                    if (cmd.Equals(guildCommand))
                         channel = ChatChannel.Guild;
-                    if (cmd == systemCommand)
+                    if (cmd.Equals(systemCommand))
                         channel = ChatChannel.System;
                     message = trimText.Substring(cmd.Length + 1); // +1 for space
                     EnterChatMessage = trimText.Substring(0, cmd.Length + 1); // +1 for space
+                }
+            }
+            else
+            {
+                if (channel == ChatChannel.Whisper && uiReceiverField)
+                {
+                    receiver = EnterChatReceiver;
                 }
             }
             GameInstance.ClientChatHandlers.SendChatMessage(new ChatMessage()
@@ -191,23 +227,47 @@ namespace MultiplayerARPG
 
         private void OnReceiveChat(ChatMessage chatMessage)
         {
+            if (!ChannelBasedChatMessages.ContainsKey(chatMessage.channel))
+                ChannelBasedChatMessages.Add(chatMessage.channel, new List<ChatMessage>());
+            ChannelBasedChatMessages[chatMessage.channel].Add(chatMessage);
+            if (ChannelBasedChatMessages[chatMessage.channel].Count > chatEntrySize)
+                ChannelBasedChatMessages[chatMessage.channel].RemoveAt(0);
+
             ChatMessages.Add(chatMessage);
             if (ChatMessages.Count > chatEntrySize)
                 ChatMessages.RemoveAt(0);
 
-            UIChatMessage tempUiChatMessage;
-            CacheList.Generate(ChatMessages, (index, message, ui) =>
-            {
-                tempUiChatMessage = ui.GetComponent<UIChatMessage>();
-                tempUiChatMessage.uiChatHandler = this;
-                tempUiChatMessage.Data = message;
-                tempUiChatMessage.Show();
-            });
+            FillChatMessages();
+        }
 
+        private void FillChatMessages()
+        {
+            if (showingMessagesFromAllChannels)
+            {
+                UIChatMessage tempUiChatMessage;
+                CacheList.Generate(ChatMessages, (index, message, ui) =>
+                {
+                    tempUiChatMessage = ui.GetComponent<UIChatMessage>();
+                    tempUiChatMessage.uiChatHandler = this;
+                    tempUiChatMessage.Data = message;
+                    tempUiChatMessage.Show();
+                });
+            }
+            else if (ChannelBasedChatMessages.ContainsKey(chatChannel))
+            {
+                UIChatMessage tempUiChatMessage;
+                CacheList.Generate(ChannelBasedChatMessages[chatChannel], (index, message, ui) =>
+                {
+                    tempUiChatMessage = ui.GetComponent<UIChatMessage>();
+                    tempUiChatMessage.uiChatHandler = this;
+                    tempUiChatMessage.Data = message;
+                    tempUiChatMessage.Show();
+                });
+            }
             StartCoroutine(VerticalScroll(0f));
         }
 
-        private void OnInputFieldValueChange(string text)
+        private void OnMessageFieldValueChange(string text)
         {
             if (text.Length > 0 && !EnterChatFieldVisible)
                 ShowEnterChatField();
