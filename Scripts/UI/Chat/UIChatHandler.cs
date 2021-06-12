@@ -16,6 +16,8 @@ namespace MultiplayerARPG
         [Tooltip("Message channel to send without channel commands, if `showingMessagesFromAllChannels` is `FALSE` it will show messages from this channel only")]
         public ChatChannel chatChannel = ChatChannel.Local;
         public bool showingMessagesFromAllChannels = true;
+        public bool clearPreviousChatMessageOnStart = false;
+        [Tooltip("When enter this key it will show enter chat message field")]
         public KeyCode enterChatKey = KeyCode.Return;
         public int chatEntrySize = 30;
 
@@ -37,7 +39,6 @@ namespace MultiplayerARPG
         [FormerlySerializedAs("uiChatMessageContainer")]
         public Transform uiContainer;
         public ScrollRect scrollRect;
-        public bool clearPreviousChatMessageOnStart;
         
         public bool EnterChatFieldVisible { get; private set; }
 
