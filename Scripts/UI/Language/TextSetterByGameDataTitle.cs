@@ -1,6 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
 namespace MultiplayerARPG
 {
@@ -8,16 +6,24 @@ namespace MultiplayerARPG
     {
         public BaseGameData gameData;
         public TextWrapper textWrapper;
+        [InspectorButton(nameof(UpdateUI))]
+        public bool updateUI;
         private string currentLanguageKey;
 
         private void Update()
         {
-            if (textWrapper == null)
-                return;
-            if (LanguageManager.CurrentLanguageKey.Equals(currentLanguageKey))
+            if (!textWrapper || LanguageManager.CurrentLanguageKey.Equals(currentLanguageKey))
                 return;
             currentLanguageKey = LanguageManager.CurrentLanguageKey;
             textWrapper.text = gameData.Title;
+        }
+
+        private void UpdateUI()
+        {
+            textWrapper.text = gameData.title;
+#if UNITY_EDITOR
+            UnityEditor.EditorUtility.SetDirty(this);
+#endif
         }
     }
 }

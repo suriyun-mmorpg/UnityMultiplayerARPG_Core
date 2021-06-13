@@ -2,21 +2,26 @@
 
 namespace MultiplayerARPG
 {
-    public class TextSetterByLocaleKey : MonoBehaviour
+    public class TextSetterByLanguageKeys : MonoBehaviour
     {
         public string defaultText;
-        public UILocaleKeySetting localeKeySetting;
+        public LanguageData[] textByLanguageKeys;
         public TextWrapper textWrapper;
         [InspectorButton(nameof(UpdateUI))]
         public bool updateUI;
         private string currentLanguageKey;
+
+        public string Title
+        {
+            get { return Language.GetText(textByLanguageKeys, defaultText); }
+        }
 
         private void Update()
         {
             if (!textWrapper || LanguageManager.CurrentLanguageKey.Equals(currentLanguageKey))
                 return;
             currentLanguageKey = LanguageManager.CurrentLanguageKey;
-            textWrapper.text = LanguageManager.GetText(localeKeySetting, defaultText);
+            textWrapper.text = Title;
         }
 
         private void UpdateUI()

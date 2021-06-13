@@ -24,16 +24,16 @@ namespace MultiplayerARPG
         }
 
 #if USE_TEXT_MESH_PRO
-    private TextMeshProUGUI textMeshText;
-    public TextMeshProUGUI TextMeshText
-    {
-        get
+        private TextMeshProUGUI textMeshText;
+        public TextMeshProUGUI TextMeshText
         {
-            if (textMeshText == null)
-                textMeshText = GetComponent<TextMeshProUGUI>();
-            return textMeshText;
+            get
+            {
+                if (textMeshText == null)
+                    textMeshText = GetComponent<TextMeshProUGUI>();
+                return textMeshText;
+            }
         }
-    }
 #endif
 
         private string languageKey;
@@ -47,14 +47,14 @@ namespace MultiplayerARPG
                 {
                     UnityText.text = text;
 #if USE_TEXT_MESH_PRO
-                TextMeshText.text = text;
+                    TextMeshText.text = text;
 #endif
                 }
                 else
                 {
                     UnityText.text = defaultText;
 #if USE_TEXT_MESH_PRO
-                TextMeshText.text = defaultText;
+                    TextMeshText.text = defaultText;
 #endif
                 }
                 languageKey = LanguageManager.CurrentLanguageKey;
@@ -65,7 +65,7 @@ namespace MultiplayerARPG
         {
             UnityText.text = defaultText;
 #if USE_TEXT_MESH_PRO
-        TextMeshText.text = defaultText;
+            TextMeshText.text = defaultText;
 #endif
         }
     }
