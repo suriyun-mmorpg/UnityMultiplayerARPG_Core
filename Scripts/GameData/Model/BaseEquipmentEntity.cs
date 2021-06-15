@@ -1,5 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 #if UNITY_EDITOR
 using UnityEditor;
@@ -7,7 +6,7 @@ using UnityEditor;
 
 namespace MultiplayerARPG
 {
-    public abstract class BaseEquipmentEntity : MonoBehaviour, IPoolDescriptorCollection
+    public abstract partial class BaseEquipmentEntity : MonoBehaviour, IPoolDescriptorCollection
     {
         private int level;
         public int Level

@@ -1,11 +1,10 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
 namespace MultiplayerARPG
 {
-    public class EquipmentEntity : BaseEquipmentEntity
+    public partial class EquipmentEntity : BaseEquipmentEntity
     {
         public List<EquipmentEntityEffect> effects = new List<EquipmentEntityEffect>();
         private Renderer equipmentRenderer;
@@ -82,7 +81,7 @@ namespace MultiplayerARPG
         }
     }
 
-    [System.Serializable]
+    [Serializable]
     public struct EquipmentEntityEffect : IComparable<EquipmentEntityEffect>
     {
         public int level;
