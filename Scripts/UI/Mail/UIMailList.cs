@@ -118,5 +118,15 @@ namespace MultiplayerARPG
             if (listEmptyObject != null)
                 listEmptyObject.SetActive(response.mails.Length == 0);
         }
+
+        public void OnClickDeleteAll()
+        {
+
+        }
+
+        public void OnClickClaimAll()
+        {
+
+        }
     }
 }
