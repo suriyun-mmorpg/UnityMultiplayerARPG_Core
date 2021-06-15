@@ -89,11 +89,13 @@ namespace MultiplayerARPG
         public ExtraMovementState extraMovementState { get; protected set; }
         public Vector2 direction2D { get; protected set; }
 
+        // Public events
+        public System.Action<string> onEquipmentModelsInstantiated;
+        public System.Action<string> onEquipmentModelsDestroyed;
+
         // Optimize garbage collector
         protected readonly List<string> tempAddingKeys = new List<string>();
         protected readonly List<string> tempCachedKeys = new List<string>();
-        protected GameObject tempEquipmentObject;
-        protected BaseEquipmentEntity tempEquipmentEntity;
 
         protected override void Awake()
         {
@@ -317,6 +319,8 @@ namespace MultiplayerARPG
             }
             if (itemIds.ContainsKey(equipPosition))
                 itemIds.Remove(equipPosition);
+            if (onEquipmentModelsDestroyed != null)
+                onEquipmentModelsDestroyed.Invoke(equipPosition);
         }
 
         private void DestroyCacheModels()
@@ -407,7 +411,11 @@ namespace MultiplayerARPG
             if (!equipmentEntities.ContainsKey(equipPosition))
                 equipmentEntities.Add(equipPosition, new List<BaseEquipmentEntity>());
 
-            int i = 0;
+            // Temp variables
+            int i;
+            GameObject tempEquipmentObject;
+            BaseEquipmentEntity tempEquipmentEntity;
+
             // Same item Id, just change equipment level don't destroy and re-create
             if (itemIds.ContainsKey(equipPosition) && itemIds[equipPosition] == itemDataId)
             {
@@ -428,7 +436,7 @@ namespace MultiplayerARPG
             if (equipmentModels == null || equipmentModels.Length == 0)
                 return;
 
-            Dictionary<string, GameObject> tempCreatingModels = new Dictionary<string, GameObject>();
+            Dictionary<string, GameObject> tempInstantiatingModels = new Dictionary<string, GameObject>();
             EquipmentContainer tempContainer;
             EquipmentModel tempEquipmentModel;
             for (i = 0; i < equipmentModels.Length; ++i)
@@ -446,7 +454,7 @@ namespace MultiplayerARPG
                     tempContainer.SetActiveDefaultModel(false);
                     tempEquipmentObject = tempContainer.instantiatedObjects[tempEquipmentModel.instantiatedObjectIndex];
                     tempEquipmentEntity = tempEquipmentObject.GetComponent<BaseEquipmentEntity>();
-                    tempCreatingModels.Add(tempEquipmentModel.equipSocket, null);
+                    tempInstantiatingModels.Add(tempEquipmentModel.equipSocket, null);
                 }
                 else
                 {
@@ -464,7 +472,7 @@ namespace MultiplayerARPG
                     tempEquipmentObject.RemoveComponentsInChildren<Collider>(false);
                     tempEquipmentEntity = tempEquipmentObject.GetComponent<BaseEquipmentEntity>();
                     AddingNewModel(tempEquipmentObject, tempContainer);
-                    tempCreatingModels.Add(tempEquipmentModel.equipSocket, tempEquipmentObject);
+                    tempInstantiatingModels.Add(tempEquipmentModel.equipSocket, tempEquipmentObject);
                 }
                 // Setup equipment entity (if exists)
                 if (tempEquipmentEntity != null)
@@ -476,7 +484,9 @@ namespace MultiplayerARPG
                 }
             }
             // Cache Models
-            cacheModels[equipPosition] = tempCreatingModels;
+            cacheModels[equipPosition] = tempInstantiatingModels;
+            if (onEquipmentModelsInstantiated != null)
+                onEquipmentModelsInstantiated.Invoke(equipPosition);
         }
 
         private void CreateCacheEffect(string buffId, List<GameEffect> effects)
