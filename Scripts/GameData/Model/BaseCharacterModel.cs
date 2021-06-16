@@ -393,20 +393,19 @@ namespace MultiplayerARPG
 
             if (equipItems != null)
             {
-                BaseEquipmentEntity tempEquipmentEntity;
                 foreach (CharacterItem equipItem in equipItems)
                 {
                     armorItem = equipItem.GetArmorItem();
                     if (armorItem == null) continue;
                     if (tempAddingKeys.Contains(armorItem.EquipPosition))
-                        InstantiateEquipModel(armorItem.EquipPosition, armorItem.DataId, equipItem.level, armorItem.EquipmentModels, out tempEquipmentEntity);
+                        InstantiateEquipModel(armorItem.EquipPosition, armorItem.DataId, equipItem.level, armorItem.EquipmentModels, out _);
                 }
             }
         }
 
-        public void InstantiateEquipModel(string equipPosition, int itemDataId, int itemLevel, EquipmentModel[] equipmentModels, out BaseEquipmentEntity equipmentEntity)
+        public void InstantiateEquipModel(string equipPosition, int itemDataId, int itemLevel, EquipmentModel[] equipmentModels, out BaseEquipmentEntity foundEquipmentEntity)
         {
-            equipmentEntity = null;
+            foundEquipmentEntity = null;
 
             if (!equipmentEntities.ContainsKey(equipPosition))
                 equipmentEntities.Add(equipPosition, new List<BaseEquipmentEntity>());
@@ -423,8 +422,8 @@ namespace MultiplayerARPG
                 {
                     tempEquipmentEntity = equipmentEntities[equipPosition][i];
                     tempEquipmentEntity.Level = itemLevel;
-                    if (equipmentEntity == null)
-                        equipmentEntity = tempEquipmentEntity;
+                    if (foundEquipmentEntity == null)
+                        foundEquipmentEntity = tempEquipmentEntity;
                 }
                 return;
             }
@@ -479,8 +478,8 @@ namespace MultiplayerARPG
                 {
                     tempEquipmentEntity.Level = itemLevel;
                     equipmentEntities[equipPosition].Add(tempEquipmentEntity);
-                    if (equipmentEntity == null)
-                        equipmentEntity = tempEquipmentEntity;
+                    if (foundEquipmentEntity == null)
+                        foundEquipmentEntity = tempEquipmentEntity;
                 }
             }
             // Cache Models
