@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Serialization;
+using Cysharp.Threading.Tasks;
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
@@ -11,7 +12,7 @@ namespace MultiplayerARPG
     /// This game database will load and setup game data from data that set in lists
     /// </summary>
     [CreateAssetMenu(fileName = "Game Database", menuName = "Create GameDatabase/Game Database", order = -5999)]
-    public class GameDatabase : BaseGameDatabase
+    public partial class GameDatabase : BaseGameDatabase
     {
         [Header("Entity")]
         public UnityHelpBox entityHelpBox = new UnityHelpBox("Game database will load referring game data from an entities when game instance initializing");
@@ -39,7 +40,7 @@ namespace MultiplayerARPG
         public Quest[] quests;
         public Faction[] factions;
 
-        public override void LoadData(GameInstance gameInstance)
+        protected override async UniTask LoadDataImplement(GameInstance gameInstance)
         {
             GameInstance.AddCharacterEntities(playerCharacterEntities);
             GameInstance.AddCharacterEntities(monsterCharacterEntities);
@@ -61,8 +62,8 @@ namespace MultiplayerARPG
             GameInstance.AddMapInfos(mapInfos);
             GameInstance.AddQuests(quests);
             GameInstance.AddFactions(factions);
-            // Tell game instance that data loaded
-            gameInstance.LoadedGameData();
+            this.InvokeInstanceDevExtMethods("LoadDataImplement", gameInstance);
+            await UniTask.Yield();
         }
 
         public void LoadReferredData()
@@ -155,6 +156,7 @@ namespace MultiplayerARPG
             List<Faction> tempFactions = new List<Faction>(GameInstance.Factions.Values);
             factions = tempFactions.ToArray();
 
+            this.InvokeInstanceDevExtMethods("LoadReferredData");
 #if UNITY_EDITOR
             EditorUtility.SetDirty(this);
 #endif

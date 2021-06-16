@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using Cysharp.Threading.Tasks;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -8,11 +9,10 @@ namespace MultiplayerARPG
     /// This game database will load and setup game data from Resources folder
     /// </summary>
     [CreateAssetMenu(fileName = "Resources Folder Game Database", menuName = "Create GameDatabase/Resources Folder Game Database", order = -5998)]
-    public class ResourcesFolderGameDatabase : BaseGameDatabase
+    public partial class ResourcesFolderGameDatabase : BaseGameDatabase
     {
-        public override void LoadData(GameInstance gameInstance)
+        protected override async UniTask LoadDataImplement(GameInstance gameInstance)
         {
-            // Use Resources Load Async ?
             Attribute[] attributes = Resources.LoadAll<Attribute>("");
             BaseItem[] items = Resources.LoadAll<BaseItem>("");
             ItemCraftFormula[] itemCraftFormulas = Resources.LoadAll<ItemCraftFormula>("");
@@ -27,7 +27,6 @@ namespace MultiplayerARPG
             Faction[] factions = Resources.LoadAll<Faction>("");
             BaseCharacterEntity[] characterEntities = Resources.LoadAll<BaseCharacterEntity>("");
             VehicleEntity[] vehicleEntities = Resources.LoadAll<VehicleEntity>("");
-
             GameInstance.AddAttributes(attributes);
             GameInstance.AddItems(items);
             GameInstance.AddItemCraftFormulas(0, itemCraftFormulas);
@@ -42,8 +41,8 @@ namespace MultiplayerARPG
             GameInstance.AddFactions(factions);
             GameInstance.AddCharacterEntities(characterEntities);
             GameInstance.AddVehicleEntities(vehicleEntities);
-            // Tell game instance that data loaded
-            gameInstance.LoadedGameData();
+            this.InvokeInstanceDevExtMethods("LoadDataImplement", gameInstance);
+            await UniTask.Yield();
         }
     }
 }

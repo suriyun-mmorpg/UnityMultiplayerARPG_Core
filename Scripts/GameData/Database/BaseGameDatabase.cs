@@ -1,11 +1,16 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using Cysharp.Threading.Tasks;
 using UnityEngine;
 
 namespace MultiplayerARPG
 {
     public abstract class BaseGameDatabase : ScriptableObject
     {
-        public abstract void LoadData(GameInstance gameInstance);
+        public async UniTaskVoid LoadData(GameInstance gameInstance)
+        {
+            await LoadDataImplement(gameInstance);
+            // Tell game instance that data loaded
+            gameInstance.LoadedGameData();
+        }
+        protected abstract UniTask LoadDataImplement(GameInstance gameInstance);
     }
 }

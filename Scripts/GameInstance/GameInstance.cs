@@ -490,7 +490,7 @@ namespace MultiplayerARPG
 
         protected virtual void Start()
         {
-            GameDatabase.LoadData(this);
+            GameDatabase.LoadData(this).Forget();
         }
 
         public static void ClearData()
