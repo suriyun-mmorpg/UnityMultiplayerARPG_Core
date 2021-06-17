@@ -278,31 +278,54 @@ namespace MultiplayerARPG
                 }
             }
 
+            int tempConsumeAmount;
+
             if (uiTextConsumeHp != null)
             {
-                uiTextConsumeHp.text = string.Format(
-                    LanguageManager.GetText(formatKeyConsumeHp),
-                    (Skill == null || Level <= 0) ?
-                        LanguageManager.GetUnknowDescription() :
-                        Skill.GetConsumeHp(Level).ToString("N0"));
+                tempConsumeAmount = Skill == null || Level <= 0 ? 0 : Skill.GetConsumeHp(Level);
+                if (tempConsumeAmount != 0)
+                {
+                    uiTextConsumeHp.text = string.Format(
+                        LanguageManager.GetText(formatKeyConsumeHp),
+                        tempConsumeAmount.ToString("N0"));
+                    uiTextConsumeHp.SetGameObjectActive(true);
+                }
+                else
+                {
+                    uiTextConsumeHp.SetGameObjectActive(false);
+                }
             }
 
             if (uiTextConsumeMp != null)
             {
-                uiTextConsumeMp.text = string.Format(
-                    LanguageManager.GetText(formatKeyConsumeMp),
-                    (Skill == null || Level <= 0) ?
-                        LanguageManager.GetUnknowDescription() :
-                        Skill.GetConsumeMp(Level).ToString("N0"));
+                tempConsumeAmount = Skill == null || Level <= 0 ? 0 : Skill.GetConsumeHp(Level);
+                if (tempConsumeAmount != 0)
+                {
+                    uiTextConsumeMp.text = string.Format(
+                        LanguageManager.GetText(formatKeyConsumeMp),
+                        tempConsumeAmount.ToString("N0"));
+                    uiTextConsumeMp.SetGameObjectActive(true);
+                }
+                else
+                {
+                    uiTextConsumeMp.SetGameObjectActive(false);
+                }
             }
 
             if (uiTextConsumeStamina != null)
             {
-                uiTextConsumeStamina.text = string.Format(
-                    LanguageManager.GetText(formatKeyConsumeStamina),
-                    (Skill == null || Level <= 0) ?
-                        LanguageManager.GetUnknowDescription() :
-                        Skill.GetConsumeStamina(Level).ToString("N0"));
+                tempConsumeAmount = Skill == null || Level <= 0 ? 0 : Skill.GetConsumeHp(Level);
+                if (tempConsumeAmount != 0)
+                {
+                    uiTextConsumeStamina.text = string.Format(
+                        LanguageManager.GetText(formatKeyConsumeStamina),
+                        tempConsumeAmount.ToString("N0"));
+                    uiTextConsumeStamina.SetGameObjectActive(true);
+                }
+                else
+                {
+                    uiTextConsumeStamina.SetGameObjectActive(false);
+                }
             }
 
             if (uiRequirement != null)
