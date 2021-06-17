@@ -218,6 +218,15 @@ namespace MultiplayerARPG
             {
                 UpdateSkillCoolDownRemainsDuration(skillItem.UsingSkill, deltaTime);
             }
+            else
+            {
+                if (uiTextCoolDownDuration != null)
+                    uiTextCoolDownDuration.SetGameObjectActive(false);
+                if (uiTextCoolDownRemainsDuration != null)
+                    uiTextCoolDownRemainsDuration.SetGameObjectActive(false);
+                if (imageCoolDownGage != null)
+                    imageCoolDownGage.gameObject.SetActive(false);
+            }
         }
 
         private void UpdateLockRemainsDuration(float deltaTime)
@@ -318,6 +327,7 @@ namespace MultiplayerARPG
             if (imageCoolDownGage != null)
             {
                 imageCoolDownGage.fillAmount = coolDownDuration <= 0 ? 0 : coolDownRemainsDuration / coolDownDuration;
+                imageCoolDownGage.gameObject.SetActive(imageCoolDownGage.fillAmount > 0f);
             }
 
             bool isCountDown = coolDownRemainsDuration > 0f;

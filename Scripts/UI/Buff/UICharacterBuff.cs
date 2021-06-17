@@ -70,7 +70,10 @@ namespace MultiplayerARPG
             }
 
             if (imageDurationGage != null)
+            {
                 imageDurationGage.fillAmount = buffDuration <= 0 ? 0 : buffRemainsDuration / buffDuration;
+                imageDurationGage.gameObject.SetActive(imageDurationGage.fillAmount > 0f);
+            }
         }
 
         protected override void UpdateData()

@@ -85,7 +85,10 @@ namespace MultiplayerARPG
             }
 
             if (imageDurationGage != null)
+            {
                 imageDurationGage.fillAmount = craftDuration <= 0 ? 0 : craftRemainsDuration / craftDuration;
+                imageDurationGage.gameObject.SetActive(imageDurationGage.fillAmount > 0f);
+            }
         }
 
         protected override void UpdateData()

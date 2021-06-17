@@ -115,6 +115,7 @@ namespace MultiplayerARPG
             if (imageCoolDownGage != null)
             {
                 imageCoolDownGage.fillAmount = coolDownDuration <= 0 ? 0 : coolDownRemainsDuration / coolDownDuration;
+                imageCoolDownGage.gameObject.SetActive(imageCoolDownGage.fillAmount > 0f);
             }
 
             bool isCountDown = coolDownRemainsDuration > 0f;
