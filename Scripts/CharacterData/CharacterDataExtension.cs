@@ -1745,5 +1745,20 @@ namespace MultiplayerARPG
                     resultAttributes[attribute] = attribute.maxAmount;
             }
         }
+
+        public static void ApplyStatusEffect(this IEnumerable<StatusEffectApplying> statusEffects, short level, EntityInfo applier, BaseCharacterEntity target)
+        {
+            if (level <= 0 || target == null || statusEffects == null)
+                return;
+            foreach (StatusEffectApplying effect in statusEffects)
+            {
+                if (effect.statusEffect == null) continue;
+                if (Random.value <= effect.chance.GetAmount(level))
+                {
+                    // Apply buffs
+                    target.ApplyBuff(effect.statusEffect.DataId, BuffType.StatusEffect, effect.buffLevel.GetAmount(level), applier);
+                }
+            }
+        }
     }
 }

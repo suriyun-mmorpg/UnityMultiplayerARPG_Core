@@ -101,6 +101,10 @@ namespace MultiplayerARPG
             ShowOnEnum(nameof(cacheItem.itemType), nameof(Item.LegacyItemType.Pet), nameof(cacheItem.petEntity));
             // Socket Enhancer
             ShowOnEnum(nameof(cacheItem.itemType), nameof(Item.LegacyItemType.SocketEnhancer), nameof(cacheItem.socketEnhanceEffect));
+            ShowOnEnum(nameof(cacheItem.itemType), nameof(Item.LegacyItemType.SocketEnhancer), nameof(cacheItem.selfStatusEffectsWhenAttacking));
+            ShowOnEnum(nameof(cacheItem.itemType), nameof(Item.LegacyItemType.SocketEnhancer), nameof(cacheItem.enemyStatusEffectsWhenAttacking));
+            ShowOnEnum(nameof(cacheItem.itemType), nameof(Item.LegacyItemType.SocketEnhancer), nameof(cacheItem.selfStatusEffectsWhenAttacked));
+            ShowOnEnum(nameof(cacheItem.itemType), nameof(Item.LegacyItemType.SocketEnhancer), nameof(cacheItem.enemyStatusEffectsWhenAttacked));
             // Mount
             ShowOnEnum(nameof(cacheItem.itemType), nameof(Item.LegacyItemType.Mount), nameof(cacheItem.mountEntity));
             // Attribute Increase

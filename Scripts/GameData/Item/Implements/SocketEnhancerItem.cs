@@ -1,6 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
 namespace MultiplayerARPG
 {
@@ -23,6 +21,43 @@ namespace MultiplayerARPG
         public EquipmentBonus SocketEnhanceEffect
         {
             get { return socketEnhanceEffect; }
+        }
+
+        [SerializeField]
+        private StatusEffectApplying[] selfStatusEffectsWhenAttacking;
+        public StatusEffectApplying[] SelfStatusEffectsWhenAttacking
+        {
+            get { return selfStatusEffectsWhenAttacking; }
+        }
+
+        [SerializeField]
+        private StatusEffectApplying[] enemyStatusEffectsWhenAttacking;
+        public StatusEffectApplying[] EnemyStatusEffectsWhenAttacking
+        {
+            get { return enemyStatusEffectsWhenAttacking; }
+        }
+
+        [SerializeField]
+        private StatusEffectApplying[] selfStatusEffectsWhenAttacked;
+        public StatusEffectApplying[] SelfStatusEffectsWhenAttacked
+        {
+            get { return selfStatusEffectsWhenAttacked; }
+        }
+
+        [SerializeField]
+        private StatusEffectApplying[] enemyStatusEffectsWhenAttacked;
+        public StatusEffectApplying[] EnemyStatusEffectsWhenAttacked
+        {
+            get { return enemyStatusEffectsWhenAttacked; }
+        }
+
+        public override void PrepareRelatesData()
+        {
+            base.PrepareRelatesData();
+            GameInstance.AddStatusEffects(SelfStatusEffectsWhenAttacking);
+            GameInstance.AddStatusEffects(EnemyStatusEffectsWhenAttacking);
+            GameInstance.AddStatusEffects(SelfStatusEffectsWhenAttacked);
+            GameInstance.AddStatusEffects(EnemyStatusEffectsWhenAttacked);
         }
     }
 }

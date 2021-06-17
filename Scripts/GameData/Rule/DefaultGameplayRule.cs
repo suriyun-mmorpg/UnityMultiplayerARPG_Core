@@ -522,51 +522,102 @@ namespace MultiplayerARPG
                 }
                 // Applies status effects
                 IEquipmentItem tempEquipmentItem;
+                Buff tempBuff;
                 EntityInfo attackerInfo = attacker.GetInfo();
                 EntityInfo damageReceiverInfo = damageReceiver.GetInfo();
                 // Attacker
-                foreach (CharacterItem item in attacker.EquipItems)
+                foreach (CharacterItem armorItem in attacker.EquipItems)
                 {
-                    tempEquipmentItem = item.GetEquipmentItem();
-                    tempEquipmentItem.ApplySelfStatusEffectsWhenAttacking(item.level, attackerInfo, attacker);
-                    tempEquipmentItem.ApplyEnemyStatusEffectsWhenAttacking(item.level, attackerInfo, damageReceiver);
+                    tempEquipmentItem = armorItem.GetEquipmentItem();
+                    ApplyStatusEffectToAttacker(armorItem, tempEquipmentItem, attackerInfo, attacker, damageReceiver);
                 }
                 tempEquipmentItem = attacker.EquipWeapons.GetRightHandEquipmentItem();
                 if (tempEquipmentItem != null)
                 {
-                    tempEquipmentItem.ApplySelfStatusEffectsWhenAttacking(attacker.EquipWeapons.rightHand.level, attackerInfo, attacker);
-                    tempEquipmentItem.ApplyEnemyStatusEffectsWhenAttacking(attacker.EquipWeapons.rightHand.level, attackerInfo, damageReceiver);
+                    ApplyStatusEffectToAttacker(attacker.EquipWeapons.rightHand, tempEquipmentItem, attackerInfo, attacker, damageReceiver);
                 }
                 tempEquipmentItem = attacker.EquipWeapons.GetLeftHandEquipmentItem();
                 if (tempEquipmentItem != null)
                 {
-                    tempEquipmentItem.ApplySelfStatusEffectsWhenAttacking(attacker.EquipWeapons.leftHand.level, attackerInfo, attacker);
-                    tempEquipmentItem.ApplyEnemyStatusEffectsWhenAttacking(attacker.EquipWeapons.leftHand.level, attackerInfo, damageReceiver);
+                    ApplyStatusEffectToAttacker(attacker.EquipWeapons.leftHand, tempEquipmentItem, attackerInfo, attacker, damageReceiver);
+                }
+                foreach (CharacterBuff buff in attacker.Buffs)
+                {
+                    tempBuff = buff.GetBuff();
+                    tempBuff.ApplySelfStatusEffectsWhenAttacking(buff.level, attackerInfo, attacker);
+                    tempBuff.ApplyEnemyStatusEffectsWhenAttacking(buff.level, attackerInfo, damageReceiver);
                 }
                 // Damage Receiver
-                foreach (CharacterItem item in damageReceiver.EquipItems)
+                foreach (CharacterItem armorItem in attacker.EquipItems)
                 {
-                    tempEquipmentItem = item.GetEquipmentItem();
-                    tempEquipmentItem.ApplySelfStatusEffectsWhenAttacked(item.level, damageReceiverInfo, damageReceiver);
-                    tempEquipmentItem.ApplyEnemyStatusEffectsWhenAttacked(item.level, damageReceiverInfo, attacker);
+                    tempEquipmentItem = armorItem.GetEquipmentItem();
+                    ApplyStatusEffectToDamageReceiver(armorItem, tempEquipmentItem, damageReceiverInfo, attacker, damageReceiver);
                 }
-                tempEquipmentItem = damageReceiver.EquipWeapons.GetRightHandEquipmentItem();
+                tempEquipmentItem = attacker.EquipWeapons.GetRightHandEquipmentItem();
                 if (tempEquipmentItem != null)
                 {
-                    tempEquipmentItem.ApplySelfStatusEffectsWhenAttacked(damageReceiver.EquipWeapons.rightHand.level, damageReceiverInfo, damageReceiver);
-                    tempEquipmentItem.ApplyEnemyStatusEffectsWhenAttacked(damageReceiver.EquipWeapons.rightHand.level, damageReceiverInfo, attacker);
+                    ApplyStatusEffectToDamageReceiver(attacker.EquipWeapons.rightHand, tempEquipmentItem, damageReceiverInfo, attacker, damageReceiver);
                 }
-                tempEquipmentItem = damageReceiver.EquipWeapons.GetLeftHandEquipmentItem();
+                tempEquipmentItem = attacker.EquipWeapons.GetLeftHandEquipmentItem();
                 if (tempEquipmentItem != null)
                 {
-                    tempEquipmentItem.ApplySelfStatusEffectsWhenAttacked(damageReceiver.EquipWeapons.leftHand.level, damageReceiverInfo, damageReceiver);
-                    tempEquipmentItem.ApplyEnemyStatusEffectsWhenAttacked(damageReceiver.EquipWeapons.leftHand.level, damageReceiverInfo, attacker);
+                    ApplyStatusEffectToDamageReceiver(attacker.EquipWeapons.leftHand, tempEquipmentItem, damageReceiverInfo, attacker, damageReceiver);
+                }
+                foreach (CharacterBuff buff in attacker.Buffs)
+                {
+                    tempBuff = buff.GetBuff();
+                    tempBuff.ApplySelfStatusEffectsWhenAttacked(buff.level, damageReceiverInfo, damageReceiver);
+                    tempBuff.ApplyEnemyStatusEffectsWhenAttacked(buff.level, damageReceiverInfo, attacker);
                 }
             }
             // Decrease Shield Durability
             DecreaseEquipShieldsDurability(damageReceiver, decreaseShieldDurability);
             // Decrease Armor Durability
             DecreaseEquipItemsDurability(damageReceiver, decreaseArmorDurability);
+        }
+
+        private void ApplyStatusEffectToAttacker(CharacterItem characterItem, IEquipmentItem equipmentItem, EntityInfo attackerInfo, BaseCharacterEntity attacker, BaseCharacterEntity damageReceiver)
+        {
+            equipmentItem.ApplySelfStatusEffectsWhenAttacking(characterItem.level, attackerInfo, attacker);
+            equipmentItem.ApplyEnemyStatusEffectsWhenAttacking(characterItem.level, attackerInfo, damageReceiver);
+            if (characterItem.Sockets.Count > 0)
+            {
+                foreach (int socketItemDataId in characterItem.Sockets)
+                {
+                    ApplyStatusEffectToAttacker(socketItemDataId, attackerInfo, attacker, damageReceiver);
+                }
+            }
+        }
+
+        private void ApplyStatusEffectToAttacker(int socketItemDataId, EntityInfo attackerInfo, BaseCharacterEntity attacker, BaseCharacterEntity damageReceiver)
+        {
+            if (!GameInstance.Items.ContainsKey(socketItemDataId))
+                return;
+            ISocketEnhancerItem tempSocketEnhancerItem = GameInstance.Items[socketItemDataId] as ISocketEnhancerItem;
+            tempSocketEnhancerItem.ApplySelfStatusEffectsWhenAttacking(attackerInfo, attacker);
+            tempSocketEnhancerItem.ApplyEnemyStatusEffectsWhenAttacking(attackerInfo, damageReceiver);
+        }
+
+        private void ApplyStatusEffectToDamageReceiver(CharacterItem characterItem, IEquipmentItem equipmentItem, EntityInfo damageReceiverInfo, BaseCharacterEntity attacker, BaseCharacterEntity damageReceiver)
+        {
+            equipmentItem.ApplySelfStatusEffectsWhenAttacked(characterItem.level, damageReceiverInfo, damageReceiver);
+            equipmentItem.ApplyEnemyStatusEffectsWhenAttacked(characterItem.level, damageReceiverInfo, attacker);
+            if (characterItem.Sockets.Count > 0)
+            {
+                foreach (int socketItemDataId in characterItem.Sockets)
+                {
+                    ApplyStatusEffectToDamageReceiver(socketItemDataId, damageReceiverInfo, attacker, damageReceiver);
+                }
+            }
+        }
+
+        private void ApplyStatusEffectToDamageReceiver(int socketItemDataId, EntityInfo damageReceiverInfo, BaseCharacterEntity attacker, BaseCharacterEntity damageReceiver)
+        {
+            if (!GameInstance.Items.ContainsKey(socketItemDataId))
+                return;
+            ISocketEnhancerItem tempSocketEnhancerItem = GameInstance.Items[socketItemDataId] as ISocketEnhancerItem;
+            tempSocketEnhancerItem.ApplySelfStatusEffectsWhenAttacked(damageReceiverInfo, damageReceiver);
+            tempSocketEnhancerItem.ApplyEnemyStatusEffectsWhenAttacked(damageReceiverInfo, attacker);
         }
 
         public override void OnHarvestableReceivedDamage(BaseCharacterEntity attacker, HarvestableEntity damageReceiver, CombatAmountType combatAmountType, int damage, CharacterItem weapon, BaseSkill skill, short skillLevel)
