@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 using System;
 #if UNITY_EDITOR
 using UnityEditor;
@@ -38,6 +37,7 @@ namespace MultiplayerARPG
             get { return Language.GetText(descriptions, description); }
         }
 
+        [NonSerialized]
         private int? dataId;
         public int DataId
         {
