@@ -1,6 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
 namespace MultiplayerARPG
 {
@@ -71,6 +69,10 @@ namespace MultiplayerARPG
             GameInstance.AddDamageElements(increaseResistances);
             GameInstance.AddDamageElements(increaseArmors);
             GameInstance.AddDamageElements(increaseDamages);
+            GameInstance.AddStatusEffects(selfStatusEffectsWhenAttacking);
+            GameInstance.AddStatusEffects(enemyStatusEffectsWhenAttacking);
+            GameInstance.AddStatusEffects(selfStatusEffectsWhenAttacked);
+            GameInstance.AddStatusEffects(enemyStatusEffectsWhenAttacked);
         }
     }
 }
