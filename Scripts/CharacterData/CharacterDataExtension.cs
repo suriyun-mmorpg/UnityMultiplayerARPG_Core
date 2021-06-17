@@ -1351,6 +1351,17 @@ namespace MultiplayerARPG
             return -1;
         }
 
+        public static List<int> IndexesOfBuff(this ICharacterData data, int dataId, BuffType type)
+        {
+            List<int> result = new List<int>();
+            for (int i = 0; i < data.Buffs.Count; ++i)
+            {
+                if (data.Buffs[i].dataId == dataId && data.Buffs[i].type == type)
+                    result.Add(i);
+            }
+            return result;
+        }
+
         public static int IndexOfEquipItem(this ICharacterData data, int dataId)
         {
             for (int i = 0; i < data.EquipItems.Count; ++i)

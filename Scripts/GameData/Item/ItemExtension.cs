@@ -215,7 +215,7 @@ namespace MultiplayerARPG
                 if (Random.value <= effect.chance.GetAmount(level))
                 {
                     // Apply buffs
-                    target.ApplyBuff(effect.statusEffect.DataId, BuffType.StatusEffect, effect.buffLevel.GetAmount(level), applier);
+                    target.ApplyBuff(effect.statusEffect.DataId, BuffType.StatusEffect, effect.buffLevel.GetAmount(level), applier, effect.statusEffect.GetMaxStack());
                 }
             }
         }

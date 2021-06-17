@@ -6,14 +6,29 @@ namespace MultiplayerARPG
 {
     public partial class BaseCharacterEntity
     {
-        public void ApplyBuff(int dataId, BuffType type, short level, EntityInfo buffApplier)
+        public void ApplyBuff(int dataId, BuffType type, short level, EntityInfo buffApplier, int maxStack = 1)
         {
             if (!IsServer || this.IsDead())
                 return;
 
-            int buffIndex = this.IndexOfBuff(dataId, type);
-            if (buffIndex >= 0)
-                buffs.RemoveAt(buffIndex);
+            if (maxStack > 1)
+            {
+                List<int> indexesOfBuff = this.IndexesOfBuff(dataId, type);
+                while (indexesOfBuff.Count > maxStack)
+                {
+                    int buffIndex = indexesOfBuff[0];
+                    if (buffIndex >= 0)
+                        buffs.RemoveAt(buffIndex);
+                    indexesOfBuff.RemoveAt(0);
+                }
+            }
+            else
+            {
+                // `maxStack` <= 0, assume that it's = `1`
+                int buffIndex = this.IndexOfBuff(dataId, type);
+                if (buffIndex >= 0)
+                    buffs.RemoveAt(buffIndex);
+            }
 
             CharacterBuff newBuff = CharacterBuff.Create(type, dataId, level);
             newBuff.Apply(buffApplier);
