@@ -21,6 +21,11 @@ public class UISelectionEntryGraphicColors : MonoBehaviour
     private void Awake()
     {
         entry = GetComponent<IUISelectionEntry>();
+    }
+
+    private void OnEnable()
+    {
+        dirtySelected = false;
         foreach (Setting setting in settings)
         {
             setting.graphic.color = setting.defaultColor;
