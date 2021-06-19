@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-[CreateAssetMenu(fileName = "Animation 2D", menuName = "Animation 2D")]
+[CreateAssetMenu(fileName = "Animation Clip 2D", menuName = "Animation Clip 2D")]
 public class AnimationClip2D : ScriptableObject
 {
     public Sprite[] frames;
