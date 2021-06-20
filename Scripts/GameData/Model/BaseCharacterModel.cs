@@ -14,6 +14,9 @@ namespace MultiplayerARPG
         public bool IsMainModel { get { return !ModelManager || ModelManager.MainModel == this; } }
         public bool IsFpsModel { get { return !ModelManager || ModelManager.FpsModel == this; } }
         public bool IsMainOrFpsModel { get { return IsMainModel || IsFpsModel; } }
+        /// <summary>
+        /// AssetId + VehicleId + SeatIndex
+        /// </summary>
         public string Id { get; set; }
 
         [Header("Model Switching Settings")]
