@@ -298,8 +298,11 @@ namespace MultiplayerARPG
         public bool setAnimatorClipsForTest;
 #endif
 
-        public AnimatorOverrideController CurrentAnimatorController { get; private set; }
-        private CacheAnimatorController cacheAnimatorController;
+        public AnimatorOverrideController CurrentAnimatorController
+        {
+            get { return animator.runtimeAnimatorController as AnimatorOverrideController; }
+            private set { animator.runtimeAnimatorController = value; }
+        }
         private int[] actionStateNameHashes;
         private int[] castSkillStateNameHashes;
         private bool isSetupComponent;
@@ -345,7 +348,6 @@ namespace MultiplayerARPG
 
         protected override void OnValidate()
         {
-            base.OnValidate();
 #if UNITY_EDITOR
             bool hasChanges = false;
             if (animator == null)
@@ -418,6 +420,7 @@ namespace MultiplayerARPG
                 EditorUtility.SetDirty(this);
             }
 #endif
+            base.OnValidate();
         }
 
         private void SetupComponent()
@@ -434,13 +437,11 @@ namespace MultiplayerARPG
             castSkillStateNameHashes = new int[castSkillStateNames.Length];
             for (indexCounter = 0; indexCounter < castSkillStateNames.Length; ++indexCounter)
                 castSkillStateNameHashes[indexCounter] = Animator.StringToHash(castSkillStateNames[indexCounter]);
-            cacheAnimatorController = SetAndGetCacheAnimatorController(Id, animatorController, defaultAnimations, weaponAnimations);
-            SetDefaultAnimations();
         }
 
         public override void SetDefaultAnimations()
         {
-            CurrentAnimatorController = cacheAnimatorController.Default;
+            CurrentAnimatorController = SetAndGetCacheAnimatorController(Id, animatorController, defaultAnimations, weaponAnimations).Default;
             SetupSpeedRates();
             base.SetDefaultAnimations();
         }
@@ -526,6 +527,7 @@ namespace MultiplayerARPG
 
         protected void SetClipBasedOnWeaponType(WeaponType weaponType)
         {
+            CacheAnimatorController cacheAnimatorController = SetAndGetCacheAnimatorController(Id, animatorController, defaultAnimations, weaponAnimations);
             WeaponAnimations currentWeaponAnimations;
             if (weaponType == null ||
                 !cacheAnimatorController.Weapons.ContainsKey(weaponType.DataId) ||
@@ -561,9 +563,6 @@ namespace MultiplayerARPG
         {
             if (!animator.isActiveAndEnabled)
                 return;
-
-            if (animator.runtimeAnimatorController != CurrentAnimatorController)
-                animator.runtimeAnimatorController = CurrentAnimatorController;
 
             if (isDead)
             {
