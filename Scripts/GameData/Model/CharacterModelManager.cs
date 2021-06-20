@@ -102,7 +102,6 @@ namespace MultiplayerARPG
                 mainModel = GetComponent<BaseCharacterModel>();
                 if (mainModel)
                 {
-                    mainModel.HashAssetId = Entity.Identity.HashAssetId;
                     return true;
                 }
                 else
@@ -110,10 +109,6 @@ namespace MultiplayerARPG
                     Logging.LogError(ToString(), "Can't find main model");
                     return false;
                 }
-            }
-            else
-            {
-                mainModel.HashAssetId = Entity.Identity.HashAssetId;
             }
             return false;
         }
@@ -130,7 +125,6 @@ namespace MultiplayerARPG
                         if (!vehicleModel.vehicleType) continue;
                         for (int i = 0; i < vehicleModel.modelsForEachSeats.Length; ++i)
                         {
-                            vehicleModel.modelsForEachSeats[i].HashAssetId = Entity.Identity.HashAssetId;
                             vehicleModel.modelsForEachSeats[i].VehicleTypeDataId = vehicleModel.vehicleType.DataId;
                             vehicleModel.modelsForEachSeats[i].VehicleSeatIndex = i;
                         }

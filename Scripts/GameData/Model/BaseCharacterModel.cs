@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
+using LiteNetLibManager;
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
@@ -14,12 +15,28 @@ namespace MultiplayerARPG
         public bool IsMainModel { get { return !ModelManager || ModelManager.MainModel == this; } }
         public bool IsFpsModel { get { return !ModelManager || ModelManager.FpsModel == this; } }
         public bool IsMainOrFpsModel { get { return IsMainModel || IsFpsModel; } }
-        public int? HashAssetId { get; set; }
+        private bool isFoundIdentity;
+        private LiteNetLibIdentity identity;
+        public LiteNetLibIdentity Identity
+        {
+            get
+            {
+                if (!isFoundIdentity)
+                {
+                    identity = GetComponent<LiteNetLibIdentity>();
+                    if (identity == null)
+                        identity = GetComponentInParent<LiteNetLibIdentity>();
+                    isFoundIdentity = identity != null;
+                }
+                return identity;
+            }
+        }
+        public int HashAssetId
+        {
+            get { return Identity.HashAssetId; }
+        }
         public int? VehicleTypeDataId { get; set; }
         public int? VehicleSeatIndex { get; set; }
-        /// <summary>
-        /// AssetId ^ VehicleId ^ SeatIndex
-        /// </summary>
         public int Id
         {
             get
@@ -27,10 +44,7 @@ namespace MultiplayerARPG
                 unchecked
                 {
                     int id = 17;
-                    if (HashAssetId.HasValue)
-                        id = id * 31 + HashAssetId.Value;
-                    else
-                        id = id * 31 + GetInstanceID();
+                    id = id * 31 + HashAssetId;
                     if (VehicleTypeDataId.HasValue)
                         id = id * 31 + VehicleTypeDataId.Value;
                     if (VehicleSeatIndex.HasValue)
