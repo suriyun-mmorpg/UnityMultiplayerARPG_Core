@@ -102,7 +102,7 @@ namespace MultiplayerARPG
                 mainModel = GetComponent<BaseCharacterModel>();
                 if (mainModel)
                 {
-                    mainModel.Id = new StringBuilder(Entity.Identity.AssetId).Append(0).Append(0).ToString();
+                    mainModel.Id = new StringBuilder(Entity.Identity.AssetId).ToString();
                     return true;
                 }
                 else
@@ -113,7 +113,7 @@ namespace MultiplayerARPG
             }
             else
             {
-                mainModel.Id = new StringBuilder(Entity.Identity.AssetId).Append(0).Append(0).ToString();
+                mainModel.Id = new StringBuilder(Entity.Identity.AssetId).ToString();
             }
             return false;
         }
