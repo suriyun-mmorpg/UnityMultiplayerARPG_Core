@@ -5,7 +5,7 @@ namespace MultiplayerARPG
 {
     public static class CacheAnimationsManager
     {
-        private static readonly Dictionary<string, ICacheAnimations> CacheAnims = new Dictionary<string, ICacheAnimations>();
+        private static readonly Dictionary<int, ICacheAnimations> CacheAnims = new Dictionary<int, ICacheAnimations>();
 
         /// <summary>
         /// Create and set new `CacheAnimations` which created by `weaponAnimations` and `skillAnimations` data
@@ -15,7 +15,7 @@ namespace MultiplayerARPG
         /// <param name="id"></param>
         /// <param name="weaponAnimations"></param>
         /// <param name="skillAnimations"></param>
-        public static void SetCacheAnimations<TWeaponAnims, TSkillAnims>(string id, IEnumerable<TWeaponAnims> weaponAnimations, IEnumerable<TSkillAnims> skillAnimations)
+        public static void SetCacheAnimations<TWeaponAnims, TSkillAnims>(int id, IEnumerable<TWeaponAnims> weaponAnimations, IEnumerable<TSkillAnims> skillAnimations)
             where TWeaponAnims : IWeaponAnims
             where TSkillAnims : ISkillAnims
         {
@@ -29,7 +29,7 @@ namespace MultiplayerARPG
         /// <typeparam name="TSkillAnims"></typeparam>
         /// <param name="id"></param>
         /// <returns></returns>
-        public static CacheAnimations<TWeaponAnims, TSkillAnims> GetCacheAnimations<TWeaponAnims, TSkillAnims>(string id)
+        public static CacheAnimations<TWeaponAnims, TSkillAnims> GetCacheAnimations<TWeaponAnims, TSkillAnims>(int id)
             where TWeaponAnims : IWeaponAnims
             where TSkillAnims : ISkillAnims
         {
@@ -46,7 +46,7 @@ namespace MultiplayerARPG
         /// <param name="weaponAnimations"></param>
         /// <param name="skillAnimations"></param>
         /// <returns></returns>
-        public static CacheAnimations<TWeaponAnims, TSkillAnims> SetAndGetCacheAnimations<TWeaponAnims, TSkillAnims>(string id, IEnumerable<TWeaponAnims> weaponAnimations, IEnumerable<TSkillAnims> skillAnimations)
+        public static CacheAnimations<TWeaponAnims, TSkillAnims> SetAndGetCacheAnimations<TWeaponAnims, TSkillAnims>(int id, IEnumerable<TWeaponAnims> weaponAnimations, IEnumerable<TSkillAnims> skillAnimations)
             where TWeaponAnims : IWeaponAnims
             where TSkillAnims : ISkillAnims
         {
@@ -67,7 +67,7 @@ namespace MultiplayerARPG
         /// <param name="dataId"></param>
         /// <param name="anims"></param>
         /// <returns></returns>
-        public static bool SetAndTryGetCacheWeaponAnimations<TWeaponAnims, TSkillAnims>(string id, IEnumerable<TWeaponAnims> weaponAnimations, IEnumerable<TSkillAnims> skillAnimations, int dataId, out TWeaponAnims anims)
+        public static bool SetAndTryGetCacheWeaponAnimations<TWeaponAnims, TSkillAnims>(int id, IEnumerable<TWeaponAnims> weaponAnimations, IEnumerable<TSkillAnims> skillAnimations, int dataId, out TWeaponAnims anims)
             where TWeaponAnims : IWeaponAnims
             where TSkillAnims : ISkillAnims
         {
@@ -86,7 +86,7 @@ namespace MultiplayerARPG
         /// <param name="dataId"></param>
         /// <param name="anims"></param>
         /// <returns></returns>
-        public static bool SetAndTryGetCacheSkillAnimations<TWeaponAnims, TSkillAnims>(string id, IEnumerable<TWeaponAnims> weaponAnimations, IEnumerable<TSkillAnims> skillAnimations, int dataId, out TSkillAnims anims)
+        public static bool SetAndTryGetCacheSkillAnimations<TWeaponAnims, TSkillAnims>(int id, IEnumerable<TWeaponAnims> weaponAnimations, IEnumerable<TSkillAnims> skillAnimations, int dataId, out TSkillAnims anims)
             where TWeaponAnims : IWeaponAnims
             where TSkillAnims : ISkillAnims
         {

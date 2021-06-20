@@ -14,10 +14,31 @@ namespace MultiplayerARPG
         public bool IsMainModel { get { return !ModelManager || ModelManager.MainModel == this; } }
         public bool IsFpsModel { get { return !ModelManager || ModelManager.FpsModel == this; } }
         public bool IsMainOrFpsModel { get { return IsMainModel || IsFpsModel; } }
+        public int? HashAssetId { get; set; }
+        public int? VehicleTypeDataId { get; set; }
+        public int? VehicleSeatIndex { get; set; }
         /// <summary>
-        /// AssetId + VehicleId + SeatIndex
+        /// AssetId ^ VehicleId ^ SeatIndex
         /// </summary>
-        public string Id { get; set; }
+        public int Id
+        {
+            get
+            {
+                unchecked
+                {
+                    int id = 17;
+                    if (HashAssetId.HasValue)
+                        id = id * 31 + HashAssetId.Value;
+                    else
+                        id = id * 31 + GetInstanceID();
+                    if (VehicleTypeDataId.HasValue)
+                        id = id * 31 + VehicleTypeDataId.Value;
+                    if (VehicleSeatIndex.HasValue)
+                        id = id * 31 + VehicleSeatIndex.Value;
+                    return id;
+                }
+            }
+        }
 
         [Header("Model Switching Settings")]
         [SerializeField]

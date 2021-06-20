@@ -21,7 +21,7 @@ namespace MultiplayerARPG
         {
             public AnimatorOverrideController Default { get; private set; }
             public Dictionary<int, AnimatorOverrideController> Weapons { get; private set; }
-            public CacheAnimatorController(string id, RuntimeAnimatorController animatorController, DefaultAnimations defaultAnimations, WeaponAnimations[] weaponAnimations)
+            public CacheAnimatorController(int id, RuntimeAnimatorController animatorController, DefaultAnimations defaultAnimations, WeaponAnimations[] weaponAnimations)
             {
                 Default = SetupController($"{id}_Default", new AnimatorOverrideController(animatorController), defaultAnimations);
                 Weapons = new Dictionary<int, AnimatorOverrideController>();
@@ -265,7 +265,7 @@ namespace MultiplayerARPG
         public static readonly int ANIM_LANDED_CLIP_MULTIPLIER = Animator.StringToHash("LandedSpeedMultiplier");
         public static readonly int ANIM_PICKUP_CLIP_MULTIPLIER = Animator.StringToHash("PickupSpeedMultiplier");
         public static readonly int ANIM_MOVE_TYPE = Animator.StringToHash("MoveType");
-        public static readonly Dictionary<string, CacheAnimatorController> CacheAnimatorControllers = new Dictionary<string, CacheAnimatorController>();
+        public static readonly Dictionary<int, CacheAnimatorController> CacheAnimatorControllers = new Dictionary<int, CacheAnimatorController>();
 
         [Header("Settings")]
         [Tooltip("The damping time for the `MoveSpeed` and `SideMoveSpeed` parameters. The higher the value the slower the parameter value changes.")]
@@ -329,17 +329,17 @@ namespace MultiplayerARPG
             SetupComponent();
         }
 
-        protected void SetCacheAnimatorController(string id, RuntimeAnimatorController animatorController, DefaultAnimations defaultAnimations, WeaponAnimations[] weaponAnimations)
+        protected void SetCacheAnimatorController(int id, RuntimeAnimatorController animatorController, DefaultAnimations defaultAnimations, WeaponAnimations[] weaponAnimations)
         {
             CacheAnimatorControllers[id] = new CacheAnimatorController(id, animatorController, defaultAnimations, weaponAnimations);
         }
 
-        protected CacheAnimatorController GetCacheAnimatorController(string id)
+        protected CacheAnimatorController GetCacheAnimatorController(int id)
         {
             return CacheAnimatorControllers[id];
         }
 
-        protected CacheAnimatorController SetAndGetCacheAnimatorController(string id, RuntimeAnimatorController animatorController, DefaultAnimations defaultAnimations, WeaponAnimations[] weaponAnimations)
+        protected CacheAnimatorController SetAndGetCacheAnimatorController(int id, RuntimeAnimatorController animatorController, DefaultAnimations defaultAnimations, WeaponAnimations[] weaponAnimations)
         {
             if (!CacheAnimatorControllers.ContainsKey(id))
                 SetCacheAnimatorController(id, animatorController, defaultAnimations, weaponAnimations);
@@ -437,6 +437,7 @@ namespace MultiplayerARPG
             castSkillStateNameHashes = new int[castSkillStateNames.Length];
             for (indexCounter = 0; indexCounter < castSkillStateNames.Length; ++indexCounter)
                 castSkillStateNameHashes[indexCounter] = Animator.StringToHash(castSkillStateNames[indexCounter]);
+            SetDefaultAnimations();
         }
 
         public override void SetDefaultAnimations()
