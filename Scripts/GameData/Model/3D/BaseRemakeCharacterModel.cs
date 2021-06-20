@@ -177,6 +177,8 @@ namespace MultiplayerARPG
             if (tempDefaultAnimations.walkBackwardRightClip == null)
                 tempDefaultAnimations.walkBackwardRightClip = tempDefaultAnimations.walkBackwardClip;
             // Crouch
+            if (tempDefaultAnimations.crouchIdleClip == null)
+                tempDefaultAnimations.crouchIdleClip = tempDefaultAnimations.idleClip;
             if (tempDefaultAnimations.crouchMoveClip == null)
                 tempDefaultAnimations.crouchMoveClip = tempDefaultAnimations.moveClip;
             if (tempDefaultAnimations.crouchMoveForwardLeftClip == null)
@@ -194,6 +196,8 @@ namespace MultiplayerARPG
             if (tempDefaultAnimations.crouchMoveBackwardRightClip == null)
                 tempDefaultAnimations.crouchMoveBackwardRightClip = tempDefaultAnimations.crouchMoveBackwardClip;
             // Crawl
+            if (tempDefaultAnimations.crawlIdleClip == null)
+                tempDefaultAnimations.crawlIdleClip = tempDefaultAnimations.idleClip;
             if (tempDefaultAnimations.crawlMoveClip == null)
                 tempDefaultAnimations.crawlMoveClip = tempDefaultAnimations.moveClip;
             if (tempDefaultAnimations.crawlMoveForwardLeftClip == null)
@@ -211,6 +215,8 @@ namespace MultiplayerARPG
             if (tempDefaultAnimations.crawlMoveBackwardRightClip == null)
                 tempDefaultAnimations.crawlMoveBackwardRightClip = tempDefaultAnimations.crawlMoveBackwardClip;
             // Swim
+            if (tempDefaultAnimations.swimIdleClip == null)
+                tempDefaultAnimations.swimIdleClip = tempDefaultAnimations.idleClip;
             if (tempDefaultAnimations.swimMoveClip == null)
                 tempDefaultAnimations.swimMoveClip = tempDefaultAnimations.moveClip;
             if (tempDefaultAnimations.swimMoveForwardLeftClip == null)
@@ -287,6 +293,8 @@ namespace MultiplayerARPG
                     if (tempWeaponAnimations.walkBackwardRightClip == null)
                         tempWeaponAnimations.walkBackwardRightClip = tempWeaponAnimations.walkBackwardClip;
                     // Crouch
+                    if (tempWeaponAnimations.crouchIdleClip == null)
+                        tempWeaponAnimations.crouchIdleClip = tempWeaponAnimations.idleClip;
                     if (tempWeaponAnimations.crouchMoveClip == null)
                         tempWeaponAnimations.crouchMoveClip = tempWeaponAnimations.moveClip;
                     if (tempWeaponAnimations.crouchMoveForwardLeftClip == null)
@@ -304,6 +312,8 @@ namespace MultiplayerARPG
                     if (tempWeaponAnimations.crouchMoveBackwardRightClip == null)
                         tempWeaponAnimations.crouchMoveBackwardRightClip = tempWeaponAnimations.crouchMoveBackwardClip;
                     // Crawl
+                    if (tempWeaponAnimations.crawlIdleClip == null)
+                        tempWeaponAnimations.crawlIdleClip = tempWeaponAnimations.idleClip;
                     if (tempWeaponAnimations.crawlMoveClip == null)
                         tempWeaponAnimations.crawlMoveClip = tempWeaponAnimations.moveClip;
                     if (tempWeaponAnimations.crawlMoveForwardLeftClip == null)
@@ -321,6 +331,8 @@ namespace MultiplayerARPG
                     if (tempWeaponAnimations.crawlMoveBackwardRightClip == null)
                         tempWeaponAnimations.crawlMoveBackwardRightClip = tempWeaponAnimations.crawlMoveBackwardClip;
                     // Swim
+                    if (tempWeaponAnimations.swimIdleClip == null)
+                        tempWeaponAnimations.swimIdleClip = tempWeaponAnimations.idleClip;
                     if (tempWeaponAnimations.swimMoveClip == null)
                         tempWeaponAnimations.swimMoveClip = tempWeaponAnimations.moveClip;
                     if (tempWeaponAnimations.swimMoveForwardLeftClip == null)
