@@ -274,7 +274,7 @@ namespace MultiplayerARPG
         [Tooltip("If this <= 0, it will not be used to calculates with animation speed multiplier")]
         public float pickupAnimSpeedRate;
 
-        [Header("Attack movements")]
+        [Header("Attack animations")]
         public AnimationClip rightHandChargeClip;
         public AnimationClip leftHandChargeClip;
         [ArrayElementTitle("clip")]
@@ -282,7 +282,7 @@ namespace MultiplayerARPG
         [ArrayElementTitle("clip")]
         public ActionAnimation[] leftHandAttackAnimations;
 
-        [Header("Reload(Gun) movements")]
+        [Header("Reload(Gun) animations")]
         public ActionAnimation rightHandReloadAnimation;
         public ActionAnimation leftHandReloadAnimation;
 
@@ -480,7 +480,7 @@ namespace MultiplayerARPG
         [Tooltip("If this <= 0, it will not be used to calculates with animation speed multiplier")]
         public float pickupAnimSpeedRate;
 
-        [Header("Attack movements")]
+        [Header("Attack animations")]
         public AnimationClip rightHandChargeClip;
         public AnimationClip leftHandChargeClip;
         [ArrayElementTitle("clip")]
@@ -488,11 +488,11 @@ namespace MultiplayerARPG
         [ArrayElementTitle("clip")]
         public ActionAnimation[] leftHandAttackAnimations;
 
-        [Header("Reload(Gun) movements")]
+        [Header("Reload(Gun) animations")]
         public ActionAnimation rightHandReloadAnimation;
         public ActionAnimation leftHandReloadAnimation;
 
-        [Header("Skill movements")]
+        [Header("Skill animations")]
         public AnimationClip skillCastClip;
         public bool playSkillCastClipAllLayers;
         public ActionAnimation skillActivateAnimation;
