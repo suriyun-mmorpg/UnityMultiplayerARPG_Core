@@ -7,14 +7,28 @@ namespace MultiplayerARPG
     {
         private static readonly Dictionary<string, ICacheAnimations> CacheAnims = new Dictionary<string, ICacheAnimations>();
 
+        /// <summary>
+        /// Create and set new `CacheAnimations` which created by `weaponAnimations` and `skillAnimations` data
+        /// </summary>
+        /// <typeparam name="TWeaponAnims"></typeparam>
+        /// <typeparam name="TSkillAnims"></typeparam>
+        /// <param name="id"></param>
+        /// <param name="weaponAnimations"></param>
+        /// <param name="skillAnimations"></param>
         public static void SetCacheAnimations<TWeaponAnims, TSkillAnims>(string id, IEnumerable<TWeaponAnims> weaponAnimations, IEnumerable<TSkillAnims> skillAnimations)
             where TWeaponAnims : IWeaponAnims
             where TSkillAnims : ISkillAnims
         {
-            if (CacheAnims.ContainsKey(id)) return;
             CacheAnims[id] = new CacheAnimations<TWeaponAnims, TSkillAnims>(weaponAnimations, skillAnimations);
         }
 
+        /// <summary>
+        /// Get `CacheAnimations` by specific ID
+        /// </summary>
+        /// <typeparam name="TWeaponAnims"></typeparam>
+        /// <typeparam name="TSkillAnims"></typeparam>
+        /// <param name="id"></param>
+        /// <returns></returns>
         public static CacheAnimations<TWeaponAnims, TSkillAnims> GetCacheAnimations<TWeaponAnims, TSkillAnims>(string id)
             where TWeaponAnims : IWeaponAnims
             where TSkillAnims : ISkillAnims
@@ -22,6 +36,16 @@ namespace MultiplayerARPG
             return CacheAnims[id] as CacheAnimations<TWeaponAnims, TSkillAnims>;
         }
 
+        /// <summary>
+        /// Create and set new `CacheAnimations` (If not exists), `CacheAnimations` will be created by `weaponAnimations` and `skillAnimations` data
+        /// Then return `CacheAnimations`
+        /// </summary>
+        /// <typeparam name="TWeaponAnims"></typeparam>
+        /// <typeparam name="TSkillAnims"></typeparam>
+        /// <param name="id"></param>
+        /// <param name="weaponAnimations"></param>
+        /// <param name="skillAnimations"></param>
+        /// <returns></returns>
         public static CacheAnimations<TWeaponAnims, TSkillAnims> SetAndGetCacheAnimations<TWeaponAnims, TSkillAnims>(string id, IEnumerable<TWeaponAnims> weaponAnimations, IEnumerable<TSkillAnims> skillAnimations)
             where TWeaponAnims : IWeaponAnims
             where TSkillAnims : ISkillAnims
@@ -31,22 +55,42 @@ namespace MultiplayerARPG
             return GetCacheAnimations<TWeaponAnims, TSkillAnims>(id);
         }
 
+        /// <summary>
+        /// Create and set new `CacheAnimations` (If not exists), `CacheAnimations` will be created by `weaponAnimations` and `skillAnimations` data
+        /// Then return `WeaponAnimations`
+        /// </summary>
+        /// <typeparam name="TWeaponAnims"></typeparam>
+        /// <typeparam name="TSkillAnims"></typeparam>
+        /// <param name="id"></param>
+        /// <param name="weaponAnimations"></param>
+        /// <param name="skillAnimations"></param>
+        /// <param name="dataId"></param>
+        /// <param name="anims"></param>
+        /// <returns></returns>
         public static bool SetAndTryGetCacheWeaponAnimations<TWeaponAnims, TSkillAnims>(string id, IEnumerable<TWeaponAnims> weaponAnimations, IEnumerable<TSkillAnims> skillAnimations, int dataId, out TWeaponAnims anims)
             where TWeaponAnims : IWeaponAnims
             where TSkillAnims : ISkillAnims
         {
-            if (!CacheAnims.ContainsKey(id))
-                SetCacheAnimations(id, weaponAnimations, skillAnimations);
-            return GetCacheAnimations<TWeaponAnims, TSkillAnims>(id).CacheWeaponAnimations.TryGetValue(dataId, out anims);
+            return SetAndGetCacheAnimations(id, weaponAnimations, skillAnimations).CacheWeaponAnimations.TryGetValue(dataId, out anims);
         }
 
+        /// <summary>
+        /// Create and set new `CacheAnimations` (If not exists), `CacheAnimations` will be created by `weaponAnimations` and `skillAnimations` data
+        /// Then return `SkillAnimations`
+        /// </summary>
+        /// <typeparam name="TWeaponAnims"></typeparam>
+        /// <typeparam name="TSkillAnims"></typeparam>
+        /// <param name="id"></param>
+        /// <param name="weaponAnimations"></param>
+        /// <param name="skillAnimations"></param>
+        /// <param name="dataId"></param>
+        /// <param name="anims"></param>
+        /// <returns></returns>
         public static bool SetAndTryGetCacheSkillAnimations<TWeaponAnims, TSkillAnims>(string id, IEnumerable<TWeaponAnims> weaponAnimations, IEnumerable<TSkillAnims> skillAnimations, int dataId, out TSkillAnims anims)
             where TWeaponAnims : IWeaponAnims
             where TSkillAnims : ISkillAnims
         {
-            if (!CacheAnims.ContainsKey(id))
-                SetCacheAnimations(id, weaponAnimations, skillAnimations);
-            return GetCacheAnimations<TWeaponAnims, TSkillAnims>(id).CacheSkillAnimations.TryGetValue(dataId, out anims);
+            return SetAndGetCacheAnimations(id, weaponAnimations, skillAnimations).CacheSkillAnimations.TryGetValue(dataId, out anims);
         }
     }
 }
