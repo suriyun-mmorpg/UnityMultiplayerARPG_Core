@@ -381,7 +381,11 @@ namespace MultiplayerARPG
         public virtual void Killed(EntityInfo lastAttacker)
         {
             StopAllCoroutines();
-            buffs.Clear();
+            for (int i = buffs.Count - 1; i >= 0; --i)
+            {
+                if (!buffs[i].DoNotRemoveOnDead())
+                    buffs.RemoveAt(i);
+            }
             skillUsages.Clear();
             CallAllOnDead();
         }

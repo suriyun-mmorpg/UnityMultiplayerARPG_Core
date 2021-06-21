@@ -9,17 +9,9 @@ namespace MultiplayerARPG
         [SerializeField]
         private Buff buff;
 
-        [SerializeField]
-        private int maxStack;
-
         public Buff Buff
         {
             get { return buff; }
-        }
-
-        public int MaxStack
-        {
-            get { return maxStack; }
         }
     }
 

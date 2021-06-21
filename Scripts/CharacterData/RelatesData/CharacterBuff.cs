@@ -67,6 +67,12 @@ namespace MultiplayerARPG
         private Dictionary<DamageElement, MinMaxFloat> cacheIncreaseDamages;
         [System.NonSerialized]
         private Dictionary<DamageElement, MinMaxFloat> cacheDamageOverTimes;
+        [System.NonSerialized]
+        private bool cacheIsExtendDuration;
+        [System.NonSerialized]
+        private int cacheMaxStack;
+        [System.NonSerialized]
+        private bool cacheDoNotRemoveOnDead;
 
         public EntityInfo BuffApplier { get; private set; }
 
@@ -95,6 +101,9 @@ namespace MultiplayerARPG
                 cacheIncreaseArmors = null;
                 cacheIncreaseDamages = null;
                 cacheDamageOverTimes = null;
+                cacheIsExtendDuration = false;
+                cacheMaxStack = 0;
+                cacheDoNotRemoveOnDead = false;
                 switch (type)
                 {
                     case BuffType.SkillBuff:
@@ -129,6 +138,9 @@ namespace MultiplayerARPG
                 cacheIncreaseArmors = cacheBuff.GetIncreaseArmors(level);
                 cacheIncreaseDamages = cacheBuff.GetIncreaseDamages(level);
                 cacheDamageOverTimes = cacheBuff.GetDamageOverTimes(level);
+                cacheIsExtendDuration = cacheBuff.isExtendDuration;
+                cacheMaxStack = cacheBuff.GetMaxStack(level);
+                cacheDoNotRemoveOnDead = cacheBuff.doNotRemoveOnDead;
             }
         }
 
@@ -244,6 +256,24 @@ namespace MultiplayerARPG
         {
             MakeCache();
             return cacheDamageOverTimes;
+        }
+
+        public bool IsExtendDuration()
+        {
+            MakeCache();
+            return cacheIsExtendDuration;
+        }
+
+        public int MaxStack()
+        {
+            MakeCache();
+            return cacheMaxStack;
+        }
+
+        public bool DoNotRemoveOnDead()
+        {
+            MakeCache();
+            return cacheDoNotRemoveOnDead;
         }
 
         public bool ShouldRemove()

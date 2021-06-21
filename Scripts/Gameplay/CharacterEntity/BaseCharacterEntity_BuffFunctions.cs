@@ -6,17 +6,60 @@ namespace MultiplayerARPG
 {
     public partial class BaseCharacterEntity
     {
-        public void ApplyBuff(int dataId, BuffType type, short level, EntityInfo buffApplier, bool extendDuration = false, int maxStack = 1)
+        public void ApplyBuff(int dataId, BuffType type, short level, EntityInfo buffApplier)
         {
             if (!IsServer || this.IsDead())
                 return;
 
-            if (extendDuration)
+            Buff tempBuff;
+            bool isExtendDuration = false;
+            int maxStack = 0;
+            switch (type)
+            {
+                case BuffType.SkillBuff:
+                    if (!GameInstance.Skills.ContainsKey(dataId) || !GameInstance.Skills[dataId].IsBuff)
+                        return;
+                    tempBuff = GameInstance.Skills[dataId].Buff;
+                    isExtendDuration = tempBuff.isExtendDuration;
+                    maxStack = tempBuff.GetMaxStack(level);
+                    break;
+                case BuffType.SkillDebuff:
+                    if (!GameInstance.Skills.ContainsKey(dataId) || !GameInstance.Skills[dataId].IsDebuff)
+                        return;
+                    tempBuff = GameInstance.Skills[dataId].Debuff;
+                    isExtendDuration = tempBuff.isExtendDuration;
+                    maxStack = tempBuff.GetMaxStack(level);
+                    break;
+                case BuffType.PotionBuff:
+                    if (!GameInstance.Items.ContainsKey(dataId) || !GameInstance.Items[dataId].IsPotion())
+                        return;
+                    tempBuff = (GameInstance.Items[dataId] as IPotionItem).Buff;
+                    isExtendDuration = tempBuff.isExtendDuration;
+                    maxStack = tempBuff.GetMaxStack(level);
+                    break;
+                case BuffType.GuildSkillBuff:
+                    if (!GameInstance.GuildSkills.ContainsKey(dataId))
+                        return;
+                    tempBuff = GameInstance.GuildSkills[dataId].Buff;
+                    isExtendDuration = tempBuff.isExtendDuration;
+                    maxStack = tempBuff.GetMaxStack(level);
+                    break;
+                case BuffType.StatusEffect:
+                    if (!GameInstance.StatusEffects.ContainsKey(dataId))
+                        return;
+                    tempBuff = GameInstance.StatusEffects[dataId].Buff;
+                    isExtendDuration = tempBuff.isExtendDuration;
+                    maxStack = tempBuff.GetMaxStack(level);
+                    break;
+            }
+
+            if (isExtendDuration)
             {
                 int buffIndex = this.IndexOfBuff(dataId, type);
                 if (buffIndex >= 0)
                 {
                     CharacterBuff characterBuff = buffs[buffIndex];
+                    characterBuff.level = level;
                     characterBuff.buffRemainsDuration += buffs[buffIndex].GetDuration();
                     buffs[buffIndex] = characterBuff;
                     return;

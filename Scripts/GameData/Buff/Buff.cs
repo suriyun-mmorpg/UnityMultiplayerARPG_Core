@@ -52,16 +52,22 @@ namespace MultiplayerARPG
         public bool isHide;
         [Tooltip("Mute character movement sound while applied. This won't be applied to monster's summoner.")]
         public bool muteFootstepSound;
-        [Tooltip("Status effects that can be applied to the attacker when attacking")]
+        [Tooltip("Status effects that can be applied to the attacker when attacking.")]
         public StatusEffectApplying[] selfStatusEffectsWhenAttacking;
-        [Tooltip("Status effects that can be applied to the enemy when attacking")]
+        [Tooltip("Status effects that can be applied to the enemy when attacking.")]
         public StatusEffectApplying[] enemyStatusEffectsWhenAttacking;
-        [Tooltip("Status effects that can be applied to the attacker when attacked")]
+        [Tooltip("Status effects that can be applied to the attacker when attacked.")]
         public StatusEffectApplying[] selfStatusEffectsWhenAttacked;
-        [Tooltip("Status effects that can be applied to the enemy when attacked")]
+        [Tooltip("Status effects that can be applied to the enemy when attacked.")]
         public StatusEffectApplying[] enemyStatusEffectsWhenAttacked;
         [Tooltip("Game effects which appearing on character while applied. This won't be applied to monster's summoner.")]
         public GameEffect[] effects;
+        [Tooltip("If this is `TRUE` it will extend duration when applying buff, not remove and re-apply")]
+        public bool isExtendDuration;
+        [Tooltip("Max stack to applies buff, it won't be used while `isExtendDuration` is `TRUE`")]
+        public IncrementalInt maxStack;
+        [Tooltip("If this is `TRUE` it will not be removed when the character dies")]
+        public bool doNotRemoveOnDead;
 
         public void PrepareRelatesData()
         {

@@ -77,6 +77,11 @@ namespace MultiplayerARPG
             return GameDataHelpers.CombineDamages(buff.damageOverTimes, new Dictionary<DamageElement, MinMaxFloat>(), level, 1f);
         }
 
+        public static int GetMaxStack(this Buff buff, short level)
+        {
+            return buff.maxStack.GetAmount(level);
+        }
+
         public static void ApplySelfStatusEffectsWhenAttacking(this Buff buff, short level, EntityInfo applier, BaseCharacterEntity target)
         {
             if (level <= 0 || target == null)
