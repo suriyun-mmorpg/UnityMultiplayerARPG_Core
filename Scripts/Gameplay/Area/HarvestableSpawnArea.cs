@@ -23,8 +23,9 @@ namespace MultiplayerARPG
         [ReadOnlyField]
         public HarvestableEntity harvestableEntity;
 
-        private void Awake()
+        protected override void Awake()
         {
+            base.Awake();
             MigrateAsset();
         }
 

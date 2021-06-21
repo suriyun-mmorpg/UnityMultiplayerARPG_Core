@@ -23,8 +23,9 @@ namespace MultiplayerARPG
         [ReadOnlyField]
         public BaseMonsterCharacterEntity monsterCharacterEntity;
 
-        private void Awake()
+        protected override void Awake()
         {
+            base.Awake();
             MigrateAsset();
         }
 

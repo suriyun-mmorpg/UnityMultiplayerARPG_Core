@@ -35,6 +35,11 @@ namespace MultiplayerARPG
         protected float respawnPendingEntitiesTimer = 0f;
         protected readonly List<SpawnPrefabData<T>> pending = new List<SpawnPrefabData<T>>();
 
+        protected virtual void Awake()
+        {
+            gameObject.layer = PhysicLayers.IgnoreRaycast;
+        }
+
         protected virtual void LateUpdate()
         {
             if (pending.Count > 0)
