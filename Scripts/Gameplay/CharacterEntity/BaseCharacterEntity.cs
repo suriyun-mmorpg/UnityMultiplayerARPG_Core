@@ -512,7 +512,7 @@ namespace MultiplayerARPG
             else
             {
                 // Apply debuff if character is not dead
-                if (skill != null && skill.IsDebuff())
+                if (skill != null && skill.IsDebuff)
                     ApplyBuff(skill.DataId, BuffType.SkillDebuff, skillLevel, instigator);
             }
         }
@@ -896,7 +896,7 @@ namespace MultiplayerARPG
             // Get activate animation type which defined at character model
             SkillActivateAnimationType useSkillActivateAnimationType = CharacterModel.UseSkillActivateAnimationType(skill);
             // Prepare animation
-            if (useSkillActivateAnimationType == SkillActivateAnimationType.UseAttackAnimation && skill.IsAttack())
+            if (useSkillActivateAnimationType == SkillActivateAnimationType.UseAttackAnimation && skill.IsAttack)
             {
                 // Assign data id
                 animationDataId = weaponItem.WeaponType.DataId;

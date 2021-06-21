@@ -12,14 +12,14 @@ namespace MultiplayerARPG
         [SerializeField]
         private int maxStack;
 
-        public Buff GetBuff()
+        public Buff Buff
         {
-            return buff;
+            get { return buff; }
         }
 
-        public int GetMaxStack()
+        public int MaxStack
         {
-            return maxStack;
+            get { return maxStack; }
         }
     }
 

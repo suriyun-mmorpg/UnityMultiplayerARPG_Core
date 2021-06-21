@@ -362,7 +362,7 @@ namespace MultiplayerARPG
             // Get activate animation type which defined at character model
             SkillActivateAnimationType useSkillActivateAnimationType = CharacterModel.UseSkillActivateAnimationType(skill);
             // Prepare animation
-            if (useSkillActivateAnimationType == SkillActivateAnimationType.UseAttackAnimation && skill.IsAttack())
+            if (useSkillActivateAnimationType == SkillActivateAnimationType.UseAttackAnimation && skill.IsAttack)
             {
                 // Assign data id
                 animationDataId = 0;

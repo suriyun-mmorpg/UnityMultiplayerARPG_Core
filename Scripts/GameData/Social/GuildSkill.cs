@@ -68,14 +68,14 @@ namespace MultiplayerARPG
             return decreaseExpLostPercentage.GetAmount(level);
         }
         
-        public bool IsActive()
+        public bool IsActive
         {
-            return skillType == GuildSkillType.Active;
+            get { return skillType == GuildSkillType.Active; }
         }
 
-        public Buff GetBuff()
+        public Buff Buff
         {
-            return buff;
+            get { return buff; }
         }
 
         public bool CanLevelUp(IPlayerCharacterData character, short level)

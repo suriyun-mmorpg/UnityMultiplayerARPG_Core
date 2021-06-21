@@ -101,7 +101,7 @@ namespace MultiplayerARPG
             }
 
             // Apply attack skill
-            if (IsAttack())
+            if (IsAttack)
             {
                 // Launch damage entity to apply damage to other characters
                 GetDamageInfo(skillUser, isLeftHand).LaunchDamageEntity(
@@ -222,24 +222,24 @@ namespace MultiplayerARPG
             get { return skillType; }
         }
 
-        public override bool IsAttack()
+        public override bool IsAttack
         {
-            return skillAttackType != SkillAttackType.None;
+            get { return skillAttackType != SkillAttackType.None; }
         }
 
-        public override bool IsBuff()
+        public override bool IsBuff
         {
-            return skillType == SkillType.Passive || skillBuffType != SkillBuffType.None;
+            get { return skillType == SkillType.Passive || skillBuffType != SkillBuffType.None; }
         }
 
-        public override bool IsDebuff()
+        public override bool IsDebuff
         {
-            return IsAttack() && isDebuff;
+            get { return IsAttack && isDebuff; }
         }
 
         public override float GetCastDistance(BaseCharacterEntity skillUser, short skillLevel, bool isLeftHand)
         {
-            if (!IsAttack())
+            if (!IsAttack)
                 return buffDistance.GetAmount(skillLevel) + skillUser.StoppingDistance;
             if (skillAttackType == SkillAttackType.Normal)
                 return GetDamageInfo(skillUser, isLeftHand).GetDistance() + skillUser.StoppingDistance;
@@ -248,7 +248,7 @@ namespace MultiplayerARPG
 
         public override float GetCastFov(BaseCharacterEntity skillUser, short skillLevel, bool isLeftHand)
         {
-            if (!IsAttack())
+            if (!IsAttack)
                 return 360f;
             if (skillAttackType == SkillAttackType.Normal)
                 return GetDamageInfo(skillUser, isLeftHand).GetFov();
@@ -269,14 +269,14 @@ namespace MultiplayerARPG
 
         public override Dictionary<DamageElement, float> GetAttackWeaponDamageInflictions(ICharacterData skillUser, short skillLevel)
         {
-            if (!IsAttack())
+            if (!IsAttack)
                 return new Dictionary<DamageElement, float>();
             return GameDataHelpers.CombineDamageInflictions(weaponDamageInflictions, new Dictionary<DamageElement, float>(), skillLevel);
         }
 
         public override Dictionary<DamageElement, MinMaxFloat> GetAttackAdditionalDamageAmounts(ICharacterData skillUser, short skillLevel)
         {
-            if (!IsAttack())
+            if (!IsAttack)
                 return new Dictionary<DamageElement, MinMaxFloat>();
             return GameDataHelpers.CombineDamages(additionalDamageAmounts, new Dictionary<DamageElement, MinMaxFloat>(), skillLevel, 1f);
         }
@@ -301,38 +301,44 @@ namespace MultiplayerARPG
             return GameDataHelpers.GetEffectivenessDamage(CacheEffectivenessAttributes, skillUser);
         }
 
-        public override Buff GetBuff()
+        public override Buff Buff
         {
-            if (!IsBuff())
-                return new Buff();
-            return buff;
+            get
+            {
+                if (!IsBuff)
+                    return Buff.Empty;
+                return buff;
+            }
         }
 
-        public override Buff GetDebuff()
+        public override Buff Debuff
         {
-            if (!IsDebuff())
-                return new Buff();
-            return debuff;
+            get
+            {
+                if (!IsDebuff)
+                    return Buff.Empty;
+                return debuff;
+            }
         }
 
-        public override SkillSummon GetSummon()
+        public override SkillSummon Summon
         {
-            return summon;
+            get { return summon; }
         }
 
-        public override SkillMount GetMount()
+        public override SkillMount Mount
         {
-            return mount;
+            get { return mount; }
         }
 
-        public override ItemCraft GetItemCraft()
+        public override ItemCraft ItemCraft
         {
-            return itemCraft;
+            get { return itemCraft; }
         }
 
-        public override bool RequiredTarget()
+        public override bool RequiredTarget
         {
-            return skillBuffType == SkillBuffType.BuffToTarget;
+            get { return skillBuffType == SkillBuffType.BuffToTarget; }
         }
 
         public override void PrepareRelatesData()
@@ -347,7 +353,7 @@ namespace MultiplayerARPG
 
         public override Transform GetApplyTransform(BaseCharacterEntity skillUser, bool isLeftHand)
         {
-            if (IsAttack())
+            if (IsAttack)
                 return GetDamageInfo(skillUser, isLeftHand).GetDamageTransform(skillUser, isLeftHand);
             return base.GetApplyTransform(skillUser, isLeftHand);
         }

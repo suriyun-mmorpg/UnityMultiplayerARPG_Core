@@ -251,10 +251,10 @@ namespace MultiplayerARPG
             base.PrepareRelatesData();
             GameInstance.AddPoolingObjects(skillCastEffects);
             GameInstance.AddPoolingObjects(damageHitEffects);
-            GameInstance.AddPoolingObjects(GetBuff().effects);
-            GameInstance.AddPoolingObjects(GetDebuff().effects);
-            GetBuff().PrepareRelatesData();
-            GetDebuff().PrepareRelatesData();
+            GameInstance.AddPoolingObjects(Buff.effects);
+            GameInstance.AddPoolingObjects(Debuff.effects);
+            Buff.PrepareRelatesData();
+            Debuff.PrepareRelatesData();
         }
 
         public GameEffect[] GetSkillCastEffect()
@@ -307,47 +307,47 @@ namespace MultiplayerARPG
         }
 
         public abstract SkillType SkillType { get; }
-        public abstract bool IsAttack();
-        public abstract bool IsBuff();
-        public abstract bool IsDebuff();
+        public virtual bool IsAttack { get { return false; } }
+        public virtual bool IsBuff { get { return false; } }
+        public virtual bool IsDebuff { get { return false; } }
         public abstract float GetCastDistance(BaseCharacterEntity skillUser, short skillLevel, bool isLeftHand);
         public abstract float GetCastFov(BaseCharacterEntity skillUser, short skillLevel, bool isLeftHand);
         public abstract KeyValuePair<DamageElement, MinMaxFloat> GetBaseAttackDamageAmount(ICharacterData skillUser, short skillLevel, bool isLeftHand);
         public abstract Dictionary<DamageElement, float> GetAttackWeaponDamageInflictions(ICharacterData skillUser, short skillLevel);
         public abstract Dictionary<DamageElement, MinMaxFloat> GetAttackAdditionalDamageAmounts(ICharacterData skillUser, short skillLevel);
-        public virtual bool RequiredTarget() { return false; }
+        public virtual bool RequiredTarget { get { return false; } }
         public virtual bool IsIncreaseAttackDamageAmountsWithBuffs(ICharacterData skillUser, short skillLevel) { return false; }
         public virtual HarvestType GetHarvestType() { return HarvestType.None; }
         public virtual IncrementalMinMaxFloat GetHarvestDamageAmount() { return new IncrementalMinMaxFloat(); }
         public virtual bool HasCustomAimControls() { return false; }
         public virtual AimPosition UpdateAimControls(Vector2 aimAxes, params object[] data) { return default; }
         public virtual void FinishAimControls(bool isCancel) { }
-        public virtual Buff GetBuff() { return new Buff(); }
-        public virtual Buff GetDebuff() { return new Buff(); }
-        public virtual SkillSummon GetSummon() { return new SkillSummon(); }
-        public virtual SkillMount GetMount() { return new SkillMount(); }
-        public virtual ItemCraft GetItemCraft() { return new ItemCraft(); }
+        public virtual Buff Buff { get { return Buff.Empty; } }
+        public virtual Buff Debuff { get { return Buff.Empty; } }
+        public virtual SkillSummon Summon { get { return SkillSummon.Empty; } }
+        public virtual SkillMount Mount { get { return SkillMount.Empty; } }
+        public virtual ItemCraft ItemCraft { get { return ItemCraft.Empty; } }
 
-        public bool IsActive()
+        public bool IsActive
         {
-            return SkillType == SkillType.Active;
+            get { return SkillType == SkillType.Active; }
         }
 
-        public bool IsPassive()
+        public bool IsPassive
         {
-            return SkillType == SkillType.Passive;
+            get { return SkillType == SkillType.Passive; }
         }
 
-        public bool IsCraftItem()
+        public bool IsCraftItem
         {
-            return SkillType == SkillType.CraftItem;
+            get { return SkillType == SkillType.CraftItem; }
         }
 
         public Dictionary<DamageElement, MinMaxFloat> GetAttackDamages(ICharacterData skillUser, short skillLevel, bool isLeftHand)
         {
             Dictionary<DamageElement, MinMaxFloat> damageAmounts = new Dictionary<DamageElement, MinMaxFloat>();
 
-            if (!IsAttack())
+            if (!IsAttack)
                 return damageAmounts;
 
             // Base attack damage amount will sum with other variables later
@@ -628,7 +628,7 @@ namespace MultiplayerARPG
                         }
                         break;
                     case SkillType.CraftItem:
-                        if (playerCharacter == null || !GetItemCraft().CanCraft(playerCharacter, out gameMessage))
+                        if (playerCharacter == null || !ItemCraft.CanCraft(playerCharacter, out gameMessage))
                             return false;
                         break;
                     default:
@@ -673,7 +673,7 @@ namespace MultiplayerARPG
                 return false;
             }
 
-            if (RequiredTarget())
+            if (RequiredTarget)
             {
                 BaseCharacterEntity targetEntity;
                 if (!character.CurrentGameManager.TryGetEntityByObjectId(targetObjectId, out targetEntity))

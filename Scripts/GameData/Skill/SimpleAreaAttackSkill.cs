@@ -86,26 +86,24 @@ namespace MultiplayerARPG
             return GameDataHelpers.GetEffectivenessDamage(CacheEffectivenessAttributes, skillUser);
         }
 
-        public override bool IsAttack()
+        public override bool IsAttack
         {
-            return true;
+            get { return true; }
         }
 
-        public override bool IsBuff()
+        public override bool IsDebuff
         {
-            return false;
+            get { return isDebuff; }
         }
 
-        public override bool IsDebuff()
+        public override Buff Debuff
         {
-            return isDebuff;
-        }
-
-        public override Buff GetDebuff()
-        {
-            if (!IsDebuff())
-                return default(Buff);
-            return debuff;
+            get
+            {
+                if (!IsDebuff)
+                    return Buff.Empty;
+                return debuff;
+            }
         }
 
         public override void PrepareRelatesData()

@@ -198,11 +198,11 @@ namespace MultiplayerARPG
             Dictionary<Attribute, float> result = new Dictionary<Attribute, float>();
             foreach (KeyValuePair<BaseSkill, short> skill in skills)
             {
-                if (skill.Key == null || !skill.Key.IsPassive() || skill.Value <= 0)
+                if (skill.Key == null || !skill.Key.IsPassive || skill.Value <= 0)
                     continue;
-                result = GameDataHelpers.CombineAttributes(result, skill.Key.GetBuff().GetIncreaseAttributes(skill.Value));
+                result = GameDataHelpers.CombineAttributes(result, skill.Key.Buff.GetIncreaseAttributes(skill.Value));
                 // Increase with rates
-                result = GameDataHelpers.CombineAttributes(result, GameDataHelpers.MultiplyAttributes(new Dictionary<Attribute, float>(baseAttributes), skill.Key.GetBuff().GetIncreaseAttributesRate(skill.Value)));
+                result = GameDataHelpers.CombineAttributes(result, GameDataHelpers.MultiplyAttributes(new Dictionary<Attribute, float>(baseAttributes), skill.Key.Buff.GetIncreaseAttributesRate(skill.Value)));
             }
             return result;
         }
@@ -348,9 +348,9 @@ namespace MultiplayerARPG
             Dictionary<DamageElement, float> result = new Dictionary<DamageElement, float>();
             foreach (KeyValuePair<BaseSkill, short> skill in skills)
             {
-                if (skill.Key == null || !skill.Key.IsPassive() || skill.Value <= 0)
+                if (skill.Key == null || !skill.Key.IsPassive || skill.Value <= 0)
                     continue;
-                result = GameDataHelpers.CombineResistances(result, skill.Key.GetBuff().GetIncreaseResistances(skill.Value));
+                result = GameDataHelpers.CombineResistances(result, skill.Key.Buff.GetIncreaseResistances(skill.Value));
             }
             return result;
         }
@@ -439,9 +439,9 @@ namespace MultiplayerARPG
             Dictionary<DamageElement, float> result = new Dictionary<DamageElement, float>();
             foreach (KeyValuePair<BaseSkill, short> skill in skills)
             {
-                if (skill.Key == null || !skill.Key.IsPassive() || skill.Value <= 0)
+                if (skill.Key == null || !skill.Key.IsPassive || skill.Value <= 0)
                     continue;
-                result = GameDataHelpers.CombineArmors(result, skill.Key.GetBuff().GetIncreaseArmors(skill.Value));
+                result = GameDataHelpers.CombineArmors(result, skill.Key.Buff.GetIncreaseArmors(skill.Value));
             }
             return result;
         }
@@ -515,9 +515,9 @@ namespace MultiplayerARPG
             Dictionary<DamageElement, MinMaxFloat> result = new Dictionary<DamageElement, MinMaxFloat>();
             foreach (KeyValuePair<BaseSkill, short> skill in skills)
             {
-                if (skill.Key == null || !skill.Key.IsPassive() || skill.Value <= 0)
+                if (skill.Key == null || !skill.Key.IsPassive || skill.Value <= 0)
                     continue;
-                result = GameDataHelpers.CombineDamages(result, skill.Key.GetBuff().GetIncreaseDamages(skill.Value));
+                result = GameDataHelpers.CombineDamages(result, skill.Key.Buff.GetIncreaseDamages(skill.Value));
             }
             return result;
         }
@@ -630,13 +630,13 @@ namespace MultiplayerARPG
             CharacterStats result = new CharacterStats();
             foreach (KeyValuePair<BaseSkill, short> skill in skills)
             {
-                if (skill.Key == null || !skill.Key.IsPassive() || skill.Value <= 0)
+                if (skill.Key == null || !skill.Key.IsPassive || skill.Value <= 0)
                     continue;
-                result += skill.Key.GetBuff().GetIncreaseStats(skill.Value);
-                result += GameDataHelpers.GetStatsFromAttributes(skill.Key.GetBuff().GetIncreaseAttributes(skill.Value));
+                result += skill.Key.Buff.GetIncreaseStats(skill.Value);
+                result += GameDataHelpers.GetStatsFromAttributes(skill.Key.Buff.GetIncreaseAttributes(skill.Value));
                 // Increase with rates
-                result += baseStats * skill.Key.GetBuff().GetIncreaseStatsRate(skill.Value);
-                result += GameDataHelpers.GetStatsFromAttributes(GameDataHelpers.MultiplyAttributes(new Dictionary<Attribute, float>(baseAttributes), skill.Key.GetBuff().GetIncreaseAttributesRate(skill.Value)));
+                result += baseStats * skill.Key.Buff.GetIncreaseStatsRate(skill.Value);
+                result += GameDataHelpers.GetStatsFromAttributes(GameDataHelpers.MultiplyAttributes(new Dictionary<Attribute, float>(baseAttributes), skill.Key.Buff.GetIncreaseAttributesRate(skill.Value)));
             }
             return result;
         }
@@ -1756,7 +1756,7 @@ namespace MultiplayerARPG
                 if (Random.value <= effect.chance.GetAmount(level))
                 {
                     // Apply buffs
-                    target.ApplyBuff(effect.statusEffect.DataId, BuffType.StatusEffect, effect.buffLevel.GetAmount(level), applier);
+                    target.ApplyBuff(effect.statusEffect.DataId, BuffType.StatusEffect, effect.buffLevel.GetAmount(level), applier, false, effect.statusEffect.MaxStack);
                 }
             }
         }

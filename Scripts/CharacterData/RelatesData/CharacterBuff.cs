@@ -100,7 +100,7 @@ namespace MultiplayerARPG
                     case BuffType.SkillBuff:
                     case BuffType.SkillDebuff:
                         if (GameInstance.Skills.TryGetValue(dataId, out cacheSkill) && cacheSkill != null)
-                            cacheBuff = type == BuffType.SkillBuff ? cacheSkill.GetBuff() : cacheSkill.GetDebuff();
+                            cacheBuff = type == BuffType.SkillBuff ? cacheSkill.Buff : cacheSkill.Debuff;
                         break;
                     case BuffType.PotionBuff:
                         if (GameInstance.Items.TryGetValue(dataId, out cacheItem) && cacheItem != null && cacheItem.IsPotion())
@@ -108,11 +108,11 @@ namespace MultiplayerARPG
                         break;
                     case BuffType.GuildSkillBuff:
                         if (GameInstance.GuildSkills.TryGetValue(dataId, out cacheGuildSkill) && cacheGuildSkill != null)
-                            cacheBuff = cacheGuildSkill.GetBuff();
+                            cacheBuff = cacheGuildSkill.Buff;
                         break;
                     case BuffType.StatusEffect:
                         if (GameInstance.StatusEffects.TryGetValue(dataId, out cacheStatusEffect) && cacheStatusEffect != null)
-                            cacheBuff = cacheStatusEffect.GetBuff();
+                            cacheBuff = cacheStatusEffect.Buff;
                         break;
                 }
                 cacheDuration = cacheBuff.GetDuration(level);

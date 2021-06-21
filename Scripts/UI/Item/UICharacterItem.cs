@@ -310,7 +310,7 @@ namespace MultiplayerARPG
 
             if (uiTextCoolDownDuration != null)
             {
-                uiTextCoolDownDuration.SetGameObjectActive(skill.IsActive() && coolDownDuration > 0f);
+                uiTextCoolDownDuration.SetGameObjectActive(skill.IsActive && coolDownDuration > 0f);
                 uiTextCoolDownDuration.text = string.Format(
                     LanguageManager.GetText(formatKeyCoolDownDuration),
                     coolDownDuration.ToString("N0"));
@@ -318,7 +318,7 @@ namespace MultiplayerARPG
 
             if (uiTextCoolDownRemainsDuration != null)
             {
-                uiTextCoolDownRemainsDuration.SetGameObjectActive(skill.IsActive() && coolDownRemainsDuration > 0);
+                uiTextCoolDownRemainsDuration.SetGameObjectActive(skill.IsActive && coolDownRemainsDuration > 0);
                 uiTextCoolDownRemainsDuration.text = string.Format(
                     LanguageManager.GetText(formatKeyCoolDownRemainsDuration),
                     coolDownRemainsDuration.ToString("N0"));

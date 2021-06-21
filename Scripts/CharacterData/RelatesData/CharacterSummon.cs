@@ -92,7 +92,7 @@ namespace MultiplayerARPG
                 {
                     case SummonType.Skill:
                         if (GameInstance.Skills.TryGetValue(dataId, out cacheSkill))
-                            cachePrefab = cacheSkill.GetSummon().MonsterEntity;
+                            cachePrefab = cacheSkill.Summon.MonsterEntity;
                         break;
                     case SummonType.PetItem:
                         if (GameInstance.Items.TryGetValue(dataId, out cachePetItem) && cachePetItem is IPetItem)

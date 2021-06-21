@@ -33,24 +33,14 @@ namespace MultiplayerARPG
             return new Dictionary<DamageElement, float>();
         }
 
-        public override bool IsAttack()
+        public override bool IsBuff
         {
-            return false;
+            get { return true; }
         }
 
-        public override bool IsBuff()
+        public override Buff Buff
         {
-            return true;
-        }
-
-        public override bool IsDebuff()
-        {
-            return false;
-        }
-
-        public override Buff GetBuff()
-        {
-            return buff;
+            get { return buff; }
         }
 
         public override void PrepareRelatesData()

@@ -215,7 +215,7 @@ namespace MultiplayerARPG
                 return usingItem.UpdateAimControls(axes);
             }
             if (usingSkill != null && usingSkillLevel > 0 &&
-                usingSkill.IsActive() &&
+                usingSkill.IsActive &&
                 usingSkill.HasCustomAimControls())
             {
                 return usingSkill.UpdateAimControls(axes, usingSkillLevel);
@@ -273,7 +273,7 @@ namespace MultiplayerARPG
                 return true;
             }
             else if (usingSkill != null && usingSkillLevel > 0 &&
-                usingSkill.IsActive() &&
+                usingSkill.IsActive &&
                 usingSkill.HasCustomAimControls())
             {
                 return true;

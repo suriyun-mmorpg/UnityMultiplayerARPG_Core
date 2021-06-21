@@ -521,7 +521,7 @@ namespace MultiplayerARPG
                 return;
             }
 
-            if (skill.IsAttack())
+            if (skill.IsAttack)
             {
                 if (wasdLockAttackTarget)
                 {
@@ -571,7 +571,7 @@ namespace MultiplayerARPG
             else
             {
                 // Not attack skill, so use skill immediately
-                if (skill.RequiredTarget())
+                if (skill.RequiredTarget)
                 {
                     if (SelectedEntity == null)
                     {
@@ -644,7 +644,7 @@ namespace MultiplayerARPG
             }
             else if (TryGetUsingSkillEntity(out targetDamageable))
             {
-                if (queueUsingSkill.skill.IsAttack() && targetDamageable.IsHideOrDead())
+                if (queueUsingSkill.skill.IsAttack && targetDamageable.IsHideOrDead())
                 {
                     ClearQueueUsingSkill();
                     PlayerCharacterEntity.StopMove();
@@ -789,7 +789,7 @@ namespace MultiplayerARPG
                     OverlappedEntity(entity.Entity, measuringPosition, targetPosition, distance))
                 {
                     // Set next frame target action type
-                    targetActionType = queueUsingSkill.skill.IsAttack() ? TargetActionType.Attack : TargetActionType.Activate;
+                    targetActionType = queueUsingSkill.skill.IsAttack ? TargetActionType.Attack : TargetActionType.Activate;
                     // Stop movement to use skill
                     PlayerCharacterEntity.StopMove();
                     // Turn character to attacking target

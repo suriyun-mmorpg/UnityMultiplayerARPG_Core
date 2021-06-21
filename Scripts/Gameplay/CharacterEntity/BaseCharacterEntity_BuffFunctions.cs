@@ -6,28 +6,42 @@ namespace MultiplayerARPG
 {
     public partial class BaseCharacterEntity
     {
-        public void ApplyBuff(int dataId, BuffType type, short level, EntityInfo buffApplier, int maxStack = 1)
+        public void ApplyBuff(int dataId, BuffType type, short level, EntityInfo buffApplier, bool extendDuration = false, int maxStack = 1)
         {
             if (!IsServer || this.IsDead())
                 return;
 
-            if (maxStack > 1)
+            if (extendDuration)
             {
-                List<int> indexesOfBuff = this.IndexesOfBuff(dataId, type);
-                while (indexesOfBuff.Count > maxStack)
+                int buffIndex = this.IndexOfBuff(dataId, type);
+                if (buffIndex >= 0)
                 {
-                    int buffIndex = indexesOfBuff[0];
-                    if (buffIndex >= 0)
-                        buffs.RemoveAt(buffIndex);
-                    indexesOfBuff.RemoveAt(0);
+                    CharacterBuff characterBuff = buffs[buffIndex];
+                    characterBuff.buffRemainsDuration += buffs[buffIndex].GetDuration();
+                    buffs[buffIndex] = characterBuff;
+                    return;
                 }
             }
             else
             {
-                // `maxStack` <= 0, assume that it's = `1`
-                int buffIndex = this.IndexOfBuff(dataId, type);
-                if (buffIndex >= 0)
-                    buffs.RemoveAt(buffIndex);
+                if (maxStack > 1)
+                {
+                    List<int> indexesOfBuff = this.IndexesOfBuff(dataId, type);
+                    while (indexesOfBuff.Count > maxStack)
+                    {
+                        int buffIndex = indexesOfBuff[0];
+                        if (buffIndex >= 0)
+                            buffs.RemoveAt(buffIndex);
+                        indexesOfBuff.RemoveAt(0);
+                    }
+                }
+                else
+                {
+                    // `maxStack` <= 0, assume that it's = `1`
+                    int buffIndex = this.IndexOfBuff(dataId, type);
+                    if (buffIndex >= 0)
+                        buffs.RemoveAt(buffIndex);
+                }
             }
 
             CharacterBuff newBuff = CharacterBuff.Create(type, dataId, level);

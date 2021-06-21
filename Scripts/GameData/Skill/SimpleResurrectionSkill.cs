@@ -70,29 +70,19 @@ namespace MultiplayerARPG
             get { return SkillType.Active; }
         }
 
-        public override bool IsAttack()
+        public override bool IsBuff
         {
-            return false;
+            get { return true; }
         }
 
-        public override bool IsBuff()
+        public override bool RequiredTarget
         {
-            return true;
+            get { return true; }
         }
 
-        public override bool IsDebuff()
+        public override Buff Buff
         {
-            return false;
-        }
-
-        public override bool RequiredTarget()
-        {
-            return true;
-        }
-
-        public override Buff GetBuff()
-        {
-            return buff;
+            get { return buff; }
         }
 
         public override bool CanUse(BaseCharacterEntity character, short level, bool isLeftHand, uint targetObjectId, out UITextKeys gameMessage, bool isItem = false)

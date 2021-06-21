@@ -98,7 +98,7 @@ namespace MultiplayerARPG
 
             if (uiTextCoolDownDuration != null)
             {
-                uiTextCoolDownDuration.SetGameObjectActive(GuildSkill.IsActive() && coolDownDuration > 0f);
+                uiTextCoolDownDuration.SetGameObjectActive(GuildSkill.IsActive && coolDownDuration > 0f);
                 uiTextCoolDownDuration.text = string.Format(
                     LanguageManager.GetText(formatKeyCoolDownDuration),
                     coolDownDuration.ToString("N0"));
@@ -106,7 +106,7 @@ namespace MultiplayerARPG
 
             if (uiTextCoolDownRemainsDuration != null)
             {
-                uiTextCoolDownRemainsDuration.SetGameObjectActive(GuildSkill.IsActive() && coolDownRemainsDuration > 0);
+                uiTextCoolDownRemainsDuration.SetGameObjectActive(GuildSkill.IsActive && coolDownRemainsDuration > 0);
                 uiTextCoolDownRemainsDuration.text = string.Format(
                     LanguageManager.GetText(formatKeyCoolDownRemainsDuration),
                     coolDownRemainsDuration.ToString("N0"));
@@ -274,14 +274,14 @@ namespace MultiplayerARPG
 
             if (uiSkillBuff != null)
             {
-                if (!GuildSkill.IsActive())
+                if (!GuildSkill.IsActive)
                 {
                     uiSkillBuff.Hide();
                 }
                 else
                 {
                     uiSkillBuff.Show();
-                    uiSkillBuff.Data = new UIBuffData(GuildSkill.GetBuff(), Level);
+                    uiSkillBuff.Data = new UIBuffData(GuildSkill.Buff, Level);
                 }
             }
 
