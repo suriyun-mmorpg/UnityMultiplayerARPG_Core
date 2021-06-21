@@ -1074,7 +1074,12 @@ namespace MultiplayerARPG
         }
 
         [ContextMenu("Convert To Newer Character Model")]
-        public virtual void ConvertToNewerCharacterModel()
+        public void ConvertToNewerCharacterModel()
+        {
+            ConvertToNewerCharacterModelImplement();
+        }
+
+        protected virtual void ConvertToNewerCharacterModelImplement()
         {
             switch (animatorType)
             {
