@@ -8,7 +8,7 @@ namespace MultiplayerARPG
     {
         [FormerlySerializedAs("uiCurrencyDialog")]
         public UICharacterCurrency uiDialog;
-        [FormerlySerializedAs("uiCharacterCurrencyDialog")]
+        [FormerlySerializedAs("uiCharacterCurrencyPrefab")]
         public UICharacterCurrency uiPrefab;
         [FormerlySerializedAs("uiCharacterCurrencyContainer")]
         public Transform uiContainer;
