@@ -1,7 +1,6 @@
 ﻿using Cysharp.Threading.Tasks;
 using LiteNetLib;
 using LiteNetLibManager;
-using System.Collections;
 using System.Collections.Generic;
 using System.Threading;
 using UnityEngine;
@@ -14,8 +13,7 @@ namespace MultiplayerARPG
         public bool IsAttacking { get; protected set; }
         public float MoveSpeedRateWhileAttacking { get; protected set; }
 
-        protected int simulatingHitIndex = 0;
-        protected int simulatingTriggerLength = 0;
+        protected readonly Dictionary<int, SimulatingHit> SimulatingHits = new Dictionary<int, SimulatingHit>();
 
         protected virtual void SetAttackActionStates(AnimActionType animActionType, int animActionDataId)
         {
@@ -30,21 +28,21 @@ namespace MultiplayerARPG
             IsAttacking = false;
         }
 
-        public bool CallAllPlayAttackAnimation(bool isLeftHand, byte animationIndex)
+        public bool CallAllPlayAttackAnimation(byte simulateSeed, bool isLeftHand)
         {
-            RPC(AllPlayAttackAnimation, BaseCharacterEntity.ACTION_TO_CLIENT_DATA_CHANNEL, DeliveryMethod.ReliableOrdered, isLeftHand, animationIndex);
+            RPC(AllPlayAttackAnimation, BaseCharacterEntity.ACTION_TO_CLIENT_DATA_CHANNEL, DeliveryMethod.ReliableOrdered, simulateSeed, isLeftHand);
             return true;
         }
 
         [AllRpc]
-        protected void AllPlayAttackAnimation(bool isLeftHand, byte animationIndex)
+        protected void AllPlayAttackAnimation(byte simulateSeed, bool isLeftHand)
         {
             if (IsOwnerClientOrOwnedByServer)
                 return;
-            AttackRoutine(isLeftHand, animationIndex).Forget();
+            AttackRoutine(simulateSeed, isLeftHand).Forget();
         }
 
-        protected async UniTaskVoid AttackRoutine(bool isLeftHand, byte animationIndex)
+        protected async UniTaskVoid AttackRoutine(byte simulateSeed, bool isLeftHand)
         {
             // Prepare cancellation
             CancellationTokenSource attackCancellationTokenSource = new CancellationTokenSource();
@@ -61,13 +59,15 @@ namespace MultiplayerARPG
                 out weapon);
 
             // Prepare required data and get animation data
+            int animationIndex;
             float animSpeedRate;
             float[] triggerDurations;
             float totalDuration;
-            Entity.GetAnimationData(
+            Entity.GetRandomAnimationData(
                 animActionType,
                 animActionDataId,
-                animationIndex,
+                simulateSeed,
+                out animationIndex,
                 out animSpeedRate,
                 out triggerDurations,
                 out totalDuration);
@@ -86,9 +86,6 @@ namespace MultiplayerARPG
             // Get play speed multiplier will use it to play animation faster or slower based on attack speed stats
             animSpeedRate *= Entity.GetAnimSpeedRate(Entity.AnimActionType);
 
-            // Get simulate seed for simulation validating
-            byte simulateSeed = (byte)Random.Range(byte.MinValue, byte.MaxValue);
-            simulatingHitIndex = 0;
             try
             {
                 // Animations will plays on clients only
@@ -103,7 +100,7 @@ namespace MultiplayerARPG
 
                 float remainsDuration = totalDuration;
                 float tempTriggerDuration;
-                simulatingTriggerLength = triggerDurations.Length;
+                SimulatingHits[simulateSeed] = new SimulatingHit(triggerDurations.Length);
                 for (int hitIndex = 0; hitIndex < triggerDurations.Length; ++hitIndex)
                 {
                     // Play special effects after trigger duration
@@ -193,8 +190,6 @@ namespace MultiplayerARPG
             {
                 attackCancellationTokenSource.Dispose();
                 attackCancellationTokenSources.Remove(attackCancellationTokenSource);
-                // Clear simulate validating data
-                simulatingTriggerLength = 0;
             }
             // Clear action states at clients and server
             Entity.ClearActionStates();
@@ -255,16 +250,19 @@ namespace MultiplayerARPG
         {
             if (IsOwnerClientOrOwnedByServer)
                 return;
-            if (simulatingHitIndex >= simulatingTriggerLength)
+            SimulatingHit simulatingHit = SimulatingHits[data.randomSeed];
+            if (simulatingHit.hitIndex >= simulatingHit.triggerLength)
                 return;
-            simulatingHitIndex++;
+            int hitIndex = SimulatingHits[data.randomSeed].hitIndex + 1;
+            simulatingHit.hitIndex = hitIndex;
+            SimulatingHits[data.randomSeed] = simulatingHit;
             bool isLeftHand = data.state.HasFlag(SimulateLaunchDamageEntityState.IsLeftHand);
             if (!data.state.HasFlag(SimulateLaunchDamageEntityState.IsSkill))
             {
                 CharacterItem weapon = Entity.GetAvailableWeapon(ref isLeftHand);
                 DamageInfo damageInfo = Entity.GetWeaponDamageInfo(weapon.GetWeaponItem());
                 Dictionary<DamageElement, MinMaxFloat> damageAmounts = Entity.GetWeaponDamagesWithBuffs(weapon);
-                int attackSeed = unchecked(data.randomSeed + (simulatingHitIndex * 16));
+                int attackSeed = unchecked(data.randomSeed + (hitIndex * 16));
                 ApplyAttack(isLeftHand, weapon, damageInfo, damageAmounts, data.aimPosition, attackSeed, data.time);
             }
         }
@@ -281,33 +279,17 @@ namespace MultiplayerARPG
 
         public void Attack(bool isLeftHand)
         {
-            // Prepare required data and get weapon data
-            AnimActionType animActionType;
-            int animaActionDataId;
-            Entity.GetAttackingData(
-                ref isLeftHand,
-                out animActionType,
-                out animaActionDataId,
-                out _);
-
-            // Prepare required data and get animation data
-            int animationIndex;
-            Entity.GetRandomAnimationData(
-                animActionType,
-                animaActionDataId,
-                out animationIndex,
-                out _,
-                out _,
-                out _);
-
             // Start attack routine
             IsAttacking = true;
 
+            // Get simulate seed for simulation validating
+            byte simulateSeed = (byte)Random.Range(byte.MinValue, byte.MaxValue);
+
             // Play attack animation at owning client immediately
-            AttackRoutine(isLeftHand, (byte)animationIndex).Forget();
+            AttackRoutine(simulateSeed, isLeftHand).Forget();
 
             // Broadcast attack animation playing
-            CallAllPlayAttackAnimation(isLeftHand, (byte)animationIndex);
+            CallAllPlayAttackAnimation(simulateSeed, isLeftHand);
         }
     }
 }

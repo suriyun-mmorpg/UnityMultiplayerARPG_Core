@@ -474,23 +474,25 @@ namespace MultiplayerARPG
 
         public override bool GetRandomRightHandAttackAnimation(
             int dataId,
+            int randomSeed,
             out int animationIndex,
             out float animSpeedRate,
             out float[] triggerDurations,
             out float totalDuration)
         {
-            animationIndex = Random.Range(0, GetRightHandAttackAnimations(dataId).Length);
+            animationIndex = GenericUtils.RandomInt(randomSeed, 0, GetRightHandAttackAnimations(dataId).Length);
             return GetRightHandAttackAnimation(dataId, animationIndex, out animSpeedRate, out triggerDurations, out totalDuration);
         }
 
         public override bool GetRandomLeftHandAttackAnimation(
             int dataId,
+            int randomSeed,
             out int animationIndex,
             out float animSpeedRate,
             out float[] triggerDurations,
             out float totalDuration)
         {
-            animationIndex = Random.Range(0, GetLeftHandAttackAnimations(dataId).Length);
+            animationIndex = GenericUtils.RandomInt(randomSeed, 0, GetLeftHandAttackAnimations(dataId).Length);
             return GetLeftHandAttackAnimation(dataId, animationIndex, out animSpeedRate, out triggerDurations, out totalDuration);
         }
 

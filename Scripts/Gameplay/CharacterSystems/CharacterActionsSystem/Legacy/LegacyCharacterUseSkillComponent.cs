@@ -93,6 +93,7 @@ namespace MultiplayerARPG
             Entity.GetRandomAnimationData(
                 animActionType,
                 animatonDataId,
+                Random.Range(int.MinValue, int.MaxValue),
                 out animationIndex,
                 out _,
                 out _,
@@ -421,6 +422,7 @@ namespace MultiplayerARPG
             Entity.GetRandomAnimationData(
                 animActionType,
                 animActionDataId,
+                Random.Range(int.MinValue, int.MaxValue),
                 out animationIndex,
                 out _,
                 out _,

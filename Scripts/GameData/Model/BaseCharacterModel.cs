@@ -601,22 +601,24 @@ namespace MultiplayerARPG
 
         public bool GetRandomRightHandAttackAnimation(
             WeaponType weaponType,
+            int randomSeed,
             out int animationIndex,
             out float animSpeedRate,
             out float[] triggerDurations,
             out float totalDuration)
         {
-            return GetRandomRightHandAttackAnimation(weaponType.DataId, out animationIndex, out animSpeedRate, out triggerDurations, out totalDuration);
+            return GetRandomRightHandAttackAnimation(weaponType.DataId, randomSeed, out animationIndex, out animSpeedRate, out triggerDurations, out totalDuration);
         }
 
         public bool GetRandomLeftHandAttackAnimation(
             WeaponType weaponType,
+            int randomSeed,
             out int animationIndex,
             out float animSpeedRate,
             out float[] triggerDurations,
             out float totalDuration)
         {
-            return GetRandomLeftHandAttackAnimation(weaponType.DataId, out animationIndex, out animSpeedRate, out triggerDurations, out totalDuration);
+            return GetRandomLeftHandAttackAnimation(weaponType.DataId, randomSeed, out animationIndex, out animSpeedRate, out triggerDurations, out totalDuration);
         }
 
         public bool GetSkillActivateAnimation(
@@ -750,8 +752,8 @@ namespace MultiplayerARPG
         public abstract void StopActionAnimation();
         public abstract void StopSkillCastAnimation();
         public abstract void StopWeaponChargeAnimation();
-        public abstract bool GetRandomRightHandAttackAnimation(int dataId, out int animationIndex, out float animSpeedRate, out float[] triggerDurations, out float totalDuration);
-        public abstract bool GetRandomLeftHandAttackAnimation(int dataId, out int animationIndex, out float animSpeedRate, out float[] triggerDurations, out float totalDuration);
+        public abstract bool GetRandomRightHandAttackAnimation(int dataId, int randomSeed, out int animationIndex, out float animSpeedRate, out float[] triggerDurations, out float totalDuration);
+        public abstract bool GetRandomLeftHandAttackAnimation(int dataId, int randomSeed, out int animationIndex, out float animSpeedRate, out float[] triggerDurations, out float totalDuration);
         public abstract bool GetRightHandAttackAnimation(int dataId, int animationIndex, out float animSpeedRate, out float[] triggerDurations, out float totalDuration);
         public abstract bool GetLeftHandAttackAnimation(int dataId, int animationIndex, out float animSpeedRate, out float[] triggerDurations, out float totalDuration);
         public abstract bool GetSkillActivateAnimation(int dataId, out float animSpeedRate, out float[] triggerDurations, out float totalDuration);

@@ -1315,6 +1315,7 @@ namespace MultiplayerARPG
         public void GetRandomAnimationData(
             AnimActionType animActionType,
             int skillOrWeaponTypeDataId,
+            int randomSeed,
             out int animationIndex,
             out float animSpeedRate,
             out float[] triggerDurations,
@@ -1328,10 +1329,10 @@ namespace MultiplayerARPG
             switch (animActionType)
             {
                 case AnimActionType.AttackRightHand:
-                    CharacterModel.GetRandomRightHandAttackAnimation(skillOrWeaponTypeDataId, out animationIndex, out animSpeedRate, out triggerDurations, out totalDuration);
+                    CharacterModel.GetRandomRightHandAttackAnimation(skillOrWeaponTypeDataId, randomSeed, out animationIndex, out animSpeedRate, out triggerDurations, out totalDuration);
                     break;
                 case AnimActionType.AttackLeftHand:
-                    CharacterModel.GetRandomLeftHandAttackAnimation(skillOrWeaponTypeDataId, out animationIndex, out animSpeedRate, out triggerDurations, out totalDuration);
+                    CharacterModel.GetRandomLeftHandAttackAnimation(skillOrWeaponTypeDataId, randomSeed, out animationIndex, out animSpeedRate, out triggerDurations, out totalDuration);
                     break;
                 case AnimActionType.SkillRightHand:
                 case AnimActionType.SkillLeftHand:

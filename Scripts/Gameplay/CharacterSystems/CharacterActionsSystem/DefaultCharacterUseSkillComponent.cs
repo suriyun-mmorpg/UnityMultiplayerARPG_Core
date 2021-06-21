@@ -1,7 +1,6 @@
 ﻿using Cysharp.Threading.Tasks;
 using LiteNetLib;
 using LiteNetLibManager;
-using System.Collections;
 using System.Collections.Generic;
 using System.Threading;
 using UnityEngine;
@@ -20,8 +19,7 @@ namespace MultiplayerARPG
         public float CastingSkillCountDown { get; protected set; }
         public float MoveSpeedRateWhileUsingSkill { get; protected set; }
 
-        protected int simulatingHitIndex = 0;
-        protected int simulatingTriggerLength = 0;
+        protected readonly Dictionary<int, SimulatingHit> SimulatingHits = new Dictionary<int, SimulatingHit>();
 
         public override void EntityUpdate()
         {
@@ -74,32 +72,14 @@ namespace MultiplayerARPG
             if (!skill.CanUse(Entity, skillLevel, isLeftHand, targetObjectId, out _))
                 return;
 
-            // Prepare required data and get skill data
-            AnimActionType animActionType;
-            int animatonDataId;
-            CharacterItem weapon;
-            Entity.GetUsingSkillData(
-                skill,
-                ref isLeftHand,
-                out animActionType,
-                out animatonDataId,
-                out weapon);
-
-            // Prepare required data and get animation data
-            int animationIndex;
-            Entity.GetRandomAnimationData(
-                animActionType,
-                animatonDataId,
-                out animationIndex,
-                out _,
-                out _,
-                out _);
-
             // Start use skill routine
             IsUsingSkill = true;
 
+            // Get simulate seed for simulation validating
+            byte simulateSeed = (byte)Random.Range(byte.MinValue, byte.MaxValue);
+
             // Play animations
-            CallAllPlayUseSkillAnimation(isLeftHand, (byte)animationIndex, skill.DataId, skillLevel, targetObjectId, aimPosition);
+            CallAllPlayUseSkillAnimation(simulateSeed, isLeftHand, skill.DataId, skillLevel, targetObjectId, aimPosition);
 #endif
         }
 
@@ -135,27 +115,6 @@ namespace MultiplayerARPG
             if (!item.UsingSkill.CanUse(Entity, item.UsingSkillLevel, isLeftHand, targetObjectId, out _, true))
                 return;
 
-            // Prepare required data and get skill data
-            AnimActionType animActionType;
-            int animActionDataId;
-            CharacterItem weapon;
-            Entity.GetUsingSkillData(
-                item.UsingSkill,
-                ref isLeftHand,
-                out animActionType,
-                out animActionDataId,
-                out weapon);
-
-            // Prepare required data and get animation data
-            int animationIndex;
-            Entity.GetRandomAnimationData(
-                animActionType,
-                animActionDataId,
-                out animationIndex,
-                out _,
-                out _,
-                out _);
-
             // Validate skill item
             if (!Entity.DecreaseItemsByIndex(itemIndex, 1))
                 return;
@@ -164,24 +123,27 @@ namespace MultiplayerARPG
             // Start use skill routine
             IsUsingSkill = true;
 
+            // Get simulate seed for simulation validating
+            byte simulateSeed = (byte)Random.Range(byte.MinValue, byte.MaxValue);
+
             // Play animations
-            CallAllPlayUseSkillAnimation(isLeftHand, (byte)animationIndex, item.UsingSkill.DataId, item.UsingSkillLevel, targetObjectId, aimPosition);
+            CallAllPlayUseSkillAnimation(simulateSeed, isLeftHand, item.UsingSkill.DataId, item.UsingSkillLevel, targetObjectId, aimPosition);
 #endif
         }
 
-        public bool CallAllPlayUseSkillAnimation(bool isLeftHand, byte animationIndex, int skillDataId, short skillLevel, uint targetObjectId, AimPosition aimPosition)
+        public bool CallAllPlayUseSkillAnimation(byte simulateSeed, bool isLeftHand, int skillDataId, short skillLevel, uint targetObjectId, AimPosition aimPosition)
         {
-            RPC(AllPlayUseSkillAnimation, BaseCharacterEntity.ACTION_TO_CLIENT_DATA_CHANNEL, DeliveryMethod.ReliableOrdered, isLeftHand, animationIndex, skillDataId, skillLevel, targetObjectId, aimPosition);
+            RPC(AllPlayUseSkillAnimation, BaseCharacterEntity.ACTION_TO_CLIENT_DATA_CHANNEL, DeliveryMethod.ReliableOrdered, simulateSeed, isLeftHand, skillDataId, skillLevel, targetObjectId, aimPosition);
             return true;
         }
 
         [AllRpc]
-        protected void AllPlayUseSkillAnimation(bool isLeftHand, byte animationIndex, int skillDataId, short skillLevel, uint targetObjectId, AimPosition aimPosition)
+        protected void AllPlayUseSkillAnimation(byte simulateSeed, bool isLeftHand, int skillDataId, short skillLevel, uint targetObjectId, AimPosition aimPosition)
         {
             BaseSkill skill;
             if (GameInstance.Skills.TryGetValue(skillDataId, out skill) && skillLevel > 0)
             {
-                UseSkillRoutine(isLeftHand, animationIndex, skill, skillLevel, targetObjectId, aimPosition).Forget();
+                UseSkillRoutine(simulateSeed, isLeftHand, skill, skillLevel, targetObjectId, aimPosition).Forget();
             }
             else
             {
@@ -250,7 +212,7 @@ namespace MultiplayerARPG
             }
         }
 
-        protected async UniTaskVoid UseSkillRoutine(bool isLeftHand, byte animationIndex, BaseSkill skill, short skillLevel, uint targetObjectId, AimPosition skillAimPosition)
+        protected async UniTaskVoid UseSkillRoutine(byte simulateSeed, bool isLeftHand, BaseSkill skill, short skillLevel, uint targetObjectId, AimPosition skillAimPosition)
         {
             // Prepare cancellation
             CancellationTokenSource skillCancellationTokenSource = new CancellationTokenSource();
@@ -268,13 +230,15 @@ namespace MultiplayerARPG
                 out weapon);
 
             // Prepare required data and get animation data
+            int animationIndex;
             float animSpeedRate;
             float[] triggerDurations;
             float totalDuration;
-            Entity.GetAnimationData(
+            Entity.GetRandomAnimationData(
                 animActionType,
                 animActionDataId,
-                animationIndex,
+                simulateSeed,
+                out animationIndex,
                 out animSpeedRate,
                 out triggerDurations,
                 out totalDuration);
@@ -307,9 +271,6 @@ namespace MultiplayerARPG
             // Get cast duration. Then if cast duration more than 0, it will play cast skill animation.
             CastingSkillDuration = CastingSkillCountDown = skill.GetCastDuration(skillLevel);
 
-            // Get simulate seed for simulation validating
-            byte simulateSeed = (byte)Random.Range(byte.MinValue, byte.MaxValue);
-            simulatingHitIndex = 0;
             try
             {
                 // Play special effect
@@ -346,7 +307,7 @@ namespace MultiplayerARPG
 
                 float remainsDuration = totalDuration;
                 float tempTriggerDuration;
-                simulatingTriggerLength = triggerDurations.Length;
+                SimulatingHits[simulateSeed] = new SimulatingHit(triggerDurations.Length);
                 for (int hitIndex = 0; hitIndex < triggerDurations.Length; ++hitIndex)
                 {
                     // Play special effects after trigger duration
@@ -419,8 +380,6 @@ namespace MultiplayerARPG
             {
                 skillCancellationTokenSource.Dispose();
                 skillCancellationTokenSources.Remove(skillCancellationTokenSource);
-                // Clear simulate validating data
-                simulatingTriggerLength = 0;
             }
             // Clear action states at clients and server
             Entity.ClearActionStates();
@@ -447,9 +406,12 @@ namespace MultiplayerARPG
         {
             if (IsOwnerClientOrOwnedByServer)
                 return;
-            if (simulatingHitIndex >= simulatingTriggerLength)
+            SimulatingHit simulatingHit = SimulatingHits[data.randomSeed];
+            if (simulatingHit.hitIndex >= simulatingHit.triggerLength)
                 return;
-            simulatingHitIndex++;
+            int hitIndex = SimulatingHits[data.randomSeed].hitIndex + 1;
+            simulatingHit.hitIndex = hitIndex;
+            SimulatingHits[data.randomSeed] = simulatingHit;
             bool isLeftHand = data.state.HasFlag(SimulateLaunchDamageEntityState.IsLeftHand);
             if (data.state.HasFlag(SimulateLaunchDamageEntityState.IsSkill))
             {
@@ -458,8 +420,8 @@ namespace MultiplayerARPG
                 {
                     CharacterItem weapon = Entity.GetAvailableWeapon(ref isLeftHand);
                     Dictionary<DamageElement, MinMaxFloat> damageAmounts = skill.GetAttackDamages(Entity, data.skillLevel, isLeftHand);
-                    int useSkillSeed = unchecked(data.randomSeed + (simulatingHitIndex * 16));
-                    skill.ApplySkill(Entity, data.skillLevel, isLeftHand, weapon, simulatingHitIndex, damageAmounts, data.targetObjectId, data.aimPosition, useSkillSeed, data.time);
+                    int useSkillSeed = unchecked(data.randomSeed + (hitIndex * 16));
+                    skill.ApplySkill(Entity, data.skillLevel, isLeftHand, weapon, hitIndex, damageAmounts, data.targetObjectId, data.aimPosition, useSkillSeed, data.time);
                 }
             }
         }
