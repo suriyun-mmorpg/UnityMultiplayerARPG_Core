@@ -31,6 +31,8 @@ namespace MultiplayerARPG
         public float atkSpeed;
         public float weightLimit;
         public float slotLimit;
+        public float goldRate;
+        public float expRate;
 
         public CharacterStats Add(CharacterStats b)
         {
@@ -55,6 +57,8 @@ namespace MultiplayerARPG
             atkSpeed = atkSpeed + b.atkSpeed;
             weightLimit = weightLimit + b.weightLimit;
             slotLimit = slotLimit + b.slotLimit;
+            goldRate = goldRate + b.goldRate;
+            expRate = expRate + b.expRate;
             return this.InvokeInstanceDevExtMethodsLoopItself("Add", b);
         }
 
@@ -81,6 +85,8 @@ namespace MultiplayerARPG
             atkSpeed = atkSpeed * multiplier;
             weightLimit = weightLimit * multiplier;
             slotLimit = slotLimit * multiplier;
+            goldRate = goldRate * multiplier;
+            expRate = expRate * multiplier;
             return this.InvokeInstanceDevExtMethodsLoopItself("Multiply", multiplier);
         }
 
@@ -107,6 +113,8 @@ namespace MultiplayerARPG
             atkSpeed = atkSpeed * b.atkSpeed;
             weightLimit = weightLimit * b.weightLimit;
             slotLimit = slotLimit * b.slotLimit;
+            goldRate = goldRate * b.slotLimit;
+            expRate = expRate * b.slotLimit;
             return this.InvokeInstanceDevExtMethodsLoopItself("MultiplyStats", b);
         }
 
@@ -150,6 +158,8 @@ namespace MultiplayerARPG
             string atkSpeedStatsFormat,
             string weightLimitStatsFormat,
             string slotLimitStatsFormat,
+            string goldRateStatsFormat,
+            string expRateStatsFormat,
             TextWrapper uiTextHp = null,
             TextWrapper uiTextHpRecovery = null,
             TextWrapper uiTextHpLeechRate = null,
@@ -170,7 +180,9 @@ namespace MultiplayerARPG
             TextWrapper uiTextMoveSpeed = null,
             TextWrapper uiTextAtkSpeed = null,
             TextWrapper uiTextWeightLimit = null,
-            TextWrapper uiTextSlotLimit = null)
+            TextWrapper uiTextSlotLimit = null,
+            TextWrapper uiTextGoldRate = null,
+            TextWrapper uiTextExpRate = null)
         {
             StringBuilder statsString = new StringBuilder();
             string statsStringPart;
@@ -212,9 +224,9 @@ namespace MultiplayerARPG
 
             // Hp Leech Rate
             if (isBonus)
-                tempValue = isRate ? (data.hpLeechRate * 10000).ToBonusString("N2") : (data.hpLeechRate * 100).ToBonusString("N2");
+                tempValue = isRate ? (data.hpLeechRate * 100).ToBonusString("N2") : (data.hpLeechRate * 100).ToBonusString("N2");
             else
-                tempValue = isRate ? (data.hpLeechRate * 10000).ToString("N2") : (data.hpLeechRate * 100).ToString("N2");
+                tempValue = isRate ? (data.hpLeechRate * 100).ToString("N2") : (data.hpLeechRate * 100).ToString("N2");
             statsStringPart = string.Format(
                 LanguageManager.GetText(hpLeechRateStatsFormat),
                 tempValue);
@@ -263,9 +275,9 @@ namespace MultiplayerARPG
 
             // Mp Leech Rate
             if (isBonus)
-                tempValue = isRate ? (data.mpLeechRate * 10000).ToBonusString("N2") : (data.mpLeechRate * 100).ToBonusString("N2");
+                tempValue = isRate ? (data.mpLeechRate * 100).ToBonusString("N2") : (data.mpLeechRate * 100).ToBonusString("N2");
             else
-                tempValue = isRate ? (data.mpLeechRate * 10000).ToString("N2") : (data.mpLeechRate * 100).ToString("N2");
+                tempValue = isRate ? (data.mpLeechRate * 100).ToString("N2") : (data.mpLeechRate * 100).ToString("N2");
             statsStringPart = string.Format(
                 LanguageManager.GetText(mpLeechRateStatsFormat),
                 tempValue);
@@ -314,9 +326,9 @@ namespace MultiplayerARPG
 
             // Stamina Leech Rate
             if (isBonus)
-                tempValue = isRate ? (data.staminaLeechRate * 10000).ToBonusString("N2") : (data.staminaLeechRate * 100).ToBonusString("N2");
+                tempValue = isRate ? (data.staminaLeechRate * 100).ToBonusString("N2") : (data.staminaLeechRate * 100).ToBonusString("N2");
             else
-                tempValue = isRate ? (data.staminaLeechRate * 10000).ToString("N2") : (data.staminaLeechRate * 100).ToString("N2");
+                tempValue = isRate ? (data.staminaLeechRate * 100).ToString("N2") : (data.staminaLeechRate * 100).ToString("N2");
             statsStringPart = string.Format(
                 LanguageManager.GetText(staminaLeechRateStatsFormat),
                 tempValue);
@@ -399,9 +411,9 @@ namespace MultiplayerARPG
 
             // Cri Rate
             if (isBonus)
-                tempValue = isRate ? (data.criRate * 10000).ToBonusString("N2") : (data.criRate * 100).ToBonusString("N2");
+                tempValue = isRate ? (data.criRate * 100).ToBonusString("N2") : (data.criRate * 100).ToBonusString("N2");
             else
-                tempValue = isRate ? (data.criRate * 10000).ToString("N2") : (data.criRate * 100).ToString("N2");
+                tempValue = isRate ? (data.criRate * 100).ToString("N2") : (data.criRate * 100).ToString("N2");
             statsStringPart = string.Format(
                 LanguageManager.GetText(criRateStatsFormat),
                 tempValue);
@@ -416,9 +428,9 @@ namespace MultiplayerARPG
 
             // Cri Dmg Rate
             if (isBonus)
-                tempValue = isRate ? (data.criDmgRate * 10000).ToBonusString("N2") : (data.criDmgRate * 100).ToBonusString("N2");
+                tempValue = isRate ? (data.criDmgRate * 100).ToBonusString("N2") : (data.criDmgRate * 100).ToBonusString("N2");
             else
-                tempValue = isRate ? (data.criDmgRate * 10000).ToString("N2") : (data.criDmgRate * 100).ToString("N2");
+                tempValue = isRate ? (data.criDmgRate * 100).ToString("N2") : (data.criDmgRate * 100).ToString("N2");
             statsStringPart = string.Format(
                 LanguageManager.GetText(criDmgRateStatsFormat),
                 tempValue);
@@ -433,9 +445,9 @@ namespace MultiplayerARPG
 
             // Block Rate
             if (isBonus)
-                tempValue = isRate ? (data.blockRate * 10000).ToBonusString("N2") : (data.blockRate * 100).ToBonusString("N2");
+                tempValue = isRate ? (data.blockRate * 100).ToBonusString("N2") : (data.blockRate * 100).ToBonusString("N2");
             else
-                tempValue = isRate ? (data.blockRate * 10000).ToString("N2") : (data.blockRate * 100).ToString("N2");
+                tempValue = isRate ? (data.blockRate * 100).ToString("N2") : (data.blockRate * 100).ToString("N2");
             statsStringPart = string.Format(
                 LanguageManager.GetText(blockRateStatsFormat),
                 tempValue);
@@ -450,9 +462,9 @@ namespace MultiplayerARPG
 
             // Block Dmg Rate
             if (isBonus)
-                tempValue = isRate ? (data.blockDmgRate * 10000).ToBonusString("N2") : (data.blockDmgRate * 100).ToBonusString("N2");
+                tempValue = isRate ? (data.blockDmgRate * 100).ToBonusString("N2") : (data.blockDmgRate * 100).ToBonusString("N2");
             else
-                tempValue = isRate ? (data.blockDmgRate * 10000).ToString("N2") : (data.blockDmgRate * 100).ToString("N2");
+                tempValue = isRate ? (data.blockDmgRate * 100).ToString("N2") : (data.blockDmgRate * 100).ToString("N2");
             statsStringPart = string.Format(
                 LanguageManager.GetText(blockDmgRateStatsFormat),
                 tempValue);
@@ -464,6 +476,40 @@ namespace MultiplayerARPG
             }
             if (uiTextBlockDmgRate != null)
                 uiTextBlockDmgRate.text = statsStringPart;
+
+            // Move Speed
+            if (isBonus)
+                tempValue = isRate ? (data.moveSpeed * 100).ToBonusString("N2") : data.moveSpeed.ToBonusString("N2");
+            else
+                tempValue = isRate ? (data.moveSpeed * 100).ToString("N2") : data.moveSpeed.ToString("N2");
+            statsStringPart = string.Format(
+                LanguageManager.GetText(moveSpeedStatsFormat),
+                tempValue);
+            if (data.moveSpeed != 0)
+            {
+                if (statsString.Length > 0)
+                    statsString.Append('\n');
+                statsString.Append(statsStringPart);
+            }
+            if (uiTextMoveSpeed != null)
+                uiTextMoveSpeed.text = statsStringPart;
+
+            // Attack Speed
+            if (isBonus)
+                tempValue = isRate ? (data.atkSpeed * 100).ToBonusString("N2") : data.atkSpeed.ToBonusString("N2");
+            else
+                tempValue = isRate ? (data.atkSpeed * 100).ToString("N2") : data.atkSpeed.ToString("N2");
+            statsStringPart = string.Format(
+                LanguageManager.GetText(atkSpeedStatsFormat),
+                tempValue);
+            if (data.atkSpeed != 0)
+            {
+                if (statsString.Length > 0)
+                    statsString.Append('\n');
+                statsString.Append(statsStringPart);
+            }
+            if (uiTextAtkSpeed != null)
+                uiTextAtkSpeed.text = statsStringPart;
 
             // Weight
             if (isBonus)
@@ -499,39 +545,39 @@ namespace MultiplayerARPG
             if (uiTextSlotLimit != null)
                 uiTextSlotLimit.text = statsStringPart;
 
-            // Move Speed
+            // Gold Rate
             if (isBonus)
-                tempValue = isRate ? (data.moveSpeed * 100).ToBonusString("N2") : data.moveSpeed.ToBonusString("N2");
+                tempValue = isRate ? (data.goldRate * 100).ToBonusString("N2") : (data.goldRate * 100).ToBonusString("N0");
             else
-                tempValue = isRate ? (data.moveSpeed * 100).ToString("N2") : data.moveSpeed.ToString("N2");
+                tempValue = isRate ? (data.goldRate * 100).ToString("N2") : (data.goldRate * 100).ToString("N0");
             statsStringPart = string.Format(
-                LanguageManager.GetText(moveSpeedStatsFormat),
+                LanguageManager.GetText(goldRateStatsFormat),
                 tempValue);
-            if (data.moveSpeed != 0)
+            if (data.goldRate != 0)
             {
                 if (statsString.Length > 0)
                     statsString.Append('\n');
                 statsString.Append(statsStringPart);
             }
-            if (uiTextMoveSpeed != null)
-                uiTextMoveSpeed.text = statsStringPart;
+            if (uiTextGoldRate != null)
+                uiTextGoldRate.text = statsStringPart;
 
-            // Attack Speed
+            // Exp Rate
             if (isBonus)
-                tempValue = isRate ? (data.atkSpeed * 100).ToBonusString("N2") : data.atkSpeed.ToBonusString("N2");
+                tempValue = isRate ? (data.expRate * 100).ToBonusString("N2") : (data.expRate * 100).ToBonusString("N0");
             else
-                tempValue = isRate ? (data.atkSpeed * 100).ToString("N2") : data.atkSpeed.ToString("N2");
+                tempValue = isRate ? (data.expRate * 100).ToString("N2") : (data.expRate * 100).ToString("N0");
             statsStringPart = string.Format(
-                LanguageManager.GetText(atkSpeedStatsFormat),
+                LanguageManager.GetText(expRateStatsFormat),
                 tempValue);
-            if (data.atkSpeed != 0)
+            if (data.expRate != 0)
             {
                 if (statsString.Length > 0)
                     statsString.Append('\n');
                 statsString.Append(statsStringPart);
             }
-            if (uiTextAtkSpeed != null)
-                uiTextAtkSpeed.text = statsStringPart;
+            if (uiTextExpRate != null)
+                uiTextExpRate.text = statsStringPart;
 
             return statsString.ToString();
         }

@@ -10,7 +10,7 @@ namespace MultiplayerARPG
             Rate
         }
 
-        [Header("String Formats")]
+        [Header("String Formats (Stats)")]
         [Tooltip("Format => {0} = {Amount}")]
         public UILocaleKeySetting formatKeyHpStats = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_HP);
         [Tooltip("Format => {0} = {Amount}")]
@@ -54,22 +54,28 @@ namespace MultiplayerARPG
         [Tooltip("Format => {0} = {Amount}")]
         public UILocaleKeySetting formatKeySlotLimitStats = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_SLOT);
         [Tooltip("Format => {0} = {Amount * 100}")]
+        public UILocaleKeySetting formatKeyGoldRateStats = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_GOLD_RATE);
+        [Tooltip("Format => {0} = {Amount * 100}")]
+        public UILocaleKeySetting formatKeyExpRateStats = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_EXP_RATE);
+
+        [Header("String Formats (Stats Rate)")]
+        [Tooltip("Format => {0} = {Amount * 100}")]
         public UILocaleKeySetting formatKeyHpRateStats = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_HP_RATE);
         [Tooltip("Format => {0} = {Amount * 100}")]
         public UILocaleKeySetting formatKeyHpRecoveryRateStats = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_HP_RECOVERY_RATE);
-        [Tooltip("Format => {0} = {Amount * 10000}")]
+        [Tooltip("Format => {0} = {Amount * 100}")]
         public UILocaleKeySetting formatKeyHpLeechRateRateStats = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_HP_LEECH_RATE_RATE);
         [Tooltip("Format => {0} = {Amount * 100}")]
         public UILocaleKeySetting formatKeyMpRateStats = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_MP_RATE);
         [Tooltip("Format => {0} = {Amount * 100}")]
         public UILocaleKeySetting formatKeyMpRecoveryRateStats = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_MP_RECOVERY_RATE);
-        [Tooltip("Format => {0} = {Amount * 10000}")]
+        [Tooltip("Format => {0} = {Amount * 100}")]
         public UILocaleKeySetting formatKeyMpLeechRateRateStats = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_MP_LEECH_RATE_RATE);
         [Tooltip("Format => {0} = {Amount * 100}")]
         public UILocaleKeySetting formatKeyStaminaRateStats = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_STAMINA_RATE);
         [Tooltip("Format => {0} = {Amount * 100}")]
         public UILocaleKeySetting formatKeyStaminaRecoveryRateStats = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_STAMINA_RECOVERY_RATE);
-        [Tooltip("Format => {0} = {Amount * 10000}")]
+        [Tooltip("Format => {0} = {Amount * 100}")]
         public UILocaleKeySetting formatKeyStaminaLeechRateRateStats = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_STAMINA_LEECH_RATE_RATE);
         [Tooltip("Format => {0} = {Amount * 100}")]
         public UILocaleKeySetting formatKeyFoodRateStats = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_FOOD_RATE);
@@ -79,13 +85,13 @@ namespace MultiplayerARPG
         public UILocaleKeySetting formatKeyAccuracyRateStats = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_ACCURACY_RATE);
         [Tooltip("Format => {0} = {Amount * 100}")]
         public UILocaleKeySetting formatKeyEvasionRateStats = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_EVASION_RATE);
-        [Tooltip("Format => {0} = {Amount * 10000}")]
+        [Tooltip("Format => {0} = {Amount * 100}")]
         public UILocaleKeySetting formatKeyCriRateRateStats = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_CRITICAL_RATE_RATE);
-        [Tooltip("Format => {0} = {Amount * 10000}")]
+        [Tooltip("Format => {0} = {Amount * 100}")]
         public UILocaleKeySetting formatKeyCriDmgRateRateStats = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_CRITICAL_DAMAGE_RATE_RATE);
-        [Tooltip("Format => {0} = {Amount * 10000}")]
+        [Tooltip("Format => {0} = {Amount * 100}")]
         public UILocaleKeySetting formatKeyBlockRateRateStats = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_BLOCK_RATE_RATE);
-        [Tooltip("Format => {0} = {Amount * 10000}")]
+        [Tooltip("Format => {0} = {Amount * 100}")]
         public UILocaleKeySetting formatKeyBlockDmgRateRateStats = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_BLOCK_DAMAGE_RATE_RATE);
         [Tooltip("Format => {0} = {Amount * 100}")]
         public UILocaleKeySetting formatKeyMoveSpeedRateStats = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_MOVE_SPEED_RATE);
@@ -95,6 +101,10 @@ namespace MultiplayerARPG
         public UILocaleKeySetting formatKeyWeightLimitRateStats = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_WEIGHT_RATE);
         [Tooltip("Format => {0} = {Amount * 100}")]
         public UILocaleKeySetting formatKeySlotLimitRateStats = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_SLOT_RATE);
+        [Tooltip("Format => {0} = {Amount * 100}")]
+        public UILocaleKeySetting formatKeyGoldRateRateStats = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_GOLD_RATE_RATE);
+        [Tooltip("Format => {0} = {Amount * 100}")]
+        public UILocaleKeySetting formatKeyExpRateRateStats = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_EXP_RATE_RATE);
 
         [Header("UI Elements")]
         public TextWrapper uiTextStats;
@@ -119,6 +129,8 @@ namespace MultiplayerARPG
         public TextWrapper uiTextAtkSpeed;
         public TextWrapper uiTextWeightLimit;
         public TextWrapper uiTextSlotLimit;
+        public TextWrapper uiTextGoldRate;
+        public TextWrapper uiTextExpRate;
         public DisplayType displayType;
         public bool isBonus;
 
@@ -154,6 +166,8 @@ namespace MultiplayerARPG
                         formatKeyAtkSpeedRateStats,
                         formatKeyWeightLimitRateStats,
                         formatKeySlotLimitRateStats,
+                        formatKeyGoldRateRateStats,
+                        formatKeyExpRateRateStats,
                         uiTextHp,
                         uiTextHpRecovery,
                         uiTextHpLeechRate,
@@ -174,7 +188,9 @@ namespace MultiplayerARPG
                         uiTextMoveSpeed,
                         uiTextAtkSpeed,
                         uiTextWeightLimit,
-                        uiTextSlotLimit);
+                        uiTextSlotLimit,
+                        uiTextGoldRate,
+                        uiTextExpRate);
                     break;
                 default:
                     statsString = CharacterStats.GetText(
@@ -202,6 +218,8 @@ namespace MultiplayerARPG
                         formatKeyAtkSpeedStats,
                         formatKeyWeightLimitStats,
                         formatKeySlotLimitStats,
+                        formatKeyGoldRateStats,
+                        formatKeyExpRateStats,
                         uiTextHp,
                         uiTextHpRecovery,
                         uiTextHpLeechRate,
@@ -222,7 +240,9 @@ namespace MultiplayerARPG
                         uiTextMoveSpeed,
                         uiTextAtkSpeed,
                         uiTextWeightLimit,
-                        uiTextSlotLimit);
+                        uiTextSlotLimit,
+                        uiTextGoldRate,
+                        uiTextExpRate);
                     break;
             }
 

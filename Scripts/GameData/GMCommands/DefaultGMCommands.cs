@@ -30,6 +30,14 @@
         /// Give item to another character: /give_item {Character Name} {Item Id} {amount}
         /// </summary>
         public const string GiveItem = "/give_item";
+        /// <summary>
+        /// Set gold rate (0.1 = 1%, 1 = 100%)
+        /// </summary>
+        public const string GoldRate = "/gold_rate";
+        /// <summary>
+        /// Set exp rate (0.1 = 1%, 1 = 100%)
+        /// </summary>
+        public const string ExpRate = "/exp_rate";
 
         public virtual bool IsDataLengthValid(string command, int dataLength)
         {
@@ -50,6 +58,10 @@
                 return true;
             if (command.Equals(GiveItem) && dataLength == 4)
                 return true;
+            if (command.Equals(GoldRate) && dataLength == 1)
+                return true;
+            if (command.Equals(ExpRate) && dataLength == 1)
+                return true;
 
             return false;
         }
@@ -68,7 +80,9 @@
                 command.Equals(Gold) ||
                 command.Equals(AddItem) ||
                 command.Equals(GiveGold) ||
-                command.Equals(GiveItem))
+                command.Equals(GiveItem) ||
+                command.Equals(GoldRate) ||
+                command.Equals(ExpRate))
             {
                 return true;
             }
@@ -163,6 +177,22 @@
                         if (amount > item.MaxStack)
                             amount = item.MaxStack;
                         playerCharacter.AddOrSetNonEquipItems(CharacterItem.Create(item, 1, amount));
+                    }
+                }
+                if (commandKey.Equals(GoldRate))
+                {
+                    float amount;
+                    if (float.TryParse(data[1], out amount))
+                    {
+                        GameInstance.Singleton.GameplayRule.GoldRate = amount;
+                    }
+                }
+                if (commandKey.Equals(ExpRate))
+                {
+                    float amount;
+                    if (float.TryParse(data[1], out amount))
+                    {
+                        GameInstance.Singleton.GameplayRule.ExpRate = amount;
                     }
                 }
             }

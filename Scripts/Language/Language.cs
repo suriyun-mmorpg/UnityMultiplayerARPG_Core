@@ -751,19 +751,19 @@ namespace MultiplayerARPG
         /// </summary>
         UI_FORMAT_EVASION_RATE,
         /// <summary>
-        /// Format => {0} = {Amount * 10000}
+        /// Format => {0} = {Amount * 100}
         /// </summary>
         UI_FORMAT_CRITICAL_RATE_RATE,
         /// <summary>
-        /// Format => {0} = {Amount * 10000}
+        /// Format => {0} = {Amount * 100}
         /// </summary>
         UI_FORMAT_CRITICAL_DAMAGE_RATE_RATE,
         /// <summary>
-        /// Format => {0} = {Amount * 10000}
+        /// Format => {0} = {Amount * 100}
         /// </summary>
         UI_FORMAT_BLOCK_RATE_RATE,
         /// <summary>
-        /// Format => {0} = {Amount * 10000}
+        /// Format => {0} = {Amount * 100}
         /// </summary>
         UI_FORMAT_BLOCK_DAMAGE_RATE_RATE,
         /// <summary>
@@ -938,7 +938,7 @@ namespace MultiplayerARPG
         /// </summary>
         UI_FORMAT_HP_RECOVERY_RATE,
         /// <summary>
-        /// Format => {0} = {Amount * 10000}
+        /// Format => {0} = {Amount * 100}
         /// </summary>
         UI_FORMAT_HP_LEECH_RATE_RATE,
         /// <summary>
@@ -946,7 +946,7 @@ namespace MultiplayerARPG
         /// </summary>
         UI_FORMAT_MP_RECOVERY_RATE,
         /// <summary>
-        /// Format => {0} = {Amount * 10000}
+        /// Format => {0} = {Amount * 100}
         /// </summary>
         UI_FORMAT_MP_LEECH_RATE_RATE,
         /// <summary>
@@ -954,9 +954,26 @@ namespace MultiplayerARPG
         /// </summary>
         UI_FORMAT_STAMINA_RECOVERY_RATE,
         /// <summary>
-        /// Format => {0} = {Amount * 10000}
+        /// Format => {0} = {Amount * 100}
         /// </summary>
         UI_FORMAT_STAMINA_LEECH_RATE_RATE,
+        // 1.66c New Formats
+        /// <summary>
+        /// Format => {0} = {Amount * 100}
+        /// </summary>
+        UI_FORMAT_GOLD_RATE,
+        /// <summary>
+        /// Format => {0} = {Amount * 100}
+        /// </summary>
+        UI_FORMAT_EXP_RATE,
+        /// <summary>
+        /// Format => {0} = {Amount * 100}
+        /// </summary>
+        UI_FORMAT_GOLD_RATE_RATE,
+        /// <summary>
+        /// Format => {0} = {Amount * 100}
+        /// </summary>
+        UI_FORMAT_EXP_RATE_RATE,
     }
 
     public static class DefaultLocale
@@ -1437,6 +1454,11 @@ namespace MultiplayerARPG
             Texts.Add(UIFormatKeys.UI_FORMAT_MP_LEECH_RATE_RATE.ToString(), "% of Mp Leech Rate: {0}%");
             Texts.Add(UIFormatKeys.UI_FORMAT_STAMINA_RECOVERY_RATE.ToString(), "Stamina Recovery Rate: {0}%");
             Texts.Add(UIFormatKeys.UI_FORMAT_STAMINA_LEECH_RATE_RATE.ToString(), "% of Stamina Leech Rate: {0}%");
+            // Format - 1.66c - New stats
+            Texts.Add(UIFormatKeys.UI_FORMAT_GOLD_RATE.ToString(), "Gold Rate: {0}%");
+            Texts.Add(UIFormatKeys.UI_FORMAT_EXP_RATE.ToString(), "Exp Rate: {0}%");
+            Texts.Add(UIFormatKeys.UI_FORMAT_GOLD_RATE_RATE.ToString(), "% of Gold Rate: {0}");
+            Texts.Add(UIFormatKeys.UI_FORMAT_EXP_RATE_RATE.ToString(), "% of Exp Rate: {0}");
         }
     }
 

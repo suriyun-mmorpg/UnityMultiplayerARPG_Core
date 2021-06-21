@@ -334,7 +334,7 @@ namespace MultiplayerARPG
             }
 
             bool isLevelUp = false;
-            int exp = Mathf.CeilToInt(reward.exp * multiplier);
+            int exp = reward.exp;
             BasePlayerCharacterEntity playerCharacter = character as BasePlayerCharacterEntity;
             if (playerCharacter != null)
             {
@@ -343,10 +343,12 @@ namespace MultiplayerARPG
                 switch (rewardGivenType)
                 {
                     case RewardGivenType.KillMonster:
+                        exp = Mathf.CeilToInt(exp * multiplier * playerCharacter.GetCaches().Stats.expRate * ExpRate);
                         if (GameInstance.ServerGuildHandlers.TryGetGuild(playerCharacter.GuildId, out guildData))
                             exp += Mathf.CeilToInt(exp * guildData.IncreaseExpGainPercentage * 0.01f);
                         break;
                     case RewardGivenType.PartyShare:
+                        exp = Mathf.CeilToInt(exp * multiplier * playerCharacter.GetCaches().Stats.expRate * ExpRate);
                         if (GameInstance.ServerGuildHandlers.TryGetGuild(playerCharacter.GuildId, out guildData))
                             exp += Mathf.CeilToInt(exp * guildData.IncreaseShareExpGainPercentage * 0.01f);
                         break;
@@ -434,7 +436,7 @@ namespace MultiplayerARPG
                 return;
             }
 
-            int gold = Mathf.CeilToInt(reward.gold * multiplier);
+            int gold = reward.gold;
             BasePlayerCharacterEntity playerCharacter = character as BasePlayerCharacterEntity;
             if (playerCharacter != null)
             {
@@ -443,10 +445,12 @@ namespace MultiplayerARPG
                 switch (rewardGivenType)
                 {
                     case RewardGivenType.KillMonster:
+                        gold = Mathf.CeilToInt(gold * multiplier * playerCharacter.GetCaches().Stats.goldRate * GoldRate);
                         if (GameInstance.ServerGuildHandlers.TryGetGuild(playerCharacter.GuildId, out guildData))
                             gold += Mathf.CeilToInt(gold * guildData.IncreaseGoldGainPercentage * 0.01f);
                         break;
                     case RewardGivenType.PartyShare:
+                        gold = Mathf.CeilToInt(gold * multiplier * playerCharacter.GetCaches().Stats.goldRate * GoldRate);
                         if (GameInstance.ServerGuildHandlers.TryGetGuild(playerCharacter.GuildId, out guildData))
                             gold += Mathf.CeilToInt(gold * guildData.IncreaseShareGoldGainPercentage * 0.01f);
                         break;
