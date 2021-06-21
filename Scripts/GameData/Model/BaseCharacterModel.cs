@@ -259,6 +259,10 @@ namespace MultiplayerARPG
                     equipmentEntities,
                     itemIds);
                 SetIsDead(previousModel.isDead);
+                SetDefaultAnimations();
+                SetEquipWeapons(previousModel.equipWeapons);
+                SetEquipItems(previousModel.equipItems);
+                SetBuffs(previousModel.buffs);
                 SetMoveAnimationSpeedMultiplier(previousModel.moveAnimationSpeedMultiplier);
                 SetMovementState(previousModel.movementState, previousModel.extraMovementState, direction2D);
             }
