@@ -1457,8 +1457,8 @@ namespace MultiplayerARPG
             // Format - 1.66c - New stats
             Texts.Add(UIFormatKeys.UI_FORMAT_GOLD_RATE.ToString(), "Gold Rate: {0}%");
             Texts.Add(UIFormatKeys.UI_FORMAT_EXP_RATE.ToString(), "Exp Rate: {0}%");
-            Texts.Add(UIFormatKeys.UI_FORMAT_GOLD_RATE_RATE.ToString(), "% of Gold Rate: {0}");
-            Texts.Add(UIFormatKeys.UI_FORMAT_EXP_RATE_RATE.ToString(), "% of Exp Rate: {0}");
+            Texts.Add(UIFormatKeys.UI_FORMAT_GOLD_RATE_RATE.ToString(), "% of Gold Rate: {0}%");
+            Texts.Add(UIFormatKeys.UI_FORMAT_EXP_RATE_RATE.ToString(), "% of Exp Rate: {0}%");
         }
     }
 
