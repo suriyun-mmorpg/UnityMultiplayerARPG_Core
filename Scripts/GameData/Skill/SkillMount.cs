@@ -1,12 +1,11 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
 namespace MultiplayerARPG
 {
     [System.Serializable]
     public partial struct SkillMount
     {
+        public static readonly SkillMount Empty = new SkillMount();
         [Tooltip("Leave `Mount Entity` to NULL to not summon mount entity")]
         [SerializeField]
         private VehicleEntity mountEntity;

@@ -5,6 +5,7 @@ namespace MultiplayerARPG
     [System.Serializable]
     public partial struct Buff
     {
+        public static readonly Buff Empty = new Buff();
         [Tooltip("If duration less than or equals to 0, buff stats won't applied only recovery will be applied. This won't be applied to monster's summoner.")]
         public IncrementalFloat duration;
         [Tooltip("Recover character's current HP. This won't be applied to monster's summoner.")]

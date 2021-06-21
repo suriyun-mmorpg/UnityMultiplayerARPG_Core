@@ -1,12 +1,11 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
 namespace MultiplayerARPG
 {
     [System.Serializable]
     public partial struct SkillSummon
     {
+        public static readonly SkillSummon Empty = new SkillSummon();
         [Tooltip("Leave `Monster Entity` to NULL to not summon monster entity")]
         [SerializeField]
         private BaseMonsterCharacterEntity monsterEntity;

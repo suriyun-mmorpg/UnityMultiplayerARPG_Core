@@ -1,5 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 
 namespace MultiplayerARPG
@@ -7,6 +6,7 @@ namespace MultiplayerARPG
     [System.Serializable]
     public partial struct ItemCraft
     {
+        public static readonly ItemCraft Empty = new ItemCraft();
         [SerializeField]
         private BaseItem craftingItem;
         [SerializeField]
