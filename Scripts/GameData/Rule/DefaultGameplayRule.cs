@@ -550,22 +550,22 @@ namespace MultiplayerARPG
                     tempBuff.ApplyEnemyStatusEffectsWhenAttacking(buff.level, attackerInfo, damageReceiver);
                 }
                 // Damage Receiver
-                foreach (CharacterItem armorItem in attacker.EquipItems)
+                foreach (CharacterItem armorItem in damageReceiver.EquipItems)
                 {
                     tempEquipmentItem = armorItem.GetEquipmentItem();
                     ApplyStatusEffectToDamageReceiver(armorItem, tempEquipmentItem, damageReceiverInfo, attacker, damageReceiver);
                 }
-                tempEquipmentItem = attacker.EquipWeapons.GetRightHandEquipmentItem();
+                tempEquipmentItem = damageReceiver.EquipWeapons.GetRightHandEquipmentItem();
                 if (tempEquipmentItem != null)
                 {
-                    ApplyStatusEffectToDamageReceiver(attacker.EquipWeapons.rightHand, tempEquipmentItem, damageReceiverInfo, attacker, damageReceiver);
+                    ApplyStatusEffectToDamageReceiver(damageReceiver.EquipWeapons.rightHand, tempEquipmentItem, damageReceiverInfo, attacker, damageReceiver);
                 }
-                tempEquipmentItem = attacker.EquipWeapons.GetLeftHandEquipmentItem();
+                tempEquipmentItem = damageReceiver.EquipWeapons.GetLeftHandEquipmentItem();
                 if (tempEquipmentItem != null)
                 {
-                    ApplyStatusEffectToDamageReceiver(attacker.EquipWeapons.leftHand, tempEquipmentItem, damageReceiverInfo, attacker, damageReceiver);
+                    ApplyStatusEffectToDamageReceiver(damageReceiver.EquipWeapons.leftHand, tempEquipmentItem, damageReceiverInfo, attacker, damageReceiver);
                 }
-                foreach (CharacterBuff buff in attacker.Buffs)
+                foreach (CharacterBuff buff in damageReceiver.Buffs)
                 {
                     tempBuff = buff.GetBuff();
                     tempBuff.ApplySelfStatusEffectsWhenAttacked(buff.level, damageReceiverInfo, damageReceiver);
