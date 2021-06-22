@@ -296,7 +296,7 @@ namespace MultiplayerARPG
 #endif
 
 #if UNITY_EDITOR
-        [ContextMenu("Set Equipment Containers By Setters")]
+        [ContextMenu("Set Equipment Containers By Setters", false, 1000301)]
         public void SetEquipmentContainersBySetters()
         {
             EquipmentContainerSetter[] setters = GetComponentsInChildren<EquipmentContainerSetter>();
@@ -311,7 +311,7 @@ namespace MultiplayerARPG
             EditorUtility.SetDirty(this);
         }
 
-        [ContextMenu("Deactivate Instantiated Objects")]
+        [ContextMenu("Deactivate Instantiated Objects", false, 1000302)]
         public void DeactivateInstantiatedObjects()
         {
             if (equipmentContainers != null && equipmentContainers.Length > 0)
@@ -324,7 +324,7 @@ namespace MultiplayerARPG
             }
         }
 
-        [ContextMenu("Activate Instantiated Object")]
+        [ContextMenu("Activate Instantiated Object", false, 1000303)]
         public void ActivateInstantiatedObject()
         {
             if (equipmentContainers != null && equipmentContainers.Length > 0)

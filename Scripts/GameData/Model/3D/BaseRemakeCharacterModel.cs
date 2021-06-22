@@ -580,26 +580,26 @@ namespace MultiplayerARPG
         }
 
 #if UNITY_EDITOR
-        [ContextMenu("Copy Default Animations")]
+        [ContextMenu("Copy Default Animations", false, 1000401)]
         public void CopyDefaultAnimations()
         {
             CharacterModelDataManager.CopyDefaultAnimations(defaultAnimations);
         }
 
-        [ContextMenu("Paste Default Animations")]
+        [ContextMenu("Paste Default Animations", false, 1000402)]
         public void PasteDefaultAnimations()
         {
             defaultAnimations = CharacterModelDataManager.PasteDefaultAnimations();
             EditorUtility.SetDirty(this);
         }
 
-        [ContextMenu("Copy Weapon Animations")]
+        [ContextMenu("Copy Weapon Animations", false, 1000403)]
         public void CopyWeaponAnimations()
         {
             CharacterModelDataManager.CopyWeaponAnimations(weaponAnimations);
         }
 
-        [ContextMenu("Paste Weapon Animations")]
+        [ContextMenu("Paste Weapon Animations", false, 1000404)]
         public void PasteWeaponAnimations()
         {
             WeaponAnimations[] weaponAnimations = CharacterModelDataManager.PasteWeaponAnimations();
@@ -610,13 +610,13 @@ namespace MultiplayerARPG
             }
         }
 
-        [ContextMenu("Copy Skill Animations")]
+        [ContextMenu("Copy Skill Animations", false, 1000405)]
         public void CopySkillAnimations()
         {
             CharacterModelDataManager.CopySkillAnimations(skillAnimations);
         }
 
-        [ContextMenu("Paste Skill Animations")]
+        [ContextMenu("Paste Skill Animations", false, 1000406)]
         public void PasteSkillAnimations()
         {
             SkillAnimations[] skillAnimations = CharacterModelDataManager.PasteSkillAnimations();

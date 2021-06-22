@@ -543,7 +543,7 @@ namespace MultiplayerARPG
         }
 
 #if UNITY_EDITOR
-        [ContextMenu("Set Animator Clips For Test")]
+        [ContextMenu("Set Animator Clips For Test", false, 1000501)]
         public void SetAnimatorClipsForTest()
         {
             SetupComponent();

@@ -982,13 +982,13 @@ namespace MultiplayerARPG
         }
 
 #if UNITY_EDITOR
-        [ContextMenu("Copy Weapon Animations")]
+        [ContextMenu("Copy Weapon Animations", false, 1000401)]
         public void CopyWeaponAnimations()
         {
             CharacterModelDataManager.CopyWeaponAnimations(weaponAnimations);
         }
 
-        [ContextMenu("Paste Weapon Animations")]
+        [ContextMenu("Paste Weapon Animations", false, 1000402)]
         public void PasteWeaponAnimations()
         {
             WeaponAnimations[] weaponAnimations = CharacterModelDataManager.PasteWeaponAnimations();
@@ -999,13 +999,13 @@ namespace MultiplayerARPG
             }
         }
 
-        [ContextMenu("Copy Skill Animations")]
+        [ContextMenu("Copy Skill Animations", false, 1000403)]
         public void CopySkillAnimations()
         {
             CharacterModelDataManager.CopySkillAnimations(skillAnimations);
         }
 
-        [ContextMenu("Paste Skill Animations")]
+        [ContextMenu("Paste Skill Animations", false, 1000404)]
         public void PasteSkillAnimations()
         {
             SkillAnimations[] skillAnimations = CharacterModelDataManager.PasteSkillAnimations();
@@ -1019,7 +1019,7 @@ namespace MultiplayerARPG
         #endregion
 
 #if UNITY_EDITOR
-        [ContextMenu("Set Animator Clips For Test")]
+        [ContextMenu("Set Animator Clips For Test", false, 1000405)]
         public void SetAnimatorClipsForTest()
         {
             SetupComponent();
@@ -1073,7 +1073,7 @@ namespace MultiplayerARPG
             this.InvokeInstanceDevExtMethods("SetAnimatorClipsForTest");
         }
 
-        [ContextMenu("Convert To Newer Character Model")]
+        [ContextMenu("Convert To Newer Character Model", false, 1000500)]
         public void ConvertToNewerCharacterModel()
         {
             ConvertToNewerCharacterModelImplement();

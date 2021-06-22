@@ -137,7 +137,7 @@ namespace MultiplayerARPG
 #endif
 
 #if UNITY_EDITOR
-        [ContextMenu("Set Effect Containers By Setters")]
+        [ContextMenu("Set Effect Containers By Setters", false, 1000101)]
         public void SetEffectContainersBySetters()
         {
             EffectContainerSetter[] setters = GetComponentsInChildren<EffectContainerSetter>();
