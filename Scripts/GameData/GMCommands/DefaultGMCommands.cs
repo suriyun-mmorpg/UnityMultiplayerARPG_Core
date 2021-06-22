@@ -58,9 +58,9 @@
                 return true;
             if (command.Equals(GiveItem) && dataLength == 4)
                 return true;
-            if (command.Equals(GoldRate) && dataLength == 1)
+            if (command.Equals(GoldRate) && dataLength == 2)
                 return true;
-            if (command.Equals(ExpRate) && dataLength == 1)
+            if (command.Equals(ExpRate) && dataLength == 2)
                 return true;
 
             return false;
@@ -96,11 +96,12 @@
             return characterEntity != null && characterEntity.UserLevel > 0;
         }
 
-        public override void HandleGMCommand(string sender, string chatMessage)
+        public override string HandleGMCommand(string sender, string chatMessage)
         {
             if (string.IsNullOrEmpty(chatMessage))
-                return;
+                return string.Empty;
 
+            string response = string.Empty;
             string[] data = chatMessage.Split(' ');
             string commandKey = data[0];
             string receiver;
@@ -114,7 +115,10 @@
                     if (GameInstance.ServerUserHandlers.TryGetPlayerCharacterByName(receiver, out playerCharacter) &&
                         short.TryParse(data[1], out amount) &&
                         amount > 0)
+                    {
                         playerCharacter.Level = amount;
+                        response = $"Set character level to {amount}";
+                    }
                 }
                 if (commandKey.Equals(StatPoint))
                 {
@@ -123,7 +127,10 @@
                     if (GameInstance.ServerUserHandlers.TryGetPlayerCharacterByName(receiver, out playerCharacter) &&
                         int.TryParse(data[1], out amount) &&
                         amount >= 0)
+                    {
                         playerCharacter.StatPoint = amount;
+                        response = $"Set character statpoint to {amount}";
+                    }
                 }
                 if (commandKey.Equals(SkillPoint))
                 {
@@ -132,7 +139,10 @@
                     if (GameInstance.ServerUserHandlers.TryGetPlayerCharacterByName(receiver, out playerCharacter) &&
                         int.TryParse(data[1], out amount) &&
                         amount >= 0)
+                    {
                         playerCharacter.SkillPoint = amount;
+                        response = $"Set character skillpoint to {amount}";
+                    }
                 }
                 if (commandKey.Equals(Gold))
                 {
@@ -141,7 +151,10 @@
                     if (GameInstance.ServerUserHandlers.TryGetPlayerCharacterByName(receiver, out playerCharacter) &&
                         short.TryParse(data[1], out amount) &&
                         amount >= 0)
+                    {
                         playerCharacter.Gold = amount;
+                        response = $"Set character gold to {amount}";
+                    }
                 }
                 if (commandKey.Equals(AddItem))
                 {
@@ -155,6 +168,7 @@
                         if (amount > item.MaxStack)
                             amount = item.MaxStack;
                         playerCharacter.AddOrSetNonEquipItems(CharacterItem.Create(item, 1, amount));
+                        response = $"Add item {item.title}x{amount} to character's inventory";
                     }
                 }
                 if (commandKey.Equals(GiveGold))
@@ -163,7 +177,10 @@
                     short amount;
                     if (GameInstance.ServerUserHandlers.TryGetPlayerCharacterByName(receiver, out playerCharacter) &&
                         short.TryParse(data[2], out amount))
+                    {
                         playerCharacter.Gold = playerCharacter.Gold.Increase(amount);
+                        response = $"Add gold for character: {receiver}";
+                    }
                 }
                 if (commandKey.Equals(GiveItem))
                 {
@@ -177,6 +194,7 @@
                         if (amount > item.MaxStack)
                             amount = item.MaxStack;
                         playerCharacter.AddOrSetNonEquipItems(CharacterItem.Create(item, 1, amount));
+                        response = $"Add item {item.title}x{amount} to character: {receiver}'s inventory";
                     }
                 }
                 if (commandKey.Equals(GoldRate))
@@ -185,6 +203,7 @@
                     if (float.TryParse(data[1], out amount))
                     {
                         GameInstance.Singleton.GameplayRule.GoldRate = amount;
+                        response = $"Set gold rate to {amount}";
                     }
                 }
                 if (commandKey.Equals(ExpRate))
@@ -193,9 +212,11 @@
                     if (float.TryParse(data[1], out amount))
                     {
                         GameInstance.Singleton.GameplayRule.ExpRate = amount;
+                        response = $"Set exp rate to {amount}";
                     }
                 }
             }
+            return response;
         }
     }
 }
