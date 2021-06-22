@@ -457,6 +457,10 @@ namespace MultiplayerARPG
             if (gameplayRule == null)
                 gameplayRule = ScriptableObject.CreateInstance<DefaultGameplayRule>();
 
+            // Reset gold and exp rate
+            gameplayRule.GoldRate = 1f;
+            gameplayRule.ExpRate = 1f;
+
             // Setup day night time updater if not existed
             if (dayNightTimeUpdater == null)
                 dayNightTimeUpdater = ScriptableObject.CreateInstance<DefaultDayNightTimeUpdater>();
