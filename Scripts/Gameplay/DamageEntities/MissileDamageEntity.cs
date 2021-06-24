@@ -141,6 +141,16 @@ namespace MultiplayerARPG
 
         protected override void OnPushBack()
         {
+            if (CurrentGameInstance.DimensionType == DimensionType.Dimension2D)
+            {
+                if (CacheRigidbody2D != null)
+                    CacheRigidbody2D.velocity = Vector2.zero;
+            }
+            else
+            {
+                if (CacheRigidbody != null)
+                    CacheRigidbody.velocity = Vector3.zero;
+            }
             previousPosition = null;
             if (onDestroy != null)
                 onDestroy.Invoke();
