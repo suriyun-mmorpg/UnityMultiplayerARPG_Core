@@ -46,7 +46,7 @@ namespace MultiplayerARPG
                     hasChanges = true;
             }
             if (legacyAnimation == null)
-                Logging.LogError(ToString(), "`Legacy Animation` is empty");
+                Logging.LogError(ToString(), $"{name}({nameof(AnimationCharacterModel)}) -> `LegacyAnimation` is empty, please set reference of `Animation` component to `{nameof(AnimationCharacterModel)}` -> `LegacyAnimation` field.");
             if (hasChanges)
             {
                 isSetupComponent = false;

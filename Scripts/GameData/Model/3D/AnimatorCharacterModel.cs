@@ -410,9 +410,9 @@ namespace MultiplayerARPG
                     break;
             }
             if (animator == null)
-                Logging.LogError(ToString(), "`Animator` is empty");
+                Logging.LogError(ToString(), $"{name}({nameof(AnimatorCharacterModel)}) -> `Animator` is empty, please set reference of `Animator` component to `{nameof(AnimatorCharacterModel)}` -> `Animator` field.");
             if (animatorController == null)
-                Logging.LogError(ToString(), "`Animator Controller` is empty");
+                Logging.LogError(ToString(), $"{name}({nameof(AnimatorCharacterModel)}) -> `AnimatorController` is empty, please set reference of `AnimatorController` data to `{nameof(AnimatorCharacterModel)}` -> `AnimatorController` field.");
             if (hasChanges)
             {
                 isSetupComponent = false;
