@@ -5,6 +5,7 @@ using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine.AI;
 using StandardAssets.Characters.Physics;
+using LiteNetLibManager;
 
 namespace MultiplayerARPG
 {
@@ -105,6 +106,7 @@ namespace MultiplayerARPG
             path = path.Substring(path.IndexOf("Assets"));
 
             var newObject = Instantiate(fbx, Vector3.zero, Quaternion.identity);
+            newObject.AddComponent<LiteNetLibIdentity>();
             newObject.AddComponent<CharacterRecoveryComponent>();
             newObject.AddComponent<CharacterSkillAndBuffComponent>();
 
