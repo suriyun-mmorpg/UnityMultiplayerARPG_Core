@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using Cysharp.Threading.Tasks;
+using UnityEngine;
 using UnityEngine.Events;
 
 namespace MultiplayerARPG
@@ -26,9 +27,15 @@ namespace MultiplayerARPG
                 onGetInstance.Invoke();
         }
 
-        protected virtual void PushBack(float delay)
+        protected void PushBack(float delay)
         {
-            Invoke(nameof(PushBack), delay);
+            PushBackRoutine(delay).Forget();
+        }
+
+        private async UniTaskVoid PushBackRoutine(float delay)
+        {
+            await UniTask.Delay((int)(delay * 1000));
+            PushBack();
         }
 
         protected virtual void PushBack()
