@@ -125,15 +125,7 @@ namespace MultiplayerARPG
 
         protected virtual void Create(T[] arr)
         {
-            T newData = ScriptableObject.CreateInstance<T>();
-            string savedPath = EditorUtility.SaveFilePanel("Save asset", "Assets", typeof(T).Name + ".asset", "asset");
-            savedPath = savedPath.Substring(savedPath.IndexOf("Assets"));
-            AssetDatabase.CreateAsset(newData, savedPath);
-            List<T> appending = new List<T>(arr);
-            appending.Add(AssetDatabase.LoadAssetAtPath<T>(savedPath));
-            T[] newArr = appending.ToArray();
-            EditorGlobalData.WorkingDatabase.GetType().GetField(FieldName, BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic).SetValue(EditorGlobalData.WorkingDatabase, newArr);
-            EditorUtility.SetDirty(EditorGlobalData.WorkingDatabase);
+            GameDataCreatorEditor.CreateNewEditor(EditorGlobalData.WorkingDatabase, typeof(T), FieldName, arr);
         }
 
         protected virtual void Duplicate(T[] arr)
