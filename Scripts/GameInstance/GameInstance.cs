@@ -512,6 +512,11 @@ namespace MultiplayerARPG
             GameDatabase.LoadData(this).Forget();
         }
 
+        protected virtual void OnDestroy()
+        {
+            this.InvokeInstanceDevExtMethods("OnDestroy");
+        }
+
         public static void ClearData()
         {
             Attributes.Clear();
