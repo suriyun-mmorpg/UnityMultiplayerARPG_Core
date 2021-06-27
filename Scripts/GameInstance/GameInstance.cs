@@ -159,11 +159,11 @@ namespace MultiplayerARPG
         private BaseGameDatabase gameDatabase;
         [Tooltip("You can add warp portals to warp portal database or may add warp portals into the scene directly, So you can leave this empty uf you are going to add warp portals into the scene directly only")]
         [SerializeField]
-        private WarpPortalDatabase warpPortalDatabase;
-        [Tooltip("You can add NPCs to NPC database or may add NPCs into the scene directly, so you can leave this empty if you are going to add NPCs into the scene directly only")]
-        [SerializeField]
         private NpcDatabase npcDatabase;
         [Tooltip("You can add social system settings or leave this empty to use default settings")]
+        [SerializeField]
+        private WarpPortalDatabase warpPortalDatabase;
+        [Tooltip("You can add NPCs to NPC database or may add NPCs into the scene directly, so you can leave this empty if you are going to add NPCs into the scene directly only")]
         [SerializeField]
         private SocialSystemSetting socialSystemSetting;
         [Tooltip("Default weapon item, will be used when character not equip any weapon")]
