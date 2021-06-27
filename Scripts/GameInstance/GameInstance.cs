@@ -102,7 +102,7 @@ namespace MultiplayerARPG
         public static readonly Dictionary<int, Faction> Factions = new Dictionary<int, Faction>();
         public static readonly HashSet<IPoolDescriptor> PoolingObjectPrefabs = new HashSet<IPoolDescriptor>();
 
-        [Header("Game Instance Configs")]
+        [Header("Gameplay Systems")]
         [SerializeField]
         private DimensionType dimensionType;
         [SerializeField]
@@ -147,7 +147,25 @@ namespace MultiplayerARPG
         [Tooltip("This UI will be instaniate as NPC's child to show quest indecator")]
         public NpcQuestIndicator npcQuestIndicator;
 
-        [Header("Gameplay Database / Settings")]
+        [Header("Gameplay Effects")]
+        public GameEffect levelUpEffect;
+
+        [Header("Gameplay Database and Default Data")]
+        [Tooltip("Exp tree for both player character and monster character")]
+        [SerializeField]
+        private int[] expTree;
+        [Tooltip("You can add game data here or leave this empty to let it load data from Resources folders")]
+        [SerializeField]
+        private BaseGameDatabase gameDatabase;
+        [Tooltip("You can add warp portals to warp portal database or may add warp portals into the scene directly, So you can leave this empty uf you are going to add warp portals into the scene directly only")]
+        [SerializeField]
+        private WarpPortalDatabase warpPortalDatabase;
+        [Tooltip("You can add NPCs to NPC database or may add NPCs into the scene directly, so you can leave this empty if you are going to add NPCs into the scene directly only")]
+        [SerializeField]
+        private NpcDatabase npcDatabase;
+        [Tooltip("You can add social system settings or leave this empty to use default settings")]
+        [SerializeField]
+        private SocialSystemSetting socialSystemSetting;
         [Tooltip("Default weapon item, will be used when character not equip any weapon")]
         [SerializeField]
         private BaseItem defaultWeaponItem;
@@ -157,36 +175,33 @@ namespace MultiplayerARPG
         [Tooltip("Default hit effects, will be used when attack to enemies or receive damages from enemies")]
         [SerializeField]
         private GameEffect[] defaultDamageHitEffects;
-        [SerializeField]
-        private int[] expTree;
-        [Tooltip("You can add game data here or leave this empty to let it load data from Resources folders")]
-        [SerializeField]
-        private BaseGameDatabase gameDatabase;
-        [Tooltip("You can add warp portals here or may add warp portals in the scene directly, So you can leave this empty")]
-        [SerializeField]
-        private WarpPortalDatabase warpPortalDatabase;
-        [Tooltip("You can add NPCs here or may add NPCs in the scene directly, so you can leave this empty")]
-        [SerializeField]
-        private NpcDatabase npcDatabase;
-        [Tooltip("You can add social system settings or leave this empty to use default settings")]
-        [SerializeField]
-        private SocialSystemSetting socialSystemSetting;
 
-        [Header("Gameplay Configs")]
-        [Tooltip("How character position load when start game")]
-        public CurrentPositionSaveMode currentPositionSaveMode;
+        [Header("Object Tags and Layers")]
+        [Tooltip("Tag for player character entities, this tag will set to player character entities game object when instantiated")]
         public UnityTag playerTag;
+        [Tooltip("Tag for monster character entities, this tag will set to monster character entities game object when instantiated")]
         public UnityTag monsterTag;
+        [Tooltip("Tag for NPC entities, this tag will set to NPC entities game object when instantiated")]
         public UnityTag npcTag;
+        [Tooltip("Tag for item drop entities, this tag will set to item drop entities game object when instantiated")]
         public UnityTag itemDropTag;
+        [Tooltip("Tag for building entities, this tag will set to building entities game object when instantiated")]
         public UnityTag buildingTag;
+        [Tooltip("Tag for harvestable entities, this tag will set to harvestable entities game object when instantiated")]
         public UnityTag harvestableTag;
+        [Tooltip("Layer for player character entities and monster character entities, this layer will be set to player character entities and monster character entities game object when instantiated")]
         public UnityLayer characterLayer;
+        [Tooltip("Layer for item drop entities, this layer will set to item drop entities game object when instantiated")]
         public UnityLayer itemDropLayer;
+        [Tooltip("Layer for building entities, this layer will set to building entities game object when instantiated")]
         public UnityLayer buildingLayer;
+        [Tooltip("Layer for harvestable entities, this layer will set to harvestable entities game object when instantiated")]
         public UnityLayer harvestableLayer;
+        [Tooltip("Layers which will be ignored when raycasting")]
         [FormerlySerializedAs("nonTargetingLayers")]
         public UnityLayer[] ignoreRaycastLayers;
+
+        [Header("Gameplay Configs - Generic")]
         [Tooltip("If dropped items does not picked up within this duration, it will be destroyed from the server")]
         public float itemAppearDuration = 60f;
         [Tooltip("If dropped items does not picked up by killer within this duration, anyone can pick up the items")]
@@ -206,6 +221,8 @@ namespace MultiplayerARPG
         [Tooltip("Maximum number of equip weapon set")]
         [Range(1, 16)]
         public byte maxEquipWeaponSet = 2;
+        [Tooltip("How character position load when start game")]
+        public CurrentPositionSaveMode currentPositionSaveMode;
 
         [Header("Gameplay Configs - Items, Inventory and Storage")]
         public ItemTypeFilter dismantleFilter = new ItemTypeFilter()
@@ -220,6 +237,7 @@ namespace MultiplayerARPG
         public bool canDismantleItemByPlayer;
         [Tooltip("If this is `TRUE`, player will be able to repair an items by themself, doesn't have to talk to NPCs")]
         public bool canRepairItemByPlayer;
+        [Tooltip("How player's inventory works")]
         public InventorySystem inventorySystem;
         [Tooltip("Base slot limit for all characters, it will be used when `InventorySystem` is `LimitSlots`")]
         public short baseSlotLimit;
@@ -246,9 +264,6 @@ namespace MultiplayerARPG
         [Header("Gameplay Configs - Instance Dungeon")]
         [Tooltip("Distance from party leader character to join instance map")]
         public float joinInstanceMapDistance = 20f;
-
-        [Header("Game Effects")]
-        public GameEffect levelUpEffect;
 
         [Header("New Character")]
         [Tooltip("If this is NULL, it will use `startGold` and `startItems`")]
