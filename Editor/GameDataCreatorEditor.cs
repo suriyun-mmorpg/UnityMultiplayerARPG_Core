@@ -63,8 +63,12 @@ namespace MultiplayerARPG
                         AssetDatabase.CreateAsset(newData, savedPath);
                         List<ScriptableObject> appending = new List<ScriptableObject>(workingArray);
                         appending.Add(AssetDatabase.LoadAssetAtPath<ScriptableObject>(savedPath));
-                        ScriptableObject[] newArr = appending.ToArray();
-                        workingDatabase.GetType().GetField(workingFieldName, BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic).SetValue(workingDatabase, newArr);
+                        Array newArray = Array.CreateInstance(workingFieldType, appending.Count);
+                        for (int i = 0; i < newArray.Length; ++i)
+                        {
+                            newArray.SetValue(appending[i], i);
+                        }
+                        workingDatabase.GetType().GetField(workingFieldName, BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic).SetValue(workingDatabase, newArray);
                         EditorUtility.SetDirty(workingDatabase);
                         Close();
                     }

@@ -101,6 +101,8 @@ namespace MultiplayerARPG
                 contentScrollPosition = GUILayout.BeginScrollView(contentScrollPosition);
                 if (arr.Length > 0)
                 {
+                    if (selectedMenuIndex < 0)
+                        selectedMenuIndex = 0;
                     Editor editor = Editor.CreateEditor(arr[selectedMenuIndex]);
                     editor.DrawDefaultInspector();
                 }
