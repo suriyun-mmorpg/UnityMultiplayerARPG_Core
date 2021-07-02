@@ -74,7 +74,7 @@ namespace MultiplayerARPG
                     characterModelType = (CharacterModelType)EditorGUILayout.EnumPopup("Character model type", characterModelType);
                     entityMovementType = (EntityMovementType)EditorGUILayout.EnumPopup("Entity movement type", entityMovementType);
                     if (gameDatabase == null)
-                        EditorGUILayout.HelpBox("Select your game database which you want to add new character data, leave it `None` if you don't want to add character data to game database", MessageType.Info);
+                        EditorGUILayout.HelpBox("Select your game database which you want to add new character entity, leave it `None` if you don't want to add character entity to game database", MessageType.Info);
                     gameDatabase = EditorGUILayout.ObjectField("Game database", gameDatabase, typeof(GameDatabase), false, GUILayout.ExpandWidth(true)) as GameDatabase;
                     if (fbx == null)
                         EditorGUILayout.HelpBox("Select your FBX model which you want to create character entity", MessageType.Info);

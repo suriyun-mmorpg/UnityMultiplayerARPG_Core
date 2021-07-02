@@ -57,7 +57,7 @@ namespace MultiplayerARPG
                     fileName = EditorGUILayout.TextField("Filename", fileName);
                     characterModelType = (CharacterModelType)EditorGUILayout.EnumPopup("Character model type", characterModelType);
                     if (npcDatabase == null)
-                        EditorGUILayout.HelpBox("Select your NPC database which you want to add new Npc data, leave it `None` if you don't want to add NPC entity to NPC database", MessageType.Info);
+                        EditorGUILayout.HelpBox("Select your NPC database which you want to add new NPC entity, leave it `None` if you don't want to add NPC entity to NPC database", MessageType.Info);
                     npcDatabase = EditorGUILayout.ObjectField("NPC database", npcDatabase, typeof(NpcDatabase), false, GUILayout.ExpandWidth(true)) as NpcDatabase;
                     if (npcDatabase != null)
                     {
@@ -119,9 +119,6 @@ namespace MultiplayerARPG
                     break;
             }
 
-            var CharacterModelManager = newObject.AddComponent<CharacterModelManager>();
-            CharacterModelManager.MainModel = characterModel;
-
             Bounds bounds = default;
             var meshes = newObject.GetComponentsInChildren<MeshRenderer>();
             for (int i = 0; i < meshes.Length; ++i)
@@ -142,12 +139,6 @@ namespace MultiplayerARPG
             }
 
             NpcEntity npcEntity = newObject.AddComponent<NpcEntity>();
-            NpcDialogGraph graph = CreateInstance<NpcDialogGraph>();
-            var graphSavePath = path + "\\" + fileName + "_NpcDialogGraph.asset";
-            Debug.Log("Saving NPC entity to " + graphSavePath);
-            AssetDatabase.DeleteAsset(graphSavePath);
-            AssetDatabase.CreateAsset(graph, graphSavePath);
-
             if (npcEntity != null)
             {
                 var tpsCamTarget = new GameObject("_TpsCamTarget");
@@ -168,6 +159,12 @@ namespace MultiplayerARPG
                 Debug.Log("Saving Npc entity to " + savePath);
                 AssetDatabase.DeleteAsset(savePath);
                 PrefabUtility.SaveAsPrefabAssetAndConnect(npcEntity.gameObject, savePath, InteractionMode.AutomatedAction);
+
+                NpcDialogGraph graph = CreateInstance<NpcDialogGraph>();
+                var graphSavePath = path + "\\" + fileName + "_NpcDialogGraph.asset";
+                Debug.Log("Saving NPC entity to " + graphSavePath);
+                AssetDatabase.DeleteAsset(graphSavePath);
+                AssetDatabase.CreateAsset(graph, graphSavePath);
 
                 if (npcDatabase != null && mapInfo != null)
                 {
