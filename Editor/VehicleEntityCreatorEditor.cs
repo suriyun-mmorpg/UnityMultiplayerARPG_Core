@@ -30,7 +30,7 @@ namespace MultiplayerARPG
         private GameDatabase gameDatabase;
         private GameObject fbx;
 
-        [MenuItem("MMORPG KIT/Vehicle Entity Creator (3D)", false, 0)]
+        [MenuItem("MMORPG KIT/Vehicle Entity Creator (3D)", false, 103)]
         public static void CreateNewVehicleEntity()
         {
             bool gettingWindow;

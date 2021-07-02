@@ -26,7 +26,7 @@ namespace MultiplayerARPG
         private static Vector3 savedDropModelOffsets;
         private static Vector3 savedDropModelRotateOffsets;
 
-        [MenuItem("MMORPG KIT/Item Creator", false, 2)]
+        [MenuItem("MMORPG KIT/Item Creator", false, 300)]
         public static void CreateNewEditor()
         {
             bool gettingWindow;
