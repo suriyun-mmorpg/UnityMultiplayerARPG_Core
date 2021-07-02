@@ -74,11 +74,11 @@ namespace MultiplayerARPG
                     characterModelType = (CharacterModelType)EditorGUILayout.EnumPopup("Character model type", characterModelType);
                     entityMovementType = (EntityMovementType)EditorGUILayout.EnumPopup("Entity movement type", entityMovementType);
                     if (gameDatabase == null)
-                        EditorGUILayout.HelpBox("Select your game database which you want to add new character data, leave it `None` if you don't want to add item data to game database", MessageType.Info);
-                    gameDatabase = EditorGUILayout.ObjectField("Game database", gameDatabase, typeof(GameDatabase), true, GUILayout.ExpandWidth(true)) as GameDatabase;
+                        EditorGUILayout.HelpBox("Select your game database which you want to add new character data, leave it `None` if you don't want to add character data to game database", MessageType.Info);
+                    gameDatabase = EditorGUILayout.ObjectField("Game database", gameDatabase, typeof(GameDatabase), false, GUILayout.ExpandWidth(true)) as GameDatabase;
                     if (fbx == null)
                         EditorGUILayout.HelpBox("Select your FBX model which you want to create character entity", MessageType.Info);
-                    fbx = EditorGUILayout.ObjectField("FBX", fbx, typeof(GameObject), true, GUILayout.ExpandWidth(true)) as GameObject;
+                    fbx = EditorGUILayout.ObjectField("FBX", fbx, typeof(GameObject), false, GUILayout.ExpandWidth(true)) as GameObject;
                 }
                 GUILayout.EndVertical();
 
@@ -207,7 +207,7 @@ namespace MultiplayerARPG
                             }
                         };
                         var dataSavePath = path + "\\" + fileName + "_PlayerCharacter.asset";
-                        Debug.Log("Saving item data to " + dataSavePath);
+                        Debug.Log("Saving character data to " + dataSavePath);
                         AssetDatabase.DeleteAsset(dataSavePath);
                         AssetDatabase.CreateAsset(data, dataSavePath);
                         PlayerCharacter savedData = AssetDatabase.LoadAssetAtPath<PlayerCharacter>(dataSavePath);
@@ -240,7 +240,7 @@ namespace MultiplayerARPG
                             }
                         };
                         var dataSavePath = path + "\\" + fileName + "_MonsterCharacter.asset";
-                        Debug.Log("Saving item data to " + dataSavePath);
+                        Debug.Log("Saving character data to " + dataSavePath);
                         AssetDatabase.DeleteAsset(dataSavePath);
                         AssetDatabase.CreateAsset(data, dataSavePath);
                         MonsterCharacter savedData = AssetDatabase.LoadAssetAtPath<MonsterCharacter>(dataSavePath);

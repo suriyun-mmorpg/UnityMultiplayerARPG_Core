@@ -62,10 +62,10 @@ namespace MultiplayerARPG
                     itemType = (ItemType)EditorGUILayout.EnumPopup("Item to create", itemType);
                     if (gameDatabase == null)
                         EditorGUILayout.HelpBox("Select your game database which you want to add new item data, leave it `None` if you don't want to add item data to game database", MessageType.Info);
-                    gameDatabase = EditorGUILayout.ObjectField("Game database", gameDatabase, typeof(GameDatabase), true, GUILayout.ExpandWidth(true)) as GameDatabase;
+                    gameDatabase = EditorGUILayout.ObjectField("Game database", gameDatabase, typeof(GameDatabase), false, GUILayout.ExpandWidth(true)) as GameDatabase;
                     if (dropModel == null)
                         EditorGUILayout.HelpBox("Select your FBX model which you want to use as drop model", MessageType.Info);
-                    dropModel = EditorGUILayout.ObjectField("Drop Model", dropModel, typeof(GameObject), true, GUILayout.ExpandWidth(true)) as GameObject;
+                    dropModel = EditorGUILayout.ObjectField("Drop Model", dropModel, typeof(GameObject), false, GUILayout.ExpandWidth(true)) as GameObject;
                     dropModelOffsets = EditorGUILayout.Vector3Field("Offsets", dropModelOffsets);
                     dropModelRotateOffsets = EditorGUILayout.Vector3Field("Rotate Offsets", dropModelRotateOffsets);
                     GUILayout.BeginHorizontal();
@@ -84,7 +84,7 @@ namespace MultiplayerARPG
                     equipSocketR = EditorGUILayout.TextField("Equip Socket: ", equipSocketR);
                     if (equipModelR == null)
                         EditorGUILayout.HelpBox("Select your FBX model which you want to use as equip model", MessageType.Info);
-                    equipModelR = EditorGUILayout.ObjectField("Equip Model", equipModelR, typeof(GameObject), true, GUILayout.ExpandWidth(true)) as GameObject;
+                    equipModelR = EditorGUILayout.ObjectField("Equip Model", equipModelR, typeof(GameObject), false, GUILayout.ExpandWidth(true)) as GameObject;
                     GUILayout.EndVertical();
                 }
                 else
@@ -100,7 +100,7 @@ namespace MultiplayerARPG
                     {
                         if (equipModelL == null)
                             EditorGUILayout.HelpBox("Select your FBX model which you want to use as offhand equip model", MessageType.Info);
-                        equipModelL = EditorGUILayout.ObjectField("Offhand Equip Model", equipModelL, typeof(GameObject), true, GUILayout.ExpandWidth(true)) as GameObject;
+                        equipModelL = EditorGUILayout.ObjectField("Offhand Equip Model", equipModelL, typeof(GameObject), false, GUILayout.ExpandWidth(true)) as GameObject;
                     }
                     else
                     {
@@ -114,7 +114,7 @@ namespace MultiplayerARPG
                 }
 
                 GUILayout.BeginVertical("box");
-                copySource = EditorGUILayout.ObjectField("Copy Source", copySource, typeof(BaseItem), true, GUILayout.ExpandWidth(true)) as BaseItem;
+                copySource = EditorGUILayout.ObjectField("Copy Source", copySource, typeof(BaseItem), false, GUILayout.ExpandWidth(true)) as BaseItem;
                 if (copySource != null && copySource.ItemType != itemType)
                 {
                     Debug.LogError("Cannot set different kind of copy source data");
