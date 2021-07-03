@@ -8,7 +8,7 @@ namespace MultiplayerARPG
 {
     public class GameDatabaseManagerEditor : EditorWindow
     {
-        private List<BaseGameDatabaseSection> sections;
+        private List<GameDataListSection> sections;
         private Vector2 menuScrollPosition;
         private int selectedMenuIndex;
         private GameDatabase selectedDatabase;
@@ -22,31 +22,26 @@ namespace MultiplayerARPG
         private void OnEnable()
         {
             selectedDatabase = null;
-            sections = new List<BaseGameDatabaseSection>();
-            var assemblies = AppDomain.CurrentDomain.GetAssemblies();
-            for (int i = 0; i < assemblies.Length; ++i)
+            sections = new List<GameDataListSection>()
             {
-                Type[] assemblyTypes;
-                try
-                {
-                    assemblyTypes = assemblies[i].GetTypes();
-                }
-                catch
-                {
-                    continue;
-                }
-                for (int j = 0; j < assemblyTypes.Length; ++j)
-                {
-                    if (!typeof(BaseGameDatabaseSection).IsAssignableFrom(assemblyTypes[j]))
-                        continue;
-
-                    if (assemblyTypes[j].IsAbstract)
-                        continue;
-
-                    sections.Add(Activator.CreateInstance(assemblyTypes[j]) as BaseGameDatabaseSection);
-                }
-            }
-            sections.Sort();
+                new GameDataListSection<Attribute>("attributes", "Attributes"),
+                new GameDataListSection<Currency>("currencies", "Currencies"),
+                new GameDataListSection<DamageElement>("damageElements", "Damage Elements"),
+                new GameDataListSection<BaseItem>("items", "Items"),
+                new GameDataListSection<ItemCraftFormula>("itemCraftFormulas", "Item Crafts"),
+                new GameDataListSection<ArmorType>("armorTypes", "Armor Types"),
+                new GameDataListSection<WeaponType>("weaponTypes", "Weapon Types"),
+                new GameDataListSection<AmmoType>("ammoTypes", "Ammo Types"),
+                new GameDataListSection<StatusEffect>("statusEffects", "Status Effects"),
+                new GameDataListSection<BaseSkill>("skills", "Skills"),
+                new GameDataListSection<GuildSkill>("guildSkills", "Guild Skills"),
+                new GameDataListSection<PlayerCharacter>("playerCharacters", "Player Characters\n(aka Character Class)"),
+                new GameDataListSection<MonsterCharacter>("monsterCharacters", "Monster Characters"),
+                new GameDataListSection<Harvestable>("harvestables", "Harvestables"),
+                new GameDataListSection<BaseMapInfo>("mapInfos", "Map Infos"),
+                new GameDataListSection<Quest>("quests", "Quests"),
+                new GameDataListSection<Faction>("factions", "Factions"),
+            };
         }
 
         private void OnDisable()

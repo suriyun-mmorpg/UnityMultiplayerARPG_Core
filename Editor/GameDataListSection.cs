@@ -1,4 +1,4 @@
-﻿using System.Collections;
+﻿using System;
 using System.Collections.Generic;
 using System.Reflection;
 using UnityEditor;
@@ -6,21 +6,36 @@ using UnityEngine;
 
 namespace MultiplayerARPG
 {
-    public abstract class BaseGameDataListSection<T> : BaseGameDatabaseSection
+    public abstract class GameDataListSection
+    {
+        public abstract string MenuTitle { get; }
+        public abstract void OnGUI(float width, float height);
+    }
+
+    public class GameDataListSection<T> : GameDataListSection
         where T : BaseGameData
     {
         protected Vector2 menuScrollPosition;
         protected Vector2 contentScrollPosition;
         protected int selectedMenuIndex;
         protected T selectedUnlistedObject;
-        protected abstract string FieldName { get; }
+        protected string fieldName;
+        public string FieldName { get { return fieldName; } }
+        protected string menuTitle;
+        public override string MenuTitle { get { return menuTitle; } }
+
+        public GameDataListSection(string fieldName, string menuTitle)
+        {
+            this.fieldName = fieldName;
+            this.menuTitle = menuTitle;
+        }
 
         public override void OnGUI(float width, float height)
         {
             if (EditorGlobalData.WorkingDatabase == null)
                 return;
 
-            T[] arr = (T[])EditorGlobalData.WorkingDatabase.GetType().GetField(FieldName, BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic).GetValue(EditorGlobalData.WorkingDatabase);
+            T[] arr = (T[])EditorGlobalData.WorkingDatabase.GetType().GetField(fieldName, BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic).GetValue(EditorGlobalData.WorkingDatabase);
             // Prepare GUI styles
             GUIStyle leftMenuButton = new GUIStyle(EditorStyles.label);
             leftMenuButton.fontSize = 10;
@@ -123,14 +138,14 @@ namespace MultiplayerARPG
                 return;
             appending.Add(selectedUnlistedObject);
             T[] newArr = appending.ToArray();
-            EditorGlobalData.WorkingDatabase.GetType().GetField(FieldName, BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic).SetValue(EditorGlobalData.WorkingDatabase, newArr);
+            EditorGlobalData.WorkingDatabase.GetType().GetField(fieldName, BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic).SetValue(EditorGlobalData.WorkingDatabase, newArr);
             EditorUtility.SetDirty(EditorGlobalData.WorkingDatabase);
             selectedUnlistedObject = null;
         }
 
         protected virtual void Create(T[] arr)
         {
-            GameDataCreatorEditor.CreateNewEditor(EditorGlobalData.WorkingDatabase, typeof(T), FieldName, arr);
+            GameDataCreatorEditor.CreateNewEditor(EditorGlobalData.WorkingDatabase, typeof(T), fieldName, arr);
         }
 
         protected virtual void Duplicate(T[] arr)
@@ -156,7 +171,7 @@ namespace MultiplayerARPG
             List<T> appending = new List<T>(arr);
             appending.Add(AssetDatabase.LoadAssetAtPath<T>(savedPath));
             T[] newArr = appending.ToArray();
-            EditorGlobalData.WorkingDatabase.GetType().GetField(FieldName, BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic).SetValue(EditorGlobalData.WorkingDatabase, newArr);
+            EditorGlobalData.WorkingDatabase.GetType().GetField(fieldName, BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic).SetValue(EditorGlobalData.WorkingDatabase, newArr);
             EditorUtility.SetDirty(EditorGlobalData.WorkingDatabase);
         }
 
@@ -169,7 +184,7 @@ namespace MultiplayerARPG
                     List<T> list = new List<T>(arr);
                     list.RemoveAt(selectedMenuIndex);
                     T[] newArr = list.ToArray();
-                    EditorGlobalData.WorkingDatabase.GetType().GetField(FieldName, BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic).SetValue(EditorGlobalData.WorkingDatabase, newArr);
+                    EditorGlobalData.WorkingDatabase.GetType().GetField(fieldName, BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic).SetValue(EditorGlobalData.WorkingDatabase, newArr);
                     EditorUtility.SetDirty(EditorGlobalData.WorkingDatabase);
                 }
             }
