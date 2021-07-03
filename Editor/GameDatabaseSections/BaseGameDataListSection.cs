@@ -20,7 +20,7 @@ namespace MultiplayerARPG
             if (EditorGlobalData.WorkingDatabase == null)
                 return;
 
-            var arr = (T[])EditorGlobalData.WorkingDatabase.GetType().GetField(FieldName, BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic).GetValue(EditorGlobalData.WorkingDatabase);
+            T[] arr = (T[])EditorGlobalData.WorkingDatabase.GetType().GetField(FieldName, BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic).GetValue(EditorGlobalData.WorkingDatabase);
             // Prepare GUI styles
             GUIStyle leftMenuButton = new GUIStyle(EditorStyles.label);
             leftMenuButton.fontSize = 10;
@@ -34,7 +34,7 @@ namespace MultiplayerARPG
             background.Apply();
             selectedLeftMenuButton.active.background = selectedLeftMenuButton.normal.background = background;
 
-            if (selectedMenuIndex >= arr.Length)
+            if (arr != null && selectedMenuIndex >= arr.Length)
                 selectedMenuIndex = arr.Length - 1;
 
             // List
@@ -43,11 +43,14 @@ namespace MultiplayerARPG
                 menuScrollPosition = GUILayout.BeginScrollView(menuScrollPosition);
                 GUILayout.BeginVertical();
                 {
-                    for (int i = 0; i < arr.Length; ++i)
+                    if (arr != null && arr.Length > 0)
                     {
-                        if (GUILayout.Button("ID: " + arr[i].Id + "\nFile: " + arr[i].name, (i == selectedMenuIndex ? selectedLeftMenuButton : leftMenuButton), GUILayout.Height(32)))
+                        for (int i = 0; i < arr.Length; ++i)
                         {
-                            selectedMenuIndex = i;
+                            if (GUILayout.Button("ID: " + arr[i].Id + "\nFile: " + arr[i].name, (i == selectedMenuIndex ? selectedLeftMenuButton : leftMenuButton), GUILayout.Height(32)))
+                            {
+                                selectedMenuIndex = i;
+                            }
                         }
                     }
                     GUILayout.EndVertical();
