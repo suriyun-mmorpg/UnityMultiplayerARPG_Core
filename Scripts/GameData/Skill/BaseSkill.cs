@@ -634,6 +634,18 @@ namespace MultiplayerARPG
                     default:
                         return false;
                 }
+
+                if (!HasEnoughItems(character, out _, out _))
+                {
+                    gameMessage = UITextKeys.UI_ERROR_NOT_ENOUGH_ITEMS;
+                    return false;
+                }
+
+                if (!HasEnoughAmmos(character, isLeftHand, out _, out _))
+                {
+                    gameMessage = UITextKeys.UI_ERROR_NO_AMMO;
+                    return false;
+                }
             }
 
             if (character.CurrentHp < GetConsumeHp(level))
@@ -658,18 +670,6 @@ namespace MultiplayerARPG
             if (skillUsageIndex >= 0 && character.SkillUsages[skillUsageIndex].coolDownRemainsDuration > 0f)
             {
                 gameMessage = UITextKeys.UI_ERROR_SKILL_IS_COOLING_DOWN;
-                return false;
-            }
-
-            if (!HasEnoughItems(character, out _, out _))
-            {
-                gameMessage = UITextKeys.UI_ERROR_NOT_ENOUGH_ITEMS;
-                return false;
-            }
-
-            if (!HasEnoughAmmos(character, isLeftHand, out _, out _))
-            {
-                gameMessage = UITextKeys.UI_ERROR_NO_AMMO;
                 return false;
             }
 
