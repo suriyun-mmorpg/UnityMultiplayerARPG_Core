@@ -525,6 +525,7 @@ namespace MultiplayerARPG
                 // Applies status effects
                 IEquipmentItem tempEquipmentItem;
                 Buff tempBuff;
+                BaseSkill tempSkill;
                 EntityInfo attackerInfo = attacker.GetInfo();
                 EntityInfo damageReceiverInfo = damageReceiver.GetInfo();
                 // Attacker
@@ -543,11 +544,19 @@ namespace MultiplayerARPG
                 {
                     ApplyStatusEffectToAttacker(attacker.EquipWeapons.leftHand, tempEquipmentItem, attackerInfo, attacker, damageReceiver);
                 }
-                foreach (CharacterBuff buff in attacker.Buffs)
+                foreach (CharacterBuff characterBuff in attacker.Buffs)
                 {
-                    tempBuff = buff.GetBuff();
-                    tempBuff.ApplySelfStatusEffectsWhenAttacking(buff.level, attackerInfo, attacker);
-                    tempBuff.ApplyEnemyStatusEffectsWhenAttacking(buff.level, attackerInfo, damageReceiver);
+                    tempBuff = characterBuff.GetBuff();
+                    tempBuff.ApplySelfStatusEffectsWhenAttacking(characterBuff.level, attackerInfo, attacker);
+                    tempBuff.ApplyEnemyStatusEffectsWhenAttacking(characterBuff.level, attackerInfo, damageReceiver);
+                }
+                foreach (CharacterSkill characterSkill in attacker.Skills)
+                {
+                    tempSkill = characterSkill.GetSkill();
+                    if (!tempSkill.IsPassive)
+                        continue;
+                    tempSkill.Buff.ApplySelfStatusEffectsWhenAttacking(characterSkill.level, attackerInfo, attacker);
+                    tempSkill.Buff.ApplyEnemyStatusEffectsWhenAttacking(characterSkill.level, attackerInfo, damageReceiver);
                 }
                 // Damage Receiver
                 foreach (CharacterItem armorItem in damageReceiver.EquipItems)
@@ -565,11 +574,19 @@ namespace MultiplayerARPG
                 {
                     ApplyStatusEffectToDamageReceiver(damageReceiver.EquipWeapons.leftHand, tempEquipmentItem, damageReceiverInfo, attacker, damageReceiver);
                 }
-                foreach (CharacterBuff buff in damageReceiver.Buffs)
+                foreach (CharacterBuff characterBuff in damageReceiver.Buffs)
                 {
-                    tempBuff = buff.GetBuff();
-                    tempBuff.ApplySelfStatusEffectsWhenAttacked(buff.level, damageReceiverInfo, damageReceiver);
-                    tempBuff.ApplyEnemyStatusEffectsWhenAttacked(buff.level, damageReceiverInfo, attacker);
+                    tempBuff = characterBuff.GetBuff();
+                    tempBuff.ApplySelfStatusEffectsWhenAttacked(characterBuff.level, damageReceiverInfo, damageReceiver);
+                    tempBuff.ApplyEnemyStatusEffectsWhenAttacked(characterBuff.level, damageReceiverInfo, attacker);
+                }
+                foreach (CharacterSkill characterSkill in damageReceiver.Skills)
+                {
+                    tempSkill = characterSkill.GetSkill();
+                    if (!tempSkill.IsPassive)
+                        continue;
+                    tempSkill.Buff.ApplySelfStatusEffectsWhenAttacked(characterSkill.level, damageReceiverInfo, damageReceiver);
+                    tempSkill.Buff.ApplyEnemyStatusEffectsWhenAttacked(characterSkill.level, damageReceiverInfo, attacker);
                 }
             }
             // Decrease Shield Durability
