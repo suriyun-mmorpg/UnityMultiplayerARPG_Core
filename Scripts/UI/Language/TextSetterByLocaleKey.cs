@@ -4,19 +4,33 @@ namespace MultiplayerARPG
 {
     public class TextSetterByLocaleKey : MonoBehaviour
     {
+        [Tooltip("Priority: get text from `LanguageManager` by `localKeySetting` then if it's not exists, get text from `textByLanguageKeys`, and then `defaultText`")]
         public string defaultText;
+        [Tooltip("Priority: get text from `LanguageManager` by `localKeySetting` then if it's not exists, get text from `textByLanguageKeys`, and then `defaultText`")]
+        public LanguageData[] textByLanguageKeys;
+        [Tooltip("Priority: get text from `LanguageManager` by `localKeySetting` then if it's not exists, get text from `textByLanguageKeys`, and then `defaultText`")]
         public UILocaleKeySetting localeKeySetting;
         public TextWrapper textWrapper;
         [InspectorButton(nameof(UpdateUI))]
         public bool updateUI;
         private string currentLanguageKey;
 
+        public string Text
+        {
+            get
+            {
+                if (!string.IsNullOrEmpty(localeKeySetting) && LanguageManager.Texts.ContainsKey(localeKeySetting))
+                    LanguageManager.GetText(localeKeySetting, defaultText);
+                return Language.GetText(textByLanguageKeys, defaultText);
+            }
+        }
+
         private void Update()
         {
             if (!textWrapper || LanguageManager.CurrentLanguageKey.Equals(currentLanguageKey))
                 return;
             currentLanguageKey = LanguageManager.CurrentLanguageKey;
-            textWrapper.text = LanguageManager.GetText(localeKeySetting, defaultText);
+            textWrapper.text = Text;
         }
 
         private void UpdateUI()
