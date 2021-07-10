@@ -2,6 +2,7 @@
 
 namespace MultiplayerARPG
 {
+    [System.Serializable]
     public struct GuildInvitationData : INetSerializable
     {
         public string InviterId { get; set; }

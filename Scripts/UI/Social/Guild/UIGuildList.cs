@@ -64,7 +64,7 @@ namespace MultiplayerARPG
 
         protected virtual void OnSelect(UIGuildListEntry ui)
         {
-            if (uiDialog != null && ui.Data != null)
+            if (uiDialog != null)
             {
                 uiDialog.Data = ui.Data;
                 uiDialog.Show();

@@ -16,6 +16,12 @@ namespace MultiplayerARPG
         public UILocaleKeySetting formatKeySkillPoint = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_SKILL_POINTS);
         [Tooltip("Format => {0} = {Message}")]
         public UILocaleKeySetting formatKeyMessage = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_SIMPLE);
+        [Tooltip("Format => {0} = {Message2}")]
+        public UILocaleKeySetting formatKeyMessage2 = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_SIMPLE);
+        [Tooltip("Format => {0} = {Score}")]
+        public UILocaleKeySetting formatKeyScore = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_SIMPLE);
+        [Tooltip("Format => {0} = {Rank}")]
+        public UILocaleKeySetting formatKeyRank = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_SIMPLE);
 
         [Header("UI Elements")]
         public UIGuildRole uiRoleDialog;
@@ -28,10 +34,15 @@ namespace MultiplayerARPG
         public TextWrapper textLeaderName;
         public TextWrapper textLevel;
         public UIGageValue uiGageExp;
-
         public TextWrapper textSkillPoint;
         public TextWrapper textMessage;
         public InputFieldWrapper inputFieldMessage;
+        public TextWrapper textMessage2;
+        public InputFieldWrapper inputFieldMessage2;
+        public TextWrapper textScore;
+        public TextWrapper textRank;
+        public GameObject[] autoAcceptRequestsObjects;
+        public GameObject[] notAutoAcceptRequestsObjects;
         public UIGuildCreate uiGuildCreate;
         public UIGuildRoleSetting uiGuildRoleSetting;
         public UIGuildMemberRoleSetting uiGuildMemberRoleSetting;
@@ -39,6 +50,7 @@ namespace MultiplayerARPG
         public GuildData Guild { get { return GameInstance.JoinedGuild; } }
 
         private string guildMessage;
+        private string guildMessage2;
 
         private UIList roleList;
         public UIList RoleList
@@ -159,6 +171,56 @@ namespace MultiplayerARPG
 
                 if (inputFieldMessage != null)
                     inputFieldMessage.text = guildMessage;
+            }
+
+            if (Guild == null)
+            {
+                if (textMessage2 != null)
+                    textMessage2.text = string.Format(LanguageManager.GetText(formatKeyMessage2), string.Empty);
+
+                if (inputFieldMessage2 != null)
+                    inputFieldMessage2.text = string.Empty;
+            }
+
+            if (Guild != null && !Guild.guildMessage2.Equals(guildMessage2))
+            {
+                guildMessage2 = Guild.guildMessage2;
+
+                if (textMessage2 != null)
+                    textMessage2.text = string.Format(LanguageManager.GetText(formatKeyMessage2), guildMessage2);
+
+                if (inputFieldMessage2 != null)
+                    inputFieldMessage2.text = guildMessage2;
+            }
+
+            if (textScore != null)
+            {
+                textScore.text = string.Format(
+                    LanguageManager.GetText(formatKeyScore), 
+                    Guild == null ? "0" : Guild.score.ToString("N0"));
+            }
+
+            if (textRank != null)
+            {
+                textRank.text = string.Format(
+                    LanguageManager.GetText(formatKeyRank), 
+                    Guild == null ? "N/A" : Guild.rank.ToString("N0"));
+            }
+
+            if (autoAcceptRequestsObjects != null && autoAcceptRequestsObjects.Length > 0)
+            {
+                foreach (GameObject autoAcceptRequestsObject in autoAcceptRequestsObjects)
+                {
+                    autoAcceptRequestsObject.SetActive(Guild != null && Guild.autoAcceptRequests);
+                }
+            }
+
+            if (notAutoAcceptRequestsObjects != null && notAutoAcceptRequestsObjects.Length > 0)
+            {
+                foreach (GameObject notAutoAcceptRequestsObject in notAutoAcceptRequestsObjects)
+                {
+                    notAutoAcceptRequestsObject.SetActive(Guild == null || !Guild.autoAcceptRequests);
+                }
             }
 
             base.UpdateUIs();

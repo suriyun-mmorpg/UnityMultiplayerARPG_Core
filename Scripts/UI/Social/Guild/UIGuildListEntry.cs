@@ -11,10 +11,24 @@ namespace MultiplayerARPG
         public UILocaleKeySetting formatKeyGuildName = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_SIMPLE);
         [Tooltip("Format => {0} = {Level}")]
         public UILocaleKeySetting formatKeyLevel = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_LEVEL);
+        [Tooltip("Format => {0} = {Message}")]
+        public UILocaleKeySetting formatKeyMessage = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_SIMPLE);
+        [Tooltip("Format => {0} = {Score}")]
+        public UILocaleKeySetting formatKeyScore = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_SIMPLE);
+        [Tooltip("Format => {0} = {Rank}")]
+        public UILocaleKeySetting formatKeyRank = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_SIMPLE);
+        [Tooltip("Format => {0} = {Current Amount}, {1} = {Max Amount}")]
+        public UILocaleKeySetting formatKeyMemberAmount = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_SOCIAL_MEMBER_AMOUNT);
 
         [Header("UI Elements")]
         public TextWrapper textGuildName;
         public TextWrapper textLevel;
+        public TextWrapper textMessage;
+        public TextWrapper textScore;
+        public TextWrapper textRank;
+        public TextWrapper textMemberAmount;
+        public GameObject[] autoAcceptRequestsObjects;
+        public GameObject[] notAutoAcceptRequestsObjects;
 
         [Header("Events")]
         public UnityEvent onGuildRequested;
@@ -22,17 +36,42 @@ namespace MultiplayerARPG
         protected override void UpdateData()
         {
             if (textGuildName != null)
-            {
-                textGuildName.text = string.Format(
-                    LanguageManager.GetText(formatKeyGuildName),
-                    Data == null ? LanguageManager.GetUnknowTitle() : Data.GuildName);
-            }
+                textGuildName.text = string.Format(LanguageManager.GetText(formatKeyGuildName), Data.GuildName);
 
             if (textLevel != null)
+                textLevel.text = string.Format(LanguageManager.GetText(formatKeyLevel), Data.Level.ToString("N0"));
+
+            if (textScore != null)
+                textScore.text = string.Format(LanguageManager.GetText(formatKeyScore), Data.Score.ToString("N0"));
+
+            if (textMessage != null)
+                textMessage.text = string.Format(LanguageManager.GetText(formatKeyMessage), Data.GuildMessage);
+
+            if (textRank != null)
+                textRank.text = string.Format(LanguageManager.GetText(formatKeyRank), Data.Rank.ToString("N0"));
+
+            if (textMemberAmount != null)
             {
-                textLevel.text = string.Format(
-                    LanguageManager.GetText(formatKeyLevel),
-                    Data == null ? "0" : Data.Level.ToString("N0"));
+                textMemberAmount.text = string.Format(
+                    LanguageManager.GetText(formatKeyMemberAmount),
+                    Data.CurrentMembers.ToString("N0"),
+                    Data.MaxMembers.ToString("N0"));
+            }
+
+            if (autoAcceptRequestsObjects != null && autoAcceptRequestsObjects.Length > 0)
+            {
+                foreach (GameObject autoAcceptRequestsObject in autoAcceptRequestsObjects)
+                {
+                    autoAcceptRequestsObject.SetActive(Data.AutoAcceptRequests);
+                }
+            }
+
+            if (notAutoAcceptRequestsObjects != null && notAutoAcceptRequestsObjects.Length > 0)
+            {
+                foreach (GameObject notAutoAcceptRequestsObject in notAutoAcceptRequestsObjects)
+                {
+                    notAutoAcceptRequestsObject.SetActive(Data.AutoAcceptRequests);
+                }
             }
         }
 
