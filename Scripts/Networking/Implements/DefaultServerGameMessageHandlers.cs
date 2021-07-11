@@ -146,6 +146,11 @@ namespace MultiplayerARPG
             Manager.SendSetGuildMessage(connectionId, GameNetworkingConsts.UpdateGuild, id, message);
         }
 
+        public void SendSetGuildMessage2(long connectionId, int id, string message)
+        {
+            Manager.SendSetGuildMessage2(connectionId, GameNetworkingConsts.UpdateGuild, id, message);
+        }
+
         public void SendSetGuildRole(long connectionId, int id, byte guildRole, string roleName, bool canInvite, bool canKick, byte shareExpPercentage)
         {
             Manager.SendSetGuildRole(connectionId, GameNetworkingConsts.UpdateGuild, id, guildRole, roleName, canInvite, canKick, shareExpPercentage);
@@ -184,6 +189,46 @@ namespace MultiplayerARPG
         public void SendSetGuildGold(long connectionId, int id, int gold)
         {
             Manager.SendSetGuildGold(connectionId, GameNetworkingConsts.UpdateGuild, id, gold);
+        }
+
+        public void SendSetGuildScore(long connectionId, int id, int score)
+        {
+            Manager.SendSetGuildScore(connectionId, GameNetworkingConsts.UpdateGuild, id, score);
+        }
+
+        public void SendSetGuildOptionId1(long connectionId, int id, int optionId)
+        {
+            Manager.SendSetGuildOptionId1(connectionId, GameNetworkingConsts.UpdateGuild, id, optionId);
+        }
+
+        public void SendSetGuildOptionId2(long connectionId, int id, int optionId)
+        {
+            Manager.SendSetGuildOptionId2(connectionId, GameNetworkingConsts.UpdateGuild, id, optionId);
+        }
+
+        public void SendSetGuildOptionId3(long connectionId, int id, int optionId)
+        {
+            Manager.SendSetGuildOptionId3(connectionId, GameNetworkingConsts.UpdateGuild, id, optionId);
+        }
+
+        public void SendSetGuildOptionId4(long connectionId, int id, int optionId)
+        {
+            Manager.SendSetGuildOptionId4(connectionId, GameNetworkingConsts.UpdateGuild, id, optionId);
+        }
+
+        public void SendSetGuildOptionId5(long connectionId, int id, int optionId)
+        {
+            Manager.SendSetGuildOptionId5(connectionId, GameNetworkingConsts.UpdateGuild, id, optionId);
+        }
+
+        public void SendSetGuildAutoAcceptRequests(long connectionId, int id, bool autoAcceptRequests)
+        {
+            Manager.SendSetGuildAutoAcceptRequests(connectionId, GameNetworkingConsts.UpdateGuild, id, autoAcceptRequests);
+        }
+
+        public void SendSetGuildRank(long connectionId, int id, int rank)
+        {
+            Manager.SendSetGuildRank(connectionId, GameNetworkingConsts.UpdateGuild, id, rank);
         }
 
         public void SendSetGuildLevelExpSkillPoint(long connectionId, int id, short level, int exp, short skillPoint)

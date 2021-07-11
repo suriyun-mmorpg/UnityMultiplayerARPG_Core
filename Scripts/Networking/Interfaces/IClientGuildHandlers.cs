@@ -7,6 +7,13 @@ namespace MultiplayerARPG
         bool RequestCreateGuild(RequestCreateGuildMessage data, ResponseDelegate<ResponseCreateGuildMessage> callback);
         bool RequestChangeGuildLeader(RequestChangeGuildLeaderMessage data, ResponseDelegate<ResponseChangeGuildLeaderMessage> callback);
         bool RequestChangeGuildMessage(RequestChangeGuildMessageMessage data, ResponseDelegate<ResponseChangeGuildMessageMessage> callback);
+        bool RequestChangeGuildMessage2(RequestChangeGuildMessageMessage data, ResponseDelegate<ResponseChangeGuildMessageMessage> callback);
+        bool RequestChangeGuildOptionId1(RequestChangeGuildOptionIdMessage data, ResponseDelegate<ResponseChangeGuildOptionIdMessage> callback);
+        bool RequestChangeGuildOptionId2(RequestChangeGuildOptionIdMessage data, ResponseDelegate<ResponseChangeGuildOptionIdMessage> callback);
+        bool RequestChangeGuildOptionId3(RequestChangeGuildOptionIdMessage data, ResponseDelegate<ResponseChangeGuildOptionIdMessage> callback);
+        bool RequestChangeGuildOptionId4(RequestChangeGuildOptionIdMessage data, ResponseDelegate<ResponseChangeGuildOptionIdMessage> callback);
+        bool RequestChangeGuildOptionId5(RequestChangeGuildOptionIdMessage data, ResponseDelegate<ResponseChangeGuildOptionIdMessage> callback);
+        bool RequestChangeGuildAutoAcceptRequests(RequestChangeGuildAutoAcceptRequestsMessage data, ResponseDelegate<ResponseChangeGuildAutoAcceptRequestsMessage> callback);
         bool RequestChangeGuildRole(RequestChangeGuildRoleMessage data, ResponseDelegate<ResponseChangeGuildRoleMessage> callback);
         bool RequestChangeMemberGuildRole(RequestChangeMemberGuildRoleMessage data, ResponseDelegate<ResponseChangeMemberGuildRoleMessage> callback);
         bool RequestSendGuildInvitation(RequestSendGuildInvitationMessage data, ResponseDelegate<ResponseSendGuildInvitationMessage> callback);

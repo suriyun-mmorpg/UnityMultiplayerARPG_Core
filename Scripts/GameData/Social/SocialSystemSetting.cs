@@ -36,6 +36,8 @@ namespace MultiplayerARPG
         private int maxGuildRoleNameLength = 16;
         [SerializeField]
         private int maxGuildMessageLength = 140;
+        [SerializeField]
+        private int maxGuildMessage2Length = 140;
         [Tooltip("Member roles from high to low priority")]
         [SerializeField]
         private GuildRoleData[] guildMemberRoles = new GuildRoleData[] {
@@ -68,6 +70,7 @@ namespace MultiplayerARPG
         public int MinGuildRoleNameLength { get { return minGuildRoleNameLength; } }
         public int MaxGuildRoleNameLength { get { return maxGuildRoleNameLength; } }
         public int MaxGuildMessageLength { get { return maxGuildMessageLength; } }
+        public int MaxGuildMessage2Length { get { return maxGuildMessage2Length; } }
         public GuildRoleData[] GuildMemberRoles { get { return guildMemberRoles; } }
         public byte MaxShareExpPercentage { get { return maxShareExpPercentage; } }
 

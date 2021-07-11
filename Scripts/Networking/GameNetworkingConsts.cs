@@ -104,5 +104,13 @@
         public const ushort GetFriendRequests = 175;
         public const ushort GetGuildRequests = 176;
         public const ushort FindGuilds = 177;
+        // 1.67
+        public const ushort ChangeGuildMessage2 = 178;
+        public const ushort ChangeGuildOptionId1 = 179;
+        public const ushort ChangeGuildOptionId2 = 180;
+        public const ushort ChangeGuildOptionId3 = 181;
+        public const ushort ChangeGuildOptionId4 = 182;
+        public const ushort ChangeGuildOptionId5 = 183;
+        public const ushort ChangeGuildAutoAcceptRequests = 184;
     }
 }

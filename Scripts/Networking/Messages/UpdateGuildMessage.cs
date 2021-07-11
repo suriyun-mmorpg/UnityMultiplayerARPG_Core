@@ -9,12 +9,21 @@ namespace MultiplayerARPG
             Create,
             ChangeLeader,
             SetGuildMessage,
+            SetGuildMessage2,
             SetGuildRole,
             SetGuildMemberRole,
             SetSkillLevel,
             LevelExpSkillPoint,
             Terminate,
             SetGold,
+            SetScore,
+            SetOptionId1,
+            SetOptionId2,
+            SetOptionId3,
+            SetOptionId4,
+            SetOptionId5,
+            SetAutoAcceptRequests,
+            SetRank,
             UpdateStorage,
         }
         public UpdateType type;
@@ -31,6 +40,10 @@ namespace MultiplayerARPG
         public int exp;
         public short skillPoint;
         public int gold;
+        public int score;
+        public int optionId;
+        public bool autoAcceptRequests;
+        public int rank;
         public int dataId;
 
         public void Deserialize(NetDataReader reader)
@@ -47,6 +60,7 @@ namespace MultiplayerARPG
                     characterId = reader.GetString();
                     break;
                 case UpdateType.SetGuildMessage:
+                case UpdateType.SetGuildMessage2:
                     guildMessage = reader.GetString();
                     break;
                 case UpdateType.SetGuildRole:
@@ -66,6 +80,22 @@ namespace MultiplayerARPG
                     break;
                 case UpdateType.SetGold:
                     gold = reader.GetInt();
+                    break;
+                case UpdateType.SetScore:
+                    score = reader.GetInt();
+                    break;
+                case UpdateType.SetOptionId1:
+                case UpdateType.SetOptionId2:
+                case UpdateType.SetOptionId3:
+                case UpdateType.SetOptionId4:
+                case UpdateType.SetOptionId5:
+                    optionId = reader.GetInt();
+                    break;
+                case UpdateType.SetAutoAcceptRequests:
+                    autoAcceptRequests = reader.GetBool();
+                    break;
+                case UpdateType.SetRank:
+                    rank = reader.GetInt();
                     break;
                 case UpdateType.LevelExpSkillPoint:
                     level = reader.GetShort();
@@ -89,6 +119,7 @@ namespace MultiplayerARPG
                     writer.Put(characterId);
                     break;
                 case UpdateType.SetGuildMessage:
+                case UpdateType.SetGuildMessage2:
                     writer.Put(guildMessage);
                     break;
                 case UpdateType.SetGuildRole:
@@ -108,6 +139,22 @@ namespace MultiplayerARPG
                     break;
                 case UpdateType.SetGold:
                     writer.Put(gold);
+                    break;
+                case UpdateType.SetScore:
+                    writer.Put(score);
+                    break;
+                case UpdateType.SetOptionId1:
+                case UpdateType.SetOptionId2:
+                case UpdateType.SetOptionId3:
+                case UpdateType.SetOptionId4:
+                case UpdateType.SetOptionId5:
+                    writer.Put(optionId);
+                    break;
+                case UpdateType.SetAutoAcceptRequests:
+                    writer.Put(autoAcceptRequests);
+                    break;
+                case UpdateType.SetRank:
+                    writer.Put(rank);
                     break;
                 case UpdateType.LevelExpSkillPoint:
                     writer.Put(level);

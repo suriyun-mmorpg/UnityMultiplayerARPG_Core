@@ -122,6 +122,9 @@ namespace MultiplayerARPG
                     case UpdateGuildMessage.UpdateType.SetGuildMessage:
                         GameInstance.JoinedGuild.guildMessage = message.guildMessage;
                         break;
+                    case UpdateGuildMessage.UpdateType.SetGuildMessage2:
+                        GameInstance.JoinedGuild.guildMessage2 = message.guildMessage;
+                        break;
                     case UpdateGuildMessage.UpdateType.SetGuildRole:
                         GameInstance.JoinedGuild.SetRole(message.guildRole, message.roleName, message.canInvite, message.canKick, message.shareExpPercentage);
                         break;
@@ -135,6 +138,30 @@ namespace MultiplayerARPG
                         break;
                     case UpdateGuildMessage.UpdateType.SetGold:
                         GameInstance.JoinedGuild.gold = message.gold;
+                        break;
+                    case UpdateGuildMessage.UpdateType.SetScore:
+                        GameInstance.JoinedGuild.score = message.score;
+                        break;
+                    case UpdateGuildMessage.UpdateType.SetOptionId1:
+                        GameInstance.JoinedGuild.optionId1 = message.optionId;
+                        break;
+                    case UpdateGuildMessage.UpdateType.SetOptionId2:
+                        GameInstance.JoinedGuild.optionId2 = message.optionId;
+                        break;
+                    case UpdateGuildMessage.UpdateType.SetOptionId3:
+                        GameInstance.JoinedGuild.optionId3 = message.optionId;
+                        break;
+                    case UpdateGuildMessage.UpdateType.SetOptionId4:
+                        GameInstance.JoinedGuild.optionId4 = message.optionId;
+                        break;
+                    case UpdateGuildMessage.UpdateType.SetOptionId5:
+                        GameInstance.JoinedGuild.optionId5 = message.optionId;
+                        break;
+                    case UpdateGuildMessage.UpdateType.SetAutoAcceptRequests:
+                        GameInstance.JoinedGuild.autoAcceptRequests = message.autoAcceptRequests;
+                        break;
+                    case UpdateGuildMessage.UpdateType.SetRank:
+                        GameInstance.JoinedGuild.rank = message.rank;
                         break;
                     case UpdateGuildMessage.UpdateType.LevelExpSkillPoint:
                         GameInstance.JoinedGuild.level = message.level;

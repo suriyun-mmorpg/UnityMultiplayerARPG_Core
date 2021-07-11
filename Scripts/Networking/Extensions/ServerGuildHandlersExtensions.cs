@@ -79,6 +79,49 @@
             return new ValidateGuildRequestResult(true, gameMessage, guildId, guild);
         }
 
+        public static ValidateGuildRequestResult CanChangeGuildMessage2(this IServerGuildHandlers serverGuildHandlers, IPlayerCharacterData playerCharacter, string guildMessage)
+        {
+            UITextKeys gameMessage;
+            int guildId = playerCharacter.GuildId;
+            GuildData guild;
+            if (guildId <= 0 || !serverGuildHandlers.TryGetGuild(guildId, out guild))
+            {
+                gameMessage = UITextKeys.UI_ERROR_NOT_JOINED_GUILD;
+                return new ValidateGuildRequestResult(false, gameMessage);
+            }
+            if (!guild.IsLeader(playerCharacter.Id))
+            {
+                gameMessage = UITextKeys.UI_ERROR_NOT_GUILD_LEADER;
+                return new ValidateGuildRequestResult(false, gameMessage);
+            }
+            if (guildMessage.Length > GameInstance.Singleton.SocialSystemSetting.MaxGuildMessage2Length)
+            {
+                gameMessage = UITextKeys.UI_ERROR_GUILD_MESSAGE_TOO_LONG;
+                return new ValidateGuildRequestResult(false, gameMessage);
+            }
+            gameMessage = UITextKeys.NONE;
+            return new ValidateGuildRequestResult(true, gameMessage, guildId, guild);
+        }
+
+        public static ValidateGuildRequestResult CanChangeGuildOptions(this IServerGuildHandlers serverGuildHandlers, IPlayerCharacterData playerCharacter)
+        {
+            UITextKeys gameMessage;
+            int guildId = playerCharacter.GuildId;
+            GuildData guild;
+            if (guildId <= 0 || !serverGuildHandlers.TryGetGuild(guildId, out guild))
+            {
+                gameMessage = UITextKeys.UI_ERROR_NOT_JOINED_GUILD;
+                return new ValidateGuildRequestResult(false, gameMessage);
+            }
+            if (!guild.IsLeader(playerCharacter.Id))
+            {
+                gameMessage = UITextKeys.UI_ERROR_NOT_GUILD_LEADER;
+                return new ValidateGuildRequestResult(false, gameMessage);
+            }
+            gameMessage = UITextKeys.NONE;
+            return new ValidateGuildRequestResult(true, gameMessage, guildId, guild);
+        }
+
         public static ValidateGuildRequestResult CanChangeGuildRole(this IServerGuildHandlers serverGuildHandlers, IPlayerCharacterData playerCharacter, byte guildRole, string roleName)
         {
             UITextKeys gameMessage;

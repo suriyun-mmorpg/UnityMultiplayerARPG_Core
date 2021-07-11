@@ -149,6 +149,15 @@ namespace MultiplayerARPG
             Send(manager, connectionId, msgType, netMessage);
         }
 
+        public static void SendSetGuildMessage2(this LiteNetLibManager.LiteNetLibManager manager, long? connectionId, ushort msgType, int id, string message)
+        {
+            UpdateGuildMessage netMessage = new UpdateGuildMessage();
+            netMessage.type = UpdateGuildMessage.UpdateType.SetGuildMessage2;
+            netMessage.id = id;
+            netMessage.guildMessage = message;
+            Send(manager, connectionId, msgType, netMessage);
+        }
+
         public static void SendSetGuildRole(this LiteNetLibManager.LiteNetLibManager manager, long? connectionId, ushort msgType, int id, byte guildRole, string roleName, bool canInvite, bool canKick, byte shareExpPercentage)
         {
             UpdateGuildMessage netMessage = new UpdateGuildMessage();
@@ -207,6 +216,78 @@ namespace MultiplayerARPG
             netMessage.type = UpdateGuildMessage.UpdateType.SetGold;
             netMessage.id = id;
             netMessage.gold = gold;
+            Send(manager, connectionId, msgType, netMessage);
+        }
+
+        public static void SendSetGuildScore(this LiteNetLibManager.LiteNetLibManager manager, long? connectionId, ushort msgType, int id, int score)
+        {
+            UpdateGuildMessage netMessage = new UpdateGuildMessage();
+            netMessage.type = UpdateGuildMessage.UpdateType.SetScore;
+            netMessage.id = id;
+            netMessage.score = score;
+            Send(manager, connectionId, msgType, netMessage);
+        }
+
+        public static void SendSetGuildOptionId1(this LiteNetLibManager.LiteNetLibManager manager, long? connectionId, ushort msgType, int id, int optionId)
+        {
+            UpdateGuildMessage netMessage = new UpdateGuildMessage();
+            netMessage.type = UpdateGuildMessage.UpdateType.SetOptionId1;
+            netMessage.id = id;
+            netMessage.optionId = optionId;
+            Send(manager, connectionId, msgType, netMessage);
+        }
+
+        public static void SendSetGuildOptionId2(this LiteNetLibManager.LiteNetLibManager manager, long? connectionId, ushort msgType, int id, int optionId)
+        {
+            UpdateGuildMessage netMessage = new UpdateGuildMessage();
+            netMessage.type = UpdateGuildMessage.UpdateType.SetOptionId2;
+            netMessage.id = id;
+            netMessage.optionId = optionId;
+            Send(manager, connectionId, msgType, netMessage);
+        }
+
+        public static void SendSetGuildOptionId3(this LiteNetLibManager.LiteNetLibManager manager, long? connectionId, ushort msgType, int id, int optionId)
+        {
+            UpdateGuildMessage netMessage = new UpdateGuildMessage();
+            netMessage.type = UpdateGuildMessage.UpdateType.SetOptionId3;
+            netMessage.id = id;
+            netMessage.optionId = optionId;
+            Send(manager, connectionId, msgType, netMessage);
+        }
+
+        public static void SendSetGuildOptionId4(this LiteNetLibManager.LiteNetLibManager manager, long? connectionId, ushort msgType, int id, int optionId)
+        {
+            UpdateGuildMessage netMessage = new UpdateGuildMessage();
+            netMessage.type = UpdateGuildMessage.UpdateType.SetOptionId4;
+            netMessage.id = id;
+            netMessage.optionId = optionId;
+            Send(manager, connectionId, msgType, netMessage);
+        }
+
+        public static void SendSetGuildOptionId5(this LiteNetLibManager.LiteNetLibManager manager, long? connectionId, ushort msgType, int id, int optionId)
+        {
+            UpdateGuildMessage netMessage = new UpdateGuildMessage();
+            netMessage.type = UpdateGuildMessage.UpdateType.SetOptionId5;
+            netMessage.id = id;
+            netMessage.optionId = optionId;
+            Send(manager, connectionId, msgType, netMessage);
+        }
+
+        public static void SendSetGuildAutoAcceptRequests(this LiteNetLibManager.LiteNetLibManager manager, long? connectionId, ushort msgType, int id, bool autoAcceptRequests)
+        {
+            UpdateGuildMessage netMessage = new UpdateGuildMessage();
+            netMessage.type = UpdateGuildMessage.UpdateType.SetAutoAcceptRequests;
+            netMessage.id = id;
+            netMessage.autoAcceptRequests = autoAcceptRequests;
+            Send(manager, connectionId, msgType, netMessage);
+        }
+
+        public static void SendSetGuildRank(this LiteNetLibManager.LiteNetLibManager manager, long? connectionId, ushort msgType, int id, int rank)
+        {
+            UpdateGuildMessage netMessage = new UpdateGuildMessage();
+            netMessage.type = UpdateGuildMessage.UpdateType.SetRank;
+            netMessage.id = id;
+            netMessage.rank = rank;
             Send(manager, connectionId, msgType, netMessage);
         }
     }
