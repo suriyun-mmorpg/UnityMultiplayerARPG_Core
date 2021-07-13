@@ -306,6 +306,8 @@ namespace MultiplayerARPG
             if (ServerGuildHandlers != null)
                 ServerGuildHandlers.ClearGuild();
             // Client components
+            if (ClientCharacterHandlers != null)
+                ClientCharacterHandlers.ClearSubscribedPlayerCharacters();
             if (ClientOnlineCharacterHandlers != null)
                 ClientOnlineCharacterHandlers.ClearOnlineCharacters();
             CurrentMapInfo = null;

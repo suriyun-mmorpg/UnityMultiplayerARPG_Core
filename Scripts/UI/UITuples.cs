@@ -170,10 +170,4 @@ namespace MultiplayerARPG
             this.maxSocket = maxSocket;
         }
     }
-
-    public struct UISocialCharacterData
-    {
-        public SocialCharacterData socialCharacter;
-        public BasePlayerCharacterEntity characterEntity;
-    }
 }

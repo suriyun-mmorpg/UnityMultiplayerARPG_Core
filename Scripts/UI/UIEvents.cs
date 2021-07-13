@@ -126,7 +126,7 @@ namespace MultiplayerARPG
 
     #region Events for UI Social Character
     [System.Serializable]
-    public class SocialCharacterEvent : UnityEvent<UISocialCharacterData> { }
+    public class SocialCharacterEvent : UnityEvent<SocialCharacterData> { }
 
     [System.Serializable]
     public class UISocialCharacterEvent : UnityEvent<UISocialCharacter> { }

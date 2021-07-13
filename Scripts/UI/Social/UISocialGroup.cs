@@ -199,7 +199,7 @@ namespace MultiplayerARPG
             if (MemberSelectionManager.SelectedUI == null)
                 return;
 
-            SocialCharacterData friend = MemberSelectionManager.SelectedUI.Data.socialCharacter;
+            SocialCharacterData friend = MemberSelectionManager.SelectedUI.Data;
             UISceneGlobal.Singleton.ShowMessageDialog(LanguageManager.GetText(UITextKeys.UI_FRIEND_ADD.ToString()), string.Format(LanguageManager.GetText(UITextKeys.UI_FRIEND_ADD_DESCRIPTION.ToString()), friend.characterName), false, true, true, false, null, () =>
             {
                 GameInstance.ClientFriendHandlers.RequestAddFriend(new RequestAddFriendMessage()
@@ -221,7 +221,7 @@ namespace MultiplayerARPG
             if (MemberSelectionManager.SelectedUI == null)
                 return;
 
-            SocialCharacterData friend = MemberSelectionManager.SelectedUI.Data.socialCharacter;
+            SocialCharacterData friend = MemberSelectionManager.SelectedUI.Data;
             UISceneGlobal.Singleton.ShowMessageDialog(LanguageManager.GetText(UITextKeys.UI_FRIEND_REMOVE.ToString()), string.Format(LanguageManager.GetText(UITextKeys.UI_FRIEND_REMOVE_DESCRIPTION.ToString()), friend.characterName), false, true, true, false, null, () =>
             {
                 GameInstance.ClientFriendHandlers.RequestRemoveFriend(new RequestRemoveFriendMessage()
@@ -243,7 +243,7 @@ namespace MultiplayerARPG
             if (MemberSelectionManager.SelectedUI == null)
                 return;
 
-            SocialCharacterData friend = MemberSelectionManager.SelectedUI.Data.socialCharacter;
+            SocialCharacterData friend = MemberSelectionManager.SelectedUI.Data;
             UISceneGlobal.Singleton.ShowMessageDialog(LanguageManager.GetText(UITextKeys.UI_FRIEND_REMOVE.ToString()), string.Format(LanguageManager.GetText(UITextKeys.UI_FRIEND_REMOVE_DESCRIPTION.ToString()), friend.characterName), false, true, true, false, null, () =>
             {
                 GameInstance.ClientFriendHandlers.RequestSendFriendRequest(new RequestSendFriendRequestMessage()
@@ -265,7 +265,7 @@ namespace MultiplayerARPG
             if (MemberSelectionManager.SelectedUI == null)
                 return;
 
-            SocialCharacterData friend = MemberSelectionManager.SelectedUI.Data.socialCharacter;
+            SocialCharacterData friend = MemberSelectionManager.SelectedUI.Data;
             GameInstance.ClientFriendHandlers.RequestAcceptFriendRequest(new RequestAcceptFriendRequestMessage()
             {
                 requesterId = friend.id,
@@ -284,7 +284,7 @@ namespace MultiplayerARPG
             if (MemberSelectionManager.SelectedUI == null)
                 return;
 
-            SocialCharacterData friend = MemberSelectionManager.SelectedUI.Data.socialCharacter;
+            SocialCharacterData friend = MemberSelectionManager.SelectedUI.Data;
             GameInstance.ClientFriendHandlers.RequestDeclineFriendRequest(new RequestDeclineFriendRequestMessage()
             {
                 requesterId = friend.id,

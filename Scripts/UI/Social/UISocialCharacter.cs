@@ -4,7 +4,7 @@ using UnityEngine.Events;
 
 namespace MultiplayerARPG
 {
-    public partial class UISocialCharacter : UISelectionEntry<UISocialCharacterData>
+    public partial class UISocialCharacter : UISelectionEntry<SocialCharacterData>
     {
         [Header("String Formats")]
         [Tooltip("Format => {0} = {Character Name}")]
@@ -40,11 +40,14 @@ namespace MultiplayerARPG
         public UnityEvent onGuildRequestAccepted = new UnityEvent();
         public UnityEvent onGuildRequestDeclined = new UnityEvent();
 
+        private string dirtyCharacterId;
+        private IPlayerCharacterData characterEntity;
+
         protected override void UpdateUI()
         {
             base.UpdateUI();
 
-            bool isOnline = GameInstance.ClientOnlineCharacterHandlers.IsCharacterOnline(Data.socialCharacter.id);
+            bool isOnline = GameInstance.ClientOnlineCharacterHandlers.IsCharacterOnline(Data.id);
 
             // Member online status
             foreach (GameObject obj in memberIsOnlineObjects)
@@ -60,8 +63,8 @@ namespace MultiplayerARPG
             }
 
             // Hp
-            int currentValue = isOnline ? Data.socialCharacter.currentHp : 0;
-            int maxValue = isOnline ? Data.socialCharacter.maxHp : 0;
+            int currentValue = isOnline ? Data.currentHp : 0;
+            int maxValue = isOnline ? Data.maxHp : 0;
             if (uiGageHp != null)
             {
                 uiGageHp.Update(currentValue, maxValue);
@@ -70,8 +73,8 @@ namespace MultiplayerARPG
             }
 
             // Mp
-            currentValue = isOnline ? Data.socialCharacter.currentMp : 0;
-            maxValue = isOnline ? Data.socialCharacter.maxMp : 0;
+            currentValue = isOnline ? Data.currentMp : 0;
+            maxValue = isOnline ? Data.maxMp : 0;
             if (uiGageMp != null)
             {
                 uiGageMp.Update(currentValue, maxValue);
@@ -79,7 +82,28 @@ namespace MultiplayerARPG
                     uiGageMp.textValue.SetGameObjectActive(maxValue > 0);
             }
 
-            GameInstance.ClientOnlineCharacterHandlers.RequestOnlineCharacter(Data.socialCharacter.id);
+            if (dirtyCharacterId != Data.id)
+            {
+                dirtyCharacterId = Data.id;
+                if (GameInstance.ClientCharacterHandlers != null)
+                    GameInstance.ClientCharacterHandlers.TryGetSubscribedPlayerCharacter(Data.id, out characterEntity);
+            }
+
+            // Buffs
+            if (uiCharacterBuffs != null)
+            {
+                if (characterEntity != null)
+                {
+                    uiCharacterBuffs.UpdateData(characterEntity);
+                    uiCharacterBuffs.Show();
+                }
+                else
+                {
+                    uiCharacterBuffs.Hide();
+                }
+            }
+
+            GameInstance.ClientOnlineCharacterHandlers.RequestOnlineCharacter(Data.id);
         }
 
         protected override void UpdateData()
@@ -88,46 +112,42 @@ namespace MultiplayerARPG
             {
                 uiTextName.text = string.Format(
                     LanguageManager.GetText(formatKeyName),
-                    string.IsNullOrEmpty(Data.socialCharacter.characterName) ? LanguageManager.GetUnknowTitle() : Data.socialCharacter.characterName);
+                    string.IsNullOrEmpty(Data.characterName) ? LanguageManager.GetUnknowTitle() : Data.characterName);
             }
 
             if (uiTextLevel != null)
             {
                 uiTextLevel.text = string.Format(
                     LanguageManager.GetText(formatKeyLevel),
-                    Data.socialCharacter.level.ToString("N0"));
+                    Data.level.ToString("N0"));
             }
-
-            // Buffs
-            if (uiCharacterBuffs != null)
-                uiCharacterBuffs.UpdateData(Data.characterEntity);
 
             foreach (GameObject obj in memberIsLeaderObjects)
             {
                 if (obj != null)
-                    obj.SetActive(!string.IsNullOrEmpty(Data.socialCharacter.id) && uiSocialGroup.IsLeader(Data.socialCharacter.id));
+                    obj.SetActive(!string.IsNullOrEmpty(Data.id) && uiSocialGroup.IsLeader(Data.id));
             }
 
             foreach (GameObject obj in memberIsNotLeaderObjects)
             {
                 if (obj != null)
-                    obj.SetActive(string.IsNullOrEmpty(Data.socialCharacter.id) || !uiSocialGroup.IsLeader(Data.socialCharacter.id));
+                    obj.SetActive(string.IsNullOrEmpty(Data.id) || !uiSocialGroup.IsLeader(Data.id));
             }
 
             // Character class data
             PlayerCharacter character;
-            GameInstance.PlayerCharacters.TryGetValue(Data.socialCharacter.dataId, out character);
+            GameInstance.PlayerCharacters.TryGetValue(Data.dataId, out character);
             if (uiCharacterClass != null)
                 uiCharacterClass.Data = character;
         }
 
         public void OnClickAddFriend()
         {
-            UISceneGlobal.Singleton.ShowMessageDialog(LanguageManager.GetText(UITextKeys.UI_FRIEND_ADD.ToString()), string.Format(LanguageManager.GetText(UITextKeys.UI_FRIEND_ADD_DESCRIPTION.ToString()), Data.socialCharacter.characterName), false, true, true, false, null, () =>
+            UISceneGlobal.Singleton.ShowMessageDialog(LanguageManager.GetText(UITextKeys.UI_FRIEND_ADD.ToString()), string.Format(LanguageManager.GetText(UITextKeys.UI_FRIEND_ADD_DESCRIPTION.ToString()), Data.characterName), false, true, true, false, null, () =>
             {
                 GameInstance.ClientFriendHandlers.RequestAddFriend(new RequestAddFriendMessage()
                 {
-                    friendId = Data.socialCharacter.id,
+                    friendId = Data.id,
                 }, AddFriendCallback);
             });
         }
@@ -141,11 +161,11 @@ namespace MultiplayerARPG
 
         public void OnClickRemoveFriend()
         {
-            UISceneGlobal.Singleton.ShowMessageDialog(LanguageManager.GetText(UITextKeys.UI_FRIEND_REMOVE.ToString()), string.Format(LanguageManager.GetText(UITextKeys.UI_FRIEND_REMOVE_DESCRIPTION.ToString()), Data.socialCharacter.characterName), false, true, true, false, null, () =>
+            UISceneGlobal.Singleton.ShowMessageDialog(LanguageManager.GetText(UITextKeys.UI_FRIEND_REMOVE.ToString()), string.Format(LanguageManager.GetText(UITextKeys.UI_FRIEND_REMOVE_DESCRIPTION.ToString()), Data.characterName), false, true, true, false, null, () =>
             {
                 GameInstance.ClientFriendHandlers.RequestRemoveFriend(new RequestRemoveFriendMessage()
                 {
-                    friendId = Data.socialCharacter.id,
+                    friendId = Data.id,
                 }, RemoveFriendCallback);
             });
         }
@@ -159,11 +179,11 @@ namespace MultiplayerARPG
 
         public void OnClickSendFriendRequest()
         {
-            UISceneGlobal.Singleton.ShowMessageDialog(LanguageManager.GetText(UITextKeys.UI_FRIEND_REMOVE.ToString()), string.Format(LanguageManager.GetText(UITextKeys.UI_FRIEND_REMOVE_DESCRIPTION.ToString()), Data.socialCharacter.characterName), false, true, true, false, null, () =>
+            UISceneGlobal.Singleton.ShowMessageDialog(LanguageManager.GetText(UITextKeys.UI_FRIEND_REMOVE.ToString()), string.Format(LanguageManager.GetText(UITextKeys.UI_FRIEND_REMOVE_DESCRIPTION.ToString()), Data.characterName), false, true, true, false, null, () =>
             {
                 GameInstance.ClientFriendHandlers.RequestSendFriendRequest(new RequestSendFriendRequestMessage()
                 {
-                    requesteeId = Data.socialCharacter.id,
+                    requesteeId = Data.id,
                 }, SendFriendRequestCallback);
             });
         }
@@ -179,7 +199,7 @@ namespace MultiplayerARPG
         {
             GameInstance.ClientFriendHandlers.RequestAcceptFriendRequest(new RequestAcceptFriendRequestMessage()
             {
-                requesterId = Data.socialCharacter.id,
+                requesterId = Data.id,
             }, AcceptFriendRequestCallback);
         }
 
@@ -194,7 +214,7 @@ namespace MultiplayerARPG
         {
             GameInstance.ClientFriendHandlers.RequestDeclineFriendRequest(new RequestDeclineFriendRequestMessage()
             {
-                requesterId = Data.socialCharacter.id,
+                requesterId = Data.id,
             }, DeclineFriendRequestCallback);
         }
 
@@ -209,7 +229,7 @@ namespace MultiplayerARPG
         {
             GameInstance.ClientGuildHandlers.RequestAcceptGuildRequest(new RequestAcceptGuildRequestMessage()
             {
-                requesterId = Data.socialCharacter.id,
+                requesterId = Data.id,
             }, AcceptGuildRequestCallback);
         }
 
@@ -224,7 +244,7 @@ namespace MultiplayerARPG
         {
             GameInstance.ClientGuildHandlers.RequestDeclineGuildRequest(new RequestDeclineGuildRequestMessage()
             {
-                requesterId = Data.socialCharacter.id,
+                requesterId = Data.id,
             }, DeclineGuildRequestCallback);
         }
 

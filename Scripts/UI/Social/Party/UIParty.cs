@@ -62,14 +62,11 @@ namespace MultiplayerARPG
 
             SocialCharacterData[] members;
             party.GetSortedMembers(out members);
-            MemberList.Generate(members, (index, partyMember, ui) =>
+            MemberList.Generate(members, (index, character, ui) =>
             {
-                UISocialCharacterData partyMemberEntity = new UISocialCharacterData();
-                partyMemberEntity.socialCharacter = partyMember;
-
                 UISocialCharacter uiPartyMember = ui.GetComponent<UISocialCharacter>();
                 uiPartyMember.uiSocialGroup = this;
-                uiPartyMember.Data = partyMemberEntity;
+                uiPartyMember.Data = character;
                 uiPartyMember.Show();
                 MemberSelectionManager.Add(uiPartyMember);
                 if (selectedIdx == index)
@@ -93,7 +90,7 @@ namespace MultiplayerARPG
             if (!OwningCharacterIsLeader() || MemberSelectionManager.SelectedUI == null)
                 return;
 
-            SocialCharacterData partyMember = MemberSelectionManager.SelectedUI.Data.socialCharacter;
+            SocialCharacterData partyMember = MemberSelectionManager.SelectedUI.Data;
             UISceneGlobal.Singleton.ShowMessageDialog(LanguageManager.GetText(UITextKeys.UI_PARTY_CHANGE_LEADER.ToString()), string.Format(LanguageManager.GetText(UITextKeys.UI_PARTY_CHANGE_LEADER_DESCRIPTION.ToString()), partyMember.characterName), false, true, true, false, null, () =>
             {
                 GameInstance.ClientPartyHandlers.RequestChangePartyLeader(new RequestChangePartyLeaderMessage()
@@ -126,7 +123,7 @@ namespace MultiplayerARPG
             if (!OwningCharacterCanKick() || MemberSelectionManager.SelectedUI == null)
                 return;
 
-            SocialCharacterData partyMember = MemberSelectionManager.SelectedUI.Data.socialCharacter;
+            SocialCharacterData partyMember = MemberSelectionManager.SelectedUI.Data;
             UISceneGlobal.Singleton.ShowMessageDialog(LanguageManager.GetText(UITextKeys.UI_PARTY_KICK_MEMBER.ToString()), string.Format(LanguageManager.GetText(UITextKeys.UI_PARTY_KICK_MEMBER_DESCRIPTION.ToString()), partyMember.characterName), false, true, true, false, null, () =>
             {
                 GameInstance.ClientPartyHandlers.RequestKickMemberFromParty(new RequestKickMemberFromPartyMessage()

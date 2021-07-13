@@ -34,14 +34,11 @@ namespace MultiplayerARPG
             MemberSelectionManager.DeselectSelectedUI();
             MemberSelectionManager.Clear();
 
-            MemberList.Generate(friends, (index, friend, ui) =>
+            MemberList.Generate(friends, (index, character, ui) =>
             {
-                UISocialCharacterData friendEntity = new UISocialCharacterData();
-                friendEntity.socialCharacter = friend;
-
                 UISocialCharacter uiRequester = ui.GetComponent<UISocialCharacter>();
                 uiRequester.uiSocialGroup = this;
-                uiRequester.Data = friendEntity;
+                uiRequester.Data = character;
                 uiRequester.Show();
                 uiRequester.onFriendRequestAccepted.RemoveListener(Refresh);
                 uiRequester.onFriendRequestAccepted.AddListener(Refresh);
