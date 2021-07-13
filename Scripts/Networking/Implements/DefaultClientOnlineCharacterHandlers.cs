@@ -25,7 +25,7 @@ namespace MultiplayerARPG
         public bool IsCharacterOnline(string characterId)
         {
             int offlineOffsets;
-            return OnlineCharacterIds.TryGetValue(characterId, out offlineOffsets) && offlineOffsets <= OnlineDuration;
+            return !string.IsNullOrEmpty(characterId) && OnlineCharacterIds.TryGetValue(characterId, out offlineOffsets) && offlineOffsets <= OnlineDuration;
         }
 
         public int GetCharacterOfflineOffsets(string characterId)
