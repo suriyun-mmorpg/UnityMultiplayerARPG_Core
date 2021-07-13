@@ -11,12 +11,14 @@ namespace MultiplayerARPG
 
         private void OnEnable()
         {
-            onEnable.Invoke();
+            if (BaseGameNetworkManager.Singleton is LanRpgNetworkManager)
+                onEnable.Invoke();
         }
 
         private void OnDisable()
         {
-            onDisable.Invoke();
+            if (BaseGameNetworkManager.Singleton is LanRpgNetworkManager)
+                onDisable.Invoke();
         }
     }
 }
