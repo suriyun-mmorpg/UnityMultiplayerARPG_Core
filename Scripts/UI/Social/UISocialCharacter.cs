@@ -85,8 +85,7 @@ namespace MultiplayerARPG
             if (dirtyCharacterId != Data.id)
             {
                 dirtyCharacterId = Data.id;
-                if (GameInstance.ClientCharacterHandlers != null)
-                    GameInstance.ClientCharacterHandlers.TryGetSubscribedPlayerCharacter(Data.id, out characterEntity);
+                GameInstance.ClientCharacterHandlers.TryGetSubscribedPlayerCharacter(Data.id, out characterEntity);
             }
 
             // Buffs
