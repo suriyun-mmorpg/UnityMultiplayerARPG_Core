@@ -20,8 +20,10 @@ namespace MultiplayerARPG
         public void HandleRequestOnlineCharacter(MessageHandlerData messageHandler)
         {
             string characterId = messageHandler.Reader.GetString();
+            if (string.IsNullOrEmpty(characterId))
+                return;
             float lastOnlineTime;
-            if (!string.IsNullOrEmpty(characterId) && OnlineCharacterIds.TryGetValue(characterId, out lastOnlineTime))
+            if (OnlineCharacterIds.TryGetValue(characterId, out lastOnlineTime))
             {
                 // Notify back online character
                 Manager.ServerSendPacket(messageHandler.ConnectionId, 0, DeliveryMethod.ReliableOrdered, GameNetworkingConsts.NotifyOnlineCharacter, (writer) =>
@@ -35,6 +37,8 @@ namespace MultiplayerARPG
 
         public void MarkOnlineCharacter(string characterId)
         {
+            if (string.IsNullOrEmpty(characterId))
+                return;
             OnlineCharacterIds.TryRemove(characterId, out _);
             OnlineCharacterIds.TryAdd(characterId, Time.unscaledTime);
         }

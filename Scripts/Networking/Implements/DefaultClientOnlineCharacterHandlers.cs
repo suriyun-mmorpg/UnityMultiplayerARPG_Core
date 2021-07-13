@@ -24,20 +24,26 @@ namespace MultiplayerARPG
 
         public bool IsCharacterOnline(string characterId)
         {
+            if (string.IsNullOrEmpty(characterId))
+                return false;
             int offlineOffsets;
-            return !string.IsNullOrEmpty(characterId) && OnlineCharacterIds.TryGetValue(characterId, out offlineOffsets) && offlineOffsets <= OnlineDuration;
+            return OnlineCharacterIds.TryGetValue(characterId, out offlineOffsets) && offlineOffsets <= OnlineDuration;
         }
 
         public int GetCharacterOfflineOffsets(string characterId)
         {
+            if (string.IsNullOrEmpty(characterId))
+                return DefaultOfflineOffsets;
             int offlineOffsets;
-            if (OnlineCharacterIds.TryGetValue(characterId, out offlineOffsets))
-                return offlineOffsets;
-            return DefaultOfflineOffsets;
+            if (!OnlineCharacterIds.TryGetValue(characterId, out offlineOffsets))
+                return DefaultOfflineOffsets;
+            return offlineOffsets;
         }
 
         public void RequestOnlineCharacter(string characterId)
         {
+            if (string.IsNullOrEmpty(characterId))
+                return;
             float currentTime = Time.unscaledTime;
             float lastRequestTime;
             if (OnlineRequestTimes.TryGetValue(characterId, out lastRequestTime) &&
