@@ -54,7 +54,7 @@ namespace MultiplayerARPG
         public void SendPartyInvitationCallback(ResponseHandlerData requestHandler, AckResponseCode responseCode, ResponseSendPartyInvitationMessage response)
         {
             ClientPartyActions.ResponseSendPartyInvitation(requestHandler, responseCode, response);
-            if (!responseCode.ShowUnhandledResponseMessageDialog(response.message))
+            if (responseCode.ShowUnhandledResponseMessageDialog(response.message))
                 return;
             Hide();
         }
@@ -70,7 +70,7 @@ namespace MultiplayerARPG
         public void SendGuildInvitationCallback(ResponseHandlerData requestHandler, AckResponseCode responseCode, ResponseSendGuildInvitationMessage response)
         {
             ClientGuildActions.ResponseSendGuildInvitation(requestHandler, responseCode, response);
-            if (!responseCode.ShowUnhandledResponseMessageDialog(response.message))
+            if (responseCode.ShowUnhandledResponseMessageDialog(response.message))
                 return;
             Hide();
         }
