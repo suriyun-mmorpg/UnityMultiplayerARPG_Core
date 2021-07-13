@@ -1,4 +1,5 @@
 ﻿using LiteNetLib;
+using LiteNetLib.Utils;
 using LiteNetLibManager;
 using System.Collections.Concurrent;
 using UnityEngine;
@@ -9,8 +10,6 @@ namespace MultiplayerARPG
     {
         public static readonly ConcurrentDictionary<string, float> OnlineCharacterIds = new ConcurrentDictionary<string, float>();
 
-        public const float OnlineDuration = 5f;
-
         public LiteNetLibManager.LiteNetLibManager Manager { get; private set; }
 
         private void Awake()
@@ -18,23 +17,20 @@ namespace MultiplayerARPG
             Manager = GetComponent<LiteNetLibManager.LiteNetLibManager>();
         }
 
-        public bool IsCharacterOnline(string characterId)
-        {
-            float time;
-            return OnlineCharacterIds.TryGetValue(characterId, out time) && Time.unscaledTime - time <= OnlineDuration;
-        }
-
         public void HandleRequestOnlineCharacter(MessageHandlerData messageHandler)
         {
             string characterId = messageHandler.Reader.GetString();
-            if (IsCharacterOnline(characterId))
+            float lastOnlineTime;
+            if (OnlineCharacterIds.TryGetValue(characterId, out lastOnlineTime))
             {
                 // Notify back online character
                 Manager.ServerSendPacket(messageHandler.ConnectionId, 0, DeliveryMethod.ReliableOrdered, GameNetworkingConsts.NotifyOnlineCharacter, (writer) =>
                 {
                     writer.Put(characterId);
+                    writer.PutPackedInt(Mathf.FloorToInt(Time.unscaledTime - lastOnlineTime));
                 });
             }
+            // NOTE: For MMO games, it should get offline offsets from database for exact offline offsets
         }
 
         public void MarkOnlineCharacter(string characterId)
