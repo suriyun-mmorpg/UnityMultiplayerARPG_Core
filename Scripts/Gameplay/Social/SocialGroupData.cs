@@ -1,7 +1,6 @@
 ﻿using LiteNetLib.Utils;
 using System.Collections.Generic;
 using System.Linq;
-using UnityEngine;
 
 namespace MultiplayerARPG
 {
@@ -64,15 +63,7 @@ namespace MultiplayerARPG
         {
             if (!members.ContainsKey(memberData.id))
                 return;
-            SocialCharacterData oldMemberData = members[memberData.id];
-            oldMemberData.characterName = memberData.characterName;
-            oldMemberData.dataId = memberData.dataId;
-            oldMemberData.level = memberData.level;
-            oldMemberData.currentHp = memberData.currentHp;
-            oldMemberData.maxHp = memberData.maxHp;
-            oldMemberData.currentMp = memberData.currentMp;
-            oldMemberData.maxMp = memberData.maxMp;
-            members[memberData.id] = oldMemberData;
+            members[memberData.id] = memberData;
         }
 
         public virtual bool RemoveMember(string characterId)
@@ -152,19 +143,19 @@ namespace MultiplayerARPG
 
         public bool UpdateSocialGroupMember(UpdateSocialMemberMessage message)
         {
-            if (id != message.id)
+            if (id != message.socialId)
                 return false;
 
             switch (message.type)
             {
                 case UpdateSocialMemberMessage.UpdateType.Add:
-                    AddMember(message.data);
+                    AddMember(message.character);
                     break;
                 case UpdateSocialMemberMessage.UpdateType.Update:
-                    UpdateMember(message.data);
+                    UpdateMember(message.character);
                     break;
                 case UpdateSocialMemberMessage.UpdateType.Remove:
-                    RemoveMember(message.data.id);
+                    RemoveMember(message.character.id);
                     break;
                 case UpdateSocialMemberMessage.UpdateType.Clear:
                     ClearMembers();

@@ -63,8 +63,7 @@ namespace MultiplayerARPG
                 return;
             foreach (SocialCharacterData member in party.GetMembers())
             {
-                bool isOnline = true; // TODO: Implement this
-                handlers.SendUpdatePartyMember(connectionId, party.id, isOnline, member.id, member.characterName, member.dataId, member.level, member.currentHp, member.maxHp, member.currentMp, member.maxMp);
+                handlers.SendUpdatePartyMember(connectionId, party.id, member);
             }
         }
 
@@ -365,8 +364,7 @@ namespace MultiplayerARPG
                 return;
             foreach (SocialCharacterData member in guild.GetMembers())
             {
-                bool isOnline = true; // TODO: Implement this
-                handlers.SendUpdateGuildMember(connectionId, guild.id, isOnline, member.id, member.characterName, member.dataId, member.level, member.currentHp, member.maxHp, member.currentMp, member.maxMp);
+                handlers.SendUpdateGuildMember(connectionId, guild.id, member);
             }
         }
 

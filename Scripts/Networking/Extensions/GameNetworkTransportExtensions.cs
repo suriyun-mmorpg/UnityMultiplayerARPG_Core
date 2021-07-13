@@ -28,8 +28,8 @@ namespace MultiplayerARPG
         {
             UpdateSocialMemberMessage netMessage = new UpdateSocialMemberMessage();
             netMessage.type = UpdateSocialMemberMessage.UpdateType.Add;
-            netMessage.id = id;
-            netMessage.data = new SocialCharacterData()
+            netMessage.socialId = id;
+            netMessage.character = new SocialCharacterData()
             {
                 id = characterId,
                 characterName = characterName,
@@ -39,23 +39,12 @@ namespace MultiplayerARPG
             Send(manager, connectionId, msgType, netMessage);
         }
 
-        public static void SendUpdateSocialMember(this LiteNetLibManager.LiteNetLibManager manager, long? connectionId, ushort msgType, int id, bool isOnline, string characterId, string characterName, int dataId, short level, int currentHp, int maxHp, int currentMp, int maxMp)
+        public static void SendUpdateSocialMember(this LiteNetLibManager.LiteNetLibManager manager, long? connectionId, ushort msgType, int id, SocialCharacterData member)
         {
             UpdateSocialMemberMessage netMessage = new UpdateSocialMemberMessage();
             netMessage.type = UpdateSocialMemberMessage.UpdateType.Update;
-            netMessage.id = id;
-            netMessage.isOnline = isOnline;
-            netMessage.data = new SocialCharacterData()
-            {
-                id = characterId,
-                characterName = characterName,
-                dataId = dataId,
-                level = level,
-                currentHp = currentHp,
-                maxHp = maxHp,
-                currentMp = currentMp,
-                maxMp = maxMp,
-            };
+            netMessage.socialId = id;
+            netMessage.character = member;
             Send(manager, connectionId, msgType, netMessage);
         }
 
@@ -63,8 +52,8 @@ namespace MultiplayerARPG
         {
             UpdateSocialMemberMessage netMessage = new UpdateSocialMemberMessage();
             netMessage.type = UpdateSocialMemberMessage.UpdateType.Remove;
-            netMessage.id = id;
-            netMessage.data.id = characterId;
+            netMessage.socialId = id;
+            netMessage.character.id = characterId;
             Send(manager, connectionId, msgType, netMessage);
         }
 
@@ -72,7 +61,7 @@ namespace MultiplayerARPG
         {
             UpdateSocialMemberMessage netMessage = new UpdateSocialMemberMessage();
             netMessage.type = UpdateSocialMemberMessage.UpdateType.Clear;
-            netMessage.id = id;
+            netMessage.socialId = id;
             Send(manager, connectionId, msgType, netMessage);
         }
 

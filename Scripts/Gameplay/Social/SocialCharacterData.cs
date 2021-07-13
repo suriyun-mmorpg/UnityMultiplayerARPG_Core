@@ -21,6 +21,24 @@ namespace MultiplayerARPG
 
         public void Deserialize(NetDataReader reader)
         {
+            DeserializeWithoutHpMp(reader);
+            currentHp = reader.GetPackedInt();
+            maxHp = reader.GetPackedInt();
+            currentMp = reader.GetPackedInt();
+            maxMp = reader.GetPackedInt();
+        }
+
+        public void Serialize(NetDataWriter writer)
+        {
+            SerializeWithoutHpMp(writer);
+            writer.PutPackedInt(currentHp);
+            writer.PutPackedInt(maxHp);
+            writer.PutPackedInt(currentMp);
+            writer.PutPackedInt(maxMp);
+        }
+
+        public void DeserializeWithoutHpMp(NetDataReader reader)
+        {
             id = reader.GetString();
             userId = reader.GetString();
             characterName = reader.GetString();
@@ -30,13 +48,9 @@ namespace MultiplayerARPG
             partyId = reader.GetPackedInt();
             guildId = reader.GetPackedInt();
             guildRole = reader.GetByte();
-            currentHp = reader.GetPackedInt();
-            maxHp = reader.GetPackedInt();
-            currentMp = reader.GetPackedInt();
-            maxMp = reader.GetPackedInt();
         }
 
-        public void Serialize(NetDataWriter writer)
+        public void SerializeWithoutHpMp(NetDataWriter writer)
         {
             writer.Put(id);
             writer.Put(userId);
@@ -47,10 +61,6 @@ namespace MultiplayerARPG
             writer.PutPackedInt(partyId);
             writer.PutPackedInt(guildId);
             writer.Put(guildRole);
-            writer.PutPackedInt(currentHp);
-            writer.PutPackedInt(maxHp);
-            writer.PutPackedInt(currentMp);
-            writer.PutPackedInt(maxMp);
         }
 
         public static SocialCharacterData Create(IPlayerCharacterData character)

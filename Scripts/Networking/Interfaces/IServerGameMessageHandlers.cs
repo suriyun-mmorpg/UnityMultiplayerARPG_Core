@@ -19,7 +19,7 @@ namespace MultiplayerARPG
         void SendSetPartySetting(long connectionId, int id, bool shareExp, bool shareItem);
         void SendClearPartyData(long connectionId, int id);
         void SendAddPartyMember(long connectionId, int id, string characterId, string characterName, int dataId, short level);
-        void SendUpdatePartyMember(long connectionId, int id, bool isOnline, string characterId, string characterName, int dataId, short level, int currentHp, int maxHp, int currentMp, int maxMp);
+        void SendUpdatePartyMember(long connectionId, int id, SocialCharacterData member);
         void SendRemovePartyMember(long connectionId, int id, string characterId);
         void SendNotifyPartyInvitation(long connectionId, PartyInvitationData invitation);
         // Guild
@@ -39,7 +39,7 @@ namespace MultiplayerARPG
         void SendSetGuildMemberRole(long connectionId, int id, string characterId, byte guildRole);
         void SendClearGuildData(long connectionId, int id);
         void SendAddGuildMember(long connectionId, int id, string characterId, string characterName, int dataId, short level);
-        void SendUpdateGuildMember(long connectionId, int id, bool isOnline, string characterId, string characterName, int dataId, short level, int currentHp, int maxHp, int currentMp, int maxMp);
+        void SendUpdateGuildMember(long connectionId, int id, SocialCharacterData member);
         void SendRemoveGuildMember(long connectionId, int id, string characterId);
         void SendSetGuildSkillLevel(long connectionId, int id, int dataId, short level);
         void SendSetGuildGold(long connectionId, int id, int gold);

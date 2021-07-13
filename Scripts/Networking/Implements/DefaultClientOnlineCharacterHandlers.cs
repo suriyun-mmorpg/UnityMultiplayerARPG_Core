@@ -10,6 +10,9 @@ namespace MultiplayerARPG
         public static readonly ConcurrentDictionary<string, float> OnlineRequestTimes = new ConcurrentDictionary<string, float>();
         public static readonly ConcurrentDictionary<string, float> OnlineCharacterIds = new ConcurrentDictionary<string, float>();
 
+        public const float OnlineDuration = 5f;
+        public const float RequestDuration = 5f * 0.75f;
+
         public LiteNetLibManager.LiteNetLibManager Manager { get; private set; }
 
         private void Awake()
@@ -20,14 +23,14 @@ namespace MultiplayerARPG
         public bool IsCharacterOnline(string characterId)
         {
             float time;
-            return OnlineCharacterIds.TryGetValue(characterId, out time) && Time.unscaledTime - time <= 5f;
+            return OnlineCharacterIds.TryGetValue(characterId, out time) && Time.unscaledTime - time <= OnlineDuration;
         }
 
         public void RequestOnlineCharacter(string characterId)
         {
             float lastRequestTime;
             if (OnlineRequestTimes.TryGetValue(characterId, out lastRequestTime) &&
-                Time.unscaledTime - lastRequestTime <= 2.5f)
+                Time.unscaledTime - lastRequestTime <= RequestDuration)
             {
                 // Requested too frequently, so skip it
                 return;

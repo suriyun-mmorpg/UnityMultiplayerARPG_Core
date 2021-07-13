@@ -40,21 +40,43 @@ namespace MultiplayerARPG
         public UnityEvent onGuildRequestAccepted = new UnityEvent();
         public UnityEvent onGuildRequestDeclined = new UnityEvent();
 
-        protected override void Update()
+        protected override void UpdateUI()
         {
-            base.Update();
+            base.UpdateUI();
 
-            // Member status
+            bool isOnline = GameInstance.ClientOnlineCharacterHandlers.IsCharacterOnline(Data.socialCharacter.id);
+
+            // Member online status
             foreach (GameObject obj in memberIsOnlineObjects)
             {
                 if (obj != null)
-                    obj.SetActive(GameInstance.ClientOnlineCharacterHandlers.IsCharacterOnline(Data.socialCharacter.id));
+                    obj.SetActive(isOnline);
             }
 
             foreach (GameObject obj in memberIsNotOnlineObjects)
             {
                 if (obj != null)
-                    obj.SetActive(!GameInstance.ClientOnlineCharacterHandlers.IsCharacterOnline(Data.socialCharacter.id));
+                    obj.SetActive(!isOnline);
+            }
+
+            // Hp
+            int currentValue = isOnline ? Data.socialCharacter.currentHp : 0;
+            int maxValue = isOnline ? Data.socialCharacter.maxHp : 0;
+            if (uiGageHp != null)
+            {
+                uiGageHp.Update(currentValue, maxValue);
+                if (uiGageHp.textValue != null)
+                    uiGageHp.textValue.SetGameObjectActive(maxValue > 0);
+            }
+
+            // Mp
+            currentValue = isOnline ? Data.socialCharacter.currentMp : 0;
+            maxValue = isOnline ? Data.socialCharacter.maxMp : 0;
+            if (uiGageMp != null)
+            {
+                uiGageMp.Update(currentValue, maxValue);
+                if (uiGageMp.textValue != null)
+                    uiGageMp.textValue.SetGameObjectActive(maxValue > 0);
             }
 
             GameInstance.ClientOnlineCharacterHandlers.RequestOnlineCharacter(Data.socialCharacter.id);
@@ -74,26 +96,6 @@ namespace MultiplayerARPG
                 uiTextLevel.text = string.Format(
                     LanguageManager.GetText(formatKeyLevel),
                     Data.socialCharacter.level.ToString("N0"));
-            }
-
-            // Hp
-            int currentHp = Data.socialCharacter.currentHp;
-            int maxHp = Data.socialCharacter.maxHp;
-            if (uiGageHp != null)
-            {
-                uiGageHp.Update(currentHp, maxHp);
-                if (uiGageHp.textValue != null)
-                    uiGageHp.textValue.SetGameObjectActive(maxHp > 0);
-            }
-
-            // Mp
-            int currentMp = Data.socialCharacter.currentMp;
-            int maxMp = Data.socialCharacter.maxMp;
-            if (uiGageMp != null)
-            {
-                uiGageMp.Update(currentMp, maxMp);
-                if (uiGageMp.textValue != null)
-                    uiGageMp.textValue.SetGameObjectActive(maxMp > 0);
             }
 
             // Buffs

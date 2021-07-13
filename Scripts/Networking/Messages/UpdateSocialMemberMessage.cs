@@ -12,65 +12,40 @@ namespace MultiplayerARPG
             Clear,
         }
         public UpdateType type;
-        public int id;
-        public bool isOnline;
-        public SocialCharacterData data;
+        public int socialId;
+        public SocialCharacterData character;
 
         public void Deserialize(NetDataReader reader)
         {
             type = (UpdateType)reader.GetByte();
-            id = reader.GetPackedInt();
-            if (type != UpdateType.Clear)
+            socialId = reader.GetPackedInt();
+            // Get social member data
+            switch (type)
             {
-                // Get social member data
-                data.id = reader.GetString();
-                switch (type)
-                {
-                    case UpdateType.Add:
-                    case UpdateType.Update:
-                        data.characterName = reader.GetString();
-                        data.dataId = reader.GetPackedInt();
-                        data.level = reader.GetPackedShort();
-                        isOnline = reader.GetBool();
-                        // Read extra data
-                        if (isOnline)
-                        {
-                            data.currentHp = reader.GetPackedInt();
-                            data.maxHp = reader.GetPackedInt();
-                            data.currentMp = reader.GetPackedInt();
-                            data.maxMp = reader.GetPackedInt();
-                        }
-                        break;
-                }
+                case UpdateType.Add:
+                case UpdateType.Update:
+                    character.Deserialize(reader);
+                    break;
+                case UpdateType.Remove:
+                    character.id = reader.GetString();
+                    break;
             }
         }
 
         public void Serialize(NetDataWriter writer)
         {
             writer.Put((byte)type);
-            writer.PutPackedInt(id);
-            if (type != UpdateType.Clear)
+            writer.PutPackedInt(socialId);
+            // Put social member data
+            switch (type)
             {
-                // Put social member data
-                writer.Put(data.id);
-                switch (type)
-                {
-                    case UpdateType.Add:
-                    case UpdateType.Update:
-                        writer.Put(data.characterName);
-                        writer.PutPackedInt(data.dataId);
-                        writer.PutPackedShort(data.level);
-                        writer.Put(isOnline);
-                        // Put extra data
-                        if (isOnline)
-                        {
-                            writer.PutPackedInt(data.currentHp);
-                            writer.PutPackedInt(data.maxHp);
-                            writer.PutPackedInt(data.currentMp);
-                            writer.PutPackedInt(data.maxMp);
-                        }
-                        break;
-                }
+                case UpdateType.Add:
+                case UpdateType.Update:
+                    character.Serialize(writer);
+                    break;
+                case UpdateType.Remove:
+                    writer.Put(character.id);
+                    break;
             }
         }
     }

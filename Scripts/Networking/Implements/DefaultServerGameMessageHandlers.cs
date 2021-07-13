@@ -115,9 +115,9 @@ namespace MultiplayerARPG
             Manager.SendAddSocialMember(connectionId, GameNetworkingConsts.UpdatePartyMember, id, characterId, characterName, dataId, level);
         }
 
-        public void SendUpdatePartyMember(long connectionId, int id, bool isOnline, string characterId, string characterName, int dataId, short level, int currentHp, int maxHp, int currentMp, int maxMp)
+        public void SendUpdatePartyMember(long connectionId, int id, SocialCharacterData member)
         {
-            Manager.SendUpdateSocialMember(connectionId, GameNetworkingConsts.UpdatePartyMember, id, isOnline, characterId, characterName, dataId, level, currentHp, maxHp, currentMp, maxMp);
+            Manager.SendUpdateSocialMember(connectionId, GameNetworkingConsts.UpdatePartyMember, id, member);
         }
 
         public void SendRemovePartyMember(long connectionId, int id, string characterId)
@@ -171,9 +171,9 @@ namespace MultiplayerARPG
             Manager.SendAddSocialMember(connectionId, GameNetworkingConsts.UpdateGuildMember, id, characterId, characterName, dataId, level);
         }
 
-        public void SendUpdateGuildMember(long connectionId, int id, bool isOnline, string characterId, string characterName, int dataId, short level, int currentHp, int maxHp, int currentMp, int maxMp)
+        public void SendUpdateGuildMember(long connectionId, int id, SocialCharacterData member)
         {
-            Manager.SendUpdateSocialMember(connectionId, GameNetworkingConsts.UpdateGuildMember, id, isOnline, characterId, characterName, dataId, level, currentHp, maxHp, currentMp, maxMp);
+            Manager.SendUpdateSocialMember(connectionId, GameNetworkingConsts.UpdateGuildMember, id, member);
         }
 
         public void SendRemoveGuildMember(long connectionId, int id, string characterId)
