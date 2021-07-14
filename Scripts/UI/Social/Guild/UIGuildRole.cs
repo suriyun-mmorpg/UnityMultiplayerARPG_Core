@@ -15,6 +15,8 @@ namespace MultiplayerARPG
         public TextWrapper textCanInvite;
         public TextWrapper textCanKick;
         public TextWrapper textShareExpPercentage;
+        public GameObject[] canInviteObjects;
+        public GameObject[] canKickObjects;
 
         protected override void UpdateData()
         {
@@ -43,6 +45,22 @@ namespace MultiplayerARPG
                 textShareExpPercentage.text = string.Format(
                     LanguageManager.GetText(formatKeyShareExpPercentage),
                     Data.shareExpPercentage.ToString("N0"));
+            }
+
+            if (canInviteObjects != null)
+            {
+                foreach (GameObject canInviteObject in canInviteObjects)
+                {
+                    canInviteObject.SetActive(Data.canInvite);
+                }
+            }
+
+            if (canKickObjects != null)
+            {
+                foreach (GameObject canKickObject in canKickObjects)
+                {
+                    canKickObject.SetActive(Data.canKick);
+                }
             }
         }
     }
