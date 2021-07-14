@@ -50,7 +50,7 @@ namespace UtilsComponents
         }
 
         [ContextMenu("Set default Sprite by image's Sprite")]
-        public void SetDefaultSpriteByimage()
+        public void SetDefaultSpriteByImage()
         {
 #if UNITY_EDITOR
             for (int i = 0; i < settings.Length; ++i)
@@ -58,6 +58,19 @@ namespace UtilsComponents
                 Setting setting = settings[i];
                 setting.defaultSprite = setting.image.sprite;
                 settings[i] = setting;
+            }
+            EditorUtility.SetDirty(this);
+#endif
+        }
+
+        [ContextMenu("Set image's Sprite by default Sprite")]
+        public void SetImageByDefaultSprite()
+        {
+#if UNITY_EDITOR
+            for (int i = 0; i < settings.Length; ++i)
+            {
+                Setting setting = settings[i];
+                setting.image.sprite = setting.defaultSprite;
             }
             EditorUtility.SetDirty(this);
 #endif

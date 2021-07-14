@@ -40,5 +40,11 @@ namespace MultiplayerARPG
             UnityEditor.EditorUtility.SetDirty(this);
 #endif
         }
+
+        [ContextMenu("Set Attached TextWrapper Component To Field")]
+        public void SetAttachedTextWrapperComponentToField()
+        {
+            textWrapper = GetComponent<TextWrapper>();
+        }
     }
 }
