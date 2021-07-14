@@ -347,4 +347,19 @@ public class InputFieldWrapper : MonoBehaviour
         if (textMeshInputField != null) textMeshInputField.MoveTextEnd(shift);
 #endif
     }
+
+    [ContextMenu("Set Attached Input Field Component To Field")]
+    public void SetAttachedInputFieldComponentToField()
+    {
+        unityInputField = GetComponent<InputField>();
+    }
+
+
+#if USE_TEXT_MESH_PRO
+    [ContextMenu("Set Attached Text Mesh Input Field Component To Field")]
+    public void SetAttachedTextMeshInputFieldComponentToField()
+    {
+        textMeshInputField = GetComponent<TMP_InputField>();
+    }
+#endif
 }

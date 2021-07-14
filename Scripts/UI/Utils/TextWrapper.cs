@@ -72,4 +72,19 @@ public class TextWrapper : MonoBehaviour
 #endif
         gameObject.SetActive(isActive);
     }
+
+    [ContextMenu("Set Attached Text Component To Field")]
+    public void SetAttachedTextComponentToField()
+    {
+        unityText = GetComponent<Text>();
+    }
+
+
+#if USE_TEXT_MESH_PRO
+    [ContextMenu("Set Attached Text Mesh Text Component To Field")]
+    public void SetAttachedTextMeshTextComponentToField()
+    {
+        textMeshText = GetComponent<TextMeshProUGUI>();
+    }
+#endif
 }

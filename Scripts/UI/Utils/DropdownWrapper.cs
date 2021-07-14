@@ -156,6 +156,21 @@ public class DropdownWrapper : MonoBehaviour
         gameObject.SetActive(isActive);
     }
 
+    [ContextMenu("Set Attached Dropdown Component To Field")]
+    public void SetAttachedDropdownComponentToField()
+    {
+        unityDropdown = GetComponent<Dropdown>();
+    }
+
+
+#if USE_TEXT_MESH_PRO
+    [ContextMenu("Set Attached Text Mesh Dropdown Component To Field")]
+    public void SetAttachedTextMeshDropdownComponentToField()
+    {
+        textMeshDropdown = GetComponent<TMP_Dropdown>();
+    }
+#endif
+
     public class OptionData
     {
         public OptionData() : this(string.Empty, null)
