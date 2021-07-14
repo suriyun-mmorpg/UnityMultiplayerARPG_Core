@@ -61,6 +61,19 @@ public class UISelectionEntryImageSprite : MonoBehaviour
 #endif
     }
 
+    [ContextMenu("Set image's Sprite by default Sprite")]
+    public void SetImageByDefaultSprite()
+    {
+#if UNITY_EDITOR
+        for (int i = 0; i < settings.Length; ++i)
+        {
+            Setting setting = settings[i];
+            setting.image.sprite = setting.defaultSprite;
+        }
+        EditorUtility.SetDirty(this);
+#endif
+    }
+
     [ContextMenu("Swap default color and selected color")]
     public void SwapDefaultSpriteAndSelectedSprite()
     {
