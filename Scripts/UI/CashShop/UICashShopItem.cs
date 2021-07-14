@@ -20,6 +20,8 @@ namespace MultiplayerARPG
         public UILocaleKeySetting formatKeySellPriceGold = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_SELL_PRICE);
         [Tooltip("Format => {0} = {Gold Amount}")]
         public UILocaleKeySetting formatKeyReceiveGold = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_REWARD_GOLD);
+        [Tooltip("Format => {0} = {Item Amount}")]
+        public UILocaleKeySetting formayKeySingleItemAmount = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_SIMPLE);
 
         [Header("UI Elements")]
         public UICashShop uiCashShop;
@@ -32,6 +34,8 @@ namespace MultiplayerARPG
         public TextWrapper uiTextSellPriceGold;
         [FormerlySerializedAs("textRecieveGold")]
         public TextWrapper uiTextRecieveGold;
+        [Tooltip("This will be shown when there is only one kind of item in the package")]
+        public TextWrapper uiTextSingleItemAmount;
         public UICurrencyAmounts uiReceiveCurrencies;
         public UIItemAmounts uiReceiveItems;
         public InputFieldWrapper inputAmount;
@@ -144,6 +148,21 @@ namespace MultiplayerARPG
                 uiTextRecieveGold.text = string.Format(
                     LanguageManager.GetText(formatKeyReceiveGold),
                     Data == null ? "0" : Data.receiveGold.ToString("N0"));
+            }
+
+            if (uiTextSingleItemAmount != null)
+            {
+                if (Data == null || Data.receiveItems.Length != 1)
+                {
+                    uiTextSingleItemAmount.SetGameObjectActive(false);
+                }
+                else
+                {
+                    uiTextSingleItemAmount.SetGameObjectActive(true);
+                    uiTextSingleItemAmount.text = string.Format(
+                        LanguageManager.GetText(formayKeySingleItemAmount),
+                        Data == null ? "0" : Data.receiveItems[0].amount.ToString("N0"));
+                }
             }
 
             if (uiReceiveCurrencies != null)
