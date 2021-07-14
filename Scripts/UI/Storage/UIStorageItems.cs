@@ -12,6 +12,11 @@ namespace MultiplayerARPG
         [Tooltip("Format => {0} = {Current Used Slots}, {1} = {Slot Limit}")]
         public UILocaleKeySetting formatKeySlotLimit = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_CURRENT_SLOT);
 
+        [Header("Filter")]
+        public List<string> filterCategories;
+        public List<ItemType> filterItemTypes;
+        public bool doNotShowEmptySlots;
+
         [Header("UI Elements")]
         public GameObject listEmptyObject;
         [FormerlySerializedAs("uiItemDialog")]
@@ -181,23 +186,59 @@ namespace MultiplayerARPG
             int showingCount = 0;
             UICharacterItem selectedUI = null;
             UICharacterItem tempUI;
+            BaseItem tempItem;
             CacheList.Generate(characterItems, (index, characterItem, ui) =>
             {
                 tempUI = ui.GetComponent<UICharacterItem>();
-                tempUI.Setup(new UICharacterItemData(characterItem, InventoryType.StorageItems), GameInstance.PlayingCharacter, index);
-                tempUI.Show();
+                tempItem = characterItem.GetItem();
                 if (characterItem.NotEmptySlot())
                 {
                     TotalWeight += characterItem.GetItem().Weight * characterItem.amount;
                     UsedSlots++;
                 }
-                UICharacterItemDragHandler dragHandler = tempUI.GetComponentInChildren<UICharacterItemDragHandler>();
-                if (dragHandler != null)
-                    dragHandler.SetupForStorageItems(tempUI);
-                CacheSelectionManager.Add(tempUI);
-                if (!string.IsNullOrEmpty(selectedId) && selectedId.Equals(characterItem.id))
-                    selectedUI = tempUI;
-                showingCount++;
+
+                if (!GameInstance.Singleton.IsLimitInventorySlot ||
+                    doNotShowEmptySlots ||
+                    (filterCategories != null && filterCategories.Count > 0) ||
+                    (filterItemTypes != null && filterItemTypes.Count > 0))
+                {
+                    // If inventory type isn't limit inventory slot, hide empty slot
+                    if (tempItem == null)
+                    {
+                        tempUI.Hide();
+                        return;
+                    }
+                }
+
+                if (tempItem == null ||
+                    string.IsNullOrEmpty(tempItem.category) ||
+                    filterCategories == null || filterCategories.Count == 0 ||
+                    filterCategories.Contains(tempItem.category))
+                {
+                    if (filterItemTypes == null || filterItemTypes.Count == 0 ||
+                        filterItemTypes.Contains(tempItem.ItemType))
+                    {
+                        tempUI.Setup(new UICharacterItemData(characterItem, InventoryType.StorageItems), GameInstance.PlayingCharacter, index);
+                        tempUI.Show();
+                        UICharacterItemDragHandler dragHandler = tempUI.GetComponentInChildren<UICharacterItemDragHandler>();
+                        if (dragHandler != null)
+                            dragHandler.SetupForStorageItems(tempUI);
+                        CacheSelectionManager.Add(tempUI);
+                        if (!string.IsNullOrEmpty(selectedId) && selectedId.Equals(characterItem.id))
+                            selectedUI = tempUI;
+                        showingCount++;
+                    }
+                    else
+                    {
+                        // Hide because item's type not matches in the filter list
+                        tempUI.Hide();
+                    }
+                }
+                else
+                {
+                    // Hide because item's category not matches in the filter list
+                    tempUI.Hide();
+                }
             });
             if (listEmptyObject != null)
                 listEmptyObject.SetActive(showingCount == 0);
