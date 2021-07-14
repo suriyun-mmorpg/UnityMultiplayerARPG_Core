@@ -6,8 +6,8 @@ public class UIList : MonoBehaviour
 {
     public GameObject uiPrefab;
     public Transform uiContainer;
-    public IEnumerable list;
     public bool doNotRemoveContainerChildren;
+    public IEnumerable List { get; protected set; }
     protected readonly List<GameObject> uis = new List<GameObject>();
     protected bool removedContainerChildren;
 
@@ -23,7 +23,7 @@ public class UIList : MonoBehaviour
     {
         RemoveContainerChildren();
 
-        this.list = list;
+        List = list;
         int i = 0;
         foreach (T entry in list)
         {
