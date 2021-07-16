@@ -26,6 +26,7 @@ namespace MultiplayerARPG
             {
                 foreach (GameObject gameObject in activateWhileEquippedObjects)
                 {
+                    if (gameObject == null) continue;
                     gameObject.SetActive(true);
                 }
             }
@@ -34,6 +35,7 @@ namespace MultiplayerARPG
             {
                 foreach (GameObject gameObject in activateWhileUnEquippedObjects)
                 {
+                    if (gameObject == null) continue;
                     gameObject.SetActive(false);
                 }
             }
@@ -46,6 +48,7 @@ namespace MultiplayerARPG
             {
                 foreach (GameObject gameObject in activateWhileEquippedObjects)
                 {
+                    if (gameObject == null) continue;
                     gameObject.SetActive(false);
                 }
             }
@@ -54,6 +57,7 @@ namespace MultiplayerARPG
             {
                 foreach (GameObject gameObject in activateWhileUnEquippedObjects)
                 {
+                    if (gameObject == null) continue;
                     gameObject.SetActive(true);
                 }
             }
