@@ -7,8 +7,8 @@ namespace MultiplayerARPG
     public partial class UICharacterItems : UIBase
     {
         [Header("Filter")]
-        public List<string> filterCategories;
-        public List<ItemType> filterItemTypes;
+        public List<string> filterCategories = new List<string>();
+        public List<ItemType> filterItemTypes = new List<ItemType>();
         public bool doNotShowEmptySlots;
 
         [Header("UI Elements")]
@@ -48,6 +48,7 @@ namespace MultiplayerARPG
         }
 
         public virtual ICharacterData Character { get; set; }
+        public List<CharacterItem> LoadedList { get; private set; } = new List<CharacterItem>();
 
         private UISelectionMode dirtySelectionMode;
 
@@ -102,10 +103,19 @@ namespace MultiplayerARPG
         public virtual void UpdateData(ICharacterData character, IList<CharacterItem> characterItems)
         {
             Character = character;
+            LoadedList.Clear();
+            if (characterItems != null && characterItems.Count > 0)
+                LoadedList.AddRange(characterItems);
+            GenerateList();
+        }
+
+        public virtual void GenerateList()
+        {
             string selectedId = CacheSelectionManager.SelectedUI != null ? CacheSelectionManager.SelectedUI.CharacterItem.id : string.Empty;
             CacheSelectionManager.Clear();
+            ConvertFilterCategoriesToTrimedLowerChar();
 
-            if (character == null || characterItems == null || characterItems.Count == 0)
+            if (Character == null || LoadedList.Count == 0)
             {
                 if (uiDialog != null)
                     uiDialog.Hide();
@@ -119,12 +129,12 @@ namespace MultiplayerARPG
             UICharacterItem selectedUI = null;
             UICharacterItem tempUI;
             BaseItem tempItem;
-            CacheList.Generate(characterItems, (index, characterItem, ui) =>
+            CacheList.Generate(LoadedList, (index, data, ui) =>
             {
                 tempUI = ui.GetComponent<UICharacterItem>();
-                tempItem = characterItem.GetItem();
-                if (!GameInstance.Singleton.IsLimitInventorySlot ||
-                    doNotShowEmptySlots ||
+                tempItem = data.GetItem();
+
+                if (!GameInstance.Singleton.IsLimitInventorySlot || doNotShowEmptySlots ||
                     (filterCategories != null && filterCategories.Count > 0) ||
                     (filterItemTypes != null && filterItemTypes.Count > 0))
                 {
@@ -137,14 +147,13 @@ namespace MultiplayerARPG
                 }
 
                 if (tempItem == null ||
-                    string.IsNullOrEmpty(tempItem.category) ||
-                    filterCategories == null || filterCategories.Count == 0 ||
-                    filterCategories.Contains(tempItem.category))
+                    (filterCategories.Count == 0 || (!string.IsNullOrEmpty(tempItem.category) &&
+                    filterCategories.Contains(tempItem.category.Trim().ToLower()))))
                 {
-                    if (filterItemTypes == null || filterItemTypes.Count == 0 ||
+                    if (filterItemTypes.Count == 0 ||
                         filterItemTypes.Contains(tempItem.ItemType))
                     {
-                        tempUI.Setup(new UICharacterItemData(characterItem, isUnknowSource ? InventoryType.Unknow : InventoryType.NonEquipItems), Character, index);
+                        tempUI.Setup(new UICharacterItemData(data, isUnknowSource ? InventoryType.Unknow : InventoryType.NonEquipItems), Character, index);
                         tempUI.Show();
                         UICharacterItemDragHandler dragHandler = tempUI.GetComponentInChildren<UICharacterItemDragHandler>();
                         if (dragHandler != null)
@@ -155,7 +164,7 @@ namespace MultiplayerARPG
                                 dragHandler.SetupForNonEquipItems(tempUI);
                         }
                         CacheSelectionManager.Add(tempUI);
-                        if (!string.IsNullOrEmpty(selectedId) && selectedId.Equals(characterItem.id))
+                        if (!string.IsNullOrEmpty(selectedId) && selectedId.Equals(data.id))
                             selectedUI = tempUI;
                         showingCount++;
                     }
@@ -171,8 +180,10 @@ namespace MultiplayerARPG
                     tempUI.Hide();
                 }
             });
+
             if (listEmptyObject != null)
                 listEmptyObject.SetActive(showingCount == 0);
+
             if (selectedUI == null)
             {
                 CacheSelectionManager.DeselectSelectedUI();
@@ -185,6 +196,14 @@ namespace MultiplayerARPG
                 selectedUI.OnClickSelect();
                 if (uiDialog != null)
                     uiDialog.dontShowComparingEquipments = defaultDontShowComparingEquipments;
+            }
+        }
+
+        protected void ConvertFilterCategoriesToTrimedLowerChar()
+        {
+            for (int i = 0; i < filterCategories.Count; ++i)
+            {
+                filterCategories[i] = filterCategories[i].Trim().ToLower();
             }
         }
 

@@ -12,7 +12,7 @@ namespace MultiplayerARPG
         public UILocaleKeySetting formatKeyCash = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_CASH);
 
         [Header("Filter")]
-        public List<string> filterCategories;
+        public List<string> filterCategories = new List<string>();
 
         [Header("UI Elements")]
         public GameObject listEmptyObject;
@@ -51,10 +51,12 @@ namespace MultiplayerARPG
             }
         }
 
-        public void RefreshCashPackageInfo()
+        public List<CashPackage> LoadedList { get; private set; } = new List<CashPackage>();
+
+        public void Refresh()
         {
             // Load cash shop item list
-            GameInstance.ClientCashShopHandlers.RequestCashPackageInfo(ResponseCashPackageInfo);
+            GameInstance.ClientCashShopHandlers.RequestCashPackageInfo(ResponseInfo);
         }
 
         protected virtual void OnEnable()
@@ -65,7 +67,7 @@ namespace MultiplayerARPG
             CacheSelectionManager.eventOnDeselect.AddListener(OnDeselect);
             if (uiDialog != null)
                 uiDialog.onHide.AddListener(OnDialogHide);
-            RefreshCashPackageInfo();
+            Refresh();
         }
 
         protected virtual void OnDisable()
@@ -113,10 +115,10 @@ namespace MultiplayerARPG
                 UISceneGlobal.Singleton.ShowMessageDialog(LanguageManager.GetText(UITextKeys.UI_LABEL_ERROR.ToString()), errorMessage);
                 return;
             }
-            RefreshCashPackageInfo();
+            Refresh();
         }
 
-        protected virtual void ResponseCashPackageInfo(ResponseHandlerData requestHandler, AckResponseCode responseCode, ResponseCashPackageInfoMessage response)
+        protected virtual void ResponseInfo(ResponseHandlerData requestHandler, AckResponseCode responseCode, ResponseCashPackageInfoMessage response)
         {
             ClientCashShopActions.ResponseCashPackageInfo(requestHandler, responseCode, response);
             if (responseCode.ShowUnhandledResponseMessageDialog(response.message)) return;
@@ -128,29 +130,34 @@ namespace MultiplayerARPG
                     response.cash.ToString("N0"));
             }
 
-            List<CashPackage> list = new List<CashPackage>();
+            LoadedList.Clear();
             foreach (int cashPackageId in response.cashPackageIds)
             {
                 CashPackage cashPackage;
                 if (GameInstance.CashPackages.TryGetValue(cashPackageId, out cashPackage))
                 {
-                    list.Add(cashPackage);
+                    LoadedList.Add(cashPackage);
                 }
             }
 
+            GenerateList();
+        }
+
+        public virtual void GenerateList()
+        {
             int selectedIdx = CacheSelectionManager.SelectedUI != null ? CacheSelectionManager.IndexOf(CacheSelectionManager.SelectedUI) : -1;
             CacheSelectionManager.DeselectSelectedUI();
             CacheSelectionManager.Clear();
+            ConvertFilterCategoriesToTrimedLowerChar();
 
             int showingCount = 0;
             UICashPackage tempUI;
-            CacheList.Generate(list, (index, data, ui) =>
+            CacheList.Generate(LoadedList, (index, data, ui) =>
             {
                 tempUI = ui.GetComponent<UICashPackage>();
-                if (data == null ||
-                    string.IsNullOrEmpty(data.category) ||
-                    filterCategories == null || filterCategories.Count == 0 ||
-                    filterCategories.Contains(data.category))
+                if (data != null &&
+                    (filterCategories.Count == 0 || (!string.IsNullOrEmpty(data.category) &&
+                    filterCategories.Contains(data.category.Trim().ToLower()))))
                 {
                     tempUI.uiCashPackages = this;
                     tempUI.Data = data;
@@ -166,8 +173,17 @@ namespace MultiplayerARPG
                     tempUI.Hide();
                 }
             });
+
             if (listEmptyObject != null)
                 listEmptyObject.SetActive(showingCount == 0);
+        }
+
+        protected void ConvertFilterCategoriesToTrimedLowerChar()
+        {
+            for (int i = 0; i < filterCategories.Count; ++i)
+            {
+                filterCategories[i] = filterCategories[i].Trim().ToLower();
+            }
         }
     }
 }

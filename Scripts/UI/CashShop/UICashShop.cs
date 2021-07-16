@@ -12,7 +12,7 @@ namespace MultiplayerARPG
         public UILocaleKeySetting formatKeyCash = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_CASH);
 
         [Header("Filter")]
-        public List<string> filterCategories;
+        public List<string> filterCategories = new List<string>();
 
         [Header("UI Elements")]
         public GameObject listEmptyObject;
@@ -51,10 +51,12 @@ namespace MultiplayerARPG
             }
         }
 
-        public void RefreshCashShopInfo()
+        public List<CashShopItem> LoadedList { get; private set; } = new List<CashShopItem>();
+
+        public void Refresh()
         {
             // Load cash shop item list
-            GameInstance.ClientCashShopHandlers.RequestCashShopInfo(ResponseCashShopInfo);
+            GameInstance.ClientCashShopHandlers.RequestCashShopInfo(ResponseInfo);
         }
 
         protected virtual void OnEnable()
@@ -65,7 +67,7 @@ namespace MultiplayerARPG
             CacheSelectionManager.eventOnDeselect.AddListener(OnDeselect);
             if (uiDialog != null)
                 uiDialog.onHide.AddListener(OnDialogHide);
-            RefreshCashShopInfo();
+            Refresh();
         }
 
         protected virtual void OnDisable()
@@ -108,10 +110,10 @@ namespace MultiplayerARPG
                 dataId = dataId,
                 currencyType = currencyType,
                 amount = amount,
-            }, ResponseCashShopBuy);
+            }, ResponseBuy);
         }
 
-        protected virtual void ResponseCashShopInfo(ResponseHandlerData requestHandler, AckResponseCode responseCode, ResponseCashShopInfoMessage response)
+        protected virtual void ResponseInfo(ResponseHandlerData requestHandler, AckResponseCode responseCode, ResponseCashShopInfoMessage response)
         {
             ClientCashShopActions.ResponseCashShopInfo(requestHandler, responseCode, response);
             if (responseCode.ShowUnhandledResponseMessageDialog(response.message)) return;
@@ -123,27 +125,40 @@ namespace MultiplayerARPG
                     response.cash.ToString("N0"));
             }
 
-            List<CashShopItem> list = new List<CashShopItem>();
+            LoadedList.Clear();
             foreach (int cashShopItemId in response.cashShopItemIds)
             {
                 CashShopItem cashShopItem;
                 if (GameInstance.CashShopItems.TryGetValue(cashShopItemId, out cashShopItem))
-                    list.Add(cashShopItem);
+                    LoadedList.Add(cashShopItem);
             }
 
+            GenerateList();
+        }
+
+        protected virtual void ResponseBuy(ResponseHandlerData requestHandler, AckResponseCode responseCode, ResponseCashShopBuyMessage response)
+        {
+            ClientCashShopActions.ResponseCashShopBuy(requestHandler, responseCode, response);
+            if (responseCode.ShowUnhandledResponseMessageDialog(response.message)) return;
+            UISceneGlobal.Singleton.ShowMessageDialog(LanguageManager.GetText(UITextKeys.UI_LABEL_SUCCESS.ToString()), LanguageManager.GetText(UITextKeys.UI_CASH_SHOP_ITEM_BOUGHT.ToString()));
+            Refresh();
+        }
+
+        public virtual void GenerateList()
+        {
             int selectedIdx = CacheSelectionManager.SelectedUI != null ? CacheSelectionManager.IndexOf(CacheSelectionManager.SelectedUI) : -1;
             CacheSelectionManager.DeselectSelectedUI();
             CacheSelectionManager.Clear();
+            ConvertFilterCategoriesToTrimedLowerChar();
 
             int showingCount = 0;
             UICashShopItem tempUI;
-            CacheList.Generate(list, (index, data, ui) =>
+            CacheList.Generate(LoadedList, (index, data, ui) =>
             {
                 tempUI = ui.GetComponent<UICashShopItem>();
-                if (data == null ||
-                    string.IsNullOrEmpty(data.category) ||
-                    filterCategories == null || filterCategories.Count == 0 ||
-                    filterCategories.Contains(data.category))
+                if (data != null &&
+                    (filterCategories.Count == 0 || (!string.IsNullOrEmpty(data.category) &&
+                    filterCategories.Contains(data.category.Trim().ToLower()))))
                 {
                     tempUI.uiCashShop = this;
                     tempUI.Data = data;
@@ -159,16 +174,17 @@ namespace MultiplayerARPG
                     tempUI.Hide();
                 }
             });
+
             if (listEmptyObject != null)
                 listEmptyObject.SetActive(showingCount == 0);
         }
 
-        private void ResponseCashShopBuy(ResponseHandlerData requestHandler, AckResponseCode responseCode, ResponseCashShopBuyMessage response)
+        protected void ConvertFilterCategoriesToTrimedLowerChar()
         {
-            ClientCashShopActions.ResponseCashShopBuy(requestHandler, responseCode, response);
-            if (responseCode.ShowUnhandledResponseMessageDialog(response.message)) return;
-            UISceneGlobal.Singleton.ShowMessageDialog(LanguageManager.GetText(UITextKeys.UI_LABEL_SUCCESS.ToString()), LanguageManager.GetText(UITextKeys.UI_CASH_SHOP_ITEM_BOUGHT.ToString()));
-            RefreshCashShopInfo();
+            for (int i = 0; i < filterCategories.Count; ++i)
+            {
+                filterCategories[i] = filterCategories[i].Trim().ToLower();
+            }
         }
     }
 }

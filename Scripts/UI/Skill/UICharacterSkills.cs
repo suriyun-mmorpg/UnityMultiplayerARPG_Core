@@ -8,8 +8,8 @@ namespace MultiplayerARPG
     public partial class UICharacterSkills : UIBase
     {
         [Header("Filter")]
-        public List<string> filterCategories;
-        public List<SkillType> filterSkillTypes;
+        public List<string> filterCategories = new List<string>();
+        public List<SkillType> filterSkillTypes = new List<SkillType>();
 
         [Header("UI Elements")]
         public GameObject listEmptyObject;
@@ -62,6 +62,7 @@ namespace MultiplayerARPG
         }
 
         public ICharacterData Character { get; protected set; }
+        public Dictionary<BaseSkill, short> LoadedList { get; private set; } = new Dictionary<BaseSkill, short>();
 
         protected virtual void OnEnable()
         {
@@ -163,10 +164,19 @@ namespace MultiplayerARPG
         public void UpdateData(ICharacterData character)
         {
             Character = character;
+            LoadedList.Clear();
+            if (Character != null && Character.GetDatabase() != null)
+                LoadedList = Character.GetCaches().Skills;
+            GenerateList();
+        }
+
+        public virtual void GenerateList()
+        {
             int selectedSkillId = CacheSelectionManager.SelectedUI != null ? CacheSelectionManager.SelectedUI.Skill.DataId : 0;
             CacheSelectionManager.Clear();
+            ConvertFilterCategoriesToTrimedLowerChar();
 
-            if (character == null || character.GetDatabase() == null)
+            if (Character == null || LoadedList.Count == 0)
             {
                 if (uiDialog != null)
                     uiDialog.Hide();
@@ -178,34 +188,31 @@ namespace MultiplayerARPG
 
             int showingCount = 0;
             UICharacterSkill tempUI;
-            CharacterSkill tempCharacterSkill;
             BaseSkill tempSkill;
-            int tempIndexOfSkill;
-            short tempSkillLevel;
-            // Combine skills from database (skill that can level up) with increased skill and equipment skill
-            CacheList.Generate(character.GetCaches().Skills, (index, skillLevel, ui) =>
+            int tempIndexOfLearnedSkill;
+            short tempLearnedSkillLevel;
+            // Combine skills from database (skill that can level up) with learned skill and equipment skill
+            CacheList.Generate(LoadedList, (index, data, ui) =>
             {
                 tempUI = ui.GetComponent<UICharacterSkill>();
-                if (string.IsNullOrEmpty(skillLevel.Key.category) ||
-                    filterCategories == null || filterCategories.Count == 0 ||
-                    filterCategories.Contains(skillLevel.Key.category))
+                tempSkill = data.Key;
+                
+                if (filterCategories.Count == 0 || (!string.IsNullOrEmpty(tempSkill.category) &&
+                    filterCategories.Contains(tempSkill.category.Trim().ToLower())))
                 {
-                    if (filterSkillTypes == null || filterSkillTypes.Count == 0 ||
-                        filterSkillTypes.Contains(skillLevel.Key.SkillType))
+                    if (filterSkillTypes.Count == 0 ||
+                        filterSkillTypes.Contains(tempSkill.SkillType))
                     {
-                        tempSkill = skillLevel.Key;
-                        tempIndexOfSkill = character.IndexOfSkill(tempSkill.DataId);
-                        tempSkillLevel = (short)(tempIndexOfSkill >= 0 ? character.Skills[tempIndexOfSkill].level : 0);
-                        // Set character skill data
-                        tempCharacterSkill =  CharacterSkill.Create(tempSkill, tempSkillLevel);
-                        // Set UI data
-                        tempUI.Setup(new UICharacterSkillData(tempCharacterSkill, skillLevel.Value), character, tempIndexOfSkill);
+                        tempIndexOfLearnedSkill = Character.IndexOfSkill(tempSkill.DataId);
+                        tempLearnedSkillLevel = (short)(tempIndexOfLearnedSkill >= 0 ? Character.Skills[tempIndexOfLearnedSkill].level : 0);
+                        // Set UI data, Create new character skill data based on learned skill, target level is sum of learned skill and equipment skill
+                        tempUI.Setup(new UICharacterSkillData(CharacterSkill.Create(tempSkill, tempLearnedSkillLevel), data.Value), Character, tempIndexOfLearnedSkill);
                         tempUI.Show();
                         UICharacterSkillDragHandler dragHandler = tempUI.GetComponentInChildren<UICharacterSkillDragHandler>();
                         if (dragHandler != null)
                             dragHandler.SetupForSkills(tempUI);
                         CacheSelectionManager.Add(tempUI);
-                        if (selectedSkillId == skillLevel.Key.DataId)
+                        if (selectedSkillId == tempSkill.DataId)
                             tempUI.OnClickSelect();
                         showingCount++;
                     }
@@ -221,8 +228,17 @@ namespace MultiplayerARPG
                     tempUI.Hide();
                 }
             });
+
             if (listEmptyObject != null)
                 listEmptyObject.SetActive(showingCount == 0);
+        }
+
+        protected void ConvertFilterCategoriesToTrimedLowerChar()
+        {
+            for (int i = 0; i < filterCategories.Count; ++i)
+            {
+                filterCategories[i] = filterCategories[i].Trim().ToLower();
+            }
         }
     }
 }

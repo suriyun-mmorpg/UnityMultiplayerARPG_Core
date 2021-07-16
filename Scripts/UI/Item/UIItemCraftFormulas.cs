@@ -9,15 +9,13 @@ namespace MultiplayerARPG
     public class UIItemCraftFormulas : UIBase
     {
         [Header("Filter")]
-        public List<string> filterCategories;
+        public List<string> filterCategories = new List<string>();
 
         [Header("UI Elements")]
         public GameObject listEmptyObject;
         public UIItemCraftFormula uiDialog;
         public UIItemCraftFormula uiPrefab;
         public Transform uiContainer;
-
-        public UICraftingQueueItems CraftingQueueManager { get; set; }
 
         private UIList cacheList;
         public UIList CacheList
@@ -45,6 +43,9 @@ namespace MultiplayerARPG
                 return cacheSelectionManager;
             }
         }
+
+        public UICraftingQueueItems CraftingQueueManager { get; set; }
+        public List<ItemCraftFormula> LoadedList { get; private set; } = new List<ItemCraftFormula>();
 
         protected virtual void OnEnable()
         {
@@ -94,22 +95,30 @@ namespace MultiplayerARPG
 
         protected virtual void UpdateData()
         {
+            int sourceId = CraftingQueueManager != null && CraftingQueueManager.Source != null ? CraftingQueueManager.Source.SourceId : 0;
+            LoadedList.Clear();
+            LoadedList.AddRange(GameInstance.ItemCraftFormulas.Values.Where(o => o.SourceId == sourceId));
+            GenerateList();
+        }
+
+        public virtual void GenerateList()
+        {
             int selectedIdx = CacheSelectionManager.SelectedUI != null ? CacheSelectionManager.IndexOf(CacheSelectionManager.SelectedUI) : -1;
             CacheSelectionManager.DeselectSelectedUI();
             CacheSelectionManager.Clear();
+            ConvertFilterCategoriesToTrimedLowerChar();
 
-            int sourceId = CraftingQueueManager != null && CraftingQueueManager.Source != null ? CraftingQueueManager.Source.SourceId : 0;
             int showingCount = 0;
             UIItemCraftFormula tempUI;
-            CacheList.Generate(GameInstance.ItemCraftFormulas.Values.Where(o => o.SourceId == sourceId), (index, formula, ui) =>
+            CacheList.Generate(LoadedList, (index, data, ui) =>
             {
                 tempUI = ui.GetComponent<UIItemCraftFormula>();
-                if (string.IsNullOrEmpty(formula.category) ||
-                    filterCategories == null || filterCategories.Count == 0 ||
-                    filterCategories.Contains(formula.category))
+                if (data != null &&
+                    (filterCategories.Count == 0 || (!string.IsNullOrEmpty(data.category) &&
+                    filterCategories.Contains(data.category.Trim().ToLower()))))
                 {
                     tempUI.CraftFormulaManager = this;
-                    tempUI.Data = formula;
+                    tempUI.Data = data;
                     tempUI.Show();
                     CacheSelectionManager.Add(tempUI);
                     if (selectedIdx == index)
@@ -122,8 +131,17 @@ namespace MultiplayerARPG
                     tempUI.Hide();
                 }
             });
+
             if (listEmptyObject != null)
                 listEmptyObject.SetActive(showingCount == 0);
+        }
+
+        protected void ConvertFilterCategoriesToTrimedLowerChar()
+        {
+            for (int i = 0; i < filterCategories.Count; ++i)
+            {
+                filterCategories[i] = filterCategories[i].Trim().ToLower();
+            }
         }
     }
 }

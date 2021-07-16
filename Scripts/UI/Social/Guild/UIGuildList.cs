@@ -1,5 +1,6 @@
 ﻿using LiteNetLibManager;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace MultiplayerARPG
 {
@@ -10,7 +11,8 @@ namespace MultiplayerARPG
         public UIGuildListEntry uiDialog;
         public UIGuildListEntry uiPrefab;
         public Transform uiContainer;
-        public InputFieldWrapper inputGuildName;
+        [FormerlySerializedAs("inputGuildName")]
+        public InputFieldWrapper inputFind;
 
         private UIList cacheList;
         public UIList CacheList
@@ -47,7 +49,7 @@ namespace MultiplayerARPG
             CacheSelectionManager.eventOnDeselect.AddListener(OnDeselect);
             if (uiDialog != null)
                 uiDialog.onHide.AddListener(OnDialogHide);
-            OnClickFindGuilds();
+            OnClickFind();
         }
 
         protected virtual void OnDisable()
@@ -104,11 +106,23 @@ namespace MultiplayerARPG
                 listEmptyObject.SetActive(foundGuilds.Length == 0);
         }
 
-        public void OnClickFindGuilds()
+        public void OnClickFind()
         {
             string guildName = string.Empty;
-            if (inputGuildName != null)
-                guildName = inputGuildName.text;
+            if (inputFind != null)
+                guildName = inputFind.text;
+            RequestFindGuilds(guildName);
+        }
+
+        public void OnClickRefresh()
+        {
+            if (inputFind != null)
+                inputFind.text = string.Empty;
+            OnClickFind();
+        }
+
+        private void RequestFindGuilds(string guildName)
+        {
             GameInstance.ClientGuildHandlers.RequestFindGuilds(new RequestFindGuildsMessage()
             {
                 guildName = guildName,
