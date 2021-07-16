@@ -6,6 +6,17 @@ namespace MultiplayerARPG
 {
     public partial class BaseCharacterEntity
     {
+        public event AppliedRecoveryAmountDelegate onBuffHpRecovery;
+        public event AppliedRecoveryAmountDelegate onBuffHpDecrease;
+        public event AppliedRecoveryAmountDelegate onBuffMpRecovery;
+        public event AppliedRecoveryAmountDelegate onBuffMpDecrease;
+        public event AppliedRecoveryAmountDelegate onBuffStaminaRecovery;
+        public event AppliedRecoveryAmountDelegate onBuffStaminaDecrease;
+        public event AppliedRecoveryAmountDelegate onBuffFoodRecovery;
+        public event AppliedRecoveryAmountDelegate onBuffFoodDecrease;
+        public event AppliedRecoveryAmountDelegate onBuffWaterRecovery;
+        public event AppliedRecoveryAmountDelegate onBuffWaterDecrease;
+
         public void ApplyBuff(int dataId, BuffType type, short level, EntityInfo buffApplier)
         {
             if (!IsServer || this.IsDead())
@@ -145,6 +156,86 @@ namespace MultiplayerARPG
             }
 
             OnApplyBuff(dataId, type, level);
+        }
+
+        public virtual void OnBuffHpRecovery(EntityInfo causer, int amount)
+        {
+            CurrentHp += amount;
+            CallAllAppendCombatText(CombatAmountType.HpRecovery, DamageSource.None, 0, amount);
+            if (onBuffHpRecovery != null)
+                onBuffHpRecovery.Invoke(causer, amount);
+        }
+
+        public virtual void OnBuffHpDecrease(EntityInfo causer, int amount)
+        {
+            CurrentHp -= amount;
+            CallAllAppendCombatText(CombatAmountType.HpDecrease, DamageSource.None, 0, amount);
+            if (onBuffHpDecrease != null)
+                onBuffHpDecrease.Invoke(causer, amount);
+        }
+
+        public virtual void OnBuffMpRecovery(EntityInfo causer, int amount)
+        {
+            CurrentMp += amount;
+            CallAllAppendCombatText(CombatAmountType.MpRecovery, DamageSource.None, 0, amount);
+            if (onBuffMpRecovery != null)
+                onBuffMpRecovery.Invoke(causer, amount);
+        }
+
+        public virtual void OnBuffMpDecrease(EntityInfo causer, int amount)
+        {
+            CurrentMp -= amount;
+            CallAllAppendCombatText(CombatAmountType.MpDecrease, DamageSource.None, 0, amount);
+            if (onBuffMpDecrease != null)
+                onBuffMpDecrease.Invoke(causer, amount);
+        }
+
+        public virtual void OnBuffStaminaRecovery(EntityInfo causer, int amount)
+        {
+            CurrentStamina += amount;
+            CallAllAppendCombatText(CombatAmountType.StaminaRecovery, DamageSource.None, 0, amount);
+            if (onBuffStaminaRecovery != null)
+                onBuffStaminaRecovery.Invoke(causer, amount);
+        }
+
+        public virtual void OnBuffStaminaDecrease(EntityInfo causer, int amount)
+        {
+            CurrentStamina -= amount;
+            CallAllAppendCombatText(CombatAmountType.StaminaDecrease, DamageSource.None, 0, amount);
+            if (onBuffStaminaDecrease != null)
+                onBuffStaminaDecrease.Invoke(causer, amount);
+        }
+
+        public virtual void OnBuffFoodRecovery(EntityInfo causer, int amount)
+        {
+            CurrentFood += amount;
+            CallAllAppendCombatText(CombatAmountType.FoodRecovery, DamageSource.None, 0, amount);
+            if (onBuffFoodRecovery != null)
+                onBuffFoodRecovery.Invoke(causer, amount);
+        }
+
+        public virtual void OnBuffFoodDecrease(EntityInfo causer, int amount)
+        {
+            CurrentFood -= amount;
+            CallAllAppendCombatText(CombatAmountType.FoodDecrease, DamageSource.None, 0, amount);
+            if (onBuffFoodDecrease != null)
+                onBuffFoodDecrease.Invoke(causer, amount);
+        }
+
+        public virtual void OnBuffWaterRecovery(EntityInfo causer, int amount)
+        {
+            CurrentWater += amount;
+            CallAllAppendCombatText(CombatAmountType.WaterRecovery, DamageSource.None, 0, amount);
+            if (onBuffWaterRecovery != null)
+                onBuffWaterRecovery.Invoke(causer, amount);
+        }
+
+        public virtual void OnBuffWaterDecrease(EntityInfo causer, int amount)
+        {
+            CurrentWater -= amount;
+            CallAllAppendCombatText(CombatAmountType.WaterDecrease, DamageSource.None, 0, amount);
+            if (onBuffWaterDecrease != null)
+                onBuffWaterDecrease.Invoke(causer, amount);
         }
     }
 }

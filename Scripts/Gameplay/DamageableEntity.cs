@@ -147,7 +147,7 @@ namespace MultiplayerARPG
         /// <param name="dataId"></param>
         /// <param name="amount"></param>
         [AllRpc]
-        protected void AllReceivedDamageFeedback(CombatAmountType combatAmountType, DamageSource damageSource, int dataId, int amount)
+        protected void AllAppendCombatText(CombatAmountType combatAmountType, DamageSource damageSource, int dataId, int amount)
         {
             switch (combatAmountType)
             {
@@ -205,9 +205,9 @@ namespace MultiplayerARPG
             }
         }
 
-        public void CallAllReceivedDamageFeedback(CombatAmountType combatAmountType, DamageSource damageSource, int dataId, int amount)
+        public void CallAllAppendCombatText(CombatAmountType combatAmountType, DamageSource damageSource, int dataId, int amount)
         {
-            RPC(AllReceivedDamageFeedback, 0, DeliveryMethod.Unreliable, combatAmountType, damageSource, dataId, amount);
+            RPC(AllAppendCombatText, 0, DeliveryMethod.Unreliable, combatAmountType, damageSource, dataId, amount);
         }
 
         /// <summary>
@@ -300,7 +300,7 @@ namespace MultiplayerARPG
                         break;
                 }
             }
-            CallAllReceivedDamageFeedback(combatAmountType, damageSource, dataId, totalDamage);
+            CallAllAppendCombatText(combatAmountType, damageSource, dataId, totalDamage);
             IGameEntity attacker = null;
             if (instigator != null)
                 instigator.TryGetEntity(out attacker);

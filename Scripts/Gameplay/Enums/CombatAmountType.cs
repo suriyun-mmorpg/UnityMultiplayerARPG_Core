@@ -11,5 +11,10 @@
         StaminaRecovery,
         FoodRecovery,
         WaterRecovery,
+        HpDecrease,
+        MpDecrease,
+        StaminaDecrease,
+        FoodDecrease,
+        WaterDecrease,
     }
 }

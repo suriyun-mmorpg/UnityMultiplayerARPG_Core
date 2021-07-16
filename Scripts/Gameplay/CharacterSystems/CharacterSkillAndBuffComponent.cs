@@ -97,14 +97,14 @@ namespace MultiplayerARPG
                         // Damage over time
                         DamageElement damageElement;
                         MinMaxFloat damageAmount;
-                        float damage;
+                        float tempReceivingDamage;
                         foreach (KeyValuePair<DamageElement, MinMaxFloat> damageOverTime in buff.GetDamageOverTimes())
                         {
                             damageElement = damageOverTime.Key;
                             damageAmount = damageOverTime.Value;
-                            damage = damageElement.GetDamageReducedByResistance(Entity.GetCaches().Resistances, Entity.GetCaches().Armors, damageAmount.Random(Random.Range(0, 255)));
-                            if (damage > 0f)
-                                tempAmount += damage / duration * updatingTime;
+                            tempReceivingDamage = damageElement.GetDamageReducedByResistance(Entity.GetCaches().Resistances, Entity.GetCaches().Armors, damageAmount.Random(Random.Range(0, 255)));
+                            if (tempReceivingDamage > 0f)
+                                tempAmount += tempReceivingDamage / duration * updatingTime;
                         }
                         recoveryData.decreasingHp += tempAmount;
                         // Hp recovery

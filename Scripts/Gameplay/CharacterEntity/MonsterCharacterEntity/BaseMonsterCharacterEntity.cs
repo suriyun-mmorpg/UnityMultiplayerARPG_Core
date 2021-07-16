@@ -297,11 +297,21 @@ namespace MultiplayerARPG
 
         public override void ReceivedDamage(Vector3 fromPosition, EntityInfo instigator, Dictionary<DamageElement, MinMaxFloat> damageAmounts, CombatAmountType damageAmountType, int totalDamage, CharacterItem weapon, BaseSkill skill, short skillLevel)
         {
-            // Attacker can be null when character buff's buff applier is null. So, avoid it
+            RecordRecivingDamage(instigator, totalDamage);
+            base.ReceivedDamage(fromPosition, instigator, damageAmounts, damageAmountType, totalDamage, weapon, skill, skillLevel);
+        }
+
+        public override void OnBuffHpDecrease(EntityInfo causer, int amount)
+        {
+            RecordRecivingDamage(causer, amount);
+            base.OnBuffHpDecrease(causer, amount);
+        }
+
+        public void RecordRecivingDamage(EntityInfo instigator, int damage)
+        {
             BaseCharacterEntity attackerCharacter;
             if (instigator != null && instigator.TryGetEntity(out attackerCharacter))
             {
-
                 // If summoned by someone, summoner is attacker
                 if (attackerCharacter != null &&
                     attackerCharacter is BaseMonsterCharacterEntity &&
@@ -312,17 +322,16 @@ namespace MultiplayerARPG
                 if (attackerCharacter != null)
                 {
                     ReceivedDamageRecord receivedDamageRecord = new ReceivedDamageRecord();
-                    receivedDamageRecord.totalReceivedDamage = totalDamage;
+                    receivedDamageRecord.totalReceivedDamage = damage;
                     if (receivedDamageRecords.ContainsKey(attackerCharacter))
                     {
                         receivedDamageRecord = receivedDamageRecords[attackerCharacter];
-                        receivedDamageRecord.totalReceivedDamage += totalDamage;
+                        receivedDamageRecord.totalReceivedDamage += damage;
                     }
                     receivedDamageRecord.lastReceivedDamageTime = Time.unscaledTime;
                     receivedDamageRecords[attackerCharacter] = receivedDamageRecord;
                 }
             }
-            base.ReceivedDamage(fromPosition, instigator, damageAmounts, damageAmountType, totalDamage, weapon, skill, skillLevel);
         }
 
         public override void GetAttackingData(

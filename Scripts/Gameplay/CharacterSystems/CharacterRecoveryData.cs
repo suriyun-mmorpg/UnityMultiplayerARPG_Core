@@ -22,8 +22,7 @@
                 if (recoveryingHp >= 1)
                 {
                     tempAmount = (int)recoveryingHp;
-                    characterEntity.CurrentHp += tempAmount;
-                    characterEntity.CallAllReceivedDamageFeedback(CombatAmountType.HpRecovery, DamageSource.None, 0, tempAmount);
+                    characterEntity.OnBuffHpRecovery(causer, tempAmount);
                     recoveryingHp -= tempAmount;
                 }
             }
@@ -36,8 +35,7 @@
                 if (decreasingHp >= 1)
                 {
                     tempAmount = (int)decreasingHp;
-                    characterEntity.CurrentHp -= tempAmount;
-                    characterEntity.CallAllReceivedDamageFeedback(CombatAmountType.NormalDamage, DamageSource.None, 0, tempAmount);
+                    characterEntity.OnBuffHpDecrease(causer, tempAmount);
                     decreasingHp -= tempAmount;
                 }
             }
@@ -50,8 +48,7 @@
                 if (recoveryingMp >= 1)
                 {
                     tempAmount = (int)recoveryingMp;
-                    characterEntity.CurrentMp += tempAmount;
-                    characterEntity.CallAllReceivedDamageFeedback(CombatAmountType.MpRecovery, DamageSource.None, 0, tempAmount);
+                    characterEntity.OnBuffMpRecovery(causer, tempAmount);
                     recoveryingMp -= tempAmount;
                 }
             }
@@ -64,8 +61,7 @@
                 if (decreasingMp >= 1)
                 {
                     tempAmount = (int)decreasingMp;
-                    characterEntity.CurrentMp -= tempAmount;
-                    characterEntity.CallAllReceivedDamageFeedback(CombatAmountType.MpRecovery, DamageSource.None, 0, tempAmount);
+                    characterEntity.OnBuffMpDecrease(causer, tempAmount);
                     decreasingMp -= tempAmount;
                 }
             }
@@ -78,8 +74,7 @@
                 if (recoveryingStamina >= 1)
                 {
                     tempAmount = (int)recoveryingStamina;
-                    characterEntity.CurrentStamina += tempAmount;
-                    characterEntity.CallAllReceivedDamageFeedback(CombatAmountType.StaminaRecovery, DamageSource.None, 0, tempAmount);
+                    characterEntity.OnBuffStaminaRecovery(causer, tempAmount);
                     recoveryingStamina -= tempAmount;
                 }
             }
@@ -92,8 +87,7 @@
                 if (decreasingStamina >= 1)
                 {
                     tempAmount = (int)decreasingStamina;
-                    characterEntity.CurrentStamina -= tempAmount;
-                    characterEntity.CallAllReceivedDamageFeedback(CombatAmountType.StaminaRecovery, DamageSource.None, 0, tempAmount);
+                    characterEntity.OnBuffStaminaDecrease(causer, tempAmount);
                     decreasingStamina -= tempAmount;
                 }
             }
@@ -106,8 +100,7 @@
                 if (recoveryingFood >= 1)
                 {
                     tempAmount = (int)recoveryingFood;
-                    characterEntity.CurrentFood += tempAmount;
-                    characterEntity.CallAllReceivedDamageFeedback(CombatAmountType.FoodRecovery, DamageSource.None, 0, tempAmount);
+                    characterEntity.OnBuffFoodRecovery(causer, tempAmount);
                     recoveryingFood -= tempAmount;
                 }
             }
@@ -120,8 +113,7 @@
                 if (decreasingFood >= 1)
                 {
                     tempAmount = (int)decreasingFood;
-                    characterEntity.CurrentFood -= tempAmount;
-                    characterEntity.CallAllReceivedDamageFeedback(CombatAmountType.FoodRecovery, DamageSource.None, 0, tempAmount);
+                    characterEntity.OnBuffFoodDecrease(causer, tempAmount);
                     decreasingFood -= tempAmount;
                 }
             }
@@ -134,8 +126,7 @@
                 if (recoveryingWater >= 1)
                 {
                     tempAmount = (int)recoveryingWater;
-                    characterEntity.CurrentWater += tempAmount;
-                    characterEntity.CallAllReceivedDamageFeedback(CombatAmountType.WaterRecovery, DamageSource.None, 0, tempAmount);
+                    characterEntity.OnBuffWaterRecovery(causer, tempAmount);
                     recoveryingWater -= tempAmount;
                 }
             }
@@ -148,8 +139,7 @@
                 if (decreasingWater >= 1)
                 {
                     tempAmount = (int)decreasingWater;
-                    characterEntity.CurrentWater -= tempAmount;
-                    characterEntity.CallAllReceivedDamageFeedback(CombatAmountType.WaterRecovery, DamageSource.None, 0, tempAmount);
+                    characterEntity.OnBuffWaterDecrease(causer, tempAmount);
                     decreasingWater -= tempAmount;
                 }
             }

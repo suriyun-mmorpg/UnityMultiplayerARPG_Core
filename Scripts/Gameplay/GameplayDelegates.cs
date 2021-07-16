@@ -20,6 +20,9 @@ namespace MultiplayerARPG
         CharacterItem weapon,
         BaseSkill skill,
         short skillLevel);
+    public delegate void AppliedRecoveryAmountDelegate(
+        EntityInfo causer,
+        int amount);
     public delegate void AttackRoutineDelegate(
         bool isLeftHand,
         CharacterItem weapon,
