@@ -166,7 +166,7 @@ namespace MultiplayerARPG
             Character = character;
             LoadedList.Clear();
             if (Character != null && Character.GetDatabase() != null)
-                LoadedList = Character.GetCaches().Skills;
+                LoadedList = GameDataHelpers.CombineSkills(LoadedList, Character.GetSkills(true));
             GenerateList();
         }
 
