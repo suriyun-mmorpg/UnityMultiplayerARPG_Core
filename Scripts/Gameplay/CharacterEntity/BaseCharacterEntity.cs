@@ -287,7 +287,7 @@ namespace MultiplayerARPG
             // Update current model
             model = ModelManager.ActiveModel;
             // Set character model hide state
-            ModelManager.SetIsHide(CharacterModelManager.HIDE_SETTER_ENTITY, this.GetCaches().IsHide);
+            ModelManager.SetIsHide(CharacterModelManager.HIDE_SETTER_ENTITY, IsHide());
             // Update model animations
             // Update is dead state
             CharacterModel.SetIsDead(this.IsDead());

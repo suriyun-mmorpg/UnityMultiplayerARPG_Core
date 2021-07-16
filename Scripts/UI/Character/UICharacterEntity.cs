@@ -69,7 +69,7 @@ namespace MultiplayerARPG
 
         protected override bool ValidateToUpdateUI()
         {
-            return base.ValidateToUpdateUI() && (Data.IsOwnerClient || !Data.GetCaches().IsHide);
+            return base.ValidateToUpdateUI() && (Data.IsOwnerClient || !Data.IsHide());
         }
 
         protected override void UpdateUI()
