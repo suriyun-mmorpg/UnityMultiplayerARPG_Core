@@ -532,17 +532,17 @@ namespace MultiplayerARPG
                 foreach (CharacterItem armorItem in attacker.EquipItems)
                 {
                     tempEquipmentItem = armorItem.GetEquipmentItem();
-                    ApplyStatusEffectToAttacker(armorItem, tempEquipmentItem, attackerInfo, attacker, damageReceiver);
+                    ApplyStatusEffectsWhenAttacking(armorItem, tempEquipmentItem, attackerInfo, attacker, damageReceiver);
                 }
                 tempEquipmentItem = attacker.EquipWeapons.GetRightHandEquipmentItem();
                 if (tempEquipmentItem != null)
                 {
-                    ApplyStatusEffectToAttacker(attacker.EquipWeapons.rightHand, tempEquipmentItem, attackerInfo, attacker, damageReceiver);
+                    ApplyStatusEffectsWhenAttacking(attacker.EquipWeapons.rightHand, tempEquipmentItem, attackerInfo, attacker, damageReceiver);
                 }
                 tempEquipmentItem = attacker.EquipWeapons.GetLeftHandEquipmentItem();
                 if (tempEquipmentItem != null)
                 {
-                    ApplyStatusEffectToAttacker(attacker.EquipWeapons.leftHand, tempEquipmentItem, attackerInfo, attacker, damageReceiver);
+                    ApplyStatusEffectsWhenAttacking(attacker.EquipWeapons.leftHand, tempEquipmentItem, attackerInfo, attacker, damageReceiver);
                 }
                 foreach (CharacterBuff characterBuff in attacker.Buffs)
                 {
@@ -562,17 +562,17 @@ namespace MultiplayerARPG
                 foreach (CharacterItem armorItem in damageReceiver.EquipItems)
                 {
                     tempEquipmentItem = armorItem.GetEquipmentItem();
-                    ApplyStatusEffectToDamageReceiver(armorItem, tempEquipmentItem, damageReceiverInfo, attacker, damageReceiver);
+                    ApplyStatusEffectsWhenAttacked(armorItem, tempEquipmentItem, damageReceiverInfo, attacker, damageReceiver);
                 }
                 tempEquipmentItem = damageReceiver.EquipWeapons.GetRightHandEquipmentItem();
                 if (tempEquipmentItem != null)
                 {
-                    ApplyStatusEffectToDamageReceiver(damageReceiver.EquipWeapons.rightHand, tempEquipmentItem, damageReceiverInfo, attacker, damageReceiver);
+                    ApplyStatusEffectsWhenAttacked(damageReceiver.EquipWeapons.rightHand, tempEquipmentItem, damageReceiverInfo, attacker, damageReceiver);
                 }
                 tempEquipmentItem = damageReceiver.EquipWeapons.GetLeftHandEquipmentItem();
                 if (tempEquipmentItem != null)
                 {
-                    ApplyStatusEffectToDamageReceiver(damageReceiver.EquipWeapons.leftHand, tempEquipmentItem, damageReceiverInfo, attacker, damageReceiver);
+                    ApplyStatusEffectsWhenAttacked(damageReceiver.EquipWeapons.leftHand, tempEquipmentItem, damageReceiverInfo, attacker, damageReceiver);
                 }
                 foreach (CharacterBuff characterBuff in damageReceiver.Buffs)
                 {
@@ -595,7 +595,7 @@ namespace MultiplayerARPG
             DecreaseEquipItemsDurability(damageReceiver, decreaseArmorDurability);
         }
 
-        private void ApplyStatusEffectToAttacker(CharacterItem characterItem, IEquipmentItem equipmentItem, EntityInfo attackerInfo, BaseCharacterEntity attacker, BaseCharacterEntity damageReceiver)
+        private void ApplyStatusEffectsWhenAttacking(CharacterItem characterItem, IEquipmentItem equipmentItem, EntityInfo attackerInfo, BaseCharacterEntity attacker, BaseCharacterEntity damageReceiver)
         {
             equipmentItem.ApplySelfStatusEffectsWhenAttacking(characterItem.level, attackerInfo, attacker);
             equipmentItem.ApplyEnemyStatusEffectsWhenAttacking(characterItem.level, attackerInfo, damageReceiver);
@@ -603,12 +603,12 @@ namespace MultiplayerARPG
             {
                 foreach (int socketItemDataId in characterItem.Sockets)
                 {
-                    ApplyStatusEffectToAttacker(socketItemDataId, attackerInfo, attacker, damageReceiver);
+                    ApplyStatusEffectsWhenAttacking(socketItemDataId, attackerInfo, attacker, damageReceiver);
                 }
             }
         }
 
-        private void ApplyStatusEffectToAttacker(int socketItemDataId, EntityInfo attackerInfo, BaseCharacterEntity attacker, BaseCharacterEntity damageReceiver)
+        private void ApplyStatusEffectsWhenAttacking(int socketItemDataId, EntityInfo attackerInfo, BaseCharacterEntity attacker, BaseCharacterEntity damageReceiver)
         {
             if (!GameInstance.Items.ContainsKey(socketItemDataId))
                 return;
@@ -617,7 +617,7 @@ namespace MultiplayerARPG
             tempSocketEnhancerItem.ApplyEnemyStatusEffectsWhenAttacking(attackerInfo, damageReceiver);
         }
 
-        private void ApplyStatusEffectToDamageReceiver(CharacterItem characterItem, IEquipmentItem equipmentItem, EntityInfo damageReceiverInfo, BaseCharacterEntity attacker, BaseCharacterEntity damageReceiver)
+        private void ApplyStatusEffectsWhenAttacked(CharacterItem characterItem, IEquipmentItem equipmentItem, EntityInfo damageReceiverInfo, BaseCharacterEntity attacker, BaseCharacterEntity damageReceiver)
         {
             equipmentItem.ApplySelfStatusEffectsWhenAttacked(characterItem.level, damageReceiverInfo, damageReceiver);
             equipmentItem.ApplyEnemyStatusEffectsWhenAttacked(characterItem.level, damageReceiverInfo, attacker);
@@ -625,12 +625,12 @@ namespace MultiplayerARPG
             {
                 foreach (int socketItemDataId in characterItem.Sockets)
                 {
-                    ApplyStatusEffectToDamageReceiver(socketItemDataId, damageReceiverInfo, attacker, damageReceiver);
+                    ApplyStatusEffectsWhenAttacked(socketItemDataId, damageReceiverInfo, attacker, damageReceiver);
                 }
             }
         }
 
-        private void ApplyStatusEffectToDamageReceiver(int socketItemDataId, EntityInfo damageReceiverInfo, BaseCharacterEntity attacker, BaseCharacterEntity damageReceiver)
+        private void ApplyStatusEffectsWhenAttacked(int socketItemDataId, EntityInfo damageReceiverInfo, BaseCharacterEntity attacker, BaseCharacterEntity damageReceiver)
         {
             if (!GameInstance.Items.ContainsKey(socketItemDataId))
                 return;
