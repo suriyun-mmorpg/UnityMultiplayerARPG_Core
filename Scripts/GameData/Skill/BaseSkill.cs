@@ -412,7 +412,10 @@ namespace MultiplayerARPG
             int randomSeed,
             long? time)
         {
-            if (skillUser.IsServer)
+            if (skillUser == null)
+                return;
+            // Decrease player character entity's items
+            if (skillUser.IsServer && skillUser is BasePlayerCharacterEntity)
             {
                 // Not enough items
                 if (!DecreaseItems(skillUser))
