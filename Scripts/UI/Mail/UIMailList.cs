@@ -134,6 +134,8 @@ namespace MultiplayerARPG
         protected virtual void ClaimAllCallback(ResponseHandlerData requestHandler, AckResponseCode responseCode, ResponseClaimAllMailsItemsMessage response)
         {
             ClientMailActions.ResponseClaimAllMailsItems(requestHandler, responseCode, response);
+            CacheSelectionManager.DeselectSelectedUI();
+            CacheSelectionManager.Clear();
             Refresh();
             onClaimAllMailsItems.Invoke();
         }
@@ -146,6 +148,8 @@ namespace MultiplayerARPG
         protected virtual void DeleteAllCallback(ResponseHandlerData requestHandler, AckResponseCode responseCode, ResponseDeleteAllMailsMessage response)
         {
             ClientMailActions.ResponseDeleteAllMails(requestHandler, responseCode, response);
+            CacheSelectionManager.DeselectSelectedUI();
+            CacheSelectionManager.Clear();
             Refresh();
             onDeleteAllMails.Invoke();
         }
