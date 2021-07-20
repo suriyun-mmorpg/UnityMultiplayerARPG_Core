@@ -10,5 +10,7 @@ namespace MultiplayerARPG
         bool RequestDeleteMail(RequestDeleteMailMessage data, ResponseDelegate<ResponseDeleteMailMessage> callback);
         bool RequestSendMail(RequestSendMailMessage data, ResponseDelegate<ResponseSendMailMessage> callback);
         bool RequestMailNotification(ResponseDelegate<ResponseMailNotificationMessage> callback);
+        bool RequestClaimAllMailsItems(ResponseDelegate<ResponseClaimAllMailsItemsMessage> callback);
+        bool RequestDeleteAllMails(ResponseDelegate<ResponseDeleteAllMailsMessage> callback);
     }
 }

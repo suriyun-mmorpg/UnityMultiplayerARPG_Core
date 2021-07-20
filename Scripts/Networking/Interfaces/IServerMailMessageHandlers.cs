@@ -31,5 +31,13 @@ namespace MultiplayerARPG
         UniTaskVoid HandleRequestMailNotification(
             RequestHandlerData requestHandler, EmptyMessage request,
             RequestProceedResultDelegate<ResponseMailNotificationMessage> result);
+
+        UniTaskVoid HandleRequestClaimAllMailsItems(
+            RequestHandlerData requestHandler, EmptyMessage request,
+            RequestProceedResultDelegate<ResponseClaimAllMailsItemsMessage> result);
+
+        UniTaskVoid HandleRequestDeleteAllMails(
+            RequestHandlerData requestHandler, EmptyMessage request,
+            RequestProceedResultDelegate<ResponseDeleteAllMailsMessage> result);
     }
 }

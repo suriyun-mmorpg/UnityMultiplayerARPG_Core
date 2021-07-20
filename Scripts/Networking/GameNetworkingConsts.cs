@@ -112,5 +112,7 @@
         public const ushort ChangeGuildOptionId4 = 182;
         public const ushort ChangeGuildOptionId5 = 183;
         public const ushort ChangeGuildAutoAcceptRequests = 184;
+        public const ushort ClaimAllMailsItems = 185;
+        public const ushort DeleteAllMails = 186;
     }
 }

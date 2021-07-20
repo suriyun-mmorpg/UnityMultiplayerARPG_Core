@@ -41,5 +41,15 @@ namespace MultiplayerARPG
         {
             return Manager.ClientSendRequest(GameNetworkingConsts.MailNotification, EmptyMessage.Value, responseDelegate: callback);
         }
+
+        public bool RequestClaimAllMailsItems(ResponseDelegate<ResponseClaimAllMailsItemsMessage> callback)
+        {
+            return Manager.ClientSendRequest(GameNetworkingConsts.ClaimAllMailsItems, EmptyMessage.Value, responseDelegate: callback);
+        }
+
+        public bool RequestDeleteAllMails(ResponseDelegate<ResponseDeleteAllMailsMessage> callback)
+        {
+            return Manager.ClientSendRequest(GameNetworkingConsts.DeleteAllMails, EmptyMessage.Value, responseDelegate: callback);
+        }
     }
 }
