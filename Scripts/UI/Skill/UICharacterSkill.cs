@@ -96,17 +96,14 @@ namespace MultiplayerARPG
         {
             base.Update();
 
-            if (coolDownRemainsDuration <= 0f)
+            if (Character != null && Skill != null)
             {
-                if (Character != null && Skill != null)
+                int indexOfSkillUsage = Character.IndexOfSkillUsage(Skill.DataId, SkillUsageType.Skill);
+                if (indexOfSkillUsage >= 0)
                 {
-                    int indexOfSkillUsage = Character.IndexOfSkillUsage(Skill.DataId, SkillUsageType.Skill);
-                    if (indexOfSkillUsage >= 0)
-                    {
-                        coolDownRemainsDuration = Character.SkillUsages[indexOfSkillUsage].coolDownRemainsDuration;
-                        if (coolDownRemainsDuration <= 1f)
-                            coolDownRemainsDuration = 0f;
-                    }
+                    coolDownRemainsDuration = Character.SkillUsages[indexOfSkillUsage].coolDownRemainsDuration;
+                    if (coolDownRemainsDuration <= 1f)
+                        coolDownRemainsDuration = 0f;
                 }
             }
 

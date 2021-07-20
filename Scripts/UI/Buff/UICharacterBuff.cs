@@ -35,12 +35,9 @@ namespace MultiplayerARPG
         {
             base.Update();
 
-            if (buffRemainsDuration <= 0f)
-            {
-                buffRemainsDuration = CharacterBuff.buffRemainsDuration;
-                if (buffRemainsDuration <= 1f)
-                    buffRemainsDuration = 0f;
-            }
+            buffRemainsDuration = CharacterBuff.buffRemainsDuration;
+            if (buffRemainsDuration <= 1f)
+                buffRemainsDuration = 0f;
 
             if (buffRemainsDuration > 0f)
             {

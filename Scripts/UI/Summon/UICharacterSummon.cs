@@ -44,12 +44,9 @@ namespace MultiplayerARPG
         {
             base.Update();
 
-            if (summonRemainsDuration <= 0f)
-            {
-                summonRemainsDuration = CharacterSummon.summonRemainsDuration;
-                if (summonRemainsDuration <= 1f)
-                    summonRemainsDuration = 0f;
-            }
+            summonRemainsDuration = CharacterSummon.summonRemainsDuration;
+            if (summonRemainsDuration <= 1f)
+                summonRemainsDuration = 0f;
 
             if (summonRemainsDuration > 0f)
             {

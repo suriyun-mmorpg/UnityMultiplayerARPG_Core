@@ -35,12 +35,9 @@ namespace MultiplayerARPG
         {
             base.Update();
 
-            if (craftRemainsDuration <= 0f)
-            {
-                craftRemainsDuration = Data.craftRemainsDuration;
-                if (craftRemainsDuration <= 1f)
-                    craftRemainsDuration = 0f;
-            }
+            craftRemainsDuration = Data.craftRemainsDuration;
+            if (craftRemainsDuration <= 1f)
+                craftRemainsDuration = 0f;
 
             if (craftRemainsDuration > 0f)
             {

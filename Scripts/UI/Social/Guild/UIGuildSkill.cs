@@ -68,17 +68,15 @@ namespace MultiplayerARPG
         protected override void Update()
         {
             base.Update();
-            if (coolDownRemainsDuration <= 0f)
+
+            if (GameInstance.PlayingCharacter != null && GuildSkill != null)
             {
-                if (GameInstance.PlayingCharacter != null && GuildSkill != null)
+                int indexOfSkillUsage = GameInstance.PlayingCharacter.IndexOfSkillUsage(GuildSkill.DataId, SkillUsageType.GuildSkill);
+                if (indexOfSkillUsage >= 0)
                 {
-                    int indexOfSkillUsage = GameInstance.PlayingCharacter.IndexOfSkillUsage(GuildSkill.DataId, SkillUsageType.GuildSkill);
-                    if (indexOfSkillUsage >= 0)
-                    {
-                        coolDownRemainsDuration = GameInstance.PlayingCharacter.SkillUsages[indexOfSkillUsage].coolDownRemainsDuration;
-                        if (coolDownRemainsDuration <= 1f)
-                            coolDownRemainsDuration = 0f;
-                    }
+                    coolDownRemainsDuration = GameInstance.PlayingCharacter.SkillUsages[indexOfSkillUsage].coolDownRemainsDuration;
+                    if (coolDownRemainsDuration <= 1f)
+                        coolDownRemainsDuration = 0f;
                 }
             }
 

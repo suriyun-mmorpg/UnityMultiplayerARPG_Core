@@ -231,12 +231,9 @@ namespace MultiplayerARPG
 
         private void UpdateLockRemainsDuration(float deltaTime)
         {
-            if (lockRemainsDuration <= 0f)
-            {
-                lockRemainsDuration = CharacterItem != null ? CharacterItem.lockRemainsDuration : 0f;
-                if (lockRemainsDuration <= 1f)
-                    lockRemainsDuration = 0f;
-            }
+            lockRemainsDuration = CharacterItem != null ? CharacterItem.lockRemainsDuration : 0f;
+            if (lockRemainsDuration <= 1f)
+                lockRemainsDuration = 0f;
 
             if (lockRemainsDuration > 0f)
             {
@@ -280,17 +277,14 @@ namespace MultiplayerARPG
 
         private void UpdateSkillCoolDownRemainsDuration(BaseSkill skill, float deltaTime)
         {
-            if (coolDownRemainsDuration <= 0f)
+            if (Character != null && skill != null)
             {
-                if (Character != null && skill != null)
+                int indexOfSkillUsage = Character.IndexOfSkillUsage(skill.DataId, SkillUsageType.Skill);
+                if (indexOfSkillUsage >= 0)
                 {
-                    int indexOfSkillUsage = Character.IndexOfSkillUsage(skill.DataId, SkillUsageType.Skill);
-                    if (indexOfSkillUsage >= 0)
-                    {
-                        coolDownRemainsDuration = Character.SkillUsages[indexOfSkillUsage].coolDownRemainsDuration;
-                        if (coolDownRemainsDuration <= 1f)
-                            coolDownRemainsDuration = 0f;
-                    }
+                    coolDownRemainsDuration = Character.SkillUsages[indexOfSkillUsage].coolDownRemainsDuration;
+                    if (coolDownRemainsDuration <= 1f)
+                        coolDownRemainsDuration = 0f;
                 }
             }
 
