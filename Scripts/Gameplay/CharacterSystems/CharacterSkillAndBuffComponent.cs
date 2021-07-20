@@ -4,7 +4,7 @@ using UnityEngine;
 namespace MultiplayerARPG
 {
     [DisallowMultipleComponent]
-    public class CharacterSkillAndBuffUpdateComponent : BaseGameEntityComponent<BaseCharacterEntity>
+    public class CharacterSkillAndBuffComponent : BaseGameEntityComponent<BaseCharacterEntity>
     {
         public const float SKILL_BUFF_UPDATE_DURATION = 1f;
 

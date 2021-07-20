@@ -73,7 +73,7 @@ namespace MultiplayerARPG
         {
             base.InitialRequiredComponents();
             Crafting = gameObject.GetOrAddComponent<PlayerCharacterCraftingComponent>();
-            gameObject.GetOrAddComponent<PlayerCharacterItemUpdateComponent>();
+            gameObject.GetOrAddComponent<PlayerCharacterItemLockAndExpireComponent>();
         }
 
         protected override void EntityUpdate()

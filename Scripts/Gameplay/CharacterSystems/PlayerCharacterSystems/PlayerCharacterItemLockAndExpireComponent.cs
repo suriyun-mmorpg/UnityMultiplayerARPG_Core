@@ -3,7 +3,7 @@
 namespace MultiplayerARPG
 {
     [DisallowMultipleComponent]
-    public class PlayerCharacterItemUpdateComponent : BaseGameEntityComponent<BasePlayerCharacterEntity>
+    public class PlayerCharacterItemLockAndExpireComponent : BaseGameEntityComponent<BasePlayerCharacterEntity>
     {
         public const float ITEM_UPDATE_DURATION = 1f;
 
