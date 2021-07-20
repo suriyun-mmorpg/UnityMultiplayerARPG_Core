@@ -24,7 +24,7 @@ namespace MultiplayerARPG
         public int DeleteTimestamp { get; set; }
         public int SentTimestamp { get; set; }
 
-        public bool HasItemsToClaim()
+        public bool HaveItemsToClaim()
         {
             return Gold != 0 || Currencies.Count > 0 || Items.Count > 0;
         }

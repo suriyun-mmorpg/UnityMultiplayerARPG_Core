@@ -106,13 +106,13 @@ namespace MultiplayerARPG
                 responseCode == AckResponseCode.Timeout)
                 return;
             UIMailListEntry tempUi;
-            CacheList.Generate(response.mails, (index, mailListEntry, ui) =>
+            CacheList.Generate(response.mails, (index, data, ui) =>
             {
                 tempUi = ui.GetComponent<UIMailListEntry>();
-                tempUi.Data = mailListEntry;
+                tempUi.Data = data;
                 tempUi.Show();
                 CacheSelectionManager.Add(tempUi);
-                if (!string.IsNullOrEmpty(selectedId) && selectedId == mailListEntry.Id)
+                if (!string.IsNullOrEmpty(selectedId) && selectedId == data.Id)
                     tempUi.OnClickSelect();
             });
             if (listEmptyObject != null)

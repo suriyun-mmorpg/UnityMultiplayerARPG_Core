@@ -1,6 +1,7 @@
 ﻿using LiteNetLibManager;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Events;
 
 namespace MultiplayerARPG
 {
@@ -32,6 +33,11 @@ namespace MultiplayerARPG
         public GameObject[] claimObjects;
         public GameObject[] unclaimObjects;
 
+        [Header("Events")]
+        public UnityEvent onReadMail;
+        public UnityEvent onClaimMailItems;
+        public UnityEvent onDeleteMail;
+
         private string mailId;
         public string MailId
         {
@@ -46,6 +52,8 @@ namespace MultiplayerARPG
             }
         }
 
+        public Mail Mail { get; protected set; }
+
         private void ReadMail()
         {
             UpdateData(null);
@@ -59,7 +67,9 @@ namespace MultiplayerARPG
         {
             ClientMailActions.ResponseReadMail(requestHandler, responseCode, response);
             if (responseCode.ShowUnhandledResponseMessageDialog(response.message)) return;
-            UpdateData(response.mail);
+            Mail = response.mail;
+            UpdateData(Mail);
+            onReadMail.Invoke();
         }
 
         public void OnClickClaimItems()
@@ -75,9 +85,11 @@ namespace MultiplayerARPG
             ClientMailActions.ResponseClaimMailItems(requestHandler, responseCode, response);
             if (responseCode.ShowUnhandledResponseMessageDialog(response.message)) return;
             UISceneGlobal.Singleton.ShowMessageDialog(LanguageManager.GetText(UITextKeys.UI_LABEL_SUCCESS.ToString()), LanguageManager.GetText(UITextKeys.UI_MAIL_CLAIMED.ToString()));
-            Hide();
+            Mail.IsClaim = true;
+            UpdateData(Mail);
             if (uiMailList)
                 uiMailList.Refresh();
+            onClaimMailItems.Invoke();
         }
 
         public void OnClickDelete()
@@ -96,6 +108,7 @@ namespace MultiplayerARPG
             Hide();
             if (uiMailList)
                 uiMailList.Refresh();
+            onDeleteMail.Invoke();
         }
 
         protected virtual void UpdateData(Mail mail)
@@ -105,6 +118,7 @@ namespace MultiplayerARPG
                 textSenderName.text = string.Format(
                     LanguageManager.GetText(formatSenderName),
                     mail == null ? LanguageManager.GetUnknowTitle() : mail.SenderName);
+                textSenderName.SetGameObjectActive(mail != null);
             }
 
             if (textTitle != null)
@@ -112,6 +126,7 @@ namespace MultiplayerARPG
                 textTitle.text = string.Format(
                     LanguageManager.GetText(formatTitle),
                     mail == null ? LanguageManager.GetUnknowTitle() : mail.Title);
+                textTitle.SetGameObjectActive(mail != null);
             }
 
             if (textContent != null)
@@ -119,6 +134,7 @@ namespace MultiplayerARPG
                 textContent.text = string.Format(
                     LanguageManager.GetText(formatContent),
                     mail == null ? string.Empty : mail.Content);
+                textContent.SetGameObjectActive(mail != null);
             }
 
             if (textGold != null)
@@ -126,7 +142,7 @@ namespace MultiplayerARPG
                 textGold.text = string.Format(
                     LanguageManager.GetText(formatGold),
                     mail == null ? "0" : mail.Gold.ToString("N0"));
-                textGold.gameObject.SetActive(mail != null && mail.Gold != 0);
+                textGold.SetGameObjectActive(mail != null && mail.Gold != 0);
             }
 
             if (uiCurrencies != null)
@@ -179,6 +195,7 @@ namespace MultiplayerARPG
                 textSentDate.text = string.Format(
                     LanguageManager.GetText(formatSentDate),
                     dateTime.GetPrettyDate());
+                textSentDate.SetGameObjectActive(mail != null);
             }
 
             if (readObjects != null && readObjects.Length > 0)
@@ -201,7 +218,7 @@ namespace MultiplayerARPG
             {
                 for (int i = 0; i < claimObjects.Length; ++i)
                 {
-                    claimObjects[i].SetActive(mail != null && mail.HasItemsToClaim() && mail.IsClaim);
+                    claimObjects[i].SetActive(mail != null && mail.HaveItemsToClaim() && mail.IsClaim);
                 }
             }
 
@@ -209,7 +226,7 @@ namespace MultiplayerARPG
             {
                 for (int i = 0; i < unclaimObjects.Length; ++i)
                 {
-                    unclaimObjects[i].SetActive(mail != null && mail.HasItemsToClaim() && !mail.IsClaim);
+                    unclaimObjects[i].SetActive(mail != null && mail.HaveItemsToClaim() && !mail.IsClaim);
                 }
             }
         }
