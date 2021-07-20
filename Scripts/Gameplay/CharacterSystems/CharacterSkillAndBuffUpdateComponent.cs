@@ -1,10 +1,10 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 
 namespace MultiplayerARPG
 {
-    public class CharacterSkillAndBuffComponent : BaseGameEntityComponent<BaseCharacterEntity>
+    [DisallowMultipleComponent]
+    public class CharacterSkillAndBuffUpdateComponent : BaseGameEntityComponent<BaseCharacterEntity>
     {
         public const float SKILL_BUFF_UPDATE_DURATION = 1f;
 
@@ -12,16 +12,6 @@ namespace MultiplayerARPG
         private float deltaTime;
         private CharacterRecoveryData nonApplierRecoveryBuff;
         private readonly Dictionary<string, CharacterRecoveryData> recoveryBuffs = new Dictionary<string, CharacterRecoveryData>();
-        private bool isPlayerCharacterEntity;
-        private BasePlayerCharacterEntity playerCharacterEnity;
-
-        public override void EntityAwake()
-        {
-            base.EntityAwake();
-            isPlayerCharacterEntity = Entity is BasePlayerCharacterEntity;
-            if (isPlayerCharacterEntity)
-                playerCharacterEnity = Entity as BasePlayerCharacterEntity;
-        }
 
         public override sealed void EntityUpdate()
         {
@@ -29,11 +19,11 @@ namespace MultiplayerARPG
                 return;
 
             deltaTime = Time.unscaledDeltaTime;
+            updatingTime += deltaTime;
 
             if (Entity.IsRecaching || Entity.IsDead())
                 return;
 
-            updatingTime += deltaTime;
             if (updatingTime >= SKILL_BUFF_UPDATE_DURATION)
             {
                 // Removing summons if it should

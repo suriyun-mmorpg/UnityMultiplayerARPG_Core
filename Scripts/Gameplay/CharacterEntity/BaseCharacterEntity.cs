@@ -10,7 +10,7 @@ namespace MultiplayerARPG
 {
     [RequireComponent(typeof(CharacterModelManager))]
     [RequireComponent(typeof(CharacterRecoveryComponent))]
-    [RequireComponent(typeof(CharacterSkillAndBuffComponent))]
+    [RequireComponent(typeof(CharacterSkillAndBuffUpdateComponent))]
     public abstract partial class BaseCharacterEntity : DamageableEntity, ICharacterData
     {
         public const float ACTION_DELAY = 0.1f;
@@ -158,6 +158,8 @@ namespace MultiplayerARPG
             UseSkillComponent = gameObject.GetOrAddComponent<ICharacterUseSkillComponent, DefaultCharacterUseSkillComponent>();
             ReloadComponent = gameObject.GetOrAddComponent<ICharacterReloadComponent, DefaultCharacterReloadComponent>();
             ChargeComponent = gameObject.GetOrAddComponent<ICharacterChargeComponent, DefaultCharacterChargeComponent>();
+            gameObject.GetOrAddComponent<CharacterRecoveryComponent>();
+            gameObject.GetOrAddComponent<CharacterSkillAndBuffUpdateComponent>();
         }
 
         protected override void EntityAwake()
