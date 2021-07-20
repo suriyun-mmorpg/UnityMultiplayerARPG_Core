@@ -90,8 +90,7 @@ public static class GenericUtils
         {
             if (gameObject == null)
                 continue;
-            comp = gameObject.GetComponent<T>();
-            if (comp != null)
+            if (gameObject.TryGetComponent(out comp))
                 result.Add(comp);
         }
         return result;
@@ -101,8 +100,8 @@ public static class GenericUtils
     {
         if (gameObject == null)
             return null;
-        T result = gameObject.GetComponent<T>();
-        if (result == null)
+        T result;
+        if (!gameObject.TryGetComponent(out result))
             result = gameObject.AddComponent<T>();
         return result;
     }
@@ -111,8 +110,8 @@ public static class GenericUtils
     {
         if (gameObject == null)
             return null;
-        T result = gameObject.GetComponent<T>();
-        if (result == null)
+        T result;
+        if (!gameObject.TryGetComponent(out result))
         {
             result = gameObject.AddComponent<T>();
             onAddComponent.Invoke(result);
@@ -120,13 +119,13 @@ public static class GenericUtils
         return result;
     }
 
-    public static TInterface GetOrAddComponent<TInterface, T>(this GameObject gameObject) 
+    public static TInterface GetOrAddComponent<TInterface, T>(this GameObject gameObject)
         where T : Component, TInterface
     {
         if (gameObject == null)
             return default;
-        TInterface result = gameObject.GetComponent<TInterface>();
-        if (result == null)
+        TInterface result;
+        if (!gameObject.TryGetComponent(out result))
             result = gameObject.AddComponent<T>();
         return result;
     }
@@ -136,8 +135,8 @@ public static class GenericUtils
     {
         if (gameObject == null)
             return default;
-        TInterface result = gameObject.GetComponent<TInterface>();
-        if (result == null)
+        TInterface result;
+        if (!gameObject.TryGetComponent(out result))
         {
             result = gameObject.AddComponent<T>();
             onAddComponent.Invoke(result);
