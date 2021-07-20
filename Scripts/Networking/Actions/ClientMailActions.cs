@@ -10,6 +10,8 @@ namespace MultiplayerARPG
         public static System.Action<ResponseHandlerData, AckResponseCode, ResponseDeleteMailMessage> onResponseDeleteMail;
         public static System.Action<ResponseHandlerData, AckResponseCode, ResponseSendMailMessage> onResponseSendMail;
         public static System.Action<ResponseHandlerData, AckResponseCode, ResponseMailNotificationMessage> onResponseMailNotification;
+        public static System.Action<ResponseHandlerData, AckResponseCode, ResponseClaimAllMailsItemsMessage> onResponseClaimAllMailsItems;
+        public static System.Action<ResponseHandlerData, AckResponseCode, ResponseDeleteAllMailsMessage> onResponseDeleteAllMails;
 
         public static void ResponseMailList(ResponseHandlerData requestHandler, AckResponseCode responseCode, ResponseMailListMessage response)
         {
@@ -50,6 +52,20 @@ namespace MultiplayerARPG
             ClientGenericActions.ClientReceiveGameMessage(response.message);
             if (onResponseMailNotification != null)
                 onResponseMailNotification.Invoke(requestHandler, responseCode, response);
+        }
+
+        public static void ResponseClaimAllMailsItems(ResponseHandlerData requestHandler, AckResponseCode responseCode, ResponseClaimAllMailsItemsMessage response)
+        {
+            ClientGenericActions.ClientReceiveGameMessage(response.message);
+            if (onResponseClaimAllMailsItems != null)
+                onResponseClaimAllMailsItems.Invoke(requestHandler, responseCode, response);
+        }
+
+        public static void ResponseDeleteAllMails(ResponseHandlerData requestHandler, AckResponseCode responseCode, ResponseDeleteAllMailsMessage response)
+        {
+            ClientGenericActions.ClientReceiveGameMessage(response.message);
+            if (onResponseDeleteAllMails != null)
+                onResponseDeleteAllMails.Invoke(requestHandler, responseCode, response);
         }
     }
 }

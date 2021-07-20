@@ -1,5 +1,6 @@
 ﻿using LiteNetLibManager;
 using UnityEngine;
+using UnityEngine.Events;
 
 namespace MultiplayerARPG
 {
@@ -10,6 +11,11 @@ namespace MultiplayerARPG
         public UIMail uiDialog;
         public UIMailListEntry uiPrefab;
         public Transform uiContainer;
+
+        [Header("Events")]
+        public UnityEvent onRefresh = new UnityEvent();
+        public UnityEvent onClaimAllMailsItems = new UnityEvent();
+        public UnityEvent onDeleteAllMails = new UnityEvent();
 
         [Header("Options")]
         public bool onlyNewMails = false;
@@ -117,16 +123,31 @@ namespace MultiplayerARPG
             });
             if (listEmptyObject != null)
                 listEmptyObject.SetActive(response.mails.Length == 0);
-        }
-
-        public void OnClickDeleteAll()
-        {
-
+            onRefresh.Invoke();
         }
 
         public void OnClickClaimAll()
         {
+            GameInstance.ClientMailHandlers.RequestClaimAllMailsItems(ClaimAllCallback);
+        }
 
+        protected virtual void ClaimAllCallback(ResponseHandlerData requestHandler, AckResponseCode responseCode, ResponseClaimAllMailsItemsMessage response)
+        {
+            ClientMailActions.ResponseClaimAllMailsItems(requestHandler, responseCode, response);
+            Refresh();
+            onClaimAllMailsItems.Invoke();
+        }
+
+        public void OnClickDeleteAll()
+        {
+            GameInstance.ClientMailHandlers.RequestDeleteAllMails(DeleteAllCallback);
+        }
+
+        protected virtual void DeleteAllCallback(ResponseHandlerData requestHandler, AckResponseCode responseCode, ResponseDeleteAllMailsMessage response)
+        {
+            ClientMailActions.ResponseDeleteAllMails(requestHandler, responseCode, response);
+            Refresh();
+            onDeleteAllMails.Invoke();
         }
     }
 }

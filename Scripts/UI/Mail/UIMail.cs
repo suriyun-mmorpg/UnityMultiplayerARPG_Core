@@ -34,9 +34,9 @@ namespace MultiplayerARPG
         public GameObject[] unclaimObjects;
 
         [Header("Events")]
-        public UnityEvent onReadMail;
-        public UnityEvent onClaimMailItems;
-        public UnityEvent onDeleteMail;
+        public UnityEvent onReadMail = new UnityEvent();
+        public UnityEvent onClaimMailItems = new UnityEvent();
+        public UnityEvent onDeleteMail = new UnityEvent();
 
         private string mailId;
         public string MailId
