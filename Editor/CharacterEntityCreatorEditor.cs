@@ -108,7 +108,7 @@ namespace MultiplayerARPG
             var newObject = Instantiate(fbx, Vector3.zero, Quaternion.identity);
             newObject.AddComponent<LiteNetLibIdentity>();
             newObject.AddComponent<CharacterRecoveryComponent>();
-            newObject.AddComponent<CharacterSkillAndBuffComponent>();
+            newObject.AddComponent<CharacterSkillAndBuffUpdateComponent>();
 
             BaseCharacterModel characterModel = null;
             switch (characterModelType)
@@ -191,6 +191,7 @@ namespace MultiplayerARPG
             {
                 case CharacterEntityType.PlayerCharacterEntity:
                     newObject.AddComponent<PlayerCharacterCraftingComponent>();
+                    newObject.AddComponent<PlayerCharacterItemUpdateComponent>();
                     PlayerCharacterEntity playerCharacterEntity = newObject.AddComponent<PlayerCharacterEntity>();
                     baseCharacterEntity = playerCharacterEntity;
                     if (!string.IsNullOrEmpty(dataId))
