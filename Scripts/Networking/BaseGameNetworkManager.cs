@@ -188,6 +188,8 @@ namespace MultiplayerARPG
                 RegisterRequestToServer<RequestDeleteMailMessage, ResponseDeleteMailMessage>(GameNetworkingConsts.DeleteMail, ServerMailMessageHandlers.HandleRequestDeleteMail);
                 RegisterRequestToServer<RequestSendMailMessage, ResponseSendMailMessage>(GameNetworkingConsts.SendMail, ServerMailMessageHandlers.HandleRequestSendMail);
                 RegisterRequestToServer<EmptyMessage, ResponseMailNotificationMessage>(GameNetworkingConsts.MailNotification, ServerMailMessageHandlers.HandleRequestMailNotification);
+                RegisterRequestToServer<EmptyMessage, ResponseClaimAllMailsItemsMessage>(GameNetworkingConsts.ClaimAllMailsItems, ServerMailMessageHandlers.HandleRequestClaimAllMailsItems);
+                RegisterRequestToServer<EmptyMessage, ResponseDeleteAllMailsMessage>(GameNetworkingConsts.DeleteAllMails, ServerMailMessageHandlers.HandleRequestDeleteAllMails);
             }
             // Storage
             if (ServerStorageMessageHandlers != null)
