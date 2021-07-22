@@ -10,7 +10,6 @@ namespace MultiplayerARPG
     [DefaultExecutionOrder(1)]
     public partial class GameEntityModel : MonoBehaviour
     {
-        [System.Flags]
         public enum EVisibleState : byte
         {
             Visible,
