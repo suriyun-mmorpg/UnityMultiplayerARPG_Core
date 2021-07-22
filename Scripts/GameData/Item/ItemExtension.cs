@@ -261,36 +261,36 @@ namespace MultiplayerARPG
         #endregion
 
         #region Socket Enhancer Extension
-        public static void ApplySelfStatusEffectsWhenAttacking<T>(this T equipmentItem, EntityInfo applier, BaseCharacterEntity target)
+        public static void ApplySelfStatusEffectsWhenAttacking<T>(this T socketEnhancerItem, EntityInfo applier, BaseCharacterEntity target)
             where T : ISocketEnhancerItem
         {
-            if (target == null || equipmentItem == null || !equipmentItem.IsEquipment())
+            if (target == null || socketEnhancerItem == null || !socketEnhancerItem.IsSocketEnhancer())
                 return;
-            equipmentItem.SelfStatusEffectsWhenAttacking.ApplyStatusEffect(1, applier, target);
+            socketEnhancerItem.SelfStatusEffectsWhenAttacking.ApplyStatusEffect(1, applier, target);
         }
 
-        public static void ApplyEnemyStatusEffectsWhenAttacking<T>(this T equipmentItem, EntityInfo applier, BaseCharacterEntity target)
+        public static void ApplyEnemyStatusEffectsWhenAttacking<T>(this T socketEnhancerItem, EntityInfo applier, BaseCharacterEntity target)
             where T : ISocketEnhancerItem
         {
-            if (target == null || equipmentItem == null || !equipmentItem.IsEquipment())
+            if (target == null || socketEnhancerItem == null || !socketEnhancerItem.IsSocketEnhancer())
                 return;
-            equipmentItem.EnemyStatusEffectsWhenAttacking.ApplyStatusEffect(1, applier, target);
+            socketEnhancerItem.EnemyStatusEffectsWhenAttacking.ApplyStatusEffect(1, applier, target);
         }
 
-        public static void ApplySelfStatusEffectsWhenAttacked<T>(this T equipmentItem, EntityInfo applier, BaseCharacterEntity target)
+        public static void ApplySelfStatusEffectsWhenAttacked<T>(this T socketEnhancerItem, EntityInfo applier, BaseCharacterEntity target)
             where T : ISocketEnhancerItem
         {
-            if (target == null || equipmentItem == null || !equipmentItem.IsEquipment())
+            if (target == null || socketEnhancerItem == null || !socketEnhancerItem.IsSocketEnhancer())
                 return;
-            equipmentItem.SelfStatusEffectsWhenAttacked.ApplyStatusEffect(1, applier, target);
+            socketEnhancerItem.SelfStatusEffectsWhenAttacked.ApplyStatusEffect(1, applier, target);
         }
 
-        public static void ApplyEnemyStatusEffectsWhenAttacked<T>(this T equipmentItem, EntityInfo applier, BaseCharacterEntity target)
+        public static void ApplyEnemyStatusEffectsWhenAttacked<T>(this T socketEnhancerItem, EntityInfo applier, BaseCharacterEntity target)
             where T : ISocketEnhancerItem
         {
-            if (target == null || equipmentItem == null || !equipmentItem.IsEquipment())
+            if (target == null || socketEnhancerItem == null || !socketEnhancerItem.IsSocketEnhancer())
                 return;
-            equipmentItem.EnemyStatusEffectsWhenAttacked.ApplyStatusEffect(1, applier, target);
+            socketEnhancerItem.EnemyStatusEffectsWhenAttacked.ApplyStatusEffect(1, applier, target);
         }
         #endregion
 
