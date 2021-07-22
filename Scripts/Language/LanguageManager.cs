@@ -374,6 +374,15 @@ namespace MultiplayerARPG
             return defaultValue;
         }
 
+        public static string GetTextByLanguage(string languageKey, string key, string defaultValue = "")
+        {
+            if (Languages.ContainsKey(languageKey) && Languages[languageKey].ContainsKey(key))
+                return Languages[languageKey][key];
+            if (DefaultLocale.Texts.ContainsKey(key))
+                return DefaultLocale.Texts[key];
+            return defaultValue;
+        }
+
         public static string GetUnknowTitle()
         {
             return GetText(UITextKeys.UI_UNKNOW_GAME_DATA_TITLE.ToString(), "Unknow");

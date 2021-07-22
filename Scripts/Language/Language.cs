@@ -974,6 +974,15 @@ namespace MultiplayerARPG
         /// Format => {0} = {Amount * 100}
         /// </summary>
         UI_FORMAT_EXP_RATE_RATE,
+        // 1.67b New Formats
+        /// <summary>
+        /// Format => {0} = {Item's Title}, {1} = {Amount}
+        /// </summary>
+        UI_FORMAT_GENERATE_CAST_SHOP_ITEM_TITLE,
+        /// <summary>
+        /// Format => {0} = {Item's Title}, {1} = {Amount}, {2} = {Item's Description}
+        /// </summary>
+        UI_FORMAT_GENERATE_CAST_SHOP_ITEM_DESCRIPTION,
     }
 
     public static class DefaultLocale
@@ -1459,6 +1468,9 @@ namespace MultiplayerARPG
             Texts.Add(UIFormatKeys.UI_FORMAT_EXP_RATE.ToString(), "Exp Rate: {0}%");
             Texts.Add(UIFormatKeys.UI_FORMAT_GOLD_RATE_RATE.ToString(), "% of Gold Rate: {0}%");
             Texts.Add(UIFormatKeys.UI_FORMAT_EXP_RATE_RATE.ToString(), "% of Exp Rate: {0}%");
+            // Format - 1.67b - Cash shop item generator
+            Texts.Add(UIFormatKeys.UI_FORMAT_GENERATE_CAST_SHOP_ITEM_TITLE.ToString(), "{0} x {1}");
+            Texts.Add(UIFormatKeys.UI_FORMAT_GENERATE_CAST_SHOP_ITEM_DESCRIPTION.ToString(), "Buy {0} x {1}\n\n{2}");
         }
     }
 
@@ -1489,6 +1501,21 @@ namespace MultiplayerARPG
                     if (string.IsNullOrEmpty(entry.key))
                         continue;
                     if (entry.key.Equals(LanguageManager.CurrentLanguageKey))
+                        return entry.value;
+                }
+            }
+            return defaultValue;
+        }
+
+        public static string GetTextByLanguageKey(IEnumerable<LanguageData> langs, string languageKey, string defaultValue)
+        {
+            if (langs != null)
+            {
+                foreach (LanguageData entry in langs)
+                {
+                    if (string.IsNullOrEmpty(entry.key))
+                        continue;
+                    if (entry.key.Equals(languageKey))
                         return entry.value;
                 }
             }
