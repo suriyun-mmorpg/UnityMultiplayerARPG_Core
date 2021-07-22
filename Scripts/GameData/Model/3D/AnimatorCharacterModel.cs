@@ -605,40 +605,41 @@ namespace MultiplayerARPG
             }
 
             int moveType = 0;
-            switch (extraMovementState)
-            {
-                case ExtraMovementState.IsCrouching:
-                    moveType = 1;
-                    moveAnimationSpeedMultiplier *= crouchMoveAnimSpeedRate;
-                    idleAnimationSpeedMultiplier = crouchIdleAnimSpeedRate;
-                    break;
-                case ExtraMovementState.IsCrawling:
-                    moveType = 2;
-                    moveAnimationSpeedMultiplier *= crawlMoveAnimSpeedRate;
-                    idleAnimationSpeedMultiplier = crawlIdleAnimSpeedRate;
-                    break;
-                case ExtraMovementState.IsSprinting:
-                    moveSpeed *= 2;
-                    sideMoveSpeed *= 2;
-                    moveAnimationSpeedMultiplier *= sprintAnimSpeedRate;
-                    idleAnimationSpeedMultiplier = idleAnimSpeedRate;
-                    break;
-                case ExtraMovementState.IsWalking:
-                    moveSpeed *= 0.5f;
-                    sideMoveSpeed *= 0.5f;
-                    moveAnimationSpeedMultiplier *= walkAnimSpeedRate;
-                    idleAnimationSpeedMultiplier = idleAnimSpeedRate;
-                    break;
-                default:
-                    moveAnimationSpeedMultiplier *= moveAnimSpeedRate;
-                    idleAnimationSpeedMultiplier = idleAnimSpeedRate;
-                    break;
-            }
-
             if (movementState.HasFlag(MovementState.IsUnderWater))
             {
                 moveAnimationSpeedMultiplier *= swimMoveAnimSpeedRate;
                 idleAnimationSpeedMultiplier = swimIdleAnimSpeedRate;
+            }
+            else if (movementState.HasFlag(MovementState.IsCrouching))
+            {
+                moveType = 1;
+                moveAnimationSpeedMultiplier *= crouchMoveAnimSpeedRate;
+                idleAnimationSpeedMultiplier = crouchIdleAnimSpeedRate;
+            }
+            else if (movementState.HasFlag(MovementState.IsCrawling))
+            {
+                moveType = 2;
+                moveAnimationSpeedMultiplier *= crawlMoveAnimSpeedRate;
+                idleAnimationSpeedMultiplier = crawlIdleAnimSpeedRate;
+            }
+            else if (movementState.HasFlag(MovementState.IsSprinting))
+            {
+                moveSpeed *= 2;
+                sideMoveSpeed *= 2;
+                moveAnimationSpeedMultiplier *= sprintAnimSpeedRate;
+                idleAnimationSpeedMultiplier = idleAnimSpeedRate;
+            }
+            else if (movementState.HasFlag(MovementState.IsWalking))
+            {
+                moveSpeed *= 0.5f;
+                sideMoveSpeed *= 0.5f;
+                moveAnimationSpeedMultiplier *= walkAnimSpeedRate;
+                idleAnimationSpeedMultiplier = idleAnimSpeedRate;
+            }
+            else
+            {
+                moveAnimationSpeedMultiplier *= moveAnimSpeedRate;
+                idleAnimationSpeedMultiplier = idleAnimSpeedRate;
             }
 
             // Character may attacking, set character to idle state, 

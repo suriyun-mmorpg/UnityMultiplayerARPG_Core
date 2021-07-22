@@ -110,18 +110,12 @@ namespace MultiplayerARPG
             }
             else
             {
-                switch (Entity.ExtraMovementState)
-                {
-                    case ExtraMovementState.IsCrouching:
-                        Apply(crouchSettings);
-                        break;
-                    case ExtraMovementState.IsCrawling:
-                        Apply(crawlSettings);
-                        break;
-                    default:
-                        Apply(standSettings);
-                        break;
-                }
+                if (Entity.MovementState.HasFlag(MovementState.IsCrouching))
+                    Apply(crouchSettings);
+                else if (Entity.MovementState.HasFlag(MovementState.IsCrawling))
+                    Apply(crawlSettings);
+                else
+                    Apply(standSettings);
             }
         }
 

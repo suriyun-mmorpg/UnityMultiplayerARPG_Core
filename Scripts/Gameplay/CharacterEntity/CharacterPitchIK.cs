@@ -34,27 +34,14 @@ namespace MultiplayerARPG
             {
                 if (!characterEntity || characterEntity.IsDead())
                     return false;
-                if (characterEntity.MovementState == MovementState.IsUnderWater)
-                {
-                    if (!enableWhileSwiming)
-                        return false;
-                    return true;
-                }
-                switch (characterEntity.ExtraMovementState)
-                {
-                    case ExtraMovementState.IsCrouching:
-                        if (!enableWhileCrouching)
-                            return false;
-                        break;
-                    case ExtraMovementState.IsCrawling:
-                        if (!enableWhileCrawling)
-                            return false;
-                        break;
-                    default:
-                        if (!enableWhileStanding)
-                            return false;
-                        break;
-                }
+                if (characterEntity.MovementState.HasFlag(MovementState.IsUnderWater) && !enableWhileSwiming)
+                    return false;
+                else if (characterEntity.MovementState.HasFlag(MovementState.IsCrouching) && !enableWhileCrouching)
+                    return false;
+                else if (characterEntity.MovementState.HasFlag(MovementState.IsCrawling) && !enableWhileCrawling)
+                    return false;
+                else if (!enableWhileStanding)
+                    return false;
                 return true;
             }
         }

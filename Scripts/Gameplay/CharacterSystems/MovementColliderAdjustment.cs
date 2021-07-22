@@ -59,7 +59,7 @@ namespace MultiplayerARPG
         private OpenCharacterController openCharacterController;
         private CapsuleCollider capsuleCollider;
         private bool previousIsUnderWater;
-        private ExtraMovementState previousExtraMovementState;
+        private MovementState previousMovementState;
 
         public override void EntityAwake()
         {
@@ -193,23 +193,17 @@ namespace MultiplayerARPG
             {
                 Apply(swimSettings);
             }
-            else if (Entity.ExtraMovementState != previousExtraMovementState)
+            else if (Entity.MovementState != previousMovementState)
             {
-                switch (Entity.ExtraMovementState)
-                {
-                    case ExtraMovementState.IsCrouching:
-                        Apply(crouchSettings);
-                        break;
-                    case ExtraMovementState.IsCrawling:
-                        Apply(crawlSettings);
-                        break;
-                    default:
-                        Apply(standSettings);
-                        break;
-                }
+                if (Entity.MovementState.HasFlag(MovementState.IsCrouching))
+                    Apply(crouchSettings);
+                else if (Entity.MovementState.HasFlag(MovementState.IsCrawling))
+                    Apply(crawlSettings);
+                else
+                    Apply(standSettings);
             }
             previousIsUnderWater = isUnderWater;
-            previousExtraMovementState = Entity.ExtraMovementState;
+            previousMovementState = Entity.MovementState;
         }
 
         private void Apply(Settings settings)

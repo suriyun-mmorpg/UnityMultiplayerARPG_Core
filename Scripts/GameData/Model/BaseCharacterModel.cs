@@ -124,7 +124,6 @@ namespace MultiplayerARPG
         public bool isDead { get; protected set; }
         public float moveAnimationSpeedMultiplier { get; protected set; }
         public MovementState movementState { get; protected set; }
-        public ExtraMovementState extraMovementState { get; protected set; }
         public Vector2 direction2D { get; protected set; }
 
         // Public events
@@ -264,7 +263,7 @@ namespace MultiplayerARPG
                 SetEquipItems(previousModel.equipItems);
                 SetBuffs(previousModel.buffs);
                 SetMoveAnimationSpeedMultiplier(previousModel.moveAnimationSpeedMultiplier);
-                SetMovementState(previousModel.movementState, previousModel.extraMovementState, direction2D);
+                SetMovementState(previousModel.movementState, direction2D);
             }
             else
             {
@@ -708,12 +707,11 @@ namespace MultiplayerARPG
             this.moveAnimationSpeedMultiplier = moveAnimationSpeedMultiplier;
         }
 
-        public void SetMovementState(MovementState movementState, ExtraMovementState extraMovementState, Vector2 direction2D)
+        public void SetMovementState(MovementState movementState, Vector2 direction2D)
         {
             if (!Application.isPlaying)
                 return;
             this.movementState = movementState;
-            this.extraMovementState = extraMovementState;
             this.direction2D = direction2D;
             PlayMoveAnimation();
         }
@@ -722,7 +720,7 @@ namespace MultiplayerARPG
         {
             SetIsDead(false);
             SetMoveAnimationSpeedMultiplier(1f);
-            SetMovementState(MovementState.IsGrounded, ExtraMovementState.None, Vector2.down);
+            SetMovementState(MovementState.IsGrounded, Vector2.down);
         }
 
         /// <summary>

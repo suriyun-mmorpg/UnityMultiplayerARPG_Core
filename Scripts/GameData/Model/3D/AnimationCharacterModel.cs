@@ -635,28 +635,30 @@ namespace MultiplayerARPG
                         PlayLandedAnimation();
                         isLanded = true;
                     }
-                    switch (extraMovementState)
+                    if (movementState.HasFlag(MovementState.IsSprinting))
                     {
-                        case ExtraMovementState.IsSprinting:
-                            CrossFadeMoveAnimaton(CLIP_IDLE, CLIP_SPRINT, CLIP_SPRINT_BACKWARD, CLIP_SPRINT_LEFT, CLIP_SPRINT_RIGHT,
-                                CLIP_SPRINT_FORWARD_LEFT, CLIP_SPRINT_FORWARD_RIGHT, CLIP_SPRINT_BACKWARD_LEFT, CLIP_SPRINT_BACKWARD_RIGHT);
-                            break;
-                        case ExtraMovementState.IsWalking:
-                            CrossFadeMoveAnimaton(CLIP_IDLE, CLIP_WALK, CLIP_WALK_BACKWARD, CLIP_WALK_LEFT, CLIP_WALK_RIGHT,
-                                CLIP_WALK_FORWARD_LEFT, CLIP_WALK_FORWARD_RIGHT, CLIP_WALK_BACKWARD_LEFT, CLIP_WALK_BACKWARD_RIGHT);
-                            break;
-                        case ExtraMovementState.IsCrouching:
-                            CrossFadeMoveAnimaton(CLIP_CROUCH_IDLE, CLIP_CROUCH_MOVE, CLIP_CROUCH_MOVE_BACKWARD, CLIP_CROUCH_MOVE_LEFT, CLIP_CROUCH_MOVE_RIGHT,
-                                CLIP_CROUCH_MOVE_FORWARD_LEFT, CLIP_CROUCH_MOVE_FORWARD_RIGHT, CLIP_CROUCH_MOVE_BACKWARD_LEFT, CLIP_CROUCH_MOVE_BACKWARD_RIGHT);
-                            break;
-                        case ExtraMovementState.IsCrawling:
-                            CrossFadeMoveAnimaton(CLIP_CRAWL_IDLE, CLIP_CRAWL_MOVE, CLIP_CRAWL_MOVE_BACKWARD, CLIP_CRAWL_MOVE_LEFT, CLIP_CRAWL_MOVE_RIGHT,
-                                CLIP_CRAWL_MOVE_FORWARD_LEFT, CLIP_CRAWL_MOVE_FORWARD_RIGHT, CLIP_CRAWL_MOVE_BACKWARD_LEFT, CLIP_CRAWL_MOVE_BACKWARD_RIGHT);
-                            break;
-                        default:
-                            CrossFadeMoveAnimaton(CLIP_IDLE, CLIP_MOVE, CLIP_MOVE_BACKWARD, CLIP_MOVE_LEFT, CLIP_MOVE_RIGHT,
-                                CLIP_MOVE_FORWARD_LEFT, CLIP_MOVE_FORWARD_RIGHT, CLIP_MOVE_BACKWARD_LEFT, CLIP_MOVE_BACKWARD_RIGHT);
-                            break;
+                        CrossFadeMoveAnimaton(CLIP_IDLE, CLIP_SPRINT, CLIP_SPRINT_BACKWARD, CLIP_SPRINT_LEFT, CLIP_SPRINT_RIGHT,
+                            CLIP_SPRINT_FORWARD_LEFT, CLIP_SPRINT_FORWARD_RIGHT, CLIP_SPRINT_BACKWARD_LEFT, CLIP_SPRINT_BACKWARD_RIGHT);
+                    }
+                    else if (movementState.HasFlag(MovementState.IsWalking))
+                    {
+                        CrossFadeMoveAnimaton(CLIP_IDLE, CLIP_WALK, CLIP_WALK_BACKWARD, CLIP_WALK_LEFT, CLIP_WALK_RIGHT,
+                            CLIP_WALK_FORWARD_LEFT, CLIP_WALK_FORWARD_RIGHT, CLIP_WALK_BACKWARD_LEFT, CLIP_WALK_BACKWARD_RIGHT);
+                    }
+                    else if (movementState.HasFlag(MovementState.IsCrouching))
+                    {
+                        CrossFadeMoveAnimaton(CLIP_CROUCH_IDLE, CLIP_CROUCH_MOVE, CLIP_CROUCH_MOVE_BACKWARD, CLIP_CROUCH_MOVE_LEFT, CLIP_CROUCH_MOVE_RIGHT,
+                            CLIP_CROUCH_MOVE_FORWARD_LEFT, CLIP_CROUCH_MOVE_FORWARD_RIGHT, CLIP_CROUCH_MOVE_BACKWARD_LEFT, CLIP_CROUCH_MOVE_BACKWARD_RIGHT);
+                    }
+                    else if (movementState.HasFlag(MovementState.IsCrawling))
+                    {
+                        CrossFadeMoveAnimaton(CLIP_CRAWL_IDLE, CLIP_CRAWL_MOVE, CLIP_CRAWL_MOVE_BACKWARD, CLIP_CRAWL_MOVE_LEFT, CLIP_CRAWL_MOVE_RIGHT,
+                            CLIP_CRAWL_MOVE_FORWARD_LEFT, CLIP_CRAWL_MOVE_FORWARD_RIGHT, CLIP_CRAWL_MOVE_BACKWARD_LEFT, CLIP_CRAWL_MOVE_BACKWARD_RIGHT);
+                    }
+                    else
+                    {
+                        CrossFadeMoveAnimaton(CLIP_IDLE, CLIP_MOVE, CLIP_MOVE_BACKWARD, CLIP_MOVE_LEFT, CLIP_MOVE_RIGHT,
+                            CLIP_MOVE_FORWARD_LEFT, CLIP_MOVE_FORWARD_RIGHT, CLIP_MOVE_BACKWARD_LEFT, CLIP_MOVE_BACKWARD_RIGHT);
                     }
                 }
             }

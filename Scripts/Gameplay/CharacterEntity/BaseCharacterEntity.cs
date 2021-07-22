@@ -125,7 +125,7 @@ namespace MultiplayerARPG
         public int MaxStamina { get { return this.GetCaches().MaxStamina; } }
         public int MaxFood { get { return this.GetCaches().MaxFood; } }
         public int MaxWater { get { return this.GetCaches().MaxWater; } }
-        public override sealed float MoveAnimationSpeedMultiplier { get { return this.GetCaches().BaseMoveSpeed > 0f ? GetMoveSpeed(MovementState, ExtraMovementState.None) / this.GetCaches().BaseMoveSpeed : 1f; } }
+        public override sealed float MoveAnimationSpeedMultiplier { get { return this.GetCaches().BaseMoveSpeed > 0f ? GetMoveSpeed(MovementState) / this.GetCaches().BaseMoveSpeed : 1f; } }
         public override sealed bool MuteFootstepSound { get { return this.GetCaches().MuteFootstepSound; } }
         public abstract int DataId { get; set; }
 
@@ -296,7 +296,7 @@ namespace MultiplayerARPG
             // Update move speed multiplier
             CharacterModel.SetMoveAnimationSpeedMultiplier(MoveAnimationSpeedMultiplier);
             // Update movement animation
-            CharacterModel.SetMovementState(MovementState, ExtraMovementState, Direction2D);
+            CharacterModel.SetMovementState(MovementState, Direction2D);
             // Update FPS model
             if (IsClient)
             {
@@ -307,7 +307,7 @@ namespace MultiplayerARPG
                     // Update move speed multiplier
                     FpsModel.SetMoveAnimationSpeedMultiplier(MoveAnimationSpeedMultiplier);
                     // Update movement animation
-                    FpsModel.SetMovementState(MovementState, ExtraMovementState, Direction2D);
+                    FpsModel.SetMovementState(MovementState, Direction2D);
                 }
             }
 
@@ -1024,7 +1024,7 @@ namespace MultiplayerARPG
             return atkSpeed;
         }
 
-        protected float GetMoveSpeed(MovementState movementState, ExtraMovementState extraMovementState)
+        protected float GetMoveSpeed(MovementState movementState)
         {
             float moveSpeed = this.GetCaches().MoveSpeed;
 
@@ -1051,21 +1051,14 @@ namespace MultiplayerARPG
             }
             else
             {
-                switch (extraMovementState)
-                {
-                    case ExtraMovementState.IsSprinting:
-                        moveSpeed *= CurrentGameplayRule.GetSprintMoveSpeedRate(this);
-                        break;
-                    case ExtraMovementState.IsWalking:
-                        moveSpeed *= CurrentGameplayRule.GetWalkMoveSpeedRate(this);
-                        break;
-                    case ExtraMovementState.IsCrouching:
-                        moveSpeed *= CurrentGameplayRule.GetCrouchMoveSpeedRate(this);
-                        break;
-                    case ExtraMovementState.IsCrawling:
-                        moveSpeed *= CurrentGameplayRule.GetCrawlMoveSpeedRate(this);
-                        break;
-                }
+                if (movementState.HasFlag(MovementState.IsSprinting))
+                    moveSpeed *= CurrentGameplayRule.GetSprintMoveSpeedRate(this);
+                if (movementState.HasFlag(MovementState.IsWalking))
+                    moveSpeed *= CurrentGameplayRule.GetWalkMoveSpeedRate(this);
+                if (movementState.HasFlag(MovementState.IsCrouching))
+                    moveSpeed *= CurrentGameplayRule.GetCrouchMoveSpeedRate(this);
+                if (movementState.HasFlag(MovementState.IsCrawling))
+                    moveSpeed *= CurrentGameplayRule.GetCrawlMoveSpeedRate(this);
             }
 
             return moveSpeed;
@@ -1073,7 +1066,7 @@ namespace MultiplayerARPG
 
         public override float GetMoveSpeed()
         {
-            return GetMoveSpeed(MovementState, ExtraMovementState);
+            return GetMoveSpeed(MovementState);
         }
 
         public override sealed bool CanMove()

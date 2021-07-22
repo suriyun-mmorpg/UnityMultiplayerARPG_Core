@@ -207,11 +207,11 @@ namespace MultiplayerARPG
             {
                 if (ViewMode == ShooterControllerViewMode.Tps)
                 {
-                    if (PlayerCharacterEntity.ExtraMovementState.HasFlag(ExtraMovementState.IsCrouching))
+                    if (PlayerCharacterEntity.MovementState.HasFlag(MovementState.IsCrouching))
                     {
                         return tpsTargetOffsetWhileCrouching;
                     }
-                    else if (PlayerCharacterEntity.ExtraMovementState.HasFlag(ExtraMovementState.IsCrawling))
+                    else if (PlayerCharacterEntity.MovementState.HasFlag(MovementState.IsCrawling))
                     {
                         return tpsTargetOffsetWhileCrawling;
                     }
@@ -259,15 +259,12 @@ namespace MultiplayerARPG
             {
                 if (PlayerCharacterEntity.MovementState.HasFlag(MovementState.IsUnderWater))
                     return turnSpeedWileSwimming;
-                switch (PlayerCharacterEntity.ExtraMovementState)
-                {
-                    case ExtraMovementState.IsSprinting:
-                        return turnSpeedWhileSprinting;
-                    case ExtraMovementState.IsCrouching:
-                        return turnSpeedWhileCrouching;
-                    case ExtraMovementState.IsCrawling:
-                        return turnSpeedWileCrawling;
-                }
+                if (PlayerCharacterEntity.MovementState.HasFlag(MovementState.IsSprinting))
+                    return turnSpeedWhileSprinting;
+                if (PlayerCharacterEntity.MovementState.HasFlag(MovementState.IsCrouching))
+                    return turnSpeedWhileCrouching;
+                if (PlayerCharacterEntity.MovementState.HasFlag(MovementState.IsCrawling))
+                    return turnSpeedWileCrawling;
                 return turnSpeed;
             }
         }
@@ -320,7 +317,6 @@ namespace MultiplayerARPG
         protected IWeaponItem rightHandWeapon;
         protected IWeaponItem leftHandWeapon;
         protected MovementState movementState;
-        protected ExtraMovementState extraMovementState;
         protected ShooterControllerViewMode? viewModeBeforeDead;
         protected bool updateAttackingCrosshair;
         protected bool updateAttackedCrosshair;
@@ -526,7 +522,6 @@ namespace MultiplayerARPG
 
             // Clear controlling states from last update
             movementState = MovementState.None;
-            extraMovementState = ExtraMovementState.None;
             UpdateActivatedWeaponAbility(tempDeltaTime);
 
             if (IsBlockController || GenericUtils.IsFocusInputField())
@@ -576,9 +571,9 @@ namespace MultiplayerARPG
             // If jumping add jump state
             if (InputManager.GetButtonDown("Jump"))
             {
-                if (unToggleCrouchWhenJump && PlayerCharacterEntity.ExtraMovementState.HasFlag(ExtraMovementState.IsCrouching))
+                if (unToggleCrouchWhenJump && PlayerCharacterEntity.MovementState.HasFlag(MovementState.IsCrouching))
                     toggleCrouchOn = false;
-                else if (unToggleCrawlWhenJump && PlayerCharacterEntity.ExtraMovementState.HasFlag(ExtraMovementState.IsCrawling))
+                else if (unToggleCrawlWhenJump && PlayerCharacterEntity.MovementState.HasFlag(MovementState.IsCrawling))
                     toggleCrawlOn = false;
                 else
                     movementState |= MovementState.IsJump;
@@ -587,26 +582,25 @@ namespace MultiplayerARPG
             {
                 if (DetectExtraActive("Sprint", sprintActiveMode, ref toggleSprintOn))
                 {
-                    extraMovementState = ExtraMovementState.IsSprinting;
+                    movementState |= MovementState.IsSprinting;
                     toggleCrouchOn = false;
                     toggleCrawlOn = false;
                 }
-                if (DetectExtraActive("Crouch", crouchActiveMode, ref toggleCrouchOn))
+                else if (DetectExtraActive("Crouch", crouchActiveMode, ref toggleCrouchOn))
                 {
-                    extraMovementState = ExtraMovementState.IsCrouching;
+                    movementState |= MovementState.IsCrouching;
                     toggleSprintOn = false;
                     toggleCrawlOn = false;
                 }
-                if (DetectExtraActive("Crawl", crawlActiveMode, ref toggleCrawlOn))
+                else if (DetectExtraActive("Crawl", crawlActiveMode, ref toggleCrawlOn))
                 {
-                    extraMovementState = ExtraMovementState.IsCrawling;
+                    movementState |= MovementState.IsCrawling;
                     toggleSprintOn = false;
                     toggleCrouchOn = false;
                 }
             }
 
             PlayerCharacterEntity.KeyMovement(moveDirection, movementState);
-            PlayerCharacterEntity.SetExtraMovement(extraMovementState);
             UpdateLookAtTarget();
 
             if (canSwitchViewMode && InputManager.GetButtonDown("SwitchViewMode"))
@@ -1257,7 +1251,7 @@ namespace MultiplayerARPG
                     recoilX = CurrentCrosshairSetting.recoilX * recoilRateWhileSwimming;
                     recoilY = CurrentCrosshairSetting.recoilY * recoilRateWhileSwimming;
                 }
-                else if (extraMovementState.HasFlag(ExtraMovementState.IsSprinting))
+                else if (movementState.HasFlag(MovementState.IsSprinting))
                 {
                     recoilX = CurrentCrosshairSetting.recoilX * recoilRateWhileSprinting;
                     recoilY = CurrentCrosshairSetting.recoilY * recoilRateWhileSprinting;
@@ -1268,12 +1262,12 @@ namespace MultiplayerARPG
                     recoilY = CurrentCrosshairSetting.recoilY * recoilRateWhileMoving;
                 }
             }
-            else if (extraMovementState.HasFlag(ExtraMovementState.IsCrouching))
+            else if (movementState.HasFlag(MovementState.IsCrouching))
             {
                 recoilX = CurrentCrosshairSetting.recoilX * recoilRateWhileCrouching;
                 recoilY = CurrentCrosshairSetting.recoilY * recoilRateWhileCrouching;
             }
-            else if (extraMovementState.HasFlag(ExtraMovementState.IsCrawling))
+            else if (movementState.HasFlag(MovementState.IsCrawling))
             {
                 recoilX = CurrentCrosshairSetting.recoilX * recoilRateWhileCrawling;
                 recoilY = CurrentCrosshairSetting.recoilY * recoilRateWhileCrawling;

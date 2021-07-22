@@ -205,7 +205,7 @@ namespace MultiplayerARPG
                 movementState.HasFlag(MovementState.Right) ||
                 movementState.HasFlag(MovementState.Left))
             {
-                if (extraMovementState.HasFlag(ExtraMovementState.IsSprinting))
+                if (movementState.HasFlag(MovementState.IsSprinting))
                     Play(sprintAnimation2D, DirectionType2D);
                 else
                     Play(moveAnimation2D, DirectionType2D);
