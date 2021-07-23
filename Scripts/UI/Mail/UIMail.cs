@@ -16,6 +16,8 @@ namespace MultiplayerARPG
         public UILocaleKeySetting formatContent = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_MAIL_CONTENT);
         [Tooltip("Format => {0} = {Gold}")]
         public UILocaleKeySetting formatGold = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_GOLD);
+        [Tooltip("Format => {0} = {Cash}")]
+        public UILocaleKeySetting formatCash = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_CASH);
         [Tooltip("Format => {0} = {Sent Date}")]
         public UILocaleKeySetting formatSentDate = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_MAIL_SENT_DATE);
 
@@ -146,6 +148,14 @@ namespace MultiplayerARPG
                     LanguageManager.GetText(formatGold),
                     mail == null ? "0" : mail.Gold.ToString("N0"));
                 textGold.SetGameObjectActive(mail != null && mail.Gold != 0);
+            }
+
+            if (textCash != null)
+            {
+                textCash.text = string.Format(
+                    LanguageManager.GetText(formatCash),
+                    mail == null ? "0" : mail.Cash.ToString("N0"));
+                textCash.SetGameObjectActive(mail != null && mail.Cash != 0);
             }
 
             if (uiCurrencies != null)
