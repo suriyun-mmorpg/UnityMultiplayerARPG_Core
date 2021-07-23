@@ -203,8 +203,8 @@ namespace MultiplayerARPG
             if (textRank != null)
             {
                 textRank.text = string.Format(
-                    LanguageManager.GetText(formatKeyRank), 
-                    Guild == null ? "N/A" : Guild.rank.ToString("N0"));
+                    LanguageManager.GetText(formatKeyRank),
+                    Guild == null || Guild.rank == 0 ? "N/A" : Guild.rank.ToString("N0"));
             }
 
             if (autoAcceptRequestsObjects != null && autoAcceptRequestsObjects.Length > 0)
