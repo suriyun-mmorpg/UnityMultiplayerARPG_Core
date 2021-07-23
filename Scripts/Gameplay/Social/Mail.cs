@@ -14,6 +14,7 @@ namespace MultiplayerARPG
         public string Title { get; set; }
         public string Content { get; set; }
         public int Gold { get; set; }
+        public int Cash { get; set; }
         public Dictionary<int, int> Currencies { get; } = new Dictionary<int, int>();
         public Dictionary<int, short> Items { get; } = new Dictionary<int, short>();
         public bool IsRead { get; set; }
@@ -26,7 +27,7 @@ namespace MultiplayerARPG
 
         public bool HaveItemsToClaim()
         {
-            return Gold != 0 || Currencies.Count > 0 || Items.Count > 0;
+            return Gold != 0 || Cash != 0 || Currencies.Count > 0 || Items.Count > 0;
         }
 
         public Dictionary<int, int> ReadCurrencies(string currencies)
@@ -91,6 +92,7 @@ namespace MultiplayerARPG
             writer.Put(Title);
             writer.Put(Content);
             writer.Put(Gold);
+            writer.Put(Cash);
             writer.Put(WriteCurrencies());
             writer.Put(WriteItems());
             writer.Put(IsRead);
@@ -112,6 +114,7 @@ namespace MultiplayerARPG
             Title = reader.GetString();
             Content = reader.GetString();
             Gold = reader.GetInt();
+            Cash = reader.GetInt();
             ReadCurrencies(reader.GetString());
             ReadItems(reader.GetString());
             IsRead = reader.GetBool();
