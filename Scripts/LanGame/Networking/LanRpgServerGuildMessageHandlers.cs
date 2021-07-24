@@ -314,13 +314,13 @@ namespace MultiplayerARPG
             result.Invoke(AckResponseCode.Success, new ResponseChangeGuildMessageMessage());
         }
 
-        public async UniTaskVoid HandleRequestChangeGuildOptionId1(RequestHandlerData requestHandler, RequestChangeGuildOptionIdMessage request, RequestProceedResultDelegate<ResponseChangeGuildOptionIdMessage> result)
+        public async UniTaskVoid HandleRequestChangeGuildOptions(RequestHandlerData requestHandler, RequestChangeGuildOptionsMessage request, RequestProceedResultDelegate<ResponseChangeGuildOptionsMessage> result)
         {
             await UniTask.Yield();
             IPlayerCharacterData playerCharacter;
             if (!GameInstance.ServerUserHandlers.TryGetPlayerCharacter(requestHandler.ConnectionId, out playerCharacter))
             {
-                result.Invoke(AckResponseCode.Error, new ResponseChangeGuildOptionIdMessage()
+                result.Invoke(AckResponseCode.Error, new ResponseChangeGuildOptionsMessage()
                 {
                     message = UITextKeys.UI_ERROR_NOT_LOGGED_IN,
                 });
@@ -329,124 +329,16 @@ namespace MultiplayerARPG
             ValidateGuildRequestResult validateResult = GameInstance.ServerGuildHandlers.CanChangeGuildOptions(playerCharacter);
             if (!validateResult.IsSuccess)
             {
-                result.Invoke(AckResponseCode.Error, new ResponseChangeGuildOptionIdMessage()
+                result.Invoke(AckResponseCode.Error, new ResponseChangeGuildOptionsMessage()
                 {
                     message = validateResult.GameMessage,
                 });
                 return;
             }
-            validateResult.Guild.optionId1 = request.optionId;
+            validateResult.Guild.options = request.options;
             GameInstance.ServerGuildHandlers.SetGuild(validateResult.GuildId, validateResult.Guild);
-            GameInstance.ServerGameMessageHandlers.SendSetGuildOptionId1ToMembers(validateResult.Guild);
-            result.Invoke(AckResponseCode.Success, new ResponseChangeGuildOptionIdMessage());
-        }
-
-        public async UniTaskVoid HandleRequestChangeGuildOptionId2(RequestHandlerData requestHandler, RequestChangeGuildOptionIdMessage request, RequestProceedResultDelegate<ResponseChangeGuildOptionIdMessage> result)
-        {
-            await UniTask.Yield();
-            IPlayerCharacterData playerCharacter;
-            if (!GameInstance.ServerUserHandlers.TryGetPlayerCharacter(requestHandler.ConnectionId, out playerCharacter))
-            {
-                result.Invoke(AckResponseCode.Error, new ResponseChangeGuildOptionIdMessage()
-                {
-                    message = UITextKeys.UI_ERROR_NOT_LOGGED_IN,
-                });
-                return;
-            }
-            ValidateGuildRequestResult validateResult = GameInstance.ServerGuildHandlers.CanChangeGuildOptions(playerCharacter);
-            if (!validateResult.IsSuccess)
-            {
-                result.Invoke(AckResponseCode.Error, new ResponseChangeGuildOptionIdMessage()
-                {
-                    message = validateResult.GameMessage,
-                });
-                return;
-            }
-            validateResult.Guild.optionId2 = request.optionId;
-            GameInstance.ServerGuildHandlers.SetGuild(validateResult.GuildId, validateResult.Guild);
-            GameInstance.ServerGameMessageHandlers.SendSetGuildOptionId2ToMembers(validateResult.Guild);
-            result.Invoke(AckResponseCode.Success, new ResponseChangeGuildOptionIdMessage());
-        }
-
-        public async UniTaskVoid HandleRequestChangeGuildOptionId3(RequestHandlerData requestHandler, RequestChangeGuildOptionIdMessage request, RequestProceedResultDelegate<ResponseChangeGuildOptionIdMessage> result)
-        {
-            await UniTask.Yield();
-            IPlayerCharacterData playerCharacter;
-            if (!GameInstance.ServerUserHandlers.TryGetPlayerCharacter(requestHandler.ConnectionId, out playerCharacter))
-            {
-                result.Invoke(AckResponseCode.Error, new ResponseChangeGuildOptionIdMessage()
-                {
-                    message = UITextKeys.UI_ERROR_NOT_LOGGED_IN,
-                });
-                return;
-            }
-            ValidateGuildRequestResult validateResult = GameInstance.ServerGuildHandlers.CanChangeGuildOptions(playerCharacter);
-            if (!validateResult.IsSuccess)
-            {
-                result.Invoke(AckResponseCode.Error, new ResponseChangeGuildOptionIdMessage()
-                {
-                    message = validateResult.GameMessage,
-                });
-                return;
-            }
-            validateResult.Guild.optionId3 = request.optionId;
-            GameInstance.ServerGuildHandlers.SetGuild(validateResult.GuildId, validateResult.Guild);
-            GameInstance.ServerGameMessageHandlers.SendSetGuildOptionId3ToMembers(validateResult.Guild);
-            result.Invoke(AckResponseCode.Success, new ResponseChangeGuildOptionIdMessage());
-        }
-
-        public async UniTaskVoid HandleRequestChangeGuildOptionId4(RequestHandlerData requestHandler, RequestChangeGuildOptionIdMessage request, RequestProceedResultDelegate<ResponseChangeGuildOptionIdMessage> result)
-        {
-            await UniTask.Yield();
-            IPlayerCharacterData playerCharacter;
-            if (!GameInstance.ServerUserHandlers.TryGetPlayerCharacter(requestHandler.ConnectionId, out playerCharacter))
-            {
-                result.Invoke(AckResponseCode.Error, new ResponseChangeGuildOptionIdMessage()
-                {
-                    message = UITextKeys.UI_ERROR_NOT_LOGGED_IN,
-                });
-                return;
-            }
-            ValidateGuildRequestResult validateResult = GameInstance.ServerGuildHandlers.CanChangeGuildOptions(playerCharacter);
-            if (!validateResult.IsSuccess)
-            {
-                result.Invoke(AckResponseCode.Error, new ResponseChangeGuildOptionIdMessage()
-                {
-                    message = validateResult.GameMessage,
-                });
-                return;
-            }
-            validateResult.Guild.optionId4 = request.optionId;
-            GameInstance.ServerGuildHandlers.SetGuild(validateResult.GuildId, validateResult.Guild);
-            GameInstance.ServerGameMessageHandlers.SendSetGuildOptionId4ToMembers(validateResult.Guild);
-            result.Invoke(AckResponseCode.Success, new ResponseChangeGuildOptionIdMessage());
-        }
-
-        public async UniTaskVoid HandleRequestChangeGuildOptionId5(RequestHandlerData requestHandler, RequestChangeGuildOptionIdMessage request, RequestProceedResultDelegate<ResponseChangeGuildOptionIdMessage> result)
-        {
-            await UniTask.Yield();
-            IPlayerCharacterData playerCharacter;
-            if (!GameInstance.ServerUserHandlers.TryGetPlayerCharacter(requestHandler.ConnectionId, out playerCharacter))
-            {
-                result.Invoke(AckResponseCode.Error, new ResponseChangeGuildOptionIdMessage()
-                {
-                    message = UITextKeys.UI_ERROR_NOT_LOGGED_IN,
-                });
-                return;
-            }
-            ValidateGuildRequestResult validateResult = GameInstance.ServerGuildHandlers.CanChangeGuildOptions(playerCharacter);
-            if (!validateResult.IsSuccess)
-            {
-                result.Invoke(AckResponseCode.Error, new ResponseChangeGuildOptionIdMessage()
-                {
-                    message = validateResult.GameMessage,
-                });
-                return;
-            }
-            validateResult.Guild.optionId5 = request.optionId;
-            GameInstance.ServerGuildHandlers.SetGuild(validateResult.GuildId, validateResult.Guild);
-            GameInstance.ServerGameMessageHandlers.SendSetGuildOptionId5ToMembers(validateResult.Guild);
-            result.Invoke(AckResponseCode.Success, new ResponseChangeGuildOptionIdMessage());
+            GameInstance.ServerGameMessageHandlers.SendSetGuildOptionsToMembers(validateResult.Guild);
+            result.Invoke(AckResponseCode.Success, new ResponseChangeGuildOptionsMessage());
         }
 
         public async UniTaskVoid HandleRequestChangeGuildAutoAcceptRequests(RequestHandlerData requestHandler, RequestChangeGuildAutoAcceptRequestsMessage request, RequestProceedResultDelegate<ResponseChangeGuildAutoAcceptRequestsMessage> result)

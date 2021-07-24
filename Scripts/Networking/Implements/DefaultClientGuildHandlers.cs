@@ -33,29 +33,9 @@ namespace MultiplayerARPG
             return Manager.ClientSendRequest(GameNetworkingConsts.ChangeGuildMessage2, data, responseDelegate: callback);
         }
 
-        public bool RequestChangeGuildOptionId1(RequestChangeGuildOptionIdMessage data, ResponseDelegate<ResponseChangeGuildOptionIdMessage> callback)
+        public bool RequestChangeGuildOptions(RequestChangeGuildOptionsMessage data, ResponseDelegate<ResponseChangeGuildOptionsMessage> callback)
         {
-            return Manager.ClientSendRequest(GameNetworkingConsts.ChangeGuildOptionId1, data, responseDelegate: callback);
-        }
-
-        public bool RequestChangeGuildOptionId2(RequestChangeGuildOptionIdMessage data, ResponseDelegate<ResponseChangeGuildOptionIdMessage> callback)
-        {
-            return Manager.ClientSendRequest(GameNetworkingConsts.ChangeGuildOptionId2, data, responseDelegate: callback);
-        }
-
-        public bool RequestChangeGuildOptionId3(RequestChangeGuildOptionIdMessage data, ResponseDelegate<ResponseChangeGuildOptionIdMessage> callback)
-        {
-            return Manager.ClientSendRequest(GameNetworkingConsts.ChangeGuildOptionId3, data, responseDelegate: callback);
-        }
-
-        public bool RequestChangeGuildOptionId4(RequestChangeGuildOptionIdMessage data, ResponseDelegate<ResponseChangeGuildOptionIdMessage> callback)
-        {
-            return Manager.ClientSendRequest(GameNetworkingConsts.ChangeGuildOptionId4, data, responseDelegate: callback);
-        }
-
-        public bool RequestChangeGuildOptionId5(RequestChangeGuildOptionIdMessage data, ResponseDelegate<ResponseChangeGuildOptionIdMessage> callback)
-        {
-            return Manager.ClientSendRequest(GameNetworkingConsts.ChangeGuildOptionId5, data, responseDelegate: callback);
+            return Manager.ClientSendRequest(GameNetworkingConsts.ChangeGuildOptions, data, responseDelegate: callback);
         }
 
         public bool RequestChangeGuildAutoAcceptRequests(RequestChangeGuildAutoAcceptRequestsMessage data, ResponseDelegate<ResponseChangeGuildAutoAcceptRequestsMessage> callback)

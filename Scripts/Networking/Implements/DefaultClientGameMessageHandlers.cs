@@ -142,20 +142,8 @@ namespace MultiplayerARPG
                     case UpdateGuildMessage.UpdateType.SetScore:
                         GameInstance.JoinedGuild.score = message.score;
                         break;
-                    case UpdateGuildMessage.UpdateType.SetOptionId1:
-                        GameInstance.JoinedGuild.optionId1 = message.optionId;
-                        break;
-                    case UpdateGuildMessage.UpdateType.SetOptionId2:
-                        GameInstance.JoinedGuild.optionId2 = message.optionId;
-                        break;
-                    case UpdateGuildMessage.UpdateType.SetOptionId3:
-                        GameInstance.JoinedGuild.optionId3 = message.optionId;
-                        break;
-                    case UpdateGuildMessage.UpdateType.SetOptionId4:
-                        GameInstance.JoinedGuild.optionId4 = message.optionId;
-                        break;
-                    case UpdateGuildMessage.UpdateType.SetOptionId5:
-                        GameInstance.JoinedGuild.optionId5 = message.optionId;
+                    case UpdateGuildMessage.UpdateType.SetOptions:
+                        GameInstance.JoinedGuild.options = message.options;
                         break;
                     case UpdateGuildMessage.UpdateType.SetAutoAcceptRequests:
                         GameInstance.JoinedGuild.autoAcceptRequests = message.autoAcceptRequests;

@@ -196,29 +196,9 @@ namespace MultiplayerARPG
             Manager.SendSetGuildScore(connectionId, GameNetworkingConsts.UpdateGuild, id, score);
         }
 
-        public void SendSetGuildOptionId1(long connectionId, int id, int optionId)
+        public void SendSetGuildOptions(long connectionId, int id, string options)
         {
-            Manager.SendSetGuildOptionId1(connectionId, GameNetworkingConsts.UpdateGuild, id, optionId);
-        }
-
-        public void SendSetGuildOptionId2(long connectionId, int id, int optionId)
-        {
-            Manager.SendSetGuildOptionId2(connectionId, GameNetworkingConsts.UpdateGuild, id, optionId);
-        }
-
-        public void SendSetGuildOptionId3(long connectionId, int id, int optionId)
-        {
-            Manager.SendSetGuildOptionId3(connectionId, GameNetworkingConsts.UpdateGuild, id, optionId);
-        }
-
-        public void SendSetGuildOptionId4(long connectionId, int id, int optionId)
-        {
-            Manager.SendSetGuildOptionId4(connectionId, GameNetworkingConsts.UpdateGuild, id, optionId);
-        }
-
-        public void SendSetGuildOptionId5(long connectionId, int id, int optionId)
-        {
-            Manager.SendSetGuildOptionId5(connectionId, GameNetworkingConsts.UpdateGuild, id, optionId);
+            Manager.SendSetGuildOptions(connectionId, GameNetworkingConsts.UpdateGuild, id, options);
         }
 
         public void SendSetGuildAutoAcceptRequests(long connectionId, int id, bool autoAcceptRequests)

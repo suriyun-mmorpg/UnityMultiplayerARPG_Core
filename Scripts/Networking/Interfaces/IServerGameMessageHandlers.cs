@@ -27,11 +27,7 @@ namespace MultiplayerARPG
         void SendSetGuildLeader(long connectionId, int id, string leaderId);
         void SendSetGuildMessage(long connectionId, int id, string message);
         void SendSetGuildMessage2(long connectionId, int id, string message);
-        void SendSetGuildOptionId1(long connectionId, int id, int optionId);
-        void SendSetGuildOptionId2(long connectionId, int id, int optionId);
-        void SendSetGuildOptionId3(long connectionId, int id, int optionId);
-        void SendSetGuildOptionId4(long connectionId, int id, int optionId);
-        void SendSetGuildOptionId5(long connectionId, int id, int optionId);
+        void SendSetGuildOptions(long connectionId, int id, string options);
         void SendSetGuildAutoAcceptRequests(long connectionId, int id, bool autoAcceptRequests);
         void SendSetGuildScore(long connectionId, int id, int score);
         void SendSetGuildRank(long connectionId, int id, int rank);

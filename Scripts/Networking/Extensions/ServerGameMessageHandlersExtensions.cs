@@ -135,14 +135,14 @@ namespace MultiplayerARPG
             }
         }
 
-        public static void SendSetGuildOptionId1(this IServerGameMessageHandlers handlers, long connectionId, GuildData guild)
+        public static void SendSetGuildOptions(this IServerGameMessageHandlers handlers, long connectionId, GuildData guild)
         {
             if (guild == null)
                 return;
-            handlers.SendSetGuildOptionId1(connectionId, guild.id, guild.optionId1);
+            handlers.SendSetGuildOptions(connectionId, guild.id, guild.options);
         }
 
-        public static void SendSetGuildOptionId1ToMembers(this IServerGameMessageHandlers handlers, GuildData guild)
+        public static void SendSetGuildOptionsToMembers(this IServerGameMessageHandlers handlers, GuildData guild)
         {
             if (guild == null)
                 return;
@@ -150,83 +150,7 @@ namespace MultiplayerARPG
             foreach (SocialCharacterData member in guild.GetMembers())
             {
                 if (GameInstance.ServerUserHandlers.TryGetConnectionId(member.id, out connectionId))
-                    handlers.SendSetGuildOptionId1(connectionId, guild.id, guild.optionId1);
-            }
-        }
-
-        public static void SendSetGuildOptionId2(this IServerGameMessageHandlers handlers, long connectionId, GuildData guild)
-        {
-            if (guild == null)
-                return;
-            handlers.SendSetGuildOptionId2(connectionId, guild.id, guild.optionId2);
-        }
-
-        public static void SendSetGuildOptionId2ToMembers(this IServerGameMessageHandlers handlers, GuildData guild)
-        {
-            if (guild == null)
-                return;
-            long connectionId;
-            foreach (SocialCharacterData member in guild.GetMembers())
-            {
-                if (GameInstance.ServerUserHandlers.TryGetConnectionId(member.id, out connectionId))
-                    handlers.SendSetGuildOptionId2(connectionId, guild.id, guild.optionId2);
-            }
-        }
-
-        public static void SendSetGuildOptionId3(this IServerGameMessageHandlers handlers, long connectionId, GuildData guild)
-        {
-            if (guild == null)
-                return;
-            handlers.SendSetGuildOptionId3(connectionId, guild.id, guild.optionId3);
-        }
-
-        public static void SendSetGuildOptionId3ToMembers(this IServerGameMessageHandlers handlers, GuildData guild)
-        {
-            if (guild == null)
-                return;
-            long connectionId;
-            foreach (SocialCharacterData member in guild.GetMembers())
-            {
-                if (GameInstance.ServerUserHandlers.TryGetConnectionId(member.id, out connectionId))
-                    handlers.SendSetGuildOptionId3(connectionId, guild.id, guild.optionId3);
-            }
-        }
-
-        public static void SendSetGuildOptionId4(this IServerGameMessageHandlers handlers, long connectionId, GuildData guild)
-        {
-            if (guild == null)
-                return;
-            handlers.SendSetGuildOptionId4(connectionId, guild.id, guild.optionId4);
-        }
-
-        public static void SendSetGuildOptionId4ToMembers(this IServerGameMessageHandlers handlers, GuildData guild)
-        {
-            if (guild == null)
-                return;
-            long connectionId;
-            foreach (SocialCharacterData member in guild.GetMembers())
-            {
-                if (GameInstance.ServerUserHandlers.TryGetConnectionId(member.id, out connectionId))
-                    handlers.SendSetGuildOptionId4(connectionId, guild.id, guild.optionId4);
-            }
-        }
-
-        public static void SendSetGuildOptionId5(this IServerGameMessageHandlers handlers, long connectionId, GuildData guild)
-        {
-            if (guild == null)
-                return;
-            handlers.SendSetGuildOptionId5(connectionId, guild.id, guild.optionId5);
-        }
-
-        public static void SendSetGuildOptionId5ToMembers(this IServerGameMessageHandlers handlers, GuildData guild)
-        {
-            if (guild == null)
-                return;
-            long connectionId;
-            foreach (SocialCharacterData member in guild.GetMembers())
-            {
-                if (GameInstance.ServerUserHandlers.TryGetConnectionId(member.id, out connectionId))
-                    handlers.SendSetGuildOptionId5(connectionId, guild.id, guild.optionId5);
+                    handlers.SendSetGuildOptions(connectionId, guild.id, guild.options);
             }
         }
 

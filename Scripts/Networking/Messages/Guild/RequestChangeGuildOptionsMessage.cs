@@ -2,18 +2,18 @@
 
 namespace MultiplayerARPG
 {
-    public struct RequestChangeGuildOptionIdMessage : INetSerializable
+    public struct RequestChangeGuildOptionsMessage : INetSerializable
     {
-        public int optionId;
+        public string options;
 
         public void Deserialize(NetDataReader reader)
         {
-            optionId = reader.GetInt();
+            options = reader.GetString();
         }
 
         public void Serialize(NetDataWriter writer)
         {
-            writer.Put(optionId);
+            writer.Put(options);
         }
     }
 }

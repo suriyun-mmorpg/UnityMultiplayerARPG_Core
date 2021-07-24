@@ -217,48 +217,12 @@ namespace MultiplayerARPG
             Send(manager, connectionId, msgType, netMessage);
         }
 
-        public static void SendSetGuildOptionId1(this LiteNetLibManager.LiteNetLibManager manager, long? connectionId, ushort msgType, int id, int optionId)
+        public static void SendSetGuildOptions(this LiteNetLibManager.LiteNetLibManager manager, long? connectionId, ushort msgType, int id, string options)
         {
             UpdateGuildMessage netMessage = new UpdateGuildMessage();
-            netMessage.type = UpdateGuildMessage.UpdateType.SetOptionId1;
+            netMessage.type = UpdateGuildMessage.UpdateType.SetOptions;
             netMessage.id = id;
-            netMessage.optionId = optionId;
-            Send(manager, connectionId, msgType, netMessage);
-        }
-
-        public static void SendSetGuildOptionId2(this LiteNetLibManager.LiteNetLibManager manager, long? connectionId, ushort msgType, int id, int optionId)
-        {
-            UpdateGuildMessage netMessage = new UpdateGuildMessage();
-            netMessage.type = UpdateGuildMessage.UpdateType.SetOptionId2;
-            netMessage.id = id;
-            netMessage.optionId = optionId;
-            Send(manager, connectionId, msgType, netMessage);
-        }
-
-        public static void SendSetGuildOptionId3(this LiteNetLibManager.LiteNetLibManager manager, long? connectionId, ushort msgType, int id, int optionId)
-        {
-            UpdateGuildMessage netMessage = new UpdateGuildMessage();
-            netMessage.type = UpdateGuildMessage.UpdateType.SetOptionId3;
-            netMessage.id = id;
-            netMessage.optionId = optionId;
-            Send(manager, connectionId, msgType, netMessage);
-        }
-
-        public static void SendSetGuildOptionId4(this LiteNetLibManager.LiteNetLibManager manager, long? connectionId, ushort msgType, int id, int optionId)
-        {
-            UpdateGuildMessage netMessage = new UpdateGuildMessage();
-            netMessage.type = UpdateGuildMessage.UpdateType.SetOptionId4;
-            netMessage.id = id;
-            netMessage.optionId = optionId;
-            Send(manager, connectionId, msgType, netMessage);
-        }
-
-        public static void SendSetGuildOptionId5(this LiteNetLibManager.LiteNetLibManager manager, long? connectionId, ushort msgType, int id, int optionId)
-        {
-            UpdateGuildMessage netMessage = new UpdateGuildMessage();
-            netMessage.type = UpdateGuildMessage.UpdateType.SetOptionId5;
-            netMessage.id = id;
-            netMessage.optionId = optionId;
+            netMessage.options = options;
             Send(manager, connectionId, msgType, netMessage);
         }
 

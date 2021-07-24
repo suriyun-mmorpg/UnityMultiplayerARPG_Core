@@ -2,7 +2,7 @@
 
 namespace MultiplayerARPG
 {
-    public struct ResponseChangeGuildOptionIdMessage : INetSerializable
+    public struct ResponseChangeGuildOptionsMessage : INetSerializable
     {
         public UITextKeys message;
 

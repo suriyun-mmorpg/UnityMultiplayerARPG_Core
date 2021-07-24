@@ -17,11 +17,7 @@ namespace MultiplayerARPG
             Terminate,
             SetGold,
             SetScore,
-            SetOptionId1,
-            SetOptionId2,
-            SetOptionId3,
-            SetOptionId4,
-            SetOptionId5,
+            SetOptions,
             SetAutoAcceptRequests,
             SetRank,
             UpdateStorage,
@@ -41,7 +37,7 @@ namespace MultiplayerARPG
         public short skillPoint;
         public int gold;
         public int score;
-        public int optionId;
+        public string options;
         public bool autoAcceptRequests;
         public int rank;
         public int dataId;
@@ -84,12 +80,8 @@ namespace MultiplayerARPG
                 case UpdateType.SetScore:
                     score = reader.GetInt();
                     break;
-                case UpdateType.SetOptionId1:
-                case UpdateType.SetOptionId2:
-                case UpdateType.SetOptionId3:
-                case UpdateType.SetOptionId4:
-                case UpdateType.SetOptionId5:
-                    optionId = reader.GetInt();
+                case UpdateType.SetOptions:
+                    options = reader.GetString();
                     break;
                 case UpdateType.SetAutoAcceptRequests:
                     autoAcceptRequests = reader.GetBool();
@@ -143,12 +135,8 @@ namespace MultiplayerARPG
                 case UpdateType.SetScore:
                     writer.Put(score);
                     break;
-                case UpdateType.SetOptionId1:
-                case UpdateType.SetOptionId2:
-                case UpdateType.SetOptionId3:
-                case UpdateType.SetOptionId4:
-                case UpdateType.SetOptionId5:
-                    writer.Put(optionId);
+                case UpdateType.SetOptions:
+                    writer.Put(options);
                     break;
                 case UpdateType.SetAutoAcceptRequests:
                     writer.Put(autoAcceptRequests);

@@ -21,25 +21,9 @@ namespace MultiplayerARPG
             RequestHandlerData requestHandler, RequestChangeGuildMessageMessage request,
             RequestProceedResultDelegate<ResponseChangeGuildMessageMessage> result);
 
-        UniTaskVoid HandleRequestChangeGuildOptionId1(
-            RequestHandlerData requestHandler, RequestChangeGuildOptionIdMessage request,
-            RequestProceedResultDelegate<ResponseChangeGuildOptionIdMessage> result);
-
-        UniTaskVoid HandleRequestChangeGuildOptionId2(
-            RequestHandlerData requestHandler, RequestChangeGuildOptionIdMessage request,
-            RequestProceedResultDelegate<ResponseChangeGuildOptionIdMessage> result);
-
-        UniTaskVoid HandleRequestChangeGuildOptionId3(
-            RequestHandlerData requestHandler, RequestChangeGuildOptionIdMessage request,
-            RequestProceedResultDelegate<ResponseChangeGuildOptionIdMessage> result);
-
-        UniTaskVoid HandleRequestChangeGuildOptionId4(
-            RequestHandlerData requestHandler, RequestChangeGuildOptionIdMessage request,
-            RequestProceedResultDelegate<ResponseChangeGuildOptionIdMessage> result);
-
-        UniTaskVoid HandleRequestChangeGuildOptionId5(
-            RequestHandlerData requestHandler, RequestChangeGuildOptionIdMessage request,
-            RequestProceedResultDelegate<ResponseChangeGuildOptionIdMessage> result);
+        UniTaskVoid HandleRequestChangeGuildOptions(
+            RequestHandlerData requestHandler, RequestChangeGuildOptionsMessage request,
+            RequestProceedResultDelegate<ResponseChangeGuildOptionsMessage> result);
 
         UniTaskVoid HandleRequestChangeGuildAutoAcceptRequests(
             RequestHandlerData requestHandler, RequestChangeGuildAutoAcceptRequestsMessage request,
