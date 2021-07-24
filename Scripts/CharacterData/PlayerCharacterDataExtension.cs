@@ -10,15 +10,11 @@ namespace MultiplayerARPG
 {
     public static partial class PlayerCharacterDataExtension
     {
-        private static System.Type classType;
-        public static System.Type ClassType
+        public static System.Type ClassType { get; private set; }
+
+        static PlayerCharacterDataExtension()
         {
-            get
-            {
-                if (classType == null)
-                    classType = typeof(PlayerCharacterDataExtension);
-                return classType;
-            }
+            ClassType = typeof(PlayerCharacterDataExtension);
         }
 
         public static T CloneTo<T>(this IPlayerCharacterData from, T to) where T : IPlayerCharacterData
