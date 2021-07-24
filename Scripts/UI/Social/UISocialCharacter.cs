@@ -18,7 +18,7 @@ namespace MultiplayerARPG
         public TextWrapper uiTextLevel;
         public UIGageValue uiGageHp;
         public UIGageValue uiGageMp;
-
+        public TextWrapper uiTextOnlineStatus;
         public UICharacterBuffs uiCharacterBuffs;
         [Header("Member states objects")]
         [Tooltip("These objects will be activated when social member -> isOnline is true")]
