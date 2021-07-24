@@ -46,5 +46,11 @@ namespace MultiplayerARPG
         {
             textWrapper = GetComponent<TextWrapper>();
         }
+
+        [ContextMenu("Set Current Text Value As Default Text")]
+        public void SetCurrentTextValueAsDefaultText()
+        {
+            defaultText = textWrapper.text;
+        }
     }
 }
