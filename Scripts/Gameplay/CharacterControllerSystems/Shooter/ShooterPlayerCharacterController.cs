@@ -207,11 +207,11 @@ namespace MultiplayerARPG
             {
                 if (ViewMode == ShooterControllerViewMode.Tps)
                 {
-                    if (PlayerCharacterEntity.ExtraMovementState.HasFlag(ExtraMovementState.IsCrouching))
+                    if (PlayerCharacterEntity.ExtraMovementState == ExtraMovementState.IsCrouching)
                     {
                         return tpsTargetOffsetWhileCrouching;
                     }
-                    else if (PlayerCharacterEntity.ExtraMovementState.HasFlag(ExtraMovementState.IsCrawling))
+                    else if (PlayerCharacterEntity.ExtraMovementState == ExtraMovementState.IsCrawling)
                     {
                         return tpsTargetOffsetWhileCrawling;
                     }
@@ -576,9 +576,9 @@ namespace MultiplayerARPG
             // If jumping add jump state
             if (InputManager.GetButtonDown("Jump"))
             {
-                if (unToggleCrouchWhenJump && PlayerCharacterEntity.ExtraMovementState.HasFlag(ExtraMovementState.IsCrouching))
+                if (unToggleCrouchWhenJump && PlayerCharacterEntity.ExtraMovementState == ExtraMovementState.IsCrouching)
                     toggleCrouchOn = false;
-                else if (unToggleCrawlWhenJump && PlayerCharacterEntity.ExtraMovementState.HasFlag(ExtraMovementState.IsCrawling))
+                else if (unToggleCrawlWhenJump && PlayerCharacterEntity.ExtraMovementState == ExtraMovementState.IsCrawling)
                     toggleCrawlOn = false;
                 else
                     movementState |= MovementState.IsJump;
@@ -1257,7 +1257,7 @@ namespace MultiplayerARPG
                     recoilX = CurrentCrosshairSetting.recoilX * recoilRateWhileSwimming;
                     recoilY = CurrentCrosshairSetting.recoilY * recoilRateWhileSwimming;
                 }
-                else if (extraMovementState.HasFlag(ExtraMovementState.IsSprinting))
+                else if (extraMovementState == ExtraMovementState.IsSprinting)
                 {
                     recoilX = CurrentCrosshairSetting.recoilX * recoilRateWhileSprinting;
                     recoilY = CurrentCrosshairSetting.recoilY * recoilRateWhileSprinting;
@@ -1268,12 +1268,12 @@ namespace MultiplayerARPG
                     recoilY = CurrentCrosshairSetting.recoilY * recoilRateWhileMoving;
                 }
             }
-            else if (extraMovementState.HasFlag(ExtraMovementState.IsCrouching))
+            else if (extraMovementState == ExtraMovementState.IsCrouching)
             {
                 recoilX = CurrentCrosshairSetting.recoilX * recoilRateWhileCrouching;
                 recoilY = CurrentCrosshairSetting.recoilY * recoilRateWhileCrouching;
             }
-            else if (extraMovementState.HasFlag(ExtraMovementState.IsCrawling))
+            else if (extraMovementState == ExtraMovementState.IsCrawling)
             {
                 recoilX = CurrentCrosshairSetting.recoilX * recoilRateWhileCrawling;
                 recoilY = CurrentCrosshairSetting.recoilY * recoilRateWhileCrawling;

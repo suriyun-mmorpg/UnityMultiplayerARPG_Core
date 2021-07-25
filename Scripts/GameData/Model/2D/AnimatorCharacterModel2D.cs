@@ -289,7 +289,7 @@ namespace MultiplayerARPG
                 movementState.HasFlag(MovementState.Right) ||
                 movementState.HasFlag(MovementState.Left))
             {
-                if (extraMovementState.HasFlag(ExtraMovementState.IsSprinting))
+                if (extraMovementState == ExtraMovementState.IsSprinting)
                     moveSpeed = 2;
                 else
                     moveSpeed = 1;

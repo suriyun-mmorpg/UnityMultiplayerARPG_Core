@@ -12,14 +12,4 @@
         IsUnderWater = 1 << 5,
         IsJump = 1 << 6,
     }
-
-    [System.Flags]
-    public enum ExtraMovementState : byte
-    {
-        None = 0,
-        IsSprinting = 1 << 0,
-        IsWalking = 1 << 1,
-        IsCrouching = 1 << 2,
-        IsCrawling = 1 << 3,
-    }
 }

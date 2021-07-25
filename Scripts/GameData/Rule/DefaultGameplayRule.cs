@@ -225,7 +225,7 @@ namespace MultiplayerARPG
 
         public override float GetDecreasingStaminaPerSeconds(BaseCharacterEntity character)
         {
-            if (!character.ExtraMovementState.HasFlag(ExtraMovementState.IsSprinting) ||
+            if (character.ExtraMovementState != ExtraMovementState.IsSprinting ||
                 !character.MovementState.HasFlag(MovementState.IsGrounded) ||
                 (!character.MovementState.HasFlag(MovementState.Forward) &&
                 !character.MovementState.HasFlag(MovementState.Backward) &&
