@@ -714,22 +714,33 @@ namespace MultiplayerARPG
             }
         }
 
-        protected virtual bool OverlappedEntity<T>(T entity, Vector3 measuringPosition, Vector3 targetPosition, float distance)
+        protected virtual bool OverlappedEntity<T>(T entity, Vector3 sourcePosition, Vector3 targetPosition, float distance)
             where T : BaseGameEntity
         {
-            if (Vector3.Distance(measuringPosition, targetPosition) <= distance)
+            if (Vector3.Distance(sourcePosition, targetPosition) <= distance)
                 return true;
             // Target is far from controlling entity, try overlap the entity
             if (entity == null)
                 return false;
-            return physicFunctions.IsGameEntityInDistance(entity, measuringPosition, distance, false);
+            return physicFunctions.IsGameEntityInDistance(entity, sourcePosition, distance, false);
+        }
+
+        protected virtual bool OverlappedEntityHitBox<T>(T entity, Vector3 sourcePosition, Vector3 targetPosition, float distance)
+            where T : BaseGameEntity
+        {
+            if (Vector3.Distance(sourcePosition, targetPosition) <= distance)
+                return true;
+            // Target is far from controlling entity, try overlap the entity
+            if (entity == null)
+                return false;
+            return physicFunctions.IsGameEntityHitBoxInDistance(entity, sourcePosition, distance, false);
         }
 
         protected virtual void DoActionOrMoveToEntity(BaseGameEntity entity, float distance, System.Action action)
         {
-            Vector3 measuringPosition = CacheTransform.position;
+            Vector3 sourcePosition = CacheTransform.position;
             Vector3 targetPosition = entity.CacheTransform.position;
-            if (OverlappedEntity(entity, measuringPosition, targetPosition, distance))
+            if (OverlappedEntity(entity, sourcePosition, targetPosition, distance))
             {
                 // Stop movement to do action
                 PlayerCharacterEntity.StopMove();
@@ -741,7 +752,7 @@ namespace MultiplayerARPG
             else
             {
                 // Move to target entity
-                UpdateTargetEntityPosition(measuringPosition, targetPosition, distance);
+                UpdateTargetEntityPosition(sourcePosition, targetPosition, distance);
             }
         }
 
@@ -753,9 +764,9 @@ namespace MultiplayerARPG
         protected virtual void AttackOrMoveToEntity(IDamageableEntity entity, float distance, int layerMask)
         {
             Transform damageTransform = PlayerCharacterEntity.GetWeaponDamageInfo(ref isLeftHandAttacking).GetDamageTransform(PlayerCharacterEntity, isLeftHandAttacking);
-            Vector3 measuringPosition = damageTransform.position;
+            Vector3 sourcePosition = damageTransform.position;
             Vector3 targetPosition = entity.OpponentAimTransform.position;
-            if (OverlappedEntity(entity.Entity, measuringPosition, targetPosition, distance))
+            if (OverlappedEntityHitBox(entity.Entity, sourcePosition, targetPosition, distance))
             {
                 // Stop movement to attack
                 PlayerCharacterEntity.StopMove();
@@ -769,7 +780,7 @@ namespace MultiplayerARPG
             else
             {
                 // Move to target entity
-                UpdateTargetEntityPosition(measuringPosition, targetPosition, distance);
+                UpdateTargetEntityPosition(sourcePosition, targetPosition, distance);
             }
         }
 
@@ -783,10 +794,10 @@ namespace MultiplayerARPG
             if (queueUsingSkill.skill != null)
             {
                 Transform applyTransform = queueUsingSkill.skill.GetApplyTransform(PlayerCharacterEntity, isLeftHandAttacking);
-                Vector3 measuringPosition = applyTransform.position;
+                Vector3 sourcePosition = applyTransform.position;
                 Vector3 targetPosition = entity.OpponentAimTransform.position;
                 if (entity.GetObjectId() == PlayerCharacterEntity.GetObjectId() /* Applying skill to user? */ ||
-                    OverlappedEntity(entity.Entity, measuringPosition, targetPosition, distance))
+                    OverlappedEntityHitBox(entity.Entity, sourcePosition, targetPosition, distance))
                 {
                     // Set next frame target action type
                     targetActionType = queueUsingSkill.skill.IsAttack ? TargetActionType.Attack : TargetActionType.Activate;
@@ -802,7 +813,7 @@ namespace MultiplayerARPG
                 else
                 {
                     // Move to target entity
-                    UpdateTargetEntityPosition(measuringPosition, targetPosition, distance);
+                    UpdateTargetEntityPosition(sourcePosition, targetPosition, distance);
                 }
             }
             else
@@ -819,12 +830,12 @@ namespace MultiplayerARPG
 
         }
 
-        protected virtual void UpdateTargetEntityPosition(Vector3 measuringPosition, Vector3 targetPosition, float distance)
+        protected virtual void UpdateTargetEntityPosition(Vector3 sourcePosition, Vector3 targetPosition, float distance)
         {
             if (PlayerCharacterEntity.IsPlayingActionAnimation())
                 return;
 
-            Vector3 direction = (targetPosition - measuringPosition).normalized;
+            Vector3 direction = (targetPosition - sourcePosition).normalized;
             Vector3 position = targetPosition - (direction * (distance - StoppingDistance));
             if (Vector3.Distance(MovementTransform.position, position) > MIN_START_MOVE_DISTANCE &&
                 Vector3.Distance(previousPointClickPosition, position) > MIN_START_MOVE_DISTANCE)

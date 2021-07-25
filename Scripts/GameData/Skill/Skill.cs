@@ -240,10 +240,10 @@ namespace MultiplayerARPG
         public override float GetCastDistance(BaseCharacterEntity skillUser, short skillLevel, bool isLeftHand)
         {
             if (!IsAttack)
-                return buffDistance.GetAmount(skillLevel) + skillUser.StoppingDistance;
+                return buffDistance.GetAmount(skillLevel);
             if (skillAttackType == SkillAttackType.Normal)
-                return GetDamageInfo(skillUser, isLeftHand).GetDistance() + skillUser.StoppingDistance;
-            return skillUser.GetAttackDistance(isLeftHand) + skillUser.StoppingDistance;
+                return GetDamageInfo(skillUser, isLeftHand).GetDistance();
+            return skillUser.GetAttackDistance(isLeftHand);
         }
 
         public override float GetCastFov(BaseCharacterEntity skillUser, short skillLevel, bool isLeftHand)

@@ -23,6 +23,24 @@ namespace MultiplayerARPG
             return false;
         }
 
+        public static bool IsGameEntityHitBoxInDistance<T>(this IPhysicFunctions functions, T targetEntity, Vector3 position, float distance, bool includeUnHittable)
+            where T : class, IGameEntity
+        {
+            int tempOverlapSize = functions.OverlapObjects(position, distance, 1 << targetEntity.GetGameObject().layer, queryTriggerInteraction: QueryTriggerInteraction.Collide);
+            if (tempOverlapSize == 0)
+                return false;
+            DamageableHitBox tempBaseEntity;
+            for (int tempLoopCounter = 0; tempLoopCounter < tempOverlapSize; ++tempLoopCounter)
+            {
+                if (!includeUnHittable && functions.GetOverlapObject(tempLoopCounter).GetComponent<IUnHittable>() != null)
+                    continue;
+                tempBaseEntity = functions.GetOverlapObject(tempLoopCounter).GetComponent<DamageableHitBox>();
+                if (tempBaseEntity != null && tempBaseEntity.Entity == targetEntity.Entity)
+                    return true;
+            }
+            return false;
+        }
+
         public static List<T> FindGameEntitiesInDistance<T>(this IPhysicFunctions functions, Vector3 position, float distance, int layerMask)
             where T : class, IGameEntity
         {
