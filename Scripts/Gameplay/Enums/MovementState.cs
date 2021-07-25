@@ -1,7 +1,7 @@
 ﻿namespace MultiplayerARPG
 {
     [System.Flags]
-    public enum MovementState : int
+    public enum MovementState : byte
     {
         None = 0,
         Forward = 1 << 0,
@@ -11,9 +11,15 @@
         IsGrounded = 1 << 4,
         IsUnderWater = 1 << 5,
         IsJump = 1 << 6,
-        IsSprinting = 1 << 7,
-        IsWalking = 1 << 8,
-        IsCrouching = 1 << 9,
-        IsCrawling = 1 << 10,
+    }
+
+    [System.Flags]
+    public enum ExtraMovementState : byte
+    {
+        None = 0,
+        IsSprinting = 1 << 0,
+        IsWalking = 1 << 1,
+        IsCrouching = 1 << 2,
+        IsCrawling = 1 << 3,
     }
 }

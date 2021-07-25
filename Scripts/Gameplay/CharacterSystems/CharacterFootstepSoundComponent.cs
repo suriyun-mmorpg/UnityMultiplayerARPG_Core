@@ -97,15 +97,27 @@ namespace MultiplayerARPG
             audioSource.mute = !AudioManager.Singleton.sfxVolumeSetting.IsOn;
 
             if (Entity.MovementState.HasFlag(MovementState.IsUnderWater))
+            {
                 currentFootstepSettings = swimFootstepSettings;
-            else if (Entity.MovementState.HasFlag(MovementState.IsSprinting))
-                currentFootstepSettings = sprintFootstepSettings;
-            else if (Entity.MovementState.HasFlag(MovementState.IsCrouching))
-                currentFootstepSettings = crouchFootstepSettings;
-            else if (Entity.MovementState.HasFlag(MovementState.IsCrawling))
-                currentFootstepSettings = crawlFootstepSettings;
+            }
             else
-                currentFootstepSettings = moveFootstepSettings;
+            {
+                switch (Entity.ExtraMovementState)
+                {
+                    case ExtraMovementState.IsSprinting:
+                        currentFootstepSettings = sprintFootstepSettings;
+                        break;
+                    case ExtraMovementState.IsCrouching:
+                        currentFootstepSettings = crouchFootstepSettings;
+                        break;
+                    case ExtraMovementState.IsCrawling:
+                        currentFootstepSettings = crawlFootstepSettings;
+                        break;
+                    default:
+                        currentFootstepSettings = moveFootstepSettings;
+                        break;
+                }
+            }
 
             if (!Entity.MovementState.HasFlag(MovementState.Forward) &&
                 !Entity.MovementState.HasFlag(MovementState.Backward) &&

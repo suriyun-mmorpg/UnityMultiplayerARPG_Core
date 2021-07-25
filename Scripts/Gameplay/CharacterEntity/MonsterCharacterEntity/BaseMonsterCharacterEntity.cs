@@ -265,7 +265,7 @@ namespace MultiplayerARPG
 
         public override float GetMoveSpeed()
         {
-            if (Entity.MovementState.HasFlag(MovementState.IsWalking))
+            if (ExtraMovementState.HasFlag(ExtraMovementState.IsWalking))
                 return CharacterDatabase.WanderMoveSpeed;
             return base.GetMoveSpeed();
         }

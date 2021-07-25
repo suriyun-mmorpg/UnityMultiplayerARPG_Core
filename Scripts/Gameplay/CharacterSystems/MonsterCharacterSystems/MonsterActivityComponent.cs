@@ -247,6 +247,7 @@ namespace MultiplayerARPG
             lastSetDestinationTime = time;
             Vector3 direction = (destination - Entity.MovementTransform.position).normalized;
             Vector3 position = destination - (direction * (distance - Entity.StoppingDistance));
+            Entity.SetExtraMovement(ExtraMovementState.None);
             Entity.PointClickMovement(position);
         }
 
@@ -256,8 +257,7 @@ namespace MultiplayerARPG
             if (time - lastSetDestinationTime <= 0.1f)
                 return;
             lastSetDestinationTime = time;
-            Entity.MovementState |= MovementState.IsWalking;
-            Entity.SetMovement(Entity.MovementState);
+            Entity.SetExtraMovement(ExtraMovementState.IsWalking);
             Entity.PointClickMovement(destination);
         }
 
