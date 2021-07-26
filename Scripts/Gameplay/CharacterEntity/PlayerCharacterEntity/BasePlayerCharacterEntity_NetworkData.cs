@@ -1,5 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 using LiteNetLibManager;
 
@@ -8,7 +7,7 @@ namespace MultiplayerARPG
     public partial class BasePlayerCharacterEntity
     {
         #region Sync data
-        [Header("Player Character Sync Fields")]
+        [Category("Sync Fields")]
         [SerializeField]
         protected SyncFieldInt dataId = new SyncFieldInt();
         [SerializeField]
@@ -35,7 +34,8 @@ namespace MultiplayerARPG
         protected SyncFieldInt lastDeadTime = new SyncFieldInt();
         [SerializeField]
         protected SyncFieldBool isWarping = new SyncFieldBool();
-        [Header("Player Character Sync Lists")]
+
+        [Category("Sync Lists")]
         [SerializeField]
         protected SyncListCharacterHotkey hotkeys = new SyncListCharacterHotkey();
         [SerializeField]

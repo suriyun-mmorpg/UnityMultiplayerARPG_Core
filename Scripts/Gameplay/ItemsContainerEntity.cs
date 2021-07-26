@@ -9,9 +9,12 @@ namespace MultiplayerARPG
     {
         public const float GROUND_DETECTION_Y_OFFSETS = 3f;
 
+        [Category(5, "Items Container Settings")]
         [Tooltip("Delay before the entity destroyed, you may set some delay to play destroyed animation by `onItemDropDestroy` event before it's going to be destroyed from the game.")]
         [SerializeField]
         protected float destroyDelay = 0f;
+
+        [Category("Events")]
         [SerializeField]
         protected UnityEvent onItemsContainerDestroy;
 

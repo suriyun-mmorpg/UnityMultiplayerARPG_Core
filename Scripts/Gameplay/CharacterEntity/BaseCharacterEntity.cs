@@ -29,7 +29,7 @@ namespace MultiplayerARPG
             public int index;
         }
 
-        [Header("Character Settings")]
+        [Category("Relative GameObjects/Transforms")]
         [Tooltip("When character attack with melee weapon, it will cast sphere from this transform to detect hit objects")]
         [SerializeField]
         private Transform meleeDamageTransform;
@@ -69,7 +69,7 @@ namespace MultiplayerARPG
         }
 
 #if UNITY_EDITOR
-        [Header("Character Attack Debugging")]
+        [Category(200, "Debugging")]
         [FormerlySerializedAs("debugFovColor")]
         public Color debugDamageLaunchingColor = new Color(0, 1, 0, 0.04f);
         public Vector3? debugDamageLaunchingPosition;
@@ -77,7 +77,7 @@ namespace MultiplayerARPG
         public Quaternion? debugDamageLaunchingRotation;
 #endif
 
-        [Header("Generic Character Profile")]
+        [Category(5, "Character Settings")]
         [SerializeField]
         private CharacterRace race;
         public CharacterRace Race

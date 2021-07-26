@@ -12,7 +12,7 @@ namespace MultiplayerARPG
     {
         public readonly Dictionary<BaseCharacterEntity, ReceivedDamageRecord> receivedDamageRecords = new Dictionary<BaseCharacterEntity, ReceivedDamageRecord>();
 
-        [Header("Monster Character Profile")]
+        [Category("Character Settings")]
         [SerializeField]
         [FormerlySerializedAs("monsterCharacter")]
         protected MonsterCharacter characterDatabase;
@@ -26,7 +26,7 @@ namespace MultiplayerARPG
         [SerializeField]
         protected float destroyRespawnDelay = 5f;
 
-        [Header("Monster Character Sync Fields")]
+        [Category("Sync Fields")]
         [SerializeField]
         protected SyncFieldUInt summonerObjectId = new SyncFieldUInt();
         [SerializeField]

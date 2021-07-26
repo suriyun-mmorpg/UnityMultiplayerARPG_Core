@@ -1,21 +1,26 @@
-﻿using LiteNetLibManager;
-using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 
 namespace MultiplayerARPG
 {
     public class QueuedWorkbenchEntity : BuildingEntity, ICraftingQueueSource
     {
-        [Header("Workbench Settings")]
+        [Category(6, "Workbench Settings")]
         [SerializeField]
-        private ItemCraftFormula[] itemCraftFormulas;
+        protected ItemCraftFormula[] itemCraftFormulas = new ItemCraftFormula[0];
+        public ItemCraftFormula[] ItemCraftFormulas { get { return itemCraftFormulas; } }
         [SerializeField]
-        private int maxQueueSize = 5;
+        protected int maxQueueSize = 5;
+        public int MaxQueueSize { get { return maxQueueSize; } }
         [SerializeField]
         [Tooltip("If this is > 0 it will limit distance to craft an items with this workbench entity by its value")]
-        private float craftingDistance = 5f;
-        private SyncListCraftingQueueItem queueItems = new SyncListCraftingQueueItem();
+        protected float craftingDistance = 5f;
+        public float CraftingDistance { get { return craftingDistance; } }
+
+        [Category("Sync Fields")]
+        [SerializeField]
+        protected SyncListCraftingQueueItem queueItems = new SyncListCraftingQueueItem();
+
         public override bool Activatable { get { return true; } }
 
         private Dictionary<int, ItemCraftFormula> cacheItemCraftFormulas;
@@ -40,11 +45,6 @@ namespace MultiplayerARPG
         public SyncListCraftingQueueItem QueueItems
         {
             get { return queueItems; }
-        }
-
-        public int MaxQueueSize
-        {
-            get { return maxQueueSize; }
         }
 
         public bool CanCraft

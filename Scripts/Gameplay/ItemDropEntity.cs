@@ -1,5 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
 using LiteNetLibManager;
@@ -12,19 +11,24 @@ namespace MultiplayerARPG
     {
         public const float GROUND_DETECTION_Y_OFFSETS = 3f;
         private static readonly RaycastHit[] findGroundRaycastHits = new RaycastHit[1000];
-        [Header("Placeholder Settings")]
+
+        [Category("Relative GameObjects/Transforms")]
         [Tooltip("Item's `dropModel` will be instantiated to this transform for items which drops from characters")]
         [SerializeField]
         protected Transform modelContainer;
-        [Header("Respawn Settings")]
+
+        [Category(5, "Respawn Settings")]
         [Tooltip("Delay before the entity destroyed, you may set some delay to play destroyed animation by `onItemDropDestroy` event before it's going to be destroyed from the game.")]
         [SerializeField]
         protected float destroyDelay = 0f;
         [SerializeField]
         protected float destroyRespawnDelay = 5f;
+
+        [Category(99, "Events")]
         [SerializeField]
         protected UnityEvent onItemDropDestroy;
-        [Header("Drop Settings")]
+
+        [Category(6, "Drop Settings")]
         [Tooltip("Max kind of items that will be dropped in ground")]
         [SerializeField]
         protected byte maxDropItems = 5;
@@ -104,6 +108,7 @@ namespace MultiplayerARPG
             }
         }
 
+        [Category("Sync Fields")]
         [SerializeField]
         protected SyncFieldItemDropData itemDropData = new SyncFieldItemDropData();
         public ItemDropData ItemDropData

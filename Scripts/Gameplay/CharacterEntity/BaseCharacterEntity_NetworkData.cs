@@ -9,7 +9,7 @@ namespace MultiplayerARPG
     public partial class BaseCharacterEntity
     {
         #region Sync data
-        [Header("Character Sync Fields")]
+        [Category("Sync Fields")]
         [SerializeField]
         protected SyncFieldString id = new SyncFieldString();
         [SerializeField]
@@ -30,7 +30,8 @@ namespace MultiplayerARPG
         protected SyncFieldByte pitch = new SyncFieldByte();
         [SerializeField]
         protected SyncFieldUInt targetEntityId = new SyncFieldUInt();
-        [Header("Character Sync Lists")]
+
+        [Category(101, "Sync Lists")]
         [SerializeField]
         protected SyncListEquipWeapons selectableWeaponSets = new SyncListEquipWeapons();
         [SerializeField]

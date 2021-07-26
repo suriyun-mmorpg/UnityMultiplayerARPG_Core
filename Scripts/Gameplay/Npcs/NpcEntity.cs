@@ -1,20 +1,28 @@
 ﻿using UnityEngine;
 using System.Collections.Generic;
+using UnityEngine.Serialization;
 
 namespace MultiplayerARPG
 {
     public class NpcEntity : BaseGameEntity
     {
+        [Category(5, "NPC Settings")]
         [SerializeField]
         [Tooltip("It will use `startDialog` if `graph` is empty")]
         private BaseNpcDialog startDialog;
         [SerializeField]
         [Tooltip("It will use `graph` start dialog if this is not empty")]
         private NpcDialogGraph graph;
-        [Header("Relates Element Containers")]
-        public Transform uiElementTransform;
-        public Transform miniMapElementContainer;
-        public Transform questIndicatorContainer;
+
+        [Category("Relative GameObjects/Transforms")]
+        [SerializeField]
+        [FormerlySerializedAs("uiElementTransform")]
+        private Transform characterUiTransform = null;
+        [SerializeField]
+        [FormerlySerializedAs("miniMapElementContainer")]
+        private Transform miniMapUiTransform = null;
+        [SerializeField]
+        private Transform questIndicatorContainer = null;
 
         private UINpcEntity uiNpcEntity;
         private NpcQuestIndicator questIndicator;
@@ -45,23 +53,23 @@ namespace MultiplayerARPG
             }
         }
 
-        public Transform UIElementTransform
+        public Transform CharacterUiTransform
         {
             get
             {
-                if (uiElementTransform == null)
-                    uiElementTransform = CacheTransform;
-                return uiElementTransform;
+                if (characterUiTransform == null)
+                    characterUiTransform = CacheTransform;
+                return characterUiTransform;
             }
         }
 
-        public Transform MiniMapElementContainer
+        public Transform MiniMapUiTransform
         {
             get
             {
-                if (miniMapElementContainer == null)
-                    miniMapElementContainer = CacheTransform;
-                return miniMapElementContainer;
+                if (miniMapUiTransform == null)
+                    miniMapUiTransform = CacheTransform;
+                return miniMapUiTransform;
             }
         }
 
@@ -112,7 +120,7 @@ namespace MultiplayerARPG
                     foreach (GameObject obj in CurrentGameInstance.npcMiniMapObjects)
                     {
                         if (obj == null) continue;
-                        Instantiate(obj, MiniMapElementContainer.position, MiniMapElementContainer.rotation, MiniMapElementContainer);
+                        Instantiate(obj, MiniMapUiTransform.position, MiniMapUiTransform.rotation, MiniMapUiTransform);
                     }
                 }
 
@@ -133,7 +141,7 @@ namespace MultiplayerARPG
                 return;
             if (uiNpcEntity != null)
                 Destroy(uiNpcEntity.gameObject);
-            uiNpcEntity = Instantiate(prefab, UIElementTransform);
+            uiNpcEntity = Instantiate(prefab, CharacterUiTransform);
             uiNpcEntity.transform.localPosition = Vector3.zero;
             uiNpcEntity.Data = this;
         }

@@ -1,6 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.Events;
 using LiteNetLibManager;
 using LiteNetLib;
@@ -9,19 +7,33 @@ namespace MultiplayerARPG
 {
     public class StorageEntity : BuildingEntity
     {
-        [Header("Storage Settings")]
-        public Storage storage;
-        public bool lockable;
-        public UnityEvent onInitialOpen;
-        public UnityEvent onInitialClose;
-        public UnityEvent onOpen;
-        public UnityEvent onClose;
-        public bool canUseByEveryone;
+        [Category(6, "Storage Settings")]
+        [SerializeField]
+        protected Storage storage = new Storage();
+        public Storage Storage { get { return storage; } }
+        [SerializeField]
+        protected bool lockable = false;
+        public override bool Lockable { get { return lockable; } }
+        [SerializeField]
+        protected bool canUseByEveryone = false;
+        public bool CanUseByEveryone { get { return canUseByEveryone; } }
+
+        [Category("Events")]
+        [SerializeField]
+        protected UnityEvent onInitialOpen = new UnityEvent();
+        [SerializeField]
+        protected UnityEvent onInitialClose = new UnityEvent();
+        [SerializeField]
+        protected UnityEvent onOpen = new UnityEvent();
+        [SerializeField]
+        protected UnityEvent onClose = new UnityEvent();
+
+        [Category("Sync Fields")]
         [SerializeField]
         protected SyncFieldBool isOpen = new SyncFieldBool();
+
         private bool dirtyIsOpen;
         public override bool Activatable { get { return true; } }
-        public override bool Lockable { get { return lockable; } }
 
         public override void OnSetup()
         {

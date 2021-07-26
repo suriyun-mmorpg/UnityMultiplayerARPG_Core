@@ -1,7 +1,4 @@
-﻿using LiteNetLib;
-using UnityEngine;
-
-namespace MultiplayerARPG
+﻿namespace MultiplayerARPG
 {
     public partial class BaseCharacterEntity
     {

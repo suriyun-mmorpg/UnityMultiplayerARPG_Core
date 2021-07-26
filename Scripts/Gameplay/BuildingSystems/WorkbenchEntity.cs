@@ -1,13 +1,15 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 
 namespace MultiplayerARPG
 {
     public class WorkbenchEntity : BuildingEntity
     {
-        [Header("Workbench Settings")]
-        public ItemCraft[] itemCrafts;
+        [Category(6, "Workbench Settings")]
+        [SerializeField]
+        protected ItemCraft[] itemCrafts = new ItemCraft[0];
+        public ItemCraft[] ItemCrafts { get { return itemCrafts; } }
+
         public override bool Activatable { get { return true; } }
 
         private Dictionary<int, ItemCraft> cacheItemCrafts;

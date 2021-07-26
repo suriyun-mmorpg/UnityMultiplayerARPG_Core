@@ -8,13 +8,13 @@ namespace MultiplayerARPG
 {
     public class VehicleEntity : DamageableEntity, IVehicleEntity
     {
-        [Header("Vehicle Settings")]
+        [Category(5, "Vehicle Settings")]
         [SerializeField]
-        private VehicleType vehicleType;
+        private VehicleType vehicleType = null;
         public VehicleType VehicleType { get { return vehicleType; } }
 
         [SerializeField]
-        protected VehicleMoveSpeedType moveSpeedType;
+        protected VehicleMoveSpeedType moveSpeedType = VehicleMoveSpeedType.FixedMovedSpeed;
 
         [Tooltip("Vehicle move speed")]
         [SerializeField]
@@ -32,7 +32,6 @@ namespace MultiplayerARPG
         [SerializeField]
         protected bool canBeAttacked;
 
-        [Header("Stats/Attributes")]
         // TODO: Vehicle can level up?
         [SerializeField]
         private short level;
@@ -55,9 +54,10 @@ namespace MultiplayerARPG
         [SerializeField]
         protected float destroyRespawnDelay = 5f;
 
-        [Header("Events")]
+        [Category("Events")]
         public UnityEvent onVehicleDestroy = new UnityEvent();
 
+        [Category("Sync Fields")]
         [SerializeField]
         private SyncListUInt syncPassengerIds = new SyncListUInt();
 

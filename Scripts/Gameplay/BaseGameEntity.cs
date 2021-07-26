@@ -19,7 +19,19 @@ namespace MultiplayerARPG
             set { }
         }
 
-        [Header("Game Entity Settings")]
+        [Category(0, "Title Settings")]
+        [Tooltip("This title will be used while `syncTitle` is empty.")]
+        [FormerlySerializedAs("characterTitle")]
+        [FormerlySerializedAs("itemTitle")]
+        [SerializeField]
+        protected string entityTitle;
+
+        [Tooltip("Titles by language keys")]
+        [FormerlySerializedAs("characterTitles")]
+        [FormerlySerializedAs("itemTitles")]
+        [SerializeField]
+        protected LanguageData[] entityTitles;
+
         [SerializeField]
         private Text textTitle;
         public Text TextTitle
@@ -34,23 +46,7 @@ namespace MultiplayerARPG
             get { return textTitleB; }
         }
 
-        [Tooltip("These objects will be hidden on non owner objects")]
-        [SerializeField]
-        private GameObject[] ownerObjects;
-        public GameObject[] OwnerObjects
-        {
-            get { return ownerObjects; }
-        }
-
-        [Tooltip("These objects will be hidden on owner objects")]
-        [SerializeField]
-        private GameObject[] nonOwnerObjects;
-        public GameObject[] NonOwnerObjects
-        {
-            get { return nonOwnerObjects; }
-        }
-
-        [Header("Game Entity Sync Fields")]
+        [Category(100, "Sync Fields")]
         [SerializeField]
         protected SyncFieldString syncTitle = new SyncFieldString();
         public string Title
@@ -67,25 +63,29 @@ namespace MultiplayerARPG
             set { syncTitleB.Value = value; }
         }
 
-        [Header("Title Settings")]
-        [Tooltip("This title will be used while `syncTitle` is empty.")]
-        [FormerlySerializedAs("characterTitle")]
-        [FormerlySerializedAs("itemTitle")]
+        [Category(1, "Relative GameObjects/Transforms")]
+        [Tooltip("These objects will be hidden on non owner objects")]
         [SerializeField]
-        protected string entityTitle;
+        private GameObject[] ownerObjects;
+        public GameObject[] OwnerObjects
+        {
+            get { return ownerObjects; }
+        }
 
-        [Tooltip("Titles by language keys")]
-        [FormerlySerializedAs("characterTitles")]
-        [FormerlySerializedAs("itemTitles")]
+        [Tooltip("These objects will be hidden on owner objects")]
         [SerializeField]
-        protected LanguageData[] entityTitles;
+        private GameObject[] nonOwnerObjects;
+        public GameObject[] NonOwnerObjects
+        {
+            get { return nonOwnerObjects; }
+        }
 
         public virtual string EntityTitle
         {
             get { return Language.GetText(entityTitles, entityTitle); }
         }
 
-        [Header("Model and Transform Settings")]
+        [Category(2, "Components")]
         [SerializeField]
         protected GameEntityModel model;
         public GameEntityModel Model
@@ -93,8 +93,7 @@ namespace MultiplayerARPG
             get { return model; }
         }
 
-        public Transform CacheTransform { get; private set; }
-
+        [Category("Relative GameObjects/Transforms")]
         [Tooltip("Transform for position which camera will look at and follow while playing in TPS view mode")]
         [SerializeField]
         private Transform cameraTargetTransform;
@@ -121,10 +120,18 @@ namespace MultiplayerARPG
             set { fpsCameraTargetTransform = value; }
         }
 
-        [Header("Entity Movement Settings")]
+        public Transform CacheTransform { get; private set; }
+
+        [Category(3, "Entity Movement")]
         [SerializeField]
         private MovementSecure movementSecure;
         public MovementSecure MovementSecure { get { return movementSecure; } set { movementSecure = value; } }
+
+        [SerializeField]
+        protected bool canSideSprint;
+
+        [SerializeField]
+        protected bool canBackwardSprint;
 
         public IEntityMovementComponent Movement { get; private set; }
 
@@ -194,7 +201,7 @@ namespace MultiplayerARPG
             }
         }
 
-        [Header("Entity Movement Sync Fields")]
+        [Category("Sync Fields")]
         [SerializeField]
         protected SyncFieldByte movementState = new SyncFieldByte();
         public MovementState LocalMovementState { get; set; }
@@ -251,12 +258,6 @@ namespace MultiplayerARPG
             get { return passengingVehicle.Value; }
             set { passengingVehicle.Value = value; }
         }
-
-        [SerializeField]
-        protected bool canSideSprint;
-
-        [SerializeField]
-        protected bool canBackwardSprint;
 
         public float StoppingDistance { get { return ActiveMovement == null ? 0.1f : ActiveMovement.StoppingDistance; } }
         public virtual float MoveAnimationSpeedMultiplier { get { return 1f; } }

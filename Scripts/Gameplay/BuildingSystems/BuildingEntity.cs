@@ -1,5 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Profiling;
 using UnityEngine.Tilemaps;
@@ -12,18 +11,18 @@ namespace MultiplayerARPG
     {
         public const float BUILD_DISTANCE_BUFFER = 0.1f;
 
-        [Header("Building Data")]
+        [Category(5, "Building Settings")]
         [SerializeField]
         [Tooltip("If this is `TRUE` this building entity will be able to build on any surface. But when constructing, if player aimming on building area it will place on building area")]
-        protected bool canBuildOnAnySurface;
+        protected bool canBuildOnAnySurface = false;
 
         [SerializeField]
         [Tooltip("Type of building you can set it as Foundation, Wall, Door anything as you wish. This is a part of `buildingTypes`, just keep it for backward compatibility.")]
-        protected string buildingType;
+        protected string buildingType = string.Empty;
 
         [SerializeField]
         [Tooltip("Type of building you can set it as Foundation, Wall, Door anything as you wish.")]
-        protected List<string> buildingTypes;
+        protected List<string> buildingTypes = new List<string>();
 
         [SerializeField]
         [Tooltip("This is a distance that allows a player to build the building")]
@@ -31,7 +30,7 @@ namespace MultiplayerARPG
 
         [SerializeField]
         [Tooltip("If this is value `TRUE`, this entity will be destroyed when its parent building entity was destroyed")]
-        protected bool destroyWhenParentDestroyed;
+        protected bool destroyWhenParentDestroyed = false;
 
         [SerializeField]
         [Tooltip("Building's max HP. If its HP <= 0, it will be destroyed")]
@@ -43,15 +42,17 @@ namespace MultiplayerARPG
 
         [SerializeField]
         [Tooltip("Items which will be dropped when building destroyed")]
-        protected List<ItemAmount> droppingItems;
+        protected List<ItemAmount> droppingItems = new List<ItemAmount>();
 
         [SerializeField]
         [Tooltip("Delay before the entity destroyed, you may set some delay to play destroyed animation by `onBuildingDestroy` event before it's going to be destroyed from the game.")]
         protected float destroyDelay = 2f;
 
-        [Header("Events")]
-        public UnityEvent onBuildingDestroy = new UnityEvent();
-        public UnityEvent onBuildingConstruct = new UnityEvent();
+        [Category("Events")]
+        [SerializeField]
+        protected UnityEvent onBuildingDestroy = new UnityEvent();
+        [SerializeField]
+        protected UnityEvent onBuildingConstruct = new UnityEvent();
 
         public bool CanBuildOnAnySurface { get { return canBuildOnAnySurface; } }
         public List<string> BuildingTypes { get { return buildingTypes; } }
@@ -70,7 +71,7 @@ namespace MultiplayerARPG
         /// </summary>
         public bool HitSurface { get; set; }
 
-        [Header("Save Data")]
+        [Category("Sync Fields")]
         [SerializeField]
         private SyncFieldString id = new SyncFieldString();
         [SerializeField]

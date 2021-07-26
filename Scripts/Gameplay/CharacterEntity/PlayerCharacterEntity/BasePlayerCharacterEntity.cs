@@ -10,7 +10,7 @@ namespace MultiplayerARPG
     {
         public BaseNpcDialog CurrentNpcDialog { get; set; }
 
-        [Header("Player Character Profile")]
+        [Category("Character Settings")]
         [Tooltip("This is list which used as choice of character classes when create character")]
         [SerializeField]
         [FormerlySerializedAs("playerCharacters")]

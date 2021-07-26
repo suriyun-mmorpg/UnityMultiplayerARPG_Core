@@ -1,5 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
 using LiteNetLibManager;
@@ -11,12 +10,22 @@ namespace MultiplayerARPG
 {
     public class CampFireEntity : StorageEntity
     {
-        [Header("Campfire Settings")]
-        public ConvertItem[] convertItems;
-        public UnityEvent onInitialTurnOn;
-        public UnityEvent onInitialTurnOff;
-        public UnityEvent onTurnOn;
-        public UnityEvent onTurnOff;
+        [Category(7, "Campfire Settings")]
+        [SerializeField]
+        protected ConvertItem[] convertItems = new ConvertItem[0];
+        public ConvertItem[] ConvertItems { get { return convertItems; } }
+
+        [Category("Events")]
+        [SerializeField]
+        protected UnityEvent onInitialTurnOn = new UnityEvent();
+        [SerializeField]
+        protected UnityEvent onInitialTurnOff = new UnityEvent();
+        [SerializeField]
+        protected UnityEvent onTurnOn = new UnityEvent();
+        [SerializeField]
+        protected UnityEvent onTurnOff = new UnityEvent();
+
+        [Category("Sync Fields")]
         [SerializeField]
         protected SyncFieldBool isTurnOn = new SyncFieldBool();
         [SerializeField]

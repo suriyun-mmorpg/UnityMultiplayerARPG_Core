@@ -5,6 +5,7 @@ namespace MultiplayerARPG
 {
     public class WarpPortalEntity : BaseGameEntity
     {
+        [Category(5, "Warp Portal Settings")]
         [Tooltip("Signal to tell players that their character can enter the portal")]
         public GameObject[] warpSignals;
         [Tooltip("If this is `TRUE`, character will warp immediately when enter this warp portal")]

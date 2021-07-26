@@ -8,7 +8,7 @@ namespace MultiplayerARPG
 {
     public abstract partial class DamageableEntity : BaseGameEntity, IDamageableEntity
     {
-        [Header("Damageable Settings")]
+        [Category("Relative GameObjects/Transforms")]
         [Tooltip("This is transform where combat texts will be instantiates from")]
         [SerializeField]
         private Transform combatTextTransform;
@@ -27,10 +27,11 @@ namespace MultiplayerARPG
             set { opponentAimTransform = value; }
         }
 
+        [Category(4, "Hit Boxes")]
         [SerializeField]
         protected bool isStaticHitBoxes;
 
-        [Header("Damageable Entity Events")]
+        [Category(99, "Events")]
         public UnityEvent onNormalDamageHit = new UnityEvent();
         public UnityEvent onCriticalDamageHit = new UnityEvent();
         public UnityEvent onBlockedDamageHit = new UnityEvent();
@@ -38,7 +39,7 @@ namespace MultiplayerARPG
         public event ReceiveDamageDelegate onReceiveDamage;
         public event ReceivedDamageDelegate onReceivedDamage;
 
-        [Header("Damageable Sync Fields")]
+        [Category("Sync Fields")]
         [SerializeField]
         protected SyncFieldBool isImmune = new SyncFieldBool();
         [SerializeField]

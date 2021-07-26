@@ -1,6 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.Events;
 using LiteNetLibManager;
 using LiteNetLib;
@@ -9,16 +7,26 @@ namespace MultiplayerARPG
 {
     public class DoorEntity : BuildingEntity
     {
-        [Header("Door Settings")]
-        public bool lockable;
-        public UnityEvent onInitialOpen;
-        public UnityEvent onInitialClose;
-        public UnityEvent onOpen;
-        public UnityEvent onClose;
+        [Category(6, "Door Settings")]
+        [SerializeField]
+        protected bool lockable = false;
+        public override bool Lockable { get { return lockable; } }
+
+        [Category("Events")]
+        [SerializeField]
+        protected UnityEvent onInitialOpen = new UnityEvent();
+        [SerializeField]
+        protected UnityEvent onInitialClose = new UnityEvent();
+        [SerializeField]
+        protected UnityEvent onOpen = new UnityEvent();
+        [SerializeField]
+        protected UnityEvent onClose = new UnityEvent();
+
+        [Category("Sync Fields")]
         [SerializeField]
         protected SyncFieldBool isOpen = new SyncFieldBool();
+
         public override bool Activatable { get { return true; } }
-        public override bool Lockable { get { return lockable; } }
 
         public bool IsOpen
         {

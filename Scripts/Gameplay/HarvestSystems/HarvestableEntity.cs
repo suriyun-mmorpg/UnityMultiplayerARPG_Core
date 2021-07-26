@@ -10,6 +10,7 @@ namespace MultiplayerARPG
 {
     public partial class HarvestableEntity : DamageableEntity
     {
+        [Category(5, "Harvestable Settings")]
         [SerializeField]
         protected int maxHp = 100;
 
@@ -30,8 +31,9 @@ namespace MultiplayerARPG
         [SerializeField]
         protected float destroyRespawnDelay = 5f;
 
-        [Header("Events")]
-        public UnityEvent onHarvestableDestroy = new UnityEvent();
+        [Category("Events")]
+        [SerializeField]
+        protected UnityEvent onHarvestableDestroy = new UnityEvent();
 
         public override string EntityTitle
         {
