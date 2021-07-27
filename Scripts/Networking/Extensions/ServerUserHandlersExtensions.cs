@@ -22,7 +22,7 @@ namespace MultiplayerARPG
         {
             playerCharacter = null;
             IPlayerCharacterData result;
-            if (handlers.TryGetPlayerCharacterById(id, out result))
+            if (!string.IsNullOrEmpty(id) && handlers.TryGetPlayerCharacterById(id, out result))
             {
                 playerCharacter = result as T;
                 return playerCharacter != null;
@@ -35,12 +35,19 @@ namespace MultiplayerARPG
         {
             playerCharacter = null;
             IPlayerCharacterData result;
-            if (handlers.TryGetPlayerCharacterByName(name, out result))
+            if (!string.IsNullOrEmpty(name) && handlers.TryGetPlayerCharacterByName(name, out result))
             {
                 playerCharacter = result as T;
                 return playerCharacter != null;
             }
             return false;
+        }
+
+        public static bool TryGetConnectionIdByName(this IServerUserHandlers handlers, string name, out long connectionId)
+        {
+            connectionId = -1;
+            IPlayerCharacterData result;
+            return !string.IsNullOrEmpty(name) && handlers.TryGetPlayerCharacterByName(name, out result) && handlers.TryGetConnectionId(result.Id, out connectionId);
         }
     }
 }
