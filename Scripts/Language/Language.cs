@@ -1360,7 +1360,7 @@ namespace MultiplayerARPG
             Texts.Add(UITextKeys.UI_GUILD_LEAVE_DESCRIPTION.ToString(), "You sure you want to leave guild?");
             Texts.Add(UITextKeys.UI_GUILD_REQUEST.ToString(), "Guild Application");
             Texts.Add(UITextKeys.UI_GUILD_REQUEST_DESCRIPTION.ToString(), "You want to request to join guild {0}?");
-            Texts.Add(UITextKeys.UI_GUILD_REQUESTED.ToString(), "Guild request were sent to the guild");
+            Texts.Add(UITextKeys.UI_GUILD_REQUESTED.ToString(), "Guild request was sent to the guild");
             Texts.Add(UITextKeys.UI_GUILD_REQUEST_ACCEPTED.ToString(), "Guild request accepted");
             Texts.Add(UITextKeys.UI_GUILD_REQUEST_DECLINED.ToString(), "Guild request accepted");
             // UI Guild Role
@@ -1377,7 +1377,7 @@ namespace MultiplayerARPG
             Texts.Add(UITextKeys.UI_FRIEND_REQUEST_DESCRIPTION.ToString(), "You want to request {0} to be friend?");
             Texts.Add(UITextKeys.UI_FRIEND_ADDED.ToString(), "The character was added to the friend list");
             Texts.Add(UITextKeys.UI_FRIEND_REMOVED.ToString(), "The character was removed from the friend list");
-            Texts.Add(UITextKeys.UI_FRIEND_REQUESTED.ToString(), "Friend request were sent to the character");
+            Texts.Add(UITextKeys.UI_FRIEND_REQUESTED.ToString(), "Friend request was sent to the character");
             Texts.Add(UITextKeys.UI_FRIEND_REQUEST_ACCEPTED.ToString(), "Friend request accepted");
             Texts.Add(UITextKeys.UI_FRIEND_REQUEST_DECLINED.ToString(), "Friend request declined");
             // UI Password Dialogs
