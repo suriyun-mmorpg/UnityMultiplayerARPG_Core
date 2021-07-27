@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using UnityEngine.Events;
 
 namespace MultiplayerARPG
 {
@@ -20,6 +21,8 @@ namespace MultiplayerARPG
 
         public TextWrapper uiTextMessage;
         public UIChatHandler uiChatHandler;
+        public UnityEvent onIsTypeWriter = new UnityEvent();
+        public UnityEvent onNotTypeWriter = new UnityEvent();
         protected override void UpdateData()
         {
             if (uiTextMessage != null)
@@ -44,9 +47,18 @@ namespace MultiplayerARPG
                         break;
                 }
                 if (Data.channel == ChatChannel.System)
+                {
                     uiTextMessage.text = string.Format(LanguageManager.GetText(formatSystem), Data.message);
+                    onNotTypeWriter.Invoke();
+                }
                 else
+                {
                     uiTextMessage.text = string.Format(format, Data.sender, Data.message);
+                    if (GameInstance.PlayingCharacter != null && GameInstance.PlayingCharacter.CharacterName.Equals(Data.sender))
+                        onIsTypeWriter.Invoke();
+                    else
+                        onNotTypeWriter.Invoke();
+                }
             }
         }
 
