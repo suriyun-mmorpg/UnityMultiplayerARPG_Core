@@ -15,22 +15,24 @@ namespace MultiplayerARPG
 
         public void OnChatMessage(ChatMessage message)
         {
-            BasePlayerCharacterEntity playerCharacter;
+            long connectionId;
             switch (message.channel)
             {
                 case ChatChannel.Local:
-                    if (!string.IsNullOrEmpty(message.sender) &&
-                        GameInstance.ServerUserHandlers.TryGetPlayerCharacterByName(message.sender, out playerCharacter))
+                    IPlayerCharacterData playerCharacter;
+                    if (!string.IsNullOrEmpty(message.sender) && GameInstance.ServerUserHandlers.TryGetPlayerCharacterByName(message.sender, out playerCharacter))
                     {
+                        BasePlayerCharacterEntity playerCharacterEntity = playerCharacter as BasePlayerCharacterEntity;
                         string gmCommand;
-                        if (GameInstance.Singleton.GMCommands.IsGMCommand(message.message, out gmCommand) &&
-                            GameInstance.Singleton.GMCommands.CanUseGMCommand(playerCharacter, gmCommand))
+                        if (playerCharacterEntity != null &&
+                            GameInstance.Singleton.GMCommands.IsGMCommand(message.message, out gmCommand) &&
+                            GameInstance.Singleton.GMCommands.CanUseGMCommand(playerCharacterEntity, gmCommand))
                         {
                             // If it's gm command and sender's user level > 0, handle gm commands
                             string response = GameInstance.Singleton.GMCommands.HandleGMCommand(message.sender, message.message);
                             if (!string.IsNullOrEmpty(response))
                             {
-                                Manager.ServerSendPacket(playerCharacter.ConnectionId, 0, DeliveryMethod.ReliableOrdered, GameNetworkingConsts.Chat, new ChatMessage()
+                                Manager.ServerSendPacket(playerCharacterEntity.ConnectionId, 0, DeliveryMethod.ReliableOrdered, GameNetworkingConsts.Chat, new ChatMessage()
                                 {
                                     channel = ChatChannel.Local,
                                     message = response,
@@ -39,14 +41,22 @@ namespace MultiplayerARPG
                         }
                         else
                         {
-                            // Send messages to nearby characters
-                            List<BasePlayerCharacterEntity> receivers = playerCharacter.FindCharacters<BasePlayerCharacterEntity>(GameInstance.Singleton.localChatDistance, false, true, true, true);
-                            foreach (BasePlayerCharacterEntity receiver in receivers)
+                            if (playerCharacterEntity != null)
                             {
-                                Manager.ServerSendPacket(receiver.ConnectionId, 0, DeliveryMethod.ReliableOrdered, GameNetworkingConsts.Chat, message);
+                                // Send messages to nearby characters
+                                List<BasePlayerCharacterEntity> receivers = playerCharacterEntity.FindCharacters<BasePlayerCharacterEntity>(GameInstance.Singleton.localChatDistance, false, true, true, true);
+                                foreach (BasePlayerCharacterEntity receiver in receivers)
+                                {
+                                    Manager.ServerSendPacket(receiver.ConnectionId, 0, DeliveryMethod.ReliableOrdered, GameNetworkingConsts.Chat, message);
+                                }
+                                // Send messages to sender
+                                Manager.ServerSendPacket(playerCharacterEntity.ConnectionId, 0, DeliveryMethod.ReliableOrdered, GameNetworkingConsts.Chat, message);
                             }
-                            // Send messages to sender
-                            Manager.ServerSendPacket(playerCharacter.ConnectionId, 0, DeliveryMethod.ReliableOrdered, GameNetworkingConsts.Chat, message);
+                            else
+                            {
+                                // Character is not the entity, assume that player enter chat message in lobby, so broadcast message to other players in the lobby
+                                Manager.ServerSendPacketToAllConnections(0, DeliveryMethod.ReliableOrdered, GameNetworkingConsts.Chat, message);
+                            }
                         }
                     }
                     break;
@@ -58,17 +68,16 @@ namespace MultiplayerARPG
                     }
                     break;
                 case ChatChannel.Whisper:
-                    if (!string.IsNullOrEmpty(message.sender) &&
-                        GameInstance.ServerUserHandlers.TryGetPlayerCharacterByName(message.sender, out playerCharacter))
+                    if (GameInstance.ServerUserHandlers.TryGetConnectionIdByName(message.sender, out connectionId))
                     {
                         // If found sender send whisper message to sender
-                        Manager.ServerSendPacket(playerCharacter.ConnectionId, 0, DeliveryMethod.ReliableOrdered, GameNetworkingConsts.Chat, message);
+                        Manager.ServerSendPacket(connectionId, 0, DeliveryMethod.ReliableOrdered, GameNetworkingConsts.Chat, message);
                     }
                     if (!string.IsNullOrEmpty(message.receiver) &&
                         GameInstance.ServerUserHandlers.TryGetPlayerCharacterByName(message.receiver, out playerCharacter))
                     {
                         // If found receiver send whisper message to receiver
-                        Manager.ServerSendPacket(playerCharacter.ConnectionId, 0, DeliveryMethod.ReliableOrdered, GameNetworkingConsts.Chat, message);
+                        Manager.ServerSendPacket(connectionId, 0, DeliveryMethod.ReliableOrdered, GameNetworkingConsts.Chat, message);
                     }
                     break;
                 case ChatChannel.Party:
@@ -77,11 +86,10 @@ namespace MultiplayerARPG
                     {
                         foreach (string memberId in party.GetMemberIds())
                         {
-                            if (GameInstance.ServerUserHandlers.TryGetPlayerCharacterById(memberId, out playerCharacter) &&
-                                Manager.ContainsConnectionId(playerCharacter.ConnectionId))
+                            if (GameInstance.ServerUserHandlers.TryGetConnectionId(memberId, out connectionId))
                             {
                                 // If party member is online, send party message to the member
-                                Manager.ServerSendPacket(playerCharacter.ConnectionId, 0, DeliveryMethod.ReliableOrdered, GameNetworkingConsts.Chat, message);
+                                Manager.ServerSendPacket(connectionId, 0, DeliveryMethod.ReliableOrdered, GameNetworkingConsts.Chat, message);
                             }
                         }
                     }
@@ -92,11 +100,10 @@ namespace MultiplayerARPG
                     {
                         foreach (string memberId in guild.GetMemberIds())
                         {
-                            if (GameInstance.ServerUserHandlers.TryGetPlayerCharacterById(memberId, out playerCharacter) &&
-                                Manager.ContainsConnectionId(playerCharacter.ConnectionId))
+                            if (GameInstance.ServerUserHandlers.TryGetConnectionId(memberId, out connectionId))
                             {
                                 // If guild member is online, send guild message to the member
-                                Manager.ServerSendPacket(playerCharacter.ConnectionId, 0, DeliveryMethod.ReliableOrdered, GameNetworkingConsts.Chat, message);
+                                Manager.ServerSendPacket(connectionId, 0, DeliveryMethod.ReliableOrdered, GameNetworkingConsts.Chat, message);
                             }
                         }
                     }
