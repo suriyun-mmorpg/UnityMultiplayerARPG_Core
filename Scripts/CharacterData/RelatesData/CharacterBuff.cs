@@ -17,6 +17,7 @@ namespace MultiplayerARPG
     public class CharacterBuff : INetSerializable
     {
         public static readonly CharacterBuff Empty = new CharacterBuff();
+        public string id;
         public BuffType type;
         public int dataId;
         public short level;
@@ -73,6 +74,8 @@ namespace MultiplayerARPG
         private int cacheMaxStack;
         [System.NonSerialized]
         private bool cacheDoNotRemoveOnDead;
+        [System.NonSerialized]
+        private string cacheKey;
 
         public EntityInfo BuffApplier { get; private set; }
 
@@ -80,6 +83,7 @@ namespace MultiplayerARPG
         {
             if (dirtyDataId != dataId || dirtyType != type || dirtyLevel != level)
             {
+                cacheKey = type + "_" + dataId;
                 dirtyDataId = dataId;
                 dirtyType = type;
                 dirtyLevel = level;
@@ -276,6 +280,12 @@ namespace MultiplayerARPG
             return cacheDoNotRemoveOnDead;
         }
 
+        public string GetKey()
+        {
+            MakeCache();
+            return cacheKey;
+        }
+
         public bool ShouldRemove()
         {
             return buffRemainsDuration <= 0f;
@@ -292,15 +302,11 @@ namespace MultiplayerARPG
             buffRemainsDuration -= deltaTime;
         }
 
-        public string GetKey()
-        {
-            return type + "_" + dataId;
-        }
-
         public static CharacterBuff Create(BuffType type, int dataId, short level = 1)
         {
             return new CharacterBuff()
             {
+                id = GenericUtils.GetUniqueId(),
                 type = type,
                 dataId = dataId,
                 level = level,
@@ -310,6 +316,7 @@ namespace MultiplayerARPG
 
         public void Serialize(NetDataWriter writer)
         {
+            writer.Put(id);
             writer.Put((byte)type);
             writer.PutPackedInt(dataId);
             writer.PutPackedShort(level);
@@ -318,6 +325,7 @@ namespace MultiplayerARPG
 
         public void Deserialize(NetDataReader reader)
         {
+            id = reader.GetString();
             type = (BuffType)reader.GetByte();
             dataId = reader.GetPackedInt();
             level = reader.GetPackedShort();

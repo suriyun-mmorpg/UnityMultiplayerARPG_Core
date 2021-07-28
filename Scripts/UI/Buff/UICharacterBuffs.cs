@@ -85,7 +85,7 @@ namespace MultiplayerARPG
         public virtual void UpdateData(ICharacterData character)
         {
             this.character = character;
-            string selectedBuffKey = CacheSelectionManager.SelectedUI != null ? CacheSelectionManager.SelectedUI.CharacterBuff.GetKey() : string.Empty;
+            string selectedId = CacheSelectionManager.SelectedUI != null ? CacheSelectionManager.SelectedUI.CharacterBuff.id : string.Empty;
             CacheSelectionManager.DeselectSelectedUI();
             CacheSelectionManager.Clear();
 
@@ -104,7 +104,7 @@ namespace MultiplayerARPG
                     tempUI.Setup(data, character, index);
                     tempUI.Show();
                     CacheSelectionManager.Add(tempUI);
-                    if (selectedBuffKey.Equals(data.GetKey()))
+                    if (!string.IsNullOrEmpty(selectedId) && selectedId.Equals(data.id))
                         tempUI.OnClickSelect();
                 }
                 else

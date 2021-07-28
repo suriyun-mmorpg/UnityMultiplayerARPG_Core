@@ -10,6 +10,7 @@ namespace MultiplayerARPG
             StreamingContext context)
         {
             CharacterBuff data = (CharacterBuff)obj;
+            info.AddValue("id", data.id);
             info.AddValue("type", (byte)data.type);
             info.AddValue("dataId", data.dataId);
             info.AddValue("level", data.level);
@@ -23,6 +24,14 @@ namespace MultiplayerARPG
             ISurrogateSelector selector)
         {
             CharacterBuff data = (CharacterBuff)obj;
+            try
+            {
+                data.id = info.GetString("id");
+            }
+            catch
+            {
+                data.id = GenericUtils.GetUniqueId();
+            }
             data.type = (BuffType)info.GetByte("type");
             data.dataId = info.GetInt32("dataId");
             data.level = info.GetInt16("level");
