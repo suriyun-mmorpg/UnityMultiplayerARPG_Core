@@ -82,6 +82,10 @@ namespace MultiplayerARPG
 
         protected override void UpdateData()
         {
+            // Update remains duration
+            if (CharacterBuff != null && CharacterBuff.buffRemainsDuration - buffRemainsDuration > 1)
+                buffRemainsDuration = CharacterBuff.buffRemainsDuration;
+
             BaseGameData tempGameData = null;
             switch (Data.type)
             {

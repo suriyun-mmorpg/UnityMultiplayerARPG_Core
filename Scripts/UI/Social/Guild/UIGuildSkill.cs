@@ -161,6 +161,14 @@ namespace MultiplayerARPG
 
         protected override void UpdateData()
         {
+            // Update remains duration
+            if (GameInstance.PlayingCharacter != null && GuildSkill != null)
+            {
+                int indexOfSkillUsage = GameInstance.PlayingCharacter.IndexOfSkillUsage(GuildSkill.DataId, SkillUsageType.GuildSkill);
+                if (indexOfSkillUsage >= 0 && GameInstance.PlayingCharacter.SkillUsages[indexOfSkillUsage].coolDownRemainsDuration - coolDownRemainsDuration > 1)
+                    coolDownRemainsDuration = GameInstance.PlayingCharacter.SkillUsages[indexOfSkillUsage].coolDownRemainsDuration;
+            }
+
             if (Level <= 0)
             {
                 onSetLevelZeroData.Invoke();
