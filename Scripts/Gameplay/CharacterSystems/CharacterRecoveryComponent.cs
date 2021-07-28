@@ -7,6 +7,12 @@ namespace MultiplayerARPG
         private float updatingTime;
         private float deltaTime;
         private CharacterRecoveryData recoveryData;
+        private bool isClearRecoveryData;
+
+        public override void EntityStart()
+        {
+            recoveryData = new CharacterRecoveryData(Entity, null);
+        }
 
         public override sealed void EntityUpdate()
         {
@@ -15,35 +21,43 @@ namespace MultiplayerARPG
 
             deltaTime = Time.unscaledDeltaTime;
 
-            if (Entity.IsRecaching || Entity.IsDead())
+            if (Entity.IsRecaching)
                 return;
+
+            if (Entity.IsDead())
+            {
+                if (!isClearRecoveryData)
+                {
+                    isClearRecoveryData = true;
+                    recoveryData.Clear();
+                }
+                return;
+            }
+            isClearRecoveryData = false;
 
             updatingTime += deltaTime;
             if (updatingTime >= CurrentGameplayRule.GetRecoveryUpdateDuration())
             {
                 // Hp
-                recoveryData.recoveryingHp += updatingTime * CurrentGameplayRule.GetRecoveryHpPerSeconds(Entity);
+                recoveryData.RecoveryingHp += updatingTime * CurrentGameplayRule.GetRecoveryHpPerSeconds(Entity);
                 // Decrease Hp
-                recoveryData.decreasingHp += updatingTime * CurrentGameplayRule.GetDecreasingHpPerSeconds(Entity);
+                recoveryData.DecreasingHp += updatingTime * CurrentGameplayRule.GetDecreasingHpPerSeconds(Entity);
                 // Mp
-                recoveryData.recoveryingMp += updatingTime * CurrentGameplayRule.GetRecoveryMpPerSeconds(Entity);
+                recoveryData.RecoveryingMp += updatingTime * CurrentGameplayRule.GetRecoveryMpPerSeconds(Entity);
                 // Decrease Mp
-                recoveryData.decreasingMp += updatingTime * CurrentGameplayRule.GetDecreasingMpPerSeconds(Entity);
+                recoveryData.DecreasingMp += updatingTime * CurrentGameplayRule.GetDecreasingMpPerSeconds(Entity);
                 // Stamina
-                recoveryData.recoveryingStamina += updatingTime * CurrentGameplayRule.GetRecoveryStaminaPerSeconds(Entity);
+                recoveryData.RecoveryingStamina += updatingTime * CurrentGameplayRule.GetRecoveryStaminaPerSeconds(Entity);
                 // Decrease Stamina
-                recoveryData.decreasingStamina += updatingTime * CurrentGameplayRule.GetDecreasingStaminaPerSeconds(Entity);
+                recoveryData.DecreasingStamina += updatingTime * CurrentGameplayRule.GetDecreasingStaminaPerSeconds(Entity);
                 // Decrease Food
-                recoveryData.decreasingFood += updatingTime * CurrentGameplayRule.GetDecreasingFoodPerSeconds(Entity);
+                recoveryData.DecreasingFood += updatingTime * CurrentGameplayRule.GetDecreasingFoodPerSeconds(Entity);
                 // Decrease Water
-                recoveryData.decreasingWater += updatingTime * CurrentGameplayRule.GetDecreasingWaterPerSeconds(Entity);
-
-                recoveryData = recoveryData.Apply(Entity, Entity.GetInfo());
-                // Dead by illness, so no causer
-                Entity.ValidateRecovery(new EntityInfo());
+                recoveryData.DecreasingWater += updatingTime * CurrentGameplayRule.GetDecreasingWaterPerSeconds(Entity);
+                // Apply
+                recoveryData.Apply();
                 updatingTime = 0;
             }
-
         }
     }
 }

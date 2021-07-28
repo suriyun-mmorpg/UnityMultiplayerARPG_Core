@@ -11,7 +11,13 @@ namespace MultiplayerARPG
         private float updatingTime;
         private float deltaTime;
         private CharacterRecoveryData nonApplierRecoveryBuff;
-        private readonly Dictionary<string, CharacterRecoveryData> recoveryBuffs = new Dictionary<string, CharacterRecoveryData>();
+        private Dictionary<string, CharacterRecoveryData> recoveryBuffs;
+
+        public override void EntityStart()
+        {
+            nonApplierRecoveryBuff = new CharacterRecoveryData(Entity, null);
+            recoveryBuffs = new Dictionary<string, CharacterRecoveryData>();
+        }
 
         public override sealed void EntityUpdate()
         {
@@ -80,63 +86,47 @@ namespace MultiplayerARPG
                     if (duration > 0f)
                     {
                         if (buff.BuffApplier != null && !recoveryBuffs.ContainsKey(buff.BuffApplier.id))
-                            recoveryBuffs.Add(buff.BuffApplier.id, default(CharacterRecoveryData));
+                            recoveryBuffs.Add(buff.BuffApplier.id, new CharacterRecoveryData(Entity, buff.BuffApplier));
 
                         CharacterRecoveryData recoveryData = buff.BuffApplier != null ? recoveryBuffs[buff.BuffApplier.id] : nonApplierRecoveryBuff;
-                        float tempAmount = 0f;
                         // Damage over time
-                        DamageElement damageElement;
-                        MinMaxFloat damageAmount;
-                        float tempReceivingDamage;
                         foreach (KeyValuePair<DamageElement, MinMaxFloat> damageOverTime in buff.GetDamageOverTimes())
                         {
-                            damageElement = damageOverTime.Key;
-                            damageAmount = damageOverTime.Value;
-                            tempReceivingDamage = damageElement.GetDamageReducedByResistance(Entity.GetCaches().Resistances, Entity.GetCaches().Armors, damageAmount.Random(Random.Range(0, 255)));
-                            if (tempReceivingDamage > 0f)
-                                tempAmount += tempReceivingDamage / duration * updatingTime;
+                            recoveryData.IncreaseDamageOverTimes(damageOverTime.Key, damageOverTime.Value / duration * updatingTime);
                         }
-                        recoveryData.decreasingHp += tempAmount;
+                        float tempAmount;
                         // Hp recovery
                         tempAmount = (float)buff.GetRecoveryHp() / duration * updatingTime;
                         if (tempAmount > 0)
-                            recoveryData.recoveryingHp += tempAmount;
+                            recoveryData.RecoveryingHp += tempAmount;
                         else if (tempAmount < 0)
-                            recoveryData.decreasingHp += -tempAmount;
+                            recoveryData.DecreasingHp += -tempAmount;
                         // Mp recovery
                         tempAmount = (float)buff.GetRecoveryMp() / duration * updatingTime;
                         if (tempAmount > 0)
-                            recoveryData.recoveryingMp += tempAmount;
+                            recoveryData.RecoveryingMp += tempAmount;
                         else if (tempAmount < 0)
-                            recoveryData.decreasingMp += -tempAmount;
+                            recoveryData.DecreasingMp += -tempAmount;
                         // Stamina recovery
                         tempAmount = (float)buff.GetRecoveryStamina() / duration * updatingTime;
                         if (tempAmount > 0)
-                            recoveryData.recoveryingStamina += tempAmount;
+                            recoveryData.RecoveryingStamina += tempAmount;
                         else if (tempAmount < 0)
-                            recoveryData.decreasingStamina += -tempAmount;
+                            recoveryData.DecreasingStamina += -tempAmount;
                         // Food recovery
                         tempAmount = (float)buff.GetRecoveryFood() / duration * updatingTime;
                         if (tempAmount > 0)
-                            recoveryData.recoveryingFood += tempAmount;
+                            recoveryData.RecoveryingFood += tempAmount;
                         else if (tempAmount < 0)
-                            recoveryData.decreasingFood += -tempAmount;
+                            recoveryData.DecreasingFood += -tempAmount;
                         // Water recovery
                         tempAmount = (float)buff.GetRecoveryWater() / duration * updatingTime;
                         if (tempAmount > 0)
-                            recoveryData.recoveryingWater += tempAmount;
+                            recoveryData.RecoveryingWater += tempAmount;
                         else if (tempAmount < 0)
-                            recoveryData.decreasingWater += -tempAmount;
-
-                        recoveryData = recoveryData.Apply(Entity, buff.BuffApplier);
-
-                        if (buff.BuffApplier != null)
-                            recoveryBuffs[buff.BuffApplier.id] = recoveryData;
-                        else
-                            nonApplierRecoveryBuff = recoveryData;
-
-                        // Causer is the entity whom applied buffs to this entity
-                        Entity.ValidateRecovery(buff.BuffApplier);
+                            recoveryData.DecreasingWater += -tempAmount;
+                        // Apply
+                        recoveryData.Apply();
                     }
                     // Don't update next buffs if character dead
                     if (Entity.IsDead())

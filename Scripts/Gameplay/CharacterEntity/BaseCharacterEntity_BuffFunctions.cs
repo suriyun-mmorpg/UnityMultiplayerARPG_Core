@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using UnityEngine;
 
 namespace MultiplayerARPG
 {
@@ -104,54 +103,44 @@ namespace MultiplayerARPG
             if (newBuff.GetDuration() <= 0f)
             {
                 CharacterRecoveryData recoveryData = default(CharacterRecoveryData);
-                int tempAmount = 0;
                 // Damage over time
-                DamageElement damageElement;
-                MinMaxFloat damageAmount;
-                float tempReceivingDamage;
                 foreach (KeyValuePair<DamageElement, MinMaxFloat> damageOverTime in newBuff.GetDamageOverTimes())
                 {
-                    damageElement = damageOverTime.Key;
-                    damageAmount = damageOverTime.Value;
-                    tempReceivingDamage = (float)damageElement.GetDamageReducedByResistance(this.GetCaches().Resistances, this.GetCaches().Armors, damageAmount.Random(Random.Range(0, 255)));
-                    if (tempReceivingDamage > 0f)
-                        tempAmount += (int)tempReceivingDamage;
+                    recoveryData.IncreaseDamageOverTimes(damageOverTime.Key, damageOverTime.Value);
                 }
-                recoveryData.decreasingHp += tempAmount;
+                int tempAmount;
                 // Hp recovery
                 tempAmount = newBuff.GetRecoveryHp();
                 if (tempAmount > 0)
-                    recoveryData.recoveryingHp += tempAmount;
+                    recoveryData.RecoveryingHp += tempAmount;
                 else if (tempAmount < 0)
-                    recoveryData.decreasingHp += -tempAmount;
+                    recoveryData.DecreasingHp += -tempAmount;
                 // Mp recovery
                 tempAmount = newBuff.GetRecoveryMp();
                 if (tempAmount > 0)
-                    recoveryData.recoveryingMp += tempAmount;
+                    recoveryData.RecoveryingMp += tempAmount;
                 else if (tempAmount < 0)
-                    recoveryData.decreasingMp += -tempAmount;
+                    recoveryData.DecreasingMp += -tempAmount;
                 // Stamina recovery
                 tempAmount = newBuff.GetRecoveryStamina();
                 if (tempAmount > 0)
-                    recoveryData.recoveryingStamina += tempAmount;
+                    recoveryData.RecoveryingStamina += tempAmount;
                 else if (tempAmount < 0)
-                    recoveryData.decreasingStamina += -tempAmount;
+                    recoveryData.DecreasingStamina += -tempAmount;
                 // Food recovery
                 tempAmount = newBuff.GetRecoveryFood();
                 if (tempAmount > 0)
-                    recoveryData.recoveryingFood += tempAmount;
+                    recoveryData.RecoveryingFood += tempAmount;
                 else if (tempAmount < 0)
-                    recoveryData.decreasingFood += -tempAmount;
+                    recoveryData.DecreasingFood += -tempAmount;
                 // Water recovery
                 tempAmount = newBuff.GetRecoveryWater();
                 if (tempAmount > 0)
-                    recoveryData.recoveryingWater += tempAmount;
+                    recoveryData.RecoveryingWater += tempAmount;
                 else if (tempAmount < 0)
-                    recoveryData.decreasingWater += -tempAmount;
-
-                recoveryData = recoveryData.Apply(this, buffApplier);
-                // Causer is the entity whom applied buffs to this entity
-                ValidateRecovery(buffApplier);
+                    recoveryData.DecreasingWater += -tempAmount;
+                // Apply
+                recoveryData.Apply();
             }
 
             OnApplyBuff(dataId, type, level);
