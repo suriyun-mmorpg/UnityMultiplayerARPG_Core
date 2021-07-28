@@ -285,6 +285,7 @@ namespace MultiplayerARPG
         {
             BuffApplier = buffApplier;
             buffRemainsDuration = GetDuration();
+            UnityEngine.Debug.LogError("Apply " + buffRemainsDuration);
         }
 
         public void Update(float deltaTime)

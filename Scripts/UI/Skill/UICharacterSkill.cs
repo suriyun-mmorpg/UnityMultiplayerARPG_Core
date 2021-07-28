@@ -96,17 +96,6 @@ namespace MultiplayerARPG
         {
             base.Update();
 
-            if (Character != null && Skill != null)
-            {
-                int indexOfSkillUsage = Character.IndexOfSkillUsage(Skill.DataId, SkillUsageType.Skill);
-                if (indexOfSkillUsage >= 0)
-                {
-                    coolDownRemainsDuration = Character.SkillUsages[indexOfSkillUsage].coolDownRemainsDuration;
-                    if (coolDownRemainsDuration <= 1f)
-                        coolDownRemainsDuration = 0f;
-                }
-            }
-
             if (coolDownRemainsDuration > 0f)
             {
                 coolDownRemainsDuration -= Time.deltaTime;
@@ -166,6 +155,14 @@ namespace MultiplayerARPG
 
         protected override void UpdateUI()
         {
+            // Update remains duration
+            if (coolDownRemainsDuration <= 0f && Character != null && Skill != null)
+            {
+                int indexOfSkillUsage = Character.IndexOfSkillUsage(Skill.DataId, SkillUsageType.Skill);
+                if (indexOfSkillUsage >= 0)
+                    coolDownRemainsDuration = Character.SkillUsages[indexOfSkillUsage].coolDownRemainsDuration;
+            }
+
             if (IsOwningCharacter() && Skill != null && Skill.CanLevelUp(GameInstance.PlayingCharacter, CharacterSkill.level, out _))
             {
                 onAbleToLevelUp.Invoke();
@@ -178,14 +175,6 @@ namespace MultiplayerARPG
 
         protected override void UpdateData()
         {
-            // Update remains duration
-            if (Character != null && Skill != null)
-            {
-                int indexOfSkillUsage = Character.IndexOfSkillUsage(Skill.DataId, SkillUsageType.Skill);
-                if (indexOfSkillUsage >= 0)
-                    coolDownRemainsDuration = Character.SkillUsages[indexOfSkillUsage].coolDownRemainsDuration;
-            }
-
             if (Level <= 0)
             {
                 onSetLevelZeroData.Invoke();

@@ -35,10 +35,6 @@ namespace MultiplayerARPG
         {
             base.Update();
 
-            buffRemainsDuration = CharacterBuff.buffRemainsDuration;
-            if (buffRemainsDuration <= 1f)
-                buffRemainsDuration = 0f;
-
             if (buffRemainsDuration > 0f)
             {
                 buffRemainsDuration -= Time.deltaTime;
@@ -46,7 +42,9 @@ namespace MultiplayerARPG
                     buffRemainsDuration = 0f;
             }
             else
+            {
                 buffRemainsDuration = 0f;
+            }
 
             // Update UIs
             float buffDuration = CharacterBuff.GetDuration();
@@ -73,12 +71,18 @@ namespace MultiplayerARPG
             }
         }
 
+        protected override void UpdateUI()
+        {
+            base.UpdateUI();
+
+            // Update remains duration
+            if (buffRemainsDuration <= 0f && CharacterBuff != null)
+                buffRemainsDuration = CharacterBuff.buffRemainsDuration;
+        }
+
         protected override void UpdateData()
         {
             BaseGameData tempGameData = null;
-            // Update remains duration
-            buffRemainsDuration = CharacterBuff.buffRemainsDuration;
-
             switch (Data.type)
             {
                 case BuffType.SkillBuff:

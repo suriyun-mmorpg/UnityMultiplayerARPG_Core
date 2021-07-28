@@ -95,21 +95,21 @@ namespace MultiplayerARPG
                 return;
             }
 
-            UICharacterBuff tempUiCharacterBuff;
-            CacheList.Generate(character.Buffs, (index, characterBuff, ui) =>
+            UICharacterBuff tempUI;
+            CacheList.Generate(character.Buffs, (index, data, ui) =>
             {
-                tempUiCharacterBuff = ui.GetComponent<UICharacterBuff>();
-                if (characterBuff.buffRemainsDuration > 0)
+                tempUI = ui.GetComponent<UICharacterBuff>();
+                if (data.buffRemainsDuration > 0)
                 {
-                    tempUiCharacterBuff.Setup(characterBuff, character, index);
-                    tempUiCharacterBuff.Show();
-                    CacheSelectionManager.Add(tempUiCharacterBuff);
-                    if (selectedBuffKey.Equals(characterBuff.GetKey()))
-                        tempUiCharacterBuff.OnClickSelect();
+                    tempUI.Setup(data, character, index);
+                    tempUI.Show();
+                    CacheSelectionManager.Add(tempUI);
+                    if (selectedBuffKey.Equals(data.GetKey()))
+                        tempUI.OnClickSelect();
                 }
                 else
                 {
-                    tempUiCharacterBuff.Hide();
+                    tempUI.Hide();
                 }
             });
         }

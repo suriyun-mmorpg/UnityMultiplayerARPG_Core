@@ -35,10 +35,6 @@ namespace MultiplayerARPG
         {
             base.Update();
 
-            craftRemainsDuration = Data.craftRemainsDuration;
-            if (craftRemainsDuration <= 1f)
-                craftRemainsDuration = 0f;
-
             if (craftRemainsDuration > 0f)
             {
                 craftRemainsDuration -= Time.deltaTime;
@@ -46,7 +42,9 @@ namespace MultiplayerARPG
                     craftRemainsDuration = 0f;
             }
             else
+            {
                 craftRemainsDuration = 0f;
+            }
 
             // Only first queue will show remains duration
             if (IndexOfData > 0)
@@ -88,13 +86,19 @@ namespace MultiplayerARPG
             }
         }
 
+        protected override void UpdateUI()
+        {
+            base.UpdateUI();
+
+            // Update remains duration
+            if (craftRemainsDuration <= 0f)
+                craftRemainsDuration = Data.craftRemainsDuration;
+        }
+
         protected override void UpdateData()
         {
             ItemCraftFormula formula;
             GameInstance.ItemCraftFormulas.TryGetValue(Data.dataId, out formula);
-
-            // Update remains duration
-            craftRemainsDuration = Data.craftRemainsDuration;
 
             if (uiItemCraft != null)
             {

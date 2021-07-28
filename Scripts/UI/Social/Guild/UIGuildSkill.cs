@@ -69,17 +69,6 @@ namespace MultiplayerARPG
         {
             base.Update();
 
-            if (GameInstance.PlayingCharacter != null && GuildSkill != null)
-            {
-                int indexOfSkillUsage = GameInstance.PlayingCharacter.IndexOfSkillUsage(GuildSkill.DataId, SkillUsageType.GuildSkill);
-                if (indexOfSkillUsage >= 0)
-                {
-                    coolDownRemainsDuration = GameInstance.PlayingCharacter.SkillUsages[indexOfSkillUsage].coolDownRemainsDuration;
-                    if (coolDownRemainsDuration <= 1f)
-                        coolDownRemainsDuration = 0f;
-                }
-            }
-
             if (coolDownRemainsDuration > 0f)
             {
                 coolDownRemainsDuration -= Time.deltaTime;
@@ -139,10 +128,17 @@ namespace MultiplayerARPG
 
         protected override void UpdateUI()
         {
-            BasePlayerCharacterEntity owningCharacter = GameInstance.PlayingCharacterEntity;
-            if (owningCharacter && GuildSkill && Level < GuildSkill.maxLevel &&
+            // Update remains duration
+            if (coolDownRemainsDuration <= 0f && GameInstance.PlayingCharacter != null && GuildSkill != null)
+            {
+                int indexOfSkillUsage = GameInstance.PlayingCharacter.IndexOfSkillUsage(GuildSkill.DataId, SkillUsageType.GuildSkill);
+                if (indexOfSkillUsage >= 0)
+                    coolDownRemainsDuration = GameInstance.PlayingCharacter.SkillUsages[indexOfSkillUsage].coolDownRemainsDuration;
+            }
+
+            if (GameInstance.PlayingCharacter != null && GuildSkill && Level < GuildSkill.maxLevel &&
                 GameInstance.JoinedGuild != null &&
-                GameInstance.JoinedGuild.IsLeader(owningCharacter.Id) &&
+                GameInstance.JoinedGuild.IsLeader(GameInstance.PlayingCharacter.Id) &&
                 GameInstance.JoinedGuild.skillPoint > 0)
             {
                 onAbleToLevelUp.Invoke();
@@ -152,7 +148,7 @@ namespace MultiplayerARPG
                 onUnableToLevelUp.Invoke();
             }
 
-            if (owningCharacter && GuildSkill && Level > 0 &&
+            if (GameInstance.PlayingCharacter != null && GuildSkill && Level > 0 &&
                 GuildSkill.GetSkillType() == GuildSkillType.Active)
             {
                 onAbleToUse.Invoke();
@@ -166,9 +162,13 @@ namespace MultiplayerARPG
         protected override void UpdateData()
         {
             if (Level <= 0)
+            {
                 onSetLevelZeroData.Invoke();
+            }
             else
+            {
                 onSetNonLevelZeroData.Invoke();
+            }
 
             if (uiTextTitle != null)
             {

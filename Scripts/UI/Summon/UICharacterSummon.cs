@@ -44,10 +44,6 @@ namespace MultiplayerARPG
         {
             base.Update();
 
-            summonRemainsDuration = CharacterSummon.summonRemainsDuration;
-            if (summonRemainsDuration <= 1f)
-                summonRemainsDuration = 0f;
-
             if (summonRemainsDuration > 0f)
             {
                 summonRemainsDuration -= Time.deltaTime;
@@ -55,7 +51,9 @@ namespace MultiplayerARPG
                     summonRemainsDuration = 0f;
             }
             else
+            {
                 summonRemainsDuration = 0f;
+            }
 
             // Update UIs
             if (uiTextRemainsDuration != null)
@@ -67,12 +65,18 @@ namespace MultiplayerARPG
             }
         }
 
+        protected override void UpdateUI()
+        {
+            base.UpdateUI();
+
+            // Update remains duration
+            if (summonRemainsDuration <= 0f && CharacterSummon != null)
+                summonRemainsDuration = CharacterSummon.summonRemainsDuration;
+        }
+
         protected override void UpdateData()
         {
             tempSummonData = null;
-            // Update remains duration
-            summonRemainsDuration = CharacterSummon.summonRemainsDuration;
-
             switch (Data.type)
             {
                 case SummonType.Skill:

@@ -232,8 +232,6 @@ namespace MultiplayerARPG
         private void UpdateLockRemainsDuration(float deltaTime)
         {
             lockRemainsDuration = CharacterItem != null ? CharacterItem.lockRemainsDuration : 0f;
-            if (lockRemainsDuration <= 1f)
-                lockRemainsDuration = 0f;
 
             if (lockRemainsDuration > 0f)
             {
@@ -277,17 +275,6 @@ namespace MultiplayerARPG
 
         private void UpdateSkillCoolDownRemainsDuration(BaseSkill skill, float deltaTime)
         {
-            if (Character != null && skill != null)
-            {
-                int indexOfSkillUsage = Character.IndexOfSkillUsage(skill.DataId, SkillUsageType.Skill);
-                if (indexOfSkillUsage >= 0)
-                {
-                    coolDownRemainsDuration = Character.SkillUsages[indexOfSkillUsage].coolDownRemainsDuration;
-                    if (coolDownRemainsDuration <= 1f)
-                        coolDownRemainsDuration = 0f;
-                }
-            }
-
             if (coolDownRemainsDuration > 0f)
             {
                 coolDownRemainsDuration -= deltaTime;
@@ -347,8 +334,17 @@ namespace MultiplayerARPG
 
         protected override void UpdateUI()
         {
+            // Update remains duration
+            if (coolDownRemainsDuration <= 0f && Character != null && SkillItem != null && SkillItem.UsingSkill != null)
+            {
+                int indexOfSkillUsage = Character.IndexOfSkillUsage(SkillItem.UsingSkill.DataId, SkillUsageType.Skill);
+                if (indexOfSkillUsage >= 0)
+                    coolDownRemainsDuration = Character.SkillUsages[indexOfSkillUsage].coolDownRemainsDuration;
+            }
+
             if (!IsOwningCharacter() || !IsVisible())
                 return;
+
             UpdateShopUIVisibility(false);
             UpdateRefineItemUIVisibility(false);
             UpdateDismantleItemUIVisibility(false);
