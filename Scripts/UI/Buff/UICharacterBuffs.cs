@@ -89,7 +89,7 @@ namespace MultiplayerARPG
             CacheSelectionManager.DeselectSelectedUI();
             CacheSelectionManager.Clear();
 
-            if (character == null)
+            if (character == null || character.CurrentHp <= 0)
             {
                 CacheList.HideAll();
                 return;
