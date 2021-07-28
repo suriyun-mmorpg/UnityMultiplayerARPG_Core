@@ -320,14 +320,9 @@ namespace MultiplayerARPG
         {
             // Calculate damages
             float calculatingTotalDamage = 0f;
-            float calculatingDamage;
-            MinMaxFloat damageAmount;
             foreach (DamageElement damageElement in damageAmounts.Keys)
             {
-                damageAmount = damageAmounts[damageElement];
-                calculatingDamage = damageAmount.Random(randomSeed);
-                if (calculatingDamage > 0f)
-                    calculatingTotalDamage += damageAmount.Random(randomSeed);
+                calculatingTotalDamage += damageAmounts[damageElement].Random(randomSeed);
             }
 
             // Apply damages

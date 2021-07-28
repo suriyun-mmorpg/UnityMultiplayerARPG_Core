@@ -260,21 +260,18 @@ namespace MultiplayerARPG
 
         protected override void ApplyReceiveDamage(Vector3 fromPosition, EntityInfo instigator, Dictionary<DamageElement, MinMaxFloat> damageAmounts, CharacterItem weapon, BaseSkill skill, short skillLevel, int randomSeed, out CombatAmountType combatAmountType, out int totalDamage)
         {
-            combatAmountType = CombatAmountType.Miss;
-            totalDamage = 0;
             if (!canBeAttacked)
+            {
+                combatAmountType = CombatAmountType.Miss;
+                totalDamage = 0;
                 return;
+            }
 
             // Calculate damages
             float calculatingTotalDamage = 0f;
-            float calculatingDamage;
-            MinMaxFloat damageAmount;
             foreach (DamageElement damageElement in damageAmounts.Keys)
             {
-                damageAmount = damageAmounts[damageElement];
-                calculatingDamage = damageElement.GetDamageReducedByResistance(Resistances, Armors, damageAmount.Random(randomSeed));
-                if (calculatingDamage > 0f)
-                    calculatingTotalDamage += calculatingDamage;
+                calculatingTotalDamage += damageElement.GetDamageReducedByResistance(Resistances, Armors, damageAmounts[damageElement].Random(randomSeed));
             }
 
             // Apply damages

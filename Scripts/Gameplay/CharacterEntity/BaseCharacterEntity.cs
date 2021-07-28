@@ -460,14 +460,9 @@ namespace MultiplayerARPG
             // Calculate damages
             combatAmountType = CombatAmountType.NormalDamage;
             float calculatingTotalDamage = 0f;
-            float calculatingDamage;
-            MinMaxFloat damageAmount;
             foreach (DamageElement damageElement in damageAmounts.Keys)
             {
-                damageAmount = damageAmounts[damageElement];
-                calculatingDamage = damageElement.GetDamageReducedByResistance(this.GetCaches().Resistances, this.GetCaches().Armors, damageAmount.Random(randomSeed));
-                if (calculatingDamage > 0f)
-                    calculatingTotalDamage += calculatingDamage;
+                calculatingTotalDamage += damageElement.GetDamageReducedByResistance(this.GetCaches().Resistances, this.GetCaches().Armors, damageAmounts[damageElement].Random(randomSeed));
             }
 
             if (attackerCharacter != null)
