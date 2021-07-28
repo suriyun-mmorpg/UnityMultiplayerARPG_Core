@@ -183,19 +183,19 @@ namespace MultiplayerARPG
                         case DamageSource.Weapon:
                             DamageElement damageElement;
                             if (GameInstance.DamageElements.TryGetValue(dataId, out damageElement) &&
-                                damageElement.GetDamageHitEffects() != null &&
-                                damageElement.GetDamageHitEffects().Length > 0)
+                                damageElement.DamageHitEffects != null &&
+                                damageElement.DamageHitEffects.Length > 0)
                             {
-                                effects = damageElement.GetDamageHitEffects();
+                                effects = damageElement.DamageHitEffects;
                             }
                             break;
                         case DamageSource.Skill:
                             BaseSkill skill;
                             if (GameInstance.Skills.TryGetValue(dataId, out skill) &&
-                                skill.GetDamageHitEffects() != null &&
-                                skill.GetDamageHitEffects().Length > 0)
+                                skill.DamageHitEffects != null &&
+                                skill.DamageHitEffects.Length > 0)
                             {
-                                effects = skill.GetDamageHitEffects();
+                                effects = skill.DamageHitEffects;
                             }
                             break;
                     }
@@ -288,7 +288,7 @@ namespace MultiplayerARPG
                             foreach (DamageElement element in damageAmounts.Keys)
                             {
                                 if (element != null && element != CurrentGameInstance.DefaultDamageElement &&
-                                    element.GetDamageHitEffects() != null && element.GetDamageHitEffects().Length > 0)
+                                    element.DamageHitEffects != null && element.DamageHitEffects.Length > 0)
                                 {
                                     dataId = element.DataId;
                                     break;
