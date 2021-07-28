@@ -172,7 +172,8 @@ namespace MultiplayerARPG
             if (destroying)
                 return;
 
-            if (other.layer == PhysicLayers.TransparentFX ||
+            if (other.layer == CurrentGameInstance.itemDropLayer ||
+                other.layer == PhysicLayers.TransparentFX ||
                 other.layer == PhysicLayers.IgnoreRaycast ||
                 other.layer == PhysicLayers.Water)
                 return;
@@ -200,8 +201,7 @@ namespace MultiplayerARPG
 
             // Must hit walls or grounds to explode
             // So if it hit item drop, character, building, harvestable and other ignore raycasting objects, it won't explode
-            if (other.layer != CurrentGameInstance.itemDropLayer &&
-                !CurrentGameInstance.IsDamageableLayer(other.layer) &&
+            if (!CurrentGameInstance.IsDamageableLayer(other.layer) &&
                 !CurrentGameInstance.IgnoreRaycastLayersValues.Contains(other.layer))
             {
                 if (explodeDistance > 0f)

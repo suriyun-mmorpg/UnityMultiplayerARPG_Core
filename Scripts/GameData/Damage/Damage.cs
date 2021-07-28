@@ -407,7 +407,8 @@ namespace MultiplayerARPG
                             distance = attacker.AttackPhysicFunctions.GetRaycastDistance(tempLoopCounter);
                             tempGameObject = attacker.AttackPhysicFunctions.GetRaycastObject(tempLoopCounter);
 
-                            if (tempGameObject.layer == PhysicLayers.TransparentFX ||
+                            if (tempGameObject.layer == GameInstance.Singleton.itemDropLayer ||
+                                tempGameObject.layer == PhysicLayers.TransparentFX ||
                                 tempGameObject.layer == PhysicLayers.IgnoreRaycast ||
                                 tempGameObject.layer == PhysicLayers.Water)
                                 continue;
