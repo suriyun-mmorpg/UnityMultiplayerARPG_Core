@@ -10,12 +10,10 @@ namespace MultiplayerARPG
 
         private float updatingTime;
         private float deltaTime;
-        private CharacterRecoveryData nonApplierRecoveryBuff;
         private Dictionary<string, CharacterRecoveryData> recoveryBuffs;
 
         public override void EntityStart()
         {
-            nonApplierRecoveryBuff = new CharacterRecoveryData(Entity, null);
             recoveryBuffs = new Dictionary<string, CharacterRecoveryData>();
         }
 
@@ -75,6 +73,7 @@ namespace MultiplayerARPG
                     duration = buff.GetDuration();
                     if (buff.ShouldRemove())
                     {
+                        recoveryBuffs.Remove(buff.id);
                         Entity.Buffs.RemoveAt(i);
                     }
                     else
@@ -85,48 +84,14 @@ namespace MultiplayerARPG
                     // If duration is 0, damages / recoveries will applied immediately, so don't apply it here
                     if (duration > 0f)
                     {
-                        if (buff.BuffApplier != null && !recoveryBuffs.ContainsKey(buff.BuffApplier.id))
-                            recoveryBuffs.Add(buff.BuffApplier.id, new CharacterRecoveryData(Entity, buff.BuffApplier));
-
-                        CharacterRecoveryData recoveryData = buff.BuffApplier != null ? recoveryBuffs[buff.BuffApplier.id] : nonApplierRecoveryBuff;
-                        // Damage over time
-                        foreach (KeyValuePair<DamageElement, MinMaxFloat> damageOverTime in buff.GetDamageOverTimes())
+                        CharacterRecoveryData recoveryData;
+                        if (!recoveryBuffs.TryGetValue(buff.id, out recoveryData))
                         {
-                            recoveryData.IncreaseDamageOverTimes(damageOverTime.Key, damageOverTime.Value / duration * updatingTime);
+                            recoveryData = new CharacterRecoveryData(Entity, buff.BuffApplier);
+                            recoveryData.Setup(buff);
+                            recoveryBuffs.Add(buff.id, recoveryData);
                         }
-                        float tempAmount;
-                        // Hp recovery
-                        tempAmount = (float)buff.GetRecoveryHp() / duration * updatingTime;
-                        if (tempAmount > 0)
-                            recoveryData.RecoveryingHp += tempAmount;
-                        else if (tempAmount < 0)
-                            recoveryData.DecreasingHp += -tempAmount;
-                        // Mp recovery
-                        tempAmount = (float)buff.GetRecoveryMp() / duration * updatingTime;
-                        if (tempAmount > 0)
-                            recoveryData.RecoveryingMp += tempAmount;
-                        else if (tempAmount < 0)
-                            recoveryData.DecreasingMp += -tempAmount;
-                        // Stamina recovery
-                        tempAmount = (float)buff.GetRecoveryStamina() / duration * updatingTime;
-                        if (tempAmount > 0)
-                            recoveryData.RecoveryingStamina += tempAmount;
-                        else if (tempAmount < 0)
-                            recoveryData.DecreasingStamina += -tempAmount;
-                        // Food recovery
-                        tempAmount = (float)buff.GetRecoveryFood() / duration * updatingTime;
-                        if (tempAmount > 0)
-                            recoveryData.RecoveryingFood += tempAmount;
-                        else if (tempAmount < 0)
-                            recoveryData.DecreasingFood += -tempAmount;
-                        // Water recovery
-                        tempAmount = (float)buff.GetRecoveryWater() / duration * updatingTime;
-                        if (tempAmount > 0)
-                            recoveryData.RecoveryingWater += tempAmount;
-                        else if (tempAmount < 0)
-                            recoveryData.DecreasingWater += -tempAmount;
-                        // Apply
-                        recoveryData.Apply();
+                        recoveryData.Apply(1 / duration * updatingTime);
                     }
                     // Don't update next buffs if character dead
                     if (Entity.IsDead())

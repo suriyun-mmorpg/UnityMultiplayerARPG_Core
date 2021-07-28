@@ -101,47 +101,7 @@ namespace MultiplayerARPG
             buffs.Add(newBuff);
 
             if (newBuff.GetDuration() <= 0f)
-            {
-                CharacterRecoveryData recoveryData = default(CharacterRecoveryData);
-                // Damage over time
-                foreach (KeyValuePair<DamageElement, MinMaxFloat> damageOverTime in newBuff.GetDamageOverTimes())
-                {
-                    recoveryData.IncreaseDamageOverTimes(damageOverTime.Key, damageOverTime.Value);
-                }
-                int tempAmount;
-                // Hp recovery
-                tempAmount = newBuff.GetRecoveryHp();
-                if (tempAmount > 0)
-                    recoveryData.RecoveryingHp += tempAmount;
-                else if (tempAmount < 0)
-                    recoveryData.DecreasingHp += -tempAmount;
-                // Mp recovery
-                tempAmount = newBuff.GetRecoveryMp();
-                if (tempAmount > 0)
-                    recoveryData.RecoveryingMp += tempAmount;
-                else if (tempAmount < 0)
-                    recoveryData.DecreasingMp += -tempAmount;
-                // Stamina recovery
-                tempAmount = newBuff.GetRecoveryStamina();
-                if (tempAmount > 0)
-                    recoveryData.RecoveryingStamina += tempAmount;
-                else if (tempAmount < 0)
-                    recoveryData.DecreasingStamina += -tempAmount;
-                // Food recovery
-                tempAmount = newBuff.GetRecoveryFood();
-                if (tempAmount > 0)
-                    recoveryData.RecoveryingFood += tempAmount;
-                else if (tempAmount < 0)
-                    recoveryData.DecreasingFood += -tempAmount;
-                // Water recovery
-                tempAmount = newBuff.GetRecoveryWater();
-                if (tempAmount > 0)
-                    recoveryData.RecoveryingWater += tempAmount;
-                else if (tempAmount < 0)
-                    recoveryData.DecreasingWater += -tempAmount;
-                // Apply
-                recoveryData.Apply();
-            }
+                new CharacterRecoveryData(this, buffApplier).Apply(1f);
 
             OnApplyBuff(dataId, type, level);
         }
