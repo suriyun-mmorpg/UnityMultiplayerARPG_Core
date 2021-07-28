@@ -10,15 +10,14 @@ namespace MultiplayerARPG
         [Range(0f, 1f)]
         public float maxResistanceAmount;
         public GameEffect[] damageHitEffects;
+        public GameEffect[] DamageHitEffects
+        {
+            get { return damageHitEffects; }
+        }
 
         public float GetDamageReducedByResistance(Dictionary<DamageElement, float> damageReceiverResistances, Dictionary<DamageElement, float> damageReceiverArmors, float damageAmount)
         {
             return GameInstance.Singleton.GameplayRule.GetDamageReducedByResistance(damageReceiverResistances, damageReceiverArmors, damageAmount, this);
-        }
-
-        public GameEffect[] GetDamageHitEffects()
-        {
-            return damageHitEffects;
         }
 
         public override void PrepareRelatesData()

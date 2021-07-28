@@ -257,9 +257,9 @@ namespace MultiplayerARPG
             Debuff.PrepareRelatesData();
         }
 
-        public GameEffect[] GetSkillCastEffect()
+        public GameEffect[] SkillCastEffect
         {
-            return skillCastEffects;
+            get { return skillCastEffects; }
         }
 
         public float GetCastDuration(short skillLevel)
@@ -267,9 +267,9 @@ namespace MultiplayerARPG
             return castDuration.GetAmount(skillLevel);
         }
 
-        public GameEffect[] GetDamageHitEffects()
+        public GameEffect[] DamageHitEffects
         {
-            return damageHitEffects;
+            get { return damageHitEffects; }
         }
 
         public int GetConsumeHp(short level)

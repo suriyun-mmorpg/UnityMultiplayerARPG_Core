@@ -277,9 +277,9 @@ namespace MultiplayerARPG
                 if (IsClient)
                 {
                     if (Entity.CharacterModel && Entity.CharacterModel.gameObject.activeSelf)
-                        Entity.CharacterModel.InstantiateEffect(skill.GetSkillCastEffect());
+                        Entity.CharacterModel.InstantiateEffect(skill.SkillCastEffect);
                     if (Entity.FpsModel && Entity.FpsModel.gameObject.activeSelf)
-                        Entity.FpsModel.InstantiateEffect(skill.GetSkillCastEffect());
+                        Entity.FpsModel.InstantiateEffect(skill.SkillCastEffect);
                 }
 
                 if (CastingSkillDuration > 0f)
