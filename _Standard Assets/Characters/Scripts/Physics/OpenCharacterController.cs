@@ -352,7 +352,7 @@ namespace StandardAssets.Characters.Physics
 
 		[Header("Player Root")]
 		[SerializeField, Tooltip("The root bone in the avatar.")]
-		Transform m_PlayerRootTransform;
+		Transform m_PlayerRootTransform = null;
 
 		[SerializeField, Tooltip("The root transform will be positioned at this offset.")]
 		Vector3 m_RootTransformOffset = new Vector3(0, 0, 0);
@@ -374,7 +374,7 @@ namespace StandardAssets.Characters.Physics
 		[SerializeField, Tooltip(
 			"If the character tries to move below the indicated value, it will not move at all. This can be used to reduce jitter. " +
 			"In most situations this value should be left at 0.")]
-		float m_MinMoveDistance;
+		float m_MinMoveDistance = 0f;
 
 		[SerializeField, Tooltip("This will offset the Capsule Collider in world space, and won’t affect how the Character pivots. " +
 				 "Ideally, x and z should be zero to avoid rotating into another collider.")]
