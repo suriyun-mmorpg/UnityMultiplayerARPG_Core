@@ -38,11 +38,6 @@ namespace MultiplayerARPG
             Show();
         }
 
-        protected void OnDialogHide()
-        {
-            CacheSelectionManager.DeselectSelectedUI();
-        }
-
         protected virtual void OnItemsOperation(LiteNetLibSyncList.Operation operation, int index)
         {
             UpdateData(TargetEntity.Items);
