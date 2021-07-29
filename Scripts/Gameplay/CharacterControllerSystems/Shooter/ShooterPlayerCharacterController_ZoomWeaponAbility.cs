@@ -1,6 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.UI;
 
 namespace MultiplayerARPG
@@ -9,7 +7,7 @@ namespace MultiplayerARPG
     {
         [Header("Zoom Weapon Ability Settings")]
         [SerializeField]
-        private Image zoomCrosshairImage;
+        private Image zoomCrosshairImage = null;
 
         public bool ShowZoomCrosshair
         {

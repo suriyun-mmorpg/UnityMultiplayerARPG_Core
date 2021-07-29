@@ -1,5 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 
 namespace MultiplayerARPG
@@ -12,9 +11,11 @@ namespace MultiplayerARPG
             Normal,
             BasedOnWeapon,
         }
-
-        public SkillAttackType skillAttackType;
+        [Category("Area Settings")]
         public AreaDamageEntity areaDamageEntity;
+
+        [Category(3, "Attacking")]
+        public SkillAttackType skillAttackType;
         public DamageIncremental damageAmount;
         public DamageEffectivenessAttribute[] effectivenessAttributes;
         public DamageInflictionIncremental[] weaponDamageInflictions;

@@ -14,16 +14,16 @@ namespace MultiplayerARPG
     [CreateAssetMenu(fileName = "Quest", menuName = "Create GameData/Quest", order = -4796)]
     public partial class Quest : BaseGameData
     {
-        [Header("Quest Configs")]
+        [Category("Quest Settings")]
         [Tooltip("Requirement to receive quest")]
-        public QuestRequirement requirement;
-        public QuestTask[] tasks;
-        public int rewardExp;
-        public int rewardGold;
+        public QuestRequirement requirement = default(QuestRequirement);
+        public QuestTask[] tasks = new QuestTask[0];
+        public int rewardExp = 0;
+        public int rewardGold = 0;
         [ArrayElementTitle("currency")]
-        public CurrencyAmount[] rewardCurrencies;
+        public CurrencyAmount[] rewardCurrencies = new CurrencyAmount[0];
         [ArrayElementTitle("item")]
-        public ItemAmount[] rewardItems;
+        public ItemAmount[] rewardItems = new ItemAmount[0];
         [Tooltip("If this is `TRUE` character will be able to do this quest repeatedly")]
         public bool canRepeat;
 

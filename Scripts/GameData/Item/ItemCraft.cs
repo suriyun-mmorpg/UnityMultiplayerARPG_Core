@@ -9,17 +9,20 @@ namespace MultiplayerARPG
         public static readonly ItemCraft Empty = new ItemCraft();
         [SerializeField]
         private BaseItem craftingItem;
+        public BaseItem CraftingItem { get { return craftingItem; } }
+
         [SerializeField]
         private short amount;
+        public short Amount { get { return (short)(amount > 0 ? amount : 1); } }
+
         [SerializeField]
         private int requireGold;
+        public int RequireGold { get { return requireGold; } }
+
         [SerializeField]
         [ArrayElementTitle("item")]
         private ItemAmount[] craftRequirements;
 
-        public BaseItem CraftingItem { get { return craftingItem; } }
-        public short Amount { get { return (short)(amount > 0 ? amount : 1); } }
-        public int RequireGold { get { return requireGold; } }
 
         [System.NonSerialized]
         private Dictionary<BaseItem, short> cacheCraftRequirements;
@@ -31,6 +34,19 @@ namespace MultiplayerARPG
                     cacheCraftRequirements = GameDataHelpers.CombineItems(craftRequirements, new Dictionary<BaseItem, short>());
                 return cacheCraftRequirements;
             }
+        }
+
+        public ItemCraft(
+            BaseItem craftingItem,
+            short amount,
+            int requireGold,
+            ItemAmount[] craftRequirements)
+        {
+            this.craftingItem = craftingItem;
+            this.amount = amount;
+            this.requireGold = requireGold;
+            this.craftRequirements = craftRequirements;
+            cacheCraftRequirements = null;
         }
 
         public bool CanCraft(IPlayerCharacterData character)

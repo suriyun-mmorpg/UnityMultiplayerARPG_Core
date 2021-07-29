@@ -137,12 +137,14 @@ namespace MultiplayerARPG
         {
             float deltaTime = Time.fixedDeltaTime;
             tempMoveDirection = Vector2.zero;
+            tempTargetDistance = 0f;
             if (currentDestination.HasValue)
             {
                 currentInput = this.SetInputPosition(currentInput, currentDestination.Value);
                 tempCurrentPosition = new Vector2(CacheTransform.position.x, CacheTransform.position.y);
                 tempMoveDirection = (currentDestination.Value - tempCurrentPosition).normalized;
-                if (Vector2.Distance(currentDestination.Value, tempCurrentPosition) < StoppingDistance)
+                tempTargetDistance = Vector2.Distance(currentDestination.Value, tempCurrentPosition);
+                if (tempTargetDistance < StoppingDistance)
                 {
                     StopMove();
                     tempMoveDirection = Vector2.zero;

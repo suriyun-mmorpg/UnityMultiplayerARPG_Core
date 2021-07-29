@@ -1,5 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Serialization;
 
@@ -25,10 +24,10 @@ namespace MultiplayerARPG
             Toggle,
         }
 
-        [Header("Type")]
+        [Category("Skill Settings")]
         public SkillType skillType;
 
-        [Header("Attack")]
+        [Category(3, "Attacking")]
         public SkillAttackType skillAttackType;
         public DamageInfo damageInfo;
         public DamageIncremental damageAmount;
@@ -42,18 +41,14 @@ namespace MultiplayerARPG
         public HarvestType harvestType;
         public IncrementalMinMaxFloat harvestDamageAmount;
 
-        [Header("Buffs")]
+        [Category(4, "Buff")]
         public SkillBuffType skillBuffType;
         public IncrementalFloat buffDistance;
         public Buff buff;
 
-        [Header("Summon")]
+        [Category(5, "Summon/Mount/Item Craft")]
         public SkillSummon summon;
-
-        [Header("Mount")]
         public SkillMount mount;
-
-        [Header("Craft")]
         public ItemCraft itemCraft;
 
         [System.NonSerialized]

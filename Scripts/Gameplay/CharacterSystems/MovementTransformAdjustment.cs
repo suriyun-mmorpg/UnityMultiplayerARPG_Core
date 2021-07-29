@@ -18,7 +18,7 @@ namespace MultiplayerARPG
         }
 
         [SerializeField]
-        private Transform targetTransform;
+        private Transform targetTransform = null;
         [SerializeField]
         private float translateSpeed = 5f;
         [SerializeField]

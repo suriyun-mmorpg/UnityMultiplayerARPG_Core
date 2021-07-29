@@ -1,21 +1,30 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 
 namespace MultiplayerARPG
 {
     public abstract partial class BaseEquipmentItem : BaseItem, IEquipmentItem
     {
-        [Header("Equipment Configs")]
+        [Category("In-Scene Objects/Appearance")]
         [SerializeField]
-        private EquipmentRequirement requirement;
+        private EquipmentModel[] equipmentModels = new EquipmentModel[0];
+        public EquipmentModel[] EquipmentModels
+        {
+            get { return equipmentModels; }
+            set { equipmentModels = value; }
+        }
+
+        [Category(2, "Equipment Settings")]
+        [Header("Generic Equipment Settings")]
+        [SerializeField]
+        private EquipmentRequirement requirement = default(EquipmentRequirement);
         public EquipmentRequirement Requirement
         {
             get { return requirement; }
         }
 
         [System.NonSerialized]
-        private Dictionary<Attribute, float> cacheRequireAttributeAmounts;
+        private Dictionary<Attribute, float> cacheRequireAttributeAmounts = null;
         public Dictionary<Attribute, float> RequireAttributeAmounts
         {
             get
@@ -27,120 +36,113 @@ namespace MultiplayerARPG
         }
 
         [SerializeField]
-        private EquipmentSet equipmentSet;
+        private EquipmentSet equipmentSet = null;
         public EquipmentSet EquipmentSet
         {
             get { return equipmentSet; }
         }
 
         [SerializeField]
-        private float maxDurability;
+        private float maxDurability = 0f;
         public float MaxDurability
         {
             get { return maxDurability; }
         }
 
         [SerializeField]
-        private bool destroyIfBroken;
+        private bool destroyIfBroken = false;
         public bool DestroyIfBroken
         {
             get { return destroyIfBroken; }
         }
 
         [SerializeField]
-        private byte maxSocket;
+        private byte maxSocket = 0;
         public byte MaxSocket
         {
             get { return maxSocket; }
         }
 
+        [Category(3, "Buff/Bonus Settings")]
         [SerializeField]
-        private EquipmentModel[] equipmentModels;
-        public EquipmentModel[] EquipmentModels
-        {
-            get { return equipmentModels; }
-            set { equipmentModels = value; }
-        }
-
-        [SerializeField]
-        private CharacterStatsIncremental increaseStats;
+        private CharacterStatsIncremental increaseStats = default(CharacterStatsIncremental);
         public CharacterStatsIncremental IncreaseStats
         {
             get { return increaseStats; }
         }
 
         [SerializeField]
-        private CharacterStatsIncremental increaseStatsRate;
+        private CharacterStatsIncremental increaseStatsRate = default(CharacterStatsIncremental);
         public CharacterStatsIncremental IncreaseStatsRate
         {
             get { return increaseStatsRate; }
         }
 
         [SerializeField]
-        private AttributeIncremental[] increaseAttributes;
+        private AttributeIncremental[] increaseAttributes = new AttributeIncremental[0];
         public AttributeIncremental[] IncreaseAttributes
         {
             get { return increaseAttributes; }
         }
 
         [SerializeField]
-        private AttributeIncremental[] increaseAttributesRate;
+        private AttributeIncremental[] increaseAttributesRate = new AttributeIncremental[0];
         public AttributeIncremental[] IncreaseAttributesRate
         {
             get { return increaseAttributesRate; }
         }
 
         [SerializeField]
-        private ResistanceIncremental[] increaseResistances;
+        private ResistanceIncremental[] increaseResistances = new ResistanceIncremental[0];
         public ResistanceIncremental[] IncreaseResistances
         {
             get { return increaseResistances; }
         }
 
         [SerializeField]
-        private ArmorIncremental[] increaseArmors;
+        private ArmorIncremental[] increaseArmors = new ArmorIncremental[0];
         public ArmorIncremental[] IncreaseArmors
         {
             get { return increaseArmors; }
         }
 
         [SerializeField]
-        private DamageIncremental[] increaseDamages;
+        private DamageIncremental[] increaseDamages = new DamageIncremental[0];
         public DamageIncremental[] IncreaseDamages
         {
             get { return increaseDamages; }
         }
 
         [SerializeField]
-        private SkillLevel[] increaseSkillLevels;
+        private SkillLevel[] increaseSkillLevels = new SkillLevel[0];
         public SkillLevel[] IncreaseSkillLevels
         {
             get { return increaseSkillLevels; }
         }
 
         [SerializeField]
-        private StatusEffectApplying[] selfStatusEffectsWhenAttacking;
+        private StatusEffectApplying[] selfStatusEffectsWhenAttacking = new StatusEffectApplying[0];
         public StatusEffectApplying[] SelfStatusEffectsWhenAttacking
         {
             get { return selfStatusEffectsWhenAttacking; }
         }
 
         [SerializeField]
-        private StatusEffectApplying[] enemyStatusEffectsWhenAttacking;
+        private StatusEffectApplying[] enemyStatusEffectsWhenAttacking = new StatusEffectApplying[0];
         public StatusEffectApplying[] EnemyStatusEffectsWhenAttacking
         {
             get { return enemyStatusEffectsWhenAttacking; }
         }
 
         [SerializeField]
-        private StatusEffectApplying[] selfStatusEffectsWhenAttacked;
+        private StatusEffectApplying[] selfStatusEffectsWhenAttacked = new StatusEffectApplying[0];
         public StatusEffectApplying[] SelfStatusEffectsWhenAttacked
         {
             get { return selfStatusEffectsWhenAttacked; }
         }
 
         [SerializeField]
-        private StatusEffectApplying[] enemyStatusEffectsWhenAttacked;
+        private StatusEffectApplying[] enemyStatusEffectsWhenAttacked = new StatusEffectApplying[0];
         public StatusEffectApplying[] EnemyStatusEffectsWhenAttacked
         {
             get { return enemyStatusEffectsWhenAttacked; }

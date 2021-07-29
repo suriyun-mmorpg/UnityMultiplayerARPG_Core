@@ -1,6 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
 namespace MultiplayerARPG
 {
@@ -17,9 +15,9 @@ namespace MultiplayerARPG
             get { return ItemType.Pet; }
         }
 
-        [Header("Pet Configs")]
+        [Category(3, "Pet Settings")]
         [SerializeField]
-        private BaseMonsterCharacterEntity petEntity;
+        private BaseMonsterCharacterEntity petEntity = null;
         public BaseMonsterCharacterEntity PetEntity
         {
             get { return petEntity; }

@@ -7,7 +7,9 @@ namespace MultiplayerARPG
     [CreateAssetMenu(fileName = "Skill", menuName = "Create GameData/Skill/Simple Resurrection Skill", order = -4986)]
     public class SimpleResurrectionSkill : BaseSkill
     {
-        [Header("Resurrect Skill")]
+        [Category("Buff")]
+        public IncrementalFloat buffDistance;
+        public Buff buff;
         [Range(0.01f, 1f)]
         public float resurrectHpRate = 0.1f;
         [Range(0.01f, 1f)]
@@ -18,10 +20,6 @@ namespace MultiplayerARPG
         public float resurrectFoodRate = 0.1f;
         [Range(0.01f, 1f)]
         public float resurrectWaterRate = 0.1f;
-
-        [Header("Buffs")]
-        public IncrementalFloat buffDistance;
-        public Buff buff;
 
         protected override void ApplySkillImplement(BaseCharacterEntity skillUser, short skillLevel, bool isLeftHand, CharacterItem weapon, int hitIndex, Dictionary<DamageElement, MinMaxFloat> damageAmounts, uint targetObjectId, AimPosition aimPosition, int randomSeed, long? time)
         {

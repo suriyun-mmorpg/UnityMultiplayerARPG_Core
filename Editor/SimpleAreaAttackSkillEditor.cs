@@ -1,12 +1,10 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEditor;
+﻿using UnityEditor;
 
 namespace MultiplayerARPG
 {
     [CustomEditor(typeof(SimpleAreaAttackSkill))]
     [CanEditMultipleObjects]
-    public class SimpleAreaAttackSkillEditor : BaseCustomEditor
+    public class SimpleAreaAttackSkillEditor : BaseGameDataEditor
     {
         private static SimpleAreaAttackSkill cacheSkill;
         protected override void SetFieldCondition()
@@ -27,6 +25,9 @@ namespace MultiplayerARPG
             ShowOnEnum(nameof(cacheSkill.skillAttackType), nameof(SimpleAreaAttackSkill.SkillAttackType.BasedOnWeapon), nameof(cacheSkill.additionalDamageAmounts));
             ShowOnEnum(nameof(cacheSkill.skillAttackType), nameof(SimpleAreaAttackSkill.SkillAttackType.BasedOnWeapon), nameof(cacheSkill.increaseDamageAmountsWithBuffs));
             ShowOnEnum(nameof(cacheSkill.skillAttackType), nameof(SimpleAreaAttackSkill.SkillAttackType.BasedOnWeapon), nameof(cacheSkill.isDebuff));
+            // Harvest
+            ShowOnEnum(nameof(cacheSkill.harvestType), nameof(HarvestType.BasedOnWeapon), nameof(cacheSkill.harvestDamageAmount));
+            ShowOnEnum(nameof(cacheSkill.harvestType), nameof(HarvestType.BasedOnSkill), nameof(cacheSkill.harvestDamageAmount));
             // Debuff
             ShowOnBool(nameof(cacheSkill.isDebuff), true, nameof(cacheSkill.debuff));
         }

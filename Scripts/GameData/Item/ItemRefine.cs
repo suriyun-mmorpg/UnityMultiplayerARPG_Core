@@ -6,12 +6,20 @@ namespace MultiplayerARPG
     [CreateAssetMenu(fileName = "Item Refine Info", menuName = "Create GameData/Item Refine", order = -4898)]
     public partial class ItemRefine : BaseGameData
     {
-        [Header("Item Refine Configs")]
-        public Color titleColor = Color.clear;
+        [Category("Item Refine Settings")]
+        [SerializeField]
+        private Color titleColor = Color.clear;
+        public Color TitleColor { get { return titleColor; } }
+
+        [SerializeField]
         [Tooltip("This is refine level, each level have difference success rate, required items, required gold")]
-        public ItemRefineLevel[] levels;
+        private ItemRefineLevel[] levels = new ItemRefineLevel[0];
+        public ItemRefineLevel[] Levels { get { return levels; } }
+
+        [SerializeField]
         [Tooltip("This is repair prices, should order from high to low durability rate")]
-        public ItemRepairPrice[] repairPrices;
+        private ItemRepairPrice[] repairPrices = new ItemRepairPrice[0];
+        public ItemRepairPrice[] RepairPrices { get { return repairPrices; } }
     }
 
     [System.Serializable]
@@ -20,20 +28,26 @@ namespace MultiplayerARPG
         [Range(0.01f, 1f)]
         [SerializeField]
         private float successRate;
+        public float SuccessRate { get { return successRate; } }
+
         [SerializeField]
         [ArrayElementTitle("item")]
         private ItemAmount[] requireItems;
+        public ItemAmount[] RequireItems { get { return requireItems; } }
+
         [SerializeField]
         private int requireGold;
+        public int RequireGold { get { return requireGold; } }
+
         [Tooltip("How many levels it will be decreased if refining failed")]
         [SerializeField]
         private short refineFailDecreaseLevels;
+        public short RefineFailDecreaseLevels { get { return refineFailDecreaseLevels; } }
+
         [Tooltip("It will be destroyed if this value is TRUE and refining failed")]
         [SerializeField]
         private bool refineFailDestroyItem;
-
-        public float SuccessRate { get { return successRate; } }
-        public ItemAmount[] RequireItems { get { return requireItems; } }
+        public bool RefineFailDestroyItem { get { return refineFailDestroyItem; } }
 
         [System.NonSerialized]
         private Dictionary<BaseItem, short> cacheRequireItems;
@@ -46,9 +60,21 @@ namespace MultiplayerARPG
                 return cacheRequireItems;
             }
         }
-        public int RequireGold { get { return requireGold; } }
-        public short RefineFailDecreaseLevels { get { return refineFailDecreaseLevels; } }
-        public bool RefineFailDestroyItem { get { return refineFailDestroyItem; } }
+
+        public ItemRefineLevel(
+            float successRate,
+            ItemAmount[] requireItems,
+            int requireGold,
+            short refineFailDecreaseLevels,
+            bool refineFailDestroyItem)
+        {
+            this.successRate = successRate;
+            this.requireItems = requireItems;
+            this.requireGold = requireGold;
+            this.refineFailDecreaseLevels = refineFailDecreaseLevels;
+            this.refineFailDestroyItem = refineFailDestroyItem;
+            cacheRequireItems = null;
+        }
 
         public bool CanRefine(IPlayerCharacterData character)
         {
@@ -84,11 +110,17 @@ namespace MultiplayerARPG
         [Range(0.01f, 1f)]
         [SerializeField]
         private float durabilityRate;
+        public float DurabilityRate { get { return durabilityRate; } }
+
         [SerializeField]
         private int requireGold;
-
-        public float DurabilityRate { get { return durabilityRate; } }
         public int RequireGold { get { return requireGold; } }
+
+        public ItemRepairPrice(float durabilityRate, int requireGold)
+        {
+            this.durabilityRate = durabilityRate;
+            this.requireGold = requireGold;
+        }
 
         public bool CanRepair(IPlayerCharacterData character)
         {

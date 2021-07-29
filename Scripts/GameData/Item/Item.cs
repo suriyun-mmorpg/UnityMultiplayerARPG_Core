@@ -28,10 +28,16 @@ namespace MultiplayerARPG
             SkillReset,
         }
 
-        [Header("Item Configs")]
+        [Category("Item Settings")]
         public LegacyItemType itemType;
 
-        [Header("Equipment Configs")]
+        [Category("In-Scene Objects/Appearance")]
+        public EquipmentModel[] equipmentModels;
+        [Tooltip("This will be available with `Weapon` item, set it in case that it will be equipped at left hand")]
+        public EquipmentModel[] subEquipmentModels;
+
+        [Category(2, "Equipment Settings")]
+        [Header("Generic Equipment Settings")]
         public EquipmentRequirement requirement;
         public EquipmentSet equipmentSet;
         [Tooltip("Equipment durability, If this set to 0 it will not broken")]
@@ -42,11 +48,11 @@ namespace MultiplayerARPG
         [Range(0, 6)]
         public byte maxSocket;
 
-        [Header("Armor/Shield Configs")]
+        [Header("Armor/Shield Settings")]
         public ArmorType armorType;
         public ArmorIncremental armorAmount;
 
-        [Header("Weapon Configs")]
+        [Header("Weapon Settings")]
         public WeaponType weaponType;
         public DamageIncremental damageAmount;
         public IncrementalMinMaxFloat harvestDamageAmount;
@@ -74,7 +80,14 @@ namespace MultiplayerARPG
         public AudioClip reloadClip;
         public AudioClip emptyClip;
 
-        [Header("Equipment Bonus Stats")]
+        [Header("Fire Configs")]
+        public FireType fireType;
+        public Vector2 fireStagger;
+        public byte fireSpread;
+        public bool destroyImmediatelyAfterFired;
+
+        [Category(3, "Buff/Bonus Settings")]
+        public Buff buff;
         public CharacterStatsIncremental increaseStats;
         public CharacterStatsIncremental increaseStatsRate;
         [ArrayElementTitle("attribute")]
@@ -90,42 +103,28 @@ namespace MultiplayerARPG
         [ArrayElementTitle("skill")]
         public SkillLevel[] increaseSkillLevels;
 
-        [Header("Fire Configs")]
-        public FireType fireType;
-        public Vector2 fireStagger;
-        public byte fireSpread;
-        private bool destroyImmediatelyAfterFired;
-
-        [Header("Equip Models")]
-        public EquipmentModel[] equipmentModels;
-        [Tooltip("This will be available with `Weapon` item, set it in case that it will be equipped at left hand")]
-        public EquipmentModel[] subEquipmentModels;
-
-        [Header("Buff Configs")]
-        public Buff buff;
-
-        [Header("Ammo Configs")]
+        [Category(2, "Ammo Settings")]
         public AmmoType ammoType;
 
-        [Header("Building Configs")]
+        [Category(2, "Building Settings")]
         public BuildingEntity buildingEntity;
 
-        [Header("Pet Configs")]
+        [Category(2, "Pet Settings")]
         public BaseMonsterCharacterEntity petEntity;
 
-        [Header("Socket Enhancer Configs")]
-        public EquipmentBonus socketEnhanceEffect;
-
-        [Header("Mount Configs")]
+        [Category(3, "Mount Settings")]
         public VehicleEntity mountEntity;
 
-        [Header("Attribute Configs")]
+        [Category("Buff/Bonus Settings")]
+        // For socket enhancer items
+        public EquipmentBonus socketEnhanceEffect;
+
+        // For attribute increase/reset items
         public AttributeAmount attributeAmount;
 
-        [Header("Skill Configs")]
+        // For skill learn/reset items
         public SkillLevel skillLevel;
 
-        [Header("Status Effects")]
         [ArrayElementTitle("statusEffect")]
         public StatusEffectApplying[] selfStatusEffectsWhenAttacking;
         [ArrayElementTitle("statusEffect")]

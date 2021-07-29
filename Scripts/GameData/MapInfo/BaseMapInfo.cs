@@ -4,18 +4,19 @@ namespace MultiplayerARPG
 {
     public abstract partial class BaseMapInfo : BaseGameData
     {
-        [Header("Map Info Configs")]
+        [Category("Map Info Settings")]
         [SerializeField]
-        private UnityScene scene;
+        private UnityScene scene = default(UnityScene);
+        public virtual UnityScene Scene { get { return scene; } }
+
         [Tooltip("This will be used when new character have been created, and this map data is start map")]
         [SerializeField]
-        private Vector3 startPosition;
+        private Vector3 startPosition = Vector3.zero;
+        public virtual Vector3 StartPosition { get { return startPosition; } }
+
         [Tooltip("When character fall to this position, character will dead")]
         [SerializeField]
         private float deadY = -100f;
-
-        public virtual UnityScene Scene { get { return scene; } }
-        public virtual Vector3 StartPosition { get { return startPosition; } }
         public virtual float DeadY { get { return deadY; } }
 
         public virtual bool AutoRespawnWhenDead { get { return false; } }

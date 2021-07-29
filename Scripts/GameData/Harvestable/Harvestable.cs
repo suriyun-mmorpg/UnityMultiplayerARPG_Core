@@ -7,7 +7,7 @@ namespace MultiplayerARPG
     [CreateAssetMenu(fileName = "Harvestable", menuName = "Create GameData/Harvestable", order = -4795)]
     public partial class Harvestable : BaseGameData
     {
-        [Header("Harvestable Configs")]
+        [Category("Harvestable Settings")]
         public HarvestEffectiveness[] harvestEffectivenesses;
         public SkillHarvestEffectiveness[] skillHarvestEffectivenesses;
         [Tooltip("Ex. if this is 10 when damage to harvestable entity = 2, character will receives 20 exp")]

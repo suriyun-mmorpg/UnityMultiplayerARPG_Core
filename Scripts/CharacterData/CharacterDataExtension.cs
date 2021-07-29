@@ -1660,7 +1660,7 @@ namespace MultiplayerARPG
             CharacterStats tempIncreaseStats;
             foreach (KeyValuePair<EquipmentSet, int> cacheEquipmentSet in equipmentSets)
             {
-                EquipmentBonus[] effects = cacheEquipmentSet.Key.effects;
+                EquipmentBonus[] effects = cacheEquipmentSet.Key.Effects;
                 int setAmount = cacheEquipmentSet.Value;
                 for (int i = 0; i < setAmount; ++i)
                 {

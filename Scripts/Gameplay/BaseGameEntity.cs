@@ -33,14 +33,14 @@ namespace MultiplayerARPG
         protected LanguageData[] entityTitles;
 
         [SerializeField]
-        private Text textTitle;
+        private Text textTitle = null;
         public Text TextTitle
         {
             get { return textTitle; }
         }
 
         [SerializeField]
-        private Text textTitleB;
+        private Text textTitleB = null;
         public Text TextTitleB
         {
             get { return textTitleB; }
@@ -66,7 +66,7 @@ namespace MultiplayerARPG
         [Category(1, "Relative GameObjects/Transforms")]
         [Tooltip("These objects will be hidden on non owner objects")]
         [SerializeField]
-        private GameObject[] ownerObjects;
+        private GameObject[] ownerObjects = new GameObject[0];
         public GameObject[] OwnerObjects
         {
             get { return ownerObjects; }
@@ -74,7 +74,7 @@ namespace MultiplayerARPG
 
         [Tooltip("These objects will be hidden on owner objects")]
         [SerializeField]
-        private GameObject[] nonOwnerObjects;
+        private GameObject[] nonOwnerObjects = new GameObject[0];
         public GameObject[] NonOwnerObjects
         {
             get { return nonOwnerObjects; }
@@ -87,7 +87,7 @@ namespace MultiplayerARPG
 
         [Category(2, "Components")]
         [SerializeField]
-        protected GameEntityModel model;
+        protected GameEntityModel model = null;
         public GameEntityModel Model
         {
             get { return model; }
@@ -96,7 +96,7 @@ namespace MultiplayerARPG
         [Category("Relative GameObjects/Transforms")]
         [Tooltip("Transform for position which camera will look at and follow while playing in TPS view mode")]
         [SerializeField]
-        private Transform cameraTargetTransform;
+        private Transform cameraTargetTransform = null;
         public Transform CameraTargetTransform
         {
             get
@@ -113,7 +113,7 @@ namespace MultiplayerARPG
 
         [Tooltip("Transform for position which camera will look at and follow while playing in FPS view mode")]
         [SerializeField]
-        private Transform fpsCameraTargetTransform;
+        private Transform fpsCameraTargetTransform = null;
         public Transform FpsCameraTargetTransform
         {
             get { return fpsCameraTargetTransform; }
@@ -124,14 +124,14 @@ namespace MultiplayerARPG
 
         [Category(3, "Entity Movement")]
         [SerializeField]
-        private MovementSecure movementSecure;
+        private MovementSecure movementSecure = MovementSecure.NotSecure;
         public MovementSecure MovementSecure { get { return movementSecure; } set { movementSecure = value; } }
 
         [SerializeField]
-        protected bool canSideSprint;
+        protected bool canSideSprint = false;
 
         [SerializeField]
-        protected bool canBackwardSprint;
+        protected bool canBackwardSprint = false;
 
         public IEntityMovementComponent Movement { get; private set; }
 

@@ -1,5 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 
 namespace MultiplayerARPG
@@ -17,31 +16,32 @@ namespace MultiplayerARPG
             get { return ItemType.Weapon; }
         }
 
-        [Header("Weapon Configs")]
+        [Category("In-Scene Objects/Appearance")]
         [SerializeField]
-        private WeaponType weaponType;
-        public WeaponType WeaponType
-        {
-            get { return weaponType; }
-        }
-
-        [SerializeField]
-        private EquipmentModel[] offHandEquipmentModels;
+        private EquipmentModel[] offHandEquipmentModels = new EquipmentModel[0];
         public EquipmentModel[] OffHandEquipmentModels
         {
             get { return offHandEquipmentModels; }
             set { offHandEquipmentModels = value; }
         }
 
+        [Header("Weapon Settings")]
         [SerializeField]
-        private DamageIncremental damageAmount;
+        private WeaponType weaponType = null;
+        public WeaponType WeaponType
+        {
+            get { return weaponType; }
+        }
+
+        [SerializeField]
+        private DamageIncremental damageAmount = default(DamageIncremental);
         public DamageIncremental DamageAmount
         {
             get { return damageAmount; }
         }
 
         [SerializeField]
-        private IncrementalMinMaxFloat harvestDamageAmount;
+        private IncrementalMinMaxFloat harvestDamageAmount = default(IncrementalMinMaxFloat);
         public IncrementalMinMaxFloat HarvestDamageAmount
         {
             get { return harvestDamageAmount; }
@@ -69,87 +69,136 @@ namespace MultiplayerARPG
         }
 
         [SerializeField]
-        private short ammoCapacity;
+        private short ammoCapacity = 0;
         public short AmmoCapacity
         {
             get { return ammoCapacity; }
         }
 
         [SerializeField]
-        private BaseWeaponAbility weaponAbility;
+        private BaseWeaponAbility weaponAbility = null;
         public BaseWeaponAbility WeaponAbility
         {
             get { return weaponAbility; }
         }
 
         [SerializeField]
-        private CrosshairSetting crosshairSetting;
+        private CrosshairSetting crosshairSetting = default(CrosshairSetting);
         public CrosshairSetting CrosshairSetting
         {
             get { return crosshairSetting; }
         }
 
+        [HideInInspector]
         [SerializeField]
-        private AudioClip launchClip;
+        private AudioClip launchClip = null;
         [SerializeField]
-        private AudioClip[] launchClips;
+        private AudioClip[] launchClips = new AudioClip[0];
         public AudioClip LaunchClip
         {
             get
             {
                 if (launchClips != null && launchClips.Length > 0)
                     return launchClips[Random.Range(0, launchClips.Length - 1)];
-                return launchClip;
+                return null;
             }
         }
 
+        [HideInInspector]
         [SerializeField]
-        private AudioClip reloadClip;
+        private AudioClip reloadClip = null;
         [SerializeField]
-        private AudioClip[] reloadClips;
+        private AudioClip[] reloadClips = new AudioClip[0];
         public AudioClip ReloadClip
         {
             get
             {
                 if (reloadClips != null && reloadClips.Length > 0)
                     return reloadClips[Random.Range(0, reloadClips.Length - 1)];
-                return reloadClip;
+                return null;
+            }
+        }
+
+        [HideInInspector]
+        [SerializeField]
+        private AudioClip emptyClip = null;
+        [SerializeField]
+        private AudioClip[] emptyClips = new AudioClip[0];
+        public AudioClip EmptyClip
+        {
+            get
+            {
+                if (emptyClips != null && emptyClips.Length > 0)
+                    return emptyClips[Random.Range(0, emptyClips.Length - 1)];
+                return null;
             }
         }
 
         [SerializeField]
-        private AudioClip emptyClip;
-        public AudioClip EmptyClip
-        {
-            get { return emptyClip; }
-        }
-
-        [SerializeField]
-        private FireType fireType;
+        private FireType fireType = FireType.SingleFire;
         public FireType FireType
         {
             get { return fireType; }
         }
 
         [SerializeField]
-        private Vector2 fireStagger;
+        private Vector2 fireStagger = Vector2.zero;
         public Vector2 FireStagger
         {
             get { return fireStagger; }
         }
 
         [SerializeField]
-        private byte fireSpread;
+        private byte fireSpread = 0;
         public byte FireSpread
         {
             get { return fireSpread; }
         }
 
         [SerializeField]
-        private bool destroyImmediatelyAfterFired;
+        private bool destroyImmediatelyAfterFired = false;
         public bool DestroyImmediatelyAfterFired
         {
             get { return destroyImmediatelyAfterFired; }
+        }
+
+        public override bool Validate()
+        {
+            bool hasChanges = false;
+            if (launchClip != null)
+            {
+                List<AudioClip> clips = new List<AudioClip>(launchClips);
+                if (!clips.Contains(launchClip))
+                {
+                    clips.Add(launchClip);
+                    launchClips = clips.ToArray();
+                }
+                launchClip = null;
+                hasChanges = true;
+            }
+            if (reloadClip != null)
+            {
+                List<AudioClip> clips = new List<AudioClip>(reloadClips);
+                if (!clips.Contains(reloadClip))
+                {
+                    clips.Add(reloadClip);
+                    reloadClips = clips.ToArray();
+                }
+                reloadClip = null;
+                hasChanges = true;
+            }
+            if (emptyClip != null)
+            {
+                List<AudioClip> clips = new List<AudioClip>(emptyClips);
+                if (!clips.Contains(emptyClip))
+                {
+                    clips.Add(emptyClip);
+                    emptyClips = clips.ToArray();
+                }
+                emptyClip = null;
+                hasChanges = true;
+            }
+            return hasChanges || base.Validate();
         }
 
         public override void PrepareRelatesData()

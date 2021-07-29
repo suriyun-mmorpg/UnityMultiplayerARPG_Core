@@ -18,7 +18,7 @@ namespace MultiplayerARPG
             StringBuilder allBonusText = new StringBuilder();
             int effectCount = 1;
             string tempText;
-            foreach (EquipmentBonus effect in Data.equipmentSet.effects)
+            foreach (EquipmentBonus effect in Data.equipmentSet.Effects)
             {
                 tempText = GetEquipmentBonusText(effect);
                 if (!string.IsNullOrEmpty(tempText))

@@ -14,19 +14,20 @@ namespace MultiplayerARPG
     [CreateAssetMenu(fileName = "Weapon Type", menuName = "Create GameData/Weapon Type", order = -4895)]
     public partial class WeaponType : BaseGameData
     {
-        [Header("Weapon Type Configs")]
+        [Category("Weapon Type Settings")]
         [SerializeField]
-        private WeaponItemEquipType equipType;
+        private WeaponItemEquipType equipType = WeaponItemEquipType.OneHand;
         public WeaponItemEquipType EquipType { get { return equipType; } }
         [SerializeField]
-        private DamageInfo damageInfo;
+        private DamageInfo damageInfo = default(DamageInfo);
         public DamageInfo DamageInfo { get { return damageInfo; } }
         [SerializeField]
-        private DamageEffectivenessAttribute[] effectivenessAttributes;
-        [Header("Ammo")]
+        private DamageEffectivenessAttribute[] effectivenessAttributes = new DamageEffectivenessAttribute[0];
+
+        [Category("Ammo Settings")]
         [Tooltip("Require Ammo, Leave it to null when it is not required")]
         [SerializeField]
-        private AmmoType requireAmmoType;
+        private AmmoType requireAmmoType = null;
         public AmmoType RequireAmmoType { get { return requireAmmoType; } }
 
         [System.NonSerialized]
@@ -45,10 +46,6 @@ namespace MultiplayerARPG
         {
             name = GameDataConst.UNKNOW_WEAPON_TYPE_ID;
             title = GameDataConst.UNKNOW_WEAPON_TYPE_TITLE;
-            equipType = WeaponItemEquipType.OneHand;
-            damageInfo = new DamageInfo();
-            effectivenessAttributes = new DamageEffectivenessAttribute[0];
-            requireAmmoType = null;
             return this;
         }
 

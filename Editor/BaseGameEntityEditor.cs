@@ -1,10 +1,9 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEditor;
+﻿using UnityEditor;
 
 namespace MultiplayerARPG
 {
     [CustomEditor(typeof(BaseGameEntity), true)]
+    [CanEditMultipleObjects]
     public class BaseGameEntityEditor : BaseCustomCategorizedEditor
     {
     }

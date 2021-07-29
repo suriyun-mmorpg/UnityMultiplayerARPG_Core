@@ -15,37 +15,37 @@ namespace MultiplayerARPG
             get { return ItemType.SocketEnhancer; }
         }
 
-        [Header("Socket Enhancer Configs")]
+        [Category(3, "Buff/Bonus Settings")]
         [SerializeField]
-        private EquipmentBonus socketEnhanceEffect;
+        private EquipmentBonus socketEnhanceEffect = default(EquipmentBonus);
         public EquipmentBonus SocketEnhanceEffect
         {
             get { return socketEnhanceEffect; }
         }
 
         [SerializeField]
-        private StatusEffectApplying[] selfStatusEffectsWhenAttacking;
+        private StatusEffectApplying[] selfStatusEffectsWhenAttacking = new StatusEffectApplying[0];
         public StatusEffectApplying[] SelfStatusEffectsWhenAttacking
         {
             get { return selfStatusEffectsWhenAttacking; }
         }
 
         [SerializeField]
-        private StatusEffectApplying[] enemyStatusEffectsWhenAttacking;
+        private StatusEffectApplying[] enemyStatusEffectsWhenAttacking = new StatusEffectApplying[0];
         public StatusEffectApplying[] EnemyStatusEffectsWhenAttacking
         {
             get { return enemyStatusEffectsWhenAttacking; }
         }
 
         [SerializeField]
-        private StatusEffectApplying[] selfStatusEffectsWhenAttacked;
+        private StatusEffectApplying[] selfStatusEffectsWhenAttacked = new StatusEffectApplying[0];
         public StatusEffectApplying[] SelfStatusEffectsWhenAttacked
         {
             get { return selfStatusEffectsWhenAttacked; }
         }
 
         [SerializeField]
-        private StatusEffectApplying[] enemyStatusEffectsWhenAttacked;
+        private StatusEffectApplying[] enemyStatusEffectsWhenAttacked = new StatusEffectApplying[0];
         public StatusEffectApplying[] EnemyStatusEffectsWhenAttacked
         {
             get { return enemyStatusEffectsWhenAttacked; }

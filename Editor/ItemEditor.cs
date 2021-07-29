@@ -1,12 +1,10 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEditor;
+﻿using UnityEditor;
 
 namespace MultiplayerARPG
 {
     [CustomEditor(typeof(Item))]
     [CanEditMultipleObjects]
-    public class ItemEditor : BaseCustomEditor
+    public class ItemEditor : BaseGameDataEditor
     {
         private static Item cacheItem;
         protected override void SetFieldCondition()
@@ -68,6 +66,7 @@ namespace MultiplayerARPG
             ShowOnEnum(nameof(cacheItem.itemType), nameof(Item.LegacyItemType.Weapon), nameof(cacheItem.fireType));
             ShowOnEnum(nameof(cacheItem.itemType), nameof(Item.LegacyItemType.Weapon), nameof(cacheItem.fireStagger));
             ShowOnEnum(nameof(cacheItem.itemType), nameof(Item.LegacyItemType.Weapon), nameof(cacheItem.fireSpread));
+            ShowOnEnum(nameof(cacheItem.itemType), nameof(Item.LegacyItemType.Weapon), nameof(cacheItem.destroyImmediatelyAfterFired));
             ShowOnEnum(nameof(cacheItem.itemType), nameof(Item.LegacyItemType.Weapon), nameof(cacheItem.maxDurability));
             ShowOnEnum(nameof(cacheItem.itemType), nameof(Item.LegacyItemType.Weapon), nameof(cacheItem.destroyIfBroken));
             // Shield

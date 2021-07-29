@@ -805,7 +805,7 @@ namespace MultiplayerARPG
 
             if (uiEquipmentSet != null)
             {
-                if (EquipmentItem == null || EquipmentItem.EquipmentSet == null || EquipmentItem.EquipmentSet.effects.Length == 0)
+                if (EquipmentItem == null || EquipmentItem.EquipmentSet == null || EquipmentItem.EquipmentSet.Effects.Length == 0)
                 {
                     // Only equipment item has equipment set data
                     uiEquipmentSet.Hide();

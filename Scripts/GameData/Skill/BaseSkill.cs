@@ -1,5 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Text;
 using UnityEngine;
 using UnityEngine.Serialization;
@@ -8,13 +7,20 @@ namespace MultiplayerARPG
 {
     public abstract partial class BaseSkill : BaseGameData, ICustomAimController
     {
-        [Header("Skill Configs")]
+        [Category("Skill Settings")]
         [Range(1, 100)]
         public short maxLevel = 1;
+
+        [Category(2, "Activation Settings")]
         [Range(0f, 1f)]
         [Tooltip("This is move speed rate while using this skill")]
         public float moveSpeedRateWhileUsingSkill = 0f;
+        public IncrementalInt consumeHp;
+        public IncrementalInt consumeMp;
+        public IncrementalInt consumeStamina;
+        public IncrementalFloat coolDownDuration;
 
+        [Category(2, "Skill Casting")]
         [Header("Casting Effects")]
         public GameEffect[] skillCastEffects;
         public IncrementalFloat castDuration;
@@ -22,6 +28,10 @@ namespace MultiplayerARPG
 
         [Header("Casted Effects")]
         public GameEffect[] damageHitEffects;
+
+        [Category(11, "Requirement")]
+        [Header("Requirements to Levelup")]
+        public SkillRequirement requirement;
 
         [Header("Required Equipments")]
         [Tooltip("If this is `TRUE`, character have to equip shield to use skill")]
@@ -36,21 +46,6 @@ namespace MultiplayerARPG
         [Header("Required Vehicles")]
         [Tooltip("Characters will be able to use skill if this list is empty or driving one in this list")]
         public VehicleType[] availableVehicles;
-
-        [Header("Consume Hp")]
-        public IncrementalInt consumeHp;
-
-        [Header("Consume Mp")]
-        public IncrementalInt consumeMp;
-
-        [Header("Consume Stamina")]
-        public IncrementalInt consumeStamina;
-
-        [Header("Cool Down")]
-        public IncrementalFloat coolDownDuration;
-
-        [Header("Requirements to Levelup")]
-        public SkillRequirement requirement;
 
         [Header("Requirements to Use")]
         [Tooltip("If this list is empty it won't decrease items from inventory. It will decrease one kind of item in this list when using skill, not all items in this list")]

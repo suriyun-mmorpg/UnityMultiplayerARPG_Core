@@ -327,7 +327,7 @@ namespace MultiplayerARPG
             tempCurrentPosition = CacheTransform.position;
             tempMoveVelocity = Vector3.zero;
             tempMoveDirection = Vector3.zero;
-            tempTargetDistance = -1f;
+            tempTargetDistance = 0f;
             WaterCheck();
 
             bool isGrounded = CacheCharacterController.isGrounded;

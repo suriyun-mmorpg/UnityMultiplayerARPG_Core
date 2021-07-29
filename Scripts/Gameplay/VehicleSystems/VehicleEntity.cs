@@ -10,7 +10,7 @@ namespace MultiplayerARPG
     {
         [Category(5, "Vehicle Settings")]
         [SerializeField]
-        private VehicleType vehicleType = null;
+        protected VehicleType vehicleType = null;
         public VehicleType VehicleType { get { return vehicleType; } }
 
         [SerializeField]
@@ -26,7 +26,7 @@ namespace MultiplayerARPG
 
         [Tooltip("First seat is for driver")]
         [SerializeField]
-        private List<VehicleSeat> seats = new List<VehicleSeat>();
+        protected List<VehicleSeat> seats = new List<VehicleSeat>();
         public List<VehicleSeat> Seats { get { return seats; } }
 
         [SerializeField]
@@ -34,18 +34,18 @@ namespace MultiplayerARPG
 
         // TODO: Vehicle can level up?
         [SerializeField]
-        private short level;
+        protected short level = 0;
 
         [SerializeField]
-        private IncrementalInt hp;
-
-        [SerializeField]
-        [ArrayElementTitle("damageElement")]
-        private ResistanceIncremental[] resistances;
+        protected IncrementalInt hp = default(IncrementalInt);
 
         [SerializeField]
         [ArrayElementTitle("damageElement")]
-        private ArmorIncremental[] armors;
+        protected ResistanceIncremental[] resistances = new ResistanceIncremental[0];
+
+        [SerializeField]
+        [ArrayElementTitle("damageElement")]
+        protected ArmorIncremental[] armors = new ArmorIncremental[0];
 
         [SerializeField]
         [Tooltip("Delay before the entity destroyed, you may set some delay to play destroyed animation by `onVehicleDestroy` event before it's going to be destroyed from the game.")]
@@ -59,7 +59,7 @@ namespace MultiplayerARPG
 
         [Category("Sync Fields")]
         [SerializeField]
-        private SyncListUInt syncPassengerIds = new SyncListUInt();
+        protected SyncListUInt syncPassengerIds = new SyncListUInt();
 
         public virtual bool IsDestroyWhenDriverExit { get { return false; } }
         public virtual bool HasDriver { get { return passengers.ContainsKey(0); } }

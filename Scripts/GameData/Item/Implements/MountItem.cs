@@ -1,6 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
 namespace MultiplayerARPG
 {
@@ -17,9 +15,9 @@ namespace MultiplayerARPG
             get { return ItemType.Mount; }
         }
 
-        [Header("Mount Configs")]
+        [Category(3, "Mount Settings")]
         [SerializeField]
-        private VehicleEntity mountEntity;
+        private VehicleEntity mountEntity = null;
         public VehicleEntity MountEntity
         {
             get { return mountEntity; }

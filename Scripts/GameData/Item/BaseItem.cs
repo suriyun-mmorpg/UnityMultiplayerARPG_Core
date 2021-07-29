@@ -5,9 +5,7 @@ namespace MultiplayerARPG
 {
     public abstract partial class BaseItem : BaseGameData, IItem
     {
-        [Header("Item Configs")]
-        [SerializeField]
-        protected GameObject dropModel;
+        [Category("Item Settings")]
         [SerializeField]
         protected int sellPrice;
         [SerializeField]
@@ -21,13 +19,17 @@ namespace MultiplayerARPG
         [Tooltip("This is duration to lock item at first time when pick up dropped item or bought it from NPC or IAP system")]
         protected float lockDuration;
 
-        [Header("Dismantle Configs")]
+        [Category(10, "In-Scene Objects/Appearance")]
+        [SerializeField]
+        protected GameObject dropModel;
+
+        [Category(50, "Dismantle Settings")]
         [SerializeField]
         protected int dismantleReturnGold;
         [SerializeField]
         protected ItemAmount[] dismantleReturnItems;
 
-        [Header("Cash Shop Generating Configs")]
+        [Category(100, "Cash Shop Generating Settings")]
         [SerializeField]
         protected CashShopItemGeneratingData[] cashShopItemGeneratingList;
 
@@ -35,9 +37,9 @@ namespace MultiplayerARPG
         {
             get
             {
-                if (itemRefine == null || itemRefine.titleColor.a == 0)
+                if (itemRefine == null || itemRefine.TitleColor.a == 0)
                     return base.Title;
-                return "<color=#" + ColorUtility.ToHtmlStringRGB(itemRefine.titleColor) + ">" + base.Title + "</color>";
+                return "<color=#" + ColorUtility.ToHtmlStringRGB(itemRefine.TitleColor) + ">" + base.Title + "</color>";
             }
         }
 
@@ -47,7 +49,7 @@ namespace MultiplayerARPG
             {
                 if (itemRefine == null)
                     return "Normal";
-                return "<color=#" + ColorUtility.ToHtmlStringRGB(itemRefine.titleColor) + ">" + itemRefine.Title + "</color>";
+                return "<color=#" + ColorUtility.ToHtmlStringRGB(itemRefine.TitleColor) + ">" + itemRefine.Title + "</color>";
             }
         }
 
@@ -75,9 +77,9 @@ namespace MultiplayerARPG
         {
             get
             {
-                if (!ItemRefine || ItemRefine.levels == null || ItemRefine.levels.Length == 0)
+                if (!ItemRefine || ItemRefine.Levels == null || ItemRefine.Levels.Length == 0)
                     return 1;
-                return ItemRefine.levels.Length;
+                return ItemRefine.Levels.Length;
             }
         }
 

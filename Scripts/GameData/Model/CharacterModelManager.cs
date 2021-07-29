@@ -16,22 +16,22 @@ namespace MultiplayerARPG
         public const byte HIDE_SETTER_CONTROLLER = 1;
 
         [SerializeField]
-        private BaseCharacterModel mainModel;
+        private BaseCharacterModel mainModel = null;
         public BaseCharacterModel MainModel { get { return mainModel; } set { mainModel = value; } }
 
         [SerializeField]
-        private BaseCharacterModel fpsModelPrefab;
+        private BaseCharacterModel fpsModelPrefab = null;
         [SerializeField]
         [FormerlySerializedAs("fpsModelOffsets")]
         [Tooltip("Position offsets from fps model container (Camera's transform)")]
-        private Vector3 fpsModelPositionOffsets;
+        private Vector3 fpsModelPositionOffsets = Vector3.zero;
         [SerializeField]
         [Tooltip("Rotation offsets from fps model container (Camera's transform)")]
-        private Vector3 fpsModelRotationOffsets;
+        private Vector3 fpsModelRotationOffsets = Vector3.zero;
         public BaseCharacterModel FpsModel { get; private set; }
 
         [SerializeField]
-        private VehicleCharacterModel[] vehicleModels;
+        private VehicleCharacterModel[] vehicleModels = new VehicleCharacterModel[0];
 
         public Dictionary<int, VehicleCharacterModel> CacheVehicleModels { get; private set; }
 

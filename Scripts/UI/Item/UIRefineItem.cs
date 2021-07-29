@@ -76,7 +76,7 @@ namespace MultiplayerARPG
                 CanRefine = EquipmentItem != null && characterItem.GetItem().CanRefine(GameInstance.PlayingCharacter, Level, out gameMessage);
                 if (CanRefine)
                 {
-                    refineLevel = EquipmentItem.ItemRefine.levels[Level - 1];
+                    refineLevel = EquipmentItem.ItemRefine.Levels[Level - 1];
                 }
                 else
                 {
@@ -87,7 +87,7 @@ namespace MultiplayerARPG
                             break;
                         case UITextKeys.UI_ERROR_NOT_ENOUGH_GOLD:
                         case UITextKeys.UI_ERROR_NOT_ENOUGH_ITEMS:
-                            refineLevel = EquipmentItem.ItemRefine.levels[Level - 1];
+                            refineLevel = EquipmentItem.ItemRefine.Levels[Level - 1];
                             break;
                     }
                 }

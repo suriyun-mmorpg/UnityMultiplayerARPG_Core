@@ -22,6 +22,8 @@ namespace MultiplayerARPG
         protected string fieldName;
         public string FieldName { get { return fieldName; } }
         protected string menuTitle;
+        protected T editorData;
+        protected Editor editor;
         public override string MenuTitle { get { return menuTitle; } }
 
         public GameDataListSection(string fieldName, string menuTitle)
@@ -121,8 +123,12 @@ namespace MultiplayerARPG
                 {
                     if (selectedMenuIndex < 0)
                         selectedMenuIndex = 0;
-                    Editor editor = Editor.CreateEditor(arr[selectedMenuIndex]);
-                    editor.DrawDefaultInspector();
+                    if (editorData != arr[selectedMenuIndex])
+                    {
+                        editor = Editor.CreateEditor(arr[selectedMenuIndex]);
+                        editorData = arr[selectedMenuIndex];
+                    }
+                    editor.OnInspectorGUI();
                 }
                 GUILayout.EndScrollView();
             }

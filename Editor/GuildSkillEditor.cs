@@ -1,12 +1,10 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEditor;
+﻿using UnityEditor;
 
 namespace MultiplayerARPG
 {
     [CustomEditor(typeof(GuildSkill))]
     [CanEditMultipleObjects]
-    public class GuildSkillEditor : BaseCustomEditor
+    public class GuildSkillEditor : BaseGameDataEditor
     {
         private static GuildSkill cacheGuildSkill;
         protected override void SetFieldCondition()

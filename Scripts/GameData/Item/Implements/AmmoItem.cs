@@ -17,16 +17,16 @@ namespace MultiplayerARPG
             get { return ItemType.Ammo; }
         }
 
-        [Header("Ammo Configs")]
+        [Category(2, "Ammo Settings")]
         [SerializeField]
-        private AmmoType ammoType;
+        private AmmoType ammoType = null;
         public AmmoType AmmoType
         {
             get { return ammoType; }
         }
 
         [SerializeField]
-        private DamageIncremental[] increaseDamages;
+        private DamageIncremental[] increaseDamages = new DamageIncremental[0];
         public DamageIncremental[] IncreaseDamages
         {
             get { return increaseDamages; }

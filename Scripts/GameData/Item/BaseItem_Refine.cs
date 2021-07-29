@@ -24,13 +24,13 @@ namespace MultiplayerARPG
                 gameMessage = UITextKeys.UI_ERROR_CANNOT_REFINE;
                 return false;
             }
-            if (level >= ItemRefine.levels.Length)
+            if (level >= ItemRefine.Levels.Length)
             {
                 // Cannot refine because item reached max level
                 gameMessage = UITextKeys.UI_ERROR_REFINE_ITEM_REACHED_MAX_LEVEL;
                 return false;
             }
-            return ItemRefine.levels[level - 1].CanRefine(character, out gameMessage);
+            return ItemRefine.Levels[level - 1].CanRefine(character, out gameMessage);
         }
 
         public static bool RefineRightHandItem(IPlayerCharacterData character, out UITextKeys gameMessageType)
@@ -107,7 +107,7 @@ namespace MultiplayerARPG
                 // Cannot refine because of some reasons
                 return false;
             }
-            ItemRefineLevel refineLevel = equipmentItem.ItemRefine.levels[refiningItem.level - 1];
+            ItemRefineLevel refineLevel = equipmentItem.ItemRefine.Levels[refiningItem.level - 1];
             if (Random.value <= refineLevel.SuccessRate)
             {
                 // If success, increase item level

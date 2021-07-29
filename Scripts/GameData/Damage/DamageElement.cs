@@ -6,7 +6,7 @@ namespace MultiplayerARPG
     [CreateAssetMenu(fileName = "Damage Element", menuName = "Create GameData/Damage Element", order = -4994)]
     public partial class DamageElement : BaseGameData
     {
-        [Header("Damage Element Configs")]
+        [Category("Damage Element Settings")]
         [Range(0f, 1f)]
         public float maxResistanceAmount;
         public GameEffect[] damageHitEffects;

@@ -7,11 +7,17 @@ namespace MultiplayerARPG
     {
         [SerializeField]
         private bool returnEnhancerItem;
+        public bool ReturnEnhancerItem { get { return returnEnhancerItem; } }
+
         [SerializeField]
         private int requireGold;
-
-        public bool ReturnEnhancerItem { get { return returnEnhancerItem; } }
         public int RequireGold { get { return requireGold; } }
+
+        public EnhancerRemoval(bool returnEnhancerItem, int requireGold)
+        {
+            this.returnEnhancerItem = returnEnhancerItem;
+            this.requireGold = requireGold;
+        }
 
         public bool CanRemove(IPlayerCharacterData character)
         {

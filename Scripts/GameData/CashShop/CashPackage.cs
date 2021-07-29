@@ -9,7 +9,7 @@ namespace MultiplayerARPG
     [CreateAssetMenu(fileName = "Cash Package", menuName = "Create CashShop/Cash Package", order = -3995)]
     public class CashPackage : BaseGameData
     {
-        [Header("Cash Package Configs")]
+        [Category("Cash Package Settings")]
         public string externalIconUrl;
         public int cashAmount;
         [HideInInspector]

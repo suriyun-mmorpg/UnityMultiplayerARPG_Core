@@ -1,6 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
 namespace MultiplayerARPG
 {
@@ -17,16 +15,16 @@ namespace MultiplayerARPG
             get { return ItemType.Skill; }
         }
 
-        [Header("Skill Configs")]
+        [Category(3, "Skill Settings")]
         [SerializeField]
-        private BaseSkill usingSkill;
+        private BaseSkill usingSkill = null;
         public BaseSkill UsingSkill
         {
             get { return usingSkill; }
         }
 
         [SerializeField]
-        private short usingSkillLevel;
+        private short usingSkillLevel = 0;
         public short UsingSkillLevel
         {
             get { return usingSkillLevel; }

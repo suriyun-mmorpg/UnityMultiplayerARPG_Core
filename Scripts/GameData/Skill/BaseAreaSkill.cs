@@ -1,12 +1,13 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
 namespace MultiplayerARPG
 {
     public abstract class BaseAreaSkill : BaseSkill
     {
+        [Category("Skill Casting")]
         public IncrementalFloat castDistance;
+
+        [Category(2, "Area Settings")]
         public IncrementalFloat areaDuration;
         public IncrementalFloat applyDuration;
         public GameObject targetObjectPrefab;

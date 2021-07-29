@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace MultiplayerARPG
 {
@@ -22,6 +23,7 @@ namespace MultiplayerARPG
     [CreateAssetMenu(fileName = "Monster Character", menuName = "Create GameData/Monster Character", order = -4998)]
     public partial class MonsterCharacter : BaseCharacter
     {
+        [Category(2, "Monster Settings")]
         [Header("Monster Data")]
         [SerializeField]
         [Tooltip("This will be used to adjust stats. If this value is 100, it means current stats which set to this character data is stats for character level 100, it will be used to adjust stats for character level 1.")]
@@ -29,29 +31,35 @@ namespace MultiplayerARPG
         public short DefaultLevel { get { return defaultLevel; } }
         [SerializeField]
         [Tooltip("`Normal` will attack when being attacked, `Aggressive` will attack when enemy nearby, `Assist` will attack when other with same `Ally Id` being attacked, `NoHarm` won't attack.")]
-        private MonsterCharacteristic characteristic;
+        private MonsterCharacteristic characteristic = MonsterCharacteristic.Normal;
         public MonsterCharacteristic Characteristic { get { return characteristic; } }
         [SerializeField]
         [Tooltip("This will work with assist characteristic only, to detect ally")]
-        private ushort allyId;
+        private ushort allyId = 0;
         public ushort AllyId { get { return allyId; } }
         [SerializeField]
         [Tooltip("This move speed will be applies when it's wandering. if it's going to chase enemy, stats'moveSpeed will be applies")]
-        private float wanderMoveSpeed;
+        private float wanderMoveSpeed = 1f;
         public float WanderMoveSpeed { get { return wanderMoveSpeed; } }
         [SerializeField]
         [Tooltip("Range to see an enemies and allies")]
         private float visualRange = 5f;
         public float VisualRange { get { return visualRange; } }
-        [SerializeField]
-        private MonsterSkill[] monsterSkills;
 
-        [Header("Weapon/Attack Abilities")]
+        [Category(3, "Character Stats")]
         [SerializeField]
-        private DamageInfo damageInfo;
+        [FormerlySerializedAs("monsterSkills")]
+        private MonsterSkill[] skills = new MonsterSkill[0];
+        [SerializeField]
+        private Buff summonerBuff = Buff.Empty;
+        public Buff SummonerBuff { get { return summonerBuff; } }
+
+        [Category(4, "Attacking")]
+        [SerializeField]
+        private DamageInfo damageInfo = default(DamageInfo);
         public DamageInfo DamageInfo { get { return damageInfo; } }
         [SerializeField]
-        private DamageIncremental damageAmount;
+        private DamageIncremental damageAmount = default(DamageIncremental);
         public DamageIncremental DamageAmount
         {
             get
@@ -83,56 +91,54 @@ namespace MultiplayerARPG
         private float moveSpeedRateWhileAttacking = 0f;
         public float MoveSpeedRateWhileAttacking { get { return moveSpeedRateWhileAttacking; } }
 
-        [Header("Killing Rewards")]
+        [Category(5, "Killing Rewards")]
+        [SerializeField]
+        private IncrementalMinMaxInt randomExp = default(IncrementalMinMaxInt);
+        [SerializeField]
+        private IncrementalMinMaxInt randomGold = default(IncrementalMinMaxInt);
+        [ArrayElementTitle("currency")]
+        public CurrencyRandomAmount[] randomCurrencies = new CurrencyRandomAmount[0];
+        [SerializeField]
+        [ArrayElementTitle("item")]
+        private ItemDrop[] randomItems = new ItemDrop[0];
+        [SerializeField]
+        private ItemDropTable itemDropTable = null;
+        [Tooltip("Max kind of items that will be dropped in ground")]
+        [SerializeField]
+        private byte maxDropItems = 5;
+
+        #region Being deprecated
         [HideInInspector]
         [SerializeField]
         private int randomExpMin;
         [HideInInspector]
         [SerializeField]
         private int randomExpMax;
-        [SerializeField]
-        private IncrementalMinMaxInt randomExp;
         [HideInInspector]
         [SerializeField]
         private int randomGoldMin;
         [HideInInspector]
         [SerializeField]
         private int randomGoldMax;
-        [SerializeField]
-        private IncrementalMinMaxInt randomGold;
-        [Tooltip("Max kind of items that will be dropped in ground")]
-        [SerializeField]
-        private byte maxDropItems = 5;
-        [SerializeField]
-        [ArrayElementTitle("item")]
-        private ItemDrop[] randomItems;
-        [ArrayElementTitle("currency")]
-        public CurrencyRandomAmount[] randomCurrencies;
-        [SerializeField]
-        private ItemDropTable itemDropTable;
-
-        [Header("Summoner Buffs")]
-        [SerializeField]
-        private Buff summonerBuff;
-        public Buff SummonerBuff { get { return summonerBuff; } }
+        #endregion
 
         [System.NonSerialized]
-        private CharacterStatsIncremental? adjustStats;
+        private CharacterStatsIncremental? adjustStats = null;
         [System.NonSerialized]
-        private AttributeIncremental[] adjustAttributes;
+        private AttributeIncremental[] adjustAttributes = null;
         [System.NonSerialized]
-        private ResistanceIncremental[] adjustResistances;
+        private ResistanceIncremental[] adjustResistances = null;
         [System.NonSerialized]
-        private ArmorIncremental[] adjustArmors;
+        private ArmorIncremental[] adjustArmors = null;
         [System.NonSerialized]
-        private DamageIncremental? adjustDamageAmount;
+        private DamageIncremental? adjustDamageAmount = null;
         [System.NonSerialized]
-        private IncrementalMinMaxInt? adjustRandomExp;
+        private IncrementalMinMaxInt? adjustRandomExp = null;
         [System.NonSerialized]
-        private IncrementalMinMaxInt? adjustRandomGold;
+        private IncrementalMinMaxInt? adjustRandomGold = null;
 
         [System.NonSerialized]
-        private List<ItemDrop> cacheRandomItems;
+        private List<ItemDrop> cacheRandomItems = null;
         public List<ItemDrop> CacheRandomItems
         {
             get
@@ -172,7 +178,7 @@ namespace MultiplayerARPG
         }
 
         [System.NonSerialized]
-        private List<CurrencyRandomAmount> cacheRandomCurrencies;
+        private List<CurrencyRandomAmount> cacheRandomCurrencies = null;
         public List<CurrencyRandomAmount> CacheRandomCurrencies
         {
             get
@@ -336,13 +342,13 @@ namespace MultiplayerARPG
         }
 
         [System.NonSerialized]
-        private Dictionary<BaseSkill, short> cacheSkillLevels;
+        private Dictionary<BaseSkill, short> cacheSkillLevels = null;
         public override Dictionary<BaseSkill, short> CacheSkillLevels
         {
             get
             {
                 if (cacheSkillLevels == null)
-                    cacheSkillLevels = GameDataHelpers.CombineSkills(monsterSkills, new Dictionary<BaseSkill, short>());
+                    cacheSkillLevels = GameDataHelpers.CombineSkills(skills, new Dictionary<BaseSkill, short>());
                 return cacheSkillLevels;
             }
         }
@@ -441,13 +447,13 @@ namespace MultiplayerARPG
             if (!entity.CanUseSkill())
                 return false;
 
-            if (monsterSkills == null || monsterSkills.Length == 0)
+            if (skills == null || skills.Length == 0)
                 return false;
 
-            if (tempRandomSkills.Count != monsterSkills.Length)
+            if (tempRandomSkills.Count != skills.Length)
             {
                 tempRandomSkills.Clear();
-                tempRandomSkills.AddRange(monsterSkills);
+                tempRandomSkills.AddRange(skills);
             }
 
             float random = Random.value;
@@ -512,7 +518,7 @@ namespace MultiplayerARPG
                 randomGoldMin = 0;
                 randomGoldMax = 0;
             }
-            return hasChanges;
+            return hasChanges || base.Validate();
         }
     }
 }

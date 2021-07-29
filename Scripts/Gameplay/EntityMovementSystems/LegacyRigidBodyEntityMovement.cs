@@ -374,7 +374,7 @@ namespace MultiplayerARPG
             GroundCheck();
             tempCurrentPosition = CacheTransform.position;
             tempMoveDirection = Vector3.zero;
-            tempTargetDistance = -1f;
+            tempTargetDistance = 0f;
 
             if (HasNavPaths)
             {

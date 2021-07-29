@@ -1,11 +1,10 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEditor;
+﻿using UnityEditor;
 
 namespace MultiplayerARPG
 {
     [CustomEditor(typeof(CharacterModel))]
     [CanEditMultipleObjects]
+    [System.Obsolete]
     public class CharacterModelEditor : BaseCharacterModelEditor
     {
         protected override void SetFieldCondition()

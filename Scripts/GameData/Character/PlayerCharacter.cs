@@ -12,32 +12,32 @@ namespace MultiplayerARPG
     [CreateAssetMenu(fileName = "Player Character", menuName = "Create GameData/Player Character", order = -4999)]
     public partial class PlayerCharacter : BaseCharacter
     {
-        [Header("Skills")]
+        [Category(3, "Character Stats")]
         [SerializeField]
         [ArrayElementTitle("skill")]
-        private SkillLevel[] skillLevels;
+        private SkillLevel[] skillLevels = new SkillLevel[0];
 
-        [Header("Start Equipments")]
+        [Category(4, "Start Items")]
+        [Header("Equipped Items")]
         [SerializeField]
-        private BaseItem rightHandEquipItem;
+        private BaseItem rightHandEquipItem = null;
         public BaseItem RightHandEquipItem { get { return rightHandEquipItem; } }
         [SerializeField]
-        private BaseItem leftHandEquipItem;
+        private BaseItem leftHandEquipItem = null;
         public BaseItem LeftHandEquipItem { get { return leftHandEquipItem; } }
         [SerializeField]
-        private BaseItem[] armorItems;
+        private BaseItem[] armorItems = new BaseItem[0];
         public BaseItem[] ArmorItems { get { return armorItems; } }
-
-        [Header("Start Items")]
+        [Header("Items in Inventory")]
         [SerializeField]
         [Tooltip("Items that will be added to character when create new character")]
         [ArrayElementTitle("item")]
-        private ItemAmount[] startItems;
+        private ItemAmount[] startItems = new ItemAmount[0];
         public ItemAmount[] StartItems { get { return startItems; } }
 
-        [Header("Start Map")]
+        [Category(6, "Start Map")]
         [SerializeField]
-        private BaseMapInfo startMap;
+        private BaseMapInfo startMap = null;
         public BaseMapInfo StartMap
         {
             get
@@ -48,9 +48,9 @@ namespace MultiplayerARPG
             }
         }
         [SerializeField]
-        private bool useOverrideStartPosition;
+        private bool useOverrideStartPosition = false;
         [SerializeField]
-        private Vector3 overrideStartPosition;
+        private Vector3 overrideStartPosition = Vector3.zero;
         public Vector3 StartPosition
         {
             get
@@ -60,7 +60,7 @@ namespace MultiplayerARPG
         }
 
         [System.NonSerialized]
-        private Dictionary<BaseSkill, short> cacheSkillLevels;
+        private Dictionary<BaseSkill, short> cacheSkillLevels = null;
         public override Dictionary<BaseSkill, short> CacheSkillLevels
         {
             get

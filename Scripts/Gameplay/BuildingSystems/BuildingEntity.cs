@@ -16,6 +16,7 @@ namespace MultiplayerARPG
         [Tooltip("If this is `TRUE` this building entity will be able to build on any surface. But when constructing, if player aimming on building area it will place on building area")]
         protected bool canBuildOnAnySurface = false;
 
+        [HideInInspector]
         [SerializeField]
         [Tooltip("Type of building you can set it as Foundation, Wall, Door anything as you wish. This is a part of `buildingTypes`, just keep it for backward compatibility.")]
         protected string buildingType = string.Empty;
@@ -168,11 +169,19 @@ namespace MultiplayerARPG
             isStaticHitBoxes = true;
             isDestroyed = false;
 
-            if (buildingTypes == null)
-                buildingTypes = new List<string>();
-
             if (!string.IsNullOrEmpty(buildingType) && !buildingTypes.Contains(buildingType))
                 buildingTypes.Add(buildingType);
+        }
+
+        protected override void OnValidate()
+        {
+            base.OnValidate();
+            if (!string.IsNullOrEmpty(buildingType))
+            {
+                if (!buildingTypes.Contains(buildingType))
+                    buildingTypes.Add(buildingType);
+                buildingType = string.Empty;
+            }
         }
 
         protected override void EntityUpdate()

@@ -53,7 +53,7 @@ namespace MultiplayerARPG
         private byte maxShareExpPercentage = 20;
         [SerializeField]
         [ArrayElementTitle("item")]
-        private ItemAmount[] createGuildRequireItems;
+        private ItemAmount[] createGuildRequireItems = new ItemAmount[0];
         [SerializeField]
         private int createGuildRequiredGold = 1000;
         [SerializeField]

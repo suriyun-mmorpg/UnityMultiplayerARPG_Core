@@ -10,5 +10,10 @@ namespace MultiplayerARPG
         [SerializeField]
         private VehicleEntity mountEntity;
         public VehicleEntity MountEntity { get { return mountEntity; } }
+
+        public SkillMount(VehicleEntity mountEntity)
+        {
+            this.mountEntity = mountEntity;
+        }
     }
 }

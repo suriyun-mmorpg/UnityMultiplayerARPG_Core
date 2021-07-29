@@ -13,24 +13,21 @@ namespace MultiplayerARPG
     [CreateAssetMenu(fileName = "Guild Skill", menuName = "Create GameData/Guild Skill", order = -4698)]
     public partial class GuildSkill : BaseGameData
     {
-        [Header("Guild Skill Configs")]
-        public GuildSkillType skillType;
-
+        [Category("Skill Settings")]
         [Range(1, 100)]
         public short maxLevel = 1;
+        public GuildSkillType skillType;
 
-        [Header("Bonus")]
+        [Category(2, "Activation Settings")]
+        public IncrementalFloat coolDownDuration;
+
+        [Category(3, "Buff/Bonus Settings")]
         public IncrementalInt increaseMaxMember;
         public IncrementalFloat increaseExpGainPercentage;
         public IncrementalFloat increaseGoldGainPercentage;
         public IncrementalFloat increaseShareExpGainPercentage;
         public IncrementalFloat increaseShareGoldGainPercentage;
         public IncrementalFloat decreaseExpLostPercentage;
-
-        [Header("Cool Down")]
-        public IncrementalFloat coolDownDuration;
-
-        [Header("Buffs")]
         public Buff buff;
 
         public GuildSkillType GetSkillType()

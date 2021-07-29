@@ -1,12 +1,11 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 
 namespace MultiplayerARPG
 {
     public abstract partial class BaseCharacter : BaseGameData
     {
-        [Header("Stats/Attributes")]
+        [Category(3, "Character Stats")]
         [SerializeField]
         private CharacterStatsIncremental stats;
         public virtual CharacterStatsIncremental Stats { get { return stats; } set { stats = value; } }

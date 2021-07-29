@@ -6,12 +6,10 @@ namespace MultiplayerARPG
     [CreateAssetMenu(fileName = "Cash Shop Item", menuName = "Create CashShop/Cash Shop Item", order = -3996)]
     public class CashShopItem : BaseGameData
     {
-        [Header("Cash Shop Item Configs")]
+        [Category("Cash Shop Item Settings")]
         public string externalIconUrl;
         [FormerlySerializedAs("sellPrice")]
-        [Tooltip("Required user's cash")]
         public int sellPriceCash;
-        [Tooltip("Required is user's gold, not character's gold")]
         public int sellPriceGold;
         [Tooltip("Gold which character will receives")]
         public int receiveGold;

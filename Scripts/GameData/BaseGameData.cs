@@ -8,9 +8,9 @@ namespace MultiplayerARPG
 {
     public abstract partial class BaseGameData : ScriptableObject, IGameData, IComparable
     {
-        [Header("Game Data Configs")]
         [Tooltip("Game data ID, if this is empty it will uses file's name as ID")]
         public string id;
+        [Category("Generic Settings")]
         [Tooltip("Default title")]
         public string title;
         [Tooltip("Titles by language keys")]

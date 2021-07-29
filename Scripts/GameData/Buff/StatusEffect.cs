@@ -5,9 +5,9 @@ namespace MultiplayerARPG
     [CreateAssetMenu(fileName = "Status Effect", menuName = "Create GameData/Status Effect", order = -4991)]
     public class StatusEffect : BaseGameData
     {
-        [Header("Buffs")]
+        [Category("Status Effect Settings")]
         [SerializeField]
-        private Buff buff;
+        private Buff buff = Buff.Empty;
 
         public Buff Buff
         {

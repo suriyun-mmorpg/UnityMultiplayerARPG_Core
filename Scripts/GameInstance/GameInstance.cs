@@ -104,102 +104,104 @@ namespace MultiplayerARPG
 
         [Header("Gameplay Systems")]
         [SerializeField]
-        private DimensionType dimensionType;
+        private DimensionType dimensionType = DimensionType.Dimension3D;
         [SerializeField]
-        private BaseGameSaveSystem saveSystem;
+        private BaseGameSaveSystem saveSystem = null;
         [SerializeField]
-        private BaseGameplayRule gameplayRule;
+        private BaseGameplayRule gameplayRule = null;
         [SerializeField]
-        private BaseDayNightTimeUpdater dayNightTimeUpdater;
+        private BaseDayNightTimeUpdater dayNightTimeUpdater = null;
         [SerializeField]
-        private BaseGMCommands gmCommands;
+        private BaseGMCommands gmCommands = null;
         [SerializeField]
-        private NetworkSetting networkSetting;
+        private NetworkSetting networkSetting = null;
 
         [Header("Gameplay Objects")]
-        public ItemDropEntity itemDropEntityPrefab;
-        public WarpPortalEntity warpPortalEntityPrefab;
-        public BaseUISceneGameplay uiSceneGameplayPrefab;
+        public ItemDropEntity itemDropEntityPrefab = null;
+        public WarpPortalEntity warpPortalEntityPrefab = null;
+        public BaseUISceneGameplay uiSceneGameplayPrefab = null;
         [Tooltip("If this is empty, it will use `UI Scene Gameplay Prefab` as gameplay UI prefab")]
-        public BaseUISceneGameplay uiSceneGameplayMobilePrefab;
+        public BaseUISceneGameplay uiSceneGameplayMobilePrefab = null;
         [Tooltip("Default controller prefab will be used when controller prefab at player character entity is null")]
-        public BasePlayerCharacterController defaultControllerPrefab;
+        public BasePlayerCharacterController defaultControllerPrefab = null;
         [Tooltip("This is camera controller when start game as server (not start with client as host)")]
-        public ServerCharacter serverCharacterPrefab;
+        public ServerCharacter serverCharacterPrefab = null;
         [Tooltip("These objects will be instantiate as owning character's children")]
-        public GameObject[] owningCharacterObjects;
+        public GameObject[] owningCharacterObjects = new GameObject[0];
         [Tooltip("These objects will be instantiate as owning character's children to show in minimap")]
-        public GameObject[] owningCharacterMiniMapObjects;
+        public GameObject[] owningCharacterMiniMapObjects = new GameObject[0];
         [Tooltip("These objects will be instantiate as non owning character's children to show in minimap")]
-        public GameObject[] nonOwningCharacterMiniMapObjects;
+        public GameObject[] nonOwningCharacterMiniMapObjects = new GameObject[0];
         [Tooltip("These objects will be instantiate as monster character's children to show in minimap")]
-        public GameObject[] monsterCharacterMiniMapObjects;
+        public GameObject[] monsterCharacterMiniMapObjects = new GameObject[0];
         [Tooltip("These objects will be instantiate as npc's children to show in minimap")]
-        public GameObject[] npcMiniMapObjects;
+        public GameObject[] npcMiniMapObjects = new GameObject[0];
         [Tooltip("This UI will be instaniate as owning character's child to show character name / HP / MP / Food / Water")]
-        public UICharacterEntity owningCharacterUI;
+        public UICharacterEntity owningCharacterUI = null;
         [Tooltip("This UI will be instaniate as non owning character's child to show character name / HP / MP / Food / Water")]
-        public UICharacterEntity nonOwningCharacterUI;
+        public UICharacterEntity nonOwningCharacterUI = null;
         [Tooltip("This UI will be instaniate as monster character's child to show character name / HP / MP / Food / Water")]
-        public UICharacterEntity monsterCharacterUI;
+        public UICharacterEntity monsterCharacterUI = null;
         [Tooltip("This UI will be instaniate as NPC's child to show character name")]
-        public UINpcEntity npcUI;
+        public UINpcEntity npcUI = null;
         [Tooltip("This UI will be instaniate as NPC's child to show quest indecator")]
-        public NpcQuestIndicator npcQuestIndicator;
+        public NpcQuestIndicator npcQuestIndicator = null;
 
         [Header("Gameplay Effects")]
-        public GameEffect levelUpEffect;
+        public GameEffect levelUpEffect = null;
 
         [Header("Gameplay Database and Default Data")]
         [Tooltip("Exp tree for both player character and monster character")]
         [SerializeField]
-        private int[] expTree;
+        private int[] expTree = new int[0];
         [Tooltip("You should add game data to game database and set the game database to this. If you leave this empty, it will load game data from Resources folders")]
         [SerializeField]
-        private BaseGameDatabase gameDatabase;
+        private BaseGameDatabase gameDatabase = null;
         [Tooltip("You can add warp portals to warp portal database or may add warp portals into the scene directly, So you can leave this empty uf you are going to add warp portals into the scene directly only")]
         [SerializeField]
-        private NpcDatabase npcDatabase;
+        private NpcDatabase npcDatabase = null;
         [Tooltip("You can add social system settings or leave this empty to use default settings")]
         [SerializeField]
-        private WarpPortalDatabase warpPortalDatabase;
+        private WarpPortalDatabase warpPortalDatabase = null;
         [Tooltip("You can add NPCs to NPC database or may add NPCs into the scene directly, so you can leave this empty if you are going to add NPCs into the scene directly only")]
         [SerializeField]
-        private SocialSystemSetting socialSystemSetting;
+        private SocialSystemSetting socialSystemSetting = null;
         [Tooltip("Default weapon item, will be used when character not equip any weapon")]
         [SerializeField]
-        private BaseItem defaultWeaponItem;
+        private BaseItem defaultWeaponItem = null;
         [Tooltip("Default damage element, will be used when attacks to enemies or receives damages from enemies")]
         [SerializeField]
-        private DamageElement defaultDamageElement;
+        private DamageElement defaultDamageElement = null;
         [Tooltip("Default hit effects, will be used when attack to enemies or receive damages from enemies")]
         [SerializeField]
-        private GameEffect[] defaultDamageHitEffects;
+        private GameEffect[] defaultDamageHitEffects = new GameEffect[0];
 
         [Header("Object Tags and Layers")]
         [Tooltip("Tag for player character entities, this tag will set to player character entities game object when instantiated")]
-        public UnityTag playerTag;
+        public UnityTag playerTag = new UnityTag("PlayerTag");
         [Tooltip("Tag for monster character entities, this tag will set to monster character entities game object when instantiated")]
-        public UnityTag monsterTag;
+        public UnityTag monsterTag = new UnityTag("MonsterTag");
         [Tooltip("Tag for NPC entities, this tag will set to NPC entities game object when instantiated")]
-        public UnityTag npcTag;
+        public UnityTag npcTag = new UnityTag("NpcTag");
         [Tooltip("Tag for item drop entities, this tag will set to item drop entities game object when instantiated")]
-        public UnityTag itemDropTag;
+        public UnityTag itemDropTag = new UnityTag("ItemDropTag");
         [Tooltip("Tag for building entities, this tag will set to building entities game object when instantiated")]
-        public UnityTag buildingTag;
+        public UnityTag buildingTag = new UnityTag("BuildingTag");
         [Tooltip("Tag for harvestable entities, this tag will set to harvestable entities game object when instantiated")]
-        public UnityTag harvestableTag;
+        public UnityTag harvestableTag = new UnityTag("HarvestableTag");
         [Tooltip("Layer for player character entities and monster character entities, this layer will be set to player character entities and monster character entities game object when instantiated")]
-        public UnityLayer characterLayer;
+        public UnityLayer characterLayer = new UnityLayer(8);
         [Tooltip("Layer for item drop entities, this layer will set to item drop entities game object when instantiated")]
-        public UnityLayer itemDropLayer;
+        public UnityLayer itemDropLayer = new UnityLayer(9);
         [Tooltip("Layer for building entities, this layer will set to building entities game object when instantiated")]
-        public UnityLayer buildingLayer;
+        public UnityLayer buildingLayer = new UnityLayer(13);
         [Tooltip("Layer for harvestable entities, this layer will set to harvestable entities game object when instantiated")]
-        public UnityLayer harvestableLayer;
+        public UnityLayer harvestableLayer = new UnityLayer(14);
         [Tooltip("Layers which will be ignored when raycasting")]
         [FormerlySerializedAs("nonTargetingLayers")]
-        public UnityLayer[] ignoreRaycastLayers;
+        public UnityLayer[] ignoreRaycastLayers = new UnityLayer[] {
+            new UnityLayer(11)
+        };
 
         [Header("Gameplay Configs - Generic")]
         [Tooltip("If dropped items does not picked up within this duration, it will be destroyed from the server")]
@@ -222,7 +224,7 @@ namespace MultiplayerARPG
         [Range(1, 16)]
         public byte maxEquipWeaponSet = 2;
         [Tooltip("How character position load when start game")]
-        public CurrentPositionSaveMode currentPositionSaveMode;
+        public CurrentPositionSaveMode currentPositionSaveMode = CurrentPositionSaveMode.UseCurrentPosition;
 
         [Header("Gameplay Configs - Items, Inventory and Storage")]
         public ItemTypeFilter dismantleFilter = new ItemTypeFilter()
@@ -232,18 +234,18 @@ namespace MultiplayerARPG
             includeWeapon = true
         };
         [Tooltip("If this is `TRUE`, player will be able to refine an items by themself, doesn't have to talk to NPCs")]
-        public bool canRefineItemByPlayer;
+        public bool canRefineItemByPlayer = false;
         [Tooltip("If this is `TRUE`, player will be able to dismantle an items by themself, doesn't have to talk to NPCs")]
-        public bool canDismantleItemByPlayer;
+        public bool canDismantleItemByPlayer = false;
         [Tooltip("If this is `TRUE`, player will be able to repair an items by themself, doesn't have to talk to NPCs")]
-        public bool canRepairItemByPlayer;
+        public bool canRepairItemByPlayer = false;
         [Tooltip("How player's inventory works")]
-        public InventorySystem inventorySystem;
+        public InventorySystem inventorySystem = InventorySystem.Simple;
         [Tooltip("Base slot limit for all characters, it will be used when `InventorySystem` is `LimitSlots`")]
-        public short baseSlotLimit;
-        public Storage playerStorage;
-        public Storage guildStorage;
-        public EnhancerRemoval enhancerRemoval;
+        public short baseSlotLimit = 0;
+        public Storage playerStorage = default(Storage);
+        public Storage guildStorage = default(Storage);
+        public EnhancerRemoval enhancerRemoval = default(EnhancerRemoval);
 
         [Header("Gameplay Configs - Summon Monster")]
         [Tooltip("This is a distance that random summon around a character")]
@@ -272,12 +274,12 @@ namespace MultiplayerARPG
         public int startGold = 0;
         [Tooltip("Items that will be added to character when create new character")]
         [ArrayElementTitle("item")]
-        public ItemAmount[] startItems;
+        public ItemAmount[] startItems = new ItemAmount[0];
 
         [Header("Scene/Maps")]
-        public UnityScene homeScene;
+        public UnityScene homeScene = default(UnityScene);
         [Tooltip("If this is empty, it will use `Home Mobile Scene` as home scene")]
-        public UnityScene homeMobileScene;
+        public UnityScene homeMobileScene = default(UnityScene);
 
         [Header("Player Configs")]
         public int minCharacterNameLength = 2;
@@ -291,7 +293,7 @@ namespace MultiplayerARPG
         public int mobileTargetFrameRate = 30;
 
         [Header("Playing In Editor")]
-        public TestInEditorMode testInEditorMode;
+        public TestInEditorMode testInEditorMode = TestInEditorMode.Standalone;
 
         // Events
         public System.Action onGameDataLoaded;

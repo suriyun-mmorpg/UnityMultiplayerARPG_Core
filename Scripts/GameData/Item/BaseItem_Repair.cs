@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using UnityEngine;
 
 namespace MultiplayerARPG
 {
@@ -44,9 +43,9 @@ namespace MultiplayerARPG
             float durabilityRate = durability / maxDurability;
             if (durabilityRate >= 0.99f)
                 return repairPrice;
-            for (int i = 0; i < itemRefine.repairPrices.Length; ++i)
+            for (int i = 0; i < itemRefine.RepairPrices.Length; ++i)
             {
-                repairPrice = itemRefine.repairPrices[i];
+                repairPrice = itemRefine.RepairPrices[i];
                 if (durabilityRate < repairPrice.DurabilityRate)
                     return repairPrice;
             }

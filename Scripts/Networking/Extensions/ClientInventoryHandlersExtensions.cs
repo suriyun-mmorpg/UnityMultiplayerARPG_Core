@@ -61,8 +61,8 @@ namespace MultiplayerARPG
                 // If first ring slot is empty, equip to first ring slot
                 // The if first ring slot is not empty, equip to second ring slot
                 // Do not equip to third ring slot because it's not allowed to do that
-                byte equippingSlotIndex = (byte)(equippingArmorItem.ArmorType.equippableSlots - 1);
-                bool[] equippedSlots = new bool[equippingArmorItem.ArmorType.equippableSlots];
+                byte equippingSlotIndex = (byte)(equippingArmorItem.ArmorType.EquippableSlots - 1);
+                bool[] equippedSlots = new bool[equippingArmorItem.ArmorType.EquippableSlots];
                 CharacterItem equippedItem;
                 for (short i = 0; i < playerCharacter.EquipItems.Count; ++i)
                 {

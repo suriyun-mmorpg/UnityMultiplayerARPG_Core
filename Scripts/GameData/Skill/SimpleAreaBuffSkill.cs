@@ -1,5 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 
 namespace MultiplayerARPG
@@ -7,7 +6,10 @@ namespace MultiplayerARPG
     [CreateAssetMenu(fileName = "Skill", menuName = "Create GameData/Skill/Simple Area Buff Skill", order = -4987)]
     public partial class SimpleAreaBuffSkill : BaseAreaSkill
     {
+        [Category("Area Settings")]
         public AreaBuffEntity areaBuffEntity;
+
+        [Category(3, "Buff")]
         public Buff buff;
 
         protected override void ApplySkillImplement(BaseCharacterEntity skillUser, short skillLevel, bool isLeftHand, CharacterItem weapon, int hitIndex, Dictionary<DamageElement, MinMaxFloat> damageAmounts, uint targetObjectId, AimPosition aimPosition, int randomSeed, long? time)

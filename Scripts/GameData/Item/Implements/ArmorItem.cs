@@ -1,6 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
 namespace MultiplayerARPG
 {
@@ -17,16 +15,17 @@ namespace MultiplayerARPG
             get { return ItemType.Armor; }
         }
 
-        [Header("Armor Configs")]
+        [Category("Equipment Settings")]
+        [Header("Armor Settings")]
         [SerializeField]
-        private ArmorType armorType;
+        private ArmorType armorType = null;
         public ArmorType ArmorType
         {
             get { return armorType; }
         }
 
         [SerializeField]
-        private string equipPosition;
+        private string equipPosition = string.Empty;
         public string EquipPosition
         {
             get { return equipPosition; }

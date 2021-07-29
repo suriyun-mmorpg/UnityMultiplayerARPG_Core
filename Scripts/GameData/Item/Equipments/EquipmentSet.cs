@@ -5,8 +5,10 @@ namespace MultiplayerARPG
     [CreateAssetMenu(fileName = "Equipment Set", menuName = "Create GameData/Equipment Set", order = -4897)]
     public class EquipmentSet : BaseGameData
     {
-        [Header("Equipment Set Configs")]
-        public EquipmentBonus[] effects;
+        [Category("Equipment Set Settings")]
+        [SerializeField]
+        private EquipmentBonus[] effects = new EquipmentBonus[0];
+        public EquipmentBonus[] Effects { get { return effects; } }
 
         public override void PrepareRelatesData()
         {
