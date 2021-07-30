@@ -333,10 +333,9 @@ namespace MultiplayerARPG
             {
                 calculatingTotalDamage += damageAmounts[damageElement].Random(randomSeed);
             }
-
             // Apply damages
             combatAmountType = CombatAmountType.NormalDamage;
-            totalDamage = (int)calculatingTotalDamage;
+            totalDamage = CurrentGameInstance.GameplayRule.GetTotalDamage(fromPosition, instigator, this, calculatingTotalDamage, weapon, skill, skillLevel);
             CurrentHp -= totalDamage;
         }
 

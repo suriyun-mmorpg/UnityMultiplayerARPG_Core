@@ -73,20 +73,23 @@ namespace MultiplayerARPG
         public bool recoverWaterWhenLevelUp;
         public bool recoverStaminaWhenLevelUp;
 
-        public override bool RandomAttackHitOccurs(BaseCharacterEntity attacker, BaseCharacterEntity damageReceiver, Dictionary<DamageElement, MinMaxFloat> damageAmounts, CharacterItem weapon, BaseSkill skill, short skillLevel, int randomSeed, out bool isCritical, out bool isBlocked)
+        public override bool RandomAttackHitOccurs(Vector3 fromPosition, BaseCharacterEntity attacker, BaseCharacterEntity damageReceiver, Dictionary<DamageElement, MinMaxFloat> damageAmounts, CharacterItem weapon, BaseSkill skill, short skillLevel, int randomSeed, out bool isCritical, out bool isBlocked)
         {
-            bool isHit = false;
             isCritical = false;
             isBlocked = false;
-            if (attacker != null)
-            {
-                isCritical = Random.value <= GetCriticalChance(attacker, damageReceiver);
-                isHit = Random.value <= GetHitChance(attacker, damageReceiver);
-                if (!isHit && isCritical && alwaysHitWhenCriticalOccurs)
-                    isHit = true;
-                isBlocked = Random.value <= GetBlockChance(attacker, damageReceiver);
-            }
+            if (attacker == null)
+                return true;
+            isCritical = Random.value <= GetCriticalChance(attacker, damageReceiver);
+            bool isHit = Random.value <= GetHitChance(attacker, damageReceiver);
+            if (!isHit && isCritical && alwaysHitWhenCriticalOccurs)
+                isHit = true;
+            isBlocked = Random.value <= GetBlockChance(attacker, damageReceiver);
             return isHit;
+        }
+
+        public override float RandomAttackDamage(Vector3 fromPosition, BaseCharacterEntity attacker, BaseCharacterEntity damageReceiver, DamageElement damageElement, MinMaxFloat damageAmount, CharacterItem weapon, BaseSkill skill, short skillLevel, int randomSeed)
+        {
+            return damageAmount.Random(randomSeed);
         }
 
         public override float GetHitChance(BaseCharacterEntity attacker, BaseCharacterEntity damageReceiver)
@@ -178,6 +181,11 @@ namespace MultiplayerARPG
                 damageAmount *= 100f / (100f + armorAmount);
             }
             return damageAmount;
+        }
+
+        public override int GetTotalDamage(Vector3 fromPosition, EntityInfo instigator, DamageableEntity damageReceiver, float totalDamage, CharacterItem weapon, BaseSkill skill, short skillLevel)
+        {
+            return (int)totalDamage;
         }
 
         public override float GetRecoveryHpPerSeconds(BaseCharacterEntity character)
@@ -862,7 +870,7 @@ namespace MultiplayerARPG
                 return;
             int damage = Mathf.CeilToInt(character.MaxHp * (float)(dist - fallDamageMinDistance) / (float)(fallDamageMaxDistance - fallDamageMinDistance));
             character.CurrentHp -= damage;
-            character.ReceivedDamage(character.CacheTransform.position, new EntityInfo(), null, CombatAmountType.NormalDamage, damage, null, null, 0);
+            character.ReceivedDamage(character.CacheTransform.position, default(EntityInfo), null, CombatAmountType.NormalDamage, damage, null, null, 0);
             if (character.IsDead())
             {
                 // Dead by itself, so causer is itself

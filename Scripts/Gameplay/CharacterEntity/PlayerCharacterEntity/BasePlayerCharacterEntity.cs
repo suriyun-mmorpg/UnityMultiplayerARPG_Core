@@ -50,17 +50,15 @@ namespace MultiplayerARPG
 
         public override EntityInfo GetInfo()
         {
-            return new EntityInfo()
-            {
-                type = EntityTypes.Player,
-                objectId = ObjectId,
-                id = Id,
-                dataId = DataId,
-                factionId = FactionId,
-                partyId = PartyId,
-                guildId = GuildId,
-                isInSafeArea = IsInSafeArea,
-            };
+            return new EntityInfo(
+                EntityTypes.Player,
+                ObjectId,
+                Id,
+                DataId,
+                FactionId,
+                PartyId,
+                GuildId,
+                IsInSafeArea);
         }
 
         protected override void EntityAwake()

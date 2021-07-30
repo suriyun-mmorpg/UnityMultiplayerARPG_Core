@@ -142,15 +142,14 @@ namespace MultiplayerARPG
 
         public override EntityInfo GetInfo()
         {
-            return new EntityInfo()
-            {
-                type = EntityTypes.Monster,
-                objectId = ObjectId,
-                id = ObjectId.ToString(),
-                dataId = DataId,
-                isInSafeArea = IsInSafeArea,
-                summonerInfo = Summoner != null ? Summoner.GetInfo() : null,
-            };
+            return new EntityInfo(
+                EntityTypes.GuildWarMonster,
+                ObjectId,
+                ObjectId.ToString(),
+                DataId,
+                0, 0, 0,
+                IsInSafeArea,
+                Summoner);
         }
 
         protected override void EntityAwake()
@@ -275,7 +274,7 @@ namespace MultiplayerARPG
             base.ApplyReceiveDamage(fromPosition, instigator, damageAmounts, weapon, skill, skillLevel, randomSeed, out combatAmountType, out totalDamage);
 
             BaseCharacterEntity attackerCharacter;
-            if (instigator != null && instigator.TryGetEntity(out attackerCharacter))
+            if (instigator.TryGetEntity(out attackerCharacter))
             {
                 // If character is not dead, try to attack
                 if (!this.IsDead())
@@ -310,7 +309,7 @@ namespace MultiplayerARPG
         public void RecordRecivingDamage(EntityInfo instigator, int damage)
         {
             BaseCharacterEntity attackerCharacter;
-            if (instigator != null && instigator.TryGetEntity(out attackerCharacter))
+            if (instigator.TryGetEntity(out attackerCharacter))
             {
                 // If summoned by someone, summoner is attacker
                 if (attackerCharacter != null &&
@@ -424,8 +423,7 @@ namespace MultiplayerARPG
                     {
                         // Set its summoner as main enemy
                         lastAttacker = tempMonsterCharacterEntity.Summoner.GetInfo();
-                        if (lastAttacker != null)
-                            lastAttacker.TryGetEntity(out attackerCharacter);
+                        lastAttacker.TryGetEntity(out attackerCharacter);
                     }
                 }
                 lastPlayer = attackerCharacter as BasePlayerCharacterEntity;
@@ -643,7 +641,7 @@ namespace MultiplayerARPG
             NetworkDestroy();
         }
 
-        protected override void NotifyEnemySpottedToAllies(BaseCharacterEntity enemy)
+        public override void NotifyEnemySpottedToAllies(BaseCharacterEntity enemy)
         {
             if (Characteristic != MonsterCharacteristic.Assist)
                 return;

@@ -241,9 +241,8 @@ namespace MultiplayerARPG
         /// <param name="skillLevel">Skill level which used to attack</param>
         public virtual void ReceivingDamage(Vector3 fromPosition, EntityInfo instigator, Dictionary<DamageElement, MinMaxFloat> damageAmounts, CharacterItem weapon, BaseSkill skill, short skillLevel)
         {
-            IGameEntity attacker = null;
-            if (instigator != null)
-                instigator.TryGetEntity(out attacker);
+            IGameEntity attacker;
+            instigator.TryGetEntity(out attacker);
             if (onReceiveDamage != null)
                 onReceiveDamage.Invoke(fromPosition, attacker, damageAmounts, weapon, skill, skillLevel);
         }
@@ -303,8 +302,7 @@ namespace MultiplayerARPG
             }
             CallAllAppendCombatText(combatAmountType, damageSource, dataId, totalDamage);
             IGameEntity attacker = null;
-            if (instigator != null)
-                instigator.TryGetEntity(out attacker);
+            instigator.TryGetEntity(out attacker);
             if (onReceivedDamage != null)
                 onReceivedDamage.Invoke(fromPosition, attacker, combatAmountType, totalDamage, weapon, skill, skillLevel);
         }
@@ -317,13 +315,13 @@ namespace MultiplayerARPG
                 return false;
             }
 
-            if (instigator == null || string.IsNullOrEmpty(instigator.id))
+            if (string.IsNullOrEmpty(instigator.Id))
             {
                 // If attacker is unknow entity, can receive damages
                 return true;
             }
 
-            if (instigator.isInSafeArea)
+            if (instigator.IsInSafeArea)
             {
                 // If attacker is in safe area, it will not receives damages
                 return false;

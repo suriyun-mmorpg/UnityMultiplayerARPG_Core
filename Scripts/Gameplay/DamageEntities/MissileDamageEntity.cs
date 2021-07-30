@@ -228,7 +228,7 @@ namespace MultiplayerARPG
                 return false;
 
             BaseGameEntity instigatorEntity;
-            if (instigator != null && instigator.TryGetEntity(out instigatorEntity) && instigatorEntity == target.Entity)
+            if (instigator.TryGetEntity(out instigatorEntity) && instigatorEntity == target.Entity)
                 return false;
 
             if (lockingTarget != null && lockingTarget.GetObjectId() != target.GetObjectId())

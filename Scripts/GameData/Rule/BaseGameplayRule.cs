@@ -1,5 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 
 namespace MultiplayerARPG
@@ -8,13 +7,15 @@ namespace MultiplayerARPG
     {
         public float GoldRate { get; set; } = 1f;
         public float ExpRate { get; set; } = 1f;
-        public abstract bool RandomAttackHitOccurs(BaseCharacterEntity attacker, BaseCharacterEntity damageReceiver, Dictionary<DamageElement, MinMaxFloat> damageAmounts, CharacterItem weapon, BaseSkill skill, short skillLevel, int randomSeed, out bool isCritical, out bool isBlocked);
+        public abstract bool RandomAttackHitOccurs(Vector3 fromPosition, BaseCharacterEntity attacker, BaseCharacterEntity damageReceiver, Dictionary<DamageElement, MinMaxFloat> damageAmounts, CharacterItem weapon, BaseSkill skill, short skillLevel, int randomSeed, out bool isCritical, out bool isBlocked);
+        public abstract float RandomAttackDamage(Vector3 fromPosition, BaseCharacterEntity attacker, BaseCharacterEntity damageReceiver, DamageElement damageElement, MinMaxFloat damageAmount, CharacterItem weapon, BaseSkill skill, short skillLevel, int randomSeed);
         public abstract float GetHitChance(BaseCharacterEntity attacker, BaseCharacterEntity damageReceiver);
         public abstract float GetCriticalChance(BaseCharacterEntity attacker, BaseCharacterEntity damageReceiver);
         public abstract float GetCriticalDamage(BaseCharacterEntity attacker, BaseCharacterEntity damageReceiver, float damage);
         public abstract float GetBlockChance(BaseCharacterEntity attacker, BaseCharacterEntity damageReceiver);
         public abstract float GetBlockDamage(BaseCharacterEntity attacker, BaseCharacterEntity damageReceiver, float damage);
         public abstract float GetDamageReducedByResistance(Dictionary<DamageElement, float> damageReceiverResistances, Dictionary<DamageElement, float> damageReceiverArmors, float damageAmount, DamageElement damageElement);
+        public abstract int GetTotalDamage(Vector3 fromPosition, EntityInfo instigator, DamageableEntity damageReceiver, float totalDamage, CharacterItem weapon, BaseSkill skill, short skillLevel);
         public abstract float GetRecoveryHpPerSeconds(BaseCharacterEntity character);
         public abstract float GetRecoveryMpPerSeconds(BaseCharacterEntity character);
         public abstract float GetRecoveryStaminaPerSeconds(BaseCharacterEntity character);

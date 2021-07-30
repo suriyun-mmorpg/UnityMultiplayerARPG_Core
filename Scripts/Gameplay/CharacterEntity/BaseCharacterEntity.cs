@@ -436,25 +436,24 @@ namespace MultiplayerARPG
 
         protected override void ApplyReceiveDamage(Vector3 fromPosition, EntityInfo instigator, Dictionary<DamageElement, MinMaxFloat> damageAmounts, CharacterItem weapon, BaseSkill skill, short skillLevel, int randomSeed, out CombatAmountType combatAmountType, out int totalDamage)
         {
-            bool isCritical = false;
-            bool isBlocked = false;
-
             BaseCharacterEntity attackerCharacter = null;
-            if (instigator != null && instigator.TryGetEntity(out attackerCharacter))
+            if (instigator.TryGetEntity(out attackerCharacter))
             {
                 // Notify enemy spotted when received damage from enemy
                 NotifyEnemySpottedToAllies(attackerCharacter);
 
                 // Notify enemy spotted when damage taken to enemy
                 attackerCharacter.NotifyEnemySpottedToAllies(this);
+            }
 
-                if (!CurrentGameInstance.GameplayRule.RandomAttackHitOccurs(attackerCharacter, this, damageAmounts, weapon, skill, skillLevel, randomSeed, out isCritical, out isBlocked))
-                {
-                    // Don't hit (Miss)
-                    combatAmountType = CombatAmountType.Miss;
-                    totalDamage = 0;
-                    return;
-                }
+            bool isCritical;
+            bool isBlocked;
+            if (!CurrentGameInstance.GameplayRule.RandomAttackHitOccurs(fromPosition, attackerCharacter, this, damageAmounts, weapon, skill, skillLevel, randomSeed, out isCritical, out isBlocked))
+            {
+                // Don't hit (Miss)
+                combatAmountType = CombatAmountType.Miss;
+                totalDamage = 0;
+                return;
             }
 
             // Calculate damages
@@ -462,7 +461,8 @@ namespace MultiplayerARPG
             float calculatingTotalDamage = 0f;
             foreach (DamageElement damageElement in damageAmounts.Keys)
             {
-                calculatingTotalDamage += damageElement.GetDamageReducedByResistance(this.GetCaches().Resistances, this.GetCaches().Armors, damageAmounts[damageElement].Random(randomSeed));
+                calculatingTotalDamage += damageElement.GetDamageReducedByResistance(this.GetCaches().Resistances, this.GetCaches().Armors,
+                    CurrentGameInstance.GameplayRule.RandomAttackDamage(fromPosition, attackerCharacter, this, damageElement, damageAmounts[damageElement], weapon, skill, skillLevel, randomSeed));
             }
 
             if (attackerCharacter != null)
@@ -482,16 +482,15 @@ namespace MultiplayerARPG
             }
 
             // Apply damages
-            totalDamage = (int)calculatingTotalDamage;
+            totalDamage = CurrentGameInstance.GameplayRule.GetTotalDamage(fromPosition, instigator, this, calculatingTotalDamage, weapon, skill, skillLevel);
             CurrentHp -= totalDamage;
         }
 
         public override void ReceivedDamage(Vector3 fromPosition, EntityInfo instigator, Dictionary<DamageElement, MinMaxFloat> damageAmounts, CombatAmountType combatAmountType, int totalDamage, CharacterItem weapon, BaseSkill skill, short skillLevel)
         {
             base.ReceivedDamage(fromPosition, instigator, damageAmounts, combatAmountType, totalDamage, weapon, skill, skillLevel);
-            BaseCharacterEntity attackerCharacter = null;
-            if (instigator != null)
-                instigator.TryGetEntity(out attackerCharacter);
+            BaseCharacterEntity attackerCharacter;
+            instigator.TryGetEntity(out attackerCharacter);
             CurrentGameInstance.GameplayRule.OnCharacterReceivedDamage(attackerCharacter, this, combatAmountType, totalDamage, weapon, skill, skillLevel);
 
             if (combatAmountType == CombatAmountType.Miss)
@@ -1380,7 +1379,7 @@ namespace MultiplayerARPG
         }
         #endregion
 
-        protected virtual void NotifyEnemySpottedToAllies(BaseCharacterEntity enemy)
+        public virtual void NotifyEnemySpottedToAllies(BaseCharacterEntity enemy)
         {
             foreach (CharacterSummon summon in Summons)
             {

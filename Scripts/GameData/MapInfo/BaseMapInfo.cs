@@ -30,7 +30,7 @@ namespace MultiplayerARPG
 
         public bool IsAlly(BaseCharacterEntity character, EntityInfo targetEntityInfo)
         {
-            if (!string.IsNullOrEmpty(targetEntityInfo.id) && targetEntityInfo.id.Equals(character.Id))
+            if (!string.IsNullOrEmpty(targetEntityInfo.Id) && targetEntityInfo.Id.Equals(character.Id))
                 return true;
             if (character is BasePlayerCharacterEntity)
                 return IsPlayerAlly(character as BasePlayerCharacterEntity, targetEntityInfo);
@@ -41,7 +41,7 @@ namespace MultiplayerARPG
 
         public bool IsEnemy(BaseCharacterEntity character, EntityInfo targetEntityInfo)
         {
-            if (!string.IsNullOrEmpty(targetEntityInfo.id) && targetEntityInfo.id.Equals(character.Id))
+            if (!string.IsNullOrEmpty(targetEntityInfo.Id) && targetEntityInfo.Id.Equals(character.Id))
                 return false;
             if (character is BasePlayerCharacterEntity)
                 return IsPlayerEnemy(character as BasePlayerCharacterEntity, targetEntityInfo);

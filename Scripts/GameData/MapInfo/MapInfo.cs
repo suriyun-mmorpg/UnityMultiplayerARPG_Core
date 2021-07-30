@@ -61,31 +61,31 @@ namespace MultiplayerARPG
 
         protected override bool IsPlayerAlly(BasePlayerCharacterEntity playerCharacter, EntityInfo targetEntity)
         {
-            if (string.IsNullOrEmpty(targetEntity.id))
+            if (string.IsNullOrEmpty(targetEntity.Id))
                 return false;
 
-            if (targetEntity.type == EntityTypes.Player)
+            if (targetEntity.Type == EntityTypes.Player)
             {
                 switch (pvpMode)
                 {
                     case PvpMode.Pvp:
-                        return targetEntity.partyId != 0 && targetEntity.partyId == playerCharacter.PartyId;
+                        return targetEntity.PartyId != 0 && targetEntity.PartyId == playerCharacter.PartyId;
                     case PvpMode.FactionPvp:
-                        return targetEntity.factionId != 0 && targetEntity.factionId == playerCharacter.FactionId;
+                        return targetEntity.FactionId != 0 && targetEntity.FactionId == playerCharacter.FactionId;
                     case PvpMode.GuildPvp:
-                        return targetEntity.guildId != 0 && targetEntity.guildId == playerCharacter.GuildId;
+                        return targetEntity.GuildId != 0 && targetEntity.GuildId == playerCharacter.GuildId;
                     default:
                         return true;
                 }
             }
 
-            if (targetEntity.type == EntityTypes.Monster)
+            if (targetEntity.Type == EntityTypes.Monster)
             {
                 // If this character is summoner so it is ally
-                if (targetEntity.summonerInfo != null)
+                if (targetEntity.Summoner.HasValue)
                 {
                     // If summoned by someone, will have same allies with summoner
-                    return playerCharacter.IsAlly(targetEntity.summonerInfo);
+                    return playerCharacter.IsAlly(targetEntity.Summoner.Value);
                 }
                 else
                 {
@@ -99,21 +99,21 @@ namespace MultiplayerARPG
 
         protected override bool IsMonsterAlly(BaseMonsterCharacterEntity monsterCharacter, EntityInfo targetEntity)
         {
-            if (string.IsNullOrEmpty(targetEntity.id))
+            if (string.IsNullOrEmpty(targetEntity.Id))
                 return false;
 
             if (monsterCharacter.IsSummoned)
             {
                 // If summoned by someone, will have same allies with summoner
-                return targetEntity.id.Equals(monsterCharacter.Summoner.Id) || monsterCharacter.Summoner.IsAlly(targetEntity);
+                return targetEntity.Id.Equals(monsterCharacter.Summoner.Id) || monsterCharacter.Summoner.IsAlly(targetEntity);
             }
 
-            if (targetEntity.type == EntityTypes.Monster)
+            if (targetEntity.Type == EntityTypes.Monster)
             {
                 // If another monster has same allyId so it is ally
-                if (targetEntity.summonerInfo != null)
-                    return monsterCharacter.IsAlly(targetEntity.summonerInfo);
-                return GameInstance.MonsterCharacters[targetEntity.dataId].AllyId == monsterCharacter.CharacterDatabase.AllyId;
+                if (targetEntity.Summoner.HasValue)
+                    return monsterCharacter.IsAlly(targetEntity.Summoner.Value);
+                return GameInstance.MonsterCharacters[targetEntity.DataId].AllyId == monsterCharacter.CharacterDatabase.AllyId;
             }
 
             return false;
@@ -121,31 +121,31 @@ namespace MultiplayerARPG
 
         protected override bool IsPlayerEnemy(BasePlayerCharacterEntity playerCharacter, EntityInfo targetEntity)
         {
-            if (string.IsNullOrEmpty(targetEntity.id))
+            if (string.IsNullOrEmpty(targetEntity.Id))
                 return false;
 
-            if (targetEntity.type == EntityTypes.Player)
+            if (targetEntity.Type == EntityTypes.Player)
             {
                 switch (pvpMode)
                 {
                     case PvpMode.Pvp:
-                        return targetEntity.partyId == 0 || targetEntity.partyId != playerCharacter.PartyId;
+                        return targetEntity.PartyId == 0 || targetEntity.PartyId != playerCharacter.PartyId;
                     case PvpMode.FactionPvp:
-                        return targetEntity.factionId == 0 || targetEntity.factionId != playerCharacter.FactionId;
+                        return targetEntity.FactionId == 0 || targetEntity.FactionId != playerCharacter.FactionId;
                     case PvpMode.GuildPvp:
-                        return targetEntity.guildId == 0 || targetEntity.guildId != playerCharacter.GuildId;
+                        return targetEntity.GuildId == 0 || targetEntity.GuildId != playerCharacter.GuildId;
                     default:
                         return false;
                 }
             }
 
-            if (targetEntity.type == EntityTypes.Monster)
+            if (targetEntity.Type == EntityTypes.Monster)
             {
                 // If this character is not summoner so it is enemy
-                if (targetEntity.summonerInfo != null)
+                if (targetEntity.Summoner.HasValue)
                 {
                     // If summoned by someone, will have same enemies with summoner
-                    return playerCharacter.IsEnemy(targetEntity.summonerInfo);
+                    return playerCharacter.IsEnemy(targetEntity.Summoner.Value);
                 }
                 else
                 {
@@ -159,17 +159,17 @@ namespace MultiplayerARPG
 
         protected override bool IsMonsterEnemy(BaseMonsterCharacterEntity monsterCharacter, EntityInfo targetEntity)
         {
-            if (string.IsNullOrEmpty(targetEntity.id))
+            if (string.IsNullOrEmpty(targetEntity.Id))
                 return false;
 
             if (monsterCharacter.IsSummoned)
             {
                 // If summoned by someone, will have same enemies with summoner
-                return targetEntity.id.Equals(monsterCharacter.Summoner.Id) && monsterCharacter.Summoner.IsEnemy(targetEntity);
+                return targetEntity.Id.Equals(monsterCharacter.Summoner.Id) && monsterCharacter.Summoner.IsEnemy(targetEntity);
             }
 
             // Attack only player by default
-            return targetEntity.type == EntityTypes.Player;
+            return targetEntity.Type == EntityTypes.Player;
         }
     }
 
