@@ -102,14 +102,6 @@ namespace MultiplayerARPG
             tempDamageElements.Sort();
             damageElements = tempDamageElements.ToArray();
 
-            List<BaseItem> tempItems = new List<BaseItem>(GameInstance.Items.Values);
-            tempItems.Sort();
-            items = tempItems.ToArray();
-
-            List<ItemCraftFormula> tempItemCraftFormulas = new List<ItemCraftFormula>(GameInstance.ItemCraftFormulas.Values);
-            tempItemCraftFormulas.Sort();
-            itemCraftFormulas = tempItemCraftFormulas.ToArray();
-
             List<ArmorType> tempArmorTypes = new List<ArmorType>(GameInstance.ArmorTypes.Values);
             tempArmorTypes.Sort();
             armorTypes = tempArmorTypes.ToArray();
@@ -121,6 +113,14 @@ namespace MultiplayerARPG
             List<AmmoType> tempAmmoTypes = new List<AmmoType>(GameInstance.AmmoTypes.Values);
             tempAmmoTypes.Sort();
             ammoTypes = tempAmmoTypes.ToArray();
+
+            List<BaseItem> tempItems = new List<BaseItem>(GameInstance.Items.Values);
+            tempItems.Sort();
+            items = tempItems.ToArray();
+
+            List<ItemCraftFormula> tempItemCraftFormulas = new List<ItemCraftFormula>(GameInstance.ItemCraftFormulas.Values);
+            tempItemCraftFormulas.Sort();
+            itemCraftFormulas = tempItemCraftFormulas.ToArray();
 
             List<BaseSkill> tempSkills = new List<BaseSkill>(GameInstance.Skills.Values);
             tempSkills.Sort();
