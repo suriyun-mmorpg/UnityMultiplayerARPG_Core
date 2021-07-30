@@ -356,7 +356,7 @@ namespace MultiplayerARPG
         /// <returns></returns>
         public virtual EntityInfo GetInfo()
         {
-            return default(EntityInfo);
+            return EntityInfo.Empty;
         }
 
         public virtual Bounds MakeLocalBounds()

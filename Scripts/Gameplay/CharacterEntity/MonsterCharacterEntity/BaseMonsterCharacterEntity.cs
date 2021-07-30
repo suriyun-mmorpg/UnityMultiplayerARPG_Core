@@ -143,7 +143,7 @@ namespace MultiplayerARPG
         public override EntityInfo GetInfo()
         {
             return new EntityInfo(
-                EntityTypes.GuildWarMonster,
+                EntityTypes.Monster,
                 ObjectId,
                 ObjectId.ToString(),
                 DataId,
