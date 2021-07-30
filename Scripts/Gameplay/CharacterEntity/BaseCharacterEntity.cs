@@ -69,7 +69,7 @@ namespace MultiplayerARPG
         }
 
 #if UNITY_EDITOR
-        [Category(200, "Debugging")]
+        [Category(200, "Debugging", false)]
         [FormerlySerializedAs("debugFovColor")]
         public Color debugDamageLaunchingColor = new Color(0, 1, 0, 0.04f);
         public Vector3? debugDamageLaunchingPosition;

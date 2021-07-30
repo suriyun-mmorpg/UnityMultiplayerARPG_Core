@@ -31,7 +31,7 @@ namespace MultiplayerARPG
         [SerializeField]
         protected bool isStaticHitBoxes;
 
-        [Category(99, "Events")]
+        [Category(99, "Events", false)]
         public UnityEvent onNormalDamageHit = new UnityEvent();
         public UnityEvent onCriticalDamageHit = new UnityEvent();
         public UnityEvent onBlockedDamageHit = new UnityEvent();
