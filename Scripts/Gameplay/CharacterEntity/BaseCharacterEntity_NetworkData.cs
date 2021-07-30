@@ -31,7 +31,7 @@ namespace MultiplayerARPG
         [SerializeField]
         protected SyncFieldUInt targetEntityId = new SyncFieldUInt();
 
-        [Category(101, "Sync Lists")]
+        [Category(101, "Sync Lists", false)]
         [SerializeField]
         protected SyncListEquipWeapons selectableWeaponSets = new SyncListEquipWeapons();
         [SerializeField]

@@ -46,7 +46,7 @@ namespace MultiplayerARPG
             get { return textTitleB; }
         }
 
-        [Category(100, "Sync Fields")]
+        [Category(100, "Sync Fields", false)]
         [SerializeField]
         protected SyncFieldString syncTitle = new SyncFieldString();
         public string Title
