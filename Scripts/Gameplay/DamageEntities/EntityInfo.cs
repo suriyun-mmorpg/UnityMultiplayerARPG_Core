@@ -4,23 +4,23 @@
     {
         public static readonly EntityInfo Empty = new EntityInfo(string.Empty, 0, string.Empty, 0, 0, 0, 0, false);
 
-        public string Type { get; set; }
-        public uint ObjectId { get; set; }
-        public string Id { get; set; }
-        public int DataId { get; set; }
-        public int FactionId { get; set; }
-        public int PartyId { get; set; }
-        public int GuildId { get; set; }
-        public bool IsInSafeArea { get; set; }
-        public bool HasSummoner { get; set; }
-        public string SummonerType { get; set; }
-        public uint SummonerObjectId { get; set; }
-        public string SummonerId { get; set; }
-        public int SummonerDataId { get; set; }
-        public int SummonerFactionId { get; set; }
-        public int SummonerPartyId { get; set; }
-        public int SummonerGuildId { get; set; }
-        public bool SummonerIsInSafeArea { get; set; }
+        public string Type { get; private set; }
+        public uint ObjectId { get; private set; }
+        public string Id { get; private set; }
+        public int DataId { get; private set; }
+        public int FactionId { get; private set; }
+        public int PartyId { get; private set; }
+        public int GuildId { get; private set; }
+        public bool IsInSafeArea { get; private set; }
+        public bool HasSummoner { get; private set; }
+        public string SummonerType { get; private set; }
+        public uint SummonerObjectId { get; private set; }
+        public string SummonerId { get; private set; }
+        public int SummonerDataId { get; private set; }
+        public int SummonerFactionId { get; private set; }
+        public int SummonerPartyId { get; private set; }
+        public int SummonerGuildId { get; private set; }
+        public bool SummonerIsInSafeArea { get; private set; }
         public EntityInfo Summoner
         {
             get
