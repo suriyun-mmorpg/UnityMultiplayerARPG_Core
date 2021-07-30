@@ -69,9 +69,6 @@ namespace MultiplayerARPG
         public void LoadReferredData()
         {
             GameInstance.ClearData();
-            GameInstance.AddCharacterEntities(playerCharacterEntities);
-            GameInstance.AddCharacterEntities(monsterCharacterEntities);
-            GameInstance.AddVehicleEntities(vehicleEntities);
             GameInstance.AddAttributes(attributes);
             GameInstance.AddCurrencies(currencies);
             GameInstance.AddDamageElements(damageElements);
@@ -89,6 +86,30 @@ namespace MultiplayerARPG
             GameInstance.AddMapInfos(mapInfos);
             GameInstance.AddQuests(quests);
             GameInstance.AddFactions(factions);
+
+            if (playerCharacterEntities != null && playerCharacterEntities.Length > 0)
+            {
+                foreach (BasePlayerCharacterEntity entity in playerCharacterEntities)
+                {
+                    entity.PrepareRelatesData();
+                }
+            }
+
+            if (monsterCharacterEntities != null && monsterCharacterEntities.Length > 0)
+            {
+                foreach (BaseMonsterCharacterEntity entity in monsterCharacterEntities)
+                {
+                    entity.PrepareRelatesData();
+                }
+            }
+
+            if (vehicleEntities != null && vehicleEntities.Length > 0)
+            {
+                foreach (VehicleEntity entity in vehicleEntities)
+                {
+                    entity.PrepareRelatesData();
+                }
+            }
 
             List<Attribute> tempAttributes = new List<Attribute>(GameInstance.Attributes.Values);
             tempAttributes.Sort();

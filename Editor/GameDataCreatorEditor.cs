@@ -59,18 +59,21 @@ namespace MultiplayerARPG
                         // create the asset, select it, allow renaming, close
                         ScriptableObject newData = CreateInstance(t);
                         string savedPath = EditorUtility.SaveFilePanel("Save asset", "Assets", t.Name + ".asset", "asset");
-                        savedPath = savedPath.Substring(savedPath.IndexOf("Assets"));
-                        AssetDatabase.CreateAsset(newData, savedPath);
-                        List<ScriptableObject> appending = new List<ScriptableObject>(workingArray);
-                        appending.Add(AssetDatabase.LoadAssetAtPath<ScriptableObject>(savedPath));
-                        Array newArray = Array.CreateInstance(workingFieldType, appending.Count);
-                        for (int i = 0; i < newArray.Length; ++i)
+                        if (!string.IsNullOrEmpty(savedPath))
                         {
-                            newArray.SetValue(appending[i], i);
+                            savedPath = savedPath.Substring(savedPath.IndexOf("Assets"));
+                            AssetDatabase.CreateAsset(newData, savedPath);
+                            List<ScriptableObject> appending = new List<ScriptableObject>(workingArray);
+                            appending.Add(AssetDatabase.LoadAssetAtPath<ScriptableObject>(savedPath));
+                            Array newArray = Array.CreateInstance(workingFieldType, appending.Count);
+                            for (int i = 0; i < newArray.Length; ++i)
+                            {
+                                newArray.SetValue(appending[i], i);
+                            }
+                            workingDatabase.GetType().GetField(workingFieldName, BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic).SetValue(workingDatabase, newArray);
+                            EditorUtility.SetDirty(workingDatabase);
+                            Close();
                         }
-                        workingDatabase.GetType().GetField(workingFieldName, BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic).SetValue(workingDatabase, newArray);
-                        EditorUtility.SetDirty(workingDatabase);
-                        Close();
                     }
                 }
             }
