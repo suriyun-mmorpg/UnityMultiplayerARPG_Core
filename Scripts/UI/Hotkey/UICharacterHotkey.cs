@@ -289,6 +289,8 @@ namespace MultiplayerARPG
 
         public bool CanAssignCharacterItem(CharacterItem characterItem)
         {
+            if (UICharacterHotkeys.doNotIncludeItems)
+                return false;
             if (characterItem.IsEmpty() || characterItem.IsEmptySlot())
                 return false;
             if (UICharacterHotkeys.filterCategories.Count > 0 &&
@@ -302,6 +304,8 @@ namespace MultiplayerARPG
 
         public bool CanAssignCharacterSkill(CharacterSkill characterSkill)
         {
+            if (UICharacterHotkeys.doNotIncludeSkills)
+                return false;
             if (characterSkill.IsEmpty())
                 return false;
             if (!characterSkill.GetSkill().IsAvailable(GameInstance.PlayingCharacter))
