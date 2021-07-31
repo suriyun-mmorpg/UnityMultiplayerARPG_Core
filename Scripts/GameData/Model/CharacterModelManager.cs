@@ -1,8 +1,6 @@
 ﻿using System.Collections.Generic;
-using LiteNetLibManager;
 using UnityEngine;
 using UnityEngine.Serialization;
-using System.Text;
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
@@ -15,10 +13,13 @@ namespace MultiplayerARPG
         public const byte HIDE_SETTER_ENTITY = 0;
         public const byte HIDE_SETTER_CONTROLLER = 1;
 
+        [Header("TPS Model Settings")]
         [SerializeField]
-        private BaseCharacterModel mainModel = null;
-        public BaseCharacterModel MainModel { get { return mainModel; } set { mainModel = value; } }
+        [FormerlySerializedAs("mainModel")]
+        private BaseCharacterModel mainTpsModel = null;
+        public BaseCharacterModel MainTpsModel { get { return mainTpsModel; } set { mainTpsModel = value; } }
 
+        [Header("FPS Model Settings")]
         [SerializeField]
         private BaseCharacterModel fpsModelPrefab = null;
         [SerializeField]
@@ -28,32 +29,14 @@ namespace MultiplayerARPG
         [SerializeField]
         [Tooltip("Rotation offsets from fps model container (Camera's transform)")]
         private Vector3 fpsModelRotationOffsets = Vector3.zero;
-        public BaseCharacterModel FpsModel { get; private set; }
+        public BaseCharacterModel ActiveTpsModel { get; private set; }
+        public BaseCharacterModel ActiveFpsModel { get; private set; }
+        public BaseCharacterModel MainFpsModel { get; set; }
 
+        [HideInInspector]
         [SerializeField]
+        // Vehicle models setup will be moved to `BaseCharacterModel`
         private VehicleCharacterModel[] vehicleModels = new VehicleCharacterModel[0];
-
-        public Dictionary<int, VehicleCharacterModel> CacheVehicleModels { get; private set; }
-
-        private bool isSetupModels;
-        private bool isSetupActiveModel;
-        private BaseCharacterModel activeModel;
-        public BaseCharacterModel ActiveModel
-        {
-            get
-            {
-                if (!isSetupActiveModel)
-                {
-                    // Setup models (assign ID)
-                    SetupModels();
-                    // Clear active model to make sure it will initialize correctly
-                    activeModel = null;
-                    SwitchModel(MainModel);
-                    isSetupActiveModel = true;
-                }
-                return activeModel;
-            }
-        }
 
         public bool IsHide
         {
@@ -75,65 +58,32 @@ namespace MultiplayerARPG
 
         public override void EntityAwake()
         {
-            SetupModels();
-        }
-
-        private void SetupModels()
-        {
-            if (isSetupModels)
-                return;
-            SetupMainModel();
-            SetupVehicleModels();
-            isSetupModels = true;
+            if (MainTpsModel == null)
+                MainTpsModel = GetComponent<BaseCharacterModel>();
+            MainTpsModel.MainModel = MainTpsModel;
+            MainTpsModel.IsTpsModel = true;
+            MainTpsModel.IsFpsModel = false;
+            ActiveTpsModel = MainTpsModel;
+            if (vehicleModels != null && vehicleModels.Length > 0)
+            {
+                MainTpsModel.VehicleModels = vehicleModels;
+                vehicleModels = new VehicleCharacterModel[0];
+            }
         }
 
         private void OnValidate()
         {
 #if UNITY_EDITOR
-            if (SetupMainModel())
+            bool hasChanges = false;
+            if (vehicleModels != null && vehicleModels.Length > 0)
+            {
+                MainTpsModel.VehicleModels = vehicleModels;
+                vehicleModels = new VehicleCharacterModel[0];
+                hasChanges = true;
+            }
+            if (hasChanges)
                 EditorUtility.SetDirty(this);
 #endif
-        }
-
-        private bool SetupMainModel()
-        {
-            if (!mainModel)
-            {
-                mainModel = GetComponent<BaseCharacterModel>();
-                if (mainModel)
-                {
-                    return true;
-                }
-                else
-                {
-                    Logging.LogError(ToString(), "Can't find main model");
-                    return false;
-                }
-            }
-            return false;
-        }
-
-        private bool SetupVehicleModels()
-        {
-            if (CacheVehicleModels == null)
-            {
-                CacheVehicleModels = new Dictionary<int, VehicleCharacterModel>();
-                if (vehicleModels != null)
-                {
-                    foreach (VehicleCharacterModel vehicleModel in vehicleModels)
-                    {
-                        if (!vehicleModel.vehicleType) continue;
-                        for (int i = 0; i < vehicleModel.modelsForEachSeats.Length; ++i)
-                        {
-                            vehicleModel.modelsForEachSeats[i].VehicleTypeDataId = vehicleModel.vehicleType.DataId;
-                            vehicleModel.modelsForEachSeats[i].VehicleSeatIndex = i;
-                        }
-                        CacheVehicleModels[vehicleModel.vehicleType.DataId] = vehicleModel;
-                    }
-                }
-                return true;
-            }
-            return false;
         }
 
         public void UpdatePassengingVehicle(VehicleType vehicleType, byte seatIndex)
@@ -146,14 +96,23 @@ namespace MultiplayerARPG
                     dirtyVehicleDataId = vehicleType.DataId;
                     dirtySeatIndex = seatIndex;
                     VehicleCharacterModel tempData;
-                    if (CacheVehicleModels.TryGetValue(dirtyVehicleDataId, out tempData) &&
-                        seatIndex < tempData.modelsForEachSeats.Length)
+                    // Switch TPS model
+                    if (MainTpsModel != null)
                     {
-                        SwitchModel(tempData.modelsForEachSeats[seatIndex]);
+                        if (MainTpsModel.CacheVehicleModels.TryGetValue(dirtyVehicleDataId, out tempData) &&
+                            seatIndex < tempData.modelsForEachSeats.Length)
+                            SwitchTpsModel(tempData.modelsForEachSeats[seatIndex]);
+                        else
+                            SwitchTpsModel(MainTpsModel);
                     }
-                    else
+                    // Switch FPS Model
+                    if (MainFpsModel != null)
                     {
-                        SwitchModel(MainModel);
+                        if (MainFpsModel.CacheVehicleModels.TryGetValue(dirtyVehicleDataId, out tempData) &&
+                            seatIndex < tempData.modelsForEachSeats.Length)
+                            SwitchFpsModel(tempData.modelsForEachSeats[seatIndex]);
+                        else
+                            SwitchFpsModel(MainFpsModel);
                     }
                 }
                 return;
@@ -163,16 +122,27 @@ namespace MultiplayerARPG
             {
                 dirtyVehicleDataId = 0;
                 dirtySeatIndex = 0;
-                SwitchModel(MainModel);
+                if (MainTpsModel != null)
+                    SwitchTpsModel(MainTpsModel);
+                if (MainFpsModel != null)
+                    SwitchFpsModel(MainFpsModel);
             }
         }
 
-        private void SwitchModel(BaseCharacterModel nextModel)
+        private void SwitchTpsModel(BaseCharacterModel nextModel)
         {
-            if (activeModel != null && nextModel == activeModel) return;
-            BaseCharacterModel previousModel = activeModel;
-            activeModel = nextModel;
-            activeModel.SwitchModel(previousModel);
+            if (ActiveTpsModel != null && nextModel == ActiveTpsModel) return;
+            BaseCharacterModel previousModel = ActiveTpsModel;
+            ActiveTpsModel = nextModel;
+            ActiveTpsModel.SwitchModel(previousModel);
+        }
+
+        private void SwitchFpsModel(BaseCharacterModel nextModel)
+        {
+            if (ActiveFpsModel != null && nextModel == ActiveFpsModel) return;
+            BaseCharacterModel previousModel = ActiveFpsModel;
+            ActiveFpsModel = nextModel;
+            ActiveFpsModel.SwitchModel(previousModel);
         }
 
         public void SetIsHide(byte setter, bool isHide)
@@ -197,29 +167,26 @@ namespace MultiplayerARPG
             if (IsHide)
                 mainModelVisibleState = GameEntityModel.EVisibleState.Invisible;
             // Set visible state to main model
-            MainModel.SetVisibleState(mainModelVisibleState);
-            // FPS model will hide when it's not fps mode
-            if (FpsModel != null)
-                FpsModel.gameObject.SetActive(IsFps);
+            MainTpsModel.SetVisibleState(mainModelVisibleState);
+            // FPS model will hide when it's not FPS mode
+            if (MainFpsModel != null)
+                MainFpsModel.gameObject.SetActive(IsFps);
         }
 
         public BaseCharacterModel InstantiateFpsModel(Transform container)
         {
             if (fpsModelPrefab == null)
                 return null;
-            FpsModel = Instantiate(fpsModelPrefab, container);
-            FpsModel.transform.localPosition = fpsModelPositionOffsets;
-            FpsModel.transform.localRotation = Quaternion.Euler(fpsModelRotationOffsets);
-            FpsModel.SetEquipItems(MainModel.equipItems);
-            FpsModel.SetEquipWeapons(MainModel.equipWeapons);
-            return FpsModel;
+            MainFpsModel = Instantiate(fpsModelPrefab, container);
+            MainFpsModel.MainModel = MainFpsModel;
+            MainFpsModel.IsFpsModel = true;
+            MainFpsModel.IsTpsModel = false;
+            MainFpsModel.transform.localPosition = fpsModelPositionOffsets;
+            MainFpsModel.transform.localRotation = Quaternion.Euler(fpsModelRotationOffsets);
+            MainFpsModel.SetEquipItems(MainTpsModel.equipItems);
+            MainFpsModel.SetEquipWeapons(MainTpsModel.equipWeapons);
+            ActiveFpsModel = MainFpsModel;
+            return MainFpsModel;
         }
-    }
-
-    [System.Serializable]
-    public struct VehicleCharacterModel
-    {
-        public VehicleType vehicleType;
-        public BaseCharacterModel[] modelsForEachSeats;
     }
 }

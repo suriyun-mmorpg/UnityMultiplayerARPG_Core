@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
-using LiteNetLibManager;
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
@@ -9,31 +8,38 @@ namespace MultiplayerARPG
 {
     public abstract partial class BaseCharacterModel : GameEntityModel, IMoveableModel, IHittableModel, IJumppableModel, IPickupableModel
     {
+        public BaseCharacterModel MainModel { get; set; }
+        public bool IsMainModel { get { return MainModel == this; } }
+        public bool IsTpsModel { get; set; }
+        public bool IsFpsModel { get; set; }
+
         [SerializeField]
-        private CharacterModelManager modelManager;
-        public CharacterModelManager ModelManager { get { return modelManager; } }
-        public bool IsMainModel { get { return !ModelManager || ModelManager.MainModel == this; } }
-        public bool IsFpsModel { get { return !ModelManager || ModelManager.FpsModel == this; } }
-        public bool IsMainOrFpsModel { get { return IsMainModel || IsFpsModel; } }
-        private bool isFoundIdentity;
-        private LiteNetLibIdentity identity;
-        public LiteNetLibIdentity Identity
+        private string assetId = string.Empty;
+        private int? hashAssetId;
+        public int HashAssetId
         {
             get
             {
-                if (!isFoundIdentity)
+                if (!hashAssetId.HasValue)
                 {
-                    identity = GetComponent<LiteNetLibIdentity>();
-                    if (identity == null)
-                        identity = GetComponentInParent<LiteNetLibIdentity>();
-                    isFoundIdentity = identity != null;
+                    unchecked
+                    {
+                        int hash1 = 5381;
+                        int hash2 = hash1;
+
+                        for (int i = 0; i < assetId.Length && assetId[i] != '\0'; i += 2)
+                        {
+                            hash1 = ((hash1 << 5) + hash1) ^ assetId[i];
+                            if (i == assetId.Length - 1 || assetId[i + 1] == '\0')
+                                break;
+                            hash2 = ((hash2 << 5) + hash2) ^ assetId[i + 1];
+                        }
+
+                        hashAssetId = hash1 + (hash2 * 1566083941);
+                    }
                 }
-                return identity;
+                return hashAssetId.Value;
             }
-        }
-        public int HashAssetId
-        {
-            get { return Identity.HashAssetId; }
         }
         public int? VehicleTypeDataId { get; set; }
         public int? VehicleSeatIndex { get; set; }
@@ -56,13 +62,20 @@ namespace MultiplayerARPG
 
         [Header("Model Switching Settings")]
         [SerializeField]
-        protected GameObject[] activateObjectsWhenSwitchModel;
+        protected GameObject[] activateObjectsWhenSwitchModel = new GameObject[0];
         [SerializeField]
-        protected GameObject[] deactivateObjectsWhenSwitchModel;
+        protected GameObject[] deactivateObjectsWhenSwitchModel = new GameObject[0];
+        [SerializeField]
+        protected VehicleCharacterModel[] vehicleModels = new VehicleCharacterModel[0];
+        public VehicleCharacterModel[] VehicleModels
+        {
+            get { return vehicleModels; }
+            set { vehicleModels = value; }
+        }
 
         [Header("Equipment Containers")]
         [SerializeField]
-        protected EquipmentContainer[] equipmentContainers;
+        protected EquipmentContainer[] equipmentContainers = new EquipmentContainer[0];
         public EquipmentContainer[] EquipmentContainers
         {
             get { return equipmentContainers; }
@@ -71,12 +84,41 @@ namespace MultiplayerARPG
 
 #if UNITY_EDITOR
         [InspectorButton(nameof(SetEquipmentContainersBySetters))]
-        public bool setEquipmentContainersBySetters;
+        public bool setEquipmentContainersBySetters = false;
         [InspectorButton(nameof(DeactivateInstantiatedObjects))]
-        public bool deactivateInstantiatedObjects;
+        public bool deactivateInstantiatedObjects = false;
         [InspectorButton(nameof(ActivateInstantiatedObject))]
-        public bool activateInstantiatedObject;
+        public bool activateInstantiatedObject = false;
 #endif
+
+        private Dictionary<int, VehicleCharacterModel> cacheVehicleModels = null;
+        public Dictionary<int, VehicleCharacterModel> CacheVehicleModels
+        {
+            get
+            {
+                if (cacheVehicleModels == null)
+                {
+                    cacheVehicleModels = new Dictionary<int, VehicleCharacterModel>();
+                    if (IsMainModel && vehicleModels != null && vehicleModels.Length > 0)
+                    {
+                        foreach (VehicleCharacterModel vehicleModel in vehicleModels)
+                        {
+                            if (!vehicleModel.vehicleType) continue;
+                            for (int i = 0; i < vehicleModel.modelsForEachSeats.Length; ++i)
+                            {
+                                vehicleModel.modelsForEachSeats[i].VehicleTypeDataId = vehicleModel.vehicleType.DataId;
+                                vehicleModel.modelsForEachSeats[i].VehicleSeatIndex = i;
+                                vehicleModel.modelsForEachSeats[i].MainModel = this;
+                                vehicleModel.modelsForEachSeats[i].IsTpsModel = IsTpsModel;
+                                vehicleModel.modelsForEachSeats[i].IsFpsModel = IsFpsModel;
+                            }
+                            cacheVehicleModels[vehicleModel.vehicleType.DataId] = vehicleModel;
+                        }
+                    }
+                }
+                return cacheVehicleModels;
+            }
+        }
 
         private Dictionary<string, EquipmentContainer> cacheEquipmentModelContainers = null;
         /// <summary>
@@ -138,27 +180,25 @@ namespace MultiplayerARPG
         protected override void Awake()
         {
             base.Awake();
-            SetupModelManager();
+            if (string.IsNullOrEmpty(assetId))
+                hashAssetId = gameObject.GetInstanceID();
         }
 
         protected override void OnValidate()
         {
             base.OnValidate();
 #if UNITY_EDITOR
-            if (SetupModelManager())
+            bool hasChanges = false;
+            if (string.IsNullOrEmpty(assetId))
+            {
+                string path = AssetDatabase.GetAssetPath(gameObject);
+                if (!string.IsNullOrEmpty(path))
+                    assetId = AssetDatabase.AssetPathToGUID(path);
+                hasChanges = true;
+            }
+            if (hasChanges)
                 EditorUtility.SetDirty(this);
 #endif
-        }
-
-        private bool SetupModelManager()
-        {
-            bool hasChanges = false;
-            if (!modelManager)
-            {
-                modelManager = GetComponentInParent<CharacterModelManager>();
-                hasChanges = modelManager;
-            }
-            return hasChanges;
         }
 
         internal virtual void CopyCacheDataTo(
@@ -239,13 +279,13 @@ namespace MultiplayerARPG
 
         internal virtual void SwitchModel(BaseCharacterModel previousModel)
         {
-            if (ModelManager && !IsMainOrFpsModel)
+            if (!IsMainModel)
             {
                 // Sub-model will use some data same as main model
-                hiddingObjects = ModelManager.MainModel.hiddingObjects;
-                hiddingRenderers = ModelManager.MainModel.hiddingRenderers;
-                effectContainers = ModelManager.MainModel.effectContainers;
-                equipmentContainers = ModelManager.MainModel.equipmentContainers;
+                hiddingObjects = MainModel.hiddingObjects;
+                hiddingRenderers = MainModel.hiddingRenderers;
+                effectContainers = MainModel.effectContainers;
+                equipmentContainers = MainModel.equipmentContainers;
             }
 
             if (previousModel != null)

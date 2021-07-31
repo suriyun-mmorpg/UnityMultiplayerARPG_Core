@@ -133,12 +133,12 @@ namespace MultiplayerARPG
 
         public BaseCharacterModel CharacterModel
         {
-            get { return ModelManager.ActiveModel; }
+            get { return ModelManager.ActiveTpsModel; }
         }
 
         public BaseCharacterModel FpsModel
         {
-            get { return ModelManager.FpsModel; }
+            get { return ModelManager.ActiveFpsModel; }
         }
 
         public override void InitialRequiredComponents()
@@ -177,21 +177,6 @@ namespace MultiplayerARPG
                 FindPhysicFunctions = new PhysicFunctions2D(512);
             }
             isRecaching = true;
-        }
-
-        protected override void OnValidate()
-        {
-            base.OnValidate();
-#if UNITY_EDITOR
-            if (Application.isPlaying)
-                return;
-            ModelManager = gameObject.GetOrAddComponent<CharacterModelManager>();
-            if (model != ModelManager.ActiveModel)
-            {
-                model = ModelManager.ActiveModel;
-                EditorUtility.SetDirty(this);
-            }
-#endif
         }
 
 #if UNITY_EDITOR
@@ -286,8 +271,6 @@ namespace MultiplayerARPG
 
             // Update character model handler based on passenging vehicle
             ModelManager.UpdatePassengingVehicle(PassengingVehicleType, PassengingVehicle.seatIndex);
-            // Update current model
-            model = ModelManager.ActiveModel;
             // Set character model hide state
             ModelManager.SetIsHide(CharacterModelManager.HIDE_SETTER_ENTITY, IsHide());
             // Update model animations
