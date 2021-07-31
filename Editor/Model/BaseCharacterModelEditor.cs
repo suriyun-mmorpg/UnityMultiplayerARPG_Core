@@ -1,23 +1,23 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEditor;
+﻿using UnityEditor;
 
 namespace MultiplayerARPG
 {
-    public abstract class BaseCharacterModelEditor : BaseCustomEditor
+    [CustomEditor(typeof(BaseCharacterModel), true)]
+    [CanEditMultipleObjects]
+    public class BaseCharacterModelEditor : BaseCustomEditor
     {
         protected override void SetFieldCondition()
         {
-            ShowOnBool("IsMainOrFpsModel", true, "hiddingObjects");
-            ShowOnBool("IsMainOrFpsModel", true, "hiddingRenderers");
-            ShowOnBool("IsMainOrFpsModel", true, "fpsHiddingObjects");
-            ShowOnBool("IsMainOrFpsModel", true, "fpsHiddingRenderers");
-            ShowOnBool("IsMainOrFpsModel", true, "effectContainers");
-            ShowOnBool("IsMainOrFpsModel", true, "setEffectContainersBySetters");
-            ShowOnBool("IsMainOrFpsModel", true, "equipmentContainers");
-            ShowOnBool("IsMainOrFpsModel", true, "setEquipmentContainersBySetters");
-            ShowOnBool("IsMainOrFpsModel", true, "deactivateInstantiatedObjects");
-            ShowOnBool("IsMainOrFpsModel", true, "activateInstantiatedObject");
+            ShowOnBool("IsMainModel", true, "hiddingObjects");
+            ShowOnBool("IsMainModel", true, "hiddingRenderers");
+            ShowOnBool("IsMainModel", true, "fpsHiddingObjects");
+            ShowOnBool("IsMainModel", true, "fpsHiddingRenderers");
+            ShowOnBool("IsMainModel", true, "effectContainers");
+            ShowOnBool("IsMainModel", true, "setEffectContainersBySetters");
+            ShowOnBool("IsMainModel", true, "equipmentContainers");
+            ShowOnBool("IsMainModel", true, "setEquipmentContainersBySetters");
+            ShowOnBool("IsMainModel", true, "deactivateInstantiatedObjects");
+            ShowOnBool("IsMainModel", true, "activateInstantiatedObject");
         }
     }
 }

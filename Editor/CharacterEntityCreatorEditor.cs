@@ -138,7 +138,7 @@ namespace MultiplayerARPG
             }
 
             var characterModelManager = newObject.AddComponent<CharacterModelManager>();
-            characterModelManager.MainModel = characterModel;
+            characterModelManager.MainTpsModel = characterModel;
 
             Bounds bounds = default;
             var meshes = newObject.GetComponentsInChildren<MeshRenderer>();
