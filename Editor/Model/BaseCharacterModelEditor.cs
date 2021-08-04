@@ -1,4 +1,5 @@
 ﻿using UnityEditor;
+using UnityEngine;
 
 namespace MultiplayerARPG
 {
@@ -9,12 +10,18 @@ namespace MultiplayerARPG
         protected override void SetFieldCondition()
         {
             BaseCharacterModel model = target as BaseCharacterModel;
-            CharacterModelManager manager = model.gameObject.GetComponentInParent<CharacterModelManager>();
+            CharacterModelManager manager = model.GetComponent<CharacterModelManager>();
+            if (manager == null)
+                manager = model.GetComponentInParent<CharacterModelManager>();
             if (manager != null)
             {
                 model.MainModel = manager.MainTpsModel;
                 if (manager.MainFpsModel == model)
                     model.MainModel = model;
+            }
+            else
+            {
+                Debug.LogWarning($"[{GetType()}] Can't find `CharacterModelManager` from {name}");
             }
             ShowOnBool(nameof(model.IsMainModel), true, "hiddingObjects");
             ShowOnBool(nameof(model.IsMainModel), true, "hiddingRenderers");
