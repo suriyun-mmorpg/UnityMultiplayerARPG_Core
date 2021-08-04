@@ -2,8 +2,6 @@
 using System.Collections.Generic;
 using LiteNetLibManager;
 using UnityEngine;
-using UnityEngine.Playables;
-using UnityEngine.Animations;
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
@@ -268,9 +266,6 @@ namespace MultiplayerARPG
         public static readonly int ANIM_PICKUP_CLIP_MULTIPLIER = Animator.StringToHash("PickupSpeedMultiplier");
         public static readonly int ANIM_MOVE_TYPE = Animator.StringToHash("MoveType");
         public static readonly Dictionary<int, CacheAnimatorController> CacheAnimatorControllers = new Dictionary<int, CacheAnimatorController>();
-        // Playable graph layers
-        public const int GRAPH_LAYER_ANIM_CONTROLLER = 0;
-        public const int GRAPH_LAYER_ANIM_ACTION_CLIP = 1;
 
         [Header("Settings")]
         [Tooltip("The damping time for the `MoveSpeed` and `SideMoveSpeed` parameters. The higher the value the slower the parameter value changes.")]
@@ -282,8 +277,16 @@ namespace MultiplayerARPG
         public Animator animator;
         [Tooltip("You can set this when animator controller type is `Custom`")]
         public RuntimeAnimatorController animatorController;
-        [Tooltip("You can set this when animator controller type is `Custom`")]
-        public AvatarMask actionLayerMask;
+
+        [Header("Action State Settings")]
+        [Tooltip("Which layer in Animator controller that you use it to play action animations, You can set this when animator controller type is `Custom`")]
+        public int actionStateLayer;
+        public string[] actionStateNames = new string[] { "Action", "Action" };
+
+        [Header("Cast Skill State Settings")]
+        [Tooltip("Which layer in Animator controller that you use it to play cast skill animations, You can set this when animator controller type is `Custom`")]
+        public int castSkillStateLayer;
+        public string[] castSkillStateNames = new string[] { "CastSkill", "CastSkill" };
 
 #if UNITY_EDITOR
         [Header("Animation Test Tool")]
@@ -295,29 +298,10 @@ namespace MultiplayerARPG
         public bool setAnimatorClipsForTest;
 #endif
 
-        private PlayableGraph playableGraph;
-        private AnimationPlayableOutput playableOutput;
-        private AnimationLayerMixerPlayable animMixer;
-        private AnimationMixerPlayable animMixerForCtrlPlayable;
-        private AnimationMixerPlayable animMixerForClipPlayable;
-        private AnimatorControllerPlayable animCtrlPlayable;
-        private AnimationClipPlayable animClipPlayable;
-        private AnimatorOverrideController currentAnimatorController;
         public AnimatorOverrideController CurrentAnimatorController
         {
-            get
-            {
-                return currentAnimatorController;
-            }
-            private set
-            {
-                currentAnimatorController = value;
-                playableGraph.Disconnect(animMixerForCtrlPlayable, 0);
-                playableGraph.Stop();
-                animCtrlPlayable = AnimatorControllerPlayable.Create(playableGraph, currentAnimatorController);
-                playableGraph.Connect(animCtrlPlayable, 0, animMixerForCtrlPlayable, 0);
-                playableGraph.Play();
-            }
+            get { return animator.runtimeAnimatorController as AnimatorOverrideController; }
+            private set { animator.runtimeAnimatorController = value; }
         }
         private int[] actionStateNameHashes;
         private int[] castSkillStateNameHashes;
@@ -342,29 +326,7 @@ namespace MultiplayerARPG
         protected override void Awake()
         {
             base.Awake();
-            playableGraph = PlayableGraph.Create($"ModelGraph({name})");
-            playableOutput = AnimationPlayableOutput.Create(playableGraph, "Output", animator);
-            animMixer = AnimationLayerMixerPlayable.Create(playableGraph, 2);
-            animMixerForCtrlPlayable = AnimationMixerPlayable.Create(playableGraph, 1);
-            playableGraph.Connect(animMixerForCtrlPlayable, 0, animMixer, GRAPH_LAYER_ANIM_CONTROLLER);
-            animMixerForClipPlayable = AnimationMixerPlayable.Create(playableGraph, 1);
-            playableGraph.Connect(animMixerForClipPlayable, 0, animMixer, GRAPH_LAYER_ANIM_ACTION_CLIP);
-            animMixer.SetLayerMaskFromAvatarMask(GRAPH_LAYER_ANIM_ACTION_CLIP, actionLayerMask);
-            animClipPlayable = AnimationClipPlayable.Create(playableGraph, null);
-            animClipPlayable.SetSpeed(1);
-            animClipPlayable.SetApplyFootIK(false);
-            animClipPlayable.SetApplyPlayableIK(false);
-            playableGraph.Connect(animClipPlayable, 0, animMixerForClipPlayable, 0);
-            animMixer.SetInputWeight(GRAPH_LAYER_ANIM_CONTROLLER, 1f);
-            animMixer.SetInputWeight(GRAPH_LAYER_ANIM_ACTION_CLIP, 1f);
-            playableOutput.SetSourcePlayable(animMixer);
-            SetDefaultAnimations();
-            playableGraph.Play();
-        }
-
-        protected virtual void OnDestroy()
-        {
-            playableGraph.Destroy();
+            SetupComponent();
         }
 
         protected void SetCacheAnimatorController(int id, RuntimeAnimatorController animatorController, DefaultAnimations defaultAnimations, WeaponAnimations[] weaponAnimations)
@@ -396,39 +358,54 @@ namespace MultiplayerARPG
             }
 
             RuntimeAnimatorController changingAnimatorController;
-            AvatarMask changingActionLayerMask;
             switch (controllerType)
             {
                 case AnimatorControllerType.Simple:
-                    changingAnimatorController = Resources.Load("__Animator/__DefaultCharacter") as RuntimeAnimatorController;
+                    changingAnimatorController = Resources.Load("__Animator/__SimpleCharacter") as RuntimeAnimatorController;
                     if (changingAnimatorController != null &&
                         changingAnimatorController != animatorController)
                     {
                         animatorController = changingAnimatorController;
                         hasChanges = true;
                     }
-                    changingActionLayerMask = Resources.Load("__Animator/Mask/__FullMask") as AvatarMask;
-                    if (changingActionLayerMask != null &&
-                        changingActionLayerMask != actionLayerMask)
+                    if (actionStateLayer != 0)
                     {
-                        actionLayerMask = changingActionLayerMask;
+                        actionStateLayer = 0;
                         hasChanges = true;
+                    }
+                    if (castSkillStateLayer != 0)
+                    {
+                        castSkillStateLayer = 0;
+                        hasChanges = true;
+                    }
+                    if (hasChanges)
+                    {
+                        actionStateNames = new string[] { "Action" };
+                        castSkillStateNames = new string[] { "CastSkill" };
                     }
                     break;
                 case AnimatorControllerType.Advance:
-                    changingAnimatorController = Resources.Load("__Animator/__DefaultCharacter") as RuntimeAnimatorController;
+                    changingAnimatorController = Resources.Load("__Animator/__AdvanceCharacter") as RuntimeAnimatorController;
                     if (changingAnimatorController != null &&
                         changingAnimatorController != animatorController)
                     {
                         animatorController = changingAnimatorController;
                         hasChanges = true;
                     }
-                    changingActionLayerMask = Resources.Load("__Animator/Mask/__TopMask") as AvatarMask;
-                    if (changingActionLayerMask != null &&
-                        changingActionLayerMask != actionLayerMask)
+                    if (actionStateLayer != 1)
                     {
-                        actionLayerMask = changingActionLayerMask;
+                        actionStateLayer = 1;
                         hasChanges = true;
+                    }
+                    if (castSkillStateLayer != 1)
+                    {
+                        castSkillStateLayer = 1;
+                        hasChanges = true;
+                    }
+                    if (hasChanges)
+                    {
+                        actionStateNames = new string[] { "Action", "Action" };
+                        castSkillStateNames = new string[] { "CastSkill", "CastSkill" };
                     }
                     break;
             }
@@ -437,9 +414,30 @@ namespace MultiplayerARPG
             if (animatorController == null)
                 Logging.LogError(ToString(), $"{name}(AnimatorCharacterModel) -> `AnimatorController` is empty, please set reference of `AnimatorController` data to `AnimatorCharacterModel` -> `AnimatorController` field.");
             if (hasChanges)
+            {
+                isSetupComponent = false;
+                SetupComponent();
                 EditorUtility.SetDirty(this);
+            }
 #endif
             base.OnValidate();
+        }
+
+        private void SetupComponent()
+        {
+            if (isSetupComponent)
+                return;
+            isSetupComponent = true;
+            // Setup action state name hashes
+            int indexCounter;
+            actionStateNameHashes = new int[actionStateNames.Length];
+            for (indexCounter = 0; indexCounter < actionStateNames.Length; ++indexCounter)
+                actionStateNameHashes[indexCounter] = Animator.StringToHash(actionStateNames[indexCounter]);
+            // Setup cast skill state name hashes
+            castSkillStateNameHashes = new int[castSkillStateNames.Length];
+            for (indexCounter = 0; indexCounter < castSkillStateNames.Length; ++indexCounter)
+                castSkillStateNameHashes[indexCounter] = Animator.StringToHash(castSkillStateNames[indexCounter]);
+            SetDefaultAnimations();
         }
 
         public override void SetDefaultAnimations()
@@ -510,6 +508,7 @@ namespace MultiplayerARPG
         public override void SetEquipWeapons(EquipWeapons equipWeapons)
         {
             base.SetEquipWeapons(equipWeapons);
+            SetupComponent();
             SetClipBasedOnWeapon(equipWeapons);
         }
 
@@ -685,19 +684,6 @@ namespace MultiplayerARPG
             bool hasClip = tempActionAnimation.clip != null && animator.isActiveAndEnabled;
             if (hasClip)
             {
-                playableGraph.Stop();
-                if (animClipPlayable.IsValid() && animClipPlayable.CanDestroy())
-                    animClipPlayable.Destroy();
-                animClipPlayable = AnimationClipPlayable.Create(playableGraph, tempActionAnimation.clip);
-                animClipPlayable.SetSpeed(playSpeedMultiplier);
-                animClipPlayable.SetApplyFootIK(false);
-                animClipPlayable.SetApplyPlayableIK(false);
-                playableGraph.Connect(animClipPlayable, 0, animMixerForClipPlayable, 0);
-                playableGraph.Play();
-            }
-            /*
-            if (hasClip)
-            {
                 CurrentAnimatorController[CLIP_ACTION] = tempActionAnimation.clip;
                 animator.SetFloat(ANIM_ACTION_CLIP_MULTIPLIER, playSpeedMultiplier);
                 animator.SetBool(ANIM_DO_ACTION, true);
@@ -714,12 +700,14 @@ namespace MultiplayerARPG
                     animator.Play(actionStateNameHashes[actionStateLayer], actionStateLayer, 0f);
                 }
             }
-            */
             // Waits by current transition + clip duration before end animation
             yield return new WaitForSecondsRealtime(tempActionAnimation.GetClipLength() / playSpeedMultiplier);
             // Stop doing action animation
-            if (animClipPlayable.IsValid() && animClipPlayable.CanDestroy())
-                animClipPlayable.Destroy();
+            if (hasClip)
+            {
+                animator.SetBool(ANIM_DO_ACTION, false);
+                animator.SetBool(ANIM_DO_ACTION_ALL_LAYERS, false);
+            }
             // Waits by current transition + extra duration before end playing animation state
             yield return new WaitForSecondsRealtime(tempActionAnimation.GetExtraDuration() / playSpeedMultiplier);
         }
@@ -738,17 +726,6 @@ namespace MultiplayerARPG
             bool hasClip = castClip != null && animator.isActiveAndEnabled;
             if (hasClip)
             {
-                if (animClipPlayable.IsValid() && animClipPlayable.CanDestroy())
-                    animClipPlayable.Destroy();
-                animClipPlayable = AnimationClipPlayable.Create(playableGraph, castClip);
-                animClipPlayable.SetSpeed(1);
-                animClipPlayable.SetApplyFootIK(false);
-                animClipPlayable.SetApplyPlayableIK(false);
-                playableGraph.Connect(animClipPlayable, 0, animMixerForClipPlayable, 0);
-            }
-            if (hasClip)
-            {
-                /*
                 bool playAllLayers = IsSkillCastClipPlayingAllLayers(dataId);
                 CurrentAnimatorController[CLIP_CAST_SKILL] = castClip;
                 animator.SetFloat(ANIM_ACTION_CLIP_MULTIPLIER, 1f);
@@ -765,13 +742,15 @@ namespace MultiplayerARPG
                 {
                     animator.Play(castSkillStateNameHashes[castSkillStateLayer], castSkillStateLayer, 0f);
                 }
-                */
             }
             // Waits by skill cast duration
             yield return new WaitForSecondsRealtime(duration);
             // Stop casting skill animation
-            if (animClipPlayable.IsValid() && animClipPlayable.CanDestroy())
-                animClipPlayable.Destroy();
+            if (hasClip)
+            {
+                animator.SetBool(ANIM_IS_CASTING_SKILL, false);
+                animator.SetBool(ANIM_IS_CASTING_SKILL_ALL_LAYERS, false);
+            }
         }
 
         public override void PlayWeaponChargeClip(int dataId, bool isLeftHand)
@@ -790,31 +769,28 @@ namespace MultiplayerARPG
 
         public override void StopActionAnimation()
         {
-            /*
             if (animator.isActiveAndEnabled)
             {
                 animator.SetBool(ANIM_DO_ACTION, false);
                 animator.SetBool(ANIM_DO_ACTION_ALL_LAYERS, false);
-            }*/
+            }
         }
 
         public override void StopSkillCastAnimation()
         {
-            /*
             if (animator.isActiveAndEnabled)
             {
                 animator.SetBool(ANIM_IS_CASTING_SKILL, false);
                 animator.SetBool(ANIM_IS_CASTING_SKILL_ALL_LAYERS, false);
-            }*/
+            }
         }
 
         public override void StopWeaponChargeAnimation()
         {
-            /*
             if (animator.isActiveAndEnabled)
             {
                 animator.SetBool(ANIM_IS_WEAPON_CHARGE, false);
-            }*/
+            }
         }
 
         public override void PlayHitAnimation()
@@ -879,6 +855,8 @@ namespace MultiplayerARPG
         [ContextMenu("Set Animator Clips For Test", false, 1000501)]
         public void SetAnimatorClipsForTest()
         {
+            SetupComponent();
+
             int testActionAnimDataId = 0;
             int testCastSkillAnimDataId = 0;
             switch (testAnimActionType)
