@@ -59,15 +59,11 @@ namespace MultiplayerARPG
         public override void EntityAwake()
         {
             ValidateMainTpsModel();
+            MigrateVehicleModels();
             MainTpsModel.MainModel = MainTpsModel;
             MainTpsModel.IsTpsModel = true;
             MainTpsModel.IsFpsModel = false;
-            ActiveTpsModel = MainTpsModel;
-            if (vehicleModels != null && vehicleModels.Length > 0)
-            {
-                MainTpsModel.VehicleModels = vehicleModels;
-                vehicleModels = new VehicleCharacterModel[0];
-            }
+            SwitchTpsModel(MainTpsModel);
         }
 
         public bool ValidateMainTpsModel()
@@ -80,17 +76,24 @@ namespace MultiplayerARPG
             return false;
         }
 
-        private void OnValidate()
+        private bool MigrateVehicleModels()
         {
-#if UNITY_EDITOR
-            bool hasChanges = false;
             if (vehicleModels != null && vehicleModels.Length > 0)
             {
                 MainTpsModel.VehicleModels = vehicleModels;
                 vehicleModels = new VehicleCharacterModel[0];
-                hasChanges = true;
+                return true;
             }
+            return false;
+        }
+
+        private void OnValidate()
+        {
+#if UNITY_EDITOR
+            bool hasChanges = false;
             if (ValidateMainTpsModel())
+                hasChanges = true;
+            if (MigrateVehicleModels())
                 hasChanges = true;
             if (hasChanges)
                 EditorUtility.SetDirty(this);
