@@ -16,232 +16,6 @@ namespace MultiplayerARPG
             Advance,
             Custom,
         }
-
-        public class CacheAnimatorController
-        {
-            public AnimatorOverrideController Default { get; private set; }
-            public Dictionary<int, AnimatorOverrideController> Weapons { get; private set; }
-            public CacheAnimatorController(int id, RuntimeAnimatorController animatorController, DefaultAnimations defaultAnimations, WeaponAnimations[] weaponAnimations)
-            {
-                Default = SetupController($"{id}_Default", new AnimatorOverrideController(animatorController), defaultAnimations);
-                Weapons = new Dictionary<int, AnimatorOverrideController>();
-                for (int i = 0; i < weaponAnimations.Length; ++i)
-                {
-                    if (Weapons.ContainsKey(weaponAnimations[i].weaponType.DataId))
-                        continue;
-                    Weapons[weaponAnimations[i].weaponType.DataId] = SetupController(
-                        $"{id}_{weaponAnimations[i].weaponType.Id}",
-                        new AnimatorOverrideController(animatorController),
-                        defaultAnimations,
-                        // Move
-                        weaponAnimations[i].idleClip,
-                        weaponAnimations[i].moveClip,
-                        weaponAnimations[i].moveBackwardClip,
-                        weaponAnimations[i].moveLeftClip,
-                        weaponAnimations[i].moveRightClip,
-                        weaponAnimations[i].moveForwardLeftClip,
-                        weaponAnimations[i].moveForwardRightClip,
-                        weaponAnimations[i].moveBackwardLeftClip,
-                        weaponAnimations[i].moveBackwardRightClip,
-                        // Sprint
-                        weaponAnimations[i].sprintClip,
-                        weaponAnimations[i].sprintBackwardClip,
-                        weaponAnimations[i].sprintLeftClip,
-                        weaponAnimations[i].sprintRightClip,
-                        weaponAnimations[i].sprintForwardLeftClip,
-                        weaponAnimations[i].sprintForwardRightClip,
-                        weaponAnimations[i].sprintBackwardLeftClip,
-                        weaponAnimations[i].sprintBackwardRightClip,
-                        // Walk
-                        weaponAnimations[i].walkClip,
-                        weaponAnimations[i].walkBackwardClip,
-                        weaponAnimations[i].walkLeftClip,
-                        weaponAnimations[i].walkRightClip,
-                        weaponAnimations[i].walkForwardLeftClip,
-                        weaponAnimations[i].walkForwardRightClip,
-                        weaponAnimations[i].walkBackwardLeftClip,
-                        weaponAnimations[i].walkBackwardRightClip,
-                        // Crouch
-                        weaponAnimations[i].crouchIdleClip,
-                        weaponAnimations[i].crouchMoveClip,
-                        weaponAnimations[i].crouchMoveBackwardClip,
-                        weaponAnimations[i].crouchMoveLeftClip,
-                        weaponAnimations[i].crouchMoveRightClip,
-                        weaponAnimations[i].crouchMoveForwardLeftClip,
-                        weaponAnimations[i].crouchMoveForwardRightClip,
-                        weaponAnimations[i].crouchMoveBackwardLeftClip,
-                        weaponAnimations[i].crouchMoveBackwardRightClip,
-                        // Crawl
-                        weaponAnimations[i].crawlIdleClip,
-                        weaponAnimations[i].crawlMoveClip,
-                        weaponAnimations[i].crawlMoveBackwardClip,
-                        weaponAnimations[i].crawlMoveLeftClip,
-                        weaponAnimations[i].crawlMoveRightClip,
-                        weaponAnimations[i].crawlMoveForwardLeftClip,
-                        weaponAnimations[i].crawlMoveForwardRightClip,
-                        weaponAnimations[i].crawlMoveBackwardLeftClip,
-                        weaponAnimations[i].crawlMoveBackwardRightClip,
-                        // Swim
-                        weaponAnimations[i].swimIdleClip,
-                        weaponAnimations[i].swimMoveClip,
-                        weaponAnimations[i].swimMoveBackwardClip,
-                        weaponAnimations[i].swimMoveLeftClip,
-                        weaponAnimations[i].swimMoveRightClip,
-                        weaponAnimations[i].swimMoveForwardLeftClip,
-                        weaponAnimations[i].swimMoveForwardRightClip,
-                        weaponAnimations[i].swimMoveBackwardLeftClip,
-                        weaponAnimations[i].swimMoveBackwardRightClip,
-                        // Other
-                        weaponAnimations[i].jumpClip,
-                        weaponAnimations[i].fallClip,
-                        weaponAnimations[i].landedClip,
-                        weaponAnimations[i].hurtClip,
-                        weaponAnimations[i].deadClip,
-                        weaponAnimations[i].pickupClip);
-                }
-            }
-
-            private AnimatorOverrideController SetupController(
-                string name,
-                AnimatorOverrideController animatorController,
-                DefaultAnimations defaultAnimations,
-                // Move
-                AnimationClip idleClip = null,
-                AnimationClip moveClip = null,
-                AnimationClip moveBackwardClip = null,
-                AnimationClip moveLeftClip = null,
-                AnimationClip moveRightClip = null,
-                AnimationClip moveForwardLeftClip = null,
-                AnimationClip moveForwardRightClip = null,
-                AnimationClip moveBackwardLeftClip = null,
-                AnimationClip moveBackwardRightClip = null,
-                // Sprint
-                AnimationClip sprintClip = null,
-                AnimationClip sprintBackwardClip = null,
-                AnimationClip sprintLeftClip = null,
-                AnimationClip sprintRightClip = null,
-                AnimationClip sprintForwardLeftClip = null,
-                AnimationClip sprintForwardRightClip = null,
-                AnimationClip sprintBackwardLeftClip = null,
-                AnimationClip sprintBackwardRightClip = null,
-                // Walk
-                AnimationClip walkClip = null,
-                AnimationClip walkBackwardClip = null,
-                AnimationClip walkLeftClip = null,
-                AnimationClip walkRightClip = null,
-                AnimationClip walkForwardLeftClip = null,
-                AnimationClip walkForwardRightClip = null,
-                AnimationClip walkBackwardLeftClip = null,
-                AnimationClip walkBackwardRightClip = null,
-                // Crouch
-                AnimationClip crouchIdleClip = null,
-                AnimationClip crouchMoveClip = null,
-                AnimationClip crouchMoveBackwardClip = null,
-                AnimationClip crouchMoveLeftClip = null,
-                AnimationClip crouchMoveRightClip = null,
-                AnimationClip crouchMoveForwardLeftClip = null,
-                AnimationClip crouchMoveForwardRightClip = null,
-                AnimationClip crouchMoveBackwardLeftClip = null,
-                AnimationClip crouchMoveBackwardRightClip = null,
-                // Crawl
-                AnimationClip crawlIdleClip = null,
-                AnimationClip crawlMoveClip = null,
-                AnimationClip crawlMoveBackwardClip = null,
-                AnimationClip crawlMoveLeftClip = null,
-                AnimationClip crawlMoveRightClip = null,
-                AnimationClip crawlMoveForwardLeftClip = null,
-                AnimationClip crawlMoveForwardRightClip = null,
-                AnimationClip crawlMoveBackwardLeftClip = null,
-                AnimationClip crawlMoveBackwardRightClip = null,
-                // Swim
-                AnimationClip swimIdleClip = null,
-                AnimationClip swimMoveClip = null,
-                AnimationClip swimMoveBackwardClip = null,
-                AnimationClip swimMoveLeftClip = null,
-                AnimationClip swimMoveRightClip = null,
-                AnimationClip swimMoveForwardLeftClip = null,
-                AnimationClip swimMoveForwardRightClip = null,
-                AnimationClip swimMoveBackwardLeftClip = null,
-                AnimationClip swimMoveBackwardRightClip = null,
-                // Other
-                AnimationClip jumpClip = null,
-                AnimationClip fallClip = null,
-                AnimationClip landedClip = null,
-                AnimationClip hurtClip = null,
-                AnimationClip deadClip = null,
-                AnimationClip pickupClip = null)
-            {
-                animatorController.name = name;
-                // Move
-                animatorController[CLIP_IDLE] = idleClip != null ? idleClip : defaultAnimations.idleClip;
-                animatorController[CLIP_MOVE] = moveClip != null ? moveClip : defaultAnimations.moveClip;
-                animatorController[CLIP_MOVE_BACKWARD] = moveBackwardClip != null ? moveBackwardClip : defaultAnimations.moveBackwardClip;
-                animatorController[CLIP_MOVE_LEFT] = moveLeftClip != null ? moveLeftClip : defaultAnimations.moveLeftClip;
-                animatorController[CLIP_MOVE_RIGHT] = moveRightClip != null ? moveRightClip : defaultAnimations.moveRightClip;
-                animatorController[CLIP_MOVE_FORWARD_LEFT] = moveForwardLeftClip != null ? moveForwardLeftClip : defaultAnimations.moveForwardLeftClip;
-                animatorController[CLIP_MOVE_FORWARD_RIGHT] = moveForwardRightClip != null ? moveForwardRightClip : defaultAnimations.moveForwardRightClip;
-                animatorController[CLIP_MOVE_BACKWARD_LEFT] = moveBackwardLeftClip != null ? moveBackwardLeftClip : defaultAnimations.moveBackwardLeftClip;
-                animatorController[CLIP_MOVE_BACKWARD_RIGHT] = moveBackwardRightClip != null ? moveBackwardRightClip : defaultAnimations.moveBackwardRightClip;
-                // Sprint
-                animatorController[CLIP_SPRINT] = sprintClip != null ? sprintClip : defaultAnimations.sprintClip;
-                animatorController[CLIP_SPRINT_BACKWARD] = sprintBackwardClip != null ? sprintBackwardClip : defaultAnimations.sprintBackwardClip;
-                animatorController[CLIP_SPRINT_LEFT] = sprintLeftClip != null ? sprintLeftClip : defaultAnimations.sprintLeftClip;
-                animatorController[CLIP_SPRINT_RIGHT] = sprintRightClip != null ? sprintRightClip : defaultAnimations.sprintRightClip;
-                animatorController[CLIP_SPRINT_FORWARD_LEFT] = sprintForwardLeftClip != null ? sprintForwardLeftClip : defaultAnimations.sprintForwardLeftClip;
-                animatorController[CLIP_SPRINT_FORWARD_RIGHT] = sprintForwardRightClip != null ? sprintForwardRightClip : defaultAnimations.sprintForwardRightClip;
-                animatorController[CLIP_SPRINT_BACKWARD_LEFT] = sprintBackwardLeftClip != null ? sprintBackwardLeftClip : defaultAnimations.sprintBackwardLeftClip;
-                animatorController[CLIP_SPRINT_BACKWARD_RIGHT] = sprintBackwardRightClip != null ? sprintBackwardRightClip : defaultAnimations.sprintBackwardRightClip;
-                // Walk
-                animatorController[CLIP_WALK] = walkClip != null ? walkClip : defaultAnimations.walkClip;
-                animatorController[CLIP_WALK_BACKWARD] = walkBackwardClip != null ? walkBackwardClip : defaultAnimations.walkBackwardClip;
-                animatorController[CLIP_WALK_LEFT] = walkLeftClip != null ? walkLeftClip : defaultAnimations.walkLeftClip;
-                animatorController[CLIP_WALK_RIGHT] = walkRightClip != null ? walkRightClip : defaultAnimations.walkRightClip;
-                animatorController[CLIP_WALK_FORWARD_LEFT] = walkForwardLeftClip != null ? walkForwardLeftClip : defaultAnimations.walkForwardLeftClip;
-                animatorController[CLIP_WALK_FORWARD_RIGHT] = walkForwardRightClip != null ? walkForwardRightClip : defaultAnimations.walkForwardRightClip;
-                animatorController[CLIP_WALK_BACKWARD_LEFT] = walkBackwardLeftClip != null ? walkBackwardLeftClip : defaultAnimations.walkBackwardLeftClip;
-                animatorController[CLIP_WALK_BACKWARD_RIGHT] = walkBackwardRightClip != null ? walkBackwardRightClip : defaultAnimations.walkBackwardRightClip;
-                // Crouch
-                animatorController[CLIP_CROUCH_IDLE] = crouchIdleClip != null ? crouchIdleClip : defaultAnimations.crouchIdleClip;
-                animatorController[CLIP_CROUCH_MOVE] = crouchMoveClip != null ? crouchMoveClip : defaultAnimations.crouchMoveClip;
-                animatorController[CLIP_CROUCH_MOVE_BACKWARD] = crouchMoveBackwardClip != null ? crouchMoveBackwardClip : defaultAnimations.crouchMoveBackwardClip;
-                animatorController[CLIP_CROUCH_MOVE_LEFT] = crouchMoveLeftClip != null ? crouchMoveLeftClip : defaultAnimations.crouchMoveLeftClip;
-                animatorController[CLIP_CROUCH_MOVE_RIGHT] = crouchMoveRightClip != null ? crouchMoveRightClip : defaultAnimations.crouchMoveRightClip;
-                animatorController[CLIP_CROUCH_MOVE_FORWARD_LEFT] = crouchMoveForwardLeftClip != null ? crouchMoveForwardLeftClip : defaultAnimations.crouchMoveForwardLeftClip;
-                animatorController[CLIP_CROUCH_MOVE_FORWARD_RIGHT] = crouchMoveForwardRightClip != null ? crouchMoveForwardRightClip : defaultAnimations.crouchMoveForwardRightClip;
-                animatorController[CLIP_CROUCH_MOVE_BACKWARD_LEFT] = crouchMoveBackwardLeftClip != null ? crouchMoveBackwardLeftClip : defaultAnimations.crouchMoveBackwardLeftClip;
-                animatorController[CLIP_CROUCH_MOVE_BACKWARD_RIGHT] = crouchMoveBackwardRightClip != null ? crouchMoveBackwardRightClip : defaultAnimations.crouchMoveBackwardRightClip;
-                // Crawl
-                animatorController[CLIP_CRAWL_IDLE] = crawlIdleClip != null ? crawlIdleClip : defaultAnimations.crawlIdleClip;
-                animatorController[CLIP_CRAWL_MOVE] = crawlMoveClip != null ? crawlMoveClip : defaultAnimations.crawlMoveClip;
-                animatorController[CLIP_CRAWL_MOVE_BACKWARD] = crawlMoveBackwardClip != null ? crawlMoveBackwardClip : defaultAnimations.crawlMoveBackwardClip;
-                animatorController[CLIP_CRAWL_MOVE_LEFT] = crawlMoveLeftClip != null ? crawlMoveLeftClip : defaultAnimations.crawlMoveLeftClip;
-                animatorController[CLIP_CRAWL_MOVE_RIGHT] = crawlMoveRightClip != null ? crawlMoveRightClip : defaultAnimations.crawlMoveRightClip;
-                animatorController[CLIP_CRAWL_MOVE_FORWARD_LEFT] = crawlMoveForwardLeftClip != null ? crawlMoveForwardLeftClip : defaultAnimations.crawlMoveForwardLeftClip;
-                animatorController[CLIP_CRAWL_MOVE_FORWARD_RIGHT] = crawlMoveForwardRightClip != null ? crawlMoveForwardRightClip : defaultAnimations.crawlMoveForwardRightClip;
-                animatorController[CLIP_CRAWL_MOVE_BACKWARD_LEFT] = crawlMoveBackwardLeftClip != null ? crawlMoveBackwardLeftClip : defaultAnimations.crawlMoveBackwardLeftClip;
-                animatorController[CLIP_CRAWL_MOVE_BACKWARD_RIGHT] = crawlMoveBackwardRightClip != null ? crawlMoveBackwardRightClip : defaultAnimations.crawlMoveBackwardRightClip;
-                // Swim
-                animatorController[CLIP_SWIM_IDLE] = swimIdleClip != null ? swimIdleClip : defaultAnimations.swimIdleClip;
-                animatorController[CLIP_SWIM_MOVE] = swimMoveClip != null ? swimMoveClip : defaultAnimations.swimMoveClip;
-                animatorController[CLIP_SWIM_MOVE_BACKWARD] = swimMoveBackwardClip != null ? swimMoveBackwardClip : defaultAnimations.swimMoveBackwardClip;
-                animatorController[CLIP_SWIM_MOVE_LEFT] = swimMoveLeftClip != null ? swimMoveLeftClip : defaultAnimations.swimMoveLeftClip;
-                animatorController[CLIP_SWIM_MOVE_RIGHT] = swimMoveRightClip != null ? swimMoveRightClip : defaultAnimations.swimMoveRightClip;
-                animatorController[CLIP_SWIM_MOVE_FORWARD_LEFT] = swimMoveForwardLeftClip != null ? swimMoveForwardLeftClip : defaultAnimations.swimMoveForwardLeftClip;
-                animatorController[CLIP_SWIM_MOVE_FORWARD_RIGHT] = swimMoveForwardRightClip != null ? swimMoveForwardRightClip : defaultAnimations.swimMoveForwardRightClip;
-                animatorController[CLIP_SWIM_MOVE_BACKWARD_LEFT] = swimMoveBackwardLeftClip != null ? swimMoveBackwardLeftClip : defaultAnimations.swimMoveBackwardLeftClip;
-                animatorController[CLIP_SWIM_MOVE_BACKWARD_RIGHT] = swimMoveBackwardRightClip != null ? swimMoveBackwardRightClip : defaultAnimations.swimMoveBackwardRightClip;
-                // Other
-                animatorController[CLIP_JUMP] = jumpClip != null ? jumpClip : defaultAnimations.jumpClip;
-                animatorController[CLIP_FALL] = fallClip != null ? fallClip : defaultAnimations.fallClip;
-                animatorController[CLIP_LANDED] = landedClip != null ? landedClip : defaultAnimations.landedClip;
-                animatorController[CLIP_HURT] = hurtClip != null ? hurtClip : defaultAnimations.hurtClip;
-                animatorController[CLIP_DEAD] = deadClip != null ? deadClip : defaultAnimations.deadClip;
-                animatorController[CLIP_PICKUP] = pickupClip != null ? pickupClip : defaultAnimations.pickupClip;
-
-                return animatorController;
-            }
-        }
-
         // Animator variables
         public static readonly int ANIM_IS_DEAD = Animator.StringToHash("IsDead");
         public static readonly int ANIM_IS_GROUNDED = Animator.StringToHash("IsGrounded");
@@ -265,7 +39,6 @@ namespace MultiplayerARPG
         public static readonly int ANIM_LANDED_CLIP_MULTIPLIER = Animator.StringToHash("LandedSpeedMultiplier");
         public static readonly int ANIM_PICKUP_CLIP_MULTIPLIER = Animator.StringToHash("PickupSpeedMultiplier");
         public static readonly int ANIM_MOVE_TYPE = Animator.StringToHash("MoveType");
-        public static readonly Dictionary<int, CacheAnimatorController> CacheAnimatorControllers = new Dictionary<int, CacheAnimatorController>();
 
         [Header("Settings")]
         [Tooltip("The damping time for the `MoveSpeed` and `SideMoveSpeed` parameters. The higher the value the slower the parameter value changes.")]
@@ -298,11 +71,8 @@ namespace MultiplayerARPG
         public bool setAnimatorClipsForTest;
 #endif
 
-        public AnimatorOverrideController CurrentAnimatorController
-        {
-            get { return animator.runtimeAnimatorController as AnimatorOverrideController; }
-            private set { animator.runtimeAnimatorController = value; }
-        }
+        public AnimatorOverrideController CacheAnimatorController { get; private set; }
+        private Dictionary<string, AnimationClip> animationClipOverrides = new Dictionary<string, AnimationClip>();
         private int[] actionStateNameHashes;
         private int[] castSkillStateNameHashes;
         private bool isSetupComponent;
@@ -329,25 +99,9 @@ namespace MultiplayerARPG
             SetupComponent();
         }
 
-        protected void SetCacheAnimatorController(int id, RuntimeAnimatorController animatorController, DefaultAnimations defaultAnimations, WeaponAnimations[] weaponAnimations)
-        {
-            CacheAnimatorControllers[id] = new CacheAnimatorController(id, animatorController, defaultAnimations, weaponAnimations);
-        }
-
-        protected CacheAnimatorController GetCacheAnimatorController(int id)
-        {
-            return CacheAnimatorControllers[id];
-        }
-
-        protected CacheAnimatorController SetAndGetCacheAnimatorController(int id, RuntimeAnimatorController animatorController, DefaultAnimations defaultAnimations, WeaponAnimations[] weaponAnimations)
-        {
-            if (!CacheAnimatorControllers.ContainsKey(id))
-                SetCacheAnimatorController(id, animatorController, defaultAnimations, weaponAnimations);
-            return GetCacheAnimatorController(id);
-        }
-
         protected override void OnValidate()
         {
+            base.OnValidate();
 #if UNITY_EDITOR
             bool hasChanges = false;
             if (animator == null)
@@ -410,9 +164,9 @@ namespace MultiplayerARPG
                     break;
             }
             if (animator == null)
-                Logging.LogError(ToString(), $"{name}(AnimatorCharacterModel) -> `Animator` is empty, please set reference of `Animator` component to `AnimatorCharacterModel` -> `Animator` field.");
+                Logging.LogError(ToString(), "`Animator` is empty");
             if (animatorController == null)
-                Logging.LogError(ToString(), $"{name}(AnimatorCharacterModel) -> `AnimatorController` is empty, please set reference of `AnimatorController` data to `AnimatorCharacterModel` -> `AnimatorController` field.");
+                Logging.LogError(ToString(), "`Animator Controller` is empty");
             if (hasChanges)
             {
                 isSetupComponent = false;
@@ -420,7 +174,6 @@ namespace MultiplayerARPG
                 EditorUtility.SetDirty(this);
             }
 #endif
-            base.OnValidate();
         }
 
         private void SetupComponent()
@@ -428,6 +181,11 @@ namespace MultiplayerARPG
             if (isSetupComponent)
                 return;
             isSetupComponent = true;
+            if (CacheAnimatorController == null)
+                CacheAnimatorController = new AnimatorOverrideController(animatorController);
+            // Use override controller as animator
+            if (animator != null && animator.runtimeAnimatorController != CacheAnimatorController)
+                animator.runtimeAnimatorController = CacheAnimatorController;
             // Setup action state name hashes
             int indexCounter;
             actionStateNameHashes = new int[actionStateNames.Length];
@@ -442,29 +200,244 @@ namespace MultiplayerARPG
 
         public override void SetDefaultAnimations()
         {
-            CurrentAnimatorController = SetAndGetCacheAnimatorController(Id, animatorController, defaultAnimations, weaponAnimations).Default;
-            SetupSpeedRates();
+            SetupClips(
+                // Move
+                defaultAnimations.idleClip,
+                defaultAnimations.moveClip,
+                defaultAnimations.moveBackwardClip,
+                defaultAnimations.moveLeftClip,
+                defaultAnimations.moveRightClip,
+                defaultAnimations.moveForwardLeftClip,
+                defaultAnimations.moveForwardRightClip,
+                defaultAnimations.moveBackwardLeftClip,
+                defaultAnimations.moveBackwardRightClip,
+                // Sprint
+                defaultAnimations.sprintClip,
+                defaultAnimations.sprintBackwardClip,
+                defaultAnimations.sprintLeftClip,
+                defaultAnimations.sprintRightClip,
+                defaultAnimations.sprintForwardLeftClip,
+                defaultAnimations.sprintForwardRightClip,
+                defaultAnimations.sprintBackwardLeftClip,
+                defaultAnimations.sprintBackwardRightClip,
+                // Walk
+                defaultAnimations.walkClip,
+                defaultAnimations.walkBackwardClip,
+                defaultAnimations.walkLeftClip,
+                defaultAnimations.walkRightClip,
+                defaultAnimations.walkForwardLeftClip,
+                defaultAnimations.walkForwardRightClip,
+                defaultAnimations.walkBackwardLeftClip,
+                defaultAnimations.walkBackwardRightClip,
+                // Crouch
+                defaultAnimations.crouchIdleClip,
+                defaultAnimations.crouchMoveClip,
+                defaultAnimations.crouchMoveBackwardClip,
+                defaultAnimations.crouchMoveLeftClip,
+                defaultAnimations.crouchMoveRightClip,
+                defaultAnimations.crouchMoveForwardLeftClip,
+                defaultAnimations.crouchMoveForwardRightClip,
+                defaultAnimations.crouchMoveBackwardLeftClip,
+                defaultAnimations.crouchMoveBackwardRightClip,
+                // Crawl
+                defaultAnimations.crawlIdleClip,
+                defaultAnimations.crawlMoveClip,
+                defaultAnimations.crawlMoveBackwardClip,
+                defaultAnimations.crawlMoveLeftClip,
+                defaultAnimations.crawlMoveRightClip,
+                defaultAnimations.crawlMoveForwardLeftClip,
+                defaultAnimations.crawlMoveForwardRightClip,
+                defaultAnimations.crawlMoveBackwardLeftClip,
+                defaultAnimations.crawlMoveBackwardRightClip,
+                // Swim
+                defaultAnimations.swimIdleClip,
+                defaultAnimations.swimMoveClip,
+                defaultAnimations.swimMoveBackwardClip,
+                defaultAnimations.swimMoveLeftClip,
+                defaultAnimations.swimMoveRightClip,
+                defaultAnimations.swimMoveForwardLeftClip,
+                defaultAnimations.swimMoveForwardRightClip,
+                defaultAnimations.swimMoveBackwardLeftClip,
+                defaultAnimations.swimMoveBackwardRightClip,
+                // Other
+                defaultAnimations.jumpClip,
+                defaultAnimations.fallClip,
+                defaultAnimations.landedClip,
+                defaultAnimations.hurtClip,
+                defaultAnimations.deadClip,
+                defaultAnimations.pickupClip,
+                // Speed Rate
+                defaultAnimations.idleAnimSpeedRate,
+                defaultAnimations.moveAnimSpeedRate,
+                defaultAnimations.sprintAnimSpeedRate,
+                defaultAnimations.walkAnimSpeedRate,
+                defaultAnimations.crouchIdleAnimSpeedRate,
+                defaultAnimations.crouchMoveAnimSpeedRate,
+                defaultAnimations.crawlIdleAnimSpeedRate,
+                defaultAnimations.crawlMoveAnimSpeedRate,
+                defaultAnimations.swimIdleAnimSpeedRate,
+                defaultAnimations.swimMoveAnimSpeedRate,
+                defaultAnimations.jumpAnimSpeedRate,
+                defaultAnimations.fallAnimSpeedRate,
+                defaultAnimations.landedAnimSpeedRate,
+                defaultAnimations.hurtAnimSpeedRate,
+                defaultAnimations.deadAnimSpeedRate,
+                defaultAnimations.pickupAnimSpeedRate);
             base.SetDefaultAnimations();
         }
 
-        private void SetupSpeedRates(
-            float idleAnimSpeedRate = 0f,
-            float moveAnimSpeedRate = 0f,
-            float sprintAnimSpeedRate = 0f,
-            float walkAnimSpeedRate = 0f,
-            float crouchIdleAnimSpeedRate = 0f,
-            float crouchMoveAnimSpeedRate = 0f,
-            float crawlIdleAnimSpeedRate = 0f,
-            float crawlMoveAnimSpeedRate = 0f,
-            float swimIdleAnimSpeedRate = 0f,
-            float swimMoveAnimSpeedRate = 0f,
-            float jumpAnimSpeedRate = 0f,
-            float fallAnimSpeedRate = 0f,
-            float landedAnimSpeedRate = 0f,
-            float hurtAnimSpeedRate = 0f,
-            float deadAnimSpeedRate = 0f,
-            float pickupAnimSpeedRate = 0f)
+        private void SetupClips(
+            // Move
+            AnimationClip idleClip,
+            AnimationClip moveClip,
+            AnimationClip moveBackwardClip,
+            AnimationClip moveLeftClip,
+            AnimationClip moveRightClip,
+            AnimationClip moveForwardLeftClip,
+            AnimationClip moveForwardRightClip,
+            AnimationClip moveBackwardLeftClip,
+            AnimationClip moveBackwardRightClip,
+            // Sprint
+            AnimationClip sprintClip,
+            AnimationClip sprintBackwardClip,
+            AnimationClip sprintLeftClip,
+            AnimationClip sprintRightClip,
+            AnimationClip sprintForwardLeftClip,
+            AnimationClip sprintForwardRightClip,
+            AnimationClip sprintBackwardLeftClip,
+            AnimationClip sprintBackwardRightClip,
+            // Walk
+            AnimationClip walkClip,
+            AnimationClip walkBackwardClip,
+            AnimationClip walkLeftClip,
+            AnimationClip walkRightClip,
+            AnimationClip walkForwardLeftClip,
+            AnimationClip walkForwardRightClip,
+            AnimationClip walkBackwardLeftClip,
+            AnimationClip walkBackwardRightClip,
+            // Crouch
+            AnimationClip crouchIdleClip,
+            AnimationClip crouchMoveClip,
+            AnimationClip crouchMoveBackwardClip,
+            AnimationClip crouchMoveLeftClip,
+            AnimationClip crouchMoveRightClip,
+            AnimationClip crouchMoveForwardLeftClip,
+            AnimationClip crouchMoveForwardRightClip,
+            AnimationClip crouchMoveBackwardLeftClip,
+            AnimationClip crouchMoveBackwardRightClip,
+            // Crawl
+            AnimationClip crawlIdleClip,
+            AnimationClip crawlMoveClip,
+            AnimationClip crawlMoveBackwardClip,
+            AnimationClip crawlMoveLeftClip,
+            AnimationClip crawlMoveRightClip,
+            AnimationClip crawlMoveForwardLeftClip,
+            AnimationClip crawlMoveForwardRightClip,
+            AnimationClip crawlMoveBackwardLeftClip,
+            AnimationClip crawlMoveBackwardRightClip,
+            // Swim
+            AnimationClip swimIdleClip,
+            AnimationClip swimMoveClip,
+            AnimationClip swimMoveBackwardClip,
+            AnimationClip swimMoveLeftClip,
+            AnimationClip swimMoveRightClip,
+            AnimationClip swimMoveForwardLeftClip,
+            AnimationClip swimMoveForwardRightClip,
+            AnimationClip swimMoveBackwardLeftClip,
+            AnimationClip swimMoveBackwardRightClip,
+            // Other
+            AnimationClip jumpClip,
+            AnimationClip fallClip,
+            AnimationClip landedClip,
+            AnimationClip hurtClip,
+            AnimationClip deadClip,
+            AnimationClip pickupClip,
+            // Speed rate
+            float idleAnimSpeedRate,
+            float moveAnimSpeedRate,
+            float sprintAnimSpeedRate,
+            float walkAnimSpeedRate,
+            float crouchIdleAnimSpeedRate,
+            float crouchMoveAnimSpeedRate,
+            float crawlIdleAnimSpeedRate,
+            float crawlMoveAnimSpeedRate,
+            float swimIdleAnimSpeedRate,
+            float swimMoveAnimSpeedRate,
+            float jumpAnimSpeedRate,
+            float fallAnimSpeedRate,
+            float landedAnimSpeedRate,
+            float hurtAnimSpeedRate,
+            float deadAnimSpeedRate,
+            float pickupAnimSpeedRate)
         {
+            if (CacheAnimatorController == null)
+                return;
+            // Move
+            animationClipOverrides.Clear();
+            OverrideAnimationClip(CLIP_IDLE, idleClip != null ? idleClip : defaultAnimations.idleClip);
+            OverrideAnimationClip(CLIP_MOVE, moveClip != null ? moveClip : defaultAnimations.moveClip);
+            OverrideAnimationClip(CLIP_MOVE_BACKWARD, moveBackwardClip != null ? moveBackwardClip : defaultAnimations.moveBackwardClip);
+            OverrideAnimationClip(CLIP_MOVE_LEFT, moveLeftClip != null ? moveLeftClip : defaultAnimations.moveLeftClip);
+            OverrideAnimationClip(CLIP_MOVE_RIGHT, moveRightClip != null ? moveRightClip : defaultAnimations.moveRightClip);
+            OverrideAnimationClip(CLIP_MOVE_FORWARD_LEFT, moveForwardLeftClip != null ? moveForwardLeftClip : defaultAnimations.moveForwardLeftClip);
+            OverrideAnimationClip(CLIP_MOVE_FORWARD_RIGHT, moveForwardRightClip != null ? moveForwardRightClip : defaultAnimations.moveForwardRightClip);
+            OverrideAnimationClip(CLIP_MOVE_BACKWARD_LEFT, moveBackwardLeftClip != null ? moveBackwardLeftClip : defaultAnimations.moveBackwardLeftClip);
+            OverrideAnimationClip(CLIP_MOVE_BACKWARD_RIGHT, moveBackwardRightClip != null ? moveBackwardRightClip : defaultAnimations.moveBackwardRightClip);
+            // Sprint
+            OverrideAnimationClip(CLIP_SPRINT, sprintClip != null ? sprintClip : defaultAnimations.sprintClip);
+            OverrideAnimationClip(CLIP_SPRINT_BACKWARD, sprintBackwardClip != null ? sprintBackwardClip : defaultAnimations.sprintBackwardClip);
+            OverrideAnimationClip(CLIP_SPRINT_LEFT, sprintLeftClip != null ? sprintLeftClip : defaultAnimations.sprintLeftClip);
+            OverrideAnimationClip(CLIP_SPRINT_RIGHT, sprintRightClip != null ? sprintRightClip : defaultAnimations.sprintRightClip);
+            OverrideAnimationClip(CLIP_SPRINT_FORWARD_LEFT, sprintForwardLeftClip != null ? sprintForwardLeftClip : defaultAnimations.sprintForwardLeftClip);
+            OverrideAnimationClip(CLIP_SPRINT_FORWARD_RIGHT, sprintForwardRightClip != null ? sprintForwardRightClip : defaultAnimations.sprintForwardRightClip);
+            OverrideAnimationClip(CLIP_SPRINT_BACKWARD_LEFT, sprintBackwardLeftClip != null ? sprintBackwardLeftClip : defaultAnimations.sprintBackwardLeftClip);
+            OverrideAnimationClip(CLIP_SPRINT_BACKWARD_RIGHT, sprintBackwardRightClip != null ? sprintBackwardRightClip : defaultAnimations.sprintBackwardRightClip);
+            // Walk
+            OverrideAnimationClip(CLIP_WALK, walkClip != null ? walkClip : defaultAnimations.walkClip);
+            OverrideAnimationClip(CLIP_WALK_BACKWARD, walkBackwardClip != null ? walkBackwardClip : defaultAnimations.walkBackwardClip);
+            OverrideAnimationClip(CLIP_WALK_LEFT, walkLeftClip != null ? walkLeftClip : defaultAnimations.walkLeftClip);
+            OverrideAnimationClip(CLIP_WALK_RIGHT, walkRightClip != null ? walkRightClip : defaultAnimations.walkRightClip);
+            OverrideAnimationClip(CLIP_WALK_FORWARD_LEFT, walkForwardLeftClip != null ? walkForwardLeftClip : defaultAnimations.walkForwardLeftClip);
+            OverrideAnimationClip(CLIP_WALK_FORWARD_RIGHT, walkForwardRightClip != null ? walkForwardRightClip : defaultAnimations.walkForwardRightClip);
+            OverrideAnimationClip(CLIP_WALK_BACKWARD_LEFT, walkBackwardLeftClip != null ? walkBackwardLeftClip : defaultAnimations.walkBackwardLeftClip);
+            OverrideAnimationClip(CLIP_WALK_BACKWARD_RIGHT, walkBackwardRightClip != null ? walkBackwardRightClip : defaultAnimations.walkBackwardRightClip);
+            // Crouch
+            OverrideAnimationClip(CLIP_CROUCH_IDLE, crouchIdleClip != null ? crouchIdleClip : defaultAnimations.crouchIdleClip);
+            OverrideAnimationClip(CLIP_CROUCH_MOVE, crouchMoveClip != null ? crouchMoveClip : defaultAnimations.crouchMoveClip);
+            OverrideAnimationClip(CLIP_CROUCH_MOVE_BACKWARD, crouchMoveBackwardClip != null ? crouchMoveBackwardClip : defaultAnimations.crouchMoveBackwardClip);
+            OverrideAnimationClip(CLIP_CROUCH_MOVE_LEFT, crouchMoveLeftClip != null ? crouchMoveLeftClip : defaultAnimations.crouchMoveLeftClip);
+            OverrideAnimationClip(CLIP_CROUCH_MOVE_RIGHT, crouchMoveRightClip != null ? crouchMoveRightClip : defaultAnimations.crouchMoveRightClip);
+            OverrideAnimationClip(CLIP_CROUCH_MOVE_FORWARD_LEFT, crouchMoveForwardLeftClip != null ? crouchMoveForwardLeftClip : defaultAnimations.crouchMoveForwardLeftClip);
+            OverrideAnimationClip(CLIP_CROUCH_MOVE_FORWARD_RIGHT, crouchMoveForwardRightClip != null ? crouchMoveForwardRightClip : defaultAnimations.crouchMoveForwardRightClip);
+            OverrideAnimationClip(CLIP_CROUCH_MOVE_BACKWARD_LEFT, crouchMoveBackwardLeftClip != null ? crouchMoveBackwardLeftClip : defaultAnimations.crouchMoveBackwardLeftClip);
+            OverrideAnimationClip(CLIP_CROUCH_MOVE_BACKWARD_RIGHT, crouchMoveBackwardRightClip != null ? crouchMoveBackwardRightClip : defaultAnimations.crouchMoveBackwardRightClip);
+            // Crawl
+            OverrideAnimationClip(CLIP_CRAWL_IDLE, crawlIdleClip != null ? crawlIdleClip : defaultAnimations.crawlIdleClip);
+            OverrideAnimationClip(CLIP_CRAWL_MOVE, crawlMoveClip != null ? crawlMoveClip : defaultAnimations.crawlMoveClip);
+            OverrideAnimationClip(CLIP_CRAWL_MOVE_BACKWARD, crawlMoveBackwardClip != null ? crawlMoveBackwardClip : defaultAnimations.crawlMoveBackwardClip);
+            OverrideAnimationClip(CLIP_CRAWL_MOVE_LEFT, crawlMoveLeftClip != null ? crawlMoveLeftClip : defaultAnimations.crawlMoveLeftClip);
+            OverrideAnimationClip(CLIP_CRAWL_MOVE_RIGHT, crawlMoveRightClip != null ? crawlMoveRightClip : defaultAnimations.crawlMoveRightClip);
+            OverrideAnimationClip(CLIP_CRAWL_MOVE_FORWARD_LEFT, crawlMoveForwardLeftClip != null ? crawlMoveForwardLeftClip : defaultAnimations.crawlMoveForwardLeftClip);
+            OverrideAnimationClip(CLIP_CRAWL_MOVE_FORWARD_RIGHT, crawlMoveForwardRightClip != null ? crawlMoveForwardRightClip : defaultAnimations.crawlMoveForwardRightClip);
+            OverrideAnimationClip(CLIP_CRAWL_MOVE_BACKWARD_LEFT, crawlMoveBackwardLeftClip != null ? crawlMoveBackwardLeftClip : defaultAnimations.crawlMoveBackwardLeftClip);
+            OverrideAnimationClip(CLIP_CRAWL_MOVE_BACKWARD_RIGHT, crawlMoveBackwardRightClip != null ? crawlMoveBackwardRightClip : defaultAnimations.crawlMoveBackwardRightClip);
+            // Swim
+            OverrideAnimationClip(CLIP_SWIM_IDLE, swimIdleClip != null ? swimIdleClip : defaultAnimations.swimIdleClip);
+            OverrideAnimationClip(CLIP_SWIM_MOVE, swimMoveClip != null ? swimMoveClip : defaultAnimations.swimMoveClip);
+            OverrideAnimationClip(CLIP_SWIM_MOVE_BACKWARD, swimMoveBackwardClip != null ? swimMoveBackwardClip : defaultAnimations.swimMoveBackwardClip);
+            OverrideAnimationClip(CLIP_SWIM_MOVE_LEFT, swimMoveLeftClip != null ? swimMoveLeftClip : defaultAnimations.swimMoveLeftClip);
+            OverrideAnimationClip(CLIP_SWIM_MOVE_RIGHT, swimMoveRightClip != null ? swimMoveRightClip : defaultAnimations.swimMoveRightClip);
+            OverrideAnimationClip(CLIP_SWIM_MOVE_FORWARD_LEFT, swimMoveForwardLeftClip != null ? swimMoveForwardLeftClip : defaultAnimations.swimMoveForwardLeftClip);
+            OverrideAnimationClip(CLIP_SWIM_MOVE_FORWARD_RIGHT, swimMoveForwardRightClip != null ? swimMoveForwardRightClip : defaultAnimations.swimMoveForwardRightClip);
+            OverrideAnimationClip(CLIP_SWIM_MOVE_BACKWARD_LEFT, swimMoveBackwardLeftClip != null ? swimMoveBackwardLeftClip : defaultAnimations.swimMoveBackwardLeftClip);
+            OverrideAnimationClip(CLIP_SWIM_MOVE_BACKWARD_RIGHT, swimMoveBackwardRightClip != null ? swimMoveBackwardRightClip : defaultAnimations.swimMoveBackwardRightClip);
+            // Other
+            OverrideAnimationClip(CLIP_JUMP, jumpClip != null ? jumpClip : defaultAnimations.jumpClip);
+            OverrideAnimationClip(CLIP_FALL, fallClip != null ? fallClip : defaultAnimations.fallClip);
+            OverrideAnimationClip(CLIP_LANDED, landedClip != null ? landedClip : defaultAnimations.landedClip);
+            OverrideAnimationClip(CLIP_HURT, hurtClip != null ? hurtClip : defaultAnimations.hurtClip);
+            OverrideAnimationClip(CLIP_DEAD, deadClip != null ? deadClip : defaultAnimations.deadClip);
+            OverrideAnimationClip(CLIP_PICKUP, pickupClip != null ? pickupClip : defaultAnimations.pickupClip);
             // Speed Rate
             // Stand move
             this.idleAnimSpeedRate = idleAnimSpeedRate > 0f ? idleAnimSpeedRate :
@@ -505,6 +478,14 @@ namespace MultiplayerARPG
                 defaultAnimations.pickupAnimSpeedRate > 0f ? defaultAnimations.pickupAnimSpeedRate : 1f;
         }
 
+        private void OverrideAnimationClip(string key, AnimationClip clip)
+        {
+            if (clip == null)
+                return;
+            animationClipOverrides[key] = clip;
+            CacheAnimatorController[key] = clip;
+        }
+
         public override void SetEquipWeapons(EquipWeapons equipWeapons)
         {
             base.SetEquipWeapons(equipWeapons);
@@ -528,42 +509,101 @@ namespace MultiplayerARPG
 
         protected void SetClipBasedOnWeaponType(WeaponType weaponType)
         {
-            CacheAnimatorController cacheAnimatorController = SetAndGetCacheAnimatorController(Id, animatorController, defaultAnimations, weaponAnimations);
-            WeaponAnimations currentWeaponAnimations;
-            if (weaponType == null ||
-                !cacheAnimatorController.Weapons.ContainsKey(weaponType.DataId) ||
-                !TryGetWeaponAnimations(weaponType.DataId, out currentWeaponAnimations))
-            {
-                CurrentAnimatorController = cacheAnimatorController.Default;
-                SetupSpeedRates();
-            }
-            else
-            {
-                CurrentAnimatorController = cacheAnimatorController.Weapons[weaponType.DataId];
-                SetupSpeedRates(
-                    currentWeaponAnimations.idleAnimSpeedRate,
-                    currentWeaponAnimations.moveAnimSpeedRate,
-                    currentWeaponAnimations.sprintAnimSpeedRate,
-                    currentWeaponAnimations.walkAnimSpeedRate,
-                    currentWeaponAnimations.crouchIdleAnimSpeedRate,
-                    currentWeaponAnimations.crouchMoveAnimSpeedRate,
-                    currentWeaponAnimations.crawlIdleAnimSpeedRate,
-                    currentWeaponAnimations.crawlMoveAnimSpeedRate,
-                    currentWeaponAnimations.swimIdleAnimSpeedRate,
-                    currentWeaponAnimations.swimMoveAnimSpeedRate,
-                    currentWeaponAnimations.jumpAnimSpeedRate,
-                    currentWeaponAnimations.fallAnimSpeedRate,
-                    currentWeaponAnimations.landedAnimSpeedRate,
-                    currentWeaponAnimations.hurtAnimSpeedRate,
-                    currentWeaponAnimations.deadAnimSpeedRate,
-                    currentWeaponAnimations.pickupAnimSpeedRate);
-            }
+            WeaponAnimations weaponAnimations;
+            TryGetWeaponAnimations(weaponType.DataId, out weaponAnimations);
+
+            SetupClips(
+                // Move
+                weaponAnimations.idleClip,
+                weaponAnimations.moveClip,
+                weaponAnimations.moveBackwardClip,
+                weaponAnimations.moveLeftClip,
+                weaponAnimations.moveRightClip,
+                weaponAnimations.moveForwardLeftClip,
+                weaponAnimations.moveForwardRightClip,
+                weaponAnimations.moveBackwardLeftClip,
+                weaponAnimations.moveBackwardRightClip,
+                // Sprint
+                weaponAnimations.sprintClip,
+                weaponAnimations.sprintBackwardClip,
+                weaponAnimations.sprintLeftClip,
+                weaponAnimations.sprintRightClip,
+                weaponAnimations.sprintForwardLeftClip,
+                weaponAnimations.sprintForwardRightClip,
+                weaponAnimations.sprintBackwardLeftClip,
+                weaponAnimations.sprintBackwardRightClip,
+                // Walk
+                weaponAnimations.walkClip,
+                weaponAnimations.walkBackwardClip,
+                weaponAnimations.walkLeftClip,
+                weaponAnimations.walkRightClip,
+                weaponAnimations.walkForwardLeftClip,
+                weaponAnimations.walkForwardRightClip,
+                weaponAnimations.walkBackwardLeftClip,
+                weaponAnimations.walkBackwardRightClip,
+                // Crouch
+                weaponAnimations.crouchIdleClip,
+                weaponAnimations.crouchMoveClip,
+                weaponAnimations.crouchMoveBackwardClip,
+                weaponAnimations.crouchMoveLeftClip,
+                weaponAnimations.crouchMoveRightClip,
+                weaponAnimations.crouchMoveForwardLeftClip,
+                weaponAnimations.crouchMoveForwardRightClip,
+                weaponAnimations.crouchMoveBackwardLeftClip,
+                weaponAnimations.crouchMoveBackwardRightClip,
+                // Crawl
+                weaponAnimations.crawlIdleClip,
+                weaponAnimations.crawlMoveClip,
+                weaponAnimations.crawlMoveBackwardClip,
+                weaponAnimations.crawlMoveLeftClip,
+                weaponAnimations.crawlMoveRightClip,
+                weaponAnimations.crawlMoveForwardLeftClip,
+                weaponAnimations.crawlMoveForwardRightClip,
+                weaponAnimations.crawlMoveBackwardLeftClip,
+                weaponAnimations.crawlMoveBackwardRightClip,
+                // Swim
+                weaponAnimations.swimIdleClip,
+                weaponAnimations.swimMoveClip,
+                weaponAnimations.swimMoveBackwardClip,
+                weaponAnimations.swimMoveLeftClip,
+                weaponAnimations.swimMoveRightClip,
+                weaponAnimations.swimMoveForwardLeftClip,
+                weaponAnimations.swimMoveForwardRightClip,
+                weaponAnimations.swimMoveBackwardLeftClip,
+                weaponAnimations.swimMoveBackwardRightClip,
+                // Other
+                weaponAnimations.jumpClip,
+                weaponAnimations.fallClip,
+                weaponAnimations.landedClip,
+                weaponAnimations.hurtClip,
+                weaponAnimations.deadClip,
+                weaponAnimations.pickupClip,
+                // Speed rate
+                weaponAnimations.idleAnimSpeedRate,
+                weaponAnimations.moveAnimSpeedRate,
+                weaponAnimations.sprintAnimSpeedRate,
+                weaponAnimations.walkAnimSpeedRate,
+                weaponAnimations.crouchIdleAnimSpeedRate,
+                weaponAnimations.crouchMoveAnimSpeedRate,
+                weaponAnimations.crawlIdleAnimSpeedRate,
+                weaponAnimations.crawlMoveAnimSpeedRate,
+                weaponAnimations.swimIdleAnimSpeedRate,
+                weaponAnimations.swimMoveAnimSpeedRate,
+                weaponAnimations.jumpAnimSpeedRate,
+                weaponAnimations.fallAnimSpeedRate,
+                weaponAnimations.landedAnimSpeedRate,
+                weaponAnimations.hurtAnimSpeedRate,
+                weaponAnimations.deadAnimSpeedRate,
+                weaponAnimations.pickupAnimSpeedRate);
         }
 
         public override void PlayMoveAnimation()
         {
             if (!animator.isActiveAndEnabled)
                 return;
+
+            if (animator.runtimeAnimatorController != CacheAnimatorController)
+                animator.runtimeAnimatorController = CacheAnimatorController;
 
             if (isDead)
             {
@@ -684,7 +724,7 @@ namespace MultiplayerARPG
             bool hasClip = tempActionAnimation.clip != null && animator.isActiveAndEnabled;
             if (hasClip)
             {
-                CurrentAnimatorController[CLIP_ACTION] = tempActionAnimation.clip;
+                CacheAnimatorController[CLIP_ACTION] = tempActionAnimation.clip;
                 animator.SetFloat(ANIM_ACTION_CLIP_MULTIPLIER, playSpeedMultiplier);
                 animator.SetBool(ANIM_DO_ACTION, true);
                 animator.SetBool(ANIM_DO_ACTION_ALL_LAYERS, tempActionAnimation.playClipAllLayers);
@@ -727,7 +767,7 @@ namespace MultiplayerARPG
             if (hasClip)
             {
                 bool playAllLayers = IsSkillCastClipPlayingAllLayers(dataId);
-                CurrentAnimatorController[CLIP_CAST_SKILL] = castClip;
+                CacheAnimatorController[CLIP_CAST_SKILL] = castClip;
                 animator.SetFloat(ANIM_ACTION_CLIP_MULTIPLIER, 1f);
                 animator.SetBool(ANIM_IS_CASTING_SKILL, true);
                 animator.SetBool(ANIM_IS_CASTING_SKILL_ALL_LAYERS, playAllLayers);
@@ -762,7 +802,7 @@ namespace MultiplayerARPG
             bool hasClip = chargeClip != null && animator.isActiveAndEnabled;
             if (hasClip)
             {
-                CurrentAnimatorController[CLIP_WEAPON_CHARGE] = chargeClip;
+                CacheAnimatorController[CLIP_WEAPON_CHARGE] = chargeClip;
                 animator.SetBool(ANIM_IS_WEAPON_CHARGE, true);
             }
         }
@@ -795,7 +835,7 @@ namespace MultiplayerARPG
 
         public override void PlayHitAnimation()
         {
-            if (!CurrentAnimatorController[CLIP_HURT])
+            if (!animationClipOverrides.ContainsKey(CLIP_HURT))
                 return;
             StartCoroutine(PlayHitAnimationRoutine());
         }
@@ -812,14 +852,14 @@ namespace MultiplayerARPG
 
         public override float GetJumpAnimationDuration()
         {
-            if (!CurrentAnimatorController[CLIP_JUMP])
+            if (!animationClipOverrides.ContainsKey(CLIP_JUMP))
                 return 0f;
-            return CurrentAnimatorController[CLIP_JUMP].length / jumpAnimSpeedRate;
+            return CacheAnimatorController[CLIP_JUMP].length / jumpAnimSpeedRate;
         }
 
         public override void PlayJumpAnimation()
         {
-            if (!CurrentAnimatorController[CLIP_JUMP])
+            if (!animationClipOverrides.ContainsKey(CLIP_JUMP))
                 return;
             StartCoroutine(PlayJumpAnimationRoutine());
         }
@@ -836,7 +876,7 @@ namespace MultiplayerARPG
 
         public override void PlayPickupAnimation()
         {
-            if (!CurrentAnimatorController[CLIP_PICKUP])
+            if (!animationClipOverrides.ContainsKey(CLIP_PICKUP))
                 return;
             StartCoroutine(PlayPickupAnimationRoutine());
         }
@@ -852,7 +892,7 @@ namespace MultiplayerARPG
         }
 
 #if UNITY_EDITOR
-        [ContextMenu("Set Animator Clips For Test", false, 1000501)]
+        [ContextMenu("Set Animator Clips For Test")]
         public void SetAnimatorClipsForTest()
         {
             SetupComponent();
@@ -888,11 +928,11 @@ namespace MultiplayerARPG
 
             // Action animation clips
             ActionAnimation tempActionAnimation = GetActionAnimation(testAnimActionType, testActionAnimDataId, testAttackAnimIndex);
-            CurrentAnimatorController[CLIP_ACTION] = tempActionAnimation.clip;
+            CacheAnimatorController[CLIP_ACTION] = tempActionAnimation.clip;
 
             // Skill animation clips
             AnimationClip castClip = GetSkillCastClip(testCastSkillAnimDataId);
-            CurrentAnimatorController[CLIP_CAST_SKILL] = castClip;
+            CacheAnimatorController[CLIP_CAST_SKILL] = castClip;
 
             Logging.Log(ToString(), "Animation Clips already set to animator controller, you can test an animations in Animation tab");
 
