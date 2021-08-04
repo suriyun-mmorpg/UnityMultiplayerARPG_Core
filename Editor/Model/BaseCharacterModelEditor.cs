@@ -8,16 +8,26 @@ namespace MultiplayerARPG
     {
         protected override void SetFieldCondition()
         {
-            ShowOnBool("IsMainModel", true, "hiddingObjects");
-            ShowOnBool("IsMainModel", true, "hiddingRenderers");
-            ShowOnBool("IsMainModel", true, "fpsHiddingObjects");
-            ShowOnBool("IsMainModel", true, "fpsHiddingRenderers");
-            ShowOnBool("IsMainModel", true, "effectContainers");
-            ShowOnBool("IsMainModel", true, "setEffectContainersBySetters");
-            ShowOnBool("IsMainModel", true, "equipmentContainers");
-            ShowOnBool("IsMainModel", true, "setEquipmentContainersBySetters");
-            ShowOnBool("IsMainModel", true, "deactivateInstantiatedObjects");
-            ShowOnBool("IsMainModel", true, "activateInstantiatedObject");
+            BaseCharacterModel model = target as BaseCharacterModel;
+            CharacterModelManager manager = model.gameObject.GetComponentInParent<CharacterModelManager>();
+            if (manager != null)
+            {
+                model.MainModel = manager.MainTpsModel;
+                if (manager.MainFpsModel == model)
+                    model.MainModel = model;
+            }
+            ShowOnBool(nameof(model.IsMainModel), true, "hiddingObjects");
+            ShowOnBool(nameof(model.IsMainModel), true, "hiddingRenderers");
+            ShowOnBool(nameof(model.IsMainModel), true, "fpsHiddingObjects");
+            ShowOnBool(nameof(model.IsMainModel), true, "fpsHiddingRenderers");
+            ShowOnBool(nameof(model.IsMainModel), true, "effectContainers");
+            ShowOnBool(nameof(model.IsMainModel), true, "setEffectContainersBySetters");
+            ShowOnBool(nameof(model.IsMainModel), true, "equipmentContainers");
+            ShowOnBool(nameof(model.IsMainModel), true, "setEquipmentContainersBySetters");
+            ShowOnBool(nameof(model.IsMainModel), true, "deactivateInstantiatedObjects");
+            ShowOnBool(nameof(model.IsMainModel), true, "activateInstantiatedObject");
+            ShowOnBool(nameof(model.IsMainModel), true, "skinnedMeshRenderer");
+            ShowOnBool(nameof(model.IsMainModel), true, "vehicleModels");
         }
     }
 }

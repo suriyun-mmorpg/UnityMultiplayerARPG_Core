@@ -13,6 +13,7 @@ namespace MultiplayerARPG
         public bool IsTpsModel { get; set; }
         public bool IsFpsModel { get; set; }
 
+        [Header("Character Model")]
         [SerializeField]
         private string assetId = string.Empty;
         private int? hashAssetId;

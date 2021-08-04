@@ -58,8 +58,7 @@ namespace MultiplayerARPG
 
         public override void EntityAwake()
         {
-            if (MainTpsModel == null)
-                MainTpsModel = GetComponent<BaseCharacterModel>();
+            ValidateMainTpsModel();
             MainTpsModel.MainModel = MainTpsModel;
             MainTpsModel.IsTpsModel = true;
             MainTpsModel.IsFpsModel = false;
@@ -69,6 +68,16 @@ namespace MultiplayerARPG
                 MainTpsModel.VehicleModels = vehicleModels;
                 vehicleModels = new VehicleCharacterModel[0];
             }
+        }
+
+        public bool ValidateMainTpsModel()
+        {
+            if (MainTpsModel == null)
+            {
+                MainTpsModel = GetComponent<BaseCharacterModel>();
+                return true;
+            }
+            return false;
         }
 
         private void OnValidate()
@@ -81,6 +90,8 @@ namespace MultiplayerARPG
                 vehicleModels = new VehicleCharacterModel[0];
                 hasChanges = true;
             }
+            if (ValidateMainTpsModel())
+                hasChanges = true;
             if (hasChanges)
                 EditorUtility.SetDirty(this);
 #endif
