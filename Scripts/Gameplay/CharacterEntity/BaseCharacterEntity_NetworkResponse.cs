@@ -136,7 +136,10 @@ namespace MultiplayerARPG
             // Drop item to the ground
             CharacterItem dropData = nonEquipItem.Clone();
             dropData.amount = amount;
-            ItemDropEntity.DropItem(this, dropData, new uint[] { ObjectId });
+            if (!CurrentGameInstance.canPickupItemsWhichDropsByPlayersImmediately)
+                ItemDropEntity.DropItem(this, dropData, new uint[] { ObjectId });
+            else
+                ItemDropEntity.DropItem(this, dropData, new uint[0]);
 #endif
         }
 
