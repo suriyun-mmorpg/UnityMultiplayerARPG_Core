@@ -101,7 +101,11 @@ namespace MultiplayerARPG
             buffs.Add(newBuff);
 
             if (newBuff.GetDuration() <= 0f)
-                new CharacterRecoveryData(this, buffApplier).Apply(1f);
+            {
+                CharacterRecoveryData recoveryData = new CharacterRecoveryData(this, buffApplier);
+                recoveryData.Setup(newBuff);
+                recoveryData.Apply(1f);
+            }
 
             OnApplyBuff(dataId, type, level);
         }
