@@ -558,13 +558,13 @@ namespace MultiplayerARPG
                     tempBuff.ApplySelfStatusEffectsWhenAttacking(characterBuff.level, attackerInfo, attacker);
                     tempBuff.ApplyEnemyStatusEffectsWhenAttacking(characterBuff.level, attackerInfo, damageReceiver);
                 }
-                foreach (CharacterSkill characterSkill in attacker.Skills)
+                foreach (KeyValuePair<BaseSkill, short> characterSkill in attacker.GetCaches().Skills)
                 {
-                    tempSkill = characterSkill.GetSkill();
+                    tempSkill = characterSkill.Key;
                     if (!tempSkill.IsPassive)
                         continue;
-                    tempSkill.Buff.ApplySelfStatusEffectsWhenAttacking(characterSkill.level, attackerInfo, attacker);
-                    tempSkill.Buff.ApplyEnemyStatusEffectsWhenAttacking(characterSkill.level, attackerInfo, damageReceiver);
+                    tempSkill.Buff.ApplySelfStatusEffectsWhenAttacking(characterSkill.Value, attackerInfo, attacker);
+                    tempSkill.Buff.ApplyEnemyStatusEffectsWhenAttacking(characterSkill.Value, attackerInfo, damageReceiver);
                 }
                 // Damage Receiver
                 foreach (CharacterItem armorItem in damageReceiver.EquipItems)
@@ -588,13 +588,13 @@ namespace MultiplayerARPG
                     tempBuff.ApplySelfStatusEffectsWhenAttacked(characterBuff.level, damageReceiverInfo, damageReceiver);
                     tempBuff.ApplyEnemyStatusEffectsWhenAttacked(characterBuff.level, damageReceiverInfo, attacker);
                 }
-                foreach (CharacterSkill characterSkill in damageReceiver.Skills)
+                foreach (KeyValuePair<BaseSkill, short> characterSkill in damageReceiver.GetCaches().Skills)
                 {
-                    tempSkill = characterSkill.GetSkill();
+                    tempSkill = characterSkill.Key;
                     if (!tempSkill.IsPassive)
                         continue;
-                    tempSkill.Buff.ApplySelfStatusEffectsWhenAttacked(characterSkill.level, damageReceiverInfo, damageReceiver);
-                    tempSkill.Buff.ApplyEnemyStatusEffectsWhenAttacked(characterSkill.level, damageReceiverInfo, attacker);
+                    tempSkill.Buff.ApplySelfStatusEffectsWhenAttacked(characterSkill.Value, damageReceiverInfo, damageReceiver);
+                    tempSkill.Buff.ApplyEnemyStatusEffectsWhenAttacked(characterSkill.Value, damageReceiverInfo, attacker);
                 }
             }
             // Decrease Shield Durability
