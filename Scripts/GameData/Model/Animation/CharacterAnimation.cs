@@ -2,18 +2,6 @@
 
 namespace MultiplayerARPG
 {
-    public enum AnimationDurationType
-    {
-        ByClipLength,
-        ByFixValue,
-    }
-
-    public enum SkillActivateAnimationType
-    {
-        UseActivateAnimation,
-        UseAttackAnimation,
-    }
-
     [System.Serializable]
     public struct ActionAnimation
     {
@@ -32,9 +20,9 @@ namespace MultiplayerARPG
         [StringShowConditional(nameof(durationType), nameof(AnimationDurationType.ByFixValue))]
         [Tooltip("This will be used when `durationType` equals to `ByFixValue` to define animation duration")]
         public float fixDurationValue;
-        [Tooltip("This will be in use with attack/skill animations, This is duration after played animation clip to add delay before next animation")]
+        [Tooltip("This will be in use with attack/skill animations, This is duration after action animation clip played to add some delay before next animation")]
         public float extraDuration;
-        [Tooltip("This will be in use with attack/skill animations, These audio clips playing randomly while play this animation (not loop)")]
+        [Tooltip("This will be in use with attack/skill animations, These audio clips will be played randomly while play this animation (not loop). PS. You actually can use animation event instead :P")]
         public AudioClip[] audioClips;
 
         public AudioClip GetRandomAudioClip()
