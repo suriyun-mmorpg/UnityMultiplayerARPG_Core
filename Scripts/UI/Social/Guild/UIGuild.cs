@@ -442,6 +442,22 @@ namespace MultiplayerARPG
             }
         }
 
+        public void OnClickSetGuildMessage2()
+        {
+            // If not in the guild or not leader, return
+            if (!OwningCharacterIsLeader())
+                return;
+
+            // Show setup guild dialog
+            if (inputFieldMessage2 != null)
+            {
+                GameInstance.ClientGuildHandlers.RequestChangeGuildMessage2(new RequestChangeGuildMessageMessage()
+                {
+                    message = inputFieldMessage2.text,
+                }, ClientGuildActions.ResponseChangeGuildMessage2);
+            }
+        }
+
         public void OnClickKickFromGuild()
         {
             // If not in the guild or not leader, return
