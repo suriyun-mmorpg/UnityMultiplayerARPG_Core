@@ -12,6 +12,7 @@ namespace MultiplayerARPG
         public static System.Action<ResponseHandlerData, AckResponseCode, ResponseKickMemberFromGuildMessage> onResponseKickMemberFromGuild;
         public static System.Action<ResponseHandlerData, AckResponseCode, ResponseLeaveGuildMessage> onResponseLeaveGuild;
         public static System.Action<ResponseHandlerData, AckResponseCode, ResponseChangeGuildMessageMessage> onResponseChangeGuildMessage;
+        public static System.Action<ResponseHandlerData, AckResponseCode, ResponseChangeGuildMessageMessage> onResponseChangeGuildMessage2;
         public static System.Action<ResponseHandlerData, AckResponseCode, ResponseChangeGuildRoleMessage> onResponseChangeGuildRole;
         public static System.Action<ResponseHandlerData, AckResponseCode, ResponseChangeMemberGuildRoleMessage> onResponseChangeMemberGuildRole;
         public static System.Action<ResponseHandlerData, AckResponseCode, ResponseIncreaseGuildSkillLevelMessage> onResponseIncreaseGuildSkillLevel;
@@ -77,6 +78,13 @@ namespace MultiplayerARPG
             ClientGenericActions.ClientReceiveGameMessage(response.message);
             if (onResponseChangeGuildMessage != null)
                 onResponseChangeGuildMessage.Invoke(requestHandler, responseCode, response);
+        }
+
+        public static void ResponseChangeGuildMessage2(ResponseHandlerData requestHandler, AckResponseCode responseCode, ResponseChangeGuildMessageMessage response)
+        {
+            ClientGenericActions.ClientReceiveGameMessage(response.message);
+            if (onResponseChangeGuildMessage2 != null)
+                onResponseChangeGuildMessage2.Invoke(requestHandler, responseCode, response);
         }
 
         public static void ResponseChangeGuildRole(ResponseHandlerData requestHandler, AckResponseCode responseCode, ResponseChangeGuildRoleMessage response)
