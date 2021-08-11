@@ -35,6 +35,7 @@ namespace MultiplayerARPG
                 new GameDataListSection<StatusEffect>("statusEffects", "Status Effects"),
                 new GameDataListSection<BaseSkill>("skills", "Skills"),
                 new GameDataListSection<GuildSkill>("guildSkills", "Guild Skills"),
+                new GameDataListSection<GuildIcon>("guildIcons", "Guild Icons"),
                 new GameDataListSection<PlayerCharacter>("playerCharacters", "Player Characters\n(aka Character Class)"),
                 new GameDataListSection<MonsterCharacter>("monsterCharacters", "Monster Characters"),
                 new GameDataListSection<Harvestable>("harvestables", "Harvestables"),

@@ -32,6 +32,7 @@ namespace MultiplayerARPG
         public AmmoType[] ammoTypes;
         public BaseSkill[] skills;
         public GuildSkill[] guildSkills;
+        public GuildIcon[] guildIcons;
         public StatusEffect[] statusEffects;
         public PlayerCharacter[] playerCharacters;
         public MonsterCharacter[] monsterCharacters;
@@ -55,6 +56,7 @@ namespace MultiplayerARPG
             GameInstance.AddAmmoTypes(ammoTypes);
             GameInstance.AddSkills(skills);
             GameInstance.AddGuildSkills(guildSkills);
+            GameInstance.AddGuildIcons(guildIcons);
             GameInstance.AddStatusEffects(statusEffects);
             GameInstance.AddCharacters(playerCharacters);
             GameInstance.AddCharacters(monsterCharacters);
@@ -79,6 +81,7 @@ namespace MultiplayerARPG
             GameInstance.AddAmmoTypes(ammoTypes);
             GameInstance.AddSkills(skills);
             GameInstance.AddGuildSkills(guildSkills);
+            GameInstance.AddGuildIcons(guildIcons);
             GameInstance.AddStatusEffects(statusEffects);
             GameInstance.AddCharacters(playerCharacters);
             GameInstance.AddCharacters(monsterCharacters);
@@ -150,6 +153,10 @@ namespace MultiplayerARPG
             List<GuildSkill> tempGuildSkills = new List<GuildSkill>(GameInstance.GuildSkills.Values);
             tempGuildSkills.Sort();
             guildSkills = tempGuildSkills.ToArray();
+
+            List<GuildIcon> tempGuildIcons = new List<GuildIcon>(GameInstance.GuildIcons.Values);
+            tempGuildIcons.Sort();
+            guildIcons = tempGuildIcons.ToArray();
 
             List<StatusEffect> tempStatusEffects = new List<StatusEffect>(GameInstance.StatusEffects.Values);
             tempStatusEffects.Sort();

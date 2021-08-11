@@ -156,6 +156,14 @@ namespace MultiplayerARPG
     public class UIGuildListEntryEvent : UnityEvent<UIGuildListEntry> { }
     #endregion
 
+    #region Events for UI Guild IconEditing
+    [System.Serializable]
+    public class GuildIconEditingEntryEvent : UnityEvent<GuildIcon> { }
+
+    [System.Serializable]
+    public class UIGuildIconEvent : UnityEvent<UIGuildIcon> { }
+    #endregion
+
     #region Events for UI Faction
     [System.Serializable]
     public class FactionEvent : UnityEvent<Faction> { }

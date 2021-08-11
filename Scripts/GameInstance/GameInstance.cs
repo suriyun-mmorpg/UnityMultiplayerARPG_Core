@@ -84,6 +84,7 @@ namespace MultiplayerARPG
         public static readonly Dictionary<int, BaseNpcDialog> NpcDialogs = new Dictionary<int, BaseNpcDialog>();
         public static readonly Dictionary<int, Quest> Quests = new Dictionary<int, Quest>();
         public static readonly Dictionary<int, GuildSkill> GuildSkills = new Dictionary<int, GuildSkill>();
+        public static readonly Dictionary<int, GuildIcon> GuildIcons = new Dictionary<int, GuildIcon>();
         public static readonly Dictionary<int, StatusEffect> StatusEffects = new Dictionary<int, StatusEffect>();
         public static readonly Dictionary<int, DamageElement> DamageElements = new Dictionary<int, DamageElement>();
         public static readonly Dictionary<int, EquipmentSet> EquipmentSets = new Dictionary<int, EquipmentSet>();
@@ -535,6 +536,7 @@ namespace MultiplayerARPG
             NpcDialogs.Clear();
             Quests.Clear();
             GuildSkills.Clear();
+            GuildIcons.Clear();
             StatusEffects.Clear();
             BuildingEntities.Clear();
             CharacterEntities.Clear();
@@ -976,6 +978,16 @@ namespace MultiplayerARPG
         public static void AddGuildSkills(IEnumerable<GuildSkill> guildSkills)
         {
             AddManyGameData(GuildSkills, guildSkills);
+        }
+
+        public static void AddGuildIcons(params GuildIcon[] guildIcons)
+        {
+            AddGuildIcons((IEnumerable<GuildIcon>)guildIcons);
+        }
+
+        public static void AddGuildIcons(IEnumerable<GuildIcon> guildIcons)
+        {
+            AddManyGameData(GuildIcons, guildIcons);
         }
 
         public static void AddStatusEffects(params StatusEffectApplying[] statusEffects)
