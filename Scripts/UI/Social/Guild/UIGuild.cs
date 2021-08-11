@@ -30,6 +30,7 @@ namespace MultiplayerARPG
         public UIGuildSkill uiSkillDialog;
         public UIGuildSkill uiSkillPrefab;
         public Transform uiSkillContainer;
+        public UIGuildIcon uiGuildIcon;
         public TextWrapper textGuildName;
         public TextWrapper textLeaderName;
         public TextWrapper textLevel;
@@ -108,6 +109,13 @@ namespace MultiplayerARPG
 
         protected override void UpdateUIs()
         {
+            GuildOptions options = new GuildOptions();
+            if (Guild != null && !string.IsNullOrEmpty(Guild.options))
+                options = JsonUtility.FromJson<GuildOptions>(Guild.options);
+
+            if (uiGuildIcon != null)
+                uiGuildIcon.SetDataByDataId(options.iconDataId);
+
             if (textGuildName != null)
             {
                 textGuildName.text = string.Format(

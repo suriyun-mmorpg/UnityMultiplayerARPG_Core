@@ -21,6 +21,7 @@ namespace MultiplayerARPG
         public UILocaleKeySetting formatKeyMemberAmount = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_SOCIAL_MEMBER_AMOUNT);
 
         [Header("UI Elements")]
+        public UIGuildIcon uiGuildIcon;
         public TextWrapper textGuildName;
         public TextWrapper textLevel;
         public TextWrapper textMessage;
@@ -35,6 +36,13 @@ namespace MultiplayerARPG
 
         protected override void UpdateData()
         {
+            GuildOptions options = new GuildOptions();
+            if (!string.IsNullOrEmpty(Data.Options))
+                options = JsonUtility.FromJson<GuildOptions>(Data.Options);
+
+            if (uiGuildIcon != null)
+                uiGuildIcon.SetDataByDataId(options.iconDataId);
+
             if (textGuildName != null)
                 textGuildName.text = string.Format(LanguageManager.GetText(formatKeyGuildName), Data.GuildName);
 

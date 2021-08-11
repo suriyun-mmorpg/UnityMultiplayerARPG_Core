@@ -1,5 +1,5 @@
-﻿using UnityEngine;
-using UnityEngine.UI;
+﻿using LiteNetLibManager;
+using UnityEngine;
 
 namespace MultiplayerARPG
 {
@@ -10,6 +10,9 @@ namespace MultiplayerARPG
         public UIGuildIcon uiPrefab;
         public Transform uiContainer;
         public UIGuildIcon[] selectedIcons;
+
+        [Header("Options")]
+        public bool updateGuildOptionsOnSelectIcon;
 
         private UIList cacheList;
         public UIList CacheList
@@ -64,6 +67,10 @@ namespace MultiplayerARPG
                 {
                     selectedIcon.Data = ui.Data;
                 }
+                if (updateGuildOptionsOnSelectIcon)
+                {
+                    UpdateGuildOptions();
+                }
             }
         }
 
@@ -87,6 +94,30 @@ namespace MultiplayerARPG
                 if (selectedId == data.DataId)
                     uiGuildIcon.OnClickSelect();
             });
+        }
+
+        public virtual void UpdateGuildOptions()
+        {
+            if (GameInstance.JoinedGuild == null)
+            {
+                // No joined guild data, so it can't update guild data
+                return;
+            }
+            // Get current guild options before modify and save
+            GuildOptions options = new GuildOptions();
+            if (!string.IsNullOrEmpty(GameInstance.JoinedGuild.options))
+                options = JsonUtility.FromJson<GuildOptions>(GameInstance.JoinedGuild.options);
+            options.iconDataId = CacheSelectionManager.SelectedUI != null ? CacheSelectionManager.SelectedUI.Data.DataId : 0;
+            GameInstance.ClientGuildHandlers.RequestChangeGuildOptions(new RequestChangeGuildOptionsMessage()
+            {
+                options = JsonUtility.ToJson(options),
+            }, ChangeGuildOptionsCallback);
+        }
+
+        private void ChangeGuildOptionsCallback(ResponseHandlerData requestHandler, AckResponseCode responseCode, ResponseChangeGuildOptionsMessage response)
+        {
+            ClientGuildActions.ResponseChangeGuildOptions(requestHandler, responseCode, response);
+            if (responseCode.ShowUnhandledResponseMessageDialog(response.message)) return;
         }
     }
 }

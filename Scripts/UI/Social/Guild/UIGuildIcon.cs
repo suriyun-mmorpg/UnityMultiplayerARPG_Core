@@ -21,5 +21,14 @@ namespace MultiplayerARPG
                 imageIcon.preserveAspect = true;
             }
         }
+
+        public void SetDataByDataId(int dataId)
+        {
+            GuildIcon guildIcon;
+            if (GameInstance.GuildIcons.TryGetValue(dataId, out guildIcon))
+                Data = guildIcon;
+            else
+                Data = null;
+        }
     }
 }
