@@ -7,18 +7,17 @@ namespace MultiplayerARPG
     {
         public const byte LeaderRole = 0;
 
-        public string guildName { get; set; }
-        public short level { get; set; }
-        public int exp { get; set; }
-        public short skillPoint { get; set; }
-        public string guildMessage { get; set; }
-        public string guildMessage2 { get; set; }
-        public int gold { get; set; }
-        public int score { get; set; }
-        public string options { get; set; }
-        public bool autoAcceptRequests { get; set; }
-        public int rank { get; set; }
-
+        public string guildName;
+        public short level;
+        public int exp;
+        public short skillPoint;
+        public string guildMessage;
+        public string guildMessage2;
+        public int gold;
+        public int score;
+        public string options;
+        public bool autoAcceptRequests;
+        public int rank;
         private List<GuildRoleData> roles;
         private Dictionary<string, byte> memberRoles;
         private Dictionary<int, short> skillLevels;
