@@ -1,10 +1,8 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
 namespace MultiplayerARPG
 {
-    [CreateAssetMenu(fileName = "New Character Setting", menuName = "Create GameData/New Character Setting", order = -4696)]
+    [CreateAssetMenu(fileName = "New Character Setting", menuName = "Create GameData/New Character Setting", order = -4695)]
     public partial class NewCharacterSetting : ScriptableObject
     {
         [Header("New Character Configs")]

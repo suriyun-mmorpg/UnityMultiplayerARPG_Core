@@ -1,5 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using LiteNetLibManager;
 using UnityEngine;
 #if UNITY_EDITOR
@@ -8,7 +7,7 @@ using UnityEditor;
 
 namespace MultiplayerARPG
 {
-    [CreateAssetMenu(fileName = "Social System Setting", menuName = "Create GameData/Social System Setting", order = -4698)]
+    [CreateAssetMenu(fileName = "Social System Setting", menuName = "Create GameData/Social System Setting", order = -4696)]
     public partial class SocialSystemSetting : ScriptableObject
     {
         [Header("Party Configs")]
