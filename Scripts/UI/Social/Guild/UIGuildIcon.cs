@@ -8,6 +8,12 @@ namespace MultiplayerARPG
     {
         public Image imageIcon;
 
+        protected override void OnEnable()
+        {
+            base.OnEnable();
+            UpdateData();
+        }
+
         protected override void UpdateData()
         {
             if (Data == null)

@@ -12,6 +12,8 @@ namespace MultiplayerARPG
         public UIGuildIcon[] selectedIcons;
 
         [Header("Options")]
+        public bool setSelectedIconByOptions;
+        public bool updateSelectedIconsOnSelectIcon;
         public bool updateGuildOptionsOnSelectIcon;
 
         private UIList cacheList;
@@ -43,35 +45,41 @@ namespace MultiplayerARPG
             }
         }
 
+        private UIGuildIconUpdater guildIconUpdater;
+        public UIGuildIconUpdater GuildIconUpdater
+        {
+            get
+            {
+                if (guildIconUpdater == null)
+                    guildIconUpdater = gameObject.GetOrAddComponent<UIGuildIconUpdater>();
+                return guildIconUpdater;
+            }
+        }
+
         protected virtual void OnEnable()
         {
             CacheSelectionManager.eventOnSelected.RemoveListener(OnSelect);
             CacheSelectionManager.eventOnSelected.AddListener(OnSelect);
-        }
-
-        protected virtual void OnDisable()
-        {
-            CacheSelectionManager.DeselectSelectedUI();
-        }
-
-        protected virtual void OnDialogHide()
-        {
-            CacheSelectionManager.DeselectSelectedUI();
+            if (setSelectedIconByOptions && GameInstance.JoinedGuild != null)
+            {
+                // Get current guild options before modify and save
+                GuildOptions options = new GuildOptions();
+                if (!string.IsNullOrEmpty(GameInstance.JoinedGuild.options))
+                    options = JsonUtility.FromJson<GuildOptions>(GameInstance.JoinedGuild.options);
+                UpdateData(options.iconDataId);
+            }
+            else
+            {
+                UpdateData();
+            }
         }
 
         protected virtual void OnSelect(UIGuildIcon ui)
         {
-            if (selectedIcons != null && selectedIcons.Length > 0)
-            {
-                foreach (UIGuildIcon selectedIcon in selectedIcons)
-                {
-                    selectedIcon.Data = ui.Data;
-                }
-                if (updateGuildOptionsOnSelectIcon)
-                {
-                    UpdateGuildOptions();
-                }
-            }
+            if (updateSelectedIconsOnSelectIcon)
+                UpdateSelectedIcons();
+            if (updateGuildOptionsOnSelectIcon)
+                UpdateGuildOptions();
         }
 
         public void UpdateData()
@@ -96,6 +104,18 @@ namespace MultiplayerARPG
             });
         }
 
+        public virtual void UpdateSelectedIcons()
+        {
+            GuildIcon guildIcon = CacheSelectionManager.SelectedUI != null ? CacheSelectionManager.SelectedUI.Data : null;
+            if (selectedIcons != null && selectedIcons.Length > 0)
+            {
+                foreach (UIGuildIcon selectedIcon in selectedIcons)
+                {
+                    selectedIcon.Data = guildIcon;
+                }
+            }
+        }
+
         public virtual void UpdateGuildOptions()
         {
             if (GameInstance.JoinedGuild == null)
@@ -103,21 +123,7 @@ namespace MultiplayerARPG
                 // No joined guild data, so it can't update guild data
                 return;
             }
-            // Get current guild options before modify and save
-            GuildOptions options = new GuildOptions();
-            if (!string.IsNullOrEmpty(GameInstance.JoinedGuild.options))
-                options = JsonUtility.FromJson<GuildOptions>(GameInstance.JoinedGuild.options);
-            options.iconDataId = CacheSelectionManager.SelectedUI != null ? CacheSelectionManager.SelectedUI.Data.DataId : 0;
-            GameInstance.ClientGuildHandlers.RequestChangeGuildOptions(new RequestChangeGuildOptionsMessage()
-            {
-                options = JsonUtility.ToJson(options),
-            }, ChangeGuildOptionsCallback);
-        }
-
-        private void ChangeGuildOptionsCallback(ResponseHandlerData requestHandler, AckResponseCode responseCode, ResponseChangeGuildOptionsMessage response)
-        {
-            ClientGuildActions.ResponseChangeGuildOptions(requestHandler, responseCode, response);
-            if (responseCode.ShowUnhandledResponseMessageDialog(response.message)) return;
+            GuildIconUpdater.UpdateData(CacheSelectionManager.SelectedUI != null ? CacheSelectionManager.SelectedUI.Data : null);
         }
     }
 }

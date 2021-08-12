@@ -107,6 +107,42 @@ namespace MultiplayerARPG
             }
         }
 
+        private UIGuildMessageUpdater guildMessageUpdater;
+        public UIGuildMessageUpdater GuildMessageUpdater
+        {
+            get
+            {
+                if (guildMessageUpdater == null)
+                    guildMessageUpdater = gameObject.GetOrAddComponent<UIGuildMessageUpdater>();
+                guildMessageUpdater.inputField = inputFieldMessage;
+                return guildMessageUpdater;
+            }
+        }
+
+        private UIGuildMessageUpdater guildMessage2Updater;
+        public UIGuildMessageUpdater GuildMessage2Updater
+        {
+            get
+            {
+                if (guildMessage2Updater == null)
+                    guildMessage2Updater = gameObject.GetOrAddComponent<UIGuildMessageUpdater>();
+                guildMessage2Updater.inputField = inputFieldMessage2;
+                return guildMessage2Updater;
+            }
+        }
+
+        private UIGuildIconUpdater guildIconUpdater;
+        public UIGuildIconUpdater GuildIconUpdater
+        {
+            get
+            {
+                if (guildIconUpdater == null)
+                    guildIconUpdater = gameObject.GetOrAddComponent<UIGuildIconUpdater>();
+                guildIconUpdater.uiGuildIcon = uiGuildIcon;
+                return guildIconUpdater;
+            }
+        }
+
         protected override void UpdateUIs()
         {
             GuildOptions options = new GuildOptions();
@@ -439,15 +475,7 @@ namespace MultiplayerARPG
             // If not in the guild or not leader, return
             if (!OwningCharacterIsLeader())
                 return;
-
-            // Show setup guild dialog
-            if (inputFieldMessage != null)
-            {
-                GameInstance.ClientGuildHandlers.RequestChangeGuildMessage(new RequestChangeGuildMessageMessage()
-                {
-                    message = inputFieldMessage.text,
-                }, ClientGuildActions.ResponseChangeGuildMessage);
-            }
+            GuildMessageUpdater.UpdateData();
         }
 
         public void OnClickSetGuildMessage2()
@@ -455,15 +483,15 @@ namespace MultiplayerARPG
             // If not in the guild or not leader, return
             if (!OwningCharacterIsLeader())
                 return;
+            GuildMessage2Updater.UpdateData();
+        }
 
-            // Show setup guild dialog
-            if (inputFieldMessage2 != null)
-            {
-                GameInstance.ClientGuildHandlers.RequestChangeGuildMessage2(new RequestChangeGuildMessageMessage()
-                {
-                    message = inputFieldMessage2.text,
-                }, ClientGuildActions.ResponseChangeGuildMessage2);
-            }
+        public void OnClickSetGuildIcon()
+        {
+            // If not in the guild or not leader, return
+            if (!OwningCharacterIsLeader())
+                return;
+            GuildIconUpdater.UpdateData();
         }
 
         public void OnClickKickFromGuild()
