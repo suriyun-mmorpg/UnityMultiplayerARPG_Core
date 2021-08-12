@@ -9,14 +9,13 @@ namespace MultiplayerARPG
 {
     public partial class UIChatHandler : UIBase
     {
-        public static readonly List<ChatMessage> ChatMessages = new List<ChatMessage>();
-        public static readonly Dictionary<ChatChannel, List<ChatMessage>> ChannelBasedChatMessages = new Dictionary<ChatChannel, List<ChatMessage>>();
-        
+        public readonly List<ChatMessage> ChatMessages = new List<ChatMessage>();
+        public readonly Dictionary<ChatChannel, List<ChatMessage>> ChannelBasedChatMessages = new Dictionary<ChatChannel, List<ChatMessage>>();
+
         [Header("Configs")]
         [Tooltip("Message channel to send without channel commands, if `showingMessagesFromAllChannels` is `FALSE` it will show messages from this channel only")]
         public ChatChannel chatChannel = ChatChannel.Local;
         public bool showingMessagesFromAllChannels = true;
-        public bool clearPreviousChatMessageOnStart = false;
         [Tooltip("When enter this key it will show enter chat message field")]
         public KeyCode enterChatKey = KeyCode.Return;
         public int chatEntrySize = 30;
@@ -39,7 +38,7 @@ namespace MultiplayerARPG
         [FormerlySerializedAs("uiChatMessageContainer")]
         public Transform uiContainer;
         public ScrollRect scrollRect;
-        
+
         public bool EnterChatFieldVisible { get; private set; }
 
         public string EnterChatReceiver
@@ -72,19 +71,18 @@ namespace MultiplayerARPG
         private bool movingToEnd;
         private ChatChannel dirtyChatChannel;
 
+        protected override void Awake()
+        {
+            base.Awake();
+            SetOnClientReceiveChatMessage();
+        }
+
         private void Start()
         {
-            if (clearPreviousChatMessageOnStart)
-            {
-                ChatMessages.Clear();
-                ChannelBasedChatMessages.Clear();
-                StartCoroutine(VerticalScroll(0f));
-            }
-            else
-            {
-                FillChatMessages();
-            }
-            
+            ChatMessages.Clear();
+            ChannelBasedChatMessages.Clear();
+            StartCoroutine(VerticalScroll(0f));
+
             HideEnterChatField();
             if (uiMessageField != null)
             {
@@ -95,10 +93,21 @@ namespace MultiplayerARPG
 
         private void OnEnable()
         {
+            StartCoroutine(VerticalScroll(0f));
+        }
+
+        private void OnDestroy()
+        {
+            RemoveOnClientReceiveChatMessage();
+        }
+
+        public void SetOnClientReceiveChatMessage()
+        {
+            RemoveOnClientReceiveChatMessage();
             ClientGenericActions.onClientReceiveChatMessage += OnReceiveChat;
         }
 
-        private void OnDisable()
+        public void RemoveOnClientReceiveChatMessage()
         {
             ClientGenericActions.onClientReceiveChatMessage -= OnReceiveChat;
         }
@@ -183,7 +192,7 @@ namespace MultiplayerARPG
             if (splitedText.Length > 0)
             {
                 string cmd = splitedText[0];
-                if (cmd.Equals(whisperCommand) && 
+                if (cmd.Equals(whisperCommand) &&
                     splitedText.Length > 2)
                 {
                     channel = ChatChannel.Whisper;
@@ -191,10 +200,10 @@ namespace MultiplayerARPG
                     message = trimText.Substring(cmd.Length + receiver.Length + 2); // +2 for space
                     EnterChatMessage = trimText.Substring(0, cmd.Length + receiver.Length + 2); // +2 for space
                 }
-                if ((cmd.Equals(globalCommand) || 
-                    cmd.Equals(partyCommand) || 
-                    cmd.Equals(guildCommand) || 
-                    cmd.Equals(systemCommand)) 
+                if ((cmd.Equals(globalCommand) ||
+                    cmd.Equals(partyCommand) ||
+                    cmd.Equals(guildCommand) ||
+                    cmd.Equals(systemCommand))
                     && splitedText.Length > 1)
                 {
                     if (cmd.Equals(globalCommand))
@@ -265,7 +274,8 @@ namespace MultiplayerARPG
                     tempUiChatMessage.Show();
                 });
             }
-            StartCoroutine(VerticalScroll(0f));
+            if (gameObject.activeInHierarchy)
+                StartCoroutine(VerticalScroll(0f));
         }
 
         private void OnMessageFieldValueChange(string text)
