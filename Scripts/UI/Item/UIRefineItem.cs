@@ -16,6 +16,8 @@ namespace MultiplayerARPG
         public UILocaleKeySetting formatKeyRequireGold = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_REQUIRE_GOLD);
         [Tooltip("Format => {0} = {Current Gold Amount}, {1} = {Target Amount}")]
         public UILocaleKeySetting formatKeyRequireGoldNotEnough = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_REQUIRE_GOLD_NOT_ENOUGH);
+        [Tooltip("Format => {0} = {Target Amount}")]
+        public UILocaleKeySetting formatKeySimpleRequireGold = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_SIMPLE);
         [Tooltip("Format => {0} = {Rate * 100}")]
         public UILocaleKeySetting formatKeySuccessRate = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_REFINE_SUCCESS_RATE);
         [Tooltip("Format => {0} = {Refining Level}")]
@@ -27,6 +29,7 @@ namespace MultiplayerARPG
         public UICharacterItem uiRefiningItem;
         public UIItemAmounts uiRequireItemAmounts;
         public TextWrapper uiTextRequireGold;
+        public TextWrapper uiTextSimpleRequireGold;
         public TextWrapper uiTextSuccessRate;
         public TextWrapper uiTextRefiningLevel;
 
@@ -140,6 +143,9 @@ namespace MultiplayerARPG
                         refineLevel.Value.RequireGold.ToString("N0"));
                 }
             }
+
+            if (uiTextSimpleRequireGold != null)
+                uiTextSimpleRequireGold.text = string.Format(LanguageManager.GetText(formatKeySimpleRequireGold), !refineLevel.HasValue ? "0" : refineLevel.Value.RequireGold.ToString("N0"));
 
             if (uiTextSuccessRate != null)
             {

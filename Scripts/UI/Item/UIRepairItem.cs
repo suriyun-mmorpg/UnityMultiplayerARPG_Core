@@ -1,7 +1,4 @@
 ﻿using UnityEngine;
-#if UNITY_EDITOR
-using UnityEditor;
-#endif
 
 namespace MultiplayerARPG
 {
@@ -15,11 +12,14 @@ namespace MultiplayerARPG
         public UILocaleKeySetting formatKeyRequireGold = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_REQUIRE_GOLD);
         [Tooltip("Format => {0} = {Current Gold Amount}, {1} = {Target Amount}")]
         public UILocaleKeySetting formatKeyRequireGoldNotEnough = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_REQUIRE_GOLD_NOT_ENOUGH);
+        [Tooltip("Format => {0} = {Target Amount}")]
+        public UILocaleKeySetting formatKeySimpleRequireGold = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_SIMPLE);
         [Tooltip("Format => {0} = {Current Durability}, {1} = {Max Durability}")]
         public UILocaleKeySetting formatKeyDurability = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_ITEM_DURABILITY);
 
         [Header("UI Elements for UI Repair Item")]
         public TextWrapper uiTextRequireGold;
+        public TextWrapper uiTextSimpleRequireGold;
         public TextWrapper uiTextDurability;
 
         protected bool activated;
@@ -79,6 +79,9 @@ namespace MultiplayerARPG
                         itemRepairPrice.RequireGold.ToString("N0"));
                 }
             }
+
+            if (uiTextSimpleRequireGold != null)
+                uiTextSimpleRequireGold.text = string.Format(LanguageManager.GetText(formatKeySimpleRequireGold), maxDurability <= 0 ? "0" : itemRepairPrice.RequireGold.ToString("N0"));
 
             if (uiTextDurability != null)
             {

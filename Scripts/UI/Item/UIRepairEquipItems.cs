@@ -1,5 +1,4 @@
 ﻿using UnityEngine;
-using System.Collections;
 
 namespace MultiplayerARPG
 {
@@ -10,9 +9,12 @@ namespace MultiplayerARPG
         public UILocaleKeySetting formatKeyRequireGold = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_REQUIRE_GOLD);
         [Tooltip("Format => {0} = {Current Gold Amount}, {1} = {Target Amount}")]
         public UILocaleKeySetting formatKeyRequireGoldNotEnough = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_REQUIRE_GOLD_NOT_ENOUGH);
+        [Tooltip("Format => {0} = {Target Amount}")]
+        public UILocaleKeySetting formatKeySimpleRequireGold = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_SIMPLE);
 
         [Header("UI Elements")]
         public TextWrapper uiTextRequireGold;
+        public TextWrapper uiTextSimpleRequireGold;
 
         private void LateUpdate()
         {
@@ -46,6 +48,9 @@ namespace MultiplayerARPG
                     GameInstance.PlayingCharacter.Gold.ToString("N0"),
                     requireGold.ToString("N0"));
             }
+
+            if (uiTextSimpleRequireGold != null)
+                uiTextSimpleRequireGold.text = string.Format(LanguageManager.GetText(formatKeySimpleRequireGold), requireGold.ToString("N0"));
         }
 
         public void OnClickRepairEquipItems()

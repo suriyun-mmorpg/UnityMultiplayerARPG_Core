@@ -1,5 +1,7 @@
 ﻿using LiteNetLibManager;
 using UnityEngine;
+using UnityEngine.Events;
+using UnityEngine.Serialization;
 
 namespace MultiplayerARPG
 {
@@ -10,20 +12,26 @@ namespace MultiplayerARPG
         public UILocaleKeySetting formatKeyRequireGold = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_REQUIRE_GOLD);
         [Tooltip("Format => {0} = {Current Gold Amount}, {1} = {Target Amount}")]
         public UILocaleKeySetting formatKeyRequireGoldNotEnough = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_REQUIRE_GOLD_NOT_ENOUGH);
+        [Tooltip("Format => {0} = {Target Amount}")]
+        public UILocaleKeySetting formatKeySimpleRequireGold = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_SIMPLE);
 
         [Header("UI Elements")]
         public InputFieldWrapper inputFieldGuildName;
-        public TextWrapper textRequireGold;
-        public UIItemAmounts uiRequireItems;
+        [FormerlySerializedAs("uiRequireItems")]
+        public UIItemAmounts uiRequireItemAmounts;
+        [FormerlySerializedAs("textRequireGold")]
+        public TextWrapper uiTextRequireGold;
+        public TextWrapper uiTextSimpleRequireGold;
+        public UnityEvent onGuildCreate = new UnityEvent();
 
         protected virtual void OnEnable()
         {
             IPlayerCharacterData owningCharacter = GameInstance.PlayingCharacter;
             SocialSystemSetting systemSetting = GameInstance.Singleton.SocialSystemSetting;
-            if (textRequireGold != null)
+            if (uiTextRequireGold != null)
             {
                 int gold = owningCharacter.Gold.Increase(owningCharacter.UserGold);
-                textRequireGold.text = string.Format(
+                uiTextRequireGold.text = string.Format(
                     gold >= systemSetting.CreateGuildRequiredGold ?
                         LanguageManager.GetText(formatKeyRequireGold) :
                         LanguageManager.GetText(formatKeyRequireGoldNotEnough),
@@ -31,10 +39,13 @@ namespace MultiplayerARPG
                     systemSetting.CreateGuildRequiredGold.ToString("N0"));
             }
 
-            if (uiRequireItems != null)
+            if (uiTextSimpleRequireGold != null)
+                uiTextSimpleRequireGold.text = string.Format(LanguageManager.GetText(formatKeySimpleRequireGold), systemSetting.CreateGuildRequiredGold.ToString("N0"));
+
+            if (uiRequireItemAmounts != null)
             {
-                uiRequireItems.showAsRequirement = true;
-                uiRequireItems.Data = systemSetting.CacheCreateGuildRequireItems;
+                uiRequireItemAmounts.showAsRequirement = true;
+                uiRequireItemAmounts.Data = systemSetting.CacheCreateGuildRequireItems;
             }
         }
 
@@ -53,6 +64,7 @@ namespace MultiplayerARPG
             ClientGuildActions.ResponseCreateGuild(requestHandler, responseCode, response);
             if (responseCode.ShowUnhandledResponseMessageDialog(response.message)) return;
             inputFieldGuildName.text = string.Empty;
+            onGuildCreate.Invoke();
             Hide();
         }
     }

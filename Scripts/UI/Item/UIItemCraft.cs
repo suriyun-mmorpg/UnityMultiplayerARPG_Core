@@ -13,11 +13,14 @@ namespace MultiplayerARPG
         public UILocaleKeySetting formatKeyRequireGold = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_REQUIRE_GOLD);
         [Tooltip("Format => {0} = {Current Gold Amount}, {1} = {Target Amount}")]
         public UILocaleKeySetting formatKeyRequireGoldNotEnough = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_REQUIRE_GOLD_NOT_ENOUGH);
+        [Tooltip("Format => {0} = {Target Amount}")]
+        public UILocaleKeySetting formatKeySimpleRequireGold = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_SIMPLE);
 
         [Header("UI Elements")]
         public UICharacterItem uiCraftingItem;
         public UIItemAmounts uiRequireItemAmounts;
         public TextWrapper uiTextRequireGold;
+        public TextWrapper uiTextSimpleRequireGold;
 
         public CrafterType CrafterType { get; private set; }
         public BaseGameEntity TargetEntity { get; private set; }
@@ -67,6 +70,9 @@ namespace MultiplayerARPG
                         ItemCraft.RequireGold.ToString("N0"));
                 }
             }
+
+            if (uiTextSimpleRequireGold != null)
+                uiTextSimpleRequireGold.text = string.Format(LanguageManager.GetText(formatKeySimpleRequireGold), CraftingItem == null ? "0" : ItemCraft.RequireGold.ToString("N0"));
         }
 
         protected override void UpdateData()
