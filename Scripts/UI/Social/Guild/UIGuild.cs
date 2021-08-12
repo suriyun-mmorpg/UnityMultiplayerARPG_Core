@@ -119,13 +119,13 @@ namespace MultiplayerARPG
             }
         }
 
-        private UIGuildMessageUpdater guildMessage2Updater;
-        public UIGuildMessageUpdater GuildMessage2Updater
+        private UIGuildMessage2Updater guildMessage2Updater;
+        public UIGuildMessage2Updater GuildMessage2Updater
         {
             get
             {
                 if (guildMessage2Updater == null)
-                    guildMessage2Updater = gameObject.GetOrAddComponent<UIGuildMessageUpdater>();
+                    guildMessage2Updater = gameObject.GetOrAddComponent<UIGuildMessage2Updater>();
                 guildMessage2Updater.inputField = inputFieldMessage2;
                 return guildMessage2Updater;
             }
