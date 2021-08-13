@@ -64,6 +64,7 @@ namespace MultiplayerARPG
         UI_ERROR_ALREADY_CONNECTED_TO_LOBBY,
         UI_ERROR_ALREADY_CONNECTED_TO_GAME,
         UI_ERROR_NO_SELECTED_REALM,
+        UI_ERROR_NO_AVAILABLE_REALM,
         UI_ERROR_NO_AVAILABLE_LOBBY,
         // Error - UI Character List
         UI_ERROR_NO_CHOSEN_CHARACTER_TO_START,
@@ -1192,6 +1193,7 @@ namespace MultiplayerARPG
             Texts.Add(UITextKeys.UI_ERROR_ALREADY_CONNECTED_TO_LOBBY.ToString(), "Already connected to lobby server");
             Texts.Add(UITextKeys.UI_ERROR_ALREADY_CONNECTED_TO_GAME.ToString(), "Already connected to game server");
             Texts.Add(UITextKeys.UI_ERROR_NO_SELECTED_REALM.ToString(), "Please select realm");
+            Texts.Add(UITextKeys.UI_ERROR_NO_AVAILABLE_REALM.ToString(), "No available realm");
             Texts.Add(UITextKeys.UI_ERROR_NO_AVAILABLE_LOBBY.ToString(), "No available lobby");
             // Error - UI Character List
             Texts.Add(UITextKeys.UI_ERROR_NO_CHOSEN_CHARACTER_TO_START.ToString(), "Please choose character to start game");
