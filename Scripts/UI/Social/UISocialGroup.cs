@@ -244,7 +244,7 @@ namespace MultiplayerARPG
                 return;
 
             SocialCharacterData friend = MemberSelectionManager.SelectedUI.Data;
-            UISceneGlobal.Singleton.ShowMessageDialog(LanguageManager.GetText(UITextKeys.UI_FRIEND_REMOVE.ToString()), string.Format(LanguageManager.GetText(UITextKeys.UI_FRIEND_REMOVE_DESCRIPTION.ToString()), friend.characterName), false, true, true, false, null, () =>
+            UISceneGlobal.Singleton.ShowMessageDialog(LanguageManager.GetText(UITextKeys.UI_FRIEND_REQUEST.ToString()), string.Format(LanguageManager.GetText(UITextKeys.UI_FRIEND_REQUEST_DESCRIPTION.ToString()), friend.characterName), false, true, true, false, null, () =>
             {
                 GameInstance.ClientFriendHandlers.RequestSendFriendRequest(new RequestSendFriendRequestMessage()
                 {
