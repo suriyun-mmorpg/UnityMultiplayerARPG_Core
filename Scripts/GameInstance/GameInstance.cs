@@ -292,7 +292,11 @@ namespace MultiplayerARPG
 
         [Header("Platforms Configs")]
         public int serverTargetFrameRate = 30;
+        [Tooltip("This will be applied if this value is 1,2,3 or 4. target framerate will be applied if this value is 0.")]
+        public int standaloneVSyncCount = 0;
         public int standaloneTargetFrameRate = 60;
+        [Tooltip("This will be applied if this value is 1,2,3 or 4. target framerate will be applied if this value is 0.")]
+        public int mobileVSyncCount = 0;
         public int mobileTargetFrameRate = 30;
 
         [Header("Playing In Editor")]
@@ -417,15 +421,22 @@ namespace MultiplayerARPG
             if (SystemInfo.graphicsDeviceType == GraphicsDeviceType.Null)
             {
                 // Set target framerate when running headless to reduce CPU usage
+                QualitySettings.vSyncCount = 0;
                 Application.targetFrameRate = serverTargetFrameRate;
             }
             else
             {
                 // Not running headless
                 if (Application.isMobilePlatform)
+                {
+                    QualitySettings.vSyncCount = mobileVSyncCount;
                     Application.targetFrameRate = mobileTargetFrameRate;
+                }
                 else
+                {
+                    QualitySettings.vSyncCount = standaloneVSyncCount;
                     Application.targetFrameRate = standaloneTargetFrameRate;
+                }
             }
             Application.runInBackground = true;
             if (Singleton != null)
