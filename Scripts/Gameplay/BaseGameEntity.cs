@@ -32,20 +32,6 @@ namespace MultiplayerARPG
         [SerializeField]
         protected LanguageData[] entityTitles;
 
-        [SerializeField]
-        private Text textTitle = null;
-        public Text TextTitle
-        {
-            get { return textTitle; }
-        }
-
-        [SerializeField]
-        private Text textTitleB = null;
-        public Text TextTitleB
-        {
-            get { return textTitleB; }
-        }
-
         [Category(100, "Sync Fields", false)]
         [SerializeField]
         protected SyncFieldString syncTitle = new SyncFieldString();
@@ -499,11 +485,6 @@ namespace MultiplayerARPG
 
         protected virtual void EntityLateUpdate()
         {
-            if (textTitle != null)
-                textTitle.text = Title;
-            if (textTitleB != null)
-                textTitleB.text = TitleB;
-
             if (PassengingVehicleEntity != null)
             {
                 // Snap character to vehicle seat
