@@ -13,21 +13,22 @@ namespace MultiplayerARPG
 
         public const int OnlineDuration = 5;
         public const float RequestDuration = 5f * 0.75f;
-        public const int DefaultOfflineOffsets = 60 * 60 * 24 * 356; // One year
+        public int DefaultOfflineOffsets { get; private set; }
 
         public LiteNetLibManager.LiteNetLibManager Manager { get; private set; }
 
         private void Awake()
         {
             Manager = GetComponent<LiteNetLibManager.LiteNetLibManager>();
+            DefaultOfflineOffsets = (int)(System.DateTime.Now - new System.DateTime(2021, 01, 01)).TotalSeconds;
         }
 
         public bool IsCharacterOnline(string characterId)
         {
             if (string.IsNullOrEmpty(characterId))
                 return false;
-            int offlineOffsets;
-            return OnlineCharacterIds.TryGetValue(characterId, out offlineOffsets) && offlineOffsets <= OnlineDuration;
+            int offlineOffsets = GetCharacterOfflineOffsets(characterId);
+            return offlineOffsets <= OnlineDuration;
         }
 
         public int GetCharacterOfflineOffsets(string characterId)
