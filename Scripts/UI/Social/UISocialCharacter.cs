@@ -48,6 +48,10 @@ namespace MultiplayerARPG
             base.UpdateUI();
 
             bool isOnline = GameInstance.ClientOnlineCharacterHandlers.IsCharacterOnline(Data.id);
+            int offlineOffsets = GameInstance.ClientOnlineCharacterHandlers.GetCharacterOfflineOffsets(Data.id);
+
+            if (uiTextOnlineStatus != null)
+                uiTextOnlineStatus.text = GetOnlineStatusText(isOnline, offlineOffsets);
 
             // Member online status
             foreach (GameObject obj in memberIsOnlineObjects)
@@ -138,6 +142,13 @@ namespace MultiplayerARPG
             GameInstance.PlayerCharacters.TryGetValue(Data.dataId, out character);
             if (uiCharacterClass != null)
                 uiCharacterClass.Data = character;
+        }
+
+        protected virtual string GetOnlineStatusText(bool isOnline, int offlineOffsets)
+        {
+            if (isOnline) 
+                return "Online";
+            return System.DateTime.Now.AddSeconds(-offlineOffsets).GetPrettyDate();
         }
 
         public void OnClickAddFriend()
