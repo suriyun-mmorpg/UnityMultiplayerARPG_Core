@@ -37,6 +37,8 @@ namespace MultiplayerARPG
             int offlineOffsets;
             if (!OnlineCharacterIds.TryGetValue(characterId, out offlineOffsets))
                 return DefaultOfflineOffsets;
+            if (offlineOffsets < 0)
+                return DefaultOfflineOffsets;
             return offlineOffsets;
         }
 
