@@ -3,6 +3,6 @@
     public enum AnimationDurationType
     {
         ByClipLength,
-        ByFixValue,
+        ByFixedDuration,
     }
 }
