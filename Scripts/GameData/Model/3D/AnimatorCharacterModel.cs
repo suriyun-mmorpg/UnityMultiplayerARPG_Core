@@ -749,7 +749,7 @@ namespace MultiplayerARPG
                 animator.SetBool(ANIM_DO_ACTION_ALL_LAYERS, false);
             }
             // Waits by current transition + extra duration before end playing animation state
-            yield return new WaitForSecondsRealtime(tempActionAnimation.GetExtraDuration() / playSpeedMultiplier);
+            yield return new WaitForSecondsRealtime(tempActionAnimation.GetExtendDuration() / playSpeedMultiplier);
         }
 
         public override Coroutine PlaySkillCastClip(int dataId, float duration)

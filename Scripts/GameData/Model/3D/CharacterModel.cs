@@ -691,7 +691,7 @@ namespace MultiplayerARPG
             if (tempActionAnimation.clip != null)
                 animator.SetBool(ANIM_DO_ACTION, false);
             // Waits by current transition + extra duration before end playing animation state
-            yield return new WaitForSecondsRealtime(tempActionAnimation.GetExtraDuration() / playSpeedMultiplier);
+            yield return new WaitForSecondsRealtime(tempActionAnimation.GetExtendDuration() / playSpeedMultiplier);
         }
 
         private IEnumerator PlayActionAnimation_LegacyAnimation(AnimActionType animActionType, int dataId, int index, float playSpeedMultiplier)
@@ -713,7 +713,7 @@ namespace MultiplayerARPG
             if (tempActionAnimation.clip != null)
                 CrossFadeLegacyAnimation(CLIP_IDLE, legacyAnimationData.idleClipFadeLength, WrapMode.Loop);
             // Waits by current transition + extra duration before end playing animation state
-            yield return new WaitForSecondsRealtime(tempActionAnimation.GetExtraDuration() / playSpeedMultiplier);
+            yield return new WaitForSecondsRealtime(tempActionAnimation.GetExtendDuration() / playSpeedMultiplier);
             isPlayingActionAnimation = false;
         }
 

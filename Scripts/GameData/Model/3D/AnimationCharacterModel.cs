@@ -733,7 +733,7 @@ namespace MultiplayerARPG
             if (tempActionAnimation.clip != null)
                 CrossFadeLegacyAnimation(CLIP_IDLE, idleClipFadeLength, WrapMode.Loop);
             // Waits by current transition + extra duration before end playing animation state
-            yield return new WaitForSecondsRealtime(tempActionAnimation.GetExtraDuration() / playSpeedMultiplier);
+            yield return new WaitForSecondsRealtime(tempActionAnimation.GetExtendDuration() / playSpeedMultiplier);
         }
 
         public override Coroutine PlaySkillCastClip(int dataId, float duration)

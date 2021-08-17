@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace MultiplayerARPG
 {
@@ -17,11 +18,13 @@ namespace MultiplayerARPG
         public float[] multiHitTriggerDurationRates;
         [Tooltip("How animation duration defined")]
         public AnimationDurationType durationType;
-        [StringShowConditional(nameof(durationType), nameof(AnimationDurationType.ByFixValue))]
+        [StringShowConditional(nameof(durationType), nameof(AnimationDurationType.ByFixedDuration))]
         [Tooltip("This will be used when `durationType` equals to `ByFixValue` to define animation duration")]
-        public float fixDurationValue;
+        [FormerlySerializedAs("fixDurationValue")]
+        public float fixedDuration;
         [Tooltip("This will be in use with attack/skill animations, This is duration after action animation clip played to add some delay before next animation")]
-        public float extraDuration;
+        [FormerlySerializedAs("extraDuration")]
+        public float extendDuration;
         [Tooltip("This will be in use with attack/skill animations, These audio clips will be played randomly while play this animation (not loop). PS. You actually can use animation event instead :P")]
         public AudioClip[] audioClips;
 
@@ -46,15 +49,15 @@ namespace MultiplayerARPG
                     if (clip == null)
                         return 0f;
                     return clip.length;
-                case AnimationDurationType.ByFixValue:
-                    return fixDurationValue;
+                case AnimationDurationType.ByFixedDuration:
+                    return fixedDuration;
             }
             return 0f;
         }
 
-        public float GetExtraDuration()
+        public float GetExtendDuration()
         {
-            return extraDuration;
+            return extendDuration;
         }
 
         public float[] GetTriggerDurations()
@@ -77,7 +80,7 @@ namespace MultiplayerARPG
 
         public float GetTotalDuration()
         {
-            return GetClipLength() + extraDuration;
+            return GetClipLength() + extendDuration;
         }
     }
 
