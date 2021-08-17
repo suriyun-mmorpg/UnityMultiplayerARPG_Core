@@ -10,6 +10,21 @@ namespace MultiplayerARPG.GameData.Model.Playables
     }
 
     [System.Serializable]
+    public struct MoveClips
+    {
+        public AnimationClip forwardClip;
+        public AnimationClip backwardClip;
+        public AnimationClip leftClip;
+        public AnimationClip rightClip;
+        public AnimationClip forwardLeftClip;
+        public AnimationClip forwardRightClip;
+        public AnimationClip backwardLeftClip;
+        public AnimationClip backwardRightClip;
+        [Tooltip("If this <= 0, it will not be used to calculates with animation speed multiplier")]
+        public float animSpeedRate;
+    }
+
+    [System.Serializable]
     public struct ActionAnimation
     {
         public AnimationClipAndAvatarMask clip;
@@ -23,11 +38,11 @@ namespace MultiplayerARPG.GameData.Model.Playables
         public float[] multiHitTriggerDurationRates;
         [Tooltip("How animation duration defined")]
         public AnimationDurationType durationType;
-        [StringShowConditional(nameof(durationType), nameof(AnimationDurationType.ByFixValue))]
+        [StringShowConditional(nameof(durationType), nameof(AnimationDurationType.ByFixedDuration))]
         [Tooltip("This will be used when `durationType` equals to `ByFixValue` to define animation duration")]
-        public float fixDurationValue;
+        public float fixedDuration;
         [Tooltip("This will be in use with attack/skill animations, This is duration after action animation clip played to add some delay before next animation")]
-        public float extraDuration;
+        public float extendDuration;
         [Tooltip("This will be in use with attack/skill animations, These audio clips will be played randomly while play this animation (not loop). PS. You actually can use animation event instead :P")]
         public AudioClip[] audioClips;
 
@@ -52,15 +67,15 @@ namespace MultiplayerARPG.GameData.Model.Playables
                     if (clip.clip == null)
                         return 0f;
                     return clip.clip.length;
-                case AnimationDurationType.ByFixValue:
-                    return fixDurationValue;
+                case AnimationDurationType.ByFixedDuration:
+                    return fixedDuration;
             }
             return 0f;
         }
 
-        public float GetExtraDuration()
+        public float GetExtendDuration()
         {
-            return extraDuration;
+            return extendDuration;
         }
 
         public float[] GetTriggerDurations()
@@ -83,7 +98,7 @@ namespace MultiplayerARPG.GameData.Model.Playables
 
         public float GetTotalDuration()
         {
-            return GetClipLength() + extraDuration;
+            return GetClipLength() + extendDuration;
         }
     }
 
@@ -96,147 +111,27 @@ namespace MultiplayerARPG.GameData.Model.Playables
         public AnimationClip idleClip;
         [Tooltip("If this <= 0, it will not be used to calculates with animation speed multiplier")]
         public float idleAnimSpeedRate;
-
-        [Header("Movements while standing (move)")]
-        public bool showMoveClipSettings;
-        [BoolShowConditional(nameof(showMoveClipSettings), true)]
-        public AnimationClip moveClip;
-        [BoolShowConditional(nameof(showMoveClipSettings), true)]
-        public AnimationClip moveBackwardClip;
-        [BoolShowConditional(nameof(showMoveClipSettings), true)]
-        public AnimationClip moveLeftClip;
-        [BoolShowConditional(nameof(showMoveClipSettings), true)]
-        public AnimationClip moveRightClip;
-        [BoolShowConditional(nameof(showMoveClipSettings), true)]
-        public AnimationClip moveForwardLeftClip;
-        [BoolShowConditional(nameof(showMoveClipSettings), true)]
-        public AnimationClip moveForwardRightClip;
-        [BoolShowConditional(nameof(showMoveClipSettings), true)]
-        public AnimationClip moveBackwardLeftClip;
-        [BoolShowConditional(nameof(showMoveClipSettings), true)]
-        public AnimationClip moveBackwardRightClip;
-        [BoolShowConditional(nameof(showMoveClipSettings), true)]
-        [Tooltip("If this <= 0, it will not be used to calculates with animation speed multiplier")]
-        public float moveAnimSpeedRate;
-
-        [Header("Movements while standing (sprint)")]
-        public bool showSprintClipSettings;
-        [BoolShowConditional(nameof(showSprintClipSettings), true)]
-        public AnimationClip sprintClip;
-        [BoolShowConditional(nameof(showSprintClipSettings), true)]
-        public AnimationClip sprintBackwardClip;
-        [BoolShowConditional(nameof(showSprintClipSettings), true)]
-        public AnimationClip sprintLeftClip;
-        [BoolShowConditional(nameof(showSprintClipSettings), true)]
-        public AnimationClip sprintRightClip;
-        [BoolShowConditional(nameof(showSprintClipSettings), true)]
-        public AnimationClip sprintForwardLeftClip;
-        [BoolShowConditional(nameof(showSprintClipSettings), true)]
-        public AnimationClip sprintForwardRightClip;
-        [BoolShowConditional(nameof(showSprintClipSettings), true)]
-        public AnimationClip sprintBackwardLeftClip;
-        [BoolShowConditional(nameof(showSprintClipSettings), true)]
-        public AnimationClip sprintBackwardRightClip;
-        [BoolShowConditional(nameof(showSprintClipSettings), true)]
-        [Tooltip("If this <= 0, it will not be used to calculates with animation speed multiplier")]
-        public float sprintAnimSpeedRate;
-
-        [Header("Movements while standing (walk)")]
-        public bool showWalkClipSettings;
-        [BoolShowConditional(nameof(showWalkClipSettings), true)]
-        public AnimationClip walkClip;
-        [BoolShowConditional(nameof(showWalkClipSettings), true)]
-        public AnimationClip walkBackwardClip;
-        [BoolShowConditional(nameof(showWalkClipSettings), true)]
-        public AnimationClip walkLeftClip;
-        [BoolShowConditional(nameof(showWalkClipSettings), true)]
-        public AnimationClip walkRightClip;
-        [BoolShowConditional(nameof(showWalkClipSettings), true)]
-        public AnimationClip walkForwardLeftClip;
-        [BoolShowConditional(nameof(showWalkClipSettings), true)]
-        public AnimationClip walkForwardRightClip;
-        [BoolShowConditional(nameof(showWalkClipSettings), true)]
-        public AnimationClip walkBackwardLeftClip;
-        [BoolShowConditional(nameof(showWalkClipSettings), true)]
-        public AnimationClip walkBackwardRightClip;
-        [BoolShowConditional(nameof(showWalkClipSettings), true)]
-        [Tooltip("If this <= 0, it will not be used to calculates with animation speed multiplier")]
-        public float walkAnimSpeedRate;
+        public MoveClips moveClips;
+        public MoveClips sprintClips;
+        public MoveClips walkClips;
 
         [Header("Movements while crouching")]
         public AnimationClip crouchIdleClip;
         [Tooltip("If this <= 0, it will not be used to calculates with animation speed multiplier")]
         public float crouchIdleAnimSpeedRate;
-        public bool showCrouchMoveClipSettings;
-        [BoolShowConditional(nameof(showCrouchMoveClipSettings), true)]
-        public AnimationClip crouchMoveClip;
-        [BoolShowConditional(nameof(showCrouchMoveClipSettings), true)]
-        public AnimationClip crouchMoveBackwardClip;
-        [BoolShowConditional(nameof(showCrouchMoveClipSettings), true)]
-        public AnimationClip crouchMoveLeftClip;
-        [BoolShowConditional(nameof(showCrouchMoveClipSettings), true)]
-        public AnimationClip crouchMoveRightClip;
-        [BoolShowConditional(nameof(showCrouchMoveClipSettings), true)]
-        public AnimationClip crouchMoveForwardLeftClip;
-        [BoolShowConditional(nameof(showCrouchMoveClipSettings), true)]
-        public AnimationClip crouchMoveForwardRightClip;
-        [BoolShowConditional(nameof(showCrouchMoveClipSettings), true)]
-        public AnimationClip crouchMoveBackwardLeftClip;
-        [BoolShowConditional(nameof(showCrouchMoveClipSettings), true)]
-        public AnimationClip crouchMoveBackwardRightClip;
-        [BoolShowConditional(nameof(showCrouchMoveClipSettings), true)]
-        [Tooltip("If this <= 0, it will not be used to calculates with animation speed multiplier")]
-        public float crouchMoveAnimSpeedRate;
+        public MoveClips crouchClips;
 
         [Header("Movements while crawling")]
         public AnimationClip crawlIdleClip;
         [Tooltip("If this <= 0, it will not be used to calculates with animation speed multiplier")]
         public float crawlIdleAnimSpeedRate;
-        public bool showCrawlMoveClipSettings;
-        [BoolShowConditional(nameof(showCrawlMoveClipSettings), true)]
-        public AnimationClip crawlMoveClip;
-        [BoolShowConditional(nameof(showCrawlMoveClipSettings), true)]
-        public AnimationClip crawlMoveBackwardClip;
-        [BoolShowConditional(nameof(showCrawlMoveClipSettings), true)]
-        public AnimationClip crawlMoveLeftClip;
-        [BoolShowConditional(nameof(showCrawlMoveClipSettings), true)]
-        public AnimationClip crawlMoveRightClip;
-        [BoolShowConditional(nameof(showCrawlMoveClipSettings), true)]
-        public AnimationClip crawlMoveForwardLeftClip;
-        [BoolShowConditional(nameof(showCrawlMoveClipSettings), true)]
-        public AnimationClip crawlMoveForwardRightClip;
-        [BoolShowConditional(nameof(showCrawlMoveClipSettings), true)]
-        public AnimationClip crawlMoveBackwardLeftClip;
-        [BoolShowConditional(nameof(showCrawlMoveClipSettings), true)]
-        public AnimationClip crawlMoveBackwardRightClip;
-        [BoolShowConditional(nameof(showCrawlMoveClipSettings), true)]
-        [Tooltip("If this <= 0, it will not be used to calculates with animation speed multiplier")]
-        public float crawlMoveAnimSpeedRate;
+        public MoveClips crawlClips;
 
         [Header("Movements while swimming")]
         public AnimationClip swimIdleClip;
         [Tooltip("If this <= 0, it will not be used to calculates with animation speed multiplier")]
         public float swimIdleAnimSpeedRate;
-        public bool showSwimMoveClipSettings;
-        [BoolShowConditional(nameof(showSwimMoveClipSettings), true)]
-        public AnimationClip swimMoveClip;
-        [BoolShowConditional(nameof(showSwimMoveClipSettings), true)]
-        public AnimationClip swimMoveBackwardClip;
-        [BoolShowConditional(nameof(showSwimMoveClipSettings), true)]
-        public AnimationClip swimMoveLeftClip;
-        [BoolShowConditional(nameof(showSwimMoveClipSettings), true)]
-        public AnimationClip swimMoveRightClip;
-        [BoolShowConditional(nameof(showSwimMoveClipSettings), true)]
-        public AnimationClip swimMoveForwardLeftClip;
-        [BoolShowConditional(nameof(showSwimMoveClipSettings), true)]
-        public AnimationClip swimMoveForwardRightClip;
-        [BoolShowConditional(nameof(showSwimMoveClipSettings), true)]
-        public AnimationClip swimMoveBackwardLeftClip;
-        [BoolShowConditional(nameof(showSwimMoveClipSettings), true)]
-        public AnimationClip swimMoveBackwardRightClip;
-        [BoolShowConditional(nameof(showSwimMoveClipSettings), true)]
-        [Tooltip("If this <= 0, it will not be used to calculates with animation speed multiplier")]
-        public float swimMoveAnimSpeedRate;
+        public MoveClips swimClips;
 
         [Header("Jump")]
         public AnimationClip jumpClip;
@@ -264,7 +159,7 @@ namespace MultiplayerARPG.GameData.Model.Playables
         public float deadAnimSpeedRate;
 
         [Header("Pickup")]
-        public AnimationClip pickupClip;
+        public AnimationClipAndAvatarMask pickupClip;
         [Tooltip("If this <= 0, it will not be used to calculates with animation speed multiplier")]
         public float pickupAnimSpeedRate;
 
@@ -301,147 +196,27 @@ namespace MultiplayerARPG.GameData.Model.Playables
         public AnimationClip idleClip;
         [Tooltip("If this <= 0, it will not be used to calculates with animation speed multiplier")]
         public float idleAnimSpeedRate;
-
-        [Header("Movements while standing (move)")]
-        public bool showMoveClipSettings;
-        [BoolShowConditional(nameof(showMoveClipSettings), true)]
-        public AnimationClip moveClip;
-        [BoolShowConditional(nameof(showMoveClipSettings), true)]
-        public AnimationClip moveBackwardClip;
-        [BoolShowConditional(nameof(showMoveClipSettings), true)]
-        public AnimationClip moveLeftClip;
-        [BoolShowConditional(nameof(showMoveClipSettings), true)]
-        public AnimationClip moveRightClip;
-        [BoolShowConditional(nameof(showMoveClipSettings), true)]
-        public AnimationClip moveForwardLeftClip;
-        [BoolShowConditional(nameof(showMoveClipSettings), true)]
-        public AnimationClip moveForwardRightClip;
-        [BoolShowConditional(nameof(showMoveClipSettings), true)]
-        public AnimationClip moveBackwardLeftClip;
-        [BoolShowConditional(nameof(showMoveClipSettings), true)]
-        public AnimationClip moveBackwardRightClip;
-        [BoolShowConditional(nameof(showMoveClipSettings), true)]
-        [Tooltip("If this <= 0, it will not be used to calculates with animation speed multiplier")]
-        public float moveAnimSpeedRate;
-
-        [Header("Movements while standing (sprint)")]
-        public bool showSprintClipSettings;
-        [BoolShowConditional(nameof(showSprintClipSettings), true)]
-        public AnimationClip sprintClip;
-        [BoolShowConditional(nameof(showSprintClipSettings), true)]
-        public AnimationClip sprintBackwardClip;
-        [BoolShowConditional(nameof(showSprintClipSettings), true)]
-        public AnimationClip sprintLeftClip;
-        [BoolShowConditional(nameof(showSprintClipSettings), true)]
-        public AnimationClip sprintRightClip;
-        [BoolShowConditional(nameof(showSprintClipSettings), true)]
-        public AnimationClip sprintForwardLeftClip;
-        [BoolShowConditional(nameof(showSprintClipSettings), true)]
-        public AnimationClip sprintForwardRightClip;
-        [BoolShowConditional(nameof(showSprintClipSettings), true)]
-        public AnimationClip sprintBackwardLeftClip;
-        [BoolShowConditional(nameof(showSprintClipSettings), true)]
-        public AnimationClip sprintBackwardRightClip;
-        [BoolShowConditional(nameof(showSprintClipSettings), true)]
-        [Tooltip("If this <= 0, it will not be used to calculates with animation speed multiplier")]
-        public float sprintAnimSpeedRate;
-
-        [Header("Movements while standing (walk)")]
-        public bool showWalkClipSettings;
-        [BoolShowConditional(nameof(showWalkClipSettings), true)]
-        public AnimationClip walkClip;
-        [BoolShowConditional(nameof(showWalkClipSettings), true)]
-        public AnimationClip walkBackwardClip;
-        [BoolShowConditional(nameof(showWalkClipSettings), true)]
-        public AnimationClip walkLeftClip;
-        [BoolShowConditional(nameof(showWalkClipSettings), true)]
-        public AnimationClip walkRightClip;
-        [BoolShowConditional(nameof(showWalkClipSettings), true)]
-        public AnimationClip walkForwardLeftClip;
-        [BoolShowConditional(nameof(showWalkClipSettings), true)]
-        public AnimationClip walkForwardRightClip;
-        [BoolShowConditional(nameof(showWalkClipSettings), true)]
-        public AnimationClip walkBackwardLeftClip;
-        [BoolShowConditional(nameof(showWalkClipSettings), true)]
-        public AnimationClip walkBackwardRightClip;
-        [BoolShowConditional(nameof(showWalkClipSettings), true)]
-        [Tooltip("If this <= 0, it will not be used to calculates with animation speed multiplier")]
-        public float walkAnimSpeedRate;
+        public MoveClips moveClips;
+        public MoveClips sprintClips;
+        public MoveClips walkClips;
 
         [Header("Movements while crouching")]
         public AnimationClip crouchIdleClip;
         [Tooltip("If this <= 0, it will not be used to calculates with animation speed multiplier")]
         public float crouchIdleAnimSpeedRate;
-        public bool showCrouchMoveClipSettings;
-        [BoolShowConditional(nameof(showCrouchMoveClipSettings), true)]
-        public AnimationClip crouchMoveClip;
-        [BoolShowConditional(nameof(showCrouchMoveClipSettings), true)]
-        public AnimationClip crouchMoveBackwardClip;
-        [BoolShowConditional(nameof(showCrouchMoveClipSettings), true)]
-        public AnimationClip crouchMoveLeftClip;
-        [BoolShowConditional(nameof(showCrouchMoveClipSettings), true)]
-        public AnimationClip crouchMoveRightClip;
-        [BoolShowConditional(nameof(showCrouchMoveClipSettings), true)]
-        public AnimationClip crouchMoveForwardLeftClip;
-        [BoolShowConditional(nameof(showCrouchMoveClipSettings), true)]
-        public AnimationClip crouchMoveForwardRightClip;
-        [BoolShowConditional(nameof(showCrouchMoveClipSettings), true)]
-        public AnimationClip crouchMoveBackwardLeftClip;
-        [BoolShowConditional(nameof(showCrouchMoveClipSettings), true)]
-        public AnimationClip crouchMoveBackwardRightClip;
-        [BoolShowConditional(nameof(showCrouchMoveClipSettings), true)]
-        [Tooltip("If this <= 0, it will not be used to calculates with animation speed multiplier")]
-        public float crouchMoveAnimSpeedRate;
+        public MoveClips crouchClips;
 
         [Header("Movements while crawling")]
         public AnimationClip crawlIdleClip;
         [Tooltip("If this <= 0, it will not be used to calculates with animation speed multiplier")]
         public float crawlIdleAnimSpeedRate;
-        public bool showCrawlMoveClipSettings;
-        [BoolShowConditional(nameof(showCrawlMoveClipSettings), true)]
-        public AnimationClip crawlMoveClip;
-        [BoolShowConditional(nameof(showCrawlMoveClipSettings), true)]
-        public AnimationClip crawlMoveBackwardClip;
-        [BoolShowConditional(nameof(showCrawlMoveClipSettings), true)]
-        public AnimationClip crawlMoveLeftClip;
-        [BoolShowConditional(nameof(showCrawlMoveClipSettings), true)]
-        public AnimationClip crawlMoveRightClip;
-        [BoolShowConditional(nameof(showCrawlMoveClipSettings), true)]
-        public AnimationClip crawlMoveForwardLeftClip;
-        [BoolShowConditional(nameof(showCrawlMoveClipSettings), true)]
-        public AnimationClip crawlMoveForwardRightClip;
-        [BoolShowConditional(nameof(showCrawlMoveClipSettings), true)]
-        public AnimationClip crawlMoveBackwardLeftClip;
-        [BoolShowConditional(nameof(showCrawlMoveClipSettings), true)]
-        public AnimationClip crawlMoveBackwardRightClip;
-        [BoolShowConditional(nameof(showCrawlMoveClipSettings), true)]
-        [Tooltip("If this <= 0, it will not be used to calculates with animation speed multiplier")]
-        public float crawlMoveAnimSpeedRate;
+        public MoveClips crawlClips;
 
         [Header("Movements while swimming")]
         public AnimationClip swimIdleClip;
         [Tooltip("If this <= 0, it will not be used to calculates with animation speed multiplier")]
         public float swimIdleAnimSpeedRate;
-        public bool showSwimMoveClipSettings;
-        [BoolShowConditional(nameof(showSwimMoveClipSettings), true)]
-        public AnimationClip swimMoveClip;
-        [BoolShowConditional(nameof(showSwimMoveClipSettings), true)]
-        public AnimationClip swimMoveBackwardClip;
-        [BoolShowConditional(nameof(showSwimMoveClipSettings), true)]
-        public AnimationClip swimMoveLeftClip;
-        [BoolShowConditional(nameof(showSwimMoveClipSettings), true)]
-        public AnimationClip swimMoveRightClip;
-        [BoolShowConditional(nameof(showSwimMoveClipSettings), true)]
-        public AnimationClip swimMoveForwardLeftClip;
-        [BoolShowConditional(nameof(showSwimMoveClipSettings), true)]
-        public AnimationClip swimMoveForwardRightClip;
-        [BoolShowConditional(nameof(showSwimMoveClipSettings), true)]
-        public AnimationClip swimMoveBackwardLeftClip;
-        [BoolShowConditional(nameof(showSwimMoveClipSettings), true)]
-        public AnimationClip swimMoveBackwardRightClip;
-        [BoolShowConditional(nameof(showSwimMoveClipSettings), true)]
-        [Tooltip("If this <= 0, it will not be used to calculates with animation speed multiplier")]
-        public float swimMoveAnimSpeedRate;
+        public MoveClips swimClips;
 
         [Header("Jump")]
         public AnimationClip jumpClip;
@@ -469,7 +244,7 @@ namespace MultiplayerARPG.GameData.Model.Playables
         public float deadAnimSpeedRate;
 
         [Header("Pickup")]
-        public AnimationClip pickupClip;
+        public AnimationClipAndAvatarMask pickupClip;
         [Tooltip("If this <= 0, it will not be used to calculates with animation speed multiplier")]
         public float pickupAnimSpeedRate;
 
