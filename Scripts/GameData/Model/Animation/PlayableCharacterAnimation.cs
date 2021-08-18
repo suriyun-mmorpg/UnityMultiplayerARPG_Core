@@ -2,40 +2,49 @@
 
 namespace MultiplayerARPG.GameData.Model.Playables
 {
+
     [System.Serializable]
-    public struct AnimationClipAndAvatarMask
+    public struct AnimState
     {
         public AnimationClip clip;
-        public AvatarMask mask;
+        [Tooltip("If this <= 0, it will not be used to calculate with animation speed multiplier")]
+        public float animSpeedRate;
+        [Tooltip("If this <= 0, it will use default transition duration setting from model component")]
+        public float transitionDuration;
     }
 
     [System.Serializable]
-    public struct MoveClips
+    public struct ActionState
     {
-        public AnimationClip forwardClip;
-        public AnimationClip backwardClip;
-        public AnimationClip leftClip;
-        public AnimationClip rightClip;
-        public AnimationClip forwardLeftClip;
-        public AnimationClip forwardRightClip;
-        public AnimationClip backwardLeftClip;
-        public AnimationClip backwardRightClip;
-        [Tooltip("If this <= 0, it will not be used to calculates with animation speed multiplier")]
+        public AnimationClip clip;
+        [Tooltip("If hits is `null`, it will use default avatar mask setting from model component")]
+        public AvatarMask avatarMask;
+        [Tooltip("If this <= 0, it will not be used to calculate with animation speed multiplier")]
         public float animSpeedRate;
+        [Tooltip("If this <= 0, it will use default transition duration setting from model component")]
+        public float transitionDuration;
+    }
+
+    [System.Serializable]
+    public struct MoveStates
+    {
+        public AnimState forwardState;
+        public AnimState backwardState;
+        public AnimState leftState;
+        public AnimState rightState;
+        public AnimState forwardLeftState;
+        public AnimState forwardRightState;
+        public AnimState backwardLeftState;
+        public AnimState backwardRightState;
     }
 
     [System.Serializable]
     public struct ActionAnimation
     {
-        public AnimationClipAndAvatarMask clip;
-        [Tooltip("If this <= 0, it will not be used to calculates with animation speed multiplier")]
-        public float animSpeedRate;
+        public ActionState state;
         [Tooltip("This will be in use with attack/skill animations, This is rate of total animation duration at when it should hit enemy or apply skill")]
         [Range(0f, 1f)]
-        public float triggerDurationRate;
-        [Tooltip("If this length more than 1, will use each entry as trigger duration rate")]
-        [Range(0f, 1f)]
-        public float[] multiHitTriggerDurationRates;
+        public float[] triggerDurationRates;
         [Tooltip("How animation duration defined")]
         public AnimationDurationType durationType;
         [StringShowConditional(nameof(durationType), nameof(AnimationDurationType.ByFixedDuration))]
@@ -48,15 +57,9 @@ namespace MultiplayerARPG.GameData.Model.Playables
 
         public AudioClip GetRandomAudioClip()
         {
-            AudioClip clip = null;
-            if (audioClips != null && audioClips.Length > 0)
-                clip = audioClips[Random.Range(0, audioClips.Length)];
-            return clip;
-        }
-
-        public float GetAnimSpeedRate()
-        {
-            return animSpeedRate > 0 ? animSpeedRate : 1f;
+            if (audioClips == null || audioClips.Length == 0)
+                return null;
+            return audioClips[Random.Range(0, audioClips.Length)];
         }
 
         public float GetClipLength()
@@ -64,9 +67,9 @@ namespace MultiplayerARPG.GameData.Model.Playables
             switch (durationType)
             {
                 case AnimationDurationType.ByClipLength:
-                    if (clip.clip == null)
+                    if (state.clip == null)
                         return 0f;
-                    return clip.clip.length;
+                    return state.clip.length;
                 case AnimationDurationType.ByFixedDuration:
                     return fixedDuration;
             }
@@ -81,19 +84,19 @@ namespace MultiplayerARPG.GameData.Model.Playables
         public float[] GetTriggerDurations()
         {
             float clipLength = GetClipLength();
-            if (multiHitTriggerDurationRates != null &&
-                multiHitTriggerDurationRates.Length > 0)
+            if (triggerDurationRates != null &&
+                triggerDurationRates.Length > 0)
             {
                 float previousRate = 0f;
-                float[] durations = new float[multiHitTriggerDurationRates.Length];
+                float[] durations = new float[triggerDurationRates.Length];
                 for (int i = 0; i < durations.Length; ++i)
                 {
-                    durations[i] = clipLength * (multiHitTriggerDurationRates[i] - previousRate);
-                    previousRate = multiHitTriggerDurationRates[i];
+                    durations[i] = clipLength * (triggerDurationRates[i] - previousRate);
+                    previousRate = triggerDurationRates[i];
                 }
                 return durations;
             }
-            return new float[] { clipLength * triggerDurationRate };
+            return new float[] { clipLength * 0.5f };
         }
 
         public float GetTotalDuration()
@@ -108,64 +111,44 @@ namespace MultiplayerARPG.GameData.Model.Playables
         public WeaponType weaponType;
 
         [Header("Movements while standing")]
-        public AnimationClip idleClip;
-        [Tooltip("If this <= 0, it will not be used to calculates with animation speed multiplier")]
-        public float idleAnimSpeedRate;
-        public MoveClips moveClips;
-        public MoveClips sprintClips;
-        public MoveClips walkClips;
+        public AnimState idleState;
+        public MoveStates moveStates;
+        public MoveStates sprintStates;
+        public MoveStates walkStates;
 
         [Header("Movements while crouching")]
-        public AnimationClip crouchIdleClip;
-        [Tooltip("If this <= 0, it will not be used to calculates with animation speed multiplier")]
-        public float crouchIdleAnimSpeedRate;
-        public MoveClips crouchClips;
+        public AnimState crouchIdleState;
+        public MoveStates crouchMoveStates;
 
         [Header("Movements while crawling")]
-        public AnimationClip crawlIdleClip;
-        [Tooltip("If this <= 0, it will not be used to calculates with animation speed multiplier")]
-        public float crawlIdleAnimSpeedRate;
-        public MoveClips crawlClips;
+        public AnimState crawlIdleState;
+        public MoveStates crawlMoveStates;
 
         [Header("Movements while swimming")]
-        public AnimationClip swimIdleClip;
-        [Tooltip("If this <= 0, it will not be used to calculates with animation speed multiplier")]
-        public float swimIdleAnimSpeedRate;
-        public MoveClips swimClips;
+        public AnimState swimIdleState;
+        public MoveStates swimMoveStates;
 
         [Header("Jump")]
-        public AnimationClip jumpClip;
-        [Tooltip("If this <= 0, it will not be used to calculates with animation speed multiplier")]
-        public float jumpAnimSpeedRate;
+        public AnimState jumpState;
 
         [Header("Fall")]
-        public AnimationClip fallClip;
-        [Tooltip("If this <= 0, it will not be used to calculates with animation speed multiplier")]
-        public float fallAnimSpeedRate;
+        public AnimState fallState;
 
         [Header("Landed")]
-        public AnimationClip landedClip;
-        [Tooltip("If this <= 0, it will not be used to calculates with animation speed multiplier")]
-        public float landedAnimSpeedRate;
+        public AnimState landedState;
 
         [Header("Hurt")]
-        public AnimationClip hurtClip;
-        [Tooltip("If this <= 0, it will not be used to calculates with animation speed multiplier")]
-        public float hurtAnimSpeedRate;
+        public AnimState hurtState;
 
         [Header("Dead")]
-        public AnimationClip deadClip;
-        [Tooltip("If this <= 0, it will not be used to calculates with animation speed multiplier")]
-        public float deadAnimSpeedRate;
+        public AnimState deadState;
 
         [Header("Pickup")]
-        public AnimationClipAndAvatarMask pickupClip;
-        [Tooltip("If this <= 0, it will not be used to calculates with animation speed multiplier")]
-        public float pickupAnimSpeedRate;
+        public ActionState pickupState;
 
         [Header("Attack animations")]
-        public AnimationClip rightHandChargeClip;
-        public AnimationClip leftHandChargeClip;
+        public AnimState rightHandChargeState;
+        public AnimState leftHandChargeState;
         [ArrayElementTitle("clip")]
         public ActionAnimation[] rightHandAttackAnimations;
         [ArrayElementTitle("clip")]
@@ -182,7 +165,7 @@ namespace MultiplayerARPG.GameData.Model.Playables
     public struct SkillAnimations : ISkillAnims
     {
         public BaseSkill skill;
-        public AnimationClipAndAvatarMask castClip;
+        public ActionState castState;
         public SkillActivateAnimationType activateAnimationType;
         [StringShowConditional(nameof(activateAnimationType), nameof(SkillActivateAnimationType.UseActivateAnimation))]
         public ActionAnimation activateAnimation;
@@ -193,64 +176,44 @@ namespace MultiplayerARPG.GameData.Model.Playables
     public struct DefaultAnimations
     {
         [Header("Movements while standing")]
-        public AnimationClip idleClip;
-        [Tooltip("If this <= 0, it will not be used to calculates with animation speed multiplier")]
-        public float idleAnimSpeedRate;
-        public MoveClips moveClips;
-        public MoveClips sprintClips;
-        public MoveClips walkClips;
+        public AnimState idleState;
+        public MoveStates moveStates;
+        public MoveStates sprintStates;
+        public MoveStates walkStates;
 
         [Header("Movements while crouching")]
-        public AnimationClip crouchIdleClip;
-        [Tooltip("If this <= 0, it will not be used to calculates with animation speed multiplier")]
-        public float crouchIdleAnimSpeedRate;
-        public MoveClips crouchClips;
+        public AnimState crouchIdleState;
+        public MoveStates crouchMoveStates;
 
         [Header("Movements while crawling")]
-        public AnimationClip crawlIdleClip;
-        [Tooltip("If this <= 0, it will not be used to calculates with animation speed multiplier")]
-        public float crawlIdleAnimSpeedRate;
-        public MoveClips crawlClips;
+        public AnimState crawlIdleState;
+        public MoveStates crawlMoveStates;
 
         [Header("Movements while swimming")]
-        public AnimationClip swimIdleClip;
-        [Tooltip("If this <= 0, it will not be used to calculates with animation speed multiplier")]
-        public float swimIdleAnimSpeedRate;
-        public MoveClips swimClips;
+        public AnimState swimIdleState;
+        public MoveStates swimMoveStates;
 
         [Header("Jump")]
-        public AnimationClip jumpClip;
-        [Tooltip("If this <= 0, it will not be used to calculates with animation speed multiplier")]
-        public float jumpAnimSpeedRate;
+        public AnimState jumpState;
 
         [Header("Fall")]
-        public AnimationClip fallClip;
-        [Tooltip("If this <= 0, it will not be used to calculates with animation speed multiplier")]
-        public float fallAnimSpeedRate;
+        public AnimState fallState;
 
         [Header("Landed")]
-        public AnimationClip landedClip;
-        [Tooltip("If this <= 0, it will not be used to calculates with animation speed multiplier")]
-        public float landedAnimSpeedRate;
+        public AnimState landedState;
 
         [Header("Hurt")]
-        public AnimationClip hurtClip;
-        [Tooltip("If this <= 0, it will not be used to calculates with animation speed multiplier")]
-        public float hurtAnimSpeedRate;
+        public AnimState hurtState;
 
         [Header("Dead")]
-        public AnimationClip deadClip;
-        [Tooltip("If this <= 0, it will not be used to calculates with animation speed multiplier")]
-        public float deadAnimSpeedRate;
+        public AnimState deadState;
 
         [Header("Pickup")]
-        public AnimationClipAndAvatarMask pickupClip;
-        [Tooltip("If this <= 0, it will not be used to calculates with animation speed multiplier")]
-        public float pickupAnimSpeedRate;
+        public ActionState pickupState;
 
         [Header("Attack animations")]
-        public AnimationClipAndAvatarMask rightHandChargeClip;
-        public AnimationClipAndAvatarMask leftHandChargeClip;
+        public ActionState rightHandChargeState;
+        public ActionState leftHandChargeState;
         [ArrayElementTitle("clip")]
         public ActionAnimation[] rightHandAttackAnimations;
         [ArrayElementTitle("clip")]
@@ -261,7 +224,7 @@ namespace MultiplayerARPG.GameData.Model.Playables
         public ActionAnimation leftHandReloadAnimation;
 
         [Header("Skill animations")]
-        public AnimationClipAndAvatarMask skillCastClip;
+        public ActionState skillCastState;
         public ActionAnimation skillActivateAnimation;
     }
 }
