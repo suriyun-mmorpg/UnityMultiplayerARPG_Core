@@ -569,7 +569,7 @@ namespace MultiplayerARPG
             return true;
         }
 
-        public override SkillActivateAnimationType UseSkillActivateAnimationType(int dataId)
+        public override SkillActivateAnimationType GetSkillActivateAnimationType(int dataId)
         {
             SkillAnimations anims;
             if (!TryGetSkillAnimations(dataId, out anims))

@@ -624,18 +624,20 @@ namespace MultiplayerARPG
         }
         #endregion
 
-        public override Coroutine PlayActionAnimation(AnimActionType animActionType, int dataId, int index, float playSpeedMultiplier = 1f)
+        public override void PlayActionAnimation(AnimActionType animActionType, int dataId, int index, float playSpeedMultiplier = 1f)
         {
             if (animatorType == AnimatorType.LegacyAnimtion)
-                return StartCoroutine(PlayActionAnimation_LegacyAnimation(animActionType, dataId, index, playSpeedMultiplier));
-            return StartCoroutine(PlayActionAnimation_Animator(animActionType, dataId, index, playSpeedMultiplier));
+                StartCoroutine(PlayActionAnimation_LegacyAnimation(animActionType, dataId, index, playSpeedMultiplier));
+            else
+                StartCoroutine(PlayActionAnimation_Animator(animActionType, dataId, index, playSpeedMultiplier));
         }
 
-        public override Coroutine PlaySkillCastClip(int dataId, float duration)
+        public override void PlaySkillCastClip(int dataId, float duration)
         {
             if (animatorType == AnimatorType.LegacyAnimtion)
-                return StartCoroutine(PlaySkillCastClip_LegacyAnimation(dataId, duration));
-            return StartCoroutine(PlaySkillCastClip_Animator(dataId, duration));
+                StartCoroutine(PlaySkillCastClip_LegacyAnimation(dataId, duration));
+            else
+                StartCoroutine(PlaySkillCastClip_Animator(dataId, duration));
         }
 
         public override void PlayWeaponChargeClip(int dataId, bool isLeftHand)
@@ -973,7 +975,7 @@ namespace MultiplayerARPG
             return true;
         }
 
-        public override SkillActivateAnimationType UseSkillActivateAnimationType(int dataId)
+        public override SkillActivateAnimationType GetSkillActivateAnimationType(int dataId)
         {
             SkillAnimations anims;
             if (!TryGetSkillAnimations(dataId, out anims))

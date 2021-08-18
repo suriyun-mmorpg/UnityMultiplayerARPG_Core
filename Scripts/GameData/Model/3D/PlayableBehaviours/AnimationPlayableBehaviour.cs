@@ -130,7 +130,7 @@ namespace MultiplayerARPG.GameData.Model.Playables
 
         }
 
-        public void PlayAction()
+        public void PlayAction(AnimActionType animActionType, int dataId, int index, float playSpeedMultiplier)
         {
 
         }
@@ -140,7 +140,7 @@ namespace MultiplayerARPG.GameData.Model.Playables
 
         }
 
-        public void PlaySkillCast()
+        public void PlaySkillCast(int dataId, float duration)
         {
 
         }
@@ -150,7 +150,7 @@ namespace MultiplayerARPG.GameData.Model.Playables
 
         }
 
-        public void PlayWeaponCharge()
+        public void PlayWeaponCharge(int dataId, bool isLeftHand)
         {
 
         }

@@ -355,9 +355,9 @@ namespace MultiplayerARPG
             return animation2D;
         }
 
-        public override Coroutine PlayActionAnimation(AnimActionType animActionType, int dataId, int index, float playSpeedMultiplier = 1f)
+        public override void PlayActionAnimation(AnimActionType animActionType, int dataId, int index, float playSpeedMultiplier = 1f)
         {
-            return StartedActionCoroutine(StartCoroutine(PlayActionAnimation_Animator(animActionType, dataId, index, playSpeedMultiplier)));
+            StartedActionCoroutine(StartCoroutine(PlayActionAnimation_Animator(animActionType, dataId, index, playSpeedMultiplier)));
         }
 
         private IEnumerator PlayActionAnimation_Animator(AnimActionType animActionType, int dataId, int index, float playSpeedMultiplier)
@@ -385,9 +385,9 @@ namespace MultiplayerARPG
             yield return new WaitForSecondsRealtime(animation2D.extraDuration / playSpeedMultiplier);
         }
 
-        public override Coroutine PlaySkillCastClip(int dataId, float duration)
+        public override void PlaySkillCastClip(int dataId, float duration)
         {
-            return StartedActionCoroutine(StartCoroutine(PlaySkillCastClip_Animator(dataId, duration)));
+            StartedActionCoroutine(StartCoroutine(PlaySkillCastClip_Animator(dataId, duration)));
         }
 
         private IEnumerator PlaySkillCastClip_Animator(int dataId, float duration)
@@ -534,7 +534,7 @@ namespace MultiplayerARPG
             return true;
         }
 
-        public override SkillActivateAnimationType UseSkillActivateAnimationType(int dataId)
+        public override SkillActivateAnimationType GetSkillActivateAnimationType(int dataId)
         {
             AnimatorSkillAnimations2D anims;
             if (!TryGetSkillAnimations(dataId, out anims))

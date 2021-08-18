@@ -707,7 +707,7 @@ namespace MultiplayerARPG
 
         public SkillActivateAnimationType UseSkillActivateAnimationType(BaseSkill skill)
         {
-            return UseSkillActivateAnimationType(skill.DataId);
+            return GetSkillActivateAnimationType(skill.DataId);
         }
 
         public List<BaseEquipmentEntity> GetEquipmentEntities(string equipPosition)
@@ -803,8 +803,8 @@ namespace MultiplayerARPG
         public virtual void PlayPickupAnimation() { }
 
         public abstract void PlayMoveAnimation();
-        public abstract Coroutine PlayActionAnimation(AnimActionType animActionType, int dataId, int index, float playSpeedMultiplier = 1f);
-        public abstract Coroutine PlaySkillCastClip(int dataId, float duration);
+        public abstract void PlayActionAnimation(AnimActionType animActionType, int dataId, int index, float playSpeedMultiplier = 1f);
+        public abstract void PlaySkillCastClip(int dataId, float duration);
         public abstract void PlayWeaponChargeClip(int dataId, bool isLeftHand);
         public abstract void StopActionAnimation();
         public abstract void StopSkillCastAnimation();
@@ -816,7 +816,7 @@ namespace MultiplayerARPG
         public abstract bool GetSkillActivateAnimation(int dataId, out float animSpeedRate, out float[] triggerDurations, out float totalDuration);
         public abstract bool GetRightHandReloadAnimation(int dataId, out float animSpeedRate, out float[] triggerDurations, out float totalDuration);
         public abstract bool GetLeftHandReloadAnimation(int dataId, out float animSpeedRate, out float[] triggerDurations, out float totalDuration);
-        public abstract SkillActivateAnimationType UseSkillActivateAnimationType(int dataId);
+        public abstract SkillActivateAnimationType GetSkillActivateAnimationType(int dataId);
     }
 
     [System.Serializable]

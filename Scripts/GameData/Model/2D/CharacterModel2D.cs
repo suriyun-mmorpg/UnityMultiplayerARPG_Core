@@ -258,9 +258,9 @@ namespace MultiplayerARPG
             return animation2D;
         }
 
-        public override Coroutine PlayActionAnimation(AnimActionType animActionType, int dataId, int index, float playSpeedMultiplier = 1)
+        public override void PlayActionAnimation(AnimActionType animActionType, int dataId, int index, float playSpeedMultiplier = 1f)
         {
-            return StartCoroutine(PlayActionAnimationRoutine(animActionType, dataId, index, playSpeedMultiplier));
+            StartCoroutine(PlayActionAnimationRoutine(animActionType, dataId, index, playSpeedMultiplier));
         }
 
         IEnumerator PlayActionAnimationRoutine(AnimActionType animActionType, int dataId, int index, float playSpeedMultiplier)
@@ -285,9 +285,9 @@ namespace MultiplayerARPG
             playingAction = false;
         }
 
-        public override Coroutine PlaySkillCastClip(int dataId, float duration)
+        public override void PlaySkillCastClip(int dataId, float duration)
         {
-            return StartCoroutine(PlaySkillCastClipRoutine(dataId, duration));
+            StartCoroutine(PlaySkillCastClipRoutine(dataId, duration));
         }
 
         IEnumerator PlaySkillCastClipRoutine(int dataId, float duration)
@@ -429,7 +429,7 @@ namespace MultiplayerARPG
             return true;
         }
 
-        public override SkillActivateAnimationType UseSkillActivateAnimationType(int dataId)
+        public override SkillActivateAnimationType GetSkillActivateAnimationType(int dataId)
         {
             SkillAnimations2D anims;
             if (!TryGetSkillAnimations(dataId, out anims))

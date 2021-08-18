@@ -709,12 +709,12 @@ namespace MultiplayerARPG
             animator.SetInteger(ANIM_MOVE_TYPE, moveType);
         }
 
-        public override Coroutine PlayActionAnimation(AnimActionType animActionType, int dataId, int index, float playSpeedMultiplier = 1f)
+        public override void PlayActionAnimation(AnimActionType animActionType, int dataId, int index, float playSpeedMultiplier = 1f)
         {
             StopActionAnimation();
             StopSkillCastAnimation();
             StopWeaponChargeAnimation();
-            return StartedActionCoroutine(StartCoroutine(PlayActionAnimation_Animator(animActionType, dataId, index, playSpeedMultiplier)));
+            StartedActionCoroutine(StartCoroutine(PlayActionAnimation_Animator(animActionType, dataId, index, playSpeedMultiplier)));
         }
 
         private IEnumerator PlayActionAnimation_Animator(AnimActionType animActionType, int dataId, int index, float playSpeedMultiplier)
@@ -752,12 +752,12 @@ namespace MultiplayerARPG
             yield return new WaitForSecondsRealtime(tempActionAnimation.GetExtendDuration() / playSpeedMultiplier);
         }
 
-        public override Coroutine PlaySkillCastClip(int dataId, float duration)
+        public override void PlaySkillCastClip(int dataId, float duration)
         {
             StopActionAnimation();
             StopSkillCastAnimation();
             StopWeaponChargeAnimation();
-            return StartedActionCoroutine(StartCoroutine(PlaySkillCastClip_Animator(dataId, duration)));
+            StartedActionCoroutine(StartCoroutine(PlaySkillCastClip_Animator(dataId, duration)));
         }
 
         private IEnumerator PlaySkillCastClip_Animator(int dataId, float duration)
