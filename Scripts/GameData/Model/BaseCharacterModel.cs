@@ -291,6 +291,7 @@ namespace MultiplayerARPG
 
             if (previousModel != null)
             {
+                previousModel.OnSwitchingToAnotherModel();
                 previousModel.RevertObjectsWhenSwitch();
                 previousModel.CopyCacheDataTo(
                     cacheModels,
@@ -316,6 +317,17 @@ namespace MultiplayerARPG
             }
 
             UpdateObjectsWhenSwitch();
+            OnSwitchedToThisModel();
+        }
+
+        internal virtual void OnSwitchingToAnotherModel()
+        {
+
+        }
+
+        internal virtual void OnSwitchedToThisModel()
+        {
+
         }
 
 #if UNITY_EDITOR

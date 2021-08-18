@@ -30,10 +30,9 @@ namespace MultiplayerARPG
 
         public AudioClip GetRandomAudioClip()
         {
-            AudioClip clip = null;
-            if (audioClips != null && audioClips.Length > 0)
-                clip = audioClips[Random.Range(0, audioClips.Length)];
-            return clip;
+            if (audioClips == null || audioClips.Length == 0)
+                return null;
+            return audioClips[Random.Range(0, audioClips.Length)];
         }
 
         public float GetAnimSpeedRate()
