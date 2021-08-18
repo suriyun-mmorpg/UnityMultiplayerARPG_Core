@@ -26,11 +26,16 @@ namespace MultiplayerARPG
                     controller.ActivatableEntityDetector.buildings.Count > 0;
             }
 
+
             if (shooterController != null && shooterController.SelectedEntity != null)
             {
-                canActivate = shooterController.SelectedEntity is BasePlayerCharacterEntity ||
-                    shooterController.SelectedEntity is NpcEntity ||
-                    shooterController.SelectedEntity is BuildingEntity;
+                canActivate = shooterController.SelectedEntity is BasePlayerCharacterEntity || shooterController.SelectedEntity is NpcEntity;
+                if (!canActivate)
+                {
+                    BuildingEntity buildingEntity = shooterController.SelectedEntity as BuildingEntity;
+                    if (buildingEntity != null && !buildingEntity.IsBuildMode && buildingEntity.Activatable)
+                        canActivate = true;
+                }
             }
 
             foreach (GameObject obj in activateObjects)
