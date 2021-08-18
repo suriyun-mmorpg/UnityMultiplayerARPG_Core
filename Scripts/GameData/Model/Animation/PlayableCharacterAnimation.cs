@@ -81,6 +81,11 @@ namespace MultiplayerARPG.GameData.Model.Playables
             return extendDuration;
         }
 
+        public float GetAnimSpeedRate()
+        {
+            return state.animSpeedRate > 0 ? state.animSpeedRate : 1f;
+        }
+
         public float[] GetTriggerDurations()
         {
             float clipLength = GetClipLength();

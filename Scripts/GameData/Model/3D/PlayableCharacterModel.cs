@@ -13,9 +13,9 @@ namespace MultiplayerARPG.GameData.Model.Playables
         public SkinnedMeshRenderer skinnedMeshRenderer;
 
         [Header("Animations")]
-        [Tooltip("If `avatarMask` in action clip settings is `null`, it will use this value")]
+        [Tooltip("If `avatarMask` in action state settings is `null`, it will use this value")]
         public AvatarMask actionAvatarMask;
-        [Tooltip("If `transitionDuration` in clip settings is <= 0, it will use this value")]
+        [Tooltip("If `transitionDuration` in state settings is <= 0, it will use this value")]
         public float transitionDuration;
         public DefaultAnimations defaultAnimations;
         [ArrayElementTitle("weaponType")]
@@ -24,32 +24,31 @@ namespace MultiplayerARPG.GameData.Model.Playables
         public SkillAnimations[] skillAnimations;
 
         public PlayableGraph Graph { get; protected set; }
+        public AnimationPlayableBehaviour Template { get; protected set; }
         public AnimationPlayableBehaviour Behaviour { get; protected set; }
 
         protected override void Awake()
         {
             base.Awake();
             PrepareMissingMovementAnimations();
-            Graph = PlayableGraph.Create();
-            Graph.SetTimeUpdateMode(DirectorUpdateMode.GameTime);
-            AnimationPlayableBehaviour template = new AnimationPlayableBehaviour();
-            template.Setup(this);
-            ScriptPlayable<AnimationPlayableBehaviour> playable = ScriptPlayable<AnimationPlayableBehaviour>.Create(Graph, template, 1);
-            Behaviour = playable.GetBehaviour();
-            AnimationPlayableOutput output = AnimationPlayableOutput.Create(Graph, "Output", GetComponent<Animator>());
-            output.SetSourcePlayable(playable);
+            Template = new AnimationPlayableBehaviour();
+            Template.Setup(this);
         }
 
         internal override void OnSwitchingToAnotherModel()
         {
-            if (Graph.IsValid() && Graph.IsPlaying())
-                Graph.Stop();
+            Graph.Destroy();
         }
 
         internal override void OnSwitchedToThisModel()
         {
-            if (Graph.IsValid() && !Graph.IsPlaying())
-                Graph.Play();
+            Graph = PlayableGraph.Create();
+            Graph.SetTimeUpdateMode(DirectorUpdateMode.GameTime);
+            ScriptPlayable<AnimationPlayableBehaviour> playable = ScriptPlayable<AnimationPlayableBehaviour>.Create(Graph, Template, 1);
+            Behaviour = playable.GetBehaviour();
+            AnimationPlayableOutput output = AnimationPlayableOutput.Create(Graph, "Output", GetComponent<Animator>());
+            output.SetSourcePlayable(playable);
+            Graph.Play();
         }
 
         protected AnimState SetClipFromDefaultStateIfEmpty(AnimState defaultState, AnimState targetState)
@@ -133,90 +132,188 @@ namespace MultiplayerARPG.GameData.Model.Playables
             Graph.Destroy();
         }
 
+        public bool TryGetWeaponAnimations(int dataId, out WeaponAnimations anims)
+        {
+            return CacheAnimationsManager.SetAndTryGetCacheWeaponAnimations(Id, weaponAnimations, skillAnimations, dataId, out anims);
+        }
+
+        public bool TryGetSkillAnimations(int dataId, out SkillAnimations anims)
+        {
+            return CacheAnimationsManager.SetAndTryGetCacheSkillAnimations(Id, weaponAnimations, skillAnimations, dataId, out anims);
+        }
+
         #region Right-hand animations
+        public ActionAnimation[] GetRightHandAttackAnimations(int dataId)
+        {
+            WeaponAnimations anims;
+            if (TryGetWeaponAnimations(dataId, out anims) && anims.rightHandAttackAnimations != null)
+                return anims.rightHandAttackAnimations;
+            return defaultAnimations.rightHandAttackAnimations;
+        }
+
+        public ActionAnimation GetRightHandReloadAnimation(int dataId)
+        {
+            WeaponAnimations anims;
+            if (TryGetWeaponAnimations(dataId, out anims) && anims.rightHandReloadAnimation.state.clip != null)
+                return anims.rightHandReloadAnimation;
+            return defaultAnimations.rightHandReloadAnimation;
+        }
+
         public override bool GetRightHandAttackAnimation(int dataId, int animationIndex, out float animSpeedRate, out float[] triggerDurations, out float totalDuration)
         {
-            throw new System.NotImplementedException();
+            ActionAnimation[] tempActionAnimations = GetRightHandAttackAnimations(dataId);
+            animSpeedRate = 1f;
+            triggerDurations = new float[] { 0f };
+            totalDuration = 0f;
+            if (tempActionAnimations.Length == 0 || animationIndex >= tempActionAnimations.Length) return false;
+            animSpeedRate = tempActionAnimations[animationIndex].GetAnimSpeedRate();
+            triggerDurations = tempActionAnimations[animationIndex].GetTriggerDurations();
+            totalDuration = tempActionAnimations[animationIndex].GetTotalDuration();
+            return true;
         }
 
         public override bool GetRightHandReloadAnimation(int dataId, out float animSpeedRate, out float[] triggerDurations, out float totalDuration)
         {
-            throw new System.NotImplementedException();
+            ActionAnimation tempActionAnimation = GetRightHandReloadAnimation(dataId);
+            animSpeedRate = tempActionAnimation.GetAnimSpeedRate();
+            triggerDurations = tempActionAnimation.GetTriggerDurations();
+            totalDuration = tempActionAnimation.GetTotalDuration();
+            return true;
         }
 
         public override bool GetRandomRightHandAttackAnimation(int dataId, int randomSeed, out int animationIndex, out float animSpeedRate, out float[] triggerDurations, out float totalDuration)
         {
-            throw new System.NotImplementedException();
+            animationIndex = GenericUtils.RandomInt(randomSeed, 0, GetRightHandAttackAnimations(dataId).Length);
+            return GetRightHandAttackAnimation(dataId, animationIndex, out animSpeedRate, out triggerDurations, out totalDuration);
         }
         #endregion
 
         #region Left-hand animations
+        public ActionAnimation[] GetLeftHandAttackAnimations(int dataId)
+        {
+            WeaponAnimations anims;
+            if (TryGetWeaponAnimations(dataId, out anims) && anims.leftHandAttackAnimations != null)
+                return anims.leftHandAttackAnimations;
+            return defaultAnimations.leftHandAttackAnimations;
+        }
+
+        public ActionAnimation GetLeftHandReloadAnimation(int dataId)
+        {
+            WeaponAnimations anims;
+            if (TryGetWeaponAnimations(dataId, out anims) && anims.leftHandReloadAnimation.state.clip != null)
+                return anims.leftHandReloadAnimation;
+            return defaultAnimations.leftHandReloadAnimation;
+        }
+
         public override bool GetLeftHandAttackAnimation(int dataId, int animationIndex, out float animSpeedRate, out float[] triggerDurations, out float totalDuration)
         {
-            throw new System.NotImplementedException();
+            ActionAnimation[] tempActionAnimations = GetLeftHandAttackAnimations(dataId);
+            animSpeedRate = 1f;
+            triggerDurations = new float[] { 0f };
+            totalDuration = 0f;
+            if (tempActionAnimations.Length == 0 || animationIndex >= tempActionAnimations.Length) return false;
+            animSpeedRate = tempActionAnimations[animationIndex].GetAnimSpeedRate();
+            triggerDurations = tempActionAnimations[animationIndex].GetTriggerDurations();
+            totalDuration = tempActionAnimations[animationIndex].GetTotalDuration();
+            return true;
         }
 
         public override bool GetLeftHandReloadAnimation(int dataId, out float animSpeedRate, out float[] triggerDurations, out float totalDuration)
         {
-            throw new System.NotImplementedException();
+            ActionAnimation tempActionAnimation = GetLeftHandReloadAnimation(dataId);
+            animSpeedRate = tempActionAnimation.GetAnimSpeedRate();
+            triggerDurations = tempActionAnimation.GetTriggerDurations();
+            totalDuration = tempActionAnimation.GetTotalDuration();
+            return true;
         }
 
         public override bool GetRandomLeftHandAttackAnimation(int dataId, int randomSeed, out int animationIndex, out float animSpeedRate, out float[] triggerDurations, out float totalDuration)
         {
-            throw new System.NotImplementedException();
+            animationIndex = GenericUtils.RandomInt(randomSeed, 0, GetLeftHandAttackAnimations(dataId).Length);
+            return GetLeftHandAttackAnimation(dataId, animationIndex, out animSpeedRate, out triggerDurations, out totalDuration);
         }
         #endregion
 
         #region Skill animations
+        public ActionAnimation GetSkillActivateAnimation(int dataId)
+        {
+            SkillAnimations anims;
+            if (TryGetSkillAnimations(dataId, out anims) && anims.activateAnimation.state.clip != null)
+                return anims.activateAnimation;
+            return defaultAnimations.skillActivateAnimation;
+        }
+
         public override bool GetSkillActivateAnimation(int dataId, out float animSpeedRate, out float[] triggerDurations, out float totalDuration)
         {
-            throw new System.NotImplementedException();
+            ActionAnimation tempActionAnimation = GetSkillActivateAnimation(dataId);
+            animSpeedRate = tempActionAnimation.GetAnimSpeedRate();
+            triggerDurations = tempActionAnimation.GetTriggerDurations();
+            totalDuration = tempActionAnimation.GetTotalDuration();
+            return true;
         }
 
-        public override SkillActivateAnimationType UseSkillActivateAnimationType(int dataId)
+        public override SkillActivateAnimationType GetSkillActivateAnimationType(int dataId)
         {
-            throw new System.NotImplementedException();
+            SkillAnimations anims;
+            if (!TryGetSkillAnimations(dataId, out anims))
+                return SkillActivateAnimationType.UseActivateAnimation;
+            return anims.activateAnimationType;
         }
 
-        public override Coroutine PlaySkillCastClip(int dataId, float duration)
+        public override void PlaySkillCastClip(int dataId, float duration)
         {
-            throw new System.NotImplementedException();
+            Behaviour.PlaySkillCast(dataId, duration);
         }
 
         public override void StopSkillCastAnimation()
         {
-            throw new System.NotImplementedException();
+            Behaviour.StopSkillCast();
         }
         #endregion
 
         #region Action animations
-        public override Coroutine PlayActionAnimation(AnimActionType animActionType, int dataId, int index, float playSpeedMultiplier = 1)
+        public override void PlayActionAnimation(AnimActionType animActionType, int dataId, int index, float playSpeedMultiplier = 1)
         {
-            throw new System.NotImplementedException();
+            Behaviour.PlayAction(animActionType, dataId, index, playSpeedMultiplier);
         }
 
         public override void StopActionAnimation()
         {
-            throw new System.NotImplementedException();
+            Behaviour.StopAction();
         }
         #endregion
 
         #region Weapon charge animations
         public override void PlayWeaponChargeClip(int dataId, bool isLeftHand)
         {
-            throw new System.NotImplementedException();
+            Behaviour.PlayWeaponCharge(dataId, isLeftHand);
         }
 
         public override void StopWeaponChargeAnimation()
         {
-            throw new System.NotImplementedException();
+            Behaviour.StopWeaponCharge();
         }
         #endregion
 
         #region Other animations
         public override void PlayMoveAnimation()
         {
-            throw new System.NotImplementedException();
+
+        }
+
+        public override void PlayHitAnimation()
+        {
+            Behaviour.PlayHit();
+        }
+
+        public override void PlayJumpAnimation()
+        {
+            Behaviour.PlayJump();
+        }
+
+        public override void PlayPickupAnimation()
+        {
+            Behaviour.PlayPickup();
         }
         #endregion
     }
