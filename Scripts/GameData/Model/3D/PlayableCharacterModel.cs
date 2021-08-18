@@ -142,6 +142,15 @@ namespace MultiplayerARPG.GameData.Model.Playables
             return CacheAnimationsManager.SetAndTryGetCacheSkillAnimations(Id, weaponAnimations, skillAnimations, dataId, out anims);
         }
 
+        public override void SetEquipWeapons(EquipWeapons equipWeapons)
+        {
+            base.SetEquipWeapons(equipWeapons);
+            IWeaponItem weaponItem = equipWeapons.GetRightHandWeaponItem();
+            if (weaponItem == null)
+                weaponItem = equipWeapons.GetLeftHandWeaponItem();
+            Behaviour.SetPlayingWeaponTypeId(weaponItem);
+        }
+
         #region Right-hand animations
         public ActionAnimation[] GetRightHandAttackAnimations(int dataId)
         {
@@ -298,7 +307,7 @@ namespace MultiplayerARPG.GameData.Model.Playables
         #region Other animations
         public override void PlayMoveAnimation()
         {
-
+            // Do nothing, animation playable behaviour will do it
         }
 
         public override void PlayHitAnimation()

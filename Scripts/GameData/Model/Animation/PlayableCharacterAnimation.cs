@@ -89,19 +89,16 @@ namespace MultiplayerARPG.GameData.Model.Playables
         public float[] GetTriggerDurations()
         {
             float clipLength = GetClipLength();
-            if (triggerDurationRates != null &&
-                triggerDurationRates.Length > 0)
+            if (triggerDurationRates == null || triggerDurationRates.Length == 0)
+                return new float[] { clipLength * 0.5f };
+            float previousRate = 0f;
+            float[] durations = new float[triggerDurationRates.Length];
+            for (int i = 0; i < durations.Length; ++i)
             {
-                float previousRate = 0f;
-                float[] durations = new float[triggerDurationRates.Length];
-                for (int i = 0; i < durations.Length; ++i)
-                {
-                    durations[i] = clipLength * (triggerDurationRates[i] - previousRate);
-                    previousRate = triggerDurationRates[i];
-                }
-                return durations;
+                durations[i] = clipLength * (triggerDurationRates[i] - previousRate);
+                previousRate = triggerDurationRates[i];
             }
-            return new float[] { clipLength * 0.5f };
+            return durations;
         }
 
         public float GetTotalDuration()
