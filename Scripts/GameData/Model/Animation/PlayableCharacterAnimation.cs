@@ -140,7 +140,7 @@ namespace MultiplayerARPG.GameData.Model.Playables
         public AnimState landedState;
 
         [Header("Hurt")]
-        public AnimState hurtState;
+        public ActionState hurtState;
 
         [Header("Dead")]
         public AnimState deadState;
@@ -149,8 +149,8 @@ namespace MultiplayerARPG.GameData.Model.Playables
         public ActionState pickupState;
 
         [Header("Attack animations")]
-        public AnimState rightHandChargeState;
-        public AnimState leftHandChargeState;
+        public ActionState rightHandChargeState;
+        public ActionState leftHandChargeState;
         [ArrayElementTitle("clip")]
         public ActionAnimation[] rightHandAttackAnimations;
         [ArrayElementTitle("clip")]
@@ -205,7 +205,7 @@ namespace MultiplayerARPG.GameData.Model.Playables
         public AnimState landedState;
 
         [Header("Hurt")]
-        public AnimState hurtState;
+        public ActionState hurtState;
 
         [Header("Dead")]
         public AnimState deadState;

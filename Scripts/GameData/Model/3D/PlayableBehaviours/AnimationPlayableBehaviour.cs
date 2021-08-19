@@ -1,21 +1,48 @@
 ﻿using System.Collections.Generic;
 using System.Text;
+using UnityEngine;
 using UnityEngine.Animations;
 using UnityEngine.Playables;
 
 namespace MultiplayerARPG.GameData.Model.Playables
 {
-    public struct StateInfo
-    {
-        public int inputPort;
-        public AnimState state;
-    }
-
     /// <summary>
     /// NOTE: Set its name to default playable behaviour, in the future I might make it able to customize character model's playable behaviour
     /// </summary>
     public class AnimationPlayableBehaviour : PlayableBehaviour
     {
+        private struct BaseStateInfo
+        {
+            public int inputPort;
+            public AnimState state;
+            public float GetSpeed(float rate)
+            {
+                return state.animSpeedRate * rate;
+            }
+
+            public float GetClipLength(float rate)
+            {
+                return state.clip.length / GetSpeed(rate);
+            }
+        }
+
+        private enum PlayingJumpState
+        {
+            None,
+            Starting,
+            Playing,
+        }
+
+        public enum PlayingActionState
+        {
+            None,
+            Action,
+            SkillCast,
+            WeaponCharge,
+            Hit,
+            Pickup,
+        }
+
         // Clip name variables
         // Move direction
         public const string DIR_FORWARD = "Forward";
@@ -54,15 +81,27 @@ namespace MultiplayerARPG.GameData.Model.Playables
         public AnimationMixerPlayable ActionLayerMixer { get; private set; }
         public PlayableCharacterModel CharacterModel { get; private set; }
 
+        private WeaponType currentWeaponType = null;
         private string playingStateId = string.Empty;
-        private string playingWeaponTypeId = string.Empty;
-        private bool isPlayingJump = false;
+        private PlayingJumpState jumpState = PlayingJumpState.None;
+        private PlayingActionState actionState = PlayingActionState.None;
         private bool isPreviouslyGrounded = true;
-        private int inputPort = 0;
-        private float transitionDuration = 0f;
+        private int baseInputPort = 0;
+        private float baseTransitionDuration = 0f;
+        private float baseClipLength = 0f;
+        private float basePlayElapsed = 0f;
+        private float actionTransitionDuration = 0f;
+        private float actionClipLength = 0f;
+        private float actionPlayElapsed = 0f;
+        private AnimActionType animActionType = AnimActionType.None;
+        private int animDataId = 0;
+        private int actionAnimIndex = 0;
+        private float actionPlaySpeedMultiplier = 0;
+        private float skillCastDuration = 0f;
+        private bool isLeftHand = false;
         private readonly StringBuilder stringBuilder = new StringBuilder();
         private readonly HashSet<string> weaponTypeIds = new HashSet<string>();
-        private readonly Dictionary<string, StateInfo> states = new Dictionary<string, StateInfo>();
+        private readonly Dictionary<string, BaseStateInfo> states = new Dictionary<string, BaseStateInfo>();
 
         public override void OnPlayableCreate(Playable playable)
         {
@@ -94,7 +133,7 @@ namespace MultiplayerARPG.GameData.Model.Playables
                 SetupWeaponAnimations(characterModel.weaponAnimations[i]);
             }
         }
-        
+
         private void SetupDefaultAnimations(DefaultAnimations defaultAnimations)
         {
             SetBaseState(stringBuilder.Clear().Append(CLIP_IDLE).ToString(), defaultAnimations.idleState);
@@ -152,7 +191,7 @@ namespace MultiplayerARPG.GameData.Model.Playables
             int inputPort = BaseLayerMixer.GetInputCount();
             BaseLayerMixer.SetInputCount(inputPort + 1);
             Graph.Connect(clipPlayable, 0, BaseLayerMixer, inputPort);
-            states[id] = new StateInfo()
+            states[id] = new BaseStateInfo()
             {
                 inputPort = inputPort,
                 state = state,
@@ -162,15 +201,16 @@ namespace MultiplayerARPG.GameData.Model.Playables
         private string GetPlayingStateId()
         {
             stringBuilder.Clear();
-            stringBuilder.Append(playingWeaponTypeId);
+            stringBuilder.Append(currentWeaponType != null ? currentWeaponType.Id : string.Empty);
             if (CharacterModel.isDead)
             {
+                jumpState = PlayingJumpState.None;
                 stringBuilder.Append(CLIP_DEAD);
                 return stringBuilder.ToString();
             }
-            else if (isPlayingJump)
+            else if (jumpState == PlayingJumpState.Starting)
             {
-                isPlayingJump = false;
+                jumpState = PlayingJumpState.Playing;
                 isPreviouslyGrounded = false;
                 stringBuilder.Append(CLIP_JUMP);
                 return stringBuilder.ToString();
@@ -180,6 +220,11 @@ namespace MultiplayerARPG.GameData.Model.Playables
                 isPreviouslyGrounded = false;
                 stringBuilder.Append(CLIP_FALL);
                 return stringBuilder.ToString();
+            }
+            else if (jumpState == PlayingJumpState.Playing)
+            {
+                // Don't change state because character is jumping, it will change to idle when jump animation played
+                return playingStateId;
             }
             else
             {
@@ -251,20 +296,34 @@ namespace MultiplayerARPG.GameData.Model.Playables
 
         public override void PrepareFrame(Playable playable, FrameData info)
         {
+            #region Update base state
             string playingStateId = GetPlayingStateId();
             if (!this.playingStateId.Equals(playingStateId))
             {
                 this.playingStateId = playingStateId;
-                inputPort = states[playingStateId].inputPort;
-                transitionDuration = states[playingStateId].state.transitionDuration;
+                baseInputPort = states[playingStateId].inputPort;
+                // Set clip info 
+                float speed = states[playingStateId].GetSpeed(1);
+                // Set transition duration
+                baseTransitionDuration = states[playingStateId].state.transitionDuration;
+                if (baseTransitionDuration <= 0f)
+                    baseTransitionDuration = CharacterModel.transitionDuration;
+                baseTransitionDuration *= speed;
+                // Set clip length
+                Playable clipPlayable = BaseLayerMixer.GetInput(baseInputPort);
+                clipPlayable.SetSpeed(speed);
+                baseClipLength = states[playingStateId].GetClipLength(1);
+                // Reset play elapsed
+                basePlayElapsed = 0f;
             }
 
-            float weightUpdate = info.deltaTime / transitionDuration;
+            // Update transition
+            float weightUpdate = info.deltaTime / baseTransitionDuration;
             int inputCount = BaseLayerMixer.GetInputCount();
             for (int i = 0; i < inputCount; ++i)
             {
                 float weight = BaseLayerMixer.GetInputWeight(i);
-                if (i != inputPort)
+                if (i != baseInputPort)
                 {
                     weight -= weightUpdate;
                     if (weight < 0f)
@@ -278,58 +337,160 @@ namespace MultiplayerARPG.GameData.Model.Playables
                 }
                 BaseLayerMixer.SetInputWeight(i, weight);
             }
+
+            // Update playing state
+            basePlayElapsed += info.deltaTime;
+
+            // It will change state to fall in next frame
+            if (jumpState == PlayingJumpState.Playing && basePlayElapsed >= baseClipLength)
+                jumpState = PlayingJumpState.None;
+            #endregion
+
+            #region Update action state
+            if (actionState != PlayingActionState.None)
+                weightUpdate = info.deltaTime / actionTransitionDuration;
+            switch (actionState)
+            {
+                case PlayingActionState.Action:
+                    break;
+                case PlayingActionState.SkillCast:
+                    break;
+                case PlayingActionState.WeaponCharge:
+                    break;
+                case PlayingActionState.Hit:
+                    break;
+                case PlayingActionState.Pickup:
+                    break;
+            }
+            #endregion
         }
 
         public void SetPlayingWeaponTypeId(IWeaponItem weaponItem)
         {
-            playingWeaponTypeId = string.Empty;
+            currentWeaponType = null;
             if (weaponItem != null && weaponTypeIds.Contains(weaponItem.WeaponType.Id))
-                playingWeaponTypeId = weaponItem.WeaponType.Id;
-        }
-
-        public void PlayHit()
-        {
-
+                currentWeaponType = weaponItem.WeaponType;
         }
 
         public void PlayJump()
         {
-            isPlayingJump = true;
+            jumpState = PlayingJumpState.Starting;
+        }
+
+        public void PlayAction(AnimActionType animActionType, int animDataId, int actionAnimIndex, float actionPlaySpeedMultiplier)
+        {
+            actionState = PlayingActionState.Action;
+            this.animActionType = animActionType;
+            this.animDataId = animDataId;
+            this.actionAnimIndex = actionAnimIndex;
+            this.actionPlaySpeedMultiplier = actionPlaySpeedMultiplier;
+            switch (animActionType)
+            {
+                case AnimActionType.AttackRightHand:
+                    break;
+                case AnimActionType.AttackLeftHand:
+                    break;
+                case AnimActionType.SkillRightHand:
+                    break;
+                case AnimActionType.SkillLeftHand:
+                    break;
+                case AnimActionType.ReloadRightHand:
+                    break;
+                case AnimActionType.ReloadLeftHand:
+                    break;
+            }
+        }
+
+        public void PlaySkillCast(int animDataId, float skillCastDuration)
+        {
+            actionState = PlayingActionState.SkillCast;
+            this.animDataId = animDataId;
+            this.skillCastDuration = skillCastDuration;
+        }
+
+        public void PlayWeaponCharge(int animDataId, bool isLeftHand)
+        {
+            actionState = PlayingActionState.WeaponCharge;
+            this.animDataId = animDataId;
+            this.isLeftHand = isLeftHand;
+            WeaponAnimations weaponAnimations;
+            if (CharacterModel.TryGetWeaponAnimations(animDataId, out weaponAnimations))
+            {
+                if (isLeftHand)
+                    PrepareActionLayerMixer(weaponAnimations.leftHandChargeState, 1);
+                else
+                    PrepareActionLayerMixer(weaponAnimations.rightHandChargeState, 1);
+            }
+            else
+            {
+                if (isLeftHand)
+                    PrepareActionLayerMixer(CharacterModel.defaultAnimations.leftHandChargeState, 1);
+                else
+                    PrepareActionLayerMixer(CharacterModel.defaultAnimations.rightHandChargeState, 1);
+            }
+        }
+
+        public void PlayHit()
+        {
+            if (actionState != PlayingActionState.None)
+                return;
+            actionState = PlayingActionState.Hit;
+            WeaponAnimations weaponAnimations;
+            if (currentWeaponType != null && CharacterModel.TryGetWeaponAnimations(currentWeaponType.DataId, out weaponAnimations))
+                PrepareActionLayerMixer(weaponAnimations.hurtState, 1);
+            else
+                PrepareActionLayerMixer(CharacterModel.defaultAnimations.hurtState, 1);
         }
 
         public void PlayPickup()
         {
-
+            if (actionState != PlayingActionState.None)
+                return;
+            actionState = PlayingActionState.Pickup;
+            WeaponAnimations weaponAnimations;
+            if (currentWeaponType != null && CharacterModel.TryGetWeaponAnimations(currentWeaponType.DataId, out weaponAnimations))
+                PrepareActionLayerMixer(weaponAnimations.pickupState, 1);
+            else
+                PrepareActionLayerMixer(CharacterModel.defaultAnimations.pickupState, 1);
         }
 
-        public void PlayAction(AnimActionType animActionType, int dataId, int index, float playSpeedMultiplier)
+        private void PrepareActionLayerMixer(ActionState actionState, float speedRate)
         {
+            // Destroy playing state
+            if (ActionLayerMixer.IsValid())
+                ActionLayerMixer.Destroy();
 
+            ActionLayerMixer = AnimationMixerPlayable.Create(Graph, 1, true);
+            Graph.Connect(ActionLayerMixer, 0, LayerMixer, 1);
+            LayerMixer.SetInputWeight(1, 0);
+
+            AnimationClipPlayable playable = AnimationClipPlayable.Create(Graph, actionState.clip);
+            Graph.Connect(playable, 0, ActionLayerMixer, 0);
+
+            // Set avatar mask
+            AvatarMask avatarMask = actionState.avatarMask;
+            if (avatarMask == null)
+                avatarMask = CharacterModel.actionAvatarMask;
+            LayerMixer.SetLayerMaskFromAvatarMask(1, avatarMask);
+
+            // Set clip info
+            float speed = actionState.animSpeedRate * speedRate;
+            // Set transition duration
+            actionTransitionDuration = actionState.transitionDuration;
+            if (actionTransitionDuration <= 0f)
+                actionTransitionDuration = CharacterModel.transitionDuration;
+            actionTransitionDuration *= speed;
+            // Set clip length
+            Playable clipPlayable = BaseLayerMixer.GetInput(baseInputPort);
+            clipPlayable.SetSpeed(speed);
+            actionClipLength = actionState.clip.length * speed;
+            // Reset play elapsed
+            actionPlayElapsed = 0f;
         }
 
         public void StopAction()
         {
-
-        }
-
-        public void PlaySkillCast(int dataId, float duration)
-        {
-
-        }
-
-        public void StopSkillCast()
-        {
-
-        }
-
-        public void PlayWeaponCharge(int dataId, bool isLeftHand)
-        {
-
-        }
-
-        public void StopWeaponCharge()
-        {
-
+            actionState = PlayingActionState.None;
         }
     }
 }

@@ -37,7 +37,8 @@ namespace MultiplayerARPG.GameData.Model.Playables
 
         internal override void OnSwitchingToAnotherModel()
         {
-            Graph.Destroy();
+            if (Graph.IsValid())
+                Graph.Destroy();
         }
 
         internal override void OnSwitchedToThisModel()
@@ -129,7 +130,8 @@ namespace MultiplayerARPG.GameData.Model.Playables
 
         private void OnDestroy()
         {
-            Graph.Destroy();
+            if (Graph.IsValid())
+                Graph.Destroy();
         }
 
         public bool TryGetWeaponAnimations(int dataId, out WeaponAnimations anims)
@@ -276,7 +278,7 @@ namespace MultiplayerARPG.GameData.Model.Playables
 
         public override void StopSkillCastAnimation()
         {
-            Behaviour.StopSkillCast();
+            Behaviour.StopAction();
         }
         #endregion
 
@@ -300,7 +302,7 @@ namespace MultiplayerARPG.GameData.Model.Playables
 
         public override void StopWeaponChargeAnimation()
         {
-            Behaviour.StopWeaponCharge();
+            Behaviour.StopAction();
         }
         #endregion
 
