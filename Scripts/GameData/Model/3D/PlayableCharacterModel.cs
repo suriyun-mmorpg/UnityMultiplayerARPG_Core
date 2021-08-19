@@ -8,6 +8,10 @@ namespace MultiplayerARPG.GameData.Model.Playables
 {
     public class PlayableCharacterModel : BaseCharacterModel
     {
+        [Header("Relates Components")]
+        [Tooltip("It will find `Animator` component on automatically if this is NULL")]
+        public Animator animator;
+
         [Header("Renderer")]
         [Tooltip("This will be used to apply bone weights when equip an equipments")]
         public SkinnedMeshRenderer skinnedMeshRenderer;
@@ -16,7 +20,7 @@ namespace MultiplayerARPG.GameData.Model.Playables
         [Tooltip("If `avatarMask` in action state settings is `null`, it will use this value")]
         public AvatarMask actionAvatarMask;
         [Tooltip("If `transitionDuration` in state settings is <= 0, it will use this value")]
-        public float transitionDuration;
+        public float transitionDuration = 0.1f;
         public DefaultAnimations defaultAnimations;
         [ArrayElementTitle("weaponType")]
         public WeaponAnimations[] weaponAnimations;
@@ -33,26 +37,40 @@ namespace MultiplayerARPG.GameData.Model.Playables
         protected override void Awake()
         {
             base.Awake();
+            if (animator == null)
+                animator = GetComponentInChildren<Animator>();
             PrepareMissingMovementAnimations();
             Template = new AnimationPlayableBehaviour();
             Template.Setup(this);
+            CreateGraph();
         }
 
-        internal override void OnSwitchingToAnotherModel()
+        protected void CreateGraph()
+        {
+            Graph = PlayableGraph.Create($"{name}.PlayableCharacterModel");
+            Graph.SetTimeUpdateMode(DirectorUpdateMode.GameTime);
+            ScriptPlayable<AnimationPlayableBehaviour> playable = ScriptPlayable<AnimationPlayableBehaviour>.Create(Graph, Template, 1);
+            Behaviour = playable.GetBehaviour();
+            AnimationPlayableOutput output = AnimationPlayableOutput.Create(Graph, "Output", animator);
+            output.SetSourcePlayable(playable);
+            Graph.Play();
+        }
+
+        protected void DestroyGraph()
         {
             if (Graph.IsValid())
                 Graph.Destroy();
         }
 
+        internal override void OnSwitchingToAnotherModel()
+        {
+            DestroyGraph();
+        }
+
         internal override void OnSwitchedToThisModel()
         {
-            Graph = PlayableGraph.Create();
-            Graph.SetTimeUpdateMode(DirectorUpdateMode.GameTime);
-            ScriptPlayable<AnimationPlayableBehaviour> playable = ScriptPlayable<AnimationPlayableBehaviour>.Create(Graph, Template, 1);
-            Behaviour = playable.GetBehaviour();
-            AnimationPlayableOutput output = AnimationPlayableOutput.Create(Graph, "Output", GetComponent<Animator>());
-            output.SetSourcePlayable(playable);
-            Graph.Play();
+            DestroyGraph();
+            CreateGraph();
         }
 
         protected AnimState SetClipFromDefaultStateIfEmpty(AnimState defaultState, AnimState targetState)
@@ -91,17 +109,11 @@ namespace MultiplayerARPG.GameData.Model.Playables
         protected void PrepareMissingMovementAnimations()
         {
             DefaultAnimations tempDefaultAnimations = defaultAnimations;
-            // Move
             tempDefaultAnimations.moveStates = SetStatesFromDefaultStatesIfEmpty(tempDefaultAnimations.moveStates);
-            // Sprint
             tempDefaultAnimations.sprintStates = SetStatesFromDefaultStatesIfEmpty(tempDefaultAnimations.moveStates, tempDefaultAnimations.sprintStates);
-            // Walk
             tempDefaultAnimations.walkStates = SetStatesFromDefaultStatesIfEmpty(tempDefaultAnimations.moveStates, tempDefaultAnimations.walkStates);
-            // Crouch
             tempDefaultAnimations.crouchMoveStates = SetStatesFromDefaultStatesIfEmpty(tempDefaultAnimations.moveStates, tempDefaultAnimations.crouchMoveStates);
-            // Crawl
             tempDefaultAnimations.crawlMoveStates = SetStatesFromDefaultStatesIfEmpty(tempDefaultAnimations.moveStates, tempDefaultAnimations.crawlMoveStates);
-            // Swim
             tempDefaultAnimations.swimMoveStates = SetStatesFromDefaultStatesIfEmpty(tempDefaultAnimations.moveStates, tempDefaultAnimations.swimMoveStates);
             // Apply
             defaultAnimations = tempDefaultAnimations;
@@ -113,17 +125,11 @@ namespace MultiplayerARPG.GameData.Model.Playables
                 for (int i = 0; i < weaponAnimations.Length; ++i)
                 {
                     tempWeaponAnimations = weaponAnimations[i];
-                    // Move
                     tempWeaponAnimations.moveStates = SetStatesFromDefaultStatesIfEmpty(tempDefaultAnimations.moveStates, tempWeaponAnimations.moveStates);
-                    // Sprint
                     tempWeaponAnimations.sprintStates = SetStatesFromDefaultStatesIfEmpty(tempWeaponAnimations.moveStates, tempWeaponAnimations.sprintStates);
-                    // Walk
                     tempWeaponAnimations.walkStates = SetStatesFromDefaultStatesIfEmpty(tempWeaponAnimations.moveStates, tempWeaponAnimations.walkStates);
-                    // Crouch
                     tempWeaponAnimations.crouchMoveStates = SetStatesFromDefaultStatesIfEmpty(tempWeaponAnimations.moveStates, tempWeaponAnimations.crouchMoveStates);
-                    // Crawl
                     tempWeaponAnimations.crawlMoveStates = SetStatesFromDefaultStatesIfEmpty(tempWeaponAnimations.moveStates, tempWeaponAnimations.crawlMoveStates);
-                    // Swim
                     tempWeaponAnimations.swimMoveStates = SetStatesFromDefaultStatesIfEmpty(tempWeaponAnimations.moveStates, tempWeaponAnimations.swimMoveStates);
                     // Apply
                     weaponAnimations[i] = tempWeaponAnimations;

@@ -11,13 +11,15 @@ namespace MultiplayerARPG.GameData.Model.Playables
     /// </summary>
     public class AnimationPlayableBehaviour : PlayableBehaviour
     {
+        public static readonly AnimationClip EmptyClip = new AnimationClip();
+
         private struct BaseStateInfo
         {
             public int inputPort;
             public AnimState state;
             public float GetSpeed(float rate)
             {
-                return state.animSpeedRate * rate;
+                return (state.animSpeedRate > 0 ? state.animSpeedRate : 1) * rate;
             }
 
             public float GetClipLength(float rate)
@@ -98,7 +100,22 @@ namespace MultiplayerARPG.GameData.Model.Playables
         private bool isLeftHand = false;
         private readonly StringBuilder stringBuilder = new StringBuilder();
         private readonly HashSet<string> weaponTypeIds = new HashSet<string>();
-        private readonly Dictionary<string, BaseStateInfo> states = new Dictionary<string, BaseStateInfo>();
+        private readonly Dictionary<string, BaseStateInfo> baseStates = new Dictionary<string, BaseStateInfo>();
+        private int baseLayerInputPortCount = 0;
+        private bool readyToPlay = false;
+
+        public void Setup(PlayableCharacterModel characterModel)
+        {
+            CharacterModel = characterModel;
+            // Setup clips by settings in character model
+            // Default
+            SetupDefaultAnimations(characterModel.defaultAnimations);
+            // Clips based on equipped weapons
+            for (int i = 0; i < characterModel.weaponAnimations.Length; ++i)
+            {
+                SetupWeaponAnimations(characterModel.weaponAnimations[i]);
+            }
+        }
 
         public override void OnPlayableCreate(Playable playable)
         {
@@ -115,20 +132,17 @@ namespace MultiplayerARPG.GameData.Model.Playables
             BaseLayerMixer = AnimationMixerPlayable.Create(Graph, 0, true);
             Graph.Connect(BaseLayerMixer, 0, LayerMixer, 0);
             LayerMixer.SetInputWeight(0, 1);
-        }
 
-        public void Setup(PlayableCharacterModel characterModel)
-        {
-            CharacterModel = characterModel;
-            states.Clear();
-            // Setup clips by settings in character model
-            // Default
-            SetupDefaultAnimations(characterModel.defaultAnimations);
-            // Clips based on equipped weapons
-            for (int i = 0; i < characterModel.weaponAnimations.Length; ++i)
+            // Connect to states
+            BaseLayerMixer.SetInputCount(baseLayerInputPortCount);
+            foreach (BaseStateInfo stateInfo in baseStates.Values)
             {
-                SetupWeaponAnimations(characterModel.weaponAnimations[i]);
+                AnimationClipPlayable clipPlayable = AnimationClipPlayable.Create(Graph, stateInfo.state.clip);
+                clipPlayable.SetApplyFootIK(false);
+                clipPlayable.SetApplyPlayableIK(false);
+                Graph.Connect(clipPlayable, 0, BaseLayerMixer, stateInfo.inputPort);
             }
+            readyToPlay = true;
         }
 
         private void SetupDefaultAnimations(DefaultAnimations defaultAnimations)
@@ -184,13 +198,16 @@ namespace MultiplayerARPG.GameData.Model.Playables
 
         private void SetBaseState(string id, AnimState state)
         {
-            AnimationClipPlayable clipPlayable = AnimationClipPlayable.Create(Graph, state.clip);
-            int inputPort = BaseLayerMixer.GetInputCount();
-            BaseLayerMixer.SetInputCount(inputPort + 1);
-            Graph.Connect(clipPlayable, 0, BaseLayerMixer, inputPort);
-            states[id] = new BaseStateInfo()
+            if (state.clip == null)
             {
-                inputPort = inputPort,
+                if (!id.Equals(CLIP_IDLE))
+                    return;
+                // Idle clip is empty, use `EmptyClip`
+                state.clip = EmptyClip;
+            }
+            baseStates[id] = new BaseStateInfo()
+            {
+                inputPort = baseLayerInputPortCount++,
                 state = state,
             };
         }
@@ -293,23 +310,32 @@ namespace MultiplayerARPG.GameData.Model.Playables
 
         public override void PrepareFrame(Playable playable, FrameData info)
         {
+            if (!readyToPlay)
+                return;
+
             #region Update base state
             string playingStateId = GetPlayingStateId();
             if (!this.playingStateId.Equals(playingStateId))
             {
                 this.playingStateId = playingStateId;
-                baseInputPort = states[playingStateId].inputPort;
+                // State not found, use idle state
+                if (!baseStates.ContainsKey(playingStateId))
+                    playingStateId = stringBuilder.Clear().Append(currentWeaponTypeId).Append(CLIP_IDLE).ToString();
+                // State still not found, use idle state from default animations
+                if (!baseStates.ContainsKey(playingStateId))
+                    playingStateId = CLIP_IDLE;
+                baseInputPort = baseStates[playingStateId].inputPort;
                 // Set clip info 
-                float speed = states[playingStateId].GetSpeed(1);
+                float speed = baseStates[playingStateId].GetSpeed(1);
                 // Set transition duration
-                baseTransitionDuration = states[playingStateId].state.transitionDuration;
+                baseTransitionDuration = baseStates[playingStateId].state.transitionDuration;
                 if (baseTransitionDuration <= 0f)
                     baseTransitionDuration = CharacterModel.transitionDuration;
                 baseTransitionDuration *= speed;
                 // Set clip length
                 Playable clipPlayable = BaseLayerMixer.GetInput(baseInputPort);
                 clipPlayable.SetSpeed(speed);
-                baseClipLength = states[playingStateId].GetClipLength(1);
+                baseClipLength = baseStates[playingStateId].GetClipLength(1);
                 // Reset play elapsed
                 basePlayElapsed = 0f;
             }
@@ -382,7 +408,7 @@ namespace MultiplayerARPG.GameData.Model.Playables
             LayerMixer.SetLayerMaskFromAvatarMask(1, avatarMask);
 
             // Set clip info
-            float speed = actionState.animSpeedRate * speedRate;
+            float speed = (actionState.animSpeedRate > 0 ? actionState.animSpeedRate : 1) * speedRate;
             // Set transition duration
             actionTransitionDuration = actionState.transitionDuration;
             if (actionTransitionDuration <= 0f)
