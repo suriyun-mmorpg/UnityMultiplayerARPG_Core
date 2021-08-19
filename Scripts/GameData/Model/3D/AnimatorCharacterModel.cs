@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using LiteNetLibManager;
 using UnityEngine;
+using Playables = MultiplayerARPG.GameData.Model.Playables;
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
@@ -892,7 +893,7 @@ namespace MultiplayerARPG
         }
 
 #if UNITY_EDITOR
-        [ContextMenu("Set Animator Clips For Test")]
+        [ContextMenu("Set Animator Clips For Test", false, 1000100)]
         public void SetAnimatorClipsForTest()
         {
             SetupComponent();
@@ -937,6 +938,784 @@ namespace MultiplayerARPG
             Logging.Log(ToString(), "Animation Clips already set to animator controller, you can test an animations in Animation tab");
 
             this.InvokeInstanceDevExtMethods("SetAnimatorClipsForTest");
+        }
+
+        private Playables.ActionAnimation ConvertToPlayableActionAnimation(ActionAnimation actionAnimation)
+        {
+            return new Playables.ActionAnimation()
+            {
+                state = new Playables.ActionState()
+                {
+                    clip = actionAnimation.clip,
+                    animSpeedRate = actionAnimation.animSpeedRate,
+                },
+                triggerDurationRates = actionAnimation.multiHitTriggerDurationRates == null || actionAnimation.multiHitTriggerDurationRates.Length == 0 ? new float[] { actionAnimation.triggerDurationRate } : actionAnimation.multiHitTriggerDurationRates,
+                durationType = actionAnimation.durationType,
+                fixedDuration = actionAnimation.fixedDuration,
+                extendDuration = actionAnimation.extendDuration,
+                audioClips = actionAnimation.audioClips,
+            };
+        }
+
+        private Playables.DefaultAnimations ConvertToPlayableDefaultAnimations(
+            DefaultAnimations oldWeaponAnim,
+            List<ActionAnimation> oldLeftHandAttackAnims,
+            List<Playables.ActionAnimation> newLeftHandAttackAnims,
+            List<ActionAnimation> oldRightHandAttackAnims,
+            List<Playables.ActionAnimation> newRightHandAttackAnims)
+        {
+            // Prepare left-hand attack animations
+            oldLeftHandAttackAnims.Clear();
+            oldLeftHandAttackAnims.AddRange(oldWeaponAnim.leftHandAttackAnimations);
+            newLeftHandAttackAnims.Clear();
+            foreach (ActionAnimation oldLeftHandAttackAnim in oldLeftHandAttackAnims)
+            {
+                newLeftHandAttackAnims.Add(ConvertToPlayableActionAnimation(oldLeftHandAttackAnim));
+            }
+            // Prepare right-hand attack animations
+            oldRightHandAttackAnims.Clear();
+            oldRightHandAttackAnims.AddRange(oldWeaponAnim.rightHandAttackAnimations);
+            newRightHandAttackAnims.Clear();
+            foreach (ActionAnimation oldRightHandAttackAnim in oldRightHandAttackAnims)
+            {
+                newRightHandAttackAnims.Add(ConvertToPlayableActionAnimation(oldRightHandAttackAnim));
+            }
+            return new Playables.DefaultAnimations()
+            {
+                idleState = new Playables.AnimState()
+                {
+                    clip = oldWeaponAnim.idleClip,
+                    animSpeedRate = oldWeaponAnim.idleAnimSpeedRate,
+                },
+                crouchIdleState = new Playables.AnimState()
+                {
+                    clip = oldWeaponAnim.crouchIdleClip,
+                    animSpeedRate = oldWeaponAnim.crouchIdleAnimSpeedRate,
+                },
+                crawlIdleState = new Playables.AnimState()
+                {
+                    clip = oldWeaponAnim.crawlIdleClip,
+                    animSpeedRate = oldWeaponAnim.crawlIdleAnimSpeedRate,
+                },
+                swimIdleState = new Playables.AnimState()
+                {
+                    clip = oldWeaponAnim.swimIdleClip,
+                    animSpeedRate = oldWeaponAnim.swimIdleAnimSpeedRate,
+                },
+                jumpState = new Playables.AnimState()
+                {
+                    clip = oldWeaponAnim.jumpClip,
+                    animSpeedRate = oldWeaponAnim.jumpAnimSpeedRate,
+                },
+                fallState = new Playables.AnimState()
+                {
+                    clip = oldWeaponAnim.fallClip,
+                    animSpeedRate = oldWeaponAnim.fallAnimSpeedRate,
+                },
+                landedState = new Playables.AnimState()
+                {
+                    clip = oldWeaponAnim.landedClip,
+                    animSpeedRate = oldWeaponAnim.landedAnimSpeedRate,
+                },
+                hurtState = new Playables.ActionState()
+                {
+                    clip = oldWeaponAnim.hurtClip,
+                    animSpeedRate = oldWeaponAnim.hurtAnimSpeedRate,
+                },
+                deadState = new Playables.AnimState()
+                {
+                    clip = oldWeaponAnim.deadClip,
+                    animSpeedRate = oldWeaponAnim.deadAnimSpeedRate,
+                },
+                pickupState = new Playables.ActionState()
+                {
+                    clip = oldWeaponAnim.pickupClip,
+                    animSpeedRate = oldWeaponAnim.pickupAnimSpeedRate,
+                },
+                rightHandChargeState = new Playables.ActionState()
+                {
+                    clip = oldWeaponAnim.rightHandChargeClip,
+                    animSpeedRate = 1,
+                },
+                leftHandChargeState = new Playables.ActionState()
+                {
+                    clip = oldWeaponAnim.leftHandChargeClip,
+                    animSpeedRate = 1,
+                },
+                rightHandReloadAnimation = ConvertToPlayableActionAnimation(oldWeaponAnim.rightHandReloadAnimation),
+                leftHandReloadAnimation = ConvertToPlayableActionAnimation(oldWeaponAnim.leftHandReloadAnimation),
+                rightHandAttackAnimations = newRightHandAttackAnims.ToArray(),
+                leftHandAttackAnimations = newLeftHandAttackAnims.ToArray(),
+                moveStates = new Playables.MoveStates()
+                {
+                    forwardState = new Playables.AnimState()
+                    {
+                        clip = oldWeaponAnim.moveClip,
+                        animSpeedRate = oldWeaponAnim.moveAnimSpeedRate,
+                    },
+                    backwardState = new Playables.AnimState()
+                    {
+                        clip = oldWeaponAnim.moveBackwardClip,
+                        animSpeedRate = oldWeaponAnim.moveAnimSpeedRate,
+                    },
+                    leftState = new Playables.AnimState()
+                    {
+                        clip = oldWeaponAnim.moveLeftClip,
+                        animSpeedRate = oldWeaponAnim.moveAnimSpeedRate,
+                    },
+                    rightState = new Playables.AnimState()
+                    {
+                        clip = oldWeaponAnim.moveRightClip,
+                        animSpeedRate = oldWeaponAnim.moveAnimSpeedRate,
+                    },
+                    forwardLeftState = new Playables.AnimState()
+                    {
+                        clip = oldWeaponAnim.moveForwardLeftClip,
+                        animSpeedRate = oldWeaponAnim.moveAnimSpeedRate,
+                    },
+                    forwardRightState = new Playables.AnimState()
+                    {
+                        clip = oldWeaponAnim.moveForwardRightClip,
+                        animSpeedRate = oldWeaponAnim.moveAnimSpeedRate,
+                    },
+                    backwardLeftState = new Playables.AnimState()
+                    {
+                        clip = oldWeaponAnim.moveBackwardLeftClip,
+                        animSpeedRate = oldWeaponAnim.moveAnimSpeedRate,
+                    },
+                    backwardRightState = new Playables.AnimState()
+                    {
+                        clip = oldWeaponAnim.moveBackwardRightClip,
+                        animSpeedRate = oldWeaponAnim.moveAnimSpeedRate,
+                    },
+                },
+                sprintStates = new Playables.MoveStates()
+                {
+                    forwardState = new Playables.AnimState()
+                    {
+                        clip = oldWeaponAnim.sprintClip,
+                        animSpeedRate = oldWeaponAnim.sprintAnimSpeedRate,
+                    },
+                    backwardState = new Playables.AnimState()
+                    {
+                        clip = oldWeaponAnim.sprintBackwardClip,
+                        animSpeedRate = oldWeaponAnim.sprintAnimSpeedRate,
+                    },
+                    leftState = new Playables.AnimState()
+                    {
+                        clip = oldWeaponAnim.sprintLeftClip,
+                        animSpeedRate = oldWeaponAnim.sprintAnimSpeedRate,
+                    },
+                    rightState = new Playables.AnimState()
+                    {
+                        clip = oldWeaponAnim.sprintRightClip,
+                        animSpeedRate = oldWeaponAnim.sprintAnimSpeedRate,
+                    },
+                    forwardLeftState = new Playables.AnimState()
+                    {
+                        clip = oldWeaponAnim.sprintForwardLeftClip,
+                        animSpeedRate = oldWeaponAnim.sprintAnimSpeedRate,
+                    },
+                    forwardRightState = new Playables.AnimState()
+                    {
+                        clip = oldWeaponAnim.sprintForwardRightClip,
+                        animSpeedRate = oldWeaponAnim.sprintAnimSpeedRate,
+                    },
+                    backwardLeftState = new Playables.AnimState()
+                    {
+                        clip = oldWeaponAnim.sprintBackwardLeftClip,
+                        animSpeedRate = oldWeaponAnim.sprintAnimSpeedRate,
+                    },
+                    backwardRightState = new Playables.AnimState()
+                    {
+                        clip = oldWeaponAnim.sprintBackwardRightClip,
+                        animSpeedRate = oldWeaponAnim.sprintAnimSpeedRate,
+                    },
+                },
+                walkStates = new Playables.MoveStates()
+                {
+                    forwardState = new Playables.AnimState()
+                    {
+                        clip = oldWeaponAnim.walkClip,
+                        animSpeedRate = oldWeaponAnim.walkAnimSpeedRate,
+                    },
+                    backwardState = new Playables.AnimState()
+                    {
+                        clip = oldWeaponAnim.walkBackwardClip,
+                        animSpeedRate = oldWeaponAnim.walkAnimSpeedRate,
+                    },
+                    leftState = new Playables.AnimState()
+                    {
+                        clip = oldWeaponAnim.walkLeftClip,
+                        animSpeedRate = oldWeaponAnim.walkAnimSpeedRate,
+                    },
+                    rightState = new Playables.AnimState()
+                    {
+                        clip = oldWeaponAnim.walkRightClip,
+                        animSpeedRate = oldWeaponAnim.walkAnimSpeedRate,
+                    },
+                    forwardLeftState = new Playables.AnimState()
+                    {
+                        clip = oldWeaponAnim.walkForwardLeftClip,
+                        animSpeedRate = oldWeaponAnim.walkAnimSpeedRate,
+                    },
+                    forwardRightState = new Playables.AnimState()
+                    {
+                        clip = oldWeaponAnim.walkForwardRightClip,
+                        animSpeedRate = oldWeaponAnim.walkAnimSpeedRate,
+                    },
+                    backwardLeftState = new Playables.AnimState()
+                    {
+                        clip = oldWeaponAnim.walkBackwardLeftClip,
+                        animSpeedRate = oldWeaponAnim.walkAnimSpeedRate,
+                    },
+                    backwardRightState = new Playables.AnimState()
+                    {
+                        clip = oldWeaponAnim.walkBackwardRightClip,
+                        animSpeedRate = oldWeaponAnim.walkAnimSpeedRate,
+                    },
+                },
+                crouchMoveStates = new Playables.MoveStates()
+                {
+                    forwardState = new Playables.AnimState()
+                    {
+                        clip = oldWeaponAnim.crouchMoveClip,
+                        animSpeedRate = oldWeaponAnim.crouchMoveAnimSpeedRate,
+                    },
+                    backwardState = new Playables.AnimState()
+                    {
+                        clip = oldWeaponAnim.crouchMoveBackwardClip,
+                        animSpeedRate = oldWeaponAnim.crouchMoveAnimSpeedRate,
+                    },
+                    leftState = new Playables.AnimState()
+                    {
+                        clip = oldWeaponAnim.crouchMoveLeftClip,
+                        animSpeedRate = oldWeaponAnim.crouchMoveAnimSpeedRate,
+                    },
+                    rightState = new Playables.AnimState()
+                    {
+                        clip = oldWeaponAnim.crouchMoveRightClip,
+                        animSpeedRate = oldWeaponAnim.crouchMoveAnimSpeedRate,
+                    },
+                    forwardLeftState = new Playables.AnimState()
+                    {
+                        clip = oldWeaponAnim.crouchMoveForwardLeftClip,
+                        animSpeedRate = oldWeaponAnim.crouchMoveAnimSpeedRate,
+                    },
+                    forwardRightState = new Playables.AnimState()
+                    {
+                        clip = oldWeaponAnim.crouchMoveForwardRightClip,
+                        animSpeedRate = oldWeaponAnim.crouchMoveAnimSpeedRate,
+                    },
+                    backwardLeftState = new Playables.AnimState()
+                    {
+                        clip = oldWeaponAnim.crouchMoveBackwardLeftClip,
+                        animSpeedRate = oldWeaponAnim.crouchMoveAnimSpeedRate,
+                    },
+                    backwardRightState = new Playables.AnimState()
+                    {
+                        clip = oldWeaponAnim.crouchMoveBackwardRightClip,
+                        animSpeedRate = oldWeaponAnim.crouchMoveAnimSpeedRate,
+                    },
+                },
+                crawlMoveStates = new Playables.MoveStates()
+                {
+                    forwardState = new Playables.AnimState()
+                    {
+                        clip = oldWeaponAnim.crawlMoveClip,
+                        animSpeedRate = oldWeaponAnim.crawlMoveAnimSpeedRate,
+                    },
+                    backwardState = new Playables.AnimState()
+                    {
+                        clip = oldWeaponAnim.crawlMoveBackwardClip,
+                        animSpeedRate = oldWeaponAnim.crawlMoveAnimSpeedRate,
+                    },
+                    leftState = new Playables.AnimState()
+                    {
+                        clip = oldWeaponAnim.crawlMoveLeftClip,
+                        animSpeedRate = oldWeaponAnim.crawlMoveAnimSpeedRate,
+                    },
+                    rightState = new Playables.AnimState()
+                    {
+                        clip = oldWeaponAnim.crawlMoveRightClip,
+                        animSpeedRate = oldWeaponAnim.crawlMoveAnimSpeedRate,
+                    },
+                    forwardLeftState = new Playables.AnimState()
+                    {
+                        clip = oldWeaponAnim.crawlMoveForwardLeftClip,
+                        animSpeedRate = oldWeaponAnim.crawlMoveAnimSpeedRate,
+                    },
+                    forwardRightState = new Playables.AnimState()
+                    {
+                        clip = oldWeaponAnim.crawlMoveForwardRightClip,
+                        animSpeedRate = oldWeaponAnim.crawlMoveAnimSpeedRate,
+                    },
+                    backwardLeftState = new Playables.AnimState()
+                    {
+                        clip = oldWeaponAnim.crawlMoveBackwardLeftClip,
+                        animSpeedRate = oldWeaponAnim.crawlMoveAnimSpeedRate,
+                    },
+                    backwardRightState = new Playables.AnimState()
+                    {
+                        clip = oldWeaponAnim.crawlMoveBackwardRightClip,
+                        animSpeedRate = oldWeaponAnim.crawlMoveAnimSpeedRate,
+                    },
+                },
+                swimMoveStates = new Playables.MoveStates()
+                {
+                    forwardState = new Playables.AnimState()
+                    {
+                        clip = oldWeaponAnim.swimMoveClip,
+                        animSpeedRate = oldWeaponAnim.swimMoveAnimSpeedRate,
+                    },
+                    backwardState = new Playables.AnimState()
+                    {
+                        clip = oldWeaponAnim.swimMoveBackwardClip,
+                        animSpeedRate = oldWeaponAnim.swimMoveAnimSpeedRate,
+                    },
+                    leftState = new Playables.AnimState()
+                    {
+                        clip = oldWeaponAnim.swimMoveLeftClip,
+                        animSpeedRate = oldWeaponAnim.swimMoveAnimSpeedRate,
+                    },
+                    rightState = new Playables.AnimState()
+                    {
+                        clip = oldWeaponAnim.swimMoveRightClip,
+                        animSpeedRate = oldWeaponAnim.swimMoveAnimSpeedRate,
+                    },
+                    forwardLeftState = new Playables.AnimState()
+                    {
+                        clip = oldWeaponAnim.swimMoveForwardLeftClip,
+                        animSpeedRate = oldWeaponAnim.swimMoveAnimSpeedRate,
+                    },
+                    forwardRightState = new Playables.AnimState()
+                    {
+                        clip = oldWeaponAnim.swimMoveForwardRightClip,
+                        animSpeedRate = oldWeaponAnim.swimMoveAnimSpeedRate,
+                    },
+                    backwardLeftState = new Playables.AnimState()
+                    {
+                        clip = oldWeaponAnim.swimMoveBackwardLeftClip,
+                        animSpeedRate = oldWeaponAnim.swimMoveAnimSpeedRate,
+                    },
+                    backwardRightState = new Playables.AnimState()
+                    {
+                        clip = oldWeaponAnim.swimMoveBackwardRightClip,
+                        animSpeedRate = oldWeaponAnim.swimMoveAnimSpeedRate,
+                    },
+                }
+            };
+        }
+
+        private Playables.WeaponAnimations ConvertToPlayableWeaponAnimations(
+            WeaponAnimations oldWeaponAnim,
+            List<ActionAnimation> oldLeftHandAttackAnims,
+            List<Playables.ActionAnimation> newLeftHandAttackAnims,
+            List<ActionAnimation> oldRightHandAttackAnims,
+            List<Playables.ActionAnimation> newRightHandAttackAnims)
+        {
+            // Prepare left-hand attack animations
+            oldLeftHandAttackAnims.Clear();
+            oldLeftHandAttackAnims.AddRange(oldWeaponAnim.leftHandAttackAnimations);
+            newLeftHandAttackAnims.Clear();
+            foreach (ActionAnimation oldLeftHandAttackAnim in oldLeftHandAttackAnims)
+            {
+                newLeftHandAttackAnims.Add(ConvertToPlayableActionAnimation(oldLeftHandAttackAnim));
+            }
+            // Prepare right-hand attack animations
+            oldRightHandAttackAnims.Clear();
+            oldRightHandAttackAnims.AddRange(oldWeaponAnim.rightHandAttackAnimations);
+            newRightHandAttackAnims.Clear();
+            foreach (ActionAnimation oldRightHandAttackAnim in oldRightHandAttackAnims)
+            {
+                newRightHandAttackAnims.Add(ConvertToPlayableActionAnimation(oldRightHandAttackAnim));
+            }
+            return new Playables.WeaponAnimations()
+            {
+                weaponType = oldWeaponAnim.weaponType,
+                idleState = new Playables.AnimState()
+                {
+                    clip = oldWeaponAnim.idleClip,
+                    animSpeedRate = oldWeaponAnim.idleAnimSpeedRate,
+                },
+                crouchIdleState = new Playables.AnimState()
+                {
+                    clip = oldWeaponAnim.crouchIdleClip,
+                    animSpeedRate = oldWeaponAnim.crouchIdleAnimSpeedRate,
+                },
+                crawlIdleState = new Playables.AnimState()
+                {
+                    clip = oldWeaponAnim.crawlIdleClip,
+                    animSpeedRate = oldWeaponAnim.crawlIdleAnimSpeedRate,
+                },
+                swimIdleState = new Playables.AnimState()
+                {
+                    clip = oldWeaponAnim.swimIdleClip,
+                    animSpeedRate = oldWeaponAnim.swimIdleAnimSpeedRate,
+                },
+                jumpState = new Playables.AnimState()
+                {
+                    clip = oldWeaponAnim.jumpClip,
+                    animSpeedRate = oldWeaponAnim.jumpAnimSpeedRate,
+                },
+                fallState = new Playables.AnimState()
+                {
+                    clip = oldWeaponAnim.fallClip,
+                    animSpeedRate = oldWeaponAnim.fallAnimSpeedRate,
+                },
+                landedState = new Playables.AnimState()
+                {
+                    clip = oldWeaponAnim.landedClip,
+                    animSpeedRate = oldWeaponAnim.landedAnimSpeedRate,
+                },
+                hurtState = new Playables.ActionState()
+                {
+                    clip = oldWeaponAnim.hurtClip,
+                    animSpeedRate = oldWeaponAnim.hurtAnimSpeedRate,
+                },
+                deadState = new Playables.AnimState()
+                {
+                    clip = oldWeaponAnim.deadClip,
+                    animSpeedRate = oldWeaponAnim.deadAnimSpeedRate,
+                },
+                pickupState = new Playables.ActionState()
+                {
+                    clip = oldWeaponAnim.pickupClip,
+                    animSpeedRate = oldWeaponAnim.pickupAnimSpeedRate,
+                },
+                rightHandChargeState = new Playables.ActionState()
+                {
+                    clip = oldWeaponAnim.rightHandChargeClip,
+                    animSpeedRate = 1,
+                },
+                leftHandChargeState = new Playables.ActionState()
+                {
+                    clip = oldWeaponAnim.leftHandChargeClip,
+                    animSpeedRate = 1,
+                },
+                rightHandReloadAnimation = ConvertToPlayableActionAnimation(oldWeaponAnim.rightHandReloadAnimation),
+                leftHandReloadAnimation = ConvertToPlayableActionAnimation(oldWeaponAnim.leftHandReloadAnimation),
+                rightHandAttackAnimations = newRightHandAttackAnims.ToArray(),
+                leftHandAttackAnimations = newLeftHandAttackAnims.ToArray(),
+                moveStates = new Playables.MoveStates()
+                {
+                    forwardState = new Playables.AnimState()
+                    {
+                        clip = oldWeaponAnim.moveClip,
+                        animSpeedRate = oldWeaponAnim.moveAnimSpeedRate,
+                    },
+                    backwardState = new Playables.AnimState()
+                    {
+                        clip = oldWeaponAnim.moveBackwardClip,
+                        animSpeedRate = oldWeaponAnim.moveAnimSpeedRate,
+                    },
+                    leftState = new Playables.AnimState()
+                    {
+                        clip = oldWeaponAnim.moveLeftClip,
+                        animSpeedRate = oldWeaponAnim.moveAnimSpeedRate,
+                    },
+                    rightState = new Playables.AnimState()
+                    {
+                        clip = oldWeaponAnim.moveRightClip,
+                        animSpeedRate = oldWeaponAnim.moveAnimSpeedRate,
+                    },
+                    forwardLeftState = new Playables.AnimState()
+                    {
+                        clip = oldWeaponAnim.moveForwardLeftClip,
+                        animSpeedRate = oldWeaponAnim.moveAnimSpeedRate,
+                    },
+                    forwardRightState = new Playables.AnimState()
+                    {
+                        clip = oldWeaponAnim.moveForwardRightClip,
+                        animSpeedRate = oldWeaponAnim.moveAnimSpeedRate,
+                    },
+                    backwardLeftState = new Playables.AnimState()
+                    {
+                        clip = oldWeaponAnim.moveBackwardLeftClip,
+                        animSpeedRate = oldWeaponAnim.moveAnimSpeedRate,
+                    },
+                    backwardRightState = new Playables.AnimState()
+                    {
+                        clip = oldWeaponAnim.moveBackwardRightClip,
+                        animSpeedRate = oldWeaponAnim.moveAnimSpeedRate,
+                    },
+                },
+                sprintStates = new Playables.MoveStates()
+                {
+                    forwardState = new Playables.AnimState()
+                    {
+                        clip = oldWeaponAnim.sprintClip,
+                        animSpeedRate = oldWeaponAnim.sprintAnimSpeedRate,
+                    },
+                    backwardState = new Playables.AnimState()
+                    {
+                        clip = oldWeaponAnim.sprintBackwardClip,
+                        animSpeedRate = oldWeaponAnim.sprintAnimSpeedRate,
+                    },
+                    leftState = new Playables.AnimState()
+                    {
+                        clip = oldWeaponAnim.sprintLeftClip,
+                        animSpeedRate = oldWeaponAnim.sprintAnimSpeedRate,
+                    },
+                    rightState = new Playables.AnimState()
+                    {
+                        clip = oldWeaponAnim.sprintRightClip,
+                        animSpeedRate = oldWeaponAnim.sprintAnimSpeedRate,
+                    },
+                    forwardLeftState = new Playables.AnimState()
+                    {
+                        clip = oldWeaponAnim.sprintForwardLeftClip,
+                        animSpeedRate = oldWeaponAnim.sprintAnimSpeedRate,
+                    },
+                    forwardRightState = new Playables.AnimState()
+                    {
+                        clip = oldWeaponAnim.sprintForwardRightClip,
+                        animSpeedRate = oldWeaponAnim.sprintAnimSpeedRate,
+                    },
+                    backwardLeftState = new Playables.AnimState()
+                    {
+                        clip = oldWeaponAnim.sprintBackwardLeftClip,
+                        animSpeedRate = oldWeaponAnim.sprintAnimSpeedRate,
+                    },
+                    backwardRightState = new Playables.AnimState()
+                    {
+                        clip = oldWeaponAnim.sprintBackwardRightClip,
+                        animSpeedRate = oldWeaponAnim.sprintAnimSpeedRate,
+                    },
+                },
+                walkStates = new Playables.MoveStates()
+                {
+                    forwardState = new Playables.AnimState()
+                    {
+                        clip = oldWeaponAnim.walkClip,
+                        animSpeedRate = oldWeaponAnim.walkAnimSpeedRate,
+                    },
+                    backwardState = new Playables.AnimState()
+                    {
+                        clip = oldWeaponAnim.walkBackwardClip,
+                        animSpeedRate = oldWeaponAnim.walkAnimSpeedRate,
+                    },
+                    leftState = new Playables.AnimState()
+                    {
+                        clip = oldWeaponAnim.walkLeftClip,
+                        animSpeedRate = oldWeaponAnim.walkAnimSpeedRate,
+                    },
+                    rightState = new Playables.AnimState()
+                    {
+                        clip = oldWeaponAnim.walkRightClip,
+                        animSpeedRate = oldWeaponAnim.walkAnimSpeedRate,
+                    },
+                    forwardLeftState = new Playables.AnimState()
+                    {
+                        clip = oldWeaponAnim.walkForwardLeftClip,
+                        animSpeedRate = oldWeaponAnim.walkAnimSpeedRate,
+                    },
+                    forwardRightState = new Playables.AnimState()
+                    {
+                        clip = oldWeaponAnim.walkForwardRightClip,
+                        animSpeedRate = oldWeaponAnim.walkAnimSpeedRate,
+                    },
+                    backwardLeftState = new Playables.AnimState()
+                    {
+                        clip = oldWeaponAnim.walkBackwardLeftClip,
+                        animSpeedRate = oldWeaponAnim.walkAnimSpeedRate,
+                    },
+                    backwardRightState = new Playables.AnimState()
+                    {
+                        clip = oldWeaponAnim.walkBackwardRightClip,
+                        animSpeedRate = oldWeaponAnim.walkAnimSpeedRate,
+                    },
+                },
+                crouchMoveStates = new Playables.MoveStates()
+                {
+                    forwardState = new Playables.AnimState()
+                    {
+                        clip = oldWeaponAnim.crouchMoveClip,
+                        animSpeedRate = oldWeaponAnim.crouchMoveAnimSpeedRate,
+                    },
+                    backwardState = new Playables.AnimState()
+                    {
+                        clip = oldWeaponAnim.crouchMoveBackwardClip,
+                        animSpeedRate = oldWeaponAnim.crouchMoveAnimSpeedRate,
+                    },
+                    leftState = new Playables.AnimState()
+                    {
+                        clip = oldWeaponAnim.crouchMoveLeftClip,
+                        animSpeedRate = oldWeaponAnim.crouchMoveAnimSpeedRate,
+                    },
+                    rightState = new Playables.AnimState()
+                    {
+                        clip = oldWeaponAnim.crouchMoveRightClip,
+                        animSpeedRate = oldWeaponAnim.crouchMoveAnimSpeedRate,
+                    },
+                    forwardLeftState = new Playables.AnimState()
+                    {
+                        clip = oldWeaponAnim.crouchMoveForwardLeftClip,
+                        animSpeedRate = oldWeaponAnim.crouchMoveAnimSpeedRate,
+                    },
+                    forwardRightState = new Playables.AnimState()
+                    {
+                        clip = oldWeaponAnim.crouchMoveForwardRightClip,
+                        animSpeedRate = oldWeaponAnim.crouchMoveAnimSpeedRate,
+                    },
+                    backwardLeftState = new Playables.AnimState()
+                    {
+                        clip = oldWeaponAnim.crouchMoveBackwardLeftClip,
+                        animSpeedRate = oldWeaponAnim.crouchMoveAnimSpeedRate,
+                    },
+                    backwardRightState = new Playables.AnimState()
+                    {
+                        clip = oldWeaponAnim.crouchMoveBackwardRightClip,
+                        animSpeedRate = oldWeaponAnim.crouchMoveAnimSpeedRate,
+                    },
+                },
+                crawlMoveStates = new Playables.MoveStates()
+                {
+                    forwardState = new Playables.AnimState()
+                    {
+                        clip = oldWeaponAnim.crawlMoveClip,
+                        animSpeedRate = oldWeaponAnim.crawlMoveAnimSpeedRate,
+                    },
+                    backwardState = new Playables.AnimState()
+                    {
+                        clip = oldWeaponAnim.crawlMoveBackwardClip,
+                        animSpeedRate = oldWeaponAnim.crawlMoveAnimSpeedRate,
+                    },
+                    leftState = new Playables.AnimState()
+                    {
+                        clip = oldWeaponAnim.crawlMoveLeftClip,
+                        animSpeedRate = oldWeaponAnim.crawlMoveAnimSpeedRate,
+                    },
+                    rightState = new Playables.AnimState()
+                    {
+                        clip = oldWeaponAnim.crawlMoveRightClip,
+                        animSpeedRate = oldWeaponAnim.crawlMoveAnimSpeedRate,
+                    },
+                    forwardLeftState = new Playables.AnimState()
+                    {
+                        clip = oldWeaponAnim.crawlMoveForwardLeftClip,
+                        animSpeedRate = oldWeaponAnim.crawlMoveAnimSpeedRate,
+                    },
+                    forwardRightState = new Playables.AnimState()
+                    {
+                        clip = oldWeaponAnim.crawlMoveForwardRightClip,
+                        animSpeedRate = oldWeaponAnim.crawlMoveAnimSpeedRate,
+                    },
+                    backwardLeftState = new Playables.AnimState()
+                    {
+                        clip = oldWeaponAnim.crawlMoveBackwardLeftClip,
+                        animSpeedRate = oldWeaponAnim.crawlMoveAnimSpeedRate,
+                    },
+                    backwardRightState = new Playables.AnimState()
+                    {
+                        clip = oldWeaponAnim.crawlMoveBackwardRightClip,
+                        animSpeedRate = oldWeaponAnim.crawlMoveAnimSpeedRate,
+                    },
+                },
+                swimMoveStates = new Playables.MoveStates()
+                {
+                    forwardState = new Playables.AnimState()
+                    {
+                        clip = oldWeaponAnim.swimMoveClip,
+                        animSpeedRate = oldWeaponAnim.swimMoveAnimSpeedRate,
+                    },
+                    backwardState = new Playables.AnimState()
+                    {
+                        clip = oldWeaponAnim.swimMoveBackwardClip,
+                        animSpeedRate = oldWeaponAnim.swimMoveAnimSpeedRate,
+                    },
+                    leftState = new Playables.AnimState()
+                    {
+                        clip = oldWeaponAnim.swimMoveLeftClip,
+                        animSpeedRate = oldWeaponAnim.swimMoveAnimSpeedRate,
+                    },
+                    rightState = new Playables.AnimState()
+                    {
+                        clip = oldWeaponAnim.swimMoveRightClip,
+                        animSpeedRate = oldWeaponAnim.swimMoveAnimSpeedRate,
+                    },
+                    forwardLeftState = new Playables.AnimState()
+                    {
+                        clip = oldWeaponAnim.swimMoveForwardLeftClip,
+                        animSpeedRate = oldWeaponAnim.swimMoveAnimSpeedRate,
+                    },
+                    forwardRightState = new Playables.AnimState()
+                    {
+                        clip = oldWeaponAnim.swimMoveForwardRightClip,
+                        animSpeedRate = oldWeaponAnim.swimMoveAnimSpeedRate,
+                    },
+                    backwardLeftState = new Playables.AnimState()
+                    {
+                        clip = oldWeaponAnim.swimMoveBackwardLeftClip,
+                        animSpeedRate = oldWeaponAnim.swimMoveAnimSpeedRate,
+                    },
+                    backwardRightState = new Playables.AnimState()
+                    {
+                        clip = oldWeaponAnim.swimMoveBackwardRightClip,
+                        animSpeedRate = oldWeaponAnim.swimMoveAnimSpeedRate,
+                    },
+                }
+            };
+        }
+
+        private Playables.SkillAnimations ConvertToPlayableSkillAnimations(SkillAnimations oldSkillAnim)
+        {
+            return new Playables.SkillAnimations()
+            {
+                skill = oldSkillAnim.skill,
+                castState = new Playables.ActionState()
+                {
+                    clip = oldSkillAnim.castClip,
+                    animSpeedRate = 1,
+                },
+                activateAnimationType = oldSkillAnim.activateAnimationType,
+                activateAnimation = ConvertToPlayableActionAnimation(oldSkillAnim.activateAnimation),
+            };
+        }
+
+        [ContextMenu("Convert To Playable Character Model", false, 1000500)]
+        public void ConvertToPlayableCharacterModel()
+        {
+            Playables.PlayableCharacterModel model = gameObject.GetOrAddComponent<Playables.PlayableCharacterModel>();
+            model.skinnedMeshRenderer = skinnedMeshRenderer;
+
+            // Prepare reusable lists
+            List<ActionAnimation> oldLeftHandAttackAnims = new List<ActionAnimation>();
+            List<Playables.ActionAnimation> newLeftHandAttackAnims = new List<Playables.ActionAnimation>();
+            List<ActionAnimation> oldRightHandAttackAnims = new List<ActionAnimation>();
+            List<Playables.ActionAnimation> newRightHandAttackAnims = new List<Playables.ActionAnimation>();
+
+            // Convert weapon animations
+            List<WeaponAnimations> oldWeaponAnims = new List<WeaponAnimations>(weaponAnimations);
+            List<Playables.WeaponAnimations> newWeaponAnims = new List<Playables.WeaponAnimations>();
+            foreach (WeaponAnimations oldWeaponAnim in oldWeaponAnims)
+            {
+                newWeaponAnims.Add(ConvertToPlayableWeaponAnimations(oldWeaponAnim, oldLeftHandAttackAnims, newLeftHandAttackAnims, oldRightHandAttackAnims, newRightHandAttackAnims));
+            }
+            model.weaponAnimations = newWeaponAnims.ToArray();
+
+            // Convert skill animations
+            List<SkillAnimations> oldSkillAnims = new List<SkillAnimations>(skillAnimations);
+            List<Playables.SkillAnimations> newSkillAnims = new List<Playables.SkillAnimations>();
+            foreach (SkillAnimations oldSkillAnim in oldSkillAnims)
+            {
+                newSkillAnims.Add(ConvertToPlayableSkillAnimations(oldSkillAnim));
+            }
+            model.skillAnimations = newSkillAnims.ToArray();
+
+            // Convert default animations
+            model.defaultAnimations = ConvertToPlayableDefaultAnimations(defaultAnimations, oldLeftHandAttackAnims, newLeftHandAttackAnims, oldRightHandAttackAnims, newRightHandAttackAnims);
+
+            // Set objects and containers
+            model.HiddingObjects = hiddingObjects;
+            model.HiddingRenderers = hiddingRenderers;
+            model.FpsHiddingObjects = fpsHiddingObjects;
+            model.FpsHiddingRenderers = fpsHiddingRenderers;
+            model.EffectContainers = effectContainers;
+            model.EquipmentContainers = equipmentContainers;
+            EditorUtility.SetDirty(model);
+
+            EditorUtility.DisplayDialog("Character Model Conversion", "New Character Model component has been added.\n\nThe old component doesn't removed yet to let you check values.\n\nThen, you have to remove the old one.", "OK");
         }
 #endif
     }
