@@ -80,8 +80,9 @@ namespace MultiplayerARPG.GameData.Model.Playables
             return targetState;
         }
 
-        protected MoveStates SetStatesFromDefaultStatesIfEmpty(MoveStates targetStates)
+        protected MoveStates SetStatesFromDefaultStatesIfEmpty(MoveStates targetStates, AnimState idleState)
         {
+            targetStates.forwardState = SetClipFromDefaultStateIfEmpty(idleState, targetStates.forwardState);
             targetStates.forwardLeftState = SetClipFromDefaultStateIfEmpty(targetStates.forwardState, targetStates.forwardLeftState);
             targetStates.forwardRightState = SetClipFromDefaultStateIfEmpty(targetStates.forwardState, targetStates.forwardRightState);
             targetStates.leftState = SetClipFromDefaultStateIfEmpty(targetStates.forwardState, targetStates.leftState);
@@ -109,7 +110,7 @@ namespace MultiplayerARPG.GameData.Model.Playables
         protected void PrepareMissingMovementAnimations()
         {
             DefaultAnimations tempDefaultAnimations = defaultAnimations;
-            tempDefaultAnimations.moveStates = SetStatesFromDefaultStatesIfEmpty(tempDefaultAnimations.moveStates);
+            tempDefaultAnimations.moveStates = SetStatesFromDefaultStatesIfEmpty(tempDefaultAnimations.moveStates, defaultAnimations.idleState);
             tempDefaultAnimations.sprintStates = SetStatesFromDefaultStatesIfEmpty(tempDefaultAnimations.moveStates, tempDefaultAnimations.sprintStates);
             tempDefaultAnimations.walkStates = SetStatesFromDefaultStatesIfEmpty(tempDefaultAnimations.moveStates, tempDefaultAnimations.walkStates);
             tempDefaultAnimations.crouchMoveStates = SetStatesFromDefaultStatesIfEmpty(tempDefaultAnimations.moveStates, tempDefaultAnimations.crouchMoveStates);
