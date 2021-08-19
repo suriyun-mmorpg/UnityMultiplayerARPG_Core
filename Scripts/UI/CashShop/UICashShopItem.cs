@@ -72,12 +72,18 @@ namespace MultiplayerARPG
             int amount;
             if (int.TryParse(result, out amount))
             {
+                inputAmount.onValueChanged.RemoveAllListeners();
+                if (amount < 1)
+                    inputAmount.text = "1";
+                if (amount > 99)
+                    inputAmount.text = "99";
 
                 if (uiTextSellPriceCash != null)
                 {
                     uiTextSellPriceCash.text = string.Format(
                         LanguageManager.GetText(formatKeySellPriceCash),
                         Data == null ? "0" : (Data.sellPriceCash * BuyAmount).ToString("N0"));
+                    uiTextSellPriceCash.SetGameObjectActive(Data.sellPriceCash > 0);
                 }
 
                 if (uiTextSellPriceGold != null)
@@ -85,13 +91,9 @@ namespace MultiplayerARPG
                     uiTextSellPriceGold.text = string.Format(
                         LanguageManager.GetText(formatKeySellPriceGold),
                         Data == null ? "0" : (Data.sellPriceGold * BuyAmount).ToString("N0"));
+                    uiTextSellPriceGold.SetGameObjectActive(Data.sellPriceGold > 0);
                 }
 
-                inputAmount.onValueChanged.RemoveAllListeners();
-                if (amount < 1)
-                    inputAmount.text = "1";
-                if (amount > 99)
-                    inputAmount.text = "99";
                 inputAmount.onValueChanged.AddListener(ValidateAmount);
             }
         }
