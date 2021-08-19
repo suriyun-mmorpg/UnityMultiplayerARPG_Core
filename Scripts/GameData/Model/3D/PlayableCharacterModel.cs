@@ -27,6 +27,9 @@ namespace MultiplayerARPG.GameData.Model.Playables
         public AnimationPlayableBehaviour Template { get; protected set; }
         public AnimationPlayableBehaviour Behaviour { get; protected set; }
 
+        protected WeaponType equippedWeaponType = null;
+        protected Coroutine actionCoroutine = null;
+
         protected override void Awake()
         {
             base.Awake();
@@ -144,12 +147,42 @@ namespace MultiplayerARPG.GameData.Model.Playables
             return CacheAnimationsManager.SetAndTryGetCacheSkillAnimations(Id, weaponAnimations, skillAnimations, dataId, out anims);
         }
 
+        public ActionAnimation GetActionAnimation(AnimActionType animActionType, int dataId, int index)
+        {
+            ActionAnimation tempActionAnimation = default;
+            switch (animActionType)
+            {
+                case AnimActionType.AttackRightHand:
+                    tempActionAnimation = GetRightHandAttackAnimations(dataId)[index];
+                    break;
+                case AnimActionType.AttackLeftHand:
+                    tempActionAnimation = GetLeftHandAttackAnimations(dataId)[index];
+                    break;
+                case AnimActionType.SkillRightHand:
+                case AnimActionType.SkillLeftHand:
+                    tempActionAnimation = GetSkillActivateAnimation(dataId);
+                    break;
+                case AnimActionType.ReloadRightHand:
+                    tempActionAnimation = GetRightHandReloadAnimation(dataId);
+                    break;
+                case AnimActionType.ReloadLeftHand:
+                    tempActionAnimation = GetLeftHandReloadAnimation(dataId);
+                    break;
+            }
+            return tempActionAnimation;
+        }
+
         public override void SetEquipWeapons(EquipWeapons equipWeapons)
         {
             base.SetEquipWeapons(equipWeapons);
+            // Get one equipped weapon from right-hand or left-hand
             IWeaponItem weaponItem = equipWeapons.GetRightHandWeaponItem();
             if (weaponItem == null)
                 weaponItem = equipWeapons.GetLeftHandWeaponItem();
+            // Set equipped weapon type, it will be used to get animations by id
+            equippedWeaponType = null;
+            if (weaponItem != null)
+                equippedWeaponType = weaponItem.WeaponType;
             Behaviour.SetPlayingWeaponTypeId(weaponItem);
         }
 
@@ -254,6 +287,14 @@ namespace MultiplayerARPG.GameData.Model.Playables
             return defaultAnimations.skillActivateAnimation;
         }
 
+        public ActionState GetSkillCastState(int dataId)
+        {
+            SkillAnimations anims;
+            if (TryGetSkillAnimations(dataId, out anims) && anims.castState.clip != null)
+                return anims.castState;
+            return defaultAnimations.skillCastState;
+        }
+
         public override bool GetSkillActivateAnimation(int dataId, out float animSpeedRate, out float[] triggerDurations, out float totalDuration)
         {
             ActionAnimation tempActionAnimation = GetSkillActivateAnimation(dataId);
@@ -273,7 +314,20 @@ namespace MultiplayerARPG.GameData.Model.Playables
 
         public override void PlaySkillCastClip(int dataId, float duration)
         {
-            Behaviour.PlaySkillCast(dataId, duration);
+            StartedActionCoroutine(StartCoroutine(PlaySkillCastClip_Animator(dataId, duration)));
+        }
+
+        private IEnumerator PlaySkillCastClip_Animator(int dataId, float duration)
+        {
+            ActionState castState = GetSkillCastState(dataId);
+            bool hasClip = castState.clip != null;
+            if (hasClip)
+                Behaviour.PlayAction(castState, 1f);
+            // Waits by skill cast duration
+            yield return new WaitForSecondsRealtime(duration);
+            // Stop casting skill animation
+            if (hasClip)
+                Behaviour.StopAction();
         }
 
         public override void StopSkillCastAnimation()
@@ -285,7 +339,23 @@ namespace MultiplayerARPG.GameData.Model.Playables
         #region Action animations
         public override void PlayActionAnimation(AnimActionType animActionType, int dataId, int index, float playSpeedMultiplier = 1)
         {
-            Behaviour.PlayAction(animActionType, dataId, index, playSpeedMultiplier);
+            StartedActionCoroutine(StartCoroutine(PlayActionAnimation_Animator(animActionType, dataId, index, playSpeedMultiplier)));
+        }
+
+        private IEnumerator PlayActionAnimation_Animator(AnimActionType animActionType, int dataId, int index, float playSpeedMultiplier)
+        {
+            ActionAnimation tempActionAnimation = GetActionAnimation(animActionType, dataId, index);
+            AudioManager.PlaySfxClipAtAudioSource(tempActionAnimation.GetRandomAudioClip(), genericAudioSource);
+            bool hasClip = tempActionAnimation.state.clip != null;
+            if (hasClip)
+                Behaviour.PlayAction(tempActionAnimation.state, playSpeedMultiplier);
+            // Waits by current transition + clip duration before end animation
+            yield return new WaitForSecondsRealtime(tempActionAnimation.GetClipLength() / playSpeedMultiplier);
+            // Stop doing action animation
+            if (hasClip)
+                Behaviour.StopAction();
+            // Waits by current transition + extra duration before end playing animation state
+            yield return new WaitForSecondsRealtime(tempActionAnimation.GetExtendDuration() / playSpeedMultiplier);
         }
 
         public override void StopActionAnimation()
@@ -297,7 +367,21 @@ namespace MultiplayerARPG.GameData.Model.Playables
         #region Weapon charge animations
         public override void PlayWeaponChargeClip(int dataId, bool isLeftHand)
         {
-            Behaviour.PlayWeaponCharge(dataId, isLeftHand);
+            WeaponAnimations weaponAnimations;
+            if (TryGetWeaponAnimations(dataId, out weaponAnimations))
+            {
+                if (isLeftHand)
+                    Behaviour.PlayAction(weaponAnimations.leftHandChargeState, 1f);
+                else
+                    Behaviour.PlayAction(weaponAnimations.rightHandChargeState, 1f);
+            }
+            else
+            {
+                if (isLeftHand)
+                    Behaviour.PlayAction(defaultAnimations.leftHandChargeState, 1f);
+                else
+                    Behaviour.PlayAction(defaultAnimations.rightHandChargeState, 1f);
+            }
         }
 
         public override void StopWeaponChargeAnimation()
@@ -314,7 +398,13 @@ namespace MultiplayerARPG.GameData.Model.Playables
 
         public override void PlayHitAnimation()
         {
-            Behaviour.PlayHit();
+            if (actionCoroutine == null)
+                return;
+            WeaponAnimations weaponAnimations;
+            if (equippedWeaponType != null && TryGetWeaponAnimations(equippedWeaponType.DataId, out weaponAnimations))
+                Behaviour.PlayAction(weaponAnimations.hurtState, 1f);
+            else
+                Behaviour.PlayAction(defaultAnimations.hurtState, 1f);
         }
 
         public override void PlayJumpAnimation()
@@ -324,8 +414,27 @@ namespace MultiplayerARPG.GameData.Model.Playables
 
         public override void PlayPickupAnimation()
         {
-            Behaviour.PlayPickup();
+            if (actionCoroutine == null)
+                return;
+            WeaponAnimations weaponAnimations;
+            if (equippedWeaponType != null && TryGetWeaponAnimations(equippedWeaponType.DataId, out weaponAnimations))
+                Behaviour.PlayAction(weaponAnimations.pickupState, 1f);
+            else
+                Behaviour.PlayAction(defaultAnimations.pickupState, 1f);
         }
         #endregion
+
+        protected Coroutine StartedActionCoroutine(Coroutine coroutine)
+        {
+            StopActionCoroutine();
+            actionCoroutine = coroutine;
+            return actionCoroutine;
+        }
+
+        protected void StopActionCoroutine()
+        {
+            if (actionCoroutine != null)
+                StopCoroutine(actionCoroutine);
+        }
     }
 }

@@ -36,11 +36,8 @@ namespace MultiplayerARPG.GameData.Model.Playables
         public enum PlayingActionState
         {
             None,
-            Action,
-            SkillCast,
-            WeaponCharge,
-            Hit,
-            Pickup,
+            Playing,
+            Stopping,
         }
 
         // Clip name variables
@@ -81,7 +78,7 @@ namespace MultiplayerARPG.GameData.Model.Playables
         public AnimationMixerPlayable ActionLayerMixer { get; private set; }
         public PlayableCharacterModel CharacterModel { get; private set; }
 
-        private WeaponType currentWeaponType = null;
+        private string currentWeaponTypeId = string.Empty;
         private string playingStateId = string.Empty;
         private PlayingJumpState jumpState = PlayingJumpState.None;
         private PlayingActionState actionState = PlayingActionState.None;
@@ -201,7 +198,7 @@ namespace MultiplayerARPG.GameData.Model.Playables
         private string GetPlayingStateId()
         {
             stringBuilder.Clear();
-            stringBuilder.Append(currentWeaponType != null ? currentWeaponType.Id : string.Empty);
+            stringBuilder.Append(currentWeaponTypeId);
             if (CharacterModel.isDead)
             {
                 jumpState = PlayingJumpState.None;
@@ -349,27 +346,15 @@ namespace MultiplayerARPG.GameData.Model.Playables
             #region Update action state
             if (actionState != PlayingActionState.None)
                 weightUpdate = info.deltaTime / actionTransitionDuration;
-            switch (actionState)
-            {
-                case PlayingActionState.Action:
-                    break;
-                case PlayingActionState.SkillCast:
-                    break;
-                case PlayingActionState.WeaponCharge:
-                    break;
-                case PlayingActionState.Hit:
-                    break;
-                case PlayingActionState.Pickup:
-                    break;
-            }
+
             #endregion
         }
 
         public void SetPlayingWeaponTypeId(IWeaponItem weaponItem)
         {
-            currentWeaponType = null;
+            currentWeaponTypeId = string.Empty;
             if (weaponItem != null && weaponTypeIds.Contains(weaponItem.WeaponType.Id))
-                currentWeaponType = weaponItem.WeaponType;
+                currentWeaponTypeId = weaponItem.WeaponType.Id;
         }
 
         public void PlayJump()
@@ -377,84 +362,7 @@ namespace MultiplayerARPG.GameData.Model.Playables
             jumpState = PlayingJumpState.Starting;
         }
 
-        public void PlayAction(AnimActionType animActionType, int animDataId, int actionAnimIndex, float actionPlaySpeedMultiplier)
-        {
-            actionState = PlayingActionState.Action;
-            this.animActionType = animActionType;
-            this.animDataId = animDataId;
-            this.actionAnimIndex = actionAnimIndex;
-            this.actionPlaySpeedMultiplier = actionPlaySpeedMultiplier;
-            switch (animActionType)
-            {
-                case AnimActionType.AttackRightHand:
-                    break;
-                case AnimActionType.AttackLeftHand:
-                    break;
-                case AnimActionType.SkillRightHand:
-                    break;
-                case AnimActionType.SkillLeftHand:
-                    break;
-                case AnimActionType.ReloadRightHand:
-                    break;
-                case AnimActionType.ReloadLeftHand:
-                    break;
-            }
-        }
-
-        public void PlaySkillCast(int animDataId, float skillCastDuration)
-        {
-            actionState = PlayingActionState.SkillCast;
-            this.animDataId = animDataId;
-            this.skillCastDuration = skillCastDuration;
-        }
-
-        public void PlayWeaponCharge(int animDataId, bool isLeftHand)
-        {
-            actionState = PlayingActionState.WeaponCharge;
-            this.animDataId = animDataId;
-            this.isLeftHand = isLeftHand;
-            WeaponAnimations weaponAnimations;
-            if (CharacterModel.TryGetWeaponAnimations(animDataId, out weaponAnimations))
-            {
-                if (isLeftHand)
-                    PrepareActionLayerMixer(weaponAnimations.leftHandChargeState, 1);
-                else
-                    PrepareActionLayerMixer(weaponAnimations.rightHandChargeState, 1);
-            }
-            else
-            {
-                if (isLeftHand)
-                    PrepareActionLayerMixer(CharacterModel.defaultAnimations.leftHandChargeState, 1);
-                else
-                    PrepareActionLayerMixer(CharacterModel.defaultAnimations.rightHandChargeState, 1);
-            }
-        }
-
-        public void PlayHit()
-        {
-            if (actionState != PlayingActionState.None)
-                return;
-            actionState = PlayingActionState.Hit;
-            WeaponAnimations weaponAnimations;
-            if (currentWeaponType != null && CharacterModel.TryGetWeaponAnimations(currentWeaponType.DataId, out weaponAnimations))
-                PrepareActionLayerMixer(weaponAnimations.hurtState, 1);
-            else
-                PrepareActionLayerMixer(CharacterModel.defaultAnimations.hurtState, 1);
-        }
-
-        public void PlayPickup()
-        {
-            if (actionState != PlayingActionState.None)
-                return;
-            actionState = PlayingActionState.Pickup;
-            WeaponAnimations weaponAnimations;
-            if (currentWeaponType != null && CharacterModel.TryGetWeaponAnimations(currentWeaponType.DataId, out weaponAnimations))
-                PrepareActionLayerMixer(weaponAnimations.pickupState, 1);
-            else
-                PrepareActionLayerMixer(CharacterModel.defaultAnimations.pickupState, 1);
-        }
-
-        private void PrepareActionLayerMixer(ActionState actionState, float speedRate)
+        public void PlayAction(ActionState actionState, float speedRate)
         {
             // Destroy playing state
             if (ActionLayerMixer.IsValid())
@@ -490,7 +398,8 @@ namespace MultiplayerARPG.GameData.Model.Playables
 
         public void StopAction()
         {
-            actionState = PlayingActionState.None;
+            if (actionState == PlayingActionState.Playing)
+                actionState = PlayingActionState.Stopping;
         }
     }
 }
