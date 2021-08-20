@@ -297,6 +297,7 @@ namespace MultiplayerARPG
     {
         UI_ITEM_TYPE_JUNK,
         UI_ITEM_TYPE_SHIELD,
+        UI_ITEM_TYPE_CONSUMABLE,
         UI_ITEM_TYPE_POTION,
         UI_ITEM_TYPE_AMMO,
         UI_ITEM_TYPE_BUILDING,
@@ -1059,6 +1060,7 @@ namespace MultiplayerARPG
             Texts.Add(UIFormatKeys.UI_FORMAT_ITEM_TYPE.ToString(), "Item Type: {0}");
             Texts.Add(UIItemTypeKeys.UI_ITEM_TYPE_JUNK.ToString(), "Junk");
             Texts.Add(UIItemTypeKeys.UI_ITEM_TYPE_SHIELD.ToString(), "Shield");
+            Texts.Add(UIItemTypeKeys.UI_ITEM_TYPE_CONSUMABLE.ToString(), "Consumable");
             Texts.Add(UIItemTypeKeys.UI_ITEM_TYPE_POTION.ToString(), "Potion");
             Texts.Add(UIItemTypeKeys.UI_ITEM_TYPE_AMMO.ToString(), "Ammo");
             Texts.Add(UIItemTypeKeys.UI_ITEM_TYPE_BUILDING.ToString(), "Building");
