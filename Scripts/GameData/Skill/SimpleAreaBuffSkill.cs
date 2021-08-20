@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace MultiplayerARPG
 {
-    [CreateAssetMenu(fileName = "Skill", menuName = "Create GameData/Skill/Simple Area Buff Skill", order = -4987)]
+    [CreateAssetMenu(fileName = "Simple Area Buff Skill", menuName = "Create GameData/Skill/Simple Area Buff Skill", order = -4987)]
     public partial class SimpleAreaBuffSkill : BaseAreaSkill
     {
         [Category("Area Settings")]
@@ -12,12 +12,19 @@ namespace MultiplayerARPG
         [Category(3, "Buff")]
         public Buff buff;
 
+        [Category("Warp Settings")]
+        public bool isWarpToAimPosition;
+
         protected override void ApplySkillImplement(BaseCharacterEntity skillUser, short skillLevel, bool isLeftHand, CharacterItem weapon, int hitIndex, Dictionary<DamageElement, MinMaxFloat> damageAmounts, uint targetObjectId, AimPosition aimPosition, int randomSeed, long? time)
         {
             // Spawn area entity
             // Aim position type always is `Position`
             PoolSystem.GetInstance(areaBuffEntity, aimPosition.position, GameInstance.Singleton.GameplayRule.GetSummonRotation(skillUser))
                 .Setup(skillUser, this, skillLevel, areaDuration.GetAmount(skillLevel), applyDuration.GetAmount(skillLevel));
+
+            // Teleport to aim position
+            if (isWarpToAimPosition)
+                skillUser.Teleport(aimPosition.position, skillUser.MovementTransform.rotation);
         }
 
         public override KeyValuePair<DamageElement, MinMaxFloat> GetBaseAttackDamageAmount(ICharacterData skillUser, short skillLevel, bool isLeftHand)

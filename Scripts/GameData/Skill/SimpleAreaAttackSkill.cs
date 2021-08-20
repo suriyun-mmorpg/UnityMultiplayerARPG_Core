@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace MultiplayerARPG
 {
-    [CreateAssetMenu(fileName = "Skill", menuName = "Create GameData/Skill/Simple Area Attack Skill", order = -4988)]
+    [CreateAssetMenu(fileName = "Simple Area Attack Skill", menuName = "Create GameData/Skill/Simple Area Attack Skill", order = -4988)]
     public partial class SimpleAreaAttackSkill : BaseAreaSkill
     {
         public enum SkillAttackType : byte
@@ -26,6 +26,9 @@ namespace MultiplayerARPG
         public HarvestType harvestType;
         public IncrementalMinMaxFloat harvestDamageAmount;
 
+        [Category("Warp Settings")]
+        public bool isWarpToAimPosition;
+
         private Dictionary<Attribute, float> cacheEffectivenessAttributes;
         public Dictionary<Attribute, float> CacheEffectivenessAttributes
         {
@@ -43,6 +46,10 @@ namespace MultiplayerARPG
             // Aim position type always is `Position`
             PoolSystem.GetInstance(areaDamageEntity, aimPosition.position, GameInstance.Singleton.GameplayRule.GetSummonRotation(skillUser))
                 .Setup(skillUser.GetInfo(), weapon, damageAmounts, this, skillLevel, areaDuration.GetAmount(skillLevel), applyDuration.GetAmount(skillLevel));
+
+            // Teleport to aim position
+            if (isWarpToAimPosition)
+                skillUser.Teleport(aimPosition.position, skillUser.MovementTransform.rotation);
         }
 
         public override KeyValuePair<DamageElement, MinMaxFloat> GetBaseAttackDamageAmount(ICharacterData skillUser, short skillLevel, bool isLeftHand)
