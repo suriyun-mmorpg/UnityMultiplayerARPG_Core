@@ -1,5 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 #if UNITY_EDITOR
 using UnityEditor;
@@ -7,7 +6,7 @@ using UnityEditor;
 
 namespace MultiplayerARPG
 {
-    [DefaultExecutionOrder(-1)]
+    [DefaultExecutionOrder(100)]
     public partial class GameEntityModel : MonoBehaviour
     {
         public enum EVisibleState : byte

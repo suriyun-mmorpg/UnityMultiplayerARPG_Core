@@ -184,9 +184,6 @@ namespace MultiplayerARPG
             isSetupComponent = true;
             if (CacheAnimatorController == null)
                 CacheAnimatorController = new AnimatorOverrideController(animatorController);
-            // Use override controller as animator
-            if (animator != null && animator.runtimeAnimatorController != CacheAnimatorController)
-                animator.runtimeAnimatorController = CacheAnimatorController;
             // Setup action state name hashes
             int indexCounter;
             actionStateNameHashes = new int[actionStateNames.Length];
@@ -196,7 +193,14 @@ namespace MultiplayerARPG
             castSkillStateNameHashes = new int[castSkillStateNames.Length];
             for (indexCounter = 0; indexCounter < castSkillStateNames.Length; ++indexCounter)
                 castSkillStateNameHashes[indexCounter] = Animator.StringToHash(castSkillStateNames[indexCounter]);
-            SetDefaultAnimations();
+            // Setup and play default animations if it's main model
+            if (IsMainModel)
+            {
+                SetDefaultAnimations();
+                // Use override controller as animator
+                if (animator != null && animator.runtimeAnimatorController != CacheAnimatorController)
+                    animator.runtimeAnimatorController = CacheAnimatorController;
+            }
         }
 
         public override void SetDefaultAnimations()

@@ -243,24 +243,30 @@ namespace MultiplayerARPG
                             defaultAnimatorData.hurtClip,
                             defaultAnimatorData.deadClip);
                     }
-                    if (animator != null && animator.runtimeAnimatorController != CacheAnimatorController)
-                        animator.runtimeAnimatorController = CacheAnimatorController;
+                    if (IsMainModel)
+                    {
+                        if (animator != null && animator.runtimeAnimatorController != CacheAnimatorController)
+                            animator.runtimeAnimatorController = CacheAnimatorController;
+                    }
                     break;
                 case AnimatorType.LegacyAnimtion:
-                    legacyAnimation.AddClip(legacyAnimationData.idleClip, CLIP_IDLE);
-                    legacyAnimation.AddClip(legacyAnimationData.moveClip, CLIP_MOVE);
-                    legacyAnimation.AddClip(legacyAnimationData.moveBackwardClip, CLIP_MOVE_BACKWARD);
-                    legacyAnimation.AddClip(legacyAnimationData.moveLeftClip, CLIP_MOVE_LEFT);
-                    legacyAnimation.AddClip(legacyAnimationData.moveRightClip, CLIP_MOVE_RIGHT);
-                    legacyAnimation.AddClip(legacyAnimationData.moveForwardLeftClip, CLIP_MOVE_FORWARD_LEFT);
-                    legacyAnimation.AddClip(legacyAnimationData.moveForwardRightClip, CLIP_MOVE_FORWARD_RIGHT);
-                    legacyAnimation.AddClip(legacyAnimationData.moveBackwardLeftClip, CLIP_MOVE_BACKWARD_LEFT);
-                    legacyAnimation.AddClip(legacyAnimationData.moveBackwardRightClip, CLIP_MOVE_BACKWARD_RIGHT);
-                    legacyAnimation.AddClip(legacyAnimationData.jumpClip, CLIP_JUMP);
-                    legacyAnimation.AddClip(legacyAnimationData.fallClip, CLIP_FALL);
-                    legacyAnimation.AddClip(legacyAnimationData.hurtClip, CLIP_HURT);
-                    legacyAnimation.AddClip(legacyAnimationData.deadClip, CLIP_DEAD);
-                    CrossFadeLegacyAnimation(CLIP_IDLE, legacyAnimationData.idleClipFadeLength, WrapMode.Loop);
+                    if (IsMainModel)
+                    {
+                        legacyAnimation.AddClip(legacyAnimationData.idleClip, CLIP_IDLE);
+                        legacyAnimation.AddClip(legacyAnimationData.moveClip, CLIP_MOVE);
+                        legacyAnimation.AddClip(legacyAnimationData.moveBackwardClip, CLIP_MOVE_BACKWARD);
+                        legacyAnimation.AddClip(legacyAnimationData.moveLeftClip, CLIP_MOVE_LEFT);
+                        legacyAnimation.AddClip(legacyAnimationData.moveRightClip, CLIP_MOVE_RIGHT);
+                        legacyAnimation.AddClip(legacyAnimationData.moveForwardLeftClip, CLIP_MOVE_FORWARD_LEFT);
+                        legacyAnimation.AddClip(legacyAnimationData.moveForwardRightClip, CLIP_MOVE_FORWARD_RIGHT);
+                        legacyAnimation.AddClip(legacyAnimationData.moveBackwardLeftClip, CLIP_MOVE_BACKWARD_LEFT);
+                        legacyAnimation.AddClip(legacyAnimationData.moveBackwardRightClip, CLIP_MOVE_BACKWARD_RIGHT);
+                        legacyAnimation.AddClip(legacyAnimationData.jumpClip, CLIP_JUMP);
+                        legacyAnimation.AddClip(legacyAnimationData.fallClip, CLIP_FALL);
+                        legacyAnimation.AddClip(legacyAnimationData.hurtClip, CLIP_HURT);
+                        legacyAnimation.AddClip(legacyAnimationData.deadClip, CLIP_DEAD);
+                        CrossFadeLegacyAnimation(CLIP_IDLE, legacyAnimationData.idleClipFadeLength, WrapMode.Loop);
+                    }
                     break;
             }
         }

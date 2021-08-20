@@ -61,7 +61,8 @@ namespace MultiplayerARPG
             if (isSetupComponent)
                 return;
             isSetupComponent = true;
-            SetDefaultAnimations();
+            if (IsMainModel)
+                SetDefaultAnimations();
         }
 
         public override void SetDefaultAnimations()

@@ -1,5 +1,4 @@
 ﻿using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Animations;
 using UnityEngine.Playables;
@@ -70,12 +69,14 @@ namespace MultiplayerARPG.GameData.Model.Playables
 
         internal override void OnSwitchingToAnotherModel()
         {
-            Graph.Stop();
+            if (Graph.IsValid())
+                Graph.Stop();
         }
 
         internal override void OnSwitchedToThisModel()
         {
-            Graph.Play();
+            if (Graph.IsValid())
+                Graph.Play();
         }
 
         private void OnDestroy()
@@ -129,7 +130,8 @@ namespace MultiplayerARPG.GameData.Model.Playables
             equippedWeaponType = null;
             if (weaponItem != null)
                 equippedWeaponType = weaponItem.WeaponType;
-            Behaviour.SetPlayingWeaponTypeId(weaponItem);
+            if (Behaviour != null)
+                Behaviour.SetPlayingWeaponTypeId(weaponItem);
         }
 
         #region Right-hand animations

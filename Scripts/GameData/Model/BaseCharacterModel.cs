@@ -104,55 +104,15 @@ namespace MultiplayerARPG
         public bool activateInstantiatedObject = false;
 #endif
 
-        private Dictionary<int, VehicleCharacterModel> cacheVehicleModels = null;
-        public Dictionary<int, VehicleCharacterModel> CacheVehicleModels
-        {
-            get
-            {
-                if (cacheVehicleModels == null)
-                {
-                    cacheVehicleModels = new Dictionary<int, VehicleCharacterModel>();
-                    if (IsMainModel && vehicleModels != null && vehicleModels.Length > 0)
-                    {
-                        foreach (VehicleCharacterModel vehicleModel in vehicleModels)
-                        {
-                            if (!vehicleModel.vehicleType) continue;
-                            for (int i = 0; i < vehicleModel.modelsForEachSeats.Length; ++i)
-                            {
-                                vehicleModel.modelsForEachSeats[i].VehicleTypeDataId = vehicleModel.vehicleType.DataId;
-                                vehicleModel.modelsForEachSeats[i].VehicleSeatIndex = i;
-                                vehicleModel.modelsForEachSeats[i].MainModel = this;
-                                vehicleModel.modelsForEachSeats[i].IsTpsModel = IsTpsModel;
-                                vehicleModel.modelsForEachSeats[i].IsFpsModel = IsFpsModel;
-                            }
-                            cacheVehicleModels[vehicleModel.vehicleType.DataId] = vehicleModel;
-                        }
-                    }
-                }
-                return cacheVehicleModels;
-            }
-        }
+        /// <summary>
+        /// Dictionary[vehicleType(Int32), vehicleCharacterModel(VehicleCharacterModel)]
+        /// </summary>
+        public Dictionary<int, VehicleCharacterModel> CacheVehicleModels { get; private set; }
 
-        private Dictionary<string, EquipmentContainer> cacheEquipmentModelContainers = null;
         /// <summary>
         /// Dictionary[equipSocket(String), container(EquipmentModelContainer)]
         /// </summary>
-        public Dictionary<string, EquipmentContainer> CacheEquipmentModelContainers
-        {
-            get
-            {
-                if (cacheEquipmentModelContainers == null)
-                {
-                    cacheEquipmentModelContainers = new Dictionary<string, EquipmentContainer>();
-                    foreach (EquipmentContainer equipmentContainer in equipmentContainers)
-                    {
-                        if (equipmentContainer.transform != null && !cacheEquipmentModelContainers.ContainsKey(equipmentContainer.equipSocket))
-                            cacheEquipmentModelContainers[equipmentContainer.equipSocket] = equipmentContainer;
-                    }
-                }
-                return cacheEquipmentModelContainers;
-            }
-        }
+        public Dictionary<string, EquipmentContainer> CacheEquipmentModelContainers { get; private set; }
 
         /// <summary>
         /// Dictionary[equipPosition(String), Dictionary[equipSocket(String), model(GameObject)]]
@@ -195,6 +155,31 @@ namespace MultiplayerARPG
             base.Awake();
             if (string.IsNullOrEmpty(assetId))
                 hashAssetId = gameObject.GetInstanceID();
+
+            CacheVehicleModels = new Dictionary<int, VehicleCharacterModel>();
+            if (IsMainModel && vehicleModels != null && vehicleModels.Length > 0)
+            {
+                foreach (VehicleCharacterModel vehicleModel in vehicleModels)
+                {
+                    if (!vehicleModel.vehicleType) continue;
+                    for (int i = 0; i < vehicleModel.modelsForEachSeats.Length; ++i)
+                    {
+                        vehicleModel.modelsForEachSeats[i].VehicleTypeDataId = vehicleModel.vehicleType.DataId;
+                        vehicleModel.modelsForEachSeats[i].VehicleSeatIndex = i;
+                        vehicleModel.modelsForEachSeats[i].MainModel = this;
+                        vehicleModel.modelsForEachSeats[i].IsTpsModel = IsTpsModel;
+                        vehicleModel.modelsForEachSeats[i].IsFpsModel = IsFpsModel;
+                    }
+                    CacheVehicleModels[vehicleModel.vehicleType.DataId] = vehicleModel;
+                }
+            }
+
+            CacheEquipmentModelContainers = new Dictionary<string, EquipmentContainer>();
+            foreach (EquipmentContainer equipmentContainer in equipmentContainers)
+            {
+                if (equipmentContainer.transform != null && !CacheEquipmentModelContainers.ContainsKey(equipmentContainer.equipSocket))
+                    CacheEquipmentModelContainers[equipmentContainer.equipSocket] = equipmentContainer;
+            }
         }
 
         protected override void OnValidate()
