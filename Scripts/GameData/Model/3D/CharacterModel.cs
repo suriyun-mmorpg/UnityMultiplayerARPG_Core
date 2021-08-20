@@ -1129,6 +1129,9 @@ namespace MultiplayerARPG
             model.FpsHiddingRenderers = fpsHiddingRenderers;
             model.EffectContainers = effectContainers;
             model.EquipmentContainers = equipmentContainers;
+            model.ActivateObjectsWhenSwitchModel = activateObjectsWhenSwitchModel;
+            model.DeactivateObjectsWhenSwitchModel = deactivateObjectsWhenSwitchModel;
+            model.VehicleModels = vehicleModels;
             EditorUtility.SetDirty(model);
         }
 
@@ -1166,6 +1169,9 @@ namespace MultiplayerARPG
             model.FpsHiddingRenderers = fpsHiddingRenderers;
             model.EffectContainers = effectContainers;
             model.EquipmentContainers = equipmentContainers;
+            model.ActivateObjectsWhenSwitchModel = activateObjectsWhenSwitchModel;
+            model.DeactivateObjectsWhenSwitchModel = deactivateObjectsWhenSwitchModel;
+            model.VehicleModels = vehicleModels;
             EditorUtility.SetDirty(model);
         }
 #endif

@@ -64,8 +64,20 @@ namespace MultiplayerARPG
         [Header("Model Switching Settings")]
         [SerializeField]
         protected GameObject[] activateObjectsWhenSwitchModel = new GameObject[0];
+        public GameObject[] ActivateObjectsWhenSwitchModel
+        {
+            get { return activateObjectsWhenSwitchModel; }
+            set { activateObjectsWhenSwitchModel = value; }
+        }
+
         [SerializeField]
         protected GameObject[] deactivateObjectsWhenSwitchModel = new GameObject[0];
+        public GameObject[] DeactivateObjectsWhenSwitchModel
+        {
+            get { return deactivateObjectsWhenSwitchModel; }
+            set { deactivateObjectsWhenSwitchModel = value; }
+        }
+
         [SerializeField]
         protected VehicleCharacterModel[] vehicleModels = new VehicleCharacterModel[0];
         public VehicleCharacterModel[] VehicleModels

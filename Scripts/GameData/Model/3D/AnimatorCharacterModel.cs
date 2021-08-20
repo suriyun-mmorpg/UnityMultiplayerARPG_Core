@@ -1720,6 +1720,9 @@ namespace MultiplayerARPG
             model.FpsHiddingRenderers = fpsHiddingRenderers;
             model.EffectContainers = effectContainers;
             model.EquipmentContainers = equipmentContainers;
+            model.ActivateObjectsWhenSwitchModel = activateObjectsWhenSwitchModel;
+            model.DeactivateObjectsWhenSwitchModel = deactivateObjectsWhenSwitchModel;
+            model.VehicleModels = vehicleModels;
             EditorUtility.SetDirty(model);
 
             EditorUtility.DisplayDialog("Character Model Conversion", "New Character Model component has been added.\n\nThe old component doesn't removed yet to let you check values.\n\nThen, you have to remove the old one.", "OK");
