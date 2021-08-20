@@ -11,10 +11,6 @@ namespace MultiplayerARPG
     [RequireComponent(typeof(OpenCharacterController))]
     public class RigidBodyEntityMovement : BaseNetworkedGameEntityComponent<BaseGameEntity>, IEntityMovementComponent
     {
-        /// <summary>
-        /// Buffer to fix invalid teleport position
-        /// </summary>
-        public const byte FRAME_BUFFER = 3;
         protected static readonly RaycastHit[] findGroundRaycastHits = new RaycastHit[25];
 
         [Header("Movement AI")]
@@ -111,8 +107,6 @@ namespace MultiplayerARPG
         private float tempEntityMoveSpeed;
         private float tempCurrentMoveSpeed;
         private CollisionFlags collisionFlags;
-        private byte framesAfterTeleported;
-        private Vector3 teleportedPosition;
         private float pauseMovementCountDown;
         private bool previouslyGrounded;
         private bool previouslyAirborne;
@@ -151,13 +145,6 @@ namespace MultiplayerARPG
             tempCurrentPosition = CacheTransform.position;
             CacheOpenCharacterController.SetPosition(tempCurrentPosition, true);
             tempVerticalVelocity = 0;
-        }
-
-        public override void EntityLateUpdate()
-        {
-            base.EntityLateUpdate();
-            if (framesAfterTeleported > 0)
-                framesAfterTeleported--;
         }
 
         public override void ComponentOnEnable()
@@ -282,12 +269,6 @@ namespace MultiplayerARPG
 
         public override void EntityUpdate()
         {
-            if (framesAfterTeleported > 0)
-            {
-                CacheOpenCharacterController.SetPosition(teleportedPosition, false);
-                return;
-            }
-
             UpdateMovement(Time.deltaTime);
             if (IsOwnerClient || (IsServer && Entity.MovementSecure == MovementSecure.ServerAuthoritative))
             {
@@ -878,8 +859,7 @@ namespace MultiplayerARPG
         {
             airborneElapsed = 0;
             tempVerticalVelocity = 0;
-            framesAfterTeleported = FRAME_BUFFER;
-            teleportedPosition = position;
+            CacheOpenCharacterController.SetPosition(position, false);
         }
 
 #if UNITY_EDITOR
