@@ -82,8 +82,8 @@ namespace MultiplayerARPG.GameData.Model.Playables
 
         private string currentWeaponTypeId = string.Empty;
         private string playingStateId = string.Empty;
-        private PlayingJumpState jumpState = PlayingJumpState.None;
-        private PlayingActionState actionState = PlayingActionState.None;
+        private PlayingJumpState playingJumpState = PlayingJumpState.None;
+        private PlayingActionState playingActionState = PlayingActionState.None;
         private bool isPreviouslyGrounded = true;
         private int baseInputPort = 0;
         private float baseTransitionDuration = 0f;
@@ -214,40 +214,45 @@ namespace MultiplayerARPG.GameData.Model.Playables
 
         private string GetPlayingStateId()
         {
-            stringBuilder.Clear();
-            stringBuilder.Append(currentWeaponTypeId);
             if (CharacterModel.isDead)
             {
-                jumpState = PlayingJumpState.None;
-                stringBuilder.Append(CLIP_DEAD);
-                return stringBuilder.ToString();
+                playingJumpState = PlayingJumpState.None;
+                // Get dead state by weapon type
+                string stateId = stringBuilder.Clear().Append(currentWeaponTypeId).Append(CLIP_DEAD).ToString();
+                // State not found, use dead state from default animations
+                if (!baseStates.ContainsKey(stateId))
+                    stateId = CLIP_DEAD;
+                return stateId;
             }
-            else if (jumpState == PlayingJumpState.Starting)
+            else if (playingJumpState == PlayingJumpState.Starting)
             {
-                jumpState = PlayingJumpState.Playing;
+                playingJumpState = PlayingJumpState.Playing;
                 isPreviouslyGrounded = false;
-                stringBuilder.Append(CLIP_JUMP);
-                return stringBuilder.ToString();
+                // Get jump state by weapon type
+                string stateId = stringBuilder.Clear().Append(currentWeaponTypeId).Append(CLIP_JUMP).ToString();
+                // State not found, use jump state from default animations
+                if (!baseStates.ContainsKey(stateId))
+                    stateId = CLIP_JUMP;
+                return stateId;
             }
-            else if (!CharacterModel.movementState.HasFlag(MovementState.IsGrounded))
-            {
-                isPreviouslyGrounded = false;
-                stringBuilder.Append(CLIP_FALL);
-                return stringBuilder.ToString();
-            }
-            else if (jumpState == PlayingJumpState.Playing)
-            {
-                // Don't change state because character is jumping, it will change to idle when jump animation played
-                return playingStateId;
-            }
-            else
+            else if (CharacterModel.movementState.HasFlag(MovementState.IsGrounded))
             {
                 if (!isPreviouslyGrounded)
                 {
                     isPreviouslyGrounded = true;
-                    stringBuilder.Append(CLIP_LANDED);
-                    return stringBuilder.ToString();
+                    // Get fall state by weapon type
+                    string stateId = stringBuilder.Clear().Append(currentWeaponTypeId).Append(CLIP_LANDED).ToString();
+                    // State not found, use fall state from default animations
+                    if (!baseStates.ContainsKey(stateId))
+                        stateId = CLIP_LANDED;
+                    // State still not found, set state Id to idle
+                    if (!baseStates.ContainsKey(stateId))
+                        stateId = stringBuilder.Clear().Append(currentWeaponTypeId).Append(CLIP_IDLE).ToString();
+                    return stateId;
                 }
+                // Get movement state
+                stringBuilder.Clear();
+                stringBuilder.Append(currentWeaponTypeId);
                 bool movingForward = CharacterModel.movementState.HasFlag(MovementState.Forward);
                 bool movingBackward = CharacterModel.movementState.HasFlag(MovementState.Backward);
                 bool movingLeft = CharacterModel.movementState.HasFlag(MovementState.Left);
@@ -306,6 +311,21 @@ namespace MultiplayerARPG.GameData.Model.Playables
                     stringBuilder.Append(DIR_RIGHT);
                 return stringBuilder.ToString();
             }
+            else if (playingJumpState == PlayingJumpState.Playing)
+            {
+                // Don't change state because character is jumping, it will change to idle when jump animation played
+                return playingStateId;
+            }
+            else
+            {
+                isPreviouslyGrounded = false;
+                // Get fall state by weapon type
+                string stateId = stringBuilder.Clear().Append(currentWeaponTypeId).Append(CLIP_FALL).ToString();
+                // State not found, use fall state from default animations
+                if (!baseStates.ContainsKey(stateId))
+                    stateId = CLIP_FALL;
+                return stateId;
+            }
         }
 
         public override void PrepareFrame(Playable playable, FrameData info)
@@ -335,17 +355,19 @@ namespace MultiplayerARPG.GameData.Model.Playables
                 // Set clip length
                 Playable clipPlayable = BaseLayerMixer.GetInput(baseInputPort);
                 clipPlayable.SetSpeed(speed);
+                clipPlayable.SetTime(0f);
                 baseClipLength = baseStates[playingStateId].GetClipLength(1);
                 // Reset play elapsed
                 basePlayElapsed = 0f;
             }
 
             // Update transition
+            float weight;
             float weightUpdate = info.deltaTime / baseTransitionDuration;
             int inputCount = BaseLayerMixer.GetInputCount();
             for (int i = 0; i < inputCount; ++i)
             {
-                float weight = BaseLayerMixer.GetInputWeight(i);
+                weight = BaseLayerMixer.GetInputWeight(i);
                 if (i != baseInputPort)
                 {
                     weight -= weightUpdate;
@@ -365,14 +387,48 @@ namespace MultiplayerARPG.GameData.Model.Playables
             basePlayElapsed += info.deltaTime;
 
             // It will change state to fall in next frame
-            if (jumpState == PlayingJumpState.Playing && basePlayElapsed >= baseClipLength)
-                jumpState = PlayingJumpState.None;
+            if (playingJumpState == PlayingJumpState.Playing && basePlayElapsed >= baseClipLength)
+                playingJumpState = PlayingJumpState.None;
             #endregion
 
             #region Update action state
-            if (actionState != PlayingActionState.None)
-                weightUpdate = info.deltaTime / actionTransitionDuration;
+            if (playingActionState == PlayingActionState.None)
+                return;
 
+            weightUpdate = info.deltaTime / actionTransitionDuration;
+            weight = LayerMixer.GetInputWeight(1);
+            switch (playingActionState)
+            {
+                case PlayingActionState.Playing:
+                    weight += weightUpdate;
+                    if (weight > 1f)
+                        weight = 1f;
+                    break;
+                case PlayingActionState.Stopping:
+                    weight -= weightUpdate;
+                    if (weight < 0f)
+                        weight = 0f;
+                    break;
+            }
+            LayerMixer.SetInputWeight(1, weight);
+
+            // Update playing state
+            actionPlayElapsed += info.deltaTime;
+
+            // Stopped
+            if (weight <= 0f)
+            {
+                playingActionState = PlayingActionState.None;
+                if (ActionLayerMixer.IsValid())
+                    ActionLayerMixer.Destroy();
+                return;
+            }
+
+            // Animation end, transition to idle
+            if (actionPlayElapsed >= actionClipLength && playingActionState == PlayingActionState.Playing)
+            {
+                playingActionState = PlayingActionState.Stopping;
+            }
             #endregion
         }
 
@@ -385,7 +441,7 @@ namespace MultiplayerARPG.GameData.Model.Playables
 
         public void PlayJump()
         {
-            jumpState = PlayingJumpState.Starting;
+            playingJumpState = PlayingJumpState.Starting;
         }
 
         public void PlayAction(ActionState actionState, float speedRate)
@@ -396,10 +452,13 @@ namespace MultiplayerARPG.GameData.Model.Playables
 
             ActionLayerMixer = AnimationMixerPlayable.Create(Graph, 1, true);
             Graph.Connect(ActionLayerMixer, 0, LayerMixer, 1);
-            LayerMixer.SetInputWeight(1, 0);
+            LayerMixer.SetInputWeight(1, 0f);
 
             AnimationClipPlayable playable = AnimationClipPlayable.Create(Graph, actionState.clip);
+            playable.SetApplyFootIK(false);
+            playable.SetApplyPlayableIK(false);
             Graph.Connect(playable, 0, ActionLayerMixer, 0);
+            ActionLayerMixer.SetInputWeight(0, 1f);
 
             // Set avatar mask
             AvatarMask avatarMask = actionState.avatarMask;
@@ -415,17 +474,20 @@ namespace MultiplayerARPG.GameData.Model.Playables
                 actionTransitionDuration = CharacterModel.transitionDuration;
             actionTransitionDuration *= speed;
             // Set clip length
-            Playable clipPlayable = BaseLayerMixer.GetInput(baseInputPort);
+            Playable clipPlayable = ActionLayerMixer.GetInput(0);
             clipPlayable.SetSpeed(speed);
-            actionClipLength = actionState.clip.length * speed;
+            clipPlayable.SetTime(0f);
+            actionClipLength = actionState.clip.length / speed;
             // Reset play elapsed
             actionPlayElapsed = 0f;
+
+            playingActionState = PlayingActionState.Playing;
         }
 
         public void StopAction()
         {
-            if (actionState == PlayingActionState.Playing)
-                actionState = PlayingActionState.Stopping;
+            if (playingActionState == PlayingActionState.Playing)
+                playingActionState = PlayingActionState.Stopping;
         }
     }
 }
