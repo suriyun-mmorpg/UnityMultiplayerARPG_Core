@@ -471,7 +471,8 @@ namespace MultiplayerARPG.GameData.Model.Playables
             AvatarMask avatarMask = actionState.avatarMask;
             if (avatarMask == null)
                 avatarMask = CharacterModel.actionAvatarMask;
-            LayerMixer.SetLayerMaskFromAvatarMask(1, avatarMask);
+            if (avatarMask != null)
+                LayerMixer.SetLayerMaskFromAvatarMask(1, avatarMask);
 
             // Set clip info
             float speed = (actionState.animSpeedRate > 0f ? actionState.animSpeedRate : 1f) * speedRate;
