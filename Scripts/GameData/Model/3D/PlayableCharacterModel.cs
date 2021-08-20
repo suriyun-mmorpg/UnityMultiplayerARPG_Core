@@ -33,16 +33,22 @@ namespace MultiplayerARPG.GameData.Model.Playables
 
         protected WeaponType equippedWeaponType = null;
         protected Coroutine actionCoroutine = null;
+        protected bool isDoingAction = false;
 
         protected override void Awake()
         {
             base.Awake();
             if (animator == null)
                 animator = GetComponentInChildren<Animator>();
-            PrepareMissingMovementAnimations();
             Template = new AnimationPlayableBehaviour();
             Template.Setup(this);
             CreateGraph();
+        }
+
+        private void Start()
+        {
+            if (!IsMainModel)
+                Graph.Stop();
         }
 
         protected void CreateGraph()
@@ -64,84 +70,17 @@ namespace MultiplayerARPG.GameData.Model.Playables
 
         internal override void OnSwitchingToAnotherModel()
         {
-            DestroyGraph();
+            Graph.Stop();
         }
 
         internal override void OnSwitchedToThisModel()
         {
-            DestroyGraph();
-            CreateGraph();
-        }
-
-        protected AnimState SetClipFromDefaultStateIfEmpty(AnimState defaultState, AnimState targetState)
-        {
-            if (targetState.clip == null)
-                targetState.clip = defaultState.clip;
-            return targetState;
-        }
-
-        protected MoveStates SetStatesFromDefaultStatesIfEmpty(MoveStates targetStates, AnimState idleState)
-        {
-            targetStates.forwardState = SetClipFromDefaultStateIfEmpty(idleState, targetStates.forwardState);
-            targetStates.forwardLeftState = SetClipFromDefaultStateIfEmpty(targetStates.forwardState, targetStates.forwardLeftState);
-            targetStates.forwardRightState = SetClipFromDefaultStateIfEmpty(targetStates.forwardState, targetStates.forwardRightState);
-            targetStates.leftState = SetClipFromDefaultStateIfEmpty(targetStates.forwardState, targetStates.leftState);
-            targetStates.rightState = SetClipFromDefaultStateIfEmpty(targetStates.forwardState, targetStates.rightState);
-            targetStates.backwardState = SetClipFromDefaultStateIfEmpty(targetStates.forwardState, targetStates.backwardState);
-            targetStates.backwardLeftState = SetClipFromDefaultStateIfEmpty(targetStates.backwardState, targetStates.backwardLeftState);
-            targetStates.backwardRightState = SetClipFromDefaultStateIfEmpty(targetStates.backwardState, targetStates.backwardRightState);
-            return targetStates;
-        }
-
-        protected MoveStates SetStatesFromDefaultStatesIfEmpty(MoveStates defaultStates, MoveStates targetStates)
-        {
-            targetStates.forwardState = SetClipFromDefaultStateIfEmpty(defaultStates.forwardState, targetStates.forwardState);
-            targetStates.forwardLeftState = SetClipFromDefaultStateIfEmpty(targetStates.forwardState, targetStates.forwardLeftState);
-            targetStates.forwardRightState = SetClipFromDefaultStateIfEmpty(targetStates.forwardState, targetStates.forwardRightState);
-            targetStates.leftState = SetClipFromDefaultStateIfEmpty(targetStates.forwardState, targetStates.leftState);
-            targetStates.rightState = SetClipFromDefaultStateIfEmpty(targetStates.forwardState, targetStates.rightState);
-            targetStates.backwardState = SetClipFromDefaultStateIfEmpty(targetStates.forwardState, targetStates.backwardState);
-            targetStates.backwardLeftState = SetClipFromDefaultStateIfEmpty(targetStates.backwardState, targetStates.backwardLeftState);
-            targetStates.backwardRightState = SetClipFromDefaultStateIfEmpty(targetStates.backwardState, targetStates.backwardRightState);
-            return targetStates;
-        }
-
-
-        protected void PrepareMissingMovementAnimations()
-        {
-            DefaultAnimations tempDefaultAnimations = defaultAnimations;
-            tempDefaultAnimations.moveStates = SetStatesFromDefaultStatesIfEmpty(tempDefaultAnimations.moveStates, defaultAnimations.idleState);
-            tempDefaultAnimations.sprintStates = SetStatesFromDefaultStatesIfEmpty(tempDefaultAnimations.moveStates, tempDefaultAnimations.sprintStates);
-            tempDefaultAnimations.walkStates = SetStatesFromDefaultStatesIfEmpty(tempDefaultAnimations.moveStates, tempDefaultAnimations.walkStates);
-            tempDefaultAnimations.crouchMoveStates = SetStatesFromDefaultStatesIfEmpty(tempDefaultAnimations.moveStates, tempDefaultAnimations.crouchMoveStates);
-            tempDefaultAnimations.crawlMoveStates = SetStatesFromDefaultStatesIfEmpty(tempDefaultAnimations.moveStates, tempDefaultAnimations.crawlMoveStates);
-            tempDefaultAnimations.swimMoveStates = SetStatesFromDefaultStatesIfEmpty(tempDefaultAnimations.moveStates, tempDefaultAnimations.swimMoveStates);
-            // Apply
-            defaultAnimations = tempDefaultAnimations;
-
-            // Weapon Animations
-            if (weaponAnimations != null && weaponAnimations.Length > 0)
-            {
-                WeaponAnimations tempWeaponAnimations;
-                for (int i = 0; i < weaponAnimations.Length; ++i)
-                {
-                    tempWeaponAnimations = weaponAnimations[i];
-                    tempWeaponAnimations.moveStates = SetStatesFromDefaultStatesIfEmpty(tempDefaultAnimations.moveStates, tempWeaponAnimations.moveStates);
-                    tempWeaponAnimations.sprintStates = SetStatesFromDefaultStatesIfEmpty(tempWeaponAnimations.moveStates, tempWeaponAnimations.sprintStates);
-                    tempWeaponAnimations.walkStates = SetStatesFromDefaultStatesIfEmpty(tempWeaponAnimations.moveStates, tempWeaponAnimations.walkStates);
-                    tempWeaponAnimations.crouchMoveStates = SetStatesFromDefaultStatesIfEmpty(tempWeaponAnimations.moveStates, tempWeaponAnimations.crouchMoveStates);
-                    tempWeaponAnimations.crawlMoveStates = SetStatesFromDefaultStatesIfEmpty(tempWeaponAnimations.moveStates, tempWeaponAnimations.crawlMoveStates);
-                    tempWeaponAnimations.swimMoveStates = SetStatesFromDefaultStatesIfEmpty(tempWeaponAnimations.moveStates, tempWeaponAnimations.swimMoveStates);
-                    // Apply
-                    weaponAnimations[i] = tempWeaponAnimations;
-                }
-            }
+            Graph.Play();
         }
 
         private void OnDestroy()
         {
-            if (Graph.IsValid())
-                Graph.Destroy();
+            DestroyGraph();
         }
 
         public bool TryGetWeaponAnimations(int dataId, out WeaponAnimations anims)
@@ -321,20 +260,22 @@ namespace MultiplayerARPG.GameData.Model.Playables
 
         public override void PlaySkillCastClip(int dataId, float duration)
         {
-            StartedActionCoroutine(StartCoroutine(PlaySkillCastClip_Animator(dataId, duration)));
+            StartedActionCoroutine(StartCoroutine(PlaySkillCastClipRoutine(dataId, duration)));
         }
 
-        private IEnumerator PlaySkillCastClip_Animator(int dataId, float duration)
+        private IEnumerator PlaySkillCastClipRoutine(int dataId, float duration)
         {
+            isDoingAction = true;
             ActionState castState = GetSkillCastState(dataId);
             bool hasClip = castState.clip != null;
             if (hasClip)
-                Behaviour.PlayAction(castState, 1f);
+                Behaviour.PlayAction(castState, 1f, duration);
             // Waits by skill cast duration
             yield return new WaitForSecondsRealtime(duration);
             // Stop casting skill animation
             if (hasClip)
                 Behaviour.StopAction();
+            isDoingAction = false;
         }
 
         public override void StopSkillCastAnimation()
@@ -346,11 +287,12 @@ namespace MultiplayerARPG.GameData.Model.Playables
         #region Action animations
         public override void PlayActionAnimation(AnimActionType animActionType, int dataId, int index, float playSpeedMultiplier = 1)
         {
-            StartedActionCoroutine(StartCoroutine(PlayActionAnimation_Animator(animActionType, dataId, index, playSpeedMultiplier)));
+            StartedActionCoroutine(StartCoroutine(PlayActionAnimationRoutine(animActionType, dataId, index, playSpeedMultiplier)));
         }
 
-        private IEnumerator PlayActionAnimation_Animator(AnimActionType animActionType, int dataId, int index, float playSpeedMultiplier)
+        private IEnumerator PlayActionAnimationRoutine(AnimActionType animActionType, int dataId, int index, float playSpeedMultiplier)
         {
+            isDoingAction = true;
             ActionAnimation tempActionAnimation = GetActionAnimation(animActionType, dataId, index);
             AudioManager.PlaySfxClipAtAudioSource(tempActionAnimation.GetRandomAudioClip(), genericAudioSource);
             bool hasClip = tempActionAnimation.state.clip != null;
@@ -363,6 +305,7 @@ namespace MultiplayerARPG.GameData.Model.Playables
                 Behaviour.StopAction();
             // Waits by current transition + extra duration before end playing animation state
             yield return new WaitForSecondsRealtime(tempActionAnimation.GetExtendDuration() / playSpeedMultiplier);
+            isDoingAction = false;
         }
 
         public override void StopActionAnimation()
@@ -377,18 +320,21 @@ namespace MultiplayerARPG.GameData.Model.Playables
             WeaponAnimations weaponAnimations;
             if (TryGetWeaponAnimations(dataId, out weaponAnimations))
             {
-                if (isLeftHand)
+                if (isLeftHand && weaponAnimations.leftHandChargeState.clip != null)
+                {
                     Behaviour.PlayAction(weaponAnimations.leftHandChargeState, 1f);
-                else
+                    return;
+                }
+                if (!isLeftHand && weaponAnimations.rightHandChargeState.clip != null)
+                {
                     Behaviour.PlayAction(weaponAnimations.rightHandChargeState, 1f);
+                    return;
+                }
             }
+            if (isLeftHand)
+                Behaviour.PlayAction(defaultAnimations.leftHandChargeState, 1f);
             else
-            {
-                if (isLeftHand)
-                    Behaviour.PlayAction(defaultAnimations.leftHandChargeState, 1f);
-                else
-                    Behaviour.PlayAction(defaultAnimations.rightHandChargeState, 1f);
-            }
+                Behaviour.PlayAction(defaultAnimations.rightHandChargeState, 1f);
         }
 
         public override void StopWeaponChargeAnimation()
@@ -405,13 +351,15 @@ namespace MultiplayerARPG.GameData.Model.Playables
 
         public override void PlayHitAnimation()
         {
-            if (actionCoroutine == null)
+            if (isDoingAction)
                 return;
             WeaponAnimations weaponAnimations;
-            if (equippedWeaponType != null && TryGetWeaponAnimations(equippedWeaponType.DataId, out weaponAnimations))
+            if (equippedWeaponType != null && TryGetWeaponAnimations(equippedWeaponType.DataId, out weaponAnimations) && weaponAnimations.hurtState.clip != null)
+            {
                 Behaviour.PlayAction(weaponAnimations.hurtState, 1f);
-            else
-                Behaviour.PlayAction(defaultAnimations.hurtState, 1f);
+                return;
+            }
+            Behaviour.PlayAction(defaultAnimations.hurtState, 1f);
         }
 
         public override void PlayJumpAnimation()
@@ -421,13 +369,15 @@ namespace MultiplayerARPG.GameData.Model.Playables
 
         public override void PlayPickupAnimation()
         {
-            if (actionCoroutine == null)
+            if (isDoingAction)
                 return;
             WeaponAnimations weaponAnimations;
-            if (equippedWeaponType != null && TryGetWeaponAnimations(equippedWeaponType.DataId, out weaponAnimations))
+            if (equippedWeaponType != null && TryGetWeaponAnimations(equippedWeaponType.DataId, out weaponAnimations) && weaponAnimations.pickupState.clip != null)
+            {
                 Behaviour.PlayAction(weaponAnimations.pickupState, 1f);
-            else
-                Behaviour.PlayAction(defaultAnimations.pickupState, 1f);
+                return;
+            }
+            Behaviour.PlayAction(defaultAnimations.pickupState, 1f);
         }
         #endregion
 
@@ -442,6 +392,8 @@ namespace MultiplayerARPG.GameData.Model.Playables
         {
             if (actionCoroutine != null)
                 StopCoroutine(actionCoroutine);
+            actionCoroutine = null;
+            isDoingAction = false;
         }
     }
 }
