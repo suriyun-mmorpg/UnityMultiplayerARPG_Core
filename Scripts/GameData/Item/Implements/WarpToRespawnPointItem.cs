@@ -1,0 +1,41 @@
+﻿using UnityEngine;
+
+namespace MultiplayerARPG
+{
+    [CreateAssetMenu(fileName = "Warp To Respawn Point Item", menuName = "Create GameData/Item/Warp To Respawn Point Item", order = -4878)]
+    public class WarpToRespawnPointItem : BaseItem, IUsableItem
+    {
+        public override string TypeTitle
+        {
+            get { return LanguageManager.GetText(UIItemTypeKeys.UI_ITEM_TYPE_CONSUMABLE.ToString()); }
+        }
+
+        public override ItemType ItemType
+        {
+            get { return ItemType.Potion; }
+        }
+
+        public bool HasCustomAimControls()
+        {
+            return false;
+        }
+
+        public AimPosition UpdateAimControls(Vector2 aimAxes, params object[] data)
+        {
+            return default;
+        }
+
+        public void FinishAimControls(bool isCancel)
+        {
+
+        }
+
+        public void UseItem(BaseCharacterEntity characterEntity, short itemIndex, CharacterItem characterItem)
+        {
+            BasePlayerCharacterEntity playerCharacterEntity = characterEntity as BasePlayerCharacterEntity;
+            if (playerCharacterEntity == null || !characterEntity.CanUseItem() || characterItem.level <= 0 || !characterEntity.DecreaseItemsByIndex(itemIndex, 1))
+                return;
+            GameInstance.ServerCharacterHandlers.Respawn(0, playerCharacterEntity);
+        }
+    }
+}
