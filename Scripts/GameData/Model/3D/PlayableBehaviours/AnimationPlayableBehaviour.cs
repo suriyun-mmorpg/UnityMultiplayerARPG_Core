@@ -237,11 +237,12 @@ namespace MultiplayerARPG.GameData.Model.Playables
             }
             else if (CharacterModel.movementState.HasFlag(MovementState.IsGrounded))
             {
+                string stateId;
                 if (!isPreviouslyGrounded)
                 {
                     isPreviouslyGrounded = true;
                     // Get fall state by weapon type
-                    string stateId = stringBuilder.Clear().Append(currentWeaponTypeId).Append(CLIP_LANDED).ToString();
+                    stateId = stringBuilder.Clear().Append(currentWeaponTypeId).Append(CLIP_LANDED).ToString();
                     // State not found, use fall state from default animations
                     if (!baseStates.ContainsKey(stateId))
                         stateId = CLIP_LANDED;
@@ -252,7 +253,6 @@ namespace MultiplayerARPG.GameData.Model.Playables
                 }
                 // Get movement state
                 stringBuilder.Clear();
-                stringBuilder.Append(currentWeaponTypeId);
                 bool movingForward = CharacterModel.movementState.HasFlag(MovementState.Forward);
                 bool movingBackward = CharacterModel.movementState.HasFlag(MovementState.Backward);
                 bool movingLeft = CharacterModel.movementState.HasFlag(MovementState.Left);
@@ -309,7 +309,13 @@ namespace MultiplayerARPG.GameData.Model.Playables
                     stringBuilder.Append(DIR_LEFT);
                 else if (movingRight)
                     stringBuilder.Append(DIR_RIGHT);
-                return stringBuilder.ToString();
+                // This is state ID with out current weapon type ID
+                stateId = stringBuilder.ToString();
+                string stateWithWeaponTypeId = stringBuilder.Clear().Append(currentWeaponTypeId).Append(stateId).ToString();
+                // State not found, use fall state from default animations
+                if (!baseStates.ContainsKey(stateWithWeaponTypeId))
+                    return stateId;
+                return stateWithWeaponTypeId;
             }
             else if (playingJumpState == PlayingJumpState.Playing)
             {
@@ -444,7 +450,7 @@ namespace MultiplayerARPG.GameData.Model.Playables
             playingJumpState = PlayingJumpState.Starting;
         }
 
-        public void PlayAction(ActionState actionState, float speedRate)
+        public void PlayAction(ActionState actionState, float speedRate, float duration = 0f)
         {
             // Destroy playing state
             if (ActionLayerMixer.IsValid())
@@ -454,7 +460,8 @@ namespace MultiplayerARPG.GameData.Model.Playables
             Graph.Connect(ActionLayerMixer, 0, LayerMixer, 1);
             LayerMixer.SetInputWeight(1, 0f);
 
-            AnimationClipPlayable playable = AnimationClipPlayable.Create(Graph, actionState.clip);
+            AnimationClip clip = actionState.clip != null ? actionState.clip : EmptyClip;
+            AnimationClipPlayable playable = AnimationClipPlayable.Create(Graph, clip);
             playable.SetApplyFootIK(false);
             playable.SetApplyPlayableIK(false);
             Graph.Connect(playable, 0, ActionLayerMixer, 0);
@@ -467,7 +474,7 @@ namespace MultiplayerARPG.GameData.Model.Playables
             LayerMixer.SetLayerMaskFromAvatarMask(1, avatarMask);
 
             // Set clip info
-            float speed = (actionState.animSpeedRate > 0 ? actionState.animSpeedRate : 1) * speedRate;
+            float speed = (actionState.animSpeedRate > 0f ? actionState.animSpeedRate : 1f) * speedRate;
             // Set transition duration
             actionTransitionDuration = actionState.transitionDuration;
             if (actionTransitionDuration <= 0f)
@@ -477,7 +484,7 @@ namespace MultiplayerARPG.GameData.Model.Playables
             Playable clipPlayable = ActionLayerMixer.GetInput(0);
             clipPlayable.SetSpeed(speed);
             clipPlayable.SetTime(0f);
-            actionClipLength = actionState.clip.length / speed;
+            actionClipLength = (duration > 0f ? duration : clip.length) / speed;
             // Reset play elapsed
             actionPlayElapsed = 0f;
 
