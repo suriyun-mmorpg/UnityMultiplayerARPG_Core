@@ -104,6 +104,8 @@ namespace MultiplayerARPG
         public bool activateInstantiatedObject = false;
 #endif
 
+        public CharacterModelManager Manager { get; private set; }
+
         /// <summary>
         /// Dictionary[vehicleType(Int32), vehicleCharacterModel(VehicleCharacterModel)]
         /// </summary>
@@ -155,6 +157,13 @@ namespace MultiplayerARPG
             base.Awake();
             if (string.IsNullOrEmpty(assetId))
                 hashAssetId = gameObject.GetInstanceID();
+
+            Manager = GetComponent<CharacterModelManager>();
+            if (Manager == null)
+                Manager = GetComponentInParent<CharacterModelManager>();
+            // Can't find manager, this component may attached to non-character entities, so assume that this character model is main model
+            if (Manager == null)
+                MainModel = this;
 
             CacheVehicleModels = new Dictionary<int, VehicleCharacterModel>();
             if (IsMainModel && vehicleModels != null && vehicleModels.Length > 0)
