@@ -1083,16 +1083,26 @@ namespace MultiplayerARPG
 
         protected virtual void ConvertToNewerCharacterModelImplement()
         {
-            switch (animatorType)
+            try
             {
-                case AnimatorType.Animator:
-                    ConvertToAnimatorCharacterModel();
-                    break;
-                case AnimatorType.LegacyAnimtion:
-                    ConvertToAnimationCharacterModel();
-                    break;
+                switch (animatorType)
+                {
+                    case AnimatorType.Animator:
+                        ConvertToAnimatorCharacterModel();
+                        break;
+                    case AnimatorType.LegacyAnimtion:
+                        ConvertToAnimationCharacterModel();
+                        break;
+                }
             }
-            EditorUtility.DisplayDialog("Character Model Conversion", "New Character Model component has been added.\n\nThe old component doesn't removed yet to let you check values.\n\nThen, you have to remove the old one.", "OK");
+            catch (System.Exception ex)
+            {
+                Debug.LogException(ex);
+            }
+            finally
+            {
+                EditorUtility.DisplayDialog("Character Model Conversion", "New Character Model component has been added.\n\nThe old component doesn't removed yet to let you check values.\n\nThen, you have to remove the old one.", "OK");
+            }
         }
 
         private void ConvertToAnimatorCharacterModel()
@@ -1132,6 +1142,14 @@ namespace MultiplayerARPG
             model.ActivateObjectsWhenSwitchModel = activateObjectsWhenSwitchModel;
             model.DeactivateObjectsWhenSwitchModel = deactivateObjectsWhenSwitchModel;
             model.VehicleModels = vehicleModels;
+
+            // Set model to manager
+            CharacterModelManager manager = GetComponent<CharacterModelManager>();
+            if (manager == null)
+                manager = GetComponentInParent<CharacterModelManager>();
+            if (manager != null && manager.MainTpsModel == this)
+                manager.MainTpsModel = model;
+
             EditorUtility.SetDirty(model);
         }
 
@@ -1172,6 +1190,14 @@ namespace MultiplayerARPG
             model.ActivateObjectsWhenSwitchModel = activateObjectsWhenSwitchModel;
             model.DeactivateObjectsWhenSwitchModel = deactivateObjectsWhenSwitchModel;
             model.VehicleModels = vehicleModels;
+
+            // Set model to manager
+            CharacterModelManager manager = GetComponent<CharacterModelManager>();
+            if (manager == null)
+                manager = GetComponentInParent<CharacterModelManager>();
+            if (manager != null && manager.MainTpsModel == this)
+                manager.MainTpsModel = model;
+
             EditorUtility.SetDirty(model);
         }
 #endif

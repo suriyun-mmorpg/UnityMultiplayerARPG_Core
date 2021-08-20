@@ -1682,6 +1682,22 @@ namespace MultiplayerARPG
         [ContextMenu("Convert To Playable Character Model", false, 1000500)]
         public void ConvertToPlayableCharacterModel()
         {
+            try
+            {
+                ConvertToPlayableCharacterModelImplement();
+            }
+            catch (System.Exception ex)
+            {
+                Debug.LogException(ex);
+            }
+            finally
+            {
+                EditorUtility.DisplayDialog("Character Model Conversion", "New Character Model component has been added.\n\nThe old component doesn't removed yet to let you check values.\n\nThen, you have to remove the old one.", "OK");
+            }
+        }
+
+        public void ConvertToPlayableCharacterModelImplement()
+        {
             Playables.PlayableCharacterModel model = gameObject.GetOrAddComponent<Playables.PlayableCharacterModel>();
             model.animator = animator;
             model.skinnedMeshRenderer = skinnedMeshRenderer;
@@ -1723,9 +1739,15 @@ namespace MultiplayerARPG
             model.ActivateObjectsWhenSwitchModel = activateObjectsWhenSwitchModel;
             model.DeactivateObjectsWhenSwitchModel = deactivateObjectsWhenSwitchModel;
             model.VehicleModels = vehicleModels;
-            EditorUtility.SetDirty(model);
 
-            EditorUtility.DisplayDialog("Character Model Conversion", "New Character Model component has been added.\n\nThe old component doesn't removed yet to let you check values.\n\nThen, you have to remove the old one.", "OK");
+            // Set model to manager
+            CharacterModelManager manager = GetComponent<CharacterModelManager>();
+            if (manager == null)
+                manager = GetComponentInParent<CharacterModelManager>();
+            if (manager != null && manager.MainTpsModel == this)
+                manager.MainTpsModel = model;
+
+            EditorUtility.SetDirty(model);
         }
 #endif
     }
