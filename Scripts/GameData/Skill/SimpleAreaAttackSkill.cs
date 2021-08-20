@@ -26,7 +26,7 @@ namespace MultiplayerARPG
         public HarvestType harvestType;
         public IncrementalMinMaxFloat harvestDamageAmount;
 
-        [Category("Warp Settings")]
+        [Category(4, "Warp Settings")]
         public bool isWarpToAimPosition;
 
         private Dictionary<Attribute, float> cacheEffectivenessAttributes;
