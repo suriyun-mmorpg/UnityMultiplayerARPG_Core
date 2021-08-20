@@ -1,10 +1,9 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 
 namespace MultiplayerARPG
 {
-    [CreateAssetMenu(fileName = "Skill", menuName = "Create GameData/Skill/Simple Resurrection Skill", order = -4986)]
+    [CreateAssetMenu(fileName = "Simple Resurrection Skill", menuName = "Create GameData/Skill/Simple Resurrection Skill", order = -4986)]
     public class SimpleResurrectionSkill : BaseSkill
     {
         [Category("Buff")]
