@@ -6,6 +6,7 @@ using UnityEditor.SceneManagement;
 using UnityEngine.AI;
 using StandardAssets.Characters.Physics;
 using LiteNetLibManager;
+using MultiplayerARPG.GameData.Model.Playables;
 
 namespace MultiplayerARPG
 {
@@ -19,6 +20,7 @@ namespace MultiplayerARPG
 
         public enum CharacterModelType
         {
+            PlayableCharacterModel,
             AnimatorCharacterModel,
             AnimationCharacterModel,
         }
@@ -110,12 +112,24 @@ namespace MultiplayerARPG
             newObject.AddComponent<CharacterRecoveryComponent>();
             newObject.AddComponent<CharacterSkillAndBuffComponent>();
 
+            Animator animator;
             BaseCharacterModel characterModel = null;
             switch (characterModelType)
             {
+                case CharacterModelType.PlayableCharacterModel:
+                    characterModel = newObject.AddComponent<PlayableCharacterModel>();
+                    animator = newObject.GetComponentInChildren<Animator>();
+                    if (animator == null)
+                    {
+                        Debug.LogError("Cannot create new entity with `PlayableCharacterModel`, can't find `Animator` component");
+                        DestroyImmediate(newObject);
+                        return;
+                    }
+                    (characterModel as PlayableCharacterModel).animator = animator;
+                    break;
                 case CharacterModelType.AnimatorCharacterModel:
                     characterModel = newObject.AddComponent<AnimatorCharacterModel>();
-                    var animator = newObject.GetComponentInChildren<Animator>();
+                    animator = newObject.GetComponentInChildren<Animator>();
                     if (animator == null)
                     {
                         Debug.LogError("Cannot create new entity with `AnimatorCharacterModel`, can't find `Animator` component");
