@@ -692,7 +692,7 @@ namespace StandardAssets.Characters.Physics
 			if (includeSkinWidth)
 			{
 				m_CapsuleCollider.radius = m_Radius + m_SkinWidth;
-				m_CapsuleCollider.height = m_Height + (m_SkinWidth * 2.0f);
+				m_CapsuleCollider.height = m_Height;
 			}
 
 			// Note: Physics.ComputePenetration does not always return values when the colliders overlap.
@@ -1336,7 +1336,7 @@ namespace StandardAssets.Characters.Physics
 		// 		canSlide: Can slide against obstacles?
 		// 		tryGrounding: Try grounding the player?
 		//		currentPosition: position of the character
-		bool MoveMajorStep(ref Vector3 moveVector, bool canSlide, bool tryGrounding, ref Vector3 currentPosition)
+		public bool MoveMajorStep(ref Vector3 moveVector, bool canSlide, bool tryGrounding, ref Vector3 currentPosition)
 		{
 			var direction = moveVector.normalized;
 			var distance = moveVector.magnitude;

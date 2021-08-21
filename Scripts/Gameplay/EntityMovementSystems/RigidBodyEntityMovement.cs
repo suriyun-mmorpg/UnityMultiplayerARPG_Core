@@ -571,7 +571,8 @@ namespace MultiplayerARPG
                 }
             }
 
-            collisionFlags = CacheOpenCharacterController.Move((tempMoveVelocity + platformMotion) * deltaTime);
+            if (CacheOpenCharacterController.enabled)
+                collisionFlags = CacheOpenCharacterController.Move((tempMoveVelocity + platformMotion) * deltaTime);
 
             if (targetYRotation.HasValue)
             {
@@ -587,6 +588,9 @@ namespace MultiplayerARPG
             acceptedJump = false;
             previouslyGrounded = isGrounded;
             previouslyAirborne = isAirborne;
+
+            if (!CacheOpenCharacterController.enabled)
+                CacheOpenCharacterController.enabled = true;
         }
 
         private void UpdateRotation()
@@ -859,7 +863,10 @@ namespace MultiplayerARPG
         {
             airborneElapsed = 0;
             tempVerticalVelocity = 0;
-            CacheOpenCharacterController.SetPosition(position, false);
+            Vector3 moveVector = Vector3.zero;
+            Vector3 currentPosition = position;
+            CacheOpenCharacterController.MoveMajorStep(ref moveVector, false, true, ref currentPosition);
+            CacheOpenCharacterController.SetPosition(currentPosition, false);
         }
 
 #if UNITY_EDITOR
