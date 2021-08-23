@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using LiteNetLibManager;
+using UnityEngine.UI;
 
 namespace MultiplayerARPG
 {
@@ -40,6 +41,7 @@ namespace MultiplayerARPG
         public InputFieldWrapper inputFieldMessage;
         public TextWrapper textMessage2;
         public InputFieldWrapper inputFieldMessage2;
+        public Toggle toggleAutoAcceptRequests;
         public TextWrapper textScore;
         public TextWrapper textRank;
         public GameObject[] autoAcceptRequestsObjects;
@@ -128,6 +130,18 @@ namespace MultiplayerARPG
                     guildMessage2Updater = gameObject.GetOrAddComponent<UIGuildMessage2Updater>();
                 guildMessage2Updater.inputField = inputFieldMessage2;
                 return guildMessage2Updater;
+            }
+        }
+
+        private UIGuildAutoAcceptRequestUpdater guildAutoAcceptRequestUpdater;
+        public UIGuildAutoAcceptRequestUpdater GuildAutoAcceptRequestUpdater
+        {
+            get
+            {
+                if (guildAutoAcceptRequestUpdater == null)
+                    guildAutoAcceptRequestUpdater = gameObject.GetOrAddComponent<UIGuildAutoAcceptRequestUpdater>();
+                guildAutoAcceptRequestUpdater.toggle = toggleAutoAcceptRequests;
+                return guildAutoAcceptRequestUpdater;
             }
         }
 
@@ -236,6 +250,9 @@ namespace MultiplayerARPG
                 if (inputFieldMessage2 != null)
                     inputFieldMessage2.text = guildMessage2;
             }
+
+            if (toggleAutoAcceptRequests != null)
+                toggleAutoAcceptRequests.isOn = Guild != null && Guild.autoAcceptRequests;
 
             if (textScore != null)
             {
