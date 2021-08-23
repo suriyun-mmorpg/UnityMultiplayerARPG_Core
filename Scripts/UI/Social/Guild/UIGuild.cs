@@ -25,6 +25,9 @@ namespace MultiplayerARPG
         public UILocaleKeySetting formatKeyRank = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_SIMPLE);
 
         [Header("UI Elements")]
+        public UIGuildCreate uiGuildCreate;
+        public UIGuildRoleSetting uiGuildRoleSetting;
+        public UIGuildMemberRoleSetting uiGuildMemberRoleSetting;
         public UIGuildRole uiRoleDialog;
         public UIGuildRole uiRolePrefab;
         public Transform uiRoleContainer;
@@ -42,13 +45,11 @@ namespace MultiplayerARPG
         public TextWrapper textMessage2;
         public InputFieldWrapper inputFieldMessage2;
         public Toggle toggleAutoAcceptRequests;
+        public Toggle toggleNotAutoAcceptRequests;
         public TextWrapper textScore;
         public TextWrapper textRank;
         public GameObject[] autoAcceptRequestsObjects;
         public GameObject[] notAutoAcceptRequestsObjects;
-        public UIGuildCreate uiGuildCreate;
-        public UIGuildRoleSetting uiGuildRoleSetting;
-        public UIGuildMemberRoleSetting uiGuildMemberRoleSetting;
 
         public GuildData Guild { get { return GameInstance.JoinedGuild; } }
 
@@ -253,6 +254,9 @@ namespace MultiplayerARPG
 
             if (toggleAutoAcceptRequests != null)
                 toggleAutoAcceptRequests.isOn = Guild != null && Guild.autoAcceptRequests;
+
+            if (toggleNotAutoAcceptRequests != null)
+                toggleNotAutoAcceptRequests.isOn = Guild == null || !Guild.autoAcceptRequests;
 
             if (textScore != null)
             {
