@@ -98,17 +98,18 @@ namespace MultiplayerARPG
             if (guild == null)
                 return;
             handlers.SendSetGuildData(connectionId, guild);
-            handlers.SendAddGuildMembersToOne(connectionId, guild);
             handlers.SendSetGuildMessage(connectionId, guild);
             handlers.SendSetGuildMessage2(connectionId, guild);
             handlers.SendSetGuildRank(connectionId, guild);
             handlers.SendSetGuildScore(connectionId, guild);
             handlers.SendSetGuildOptions(connectionId, guild);
             handlers.SendSetGuildRolesToOne(connectionId, guild);
+            handlers.SendAddGuildMembersToOne(connectionId, guild);
             handlers.SendSetGuildMemberRolesToOne(connectionId, guild);
             handlers.SendSetGuildSkillLevelsToOne(connectionId, guild);
             handlers.SendSetGuildGold(connectionId, guild);
             handlers.SendSetGuildLevelExpSkillPoint(connectionId, guild);
+            handlers.SendSetGuildAutoAcceptRequests(connectionId, guild);
         }
 
         public static void SendSetGuildLeaderToMembers(this IServerGameMessageHandlers handlers, GuildData guild)
