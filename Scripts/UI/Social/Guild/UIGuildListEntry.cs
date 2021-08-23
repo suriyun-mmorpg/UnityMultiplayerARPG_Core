@@ -78,7 +78,7 @@ namespace MultiplayerARPG
             {
                 foreach (GameObject notAutoAcceptRequestsObject in notAutoAcceptRequestsObjects)
                 {
-                    notAutoAcceptRequestsObject.SetActive(Data.AutoAcceptRequests);
+                    notAutoAcceptRequestsObject.SetActive(!Data.AutoAcceptRequests);
                 }
             }
         }
