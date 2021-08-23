@@ -14,6 +14,9 @@ namespace MultiplayerARPG
         [FormerlySerializedAs("inputGuildName")]
         public InputFieldWrapper inputFind;
 
+        [Header("Options")]
+        public GuildListFieldOptions fieldOptions = GuildListFieldOptions.All;
+
         private UIList cacheList;
         public UIList CacheList
         {
@@ -125,6 +128,7 @@ namespace MultiplayerARPG
         {
             GameInstance.ClientGuildHandlers.RequestFindGuilds(new RequestFindGuildsMessage()
             {
+                fieldOptions = fieldOptions,
                 guildName = guildName,
             }, GuildListCallback);
         }
