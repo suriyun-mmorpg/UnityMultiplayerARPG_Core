@@ -11,6 +11,14 @@ namespace MultiplayerARPG
             handlers.SendSetPartyData(connectionId, party.id, party.shareExp, party.shareItem, party.leaderId);
         }
 
+        public static void SendSetFullPartyData(this IServerGameMessageHandlers handlers, long connectionId, PartyData party)
+        {
+            if (party == null)
+                return;
+            handlers.SendSetPartyData(connectionId, party);
+            handlers.SendAddPartyMembersToOne(connectionId, party);
+        }
+
         public static void SendSetPartyLeaderToMembers(this IServerGameMessageHandlers handlers, PartyData party)
         {
             if (party == null)
@@ -83,6 +91,24 @@ namespace MultiplayerARPG
             if (guild == null)
                 return;
             handlers.SendSetGuildData(connectionId, guild.id, guild.guildName, guild.leaderId);
+        }
+
+        public static void SendSetFullGuildData(this IServerGameMessageHandlers handlers, long connectionId, GuildData guild)
+        {
+            if (guild == null)
+                return;
+            handlers.SendSetGuildData(connectionId, guild);
+            handlers.SendAddGuildMembersToOne(connectionId, guild);
+            handlers.SendSetGuildMessage(connectionId, guild);
+            handlers.SendSetGuildMessage2(connectionId, guild);
+            handlers.SendSetGuildRank(connectionId, guild);
+            handlers.SendSetGuildScore(connectionId, guild);
+            handlers.SendSetGuildOptions(connectionId, guild);
+            handlers.SendSetGuildRolesToOne(connectionId, guild);
+            handlers.SendSetGuildMemberRolesToOne(connectionId, guild);
+            handlers.SendSetGuildSkillLevelsToOne(connectionId, guild);
+            handlers.SendSetGuildGold(connectionId, guild);
+            handlers.SendSetGuildLevelExpSkillPoint(connectionId, guild);
         }
 
         public static void SendSetGuildLeaderToMembers(this IServerGameMessageHandlers handlers, GuildData guild)

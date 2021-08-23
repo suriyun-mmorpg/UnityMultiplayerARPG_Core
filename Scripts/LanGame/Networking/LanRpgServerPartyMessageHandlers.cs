@@ -33,8 +33,7 @@ namespace MultiplayerARPG
             validateResult.Party.AddMember(playerCharacter);
             GameInstance.ServerPartyHandlers.SetParty(request.partyId, validateResult.Party);
             GameInstance.ServerPartyHandlers.RemovePartyInvitation(request.partyId, playerCharacter.Id);
-            GameInstance.ServerGameMessageHandlers.SendSetPartyData(requestHandler.ConnectionId, validateResult.Party);
-            GameInstance.ServerGameMessageHandlers.SendAddPartyMembersToOne(requestHandler.ConnectionId, validateResult.Party);
+            GameInstance.ServerGameMessageHandlers.SendSetFullPartyData(requestHandler.ConnectionId, validateResult.Party);
             GameInstance.ServerGameMessageHandlers.SendAddPartyMemberToMembers(validateResult.Party, playerCharacter.Id, playerCharacter.CharacterName, playerCharacter.DataId, playerCharacter.Level);
             result.Invoke(AckResponseCode.Success, new ResponseAcceptPartyInvitationMessage()
             {
@@ -137,8 +136,7 @@ namespace MultiplayerARPG
             PartyData party = new PartyData(++Id, request.shareExp, request.shareItem, SocialCharacterData.Create(playerCharacter));
             GameInstance.ServerPartyHandlers.SetParty(party.id, party);
             playerCharacter.PartyId = party.id;
-            GameInstance.ServerGameMessageHandlers.SendSetPartyData(requestHandler.ConnectionId, party);
-            GameInstance.ServerGameMessageHandlers.SendAddPartyMembersToOne(requestHandler.ConnectionId, party);
+            GameInstance.ServerGameMessageHandlers.SendSetFullPartyData(requestHandler.ConnectionId, party);
             result.Invoke(AckResponseCode.Success, new ResponseCreatePartyMessage());
         }
 

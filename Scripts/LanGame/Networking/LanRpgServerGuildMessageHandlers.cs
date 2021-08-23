@@ -33,8 +33,7 @@ namespace MultiplayerARPG
             validateResult.Guild.AddMember(playerCharacter);
             GameInstance.ServerGuildHandlers.SetGuild(request.guildId, validateResult.Guild);
             GameInstance.ServerGuildHandlers.RemoveGuildInvitation(request.guildId, playerCharacter.Id);
-            GameInstance.ServerGameMessageHandlers.SendSetGuildData(requestHandler.ConnectionId, validateResult.Guild);
-            GameInstance.ServerGameMessageHandlers.SendAddGuildMembersToOne(requestHandler.ConnectionId, validateResult.Guild);
+            GameInstance.ServerGameMessageHandlers.SendSetFullGuildData(requestHandler.ConnectionId, validateResult.Guild);
             GameInstance.ServerGameMessageHandlers.SendAddGuildMemberToMembers(validateResult.Guild, playerCharacter.Id, playerCharacter.CharacterName, playerCharacter.DataId, playerCharacter.Level);
             result.Invoke(AckResponseCode.Success, new ResponseAcceptGuildInvitationMessage()
             {
@@ -145,8 +144,7 @@ namespace MultiplayerARPG
                 // Sync guild name to client
                 (playerCharacter as BasePlayerCharacterEntity).GuildName = request.guildName;
             }
-            GameInstance.ServerGameMessageHandlers.SendSetGuildData(requestHandler.ConnectionId, guild);
-            GameInstance.ServerGameMessageHandlers.SendAddGuildMembersToOne(requestHandler.ConnectionId, guild);
+            GameInstance.ServerGameMessageHandlers.SendSetFullGuildData(requestHandler.ConnectionId, guild);
             result.Invoke(AckResponseCode.Success, new ResponseCreateGuildMessage());
         }
 
