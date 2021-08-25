@@ -985,6 +985,15 @@ namespace MultiplayerARPG
         /// Format => {0} = {Item's Title}, {1} = {Amount}, {2} = {Item's Description}
         /// </summary>
         UI_FORMAT_GENERATE_CAST_SHOP_ITEM_DESCRIPTION,
+        // 1.68b New Formats
+        /// <summary>
+        /// Format => {0} = {Loading Asset Bundle File Name}
+        /// </summary>
+        UI_FORMAT_LOADING_ASSET_BUNDLE_FILE_NAME,
+        /// <summary>
+        /// Format => {0} = {Current Loaded Asset Bundles Count}, {1} = {Total Loading Asset Bundles Count}
+        /// </summary>
+        UI_FORMAT_LOADED_ASSET_BUNDLES_COUNT,
     }
 
     public static class DefaultLocale
@@ -1475,6 +1484,9 @@ namespace MultiplayerARPG
             // Format - 1.67b - Cash shop item generator
             Texts.Add(UIFormatKeys.UI_FORMAT_GENERATE_CAST_SHOP_ITEM_TITLE.ToString(), "{0} x {1}");
             Texts.Add(UIFormatKeys.UI_FORMAT_GENERATE_CAST_SHOP_ITEM_DESCRIPTION.ToString(), "Buy {0} x {1}\n\n{2}");
+            // Format - 1.68b - Asset bundle
+            Texts.Add(UIFormatKeys.UI_FORMAT_LOADING_ASSET_BUNDLE_FILE_NAME.ToString(), "Loading File: {0}");
+            Texts.Add(UIFormatKeys.UI_FORMAT_LOADED_ASSET_BUNDLES_COUNT.ToString(), "Loaded Files: {0}/{1}");
         }
     }
 

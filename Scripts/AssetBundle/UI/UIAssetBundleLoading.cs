@@ -1,0 +1,101 @@
+using UnityEngine;
+using UnityEngine.UI;
+
+namespace MultiplayerARPG
+{
+    public partial class UIAssetBundleLoading : MonoBehaviour
+    {
+        public static UIAssetBundleLoading Singleton { get; private set; }
+        public UILocaleKeySetting formatLoadingAssetBundleFileName = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_SIMPLE);
+        public UILocaleKeySetting formatLoadedAssetBundles = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_SIMPLE_MIN_BY_MAX);
+        public GameObject rootObject;
+        public TextWrapper uiTextProgress;
+        public Image imageGage;
+        public GameObject totalRootObject;
+        public TextWrapper uiTextTotalProgress;
+        public Image imageGageTotal;
+        public TextWrapper textLoadingAssetBundleFileName;
+        public TextWrapper textLoadedAssetBundlesCount;
+
+        private void Awake()
+        {
+            if (Singleton != null)
+            {
+                Destroy(gameObject);
+                return;
+            }
+
+            DontDestroyOnLoad(gameObject);
+            Singleton = this;
+
+            if (rootObject != null)
+                rootObject.SetActive(false);
+
+            if (totalRootObject != null)
+                totalRootObject.SetActive(false);
+        }
+
+        private void Update()
+        {
+            switch (AssetBundleManager.Singleton.CurrentLoadState)
+            {
+                case AssetBundleManager.LoadState.None:
+                    if (rootObject != null)
+                        rootObject.SetActive(false);
+
+                    if (totalRootObject != null)
+                        totalRootObject.SetActive(false);
+
+                    if (textLoadingAssetBundleFileName != null)
+                        textLoadingAssetBundleFileName.text = string.Empty;
+                    if (textLoadedAssetBundlesCount != null)
+                        textLoadedAssetBundlesCount.text = string.Empty;
+                    break;
+                case AssetBundleManager.LoadState.LoadManifest:
+                    // TODO: May show message
+                    break;
+                case AssetBundleManager.LoadState.LoadDependencies:
+                case AssetBundleManager.LoadState.LoadMainAssetBundle:
+                    if (rootObject != null)
+                        rootObject.SetActive(true);
+                    if (uiTextProgress != null)
+                        uiTextProgress.text = (AssetBundleManager.Singleton.CurrentWebRequest.downloadProgress * 100f).ToString("N2") + "%";
+                    if (imageGage != null)
+                        imageGage.fillAmount = AssetBundleManager.Singleton.CurrentWebRequest.downloadProgress;
+
+                    if (totalRootObject != null)
+                        totalRootObject.SetActive(true);
+                    if (uiTextTotalProgress != null)
+                        uiTextTotalProgress.text = (AssetBundleManager.Singleton.TotalLoadProgress * 100f).ToString("N2") + "%";
+                    if (imageGageTotal != null)
+                        imageGageTotal.fillAmount = AssetBundleManager.Singleton.TotalLoadProgress;
+
+                    if (textLoadingAssetBundleFileName != null)
+                        textLoadingAssetBundleFileName.text = string.Format(LanguageManager.GetText(formatLoadingAssetBundleFileName), AssetBundleManager.Singleton.LoadingAssetBundleFileName);
+                    if (textLoadedAssetBundlesCount != null)
+                        textLoadedAssetBundlesCount.text = string.Format(LanguageManager.GetText(formatLoadedAssetBundles), AssetBundleManager.Singleton.LoadedDependenciesCount, AssetBundleManager.Singleton.LoadingDependenciesCount);
+                    break;
+                case AssetBundleManager.LoadState.Done:
+                    if (rootObject != null)
+                        rootObject.SetActive(true);
+                    if (uiTextProgress != null)
+                        uiTextProgress.text = "100.00%";
+                    if (imageGage != null)
+                        imageGage.fillAmount = 1;
+
+                    if (totalRootObject != null)
+                        totalRootObject.SetActive(true);
+                    if (uiTextTotalProgress != null)
+                        uiTextTotalProgress.text = "100.00%";
+                    if (imageGageTotal != null)
+                        imageGageTotal.fillAmount = 1;
+
+                    if (textLoadingAssetBundleFileName != null)
+                        textLoadingAssetBundleFileName.text = string.Empty;
+                    if (textLoadedAssetBundlesCount != null)
+                        textLoadedAssetBundlesCount.text = string.Empty;
+                    break;
+            }
+        }
+    }
+}

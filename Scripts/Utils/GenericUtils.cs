@@ -4,6 +4,7 @@ using System.Text;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
+using System.Linq;
 #if USE_TEXT_MESH_PRO
 using TMPro;
 #endif
@@ -533,5 +534,10 @@ public static class GenericUtils
         if (monthDiff < 12)
             return string.Format(formatMonthsAgo, monthDiff);
         return dateTime.ToShortDateString();
+    }
+
+    public static System.Uri Append(this System.Uri uri, params string[] paths)
+    {
+        return new System.Uri(paths.Aggregate(uri.AbsoluteUri, (current, path) => string.Format("{0}/{1}", current.TrimEnd('/'), path.TrimStart('/'))));
     }
 }

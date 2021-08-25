@@ -41,6 +41,19 @@ namespace MultiplayerARPG
         public Quest[] quests;
         public Faction[] factions;
 
+        [Header("Set Asset Bundle Name Tools")]
+        public string attributeBundleName = "attribute";
+        public string currencyBundleName = "currency";
+        public string damageElementBundleName = "damageElement";
+        public string characterBundleName = "character";
+        public string itemBundleName = "item";
+        public string mapInfoBundleName = "map";
+        public string sceneBundleName = "scene";
+        public string skillBundleName = "skill";
+        public string guildSkillBundleName = "guildSkill";
+        public string questBundleName = "quest";
+        public bool setNameForUnnamedAssetsOnly = true;
+
         protected override async UniTask LoadDataImplement(GameInstance gameInstance)
         {
             GameInstance.AddCharacterEntities(playerCharacterEntities);
@@ -68,6 +81,109 @@ namespace MultiplayerARPG
             await UniTask.Yield();
         }
 
+#if UNITY_EDITOR
+        [ContextMenu("Set Asset Bundle Name", false, 1000100)]
+        public void SetAssetBundleName()
+        {
+            LoadReferredData();
+            string assetPath;
+            AssetImporter assetImporter;
+            foreach (Attribute asset in GameInstance.Attributes.Values)
+            {
+                assetPath = AssetDatabase.GetAssetPath(asset.GetInstanceID());
+                assetImporter = AssetImporter.GetAtPath(assetPath);
+                if (string.IsNullOrEmpty(assetImporter.assetBundleName))
+                    assetImporter.SetAssetBundleNameAndVariant(attributeBundleName, "");
+            }
+            foreach (Currency asset in GameInstance.Currencies.Values)
+            {
+                assetPath = AssetDatabase.GetAssetPath(asset.GetInstanceID());
+                assetImporter = AssetImporter.GetAtPath(assetPath);
+                if (string.IsNullOrEmpty(assetImporter.assetBundleName))
+                    assetImporter.SetAssetBundleNameAndVariant(currencyBundleName, "");
+            }
+            foreach (DamageElement asset in GameInstance.DamageElements.Values)
+            {
+                assetPath = AssetDatabase.GetAssetPath(asset.GetInstanceID());
+                assetImporter = AssetImporter.GetAtPath(assetPath);
+                if (string.IsNullOrEmpty(assetImporter.assetBundleName))
+                    assetImporter.SetAssetBundleNameAndVariant(damageElementBundleName, "");
+            }
+            foreach (BasePlayerCharacterEntity asset in GameInstance.PlayerCharacterEntities.Values)
+            {
+                assetPath = AssetDatabase.GetAssetPath(asset.GetInstanceID());
+                assetImporter = AssetImporter.GetAtPath(assetPath);
+                if (string.IsNullOrEmpty(assetImporter.assetBundleName))
+                    assetImporter.SetAssetBundleNameAndVariant(characterBundleName, "");
+            }
+            foreach (BaseMonsterCharacterEntity asset in GameInstance.MonsterCharacterEntities.Values)
+            {
+                assetPath = AssetDatabase.GetAssetPath(asset.GetInstanceID());
+                assetImporter = AssetImporter.GetAtPath(assetPath);
+                if (string.IsNullOrEmpty(assetImporter.assetBundleName))
+                    assetImporter.SetAssetBundleNameAndVariant(characterBundleName, "");
+            }
+            foreach (VehicleEntity asset in GameInstance.VehicleEntities.Values)
+            {
+                assetPath = AssetDatabase.GetAssetPath(asset.GetInstanceID());
+                assetImporter = AssetImporter.GetAtPath(assetPath);
+                if (string.IsNullOrEmpty(assetImporter.assetBundleName))
+                    assetImporter.SetAssetBundleNameAndVariant(characterBundleName, "");
+            }
+            foreach (BaseCharacter asset in GameInstance.Characters.Values)
+            {
+                assetPath = AssetDatabase.GetAssetPath(asset.GetInstanceID());
+                assetImporter = AssetImporter.GetAtPath(assetPath);
+                if (string.IsNullOrEmpty(assetImporter.assetBundleName))
+                    assetImporter.SetAssetBundleNameAndVariant(characterBundleName, "");
+            }
+            foreach (BaseItem asset in GameInstance.Items.Values)
+            {
+                assetPath = AssetDatabase.GetAssetPath(asset.GetInstanceID());
+                assetImporter = AssetImporter.GetAtPath(assetPath);
+                if (string.IsNullOrEmpty(assetImporter.assetBundleName))
+                    assetImporter.SetAssetBundleNameAndVariant(itemBundleName, "");
+            }
+            foreach (BaseMapInfo asset in GameInstance.MapInfos.Values)
+            {
+                assetPath = AssetDatabase.GetAssetPath(asset.GetInstanceID());
+                assetImporter = AssetImporter.GetAtPath(assetPath);
+                if (string.IsNullOrEmpty(assetImporter.assetBundleName))
+                    assetImporter.SetAssetBundleNameAndVariant(mapInfoBundleName, "");
+                if (asset.Scene.SceneAsset == null)
+                {
+                    Debug.LogWarning("Map info: " + asset.Id + " has no scene set.");
+                    continue;
+                }
+                assetPath = AssetDatabase.GetAssetPath(asset.Scene.SceneAsset.GetInstanceID());
+                assetImporter = AssetImporter.GetAtPath(assetPath);
+                if (string.IsNullOrEmpty(assetImporter.assetBundleName))
+                    assetImporter.SetAssetBundleNameAndVariant(sceneBundleName, "");
+            }
+            foreach (BaseSkill asset in GameInstance.Skills.Values)
+            {
+                assetPath = AssetDatabase.GetAssetPath(asset.GetInstanceID());
+                assetImporter = AssetImporter.GetAtPath(assetPath);
+                if (string.IsNullOrEmpty(assetImporter.assetBundleName))
+                    assetImporter.SetAssetBundleNameAndVariant(skillBundleName, "");
+            }
+            foreach (GuildSkill asset in GameInstance.GuildSkills.Values)
+            {
+                assetPath = AssetDatabase.GetAssetPath(asset.GetInstanceID());
+                assetImporter = AssetImporter.GetAtPath(assetPath);
+                if (string.IsNullOrEmpty(assetImporter.assetBundleName))
+                    assetImporter.SetAssetBundleNameAndVariant(guildSkillBundleName, "");
+            }
+            foreach (Quest asset in GameInstance.Quests.Values)
+            {
+                assetPath = AssetDatabase.GetAssetPath(asset.GetInstanceID());
+                assetImporter = AssetImporter.GetAtPath(assetPath);
+                if (string.IsNullOrEmpty(assetImporter.assetBundleName))
+                    assetImporter.SetAssetBundleNameAndVariant(questBundleName, "");
+            }
+        }
+#endif
+
         public void LoadReferredData()
         {
             GameInstance.ClearData();
@@ -89,30 +205,9 @@ namespace MultiplayerARPG
             GameInstance.AddMapInfos(mapInfos);
             GameInstance.AddQuests(quests);
             GameInstance.AddFactions(factions);
-
-            if (playerCharacterEntities != null && playerCharacterEntities.Length > 0)
-            {
-                foreach (BasePlayerCharacterEntity entity in playerCharacterEntities)
-                {
-                    entity.PrepareRelatesData();
-                }
-            }
-
-            if (monsterCharacterEntities != null && monsterCharacterEntities.Length > 0)
-            {
-                foreach (BaseMonsterCharacterEntity entity in monsterCharacterEntities)
-                {
-                    entity.PrepareRelatesData();
-                }
-            }
-
-            if (vehicleEntities != null && vehicleEntities.Length > 0)
-            {
-                foreach (VehicleEntity entity in vehicleEntities)
-                {
-                    entity.PrepareRelatesData();
-                }
-            }
+            GameInstance.AddCharacterEntities(playerCharacterEntities);
+            GameInstance.AddCharacterEntities(monsterCharacterEntities);
+            GameInstance.AddVehicleEntities(vehicleEntities);
 
             List<Attribute> tempAttributes = new List<Attribute>(GameInstance.Attributes.Values);
             tempAttributes.Sort();
