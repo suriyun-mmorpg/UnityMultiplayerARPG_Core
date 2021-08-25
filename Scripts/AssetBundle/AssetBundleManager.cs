@@ -180,41 +180,53 @@ namespace MultiplayerARPG
 
         public void LoadAssetBundleFromLocalFolder()
         {
-            StartCoroutine(LoadAssetBundleFromUrlRoutine($"file:///{Path.GetFullPath(".")}/{LocalFolderPath}"));
+            switch (Application.platform)
+            {
+                case RuntimePlatform.WindowsEditor:
+                case RuntimePlatform.WindowsPlayer:
+                    StartCoroutine(LoadAssetBundleFromUrlRoutine($"file:///{Path.GetFullPath(".")}/{LocalFolderPath}"));
+                    break;
+                default:
+                    StartCoroutine(LoadAssetBundleFromUrlRoutine($"{Path.GetFullPath(".")}/{LocalFolderPath}"));
+                    break;
+            }
         }
 
-        private bool IsWebRequestLoadedFail(UnityEvent evt)
+        private bool IsWebRequestLoadedFail(string key, UnityEvent evt)
         {
             if (CurrentWebRequest.isNetworkError || CurrentWebRequest.isHttpError)
             {
-                OnAssetBundleLoadedFail(evt);
+                OnAssetBundleLoadedFail(key, evt);
                 return true;
             }
             return false;
         }
 
-        private void OnAssetBundleLoadedFail(UnityEvent evt)
+        private void OnAssetBundleLoadedFail(string key, UnityEvent evt, string error = "")
         {
             evt.Invoke();
             CurrentLoadState = LoadState.None;
+            Debug.LogError($"[AssetBundleManager] Load {key} from {CurrentWebRequest.url}, error: {CurrentWebRequest.error}");
         }
 
         private IEnumerator LoadAssetBundleFromUrlRoutine(string url)
         {
             Dependencies.Clear();
 
+            Debug.Log($"[AssetBundleManager] Load manifest");
             CurrentLoadState = LoadState.LoadManifest;
             CurrentWebRequest = UnityWebRequestAssetBundle.GetAssetBundle(new Uri(url).Append(CurrentSetting.platformFolderName, CurrentSetting.platformFolderName).AbsoluteUri);
             yield return CurrentWebRequest.SendWebRequest();
-            if (IsWebRequestLoadedFail(onManifestLoadedFail))
+            if (IsWebRequestLoadedFail("manifest", onManifestLoadedFail))
                 yield break;
             AssetBundle assetBundle = DownloadHandlerAssetBundle.GetContent(CurrentWebRequest);
             if (assetBundle == null)
             {
-                OnAssetBundleLoadedFail(onManifestLoadedFail);
+                OnAssetBundleLoadedFail("manifest", onManifestLoadedFail, "No Asset Bundle");
                 yield break;
             }
             onManifestLoaded.Invoke();
+            Debug.Log($"[AssetBundleManager] Load manifest done");
 
             CurrentLoadState = LoadState.LoadDependencies;
             AssetBundleManifest manifest = assetBundle.LoadAsset<AssetBundleManifest>("AssetBundleManifest");
@@ -224,34 +236,40 @@ namespace MultiplayerARPG
             foreach (var dependency in dependencies)
             {
                 LoadingAssetBundleFileName = dependency;
+                Debug.Log($"[AssetBundleManager] Load dependency: {dependency}");
                 CurrentWebRequest = UnityWebRequestAssetBundle.GetAssetBundle(new Uri(url).Append(CurrentSetting.platformFolderName, dependency).AbsoluteUri, Hash128.Compute(dependency));
                 yield return CurrentWebRequest.SendWebRequest();
-                if (IsWebRequestLoadedFail(onDependenciesLoadedFail))
+                if (IsWebRequestLoadedFail($"dependency: {dependency}", onDependenciesLoadedFail))
                     yield break;
                 assetBundle = DownloadHandlerAssetBundle.GetContent(CurrentWebRequest);
                 if (assetBundle == null)
                 {
-                    OnAssetBundleLoadedFail(onDependenciesLoadedFail);
+                    OnAssetBundleLoadedFail($"dependency: {dependency}", onDependenciesLoadedFail, "No Asset Bundle");
                     yield break;
                 }
                 Dependencies[dependency] = assetBundle;
+                Debug.Log($"[AssetBundleManager] Load dependency: {dependency} done");
                 LoadedDependenciesCount++;
             }
             onDependenciesLoaded.Invoke();
 
             CurrentLoadState = LoadState.LoadMainAssetBundle;
             LoadingAssetBundleFileName = mainAssetBundleName;
+            Debug.Log($"[AssetBundleManager] Load main asset bundle");
             CurrentWebRequest = UnityWebRequestAssetBundle.GetAssetBundle(new Uri(url).Append(CurrentSetting.platformFolderName, mainAssetBundleName).AbsoluteUri, Hash128.Compute(mainAssetBundleName));
             yield return CurrentWebRequest.SendWebRequest();
-            if (IsWebRequestLoadedFail(onMainAssetBundleLoadedFail))
+            if (IsWebRequestLoadedFail("main asset bundle", onMainAssetBundleLoadedFail))
+            {
                 yield break;
+            }
             assetBundle = DownloadHandlerAssetBundle.GetContent(CurrentWebRequest);
             if (assetBundle == null)
             {
-                OnAssetBundleLoadedFail(onMainAssetBundleLoadedFail);
+                OnAssetBundleLoadedFail("main asset bundle", onMainAssetBundleLoadedFail, "No Asset Bundle");
                 yield break;
             }
             MainAssetBundle = assetBundle;
+            Debug.Log($"[AssetBundleManager] Load main asset bundle done");
             LoadedDependenciesCount++;
             onMainAssetBundleLoaded.Invoke();
 
