@@ -304,7 +304,6 @@ namespace MultiplayerARPG
                 if (tempErrorOccuring)
                     yield break;
                 Dependencies[dependency] = tempAssetBundle;
-                tempAssetBundle.LoadAllAssets();
                 LoadedDependenciesCount++;
             }
 
@@ -314,7 +313,6 @@ namespace MultiplayerARPG
             if (tempErrorOccuring)
                 yield break;
             MainAssetBundle = tempAssetBundle;
-            tempAssetBundle.LoadAllAssets();
             LoadedDependenciesCount++;
 
             CurrentLoadState = LoadState.Done;
