@@ -115,6 +115,9 @@ namespace MultiplayerARPG
         public AssetBundle MainAssetBundle { get; protected set; }
         public UnityWebRequest CurrentWebRequest { get; protected set; }
 
+        private bool tempErrorOccuring = false;
+        private AssetBundle tempAssetBundle = null;
+
         private void Awake()
         {
             if (Singleton != null)
@@ -175,7 +178,7 @@ namespace MultiplayerARPG
 
         public void LoadAssetBundleFromServer()
         {
-            StartCoroutine(LoadAssetBundleFromUrlRoutine(ServerUrl));
+            StartCoroutine(LoadAssetBundlesFromUrlRoutine(ServerUrl));
         }
 
         public void LoadAssetBundleFromLocalFolder()
@@ -184,10 +187,10 @@ namespace MultiplayerARPG
             {
                 case RuntimePlatform.WindowsEditor:
                 case RuntimePlatform.WindowsPlayer:
-                    StartCoroutine(LoadAssetBundleFromUrlRoutine($"file:///{Path.GetFullPath(".")}/{LocalFolderPath}"));
+                    StartCoroutine(LoadAssetBundlesFromUrlRoutine($"file:///{Path.GetFullPath(".")}/{LocalFolderPath}"));
                     break;
                 default:
-                    StartCoroutine(LoadAssetBundleFromUrlRoutine($"{Path.GetFullPath(".")}/{LocalFolderPath}"));
+                    StartCoroutine(LoadAssetBundlesFromUrlRoutine($"{Path.GetFullPath(".")}/{LocalFolderPath}"));
                     break;
             }
         }
@@ -204,74 +207,115 @@ namespace MultiplayerARPG
 
         private void OnAssetBundleLoadedFail(string key, UnityEvent evt, string error = "")
         {
+            tempErrorOccuring = true;
             evt.Invoke();
             CurrentLoadState = LoadState.None;
-            Debug.LogError($"[AssetBundleManager] Load {key} from {CurrentWebRequest.url}, error: {CurrentWebRequest.error}");
+            string logError = error;
+            if (!string.IsNullOrEmpty(CurrentWebRequest.error))
+                logError = CurrentWebRequest.error;
+            Debug.LogError($"[AssetBundleManager] Load {key} from {CurrentWebRequest.url}, error: {logError}");
         }
 
-        private IEnumerator LoadAssetBundleFromUrlRoutine(string url)
+        private IEnumerator LoadAssetBundleFromUrlRoutine(string url, string loadKey, UnityEvent successEvt, UnityEvent errorEvt, bool checkAssetFileHash = true)
+        {
+            Debug.Log($"[AssetBundleManager] Load {loadKey}");
+            // Load manifest file to read CRC
+            CurrentWebRequest = UnityWebRequest.Get($"{url}.manifest");
+            yield return CurrentWebRequest.SendWebRequest();
+            if (IsWebRequestLoadedFail(loadKey, errorEvt))
+                yield break;
+            // Read CRC
+            bool foundCRC = false;
+            bool foundAssetFileHashKey = false;
+            bool foundAssetFileHash = false;
+            uint crc = 0;
+            string assetFileHash = string.Empty;
+            string downloadedText = CurrentWebRequest.downloadHandler.text;
+            if (downloadedText.Contains("CRC"))
+            {
+                string[] splitedLines = downloadedText.Split('\n');
+                foreach (string splitedLine in splitedLines)
+                {
+                    string[] splitedKeyValue = splitedLine.Split(':');
+                    if (splitedKeyValue.Length >= 2 && splitedKeyValue[0].Contains("CRC") && uint.TryParse(splitedKeyValue[1].Trim(), out crc))
+                        foundCRC = true;
+                    if (checkAssetFileHash)
+                    {
+                        if (splitedKeyValue.Length >= 1 && splitedKeyValue[0].Contains("AssetFileHash"))
+                            foundAssetFileHashKey = true;
+                        if (foundAssetFileHashKey && splitedKeyValue.Length >= 2 && splitedKeyValue[0].Contains("Hash"))
+                        {
+                            assetFileHash = splitedKeyValue[1].Trim();
+                            foundAssetFileHash = true;
+                        }
+                    }
+                    if (foundCRC && (!checkAssetFileHash || foundAssetFileHash))
+                        break;
+                }
+            }
+            // Can't read CRC
+            if (!foundCRC)
+            {
+                OnAssetBundleLoadedFail(loadKey, errorEvt, "No CRC in manifest");
+                yield break;
+            }
+            // Can't read asset hash
+            if (checkAssetFileHash && !foundAssetFileHash)
+            {
+                OnAssetBundleLoadedFail(loadKey, errorEvt, "No asset file hash in manifest");
+                yield break;
+            }
+            // Download asset bundle from server or from cache by CRC
+            CurrentWebRequest = UnityWebRequestAssetBundle.GetAssetBundle(url, Hash128.Compute(assetFileHash), crc);
+            yield return CurrentWebRequest.SendWebRequest();
+            if (IsWebRequestLoadedFail(loadKey, errorEvt))
+                yield break;
+            tempAssetBundle = DownloadHandlerAssetBundle.GetContent(CurrentWebRequest);
+            if (tempAssetBundle == null)
+            {
+                OnAssetBundleLoadedFail(loadKey, errorEvt, "No Asset Bundle");
+                yield break;
+            }
+            successEvt.Invoke();
+            Debug.Log($"[AssetBundleManager] Load {loadKey} done");
+        }
+
+        private IEnumerator LoadAssetBundlesFromUrlRoutine(string url)
         {
             Dependencies.Clear();
 
-            Debug.Log($"[AssetBundleManager] Load manifest");
+            tempErrorOccuring = false;
+            tempAssetBundle = null;
+
             CurrentLoadState = LoadState.LoadManifest;
-            CurrentWebRequest = UnityWebRequestAssetBundle.GetAssetBundle(new Uri(url).Append(CurrentSetting.platformFolderName, CurrentSetting.platformFolderName).AbsoluteUri);
-            yield return CurrentWebRequest.SendWebRequest();
-            if (IsWebRequestLoadedFail("manifest", onManifestLoadedFail))
+            yield return StartCoroutine(LoadAssetBundleFromUrlRoutine(new Uri(url).Append(CurrentSetting.platformFolderName, CurrentSetting.platformFolderName).AbsoluteUri, "manifest", onManifestLoaded, onManifestLoadedFail, false));
+            if (tempErrorOccuring)
                 yield break;
-            AssetBundle assetBundle = DownloadHandlerAssetBundle.GetContent(CurrentWebRequest);
-            if (assetBundle == null)
-            {
-                OnAssetBundleLoadedFail("manifest", onManifestLoadedFail, "No Asset Bundle");
-                yield break;
-            }
-            onManifestLoaded.Invoke();
-            Debug.Log($"[AssetBundleManager] Load manifest done");
 
             CurrentLoadState = LoadState.LoadDependencies;
-            AssetBundleManifest manifest = assetBundle.LoadAsset<AssetBundleManifest>("AssetBundleManifest");
+            AssetBundleManifest manifest = tempAssetBundle.LoadAsset<AssetBundleManifest>("AssetBundleManifest");
             string[] dependencies = manifest.GetAllDependencies(mainAssetBundleName);
             LoadedDependenciesCount = 0;
             LoadingDependenciesCount = dependencies.Length;
             foreach (var dependency in dependencies)
             {
                 LoadingAssetBundleFileName = dependency;
-                Debug.Log($"[AssetBundleManager] Load dependency: {dependency}");
-                CurrentWebRequest = UnityWebRequestAssetBundle.GetAssetBundle(new Uri(url).Append(CurrentSetting.platformFolderName, dependency).AbsoluteUri, Hash128.Compute(dependency));
-                yield return CurrentWebRequest.SendWebRequest();
-                if (IsWebRequestLoadedFail($"dependency: {dependency}", onDependenciesLoadedFail))
+                yield return StartCoroutine(LoadAssetBundleFromUrlRoutine(new Uri(url).Append(CurrentSetting.platformFolderName, dependency).AbsoluteUri, $"dependency: {dependency}", onDependenciesLoaded, onDependenciesLoadedFail));
+                if (tempErrorOccuring)
                     yield break;
-                assetBundle = DownloadHandlerAssetBundle.GetContent(CurrentWebRequest);
-                if (assetBundle == null)
-                {
-                    OnAssetBundleLoadedFail($"dependency: {dependency}", onDependenciesLoadedFail, "No Asset Bundle");
-                    yield break;
-                }
-                Dependencies[dependency] = assetBundle;
-                Debug.Log($"[AssetBundleManager] Load dependency: {dependency} done");
+                Dependencies[dependency] = tempAssetBundle;
+                tempAssetBundle.LoadAllAssets();
                 LoadedDependenciesCount++;
             }
-            onDependenciesLoaded.Invoke();
 
             CurrentLoadState = LoadState.LoadMainAssetBundle;
             LoadingAssetBundleFileName = mainAssetBundleName;
-            Debug.Log($"[AssetBundleManager] Load main asset bundle");
-            CurrentWebRequest = UnityWebRequestAssetBundle.GetAssetBundle(new Uri(url).Append(CurrentSetting.platformFolderName, mainAssetBundleName).AbsoluteUri, Hash128.Compute(mainAssetBundleName));
-            yield return CurrentWebRequest.SendWebRequest();
-            if (IsWebRequestLoadedFail("main asset bundle", onMainAssetBundleLoadedFail))
-            {
+            yield return StartCoroutine(LoadAssetBundleFromUrlRoutine(new Uri(url).Append(CurrentSetting.platformFolderName, mainAssetBundleName).AbsoluteUri, "main asset bundle", onMainAssetBundleLoaded, onMainAssetBundleLoadedFail));
+            if (tempErrorOccuring)
                 yield break;
-            }
-            assetBundle = DownloadHandlerAssetBundle.GetContent(CurrentWebRequest);
-            if (assetBundle == null)
-            {
-                OnAssetBundleLoadedFail("main asset bundle", onMainAssetBundleLoadedFail, "No Asset Bundle");
-                yield break;
-            }
-            MainAssetBundle = assetBundle;
-            Debug.Log($"[AssetBundleManager] Load main asset bundle done");
+            MainAssetBundle = tempAssetBundle;
+            tempAssetBundle.LoadAllAssets();
             LoadedDependenciesCount++;
-            onMainAssetBundleLoaded.Invoke();
 
             CurrentLoadState = LoadState.Done;
             SceneManager.LoadScene(initSceneName);

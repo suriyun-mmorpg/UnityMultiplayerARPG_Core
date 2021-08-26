@@ -5,7 +5,6 @@ namespace MultiplayerARPG
 {
     public partial class UIAssetBundleLoading : MonoBehaviour
     {
-        public static UIAssetBundleLoading Singleton { get; private set; }
         public UILocaleKeySetting formatLoadingAssetBundleFileName = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_SIMPLE);
         public UILocaleKeySetting formatLoadedAssetBundles = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_SIMPLE_MIN_BY_MAX);
         public GameObject rootObject;
@@ -19,15 +18,6 @@ namespace MultiplayerARPG
 
         private void Awake()
         {
-            if (Singleton != null)
-            {
-                Destroy(gameObject);
-                return;
-            }
-
-            DontDestroyOnLoad(gameObject);
-            Singleton = this;
-
             if (rootObject != null)
                 rootObject.SetActive(false);
 
