@@ -44,8 +44,7 @@ namespace MultiplayerARPG
                 case AssetBundleManager.LoadState.LoadManifest:
                     // TODO: May show message
                     break;
-                case AssetBundleManager.LoadState.LoadDependencies:
-                case AssetBundleManager.LoadState.LoadMainAssetBundle:
+                case AssetBundleManager.LoadState.LoadAssetBundles:
                     if (rootObject != null)
                         rootObject.SetActive(true);
                     if (uiTextProgress != null)
@@ -63,7 +62,7 @@ namespace MultiplayerARPG
                     if (textLoadingAssetBundleFileName != null)
                         textLoadingAssetBundleFileName.text = string.Format(LanguageManager.GetText(formatLoadingAssetBundleFileName), AssetBundleManager.Singleton.LoadingAssetBundleFileName);
                     if (textLoadedAssetBundlesCount != null)
-                        textLoadedAssetBundlesCount.text = string.Format(LanguageManager.GetText(formatLoadedAssetBundles), AssetBundleManager.Singleton.LoadedDependenciesCount, AssetBundleManager.Singleton.LoadingDependenciesCount);
+                        textLoadedAssetBundlesCount.text = string.Format(LanguageManager.GetText(formatLoadedAssetBundles), AssetBundleManager.Singleton.LoadedAssetBundlesCount, AssetBundleManager.Singleton.LoadingAssetBundlesCount);
                     break;
                 case AssetBundleManager.LoadState.Done:
                     if (rootObject != null)

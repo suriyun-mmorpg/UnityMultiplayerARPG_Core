@@ -23,8 +23,7 @@ namespace MultiplayerARPG
         {
             None,
             LoadManifest,
-            LoadDependencies,
-            LoadMainAssetBundle,
+            LoadAssetBundles,
             Done,
         }
 
@@ -43,8 +42,6 @@ namespace MultiplayerARPG
         protected string serverUrl = "http://localhost/AssetBundles";
         [SerializeField]
         protected string localFolderPath = "AssetBundles/";
-        [SerializeField]
-        protected string mainAssetBundleName = "init";
         [SerializeField]
         protected string initSceneName = "init";
         [SerializeField]
@@ -86,10 +83,8 @@ namespace MultiplayerARPG
         };
         public UnityEvent onManifestLoaded = new UnityEvent();
         public UnityEvent onManifestLoadedFail = new UnityEvent();
-        public UnityEvent onDependenciesLoaded = new UnityEvent();
-        public UnityEvent onDependenciesLoadedFail = new UnityEvent();
-        public UnityEvent onMainAssetBundleLoaded = new UnityEvent();
-        public UnityEvent onMainAssetBundleLoadedFail = new UnityEvent();
+        public UnityEvent onAssetBundlesLoaded = new UnityEvent();
+        public UnityEvent onAssetBundlesLoadedFail = new UnityEvent();
 
         public LoadMode CurrentLoadMode
         {
@@ -104,19 +99,19 @@ namespace MultiplayerARPG
             }
         }
         public LoadState CurrentLoadState { get; protected set; } = LoadState.None;
-        public int LoadingDependenciesCount { get; protected set; } = 0;
-        public int LoadedDependenciesCount { get; protected set; } = 0;
-        public float TotalLoadProgress { get { return (float)LoadedDependenciesCount / (float)(LoadingDependenciesCount + 1); } }
+        public int LoadingAssetBundlesCount { get; protected set; } = 0;
+        public int LoadedAssetBundlesCount { get; protected set; } = 0;
+        public float TotalLoadProgress { get { return (float)LoadedAssetBundlesCount / (float)LoadingAssetBundlesCount; } }
         public string LoadingAssetBundleFileName { get; protected set; }
         public AssetBundleSetting CurrentSetting { get; protected set; }
         public string ServerUrl { get { return !string.IsNullOrEmpty(CurrentSetting.overrideServerUrl) ? CurrentSetting.overrideServerUrl : serverUrl; } }
         public string LocalFolderPath { get { return !string.IsNullOrEmpty(CurrentSetting.overrideLocalFolderPath) ? CurrentSetting.overrideLocalFolderPath : localFolderPath; } }
         public Dictionary<string, AssetBundle> Dependencies { get; private set; } = new Dictionary<string, AssetBundle>();
-        public AssetBundle MainAssetBundle { get; protected set; }
         public UnityWebRequest CurrentWebRequest { get; protected set; }
 
         private bool tempErrorOccuring = false;
         private AssetBundle tempAssetBundle = null;
+        private readonly List<string> loadingAssetBundles = new List<string>();
 
         private void Awake()
         {
@@ -154,6 +149,7 @@ namespace MultiplayerARPG
                         CurrentSetting = linuxSetting;
                         break;
                 }
+                CurrentSetting = androidSetting;
             }
         }
 
@@ -225,39 +221,26 @@ namespace MultiplayerARPG
             if (IsWebRequestLoadedFail(loadKey, errorEvt))
                 yield break;
             // Read CRC
-            bool foundCRC = false;
             bool foundAssetFileHashKey = false;
             bool foundAssetFileHash = false;
-            uint crc = 0;
             string assetFileHash = string.Empty;
             string downloadedText = CurrentWebRequest.downloadHandler.text;
-            if (downloadedText.Contains("CRC"))
+            string[] splitedLines = downloadedText.Split('\n');
+            foreach (string splitedLine in splitedLines)
             {
-                string[] splitedLines = downloadedText.Split('\n');
-                foreach (string splitedLine in splitedLines)
+                string[] splitedKeyValue = splitedLine.Split(':');
+                if (checkAssetFileHash)
                 {
-                    string[] splitedKeyValue = splitedLine.Split(':');
-                    if (splitedKeyValue.Length >= 2 && splitedKeyValue[0].Contains("CRC") && uint.TryParse(splitedKeyValue[1].Trim(), out crc))
-                        foundCRC = true;
-                    if (checkAssetFileHash)
+                    if (splitedKeyValue.Length >= 1 && splitedKeyValue[0].Contains("AssetFileHash"))
+                        foundAssetFileHashKey = true;
+                    if (foundAssetFileHashKey && splitedKeyValue.Length >= 2 && splitedKeyValue[0].Contains("Hash"))
                     {
-                        if (splitedKeyValue.Length >= 1 && splitedKeyValue[0].Contains("AssetFileHash"))
-                            foundAssetFileHashKey = true;
-                        if (foundAssetFileHashKey && splitedKeyValue.Length >= 2 && splitedKeyValue[0].Contains("Hash"))
-                        {
-                            assetFileHash = splitedKeyValue[1].Trim();
-                            foundAssetFileHash = true;
-                        }
+                        assetFileHash = splitedKeyValue[1].Trim();
+                        foundAssetFileHash = true;
                     }
-                    if (foundCRC && (!checkAssetFileHash || foundAssetFileHash))
-                        break;
                 }
-            }
-            // Can't read CRC
-            if (!foundCRC)
-            {
-                OnAssetBundleLoadedFail(loadKey, errorEvt, "No CRC in manifest");
-                yield break;
+                if (!checkAssetFileHash || foundAssetFileHash)
+                    break;
             }
             // Can't read asset hash
             if (checkAssetFileHash && !foundAssetFileHash)
@@ -266,7 +249,7 @@ namespace MultiplayerARPG
                 yield break;
             }
             // Download asset bundle from server or from cache by CRC
-            CurrentWebRequest = UnityWebRequestAssetBundle.GetAssetBundle(url, Hash128.Compute(assetFileHash), crc);
+            CurrentWebRequest = UnityWebRequestAssetBundle.GetAssetBundle(url, Hash128.Compute(assetFileHash));
             yield return CurrentWebRequest.SendWebRequest();
             if (IsWebRequestLoadedFail(loadKey, errorEvt))
                 yield break;
@@ -292,28 +275,31 @@ namespace MultiplayerARPG
             if (tempErrorOccuring)
                 yield break;
 
-            CurrentLoadState = LoadState.LoadDependencies;
+            CurrentLoadState = LoadState.LoadAssetBundles;
             AssetBundleManifest manifest = tempAssetBundle.LoadAsset<AssetBundleManifest>("AssetBundleManifest");
-            string[] dependencies = manifest.GetAllDependencies(mainAssetBundleName);
-            LoadedDependenciesCount = 0;
-            LoadingDependenciesCount = dependencies.Length;
-            foreach (var dependency in dependencies)
+            string[] assetBundles = manifest.GetAllAssetBundles();
+            foreach (string assetBundle in assetBundles)
             {
-                LoadingAssetBundleFileName = dependency;
-                yield return StartCoroutine(LoadAssetBundleFromUrlRoutine(new Uri(url).Append(CurrentSetting.platformFolderName, dependency).AbsoluteUri, $"dependency: {dependency}", onDependenciesLoaded, onDependenciesLoadedFail));
+                string[] dependencies = manifest.GetAllDependencies(assetBundle);
+                foreach (string dependency in dependencies)
+                {
+                    if (!loadingAssetBundles.Contains(dependency))
+                        loadingAssetBundles.Add(dependency);
+                }
+                if (!loadingAssetBundles.Contains(assetBundle))
+                    loadingAssetBundles.Add(assetBundle);
+            }
+            LoadedAssetBundlesCount = 0;
+            LoadingAssetBundlesCount = loadingAssetBundles.Count;
+            foreach (string loadingAssetBundle in loadingAssetBundles)
+            {
+                LoadingAssetBundleFileName = loadingAssetBundle;
+                yield return StartCoroutine(LoadAssetBundleFromUrlRoutine(new Uri(url).Append(CurrentSetting.platformFolderName, loadingAssetBundle).AbsoluteUri, $"dependency: {loadingAssetBundle}", onAssetBundlesLoaded, onAssetBundlesLoadedFail));
                 if (tempErrorOccuring)
                     yield break;
-                Dependencies[dependency] = tempAssetBundle;
-                LoadedDependenciesCount++;
+                Dependencies[loadingAssetBundle] = tempAssetBundle;
+                LoadedAssetBundlesCount++;
             }
-
-            CurrentLoadState = LoadState.LoadMainAssetBundle;
-            LoadingAssetBundleFileName = mainAssetBundleName;
-            yield return StartCoroutine(LoadAssetBundleFromUrlRoutine(new Uri(url).Append(CurrentSetting.platformFolderName, mainAssetBundleName).AbsoluteUri, "main asset bundle", onMainAssetBundleLoaded, onMainAssetBundleLoadedFail));
-            if (tempErrorOccuring)
-                yield break;
-            MainAssetBundle = tempAssetBundle;
-            LoadedDependenciesCount++;
 
             CurrentLoadState = LoadState.Done;
             SceneManager.LoadScene(initSceneName);
