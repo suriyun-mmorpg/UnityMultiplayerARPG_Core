@@ -141,6 +141,7 @@ namespace MultiplayerARPG.GameData.Model.Playables
                 clipPlayable.SetApplyPlayableIK(false);
                 Graph.Connect(clipPlayable, 0, BaseLayerMixer, stateInfo.inputPort);
             }
+            BaseLayerMixer.SetInputWeight(0, 1);
             readyToPlay = true;
         }
 
@@ -255,15 +256,18 @@ namespace MultiplayerARPG.GameData.Model.Playables
                 bool movingBackward = CharacterModel.movementState.HasFlag(MovementState.Backward);
                 bool movingLeft = CharacterModel.movementState.HasFlag(MovementState.Left);
                 bool movingRight = CharacterModel.movementState.HasFlag(MovementState.Right);
-                bool moving = movingForward || movingBackward || movingLeft || movingRight;
-                if (movingForward)
-                    stringBuilder.Append(DIR_FORWARD);
-                else if (movingBackward)
-                    stringBuilder.Append(DIR_BACKWARD);
-                if (movingLeft)
-                    stringBuilder.Append(DIR_LEFT);
-                else if (movingRight)
-                    stringBuilder.Append(DIR_RIGHT);
+                bool moving = (movingForward || movingBackward || movingLeft || movingRight) && CharacterModel.moveAnimationSpeedMultiplier > 0f;
+                if (moving)
+                {
+                    if (movingForward)
+                        stringBuilder.Append(DIR_FORWARD);
+                    else if (movingBackward)
+                        stringBuilder.Append(DIR_BACKWARD);
+                    if (movingLeft)
+                        stringBuilder.Append(DIR_LEFT);
+                    else if (movingRight)
+                        stringBuilder.Append(DIR_RIGHT);
+                }
                 // Set state without move type, it will be used if state with move type not found
                 string stateWithoutMoveType = stringBuilder.ToString();
                 if (CharacterModel.movementState.HasFlag(MovementState.IsUnderWater))
@@ -344,33 +348,47 @@ namespace MultiplayerARPG.GameData.Model.Playables
                 return;
 
             #region Update base state
-            string playingStateId = GetPlayingStateId();
-            if (!this.playingStateId.Equals(playingStateId))
+            // Change state only when previous animation weight >= 1f
+            if (BaseLayerMixer.GetInputWeight(baseInputPort) >= 1f)
             {
-                this.playingStateId = playingStateId;
-                // State not found, use idle state
-                if (!baseStates.ContainsKey(playingStateId))
-                    playingStateId = stringBuilder.Clear().Append(currentWeaponTypeId).Append(CLIP_IDLE).ToString();
-                // State still not found, use idle state from default animations
-                if (!baseStates.ContainsKey(playingStateId))
-                    playingStateId = CLIP_IDLE;
-                baseInputPort = baseStates[playingStateId].inputPort;
-                // Set clip info 
-                float speed = baseStates[playingStateId].GetSpeed(1);
-                // Set transition duration
-                baseTransitionDuration = baseStates[playingStateId].state.transitionDuration;
-                if (baseTransitionDuration <= 0f)
-                    baseTransitionDuration = CharacterModel.transitionDuration;
-                baseTransitionDuration *= speed;
-                // Set clip length
-                Playable clipPlayable = BaseLayerMixer.GetInput(baseInputPort);
-                clipPlayable.SetSpeed(speed);
-                clipPlayable.SetTime(0f);
-                baseClipLength = baseStates[playingStateId].GetClipLength(1);
-                // Set layer additive
-                LayerMixer.SetLayerAdditive(0, baseStates[playingStateId].state.isAdditive);
-                // Reset play elapsed
-                basePlayElapsed = 0f;
+                string playingStateId = GetPlayingStateId();
+                if (!this.playingStateId.Equals(playingStateId))
+                {
+                    string previousStateId = this.playingStateId;
+                    this.playingStateId = playingStateId;
+                    // State not found, use idle state
+                    if (!baseStates.ContainsKey(playingStateId))
+                        playingStateId = stringBuilder.Clear().Append(currentWeaponTypeId).Append(CLIP_IDLE).ToString();
+                    // State still not found, use idle state from default animations
+                    if (!baseStates.ContainsKey(playingStateId))
+                        playingStateId = CLIP_IDLE;
+                    // Get previous clip to continue playing it
+                    if (string.IsNullOrEmpty(previousStateId))
+                        previousStateId = playingStateId;
+                    double playingTime = 0;
+                    AnimationClip previousClip = baseStates[previousStateId].state.clip;
+                    AnimationClip playingClip = baseStates[playingStateId].state.clip;
+                    if (previousClip == playingClip)
+                        playingTime = BaseLayerMixer.GetInput(baseInputPort).GetTime();
+                    // Get input port from new playing state ID
+                    baseInputPort = baseStates[playingStateId].inputPort;
+                    // Set clip info 
+                    float speed = baseStates[playingStateId].GetSpeed(1);
+                    // Set transition duration
+                    baseTransitionDuration = baseStates[playingStateId].state.transitionDuration;
+                    if (baseTransitionDuration <= 0f)
+                        baseTransitionDuration = CharacterModel.transitionDuration;
+                    baseTransitionDuration *= speed;
+                    // Set clip length
+                    Playable clipPlayable = BaseLayerMixer.GetInput(baseInputPort);
+                    clipPlayable.SetSpeed(speed);
+                    clipPlayable.SetTime(playingTime);
+                    baseClipLength = baseStates[playingStateId].GetClipLength(1);
+                    // Set layer additive
+                    LayerMixer.SetLayerAdditive(0, baseStates[playingStateId].state.isAdditive);
+                    // Reset play elapsed
+                    basePlayElapsed = 0f;
+                }
             }
 
             // Update transition
