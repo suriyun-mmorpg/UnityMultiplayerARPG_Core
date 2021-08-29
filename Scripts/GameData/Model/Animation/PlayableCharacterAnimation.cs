@@ -11,6 +11,7 @@ namespace MultiplayerARPG.GameData.Model.Playables
         public float animSpeedRate;
         [Tooltip("If this <= 0, it will use default transition duration setting from model component")]
         public float transitionDuration;
+        public bool isAdditive;
     }
 
     [System.Serializable]
@@ -23,6 +24,7 @@ namespace MultiplayerARPG.GameData.Model.Playables
         public float animSpeedRate;
         [Tooltip("If this <= 0, it will use default transition duration setting from model component")]
         public float transitionDuration;
+        public bool isAdditive;
     }
 
     [System.Serializable]

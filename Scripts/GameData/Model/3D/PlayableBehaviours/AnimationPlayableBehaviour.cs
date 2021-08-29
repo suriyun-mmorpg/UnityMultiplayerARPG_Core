@@ -268,38 +268,38 @@ namespace MultiplayerARPG.GameData.Model.Playables
                 string stateWithoutMoveType = stringBuilder.ToString();
                 if (CharacterModel.movementState.HasFlag(MovementState.IsUnderWater))
                 {
-                    if (moving)
-                        stringBuilder.Append(MOVE_TYPE_SWIM);
-                    else
+                    if (!moving)
                         stringBuilder.Append(CLIP_SWIM_IDLE);
+                    else
+                        stringBuilder.Append(MOVE_TYPE_SWIM);
                 }
                 else
                 {
                     switch (CharacterModel.extraMovementState)
                     {
                         case ExtraMovementState.IsSprinting:
-                            if (moving)
-                                stringBuilder.Append(MOVE_TYPE_SPRINT);
-                            else
+                            if (!moving)
                                 stringBuilder.Append(CLIP_IDLE);
+                            else
+                                stringBuilder.Append(MOVE_TYPE_SPRINT);
                             break;
                         case ExtraMovementState.IsWalking:
-                            if (moving)
-                                stringBuilder.Append(MOVE_TYPE_WALK);
-                            else
+                            if (!moving)
                                 stringBuilder.Append(CLIP_IDLE);
+                            else
+                                stringBuilder.Append(MOVE_TYPE_WALK);
                             break;
                         case ExtraMovementState.IsCrouching:
-                            if (moving)
-                                stringBuilder.Append(MOVE_TYPE_CROUCH);
-                            else
+                            if (!moving)
                                 stringBuilder.Append(CLIP_CROUCH_IDLE);
+                            else
+                                stringBuilder.Append(MOVE_TYPE_CROUCH);
                             break;
                         case ExtraMovementState.IsCrawling:
-                            if (moving)
-                                stringBuilder.Append(MOVE_TYPE_CRAWL);
-                            else
+                            if (!moving)
                                 stringBuilder.Append(CLIP_CRAWL_IDLE);
+                            else
+                                stringBuilder.Append(MOVE_TYPE_CRAWL);
                             break;
                         default:
                             if (!moving)
@@ -367,6 +367,8 @@ namespace MultiplayerARPG.GameData.Model.Playables
                 clipPlayable.SetSpeed(speed);
                 clipPlayable.SetTime(0f);
                 baseClipLength = baseStates[playingStateId].GetClipLength(1);
+                // Set layer additive
+                LayerMixer.SetLayerAdditive(0, baseStates[playingStateId].state.isAdditive);
                 // Reset play elapsed
                 basePlayElapsed = 0f;
             }
@@ -490,6 +492,8 @@ namespace MultiplayerARPG.GameData.Model.Playables
             clipPlayable.SetSpeed(speed);
             clipPlayable.SetTime(0f);
             actionClipLength = (duration > 0f ? duration : clip.length) / speed;
+            // Set layer additive
+            LayerMixer.SetLayerAdditive(1, actionState.isAdditive);
             // Reset play elapsed
             actionPlayElapsed = 0f;
 
