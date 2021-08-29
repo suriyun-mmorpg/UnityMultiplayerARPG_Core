@@ -16,6 +16,34 @@ namespace MultiplayerARPG
             Fps
         }
 
+        internal static int GeneratingId { get; set; } = 0;
+
+        [SerializeField]
+        [HideInInspector]
+        private bool isIdAssigned;
+
+        [SerializeField]
+        [HideInInspector]
+        private int id;
+
+        public int Id
+        {
+            get
+            {
+                if (!isIdAssigned)
+                {
+                    id = gameObject.GetInstanceID();
+                    isIdAssigned = true;
+                }
+                return id;
+            }
+            private set
+            {
+                id = value;
+                isIdAssigned = true;
+            }
+        }
+
         public EVisibleState VisibleState { get; protected set; }
         protected GameInstance CurrentGameInstance { get { return GameInstance.Singleton; } }
 
@@ -102,6 +130,11 @@ namespace MultiplayerARPG
 
         // Optimize garbage collector
         private GameEffect tempGameEffect;
+
+        internal void AssignId()
+        {
+            Id = ++GeneratingId;
+        }
 
         protected virtual void Awake()
         {

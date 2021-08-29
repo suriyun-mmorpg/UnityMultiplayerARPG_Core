@@ -13,54 +13,6 @@ namespace MultiplayerARPG
         public bool IsTpsModel { get; set; }
         public bool IsFpsModel { get; set; }
 
-        [Header("Character Model")]
-        [SerializeField]
-        private string assetId = string.Empty;
-        private int? hashAssetId;
-        public int HashAssetId
-        {
-            get
-            {
-                if (!hashAssetId.HasValue)
-                {
-                    unchecked
-                    {
-                        int hash1 = 5381;
-                        int hash2 = hash1;
-
-                        for (int i = 0; i < assetId.Length && assetId[i] != '\0'; i += 2)
-                        {
-                            hash1 = ((hash1 << 5) + hash1) ^ assetId[i];
-                            if (i == assetId.Length - 1 || assetId[i + 1] == '\0')
-                                break;
-                            hash2 = ((hash2 << 5) + hash2) ^ assetId[i + 1];
-                        }
-
-                        hashAssetId = hash1 + (hash2 * 1566083941);
-                    }
-                }
-                return hashAssetId.Value;
-            }
-        }
-        public int? VehicleTypeDataId { get; set; }
-        public int? VehicleSeatIndex { get; set; }
-        public int Id
-        {
-            get
-            {
-                unchecked
-                {
-                    int id = 17;
-                    id = id * 31 + HashAssetId;
-                    if (VehicleTypeDataId.HasValue)
-                        id = id * 31 + VehicleTypeDataId.Value;
-                    if (VehicleSeatIndex.HasValue)
-                        id = id * 31 + VehicleSeatIndex.Value;
-                    return id;
-                }
-            }
-        }
-
         [Header("Model Switching Settings")]
         [SerializeField]
         protected GameObject[] activateObjectsWhenSwitchModel = new GameObject[0];
@@ -155,8 +107,6 @@ namespace MultiplayerARPG
         protected override void Awake()
         {
             base.Awake();
-            if (string.IsNullOrEmpty(assetId))
-                hashAssetId = gameObject.GetInstanceID();
 
             Manager = GetComponent<CharacterModelManager>();
             if (Manager == null)
@@ -173,8 +123,6 @@ namespace MultiplayerARPG
                     if (!vehicleModel.vehicleType) continue;
                     for (int i = 0; i < vehicleModel.modelsForEachSeats.Length; ++i)
                     {
-                        vehicleModel.modelsForEachSeats[i].VehicleTypeDataId = vehicleModel.vehicleType.DataId;
-                        vehicleModel.modelsForEachSeats[i].VehicleSeatIndex = i;
                         vehicleModel.modelsForEachSeats[i].MainModel = this;
                         vehicleModel.modelsForEachSeats[i].IsTpsModel = IsTpsModel;
                         vehicleModel.modelsForEachSeats[i].IsFpsModel = IsFpsModel;
@@ -189,23 +137,6 @@ namespace MultiplayerARPG
                 if (equipmentContainer.transform != null && !CacheEquipmentModelContainers.ContainsKey(equipmentContainer.equipSocket))
                     CacheEquipmentModelContainers[equipmentContainer.equipSocket] = equipmentContainer;
             }
-        }
-
-        protected override void OnValidate()
-        {
-            base.OnValidate();
-#if UNITY_EDITOR
-            bool hasChanges = false;
-            if (string.IsNullOrEmpty(assetId))
-            {
-                string path = AssetDatabase.GetAssetPath(gameObject);
-                if (!string.IsNullOrEmpty(path))
-                    assetId = AssetDatabase.AssetPathToGUID(path);
-                hasChanges = true;
-            }
-            if (hasChanges)
-                EditorUtility.SetDirty(this);
-#endif
         }
 
         internal virtual void CopyCacheDataTo(

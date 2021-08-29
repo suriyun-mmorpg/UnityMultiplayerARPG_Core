@@ -22,7 +22,7 @@ namespace MultiplayerARPG
         {
             if (gameEntity == null || !gameEntity.Entity)
                 return null;
-            return gameEntity.Entity.CacheTransform;
+            return gameEntity.Entity.transform;
         }
 
         public static GameObject GetGameObject(this IGameEntity gameEntity)
