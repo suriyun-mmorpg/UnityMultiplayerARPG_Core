@@ -80,6 +80,7 @@ namespace MultiplayerARPG.GameData.Model.Playables
         public PlayableCharacterModel CharacterModel { get; private set; }
 
         private string currentWeaponTypeId = string.Empty;
+        private string previousStateId = string.Empty;
         private string playingStateId = string.Empty;
         private PlayingJumpState playingJumpState = PlayingJumpState.None;
         private PlayingActionState playingActionState = PlayingActionState.None;
@@ -354,7 +355,6 @@ namespace MultiplayerARPG.GameData.Model.Playables
                 string playingStateId = GetPlayingStateId();
                 if (!this.playingStateId.Equals(playingStateId))
                 {
-                    string previousStateId = this.playingStateId;
                     this.playingStateId = playingStateId;
                     // State not found, use idle state
                     if (!baseStates.ContainsKey(playingStateId))
@@ -388,6 +388,8 @@ namespace MultiplayerARPG.GameData.Model.Playables
                     LayerMixer.SetLayerAdditive(0, baseStates[playingStateId].state.isAdditive);
                     // Reset play elapsed
                     basePlayElapsed = 0f;
+                    // Set previous state Id for next state change updating
+                    previousStateId = playingStateId;
                 }
             }
 
