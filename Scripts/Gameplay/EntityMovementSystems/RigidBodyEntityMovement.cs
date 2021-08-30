@@ -590,8 +590,7 @@ namespace MultiplayerARPG
                 }
             }
 
-            if (CacheOpenCharacterController.enabled)
-                collisionFlags = CacheOpenCharacterController.Move((tempMoveVelocity + platformMotion) * deltaTime);
+            collisionFlags = CacheOpenCharacterController.Move((tempMoveVelocity + platformMotion) * deltaTime);
 
             if (targetYRotation.HasValue)
             {
@@ -607,9 +606,6 @@ namespace MultiplayerARPG
             acceptedJump = false;
             previouslyGrounded = isGrounded;
             previouslyAirborne = isAirborne;
-
-            if (!CacheOpenCharacterController.enabled)
-                CacheOpenCharacterController.enabled = true;
         }
 
         private void UpdateRotation()
