@@ -151,7 +151,7 @@ namespace MultiplayerARPG
             UpdatePointClickInput();
             UpdateWASDInput();
             // Set sprinting state
-            PlayerCharacterEntity.SetExtraMovement(isSprinting ? ExtraMovementState.IsSprinting : ExtraMovementState.None);
+            PlayerCharacterEntity.SetExtraMovementState(isSprinting ? ExtraMovementState.IsSprinting : ExtraMovementState.None);
         }
 
         protected void ReloadAmmo()

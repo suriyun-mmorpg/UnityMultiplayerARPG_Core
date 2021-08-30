@@ -26,9 +26,10 @@ namespace MultiplayerARPG
         {
             get { return stoppingDistance; }
         }
+        public MovementState MovementState { get; protected set; }
+        public ExtraMovementState ExtraMovementState { get; protected set; }
 
         protected Vector2? currentDestination;
-
         private Vector2 tempMoveDirection;
         private Vector2 tempCurrentPosition;
         private Vector2 tempPredictPosition;
@@ -41,9 +42,9 @@ namespace MultiplayerARPG
         private float lastServerSyncTransform;
         private float lastClientSyncTransform;
         private float lastClientSendInputs;
-
         private EntityMovementInput oldInput;
         private EntityMovementInput currentInput;
+        private ExtraMovementState tempExtraMovementState;
 
         public override void EntityAwake()
         {
@@ -102,6 +103,17 @@ namespace MultiplayerARPG
             {
                 // Always apply movement to owner client (it's client prediction for server auth movement)
                 currentDestination = position;
+            }
+        }
+
+        public void SetExtraMovementState(ExtraMovementState extraMovementState)
+        {
+            if (!Entity.CanMove())
+                return;
+            if (this.CanPredictMovement())
+            {
+                // Always apply movement to owner client (it's client prediction for server auth movement)
+                tempExtraMovementState = extraMovementState;
             }
         }
 
@@ -173,7 +185,11 @@ namespace MultiplayerARPG
                     CacheRigidbody2D.velocity = new Vector2(0, 0);
                 }
             }
-            Entity.SetMovement((CacheRigidbody2D.velocity.sqrMagnitude > 0 ? MovementState.Forward : MovementState.None) | MovementState.IsGrounded);
+            MovementState = (CacheRigidbody2D.velocity.sqrMagnitude > 0 ? MovementState.Forward : MovementState.None) | MovementState.IsGrounded;
+            // Update extra movement state
+            tempExtraMovementState = CacheRigidbody2D.velocity.sqrMagnitude > 0 ? tempExtraMovementState : ExtraMovementState.None;
+            tempExtraMovementState = this.ValidateExtraMovementState(MovementState, tempExtraMovementState);
+            ExtraMovementState = tempExtraMovementState;
             SyncTransform();
         }
 
@@ -194,7 +210,8 @@ namespace MultiplayerARPG
                 InputState inputState;
                 if (currentTime - lastClientSendInputs > clientSendInputsInterval && this.DifferInputEnoughToSend(oldInput, currentInput, out inputState))
                 {
-                    this.ClientSendMovementInput2D(currentInput.Position);
+                    currentInput = this.SetInputExtraMovementState(currentInput, tempExtraMovementState);
+                    this.ClientSendMovementInput2D(currentInput.MovementState, currentInput.ExtraMovementState, currentInput.Position);
                     oldInput = currentInput;
                     currentInput = null;
                     lastClientSendInputs = currentTime;
@@ -218,9 +235,11 @@ namespace MultiplayerARPG
                 // Don't read and apply transform, because it was done at server
                 return;
             }
+            MovementState movementState;
+            ExtraMovementState extraMovementState;
             Vector2 position;
             long timestamp;
-            messageHandler.Reader.ReadSyncTransformMessage2D(out position, out timestamp);
+            messageHandler.Reader.ReadSyncTransformMessage2D(out movementState, out extraMovementState, out position, out timestamp);
             if (acceptedPositionTimestamp < timestamp)
             {
                 acceptedPositionTimestamp = timestamp;
@@ -231,6 +250,8 @@ namespace MultiplayerARPG
                     {
                         CacheTransform.position = position;
                     }
+                    MovementState = movementState;
+                    ExtraMovementState = extraMovementState;
                 }
                 else if (!IsOwnerClient)
                 {
@@ -238,6 +259,8 @@ namespace MultiplayerARPG
                     {
                         currentDestination = position;
                     }
+                    MovementState = movementState;
+                    ExtraMovementState = extraMovementState;
                 }
             }
         }
@@ -278,12 +301,15 @@ namespace MultiplayerARPG
             }
             if (!Entity.CanMove())
                 return;
+            MovementState movementState;
+            ExtraMovementState extraMovementState;
             Vector2 position;
             long timestamp;
-            messageHandler.Reader.ReadMovementInputMessage2D(out position, out timestamp);
+            messageHandler.Reader.ReadMovementInputMessage2D(out movementState, out extraMovementState, out position, out timestamp);
             if (acceptedPositionTimestamp < timestamp)
             {
                 acceptedPositionTimestamp = timestamp;
+                tempExtraMovementState = extraMovementState;
                 currentDestination = position;
             }
         }
@@ -300,9 +326,11 @@ namespace MultiplayerARPG
                 // Movement handling at server, so don't read sync transform from client
                 return;
             }
+            MovementState movementState;
+            ExtraMovementState extraMovementState;
             Vector2 position;
             long timestamp;
-            messageHandler.Reader.ReadSyncTransformMessage2D(out position, out timestamp);
+            messageHandler.Reader.ReadSyncTransformMessage2D(out movementState, out extraMovementState, out position, out timestamp);
             if (acceptedPositionTimestamp < timestamp)
             {
                 acceptedPositionTimestamp = timestamp;
@@ -319,6 +347,8 @@ namespace MultiplayerARPG
                         currentDestination = position;
                     }
                 }
+                MovementState = movementState;
+                ExtraMovementState = extraMovementState;
             }
         }
 

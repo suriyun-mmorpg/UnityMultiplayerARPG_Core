@@ -24,11 +24,12 @@ namespace MultiplayerARPG
         public float serverSyncTransformInterval = 0.05f;
 
         public NavMeshAgent CacheNavMeshAgent { get; private set; }
-
         public float StoppingDistance
         {
             get { return CacheNavMeshAgent.stoppingDistance; }
         }
+        public MovementState MovementState { get; protected set; }
+        public ExtraMovementState ExtraMovementState { get; protected set; }
 
         private long acceptedPositionTimestamp;
         private float lastServerSyncTransform;
@@ -39,6 +40,7 @@ namespace MultiplayerARPG
         private float yRotateLerpDuration;
         private EntityMovementInput oldInput;
         private EntityMovementInput currentInput;
+        private ExtraMovementState tempExtraMovementState;
 
         public override void EntityAwake()
         {
@@ -91,6 +93,17 @@ namespace MultiplayerARPG
                 SetMovePaths(position, false);
                 currentInput = this.SetInputPosition(currentInput, position);
                 currentInput = this.SetInputIsKeyMovement(currentInput, false);
+            }
+        }
+
+        public void SetExtraMovementState(ExtraMovementState extraMovementState)
+        {
+            if (!Entity.CanMove())
+                return;
+            if (this.CanPredictMovement())
+            {
+                // Always apply movement to owner client (it's client prediction for server auth movement)
+                tempExtraMovementState = extraMovementState;
             }
         }
 
@@ -176,7 +189,9 @@ namespace MultiplayerARPG
         {
             bool isStationary = CacheNavMeshAgent.isStopped || CacheNavMeshAgent.remainingDistance <= CacheNavMeshAgent.stoppingDistance;
             CacheNavMeshAgent.obstacleAvoidanceType = isStationary ? obstacleAvoidanceWhileStationary : obstacleAvoidanceWhileMoving;
-            Entity.SetMovement((CacheNavMeshAgent.velocity.sqrMagnitude > 0 ? MovementState.Forward : MovementState.None) | MovementState.IsGrounded);
+            MovementState = (CacheNavMeshAgent.velocity.sqrMagnitude > 0 ? MovementState.Forward : MovementState.None) | MovementState.IsGrounded;
+            tempExtraMovementState = this.ValidateExtraMovementState(MovementState, tempExtraMovementState);
+            ExtraMovementState = tempExtraMovementState;
             SyncTransform();
         }
 
@@ -197,7 +212,8 @@ namespace MultiplayerARPG
                 InputState inputState;
                 if (currentTime - lastClientSendInputs > clientSendInputsInterval && this.DifferInputEnoughToSend(oldInput, currentInput, out inputState))
                 {
-                    this.ClientSendMovementInput3D(inputState, currentInput.MovementState, currentInput.Position, currentInput.Rotation);
+                    currentInput = this.SetInputExtraMovementState(currentInput, tempExtraMovementState);
+                    this.ClientSendMovementInput3D(inputState, currentInput.MovementState, currentInput.ExtraMovementState, currentInput.Position, currentInput.Rotation);
                     oldInput = currentInput;
                     currentInput = null;
                     lastClientSendInputs = currentTime;
@@ -242,10 +258,12 @@ namespace MultiplayerARPG
                 // Don't read and apply transform, because it was done at server
                 return;
             }
+            MovementState movementState;
+            ExtraMovementState extraMovementState;
             Vector3 position;
             float yAngle;
             long timestamp;
-            messageHandler.Reader.ReadSyncTransformMessage3D(out position, out yAngle, out timestamp);
+            messageHandler.Reader.ReadSyncTransformMessage3D(out movementState, out extraMovementState, out position, out yAngle, out timestamp);
             if (acceptedPositionTimestamp < timestamp)
             {
                 acceptedPositionTimestamp = timestamp;
@@ -257,6 +275,8 @@ namespace MultiplayerARPG
                         CacheTransform.eulerAngles = new Vector3(0, yAngle, 0);
                         CacheNavMeshAgent.Warp(position);
                     }
+                    MovementState = movementState;
+                    ExtraMovementState = extraMovementState;
                 }
                 else if (!IsOwnerClient)
                 {
@@ -267,6 +287,8 @@ namespace MultiplayerARPG
                     {
                         SetMovePaths(position, false);
                     }
+                    MovementState = movementState;
+                    ExtraMovementState = extraMovementState;
                 }
             }
         }
@@ -311,13 +333,15 @@ namespace MultiplayerARPG
                 return;
             InputState inputState;
             MovementState movementState;
+            ExtraMovementState extraMovementState;
             Vector3 position;
             float yAngle;
             long timestamp;
-            messageHandler.Reader.ReadMovementInputMessage3D(out inputState, out movementState, out position, out yAngle, out timestamp);
+            messageHandler.Reader.ReadMovementInputMessage3D(out inputState, out movementState, out extraMovementState, out position, out yAngle, out timestamp);
             if (acceptedPositionTimestamp < timestamp)
             {
                 acceptedPositionTimestamp = timestamp;
+                tempExtraMovementState = extraMovementState;
                 if (inputState.HasFlag(InputState.PositionChanged))
                 {
                     SetMovePaths(position, inputState.HasFlag(InputState.IsKeyMovement));
@@ -350,10 +374,12 @@ namespace MultiplayerARPG
                 // Movement handling at server, so don't read sync transform from client
                 return;
             }
+            MovementState movementState;
+            ExtraMovementState extraMovementState;
             Vector3 position;
             float yAngle;
             long timestamp;
-            messageHandler.Reader.ReadSyncTransformMessage3D(out position, out yAngle, out timestamp);
+            messageHandler.Reader.ReadSyncTransformMessage3D(out movementState, out extraMovementState, out position, out yAngle, out timestamp);
             if (acceptedPositionTimestamp < timestamp)
             {
                 acceptedPositionTimestamp = timestamp;
@@ -371,6 +397,8 @@ namespace MultiplayerARPG
                         SetMovePaths(position, false);
                     }
                 }
+                MovementState = movementState;
+                ExtraMovementState = extraMovementState;
             }
         }
 

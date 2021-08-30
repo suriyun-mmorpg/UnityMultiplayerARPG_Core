@@ -6,6 +6,7 @@ namespace MultiplayerARPG
     {
         public bool IsKeyMovement { get; set; }
         public MovementState MovementState { get; set; }
+        public ExtraMovementState ExtraMovementState { get; set; }
         public Vector3 Position { get; set; }
         public Quaternion Rotation { get; set; }
     }
@@ -37,6 +38,16 @@ namespace MultiplayerARPG
             input.MovementState = movementState;
             if (isJump)
                 input = entityMovement.SetInputJump(input);
+            // Update extra movement state because some movement state can affect extra movement state
+            input = SetInputExtraMovementState(entityMovement, input, input.ExtraMovementState);
+            return input;
+        }
+
+        public static EntityMovementInput SetInputExtraMovementState(this IEntityMovementComponent entityMovement, EntityMovementInput input, ExtraMovementState extraMovementState)
+        {
+            if (input == null)
+                input = entityMovement.InitInput();
+            input.ExtraMovementState = entityMovement.ValidateExtraMovementState(input.MovementState, extraMovementState);
             return input;
         }
 

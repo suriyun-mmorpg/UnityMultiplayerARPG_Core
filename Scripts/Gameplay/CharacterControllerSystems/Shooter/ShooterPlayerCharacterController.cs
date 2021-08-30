@@ -606,7 +606,7 @@ namespace MultiplayerARPG
             }
 
             PlayerCharacterEntity.KeyMovement(moveDirection, movementState);
-            PlayerCharacterEntity.SetExtraMovement(extraMovementState);
+            PlayerCharacterEntity.SetExtraMovementState(extraMovementState);
             UpdateLookAtTarget();
 
             if (canSwitchViewMode && InputManager.GetButtonDown("SwitchViewMode"))

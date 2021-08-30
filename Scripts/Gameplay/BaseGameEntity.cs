@@ -1,7 +1,6 @@
 ﻿using UnityEngine;
 using UnityEngine.Profiling;
 using UnityEngine.Serialization;
-using UnityEngine.UI;
 using LiteNetLib;
 using LiteNetLibManager;
 
@@ -115,9 +114,11 @@ namespace MultiplayerARPG
 
         [SerializeField]
         protected bool canSideSprint = false;
+        public bool CanSideSprint { get { return canSideSprint; } }
 
         [SerializeField]
         protected bool canBackwardSprint = false;
+        public bool CanBackwardSprint { get { return canBackwardSprint; } }
 
         public IEntityMovementComponent Movement { get; private set; }
 
@@ -189,38 +190,6 @@ namespace MultiplayerARPG
 
         [Category("Sync Fields")]
         [SerializeField]
-        protected SyncFieldByte movementState = new SyncFieldByte();
-        public MovementState LocalMovementState { get; set; }
-        public MovementState MovementState
-        {
-            get
-            {
-                if (PassengingVehicleEntity != null)
-                    return PassengingVehicleEntity.Entity.MovementState;
-                if (IsOwnerClient)
-                    return LocalMovementState;
-                return (MovementState)movementState.Value;
-            }
-            set { movementState.Value = (byte)value; }
-        }
-
-        [SerializeField]
-        protected SyncFieldByte extraMovementState = new SyncFieldByte();
-        public ExtraMovementState LocalExtraMovementState { get; set; }
-        public ExtraMovementState ExtraMovementState
-        {
-            get
-            {
-                if (PassengingVehicleEntity != null)
-                    return PassengingVehicleEntity.Entity.ExtraMovementState;
-                if (IsOwnerClient)
-                    return LocalExtraMovementState;
-                return (ExtraMovementState)extraMovementState.Value;
-            }
-            set { extraMovementState.Value = (byte)value; }
-        }
-
-        [SerializeField]
         [FormerlySerializedAs("currentDirection")]
         protected SyncFieldDirectionVector2 direction2D = new SyncFieldDirectionVector2();
         public Vector2 LocalDirection2D { get; set; }
@@ -246,6 +215,8 @@ namespace MultiplayerARPG
         }
 
         public float StoppingDistance { get { return ActiveMovement == null ? 0.1f : ActiveMovement.StoppingDistance; } }
+        public MovementState MovementState { get { return ActiveMovement == null ? MovementState.IsGrounded : ActiveMovement.MovementState; } }
+        public ExtraMovementState ExtraMovementState { get { return ActiveMovement == null ? ExtraMovementState.None : ActiveMovement.ExtraMovementState; } }
         public virtual float MoveAnimationSpeedMultiplier { get { return 1f; } }
         public virtual bool MuteFootstepSound { get { return false; } }
         protected bool dirtyIsHide;
@@ -563,14 +534,6 @@ namespace MultiplayerARPG
             syncTitleB.deliveryMethod = DeliveryMethod.ReliableOrdered;
             syncTitleB.syncMode = LiteNetLibSyncField.SyncMode.ServerToClients;
             // Movement data
-            movementState.deliveryMethod = DeliveryMethod.Sequenced;
-            movementState.syncMode = LiteNetLibSyncField.SyncMode.ServerToClients;
-            movementState.alwaysSync = true;
-            movementState.doNotSyncInitialDataImmediately = true;
-            extraMovementState.deliveryMethod = DeliveryMethod.Sequenced;
-            extraMovementState.syncMode = LiteNetLibSyncField.SyncMode.ServerToClients;
-            extraMovementState.alwaysSync = true;
-            extraMovementState.doNotSyncInitialDataImmediately = true;
             direction2D.deliveryMethod = DeliveryMethod.Sequenced;
             direction2D.syncMode = LiteNetLibSyncField.SyncMode.ServerToClients;
             direction2D.doNotSyncInitialDataImmediately = true;
@@ -645,22 +608,6 @@ namespace MultiplayerARPG
         protected void AllPlayPickupAnimation()
         {
             this.PlayPickupAnimation();
-        }
-
-        [ServerRpc]
-        protected void ServerSetMovement(MovementState movementState)
-        {
-#if !CLIENT_BUILD
-            MovementState = movementState;
-#endif
-        }
-
-        [ServerRpc]
-        protected void ServerSetExtraMovement(ExtraMovementState extraMovementState)
-        {
-#if !CLIENT_BUILD
-            ExtraMovementState = extraMovementState;
-#endif
         }
 
         [ServerRpc]
@@ -744,6 +691,12 @@ namespace MultiplayerARPG
                 ActiveMovement.PointClickMovement(position);
         }
 
+        public void SetExtraMovementState(ExtraMovementState extraMovementState)
+        {
+            if (ActiveMovement != null)
+                ActiveMovement.SetExtraMovementState(extraMovementState);
+        }
+
         public void SetLookRotation(Quaternion rotation)
         {
             if (ActiveMovement != null)
@@ -801,65 +754,6 @@ namespace MultiplayerARPG
         public void CallAllPlayPickupAnimation()
         {
             RPC(AllPlayPickupAnimation);
-        }
-
-        public void SetMovement(MovementState movementState)
-        {
-            // Set local movement state which will be used by owner client
-            LocalMovementState = movementState;
-
-            if (IsServer)
-            {
-                MovementState = movementState;
-                return;
-            }
-
-            if (IsOwnerClient)
-                RPC(ServerSetMovement, 0, DeliveryMethod.Sequenced, movementState);
-        }
-
-        public void SetExtraMovement(ExtraMovementState extraMovementState)
-        {
-            // Set local movement state which will be used by owner client
-            if (MovementState.HasFlag(MovementState.IsUnderWater))
-            {
-                // Extra movement states always none while under water
-                extraMovementState = ExtraMovementState.None;
-            }
-            else
-            {
-                switch (extraMovementState)
-                {
-                    case ExtraMovementState.IsSprinting:
-                        if (!ActiveMovement.Entity.CanSprint())
-                            extraMovementState = ExtraMovementState.None;
-                        else if (!canSideSprint && (MovementState.HasFlag(MovementState.Left) || MovementState.HasFlag(MovementState.Right)))
-                            extraMovementState = ExtraMovementState.None;
-                        else if (!canBackwardSprint && MovementState.HasFlag(MovementState.Backward))
-                            extraMovementState = ExtraMovementState.None;
-                        break;
-                    case ExtraMovementState.IsCrouching:
-                        if (!ActiveMovement.Entity.CanCrouch())
-                            extraMovementState = ExtraMovementState.None;
-                        break;
-                    case ExtraMovementState.IsCrawling:
-                        if (!ActiveMovement.Entity.CanCrawl())
-                            extraMovementState = ExtraMovementState.None;
-                        break;
-                }
-            }
-
-            // Set local extra movement state which will be used by owner client
-            LocalExtraMovementState = extraMovementState;
-
-            if (IsServer)
-            {
-                ExtraMovementState = extraMovementState;
-                return;
-            }
-
-            if (IsOwnerClient)
-                RPC(ServerSetExtraMovement, 0, DeliveryMethod.Sequenced, extraMovementState);
         }
 
         public void SetDirection2D(Vector2 direction)

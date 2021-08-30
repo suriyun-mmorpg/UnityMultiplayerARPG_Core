@@ -130,9 +130,6 @@ namespace MultiplayerARPG
                 if (CurrentGameInstance.npcQuestIndicator != null)
                     InstantiateQuestIndicator(CurrentGameInstance.npcQuestIndicator);
             }
-
-            // Set movement state to be on ground by default
-            MovementState = MovementState.IsGrounded;
         }
 
         public void InstantiateUI(UINpcEntity prefab)

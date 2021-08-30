@@ -1,7 +1,7 @@
 ﻿namespace MultiplayerARPG
 {
     [System.Flags]
-    public enum InputState : int
+    public enum InputState : byte
     {
         None = 0,
         IsKeyMovement = 1 << 0,
