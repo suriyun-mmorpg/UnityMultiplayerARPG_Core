@@ -36,6 +36,13 @@ namespace MultiplayerARPG
             public string platformFolderName;
         }
 
+        [SerializeField]
+        public struct AssetBundleInfo
+        {
+            public string url;
+            public Hash128 hash;
+        }
+
         public static AssetBundleManager Singleton { get; private set; }
 
         [SerializeField]
@@ -111,7 +118,7 @@ namespace MultiplayerARPG
 
         private bool tempErrorOccuring = false;
         private AssetBundle tempAssetBundle = null;
-        private readonly Dictionary<string, Hash128> loadingAssetBundles = new Dictionary<string, Hash128>();
+        private readonly Dictionary<string, AssetBundleInfo> loadingAssetBundles = new Dictionary<string, AssetBundleInfo>();
 
         private void Awake()
         {
@@ -244,12 +251,14 @@ namespace MultiplayerARPG
         private IEnumerator LoadAssetBundlesFromUrlRoutine(string url)
         {
             Dependencies.Clear();
-
+            string downloadingUrl;
+            Hash128 downloadHash;
             tempErrorOccuring = false;
             tempAssetBundle = null;
             // Load platform's manifest to get all asset bundles
             CurrentLoadState = LoadState.LoadManifest;
-            yield return StartCoroutine(LoadAssetBundleFromUrlRoutine(new Uri(url).Append(CurrentSetting.platformFolderName, CurrentSetting.platformFolderName).AbsoluteUri, "manifest", onManifestLoaded, onManifestLoadedFail, null));
+            downloadingUrl = new Uri(url).Append(CurrentSetting.platformFolderName, CurrentSetting.platformFolderName).AbsoluteUri;
+            yield return StartCoroutine(LoadAssetBundleFromUrlRoutine(downloadingUrl, "manifest", onManifestLoaded, onManifestLoadedFail, null));
             if (tempErrorOccuring)
                 yield break;
             // Read platform's manifest to get all asset bundles info
@@ -260,20 +269,36 @@ namespace MultiplayerARPG
                 string[] dependencies = manifest.GetAllDependencies(assetBundle);
                 foreach (string dependency in dependencies)
                 {
-                    if (!loadingAssetBundles.ContainsKey(dependency))
-                        loadingAssetBundles.Add(dependency, manifest.GetAssetBundleHash(dependency));
+                    downloadingUrl = new Uri(url).Append(CurrentSetting.platformFolderName, dependency).AbsoluteUri;
+                    downloadHash = manifest.GetAssetBundleHash(dependency);
+                    if (!loadingAssetBundles.ContainsKey(dependency) && !Caching.IsVersionCached(downloadingUrl, downloadHash))
+                    {
+                        loadingAssetBundles.Add(dependency, new AssetBundleInfo()
+                        {
+                            url = downloadingUrl,
+                            hash = downloadHash,
+                        });
+                    }
                 }
-                if (!loadingAssetBundles.ContainsKey(assetBundle))
-                    loadingAssetBundles.Add(assetBundle, manifest.GetAssetBundleHash(assetBundle));
+                downloadingUrl = new Uri(url).Append(CurrentSetting.platformFolderName, assetBundle).AbsoluteUri;
+                downloadHash = manifest.GetAssetBundleHash(assetBundle);
+                if (!loadingAssetBundles.ContainsKey(assetBundle) && !Caching.IsVersionCached(downloadingUrl, downloadHash))
+                {
+                    loadingAssetBundles.Add(assetBundle, new AssetBundleInfo()
+                    {
+                        url = downloadingUrl,
+                        hash = downloadHash,
+                    });
+                }
             }
             LoadedAssetBundlesCount = 0;
             LoadingAssetBundlesCount = loadingAssetBundles.Count;
             // Load all asset bundles
             CurrentLoadState = LoadState.LoadAssetBundles;
-            foreach (KeyValuePair<string, Hash128> loadingAssetBundle in loadingAssetBundles)
+            foreach (KeyValuePair<string, AssetBundleInfo> loadingAssetBundle in loadingAssetBundles)
             {
                 LoadingAssetBundleFileName = loadingAssetBundle.Key;
-                yield return StartCoroutine(LoadAssetBundleFromUrlRoutine(new Uri(url).Append(CurrentSetting.platformFolderName, LoadingAssetBundleFileName).AbsoluteUri, $"dependency: {loadingAssetBundle.Key}", onAssetBundlesLoaded, onAssetBundlesLoadedFail, loadingAssetBundle.Value));
+                yield return StartCoroutine(LoadAssetBundleFromUrlRoutine(loadingAssetBundle.Value.url, $"dependency: {loadingAssetBundle.Key}", onAssetBundlesLoaded, onAssetBundlesLoadedFail, loadingAssetBundle.Value.hash));
                 if (tempErrorOccuring)
                     yield break;
                 Dependencies[loadingAssetBundle.Key] = tempAssetBundle;
