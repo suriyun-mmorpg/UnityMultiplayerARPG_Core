@@ -41,6 +41,7 @@ namespace MultiplayerARPG
         {
             public string url;
             public Hash128 hash;
+            public bool cached;
         }
 
         public static AssetBundleManager Singleton { get; private set; }
@@ -253,6 +254,7 @@ namespace MultiplayerARPG
             Dependencies.Clear();
             string downloadingUrl;
             Hash128 downloadHash;
+            bool isCached;
             tempErrorOccuring = false;
             tempAssetBundle = null;
             // Load platform's manifest to get all asset bundles
@@ -264,6 +266,7 @@ namespace MultiplayerARPG
             // Read platform's manifest to get all asset bundles info
             AssetBundleManifest manifest = tempAssetBundle.LoadAsset<AssetBundleManifest>("AssetBundleManifest");
             string[] assetBundles = manifest.GetAllAssetBundles();
+            LoadingAssetBundlesCount = 0;
             foreach (string assetBundle in assetBundles)
             {
                 string[] dependencies = manifest.GetAllDependencies(assetBundle);
@@ -271,38 +274,48 @@ namespace MultiplayerARPG
                 {
                     downloadingUrl = new Uri(url).Append(CurrentSetting.platformFolderName, dependency).AbsoluteUri;
                     downloadHash = manifest.GetAssetBundleHash(dependency);
-                    if (!loadingAssetBundles.ContainsKey(dependency) && !Caching.IsVersionCached(downloadingUrl, downloadHash))
+                    if (!loadingAssetBundles.ContainsKey(dependency))
                     {
+                        isCached = Caching.IsVersionCached(downloadingUrl, downloadHash);
                         loadingAssetBundles.Add(dependency, new AssetBundleInfo()
                         {
                             url = downloadingUrl,
                             hash = downloadHash,
+                            cached = isCached,
                         });
+                        if (!isCached)
+                            LoadingAssetBundlesCount++;
                     }
                 }
                 downloadingUrl = new Uri(url).Append(CurrentSetting.platformFolderName, assetBundle).AbsoluteUri;
                 downloadHash = manifest.GetAssetBundleHash(assetBundle);
                 if (!loadingAssetBundles.ContainsKey(assetBundle) && !Caching.IsVersionCached(downloadingUrl, downloadHash))
                 {
+                    isCached = Caching.IsVersionCached(downloadingUrl, downloadHash);
                     loadingAssetBundles.Add(assetBundle, new AssetBundleInfo()
                     {
                         url = downloadingUrl,
                         hash = downloadHash,
+                        cached = isCached,
                     });
+                    if (!isCached)
+                        LoadingAssetBundlesCount++;
                 }
             }
-            LoadedAssetBundlesCount = 0;
-            LoadingAssetBundlesCount = loadingAssetBundles.Count;
             // Load all asset bundles
+            LoadedAssetBundlesCount = 0;
             CurrentLoadState = LoadState.LoadAssetBundles;
             foreach (KeyValuePair<string, AssetBundleInfo> loadingAssetBundle in loadingAssetBundles)
             {
-                LoadingAssetBundleFileName = loadingAssetBundle.Key;
+                isCached = loadingAssetBundle.Value.cached;
+                if (!isCached)
+                    LoadingAssetBundleFileName = loadingAssetBundle.Key;
                 yield return StartCoroutine(LoadAssetBundleFromUrlRoutine(loadingAssetBundle.Value.url, $"dependency: {loadingAssetBundle.Key}", onAssetBundlesLoaded, onAssetBundlesLoadedFail, loadingAssetBundle.Value.hash));
                 if (tempErrorOccuring)
                     yield break;
                 Dependencies[loadingAssetBundle.Key] = tempAssetBundle;
-                LoadedAssetBundlesCount++;
+                if (!isCached)
+                    LoadedAssetBundlesCount++;
             }
             // All asset bundles loaded, load init scene
             CurrentLoadState = LoadState.Done;
