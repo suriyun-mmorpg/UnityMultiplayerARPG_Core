@@ -223,11 +223,6 @@ namespace MultiplayerARPG
         private IEnumerator LoadAssetBundleFromUrlRoutine(string url, string loadKey, UnityEvent successEvt, UnityEvent errorEvt, Hash128? hash)
         {
             Debug.Log($"[AssetBundleManager] Load {loadKey}");
-            // Load manifest file to read CRC
-            CurrentWebRequest = UnityWebRequest.Get($"{url}.manifest");
-            yield return CurrentWebRequest.SendWebRequest();
-            if (IsWebRequestLoadedFail(loadKey, errorEvt))
-                yield break;
             // Create request to get asset bundle from cache or download from server
             if (hash.HasValue)
                 CurrentWebRequest = UnityWebRequestAssetBundle.GetAssetBundle(url, hash.Value);
@@ -289,7 +284,7 @@ namespace MultiplayerARPG
                 }
                 downloadingUrl = new Uri(url).Append(CurrentSetting.platformFolderName, assetBundle).AbsoluteUri;
                 downloadHash = manifest.GetAssetBundleHash(assetBundle);
-                if (!loadingAssetBundles.ContainsKey(assetBundle) && !Caching.IsVersionCached(downloadingUrl, downloadHash))
+                if (!loadingAssetBundles.ContainsKey(assetBundle))
                 {
                     isCached = Caching.IsVersionCached(downloadingUrl, downloadHash);
                     loadingAssetBundles.Add(assetBundle, new AssetBundleInfo()
