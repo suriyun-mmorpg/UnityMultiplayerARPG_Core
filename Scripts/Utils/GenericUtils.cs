@@ -486,7 +486,7 @@ public static class GenericUtils
     }
 
     public static string GetPrettyDate(this System.DateTime dateTime,
-        string textNow = "Just now",
+        string textNow = "a few seconds ago",
         string textAMinuteAgo = "1 Minute ago",
         string textAHourAgo = "1 Hour ago",
         string textYesterday = "Yesterday",
