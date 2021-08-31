@@ -111,7 +111,7 @@ namespace MultiplayerARPG
 
         private bool tempErrorOccuring = false;
         private AssetBundle tempAssetBundle = null;
-        private readonly List<string> loadingAssetBundles = new List<string>();
+        private readonly Dictionary<string, Hash128> loadingAssetBundles = new Dictionary<string, Hash128>();
 
         private void Awake()
         {
@@ -212,7 +212,7 @@ namespace MultiplayerARPG
             Debug.LogError($"[AssetBundleManager] Load {key} from {CurrentWebRequest.url}, error: {logError}");
         }
 
-        private IEnumerator LoadAssetBundleFromUrlRoutine(string url, string loadKey, UnityEvent successEvt, UnityEvent errorEvt, bool checkAssetFileHash = true)
+        private IEnumerator LoadAssetBundleFromUrlRoutine(string url, string loadKey, UnityEvent successEvt, UnityEvent errorEvt, Hash128? hash)
         {
             Debug.Log($"[AssetBundleManager] Load {loadKey}");
             // Load manifest file to read CRC
@@ -220,37 +220,14 @@ namespace MultiplayerARPG
             yield return CurrentWebRequest.SendWebRequest();
             if (IsWebRequestLoadedFail(loadKey, errorEvt))
                 yield break;
-            // Read CRC
-            bool foundAssetFileHashKey = false;
-            bool foundAssetFileHash = false;
-            string assetFileHash = string.Empty;
-            string downloadedText = CurrentWebRequest.downloadHandler.text;
-            string[] splitedLines = downloadedText.Split('\n');
-            foreach (string splitedLine in splitedLines)
-            {
-                string[] splitedKeyValue = splitedLine.Split(':');
-                if (checkAssetFileHash)
-                {
-                    if (splitedKeyValue.Length >= 1 && splitedKeyValue[0].Contains("AssetFileHash"))
-                        foundAssetFileHashKey = true;
-                    if (foundAssetFileHashKey && splitedKeyValue.Length >= 2 && splitedKeyValue[0].Contains("Hash"))
-                    {
-                        assetFileHash = splitedKeyValue[1].Trim();
-                        foundAssetFileHash = true;
-                    }
-                }
-                if (!checkAssetFileHash || foundAssetFileHash)
-                    break;
-            }
-            // Can't read asset hash
-            if (checkAssetFileHash && !foundAssetFileHash)
-            {
-                OnAssetBundleLoadedFail(loadKey, errorEvt, "No asset file hash in manifest");
-                yield break;
-            }
-            // Download asset bundle from server or from cache by CRC
-            CurrentWebRequest = UnityWebRequestAssetBundle.GetAssetBundle(url, Hash128.Compute(assetFileHash));
+            // Create request to get asset bundle from cache or download from server
+            if (hash.HasValue)
+                CurrentWebRequest = UnityWebRequestAssetBundle.GetAssetBundle(url, hash.Value);
+            else
+                CurrentWebRequest = UnityWebRequestAssetBundle.GetAssetBundle(url);
+            // Send request
             yield return CurrentWebRequest.SendWebRequest();
+            // Error handling
             if (IsWebRequestLoadedFail(loadKey, errorEvt))
                 yield break;
             tempAssetBundle = DownloadHandlerAssetBundle.GetContent(CurrentWebRequest);
@@ -259,6 +236,7 @@ namespace MultiplayerARPG
                 OnAssetBundleLoadedFail(loadKey, errorEvt, "No Asset Bundle");
                 yield break;
             }
+            // Done
             successEvt.Invoke();
             Debug.Log($"[AssetBundleManager] Load {loadKey} done");
         }
@@ -269,13 +247,12 @@ namespace MultiplayerARPG
 
             tempErrorOccuring = false;
             tempAssetBundle = null;
-
+            // Load platform's manifest to get all asset bundles
             CurrentLoadState = LoadState.LoadManifest;
-            yield return StartCoroutine(LoadAssetBundleFromUrlRoutine(new Uri(url).Append(CurrentSetting.platformFolderName, CurrentSetting.platformFolderName).AbsoluteUri, "manifest", onManifestLoaded, onManifestLoadedFail, false));
+            yield return StartCoroutine(LoadAssetBundleFromUrlRoutine(new Uri(url).Append(CurrentSetting.platformFolderName, CurrentSetting.platformFolderName).AbsoluteUri, "manifest", onManifestLoaded, onManifestLoadedFail, null));
             if (tempErrorOccuring)
                 yield break;
-
-            CurrentLoadState = LoadState.LoadAssetBundles;
+            // Read platform's manifest to get all asset bundles info
             AssetBundleManifest manifest = tempAssetBundle.LoadAsset<AssetBundleManifest>("AssetBundleManifest");
             string[] assetBundles = manifest.GetAllAssetBundles();
             foreach (string assetBundle in assetBundles)
@@ -283,24 +260,26 @@ namespace MultiplayerARPG
                 string[] dependencies = manifest.GetAllDependencies(assetBundle);
                 foreach (string dependency in dependencies)
                 {
-                    if (!loadingAssetBundles.Contains(dependency))
-                        loadingAssetBundles.Add(dependency);
+                    if (!loadingAssetBundles.ContainsKey(dependency))
+                        loadingAssetBundles.Add(dependency, manifest.GetAssetBundleHash(dependency));
                 }
-                if (!loadingAssetBundles.Contains(assetBundle))
-                    loadingAssetBundles.Add(assetBundle);
+                if (!loadingAssetBundles.ContainsKey(assetBundle))
+                    loadingAssetBundles.Add(assetBundle, manifest.GetAssetBundleHash(assetBundle));
             }
             LoadedAssetBundlesCount = 0;
             LoadingAssetBundlesCount = loadingAssetBundles.Count;
-            foreach (string loadingAssetBundle in loadingAssetBundles)
+            // Load all asset bundles
+            CurrentLoadState = LoadState.LoadAssetBundles;
+            foreach (KeyValuePair<string, Hash128> loadingAssetBundle in loadingAssetBundles)
             {
-                LoadingAssetBundleFileName = loadingAssetBundle;
-                yield return StartCoroutine(LoadAssetBundleFromUrlRoutine(new Uri(url).Append(CurrentSetting.platformFolderName, loadingAssetBundle).AbsoluteUri, $"dependency: {loadingAssetBundle}", onAssetBundlesLoaded, onAssetBundlesLoadedFail));
+                LoadingAssetBundleFileName = loadingAssetBundle.Key;
+                yield return StartCoroutine(LoadAssetBundleFromUrlRoutine(new Uri(url).Append(CurrentSetting.platformFolderName, LoadingAssetBundleFileName).AbsoluteUri, $"dependency: {loadingAssetBundle.Key}", onAssetBundlesLoaded, onAssetBundlesLoadedFail, loadingAssetBundle.Value));
                 if (tempErrorOccuring)
                     yield break;
-                Dependencies[loadingAssetBundle] = tempAssetBundle;
+                Dependencies[loadingAssetBundle.Key] = tempAssetBundle;
                 LoadedAssetBundlesCount++;
             }
-
+            // All asset bundles loaded, load init scene
             CurrentLoadState = LoadState.Done;
             SceneManager.LoadScene(initSceneName);
         }
