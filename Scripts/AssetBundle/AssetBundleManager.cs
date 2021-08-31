@@ -109,7 +109,7 @@ namespace MultiplayerARPG
         public LoadState CurrentLoadState { get; protected set; } = LoadState.None;
         public int LoadingAssetBundlesCount { get; protected set; } = 0;
         public int LoadedAssetBundlesCount { get; protected set; } = 0;
-        public float TotalLoadProgress { get { return (float)LoadedAssetBundlesCount / (float)LoadingAssetBundlesCount; } }
+        public float TotalLoadProgress { get { return LoadedAssetBundlesCount == LoadingAssetBundlesCount ? 1f : ((float)LoadedAssetBundlesCount / (float)LoadingAssetBundlesCount); } }
         public string LoadingAssetBundleFileName { get; protected set; }
         public AssetBundleSetting CurrentSetting { get; protected set; }
         public string ServerUrl { get { return !string.IsNullOrEmpty(CurrentSetting.overrideServerUrl) ? CurrentSetting.overrideServerUrl : serverUrl; } }

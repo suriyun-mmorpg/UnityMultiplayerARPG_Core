@@ -30,6 +30,8 @@ namespace MultiplayerARPG
             switch (AssetBundleManager.Singleton.CurrentLoadState)
             {
                 case AssetBundleManager.LoadState.None:
+                case AssetBundleManager.LoadState.LoadManifest:
+                case AssetBundleManager.LoadState.Done:
                     if (rootObject != null)
                         rootObject.SetActive(false);
 
@@ -41,48 +43,28 @@ namespace MultiplayerARPG
                     if (textLoadedAssetBundlesCount != null)
                         textLoadedAssetBundlesCount.text = string.Empty;
                     break;
-                case AssetBundleManager.LoadState.LoadManifest:
-                    // TODO: May show message
-                    break;
                 case AssetBundleManager.LoadState.LoadAssetBundles:
-                    if (rootObject != null)
-                        rootObject.SetActive(true);
-                    if (uiTextProgress != null)
-                        uiTextProgress.text = (AssetBundleManager.Singleton.CurrentWebRequest.downloadProgress * 100f).ToString("N2") + "%";
-                    if (imageGage != null)
-                        imageGage.fillAmount = AssetBundleManager.Singleton.CurrentWebRequest.downloadProgress;
+                    if (AssetBundleManager.Singleton.LoadedAssetBundlesCount > 0)
+                    {
+                        if (rootObject != null)
+                            rootObject.SetActive(true);
+                        if (uiTextProgress != null)
+                            uiTextProgress.text = (AssetBundleManager.Singleton.CurrentWebRequest.downloadProgress * 100f).ToString("N2") + "%";
+                        if (imageGage != null)
+                            imageGage.fillAmount = AssetBundleManager.Singleton.CurrentWebRequest.downloadProgress;
 
-                    if (totalRootObject != null)
-                        totalRootObject.SetActive(true);
-                    if (uiTextTotalProgress != null)
-                        uiTextTotalProgress.text = (AssetBundleManager.Singleton.TotalLoadProgress * 100f).ToString("N2") + "%";
-                    if (imageGageTotal != null)
-                        imageGageTotal.fillAmount = AssetBundleManager.Singleton.TotalLoadProgress;
+                        if (totalRootObject != null)
+                            totalRootObject.SetActive(true);
+                        if (uiTextTotalProgress != null)
+                            uiTextTotalProgress.text = (AssetBundleManager.Singleton.TotalLoadProgress * 100f).ToString("N2") + "%";
+                        if (imageGageTotal != null)
+                            imageGageTotal.fillAmount = AssetBundleManager.Singleton.TotalLoadProgress;
 
-                    if (textLoadingAssetBundleFileName != null)
-                        textLoadingAssetBundleFileName.text = string.Format(LanguageManager.GetText(formatLoadingAssetBundleFileName), AssetBundleManager.Singleton.LoadingAssetBundleFileName);
-                    if (textLoadedAssetBundlesCount != null)
-                        textLoadedAssetBundlesCount.text = string.Format(LanguageManager.GetText(formatLoadedAssetBundles), AssetBundleManager.Singleton.LoadedAssetBundlesCount, AssetBundleManager.Singleton.LoadingAssetBundlesCount);
-                    break;
-                case AssetBundleManager.LoadState.Done:
-                    if (rootObject != null)
-                        rootObject.SetActive(true);
-                    if (uiTextProgress != null)
-                        uiTextProgress.text = "100.00%";
-                    if (imageGage != null)
-                        imageGage.fillAmount = 1;
-
-                    if (totalRootObject != null)
-                        totalRootObject.SetActive(true);
-                    if (uiTextTotalProgress != null)
-                        uiTextTotalProgress.text = "100.00%";
-                    if (imageGageTotal != null)
-                        imageGageTotal.fillAmount = 1;
-
-                    if (textLoadingAssetBundleFileName != null)
-                        textLoadingAssetBundleFileName.text = string.Empty;
-                    if (textLoadedAssetBundlesCount != null)
-                        textLoadedAssetBundlesCount.text = string.Empty;
+                        if (textLoadingAssetBundleFileName != null)
+                            textLoadingAssetBundleFileName.text = string.Format(LanguageManager.GetText(formatLoadingAssetBundleFileName), AssetBundleManager.Singleton.LoadingAssetBundleFileName);
+                        if (textLoadedAssetBundlesCount != null)
+                            textLoadedAssetBundlesCount.text = string.Format(LanguageManager.GetText(formatLoadedAssetBundles), AssetBundleManager.Singleton.LoadedAssetBundlesCount, AssetBundleManager.Singleton.LoadingAssetBundlesCount);
+                    }
                     break;
             }
         }
