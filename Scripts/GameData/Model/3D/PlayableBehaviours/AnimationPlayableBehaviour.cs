@@ -236,9 +236,9 @@ namespace MultiplayerARPG.GameData.Model.Playables
                     stateId = CLIP_JUMP;
                 return stateId;
             }
-            else if (CharacterModel.movementState.HasFlag(MovementState.IsGrounded))
+            else if (CharacterModel.movementState.HasFlag(MovementState.IsUnderWater) || CharacterModel.movementState.HasFlag(MovementState.IsGrounded))
             {
-                if (!isPreviouslyGrounded)
+                if (CharacterModel.movementState.HasFlag(MovementState.IsGrounded) && !isPreviouslyGrounded)
                 {
                     isPreviouslyGrounded = true;
                     // Get fall state by weapon type
