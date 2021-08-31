@@ -570,7 +570,7 @@ namespace MultiplayerARPG
                 }
             }
 
-            Vector3 stickGroundMove = isGrounded && !isUnderWater ? Vector3.down * stickGroundForce * Time.deltaTime : Vector3.zero;
+            Vector3 stickGroundMove = isGrounded && !isUnderWater ? (Vector3.down * stickGroundForce * deltaTime) : Vector3.zero;
             collisionFlags = CacheCharacterController.Move((tempMoveVelocity + platformMotion) * deltaTime + stickGroundMove);
 
             if (targetYRotation.HasValue)
