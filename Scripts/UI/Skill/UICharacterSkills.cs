@@ -170,6 +170,28 @@ namespace MultiplayerARPG
             GenerateList();
         }
 
+        public void UpdateData(ICharacterData character, Dictionary<BaseSkill, short> skills)
+        {
+            Character = character;
+            LoadedList.Clear();
+            foreach (KeyValuePair<BaseSkill, short> skill in skills)
+            {
+                LoadedList[skill.Key] = skill.Value;
+            }
+            GenerateList();
+        }
+
+        public void UpdateData(ICharacterData character, List<SkillLevel> skills)
+        {
+            Character = character;
+            LoadedList.Clear();
+            foreach (SkillLevel skill in skills)
+            {
+                LoadedList[skill.skill] = skill.level;
+            }
+            GenerateList();
+        }
+
         public virtual void GenerateList()
         {
             int selectedSkillId = CacheSelectionManager.SelectedUI != null ? CacheSelectionManager.SelectedUI.Skill.DataId : 0;
@@ -196,7 +218,7 @@ namespace MultiplayerARPG
             {
                 tempUI = ui.GetComponent<UICharacterSkill>();
                 tempSkill = data.Key;
-                
+
                 if (filterCategories.Count == 0 || (!string.IsNullOrEmpty(tempSkill.category) &&
                     filterCategories.Contains(tempSkill.category.Trim().ToLower())))
                 {
