@@ -70,7 +70,7 @@ namespace MultiplayerARPG
 
         public virtual void PrepareRelatesData()
         {
-
+            this.InvokeInstanceDevExtMethods("PrepareRelatesData");
         }
 
         public int CompareTo(object obj)
