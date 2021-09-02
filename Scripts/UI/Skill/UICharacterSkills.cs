@@ -181,6 +181,19 @@ namespace MultiplayerARPG
             GenerateList();
         }
 
+        public void UpdateData(ICharacterData character, Dictionary<int, short> skills)
+        {
+            Character = character;
+            LoadedList.Clear();
+            BaseSkill tempSkill;
+            foreach (KeyValuePair<int, short> skill in skills)
+            {
+                if (GameInstance.Skills.TryGetValue(skill.Key, out tempSkill))
+                    LoadedList[tempSkill] = skill.Value;
+            }
+            GenerateList();
+        }
+
         public void UpdateData(ICharacterData character, List<SkillLevel> skills)
         {
             Character = character;
