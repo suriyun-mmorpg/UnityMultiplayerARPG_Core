@@ -8,6 +8,8 @@ public class UIList : MonoBehaviour
     public Transform uiContainer;
     public bool doNotRemoveContainerChildren;
     public IEnumerable List { get; protected set; }
+    public int ListCount { get; protected set; } = 0;
+    public IEnumerable<GameObject> UIs { get { return uis; } }
     protected readonly List<GameObject> uis = new List<GameObject>();
     protected bool removedContainerChildren;
 
@@ -50,6 +52,7 @@ public class UIList : MonoBehaviour
                 onGenerateEntry.Invoke(i, entry, ui);
             ++i;
         }
+        ListCount = i;
         for (; i < uis.Count; ++i)
         {
             GameObject ui = uis[i];
