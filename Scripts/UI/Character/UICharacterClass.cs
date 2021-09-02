@@ -1,11 +1,9 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.UI;
 
 namespace MultiplayerARPG
 {
-    public class UICharacterClass : UISelectionEntry<BaseCharacter>
+    public partial class UICharacterClass : UISelectionEntry<BaseCharacter>
     {
         [Header("String Formats")]
         [Tooltip("Format => {0} = {Title}")]
