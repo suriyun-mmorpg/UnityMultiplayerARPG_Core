@@ -9,7 +9,7 @@ public class UIList : MonoBehaviour
     public bool doNotRemoveContainerChildren;
     public IEnumerable List { get; protected set; }
     public int ListCount { get; protected set; } = 0;
-    public IEnumerable<GameObject> UIs { get { return uis; } }
+    public System.Action<int, object, GameObject> onGenerateEntry = null;
     protected readonly List<GameObject> uis = new List<GameObject>();
     protected bool removedContainerChildren;
 
@@ -48,6 +48,8 @@ public class UIList : MonoBehaviour
                     ui.SetActive(true);
                 }
             }
+            if (this.onGenerateEntry != null)
+                this.onGenerateEntry.Invoke(i, entry, ui);
             if (onGenerateEntry != null)
                 onGenerateEntry.Invoke(i, entry, ui);
             ++i;
