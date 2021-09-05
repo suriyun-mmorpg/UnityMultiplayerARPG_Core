@@ -185,11 +185,15 @@ namespace MultiplayerARPG
                     CacheRigidbody2D.velocity = new Vector2(0, 0);
                 }
             }
-            MovementState = (CacheRigidbody2D.velocity.sqrMagnitude > 0 ? MovementState.Forward : MovementState.None) | MovementState.IsGrounded;
-            // Update extra movement state
-            tempExtraMovementState = CacheRigidbody2D.velocity.sqrMagnitude > 0 ? tempExtraMovementState : ExtraMovementState.None;
-            tempExtraMovementState = this.ValidateExtraMovementState(MovementState, tempExtraMovementState);
-            ExtraMovementState = tempExtraMovementState;
+            if (IsOwnerClient || (IsServer && Entity.MovementSecure == MovementSecure.ServerAuthoritative))
+            {
+                // Update movement state
+                MovementState = (CacheRigidbody2D.velocity.sqrMagnitude > 0 ? MovementState.Forward : MovementState.None) | MovementState.IsGrounded;
+                // Update extra movement state
+                tempExtraMovementState = CacheRigidbody2D.velocity.sqrMagnitude > 0 ? tempExtraMovementState : ExtraMovementState.None;
+                tempExtraMovementState = this.ValidateExtraMovementState(MovementState, tempExtraMovementState);
+                ExtraMovementState = tempExtraMovementState;
+            }
             SyncTransform();
         }
 
@@ -210,6 +214,7 @@ namespace MultiplayerARPG
                 InputState inputState;
                 if (currentTime - lastClientSendInputs > clientSendInputsInterval && this.DifferInputEnoughToSend(oldInput, currentInput, out inputState))
                 {
+                    currentInput = this.SetInputMovementState(currentInput, MovementState);
                     currentInput = this.SetInputExtraMovementState(currentInput, tempExtraMovementState);
                     this.ClientSendMovementInput2D(currentInput.MovementState, currentInput.ExtraMovementState, currentInput.Position);
                     oldInput = currentInput;
@@ -250,8 +255,6 @@ namespace MultiplayerARPG
                     {
                         CacheTransform.position = position;
                     }
-                    MovementState = movementState;
-                    ExtraMovementState = extraMovementState;
                 }
                 else if (!IsOwnerClient)
                 {
@@ -259,9 +262,9 @@ namespace MultiplayerARPG
                     {
                         currentDestination = position;
                     }
-                    MovementState = movementState;
-                    ExtraMovementState = extraMovementState;
                 }
+                MovementState = movementState;
+                ExtraMovementState = extraMovementState;
             }
         }
 
