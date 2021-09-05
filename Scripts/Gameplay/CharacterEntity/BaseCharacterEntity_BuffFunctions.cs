@@ -79,7 +79,7 @@ namespace MultiplayerARPG
                 if (maxStack > 1)
                 {
                     List<int> indexesOfBuff = this.IndexesOfBuff(dataId, type);
-                    while (indexesOfBuff.Count > maxStack)
+                    while (indexesOfBuff.Count + 1 > maxStack)
                     {
                         int buffIndex = indexesOfBuff[0];
                         if (buffIndex >= 0)
