@@ -31,16 +31,16 @@ namespace MultiplayerARPG
         public MovementState MovementState { get; protected set; }
         public ExtraMovementState ExtraMovementState { get; protected set; }
 
-        private long acceptedPositionTimestamp;
-        private float lastServerSyncTransform;
-        private float lastClientSyncTransform;
-        private float lastClientSendInputs;
-        private float? targetYRotation;
-        private float yRotateLerpTime;
-        private float yRotateLerpDuration;
-        private EntityMovementInput oldInput;
-        private EntityMovementInput currentInput;
-        private ExtraMovementState tempExtraMovementState;
+        protected long acceptedPositionTimestamp;
+        protected float lastServerSyncTransform;
+        protected float lastClientSyncTransform;
+        protected float lastClientSendInputs;
+        protected float? targetYRotation;
+        protected float yRotateLerpTime;
+        protected float yRotateLerpDuration;
+        protected EntityMovementInput oldInput;
+        protected EntityMovementInput currentInput;
+        protected ExtraMovementState tempExtraMovementState;
 
         public override void EntityAwake()
         {

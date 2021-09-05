@@ -30,21 +30,21 @@ namespace MultiplayerARPG
         public ExtraMovementState ExtraMovementState { get; protected set; }
 
         protected Vector2? currentDestination;
-        private Vector2 tempMoveDirection;
-        private Vector2 tempCurrentPosition;
-        private Vector2 tempPredictPosition;
-        private float tempSqrMagnitude;
-        private float tempPredictSqrMagnitude;
-        private float tempTargetDistance;
-        private float tempCurrentMoveSpeed;
-        private Quaternion lookRotation;
-        private long acceptedPositionTimestamp;
-        private float lastServerSyncTransform;
-        private float lastClientSyncTransform;
-        private float lastClientSendInputs;
-        private EntityMovementInput oldInput;
-        private EntityMovementInput currentInput;
-        private ExtraMovementState tempExtraMovementState;
+        protected Vector2 tempMoveDirection;
+        protected Vector2 tempCurrentPosition;
+        protected Vector2 tempPredictPosition;
+        protected float tempSqrMagnitude;
+        protected float tempPredictSqrMagnitude;
+        protected float tempTargetDistance;
+        protected float tempCurrentMoveSpeed;
+        protected Quaternion lookRotation;
+        protected long acceptedPositionTimestamp;
+        protected float lastServerSyncTransform;
+        protected float lastClientSyncTransform;
+        protected float lastClientSendInputs;
+        protected EntityMovementInput oldInput;
+        protected EntityMovementInput currentInput;
+        protected ExtraMovementState tempExtraMovementState;
 
         public override void EntityAwake()
         {
@@ -255,6 +255,8 @@ namespace MultiplayerARPG
                     {
                         CacheTransform.position = position;
                     }
+                    MovementState = movementState;
+                    ExtraMovementState = extraMovementState;
                 }
                 else if (!IsOwnerClient)
                 {
@@ -262,9 +264,9 @@ namespace MultiplayerARPG
                     {
                         currentDestination = position;
                     }
+                    MovementState = movementState;
+                    ExtraMovementState = extraMovementState;
                 }
-                MovementState = movementState;
-                ExtraMovementState = extraMovementState;
             }
         }
 
