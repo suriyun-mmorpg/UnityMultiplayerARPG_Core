@@ -357,8 +357,7 @@ namespace MultiplayerARPG
 
         private void DestroyCacheModels()
         {
-            List<string> equipPositions = new List<string>(cacheModels.Keys);
-            foreach (string equipPosition in equipPositions)
+            foreach (string equipPosition in cacheModels.Keys)
             {
                 DestroyCacheModel(equipPosition);
             }
@@ -402,7 +401,7 @@ namespace MultiplayerARPG
             this.equipItems = equipItems;
             IArmorItem armorItem;
             tempAddingKeys.Clear();
-            if (equipItems != null)
+            if (equipItems != null && equipItems.Count > 0)
             {
                 foreach (CharacterItem equipItem in equipItems)
                 {
@@ -543,8 +542,7 @@ namespace MultiplayerARPG
 
         private void DestroyCacheEffects()
         {
-            List<string> buffIds = new List<string>(cacheEffects.Keys);
-            foreach (string buffId in buffIds)
+            foreach (string buffId in cacheEffects.Keys)
             {
                 DestroyCacheEffect(buffId);
             }
@@ -558,10 +556,10 @@ namespace MultiplayerARPG
             tempCachedKeys.AddRange(cacheEffects.Keys);
             // Prepare data
             tempAddingKeys.Clear();
-            string tempKey;
             // Loop new buffs to prepare adding keys
-            if (buffs != null)
+            if (buffs != null && buffs.Count > 0)
             {
+                string tempKey;
                 foreach (CharacterBuff buff in buffs)
                 {
                     tempKey = buff.GetKey();
@@ -569,11 +567,11 @@ namespace MultiplayerARPG
                     {
                         // If old buffs not contains this buff, add this buff effect
                         InstantiateBuffEffect(tempKey, buff.GetBuff().effects);
+                        tempCachedKeys.Add(tempKey);
                     }
                     tempAddingKeys.Add(tempKey);
                 }
             }
-
             // Remove effects which removed from new buffs list
             // Loop old keys to destroy removed buffs
             foreach (string key in tempCachedKeys)
