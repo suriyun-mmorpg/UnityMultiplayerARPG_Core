@@ -201,12 +201,24 @@ namespace MultiplayerARPG
 
         private bool IsWebRequestLoadedFail(string key, UnityEvent evt)
         {
-            if (CurrentWebRequest.isNetworkError || CurrentWebRequest.isHttpError)
+            if (WebRequestIsError(CurrentWebRequest))
             {
                 OnAssetBundleLoadedFail(key, evt);
                 return true;
             }
             return false;
+        }
+
+        public bool WebRequestIsError(UnityWebRequest unityWebRequest)
+        {
+#if UNITY_2020_2_OR_NEWER
+            UnityWebRequest.Result result = unityWebRequest.result;
+            return (result == UnityWebRequest.Result.ConnectionError)
+                || (result == UnityWebRequest.Result.DataProcessingError)
+                || (result == UnityWebRequest.Result.ProtocolError);
+#else
+            return unityWebRequest.isHttpError || unityWebRequest.isNetworkError;
+#endif
         }
 
         private void OnAssetBundleLoadedFail(string key, UnityEvent evt, string error = "")
