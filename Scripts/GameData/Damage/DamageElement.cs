@@ -7,9 +7,13 @@ namespace MultiplayerARPG
     public partial class DamageElement : BaseGameData
     {
         [Category("Damage Element Settings")]
+        [SerializeField]
         [Range(0f, 1f)]
-        public float maxResistanceAmount;
-        public GameEffect[] damageHitEffects;
+        private float maxResistanceAmount = 1f;
+        public float MaxResistanceAmount { get { return maxResistanceAmount; } }
+
+        [SerializeField]
+        private GameEffect[] damageHitEffects = new GameEffect[0];
         public GameEffect[] DamageHitEffects
         {
             get { return damageHitEffects; }
@@ -24,6 +28,15 @@ namespace MultiplayerARPG
         {
             base.PrepareRelatesData();
             GameInstance.AddPoolingObjects(damageHitEffects);
+        }
+
+        public DamageElement GenerateDefaultDamageElement(GameEffect[] defaultDamageHitEffects)
+        {
+            name = GameDataConst.DEFAULT_DAMAGE_ID;
+            title = GameDataConst.DEFAULT_DAMAGE_TITLE;
+            maxResistanceAmount = 1f;
+            damageHitEffects = defaultDamageHitEffects;
+            return this;
         }
     }
 }

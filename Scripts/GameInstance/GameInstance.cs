@@ -474,10 +474,8 @@ namespace MultiplayerARPG
             // Setup default damage element if not existed
             if (defaultDamageElement == null)
             {
-                defaultDamageElement = ScriptableObject.CreateInstance<DamageElement>();
-                defaultDamageElement.name = GameDataConst.DEFAULT_DAMAGE_ID;
-                defaultDamageElement.title = GameDataConst.DEFAULT_DAMAGE_TITLE;
-                defaultDamageElement.damageHitEffects = DefaultDamageHitEffects;
+                defaultDamageElement = ScriptableObject.CreateInstance<DamageElement>()
+                    .GenerateDefaultDamageElement(DefaultDamageHitEffects);
             }
 
             // Setup save system if not existed

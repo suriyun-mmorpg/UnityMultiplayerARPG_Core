@@ -121,6 +121,8 @@ namespace MultiplayerARPG
                     targetDictionary[newEntry.Key] = newEntry.Value;
                 else
                     targetDictionary[newEntry.Key] += newEntry.Value;
+                if (targetDictionary[newEntry.Key] > newEntry.Key.MaxResistanceAmount)
+                    targetDictionary[newEntry.Key] = newEntry.Key.MaxResistanceAmount;
             }
             return targetDictionary;
         }

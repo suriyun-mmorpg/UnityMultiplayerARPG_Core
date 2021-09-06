@@ -169,8 +169,8 @@ namespace MultiplayerARPG
             float resistanceAmount;
             if (damageReceiverResistances.TryGetValue(damageElement, out resistanceAmount))
             {
-                if (resistanceAmount > damageElement.maxResistanceAmount)
-                    resistanceAmount = damageElement.maxResistanceAmount;
+                if (resistanceAmount > damageElement.MaxResistanceAmount)
+                    resistanceAmount = damageElement.MaxResistanceAmount;
                 damageAmount -= damageAmount * resistanceAmount; // If resistance is minus damage will be increased
             }
             // Reduce damage by armor
