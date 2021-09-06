@@ -1,7 +1,26 @@
-﻿namespace MultiplayerARPG
+﻿using LiteNetLibManager;
+
+namespace MultiplayerARPG
 {
     public partial class BasePlayerCharacterEntity
     {
+        [ServerRpc]
+        protected void ServerChangeQuestTracking(int questDataId, bool isTracking)
+        {
+            ChangeQuestTracking(questDataId, isTracking);
+        }
+
+        public void ChangeQuestTracking(int questDataId, bool isTracking)
+        {
+            int indexOfQuest = this.IndexOfQuest(questDataId);
+            Quest quest;
+            if (indexOfQuest < 0 || !GameInstance.Quests.TryGetValue(questDataId, out quest))
+                return;
+            CharacterQuest characterQuest = quests[indexOfQuest];
+            characterQuest.isTracking = isTracking;
+            quests[indexOfQuest] = characterQuest;
+        }
+
         public void AcceptQuest(int questDataId)
         {
             int indexOfQuest = this.IndexOfQuest(questDataId);

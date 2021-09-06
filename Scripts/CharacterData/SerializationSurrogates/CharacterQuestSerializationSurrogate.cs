@@ -13,6 +13,7 @@ namespace MultiplayerARPG
             CharacterQuest data = (CharacterQuest)obj;
             info.AddValue("dataId", data.dataId);
             info.AddValue("isComplete", data.isComplete);
+            info.AddValue("isTracking", data.isTracking);
             info.AddValue("killedMonsters", data.killedMonsters);
             info.AddValue("completedTasks", data.completedTasks);
         }
@@ -26,6 +27,12 @@ namespace MultiplayerARPG
             CharacterQuest data = (CharacterQuest)obj;
             data.dataId = info.GetInt32("dataId");
             data.isComplete = info.GetBoolean("isComplete");
+            // TODO: Backward compatible, this will be removed in future version
+            try
+            {
+                data.isTracking = info.GetBoolean("isTracking");
+            }
+            catch { }
             data.killedMonsters = (Dictionary<int, int>)info.GetValue("killedMonsters", typeof(Dictionary<int, int>));
             // TODO: Backward compatible, this will be removed in future version
             try

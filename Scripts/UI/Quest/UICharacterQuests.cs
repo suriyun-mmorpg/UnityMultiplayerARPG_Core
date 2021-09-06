@@ -28,7 +28,20 @@ namespace MultiplayerARPG
                 }
             }
         }
-
+        [SerializeField]
+        private bool showOnlyTrackingQuests;
+        public bool ShowOnlyTrackingQuests
+        {
+            get { return showOnlyTrackingQuests; }
+            set
+            {
+                if (showOnlyTrackingQuests != value)
+                {
+                    showOnlyTrackingQuests = value;
+                    UpdateData(character);
+                }
+            }
+        }
 
         private UIList cacheList;
         public UIList CacheList
@@ -127,10 +140,20 @@ namespace MultiplayerARPG
             CacheSelectionManager.Clear();
             int showingCount = 0;
             UICharacterQuest tempUI;
+            bool hasTrackingQuest = false;
+            for (int i = 0; i < character.Quests.Count; ++i)
+            {
+                if (character.Quests[i].isTracking)
+                {
+                    hasTrackingQuest = true;
+                    break;
+                }
+            }
             CacheList.Generate(character.Quests, (index, characterQuest, ui) =>
             {
                 tempUI = ui.GetComponent<UICharacterQuest>();
-                if (GameInstance.Quests.ContainsKey(characterQuest.dataId) && 
+                if (GameInstance.Quests.ContainsKey(characterQuest.dataId) &&
+                    (!ShowOnlyTrackingQuests || characterQuest.isTracking || !hasTrackingQuest) &&
                     (!HideCompleteQuest || !characterQuest.isComplete))
                 {
                     tempUI.Setup(characterQuest, character, index);

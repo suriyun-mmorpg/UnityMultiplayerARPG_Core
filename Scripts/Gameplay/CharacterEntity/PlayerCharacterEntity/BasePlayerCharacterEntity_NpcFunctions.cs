@@ -5,7 +5,7 @@ namespace MultiplayerARPG
     public partial class BasePlayerCharacterEntity
     {
         [ServerRpc]
-        protected void ServerNpcActivate(PackedUInt objectId)
+        protected void ServerNpcActivate(uint objectId)
         {
 #if !CLIENT_BUILD
             if (!CanDoActions())

@@ -43,6 +43,8 @@ namespace MultiplayerARPG
         public GameObject questOnGoingStatusObject;
         public GameObject questTasksCompleteStatusObject;
         public GameObject questCompleteStatusObject;
+        public GameObject questIsTrackingObject;
+        public GameObject questIsNotTrackingObject;
 
         private UIList cacheRewardItemList;
         public UIList CacheRewardItemList
@@ -94,6 +96,7 @@ namespace MultiplayerARPG
         protected override void UpdateData()
         {
             bool isComplete = CharacterQuest.isComplete;
+            bool isTracking = CharacterQuest.isTracking;
             bool isAllTasksDone = CharacterQuest.IsAllTasksDone(GameInstance.PlayingCharacter);
 
             string titleFormat = isComplete ?
@@ -163,6 +166,17 @@ namespace MultiplayerARPG
 
             if (questOnGoingStatusObject != null)
                 questOnGoingStatusObject.SetActive(!isComplete && !isAllTasksDone);
+
+            if (questIsTrackingObject != null)
+                questIsTrackingObject.SetActive(isTracking);
+
+            if (questIsNotTrackingObject != null)
+                questIsNotTrackingObject.SetActive(!isTracking);
+        }
+
+        public void OnToggleTracking(bool isOn)
+        {
+            GameInstance.PlayingCharacterEntity.ChangeQuestTracking(Data.dataId, isOn);
         }
     }
 }

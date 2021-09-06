@@ -75,7 +75,7 @@ namespace MultiplayerARPG
         {
             if (this.IsDead())
                 return false;
-            RPC(ServerNpcActivate, new PackedUInt(objectId));
+            RPC(ServerNpcActivate, objectId);
             return true;
         }
 
@@ -338,6 +338,12 @@ namespace MultiplayerARPG
             if (!CurrentGameplayRule.CanInteractEntity(this, sourceObjectId))
                 return false;
             RPC(ServerCancelCraftingQueueItem, sourceObjectId, indexOfData);
+            return true;
+        }
+
+        public bool CallServerChangeQuestTracking(int questDataId, bool isTracking)
+        {
+            RPC(ServerChangeQuestTracking, questDataId, isTracking);
             return true;
         }
     }
