@@ -368,7 +368,7 @@ namespace MultiplayerARPG
             StopAllCoroutines();
             for (int i = buffs.Count - 1; i >= 0; --i)
             {
-                if (!buffs[i].DoNotRemoveOnDead())
+                if (!buffs[i].GetBuff().doNotRemoveOnDead)
                     buffs.RemoveAt(i);
             }
             skillUsages.Clear();
