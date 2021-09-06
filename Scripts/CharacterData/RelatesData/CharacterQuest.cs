@@ -10,6 +10,7 @@ namespace MultiplayerARPG
         public static readonly CharacterQuest Empty = new CharacterQuest();
         public int dataId;
         public bool isComplete;
+        public bool isTracking;
         public Dictionary<int, int> killedMonsters = new Dictionary<int, int>();
         public List<int> completedTasks = new List<int>();
 
@@ -193,6 +194,7 @@ namespace MultiplayerARPG
         {
             writer.PutPackedInt(dataId);
             writer.Put(isComplete);
+            writer.Put(isTracking);
             byte killMonstersCount = (byte)KilledMonsters.Count;
             writer.Put(killMonstersCount);
             if (killMonstersCount > 0)
@@ -218,6 +220,7 @@ namespace MultiplayerARPG
         {
             dataId = reader.GetPackedInt();
             isComplete = reader.GetBool();
+            isTracking = reader.GetBool();
             int killMonstersCount = reader.GetByte();
             KilledMonsters.Clear();
             for (int i = 0; i < killMonstersCount; ++i)
