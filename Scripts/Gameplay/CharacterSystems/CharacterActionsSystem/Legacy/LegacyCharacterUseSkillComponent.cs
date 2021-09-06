@@ -223,9 +223,20 @@ namespace MultiplayerARPG
             // Update skill usage states at server only
             if (IsServer)
             {
-                CharacterSkillUsage newSkillUsage = CharacterSkillUsage.Create(SkillUsageType.Skill, skill.DataId);
-                newSkillUsage.Use(Entity, skillLevel);
-                Entity.SkillUsages.Add(newSkillUsage);
+                CharacterSkillUsage newSkillUsage;
+                int skillUsageIndex = Entity.IndexOfSkillUsage(skill.DataId, SkillUsageType.Skill);
+                if (skillUsageIndex >= 0)
+                {
+                    newSkillUsage = Entity.SkillUsages[skillUsageIndex];
+                    newSkillUsage.Use(Entity, skillLevel);
+                    Entity.SkillUsages[skillUsageIndex] = newSkillUsage;
+                }
+                else
+                {
+                    newSkillUsage = CharacterSkillUsage.Create(SkillUsageType.Skill, skill.DataId);
+                    newSkillUsage.Use(Entity, skillLevel);
+                    Entity.SkillUsages.Add(newSkillUsage);
+                }
             }
 
             // Prepare requires data and get damages data
