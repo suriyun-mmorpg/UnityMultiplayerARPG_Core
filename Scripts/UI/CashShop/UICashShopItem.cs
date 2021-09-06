@@ -238,7 +238,7 @@ namespace MultiplayerARPG
         {
             UnityWebRequest www = UnityWebRequestTexture.GetTexture(Data.externalIconUrl);
             yield return www.SendWebRequest();
-            if (!www.isNetworkError && !www.isHttpError)
+            if (!www.IsError())
                 rawImageExternalIcon.texture = ((DownloadHandlerTexture)www.downloadHandler).texture;
         }
 

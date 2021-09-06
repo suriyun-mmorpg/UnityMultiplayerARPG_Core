@@ -5,6 +5,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 using System.Linq;
+using UnityEngine.Networking;
 #if USE_TEXT_MESH_PRO
 using TMPro;
 #endif
@@ -539,5 +540,17 @@ public static class GenericUtils
     public static System.Uri Append(this System.Uri uri, params string[] paths)
     {
         return new System.Uri(paths.Aggregate(uri.AbsoluteUri, (current, path) => string.Format("{0}/{1}", current.TrimEnd('/'), path.TrimStart('/'))));
+    }
+
+    public static bool IsError(this UnityWebRequest unityWebRequest)
+    {
+#if UNITY_2020_2_OR_NEWER
+            UnityWebRequest.Result result = unityWebRequest.result;
+            return (result == UnityWebRequest.Result.ConnectionError)
+                || (result == UnityWebRequest.Result.DataProcessingError)
+                || (result == UnityWebRequest.Result.ProtocolError);
+#else
+        return unityWebRequest.isHttpError || unityWebRequest.isNetworkError;
+#endif
     }
 }
