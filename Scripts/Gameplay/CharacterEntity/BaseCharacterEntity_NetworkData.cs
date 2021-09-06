@@ -411,9 +411,21 @@ namespace MultiplayerARPG
         /// <param name="index"></param>
         protected virtual void OnBuffsOperation(LiteNetLibSyncList.Operation operation, int index)
         {
+            // Update model's buffs effects
             CharacterModel.SetBuffs(buffs);
             if (FpsModel)
                 FpsModel.SetBuffs(buffs);
+
+            switch (operation)
+            {
+                case LiteNetLibSyncList.Operation.Add:
+                case LiteNetLibSyncList.Operation.AddRangeEnd:
+                case LiteNetLibSyncList.Operation.Insert:
+                    // Check last buff to update disallow status
+                    if (buffs[buffs.Count - 1].GetBuff().disallowMove)
+                        StopMove();
+                    break;
+            }
 
             buffsRecachingState = new SyncListRecachingState()
             {
