@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using UnityEngine.Serialization;
 using System;
 #if UNITY_EDITOR
 using UnityEditor;
@@ -9,36 +10,72 @@ namespace MultiplayerARPG
     public abstract partial class BaseGameData : ScriptableObject, IGameData, IComparable
     {
         [Tooltip("Game data ID, if this is empty it will uses file's name as ID")]
-        public string id;
-        [Category("Generic Settings")]
-        [Tooltip("Default title")]
-        public string title;
-        [Tooltip("Titles by language keys")]
-        public LanguageData[] titles;
-        [Tooltip("Default description")]
-        [TextArea]
-        public string description;
-        [Tooltip("Descriptions by language keys")]
-        public LanguageData[] descriptions;
-        public string category;
-        [PreviewSprite(50)]
-        public Sprite icon;
-
+        [SerializeField]
+        protected string id = string.Empty;
         public virtual string Id
         {
             get { return string.IsNullOrEmpty(id) ? name : id; }
+            set { id = value; }
+        }
+
+        [Category("Generic Settings")]
+        [SerializeField]
+        [FormerlySerializedAs("title")]
+        protected string defaultTitle = string.Empty;
+        [SerializeField]
+        [FormerlySerializedAs("titles")]
+        protected LanguageData[] languageSpecificTitles;
+        public string DefaultTitle
+        {
+            get { return defaultTitle; }
+        }
+        public LanguageData[] LanguageSpecificTitles
+        {
+            get { return languageSpecificTitles; }
         }
         public virtual string Title
         {
-            get { return Language.GetText(titles, title); }
+            get { return Language.GetText(languageSpecificTitles, defaultTitle); }
+        }
+
+        [SerializeField]
+        [FormerlySerializedAs("description")]
+        [TextArea]
+        protected string defaultDescription = string.Empty;
+        [SerializeField]
+        [FormerlySerializedAs("descriptions")]
+        protected LanguageData[] languageSpecificDescriptions;
+        public string DefaultDescription
+        {
+            get { return defaultDescription; }
+        }
+        public LanguageData[] LanguageSpecificDescriptions
+        {
+            get { return languageSpecificDescriptions; }
         }
         public virtual string Description
         {
-            get { return Language.GetText(descriptions, description); }
+            get { return Language.GetText(languageSpecificDescriptions, defaultDescription); }
         }
 
+        [SerializeField]
+        protected string category = string.Empty;
+        public string Category
+        {
+            get { return category; }
+        }
+
+        [SerializeField]
+        [PreviewSprite(50)]
+        protected Sprite icon;
+        public Sprite Icon
+        {
+            get { return icon; }
+        }
+
+
         [NonSerialized]
-        private int? dataId;
+        protected int? dataId;
         public int DataId
         {
             get

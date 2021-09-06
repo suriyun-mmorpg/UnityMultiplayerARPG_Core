@@ -168,7 +168,7 @@
                         if (amount > item.MaxStack)
                             amount = item.MaxStack;
                         playerCharacter.AddOrSetNonEquipItems(CharacterItem.Create(item, 1, amount));
-                        response = $"Add item {item.title}x{amount} to character's inventory";
+                        response = $"Add item {item.Title}x{amount} to character's inventory";
                     }
                 }
                 if (commandKey.Equals(GiveGold))
@@ -194,7 +194,7 @@
                         if (amount > item.MaxStack)
                             amount = item.MaxStack;
                         playerCharacter.AddOrSetNonEquipItems(CharacterItem.Create(item, 1, amount));
-                        response = $"Add item {item.title}x{amount} to character: {receiver}'s inventory";
+                        response = $"Add item {item.Title}x{amount} to character: {receiver}'s inventory";
                     }
                 }
                 if (commandKey.Equals(GoldRate))

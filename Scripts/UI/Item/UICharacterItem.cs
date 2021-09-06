@@ -455,7 +455,7 @@ namespace MultiplayerARPG
 
             if (imageIcon != null)
             {
-                Sprite iconSprite = Item == null ? null : Item.icon;
+                Sprite iconSprite = Item == null ? null : Item.Icon;
                 imageIcon.gameObject.SetActive(iconSprite != null);
                 imageIcon.sprite = iconSprite;
                 imageIcon.preserveAspect = true;
@@ -463,7 +463,7 @@ namespace MultiplayerARPG
 
             if (imageRarity != null)
             {
-                Sprite iconSprite = Item == null || Item.ItemRefine == null ? null : Item.ItemRefine.icon;
+                Sprite iconSprite = Item == null || Item.ItemRefine == null ? null : Item.ItemRefine.Icon;
                 imageRarity.gameObject.SetActive(iconSprite != null);
                 imageRarity.sprite = iconSprite;
             }

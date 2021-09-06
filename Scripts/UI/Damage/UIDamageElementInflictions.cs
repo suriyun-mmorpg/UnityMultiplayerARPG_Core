@@ -110,7 +110,7 @@ namespace MultiplayerARPG
                 tempElement.Title,
                 "0");
             if (componentPair.imageIcon != null)
-                componentPair.imageIcon.sprite = tempElement.icon;
+                componentPair.imageIcon.sprite = tempElement.Icon;
             if (inactiveIfAmountZero && componentPair.root != null)
                 componentPair.root.SetActive(false);
         }

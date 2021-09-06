@@ -82,16 +82,16 @@ namespace MultiplayerARPG
                 {
                     uiTextSellPriceCash.text = string.Format(
                         LanguageManager.GetText(formatKeySellPriceCash),
-                        Data == null ? "0" : (Data.sellPriceCash * BuyAmount).ToString("N0"));
-                    uiTextSellPriceCash.SetGameObjectActive(Data.sellPriceCash > 0);
+                        Data == null ? "0" : (Data.SellPriceCash * BuyAmount).ToString("N0"));
+                    uiTextSellPriceCash.SetGameObjectActive(Data.SellPriceCash > 0);
                 }
 
                 if (uiTextSellPriceGold != null)
                 {
                     uiTextSellPriceGold.text = string.Format(
                         LanguageManager.GetText(formatKeySellPriceGold),
-                        Data == null ? "0" : (Data.sellPriceGold * BuyAmount).ToString("N0"));
-                    uiTextSellPriceGold.SetGameObjectActive(Data.sellPriceGold > 0);
+                        Data == null ? "0" : (Data.SellPriceGold * BuyAmount).ToString("N0"));
+                    uiTextSellPriceGold.SetGameObjectActive(Data.SellPriceGold > 0);
                 }
 
                 inputAmount.onValueChanged.AddListener(ValidateAmount);
@@ -116,7 +116,7 @@ namespace MultiplayerARPG
 
             if (imageIcon != null)
             {
-                Sprite iconSprite = Data == null || Data.icon == null ? BuildIcon() : Data.icon;
+                Sprite iconSprite = Data == null || Data.Icon == null ? BuildIcon() : Data.Icon;
                 imageIcon.gameObject.SetActive(iconSprite != null);
                 imageIcon.sprite = iconSprite;
                 imageIcon.preserveAspect = true;
@@ -124,8 +124,8 @@ namespace MultiplayerARPG
 
             if (rawImageExternalIcon != null)
             {
-                rawImageExternalIcon.gameObject.SetActive(Data != null && !string.IsNullOrEmpty(Data.externalIconUrl));
-                if (Data != null && !string.IsNullOrEmpty(Data.externalIconUrl))
+                rawImageExternalIcon.gameObject.SetActive(Data != null && !string.IsNullOrEmpty(Data.ExternalIconUrl));
+                if (Data != null && !string.IsNullOrEmpty(Data.ExternalIconUrl))
                     StartCoroutine(LoadExternalIcon());
             }
 
@@ -133,28 +133,28 @@ namespace MultiplayerARPG
             {
                 uiTextSellPriceCash.text = string.Format(
                     LanguageManager.GetText(formatKeySellPriceCash),
-                    Data == null ? "0" : (Data.sellPriceCash * BuyAmount).ToString("N0"));
-                uiTextSellPriceCash.SetGameObjectActive(Data.sellPriceCash > 0);
+                    Data == null ? "0" : (Data.SellPriceCash * BuyAmount).ToString("N0"));
+                uiTextSellPriceCash.SetGameObjectActive(Data.SellPriceCash > 0);
             }
 
             if (uiTextSellPriceGold != null)
             {
                 uiTextSellPriceGold.text = string.Format(
                     LanguageManager.GetText(formatKeySellPriceGold),
-                    Data == null ? "0" : (Data.sellPriceGold * BuyAmount).ToString("N0"));
-                uiTextSellPriceGold.SetGameObjectActive(Data.sellPriceGold > 0);
+                    Data == null ? "0" : (Data.SellPriceGold * BuyAmount).ToString("N0"));
+                uiTextSellPriceGold.SetGameObjectActive(Data.SellPriceGold > 0);
             }
 
             if (uiTextRecieveGold != null)
             {
                 uiTextRecieveGold.text = string.Format(
                     LanguageManager.GetText(formatKeyReceiveGold),
-                    Data == null ? "0" : Data.receiveGold.ToString("N0"));
+                    Data == null ? "0" : Data.ReceiveGold.ToString("N0"));
             }
 
             if (uiTextSingleItemAmount != null)
             {
-                if (Data == null || Data.receiveItems.Length != 1)
+                if (Data == null || Data.ReceiveItems.Length != 1)
                 {
                     uiTextSingleItemAmount.SetGameObjectActive(false);
                 }
@@ -163,25 +163,25 @@ namespace MultiplayerARPG
                     uiTextSingleItemAmount.SetGameObjectActive(true);
                     uiTextSingleItemAmount.text = string.Format(
                         LanguageManager.GetText(formayKeySingleItemAmount),
-                        Data == null ? "0" : Data.receiveItems[0].amount.ToString("N0"));
+                        Data == null ? "0" : Data.ReceiveItems[0].amount.ToString("N0"));
                 }
             }
 
             if (uiReceiveCurrencies != null)
             {
-                uiReceiveCurrencies.Data = Data == null ? null : GameDataHelpers.CombineCurrencies(Data.receiveCurrencies, null);
+                uiReceiveCurrencies.Data = Data == null ? null : GameDataHelpers.CombineCurrencies(Data.ReceiveCurrencies, null);
             }
 
             if (uiReceiveItems != null)
             {
-                uiReceiveItems.Data = Data == null ? null : GameDataHelpers.CombineItems(Data.receiveItems, null);
+                uiReceiveItems.Data = Data == null ? null : GameDataHelpers.CombineItems(Data.ReceiveItems, null);
             }
 
             if (cashObjects != null && cashObjects.Length > 0)
             {
                 foreach (GameObject cashObject in cashObjects)
                 {
-                    cashObject.SetActive(Data.sellPriceCash > 0);
+                    cashObject.SetActive(Data.SellPriceCash > 0);
                 }
             }
 
@@ -189,7 +189,7 @@ namespace MultiplayerARPG
             {
                 foreach (GameObject goldObject in goldObjects)
                 {
-                    goldObject.SetActive(Data.sellPriceGold > 0);
+                    goldObject.SetActive(Data.SellPriceGold > 0);
                 }
             }
         }
@@ -198,12 +198,12 @@ namespace MultiplayerARPG
         {
             if (Data != null)
             {
-                if (Data.receiveItems.Length > 0)
-                    return Data.receiveItems[0].item.Title;
-                if (Data.receiveCurrencies.Length > 0)
-                    return string.Format(LanguageManager.GetText(UIFormatKeys.UI_FORMAT_CURRENCY_AMOUNT.ToString()), Data.receiveCurrencies[0].currency.Title, Data.receiveCurrencies[0].amount);
-                if (Data.receiveGold > 0)
-                    return string.Format(LanguageManager.GetText(UIFormatKeys.UI_FORMAT_GOLD.ToString()), Data.receiveGold.ToString("N0"));
+                if (Data.ReceiveItems.Length > 0)
+                    return Data.ReceiveItems[0].item.Title;
+                if (Data.ReceiveCurrencies.Length > 0)
+                    return string.Format(LanguageManager.GetText(UIFormatKeys.UI_FORMAT_CURRENCY_AMOUNT.ToString()), Data.ReceiveCurrencies[0].currency.Title, Data.ReceiveCurrencies[0].amount);
+                if (Data.ReceiveGold > 0)
+                    return string.Format(LanguageManager.GetText(UIFormatKeys.UI_FORMAT_GOLD.ToString()), Data.ReceiveGold.ToString("N0"));
             }
             return LanguageManager.GetUnknowTitle();
         }
@@ -212,12 +212,12 @@ namespace MultiplayerARPG
         {
             if (Data != null)
             {
-                if (Data.receiveItems.Length > 0)
-                    return Data.receiveItems[0].item.Description;
-                if (Data.receiveCurrencies.Length > 0)
-                    return string.Format(LanguageManager.GetText(UIFormatKeys.UI_FORMAT_CURRENCY_AMOUNT.ToString()), Data.receiveCurrencies[0].currency.Title, Data.receiveCurrencies[0].amount);
-                if (Data.receiveGold > 0)
-                    return string.Format(LanguageManager.GetText(UIFormatKeys.UI_FORMAT_GOLD.ToString()), Data.receiveGold.ToString("N0"));
+                if (Data.ReceiveItems.Length > 0)
+                    return Data.ReceiveItems[0].item.Description;
+                if (Data.ReceiveCurrencies.Length > 0)
+                    return string.Format(LanguageManager.GetText(UIFormatKeys.UI_FORMAT_CURRENCY_AMOUNT.ToString()), Data.ReceiveCurrencies[0].currency.Title, Data.ReceiveCurrencies[0].amount);
+                if (Data.ReceiveGold > 0)
+                    return string.Format(LanguageManager.GetText(UIFormatKeys.UI_FORMAT_GOLD.ToString()), Data.ReceiveGold.ToString("N0"));
             }
             return LanguageManager.GetUnknowTitle();
         }
@@ -226,17 +226,17 @@ namespace MultiplayerARPG
         {
             if (Data != null)
             {
-                if (Data.receiveItems.Length > 0)
-                    return Data.receiveItems[0].item.icon;
-                if (Data.receiveCurrencies.Length > 0)
-                    return Data.receiveCurrencies[0].currency.icon;
+                if (Data.ReceiveItems.Length > 0)
+                    return Data.ReceiveItems[0].item.Icon;
+                if (Data.ReceiveCurrencies.Length > 0)
+                    return Data.ReceiveCurrencies[0].currency.Icon;
             }
             return null;
         }
 
         IEnumerator LoadExternalIcon()
         {
-            UnityWebRequest www = UnityWebRequestTexture.GetTexture(Data.externalIconUrl);
+            UnityWebRequest www = UnityWebRequestTexture.GetTexture(Data.ExternalIconUrl);
             yield return www.SendWebRequest();
             if (!www.IsError())
                 rawImageExternalIcon.texture = ((DownloadHandlerTexture)www.downloadHandler).texture;

@@ -156,8 +156,8 @@ namespace MultiplayerARPG
             {
                 tempUI = ui.GetComponent<UICashPackage>();
                 if (data != null &&
-                    (filterCategories.Count == 0 || (!string.IsNullOrEmpty(data.category) &&
-                    filterCategories.Contains(data.category.Trim().ToLower()))))
+                    (filterCategories.Count == 0 || (!string.IsNullOrEmpty(data.Category) &&
+                    filterCategories.Contains(data.Category.Trim().ToLower()))))
                 {
                     tempUI.uiCashPackages = this;
                     tempUI.Data = data;

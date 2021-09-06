@@ -248,7 +248,7 @@ namespace MultiplayerARPG
             {
                 newItemData = Instantiate(copySource);
             }
-            newItemData.id = id;
+            newItemData.Id = id;
             if (savedDropModel != null)
                 newItemData.DropModel = savedDropModel;
 

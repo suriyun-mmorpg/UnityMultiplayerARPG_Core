@@ -211,7 +211,7 @@ namespace MultiplayerARPG
                     if (!string.IsNullOrEmpty(dataId))
                     {
                         PlayerCharacter data = CreateInstance<PlayerCharacter>();
-                        data.id = dataId;
+                        data.Id = dataId;
                         data.Stats = new CharacterStatsIncremental()
                         {
                             baseStats = new CharacterStats()
@@ -244,7 +244,7 @@ namespace MultiplayerARPG
                     if (!string.IsNullOrEmpty(dataId))
                     {
                         MonsterCharacter data = CreateInstance<MonsterCharacter>();
-                        data.id = dataId;
+                        data.Id = dataId;
                         data.Stats = new CharacterStatsIncremental()
                         {
                             baseStats = new CharacterStats()

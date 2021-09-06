@@ -114,8 +114,8 @@ namespace MultiplayerARPG
             {
                 tempUI = ui.GetComponent<UIItemCraftFormula>();
                 if (data != null &&
-                    (filterCategories.Count == 0 || (!string.IsNullOrEmpty(data.category) &&
-                    filterCategories.Contains(data.category.Trim().ToLower()))))
+                    (filterCategories.Count == 0 || (!string.IsNullOrEmpty(data.Category) &&
+                    filterCategories.Contains(data.Category.Trim().ToLower()))))
                 {
                     tempUI.CraftFormulaManager = this;
                     tempUI.Data = data;

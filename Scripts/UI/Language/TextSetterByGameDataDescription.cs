@@ -20,7 +20,7 @@ namespace MultiplayerARPG
 
         private void UpdateUI()
         {
-            textWrapper.text = gameData.description;
+            textWrapper.text = gameData.Description;
 #if UNITY_EDITOR
             UnityEditor.EditorUtility.SetDirty(this);
 #endif

@@ -146,18 +146,18 @@ namespace MultiplayerARPG
                 case DisplayType.Requirement:
                     componentPair.uiText.text = string.Format(
                         LanguageManager.GetText(formatKeyAmount),
-                        componentPair.currency.title,
+                        componentPair.currency.Title,
                         "0", "0");
                     break;
                 case DisplayType.Simple:
                     componentPair.uiText.text = string.Format(
                         LanguageManager.GetText(formatKeySimpleAmount),
-                        componentPair.currency.title,
+                        componentPair.currency.Title,
                         isBonus ? 0f.ToBonusString("N0") : "0");
                     break;
             }
             if (componentPair.imageIcon != null)
-                componentPair.imageIcon.sprite = componentPair.currency.icon;
+                componentPair.imageIcon.sprite = componentPair.currency.Icon;
             if (inactiveIfAmountZero && componentPair.root != null)
                 componentPair.root.SetActive(false);
         }

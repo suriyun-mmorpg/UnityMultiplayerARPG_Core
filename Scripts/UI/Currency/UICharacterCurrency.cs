@@ -49,7 +49,7 @@ namespace MultiplayerARPG
 
             if (imageIcon != null)
             {
-                Sprite iconSprite = Currency == null ? null : Currency.icon;
+                Sprite iconSprite = Currency == null ? null : Currency.Icon;
                 imageIcon.gameObject.SetActive(iconSprite != null);
                 imageIcon.sprite = iconSprite;
                 imageIcon.preserveAspect = true;

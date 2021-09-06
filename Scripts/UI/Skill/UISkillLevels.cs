@@ -159,7 +159,7 @@ namespace MultiplayerARPG
                     break;
             }
             if (componentPair.imageIcon != null)
-                componentPair.imageIcon.sprite = componentPair.skill.icon;
+                componentPair.imageIcon.sprite = componentPair.skill.Icon;
             if (inactiveIfLevelZero && componentPair.root != null)
                 componentPair.root.SetActive(false);
         }

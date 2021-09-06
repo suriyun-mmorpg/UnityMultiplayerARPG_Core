@@ -33,7 +33,7 @@ namespace MultiplayerARPG
         public DamageElement GenerateDefaultDamageElement(GameEffect[] defaultDamageHitEffects)
         {
             name = GameDataConst.DEFAULT_DAMAGE_ID;
-            title = GameDataConst.DEFAULT_DAMAGE_TITLE;
+            defaultTitle = GameDataConst.DEFAULT_DAMAGE_TITLE;
             maxResistanceAmount = 1f;
             damageHitEffects = defaultDamageHitEffects;
             return this;

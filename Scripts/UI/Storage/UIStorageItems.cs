@@ -223,8 +223,8 @@ namespace MultiplayerARPG
                 }
 
                 if (tempItem == null ||
-                    (filterCategories.Count == 0 || (!string.IsNullOrEmpty(tempItem.category) &&
-                    filterCategories.Contains(tempItem.category.Trim().ToLower()))))
+                    (filterCategories.Count == 0 || (!string.IsNullOrEmpty(tempItem.Category) &&
+                    filterCategories.Contains(tempItem.Category.Trim().ToLower()))))
                 {
                     if (filterItemTypes == null || filterItemTypes.Count == 0 ||
                         filterItemTypes.Contains(tempItem.ItemType))

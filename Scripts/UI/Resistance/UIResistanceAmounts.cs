@@ -103,7 +103,7 @@ namespace MultiplayerARPG
                     tempElement.Title,
                     isBonus ? 0f.ToBonusString("N2") : 0f.ToString("N2"));
             if (componentPair.imageIcon != null)
-                componentPair.imageIcon.sprite = tempElement.icon;
+                componentPair.imageIcon.sprite = tempElement.Icon;
         }
     }
 }

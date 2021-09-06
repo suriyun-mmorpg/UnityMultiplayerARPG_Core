@@ -139,7 +139,7 @@ namespace MultiplayerARPG
                 isBonus ? 0.ToBonusString("N0") : "0",
                 "0");
             if (componentPair.imageIcon != null)
-                componentPair.imageIcon.sprite = tempElement.icon;
+                componentPair.imageIcon.sprite = tempElement.Icon;
             if (inactiveIfAmountZero && componentPair.root != null)
                 componentPair.root.SetActive(false);
         }

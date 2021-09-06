@@ -232,8 +232,8 @@ namespace MultiplayerARPG
                 tempUI = ui.GetComponent<UICharacterSkill>();
                 tempSkill = data.Key;
 
-                if (filterCategories.Count == 0 || (!string.IsNullOrEmpty(tempSkill.category) &&
-                    filterCategories.Contains(tempSkill.category.Trim().ToLower())))
+                if (filterCategories.Count == 0 || (!string.IsNullOrEmpty(tempSkill.Category) &&
+                    filterCategories.Contains(tempSkill.Category.Trim().ToLower())))
                 {
                     if (filterSkillTypes.Count == 0 ||
                         filterSkillTypes.Contains(tempSkill.SkillType))

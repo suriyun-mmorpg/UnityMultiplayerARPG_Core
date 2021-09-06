@@ -46,7 +46,7 @@ namespace MultiplayerARPG
 
             if (imageIcon != null)
             {
-                Sprite iconSprite = Data == null ? null : Data.icon;
+                Sprite iconSprite = Data == null ? null : Data.Icon;
                 imageIcon.gameObject.SetActive(iconSprite != null);
                 imageIcon.sprite = iconSprite;
                 imageIcon.preserveAspect = true;
@@ -54,8 +54,8 @@ namespace MultiplayerARPG
 
             if (rawImageExternalIcon != null)
             {
-                rawImageExternalIcon.gameObject.SetActive(Data != null && !string.IsNullOrEmpty(Data.externalIconUrl));
-                if (Data != null && !string.IsNullOrEmpty(Data.externalIconUrl))
+                rawImageExternalIcon.gameObject.SetActive(Data != null && !string.IsNullOrEmpty(Data.ExternalIconUrl));
+                if (Data != null && !string.IsNullOrEmpty(Data.ExternalIconUrl))
                     StartCoroutine(LoadExternalIcon());
             }
 
@@ -70,13 +70,13 @@ namespace MultiplayerARPG
             {
                 uiTextCashAmount.text = string.Format(
                     LanguageManager.GetText(formatKeyCashAmount),
-                    Data == null ? "0" : Data.cashAmount.ToString("N0"));
+                    Data == null ? "0" : Data.CashAmount.ToString("N0"));
             }
         }
 
         IEnumerator LoadExternalIcon()
         {
-            UnityWebRequest www = UnityWebRequestTexture.GetTexture(Data.externalIconUrl);
+            UnityWebRequest www = UnityWebRequestTexture.GetTexture(Data.ExternalIconUrl);
             yield return www.SendWebRequest();
             if (!www.IsError())
                 rawImageExternalIcon.texture = ((DownloadHandlerTexture)www.downloadHandler).texture;

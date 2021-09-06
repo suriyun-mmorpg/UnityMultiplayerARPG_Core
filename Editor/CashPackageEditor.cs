@@ -43,7 +43,7 @@ namespace MultiplayerARPG
                 m_ValidIDs.Add(product.id);
             }
 
-            int currentIndex = string.IsNullOrEmpty(package.productId) ? 0 : m_ValidIDs.IndexOf(package.productId);
+            int currentIndex = string.IsNullOrEmpty(package.ProductId) ? 0 : m_ValidIDs.IndexOf(package.ProductId);
             int newIndex = EditorGUILayout.Popup(currentIndex, m_ValidIDs.ToArray());
             if (newIndex > 0 && newIndex < m_ValidIDs.Count)
             {

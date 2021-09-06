@@ -294,7 +294,7 @@ namespace MultiplayerARPG
             if (characterItem.IsEmpty() || characterItem.IsEmptySlot())
                 return false;
             if (UICharacterHotkeys.filterCategories.Count > 0 &&
-                !UICharacterHotkeys.filterCategories.Contains(characterItem.GetItem().category))
+                !UICharacterHotkeys.filterCategories.Contains(characterItem.GetItem().Category))
                 return false;
             if (UICharacterHotkeys.filterItemTypes.Count > 0 &&
                 !UICharacterHotkeys.filterItemTypes.Contains(characterItem.GetItem().ItemType))
@@ -311,7 +311,7 @@ namespace MultiplayerARPG
             if (!characterSkill.GetSkill().IsAvailable(GameInstance.PlayingCharacter))
                 return false;
             if (UICharacterHotkeys.filterCategories.Count > 0 &&
-                !UICharacterHotkeys.filterCategories.Contains(characterSkill.GetSkill().category))
+                !UICharacterHotkeys.filterCategories.Contains(characterSkill.GetSkill().Category))
                 return false;
             if (UICharacterHotkeys.filterSkillTypes.Count > 0 &&
                 !UICharacterHotkeys.filterSkillTypes.Contains(characterSkill.GetSkill().SkillType))

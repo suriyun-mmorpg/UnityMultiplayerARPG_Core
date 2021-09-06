@@ -15,7 +15,7 @@ namespace MultiplayerARPG
         public ArmorType GenerateDefaultArmorType()
         {
             name = GameDataConst.UNKNOW_ARMOR_TYPE_ID;
-            title = GameDataConst.UNKNOW_ARMOR_TYPE_TITLE;
+            defaultTitle = GameDataConst.UNKNOW_ARMOR_TYPE_TITLE;
             return this;
         }
     }

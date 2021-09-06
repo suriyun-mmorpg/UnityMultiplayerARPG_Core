@@ -506,7 +506,7 @@ namespace MultiplayerARPG
         public Item GenerateDefaultItem(WeaponType type)
         {
             name = GameDataConst.DEFAULT_WEAPON_ID;
-            title = GameDataConst.DEFAULT_WEAPON_TITLE;
+            defaultTitle = GameDataConst.DEFAULT_WEAPON_TITLE;
             itemType = LegacyItemType.Weapon;
             weaponType = type;
             // Default damage amount

@@ -10,10 +10,18 @@ namespace MultiplayerARPG
     public class CashPackage : BaseGameData
     {
         [Category("Cash Package Settings")]
-        public string externalIconUrl;
-        public int cashAmount;
+        [SerializeField]
+        private string externalIconUrl = string.Empty;
+        public string ExternalIconUrl { get { return externalIconUrl; } }
+
+        [SerializeField]
+        private int cashAmount = 0;
+        public int CashAmount { get { return cashAmount; } }
+
         [HideInInspector]
-        public string productId;
+        [SerializeField]
+        private string productId = string.Empty;
+        public string ProductId { get { return productId; } }
 
         public override string Id { get { return productId; } }
 

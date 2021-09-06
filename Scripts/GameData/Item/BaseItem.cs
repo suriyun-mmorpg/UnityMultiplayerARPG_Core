@@ -115,47 +115,14 @@ namespace MultiplayerARPG
             if (cashShopItemGeneratingList == null || cashShopItemGeneratingList.Length == 0)
                 return;
 
-            List<string> languageKeys = new List<string>(LanguageManager.Languages.Keys);
             CashShopItemGeneratingData generatingData;
             CashShopItem cashShopItem;
-            List<LanguageData> titleLanguageDataList = new List<LanguageData>();
-            List<LanguageData> descriptionLanguageDataList = new List<LanguageData>();
             for (int i = 0; i < cashShopItemGeneratingList.Length; ++i)
             {
                 generatingData = cashShopItemGeneratingList[i];
                 cashShopItem = CreateInstance<CashShopItem>();
                 cashShopItem.name = $"<CASHSHOPITEM_{name}_{i}>";
-                cashShopItem.title = string.Format(LanguageManager.GetText(UIFormatKeys.UI_FORMAT_GENERATE_CAST_SHOP_ITEM_TITLE.ToString()), title, generatingData.amount);
-                cashShopItem.description = string.Format(LanguageManager.GetText(UIFormatKeys.UI_FORMAT_GENERATE_CAST_SHOP_ITEM_DESCRIPTION.ToString()), title, generatingData.amount, description);
-                titleLanguageDataList.Clear();
-                descriptionLanguageDataList.Clear();
-                foreach (string languageKey in languageKeys)
-                {
-                    titleLanguageDataList.Add(new LanguageData()
-                    {
-                        key = languageKey,
-                        value = string.Format(LanguageManager.GetTextByLanguage(languageKey, UIFormatKeys.UI_FORMAT_GENERATE_CAST_SHOP_ITEM_TITLE.ToString()), Language.GetTextByLanguageKey(titles, languageKey, title), generatingData.amount),
-                    });
-                    descriptionLanguageDataList.Add(new LanguageData()
-                    {
-                        key = languageKey,
-                        value = string.Format(LanguageManager.GetTextByLanguage(languageKey, UIFormatKeys.UI_FORMAT_GENERATE_CAST_SHOP_ITEM_DESCRIPTION.ToString()), Language.GetTextByLanguageKey(titles, languageKey, title), generatingData.amount, Language.GetTextByLanguageKey(descriptions, languageKey, description)),
-                    });
-                }
-                cashShopItem.titles = titleLanguageDataList.ToArray();
-                cashShopItem.descriptions = descriptionLanguageDataList.ToArray();
-                cashShopItem.category = category;
-                cashShopItem.icon = icon;
-                cashShopItem.sellPriceCash = generatingData.sellPriceCash;
-                cashShopItem.sellPriceGold = generatingData.sellPriceGold;
-                cashShopItem.receiveItems = new ItemAmount[]
-                {
-                    new ItemAmount()
-                    {
-                        item = this,
-                        amount = generatingData.amount,
-                    }
-                };
+                cashShopItem.GenerateByItem(this, generatingData);
             }
         }
     }

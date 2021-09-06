@@ -45,7 +45,7 @@ namespace MultiplayerARPG
         public WeaponType GenerateDefaultWeaponType()
         {
             name = GameDataConst.UNKNOW_WEAPON_TYPE_ID;
-            title = GameDataConst.UNKNOW_WEAPON_TYPE_TITLE;
+            defaultTitle = GameDataConst.UNKNOW_WEAPON_TYPE_TITLE;
             return this;
         }
 
