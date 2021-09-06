@@ -99,6 +99,8 @@ namespace MultiplayerARPG
             CharacterBuff newBuff = CharacterBuff.Create(type, dataId, level);
             newBuff.Apply(buffApplier);
             buffs.Add(newBuff);
+            if (newBuff.GetBuff().disallowMove)
+                StopMove();
 
             if (newBuff.GetDuration() <= 0f)
             {
