@@ -27,4 +27,4 @@
 	url = https://github.com/insthync/LiteNetLib-SuperGrid2D-Integration.git
 [submodule "SimpleAssetBundleClient"]
 	path = SimpleAssetBundleClient
-	url = https://github.com/insthync/SimpleAssetBundleClient.git
+	url = https://github.com/insthync/unity-simple-asset-bundle-client.git
