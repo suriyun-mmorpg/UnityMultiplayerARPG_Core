@@ -181,7 +181,7 @@ namespace MultiplayerARPG
 
         public void OnToggleTracking(bool isOn)
         {
-            GameInstance.PlayingCharacterEntity.ChangeQuestTracking(Data.dataId, isOn);
+            GameInstance.PlayingCharacterEntity.CallServerChangeQuestTracking(Data.dataId, isOn);
         }
     }
 }
