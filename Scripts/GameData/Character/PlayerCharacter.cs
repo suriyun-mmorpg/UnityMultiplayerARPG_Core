@@ -58,6 +58,17 @@ namespace MultiplayerARPG
                 return useOverrideStartPosition ? overrideStartPosition : StartMap.StartPosition;
             }
         }
+        [SerializeField]
+        private bool useOverrideStartRotation = false;
+        [SerializeField]
+        private Vector3 overrideStartRotation = Vector3.zero;
+        public Vector3 StartRotation
+        {
+            get
+            {
+                return useOverrideStartRotation ? overrideStartRotation : StartMap.StartRotation;
+            }
+        }
 
         [System.NonSerialized]
         private Dictionary<BaseSkill, short> cacheSkillLevels = null;

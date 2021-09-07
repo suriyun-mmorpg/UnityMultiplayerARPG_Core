@@ -188,6 +188,7 @@ namespace MultiplayerARPG
                 PlayerCharacter database = SelectedPlayerCharacterData.GetDatabase() as PlayerCharacter;
                 SelectedPlayerCharacterData.CurrentMapName = database.StartMap.Id;
                 SelectedPlayerCharacterData.CurrentPosition = database.StartPosition;
+                SelectedPlayerCharacterData.CurrentRotation = database.StartRotation;
             }
             // Set selected character to network manager
             (BaseGameNetworkManager.Singleton as LanRpgNetworkManager).selectedCharacter = SelectedPlayerCharacterData;

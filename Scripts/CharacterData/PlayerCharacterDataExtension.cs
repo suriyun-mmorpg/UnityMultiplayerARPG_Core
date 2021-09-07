@@ -258,6 +258,7 @@ namespace MultiplayerARPG
             character.CurrentMapName = playerCharacter.StartMap.Id;
             character.RespawnMapName = playerCharacter.StartMap.Id;
             character.CurrentPosition = playerCharacter.StartPosition;
+            character.CurrentRotation = playerCharacter.StartRotation;
             character.RespawnPosition = playerCharacter.StartPosition;
             DevExtUtils.InvokeStaticDevExtMethods(ClassType, "SetNewCharacterData", character, characterName, dataId, entityId);
             return character;

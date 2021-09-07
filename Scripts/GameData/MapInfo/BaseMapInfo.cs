@@ -9,10 +9,15 @@ namespace MultiplayerARPG
         private UnityScene scene = default(UnityScene);
         public virtual UnityScene Scene { get { return scene; } }
 
-        [Tooltip("This will be used when new character have been created, and this map data is start map")]
+        [Tooltip("This will be used when new character has been created, and this map data is the start map")]
         [SerializeField]
         private Vector3 startPosition = Vector3.zero;
         public virtual Vector3 StartPosition { get { return startPosition; } }
+
+        [Tooltip("This will be used when new character has been created, and this map data is the start map")]
+        [SerializeField]
+        private Vector3 startRotation = Vector3.zero;
+        public virtual Vector3 StartRotation { get { return startRotation; } }
 
         [Tooltip("When character fall to this position, character will dead")]
         [SerializeField]
