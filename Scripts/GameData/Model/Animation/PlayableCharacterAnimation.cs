@@ -18,7 +18,7 @@ namespace MultiplayerARPG.GameData.Model.Playables
     public struct ActionState
     {
         public AnimationClip clip;
-        [Tooltip("If hits is `null`, it will use default avatar mask setting from model component")]
+        [Tooltip("If this is `null`, it will use default avatar mask setting from model component")]
         public AvatarMask avatarMask;
         [Tooltip("If this <= 0, it will not be used to calculate with animation speed multiplier")]
         public float animSpeedRate;
@@ -44,7 +44,7 @@ namespace MultiplayerARPG.GameData.Model.Playables
     public struct ActionAnimation
     {
         public ActionState state;
-        [Tooltip("This will be in use with attack/skill animations, This is rate of total animation duration at when it should hit enemy or apply skill")]
+        [Tooltip("This will be in used with attacking/skill animations, This is rate of total animation duration at when it should hit enemy or apply skill")]
         [Range(0f, 1f)]
         public float[] triggerDurationRates;
         [Tooltip("How animation duration defined")]
@@ -52,9 +52,9 @@ namespace MultiplayerARPG.GameData.Model.Playables
         [StringShowConditional(nameof(durationType), nameof(AnimationDurationType.ByFixedDuration))]
         [Tooltip("This will be used when `durationType` equals to `ByFixValue` to define animation duration")]
         public float fixedDuration;
-        [Tooltip("This will be in use with attack/skill animations, This is duration after action animation clip played to add some delay before next animation")]
+        [Tooltip("This will be in use with attacking/skill animations, This is duration after action animation clip played to add some delay before next animation")]
         public float extendDuration;
-        [Tooltip("This will be in use with attack/skill animations, These audio clips will be played randomly while play this animation (not loop). PS. You actually can use animation event instead :P")]
+        [Tooltip("This will be in use with attacking/skill animations, These audio clips will be played randomly while play this animation (not loop). PS. You actually can use animation event instead :P")]
         public AudioClip[] audioClips;
 
         public AudioClip GetRandomAudioClip()
