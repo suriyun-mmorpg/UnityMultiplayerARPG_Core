@@ -33,6 +33,10 @@ namespace MultiplayerARPG
         /// Controlled character, can use `GameInstance.PlayingCharacter` or `GameInstance.PlayingCharacterEntity` instead.
         /// </summary>
         public static BasePlayerCharacterEntity OwningCharacter { get { return Singleton == null ? null : Singleton.PlayerCharacterEntity; } }
+        [SerializeField]
+        protected InputField.ContentType buildingPasswordContentType = InputField.ContentType.Pin;
+        [SerializeField]
+        protected int buildingPasswordLength = 6;
         public System.Action<BasePlayerCharacterController> onSetup;
         public System.Action<BasePlayerCharacterController> onDesetup;
         public System.Action<BuildingEntity> onActivateBuilding;
@@ -185,7 +189,7 @@ namespace MultiplayerARPG
                 (password) =>
                 {
                     PlayerCharacterEntity.CallServerSetBuildingPassword(objectId, password);
-                }, string.Empty, InputField.ContentType.Pin, 6);
+                }, string.Empty, buildingPasswordContentType, buildingPasswordLength);
             DeselectBuilding();
         }
 
@@ -273,7 +277,7 @@ namespace MultiplayerARPG
                             (password) =>
                             {
                                 OwningCharacter.CallServerOpenDoor(objectId, password);
-                            }, string.Empty, InputField.ContentType.Pin, 6);
+                            }, string.Empty, buildingPasswordContentType, buildingPasswordLength);
                     }
                 }
                 else
@@ -296,7 +300,7 @@ namespace MultiplayerARPG
                         (password) =>
                         {
                             OwningCharacter.CallServerOpenStorage(objectId, password);
-                        }, string.Empty, InputField.ContentType.Pin, 6);
+                        }, string.Empty, buildingPasswordContentType, buildingPasswordLength);
                 }
             }
 
