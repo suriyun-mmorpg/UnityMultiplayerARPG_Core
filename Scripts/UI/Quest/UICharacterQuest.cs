@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using UnityEngine.UI;
 
 namespace MultiplayerARPG
 {
@@ -40,6 +41,7 @@ namespace MultiplayerARPG
         public UIQuestTask uiQuestTaskPrefab;
         public Transform uiQuestTaskContainer;
         [Header("Quest Status")]
+        public Toggle toggleQuestTracking;
         public GameObject questOnGoingStatusObject;
         public GameObject questTasksCompleteStatusObject;
         public GameObject questCompleteStatusObject;
@@ -172,6 +174,9 @@ namespace MultiplayerARPG
 
             if (questIsNotTrackingObject != null)
                 questIsNotTrackingObject.SetActive(!isTracking);
+
+            if (toggleQuestTracking != null)
+                toggleQuestTracking.SetIsOnWithoutNotify(Data.isTracking);
         }
 
         public void OnToggleTracking(bool isOn)
