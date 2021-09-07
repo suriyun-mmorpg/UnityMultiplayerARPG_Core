@@ -150,6 +150,7 @@ namespace MultiplayerARPG
                     LockPassword = buildingEntity.LockPassword,
                     CreatorId = buildingEntity.CreatorId,
                     CreatorName = buildingEntity.CreatorName,
+                    ExtraData = buildingEntity.ExtraData,
                 });
             }
             worldSaveData.SavePersistentData(hostPlayerCharacterData.Id, BaseGameNetworkManager.CurrentMapInfo.Id);
