@@ -221,8 +221,15 @@
                     {
                         if (amount > item.MaxStack)
                             amount = item.MaxStack;
-                        playerCharacter.AddOrSetNonEquipItems(CharacterItem.Create(item, 1, amount));
-                        response = $"Add item {item.Title}x{amount} to character: {receiver}'s inventory";
+                        if (playerCharacter.IncreasingItemsWillOverwhelming(item.DataId, amount))
+                        {
+                            response = $"Cannot add item {item.Title}x{amount} to {receiver}'s inventory, cannot carry any more of those items";
+                        }
+                        else
+                        {
+                            playerCharacter.AddOrSetNonEquipItems(CharacterItem.Create(item, 1, amount));
+                            response = $"Add item {item.Title}x{amount} to {receiver}'s inventory";
+                        }
                     }
                 }
                 if (commandKey.Equals(GoldRate))
