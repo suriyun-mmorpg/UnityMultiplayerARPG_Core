@@ -674,7 +674,7 @@ namespace MultiplayerARPG
         public static void FillEmptySlots(this IList<CharacterItem> itemList, bool isLimitSlot, short slotLimit)
         {
             int i;
-            if (!isLimitSlot)
+            if (!isLimitSlot || GameInstance.Singleton.doNotFillEmptySlots)
             {
                 // If it is not limit slots, don't fill it, and also remove empty slots
                 for (i = itemList.Count - 1; i >= 0; --i)

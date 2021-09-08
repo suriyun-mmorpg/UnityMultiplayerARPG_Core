@@ -244,6 +244,8 @@ namespace MultiplayerARPG
         public bool canRepairItemByPlayer = false;
         [Tooltip("How player's inventory works")]
         public InventorySystem inventorySystem = InventorySystem.Simple;
+        [Tooltip("If this is `TRUE` it won't fill empty slots")]
+        public bool doNotFillEmptySlots = false;
         [Tooltip("Base slot limit for all characters, it will be used when `InventorySystem` is `LimitSlots`")]
         public short baseSlotLimit = 0;
         public Storage playerStorage = default(Storage);
