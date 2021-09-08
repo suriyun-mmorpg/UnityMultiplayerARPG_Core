@@ -3,6 +3,10 @@
     public class DefaultGMCommands : BaseGMCommands
     {
         /// <summary>
+        /// Get list of all GM commands
+        /// </summary>
+        public const string Help = "/help";
+        /// <summary>
         /// Set character level: /level {level}
         /// </summary>
         public const string Level = "/level";
@@ -39,11 +43,23 @@
         /// </summary>
         public const string ExpRate = "/exp_rate";
 
+        public const string HelpResponse = "/level {level} = Set character's level to {level} value.\n" +
+            "/statpoint {amount} = Set character's stat point to {amount} value.\n" +
+            "/skillpoint {amount} = Set character's skill point to {amount} value.\n" +
+            "/gold {amount} = Set character's gold to {amount} value.\n" +
+            "/add_item {item_id} {amount} = Add item which its ID is {item_id}x{amount}.\n" +
+            "/give_gold {name} {amount} = Increase {amount} of gold to character which its name is {name}.\n" +
+            "/give_item {name} {item_id} {amount} = Add item which its ID is {item_id}x{amount} to character which its name is {name}.\n" +
+            "/gold_rate {rate} = Set server's gold drop rate to {rate}.\n" +
+            "/exp_rate {rate} = Set server's exp rewarding rate to {rate}.";
+
         public virtual bool IsDataLengthValid(string command, int dataLength)
         {
             if (string.IsNullOrEmpty(command))
                 return false;
 
+            if (command.Equals(Help))
+                return true;
             if (command.Equals(Level) && dataLength == 2)
                 return true;
             if (command.Equals(StatPoint) && dataLength == 2)
@@ -74,7 +90,8 @@
 
             string[] splited = chatMessage.Split(' ');
             command = splited[0];
-            if (command.Equals(Level) ||
+            if (command.Equals(Help) ||
+                command.Equals(Level) ||
                 command.Equals(StatPoint) ||
                 command.Equals(SkillPoint) ||
                 command.Equals(Gold) ||
@@ -108,6 +125,10 @@
             BasePlayerCharacterEntity playerCharacter;
             if (IsDataLengthValid(commandKey, data.Length))
             {
+                if (commandKey.Equals(Help))
+                {
+                    response = HelpResponse;
+                }
                 if (commandKey.Equals(Level))
                 {
                     receiver = sender;
@@ -167,7 +188,7 @@
                     {
                         if (amount > item.MaxStack)
                             amount = item.MaxStack;
-                        if (!playerCharacter.IncreasingItemsWillOverwhelming(item.DataId, amount))
+                        if (playerCharacter.IncreasingItemsWillOverwhelming(item.DataId, amount))
                         {
                             response = $"Cannot add item {item.Title}x{amount}, cannot carry any more of those items";
                         }
