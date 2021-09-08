@@ -189,7 +189,11 @@ namespace MultiplayerARPG
         {
             bool isStationary = CacheNavMeshAgent.isStopped || CacheNavMeshAgent.remainingDistance <= CacheNavMeshAgent.stoppingDistance;
             CacheNavMeshAgent.obstacleAvoidanceType = isStationary ? obstacleAvoidanceWhileStationary : obstacleAvoidanceWhileMoving;
+            // Update movement state
             MovementState = (CacheNavMeshAgent.velocity.sqrMagnitude > 0 ? MovementState.Forward : MovementState.None) | MovementState.IsGrounded;
+            // Update extra movement state
+            bool isStandingExtraMovementState = tempExtraMovementState == ExtraMovementState.IsWalking || tempExtraMovementState == ExtraMovementState.IsSprinting;
+            tempExtraMovementState = !isStandingExtraMovementState || CacheNavMeshAgent.velocity.sqrMagnitude > 0 ? tempExtraMovementState : ExtraMovementState.None;
             tempExtraMovementState = this.ValidateExtraMovementState(MovementState, tempExtraMovementState);
             ExtraMovementState = tempExtraMovementState;
             SyncTransform();

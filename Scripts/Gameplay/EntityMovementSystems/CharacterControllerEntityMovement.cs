@@ -268,9 +268,11 @@ namespace MultiplayerARPG
                     tempMovementState |= MovementState.IsUnderWater;
                 if (CacheCharacterController.isGrounded || airborneElapsed < airborneDelay)
                     tempMovementState |= MovementState.IsGrounded;
+                // Update movement state
                 MovementState = tempMovementState;
                 // Update extra movement state
-                tempExtraMovementState = tempMoveDirection.sqrMagnitude > 0f ? tempExtraMovementState : ExtraMovementState.None;
+                bool isStandingExtraMovementState = tempExtraMovementState == ExtraMovementState.IsWalking || tempExtraMovementState == ExtraMovementState.IsSprinting;
+                tempExtraMovementState = !isStandingExtraMovementState || tempMoveDirection.sqrMagnitude > 0 ? tempExtraMovementState : ExtraMovementState.None;
                 tempExtraMovementState = this.ValidateExtraMovementState(MovementState, tempExtraMovementState);
                 ExtraMovementState = tempExtraMovementState;
             }
