@@ -96,6 +96,7 @@ namespace MultiplayerARPG
         private IncrementalMinMaxInt randomExp = default(IncrementalMinMaxInt);
         [SerializeField]
         private IncrementalMinMaxInt randomGold = default(IncrementalMinMaxInt);
+        [SerializeField]
         [ArrayElementTitle("currency")]
         public CurrencyRandomAmount[] randomCurrencies = new CurrencyRandomAmount[0];
         [SerializeField]
@@ -103,8 +104,8 @@ namespace MultiplayerARPG
         private ItemDrop[] randomItems = new ItemDrop[0];
         [SerializeField]
         private ItemDropTable itemDropTable = null;
-        [Tooltip("Max kind of items that will be dropped in ground")]
         [SerializeField]
+        [Tooltip("Max kind of items that will be dropped in ground")]
         private byte maxDropItems = 5;
 
         #region Being deprecated
