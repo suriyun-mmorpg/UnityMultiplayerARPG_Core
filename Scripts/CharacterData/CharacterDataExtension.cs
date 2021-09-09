@@ -1765,5 +1765,25 @@ namespace MultiplayerARPG
                 }
             }
         }
+
+        public static Dictionary<int, short> ToAttributeAmountDictionary(this IEnumerable<CharacterAttribute> list)
+        {
+            Dictionary<int, short> result = new Dictionary<int, short>();
+            foreach (CharacterAttribute entry in list)
+            {
+                result[entry.dataId] = entry.amount;
+            }
+            return result;
+        }
+
+        public static Dictionary<int, short> ToSkillLevelDictionary(this IEnumerable<CharacterSkill> list)
+        {
+            Dictionary<int, short> result = new Dictionary<int, short>();
+            foreach (CharacterSkill entry in list)
+            {
+                result[entry.dataId] = entry.level;
+            }
+            return result;
+        }
     }
 }
