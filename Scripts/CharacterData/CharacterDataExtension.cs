@@ -1776,12 +1776,32 @@ namespace MultiplayerARPG
             return result;
         }
 
+        public static List<CharacterAttribute> ToCharacterAttributes(this Dictionary<int, short> dict)
+        {
+            List<CharacterAttribute> result = new List<CharacterAttribute>();
+            foreach (KeyValuePair<int, short> entry in dict)
+            {
+                result.Add(CharacterAttribute.Create(entry.Key, entry.Value));
+            }
+            return result;
+        }
+
         public static Dictionary<int, short> ToSkillLevelDictionary(this IEnumerable<CharacterSkill> list)
         {
             Dictionary<int, short> result = new Dictionary<int, short>();
             foreach (CharacterSkill entry in list)
             {
                 result[entry.dataId] = entry.level;
+            }
+            return result;
+        }
+
+        public static List<CharacterSkill> ToCharacterSkills(this Dictionary<int, short> dict)
+        {
+            List<CharacterSkill> result = new List<CharacterSkill>();
+            foreach (KeyValuePair<int, short> entry in dict)
+            {
+                result.Add(CharacterSkill.Create(entry.Key, entry.Value));
             }
             return result;
         }
