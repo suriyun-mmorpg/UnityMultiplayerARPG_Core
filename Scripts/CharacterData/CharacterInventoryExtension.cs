@@ -46,7 +46,6 @@ namespace MultiplayerARPG
                         }
                         // Remove from storage
                         storageItems.DecreaseItemsByIndex(storageItemIndex, storageItemAmount, storageIsLimitSlot);
-                        storageItems.FillEmptySlots(storageIsLimitSlot, storageSlotLimit);
                     }
                     else
                     {
@@ -58,6 +57,7 @@ namespace MultiplayerARPG
                     }
                     break;
             }
+            storageItems.FillEmptySlots(storageIsLimitSlot, storageSlotLimit);
             playerCharacter.FillEmptySlots();
             gameMessage = UITextKeys.NONE;
             return true;
@@ -164,7 +164,6 @@ namespace MultiplayerARPG
                         }
                         // Remove from inventory
                         playerCharacter.DecreaseItemsByIndex(inventoryItemIndex, inventoryItemAmount);
-                        playerCharacter.FillEmptySlots();
                     }
                     else
                     {
@@ -177,6 +176,7 @@ namespace MultiplayerARPG
                     break;
             }
             storageItems.FillEmptySlots(storageIsLimitSlot, storageSlotLimit);
+            playerCharacter.FillEmptySlots();
             gameMessage = UITextKeys.NONE;
             return true;
         }
@@ -225,7 +225,6 @@ namespace MultiplayerARPG
                         playerCharacter.SelectableWeaponSets[equipSlotIndexOrWeaponSet] = equipWeapons;
                         // Remove from storage
                         storageItems.DecreaseItemsByIndex(storageItemIndex, movingItem.amount, storageIsLimitSlot);
-                        storageItems.FillEmptySlots(storageIsLimitSlot, storageSlotLimit);
                     }
                     else
                     {
@@ -254,7 +253,6 @@ namespace MultiplayerARPG
                         playerCharacter.SelectableWeaponSets[equipSlotIndexOrWeaponSet] = equipWeapons;
                         // Remove from storage
                         storageItems.DecreaseItemsByIndex(storageItemIndex, movingItem.amount, storageIsLimitSlot);
-                        storageItems.FillEmptySlots(storageIsLimitSlot, storageSlotLimit);
                     }
                     else
                     {
@@ -277,7 +275,6 @@ namespace MultiplayerARPG
                         playerCharacter.EquipItems.Add(movingItem);
                         // Remove from storage
                         storageItems.DecreaseItemsByIndex(storageItemIndex, movingItem.amount, storageIsLimitSlot);
-                        storageItems.FillEmptySlots(storageIsLimitSlot, storageSlotLimit);
                     }
                     else
                     {
