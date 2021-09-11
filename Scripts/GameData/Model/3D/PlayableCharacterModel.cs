@@ -361,7 +361,8 @@ namespace MultiplayerARPG.GameData.Model.Playables
                 Behaviour.PlayAction(weaponAnimations.hurtState, 1f);
                 return;
             }
-            Behaviour.PlayAction(defaultAnimations.hurtState, 1f);
+            if (defaultAnimations.hurtState.clip != null)
+                Behaviour.PlayAction(defaultAnimations.hurtState, 1f);
         }
 
         public override void PlayJumpAnimation()
@@ -379,7 +380,8 @@ namespace MultiplayerARPG.GameData.Model.Playables
                 Behaviour.PlayAction(weaponAnimations.pickupState, 1f);
                 return;
             }
-            Behaviour.PlayAction(defaultAnimations.pickupState, 1f);
+            if (defaultAnimations.pickupState.clip != null)
+                Behaviour.PlayAction(defaultAnimations.pickupState, 1f);
         }
         #endregion
 
