@@ -246,7 +246,7 @@ namespace MultiplayerARPG
                             return false;
                     }
                     // Just equip or swapping
-                    if (equipWeapons.IsEmptyLeftHandSlot())
+                    if (equipWeapons.IsEmptyRightHandSlot())
                     {
                         // Just equip
                         equipWeapons.rightHand = movingItem;
