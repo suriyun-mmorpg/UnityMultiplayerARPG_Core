@@ -914,30 +914,30 @@ namespace MultiplayerARPG
             Dictionary<int, CharacterItem> emptySlots = new Dictionary<int, CharacterItem>();
             Dictionary<int, CharacterItem> changes = new Dictionary<int, CharacterItem>();
             // Loop to all slots to add amount to any slots that item amount not max in stack
-            CharacterItem tempNonEquipItem;
+            CharacterItem item;
             for (int i = 0; i < itemList.Count; ++i)
             {
-                tempNonEquipItem = itemList[i];
-                if (tempNonEquipItem.IsEmptySlot())
+                item = itemList[i];
+                if (item.IsEmptySlot())
                 {
                     // If current entry is not valid, add it to empty list, going to replacing it later
-                    emptySlots[i] = tempNonEquipItem;
+                    emptySlots[i] = item;
                 }
-                else if (tempNonEquipItem.dataId == increasingItem.dataId)
+                else if (item.dataId == increasingItem.dataId)
                 {
                     // If same item id, increase its amount
-                    if (tempNonEquipItem.amount + amount <= maxStack)
+                    if (item.amount + amount <= maxStack)
                     {
-                        tempNonEquipItem.amount += amount;
-                        changes[i] = tempNonEquipItem;
+                        item.amount += amount;
+                        changes[i] = item;
                         amount = 0;
                         break;
                     }
-                    else if (maxStack - tempNonEquipItem.amount >= 0)
+                    else if (maxStack - item.amount >= 0)
                     {
-                        amount -= (short)(maxStack - tempNonEquipItem.amount);
-                        tempNonEquipItem.amount = maxStack;
-                        changes[i] = tempNonEquipItem;
+                        amount -= (short)(maxStack - item.amount);
+                        item.amount = maxStack;
+                        changes[i] = item;
                     }
                 }
             }
@@ -1146,10 +1146,10 @@ namespace MultiplayerARPG
         {
             if (index < 0 || index >= itemList.Count)
                 return false;
-            CharacterItem nonEquipItem = itemList[index];
-            if (nonEquipItem.IsEmptySlot() || amount > nonEquipItem.amount)
+            CharacterItem item = itemList[index];
+            if (item.IsEmptySlot() || amount > item.amount)
                 return false;
-            if (nonEquipItem.amount - amount == 0)
+            if (item.amount - amount == 0)
             {
                 if (isLimitInventorySlot)
                     itemList[index] = CharacterItem.Empty;
@@ -1158,8 +1158,8 @@ namespace MultiplayerARPG
             }
             else
             {
-                nonEquipItem.amount -= amount;
-                itemList[index] = nonEquipItem;
+                item.amount -= amount;
+                itemList[index] = item;
             }
             return true;
         }
