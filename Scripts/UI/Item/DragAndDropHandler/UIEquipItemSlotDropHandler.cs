@@ -53,6 +53,9 @@ namespace MultiplayerARPG
                         // If dropped non equipped equipment item to equip slot, equip it
                         EquipItem(draggedItemUI);
                         break;
+                    case UICharacterItemDragHandler.SourceLocation.StorageItems:
+                        draggedItemUI.uiCharacterItem.OnClickMoveFromStorage(uiCharacterItem.InventoryType, uiCharacterItem.EquipSlotIndex, (short)uiCharacterItem.IndexOfData);
+                        break;
                 }
             }
         }

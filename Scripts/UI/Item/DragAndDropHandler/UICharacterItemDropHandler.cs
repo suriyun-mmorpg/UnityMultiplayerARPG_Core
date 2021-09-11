@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using UnityEngine.EventSystems;
+using UnityEngine.Serialization;
 
 namespace MultiplayerARPG
 {
@@ -15,7 +16,8 @@ namespace MultiplayerARPG
         [Tooltip("If this is `TRUE`, it will not swap or merge item which dragging from inventory to storage")]
         public bool doNotSwapOrMergeWithStorageItem;
         [Tooltip("If this is `TRUE`, it will not swap or merge item which dragging from storage to inventory")]
-        public bool doNotSwapOrMergeWithNonEquipItem;
+        [FormerlySerializedAs("doNotSwapOrMergeWithNonEquipItem")]
+        public bool doNotSwapOrMergeWithInventoryItem;
 
         protected RectTransform dropRect;
         public RectTransform DropRect
@@ -86,6 +88,19 @@ namespace MultiplayerARPG
                         ClientInventoryActions.ResponseUnEquipArmor,
                         ClientInventoryActions.ResponseUnEquipWeapon);
                     break;
+                case InventoryType.StorageItems:
+                    if (doNotMoveToStorage)
+                        return;
+                    // Drop non equip item to storage item
+                    if (doNotSwapOrMergeWithStorageItem)
+                    {
+                        draggedItemUI.uiCharacterItem.OnClickMoveToStorage(-1);
+                    }
+                    else
+                    {
+                        draggedItemUI.uiCharacterItem.OnClickMoveToStorage((short)uiCharacterItem.IndexOfData);
+                    }
+                    break;
             }
         }
 
@@ -140,16 +155,19 @@ namespace MultiplayerARPG
             switch (uiCharacterItem.InventoryType)
             {
                 case InventoryType.NonEquipItems:
+                case InventoryType.EquipItems:
+                case InventoryType.EquipWeaponRight:
+                case InventoryType.EquipWeaponLeft:
                     if (doNotMoveFromStorage)
                         return;
                     // Drop storage item to non equip item
-                    if (doNotSwapOrMergeWithNonEquipItem)
+                    if (doNotSwapOrMergeWithInventoryItem)
                     {
-                        draggedItemUI.uiCharacterItem.OnClickMoveFromStorage(-1);
+                        draggedItemUI.uiCharacterItem.OnClickMoveFromStorage(uiCharacterItem.InventoryType, uiCharacterItem.EquipSlotIndex, -1);
                     }
                     else
                     {
-                        draggedItemUI.uiCharacterItem.OnClickMoveFromStorage((short)uiCharacterItem.IndexOfData);
+                        draggedItemUI.uiCharacterItem.OnClickMoveFromStorage(uiCharacterItem.InventoryType, uiCharacterItem.EquipSlotIndex, (short)uiCharacterItem.IndexOfData);
                     }
                     break;
                 case InventoryType.StorageItems:

@@ -1487,7 +1487,7 @@ namespace MultiplayerARPG
         public void OnClickMoveToStorage(short storageItemIndex)
         {
             // Only unequipped equipment can be moved to storage
-            if (!IsOwningCharacter() || InventoryType != InventoryType.NonEquipItems)
+            if (!IsOwningCharacter() || (InventoryType != InventoryType.NonEquipItems && InventoryType != InventoryType.EquipItems && InventoryType != InventoryType.EquipWeaponRight && InventoryType != InventoryType.EquipWeaponLeft))
                 return;
 
             if (CharacterItem.amount == 1)
@@ -1516,6 +1516,8 @@ namespace MultiplayerARPG
                 inventoryItemIndex = (short)IndexOfData,
                 inventoryItemAmount = (short)amount,
                 storageItemIndex = storageItemIndex,
+                inventoryType = InventoryType,
+                equipSlotIndexOrWeaponSet = EquipSlotIndex,
             }, ClientStorageActions.ResponseMoveItemToStorage);
         }
         #endregion
@@ -1523,10 +1525,10 @@ namespace MultiplayerARPG
         #region Move From Storage Functions
         public void OnClickMoveFromStorage()
         {
-            OnClickMoveFromStorage(-1);
+            OnClickMoveFromStorage(InventoryType.NonEquipItems, Character.EquipWeaponSet, -1);
         }
 
-        public void OnClickMoveFromStorage(short inventoryItemIndex)
+        public void OnClickMoveFromStorage(InventoryType inventoryType, byte equipSlotIndex, short inventoryItemIndex)
         {
             // Only storage items can be moved from storage
             if (!IsOwningCharacter() || InventoryType != InventoryType.StorageItems)
@@ -1534,18 +1536,18 @@ namespace MultiplayerARPG
 
             if (CharacterItem.amount == 1)
             {
-                OnClickMoveFromStorageConfirmed(inventoryItemIndex, 1);
+                OnClickMoveFromStorageConfirmed(inventoryType, equipSlotIndex, inventoryItemIndex, 1);
             }
             else
             {
                 UISceneGlobal.Singleton.ShowInputDialog(LanguageManager.GetText(UITextKeys.UI_MOVE_ITEM_FROM_STORAGE.ToString()), LanguageManager.GetText(UITextKeys.UI_MOVE_ITEM_FROM_STORAGE_DESCRIPTION.ToString()), (amount) =>
                 {
-                    OnClickMoveFromStorageConfirmed(inventoryItemIndex, amount);
+                    OnClickMoveFromStorageConfirmed(inventoryType, equipSlotIndex, inventoryItemIndex, amount);
                 }, 1, CharacterItem.amount, CharacterItem.amount);
             }
         }
 
-        private void OnClickMoveFromStorageConfirmed(short inventoryItemIndex, int amount)
+        private void OnClickMoveFromStorageConfirmed(InventoryType inventoryType, byte equipSlotIndex, short inventoryItemIndex, int amount)
         {
             if (selectionManager != null)
                 selectionManager.DeselectSelectedUI();
@@ -1558,6 +1560,8 @@ namespace MultiplayerARPG
                 storageItemIndex = (short)IndexOfData,
                 storageItemAmount = (short)amount,
                 inventoryItemIndex = inventoryItemIndex,
+                inventoryType = inventoryType,
+                equipSlotIndexOrWeaponSet = equipSlotIndex,
             }, ClientStorageActions.ResponseMoveItemFromStorage);
         }
         #endregion
