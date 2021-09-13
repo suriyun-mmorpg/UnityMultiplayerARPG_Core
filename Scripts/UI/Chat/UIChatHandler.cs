@@ -252,6 +252,9 @@ namespace MultiplayerARPG
 
         private void FillChatMessages()
         {
+            // It can be null when changing scene, so avoid an errors here
+            if (gameObject == null)
+                return;
             if (showingMessagesFromAllChannels)
             {
                 UIChatMessage tempUiChatMessage;
