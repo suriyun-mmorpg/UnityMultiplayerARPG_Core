@@ -1,6 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.Events;
 
 namespace UtilsComponents
@@ -9,11 +7,16 @@ namespace UtilsComponents
     {
         public float firstDelay;
         public float repeatDelay;
-        public UnityEvent repeating;
+        public UnityEvent repeating = new UnityEvent();
 
-        private void Start()
+        private void OnEnable()
         {
             InvokeRepeating(nameof(Repeating), firstDelay, repeatDelay);
+        }
+
+        private void OnDisable()
+        {
+            CancelInvoke();
         }
 
         private void Repeating()
