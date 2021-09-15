@@ -30,7 +30,7 @@ namespace MultiplayerARPG
             SocialSystemSetting systemSetting = GameInstance.Singleton.SocialSystemSetting;
             if (uiTextRequireGold != null)
             {
-                int gold = owningCharacter.Gold.Increase(owningCharacter.UserGold);
+                int gold = owningCharacter.Gold;
                 uiTextRequireGold.text = string.Format(
                     gold >= systemSetting.CreateGuildRequiredGold ?
                         LanguageManager.GetText(formatKeyRequireGold) :
