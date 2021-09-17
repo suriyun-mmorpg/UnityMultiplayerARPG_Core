@@ -5,6 +5,7 @@ namespace MultiplayerARPG
     public class TextSetterByLocaleKey : MonoBehaviour
     {
         [Tooltip("Priority: get text from `LanguageManager` by `localKeySetting` then if it's not exists, get text from `textByLanguageKeys`, and then `defaultText`")]
+        [TextArea]
         public string defaultText;
         [Tooltip("Priority: get text from `LanguageManager` by `localKeySetting` then if it's not exists, get text from `textByLanguageKeys`, and then `defaultText`")]
         public LanguageData[] textByLanguageKeys;
