@@ -78,7 +78,7 @@ namespace MultiplayerARPG
 
         public override uint PacketVersion()
         {
-            return 20;
+            return 25;
         }
 
         protected override void Awake()
@@ -597,6 +597,13 @@ namespace MultiplayerARPG
                 PoolSystem.InitPool(poolingObject);
             }
             System.GC.Collect();
+        }
+
+        protected override void HandleEnterGameResponse(ResponseHandlerData responseHandler, AckResponseCode responseCode, EnterGameResponseMessage response)
+        {
+            base.HandleEnterGameResponse(responseHandler, responseCode, response);
+            if (responseCode != AckResponseCode.Success)
+                UISceneGlobal.Singleton.ShowDisconnectDialog(DisconnectReason.ConnectionRejected);
         }
 
         public override void OnClientOnlineSceneLoaded()

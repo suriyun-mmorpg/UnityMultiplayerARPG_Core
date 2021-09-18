@@ -121,8 +121,13 @@ namespace MultiplayerARPG
 
         public void ShowDisconnectDialog(DisconnectInfo disconnectInfo)
         {
+            ShowDisconnectDialog(disconnectInfo.Reason);
+        }
+
+        public void ShowDisconnectDialog(DisconnectReason reason)
+        {
             string errorMessage = LanguageManager.GetUnknowTitle();
-            switch (disconnectInfo.Reason)
+            switch (reason)
             {
                 case DisconnectReason.DisconnectPeerCalled:
                     errorMessage = LanguageManager.GetText(UITextKeys.UI_ERROR_KICKED_FROM_SERVER.ToString());
