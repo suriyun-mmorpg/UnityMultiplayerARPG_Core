@@ -73,8 +73,8 @@ namespace MultiplayerARPG
                         // If found sender send whisper message to sender
                         Manager.ServerSendPacket(connectionId, 0, DeliveryMethod.ReliableOrdered, GameNetworkingConsts.Chat, message);
                     }
-                    if (!string.IsNullOrEmpty(message.receiver) &&
-                        GameInstance.ServerUserHandlers.TryGetPlayerCharacterByName(message.receiver, out playerCharacter))
+                    if (!string.IsNullOrEmpty(message.receiver) && !message.receiver.Equals(message.sender) &&
+                        GameInstance.ServerUserHandlers.TryGetConnectionIdByName(message.receiver, out connectionId))
                     {
                         // If found receiver send whisper message to receiver
                         Manager.ServerSendPacket(connectionId, 0, DeliveryMethod.ReliableOrdered, GameNetworkingConsts.Chat, message);
