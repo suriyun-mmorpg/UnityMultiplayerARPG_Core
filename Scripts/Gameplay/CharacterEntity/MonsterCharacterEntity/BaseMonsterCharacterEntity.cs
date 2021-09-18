@@ -488,28 +488,31 @@ namespace MultiplayerARPG
                         // Try find party data from player character
                         if (tempPlayerCharacterEntity.PartyId > 0 && GameInstance.ServerPartyHandlers.TryGetParty(tempPlayerCharacterEntity.PartyId, out tempPartyData))
                         {
-                            BasePlayerCharacterEntity partyPlayerCharacterEntity;
-                            // Loop party member to fill looter list / increase gold / increase exp
-                            foreach (SocialCharacterData member in tempPartyData.GetMembers())
+                            List<BasePlayerCharacterEntity> nearbyPartyMembers = new List<BasePlayerCharacterEntity>();
+                            BasePlayerCharacterEntity nearbyPartyMember;
+                            foreach (string memberId in tempPartyData.GetMemberIds())
                             {
-                                if (GameInstance.ServerUserHandlers.TryGetPlayerCharacterById(member.id, out partyPlayerCharacterEntity))
-                                {
-                                    // If share exp, every party member will receive devided exp
-                                    // If not share exp, character who make damage will receive non-devided exp
-                                    if (tempPartyData.shareExp)
-                                        partyPlayerCharacterEntity.RewardExp(reward, (1f - shareGuildExpRate) / (float)tempPartyData.CountMember() * rewardRate, RewardGivenType.PartyShare);
+                                if (GameInstance.ServerUserHandlers.TryGetPlayerCharacterById(memberId, out nearbyPartyMember))
+                                    nearbyPartyMembers.Add(nearbyPartyMember);
+                            }
+                            int countNearbyPartyMembers = nearbyPartyMembers.Count;
+                            foreach (BasePlayerCharacterEntity partyMember in nearbyPartyMembers)
+                            {
+                                // If share exp, every party member will receive devided exp
+                                // If not share exp, character who make damage will receive non-devided exp
+                                if (tempPartyData.shareExp)
+                                    partyMember.RewardExp(reward, (1f - shareGuildExpRate) / (float)countNearbyPartyMembers * rewardRate, RewardGivenType.PartyShare);
 
-                                    // If share item, every party member will receive devided gold
-                                    // If not share item, character who make damage will receive non-devided gold
-                                    if (tempPartyData.shareItem)
+                                // If share item, every party member will receive devided gold
+                                // If not share item, character who make damage will receive non-devided gold
+                                if (tempPartyData.shareItem)
+                                {
+                                    if (makeMostDamage)
                                     {
-                                        if (makeMostDamage)
-                                        {
-                                            // Make other member in party able to pickup items
-                                            looters.Add(partyPlayerCharacterEntity.ObjectId);
-                                        }
-                                        partyPlayerCharacterEntity.RewardCurrencies(reward, 1f / (float)tempPartyData.CountMember() * rewardRate, RewardGivenType.PartyShare);
+                                        // Make other member in party able to pickup items
+                                        looters.Add(partyMember.ObjectId);
                                     }
+                                    partyMember.RewardCurrencies(reward, 1f / (float)countNearbyPartyMembers * rewardRate, RewardGivenType.PartyShare);
                                 }
                             }
                             // Shared exp has been given, so do not give it to character again
