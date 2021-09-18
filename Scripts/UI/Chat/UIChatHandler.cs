@@ -18,6 +18,7 @@ namespace MultiplayerARPG
         public bool showingMessagesFromAllChannels = true;
         [Tooltip("When enter this key it will show enter chat message field")]
         public KeyCode enterChatKey = KeyCode.Return;
+        [Range(0, UIChatHistory.MAX_CHAT_HISTORY)]
         public int chatEntrySize = 30;
 
         [Header("Channel Commands")]
@@ -74,6 +75,14 @@ namespace MultiplayerARPG
         protected override void Awake()
         {
             base.Awake();
+            int index = UIChatHistory.ChatMessages.Count - chatEntrySize;
+            if (index < 0)
+                index = 0;
+            while (index < UIChatHistory.ChatMessages.Count)
+            {
+                OnReceiveChat(UIChatHistory.ChatMessages[index]);
+                index++;
+            }
             SetOnClientReceiveChatMessage();
         }
 
@@ -237,6 +246,12 @@ namespace MultiplayerARPG
 
         private void OnReceiveChat(ChatMessage chatMessage)
         {
+            if (this == null)
+            {
+                RemoveOnClientReceiveChatMessage();
+                return;
+            }
+
             if (!ChannelBasedChatMessages.ContainsKey(chatMessage.channel))
                 ChannelBasedChatMessages.Add(chatMessage.channel, new List<ChatMessage>());
             ChannelBasedChatMessages[chatMessage.channel].Add(chatMessage);
@@ -252,9 +267,6 @@ namespace MultiplayerARPG
 
         private void FillChatMessages()
         {
-            // It can be null when changing scene, so avoid an errors here
-            if (gameObject == null)
-                return;
             if (showingMessagesFromAllChannels)
             {
                 UIChatMessage tempUiChatMessage;

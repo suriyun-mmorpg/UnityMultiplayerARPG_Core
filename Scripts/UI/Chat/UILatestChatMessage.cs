@@ -2,15 +2,25 @@
 {
     public partial class UILatestChatMessage : UIChatMessage
     {
-        protected override void OnEnable()
+        protected override void Awake()
         {
-            base.OnEnable();
+            base.Awake();
+            SetOnClientReceiveChatMessage();
+        }
+
+        private void OnDestroy()
+        {
+            RemoveOnClientReceiveChatMessage();
+        }
+
+        public void SetOnClientReceiveChatMessage()
+        {
+            RemoveOnClientReceiveChatMessage();
             ClientGenericActions.onClientReceiveChatMessage += OnReceiveChat;
         }
 
-        protected override void OnDisable()
+        public void RemoveOnClientReceiveChatMessage()
         {
-            base.OnDisable();
             ClientGenericActions.onClientReceiveChatMessage -= OnReceiveChat;
         }
 
