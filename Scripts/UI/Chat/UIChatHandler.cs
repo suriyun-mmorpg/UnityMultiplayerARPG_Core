@@ -75,13 +75,17 @@ namespace MultiplayerARPG
         protected override void Awake()
         {
             base.Awake();
-            int index = UIChatHistory.ChatMessages.Count - chatEntrySize;
-            if (index < 0)
-                index = 0;
-            while (index < UIChatHistory.ChatMessages.Count)
+            if (ChatMessages.Count == 0)
             {
-                OnReceiveChat(UIChatHistory.ChatMessages[index]);
-                index++;
+                // No received chat messages, try fill it from global chat messages
+                int index = UIChatHistory.ChatMessages.Count - chatEntrySize;
+                if (index < 0)
+                    index = 0;
+                while (index < UIChatHistory.ChatMessages.Count)
+                {
+                    OnReceiveChat(UIChatHistory.ChatMessages[index]);
+                    index++;
+                }
             }
             SetOnClientReceiveChatMessage();
         }
@@ -198,41 +202,35 @@ namespace MultiplayerARPG
             string receiver = string.Empty;
             // Set chat channel by command
             string[] splitedText = trimText.Split(' ');
-            if (splitedText.Length > 0)
+            string cmd = splitedText[0];
+            if (cmd.Equals(whisperCommand) &&
+                splitedText.Length > 2)
             {
-                string cmd = splitedText[0];
-                if (cmd.Equals(whisperCommand) &&
-                    splitedText.Length > 2)
-                {
-                    channel = ChatChannel.Whisper;
-                    receiver = splitedText[1];
-                    message = trimText.Substring(cmd.Length + receiver.Length + 2); // +2 for space
-                    EnterChatMessage = trimText.Substring(0, cmd.Length + receiver.Length + 2); // +2 for space
-                }
-                if ((cmd.Equals(globalCommand) ||
-                    cmd.Equals(partyCommand) ||
-                    cmd.Equals(guildCommand) ||
-                    cmd.Equals(systemCommand))
-                    && splitedText.Length > 1)
-                {
-                    if (cmd.Equals(globalCommand))
-                        channel = ChatChannel.Global;
-                    if (cmd.Equals(partyCommand))
-                        channel = ChatChannel.Party;
-                    if (cmd.Equals(guildCommand))
-                        channel = ChatChannel.Guild;
-                    if (cmd.Equals(systemCommand))
-                        channel = ChatChannel.System;
-                    message = trimText.Substring(cmd.Length + 1); // +1 for space
-                    EnterChatMessage = trimText.Substring(0, cmd.Length + 1); // +1 for space
-                }
+                channel = ChatChannel.Whisper;
+                receiver = splitedText[1];
+                message = trimText.Substring(cmd.Length + receiver.Length + 2); // +2 for space
+                EnterChatMessage = trimText.Substring(0, cmd.Length + receiver.Length + 2); // +2 for space
             }
-            else
+            if ((cmd.Equals(globalCommand) ||
+                cmd.Equals(partyCommand) ||
+                cmd.Equals(guildCommand) ||
+                cmd.Equals(systemCommand))
+                && splitedText.Length > 1)
             {
-                if (channel == ChatChannel.Whisper && uiReceiverField)
-                {
-                    receiver = EnterChatReceiver;
-                }
+                if (cmd.Equals(globalCommand))
+                    channel = ChatChannel.Global;
+                if (cmd.Equals(partyCommand))
+                    channel = ChatChannel.Party;
+                if (cmd.Equals(guildCommand))
+                    channel = ChatChannel.Guild;
+                if (cmd.Equals(systemCommand))
+                    channel = ChatChannel.System;
+                message = trimText.Substring(cmd.Length + 1); // +1 for space
+                EnterChatMessage = trimText.Substring(0, cmd.Length + 1); // +1 for space
+            }
+            if (channel == ChatChannel.Whisper && uiReceiverField)
+            {
+                receiver = EnterChatReceiver;
             }
             GameInstance.ClientChatHandlers.SendChatMessage(new ChatMessage()
             {
