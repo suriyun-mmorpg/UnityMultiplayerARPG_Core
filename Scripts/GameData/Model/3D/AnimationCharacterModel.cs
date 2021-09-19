@@ -717,6 +717,7 @@ namespace MultiplayerARPG
 
         private IEnumerator PlayActionAnimation_LegacyAnimation(AnimActionType animActionType, int dataId, int index, float playSpeedMultiplier)
         {
+            isDoingAction = true;
             // If animator is not null, play the action animation
             ActionAnimation tempActionAnimation = GetActionAnimation(animActionType, dataId, index);
             if (tempActionAnimation.clip != null)
@@ -735,6 +736,7 @@ namespace MultiplayerARPG
                 CrossFadeLegacyAnimation(CLIP_IDLE, idleClipFadeLength, WrapMode.Loop);
             // Waits by current transition + extra duration before end playing animation state
             yield return new WaitForSecondsRealtime(tempActionAnimation.GetExtendDuration() / playSpeedMultiplier);
+            isDoingAction = false;
         }
 
         public override void PlaySkillCastClip(int dataId, float duration)
@@ -744,6 +746,7 @@ namespace MultiplayerARPG
 
         private IEnumerator PlaySkillCastClip_LegacyAnimation(int dataId, float duration)
         {
+            isDoingAction = true;
             AnimationClip castClip = GetSkillCastClip(dataId);
             if (legacyAnimation.GetClip(CLIP_CAST_SKILL) != null)
                 legacyAnimation.RemoveClip(CLIP_CAST_SKILL);
@@ -751,10 +754,12 @@ namespace MultiplayerARPG
             CrossFadeLegacyAnimation(CLIP_CAST_SKILL, actionClipFadeLength, WrapMode.Loop);
             yield return new WaitForSecondsRealtime(duration);
             CrossFadeLegacyAnimation(CLIP_IDLE, idleClipFadeLength, WrapMode.Loop);
+            isDoingAction = false;
         }
 
         public override void PlayWeaponChargeClip(int dataId, bool isLeftHand)
         {
+            isDoingAction = true;
             AnimationClip chargeClip = isLeftHand ? GetLeftHandWeaponChargeClip(dataId) : GetRightHandWeaponChargeClip(dataId);
             if (legacyAnimation.GetClip(CLIP_WEAPON_CHARGE) != null)
                 legacyAnimation.RemoveClip(CLIP_WEAPON_CHARGE);
@@ -765,20 +770,25 @@ namespace MultiplayerARPG
         public override void StopActionAnimation()
         {
             CrossFadeLegacyAnimation(CLIP_IDLE, idleClipFadeLength, WrapMode.Loop);
+            isDoingAction = false;
         }
 
         public override void StopSkillCastAnimation()
         {
             CrossFadeLegacyAnimation(CLIP_IDLE, idleClipFadeLength, WrapMode.Loop);
+            isDoingAction = false;
         }
 
         public override void StopWeaponChargeAnimation()
         {
             CrossFadeLegacyAnimation(CLIP_IDLE, idleClipFadeLength, WrapMode.Loop);
+            isDoingAction = false;
         }
 
         public override void PlayHitAnimation()
         {
+            if (isDoingAction)
+                return;
             if (legacyAnimation.GetClip(CLIP_HURT) == null)
                 return;
             CrossFadeLegacyAnimation(CLIP_HURT, hurtClipFadeLength, WrapMode.Once);
@@ -800,6 +810,8 @@ namespace MultiplayerARPG
 
         public override void PlayPickupAnimation()
         {
+            if (isDoingAction)
+                return;
             if (legacyAnimation.GetClip(CLIP_PICKUP) == null)
                 return;
             CrossFadeLegacyAnimation(CLIP_PICKUP, pickupClipFadeLength, WrapMode.Once);

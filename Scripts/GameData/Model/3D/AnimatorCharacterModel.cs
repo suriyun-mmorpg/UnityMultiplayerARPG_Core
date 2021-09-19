@@ -724,6 +724,7 @@ namespace MultiplayerARPG
 
         private IEnumerator PlayActionAnimation_Animator(AnimActionType animActionType, int dataId, int index, float playSpeedMultiplier)
         {
+            isDoingAction = true;
             ActionAnimation tempActionAnimation = GetActionAnimation(animActionType, dataId, index);
             AudioManager.PlaySfxClipAtAudioSource(tempActionAnimation.GetRandomAudioClip(), genericAudioSource);
             bool hasClip = tempActionAnimation.clip != null && animator.isActiveAndEnabled;
@@ -755,6 +756,7 @@ namespace MultiplayerARPG
             }
             // Waits by current transition + extra duration before end playing animation state
             yield return new WaitForSecondsRealtime(tempActionAnimation.GetExtendDuration() / playSpeedMultiplier);
+            isDoingAction = false;
         }
 
         public override void PlaySkillCastClip(int dataId, float duration)
@@ -767,6 +769,7 @@ namespace MultiplayerARPG
 
         private IEnumerator PlaySkillCastClip_Animator(int dataId, float duration)
         {
+            isDoingAction = true;
             AnimationClip castClip = GetSkillCastClip(dataId);
             bool hasClip = castClip != null && animator.isActiveAndEnabled;
             if (hasClip)
@@ -796,6 +799,7 @@ namespace MultiplayerARPG
                 animator.SetBool(ANIM_IS_CASTING_SKILL, false);
                 animator.SetBool(ANIM_IS_CASTING_SKILL_ALL_LAYERS, false);
             }
+            isDoingAction = false;
         }
 
         public override void PlayWeaponChargeClip(int dataId, bool isLeftHand)
@@ -803,6 +807,7 @@ namespace MultiplayerARPG
             StopActionAnimation();
             StopSkillCastAnimation();
             StopWeaponChargeAnimation();
+            isDoingAction = true;
             AnimationClip chargeClip = isLeftHand ? GetLeftHandWeaponChargeClip(dataId) : GetRightHandWeaponChargeClip(dataId);
             bool hasClip = chargeClip != null && animator.isActiveAndEnabled;
             if (hasClip)
@@ -819,6 +824,7 @@ namespace MultiplayerARPG
                 animator.SetBool(ANIM_DO_ACTION, false);
                 animator.SetBool(ANIM_DO_ACTION_ALL_LAYERS, false);
             }
+            isDoingAction = false;
         }
 
         public override void StopSkillCastAnimation()
@@ -828,6 +834,7 @@ namespace MultiplayerARPG
                 animator.SetBool(ANIM_IS_CASTING_SKILL, false);
                 animator.SetBool(ANIM_IS_CASTING_SKILL_ALL_LAYERS, false);
             }
+            isDoingAction = false;
         }
 
         public override void StopWeaponChargeAnimation()
@@ -836,10 +843,13 @@ namespace MultiplayerARPG
             {
                 animator.SetBool(ANIM_IS_WEAPON_CHARGE, false);
             }
+            isDoingAction = false;
         }
 
         public override void PlayHitAnimation()
         {
+            if (isDoingAction)
+                return;
             if (!animationClipOverrides.ContainsKey(CLIP_HURT))
                 return;
             StartCoroutine(PlayHitAnimationRoutine());
@@ -881,6 +891,8 @@ namespace MultiplayerARPG
 
         public override void PlayPickupAnimation()
         {
+            if (isDoingAction)
+                return;
             if (!animationClipOverrides.ContainsKey(CLIP_PICKUP))
                 return;
             StartCoroutine(PlayPickupAnimationRoutine());

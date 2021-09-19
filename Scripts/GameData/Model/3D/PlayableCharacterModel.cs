@@ -283,6 +283,7 @@ namespace MultiplayerARPG.GameData.Model.Playables
         public override void StopSkillCastAnimation()
         {
             Behaviour.StopAction();
+            isDoingAction = false;
         }
         #endregion
 
@@ -313,12 +314,14 @@ namespace MultiplayerARPG.GameData.Model.Playables
         public override void StopActionAnimation()
         {
             Behaviour.StopAction();
+            isDoingAction = false;
         }
         #endregion
 
         #region Weapon charge animations
         public override void PlayWeaponChargeClip(int dataId, bool isLeftHand)
         {
+            isDoingAction = true;
             WeaponAnimations weaponAnimations;
             if (TryGetWeaponAnimations(dataId, out weaponAnimations))
             {
@@ -342,6 +345,7 @@ namespace MultiplayerARPG.GameData.Model.Playables
         public override void StopWeaponChargeAnimation()
         {
             Behaviour.StopAction();
+            isDoingAction = false;
         }
         #endregion
 

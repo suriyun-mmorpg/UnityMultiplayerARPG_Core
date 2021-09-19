@@ -92,6 +92,7 @@ namespace MultiplayerARPG
         /// Coroutine for attack, use skill and other animations
         /// </summary>
         protected Coroutine actionCoroutine;
+        protected bool isDoingAction = false;
 
         protected override void Awake()
         {
