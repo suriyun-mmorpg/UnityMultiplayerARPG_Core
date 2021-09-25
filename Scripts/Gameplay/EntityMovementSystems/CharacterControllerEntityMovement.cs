@@ -22,6 +22,7 @@ namespace MultiplayerARPG
         public float gravity = 9.81f;
         public float maxFallVelocity = 40f;
         public float stickGroundForce = 9.6f;
+        public LayerMask platformLayerMask = 1;
         [Tooltip("Delay before character change from grounded state to airborne")]
         public float airborneDelay = 0.01f;
         public bool doNotChangeVelocityWhileAirborne;
@@ -646,11 +647,15 @@ namespace MultiplayerARPG
             if (CacheCharacterController.isGrounded)
             {
                 RaycastHit raycastHit;
-                if (Physics.SphereCast(transform.position + Vector3.up * 0.8f, 0.8f, Vector3.down, out raycastHit, 0.1f, -1, QueryTriggerInteraction.Ignore))
+                if (Physics.SphereCast(transform.position + Vector3.up * 0.8f, 0.8f, Vector3.down, out raycastHit, 0.1f, platformLayerMask, QueryTriggerInteraction.Ignore))
                 {
                     groundedTransform = raycastHit.collider.transform;
                     oldGroundedPosition = raycastHit.point;
                     groundedLocalPosition = groundedTransform.InverseTransformPoint(oldGroundedPosition);
+                }
+                else
+                {
+                    groundedTransform = null;
                 }
             }
         }
