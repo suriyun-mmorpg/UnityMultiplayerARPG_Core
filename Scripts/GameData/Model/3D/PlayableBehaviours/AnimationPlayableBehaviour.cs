@@ -85,6 +85,7 @@ namespace MultiplayerARPG.GameData.Model.Playables
         private PlayingJumpState playingJumpState = PlayingJumpState.None;
         private PlayingActionState playingActionState = PlayingActionState.None;
         private bool isPreviouslyGrounded = true;
+        private bool playingLandedState = false;
         private int baseInputPort = 0;
         private float baseTransitionDuration = 0f;
         private float baseClipLength = 0f;
@@ -238,18 +239,25 @@ namespace MultiplayerARPG.GameData.Model.Playables
             }
             else if (CharacterModel.movementState.HasFlag(MovementState.IsUnderWater) || CharacterModel.movementState.HasFlag(MovementState.IsGrounded))
             {
+                if (playingLandedState)
+                {
+                    // Don't change state because character is just landed, landed animation has to be played before change to move state
+                    return playingStateId;
+                }
                 if (CharacterModel.movementState.HasFlag(MovementState.IsGrounded) && !isPreviouslyGrounded)
                 {
                     isPreviouslyGrounded = true;
-                    // Get fall state by weapon type
+                    // Get landed state by weapon type
                     string stateId = stringBuilder.Clear().Append(currentWeaponTypeId).Append(CLIP_LANDED).ToString();
-                    // State not found, use fall state from default animations
+                    // State not found, use landed state from default animations
                     if (!baseStates.ContainsKey(stateId))
                         stateId = CLIP_LANDED;
-                    // State still not found, set state Id to idle
-                    if (!baseStates.ContainsKey(stateId))
-                        stateId = stringBuilder.Clear().Append(currentWeaponTypeId).Append(CLIP_IDLE).ToString();
-                    return stateId;
+                    // State found, use this state Id. If it not, use move state
+                    if (baseStates.ContainsKey(stateId))
+                    {
+                        playingLandedState = true;
+                        return stateId;
+                    }
                 }
                 // Get movement state
                 stringBuilder.Clear();
@@ -328,7 +336,7 @@ namespace MultiplayerARPG.GameData.Model.Playables
             }
             else if (playingJumpState == PlayingJumpState.Playing)
             {
-                // Don't change state because character is jumping, it will change to idle when jump animation played
+                // Don't change state because character is jumping, it will change to fall when jump animation played
                 return playingStateId;
             }
             else
@@ -421,6 +429,10 @@ namespace MultiplayerARPG.GameData.Model.Playables
             // It will change state to fall in next frame
             if (playingJumpState == PlayingJumpState.Playing && basePlayElapsed >= baseClipLength)
                 playingJumpState = PlayingJumpState.None;
+
+            // It will change state to movement in next frame
+            if (playingLandedState && basePlayElapsed >= baseClipLength)
+                playingLandedState = false;
             #endregion
 
             #region Update action state
