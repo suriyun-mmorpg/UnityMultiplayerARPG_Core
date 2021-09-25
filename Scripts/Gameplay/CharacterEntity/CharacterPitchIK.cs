@@ -1,6 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
 namespace MultiplayerARPG
 {
@@ -23,15 +21,18 @@ namespace MultiplayerARPG
         public float lerpDamping = 25f;
         [Range(0f, 180f)]
         public float maxAngle = 0f;
+        private CharacterPitchIKManager manager;
         private BaseCharacterEntity characterEntity;
         private float tempPitch;
         private Quaternion tempRotation;
-        private Quaternion pitchRotation;
+        public Quaternion PitchRotation { get; private set; }
 
         public bool Enabling
         {
             get
             {
+                if (!enabled)
+                    return false;
                 if (!characterEntity || characterEntity.IsDead())
                     return false;
                 if (characterEntity.MovementState == MovementState.IsUnderWater)
@@ -59,7 +60,7 @@ namespace MultiplayerARPG
             }
         }
 
-        private void Start()
+        private void Awake()
         {
             characterEntity = GetComponentInParent<BaseCharacterEntity>();
             if (characterEntity == null)
@@ -76,10 +77,23 @@ namespace MultiplayerARPG
             }
         }
 
-        private void Update()
+        private void Start()
+        {
+            manager = animator.gameObject.GetOrAddComponent<CharacterPitchIKManager>();
+            manager.Register(this);
+        }
+
+        private void OnDestroy()
+        {
+            if (manager != null)
+                manager.Unregister(this);
+        }
+
+        public void UpdatePitchRotation()
         {
             if (!Enabling)
                 return;
+            // Clamp pitch
             tempPitch = characterEntity.Pitch;
             if (maxAngle > 0f)
             {
@@ -92,6 +106,7 @@ namespace MultiplayerARPG
                     tempPitch = maxAngle;
                 }
             }
+            // Find pitch rotation
             tempRotation = Quaternion.identity;
             switch (axis)
             {
@@ -107,16 +122,20 @@ namespace MultiplayerARPG
             }
             tempRotation = tempRotation * Quaternion.Euler(rotateOffset);
             if (lerpDamping > 0f)
-                pitchRotation = Quaternion.Lerp(pitchRotation, tempRotation, lerpDamping * Time.deltaTime);
+            {
+                PitchRotation = Quaternion.Lerp(PitchRotation, tempRotation, lerpDamping * Time.deltaTime);
+            }
             else
-                pitchRotation = tempRotation;
+            {
+                PitchRotation = tempRotation;
+            }
         }
 
-        private void OnAnimatorIK(int layerIndex)
+        internal void UpdateOnAnimatorIK()
         {
             if (!Enabling)
                 return;
-            animator.SetBoneLocalRotation(pitchBone, pitchRotation);
+            animator.SetBoneLocalRotation(pitchBone, PitchRotation);
         }
     }
 }
