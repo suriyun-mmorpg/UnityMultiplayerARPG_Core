@@ -136,6 +136,12 @@ namespace MultiplayerARPG
             Id = ++GeneratingId;
         }
 
+        internal void UnassignId()
+        {
+            isIdAssigned = false;
+            id = 0;
+        }
+
         protected virtual void Awake()
         {
             CacheTransform = transform;
