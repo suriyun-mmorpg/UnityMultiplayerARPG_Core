@@ -28,9 +28,15 @@ namespace MultiplayerARPG
             int weaponTypeDataId = weaponItem.WeaponType.DataId;
             // Play animation
             if (Entity.CharacterModel && Entity.CharacterModel.gameObject.activeSelf)
+            {
                 Entity.CharacterModel.PlayWeaponChargeClip(weaponTypeDataId, isLeftHand);
+                Entity.CharacterModel.PlayEquippedWeaponCharge(isLeftHand);
+            }
             if (Entity.FpsModel && Entity.FpsModel.gameObject.activeSelf)
+            {
                 Entity.FpsModel.PlayWeaponChargeClip(weaponTypeDataId, isLeftHand);
+                Entity.FpsModel.PlayEquippedWeaponCharge(isLeftHand);
+            }
             // Set weapon charging state
             MoveSpeedRateWhileCharging = Entity.GetMoveSpeedRateWhileCharging(weaponItem);
             IsCharging = true;

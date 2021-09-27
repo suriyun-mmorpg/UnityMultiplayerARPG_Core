@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Events;
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
@@ -22,14 +23,15 @@ namespace MultiplayerARPG
             }
         }
 
-        [Tooltip("These game effects must placed as this children, it will active when launch (can place muzzle effects here)")]
+        [Tooltip("These game effects must placed as this children, it will be activated when launch (can place muzzle effects here)")]
         public GameEffect[] weaponLaunchEffects;
-        [Tooltip("These game effects must placed as this children, it will active when launch (can place muzzle sound effects here)")]
-        public AudioClip[] weaponLaunchSoundEffects;
         [Tooltip("These game effects prefabs will instantiates to container when launch (can place muzzle effects here)")]
         public GameEffectPoolContainer[] poolingWeaponLaunchEffects;
         [Tooltip("This is overriding missile damage transform, if this is not empty, it will spawn missile damage entity from this transform")]
         public Transform missileDamageTransform;
+        public UnityEvent onPlayLaunch = new UnityEvent();
+        public UnityEvent onPlayReload = new UnityEvent();
+        public UnityEvent onPlayCharge = new UnityEvent();
 
         public IEnumerable<IPoolDescriptor> PoolDescriptors
         {
@@ -58,7 +60,7 @@ namespace MultiplayerARPG
             }
         }
 
-        public void PlayWeaponLaunchEffect()
+        public virtual void PlayLaunch()
         {
             if (!gameObject.activeInHierarchy)
                 return;
@@ -68,6 +70,18 @@ namespace MultiplayerARPG
 
             if (poolingWeaponLaunchEffects != null && poolingWeaponLaunchEffects.Length > 0)
                 poolingWeaponLaunchEffects[Random.Range(0, poolingWeaponLaunchEffects.Length)].GetInstance();
+
+            onPlayLaunch.Invoke();
+        }
+
+        public virtual void PlayReload()
+        {
+            onPlayReload.Invoke();
+        }
+
+        public virtual void PlayCharge()
+        {
+            onPlayCharge.Invoke();
         }
 
 #if UNITY_EDITOR

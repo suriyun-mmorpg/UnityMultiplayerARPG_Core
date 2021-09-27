@@ -307,9 +307,9 @@ namespace MultiplayerARPG
                     {
                         // Play weapon launch special effects
                         if (Entity.CharacterModel && Entity.CharacterModel.gameObject.activeSelf)
-                            Entity.CharacterModel.PlayWeaponLaunchEffect(Entity.AnimActionType);
+                            Entity.CharacterModel.PlayEquippedWeaponLaunch(isLeftHand);
                         if (Entity.FpsModel && Entity.FpsModel.gameObject.activeSelf)
-                            Entity.FpsModel.PlayWeaponLaunchEffect(Entity.AnimActionType);
+                            Entity.FpsModel.PlayEquippedWeaponLaunch(isLeftHand);
                         // Play launch sfx
                         if (weaponItem != null &&
                             (Entity.AnimActionType == AnimActionType.AttackRightHand ||

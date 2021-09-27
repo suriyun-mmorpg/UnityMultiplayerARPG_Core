@@ -676,12 +676,28 @@ namespace MultiplayerARPG
             return null;
         }
 
-        public void PlayWeaponLaunchEffect(AnimActionType animActionType)
+        public void PlayEquippedWeaponLaunch(bool isLeftHand)
         {
-            if (animActionType == AnimActionType.AttackRightHand && rightHandEquipmentEntity != null)
-                rightHandEquipmentEntity.PlayWeaponLaunchEffect();
-            if (animActionType == AnimActionType.AttackLeftHand && leftHandEquipmentEntity != null)
-                leftHandEquipmentEntity.PlayWeaponLaunchEffect();
+            if (!isLeftHand && rightHandEquipmentEntity != null)
+                rightHandEquipmentEntity.PlayLaunch();
+            if (isLeftHand && leftHandEquipmentEntity != null)
+                leftHandEquipmentEntity.PlayLaunch();
+        }
+
+        public void PlayEquippedWeaponReload(bool isLeftHand)
+        {
+            if (!isLeftHand && rightHandEquipmentEntity != null)
+                rightHandEquipmentEntity.PlayReload();
+            if (isLeftHand && leftHandEquipmentEntity != null)
+                leftHandEquipmentEntity.PlayReload();
+        }
+
+        public void PlayEquippedWeaponCharge(bool isLeftHand)
+        {
+            if (!isLeftHand && rightHandEquipmentEntity != null)
+                rightHandEquipmentEntity.PlayCharge();
+            if (isLeftHand && leftHandEquipmentEntity != null)
+                leftHandEquipmentEntity.PlayCharge();
         }
 
         public virtual void AddingNewModel(GameObject newModel, EquipmentContainer equipmentContainer) { }

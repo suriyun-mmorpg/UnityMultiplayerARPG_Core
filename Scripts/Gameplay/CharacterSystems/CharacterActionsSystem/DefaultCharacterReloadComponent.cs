@@ -125,14 +125,20 @@ namespace MultiplayerARPG
             MoveSpeedRateWhileReloading = Entity.GetMoveSpeedRateWhileReloading(weaponItem);
             try
             {
+                // Play animation
+                if (Entity.CharacterModel && Entity.CharacterModel.gameObject.activeSelf)
+                    Entity.CharacterModel.PlayActionAnimation(Entity.AnimActionType, animActionDataId, 0);
+                if (Entity.FpsModel && Entity.FpsModel.gameObject.activeSelf)
+                    Entity.FpsModel.PlayActionAnimation(Entity.AnimActionType, animActionDataId, 0);
+
                 // Animations will plays on clients only
                 if (IsClient)
                 {
-                    // Play animation
+                    // Play weapon reload special effects
                     if (Entity.CharacterModel && Entity.CharacterModel.gameObject.activeSelf)
-                        Entity.CharacterModel.PlayActionAnimation(Entity.AnimActionType, animActionDataId, 0);
+                        Entity.CharacterModel.PlayEquippedWeaponReload(isLeftHand);
                     if (Entity.FpsModel && Entity.FpsModel.gameObject.activeSelf)
-                        Entity.FpsModel.PlayActionAnimation(Entity.AnimActionType, animActionDataId, 0);
+                        Entity.FpsModel.PlayEquippedWeaponReload(isLeftHand);
                     // Play reload sfx
                     if (Entity.AnimActionType == AnimActionType.ReloadRightHand ||
                         Entity.AnimActionType == AnimActionType.ReloadLeftHand)
