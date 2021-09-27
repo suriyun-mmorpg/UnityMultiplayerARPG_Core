@@ -92,7 +92,7 @@ namespace MultiplayerARPG
             playableAnimJob.DisposeArrays();
         }
 
-        private void OnAnimatorIK()
+        private void OnAnimatorIK(int layerIndex)
         {
             if (forPlayableCharacterModel)
                 return;
