@@ -192,10 +192,7 @@ namespace MultiplayerARPG
             // Update movement state
             MovementState = (CacheNavMeshAgent.velocity.sqrMagnitude > 0 ? MovementState.Forward : MovementState.None) | MovementState.IsGrounded;
             // Update extra movement state
-            bool isStandingExtraMovementState = tempExtraMovementState == ExtraMovementState.IsWalking || tempExtraMovementState == ExtraMovementState.IsSprinting;
-            tempExtraMovementState = !isStandingExtraMovementState || CacheNavMeshAgent.velocity.sqrMagnitude > 0 ? tempExtraMovementState : ExtraMovementState.None;
-            tempExtraMovementState = this.ValidateExtraMovementState(MovementState, tempExtraMovementState);
-            ExtraMovementState = tempExtraMovementState;
+            ExtraMovementState = this.ValidateExtraMovementState(MovementState, tempExtraMovementState);
             SyncTransform();
         }
 
