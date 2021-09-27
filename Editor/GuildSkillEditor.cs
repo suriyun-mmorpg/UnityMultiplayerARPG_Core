@@ -6,21 +6,19 @@ namespace MultiplayerARPG
     [CanEditMultipleObjects]
     public class GuildSkillEditor : BaseGameDataEditor
     {
-        private static GuildSkill cacheGuildSkill;
         protected override void SetFieldCondition()
         {
-            if (cacheGuildSkill == null)
-                cacheGuildSkill = CreateInstance<GuildSkill>();
+            GuildSkill guildSkill = CreateInstance<GuildSkill>();
             // Passive skill
-            ShowOnEnum(nameof(cacheGuildSkill.skillType), nameof(SkillType.Passive), nameof(cacheGuildSkill.increaseMaxMember));
-            ShowOnEnum(nameof(cacheGuildSkill.skillType), nameof(SkillType.Passive), nameof(cacheGuildSkill.increaseExpGainPercentage));
-            ShowOnEnum(nameof(cacheGuildSkill.skillType), nameof(SkillType.Passive), nameof(cacheGuildSkill.increaseGoldGainPercentage));
-            ShowOnEnum(nameof(cacheGuildSkill.skillType), nameof(SkillType.Passive), nameof(cacheGuildSkill.increaseShareExpGainPercentage));
-            ShowOnEnum(nameof(cacheGuildSkill.skillType), nameof(SkillType.Passive), nameof(cacheGuildSkill.increaseShareGoldGainPercentage));
-            ShowOnEnum(nameof(cacheGuildSkill.skillType), nameof(SkillType.Passive), nameof(cacheGuildSkill.decreaseExpLostPercentage));
+            ShowOnEnum(nameof(guildSkill.skillType), nameof(SkillType.Passive), nameof(guildSkill.increaseMaxMember));
+            ShowOnEnum(nameof(guildSkill.skillType), nameof(SkillType.Passive), nameof(guildSkill.increaseExpGainPercentage));
+            ShowOnEnum(nameof(guildSkill.skillType), nameof(SkillType.Passive), nameof(guildSkill.increaseGoldGainPercentage));
+            ShowOnEnum(nameof(guildSkill.skillType), nameof(SkillType.Passive), nameof(guildSkill.increaseShareExpGainPercentage));
+            ShowOnEnum(nameof(guildSkill.skillType), nameof(SkillType.Passive), nameof(guildSkill.increaseShareGoldGainPercentage));
+            ShowOnEnum(nameof(guildSkill.skillType), nameof(SkillType.Passive), nameof(guildSkill.decreaseExpLostPercentage));
             // Active skill
-            ShowOnEnum(nameof(cacheGuildSkill.skillType), nameof(SkillType.Active), nameof(cacheGuildSkill.coolDownDuration));
-            ShowOnEnum(nameof(cacheGuildSkill.skillType), nameof(SkillType.Active), nameof(cacheGuildSkill.buff));
+            ShowOnEnum(nameof(guildSkill.skillType), nameof(SkillType.Active), nameof(guildSkill.coolDownDuration));
+            ShowOnEnum(nameof(guildSkill.skillType), nameof(SkillType.Active), nameof(guildSkill.buff));
         }
     }
 }

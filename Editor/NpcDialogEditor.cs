@@ -1,6 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEditor;
+﻿using UnityEditor;
 
 namespace MultiplayerARPG
 {
@@ -8,11 +6,9 @@ namespace MultiplayerARPG
     [CanEditMultipleObjects]
     public class NpcDialogEditor : BaseCustomEditor
     {
-        private static NpcDialog cacheNpcDialog;
         protected override void SetFieldCondition()
         {
-            if (cacheNpcDialog == null)
-                cacheNpcDialog = CreateInstance<NpcDialog>();
+            NpcDialog npcDialog = target as NpcDialog;
 
             if ((target as NpcDialog).graph == null)
             {
@@ -23,40 +19,40 @@ namespace MultiplayerARPG
             hiddenFields.Add("input");
 
             // Normal
-            ShowOnEnum(nameof(cacheNpcDialog.type), nameof(NpcDialogType.Normal), nameof(cacheNpcDialog.menus));
+            ShowOnEnum(nameof(npcDialog.type), nameof(NpcDialogType.Normal), nameof(npcDialog.menus));
             // Quest
-            ShowOnEnum(nameof(cacheNpcDialog.type), nameof(NpcDialogType.Quest), nameof(cacheNpcDialog.quest));
-            ShowOnEnum(nameof(cacheNpcDialog.type), nameof(NpcDialogType.Quest), nameof(cacheNpcDialog.questAcceptedDialog));
-            ShowOnEnum(nameof(cacheNpcDialog.type), nameof(NpcDialogType.Quest), nameof(cacheNpcDialog.questDeclinedDialog));
-            ShowOnEnum(nameof(cacheNpcDialog.type), nameof(NpcDialogType.Quest), nameof(cacheNpcDialog.questAbandonedDialog));
-            ShowOnEnum(nameof(cacheNpcDialog.type), nameof(NpcDialogType.Quest), nameof(cacheNpcDialog.questCompletedDialog));
+            ShowOnEnum(nameof(npcDialog.type), nameof(NpcDialogType.Quest), nameof(npcDialog.quest));
+            ShowOnEnum(nameof(npcDialog.type), nameof(NpcDialogType.Quest), nameof(npcDialog.questAcceptedDialog));
+            ShowOnEnum(nameof(npcDialog.type), nameof(NpcDialogType.Quest), nameof(npcDialog.questDeclinedDialog));
+            ShowOnEnum(nameof(npcDialog.type), nameof(NpcDialogType.Quest), nameof(npcDialog.questAbandonedDialog));
+            ShowOnEnum(nameof(npcDialog.type), nameof(NpcDialogType.Quest), nameof(npcDialog.questCompletedDialog));
             // Shop
-            ShowOnEnum(nameof(cacheNpcDialog.type), nameof(NpcDialogType.Shop), nameof(cacheNpcDialog.sellItems));
+            ShowOnEnum(nameof(npcDialog.type), nameof(NpcDialogType.Shop), nameof(npcDialog.sellItems));
             // Craft Item
-            ShowOnEnum(nameof(cacheNpcDialog.type), nameof(NpcDialogType.CraftItem), nameof(cacheNpcDialog.itemCraft));
-            ShowOnEnum(nameof(cacheNpcDialog.type), nameof(NpcDialogType.CraftItem), nameof(cacheNpcDialog.craftDoneDialog));
-            ShowOnEnum(nameof(cacheNpcDialog.type), nameof(NpcDialogType.CraftItem), nameof(cacheNpcDialog.craftItemWillOverwhelmingDialog));
-            ShowOnEnum(nameof(cacheNpcDialog.type), nameof(NpcDialogType.CraftItem), nameof(cacheNpcDialog.craftNotMeetRequirementsDialog));
-            ShowOnEnum(nameof(cacheNpcDialog.type), nameof(NpcDialogType.CraftItem), nameof(cacheNpcDialog.craftCancelDialog));
+            ShowOnEnum(nameof(npcDialog.type), nameof(NpcDialogType.CraftItem), nameof(npcDialog.itemCraft));
+            ShowOnEnum(nameof(npcDialog.type), nameof(NpcDialogType.CraftItem), nameof(npcDialog.craftDoneDialog));
+            ShowOnEnum(nameof(npcDialog.type), nameof(NpcDialogType.CraftItem), nameof(npcDialog.craftItemWillOverwhelmingDialog));
+            ShowOnEnum(nameof(npcDialog.type), nameof(NpcDialogType.CraftItem), nameof(npcDialog.craftNotMeetRequirementsDialog));
+            ShowOnEnum(nameof(npcDialog.type), nameof(NpcDialogType.CraftItem), nameof(npcDialog.craftCancelDialog));
             // Save Spawn Point
-            ShowOnEnum(nameof(cacheNpcDialog.type), nameof(NpcDialogType.SaveRespawnPoint), nameof(cacheNpcDialog.saveRespawnMap));
-            ShowOnEnum(nameof(cacheNpcDialog.type), nameof(NpcDialogType.SaveRespawnPoint), nameof(cacheNpcDialog.saveRespawnPosition));
-            ShowOnEnum(nameof(cacheNpcDialog.type), nameof(NpcDialogType.SaveRespawnPoint), nameof(cacheNpcDialog.saveRespawnConfirmDialog));
-            ShowOnEnum(nameof(cacheNpcDialog.type), nameof(NpcDialogType.SaveRespawnPoint), nameof(cacheNpcDialog.saveRespawnCancelDialog));
+            ShowOnEnum(nameof(npcDialog.type), nameof(NpcDialogType.SaveRespawnPoint), nameof(npcDialog.saveRespawnMap));
+            ShowOnEnum(nameof(npcDialog.type), nameof(NpcDialogType.SaveRespawnPoint), nameof(npcDialog.saveRespawnPosition));
+            ShowOnEnum(nameof(npcDialog.type), nameof(NpcDialogType.SaveRespawnPoint), nameof(npcDialog.saveRespawnConfirmDialog));
+            ShowOnEnum(nameof(npcDialog.type), nameof(NpcDialogType.SaveRespawnPoint), nameof(npcDialog.saveRespawnCancelDialog));
             // Warp
-            ShowOnEnum(nameof(cacheNpcDialog.type), nameof(NpcDialogType.Warp), nameof(cacheNpcDialog.warpPortalType));
-            ShowOnEnum(nameof(cacheNpcDialog.type), nameof(NpcDialogType.Warp), nameof(cacheNpcDialog.warpMap));
-            ShowOnEnum(nameof(cacheNpcDialog.type), nameof(NpcDialogType.Warp), nameof(cacheNpcDialog.warpPosition));
-            ShowOnEnum(nameof(cacheNpcDialog.type), nameof(NpcDialogType.Warp), nameof(cacheNpcDialog.warpCancelDialog));
+            ShowOnEnum(nameof(npcDialog.type), nameof(NpcDialogType.Warp), nameof(npcDialog.warpPortalType));
+            ShowOnEnum(nameof(npcDialog.type), nameof(NpcDialogType.Warp), nameof(npcDialog.warpMap));
+            ShowOnEnum(nameof(npcDialog.type), nameof(NpcDialogType.Warp), nameof(npcDialog.warpPosition));
+            ShowOnEnum(nameof(npcDialog.type), nameof(NpcDialogType.Warp), nameof(npcDialog.warpCancelDialog));
             // Refine Item
-            ShowOnEnum(nameof(cacheNpcDialog.type), nameof(NpcDialogType.RefineItem), nameof(cacheNpcDialog.refineItemCancelDialog));
+            ShowOnEnum(nameof(npcDialog.type), nameof(NpcDialogType.RefineItem), nameof(npcDialog.refineItemCancelDialog));
             // Dismantle Item
-            ShowOnEnum(nameof(cacheNpcDialog.type), nameof(NpcDialogType.DismantleItem), nameof(cacheNpcDialog.dismantleItemCancelDialog));
+            ShowOnEnum(nameof(npcDialog.type), nameof(NpcDialogType.DismantleItem), nameof(npcDialog.dismantleItemCancelDialog));
             // Repair Item
-            ShowOnEnum(nameof(cacheNpcDialog.type), nameof(NpcDialogType.RepairItem), nameof(cacheNpcDialog.repairItemCancelDialog));
+            ShowOnEnum(nameof(npcDialog.type), nameof(NpcDialogType.RepairItem), nameof(npcDialog.repairItemCancelDialog));
             // Storage
-            ShowOnEnum(nameof(cacheNpcDialog.type), nameof(NpcDialogType.PlayerStorage), nameof(cacheNpcDialog.storageCancelDialog));
-            ShowOnEnum(nameof(cacheNpcDialog.type), nameof(NpcDialogType.GuildStorage), nameof(cacheNpcDialog.storageCancelDialog));
+            ShowOnEnum(nameof(npcDialog.type), nameof(NpcDialogType.PlayerStorage), nameof(npcDialog.storageCancelDialog));
+            ShowOnEnum(nameof(npcDialog.type), nameof(NpcDialogType.GuildStorage), nameof(npcDialog.storageCancelDialog));
         }
     }
 }

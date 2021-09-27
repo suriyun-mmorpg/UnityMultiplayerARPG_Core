@@ -6,30 +6,28 @@ namespace MultiplayerARPG
     [CanEditMultipleObjects]
     public class SimpleAreaAttackSkillEditor : BaseGameDataEditor
     {
-        private static SimpleAreaAttackSkill cacheSkill;
         protected override void SetFieldCondition()
         {
-            if (cacheSkill == null)
-                cacheSkill = CreateInstance<SimpleAreaAttackSkill>();
+            SimpleAreaAttackSkill skill = CreateInstance<SimpleAreaAttackSkill>();
             // Normal Attack skill
-            ShowOnEnum(nameof(cacheSkill.skillAttackType), nameof(SimpleAreaAttackSkill.SkillAttackType.Normal), nameof(cacheSkill.damageHitEffects));
-            ShowOnEnum(nameof(cacheSkill.skillAttackType), nameof(SimpleAreaAttackSkill.SkillAttackType.Normal), nameof(cacheSkill.damageAmount));
-            ShowOnEnum(nameof(cacheSkill.skillAttackType), nameof(SimpleAreaAttackSkill.SkillAttackType.Normal), nameof(cacheSkill.effectivenessAttributes));
-            ShowOnEnum(nameof(cacheSkill.skillAttackType), nameof(SimpleAreaAttackSkill.SkillAttackType.Normal), nameof(cacheSkill.weaponDamageInflictions));
-            ShowOnEnum(nameof(cacheSkill.skillAttackType), nameof(SimpleAreaAttackSkill.SkillAttackType.Normal), nameof(cacheSkill.additionalDamageAmounts));
-            ShowOnEnum(nameof(cacheSkill.skillAttackType), nameof(SimpleAreaAttackSkill.SkillAttackType.Normal), nameof(cacheSkill.increaseDamageAmountsWithBuffs));
-            ShowOnEnum(nameof(cacheSkill.skillAttackType), nameof(SimpleAreaAttackSkill.SkillAttackType.Normal), nameof(cacheSkill.isDebuff));
+            ShowOnEnum(nameof(skill.skillAttackType), nameof(SimpleAreaAttackSkill.SkillAttackType.Normal), nameof(skill.damageHitEffects));
+            ShowOnEnum(nameof(skill.skillAttackType), nameof(SimpleAreaAttackSkill.SkillAttackType.Normal), nameof(skill.damageAmount));
+            ShowOnEnum(nameof(skill.skillAttackType), nameof(SimpleAreaAttackSkill.SkillAttackType.Normal), nameof(skill.effectivenessAttributes));
+            ShowOnEnum(nameof(skill.skillAttackType), nameof(SimpleAreaAttackSkill.SkillAttackType.Normal), nameof(skill.weaponDamageInflictions));
+            ShowOnEnum(nameof(skill.skillAttackType), nameof(SimpleAreaAttackSkill.SkillAttackType.Normal), nameof(skill.additionalDamageAmounts));
+            ShowOnEnum(nameof(skill.skillAttackType), nameof(SimpleAreaAttackSkill.SkillAttackType.Normal), nameof(skill.increaseDamageAmountsWithBuffs));
+            ShowOnEnum(nameof(skill.skillAttackType), nameof(SimpleAreaAttackSkill.SkillAttackType.Normal), nameof(skill.isDebuff));
             // Based On Weapon Attack skill
-            ShowOnEnum(nameof(cacheSkill.skillAttackType), nameof(SimpleAreaAttackSkill.SkillAttackType.BasedOnWeapon), nameof(cacheSkill.damageHitEffects));
-            ShowOnEnum(nameof(cacheSkill.skillAttackType), nameof(SimpleAreaAttackSkill.SkillAttackType.BasedOnWeapon), nameof(cacheSkill.weaponDamageInflictions));
-            ShowOnEnum(nameof(cacheSkill.skillAttackType), nameof(SimpleAreaAttackSkill.SkillAttackType.BasedOnWeapon), nameof(cacheSkill.additionalDamageAmounts));
-            ShowOnEnum(nameof(cacheSkill.skillAttackType), nameof(SimpleAreaAttackSkill.SkillAttackType.BasedOnWeapon), nameof(cacheSkill.increaseDamageAmountsWithBuffs));
-            ShowOnEnum(nameof(cacheSkill.skillAttackType), nameof(SimpleAreaAttackSkill.SkillAttackType.BasedOnWeapon), nameof(cacheSkill.isDebuff));
+            ShowOnEnum(nameof(skill.skillAttackType), nameof(SimpleAreaAttackSkill.SkillAttackType.BasedOnWeapon), nameof(skill.damageHitEffects));
+            ShowOnEnum(nameof(skill.skillAttackType), nameof(SimpleAreaAttackSkill.SkillAttackType.BasedOnWeapon), nameof(skill.weaponDamageInflictions));
+            ShowOnEnum(nameof(skill.skillAttackType), nameof(SimpleAreaAttackSkill.SkillAttackType.BasedOnWeapon), nameof(skill.additionalDamageAmounts));
+            ShowOnEnum(nameof(skill.skillAttackType), nameof(SimpleAreaAttackSkill.SkillAttackType.BasedOnWeapon), nameof(skill.increaseDamageAmountsWithBuffs));
+            ShowOnEnum(nameof(skill.skillAttackType), nameof(SimpleAreaAttackSkill.SkillAttackType.BasedOnWeapon), nameof(skill.isDebuff));
             // Harvest
-            ShowOnEnum(nameof(cacheSkill.harvestType), nameof(HarvestType.BasedOnWeapon), nameof(cacheSkill.harvestDamageAmount));
-            ShowOnEnum(nameof(cacheSkill.harvestType), nameof(HarvestType.BasedOnSkill), nameof(cacheSkill.harvestDamageAmount));
+            ShowOnEnum(nameof(skill.harvestType), nameof(HarvestType.BasedOnWeapon), nameof(skill.harvestDamageAmount));
+            ShowOnEnum(nameof(skill.harvestType), nameof(HarvestType.BasedOnSkill), nameof(skill.harvestDamageAmount));
             // Debuff
-            ShowOnBool(nameof(cacheSkill.isDebuff), true, nameof(cacheSkill.debuff));
+            ShowOnBool(nameof(skill.isDebuff), true, nameof(skill.debuff));
         }
     }
 }

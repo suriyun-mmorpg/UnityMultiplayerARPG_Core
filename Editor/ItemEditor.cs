@@ -6,112 +6,109 @@ namespace MultiplayerARPG
     [CanEditMultipleObjects]
     public class ItemEditor : BaseGameDataEditor
     {
-        private static Item cacheItem;
         protected override void SetFieldCondition()
         {
-            if (cacheItem == null)
-                cacheItem = CreateInstance<Item>();
-
+            Item item = CreateInstance<Item>();
             // Armor
-            ShowOnEnum(nameof(cacheItem.itemType), nameof(Item.LegacyItemType.Armor), nameof(cacheItem.maxSocket));
-            ShowOnEnum(nameof(cacheItem.itemType), nameof(Item.LegacyItemType.Armor), nameof(cacheItem.equipmentModels));
-            ShowOnEnum(nameof(cacheItem.itemType), nameof(Item.LegacyItemType.Armor), nameof(cacheItem.requirement));
-            ShowOnEnum(nameof(cacheItem.itemType), nameof(Item.LegacyItemType.Armor), nameof(cacheItem.increaseStats));
-            ShowOnEnum(nameof(cacheItem.itemType), nameof(Item.LegacyItemType.Armor), nameof(cacheItem.increaseStatsRate));
-            ShowOnEnum(nameof(cacheItem.itemType), nameof(Item.LegacyItemType.Armor), nameof(cacheItem.increaseAttributes));
-            ShowOnEnum(nameof(cacheItem.itemType), nameof(Item.LegacyItemType.Armor), nameof(cacheItem.increaseAttributesRate));
-            ShowOnEnum(nameof(cacheItem.itemType), nameof(Item.LegacyItemType.Armor), nameof(cacheItem.increaseResistances));
-            ShowOnEnum(nameof(cacheItem.itemType), nameof(Item.LegacyItemType.Armor), nameof(cacheItem.increaseArmors));
-            ShowOnEnum(nameof(cacheItem.itemType), nameof(Item.LegacyItemType.Armor), nameof(cacheItem.increaseDamages));
-            ShowOnEnum(nameof(cacheItem.itemType), nameof(Item.LegacyItemType.Armor), nameof(cacheItem.increaseSkillLevels));
-            ShowOnEnum(nameof(cacheItem.itemType), nameof(Item.LegacyItemType.Armor), nameof(cacheItem.selfStatusEffectsWhenAttacking));
-            ShowOnEnum(nameof(cacheItem.itemType), nameof(Item.LegacyItemType.Armor), nameof(cacheItem.enemyStatusEffectsWhenAttacking));
-            ShowOnEnum(nameof(cacheItem.itemType), nameof(Item.LegacyItemType.Armor), nameof(cacheItem.selfStatusEffectsWhenAttacked));
-            ShowOnEnum(nameof(cacheItem.itemType), nameof(Item.LegacyItemType.Armor), nameof(cacheItem.enemyStatusEffectsWhenAttacked));
-            ShowOnEnum(nameof(cacheItem.itemType), nameof(Item.LegacyItemType.Armor), nameof(cacheItem.equipmentSet));
-            ShowOnEnum(nameof(cacheItem.itemType), nameof(Item.LegacyItemType.Armor), nameof(cacheItem.armorType));
-            ShowOnEnum(nameof(cacheItem.itemType), nameof(Item.LegacyItemType.Armor), nameof(cacheItem.armorAmount));
-            ShowOnEnum(nameof(cacheItem.itemType), nameof(Item.LegacyItemType.Armor), nameof(cacheItem.maxDurability));
-            ShowOnEnum(nameof(cacheItem.itemType), nameof(Item.LegacyItemType.Armor), nameof(cacheItem.destroyIfBroken));
+            ShowOnEnum(nameof(item.itemType), nameof(Item.LegacyItemType.Armor), nameof(item.maxSocket));
+            ShowOnEnum(nameof(item.itemType), nameof(Item.LegacyItemType.Armor), nameof(item.equipmentModels));
+            ShowOnEnum(nameof(item.itemType), nameof(Item.LegacyItemType.Armor), nameof(item.requirement));
+            ShowOnEnum(nameof(item.itemType), nameof(Item.LegacyItemType.Armor), nameof(item.increaseStats));
+            ShowOnEnum(nameof(item.itemType), nameof(Item.LegacyItemType.Armor), nameof(item.increaseStatsRate));
+            ShowOnEnum(nameof(item.itemType), nameof(Item.LegacyItemType.Armor), nameof(item.increaseAttributes));
+            ShowOnEnum(nameof(item.itemType), nameof(Item.LegacyItemType.Armor), nameof(item.increaseAttributesRate));
+            ShowOnEnum(nameof(item.itemType), nameof(Item.LegacyItemType.Armor), nameof(item.increaseResistances));
+            ShowOnEnum(nameof(item.itemType), nameof(Item.LegacyItemType.Armor), nameof(item.increaseArmors));
+            ShowOnEnum(nameof(item.itemType), nameof(Item.LegacyItemType.Armor), nameof(item.increaseDamages));
+            ShowOnEnum(nameof(item.itemType), nameof(Item.LegacyItemType.Armor), nameof(item.increaseSkillLevels));
+            ShowOnEnum(nameof(item.itemType), nameof(Item.LegacyItemType.Armor), nameof(item.selfStatusEffectsWhenAttacking));
+            ShowOnEnum(nameof(item.itemType), nameof(Item.LegacyItemType.Armor), nameof(item.enemyStatusEffectsWhenAttacking));
+            ShowOnEnum(nameof(item.itemType), nameof(Item.LegacyItemType.Armor), nameof(item.selfStatusEffectsWhenAttacked));
+            ShowOnEnum(nameof(item.itemType), nameof(Item.LegacyItemType.Armor), nameof(item.enemyStatusEffectsWhenAttacked));
+            ShowOnEnum(nameof(item.itemType), nameof(Item.LegacyItemType.Armor), nameof(item.equipmentSet));
+            ShowOnEnum(nameof(item.itemType), nameof(Item.LegacyItemType.Armor), nameof(item.armorType));
+            ShowOnEnum(nameof(item.itemType), nameof(Item.LegacyItemType.Armor), nameof(item.armorAmount));
+            ShowOnEnum(nameof(item.itemType), nameof(Item.LegacyItemType.Armor), nameof(item.maxDurability));
+            ShowOnEnum(nameof(item.itemType), nameof(Item.LegacyItemType.Armor), nameof(item.destroyIfBroken));
             // Weapon
-            ShowOnEnum(nameof(cacheItem.itemType), nameof(Item.LegacyItemType.Weapon), nameof(cacheItem.maxSocket));
-            ShowOnEnum(nameof(cacheItem.itemType), nameof(Item.LegacyItemType.Weapon), nameof(cacheItem.equipmentModels));
-            ShowOnEnum(nameof(cacheItem.itemType), nameof(Item.LegacyItemType.Weapon), nameof(cacheItem.subEquipmentModels));
-            ShowOnEnum(nameof(cacheItem.itemType), nameof(Item.LegacyItemType.Weapon), nameof(cacheItem.requirement));
-            ShowOnEnum(nameof(cacheItem.itemType), nameof(Item.LegacyItemType.Weapon), nameof(cacheItem.launchClip));
-            ShowOnEnum(nameof(cacheItem.itemType), nameof(Item.LegacyItemType.Weapon), nameof(cacheItem.reloadClip));
-            ShowOnEnum(nameof(cacheItem.itemType), nameof(Item.LegacyItemType.Weapon), nameof(cacheItem.emptyClip));
-            ShowOnEnum(nameof(cacheItem.itemType), nameof(Item.LegacyItemType.Weapon), nameof(cacheItem.increaseStats));
-            ShowOnEnum(nameof(cacheItem.itemType), nameof(Item.LegacyItemType.Weapon), nameof(cacheItem.increaseStatsRate));
-            ShowOnEnum(nameof(cacheItem.itemType), nameof(Item.LegacyItemType.Weapon), nameof(cacheItem.increaseAttributes));
-            ShowOnEnum(nameof(cacheItem.itemType), nameof(Item.LegacyItemType.Weapon), nameof(cacheItem.increaseAttributesRate));
-            ShowOnEnum(nameof(cacheItem.itemType), nameof(Item.LegacyItemType.Weapon), nameof(cacheItem.increaseResistances));
-            ShowOnEnum(nameof(cacheItem.itemType), nameof(Item.LegacyItemType.Weapon), nameof(cacheItem.increaseArmors));
-            ShowOnEnum(nameof(cacheItem.itemType), nameof(Item.LegacyItemType.Weapon), nameof(cacheItem.increaseDamages));
-            ShowOnEnum(nameof(cacheItem.itemType), nameof(Item.LegacyItemType.Weapon), nameof(cacheItem.increaseSkillLevels));
-            ShowOnEnum(nameof(cacheItem.itemType), nameof(Item.LegacyItemType.Weapon), nameof(cacheItem.selfStatusEffectsWhenAttacking));
-            ShowOnEnum(nameof(cacheItem.itemType), nameof(Item.LegacyItemType.Weapon), nameof(cacheItem.enemyStatusEffectsWhenAttacking));
-            ShowOnEnum(nameof(cacheItem.itemType), nameof(Item.LegacyItemType.Weapon), nameof(cacheItem.selfStatusEffectsWhenAttacked));
-            ShowOnEnum(nameof(cacheItem.itemType), nameof(Item.LegacyItemType.Weapon), nameof(cacheItem.enemyStatusEffectsWhenAttacked));
-            ShowOnEnum(nameof(cacheItem.itemType), nameof(Item.LegacyItemType.Weapon), nameof(cacheItem.equipmentSet));
-            ShowOnEnum(nameof(cacheItem.itemType), nameof(Item.LegacyItemType.Weapon), nameof(cacheItem.weaponType));
-            ShowOnEnum(nameof(cacheItem.itemType), nameof(Item.LegacyItemType.Weapon), nameof(cacheItem.damageAmount));
-            ShowOnEnum(nameof(cacheItem.itemType), nameof(Item.LegacyItemType.Weapon), nameof(cacheItem.harvestDamageAmount));
-            ShowOnEnum(nameof(cacheItem.itemType), nameof(Item.LegacyItemType.Weapon), nameof(cacheItem.moveSpeedRateWhileAttacking));
-            ShowOnEnum(nameof(cacheItem.itemType), nameof(Item.LegacyItemType.Weapon), nameof(cacheItem.moveSpeedRateWhileCharging));
-            ShowOnEnum(nameof(cacheItem.itemType), nameof(Item.LegacyItemType.Weapon), nameof(cacheItem.moveSpeedRateWhileReloading));
-            ShowOnEnum(nameof(cacheItem.itemType), nameof(Item.LegacyItemType.Weapon), nameof(cacheItem.ammoCapacity));
-            ShowOnEnum(nameof(cacheItem.itemType), nameof(Item.LegacyItemType.Weapon), nameof(cacheItem.weaponAbility));
-            ShowOnEnum(nameof(cacheItem.itemType), nameof(Item.LegacyItemType.Weapon), nameof(cacheItem.crosshairSetting));
-            ShowOnEnum(nameof(cacheItem.itemType), nameof(Item.LegacyItemType.Weapon), nameof(cacheItem.fireType));
-            ShowOnEnum(nameof(cacheItem.itemType), nameof(Item.LegacyItemType.Weapon), nameof(cacheItem.fireStagger));
-            ShowOnEnum(nameof(cacheItem.itemType), nameof(Item.LegacyItemType.Weapon), nameof(cacheItem.fireSpread));
-            ShowOnEnum(nameof(cacheItem.itemType), nameof(Item.LegacyItemType.Weapon), nameof(cacheItem.destroyImmediatelyAfterFired));
-            ShowOnEnum(nameof(cacheItem.itemType), nameof(Item.LegacyItemType.Weapon), nameof(cacheItem.maxDurability));
-            ShowOnEnum(nameof(cacheItem.itemType), nameof(Item.LegacyItemType.Weapon), nameof(cacheItem.destroyIfBroken));
+            ShowOnEnum(nameof(item.itemType), nameof(Item.LegacyItemType.Weapon), nameof(item.maxSocket));
+            ShowOnEnum(nameof(item.itemType), nameof(Item.LegacyItemType.Weapon), nameof(item.equipmentModels));
+            ShowOnEnum(nameof(item.itemType), nameof(Item.LegacyItemType.Weapon), nameof(item.subEquipmentModels));
+            ShowOnEnum(nameof(item.itemType), nameof(Item.LegacyItemType.Weapon), nameof(item.requirement));
+            ShowOnEnum(nameof(item.itemType), nameof(Item.LegacyItemType.Weapon), nameof(item.launchClip));
+            ShowOnEnum(nameof(item.itemType), nameof(Item.LegacyItemType.Weapon), nameof(item.reloadClip));
+            ShowOnEnum(nameof(item.itemType), nameof(Item.LegacyItemType.Weapon), nameof(item.emptyClip));
+            ShowOnEnum(nameof(item.itemType), nameof(Item.LegacyItemType.Weapon), nameof(item.increaseStats));
+            ShowOnEnum(nameof(item.itemType), nameof(Item.LegacyItemType.Weapon), nameof(item.increaseStatsRate));
+            ShowOnEnum(nameof(item.itemType), nameof(Item.LegacyItemType.Weapon), nameof(item.increaseAttributes));
+            ShowOnEnum(nameof(item.itemType), nameof(Item.LegacyItemType.Weapon), nameof(item.increaseAttributesRate));
+            ShowOnEnum(nameof(item.itemType), nameof(Item.LegacyItemType.Weapon), nameof(item.increaseResistances));
+            ShowOnEnum(nameof(item.itemType), nameof(Item.LegacyItemType.Weapon), nameof(item.increaseArmors));
+            ShowOnEnum(nameof(item.itemType), nameof(Item.LegacyItemType.Weapon), nameof(item.increaseDamages));
+            ShowOnEnum(nameof(item.itemType), nameof(Item.LegacyItemType.Weapon), nameof(item.increaseSkillLevels));
+            ShowOnEnum(nameof(item.itemType), nameof(Item.LegacyItemType.Weapon), nameof(item.selfStatusEffectsWhenAttacking));
+            ShowOnEnum(nameof(item.itemType), nameof(Item.LegacyItemType.Weapon), nameof(item.enemyStatusEffectsWhenAttacking));
+            ShowOnEnum(nameof(item.itemType), nameof(Item.LegacyItemType.Weapon), nameof(item.selfStatusEffectsWhenAttacked));
+            ShowOnEnum(nameof(item.itemType), nameof(Item.LegacyItemType.Weapon), nameof(item.enemyStatusEffectsWhenAttacked));
+            ShowOnEnum(nameof(item.itemType), nameof(Item.LegacyItemType.Weapon), nameof(item.equipmentSet));
+            ShowOnEnum(nameof(item.itemType), nameof(Item.LegacyItemType.Weapon), nameof(item.weaponType));
+            ShowOnEnum(nameof(item.itemType), nameof(Item.LegacyItemType.Weapon), nameof(item.damageAmount));
+            ShowOnEnum(nameof(item.itemType), nameof(Item.LegacyItemType.Weapon), nameof(item.harvestDamageAmount));
+            ShowOnEnum(nameof(item.itemType), nameof(Item.LegacyItemType.Weapon), nameof(item.moveSpeedRateWhileAttacking));
+            ShowOnEnum(nameof(item.itemType), nameof(Item.LegacyItemType.Weapon), nameof(item.moveSpeedRateWhileCharging));
+            ShowOnEnum(nameof(item.itemType), nameof(Item.LegacyItemType.Weapon), nameof(item.moveSpeedRateWhileReloading));
+            ShowOnEnum(nameof(item.itemType), nameof(Item.LegacyItemType.Weapon), nameof(item.ammoCapacity));
+            ShowOnEnum(nameof(item.itemType), nameof(Item.LegacyItemType.Weapon), nameof(item.weaponAbility));
+            ShowOnEnum(nameof(item.itemType), nameof(Item.LegacyItemType.Weapon), nameof(item.crosshairSetting));
+            ShowOnEnum(nameof(item.itemType), nameof(Item.LegacyItemType.Weapon), nameof(item.fireType));
+            ShowOnEnum(nameof(item.itemType), nameof(Item.LegacyItemType.Weapon), nameof(item.fireStagger));
+            ShowOnEnum(nameof(item.itemType), nameof(Item.LegacyItemType.Weapon), nameof(item.fireSpread));
+            ShowOnEnum(nameof(item.itemType), nameof(Item.LegacyItemType.Weapon), nameof(item.destroyImmediatelyAfterFired));
+            ShowOnEnum(nameof(item.itemType), nameof(Item.LegacyItemType.Weapon), nameof(item.maxDurability));
+            ShowOnEnum(nameof(item.itemType), nameof(Item.LegacyItemType.Weapon), nameof(item.destroyIfBroken));
             // Shield
-            ShowOnEnum(nameof(cacheItem.itemType), nameof(Item.LegacyItemType.Shield), nameof(cacheItem.maxSocket));
-            ShowOnEnum(nameof(cacheItem.itemType), nameof(Item.LegacyItemType.Shield), nameof(cacheItem.equipmentModels));
-            ShowOnEnum(nameof(cacheItem.itemType), nameof(Item.LegacyItemType.Shield), nameof(cacheItem.requirement));
-            ShowOnEnum(nameof(cacheItem.itemType), nameof(Item.LegacyItemType.Shield), nameof(cacheItem.increaseStats));
-            ShowOnEnum(nameof(cacheItem.itemType), nameof(Item.LegacyItemType.Shield), nameof(cacheItem.increaseStatsRate));
-            ShowOnEnum(nameof(cacheItem.itemType), nameof(Item.LegacyItemType.Shield), nameof(cacheItem.increaseAttributes));
-            ShowOnEnum(nameof(cacheItem.itemType), nameof(Item.LegacyItemType.Shield), nameof(cacheItem.increaseAttributesRate));
-            ShowOnEnum(nameof(cacheItem.itemType), nameof(Item.LegacyItemType.Shield), nameof(cacheItem.increaseResistances));
-            ShowOnEnum(nameof(cacheItem.itemType), nameof(Item.LegacyItemType.Shield), nameof(cacheItem.increaseArmors));
-            ShowOnEnum(nameof(cacheItem.itemType), nameof(Item.LegacyItemType.Shield), nameof(cacheItem.increaseDamages));
-            ShowOnEnum(nameof(cacheItem.itemType), nameof(Item.LegacyItemType.Shield), nameof(cacheItem.increaseSkillLevels));
-            ShowOnEnum(nameof(cacheItem.itemType), nameof(Item.LegacyItemType.Shield), nameof(cacheItem.selfStatusEffectsWhenAttacking));
-            ShowOnEnum(nameof(cacheItem.itemType), nameof(Item.LegacyItemType.Shield), nameof(cacheItem.enemyStatusEffectsWhenAttacking));
-            ShowOnEnum(nameof(cacheItem.itemType), nameof(Item.LegacyItemType.Shield), nameof(cacheItem.selfStatusEffectsWhenAttacked));
-            ShowOnEnum(nameof(cacheItem.itemType), nameof(Item.LegacyItemType.Shield), nameof(cacheItem.enemyStatusEffectsWhenAttacked));
-            ShowOnEnum(nameof(cacheItem.itemType), nameof(Item.LegacyItemType.Shield), nameof(cacheItem.equipmentSet));
-            ShowOnEnum(nameof(cacheItem.itemType), nameof(Item.LegacyItemType.Shield), nameof(cacheItem.armorAmount));
-            ShowOnEnum(nameof(cacheItem.itemType), nameof(Item.LegacyItemType.Shield), nameof(cacheItem.maxDurability));
-            ShowOnEnum(nameof(cacheItem.itemType), nameof(Item.LegacyItemType.Shield), nameof(cacheItem.destroyIfBroken));
+            ShowOnEnum(nameof(item.itemType), nameof(Item.LegacyItemType.Shield), nameof(item.maxSocket));
+            ShowOnEnum(nameof(item.itemType), nameof(Item.LegacyItemType.Shield), nameof(item.equipmentModels));
+            ShowOnEnum(nameof(item.itemType), nameof(Item.LegacyItemType.Shield), nameof(item.requirement));
+            ShowOnEnum(nameof(item.itemType), nameof(Item.LegacyItemType.Shield), nameof(item.increaseStats));
+            ShowOnEnum(nameof(item.itemType), nameof(Item.LegacyItemType.Shield), nameof(item.increaseStatsRate));
+            ShowOnEnum(nameof(item.itemType), nameof(Item.LegacyItemType.Shield), nameof(item.increaseAttributes));
+            ShowOnEnum(nameof(item.itemType), nameof(Item.LegacyItemType.Shield), nameof(item.increaseAttributesRate));
+            ShowOnEnum(nameof(item.itemType), nameof(Item.LegacyItemType.Shield), nameof(item.increaseResistances));
+            ShowOnEnum(nameof(item.itemType), nameof(Item.LegacyItemType.Shield), nameof(item.increaseArmors));
+            ShowOnEnum(nameof(item.itemType), nameof(Item.LegacyItemType.Shield), nameof(item.increaseDamages));
+            ShowOnEnum(nameof(item.itemType), nameof(Item.LegacyItemType.Shield), nameof(item.increaseSkillLevels));
+            ShowOnEnum(nameof(item.itemType), nameof(Item.LegacyItemType.Shield), nameof(item.selfStatusEffectsWhenAttacking));
+            ShowOnEnum(nameof(item.itemType), nameof(Item.LegacyItemType.Shield), nameof(item.enemyStatusEffectsWhenAttacking));
+            ShowOnEnum(nameof(item.itemType), nameof(Item.LegacyItemType.Shield), nameof(item.selfStatusEffectsWhenAttacked));
+            ShowOnEnum(nameof(item.itemType), nameof(Item.LegacyItemType.Shield), nameof(item.enemyStatusEffectsWhenAttacked));
+            ShowOnEnum(nameof(item.itemType), nameof(Item.LegacyItemType.Shield), nameof(item.equipmentSet));
+            ShowOnEnum(nameof(item.itemType), nameof(Item.LegacyItemType.Shield), nameof(item.armorAmount));
+            ShowOnEnum(nameof(item.itemType), nameof(Item.LegacyItemType.Shield), nameof(item.maxDurability));
+            ShowOnEnum(nameof(item.itemType), nameof(Item.LegacyItemType.Shield), nameof(item.destroyIfBroken));
             // Potion
-            ShowOnEnum(nameof(cacheItem.itemType), nameof(Item.LegacyItemType.Potion), nameof(cacheItem.buff));
+            ShowOnEnum(nameof(item.itemType), nameof(Item.LegacyItemType.Potion), nameof(item.buff));
             // Ammo
-            ShowOnEnum(nameof(cacheItem.itemType), nameof(Item.LegacyItemType.Ammo), nameof(cacheItem.increaseDamages));
-            ShowOnEnum(nameof(cacheItem.itemType), nameof(Item.LegacyItemType.Ammo), nameof(cacheItem.ammoType));
+            ShowOnEnum(nameof(item.itemType), nameof(Item.LegacyItemType.Ammo), nameof(item.increaseDamages));
+            ShowOnEnum(nameof(item.itemType), nameof(Item.LegacyItemType.Ammo), nameof(item.ammoType));
             // Building
-            ShowOnEnum(nameof(cacheItem.itemType), nameof(Item.LegacyItemType.Building), nameof(cacheItem.buildingEntity));
+            ShowOnEnum(nameof(item.itemType), nameof(Item.LegacyItemType.Building), nameof(item.buildingEntity));
             // Pet
-            ShowOnEnum(nameof(cacheItem.itemType), nameof(Item.LegacyItemType.Pet), nameof(cacheItem.petEntity));
+            ShowOnEnum(nameof(item.itemType), nameof(Item.LegacyItemType.Pet), nameof(item.petEntity));
             // Socket Enhancer
-            ShowOnEnum(nameof(cacheItem.itemType), nameof(Item.LegacyItemType.SocketEnhancer), nameof(cacheItem.socketEnhanceEffect));
-            ShowOnEnum(nameof(cacheItem.itemType), nameof(Item.LegacyItemType.SocketEnhancer), nameof(cacheItem.selfStatusEffectsWhenAttacking));
-            ShowOnEnum(nameof(cacheItem.itemType), nameof(Item.LegacyItemType.SocketEnhancer), nameof(cacheItem.enemyStatusEffectsWhenAttacking));
-            ShowOnEnum(nameof(cacheItem.itemType), nameof(Item.LegacyItemType.SocketEnhancer), nameof(cacheItem.selfStatusEffectsWhenAttacked));
-            ShowOnEnum(nameof(cacheItem.itemType), nameof(Item.LegacyItemType.SocketEnhancer), nameof(cacheItem.enemyStatusEffectsWhenAttacked));
+            ShowOnEnum(nameof(item.itemType), nameof(Item.LegacyItemType.SocketEnhancer), nameof(item.socketEnhanceEffect));
+            ShowOnEnum(nameof(item.itemType), nameof(Item.LegacyItemType.SocketEnhancer), nameof(item.selfStatusEffectsWhenAttacking));
+            ShowOnEnum(nameof(item.itemType), nameof(Item.LegacyItemType.SocketEnhancer), nameof(item.enemyStatusEffectsWhenAttacking));
+            ShowOnEnum(nameof(item.itemType), nameof(Item.LegacyItemType.SocketEnhancer), nameof(item.selfStatusEffectsWhenAttacked));
+            ShowOnEnum(nameof(item.itemType), nameof(Item.LegacyItemType.SocketEnhancer), nameof(item.enemyStatusEffectsWhenAttacked));
             // Mount
-            ShowOnEnum(nameof(cacheItem.itemType), nameof(Item.LegacyItemType.Mount), nameof(cacheItem.mountEntity));
+            ShowOnEnum(nameof(item.itemType), nameof(Item.LegacyItemType.Mount), nameof(item.mountEntity));
             // Attribute Increase
-            ShowOnEnum(nameof(cacheItem.itemType), nameof(Item.LegacyItemType.AttributeIncrease), nameof(cacheItem.attributeAmount));
+            ShowOnEnum(nameof(item.itemType), nameof(Item.LegacyItemType.AttributeIncrease), nameof(item.attributeAmount));
             // Skill Use
-            ShowOnEnum(nameof(cacheItem.itemType), nameof(Item.LegacyItemType.Skill), nameof(cacheItem.skillLevel));
+            ShowOnEnum(nameof(item.itemType), nameof(Item.LegacyItemType.Skill), nameof(item.skillLevel));
             // Skill Learn
-            ShowOnEnum(nameof(cacheItem.itemType), nameof(Item.LegacyItemType.SkillLearn), nameof(cacheItem.skillLevel));
+            ShowOnEnum(nameof(item.itemType), nameof(Item.LegacyItemType.SkillLearn), nameof(item.skillLevel));
         }
     }
 }

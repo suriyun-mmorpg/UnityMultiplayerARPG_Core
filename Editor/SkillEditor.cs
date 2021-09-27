@@ -6,85 +6,83 @@ namespace MultiplayerARPG
     [CanEditMultipleObjects]
     public class SkillEditor : BaseGameDataEditor
     {
-        private static Skill cacheSkill;
         protected override void SetFieldCondition()
         {
-            if (cacheSkill == null)
-                cacheSkill = CreateInstance<Skill>();
+            Skill skill = target as Skill;
             // Skill type
-            ShowOnEnum(nameof(cacheSkill.skillType), nameof(SkillType.Active), nameof(cacheSkill.availableWeapons));
-            ShowOnEnum(nameof(cacheSkill.skillType), nameof(SkillType.Active), nameof(cacheSkill.consumeHp));
-            ShowOnEnum(nameof(cacheSkill.skillType), nameof(SkillType.Active), nameof(cacheSkill.consumeMp));
-            ShowOnEnum(nameof(cacheSkill.skillType), nameof(SkillType.Active), nameof(cacheSkill.consumeStamina));
-            ShowOnEnum(nameof(cacheSkill.skillType), nameof(SkillType.Active), nameof(cacheSkill.coolDownDuration));
-            ShowOnEnum(nameof(cacheSkill.skillType), nameof(SkillType.Active), nameof(cacheSkill.skillAttackType));
-            ShowOnEnum(nameof(cacheSkill.skillType), nameof(SkillType.Active), nameof(cacheSkill.skillBuffType));
-            ShowOnEnum(nameof(cacheSkill.skillType), nameof(SkillType.Active), nameof(cacheSkill.moveSpeedRateWhileUsingSkill));
-            ShowOnEnum(nameof(cacheSkill.skillType), nameof(SkillType.Active), nameof(cacheSkill.skillCastEffects));
-            ShowOnEnum(nameof(cacheSkill.skillType), nameof(SkillType.Active), nameof(cacheSkill.castDuration));
-            ShowOnEnum(nameof(cacheSkill.skillType), nameof(SkillType.Active), nameof(cacheSkill.canBeInterruptedWhileCasting));
-            ShowOnEnum(nameof(cacheSkill.skillType), nameof(SkillType.Active), nameof(cacheSkill.requireShield));
-            ShowOnEnum(nameof(cacheSkill.skillType), nameof(SkillType.Active), nameof(cacheSkill.availableWeapons));
-            ShowOnEnum(nameof(cacheSkill.skillType), nameof(SkillType.Active), nameof(cacheSkill.availableArmors));
-            ShowOnEnum(nameof(cacheSkill.skillType), nameof(SkillType.Active), nameof(cacheSkill.availableVehicles));
-            ShowOnEnum(nameof(cacheSkill.skillType), nameof(SkillType.Active), nameof(cacheSkill.requireItems));
-            ShowOnEnum(nameof(cacheSkill.skillType), nameof(SkillType.Active), nameof(cacheSkill.requireAmmoType));
-            ShowOnEnum(nameof(cacheSkill.skillType), nameof(SkillType.Active), nameof(cacheSkill.requireAmmoAmount));
-            ShowOnEnum(nameof(cacheSkill.skillType), nameof(SkillType.Active), nameof(cacheSkill.requireAmmos));
-            ShowOnEnum(nameof(cacheSkill.skillType), nameof(SkillType.CraftItem), nameof(cacheSkill.consumeHp));
-            ShowOnEnum(nameof(cacheSkill.skillType), nameof(SkillType.CraftItem), nameof(cacheSkill.consumeMp));
-            ShowOnEnum(nameof(cacheSkill.skillType), nameof(SkillType.CraftItem), nameof(cacheSkill.consumeStamina));
-            ShowOnEnum(nameof(cacheSkill.skillType), nameof(SkillType.CraftItem), nameof(cacheSkill.coolDownDuration));
-            ShowOnEnum(nameof(cacheSkill.skillType), nameof(SkillType.CraftItem), nameof(cacheSkill.moveSpeedRateWhileUsingSkill));
-            ShowOnEnum(nameof(cacheSkill.skillType), nameof(SkillType.CraftItem), nameof(cacheSkill.skillCastEffects));
-            ShowOnEnum(nameof(cacheSkill.skillType), nameof(SkillType.CraftItem), nameof(cacheSkill.castDuration));
-            ShowOnEnum(nameof(cacheSkill.skillType), nameof(SkillType.CraftItem), nameof(cacheSkill.canBeInterruptedWhileCasting));
-            ShowOnEnum(nameof(cacheSkill.skillType), nameof(SkillType.CraftItem), nameof(cacheSkill.requireShield));
-            ShowOnEnum(nameof(cacheSkill.skillType), nameof(SkillType.CraftItem), nameof(cacheSkill.availableWeapons));
-            ShowOnEnum(nameof(cacheSkill.skillType), nameof(SkillType.CraftItem), nameof(cacheSkill.availableArmors));
-            ShowOnEnum(nameof(cacheSkill.skillType), nameof(SkillType.CraftItem), nameof(cacheSkill.availableVehicles));
-            ShowOnEnum(nameof(cacheSkill.skillType), nameof(SkillType.CraftItem), nameof(cacheSkill.requireItems));
-            ShowOnEnum(nameof(cacheSkill.skillType), nameof(SkillType.CraftItem), nameof(cacheSkill.requireAmmoType));
-            ShowOnEnum(nameof(cacheSkill.skillType), nameof(SkillType.CraftItem), nameof(cacheSkill.requireAmmoAmount));
-            ShowOnEnum(nameof(cacheSkill.skillType), nameof(SkillType.CraftItem), nameof(cacheSkill.requireAmmos));
+            ShowOnEnum(nameof(skill.skillType), nameof(SkillType.Active), nameof(skill.availableWeapons));
+            ShowOnEnum(nameof(skill.skillType), nameof(SkillType.Active), nameof(skill.consumeHp));
+            ShowOnEnum(nameof(skill.skillType), nameof(SkillType.Active), nameof(skill.consumeMp));
+            ShowOnEnum(nameof(skill.skillType), nameof(SkillType.Active), nameof(skill.consumeStamina));
+            ShowOnEnum(nameof(skill.skillType), nameof(SkillType.Active), nameof(skill.coolDownDuration));
+            ShowOnEnum(nameof(skill.skillType), nameof(SkillType.Active), nameof(skill.skillAttackType));
+            ShowOnEnum(nameof(skill.skillType), nameof(SkillType.Active), nameof(skill.skillBuffType));
+            ShowOnEnum(nameof(skill.skillType), nameof(SkillType.Active), nameof(skill.moveSpeedRateWhileUsingSkill));
+            ShowOnEnum(nameof(skill.skillType), nameof(SkillType.Active), nameof(skill.skillCastEffects));
+            ShowOnEnum(nameof(skill.skillType), nameof(SkillType.Active), nameof(skill.castDuration));
+            ShowOnEnum(nameof(skill.skillType), nameof(SkillType.Active), nameof(skill.canBeInterruptedWhileCasting));
+            ShowOnEnum(nameof(skill.skillType), nameof(SkillType.Active), nameof(skill.requireShield));
+            ShowOnEnum(nameof(skill.skillType), nameof(SkillType.Active), nameof(skill.availableWeapons));
+            ShowOnEnum(nameof(skill.skillType), nameof(SkillType.Active), nameof(skill.availableArmors));
+            ShowOnEnum(nameof(skill.skillType), nameof(SkillType.Active), nameof(skill.availableVehicles));
+            ShowOnEnum(nameof(skill.skillType), nameof(SkillType.Active), nameof(skill.requireItems));
+            ShowOnEnum(nameof(skill.skillType), nameof(SkillType.Active), nameof(skill.requireAmmoType));
+            ShowOnEnum(nameof(skill.skillType), nameof(SkillType.Active), nameof(skill.requireAmmoAmount));
+            ShowOnEnum(nameof(skill.skillType), nameof(SkillType.Active), nameof(skill.requireAmmos));
+            ShowOnEnum(nameof(skill.skillType), nameof(SkillType.CraftItem), nameof(skill.consumeHp));
+            ShowOnEnum(nameof(skill.skillType), nameof(SkillType.CraftItem), nameof(skill.consumeMp));
+            ShowOnEnum(nameof(skill.skillType), nameof(SkillType.CraftItem), nameof(skill.consumeStamina));
+            ShowOnEnum(nameof(skill.skillType), nameof(SkillType.CraftItem), nameof(skill.coolDownDuration));
+            ShowOnEnum(nameof(skill.skillType), nameof(SkillType.CraftItem), nameof(skill.moveSpeedRateWhileUsingSkill));
+            ShowOnEnum(nameof(skill.skillType), nameof(SkillType.CraftItem), nameof(skill.skillCastEffects));
+            ShowOnEnum(nameof(skill.skillType), nameof(SkillType.CraftItem), nameof(skill.castDuration));
+            ShowOnEnum(nameof(skill.skillType), nameof(SkillType.CraftItem), nameof(skill.canBeInterruptedWhileCasting));
+            ShowOnEnum(nameof(skill.skillType), nameof(SkillType.CraftItem), nameof(skill.requireShield));
+            ShowOnEnum(nameof(skill.skillType), nameof(SkillType.CraftItem), nameof(skill.availableWeapons));
+            ShowOnEnum(nameof(skill.skillType), nameof(SkillType.CraftItem), nameof(skill.availableArmors));
+            ShowOnEnum(nameof(skill.skillType), nameof(SkillType.CraftItem), nameof(skill.availableVehicles));
+            ShowOnEnum(nameof(skill.skillType), nameof(SkillType.CraftItem), nameof(skill.requireItems));
+            ShowOnEnum(nameof(skill.skillType), nameof(SkillType.CraftItem), nameof(skill.requireAmmoType));
+            ShowOnEnum(nameof(skill.skillType), nameof(SkillType.CraftItem), nameof(skill.requireAmmoAmount));
+            ShowOnEnum(nameof(skill.skillType), nameof(SkillType.CraftItem), nameof(skill.requireAmmos));
             // Normal Attack skill
-            ShowOnEnum(nameof(cacheSkill.skillAttackType), nameof(Skill.SkillAttackType.Normal), nameof(cacheSkill.damageHitEffects));
-            ShowOnEnum(nameof(cacheSkill.skillAttackType), nameof(Skill.SkillAttackType.Normal), nameof(cacheSkill.damageInfo));
-            ShowOnEnum(nameof(cacheSkill.skillAttackType), nameof(Skill.SkillAttackType.Normal), nameof(cacheSkill.damageAmount));
-            ShowOnEnum(nameof(cacheSkill.skillAttackType), nameof(Skill.SkillAttackType.Normal), nameof(cacheSkill.effectivenessAttributes));
-            ShowOnEnum(nameof(cacheSkill.skillAttackType), nameof(Skill.SkillAttackType.Normal), nameof(cacheSkill.weaponDamageInflictions));
-            ShowOnEnum(nameof(cacheSkill.skillAttackType), nameof(Skill.SkillAttackType.Normal), nameof(cacheSkill.additionalDamageAmounts));
-            ShowOnEnum(nameof(cacheSkill.skillAttackType), nameof(Skill.SkillAttackType.Normal), nameof(cacheSkill.increaseDamageAmountsWithBuffs));
-            ShowOnEnum(nameof(cacheSkill.skillAttackType), nameof(Skill.SkillAttackType.Normal), nameof(cacheSkill.isDebuff));
-            ShowOnEnum(nameof(cacheSkill.skillAttackType), nameof(Skill.SkillAttackType.Normal), nameof(cacheSkill.harvestType));
+            ShowOnEnum(nameof(skill.skillAttackType), nameof(Skill.SkillAttackType.Normal), nameof(skill.damageHitEffects));
+            ShowOnEnum(nameof(skill.skillAttackType), nameof(Skill.SkillAttackType.Normal), nameof(skill.damageInfo));
+            ShowOnEnum(nameof(skill.skillAttackType), nameof(Skill.SkillAttackType.Normal), nameof(skill.damageAmount));
+            ShowOnEnum(nameof(skill.skillAttackType), nameof(Skill.SkillAttackType.Normal), nameof(skill.effectivenessAttributes));
+            ShowOnEnum(nameof(skill.skillAttackType), nameof(Skill.SkillAttackType.Normal), nameof(skill.weaponDamageInflictions));
+            ShowOnEnum(nameof(skill.skillAttackType), nameof(Skill.SkillAttackType.Normal), nameof(skill.additionalDamageAmounts));
+            ShowOnEnum(nameof(skill.skillAttackType), nameof(Skill.SkillAttackType.Normal), nameof(skill.increaseDamageAmountsWithBuffs));
+            ShowOnEnum(nameof(skill.skillAttackType), nameof(Skill.SkillAttackType.Normal), nameof(skill.isDebuff));
+            ShowOnEnum(nameof(skill.skillAttackType), nameof(Skill.SkillAttackType.Normal), nameof(skill.harvestType));
             // Based On Weapon Attack skill
-            ShowOnEnum(nameof(cacheSkill.skillAttackType), nameof(Skill.SkillAttackType.BasedOnWeapon), nameof(cacheSkill.damageHitEffects));
-            ShowOnEnum(nameof(cacheSkill.skillAttackType), nameof(Skill.SkillAttackType.BasedOnWeapon), nameof(cacheSkill.weaponDamageInflictions));
-            ShowOnEnum(nameof(cacheSkill.skillAttackType), nameof(Skill.SkillAttackType.BasedOnWeapon), nameof(cacheSkill.additionalDamageAmounts));
-            ShowOnEnum(nameof(cacheSkill.skillAttackType), nameof(Skill.SkillAttackType.BasedOnWeapon), nameof(cacheSkill.increaseDamageAmountsWithBuffs));
-            ShowOnEnum(nameof(cacheSkill.skillAttackType), nameof(Skill.SkillAttackType.BasedOnWeapon), nameof(cacheSkill.isDebuff));
-            ShowOnEnum(nameof(cacheSkill.skillAttackType), nameof(Skill.SkillAttackType.BasedOnWeapon), nameof(cacheSkill.harvestType));
+            ShowOnEnum(nameof(skill.skillAttackType), nameof(Skill.SkillAttackType.BasedOnWeapon), nameof(skill.damageHitEffects));
+            ShowOnEnum(nameof(skill.skillAttackType), nameof(Skill.SkillAttackType.BasedOnWeapon), nameof(skill.weaponDamageInflictions));
+            ShowOnEnum(nameof(skill.skillAttackType), nameof(Skill.SkillAttackType.BasedOnWeapon), nameof(skill.additionalDamageAmounts));
+            ShowOnEnum(nameof(skill.skillAttackType), nameof(Skill.SkillAttackType.BasedOnWeapon), nameof(skill.increaseDamageAmountsWithBuffs));
+            ShowOnEnum(nameof(skill.skillAttackType), nameof(Skill.SkillAttackType.BasedOnWeapon), nameof(skill.isDebuff));
+            ShowOnEnum(nameof(skill.skillAttackType), nameof(Skill.SkillAttackType.BasedOnWeapon), nameof(skill.harvestType));
             // Harvest
-            ShowOnEnum(nameof(cacheSkill.harvestType), nameof(HarvestType.BasedOnWeapon), nameof(cacheSkill.harvestDamageAmount));
-            ShowOnEnum(nameof(cacheSkill.harvestType), nameof(HarvestType.BasedOnSkill), nameof(cacheSkill.harvestDamageAmount));
+            ShowOnEnum(nameof(skill.harvestType), nameof(HarvestType.BasedOnWeapon), nameof(skill.harvestDamageAmount));
+            ShowOnEnum(nameof(skill.harvestType), nameof(HarvestType.BasedOnSkill), nameof(skill.harvestDamageAmount));
             // Debuff
-            ShowOnBool(nameof(cacheSkill.isDebuff), true, nameof(cacheSkill.debuff));
+            ShowOnBool(nameof(skill.isDebuff), true, nameof(skill.debuff));
             // Buff
-            ShowOnEnum(nameof(cacheSkill.skillBuffType), nameof(Skill.SkillBuffType.BuffToNearbyAllies), nameof(cacheSkill.buffDistance));
-            ShowOnEnum(nameof(cacheSkill.skillBuffType), nameof(Skill.SkillBuffType.BuffToNearbyCharacters), nameof(cacheSkill.buffDistance));
-            ShowOnEnum(nameof(cacheSkill.skillBuffType), nameof(Skill.SkillBuffType.BuffToTarget), nameof(cacheSkill.buffDistance));
-            ShowOnEnum(nameof(cacheSkill.skillBuffType), nameof(Skill.SkillBuffType.BuffToUser), nameof(cacheSkill.buff));
-            ShowOnEnum(nameof(cacheSkill.skillBuffType), nameof(Skill.SkillBuffType.BuffToNearbyAllies), nameof(cacheSkill.buff));
-            ShowOnEnum(nameof(cacheSkill.skillBuffType), nameof(Skill.SkillBuffType.BuffToNearbyCharacters), nameof(cacheSkill.buff));
-            ShowOnEnum(nameof(cacheSkill.skillBuffType), nameof(Skill.SkillBuffType.BuffToTarget), nameof(cacheSkill.buff));
-            ShowOnEnum(nameof(cacheSkill.skillBuffType), nameof(Skill.SkillBuffType.Toggle), nameof(cacheSkill.buff));
-            ShowOnEnum(nameof(cacheSkill.skillType), nameof(SkillType.Passive), nameof(cacheSkill.buff));
+            ShowOnEnum(nameof(skill.skillBuffType), nameof(Skill.SkillBuffType.BuffToNearbyAllies), nameof(skill.buffDistance));
+            ShowOnEnum(nameof(skill.skillBuffType), nameof(Skill.SkillBuffType.BuffToNearbyCharacters), nameof(skill.buffDistance));
+            ShowOnEnum(nameof(skill.skillBuffType), nameof(Skill.SkillBuffType.BuffToTarget), nameof(skill.buffDistance));
+            ShowOnEnum(nameof(skill.skillBuffType), nameof(Skill.SkillBuffType.BuffToUser), nameof(skill.buff));
+            ShowOnEnum(nameof(skill.skillBuffType), nameof(Skill.SkillBuffType.BuffToNearbyAllies), nameof(skill.buff));
+            ShowOnEnum(nameof(skill.skillBuffType), nameof(Skill.SkillBuffType.BuffToNearbyCharacters), nameof(skill.buff));
+            ShowOnEnum(nameof(skill.skillBuffType), nameof(Skill.SkillBuffType.BuffToTarget), nameof(skill.buff));
+            ShowOnEnum(nameof(skill.skillBuffType), nameof(Skill.SkillBuffType.Toggle), nameof(skill.buff));
+            ShowOnEnum(nameof(skill.skillType), nameof(SkillType.Passive), nameof(skill.buff));
             // Summon
-            ShowOnEnum(nameof(cacheSkill.skillType), nameof(SkillType.Active), nameof(cacheSkill.summon));
+            ShowOnEnum(nameof(skill.skillType), nameof(SkillType.Active), nameof(skill.summon));
             // Mount
-            ShowOnEnum(nameof(cacheSkill.skillType), nameof(SkillType.Active), nameof(cacheSkill.mount));
+            ShowOnEnum(nameof(skill.skillType), nameof(SkillType.Active), nameof(skill.mount));
             // Craft
-            ShowOnEnum(nameof(cacheSkill.skillType), nameof(SkillType.CraftItem), nameof(cacheSkill.itemCraft));
+            ShowOnEnum(nameof(skill.skillType), nameof(SkillType.CraftItem), nameof(skill.itemCraft));
         }
     }
 }
