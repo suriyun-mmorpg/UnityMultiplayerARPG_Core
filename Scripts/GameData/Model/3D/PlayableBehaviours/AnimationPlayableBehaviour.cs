@@ -239,7 +239,7 @@ namespace MultiplayerARPG.GameData.Model.Playables
             }
             else if (CharacterModel.movementState.HasFlag(MovementState.IsUnderWater) || CharacterModel.movementState.HasFlag(MovementState.IsGrounded))
             {
-                if (playingLandedState)
+                if (playingLandedState || playingJumpState == PlayingJumpState.Playing)
                 {
                     // Don't change state because character is just landed, landed animation has to be played before change to move state
                     return playingStateId;
