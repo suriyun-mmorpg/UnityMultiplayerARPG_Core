@@ -33,7 +33,6 @@ namespace MultiplayerARPG
             ShowOnBool(nameof(model.IsMainModel), true, "setEquipmentContainersBySetters");
             ShowOnBool(nameof(model.IsMainModel), true, "deactivateInstantiatedObjects");
             ShowOnBool(nameof(model.IsMainModel), true, "activateInstantiatedObject");
-            ShowOnBool(nameof(model.IsMainModel), true, "skinnedMeshRenderer");
             ShowOnBool(nameof(model.IsMainModel), true, "vehicleModels");
         }
     }
