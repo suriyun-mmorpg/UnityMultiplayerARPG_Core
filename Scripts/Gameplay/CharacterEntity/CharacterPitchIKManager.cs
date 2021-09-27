@@ -11,6 +11,7 @@ namespace MultiplayerARPG
     [DisallowMultipleComponent]
     public class CharacterPitchIKManager : MonoBehaviour
     {
+        public Animator Animator { get; private set; }
         private readonly List<CharacterPitchIK> components = new List<CharacterPitchIK>();
         private PlayableCharacterModel playableCharacterModel;
         private bool forPlayableCharacterModel;
@@ -23,6 +24,7 @@ namespace MultiplayerARPG
 
         private void Awake()
         {
+            Animator = GetComponentInParent<Animator>();
             playableCharacterModel = GetComponentInParent<PlayableCharacterModel>();
             if (playableCharacterModel != null)
             {
@@ -74,7 +76,7 @@ namespace MultiplayerARPG
                 if (forPlayableCharacterModel)
                 {
                     enablings[i] = components[i].Enabling;
-                    pitchBones[i] = components[i].animator.BindStreamTransform(components[i].animator.GetBoneTransform(components[i].pitchBone));
+                    pitchBones[i] = Animator.BindStreamTransform(Animator.GetBoneTransform(components[i].pitchBone));
                     pitchRotations[i] = components[i].PitchRotation;
                 }
             }
@@ -98,7 +100,8 @@ namespace MultiplayerARPG
                 return;
             for (int i = 0; i < components.Count; ++i)
             {
-                components[i].UpdateOnAnimatorIK();
+                if (!components[i].Enabling) continue;
+                Animator.SetBoneLocalRotation(components[i].pitchBone, components[i].PitchRotation);
             }
         }
 

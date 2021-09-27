@@ -9,7 +9,6 @@ namespace MultiplayerARPG
             X, Y, Z
         }
 
-        public Animator animator;
         public Axis axis = Axis.Z;
         public bool enableWhileStanding = true;
         public bool enableWhileCrouching = true;
@@ -21,11 +20,11 @@ namespace MultiplayerARPG
         public float lerpDamping = 25f;
         [Range(0f, 180f)]
         public float maxAngle = 0f;
-        private CharacterPitchIKManager manager;
-        private BaseCharacterEntity characterEntity;
         private float tempPitch;
         private Quaternion tempRotation;
         public Quaternion PitchRotation { get; private set; }
+        public BaseCharacterEntity CharacterEntity { get; private set; }
+        public CharacterPitchIKManager Manager { get; private set; }
 
         public bool Enabling
         {
@@ -33,15 +32,15 @@ namespace MultiplayerARPG
             {
                 if (!enabled)
                     return false;
-                if (!characterEntity || characterEntity.IsDead())
+                if (!CharacterEntity || CharacterEntity.IsDead())
                     return false;
-                if (characterEntity.MovementState == MovementState.IsUnderWater)
+                if (CharacterEntity.MovementState == MovementState.IsUnderWater)
                 {
                     if (!enableWhileSwiming)
                         return false;
                     return true;
                 }
-                switch (characterEntity.ExtraMovementState)
+                switch (CharacterEntity.ExtraMovementState)
                 {
                     case ExtraMovementState.IsCrouching:
                         if (!enableWhileCrouching)
@@ -62,15 +61,8 @@ namespace MultiplayerARPG
 
         private void Awake()
         {
-            characterEntity = GetComponentInParent<BaseCharacterEntity>();
-            if (characterEntity == null)
-            {
-                enabled = false;
-                return;
-            }
-            if (animator == null)
-                animator = GetComponentInParent<Animator>();
-            if (animator == null)
+            CharacterEntity = GetComponentInParent<BaseCharacterEntity>();
+            if (CharacterEntity == null)
             {
                 enabled = false;
                 return;
@@ -79,14 +71,14 @@ namespace MultiplayerARPG
 
         private void Start()
         {
-            manager = animator.gameObject.GetOrAddComponent<CharacterPitchIKManager>();
-            manager.Register(this);
+            Manager = CharacterEntity.gameObject.GetOrAddComponent<CharacterPitchIKManager>();
+            Manager.Register(this);
         }
 
         private void OnDestroy()
         {
-            if (manager != null)
-                manager.Unregister(this);
+            if (Manager != null)
+                Manager.Unregister(this);
         }
 
         public void UpdatePitchRotation()
@@ -94,7 +86,7 @@ namespace MultiplayerARPG
             if (!Enabling)
                 return;
             // Clamp pitch
-            tempPitch = characterEntity.Pitch;
+            tempPitch = CharacterEntity.Pitch;
             if (maxAngle > 0f)
             {
                 if (tempPitch >= 180f && tempPitch < 360f - maxAngle)
@@ -129,13 +121,6 @@ namespace MultiplayerARPG
             {
                 PitchRotation = tempRotation;
             }
-        }
-
-        internal void UpdateOnAnimatorIK()
-        {
-            if (!Enabling)
-                return;
-            animator.SetBoneLocalRotation(pitchBone, PitchRotation);
         }
     }
 }
