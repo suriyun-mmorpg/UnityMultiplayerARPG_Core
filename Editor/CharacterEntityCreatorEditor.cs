@@ -172,25 +172,32 @@ namespace MultiplayerARPG
                 else
                     bounds = skinnedMeshes[i].bounds;
             }
-
+            CharacterController characterController;
+            CapsuleCollider capsuleCollider;
+            NavMeshAgent navMeshAgent;
             switch (entityMovementType)
             {
                 case EntityMovementType.CharacterController:
-                    var characterController = newObject.AddComponent<CharacterController>();
+                    characterController = newObject.AddComponent<CharacterController>();
                     characterController.height = bounds.size.y;
                     characterController.radius = Mathf.Min(bounds.extents.x, bounds.extents.z);
                     characterController.center = Vector3.zero + (Vector3.up * characterController.height * 0.5f);
                     newObject.AddComponent<CharacterControllerEntityMovement>();
                     break;
                 case EntityMovementType.NavMesh:
-                    var navMeshAgent = newObject.AddComponent<NavMeshAgent>();
+                    capsuleCollider = newObject.AddComponent<CapsuleCollider>();
+                    capsuleCollider.height = bounds.size.y;
+                    capsuleCollider.radius = Mathf.Min(bounds.extents.x, bounds.extents.z);
+                    capsuleCollider.center = Vector3.zero + (Vector3.up * capsuleCollider.height * 0.5f);
+                    capsuleCollider.isTrigger = true;
+                    navMeshAgent = newObject.AddComponent<NavMeshAgent>();
                     navMeshAgent.height = bounds.size.y;
                     navMeshAgent.radius = Mathf.Min(bounds.extents.x, bounds.extents.z);
                     newObject.AddComponent<NavMeshEntityMovement>();
                     break;
                 case EntityMovementType.Rigidbody:
                     newObject.AddComponent<Rigidbody>();
-                    var capsuleCollider = newObject.AddComponent<CapsuleCollider>();
+                    capsuleCollider = newObject.AddComponent<CapsuleCollider>();
                     capsuleCollider.height = bounds.size.y;
                     capsuleCollider.radius = Mathf.Min(bounds.extents.x, bounds.extents.z);
                     capsuleCollider.center = Vector3.zero + (Vector3.up * capsuleCollider.height * 0.5f);
@@ -239,6 +246,7 @@ namespace MultiplayerARPG
                     }
                     break;
                 case CharacterEntityType.MonsterCharacterEntity:
+                    newObject.AddComponent<MonsterActivityComponent>();
                     MonsterCharacterEntity monsterCharacterEntity = newObject.AddComponent<MonsterCharacterEntity>();
                     baseCharacterEntity = monsterCharacterEntity;
                     if (!string.IsNullOrEmpty(dataId))
