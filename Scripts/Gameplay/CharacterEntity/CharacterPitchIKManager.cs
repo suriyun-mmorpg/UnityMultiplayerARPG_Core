@@ -25,6 +25,8 @@ namespace MultiplayerARPG
         private void Awake()
         {
             Animator = GetComponentInParent<Animator>();
+            if (Animator == null)
+                Animator = GetComponentInChildren<Animator>();
             playableCharacterModel = GetComponentInParent<PlayableCharacterModel>();
             if (playableCharacterModel != null)
             {
