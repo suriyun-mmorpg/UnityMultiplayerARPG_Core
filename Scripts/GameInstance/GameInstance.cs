@@ -415,7 +415,19 @@ namespace MultiplayerARPG
 
         public HashSet<int> IgnoreRaycastLayersValues { get; private set; }
 
-        public bool DoNotLoadHomeScene { get; set; }
+        public readonly Dictionary<string, bool> LoadHomeScenePreventions = new Dictionary<string, bool>();
+        public bool DoNotLoadHomeScene
+        {
+            get
+            {
+                foreach (bool doNotLoad in LoadHomeScenePreventions.Values)
+                {
+                    if (doNotLoad)
+                        return true;
+                }
+                return false;
+            }
+        }
         #endregion
 
         protected virtual void Awake()
