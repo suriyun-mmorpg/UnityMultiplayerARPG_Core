@@ -140,6 +140,7 @@ namespace MultiplayerARPG
                     DisallowAttack &&
                     DisallowUseSkill &&
                     DisallowUseItem &&
+                    FreezeAnimation &&
                     IsHide &&
                     MuteFootstepSound)
                     break;
