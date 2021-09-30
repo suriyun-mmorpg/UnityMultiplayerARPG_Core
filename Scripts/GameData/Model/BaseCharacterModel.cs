@@ -562,6 +562,7 @@ namespace MultiplayerARPG
                 string tempKey;
                 foreach (CharacterBuff buff in buffs)
                 {
+                    // Buff effects
                     tempKey = buff.GetKey();
                     if (!tempCachedKeys.Contains(tempKey))
                     {
@@ -570,6 +571,37 @@ namespace MultiplayerARPG
                         tempCachedKeys.Add(tempKey);
                     }
                     tempAddingKeys.Add(tempKey);
+                    // Ailment effects
+                    switch (buff.GetBuff().ailment)
+                    {
+                        case AilmentPresets.Stun:
+                            tempKey = nameof(AilmentPresets.Stun);
+                            if (!tempCachedKeys.Contains(tempKey))
+                            {
+                                InstantiateBuffEffect(tempKey, GameInstance.Singleton.StunEffects);
+                                tempCachedKeys.Add(tempKey);
+                            }
+                            tempAddingKeys.Add(tempKey);
+                            break;
+                        case AilmentPresets.Mute:
+                            tempKey = nameof(AilmentPresets.Mute);
+                            if (!tempCachedKeys.Contains(tempKey))
+                            {
+                                InstantiateBuffEffect(tempKey, GameInstance.Singleton.MuteEffects);
+                                tempCachedKeys.Add(tempKey);
+                            }
+                            tempAddingKeys.Add(tempKey);
+                            break;
+                        case AilmentPresets.Freeze:
+                            tempKey = nameof(AilmentPresets.Freeze);
+                            if (!tempCachedKeys.Contains(tempKey))
+                            {
+                                InstantiateBuffEffect(tempKey, GameInstance.Singleton.FreezeEffects);
+                                tempCachedKeys.Add(tempKey);
+                            }
+                            tempAddingKeys.Add(tempKey);
+                            break;
+                    }
                 }
             }
             // Remove effects which removed from new buffs list

@@ -149,7 +149,14 @@ namespace MultiplayerARPG
         public NpcQuestIndicator npcQuestIndicator = null;
 
         [Header("Gameplay Effects")]
-        public GameEffect levelUpEffect = null;
+        [SerializeField]
+        private GameEffect levelUpEffect = null;
+        [SerializeField]
+        private GameEffect[] stunEffects = new GameEffect[0];
+        [SerializeField]
+        private GameEffect[] muteEffects = new GameEffect[0];
+        [SerializeField]
+        private GameEffect[] freezeEffects = new GameEffect[0];
 
         [Header("Gameplay Database and Default Data")]
         [Tooltip("Exp tree for both player character and monster character")]
@@ -388,15 +395,45 @@ namespace MultiplayerARPG
             }
         }
 
-        public ArmorType DefaultArmorType { get; private set; }
-        public WeaponType DefaultWeaponType { get; private set; }
+        public GameEffect LevelUpEffect
+        {
+            get { return levelUpEffect; }
+        }
+
+        public GameEffect[] StunEffects
+        {
+            get { return stunEffects; }
+        }
+
+        public GameEffect[] MuteEffects
+        {
+            get { return muteEffects; }
+        }
+
+        public GameEffect[] FreezeEffects
+        {
+            get { return freezeEffects; }
+        }
+
+        public ArmorType DefaultArmorType
+        {
+            get; private set;
+        }
+
+        public WeaponType DefaultWeaponType
+        {
+            get; private set;
+        }
 
         public IWeaponItem DefaultWeaponItem
         {
             get { return defaultWeaponItem as IWeaponItem; }
         }
 
-        public IWeaponItem MonsterWeaponItem { get; private set; }
+        public IWeaponItem MonsterWeaponItem
+        {
+            get; private set;
+        }
 
         public DamageElement DefaultDamageElement
         {
@@ -594,7 +631,10 @@ namespace MultiplayerARPG
                 DefaultWeaponItem as BaseItem,
                 MonsterWeaponItem as BaseItem
             });
-            AddPoolingObjects(levelUpEffect);
+            AddPoolingObjects(LevelUpEffect);
+            AddPoolingObjects(StunEffects);
+            AddPoolingObjects(MuteEffects);
+            AddPoolingObjects(FreezeEffects);
             AddPoolingObjects(DefaultDamageHitEffects);
 
             if (warpPortalDatabase != null)

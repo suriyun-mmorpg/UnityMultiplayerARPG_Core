@@ -169,7 +169,7 @@ namespace MultiplayerARPG
         [AllRpc]
         protected virtual void AllOnLevelUp()
         {
-            CharacterModel.InstantiateEffect(CurrentGameInstance.levelUpEffect);
+            CharacterModel.InstantiateEffect(CurrentGameInstance.LevelUpEffect);
             if (onLevelUp != null)
                 onLevelUp.Invoke();
         }

@@ -238,6 +238,13 @@ namespace MultiplayerARPG
         {
             if (effects == null || effects.Length == 0)
                 return null;
+            return InstantiateEffect((IEnumerable<GameEffect>)effects);
+        }
+
+        public List<GameEffect> InstantiateEffect(IEnumerable<GameEffect> effects)
+        {
+            if (effects == null)
+                return null;
             List<GameEffect> tempAddingEffects = new List<GameEffect>();
             EffectContainer tempContainer;
             foreach (GameEffect effect in effects)
