@@ -104,12 +104,6 @@ namespace MultiplayerARPG
             return hasChanges;
         }
 
-        public override void PrepareRelatesData()
-        {
-            base.PrepareRelatesData();
-            GenerateCashShopItems();
-        }
-
         public void GenerateCashShopItems()
         {
             if (cashShopItemGeneratingList == null || cashShopItemGeneratingList.Length == 0)
@@ -123,6 +117,7 @@ namespace MultiplayerARPG
                 cashShopItem = CreateInstance<CashShopItem>();
                 cashShopItem.name = $"<CASHSHOPITEM_{name}_{i}>";
                 cashShopItem.GenerateByItem(this, generatingData);
+                GameInstance.CashShopItems[cashShopItem.DataId] = cashShopItem;
             }
         }
     }

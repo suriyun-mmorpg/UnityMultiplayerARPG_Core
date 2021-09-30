@@ -47,6 +47,11 @@ namespace MultiplayerARPG
                     CashShopItems[cashShopItem.DataId] = cashShopItem;
                 }
             }
+            // Generate and add cash shop items by items data
+            foreach (BaseItem item in Items.Values)
+            {
+                item.GenerateCashShopItems();
+            }
 
 #if ENABLE_PURCHASING && UNITY_PURCHASING && (UNITY_ANDROID || UNITY_IOS)
             // If we have already connected to Purchasing ...
