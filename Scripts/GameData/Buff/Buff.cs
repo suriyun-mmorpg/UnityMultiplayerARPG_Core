@@ -40,6 +40,8 @@ namespace MultiplayerARPG
         [Tooltip("Applies damage within duration to character. This won't be applied to monster's summoner.")]
         [ArrayElementTitle("damageElement")]
         public DamageIncremental[] damageOverTimes;
+        [Tooltip("If this is `None`, it will uses `disallowMove`, `disallowAttack`, `disallowUseSkill`, `disallowUseItem` and `freezeAnimation`")]
+        public AilmentPresets ailment;
         [Tooltip("Disallow character to move while applied. This won't be applied to monster's summoner.")]
         public bool disallowMove;
         [Tooltip("Disallow character to attack while applied. This won't be applied to monster's summoner.")]
@@ -48,6 +50,8 @@ namespace MultiplayerARPG
         public bool disallowUseSkill;
         [Tooltip("Disallow character to use item while applied. This won't be applied to monster's summoner.")]
         public bool disallowUseItem;
+        [Tooltip("Freeze animation while the buff is applied")]
+        public bool freezeAnimation;
         [Tooltip("Hide character. This won't be applied to monster's summoner.")]
         public bool isHide;
         [Tooltip("Mute character movement sound while applied. This won't be applied to monster's summoner.")]

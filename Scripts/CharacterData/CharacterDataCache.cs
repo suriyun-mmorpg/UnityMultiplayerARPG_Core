@@ -37,6 +37,7 @@ namespace MultiplayerARPG
         public bool DisallowAttack { get; private set; }
         public bool DisallowUseSkill { get; private set; }
         public bool DisallowUseItem { get; private set; }
+        public bool FreezeAnimation { get; private set; }
         public bool IsHide { get; private set; }
         public bool MuteFootstepSound { get; private set; }
 
@@ -93,20 +94,44 @@ namespace MultiplayerARPG
             DisallowAttack = false;
             DisallowUseSkill = false;
             DisallowUseItem = false;
+            FreezeAnimation = false;
             IsHide = false;
             MuteFootstepSound = false;
             Buff tempBuff;
             foreach (CharacterBuff characterBuff in characterData.Buffs)
             {
                 tempBuff = characterBuff.GetBuff();
-                if (tempBuff.disallowMove)
-                    DisallowMove = true;
-                if (tempBuff.disallowAttack)
-                    DisallowAttack = true;
-                if (tempBuff.disallowUseSkill)
-                    DisallowUseSkill = true;
-                if (tempBuff.disallowUseItem)
-                    DisallowUseItem = true;
+                switch (tempBuff.ailment)
+                {
+                    case AilmentPresets.Stun:
+                        DisallowMove = true;
+                        DisallowAttack = true;
+                        DisallowUseSkill = true;
+                        DisallowUseItem = true;
+                        break;
+                    case AilmentPresets.Mute:
+                        DisallowUseSkill = true;
+                        break;
+                    case AilmentPresets.Freeze:
+                        DisallowMove = true;
+                        DisallowAttack = true;
+                        DisallowUseSkill = true;
+                        DisallowUseItem = true;
+                        FreezeAnimation = true;
+                        break;
+                    default:
+                        if (tempBuff.disallowMove)
+                            DisallowMove = true;
+                        if (tempBuff.disallowAttack)
+                            DisallowAttack = true;
+                        if (tempBuff.disallowUseSkill)
+                            DisallowUseSkill = true;
+                        if (tempBuff.disallowUseItem)
+                            DisallowUseItem = true;
+                        if (tempBuff.freezeAnimation)
+                            FreezeAnimation = true;
+                        break;
+                }
                 if (tempBuff.isHide)
                     IsHide = true;
                 if (tempBuff.muteFootstepSound)
