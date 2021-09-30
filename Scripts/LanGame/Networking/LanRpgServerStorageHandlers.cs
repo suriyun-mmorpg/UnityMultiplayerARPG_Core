@@ -189,6 +189,8 @@ namespace MultiplayerARPG
         public void NotifyStorageItemsUpdated(StorageType storageType, string storageOwnerId)
         {
             StorageId storageId = new StorageId(storageType, storageOwnerId);
+            if (!usingStorageClients.ContainsKey(storageId))
+                return;
             GameInstance.ServerGameMessageHandlers.NotifyStorageItemsToClients(usingStorageClients[storageId], GetStorageItems(storageId));
         }
 
