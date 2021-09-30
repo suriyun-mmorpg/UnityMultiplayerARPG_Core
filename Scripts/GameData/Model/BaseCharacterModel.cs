@@ -95,6 +95,7 @@ namespace MultiplayerARPG
         public MovementState movementState { get; protected set; }
         public ExtraMovementState extraMovementState { get; protected set; }
         public Vector2 direction2D { get; protected set; }
+        public bool isFreezeAnimation { get; protected set; }
 
         // Public events
         public System.Action<string> onEquipmentModelsInstantiated;
@@ -243,7 +244,7 @@ namespace MultiplayerARPG
                 SetEquipItems(previousModel.equipItems);
                 SetBuffs(previousModel.buffs);
                 SetMoveAnimationSpeedMultiplier(previousModel.moveAnimationSpeedMultiplier);
-                SetMovementState(previousModel.movementState, previousModel.extraMovementState, direction2D);
+                SetMovementState(previousModel.movementState, previousModel.extraMovementState, previousModel.direction2D, previousModel.isFreezeAnimation);
             }
             else
             {
@@ -744,13 +745,14 @@ namespace MultiplayerARPG
             this.moveAnimationSpeedMultiplier = moveAnimationSpeedMultiplier;
         }
 
-        public void SetMovementState(MovementState movementState, ExtraMovementState extraMovementState, Vector2 direction2D)
+        public void SetMovementState(MovementState movementState, ExtraMovementState extraMovementState, Vector2 direction2D, bool isFreezeAnimation)
         {
             if (!Application.isPlaying)
                 return;
             this.movementState = movementState;
             this.extraMovementState = extraMovementState;
             this.direction2D = direction2D;
+            this.isFreezeAnimation = isFreezeAnimation;
             PlayMoveAnimation();
         }
 
@@ -758,7 +760,7 @@ namespace MultiplayerARPG
         {
             SetIsDead(false);
             SetMoveAnimationSpeedMultiplier(1f);
-            SetMovementState(MovementState.IsGrounded, ExtraMovementState.None, Vector2.down);
+            SetMovementState(MovementState.IsGrounded, ExtraMovementState.None, Vector2.down, false);
         }
 
         /// <summary>

@@ -78,6 +78,7 @@ namespace MultiplayerARPG.GameData.Model.Playables
         public AnimationMixerPlayable BaseLayerMixer { get; private set; }
         public AnimationMixerPlayable ActionLayerMixer { get; private set; }
         public PlayableCharacterModel CharacterModel { get; private set; }
+        public bool IsFreeze { get; set; }
 
         private string currentWeaponTypeId = string.Empty;
         private string previousStateId = string.Empty;
@@ -99,6 +100,8 @@ namespace MultiplayerARPG.GameData.Model.Playables
         private float actionPlaySpeedMultiplier = 0;
         private float skillCastDuration = 0f;
         private bool isLeftHand = false;
+        private float baseLayerClipSpeed = 0f;
+        private float actionLayerClipSpeed = 0f;
         private readonly StringBuilder stringBuilder = new StringBuilder();
         private readonly HashSet<string> weaponTypeIds = new HashSet<string>();
         private readonly Dictionary<string, BaseStateInfo> baseStates = new Dictionary<string, BaseStateInfo>();
@@ -357,49 +360,53 @@ namespace MultiplayerARPG.GameData.Model.Playables
                 return;
 
             #region Update base state
-            // Change state only when previous animation weight >= 1f
-            if (BaseLayerMixer.GetInputWeight(baseInputPort) >= 1f)
+            if (!IsFreeze)
             {
-                string playingStateId = GetPlayingStateId();
-                if (!this.playingStateId.Equals(playingStateId))
+                // Change state only when previous animation weight >= 1f
+                if (BaseLayerMixer.GetInputWeight(baseInputPort) >= 1f)
                 {
-                    this.playingStateId = playingStateId;
-                    // State not found, use idle state
-                    if (!baseStates.ContainsKey(playingStateId))
-                        playingStateId = stringBuilder.Clear().Append(currentWeaponTypeId).Append(CLIP_IDLE).ToString();
-                    // State still not found, use idle state from default animations
-                    if (!baseStates.ContainsKey(playingStateId))
-                        playingStateId = CLIP_IDLE;
-                    // Get previous clip to continue playing it
-                    if (string.IsNullOrEmpty(previousStateId))
+                    string playingStateId = GetPlayingStateId();
+                    if (!this.playingStateId.Equals(playingStateId))
+                    {
+                        this.playingStateId = playingStateId;
+                        // State not found, use idle state
+                        if (!baseStates.ContainsKey(playingStateId))
+                            playingStateId = stringBuilder.Clear().Append(currentWeaponTypeId).Append(CLIP_IDLE).ToString();
+                        // State still not found, use idle state from default animations
+                        if (!baseStates.ContainsKey(playingStateId))
+                            playingStateId = CLIP_IDLE;
+                        // Get previous clip to continue playing it
+                        if (string.IsNullOrEmpty(previousStateId))
+                            previousStateId = playingStateId;
+                        double playingTime = 0;
+                        AnimationClip previousClip = baseStates[previousStateId].state.clip;
+                        AnimationClip playingClip = baseStates[playingStateId].state.clip;
+                        if (previousClip == playingClip)
+                            playingTime = BaseLayerMixer.GetInput(baseInputPort).GetTime();
+                        // Get input port from new playing state ID
+                        baseInputPort = baseStates[playingStateId].inputPort;
+                        // Set clip info 
+                        baseLayerClipSpeed = baseStates[playingStateId].GetSpeed(1);
+                        // Set transition duration
+                        baseTransitionDuration = baseStates[playingStateId].state.transitionDuration;
+                        if (baseTransitionDuration <= 0f)
+                            baseTransitionDuration = CharacterModel.transitionDuration;
+                        baseTransitionDuration *= baseLayerClipSpeed;
+                        // Set clip length
+                        BaseLayerMixer.GetInput(baseInputPort).SetTime(playingTime);
+                        baseClipLength = baseStates[playingStateId].GetClipLength(1);
+                        // Set layer additive
+                        LayerMixer.SetLayerAdditive(0, baseStates[playingStateId].state.isAdditive);
+                        // Reset play elapsed
+                        basePlayElapsed = 0f;
+                        // Set previous state Id for next state change updating
                         previousStateId = playingStateId;
-                    double playingTime = 0;
-                    AnimationClip previousClip = baseStates[previousStateId].state.clip;
-                    AnimationClip playingClip = baseStates[playingStateId].state.clip;
-                    if (previousClip == playingClip)
-                        playingTime = BaseLayerMixer.GetInput(baseInputPort).GetTime();
-                    // Get input port from new playing state ID
-                    baseInputPort = baseStates[playingStateId].inputPort;
-                    // Set clip info 
-                    float speed = baseStates[playingStateId].GetSpeed(1);
-                    // Set transition duration
-                    baseTransitionDuration = baseStates[playingStateId].state.transitionDuration;
-                    if (baseTransitionDuration <= 0f)
-                        baseTransitionDuration = CharacterModel.transitionDuration;
-                    baseTransitionDuration *= speed;
-                    // Set clip length
-                    Playable clipPlayable = BaseLayerMixer.GetInput(baseInputPort);
-                    clipPlayable.SetSpeed(speed);
-                    clipPlayable.SetTime(playingTime);
-                    baseClipLength = baseStates[playingStateId].GetClipLength(1);
-                    // Set layer additive
-                    LayerMixer.SetLayerAdditive(0, baseStates[playingStateId].state.isAdditive);
-                    // Reset play elapsed
-                    basePlayElapsed = 0f;
-                    // Set previous state Id for next state change updating
-                    previousStateId = playingStateId;
+                    }
                 }
             }
+
+            // Update freezing state
+            BaseLayerMixer.GetInput(baseInputPort).SetSpeed(IsFreeze ? 0 : baseLayerClipSpeed);
 
             // Update transition
             float weight;
@@ -439,6 +446,10 @@ namespace MultiplayerARPG.GameData.Model.Playables
             if (playingActionState == PlayingActionState.None)
                 return;
 
+            // Update freezing state
+            ActionLayerMixer.GetInput(0).SetSpeed(IsFreeze ? 0 : actionLayerClipSpeed);
+
+            // Update transition
             weightUpdate = info.deltaTime / actionTransitionDuration;
             weight = LayerMixer.GetInputWeight(1);
             switch (playingActionState)
@@ -490,6 +501,9 @@ namespace MultiplayerARPG.GameData.Model.Playables
 
         public void PlayAction(ActionState actionState, float speedRate, float duration = 0f)
         {
+            if (IsFreeze)
+                return;
+
             // Destroy playing state
             if (ActionLayerMixer.IsValid())
                 ActionLayerMixer.Destroy();
@@ -513,17 +527,15 @@ namespace MultiplayerARPG.GameData.Model.Playables
                 LayerMixer.SetLayerMaskFromAvatarMask(1, avatarMask);
 
             // Set clip info
-            float speed = (actionState.animSpeedRate > 0f ? actionState.animSpeedRate : 1f) * speedRate;
+            actionLayerClipSpeed = (actionState.animSpeedRate > 0f ? actionState.animSpeedRate : 1f) * speedRate;
             // Set transition duration
             actionTransitionDuration = actionState.transitionDuration;
             if (actionTransitionDuration <= 0f)
                 actionTransitionDuration = CharacterModel.transitionDuration;
-            actionTransitionDuration *= speed;
+            actionTransitionDuration *= actionLayerClipSpeed;
             // Set clip length
-            Playable clipPlayable = ActionLayerMixer.GetInput(0);
-            clipPlayable.SetSpeed(speed);
-            clipPlayable.SetTime(0f);
-            actionClipLength = (duration > 0f ? duration : clip.length) / speed;
+            ActionLayerMixer.GetInput(0).SetTime(0f);
+            actionClipLength = (duration > 0f ? duration : clip.length) / actionLayerClipSpeed;
             // Set layer additive
             LayerMixer.SetLayerAdditive(1, actionState.isAdditive);
             // Reset play elapsed

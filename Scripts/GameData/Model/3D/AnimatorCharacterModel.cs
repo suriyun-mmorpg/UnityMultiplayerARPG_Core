@@ -712,6 +712,7 @@ namespace MultiplayerARPG
             animator.SetBool(ANIM_IS_GROUNDED, isGrounded);
             animator.SetBool(ANIM_IS_UNDER_WATER, isUnderWater);
             animator.SetInteger(ANIM_MOVE_TYPE, moveType);
+            animator.speed = isFreezeAnimation ? 0 : 1;
         }
 
         public override void PlayActionAnimation(AnimActionType animActionType, int dataId, int index, float playSpeedMultiplier = 1f)

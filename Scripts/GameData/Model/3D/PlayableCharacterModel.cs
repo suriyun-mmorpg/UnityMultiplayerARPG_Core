@@ -353,6 +353,8 @@ namespace MultiplayerARPG.GameData.Model.Playables
         public override void PlayMoveAnimation()
         {
             // Do nothing, animation playable behaviour will do it
+            if (Behaviour != null)
+                Behaviour.IsFreeze = isFreezeAnimation;
         }
 
         public override void PlayHitAnimation()

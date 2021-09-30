@@ -279,7 +279,7 @@ namespace MultiplayerARPG
             // Update move speed multiplier
             CharacterModel.SetMoveAnimationSpeedMultiplier(MoveAnimationSpeedMultiplier);
             // Update movement animation
-            CharacterModel.SetMovementState(MovementState, ExtraMovementState, Direction2D);
+            CharacterModel.SetMovementState(MovementState, ExtraMovementState, Direction2D, this.GetCaches().FreezeAnimation);
             // Update FPS model
             if (IsClient)
             {
@@ -290,7 +290,7 @@ namespace MultiplayerARPG
                     // Update move speed multiplier
                     FpsModel.SetMoveAnimationSpeedMultiplier(MoveAnimationSpeedMultiplier);
                     // Update movement animation
-                    FpsModel.SetMovementState(MovementState, ExtraMovementState, Direction2D);
+                    FpsModel.SetMovementState(MovementState, ExtraMovementState, Direction2D, this.GetCaches().FreezeAnimation);
                 }
             }
 

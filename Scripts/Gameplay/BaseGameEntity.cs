@@ -426,7 +426,7 @@ namespace MultiplayerARPG
             {
                 // Update movement animation
                 (Model as IMoveableModel).SetMoveAnimationSpeedMultiplier(MoveAnimationSpeedMultiplier);
-                (Model as IMoveableModel).SetMovementState(MovementState, ExtraMovementState, Direction2D);
+                (Model as IMoveableModel).SetMovementState(MovementState, ExtraMovementState, Direction2D, false);
             }
         }
 
