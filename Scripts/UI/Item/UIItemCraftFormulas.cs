@@ -97,7 +97,7 @@ namespace MultiplayerARPG
         {
             int sourceId = CraftingQueueManager != null && CraftingQueueManager.Source != null ? CraftingQueueManager.Source.SourceId : 0;
             LoadedList.Clear();
-            LoadedList.AddRange(GameInstance.ItemCraftFormulas.Values.Where(o => o.SourceId == sourceId));
+            LoadedList.AddRange(GameInstance.ItemCraftFormulas.Values.Where(o => o.SourceIds.Contains(sourceId)));
             GenerateList();
         }
 

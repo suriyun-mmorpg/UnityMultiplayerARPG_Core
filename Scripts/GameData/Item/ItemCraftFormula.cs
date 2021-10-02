@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace MultiplayerARPG
@@ -22,6 +23,6 @@ namespace MultiplayerARPG
             get { return craftDuration; }
         }
 
-        public int SourceId { get; set; }
+        public HashSet<int> SourceIds { get; private set; } = new HashSet<int>();
     }
 }

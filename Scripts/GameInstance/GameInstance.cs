@@ -944,7 +944,7 @@ namespace MultiplayerARPG
         {
             foreach (ItemCraftFormula formula in itemCraftFormulas)
             {
-                formula.SourceId = sourceId;
+                formula.SourceIds.Add(sourceId);
             }
             AddManyGameData(ItemCraftFormulas, itemCraftFormulas);
         }
