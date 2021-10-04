@@ -113,9 +113,10 @@ namespace MultiplayerARPG
             CacheList.Generate(LoadedList, (index, data, ui) =>
             {
                 tempUI = ui.GetComponent<UIItemCraftFormula>();
-                if (data != null &&
-                    (filterCategories.Count == 0 || (!string.IsNullOrEmpty(data.Category) &&
-                    filterCategories.Contains(data.Category.Trim().ToLower()))))
+                if (data != null && data.ItemCraft.CraftingItem != null &&
+                    (filterCategories.Count == 0 || 
+                    (!string.IsNullOrEmpty(data.Category) && filterCategories.Contains(data.Category.Trim().ToLower())) ||
+                    (!string.IsNullOrEmpty(data.ItemCraft.CraftingItem.Category) && filterCategories.Contains(data.ItemCraft.CraftingItem.Category.Trim().ToLower()))))
                 {
                     tempUI.CraftFormulaManager = this;
                     tempUI.Data = data;
