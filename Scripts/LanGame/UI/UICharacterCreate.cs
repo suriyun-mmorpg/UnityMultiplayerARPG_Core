@@ -25,7 +25,7 @@ namespace MultiplayerARPG
 
         [System.Obsolete("Deprecated, use `uiInputCharacterName` instead.")]
         [HideInInspector]
-        private InputField inputCharacterName;
+        public InputField inputCharacterName;
         public InputFieldWrapper uiInputCharacterName;
         public Button buttonCreate;
 
