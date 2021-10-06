@@ -25,6 +25,7 @@ namespace MultiplayerARPG
             set { offHandEquipmentModels = value; }
         }
 
+        [Category("Equipment Settings")]
         [Header("Weapon Settings")]
         [SerializeField]
         private WeaponType weaponType = null;
