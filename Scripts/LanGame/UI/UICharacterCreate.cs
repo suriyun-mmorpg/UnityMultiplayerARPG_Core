@@ -3,6 +3,9 @@ using System.Linq;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.UI;
+#if UNITY_EDITOR
+using UnityEditor;
+#endif
 
 namespace MultiplayerARPG
 {
@@ -20,7 +23,10 @@ namespace MultiplayerARPG
         public UIFaction uiFactionPrefab;
         public Transform uiFactionContainer;
 
-        public InputField inputCharacterName;
+        [System.Obsolete("Deprecated, use `uiInputCharacterName` instead.")]
+        [HideInInspector]
+        private InputField inputCharacterName;
+        public InputFieldWrapper uiInputCharacterName;
         public Button buttonCreate;
 
         [Header("Event")]
@@ -158,6 +164,37 @@ namespace MultiplayerARPG
         public int SelectedDataId { get; protected set; }
         public int SelectedFactionId { get; protected set; }
 
+        protected override void Awake()
+        {
+            base.Awake();
+            MigrateInputFieldComponent();
+        }
+
+#if UNITY_EDITOR
+        private void OnValidate()
+        {
+            if (MigrateInputFieldComponent())
+                EditorUtility.SetDirty(this);
+        }
+#endif
+
+        public bool MigrateInputFieldComponent()
+        {
+            bool hasChanges = false;
+            InputFieldWrapper wrapper;
+#pragma warning disable CS0618 // Type or member is obsolete
+            if (inputCharacterName != null)
+            {
+                hasChanges = true;
+                wrapper = inputCharacterName.gameObject.GetOrAddComponent<InputFieldWrapper>();
+                wrapper.unityInputField = inputCharacterName;
+                uiInputCharacterName = wrapper;
+                inputCharacterName = null;
+            }
+#pragma warning restore CS0618 // Type or member is obsolete
+            return hasChanges;
+        }
+
         protected virtual List<BasePlayerCharacterEntity> GetCreatableCharacters()
         {
             if (CacheRaceToggles.Count == 0)
@@ -274,7 +311,7 @@ namespace MultiplayerARPG
         protected virtual void OnDisable()
         {
             characterModelContainer.RemoveChildren();
-            inputCharacterName.text = "";
+            uiInputCharacterName.text = "";
         }
 
         protected void OnSelectCharacter(UICharacter uiCharacter)
@@ -384,7 +421,7 @@ namespace MultiplayerARPG
         {
             GameInstance gameInstance = GameInstance.Singleton;
             // Validate character name
-            string characterName = inputCharacterName.text.Trim();
+            string characterName = uiInputCharacterName.text.Trim();
             int minCharacterNameLength = gameInstance.minCharacterNameLength;
             int maxCharacterNameLength = gameInstance.maxCharacterNameLength;
             if (characterName.Length < minCharacterNameLength)
