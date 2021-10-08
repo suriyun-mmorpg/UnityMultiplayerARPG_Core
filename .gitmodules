@@ -28,6 +28,6 @@
 [submodule "SimpleAssetBundleClient"]
 	path = SimpleAssetBundleClient
 	url = https://github.com/insthync/unity-simple-asset-bundle-client.git
-[submodule "GraphicSettings"]
-	path = GraphicSettings
-	url = https://github.com/insthync/unity-graphic-settings.git
+[submodule "VideoSettings"]
+	path = VideoSettings
+	url = https://github.com/insthync/unity-video-settings.git
