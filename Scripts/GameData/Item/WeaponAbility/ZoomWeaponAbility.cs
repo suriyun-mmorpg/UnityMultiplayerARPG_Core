@@ -1,6 +1,5 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace MultiplayerARPG
 {
@@ -11,7 +10,9 @@ namespace MultiplayerARPG
 
         public float zoomingFov = 20f;
         [Range(0.1f, 1f)]
-        public float rotationSpeedScaleWhileZooming = 0.5f;
+        [FormerlySerializedAs("rotationSpeedScaleWhileZooming")]
+        public float cameraRotationSpeedScaleWhileZooming = 0.5f;
+        public string cameraRotationSpeedScaleSaveKey = string.Empty;
         public bool disableRenderersOnZoom;
         public Sprite zoomCrosshair;
 
@@ -24,8 +25,22 @@ namespace MultiplayerARPG
         [System.NonSerialized]
         private ShooterControllerViewMode? preActivateViewMode;
 
-        // TODO: Add rotate scale player's config
         public override bool ShouldDeactivateWhenReload { get { return true; } }
+        public float? cameraRotationSpeedScale;
+        public float CameraRotationSpeedScale
+        {
+            get
+            {
+                if (!cameraRotationSpeedScale.HasValue)
+                {
+                    if (string.IsNullOrEmpty(cameraRotationSpeedScaleSaveKey))
+                        cameraRotationSpeedScale = cameraRotationSpeedScaleWhileZooming;
+                    else
+                        cameraRotationSpeedScale = PlayerPrefs.GetFloat(cameraRotationSpeedScaleSaveKey, cameraRotationSpeedScaleWhileZooming);
+                }
+                return cameraRotationSpeedScale.Value;
+            }
+        }
 
         public override void Setup(BasePlayerCharacterController controller, CharacterItem weapon)
         {
@@ -43,7 +58,7 @@ namespace MultiplayerARPG
         {
             if (preActivateViewMode.HasValue)
                 zoomWeaponAbilityController.ViewMode = preActivateViewMode.Value;
-            zoomWeaponAbilityController.RotationSpeedScale = 1f;
+            zoomWeaponAbilityController.CameraRotationSpeedScale = zoomWeaponAbilityController.DefaultCameraRotationSpeedScale;
             zoomWeaponAbilityController.ShowZoomCrosshair = false;
             zoomWeaponAbilityController.HideCrosshair = false;
             zoomWeaponAbilityController.UpdateCameraSettings();
@@ -59,7 +74,7 @@ namespace MultiplayerARPG
                 zoomWeaponAbilityController.ViewMode = ShooterControllerViewMode.Fps;
                 zoomWeaponAbilityController.SetZoomCrosshairSprite(zoomCrosshair);
             }
-            zoomWeaponAbilityController.RotationSpeedScale = rotationSpeedScaleWhileZooming;
+            zoomWeaponAbilityController.CameraRotationSpeedScale = CameraRotationSpeedScale;
             currentZoomInterpTime = 0f;
             currentZoomFov = zoomWeaponAbilityController.CurrentCameraFov;
         }
@@ -107,7 +122,7 @@ namespace MultiplayerARPG
         public override void OnPreDeactivate()
         {
             zoomWeaponAbilityController.ViewMode = preActivateViewMode.Value;
-            zoomWeaponAbilityController.RotationSpeedScale = 1f;
+            zoomWeaponAbilityController.CameraRotationSpeedScale = zoomWeaponAbilityController.DefaultCameraRotationSpeedScale;
             currentZoomInterpTime = 0f;
             currentZoomFov = zoomWeaponAbilityController.CurrentCameraFov;
         }

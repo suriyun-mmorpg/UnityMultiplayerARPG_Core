@@ -16,7 +16,7 @@ namespace MultiplayerARPG
         float AimAssistXSpeed { get; set; }
         float AimAssistYSpeed { get; set; }
         float AimAssistMaxAngleFromFollowingTarget { get; set; }
-        float RotationSpeedScale { get; set; }
+        float CameraRotationSpeedScale { get; set; }
         void Recoil(float x, float y);
     }
 }

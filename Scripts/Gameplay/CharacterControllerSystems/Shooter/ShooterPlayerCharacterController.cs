@@ -1,5 +1,4 @@
 ﻿using Cysharp.Threading.Tasks;
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -66,6 +65,8 @@ namespace MultiplayerARPG
         protected float buildRotateSpeed = 200f;
         [SerializeField]
         protected RectTransform crosshairRect;
+        [SerializeField]
+        protected string defaultCameraRotationSpeedScaleSaveKey = "DEFAULT_CAMERA_ROTATION_SPEED_SCALE";
 
         [Header("TPS Settings")]
         [SerializeField]
@@ -242,10 +243,26 @@ namespace MultiplayerARPG
             set { CacheGameplayCameraController.Camera.fieldOfView = value; }
         }
 
-        public float RotationSpeedScale
+        public float? defaultCameraRotationSpeedScale;
+        public float DefaultCameraRotationSpeedScale
         {
-            get { return CacheGameplayCameraController.RotationSpeedScale; }
-            set { CacheGameplayCameraController.RotationSpeedScale = value; }
+            get
+            {
+                if (!defaultCameraRotationSpeedScale.HasValue)
+                {
+                    if (string.IsNullOrEmpty(defaultCameraRotationSpeedScaleSaveKey))
+                        defaultCameraRotationSpeedScale = 1f;
+                    else
+                        defaultCameraRotationSpeedScale = PlayerPrefs.GetFloat(defaultCameraRotationSpeedScaleSaveKey, 1f);
+                }
+                return defaultCameraRotationSpeedScale.Value;
+            }
+        }
+
+        public float CameraRotationSpeedScale
+        {
+            get { return CacheGameplayCameraController.CameraRotationSpeedScale; }
+            set { CacheGameplayCameraController.CameraRotationSpeedScale = value; }
         }
 
         public bool HideCrosshair { get; set; }
