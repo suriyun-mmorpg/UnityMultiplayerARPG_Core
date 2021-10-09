@@ -49,8 +49,14 @@ namespace MultiplayerARPG
         public BaseNpcDialog saveRespawnCancelDialog;
         // Warp
         public WarpPortalType warpPortalType;
+        [Tooltip("Map which character will warp to when use the warp portal, leave this empty to warp character to other position in the same map")]
         public BaseMapInfo warpMap;
+        [Tooltip("Position which character will warp to when use the warp portal")]
         public Vector3 warpPosition;
+        [Tooltip("If this is `TRUE` it will change character's rotation when warp")]
+        public bool warpOverrideRotation;
+        [Tooltip("This will be used if `warpOverrideRotation` is `TRUE` to change character's rotation when warp")]
+        public Vector3 warpRotation;
         [Output(connectionType = ConnectionType.Override)]
         public BaseNpcDialog warpCancelDialog;
         // Refine Item
@@ -461,7 +467,7 @@ namespace MultiplayerARPG
                     switch (menuIndex)
                     {
                         case CONFIRM_MENU_INDEX:
-                            BaseGameNetworkManager.Singleton.WarpCharacter(warpPortalType, characterEntity, warpMap.Id, warpPosition, false, Vector3.zero);
+                            BaseGameNetworkManager.Singleton.WarpCharacter(warpPortalType, characterEntity, warpMap.Id, warpPosition, warpOverrideRotation, warpRotation);
                             return null;
                         case CANCEL_MENU_INDEX:
                             nextDialog = warpCancelDialog;

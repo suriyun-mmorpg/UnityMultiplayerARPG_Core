@@ -55,6 +55,8 @@ namespace MultiplayerARPG
                     EditorGUILayout.PropertyField(serializedObject.FindProperty(nameof(node.warpPortalType)));
                     EditorGUILayout.PropertyField(serializedObject.FindProperty(nameof(node.warpMap)));
                     EditorGUILayout.PropertyField(serializedObject.FindProperty(nameof(node.warpPosition)));
+                    EditorGUILayout.PropertyField(serializedObject.FindProperty(nameof(node.warpOverrideRotation)));
+                    EditorGUILayout.PropertyField(serializedObject.FindProperty(nameof(node.warpRotation)));
                     NodeEditorGUILayout.PortField(target.GetOutputPort(nameof(node.warpCancelDialog)));
                     break;
                 case NpcDialogType.RefineItem:

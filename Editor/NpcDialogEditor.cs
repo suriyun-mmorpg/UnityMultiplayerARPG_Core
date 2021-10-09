@@ -43,6 +43,8 @@ namespace MultiplayerARPG
             ShowOnEnum(nameof(npcDialog.type), nameof(NpcDialogType.Warp), nameof(npcDialog.warpPortalType));
             ShowOnEnum(nameof(npcDialog.type), nameof(NpcDialogType.Warp), nameof(npcDialog.warpMap));
             ShowOnEnum(nameof(npcDialog.type), nameof(NpcDialogType.Warp), nameof(npcDialog.warpPosition));
+            ShowOnEnum(nameof(npcDialog.type), nameof(NpcDialogType.Warp), nameof(npcDialog.warpOverrideRotation));
+            ShowOnEnum(nameof(npcDialog.type), nameof(NpcDialogType.Warp), nameof(npcDialog.warpRotation));
             ShowOnEnum(nameof(npcDialog.type), nameof(NpcDialogType.Warp), nameof(npcDialog.warpCancelDialog));
             // Refine Item
             ShowOnEnum(nameof(npcDialog.type), nameof(NpcDialogType.RefineItem), nameof(npcDialog.refineItemCancelDialog));
