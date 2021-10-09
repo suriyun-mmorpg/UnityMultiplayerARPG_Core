@@ -6,8 +6,8 @@ namespace MultiplayerARPG
     public class CameraRotationSpeedScaleSetting : MonoBehaviour
     {
         public Slider slider;
-        public float defaultValue;
-        public string cameraRotationSpeedScaleSaveKey;
+        public float defaultValue = 1f;
+        public string cameraRotationSpeedScaleSaveKey = "DEFAULT_CAMERA_ROTATION_SPEED_SCALE";
         public float? cameraRotationSpeedScale;
         public float CameraRotationSpeedScale
         {
