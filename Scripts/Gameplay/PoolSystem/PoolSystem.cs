@@ -6,7 +6,7 @@ namespace MultiplayerARPG
 {
     public class PoolSystem
     {
-        private static Dictionary<IPoolDescriptor, Queue<IPoolDescriptor>> m_Pools = new Dictionary<IPoolDescriptor, Queue<IPoolDescriptor>>();
+        private static Dictionary<IPoolDescriptor, Queue<IPoolDescriptor>> poolingObjects = new Dictionary<IPoolDescriptor, Queue<IPoolDescriptor>>();
 #if UNITY_EDITOR && INIT_POOL_TO_TRANSFORM
         private static Transform poolingTransform;
         private static Transform PoolingTransform
@@ -22,7 +22,7 @@ namespace MultiplayerARPG
 
         public static void Clear()
         {
-            foreach (Queue<IPoolDescriptor> queue in m_Pools.Values)
+            foreach (Queue<IPoolDescriptor> queue in poolingObjects.Values)
             {
                 while (queue.Count > 0)
                 {
@@ -36,18 +36,18 @@ namespace MultiplayerARPG
                     catch { }
                 }
             }
-            m_Pools.Clear();
+            poolingObjects.Clear();
         }
 
         public static void InitPool(IPoolDescriptor prefab)
         {
             if ((Object)prefab == null)
             {
-                Debug.LogWarning("[PoolSystem] Cannot init prefab: " + prefab);
+                Debug.LogWarning($"[PoolSystem] Cannot init prefab: {prefab}");
                 return;
             }
 
-            if (m_Pools.ContainsKey(prefab))
+            if (poolingObjects.ContainsKey(prefab))
                 return;
 
             prefab.InitPrefab();
@@ -67,7 +67,7 @@ namespace MultiplayerARPG
                 queue.Enqueue(obj);
             }
 
-            m_Pools[prefab] = queue;
+            poolingObjects[prefab] = queue;
         }
 
         public static T GetInstance<T>(T prefab)
@@ -85,7 +85,7 @@ namespace MultiplayerARPG
             if (prefab == null)
                 return null;
             Queue<IPoolDescriptor> queue;
-            if (m_Pools.TryGetValue(prefab, out queue))
+            if (poolingObjects.TryGetValue(prefab, out queue))
             {
                 IPoolDescriptor obj;
 
@@ -118,18 +118,18 @@ namespace MultiplayerARPG
         {
             if (instance == null)
             {
-                Debug.LogWarning("[PoolSystem] Cannot push back (" + instance.gameObject + "). The instance's is empty.");
+                Debug.LogWarning($"[PoolSystem] Cannot push back ({instance.gameObject}). The instance's is empty.");
                 return;
             }
             if (instance.ObjectPrefab == null)
             {
-                Debug.LogWarning("[PoolSystem] Cannot push back (" + instance.gameObject + "). The instance's prefab is empty");
+                Debug.LogWarning($"[PoolSystem] Cannot push back ({instance.gameObject}). The instance's prefab is empty");
                 return;
             }
             Queue<IPoolDescriptor> queue;
-            if (!m_Pools.TryGetValue(instance.ObjectPrefab, out queue))
+            if (!poolingObjects.TryGetValue(instance.ObjectPrefab, out queue))
             {
-                Debug.LogWarning("[PoolSystem] Cannot push back (" + instance.gameObject + "). The instance's prefab does not initailized yet.");
+                Debug.LogWarning($"[PoolSystem] Cannot push back ({instance.gameObject}). The instance's prefab does not initailized yet.");
                 return;
             }
             instance.gameObject.SetActive(false);
