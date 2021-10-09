@@ -5,7 +5,7 @@ using UnityEngine;
 
 namespace MultiplayerARPG
 {
-    public partial class ShooterPlayerCharacterController : BasePlayerCharacterController, IShooterWeaponController, IWeaponAbilityController, IAimAssistAvoidanceListener
+    public partial class ShooterPlayerCharacterController : BasePlayerCharacterController, IShooterWeaponController, IWeaponAbilityController
     {
         public const byte PAUSE_FIRE_INPUT_FRAMES_AFTER_CONFIRM_BUILD = 3;
 
@@ -156,12 +156,9 @@ namespace MultiplayerARPG
         protected float recoilRateWhileSwimming = 0.5f;
 
         public bool IsBlockController { get; protected set; }
-        public FollowCameraControls CacheGameplayCameraControls { get; protected set; }
-        public FollowCameraControls CacheMinimapCameraControls { get; protected set; }
-        public Camera CacheGameplayCamera { get { return CacheGameplayCameraControls.CacheCamera; } }
-        public Camera CacheMiniMapCamera { get { return CacheMinimapCameraControls.CacheCamera; } }
-        public Transform CacheGameplayCameraTransform { get { return CacheGameplayCameraControls.CacheCameraTransform; } }
-        public Transform CacheMiniMapCameraTransform { get { return CacheMinimapCameraControls.CacheCameraTransform; } }
+        public IShooterGameplayCameraController CacheGameplayCameraController { get; protected set; }
+        public IMinimapCameraController CacheMinimapCameraController { get; protected set; }
+        public BaseCharacterModel CacheFpsModel { get; protected set; }
         public Vector2 CurrentCrosshairSize { get; protected set; }
         public CrosshairSetting CurrentCrosshairSetting { get; protected set; }
         public BaseWeaponAbility WeaponAbility { get; protected set; }
@@ -241,14 +238,14 @@ namespace MultiplayerARPG
 
         public float CurrentCameraFov
         {
-            get { return CacheGameplayCamera.fieldOfView; }
-            set { CacheGameplayCamera.fieldOfView = value; }
+            get { return CacheGameplayCameraController.Camera.fieldOfView; }
+            set { CacheGameplayCameraController.Camera.fieldOfView = value; }
         }
 
         public float RotationSpeedScale
         {
-            get { return CacheGameplayCameraControls.rotationSpeedScale; }
-            set { CacheGameplayCameraControls.rotationSpeedScale = value; }
+            get { return CacheGameplayCameraController.RotationSpeedScale; }
+            set { CacheGameplayCameraController.RotationSpeedScale = value; }
         }
 
         public bool HideCrosshair { get; set; }
@@ -331,10 +328,17 @@ namespace MultiplayerARPG
         protected override void Awake()
         {
             base.Awake();
-            if (gameplayCameraPrefab != null)
-                CacheGameplayCameraControls = Instantiate(gameplayCameraPrefab);
-            if (minimapCameraPrefab != null)
-                CacheMinimapCameraControls = Instantiate(minimapCameraPrefab);
+            CacheGameplayCameraController = gameObject.GetOrAddComponent<IShooterGameplayCameraController, ShooterGameplayCameraController>((obj) =>
+            {
+                ShooterGameplayCameraController castedObj = obj as ShooterGameplayCameraController;
+                castedObj.gameplayCameraPrefab = gameplayCameraPrefab;
+                castedObj.InitialCameraControls();
+            });
+            CacheMinimapCameraController = gameObject.GetOrAddComponent<IMinimapCameraController, DefaultMinimapCameraController>((obj) =>
+            {
+                DefaultMinimapCameraController castedObj = obj as DefaultMinimapCameraController;
+                castedObj.minimapCameraPrefab = minimapCameraPrefab;
+            });
             buildingItemIndex = -1;
             isLeftHandAttacking = false;
             ConstructingBuildingEntity = null;
@@ -353,6 +357,8 @@ namespace MultiplayerARPG
         protected override void Setup(BasePlayerCharacterEntity characterEntity)
         {
             base.Setup(characterEntity);
+            CacheGameplayCameraController.Setup(characterEntity);
+            CacheMinimapCameraController.Setup(characterEntity);
 
             if (characterEntity == null)
                 return;
@@ -362,21 +368,18 @@ namespace MultiplayerARPG
             characterEntity.onEquipWeaponSetChange += SetupEquipWeapons;
             characterEntity.onSelectableWeaponSetsOperation += SetupEquipWeapons;
             characterEntity.onLaunchDamageEntity += OnLaunchDamageEntity;
-            characterEntity.ModelManager.InstantiateFpsModel(CacheGameplayCameraTransform);
+            if (CacheFpsModel != null)
+                Destroy(CacheFpsModel.gameObject);
+            CacheFpsModel = characterEntity.ModelManager.InstantiateFpsModel(CacheGameplayCameraController.CameraTransform);
             characterEntity.ModelManager.SetIsFps(ViewMode == ShooterControllerViewMode.Fps);
-            CacheGameplayCameraControls.startYRotation = characterEntity.CurrentRotation.y;
             UpdateViewMode();
         }
 
         protected override void Desetup(BasePlayerCharacterEntity characterEntity)
         {
             base.Desetup(characterEntity);
-
-            if (CacheGameplayCameraControls != null)
-                CacheGameplayCameraControls.target = null;
-
-            if (CacheMinimapCameraControls != null)
-                CacheMinimapCameraControls.target = null;
+            CacheGameplayCameraController.Desetup(characterEntity);
+            CacheMinimapCameraController.Desetup(characterEntity);
 
             if (characterEntity == null)
                 return;
@@ -389,10 +392,8 @@ namespace MultiplayerARPG
         protected override void OnDestroy()
         {
             base.OnDestroy();
-            if (CacheGameplayCameraControls != null)
-                Destroy(CacheGameplayCameraControls.gameObject);
-            if (CacheMinimapCameraControls != null)
-                Destroy(CacheMinimapCameraControls.gameObject);
+            Destroy(CacheGameplayCameraController.GameObject);
+            Destroy(CacheMinimapCameraController.GameObject);
             if (warpPortalEntityDetector != null)
                 Destroy(warpPortalEntityDetector.gameObject);
             Cursor.lockState = CursorLockMode.None;
@@ -450,11 +451,8 @@ namespace MultiplayerARPG
             if (PlayerCharacterEntity == null || !PlayerCharacterEntity.IsOwnerClient)
                 return;
 
-            if (CacheGameplayCameraControls != null)
-                CacheGameplayCameraControls.target = CameraTargetTransform;
-
-            if (CacheMinimapCameraControls != null)
-                CacheMinimapCameraControls.target = CameraTargetTransform;
+            CacheMinimapCameraController.FollowingEntityTransform = CameraTargetTransform;
+            CacheMinimapCameraController.FollowingGameplayCameraTransform = CacheGameplayCameraController.CameraTransform;
 
             if (PlayerCharacterEntity.IsDead())
             {
@@ -482,9 +480,9 @@ namespace MultiplayerARPG
             if (dirtyViewMode != viewMode)
                 UpdateViewMode();
 
-            CacheGameplayCameraControls.targetOffset = CameraTargetOffset;
-            CacheGameplayCameraControls.enableWallHitSpring = viewMode == ShooterControllerViewMode.Tps ? true : false;
-            CacheGameplayCameraControls.target = ViewMode == ShooterControllerViewMode.Fps ? PlayerCharacterEntity.FpsCameraTargetTransform : PlayerCharacterEntity.CameraTargetTransform;
+            CacheGameplayCameraController.TargetOffset = CameraTargetOffset;
+            CacheGameplayCameraController.EnableWallHitSpring = viewMode == ShooterControllerViewMode.Tps;
+            CacheGameplayCameraController.FollowingEntityTransform = ViewMode == ShooterControllerViewMode.Fps ? PlayerCharacterEntity.FpsCameraTargetTransform : PlayerCharacterEntity.CameraTargetTransform;
 
             // Set temp data
             tempDeltaTime = Time.deltaTime;
@@ -505,18 +503,18 @@ namespace MultiplayerARPG
                 // Control camera by touch-screen
                 Cursor.lockState = CursorLockMode.None;
                 Cursor.visible = true;
-                CacheGameplayCameraControls.updateRotationX = false;
-                CacheGameplayCameraControls.updateRotationY = false;
-                CacheGameplayCameraControls.updateRotation = InputManager.GetButton("CameraRotate");
-                CacheGameplayCameraControls.updateZoom = !IsBlockController;
+                CacheGameplayCameraController.UpdateRotationX = false;
+                CacheGameplayCameraController.UpdateRotationY = false;
+                CacheGameplayCameraController.UpdateRotation = InputManager.GetButton("CameraRotate");
+                CacheGameplayCameraController.UpdateZoom = !IsBlockController;
             }
             else
             {
                 // Control camera by mouse-move
                 Cursor.lockState = !IsBlockController ? CursorLockMode.Locked : CursorLockMode.None;
                 Cursor.visible = IsBlockController;
-                CacheGameplayCameraControls.updateRotation = !IsBlockController;
-                CacheGameplayCameraControls.updateZoom = !IsBlockController;
+                CacheGameplayCameraController.UpdateRotation = !IsBlockController;
+                CacheGameplayCameraController.UpdateZoom = !IsBlockController;
             }
             // Clear selected entity
             SelectedEntity = null;
@@ -539,12 +537,12 @@ namespace MultiplayerARPG
             }
 
             // Prepare variables to find nearest raycasted hit point
-            centerRay = CacheGameplayCamera.ViewportPointToRay(new Vector3(0.5f, 0.5f, 0));
+            centerRay = CacheGameplayCameraController.Camera.ViewportPointToRay(new Vector3(0.5f, 0.5f, 0));
             centerOriginToCharacterDistance = Vector3.Distance(centerRay.origin, CacheTransform.position);
-            cameraForward = CacheGameplayCameraTransform.forward;
+            cameraForward = CacheGameplayCameraController.CameraTransform.forward;
             cameraForward.y = 0f;
             cameraForward.Normalize();
-            cameraRight = CacheGameplayCameraTransform.right;
+            cameraRight = CacheGameplayCameraController.CameraTransform.right;
             cameraRight.y = 0f;
             cameraRight.Normalize();
 
@@ -812,49 +810,27 @@ namespace MultiplayerARPG
             CacheUISceneGameplay.SetTargetEntity(SelectedEntity);
             PlayerCharacterEntity.SetTargetEntity(SelectedEntity);
             // Update aim assist
-            CacheGameplayCameraControls.enableAimAssist = enableAimAssist && (tempPressAttackRight || tempPressAttackLeft || !aimAssistOnFireOnly) && !(SelectedEntity is IDamageableEntity);
-            CacheGameplayCameraControls.enableAimAssistX = enableAimAssistX;
-            CacheGameplayCameraControls.enableAimAssistY = enableAimAssistY;
-            CacheGameplayCameraControls.aimAssistRadius = aimAssistRadius;
-            CacheGameplayCameraControls.aimAssistLayerMask = GetAimAssistLayerMask();
-            CacheGameplayCameraControls.aimAssistXSpeed = aimAssistXSpeed;
-            CacheGameplayCameraControls.aimAssistYSpeed = aimAssistYSpeed;
-            CacheGameplayCameraControls.aimAssistMaxAngleFromFollowingTarget = 115f;
-            CacheGameplayCameraControls.AimAssistAvoidanceListener = this;
-        }
-
-        public virtual bool AvoidAimAssist(RaycastHit hitInfo)
-        {
-            IGameEntity entity = hitInfo.collider.GetComponent<IGameEntity>();
-            if (entity != null && entity.Entity != null && entity.Entity != PlayerCharacterEntity)
-            {
-                DamageableEntity damageableEntity = entity.Entity as DamageableEntity;
-                return damageableEntity == null || damageableEntity.IsDead() || !damageableEntity.CanReceiveDamageFrom(PlayerCharacterEntity.GetInfo());
-            }
-            return true;
-        }
-
-        protected virtual int GetAimAssistLayerMask()
-        {
-            int layerMask = 0;
-            if (aimAssistCharacter)
-                layerMask = layerMask | CurrentGameInstance.characterLayer.Mask;
-            if (aimAssistBuilding)
-                layerMask = layerMask | CurrentGameInstance.buildingLayer.Mask;
-            if (aimAssistHarvestable)
-                layerMask = layerMask | CurrentGameInstance.harvestableLayer.Mask;
-            return layerMask;
+            CacheGameplayCameraController.EnableAimAssist = enableAimAssist && (tempPressAttackRight || tempPressAttackLeft || !aimAssistOnFireOnly) && !(SelectedEntity is IDamageableEntity);
+            CacheGameplayCameraController.EnableAimAssistX = enableAimAssistX;
+            CacheGameplayCameraController.EnableAimAssistY = enableAimAssistY;
+            CacheGameplayCameraController.AimAssistCharacter = aimAssistCharacter;
+            CacheGameplayCameraController.AimAssistBuilding = aimAssistBuilding;
+            CacheGameplayCameraController.AimAssistHarvestable = aimAssistHarvestable;
+            CacheGameplayCameraController.AimAssistRadius = aimAssistRadius;
+            CacheGameplayCameraController.AimAssistXSpeed = aimAssistXSpeed;
+            CacheGameplayCameraController.AimAssistYSpeed = aimAssistYSpeed;
+            CacheGameplayCameraController.AimAssistMaxAngleFromFollowingTarget = 115f;
         }
 
         protected virtual void UpdateTarget_BuildMode()
         {
             // Disable aim assist while constucting the building
-            CacheGameplayCameraControls.enableAimAssist = false;
+            CacheGameplayCameraController.EnableAimAssist = false;
         }
 
         protected virtual void UpdateMovementInputs()
         {
-            pitch = CacheGameplayCameraTransform.eulerAngles.x;
+            pitch = CacheGameplayCameraController.CameraTransform.eulerAngles.x;
 
             // Update charcter pitch
             PlayerCharacterEntity.Pitch = pitch;
@@ -1285,7 +1261,7 @@ namespace MultiplayerARPG
             }
             if (recoilX > 0f || recoilY > 0f)
             {
-                CacheGameplayCameraControls.Recoil(recoilY, Random.Range(-recoilX, recoilX));
+                CacheGameplayCameraController.Recoil(recoilY, Random.Range(-recoilX, recoilX));
             }
         }
 
@@ -1632,16 +1608,16 @@ namespace MultiplayerARPG
             dirtyViewMode = viewMode;
             UpdateCameraSettings();
             // Update camera zoom distance when change view mode only, to allow zoom controls
-            CacheGameplayCameraControls.zoomDistance = CameraZoomDistance;
-            CacheGameplayCameraControls.minZoomDistance = CameraMinZoomDistance;
-            CacheGameplayCameraControls.maxZoomDistance = CameraMaxZoomDistance;
+            CacheGameplayCameraController.MinZoomDistance = CameraMinZoomDistance;
+            CacheGameplayCameraController.MaxZoomDistance = CameraMaxZoomDistance;
+            CacheGameplayCameraController.CurrentZoomDistance = CameraZoomDistance;
         }
 
         public virtual void UpdateCameraSettings()
         {
-            CacheGameplayCamera.fieldOfView = CameraFov;
-            CacheGameplayCamera.nearClipPlane = CameraNearClipPlane;
-            CacheGameplayCamera.farClipPlane = CameraFarClipPlane;
+            CacheGameplayCameraController.Camera.fieldOfView = CameraFov;
+            CacheGameplayCameraController.Camera.nearClipPlane = CameraNearClipPlane;
+            CacheGameplayCameraController.Camera.farClipPlane = CameraFarClipPlane;
             PlayerCharacterEntity.ModelManager.SetIsFps(viewMode == ShooterControllerViewMode.Fps);
         }
 
@@ -1705,7 +1681,7 @@ namespace MultiplayerARPG
                 // It's also no snapping build area, so set building rotation by camera look direction
                 ConstructingBuildingEntity.Position = aimTargetPosition;
                 // Rotate to camera
-                Vector3 direction = aimTargetPosition - CacheGameplayCameraTransform.position;
+                Vector3 direction = aimTargetPosition - CacheGameplayCameraController.CameraTransform.position;
                 direction.y = 0f;
                 direction.Normalize();
                 ConstructingBuildingEntity.CacheTransform.eulerAngles = Quaternion.LookRotation(direction).eulerAngles + (Vector3.up * buildYRotate);

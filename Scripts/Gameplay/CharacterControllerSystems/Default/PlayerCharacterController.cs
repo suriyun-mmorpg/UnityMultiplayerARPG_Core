@@ -64,15 +64,11 @@ namespace MultiplayerARPG
         [SerializeField]
         protected float buildRotateSpeed = 200f;
 
-        public FollowCameraControls CacheGameplayCameraControls { get; protected set; }
-        public FollowCameraControls CacheMinimapCameraControls { get; protected set; }
         public NearbyEntityDetector ActivatableEntityDetector { get; protected set; }
         public NearbyEntityDetector ItemDropEntityDetector { get; protected set; }
         public NearbyEntityDetector EnemyEntityDetector { get; protected set; }
-        public Camera CacheGameplayCamera { get { return CacheGameplayCameraControls.CacheCamera; } }
-        public Camera CacheMiniMapCamera { get { return CacheMinimapCameraControls.CacheCamera; } }
-        public Transform CacheGameplayCameraTransform { get { return CacheGameplayCameraControls.CacheCameraTransform; } }
-        public Transform CacheMiniMapCameraTransform { get { return CacheMinimapCameraControls.CacheCameraTransform; } }
+        public IGameplayCameraController CacheGameplayCameraController { get; protected set; }
+        public IMinimapCameraController CacheMinimapCameraController { get; protected set; }
         public GameObject CacheTargetObject { get; protected set; }
 
         // Input & control states variables
@@ -111,10 +107,17 @@ namespace MultiplayerARPG
         protected override void Awake()
         {
             base.Awake();
-            if (gameplayCameraPrefab != null)
-                CacheGameplayCameraControls = Instantiate(gameplayCameraPrefab);
-            if (minimapCameraPrefab != null)
-                CacheMinimapCameraControls = Instantiate(minimapCameraPrefab);
+            CacheGameplayCameraController = gameObject.GetOrAddComponent<IGameplayCameraController, DefaultGameplayCameraController>((obj) =>
+            {
+                DefaultGameplayCameraController castedObj = obj as DefaultGameplayCameraController;
+                castedObj.gameplayCameraPrefab = gameplayCameraPrefab;
+                castedObj.InitialCameraControls();
+            });
+            CacheMinimapCameraController = gameObject.GetOrAddComponent<IMinimapCameraController, DefaultMinimapCameraController>((obj) =>
+            {
+                DefaultMinimapCameraController castedObj = obj as DefaultMinimapCameraController;
+                castedObj.minimapCameraPrefab = minimapCameraPrefab;
+            });
             buildingItemIndex = -1;
             findingEnemyIndex = -1;
             isLeftHandAttacking = false;
@@ -160,24 +163,25 @@ namespace MultiplayerARPG
                 physicFunctions = new PhysicFunctions2D(512);
         }
 
+        protected override void Setup(BasePlayerCharacterEntity characterEntity)
+        {
+            base.Setup(characterEntity);
+            CacheGameplayCameraController.Setup(characterEntity);
+            CacheMinimapCameraController.Setup(characterEntity);
+        }
+
         protected override void Desetup(BasePlayerCharacterEntity characterEntity)
         {
             base.Desetup(characterEntity);
-
-            if (CacheGameplayCameraControls != null)
-                CacheGameplayCameraControls.target = null;
-
-            if (CacheMinimapCameraControls != null)
-                CacheMinimapCameraControls.target = null;
+            CacheGameplayCameraController.Desetup(characterEntity);
+            CacheMinimapCameraController.Desetup(characterEntity);
         }
 
         protected override void OnDestroy()
         {
             base.OnDestroy();
-            if (CacheGameplayCameraControls != null)
-                Destroy(CacheGameplayCameraControls.gameObject);
-            if (CacheMinimapCameraControls != null)
-                Destroy(CacheMinimapCameraControls.gameObject);
+            Destroy(CacheGameplayCameraController.GameObject);
+            Destroy(CacheMinimapCameraController.GameObject);
             if (CacheTargetObject != null)
                 Destroy(CacheTargetObject.gameObject);
             if (ActivatableEntityDetector != null)
@@ -193,11 +197,9 @@ namespace MultiplayerARPG
             if (PlayerCharacterEntity == null || !PlayerCharacterEntity.IsOwnerClient)
                 return;
 
-            if (CacheGameplayCameraControls != null)
-                CacheGameplayCameraControls.target = CameraTargetTransform;
-
-            if (CacheMinimapCameraControls != null)
-                CacheMinimapCameraControls.target = CameraTargetTransform;
+            CacheGameplayCameraController.FollowingEntityTransform = CameraTargetTransform;
+            CacheMinimapCameraController.FollowingEntityTransform = CameraTargetTransform;
+            CacheMinimapCameraController.FollowingGameplayCameraTransform = CacheGameplayCameraController.CameraTransform;
 
             if (CacheTargetObject != null)
                 CacheTargetObject.gameObject.SetActive(destination.HasValue);
@@ -327,8 +329,8 @@ namespace MultiplayerARPG
             switch (CurrentGameInstance.DimensionType)
             {
                 case DimensionType.Dimension3D:
-                    Vector3 forward = CacheGameplayCameraTransform.forward;
-                    Vector3 right = CacheGameplayCameraTransform.right;
+                    Vector3 forward = CacheGameplayCameraController.CameraTransform.forward;
+                    Vector3 right = CacheGameplayCameraController.CameraTransform.right;
                     forward.y = 0f;
                     right.y = 0f;
                     forward.Normalize();

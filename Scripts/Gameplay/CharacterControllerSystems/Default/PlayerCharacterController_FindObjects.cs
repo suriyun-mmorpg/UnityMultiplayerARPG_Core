@@ -6,12 +6,12 @@ namespace MultiplayerARPG
     {
         public int FindClickObjects(out Vector3 worldPosition2D)
         {
-            return physicFunctions.RaycastPickObjects(CacheGameplayCamera, InputManager.MousePosition(), CurrentGameInstance.GetTargetLayerMask(), 100f, out worldPosition2D);
+            return physicFunctions.RaycastPickObjects(CacheGameplayCameraController.Camera, InputManager.MousePosition(), CurrentGameInstance.GetTargetLayerMask(), 100f, out worldPosition2D);
         }
 
         public void FindAndSetBuildingAreaByAxes(Vector2 aimAxes)
         {
-            Vector3 raycastPosition = CacheTransform.position + (GameplayUtils.GetDirectionByAxes(CacheGameplayCameraTransform, aimAxes.x, aimAxes.y) * ConstructingBuildingEntity.BuildDistance);
+            Vector3 raycastPosition = CacheTransform.position + (GameplayUtils.GetDirectionByAxes(CacheGameplayCameraController.CameraTransform, aimAxes.x, aimAxes.y) * ConstructingBuildingEntity.BuildDistance);
             if (CurrentGameInstance.DimensionType == DimensionType.Dimension3D)
                 raycastPosition += Vector3.up;
             LoopSetBuildingArea(physicFunctions.RaycastDown(raycastPosition, CurrentGameInstance.GetBuildLayerMask(), 100f, QueryTriggerInteraction.Collide));
@@ -19,7 +19,7 @@ namespace MultiplayerARPG
 
         public void FindAndSetBuildingAreaByMousePosition()
         {
-            LoopSetBuildingArea(physicFunctions.RaycastPickObjects(CacheGameplayCamera, InputManager.MousePosition(), CurrentGameInstance.GetBuildLayerMask(), Vector3.Distance(CacheGameplayCameraTransform.position, MovementTransform.position) + ConstructingBuildingEntity.BuildDistance, out _, QueryTriggerInteraction.Collide));
+            LoopSetBuildingArea(physicFunctions.RaycastPickObjects(CacheGameplayCameraController.Camera, InputManager.MousePosition(), CurrentGameInstance.GetBuildLayerMask(), Vector3.Distance(CacheGameplayCameraController.CameraTransform.position, MovementTransform.position) + ConstructingBuildingEntity.BuildDistance, out _, QueryTriggerInteraction.Collide));
         }
 
         /// <summary>
