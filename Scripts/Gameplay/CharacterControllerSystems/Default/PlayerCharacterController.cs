@@ -180,8 +180,8 @@ namespace MultiplayerARPG
         protected override void OnDestroy()
         {
             base.OnDestroy();
-            Destroy(CacheGameplayCameraController.GameObject);
-            Destroy(CacheMinimapCameraController.GameObject);
+            Destroy(CacheGameplayCameraController.gameObject);
+            Destroy(CacheMinimapCameraController.gameObject);
             if (CacheTargetObject != null)
                 Destroy(CacheTargetObject.gameObject);
             if (ActivatableEntityDetector != null)
