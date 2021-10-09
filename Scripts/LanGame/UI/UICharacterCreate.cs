@@ -167,18 +167,18 @@ namespace MultiplayerARPG
         protected override void Awake()
         {
             base.Awake();
-            MigrateInputFieldComponent();
+            MigrateInputComponent();
         }
 
 #if UNITY_EDITOR
         private void OnValidate()
         {
-            if (MigrateInputFieldComponent())
+            if (MigrateInputComponent())
                 EditorUtility.SetDirty(this);
         }
 #endif
 
-        public bool MigrateInputFieldComponent()
+        public bool MigrateInputComponent()
         {
             bool hasChanges = false;
             InputFieldWrapper wrapper;
