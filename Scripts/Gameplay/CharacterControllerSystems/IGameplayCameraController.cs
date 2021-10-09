@@ -4,7 +4,7 @@ namespace MultiplayerARPG
 {
     public interface IGameplayCameraController
     {
-        GameObject GameObject { get; }
+        GameObject gameObject { get; }
         Camera Camera { get; }
         Transform CameraTransform { get; }
         Transform FollowingEntityTransform { get; set; }

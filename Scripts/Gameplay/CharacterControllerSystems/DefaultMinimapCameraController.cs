@@ -6,7 +6,6 @@ namespace MultiplayerARPG
     {
         public FollowCameraControls minimapCameraPrefab = null;
         public FollowCameraControls CameraControls { get; protected set; }
-        public GameObject GameObject { get { return gameObject; } }
         public Camera Camera { get { return CameraControls.CacheCamera; } }
         public Transform CameraTransform { get { return CameraControls.CacheCameraTransform; } }
         public Transform FollowingEntityTransform { get; set; }

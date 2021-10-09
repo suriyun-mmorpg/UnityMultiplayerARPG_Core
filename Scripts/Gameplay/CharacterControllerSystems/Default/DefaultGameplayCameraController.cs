@@ -10,7 +10,6 @@ namespace MultiplayerARPG
         public bool aimAssistHarvestable = false;
         public BasePlayerCharacterEntity PlayerCharacterEntity { get; protected set; }
         public FollowCameraControls CameraControls { get; protected set; }
-        public GameObject GameObject { get { return gameObject; } }
         public Camera Camera { get { return CameraControls.CacheCamera; } }
         public Transform CameraTransform { get { return CameraControls.CacheCameraTransform; } }
         public Transform FollowingEntityTransform { get; set; }

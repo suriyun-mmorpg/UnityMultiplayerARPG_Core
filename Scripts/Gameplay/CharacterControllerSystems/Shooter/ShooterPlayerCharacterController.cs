@@ -399,8 +399,8 @@ namespace MultiplayerARPG
         protected override void OnDestroy()
         {
             base.OnDestroy();
-            Destroy(CacheGameplayCameraController.GameObject);
-            Destroy(CacheMinimapCameraController.GameObject);
+            Destroy(CacheGameplayCameraController.gameObject);
+            Destroy(CacheMinimapCameraController.gameObject);
             if (warpPortalEntityDetector != null)
                 Destroy(warpPortalEntityDetector.gameObject);
             Cursor.lockState = CursorLockMode.None;
