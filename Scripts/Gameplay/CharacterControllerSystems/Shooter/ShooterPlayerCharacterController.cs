@@ -243,20 +243,9 @@ namespace MultiplayerARPG
             set { CacheGameplayCameraController.Camera.fieldOfView = value; }
         }
 
-        public float? defaultCameraRotationSpeedScale;
         public float DefaultCameraRotationSpeedScale
         {
-            get
-            {
-                if (!defaultCameraRotationSpeedScale.HasValue)
-                {
-                    if (string.IsNullOrEmpty(defaultCameraRotationSpeedScaleSaveKey))
-                        defaultCameraRotationSpeedScale = 1f;
-                    else
-                        defaultCameraRotationSpeedScale = PlayerPrefs.GetFloat(defaultCameraRotationSpeedScaleSaveKey, 1f);
-                }
-                return defaultCameraRotationSpeedScale.Value;
-            }
+            get { return CameraRotationSpeedScaleSetting.GetCameraRotationSpeedScaleByKey(defaultCameraRotationSpeedScaleSaveKey, 1f); }
         }
 
         public float CameraRotationSpeedScale
@@ -351,6 +340,7 @@ namespace MultiplayerARPG
                 castedObj.gameplayCameraPrefab = gameplayCameraPrefab;
                 castedObj.InitialCameraControls();
             });
+            CameraRotationSpeedScale = DefaultCameraRotationSpeedScale;
             CacheMinimapCameraController = gameObject.GetOrAddComponent<IMinimapCameraController, DefaultMinimapCameraController>((obj) =>
             {
                 DefaultMinimapCameraController castedObj = obj as DefaultMinimapCameraController;
@@ -542,7 +532,8 @@ namespace MultiplayerARPG
             // Clear controlling states from last update
             movementState = MovementState.None;
             extraMovementState = ExtraMovementState.None;
-            UpdateActivatedWeaponAbility(tempDeltaTime);
+            CacheGameplayCameraController.CameraRotationSpeedScale = DefaultCameraRotationSpeedScale;
+            UpdateWeaponAbilityActivation(tempDeltaTime);
 
             if (IsBlockController || GenericUtils.IsFocusInputField())
             {
@@ -1493,13 +1484,9 @@ namespace MultiplayerARPG
             WeaponAbilityState = WeaponAbilityState.Activating;
         }
 
-        protected virtual void UpdateActivatedWeaponAbility(float deltaTime)
+        protected virtual void UpdateWeaponAbilityActivation(float deltaTime)
         {
             if (WeaponAbility == null)
-                return;
-
-            if (WeaponAbilityState == WeaponAbilityState.Activated ||
-                WeaponAbilityState == WeaponAbilityState.Deactivated)
                 return;
 
             WeaponAbilityState = WeaponAbility.UpdateActivation(WeaponAbilityState, deltaTime);

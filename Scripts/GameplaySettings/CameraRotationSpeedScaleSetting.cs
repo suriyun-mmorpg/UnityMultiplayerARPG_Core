@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System.Collections.Generic;
+using UnityEngine;
 using UnityEngine.UI;
 
 namespace MultiplayerARPG
@@ -8,20 +9,30 @@ namespace MultiplayerARPG
         public Slider slider;
         public float defaultValue = 1f;
         public string cameraRotationSpeedScaleSaveKey = "DEFAULT_CAMERA_ROTATION_SPEED_SCALE";
-        public float? cameraRotationSpeedScale;
+        private readonly static Dictionary<string, float> CameraRotationSpeedScales = new Dictionary<string, float>();
         public float CameraRotationSpeedScale
         {
             get
             {
-                if (!cameraRotationSpeedScale.HasValue)
-                    cameraRotationSpeedScale = PlayerPrefs.GetFloat(cameraRotationSpeedScaleSaveKey, defaultValue);
-                return cameraRotationSpeedScale.Value;
+                return GetCameraRotationSpeedScaleByKey(cameraRotationSpeedScaleSaveKey, defaultValue);
             }
             set
             {
-                cameraRotationSpeedScale = value;
-                PlayerPrefs.SetFloat(cameraRotationSpeedScaleSaveKey, value);
+                if (!string.IsNullOrEmpty(cameraRotationSpeedScaleSaveKey))
+                {
+                    CameraRotationSpeedScales[cameraRotationSpeedScaleSaveKey] = value;
+                    PlayerPrefs.SetFloat(cameraRotationSpeedScaleSaveKey, value);
+                }
             }
+        }
+
+        public static float GetCameraRotationSpeedScaleByKey(string key, float defaultValue)
+        {
+            if (string.IsNullOrEmpty(key))
+                return defaultValue;
+            if (!CameraRotationSpeedScales.ContainsKey(key))
+                CameraRotationSpeedScales[key] = PlayerPrefs.GetFloat(key, defaultValue);
+            return CameraRotationSpeedScales[key];
         }
 
         private void Start()
