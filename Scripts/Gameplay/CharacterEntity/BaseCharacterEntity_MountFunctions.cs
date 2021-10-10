@@ -19,8 +19,9 @@ namespace MultiplayerARPG
             }
 
             // Instantiate new mount entity
-            GameObject spawnObj = Instantiate(mountEntityPrefab.gameObject, enterPosition, Quaternion.Euler(0, CacheTransform.eulerAngles.y, 0));
-            VehicleEntity vehicle = BaseGameNetworkManager.Singleton.Assets.NetworkSpawn(spawnObj, 0, ConnectionId).GetComponent<VehicleEntity>();
+            VehicleEntity vehicle = BaseGameNetworkManager.Singleton.Assets
+                .NetworkSpawn(mountEntityPrefab.Identity.HashAssetId, enterPosition, Quaternion.Euler(0, CacheTransform.eulerAngles.y, 0), 0, ConnectionId)
+                .GetComponent<VehicleEntity>();
 
             // Seat index for mount entity always 0
             EnterVehicle(vehicle, 0);

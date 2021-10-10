@@ -58,7 +58,7 @@ namespace MultiplayerARPG
             if (GetRandomPosition(out spawnPosition))
             {
                 Quaternion spawnRotation = GetRandomRotation();
-                GameObject spawnObj = Instantiate(prefab.gameObject, spawnPosition, spawnRotation);
+                LiteNetLibIdentity spawnObj = BaseGameNetworkManager.Singleton.Assets.GetObjectInstance(prefab.Identity.HashAssetId, spawnPosition, spawnRotation);
                 BaseMonsterCharacterEntity entity = spawnObj.GetComponent<BaseMonsterCharacterEntity>();
                 if (!entity.FindGroundedPosition(spawnPosition, GROUND_DETECTION_DISTANCE, out spawnPosition))
                 {

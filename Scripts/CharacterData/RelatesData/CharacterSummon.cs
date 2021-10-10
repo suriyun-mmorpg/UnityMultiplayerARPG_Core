@@ -122,7 +122,7 @@ namespace MultiplayerARPG
             if (GetPrefab() == null)
                 return;
             cacheEntity = BaseGameNetworkManager.Singleton.Assets
-                .NetworkSpawn(Object.Instantiate(GetPrefab().gameObject, GameInstance.Singleton.GameplayRule.GetSummonPosition(summoner), GameInstance.Singleton.GameplayRule.GetSummonRotation(summoner)))
+                .NetworkSpawn(GetPrefab().Identity.HashAssetId, GameInstance.Singleton.GameplayRule.GetSummonPosition(summoner), GameInstance.Singleton.GameplayRule.GetSummonRotation(summoner))
                 .GetComponent<BaseMonsterCharacterEntity>();
             CacheEntity.Summon(summoner, type, summonLevel);
             objectId = CacheEntity.ObjectId;

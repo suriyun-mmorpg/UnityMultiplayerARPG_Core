@@ -649,6 +649,7 @@ namespace MultiplayerARPG
             RegisterEntities();
             await UniTask.SwitchToMainThread();
             int i;
+            LiteNetLibIdentity spawnObj;
             // Spawn Warp Portals
             if (LogInfo)
                 Logging.Log("Spawning warp portals");
@@ -666,13 +667,14 @@ namespace MultiplayerARPG
                         warpPortalPrefab = warpPortal.entityPrefab != null ? warpPortal.entityPrefab : CurrentGameInstance.warpPortalEntityPrefab;
                         if (warpPortalPrefab != null)
                         {
-                            warpPortalEntity = Instantiate(warpPortalPrefab, warpPortal.position, Quaternion.identity);
+                            spawnObj = Assets.GetObjectInstance(warpPortalPrefab.Identity.HashAssetId, warpPortal.position, Quaternion.Euler(warpPortal.rotation));
+                            warpPortalEntity = spawnObj.GetComponent<WarpPortalEntity>();
                             warpPortalEntity.warpPortalType = warpPortal.warpPortalType;
                             warpPortalEntity.warpToMapInfo = warpPortal.warpToMapInfo;
                             warpPortalEntity.warpToPosition = warpPortal.warpToPosition;
                             warpPortalEntity.warpOverrideRotation = warpPortal.warpOverrideRotation;
                             warpPortalEntity.warpToRotation = warpPortal.warpToRotation;
-                            Assets.NetworkSpawn(warpPortalEntity.gameObject);
+                            Assets.NetworkSpawn(spawnObj);
                         }
                         await UniTask.Yield();
                         progress = 0f + ((float)i / (float)mapWarpPortals.Count * 0.25f);
@@ -700,11 +702,12 @@ namespace MultiplayerARPG
                         npcPrefab = npc.entityPrefab;
                         if (npcPrefab != null)
                         {
-                            npcEntity = Instantiate(npcPrefab, npc.position, Quaternion.Euler(npc.rotation));
+                            spawnObj = Assets.GetObjectInstance(npcPrefab.Identity.HashAssetId, npc.position, Quaternion.Euler(npc.rotation));
+                            npcEntity = spawnObj.GetComponent<NpcEntity>();
                             npcEntity.Title = npc.title;
                             npcEntity.StartDialog = npc.startDialog;
                             npcEntity.Graph = npc.graph;
-                            Assets.NetworkSpawn(npcEntity.gameObject);
+                            Assets.NetworkSpawn(spawnObj);
                         }
                         await UniTask.Yield();
                         progress = 0.25f + ((float)i / (float)mapNpcs.Count * 0.25f);
@@ -815,7 +818,7 @@ namespace MultiplayerARPG
         {
             if (GameInstance.BuildingEntities.ContainsKey(saveData.EntityId))
             {
-                GameObject spawnObj = Instantiate(GameInstance.BuildingEntities[saveData.EntityId].gameObject, saveData.position, saveData.Rotation);
+                LiteNetLibIdentity spawnObj = Assets.GetObjectInstance(GameInstance.BuildingEntities[saveData.EntityId].Identity.HashAssetId, saveData.position, saveData.Rotation);
                 BuildingEntity buildingEntity = spawnObj.GetComponent<BuildingEntity>();
                 buildingEntity.Id = saveData.Id;
                 buildingEntity.ParentId = saveData.ParentId;

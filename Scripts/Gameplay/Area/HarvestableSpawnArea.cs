@@ -104,7 +104,7 @@ namespace MultiplayerARPG
                 }
 
                 Quaternion spawnRotation = GetRandomRotation();
-                GameObject spawnObj = Instantiate(prefab.gameObject, spawnPosition, spawnRotation);
+                LiteNetLibIdentity spawnObj = BaseGameNetworkManager.Singleton.Assets.GetObjectInstance(prefab.Identity.HashAssetId, spawnPosition, spawnRotation);
                 HarvestableEntity entity = spawnObj.GetComponent<HarvestableEntity>();
                 entity.SetSpawnArea(this, prefab, level, spawnPosition);
                 BaseGameNetworkManager.Singleton.Assets.NetworkSpawn(spawnObj);

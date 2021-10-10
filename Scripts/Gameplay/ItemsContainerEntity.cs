@@ -93,7 +93,7 @@ namespace MultiplayerARPG
                 // Find drop position on ground
                 dropPosition = PhysicUtils.FindGroundedPosition(dropPosition, findGroundRaycastHits, GROUND_DETECTION_DISTANCE, GameInstance.Singleton.GetItemDropGroundDetectionLayerMask());
             }
-            GameObject spawnObj = Instantiate(prefab.gameObject, dropPosition, dropRotation);
+            LiteNetLibIdentity spawnObj = BaseGameNetworkManager.Singleton.Assets.GetObjectInstance(prefab.Identity.HashAssetId, dropPosition, dropRotation);
             ItemsContainerEntity itemsContainerEntity = spawnObj.GetComponent<ItemsContainerEntity>();
             itemsContainerEntity.Items.AddRange(dropItems);
             BaseGameNetworkManager.Singleton.Assets.NetworkSpawn(spawnObj);

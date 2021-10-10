@@ -245,7 +245,7 @@ namespace MultiplayerARPG
             Quaternion characterRotation = Quaternion.identity;
             if (CurrentGameInstance.DimensionType == DimensionType.Dimension3D)
                 characterRotation = Quaternion.Euler(playerCharacterData.CurrentRotation);
-            GameObject spawnObj = Instantiate(entityPrefab.gameObject, playerCharacterData.CurrentPosition, characterRotation);
+            LiteNetLibIdentity spawnObj = Assets.GetObjectInstance(entityPrefab.Identity.HashAssetId, playerCharacterData.CurrentPosition, characterRotation);
             BasePlayerCharacterEntity playerCharacterEntity = spawnObj.GetComponent<BasePlayerCharacterEntity>();
             playerCharacterData.CloneTo(playerCharacterEntity);
             Assets.NetworkSpawn(spawnObj, 0, connectionId);

@@ -86,6 +86,7 @@ namespace MultiplayerARPG
         public Vector3 SpawnPosition { get; protected set; }
         public float DestroyDelay { get { return destroyDelay; } }
         public float DestroyRespawnDelay { get { return destroyRespawnDelay; } }
+        private GameObject dropModel;
 
         public override string EntityTitle
         {
@@ -234,16 +235,18 @@ namespace MultiplayerARPG
             // Instantiate model at clients
             if (!IsClient)
                 return;
+            if (dropModel != null)
+                Destroy(dropModel);
             BaseItem item;
             if (CacheModelContainer != null && itemDropData.putOnPlaceholder &&
                 GameInstance.Items.TryGetValue(itemDropData.dataId, out item) &&
                 item.DropModel != null)
             {
-                GameObject model = Instantiate(item.DropModel, CacheModelContainer);
-                model.gameObject.SetLayerRecursively(CurrentGameInstance.itemDropLayer, true);
-                model.gameObject.SetActive(true);
-                model.RemoveComponentsInChildren<Collider>(false);
-                model.transform.localPosition = Vector3.zero;
+                dropModel = Instantiate(item.DropModel, CacheModelContainer);
+                dropModel.gameObject.SetLayerRecursively(CurrentGameInstance.itemDropLayer, true);
+                dropModel.gameObject.SetActive(true);
+                dropModel.RemoveComponentsInChildren<Collider>(false);
+                dropModel.transform.localPosition = Vector3.zero;
             }
         }
 
@@ -320,7 +323,7 @@ namespace MultiplayerARPG
                 // Find drop position on ground
                 dropPosition = PhysicUtils.FindGroundedPosition(dropPosition, findGroundRaycastHits, GROUND_DETECTION_DISTANCE, GameInstance.Singleton.GetItemDropGroundDetectionLayerMask());
             }
-            GameObject spawnObj = Instantiate(prefab.gameObject, dropPosition, dropRotation);
+            LiteNetLibIdentity spawnObj = BaseGameNetworkManager.Singleton.Assets.GetObjectInstance(prefab.Identity.HashAssetId, dropPosition, dropRotation);
             ItemDropEntity itemDropEntity = spawnObj.GetComponent<ItemDropEntity>();
             itemDropEntity.PutOnPlaceholder = true;
             itemDropEntity.DropItems = new List<CharacterItem> { dropItem };
