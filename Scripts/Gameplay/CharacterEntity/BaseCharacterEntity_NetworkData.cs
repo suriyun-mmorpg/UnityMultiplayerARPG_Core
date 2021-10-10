@@ -422,7 +422,7 @@ namespace MultiplayerARPG
                 case LiteNetLibSyncList.Operation.AddRangeEnd:
                 case LiteNetLibSyncList.Operation.Insert:
                     // Check last buff to update disallow status
-                    if (buffs[buffs.Count - 1].GetBuff().disallowMove)
+                    if (buffs.Count > 0 && buffs[buffs.Count - 1].GetBuff().disallowMove)
                         StopMove();
                     break;
             }
