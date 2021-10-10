@@ -281,11 +281,11 @@ namespace MultiplayerARPG
         protected async UniTaskVoid RespawnRoutine(float delay)
         {
             await UniTask.Delay(Mathf.CeilToInt(delay * 1000));
-            InitDropItems();
             Manager.Assets.NetworkSpawnScene(
                 Identity.ObjectId,
                 CacheTransform.position,
                 CurrentGameInstance.DimensionType == DimensionType.Dimension3D ? Quaternion.Euler(Vector3.up * Random.Range(0, 360)) : Quaternion.identity);
+            InitDropItems();
         }
 
         public static ItemDropEntity DropItem(BaseGameEntity dropper, CharacterItem dropData, IEnumerable<uint> looters)
@@ -331,6 +331,7 @@ namespace MultiplayerARPG
             itemDropEntity.isPickedUp = false;
             itemDropEntity.dropTime = Time.unscaledTime;
             BaseGameNetworkManager.Singleton.Assets.NetworkSpawn(spawnObj);
+            itemDropEntity.InitDropItems();
             return itemDropEntity;
         }
     }
