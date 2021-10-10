@@ -5,7 +5,7 @@ namespace MultiplayerARPG
 {
     public static class PoolSystem
     {
-        private static Dictionary<IPoolDescriptor, Queue<IPoolDescriptor>> poolingObjects = new Dictionary<IPoolDescriptor, Queue<IPoolDescriptor>>();
+        private static Dictionary<IPoolDescriptor, Queue<IPoolDescriptor>> pooledObjects = new Dictionary<IPoolDescriptor, Queue<IPoolDescriptor>>();
 #if UNITY_EDITOR && INIT_POOL_TO_TRANSFORM
         private static Transform poolingTransform;
         private static Transform PoolingTransform
@@ -21,7 +21,7 @@ namespace MultiplayerARPG
 
         public static void Clear()
         {
-            foreach (Queue<IPoolDescriptor> queue in poolingObjects.Values)
+            foreach (Queue<IPoolDescriptor> queue in pooledObjects.Values)
             {
                 while (queue.Count > 0)
                 {
@@ -35,7 +35,7 @@ namespace MultiplayerARPG
                     catch { }
                 }
             }
-            poolingObjects.Clear();
+            pooledObjects.Clear();
         }
 
         public static void InitPool(IPoolDescriptor prefab)
@@ -46,7 +46,7 @@ namespace MultiplayerARPG
                 return;
             }
 
-            if (poolingObjects.ContainsKey(prefab))
+            if (pooledObjects.ContainsKey(prefab))
                 return;
 
             prefab.InitPrefab();
@@ -66,7 +66,7 @@ namespace MultiplayerARPG
                 queue.Enqueue(obj);
             }
 
-            poolingObjects[prefab] = queue;
+            pooledObjects[prefab] = queue;
         }
 
         public static T GetInstance<T>(T prefab)
@@ -84,7 +84,7 @@ namespace MultiplayerARPG
             if (prefab == null)
                 return null;
             Queue<IPoolDescriptor> queue;
-            if (poolingObjects.TryGetValue(prefab, out queue))
+            if (pooledObjects.TryGetValue(prefab, out queue))
             {
                 IPoolDescriptor obj;
 
@@ -126,7 +126,7 @@ namespace MultiplayerARPG
                 return;
             }
             Queue<IPoolDescriptor> queue;
-            if (!poolingObjects.TryGetValue(instance.ObjectPrefab, out queue))
+            if (!pooledObjects.TryGetValue(instance.ObjectPrefab, out queue))
             {
                 Debug.LogWarning($"[PoolSystem] Cannot push back ({instance.gameObject}). The instance's prefab does not initailized yet.");
                 return;
