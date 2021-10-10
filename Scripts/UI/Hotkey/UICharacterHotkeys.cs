@@ -208,11 +208,13 @@ namespace MultiplayerARPG
             // Cancel old using hotkey
             if (UsingHotkey != null)
             {
-                UsingHotkey.FinishAimControls(true);
+                UsingHotkey.FinishAimControls(true, HotkeyAimPosition);
                 UsingHotkey = null;
                 HotkeyAimPosition = default;
             }
             UsingHotkey = hotkey;
+            if (UsingHotkey.IsChanneledAbility())
+                UsingHotkey.StartChanneledAbility();
         }
 
         /// <summary>
@@ -222,9 +224,9 @@ namespace MultiplayerARPG
         {
             if (UsingHotkey == null)
                 return;
-
             HotkeyAimPosition = UsingHotkey.UpdateAimControls(Vector2.zero);
-            if (Input.GetMouseButtonDown(0))
+            // Click anywhere (on the map) to use skill
+            if (Input.GetMouseButtonDown(0) && !UsingHotkey.IsChanneledAbility())
                 FinishHotkeyAimControls(false);
         }
 
@@ -253,14 +255,7 @@ namespace MultiplayerARPG
         {
             if (UsingHotkey == null)
                 return;
-
-            UsingHotkey.FinishAimControls(isCancel);
-            if (!isCancel)
-            {
-                // Use hotkey
-                UsingHotkey.Use(HotkeyAimPosition);
-            }
-
+            UsingHotkey.FinishAimControls(isCancel, HotkeyAimPosition);
             UsingHotkey = null;
             HotkeyAimPosition = default;
         }

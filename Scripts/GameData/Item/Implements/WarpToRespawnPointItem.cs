@@ -30,6 +30,11 @@ namespace MultiplayerARPG
 
         }
 
+        public bool IsChanneledAbility()
+        {
+            return false;
+        }
+
         public void UseItem(BaseCharacterEntity characterEntity, short itemIndex, CharacterItem characterItem)
         {
             BasePlayerCharacterEntity playerCharacterEntity = characterEntity as BasePlayerCharacterEntity;

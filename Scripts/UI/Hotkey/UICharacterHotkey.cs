@@ -1,9 +1,7 @@
 ﻿using LiteNetLibManager;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.EventSystems;
 using UnityEngine.Serialization;
-using UnityEngine.UI;
 
 namespace MultiplayerARPG
 {
@@ -26,6 +24,7 @@ namespace MultiplayerARPG
         private IUsableItem usingItem;
         private BaseSkill usingSkill;
         private short usingSkillLevel;
+        private bool channeledActionStarted;
 
         protected override void OnEnable()
         {
@@ -82,8 +81,24 @@ namespace MultiplayerARPG
             if (GenericUtils.IsFocusInputField())
                 return;
 
-            if (Input.GetKeyDown(key))
-                OnClickUse();
+            if (IsChanneledAbility())
+            {
+                if (Input.GetKey(key) && !channeledActionStarted)
+                {
+                    channeledActionStarted = true;
+                    UICharacterHotkeys.SetUsingHotkey(this);
+                }
+                else if (!Input.GetKey(key) && channeledActionStarted)
+                {
+                    channeledActionStarted = false;
+                    UICharacterHotkeys.FinishHotkeyAimControls(false);
+                }
+            }
+            else
+            {
+                if (Input.GetKeyDown(key))
+                    OnClickUse();
+            }
         }
 
         public bool GetAssignedSkill(out BaseSkill skill, out short skillLevel)
@@ -207,6 +222,22 @@ namespace MultiplayerARPG
             }
         }
 
+        public bool HasCustomAimControls()
+        {
+            if (usingItem != null &&
+                usingItem.HasCustomAimControls())
+            {
+                return true;
+            }
+            else if (usingSkill != null && usingSkillLevel > 0 &&
+                usingSkill.IsActive &&
+                usingSkill.HasCustomAimControls())
+            {
+                return true;
+            }
+            return false;
+        }
+
         public AimPosition UpdateAimControls(Vector2 axes)
         {
             if (usingItem != null &&
@@ -223,12 +254,36 @@ namespace MultiplayerARPG
             return default;
         }
 
-        public void FinishAimControls(bool isCancel)
+        public void FinishAimControls(bool isCancel, AimPosition aimPosition)
         {
+            ICustomAimController ability = null;
             if (usingItem != null)
-                usingItem.FinishAimControls(isCancel);
+                ability = usingItem;
             if (usingSkill != null)
-                usingSkill.FinishAimControls(isCancel);
+                ability = usingSkill;
+            if (ability == null)
+                return;
+            ability.FinishAimControls(isCancel);
+            if (ability.IsChanneledAbility())
+                StopChanneledAbility();
+            else if (!isCancel)
+                Use(aimPosition);
+        }
+
+        public bool IsChanneledAbility()
+        {
+            if (usingItem != null &&
+                usingItem.IsChanneledAbility())
+            {
+                return true;
+            }
+            if (usingSkill != null && usingSkillLevel > 0 &&
+                usingSkill.IsActive &&
+                usingSkill.IsChanneledAbility())
+            {
+                return true;
+            }
+            return false;
         }
 
         public void OnClickAssign()
@@ -245,6 +300,9 @@ namespace MultiplayerARPG
         /// </summary>
         public void OnClickUse()
         {
+            if (IsChanneledAbility())
+                return;
+
             if (UICharacterHotkeys.UsingHotkey != null)
             {
                 if (UICharacterHotkeys.UsingHotkey == this)
@@ -271,26 +329,22 @@ namespace MultiplayerARPG
             }
         }
 
-        public bool HasCustomAimControls()
-        {
-            if (usingItem != null &&
-                usingItem.HasCustomAimControls())
-            {
-                return true;
-            }
-            else if (usingSkill != null && usingSkillLevel > 0 &&
-                usingSkill.IsActive &&
-                usingSkill.HasCustomAimControls())
-            {
-                return true;
-            }
-            return false;
-        }
-
         public void Use(AimPosition aimPosition)
         {
+            if (IsChanneledAbility())
+                return;
             if (BasePlayerCharacterController.Singleton != null && Data != null)
                 BasePlayerCharacterController.Singleton.UseHotkey(Data.type, Data.relateId, aimPosition);
+        }
+
+        public void StartChanneledAbility()
+        {
+
+        }
+
+        public void StopChanneledAbility()
+        {
+
         }
 
         public bool CanAssignCharacterItem(CharacterItem characterItem)

@@ -681,5 +681,23 @@ namespace MultiplayerARPG
                     break;
             }
         }
+
+        public bool IsChanneledAbility()
+        {
+            switch (itemType)
+            {
+                case LegacyItemType.Potion:
+                    return false;
+                case LegacyItemType.Building:
+                    return false;
+                case LegacyItemType.Pet:
+                    return false;
+                case LegacyItemType.Mount:
+                    return false;
+                case LegacyItemType.Skill:
+                    return skillLevel.skill.IsChanneledAbility();
+            }
+            return false;
+        }
     }
 }

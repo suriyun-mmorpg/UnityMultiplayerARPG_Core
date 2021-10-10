@@ -317,6 +317,7 @@ namespace MultiplayerARPG
         public virtual bool HasCustomAimControls() { return false; }
         public virtual AimPosition UpdateAimControls(Vector2 aimAxes, params object[] data) { return default; }
         public virtual void FinishAimControls(bool isCancel) { }
+        public virtual bool IsChanneledAbility() { return false; }
         public virtual Buff Buff { get { return Buff.Empty; } }
         public virtual Buff Debuff { get { return Buff.Empty; } }
         public virtual SkillSummon Summon { get { return SkillSummon.Empty; } }

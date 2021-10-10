@@ -7,5 +7,6 @@ namespace MultiplayerARPG
         bool HasCustomAimControls();
         AimPosition UpdateAimControls(Vector2 aimAxes, params object[] data);
         void FinishAimControls(bool isCancel);
+        bool IsChanneledAbility();
     }
 }

@@ -59,6 +59,11 @@ namespace MultiplayerARPG
 
         }
 
+        public bool IsChanneledAbility()
+        {
+            return false;
+        }
+
         public override void PrepareRelatesData()
         {
             base.PrepareRelatesData();

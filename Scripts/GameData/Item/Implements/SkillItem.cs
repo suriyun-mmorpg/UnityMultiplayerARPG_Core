@@ -50,6 +50,11 @@ namespace MultiplayerARPG
             UsingSkill.FinishAimControls(isCancel);
         }
 
+        public bool IsChanneledAbility()
+        {
+            return UsingSkill.IsChanneledAbility();
+        }
+
         public override void PrepareRelatesData()
         {
             base.PrepareRelatesData();
