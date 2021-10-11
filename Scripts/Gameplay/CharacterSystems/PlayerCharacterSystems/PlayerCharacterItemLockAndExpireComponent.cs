@@ -24,13 +24,13 @@ namespace MultiplayerARPG
             if (updatingTime >= ITEM_UPDATE_DURATION)
             {
                 // Removing non-equip items if it should
-                int count = Entity.NonEquipItems.Count;
+                long currentTime = System.DateTimeOffset.UtcNow.ToUnixTimeSeconds();
                 bool haveRemovedItems = false;
                 CharacterItem nonEquipItem;
-                for (int i = count - 1; i >= 0; --i)
+                for (int i = Entity.NonEquipItems.Count - 1; i >= 0; --i)
                 {
                     nonEquipItem = Entity.NonEquipItems[i];
-                    if (nonEquipItem.ShouldRemove())
+                    if (nonEquipItem.ShouldRemove(currentTime))
                     {
                         if (CurrentGameInstance.IsLimitInventorySlot)
                             Entity.NonEquipItems[i] = CharacterItem.Empty;

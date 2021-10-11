@@ -1,9 +1,28 @@
 ﻿using System.Collections.Generic;
+using System.Text;
 using LiteNetLib.Utils;
 using LiteNetLibManager;
 
 namespace MultiplayerARPG
 {
+    [System.Flags]
+    internal enum CharacterItemSyncState : byte
+    {
+        None = 0,
+        IsOwner = 1 << 0,
+        IsEquipment = 1 << 1,
+        IsWeapon = 1 << 2,
+        IsPet = 1 << 3,
+    }
+
+    internal static class CharacterItemSyncStateExtensions
+    {
+        internal static bool Has(this CharacterItemSyncState self, CharacterItemSyncState flag)
+        {
+            return (self & flag) == flag;
+        }
+    }
+
     [System.Serializable]
     public class CharacterItem : INetSerializableWithElement
     {
@@ -16,10 +35,11 @@ namespace MultiplayerARPG
         public float durability;
         public int exp;
         public float lockRemainsDuration;
+        public long expireTime;
+        public byte randomSeed;
         public short ammo;
         public List<int> sockets = new List<int>();
 
-        // TODO: I want to add random item bonus
         [System.NonSerialized]
         private int dirtyDataId;
 
@@ -51,6 +71,9 @@ namespace MultiplayerARPG
         private IMountItem cacheMountItem;
         [System.NonSerialized]
         private ISkillItem cacheSkillItem;
+
+        [System.NonSerialized]
+        private readonly StringBuilder stringBuilder = new StringBuilder();
 
         public List<int> Sockets
         {
@@ -250,10 +273,9 @@ namespace MultiplayerARPG
             lockRemainsDuration = duration;
         }
 
-        public bool ShouldRemove()
+        public bool ShouldRemove(long currentTime)
         {
-            // TODO: have expire date to remove
-            return false;
+            return expireTime > 0 && expireTime < currentTime;
         }
 
         public void Update(float deltaTime)
@@ -520,12 +542,14 @@ namespace MultiplayerARPG
 
         public string WriteSockets()
         {
-            string result = string.Empty;
+            stringBuilder.Clear();
             foreach (int socket in Sockets)
             {
-                result += $"{socket};";
+                stringBuilder
+                    .Append(socket)
+                    .Append(';');
             }
-            return result;
+            return stringBuilder.ToString();
         }
 
         public void Serialize(NetDataWriter writer)
@@ -540,10 +564,28 @@ namespace MultiplayerARPG
 
         public void Serialize(NetDataWriter writer, bool isOwnerClient)
         {
-            writer.Put(isOwnerClient);
+            bool isEquipment = GetEquipmentItem() != null;
+            bool isWeapon = isEquipment && GetWeaponItem() != null;
+            bool isPet = GetPetItem() != null;
+            CharacterItemSyncState syncState = CharacterItemSyncState.None;
+            if (isEquipment)
+            {
+                syncState |= CharacterItemSyncState.IsEquipment;
+            }
+            if (isWeapon)
+            {
+                syncState |= CharacterItemSyncState.IsWeapon;
+            }
+            if (isPet)
+            {
+                syncState |= CharacterItemSyncState.IsPet;
+            }
+            writer.Put((byte)syncState);
+
             if (isOwnerClient)
             {
                 writer.Put(id);
+                writer.PutPackedLong(expireTime);
             }
 
             writer.PutPackedInt(dataId);
@@ -556,19 +598,12 @@ namespace MultiplayerARPG
                 writer.Put(lockRemainsDuration);
             }
 
-            // Put only needed data
-            if (GetEquipmentItem() != null)
+            if (isEquipment)
             {
                 if (isOwnerClient)
                 {
                     writer.Put(durability);
                     writer.PutPackedInt(exp);
-                }
-
-                if (GetWeaponItem() != null)
-                {
-                    // Only weapons have an ammo
-                    writer.PutPackedShort(ammo);
                 }
 
                 byte socketCount = (byte)Sockets.Count;
@@ -580,9 +615,16 @@ namespace MultiplayerARPG
                         writer.PutPackedInt(socketDataId);
                     }
                 }
+
+                writer.Put(randomSeed);
             }
 
-            if (GetPetItem() != null)
+            if (isWeapon)
+            {
+                writer.PutPackedShort(ammo);
+            }
+
+            if (isPet)
             {
                 if (isOwnerClient)
                 {
@@ -593,10 +635,13 @@ namespace MultiplayerARPG
 
         public void Deserialize(NetDataReader reader)
         {
-            bool isOwnerClient = reader.GetBool();
+            CharacterItemSyncState syncState = (CharacterItemSyncState)reader.GetByte();
+            bool isOwnerClient = syncState.Has(CharacterItemSyncState.IsOwner);
+
             if (isOwnerClient)
             {
                 id = reader.GetString();
+                expireTime = reader.GetPackedLong();
             }
 
             dataId = reader.GetPackedInt();
@@ -609,19 +654,12 @@ namespace MultiplayerARPG
                 lockRemainsDuration = reader.GetFloat();
             }
 
-            // Read only needed data
-            if (GetEquipmentItem() != null)
+            if (syncState.Has(CharacterItemSyncState.IsEquipment))
             {
                 if (isOwnerClient)
                 {
                     durability = reader.GetFloat();
                     exp = reader.GetPackedInt();
-                }
-
-                if (GetWeaponItem() != null)
-                {
-                    // Only weapons have an ammo
-                    ammo = reader.GetPackedShort();
                 }
 
                 byte socketCount = reader.GetByte();
@@ -630,9 +668,16 @@ namespace MultiplayerARPG
                 {
                     Sockets.Add(reader.GetPackedInt());
                 }
+
+                randomSeed = reader.GetByte();
             }
 
-            if (GetPetItem() != null)
+            if (syncState.Has(CharacterItemSyncState.IsWeapon))
+            {
+                ammo = reader.GetPackedShort();
+            }
+
+            if (syncState.Has(CharacterItemSyncState.IsPet))
             {
                 if (isOwnerClient)
                 {
