@@ -1,4 +1,7 @@
-﻿namespace MultiplayerARPG
+﻿using LiteNetLibManager;
+using UnityEngine;
+
+namespace MultiplayerARPG
 {
     public class DefaultGMCommands : BaseGMCommands
     {
@@ -42,6 +45,50 @@
         /// Set exp rate (0.1 = 1%, 1 = 100%)
         /// </summary>
         public const string ExpRate = "/exp_rate";
+        /// <summary>
+        /// Warp to specific map
+        /// </summary>
+        public const string Warp = "/warp";
+        /// <summary>
+        /// Warp to specific character
+        /// </summary>
+        public const string WarpToCharacter = "/warp_to_character";
+        /// <summary>
+        /// Summon specific character
+        /// </summary>
+        public const string Summon = "/summon";
+        /// <summary>
+        /// Summon monster
+        /// </summary>
+        public const string Monster = "/monster";
+        /// <summary>
+        /// Kill specific character
+        /// </summary>
+        public const string Kill = "/kill";
+        /// <summary>
+        /// Suicide
+        /// </summary>
+        public const string Suicide = "/suicide";
+        /// <summary>
+        /// Mute specific character
+        /// </summary>
+        public const string Mute = "/mute";
+        /// <summary>
+        /// Unmute specific character
+        /// </summary>
+        public const string Unmute = "/unmute";
+        /// <summary>
+        /// Ban specific character
+        /// </summary>
+        public const string Ban = "/ban";
+        /// <summary>
+        /// Unban specific character
+        /// </summary>
+        public const string Unban = "/unban";
+        /// <summary>
+        /// Kick specific character
+        /// </summary>
+        public const string Kick = "/kick";
 
         public const string HelpResponse = "/level {level} = Set character's level to {level} value.\n" +
             "/statpoint {amount} = Set character's stat point to {amount} value.\n" +
@@ -51,32 +98,65 @@
             "/give_gold {name} {amount} = Increase {amount} of gold to character which its name is {name}.\n" +
             "/give_item {name} {item_id} {amount} = Add item which its ID is {item_id}x{amount} to character which its name is {name}.\n" +
             "/gold_rate {rate} = Set server's gold drop rate to {rate}.\n" +
-            "/exp_rate {rate} = Set server's exp rewarding rate to {rate}.";
+            "/exp_rate {rate} = Set server's exp rewarding rate to {rate}.\n" +
+            "/warp {map_id} = Warp to specific map.\n" +
+            "/warp_to_character {name} = Warp to character which its name is {name}.\n" +
+            "/summon {name} = Summon character which its name is {name}.\n" +
+            "/monster {monster_id} {level} {amount} = Summon monster which its ID is {monster_id}, lv. {level}, amount {amount}.\n" +
+            "/kill {name} = Kill character which its name is {name}.\n" +
+            "/suicide = Kill yourself.\n" +
+            "/mute {name} {duration} = Mute character which its name is {name} for {duration} seconds.\n" +
+            "/unmute {name} = Unmute character which its name is {name}.\n" +
+            "/ban {name} {duration} = Ban character's account which its name is {name} for {duration} days.\n" +
+            "/unban {name} = Unban character's account which its name is {name}.\n" +
+            "/kick {name} = Kick character which its name is {name}.\n";
 
         public virtual bool IsDataLengthValid(string command, int dataLength)
         {
             if (string.IsNullOrEmpty(command))
                 return false;
 
-            if (command.Equals(Help))
+            if (command.ToLower().Equals(Help.ToLower()))
                 return true;
-            if (command.Equals(Level) && dataLength == 2)
+            if (command.ToLower().Equals(Level.ToLower()) && dataLength == 2)
                 return true;
-            if (command.Equals(StatPoint) && dataLength == 2)
+            if (command.ToLower().Equals(StatPoint.ToLower()) && dataLength == 2)
                 return true;
-            if (command.Equals(SkillPoint) && dataLength == 2)
+            if (command.ToLower().Equals(SkillPoint.ToLower()) && dataLength == 2)
                 return true;
-            if (command.Equals(Gold) && dataLength == 2)
+            if (command.ToLower().Equals(Gold.ToLower()) && dataLength == 2)
                 return true;
-            if (command.Equals(AddItem) && dataLength == 3)
+            if (command.ToLower().Equals(AddItem.ToLower()) && dataLength == 3)
                 return true;
-            if (command.Equals(GiveGold) && dataLength == 3)
+            if (command.ToLower().Equals(GiveGold.ToLower()) && dataLength == 3)
                 return true;
-            if (command.Equals(GiveItem) && dataLength == 4)
+            if (command.ToLower().Equals(GiveItem.ToLower()) && dataLength == 4)
                 return true;
-            if (command.Equals(GoldRate) && dataLength == 2)
+            if (command.ToLower().Equals(GoldRate.ToLower()) && dataLength == 2)
                 return true;
-            if (command.Equals(ExpRate) && dataLength == 2)
+            if (command.ToLower().Equals(ExpRate.ToLower()) && dataLength == 2)
+                return true;
+            if (command.ToLower().Equals(Warp.ToLower()) && dataLength == 2)
+                return true;
+            if (command.ToLower().Equals(WarpToCharacter.ToLower()) && dataLength == 2)
+                return true;
+            if (command.ToLower().Equals(Summon.ToLower()) && dataLength == 2)
+                return true;
+            if (command.ToLower().Equals(Monster.ToLower()) && dataLength == 4)
+                return true;
+            if (command.ToLower().Equals(Kill.ToLower()) && dataLength == 2)
+                return true;
+            if (command.ToLower().Equals(Suicide.ToLower()))
+                return true;
+            if (command.ToLower().Equals(Mute.ToLower()) && dataLength == 3)
+                return true;
+            if (command.ToLower().Equals(Unmute.ToLower()) && dataLength == 2)
+                return true;
+            if (command.ToLower().Equals(Ban.ToLower()) && dataLength == 3)
+                return true;
+            if (command.ToLower().Equals(Unban.ToLower()) && dataLength == 2)
+                return true;
+            if (command.ToLower().Equals(Kick.ToLower()) && dataLength == 2)
                 return true;
 
             return false;
@@ -90,16 +170,27 @@
 
             string[] splited = chatMessage.Split(' ');
             command = splited[0];
-            if (command.Equals(Help) ||
-                command.Equals(Level) ||
-                command.Equals(StatPoint) ||
-                command.Equals(SkillPoint) ||
-                command.Equals(Gold) ||
-                command.Equals(AddItem) ||
-                command.Equals(GiveGold) ||
-                command.Equals(GiveItem) ||
-                command.Equals(GoldRate) ||
-                command.Equals(ExpRate))
+            if (command.ToLower().Equals(Help.ToLower()) ||
+                command.ToLower().Equals(Level.ToLower()) ||
+                command.ToLower().Equals(StatPoint.ToLower()) ||
+                command.ToLower().Equals(SkillPoint.ToLower()) ||
+                command.ToLower().Equals(Gold.ToLower()) ||
+                command.ToLower().Equals(AddItem.ToLower()) ||
+                command.ToLower().Equals(GiveGold.ToLower()) ||
+                command.ToLower().Equals(GiveItem.ToLower()) ||
+                command.ToLower().Equals(GoldRate.ToLower()) ||
+                command.ToLower().Equals(ExpRate.ToLower()) ||
+                command.ToLower().Equals(Warp.ToLower()) ||
+                command.ToLower().Equals(WarpToCharacter.ToLower()) ||
+                command.ToLower().Equals(Summon.ToLower()) ||
+                command.ToLower().Equals(Monster.ToLower()) ||
+                command.ToLower().Equals(Kill.ToLower()) ||
+                command.ToLower().Equals(Suicide.ToLower()) ||
+                command.ToLower().Equals(Mute.ToLower()) ||
+                command.ToLower().Equals(Unmute.ToLower()) ||
+                command.ToLower().Equals(Ban.ToLower()) ||
+                command.ToLower().Equals(Unban.ToLower()) ||
+                command.ToLower().Equals(Kick.ToLower()))
             {
                 return true;
             }
@@ -125,66 +216,80 @@
             BasePlayerCharacterEntity playerCharacter;
             if (IsDataLengthValid(commandKey, data.Length))
             {
-                if (commandKey.Equals(Help))
+                if (commandKey.ToLower().Equals(Help.ToLower()))
                 {
                     response = HelpResponse;
                 }
-                if (commandKey.Equals(Level))
+                if (commandKey.ToLower().Equals(Level.ToLower()))
                 {
                     receiver = sender;
                     short amount;
-                    if (GameInstance.ServerUserHandlers.TryGetPlayerCharacterByName(receiver, out playerCharacter) &&
-                        short.TryParse(data[1], out amount) &&
-                        amount > 0)
+                    if (!short.TryParse(data[1], out amount) || amount <= 0)
+                    {
+                        response = "Wrong input data";
+                    }
+                    else if (GameInstance.ServerUserHandlers.TryGetPlayerCharacterByName(receiver, out playerCharacter))
                     {
                         playerCharacter.Level = amount;
                         response = $"Set character level to {amount}";
                     }
                 }
-                if (commandKey.Equals(StatPoint))
+                if (commandKey.ToLower().Equals(StatPoint.ToLower()))
                 {
                     receiver = sender;
                     int amount;
-                    if (GameInstance.ServerUserHandlers.TryGetPlayerCharacterByName(receiver, out playerCharacter) &&
-                        int.TryParse(data[1], out amount) &&
-                        amount >= 0)
+                    if (!int.TryParse(data[1], out amount) || amount <= 0)
+                    {
+                        response = "Wrong input data";
+                    }
+                    else if (GameInstance.ServerUserHandlers.TryGetPlayerCharacterByName(receiver, out playerCharacter))
                     {
                         playerCharacter.StatPoint = amount;
                         response = $"Set character statpoint to {amount}";
                     }
                 }
-                if (commandKey.Equals(SkillPoint))
+                if (commandKey.ToLower().Equals(SkillPoint.ToLower()))
                 {
                     receiver = sender;
                     int amount;
-                    if (GameInstance.ServerUserHandlers.TryGetPlayerCharacterByName(receiver, out playerCharacter) &&
-                        int.TryParse(data[1], out amount) &&
-                        amount >= 0)
+                    if (!int.TryParse(data[1], out amount) || amount <= 0)
+                    {
+                        response = "Wrong input data";
+                    }
+                    else if (GameInstance.ServerUserHandlers.TryGetPlayerCharacterByName(receiver, out playerCharacter))
                     {
                         playerCharacter.SkillPoint = amount;
                         response = $"Set character skillpoint to {amount}";
                     }
                 }
-                if (commandKey.Equals(Gold))
+                if (commandKey.ToLower().Equals(Gold.ToLower()))
                 {
                     receiver = sender;
                     short amount;
-                    if (GameInstance.ServerUserHandlers.TryGetPlayerCharacterByName(receiver, out playerCharacter) &&
-                        short.TryParse(data[1], out amount) &&
-                        amount >= 0)
+                    if (!short.TryParse(data[1], out amount) || amount <= 0)
+                    {
+                        response = "Wrong input data";
+                    }
+                    else if (GameInstance.ServerUserHandlers.TryGetPlayerCharacterByName(receiver, out playerCharacter))
                     {
                         playerCharacter.Gold = amount;
                         response = $"Set character gold to {amount}";
                     }
                 }
-                if (commandKey.Equals(AddItem))
+                if (commandKey.ToLower().Equals(AddItem.ToLower()))
                 {
                     receiver = sender;
                     BaseItem item;
                     short amount;
-                    if (GameInstance.ServerUserHandlers.TryGetPlayerCharacterByName(receiver, out playerCharacter) &&
-                        GameInstance.Items.TryGetValue(data[1].GenerateHashId(), out item) &&
-                        short.TryParse(data[2], out amount))
+                    if (!short.TryParse(data[2], out amount) || amount <= 0)
+                    {
+                        response = "Wrong input data";
+                    }
+                    else if (!GameInstance.Items.TryGetValue(data[1].GenerateHashId(), out item))
+                    {
+                        response = "Cannot find the item";
+                    }
+                    else if (GameInstance.ServerUserHandlers.TryGetPlayerCharacterByName(receiver, out playerCharacter))
                     {
                         if (amount > item.MaxStack)
                             amount = item.MaxStack;
@@ -199,25 +304,34 @@
                         }
                     }
                 }
-                if (commandKey.Equals(GiveGold))
+                if (commandKey.ToLower().Equals(GiveGold.ToLower()))
                 {
                     receiver = data[1];
                     short amount;
-                    if (GameInstance.ServerUserHandlers.TryGetPlayerCharacterByName(receiver, out playerCharacter) &&
-                        short.TryParse(data[2], out amount))
+                    if (!short.TryParse(data[1], out amount) || amount <= 0)
+                    {
+                        response = "Wrong input data";
+                    }
+                    else if (GameInstance.ServerUserHandlers.TryGetPlayerCharacterByName(receiver, out playerCharacter))
                     {
                         playerCharacter.Gold = playerCharacter.Gold.Increase(amount);
                         response = $"Add gold for character: {receiver}";
                     }
                 }
-                if (commandKey.Equals(GiveItem))
+                if (commandKey.ToLower().Equals(GiveItem.ToLower()))
                 {
                     receiver = data[1];
                     BaseItem item;
                     short amount;
-                    if (GameInstance.ServerUserHandlers.TryGetPlayerCharacterByName(receiver, out playerCharacter) &&
-                        GameInstance.Items.TryGetValue(data[2].GenerateHashId(), out item) &&
-                        short.TryParse(data[3], out amount))
+                    if (!short.TryParse(data[3], out amount) || amount <= 0)
+                    {
+                        response = "Wrong input data";
+                    }
+                    else if (!GameInstance.Items.TryGetValue(data[2].GenerateHashId(), out item))
+                    {
+                        response = "Cannot find the item";
+                    }
+                    else if (GameInstance.ServerUserHandlers.TryGetPlayerCharacterByName(receiver, out playerCharacter))
                     {
                         if (amount > item.MaxStack)
                             amount = item.MaxStack;
@@ -232,22 +346,162 @@
                         }
                     }
                 }
-                if (commandKey.Equals(GoldRate))
+                if (commandKey.ToLower().Equals(GoldRate.ToLower()))
                 {
                     float amount;
-                    if (float.TryParse(data[1], out amount))
+                    if (!float.TryParse(data[1], out amount) || amount < 0f)
+                    {
+                        response = "Wrong input data";
+                    }
+                    else
                     {
                         GameInstance.Singleton.GameplayRule.GoldRate = amount;
                         response = $"Set gold rate to {amount}";
                     }
                 }
-                if (commandKey.Equals(ExpRate))
+                if (commandKey.ToLower().Equals(ExpRate.ToLower()))
                 {
                     float amount;
-                    if (float.TryParse(data[1], out amount))
+                    if (!float.TryParse(data[1], out amount) || amount < 0f)
+                    {
+                        response = "Wrong input data";
+                    }
+                    else
                     {
                         GameInstance.Singleton.GameplayRule.ExpRate = amount;
                         response = $"Set exp rate to {amount}";
+                    }
+                }
+                if (commandKey.ToLower().Equals(Warp.ToLower()))
+                {
+                    receiver = sender;
+                    if (!GameInstance.MapInfos.ContainsKey(data[1]))
+                    {
+                        response = "Cannot find the map";
+                    }
+                    else if (GameInstance.ServerUserHandlers.TryGetPlayerCharacterByName(receiver, out playerCharacter))
+                    {
+                        BaseMapInfo mapInfo = GameInstance.MapInfos[data[1]];
+                        BaseGameNetworkManager.Singleton.WarpCharacter(playerCharacter, data[1], mapInfo.StartPosition, false, Vector3.zero);
+                        response = $"Warping to: {data[1]} {mapInfo.StartPosition}";
+                    }
+                }
+                if (commandKey.ToLower().Equals(WarpToCharacter.ToLower()))
+                {
+                    receiver = sender;
+                    BasePlayerCharacterEntity targetCharacter;
+                    if (!GameInstance.ServerUserHandlers.TryGetPlayerCharacterByName(data[1], out targetCharacter))
+                    {
+                        response = "Cannot find the character";
+                    }
+                    else if (GameInstance.ServerUserHandlers.TryGetPlayerCharacterByName(receiver, out playerCharacter))
+                    {
+                        BaseGameNetworkManager.Singleton.WarpCharacter(playerCharacter, targetCharacter.CurrentMapName, targetCharacter.CurrentPosition, false, Vector3.zero);
+                        response = $"Warping to: {targetCharacter.CurrentMapName} {targetCharacter.CurrentPosition}";
+                    }
+                }
+                if (commandKey.ToLower().Equals(Summon.ToLower()))
+                {
+                    receiver = sender;
+                    BasePlayerCharacterEntity targetCharacter;
+                    if (!GameInstance.ServerUserHandlers.TryGetPlayerCharacterByName(data[1], out targetCharacter))
+                    {
+                        response = "Cannot find the character";
+                    }
+                    else if (GameInstance.ServerUserHandlers.TryGetPlayerCharacterByName(receiver, out playerCharacter))
+                    {
+                        BaseGameNetworkManager.Singleton.WarpCharacter(targetCharacter, playerCharacter.CurrentMapName, playerCharacter.CurrentPosition, false, Vector3.zero);
+                        response = $"Summon character: {data[1]}";
+                    }
+                }
+                if (commandKey.ToLower().Equals(Monster.ToLower()))
+                {
+                    receiver = sender;
+                    BaseMonsterCharacterEntity targetMonster = null;
+                    foreach (BaseMonsterCharacterEntity monster in GameInstance.MonsterCharacterEntities.Values)
+                    {
+                        if (monster.name.Equals(data[1]) ||
+                            monster.Identity.AssetId.Equals(data[1]))
+                        {
+                            targetMonster = monster;
+                            break;
+                        }
+                    }
+                    short level;
+                    int amount;
+                    if (targetMonster == null)
+                    {
+                        response = "Cannot find the monster";
+                    }
+                    else if (!short.TryParse(data[2], out level) || !int.TryParse(data[3], out amount))
+                    {
+                        response = "Wrong input data";
+                    }
+                    else if (GameInstance.ServerUserHandlers.TryGetPlayerCharacterByName(receiver, out playerCharacter))
+                    {
+                        for (int i = 0; i < amount; ++i)
+                        {
+                            LiteNetLibIdentity spawnObj = BaseGameNetworkManager.Singleton.Assets.GetObjectInstance(targetMonster.Identity.HashAssetId, playerCharacter.MovementTransform.position, Quaternion.identity);
+                            BaseMonsterCharacterEntity entity = spawnObj.GetComponent<BaseMonsterCharacterEntity>();
+                            entity.Level = level;
+                            BaseGameNetworkManager.Singleton.Assets.NetworkSpawn(spawnObj);
+                        }
+                    }
+                }
+                if (commandKey.ToLower().Equals(Kill.ToLower()))
+                {
+                    BasePlayerCharacterEntity targetCharacter;
+                    if (GameInstance.ServerUserHandlers.TryGetPlayerCharacterByName(data[1], out targetCharacter))
+                    {
+                        if (targetCharacter.IsDead())
+                        {
+                            response = "Character is already dead";
+                        }
+                        else
+                        {
+                            targetCharacter.CurrentHp = 0;
+                            targetCharacter.Killed(EntityInfo.Empty);
+                            response = $"Kill character: {data[1]}";
+                        }
+                    }
+                }
+                if (commandKey.ToLower().Equals(Suicide.ToLower()))
+                {
+                    receiver = sender;
+                    if (GameInstance.ServerUserHandlers.TryGetPlayerCharacterByName(receiver, out playerCharacter))
+                    {
+                        playerCharacter.CurrentHp = 0;
+                        playerCharacter.Killed(EntityInfo.Empty);
+                        response = "Suicided";
+                    }
+                }
+                if (commandKey.ToLower().Equals(Mute.ToLower()))
+                {
+                    response = "This command is not implemented yet.";
+                }
+                if (commandKey.ToLower().Equals(Unmute.ToLower()))
+                {
+                    response = "This command is not implemented yet.";
+                }
+                if (commandKey.ToLower().Equals(Ban.ToLower()))
+                {
+                    response = "This command is not implemented yet.";
+                }
+                if (commandKey.ToLower().Equals(Unban.ToLower()))
+                {
+                    response = "This command is not implemented yet.";
+                }
+                if (commandKey.ToLower().Equals(Kick.ToLower()))
+                {
+                    BasePlayerCharacterEntity targetCharacter;
+                    if (!GameInstance.ServerUserHandlers.TryGetPlayerCharacterByName(data[1], out targetCharacter))
+                    {
+                        response = "Cannot find the character";
+                    }
+                    else
+                    {
+                        BaseGameNetworkManager.Singleton.Transport.ServerDisconnect(targetCharacter.ConnectionId);
+                        response = $"Kick character: {data[1]}";
                     }
                 }
             }
