@@ -352,8 +352,7 @@ namespace MultiplayerARPG
                             damageHitObjectInfos.Add(damageHitObjectInfo);
 
                             // Target won't receive damage if dead or can't receive damage from this character
-                            if (tempDamageableHitBox.IsDead() ||
-                                !tempDamageableHitBox.CanReceiveDamageFrom(instigator) ||
+                            if (tempDamageableHitBox.IsDead() || !tempDamageableHitBox.CanReceiveDamageFrom(instigator) ||
                                 !attacker.IsPositionInFov(hitFov, tempDamageableHitBox.GetTransform().position))
                                 continue;
 
@@ -446,8 +445,7 @@ namespace MultiplayerARPG
                             damageHitObjectInfos.Add(damageHitObjectInfo);
 
                             // Target won't receive damage if dead or can't receive damage from this character
-                            if (tempDamageableHitBox.IsDead() ||
-                                !tempDamageableHitBox.CanReceiveDamageFrom(instigator))
+                            if (tempDamageableHitBox.IsDead() || !tempDamageableHitBox.CanReceiveDamageFrom(instigator))
                                 continue;
 
                             // Target receives damages
