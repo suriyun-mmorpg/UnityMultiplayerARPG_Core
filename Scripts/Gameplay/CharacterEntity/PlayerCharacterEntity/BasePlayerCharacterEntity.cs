@@ -90,7 +90,7 @@ namespace MultiplayerARPG
         public override void Killed(EntityInfo lastAttacker)
         {
             // Dead time
-            LastDeadTime = (int)System.DateTimeOffset.UtcNow.ToUnixTimeSeconds();
+            LastDeadTime = System.DateTimeOffset.UtcNow.ToUnixTimeSeconds();
             // Dead penalty
             float expLostPercentage = CurrentGameInstance.GameplayRule.GetExpLostPercentageWhenDeath(this);
             GuildData guildData;

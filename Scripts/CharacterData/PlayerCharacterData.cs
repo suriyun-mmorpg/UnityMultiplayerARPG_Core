@@ -28,8 +28,8 @@ namespace MultiplayerARPG
         public string RespawnMapName { get; set; }
         public Vector3 RespawnPosition { get; set; }
         public int MountDataId { get; set; }
-        public int LastDeadTime { get; set; }
-        public int LastUpdate { get; set; }
+        public long LastDeadTime { get; set; }
+        public long LastUpdate { get; set; }
 
         public IList<CharacterHotkey> Hotkeys
         {

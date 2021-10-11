@@ -63,8 +63,8 @@ namespace MultiplayerARPG
         string RespawnMapName { get; set; }
         Vector3 RespawnPosition { get; set; }
         int MountDataId { get; set; }
-        int LastDeadTime { get; set; }
-        int LastUpdate { get; set; }
+        long LastDeadTime { get; set; }
+        long LastUpdate { get; set; }
         IList<CharacterHotkey> Hotkeys { get; set; }
         IList<CharacterQuest> Quests { get; set; }
         IList<CharacterCurrency> Currencies { get; set; }

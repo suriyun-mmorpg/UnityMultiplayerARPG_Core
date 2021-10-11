@@ -295,7 +295,7 @@ namespace MultiplayerARPG
             characterData.CloneTo(savingData);
             if (string.IsNullOrEmpty(savingData.Id))
                 return;
-            savingData.LastUpdate = (int)System.DateTimeOffset.Now.ToUnixTimeSeconds();
+            savingData.LastUpdate = System.DateTimeOffset.Now.ToUnixTimeSeconds();
             BinaryFormatter binaryFormatter = new BinaryFormatter();
             SurrogateSelector surrogateSelector = new SurrogateSelector();
             surrogateSelector.AddAllUnitySurrogate();
@@ -426,8 +426,8 @@ namespace MultiplayerARPG
                 writer.Put(characterData.RespawnPosition.z);
             }
             writer.PutPackedInt(characterData.MountDataId);
-            writer.PutPackedInt(characterData.LastDeadTime);
-            writer.PutPackedInt(characterData.LastUpdate);
+            writer.PutPackedLong(characterData.LastDeadTime);
+            writer.PutPackedLong(characterData.LastUpdate);
             // Attributes
             if (withAttributes)
             {
@@ -590,8 +590,8 @@ namespace MultiplayerARPG
                 characterData.RespawnPosition = new Vector3(reader.GetFloat(), reader.GetFloat(), reader.GetFloat());
             }
             characterData.MountDataId = reader.GetPackedInt();
-            characterData.LastDeadTime = reader.GetPackedInt();
-            characterData.LastUpdate = reader.GetPackedInt();
+            characterData.LastDeadTime = reader.GetPackedLong();
+            characterData.LastUpdate = reader.GetPackedLong();
             int count;
             // Attributes
             if (withAttributes)

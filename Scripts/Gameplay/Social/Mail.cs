@@ -18,12 +18,12 @@ namespace MultiplayerARPG
         public Dictionary<int, int> Currencies { get; } = new Dictionary<int, int>();
         public Dictionary<int, short> Items { get; } = new Dictionary<int, short>();
         public bool IsRead { get; set; }
-        public int ReadTimestamp { get; set; }
+        public long ReadTimestamp { get; set; }
         public bool IsClaim { get; set; }
-        public int ClaimTimestamp { get; set; }
+        public long ClaimTimestamp { get; set; }
         public bool IsDelete { get; set; }
-        public int DeleteTimestamp { get; set; }
-        public int SentTimestamp { get; set; }
+        public long DeleteTimestamp { get; set; }
+        public long SentTimestamp { get; set; }
 
         public bool HaveItemsToClaim()
         {

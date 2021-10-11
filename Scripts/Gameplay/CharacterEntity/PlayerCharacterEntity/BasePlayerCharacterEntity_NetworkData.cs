@@ -31,7 +31,7 @@ namespace MultiplayerARPG
         [SerializeField]
         protected SyncFieldVector3 respawnPosition = new SyncFieldVector3();
         [SerializeField]
-        protected SyncFieldInt lastDeadTime = new SyncFieldInt();
+        protected SyncFieldLong lastDeadTime = new SyncFieldLong();
         [SerializeField]
         protected SyncFieldBool isWarping = new SyncFieldBool();
 
@@ -157,8 +157,8 @@ namespace MultiplayerARPG
             }
             set { }
         }
-        public int LastDeadTime { get { return lastDeadTime.Value; } set { lastDeadTime.Value = value; } }
-        public int LastUpdate { get; set; }
+        public long LastDeadTime { get { return lastDeadTime.Value; } set { lastDeadTime.Value = value; } }
+        public long LastUpdate { get; set; }
 
         public IList<CharacterHotkey> Hotkeys
         {

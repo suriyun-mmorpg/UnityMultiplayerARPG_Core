@@ -12,12 +12,6 @@ namespace MultiplayerARPG
         private int entityId;
         private string characterName;
         private short level;
-        private int exp;
-        private int currentHp;
-        private int currentMp;
-        private int currentStamina;
-        private int currentFood;
-        private int currentWater;
         private byte equipWeaponSet;
         private ObservableCollection<EquipWeapons> selectableEquipWeapons;
 
@@ -67,12 +61,12 @@ namespace MultiplayerARPG
                 this.MarkToMakeCaches();
             }
         }
-        public int Exp { get { return exp; } set { exp = value; } }
-        public int CurrentHp { get { return currentHp; } set { currentHp = value; } }
-        public int CurrentMp { get { return currentMp; } set { currentMp = value; } }
-        public int CurrentStamina { get { return currentStamina; } set { currentStamina = value; } }
-        public int CurrentFood { get { return currentFood; } set { currentFood = value; } }
-        public int CurrentWater { get { return currentWater; } set { currentWater = value; } }
+        public int Exp { get; set; }
+        public int CurrentHp { get; set; }
+        public int CurrentMp { get; set; }
+        public int CurrentStamina { get; set; }
+        public int CurrentFood { get; set; }
+        public int CurrentWater { get; set; }
 
         public EquipWeapons EquipWeapons
         {
