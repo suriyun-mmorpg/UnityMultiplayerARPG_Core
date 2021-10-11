@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-public interface IBuildingSaveData
+public partial interface IBuildingSaveData
 {
     string Id { get; set; }
     string ParentId { get; set; }
