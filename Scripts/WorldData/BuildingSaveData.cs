@@ -1,6 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 using LiteNetLib.Utils;
 
 namespace MultiplayerARPG
@@ -8,90 +6,29 @@ namespace MultiplayerARPG
     [System.Serializable]
     public partial struct BuildingSaveData : IBuildingSaveData, INetSerializable
     {
-        public string id;
-        public string parentId;
-        public int entityId;
-        public int currentHp;
-        public float remainsLifeTime;
-        public bool isLocked;
-        public string lockPassword;
-        public Vector3 position;
-        public Quaternion rotation;
-        public string creatorId;
-        public string creatorName;
-        public string extraData;
+        public string Id { get; set; }
 
-        public string Id
-        {
-            get { return id; }
-            set { id = value; }
-        }
+        public string ParentId { get; set; }
 
-        public string ParentId
-        {
-            get { return parentId; }
-            set { parentId = value; }
-        }
+        public int EntityId { get; set; }
 
-        public int EntityId
-        {
-            get { return entityId; }
-            set { entityId = value; }
-        }
+        public int CurrentHp { get; set; }
 
-        public int CurrentHp
-        {
-            get { return currentHp; }
-            set { currentHp = value; }
-        }
+        public float RemainsLifeTime { get; set; }
 
-        public float RemainsLifeTime
-        {
-            get { return remainsLifeTime; }
-            set { remainsLifeTime = value; }
-        }
+        public bool IsLocked { get; set; }
 
-        public bool IsLocked
-        {
-            get { return isLocked; }
-            set { isLocked = value; }
-        }
+        public string LockPassword { get; set; }
 
-        public string LockPassword
-        {
-            get { return lockPassword; }
-            set { lockPassword = value; }
-        }
+        public Vector3 Position { get; set; }
 
-        public Vector3 Position
-        {
-            get { return position; }
-            set { position = value; }
-        }
+        public Quaternion Rotation { get; set; }
 
-        public Quaternion Rotation
-        {
-            get { return rotation; }
-            set { rotation = value; }
-        }
+        public string CreatorId { get; set; }
 
-        public string CreatorId
-        {
-            get { return creatorId; }
-            set { creatorId = value; }
-        }
+        public string CreatorName { get; set; }
 
-        public string CreatorName
-        {
-            get { return creatorName; }
-            set { creatorName = value; }
-        }
-
-        public string ExtraData
-        {
-            get { return extraData; }
-            set { extraData = value; }
-        }
+        public string ExtraData { get; set; }
 
         public void Deserialize(NetDataReader reader)
         {
