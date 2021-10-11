@@ -378,11 +378,8 @@ namespace MultiplayerARPG.GameData.Model.Playables
                         // Get previous clip to continue playing it
                         if (string.IsNullOrEmpty(previousStateId))
                             previousStateId = playingStateId;
-                        double playingTime = 0;
                         AnimationClip previousClip = baseStates[previousStateId].state.clip;
                         AnimationClip playingClip = baseStates[playingStateId].state.clip;
-                        if (previousClip == playingClip)
-                            playingTime = BaseLayerMixer.GetInput(baseInputPort).GetTime();
                         // Get input port from new playing state ID
                         baseInputPort = baseStates[playingStateId].inputPort;
                         // Set clip info 
@@ -393,7 +390,8 @@ namespace MultiplayerARPG.GameData.Model.Playables
                             baseTransitionDuration = CharacterModel.transitionDuration;
                         baseTransitionDuration *= baseLayerClipSpeed;
                         // Set clip length
-                        BaseLayerMixer.GetInput(baseInputPort).SetTime(playingTime);
+                        if (previousClip != playingClip)
+                            BaseLayerMixer.GetInput(baseInputPort).SetTime(0);
                         baseClipLength = baseStates[playingStateId].GetClipLength(1);
                         // Set layer additive
                         LayerMixer.SetLayerAdditive(0, baseStates[playingStateId].state.isAdditive);
