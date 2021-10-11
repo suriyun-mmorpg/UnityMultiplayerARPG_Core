@@ -24,7 +24,6 @@ namespace MultiplayerARPG
             IDamageableEntity gameEntity = other.GetComponent<IDamageableEntity>();
             if (gameEntity == null)
                 return;
-
             gameEntity.IsInSafeArea = true;
         }
 
@@ -43,7 +42,6 @@ namespace MultiplayerARPG
             IDamageableEntity gameEntity = other.GetComponent<IDamageableEntity>();
             if (gameEntity == null)
                 return;
-
             gameEntity.IsInSafeArea = false;
         }
     }
