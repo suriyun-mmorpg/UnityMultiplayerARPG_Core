@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Text;
 using LiteNetLib.Utils;
 using LiteNetLibManager;
 
@@ -19,6 +20,9 @@ namespace MultiplayerARPG
 
         [System.NonSerialized]
         private Quest cacheQuest;
+
+        [System.NonSerialized]
+        private readonly StringBuilder stringBuilder = new StringBuilder();
 
         public Dictionary<int, int> KilledMonsters
         {
@@ -159,12 +163,14 @@ namespace MultiplayerARPG
 
         public string WriteKilledMonsters()
         {
-            string result = string.Empty;
+            stringBuilder.Clear();
             foreach (KeyValuePair<int, int> keyValue in KilledMonsters)
             {
-                result += $"{keyValue.Key}:{keyValue.Value};";
+                stringBuilder
+                    .Append(keyValue.Key).Append(':')
+                    .Append(keyValue.Value).Append(';');
             }
-            return result;
+            return stringBuilder.ToString();
         }
 
         public List<int> ReadCompletedTasks(string completedTasks)
@@ -182,12 +188,14 @@ namespace MultiplayerARPG
 
         public string WriteCompletedTasks()
         {
-            string result = string.Empty;
+            stringBuilder.Clear();
             foreach (int completedTask in CompletedTasks)
             {
-                result += $"{completedTask};";
+                stringBuilder
+                    .Append(completedTask)
+                    .Append(';');
             }
-            return result;
+            return stringBuilder.ToString();
         }
 
         public void Serialize(NetDataWriter writer)
