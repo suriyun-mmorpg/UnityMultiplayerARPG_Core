@@ -309,10 +309,9 @@ namespace MultiplayerARPG
                 }
                 if (commandKey.ToLower().Equals(GiveGold.ToLower()))
                 {
-                    // TODO: Add function to find character from all map
                     receiver = data[1];
                     short amount;
-                    if (!short.TryParse(data[1], out amount) || amount <= 0)
+                    if (!short.TryParse(data[2], out amount) || amount <= 0)
                     {
                         response = "Wrong input data";
                     }
@@ -324,7 +323,6 @@ namespace MultiplayerARPG
                 }
                 if (commandKey.ToLower().Equals(GiveItem.ToLower()))
                 {
-                    // TODO: Add function to find character from all map
                     receiver = data[1];
                     BaseItem item;
                     short amount;
@@ -392,7 +390,6 @@ namespace MultiplayerARPG
                 }
                 if (commandKey.ToLower().Equals(WarpCharacter.ToLower()))
                 {
-                    // TODO: Add function to find character from all map
                     float x, y, z;
                     if (!float.TryParse(data[3], out x) || 
                         !float.TryParse(data[4], out y) || 
@@ -411,7 +408,7 @@ namespace MultiplayerARPG
                 }
                 if (commandKey.ToLower().Equals(WarpToCharacter.ToLower()))
                 {
-                    // TODO: Add function to find character from all map
+                    // TODO: Add function to find character from all maps
                     if (!GameInstance.ServerUserHandlers.TryGetPlayerCharacterByName(data[1], out targetCharacter))
                     {
                         response = "Cannot find the character";
@@ -424,7 +421,7 @@ namespace MultiplayerARPG
                 }
                 if (commandKey.ToLower().Equals(Summon.ToLower()))
                 {
-                    // TODO: Add function to find character from all map
+                    // TODO: Add function to find character from all maps
                     if (!GameInstance.ServerUserHandlers.TryGetPlayerCharacterByName(data[1], out targetCharacter))
                     {
                         response = "Cannot find the character";
