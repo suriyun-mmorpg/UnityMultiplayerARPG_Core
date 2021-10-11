@@ -24,6 +24,6 @@ namespace MultiplayerARPG
         /// <param name="sender"></param>
         /// <param name="chatMessage"></param>
         /// <returns></returns>
-        public abstract string HandleGMCommand(string sender, string chatMessage);
+        public abstract string HandleGMCommand(BasePlayerCharacterEntity characterEntity, string chatMessage);
     }
 }

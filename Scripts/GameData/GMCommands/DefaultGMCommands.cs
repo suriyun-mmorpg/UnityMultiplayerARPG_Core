@@ -50,6 +50,10 @@ namespace MultiplayerARPG
         /// </summary>
         public const string Warp = "/warp";
         /// <summary>
+        /// Warp to specific character to specific map and position
+        /// </summary>
+        public const string WarpCharacter = "/warp_character";
+        /// <summary>
         /// Warp to specific character
         /// </summary>
         public const string WarpToCharacter = "/warp_to_character";
@@ -100,6 +104,7 @@ namespace MultiplayerARPG
             "/gold_rate {rate} = Set server's gold drop rate to {rate}.\n" +
             "/exp_rate {rate} = Set server's exp rewarding rate to {rate}.\n" +
             "/warp {map_id} = Warp to specific map.\n" +
+            "/warp_character {name} {map_id} {x} {y} {z} = Warp to specific character to specific map and position.\n" +
             "/warp_to_character {name} = Warp to character which its name is {name}.\n" +
             "/summon {name} = Summon character which its name is {name}.\n" +
             "/monster {monster_id} {level} {amount} = Summon monster which its ID is {monster_id}, lv. {level}, amount {amount}.\n" +
@@ -137,6 +142,8 @@ namespace MultiplayerARPG
             if (command.ToLower().Equals(ExpRate.ToLower()) && dataLength == 2)
                 return true;
             if (command.ToLower().Equals(Warp.ToLower()) && dataLength == 2)
+                return true;
+            if (command.ToLower().Equals(WarpCharacter.ToLower()) && dataLength == 6)
                 return true;
             if (command.ToLower().Equals(WarpToCharacter.ToLower()) && dataLength == 2)
                 return true;
@@ -181,6 +188,7 @@ namespace MultiplayerARPG
                 command.ToLower().Equals(GoldRate.ToLower()) ||
                 command.ToLower().Equals(ExpRate.ToLower()) ||
                 command.ToLower().Equals(Warp.ToLower()) ||
+                command.ToLower().Equals(WarpCharacter.ToLower()) ||
                 command.ToLower().Equals(WarpToCharacter.ToLower()) ||
                 command.ToLower().Equals(Summon.ToLower()) ||
                 command.ToLower().Equals(Monster.ToLower()) ||
@@ -204,7 +212,7 @@ namespace MultiplayerARPG
             return characterEntity != null && characterEntity.UserLevel > 0;
         }
 
-        public override string HandleGMCommand(string sender, string chatMessage)
+        public override string HandleGMCommand(BasePlayerCharacterEntity characterEntity, string chatMessage)
         {
             if (string.IsNullOrEmpty(chatMessage))
                 return string.Empty;
@@ -213,7 +221,7 @@ namespace MultiplayerARPG
             string[] data = chatMessage.Split(' ');
             string commandKey = data[0];
             string receiver;
-            BasePlayerCharacterEntity playerCharacter;
+            BasePlayerCharacterEntity targetCharacter;
             if (IsDataLengthValid(commandKey, data.Length))
             {
                 if (commandKey.ToLower().Equals(Help.ToLower()))
@@ -222,63 +230,58 @@ namespace MultiplayerARPG
                 }
                 if (commandKey.ToLower().Equals(Level.ToLower()))
                 {
-                    receiver = sender;
                     short amount;
                     if (!short.TryParse(data[1], out amount) || amount <= 0)
                     {
                         response = "Wrong input data";
                     }
-                    else if (GameInstance.ServerUserHandlers.TryGetPlayerCharacterByName(receiver, out playerCharacter))
+                    else
                     {
-                        playerCharacter.Level = amount;
+                        characterEntity.Level = amount;
                         response = $"Set character level to {amount}";
                     }
                 }
                 if (commandKey.ToLower().Equals(StatPoint.ToLower()))
                 {
-                    receiver = sender;
                     int amount;
                     if (!int.TryParse(data[1], out amount) || amount <= 0)
                     {
                         response = "Wrong input data";
                     }
-                    else if (GameInstance.ServerUserHandlers.TryGetPlayerCharacterByName(receiver, out playerCharacter))
+                    else
                     {
-                        playerCharacter.StatPoint = amount;
+                        characterEntity.StatPoint = amount;
                         response = $"Set character statpoint to {amount}";
                     }
                 }
                 if (commandKey.ToLower().Equals(SkillPoint.ToLower()))
                 {
-                    receiver = sender;
                     int amount;
                     if (!int.TryParse(data[1], out amount) || amount <= 0)
                     {
                         response = "Wrong input data";
                     }
-                    else if (GameInstance.ServerUserHandlers.TryGetPlayerCharacterByName(receiver, out playerCharacter))
+                    else
                     {
-                        playerCharacter.SkillPoint = amount;
+                        characterEntity.SkillPoint = amount;
                         response = $"Set character skillpoint to {amount}";
                     }
                 }
                 if (commandKey.ToLower().Equals(Gold.ToLower()))
                 {
-                    receiver = sender;
                     short amount;
                     if (!short.TryParse(data[1], out amount) || amount <= 0)
                     {
                         response = "Wrong input data";
                     }
-                    else if (GameInstance.ServerUserHandlers.TryGetPlayerCharacterByName(receiver, out playerCharacter))
+                    else
                     {
-                        playerCharacter.Gold = amount;
+                        characterEntity.Gold = amount;
                         response = $"Set character gold to {amount}";
                     }
                 }
                 if (commandKey.ToLower().Equals(AddItem.ToLower()))
                 {
-                    receiver = sender;
                     BaseItem item;
                     short amount;
                     if (!short.TryParse(data[2], out amount) || amount <= 0)
@@ -289,37 +292,39 @@ namespace MultiplayerARPG
                     {
                         response = "Cannot find the item";
                     }
-                    else if (GameInstance.ServerUserHandlers.TryGetPlayerCharacterByName(receiver, out playerCharacter))
+                    else
                     {
                         if (amount > item.MaxStack)
                             amount = item.MaxStack;
-                        if (playerCharacter.IncreasingItemsWillOverwhelming(item.DataId, amount))
+                        if (characterEntity.IncreasingItemsWillOverwhelming(item.DataId, amount))
                         {
                             response = $"Cannot add item {item.Title}x{amount}, cannot carry any more of those items";
                         }
                         else
                         {
-                            playerCharacter.AddOrSetNonEquipItems(CharacterItem.Create(item, 1, amount));
+                            characterEntity.AddOrSetNonEquipItems(CharacterItem.Create(item, 1, amount));
                             response = $"Add item {item.Title}x{amount} to character's inventory";
                         }
                     }
                 }
                 if (commandKey.ToLower().Equals(GiveGold.ToLower()))
                 {
+                    // TODO: Add function to find character from all map
                     receiver = data[1];
                     short amount;
                     if (!short.TryParse(data[1], out amount) || amount <= 0)
                     {
                         response = "Wrong input data";
                     }
-                    else if (GameInstance.ServerUserHandlers.TryGetPlayerCharacterByName(receiver, out playerCharacter))
+                    else if (GameInstance.ServerUserHandlers.TryGetPlayerCharacterByName(receiver, out targetCharacter))
                     {
-                        playerCharacter.Gold = playerCharacter.Gold.Increase(amount);
+                        targetCharacter.Gold = targetCharacter.Gold.Increase(amount);
                         response = $"Add gold for character: {receiver}";
                     }
                 }
                 if (commandKey.ToLower().Equals(GiveItem.ToLower()))
                 {
+                    // TODO: Add function to find character from all map
                     receiver = data[1];
                     BaseItem item;
                     short amount;
@@ -331,17 +336,17 @@ namespace MultiplayerARPG
                     {
                         response = "Cannot find the item";
                     }
-                    else if (GameInstance.ServerUserHandlers.TryGetPlayerCharacterByName(receiver, out playerCharacter))
+                    else if (GameInstance.ServerUserHandlers.TryGetPlayerCharacterByName(receiver, out targetCharacter))
                     {
                         if (amount > item.MaxStack)
                             amount = item.MaxStack;
-                        if (playerCharacter.IncreasingItemsWillOverwhelming(item.DataId, amount))
+                        if (targetCharacter.IncreasingItemsWillOverwhelming(item.DataId, amount))
                         {
                             response = $"Cannot add item {item.Title}x{amount} to {receiver}'s inventory, cannot carry any more of those items";
                         }
                         else
                         {
-                            playerCharacter.AddOrSetNonEquipItems(CharacterItem.Create(item, 1, amount));
+                            targetCharacter.AddOrSetNonEquipItems(CharacterItem.Create(item, 1, amount));
                             response = $"Add item {item.Title}x{amount} to {receiver}'s inventory";
                         }
                     }
@@ -374,49 +379,64 @@ namespace MultiplayerARPG
                 }
                 if (commandKey.ToLower().Equals(Warp.ToLower()))
                 {
-                    receiver = sender;
                     if (!GameInstance.MapInfos.ContainsKey(data[1]))
                     {
                         response = "Cannot find the map";
                     }
-                    else if (GameInstance.ServerUserHandlers.TryGetPlayerCharacterByName(receiver, out playerCharacter))
+                    else
                     {
                         BaseMapInfo mapInfo = GameInstance.MapInfos[data[1]];
-                        BaseGameNetworkManager.Singleton.WarpCharacter(playerCharacter, data[1], mapInfo.StartPosition, false, Vector3.zero);
+                        BaseGameNetworkManager.Singleton.WarpCharacter(characterEntity, data[1], mapInfo.StartPosition, false, Vector3.zero);
                         response = $"Warping to: {data[1]} {mapInfo.StartPosition}";
+                    }
+                }
+                if (commandKey.ToLower().Equals(WarpCharacter.ToLower()))
+                {
+                    // TODO: Add function to find character from all map
+                    float x, y, z;
+                    if (!float.TryParse(data[3], out x) || 
+                        !float.TryParse(data[4], out y) || 
+                        !float.TryParse(data[5], out z))
+                    {
+                        response = "Wrong input data";
+                    }
+                    else if (!GameInstance.MapInfos.ContainsKey(data[2]))
+                    {
+                        response = "Cannot find the map";
+                    }
+                    else if (GameInstance.ServerUserHandlers.TryGetPlayerCharacterByName(data[1], out targetCharacter))
+                    {
+                        BaseGameNetworkManager.Singleton.WarpCharacter(targetCharacter, data[1], new Vector3(x,y,z), false, Vector3.zero);
                     }
                 }
                 if (commandKey.ToLower().Equals(WarpToCharacter.ToLower()))
                 {
-                    receiver = sender;
-                    BasePlayerCharacterEntity targetCharacter;
+                    // TODO: Add function to find character from all map
                     if (!GameInstance.ServerUserHandlers.TryGetPlayerCharacterByName(data[1], out targetCharacter))
                     {
                         response = "Cannot find the character";
                     }
-                    else if (GameInstance.ServerUserHandlers.TryGetPlayerCharacterByName(receiver, out playerCharacter))
+                    else
                     {
-                        BaseGameNetworkManager.Singleton.WarpCharacter(playerCharacter, targetCharacter.CurrentMapName, targetCharacter.CurrentPosition, false, Vector3.zero);
+                        BaseGameNetworkManager.Singleton.WarpCharacter(characterEntity, targetCharacter.CurrentMapName, targetCharacter.CurrentPosition, false, Vector3.zero);
                         response = $"Warping to: {targetCharacter.CurrentMapName} {targetCharacter.CurrentPosition}";
                     }
                 }
                 if (commandKey.ToLower().Equals(Summon.ToLower()))
                 {
-                    receiver = sender;
-                    BasePlayerCharacterEntity targetCharacter;
+                    // TODO: Add function to find character from all map
                     if (!GameInstance.ServerUserHandlers.TryGetPlayerCharacterByName(data[1], out targetCharacter))
                     {
                         response = "Cannot find the character";
                     }
-                    else if (GameInstance.ServerUserHandlers.TryGetPlayerCharacterByName(receiver, out playerCharacter))
+                    else
                     {
-                        BaseGameNetworkManager.Singleton.WarpCharacter(targetCharacter, playerCharacter.CurrentMapName, playerCharacter.CurrentPosition, false, Vector3.zero);
+                        BaseGameNetworkManager.Singleton.WarpCharacter(targetCharacter, characterEntity.CurrentMapName, characterEntity.CurrentPosition, false, Vector3.zero);
                         response = $"Summon character: {data[1]}";
                     }
                 }
                 if (commandKey.ToLower().Equals(Monster.ToLower()))
                 {
-                    receiver = sender;
                     BaseMonsterCharacterEntity targetMonster = null;
                     foreach (BaseMonsterCharacterEntity monster in GameInstance.MonsterCharacterEntities.Values)
                     {
@@ -437,11 +457,11 @@ namespace MultiplayerARPG
                     {
                         response = "Wrong input data";
                     }
-                    else if (GameInstance.ServerUserHandlers.TryGetPlayerCharacterByName(receiver, out playerCharacter))
+                    else
                     {
                         for (int i = 0; i < amount; ++i)
                         {
-                            LiteNetLibIdentity spawnObj = BaseGameNetworkManager.Singleton.Assets.GetObjectInstance(targetMonster.Identity.HashAssetId, playerCharacter.MovementTransform.position, Quaternion.identity);
+                            LiteNetLibIdentity spawnObj = BaseGameNetworkManager.Singleton.Assets.GetObjectInstance(targetMonster.Identity.HashAssetId, characterEntity.MovementTransform.position, Quaternion.identity);
                             BaseMonsterCharacterEntity entity = spawnObj.GetComponent<BaseMonsterCharacterEntity>();
                             entity.Level = level;
                             BaseGameNetworkManager.Singleton.Assets.NetworkSpawn(spawnObj);
@@ -450,7 +470,6 @@ namespace MultiplayerARPG
                 }
                 if (commandKey.ToLower().Equals(Kill.ToLower()))
                 {
-                    BasePlayerCharacterEntity targetCharacter;
                     if (GameInstance.ServerUserHandlers.TryGetPlayerCharacterByName(data[1], out targetCharacter))
                     {
                         if (targetCharacter.IsDead())
@@ -467,13 +486,9 @@ namespace MultiplayerARPG
                 }
                 if (commandKey.ToLower().Equals(Suicide.ToLower()))
                 {
-                    receiver = sender;
-                    if (GameInstance.ServerUserHandlers.TryGetPlayerCharacterByName(receiver, out playerCharacter))
-                    {
-                        playerCharacter.CurrentHp = 0;
-                        playerCharacter.Killed(EntityInfo.Empty);
-                        response = "Suicided";
-                    }
+                    characterEntity.CurrentHp = 0;
+                    characterEntity.Killed(EntityInfo.Empty);
+                    response = "Suicided";
                 }
                 if (commandKey.ToLower().Equals(Mute.ToLower()))
                 {
@@ -493,7 +508,6 @@ namespace MultiplayerARPG
                 }
                 if (commandKey.ToLower().Equals(Kick.ToLower()))
                 {
-                    BasePlayerCharacterEntity targetCharacter;
                     if (!GameInstance.ServerUserHandlers.TryGetPlayerCharacterByName(data[1], out targetCharacter))
                     {
                         response = "Cannot find the character";
