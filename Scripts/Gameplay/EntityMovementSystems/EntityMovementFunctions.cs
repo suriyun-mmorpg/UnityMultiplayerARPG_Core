@@ -17,7 +17,7 @@ namespace MultiplayerARPG
         public static ExtraMovementState ValidateExtraMovementState(this IEntityMovement movement, MovementState movementState, ExtraMovementState extraMovementState)
         {
             // Movement state can affect extra movement state
-            if (movementState.HasFlag(MovementState.IsUnderWater))
+            if (movementState.Has(MovementState.IsUnderWater))
             {
                 // Extra movement states always none while under water
                 extraMovementState = ExtraMovementState.None;
@@ -29,9 +29,9 @@ namespace MultiplayerARPG
                     case ExtraMovementState.IsSprinting:
                         if (!movement.Entity.CanSprint())
                             extraMovementState = ExtraMovementState.None;
-                        else if (!movement.Entity.CanSideSprint && (movementState.HasFlag(MovementState.Left) || movementState.HasFlag(MovementState.Right)))
+                        else if (!movement.Entity.CanSideSprint && (movementState.Has(MovementState.Left) || movementState.Has(MovementState.Right)))
                             extraMovementState = ExtraMovementState.None;
-                        else if (!movement.Entity.CanBackwardSprint && movementState.HasFlag(MovementState.Backward))
+                        else if (!movement.Entity.CanBackwardSprint && movementState.Has(MovementState.Backward))
                             extraMovementState = ExtraMovementState.None;
                         break;
                     case ExtraMovementState.IsCrouching:

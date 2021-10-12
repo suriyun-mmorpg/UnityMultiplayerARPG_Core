@@ -12,4 +12,12 @@
         IsUnderWater = 1 << 5,
         IsJump = 1 << 6,
     }
+
+    public static class MovementStateExtensions
+    {
+        public static bool Has(this MovementState self, MovementState flag)
+        {
+            return (self & flag) == flag;
+        }
+    }
 }

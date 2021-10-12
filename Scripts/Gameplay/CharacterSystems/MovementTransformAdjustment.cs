@@ -104,7 +104,7 @@ namespace MultiplayerARPG
             if (targetTransform == null)
                 return;
 
-            if (Entity.MovementState.HasFlag(MovementState.IsUnderWater))
+            if (Entity.MovementState.Has(MovementState.IsUnderWater))
             {
                 Apply(swimSettings);
             }

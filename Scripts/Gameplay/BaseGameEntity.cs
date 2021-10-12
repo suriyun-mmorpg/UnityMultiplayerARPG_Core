@@ -404,7 +404,7 @@ namespace MultiplayerARPG
             if (IsServer && CurrentGameInstance.DimensionType == DimensionType.Dimension3D)
             {
                 // Ground check / ground damage will be calculated at server while dimension type is 3d only
-                lastGrounded = MovementState.HasFlag(MovementState.IsGrounded);
+                lastGrounded = MovementState.Has(MovementState.IsGrounded);
                 if (lastGrounded)
                     lastGroundedPosition = CacheTransform.position;
             }

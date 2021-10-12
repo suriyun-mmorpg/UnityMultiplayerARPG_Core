@@ -260,7 +260,7 @@ namespace MultiplayerARPG
         {
             get
             {
-                if (PlayerCharacterEntity.MovementState.HasFlag(MovementState.IsUnderWater))
+                if (PlayerCharacterEntity.MovementState.Has(MovementState.IsUnderWater))
                     return turnSpeedWileSwimming;
                 switch (PlayerCharacterEntity.ExtraMovementState)
                 {
@@ -589,7 +589,7 @@ namespace MultiplayerARPG
                 else
                     movementState |= MovementState.IsJump;
             }
-            else if (PlayerCharacterEntity.MovementState.HasFlag(MovementState.IsGrounded))
+            else if (PlayerCharacterEntity.MovementState.Has(MovementState.IsGrounded))
             {
                 if (DetectExtraActive("Sprint", sprintActiveMode, ref toggleSprintOn))
                 {
@@ -631,7 +631,7 @@ namespace MultiplayerARPG
 
         protected virtual void LateUpdate()
         {
-            if (PlayerCharacterEntity.MovementState.HasFlag(MovementState.IsUnderWater))
+            if (PlayerCharacterEntity.MovementState.Has(MovementState.IsUnderWater))
             {
                 // Clear toggled sprint, crouch and crawl
                 toggleSprintOn = false;
@@ -1182,11 +1182,11 @@ namespace MultiplayerARPG
 
         protected virtual void UpdateCrosshair()
         {
-            bool isMoving = movementState.HasFlag(MovementState.Forward) ||
-                movementState.HasFlag(MovementState.Backward) ||
-                movementState.HasFlag(MovementState.Left) ||
-                movementState.HasFlag(MovementState.Right) ||
-                movementState.HasFlag(MovementState.IsJump);
+            bool isMoving = movementState.Has(MovementState.Forward) ||
+                movementState.Has(MovementState.Backward) ||
+                movementState.Has(MovementState.Left) ||
+                movementState.Has(MovementState.Right) ||
+                movementState.Has(MovementState.IsJump);
             if (updateAttackingCrosshair)
             {
                 UpdateCrosshair(CurrentCrosshairSetting, true, CurrentCrosshairSetting.expandPerFrameWhileAttacking);
@@ -1231,12 +1231,12 @@ namespace MultiplayerARPG
         {
             float recoilX;
             float recoilY;
-            if (movementState.HasFlag(MovementState.Forward) ||
-                movementState.HasFlag(MovementState.Backward) ||
-                movementState.HasFlag(MovementState.Left) ||
-                movementState.HasFlag(MovementState.Right))
+            if (movementState.Has(MovementState.Forward) ||
+                movementState.Has(MovementState.Backward) ||
+                movementState.Has(MovementState.Left) ||
+                movementState.Has(MovementState.Right))
             {
-                if (movementState.HasFlag(MovementState.IsUnderWater))
+                if (movementState.Has(MovementState.IsUnderWater))
                 {
                     recoilX = CurrentCrosshairSetting.recoilX * recoilRateWhileSwimming;
                     recoilY = CurrentCrosshairSetting.recoilY * recoilRateWhileSwimming;

@@ -625,12 +625,12 @@ namespace MultiplayerARPG
             // Set move speed based on inputs
             bool moving = false;
             float moveSpeed = 0f;
-            if (movementState.HasFlag(MovementState.Forward))
+            if (movementState.Has(MovementState.Forward))
             {
                 moveSpeed = 1f;
                 moving = true;
             }
-            else if (movementState.HasFlag(MovementState.Backward))
+            else if (movementState.Has(MovementState.Backward))
             {
                 moveSpeed = -1f;
                 moving = true;
@@ -638,12 +638,12 @@ namespace MultiplayerARPG
 
             // Set side move speed based on inputs
             float sideMoveSpeed = 0f;
-            if (movementState.HasFlag(MovementState.Right))
+            if (movementState.Has(MovementState.Right))
             {
                 sideMoveSpeed = 1f;
                 moving = true;
             }
-            else if (movementState.HasFlag(MovementState.Left))
+            else if (movementState.Has(MovementState.Left))
             {
                 sideMoveSpeed = -1f;
                 moving = true;
@@ -680,7 +680,7 @@ namespace MultiplayerARPG
                     break;
             }
 
-            if (movementState.HasFlag(MovementState.IsUnderWater))
+            if (movementState.Has(MovementState.IsUnderWater))
             {
                 moveAnimationSpeedMultiplier *= swimMoveAnimSpeedRate;
                 idleAnimationSpeedMultiplier = swimIdleAnimSpeedRate;
@@ -697,8 +697,8 @@ namespace MultiplayerARPG
 
             // Set animator parameters
             float deltaTime = animator.updateMode == AnimatorUpdateMode.AnimatePhysics ? Time.fixedDeltaTime : Time.deltaTime;
-            bool isUnderWater = movementState.HasFlag(MovementState.IsUnderWater);
-            bool isGrounded = !isUnderWater && movementState.HasFlag(MovementState.IsGrounded);
+            bool isUnderWater = movementState.Has(MovementState.IsUnderWater);
+            bool isGrounded = !isUnderWater && movementState.Has(MovementState.IsGrounded);
             animator.SetFloat(ANIM_MOVE_SPEED, isDead ? 0 : moveSpeed, movementDampingTme, deltaTime);
             animator.SetFloat(ANIM_SIDE_MOVE_SPEED, isDead ? 0 : sideMoveSpeed, movementDampingTme, deltaTime);
             animator.SetFloat(ANIM_MOVE_CLIP_MULTIPLIER, moveAnimationSpeedMultiplier);

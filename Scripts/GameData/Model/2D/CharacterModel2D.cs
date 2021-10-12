@@ -200,10 +200,10 @@ namespace MultiplayerARPG
                 return;
             }
 
-            if (movementState.HasFlag(MovementState.Forward) ||
-                movementState.HasFlag(MovementState.Backward) ||
-                movementState.HasFlag(MovementState.Right) ||
-                movementState.HasFlag(MovementState.Left))
+            if (movementState.Has(MovementState.Forward) ||
+                movementState.Has(MovementState.Backward) ||
+                movementState.Has(MovementState.Right) ||
+                movementState.Has(MovementState.Left))
             {
                 if (extraMovementState == ExtraMovementState.IsSprinting)
                     Play(sprintAnimation2D, DirectionType2D);

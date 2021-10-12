@@ -188,7 +188,7 @@ namespace MultiplayerARPG
             if (openCharacterController == null && capsuleCollider == null)
                 return;
 
-            bool isUnderWater = Entity.MovementState.HasFlag(MovementState.IsUnderWater);
+            bool isUnderWater = Entity.MovementState.Has(MovementState.IsUnderWater);
             if (isUnderWater && isUnderWater != previousIsUnderWater)
             {
                 Apply(swimSettings);

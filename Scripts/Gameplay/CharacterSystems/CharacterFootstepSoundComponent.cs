@@ -96,7 +96,7 @@ namespace MultiplayerARPG
         {
             audioSource.mute = !AudioManager.Singleton.sfxVolumeSetting.IsOn;
 
-            if (Entity.MovementState.HasFlag(MovementState.IsUnderWater))
+            if (Entity.MovementState.Has(MovementState.IsUnderWater))
             {
                 currentFootstepSettings = swimFootstepSettings;
             }
@@ -119,10 +119,10 @@ namespace MultiplayerARPG
                 }
             }
 
-            if (!Entity.MovementState.HasFlag(MovementState.Forward) &&
-                !Entity.MovementState.HasFlag(MovementState.Backward) &&
-                !Entity.MovementState.HasFlag(MovementState.Right) &&
-                !Entity.MovementState.HasFlag(MovementState.Left))
+            if (!Entity.MovementState.Has(MovementState.Forward) &&
+                !Entity.MovementState.Has(MovementState.Backward) &&
+                !Entity.MovementState.Has(MovementState.Right) &&
+                !Entity.MovementState.Has(MovementState.Left))
             {
                 // No movement
                 delayCounter = 0f;
@@ -132,7 +132,7 @@ namespace MultiplayerARPG
             delayCounter += Time.deltaTime;
             if (delayCounter >= currentFootstepSettings.stepDelay / Entity.MoveAnimationSpeedMultiplier)
             {
-                if (Entity.MovementState.HasFlag(MovementState.IsGrounded))
+                if (Entity.MovementState.Has(MovementState.IsGrounded))
                     PlaySound();
 
                 delayCounter = 0f;

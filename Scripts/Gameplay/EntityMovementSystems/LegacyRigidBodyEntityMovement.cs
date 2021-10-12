@@ -142,20 +142,20 @@ namespace MultiplayerARPG
                 return;
 
             if (useRootMotionWhileNotMoving &&
-                !Entity.MovementState.HasFlag(MovementState.Forward) &&
-                !Entity.MovementState.HasFlag(MovementState.Backward) &&
-                !Entity.MovementState.HasFlag(MovementState.Left) &&
-                !Entity.MovementState.HasFlag(MovementState.Right) &&
-                !Entity.MovementState.HasFlag(MovementState.IsJump))
+                !Entity.MovementState.Has(MovementState.Forward) &&
+                !Entity.MovementState.Has(MovementState.Backward) &&
+                !Entity.MovementState.Has(MovementState.Left) &&
+                !Entity.MovementState.Has(MovementState.Right) &&
+                !Entity.MovementState.Has(MovementState.IsJump))
             {
                 // No movement, apply root motion position / rotation
                 CacheAnimator.ApplyBuiltinRootMotion();
                 return;
             }
 
-            if (Entity.MovementState.HasFlag(MovementState.IsGrounded) && useRootMotionForMovement)
+            if (Entity.MovementState.Has(MovementState.IsGrounded) && useRootMotionForMovement)
                 CacheAnimator.ApplyBuiltinRootMotion();
-            if (!Entity.MovementState.HasFlag(MovementState.IsGrounded) && useRootMotionForAirMovement)
+            if (!Entity.MovementState.Has(MovementState.IsGrounded) && useRootMotionForAirMovement)
                 CacheAnimator.ApplyBuiltinRootMotion();
         }
 
@@ -187,7 +187,7 @@ namespace MultiplayerARPG
                 if (tempInputDirection.sqrMagnitude > 0)
                     navPaths = null;
                 if (!isJumping && !applyingJumpForce)
-                    isJumping = isGrounded && tempMovementState.HasFlag(MovementState.IsJump);
+                    isJumping = isGrounded && tempMovementState.Has(MovementState.IsJump);
             }
         }
 

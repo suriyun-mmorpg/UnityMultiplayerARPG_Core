@@ -240,14 +240,14 @@ namespace MultiplayerARPG.GameData.Model.Playables
                     stateId = CLIP_JUMP;
                 return stateId;
             }
-            else if (CharacterModel.movementState.HasFlag(MovementState.IsUnderWater) || CharacterModel.movementState.HasFlag(MovementState.IsGrounded))
+            else if (CharacterModel.movementState.Has(MovementState.IsUnderWater) || CharacterModel.movementState.Has(MovementState.IsGrounded))
             {
                 if (playingLandedState || playingJumpState == PlayingJumpState.Playing)
                 {
                     // Don't change state because character is just landed, landed animation has to be played before change to move state
                     return playingStateId;
                 }
-                if (CharacterModel.movementState.HasFlag(MovementState.IsGrounded) && !isPreviouslyGrounded)
+                if (CharacterModel.movementState.Has(MovementState.IsGrounded) && !isPreviouslyGrounded)
                 {
                     isPreviouslyGrounded = true;
                     // Get landed state by weapon type
@@ -264,10 +264,10 @@ namespace MultiplayerARPG.GameData.Model.Playables
                 }
                 // Get movement state
                 stringBuilder.Clear();
-                bool movingForward = CharacterModel.movementState.HasFlag(MovementState.Forward);
-                bool movingBackward = CharacterModel.movementState.HasFlag(MovementState.Backward);
-                bool movingLeft = CharacterModel.movementState.HasFlag(MovementState.Left);
-                bool movingRight = CharacterModel.movementState.HasFlag(MovementState.Right);
+                bool movingForward = CharacterModel.movementState.Has(MovementState.Forward);
+                bool movingBackward = CharacterModel.movementState.Has(MovementState.Backward);
+                bool movingLeft = CharacterModel.movementState.Has(MovementState.Left);
+                bool movingRight = CharacterModel.movementState.Has(MovementState.Right);
                 bool moving = (movingForward || movingBackward || movingLeft || movingRight) && CharacterModel.moveAnimationSpeedMultiplier > 0f;
                 if (moving)
                 {
@@ -282,7 +282,7 @@ namespace MultiplayerARPG.GameData.Model.Playables
                 }
                 // Set state without move type, it will be used if state with move type not found
                 string stateWithoutMoveType = stringBuilder.ToString();
-                if (CharacterModel.movementState.HasFlag(MovementState.IsUnderWater))
+                if (CharacterModel.movementState.Has(MovementState.IsUnderWater))
                 {
                     if (!moving)
                         stringBuilder.Append(CLIP_SWIM_IDLE);

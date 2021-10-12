@@ -224,12 +224,12 @@ namespace MultiplayerARPG
             if (IsServer && CurrentGameInstance.DimensionType == DimensionType.Dimension3D)
             {
                 // Ground check / ground damage will be calculated at server while dimension type is 3d only
-                if (!lastGrounded && MovementState.HasFlag(MovementState.IsGrounded))
+                if (!lastGrounded && MovementState.Has(MovementState.IsGrounded))
                 {
                     // Apply fall damage when not passenging vehicle
                     CurrentGameplayRule.ApplyFallDamage(this, lastGroundedPosition);
                 }
-                lastGrounded = MovementState.HasFlag(MovementState.IsGrounded);
+                lastGrounded = MovementState.Has(MovementState.IsGrounded);
                 if (lastGrounded)
                     lastGroundedPosition = CacheTransform.position;
             }
@@ -1022,7 +1022,7 @@ namespace MultiplayerARPG
                 moveSpeed *= MoveSpeedRateWhileCharging;
             }
 
-            if (movementState.HasFlag(MovementState.IsUnderWater))
+            if (movementState.Has(MovementState.IsUnderWater))
             {
                 moveSpeed *= CurrentGameplayRule.GetSwimMoveSpeedRate(this);
             }
@@ -1064,21 +1064,21 @@ namespace MultiplayerARPG
 
         public override sealed bool CanSprint()
         {
-            if (!MovementState.HasFlag(MovementState.IsGrounded) || MovementState.HasFlag(MovementState.IsUnderWater))
+            if (!MovementState.Has(MovementState.IsGrounded) || MovementState.Has(MovementState.IsUnderWater))
                 return false;
             return CurrentStamina > 0;
         }
 
         public override sealed bool CanCrouch()
         {
-            if (!MovementState.HasFlag(MovementState.IsGrounded) || MovementState.HasFlag(MovementState.IsUnderWater))
+            if (!MovementState.Has(MovementState.IsGrounded) || MovementState.Has(MovementState.IsUnderWater))
                 return false;
             return true;
         }
 
         public override sealed bool CanCrawl()
         {
-            if (!MovementState.HasFlag(MovementState.IsGrounded) || MovementState.HasFlag(MovementState.IsUnderWater))
+            if (!MovementState.Has(MovementState.IsGrounded) || MovementState.Has(MovementState.IsUnderWater))
                 return false;
             return true;
         }

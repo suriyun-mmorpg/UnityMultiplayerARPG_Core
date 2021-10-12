@@ -34,7 +34,7 @@ namespace MultiplayerARPG
         {
             if (input == null)
                 input = entityMovement.InitInput();
-            bool isJump = input.MovementState.HasFlag(MovementState.IsJump);
+            bool isJump = input.MovementState.Has(MovementState.IsJump);
             input.MovementState = movementState;
             if (isJump)
                 input = entityMovement.SetInputJump(input);
@@ -95,7 +95,7 @@ namespace MultiplayerARPG
                 state = InputState.PositionChanged | InputState.RotationChanged;
                 if (newInput.IsKeyMovement)
                     state |= InputState.IsKeyMovement;
-                if (newInput.MovementState.HasFlag(MovementState.IsJump))
+                if (newInput.MovementState.Has(MovementState.IsJump))
                     state |= InputState.IsJump;
                 return true;
             }
@@ -106,7 +106,7 @@ namespace MultiplayerARPG
                 state |= InputState.PositionChanged;
             if (Quaternion.Angle(newInput.Rotation, oldInput.Rotation) > 1)
                 state |= InputState.RotationChanged;
-            if (newInput.MovementState.HasFlag(MovementState.IsJump))
+            if (newInput.MovementState.Has(MovementState.IsJump))
                 state |= InputState.IsJump;
             return state != InputState.None;
         }

@@ -284,10 +284,10 @@ namespace MultiplayerARPG
             }
 
             float moveSpeed = 0f;
-            if (movementState.HasFlag(MovementState.Forward) ||
-                movementState.HasFlag(MovementState.Backward) ||
-                movementState.HasFlag(MovementState.Right) ||
-                movementState.HasFlag(MovementState.Left))
+            if (movementState.Has(MovementState.Forward) ||
+                movementState.Has(MovementState.Backward) ||
+                movementState.Has(MovementState.Right) ||
+                movementState.Has(MovementState.Left))
             {
                 if (extraMovementState == ExtraMovementState.IsSprinting)
                     moveSpeed = 2;
