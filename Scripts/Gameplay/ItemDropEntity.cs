@@ -54,7 +54,7 @@ namespace MultiplayerARPG
                         for (i = 0; i < randomItems.Length; ++i)
                         {
                             if (randomItems[i].item == null ||
-                                randomItems[i].amount <= 0 ||
+                                randomItems[i].maxAmount <= 0 ||
                                 randomItems[i].dropRate <= 0)
                                 continue;
                             cacheRandomItems.Add(randomItems[i]);
@@ -67,7 +67,7 @@ namespace MultiplayerARPG
                         for (i = 0; i < itemDropTable.randomItems.Length; ++i)
                         {
                             if (itemDropTable.randomItems[i].item == null ||
-                                itemDropTable.randomItems[i].amount <= 0 ||
+                                itemDropTable.randomItems[i].maxAmount <= 0 ||
                                 itemDropTable.randomItems[i].dropRate <= 0)
                                 continue;
                             cacheRandomItems.Add(itemDropTable.randomItems[i]);
@@ -161,12 +161,12 @@ namespace MultiplayerARPG
                         randomItem = CacheRandomItems[Random.Range(0, CacheRandomItems.Count)];
                         if (Random.value > randomItem.dropRate)
                             continue;
-                        DropItems.Add(CharacterItem.Create(randomItem.item.DataId, 1, randomItem.amount));
+                        DropItems.Add(CharacterItem.Create(randomItem.item.DataId, 1, (short)Random.Range(randomItem.minAmount <= 0 ? 1 : randomItem.minAmount, randomItem.maxAmount)));
                     }
                     if (DropItems.Count == 0)
                     {
                         randomItem = CacheRandomItems[Random.Range(0, CacheRandomItems.Count)];
-                        DropItems.Add(CharacterItem.Create(randomItem.item.DataId, 1, randomItem.amount));
+                        DropItems.Add(CharacterItem.Create(randomItem.item.DataId, 1, (short)Random.Range(randomItem.minAmount <= 0 ? 1 : randomItem.minAmount, randomItem.maxAmount)));
                     }
                 }
             }

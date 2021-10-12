@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace MultiplayerARPG
 {
@@ -6,7 +7,9 @@ namespace MultiplayerARPG
     public struct ItemDrop
     {
         public BaseItem item;
-        public short amount;
+        public short minAmount;
+        [FormerlySerializedAs("amount")]
+        public short maxAmount;
         [Range(0f, 1f)]
         public float dropRate;
     }
