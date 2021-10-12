@@ -278,14 +278,13 @@ namespace MultiplayerARPG
             }
 
             // Fire
+            System.Random random = new System.Random(randomSeed);
             Vector3 stagger;
             for (int i = 0; i < fireSpread + 1; ++i)
             {
                 stagger = new Vector3();
-                randomSeed = unchecked(randomSeed += (i + 1) * 4);
-                stagger.x = GenericUtils.RandomFloat(randomSeed, -fireStagger.x, fireStagger.x);
-                randomSeed = unchecked(randomSeed += (i + 1) * 4);
-                stagger.y = GenericUtils.RandomFloat(randomSeed, -fireStagger.y, fireStagger.y);
+                stagger.x = GenericUtils.RandomFloat(random.Next(), -fireStagger.x, fireStagger.x);
+                stagger.y = GenericUtils.RandomFloat(random.Next(), -fireStagger.y, fireStagger.y);
                 damageInfo.LaunchDamageEntity(
                     Entity,
                     isLeftHand,

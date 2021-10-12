@@ -19,17 +19,17 @@ namespace MultiplayerARPG
         [Range(0, 1f)]
         public float applyRate;
 
-        public bool Apply(int seed)
+        public bool Apply(System.Random random)
         {
-            return GenericUtils.RandomFloat(seed, 0f, 1f) <= applyRate;
+            return random.NextDouble() <= applyRate;
         }
 
-        public ArmorAmount GetRandomedAmount(int seed)
+        public ArmorAmount GetRandomedAmount(System.Random random)
         {
             return new ArmorAmount()
             {
                 damageElement = damageElement,
-                amount = GenericUtils.RandomFloat(seed, minAmount, maxAmount),
+                amount = random.RandomFloat(minAmount, maxAmount),
             };
         }
     }

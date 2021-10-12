@@ -524,20 +524,20 @@ namespace MultiplayerARPG
         [Range(0, 1f)]
         public float applyRate;
 
-        public bool Apply(int seed)
+        public bool Apply(System.Random random)
         {
-            return GenericUtils.RandomFloat(seed, 0f, 1f) <= applyRate;
+            return random.NextDouble() <= applyRate;
         }
 
-        public DamageAmount GetRandomedAmount(int seed)
+        public DamageAmount GetRandomedAmount(System.Random random)
         {
             return new DamageAmount()
             {
                 damageElement = damageElement,
                 amount = new MinMaxFloat()
                 {
-                    min = GenericUtils.RandomFloat(seed, minAmount.min, minAmount.max),
-                    max = GenericUtils.RandomFloat(seed, maxAmount.min, maxAmount.max),
+                    min = random.RandomFloat(minAmount.min, minAmount.max),
+                    max = random.RandomFloat(maxAmount.min, maxAmount.max),
                 },
             };
         }

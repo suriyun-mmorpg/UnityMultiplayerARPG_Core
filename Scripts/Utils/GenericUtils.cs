@@ -476,14 +476,24 @@ public static class GenericUtils
         }
     }
 
+    public static float RandomFloat(this System.Random random, float min, float max)
+    {
+        return (float)random.NextDouble() * (max - min) + min;
+    }
+
     public static float RandomFloat(int seed, float min, float max)
     {
-        return (float)(new System.Random(seed).NextDouble() * (max - min) + min);
+        return new System.Random(seed).RandomFloat(min, max);
+    }
+
+    public static int RandomInt(this System.Random random, int min, int max)
+    {
+        return random.Next(min, max);
     }
 
     public static int RandomInt(int seed, int min, int max)
     {
-        return new System.Random(seed).Next(min, max);
+        return new System.Random(seed).RandomInt(min, max);
     }
 
     public static string GetPrettyDate(this System.DateTime dateTime,

@@ -48,17 +48,17 @@ namespace MultiplayerARPG
         [Range(0, 1f)]
         public float applyRate;
 
-        public bool Apply(int seed)
+        public bool Apply(System.Random random)
         {
-            return GenericUtils.RandomFloat(seed, 0f, 1f) <= applyRate;
+            return random.NextDouble() <= applyRate;
         }
 
-        public AttributeAmount GetRandomedAmount(int seed)
+        public AttributeAmount GetRandomedAmount(System.Random random)
         {
             return new AttributeAmount()
             {
                 attribute = attribute,
-                amount = GenericUtils.RandomFloat(seed, minAmount, maxAmount),
+                amount = random.RandomFloat(minAmount, maxAmount),
             };
         }
     }
