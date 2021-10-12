@@ -149,7 +149,7 @@ namespace MultiplayerARPG
         }
 
         [SerializeField]
-        private ItemRandomBonus randomBonus;
+        private ItemRandomBonus randomBonus = new ItemRandomBonus();
         public ItemRandomBonus RandomBonus
         {
             get { return randomBonus; }
