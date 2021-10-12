@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Runtime.Serialization;
+﻿using System.Runtime.Serialization;
 
 namespace MultiplayerARPG
 {
@@ -20,6 +19,8 @@ namespace MultiplayerARPG
             info.AddValue("durability", data.characterItem.durability);
             info.AddValue("exp", data.characterItem.exp);
             info.AddValue("lockRemainsDuration", data.characterItem.lockRemainsDuration);
+            info.AddValue("expireTime", data.characterItem.expireTime);
+            info.AddValue("randomSeed", data.characterItem.randomSeed);
             info.AddValue("ammo", data.characterItem.ammo);
             info.AddValue("sockets", data.characterItem.sockets);
         }
@@ -52,7 +53,12 @@ namespace MultiplayerARPG
             }
             try
             {
-                characterItem.sockets = (List<int>)info.GetValue("sockets", typeof(List<int>));
+                characterItem.expireTime = info.GetInt64("expireTime");
+            }
+            catch { }
+            try
+            {
+                characterItem.randomSeed = info.GetByte("randomSeed");
             }
             catch { }
             if (string.IsNullOrEmpty(characterItem.id))

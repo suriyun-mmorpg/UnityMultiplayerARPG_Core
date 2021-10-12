@@ -389,7 +389,7 @@ namespace MultiplayerARPG
         /// <param name="rate"></param>
         /// <param name="effectiveness"></param>
         /// <returns></returns>
-        public static KeyValuePair<DamageElement, MinMaxFloat> MakeDamage(DamageAmount source, float rate, float effectiveness)
+        public static KeyValuePair<DamageElement, MinMaxFloat> ToKeyValuePair(this DamageAmount source, float rate, float effectiveness)
         {
             DamageElement damageElement = source.damageElement;
             if (damageElement == null)
@@ -405,7 +405,7 @@ namespace MultiplayerARPG
         /// <param name="rate"></param>
         /// <param name="effectiveness"></param>
         /// <returns></returns>
-        public static KeyValuePair<DamageElement, MinMaxFloat> MakeDamage(DamageIncremental source, short level, float rate, float effectiveness)
+        public static KeyValuePair<DamageElement, MinMaxFloat> ToKeyValuePair(this DamageIncremental source, short level, float rate, float effectiveness)
         {
             DamageElement damageElement = source.damageElement;
             if (damageElement == null)
@@ -418,7 +418,7 @@ namespace MultiplayerARPG
         /// </summary>
         /// <param name="source"></param>
         /// <returns></returns>
-        public static KeyValuePair<DamageElement, float> MakeDamageInfliction(DamageInflictionAmount source)
+        public static KeyValuePair<DamageElement, float> ToKeyValuePair(this DamageInflictionAmount source)
         {
             DamageElement damageElement = source.damageElement;
             if (damageElement == null)
@@ -432,7 +432,7 @@ namespace MultiplayerARPG
         /// <param name="source"></param>
         /// <param name="level"></param>
         /// <returns></returns>
-        public static KeyValuePair<DamageElement, float> MakeDamageInfliction(DamageInflictionIncremental source, short level)
+        public static KeyValuePair<DamageElement, float> ToKeyValuePair(this DamageInflictionIncremental source, short level)
         {
             DamageElement damageElement = source.damageElement;
             if (damageElement == null)
@@ -446,7 +446,7 @@ namespace MultiplayerARPG
         /// <param name="source"></param>
         /// <param name="rate"></param>
         /// <returns></returns>
-        public static KeyValuePair<Attribute, float> MakeAttribute(AttributeAmount source, float rate)
+        public static KeyValuePair<Attribute, float> ToKeyValuePair(this AttributeAmount source, float rate)
         {
             if (source.attribute == null)
                 return new KeyValuePair<Attribute, float>();
@@ -460,7 +460,7 @@ namespace MultiplayerARPG
         /// <param name="level"></param>
         /// <param name="rate"></param>
         /// <returns></returns>
-        public static KeyValuePair<Attribute, float> MakeAttribute(AttributeIncremental source, short level, float rate)
+        public static KeyValuePair<Attribute, float> ToKeyValuePair(this AttributeIncremental source, short level, float rate)
         {
             if (source.attribute == null)
                 return new KeyValuePair<Attribute, float>();
@@ -472,7 +472,7 @@ namespace MultiplayerARPG
         /// </summary>
         /// <param name="source"></param>
         /// <returns></returns>
-        public static KeyValuePair<Currency, int> MakeCurrency(CurrencyAmount source)
+        public static KeyValuePair<Currency, int> ToKeyValuePair(this CurrencyAmount source)
         {
             return new KeyValuePair<Currency, int>(source.currency, source.amount);
         }
@@ -483,7 +483,7 @@ namespace MultiplayerARPG
         /// <param name="source"></param>
         /// <param name="rate"></param>
         /// <returns></returns>
-        public static KeyValuePair<DamageElement, float> MakeResistance(ResistanceAmount source, float rate)
+        public static KeyValuePair<DamageElement, float> ToKeyValuePair(this ResistanceAmount source, float rate)
         {
             DamageElement damageElement = source.damageElement;
             if (damageElement == null)
@@ -498,7 +498,7 @@ namespace MultiplayerARPG
         /// <param name="level"></param>
         /// <param name="rate"></param>
         /// <returns></returns>
-        public static KeyValuePair<DamageElement, float> MakeResistance(ResistanceIncremental source, short level, float rate)
+        public static KeyValuePair<DamageElement, float> ToKeyValuePair(this ResistanceIncremental source, short level, float rate)
         {
             DamageElement damageElement = source.damageElement;
             if (damageElement == null)
@@ -512,7 +512,7 @@ namespace MultiplayerARPG
         /// <param name="source"></param>
         /// <param name="rate"></param>
         /// <returns></returns>
-        public static KeyValuePair<DamageElement, float> MakeArmor(ArmorAmount source, float rate)
+        public static KeyValuePair<DamageElement, float> ToKeyValuePair(this ArmorAmount source, float rate)
         {
             DamageElement damageElement = source.damageElement;
             if (damageElement == null)
@@ -527,7 +527,7 @@ namespace MultiplayerARPG
         /// <param name="level"></param>
         /// <param name="rate"></param>
         /// <returns></returns>
-        public static KeyValuePair<DamageElement, float> MakeArmor(ArmorIncremental source, short level, float rate)
+        public static KeyValuePair<DamageElement, float> ToKeyValuePair(this ArmorIncremental source, short level, float rate)
         {
             DamageElement damageElement = source.damageElement;
             if (damageElement == null)
@@ -540,7 +540,7 @@ namespace MultiplayerARPG
         /// </summary>
         /// <param name="source"></param>
         /// <returns></returns>
-        public static KeyValuePair<BaseSkill, short> MakeSkill(SkillLevel source)
+        public static KeyValuePair<BaseSkill, short> ToKeyValuePair(this SkillLevel source)
         {
             if (source.skill == null)
                 return new KeyValuePair<BaseSkill, short>();
@@ -552,7 +552,7 @@ namespace MultiplayerARPG
         /// </summary>
         /// <param name="source"></param>
         /// <returns></returns>
-        public static KeyValuePair<BaseSkill, short> MakeSkill(MonsterSkill source)
+        public static KeyValuePair<BaseSkill, short> ToKeyValuePair(this MonsterSkill source)
         {
             if (source.skill == null)
                 return new KeyValuePair<BaseSkill, short>();
@@ -564,7 +564,7 @@ namespace MultiplayerARPG
         /// </summary>
         /// <param name="source"></param>
         /// <returns></returns>
-        public static KeyValuePair<BaseItem, short> MakeItem(ItemAmount source)
+        public static KeyValuePair<BaseItem, short> ToKeyValuePair(this ItemAmount source)
         {
             if (source.item == null)
                 return new KeyValuePair<BaseItem, short>();
@@ -576,7 +576,7 @@ namespace MultiplayerARPG
         /// </summary>
         /// <param name="source"></param>
         /// <returns></returns>
-        public static KeyValuePair<AmmoType, short> MakeAmmoType(AmmoTypeAmount source)
+        public static KeyValuePair<AmmoType, short> ToKeyValuePair(this AmmoTypeAmount source)
         {
             if (source.ammoType == null)
                 return new KeyValuePair<AmmoType, short>();
@@ -626,7 +626,7 @@ namespace MultiplayerARPG
                 KeyValuePair<DamageElement, MinMaxFloat> pair;
                 foreach (DamageAmount sourceAmount in sourceAmounts)
                 {
-                    pair = MakeDamage(sourceAmount, rate, 0f);
+                    pair = ToKeyValuePair(sourceAmount, rate, 0f);
                     targetDictionary = CombineDamages(targetDictionary, pair);
                 }
             }
@@ -650,7 +650,7 @@ namespace MultiplayerARPG
                 KeyValuePair<DamageElement, MinMaxFloat> pair;
                 foreach (DamageIncremental sourceIncremental in sourceIncrementals)
                 {
-                    pair = MakeDamage(sourceIncremental, level, rate, 0f);
+                    pair = ToKeyValuePair(sourceIncremental, level, rate, 0f);
                     targetDictionary = CombineDamages(targetDictionary, pair);
                 }
             }
@@ -673,7 +673,7 @@ namespace MultiplayerARPG
                 KeyValuePair<DamageElement, float> pair;
                 foreach (DamageInflictionIncremental sourceIncremental in sourceIncrementals)
                 {
-                    pair = MakeDamageInfliction(sourceIncremental, level);
+                    pair = ToKeyValuePair(sourceIncremental, level);
                     targetDictionary = CombineDamageInflictions(targetDictionary, pair);
                 }
             }
@@ -696,7 +696,7 @@ namespace MultiplayerARPG
                 KeyValuePair<Attribute, float> pair;
                 foreach (AttributeAmount sourceAmount in sourceAmounts)
                 {
-                    pair = MakeAttribute(sourceAmount, rate);
+                    pair = ToKeyValuePair(sourceAmount, rate);
                     targetDictionary = CombineAttributes(targetDictionary, pair);
                 }
             }
@@ -720,7 +720,7 @@ namespace MultiplayerARPG
                 KeyValuePair<Attribute, float> pair;
                 foreach (AttributeIncremental sourceIncremental in sourceIncrementals)
                 {
-                    pair = MakeAttribute(sourceIncremental, level, rate);
+                    pair = ToKeyValuePair(sourceIncremental, level, rate);
                     targetDictionary = CombineAttributes(targetDictionary, pair);
                 }
             }
@@ -743,7 +743,7 @@ namespace MultiplayerARPG
                 KeyValuePair<Currency, int> pair;
                 foreach (CurrencyAmount sourceAmount in sourceAmounts)
                 {
-                    pair = MakeCurrency(sourceAmount);
+                    pair = ToKeyValuePair(sourceAmount);
                     targetDictionary = CombineCurrencies(targetDictionary, pair);
                 }
             }
@@ -766,7 +766,7 @@ namespace MultiplayerARPG
                 KeyValuePair<DamageElement, float> pair;
                 foreach (ResistanceAmount sourceAmount in sourceAmounts)
                 {
-                    pair = MakeResistance(sourceAmount, rate);
+                    pair = ToKeyValuePair(sourceAmount, rate);
                     targetDictionary = CombineResistances(targetDictionary, pair);
                 }
             }
@@ -790,7 +790,7 @@ namespace MultiplayerARPG
                 KeyValuePair<DamageElement, float> pair;
                 foreach (ResistanceIncremental sourceIncremental in sourceIncrementals)
                 {
-                    pair = MakeResistance(sourceIncremental, level, rate);
+                    pair = ToKeyValuePair(sourceIncremental, level, rate);
                     targetDictionary = CombineResistances(targetDictionary, pair);
                 }
             }
@@ -814,7 +814,7 @@ namespace MultiplayerARPG
                 KeyValuePair<DamageElement, float> pair;
                 foreach (ArmorAmount sourceAmount in sourceAmounts)
                 {
-                    pair = MakeArmor(sourceAmount, rate);
+                    pair = ToKeyValuePair(sourceAmount, rate);
                     targetDictionary = CombineArmors(targetDictionary, pair);
                 }
             }
@@ -838,7 +838,7 @@ namespace MultiplayerARPG
                 KeyValuePair<DamageElement, float> pair;
                 foreach (ArmorIncremental sourceIncremental in sourceIncrementals)
                 {
-                    pair = MakeArmor(sourceIncremental, level, rate);
+                    pair = ToKeyValuePair(sourceIncremental, level, rate);
                     targetDictionary = CombineArmors(targetDictionary, pair);
                 }
             }
@@ -860,7 +860,7 @@ namespace MultiplayerARPG
                 KeyValuePair<BaseSkill, short> pair;
                 foreach (SkillLevel sourceLevel in sourceLevels)
                 {
-                    pair = MakeSkill(sourceLevel);
+                    pair = ToKeyValuePair(sourceLevel);
                     targetDictionary = CombineSkills(targetDictionary, pair);
                 }
             }
@@ -882,7 +882,7 @@ namespace MultiplayerARPG
                 KeyValuePair<BaseSkill, short> pair;
                 foreach (MonsterSkill sourceMonsterSkill in sourceMonsterSkills)
                 {
-                    pair = MakeSkill(sourceMonsterSkill);
+                    pair = ToKeyValuePair(sourceMonsterSkill);
                     targetDictionary = CombineSkills(targetDictionary, pair);
                 }
             }
@@ -904,7 +904,7 @@ namespace MultiplayerARPG
                 KeyValuePair<BaseItem, short> pair;
                 foreach (ItemAmount sourceAmount in sourceAmounts)
                 {
-                    pair = MakeItem(sourceAmount);
+                    pair = ToKeyValuePair(sourceAmount);
                     targetDictionary = CombineItems(targetDictionary, pair);
                 }
             }
@@ -926,7 +926,7 @@ namespace MultiplayerARPG
                 KeyValuePair<AmmoType, short> pair;
                 foreach (AmmoTypeAmount sourceAmount in sourceAmounts)
                 {
-                    pair = MakeAmmoType(sourceAmount);
+                    pair = ToKeyValuePair(sourceAmount);
                     targetDictionary = CombineAmmoTypes(targetDictionary, pair);
                 }
             }

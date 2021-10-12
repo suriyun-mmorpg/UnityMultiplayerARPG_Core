@@ -331,7 +331,7 @@ namespace MultiplayerARPG
         {
             if (GetEquipmentItem() == null)
                 return null;
-            return GetEquipmentItem().GetIncreaseAttributes(level);
+            return GetEquipmentItem().GetIncreaseAttributes(level, randomSeed);
         }
 
         public Dictionary<Attribute, float> GetIncreaseAttributesRate()
@@ -345,28 +345,28 @@ namespace MultiplayerARPG
         {
             if (GetEquipmentItem() == null)
                 return null;
-            return GetEquipmentItem().GetIncreaseResistances(level);
+            return GetEquipmentItem().GetIncreaseResistances(level, randomSeed);
         }
 
         public Dictionary<DamageElement, float> GetIncreaseArmors()
         {
             if (GetEquipmentItem() == null)
                 return null;
-            return GetEquipmentItem().GetIncreaseArmors(level);
+            return GetEquipmentItem().GetIncreaseArmors(level, randomSeed);
         }
 
         public Dictionary<DamageElement, MinMaxFloat> GetIncreaseDamages()
         {
             if (GetEquipmentItem() == null)
                 return null;
-            return GetEquipmentItem().GetIncreaseDamages(level);
+            return GetEquipmentItem().GetIncreaseDamages(level, randomSeed);
         }
 
         public Dictionary<BaseSkill, short> GetIncreaseSkills()
         {
             if (GetEquipmentItem() == null)
                 return null;
-            return GetEquipmentItem().GetIncreaseSkills();
+            return GetEquipmentItem().GetIncreaseSkills(randomSeed);
         }
 
         public CharacterStats GetSocketsIncreaseStats()

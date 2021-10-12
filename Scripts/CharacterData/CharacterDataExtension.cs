@@ -1280,7 +1280,7 @@ namespace MultiplayerARPG
             {
                 isLeftHand = false;
                 BaseMonsterCharacterEntity monsterCharacterEntity = data as BaseMonsterCharacterEntity;
-                return GameDataHelpers.MakeDamage(monsterCharacterEntity.CharacterDatabase.DamageAmount, monsterCharacterEntity.Level, 1f, 0f);
+                return GameDataHelpers.ToKeyValuePair(monsterCharacterEntity.CharacterDatabase.DamageAmount, monsterCharacterEntity.Level, 1f, 0f);
             }
             return data.GetAvailableWeapon(ref isLeftHand).GetDamageAmount(data);
         }
@@ -1290,7 +1290,7 @@ namespace MultiplayerARPG
             if (data is BaseMonsterCharacterEntity)
             {
                 BaseMonsterCharacterEntity monsterCharacterEntity = data as BaseMonsterCharacterEntity;
-                return GameDataHelpers.MakeDamage(monsterCharacterEntity.CharacterDatabase.DamageAmount, monsterCharacterEntity.Level, 1f, 0f);
+                return GameDataHelpers.ToKeyValuePair(monsterCharacterEntity.CharacterDatabase.DamageAmount, monsterCharacterEntity.Level, 1f, 0f);
             }
             return weapon.GetDamageAmount(data);
         }
