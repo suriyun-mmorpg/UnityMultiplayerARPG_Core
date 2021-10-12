@@ -128,10 +128,13 @@ namespace MultiplayerARPG
                 if (equipmentItem.RandomBonus.randomAttributeAmounts != null &&
                     equipmentItem.RandomBonus.randomAttributeAmounts.Length > 0)
                 {
+                    randomSeed = randomSeed.Increase(equipmentItem.RandomBonus.randomAttributeAmounts.Length * 8);
                     foreach (var randomBonus in equipmentItem.RandomBonus.randomAttributeAmounts)
                     {
                         if (!randomBonus.Apply(randomSeed)) continue;
+                        randomSeed = randomSeed.Increase(16);
                         result = GameDataHelpers.CombineAttributes(result, randomBonus.GetRandomedAmount(randomSeed).ToKeyValuePair(1f));
+                        randomSeed = randomSeed.Increase(16);
                     }
                 }
             }
@@ -157,10 +160,13 @@ namespace MultiplayerARPG
                 if (equipmentItem.RandomBonus.randomResistanceAmounts != null &&
                     equipmentItem.RandomBonus.randomResistanceAmounts.Length > 0)
                 {
+                    randomSeed = randomSeed.Increase(equipmentItem.RandomBonus.randomResistanceAmounts.Length * 8);
                     foreach (var randomBonus in equipmentItem.RandomBonus.randomResistanceAmounts)
                     {
                         if (!randomBonus.Apply(randomSeed)) continue;
+                        randomSeed = randomSeed.Increase(16);
                         result = GameDataHelpers.CombineResistances(result, randomBonus.GetRandomedAmount(randomSeed).ToKeyValuePair(1f));
+                        randomSeed = randomSeed.Increase(16);
                     }
                 }
             }
@@ -177,10 +183,13 @@ namespace MultiplayerARPG
                 if (equipmentItem.RandomBonus.randomArmorAmounts != null &&
                     equipmentItem.RandomBonus.randomArmorAmounts.Length > 0)
                 {
+                    randomSeed = randomSeed.Increase(equipmentItem.RandomBonus.randomArmorAmounts.Length * 8);
                     foreach (var randomBonus in equipmentItem.RandomBonus.randomArmorAmounts)
                     {
                         if (!randomBonus.Apply(randomSeed)) continue;
+                        randomSeed = randomSeed.Increase(16);
                         result = GameDataHelpers.CombineArmors(result, randomBonus.GetRandomedAmount(randomSeed).ToKeyValuePair(1f));
+                        randomSeed = randomSeed.Increase(16);
                     }
                 }
             }
@@ -197,10 +206,13 @@ namespace MultiplayerARPG
                 if (equipmentItem.RandomBonus.randomDamageAmounts != null &&
                     equipmentItem.RandomBonus.randomDamageAmounts.Length > 0)
                 {
+                    randomSeed = randomSeed.Increase(equipmentItem.RandomBonus.randomDamageAmounts.Length * 8);
                     foreach (var randomBonus in equipmentItem.RandomBonus.randomDamageAmounts)
                     {
                         if (!randomBonus.Apply(randomSeed)) continue;
+                        randomSeed = randomSeed.Increase(16);
                         result = GameDataHelpers.CombineDamages(result, randomBonus.GetRandomedAmount(randomSeed).ToKeyValuePair(1f, 1f));
+                        randomSeed = randomSeed.Increase(16);
                     }
                 }
             }
@@ -217,10 +229,13 @@ namespace MultiplayerARPG
                 if (equipmentItem.RandomBonus.randomSkillLevels != null &&
                     equipmentItem.RandomBonus.randomSkillLevels.Length > 0)
                 {
+                    randomSeed = randomSeed.Increase(equipmentItem.RandomBonus.randomSkillLevels.Length * 8);
                     foreach (var randomBonus in equipmentItem.RandomBonus.randomSkillLevels)
                     {
                         if (!randomBonus.Apply(randomSeed)) continue;
+                        randomSeed = randomSeed.Increase(16);
                         result = GameDataHelpers.CombineSkills(result, randomBonus.GetRandomedAmount(randomSeed).ToKeyValuePair());
+                        randomSeed = randomSeed.Increase(16);
                     }
                 }
             }
