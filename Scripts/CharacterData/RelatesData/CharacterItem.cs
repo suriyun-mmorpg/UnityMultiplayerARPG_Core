@@ -572,6 +572,10 @@ namespace MultiplayerARPG
             bool isWeapon = isEquipment && GetWeaponItem() != null;
             bool isPet = GetPetItem() != null;
             CharacterItemSyncState syncState = CharacterItemSyncState.None;
+            if (isOwnerClient)
+            {
+                syncState |= CharacterItemSyncState.IsOwner;
+            }
             if (isEquipment)
             {
                 syncState |= CharacterItemSyncState.IsEquipment;
