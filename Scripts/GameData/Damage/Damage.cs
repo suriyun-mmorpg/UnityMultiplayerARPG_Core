@@ -515,6 +515,35 @@ namespace MultiplayerARPG
     }
 
     [System.Serializable]
+    public struct DamageRandomAmount
+    {
+        [Tooltip("If `damageElement` is empty it will use default damage element from game instance")]
+        public DamageElement damageElement;
+        public MinMaxFloat minAmount;
+        public MinMaxFloat maxAmount;
+        [Range(0, 1f)]
+        public float applyRate;
+
+        public bool Apply(int seed)
+        {
+            return GenericUtils.RandomFloat(seed, 0f, 1f) <= applyRate;
+        }
+
+        public DamageAmount GetRandomedAmount(int seed)
+        {
+            return new DamageAmount()
+            {
+                damageElement = damageElement,
+                amount = new MinMaxFloat()
+                {
+                    min = GenericUtils.RandomFloat(seed, minAmount.min, minAmount.max),
+                    max = GenericUtils.RandomFloat(seed, maxAmount.min, maxAmount.max),
+                },
+            };
+        }
+    }
+
+    [System.Serializable]
     public struct DamageIncremental
     {
         [Tooltip("If `damageElement` is empty it will use default damage element from game instance")]

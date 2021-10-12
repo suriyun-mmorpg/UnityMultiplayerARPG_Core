@@ -134,6 +134,9 @@ namespace MultiplayerARPG
         [ArrayElementTitle("statusEffect")]
         public StatusEffectApplying[] enemyStatusEffectsWhenAttacked;
 
+        // For equipment items
+        public ItemRandomBonus randomBonus;
+
         public override ItemType ItemType
         {
             get
@@ -319,6 +322,11 @@ namespace MultiplayerARPG
         {
             get { return enemyStatusEffectsWhenAttacked; }
         }
+
+        public ItemRandomBonus RandomBonus
+        {
+            get { return randomBonus; }
+        }
         #endregion
 
         #region Implement IDefendEquipmentItem
@@ -500,6 +508,7 @@ namespace MultiplayerARPG
             GameInstance.AddArmorTypes(armorType);
             GameInstance.AddWeaponTypes(weaponType);
             GameInstance.AddAmmoTypes(ammoType);
+            randomBonus.PrepareRelatesData();
             buff.PrepareRelatesData();
         }
 

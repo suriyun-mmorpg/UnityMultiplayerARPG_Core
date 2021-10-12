@@ -80,5 +80,9 @@ namespace MultiplayerARPG
         /// Status effects that can be applied to the enemy when attacked
         /// </summary>
         StatusEffectApplying[] EnemyStatusEffectsWhenAttacked { get; }
+        /// <summary>
+        /// Random bonus
+        /// </summary>
+        ItemRandomBonus RandomBonus { get; }
     }
 }

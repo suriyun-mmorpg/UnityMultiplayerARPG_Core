@@ -40,6 +40,30 @@ namespace MultiplayerARPG
     }
 
     [System.Serializable]
+    public struct AttributeRandomAmount
+    {
+        public Attribute attribute;
+        public float minAmount;
+        public float maxAmount;
+        [Range(0, 1f)]
+        public float applyRate;
+
+        public bool Apply(int seed)
+        {
+            return GenericUtils.RandomFloat(seed, 0f, 1f) <= applyRate;
+        }
+
+        public AttributeAmount GetRandomedAmount(int seed)
+        {
+            return new AttributeAmount()
+            {
+                attribute = attribute,
+                amount = GenericUtils.RandomFloat(seed, minAmount, maxAmount),
+            };
+        }
+    }
+
+    [System.Serializable]
     public struct AttributeIncremental
     {
         public Attribute attribute;

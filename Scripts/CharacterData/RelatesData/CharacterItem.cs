@@ -2,6 +2,7 @@
 using System.Text;
 using LiteNetLib.Utils;
 using LiteNetLibManager;
+using UnityEngine;
 
 namespace MultiplayerARPG
 {
@@ -492,6 +493,8 @@ namespace MultiplayerARPG
             cloneItem.durability = durability;
             cloneItem.exp = exp;
             cloneItem.lockRemainsDuration = lockRemainsDuration;
+            cloneItem.expireTime = expireTime;
+            cloneItem.randomSeed = randomSeed;
             cloneItem.ammo = ammo;
             cloneItem.sockets = new List<int>(sockets);
             return cloneItem;
@@ -518,6 +521,7 @@ namespace MultiplayerARPG
             {
                 newItem.durability = (tempItem as IEquipmentItem).MaxDurability;
                 newItem.lockRemainsDuration = tempItem.LockDuration;
+                newItem.randomSeed = (byte)Random.Range(0, 255);
             }
             return newItem;
         }

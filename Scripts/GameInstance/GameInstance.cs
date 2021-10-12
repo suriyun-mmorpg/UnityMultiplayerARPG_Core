@@ -840,6 +840,21 @@ namespace MultiplayerARPG
             }
         }
 
+        public static void AddAttributes(params AttributeRandomAmount[] attributeAmounts)
+        {
+            AddAttributes((IEnumerable<AttributeRandomAmount>)attributeAmounts);
+        }
+
+        public static void AddAttributes(IEnumerable<AttributeRandomAmount> attributeAmounts)
+        {
+            if (attributeAmounts == null)
+                return;
+            foreach (AttributeRandomAmount attributeAmount in attributeAmounts)
+            {
+                AddGameData(Attributes, attributeAmount.attribute);
+            }
+        }
+
         public static void AddAttributes(params AttributeIncremental[] attributeIncrementals)
         {
             AddAttributes((IEnumerable<AttributeIncremental>)attributeIncrementals);
@@ -999,6 +1014,21 @@ namespace MultiplayerARPG
             if (skillLevels == null)
                 return;
             foreach (SkillLevel skillLevel in skillLevels)
+            {
+                AddGameData(Skills, skillLevel.skill);
+            }
+        }
+
+        public static void AddSkills(params SkillRandomLevel[] skillLevels)
+        {
+            AddSkills((IEnumerable<SkillRandomLevel>)skillLevels);
+        }
+
+        public static void AddSkills(IEnumerable<SkillRandomLevel> skillLevels)
+        {
+            if (skillLevels == null)
+                return;
+            foreach (SkillRandomLevel skillLevel in skillLevels)
             {
                 AddGameData(Skills, skillLevel.skill);
             }
@@ -1196,6 +1226,21 @@ namespace MultiplayerARPG
             }
         }
 
+        public static void AddDamageElements(params ArmorRandomAmount[] armorAmounts)
+        {
+            AddDamageElements((IEnumerable<ArmorRandomAmount>)armorAmounts);
+        }
+
+        public static void AddDamageElements(IEnumerable<ArmorRandomAmount> armorAmounts)
+        {
+            if (armorAmounts == null)
+                return;
+            foreach (ArmorRandomAmount armorAmount in armorAmounts)
+            {
+                AddGameData(DamageElements, armorAmount.damageElement);
+            }
+        }
+
         public static void AddDamageElements(params ArmorIncremental[] armorIncrementals)
         {
             AddDamageElements((IEnumerable<ArmorIncremental>)armorIncrementals);
@@ -1221,6 +1266,21 @@ namespace MultiplayerARPG
             if (damageAmounts == null)
                 return;
             foreach (DamageAmount damageAmount in damageAmounts)
+            {
+                AddGameData(DamageElements, damageAmount.damageElement);
+            }
+        }
+
+        public static void AddDamageElements(params DamageRandomAmount[] damageAmounts)
+        {
+            AddDamageElements((IEnumerable<DamageRandomAmount>)damageAmounts);
+        }
+
+        public static void AddDamageElements(IEnumerable<DamageRandomAmount> damageAmounts)
+        {
+            if (damageAmounts == null)
+                return;
+            foreach (DamageRandomAmount damageAmount in damageAmounts)
             {
                 AddGameData(DamageElements, damageAmount.damageElement);
             }
@@ -1261,6 +1321,21 @@ namespace MultiplayerARPG
             if (resistanceAmounts == null)
                 return;
             foreach (ResistanceAmount resistanceAmount in resistanceAmounts)
+            {
+                AddGameData(DamageElements, resistanceAmount.damageElement);
+            }
+        }
+
+        public static void AddDamageElements(params ResistanceRandomAmount[] resistanceAmounts)
+        {
+            AddDamageElements((IEnumerable<ResistanceRandomAmount>)resistanceAmounts);
+        }
+
+        public static void AddDamageElements(IEnumerable<ResistanceRandomAmount> resistanceAmounts)
+        {
+            if (resistanceAmounts == null)
+                return;
+            foreach (ResistanceRandomAmount resistanceAmount in resistanceAmounts)
             {
                 AddGameData(DamageElements, resistanceAmount.damageElement);
             }

@@ -148,6 +148,13 @@ namespace MultiplayerARPG
             get { return enemyStatusEffectsWhenAttacked; }
         }
 
+        [SerializeField]
+        private ItemRandomBonus randomBonus;
+        public ItemRandomBonus RandomBonus
+        {
+            get { return randomBonus; }
+        }
+
         public override void PrepareRelatesData()
         {
             base.PrepareRelatesData();
@@ -163,6 +170,7 @@ namespace MultiplayerARPG
             GameInstance.AddStatusEffects(EnemyStatusEffectsWhenAttacked);
             GameInstance.AddEquipmentSets(EquipmentSet);
             GameInstance.AddPoolingWeaponLaunchEffects(EquipmentModels);
+            RandomBonus.PrepareRelatesData();
         }
     }
 }
