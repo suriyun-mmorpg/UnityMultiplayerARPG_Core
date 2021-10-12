@@ -783,9 +783,9 @@ namespace MultiplayerARPG
                 tempExtraMovementState = extraMovementState;
                 clientTargetPosition = null;
                 targetYRotation = null;
-                if (inputState.HasFlag(InputState.PositionChanged))
+                if (inputState.Has(InputState.PositionChanged))
                 {
-                    if (inputState.HasFlag(InputState.IsKeyMovement))
+                    if (inputState.Has(InputState.IsKeyMovement))
                     {
                         clientTargetPosition = position;
                     }
@@ -794,7 +794,7 @@ namespace MultiplayerARPG
                         SetMovePaths(position, true);
                     }
                 }
-                if (inputState.HasFlag(InputState.RotationChanged))
+                if (inputState.Has(InputState.RotationChanged))
                 {
                     if (IsClient)
                     {
@@ -807,7 +807,7 @@ namespace MultiplayerARPG
                         yRotation = yAngle;
                     }
                 }
-                isJumping = inputState.HasFlag(InputState.IsJump);
+                isJumping = inputState.Has(InputState.IsJump);
             }
         }
 

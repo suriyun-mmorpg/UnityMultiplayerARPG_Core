@@ -58,9 +58,9 @@ namespace MultiplayerARPG
                 writer.Put((byte)inputState);
                 writer.Put((byte)movementState);
                 writer.Put((byte)extraMovementState);
-                if (inputState.HasFlag(InputState.PositionChanged))
+                if (inputState.Has(InputState.PositionChanged))
                     writer.PutVector3(position);
-                if (inputState.HasFlag(InputState.RotationChanged))
+                if (inputState.Has(InputState.RotationChanged))
                     writer.PutPackedInt(GetCompressedAngle(rotation.eulerAngles.y));
                 writer.PutPackedLong(movement.Entity.Manager.ServerTimestamp);
             });
@@ -145,10 +145,10 @@ namespace MultiplayerARPG
             movementState = (MovementState)reader.GetByte();
             extraMovementState = (ExtraMovementState)reader.GetByte();
             position = Vector3.zero;
-            if (inputState.HasFlag(InputState.PositionChanged))
+            if (inputState.Has(InputState.PositionChanged))
                 position = reader.GetVector3();
             yAngle = 0f;
-            if (inputState.HasFlag(InputState.RotationChanged))
+            if (inputState.Has(InputState.RotationChanged))
                 yAngle = GetDecompressedAngle(reader.GetPackedInt());
             timestamp = reader.GetPackedLong();
         }

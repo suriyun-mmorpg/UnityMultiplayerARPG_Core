@@ -24,21 +24,21 @@ namespace MultiplayerARPG
             writer.Put(GuildName);
             writer.PutPackedShort(Level);
             writer.PutPackedInt((int)FieldOptions);
-            if (FieldOptions.HasFlag(GuildListFieldOptions.All) || FieldOptions.HasFlag(GuildListFieldOptions.GuildMessage))
+            if (FieldOptions.Has(GuildListFieldOptions.GuildMessage))
                 writer.Put(GuildMessage);
-            if (FieldOptions.HasFlag(GuildListFieldOptions.All) || FieldOptions.HasFlag(GuildListFieldOptions.GuildMessage2))
+            if (FieldOptions.Has(GuildListFieldOptions.GuildMessage2))
                 writer.Put(GuildMessage2);
-            if (FieldOptions.HasFlag(GuildListFieldOptions.All) || FieldOptions.HasFlag(GuildListFieldOptions.Score))
+            if (FieldOptions.Has(GuildListFieldOptions.Score))
                 writer.PutPackedInt(Score);
-            if (FieldOptions.HasFlag(GuildListFieldOptions.All) || FieldOptions.HasFlag(GuildListFieldOptions.Options))
+            if (FieldOptions.Has(GuildListFieldOptions.Options))
                 writer.Put(Options);
-            if (FieldOptions.HasFlag(GuildListFieldOptions.All) || FieldOptions.HasFlag(GuildListFieldOptions.AutoAcceptRequests))
+            if (FieldOptions.Has(GuildListFieldOptions.AutoAcceptRequests))
                 writer.Put(AutoAcceptRequests);
-            if (FieldOptions.HasFlag(GuildListFieldOptions.All) || FieldOptions.HasFlag(GuildListFieldOptions.Rank))
+            if (FieldOptions.Has(GuildListFieldOptions.Rank))
                 writer.PutPackedInt(Rank);
-            if (FieldOptions.HasFlag(GuildListFieldOptions.All) || FieldOptions.HasFlag(GuildListFieldOptions.CurrentMembers))
+            if (FieldOptions.Has(GuildListFieldOptions.CurrentMembers))
                 writer.PutPackedInt(CurrentMembers);
-            if (FieldOptions.HasFlag(GuildListFieldOptions.All) || FieldOptions.HasFlag(GuildListFieldOptions.MaxMembers))
+            if (FieldOptions.Has(GuildListFieldOptions.MaxMembers))
                 writer.PutPackedInt(MaxMembers);
         }
 
@@ -48,21 +48,21 @@ namespace MultiplayerARPG
             GuildName = reader.GetString();
             Level = reader.GetPackedShort();
             FieldOptions = (GuildListFieldOptions)reader.GetPackedInt();
-            if (FieldOptions.HasFlag(GuildListFieldOptions.All) || FieldOptions.HasFlag(GuildListFieldOptions.GuildMessage))
+            if (FieldOptions.Has(GuildListFieldOptions.GuildMessage))
                 GuildMessage = reader.GetString();
-            if (FieldOptions.HasFlag(GuildListFieldOptions.All) || FieldOptions.HasFlag(GuildListFieldOptions.GuildMessage2))
+            if (FieldOptions.Has(GuildListFieldOptions.GuildMessage2))
                 GuildMessage2 = reader.GetString();
-            if (FieldOptions.HasFlag(GuildListFieldOptions.All) || FieldOptions.HasFlag(GuildListFieldOptions.Score))
+            if (FieldOptions.Has(GuildListFieldOptions.Score))
                 Score = reader.GetPackedInt();
-            if (FieldOptions.HasFlag(GuildListFieldOptions.All) || FieldOptions.HasFlag(GuildListFieldOptions.Options))
+            if (FieldOptions.Has(GuildListFieldOptions.Options))
                 Options = reader.GetString();
-            if (FieldOptions.HasFlag(GuildListFieldOptions.All) || FieldOptions.HasFlag(GuildListFieldOptions.AutoAcceptRequests))
+            if (FieldOptions.Has(GuildListFieldOptions.AutoAcceptRequests))
                 AutoAcceptRequests = reader.GetBool();
-            if (FieldOptions.HasFlag(GuildListFieldOptions.All) || FieldOptions.HasFlag(GuildListFieldOptions.Rank))
+            if (FieldOptions.Has(GuildListFieldOptions.Rank))
                 Rank = reader.GetPackedInt();
-            if (FieldOptions.HasFlag(GuildListFieldOptions.All) || FieldOptions.HasFlag(GuildListFieldOptions.CurrentMembers))
+            if (FieldOptions.Has(GuildListFieldOptions.CurrentMembers))
                 CurrentMembers = reader.GetPackedInt();
-            if (FieldOptions.HasFlag(GuildListFieldOptions.All) || FieldOptions.HasFlag(GuildListFieldOptions.MaxMembers))
+            if (FieldOptions.Has(GuildListFieldOptions.MaxMembers))
                 MaxMembers = reader.GetPackedInt();
         }
     }

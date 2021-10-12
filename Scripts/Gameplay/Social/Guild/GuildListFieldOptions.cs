@@ -14,4 +14,12 @@
         MaxMembers = 1 << 7,
         All = GuildMessage | GuildMessage2 | Score | Options | AutoAcceptRequests | Rank | CurrentMembers | MaxMembers,
     }
+
+    public static class GuildListFieldOptionsExtensions
+    {
+        public static bool Has(this GuildListFieldOptions self, GuildListFieldOptions flag)
+        {
+            return (self & flag) == flag;
+        }
+    }
 }

@@ -346,11 +346,11 @@ namespace MultiplayerARPG
             {
                 acceptedPositionTimestamp = timestamp;
                 tempExtraMovementState = extraMovementState;
-                if (inputState.HasFlag(InputState.PositionChanged))
+                if (inputState.Has(InputState.PositionChanged))
                 {
-                    SetMovePaths(position, inputState.HasFlag(InputState.IsKeyMovement));
+                    SetMovePaths(position, inputState.Has(InputState.IsKeyMovement));
                 }
-                if (inputState.HasFlag(InputState.RotationChanged))
+                if (inputState.Has(InputState.RotationChanged))
                 {
                     if (IsClient)
                     {
