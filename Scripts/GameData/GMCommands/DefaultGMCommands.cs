@@ -110,7 +110,7 @@ namespace MultiplayerARPG
             "/monster {monster_id} {level} {amount} = Summon monster which its ID is {monster_id}, lv. {level}, amount {amount}.\n" +
             "/kill {name} = Kill character which its name is {name}.\n" +
             "/suicide = Kill yourself.\n" +
-            "/mute {name} {duration} = Mute character which its name is {name} for {duration} seconds.\n" +
+            "/mute {name} {duration} = Mute character which its name is {name} for {duration} minutes.\n" +
             "/unmute {name} = Unmute character which its name is {name}.\n" +
             "/ban {name} {duration} = Ban character's account which its name is {name} for {duration} days.\n" +
             "/unban {name} = Unban character's account which its name is {name}.\n" +
@@ -235,7 +235,7 @@ namespace MultiplayerARPG
                     {
                         response = "Wrong input data";
                     }
-                    else
+                    else if (characterEntity != null)
                     {
                         characterEntity.Level = amount;
                         response = $"Set character level to {amount}";
@@ -248,7 +248,7 @@ namespace MultiplayerARPG
                     {
                         response = "Wrong input data";
                     }
-                    else
+                    else if (characterEntity != null)
                     {
                         characterEntity.StatPoint = amount;
                         response = $"Set character statpoint to {amount}";
@@ -261,7 +261,7 @@ namespace MultiplayerARPG
                     {
                         response = "Wrong input data";
                     }
-                    else
+                    else if (characterEntity != null)
                     {
                         characterEntity.SkillPoint = amount;
                         response = $"Set character skillpoint to {amount}";
@@ -274,7 +274,7 @@ namespace MultiplayerARPG
                     {
                         response = "Wrong input data";
                     }
-                    else
+                    else if (characterEntity != null)
                     {
                         characterEntity.Gold = amount;
                         response = $"Set character gold to {amount}";
@@ -292,7 +292,7 @@ namespace MultiplayerARPG
                     {
                         response = "Cannot find the item";
                     }
-                    else
+                    else if (characterEntity != null)
                     {
                         if (amount > item.MaxStack)
                             amount = item.MaxStack;
@@ -381,7 +381,7 @@ namespace MultiplayerARPG
                     {
                         response = "Cannot find the map";
                     }
-                    else
+                    else if (characterEntity != null)
                     {
                         BaseMapInfo mapInfo = GameInstance.MapInfos[data[1]];
                         BaseGameNetworkManager.Singleton.WarpCharacter(characterEntity, data[1], mapInfo.StartPosition, false, Vector3.zero);
@@ -413,7 +413,7 @@ namespace MultiplayerARPG
                     {
                         response = "Cannot find the character";
                     }
-                    else
+                    else if (characterEntity != null)
                     {
                         BaseGameNetworkManager.Singleton.WarpCharacter(characterEntity, targetCharacter.CurrentMapName, targetCharacter.CurrentPosition, false, Vector3.zero);
                         response = $"Warping to: {targetCharacter.CurrentMapName} {targetCharacter.CurrentPosition}";
@@ -426,7 +426,7 @@ namespace MultiplayerARPG
                     {
                         response = "Cannot find the character";
                     }
-                    else
+                    else if (characterEntity != null)
                     {
                         BaseGameNetworkManager.Singleton.WarpCharacter(targetCharacter, characterEntity.CurrentMapName, characterEntity.CurrentPosition, false, Vector3.zero);
                         response = $"Summon character: {data[1]}";
@@ -454,7 +454,7 @@ namespace MultiplayerARPG
                     {
                         response = "Wrong input data";
                     }
-                    else
+                    else if (characterEntity != null)
                     {
                         for (int i = 0; i < amount; ++i)
                         {
@@ -483,25 +483,54 @@ namespace MultiplayerARPG
                 }
                 if (commandKey.ToLower().Equals(Suicide.ToLower()))
                 {
-                    characterEntity.CurrentHp = 0;
-                    characterEntity.Killed(EntityInfo.Empty);
-                    response = "Suicided";
+                    if (characterEntity != null)
+                    {
+                        characterEntity.CurrentHp = 0;
+                        characterEntity.Killed(EntityInfo.Empty);
+                        response = "Suicided";
+                    }
                 }
                 if (commandKey.ToLower().Equals(Mute.ToLower()))
                 {
-                    response = "This command is not implemented yet.";
+                    int amount;
+                    if (!int.TryParse(data[2], out amount) || amount < 0)
+                    {
+                        response = "Wrong input data";
+                    }
+                    else if (characterEntity != null)
+                    {
+                        GameInstance.ServerUserHandlers.MuteCharacterByName(data[1], amount);
+                        response = $"Mute character named: {data[1]}";
+                    }
                 }
                 if (commandKey.ToLower().Equals(Unmute.ToLower()))
                 {
-                    response = "This command is not implemented yet.";
+                    if (characterEntity != null)
+                    {
+                        GameInstance.ServerUserHandlers.UnmuteCharacterByName(data[1]);
+                        response = $"Unmute character named: {data[1]}";
+                    }
                 }
                 if (commandKey.ToLower().Equals(Ban.ToLower()))
                 {
-                    response = "This command is not implemented yet.";
+                    int amount;
+                    if (!int.TryParse(data[2], out amount) || amount < 0)
+                    {
+                        response = "Wrong input data";
+                    }
+                    else if (characterEntity != null)
+                    {
+                        GameInstance.ServerUserHandlers.BanUserByCharacterName(data[1], amount);
+                        response = $"Ban user's who own character named: {data[1]}";
+                    }
                 }
                 if (commandKey.ToLower().Equals(Unban.ToLower()))
                 {
-                    response = "This command is not implemented yet.";
+                    if (characterEntity != null)
+                    {
+                        GameInstance.ServerUserHandlers.UnbanUserByCharacterName(data[1]);
+                        response = $"Unban user's who own character named: {data[1]}";
+                    }
                 }
                 if (commandKey.ToLower().Equals(Kick.ToLower()))
                 {

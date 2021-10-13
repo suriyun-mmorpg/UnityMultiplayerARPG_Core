@@ -102,5 +102,25 @@ namespace MultiplayerARPG
         {
             return UserIds.TryRemove(connectionId, out _);
         }
+
+        public virtual void BanUserByCharacterName(string characterName, int days)
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public virtual void UnbanUserByCharacterName(string characterName)
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public virtual void MuteCharacterByName(string characterName, int minutes)
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public virtual void UnmuteCharacterByName(string characterName)
+        {
+            throw new System.NotImplementedException();
+        }
     }
 }

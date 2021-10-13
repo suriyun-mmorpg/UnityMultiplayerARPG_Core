@@ -103,5 +103,31 @@ namespace MultiplayerARPG
         /// <param name="connectionId"></param>
         /// <returns></returns>
         bool RemoveUserId(long connectionId);
+
+        /// <summary>
+        /// Ban user who own character which its name = `characterName`
+        /// </summary>
+        /// <param name="characterName"></param>
+        /// <param name="days"></param>
+        void BanUserByCharacterName(string characterName, int days);
+
+        /// <summary>
+        /// Unban user who own character which its name = `characterName`
+        /// </summary>
+        /// <param name="characterName"></param>
+        void UnbanUserByCharacterName(string characterName);
+
+        /// <summary>
+        /// Mute character which its name = `characterName`
+        /// </summary>
+        /// <param name="characterName"></param>
+        /// <param name="minutes"></param>
+        void MuteCharacterByName(string characterName, int minutes);
+
+        /// <summary>
+        /// Unmute user who own character which its name = `characterName`
+        /// </summary>
+        /// <param name="characterName"></param>
+        void UnmuteCharacterByName(string characterName);
     }
 }
