@@ -505,11 +505,8 @@ namespace MultiplayerARPG
                 }
                 if (commandKey.ToLower().Equals(Unmute.ToLower()))
                 {
-                    if (characterEntity != null)
-                    {
-                        GameInstance.ServerUserHandlers.UnmuteCharacterByName(data[1]);
-                        response = $"Unmute character named: {data[1]}";
-                    }
+                    GameInstance.ServerUserHandlers.UnmuteCharacterByName(data[1]);
+                    response = $"Unmute character named: {data[1]}";
                 }
                 if (commandKey.ToLower().Equals(Ban.ToLower()))
                 {
@@ -526,11 +523,8 @@ namespace MultiplayerARPG
                 }
                 if (commandKey.ToLower().Equals(Unban.ToLower()))
                 {
-                    if (characterEntity != null)
-                    {
-                        GameInstance.ServerUserHandlers.UnbanUserByCharacterName(data[1]);
-                        response = $"Unban user's who own character named: {data[1]}";
-                    }
+                    GameInstance.ServerUserHandlers.UnbanUserByCharacterName(data[1]);
+                    response = $"Unban user's who own character named: {data[1]}";
                 }
                 if (commandKey.ToLower().Equals(Kick.ToLower()))
                 {
