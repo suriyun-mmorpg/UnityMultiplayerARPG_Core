@@ -29,6 +29,7 @@ namespace MultiplayerARPG
         public Vector3 RespawnPosition { get; set; }
         public int MountDataId { get; set; }
         public long LastDeadTime { get; set; }
+        public long UnmuteTime { get; set; }
         public long LastUpdate { get; set; }
 
         public IList<CharacterHotkey> Hotkeys

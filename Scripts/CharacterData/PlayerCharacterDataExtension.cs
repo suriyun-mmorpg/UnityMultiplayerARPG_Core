@@ -980,5 +980,10 @@ namespace MultiplayerARPG
             character.GuildRole = 0;
             character.SharedGuildExp = 0;
         }
+
+        public static bool IsMuting(this IPlayerCharacterData character)
+        {
+            return character.UnmuteTime > 0 && character.UnmuteTime < (BaseGameNetworkManager.Singleton.ServerTimestamp * 1000);
+        }
     }
 }

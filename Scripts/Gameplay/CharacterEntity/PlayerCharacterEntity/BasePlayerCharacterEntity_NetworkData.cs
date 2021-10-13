@@ -33,6 +33,8 @@ namespace MultiplayerARPG
         [SerializeField]
         protected SyncFieldLong lastDeadTime = new SyncFieldLong();
         [SerializeField]
+        protected SyncFieldLong unmuteTime = new SyncFieldLong();
+        [SerializeField]
         protected SyncFieldBool isWarping = new SyncFieldBool();
 
         [Category("Sync Lists")]
@@ -158,6 +160,7 @@ namespace MultiplayerARPG
             set { }
         }
         public long LastDeadTime { get { return lastDeadTime.Value; } set { lastDeadTime.Value = value; } }
+        public long UnmuteTime { get { return unmuteTime.Value; } set { unmuteTime.Value = value; } }
         public long LastUpdate { get; set; }
 
         public IList<CharacterHotkey> Hotkeys
