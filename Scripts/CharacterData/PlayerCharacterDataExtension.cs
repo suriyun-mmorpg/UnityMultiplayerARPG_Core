@@ -986,7 +986,7 @@ namespace MultiplayerARPG
 
         public static bool IsMuting(this IPlayerCharacterData character)
         {
-            return character.UnmuteTime > 0 && character.UnmuteTime < (BaseGameNetworkManager.Singleton.ServerTimestamp / 1000);
+            return character.UnmuteTime > 0 && character.UnmuteTime > (BaseGameNetworkManager.Singleton.ServerTimestamp / 1000);
         }
     }
 }
