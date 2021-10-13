@@ -486,7 +486,23 @@ namespace MultiplayerARPG
 
         protected virtual void HandleChatAtServer(MessageHandlerData messageHandler)
         {
-            ServerChatHandlers.OnChatMessage(messageHandler.ReadMessage<ChatMessage>().FillChannelId());
+            ChatMessage message = messageHandler.ReadMessage<ChatMessage>().FillChannelId();
+            // Check muting character
+            IPlayerCharacterData playerCharacter;
+            if (!string.IsNullOrEmpty(message.sender) && GameInstance.ServerUserHandlers.TryGetPlayerCharacterByName(message.sender, out playerCharacter) && playerCharacter.IsMuting())
+            {
+                long connectionId;
+                if (GameInstance.ServerUserHandlers.TryGetConnectionId(playerCharacter.Id, out connectionId))
+                {
+                    ServerSendPacket(connectionId, 0, DeliveryMethod.ReliableOrdered, GameNetworkingConsts.Chat, new ChatMessage()
+                    {
+                        channel = ChatChannel.System,
+                        message = "You have been muted.",
+                    });
+                }
+                return;
+            }
+            ServerChatHandlers.OnChatMessage(message);
         }
 
         protected void HandleMovementInputAtServer(MessageHandlerData messageHandler)
