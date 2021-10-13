@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using LiteNetLibManager;
+using UnityEngine;
 
 namespace MultiplayerARPG
 {
@@ -19,9 +20,11 @@ namespace MultiplayerARPG
             }
 
             // Instantiate new mount entity
-            VehicleEntity vehicle = BaseGameNetworkManager.Singleton.Assets
-                .NetworkSpawn(mountEntityPrefab.Identity.HashAssetId, enterPosition, Quaternion.Euler(0, CacheTransform.eulerAngles.y, 0), 0, ConnectionId)
-                .GetComponent<VehicleEntity>();
+            LiteNetLibIdentity spawnObj = BaseGameNetworkManager.Singleton.Assets.GetObjectInstance(
+                mountEntityPrefab.Identity.HashAssetId, enterPosition,
+                Quaternion.Euler(0, CacheTransform.eulerAngles.y, 0));
+            VehicleEntity vehicle = spawnObj.GetComponent<VehicleEntity>();
+            BaseGameNetworkManager.Singleton.Assets.NetworkSpawn(spawnObj);
 
             // Seat index for mount entity always 0
             EnterVehicle(vehicle, 0);
