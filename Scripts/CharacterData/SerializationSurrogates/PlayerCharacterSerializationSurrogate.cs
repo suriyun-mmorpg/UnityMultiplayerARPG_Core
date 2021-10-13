@@ -121,10 +121,10 @@ namespace MultiplayerARPG
             // TODO: Backward compatible, this will be removed in future version
             try
             {
-                data.LastDeadTime = info.GetInt32("lastDeadTime");
+                data.LastDeadTime = info.GetInt64("lastDeadTime");
             }
             catch { }
-            data.LastUpdate = info.GetInt32("lastUpdate");
+            data.LastUpdate = info.GetInt64("lastUpdate");
             data.Hotkeys = info.GetListValue<CharacterHotkey>("hotkeys");
             data.Quests = info.GetListValue<CharacterQuest>("quests");
             // TODO: Backward compatible, this will be removed in future version
