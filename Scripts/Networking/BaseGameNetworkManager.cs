@@ -683,7 +683,9 @@ namespace MultiplayerARPG
                         warpPortalPrefab = warpPortal.entityPrefab != null ? warpPortal.entityPrefab : CurrentGameInstance.warpPortalEntityPrefab;
                         if (warpPortalPrefab != null)
                         {
-                            spawnObj = Assets.GetObjectInstance(warpPortalPrefab.Identity.HashAssetId, warpPortal.position, Quaternion.Euler(warpPortal.rotation));
+                            spawnObj = Assets.GetObjectInstance(
+                                warpPortalPrefab.Identity.HashAssetId, warpPortal.position,
+                                Quaternion.Euler(warpPortal.rotation));
                             warpPortalEntity = spawnObj.GetComponent<WarpPortalEntity>();
                             warpPortalEntity.warpPortalType = warpPortal.warpPortalType;
                             warpPortalEntity.warpToMapInfo = warpPortal.warpToMapInfo;
@@ -718,7 +720,9 @@ namespace MultiplayerARPG
                         npcPrefab = npc.entityPrefab;
                         if (npcPrefab != null)
                         {
-                            spawnObj = Assets.GetObjectInstance(npcPrefab.Identity.HashAssetId, npc.position, Quaternion.Euler(npc.rotation));
+                            spawnObj = Assets.GetObjectInstance(
+                                npcPrefab.Identity.HashAssetId, npc.position,
+                                Quaternion.Euler(npc.rotation));
                             npcEntity = spawnObj.GetComponent<NpcEntity>();
                             npcEntity.Title = npc.title;
                             npcEntity.StartDialog = npc.startDialog;
@@ -834,7 +838,9 @@ namespace MultiplayerARPG
         {
             if (GameInstance.BuildingEntities.ContainsKey(saveData.EntityId))
             {
-                LiteNetLibIdentity spawnObj = Assets.GetObjectInstance(GameInstance.BuildingEntities[saveData.EntityId].Identity.HashAssetId, saveData.Position, saveData.Rotation);
+                LiteNetLibIdentity spawnObj = Assets.GetObjectInstance(
+                    GameInstance.BuildingEntities[saveData.EntityId].Identity.HashAssetId,
+                    saveData.Position, saveData.Rotation);
                 BuildingEntity buildingEntity = spawnObj.GetComponent<BuildingEntity>();
                 buildingEntity.Id = saveData.Id;
                 buildingEntity.ParentId = saveData.ParentId;

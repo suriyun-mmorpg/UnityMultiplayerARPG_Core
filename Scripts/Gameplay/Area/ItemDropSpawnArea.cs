@@ -28,7 +28,9 @@ namespace MultiplayerARPG
             if (GetRandomPosition(out spawnPosition))
             {
                 Quaternion spawnRotation = GetRandomRotation();
-                LiteNetLibIdentity spawnObj = BaseGameNetworkManager.Singleton.Assets.GetObjectInstance(prefab.Identity.HashAssetId, spawnPosition, spawnRotation);
+                LiteNetLibIdentity spawnObj = BaseGameNetworkManager.Singleton.Assets.GetObjectInstance(
+                    prefab.Identity.HashAssetId,
+                    spawnPosition, spawnRotation);
                 ItemDropEntity entity = spawnObj.GetComponent<ItemDropEntity>();
                 entity.SetSpawnArea(this, prefab, level, spawnPosition);
                 BaseGameNetworkManager.Singleton.Assets.NetworkSpawn(spawnObj);

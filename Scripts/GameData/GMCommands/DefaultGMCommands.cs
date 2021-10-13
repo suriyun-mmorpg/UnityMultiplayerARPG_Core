@@ -458,7 +458,10 @@ namespace MultiplayerARPG
                     {
                         for (int i = 0; i < amount; ++i)
                         {
-                            LiteNetLibIdentity spawnObj = BaseGameNetworkManager.Singleton.Assets.GetObjectInstance(targetMonster.Identity.HashAssetId, characterEntity.MovementTransform.position, Quaternion.identity);
+                            LiteNetLibIdentity spawnObj = BaseGameNetworkManager.Singleton.Assets.GetObjectInstance(
+                                targetMonster.Identity.HashAssetId,
+                                characterEntity.MovementTransform.position,
+                                Quaternion.identity);
                             BaseMonsterCharacterEntity entity = spawnObj.GetComponent<BaseMonsterCharacterEntity>();
                             entity.Level = level;
                             BaseGameNetworkManager.Singleton.Assets.NetworkSpawn(spawnObj);
