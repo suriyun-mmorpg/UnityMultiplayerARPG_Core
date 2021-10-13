@@ -49,6 +49,7 @@ namespace MultiplayerARPG
             to.RespawnPosition = from.RespawnPosition;
             to.MountDataId = from.MountDataId;
             to.LastDeadTime = from.LastDeadTime;
+            to.UnmuteTime = from.UnmuteTime;
             to.LastUpdate = from.LastUpdate;
             to.SelectableWeaponSets = new List<EquipWeapons>(from.SelectableWeaponSets);
             to.Attributes = new List<CharacterAttribute>(from.Attributes);
@@ -427,6 +428,7 @@ namespace MultiplayerARPG
             }
             writer.PutPackedInt(characterData.MountDataId);
             writer.PutPackedLong(characterData.LastDeadTime);
+            writer.PutPackedLong(characterData.UnmuteTime);
             writer.PutPackedLong(characterData.LastUpdate);
             // Attributes
             if (withAttributes)
@@ -591,6 +593,7 @@ namespace MultiplayerARPG
             }
             characterData.MountDataId = reader.GetPackedInt();
             characterData.LastDeadTime = reader.GetPackedLong();
+            characterData.UnmuteTime = reader.GetPackedLong();
             characterData.LastUpdate = reader.GetPackedLong();
             int count;
             // Attributes
@@ -983,7 +986,7 @@ namespace MultiplayerARPG
 
         public static bool IsMuting(this IPlayerCharacterData character)
         {
-            return character.UnmuteTime > 0 && character.UnmuteTime < (BaseGameNetworkManager.Singleton.ServerTimestamp * 1000);
+            return character.UnmuteTime > 0 && character.UnmuteTime < (BaseGameNetworkManager.Singleton.ServerTimestamp / 1000);
         }
     }
 }
