@@ -497,7 +497,7 @@ namespace MultiplayerARPG
                     {
                         response = "Wrong input data";
                     }
-                    else if (characterEntity != null)
+                    else
                     {
                         GameInstance.ServerUserHandlers.MuteCharacterByName(data[1], amount);
                         response = $"Mute character named: {data[1]}";
@@ -518,7 +518,7 @@ namespace MultiplayerARPG
                     {
                         response = "Wrong input data";
                     }
-                    else if (characterEntity != null)
+                    else
                     {
                         GameInstance.ServerUserHandlers.BanUserByCharacterName(data[1], amount);
                         response = $"Ban user's who own character named: {data[1]}";
