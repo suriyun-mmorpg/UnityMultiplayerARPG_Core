@@ -7,10 +7,8 @@ namespace MultiplayerARPG
     [System.Serializable]
     public partial class CharacterData : ICharacterData
     {
-        private string id;
         private int dataId;
         private int entityId;
-        private string characterName;
         private short level;
         private byte equipWeaponSet;
         private ObservableCollection<EquipWeapons> selectableEquipWeapons;
@@ -23,7 +21,7 @@ namespace MultiplayerARPG
         private ObservableCollection<CharacterItem> nonEquipItems;
         private ObservableCollection<CharacterSummon> summons;
 
-        public string Id { get { return id; } set { id = value; } }
+        public string Id { get; set; }
         public int DataId
         {
             get { return dataId; }
@@ -42,11 +40,7 @@ namespace MultiplayerARPG
                 this.MarkToMakeCaches();
             }
         }
-        public string CharacterName
-        {
-            get { return characterName; }
-            set { characterName = value; }
-        }
+        public string CharacterName { get; set; }
         public string Title
         {
             get { return CharacterName; }
