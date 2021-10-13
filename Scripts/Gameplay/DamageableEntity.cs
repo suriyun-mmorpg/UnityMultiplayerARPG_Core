@@ -140,6 +140,16 @@ namespace MultiplayerARPG
             CurrentGameManager.LagCompensationManager.RemoveHitBoxes(ObjectId);
         }
 
+        protected override void EntityUpdate()
+        {
+            base.EntityUpdate();
+            if (Model != null && Model is IDeadlyModel)
+            {
+                // Update dead animation
+                (Model as IDeadlyModel).SetIsDead(this.IsDead());
+            }
+        }
+
         /// <summary>
         /// This will be called on clients to display combat texts, play hit effects, play hit animation
         /// </summary>
