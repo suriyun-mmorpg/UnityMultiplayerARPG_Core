@@ -34,7 +34,7 @@ namespace MultiplayerARPG
                             {
                                 Manager.ServerSendPacket(playerCharacterEntity.ConnectionId, 0, DeliveryMethod.ReliableOrdered, GameNetworkingConsts.Chat, new ChatMessage()
                                 {
-                                    channel = ChatChannel.Local,
+                                    channel = ChatChannel.System,
                                     message = response,
                                 });
                             }
