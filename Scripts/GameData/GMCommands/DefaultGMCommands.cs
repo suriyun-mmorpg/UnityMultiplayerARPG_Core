@@ -403,7 +403,7 @@ namespace MultiplayerARPG
                     }
                     else if (GameInstance.ServerUserHandlers.TryGetPlayerCharacterByName(data[1], out targetCharacter))
                     {
-                        BaseGameNetworkManager.Singleton.WarpCharacter(targetCharacter, data[1], new Vector3(x,y,z), false, Vector3.zero);
+                        BaseGameNetworkManager.Singleton.WarpCharacter(targetCharacter, data[2], new Vector3(x,y,z), false, Vector3.zero);
                     }
                 }
                 if (commandKey.ToLower().Equals(WarpToCharacter.ToLower()))
