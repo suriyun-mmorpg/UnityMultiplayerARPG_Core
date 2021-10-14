@@ -101,14 +101,14 @@ namespace MultiplayerARPG.GameData.Model.Playables
             {
                 case AnimActionType.AttackRightHand:
                     ActionAnimation[] rightHandAnims = GetRightHandAttackAnimations(dataId);
-                    if (index < rightHandAnims.Length)
+                    if (index >= rightHandAnims.Length)
                         index = 0;
                     if (index < rightHandAnims.Length)
                         tempActionAnimation = rightHandAnims[index];
                     break;
                 case AnimActionType.AttackLeftHand:
                     ActionAnimation[] leftHandAnims = GetLeftHandAttackAnimations(dataId);
-                    if (index < leftHandAnims.Length)
+                    if (index >= leftHandAnims.Length)
                         index = 0;
                     if (index < leftHandAnims.Length)
                         tempActionAnimation = leftHandAnims[index];
