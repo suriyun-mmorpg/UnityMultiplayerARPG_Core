@@ -2,7 +2,6 @@
 using LiteNetLib;
 using LiteNetLib.Utils;
 using LiteNetLibManager;
-using System.Collections;
 using System.Collections.Generic;
 using System.Threading;
 using UnityEngine;
@@ -153,14 +152,26 @@ namespace MultiplayerARPG
             animSpeedRate *= Entity.GetAnimSpeedRate(Entity.AnimActionType);
             try
             {
-                // Animations will plays on clients only
-                // Play animation
+                // Play action animation
                 if (Entity.CharacterModel && Entity.CharacterModel.gameObject.activeSelf)
+                {
+                    // TPS model
                     Entity.CharacterModel.PlayActionAnimation(Entity.AnimActionType, Entity.AnimActionDataId, animationIndex, animSpeedRate);
+                }
+                if (Entity.PassengingVehicleEntity != null && Entity.PassengingVehicleEntity.Entity.Model &&
+                    Entity.PassengingVehicleEntity.Entity.Model.gameObject.activeSelf &&
+                    Entity.PassengingVehicleEntity.Entity.Model is BaseCharacterModel)
+                {
+                    // Vehicle model
+                    (Entity.PassengingVehicleEntity.Entity.Model as BaseCharacterModel).PlayActionAnimation(Entity.AnimActionType, Entity.AnimActionDataId, animationIndex, animSpeedRate);
+                }
                 if (IsClient)
                 {
                     if (Entity.FpsModel && Entity.FpsModel.gameObject.activeSelf)
+                    {
+                        // FPS model
                         Entity.FpsModel.PlayActionAnimation(Entity.AnimActionType, Entity.AnimActionDataId, animationIndex, animSpeedRate);
+                    }
                 }
 
                 float remainsDuration = totalDuration;

@@ -127,9 +127,25 @@ namespace MultiplayerARPG
             {
                 // Play animation
                 if (Entity.CharacterModel && Entity.CharacterModel.gameObject.activeSelf)
+                {
+                    // TPS model
                     Entity.CharacterModel.PlayActionAnimation(Entity.AnimActionType, animActionDataId, 0);
-                if (Entity.FpsModel && Entity.FpsModel.gameObject.activeSelf)
-                    Entity.FpsModel.PlayActionAnimation(Entity.AnimActionType, animActionDataId, 0);
+                }
+                if (Entity.PassengingVehicleEntity != null && Entity.PassengingVehicleEntity.Entity.Model &&
+                    Entity.PassengingVehicleEntity.Entity.Model.gameObject.activeSelf &&
+                    Entity.PassengingVehicleEntity.Entity.Model is BaseCharacterModel)
+                {
+                    // Vehicle model
+                    (Entity.PassengingVehicleEntity.Entity.Model as BaseCharacterModel).PlayActionAnimation(Entity.AnimActionType, animActionDataId, 0);
+                }
+                if (IsClient)
+                {
+                    if (Entity.FpsModel && Entity.FpsModel.gameObject.activeSelf)
+                    {
+                        // FPS model
+                        Entity.FpsModel.PlayActionAnimation(Entity.AnimActionType, animActionDataId, 0);
+                    }
+                }
 
                 // Animations will plays on clients only
                 if (IsClient)
