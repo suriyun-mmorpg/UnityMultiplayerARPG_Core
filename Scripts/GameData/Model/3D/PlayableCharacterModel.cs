@@ -100,10 +100,14 @@ namespace MultiplayerARPG.GameData.Model.Playables
             switch (animActionType)
             {
                 case AnimActionType.AttackRightHand:
-                    tempActionAnimation = GetRightHandAttackAnimations(dataId)[index];
+                    ActionAnimation[] rightHandAnims = GetRightHandAttackAnimations(dataId);
+                    if (index < rightHandAnims.Length)
+                        tempActionAnimation = rightHandAnims[index];
                     break;
                 case AnimActionType.AttackLeftHand:
-                    tempActionAnimation = GetLeftHandAttackAnimations(dataId)[index];
+                    ActionAnimation[] leftHandAnims = GetLeftHandAttackAnimations(dataId);
+                    if (index < leftHandAnims.Length)
+                        tempActionAnimation = leftHandAnims[index];
                     break;
                 case AnimActionType.SkillRightHand:
                 case AnimActionType.SkillLeftHand:
