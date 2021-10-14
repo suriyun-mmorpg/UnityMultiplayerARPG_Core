@@ -338,7 +338,7 @@ namespace MultiplayerARPG
         {
             if (GetEquipmentItem() == null)
                 return null;
-            return GetEquipmentItem().GetIncreaseAttributesRate(level);
+            return GetEquipmentItem().GetIncreaseAttributesRate(level, randomSeed);
         }
 
         public Dictionary<DamageElement, float> GetIncreaseResistances()

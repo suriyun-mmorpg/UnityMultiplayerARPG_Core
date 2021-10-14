@@ -128,7 +128,7 @@ namespace MultiplayerARPG
                 if (equipmentItem.RandomBonus.randomAttributeAmounts != null &&
                     equipmentItem.RandomBonus.randomAttributeAmounts.Length > 0)
                 {
-                    randomSeed = randomSeed.Increase(64);
+                    randomSeed = randomSeed.Increase(32);
                     System.Random random = new System.Random(randomSeed);
                     for (int i = 0; i < equipmentItem.RandomBonus.randomAttributeAmounts.Length; ++i)
                     {
@@ -140,12 +140,25 @@ namespace MultiplayerARPG
             return result;
         }
 
-        public static Dictionary<Attribute, float> GetIncreaseAttributesRate<T>(this T equipmentItem, short level)
+        public static Dictionary<Attribute, float> GetIncreaseAttributesRate<T>(this T equipmentItem, short level, int randomSeed)
             where T : IEquipmentItem
         {
             Dictionary<Attribute, float> result = new Dictionary<Attribute, float>();
             if (equipmentItem != null && equipmentItem.IsEquipment())
+            {
                 result = GameDataHelpers.CombineAttributes(equipmentItem.IncreaseAttributesRate, result, level, 1f);
+                if (equipmentItem.RandomBonus.randomAttributeAmountRates != null &&
+                    equipmentItem.RandomBonus.randomAttributeAmountRates.Length > 0)
+                {
+                    randomSeed = randomSeed.Increase(64);
+                    System.Random random = new System.Random(randomSeed);
+                    for (int i = 0; i < equipmentItem.RandomBonus.randomAttributeAmountRates.Length; ++i)
+                    {
+                        if (!equipmentItem.RandomBonus.randomAttributeAmountRates[i].Apply(random)) continue;
+                        result = GameDataHelpers.CombineAttributes(result, equipmentItem.RandomBonus.randomAttributeAmountRates[i].GetRandomedAmount(random).ToKeyValuePair(1f));
+                    }
+                }
+            }
             return result;
         }
 

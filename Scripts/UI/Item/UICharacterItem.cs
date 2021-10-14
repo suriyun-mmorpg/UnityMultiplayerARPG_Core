@@ -700,7 +700,7 @@ namespace MultiplayerARPG
             {
                 Dictionary<Attribute, float> attributesRate = null;
                 if (EquipmentItem != null)
-                    attributesRate = EquipmentItem.GetIncreaseAttributesRate(Level);
+                    attributesRate = EquipmentItem.GetIncreaseAttributesRate(Level, CharacterItem.randomSeed);
                 else if (SocketEnhancerItem != null)
                     attributesRate = GameDataHelpers.CombineAttributes(SocketEnhancerItem.SocketEnhanceEffect.attributesRate, attributesRate, 1f);
 
