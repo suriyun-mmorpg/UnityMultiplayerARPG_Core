@@ -317,14 +317,14 @@ namespace MultiplayerARPG
         {
             if (GetEquipmentItem() == null)
                 return CharacterStats.Empty;
-            return GetEquipmentItem().GetIncreaseStats(level);
+            return GetEquipmentItem().GetIncreaseStats(level, randomSeed);
         }
 
         public CharacterStats GetIncreaseStatsRate()
         {
             if (GetEquipmentItem() == null)
                 return CharacterStats.Empty;
-            return GetEquipmentItem().GetIncreaseStatsRate(level);
+            return GetEquipmentItem().GetIncreaseStatsRate(level, randomSeed);
         }
 
         public Dictionary<Attribute, float> GetIncreaseAttributes()

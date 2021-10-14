@@ -634,7 +634,7 @@ namespace MultiplayerARPG
             {
                 CharacterStats stats = new CharacterStats();
                 if (EquipmentItem != null)
-                    stats += EquipmentItem.GetIncreaseStats(Level);
+                    stats += EquipmentItem.GetIncreaseStats(Level, CharacterItem.randomSeed);
                 else if (SocketEnhancerItem != null)
                     stats += SocketEnhancerItem.SocketEnhanceEffect.stats;
 
@@ -656,7 +656,7 @@ namespace MultiplayerARPG
             {
                 CharacterStats statsRate = new CharacterStats();
                 if (EquipmentItem != null)
-                    statsRate += EquipmentItem.GetIncreaseStatsRate(Level);
+                    statsRate += EquipmentItem.GetIncreaseStatsRate(Level, CharacterItem.randomSeed);
                 else if (SocketEnhancerItem != null)
                     statsRate += SocketEnhancerItem.SocketEnhanceEffect.statsRate;
 

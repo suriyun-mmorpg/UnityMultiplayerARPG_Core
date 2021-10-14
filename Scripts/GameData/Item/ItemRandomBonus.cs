@@ -1,8 +1,14 @@
-﻿namespace MultiplayerARPG
+﻿using UnityEngine;
+
+namespace MultiplayerARPG
 {
     [System.Serializable]
     public struct ItemRandomBonus
     {
+        [Tooltip("0 = Unlimit")]
+        public int maxRandomStatsAmount;
+        public RandomCharacterStats randomCharacterStats;
+        public RandomCharacterStats randomCharacterStatsRate;
         public AttributeRandomAmount[] randomAttributeAmounts;
         public AttributeRandomAmount[] randomAttributeAmountRates;
         public ResistanceRandomAmount[] randomResistanceAmounts;

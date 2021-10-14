@@ -17,6 +17,7 @@ public static class GenericUtils
     private static List<TMP_InputField> textMeshInputFields;
 #endif
     private static bool isSetOnActiveSceneChanged_ResetInputField;
+    private static System.Random randomizer = new System.Random();
 
     public static bool IsFocusInputField()
     {
@@ -446,7 +447,7 @@ public static class GenericUtils
         return value >= 0 ? "+" + value.ToString(format) : value.ToString(format);
     }
 
-    public static void Shuffle<T>(this IList<T> list)
+    public static void Shuffle<T>(this IList<T> list, System.Random random)
     {
         if (list == null || list.Count <= 1)
             return;
@@ -454,11 +455,17 @@ public static class GenericUtils
         T tempEntry;
         for (int i = 0; i < list.Count - 1; ++i)
         {
-            tempRandomIndex = Random.Range(i, list.Count);
+            tempRandomIndex = random.Next(i, list.Count);
             tempEntry = list[i];
             list[i] = list[tempRandomIndex];
             list[tempRandomIndex] = tempEntry;
         }
+    }
+
+    public static void Shuffle<T>(this IList<T> list)
+    {
+        randomizer.Next();
+        Shuffle(list, randomizer);
     }
 
     public static int Increase(this int a, int b)
