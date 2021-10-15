@@ -20,8 +20,6 @@ namespace MultiplayerARPG
         public float lerpDamping = 25f;
         [Range(0f, 180f)]
         public float maxAngle = 0f;
-        private float tempPitch;
-        private Quaternion tempRotation;
         public Quaternion PitchRotation { get; private set; }
         public BaseCharacterEntity CharacterEntity { get; private set; }
         public CharacterPitchIKManager Manager { get; private set; }
@@ -85,42 +83,49 @@ namespace MultiplayerARPG
         {
             if (!Enabling)
                 return;
+            PitchRotation = CalculatePitchRotation(CharacterEntity.Pitch, Time.deltaTime, PitchRotation, axis, rotateOffset, inversePitch, lerpDamping, maxAngle);
+        }
+
+        public static Quaternion CalculatePitchRotation(
+            float characterPitch,
+            float deltaTime,
+            Quaternion oldRotation,
+            Axis axis,
+            Vector3 rotateOffset,
+            bool inversePitch,
+            float lerpDamping,
+            float maxAngle)
+        {
             // Clamp pitch
-            tempPitch = CharacterEntity.Pitch;
             if (maxAngle > 0f)
             {
-                if (tempPitch >= 180f && tempPitch < 360f - maxAngle)
+                if (characterPitch >= 180f && characterPitch < 360f - maxAngle)
                 {
-                    tempPitch = 360f - maxAngle;
+                    characterPitch = 360f - maxAngle;
                 }
-                else if (tempPitch < 180f && tempPitch > maxAngle)
+                else if (characterPitch < 180f && characterPitch > maxAngle)
                 {
-                    tempPitch = maxAngle;
+                    characterPitch = maxAngle;
                 }
             }
             // Find pitch rotation
-            tempRotation = Quaternion.identity;
+            Quaternion tempRotation = Quaternion.identity;
             switch (axis)
             {
                 case Axis.X:
-                    tempRotation = Quaternion.Euler(Vector3.left * tempPitch * (inversePitch ? -1 : 1));
+                    tempRotation = Quaternion.Euler(Vector3.left * characterPitch * (inversePitch ? -1 : 1));
                     break;
                 case Axis.Y:
-                    tempRotation = Quaternion.Euler(Vector3.up * tempPitch * (inversePitch ? -1 : 1));
+                    tempRotation = Quaternion.Euler(Vector3.up * characterPitch * (inversePitch ? -1 : 1));
                     break;
                 case Axis.Z:
-                    tempRotation = Quaternion.Euler(Vector3.forward * tempPitch * (inversePitch ? -1 : 1));
+                    tempRotation = Quaternion.Euler(Vector3.forward * characterPitch * (inversePitch ? -1 : 1));
                     break;
             }
             tempRotation = tempRotation * Quaternion.Euler(rotateOffset);
             if (lerpDamping > 0f)
-            {
-                PitchRotation = Quaternion.Lerp(PitchRotation, tempRotation, lerpDamping * Time.deltaTime);
-            }
-            else
-            {
-                PitchRotation = tempRotation;
-            }
+                return Quaternion.Lerp(oldRotation, tempRotation, lerpDamping * deltaTime);
+            return tempRotation;
         }
     }
 }

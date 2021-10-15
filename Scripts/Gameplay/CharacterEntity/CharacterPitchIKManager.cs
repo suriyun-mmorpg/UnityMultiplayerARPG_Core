@@ -12,6 +12,7 @@ namespace MultiplayerARPG
     public class CharacterPitchIKManager : MonoBehaviour
     {
         public Animator Animator { get; private set; }
+        public BaseCharacterEntity CharacterEntity { get; private set; }
         private readonly List<CharacterPitchIK> components = new List<CharacterPitchIK>();
         private PlayableCharacterModel playableCharacterModel;
         private bool forPlayableCharacterModel;
@@ -19,12 +20,14 @@ namespace MultiplayerARPG
         private NativeArray<bool> enablings;
         private NativeArray<TransformStreamHandle> pitchBones;
         private NativeArray<Quaternion> pitchRotations;
+        private NativeArray<UpdatingRotationData> rotationDataList;
         private PlayableAnimJob playableAnimJob;
         private AnimationScriptPlayable pitchUpdatePlayable;
 
         private void Awake()
         {
             Animator = GetComponentInParent<Animator>();
+            CharacterEntity = GetComponentInParent<BaseCharacterEntity>();
             if (Animator == null)
                 Animator = GetComponentInChildren<Animator>();
             playableCharacterModel = GetComponentInParent<PlayableCharacterModel>();
@@ -70,23 +73,42 @@ namespace MultiplayerARPG
                 enablings = new NativeArray<bool>(components.Count, Allocator.Persistent, NativeArrayOptions.UninitializedMemory);
                 pitchBones = new NativeArray<TransformStreamHandle>(components.Count, Allocator.Persistent, NativeArrayOptions.UninitializedMemory);
                 pitchRotations = new NativeArray<Quaternion>(components.Count, Allocator.Persistent, NativeArrayOptions.UninitializedMemory);
+                rotationDataList = new NativeArray<UpdatingRotationData>(components.Count, Allocator.Persistent, NativeArrayOptions.UninitializedMemory);
             }
-            sizeChanged = false;
             for (int i = 0; i < components.Count; ++i)
             {
-                components[i].UpdatePitchRotation();
                 if (forPlayableCharacterModel)
                 {
                     enablings[i] = components[i].Enabling;
-                    pitchBones[i] = Animator.BindStreamTransform(Animator.GetBoneTransform(components[i].pitchBone));
-                    pitchRotations[i] = components[i].PitchRotation;
+                    if (sizeChanged)
+                        pitchBones[i] = Animator.BindStreamTransform(Animator.GetBoneTransform(components[i].pitchBone));
+                    if (enablings[i])
+                    {
+                        // Change updating data
+                        rotationDataList[i] = new UpdatingRotationData()
+                        {
+                            axis = components[i].axis,
+                            rotateOffset = components[i].rotateOffset,
+                            inversePitch = components[i].inversePitch,
+                            lerpDamping = components[i].lerpDamping,
+                            maxAngle = components[i].maxAngle,
+                        };
+                    }
+                }
+                else
+                {
+                    components[i].UpdatePitchRotation();
                 }
             }
+            sizeChanged = false;
             if (forPlayableCharacterModel)
             {
+                playableAnimJob.characterPitch = CharacterEntity.Pitch;
+                playableAnimJob.deltaTime = Time.deltaTime;
                 playableAnimJob.enablings = enablings;
                 playableAnimJob.pitchBones = pitchBones;
                 playableAnimJob.pitchRotations = pitchRotations;
+                playableAnimJob.rotationDataList = rotationDataList;
                 pitchUpdatePlayable.SetJobData(playableAnimJob);
             }
         }
@@ -107,21 +129,39 @@ namespace MultiplayerARPG
             }
         }
 
+        public struct UpdatingRotationData
+        {
+            public CharacterPitchIK.Axis axis;
+            public Vector3 rotateOffset;
+            public bool inversePitch;
+            public float lerpDamping;
+            public float maxAngle;
+        }
+
         public struct PlayableAnimJob : IAnimationJob
         {
+            public float characterPitch;
+            public float deltaTime;
             public NativeArray<bool> enablings;
             public NativeArray<TransformStreamHandle> pitchBones;
             public NativeArray<Quaternion> pitchRotations;
+            public NativeArray<UpdatingRotationData> rotationDataList;
 
             public void ProcessAnimation(AnimationStream stream)
             {
                 if (!enablings.IsCreated ||
                     !pitchBones.IsCreated ||
-                    !pitchRotations.IsCreated)
+                    !pitchRotations.IsCreated ||
+                    !rotationDataList.IsCreated)
                     return;
                 for (int i = pitchBones.Length - 1; i >= 0; --i)
                 {
                     if (!enablings[i]) continue;
+                    pitchRotations[i] = CharacterPitchIK.CalculatePitchRotation(
+                        characterPitch, deltaTime, pitchRotations[i],
+                        rotationDataList[i].axis, rotationDataList[i].rotateOffset,
+                        rotationDataList[i].inversePitch, rotationDataList[i].lerpDamping,
+                        rotationDataList[i].maxAngle);
                     pitchBones[i].SetLocalRotation(stream, pitchRotations[i]);
                 }
             }
@@ -138,6 +178,8 @@ namespace MultiplayerARPG
                     pitchBones.Dispose();
                 if (pitchRotations.IsCreated)
                     pitchRotations.Dispose();
+                if (rotationDataList.IsCreated)
+                    rotationDataList.Dispose();
             }
         }
     }
