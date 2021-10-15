@@ -212,7 +212,7 @@ namespace MultiplayerARPG
             return characterEntity != null && characterEntity.UserLevel > 0;
         }
 
-        public override string HandleGMCommand(BasePlayerCharacterEntity characterEntity, string chatMessage)
+        public override string HandleGMCommand(string sender, BasePlayerCharacterEntity characterEntity, string chatMessage)
         {
             if (string.IsNullOrEmpty(chatMessage))
                 return string.Empty;
@@ -454,28 +454,18 @@ namespace MultiplayerARPG
                 }
                 if (commandKey.ToLower().Equals(WarpToCharacter.ToLower()))
                 {
-                    // TODO: Add function to find character from all maps
-                    if (!GameInstance.ServerUserHandlers.TryGetPlayerCharacterByName(data[1], out targetCharacter))
+                    if (GameInstance.ServerUserHandlers.TryGetPlayerCharacterByName(data[1], out targetCharacter))
                     {
-                        response = "Cannot find the character";
-                    }
-                    else if (characterEntity != null)
-                    {
-                        BaseGameNetworkManager.Singleton.WarpCharacter(characterEntity, targetCharacter.CurrentMapName, targetCharacter.CurrentPosition, false, Vector3.zero);
-                        response = $"Warping to: {targetCharacter.CurrentMapName} {targetCharacter.CurrentPosition}";
+                        string resendCommand = $"{WarpCharacter} {sender} {BaseGameNetworkManager.CurrentMapInfo.Id.Replace(' ', '_')} {targetCharacter.MovementTransform.position.x} {targetCharacter.MovementTransform.position.y} {targetCharacter.MovementTransform.position.z}";
+                        BaseGameNetworkManager.Singleton.ServerSendLocalMessage(data[1], resendCommand);
                     }
                 }
                 if (commandKey.ToLower().Equals(Summon.ToLower()))
                 {
-                    // TODO: Add function to find character from all maps
-                    if (!GameInstance.ServerUserHandlers.TryGetPlayerCharacterByName(data[1], out targetCharacter))
+                    if (characterEntity != null)
                     {
-                        response = "Cannot find the character";
-                    }
-                    else if (characterEntity != null)
-                    {
-                        BaseGameNetworkManager.Singleton.WarpCharacter(targetCharacter, characterEntity.CurrentMapName, characterEntity.CurrentPosition, false, Vector3.zero);
-                        response = $"Summon character: {data[1]}";
+                        string resendCommand = $"{WarpCharacter} {data[1]} {BaseGameNetworkManager.CurrentMapInfo.Id.Replace(' ', '_')} {characterEntity.MovementTransform.position.x} {characterEntity.MovementTransform.position.y} {characterEntity.MovementTransform.position.z}";
+                        BaseGameNetworkManager.Singleton.ServerSendLocalMessage(sender, resendCommand);
                     }
                 }
                 if (commandKey.ToLower().Equals(Monster.ToLower()))
