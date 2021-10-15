@@ -57,7 +57,7 @@ namespace MultiplayerARPG
         {
             if (targetTransform == null)
             {
-                Logging.LogError(ToString(), "`Target Transform` is empty");
+                Debug.LogError("`Target Transform` is empty");
                 return;
             }
             ApplyingSettings(ref standSettings);
