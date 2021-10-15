@@ -19,14 +19,14 @@ namespace MultiplayerARPG
             switch (message.channel)
             {
                 case ChatChannel.Local:
-                    IPlayerCharacterData playerCharacter;
-                    if (!string.IsNullOrEmpty(message.sender) && GameInstance.ServerUserHandlers.TryGetPlayerCharacterByName(message.sender, out playerCharacter))
+                    IPlayerCharacterData playerCharacter = null;
+                    if (message.sendByServer || (!string.IsNullOrEmpty(message.sender) && GameInstance.ServerUserHandlers.TryGetPlayerCharacterByName(message.sender, out playerCharacter)))
                     {
-                        BasePlayerCharacterEntity playerCharacterEntity = playerCharacter as BasePlayerCharacterEntity;
+                        BasePlayerCharacterEntity playerCharacterEntity = playerCharacter == null ? null : playerCharacter as BasePlayerCharacterEntity;
                         string gmCommand;
-                        if (playerCharacterEntity != null &&
+                        if (message.sendByServer || (playerCharacterEntity != null &&
                             GameInstance.Singleton.GMCommands.IsGMCommand(message.message, out gmCommand) &&
-                            GameInstance.Singleton.GMCommands.CanUseGMCommand(playerCharacterEntity, gmCommand))
+                            GameInstance.Singleton.GMCommands.CanUseGMCommand(playerCharacterEntity, gmCommand)))
                         {
                             // If it's gm command and sender's user level > 0, handle gm commands
                             string response = GameInstance.Singleton.GMCommands.HandleGMCommand(message.sender, playerCharacterEntity, message.message);
