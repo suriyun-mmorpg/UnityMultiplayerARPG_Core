@@ -165,9 +165,9 @@ namespace MultiplayerARPG
                     break;
             }
             if (animator == null)
-                Logging.LogError(ToString(), "`Animator` is empty");
+                Debug.LogError("`Animator` is empty");
             if (animatorController == null)
-                Logging.LogError(ToString(), "`Animator Controller` is empty");
+                Debug.LogError("`Animator Controller` is empty");
             if (hasChanges)
             {
                 isSetupComponent = false;
