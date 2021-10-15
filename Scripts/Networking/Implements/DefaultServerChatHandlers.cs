@@ -29,7 +29,7 @@ namespace MultiplayerARPG
                             GameInstance.Singleton.GMCommands.CanUseGMCommand(playerCharacterEntity, gmCommand))
                         {
                             // If it's gm command and sender's user level > 0, handle gm commands
-                            string response = GameInstance.Singleton.GMCommands.HandleGMCommand(playerCharacterEntity, message.message);
+                            string response = GameInstance.Singleton.GMCommands.HandleGMCommand(message.sender, playerCharacterEntity, message.message);
                             if (!string.IsNullOrEmpty(response))
                             {
                                 Manager.ServerSendPacket(playerCharacterEntity.ConnectionId, 0, DeliveryMethod.ReliableOrdered, GameNetworkingConsts.Chat, new ChatMessage()
