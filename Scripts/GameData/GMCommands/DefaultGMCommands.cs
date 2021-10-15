@@ -98,16 +98,16 @@ namespace MultiplayerARPG
             "/statpoint {amount} = Set character's stat point to {amount} value.\n" +
             "/skillpoint {amount} = Set character's skill point to {amount} value.\n" +
             "/gold {amount} = Set character's gold to {amount} value.\n" +
-            "/add_item {item_id} {amount} = Add item which its ID is {item_id}x{amount}.\n" +
+            "/add_item {item_id} {amount} = Add item which its ID is {item_id} (if item ID have spaces, use _ for spaces) x {amount}.\n" +
             "/give_gold {name} {amount} = Increase {amount} of gold to character which its name is {name}.\n" +
-            "/give_item {name} {item_id} {amount} = Add item which its ID is {item_id}x{amount} to character which its name is {name}.\n" +
+            "/give_item {name} {item_id} {amount} = Add item which its ID is {item_id} (if item ID have spaces, use _ for spaces) x {amount} to character which its name is {name}.\n" +
             "/gold_rate {rate} = Set server's gold drop rate to {rate}.\n" +
             "/exp_rate {rate} = Set server's exp rewarding rate to {rate}.\n" +
-            "/warp {map_id} = Warp to specific map.\n" +
-            "/warp_character {name} {map_id} {x} {y} {z} = Warp to specific character to specific map and position.\n" +
+            "/warp {map_id} = Warp to specific map (if map ID have spaces, use _ for spaces).\n" +
+            "/warp_character {name} {map_id} {x} {y} {z} = Warp to specific character to specific map and position (if map ID have spaces, use _ for spaces).\n" +
             "/warp_to_character {name} = Warp to character which its name is {name}.\n" +
             "/summon {name} = Summon character which its name is {name}.\n" +
-            "/monster {monster_id} {level} {amount} = Summon monster which its ID is {monster_id}, lv. {level}, amount {amount}.\n" +
+            "/monster {monster_id} {level} {amount} = Summon monster entity which its ID is {monster_id} (if prefab name have spaces, use _ for spaces), lv. {level}, amount {amount}.\n" +
             "/kill {name} = Kill character which its name is {name}.\n" +
             "/suicide = Kill yourself.\n" +
             "/mute {name} {duration} = Mute character which its name is {name} for {duration} minutes.\n" +
@@ -282,28 +282,39 @@ namespace MultiplayerARPG
                 }
                 if (commandKey.ToLower().Equals(AddItem.ToLower()))
                 {
-                    BaseItem item;
+                    BaseItem targetItem = null;
+                    foreach (BaseItem item in GameInstance.Items.Values)
+                    {
+                        if (item.name.Equals(data[1]) ||
+                            item.name.Replace(' ', '_').Equals(data[1]) ||
+                            item.Id.Equals(data[1]) ||
+                            item.Id.Replace(' ', '_').Equals(data[1]))
+                        {
+                            targetItem = item;
+                            break;
+                        }
+                    }
                     short amount;
                     if (!short.TryParse(data[2], out amount) || amount <= 0)
                     {
                         response = "Wrong input data";
                     }
-                    else if (!GameInstance.Items.TryGetValue(data[1].GenerateHashId(), out item))
+                    else if (targetItem == null)
                     {
                         response = "Cannot find the item";
                     }
                     else if (characterEntity != null)
                     {
-                        if (amount > item.MaxStack)
-                            amount = item.MaxStack;
-                        if (characterEntity.IncreasingItemsWillOverwhelming(item.DataId, amount))
+                        if (amount > targetItem.MaxStack)
+                            amount = targetItem.MaxStack;
+                        if (characterEntity.IncreasingItemsWillOverwhelming(targetItem.DataId, amount))
                         {
-                            response = $"Cannot add item {item.Title}x{amount}, cannot carry any more of those items";
+                            response = $"Cannot add item {targetItem.Title}x{amount}, cannot carry any more of those items";
                         }
                         else
                         {
-                            characterEntity.AddOrSetNonEquipItems(CharacterItem.Create(item, 1, amount));
-                            response = $"Add item {item.Title}x{amount} to character's inventory";
+                            characterEntity.AddOrSetNonEquipItems(CharacterItem.Create(targetItem, 1, amount));
+                            response = $"Add item {targetItem.Title}x{amount} to character's inventory";
                         }
                     }
                 }
@@ -324,28 +335,39 @@ namespace MultiplayerARPG
                 if (commandKey.ToLower().Equals(GiveItem.ToLower()))
                 {
                     receiver = data[1];
-                    BaseItem item;
+                    BaseItem targetItem = null;
+                    foreach (BaseItem item in GameInstance.Items.Values)
+                    {
+                        if (item.name.Equals(data[1]) ||
+                            item.name.Replace(' ', '_').Equals(data[1]) ||
+                            item.Id.Equals(data[1]) ||
+                            item.Id.Replace(' ', '_').Equals(data[1]))
+                        {
+                            targetItem = item;
+                            break;
+                        }
+                    }
                     short amount;
                     if (!short.TryParse(data[3], out amount) || amount <= 0)
                     {
                         response = "Wrong input data";
                     }
-                    else if (!GameInstance.Items.TryGetValue(data[2].GenerateHashId(), out item))
+                    else if (targetItem == null)
                     {
                         response = "Cannot find the item";
                     }
                     else if (GameInstance.ServerUserHandlers.TryGetPlayerCharacterByName(receiver, out targetCharacter))
                     {
-                        if (amount > item.MaxStack)
-                            amount = item.MaxStack;
-                        if (targetCharacter.IncreasingItemsWillOverwhelming(item.DataId, amount))
+                        if (amount > targetItem.MaxStack)
+                            amount = targetItem.MaxStack;
+                        if (targetCharacter.IncreasingItemsWillOverwhelming(targetItem.DataId, amount))
                         {
-                            response = $"Cannot add item {item.Title}x{amount} to {receiver}'s inventory, cannot carry any more of those items";
+                            response = $"Cannot add item {targetItem.Title}x{amount} to {receiver}'s inventory, cannot carry any more of those items";
                         }
                         else
                         {
-                            targetCharacter.AddOrSetNonEquipItems(CharacterItem.Create(item, 1, amount));
-                            response = $"Add item {item.Title}x{amount} to {receiver}'s inventory";
+                            targetCharacter.AddOrSetNonEquipItems(CharacterItem.Create(targetItem, 1, amount));
+                            response = $"Add item {targetItem.Title}x{amount} to {receiver}'s inventory";
                         }
                     }
                 }
@@ -377,7 +399,19 @@ namespace MultiplayerARPG
                 }
                 if (commandKey.ToLower().Equals(Warp.ToLower()))
                 {
-                    if (!GameInstance.MapInfos.ContainsKey(data[1]))
+                    BaseMapInfo targetMapInfo = null;
+                    foreach (BaseMapInfo mapInfo in GameInstance.MapInfos.Values)
+                    {
+                        if (mapInfo.name.Equals(data[1]) ||
+                            mapInfo.name.Replace(' ', '_').Equals(data[1]) ||
+                            mapInfo.Id.Equals(data[1]) ||
+                            mapInfo.Id.Replace(' ', '_').Equals(data[1]))
+                        {
+                            targetMapInfo = mapInfo;
+                            break;
+                        }
+                    }
+                    if (targetMapInfo == null)
                     {
                         response = "Cannot find the map";
                     }
@@ -390,6 +424,18 @@ namespace MultiplayerARPG
                 }
                 if (commandKey.ToLower().Equals(WarpCharacter.ToLower()))
                 {
+                    BaseMapInfo targetMapInfo = null;
+                    foreach (BaseMapInfo mapInfo in GameInstance.MapInfos.Values)
+                    {
+                        if (mapInfo.name.Equals(data[2]) ||
+                            mapInfo.name.Replace(' ', '_').Equals(data[2]) ||
+                            mapInfo.Id.Equals(data[2]) ||
+                            mapInfo.Id.Replace(' ', '_').Equals(data[2]))
+                        {
+                            targetMapInfo = mapInfo;
+                            break;
+                        }
+                    }
                     float x, y, z;
                     if (!float.TryParse(data[3], out x) || 
                         !float.TryParse(data[4], out y) || 
@@ -397,7 +443,7 @@ namespace MultiplayerARPG
                     {
                         response = "Wrong input data";
                     }
-                    else if (!GameInstance.MapInfos.ContainsKey(data[2]))
+                    else if (targetMapInfo == null)
                     {
                         response = "Cannot find the map";
                     }
@@ -438,6 +484,7 @@ namespace MultiplayerARPG
                     foreach (BaseMonsterCharacterEntity monster in GameInstance.MonsterCharacterEntities.Values)
                     {
                         if (monster.name.Equals(data[1]) ||
+                            monster.name.Replace(' ', '_').Equals(data[1]) ||
                             monster.Identity.AssetId.Equals(data[1]))
                         {
                             targetMonster = monster;
