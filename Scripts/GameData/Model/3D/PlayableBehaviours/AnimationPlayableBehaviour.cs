@@ -12,6 +12,7 @@ namespace MultiplayerARPG.GameData.Model.Playables
     public class AnimationPlayableBehaviour : PlayableBehaviour
     {
         public static readonly AnimationClip EmptyClip = new AnimationClip();
+        public static readonly AvatarMask EmptyMask = new AvatarMask();
 
         private struct BaseStateInfo
         {
@@ -522,7 +523,7 @@ namespace MultiplayerARPG.GameData.Model.Playables
             if (avatarMask == null)
                 avatarMask = CharacterModel.actionAvatarMask;
             if (avatarMask == null)
-                avatarMask = new AvatarMask();
+                avatarMask = EmptyMask;
             LayerMixer.SetLayerMaskFromAvatarMask(1, avatarMask);
 
             // Set clip info
