@@ -457,7 +457,7 @@ namespace MultiplayerARPG
                     if (GameInstance.ServerUserHandlers.TryGetPlayerCharacterByName(data[1], out targetCharacter))
                     {
                         string resendCommand = $"{WarpCharacter} {sender} {BaseGameNetworkManager.CurrentMapInfo.Id.Replace(' ', '_')} {targetCharacter.MovementTransform.position.x} {targetCharacter.MovementTransform.position.y} {targetCharacter.MovementTransform.position.z}";
-                        BaseGameNetworkManager.Singleton.ServerSendLocalMessage(data[1], resendCommand);
+                        BaseGameNetworkManager.Singleton.ServerSendLocalMessage(sender, resendCommand);
                     }
                 }
                 if (commandKey.ToLower().Equals(Summon.ToLower()))
