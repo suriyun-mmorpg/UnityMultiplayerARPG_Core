@@ -20,7 +20,9 @@ namespace MultiplayerARPG
             {
                 case ChatChannel.Local:
                     IPlayerCharacterData playerCharacter = null;
-                    if (message.sendByServer || (!string.IsNullOrEmpty(message.sender) && GameInstance.ServerUserHandlers.TryGetPlayerCharacterByName(message.sender, out playerCharacter)))
+                    if (!string.IsNullOrEmpty(message.sender))
+                        GameInstance.ServerUserHandlers.TryGetPlayerCharacterByName(message.sender, out playerCharacter);
+                    if (message.sendByServer || playerCharacter != null)
                     {
                         BasePlayerCharacterEntity playerCharacterEntity = playerCharacter == null ? null : playerCharacter as BasePlayerCharacterEntity;
                         string gmCommand;
