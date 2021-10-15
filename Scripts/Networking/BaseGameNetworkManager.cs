@@ -946,5 +946,20 @@ namespace MultiplayerARPG
             chatMessage.Serialize(writer);
             HandleChatAtServer(new MessageHandlerData(GameNetworkingConsts.Chat, Server, -1, new NetDataReader(writer.CopyData())));
         }
+
+        public void ServerSendLocalMessage(string sender, string command)
+        {
+            if (!IsServer)
+                return;
+            NetDataWriter writer = new NetDataWriter();
+            ChatMessage chatMessage = new ChatMessage()
+            {
+                channel = ChatChannel.Local,
+                sender = sender,
+                message = command,
+            };
+            chatMessage.Serialize(writer);
+            HandleChatAtServer(new MessageHandlerData(GameNetworkingConsts.Chat, Server, -1, new NetDataReader(writer.CopyData())));
+        }
     }
 }
