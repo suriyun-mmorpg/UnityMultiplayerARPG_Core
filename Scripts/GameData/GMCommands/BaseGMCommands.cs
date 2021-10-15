@@ -21,9 +21,10 @@ namespace MultiplayerARPG
         /// <summary>
         /// Return response message, it's a message which send to command user.
         /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="chatMessage"></param>
+        /// <param name="sender">Sender's name</param>
+        /// <param name="characterEntity">Sender's character entity</param>
+        /// <param name="chatMessage">Message</param>
         /// <returns></returns>
-        public abstract string HandleGMCommand(BasePlayerCharacterEntity characterEntity, string chatMessage);
+        public abstract string HandleGMCommand(string sender, BasePlayerCharacterEntity characterEntity, string chatMessage);
     }
 }
