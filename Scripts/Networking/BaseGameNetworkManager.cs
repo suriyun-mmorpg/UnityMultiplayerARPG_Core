@@ -489,7 +489,7 @@ namespace MultiplayerARPG
             ChatMessage message = messageHandler.ReadMessage<ChatMessage>().FillChannelId();
             // Check muting character
             IPlayerCharacterData playerCharacter;
-            if (!string.IsNullOrEmpty(message.sender) && GameInstance.ServerUserHandlers.TryGetPlayerCharacterByName(message.sender, out playerCharacter) && playerCharacter.IsMuting())
+            if (!message.sendByServer && !string.IsNullOrEmpty(message.sender) && GameInstance.ServerUserHandlers.TryGetPlayerCharacterByName(message.sender, out playerCharacter) && playerCharacter.IsMuting())
             {
                 long connectionId;
                 if (GameInstance.ServerUserHandlers.TryGetConnectionId(playerCharacter.Id, out connectionId))
@@ -942,12 +942,13 @@ namespace MultiplayerARPG
                 channel = ChatChannel.System,
                 sender = CHAT_SYSTEM_ANNOUNCER_SENDER,
                 message = message,
+                sendByServer = true,
             };
             chatMessage.Serialize(writer);
             HandleChatAtServer(new MessageHandlerData(GameNetworkingConsts.Chat, Server, -1, new NetDataReader(writer.CopyData())));
         }
 
-        public void ServerSendLocalMessage(string sender, string command)
+        public void ServerSendLocalMessage(string sender, string message)
         {
             if (!IsServer)
                 return;
@@ -956,7 +957,8 @@ namespace MultiplayerARPG
             {
                 channel = ChatChannel.Local,
                 sender = sender,
-                message = command,
+                message = message,
+                sendByServer = true,
             };
             chatMessage.Serialize(writer);
             HandleChatAtServer(new MessageHandlerData(GameNetworkingConsts.Chat, Server, -1, new NetDataReader(writer.CopyData())));
