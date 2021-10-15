@@ -932,7 +932,7 @@ namespace MultiplayerARPG
             return true;
         }
 
-        public void SendSystemAnnounce(string message)
+        public void ServerSendSystemAnnounce(string message)
         {
             if (!IsServer)
                 return;
