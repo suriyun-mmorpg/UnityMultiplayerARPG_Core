@@ -24,7 +24,7 @@ namespace MultiplayerARPG
                 mountEntityPrefab.Identity.HashAssetId, enterPosition,
                 Quaternion.Euler(0, CacheTransform.eulerAngles.y, 0));
             VehicleEntity vehicle = spawnObj.GetComponent<VehicleEntity>();
-            BaseGameNetworkManager.Singleton.Assets.NetworkSpawn(spawnObj);
+            BaseGameNetworkManager.Singleton.Assets.NetworkSpawn(spawnObj, 0, ConnectionId);
 
             // Seat index for mount entity always 0
             EnterVehicle(vehicle, 0);
