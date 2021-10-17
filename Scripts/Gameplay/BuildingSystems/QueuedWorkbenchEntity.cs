@@ -68,7 +68,8 @@ namespace MultiplayerARPG
         protected override void EntityUpdate()
         {
             base.EntityUpdate();
-            this.UpdateQueue(craftingDistance, CacheTransform.position);
+            if (IsServer)
+                this.UpdateQueue(craftingDistance, CacheTransform.position);
         }
 
         public override void PrepareRelatesData()

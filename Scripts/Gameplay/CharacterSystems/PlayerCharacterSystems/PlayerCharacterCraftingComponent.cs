@@ -38,7 +38,8 @@ namespace MultiplayerARPG
         public override sealed void EntityUpdate()
         {
             base.EntityUpdate();
-            this.UpdateQueue(0f, CacheTransform.position);
+            if (IsServer)
+                this.UpdateQueue(0f, CacheTransform.position);
         }
     }
 }
