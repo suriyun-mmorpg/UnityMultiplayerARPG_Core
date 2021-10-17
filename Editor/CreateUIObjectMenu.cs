@@ -10,7 +10,7 @@ using TMPro;
 
 namespace UnityEditor.UI
 {
-    public static class UIMenuOptions
+    public static class CreateUIObjectMenu
     {
         private const string kUILayerName = "UI";
 
