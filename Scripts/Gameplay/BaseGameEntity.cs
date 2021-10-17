@@ -456,7 +456,7 @@ namespace MultiplayerARPG
 
         protected virtual void EntityLateUpdate()
         {
-            if (PassengingVehicleEntity != null)
+            if (PassengingVehicleSeat.passengingTransform != null)
             {
                 // Snap character to vehicle seat
                 CacheTransform.position = PassengingVehicleSeat.passengingTransform.position;
