@@ -213,7 +213,7 @@ namespace MultiplayerARPG
                 HotkeyAimPosition = default;
             }
             UsingHotkey = hotkey;
-            if (UsingHotkey.IsChanneledAbility())
+            if (UsingHotkey != null && UsingHotkey.IsChanneledAbility())
                 UsingHotkey.StartChanneledAbility();
         }
 
