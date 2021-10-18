@@ -94,8 +94,6 @@ namespace MultiplayerARPG
         }
 
         public BuildingEntity BuildingEntity { get; private set; }
-        public Collider CacheCollider { get; private set; }
-        public Collider2D CacheCollider2D { get; private set; }
         public NavMeshObstacle CacheNavMeshObstacle { get; private set; }
         private bool dirtyIsBuildMode;
 
@@ -104,8 +102,6 @@ namespace MultiplayerARPG
             base.Setup(index);
             BuildingEntity = DamageableEntity as BuildingEntity;
             BuildingEntity.RegisterMaterial(this);
-            CacheCollider = GetComponent<Collider>();
-            CacheCollider2D = GetComponent<Collider2D>();
             CacheNavMeshObstacle = GetComponent<NavMeshObstacle>();
 
             if (meshRenderer == null)
