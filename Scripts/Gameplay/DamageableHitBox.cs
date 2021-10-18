@@ -47,6 +47,10 @@ namespace MultiplayerARPG
         {
             get { return DamageableEntity.Identity; }
         }
+        public Collider CacheCollider { get; private set; }
+        public Rigidbody CacheRigidbody { get; private set; }
+        public Collider2D CacheCollider2D { get; private set; }
+        public Rigidbody2D CacheRigidbody2D { get; private set; }
         public int Index { get; private set; }
 
         protected bool isSetup;
@@ -67,20 +71,29 @@ namespace MultiplayerARPG
         private void Awake()
         {
             DamageableEntity = GetComponentInParent<DamageableEntity>();
+            CacheCollider = GetComponent<Collider>();
+            if (CacheCollider)
+            {
+                CacheRigidbody = gameObject.GetOrAddComponent<Rigidbody>();
+                CacheRigidbody.useGravity = false;
+                CacheRigidbody.isKinematic = true;
 #if UNITY_EDITOR
-            Collider debugCollider = GetComponent<Collider>();
-            Collider2D debugCollider2D = GetComponent<Collider2D>();
-            if (debugCollider)
-            {
-                debugRewindCenter = debugCollider.bounds.center - transform.position;
-                debugRewindSize = debugCollider.bounds.size;
-            }
-            else if (debugCollider2D)
-            {
-                debugRewindCenter = debugCollider2D.bounds.center - transform.position;
-                debugRewindSize = debugCollider2D.bounds.size;
-            }
+                debugRewindCenter = CacheCollider.bounds.center - transform.position;
+                debugRewindSize = CacheCollider.bounds.size;
 #endif
+                return;
+            }
+            CacheCollider2D = GetComponent<Collider2D>();
+            if (CacheCollider2D)
+            {
+                CacheRigidbody2D = gameObject.GetOrAddComponent<Rigidbody2D>();
+                CacheRigidbody2D.gravityScale = 0;
+                CacheRigidbody2D.isKinematic = true;
+#if UNITY_EDITOR
+                debugRewindCenter = CacheCollider2D.bounds.center - transform.position;
+                debugRewindSize = CacheCollider2D.bounds.size;
+#endif
+            }
         }
 
         public virtual void Setup(int index)
