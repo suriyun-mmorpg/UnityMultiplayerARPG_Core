@@ -97,53 +97,24 @@ namespace MultiplayerARPG
             FreezeAnimation = false;
             IsHide = false;
             MuteFootstepSound = false;
-            Buff tempBuff;
+
             foreach (CharacterBuff characterBuff in characterData.Buffs)
             {
-                tempBuff = characterBuff.GetBuff();
-                switch (tempBuff.ailment)
+                UpdateAppliedAilments(characterBuff.GetBuff());
+                if (AllAilmentsWereApplied())
+                    break;
+            }
+
+            if (!AllAilmentsWereApplied())
+            {
+                foreach (BaseSkill tempSkill in Skills.Keys)
                 {
-                    case AilmentPresets.Stun:
-                        DisallowMove = true;
-                        DisallowAttack = true;
-                        DisallowUseSkill = true;
-                        DisallowUseItem = true;
-                        break;
-                    case AilmentPresets.Mute:
-                        DisallowUseSkill = true;
-                        break;
-                    case AilmentPresets.Freeze:
-                        DisallowMove = true;
-                        DisallowAttack = true;
-                        DisallowUseSkill = true;
-                        DisallowUseItem = true;
-                        FreezeAnimation = true;
-                        break;
-                    default:
-                        if (tempBuff.disallowMove)
-                            DisallowMove = true;
-                        if (tempBuff.disallowAttack)
-                            DisallowAttack = true;
-                        if (tempBuff.disallowUseSkill)
-                            DisallowUseSkill = true;
-                        if (tempBuff.disallowUseItem)
-                            DisallowUseItem = true;
-                        if (tempBuff.freezeAnimation)
-                            FreezeAnimation = true;
+                    if (tempSkill == null || tempSkill.IsActive || !tempSkill.IsBuff)
+                        continue;
+                    UpdateAppliedAilments(tempSkill.Buff);
+                    if (AllAilmentsWereApplied())
                         break;
                 }
-                if (tempBuff.isHide)
-                    IsHide = true;
-                if (tempBuff.muteFootstepSound)
-                    MuteFootstepSound = true;
-                if (DisallowMove &&
-                    DisallowAttack &&
-                    DisallowUseSkill &&
-                    DisallowUseItem &&
-                    FreezeAnimation &&
-                    IsHide &&
-                    MuteFootstepSound)
-                    break;
             }
 
             return this;
@@ -238,6 +209,56 @@ namespace MultiplayerARPG
                 EquipmentSets.TryGetValue(data, out result))
                 return result;
             return 0;
+        }
+
+        public void UpdateAppliedAilments(Buff tempBuff)
+        {
+            switch (tempBuff.ailment)
+            {
+                case AilmentPresets.Stun:
+                    DisallowMove = true;
+                    DisallowAttack = true;
+                    DisallowUseSkill = true;
+                    DisallowUseItem = true;
+                    break;
+                case AilmentPresets.Mute:
+                    DisallowUseSkill = true;
+                    break;
+                case AilmentPresets.Freeze:
+                    DisallowMove = true;
+                    DisallowAttack = true;
+                    DisallowUseSkill = true;
+                    DisallowUseItem = true;
+                    FreezeAnimation = true;
+                    break;
+                default:
+                    if (tempBuff.disallowMove)
+                        DisallowMove = true;
+                    if (tempBuff.disallowAttack)
+                        DisallowAttack = true;
+                    if (tempBuff.disallowUseSkill)
+                        DisallowUseSkill = true;
+                    if (tempBuff.disallowUseItem)
+                        DisallowUseItem = true;
+                    if (tempBuff.freezeAnimation)
+                        FreezeAnimation = true;
+                    break;
+            }
+            if (tempBuff.isHide)
+                IsHide = true;
+            if (tempBuff.muteFootstepSound)
+                MuteFootstepSound = true;
+        }
+
+        public bool AllAilmentsWereApplied()
+        {
+            return DisallowMove &&
+                DisallowAttack &&
+                DisallowUseSkill &&
+                DisallowUseItem &&
+                FreezeAnimation &&
+                IsHide &&
+                MuteFootstepSound;
         }
         #endregion
     }
