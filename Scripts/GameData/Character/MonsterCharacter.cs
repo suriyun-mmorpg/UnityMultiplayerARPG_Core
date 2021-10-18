@@ -103,7 +103,7 @@ namespace MultiplayerARPG
         [ArrayElementTitle("item")]
         private ItemDrop[] randomItems = new ItemDrop[0];
         [SerializeField]
-        private ItemDropTable itemDropTable = null;
+        private ItemDropTable[] itemDropTables = new ItemDropTable[0];
         [SerializeField]
         [Tooltip("Max kind of items that will be dropped in ground")]
         private byte maxDropItems = 5;
@@ -121,6 +121,9 @@ namespace MultiplayerARPG
         [HideInInspector]
         [SerializeField]
         private int randomGoldMax;
+        [HideInInspector]
+        [SerializeField]
+        private ItemDropTable itemDropTable = null;
         #endregion
 
         [System.NonSerialized]
@@ -160,19 +163,27 @@ namespace MultiplayerARPG
                             cacheRandomItems.Add(randomItems[i]);
                         }
                     }
-                    if (itemDropTable != null &&
-                        itemDropTable.randomItems != null &&
-                        itemDropTable.randomItems.Length > 0)
+                    if (itemDropTables != null &&
+                        itemDropTables.Length > 0)
                     {
-                        for (i = 0; i < itemDropTable.randomItems.Length; ++i)
+                        foreach (ItemDropTable itemDropTable in itemDropTables)
                         {
-                            if (itemDropTable.randomItems[i].item == null ||
-                                itemDropTable.randomItems[i].maxAmount <= 0 ||
-                                itemDropTable.randomItems[i].dropRate <= 0)
-                                continue;
-                            cacheRandomItems.Add(itemDropTable.randomItems[i]);
+                            if (itemDropTable != null &&
+                                itemDropTable.randomItems != null &&
+                                itemDropTable.randomItems.Length > 0)
+                            {
+                                for (i = 0; i < itemDropTable.randomItems.Length; ++i)
+                                {
+                                    if (itemDropTable.randomItems[i].item == null ||
+                                        itemDropTable.randomItems[i].maxAmount <= 0 ||
+                                        itemDropTable.randomItems[i].dropRate <= 0)
+                                        continue;
+                                    cacheRandomItems.Add(itemDropTable.randomItems[i]);
+                                }
+                            }
                         }
                     }
+                    cacheRandomItems.Sort((a, b) => b.dropRate.CompareTo(a.dropRate));
                 }
                 return cacheRandomItems;
             }
@@ -194,21 +205,28 @@ namespace MultiplayerARPG
                         for (i = 0; i < randomCurrencies.Length; ++i)
                         {
                             if (randomCurrencies[i].currency == null ||
-                                randomCurrencies[i].minAmount <= 0)
+                                randomCurrencies[i].maxAmount <= 0)
                                 continue;
                             cacheRandomCurrencies.Add(randomCurrencies[i]);
                         }
                     }
-                    if (itemDropTable != null &&
-                        itemDropTable.randomCurrencies != null &&
-                        itemDropTable.randomCurrencies.Length > 0)
+                    if (itemDropTables != null &&
+                        itemDropTables.Length > 0)
                     {
-                        for (i = 0; i < itemDropTable.randomCurrencies.Length; ++i)
+                        foreach (ItemDropTable itemDropTable in itemDropTables)
                         {
-                            if (itemDropTable.randomCurrencies[i].currency == null ||
-                                itemDropTable.randomCurrencies[i].minAmount <= 0)
-                                continue;
-                            cacheRandomCurrencies.Add(itemDropTable.randomCurrencies[i]);
+                            if (itemDropTable != null &&
+                                itemDropTable.randomCurrencies != null &&
+                                itemDropTable.randomCurrencies.Length > 0)
+                            {
+                                for (i = 0; i < itemDropTable.randomCurrencies.Length; ++i)
+                                {
+                                    if (itemDropTable.randomCurrencies[i].currency == null ||
+                                        itemDropTable.randomCurrencies[i].maxAmount <= 0)
+                                        continue;
+                                    cacheRandomCurrencies.Add(itemDropTable.randomCurrencies[i]);
+                                }
+                            }
                         }
                     }
                 }
@@ -418,12 +436,21 @@ namespace MultiplayerARPG
         {
             if (CacheRandomItems.Count == 0)
                 return;
+            int lastCertainIndex = 0;
             ItemDrop randomItem;
             for (int count = 0; count < CacheRandomItems.Count && count < maxDropItems; ++count)
             {
-                randomItem = CacheRandomItems[Random.Range(0, CacheRandomItems.Count)];
-                if (Random.value > randomItem.dropRate)
-                    continue;
+                randomItem = CacheRandomItems[count];
+                if (randomItem.dropRate >= 1f)
+                {
+                    lastCertainIndex = count;
+                }
+                else
+                {
+                    randomItem = CacheRandomItems[Random.Range(lastCertainIndex, CacheRandomItems.Count)];
+                    if (Random.value >= randomItem.dropRate)
+                        continue;
+                }
                 onRandomItem.Invoke(randomItem.item, (short)Random.Range(randomItem.minAmount <= 0 ? 1 : randomItem.minAmount, randomItem.maxAmount));
             }
         }
@@ -518,6 +545,13 @@ namespace MultiplayerARPG
                 }
                 randomGoldMin = 0;
                 randomGoldMax = 0;
+            }
+            if (itemDropTable != null)
+            {
+                hasChanges = true;
+                List<ItemDropTable> tempItemDropTables = new List<ItemDropTable>(itemDropTables);
+                tempItemDropTables.Add(itemDropTable);
+                itemDropTables = tempItemDropTables.ToArray();
             }
             return hasChanges || base.Validate();
         }
