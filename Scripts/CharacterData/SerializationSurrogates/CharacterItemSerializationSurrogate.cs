@@ -1,4 +1,5 @@
-﻿using System.Runtime.Serialization;
+﻿using System.Collections.Generic;
+using System.Runtime.Serialization;
 
 namespace MultiplayerARPG
 {
@@ -34,9 +35,12 @@ namespace MultiplayerARPG
             data.dataId = info.GetInt32("dataId");
             data.level = info.GetInt16("level");
             data.amount = info.GetInt16("amount");
+            data.equipSlotIndex = info.GetByte("equipSlotIndex");
             data.durability = info.GetSingle("durability");
             data.exp = info.GetInt32("exp");
             data.lockRemainsDuration = info.GetSingle("lockRemainsDuration");
+            data.ammo = info.GetInt16("ammo");
+            data.sockets = (List<int>)info.GetValue("sockets", typeof(List<int>));
             // TODO: Backward compatible, this will be removed in future version
             try
             {
