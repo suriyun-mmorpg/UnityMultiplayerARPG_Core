@@ -552,6 +552,7 @@ namespace MultiplayerARPG
                 List<ItemDropTable> tempItemDropTables = new List<ItemDropTable>(itemDropTables);
                 tempItemDropTables.Add(itemDropTable);
                 itemDropTables = tempItemDropTables.ToArray();
+                itemDropTable = null;
             }
             return hasChanges || base.Validate();
         }
