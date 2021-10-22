@@ -869,6 +869,8 @@ namespace MultiplayerARPG
             if (dist < fallDamageMinDistance)
                 return;
             int damage = Mathf.CeilToInt(character.MaxHp * (float)(dist - fallDamageMinDistance) / (float)(fallDamageMaxDistance - fallDamageMinDistance));
+            if (damage < 0)
+                damage = 0;
             character.CurrentHp -= damage;
             character.ReceivedDamage(character.CacheTransform.position, EntityInfo.Empty, null, CombatAmountType.NormalDamage, damage, null, null, 0);
             if (character.IsDead())

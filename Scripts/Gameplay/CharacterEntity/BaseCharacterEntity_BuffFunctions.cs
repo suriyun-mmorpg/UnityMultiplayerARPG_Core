@@ -114,6 +114,8 @@ namespace MultiplayerARPG
 
         public virtual void OnBuffHpRecovery(EntityInfo causer, int amount)
         {
+            if (amount < 0)
+                amount = 0;
             CurrentHp += amount;
             CallAllAppendCombatText(CombatAmountType.HpRecovery, DamageSource.None, 0, amount);
             if (onBuffHpRecovery != null)
@@ -122,6 +124,8 @@ namespace MultiplayerARPG
 
         public virtual void OnBuffHpDecrease(EntityInfo causer, int amount)
         {
+            if (amount < 0)
+                amount = 0;
             CurrentHp -= amount;
             CallAllAppendCombatText(CombatAmountType.HpDecrease, DamageSource.None, 0, amount);
             if (onBuffHpDecrease != null)
@@ -130,6 +134,8 @@ namespace MultiplayerARPG
 
         public virtual void OnBuffMpRecovery(EntityInfo causer, int amount)
         {
+            if (amount < 0)
+                amount = 0;
             CurrentMp += amount;
             CallAllAppendCombatText(CombatAmountType.MpRecovery, DamageSource.None, 0, amount);
             if (onBuffMpRecovery != null)
@@ -138,6 +144,8 @@ namespace MultiplayerARPG
 
         public virtual void OnBuffMpDecrease(EntityInfo causer, int amount)
         {
+            if (amount < 0)
+                amount = 0;
             CurrentMp -= amount;
             CallAllAppendCombatText(CombatAmountType.MpDecrease, DamageSource.None, 0, amount);
             if (onBuffMpDecrease != null)
@@ -146,6 +154,8 @@ namespace MultiplayerARPG
 
         public virtual void OnBuffStaminaRecovery(EntityInfo causer, int amount)
         {
+            if (amount < 0)
+                amount = 0;
             CurrentStamina += amount;
             CallAllAppendCombatText(CombatAmountType.StaminaRecovery, DamageSource.None, 0, amount);
             if (onBuffStaminaRecovery != null)
@@ -154,6 +164,8 @@ namespace MultiplayerARPG
 
         public virtual void OnBuffStaminaDecrease(EntityInfo causer, int amount)
         {
+            if (amount < 0)
+                amount = 0;
             CurrentStamina -= amount;
             CallAllAppendCombatText(CombatAmountType.StaminaDecrease, DamageSource.None, 0, amount);
             if (onBuffStaminaDecrease != null)
@@ -162,6 +174,8 @@ namespace MultiplayerARPG
 
         public virtual void OnBuffFoodRecovery(EntityInfo causer, int amount)
         {
+            if (amount < 0)
+                amount = 0;
             CurrentFood += amount;
             CallAllAppendCombatText(CombatAmountType.FoodRecovery, DamageSource.None, 0, amount);
             if (onBuffFoodRecovery != null)
@@ -170,6 +184,8 @@ namespace MultiplayerARPG
 
         public virtual void OnBuffFoodDecrease(EntityInfo causer, int amount)
         {
+            if (amount < 0)
+                amount = 0;
             CurrentFood -= amount;
             CallAllAppendCombatText(CombatAmountType.FoodDecrease, DamageSource.None, 0, amount);
             if (onBuffFoodDecrease != null)
@@ -178,6 +194,8 @@ namespace MultiplayerARPG
 
         public virtual void OnBuffWaterRecovery(EntityInfo causer, int amount)
         {
+            if (amount < 0)
+                amount = 0;
             CurrentWater += amount;
             CallAllAppendCombatText(CombatAmountType.WaterRecovery, DamageSource.None, 0, amount);
             if (onBuffWaterRecovery != null)
@@ -186,6 +204,8 @@ namespace MultiplayerARPG
 
         public virtual void OnBuffWaterDecrease(EntityInfo causer, int amount)
         {
+            if (amount < 0)
+                amount = 0;
             CurrentWater -= amount;
             CallAllAppendCombatText(CombatAmountType.WaterDecrease, DamageSource.None, 0, amount);
             if (onBuffWaterDecrease != null)
