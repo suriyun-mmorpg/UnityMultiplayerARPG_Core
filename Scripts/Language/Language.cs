@@ -306,6 +306,7 @@ namespace MultiplayerARPG
         UI_ITEM_TYPE_SOCKET_ENHANCER,
         UI_ITEM_TYPE_MOUNT,
         UI_ITEM_TYPE_SKILL,
+        UI_ITEM_TYPE_EQUIPMENT_SKIN,
     }
 
     public enum UISkillTypeKeys : byte
@@ -1078,6 +1079,7 @@ namespace MultiplayerARPG
             Texts.Add(UIItemTypeKeys.UI_ITEM_TYPE_SOCKET_ENHANCER.ToString(), "Socket Enhancer");
             Texts.Add(UIItemTypeKeys.UI_ITEM_TYPE_MOUNT.ToString(), "Mount");
             Texts.Add(UIItemTypeKeys.UI_ITEM_TYPE_SKILL.ToString(), "Skill");
+            Texts.Add(UIItemTypeKeys.UI_ITEM_TYPE_EQUIPMENT_SKIN.ToString(), "Equipment Skin");
             Texts.Add(UIFormatKeys.UI_FORMAT_ITEM_RARITY.ToString(), "Rarity: {0}");
             Texts.Add(UIFormatKeys.UI_FORMAT_ITEM_STACK.ToString(), "{0}/{1}");
             Texts.Add(UIFormatKeys.UI_FORMAT_ITEM_DURABILITY.ToString(), "Durability: {0}/{1}");
