@@ -466,6 +466,8 @@ namespace MultiplayerARPG
 
             // Apply damages
             totalDamage = CurrentGameInstance.GameplayRule.GetTotalDamage(fromPosition, instigator, this, calculatingTotalDamage, weapon, skill, skillLevel);
+            if (totalDamage < 0)
+                totalDamage = 0;
             CurrentHp -= totalDamage;
         }
 
