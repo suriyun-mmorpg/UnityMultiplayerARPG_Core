@@ -144,7 +144,7 @@ namespace MultiplayerARPG.GameData.Model.Playables
             {
                 AnimationClipPlayable clipPlayable = AnimationClipPlayable.Create(Graph, stateInfo.state.clip);
                 clipPlayable.SetApplyFootIK(false);
-                clipPlayable.SetApplyPlayableIK(false);
+                clipPlayable.SetApplyPlayableIK(true);
                 Graph.Connect(clipPlayable, 0, BaseLayerMixer, stateInfo.inputPort);
             }
             BaseLayerMixer.SetInputWeight(0, 1);
