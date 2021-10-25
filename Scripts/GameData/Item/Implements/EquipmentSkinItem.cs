@@ -14,5 +14,25 @@ namespace MultiplayerARPG
         {
             get { return ItemType.EquipmentSkin; }
         }
+
+        [Category("Equipment Settings")]
+        [Header("Equipment Skin Settings")]
+        [SerializeField]
+        private BaseItem baseEquipmentItem = null;
+        public BaseItem BaseEquipmentItem
+        {
+            get { return baseEquipmentItem; }
+        }
+
+        public override bool Validate()
+        {
+            bool hasChanges = false;
+            if (baseEquipmentItem != null && !baseEquipmentItem.IsEquipment())
+            {
+                baseEquipmentItem = null;
+                hasChanges = true;
+            }
+            return hasChanges || base.Validate();
+        }
     }
 }
