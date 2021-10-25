@@ -12,7 +12,6 @@
         Pet,
         SocketEnhancer,
         Mount,
-        Skill,
-        EquipmentSkin,
+        Skill
     }
 }
