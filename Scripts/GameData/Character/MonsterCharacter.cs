@@ -142,6 +142,11 @@ namespace MultiplayerARPG
         private IncrementalMinMaxInt? adjustRandomGold = null;
 
         [System.NonSerialized]
+        private List<ItemDrop> certainDropItems = new List<ItemDrop>();
+        [System.NonSerialized]
+        private List<ItemDrop> uncertainDropItems = new List<ItemDrop>();
+
+        [System.NonSerialized]
         private List<ItemDrop> cacheRandomItems = null;
         public List<ItemDrop> CacheRandomItems
         {
@@ -184,6 +189,15 @@ namespace MultiplayerARPG
                         }
                     }
                     cacheRandomItems.Sort((a, b) => b.dropRate.CompareTo(a.dropRate));
+                    certainDropItems.Clear();
+                    uncertainDropItems.Clear();
+                    for (i = 0; i < cacheRandomItems.Count; ++i)
+                    {
+                        if (cacheRandomItems[i].dropRate >= 1f)
+                            certainDropItems.Add(cacheRandomItems[i]);
+                        else
+                            uncertainDropItems.Add(cacheRandomItems[i]);
+                    }
                 }
                 return cacheRandomItems;
             }
@@ -436,22 +450,26 @@ namespace MultiplayerARPG
         {
             if (CacheRandomItems.Count == 0)
                 return;
-            int lastCertainIndex = 0;
-            ItemDrop randomItem;
-            for (int count = 0; count < CacheRandomItems.Count && count < maxDropItems; ++count)
+            int randomDropCount = 0;
+            int i;
+            // Drop certain drop rate items
+            certainDropItems.Shuffle();
+            for (i = 0; i < certainDropItems.Count && randomDropCount < maxDropItems; ++i)
             {
-                randomItem = CacheRandomItems[count];
-                if (randomItem.dropRate >= 1f)
-                {
-                    lastCertainIndex = count;
-                }
-                else
-                {
-                    randomItem = CacheRandomItems[Random.Range(lastCertainIndex, CacheRandomItems.Count)];
-                    if (Random.value >= randomItem.dropRate)
-                        continue;
-                }
-                onRandomItem.Invoke(randomItem.item, (short)Random.Range(randomItem.minAmount <= 0 ? 1 : randomItem.minAmount, randomItem.maxAmount));
+                onRandomItem.Invoke(certainDropItems[i].item, (short)Random.Range(certainDropItems[i].minAmount <= 0 ? 1 : certainDropItems[i].minAmount, certainDropItems[i].maxAmount));
+                ++randomDropCount;
+            }
+            // Reached max drop items?
+            if (randomDropCount >= maxDropItems)
+                return;
+            // Drop uncertain drop rate items
+            uncertainDropItems.Shuffle();
+            for (i = 0; i < uncertainDropItems.Count && randomDropCount < maxDropItems; ++i)
+            {
+                if (Random.value >= uncertainDropItems[i].dropRate)
+                    continue;
+                onRandomItem.Invoke(uncertainDropItems[i].item, (short)Random.Range(uncertainDropItems[i].minAmount <= 0 ? 1 : uncertainDropItems[i].minAmount, uncertainDropItems[i].maxAmount));
+                ++randomDropCount;
             }
         }
 
