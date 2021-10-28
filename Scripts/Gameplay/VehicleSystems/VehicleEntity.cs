@@ -66,6 +66,7 @@ namespace MultiplayerARPG
         public virtual bool ShouldBeAttackTarget { get { return HasDriver && canBeAttacked && !this.IsDead(); } }
         public Dictionary<DamageElement, float> Resistances { get; private set; }
         public Dictionary<DamageElement, float> Armors { get; private set; }
+        public override bool IsImmune { get { return base.IsImmune || !canBeAttacked; } set { base.IsImmune = value; } }
         public override int MaxHp { get { return canBeAttacked ? hp.GetAmount(level) : 1; } }
         public Vector3 SpawnPosition { get; protected set; }
         public float DestroyDelay { get { return destroyDelay; } }
