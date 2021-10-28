@@ -284,6 +284,8 @@ namespace MultiplayerARPG
         /// <param name="skillLevel">Skill level which used to attack</param>
         public virtual void ReceivedDamage(Vector3 fromPosition, EntityInfo instigator, Dictionary<DamageElement, MinMaxFloat> damageAmounts, CombatAmountType combatAmountType, int totalDamage, CharacterItem weapon, BaseSkill skill, short skillLevel)
         {
+            if (IsImmune)
+                return;
             DamageSource damageSource = DamageSource.None;
             int dataId = 0;
             if (combatAmountType != CombatAmountType.Miss)
