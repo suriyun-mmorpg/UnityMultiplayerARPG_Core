@@ -99,7 +99,7 @@ namespace MultiplayerARPG
             }
         }
 
-        public void EnterWarp(BasePlayerCharacterEntity playerCharacterEntity)
+        public virtual void EnterWarp(BasePlayerCharacterEntity playerCharacterEntity)
         {
             if (warpToMapInfo == null)
                 CurrentGameManager.WarpCharacter(warpPortalType, playerCharacterEntity, string.Empty, warpToPosition, warpOverrideRotation, warpToRotation);
