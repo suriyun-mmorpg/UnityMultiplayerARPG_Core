@@ -311,7 +311,7 @@ namespace MultiplayerARPG
                 }
             }
             CallAllAppendCombatText(combatAmountType, damageSource, dataId, totalDamage);
-            IGameEntity attacker = null;
+            IGameEntity attacker;
             instigator.TryGetEntity(out attacker);
             if (onReceivedDamage != null)
                 onReceivedDamage.Invoke(fromPosition, attacker, combatAmountType, totalDamage, weapon, skill, skillLevel);
