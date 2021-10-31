@@ -96,7 +96,8 @@ namespace MultiplayerARPG
                     if (CurrentGameInstance.DimensionType == DimensionType.Dimension2D)
                     {
                         RaycastHit2D hit = Physics2D.Raycast(previousPosition.Value, dir, dist);
-                        TriggerEnter(hit.transform.gameObject);
+                        if (hit.transform != null)
+                            TriggerEnter(hit.transform.gameObject);
                     }
                     else
                     {
