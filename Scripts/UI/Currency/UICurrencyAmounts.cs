@@ -28,6 +28,7 @@ namespace MultiplayerARPG
         public DisplayType displayType;
         public bool isBonus;
         public bool inactiveIfAmountZero;
+        public bool useSimpleFormatIfAmountEnough = true;
 
         private Dictionary<Currency, UICurrencyTextPair> cacheTextAmounts;
         public Dictionary<Currency, UICurrencyTextPair> CacheTextAmounts
@@ -37,14 +38,14 @@ namespace MultiplayerARPG
                 if (cacheTextAmounts == null)
                 {
                     cacheTextAmounts = new Dictionary<Currency, UICurrencyTextPair>();
-                    Currency tempCurrency;
+                    Currency tempData;
                     foreach (UICurrencyTextPair componentPair in textAmounts)
                     {
                         if (componentPair.currency == null || componentPair.uiText == null)
                             continue;
-                        tempCurrency = componentPair.currency;
+                        tempData = componentPair.currency;
                         SetDefaultValue(componentPair);
-                        cacheTextAmounts[tempCurrency] = componentPair;
+                        cacheTextAmounts[tempData] = componentPair;
                     }
                 }
                 return cacheTextAmounts;
@@ -67,9 +68,10 @@ namespace MultiplayerARPG
             else
             {
                 StringBuilder tempAllText = new StringBuilder();
-                Currency tempCurrency;
+                Currency tempData;
                 int tempCurrentAmount;
                 int tempTargetAmount;
+                bool tempAmountEnough;
                 string tempCurrentValue;
                 string tempTargetValue;
                 string tempFormat;
@@ -80,13 +82,13 @@ namespace MultiplayerARPG
                     if (dataEntry.Key == null)
                         continue;
                     // Set temp data
-                    tempCurrency = dataEntry.Key;
+                    tempData = dataEntry.Key;
                     tempTargetAmount = dataEntry.Value;
                     tempCurrentAmount = 0;
                     // Get currency amount from character
                     if (GameInstance.PlayingCharacter != null)
                     {
-                        int indexOfCurrency = GameInstance.PlayingCharacter.IndexOfCurrency(tempCurrency.DataId);
+                        int indexOfCurrency = GameInstance.PlayingCharacter.IndexOfCurrency(tempData.DataId);
                         if (indexOfCurrency >= 0)
                             tempCurrentAmount = GameInstance.PlayingCharacter.Currencies[indexOfCurrency].amount;
                     }
@@ -95,12 +97,14 @@ namespace MultiplayerARPG
                     {
                         case DisplayType.Requirement:
                             // This will show both current character currency amount and target amount
-                            tempFormat = tempCurrentAmount >= tempTargetAmount ?
-                                LanguageManager.GetText(formatKeyAmount) :
-                                LanguageManager.GetText(formatKeyAmountNotEnough);
+                            tempAmountEnough = tempCurrentAmount >= tempTargetAmount;
+                            tempFormat = LanguageManager.GetText(tempAmountEnough ? formatKeyAmount : formatKeyAmountNotEnough);
                             tempCurrentValue = tempCurrentAmount.ToString("N0");
                             tempTargetValue = tempTargetAmount.ToString("N0");
-                            tempAmountText = string.Format(tempFormat, tempCurrency.Title, tempCurrentValue, tempTargetValue);
+                            if (useSimpleFormatIfAmountEnough && tempAmountEnough)
+                                tempAmountText = string.Format(LanguageManager.GetText(formatKeySimpleAmount), tempData.Title, tempTargetValue);
+                            else
+                                tempAmountText = string.Format(tempFormat, tempData.Title, tempCurrentValue, tempTargetValue);
                             break;
                         default:
                             // This will show only target amount, so current character currency amount will not be shown
@@ -110,7 +114,7 @@ namespace MultiplayerARPG
                                 tempTargetValue = tempTargetAmount.ToString("N0");
                             tempAmountText = string.Format(
                                 LanguageManager.GetText(formatKeySimpleAmount),
-                                tempCurrency.Title,
+                                tempData.Title,
                                 tempTargetValue);
                             break;
                     }
@@ -123,7 +127,7 @@ namespace MultiplayerARPG
                         tempAllText.Append(tempAmountText);
                     }
                     // Set current currency text to UI
-                    if (CacheTextAmounts.TryGetValue(tempCurrency, out tempComponentPair))
+                    if (CacheTextAmounts.TryGetValue(tempData, out tempComponentPair))
                     {
                         tempComponentPair.uiText.text = tempAmountText;
                         if (tempComponentPair.root != null)
@@ -144,10 +148,20 @@ namespace MultiplayerARPG
             switch (displayType)
             {
                 case DisplayType.Requirement:
-                    componentPair.uiText.text = string.Format(
-                        LanguageManager.GetText(formatKeyAmount),
-                        componentPair.currency.Title,
-                        "0", "0");
+                    if (useSimpleFormatIfAmountEnough)
+                    {
+                        componentPair.uiText.text = string.Format(
+                            LanguageManager.GetText(formatKeySimpleAmount),
+                            componentPair.currency.Title,
+                            "0");
+                    }
+                    else
+                    {
+                        componentPair.uiText.text = string.Format(
+                            LanguageManager.GetText(formatKeyAmount),
+                            componentPair.currency.Title,
+                            "0", "0");
+                    }
                     break;
                 case DisplayType.Simple:
                     componentPair.uiText.text = string.Format(

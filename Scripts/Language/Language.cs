@@ -318,6 +318,7 @@ namespace MultiplayerARPG
     public enum UIFormatKeys : ushort
     {
         UI_CUSTOM,
+
         // Format - Generic
         /// <summary>
         /// Format => {0} = {Value}
@@ -379,6 +380,7 @@ namespace MultiplayerARPG
         /// Format => {0} = {Current Slot}, {1} = {Slot Limit}
         /// </summary>
         UI_FORMAT_CURRENT_SLOT,
+
         // Format - Character Stats
         /// <summary>
         /// Format => {0} = {Amount}
@@ -457,7 +459,7 @@ namespace MultiplayerARPG
         /// </summary>
         UI_FORMAT_REQUIRE_LEVEL,
         /// <summary>
-        /// Format => {0} = {Character Class}
+        /// Format => {0} = {Character Classes}
         /// </summary>
         UI_FORMAT_REQUIRE_CLASS,
         /// <summary>
@@ -468,6 +470,7 @@ namespace MultiplayerARPG
         /// Format => {0} = {Consume Mp}
         /// </summary>
         UI_FORMAT_CONSUME_MP,
+
         // Format - Skill
         /// <summary>
         /// Format => {0} = {Skill Cooldown Duration}
@@ -477,6 +480,7 @@ namespace MultiplayerARPG
         /// Format => {0} = {Skill Type}
         /// </summary>
         UI_FORMAT_SKILL_TYPE,
+
         // Format - Buff
         /// <summary>
         /// Format => {0} = {Buff Duration}
@@ -502,6 +506,7 @@ namespace MultiplayerARPG
         /// Format => {0} = {Buff Recovery Water}
         /// </summary>
         UI_FORMAT_BUFF_RECOVERY_WATER,
+
         // Format -  Item
         /// <summary>
         /// Format => {0} = {Level - 1}
@@ -527,6 +532,7 @@ namespace MultiplayerARPG
         /// Format => {0} = {Item Current Durability}, {1} = {Item Max Durability}
         /// </summary>
         UI_FORMAT_ITEM_DURABILITY,
+
         // Format -  Social
         /// <summary>
         /// Format => {0} = {Character Name}
@@ -556,6 +562,7 @@ namespace MultiplayerARPG
         /// Format => {0} = {Cash Amount}
         /// </summary>
         UI_FORMAT_REWARD_CASH,
+
         // Format - Attribute Amount
         /// <summary>
         /// Format => {0} = {Attribute Title}, {1} = {Current Amount}, {2} = {Target Amount}
@@ -569,11 +576,13 @@ namespace MultiplayerARPG
         /// Format => {0} = {Attribute Title}, {1} = {Amount}
         /// </summary>
         UI_FORMAT_ATTRIBUTE_AMOUNT,
+
         // Format - Resistance Amount
         /// <summary>
         /// Format => {0} = {Resistance Title}, {1} = {Amount * 100}
         /// </summary>
         UI_FORMAT_RESISTANCE_AMOUNT,
+
         // Format - Skill Level
         /// <summary>
         /// Format => {0} = {Skill Title}, {1} = {Current Level}, {2} = {Target Level}
@@ -587,6 +596,7 @@ namespace MultiplayerARPG
         /// Format => {0} = {Skill Title}, {1} = {Target Level}
         /// </summary>
         UI_FORMAT_SKILL_LEVEL,
+
         // Format - Item Amount
         /// <summary>
         /// Format => {0} = {Item Title}, {1} = {Current Amount}, {2} = {Target Amount}
@@ -600,6 +610,7 @@ namespace MultiplayerARPG
         /// Format => {0} = {Item Title}, {1} = {Target Amount}
         /// </summary>
         UI_FORMAT_ITEM_AMOUNT,
+
         // Format - Damage
         /// <summary>
         /// Format => {0} = {Min Damage}, {1} = {Max Damage}
@@ -617,6 +628,7 @@ namespace MultiplayerARPG
         /// Format => {0} = {Damage Element Title}, {1} => {Infliction * 100}
         /// </summary>
         UI_FORMAT_DAMAGE_INFLICTION_AS_ELEMENTAL,
+
         // Format - Gold Amount
         /// <summary>
         /// Format => {0} = {Current Gold Amount}, {1} = {Target Amount}
@@ -626,6 +638,7 @@ namespace MultiplayerARPG
         /// Format => {0} = {Current Gold Amount}, {1} = {Target Amount}
         /// </summary>
         UI_FORMAT_REQUIRE_GOLD_NOT_ENOUGH,
+
         // Format - UI Equipment Set
         /// <summary>
         /// Format => {0} = {Set Title}, {1} = {List Of Effect}
@@ -639,6 +652,7 @@ namespace MultiplayerARPG
         /// Format => {0} = {Equip Amount}, {1} = {List Of Bonus}
         /// </summary>
         UI_FORMAT_EQUIPMENT_SET_UNAPPLIED_EFFECT,
+
         // Format - UI Equipment Socket
         /// <summary>
         /// Format => {0} = {Socket Index}, {1} = {Item Title}, {2} = {List Of Bonus}
@@ -648,6 +662,7 @@ namespace MultiplayerARPG
         /// Format => {0} = {Socket Index}
         /// </summary>
         UI_FORMAT_EQUIPMENT_SOCKET_EMPTY,
+
         // Refine Item
         /// <summary>
         /// Format => {0} = {Rate * 100}
@@ -657,6 +672,7 @@ namespace MultiplayerARPG
         /// Format => {0} = {Refining Level}
         /// </summary>
         UI_FORMAT_REFINING_LEVEL,
+
         // Format - Guild Bonus
         UI_FORMAT_INCREASE_MAX_MEMBER,
         UI_FORMAT_INCREASE_EXP_GAIN_PERCENTAGE,
@@ -664,6 +680,7 @@ namespace MultiplayerARPG
         UI_FORMAT_INCREASE_SHARE_EXP_GAIN_PERCENTAGE,
         UI_FORMAT_INCREASE_SHARE_GOLD_GAIN_PERCENTAGE,
         UI_FORMAT_DECREASE_EXP_PENALTY_PERCENTAGE,
+
         // Format - UI Character Quest
         /// <summary>
         /// Format => {0} = {Title}
@@ -677,6 +694,7 @@ namespace MultiplayerARPG
         /// Format => {0} = {Title}
         /// </summary>
         UI_FORMAT_QUEST_TITLE_COMPLETE,
+
         // Format - UI Quest Task
         /// <summary>
         /// Format => {0} = {Title}, {1} = {Progress}, {2} = {Amount}
@@ -694,6 +712,7 @@ namespace MultiplayerARPG
         /// Format => {0} = {Title}, {1} = {Progress}, {2} = {Amount}
         /// </summary>
         UI_FORMAT_QUEST_TASK_COLLECT_ITEM_COMPLETE,
+
         // UI Chat Message
         /// <summary>
         /// Format => {0} = {Character Name}, {1} = {Message}
@@ -719,6 +738,7 @@ namespace MultiplayerARPG
         /// Format => {0} = {Message}
         /// </summary>
         UI_FORMAT_CHAT_SYSTEM,
+
         // Format - Armor Amount
         /// <summary>
         /// Format => {0} = {Damage Element Title}, {1} = {Target Amount}
@@ -785,31 +805,37 @@ namespace MultiplayerARPG
         /// Format => {0} = {Amount * 100}
         /// </summary>
         UI_FORMAT_SLOT_RATE,
+
         // Format - Attribute Amount Rate
         /// <summary>
         /// Format => {0} = {Attribute Title}, {1} = {Amount * 100}
         /// </summary>
         UI_FORMAT_ATTRIBUTE_RATE,
+
         // Format - Item Building
         /// <summary>
         /// Format => {0} = {Building Title}
         /// </summary>
         UI_FORMAT_ITEM_BUILDING,
+
         // Format - Item Pet
         /// <summary>
         /// Format => {0} = {Pet Title}
         /// </summary>
         UI_FORMAT_ITEM_PET,
+
         // Format - Item Mount
         /// <summary>
         /// Format => {0} = {Mount Title}
         /// </summary>
         UI_FORMAT_ITEM_MOUNT,
+
         // Format - Item Skill
         /// <summary>
         /// Format => {0} = {Skill Title}, {1} = {Skill Level}
         /// </summary>
         UI_FORMAT_ITEM_SKILL,
+
         // Format - Skill Summon
         /// <summary>
         /// Format => {0} = {Monster Title}, {1} = {Monster Level}, {2} = {Amount}, {3} = {Max Stack}, {4} = {Duration}
@@ -820,6 +846,7 @@ namespace MultiplayerARPG
         /// Format => {0} = {Mount Title}
         /// </summary>
         UI_FORMAT_SKILL_MOUNT,
+
         // Format - Skip Title
         /// <summary>
         /// Format => {1} = {Value}
@@ -829,6 +856,7 @@ namespace MultiplayerARPG
         /// Format => {1} = {Value}
         /// </summary>
         UI_FORMAT_SKIP_TITLE_PERCENTAGE,
+
         // Format - Notify Rewards
         /// <summary>
         /// Format => {0} = {Exp Amount}
@@ -842,6 +870,7 @@ namespace MultiplayerARPG
         /// Format => {0} = {Item Title}, {1} = {Amount}
         /// </summary>
         UI_FORMAT_NOTIFY_REWARD_ITEM,
+
         // 1.61 Talk to NPC quest task
         /// <summary>
         /// Format => {0} = {Title}
@@ -864,6 +893,7 @@ namespace MultiplayerARPG
         /// Format => {0} = {Currency Title}, {1} = {Amount}
         /// </summary>
         UI_FORMAT_CURRENCY_AMOUNT,
+
         // 1.61b New Formats
         /// <summary>
         /// Format => {0} = {Consume Hp}
@@ -889,6 +919,7 @@ namespace MultiplayerARPG
         /// Format => {0} = {Sent Date}
         /// </summary>
         UI_FORMAT_MAIL_SENT_DATE,
+
         // 1.62 New Formats
         /// <summary>
         /// Format => {0} = {List Of Armor Type}
@@ -902,6 +933,7 @@ namespace MultiplayerARPG
         /// Format => {0} = {Craft Duration}
         /// </summary>
         UI_FORMAT_CRAFT_DURATION,
+
         // 1.63 New Formats
         /// <summary>
         /// Format => {0} = {Currency Title}, {1} = {Amount}
@@ -911,6 +943,7 @@ namespace MultiplayerARPG
         /// Format => {0} = {Currency Title}, {1} = {Amount}
         /// </summary>
         UI_FORMAT_NOTIFY_REWARD_CURRENCY,
+
         // 1.65f New Formats
         /// <summary>
         /// Format => {0} = {Amount}
@@ -960,6 +993,7 @@ namespace MultiplayerARPG
         /// Format => {0} = {Amount * 100}
         /// </summary>
         UI_FORMAT_STAMINA_LEECH_RATE_RATE,
+
         // 1.66c New Formats
         /// <summary>
         /// Format => {0} = {Amount * 100}
@@ -977,6 +1011,7 @@ namespace MultiplayerARPG
         /// Format => {0} = {Amount * 100}
         /// </summary>
         UI_FORMAT_EXP_RATE_RATE,
+
         // 1.67b New Formats
         /// <summary>
         /// Format => {0} = {Item's Title}, {1} = {Amount}
@@ -986,6 +1021,7 @@ namespace MultiplayerARPG
         /// Format => {0} = {Item's Title}, {1} = {Amount}, {2} = {Item's Description}
         /// </summary>
         UI_FORMAT_GENERATE_CAST_SHOP_ITEM_DESCRIPTION,
+
         // 1.68b New Formats
         /// <summary>
         /// Format => {0} = {Loading Asset Bundle File Name}
@@ -995,6 +1031,16 @@ namespace MultiplayerARPG
         /// Format => {0} = {Current Loaded Asset Bundles Count}, {1} = {Total Loading Asset Bundles Count}
         /// </summary>
         UI_FORMAT_LOADED_ASSET_BUNDLES_COUNT,
+
+        // 1.71 New Formats
+        /// <summary>
+        /// Format => {0} = {Character Level}, {1} = {Require Level}
+        /// </summary>
+        UI_FORMAT_REQUIRE_LEVEL_NOT_ENOUGH,
+        /// <summary>
+        /// Format => {0} = {Character Classes}
+        /// </summary>
+        UI_FORMAT_INVALID_REQUIRE_CLASS,
     }
 
     public static class DefaultLocale
@@ -1044,7 +1090,9 @@ namespace MultiplayerARPG
             Texts.Add(UIFormatKeys.UI_FORMAT_CASH.ToString(), "Cash: {0}");
             Texts.Add(UIFormatKeys.UI_FORMAT_SELL_PRICE.ToString(), "Sell Price: {0}");
             Texts.Add(UIFormatKeys.UI_FORMAT_REQUIRE_LEVEL.ToString(), "Require Level: {0}");
+            Texts.Add(UIFormatKeys.UI_FORMAT_REQUIRE_LEVEL_NOT_ENOUGH.ToString(), "Require Level: <color=red>{0}/{1}</color>");
             Texts.Add(UIFormatKeys.UI_FORMAT_REQUIRE_CLASS.ToString(), "Require Class: {0}");
+            Texts.Add(UIFormatKeys.UI_FORMAT_INVALID_REQUIRE_CLASS.ToString(), "Require Class: <color=red>{0}</color>");
             Texts.Add(UIFormatKeys.UI_FORMAT_AVAILABLE_WEAPONS.ToString(), "Have to equip: {0}");
             Texts.Add(UIFormatKeys.UI_FORMAT_AVAILABLE_ARMORS.ToString(), "Have to equip: {0}");
             Texts.Add(UIFormatKeys.UI_FORMAT_AVAILABLE_VEHICLES.ToString(), "Have to drive: {0}");

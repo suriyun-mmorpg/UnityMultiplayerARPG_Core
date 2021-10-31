@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System.Collections.Generic;
+using UnityEngine;
 using UnityEngine.Serialization;
 
 namespace MultiplayerARPG
@@ -10,7 +11,7 @@ namespace MultiplayerARPG
         [Tooltip("Which character classes can equip item. This is a part of `availableClasses`, just keep it for backward compatibility.")]
         public PlayerCharacter availableClass;
         [Tooltip("Which character classes can equip item.")]
-        public PlayerCharacter[] availableClasses;
+        public List<PlayerCharacter> availableClasses;
         [Tooltip("Character must have level equals or more than this setting to equip item.")]
         public short level;
         [Tooltip("Character must have attribute amounts equals or more than this setting to equip item.")]
@@ -19,7 +20,7 @@ namespace MultiplayerARPG
 
         public bool HasAvailableClasses()
         {
-            return availableClass != null || (availableClasses != null && availableClasses.Length > 0);
+            return availableClass != null || (availableClasses != null && availableClasses.Count > 0);
         }
 
         public bool ClassIsAvailable(PlayerCharacter characterClass)
@@ -28,9 +29,9 @@ namespace MultiplayerARPG
                 return true;
             if (availableClass != null && availableClass == characterClass)
                 return true;
-            if (availableClasses != null && availableClasses.Length > 0)
+            if (availableClasses != null && availableClasses.Count > 0)
             {
-                for (int i = 0; i < availableClasses.Length; ++i)
+                for (int i = 0; i < availableClasses.Count; ++i)
                 {
                     if (availableClasses[i] != null && availableClasses[i] == characterClass)
                         return true;

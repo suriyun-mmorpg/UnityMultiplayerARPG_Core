@@ -118,7 +118,7 @@ namespace MultiplayerARPG
                 }
                 else
                 {
-                    uiRequireItemAmounts.showAsRequirement = true;
+                    uiRequireItemAmounts.displayType = UIItemAmounts.DisplayType.Requirement;
                     uiRequireItemAmounts.Show();
                     uiRequireItemAmounts.Data = refineLevel.Value.CacheRequireItems;
                 }

@@ -40,12 +40,11 @@ namespace MultiplayerARPG
             {
                 if (CraftingItem == null)
                 {
-                    // Hide if crafting item is null
                     uiRequireItemAmounts.Hide();
                 }
                 else
                 {
-                    uiRequireItemAmounts.showAsRequirement = true;
+                    uiRequireItemAmounts.displayType = UIItemAmounts.DisplayType.Requirement;
                     uiRequireItemAmounts.Show();
                     uiRequireItemAmounts.Data = ItemCraft.CacheCraftRequirements;
                 }

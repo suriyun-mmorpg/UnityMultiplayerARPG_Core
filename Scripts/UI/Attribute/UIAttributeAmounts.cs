@@ -34,6 +34,7 @@ namespace MultiplayerARPG
         public bool includeSkillsForCurrentAmounts;
         public bool isBonus;
         public bool inactiveIfAmountZero;
+        public bool useSimpleFormatIfAmountEnough = true;
 
         private Dictionary<Attribute, UIAttributeTextPair> cacheTextAmounts;
         public Dictionary<Attribute, UIAttributeTextPair> CacheTextAmounts
@@ -43,14 +44,14 @@ namespace MultiplayerARPG
                 if (cacheTextAmounts == null)
                 {
                     cacheTextAmounts = new Dictionary<Attribute, UIAttributeTextPair>();
-                    Attribute tempAttribute;
+                    Attribute tempData;
                     foreach (UIAttributeTextPair componentPair in textAmounts)
                     {
                         if (componentPair.attribute == null || componentPair.uiText == null)
                             continue;
-                        tempAttribute = componentPair.attribute;
+                        tempData = componentPair.attribute;
                         SetDefaultValue(componentPair);
-                        cacheTextAmounts[tempAttribute] = componentPair;
+                        cacheTextAmounts[tempData] = componentPair;
                     }
                 }
                 return cacheTextAmounts;
@@ -79,9 +80,10 @@ namespace MultiplayerARPG
                     currentAttributeAmounts = character.GetAttributes(includeEquipmentsForCurrentAmounts, includeBuffsForCurrentAmounts, includeSkillsForCurrentAmounts ? character.GetSkills(includeEquipmentsForCurrentAmounts) : null);
                 // In-loop temp data
                 StringBuilder tempAllText = new StringBuilder();
-                Attribute tempAttribute;
+                Attribute tempData;
                 float tempCurrentAmount;
                 float tempTargetAmount;
+                bool tempAmountEnough;
                 string tempCurrentValue;
                 string tempTargetValue;
                 string tempFormat;
@@ -92,11 +94,11 @@ namespace MultiplayerARPG
                     if (dataEntry.Key == null)
                         continue;
                     // Set temp data
-                    tempAttribute = dataEntry.Key;
+                    tempData = dataEntry.Key;
                     tempTargetAmount = dataEntry.Value;
                     tempCurrentAmount = 0;
                     // Get attribute amount
-                    currentAttributeAmounts.TryGetValue(tempAttribute, out tempCurrentAmount);
+                    currentAttributeAmounts.TryGetValue(tempData, out tempCurrentAmount);
                     // Use difference format by option
                     switch (displayType)
                     {
@@ -108,17 +110,19 @@ namespace MultiplayerARPG
                                 tempTargetValue = (tempTargetAmount * 100).ToString("N2");
                             tempAmountText = string.Format(
                                 LanguageManager.GetText(formatKeyRateAmount),
-                                tempAttribute.Title,
+                                tempData.Title,
                                 tempTargetValue);
                             break;
                         case DisplayType.Requirement:
                             // This will show both current character attribute amount and target amount
-                            tempFormat = tempCurrentAmount >= tempTargetAmount ?
-                                LanguageManager.GetText(formatKeyAmount) :
-                                LanguageManager.GetText(formatKeyAmountNotEnough);
+                            tempAmountEnough = tempCurrentAmount >= tempTargetAmount;
+                            tempFormat = LanguageManager.GetText(tempAmountEnough ? formatKeyAmount : formatKeyAmountNotEnough);
                             tempCurrentValue = tempCurrentAmount.ToString("N0");
                             tempTargetValue = tempTargetAmount.ToString("N0");
-                            tempAmountText = string.Format(tempFormat, tempAttribute.Title, tempCurrentValue, tempTargetValue);
+                            if (useSimpleFormatIfAmountEnough && tempAmountEnough)
+                                tempAmountText = string.Format(LanguageManager.GetText(formatKeySimpleAmount), tempData.Title, tempTargetValue);
+                            else
+                                tempAmountText = string.Format(tempFormat, tempData.Title, tempCurrentValue, tempTargetValue);
                             break;
                         default:
                             // This will show only target amount, so current character attribute amount will not be shown
@@ -128,7 +132,7 @@ namespace MultiplayerARPG
                                 tempTargetValue = tempTargetAmount.ToString("N0");
                             tempAmountText = string.Format(
                                 LanguageManager.GetText(formatKeySimpleAmount),
-                                tempAttribute.Title,
+                                tempData.Title,
                                 tempTargetValue);
                             break;
                     }
@@ -141,7 +145,7 @@ namespace MultiplayerARPG
                         tempAllText.Append(tempAmountText);
                     }
                     // Set current attribute text to UI
-                    if (CacheTextAmounts.TryGetValue(tempAttribute, out tempComponentPair))
+                    if (CacheTextAmounts.TryGetValue(tempData, out tempComponentPair))
                     {
                         tempComponentPair.uiText.text = tempAmountText;
                         if (tempComponentPair.root != null)
@@ -168,10 +172,20 @@ namespace MultiplayerARPG
                         isBonus ? 0f.ToBonusString("N2") : 0f.ToString("N2"));
                     break;
                 case DisplayType.Requirement:
-                    componentPair.uiText.text = string.Format(
-                        LanguageManager.GetText(formatKeyAmount),
-                        componentPair.attribute.Title,
-                        "0", "0");
+                    if (useSimpleFormatIfAmountEnough)
+                    {
+                        componentPair.uiText.text = string.Format(
+                            LanguageManager.GetText(formatKeySimpleAmount),
+                            componentPair.attribute.Title,
+                            "0");
+                    }
+                    else
+                    {
+                        componentPair.uiText.text = string.Format(
+                            LanguageManager.GetText(formatKeyAmount),
+                            componentPair.attribute.Title,
+                            "0", "0");
+                    }
                     break;
                 case DisplayType.Simple:
                     componentPair.uiText.text = string.Format(

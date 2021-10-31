@@ -9,9 +9,13 @@ namespace MultiplayerARPG
         [Header("String Formats")]
         [Tooltip("Format => {0} = {Require Level}")]
         public UILocaleKeySetting formatKeyRequireLevel = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_REQUIRE_LEVEL);
-        [Tooltip("Format => {0} = {Require Class Title}")]
+        [Tooltip("Format => {0} = {Current Level}, {1} = {Require Level}")]
+        public UILocaleKeySetting formatKeyRequireLevelNotEnough = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_REQUIRE_LEVEL_NOT_ENOUGH);
+        [Tooltip("Format => {0} = {Require Classes Title}")]
         [FormerlySerializedAs("formatKeyRequireClasses")]
         public UILocaleKeySetting formatKeyRequireClasses = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_REQUIRE_CLASS);
+        [Tooltip("Format => {0} = {Require Classes Title}")]
+        public UILocaleKeySetting formatKeyInvalidRequireClasses = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_INVALID_REQUIRE_CLASS);
 
         [Header("UI Elements")]
         public TextWrapper uiTextRequireLevel;
@@ -31,9 +35,21 @@ namespace MultiplayerARPG
                 else
                 {
                     uiTextRequireLevel.SetGameObjectActive(true);
-                    uiTextRequireLevel.text = string.Format(
-                        LanguageManager.GetText(formatKeyRequireLevel),
-                        Data.Requirement.level.ToString("N0"));
+                    short characterLevel = (short)(GameInstance.PlayingCharacter != null ? GameInstance.PlayingCharacter.Level : 1);
+                    short requireCharacterLevel = Data.Requirement.level;
+                    if (characterLevel >= requireCharacterLevel)
+                    {
+                        uiTextRequireLevel.text = string.Format(
+                            LanguageManager.GetText(formatKeyRequireLevel),
+                            requireCharacterLevel.ToString("N0"));
+                    }
+                    else
+                    {
+                        uiTextRequireLevel.text = string.Format(
+                            LanguageManager.GetText(formatKeyRequireLevelNotEnough),
+                            characterLevel,
+                            requireCharacterLevel.ToString("N0"));
+                    }
                 }
             }
 
@@ -47,12 +63,16 @@ namespace MultiplayerARPG
                 else
                 {
                     StringBuilder str = new StringBuilder();
+                    PlayerCharacter playingCharacterClass = GameInstance.PlayingCharacter.GetDatabase() as PlayerCharacter;
+                    bool available = false;
                     if (Data.Requirement.availableClass != null)
                     {
                         str.Append(Data.Requirement.availableClass.Title);
+                        if (playingCharacterClass == Data.Requirement.availableClass)
+                            available = true;
                     }
                     if (Data.Requirement.availableClasses != null &&
-                        Data.Requirement.availableClasses.Length > 0)
+                        Data.Requirement.availableClasses.Count > 0)
                     {
                         foreach (PlayerCharacter characterClass in Data.Requirement.availableClasses)
                         {
@@ -61,11 +81,13 @@ namespace MultiplayerARPG
                             if (str.Length > 0)
                                 str.Append('/');
                             str.Append(characterClass.Title);
+                            if (playingCharacterClass == characterClass)
+                                available = true;
                         }
                     }
                     uiTextRequireClasses.SetGameObjectActive(true);
                     uiTextRequireClasses.text = string.Format(
-                        LanguageManager.GetText(formatKeyRequireClasses),
+                        LanguageManager.GetText(available ? formatKeyRequireClasses : formatKeyInvalidRequireClasses),
                         str.ToString());
                 }
             }

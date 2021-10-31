@@ -6,12 +6,18 @@ namespace MultiplayerARPG
 {
     public partial class UIItemAmounts : UISelectionEntry<Dictionary<BaseItem, short>>
     {
+        public enum DisplayType
+        {
+            Simple,
+            Requirement
+        }
+
         [Header("String Formats")]
         [Tooltip("Format => {0} = {Item Title}, {1} = {Current Amount}, {2} = {Target Amount}")]
         public UILocaleKeySetting formatKeyAmount = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_CURRENT_ITEM);
         [Tooltip("Format => {0} = {Item Title}, {1} = {Current Amount}, {2} = {Target Amount}")]
         public UILocaleKeySetting formatKeyAmountNotEnough = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_CURRENT_ITEM_NOT_ENOUGH);
-        [Tooltip("Format => {0} = {Item Title}, {1} = {Target Amount}")]
+        [Tooltip("Format => {0} = {Item Title}, {1} = {Amount}")]
         public UILocaleKeySetting formatKeySimpleAmount = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_ITEM_AMOUNT);
 
         [Header("UI Elements")]
@@ -19,35 +25,37 @@ namespace MultiplayerARPG
         public UIItemTextPair[] textAmounts;
 
         [Header("Options")]
-        public bool showAsRequirement;
+        public DisplayType displayType;
+        public bool isBonus;
         public bool inactiveIfAmountZero;
+        public bool useSimpleFormatIfAmountEnough = true;
 
-        private Dictionary<BaseItem, UIItemTextPair> cacheTextLevels;
-        public Dictionary<BaseItem, UIItemTextPair> CacheTextLevels
+        private Dictionary<BaseItem, UIItemTextPair> cacheTextAmounts;
+        public Dictionary<BaseItem, UIItemTextPair> CacheTextAmounts
         {
             get
             {
-                if (cacheTextLevels == null)
+                if (cacheTextAmounts == null)
                 {
-                    cacheTextLevels = new Dictionary<BaseItem, UIItemTextPair>();
-                    BaseItem tempItem;
+                    cacheTextAmounts = new Dictionary<BaseItem, UIItemTextPair>();
+                    BaseItem tempData;
                     foreach (UIItemTextPair componentPair in textAmounts)
                     {
                         if (componentPair.item == null || componentPair.uiText == null)
                             continue;
-                        tempItem = componentPair.item;
+                        tempData = componentPair.item;
                         SetDefaultValue(componentPair);
-                        cacheTextLevels[tempItem] = componentPair;
+                        cacheTextAmounts[tempData] = componentPair;
                     }
                 }
-                return cacheTextLevels;
+                return cacheTextAmounts;
             }
         }
 
         protected override void UpdateData()
         {
             // Reset number
-            foreach (UIItemTextPair entry in CacheTextLevels.Values)
+            foreach (UIItemTextPair entry in CacheTextAmounts.Values)
             {
                 SetDefaultValue(entry);
             }
@@ -60,9 +68,12 @@ namespace MultiplayerARPG
             else
             {
                 StringBuilder tempAllText = new StringBuilder();
-                BaseItem tempItem;
+                BaseItem tempData;
                 int tempCurrentAmount;
-                short tempTargetAmount;
+                int tempTargetAmount;
+                bool tempAmountEnough;
+                string tempCurrentValue;
+                string tempTargetValue;
                 string tempFormat;
                 string tempAmountText;
                 UIItemTextPair tempComponentPair;
@@ -71,28 +82,41 @@ namespace MultiplayerARPG
                     if (dataEntry.Key == null)
                         continue;
                     // Set temp data
-                    tempItem = dataEntry.Key;
+                    tempData = dataEntry.Key;
                     tempTargetAmount = dataEntry.Value;
                     tempCurrentAmount = 0;
                     // Get item amount from character
                     if (GameInstance.PlayingCharacter != null)
-                        tempCurrentAmount = GameInstance.PlayingCharacter.CountNonEquipItems(tempItem.DataId);
-                    // Use difference format by option 
-                    if (showAsRequirement)
                     {
-                        // This will show both current character item amount and target amount
-                        tempFormat = tempCurrentAmount >= tempTargetAmount ?
-                            LanguageManager.GetText(formatKeyAmount) :
-                            LanguageManager.GetText(formatKeyAmountNotEnough);
-                        tempAmountText = string.Format(tempFormat, tempItem.Title, tempCurrentAmount.ToString("N0"), tempTargetAmount.ToString("N0"));
+                        int indexOfItem = GameInstance.PlayingCharacter.IndexOfNonEquipItem(tempData.DataId);
+                        if (indexOfItem >= 0)
+                            tempCurrentAmount = GameInstance.PlayingCharacter.Currencies[indexOfItem].amount;
                     }
-                    else
+                    // Use difference format by option 
+                    switch (displayType)
                     {
-                        // This will show only target amount, so current character item amount will not be shown
-                        tempAmountText = string.Format(
-                            LanguageManager.GetText(formatKeySimpleAmount),
-                            tempItem.Title,
-                            tempTargetAmount.ToString("N0"));
+                        case DisplayType.Requirement:
+                            // This will show both current character item amount and target amount
+                            tempAmountEnough = tempCurrentAmount >= tempTargetAmount;
+                            tempFormat = LanguageManager.GetText(tempAmountEnough ? formatKeyAmount : formatKeyAmountNotEnough);
+                            tempCurrentValue = tempCurrentAmount.ToString("N0");
+                            tempTargetValue = tempTargetAmount.ToString("N0");
+                            if (useSimpleFormatIfAmountEnough && tempAmountEnough)
+                                tempAmountText = string.Format(LanguageManager.GetText(formatKeySimpleAmount), tempData.Title, tempTargetValue);
+                            else
+                                tempAmountText = string.Format(tempFormat, tempData.Title, tempCurrentValue, tempTargetValue);
+                            break;
+                        default:
+                            // This will show only target amount, so current character item amount will not be shown
+                            if (isBonus)
+                                tempTargetValue = tempTargetAmount.ToBonusString("N0");
+                            else
+                                tempTargetValue = tempTargetAmount.ToString("N0");
+                            tempAmountText = string.Format(
+                                LanguageManager.GetText(formatKeySimpleAmount),
+                                tempData.Title,
+                                tempTargetValue);
+                            break;
                     }
                     // Append current item amount text
                     if (dataEntry.Value != 0)
@@ -103,7 +127,7 @@ namespace MultiplayerARPG
                         tempAllText.Append(tempAmountText);
                     }
                     // Set current item text to UI
-                    if (CacheTextLevels.TryGetValue(dataEntry.Key, out tempComponentPair))
+                    if (CacheTextAmounts.TryGetValue(tempData, out tempComponentPair))
                     {
                         tempComponentPair.uiText.text = tempAmountText;
                         if (tempComponentPair.root != null)
@@ -121,11 +145,31 @@ namespace MultiplayerARPG
 
         private void SetDefaultValue(UIItemTextPair componentPair)
         {
-            componentPair.uiText.text = string.Format(
-                LanguageManager.GetText(formatKeyAmount),
-                componentPair.item.Title,
-                "0",
-                "0");
+            switch (displayType)
+            {
+                case DisplayType.Requirement:
+                    if (useSimpleFormatIfAmountEnough)
+                    {
+                        componentPair.uiText.text = string.Format(
+                            LanguageManager.GetText(formatKeySimpleAmount),
+                            componentPair.item.Title,
+                            "0");
+                    }
+                    else
+                    {
+                        componentPair.uiText.text = string.Format(
+                            LanguageManager.GetText(formatKeyAmount),
+                            componentPair.item.Title,
+                            "0", "0");
+                    }
+                    break;
+                case DisplayType.Simple:
+                    componentPair.uiText.text = string.Format(
+                        LanguageManager.GetText(formatKeySimpleAmount),
+                        componentPair.item.Title,
+                        isBonus ? 0f.ToBonusString("N0") : "0");
+                    break;
+            }
             if (componentPair.imageIcon != null)
                 componentPair.imageIcon.sprite = componentPair.item.Icon;
             if (inactiveIfAmountZero && componentPair.root != null)

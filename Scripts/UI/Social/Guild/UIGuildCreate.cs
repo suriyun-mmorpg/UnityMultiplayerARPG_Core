@@ -44,7 +44,7 @@ namespace MultiplayerARPG
 
             if (uiRequireItemAmounts != null)
             {
-                uiRequireItemAmounts.showAsRequirement = true;
+                uiRequireItemAmounts.displayType = UIItemAmounts.DisplayType.Requirement;
                 uiRequireItemAmounts.Data = systemSetting.CacheCreateGuildRequireItems;
             }
         }

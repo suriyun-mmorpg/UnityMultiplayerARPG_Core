@@ -29,6 +29,7 @@ namespace MultiplayerARPG
         public bool includeEquipmentsForCurrentLevels;
         public bool isBonus;
         public bool inactiveIfLevelZero;
+        public bool useSimpleFormatIfLevelEnough = true;
 
         private Dictionary<BaseSkill, UISkillTextPair> cacheTextLevels;
         public Dictionary<BaseSkill, UISkillTextPair> CacheTextLevels
@@ -38,14 +39,14 @@ namespace MultiplayerARPG
                 if (cacheTextLevels == null)
                 {
                     cacheTextLevels = new Dictionary<BaseSkill, UISkillTextPair>();
-                    BaseSkill tempSkill;
+                    BaseSkill tempData;
                     foreach (UISkillTextPair componentPair in textLevels)
                     {
                         if (componentPair.skill == null || componentPair.uiText == null)
                             continue;
-                        tempSkill = componentPair.skill;
+                        tempData = componentPair.skill;
                         SetDefaultValue(componentPair);
-                        cacheTextLevels[tempSkill] = componentPair;
+                        cacheTextLevels[tempData] = componentPair;
                     }
                 }
                 return cacheTextLevels;
@@ -74,9 +75,12 @@ namespace MultiplayerARPG
                     currentSkillLevels = character.GetSkills(includeEquipmentsForCurrentLevels);
                 // In-loop temp data
                 StringBuilder tempAllText = new StringBuilder();
-                BaseSkill tempSkill;
+                BaseSkill tempData;
                 short tempCurrentLevel;
                 short tempTargetLevel;
+                bool tempLevelEnough;
+                string tempCurrentValue;
+                string tempTargetValue;
                 string tempFormat;
                 string tempLevelText;
                 UISkillTextPair tempComponentPair;
@@ -85,24 +89,24 @@ namespace MultiplayerARPG
                     if (dataEntry.Key == null)
                         continue;
                     // Set temp data
-                    tempSkill = dataEntry.Key;
-                    tempCurrentLevel = 0;
+                    tempData = dataEntry.Key;
                     tempTargetLevel = dataEntry.Value;
-                    string tempCurrentValue;
-                    string tempTargetValue;
+                    tempCurrentLevel = 0;
                     // Get skill level from character
-                    currentSkillLevels.TryGetValue(tempSkill, out tempCurrentLevel);
+                    currentSkillLevels.TryGetValue(tempData, out tempCurrentLevel);
                     // Use difference format by option
                     switch (displayType)
                     {
                         case DisplayType.Requirement:
                             // This will show both current character skill level and target level
-                            tempFormat = tempCurrentLevel >= tempTargetLevel ?
-                                LanguageManager.GetText(formatKeyLevel) :
-                                LanguageManager.GetText(formatKeyLevelNotEnough);
+                            tempLevelEnough = tempCurrentLevel >= tempTargetLevel;
+                            tempFormat = LanguageManager.GetText(tempLevelEnough ? formatKeyLevel : formatKeyLevelNotEnough);
                             tempCurrentValue = tempCurrentLevel.ToString("N0");
                             tempTargetValue = tempTargetLevel.ToString("N0");
-                            tempLevelText = string.Format(tempFormat, tempSkill.Title, tempCurrentValue, tempTargetValue);
+                            if (useSimpleFormatIfLevelEnough && tempLevelEnough)
+                                tempLevelText = string.Format(LanguageManager.GetText(formatKeySimpleLevel), tempData.Title, tempTargetValue);
+                            else
+                                tempLevelText = string.Format(tempFormat, tempData.Title, tempCurrentValue, tempTargetValue);
                             break;
                         default:
                             // This will show only target level, so current character skill level will not be shown
@@ -112,7 +116,7 @@ namespace MultiplayerARPG
                                 tempTargetValue = tempTargetLevel.ToString("N0");
                             tempLevelText = string.Format(
                                 LanguageManager.GetText(formatKeySimpleLevel),
-                                tempSkill.Title,
+                                tempData.Title,
                                 tempTargetValue);
                             break;
                     }
@@ -146,10 +150,20 @@ namespace MultiplayerARPG
             switch (displayType)
             {
                 case DisplayType.Requirement:
-                    componentPair.uiText.text = string.Format(
-                        LanguageManager.GetText(formatKeyLevel),
-                        componentPair.skill.Title,
-                        "0", "0");
+                    if (useSimpleFormatIfLevelEnough)
+                    {
+                        componentPair.uiText.text = string.Format(
+                            LanguageManager.GetText(formatKeySimpleLevel),
+                            componentPair.skill.Title,
+                            "0");
+                    }
+                    else
+                    {
+                        componentPair.uiText.text = string.Format(
+                            LanguageManager.GetText(formatKeyLevel),
+                            componentPair.skill.Title,
+                            "0", "0");
+                    }
                     break;
                 case DisplayType.Simple:
                     componentPair.uiText.text = string.Format(
