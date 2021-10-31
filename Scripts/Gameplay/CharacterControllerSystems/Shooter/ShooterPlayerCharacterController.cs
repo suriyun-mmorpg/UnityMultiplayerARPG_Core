@@ -46,6 +46,8 @@ namespace MultiplayerARPG
         [SerializeField]
         protected ExtraMoveActiveMode sprintActiveMode;
         [SerializeField]
+        protected ExtraMoveActiveMode walkActiveMode;
+        [SerializeField]
         protected ExtraMoveActiveMode crouchActiveMode;
         [SerializeField]
         protected ExtraMoveActiveMode crawlActiveMode;
@@ -99,6 +101,9 @@ namespace MultiplayerARPG
         protected float turnSpeedWhileSprinting = 0f;
         [SerializeField]
         [Tooltip("Use this to turn character smoothly, Set this <= 0 to turn immediately")]
+        protected float turnSpeedWhileWalking = 0f;
+        [SerializeField]
+        [Tooltip("Use this to turn character smoothly, Set this <= 0 to turn immediately")]
         protected float turnSpeedWhileCrouching = 0f;
         [SerializeField]
         [Tooltip("Use this to turn character smoothly, Set this <= 0 to turn immediately")]
@@ -149,6 +154,8 @@ namespace MultiplayerARPG
         protected float recoilRateWhileMoving = 1.5f;
         [SerializeField]
         protected float recoilRateWhileSprinting = 2f;
+        [SerializeField]
+        protected float recoilRateWhileWalking = 1f;
         [SerializeField]
         protected float recoilRateWhileCrouching = 0.5f;
         [SerializeField]
@@ -266,6 +273,8 @@ namespace MultiplayerARPG
                 {
                     case ExtraMovementState.IsSprinting:
                         return turnSpeedWhileSprinting;
+                    case ExtraMovementState.IsWalking:
+                        return turnSpeedWhileWalking;
                     case ExtraMovementState.IsCrouching:
                         return turnSpeedWhileCrouching;
                     case ExtraMovementState.IsCrawling:
@@ -316,6 +325,7 @@ namespace MultiplayerARPG
         protected Vector3 aimTargetPosition;
         protected Vector3 turnDirection;
         protected bool toggleSprintOn;
+        protected bool toggleWalkOn;
         protected bool toggleCrouchOn;
         protected bool toggleCrawlOn;
         // Controlling states
@@ -594,6 +604,14 @@ namespace MultiplayerARPG
                 if (DetectExtraActive("Sprint", sprintActiveMode, ref toggleSprintOn))
                 {
                     extraMovementState = ExtraMovementState.IsSprinting;
+                    toggleWalkOn = false;
+                    toggleCrouchOn = false;
+                    toggleCrawlOn = false;
+                }
+                if (DetectExtraActive("Walk", walkActiveMode, ref toggleWalkOn))
+                {
+                    extraMovementState = ExtraMovementState.IsWalking;
+                    toggleSprintOn = false;
                     toggleCrouchOn = false;
                     toggleCrawlOn = false;
                 }
@@ -601,12 +619,14 @@ namespace MultiplayerARPG
                 {
                     extraMovementState = ExtraMovementState.IsCrouching;
                     toggleSprintOn = false;
+                    toggleWalkOn = false;
                     toggleCrawlOn = false;
                 }
                 if (DetectExtraActive("Crawl", crawlActiveMode, ref toggleCrawlOn))
                 {
                     extraMovementState = ExtraMovementState.IsCrawling;
                     toggleSprintOn = false;
+                    toggleWalkOn = false;
                     toggleCrouchOn = false;
                 }
             }
@@ -635,6 +655,7 @@ namespace MultiplayerARPG
             {
                 // Clear toggled sprint, crouch and crawl
                 toggleSprintOn = false;
+                toggleWalkOn = false;
                 toggleCrouchOn = false;
                 toggleCrawlOn = false;
             }
@@ -1245,6 +1266,11 @@ namespace MultiplayerARPG
                 {
                     recoilX = CurrentCrosshairSetting.recoilX * recoilRateWhileSprinting;
                     recoilY = CurrentCrosshairSetting.recoilY * recoilRateWhileSprinting;
+                }
+                else if (extraMovementState == ExtraMovementState.IsWalking)
+                {
+                    recoilX = CurrentCrosshairSetting.recoilX * recoilRateWhileWalking;
+                    recoilY = CurrentCrosshairSetting.recoilY * recoilRateWhileWalking;
                 }
                 else
                 {

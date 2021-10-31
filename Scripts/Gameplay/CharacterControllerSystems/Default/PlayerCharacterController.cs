@@ -80,6 +80,7 @@ namespace MultiplayerARPG
         protected bool isMouseHoldDetected;
         protected bool isMouseHoldAndNotDrag;
         protected bool isSprinting;
+        protected bool isWalking;
         protected Vector3? destination;
         protected Vector3 mouseDownPosition;
         protected float mouseDownTime;
