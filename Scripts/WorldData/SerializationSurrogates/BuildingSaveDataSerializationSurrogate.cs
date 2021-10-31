@@ -34,50 +34,16 @@ namespace MultiplayerARPG
             BuildingSaveData data = (BuildingSaveData)obj;
             data.Id = info.GetString("id");
             data.ParentId = info.GetString("parentId");
+            data.EntityId = info.GetInt32("entityId");
             data.CurrentHp = info.GetInt32("currentHp");
+            data.RemainsLifeTime = info.GetSingle("remainsLifeTime");
             data.Position = (Vector3)info.GetValue("position", typeof(Vector3));
             data.Rotation = (Quaternion)info.GetValue("rotation", typeof(Quaternion));
+            data.IsLocked = info.GetBoolean("isLocked");
+            data.LockPassword = info.GetString("lockPassword");
             data.CreatorId = info.GetString("creatorId");
             data.CreatorName = info.GetString("creatorName");
-            // TODO: Backward compatible, this will be removed in future version
-            try
-            {
-                data.RemainsLifeTime = info.GetSingle("remainsLifeTime");
-            }
-            catch { }
-            try
-            {
-                data.IsLocked = info.GetBoolean("isLocked");
-            }
-            catch { }
-            try
-            {
-                data.LockPassword = info.GetString("lockPassword");
-            }
-            catch { }
-            try
-            {
-                data.ExtraData = info.GetString("extraData");
-            }
-            catch { }
-            try
-            {
-                data.EntityId = info.GetInt32("entityId");
-            }
-            catch { }
-            try
-            {
-                int dataId = info.GetInt32("dataId");
-                foreach (BuildingEntity prefab in GameInstance.BuildingEntities.Values)
-                {
-                    if (dataId == prefab.name.GenerateHashId())
-                    {
-                        data.EntityId = prefab.EntityId;
-                        break;
-                    }
-                }
-            }
-            catch { }
+            data.ExtraData = info.GetString("extraData");
             obj = data;
             return obj;
         }
