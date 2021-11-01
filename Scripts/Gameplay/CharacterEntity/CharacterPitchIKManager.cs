@@ -1,5 +1,4 @@
 ﻿using MultiplayerARPG.GameData.Model.Playables;
-using System.Collections;
 using System.Collections.Generic;
 using Unity.Collections;
 using UnityEngine;
@@ -9,6 +8,7 @@ using UnityEngine.Playables;
 namespace MultiplayerARPG
 {
     [DisallowMultipleComponent]
+    [DefaultExecutionOrder(1)]
     public class CharacterPitchIKManager : MonoBehaviour
     {
         public Animator Animator { get; private set; }
@@ -16,7 +16,9 @@ namespace MultiplayerARPG
         private readonly List<CharacterPitchIK> components = new List<CharacterPitchIK>();
         private PlayableCharacterModel playableCharacterModel;
         private bool forPlayableCharacterModel;
-        private bool sizeChanged;
+        public bool sizeChanging;
+        public bool sizeChanged;
+        private bool arraysCreatedOnce;
         private NativeArray<bool> enablings;
         private NativeArray<TransformStreamHandle> pitchBones;
         private NativeArray<Quaternion> pitchRotations;
@@ -32,8 +34,13 @@ namespace MultiplayerARPG
                 Animator = GetComponentInChildren<Animator>();
             playableCharacterModel = GetComponentInParent<PlayableCharacterModel>();
             if (playableCharacterModel != null)
-            {
                 forPlayableCharacterModel = true;
+        }
+
+        private void Start()
+        {
+            if (forPlayableCharacterModel)
+            {
                 // Insert animation job as output before default output
                 playableAnimJob = new PlayableAnimJob();
                 pitchUpdatePlayable = AnimationScriptPlayable.Create(playableCharacterModel.Graph, playableAnimJob, 1);
@@ -49,7 +56,7 @@ namespace MultiplayerARPG
             if (!components.Contains(comp))
             {
                 components.Add(comp);
-                sizeChanged = true;
+                sizeChanging = true;
                 return true;
             }
             return false;
@@ -59,7 +66,7 @@ namespace MultiplayerARPG
         {
             if (components.Remove(comp))
             {
-                sizeChanged = true;
+                sizeChanging = true;
                 return true;
             }
             return false;
@@ -67,17 +74,14 @@ namespace MultiplayerARPG
 
         private void Update()
         {
-            if (forPlayableCharacterModel && sizeChanged)
-            {
-                playableAnimJob.DisposeArrays();
-                enablings = new NativeArray<bool>(components.Count, Allocator.Persistent, NativeArrayOptions.UninitializedMemory);
-                pitchBones = new NativeArray<TransformStreamHandle>(components.Count, Allocator.Persistent, NativeArrayOptions.UninitializedMemory);
-                pitchRotations = new NativeArray<Quaternion>(components.Count, Allocator.Persistent, NativeArrayOptions.UninitializedMemory);
-                rotationDataList = new NativeArray<UpdatingRotationData>(components.Count, Allocator.Persistent, NativeArrayOptions.UninitializedMemory);
-            }
             for (int i = 0; i < components.Count; ++i)
             {
-                if (forPlayableCharacterModel)
+
+                if (!forPlayableCharacterModel)
+                {
+                    components[i].UpdatePitchRotation();
+                }
+                else if (arraysCreatedOnce)
                 {
                     enablings[i] = components[i].Enabling;
                     if (sizeChanged)
@@ -95,13 +99,9 @@ namespace MultiplayerARPG
                         };
                     }
                 }
-                else
-                {
-                    components[i].UpdatePitchRotation();
-                }
             }
             sizeChanged = false;
-            if (forPlayableCharacterModel)
+            if (forPlayableCharacterModel && arraysCreatedOnce)
             {
                 playableAnimJob.characterPitch = CharacterEntity.Pitch;
                 playableAnimJob.deltaTime = Time.deltaTime;
@@ -113,9 +113,24 @@ namespace MultiplayerARPG
             }
         }
 
+        private void LateUpdate()
+        {
+            if (forPlayableCharacterModel && sizeChanging)
+            {
+                DisposePlayableAnimArrays();
+                enablings = new NativeArray<bool>(components.Count, Allocator.Persistent, NativeArrayOptions.UninitializedMemory);
+                pitchBones = new NativeArray<TransformStreamHandle>(components.Count, Allocator.Persistent, NativeArrayOptions.UninitializedMemory);
+                pitchRotations = new NativeArray<Quaternion>(components.Count, Allocator.Persistent, NativeArrayOptions.UninitializedMemory);
+                rotationDataList = new NativeArray<UpdatingRotationData>(components.Count, Allocator.Persistent, NativeArrayOptions.UninitializedMemory);
+                sizeChanging = false;
+                sizeChanged = true;
+                arraysCreatedOnce = true;
+            }
+        }
+
         private void OnDestroy()
         {
-            playableAnimJob.DisposeArrays();
+            DisposePlayableAnimArrays();
         }
 
         private void OnAnimatorIK(int layerIndex)
@@ -127,6 +142,18 @@ namespace MultiplayerARPG
                 if (!components[i].Enabling) continue;
                 Animator.SetBoneLocalRotation(components[i].pitchBone, components[i].PitchRotation);
             }
+        }
+
+        private void DisposePlayableAnimArrays()
+        {
+            if (enablings.IsCreated)
+                enablings.Dispose();
+            if (pitchBones.IsCreated)
+                pitchBones.Dispose();
+            if (pitchRotations.IsCreated)
+                pitchRotations.Dispose();
+            if (rotationDataList.IsCreated)
+                rotationDataList.Dispose();
         }
 
         public struct UpdatingRotationData
@@ -168,18 +195,6 @@ namespace MultiplayerARPG
 
             public void ProcessRootMotion(AnimationStream stream)
             {
-            }
-
-            public void DisposeArrays()
-            {
-                if (enablings.IsCreated)
-                    enablings.Dispose();
-                if (pitchBones.IsCreated)
-                    pitchBones.Dispose();
-                if (pitchRotations.IsCreated)
-                    pitchRotations.Dispose();
-                if (rotationDataList.IsCreated)
-                    rotationDataList.Dispose();
             }
         }
     }
