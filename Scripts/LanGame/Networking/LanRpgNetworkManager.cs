@@ -26,11 +26,13 @@ namespace MultiplayerARPG
         public float autoSaveDuration = 2f;
         public GameStartType startType;
         public PlayerCharacterData selectedCharacter;
+        public List<CharacterBuff> selectedCharacterSummonBuffs;
         public List<CharacterItem> selectedCharacterStorageItems;
         public EnableGmCommandType enableGmCommands;
         private float lastSaveTime;
         private Vector3? teleportPosition;
         private readonly Dictionary<long, PlayerCharacterData> pendingSpawnPlayerCharacters = new Dictionary<long, PlayerCharacterData>();
+        private readonly Dictionary<long, List<CharacterBuff>> pendingSpawnPlayerCharacterSummonBuffs = new Dictionary<long, List<CharacterBuff>>();
 
         public LiteNetLibDiscovery CacheDiscovery { get; private set; }
         public BaseGameSaveSystem SaveSystem { get { return GameInstance.Singleton.SaveSystem; } }
@@ -147,6 +149,7 @@ namespace MultiplayerARPG
             if (!IsServer && IsClientConnected && owningCharacter != null)
             {
                 SaveSystem.SaveCharacter(owningCharacter);
+                SaveSystem.SaveSummonBuffs(owningCharacter, new List<CharacterSummon>(owningCharacter.Summons));
                 SaveSystem.OnSceneChanging();
             }
             base.HandleServerSceneChange(messageHandler);
@@ -168,6 +171,7 @@ namespace MultiplayerARPG
                 if (owningCharacter != null && IsClientConnected)
                 {
                     SaveSystem.SaveCharacter(owningCharacter);
+                    SaveSystem.SaveSummonBuffs(owningCharacter, new List<CharacterSummon>(owningCharacter.Summons));
                     if (IsServer)
                     {
                         SaveSystem.SaveWorld(owningCharacter, ServerBuildingHandlers.GetBuildings());
@@ -191,9 +195,10 @@ namespace MultiplayerARPG
                     if (!Players.TryGetValue(spawnPlayerCharacter.Key, out player))
                         continue;
                     player.IsReady = true;
-                    SpawnPlayerCharacter(spawnPlayerCharacter.Key, spawnPlayerCharacter.Value);
+                    SpawnPlayerCharacter(spawnPlayerCharacter.Key, spawnPlayerCharacter.Value, pendingSpawnPlayerCharacterSummonBuffs[spawnPlayerCharacter.Key]);
                 }
                 pendingSpawnPlayerCharacters.Clear();
+                pendingSpawnPlayerCharacterSummonBuffs.Clear();
             }
         }
 
@@ -207,8 +212,10 @@ namespace MultiplayerARPG
         {
             GameInstance.SelectedCharacterId = selectedCharacter.Id;
             GameInstance.PlayingCharacter = selectedCharacter;
+            selectedCharacterSummonBuffs = SaveSystem.LoadSummonBuffs(selectedCharacter);
             selectedCharacterStorageItems = SaveSystem.LoadPlayerStorage(selectedCharacter);
             selectedCharacter.SerializeCharacterData(writer);
+            writer.PutList(selectedCharacterSummonBuffs);
             writer.PutList(selectedCharacterStorageItems);
         }
 
@@ -216,6 +223,7 @@ namespace MultiplayerARPG
         {
             await UniTask.Yield();
             PlayerCharacterData playerCharacterData = new PlayerCharacterData().DeserializeCharacterData(reader);
+            List<CharacterBuff> playerSummonBuffs = reader.GetList<CharacterBuff>();
             List<CharacterItem> playerStorageItems = reader.GetList<CharacterItem>();
             ServerStorageHandlers.SetStorageItems(new StorageId(StorageType.Player, playerCharacterData.Id), playerStorageItems);
             if (!isReadyToInstantiatePlayers)
@@ -224,14 +232,16 @@ namespace MultiplayerARPG
                 if (LogDev) Logging.Log("[LanRpgNetworkManager] Not ready to deserializing client ready extra");
                 if (!pendingSpawnPlayerCharacters.ContainsKey(connectionId))
                     pendingSpawnPlayerCharacters.Add(connectionId, playerCharacterData);
+                if (!pendingSpawnPlayerCharacterSummonBuffs.ContainsKey(connectionId))
+                    pendingSpawnPlayerCharacterSummonBuffs.Add(connectionId, playerSummonBuffs);
                 return false;
             }
             if (LogDev) Logging.Log("[LanRpgNetworkManager] Deserializing client ready extra");
-            SpawnPlayerCharacter(connectionId, playerCharacterData);
+            SpawnPlayerCharacter(connectionId, playerCharacterData, playerSummonBuffs);
             return true;
         }
 
-        private void SpawnPlayerCharacter(long connectionId, PlayerCharacterData playerCharacterData)
+        private void SpawnPlayerCharacter(long connectionId, PlayerCharacterData playerCharacterData, List<CharacterBuff> playerSummonBuffs)
         {
             BasePlayerCharacterEntity entityPrefab = playerCharacterData.GetEntityPrefab() as BasePlayerCharacterEntity;
             // If it is not allow this character data, disconnect user
@@ -273,6 +283,15 @@ namespace MultiplayerARPG
             {
                 CharacterSummon summon = playerCharacterEntity.Summons[i];
                 summon.Summon(playerCharacterEntity, summon.Level, summon.summonRemainsDuration, summon.Exp, summon.CurrentHp, summon.CurrentMp);
+                for (int j = 0; j < playerSummonBuffs.Count; ++j)
+                {
+                    if (playerSummonBuffs[j].id.StartsWith(i.ToString()))
+                    {
+                        summon.CacheEntity.Buffs.Add(playerSummonBuffs[j]);
+                        playerSummonBuffs.RemoveAt(j);
+                        j--;
+                    }
+                }
                 playerCharacterEntity.Summons[i] = summon;
             }
 
@@ -369,6 +388,7 @@ namespace MultiplayerARPG
                     if (overrideRotation)
                         selectedCharacter.CurrentRotation = rotation;
                     SaveSystem.SaveCharacter(selectedCharacter);
+                    SaveSystem.SaveSummonBuffs(selectedCharacter, new List<CharacterSummon>(owningCharacter.Summons));
                 }
                 SaveSystem.OnSceneChanging();
                 // Unregister all players characters to register later after map changed

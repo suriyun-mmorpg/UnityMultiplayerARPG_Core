@@ -8,6 +8,7 @@ namespace MultiplayerARPG
     public class DefaultGameSaveSystem : BaseGameSaveSystem
     {
         private readonly WorldSaveData worldSaveData = new WorldSaveData();
+        private readonly SummonBuffsSaveData summonBuffsSaveData = new SummonBuffsSaveData();
         private readonly StorageSaveData hostStorageSaveData = new StorageSaveData();
         private readonly StorageSaveData playerStorageSaveData = new StorageSaveData();
         private readonly Dictionary<StorageId, List<CharacterItem>> playerStorageItems = new Dictionary<StorageId, List<CharacterItem>>();
@@ -53,6 +54,12 @@ namespace MultiplayerARPG
         public override List<PlayerCharacterData> LoadCharacters()
         {
             return PlayerCharacterDataExtension.LoadAllPersistentCharacterData();
+        }
+
+        public override List<CharacterBuff> LoadSummonBuffs(IPlayerCharacterData playerCharacterData)
+        {
+            summonBuffsSaveData.LoadPersistentData(playerCharacterData.Id);
+            return summonBuffsSaveData.summonBuffs;
         }
 
         public override List<CharacterItem> LoadPlayerStorage(IPlayerCharacterData playerCharacterData)
@@ -154,6 +161,35 @@ namespace MultiplayerARPG
                 });
             }
             worldSaveData.SavePersistentData(hostPlayerCharacterData.Id, BaseGameNetworkManager.CurrentMapInfo.Id);
+        }
+
+        public override void SaveSummonBuffs(IPlayerCharacterData playerCharacterData, List<CharacterSummon> summons)
+        {
+            if (!isReadyToSave)
+                return;
+
+            // Save buffs from all summons
+            summonBuffsSaveData.summonBuffs.Clear();
+            CharacterSummon tempSummon;
+            CharacterBuff tempBuff;
+            for (int i = 0; i < summons.Count; ++i)
+            {
+                tempSummon = summons[i];
+                if (tempSummon == null || tempSummon.CacheEntity == null || tempSummon.CacheEntity.Buffs == null || tempSummon.CacheEntity.Buffs.Count == 0) continue;
+                for (int j = 0; j < tempSummon.CacheEntity.Buffs.Count; ++j)
+                {
+                    tempBuff = tempSummon.CacheEntity.Buffs[j];
+                    summonBuffsSaveData.summonBuffs.Add(new CharacterBuff()
+                    {
+                        id = $"{i}_{j}",
+                        type = tempBuff.type,
+                        dataId = tempBuff.dataId,
+                        level = tempBuff.level,
+                        buffRemainsDuration = tempBuff.buffRemainsDuration,
+                    });
+                }
+            }
+            summonBuffsSaveData.SavePersistentData(playerCharacterData.Id);
         }
 
         public override void OnSceneChanging()

@@ -35,6 +35,8 @@ namespace MultiplayerARPG
                 return typeof(BuildingSaveData);
             if (typeName == "WorldSaveData")
                 return typeof(WorldSaveData);
+            if (typeName == "SummonBuffsSaveData")
+                return typeof(SummonBuffsSaveData);
             return null;
         }
     }

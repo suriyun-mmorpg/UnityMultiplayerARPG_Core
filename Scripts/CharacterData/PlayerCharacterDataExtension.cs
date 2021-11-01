@@ -304,11 +304,11 @@ namespace MultiplayerARPG
             binaryFormatter.SurrogateSelector = surrogateSelector;
             binaryFormatter.Binder = new PlayerCharacterDataTypeBinder();
             string path = Application.persistentDataPath + "/" + savingData.Id + ".sav";
-            Logging.Log("Character Saving to: " + path);
+            Debug.Log("Character Saving to: " + path);
             FileStream file = File.Open(path, FileMode.OpenOrCreate);
             binaryFormatter.Serialize(file, savingData);
             file.Close();
-            Logging.Log("Character Saved to: " + path);
+            Debug.Log("Character Saved to: " + path);
         }
 
         public static T LoadPersistentCharacterDataById<T>(this T characterData, string id) where T : IPlayerCharacterData
@@ -339,17 +339,17 @@ namespace MultiplayerARPG
             List<PlayerCharacterData> result = new List<PlayerCharacterData>();
             string path = Application.persistentDataPath;
             string[] files = Directory.GetFiles(path, "*.sav");
-            Logging.Log("Characters loading from: " + path);
+            Debug.Log("Characters loading from: " + path);
             PlayerCharacterData characterData;
             foreach (string file in files)
             {
                 // If filename is empty or this is not character save, skip it
-                if (file.Length <= 4 || file.Contains("_world_") || file.Contains("_storage"))
+                if (file.Length <= 4 || file.Contains("_world_") || file.Contains("_storage") || file.Contains("_summon_buffs"))
                     continue;
                 characterData = new PlayerCharacterData();
                 result.Add(characterData.LoadPersistentCharacterData(file));
             }
-            Logging.Log("Characters loaded from: " + path);
+            Debug.Log("Characters loaded from: " + path);
             return result;
         }
 
@@ -357,7 +357,7 @@ namespace MultiplayerARPG
         {
             if (string.IsNullOrEmpty(id))
             {
-                Logging.LogWarning("Cannot delete character: character id is empty");
+                Debug.LogWarning("Cannot delete character: character id is empty");
                 return;
             }
             File.Delete(Application.persistentDataPath + "/" + id + ".sav");
@@ -367,7 +367,7 @@ namespace MultiplayerARPG
         {
             if (characterData == null)
             {
-                Logging.LogWarning("Cannot delete character: character data is empty");
+                Debug.LogWarning("Cannot delete character: character data is empty");
                 return;
             }
             DeletePersistentCharacterData(characterData.Id);

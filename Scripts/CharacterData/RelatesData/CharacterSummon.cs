@@ -1,5 +1,4 @@
-﻿using UnityEngine;
-using LiteNetLib.Utils;
+﻿using LiteNetLib.Utils;
 using LiteNetLibManager;
 using System.Collections.Generic;
 
