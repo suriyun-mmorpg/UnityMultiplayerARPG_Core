@@ -90,7 +90,7 @@ namespace MultiplayerARPG
                     {
                         int indexOfItem = GameInstance.PlayingCharacter.IndexOfNonEquipItem(tempData.DataId);
                         if (indexOfItem >= 0)
-                            tempCurrentAmount = GameInstance.PlayingCharacter.Currencies[indexOfItem].amount;
+                            tempCurrentAmount = GameInstance.PlayingCharacter.NonEquipItems[indexOfItem].amount;
                     }
                     // Use difference format by option 
                     switch (displayType)
