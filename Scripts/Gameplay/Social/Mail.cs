@@ -16,7 +16,7 @@ namespace MultiplayerARPG
         public string Content { get; set; }
         public int Gold { get; set; }
         public int Cash { get; set; }
-        public Dictionary<int, int> Currencies { get; } = new Dictionary<int, int>();
+        public List<CharacterCurrency> Currencies { get; } = new List<CharacterCurrency>();
         public List<CharacterItem> Items { get; } = new List<CharacterItem>();
         public bool IsRead { get; set; }
         public long ReadTimestamp { get; set; }
@@ -34,7 +34,7 @@ namespace MultiplayerARPG
             return Gold != 0 || Cash != 0 || Currencies.Count > 0 || Items.Count > 0;
         }
 
-        public Dictionary<int, int> ReadCurrencies(string currencies)
+        public List<CharacterCurrency> ReadCurrencies(string currencies)
         {
             Currencies.Clear();
             string[] splitSets = currencies.Split(';');
@@ -45,7 +45,7 @@ namespace MultiplayerARPG
                 string[] splitData = set.Split(':');
                 if (splitData.Length != 2)
                     continue;
-                Currencies[int.Parse(splitData[0])] = int.Parse(splitData[1]);
+                Currencies.Add(CharacterCurrency.Create(int.Parse(splitData[0]), int.Parse(splitData[1])));
             }
             return Currencies;
         }
@@ -53,9 +53,9 @@ namespace MultiplayerARPG
         public string WriteCurrencies()
         {
             string result = string.Empty;
-            foreach (KeyValuePair<int, int> keyValue in Currencies)
+            foreach (CharacterCurrency currency in Currencies)
             {
-                result += $"{keyValue.Key}:{keyValue.Value};";
+                result += $"{currency.dataId}:{currency.amount};";
             }
             return result;
         }

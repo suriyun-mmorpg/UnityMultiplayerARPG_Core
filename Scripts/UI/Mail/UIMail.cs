@@ -160,17 +160,9 @@ namespace MultiplayerARPG
 
             if (uiCurrencies != null)
             {
-                List<CharacterCurrency> increasingCurrencies = new List<CharacterCurrency>();
-                if (mail != null)
+                if (mail != null && mail.Currencies.Count > 0)
                 {
-                    foreach (KeyValuePair<int, int> mailCurrency in mail.Currencies)
-                    {
-                        increasingCurrencies.Add(CharacterCurrency.Create(mailCurrency.Key, amount: mailCurrency.Value));
-                    }
-                }
-                if (increasingCurrencies.Count > 0)
-                {
-                    uiCurrencies.UpdateData(GameInstance.PlayingCharacter, increasingCurrencies);
+                    uiCurrencies.UpdateData(GameInstance.PlayingCharacter, mail.Currencies);
                     uiCurrencies.Show();
                 }
                 else

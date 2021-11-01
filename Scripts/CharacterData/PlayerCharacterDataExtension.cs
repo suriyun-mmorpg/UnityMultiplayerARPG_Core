@@ -913,6 +913,16 @@ namespace MultiplayerARPG
             }
         }
 
+        public static void IncreaseCurrencies(this IPlayerCharacterData character, IEnumerable<CharacterCurrency> currencies, float multiplier = 1)
+        {
+            if (currencies == null)
+                return;
+            foreach (CharacterCurrency currency in currencies)
+            {
+                character.IncreaseCurrency(currency.GetCurrency(), Mathf.CeilToInt(currency.amount * multiplier));
+            }
+        }
+
         public static void IncreaseCurrency(this IPlayerCharacterData character, Currency currency, int amount)
         {
             if (currency == null) return;
