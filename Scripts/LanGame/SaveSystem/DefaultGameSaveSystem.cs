@@ -181,7 +181,7 @@ namespace MultiplayerARPG
                     tempBuff = tempSummon.CacheEntity.Buffs[j];
                     summonBuffsSaveData.summonBuffs.Add(new CharacterBuff()
                     {
-                        id = $"{i}_{j}",
+                        id = i + "_" + j,
                         type = tempBuff.type,
                         dataId = tempBuff.dataId,
                         level = tempBuff.level,

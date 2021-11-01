@@ -241,7 +241,7 @@ namespace MultiplayerARPG
             return true;
         }
 
-        private void SpawnPlayerCharacter(long connectionId, PlayerCharacterData playerCharacterData, List<CharacterBuff> playerSummonBuffs)
+        private void SpawnPlayerCharacter(long connectionId, PlayerCharacterData playerCharacterData, List<CharacterBuff> summonBuffs)
         {
             BasePlayerCharacterEntity entityPrefab = playerCharacterData.GetEntityPrefab() as BasePlayerCharacterEntity;
             // If it is not allow this character data, disconnect user
@@ -283,12 +283,12 @@ namespace MultiplayerARPG
             {
                 CharacterSummon summon = playerCharacterEntity.Summons[i];
                 summon.Summon(playerCharacterEntity, summon.Level, summon.summonRemainsDuration, summon.Exp, summon.CurrentHp, summon.CurrentMp);
-                for (int j = 0; j < playerSummonBuffs.Count; ++j)
+                for (int j = 0; j < summonBuffs.Count; ++j)
                 {
-                    if (playerSummonBuffs[j].id.StartsWith(i.ToString()))
+                    if (summonBuffs[j].id.StartsWith(i.ToString()))
                     {
-                        summon.CacheEntity.Buffs.Add(playerSummonBuffs[j]);
-                        playerSummonBuffs.RemoveAt(j);
+                        summon.CacheEntity.Buffs.Add(summonBuffs[j]);
+                        summonBuffs.RemoveAt(j);
                         j--;
                     }
                 }
