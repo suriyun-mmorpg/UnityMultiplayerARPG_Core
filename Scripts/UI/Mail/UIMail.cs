@@ -181,17 +181,9 @@ namespace MultiplayerARPG
 
             if (uiItems != null)
             {
-                List<CharacterItem> increasingItems = new List<CharacterItem>();
-                if (mail != null)
+                if (mail != null && mail.Items.Count > 0)
                 {
-                    foreach (KeyValuePair<int, short> mailItem in mail.Items)
-                    {
-                        increasingItems.Add(CharacterItem.Create(mailItem.Key, amount: mailItem.Value));
-                    }
-                }
-                if (increasingItems.Count > 0)
-                {
-                    uiItems.UpdateData(GameInstance.PlayingCharacter, increasingItems);
+                    uiItems.UpdateData(GameInstance.PlayingCharacter, mail.Items);
                     uiItems.Show();
                 }
                 else

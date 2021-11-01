@@ -1,5 +1,6 @@
 ﻿using LiteNetLib.Utils;
 using System.Collections.Generic;
+using System.Text;
 
 namespace MultiplayerARPG
 {
@@ -16,7 +17,7 @@ namespace MultiplayerARPG
         public int Gold { get; set; }
         public int Cash { get; set; }
         public Dictionary<int, int> Currencies { get; } = new Dictionary<int, int>();
-        public Dictionary<int, short> Items { get; } = new Dictionary<int, short>();
+        public List<CharacterItem> Items { get; } = new List<CharacterItem>();
         public bool IsRead { get; set; }
         public long ReadTimestamp { get; set; }
         public bool IsClaim { get; set; }
@@ -24,6 +25,9 @@ namespace MultiplayerARPG
         public bool IsDelete { get; set; }
         public long DeleteTimestamp { get; set; }
         public long SentTimestamp { get; set; }
+
+        [System.NonSerialized]
+        private readonly StringBuilder stringBuilder = new StringBuilder();
 
         public bool HaveItemsToClaim()
         {
@@ -56,7 +60,7 @@ namespace MultiplayerARPG
             return result;
         }
 
-        public Dictionary<int, short> ReadItems(string items)
+        public List<CharacterItem> ReadItems(string items)
         {
             Items.Clear();
             string[] splitSets = items.Split(';');
@@ -65,21 +69,73 @@ namespace MultiplayerARPG
                 if (string.IsNullOrEmpty(set))
                     continue;
                 string[] splitData = set.Split(':');
-                if (splitData.Length != 2)
+
+                int dataId;
+                if (splitData.Length < 1 || !int.TryParse(splitData[0], out dataId))
                     continue;
-                Items[int.Parse(splitData[0])] = short.Parse(splitData[1]);
+
+                short amount;
+                if (splitData.Length < 2 || !short.TryParse(splitData[1], out amount))
+                    amount = 1;
+
+                short level;
+                if (splitData.Length < 3 || !short.TryParse(splitData[2], out level))
+                    level = 1;
+
+                float durability;
+                if (splitData.Length < 4 || !float.TryParse(splitData[3], out durability))
+                    durability = 0f;
+
+                int exp;
+                if (splitData.Length < 5 || !int.TryParse(splitData[4], out exp))
+                    exp = 0;
+
+                float lockRemainsDuration;
+                if (splitData.Length < 6 || !float.TryParse(splitData[5], out lockRemainsDuration))
+                    lockRemainsDuration = 0f;
+
+                long expireTime;
+                if (splitData.Length < 7 || !long.TryParse(splitData[6], out expireTime))
+                    expireTime = 0;
+
+                byte randomSeed;
+                if (splitData.Length < 8 || !byte.TryParse(splitData[7], out randomSeed))
+                    randomSeed = 0;
+
+                string sockets;
+                if (splitData.Length < 9)
+                    sockets = "";
+                else
+                    sockets = splitData[8];
+
+                CharacterItem characterItem = CharacterItem.Create(dataId, level, amount);
+                characterItem.durability = durability;
+                characterItem.exp = exp;
+                characterItem.lockRemainsDuration = lockRemainsDuration;
+                characterItem.expireTime = expireTime;
+                characterItem.randomSeed = randomSeed;
+                characterItem.ReadSockets(sockets, '|');
+                Items[dataId] = characterItem;
             }
             return Items;
         }
 
         public string WriteItems()
         {
-            string result = string.Empty;
-            foreach (KeyValuePair<int, short> keyValue in Items)
+            stringBuilder.Clear();
+            foreach (CharacterItem item in Items)
             {
-                result += $"{keyValue.Key}:{keyValue.Value};";
+                stringBuilder.Append(item.dataId).Append(':');
+                stringBuilder.Append(item.amount).Append(':');
+                stringBuilder.Append(item.level).Append(':');
+                stringBuilder.Append(item.durability.ToString("N2")).Append(':');
+                stringBuilder.Append(item.exp).Append(':');
+                stringBuilder.Append(item.lockRemainsDuration.ToString("N2")).Append(':');
+                stringBuilder.Append(item.expireTime).Append(':');
+                stringBuilder.Append(item.randomSeed).Append(':');
+                stringBuilder.Append(item.WriteSockets('|')).Append(';');
             }
-            return result;
+            return stringBuilder.ToString();
         }
 
         public void Serialize(NetDataWriter writer)

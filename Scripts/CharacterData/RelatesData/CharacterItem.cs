@@ -531,10 +531,10 @@ namespace MultiplayerARPG
             return Create(0, 1, 0);
         }
 
-        public List<int> ReadSockets(string sockets)
+        public List<int> ReadSockets(string sockets, char separator = ';')
         {
             Sockets.Clear();
-            string[] splitTexts = sockets.Split(';');
+            string[] splitTexts = sockets.Split(separator);
             foreach (string text in splitTexts)
             {
                 if (string.IsNullOrEmpty(text))
@@ -544,14 +544,14 @@ namespace MultiplayerARPG
             return Sockets;
         }
 
-        public string WriteSockets()
+        public string WriteSockets(char separator = ';')
         {
             stringBuilder.Clear();
             foreach (int socket in Sockets)
             {
                 stringBuilder
                     .Append(socket)
-                    .Append(';');
+                    .Append(separator);
             }
             return stringBuilder.ToString();
         }
