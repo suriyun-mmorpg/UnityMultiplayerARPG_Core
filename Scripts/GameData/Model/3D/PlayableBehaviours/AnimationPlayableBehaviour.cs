@@ -446,6 +446,12 @@ namespace MultiplayerARPG.GameData.Model.Playables
             if (playingActionState == PlayingActionState.None)
                 return;
 
+            if (CharacterModel.isDead && playingActionState != PlayingActionState.Stopping)
+            {
+                // Character dead, stop action animation
+                playingActionState = PlayingActionState.Stopping;
+            }
+
             // Update freezing state
             ActionLayerMixer.GetInput(0).SetSpeed(IsFreeze ? 0 : actionLayerClipSpeed);
 
@@ -501,7 +507,7 @@ namespace MultiplayerARPG.GameData.Model.Playables
 
         public void PlayAction(ActionState actionState, float speedRate, float duration = 0f)
         {
-            if (IsFreeze)
+            if (IsFreeze || CharacterModel.isDead)
                 return;
 
             // Destroy playing state
