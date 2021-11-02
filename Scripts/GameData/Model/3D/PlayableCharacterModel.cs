@@ -402,7 +402,10 @@ namespace MultiplayerARPG.GameData.Model.Playables
         protected Coroutine StartedActionCoroutine(Coroutine coroutine)
         {
             StopActionCoroutine();
+            if (actionCoroutine != null)
+                StopCoroutine(actionCoroutine);
             actionCoroutine = coroutine;
+            isDoingAction = true;
             return actionCoroutine;
         }
 
