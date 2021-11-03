@@ -27,6 +27,8 @@ namespace MultiplayerARPG
         public float airborneDelay = 0.01f;
         public bool doNotChangeVelocityWhileAirborne;
         public float landedPauseMovementDuration = 0f;
+        public float beforeCrawlingPauseMovementDuration = 0f;
+        public float afterCrawlingPauseMovementDuration = 0f;
         [Range(0.1f, 1f)]
         public float underWaterThreshold = 0.75f;
         public bool autoSwimToSurface;
@@ -110,6 +112,7 @@ namespace MultiplayerARPG
         protected float pauseMovementCountDown;
         protected bool previouslyGrounded;
         protected bool previouslyAirborne;
+        protected ExtraMovementState previouslyExtraMovementState;
 
         public override void EntityAwake()
         {
@@ -503,6 +506,14 @@ namespace MultiplayerARPG
             {
                 pauseMovementCountDown = landedPauseMovementDuration;
             }
+            else if (isGrounded && previouslyExtraMovementState != ExtraMovementState.IsCrawling && tempExtraMovementState == ExtraMovementState.IsCrawling)
+            {
+                pauseMovementCountDown = beforeCrawlingPauseMovementDuration;
+            }
+            else if (isGrounded && previouslyExtraMovementState == ExtraMovementState.IsCrawling && tempExtraMovementState != ExtraMovementState.IsCrawling)
+            {
+                pauseMovementCountDown = afterCrawlingPauseMovementDuration;
+            }
             else if (isAirborne && doNotChangeVelocityWhileAirborne)
             {
                 tempMoveVelocity = velocityBeforeAirborne;
@@ -585,6 +596,7 @@ namespace MultiplayerARPG
             acceptedJump = false;
             previouslyGrounded = isGrounded;
             previouslyAirborne = isAirborne;
+            previouslyExtraMovementState = tempExtraMovementState;
         }
 
         private void UpdateRotation()
