@@ -198,7 +198,7 @@ namespace MultiplayerARPG
                 result.AppendFormat(
                     LanguageManager.GetText(formatKeyAttributeAmount),
                     entry.attribute.Title,
-                    entry.amount.ToBonusString());
+                    entry.amount.ToBonusString("N0"));
             }
             foreach (AttributeAmount entry in equipmentBonus.attributesRate)
             {
@@ -209,7 +209,7 @@ namespace MultiplayerARPG
                 result.AppendFormat(
                     LanguageManager.GetText(formatKeyAttributeAmountRate),
                     entry.attribute.Title,
-                    (entry.amount * 100).ToBonusString());
+                    (entry.amount * 100).ToBonusString("N2"));
             }
 
             DamageElement tempElement;
@@ -224,7 +224,7 @@ namespace MultiplayerARPG
                 result.AppendFormat(
                     LanguageManager.GetText(formatKeyResistanceAmount),
                     tempElement.Title,
-                    (entry.amount * 100).ToBonusString());
+                    (entry.amount * 100).ToBonusString("N2"));
             }
 
             // Damages
@@ -238,7 +238,7 @@ namespace MultiplayerARPG
                 result.AppendFormat(
                     LanguageManager.GetText(formatKeyDamageAmount),
                     tempElement.Title,
-                    entry.amount.min.ToBonusString(),
+                    entry.amount.min.ToBonusString("N0"),
                     entry.amount.max.ToString("N0"));
             }
 
@@ -253,7 +253,7 @@ namespace MultiplayerARPG
                 result.AppendFormat(
                     LanguageManager.GetText(formatKeyArmorAmount),
                     tempElement.Title,
-                    entry.amount.ToBonusString());
+                    entry.amount.ToBonusString("N0"));
             }
 
             // Skills
@@ -266,7 +266,7 @@ namespace MultiplayerARPG
                 result.AppendFormat(
                     LanguageManager.GetText(formatKeySkillLevel),
                     entry.skill.Title,
-                    entry.level.ToBonusString());
+                    entry.level.ToBonusString("N0"));
             }
 
             return result.ToString();
