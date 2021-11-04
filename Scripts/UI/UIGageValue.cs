@@ -1,6 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.UI;
 
 namespace MultiplayerARPG
@@ -17,6 +15,7 @@ namespace MultiplayerARPG
         public DisplayType displayType = DisplayType.CurrentByMax;
         public TextWrapper textValue;
         public Image imageGage;
+        public Slider sliderGage;
 
         [Header("Min By Max Setting")]
         public UILocaleKeySetting formatCurrentByMax = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_SIMPLE_MIN_BY_MAX);
@@ -36,6 +35,9 @@ namespace MultiplayerARPG
 
             if (imageGage != null)
                 imageGage.gameObject.SetActive(isVisible);
+
+            if (sliderGage != null)
+                sliderGage.gameObject.SetActive(isVisible);
         }
 
         public void Update(int current, int max)
@@ -66,24 +68,12 @@ namespace MultiplayerARPG
 
             if (imageGage != null)
                 imageGage.fillAmount = rate;
-        }
 
-        // TODO: This is temporary use for migrate from old version
-        public static bool Migrate(ref UIGageValue target, ref TextWrapper oldText, ref Image oldGage)
-        {
-            if (oldText == null && oldGage == null)
-                return false;
-
-            target = new UIGageValue()
+            if (sliderGage != null)
             {
-                textValue = oldText,
-                imageGage = oldGage
-            };
-
-            oldText = null;
-            oldGage = null;
-
-            return true;
+                sliderGage.maxValue = max;
+                sliderGage.value = current;
+            }
         }
     }
 }
