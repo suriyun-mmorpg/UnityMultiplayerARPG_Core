@@ -630,7 +630,15 @@ namespace MultiplayerARPG
                     toggleCrouchOn = false;
                 }
             }
-
+            switch (mode)
+            {
+                case ControllerMode.Adventure:
+                    movementState |= GameplayUtils.GetStraightlyMovementStateByDirection(moveDirection, MovementTransform.forward);
+                    break;
+                case ControllerMode.Combat:
+                    movementState |= GameplayUtils.GetMovementStateByDirection(moveDirection, MovementTransform.forward);
+                    break;
+            }
             PlayerCharacterEntity.KeyMovement(moveDirection, movementState);
             PlayerCharacterEntity.SetExtraMovementState(extraMovementState);
             UpdateLookAtTarget();
@@ -878,24 +886,15 @@ namespace MultiplayerARPG
                     pitch -= 360f;
                 moveDirection.y = -pitch / 90f;
             }
-            // Set movement state by inputs
+
+            // Set look direction
             switch (Mode)
             {
                 case ControllerMode.Adventure:
-                    if (normalizedInput.x > 0.5f || normalizedInput.x < -0.5f || normalizedInput.y > 0.5f || normalizedInput.y < -0.5f)
-                        movementState = MovementState.Forward;
                     moveLookDirection = moveDirection;
                     moveLookDirection.y = 0f;
                     break;
                 case ControllerMode.Combat:
-                    if (normalizedInput.x > 0.5f)
-                        movementState |= MovementState.Forward;
-                    else if (normalizedInput.x < -0.5f)
-                        movementState |= MovementState.Backward;
-                    if (normalizedInput.y > 0.5f)
-                        movementState |= MovementState.Right;
-                    else if (normalizedInput.y < -0.5f)
-                        movementState |= MovementState.Left;
                     moveLookDirection = cameraForward;
                     break;
             }

@@ -71,6 +71,66 @@ namespace MultiplayerARPG
             return DirectionType2D.Down;
         }
 
+        public static MovementState GetMovementStateByDirection(Vector3 moveDirection, Vector3 entityForward)
+        {
+            float angle = Vector3.SignedAngle(moveDirection, entityForward, Vector3.up);
+            if (angle >= -30 && angle <= 30)
+            {
+                return MovementState.Forward;
+            }
+            else if (angle >= 30 && angle <= 60)
+            {
+                return MovementState.Forward | MovementState.Left;
+            }
+            else if (angle >= 60 && angle <= 120)
+            {
+                return MovementState.Left;
+            }
+            else if (angle >= 120 && angle <= 150)
+            {
+                return MovementState.Backward | MovementState.Left;
+            }
+            else if (angle >= 150 || angle <= -150)
+            {
+                return MovementState.Backward;
+            }
+            else if (angle <= -120 && angle >= -150)
+            {
+                return MovementState.Backward | MovementState.Right;
+            }
+            else if (angle <= -60 && angle >= -120)
+            {
+                return MovementState.Right;
+            }
+            else if (angle <= -30 && angle >= -60)
+            {
+                return MovementState.Forward | MovementState.Right;
+            }
+            return MovementState.None;
+        }
+
+        public static MovementState GetStraightlyMovementStateByDirection(Vector3 moveDirection, Vector3 entityForward)
+        {
+            float angle = Vector3.SignedAngle(moveDirection, entityForward, Vector3.up);
+            if (angle >= -60 && angle <= 60)
+            {
+                return MovementState.Forward;
+            }
+            else if (angle >= 60 && angle <= 120)
+            {
+                return MovementState.Left;
+            }
+            else if (angle >= 120 || angle <= -120)
+            {
+                return MovementState.Backward;
+            }
+            else if (angle <= -60 && angle >= -120)
+            {
+                return MovementState.Right;
+            }
+            return MovementState.None;
+        }
+
         public static Bounds MakeLocalBoundsByCollider(Transform transform)
         {
             Bounds result = new Bounds();
