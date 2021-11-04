@@ -1,25 +1,19 @@
 ﻿using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.UI;
-#if USE_TEXT_MESH_PRO
 using TMPro;
-#endif
 
 public class InputFieldWrapper : MonoBehaviour
 {
     public InputField unityInputField;
-#if USE_TEXT_MESH_PRO
     public TMP_InputField textMeshInputField;
-#endif
     private string _textValue = null;
     public virtual string text
     {
         get
         {
             if (unityInputField != null) return unityInputField.text;
-#if USE_TEXT_MESH_PRO
             if (textMeshInputField != null) return textMeshInputField.text;
-#endif
             return _textValue;
         }
 
@@ -27,9 +21,7 @@ public class InputFieldWrapper : MonoBehaviour
         {
             _textValue = value;
             if (unityInputField != null) unityInputField.text = value;
-#if USE_TEXT_MESH_PRO
             if (textMeshInputField != null) textMeshInputField.text = value;
-#endif
         }
     }
 
@@ -38,18 +30,14 @@ public class InputFieldWrapper : MonoBehaviour
         get
         {
             if (unityInputField != null) return unityInputField.interactable;
-#if USE_TEXT_MESH_PRO
             if (textMeshInputField != null) return textMeshInputField.interactable;
-#endif
             return false;
         }
 
         set
         {
             if (unityInputField != null) unityInputField.interactable = value;
-#if USE_TEXT_MESH_PRO
             if (textMeshInputField != null) textMeshInputField.interactable = value;
-#endif
         }
     }
 
@@ -58,9 +46,7 @@ public class InputFieldWrapper : MonoBehaviour
         get
         {
             if (unityInputField != null) return unityInputField.multiLine;
-#if USE_TEXT_MESH_PRO
             if (textMeshInputField != null) return textMeshInputField.multiLine;
-#endif
             return false;
         }
     }
@@ -71,9 +57,7 @@ public class InputFieldWrapper : MonoBehaviour
         {
             bool result = false;
             if (unityInputField != null) result = unityInputField.isFocused;
-#if USE_TEXT_MESH_PRO
             if (textMeshInputField != null) result = result || textMeshInputField.isFocused;
-#endif
             return result;
         }
     }
@@ -83,18 +67,14 @@ public class InputFieldWrapper : MonoBehaviour
         get
         {
             if (unityInputField != null) return unityInputField.onValueChanged;
-#if USE_TEXT_MESH_PRO
             if (textMeshInputField != null) return textMeshInputField.onValueChanged;
-#endif
             return null;
         }
 
         set
         {
             if (unityInputField != null) unityInputField.onValueChanged = value as InputField.OnChangeEvent;
-#if USE_TEXT_MESH_PRO
             if (textMeshInputField != null) textMeshInputField.onValueChanged = value as TMP_InputField.OnChangeEvent;
-#endif
         }
     }
 
@@ -103,17 +83,13 @@ public class InputFieldWrapper : MonoBehaviour
         get
         {
             if (unityInputField != null) return unityInputField.characterLimit;
-#if USE_TEXT_MESH_PRO
             if (textMeshInputField != null) return textMeshInputField.characterLimit;
-#endif
             return 0;
         }
         set
         {
             if (unityInputField != null) unityInputField.characterLimit = value;
-#if USE_TEXT_MESH_PRO
             if (textMeshInputField != null) textMeshInputField.characterLimit = value;
-#endif
         }
     }
 
@@ -122,7 +98,6 @@ public class InputFieldWrapper : MonoBehaviour
         get
         {
             if (unityInputField != null) return unityInputField.contentType;
-#if USE_TEXT_MESH_PRO
             if (textMeshInputField != null)
             {
                 switch (textMeshInputField.contentType)
@@ -149,14 +124,12 @@ public class InputFieldWrapper : MonoBehaviour
                         return InputField.ContentType.Custom;
                 }
             }
-#endif
             return InputField.ContentType.Standard;
         }
 
         set
         {
             if (unityInputField != null) unityInputField.contentType = value;
-#if USE_TEXT_MESH_PRO
             if (textMeshInputField != null)
             {
                 switch (value)
@@ -193,7 +166,6 @@ public class InputFieldWrapper : MonoBehaviour
                         break;
                 }
             }
-#endif
         }
     }
 
@@ -202,7 +174,6 @@ public class InputFieldWrapper : MonoBehaviour
         get
         {
             if (unityInputField != null) return unityInputField.inputType;
-#if USE_TEXT_MESH_PRO
             if (textMeshInputField != null)
             {
                 switch (textMeshInputField.inputType)
@@ -215,14 +186,12 @@ public class InputFieldWrapper : MonoBehaviour
                         return InputField.InputType.Password;
                 }
             }
-#endif
             return InputField.InputType.Standard;
         }
 
         set
         {
             if (unityInputField != null) unityInputField.inputType = value;
-#if USE_TEXT_MESH_PRO
             if (textMeshInputField != null)
             {
                 switch (value)
@@ -238,7 +207,6 @@ public class InputFieldWrapper : MonoBehaviour
                         break;
                 }
             }
-#endif
         }
     }
 
@@ -247,7 +215,6 @@ public class InputFieldWrapper : MonoBehaviour
         get
         {
             if (unityInputField != null) return unityInputField.lineType;
-#if USE_TEXT_MESH_PRO
             if (textMeshInputField != null)
             {
                 switch (textMeshInputField.lineType)
@@ -260,14 +227,12 @@ public class InputFieldWrapper : MonoBehaviour
                         return InputField.LineType.MultiLineNewline;
                 }
             }
-#endif
             return InputField.LineType.SingleLine;
         }
 
         set
         {
             if (unityInputField != null) unityInputField.lineType = value;
-#if USE_TEXT_MESH_PRO
             if (textMeshInputField != null)
             {
                 switch (value)
@@ -283,16 +248,13 @@ public class InputFieldWrapper : MonoBehaviour
                         break;
                 }
             }
-#endif
         }
     }
 
     void Awake()
     {
         if (unityInputField == null) unityInputField = GetComponent<InputField>();
-#if USE_TEXT_MESH_PRO
         if (textMeshInputField == null) textMeshInputField = GetComponent<TMP_InputField>();
-#endif
         if (_textValue != null)
             text = _textValue;
     }
@@ -301,51 +263,39 @@ public class InputFieldWrapper : MonoBehaviour
     {
         if (unityInputField != null)
             unityInputField.gameObject.SetActive(isActive);
-#if USE_TEXT_MESH_PRO
         if (textMeshInputField != null)
             textMeshInputField.gameObject.SetActive(isActive);
-#endif
         gameObject.SetActive(isActive);
     }
 
     public void DeactivateInputField()
     {
         if (unityInputField != null) unityInputField.DeactivateInputField();
-#if USE_TEXT_MESH_PRO
         if (textMeshInputField != null) textMeshInputField.DeactivateInputField();
-#endif
     }
 
     public void Select()
     {
         if (unityInputField != null) unityInputField.Select();
-#if USE_TEXT_MESH_PRO
         if (textMeshInputField != null) textMeshInputField.Select();
-#endif
     }
 
     public void ActivateInputField()
     {
         if (unityInputField != null) unityInputField.ActivateInputField();
-#if USE_TEXT_MESH_PRO
         if (textMeshInputField != null) textMeshInputField.ActivateInputField();
-#endif
     }
 
     public void MoveTextStart(bool shift)
     {
         if (unityInputField != null) unityInputField.MoveTextStart(shift);
-#if USE_TEXT_MESH_PRO
         if (textMeshInputField != null) textMeshInputField.MoveTextStart(shift);
-#endif
     }
 
     public void MoveTextEnd(bool shift)
     {
         if (unityInputField != null) unityInputField.MoveTextEnd(shift);
-#if USE_TEXT_MESH_PRO
         if (textMeshInputField != null) textMeshInputField.MoveTextEnd(shift);
-#endif
     }
 
     [ContextMenu("Set Attached Input Field Component To Field")]
@@ -354,12 +304,9 @@ public class InputFieldWrapper : MonoBehaviour
         unityInputField = GetComponent<InputField>();
     }
 
-
-#if USE_TEXT_MESH_PRO
     [ContextMenu("Set Attached Text Mesh Input Field Component To Field")]
     public void SetAttachedTextMeshInputFieldComponentToField()
     {
         textMeshInputField = GetComponent<TMP_InputField>();
     }
-#endif
 }

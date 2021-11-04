@@ -2,16 +2,12 @@
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.UI;
-#if USE_TEXT_MESH_PRO
 using TMPro;
-#endif
 
 public class DropdownWrapper : MonoBehaviour
 {
     public Dropdown unityDropdown;
-#if USE_TEXT_MESH_PRO
     public TMP_Dropdown textMeshDropdown;
-#endif
 
     public bool interactable
     {
@@ -19,10 +15,8 @@ public class DropdownWrapper : MonoBehaviour
         {
             if (unityDropdown != null)
                 return unityDropdown.interactable;
-#if USE_TEXT_MESH_PRO
             if (textMeshDropdown != null)
                 return textMeshDropdown.interactable;
-#endif
             return false;
         }
     }
@@ -33,10 +27,8 @@ public class DropdownWrapper : MonoBehaviour
         {
             if (unityDropdown != null)
                 return unityDropdown.value;
-#if USE_TEXT_MESH_PRO
             if (textMeshDropdown != null)
                 return textMeshDropdown.value;
-#endif
             return 0;
         }
 
@@ -44,10 +36,8 @@ public class DropdownWrapper : MonoBehaviour
         {
             if (unityDropdown != null)
                 unityDropdown.value = value;
-#if USE_TEXT_MESH_PRO
             if (textMeshDropdown != null)
                 textMeshDropdown.value = value;
-#endif
         }
     }
 
@@ -66,7 +56,6 @@ public class DropdownWrapper : MonoBehaviour
                 }
                 return options;
             }
-#if USE_TEXT_MESH_PRO
             if (textMeshDropdown != null)
             {
                 if (textMeshDropdown.options == null)
@@ -78,7 +67,6 @@ public class DropdownWrapper : MonoBehaviour
                 }
                 return options;
             }
-#endif
             return null;
         }
 
@@ -98,7 +86,6 @@ public class DropdownWrapper : MonoBehaviour
                     unityDropdown.options = options;
                 }
             }
-#if USE_TEXT_MESH_PRO
             if (textMeshDropdown != null)
             {
                 if (value == null)
@@ -113,7 +100,6 @@ public class DropdownWrapper : MonoBehaviour
                     textMeshDropdown.options = options;
                 }
             }
-#endif
         }
     }
 
@@ -122,37 +108,29 @@ public class DropdownWrapper : MonoBehaviour
         get
         {
             if (unityDropdown != null) return unityDropdown.onValueChanged;
-#if USE_TEXT_MESH_PRO
             if (textMeshDropdown != null) return textMeshDropdown.onValueChanged;
-#endif
             return null;
         }
 
         set
         {
             if (unityDropdown != null) unityDropdown.onValueChanged = value as Dropdown.DropdownEvent;
-#if USE_TEXT_MESH_PRO
             if (textMeshDropdown != null) textMeshDropdown.onValueChanged = value as TMP_Dropdown.DropdownEvent;
-#endif
         }
     }
 
     void Awake()
     {
         if (unityDropdown == null) unityDropdown = GetComponent<Dropdown>();
-#if USE_TEXT_MESH_PRO
         if (textMeshDropdown == null) textMeshDropdown = GetComponent<TMP_Dropdown>();
-#endif
     }
 
     public void SetGameObjectActive(bool isActive)
     {
         if (unityDropdown != null)
             unityDropdown.gameObject.SetActive(isActive);
-#if USE_TEXT_MESH_PRO
         if (textMeshDropdown != null)
             textMeshDropdown.gameObject.SetActive(isActive);
-#endif
         gameObject.SetActive(isActive);
     }
 
@@ -162,14 +140,11 @@ public class DropdownWrapper : MonoBehaviour
         unityDropdown = GetComponent<Dropdown>();
     }
 
-
-#if USE_TEXT_MESH_PRO
     [ContextMenu("Set Attached Text Mesh Dropdown Component To Field")]
     public void SetAttachedTextMeshDropdownComponentToField()
     {
         textMeshDropdown = GetComponent<TMP_Dropdown>();
     }
-#endif
 
     public class OptionData
     {

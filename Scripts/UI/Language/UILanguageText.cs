@@ -1,8 +1,6 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
-#if USE_TEXT_MESH_PRO
 using TMPro;
-#endif
 
 namespace MultiplayerARPG
 {
@@ -23,7 +21,6 @@ namespace MultiplayerARPG
             }
         }
 
-#if USE_TEXT_MESH_PRO
         private TextMeshProUGUI textMeshText;
         public TextMeshProUGUI TextMeshText
         {
@@ -34,7 +31,6 @@ namespace MultiplayerARPG
                 return textMeshText;
             }
         }
-#endif
 
         private string languageKey;
 
@@ -46,16 +42,12 @@ namespace MultiplayerARPG
                 if (LanguageManager.Texts.TryGetValue(dataKey, out text))
                 {
                     UnityText.text = text;
-#if USE_TEXT_MESH_PRO
                     TextMeshText.text = text;
-#endif
                 }
                 else
                 {
                     UnityText.text = defaultText;
-#if USE_TEXT_MESH_PRO
                     TextMeshText.text = defaultText;
-#endif
                 }
                 languageKey = LanguageManager.CurrentLanguageKey;
             }
@@ -64,9 +56,7 @@ namespace MultiplayerARPG
         void OnValidate()
         {
             UnityText.text = defaultText;
-#if USE_TEXT_MESH_PRO
             TextMeshText.text = defaultText;
-#endif
         }
     }
 }

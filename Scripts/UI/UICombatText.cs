@@ -1,10 +1,6 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.UI;
-#if USE_TEXT_MESH_PRO
 using TMPro;
-#endif
 
 namespace MultiplayerARPG
 {
@@ -48,9 +44,7 @@ namespace MultiplayerARPG
             CacheText = gameObject.GetOrAddComponent<TextWrapper>((comp) =>
             {
                 comp.unityText = GetComponent<Text>();
-#if USE_TEXT_MESH_PRO
                 comp.textMeshText = GetComponent<TextMeshProUGUI>();
-#endif
             });
             AlreadyCachedComponents = true;
         }

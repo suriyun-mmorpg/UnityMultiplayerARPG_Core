@@ -6,23 +6,18 @@ using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 using System.Linq;
 using UnityEngine.Networking;
-#if USE_TEXT_MESH_PRO
 using TMPro;
-#endif
 
 public static class GenericUtils
 {
     private static List<InputField> inputFields;
-#if USE_TEXT_MESH_PRO
     private static List<TMP_InputField> textMeshInputFields;
-#endif
     private static bool isSetOnActiveSceneChanged_ResetInputField;
     private static System.Random randomizer = new System.Random();
 
     public static bool IsFocusInputField()
     {
         GameObject[] rootObjects;
-#if USE_TEXT_MESH_PRO
         if (inputFields == null || textMeshInputFields == null)
         {
             inputFields = new List<InputField>();
@@ -34,30 +29,16 @@ public static class GenericUtils
                 textMeshInputFields.AddRange(rootObject.GetComponentsInChildren<TMP_InputField>(true));
             }
         }
-#else
-        if (inputFields == null)
-        {
-            inputFields = new List<InputField>();
-            rootObjects = SceneManager.GetActiveScene().GetRootGameObjects();
-            foreach (GameObject rootObject in rootObjects)
-            {
-                inputFields.AddRange(rootObject.GetComponentsInChildren<InputField>(true));
-            }
-        }
-#endif
-
         foreach (InputField inputField in inputFields)
         {
             if (inputField.isFocused)
                 return true;
         }
-#if USE_TEXT_MESH_PRO
         foreach (TMP_InputField inputField in textMeshInputFields)
         {
             if (inputField.isFocused)
                 return true;
         }
-#endif
         if (!isSetOnActiveSceneChanged_ResetInputField)
         {
             SceneManager.activeSceneChanged += OnActiveSceneChanged_ResetInputField;
@@ -69,9 +50,7 @@ public static class GenericUtils
     public static void OnActiveSceneChanged_ResetInputField(Scene scene1, Scene scene2)
     {
         inputFields = null;
-#if USE_TEXT_MESH_PRO
         textMeshInputFields = null;
-#endif
     }
 
     public static void SetLayerRecursively(this GameObject gameObject, int layerIndex, bool includeInactive)

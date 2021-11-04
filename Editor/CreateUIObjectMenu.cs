@@ -4,9 +4,7 @@ using UnityEngine.EventSystems;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 using UnityEditor.Experimental.SceneManagement;
-#if USE_TEXT_MESH_PRO
 using TMPro;
-#endif
 
 namespace UnityEditor.UI
 {
@@ -38,7 +36,6 @@ namespace UnityEditor.UI
             return s_StandardResources;
         }
 
-#if USE_TEXT_MESH_PRO
         private static TMP_DefaultControls.Resources s_TMPStandardResources;
 
         private static TMP_DefaultControls.Resources GetTMPStandardResources()
@@ -55,7 +52,6 @@ namespace UnityEditor.UI
             }
             return s_TMPStandardResources;
         }
-#endif
 
         private static void SetPositionVisibleinSceneView(RectTransform canvasRTransform, RectTransform itemTransform)
         {
@@ -158,8 +154,6 @@ namespace UnityEditor.UI
             PlaceUIElementRoot(go, menuCommand);
         }
 
-
-#if USE_TEXT_MESH_PRO
         [MenuItem("GameObject/UI/Wrappers/Text Wrapper - Text Mesh Pro", false)]
         public static void CreateTextWrapperTextMeshPro(MenuCommand menuCommand)
         {
@@ -168,7 +162,6 @@ namespace UnityEditor.UI
             wrapper.textMeshText = go.GetComponent<TextMeshProUGUI>();
             PlaceUIElementRoot(go, menuCommand);
         }
-#endif
 
         [MenuItem("GameObject/UI/Wrappers/Dropdown Wrapper", false)]
         public static void CreateDropdownWrapper(MenuCommand menuCommand)
@@ -179,7 +172,6 @@ namespace UnityEditor.UI
             PlaceUIElementRoot(go, menuCommand);
         }
 
-#if USE_TEXT_MESH_PRO
         [MenuItem("GameObject/UI/Wrappers/Dropdown Wrapper - Text Mesh Pro", false)]
         public static void CreateDropdownWrapperTextMeshPro(MenuCommand menuCommand)
         {
@@ -188,7 +180,6 @@ namespace UnityEditor.UI
             wrapper.textMeshDropdown = go.GetComponent<TMP_Dropdown>();
             PlaceUIElementRoot(go, menuCommand);
         }
-#endif
 
         [MenuItem("GameObject/UI/Wrappers/InputField Wrapper", false)]
         public static void CreateInputFieldWrapper(MenuCommand menuCommand)
@@ -199,7 +190,6 @@ namespace UnityEditor.UI
             PlaceUIElementRoot(go, menuCommand);
         }
 
-#if USE_TEXT_MESH_PRO
         [MenuItem("GameObject/UI/Wrappers/InputField Wrapper - Text Mesh Pro", false)]
         public static void CreateInputFieldWrapperTextMeshPro(MenuCommand menuCommand)
         {
@@ -208,7 +198,6 @@ namespace UnityEditor.UI
             wrapper.textMeshInputField = go.GetComponent<TMP_InputField>();
             PlaceUIElementRoot(go, menuCommand);
         }
-#endif
 
         // Helper methods
         public static GameObject CreateNewUI()
