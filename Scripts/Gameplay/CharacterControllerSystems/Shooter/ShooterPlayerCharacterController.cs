@@ -340,6 +340,7 @@ namespace MultiplayerARPG
         protected bool mustReleaseFireKey;
         protected float buildYRotate;
         protected byte pauseFireInputFrames;
+        protected bool activatingEntityOrDoAction;
 
         protected override void Awake()
         {
@@ -576,6 +577,7 @@ namespace MultiplayerARPG
             // Update aim position
             PlayerCharacterEntity.AimPosition = PlayerCharacterEntity.GetAttackAimPosition(ref isLeftHandAttacking, aimTargetPosition);
 
+            activatingEntityOrDoAction = false;
             // Update input
             if (!updatingInputs)
             {
@@ -633,7 +635,10 @@ namespace MultiplayerARPG
             switch (mode)
             {
                 case ControllerMode.Adventure:
-                    movementState |= GameplayUtils.GetStraightlyMovementStateByDirection(moveDirection, MovementTransform.forward);
+                    if (activatingEntityOrDoAction)
+                        movementState |= GameplayUtils.GetMovementStateByDirection(moveDirection, MovementTransform.forward);
+                    else
+                        movementState |= MovementState.Forward;
                     break;
                 case ControllerMode.Combat:
                     movementState |= GameplayUtils.GetMovementStateByDirection(moveDirection, MovementTransform.forward);
@@ -945,7 +950,6 @@ namespace MultiplayerARPG
             if (PlayerCharacterEntity.IsPlayingAttackOrUseSkillAnimation())
                 lastPlayingAttackOrUseSkillAnimationTime = Time.unscaledTime;
             bool anyKeyPressed = false;
-            bool activatingEntityOrDoAction = false;
             if (queueUsingSkill.skill != null ||
                 tempPressAttackRight ||
                 tempPressAttackLeft ||
