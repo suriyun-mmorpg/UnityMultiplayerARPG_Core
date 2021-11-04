@@ -338,10 +338,10 @@ namespace MultiplayerARPG
                     BaseItem targetItem = null;
                     foreach (BaseItem item in GameInstance.Items.Values)
                     {
-                        if (item.name.Equals(data[1]) ||
-                            item.name.Replace(' ', '_').Equals(data[1]) ||
-                            item.Id.Equals(data[1]) ||
-                            item.Id.Replace(' ', '_').Equals(data[1]))
+                        if (item.name.Equals(data[2]) ||
+                            item.name.Replace(' ', '_').Equals(data[2]) ||
+                            item.Id.Equals(data[2]) ||
+                            item.Id.Replace(' ', '_').Equals(data[2]))
                         {
                             targetItem = item;
                             break;
