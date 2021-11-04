@@ -703,6 +703,11 @@ namespace MultiplayerARPG
             return true;
         }
 
+        public bool CanDoNextAction()
+        {
+            return Time.unscaledTime - lastActionTime >= ACTION_DELAY;
+        }
+
         public void ClearActionStates()
         {
             AttackComponent.ClearAttackStates();

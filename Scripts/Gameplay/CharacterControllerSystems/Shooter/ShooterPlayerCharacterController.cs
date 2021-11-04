@@ -341,6 +341,7 @@ namespace MultiplayerARPG
         protected float buildYRotate;
         protected byte pauseFireInputFrames;
         protected bool activatingEntityOrDoAction;
+        protected bool isCharging;
 
         protected override void Awake()
         {
@@ -632,17 +633,20 @@ namespace MultiplayerARPG
                     toggleCrouchOn = false;
                 }
             }
-            switch (mode)
+            if (moveDirection.magnitude > 0f)
             {
-                case ControllerMode.Adventure:
-                    if (activatingEntityOrDoAction)
+                switch (mode)
+                {
+                    case ControllerMode.Adventure:
+                        if (activatingEntityOrDoAction)
+                            movementState |= GameplayUtils.GetMovementStateByDirection(moveDirection, MovementTransform.forward);
+                        else
+                            movementState |= MovementState.Forward;
+                        break;
+                    case ControllerMode.Combat:
                         movementState |= GameplayUtils.GetMovementStateByDirection(moveDirection, MovementTransform.forward);
-                    else
-                        movementState |= MovementState.Forward;
-                    break;
-                case ControllerMode.Combat:
-                    movementState |= GameplayUtils.GetMovementStateByDirection(moveDirection, MovementTransform.forward);
-                    break;
+                        break;
+                }
             }
             PlayerCharacterEntity.KeyMovement(moveDirection, movementState);
             PlayerCharacterEntity.SetExtraMovementState(extraMovementState);
@@ -917,40 +921,66 @@ namespace MultiplayerARPG
         protected virtual async UniTaskVoid UpdateInputs_BattleMode()
         {
             updatingInputs = true;
+            // Prepare fire type data
             FireType rightHandFireType = FireType.SingleFire;
-            FireType leftHandFireType = FireType.SingleFire;
             if (rightHandWeapon != null)
+            {
                 rightHandFireType = rightHandWeapon.FireType;
+            }
+            // Prepare fire type data
+            FireType leftHandFireType = FireType.SingleFire;
             if (leftHandWeapon != null)
+            {
                 leftHandFireType = leftHandWeapon.FireType;
+            }
+            // Set last playing attack or use skill animation time, use it as delay before turn to move direction
+            if (PlayerCharacterEntity.IsPlayingAttackOrUseSkillAnimation() || isCharging)
+            {
+                lastPlayingAttackOrUseSkillAnimationTime = Time.unscaledTime;
+            }
             // Have to release fire key, then check press fire key later on next frame
             if (mustReleaseFireKey)
             {
                 tempPressAttackRight = false;
                 tempPressAttackLeft = false;
+                // If release fire key while charging, attack
                 if (!isLeftHandAttacking &&
                     (GetPrimaryAttackButtonUp() ||
                     !GetPrimaryAttackButton()))
                 {
                     mustReleaseFireKey = false;
+                    activatingEntityOrDoAction = true;
+                    while (!SetTargetLookDirectionWhileDoingAction())
+                    {
+                        await UniTask.Yield();
+                    }
+                    UpdateLookAtTarget();
                     // Button released, start attacking while fire type is fire on release
                     if (rightHandFireType == FireType.FireOnRelease)
                         Attack(isLeftHandAttacking);
+                    isCharging = false;
                 }
+                // If release fire key while charging, attack
                 if (isLeftHandAttacking &&
                     (GetSecondaryAttackButtonUp() ||
                     !GetSecondaryAttackButton()))
                 {
                     mustReleaseFireKey = false;
+                    activatingEntityOrDoAction = true;
+                    while (!SetTargetLookDirectionWhileDoingAction())
+                    {
+                        await UniTask.Yield();
+                    }
+                    UpdateLookAtTarget();
                     // Button released, start attacking while fire type is fire on release
                     if (leftHandFireType == FireType.FireOnRelease)
                         Attack(isLeftHandAttacking);
+                    isCharging = false;
                 }
             }
-            if (PlayerCharacterEntity.IsPlayingAttackOrUseSkillAnimation())
-                lastPlayingAttackOrUseSkillAnimationTime = Time.unscaledTime;
             bool anyKeyPressed = false;
-            if (queueUsingSkill.skill != null ||
+            if (isCharging ||
+                queueUsingSkill.skill != null ||
                 tempPressAttackRight ||
                 tempPressAttackLeft ||
                 activateInput.IsPress ||
@@ -1025,13 +1055,14 @@ namespace MultiplayerARPG
                 }
 
                 // Update look direction
-                if (PlayerCharacterEntity.IsPlayingAttackOrUseSkillAnimation())
+                if (PlayerCharacterEntity.IsPlayingAttackOrUseSkillAnimation() || isCharging)
                 {
                     activatingEntityOrDoAction = true;
                     while (!SetTargetLookDirectionWhileDoingAction())
                     {
                         await UniTask.Yield();
                     }
+                    UpdateLookAtTarget();
                 }
                 else if (queueUsingSkill.skill != null)
                 {
@@ -1055,17 +1086,29 @@ namespace MultiplayerARPG
                     {
                         // Fire on release weapons have to release to fire, so when start holding, play weapon charge animation
                         if (rightHandFireType == FireType.FireOnRelease)
+                        {
+                            isCharging = true;
                             WeaponCharge(isLeftHandAttacking);
+                        }
                         else
+                        {
+                            isCharging = false;
                             Attack(isLeftHandAttacking);
+                        }
                     }
                     else
                     {
                         // Fire on release weapons have to release to fire, so when start holding, play weapon charge animation
                         if (leftHandFireType == FireType.FireOnRelease)
+                        {
+                            isCharging = true;
                             WeaponCharge(isLeftHandAttacking);
+                        }
                         else
+                        {
+                            isCharging = false;
                             Attack(isLeftHandAttacking);
+                        }
                     }
                 }
                 else if (activateInput.IsHold && activatingEntityOrDoAction)
@@ -1150,7 +1193,7 @@ namespace MultiplayerARPG
                 // The weapon's fire mode is single fire or fire on release, so player have to release fire key for next fire
                 mustReleaseFireKey = true;
             }
-            else if (tempPressAttackLeft && leftHandFireType != FireType.Automatic)
+            if (tempPressAttackLeft && leftHandFireType != FireType.Automatic)
             {
                 // The weapon's fire mode is single fire or fire on release, so player have to release fire key for next fire
                 mustReleaseFireKey = true;
@@ -1193,7 +1236,6 @@ namespace MultiplayerARPG
                     SetTargetLookDirectionWhileMoving();
                 }
             }
-
             updatingInputs = false;
         }
 
@@ -1318,7 +1360,7 @@ namespace MultiplayerARPG
                 case ShooterControllerViewMode.Fps:
                     // Just look at camera forward while character playing action animation
                     targetLookDirection = cameraForward;
-                    return true;
+                    return PlayerCharacterEntity.CanDoNextAction();
                 case ShooterControllerViewMode.Tps:
                     // Just look at camera forward while character playing action animation while `turnForwardWhileDoingAction` is `true`
                     Vector3 doActionLookDirection = turnForwardWhileDoingAction ? cameraForward : turnDirection;
@@ -1328,13 +1370,13 @@ namespace MultiplayerARPG
                         Quaternion targetRot = Quaternion.LookRotation(doActionLookDirection);
                         currentRot = Quaternion.Slerp(currentRot, targetRot, turnSpeedWileDoingAction * Time.deltaTime);
                         targetLookDirection = currentRot * Vector3.forward;
-                        return Quaternion.Angle(currentRot, targetRot) <= 15f;
+                        return Quaternion.Angle(currentRot, targetRot) <= 15f && PlayerCharacterEntity.CanDoNextAction();
                     }
                     else
                     {
                         // Turn immediately because turn speed <= 0
                         targetLookDirection = doActionLookDirection;
-                        return true;
+                        return PlayerCharacterEntity.CanDoNextAction();
                     }
             }
             return false;
