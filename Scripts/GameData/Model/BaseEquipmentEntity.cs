@@ -84,6 +84,20 @@ namespace MultiplayerARPG
             onPlayCharge.Invoke();
         }
 
+        [ContextMenu("Set `missileDamageTransform` as `poolingWeaponLaunchEffects` container")]
+        public void SetMissileDamageTransformAsPoolingEffectsContainer()
+        {
+            if (poolingWeaponLaunchEffects != null && poolingWeaponLaunchEffects.Length > 0)
+            {
+                for (int i = 0; i < poolingWeaponLaunchEffects.Length; ++i)
+                {
+                    GameEffectPoolContainer container = poolingWeaponLaunchEffects[i];
+                    container.container = missileDamageTransform;
+                    poolingWeaponLaunchEffects[i] = container;
+                }
+            }
+        }
+
 #if UNITY_EDITOR
         protected virtual void OnDrawGizmos()
         {
