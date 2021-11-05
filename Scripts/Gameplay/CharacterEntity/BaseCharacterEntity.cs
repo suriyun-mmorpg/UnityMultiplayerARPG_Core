@@ -987,11 +987,16 @@ namespace MultiplayerARPG
                 AnimActionType == AnimActionType.SkillRightHand;
         }
 
+        public virtual bool IsPlayingReloadAnimation()
+        {
+            return AnimActionType == AnimActionType.ReloadRightHand ||
+                AnimActionType == AnimActionType.ReloadLeftHand;
+        }
+
         public virtual bool IsPlayingActionAnimation()
         {
             return IsPlayingAttackOrUseSkillAnimation() ||
-                AnimActionType == AnimActionType.ReloadRightHand ||
-                AnimActionType == AnimActionType.ReloadLeftHand;
+                IsPlayingReloadAnimation();
         }
 
         public virtual bool CanDoActions()

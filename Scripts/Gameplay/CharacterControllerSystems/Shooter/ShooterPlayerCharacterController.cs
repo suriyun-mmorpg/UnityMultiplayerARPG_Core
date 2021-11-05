@@ -1074,7 +1074,7 @@ namespace MultiplayerARPG
                     UpdateLookAtTarget();
                     UseSkill(isLeftHandAttacking);
                 }
-                else if (tempPressAttackRight || tempPressAttackLeft)
+                else if ((tempPressAttackRight || tempPressAttackLeft) && !PlayerCharacterEntity.IsPlayingReloadAnimation())
                 {
                     activatingEntityOrDoAction = true;
                     while (!SetTargetLookDirectionWhileDoingAction())
