@@ -610,6 +610,9 @@ namespace MultiplayerARPG
             if (animator.runtimeAnimatorController != CacheAnimatorController)
                 animator.runtimeAnimatorController = CacheAnimatorController;
 
+            if (animator.runtimeAnimatorController == null)
+                return;
+
             if (isDead)
             {
                 // Clear action animations when dead
