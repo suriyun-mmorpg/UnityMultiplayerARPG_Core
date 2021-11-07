@@ -453,7 +453,7 @@ namespace MultiplayerARPG
                 for (i = 0; i < equipmentEntities[equipPosition].Count; ++i)
                 {
                     tempEquipmentEntity = equipmentEntities[equipPosition][i];
-                    tempEquipmentEntity.Level = itemLevel;
+                    tempEquipmentEntity.Setup(this, equipPosition, itemLevel);
                     if (foundEquipmentEntity == null)
                         foundEquipmentEntity = tempEquipmentEntity;
                 }
@@ -508,7 +508,7 @@ namespace MultiplayerARPG
                 // Setup equipment entity (if exists)
                 if (tempEquipmentEntity != null)
                 {
-                    tempEquipmentEntity.Level = itemLevel;
+                    tempEquipmentEntity.Setup(this, equipPosition, itemLevel);
                     equipmentEntities[equipPosition].Add(tempEquipmentEntity);
                     if (foundEquipmentEntity == null)
                         foundEquipmentEntity = tempEquipmentEntity;

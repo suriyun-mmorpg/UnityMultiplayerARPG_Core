@@ -9,6 +9,9 @@ namespace MultiplayerARPG
 {
     public abstract partial class BaseEquipmentEntity : MonoBehaviour, IPoolDescriptorCollection
     {
+        public BaseCharacterModel CharacterModel { get; set; }
+        public string EquipPosition { get; set; }
+
         private int level;
         public int Level
         {
@@ -29,6 +32,7 @@ namespace MultiplayerARPG
         public GameEffectPoolContainer[] poolingWeaponLaunchEffects;
         [Tooltip("This is overriding missile damage transform, if this is not empty, it will spawn missile damage entity from this transform")]
         public Transform missileDamageTransform;
+        public UnityEvent onSetup = new UnityEvent();
         public UnityEvent onEnable = new UnityEvent();
         public UnityEvent onDisable = new UnityEvent();
         public UnityEvent onPlayLaunch = new UnityEvent();
@@ -49,6 +53,14 @@ namespace MultiplayerARPG
                 }
                 return effects;
             }
+        }
+
+        public virtual void Setup(BaseCharacterModel characterModel, string equipPosition, int level)
+        {
+            CharacterModel = characterModel;
+            EquipPosition = equipPosition;
+            Level = level;
+            onSetup.Invoke();
         }
 
         protected virtual void OnEnable()
