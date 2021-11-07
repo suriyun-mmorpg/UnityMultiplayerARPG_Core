@@ -29,6 +29,8 @@ namespace MultiplayerARPG
         public GameEffectPoolContainer[] poolingWeaponLaunchEffects;
         [Tooltip("This is overriding missile damage transform, if this is not empty, it will spawn missile damage entity from this transform")]
         public Transform missileDamageTransform;
+        public UnityEvent onEnable = new UnityEvent();
+        public UnityEvent onDisable = new UnityEvent();
         public UnityEvent onPlayLaunch = new UnityEvent();
         public UnityEvent onPlayReload = new UnityEvent();
         public UnityEvent onPlayCharge = new UnityEvent();
@@ -58,6 +60,13 @@ namespace MultiplayerARPG
                     weaponLaunchEffect.gameObject.SetActive(false);
                 }
             }
+
+            onEnable.Invoke();
+        }
+
+        protected virtual void OnDisable()
+        {
+            onDisable.Invoke();
         }
 
         public virtual void PlayLaunch()
