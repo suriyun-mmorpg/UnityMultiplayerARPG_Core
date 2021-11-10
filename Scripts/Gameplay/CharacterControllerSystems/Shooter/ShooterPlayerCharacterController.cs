@@ -56,6 +56,8 @@ namespace MultiplayerARPG
         [SerializeField]
         protected bool unToggleCrawlWhenJump;
         [SerializeField]
+        protected float durationBeforeStopAimming = 2f;
+        [SerializeField]
         protected float findTargetRaycastDistance = 16f;
         [SerializeField]
         protected bool showConfirmConstructionUI = false;
@@ -340,8 +342,9 @@ namespace MultiplayerARPG
         protected bool mustReleaseFireKey;
         protected float buildYRotate;
         protected byte pauseFireInputFrames;
-        protected bool activatingEntityOrDoAction;
+        protected bool isAimming;
         protected bool isCharging;
+        protected float stopAimmingCountDown;
 
         protected override void Awake()
         {
@@ -578,7 +581,7 @@ namespace MultiplayerARPG
             // Update aim position
             PlayerCharacterEntity.AimPosition = PlayerCharacterEntity.GetAttackAimPosition(ref isLeftHandAttacking, aimTargetPosition);
 
-            activatingEntityOrDoAction = false;
+            isAimming = false;
             // Update input
             if (!updatingInputs)
             {
@@ -586,6 +589,13 @@ namespace MultiplayerARPG
                     UpdateInputs_BattleMode().Forget();
                 else
                     UpdateInputs_BuildMode().Forget();
+            }
+
+            if (stopAimmingCountDown > 0f && !isAimming)
+            {
+                // Keep aimming
+                SetTargetLookDirectionWhileDoingAction();
+                stopAimmingCountDown -= tempDeltaTime;
             }
 
             // Hide Npc UIs when move
@@ -638,7 +648,7 @@ namespace MultiplayerARPG
                 switch (mode)
                 {
                     case ControllerMode.Adventure:
-                        if (activatingEntityOrDoAction)
+                        if (isAimming || stopAimmingCountDown > 0f)
                             movementState |= GameplayUtils.GetMovementStateByDirection(moveDirection, MovementTransform.forward);
                         else
                             movementState |= MovementState.Forward;
@@ -949,12 +959,8 @@ namespace MultiplayerARPG
                     !GetPrimaryAttackButton()))
                 {
                     mustReleaseFireKey = false;
-                    activatingEntityOrDoAction = true;
-                    while (!SetTargetLookDirectionWhileDoingAction())
-                    {
-                        await UniTask.Yield();
-                    }
-                    UpdateLookAtTarget();
+                    isAimming = true;
+                    await Aimming();
                     // Button released, start attacking while fire type is fire on release
                     if (rightHandFireType == FireType.FireOnRelease)
                         Attack(isLeftHandAttacking);
@@ -966,12 +972,8 @@ namespace MultiplayerARPG
                     !GetSecondaryAttackButton()))
                 {
                     mustReleaseFireKey = false;
-                    activatingEntityOrDoAction = true;
-                    while (!SetTargetLookDirectionWhileDoingAction())
-                    {
-                        await UniTask.Yield();
-                    }
-                    UpdateLookAtTarget();
+                    isAimming = true;
+                    await Aimming();
                     // Button released, start attacking while fire type is fire on release
                     if (leftHandFireType == FireType.FireOnRelease)
                         Attack(isLeftHandAttacking);
@@ -1003,7 +1005,7 @@ namespace MultiplayerARPG
                     {
                         if (SelectedEntity is BuildingEntity)
                         {
-                            activatingEntityOrDoAction = true;
+                            isAimming = true;
                             targetBuilding = SelectedEntity as BuildingEntity;
                         }
                     }
@@ -1013,7 +1015,7 @@ namespace MultiplayerARPG
                         {
                             if (warpPortalEntityDetector?.warpPortals.Count > 0)
                             {
-                                activatingEntityOrDoAction = true;
+                                isAimming = true;
                                 // It may not able to raycast from inside warp portal, so try to get it from the detector
                                 targetWarpPortal = warpPortalEntityDetector.warpPortals[0];
                             }
@@ -1022,32 +1024,32 @@ namespace MultiplayerARPG
                         {
                             if (SelectedEntity is BasePlayerCharacterEntity)
                             {
-                                activatingEntityOrDoAction = true;
+                                isAimming = true;
                                 targetPlayer = SelectedEntity as BasePlayerCharacterEntity;
                             }
                             if (SelectedEntity is NpcEntity)
                             {
-                                activatingEntityOrDoAction = true;
+                                isAimming = true;
                                 targetNpc = SelectedEntity as NpcEntity;
                             }
                             if (SelectedEntity is BuildingEntity)
                             {
-                                activatingEntityOrDoAction = true;
+                                isAimming = true;
                                 targetBuilding = SelectedEntity as BuildingEntity;
                             }
                             if (SelectedEntity is VehicleEntity)
                             {
-                                activatingEntityOrDoAction = true;
+                                isAimming = true;
                                 targetVehicle = SelectedEntity as VehicleEntity;
                             }
                             if (SelectedEntity is WarpPortalEntity)
                             {
-                                activatingEntityOrDoAction = true;
+                                isAimming = true;
                                 targetWarpPortal = SelectedEntity as WarpPortalEntity;
                             }
                             if (SelectedEntity is ItemsContainerEntity)
                             {
-                                activatingEntityOrDoAction = true;
+                                isAimming = true;
                                 targetItemsContainer = SelectedEntity as ItemsContainerEntity;
                             }
                         }
@@ -1057,31 +1059,19 @@ namespace MultiplayerARPG
                 // Update look direction
                 if (PlayerCharacterEntity.IsPlayingAttackOrUseSkillAnimation() || isCharging)
                 {
-                    activatingEntityOrDoAction = true;
-                    while (!SetTargetLookDirectionWhileDoingAction())
-                    {
-                        await UniTask.Yield();
-                    }
-                    UpdateLookAtTarget();
+                    isAimming = true;
+                    await Aimming();
                 }
                 else if (queueUsingSkill.skill != null)
                 {
-                    activatingEntityOrDoAction = true;
-                    while (!SetTargetLookDirectionWhileDoingAction())
-                    {
-                        await UniTask.Yield();
-                    }
-                    UpdateLookAtTarget();
+                    isAimming = true;
+                    await Aimming();
                     UseSkill(isLeftHandAttacking);
                 }
                 else if ((tempPressAttackRight || tempPressAttackLeft) && !PlayerCharacterEntity.IsPlayingReloadAnimation())
                 {
-                    activatingEntityOrDoAction = true;
-                    while (!SetTargetLookDirectionWhileDoingAction())
-                    {
-                        await UniTask.Yield();
-                    }
-                    UpdateLookAtTarget();
+                    isAimming = true;
+                    await Aimming();
                     if (!isLeftHandAttacking)
                     {
                         // Fire on release weapons have to release to fire, so when start holding, play weapon charge animation
@@ -1111,22 +1101,14 @@ namespace MultiplayerARPG
                         }
                     }
                 }
-                else if (activateInput.IsHold && activatingEntityOrDoAction)
+                else if (activateInput.IsHold && isAimming)
                 {
-                    while (!SetTargetLookDirectionWhileDoingAction())
-                    {
-                        await UniTask.Yield();
-                    }
-                    UpdateLookAtTarget();
+                    await Aimming();
                     HoldActivate();
                 }
-                else if (activateInput.IsRelease && activatingEntityOrDoAction)
+                else if (activateInput.IsRelease && isAimming)
                 {
-                    while (!SetTargetLookDirectionWhileDoingAction())
-                    {
-                        await UniTask.Yield();
-                    }
-                    UpdateLookAtTarget();
+                    await Aimming();
                     Activate();
                 }
                 else
@@ -1135,7 +1117,7 @@ namespace MultiplayerARPG
                 }
             }
 
-            if (tempPressWeaponAbility && !activatingEntityOrDoAction)
+            if (tempPressWeaponAbility && !isAimming)
             {
                 anyKeyPressed = true;
                 // Toggle weapon ability
@@ -1152,32 +1134,31 @@ namespace MultiplayerARPG
                 }
             }
 
-            if (pickupItemInput.IsPress && !activatingEntityOrDoAction)
+            if (pickupItemInput.IsPress && !isAimming)
             {
                 anyKeyPressed = true;
                 // Find for item to pick up
                 if (SelectedEntity != null && SelectedEntity is ItemDropEntity)
                 {
-                    activatingEntityOrDoAction = true;
                     PlayerCharacterEntity.CallServerPickupItem(SelectedEntity.ObjectId);
                 }
             }
 
-            if (reloadInput.IsPress && !activatingEntityOrDoAction)
+            if (reloadInput.IsPress && !isAimming)
             {
                 anyKeyPressed = true;
                 // Reload ammo when press the button
                 Reload();
             }
 
-            if (exitVehicleInput.IsPress && !activatingEntityOrDoAction)
+            if (exitVehicleInput.IsPress && !isAimming)
             {
                 anyKeyPressed = true;
                 // Exit vehicle
                 PlayerCharacterEntity.CallServerExitVehicle();
             }
 
-            if (switchEquipWeaponSetInput.IsPress && !activatingEntityOrDoAction)
+            if (switchEquipWeaponSetInput.IsPress && !isAimming)
             {
                 anyKeyPressed = true;
                 // Switch equip weapon set
@@ -1220,16 +1201,13 @@ namespace MultiplayerARPG
             }
 
             // Update look direction
-            if (!anyKeyPressed && !activatingEntityOrDoAction)
+            if (!anyKeyPressed && !isAimming)
             {
                 // Update look direction while moving without doing any action
                 if (Time.unscaledTime - lastPlayingAttackOrUseSkillAnimationTime < stoppedPlayingAttackOrUseSkillAnimationDelay)
                 {
-                    activatingEntityOrDoAction = true;
-                    while (!SetTargetLookDirectionWhileDoingAction())
-                    {
-                        await UniTask.Yield();
-                    }
+                    isAimming = true;
+                    await Aimming();
                 }
                 else
                 {
@@ -1347,6 +1325,15 @@ namespace MultiplayerARPG
         protected void OnLaunchDamageEntity(bool isLeftHand, CharacterItem weapon, Dictionary<DamageElement, MinMaxFloat> damageAmounts, BaseSkill skill, short skillLevel, int randomSeed, AimPosition aimPosition, Vector3 stagger, HashSet<DamageHitObjectInfo> hitObjectIds)
         {
             UpdateRecoil();
+        }
+
+        protected virtual async UniTask Aimming()
+        {
+            while (!SetTargetLookDirectionWhileDoingAction())
+            {
+                await UniTask.Yield();
+            }
+            stopAimmingCountDown = durationBeforeStopAimming;
         }
 
         /// <summary>
