@@ -57,19 +57,17 @@ namespace MultiplayerARPG
             if (destroyTime >= 0 && destroyTime - Time.time <= 0)
             {
                 PushBack();
+                return;
             }
-        }
-
-        private void LateUpdate()
-        {
             if (FollowingTarget != null)
             {
+                // Following target is not destroyed, follow its position
                 CacheTransform.position = FollowingTarget.position;
                 CacheTransform.rotation = FollowingTarget.rotation;
             }
             else if (intendToFollowingTarget)
             {
-                // Don't push back immediately
+                // Following target destroyed, don't push back immediately, destroy it after some delay
                 DestroyEffect();
             }
         }
