@@ -59,7 +59,7 @@ namespace MultiplayerARPG
             if (!other.CompareTag(GameInstance.Singleton.playerTag))
                 return;
 
-            BasePlayerCharacterEntity playerCharacterEntity = other.GetComponent<BasePlayerCharacterEntity>();
+            BasePlayerCharacterEntity playerCharacterEntity = other.GetComponentInParent<BasePlayerCharacterEntity>();
             if (playerCharacterEntity == null)
                 return;
 
@@ -85,7 +85,7 @@ namespace MultiplayerARPG
             if (!other.CompareTag(GameInstance.Singleton.playerTag))
                 return;
 
-            BasePlayerCharacterEntity playerCharacterEntity = other.GetComponent<BasePlayerCharacterEntity>();
+            BasePlayerCharacterEntity playerCharacterEntity = other.GetComponentInParent<BasePlayerCharacterEntity>();
             if (playerCharacterEntity == null)
                 return;
 
