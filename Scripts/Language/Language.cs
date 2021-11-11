@@ -55,11 +55,14 @@ namespace MultiplayerARPG
         UI_ERROR_ALREADY_LOGGED_IN,
         UI_ERROR_ACCOUNT_LOGGED_IN_BY_OTHER,
         UI_ERROR_USER_BANNED,
+        UI_ERROR_EMAIL_NOT_VERIFIED,
         // Error - UI Register
         UI_ERROR_INVALID_CONFIRM_PASSWORD,
         UI_ERROR_USERNAME_TOO_SHORT,
         UI_ERROR_USERNAME_TOO_LONG,
         UI_ERROR_PASSWORD_TOO_SHORT,
+        UI_ERROR_INVALID_EMAIL,
+        UI_ERROR_EMAIL_ALREADY_IN_USE,
         UI_ERROR_USERNAME_EXISTED,
         // Error - UI Lobby
         UI_ERROR_ALREADY_CONNECTED_TO_LOBBY,
@@ -1244,11 +1247,14 @@ namespace MultiplayerARPG
             Texts.Add(UITextKeys.UI_ERROR_ALREADY_LOGGED_IN.ToString(), "User already logged in");
             Texts.Add(UITextKeys.UI_ERROR_ACCOUNT_LOGGED_IN_BY_OTHER.ToString(), "Your account was logged in by other");
             Texts.Add(UITextKeys.UI_ERROR_USER_BANNED.ToString(), "Your account was banned");
+            Texts.Add(UITextKeys.UI_ERROR_EMAIL_NOT_VERIFIED.ToString(), "Email is not verified");
             // Error - UI Register
             Texts.Add(UITextKeys.UI_ERROR_INVALID_CONFIRM_PASSWORD.ToString(), "Invalid confirm password");
             Texts.Add(UITextKeys.UI_ERROR_USERNAME_TOO_SHORT.ToString(), "Username is too short");
             Texts.Add(UITextKeys.UI_ERROR_USERNAME_TOO_LONG.ToString(), "Username is too long");
             Texts.Add(UITextKeys.UI_ERROR_PASSWORD_TOO_SHORT.ToString(), "Password is too short");
+            Texts.Add(UITextKeys.UI_ERROR_INVALID_EMAIL.ToString(), "Invalid email format");
+            Texts.Add(UITextKeys.UI_ERROR_EMAIL_ALREADY_IN_USE.ToString(), "Email is already in use");
             Texts.Add(UITextKeys.UI_ERROR_USERNAME_EXISTED.ToString(), "Username is already existed");
             // Error - UI Lobby
             Texts.Add(UITextKeys.UI_ERROR_ALREADY_CONNECTED_TO_LOBBY.ToString(), "Already connected to lobby server");
