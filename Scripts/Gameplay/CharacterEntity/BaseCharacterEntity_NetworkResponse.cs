@@ -133,13 +133,19 @@ namespace MultiplayerARPG
                 return;
 
             this.FillEmptySlots();
-            // Drop item to the ground
-            CharacterItem dropData = nonEquipItem.Clone();
-            dropData.amount = amount;
-            if (!CurrentGameInstance.canPickupItemsWhichDropsByPlayersImmediately)
-                ItemDropEntity.DropItem(this, dropData, new uint[] { ObjectId });
-            else
-                ItemDropEntity.DropItem(this, dropData, new uint[0]);
+
+            switch (CurrentGameInstance.playerDropItemMode)
+            {
+                case PlayerDropItemMode.DropOnGround:
+                    // Drop item to the ground
+                    CharacterItem dropData = nonEquipItem.Clone();
+                    dropData.amount = amount;
+                    if (!CurrentGameInstance.canPickupItemsWhichDropsByPlayersImmediately)
+                        ItemDropEntity.DropItem(this, dropData, new uint[] { ObjectId });
+                    else
+                        ItemDropEntity.DropItem(this, dropData, new uint[0]);
+                    break;
+            }
 #endif
         }
 

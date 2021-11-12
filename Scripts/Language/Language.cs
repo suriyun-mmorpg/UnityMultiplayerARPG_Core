@@ -199,6 +199,8 @@ namespace MultiplayerARPG
         // UI Character Item
         UI_DROP_ITEM,
         UI_DROP_ITEM_DESCRIPTION,
+        UI_DESTROY_ITEM,
+        UI_DESTROY_ITEM_DESCRIPTION,
         UI_SELL_ITEM,
         UI_SELL_ITEM_DESCRIPTION,
         UI_DISMANTLE_ITEM,
@@ -1391,6 +1393,8 @@ namespace MultiplayerARPG
             // UI Character Item
             Texts.Add(UITextKeys.UI_DROP_ITEM.ToString(), "Drop Item");
             Texts.Add(UITextKeys.UI_DROP_ITEM_DESCRIPTION.ToString(), "Enter amount of item");
+            Texts.Add(UITextKeys.UI_DESTROY_ITEM.ToString(), "Destroy Item");
+            Texts.Add(UITextKeys.UI_DESTROY_ITEM_DESCRIPTION.ToString(), "Do you want to destroy an items?");
             Texts.Add(UITextKeys.UI_SELL_ITEM.ToString(), "Sell Item");
             Texts.Add(UITextKeys.UI_SELL_ITEM_DESCRIPTION.ToString(), "Enter amount of item");
             Texts.Add(UITextKeys.UI_DISMANTLE_ITEM.ToString(), "Dismantle Item");

@@ -22,6 +22,18 @@ namespace MultiplayerARPG
         UseRespawnPosition
     }
 
+    public enum PlayerDropItemMode
+    {
+        DropOnGround,
+        DestroyItem,
+    }
+
+    public enum MonsterDropItemMode
+    {
+        DropOnGround,
+        CorpseLooting,
+    }
+
     public enum TestInEditorMode
     {
         Standalone,
@@ -235,6 +247,10 @@ namespace MultiplayerARPG
         public byte maxEquipWeaponSet = 2;
         [Tooltip("How character position load when start game")]
         public CurrentPositionSaveMode currentPositionSaveMode = CurrentPositionSaveMode.UseCurrentPosition;
+        [Tooltip("How player drop item")]
+        public PlayerDropItemMode playerDropItemMode = PlayerDropItemMode.DropOnGround;
+        [Tooltip("How monster drop item")]
+        public MonsterDropItemMode monsterDropItemMode = MonsterDropItemMode.DropOnGround;
 
         [Header("Gameplay Configs - Items, Inventory and Storage")]
         public ItemTypeFilter dismantleFilter = new ItemTypeFilter()

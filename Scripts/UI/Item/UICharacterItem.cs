@@ -1406,13 +1406,40 @@ namespace MultiplayerARPG
             if (!IsOwningCharacter() || InventoryType != InventoryType.NonEquipItems || GameInstance.PlayingCharacterEntity == null)
                 return;
 
-            if (CharacterItem.amount == 1)
+            switch (GameInstance.Singleton.playerDropItemMode)
             {
-                OnDropAmountConfirmed(1);
-            }
-            else
-            {
-                UISceneGlobal.Singleton.ShowInputDialog(LanguageManager.GetText(UITextKeys.UI_DROP_ITEM.ToString()), LanguageManager.GetText(UITextKeys.UI_DROP_ITEM_DESCRIPTION.ToString()), OnDropAmountConfirmed, 1, CharacterItem.amount, CharacterItem.amount);
+                case PlayerDropItemMode.DestroyItem:
+                    if (CharacterItem.amount == 1)
+                    {
+                        UISceneGlobal.Singleton.ShowMessageDialog(
+                            LanguageManager.GetText(UITextKeys.UI_DESTROY_ITEM.ToString()),
+                            LanguageManager.GetText(UITextKeys.UI_DESTROY_ITEM_DESCRIPTION.ToString()),
+                            false, true, true, false, null, () =>
+                            {
+                                OnDropAmountConfirmed(1);
+                            });
+                    }
+                    else
+                    {
+                        UISceneGlobal.Singleton.ShowInputDialog(
+                            LanguageManager.GetText(UITextKeys.UI_DESTROY_ITEM.ToString()),
+                            LanguageManager.GetText(UITextKeys.UI_DESTROY_ITEM_DESCRIPTION.ToString()),
+                            OnDropAmountConfirmed, 1, CharacterItem.amount, CharacterItem.amount);
+                    }
+                    break;
+                case PlayerDropItemMode.DropOnGround:
+                    if (CharacterItem.amount == 1)
+                    {
+                        OnDropAmountConfirmed(1);
+                    }
+                    else
+                    {
+                        UISceneGlobal.Singleton.ShowInputDialog(
+                            LanguageManager.GetText(UITextKeys.UI_DROP_ITEM.ToString()),
+                            LanguageManager.GetText(UITextKeys.UI_DROP_ITEM_DESCRIPTION.ToString()),
+                            OnDropAmountConfirmed, 1, CharacterItem.amount, CharacterItem.amount);
+                    }
+                    break;
             }
         }
 
