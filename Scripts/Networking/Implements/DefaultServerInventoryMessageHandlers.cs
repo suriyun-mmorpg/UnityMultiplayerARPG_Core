@@ -163,16 +163,23 @@ namespace MultiplayerARPG
                 });
                 return;
             }
-            if (playerCharacter.CurrentHp <= 0)
+
+            BasePlayerCharacterEntity playerCharacterEntity = playerCharacter as BasePlayerCharacterEntity;
+            if (playerCharacterEntity != null)
             {
-                result.Invoke(AckResponseCode.Error, new ResponseSwitchEquipWeaponSetMessage());
-                return;
+                if (!playerCharacterEntity.CanDoActions())
+                {
+                    result.Invoke(AckResponseCode.Error, new ResponseSwitchEquipWeaponSetMessage());
+                    return;
+                }
             }
+
             byte equipWeaponSet = request.equipWeaponSet;
             if (equipWeaponSet >= GameInstance.Singleton.maxEquipWeaponSet)
                 equipWeaponSet = 0;
             playerCharacter.FillWeaponSetsIfNeeded(equipWeaponSet);
             playerCharacter.EquipWeaponSet = equipWeaponSet;
+
             result.Invoke(AckResponseCode.Success, new ResponseSwitchEquipWeaponSetMessage());
         }
 
