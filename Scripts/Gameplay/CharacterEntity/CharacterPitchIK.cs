@@ -23,7 +23,7 @@ namespace MultiplayerARPG
         public float maxAngle = 0f;
         public Quaternion PitchRotation { get; private set; }
         public BaseCharacterEntity CharacterEntity { get; private set; }
-        public CharacterPitchIKManager Manager { get; private set; }
+        public Animator Animator { get; private set; }
 
         public bool Enabling
         {
@@ -60,31 +60,26 @@ namespace MultiplayerARPG
 
         private void Awake()
         {
-            CharacterEntity = GetComponentInParent<BaseCharacterEntity>();
+            CharacterEntity = GetComponent<BaseCharacterEntity>();
+            if (CharacterEntity == null)
+                CharacterEntity = GetComponentInParent<BaseCharacterEntity>();
             if (CharacterEntity == null)
             {
                 enabled = false;
                 return;
             }
+            Animator = CharacterEntity.GetComponent<Animator>();
+            if (Animator == null)
+                Animator = CharacterEntity.GetComponentInChildren<Animator>();
         }
 
-        private void Start()
-        {
-            Manager = CharacterEntity.gameObject.GetOrAddComponent<CharacterPitchIKManager>();
-            Manager.Register(this);
-        }
-
-        private void OnDestroy()
-        {
-            if (Manager != null)
-                Manager.Unregister(this);
-        }
-
-        public void UpdatePitchRotation()
+        public void LateUpdate()
         {
             if (!Enabling)
                 return;
             PitchRotation = CalculatePitchRotation(CharacterEntity.Pitch, Time.deltaTime, PitchRotation, axis, rotateOffset, inversePitch, lerpDamping, maxAngle);
+            Transform tempTransform = Animator.GetBoneTransform(pitchBone);
+            tempTransform.localRotation = PitchRotation;
         }
 
         public static Quaternion CalculatePitchRotation(
