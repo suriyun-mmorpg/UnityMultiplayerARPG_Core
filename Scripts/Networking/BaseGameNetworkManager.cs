@@ -550,6 +550,10 @@ namespace MultiplayerARPG
                 spawnablePrefabs.Add(CurrentGameInstance.itemDropEntityPrefab.Identity);
             if (CurrentGameInstance.warpPortalEntityPrefab != null)
                 spawnablePrefabs.Add(CurrentGameInstance.warpPortalEntityPrefab.Identity);
+            if (CurrentGameInstance.playerCorpsePrefab != null)
+                spawnablePrefabs.Add(CurrentGameInstance.playerCorpsePrefab.Identity);
+            if (CurrentGameInstance.monsterCorpsePrefab != null)
+                spawnablePrefabs.Add(CurrentGameInstance.monsterCorpsePrefab.Identity);
             foreach (BaseCharacterEntity entry in GameInstance.CharacterEntities.Values)
             {
                 spawnablePrefabs.Add(entry.Identity);

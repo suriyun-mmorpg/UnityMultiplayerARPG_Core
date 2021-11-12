@@ -49,6 +49,11 @@ namespace MultiplayerARPG
                 OnClickPickUpSelectedItem();
         }
 
+        public void OnClickPickUpAllItems()
+        {
+            GameInstance.PlayingCharacterEntity.CallServerPickupAllItemsFromContainer(TargetEntity.ObjectId);
+        }
+
         public void OnClickPickUpSelectedItem()
         {
             int selectedIndex = CacheSelectionManager.SelectedUI != null ? CacheSelectionManager.SelectedUI.IndexOfData : -1;

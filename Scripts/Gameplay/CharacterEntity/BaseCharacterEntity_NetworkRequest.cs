@@ -20,6 +20,15 @@
             return true;
         }
 
+        public bool CallServerPickupAllItemsFromContainer(uint objectId)
+        {
+            if (!CanDoActions())
+                return false;
+            RPC(ServerPickupAllItemsFromContainer, objectId);
+            CallAllPlayPickupAnimation();
+            return true;
+        }
+
         public bool CallServerPickupNearbyItems()
         {
             if (!CanDoActions())

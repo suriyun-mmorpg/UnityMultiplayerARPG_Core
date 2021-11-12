@@ -69,6 +69,12 @@ namespace MultiplayerARPG
                 return;
             }
 
+            if (!itemsContainerEntity.IsAbleToLoot(this))
+            {
+                GameInstance.ServerGameMessageHandlers.SendGameMessage(ConnectionId, UITextKeys.UI_ERROR_NOT_ABLE_TO_LOOT);
+                return;
+            }
+
             if (!IsGameEntityInDistance(itemsContainerEntity, CurrentGameInstance.pickUpItemDistance))
             {
                 GameInstance.ServerGameMessageHandlers.SendGameMessage(ConnectionId, UITextKeys.UI_ERROR_CHARACTER_IS_TOO_FAR);
@@ -90,6 +96,56 @@ namespace MultiplayerARPG
                 GameInstance.ServerGameMessageHandlers.NotifyRewardItem(ConnectionId, dataId, amount);
             });
             itemsContainerEntity.Items.RemoveAt(index);
+            itemsContainerEntity.PickedUp();
+            this.FillEmptySlots();
+#endif
+        }
+
+        /// <summary>
+        /// This will be called at server to order character to pickup all items from items container
+        /// </summary>
+        /// <param name="objectId"></param>
+        [ServerRpc]
+        protected virtual void ServerPickupAllItemsFromContainer(uint objectId)
+        {
+#if !CLIENT_BUILD
+            if (!CanDoActions())
+                return;
+
+            ItemsContainerEntity itemsContainerEntity;
+            if (!Manager.TryGetEntityByObjectId(objectId, out itemsContainerEntity))
+            {
+                // Can't find the entity
+                return;
+            }
+
+            if (!itemsContainerEntity.IsAbleToLoot(this))
+            {
+                GameInstance.ServerGameMessageHandlers.SendGameMessage(ConnectionId, UITextKeys.UI_ERROR_NOT_ABLE_TO_LOOT);
+                return;
+            }
+
+            if (!IsGameEntityInDistance(itemsContainerEntity, CurrentGameInstance.pickUpItemDistance))
+            {
+                GameInstance.ServerGameMessageHandlers.SendGameMessage(ConnectionId, UITextKeys.UI_ERROR_CHARACTER_IS_TOO_FAR);
+                return;
+            }
+
+            while (itemsContainerEntity.Items.Count > 0)
+            {
+                CharacterItem pickingItem = itemsContainerEntity.Items[0];
+                if (this.IncreasingItemsWillOverwhelming(pickingItem.dataId, pickingItem.amount))
+                {
+                    GameInstance.ServerGameMessageHandlers.SendGameMessage(ConnectionId, UITextKeys.UI_ERROR_WILL_OVERWHELMING);
+                    break;
+                }
+
+                this.IncreaseItems(pickingItem, (dataId, level, amount) =>
+                {
+                    GameInstance.ServerGameMessageHandlers.NotifyRewardItem(ConnectionId, dataId, amount);
+                });
+                itemsContainerEntity.Items.RemoveAt(0);
+            }
             itemsContainerEntity.PickedUp();
             this.FillEmptySlots();
 #endif

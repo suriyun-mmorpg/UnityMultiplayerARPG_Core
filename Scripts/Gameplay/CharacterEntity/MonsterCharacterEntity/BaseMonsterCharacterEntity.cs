@@ -133,6 +133,7 @@ namespace MultiplayerARPG
         // Private variables
         private bool isDestroyed;
         private readonly HashSet<uint> looters = new HashSet<uint>();
+        private readonly List<CharacterItem> droppingItems = new List<CharacterItem>();
 
         public override void PrepareRelatesData()
         {
@@ -561,12 +562,27 @@ namespace MultiplayerARPG
                 }   // End for-loop
             }   // End count recived damage record count
             receivedDamageRecords.Clear();
+            // Clear dropping items, it will fills in `OnRandomDropItem` function
+            droppingItems.Clear();
             // Drop items
             CharacterDatabase.RandomItems(OnRandomDropItem);
             // Drop currency
             CharacterDatabase.RandomCurrencies(OnRandomDropCurrency);
             // Clear looters because they are already set to dropped items
             looters.Clear();
+
+            switch (CurrentGameInstance.monsterDeadDropItemMode)
+            {
+                case DeadDropItemMode.DropOnGround:
+                    for (int i = 0; i < droppingItems.Count; ++i)
+                    {
+                        ItemDropEntity.DropItem(this, droppingItems[i], looters);
+                    }
+                    break;
+                case DeadDropItemMode.CorpseLooting:
+                    ItemsContainerEntity.DropItems(CurrentGameInstance.monsterCorpsePrefab, this, droppingItems, looters);
+                    break;
+            }
 
             if (lastPlayer != null)
             {
@@ -586,7 +602,7 @@ namespace MultiplayerARPG
             // Drop item to the ground
             if (amount > item.MaxStack)
                 amount = item.MaxStack;
-            ItemDropEntity.DropItem(this, CharacterItem.Create(item, 1, amount), looters);
+            droppingItems.Add(CharacterItem.Create(item, 1, amount));
         }
 
         private void OnRandomDropCurrency(Currency currency, int amount)

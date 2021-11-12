@@ -25,9 +25,11 @@ namespace MultiplayerARPG
         {
             get { return items; }
         }
+        public HashSet<uint> Looters { get; protected set; }
 
         // Private variables
         protected bool isDestroyed;
+        protected float dropTime;
 
         protected override void SetupNetElements()
         {
@@ -47,6 +49,15 @@ namespace MultiplayerARPG
             RPC(AllOnItemsContainerDestroy);
         }
 
+        public bool IsAbleToLoot(BaseCharacterEntity baseCharacterEntity)
+        {
+            if ((Looters == null || Looters.Count == 0 || Looters.Contains(baseCharacterEntity.ObjectId) ||
+                Time.unscaledTime - dropTime > CurrentGameInstance.itemLootLockDuration) &&
+                !isDestroyed)
+                return true;
+            return false;
+        }
+
         public void PickedUp()
         {
             if (!IsServer)
@@ -63,27 +74,36 @@ namespace MultiplayerARPG
             NetworkDestroy(destroyDelay);
         }
 
-        public static ItemsContainerEntity DropItems(ItemsContainerEntity prefab, BaseGameEntity dropper, IEnumerable<CharacterItem> dropItems)
+        public static ItemsContainerEntity DropItems(ItemsContainerEntity prefab, BaseGameEntity dropper, IEnumerable<CharacterItem> dropItems, IEnumerable<uint> looters, bool randomPosition = false, bool randomRotation = false)
         {
             Vector3 dropPosition = dropper.CacheTransform.position;
-            Quaternion dropRotation = Quaternion.identity;
+            Quaternion dropRotation = dropper.CacheTransform.rotation;
             switch (GameInstance.Singleton.DimensionType)
             {
                 case DimensionType.Dimension3D:
-                    // Random position around dropper with its height
-                    dropPosition += new Vector3(Random.Range(-1f, 1f) * GameInstance.Singleton.dropDistance, GROUND_DETECTION_Y_OFFSETS, Random.Range(-1f, 1f) * GameInstance.Singleton.dropDistance);
-                    // Random rotation
-                    dropRotation = Quaternion.Euler(Vector3.up * Random.Range(0, 360));
+                    if (randomPosition)
+                    {
+                        // Random position around dropper with its height
+                        dropPosition += new Vector3(Random.Range(-1f, 1f) * GameInstance.Singleton.dropDistance, GROUND_DETECTION_Y_OFFSETS, Random.Range(-1f, 1f) * GameInstance.Singleton.dropDistance);
+                    }
+                    if (randomRotation)
+                    {
+                        // Random rotation
+                        dropRotation = Quaternion.Euler(Vector3.up * Random.Range(0, 360));
+                    }
                     break;
                 case DimensionType.Dimension2D:
-                    // Random position around dropper
-                    dropPosition += new Vector3(Random.Range(-1f, 1f) * GameInstance.Singleton.dropDistance, Random.Range(-1f, 1f) * GameInstance.Singleton.dropDistance);
+                    if (randomPosition)
+                    {
+                        // Random position around dropper
+                        dropPosition += new Vector3(Random.Range(-1f, 1f) * GameInstance.Singleton.dropDistance, Random.Range(-1f, 1f) * GameInstance.Singleton.dropDistance);
+                    }
                     break;
             }
-            return DropItems(prefab, dropPosition, dropRotation, dropItems);
+            return DropItems(prefab, dropPosition, dropRotation, dropItems, looters);
         }
 
-        public static ItemsContainerEntity DropItems(ItemsContainerEntity prefab, Vector3 dropPosition, Quaternion dropRotation, IEnumerable<CharacterItem> dropItems)
+        public static ItemsContainerEntity DropItems(ItemsContainerEntity prefab, Vector3 dropPosition, Quaternion dropRotation, IEnumerable<CharacterItem> dropItems, IEnumerable<uint> looters)
         {
             if (prefab == null)
                 return null;
@@ -98,6 +118,9 @@ namespace MultiplayerARPG
                 dropPosition, dropRotation);
             ItemsContainerEntity itemsContainerEntity = spawnObj.GetComponent<ItemsContainerEntity>();
             itemsContainerEntity.Items.AddRange(dropItems);
+            itemsContainerEntity.Looters = new HashSet<uint>(looters);
+            itemsContainerEntity.isDestroyed = false;
+            itemsContainerEntity.dropTime = Time.unscaledTime;
             BaseGameNetworkManager.Singleton.Assets.NetworkSpawn(spawnObj);
             return itemsContainerEntity;
         }

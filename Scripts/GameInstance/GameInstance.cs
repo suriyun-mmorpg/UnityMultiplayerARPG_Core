@@ -28,7 +28,7 @@ namespace MultiplayerARPG
         DestroyItem,
     }
 
-    public enum MonsterDropItemMode
+    public enum DeadDropItemMode
     {
         DropOnGround,
         CorpseLooting,
@@ -132,6 +132,8 @@ namespace MultiplayerARPG
         [Header("Gameplay Objects")]
         public ItemDropEntity itemDropEntityPrefab = null;
         public WarpPortalEntity warpPortalEntityPrefab = null;
+        public ItemsContainerEntity playerCorpsePrefab = null;
+        public ItemsContainerEntity monsterCorpsePrefab = null;
         public BaseUISceneGameplay uiSceneGameplayPrefab = null;
         [Tooltip("If this is empty, it will use `UI Scene Gameplay Prefab` as gameplay UI prefab")]
         public BaseUISceneGameplay uiSceneGameplayMobilePrefab = null;
@@ -249,9 +251,10 @@ namespace MultiplayerARPG
         public CurrentPositionSaveMode currentPositionSaveMode = CurrentPositionSaveMode.UseCurrentPosition;
         [Tooltip("How player drop item")]
         public PlayerDropItemMode playerDropItemMode = PlayerDropItemMode.DropOnGround;
-        [Tooltip("How monster drop item")]
-        public MonsterDropItemMode monsterDropItemMode = MonsterDropItemMode.DropOnGround;
-
+        [Tooltip("How player character drop item when dying (it will drop items if map info was set to drop items)")]
+        public DeadDropItemMode playerDeadDropItemMode = DeadDropItemMode.DropOnGround;
+        [Tooltip("How monster character drop item when dying")]
+        public DeadDropItemMode monsterDeadDropItemMode = DeadDropItemMode.DropOnGround;
         [Header("Gameplay Configs - Items, Inventory and Storage")]
         public ItemTypeFilter dismantleFilter = new ItemTypeFilter()
         {
