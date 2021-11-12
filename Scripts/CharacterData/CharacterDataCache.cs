@@ -40,6 +40,7 @@ namespace MultiplayerARPG
         public bool FreezeAnimation { get; private set; }
         public bool IsHide { get; private set; }
         public bool MuteFootstepSound { get; private set; }
+        public bool IsOverweight { get; private set; }
 
         public CharacterDataCache()
         {
@@ -90,6 +91,7 @@ namespace MultiplayerARPG
             LimitItemWeight = GameInstance.Singleton.GameplayRule.GetLimitWeight(characterData, stats);
             LimitItemSlot = GameInstance.Singleton.GameplayRule.GetLimitSlot(characterData, stats);
 
+            IsOverweight = TotalItemWeight > LimitItemWeight || TotalItemSlot > LimitItemSlot;
             DisallowMove = false;
             DisallowAttack = false;
             DisallowUseSkill = false;

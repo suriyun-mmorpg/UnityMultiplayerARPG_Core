@@ -1057,6 +1057,9 @@ namespace MultiplayerARPG
                 }
             }
 
+            if (this.GetCaches().IsOverweight)
+                moveSpeed *= CurrentGameplayRule.GetOverweightMoveSpeedRate(this);
+
             return moveSpeed;
         }
 

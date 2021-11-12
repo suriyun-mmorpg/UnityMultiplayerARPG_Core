@@ -19,6 +19,7 @@ namespace MultiplayerARPG
         [Header("Stamina/Sprint")]
         public float staminaRecoveryPerSeconds = 5;
         public float staminaDecreasePerSeconds = 5;
+        public float moveSpeedRateWhileOverweight = 0.05f;
         [FormerlySerializedAs("moveSpeedRateWhileSprint")]
         public float moveSpeedRateWhileSprinting = 1.5f;
         [Header("Walk")]
@@ -262,6 +263,12 @@ namespace MultiplayerARPG
             if (character is BaseMonsterCharacterEntity)
                 return 0f;
             return expLostPercentageWhenDeath;
+        }
+
+        public override float GetOverweightMoveSpeedRate(BaseGameEntity gameEntity)
+        {
+            // For some gameplay rule, move speed rate may difference for specific entiy type.
+            return moveSpeedRateWhileOverweight;
         }
 
         public override float GetSprintMoveSpeedRate(BaseGameEntity gameEntity)
