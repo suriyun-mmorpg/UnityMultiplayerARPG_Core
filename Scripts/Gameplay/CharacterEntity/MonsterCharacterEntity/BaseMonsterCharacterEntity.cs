@@ -580,7 +580,7 @@ namespace MultiplayerARPG
                     }
                     break;
                 case DeadDropItemMode.CorpseLooting:
-                    ItemsContainerEntity.DropItems(CurrentGameInstance.monsterCorpsePrefab, this, droppingItems, looters);
+                    ItemsContainerEntity.DropItems(CurrentGameInstance.monsterCorpsePrefab, this, droppingItems, looters, CurrentGameInstance.monsterCorpseAppearDuration);
                     break;
             }
 

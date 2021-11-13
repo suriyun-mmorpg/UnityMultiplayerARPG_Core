@@ -30,11 +30,18 @@ namespace MultiplayerARPG
         // Private variables
         protected bool isDestroyed;
         protected float dropTime;
+        protected float appearDuration;
 
         protected override void SetupNetElements()
         {
             base.SetupNetElements();
             items.forOwnerOnly = false;
+        }
+
+        public override void OnSetup()
+        {
+            base.OnSetup();
+            NetworkDestroy(appearDuration);
         }
 
         [AllRpc]
@@ -74,7 +81,7 @@ namespace MultiplayerARPG
             NetworkDestroy(destroyDelay);
         }
 
-        public static ItemsContainerEntity DropItems(ItemsContainerEntity prefab, BaseGameEntity dropper, IEnumerable<CharacterItem> dropItems, IEnumerable<uint> looters, bool randomPosition = false, bool randomRotation = false)
+        public static ItemsContainerEntity DropItems(ItemsContainerEntity prefab, BaseGameEntity dropper, IEnumerable<CharacterItem> dropItems, IEnumerable<uint> looters, float appearDuration, bool randomPosition = false, bool randomRotation = false)
         {
             Vector3 dropPosition = dropper.CacheTransform.position;
             Quaternion dropRotation = dropper.CacheTransform.rotation;
@@ -100,10 +107,10 @@ namespace MultiplayerARPG
                     }
                     break;
             }
-            return DropItems(prefab, dropPosition, dropRotation, dropItems, looters);
+            return DropItems(prefab, dropPosition, dropRotation, dropItems, looters, appearDuration);
         }
 
-        public static ItemsContainerEntity DropItems(ItemsContainerEntity prefab, Vector3 dropPosition, Quaternion dropRotation, IEnumerable<CharacterItem> dropItems, IEnumerable<uint> looters)
+        public static ItemsContainerEntity DropItems(ItemsContainerEntity prefab, Vector3 dropPosition, Quaternion dropRotation, IEnumerable<CharacterItem> dropItems, IEnumerable<uint> looters, float appearDuration)
         {
             if (prefab == null)
                 return null;
@@ -121,6 +128,7 @@ namespace MultiplayerARPG
             itemsContainerEntity.Looters = new HashSet<uint>(looters);
             itemsContainerEntity.isDestroyed = false;
             itemsContainerEntity.dropTime = Time.unscaledTime;
+            itemsContainerEntity.appearDuration = appearDuration;
             BaseGameNetworkManager.Singleton.Assets.NetworkSpawn(spawnObj);
             return itemsContainerEntity;
         }

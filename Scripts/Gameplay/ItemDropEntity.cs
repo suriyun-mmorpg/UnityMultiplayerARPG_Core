@@ -121,6 +121,7 @@ namespace MultiplayerARPG
         // Private variables
         protected bool isPickedUp;
         protected float dropTime;
+        protected float appearDuration;
 
         public override void PrepareRelatesData()
         {
@@ -186,7 +187,7 @@ namespace MultiplayerARPG
             if (PutOnPlaceholder)
             {
                 // Destroy later by duration value
-                NetworkDestroy(CurrentGameInstance.itemAppearDuration);
+                NetworkDestroy(appearDuration);
             }
         }
 
@@ -290,10 +291,10 @@ namespace MultiplayerARPG
 
         public static ItemDropEntity DropItem(BaseGameEntity dropper, CharacterItem dropData, IEnumerable<uint> looters)
         {
-            return DropItem(GameInstance.Singleton.itemDropEntityPrefab, dropper, dropData, looters);
+            return DropItem(GameInstance.Singleton.itemDropEntityPrefab, dropper, dropData, looters, GameInstance.Singleton.itemAppearDuration);
         }
 
-        public static ItemDropEntity DropItem(ItemDropEntity prefab, BaseGameEntity dropper, CharacterItem dropData, IEnumerable<uint> looters)
+        public static ItemDropEntity DropItem(ItemDropEntity prefab, BaseGameEntity dropper, CharacterItem dropData, IEnumerable<uint> looters, float appearDuration)
         {
             Vector3 dropPosition = dropper.CacheTransform.position;
             Quaternion dropRotation = Quaternion.identity;
@@ -310,10 +311,10 @@ namespace MultiplayerARPG
                     dropPosition += new Vector3(Random.Range(-1f, 1f) * GameInstance.Singleton.dropDistance, Random.Range(-1f, 1f) * GameInstance.Singleton.dropDistance);
                     break;
             }
-            return DropItem(prefab, dropPosition, dropRotation, dropData, looters);
+            return DropItem(prefab, dropPosition, dropRotation, dropData, looters, appearDuration);
         }
 
-        public static ItemDropEntity DropItem(ItemDropEntity prefab, Vector3 dropPosition, Quaternion dropRotation, CharacterItem dropItem, IEnumerable<uint> looters = null)
+        public static ItemDropEntity DropItem(ItemDropEntity prefab, Vector3 dropPosition, Quaternion dropRotation, CharacterItem dropItem, IEnumerable<uint> looters, float appearDuration)
         {
             if (prefab == null)
                 return null;
@@ -332,6 +333,7 @@ namespace MultiplayerARPG
             itemDropEntity.Looters = new HashSet<uint>(looters);
             itemDropEntity.isPickedUp = false;
             itemDropEntity.dropTime = Time.unscaledTime;
+            itemDropEntity.appearDuration = appearDuration;
             BaseGameNetworkManager.Singleton.Assets.NetworkSpawn(spawnObj);
             itemDropEntity.InitDropItems();
             return itemDropEntity;

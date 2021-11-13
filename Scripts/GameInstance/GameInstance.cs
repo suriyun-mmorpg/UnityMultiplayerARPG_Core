@@ -253,8 +253,12 @@ namespace MultiplayerARPG
         public PlayerDropItemMode playerDropItemMode = PlayerDropItemMode.DropOnGround;
         [Tooltip("How player character drop item when dying (it will drop items if map info was set to drop items)")]
         public DeadDropItemMode playerDeadDropItemMode = DeadDropItemMode.DropOnGround;
+        [Tooltip("If all items does not picked up from corpse within this duration, it will be destroyed from the server")]
+        public float playerCorpseAppearDuration = 10f;
         [Tooltip("How monster character drop item when dying")]
         public DeadDropItemMode monsterDeadDropItemMode = DeadDropItemMode.DropOnGround;
+        [Tooltip("If all items does not picked up from corpse within this duration, it will be destroyed from the server")]
+        public float monsterCorpseAppearDuration = 10f;
         [Header("Gameplay Configs - Items, Inventory and Storage")]
         public ItemTypeFilter dismantleFilter = new ItemTypeFilter()
         {
