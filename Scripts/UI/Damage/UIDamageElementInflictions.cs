@@ -69,12 +69,19 @@ namespace MultiplayerARPG
                     tempElement = dataEntry.Key;
                     tempInfliction = dataEntry.Value;
                     // Set current elemental damage infliction text
-                    tempAmountText = string.Format(
-                        tempElement == GameInstance.Singleton.DefaultDamageElement ?
-                            LanguageManager.GetText(formatKeyInfliction) :
+                    if (tempElement == null || tempElement == GameInstance.Singleton.DefaultDamageElement)
+                    {
+                        tempAmountText = string.Format(
+                            LanguageManager.GetText(formatKeyInfliction),
+                            (tempInfliction * 100f).ToString("N0"));
+                    }
+                    else
+                    {
+                        tempAmountText = string.Format(
                             LanguageManager.GetText(formatKeyInflictionAsElemental),
-                        tempElement.Title,
-                        (tempInfliction * 100f).ToString("N0"));
+                            tempElement.Title,
+                            (tempInfliction * 100f).ToString("N0"));
+                    }
                     // Append current elemental damage infliction text
                     if (dataEntry.Value != 0)
                     {
@@ -103,12 +110,19 @@ namespace MultiplayerARPG
         private void SetDefaultValue(UIDamageElementTextPair componentPair)
         {
             DamageElement tempElement = componentPair.damageElement == null ? GameInstance.Singleton.DefaultDamageElement : componentPair.damageElement;
-            componentPair.uiText.text = string.Format(
-                tempElement == GameInstance.Singleton.DefaultDamageElement ?
-                    LanguageManager.GetText(formatKeyInfliction) :
+            if (tempElement == null || tempElement == GameInstance.Singleton.DefaultDamageElement)
+            {
+                componentPair.uiText.text = string.Format(
+                    LanguageManager.GetText(formatKeyInfliction),
+                    "0");
+            }
+            else
+            {
+                componentPair.uiText.text = string.Format(
                     LanguageManager.GetText(formatKeyInflictionAsElemental),
-                tempElement.Title,
-                "0");
+                    tempElement.Title,
+                    "0");
+            }
             if (componentPair.imageIcon != null)
                 componentPair.imageIcon.sprite = tempElement.Icon;
             if (inactiveIfAmountZero && componentPair.root != null)

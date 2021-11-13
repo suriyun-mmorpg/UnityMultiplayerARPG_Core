@@ -18,12 +18,19 @@ namespace MultiplayerARPG
             if (uiTextInfliction != null)
             {
                 DamageElement element = Data.damageElement;
-                uiTextInfliction.text = string.Format(
-                    element == GameInstance.Singleton.DefaultDamageElement ?
-                        LanguageManager.GetText(formatKeyInfliction) :
+                if (element == null || element == GameInstance.Singleton.DefaultDamageElement)
+                {
+                    uiTextInfliction.text = string.Format(
+                        LanguageManager.GetText(formatKeyInfliction),
+                        (Data.infliction * 100f).ToString("N0"));
+                }
+                else
+                {
+                    uiTextInfliction.text = string.Format(
                         LanguageManager.GetText(formatKeyInflictionAsElemental),
-                    element.Title,
-                    (Data.infliction * 100f).ToString("N0"));
+                        element.Title,
+                        (Data.infliction * 100f).ToString("N0"));
+                }
             }
         }
     }
