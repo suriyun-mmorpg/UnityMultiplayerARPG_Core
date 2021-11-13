@@ -87,45 +87,6 @@ namespace MultiplayerARPG
             Profiler.EndSample();
         }
 
-        public override void Killed(EntityInfo lastAttacker)
-        {
-            // Dead time
-            LastDeadTime = System.DateTimeOffset.UtcNow.ToUnixTimeSeconds();
-            // Dead penalty
-            float expLostPercentage = CurrentGameInstance.GameplayRule.GetExpLostPercentageWhenDeath(this);
-            GuildData guildData;
-            if (GameInstance.ServerGuildHandlers.TryGetGuild(GuildId, out guildData))
-                expLostPercentage -= expLostPercentage * guildData.DecreaseExpLostPercentage;
-            if (expLostPercentage <= 0f)
-                expLostPercentage = 0f;
-            int exp = Exp;
-            exp -= (int)(this.GetNextLevelExp() * expLostPercentage / 100f);
-            if (exp <= 0)
-                exp = 0;
-            Exp = exp;
-
-            base.Killed(lastAttacker);
-            CurrentNpcDialog = null;
-
-#if !CLIENT_BUILD
-            if (BaseGameNetworkManager.CurrentMapInfo.AutoRespawnWhenDead)
-                GameInstance.ServerCharacterHandlers.Respawn(0, this);
-#endif
-        }
-
-        public void OnKillMonster(BaseMonsterCharacterEntity monsterCharacterEntity)
-        {
-            if (!IsServer || monsterCharacterEntity == null)
-                return;
-
-            for (int i = 0; i < Quests.Count; ++i)
-            {
-                CharacterQuest quest = Quests[i];
-                if (quest.AddKillMonster(monsterCharacterEntity, 1))
-                    quests[i] = quest;
-            }
-        }
-
         public bool ExchangingDealingItemsWillOverwhelming()
         {
             if (DealingCharacter == null)

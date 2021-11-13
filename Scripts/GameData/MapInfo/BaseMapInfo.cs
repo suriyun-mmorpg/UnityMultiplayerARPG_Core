@@ -24,6 +24,21 @@ namespace MultiplayerARPG
         private float deadY = -100f;
         public virtual float DeadY { get { return deadY; } }
 
+        [Tooltip("When character dead, it will drop equipping weapons or not?")]
+        [SerializeField]
+        private bool playerDeadDropsEquipWeapons = false;
+        public virtual bool PlayerDeadDropsEquipWeapons { get { return playerDeadDropsEquipWeapons; } }
+
+        [Tooltip("When character dead, it will drop equipping items or not?")]
+        [SerializeField]
+        private bool playerDeadDropsEquipItems = false;
+        public virtual bool PlayerDeadDropsEquipItems { get { return playerDeadDropsEquipItems; } }
+
+        [Tooltip("When character dead, it will drop non equipping items or not?")]
+        [SerializeField]
+        private bool playerDeadDropsNonEquipItems = false;
+        public virtual bool PlayerDeadDropsNonEquipItems { get { return playerDeadDropsNonEquipItems; } }
+
         public virtual bool AutoRespawnWhenDead { get { return false; } }
         public virtual bool SaveCurrentMapPosition { get { return true; } }
 
