@@ -244,6 +244,7 @@ namespace MultiplayerARPG
                         targetMonster = tempTransform.GetComponent<BaseMonsterCharacterEntity>();
                         targetNpc = tempTransform.GetComponent<NpcEntity>();
                         targetItemDrop = tempTransform.GetComponent<ItemDropEntity>();
+                        targetItemsContainer = tempTransform.GetComponent<ItemsContainerEntity>();
                         targetHarvestable = tempTransform.GetComponent<HarvestableEntity>();
                         targetBuilding = null;
                         tempBuildingMaterial = tempTransform.GetComponent<BuildingMaterial>();
@@ -281,6 +282,14 @@ namespace MultiplayerARPG
                         {
                             // Found activating entity as item drop entity
                             SetTarget(targetItemDrop, TargetActionType.Activate);
+                            isFollowingTarget = true;
+                            tempHasMapPosition = false;
+                            break;
+                        }
+                        else if (targetItemsContainer)
+                        {
+                            // Found activating entity as items container entity
+                            SetTarget(targetItemsContainer, TargetActionType.Activate);
                             isFollowingTarget = true;
                             tempHasMapPosition = false;
                             break;
@@ -688,6 +697,14 @@ namespace MultiplayerARPG
                 DoActionOrMoveToEntity(targetItemDrop, CurrentGameInstance.pickUpItemDistance, () =>
                 {
                     PlayerCharacterEntity.CallServerPickupItem(targetItemDrop.ObjectId);
+                    ClearTarget();
+                });
+            }
+            else if (TryGetDoActionEntity(out targetItemsContainer))
+            {
+                DoActionOrMoveToEntity(targetItemsContainer, CurrentGameInstance.pickUpItemDistance, () =>
+                {
+                    ShowItemsContainerDialog(targetItemsContainer);
                     ClearTarget();
                 });
             }
