@@ -10,6 +10,7 @@ namespace MultiplayerARPG
             NonEquipItems,
             EquipItems,
             StorageItems,
+            ItemsContainer,
             Hotkey,
             Unknow = 254,
         }
@@ -43,6 +44,7 @@ namespace MultiplayerARPG
                     case SourceLocation.NonEquipItems:
                     case SourceLocation.EquipItems:
                     case SourceLocation.StorageItems:
+                    case SourceLocation.ItemsContainer:
                         return uiCharacterItem != null && uiCharacterItem.IndexOfData >= 0 && uiCharacterItem.CharacterItem.NotEmptySlot();
                     case SourceLocation.Hotkey:
                         return uiCharacterHotkey != null;
@@ -72,6 +74,12 @@ namespace MultiplayerARPG
         public void SetupForStorageItems(UICharacterItem uiCharacterItem)
         {
             sourceLocation = SourceLocation.StorageItems;
+            this.uiCharacterItem = uiCharacterItem;
+        }
+
+        public void SetupForItemsContainer(UICharacterItem uiCharacterItem)
+        {
+            sourceLocation = SourceLocation.ItemsContainer;
             this.uiCharacterItem = uiCharacterItem;
         }
 
@@ -105,6 +113,8 @@ namespace MultiplayerARPG
                 uiCharacterItem.OnClickUnEquip();
             if (sourceLocation == SourceLocation.StorageItems)
                 uiCharacterItem.OnClickMoveFromStorage();
+            if (sourceLocation == SourceLocation.ItemsContainer)
+                uiCharacterItem.OnClickPickUpFromContainer();
             if (sourceLocation == SourceLocation.Hotkey)
                 GameInstance.PlayingCharacterEntity.UnAssignHotkey(uiCharacterHotkey.hotkeyId);
         }

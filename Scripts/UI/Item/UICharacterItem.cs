@@ -161,6 +161,8 @@ namespace MultiplayerARPG
         public UnityEvent onEnhanceSocketItemDialogDisappear = new UnityEvent();
         public UnityEvent onStorageDialogAppear = new UnityEvent();
         public UnityEvent onStorageDialogDisappear = new UnityEvent();
+        public UnityEvent onItemsContainerDialogAppear = new UnityEvent();
+        public UnityEvent onItemsContainerDialogDisappear = new UnityEvent();
         public UnityEvent onEnterDealingState = new UnityEvent();
         public UnityEvent onExitDealingState = new UnityEvent();
 
@@ -183,6 +185,7 @@ namespace MultiplayerARPG
         protected bool isRepairItemDialogAppeared;
         protected bool isEnhanceSocketItemDialogAppeared;
         protected bool isStorageDialogAppeared;
+        protected bool isItemsContainerDialogAppeared;
         protected bool isDealingStateEntered;
         protected float lockRemainsDuration;
         protected bool dirtyIsLock;
@@ -351,6 +354,7 @@ namespace MultiplayerARPG
             UpdateRepairItemUIVisibility(false);
             UpdateEnhanceSocketUIVisibility(false);
             UpdateStorageUIVisibility(false);
+            UpdateItemsContainerUIVisibility(false);
             UpdateDealingState(false);
         }
 
@@ -1099,6 +1103,7 @@ namespace MultiplayerARPG
             UpdateRepairItemUIVisibility(true);
             UpdateEnhanceSocketUIVisibility(true);
             UpdateStorageUIVisibility(true);
+            UpdateItemsContainerUIVisibility(true);
             UpdateDealingState(true);
         }
 
@@ -1158,8 +1163,7 @@ namespace MultiplayerARPG
             }
             // Check visible item dialog
             if (GameInstance.ItemUIVisibilityManager.IsRefineItemDialogVisible() &&
-                EquipmentItem != null &&
-                InventoryType != InventoryType.StorageItems)
+                EquipmentItem != null && InventoryType != InventoryType.StorageItems)
             {
                 if (initData || !isRefineItemDialogAppeared)
                 {
@@ -1228,8 +1232,7 @@ namespace MultiplayerARPG
             }
             // Check visible item dialog
             if (GameInstance.ItemUIVisibilityManager.IsRepairItemDialogVisible() &&
-                EquipmentItem != null &&
-                InventoryType != InventoryType.StorageItems)
+                EquipmentItem != null && InventoryType != InventoryType.StorageItems)
             {
                 if (initData || !isRepairItemDialogAppeared)
                 {
@@ -1263,8 +1266,7 @@ namespace MultiplayerARPG
             }
             // Check visible item dialog
             if (GameInstance.ItemUIVisibilityManager.IsEnhanceSocketItemDialogVisible() &&
-                EquipmentItem != null &&
-                InventoryType != InventoryType.StorageItems)
+                EquipmentItem != null && InventoryType != InventoryType.StorageItems)
             {
                 if (initData || !isEnhanceSocketItemDialogAppeared)
                 {
@@ -1314,6 +1316,40 @@ namespace MultiplayerARPG
                     isStorageDialogAppeared = false;
                     if (onStorageDialogDisappear != null)
                         onStorageDialogDisappear.Invoke();
+                }
+            }
+        }
+
+        private void UpdateItemsContainerUIVisibility(bool initData)
+        {
+            if (!IsOwningCharacter())
+            {
+                if (initData || isItemsContainerDialogAppeared)
+                {
+                    isItemsContainerDialogAppeared = false;
+                    if (onItemsContainerDialogDisappear != null)
+                        onItemsContainerDialogDisappear.Invoke();
+                }
+                return;
+            }
+            // Check visible item dialog
+            if (GameInstance.ItemsContainerUIVisibilityManager.IsItemsContainerDialogVisible() &&
+                InventoryType == InventoryType.ItemsContainer)
+            {
+                if (initData || !isItemsContainerDialogAppeared)
+                {
+                    isItemsContainerDialogAppeared = true;
+                    if (onItemsContainerDialogAppear != null)
+                        onItemsContainerDialogAppear.Invoke();
+                }
+            }
+            else
+            {
+                if (initData || isItemsContainerDialogAppeared)
+                {
+                    isItemsContainerDialogAppeared = false;
+                    if (onItemsContainerDialogDisappear != null)
+                        onItemsContainerDialogDisappear.Invoke();
                 }
             }
         }
@@ -1590,6 +1626,34 @@ namespace MultiplayerARPG
                 inventoryType = inventoryType,
                 equipSlotIndexOrWeaponSet = equipSlotIndex,
             }, ClientStorageActions.ResponseMoveItemFromStorage);
+        }
+        #endregion
+
+        #region Move From Items Container Functions
+        public void OnClickPickUpFromContainer()
+        {
+            // Only Items container items can be moved from ItemsContainer
+            if (!IsOwningCharacter() || InventoryType != InventoryType.ItemsContainer)
+                return;
+
+            if (CharacterItem.amount == 1)
+            {
+                OnClickPickUpFromContainerConfirmed(1);
+            }
+            else
+            {
+                UISceneGlobal.Singleton.ShowInputDialog(LanguageManager.GetText(UITextKeys.UI_MOVE_ITEM_FROM_ITEMS_CONTAINER.ToString()), LanguageManager.GetText(UITextKeys.UI_MOVE_ITEM_FROM_ITEMS_CONTAINER_DESCRIPTION.ToString()), (amount) =>
+                {
+                    OnClickPickUpFromContainerConfirmed(amount);
+                }, 1, CharacterItem.amount, CharacterItem.amount);
+            }
+        }
+
+        private void OnClickPickUpFromContainerConfirmed(int amount)
+        {
+            if (selectionManager != null)
+                selectionManager.DeselectSelectedUI();
+            GameInstance.PlayingCharacterEntity.CallServerPickupItemFromContainer(GameInstance.ItemsContainerUIVisibilityManager.ItemsContainerEntity.ObjectId, IndexOfData, (short)amount);
         }
         #endregion
 

@@ -7,6 +7,7 @@
         EquipWeaponRight,
         EquipWeaponLeft,
         StorageItems,
+        ItemsContainer,
         Unknow = 254,
     }
 }

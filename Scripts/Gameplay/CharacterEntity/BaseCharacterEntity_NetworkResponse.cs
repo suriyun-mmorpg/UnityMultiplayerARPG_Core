@@ -54,9 +54,9 @@ namespace MultiplayerARPG
         /// This will be called at server to order character to pickup selected item from items container
         /// </summary>
         /// <param name="objectId"></param>
-        /// <param name="index"></param>
+        /// <param name="itemsContainerIndex"></param>
         [ServerRpc]
-        protected virtual void ServerPickupItemFromContainer(uint objectId, int index)
+        protected virtual void ServerPickupItemFromContainer(uint objectId, int itemsContainerIndex, short amount)
         {
 #if !CLIENT_BUILD
             if (!CanDoActions())
@@ -81,21 +81,24 @@ namespace MultiplayerARPG
                 return;
             }
 
-            if (index < 0 || index >= itemsContainerEntity.Items.Count)
+            if (itemsContainerIndex < 0 || itemsContainerIndex >= itemsContainerEntity.Items.Count)
                 return;
 
-            CharacterItem pickingItem = itemsContainerEntity.Items[index];
+            CharacterItem pickingItem = itemsContainerEntity.Items[itemsContainerIndex].Clone();
+            if (amount < 0)
+                amount = pickingItem.amount;
+            pickingItem.amount = amount;
             if (this.IncreasingItemsWillOverwhelming(pickingItem.dataId, pickingItem.amount))
             {
                 GameInstance.ServerGameMessageHandlers.SendGameMessage(ConnectionId, UITextKeys.UI_ERROR_WILL_OVERWHELMING);
                 return;
             }
 
-            this.IncreaseItems(pickingItem, (dataId, level, amount) =>
+            this.IncreaseItems(pickingItem, (dataId, level, increaseAmount) =>
             {
-                GameInstance.ServerGameMessageHandlers.NotifyRewardItem(ConnectionId, dataId, amount);
+                GameInstance.ServerGameMessageHandlers.NotifyRewardItem(ConnectionId, dataId, increaseAmount);
             });
-            itemsContainerEntity.Items.RemoveAt(index);
+            itemsContainerEntity.Items.DecreaseItemsByIndex(itemsContainerIndex, amount, false);
             itemsContainerEntity.PickedUp();
             this.FillEmptySlots();
 #endif

@@ -96,6 +96,8 @@ namespace MultiplayerARPG
         public System.Action<BuildingEntity> onShowCurrentBuildingDialog;
         public System.Action onHideCurrentBuildingDialog;
 
+        public override ItemsContainerEntity ItemsContainerEntity { get { return uiItemsContainer.TargetEntity; } }
+
         /// <summary>
         /// List of dialogs which open by activate on NPCs or Building Entites
         /// </summary>

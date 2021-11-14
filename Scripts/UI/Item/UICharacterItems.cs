@@ -19,7 +19,7 @@ namespace MultiplayerARPG
         public UICharacterItem uiPrefab;
         [FormerlySerializedAs("uiCharacterItemContainer")]
         public Transform uiContainer;
-        public bool isUnknowSource;
+        public InventoryType inventoryType = InventoryType.NonEquipItems;
 
         private UIList cacheList;
         public UIList CacheList
@@ -153,15 +153,28 @@ namespace MultiplayerARPG
                     if (filterItemTypes.Count == 0 ||
                         filterItemTypes.Contains(tempItem.ItemType))
                     {
-                        tempUI.Setup(new UICharacterItemData(data, isUnknowSource ? InventoryType.Unknow : InventoryType.NonEquipItems), Character, index);
+                        tempUI.Setup(new UICharacterItemData(data, inventoryType), Character, index);
                         tempUI.Show();
                         UICharacterItemDragHandler dragHandler = tempUI.GetComponentInChildren<UICharacterItemDragHandler>();
                         if (dragHandler != null)
                         {
-                            if (isUnknowSource)
-                                dragHandler.SetupForUnknow(tempUI);
-                            else
-                                dragHandler.SetupForNonEquipItems(tempUI);
+                            switch (inventoryType)
+                            {
+                                case InventoryType.NonEquipItems:
+                                    dragHandler.SetupForNonEquipItems(tempUI);
+                                    break;
+                                case InventoryType.EquipItems:
+                                case InventoryType.EquipWeaponRight:
+                                case InventoryType.EquipWeaponLeft:
+                                    dragHandler.SetupForEquipItems(tempUI);
+                                    break;
+                                case InventoryType.StorageItems:
+                                    dragHandler.SetupForStorageItems(tempUI);
+                                    break;
+                                case InventoryType.Unknow:
+                                    dragHandler.SetupForUnknow(tempUI);
+                                    break;
+                            }
                         }
                         CacheSelectionManager.Add(tempUI);
                         if (!string.IsNullOrEmpty(selectedId) && selectedId.Equals(data.id))

@@ -11,11 +11,11 @@
             return true;
         }
 
-        public bool CallServerPickupItemFromContainer(uint objectId, int index)
+        public bool CallServerPickupItemFromContainer(uint objectId, int itemsContainerIndex, short amount)
         {
             if (!CanDoActions())
                 return false;
-            RPC(ServerPickupItemFromContainer, objectId, index);
+            RPC(ServerPickupItemFromContainer, objectId, itemsContainerIndex, amount);
             CallAllPlayPickupAnimation();
             return true;
         }

@@ -211,6 +211,8 @@ namespace MultiplayerARPG
         UI_MOVE_ITEM_TO_STORAGE_DESCRIPTION,
         UI_MOVE_ITEM_FROM_STORAGE,
         UI_MOVE_ITEM_FROM_STORAGE_DESCRIPTION,
+        UI_MOVE_ITEM_FROM_ITEMS_CONTAINER,
+        UI_MOVE_ITEM_FROM_ITEMS_CONTAINER_DESCRIPTION,
         UI_ERROR_STORAGE_WILL_OVERWHELMING,
         // UI Bank
         UI_BANK_DEPOSIT,
@@ -1405,6 +1407,8 @@ namespace MultiplayerARPG
             Texts.Add(UITextKeys.UI_MOVE_ITEM_TO_STORAGE_DESCRIPTION.ToString(), "Enter amount of item");
             Texts.Add(UITextKeys.UI_MOVE_ITEM_FROM_STORAGE.ToString(), "Move From Storage");
             Texts.Add(UITextKeys.UI_MOVE_ITEM_FROM_STORAGE_DESCRIPTION.ToString(), "Enter amount of item");
+            Texts.Add(UITextKeys.UI_MOVE_ITEM_FROM_ITEMS_CONTAINER.ToString(), "Move From Container");
+            Texts.Add(UITextKeys.UI_MOVE_ITEM_FROM_ITEMS_CONTAINER_DESCRIPTION.ToString(), "Enter amount of item");
             Texts.Add(UITextKeys.UI_ERROR_STORAGE_WILL_OVERWHELMING.ToString(), "Storage will overwhelming");
             // UI Bank
             Texts.Add(UITextKeys.UI_BANK_DEPOSIT.ToString(), "Deposit");

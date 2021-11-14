@@ -108,7 +108,7 @@ namespace MultiplayerARPG
 
             if (uiAppliedSocketEnhancerItems != null)
             {
-                uiAppliedSocketEnhancerItems.isUnknowSource = true;
+                uiAppliedSocketEnhancerItems.inventoryType = InventoryType.Unknow;
                 uiAppliedSocketEnhancerItems.filterItemTypes = new List<ItemType>() { ItemType.SocketEnhancer };
                 uiAppliedSocketEnhancerItems.filterCategories = new List<string>();
                 List<CharacterItem> characterItems = new List<CharacterItem>();

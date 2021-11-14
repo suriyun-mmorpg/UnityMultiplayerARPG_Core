@@ -5,7 +5,8 @@ namespace MultiplayerARPG
 {
     public class UIItemsContainer : UICharacterItems
     {
-        public bool pickUpOnSelect;
+        public bool pickUpOnSelect = false;
+        public bool doNotAskForAmount = true;
         private bool readyToPickUp;
 
         public ItemsContainerEntity TargetEntity { get; private set; }
@@ -59,7 +60,30 @@ namespace MultiplayerARPG
             int selectedIndex = CacheSelectionManager.SelectedUI != null ? CacheSelectionManager.SelectedUI.IndexOfData : -1;
             if (selectedIndex < 0)
                 return;
-            GameInstance.PlayingCharacterEntity.CallServerPickupItemFromContainer(TargetEntity.ObjectId, selectedIndex);
+            CharacterItem characterItem = TargetEntity.Items[selectedIndex];
+            if (characterItem.amount == 1)
+            {
+                OnClickPickUpItemsContainerConfirmed(selectedIndex, 1);
+            }
+            else
+            {
+                if (doNotAskForAmount)
+                {
+                    OnClickPickUpItemsContainerConfirmed(selectedIndex, -1);
+                }
+                else
+                {
+                    UISceneGlobal.Singleton.ShowInputDialog(LanguageManager.GetText(UITextKeys.UI_MOVE_ITEM_FROM_ITEMS_CONTAINER.ToString()), LanguageManager.GetText(UITextKeys.UI_MOVE_ITEM_FROM_ITEMS_CONTAINER_DESCRIPTION.ToString()), (amount) =>
+                    {
+                        OnClickPickUpItemsContainerConfirmed(selectedIndex, amount);
+                    }, 1, characterItem.amount, characterItem.amount);
+                }
+            }
+        }
+
+        private void OnClickPickUpItemsContainerConfirmed(int selectedIndex, int amount)
+        {
+            GameInstance.PlayingCharacterEntity.CallServerPickupItemFromContainer(TargetEntity.ObjectId, selectedIndex, (short)amount);
         }
 
         public void UpdateData(ItemsContainerEntity targetEntity)

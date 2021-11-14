@@ -5,7 +5,7 @@ using System.Collections.Generic;
 namespace MultiplayerARPG
 {
     [DisallowMultipleComponent]
-    public abstract class BaseUISceneGameplay : MonoBehaviour, IItemUIVisibilityManager
+    public abstract class BaseUISceneGameplay : MonoBehaviour, IItemUIVisibilityManager, IItemsContainerUIVisibilityManager
     {
         public static BaseUISceneGameplay Singleton { get; private set; }
 
@@ -37,11 +37,13 @@ namespace MultiplayerARPG
         protected virtual void OnEnable()
         {
             GameInstance.ItemUIVisibilityManager = this;
+            GameInstance.ItemsContainerUIVisibilityManager = this;
         }
 
         protected virtual void OnDisable()
         {
             GameInstance.ItemUIVisibilityManager = null;
+            GameInstance.ItemsContainerUIVisibilityManager = null;
         }
 
         protected virtual void Update()
@@ -153,6 +155,7 @@ namespace MultiplayerARPG
             return false;
         }
 
+        // Abstract functions
         public abstract void SetTargetEntity(BaseGameEntity entity);
         public abstract void SetActivePlayerCharacter(BasePlayerCharacterEntity playerCharacter);
         public abstract void ShowNpcDialog(int npcDialogDataId);
@@ -181,5 +184,7 @@ namespace MultiplayerARPG
         public abstract void ShowCraftingQueueItemsDialog(ICraftingQueueSource source);
         public abstract void OnControllerSetup(BasePlayerCharacterEntity characterEntity);
         public abstract void OnControllerDesetup(BasePlayerCharacterEntity characterEntity);
+        // Abstract properties
+        public abstract ItemsContainerEntity ItemsContainerEntity { get; }
     }
 }
