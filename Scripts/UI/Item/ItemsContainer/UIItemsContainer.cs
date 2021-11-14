@@ -40,7 +40,7 @@ namespace MultiplayerARPG
 
         protected virtual void OnItemsOperation(LiteNetLibSyncList.Operation operation, int index)
         {
-            UpdateData(TargetEntity.Items);
+            UpdateData();
         }
 
         protected override void OnSelect(UICharacterItem ui)
@@ -94,14 +94,14 @@ namespace MultiplayerARPG
                 return;
             }
             TargetEntity = targetEntity;
-            UpdateData(TargetEntity.Items);
+            UpdateData();
         }
 
-        public virtual void UpdateData(IList<CharacterItem> characterItems)
+        protected virtual void UpdateData()
         {
             readyToPickUp = false;
             inventoryType = InventoryType.ItemsContainer;
-            UpdateData(GameInstance.PlayingCharacter, TargetEntity.Items);
+            UpdateData(GameInstance.PlayingCharacter, TargetEntity ? TargetEntity.Items : null);
             readyToPickUp = true;
         }
     }
