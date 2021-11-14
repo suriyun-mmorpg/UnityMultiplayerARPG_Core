@@ -12,10 +12,10 @@ public class UIBase : MonoBehaviour
     public bool hideOnAwake = false;
     public bool moveToLastSiblingOnShow = false;
     public GameObject root;
-    public UnityEvent onShow;
-    public UnityEvent onHide;
-    public UIBaseEvent onShowWithObject;
-    public UIBaseEvent onHideWithObject;
+    public UnityEvent onShow = new UnityEvent();
+    public UnityEvent onHide = new UnityEvent();
+    public UIBaseEvent onShowWithObject = new UIBaseEvent();
+    public UIBaseEvent onHideWithObject = new UIBaseEvent();
 
     private bool isAwaken;
 
@@ -67,10 +67,8 @@ public class UIBase : MonoBehaviour
         CacheComponents();
         if (!CacheRoot.activeSelf)
             CacheRoot.SetActive(true);
-        if (onShow != null)
-            onShow.Invoke();
-        if (onShowWithObject != null)
-            onShowWithObject.Invoke(this);
+        onShow.Invoke();
+        onShowWithObject.Invoke(this);
         OnShow();
         if (moveToLastSiblingOnShow)
             CacheRoot.transform.SetAsLastSibling();
@@ -89,10 +87,8 @@ public class UIBase : MonoBehaviour
         isAwaken = true;
         CacheComponents();
         CacheRoot.SetActive(false);
-        if (onHide != null)
-            onHide.Invoke();
-        if (onHideWithObject != null)
-            onHideWithObject.Invoke(this);
+        onHide.Invoke();
+        onHideWithObject.Invoke(this);
         OnHide();
         this.InvokeInstanceDevExtMethods("Hide");
     }
