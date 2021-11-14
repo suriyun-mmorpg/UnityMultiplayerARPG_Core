@@ -1,8 +1,11 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.Events;
-using UnityEngine.UI;
+
+[System.Serializable]
+public class UIBaseEvent : UnityEvent<UIBase>
+{
+
+}
 
 public class UIBase : MonoBehaviour
 {
@@ -11,6 +14,8 @@ public class UIBase : MonoBehaviour
     public GameObject root;
     public UnityEvent onShow;
     public UnityEvent onHide;
+    public UIBaseEvent onShowWithObject;
+    public UIBaseEvent onHideWithObject;
 
     private bool isAwaken;
 
@@ -64,6 +69,8 @@ public class UIBase : MonoBehaviour
             CacheRoot.SetActive(true);
         if (onShow != null)
             onShow.Invoke();
+        if (onShowWithObject != null)
+            onShowWithObject.Invoke(this);
         OnShow();
         if (moveToLastSiblingOnShow)
             CacheRoot.transform.SetAsLastSibling();
@@ -84,6 +91,8 @@ public class UIBase : MonoBehaviour
         CacheRoot.SetActive(false);
         if (onHide != null)
             onHide.Invoke();
+        if (onHideWithObject != null)
+            onHideWithObject.Invoke(this);
         OnHide();
         this.InvokeInstanceDevExtMethods("Hide");
     }
