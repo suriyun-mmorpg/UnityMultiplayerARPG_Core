@@ -387,7 +387,7 @@ namespace MultiplayerARPG.GameData.Model.Playables
                         baseTransitionDuration = baseStates[playingStateId].state.transitionDuration;
                         if (baseTransitionDuration <= 0f)
                             baseTransitionDuration = CharacterModel.transitionDuration;
-                        baseTransitionDuration *= baseLayerClipSpeed;
+                        baseTransitionDuration /= baseLayerClipSpeed;
                         BaseLayerMixer.GetInput(baseInputPort).Play();
                         baseClipLength = baseStates[playingStateId].GetClipLength(1);
                         // Set layer additive
@@ -539,7 +539,7 @@ namespace MultiplayerARPG.GameData.Model.Playables
             actionTransitionDuration = actionState.transitionDuration;
             if (actionTransitionDuration <= 0f)
                 actionTransitionDuration = CharacterModel.transitionDuration;
-            actionTransitionDuration *= actionLayerClipSpeed;
+            actionTransitionDuration /= actionLayerClipSpeed;
             // Set clip length
             ActionLayerMixer.GetInput(0).SetTime(0f);
             actionClipLength = (duration > 0f ? duration : clip.length) / actionLayerClipSpeed;
