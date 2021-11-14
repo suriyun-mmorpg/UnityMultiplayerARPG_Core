@@ -89,7 +89,10 @@ namespace MultiplayerARPG
         public void UpdateData(ItemsContainerEntity targetEntity)
         {
             if (targetEntity == null || !GameInstance.PlayingCharacterEntity.IsGameEntityInDistance(targetEntity, GameInstance.Singleton.pickUpItemDistance))
+            {
+                TargetEntity = null;
                 return;
+            }
             TargetEntity = targetEntity;
             UpdateData(TargetEntity.Items);
         }
@@ -97,48 +100,8 @@ namespace MultiplayerARPG
         public virtual void UpdateData(IList<CharacterItem> characterItems)
         {
             readyToPickUp = false;
-            string selectedId = CacheSelectionManager.SelectedUI != null ? CacheSelectionManager.SelectedUI.Data.characterItem.id : string.Empty;
-            CacheSelectionManager.Clear();
-
-            if (characterItems == null || characterItems.Count == 0)
-            {
-                if (uiDialog != null)
-                    uiDialog.Hide();
-                CacheList.HideAll();
-                if (listEmptyObject != null)
-                    listEmptyObject.SetActive(true);
-                return;
-            }
-
-            UICharacterItem selectedUI = null;
-            UICharacterItem tempUI;
-            CacheList.Generate(characterItems, (index, characterItem, ui) =>
-            {
-                tempUI = ui.GetComponent<UICharacterItem>();
-                tempUI.Setup(new UICharacterItemData(characterItem, InventoryType.Unknow), GameInstance.PlayingCharacter, index);
-                tempUI.Show();
-                UICharacterItemDragHandler dragHandler = tempUI.GetComponentInChildren<UICharacterItemDragHandler>();
-                if (dragHandler != null)
-                    dragHandler.SetupForStorageItems(tempUI);
-                CacheSelectionManager.Add(tempUI);
-                if (!string.IsNullOrEmpty(selectedId) && selectedId.Equals(characterItem.id))
-                    selectedUI = tempUI;
-            });
-            if (listEmptyObject != null)
-                listEmptyObject.SetActive(false);
-            if (selectedUI == null)
-            {
-                CacheSelectionManager.DeselectSelectedUI();
-            }
-            else
-            {
-                bool defaultDontShowComparingEquipments = uiDialog != null ? uiDialog.dontShowComparingEquipments : false;
-                if (uiDialog != null)
-                    uiDialog.dontShowComparingEquipments = true;
-                selectedUI.OnClickSelect();
-                if (uiDialog != null)
-                    uiDialog.dontShowComparingEquipments = defaultDontShowComparingEquipments;
-            }
+            inventoryType = InventoryType.ItemsContainer;
+            UpdateData(GameInstance.PlayingCharacter, TargetEntity.Items);
             readyToPickUp = true;
         }
     }
