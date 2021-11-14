@@ -1,13 +1,16 @@
-﻿namespace MultiplayerARPG
+﻿using System.Collections.Generic;
+
+namespace MultiplayerARPG
 {
 	public class UIPickupItemList : UICharacterItems
     {
         public bool pickUpOnSelect;
+        private bool readyToPickUp;
 
         protected override void OnSelect(UICharacterItem ui)
         {
             base.OnSelect(ui);
-            if (pickUpOnSelect)
+            if (pickUpOnSelect && readyToPickUp)
                 OnClickPickUpSelectedItem();
         }
 
@@ -22,6 +25,14 @@
         public void OnClickPickupNearbyItems()
         {
             GameInstance.PlayingCharacterEntity.CallServerPickupNearbyItems();
+        }
+
+        public void UpdateData(IList<CharacterItem> characterItems)
+        {
+            readyToPickUp = false;
+            inventoryType = InventoryType.Unknow;
+            UpdateData(GameInstance.PlayingCharacter, characterItems);
+            readyToPickUp = true;
         }
     }
 }

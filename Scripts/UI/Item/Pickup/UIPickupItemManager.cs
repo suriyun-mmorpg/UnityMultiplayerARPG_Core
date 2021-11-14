@@ -1,5 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 
 namespace MultiplayerARPG
@@ -56,7 +55,6 @@ namespace MultiplayerARPG
             // Update list
             if (uiList != null)
             {
-                uiList.UpdateData(GameInstance.PlayingCharacterEntity, droppedItems);
                 if (droppedItems.Count == 0)
                 {
                     if (uiList.IsVisible())
@@ -64,6 +62,7 @@ namespace MultiplayerARPG
                 }
                 else
                 {
+                    uiList.UpdateData(droppedItems);
                     if (!uiList.IsVisible())
                         uiList.Show();
                 }
