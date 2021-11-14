@@ -17,6 +17,7 @@ namespace MultiplayerARPG
         public Button buttonOffer;
         public Button buttonMoveToStorage;
         public Button buttonMoveFromStorage;
+        public Button buttonPickUpFromContainer;
         public Button buttonDrop;
         private UICharacterItem ui;
 
@@ -26,9 +27,10 @@ namespace MultiplayerARPG
             ui.onSetEquippedData.AddListener(OnSetEquippedData);
             ui.onSetUnEquippedData.AddListener(OnSetUnEquippedData);
             ui.onSetUnEquippableData.AddListener(OnSetUnEquippableData);
-            ui.onSetUnknowSourceData.AddListener(OnSetUnknowSourceData);
             ui.onSetUsableData.AddListener(OnSetUsableData);
             ui.onSetStorageItemData.AddListener(OnSetStorageItemData);
+            ui.onSetItemsContainerItemData.AddListener(OnSetItemsContainerItemData);
+            ui.onSetUnknowSourceData.AddListener(OnSetUnknowSourceData);
             ui.onRefineItemDialogAppear.AddListener(OnRefineItemDialogAppear);
             ui.onRefineItemDialogDisappear.AddListener(OnRefineItemDialogDisappear);
             ui.onDismantleItemDialogAppear.AddListener(OnDismantleItemDialogAppear);
@@ -71,6 +73,8 @@ namespace MultiplayerARPG
                 buttonMoveFromStorage.gameObject.SetActive(false);
             if (buttonDrop)
                 buttonDrop.gameObject.SetActive(false);
+            if (buttonPickUpFromContainer)
+                buttonPickUpFromContainer.gameObject.SetActive(false);
         }
 
         public void OnSetEquippedData()
@@ -112,11 +116,6 @@ namespace MultiplayerARPG
                 buttonDrop.gameObject.SetActive(true);
         }
 
-        public void OnSetUnknowSourceData()
-        {
-            DeactivateAllButtons();
-        }
-
         public void OnSetUsableData()
         {
             DeactivateAllButtons();
@@ -133,6 +132,18 @@ namespace MultiplayerARPG
             DeactivateAllButtons();
             if (buttonMoveFromStorage)
                 buttonMoveFromStorage.gameObject.SetActive(true);
+        }
+
+        public void OnSetItemsContainerItemData()
+        {
+            DeactivateAllButtons();
+            if (buttonPickUpFromContainer)
+                buttonPickUpFromContainer.gameObject.SetActive(true);
+        }
+
+        public void OnSetUnknowSourceData()
+        {
+            DeactivateAllButtons();
         }
 
         public void OnRefineItemDialogAppear()

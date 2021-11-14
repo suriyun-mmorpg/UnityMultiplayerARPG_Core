@@ -146,9 +146,10 @@ namespace MultiplayerARPG
         public UnityEvent onSetEquippedData = new UnityEvent();
         public UnityEvent onSetUnEquippedData = new UnityEvent();
         public UnityEvent onSetUnEquippableData = new UnityEvent();
-        public UnityEvent onSetUnknowSourceData = new UnityEvent();
         public UnityEvent onSetUsableData = new UnityEvent();
         public UnityEvent onSetStorageItemData = new UnityEvent();
+        public UnityEvent onSetItemsContainerItemData = new UnityEvent();
+        public UnityEvent onSetUnknowSourceData = new UnityEvent();
         public UnityEvent onNpcSellItemDialogAppear = new UnityEvent();
         public UnityEvent onNpcSellItemDialogDisappear = new UnityEvent();
         public UnityEvent onRefineItemDialogAppear = new UnityEvent();
@@ -161,8 +162,6 @@ namespace MultiplayerARPG
         public UnityEvent onEnhanceSocketItemDialogDisappear = new UnityEvent();
         public UnityEvent onStorageDialogAppear = new UnityEvent();
         public UnityEvent onStorageDialogDisappear = new UnityEvent();
-        public UnityEvent onItemsContainerDialogAppear = new UnityEvent();
-        public UnityEvent onItemsContainerDialogDisappear = new UnityEvent();
         public UnityEvent onEnterDealingState = new UnityEvent();
         public UnityEvent onExitDealingState = new UnityEvent();
 
@@ -185,7 +184,6 @@ namespace MultiplayerARPG
         protected bool isRepairItemDialogAppeared;
         protected bool isEnhanceSocketItemDialogAppeared;
         protected bool isStorageDialogAppeared;
-        protected bool isItemsContainerDialogAppeared;
         protected bool isDealingStateEntered;
         protected float lockRemainsDuration;
         protected bool dirtyIsLock;
@@ -354,7 +352,6 @@ namespace MultiplayerARPG
             UpdateRepairItemUIVisibility(false);
             UpdateEnhanceSocketUIVisibility(false);
             UpdateStorageUIVisibility(false);
-            UpdateItemsContainerUIVisibility(false);
             UpdateDealingState(false);
         }
 
@@ -377,29 +374,35 @@ namespace MultiplayerARPG
                 onSetNonLevelZeroData.Invoke();
             }
 
-            if (InventoryType != InventoryType.StorageItems)
+            switch (InventoryType)
             {
-                if (InventoryType == InventoryType.Unknow)
-                {
+                case InventoryType.Unknow:
                     onSetUnknowSourceData.Invoke();
-                }
-                else if (EquipmentItem != null)
-                {
-                    if (InventoryType != InventoryType.NonEquipItems)
-                        onSetEquippedData.Invoke();
+                    break;
+                case InventoryType.StorageItems:
+                    onSetStorageItemData.Invoke();
+                    break;
+                case InventoryType.ItemsContainer:
+                    onSetItemsContainerItemData.Invoke();
+                    break;
+                case InventoryType.NonEquipItems:
+                case InventoryType.EquipItems:
+                case InventoryType.EquipWeaponRight:
+                case InventoryType.EquipWeaponLeft:
+                    if (EquipmentItem != null)
+                    {
+                        if (InventoryType == InventoryType.NonEquipItems)
+                            onSetUnEquippedData.Invoke();
+                        else
+                            onSetEquippedData.Invoke();
+                    }
                     else
-                        onSetUnEquippedData.Invoke();
-                }
-                else
-                {
-                    onSetUnEquippableData.Invoke();
-                    if (UsableItem != null)
-                        onSetUsableData.Invoke();
-                }
-            }
-            else
-            {
-                onSetStorageItemData.Invoke();
+                    {
+                        onSetUnEquippableData.Invoke();
+                        if (UsableItem != null)
+                            onSetUsableData.Invoke();
+                    }
+                    break;
             }
 
             if (uiTextTitle != null)
@@ -1103,7 +1106,6 @@ namespace MultiplayerARPG
             UpdateRepairItemUIVisibility(true);
             UpdateEnhanceSocketUIVisibility(true);
             UpdateStorageUIVisibility(true);
-            UpdateItemsContainerUIVisibility(true);
             UpdateDealingState(true);
         }
 
@@ -1316,40 +1318,6 @@ namespace MultiplayerARPG
                     isStorageDialogAppeared = false;
                     if (onStorageDialogDisappear != null)
                         onStorageDialogDisappear.Invoke();
-                }
-            }
-        }
-
-        private void UpdateItemsContainerUIVisibility(bool initData)
-        {
-            if (!IsOwningCharacter())
-            {
-                if (initData || isItemsContainerDialogAppeared)
-                {
-                    isItemsContainerDialogAppeared = false;
-                    if (onItemsContainerDialogDisappear != null)
-                        onItemsContainerDialogDisappear.Invoke();
-                }
-                return;
-            }
-            // Check visible item dialog
-            if (GameInstance.ItemsContainerUIVisibilityManager.IsItemsContainerDialogVisible() &&
-                InventoryType == InventoryType.ItemsContainer)
-            {
-                if (initData || !isItemsContainerDialogAppeared)
-                {
-                    isItemsContainerDialogAppeared = true;
-                    if (onItemsContainerDialogAppear != null)
-                        onItemsContainerDialogAppear.Invoke();
-                }
-            }
-            else
-            {
-                if (initData || isItemsContainerDialogAppeared)
-                {
-                    isItemsContainerDialogAppeared = false;
-                    if (onItemsContainerDialogDisappear != null)
-                        onItemsContainerDialogDisappear.Invoke();
                 }
             }
         }
