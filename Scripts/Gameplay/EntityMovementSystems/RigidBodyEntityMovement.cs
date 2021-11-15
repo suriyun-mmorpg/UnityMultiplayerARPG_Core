@@ -544,6 +544,11 @@ namespace MultiplayerARPG
                 if (pauseMovementCountDown > 0f)
                     pauseMovementCountDown -= deltaTime;
             }
+            if (pauseMovementCountDown > 0f)
+            {
+                // Remove movement from movestate while pausing movement
+                tempMovementState ^= MovementState.Forward | MovementState.Backward | MovementState.Right | MovementState.Right;
+            }
             // Updating vertical movement (Fall, WASD inputs under water)
             if (isUnderWater)
             {
