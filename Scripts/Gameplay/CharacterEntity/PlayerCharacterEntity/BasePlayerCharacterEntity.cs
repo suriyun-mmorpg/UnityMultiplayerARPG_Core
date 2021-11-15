@@ -147,7 +147,7 @@ namespace MultiplayerARPG
             this.FillEmptySlots();
             DealingCharacter.FillEmptySlots();
             Gold -= DealingGold;
-            DealingCharacter.Gold = DealingCharacter.Gold.Increase(gold);
+            DealingCharacter.Gold = DealingCharacter.Gold.Increase(DealingGold);
             GameInstance.ServerGameMessageHandlers.NotifyRewardGold(DealingCharacter.ConnectionId, DealingGold);
         }
 
