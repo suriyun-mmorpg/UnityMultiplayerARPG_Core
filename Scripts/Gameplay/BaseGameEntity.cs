@@ -34,6 +34,10 @@ namespace MultiplayerARPG
         [Category(100, "Sync Fields", false)]
         [SerializeField]
         protected SyncFieldString syncTitle = new SyncFieldString();
+        public SyncFieldString SyncTitle
+        {
+            get { return syncTitle; }
+        }
         public string Title
         {
             get { return !string.IsNullOrEmpty(syncTitle.Value) ? syncTitle.Value : EntityTitle; }
@@ -42,6 +46,10 @@ namespace MultiplayerARPG
 
         [SerializeField]
         protected SyncFieldString syncTitleB = new SyncFieldString();
+        public SyncFieldString SyncTitleB
+        {
+            get { return syncTitleB; }
+        }
         public string TitleB
         {
             get { return syncTitleB.Value; }

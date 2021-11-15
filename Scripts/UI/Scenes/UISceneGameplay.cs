@@ -23,6 +23,7 @@ namespace MultiplayerARPG
         public UICharacterEntity uiTargetCharacter;
         public UIBaseGameEntity uiTargetNpc;
         public UIBaseGameEntity uiTargetItemDrop;
+        public UIBaseGameEntity uiTargetItemsContainer;
         public UIDamageableEntity uiTargetBuilding;
         public UIDamageableEntity uiTargetHarvestable;
         public UIBaseGameEntity uiTargetVehicle;
@@ -201,6 +202,7 @@ namespace MultiplayerARPG
                 SetTargetCharacter(null);
                 SetTargetNpc(null);
                 SetTargetItemDrop(null);
+                SetTargetItemsContainer(null);
                 SetTargetBuilding(null);
                 SetTargetHarvestable(null);
                 SetTargetVehicle(null);
@@ -213,6 +215,8 @@ namespace MultiplayerARPG
                 SetTargetNpc(entity as NpcEntity);
             if (entity is ItemDropEntity)
                 SetTargetItemDrop(entity as ItemDropEntity);
+            if (entity is ItemsContainerEntity)
+                SetTargetItemsContainer(entity as ItemsContainerEntity);
             if (entity is BuildingEntity)
                 SetTargetBuilding(entity as BuildingEntity);
             if (entity is HarvestableEntity)
@@ -265,6 +269,21 @@ namespace MultiplayerARPG
 
             uiTargetItemDrop.Data = itemDrop;
             uiTargetItemDrop.Show();
+        }
+
+        protected void SetTargetItemsContainer(ItemsContainerEntity itemsContainer)
+        {
+            if (uiTargetItemsContainer == null)
+                return;
+
+            if (itemsContainer == null)
+            {
+                uiTargetItemsContainer.Hide();
+                return;
+            }
+
+            uiTargetItemsContainer.Data = itemsContainer;
+            uiTargetItemsContainer.Show();
         }
 
         protected void SetTargetBuilding(BuildingEntity building)

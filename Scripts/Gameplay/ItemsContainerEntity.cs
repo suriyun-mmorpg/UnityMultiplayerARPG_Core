@@ -13,6 +13,9 @@ namespace MultiplayerARPG
         [Tooltip("Delay before the entity destroyed, you may set some delay to play destroyed animation by `onItemDropDestroy` event before it's going to be destroyed from the game.")]
         [SerializeField]
         protected float destroyDelay = 0f;
+        [SerializeField]
+        [Tooltip("Format => {0} = {Title}")]
+        protected UILocaleKeySetting formatKeyCorpseTitle = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_CORPSE_TITLE);
 
         [Category("Events")]
         [SerializeField]
@@ -20,12 +23,37 @@ namespace MultiplayerARPG
 
         private static readonly RaycastHit[] findGroundRaycastHits = new RaycastHit[1000];
 
+        protected SyncFieldString dropperTitle = new SyncFieldString();
+        public SyncFieldString DropperTitle
+        {
+            get { return dropperTitle; }
+        }
+        protected SyncFieldInt dropperEntityId = new SyncFieldInt();
+        public SyncFieldInt DropperEntityId
+        {
+            get { return dropperEntityId; }
+        }
         protected SyncListCharacterItem items = new SyncListCharacterItem();
         public SyncListCharacterItem Items
         {
             get { return items; }
         }
         public HashSet<uint> Looters { get; protected set; }
+        public override string EntityTitle
+        {
+            get
+            {
+                if (!string.IsNullOrEmpty(dropperTitle.Value))
+                {
+                    return string.Format(LanguageManager.GetText(formatKeyCorpseTitle), DropperTitle.Value);
+                }
+                if (GameInstance.MonsterCharacterEntities.ContainsKey(dropperEntityId.Value))
+                {
+                    return string.Format(LanguageManager.GetText(formatKeyCorpseTitle), GameInstance.MonsterCharacterEntities[dropperEntityId.Value].EntityTitle);
+                }
+                return base.EntityTitle;
+            }
+        }
 
         // Private variables
         protected bool isDestroyed;
@@ -35,6 +63,8 @@ namespace MultiplayerARPG
         protected override void SetupNetElements()
         {
             base.SetupNetElements();
+            dropperTitle.syncMode = LiteNetLibSyncField.SyncMode.ServerToClients;
+            dropperEntityId.syncMode = LiteNetLibSyncField.SyncMode.ServerToClients;
             items.forOwnerOnly = false;
         }
 
@@ -107,10 +137,10 @@ namespace MultiplayerARPG
                     }
                     break;
             }
-            return DropItems(prefab, dropPosition, dropRotation, dropItems, looters, appearDuration);
+            return DropItems(prefab, dropper, dropPosition, dropRotation, dropItems, looters, appearDuration);
         }
 
-        public static ItemsContainerEntity DropItems(ItemsContainerEntity prefab, Vector3 dropPosition, Quaternion dropRotation, IEnumerable<CharacterItem> dropItems, IEnumerable<uint> looters, float appearDuration)
+        public static ItemsContainerEntity DropItems(ItemsContainerEntity prefab, BaseGameEntity dropper, Vector3 dropPosition, Quaternion dropRotation, IEnumerable<CharacterItem> dropItems, IEnumerable<uint> looters, float appearDuration)
         {
             if (prefab == null)
                 return null;
@@ -129,6 +159,13 @@ namespace MultiplayerARPG
             itemsContainerEntity.isDestroyed = false;
             itemsContainerEntity.dropTime = Time.unscaledTime;
             itemsContainerEntity.appearDuration = appearDuration;
+            if (dropper != null)
+            {
+                if (!string.IsNullOrEmpty(dropper.SyncTitle))
+                    itemsContainerEntity.DropperTitle.Value = dropper.SyncTitle;
+                else
+                    itemsContainerEntity.DropperEntityId.Value = dropper.EntityId;
+            }
             BaseGameNetworkManager.Singleton.Assets.NetworkSpawn(spawnObj);
             return itemsContainerEntity;
         }

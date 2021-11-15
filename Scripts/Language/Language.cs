@@ -1048,6 +1048,9 @@ namespace MultiplayerARPG
         /// Format => {0} = {Character Classes}
         /// </summary>
         UI_FORMAT_INVALID_REQUIRE_CLASS,
+
+        // 1.71c New Formats
+        UI_FORMAT_CORPSE_TITLE,
     }
 
     public static class DefaultLocale
@@ -1551,6 +1554,8 @@ namespace MultiplayerARPG
             // Format - 1.68b - Asset bundle
             Texts.Add(UIFormatKeys.UI_FORMAT_LOADING_ASSET_BUNDLE_FILE_NAME.ToString(), "Loading File: {0}");
             Texts.Add(UIFormatKeys.UI_FORMAT_LOADED_ASSET_BUNDLES_COUNT.ToString(), "Loaded Files: {0}/{1}");
+            // Format - 1.71c - Corpse items container
+            Texts.Add(UIFormatKeys.UI_FORMAT_CORPSE_TITLE.ToString(), "{0}'s corpse");
         }
     }
 

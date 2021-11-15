@@ -705,7 +705,6 @@ namespace MultiplayerARPG
                 DoActionOrMoveToEntity(targetItemsContainer, CurrentGameInstance.pickUpItemDistance, () =>
                 {
                     ShowItemsContainerDialog(targetItemsContainer);
-                    ClearTarget();
                 });
             }
             else if (TryGetDoActionEntity(out targetBuilding, TargetActionType.Activate))
