@@ -13,6 +13,7 @@ namespace MultiplayerARPG
         public BaseSkill UsingSkill { get; protected set; }
         public short UsingSkillLevel { get; protected set; }
         public bool IsUsingSkill { get; protected set; }
+        public float LastUseSkillEndTime { get; protected set; }
         public bool IsCastingSkillCanBeInterrupted { get; protected set; }
         public bool IsCastingSkillInterrupted { get; protected set; }
         public float CastingSkillDuration { get; protected set; }
@@ -395,6 +396,7 @@ namespace MultiplayerARPG
             }
             // Clear action states at clients and server
             Entity.ClearActionStates();
+            LastUseSkillEndTime = Time.unscaledTime;
         }
 
         public void CancelSkill()

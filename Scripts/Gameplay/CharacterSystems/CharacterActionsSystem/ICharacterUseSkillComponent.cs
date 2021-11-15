@@ -9,6 +9,7 @@
         float CastingSkillDuration { get; }
         float CastingSkillCountDown { get; }
         bool IsUsingSkill { get; }
+        float LastUseSkillEndTime { get; }
         float MoveSpeedRateWhileUsingSkill { get; }
 
         void InterruptCastingSkill();

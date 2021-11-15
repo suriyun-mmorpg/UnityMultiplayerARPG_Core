@@ -12,6 +12,7 @@ namespace MultiplayerARPG
     {
         protected List<CancellationTokenSource> attackCancellationTokenSources = new List<CancellationTokenSource>();
         public bool IsAttacking { get; protected set; }
+        public float LastAttackEndTime { get; protected set; }
         public float MoveSpeedRateWhileAttacking { get; protected set; }
         [SerializeField]
         [Range(0.00825f, 0.1f)]
@@ -266,6 +267,7 @@ namespace MultiplayerARPG
             }
             // Clear action states at clients and server
             Entity.ClearActionStates();
+            LastAttackEndTime = Time.unscaledTime;
         }
 
         protected virtual void ApplyAttack(bool isLeftHand, CharacterItem weapon, DamageInfo damageInfo, Dictionary<DamageElement, MinMaxFloat> damageAmounts, AimPosition aimPosition, int randomSeed)

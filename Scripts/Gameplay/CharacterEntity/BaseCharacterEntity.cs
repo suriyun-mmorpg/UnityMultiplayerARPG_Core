@@ -20,6 +20,7 @@ namespace MultiplayerARPG
         public const float RESPAWN_GROUNDED_CHECK_DURATION = 1f;
         public const float MOUNT_DELAY = 1f;
         public const float FIND_ENTITY_DISTANCE_BUFFER = 1f;
+        public const float RETURN_MOVEMENT_SPEED_DELAY = 0.2f;
 
         protected struct SyncListRecachingState
         {
@@ -95,8 +96,10 @@ namespace MultiplayerARPG
         public AnimActionType AnimActionType { get; set; }
         public int AnimActionDataId { get; set; }
         public bool IsAttacking { get { return AttackComponent.IsAttacking; } }
+        public float LastAttackEndTime { get { return AttackComponent.LastAttackEndTime; } }
         public float MoveSpeedRateWhileAttacking { get { return AttackComponent.MoveSpeedRateWhileAttacking; } }
         public bool IsUsingSkill { get { return UseSkillComponent.IsUsingSkill; } }
+        public float LastUseSkillEndTime { get { return UseSkillComponent.LastUseSkillEndTime; } }
         public float MoveSpeedRateWhileUsingSkill { get { return UseSkillComponent.MoveSpeedRateWhileUsingSkill; } }
         public BaseSkill UsingSkill { get { return UseSkillComponent.UsingSkill; } }
         public short UsingSkillLevel { get { return UseSkillComponent.UsingSkillLevel; } }
@@ -840,12 +843,12 @@ namespace MultiplayerARPG
         protected float GetMoveSpeed(MovementState movementState, ExtraMovementState extraMovementState)
         {
             float moveSpeed = this.GetCaches().MoveSpeed;
-
-            if (IsAttacking)
+            float time = Time.unscaledTime;
+            if (IsAttacking || time - LastAttackEndTime < RETURN_MOVEMENT_SPEED_DELAY)
             {
                 moveSpeed *= MoveSpeedRateWhileAttacking;
             }
-            else if (IsUsingSkill)
+            else if (IsUsingSkill || time - LastUseSkillEndTime < RETURN_MOVEMENT_SPEED_DELAY)
             {
                 moveSpeed *= MoveSpeedRateWhileUsingSkill;
             }

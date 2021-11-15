@@ -9,10 +9,8 @@ namespace MultiplayerARPG
             if (!CanUseItem())
                 return false;
 
-            float time = Time.unscaledTime;
-            if (time - lastActionTime < ACTION_DELAY)
+            if (!UpdateLastActionTime())
                 return false;
-            lastActionTime = time;
 
             if (index >= nonEquipItems.Count)
                 return false;
