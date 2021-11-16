@@ -177,22 +177,22 @@ namespace MultiplayerARPG
                 return;
 
             if (useRootMotionWhileNotMoving &&
-                !Entity.MovementState.Has(MovementState.Forward) &&
-                !Entity.MovementState.Has(MovementState.Backward) &&
-                !Entity.MovementState.Has(MovementState.Left) &&
-                !Entity.MovementState.Has(MovementState.Right) &&
-                !Entity.MovementState.Has(MovementState.IsJump))
+                !MovementState.Has(MovementState.Forward) &&
+                !MovementState.Has(MovementState.Backward) &&
+                !MovementState.Has(MovementState.Left) &&
+                !MovementState.Has(MovementState.Right) &&
+                !MovementState.Has(MovementState.IsJump))
             {
                 // No movement, apply root motion position / rotation
                 CacheAnimator.ApplyBuiltinRootMotion();
                 return;
             }
 
-            if (Entity.MovementState.Has(MovementState.IsGrounded) && useRootMotionForMovement)
+            if (MovementState.Has(MovementState.IsGrounded) && useRootMotionForMovement)
                 CacheAnimator.ApplyBuiltinRootMotion();
-            if (!Entity.MovementState.Has(MovementState.IsGrounded) && useRootMotionForAirMovement)
+            if (!MovementState.Has(MovementState.IsGrounded) && useRootMotionForAirMovement)
                 CacheAnimator.ApplyBuiltinRootMotion();
-            if (Entity.MovementState.Has(MovementState.IsUnderWater) && useRootMotionUnderWater)
+            if (MovementState.Has(MovementState.IsUnderWater) && useRootMotionUnderWater)
                 CacheAnimator.ApplyBuiltinRootMotion();
         }
 
