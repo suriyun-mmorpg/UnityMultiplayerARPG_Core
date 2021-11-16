@@ -18,11 +18,7 @@ namespace MultiplayerARPG
                 });
                 return;
             }
-            if (playerCharacter.CurrentHp <= 0)
-            {
-                result.Invoke(AckResponseCode.Error, new ResponseSwapOrMergeItemMessage());
-                return;
-            }
+
             UITextKeys gameMessage;
             if (!playerCharacter.SwapOrMergeItem(request.fromIndex, request.toIndex, out gameMessage))
             {
@@ -47,11 +43,14 @@ namespace MultiplayerARPG
                 });
                 return;
             }
-            if (playerCharacter.CurrentHp <= 0)
+
+            BasePlayerCharacterEntity playerCharacterEntity = playerCharacter as BasePlayerCharacterEntity;
+            if (playerCharacterEntity != null && !playerCharacterEntity.CanDoActions())
             {
                 result.Invoke(AckResponseCode.Error, new ResponseEquipArmorMessage());
                 return;
             }
+
             UITextKeys gameMessage;
             if (!playerCharacter.EquipArmor(request.nonEquipIndex, request.equipSlotIndex, out gameMessage))
             {
@@ -76,11 +75,14 @@ namespace MultiplayerARPG
                 });
                 return;
             }
-            if (playerCharacter.CurrentHp <= 0)
+
+            BasePlayerCharacterEntity playerCharacterEntity = playerCharacter as BasePlayerCharacterEntity;
+            if (playerCharacterEntity != null && !playerCharacterEntity.CanDoActions())
             {
                 result.Invoke(AckResponseCode.Error, new ResponseEquipWeaponMessage());
                 return;
             }
+
             UITextKeys gameMessage;
             if (!playerCharacter.EquipWeapon(request.nonEquipIndex, request.equipWeaponSet, request.isLeftHand, out gameMessage))
             {
@@ -105,11 +107,14 @@ namespace MultiplayerARPG
                 });
                 return;
             }
-            if (playerCharacter.CurrentHp <= 0)
+
+            BasePlayerCharacterEntity playerCharacterEntity = playerCharacter as BasePlayerCharacterEntity;
+            if (playerCharacterEntity != null && !playerCharacterEntity.CanDoActions())
             {
                 result.Invoke(AckResponseCode.Error, new ResponseUnEquipArmorMessage());
                 return;
             }
+
             UITextKeys gameMessage;
             if (!playerCharacter.UnEquipArmor(request.equipIndex, false, out gameMessage, out _, request.nonEquipIndex))
             {
@@ -134,11 +139,14 @@ namespace MultiplayerARPG
                 });
                 return;
             }
-            if (playerCharacter.CurrentHp <= 0)
+
+            BasePlayerCharacterEntity playerCharacterEntity = playerCharacter as BasePlayerCharacterEntity;
+            if (playerCharacterEntity != null && !playerCharacterEntity.CanDoActions())
             {
                 result.Invoke(AckResponseCode.Error, new ResponseUnEquipWeaponMessage());
                 return;
             }
+
             UITextKeys gameMessage;
             if (!playerCharacter.UnEquipWeapon(request.equipWeaponSet, request.isLeftHand, false, out gameMessage, out _, request.nonEquipIndex))
             {
@@ -165,13 +173,10 @@ namespace MultiplayerARPG
             }
 
             BasePlayerCharacterEntity playerCharacterEntity = playerCharacter as BasePlayerCharacterEntity;
-            if (playerCharacterEntity != null)
+            if (playerCharacterEntity != null && !playerCharacterEntity.CanDoActions())
             {
-                if (!playerCharacterEntity.CanDoActions())
-                {
-                    result.Invoke(AckResponseCode.Error, new ResponseSwitchEquipWeaponSetMessage());
-                    return;
-                }
+                result.Invoke(AckResponseCode.Error, new ResponseSwitchEquipWeaponSetMessage());
+                return;
             }
 
             byte equipWeaponSet = request.equipWeaponSet;
@@ -195,11 +200,14 @@ namespace MultiplayerARPG
                 });
                 return;
             }
-            if (playerCharacter.CurrentHp <= 0)
+
+            BasePlayerCharacterEntity playerCharacterEntity = playerCharacter as BasePlayerCharacterEntity;
+            if (playerCharacterEntity != null && !playerCharacterEntity.CanDoActions())
             {
                 result.Invoke(AckResponseCode.Error, new ResponseDismantleItemMessage());
                 return;
             }
+
             UITextKeys gameMessage;
             if (!playerCharacter.DismantleItem(request.index, request.amount, out gameMessage))
             {
@@ -209,6 +217,7 @@ namespace MultiplayerARPG
                 });
                 return;
             }
+
             result.Invoke(AckResponseCode.Success, new ResponseDismantleItemMessage()
             {
                 message = gameMessage,
@@ -227,11 +236,14 @@ namespace MultiplayerARPG
                 });
                 return;
             }
-            if (playerCharacter.CurrentHp <= 0)
+
+            BasePlayerCharacterEntity playerCharacterEntity = playerCharacter as BasePlayerCharacterEntity;
+            if (playerCharacterEntity != null && !playerCharacterEntity.CanDoActions())
             {
                 result.Invoke(AckResponseCode.Error, new ResponseDismantleItemsMessage());
                 return;
             }
+
             UITextKeys gameMessage;
             if (!playerCharacter.DismantleItems(request.selectedIndexes, out gameMessage))
             {
@@ -241,6 +253,7 @@ namespace MultiplayerARPG
                 });
                 return;
             }
+
             result.Invoke(AckResponseCode.Success, new ResponseDismantleItemsMessage()
             {
                 message = gameMessage,
@@ -259,11 +272,14 @@ namespace MultiplayerARPG
                 });
                 return;
             }
-            if (playerCharacter.CurrentHp <= 0)
+
+            BasePlayerCharacterEntity playerCharacterEntity = playerCharacter as BasePlayerCharacterEntity;
+            if (playerCharacterEntity != null && !playerCharacterEntity.CanDoActions())
             {
                 result.Invoke(AckResponseCode.Error, new ResponseEnhanceSocketItemMessage());
                 return;
             }
+
             UITextKeys gameMessage;
             if (!playerCharacter.EnhanceSocketItem(request.inventoryType, request.index, request.enhancerId, request.socketIndex, out gameMessage))
             {
@@ -291,11 +307,14 @@ namespace MultiplayerARPG
                 });
                 return;
             }
-            if (playerCharacter.CurrentHp <= 0)
+
+            BasePlayerCharacterEntity playerCharacterEntity = playerCharacter as BasePlayerCharacterEntity;
+            if (playerCharacterEntity != null && !playerCharacterEntity.CanDoActions())
             {
                 result.Invoke(AckResponseCode.Error, new ResponseRefineItemMessage());
                 return;
             }
+
             UITextKeys gameMessage;
             if (!playerCharacter.RefineItem(request.inventoryType, request.index, out gameMessage))
             {
@@ -305,6 +324,7 @@ namespace MultiplayerARPG
                 });
                 return;
             }
+
             result.Invoke(AckResponseCode.Success, new ResponseRefineItemMessage()
             {
                 message = gameMessage,
@@ -323,11 +343,14 @@ namespace MultiplayerARPG
                 });
                 return;
             }
-            if (playerCharacter.CurrentHp <= 0)
+
+            BasePlayerCharacterEntity playerCharacterEntity = playerCharacter as BasePlayerCharacterEntity;
+            if (playerCharacterEntity != null && !playerCharacterEntity.CanDoActions())
             {
                 result.Invoke(AckResponseCode.Error, new ResponseRemoveEnhancerFromItemMessage());
                 return;
             }
+
             UITextKeys gameMessage;
             if (!playerCharacter.RemoveEnhancerFromItem(request.inventoryType, request.index, request.socketIndex, out gameMessage))
             {
@@ -337,6 +360,7 @@ namespace MultiplayerARPG
                 });
                 return;
             }
+
             result.Invoke(AckResponseCode.Success, new ResponseRemoveEnhancerFromItemMessage()
             {
                 message = gameMessage,
@@ -355,11 +379,14 @@ namespace MultiplayerARPG
                 });
                 return;
             }
-            if (playerCharacter.CurrentHp <= 0)
+
+            BasePlayerCharacterEntity playerCharacterEntity = playerCharacter as BasePlayerCharacterEntity;
+            if (playerCharacterEntity != null && !playerCharacterEntity.CanDoActions())
             {
                 result.Invoke(AckResponseCode.Error, new ResponseRepairItemMessage());
                 return;
             }
+
             UITextKeys gameMessage;
             if (!playerCharacter.RepairItem(request.inventoryType, request.index, out gameMessage))
             {
@@ -369,6 +396,7 @@ namespace MultiplayerARPG
                 });
                 return;
             }
+
             result.Invoke(AckResponseCode.Success, new ResponseRepairItemMessage()
             {
                 message = gameMessage,
@@ -387,11 +415,14 @@ namespace MultiplayerARPG
                 });
                 return;
             }
-            if (playerCharacter.CurrentHp <= 0)
+
+            BasePlayerCharacterEntity playerCharacterEntity = playerCharacter as BasePlayerCharacterEntity;
+            if (playerCharacterEntity != null && !playerCharacterEntity.CanDoActions())
             {
                 result.Invoke(AckResponseCode.Error, new ResponseRepairEquipItemsMessage());
                 return;
             }
+
             UITextKeys gameMessage;
             if (!playerCharacter.RepairEquipItems(out gameMessage))
             {
@@ -401,6 +432,7 @@ namespace MultiplayerARPG
                 });
                 return;
             }
+
             result.Invoke(AckResponseCode.Success, new ResponseRepairEquipItemsMessage()
             {
                 message = gameMessage,
@@ -419,11 +451,19 @@ namespace MultiplayerARPG
                 });
                 return;
             }
-            if (playerCharacter.CurrentHp <= 0 || !playerCharacter.AccessingNpcShopDialog(out _))
+
+            if (!playerCharacter.CanDoActions())
             {
                 result.Invoke(AckResponseCode.Error, new ResponseSellItemMessage());
                 return;
             }
+
+            if (!playerCharacter.AccessingNpcShopDialog(out _))
+            {
+                result.Invoke(AckResponseCode.Error, new ResponseSellItemMessage());
+                return;
+            }
+
             UITextKeys gameMessage;
             if (!playerCharacter.SellItem(request.index, request.amount, out gameMessage))
             {
@@ -433,6 +473,7 @@ namespace MultiplayerARPG
                 });
                 return;
             }
+
             result.Invoke(AckResponseCode.Success, new ResponseSellItemMessage()
             {
                 message = gameMessage,
@@ -451,11 +492,19 @@ namespace MultiplayerARPG
                 });
                 return;
             }
-            if (playerCharacter.CurrentHp <= 0 || !playerCharacter.AccessingNpcShopDialog(out _))
+
+            if (!playerCharacter.CanDoActions())
             {
                 result.Invoke(AckResponseCode.Error, new ResponseSellItemsMessage());
                 return;
             }
+
+            if (!playerCharacter.AccessingNpcShopDialog(out _))
+            {
+                result.Invoke(AckResponseCode.Error, new ResponseSellItemsMessage());
+                return;
+            }
+
             UITextKeys gameMessage;
             if (!playerCharacter.SellItems(request.selectedIndexes, out gameMessage))
             {
@@ -465,6 +514,7 @@ namespace MultiplayerARPG
                 });
                 return;
             }
+
             result.Invoke(AckResponseCode.Success, new ResponseSellItemsMessage()
             {
                 message = gameMessage,
