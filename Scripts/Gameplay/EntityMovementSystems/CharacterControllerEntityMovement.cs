@@ -212,7 +212,6 @@ namespace MultiplayerARPG
             if (this.CanPredictMovement())
             {
                 // Always apply movement to owner client (it's client prediction for server auth movement)
-                tempMovementState = MovementState.Forward;
                 SetMovePaths(position, true);
             }
         }
@@ -365,6 +364,8 @@ namespace MultiplayerARPG
                 tempTargetPosition = navPaths.Peek();
                 tempMoveDirection = (tempTargetPosition - tempCurrentPosition).normalized;
                 tempTargetDistance = Vector3.Distance(tempTargetPosition.GetXZ(), tempCurrentPosition.GetXZ());
+                if (!tempMovementState.Has(MovementState.Forward))
+                    tempMovementState |= MovementState.Forward;
                 if (tempTargetDistance < StoppingDistance)
                 {
                     navPaths.Dequeue();
