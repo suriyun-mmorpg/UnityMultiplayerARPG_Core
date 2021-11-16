@@ -12,14 +12,17 @@ namespace MultiplayerARPG
             bool isPointerOverUIObject = CacheUISceneGameplay.IsPointerOverUIObject();
             CacheGameplayCameraController.UpdateRotationX = false;
             CacheGameplayCameraController.UpdateRotationY = false;
-            CacheGameplayCameraController.UpdateRotation = !isFocusInputField && !isPointerOverUIObject && InputManager.GetButton("CameraRotate");
+            if (Application.isConsolePlatform)
+                CacheGameplayCameraController.UpdateRotation = !isFocusInputField && !isPointerOverUIObject;
+            else
+                CacheGameplayCameraController.UpdateRotation = !isFocusInputField && !isPointerOverUIObject && InputManager.GetButton("CameraRotate");
             CacheGameplayCameraController.UpdateZoom = !isFocusInputField && !isPointerOverUIObject;
 
-            if (isFocusInputField)
+            if (isFocusInputField || PlayerCharacterEntity.IsDead())
+            {
+                PlayerCharacterEntity.KeyMovement(Vector3.zero, MovementState.None);
                 return;
-
-            if (PlayerCharacterEntity.IsDead())
-                return;
+            }
 
             // If it's building something, don't allow to activate NPC/Warp/Pickup Item
             if (ConstructingBuildingEntity == null)
