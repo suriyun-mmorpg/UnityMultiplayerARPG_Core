@@ -193,7 +193,10 @@ namespace MultiplayerARPG
 
             string trimText = EnterChatMessage.Trim();
             if (trimText.Length == 0)
+            {
+                HideEnterChatField();
                 return;
+            }
 
             EnterChatMessage = string.Empty;
             ChatChannel channel = chatChannel;
