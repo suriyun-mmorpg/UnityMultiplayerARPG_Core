@@ -20,7 +20,7 @@ namespace MultiplayerARPG
         public const float RESPAWN_GROUNDED_CHECK_DURATION = 1f;
         public const float MOUNT_DELAY = 1f;
         public const float FIND_ENTITY_DISTANCE_BUFFER = 1f;
-        public const float RETURN_MOVEMENT_SPEED_DELAY = 0.2f;
+        public const float RETURN_MOVEMENT_SPEED_DELAY = 0.01f;
 
         protected struct SyncListRecachingState
         {
