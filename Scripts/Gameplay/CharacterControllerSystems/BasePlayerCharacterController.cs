@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
 namespace MultiplayerARPG
@@ -108,10 +109,15 @@ namespace MultiplayerARPG
 
         protected virtual void Setup(BasePlayerCharacterEntity characterEntity)
         {
+            // Initial UI Scene gameplay
             if (CurrentGameInstance.UISceneGameplayPrefab != null)
                 CacheUISceneGameplay = Instantiate(CurrentGameInstance.UISceneGameplayPrefab);
             if (CacheUISceneGameplay != null)
                 CacheUISceneGameplay.OnControllerSetup(characterEntity);
+            // Don't send navigation events
+            EventSystem eventSystem = FindObjectOfType<EventSystem>();
+            if (eventSystem != null)
+                eventSystem.sendNavigationEvents = false;
             if (onSetup != null)
                 onSetup.Invoke(this);
         }
