@@ -80,15 +80,15 @@ namespace MultiplayerARPG
 
             CacheTransform.position = GameInstance.PlayingCharacterEntity.CacheTransform.position;
             // Find nearby entities
-            SortNearestEntity(characters);
-            SortNearestEntity(players);
-            SortNearestEntity(monsters);
-            SortNearestEntity(npcs);
-            SortNearestEntity(itemDrops);
-            SortNearestEntity(buildings);
-            SortNearestEntity(vehicles);
-            SortNearestEntity(warpPortals);
-            SortNearestEntity(itemsContainers);
+            RemoveInactiveAndSortNearestEntity(characters);
+            RemoveInactiveAndSortNearestEntity(players);
+            RemoveInactiveAndSortNearestEntity(monsters);
+            RemoveInactiveAndSortNearestEntity(npcs);
+            RemoveInactiveAndSortNearestEntity(itemDrops);
+            RemoveInactiveAndSortNearestEntity(buildings);
+            RemoveInactiveAndSortNearestEntity(vehicles);
+            RemoveInactiveAndSortNearestEntity(warpPortals);
+            RemoveInactiveAndSortNearestEntity(itemsContainers);
         }
 
         public void ClearExcludeColliders()
@@ -319,18 +319,20 @@ namespace MultiplayerARPG
                 itemsContainer = gameEntity.Entity as ItemsContainerEntity;
         }
 
-        private void SortNearestEntity<T>(List<T> entities) where T : BaseGameEntity
+        private void RemoveInactiveAndSortNearestEntity<T>(List<T> entities) where T : BaseGameEntity
         {
             T temp;
-            for (int i = entities.Count - 1; i >= 0; i--)
+            bool hasUpdate = false;
+            for (int i = entities.Count - 1; i >= 0; --i)
             {
-                if (entities[i] == null)
+                if (entities[i] == null || !entities[i].gameObject.activeInHierarchy)
                 {
                     entities.RemoveAt(i);
-                    if (onUpdateList != null)
-                        onUpdateList.Invoke();
+                    hasUpdate = true;
                 }
             }
+            if (hasUpdate && onUpdateList != null)
+                onUpdateList.Invoke();
             for (int i = 0; i < entities.Count; i++)
             {
                 for (int j = 0; j < entities.Count - 1; j++)
