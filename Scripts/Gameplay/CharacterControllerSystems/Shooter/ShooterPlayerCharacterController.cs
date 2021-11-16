@@ -318,19 +318,17 @@ namespace MultiplayerARPG
         protected Vector2 normalizedInput;
         protected Vector3 moveLookDirection;
         protected Vector3 targetLookDirection;
-        protected float tempDeltaTime;
         protected bool tempPressAttackRight;
         protected bool tempPressAttackLeft;
         protected bool tempPressWeaponAbility;
         protected bool isLeftHandAttacking;
-        protected float pitch;
         protected Vector3 aimTargetPosition;
         protected Vector3 turnDirection;
+        // Controlling states
         protected bool toggleSprintOn;
         protected bool toggleWalkOn;
         protected bool toggleCrouchOn;
         protected bool toggleCrawlOn;
-        // Controlling states
         protected ShooterControllerViewMode dirtyViewMode;
         protected IWeaponItem rightHandWeapon;
         protected IWeaponItem leftHandWeapon;
@@ -506,7 +504,7 @@ namespace MultiplayerARPG
             CacheGameplayCameraController.FollowingEntityTransform = ViewMode == ShooterControllerViewMode.Fps ? PlayerCharacterEntity.FpsCameraTargetTransform : PlayerCharacterEntity.CameraTargetTransform;
 
             // Set temp data
-            tempDeltaTime = Time.deltaTime;
+            float tempDeltaTime = Time.deltaTime;
 
             // Update inputs
             activateInput.OnUpdate(tempDeltaTime);
@@ -552,7 +550,6 @@ namespace MultiplayerARPG
             if (IsBlockController || GenericUtils.IsFocusInputField())
             {
                 mustReleaseFireKey = false;
-
                 PlayerCharacterEntity.KeyMovement(Vector3.zero, MovementState.None);
                 DeactivateWeaponAbility();
                 return;
@@ -878,7 +875,7 @@ namespace MultiplayerARPG
 
         protected virtual void UpdateMovementInputs()
         {
-            pitch = CacheGameplayCameraController.CameraTransform.eulerAngles.x;
+            float pitch = CacheGameplayCameraController.CameraTransform.eulerAngles.x;
 
             // Update charcter pitch
             PlayerCharacterEntity.Pitch = pitch;
