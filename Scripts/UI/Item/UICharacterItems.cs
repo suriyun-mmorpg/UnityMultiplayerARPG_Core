@@ -47,7 +47,7 @@ namespace MultiplayerARPG
             }
         }
 
-        public virtual ICharacterData Character { get; set; }
+        public virtual ICharacterData Character { get; protected set; }
         public List<CharacterItem> LoadedList { get; private set; } = new List<CharacterItem>();
 
         private UISelectionMode dirtySelectionMode;
