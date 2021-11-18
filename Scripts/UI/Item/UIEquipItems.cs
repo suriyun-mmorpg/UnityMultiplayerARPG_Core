@@ -7,8 +7,6 @@ namespace MultiplayerARPG
 {
     public partial class UIEquipItems : UIBase
     {
-        public ICharacterData character { get; protected set; }
-
         [Header("UI Elements")]
         [FormerlySerializedAs("uiItemDialog")]
         public UICharacterItem uiDialog;
@@ -54,7 +52,7 @@ namespace MultiplayerARPG
                             otherEquipSlot.ui != null &&
                             !cacheEquipItemSlots.ContainsKey(tempEquipPosition))
                         {
-                            otherEquipSlot.ui.Setup(CreateEmptyUIData(InventoryType.EquipItems), character, -1);
+                            otherEquipSlot.ui.Setup(CreateEmptyUIData(InventoryType.EquipItems), Character, -1);
                             otherEquipSlot.ui.SetupAsEquipSlot(otherEquipSlot.armorType.Id, tempEquipSlotIndex);
                             UICharacterItemDragHandler dragHandler = otherEquipSlot.ui.GetComponentInChildren<UICharacterItemDragHandler>();
                             if (dragHandler != null)
@@ -79,6 +77,8 @@ namespace MultiplayerARPG
                 return cacheSelectionManager;
             }
         }
+
+        public ICharacterData Character { get; protected set; }
 
         protected virtual void OnEnable()
         {
@@ -153,7 +153,7 @@ namespace MultiplayerARPG
             if (uiDialog != null)
             {
                 uiDialog.selectionManager = CacheSelectionManager;
-                uiDialog.Setup(ui.Data, character, ui.IndexOfData);
+                uiDialog.Setup(ui.Data, Character, ui.IndexOfData);
                 uiDialog.Show();
             }
         }
@@ -170,7 +170,7 @@ namespace MultiplayerARPG
 
         public virtual void UpdateData(ICharacterData character)
         {
-            this.character = character;
+            this.Character = character;
             string selectedId = CacheSelectionManager.SelectedUI != null ? CacheSelectionManager.SelectedUI.CharacterItem.id : string.Empty;
             // Clear slots data
             UICharacterItem equipSlot;
@@ -232,7 +232,7 @@ namespace MultiplayerARPG
         {
             if (slot == null)
                 return;
-            slot.Setup(CreateEmptyUIData(isLeftHand ? InventoryType.EquipWeaponLeft : InventoryType.EquipWeaponRight), character, -1);
+            slot.Setup(CreateEmptyUIData(isLeftHand ? InventoryType.EquipWeaponLeft : InventoryType.EquipWeaponRight), Character, -1);
             slot.SetupAsEquipSlot(isLeftHand ? GameDataConst.EQUIP_POSITION_LEFT_HAND : GameDataConst.EQUIP_POSITION_RIGHT_HAND, equipWeaponSet);
             UICharacterItemDragHandler dragHandler = slot.GetComponentInChildren<UICharacterItemDragHandler>();
             if (dragHandler != null)
@@ -256,7 +256,7 @@ namespace MultiplayerARPG
                 if (equipWeapon.GetEquipmentItem() != null)
                 {
                     equipWeapon.equipSlotIndex = equipWeaponSet;
-                    tempSlot.Setup(new UICharacterItemData(equipWeapon, isLeftHand ? InventoryType.EquipWeaponLeft : InventoryType.EquipWeaponRight), character, 0);
+                    tempSlot.Setup(new UICharacterItemData(equipWeapon, isLeftHand ? InventoryType.EquipWeaponLeft : InventoryType.EquipWeaponRight), Character, 0);
                     if (!string.IsNullOrEmpty(selectedId) && selectedId.Equals(equipWeapon.id))
                         tempSlot.OnClickSelect();
                 }
