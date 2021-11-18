@@ -964,6 +964,21 @@ namespace MultiplayerARPG
             }
         }
 
+        public static void AddItems(params ItemRandomByWeight[] itemDrops)
+        {
+            AddItems((IEnumerable<ItemRandomByWeight>)itemDrops);
+        }
+
+        public static void AddItems(IEnumerable<ItemRandomByWeight> itemDrops)
+        {
+            if (itemDrops == null)
+                return;
+            foreach (ItemRandomByWeight itemDrop in itemDrops)
+            {
+                AddItems(itemDrop.item);
+            }
+        }
+
         public static void AddItems(params BaseItem[] items)
         {
             AddItems((IEnumerable<BaseItem>)items);
