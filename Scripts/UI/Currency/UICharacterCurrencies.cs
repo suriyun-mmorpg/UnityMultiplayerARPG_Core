@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using LiteNetLibManager;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Serialization;
 
@@ -13,7 +14,21 @@ namespace MultiplayerARPG
         [FormerlySerializedAs("uiCharacterCurrencyContainer")]
         public Transform uiContainer;
 
-        public virtual ICharacterData Character { get; set; }
+        [Header("Options")]
+        [Tooltip("If this is `TRUE` it won't update data when controlling character's data changes")]
+        public bool notForOwningCharacter;
+
+        public bool NotForOwningCharacter
+        {
+            get { return notForOwningCharacter; }
+            set
+            {
+                notForOwningCharacter = value;
+                RegisterOwningCharacterEvents();
+            }
+        }
+
+        public virtual IPlayerCharacterData Character { get; set; }
 
         private UIList cacheList;
         public UIList CacheList
@@ -37,21 +52,21 @@ namespace MultiplayerARPG
             {
                 if (cacheSelectionManager == null)
                     cacheSelectionManager = gameObject.GetOrAddComponent<UICharacterCurrencySelectionManager>();
+                CacheSelectionManager.selectionMode = UISelectionMode.SelectSingle;
                 return cacheSelectionManager;
             }
         }
 
-        private UISelectionMode dirtySelectionMode;
-
         protected virtual void OnEnable()
         {
-            CacheSelectionManager.selectionMode = UISelectionMode.SelectSingle;
             CacheSelectionManager.eventOnSelected.RemoveListener(OnSelect);
             CacheSelectionManager.eventOnSelected.AddListener(OnSelect);
             CacheSelectionManager.eventOnDeselected.RemoveListener(OnDeselect);
             CacheSelectionManager.eventOnDeselected.AddListener(OnDeselect);
             if (uiDialog != null)
                 uiDialog.onHide.AddListener(OnDialogHide);
+            UpdateOwningCharacterData();
+            RegisterOwningCharacterEvents();
         }
 
         protected virtual void OnDisable()
@@ -59,6 +74,31 @@ namespace MultiplayerARPG
             if (uiDialog != null)
                 uiDialog.onHide.RemoveListener(OnDialogHide);
             CacheSelectionManager.DeselectSelectedUI();
+            UnregisterOwningCharacterEvents();
+        }
+
+        public void RegisterOwningCharacterEvents()
+        {
+            UnregisterOwningCharacterEvents();
+            if (notForOwningCharacter || !GameInstance.PlayingCharacterEntity) return;
+            GameInstance.PlayingCharacterEntity.onCurrenciesOperation += OnCurrenciesOperation;
+        }
+
+        public void UnregisterOwningCharacterEvents()
+        {
+            if (!GameInstance.PlayingCharacterEntity) return;
+            GameInstance.PlayingCharacterEntity.onCurrenciesOperation -= OnCurrenciesOperation;
+        }
+
+        private void OnCurrenciesOperation(LiteNetLibSyncList.Operation operation, int index)
+        {
+            UpdateOwningCharacterData();
+        }
+
+        public void UpdateOwningCharacterData()
+        {
+            if (notForOwningCharacter || GameInstance.PlayingCharacter == null) return;
+            UpdateData(GameInstance.PlayingCharacter);
         }
 
         protected virtual void OnDialogHide()
@@ -91,7 +131,12 @@ namespace MultiplayerARPG
             }
         }
 
-        public virtual void UpdateData(ICharacterData character, IList<CharacterCurrency> characterCurrencies)
+        public void UpdateData(IPlayerCharacterData character)
+        {
+            UpdateData(character, character.Currencies);
+        }
+
+        public virtual void UpdateData(IPlayerCharacterData character, IList<CharacterCurrency> characterCurrencies)
         {
             Character = character;
             int selectedId = CacheSelectionManager.SelectedUI != null ? CacheSelectionManager.SelectedUI.Data.characterCurrency.dataId : 0;
@@ -114,21 +159,6 @@ namespace MultiplayerARPG
                 if (selectedId != 0 && selectedId == characterCurrency.dataId)
                     tempUiCharacterCurrency.OnClickSelect();
             });
-        }
-
-        protected virtual void Update()
-        {
-            if (CacheSelectionManager.selectionMode != dirtySelectionMode)
-            {
-                CacheSelectionManager.DeselectAll();
-                dirtySelectionMode = CacheSelectionManager.selectionMode;
-                if (uiDialog != null)
-                {
-                    uiDialog.onHide.RemoveListener(OnDialogHide);
-                    uiDialog.Hide();
-                    uiDialog.onHide.AddListener(OnDialogHide);
-                }
-            }
         }
     }
 }
