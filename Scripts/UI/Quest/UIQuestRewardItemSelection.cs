@@ -2,6 +2,12 @@
 {
     public partial class UIQuestRewardItemSelection : UICharacterItems
     {
+        protected override void OnEnable()
+        {
+            base.OnEnable();
+            CacheSelectionManager.selectionMode = UISelectionMode.Toggle;
+        }
+
         public void UpdateData(int questDataId)
         {
             if (!GameInstance.Quests.ContainsKey(questDataId))
@@ -19,6 +25,8 @@
 
         public void OnClickSelectRewardItem()
         {
+            if (CacheSelectionManager.SelectedUI == null)
+                return;
             GameInstance.PlayingCharacterEntity.CallServerSelectQuestRewardItem((byte)CacheSelectionManager.SelectedUI.IndexOfData);
             Hide();
         }
