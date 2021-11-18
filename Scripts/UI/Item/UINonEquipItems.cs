@@ -32,6 +32,7 @@ namespace MultiplayerARPG
 
         public void UpdateData(ICharacterData character)
         {
+            inventoryType = InventoryType.NonEquipItems;
             UpdateData(character, character.NonEquipItems);
         }
     }
