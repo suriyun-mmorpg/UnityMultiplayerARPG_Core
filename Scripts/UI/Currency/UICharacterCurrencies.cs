@@ -28,8 +28,6 @@ namespace MultiplayerARPG
             }
         }
 
-        public virtual IPlayerCharacterData Character { get; set; }
-
         private UIList cacheList;
         public UIList CacheList
         {
@@ -56,6 +54,8 @@ namespace MultiplayerARPG
                 return cacheSelectionManager;
             }
         }
+
+        public virtual IPlayerCharacterData Character { get; protected set; }
 
         protected virtual void OnEnable()
         {
