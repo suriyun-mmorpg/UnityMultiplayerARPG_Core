@@ -5,7 +5,6 @@ namespace MultiplayerARPG
 {
     public partial class UICharacterBuffs : UIBase
     {
-        public ICharacterData character { get; protected set; }
         [FormerlySerializedAs("uiBuffDialog")]
         public UICharacterBuff uiDialog;
         [FormerlySerializedAs("uiCharacterBuffPrefab")]
@@ -40,6 +39,8 @@ namespace MultiplayerARPG
             }
         }
 
+        public virtual ICharacterData Character { get; protected set; }
+
         protected virtual void OnEnable()
         {
             CacheSelectionManager.eventOnSelect.RemoveListener(OnSelect);
@@ -67,7 +68,7 @@ namespace MultiplayerARPG
             if (uiDialog != null)
             {
                 uiDialog.selectionManager = CacheSelectionManager;
-                uiDialog.Setup(ui.Data, character, ui.IndexOfData);
+                uiDialog.Setup(ui.Data, Character, ui.IndexOfData);
                 uiDialog.Show();
             }
         }
@@ -84,7 +85,7 @@ namespace MultiplayerARPG
 
         public virtual void UpdateData(ICharacterData character)
         {
-            this.character = character;
+            this.Character = character;
             string selectedId = CacheSelectionManager.SelectedUI != null ? CacheSelectionManager.SelectedUI.CharacterBuff.id : string.Empty;
             CacheSelectionManager.DeselectSelectedUI();
             CacheSelectionManager.Clear();
