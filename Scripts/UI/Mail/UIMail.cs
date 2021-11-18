@@ -162,6 +162,7 @@ namespace MultiplayerARPG
             {
                 if (mail != null && mail.Currencies.Count > 0)
                 {
+                    uiCurrencies.NotForOwningCharacter = true;
                     uiCurrencies.UpdateData(GameInstance.PlayingCharacter, mail.Currencies);
                     uiCurrencies.Show();
                 }
