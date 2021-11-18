@@ -524,7 +524,7 @@ namespace StandardAssets.Characters.Physics
 		float m_SlopeMovementOffset;
 		
 		// It will be used for pause current frame movement after set position to avoid wrong position issues.
-		bool m_PauseMove = false;
+		int m_PauseMoveFrames = 0;
 
 		// Is character busy sliding down a steep slope?
 		bool isSlidingDownSlope { get { return m_SlidingDownSlopeTime > 0.0f; } }
@@ -587,13 +587,15 @@ namespace StandardAssets.Characters.Physics
 
 			m_InvRescaleFactor = 1 / Mathf.Cos(m_MinSlowAgainstWallsAngle * Mathf.Deg2Rad);
 			m_SlopeMovementOffset = m_StepOffset / Mathf.Tan(m_SlopeLimit * Mathf.Deg2Rad);
+			m_PauseMoveFrames += 3;
 		}
 
 		// Set the root position.
 		void LateUpdate()
 		{
 			SetRootToOffset();
-			m_PauseMove = false;
+			if (m_PauseMoveFrames > 0)
+				m_PauseMoveFrames--;
 		}
 
 		// Update sliding down slopes, and changes to the capsule's height and center.
@@ -649,7 +651,7 @@ namespace StandardAssets.Characters.Physics
 		/// <returns>CollisionFlags is the summary of collisions that occurred during the Move.</returns>
 		public CollisionFlags Move(Vector3 moveVector)
 		{
-			if (m_PauseMove)
+			if (m_PauseMoveFrames > 0)
 				return CollisionFlags.None;
 			MoveInternal(moveVector, true);
 			return collisionFlags;
@@ -665,7 +667,7 @@ namespace StandardAssets.Characters.Physics
 			transform.position = position;
 			m_Velocity = Vector3.zero;
 			StopSlideDownSlopes();
-			m_PauseMove = true;
+			m_PauseMoveFrames += 1;
 
 			if (updateGrounded)
 			{
@@ -1345,7 +1347,7 @@ namespace StandardAssets.Characters.Physics
 		// 		canSlide: Can slide against obstacles?
 		// 		tryGrounding: Try grounding the player?
 		//		currentPosition: position of the character
-		public bool MoveMajorStep(ref Vector3 moveVector, bool canSlide, bool tryGrounding, ref Vector3 currentPosition)
+		bool MoveMajorStep(ref Vector3 moveVector, bool canSlide, bool tryGrounding, ref Vector3 currentPosition)
 		{
 			var direction = moveVector.normalized;
 			var distance = moveVector.magnitude;
