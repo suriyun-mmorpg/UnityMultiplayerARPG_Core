@@ -7,7 +7,6 @@ namespace MultiplayerARPG
 {
     public partial class UICharacterSummons : UIBase
     {
-        public ICharacterData character { get; protected set; }
         [FormerlySerializedAs("uiSummonDialog")]
         public UICharacterSummon uiDialog;
         [FormerlySerializedAs("uiCharacterSummonPrefab")]
@@ -41,6 +40,8 @@ namespace MultiplayerARPG
                 return cacheSelectionManager;
             }
         }
+
+        public ICharacterData Character { get; protected set; }
 
         protected virtual void OnEnable()
         {
@@ -85,7 +86,7 @@ namespace MultiplayerARPG
             if (uiDialog != null)
             {
                 uiDialog.selectionManager = CacheSelectionManager;
-                uiDialog.Setup(ui.Data, character, ui.IndexOfData);
+                uiDialog.Setup(ui.Data, Character, ui.IndexOfData);
                 uiDialog.Show();
             }
         }
@@ -102,7 +103,7 @@ namespace MultiplayerARPG
 
         public virtual void UpdateData(ICharacterData character)
         {
-            this.character = character;
+            this.Character = character;
             uint selectedSummonObjectId = CacheSelectionManager.SelectedUI != null ? CacheSelectionManager.SelectedUI.CharacterSummon.objectId : 0;
             CacheSelectionManager.DeselectSelectedUI();
             CacheSelectionManager.Clear();
