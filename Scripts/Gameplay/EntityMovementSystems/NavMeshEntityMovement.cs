@@ -151,7 +151,7 @@ namespace MultiplayerARPG
             }
             this.ServerSendTeleport3D(position, rotation);
             CacheTransform.rotation = Quaternion.Euler(0, rotation.eulerAngles.y, 0);
-            CacheNavMeshAgent.Warp(position);
+            OnTeleport(position);
         }
 
         public bool FindGroundedPosition(Vector3 fromPosition, float findDistance, out Vector3 result)
@@ -312,7 +312,7 @@ namespace MultiplayerARPG
             {
                 acceptedPositionTimestamp = timestamp;
                 CacheTransform.eulerAngles = new Vector3(0, yAngle, 0);
-                CacheNavMeshAgent.Warp(position);
+                OnTeleport(position);
             }
         }
 
@@ -430,6 +430,12 @@ namespace MultiplayerARPG
         public void HandleJumpAtServer(MessageHandlerData messageHandler)
         {
             // There is no jump for navmesh
+        }
+
+        protected virtual void OnTeleport(Vector2 position)
+        {
+            CacheNavMeshAgent.isStopped = true;
+            CacheNavMeshAgent.Warp(position);
         }
     }
 }

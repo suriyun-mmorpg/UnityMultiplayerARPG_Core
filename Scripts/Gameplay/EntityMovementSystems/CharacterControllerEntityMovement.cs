@@ -890,7 +890,7 @@ namespace MultiplayerARPG
             }
         }
 
-        private void OnTeleport(Vector3 position)
+        protected virtual void OnTeleport(Vector3 position)
         {
             airborneElapsed = 0;
             tempVerticalVelocity = 0;

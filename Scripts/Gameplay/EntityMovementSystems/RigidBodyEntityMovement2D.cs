@@ -383,6 +383,7 @@ namespace MultiplayerARPG
 
         protected virtual void OnTeleport(Vector2 position)
         {
+            currentDestination = null;
             CacheTransform.position = position;
         }
     }
