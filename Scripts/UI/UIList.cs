@@ -42,6 +42,8 @@ public class UIList : MonoBehaviour
                 {
                     ui = Instantiate(uiPrefab);
                     ui.transform.SetParent(uiContainer);
+                    ui.transform.localPosition = Vector3.zero;
+                    ui.transform.localRotation = Quaternion.identity;
                     ui.transform.localScale = Vector3.one;
                     ui.transform.SetAsLastSibling();
                     uis.Add(ui);
