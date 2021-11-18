@@ -916,10 +916,8 @@ namespace MultiplayerARPG
         {
             airborneElapsed = 0;
             tempVerticalVelocity = 0;
-            Vector3 moveVector = Vector3.zero;
-            Vector3 currentPosition = position;
-            CacheOpenCharacterController.MoveMajorStep(ref moveVector, false, true, ref currentPosition);
-            CacheOpenCharacterController.SetPosition(currentPosition, false);
+            navPaths = null;
+            CacheOpenCharacterController.SetPosition(position, false);
         }
 
 #if UNITY_EDITOR

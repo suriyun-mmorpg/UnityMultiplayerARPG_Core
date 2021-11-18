@@ -522,6 +522,9 @@ namespace StandardAssets.Characters.Physics
 
 		// Used to offset movement raycast when determining if a slope is travesable.
 		float m_SlopeMovementOffset;
+		
+		// It will be used for pause current frame movement after set position to avoid wrong position issues.
+		bool m_PauseMove = false;
 
 		// Is character busy sliding down a steep slope?
 		bool isSlidingDownSlope { get { return m_SlidingDownSlopeTime > 0.0f; } }
@@ -590,6 +593,7 @@ namespace StandardAssets.Characters.Physics
 		void LateUpdate()
 		{
 			SetRootToOffset();
+			m_PauseMove = false;
 		}
 
 		// Update sliding down slopes, and changes to the capsule's height and center.
@@ -645,6 +649,8 @@ namespace StandardAssets.Characters.Physics
 		/// <returns>CollisionFlags is the summary of collisions that occurred during the Move.</returns>
 		public CollisionFlags Move(Vector3 moveVector)
 		{
+			if (m_PauseMove)
+				return CollisionFlags.None;
 			MoveInternal(moveVector, true);
 			return collisionFlags;
 		}
@@ -657,6 +663,9 @@ namespace StandardAssets.Characters.Physics
 		public void SetPosition(Vector3 position, bool updateGrounded)
 		{
 			transform.position = position;
+			m_Velocity = Vector3.zero;
+			StopSlideDownSlopes();
+			m_PauseMove = true;
 
 			if (updateGrounded)
 			{
