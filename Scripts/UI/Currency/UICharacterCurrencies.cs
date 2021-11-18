@@ -108,12 +108,7 @@ namespace MultiplayerARPG
 
         protected virtual void OnSelect(UICharacterCurrency ui)
         {
-            if (ui.Data.characterCurrency.GetCurrency() == null)
-            {
-                CacheSelectionManager.DeselectSelectedUI();
-                return;
-            }
-            if (uiDialog != null && CacheSelectionManager.selectionMode == UISelectionMode.SelectSingle)
+            if (uiDialog != null)
             {
                 uiDialog.selectionManager = CacheSelectionManager;
                 uiDialog.Setup(ui.Data, Character, ui.IndexOfData);
@@ -123,7 +118,7 @@ namespace MultiplayerARPG
 
         protected virtual void OnDeselect(UICharacterCurrency ui)
         {
-            if (uiDialog != null && CacheSelectionManager.selectionMode == UISelectionMode.SelectSingle)
+            if (uiDialog != null)
             {
                 uiDialog.onHide.RemoveListener(OnDialogHide);
                 uiDialog.Hide();
