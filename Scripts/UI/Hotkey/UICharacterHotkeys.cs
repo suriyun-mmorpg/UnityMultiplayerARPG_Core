@@ -7,7 +7,6 @@ namespace MultiplayerARPG
 {
     public partial class UICharacterHotkeys : UIBase
     {
-        public IPlayerCharacterData character { get; protected set; }
         public List<string> filterCategories = new List<string>();
         public bool doNotIncludeItems;
         public List<ItemType> filterItemTypes = new List<ItemType>() { ItemType.Armor, ItemType.Shield, ItemType.Weapon, ItemType.Potion, ItemType.Building, ItemType.Pet, ItemType.Mount, ItemType.Skill };
@@ -109,7 +108,7 @@ namespace MultiplayerARPG
 
         protected virtual void OnEnable()
         {
-            UpdateOwningCharacterData();
+            UpdateData();
             if (!GameInstance.PlayingCharacterEntity) return;
             GameInstance.PlayingCharacterEntity.onEquipItemsOperation += OnEquipItemsOperation;
             GameInstance.PlayingCharacterEntity.onEquipWeaponSetChange += OnEquipWeaponSetChange;
@@ -132,38 +131,32 @@ namespace MultiplayerARPG
 
         private void OnEquipWeaponSetChange(byte equipWeaponSet)
         {
-            UpdateOwningCharacterData();
+            UpdateData();
         }
 
         private void OnSelectableWeaponSetsOperation(LiteNetLibSyncList.Operation operation, int index)
         {
-            UpdateOwningCharacterData();
+            UpdateData();
         }
 
         private void OnEquipItemsOperation(LiteNetLibSyncList.Operation operation, int index)
         {
-            UpdateOwningCharacterData();
+            UpdateData();
         }
 
         private void OnNonEquipItemsOperation(LiteNetLibSyncList.Operation operation, int index)
         {
-            UpdateOwningCharacterData();
+            UpdateData();
         }
 
         private void OnSkillsOperation(LiteNetLibSyncList.Operation operation, int index)
         {
-            UpdateOwningCharacterData();
+            UpdateData();
         }
 
         private void OnHotkeysOperation(LiteNetLibSyncList.Operation operation, int index)
         {
-            UpdateOwningCharacterData();
-        }
-
-        public void UpdateOwningCharacterData()
-        {
-            if (!GameInstance.PlayingCharacterEntity) return;
-            UpdateData(GameInstance.PlayingCharacterEntity);
+            UpdateData();
         }
 
         private void Update()
@@ -180,11 +173,10 @@ namespace MultiplayerARPG
             base.Hide();
         }
 
-        public virtual void UpdateData(IPlayerCharacterData character)
+        public virtual void UpdateData()
         {
-            this.character = character;
             InitCaches();
-            IList<CharacterHotkey> characterHotkeys = character.Hotkeys;
+            IList<CharacterHotkey> characterHotkeys = GameInstance.PlayingCharacterEntity.Hotkeys;
             for (int i = 0; i < characterHotkeys.Count; ++i)
             {
                 CharacterHotkey characterHotkey = characterHotkeys[i];
