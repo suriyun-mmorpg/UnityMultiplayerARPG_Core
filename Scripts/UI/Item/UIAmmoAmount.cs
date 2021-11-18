@@ -5,8 +5,6 @@ namespace MultiplayerARPG
 {
     public class UIAmmoAmount : UIBase
     {
-        public ICharacterData character { get; protected set; }
-
         [Header("Right Hand Ammo Amount")]
         public GameObject uiRightHandAmmoRoot;
         public TextWrapper uiTextRightHandCurrentAmmo;
@@ -65,15 +63,14 @@ namespace MultiplayerARPG
 
         public void UpdateOwningCharacterData()
         {
-            if (GameInstance.PlayingCharacter == null) return;
-            UpdateData(GameInstance.PlayingCharacter);
+            if (!GameInstance.PlayingCharacterEntity) return;
+            UpdateData();
         }
 
-        public void UpdateData(ICharacterData character)
+        public void UpdateData()
         {
-            this.character = character;
-            UpdateUI(uiRightHandAmmoRoot, uiTextRightHandCurrentAmmo, uiTextRightHandReserveAmmo, uiTextRightHandSumAmmo, rightHandRequireAmmoSymbols, rightHandNoRequireAmmoSymbols, gageRightHandAmmo, character.EquipWeapons.rightHand);
-            UpdateUI(uiLeftHandAmmoRoot, uiTextLeftHandCurrentAmmo, uiTextLeftHandReserveAmmo, uiTextLeftHandSumAmmo, leftHandRequireAmmoSymbols, leftHandNoRequireAmmoSymbols, gageLeftHandAmmo, character.EquipWeapons.leftHand);
+            UpdateUI(uiRightHandAmmoRoot, uiTextRightHandCurrentAmmo, uiTextRightHandReserveAmmo, uiTextRightHandSumAmmo, rightHandRequireAmmoSymbols, rightHandNoRequireAmmoSymbols, gageRightHandAmmo, GameInstance.PlayingCharacterEntity.EquipWeapons.rightHand);
+            UpdateUI(uiLeftHandAmmoRoot, uiTextLeftHandCurrentAmmo, uiTextLeftHandReserveAmmo, uiTextLeftHandSumAmmo, leftHandRequireAmmoSymbols, leftHandNoRequireAmmoSymbols, gageLeftHandAmmo, GameInstance.PlayingCharacterEntity.EquipWeapons.leftHand);
         }
 
         protected virtual void UpdateUI(GameObject root, TextWrapper textCurrentAmmo, TextWrapper textReserveAmmo, TextWrapper textSumAmmo, GameObject[] requireAmmoSymbols, GameObject[] noRequireAmmoSymbols, UIGageValue gageAmmo, CharacterItem characterItem)
@@ -85,8 +82,8 @@ namespace MultiplayerARPG
 
             int currentAmmo = characterItem.ammo;
             int reserveAmmo = 0;
-            if (character != null && isActive)
-                reserveAmmo = character.CountAmmos(weaponItem.WeaponType.RequireAmmoType);
+            if (GameInstance.PlayingCharacterEntity && isActive)
+                reserveAmmo = GameInstance.PlayingCharacterEntity.CountAmmos(weaponItem.WeaponType.RequireAmmoType);
 
             if (textCurrentAmmo != null)
             {
