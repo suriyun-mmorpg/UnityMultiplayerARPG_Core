@@ -170,7 +170,7 @@ namespace MultiplayerARPG
             GenerateList();
         }
 
-        public void UpdateData(ICharacterData character, Dictionary<BaseSkill, short> skills)
+        public void UpdateData(ICharacterData character, IDictionary<BaseSkill, short> skills)
         {
             Character = character;
             LoadedList.Clear();
@@ -181,7 +181,7 @@ namespace MultiplayerARPG
             GenerateList();
         }
 
-        public void UpdateData(ICharacterData character, Dictionary<int, short> skills)
+        public void UpdateData(ICharacterData character, IDictionary<int, short> skills)
         {
             Character = character;
             LoadedList.Clear();
@@ -194,7 +194,7 @@ namespace MultiplayerARPG
             GenerateList();
         }
 
-        public void UpdateData(ICharacterData character, List<SkillLevel> skills)
+        public void UpdateData(ICharacterData character, IList<SkillLevel> skills)
         {
             Character = character;
             LoadedList.Clear();
