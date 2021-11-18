@@ -42,7 +42,8 @@ namespace MultiplayerARPG
                 if (quest == null || !quest.HaveToTalkToNpc(this, npcEntity, out taskIndex, out talkToNpcTaskDialog, out completeAfterTalked))
                     continue;
                 CurrentNpcDialog = talkToNpcTaskDialog;
-                characterQuest.CompletedTasks.Add(taskIndex);
+                if (!characterQuest.CompletedTasks.Contains(taskIndex))
+                    characterQuest.CompletedTasks.Add(taskIndex);
                 Quests[i] = characterQuest;
                 if (completeAfterTalked && characterQuest.IsAllTasksDone(this))
                 {
@@ -58,7 +59,8 @@ namespace MultiplayerARPG
                     else
                     {
                         // No selectable reward items, complete the quest immediately
-                        CompleteQuest(quest.DataId, 0);
+                        if (!CompleteQuest(quest.DataId, 0))
+                            CurrentNpcDialog = null;
                     }
                     break;
                 }
@@ -193,7 +195,9 @@ namespace MultiplayerARPG
             if (CompletingQuest == null)
                 return;
 
-            CompleteQuest(CompletingQuest.DataId, index);
+            if (!CompleteQuest(CompletingQuest.DataId, index))
+                return;
+
             CurrentNpcDialog = NpcDialogAfterSelectRewardItem;
             if (CurrentNpcDialog != null)
             {

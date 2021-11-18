@@ -172,7 +172,7 @@ namespace MultiplayerARPG
                             if (index >= 0)
                             {
                                 characterQuest = owningCharacter.Quests[index];
-                                if (!characterQuest.IsAllTasksDone(owningCharacter))
+                                if (!characterQuest.IsAllTasksDoneAndIsCompletingTarget(owningCharacter, owningCharacter.GetTargetEntity() as NpcEntity))
                                     menuActions.Add(abandonMenuAction);
                                 else
                                     menuActions.Add(completeMenuAction);
@@ -430,8 +430,8 @@ namespace MultiplayerARPG
                             else
                             {
                                 // No selectable reward items, complete the quest immediately
-                                characterEntity.CompleteQuest(quest.DataId, 0);
-                                characterEntity.CurrentNpcDialog = GetValidatedDialogOrNull(questCompletedDialog, characterEntity);
+                                if (characterEntity.CompleteQuest(quest.DataId, 0))
+                                    characterEntity.CurrentNpcDialog = GetValidatedDialogOrNull(questCompletedDialog, characterEntity);
                             }
                             return;
                     }

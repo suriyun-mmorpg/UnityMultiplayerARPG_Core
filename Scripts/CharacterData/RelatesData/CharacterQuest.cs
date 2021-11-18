@@ -80,6 +80,26 @@ namespace MultiplayerARPG
             return true;
         }
 
+        public bool IsAllTasksDoneAndIsCompletingTarget(IPlayerCharacterData character, NpcEntity npcEntity)
+        {
+            Quest quest = GetQuest();
+            if (character == null || quest == null)
+                return false;
+            QuestTask[] tasks = quest.tasks;
+            for (int i = 0; i < tasks.Length; ++i)
+            {
+                bool isComplete;
+                GetProgress(character, i, out isComplete);
+                if (!isComplete)
+                    return false;
+                if (tasks[i].taskType == QuestTaskType.TalkToNpc &&
+                    tasks[i].completeAfterTalked &&
+                    tasks[i].npcEntity != npcEntity)
+                    return false;
+            }
+            return true;
+        }
+
         public int GetProgress(IPlayerCharacterData character, int taskIndex, out bool isComplete)
         {
             Quest quest = GetQuest();

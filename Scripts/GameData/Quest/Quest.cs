@@ -98,8 +98,6 @@ namespace MultiplayerARPG
                 if (tasks[i].taskType != QuestTaskType.TalkToNpc ||
                     tasks[i].npcEntity == null)
                     continue;
-                if (character.Quests[indexOfQuest].CompletedTasks.Contains(i))
-                    continue;
                 if (tasks[i].npcEntity.EntityId == npcEntity.EntityId)
                 {
                     taskIndex = i;

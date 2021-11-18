@@ -260,7 +260,7 @@ namespace MultiplayerARPG
             foreach (CharacterQuest characterQuest in playerCharacter.Quests)
             {
                 quest = characterQuest.GetQuest();
-                if (quest == null || characterQuest.isComplete || !characterQuest.IsAllTasksDone(playerCharacter))
+                if (quest == null || characterQuest.isComplete || !characterQuest.IsAllTasksDoneAndIsCompletingTarget(playerCharacter, this))
                     continue;
                 tasksDoneQuests.Add(quest.DataId);
             }

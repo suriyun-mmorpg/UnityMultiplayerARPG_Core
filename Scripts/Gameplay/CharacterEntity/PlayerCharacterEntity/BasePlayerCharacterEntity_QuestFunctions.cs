@@ -44,19 +44,19 @@ namespace MultiplayerARPG
             quests.RemoveAt(indexOfQuest);
         }
 
-        public void CompleteQuest(int questDataId, byte selectedRewardIndex)
+        public bool CompleteQuest(int questDataId, byte selectedRewardIndex)
         {
             int indexOfQuest = this.IndexOfQuest(questDataId);
             Quest quest;
             if (indexOfQuest < 0 || !GameInstance.Quests.TryGetValue(questDataId, out quest))
-                return;
+                return false;
 
             CharacterQuest characterQuest = quests[indexOfQuest];
             if (!characterQuest.IsAllTasksDone(this))
-                return;
+                return false;
 
             if (characterQuest.isComplete)
-                return;
+                return false;
 
             Reward reward = CurrentGameplayRule.MakeQuestReward(quest);
             List<ItemAmount> rewardItems = new List<ItemAmount>();
@@ -67,7 +67,7 @@ namespace MultiplayerARPG
                 if (selectedRewardIndex >= quest.selectableRewardItems.Length)
                 {
                     GameInstance.ServerGameMessageHandlers.SendGameMessage(ConnectionId, UITextKeys.UI_ERROR_INVALID_ITEM_INDEX);
-                    return;
+                    return false;
                 }
                 rewardItems.Add(quest.selectableRewardItems[selectedRewardIndex]);
             }
@@ -98,7 +98,7 @@ namespace MultiplayerARPG
             {
                 // Overwhelming
                 GameInstance.ServerGameMessageHandlers.SendGameMessage(ConnectionId, UITextKeys.UI_ERROR_WILL_OVERWHELMING);
-                return;
+                return false;
             }
             // Decrease task items
             QuestTask[] tasks = quest.tasks;
@@ -134,6 +134,8 @@ namespace MultiplayerARPG
                 quests[indexOfQuest] = characterQuest;
             else
                 quests.RemoveAt(indexOfQuest);
+
+            return true;
         }
     }
 }
