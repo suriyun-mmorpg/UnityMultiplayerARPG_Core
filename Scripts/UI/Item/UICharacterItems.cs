@@ -82,7 +82,8 @@ namespace MultiplayerARPG
                 CacheSelectionManager.DeselectSelectedUI();
                 return;
             }
-            if (uiDialog != null && CacheSelectionManager.selectionMode == UISelectionMode.SelectSingle)
+            if (uiDialog != null && (CacheSelectionManager.selectionMode == UISelectionMode.SelectSingle ||
+                CacheSelectionManager.selectionMode == UISelectionMode.Toggle))
             {
                 uiDialog.selectionManager = CacheSelectionManager;
                 uiDialog.Setup(ui.Data, Character, ui.IndexOfData);
@@ -92,7 +93,8 @@ namespace MultiplayerARPG
 
         protected virtual void OnDeselect(UICharacterItem ui)
         {
-            if (uiDialog != null && CacheSelectionManager.selectionMode == UISelectionMode.SelectSingle)
+            if (uiDialog != null && (CacheSelectionManager.selectionMode == UISelectionMode.SelectSingle ||
+                CacheSelectionManager.selectionMode == UISelectionMode.Toggle))
             {
                 uiDialog.onHide.RemoveListener(OnDialogHide);
                 uiDialog.Hide();
