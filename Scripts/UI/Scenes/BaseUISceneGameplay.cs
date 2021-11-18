@@ -157,6 +157,8 @@ namespace MultiplayerARPG
         // Abstract functions
         public abstract void SetTargetEntity(BaseGameEntity entity);
         public abstract void SetActivePlayerCharacter(BasePlayerCharacterEntity playerCharacter);
+        public abstract void ShowQuestRewardItemSelection(int questDataId);
+        public abstract void HideQuestRewardItemSelection();
         public abstract void ShowNpcDialog(int npcDialogDataId);
         public abstract void HideNpcDialog();
         public abstract void ShowConstructBuildingDialog(BuildingEntity buildingEntity);

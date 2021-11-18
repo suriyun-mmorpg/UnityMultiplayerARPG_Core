@@ -32,6 +32,8 @@ namespace MultiplayerARPG
         [Tooltip("If this UI was not set, it will find component in children to set when `Awake`")]
         public UINpcDialog uiNpcDialog;
         [Tooltip("If this UI was not set, it will find component in children to set when `Awake`")]
+        public UIQuestRewardItemSelection uiQuestRewardItemSelection;
+        [Tooltip("If this UI was not set, it will find component in children to set when `Awake`")]
         public UIRefineItem uiRefineItem;
         [Tooltip("If this UI was not set, it will find component in children to set when `Awake`")]
         public UIDismantleItem uiDismantleItem;
@@ -109,6 +111,8 @@ namespace MultiplayerARPG
             base.Awake();
             if (uiNpcDialog == null)
                 uiNpcDialog = gameObject.GetComponentInChildren<UINpcDialog>(true);
+            if (uiQuestRewardItemSelection == null)
+                uiQuestRewardItemSelection = gameObject.GetComponentInChildren<UIQuestRewardItemSelection>(true);
             if (uiRefineItem == null)
                 uiRefineItem = gameObject.GetComponentInChildren<UIRefineItem>(true);
             if (uiDismantleItem == null)
@@ -361,6 +365,20 @@ namespace MultiplayerARPG
         public void OnCharacterRespawn()
         {
             onCharacterRespawn.Invoke();
+        }
+
+        public override void ShowQuestRewardItemSelection(int questDataId)
+        {
+            if (uiQuestRewardItemSelection == null)
+                return;
+            uiQuestRewardItemSelection.UpdateData(questDataId);
+            uiQuestRewardItemSelection.Show();
+        }
+
+        public override void HideQuestRewardItemSelection()
+        {
+            if (uiQuestRewardItemSelection.IsVisible())
+                uiQuestRewardItemSelection.Hide();
         }
 
         public override void ShowNpcDialog(int npcDialogDataId)
@@ -739,6 +757,7 @@ namespace MultiplayerARPG
 
         public override void OnControllerSetup(BasePlayerCharacterEntity characterEntity)
         {
+            characterEntity.onShowQuestRewardItemSelection += ShowQuestRewardItemSelection;
             characterEntity.onShowNpcDialog += ShowNpcDialog;
             characterEntity.onShowNpcRefineItem += OnShowNpcRefineItem;
             characterEntity.onShowNpcDismantleItem += OnShowNpcDismantleItem;
@@ -754,6 +773,7 @@ namespace MultiplayerARPG
 
         public override void OnControllerDesetup(BasePlayerCharacterEntity characterEntity)
         {
+            characterEntity.onShowQuestRewardItemSelection -= ShowQuestRewardItemSelection;
             characterEntity.onShowNpcDialog -= ShowNpcDialog;
             characterEntity.onShowNpcRefineItem -= OnShowNpcRefineItem;
             characterEntity.onShowNpcDismantleItem -= OnShowNpcDismantleItem;

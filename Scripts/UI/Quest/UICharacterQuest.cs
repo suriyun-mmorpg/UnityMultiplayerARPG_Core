@@ -27,11 +27,21 @@ namespace MultiplayerARPG
         public TextWrapper uiTextDescription;
         public TextWrapper uiTextRewardExp;
         public TextWrapper uiTextRewardGold;
+        [Header("Items")]
+        public UICharacterItem uiRewardItemDialog;
+        public UICharacterItem uiRewardItemPrefab;
         [Header("Reward Items")]
         public bool showRewardItemList;
         public GameObject uiRewardItemRoot;
-        public UICharacterItem uiRewardItemPrefab;
         public Transform uiRewardItemContainer;
+        [Header("Selectable Reward Items")]
+        public bool showSelectableRewardItemList;
+        public GameObject uiSelectableRewardItemRoot;
+        public Transform uiSelectableRewardItemContainer;
+        [Header("Random Reward Items")]
+        public bool showRandomRewardItemList;
+        public GameObject uiRandomRewardItemRoot;
+        public Transform uiRandomRewardItemContainer;
         [Header("Reward Currencies")]
         public bool showRewardCurrencies;
         public UICurrencyAmounts uiRewardCurrencies;
@@ -63,6 +73,48 @@ namespace MultiplayerARPG
             }
         }
 
+        private UIList cacheSelectableRewardItemList;
+        public UIList CacheSelectableRewardItemList
+        {
+            get
+            {
+                if (cacheSelectableRewardItemList == null)
+                {
+                    cacheSelectableRewardItemList = gameObject.AddComponent<UIList>();
+                    cacheSelectableRewardItemList.uiPrefab = uiRewardItemPrefab.gameObject;
+                    cacheSelectableRewardItemList.uiContainer = uiSelectableRewardItemContainer;
+                }
+                return cacheSelectableRewardItemList;
+            }
+        }
+
+        private UIList cacheRandomRewardItemList;
+        public UIList CacheRandomRewardItemList
+        {
+            get
+            {
+                if (cacheRandomRewardItemList == null)
+                {
+                    cacheRandomRewardItemList = gameObject.AddComponent<UIList>();
+                    cacheRandomRewardItemList.uiPrefab = uiRewardItemPrefab.gameObject;
+                    cacheRandomRewardItemList.uiContainer = uiRandomRewardItemContainer;
+                }
+                return cacheRandomRewardItemList;
+            }
+        }
+
+        private UICharacterItemSelectionManager cacheRewardItemSelectionManager;
+        public UICharacterItemSelectionManager CacheRewardItemSelectionManager
+        {
+            get
+            {
+                if (cacheRewardItemSelectionManager == null)
+                    cacheRewardItemSelectionManager = gameObject.GetOrAddComponent<UICharacterItemSelectionManager>();
+                cacheRewardItemSelectionManager.selectionMode = UISelectionMode.SelectSingle;
+                return cacheRewardItemSelectionManager;
+            }
+        }
+
         private UIList cacheQuestTaskList;
         public UIList CacheQuestTaskList
         {
@@ -75,6 +127,55 @@ namespace MultiplayerARPG
                     cacheQuestTaskList.uiContainer = uiQuestTaskContainer;
                 }
                 return cacheQuestTaskList;
+            }
+        }
+
+        protected override void OnEnable()
+        {
+            base.OnEnable();
+            CacheRewardItemSelectionManager.eventOnSelected.RemoveListener(OnSelectRewardItem);
+            CacheRewardItemSelectionManager.eventOnSelected.AddListener(OnSelectRewardItem);
+            CacheRewardItemSelectionManager.eventOnDeselected.RemoveListener(OnDeselectRewardItem);
+            CacheRewardItemSelectionManager.eventOnDeselected.AddListener(OnDeselectRewardItem);
+            if (uiRewardItemDialog != null)
+                uiRewardItemDialog.onHide.AddListener(OnRewardItemDialogHide);
+        }
+
+        protected override void OnDisable()
+        {
+            base.OnDisable();
+            if (uiRewardItemDialog != null)
+                uiRewardItemDialog.onHide.RemoveListener(OnRewardItemDialogHide);
+            CacheRewardItemSelectionManager.DeselectSelectedUI();
+        }
+
+        protected virtual void OnRewardItemDialogHide()
+        {
+            CacheRewardItemSelectionManager.DeselectSelectedUI();
+        }
+
+        protected virtual void OnSelectRewardItem(UICharacterItem ui)
+        {
+            if (ui.Data.characterItem.IsEmptySlot())
+            {
+                CacheRewardItemSelectionManager.DeselectSelectedUI();
+                return;
+            }
+            if (uiRewardItemDialog != null)
+            {
+                uiRewardItemDialog.selectionManager = CacheRewardItemSelectionManager;
+                uiRewardItemDialog.Setup(ui.Data, Character, ui.IndexOfData);
+                uiRewardItemDialog.Show();
+            }
+        }
+
+        protected virtual void OnDeselectRewardItem(UICharacterItem ui)
+        {
+            if (uiRewardItemDialog != null)
+            {
+                uiRewardItemDialog.onHide.RemoveListener(OnRewardItemDialogHide);
+                uiRewardItemDialog.Hide();
+                uiRewardItemDialog.onHide.AddListener(OnRewardItemDialogHide);
             }
         }
 
@@ -131,6 +232,10 @@ namespace MultiplayerARPG
                     Quest == null ? "0" : Quest.rewardGold.ToString("N0"));
             }
 
+            // Prepare reward items
+            CacheRewardItemSelectionManager.Clear();
+
+            // Reward Items
             if (Quest != null && showRewardItemList)
             {
                 CacheRewardItemList.Generate(Quest.rewardItems, (index, rewardItem, ui) =>
@@ -138,12 +243,46 @@ namespace MultiplayerARPG
                     UICharacterItem uiCharacterItem = ui.GetComponent<UICharacterItem>();
                     uiCharacterItem.Setup(new UICharacterItemData(CharacterItem.Create(rewardItem.item, 1, rewardItem.amount), InventoryType.NonEquipItems), GameInstance.PlayingCharacter, -1);
                     uiCharacterItem.Show();
+                    CacheRewardItemSelectionManager.Add(uiCharacterItem);
                 });
             }
 
             if (uiRewardItemRoot != null)
                 uiRewardItemRoot.SetActive(showRewardItemList && Quest.rewardItems.Length > 0);
 
+            // Selectable Reward Items
+            if (Quest != null && showSelectableRewardItemList)
+            {
+                CacheSelectableRewardItemList.Generate(Quest.selectableRewardItems, (index, SelectablerewardItem, ui) =>
+                {
+                    UICharacterItem uiCharacterItem = ui.GetComponent<UICharacterItem>();
+                    uiCharacterItem.Setup(new UICharacterItemData(CharacterItem.Create(SelectablerewardItem.item, 1, SelectablerewardItem.amount), InventoryType.NonEquipItems), GameInstance.PlayingCharacter, -1);
+                    uiCharacterItem.Show();
+                    CacheRewardItemSelectionManager.Add(uiCharacterItem);
+                });
+            }
+
+            if (uiSelectableRewardItemRoot != null)
+                uiSelectableRewardItemRoot.SetActive(showSelectableRewardItemList && Quest.selectableRewardItems.Length > 0);
+
+            // Random Reward Items
+            if (Quest != null && showRandomRewardItemList)
+            {
+                CacheRandomRewardItemList.Generate(Quest.randomRewardItems, (index, RandomrewardItem, ui) =>
+                {
+                    UICharacterItem uiCharacterItem = ui.GetComponent<UICharacterItem>();
+                    uiCharacterItem.Setup(new UICharacterItemData(CharacterItem.Create(RandomrewardItem.item, 1, RandomrewardItem.amount), InventoryType.NonEquipItems), GameInstance.PlayingCharacter, -1);
+                    uiCharacterItem.Show();
+                    CacheRewardItemSelectionManager.Add(uiCharacterItem);
+                });
+            }
+
+            if (uiRandomRewardItemRoot != null)
+                uiRandomRewardItemRoot.SetActive(showRandomRewardItemList && Quest.randomRewardItems.Length > 0);
+
+            CacheRewardItemSelectionManager.DeselectSelectedUI();
+
+            // Reward Currencies
             if (uiRewardCurrencies != null)
             {
                 if (showRewardCurrencies)
@@ -157,8 +296,11 @@ namespace MultiplayerARPG
                 }
             }
 
+            // Quest tasks
             if (uiQuestTaskRoot != null)
                 uiQuestTaskRoot.SetActive(showQuestTaskList && Quest.tasks.Length > 0);
+
+            // Quest status
 
             if (questCompleteStatusObject != null)
                 questCompleteStatusObject.SetActive(isComplete);

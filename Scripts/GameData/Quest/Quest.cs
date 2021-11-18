@@ -24,6 +24,10 @@ namespace MultiplayerARPG
         public CurrencyAmount[] rewardCurrencies = new CurrencyAmount[0];
         [ArrayElementTitle("item")]
         public ItemAmount[] rewardItems = new ItemAmount[0];
+        [ArrayElementTitle("item")]
+        public ItemAmount[] selectableRewardItems = new ItemAmount[0];
+        [ArrayElementTitle("item")]
+        public ItemRandomByWeight[] randomRewardItems = new ItemRandomByWeight[0];
         [Tooltip("If this is `TRUE` character will be able to do this quest repeatedly")]
         public bool canRepeat;
 
@@ -72,20 +76,10 @@ namespace MultiplayerARPG
                     GameInstance.AddNpcDialogs(task.talkToNpcDialog);
                 }
             }
-            if (rewardCurrencies != null && rewardCurrencies.Length > 0)
-            {
-                foreach (CurrencyAmount rewardCurrency in rewardCurrencies)
-                {
-                    GameInstance.AddCurrencies(rewardCurrency.currency);
-                }
-            }
-            if (rewardItems != null && rewardItems.Length > 0)
-            {
-                foreach (ItemAmount rewardItem in rewardItems)
-                {
-                    GameInstance.AddItems(rewardItem.item);
-                }
-            }
+            GameInstance.AddCurrencies(rewardCurrencies);
+            GameInstance.AddItems(rewardItems);
+            GameInstance.AddItems(selectableRewardItems);
+            GameInstance.AddItems(randomRewardItems);
             GameInstance.AddQuests(requirement.completedQuests);
         }
 

@@ -78,6 +78,13 @@ namespace MultiplayerARPG
             return true;
         }
 
+        public static BaseNpcDialog GetValidatedDialogOrNull(BaseNpcDialog dialog, BasePlayerCharacterEntity characterEntity)
+        {
+            if (dialog == null || !dialog.ValidateDialog(characterEntity))
+                return null;
+            return dialog;
+        }
+
         /// <summary>
         /// This will be called to render current dialog
         /// </summary>
@@ -100,7 +107,7 @@ namespace MultiplayerARPG
         /// <param name="characterEntity"></param>
         /// <param name="menuIndex"></param>
         /// <returns></returns>
-        public abstract BaseNpcDialog GetNextDialog(BasePlayerCharacterEntity characterEntity, byte menuIndex);
+        public abstract void GoToNextDialog(BasePlayerCharacterEntity characterEntity, byte menuIndex);
         protected abstract void SetDialogByPort(NodePort from, NodePort to);
         public abstract bool IsShop { get; }
     }

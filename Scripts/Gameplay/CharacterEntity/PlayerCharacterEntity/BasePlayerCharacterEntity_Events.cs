@@ -5,13 +5,27 @@ namespace MultiplayerARPG
     public partial class BasePlayerCharacterEntity
     {
         // Note: You may use `Awake` dev extension to setup an events and `OnDestroy` to desetup an events
+        // Quest dialog events
+        /// <summary>
+        /// Action: int questDataId
+        /// </summary>
+        public event System.Action<int> onShowQuestRewardItemSelection;
         // Npc dialog events
+        /// <summary>
+        /// Action: int npcDialogDataId
+        /// </summary>
         public event System.Action<int> onShowNpcDialog;
         public event System.Action onShowNpcRefineItem;
         public event System.Action onShowNpcDismantleItem;
         public event System.Action onShowNpcRepairItem;
         // Dealing dialog events
+        /// <summary>
+        /// Action: BasePlayerCharacterEntity anotherCharacter
+        /// </summary>
         public event System.Action<BasePlayerCharacterEntity> onShowDealingRequestDialog;
+        /// <summary>
+        /// Action: BasePlayerCharacterEntity anotherCharacter
+        /// </summary>
         public event System.Action<BasePlayerCharacterEntity> onShowDealingDialog;
         public event System.Action<DealingState> onUpdateDealingState;
         public event System.Action<DealingState> onUpdateAnotherDealingState;

@@ -9,6 +9,8 @@ namespace MultiplayerARPG
     public abstract partial class BasePlayerCharacterEntity : BaseCharacterEntity, IPlayerCharacterData
     {
         public BaseNpcDialog CurrentNpcDialog { get; set; }
+        public Quest CompletingQuest { get; set; }
+        public BaseNpcDialog NpcDialogAfterSelectRewardItem { get; set; }
 
         [Category("Character Settings")]
         [Tooltip("This is list which used as choice of character classes when create character")]

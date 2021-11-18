@@ -77,11 +77,19 @@ namespace MultiplayerARPG
             return true;
         }
 
-        public bool CallOwnerShowNpcDialog(int dataId)
+        public bool CallOwnerShowQuestRewardItemSelection(int questDataId)
         {
             if (this.IsDead())
                 return false;
-            RPC(TargetShowNpcDialog, ConnectionId, dataId);
+            RPC(TargetShowQuestRewardItemSelection, ConnectionId, questDataId);
+            return true;
+        }
+
+        public bool CallOwnerShowNpcDialog(int npcDialogDataId)
+        {
+            if (this.IsDead())
+                return false;
+            RPC(TargetShowNpcDialog, ConnectionId, npcDialogDataId);
             return true;
         }
 
@@ -122,6 +130,14 @@ namespace MultiplayerARPG
             if (this.IsDead())
                 return false;
             RPC(ServerBuyNpcItem, itemIndex, amount);
+            return true;
+        }
+
+        public bool CallServerSelectQuestRewardItem(byte itemIndex)
+        {
+            if (this.IsDead())
+                return false;
+            RPC(ServerSelectQuestRewardItem, itemIndex);
             return true;
         }
 

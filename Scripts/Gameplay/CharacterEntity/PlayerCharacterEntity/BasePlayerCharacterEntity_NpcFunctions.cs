@@ -24,6 +24,7 @@ namespace MultiplayerARPG
                 return;
             }
 
+            // Show start dialog
             CurrentNpcDialog = npcEntity.StartDialog;
 
             // Update task
@@ -44,7 +45,23 @@ namespace MultiplayerARPG
                 characterQuest.CompletedTasks.Add(taskIndex);
                 Quests[i] = characterQuest;
                 if (completeAfterTalked && characterQuest.IsAllTasksDone(this))
-                    CompleteQuest(quest.DataId);
+                {
+                    if (quest.selectableRewardItems != null &&
+                        quest.selectableRewardItems.Length > 0)
+                    {
+                        // Show quest reward dialog at client
+                        CallOwnerShowQuestRewardItemSelection(quest.DataId);
+                        CompletingQuest = quest;
+                        NpcDialogAfterSelectRewardItem = talkToNpcTaskDialog;
+                        CurrentNpcDialog = null;
+                    }
+                    else
+                    {
+                        // No selectable reward items, complete the quest immediately
+                        CompleteQuest(quest.DataId, 0);
+                    }
+                    break;
+                }
             }
 
             if (CurrentNpcDialog != null)
@@ -53,11 +70,23 @@ namespace MultiplayerARPG
         }
 
         [TargetRpc]
-        protected void TargetShowNpcDialog(int dataId)
+        protected void TargetShowQuestRewardItemSelection(int questDataId)
+        {
+            // Hide npc dialog
+            if (onShowNpcDialog != null)
+                onShowNpcDialog.Invoke(0);
+
+            // Show quest reward dialog
+            if (onShowQuestRewardItemSelection != null)
+                onShowQuestRewardItemSelection.Invoke(questDataId);
+        }
+
+        [TargetRpc]
+        protected void TargetShowNpcDialog(int npcDialogDataId)
         {
             // Show npc dialog by dataId, if dataId = 0 it will hide
             if (onShowNpcDialog != null)
-                onShowNpcDialog.Invoke(dataId);
+                onShowNpcDialog.Invoke(npcDialogDataId);
         }
 
         [TargetRpc]
@@ -103,7 +132,7 @@ namespace MultiplayerARPG
             if (CurrentNpcDialog == null)
                 return;
 
-            CurrentNpcDialog = CurrentNpcDialog.GetNextDialog(this, menuIndex);
+            CurrentNpcDialog.GoToNextDialog(this, menuIndex);
             if (CurrentNpcDialog != null)
             {
                 // Show Npc dialog on client
@@ -154,6 +183,32 @@ namespace MultiplayerARPG
             this.IncreaseItems(CharacterItem.Create(dataId, 1, amount));
             this.FillEmptySlots();
             GameInstance.ServerGameMessageHandlers.NotifyRewardItem(ConnectionId, dataId, amount);
+#endif
+        }
+
+        [ServerRpc]
+        protected void ServerSelectQuestRewardItem(byte index)
+        {
+#if !CLIENT_BUILD
+            if (CompletingQuest == null)
+                return;
+
+            CompleteQuest(CompletingQuest.DataId, index);
+            CurrentNpcDialog = NpcDialogAfterSelectRewardItem;
+            if (CurrentNpcDialog != null)
+            {
+                // Show Npc dialog on client
+                CallOwnerShowNpcDialog(CurrentNpcDialog.DataId);
+            }
+            else
+            {
+                // Hide Npc dialog on client
+                CallOwnerShowNpcDialog(0);
+            }
+
+            // Clear data
+            CompletingQuest = null;
+            NpcDialogAfterSelectRewardItem = null;
 #endif
         }
 
