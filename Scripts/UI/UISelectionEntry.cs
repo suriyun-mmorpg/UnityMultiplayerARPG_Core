@@ -31,6 +31,9 @@ public abstract class UISelectionEntry<T> : UIBase, IUISelectionEntry
         }
     }
 
+    public System.Action onUpdateUI;
+    public System.Action<T> onUpdateData;
+
     protected override void Awake()
     {
         base.Awake();
@@ -55,6 +58,8 @@ public abstract class UISelectionEntry<T> : UIBase, IUISelectionEntry
         {
             updateCountDown = updateUIRepeatRate;
             UpdateUI();
+            if (onUpdateUI != null)
+                onUpdateUI.Invoke();
             this.InvokeInstanceDevExtMethods("UpdateUI");
         }
     }
@@ -63,6 +68,8 @@ public abstract class UISelectionEntry<T> : UIBase, IUISelectionEntry
     {
         UpdateData();
         UpdateUI();
+        if (onUpdateData != null)
+            onUpdateData.Invoke(Data);
         this.InvokeInstanceDevExtMethods("UpdateData");
     }
 
