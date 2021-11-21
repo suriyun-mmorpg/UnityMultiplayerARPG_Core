@@ -298,6 +298,12 @@ public class InputFieldWrapper : MonoBehaviour
         if (textMeshInputField != null) textMeshInputField.MoveTextEnd(shift);
     }
 
+    public void SetTextWithoutNotify(string text)
+    {
+        if (unityInputField != null) unityInputField.SetTextWithoutNotify(text);
+        if (textMeshInputField != null) textMeshInputField.SetTextWithoutNotify(text);
+    }
+
     [ContextMenu("Set Attached Input Field Component To Field")]
     public void SetAttachedInputFieldComponentToField()
     {
