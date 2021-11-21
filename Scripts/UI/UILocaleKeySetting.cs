@@ -12,6 +12,11 @@
             customKey = string.Empty;
         }
 
+        public string ToFormat()
+        {
+            return LanguageManager.GetText(ToString());
+        }
+
         public override string ToString()
         {
             if (localeKey == UIFormatKeys.UI_CUSTOM)
