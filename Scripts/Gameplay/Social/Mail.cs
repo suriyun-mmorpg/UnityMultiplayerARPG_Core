@@ -115,7 +115,7 @@ namespace MultiplayerARPG
                 characterItem.expireTime = expireTime;
                 characterItem.randomSeed = randomSeed;
                 characterItem.ReadSockets(sockets, '|');
-                Items[dataId] = characterItem;
+                Items.Add(characterItem);
             }
             return Items;
         }
