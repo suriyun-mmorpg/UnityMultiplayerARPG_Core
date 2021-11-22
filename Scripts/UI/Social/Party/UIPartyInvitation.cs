@@ -45,6 +45,7 @@ namespace MultiplayerARPG
             {
                 partyId = Data.PartyId,
             }, DeclinePartyInvitationCallback);
+            Hide();
         }
 
         private void DeclinePartyInvitationCallback(ResponseHandlerData requestHandler, AckResponseCode responseCode, ResponseDeclinePartyInvitationMessage response)
