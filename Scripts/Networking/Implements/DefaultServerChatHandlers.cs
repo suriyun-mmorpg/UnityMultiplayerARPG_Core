@@ -111,11 +111,8 @@ namespace MultiplayerARPG
                     }
                     break;
                 case ChatChannel.System:
-                    if (CanSendSystemAnnounce(message.sender))
-                    {
-                        // Send message to all clients
-                        Manager.ServerSendPacketToAllConnections(0, DeliveryMethod.ReliableOrdered, GameNetworkingConsts.Chat, message);
-                    }
+                    // Send message to all clients
+                    Manager.ServerSendPacketToAllConnections(0, DeliveryMethod.ReliableOrdered, GameNetworkingConsts.Chat, message);
                     break;
             }
         }
