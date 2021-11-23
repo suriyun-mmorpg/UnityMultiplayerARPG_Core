@@ -260,6 +260,9 @@ namespace MultiplayerARPG
         public DeadDropItemMode monsterDeadDropItemMode = DeadDropItemMode.DropOnGround;
         [Tooltip("If all items does not picked up from corpse within this duration, it will be destroyed from the server")]
         public float monsterCorpseAppearDuration = 60f;
+        [Tooltip("Delay before return move speed while attack or use skill to generic move speed")]
+        public float returnMoveSpeedDelayAfterAction = 0.1f;
+
         [Header("Gameplay Configs - Items, Inventory and Storage")]
         public ItemTypeFilter dismantleFilter = new ItemTypeFilter()
         {
