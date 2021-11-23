@@ -20,7 +20,6 @@ namespace MultiplayerARPG
         public const float RESPAWN_GROUNDED_CHECK_DURATION = 1f;
         public const float MOUNT_DELAY = 1f;
         public const float FIND_ENTITY_DISTANCE_BUFFER = 1f;
-        public const float RETURN_MOVEMENT_SPEED_DELAY = 0.01f;
 
         protected struct SyncListRecachingState
         {
@@ -76,6 +75,7 @@ namespace MultiplayerARPG
         public Vector3? debugDamageLaunchingPosition;
         public Vector3? debugDamageLaunchingDirection;
         public Quaternion? debugDamageLaunchingRotation;
+        public bool? debugDamageLaunchingIsLeftHand;
 #endif
 
         [Category(5, "Character Settings")]
@@ -188,10 +188,11 @@ namespace MultiplayerARPG
             base.OnDrawGizmos();
             if (debugDamageLaunchingPosition.HasValue &&
                 debugDamageLaunchingDirection.HasValue &&
-                debugDamageLaunchingRotation.HasValue)
+                debugDamageLaunchingRotation.HasValue &&
+                debugDamageLaunchingIsLeftHand.HasValue)
             {
-                float atkHalfFov = GetAttackFov(false) * 0.5f;
-                float atkDist = GetAttackDistance(false);
+                float atkHalfFov = GetAttackFov(debugDamageLaunchingIsLeftHand.Value) * 0.5f;
+                float atkDist = GetAttackDistance(debugDamageLaunchingIsLeftHand.Value);
                 Handles.color = debugDamageLaunchingColor;
                 Handles.DrawSolidArc(debugDamageLaunchingPosition.Value, debugDamageLaunchingRotation.Value * Vector3.up, debugDamageLaunchingRotation.Value * Vector3.forward, -atkHalfFov, atkDist);
                 Handles.DrawSolidArc(debugDamageLaunchingPosition.Value, debugDamageLaunchingRotation.Value * Vector3.up, debugDamageLaunchingRotation.Value * Vector3.forward, atkHalfFov, atkDist);
@@ -796,11 +797,12 @@ namespace MultiplayerARPG
         }
 
 #if UNITY_EDITOR
-        public void SetDebugDamage(Vector3 damagePosition, Vector3 damageDirection, Quaternion damageRotation)
+        public void SetDebugDamage(Vector3 damagePosition, Vector3 damageDirection, Quaternion damageRotation, bool isLeftHand)
         {
             debugDamageLaunchingPosition = damagePosition;
             debugDamageLaunchingDirection = damageDirection;
             debugDamageLaunchingRotation = damageRotation;
+            debugDamageLaunchingIsLeftHand = isLeftHand;
         }
 #endif
         #endregion
@@ -844,11 +846,11 @@ namespace MultiplayerARPG
         {
             float moveSpeed = this.GetCaches().MoveSpeed;
             float time = Time.unscaledTime;
-            if (IsAttacking || time - LastAttackEndTime < RETURN_MOVEMENT_SPEED_DELAY)
+            if (IsAttacking || time - LastAttackEndTime < CurrentGameInstance.returnMoveSpeedDelayAfterAction)
             {
                 moveSpeed *= MoveSpeedRateWhileAttacking;
             }
-            else if (IsUsingSkill || time - LastUseSkillEndTime < RETURN_MOVEMENT_SPEED_DELAY)
+            else if (IsUsingSkill || time - LastUseSkillEndTime < CurrentGameInstance.returnMoveSpeedDelayAfterAction)
             {
                 moveSpeed *= MoveSpeedRateWhileUsingSkill;
             }
