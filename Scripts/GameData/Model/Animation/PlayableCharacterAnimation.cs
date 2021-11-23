@@ -12,6 +12,8 @@ namespace MultiplayerARPG.GameData.Model.Playables
         [Tooltip("If this <= 0, it will use default transition duration setting from model component")]
         public float transitionDuration;
         public bool isAdditive;
+        public bool applyFootIk;
+        public bool applyPlayableIk;
     }
 
     [System.Serializable]
@@ -25,6 +27,8 @@ namespace MultiplayerARPG.GameData.Model.Playables
         [Tooltip("If this <= 0, it will use default transition duration setting from model component")]
         public float transitionDuration;
         public bool isAdditive;
+        public bool applyFootIk;
+        public bool applyPlayableIk;
     }
 
     [System.Serializable]

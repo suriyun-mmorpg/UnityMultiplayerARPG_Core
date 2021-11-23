@@ -143,8 +143,8 @@ namespace MultiplayerARPG.GameData.Model.Playables
             foreach (BaseStateInfo stateInfo in baseStates.Values)
             {
                 AnimationClipPlayable clipPlayable = AnimationClipPlayable.Create(Graph, stateInfo.state.clip);
-                clipPlayable.SetApplyFootIK(false);
-                clipPlayable.SetApplyPlayableIK(true);
+                clipPlayable.SetApplyFootIK(stateInfo.state.applyFootIk);
+                clipPlayable.SetApplyPlayableIK(stateInfo.state.applyPlayableIk);
                 Graph.Connect(clipPlayable, 0, BaseLayerMixer, stateInfo.inputPort);
             }
             BaseLayerMixer.SetInputWeight(0, 1);
@@ -520,8 +520,8 @@ namespace MultiplayerARPG.GameData.Model.Playables
 
             AnimationClip clip = actionState.clip != null ? actionState.clip : EmptyClip;
             AnimationClipPlayable playable = AnimationClipPlayable.Create(Graph, clip);
-            playable.SetApplyFootIK(false);
-            playable.SetApplyPlayableIK(false);
+            playable.SetApplyFootIK(actionState.applyFootIk);
+            playable.SetApplyPlayableIK(actionState.applyPlayableIk);
             Graph.Connect(playable, 0, ActionLayerMixer, 0);
             ActionLayerMixer.SetInputWeight(0, 1f);
 
