@@ -489,10 +489,10 @@ namespace MultiplayerARPG
             ChatMessage message = messageHandler.ReadMessage<ChatMessage>().FillChannelId();
             // Check muting character
             IPlayerCharacterData playerCharacter;
-            if (!message.sendByServer && !string.IsNullOrEmpty(message.sender) && GameInstance.ServerUserHandlers.TryGetPlayerCharacterByName(message.sender, out playerCharacter) && playerCharacter.IsMuting())
+            if (!message.sendByServer && !string.IsNullOrEmpty(message.sender) && ServerUserHandlers.TryGetPlayerCharacterByName(message.sender, out playerCharacter) && playerCharacter.IsMuting())
             {
                 long connectionId;
-                if (GameInstance.ServerUserHandlers.TryGetConnectionId(playerCharacter.Id, out connectionId))
+                if (ServerUserHandlers.TryGetConnectionId(playerCharacter.Id, out connectionId))
                 {
                     ServerSendPacket(connectionId, 0, DeliveryMethod.ReliableOrdered, GameNetworkingConsts.Chat, new ChatMessage()
                     {
@@ -502,7 +502,8 @@ namespace MultiplayerARPG
                 }
                 return;
             }
-            ServerChatHandlers.OnChatMessage(message);
+            if (message.channel != ChatChannel.System || ServerChatHandlers.CanSendSystemAnnounce(message.sender))
+                ServerChatHandlers.OnChatMessage(message);
         }
 
         protected void HandleMovementInputAtServer(MessageHandlerData messageHandler)
