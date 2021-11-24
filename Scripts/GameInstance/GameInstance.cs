@@ -262,6 +262,10 @@ namespace MultiplayerARPG
         public float monsterCorpseAppearDuration = 60f;
         [Tooltip("Delay before return move speed while attack or use skill to generic move speed")]
         public float returnMoveSpeedDelayAfterAction = 0.1f;
+        [Tooltip("Delay before mount again")]
+        public float mountDelay = 1f;
+        [Tooltip("Delay before use item again")]
+        public float useItemDelay = 0.25f;
 
         [Header("Gameplay Configs - Items, Inventory and Storage")]
         public ItemTypeFilter dismantleFilter = new ItemTypeFilter()

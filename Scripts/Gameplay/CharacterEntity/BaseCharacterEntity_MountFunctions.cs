@@ -7,7 +7,7 @@ namespace MultiplayerARPG
     {
         public void Mount(VehicleEntity mountEntityPrefab)
         {
-            if (!IsServer || mountEntityPrefab == null || Time.unscaledTime - lastMountTime < MOUNT_DELAY)
+            if (!IsServer || mountEntityPrefab == null || Time.unscaledTime - lastMountTime < CurrentGameInstance.mountDelay)
                 return;
 
             lastMountTime = Time.unscaledTime;

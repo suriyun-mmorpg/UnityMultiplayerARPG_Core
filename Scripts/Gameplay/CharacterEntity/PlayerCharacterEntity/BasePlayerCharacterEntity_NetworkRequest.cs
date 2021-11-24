@@ -12,6 +12,9 @@ namespace MultiplayerARPG
             if (!UpdateLastActionTime())
                 return false;
 
+            if (Time.unscaledTime - lastUseItemTime < CurrentGameInstance.useItemDelay)
+                return false;
+
             if (index >= nonEquipItems.Count)
                 return false;
 
@@ -22,6 +25,7 @@ namespace MultiplayerARPG
             if (item == null)
                 return false;
 
+            lastUseItemTime = Time.unscaledTime;
             return true;
         }
 
