@@ -144,9 +144,21 @@ namespace MultiplayerARPG
                 Direction2D = LocalDirection2D = Quaternion.Euler(value) * Vector3.forward;
             }
         }
-        public string RespawnMapName { get { return respawnMapName.Value; } set { respawnMapName.Value = value; } }
-        public Vector3 RespawnPosition { get { return respawnPosition.Value; } set { respawnPosition.Value = value; } }
-        public bool IsWarping { get { return isWarping.Value; } set { isWarping.Value = value; } }
+        public string RespawnMapName
+        {
+            get { return respawnMapName.Value; }
+            set { respawnMapName.Value = value; }
+        }
+        public Vector3 RespawnPosition
+        {
+            get { return respawnPosition.Value; }
+            set { respawnPosition.Value = value; }
+        }
+        public bool IsWarping
+        {
+            get { return isWarping.Value; }
+            set { isWarping.Value = value; }
+        }
         public int MountDataId
         {
             get
@@ -159,8 +171,16 @@ namespace MultiplayerARPG
             }
             set { }
         }
-        public long LastDeadTime { get { return lastDeadTime.Value; } set { lastDeadTime.Value = value; } }
-        public long UnmuteTime { get { return unmuteTime.Value; } set { unmuteTime.Value = value; } }
+        public long LastDeadTime
+        {
+            get { return lastDeadTime.Value; }
+            set { lastDeadTime.Value = value; }
+        }
+        public long UnmuteTime
+        {
+            get { return unmuteTime.Value; }
+            set { unmuteTime.Value = value; }
+        }
         public long LastUpdate { get; set; }
 
         public IList<CharacterHotkey> Hotkeys
