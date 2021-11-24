@@ -18,6 +18,9 @@ namespace MultiplayerARPG
         public IncrementalInt consumeHp;
         public IncrementalInt consumeMp;
         public IncrementalInt consumeStamina;
+        public IncrementalFloat consumeHpRate;
+        public IncrementalFloat consumeMpRate;
+        public IncrementalFloat consumeStaminaRate;
         public IncrementalFloat coolDownDuration;
 
         [Category(2, "Skill Casting")]
@@ -280,6 +283,36 @@ namespace MultiplayerARPG
         public int GetConsumeStamina(short level)
         {
             return consumeStamina.GetAmount(level);
+        }
+
+        public float GetConsumeHpRate(short level)
+        {
+            return consumeHpRate.GetAmount(level);
+        }
+
+        public float GetConsumeMpRate(short level)
+        {
+            return consumeMpRate.GetAmount(level);
+        }
+
+        public float GetConsumeStaminaRate(short level)
+        {
+            return consumeStaminaRate.GetAmount(level);
+        }
+
+        public int GetTotalConsumeHp(short level, ICharacterData character)
+        {
+            return (int)(character.GetCaches().MaxHp * GetConsumeHpRate(level)) + GetConsumeHp(level);
+        }
+
+        public int GetTotalConsumeMp(short level, ICharacterData character)
+        {
+            return (int)(character.GetCaches().MaxMp * GetConsumeMpRate(level)) + GetConsumeMp(level);
+        }
+
+        public int GetTotalConsumeStamina(short level, ICharacterData character)
+        {
+            return (int)(character.GetCaches().MaxStamina * GetConsumeStaminaRate(level)) + GetConsumeStamina(level);
         }
 
         public float GetCoolDownDuration(short level)

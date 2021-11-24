@@ -277,7 +277,7 @@ namespace MultiplayerARPG
 
             if (uiTextConsumeHp != null)
             {
-                tempConsumeAmount = Skill == null || Level <= 0 ? 0 : Skill.GetConsumeHp(Level);
+                tempConsumeAmount = Skill == null || Level <= 0 ? 0 : Skill.GetTotalConsumeHp(Level, Character);
                 if (tempConsumeAmount != 0)
                 {
                     uiTextConsumeHp.text = string.Format(
@@ -293,7 +293,7 @@ namespace MultiplayerARPG
 
             if (uiTextConsumeMp != null)
             {
-                tempConsumeAmount = Skill == null || Level <= 0 ? 0 : Skill.GetConsumeMp(Level);
+                tempConsumeAmount = Skill == null || Level <= 0 ? 0 : Skill.GetTotalConsumeMp(Level, Character);
                 if (tempConsumeAmount != 0)
                 {
                     uiTextConsumeMp.text = string.Format(
@@ -309,7 +309,7 @@ namespace MultiplayerARPG
 
             if (uiTextConsumeStamina != null)
             {
-                tempConsumeAmount = Skill == null || Level <= 0 ? 0 : Skill.GetConsumeStamina(Level);
+                tempConsumeAmount = Skill == null || Level <= 0 ? 0 : Skill.GetTotalConsumeStamina(Level, Character);
                 if (tempConsumeAmount != 0)
                 {
                     uiTextConsumeStamina.text = string.Format(

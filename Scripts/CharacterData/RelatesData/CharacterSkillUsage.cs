@@ -66,17 +66,17 @@ namespace MultiplayerARPG
                         coolDownRemainsDuration = GetSkill().GetCoolDownDuration(level);
                         int tempAmount;
                         // Consume HP
-                        tempAmount = GetSkill().GetConsumeHp(level);
+                        tempAmount = GetSkill().GetTotalConsumeHp(level, character);
                         if (tempAmount < 0)
                             tempAmount = 0;
                         character.CurrentHp -= tempAmount;
                         // Consume MP
-                        tempAmount = GetSkill().GetConsumeMp(level);
+                        tempAmount = GetSkill().GetTotalConsumeMp(level, character);
                         if (tempAmount < 0)
                             tempAmount = 0;
                         character.CurrentMp -= tempAmount;
                         // Consume Stamina
-                        tempAmount = GetSkill().GetConsumeStamina(level);
+                        tempAmount = GetSkill().GetTotalConsumeStamina(level, character);
                         if (tempAmount < 0)
                             tempAmount = 0;
                         character.CurrentStamina -= tempAmount;
