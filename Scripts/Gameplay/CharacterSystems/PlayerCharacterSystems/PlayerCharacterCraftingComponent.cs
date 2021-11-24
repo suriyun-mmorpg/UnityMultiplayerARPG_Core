@@ -3,20 +3,20 @@
 namespace MultiplayerARPG
 {
     [DisallowMultipleComponent]
-    public class PlayerCharacterCraftingComponent : BaseNetworkedGameEntityComponent<BasePlayerCharacterEntity>, ICraftingQueueSource
+    public partial class PlayerCharacterCraftingComponent : BaseNetworkedGameEntityComponent<BasePlayerCharacterEntity>, ICraftingQueueSource
     {
         [SerializeField]
         private int maxQueueSize = 5;
+        public int MaxQueueSize
+        {
+            get { return maxQueueSize; }
+        }
+
         private SyncListCraftingQueueItem queueItems = new SyncListCraftingQueueItem();
 
         public SyncListCraftingQueueItem QueueItems
         {
             get { return queueItems; }
-        }
-
-        public int MaxQueueSize
-        {
-            get { return maxQueueSize; }
         }
 
         public bool CanCraft

@@ -4,7 +4,7 @@ using UnityEngine;
 namespace MultiplayerARPG
 {
     [DisallowMultipleComponent]
-    public class PlayerCharacterNpcActionComponent : BaseNetworkedGameEntityComponent<BasePlayerCharacterEntity>
+    public partial class PlayerCharacterNpcActionComponent : BaseNetworkedGameEntityComponent<BasePlayerCharacterEntity>
     {
         public BaseNpcDialog CurrentNpcDialog { get; set; }
         public Quest CompletingQuest { get; set; }
