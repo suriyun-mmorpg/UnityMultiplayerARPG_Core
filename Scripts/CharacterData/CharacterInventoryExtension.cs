@@ -357,7 +357,7 @@ namespace MultiplayerARPG
                         // Unequip item if left hand weapon is off-hand only when equipping at right-hand
                         if (!isLeftHand && hasLeftHandItem)
                         {
-                            if (rightHandEquipType == WeaponItemEquipType.OffHandOnly)
+                            if (leftHandEquipType == WeaponItemEquipType.OffHandOnly)
                                 shouldUnequipLeftHand = true;
                         }
                         break;
