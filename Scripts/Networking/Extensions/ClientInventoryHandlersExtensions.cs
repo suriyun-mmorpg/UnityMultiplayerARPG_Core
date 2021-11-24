@@ -15,11 +15,11 @@ namespace MultiplayerARPG
             IShieldItem equippingShieldItem = equippingItem.GetShieldItem();
             if (equippingWeaponItem != null)
             {
-                if (equippingWeaponItem.GetEquipType() == WeaponItemEquipType.OneHandCanDual)
+                if (equippingWeaponItem.GetEquipType() == WeaponItemEquipType.DualWieldable)
                 {
                     IWeaponItem rightWeapon = playerCharacter.EquipWeapons.GetRightHandWeaponItem();
                     // Equip at left-hand if able to do it
-                    if (rightWeapon != null && rightWeapon.GetEquipType() == WeaponItemEquipType.OneHandCanDual)
+                    if (rightWeapon != null && rightWeapon.GetEquipType() == WeaponItemEquipType.DualWieldable)
                         handlers.RequestEquipWeapon(new RequestEquipWeaponMessage()
                         {
                             nonEquipIndex = nonEquipIndex,

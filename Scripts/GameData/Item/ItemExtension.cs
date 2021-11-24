@@ -250,7 +250,7 @@ namespace MultiplayerARPG
             where T : IWeaponItem
         {
             if (weaponItem == null || !weaponItem.IsWeapon() || !weaponItem.WeaponType)
-                return WeaponItemEquipType.OneHand;
+                return WeaponItemEquipType.MainHandOnly;
             return weaponItem.WeaponType.EquipType;
         }
 
@@ -273,7 +273,7 @@ namespace MultiplayerARPG
         public static bool TryGetWeaponItemEquipType<T>(this T weaponItem, out WeaponItemEquipType equipType)
             where T : IWeaponItem
         {
-            equipType = WeaponItemEquipType.OneHand;
+            equipType = WeaponItemEquipType.MainHandOnly;
             if (weaponItem == null || !weaponItem.IsWeapon())
                 return false;
             equipType = weaponItem.GetEquipType();

@@ -322,8 +322,8 @@ namespace MultiplayerARPG
             {
                 switch (equippingWeaponItem.GetEquipType())
                 {
-                    case WeaponItemEquipType.OneHand:
-                        // If weapon is one hand its equip position must be right hand
+                    case WeaponItemEquipType.MainHandOnly:
+                        // If weapon is main-hand only its equip position must be right hand
                         if (isLeftHand)
                         {
                             gameMessage = UITextKeys.UI_ERROR_INVALID_EQUIP_POSITION_RIGHT_HAND;
@@ -337,7 +337,7 @@ namespace MultiplayerARPG
                         if (hasLeftHandItem && tempEquipWeapons.GetLeftHandWeaponItem() != null)
                             shouldUnequipLeftHand = true;
                         break;
-                    case WeaponItemEquipType.OneHandCanDual:
+                    case WeaponItemEquipType.DualWieldable:
                         // If weapon is one hand can dual its equip position must be right or left hand
                         if (!isLeftHand && hasRightHandItem)
                         {
@@ -347,12 +347,18 @@ namespace MultiplayerARPG
                         {
                             shouldUnequipLeftHand = true;
                         }
-                        // Unequip item if right hand weapon is one hand or two hand when equipping at left hand
+                        // Unequip item if right hand weapon is main-hand only or two-hand when equipping at left-hand
                         if (isLeftHand && hasRightHandItem)
                         {
-                            if (rightHandEquipType == WeaponItemEquipType.OneHand ||
+                            if (rightHandEquipType == WeaponItemEquipType.MainHandOnly ||
                                 rightHandEquipType == WeaponItemEquipType.TwoHand)
                                 shouldUnequipRightHand = true;
+                        }
+                        // Unequip item if left hand weapon is off-hand only when equipping at right-hand
+                        if (!isLeftHand && hasLeftHandItem)
+                        {
+                            if (rightHandEquipType == WeaponItemEquipType.OffHandOnly)
+                                shouldUnequipLeftHand = true;
                         }
                         break;
                     case WeaponItemEquipType.TwoHand:
@@ -363,6 +369,19 @@ namespace MultiplayerARPG
                             return false;
                         }
                         // Unequip both left and right hand
+                        if (hasRightHandItem)
+                            shouldUnequipRightHand = true;
+                        if (hasLeftHandItem)
+                            shouldUnequipLeftHand = true;
+                        break;
+                    case WeaponItemEquipType.OffHandOnly:
+                        // If weapon is off-hand only its equip position must be left hand
+                        if (!isLeftHand)
+                        {
+                            gameMessage = UITextKeys.UI_ERROR_INVALID_EQUIP_POSITION_LEFT_HAND;
+                            return false;
+                        }
+                        // Unequip both left and right hand (there is no shield for main-hand)
                         if (hasRightHandItem)
                             shouldUnequipRightHand = true;
                         if (hasLeftHandItem)

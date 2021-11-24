@@ -6,9 +6,10 @@ namespace MultiplayerARPG
 {
     public enum WeaponItemEquipType : byte
     {
-        OneHand,
-        OneHandCanDual,
+        MainHandOnly,
+        DualWieldable,
         TwoHand,
+        OffHandOnly,
     }
 
     [CreateAssetMenu(fileName = "Weapon Type", menuName = "Create GameData/Weapon Type", order = -4895)]
@@ -16,7 +17,7 @@ namespace MultiplayerARPG
     {
         [Category("Weapon Type Settings")]
         [SerializeField]
-        private WeaponItemEquipType equipType = WeaponItemEquipType.OneHand;
+        private WeaponItemEquipType equipType = WeaponItemEquipType.MainHandOnly;
         public WeaponItemEquipType EquipType { get { return equipType; } }
         [SerializeField]
         private DamageInfo damageInfo = default(DamageInfo);

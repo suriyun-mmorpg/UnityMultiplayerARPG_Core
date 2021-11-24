@@ -95,7 +95,7 @@ namespace MultiplayerARPG
 
                 if (tempRightHandWeapon == null || tempRightHandWeapon.WeaponType == null)
                 {
-                    Logging.LogWarning(ToString(), "Right hand equipment is not weapon");
+                    Logging.LogWarning(ToString(), "Right hand equipment is not weapon.");
                     rightHandEquipItem = null;
                     hasChanges = true;
                 }
@@ -109,7 +109,7 @@ namespace MultiplayerARPG
 
                 if ((tempLeftHandWeapon == null || tempLeftHandWeapon.WeaponType == null) && tempLeftHandShield == null)
                 {
-                    Logging.LogWarning(ToString(), "Left hand equipment is not weapon or shield");
+                    Logging.LogWarning(ToString(), "Left hand equipment is not weapon or shield.");
                     leftHandEquipItem = null;
                     hasChanges = true;
                 }
@@ -117,23 +117,36 @@ namespace MultiplayerARPG
                 {
                     if (tempLeftHandShield != null && tempRightHandWeapon.GetEquipType() == WeaponItemEquipType.TwoHand)
                     {
-                        Logging.LogWarning(ToString(), "Cannot set left hand equipment because it's equipping two hand weapon");
+                        Logging.LogWarning(ToString(), "Cannot set left hand equipment because it's equipping `TwoHand` item.");
                         leftHandEquipItem = null;
                         hasChanges = true;
                     }
-                    else if (tempLeftHandWeapon != null && tempRightHandWeapon.GetEquipType() != WeaponItemEquipType.OneHandCanDual)
+                    else if (tempLeftHandWeapon != null && tempRightHandWeapon.GetEquipType() != WeaponItemEquipType.DualWieldable)
                     {
-                        Logging.LogWarning(ToString(), "Cannot set left hand equipment because it's equipping one hand weapon which cannot equip dual");
+                        Logging.LogWarning(ToString(), "Cannot set left hand equipment because it isn't equipping `DualWieldable` item.");
                         leftHandEquipItem = null;
+                        hasChanges = true;
+                    }
+                    else if (tempLeftHandWeapon != null && tempLeftHandWeapon.GetEquipType() == WeaponItemEquipType.OffHandOnly)
+                    {
+                        Logging.LogWarning(ToString(), "Cannot set right hand equipment because it's equipping `OffHandOnly` item.");
+                        rightHandEquipItem = null;
                         hasChanges = true;
                     }
                 }
                 if (tempLeftHandWeapon != null &&
-                    (tempLeftHandWeapon.GetEquipType() == WeaponItemEquipType.OneHand ||
+                    (tempLeftHandWeapon.GetEquipType() == WeaponItemEquipType.MainHandOnly ||
                     tempLeftHandWeapon.GetEquipType() == WeaponItemEquipType.TwoHand))
                 {
-                    Logging.LogWarning(ToString(), "Left hand weapon cannot be OneHand or TwoHand");
+                    Logging.LogWarning(ToString(), "Left hand weapon cannot be `MainHandOnly` or `TwoHand` item.");
                     leftHandEquipItem = null;
+                    hasChanges = true;
+                }
+                if (tempRightHandWeapon != null &&
+                    (tempRightHandWeapon.GetEquipType() == WeaponItemEquipType.OffHandOnly))
+                {
+                    Logging.LogWarning(ToString(), "Right hand weapon cannot be `OffHandOnly` item.");
+                    rightHandEquipItem = null;
                     hasChanges = true;
                 }
             }
