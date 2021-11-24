@@ -5,6 +5,7 @@ using UnityEngine.Serialization;
 
 namespace MultiplayerARPG
 {
+    [RequireComponent(typeof(PlayerCharacterBuildingComponent))]
     [RequireComponent(typeof(PlayerCharacterCraftingComponent))]
     [RequireComponent(typeof(PlayerCharacterDealingComponent))]
     [RequireComponent(typeof(PlayerCharacterNpcActionComponent))]
@@ -28,6 +29,11 @@ namespace MultiplayerARPG
         public BasePlayerCharacterController ControllerPrefab
         {
             get { return controllerPrefab; }
+        }
+
+        public PlayerCharacterBuildingComponent Building
+        {
+            get; private set;
         }
 
         public PlayerCharacterCraftingComponent Crafting
@@ -83,6 +89,7 @@ namespace MultiplayerARPG
         public override void InitialRequiredComponents()
         {
             base.InitialRequiredComponents();
+            Building = gameObject.GetOrAddComponent<PlayerCharacterBuildingComponent>();
             Crafting = gameObject.GetOrAddComponent<PlayerCharacterCraftingComponent>();
             Dealing = gameObject.GetOrAddComponent<PlayerCharacterDealingComponent>();
             NpcAction = gameObject.GetOrAddComponent<PlayerCharacterNpcActionComponent>();

@@ -145,7 +145,7 @@ namespace MultiplayerARPG
                 uint parentObjectId = 0;
                 if (ConstructingBuildingEntity.BuildingArea != null)
                     parentObjectId = ConstructingBuildingEntity.BuildingArea.GetEntityObjectId();
-                PlayerCharacterEntity.CallServerConstructBuilding((short)buildingItemIndex, ConstructingBuildingEntity.CacheTransform.position, ConstructingBuildingEntity.CacheTransform.rotation, parentObjectId);
+                PlayerCharacterEntity.Building.CallServerConstructBuilding((short)buildingItemIndex, ConstructingBuildingEntity.CacheTransform.position, ConstructingBuildingEntity.CacheTransform.rotation, parentObjectId);
             }
             DestroyConstructingBuilding();
         }
@@ -180,7 +180,7 @@ namespace MultiplayerARPG
         {
             if (TargetBuildingEntity == null)
                 return;
-            PlayerCharacterEntity.CallServerDestroyBuilding(TargetBuildingEntity.ObjectId);
+            PlayerCharacterEntity.Building.CallServerDestroyBuilding(TargetBuildingEntity.ObjectId);
             DeselectBuilding();
         }
 
@@ -194,7 +194,7 @@ namespace MultiplayerARPG
                 LanguageManager.GetText(UITextKeys.UI_SET_BUILDING_PASSWORD_DESCRIPTION.ToString()),
                 (password) =>
                 {
-                    PlayerCharacterEntity.CallServerSetBuildingPassword(objectId, password);
+                    PlayerCharacterEntity.Building.CallServerSetBuildingPassword(objectId, password);
                 }, string.Empty, buildingPasswordContentType, buildingPasswordLength);
             DeselectBuilding();
         }
@@ -203,7 +203,7 @@ namespace MultiplayerARPG
         {
             if (TargetBuildingEntity == null)
                 return;
-            PlayerCharacterEntity.CallServerLockBuilding(TargetBuildingEntity.ObjectId);
+            PlayerCharacterEntity.Building.CallServerLockBuilding(TargetBuildingEntity.ObjectId);
             DeselectBuilding();
         }
 
@@ -211,7 +211,7 @@ namespace MultiplayerARPG
         {
             if (TargetBuildingEntity == null)
                 return;
-            PlayerCharacterEntity.CallServerUnlockBuilding(TargetBuildingEntity.ObjectId);
+            PlayerCharacterEntity.Building.CallServerUnlockBuilding(TargetBuildingEntity.ObjectId);
             DeselectBuilding();
         }
 
@@ -273,7 +273,7 @@ namespace MultiplayerARPG
                 {
                     if (!buildingEntity.Lockable || !buildingEntity.IsLocked)
                     {
-                        OwningCharacter.CallServerOpenDoor(objectId, string.Empty);
+                        OwningCharacter.Building.CallServerOpenDoor(objectId, string.Empty);
                     }
                     else
                     {
@@ -282,13 +282,13 @@ namespace MultiplayerARPG
                             LanguageManager.GetText(UITextKeys.UI_ENTER_BUILDING_PASSWORD_DESCRIPTION.ToString()),
                             (password) =>
                             {
-                                OwningCharacter.CallServerOpenDoor(objectId, password);
+                                OwningCharacter.Building.CallServerOpenDoor(objectId, password);
                             }, string.Empty, buildingPasswordContentType, buildingPasswordLength);
                     }
                 }
                 else
                 {
-                    OwningCharacter.CallServerCloseDoor(objectId);
+                    OwningCharacter.Building.CallServerCloseDoor(objectId);
                 }
             }
 

@@ -48,12 +48,12 @@ namespace MultiplayerARPG
 
         public void OnClickTurnOn()
         {
-            GameInstance.PlayingCharacterEntity.CallServerTurnOnCampFire(TargetEntity.ObjectId);
+            GameInstance.PlayingCharacterEntity.Building.CallServerTurnOnCampFire(TargetEntity.ObjectId);
         }
 
         public void OnClickTurnOff()
         {
-            GameInstance.PlayingCharacterEntity.CallServerTurnOffCampFire(TargetEntity.ObjectId);
+            GameInstance.PlayingCharacterEntity.Building.CallServerTurnOffCampFire(TargetEntity.ObjectId);
         }
     }
 }

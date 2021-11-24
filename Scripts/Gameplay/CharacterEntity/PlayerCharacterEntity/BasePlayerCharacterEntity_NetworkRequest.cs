@@ -81,89 +81,11 @@ namespace MultiplayerARPG
             return true;
         }
 
-        public bool CallServerConstructBuilding(short itemIndex, Vector3 position, Quaternion rotation, uint parentObjectId)
-        {
-            if (!CanDoActions())
-                return false;
-            RPC(ServerConstructBuilding, itemIndex, position, rotation, parentObjectId);
-            return true;
-        }
-
-        public bool CallServerDestroyBuilding(uint objectId)
-        {
-            if (!CanDoActions())
-                return false;
-            RPC(ServerDestroyBuilding, objectId);
-            return true;
-        }
-
         public bool CallServerOpenStorage(uint objectId, string password)
         {
             if (!CurrentGameplayRule.CanInteractEntity(this, objectId))
                 return false;
             RPC(ServerOpenStorage, objectId, password);
-            return true;
-        }
-
-        public bool CallServerOpenDoor(uint objectId, string password)
-        {
-            if (!CurrentGameplayRule.CanInteractEntity(this, objectId))
-                return false;
-            RPC(ServerOpenDoor, objectId, password);
-            return true;
-        }
-
-        public bool CallServerCloseDoor(uint objectId)
-        {
-            if (!CurrentGameplayRule.CanInteractEntity(this, objectId))
-                return false;
-            RPC(ServerCloseDoor, objectId);
-            return true;
-        }
-
-        public bool CallServerTurnOnCampFire(uint objectId)
-        {
-            if (!CurrentGameplayRule.CanInteractEntity(this, objectId))
-                return false;
-            RPC(ServerTurnOnCampFire, objectId);
-            return true;
-        }
-
-        public bool CallServerTurnOffCampFire(uint objectId)
-        {
-            if (!CurrentGameplayRule.CanInteractEntity(this, objectId))
-                return false;
-            RPC(ServerTurnOffCampFire, objectId);
-            return true;
-        }
-
-        public bool CallServerCraftItemByWorkbench(uint objectId, int dataId)
-        {
-            RPC(ServerCraftItemByWorkbench, objectId, dataId);
-            return true;
-        }
-
-        public bool CallServerSetBuildingPassword(uint objectId, string password)
-        {
-            if (!CurrentGameplayRule.CanInteractEntity(this, objectId))
-                return false;
-            RPC(ServerSetBuildingPassword, objectId, password);
-            return true;
-        }
-
-        public bool CallServerLockBuilding(uint objectId)
-        {
-            if (!CurrentGameplayRule.CanInteractEntity(this, objectId))
-                return false;
-            RPC(ServerLockBuilding, objectId);
-            return true;
-        }
-
-        public bool CallServerUnlockBuilding(uint objectId)
-        {
-            if (!CurrentGameplayRule.CanInteractEntity(this, objectId))
-                return false;
-            RPC(ServerUnlockBuilding, objectId);
             return true;
         }
 
