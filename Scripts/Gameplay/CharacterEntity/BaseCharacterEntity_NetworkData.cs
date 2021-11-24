@@ -160,7 +160,7 @@ namespace MultiplayerARPG
                         value.RemoveAt(i);
                         continue;
                     }
-                    tempEquipPosition = GetEquipPosition(tempArmor.EquipPosition, value[i].equipSlotIndex);
+                    tempEquipPosition = GetEquipPosition(tempArmor.GetEquipPosition(), value[i].equipSlotIndex);
                     if (equipPositions.Contains(tempEquipPosition))
                     {
                         value.RemoveAt(i);

@@ -428,7 +428,7 @@ namespace MultiplayerARPG
             IArmorItem equippingArmorItem = equippingItem.GetArmorItem();
             if (equippingArmorItem != null)
             {
-                unEquippingIndex = character.IndexOfEquipItemByEquipPosition(equippingArmorItem.EquipPosition, equipSlotIndex);
+                unEquippingIndex = character.IndexOfEquipItemByEquipPosition(equippingArmorItem.GetEquipPosition(), equipSlotIndex);
                 return true;
             }
             gameMessage = UITextKeys.UI_ERROR_CANNOT_EQUIP;

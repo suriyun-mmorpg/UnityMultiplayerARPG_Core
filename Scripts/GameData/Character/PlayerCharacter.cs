@@ -166,7 +166,7 @@ namespace MultiplayerARPG
                     continue;
                 }
 
-                if (equipedPositions.Contains((armorItem as IArmorItem).EquipPosition))
+                if (equipedPositions.Contains((armorItem as IArmorItem).GetEquipPosition()))
                 {
                     // Already equip armor at the position, it cannot equip same position again, So set it to NULL
                     armorItems[i] = null;
@@ -174,7 +174,7 @@ namespace MultiplayerARPG
                 }
                 else
                 {
-                    equipedPositions.Add((armorItem as IArmorItem).EquipPosition);
+                    equipedPositions.Add((armorItem as IArmorItem).GetEquipPosition());
                 }
             }
             return hasChanges;

@@ -243,6 +243,14 @@ namespace MultiplayerARPG
                 return new KeyValuePair<DamageElement, float>();
             return GameDataHelpers.ToKeyValuePair(defendItem.ArmorAmount, level, rate);
         }
+
+        public static string GetEquipPosition<T>(this T armorItem)
+            where T : IArmorItem
+        {
+            if (armorItem == null || armorItem.ArmorType == null)
+                return string.Empty;
+            return armorItem.ArmorType.EquipPosition;
+        }
         #endregion
 
         #region Weapon Extension

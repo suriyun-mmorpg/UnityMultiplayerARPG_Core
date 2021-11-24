@@ -47,13 +47,13 @@ namespace MultiplayerARPG
                     foreach (UIEquipItemPair otherEquipSlot in otherEquipSlots)
                     {
                         tempEquipSlotIndex = otherEquipSlot.equipSlotIndex;
-                        tempEquipPosition = GetEquipPosition(otherEquipSlot.armorType.Id, tempEquipSlotIndex);
+                        tempEquipPosition = GetEquipPosition(otherEquipSlot.armorType.EquipPosition, tempEquipSlotIndex);
                         if (!string.IsNullOrEmpty(tempEquipPosition) &&
                             otherEquipSlot.ui != null &&
                             !cacheEquipItemSlots.ContainsKey(tempEquipPosition))
                         {
                             otherEquipSlot.ui.Setup(CreateEmptyUIData(InventoryType.EquipItems), Character, -1);
-                            otherEquipSlot.ui.SetupAsEquipSlot(otherEquipSlot.armorType.Id, tempEquipSlotIndex);
+                            otherEquipSlot.ui.SetupAsEquipSlot(otherEquipSlot.armorType.EquipPosition, tempEquipSlotIndex);
                             UICharacterItemDragHandler dragHandler = otherEquipSlot.ui.GetComponentInChildren<UICharacterItemDragHandler>();
                             if (dragHandler != null)
                                 dragHandler.SetupForEquipItems(otherEquipSlot.ui);
@@ -195,7 +195,7 @@ namespace MultiplayerARPG
                 if (tempArmorItem == null)
                     continue;
 
-                if (CacheEquipItemSlots.TryGetValue(GetEquipPosition(tempArmorItem.EquipPosition, tempEquipItem.equipSlotIndex), out tempUI))
+                if (CacheEquipItemSlots.TryGetValue(GetEquipPosition(tempArmorItem.GetEquipPosition(), tempEquipItem.equipSlotIndex), out tempUI))
                 {
                     tempUI.Setup(new UICharacterItemData(tempEquipItem, InventoryType.EquipItems), character, i);
                     if (!string.IsNullOrEmpty(selectedId) && selectedId.Equals(tempEquipItem.id))
@@ -268,9 +268,9 @@ namespace MultiplayerARPG
             return new UICharacterItemData(CharacterItem.Empty, 1, inventoryType);
         }
 
-        private string GetEquipPosition(string equipPositionId, byte equipSlotIndex)
+        private string GetEquipPosition(string equipPosition, byte equipSlotIndex)
         {
-            return equipPositionId + ":" + equipSlotIndex;
+            return equipPosition + ":" + equipSlotIndex;
         }
 
         private byte GetEquipSlotIndexFromEquipPosition(string equipPosition)

@@ -199,7 +199,7 @@ namespace MultiplayerARPG
             {
                 case InventoryType.EquipItems:
                     if (armorItem == null ||
-                        !armorItem.EquipPosition.Equals(uiCharacterItem.EquipPosition))
+                        !armorItem.GetEquipPosition().Equals(uiCharacterItem.EquipPosition))
                     {
                         // Check if it's correct equip position or not
                         ClientGenericActions.ClientReceiveGameMessage(UITextKeys.UI_ERROR_CANNOT_EQUIP);

@@ -408,7 +408,7 @@ namespace MultiplayerARPG
                 {
                     armorItem = equipItem.GetArmorItem();
                     if (armorItem == null) continue;
-                    tempAddingKeys.Add(armorItem.EquipPosition);
+                    tempAddingKeys.Add(armorItem.GetEquipPosition());
                 }
             }
 
@@ -429,8 +429,8 @@ namespace MultiplayerARPG
                 {
                     armorItem = equipItem.GetArmorItem();
                     if (armorItem == null) continue;
-                    if (tempAddingKeys.Contains(armorItem.EquipPosition))
-                        InstantiateEquipModel(armorItem.EquipPosition, armorItem.DataId, equipItem.level, armorItem.EquipmentModels, out _);
+                    if (tempAddingKeys.Contains(armorItem.GetEquipPosition()))
+                        InstantiateEquipModel(armorItem.GetEquipPosition(), armorItem.DataId, equipItem.level, armorItem.EquipmentModels, out _);
                 }
             }
         }

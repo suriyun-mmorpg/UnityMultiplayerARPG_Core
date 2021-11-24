@@ -346,11 +346,6 @@ namespace MultiplayerARPG
                 return armorType;
             }
         }
-
-        public string EquipPosition
-        {
-            get { return ArmorType == null ? string.Empty : ArmorType.Id; }
-        }
         #endregion
 
         #region Implement IWeaponItem

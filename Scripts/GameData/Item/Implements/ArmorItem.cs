@@ -24,13 +24,6 @@ namespace MultiplayerARPG
             get { return armorType; }
         }
 
-        [SerializeField]
-        private string equipPosition = string.Empty;
-        public string EquipPosition
-        {
-            get { return equipPosition; }
-        }
-
         public override void PrepareRelatesData()
         {
             base.PrepareRelatesData();

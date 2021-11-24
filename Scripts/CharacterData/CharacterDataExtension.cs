@@ -1398,7 +1398,7 @@ namespace MultiplayerARPG
                     continue;
 
                 if (data.EquipItems[i].equipSlotIndex == equipSlotIndex &&
-                    equipPosition.Equals(data.EquipItems[i].GetArmorItem().EquipPosition))
+                    equipPosition.Equals(data.EquipItems[i].GetArmorItem().GetEquipPosition()))
                     return i;
             }
             return -1;
