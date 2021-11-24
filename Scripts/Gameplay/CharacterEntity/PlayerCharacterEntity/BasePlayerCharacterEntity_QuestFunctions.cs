@@ -28,6 +28,13 @@ namespace MultiplayerARPG
             Quest quest;
             if (indexOfQuest >= 0 || !GameInstance.Quests.TryGetValue(questDataId, out quest))
                 return;
+            if (quest.abandonQuests != null && quest.abandonQuests.Length > 0)
+            {
+                for (int i = 0; i < quest.abandonQuests.Length; ++i)
+                {
+                    AbandonQuest(quest.abandonQuests[i].DataId);
+                }
+            }
             CharacterQuest characterQuest = CharacterQuest.Create(quest);
             quests.Add(characterQuest);
         }
@@ -124,6 +131,9 @@ namespace MultiplayerARPG
                 }
             }
             this.FillEmptySlots();
+            // Change character class
+            if (quest.changeCharacterClass != null)
+                DataId = quest.changeCharacterClass.DataId;
             // Add exp
             RewardExp(reward, 1f, RewardGivenType.Quest);
             // Add currency
@@ -134,7 +144,6 @@ namespace MultiplayerARPG
                 quests[indexOfQuest] = characterQuest;
             else
                 quests.RemoveAt(indexOfQuest);
-
             return true;
         }
     }

@@ -18,8 +18,10 @@ namespace MultiplayerARPG
         [Tooltip("Requirement to receive quest")]
         public QuestRequirement requirement = default(QuestRequirement);
         public QuestTask[] tasks = new QuestTask[0];
+        public PlayerCharacter changeCharacterClass;
         public int rewardExp = 0;
         public int rewardGold = 0;
+        public Quest[] abandonQuests = new Quest[0];
         [ArrayElementTitle("currency")]
         public CurrencyAmount[] rewardCurrencies = new CurrencyAmount[0];
         [ArrayElementTitle("item")]
@@ -76,6 +78,8 @@ namespace MultiplayerARPG
                     GameInstance.AddNpcDialogs(task.talkToNpcDialog);
                 }
             }
+            GameInstance.AddCharacters(changeCharacterClass);
+            GameInstance.AddQuests(abandonQuests);
             GameInstance.AddCurrencies(rewardCurrencies);
             GameInstance.AddItems(rewardItems);
             GameInstance.AddItems(selectableRewardItems);
