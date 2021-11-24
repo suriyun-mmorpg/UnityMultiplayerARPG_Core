@@ -373,6 +373,7 @@ namespace MultiplayerARPG
                 return;
             uiQuestRewardItemSelection.UpdateData(questDataId);
             uiQuestRewardItemSelection.Show();
+            AddNpcDialog(uiQuestRewardItemSelection);
         }
 
         public override void HideQuestRewardItemSelection()
@@ -404,6 +405,7 @@ namespace MultiplayerARPG
                     npcDialogs[i].Hide();
                 npcDialogs.RemoveAt(i);
             }
+            GameInstance.PlayingCharacterEntity.NpcAction.CallServerHideNpcDialog();
         }
 
         public void OnShowNpcRefineItem()
@@ -757,11 +759,11 @@ namespace MultiplayerARPG
 
         public override void OnControllerSetup(BasePlayerCharacterEntity characterEntity)
         {
-            characterEntity.onShowQuestRewardItemSelection += ShowQuestRewardItemSelection;
-            characterEntity.onShowNpcDialog += ShowNpcDialog;
-            characterEntity.onShowNpcRefineItem += OnShowNpcRefineItem;
-            characterEntity.onShowNpcDismantleItem += OnShowNpcDismantleItem;
-            characterEntity.onShowNpcRepairItem += OnShowNpcRepairItem;
+            characterEntity.NpcAction.onShowQuestRewardItemSelection += ShowQuestRewardItemSelection;
+            characterEntity.NpcAction.onShowNpcDialog += ShowNpcDialog;
+            characterEntity.NpcAction.onShowNpcRefineItem += OnShowNpcRefineItem;
+            characterEntity.NpcAction.onShowNpcDismantleItem += OnShowNpcDismantleItem;
+            characterEntity.NpcAction.onShowNpcRepairItem += OnShowNpcRepairItem;
             characterEntity.onDead.AddListener(OnCharacterDead);
             characterEntity.onRespawn.AddListener(OnCharacterRespawn);
             characterEntity.onShowDealingRequestDialog += OnShowDealingRequest;
@@ -773,11 +775,11 @@ namespace MultiplayerARPG
 
         public override void OnControllerDesetup(BasePlayerCharacterEntity characterEntity)
         {
-            characterEntity.onShowQuestRewardItemSelection -= ShowQuestRewardItemSelection;
-            characterEntity.onShowNpcDialog -= ShowNpcDialog;
-            characterEntity.onShowNpcRefineItem -= OnShowNpcRefineItem;
-            characterEntity.onShowNpcDismantleItem -= OnShowNpcDismantleItem;
-            characterEntity.onShowNpcRepairItem -= OnShowNpcRepairItem;
+            characterEntity.NpcAction.onShowQuestRewardItemSelection -= ShowQuestRewardItemSelection;
+            characterEntity.NpcAction.onShowNpcDialog -= ShowNpcDialog;
+            characterEntity.NpcAction.onShowNpcRefineItem -= OnShowNpcRefineItem;
+            characterEntity.NpcAction.onShowNpcDismantleItem -= OnShowNpcDismantleItem;
+            characterEntity.NpcAction.onShowNpcRepairItem -= OnShowNpcRepairItem;
             characterEntity.onDead.RemoveListener(OnCharacterDead);
             characterEntity.onRespawn.RemoveListener(OnCharacterRespawn);
             characterEntity.onShowDealingRequestDialog -= OnShowDealingRequest;

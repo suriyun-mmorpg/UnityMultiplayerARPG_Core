@@ -1,5 +1,4 @@
-﻿using LiteNetLibManager;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
 namespace MultiplayerARPG
 {
@@ -37,7 +36,7 @@ namespace MultiplayerARPG
             Exp = exp;
 
             // Clear data
-            CurrentNpcDialog = null;
+            NpcAction.ClearNpcDialogData();
 
             // Add killer to looters
             HashSet<uint> looters = new HashSet<uint>();

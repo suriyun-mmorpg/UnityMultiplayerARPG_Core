@@ -382,9 +382,7 @@ namespace MultiplayerARPG
 
         public override void GoToNextDialog(BasePlayerCharacterEntity characterEntity, byte menuIndex)
         {
-            characterEntity.CurrentNpcDialog = null;
-            characterEntity.CompletingQuest = null;
-            characterEntity.NpcDialogAfterSelectRewardItem = null;
+            characterEntity.NpcAction.ClearNpcDialogData();
             // This dialog is current NPC dialog
             switch (type)
             {
@@ -392,7 +390,7 @@ namespace MultiplayerARPG
                     if (menuIndex >= menus.Length)
                     {
                         // Invalid menu, so no next dialog, so return itself
-                        characterEntity.CurrentNpcDialog = GetValidatedDialogOrNull(this, characterEntity);
+                        characterEntity.NpcAction.CurrentNpcDialog = GetValidatedDialogOrNull(this, characterEntity);
                         return;
                     }
                     // Changing current npc dialog
@@ -402,36 +400,36 @@ namespace MultiplayerARPG
                         // Close dialog, so return null
                         return;
                     }
-                    characterEntity.CurrentNpcDialog = GetValidatedDialogOrNull(selectedMenu.dialog, characterEntity);
+                    characterEntity.NpcAction.CurrentNpcDialog = GetValidatedDialogOrNull(selectedMenu.dialog, characterEntity);
                     return;
                 case NpcDialogType.Quest:
                     switch (menuIndex)
                     {
                         case QUEST_ACCEPT_MENU_INDEX:
                             characterEntity.AcceptQuest(quest.DataId);
-                            characterEntity.CurrentNpcDialog = GetValidatedDialogOrNull(questAcceptedDialog, characterEntity);
+                            characterEntity.NpcAction.CurrentNpcDialog = GetValidatedDialogOrNull(questAcceptedDialog, characterEntity);
                             return;
                         case QUEST_DECLINE_MENU_INDEX:
-                            characterEntity.CurrentNpcDialog = GetValidatedDialogOrNull(questDeclinedDialog, characterEntity);
+                            characterEntity.NpcAction.CurrentNpcDialog = GetValidatedDialogOrNull(questDeclinedDialog, characterEntity);
                             return;
                         case QUEST_ABANDON_MENU_INDEX:
                             characterEntity.AbandonQuest(quest.DataId);
-                            characterEntity.CurrentNpcDialog = GetValidatedDialogOrNull(questAbandonedDialog, characterEntity);
+                            characterEntity.NpcAction.CurrentNpcDialog = GetValidatedDialogOrNull(questAbandonedDialog, characterEntity);
                             return;
                         case QUEST_COMPLETE_MENU_INDEX:
                             if (quest.selectableRewardItems != null &&
                                 quest.selectableRewardItems.Length > 0)
                             {
                                 // Show quest reward dialog at client
-                                characterEntity.CallOwnerShowQuestRewardItemSelection(quest.DataId);
-                                characterEntity.CompletingQuest = quest;
-                                characterEntity.NpcDialogAfterSelectRewardItem = GetValidatedDialogOrNull(questCompletedDialog, characterEntity);
+                                characterEntity.NpcAction.CallOwnerShowQuestRewardItemSelection(quest.DataId);
+                                characterEntity.NpcAction.CompletingQuest = quest;
+                                characterEntity.NpcAction.NpcDialogAfterSelectRewardItem = GetValidatedDialogOrNull(questCompletedDialog, characterEntity);
                             }
                             else
                             {
                                 // No selectable reward items, complete the quest immediately
                                 if (characterEntity.CompleteQuest(quest.DataId, 0))
-                                    characterEntity.CurrentNpcDialog = GetValidatedDialogOrNull(questCompletedDialog, characterEntity);
+                                    characterEntity.NpcAction.CurrentNpcDialog = GetValidatedDialogOrNull(questCompletedDialog, characterEntity);
                             }
                             return;
                     }
@@ -444,21 +442,21 @@ namespace MultiplayerARPG
                             if (itemCraft.CanCraft(characterEntity, out gameMessage))
                             {
                                 itemCraft.CraftItem(characterEntity);
-                                characterEntity.CurrentNpcDialog = GetValidatedDialogOrNull(craftDoneDialog, characterEntity);
+                                characterEntity.NpcAction.CurrentNpcDialog = GetValidatedDialogOrNull(craftDoneDialog, characterEntity);
                                 return;
                             }
                             // Cannot craft item
                             switch (gameMessage)
                             {
                                 case UITextKeys.UI_ERROR_WILL_OVERWHELMING:
-                                    characterEntity.CurrentNpcDialog = GetValidatedDialogOrNull(craftItemWillOverwhelmingDialog, characterEntity);
+                                    characterEntity.NpcAction.CurrentNpcDialog = GetValidatedDialogOrNull(craftItemWillOverwhelmingDialog, characterEntity);
                                     return;
                                 default:
-                                    characterEntity.CurrentNpcDialog = GetValidatedDialogOrNull(craftNotMeetRequirementsDialog, characterEntity);
+                                    characterEntity.NpcAction.CurrentNpcDialog = GetValidatedDialogOrNull(craftNotMeetRequirementsDialog, characterEntity);
                                     return;
                             }
                         case CANCEL_MENU_INDEX:
-                            characterEntity.CurrentNpcDialog = GetValidatedDialogOrNull(craftCancelDialog, characterEntity);
+                            characterEntity.NpcAction.CurrentNpcDialog = GetValidatedDialogOrNull(craftCancelDialog, characterEntity);
                             return;
                     }
                     return;
@@ -468,10 +466,10 @@ namespace MultiplayerARPG
                         case CONFIRM_MENU_INDEX:
                             characterEntity.RespawnMapName = saveRespawnMap.Id;
                             characterEntity.RespawnPosition = saveRespawnPosition;
-                            characterEntity.CurrentNpcDialog = GetValidatedDialogOrNull(saveRespawnConfirmDialog, characterEntity);
+                            characterEntity.NpcAction.CurrentNpcDialog = GetValidatedDialogOrNull(saveRespawnConfirmDialog, characterEntity);
                             return;
                         case CANCEL_MENU_INDEX:
-                            characterEntity.CurrentNpcDialog = GetValidatedDialogOrNull(saveRespawnCancelDialog, characterEntity);
+                            characterEntity.NpcAction.CurrentNpcDialog = GetValidatedDialogOrNull(saveRespawnCancelDialog, characterEntity);
                             return;
                     }
                     return;
@@ -482,7 +480,7 @@ namespace MultiplayerARPG
                             BaseGameNetworkManager.Singleton.WarpCharacter(warpPortalType, characterEntity, warpMap.Id, warpPosition, warpOverrideRotation, warpRotation);
                             return;
                         case CANCEL_MENU_INDEX:
-                            characterEntity.CurrentNpcDialog = GetValidatedDialogOrNull(warpCancelDialog, characterEntity);
+                            characterEntity.NpcAction.CurrentNpcDialog = GetValidatedDialogOrNull(warpCancelDialog, characterEntity);
                             return;
                     }
                     return;
@@ -490,10 +488,10 @@ namespace MultiplayerARPG
                     switch (menuIndex)
                     {
                         case CONFIRM_MENU_INDEX:
-                            characterEntity.CallOwnerShowNpcRefineItem();
+                            characterEntity.NpcAction.CallOwnerShowNpcRefineItem();
                             return;
                         case CANCEL_MENU_INDEX:
-                            characterEntity.CurrentNpcDialog = GetValidatedDialogOrNull(refineItemCancelDialog, characterEntity);
+                            characterEntity.NpcAction.CurrentNpcDialog = GetValidatedDialogOrNull(refineItemCancelDialog, characterEntity);
                             return;
                     }
                     return;
@@ -501,10 +499,10 @@ namespace MultiplayerARPG
                     switch (menuIndex)
                     {
                         case CONFIRM_MENU_INDEX:
-                            characterEntity.CallOwnerShowNpcDismantleItem();
+                            characterEntity.NpcAction.CallOwnerShowNpcDismantleItem();
                             return;
                         case CANCEL_MENU_INDEX:
-                            characterEntity.CurrentNpcDialog = GetValidatedDialogOrNull(dismantleItemCancelDialog, characterEntity);
+                            characterEntity.NpcAction.CurrentNpcDialog = GetValidatedDialogOrNull(dismantleItemCancelDialog, characterEntity);
                             return;
                     }
                     return;
@@ -517,7 +515,7 @@ namespace MultiplayerARPG
                                 GameInstance.ServerStorageHandlers.OpenStorage(characterEntity.ConnectionId, characterEntity, storageId);
                             return;
                         case CANCEL_MENU_INDEX:
-                            characterEntity.CurrentNpcDialog = GetValidatedDialogOrNull(storageCancelDialog, characterEntity);
+                            characterEntity.NpcAction.CurrentNpcDialog = GetValidatedDialogOrNull(storageCancelDialog, characterEntity);
                             return;
                     }
                     return;
@@ -530,7 +528,7 @@ namespace MultiplayerARPG
                                 GameInstance.ServerStorageHandlers.OpenStorage(characterEntity.ConnectionId, characterEntity, storageId);
                             return;
                         case CANCEL_MENU_INDEX:
-                            characterEntity.CurrentNpcDialog = GetValidatedDialogOrNull(storageCancelDialog, characterEntity);
+                            characterEntity.NpcAction.CurrentNpcDialog = GetValidatedDialogOrNull(storageCancelDialog, characterEntity);
                             return;
                     }
                     return;
@@ -538,10 +536,10 @@ namespace MultiplayerARPG
                     switch (menuIndex)
                     {
                         case CONFIRM_MENU_INDEX:
-                            characterEntity.CallOwnerShowNpcRepairItem();
+                            characterEntity.NpcAction.CallOwnerShowNpcRepairItem();
                             return;
                         case CANCEL_MENU_INDEX:
-                            characterEntity.CurrentNpcDialog = GetValidatedDialogOrNull(repairItemCancelDialog, characterEntity);
+                            characterEntity.NpcAction.CurrentNpcDialog = GetValidatedDialogOrNull(repairItemCancelDialog, characterEntity);
                             return;
                     }
                     return;

@@ -59,7 +59,7 @@ namespace MultiplayerARPG
                     {
                         // Talk to NPC
                         SelectedEntity = targetNpc;
-                        PlayerCharacterEntity.CallServerNpcActivate(targetNpc.ObjectId);
+                        PlayerCharacterEntity.NpcAction.CallServerNpcActivate(targetNpc.ObjectId);
                     }
                     else if (targetBuilding != null)
                     {
@@ -691,7 +691,7 @@ namespace MultiplayerARPG
                     if (!didActionOnTarget)
                     {
                         didActionOnTarget = true;
-                        PlayerCharacterEntity.CallServerNpcActivate(targetNpc.ObjectId);
+                        PlayerCharacterEntity.NpcAction.CallServerNpcActivate(targetNpc.ObjectId);
                     }
                 });
             }

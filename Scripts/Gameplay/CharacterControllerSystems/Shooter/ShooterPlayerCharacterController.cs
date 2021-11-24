@@ -1545,7 +1545,7 @@ namespace MultiplayerARPG
             if (targetPlayer != null)
                 CacheUISceneGameplay.SetActivePlayerCharacter(targetPlayer);
             else if (targetNpc != null)
-                PlayerCharacterEntity.CallServerNpcActivate(targetNpc.ObjectId);
+                PlayerCharacterEntity.NpcAction.CallServerNpcActivate(targetNpc.ObjectId);
             else if (targetBuilding != null)
                 ActivateBuilding(targetBuilding);
             else if (targetVehicle != null)

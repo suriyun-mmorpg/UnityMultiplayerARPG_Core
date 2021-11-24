@@ -6,12 +6,9 @@ using UnityEngine.Serialization;
 namespace MultiplayerARPG
 {
     [RequireComponent(typeof(PlayerCharacterCraftingComponent))]
+    [RequireComponent(typeof(PlayerCharacterNpcActionComponent))]
     public abstract partial class BasePlayerCharacterEntity : BaseCharacterEntity, IPlayerCharacterData
     {
-        public BaseNpcDialog CurrentNpcDialog { get; set; }
-        public Quest CompletingQuest { get; set; }
-        public BaseNpcDialog NpcDialogAfterSelectRewardItem { get; set; }
-
         [Category("Character Settings")]
         [Tooltip("This is list which used as choice of character classes when create character")]
         [SerializeField]
@@ -32,7 +29,15 @@ namespace MultiplayerARPG
             get { return controllerPrefab; }
         }
 
-        public PlayerCharacterCraftingComponent Crafting { get; private set; }
+        public PlayerCharacterCraftingComponent Crafting
+        {
+            get; private set;
+        }
+
+        public PlayerCharacterNpcActionComponent NpcAction
+        {
+            get; private set;
+        }
 
         public int IndexOfCharacterDatabase(int dataId)
         {
@@ -73,6 +78,7 @@ namespace MultiplayerARPG
         {
             base.InitialRequiredComponents();
             Crafting = gameObject.GetOrAddComponent<PlayerCharacterCraftingComponent>();
+            NpcAction = gameObject.GetOrAddComponent<PlayerCharacterNpcActionComponent>();
             gameObject.GetOrAddComponent<PlayerCharacterItemLockAndExpireComponent>();
         }
 
