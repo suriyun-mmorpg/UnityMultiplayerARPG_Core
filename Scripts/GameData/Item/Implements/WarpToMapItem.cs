@@ -5,15 +5,27 @@ namespace MultiplayerARPG
     [CreateAssetMenu(fileName = "Warp To Map Item", menuName = "Create GameData/Item/Warp To Map Item", order = -4879)]
     public class WarpToMapItem : BaseItem, IUsableItem
     {
-        public WarpPortalType warpPortalType;
+        [SerializeField]
+        private WarpPortalType warpPortalType = WarpPortalType.Default;
         [Tooltip("Map which character will warp to when use the item, leave this empty to warp character to other position in the same map")]
-        public BaseMapInfo warpToMapInfo;
+        [SerializeField]
+        private BaseMapInfo warpToMapInfo = null;
         [Tooltip("Position which character will warp to when use the item")]
-        public Vector3 warpToPosition;
+        [SerializeField]
+        private Vector3 warpToPosition = Vector3.zero;
         [Tooltip("If this is `TRUE` it will change character's rotation when warp")]
-        public bool warpOverrideRotation;
+        [SerializeField]
+        private bool warpOverrideRotation = false;
         [Tooltip("This will be used if `warpOverrideRotation` is `TRUE` to change character's rotation when warp")]
-        public Vector3 warpToRotation;
+        [SerializeField]
+        private Vector3 warpToRotation = Vector3.zero;
+
+        [SerializeField]
+        private float useItemCooldown = 0f;
+        public float UseItemCooldown
+        {
+            get { return useItemCooldown; }
+        }
 
         public override string TypeTitle
         {

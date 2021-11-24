@@ -19,15 +19,28 @@ namespace MultiplayerARPG
             if (itemIndex >= nonEquipItems.Count)
                 return;
 
-            CharacterItem characterItem = nonEquipItems[itemIndex];
-            if (characterItem.IsLock())
+            CharacterItem tempCharacterItem = nonEquipItems[itemIndex];
+            if (tempCharacterItem.IsLock())
                 return;
 
-            IUsableItem usableItem = characterItem.GetUsableItem();
+            IUsableItem usableItem = tempCharacterItem.GetUsableItem();
             if (usableItem == null)
                 return;
 
-            usableItem.UseItem(this, itemIndex, characterItem);
+            usableItem.UseItem(this, itemIndex, tempCharacterItem);
+
+            if (usableItem.UseItemCooldown > 0f)
+            {
+                for (int i = 0; i < nonEquipItems.Count; ++i)
+                {
+                    if (nonEquipItems[i].dataId == usableItem.DataId)
+                    {
+                        tempCharacterItem = nonEquipItems[i];
+                        tempCharacterItem.Lock(usableItem.UseItemCooldown);
+                        nonEquipItems[i] = tempCharacterItem;
+                    }
+                }
+            }
 #endif
         }
     }

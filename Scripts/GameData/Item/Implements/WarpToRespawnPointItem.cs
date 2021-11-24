@@ -5,6 +5,12 @@ namespace MultiplayerARPG
     [CreateAssetMenu(fileName = "Warp To Respawn Point Item", menuName = "Create GameData/Item/Warp To Respawn Point Item", order = -4878)]
     public class WarpToRespawnPointItem : BaseItem, IUsableItem
     {
+        [SerializeField]
+        private float useItemCooldown = 0f;
+        public float UseItemCooldown
+        {
+            get { return useItemCooldown; }
+        }
         public override string TypeTitle
         {
             get { return LanguageManager.GetText(UIItemTypeKeys.UI_ITEM_TYPE_CONSUMABLE.ToString()); }

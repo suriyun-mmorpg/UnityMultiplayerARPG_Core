@@ -23,6 +23,13 @@ namespace MultiplayerARPG
             get { return buildingEntity; }
         }
 
+        [SerializeField]
+        private float useItemCooldown = 0f;
+        public float UseItemCooldown
+        {
+            get { return useItemCooldown; }
+        }
+
         public void UseItem(BaseCharacterEntity characterEntity, short itemIndex, CharacterItem characterItem)
         {
             // TODO: May changes this function later.

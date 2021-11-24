@@ -30,6 +30,7 @@ namespace MultiplayerARPG
 
         [Category("Item Settings")]
         public LegacyItemType itemType;
+        public float useItemCooldown;
 
         [Category("In-Scene Objects/Appearance")]
         public EquipmentModel[] equipmentModels;
@@ -211,6 +212,11 @@ namespace MultiplayerARPG
                         return LanguageManager.GetUnknowTitle();
                 }
             }
+        }
+
+        public float UseItemCooldown
+        {
+            get { return useItemCooldown; }
         }
 
         #region Implement IAmmoItem
