@@ -13,12 +13,11 @@ namespace MultiplayerARPG
     [RequireComponent(typeof(CharacterSkillAndBuffComponent))]
     public abstract partial class BaseCharacterEntity : DamageableEntity, ICharacterData
     {
-        public const float ACTION_DELAY = 0.1f;
         public const byte ACTION_TO_SERVER_DATA_CHANNEL = 1;
         public const byte ACTION_TO_CLIENT_DATA_CHANNEL = 1;
+        public const float ACTION_DELAY = 0.1f;
         public const float COMBATANT_MESSAGE_DELAY = 1f;
         public const float RESPAWN_GROUNDED_CHECK_DURATION = 1f;
-        public const float MOUNT_DELAY = 1f;
         public const float FIND_ENTITY_DISTANCE_BUFFER = 1f;
 
         protected struct SyncListRecachingState
@@ -115,6 +114,7 @@ namespace MultiplayerARPG
         public float RespawnGroundedCheckCountDown { get; protected set; }
 
         protected float lastMountTime;
+        protected float lastUseItemTime;
         protected float lastActionTime;
         protected float pushGameMessageCountDown;
         protected readonly Queue<UITextKeys> pushingGameMessages = new Queue<UITextKeys>();
