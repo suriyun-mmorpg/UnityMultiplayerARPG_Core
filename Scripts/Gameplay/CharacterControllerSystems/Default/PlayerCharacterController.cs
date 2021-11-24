@@ -358,7 +358,7 @@ namespace MultiplayerARPG
         public void RequestUsePendingSkill()
         {
             if (PlayerCharacterEntity.IsDead() ||
-                PlayerCharacterEntity.DealingState != DealingState.None)
+                PlayerCharacterEntity.Dealing.DealingState != DealingState.None)
             {
                 ClearQueueUsingSkill();
                 return;

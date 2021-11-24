@@ -6,6 +6,7 @@ using UnityEngine.Serialization;
 namespace MultiplayerARPG
 {
     [RequireComponent(typeof(PlayerCharacterCraftingComponent))]
+    [RequireComponent(typeof(PlayerCharacterDealingComponent))]
     [RequireComponent(typeof(PlayerCharacterNpcActionComponent))]
     public abstract partial class BasePlayerCharacterEntity : BaseCharacterEntity, IPlayerCharacterData
     {
@@ -30,6 +31,11 @@ namespace MultiplayerARPG
         }
 
         public PlayerCharacterCraftingComponent Crafting
+        {
+            get; private set;
+        }
+
+        public PlayerCharacterDealingComponent Dealing
         {
             get; private set;
         }
@@ -78,6 +84,7 @@ namespace MultiplayerARPG
         {
             base.InitialRequiredComponents();
             Crafting = gameObject.GetOrAddComponent<PlayerCharacterCraftingComponent>();
+            Dealing = gameObject.GetOrAddComponent<PlayerCharacterDealingComponent>();
             NpcAction = gameObject.GetOrAddComponent<PlayerCharacterNpcActionComponent>();
             gameObject.GetOrAddComponent<PlayerCharacterItemLockAndExpireComponent>();
         }
@@ -95,80 +102,9 @@ namespace MultiplayerARPG
             Profiler.EndSample();
         }
 
-        public bool ExchangingDealingItemsWillOverwhelming()
-        {
-            if (DealingCharacter == null)
-                return true;
-            List<ItemAmount> itemAmounts = new List<ItemAmount>();
-            for (int i = 0; i < DealingItems.Count; ++i)
-            {
-                if (DealingItems[i].characterItem.IsEmptySlot()) continue;
-                itemAmounts.Add(new ItemAmount()
-                {
-                    item = DealingItems[i].characterItem.GetItem(),
-                    amount = DealingItems[i].characterItem.amount,
-                });
-            }
-            return DealingCharacter.IncreasingItemsWillOverwhelming(itemAmounts);
-        }
-
-        public void ExchangeDealingItemsAndGold()
-        {
-            if (DealingCharacter == null)
-                return;
-            List<DealingCharacterItem> tempDealingItems = new List<DealingCharacterItem>(DealingItems);
-            CharacterItem nonEquipItem;
-            DealingCharacterItem dealingItem;
-            int i, j;
-            for (i = nonEquipItems.Count - 1; i >= 0; --i)
-            {
-                nonEquipItem = nonEquipItems[i];
-                for (j = tempDealingItems.Count - 1; j >= 0; --j)
-                {
-                    dealingItem = tempDealingItems[j];
-                    if (dealingItem.nonEquipIndex == i && nonEquipItem.amount >= dealingItem.characterItem.amount)
-                    {
-                        if (DealingCharacter.IncreaseItems(dealingItem.characterItem))
-                        {
-                            GameInstance.ServerGameMessageHandlers.NotifyRewardItem(DealingCharacter.ConnectionId, dealingItem.characterItem.dataId, dealingItem.characterItem.amount);
-                            // Reduce item amount when able to increase item to co character
-                            nonEquipItem.amount -= dealingItem.characterItem.amount;
-                            if (nonEquipItem.amount == 0)
-                            {
-                                // Amount is 0, remove it from inventory
-                                if (CurrentGameInstance.IsLimitInventorySlot)
-                                    nonEquipItems[i] = CharacterItem.Empty;
-                                else
-                                    nonEquipItems.RemoveAt(i);
-                            }
-                            else
-                            {
-                                // Update amount
-                                nonEquipItems[i] = nonEquipItem;
-                            }
-                        }
-                        tempDealingItems.RemoveAt(j);
-                        break;
-                    }
-                }
-            }
-            this.FillEmptySlots();
-            DealingCharacter.FillEmptySlots();
-            Gold -= DealingGold;
-            DealingCharacter.Gold = DealingCharacter.Gold.Increase(DealingGold);
-            GameInstance.ServerGameMessageHandlers.NotifyRewardGold(DealingCharacter.ConnectionId, DealingGold);
-        }
-
-        public void ClearDealingData()
-        {
-            DealingState = DealingState.None;
-            DealingGold = 0;
-            DealingItems.Clear();
-        }
-
         public override bool CanDoActions()
         {
-            return base.CanDoActions() && DealingState == DealingState.None;
+            return base.CanDoActions() && Dealing.DealingState == DealingState.None;
         }
 
         public override void NotifyEnemySpotted(BaseCharacterEntity ally, BaseCharacterEntity attacker)

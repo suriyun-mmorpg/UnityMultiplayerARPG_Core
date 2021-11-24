@@ -92,12 +92,12 @@ namespace MultiplayerARPG
                 uiItemDialog.onHide.AddListener(OnItemDialogHide);
             UpdateData();
             if (!GameInstance.PlayingCharacterEntity) return;
-            GameInstance.PlayingCharacterEntity.onUpdateDealingState += UpdateDealingState;
-            GameInstance.PlayingCharacterEntity.onUpdateDealingGold += UpdateDealingGold;
-            GameInstance.PlayingCharacterEntity.onUpdateDealingItems += UpdateDealingItems;
-            GameInstance.PlayingCharacterEntity.onUpdateAnotherDealingState += UpdateAnotherDealingState;
-            GameInstance.PlayingCharacterEntity.onUpdateAnotherDealingGold += UpdateAnotherDealingGold;
-            GameInstance.PlayingCharacterEntity.onUpdateAnotherDealingItems += UpdateAnotherDealingItems;
+            GameInstance.PlayingCharacterEntity.Dealing.onUpdateDealingState += UpdateDealingState;
+            GameInstance.PlayingCharacterEntity.Dealing.onUpdateDealingGold += UpdateDealingGold;
+            GameInstance.PlayingCharacterEntity.Dealing.onUpdateDealingItems += UpdateDealingItems;
+            GameInstance.PlayingCharacterEntity.Dealing.onUpdateAnotherDealingState += UpdateAnotherDealingState;
+            GameInstance.PlayingCharacterEntity.Dealing.onUpdateAnotherDealingGold += UpdateAnotherDealingGold;
+            GameInstance.PlayingCharacterEntity.Dealing.onUpdateAnotherDealingItems += UpdateAnotherDealingItems;
         }
 
         protected override void OnDisable()
@@ -107,12 +107,12 @@ namespace MultiplayerARPG
                 uiItemDialog.onHide.RemoveListener(OnItemDialogHide);
             CacheItemSelectionManager.DeselectSelectedUI();
             if (!GameInstance.PlayingCharacterEntity) return;
-            GameInstance.PlayingCharacterEntity.onUpdateDealingState -= UpdateDealingState;
-            GameInstance.PlayingCharacterEntity.onUpdateDealingGold -= UpdateDealingGold;
-            GameInstance.PlayingCharacterEntity.onUpdateDealingItems -= UpdateDealingItems;
-            GameInstance.PlayingCharacterEntity.onUpdateAnotherDealingState -= UpdateAnotherDealingState;
-            GameInstance.PlayingCharacterEntity.onUpdateAnotherDealingGold -= UpdateAnotherDealingGold;
-            GameInstance.PlayingCharacterEntity.onUpdateAnotherDealingItems -= UpdateAnotherDealingItems;
+            GameInstance.PlayingCharacterEntity.Dealing.onUpdateDealingState -= UpdateDealingState;
+            GameInstance.PlayingCharacterEntity.Dealing.onUpdateDealingGold -= UpdateDealingGold;
+            GameInstance.PlayingCharacterEntity.Dealing.onUpdateDealingItems -= UpdateDealingItems;
+            GameInstance.PlayingCharacterEntity.Dealing.onUpdateAnotherDealingState -= UpdateAnotherDealingState;
+            GameInstance.PlayingCharacterEntity.Dealing.onUpdateAnotherDealingGold -= UpdateAnotherDealingGold;
+            GameInstance.PlayingCharacterEntity.Dealing.onUpdateAnotherDealingItems -= UpdateAnotherDealingItems;
         }
 
         protected void OnItemDialogHide()
@@ -308,27 +308,27 @@ namespace MultiplayerARPG
                 OnDealingGoldConfirmed, 
                 0, // Min amount is 0
                 GameInstance.PlayingCharacterEntity.Gold, // Max amount is number of gold
-                GameInstance.PlayingCharacterEntity.DealingGold);
+                GameInstance.PlayingCharacterEntity.Dealing.DealingGold);
         }
 
         private void OnDealingGoldConfirmed(int amount)
         {
-            GameInstance.PlayingCharacterEntity.CallServerSetDealingGold(amount);
+            GameInstance.PlayingCharacterEntity.Dealing.CallServerSetDealingGold(amount);
         }
 
         public void OnClickLock()
         {
-            GameInstance.PlayingCharacterEntity.CallServerLockDealing();
+            GameInstance.PlayingCharacterEntity.Dealing.CallServerLockDealing();
         }
 
         public void OnClickConfirm()
         {
-            GameInstance.PlayingCharacterEntity.CallServerConfirmDealing();
+            GameInstance.PlayingCharacterEntity.Dealing.CallServerConfirmDealing();
         }
 
         public void OnClickCancel()
         {
-            GameInstance.PlayingCharacterEntity.CallServerCancelDealing();
+            GameInstance.PlayingCharacterEntity.Dealing.CallServerCancelDealing();
         }
     }
 }

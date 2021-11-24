@@ -46,65 +46,6 @@ namespace MultiplayerARPG
         protected SyncListCharacterCurrency currencies = new SyncListCharacterCurrency();
         #endregion
 
-        #region Dealing System
-        protected DealingState dealingState = DealingState.None;
-        protected int dealingGold = 0;
-        protected DealingCharacterItems dealingItems = new DealingCharacterItems();
-        public DealingState DealingState
-        {
-            get { return dealingState; }
-            set
-            {
-                dealingState = value;
-                CallOwnerUpdateDealingState(value);
-                if (DealingCharacter != null)
-                    DealingCharacter.CallOwnerUpdateAnotherDealingState(value);
-            }
-        }
-
-        public int DealingGold
-        {
-            get { return dealingGold; }
-            set
-            {
-                dealingGold = value;
-                CallOwnerUpdateDealingGold(value);
-                if (DealingCharacter != null)
-                    DealingCharacter.CallOwnerUpdateAnotherDealingGold(value);
-            }
-        }
-
-        public DealingCharacterItems DealingItems
-        {
-            get { return dealingItems; }
-            set
-            {
-                dealingItems = value;
-                CallOwnerUpdateDealingItems(value);
-                if (DealingCharacter != null)
-                    DealingCharacter.CallOwnerUpdateAnotherDealingItems(value);
-            }
-        }
-
-        private BasePlayerCharacterEntity dealingCharacter;
-        public BasePlayerCharacterEntity DealingCharacter
-        {
-            get
-            {
-                if (DealingState == DealingState.None && Time.unscaledTime - dealingCharacterTime >= CurrentGameInstance.dealingRequestDuration)
-                    dealingCharacter = null;
-                return dealingCharacter;
-            }
-            set
-            {
-                dealingCharacter = value;
-                dealingCharacterTime = Time.unscaledTime;
-            }
-        }
-
-        public float dealingCharacterTime { get; private set; }
-        #endregion
-
         #region Fields/Interface/Getter/Setter implementation
         public override int DataId { get { return dataId.Value; } set { dataId.Value = value; } }
         public int FactionId { get { return factionId.Value; } set { factionId.Value = value; } }

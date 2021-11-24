@@ -17,13 +17,13 @@
 
         public void OnClickAccept()
         {
-            GameInstance.PlayingCharacterEntity.CallServerAcceptDealingRequest();
+            GameInstance.PlayingCharacterEntity.Dealing.CallServerAcceptDealingRequest();
             Hide();
         }
 
         public void OnClickDecline()
         {
-            GameInstance.PlayingCharacterEntity.CallServerDeclineDealingRequest();
+            GameInstance.PlayingCharacterEntity.Dealing.CallServerDeclineDealingRequest();
             Hide();
         }
     }

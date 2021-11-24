@@ -766,8 +766,8 @@ namespace MultiplayerARPG
             characterEntity.NpcAction.onShowNpcRepairItem += OnShowNpcRepairItem;
             characterEntity.onDead.AddListener(OnCharacterDead);
             characterEntity.onRespawn.AddListener(OnCharacterRespawn);
-            characterEntity.onShowDealingRequestDialog += OnShowDealingRequest;
-            characterEntity.onShowDealingDialog += OnShowDealing;
+            characterEntity.Dealing.onShowDealingRequestDialog += OnShowDealingRequest;
+            characterEntity.Dealing.onShowDealingDialog += OnShowDealing;
             characterEntity.onIsWarpingChange += OnIsWarpingChange;
             ClientPartyActions.onNotifyPartyInvitation += OnNotifyPartyInvitation;
             ClientGuildActions.onNotifyGuildInvitation += OnNotifyGuildInvitation;
@@ -782,8 +782,8 @@ namespace MultiplayerARPG
             characterEntity.NpcAction.onShowNpcRepairItem -= OnShowNpcRepairItem;
             characterEntity.onDead.RemoveListener(OnCharacterDead);
             characterEntity.onRespawn.RemoveListener(OnCharacterRespawn);
-            characterEntity.onShowDealingRequestDialog -= OnShowDealingRequest;
-            characterEntity.onShowDealingDialog -= OnShowDealing;
+            characterEntity.Dealing.onShowDealingRequestDialog -= OnShowDealingRequest;
+            characterEntity.Dealing.onShowDealingDialog -= OnShowDealing;
             characterEntity.onIsWarpingChange -= OnIsWarpingChange;
             ClientPartyActions.onNotifyPartyInvitation -= OnNotifyPartyInvitation;
             ClientGuildActions.onNotifyGuildInvitation -= OnNotifyGuildInvitation;
