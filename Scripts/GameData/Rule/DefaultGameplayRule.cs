@@ -889,6 +889,8 @@ namespace MultiplayerARPG
 
         public override bool CanInteractEntity(BaseCharacterEntity character, uint objectId)
         {
+            if (!character.CanDoActions())
+                return false;
             BaseGameEntity interactingEntity;
             if (!character.Manager.Assets.TryGetSpawnedObject(objectId, out interactingEntity))
                 return false;
