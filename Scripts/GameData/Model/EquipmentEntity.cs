@@ -1,24 +1,22 @@
 ﻿using System;
 using System.Collections.Generic;
 using UnityEngine;
+#if UNITY_EDITOR
+using UnityEditor;
+#endif
 
 namespace MultiplayerARPG
 {
     public partial class EquipmentEntity : BaseEquipmentEntity
     {
+        public MaterialCollection[] defaultMaterials;
         public List<EquipmentEntityEffect> effects = new List<EquipmentEntityEffect>();
-        private Renderer equipmentRenderer;
-        private Material[] defaultMaterials;
         private List<GameObject> allEffectObjects = new List<GameObject>();
         private bool isFoundEffect;
         private EquipmentEntityEffect usingEffect;
 
         private void Awake()
         {
-            equipmentRenderer = GetComponent<Renderer>();
-            if (equipmentRenderer != null)
-                defaultMaterials = equipmentRenderer.sharedMaterials;
-            
             if (effects != null && effects.Count > 0)
             {
                 effects.Sort();
@@ -34,6 +32,62 @@ namespace MultiplayerARPG
                     }
                 }
             }
+        }
+
+#if UNITY_EDITOR
+        private void OnValidate()
+        {
+            if (MigrateMaterials())
+                EditorUtility.SetDirty(this);
+        }
+#endif
+
+        [ContextMenu("Migrate Materials")]
+        public bool MigrateMaterials()
+        {
+            bool hasChanges = false;
+            Renderer equipmentRenderer = GetComponent<Renderer>();
+            if (defaultMaterials == null || defaultMaterials.Length == 0)
+            {
+                if (equipmentRenderer)
+                {
+                    defaultMaterials = new MaterialCollection[1]
+                    {
+                        new MaterialCollection()
+                        {
+                            renderer = equipmentRenderer,
+                            materials = equipmentRenderer.sharedMaterials
+                        }
+                    };
+                    hasChanges = true;
+                }
+            }
+
+#pragma warning disable CS0618 // Type or member is obsolete
+            if (effects != null && effects.Count > 0)
+            {
+                EquipmentEntityEffect tempEffect;
+                for (int i = 0; i < effects.Count; ++i)
+                {
+                    tempEffect = effects[i];
+                    if (tempEffect.materials != null && tempEffect.materials.Length > 0 && (tempEffect.equipmentMaterials == null || tempEffect.equipmentMaterials.Length == 0))
+                    {
+                        MaterialCollection[] materials = new MaterialCollection[1]
+                        {
+                            new MaterialCollection()
+                            {
+                                renderer = equipmentRenderer,
+                                materials = tempEffect.materials,
+                            }
+                        };
+                        tempEffect.equipmentMaterials = materials;
+                        effects[i] = tempEffect;
+                        hasChanges = true;
+                    }
+                }
+            }
+#pragma warning restore CS0618 // Type or member is obsolete
+            return hasChanges;
         }
 
         public override void OnLevelChanged(int level)
@@ -61,8 +115,7 @@ namespace MultiplayerARPG
                         break;
                 }
                 // Apply materials
-                if (equipmentRenderer != null && usingEffect.materials != null && usingEffect.materials.Length > 0)
-                    equipmentRenderer.materials = usingEffect.materials;
+                usingEffect.equipmentMaterials.ApplyMaterials();
                 // Activate effect objects
                 if (usingEffect.effectObjects != null && usingEffect.effectObjects.Length > 0)
                 {
@@ -75,8 +128,7 @@ namespace MultiplayerARPG
             // Not found effect apply default materials
             if (!isFoundEffect)
             {
-                if (equipmentRenderer != null)
-                    equipmentRenderer.materials = defaultMaterials;
+                defaultMaterials.ApplyMaterials();
             }
         }
     }
@@ -85,12 +137,20 @@ namespace MultiplayerARPG
     public struct EquipmentEntityEffect : IComparable<EquipmentEntityEffect>
     {
         public int level;
+        [HideInInspector]
+        [Obsolete("This is deprecated, use `effectMaterials` instead.")]
         public Material[] materials;
+        public MaterialCollection[] equipmentMaterials;
         public GameObject[] effectObjects;
 
         public int CompareTo(EquipmentEntityEffect other)
         {
             return level.CompareTo(other.level);
+        }
+
+        public void ApplyMaterials()
+        {
+            equipmentMaterials.ApplyMaterials();
         }
     }
 }

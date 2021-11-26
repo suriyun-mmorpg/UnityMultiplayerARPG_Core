@@ -171,6 +171,8 @@ namespace MultiplayerARPG
             GameInstance.AddEquipmentSets(EquipmentSet);
             GameInstance.AddPoolingWeaponLaunchEffects(EquipmentModels);
             RandomBonus.PrepareRelatesData();
+            // Data migration
+            GameInstance.MigrateEquipmentEntities(EquipmentModels);
         }
     }
 }

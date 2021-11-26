@@ -511,6 +511,9 @@ namespace MultiplayerARPG
             GameInstance.AddAmmoTypes(ammoType);
             randomBonus.PrepareRelatesData();
             buff.PrepareRelatesData();
+            // Data migration
+            GameInstance.MigrateEquipmentEntities(equipmentModels);
+            GameInstance.MigrateEquipmentEntities(subEquipmentModels);
         }
 
         public Item GenerateDefaultItem(WeaponType type)
