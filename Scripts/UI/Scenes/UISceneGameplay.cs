@@ -745,6 +745,8 @@ namespace MultiplayerARPG
 
         public override void ShowCraftingQueueItemsDialog(ICraftingQueueSource source)
         {
+            if (!GameInstance.Singleton.GameplayRule.CanInteractEntity(GameInstance.PlayingCharacterEntity, source.ObjectId))
+                return;
             if (uiCraftingQueueItems == null)
                 return;
             uiCraftingQueueItems.Show(source);
