@@ -77,10 +77,9 @@ namespace MultiplayerARPG
 
         public virtual void ApplyDamageTo(DamageableHitBox target)
         {
-            if (target == null || target.IsDead() || !target.CanReceiveDamageFrom(instigator))
+            if (!IsServer || target == null || target.IsDead() || !target.CanReceiveDamageFrom(instigator))
                 return;
-            if (IsServer)
-                target.ReceiveDamage(CacheTransform.position, instigator, damageAmounts, weapon, skill, skillLevel, Random.Range(0, 255));
+            target.ReceiveDamage(CacheTransform.position, instigator, damageAmounts, weapon, skill, skillLevel, Random.Range(0, 255));
         }
 
         public override void InitPrefab()

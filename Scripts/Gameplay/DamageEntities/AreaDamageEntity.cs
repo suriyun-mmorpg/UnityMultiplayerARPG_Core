@@ -6,6 +6,7 @@ namespace MultiplayerARPG
 {
     public partial class AreaDamageEntity : BaseDamageEntity
     {
+        public bool canApplyDamageToUser;
         public UnityEvent onDestroy;
 
         protected float applyDuration;
@@ -56,6 +57,18 @@ namespace MultiplayerARPG
                     ApplyDamageTo(hitBox);
                 }
             }
+        }
+
+        public override void ApplyDamageTo(DamageableHitBox target)
+        {
+            if (canApplyDamageToUser)
+            {
+                if (!IsServer || target == null || target.IsDead() || target.IsImmune || instigator.IsInSafeArea)
+                    return;
+                target.ReceiveDamage(CacheTransform.position, instigator, damageAmounts, weapon, skill, skillLevel, Random.Range(0, 255));
+                return;
+            }
+            base.ApplyDamageTo(target);
         }
 
         protected override void OnPushBack()
