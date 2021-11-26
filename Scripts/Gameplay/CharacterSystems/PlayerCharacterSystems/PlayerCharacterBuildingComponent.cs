@@ -51,7 +51,7 @@ namespace MultiplayerARPG
 
         public bool CallServerDestroyBuilding(uint objectId)
         {
-            if (!Entity.CanDoActions())
+            if (!CurrentGameplayRule.CanInteractEntity(Entity, objectId))
                 return false;
             RPC(ServerDestroyBuilding, objectId);
             return true;
