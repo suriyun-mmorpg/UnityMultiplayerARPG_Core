@@ -1,36 +1,47 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace MultiplayerARPG
 {
     [CreateAssetMenu(fileName = "Map Info", menuName = "Create GameData/Map Info", order = -4799)]
     public partial class MapInfo : BaseMapInfo
     {
+        public enum PvpMode
+        {
+            None,
+            Pvp,
+            FactionPvp,
+            GuildPvp,
+        }
+
+        [Category("Map Info Settings")]
         [Tooltip("If this is `TRUE`, player can return to save point by `return` key. Else it will able to do that when dead only")]
         public bool canReturnToSavePoint;
         [Tooltip("If this is `Pvp`, player can battle all other players. `FactionPvp`, player can battle difference faction players. `GuildPvp`, player can battle difference guild players")]
         public PvpMode pvpMode;
-        [Tooltip("If this is `Override`, player will return to map and position in `overrideRespawnPoints`")]
-        public OverrideRespawnPointMode overrideRespawnPointMode;
-        public OverrideRespawnPoint[] overrideRespawnPoints;
+        [Tooltip("If this is `TRUE`, player will return to map and position in `overrideRespawnPoints`")]
+        [FormerlySerializedAs("overrideRespawnPointMode")]
+        public bool isOverrideRespawnPoint;
+        public WarpPointByCondition[] overrideRespawnPoints;
 
         [System.NonSerialized]
-        private Dictionary<int, List<OverrideRespawnPoint>> cacheOverrideRespawnPoints;
-        public Dictionary<int, List<OverrideRespawnPoint>> CacheOverrideRespawnPoints
+        private Dictionary<int, List<WarpPointByCondition>> cacheOverrideRespawnPoints;
+        public Dictionary<int, List<WarpPointByCondition>> CacheOverrideRespawnPoints
         {
             get
             {
                 if (cacheOverrideRespawnPoints == null)
                 {
-                    cacheOverrideRespawnPoints = new Dictionary<int, List<OverrideRespawnPoint>>();
+                    cacheOverrideRespawnPoints = new Dictionary<int, List<WarpPointByCondition>>();
                     int factionDataId;
-                    foreach (OverrideRespawnPoint overrideRespawnPoint in overrideRespawnPoints)
+                    foreach (WarpPointByCondition overrideRespawnPoint in overrideRespawnPoints)
                     {
                         factionDataId = 0;
                         if (overrideRespawnPoint.forFaction != null)
                             factionDataId = overrideRespawnPoint.forFaction.DataId;
                         if (!cacheOverrideRespawnPoints.ContainsKey(factionDataId))
-                            cacheOverrideRespawnPoints.Add(factionDataId, new List<OverrideRespawnPoint>());
+                            cacheOverrideRespawnPoints.Add(factionDataId, new List<WarpPointByCondition>());
                         cacheOverrideRespawnPoints[factionDataId].Add(overrideRespawnPoint);
                     }
                 }
@@ -38,24 +49,22 @@ namespace MultiplayerARPG
             }
         }
 
-        public override void GetRespawnPoint(IPlayerCharacterData playerCharacterData, out string mapName, out Vector3 position)
+        public override void GetRespawnPoint(IPlayerCharacterData playerCharacterData, out WarpPortalType portalType, out string mapName, out Vector3 position, out bool overrideRotation, out Vector3 rotation)
         {
-            base.GetRespawnPoint(playerCharacterData, out mapName, out position);
-            switch (overrideRespawnPointMode)
+            base.GetRespawnPoint(playerCharacterData, out portalType, out mapName, out position, out overrideRotation, out rotation);
+            if (isOverrideRespawnPoint)
             {
-                case OverrideRespawnPointMode.Override:
-                    List<OverrideRespawnPoint> overrideRespawnPoints;
-                    if (CacheOverrideRespawnPoints.TryGetValue(playerCharacterData.FactionId, out overrideRespawnPoints) ||
-                        CacheOverrideRespawnPoints.TryGetValue(0, out overrideRespawnPoints))
-                    {
-                        OverrideRespawnPoint overrideRespawnPoint = overrideRespawnPoints[Random.Range(0, overrideRespawnPoints.Count)];
-                        if (overrideRespawnPoint.respawnMapInfo != null)
-                            mapName = overrideRespawnPoint.respawnMapInfo.Id;
-                        else
-                            mapName = BaseGameNetworkManager.CurrentMapInfo.Id;
-                        position = overrideRespawnPoint.respawnPosition;
-                    }
-                    break;
+                List<WarpPointByCondition> warpPoints;
+                if (CacheOverrideRespawnPoints.TryGetValue(playerCharacterData.FactionId, out warpPoints) ||
+                    CacheOverrideRespawnPoints.TryGetValue(0, out warpPoints))
+                {
+                    WarpPointByCondition warpPoint = warpPoints[Random.Range(0, warpPoints.Count)];
+                    portalType = warpPoint.warpPortalType;
+                    mapName = warpPoint.warpToMapInfo == null ? string.Empty : warpPoint.warpToMapInfo.Id;
+                    position = warpPoint.warpToPosition;
+                    overrideRotation = warpPoint.warpOverrideRotation;
+                    rotation = warpPoint.warpToRotation;
+                }
             }
         }
 
@@ -171,29 +180,5 @@ namespace MultiplayerARPG
             // Attack only player by default
             return targetEntity.Type == EntityTypes.Player;
         }
-    }
-
-    public enum PvpMode
-    {
-        None,
-        Pvp,
-        FactionPvp,
-        GuildPvp,
-    }
-
-    public enum OverrideRespawnPointMode
-    {
-        None,
-        Override,
-    }
-
-    [System.Serializable]
-    public struct OverrideRespawnPoint
-    {
-        [Tooltip("If this is not empty, character who have the same faction will respawn to this point")]
-        public Faction forFaction;
-        [Tooltip("IF this is empty, it will respawn in current map")]
-        public BaseMapInfo respawnMapInfo;
-        public Vector3 respawnPosition;
     }
 }

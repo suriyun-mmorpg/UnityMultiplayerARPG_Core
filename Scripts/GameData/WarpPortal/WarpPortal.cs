@@ -12,7 +12,7 @@ namespace MultiplayerARPG
         [Tooltip("Rotation for the warp portal which will be placed on the map scene")]
         public Vector3 rotation;
         public WarpPortalType warpPortalType;
-        [Tooltip("Map which character will warp to when use the warp portal, leave this empty to warp character to other position in the same map")]
+        [Tooltip("Map which character will warp to, when use the warp portal, leave this empty to warp character to other position in the same map")]
         public BaseMapInfo warpToMapInfo;
         [Tooltip("Position which character will warp to when use the warp portal")]
         public Vector3 warpToPosition;
@@ -20,5 +20,6 @@ namespace MultiplayerARPG
         public bool warpOverrideRotation;
         [Tooltip("This will be used if `warpOverrideRotation` is `TRUE` to change character's rotation when warp")]
         public Vector3 warpToRotation;
+        public WarpPointByCondition[] warpPointByConditions;
     }
 }

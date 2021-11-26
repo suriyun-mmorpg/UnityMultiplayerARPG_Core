@@ -19,6 +19,7 @@ namespace MultiplayerARPG
         private Vector3 startRotation = Vector3.zero;
         public virtual Vector3 StartRotation { get { return startRotation; } }
 
+        [Category("Character Death Rules")]
         [Tooltip("When character fall to this position, character will dead")]
         [SerializeField]
         private float deadY = -100f;
@@ -42,10 +43,13 @@ namespace MultiplayerARPG
         public virtual bool AutoRespawnWhenDead { get { return false; } }
         public virtual bool SaveCurrentMapPosition { get { return true; } }
 
-        public virtual void GetRespawnPoint(IPlayerCharacterData playerCharacterData, out string mapName, out Vector3 position)
+        public virtual void GetRespawnPoint(IPlayerCharacterData playerCharacterData, out WarpPortalType portalType, out string mapName, out Vector3 position, out bool overrideRotation, out Vector3 rotation)
         {
+            portalType = WarpPortalType.Default;
             mapName = playerCharacterData.RespawnMapName;
             position = playerCharacterData.RespawnPosition;
+            overrideRotation = false;
+            rotation = Vector3.zero;
         }
 
         public bool IsAlly(BaseCharacterEntity character, EntityInfo targetEntityInfo)

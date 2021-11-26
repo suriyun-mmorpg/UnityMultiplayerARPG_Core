@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System.Collections.Generic;
+using UnityEngine;
 using UnityEngine.Serialization;
 
 namespace MultiplayerARPG
@@ -22,6 +23,31 @@ namespace MultiplayerARPG
         public bool warpOverrideRotation;
         [Tooltip("This will be used if `warpOverrideRotation` is `TRUE` to change character's rotation when warp")]
         public Vector3 warpToRotation;
+        public WarpPointByCondition[] warpPointByConditions;
+
+        [System.NonSerialized]
+        private Dictionary<int, List<WarpPointByCondition>> cacheWarpPointByConditions;
+        public Dictionary<int, List<WarpPointByCondition>> CacheWarpPointByConditions
+        {
+            get
+            {
+                if (cacheWarpPointByConditions == null)
+                {
+                    cacheWarpPointByConditions = new Dictionary<int, List<WarpPointByCondition>>();
+                    int factionDataId;
+                    foreach (WarpPointByCondition warpPointByCondition in warpPointByConditions)
+                    {
+                        factionDataId = 0;
+                        if (warpPointByCondition.forFaction != null)
+                            factionDataId = warpPointByCondition.forFaction.DataId;
+                        if (!cacheWarpPointByConditions.ContainsKey(factionDataId))
+                            cacheWarpPointByConditions.Add(factionDataId, new List<WarpPointByCondition>());
+                        cacheWarpPointByConditions[factionDataId].Add(warpPointByCondition);
+                    }
+                }
+                return cacheWarpPointByConditions;
+            }
+        }
 
         protected override void EntityAwake()
         {
@@ -101,10 +127,25 @@ namespace MultiplayerARPG
 
         public virtual void EnterWarp(BasePlayerCharacterEntity playerCharacterEntity)
         {
-            if (warpToMapInfo == null)
-                CurrentGameManager.WarpCharacter(warpPortalType, playerCharacterEntity, string.Empty, warpToPosition, warpOverrideRotation, warpToRotation);
-            else
-                CurrentGameManager.WarpCharacter(warpPortalType, playerCharacterEntity, warpToMapInfo.Id, warpToPosition, warpOverrideRotation, warpToRotation);
+            WarpPortalType portalType = warpPortalType;
+            string mapName = warpToMapInfo == null ? string.Empty : warpToMapInfo.Id;
+            Vector3 position = warpToPosition;
+            bool overrideRotation = warpOverrideRotation;
+            Vector3 rotation = warpToRotation;
+
+            List<WarpPointByCondition> warpPoints;
+            if (CacheWarpPointByConditions.TryGetValue(playerCharacterEntity.FactionId, out warpPoints) ||
+                CacheWarpPointByConditions.TryGetValue(0, out warpPoints))
+            {
+                WarpPointByCondition warpPoint = warpPoints[Random.Range(0, warpPoints.Count)];
+                portalType = warpPoint.warpPortalType;
+                mapName = warpPoint.warpToMapInfo == null ? string.Empty : warpPoint.warpToMapInfo.Id;
+                position = warpPoint.warpToPosition;
+                overrideRotation = warpPoint.warpOverrideRotation;
+                rotation = warpPoint.warpToRotation;
+            }
+
+            CurrentGameManager.WarpCharacter(portalType, playerCharacterEntity, mapName, position, overrideRotation, rotation);
         }
     }
 }

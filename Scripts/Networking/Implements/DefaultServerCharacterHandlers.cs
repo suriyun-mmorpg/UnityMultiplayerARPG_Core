@@ -51,14 +51,25 @@ namespace MultiplayerARPG
         public void Respawn(int option, IPlayerCharacterData playerCharacter)
         {
             GameInstance.Singleton.GameplayRule.OnCharacterRespawn(playerCharacter);
+            WarpPortalType respawnPortalType = WarpPortalType.Default;
             string respawnMapName = playerCharacter.RespawnMapName;
             Vector3 respawnPosition = playerCharacter.RespawnPosition;
+            bool respawnOverrideRotation = false;
+            Vector3 respawnRotation = Vector3.zero;
             if (BaseGameNetworkManager.CurrentMapInfo != null)
-                BaseGameNetworkManager.CurrentMapInfo.GetRespawnPoint(playerCharacter, out respawnMapName, out respawnPosition);
+                BaseGameNetworkManager.CurrentMapInfo.GetRespawnPoint(playerCharacter, out respawnPortalType, out respawnMapName, out respawnPosition, out respawnOverrideRotation, out respawnRotation);
             if (playerCharacter is BasePlayerCharacterEntity)
             {
                 BasePlayerCharacterEntity entity = playerCharacter as BasePlayerCharacterEntity;
-                BaseGameNetworkManager.Singleton.WarpCharacter(entity, respawnMapName, respawnPosition, false, Vector3.zero);
+                switch (respawnPortalType)
+                {
+                    case WarpPortalType.Default:
+                        BaseGameNetworkManager.Singleton.WarpCharacter(entity, respawnMapName, respawnPosition, respawnOverrideRotation, respawnRotation);
+                        break;
+                    case WarpPortalType.EnterInstance:
+                        BaseGameNetworkManager.Singleton.WarpCharacterToInstance(entity, respawnMapName, respawnPosition, respawnOverrideRotation, respawnRotation);
+                        break;
+                }
                 entity.OnRespawn();
             }
             else
