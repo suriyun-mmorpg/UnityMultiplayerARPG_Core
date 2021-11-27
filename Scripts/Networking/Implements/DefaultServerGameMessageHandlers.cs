@@ -92,37 +92,37 @@ namespace MultiplayerARPG
         // Party
         public void SendSetPartyData(long connectionId, int id, bool shareExp, bool shareItem, string leaderId)
         {
-            Manager.SendCreateParty(connectionId, GameNetworkingConsts.UpdateParty, id, shareExp, shareItem, leaderId);
+            Manager.Server.SendCreateParty(connectionId, GameNetworkingConsts.UpdateParty, id, shareExp, shareItem, leaderId);
         }
 
         public void SendSetPartyLeader(long connectionId, int id, string leaderId)
         {
-            Manager.SendChangePartyLeader(connectionId, GameNetworkingConsts.UpdateParty, id, leaderId);
+            Manager.Server.SendChangePartyLeader(connectionId, GameNetworkingConsts.UpdateParty, id, leaderId);
         }
 
         public void SendSetPartySetting(long connectionId, int id, bool shareExp, bool shareItem)
         {
-            Manager.SendPartySetting(connectionId, GameNetworkingConsts.UpdateParty, id, shareExp, shareItem);
+            Manager.Server.SendPartySetting(connectionId, GameNetworkingConsts.UpdateParty, id, shareExp, shareItem);
         }
 
         public void SendClearPartyData(long connectionId, int id)
         {
-            Manager.SendPartyTerminate(connectionId, GameNetworkingConsts.UpdateParty, id);
+            Manager.Server.SendPartyTerminate(connectionId, GameNetworkingConsts.UpdateParty, id);
         }
 
         public void SendAddPartyMember(long connectionId, int id, string characterId, string characterName, int dataId, short level)
         {
-            Manager.SendAddSocialMember(connectionId, GameNetworkingConsts.UpdatePartyMember, id, characterId, characterName, dataId, level);
+            Manager.Server.SendAddSocialMember(connectionId, GameNetworkingConsts.UpdatePartyMember, id, characterId, characterName, dataId, level);
         }
 
         public void SendUpdatePartyMember(long connectionId, int id, SocialCharacterData member)
         {
-            Manager.SendUpdateSocialMember(connectionId, GameNetworkingConsts.UpdatePartyMember, id, member);
+            Manager.Server.SendUpdateSocialMember(connectionId, GameNetworkingConsts.UpdatePartyMember, id, member);
         }
 
         public void SendRemovePartyMember(long connectionId, int id, string characterId)
         {
-            Manager.SendRemoveSocialMember(connectionId, GameNetworkingConsts.UpdatePartyMember, id, characterId);
+            Manager.Server.SendRemoveSocialMember(connectionId, GameNetworkingConsts.UpdatePartyMember, id, characterId);
         }
 
         public void SendNotifyPartyInvitation(long connectionId, PartyInvitationData invitation)
@@ -133,87 +133,87 @@ namespace MultiplayerARPG
         // Guild
         public void SendSetGuildData(long connectionId, int id, string guildName, string leaderId)
         {
-            Manager.SendCreateGuild(connectionId, GameNetworkingConsts.UpdateGuild, id, guildName, leaderId);
+            Manager.Server.SendCreateGuild(connectionId, GameNetworkingConsts.UpdateGuild, id, guildName, leaderId);
         }
 
         public void SendSetGuildLeader(long connectionId, int id, string leaderId)
         {
-            Manager.SendChangeGuildLeader(connectionId, GameNetworkingConsts.UpdateGuild, id, leaderId);
+            Manager.Server.SendChangeGuildLeader(connectionId, GameNetworkingConsts.UpdateGuild, id, leaderId);
         }
 
         public void SendSetGuildMessage(long connectionId, int id, string message)
         {
-            Manager.SendSetGuildMessage(connectionId, GameNetworkingConsts.UpdateGuild, id, message);
+            Manager.Server.SendSetGuildMessage(connectionId, GameNetworkingConsts.UpdateGuild, id, message);
         }
 
         public void SendSetGuildMessage2(long connectionId, int id, string message)
         {
-            Manager.SendSetGuildMessage2(connectionId, GameNetworkingConsts.UpdateGuild, id, message);
+            Manager.Server.SendSetGuildMessage2(connectionId, GameNetworkingConsts.UpdateGuild, id, message);
         }
 
         public void SendSetGuildRole(long connectionId, int id, byte guildRole, string roleName, bool canInvite, bool canKick, byte shareExpPercentage)
         {
-            Manager.SendSetGuildRole(connectionId, GameNetworkingConsts.UpdateGuild, id, guildRole, roleName, canInvite, canKick, shareExpPercentage);
+            Manager.Server.SendSetGuildRole(connectionId, GameNetworkingConsts.UpdateGuild, id, guildRole, roleName, canInvite, canKick, shareExpPercentage);
         }
 
         public void SendSetGuildMemberRole(long connectionId, int id, string characterId, byte guildRole)
         {
-            Manager.SendSetGuildMemberRole(connectionId, GameNetworkingConsts.UpdateGuild, id, characterId, guildRole);
+            Manager.Server.SendSetGuildMemberRole(connectionId, GameNetworkingConsts.UpdateGuild, id, characterId, guildRole);
         }
 
         public void SendClearGuildData(long connectionId, int id)
         {
-            Manager.SendGuildTerminate(connectionId, GameNetworkingConsts.UpdateGuild, id);
+            Manager.Server.SendGuildTerminate(connectionId, GameNetworkingConsts.UpdateGuild, id);
         }
 
         public void SendAddGuildMember(long connectionId, int id, string characterId, string characterName, int dataId, short level)
         {
-            Manager.SendAddSocialMember(connectionId, GameNetworkingConsts.UpdateGuildMember, id, characterId, characterName, dataId, level);
+            Manager.Server.SendAddSocialMember(connectionId, GameNetworkingConsts.UpdateGuildMember, id, characterId, characterName, dataId, level);
         }
 
         public void SendUpdateGuildMember(long connectionId, int id, SocialCharacterData member)
         {
-            Manager.SendUpdateSocialMember(connectionId, GameNetworkingConsts.UpdateGuildMember, id, member);
+            Manager.Server.SendUpdateSocialMember(connectionId, GameNetworkingConsts.UpdateGuildMember, id, member);
         }
 
         public void SendRemoveGuildMember(long connectionId, int id, string characterId)
         {
-            Manager.SendRemoveSocialMember(connectionId, GameNetworkingConsts.UpdateGuildMember, id, characterId);
+            Manager.Server.SendRemoveSocialMember(connectionId, GameNetworkingConsts.UpdateGuildMember, id, characterId);
         }
 
         public void SendSetGuildSkillLevel(long connectionId, int id, int dataId, short level)
         {
-            Manager.SendSetGuildSkillLevel(connectionId, GameNetworkingConsts.UpdateGuild, id, dataId, level);
+            Manager.Server.SendSetGuildSkillLevel(connectionId, GameNetworkingConsts.UpdateGuild, id, dataId, level);
         }
 
         public void SendSetGuildGold(long connectionId, int id, int gold)
         {
-            Manager.SendSetGuildGold(connectionId, GameNetworkingConsts.UpdateGuild, id, gold);
+            Manager.Server.SendSetGuildGold(connectionId, GameNetworkingConsts.UpdateGuild, id, gold);
         }
 
         public void SendSetGuildScore(long connectionId, int id, int score)
         {
-            Manager.SendSetGuildScore(connectionId, GameNetworkingConsts.UpdateGuild, id, score);
+            Manager.Server.SendSetGuildScore(connectionId, GameNetworkingConsts.UpdateGuild, id, score);
         }
 
         public void SendSetGuildOptions(long connectionId, int id, string options)
         {
-            Manager.SendSetGuildOptions(connectionId, GameNetworkingConsts.UpdateGuild, id, options);
+            Manager.Server.SendSetGuildOptions(connectionId, GameNetworkingConsts.UpdateGuild, id, options);
         }
 
         public void SendSetGuildAutoAcceptRequests(long connectionId, int id, bool autoAcceptRequests)
         {
-            Manager.SendSetGuildAutoAcceptRequests(connectionId, GameNetworkingConsts.UpdateGuild, id, autoAcceptRequests);
+            Manager.Server.SendSetGuildAutoAcceptRequests(connectionId, GameNetworkingConsts.UpdateGuild, id, autoAcceptRequests);
         }
 
         public void SendSetGuildRank(long connectionId, int id, int rank)
         {
-            Manager.SendSetGuildRank(connectionId, GameNetworkingConsts.UpdateGuild, id, rank);
+            Manager.Server.SendSetGuildRank(connectionId, GameNetworkingConsts.UpdateGuild, id, rank);
         }
 
         public void SendSetGuildLevelExpSkillPoint(long connectionId, int id, short level, int exp, short skillPoint)
         {
-            Manager.SendSetGuildLevelExpSkillPoint(connectionId, GameNetworkingConsts.UpdateGuild, id, level, exp, skillPoint);
+            Manager.Server.SendSetGuildLevelExpSkillPoint(connectionId, GameNetworkingConsts.UpdateGuild, id, level, exp, skillPoint);
         }
 
         public void SendNotifyGuildInvitation(long connectionId, GuildInvitationData invitation)

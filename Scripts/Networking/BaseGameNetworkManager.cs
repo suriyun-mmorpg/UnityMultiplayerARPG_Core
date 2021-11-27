@@ -888,7 +888,7 @@ namespace MultiplayerARPG
         {
             if (!IsServer)
                 return;
-            foreach (long connectionId in ConnectionIds)
+            foreach (long connectionId in Server.ConnectionIds)
             {
                 SendMapInfo(connectionId);
             }
@@ -907,7 +907,7 @@ namespace MultiplayerARPG
         {
             if (!IsServer)
                 return;
-            foreach (long connectionId in ConnectionIds)
+            foreach (long connectionId in Server.ConnectionIds)
             {
                 SendTimeOfDay(connectionId);
             }
