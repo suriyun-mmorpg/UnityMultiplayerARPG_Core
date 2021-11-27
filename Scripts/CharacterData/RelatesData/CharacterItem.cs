@@ -10,7 +10,6 @@ namespace MultiplayerARPG
     internal enum CharacterItemSyncState : byte
     {
         None = 0,
-        IsOwner = 1 << 0,
         IsEquipment = 1 << 1,
         IsWeapon = 1 << 2,
         IsPet = 1 << 3,
@@ -25,7 +24,7 @@ namespace MultiplayerARPG
     }
 
     [System.Serializable]
-    public class CharacterItem : INetSerializableWithElement
+    public class CharacterItem : INetSerializable
     {
         public static readonly CharacterItem Empty = new CharacterItem();
         public string id;
@@ -558,24 +557,10 @@ namespace MultiplayerARPG
 
         public void Serialize(NetDataWriter writer)
         {
-            Serialize(writer, true);
-        }
-
-        public void Serialize(NetDataWriter writer, LiteNetLibElement element)
-        {
-            Serialize(writer, element == null || element.SendingConnectionId == element.ConnectionId);
-        }
-
-        public void Serialize(NetDataWriter writer, bool isOwnerClient)
-        {
             bool isEquipment = GetEquipmentItem() != null;
             bool isWeapon = isEquipment && GetWeaponItem() != null;
             bool isPet = GetPetItem() != null;
             CharacterItemSyncState syncState = CharacterItemSyncState.None;
-            if (isOwnerClient)
-            {
-                syncState |= CharacterItemSyncState.IsOwner;
-            }
             if (isEquipment)
             {
                 syncState |= CharacterItemSyncState.IsEquipment;
@@ -590,29 +575,18 @@ namespace MultiplayerARPG
             }
             writer.Put((byte)syncState);
 
-            if (isOwnerClient)
-            {
-                writer.Put(id);
-                writer.PutPackedLong(expireTime);
-            }
-
+            writer.Put(id);
+            writer.PutPackedLong(expireTime);
             writer.PutPackedInt(dataId);
             writer.PutPackedShort(level);
             writer.PutPackedShort(amount);
             writer.Put(equipSlotIndex);
-
-            if (isOwnerClient)
-            {
-                writer.Put(lockRemainsDuration);
-            }
+            writer.Put(lockRemainsDuration);
 
             if (isEquipment)
             {
-                if (isOwnerClient)
-                {
-                    writer.Put(durability);
-                    writer.PutPackedInt(exp);
-                }
+                writer.Put(durability);
+                writer.PutPackedInt(exp);
 
                 byte socketCount = (byte)Sockets.Count;
                 writer.Put(socketCount);
@@ -634,41 +608,26 @@ namespace MultiplayerARPG
 
             if (isPet)
             {
-                if (isOwnerClient)
-                {
-                    writer.PutPackedInt(exp);
-                }
+                writer.PutPackedInt(exp);
             }
         }
 
         public void Deserialize(NetDataReader reader)
         {
             CharacterItemSyncState syncState = (CharacterItemSyncState)reader.GetByte();
-            bool isOwnerClient = syncState.Has(CharacterItemSyncState.IsOwner);
 
-            if (isOwnerClient)
-            {
-                id = reader.GetString();
-                expireTime = reader.GetPackedLong();
-            }
-
+            id = reader.GetString();
+            expireTime = reader.GetPackedLong();
             dataId = reader.GetPackedInt();
             level = reader.GetPackedShort();
             amount = reader.GetPackedShort();
             equipSlotIndex = reader.GetByte();
-
-            if (isOwnerClient)
-            {
-                lockRemainsDuration = reader.GetFloat();
-            }
+            lockRemainsDuration = reader.GetFloat();
 
             if (syncState.Has(CharacterItemSyncState.IsEquipment))
             {
-                if (isOwnerClient)
-                {
-                    durability = reader.GetFloat();
-                    exp = reader.GetPackedInt();
-                }
+                durability = reader.GetFloat();
+                exp = reader.GetPackedInt();
 
                 byte socketCount = reader.GetByte();
                 Sockets.Clear();
@@ -687,21 +646,13 @@ namespace MultiplayerARPG
 
             if (syncState.Has(CharacterItemSyncState.IsPet))
             {
-                if (isOwnerClient)
-                {
-                    exp = reader.GetPackedInt();
-                }
+                exp = reader.GetPackedInt();
             }
-        }
-
-        public void Deserialize(NetDataReader reader, LiteNetLibElement element)
-        {
-            Deserialize(reader);
         }
     }
 
     [System.Serializable]
-    public class SyncListCharacterItem : LiteNetLibSyncListWithElement<CharacterItem>
+    public class SyncListCharacterItem : LiteNetLibSyncList<CharacterItem>
     {
     }
 }

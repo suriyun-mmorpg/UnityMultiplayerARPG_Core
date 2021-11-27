@@ -4,7 +4,7 @@ using LiteNetLibManager;
 namespace MultiplayerARPG
 {
     [System.Serializable]
-    public class EquipWeapons : INetSerializableWithElement
+    public class EquipWeapons : INetSerializable
     {
         public CharacterItem rightHand;
         public CharacterItem leftHand;
@@ -26,21 +26,11 @@ namespace MultiplayerARPG
 
         public void Serialize(NetDataWriter writer)
         {
-            Serialize(writer, true);
-        }
-
-        public void Serialize(NetDataWriter writer, LiteNetLibElement element)
-        {
-            Serialize(writer, element == null || element.SendingConnectionId == element.ConnectionId);
-        }
-
-        public void Serialize(NetDataWriter writer, bool isOwnerClient)
-        {
             Validate();
             // Right hand
-            rightHand.Serialize(writer, isOwnerClient);
+            rightHand.Serialize(writer);
             // Left hand
-            leftHand.Serialize(writer, isOwnerClient);
+            leftHand.Serialize(writer);
         }
 
         public void Deserialize(NetDataReader reader)
@@ -59,7 +49,7 @@ namespace MultiplayerARPG
     }
 
     [System.Serializable]
-    public class SyncFieldEquipWeapons : LiteNetLibSyncFieldWithElement<EquipWeapons>
+    public class SyncFieldEquipWeapons : LiteNetLibSyncField<EquipWeapons>
     {
         protected override bool IsValueChanged(EquipWeapons newValue)
         {
@@ -69,7 +59,7 @@ namespace MultiplayerARPG
 
 
     [System.Serializable]
-    public class SyncListEquipWeapons : LiteNetLibSyncListWithElement<EquipWeapons>
+    public class SyncListEquipWeapons : LiteNetLibSyncList<EquipWeapons>
     {
     }
 }
