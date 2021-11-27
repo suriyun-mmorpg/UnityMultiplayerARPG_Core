@@ -481,7 +481,7 @@ namespace MultiplayerARPG
                 writer.Put((byte)characterData.EquipItems.Count);
                 foreach (CharacterItem entry in characterData.EquipItems)
                 {
-                    entry.Serialize(writer, true); // Force serialize for owner client to send all data
+                    entry.Serialize(writer); // Force serialize for owner client to send all data
                 }
             }
             // Non Equip Items
@@ -490,7 +490,7 @@ namespace MultiplayerARPG
                 writer.Put((short)characterData.NonEquipItems.Count);
                 foreach (CharacterItem entry in characterData.NonEquipItems)
                 {
-                    entry.Serialize(writer, true); // Force serialize for owner client to send all data
+                    entry.Serialize(writer); // Force serialize for owner client to send all data
                 }
             }
             // Hotkeys
@@ -528,7 +528,7 @@ namespace MultiplayerARPG
                 writer.Put((byte)characterData.SelectableWeaponSets.Count);
                 foreach (EquipWeapons entry in characterData.SelectableWeaponSets)
                 {
-                    entry.Serialize(writer, true); // Force serialize for owner client to send all data
+                    entry.Serialize(writer); // Force serialize for owner client to send all data
                 }
             }
             DevExtUtils.InvokeStaticDevExtMethods(ClassType, "SerializeCharacterData", characterData, writer);
