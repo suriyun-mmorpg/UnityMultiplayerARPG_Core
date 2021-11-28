@@ -51,6 +51,7 @@ namespace MultiplayerARPG
         [SerializeField]
         private Vector3 overrideStartRotation = Vector3.zero;
 
+        [Tooltip("If this length is more than 1 it will find start maps which its condition is match with the character")]
         [SerializeField]
         private StartMapByCondition[] startPointsByCondition = new StartMapByCondition[0];
         [System.NonSerialized]
