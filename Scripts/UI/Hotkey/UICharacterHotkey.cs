@@ -261,12 +261,16 @@ namespace MultiplayerARPG
                 ability = usingItem;
             if (usingSkill != null)
                 ability = usingSkill;
-            if (ability == null)
-                return;
-            ability.FinishAimControls(isCancel);
-            if (ability.IsChanneledAbility())
-                StopChanneledAbility();
-            else if (!isCancel)
+            if (ability != null)
+            {
+                ability.FinishAimControls(isCancel);
+                if (ability.IsChanneledAbility())
+                {
+                    StopChanneledAbility();
+                    return;
+                }
+            }
+            if (!isCancel)
                 Use(aimPosition);
         }
 
