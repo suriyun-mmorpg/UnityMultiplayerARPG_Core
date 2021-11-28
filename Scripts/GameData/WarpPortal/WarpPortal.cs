@@ -20,6 +20,6 @@ namespace MultiplayerARPG
         public bool warpOverrideRotation;
         [Tooltip("This will be used if `warpOverrideRotation` is `TRUE` to change character's rotation when warp")]
         public Vector3 warpToRotation;
-        public WarpPointByCondition[] warpPointByConditions;
+        public WarpPointByCondition[] warpPointsByCondition;
     }
 }

@@ -23,29 +23,29 @@ namespace MultiplayerARPG
         public bool warpOverrideRotation;
         [Tooltip("This will be used if `warpOverrideRotation` is `TRUE` to change character's rotation when warp")]
         public Vector3 warpToRotation;
-        public WarpPointByCondition[] warpPointByConditions;
+        public WarpPointByCondition[] warpPointsByCondition;
 
         [System.NonSerialized]
-        private Dictionary<int, List<WarpPointByCondition>> cacheWarpPointByConditions;
-        public Dictionary<int, List<WarpPointByCondition>> CacheWarpPointByConditions
+        private Dictionary<int, List<WarpPointByCondition>> cacheWarpPointsByCondition;
+        public Dictionary<int, List<WarpPointByCondition>> CacheWarpPointsByCondition
         {
             get
             {
-                if (cacheWarpPointByConditions == null)
+                if (cacheWarpPointsByCondition == null)
                 {
-                    cacheWarpPointByConditions = new Dictionary<int, List<WarpPointByCondition>>();
+                    cacheWarpPointsByCondition = new Dictionary<int, List<WarpPointByCondition>>();
                     int factionDataId;
-                    foreach (WarpPointByCondition warpPointByCondition in warpPointByConditions)
+                    foreach (WarpPointByCondition warpPointByCondition in warpPointsByCondition)
                     {
                         factionDataId = 0;
                         if (warpPointByCondition.forFaction != null)
                             factionDataId = warpPointByCondition.forFaction.DataId;
-                        if (!cacheWarpPointByConditions.ContainsKey(factionDataId))
-                            cacheWarpPointByConditions.Add(factionDataId, new List<WarpPointByCondition>());
-                        cacheWarpPointByConditions[factionDataId].Add(warpPointByCondition);
+                        if (!cacheWarpPointsByCondition.ContainsKey(factionDataId))
+                            cacheWarpPointsByCondition.Add(factionDataId, new List<WarpPointByCondition>());
+                        cacheWarpPointsByCondition[factionDataId].Add(warpPointByCondition);
                     }
                 }
-                return cacheWarpPointByConditions;
+                return cacheWarpPointsByCondition;
             }
         }
 
@@ -134,8 +134,8 @@ namespace MultiplayerARPG
             Vector3 rotation = warpToRotation;
 
             List<WarpPointByCondition> warpPoints;
-            if (CacheWarpPointByConditions.TryGetValue(playerCharacterEntity.FactionId, out warpPoints) ||
-                CacheWarpPointByConditions.TryGetValue(0, out warpPoints))
+            if (CacheWarpPointsByCondition.TryGetValue(playerCharacterEntity.FactionId, out warpPoints) ||
+                CacheWarpPointsByCondition.TryGetValue(0, out warpPoints))
             {
                 WarpPointByCondition warpPoint = warpPoints[Random.Range(0, warpPoints.Count)];
                 portalType = warpPoint.warpPortalType;

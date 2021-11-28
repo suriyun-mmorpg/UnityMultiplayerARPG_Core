@@ -255,12 +255,16 @@ namespace MultiplayerARPG
             character.CurrentFood = (int)stats.food;
             character.CurrentWater = (int)stats.water;
             character.Gold = gameInstance.newCharacterSetting != null ? gameInstance.newCharacterSetting.startGold : gameInstance.startGold;
-            // Position
-            character.CurrentMapName = playerCharacter.StartMap.Id;
-            character.RespawnMapName = playerCharacter.StartMap.Id;
-            character.CurrentPosition = playerCharacter.StartPosition;
-            character.CurrentRotation = playerCharacter.StartRotation;
-            character.RespawnPosition = playerCharacter.StartPosition;
+            // Start Map
+            BaseMapInfo startMap;
+            Vector3 startPosition;
+            Vector3 startRotation;
+            playerCharacter.GetStartMapAndTransform(character, out startMap, out startPosition, out startRotation);
+            character.CurrentMapName = startMap.Id;
+            character.CurrentPosition = startPosition;
+            character.CurrentRotation = startRotation;
+            character.RespawnMapName = startMap.Id;
+            character.RespawnPosition = startPosition;
             DevExtUtils.InvokeStaticDevExtMethods(ClassType, "SetNewCharacterData", character, characterName, dataId, entityId);
             return character;
         }

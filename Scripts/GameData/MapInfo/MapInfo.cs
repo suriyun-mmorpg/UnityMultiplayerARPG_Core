@@ -20,43 +20,42 @@ namespace MultiplayerARPG
         public bool canReturnToSavePoint;
         [Tooltip("If this is `Pvp`, player can battle all other players. `FactionPvp`, player can battle difference faction players. `GuildPvp`, player can battle difference guild players")]
         public PvpMode pvpMode;
-        [Tooltip("If this is `TRUE`, player will return to map and position in `overrideRespawnPoints`")]
-        [FormerlySerializedAs("overrideRespawnPointMode")]
-        public bool isOverrideRespawnPoint;
-        public WarpPointByCondition[] overrideRespawnPoints;
+        [Tooltip("If this length is more than 1 it will find respawn points which its condition is match with the character")]
+        [FormerlySerializedAs("overrideRespawnPoints")]
+        public WarpPointByCondition[] respawnPointsByCondition;
 
         [System.NonSerialized]
-        private Dictionary<int, List<WarpPointByCondition>> cacheOverrideRespawnPoints;
-        public Dictionary<int, List<WarpPointByCondition>> CacheOverrideRespawnPoints
+        private Dictionary<int, List<WarpPointByCondition>> cacheRespawnPointsByCondition;
+        public Dictionary<int, List<WarpPointByCondition>> CacheRespawnPointsByCondition
         {
             get
             {
-                if (cacheOverrideRespawnPoints == null)
+                if (cacheRespawnPointsByCondition == null)
                 {
-                    cacheOverrideRespawnPoints = new Dictionary<int, List<WarpPointByCondition>>();
+                    cacheRespawnPointsByCondition = new Dictionary<int, List<WarpPointByCondition>>();
                     int factionDataId;
-                    foreach (WarpPointByCondition overrideRespawnPoint in overrideRespawnPoints)
+                    foreach (WarpPointByCondition overrideRespawnPoint in respawnPointsByCondition)
                     {
                         factionDataId = 0;
                         if (overrideRespawnPoint.forFaction != null)
                             factionDataId = overrideRespawnPoint.forFaction.DataId;
-                        if (!cacheOverrideRespawnPoints.ContainsKey(factionDataId))
-                            cacheOverrideRespawnPoints.Add(factionDataId, new List<WarpPointByCondition>());
-                        cacheOverrideRespawnPoints[factionDataId].Add(overrideRespawnPoint);
+                        if (!cacheRespawnPointsByCondition.ContainsKey(factionDataId))
+                            cacheRespawnPointsByCondition.Add(factionDataId, new List<WarpPointByCondition>());
+                        cacheRespawnPointsByCondition[factionDataId].Add(overrideRespawnPoint);
                     }
                 }
-                return cacheOverrideRespawnPoints;
+                return cacheRespawnPointsByCondition;
             }
         }
 
         public override void GetRespawnPoint(IPlayerCharacterData playerCharacterData, out WarpPortalType portalType, out string mapName, out Vector3 position, out bool overrideRotation, out Vector3 rotation)
         {
             base.GetRespawnPoint(playerCharacterData, out portalType, out mapName, out position, out overrideRotation, out rotation);
-            if (isOverrideRespawnPoint)
+            if (CacheRespawnPointsByCondition.Count > 0)
             {
                 List<WarpPointByCondition> warpPoints;
-                if (CacheOverrideRespawnPoints.TryGetValue(playerCharacterData.FactionId, out warpPoints) ||
-                    CacheOverrideRespawnPoints.TryGetValue(0, out warpPoints))
+                if (CacheRespawnPointsByCondition.TryGetValue(playerCharacterData.FactionId, out warpPoints) ||
+                    CacheRespawnPointsByCondition.TryGetValue(0, out warpPoints))
                 {
                     WarpPointByCondition warpPoint = warpPoints[Random.Range(0, warpPoints.Count)];
                     portalType = warpPoint.warpPortalType;

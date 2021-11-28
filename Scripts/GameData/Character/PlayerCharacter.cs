@@ -38,6 +38,45 @@ namespace MultiplayerARPG
         [Category(6, "Start Map")]
         [SerializeField]
         private BaseMapInfo startMap = null;
+
+        [Tooltip("If this is `TRUE` it will uses `overrideStartPosition` as start position, instead of `startMap` -> `startPosition`")]
+        [SerializeField]
+        private bool useOverrideStartPosition = false;
+        [SerializeField]
+        private Vector3 overrideStartPosition = Vector3.zero;
+
+        [Tooltip("If this is `TRUE` it will uses `overrideStartRotation` as start position, instead of `startMap` -> `startRotation`")]
+        [SerializeField]
+        private bool useOverrideStartRotation = false;
+        [SerializeField]
+        private Vector3 overrideStartRotation = Vector3.zero;
+
+        [SerializeField]
+        private StartMapByCondition[] startPointsByCondition = new StartMapByCondition[0];
+        [System.NonSerialized]
+        private Dictionary<int, List<StartMapByCondition>> cacheStartMapsByCondition;
+        public Dictionary<int, List<StartMapByCondition>> CacheStartMapsByCondition
+        {
+            get
+            {
+                if (cacheStartMapsByCondition == null)
+                {
+                    cacheStartMapsByCondition = new Dictionary<int, List<StartMapByCondition>>();
+                    int factionDataId;
+                    foreach (StartMapByCondition startPointByCondition in startPointsByCondition)
+                    {
+                        factionDataId = 0;
+                        if (startPointByCondition.forFaction != null)
+                            factionDataId = startPointByCondition.forFaction.DataId;
+                        if (!cacheStartMapsByCondition.ContainsKey(factionDataId))
+                            cacheStartMapsByCondition.Add(factionDataId, new List<StartMapByCondition>());
+                        cacheStartMapsByCondition[factionDataId].Add(startPointByCondition);
+                    }
+                }
+                return cacheStartMapsByCondition;
+            }
+        }
+
         public BaseMapInfo StartMap
         {
             get
@@ -47,10 +86,7 @@ namespace MultiplayerARPG
                 return startMap;
             }
         }
-        [SerializeField]
-        private bool useOverrideStartPosition = false;
-        [SerializeField]
-        private Vector3 overrideStartPosition = Vector3.zero;
+
         public Vector3 StartPosition
         {
             get
@@ -58,10 +94,7 @@ namespace MultiplayerARPG
                 return useOverrideStartPosition ? overrideStartPosition : StartMap.StartPosition;
             }
         }
-        [SerializeField]
-        private bool useOverrideStartRotation = false;
-        [SerializeField]
-        private Vector3 overrideStartRotation = Vector3.zero;
+
         public Vector3 StartRotation
         {
             get
@@ -79,6 +112,25 @@ namespace MultiplayerARPG
                 if (cacheSkillLevels == null)
                     cacheSkillLevels = GameDataHelpers.CombineSkills(skillLevels, new Dictionary<BaseSkill, short>());
                 return cacheSkillLevels;
+            }
+        }
+
+        public void GetStartMapAndTransform(IPlayerCharacterData playerCharacterData, out BaseMapInfo startMap, out Vector3 position, out Vector3 rotation)
+        {
+            startMap = StartMap;
+            position = StartPosition;
+            rotation = StartRotation;
+            if (CacheStartMapsByCondition.Count > 0)
+            {
+                List<StartMapByCondition> startPoints;
+                if (CacheStartMapsByCondition.TryGetValue(playerCharacterData.FactionId, out startPoints) ||
+                    CacheStartMapsByCondition.TryGetValue(0, out startPoints))
+                {
+                    StartMapByCondition startPoint = startPoints[Random.Range(0, startPoints.Count)];
+                    startMap = startPoint.StartMap;
+                    position = startPoint.StartPosition;
+                    rotation = startPoint.StartRotation;
+                }
             }
         }
         

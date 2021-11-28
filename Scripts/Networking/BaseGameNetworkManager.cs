@@ -697,7 +697,7 @@ namespace MultiplayerARPG
                             warpPortalEntity.warpToPosition = warpPortal.warpToPosition;
                             warpPortalEntity.warpOverrideRotation = warpPortal.warpOverrideRotation;
                             warpPortalEntity.warpToRotation = warpPortal.warpToRotation;
-                            warpPortalEntity.warpPointByConditions = warpPortal.warpPointByConditions;
+                            warpPortalEntity.warpPointsByCondition = warpPortal.warpPointsByCondition;
                             Assets.NetworkSpawn(spawnObj);
                         }
                         await UniTask.Yield();
