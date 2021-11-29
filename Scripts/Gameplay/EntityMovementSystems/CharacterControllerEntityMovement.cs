@@ -276,6 +276,12 @@ namespace MultiplayerARPG
                 // Update extra movement state
                 ExtraMovementState = this.ValidateExtraMovementState(MovementState, tempExtraMovementState);
             }
+            else
+            {
+                // Update movement state
+                if (HasNavPaths && !MovementState.Has(MovementState.Forward))
+                    MovementState |= MovementState.Forward;
+            }
         }
 
         public override void EntityFixedUpdate()
@@ -364,8 +370,6 @@ namespace MultiplayerARPG
                 tempTargetPosition = navPaths.Peek();
                 tempMoveDirection = (tempTargetPosition - tempCurrentPosition).normalized;
                 tempTargetDistance = Vector3.Distance(tempTargetPosition.GetXZ(), tempCurrentPosition.GetXZ());
-                if (!tempMovementState.Has(MovementState.Forward))
-                    tempMovementState |= MovementState.Forward;
                 if (tempTargetDistance < StoppingDistance)
                 {
                     navPaths.Dequeue();

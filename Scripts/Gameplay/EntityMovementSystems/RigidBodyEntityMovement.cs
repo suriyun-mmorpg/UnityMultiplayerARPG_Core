@@ -299,6 +299,12 @@ namespace MultiplayerARPG
                 // Update extra movement state
                 ExtraMovementState = this.ValidateExtraMovementState(MovementState, tempExtraMovementState);
             }
+            else
+            {
+                // Update movement state
+                if (HasNavPaths && !MovementState.Has(MovementState.Forward))
+                    MovementState |= MovementState.Forward;
+            }
         }
 
         public override void EntityFixedUpdate()

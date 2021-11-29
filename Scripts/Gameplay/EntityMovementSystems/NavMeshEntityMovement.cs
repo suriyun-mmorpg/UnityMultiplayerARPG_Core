@@ -183,10 +183,6 @@ namespace MultiplayerARPG
                     targetYRotation = null;
                 }
             }
-        }
-
-        public override void EntityFixedUpdate()
-        {
             bool isStationary = CacheNavMeshAgent.isStopped || CacheNavMeshAgent.remainingDistance <= CacheNavMeshAgent.stoppingDistance;
             CacheNavMeshAgent.obstacleAvoidanceType = isStationary ? obstacleAvoidanceWhileStationary : obstacleAvoidanceWhileMoving;
             if (IsOwnerClient || (IsServer && Entity.MovementSecure == MovementSecure.ServerAuthoritative))
@@ -196,6 +192,15 @@ namespace MultiplayerARPG
                 // Update extra movement state
                 ExtraMovementState = this.ValidateExtraMovementState(MovementState, tempExtraMovementState);
             }
+            else
+            {
+                // Update movement state
+                MovementState = (CacheNavMeshAgent.velocity.sqrMagnitude > 0 ? MovementState.Forward : MovementState.None) | MovementState.IsGrounded;
+            }
+        }
+
+        public override void EntityFixedUpdate()
+        {
             SyncTransform();
         }
 
