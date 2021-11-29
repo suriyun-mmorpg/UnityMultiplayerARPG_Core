@@ -574,7 +574,7 @@ namespace MultiplayerARPG
                     }
                     else
                     {
-                        BaseGameNetworkManager.Singleton.Transport.ServerDisconnect(targetCharacter.ConnectionId);
+                        BaseGameNetworkManager.Singleton.ServerTransport.ServerDisconnect(targetCharacter.ConnectionId);
                         response = $"Kick character: {data[1]}";
                     }
                 }
