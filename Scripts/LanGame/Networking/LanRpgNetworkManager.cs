@@ -23,6 +23,7 @@ namespace MultiplayerARPG
             HostOnly,
         }
 
+        [Header("Lan RPG")]
         public float autoSaveDuration = 2f;
         public GameStartType startType;
         public PlayerCharacterData selectedCharacter;
