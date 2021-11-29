@@ -304,6 +304,13 @@ namespace MultiplayerARPG
                 // Update movement state
                 if (HasNavPaths && !MovementState.Has(MovementState.Forward))
                     MovementState |= MovementState.Forward;
+                if (!HasNavPaths && tempMoveDirection.sqrMagnitude <= 0f)
+                {
+                    MovementState &= ~MovementState.Forward;
+                    MovementState &= ~MovementState.Backward;
+                    MovementState &= ~MovementState.Right;
+                    MovementState &= ~MovementState.Left;
+                }
             }
         }
 
