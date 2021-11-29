@@ -209,6 +209,11 @@ namespace MultiplayerARPG
         private void StopMoveFunction()
         {
             navPaths = null;
+            tempInputDirection = Vector3.zero;
+            MovementState &= ~MovementState.Forward;
+            MovementState &= ~MovementState.Backward;
+            MovementState &= ~MovementState.Right;
+            MovementState &= ~MovementState.Left;
         }
 
         public void KeyMovement(Vector3 moveDirection, MovementState movementState)
