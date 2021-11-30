@@ -746,7 +746,10 @@ namespace MultiplayerARPG
         public override void ShowCraftingQueueItemsDialog(ICraftingQueueSource source)
         {
             if (!GameInstance.Singleton.GameplayRule.CanInteractEntity(GameInstance.PlayingCharacterEntity, source.ObjectId))
+            {
+                ClientGenericActions.ClientReceiveGameMessage(UITextKeys.UI_ERROR_CHARACTER_IS_TOO_FAR);
                 return;
+            }
             if (uiCraftingQueueItems == null)
                 return;
             uiCraftingQueueItems.Show(source);

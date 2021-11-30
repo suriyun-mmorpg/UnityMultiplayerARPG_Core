@@ -52,7 +52,10 @@ namespace MultiplayerARPG
         public bool CallServerDestroyBuilding(uint objectId)
         {
             if (!CurrentGameplayRule.CanInteractEntity(Entity, objectId))
+            {
+                ClientGenericActions.ClientReceiveGameMessage(UITextKeys.UI_ERROR_CHARACTER_IS_TOO_FAR);
                 return false;
+            }
             RPC(ServerDestroyBuilding, objectId);
             return true;
         }
@@ -90,7 +93,10 @@ namespace MultiplayerARPG
         public bool CallServerOpenDoor(uint objectId, string password)
         {
             if (!CurrentGameplayRule.CanInteractEntity(Entity, objectId))
+            {
+                ClientGenericActions.ClientReceiveGameMessage(UITextKeys.UI_ERROR_CHARACTER_IS_TOO_FAR);
                 return false;
+            }
             RPC(ServerOpenDoor, objectId, password);
             return true;
         }
@@ -128,7 +134,10 @@ namespace MultiplayerARPG
         public bool CallServerCloseDoor(uint objectId)
         {
             if (!CurrentGameplayRule.CanInteractEntity(Entity, objectId))
+            {
+                ClientGenericActions.ClientReceiveGameMessage(UITextKeys.UI_ERROR_CHARACTER_IS_TOO_FAR);
                 return false;
+            }
             RPC(ServerCloseDoor, objectId);
             return true;
         }
@@ -160,7 +169,10 @@ namespace MultiplayerARPG
         public bool CallServerTurnOnCampFire(uint objectId)
         {
             if (!CurrentGameplayRule.CanInteractEntity(Entity, objectId))
+            {
+                ClientGenericActions.ClientReceiveGameMessage(UITextKeys.UI_ERROR_CHARACTER_IS_TOO_FAR);
                 return false;
+            }
             RPC(ServerTurnOnCampFire, objectId);
             return true;
         }
@@ -192,7 +204,10 @@ namespace MultiplayerARPG
         public bool CallServerTurnOffCampFire(uint objectId)
         {
             if (!CurrentGameplayRule.CanInteractEntity(Entity, objectId))
+            {
+                ClientGenericActions.ClientReceiveGameMessage(UITextKeys.UI_ERROR_CHARACTER_IS_TOO_FAR);
                 return false;
+            }
             RPC(ServerTurnOffCampFire, objectId);
             return true;
         }
@@ -254,7 +269,10 @@ namespace MultiplayerARPG
         public bool CallServerSetBuildingPassword(uint objectId, string password)
         {
             if (!CurrentGameplayRule.CanInteractEntity(Entity, objectId))
+            {
+                ClientGenericActions.ClientReceiveGameMessage(UITextKeys.UI_ERROR_CHARACTER_IS_TOO_FAR);
                 return false;
+            }
             RPC(ServerSetBuildingPassword, objectId, password);
             return true;
         }
@@ -299,7 +317,10 @@ namespace MultiplayerARPG
         public bool CallServerLockBuilding(uint objectId)
         {
             if (!CurrentGameplayRule.CanInteractEntity(Entity, objectId))
+            {
+                ClientGenericActions.ClientReceiveGameMessage(UITextKeys.UI_ERROR_CHARACTER_IS_TOO_FAR);
                 return false;
+            }
             RPC(ServerLockBuilding, objectId);
             return true;
         }
@@ -343,7 +364,10 @@ namespace MultiplayerARPG
         public bool CallServerUnlockBuilding(uint objectId)
         {
             if (!CurrentGameplayRule.CanInteractEntity(Entity, objectId))
+            {
+                ClientGenericActions.ClientReceiveGameMessage(UITextKeys.UI_ERROR_CHARACTER_IS_TOO_FAR);
                 return false;
+            }
             RPC(ServerUnlockBuilding, objectId);
             return true;
         }

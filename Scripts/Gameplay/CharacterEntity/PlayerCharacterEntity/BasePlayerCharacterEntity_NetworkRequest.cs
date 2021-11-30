@@ -84,7 +84,10 @@ namespace MultiplayerARPG
         public bool CallServerOpenStorage(uint objectId, string password)
         {
             if (!CurrentGameplayRule.CanInteractEntity(this, objectId))
+            {
+                ClientGenericActions.ClientReceiveGameMessage(UITextKeys.UI_ERROR_CHARACTER_IS_TOO_FAR);
                 return false;
+            }
             RPC(ServerOpenStorage, objectId, password);
             return true;
         }
