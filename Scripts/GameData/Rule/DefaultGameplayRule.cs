@@ -922,6 +922,16 @@ namespace MultiplayerARPG
         {
             float halfDist = (GameInstance.Singleton.minSummonDistance + GameInstance.Singleton.maxSummonDistance) * 0.5f;
             Vector2 randomCircle = Random.insideUnitCircle * halfDist;
+            // X
+            if (randomCircle.x < 0 && Mathf.Abs(randomCircle.x) < halfDist)
+                randomCircle.x = -halfDist;
+            else if (randomCircle.x > 0 && randomCircle.x < halfDist)
+                randomCircle.x = halfDist;
+            // Y
+            if (randomCircle.y < 0 && Mathf.Abs(randomCircle.y) < halfDist)
+                randomCircle.y = -halfDist;
+            else if (randomCircle.y > 0 && randomCircle.y < halfDist)
+                randomCircle.y = halfDist;
             if (GameInstance.Singleton.DimensionType == DimensionType.Dimension2D)
                 return character.CacheTransform.position + new Vector3(randomCircle.x, randomCircle.y, 0f);
             return character.CacheTransform.position + new Vector3(randomCircle.x, 0f, randomCircle.y);
