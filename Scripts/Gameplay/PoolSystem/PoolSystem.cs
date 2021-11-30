@@ -131,8 +131,15 @@ namespace MultiplayerARPG
                 Debug.LogWarning($"[PoolSystem] Cannot push back ({instance.gameObject}). The instance's prefab does not initailized yet.");
                 return;
             }
-            instance.gameObject.SetActive(false);
-            queue.Enqueue(instance);
+            if (queue.Count >= instance.ObjectPrefab.PoolSize)
+            {
+                Object.Destroy(instance.gameObject);
+            }
+            else
+            {
+                instance.gameObject.SetActive(false);
+                queue.Enqueue(instance);
+            }
         }
     }
 }
