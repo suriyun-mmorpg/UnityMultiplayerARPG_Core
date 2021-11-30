@@ -143,6 +143,11 @@ namespace MultiplayerARPG
         {
             if (!DamageableEntity.IsServer || this.IsDead() || !CanReceiveDamageFrom(instigator))
                 return;
+            ReceiveDamageWithoutConditionCheck(fromPosition, instigator, damageAmounts, weapon, skill, skillLevel, randomSeed);
+        }
+
+        public virtual void ReceiveDamageWithoutConditionCheck(Vector3 fromPosition, EntityInfo instigator, Dictionary<DamageElement, MinMaxFloat> damageAmounts, CharacterItem weapon, BaseSkill skill, short skillLevel, int randomSeed)
+        {
             List<DamageElement> keys = new List<DamageElement>(damageAmounts.Keys);
             foreach (DamageElement key in keys)
             {

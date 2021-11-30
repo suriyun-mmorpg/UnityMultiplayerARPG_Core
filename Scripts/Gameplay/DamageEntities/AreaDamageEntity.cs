@@ -65,7 +65,7 @@ namespace MultiplayerARPG
             {
                 if (!IsServer || target == null || target.IsDead() || target.IsImmune || instigator.IsInSafeArea)
                     return;
-                target.ReceiveDamage(CacheTransform.position, instigator, damageAmounts, weapon, skill, skillLevel, Random.Range(0, 255));
+                target.ReceiveDamageWithoutConditionCheck(CacheTransform.position, instigator, damageAmounts, weapon, skill, skillLevel, Random.Range(0, 255));
                 return;
             }
             base.ApplyDamageTo(target);
