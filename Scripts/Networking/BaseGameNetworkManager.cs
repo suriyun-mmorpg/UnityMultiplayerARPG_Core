@@ -367,6 +367,7 @@ namespace MultiplayerARPG
             if (!IsServer)
                 Clean();
             base.OnStopClient();
+            ClientGenericActions.ClientStopped();
         }
 
         public override void OnClientConnected()

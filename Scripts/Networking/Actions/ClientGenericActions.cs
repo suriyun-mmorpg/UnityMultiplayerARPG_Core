@@ -6,6 +6,7 @@ namespace MultiplayerARPG
     {
         public static System.Action onClientConnected;
         public static System.Action<DisconnectInfo> onClientDisconnected;
+        public static System.Action onClientStopped;
         public static System.Action onClientWarp;
         public static System.Action<ChatMessage> onClientReceiveChatMessage;
         public static System.Action<UITextKeys> onClientReceiveGameMessage;
@@ -24,6 +25,12 @@ namespace MultiplayerARPG
         {
             if (onClientDisconnected != null)
                 onClientDisconnected.Invoke(disconnectInfo);
+        }
+
+        public static void ClientStopped()
+        {
+            if (onClientStopped != null)
+                onClientStopped.Invoke();
         }
 
         public static void ClientWarp()
