@@ -188,6 +188,7 @@ namespace MultiplayerARPG
                             currentTime - lastTeleportToSummonerTime > TELEPORT_TO_SUMMONER_DELAY)
                         {
                             // Teleport to summoner if too far from summoner
+                            Debug.LogError("Teleporting to " + GameInstance.Singleton.GameplayRule.GetSummonPosition(Summoner));
                             Teleport(GameInstance.Singleton.GameplayRule.GetSummonPosition(Summoner), GameInstance.Singleton.GameplayRule.GetSummonRotation(Summoner));
                             lastTeleportToSummonerTime = currentTime;
                         }

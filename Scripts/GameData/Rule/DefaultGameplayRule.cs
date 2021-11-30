@@ -920,16 +920,18 @@ namespace MultiplayerARPG
 
         public override Vector3 GetSummonPosition(BaseCharacterEntity character)
         {
+            float halfDist = (GameInstance.Singleton.minSummonDistance + GameInstance.Singleton.maxSummonDistance) * 0.5f;
+            Vector2 randomCircle = Random.insideUnitCircle * halfDist;
             if (GameInstance.Singleton.DimensionType == DimensionType.Dimension2D)
-                return character.MovementTransform.position + new Vector3(Random.Range(GameInstance.Singleton.minSummonDistance, GameInstance.Singleton.maxSummonDistance) * GenericUtils.GetNegativePositive(), Random.Range(GameInstance.Singleton.minSummonDistance, GameInstance.Singleton.maxSummonDistance) * GenericUtils.GetNegativePositive(), 0f);
-            return character.MovementTransform.position + new Vector3(Random.Range(GameInstance.Singleton.minSummonDistance, GameInstance.Singleton.maxSummonDistance) * GenericUtils.GetNegativePositive(), 0f, Random.Range(GameInstance.Singleton.minSummonDistance, GameInstance.Singleton.maxSummonDistance) * GenericUtils.GetNegativePositive());
+                return character.CacheTransform.position + new Vector3(randomCircle.x, randomCircle.y, 0f);
+            return character.CacheTransform.position + new Vector3(randomCircle.x, 0f, randomCircle.y);
         }
 
         public override Quaternion GetSummonRotation(BaseCharacterEntity character)
         {
             if (GameInstance.Singleton.DimensionType == DimensionType.Dimension2D)
                 return Quaternion.identity;
-            return character.MovementTransform.rotation;
+            return character.CacheTransform.rotation;
         }
     }
 }

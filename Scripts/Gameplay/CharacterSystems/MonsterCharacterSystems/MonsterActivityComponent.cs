@@ -263,21 +263,17 @@ namespace MultiplayerARPG
 
         public virtual void RandomWanderDestination()
         {
-            // Random position around spawn point
-            Vector2 randomCircle;
             Vector3 randomPosition;
             // Random position around summoner or around spawn point
             if (Entity.Summoner != null)
             {
-                randomCircle = Random.insideUnitCircle * CurrentGameInstance.minFollowSummonerDistance;
-                if (CurrentGameInstance.DimensionType == DimensionType.Dimension2D)
-                    randomPosition = Entity.Summoner.CacheTransform.position + new Vector3(randomCircle.x, randomCircle.y);
-                else
-                    randomPosition = Entity.Summoner.CacheTransform.position + new Vector3(randomCircle.x, 0f, randomCircle.y);
+                // Random position around summoner
+                randomPosition = CurrentGameInstance.GameplayRule.GetSummonPosition(Entity.Summoner);
             }
             else
             {
-                randomCircle = Random.insideUnitCircle * randomWanderDistance;
+                // Random position around spawn point
+                Vector2 randomCircle = Random.insideUnitCircle * randomWanderDistance;
                 if (CurrentGameInstance.DimensionType == DimensionType.Dimension2D)
                     randomPosition = Entity.SpawnPosition + new Vector3(randomCircle.x, randomCircle.y);
                 else
@@ -291,15 +287,22 @@ namespace MultiplayerARPG
 
         public virtual void FollowSummoner()
         {
-            // Random position around spawn point
             Vector3 randomPosition;
-            if (CurrentGameInstance.DimensionType == DimensionType.Dimension3D)
-                randomPosition = Entity.SpawnPosition + new Vector3(Random.Range(-1f, 1f) * randomWanderDistance, 0, Random.Range(-1f, 1f) * randomWanderDistance);
-            else
-                randomPosition = Entity.SpawnPosition + new Vector3(Random.Range(-1f, 1f) * randomWanderDistance, Random.Range(-1f, 1f) * randomWanderDistance);
-            // Random position around summoner
+            // Random position around summoner or around spawn point
             if (Entity.Summoner != null)
+            {
+                // Random position around summoner
                 randomPosition = GameInstance.Singleton.GameplayRule.GetSummonPosition(Entity.Summoner);
+            }
+            else
+            {
+                // Random position around spawn point
+                Vector2 randomCircle = Random.insideUnitCircle * randomWanderDistance;
+                if (CurrentGameInstance.DimensionType == DimensionType.Dimension2D)
+                    randomPosition = Entity.SpawnPosition + new Vector3(randomCircle.x, randomCircle.y);
+                else
+                    randomPosition = Entity.SpawnPosition + new Vector3(randomCircle.x, 0f, randomCircle.y);
+            }
 
             Entity.SetTargetEntity(null);
             SetDestination(randomPosition, 0f);
