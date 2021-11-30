@@ -437,7 +437,7 @@ namespace MultiplayerARPG
             // There is no jump for navmesh
         }
 
-        protected virtual void OnTeleport(Vector2 position)
+        protected virtual void OnTeleport(Vector3 position)
         {
             CacheNavMeshAgent.isStopped = true;
             CacheNavMeshAgent.Warp(position);
