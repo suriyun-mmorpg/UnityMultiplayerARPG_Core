@@ -10,6 +10,8 @@ namespace MultiplayerARPG
 {
     public abstract partial class BaseMonsterCharacterEntity : BaseCharacterEntity
     {
+        public const float TELEPORT_TO_SUMMONER_DELAY = 5f;
+
         public readonly Dictionary<BaseCharacterEntity, ReceivedDamageRecord> receivedDamageRecords = new Dictionary<BaseCharacterEntity, ReceivedDamageRecord>();
 
         [Category("Character Settings")]
@@ -134,6 +136,7 @@ namespace MultiplayerARPG
         private bool isDestroyed;
         private readonly HashSet<uint> looters = new HashSet<uint>();
         private readonly List<CharacterItem> droppingItems = new List<CharacterItem>();
+        private float lastTeleportToSummonerTime = 0f;
 
         public override void PrepareRelatesData()
         {
@@ -169,19 +172,25 @@ namespace MultiplayerARPG
             }
             Profiler.BeginSample("BaseMonsterCharacterEntity - Update");
             base.EntityUpdate();
-            if (IsSummoned)
+            if (IsServer)
             {
-                if (!Summoner || Summoner.IsDead())
+                if (IsSummoned && Summoner)
                 {
-                    // Summoner disappear so destroy it
-                    UnSummon();
-                }
-                else
-                {
-                    if (Vector3.Distance(CacheTransform.position, Summoner.CacheTransform.position) > CurrentGameInstance.maxFollowSummonerDistance)
+                    if (Summoner.IsDead())
                     {
-                        // Teleport to summoner if too far from summoner
-                        Teleport(GameInstance.Singleton.GameplayRule.GetSummonPosition(Summoner), Quaternion.LookRotation(-MovementTransform.forward));
+                        // Summoner disappear so destroy it
+                        UnSummon();
+                    }
+                    else
+                    {
+                        float currentTime = Time.unscaledTime;
+                        if (Vector3.Distance(CacheTransform.position, Summoner.CacheTransform.position) > CurrentGameInstance.maxFollowSummonerDistance &&
+                            currentTime - lastTeleportToSummonerTime > TELEPORT_TO_SUMMONER_DELAY)
+                        {
+                            // Teleport to summoner if too far from summoner
+                            Teleport(GameInstance.Singleton.GameplayRule.GetSummonPosition(Summoner), GameInstance.Singleton.GameplayRule.GetSummonRotation(Summoner));
+                            lastTeleportToSummonerTime = currentTime;
+                        }
                     }
                 }
             }
