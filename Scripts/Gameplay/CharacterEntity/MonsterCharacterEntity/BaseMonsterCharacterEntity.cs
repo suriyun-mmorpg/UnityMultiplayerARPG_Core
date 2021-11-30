@@ -174,9 +174,9 @@ namespace MultiplayerARPG
             base.EntityUpdate();
             if (IsServer)
             {
-                if (IsSummoned && Summoner)
+                if (IsSummoned)
                 {
-                    if (Summoner.IsDead())
+                    if (!Summoner || Summoner.IsDead())
                     {
                         // Summoner disappear so destroy it
                         UnSummon();
@@ -188,7 +188,6 @@ namespace MultiplayerARPG
                             currentTime - lastTeleportToSummonerTime > TELEPORT_TO_SUMMONER_DELAY)
                         {
                             // Teleport to summoner if too far from summoner
-                            Debug.LogError("Teleporting to " + GameInstance.Singleton.GameplayRule.GetSummonPosition(Summoner));
                             Teleport(GameInstance.Singleton.GameplayRule.GetSummonPosition(Summoner), GameInstance.Singleton.GameplayRule.GetSummonRotation(Summoner));
                             lastTeleportToSummonerTime = currentTime;
                         }
