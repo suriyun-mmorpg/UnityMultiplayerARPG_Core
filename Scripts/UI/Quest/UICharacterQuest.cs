@@ -287,8 +287,8 @@ namespace MultiplayerARPG
             {
                 if (showRewardCurrencies)
                 {
-                    uiRewardCurrencies.Data = Quest.CacheRewardCurrencies;
                     uiRewardCurrencies.Show();
+                    uiRewardCurrencies.Data = Quest.CacheRewardCurrencies;
                 }
                 else
                 {
