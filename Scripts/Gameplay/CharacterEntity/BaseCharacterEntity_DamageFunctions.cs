@@ -48,6 +48,11 @@ namespace MultiplayerARPG
                 if (!buffs[i].GetBuff().doNotRemoveOnDead)
                     buffs.RemoveAt(i);
             }
+            for (int i = summons.Count - 1; i >= 0; --i)
+            {
+                summons[i].UnSummon(this);
+                summons.RemoveAt(i);
+            }
             skillUsages.Clear();
             CallAllOnDead();
         }
