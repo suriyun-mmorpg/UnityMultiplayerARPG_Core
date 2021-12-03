@@ -4,6 +4,8 @@ namespace MultiplayerARPG
 {
     public partial class PlayerCharacterController
     {
+        public const float BUILDING_CONSTRUCTING_GROUND_FINDING_DISTANCE = 100f;
+
         public int FindClickObjects(out Vector3 worldPosition2D)
         {
             return physicFunctions.RaycastPickObjects(CacheGameplayCameraController.Camera, InputManager.MousePosition(), CurrentGameInstance.GetTargetLayerMask(), 100f, out worldPosition2D);
@@ -34,7 +36,6 @@ namespace MultiplayerARPG
             BuildingEntity buildingEntity;
             BuildingArea buildingArea;
             Transform tempTransform;
-            Bounds tempColliderBounds;
             Vector3 tempRaycastPoint;
             Vector3 snappedPosition = GetBuildingPlacePosition(ConstructingBuildingEntity.Position);
             for (int tempCounter = 0; tempCounter < count; ++tempCounter)
@@ -48,14 +49,13 @@ namespace MultiplayerARPG
 
                 tempRaycastPoint = physicFunctions.GetRaycastPoint(tempCounter);
                 snappedPosition = GetBuildingPlacePosition(tempRaycastPoint);
-                tempColliderBounds = physicFunctions.GetRaycastColliderBounds(tempCounter);
 
                 if (CurrentGameInstance.DimensionType == DimensionType.Dimension3D)
                 {
                     // Find ground position from upper position
                     bool hitAimmingObject = false;
-                    Vector3 raycastOrigin = new Vector3(tempRaycastPoint.x, tempColliderBounds.center.y + tempColliderBounds.extents.y + 0.01f, tempRaycastPoint.z);
-                    RaycastHit[] groundHits = Physics.RaycastAll(raycastOrigin, Vector3.down, tempColliderBounds.size.y + 0.01f, CurrentGameInstance.GetBuildLayerMask());
+                    Vector3 raycastOrigin = tempRaycastPoint + Vector3.up * BUILDING_CONSTRUCTING_GROUND_FINDING_DISTANCE * 0.5f;
+                    RaycastHit[] groundHits = Physics.RaycastAll(raycastOrigin, Vector3.down, BUILDING_CONSTRUCTING_GROUND_FINDING_DISTANCE, CurrentGameInstance.GetBuildLayerMask());
                     for (int j = 0; j < groundHits.Length; ++j)
                     {
                         if (groundHits[j].transform == tempTransform)
