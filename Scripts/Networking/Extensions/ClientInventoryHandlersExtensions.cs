@@ -34,6 +34,15 @@ namespace MultiplayerARPG
                             isLeftHand = false,
                         }, responseEquipWeapon);
                 }
+                else if (equippingWeaponItem.GetEquipType() == WeaponItemEquipType.OffHandOnly)
+                {
+                    handlers.RequestEquipWeapon(new RequestEquipWeaponMessage()
+                    {
+                        nonEquipIndex = nonEquipIndex,
+                        equipWeaponSet = playerCharacter.EquipWeaponSet,
+                        isLeftHand = true,
+                    }, responseEquipWeapon);
+                }
                 else
                 {
                     handlers.RequestEquipWeapon(new RequestEquipWeaponMessage()
