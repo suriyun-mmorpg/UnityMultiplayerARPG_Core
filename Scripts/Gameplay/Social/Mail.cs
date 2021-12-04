@@ -152,12 +152,12 @@ namespace MultiplayerARPG
             writer.Put(WriteCurrencies());
             writer.Put(WriteItems());
             writer.Put(IsRead);
-            writer.Put(ReadTimestamp);
+            writer.PutPackedLong(ReadTimestamp);
             writer.Put(IsClaim);
-            writer.Put(ClaimTimestamp);
+            writer.PutPackedLong(ClaimTimestamp);
             writer.Put(IsDelete);
-            writer.Put(DeleteTimestamp);
-            writer.Put(SentTimestamp);
+            writer.PutPackedLong(DeleteTimestamp);
+            writer.PutPackedLong(SentTimestamp);
         }
 
         public void Deserialize(NetDataReader reader)
@@ -174,12 +174,12 @@ namespace MultiplayerARPG
             ReadCurrencies(reader.GetString());
             ReadItems(reader.GetString());
             IsRead = reader.GetBool();
-            ReadTimestamp = reader.GetInt();
+            ReadTimestamp = reader.GetPackedLong();
             IsClaim = reader.GetBool();
-            ClaimTimestamp = reader.GetInt();
+            ClaimTimestamp = reader.GetPackedLong();
             IsDelete = reader.GetBool();
-            DeleteTimestamp = reader.GetInt();
-            SentTimestamp = reader.GetInt();
+            DeleteTimestamp = reader.GetPackedLong();
+            SentTimestamp = reader.GetPackedLong();
         }
     }
 }
