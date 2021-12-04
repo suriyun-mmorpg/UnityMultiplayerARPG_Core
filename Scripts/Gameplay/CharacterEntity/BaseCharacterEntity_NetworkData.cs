@@ -387,6 +387,7 @@ namespace MultiplayerARPG
             switch (operation)
             {
                 case LiteNetLibSyncList.Operation.Add:
+                case LiteNetLibSyncList.Operation.AddInitial:
                 case LiteNetLibSyncList.Operation.Insert:
                 case LiteNetLibSyncList.Operation.Set:
                 case LiteNetLibSyncList.Operation.Dirty:
@@ -419,6 +420,7 @@ namespace MultiplayerARPG
             switch (operation)
             {
                 case LiteNetLibSyncList.Operation.Add:
+                case LiteNetLibSyncList.Operation.AddInitial:
                 case LiteNetLibSyncList.Operation.Insert:
                     // Check last buff to update disallow status
                     if (buffs.Count > 0 && buffs[buffs.Count - 1].GetBuff().disallowMove)
