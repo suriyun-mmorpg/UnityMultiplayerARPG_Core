@@ -402,7 +402,7 @@ namespace MultiplayerARPG
                 {
                     navPaths.Dequeue();
                     if (!HasNavPaths)
-                        StopMove();
+                        StopMoveFunction();
                 }
                 else
                 {
@@ -419,7 +419,7 @@ namespace MultiplayerARPG
                 if (tempTargetDistance < StoppingDistance)
                 {
                     clientTargetPosition = null;
-                    StopMove();
+                    StopMoveFunction();
                     tempMoveDirection = Vector3.zero;
                 }
             }

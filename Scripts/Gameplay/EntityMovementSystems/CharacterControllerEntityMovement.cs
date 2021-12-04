@@ -187,11 +187,6 @@ namespace MultiplayerARPG
         private void StopMoveFunction()
         {
             navPaths = null;
-            tempInputDirection = Vector3.zero;
-            MovementState &= ~MovementState.Forward;
-            MovementState &= ~MovementState.Backward;
-            MovementState &= ~MovementState.Right;
-            MovementState &= ~MovementState.Left;
         }
 
         public void KeyMovement(Vector3 moveDirection, MovementState movementState)
@@ -380,7 +375,7 @@ namespace MultiplayerARPG
                     navPaths.Dequeue();
                     if (!HasNavPaths)
                     {
-                        StopMove();
+                        StopMoveFunction();
                         tempMoveDirection = Vector3.zero;
                     }
                 }
@@ -399,7 +394,7 @@ namespace MultiplayerARPG
                 if (tempTargetDistance < StoppingDistance)
                 {
                     clientTargetPosition = null;
-                    StopMove();
+                    StopMoveFunction();
                     tempMoveDirection = Vector3.zero;
                 }
             }

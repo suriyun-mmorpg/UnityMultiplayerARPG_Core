@@ -158,7 +158,7 @@ namespace MultiplayerARPG
                 tempTargetDistance = Vector2.Distance(currentDestination.Value, tempCurrentPosition);
                 if (tempTargetDistance < StoppingDistance)
                 {
-                    StopMove();
+                    StopMoveFunction();
                     tempMoveDirection = Vector2.zero;
                 }
             }
