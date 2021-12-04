@@ -50,7 +50,7 @@ namespace MultiplayerARPG
             {
                 if (cacheSelectionManager == null)
                     cacheSelectionManager = gameObject.GetOrAddComponent<UICharacterCurrencySelectionManager>();
-                CacheSelectionManager.selectionMode = UISelectionMode.SelectSingle;
+                cacheSelectionManager.selectionMode = UISelectionMode.SelectSingle;
                 return cacheSelectionManager;
             }
         }
