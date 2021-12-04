@@ -8,7 +8,6 @@ namespace MultiplayerARPG
         /// This function will be called at server to order character to use item
         /// </summary>
         /// <param name="itemIndex"></param>
-        /// <param name="aimPosition"></param>
         [ServerRpc]
         protected void ServerUseItem(short itemIndex)
         {
