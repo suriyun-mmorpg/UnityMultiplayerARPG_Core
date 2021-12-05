@@ -13,7 +13,7 @@ namespace MultiplayerARPG
             public List<QuestTaskRecord> tasks = new List<QuestTaskRecord>();
         }
 
-        private struct QuestTaskRecord
+        private class QuestTaskRecord
         {
             public int progress;
             public bool isComplete;
@@ -34,7 +34,6 @@ namespace MultiplayerARPG
         public UIGameMessageHandler messageHandler;
 
         private List<QuestRecord> comparingQuests = new List<QuestRecord>();
-        private HashSet<int> notifyingItemDataIds = new HashSet<int>();
 
         private void OnEnable()
         {
@@ -43,18 +42,15 @@ namespace MultiplayerARPG
 
         public void Setup()
         {
-            comparingQuests.Clear();
-            notifyingItemDataIds.Clear();
-            foreach (CharacterQuest characterQuest in GameInstance.PlayingCharacterEntity.Quests)
-            {
-                comparingQuests.Add(MakeRecord(characterQuest));
-            }
+            MakeComparingQuests();
             GameInstance.PlayingCharacterEntity.onQuestsOperation += OnQuestsOperation;
+            GameInstance.PlayingCharacterEntity.onNonEquipItemsOperation += OnNonEquipItemsOperation;
         }
 
         public void Desetup()
         {
             GameInstance.PlayingCharacterEntity.onQuestsOperation -= OnQuestsOperation;
+            GameInstance.PlayingCharacterEntity.onNonEquipItemsOperation -= OnNonEquipItemsOperation;
         }
 
         private QuestRecord MakeRecord(CharacterQuest characterQuest)
@@ -77,26 +73,85 @@ namespace MultiplayerARPG
             return record;
         }
 
-        private void AddItemDataIdsForNotification(CharacterQuest characterQuest)
+        private void MakeComparingQuests()
         {
-            Quest quest = characterQuest.GetQuest();
-            if (quest == null)
-                return;
-            foreach (QuestTask task in quest.tasks)
+            comparingQuests.Clear();
+            foreach (CharacterQuest characterQuest in GameInstance.PlayingCharacterEntity.Quests)
             {
-                if (task.taskType == QuestTaskType.CollectItem && task.itemAmount.item)
-                {
-                    notifyingItemDataIds.Add(task.itemAmount.item.DataId);
-                }
+                comparingQuests.Add(MakeRecord(characterQuest));
+            }
+        }
+
+        private void OnNonEquipItemsOperation(LiteNetLibSyncList.Operation op, int index)
+        {
+            TextWrapper newMessage;
+            BasePlayerCharacterEntity character = GameInstance.PlayingCharacterEntity;
+            CharacterQuest tempCharacterQuest;
+            Quest tempQuestData;
+            QuestTask[] tempTasks;
+            switch (op)
+            {
+                case LiteNetLibSyncList.Operation.Add:
+                case LiteNetLibSyncList.Operation.Insert:
+                case LiteNetLibSyncList.Operation.Set:
+                case LiteNetLibSyncList.Operation.Dirty:
+                    for (int i = 0; i < character.Quests.Count; ++i)
+                    {
+                        tempCharacterQuest = character.Quests[i];
+                        if (tempCharacterQuest.isComplete)
+                            continue;
+                        tempQuestData = tempCharacterQuest.GetQuest();
+                        tempTasks = tempQuestData.tasks;
+                        for (int j = 0; j < tempTasks.Length; ++j)
+                        {
+                            if (tempTasks[j].taskType != QuestTaskType.CollectItem || !tempTasks[j].itemAmount.item || tempTasks[j].itemAmount.amount <= 0)
+                                continue;
+                            string taskTitle;
+                            int maxProgress;
+                            bool updatingIsComplete;
+                            int updatingProgress = tempCharacterQuest.GetProgress(character, j, out taskTitle, out maxProgress, out updatingIsComplete);
+                            if (comparingQuests[i].tasks[j].progress != updatingProgress)
+                            {
+                                newMessage = messageHandler.AddMessage(questCompleteMessagePrefab);
+                                if (updatingProgress >= maxProgress)
+                                    newMessage.text = string.Format(LanguageManager.GetText(formatKeyQuestTaskUpdateCollectItemComplete.ToString()), taskTitle, updatingProgress, maxProgress);
+                                else
+                                    newMessage.text = string.Format(LanguageManager.GetText(formatKeyQuestTaskUpdateCollectItem.ToString()), taskTitle, updatingProgress, maxProgress);
+                                comparingQuests[i].tasks[j].progress = updatingProgress;
+                                comparingQuests[i].tasks[j].isComplete = updatingIsComplete;
+                            }
+                            break;
+                        }
+                    }
+                    break;
+                case LiteNetLibSyncList.Operation.RemoveAt:
+                case LiteNetLibSyncList.Operation.RemoveFirst:
+                case LiteNetLibSyncList.Operation.RemoveLast:
+                    for (int i = 0; i < character.Quests.Count; ++i)
+                    {
+                        tempCharacterQuest = character.Quests[i];
+                        if (tempCharacterQuest.isComplete)
+                            continue;
+                        tempQuestData = tempCharacterQuest.GetQuest();
+                        tempTasks = tempQuestData.tasks;
+                        for (int j = 0; j < tempTasks.Length; ++j)
+                        {
+                            if (tempTasks[j].taskType != QuestTaskType.CollectItem || !tempTasks[j].itemAmount.item || tempTasks[j].itemAmount.amount <= 0)
+                                continue;
+                            comparingQuests[i].tasks[j].progress = character.CountNonEquipItems(character.NonEquipItems[index].dataId);
+                            break;
+                        }
+                    }
+                    break;
             }
         }
 
         private void OnQuestsOperation(LiteNetLibSyncList.Operation op, int index)
         {
-            BasePlayerCharacterEntity character = GameInstance.PlayingCharacterEntity;
-            Quest tempQuestData;
             TextWrapper newMessage;
+            BasePlayerCharacterEntity character = GameInstance.PlayingCharacterEntity;
             CharacterQuest tempCharacterQuest;
+            Quest tempQuestData;
             switch (op)
             {
                 case LiteNetLibSyncList.Operation.Clear:
@@ -119,11 +174,13 @@ namespace MultiplayerARPG
                         // **Repeatable quests can be accepted again after completed**
                         newMessage = messageHandler.AddMessage(questAcceptMessagePrefab);
                         newMessage.text = string.Format(LanguageManager.GetText(formatKeyQuestAccept.ToString()), tempQuestData.Title);
+                        comparingQuests[index] = MakeRecord(tempCharacterQuest);
                     }
                     else if (!comparingQuests[index].isComplete && tempCharacterQuest.isComplete)
                     {
                         newMessage = messageHandler.AddMessage(questCompleteMessagePrefab);
                         newMessage.text = string.Format(LanguageManager.GetText(formatKeyQuestComplete.ToString()), tempQuestData.Title);
+                        comparingQuests[index] = MakeRecord(tempCharacterQuest);
                     }
                     else if (!comparingQuests[index].isComplete)
                     {
@@ -149,13 +206,6 @@ namespace MultiplayerARPG
                                         else
                                             newMessage.text = string.Format(LanguageManager.GetText(formatKeyQuestTaskUpdateKillMonster.ToString()), taskTitle, updatingProgress, maxProgress);
                                         break;
-                                    case QuestTaskType.CollectItem:
-                                        newMessage = messageHandler.AddMessage(questTaskUpdateMessagePrefab);
-                                        if (updatingProgress >= maxProgress)
-                                            newMessage.text = string.Format(LanguageManager.GetText(formatKeyQuestTaskUpdateCollectItemComplete.ToString()), taskTitle, updatingProgress, maxProgress);
-                                        else
-                                            newMessage.text = string.Format(LanguageManager.GetText(formatKeyQuestTaskUpdateCollectItem.ToString()), taskTitle, updatingProgress, maxProgress);
-                                        break;
                                     case QuestTaskType.TalkToNpc:
                                         newMessage = messageHandler.AddMessage(questTaskUpdateMessagePrefab);
                                         if (updatingProgress >= maxProgress)
@@ -165,11 +215,11 @@ namespace MultiplayerARPG
                                         break;
                                     default:
                                         break;
-                                }
-                            }
-                        }
+                                } // End switch
+                            } // End if
+                        } // End for
+                        comparingQuests[index] = MakeRecord(tempCharacterQuest);
                     }
-                    comparingQuests[index] = MakeRecord(tempCharacterQuest);
                     break;
                 case LiteNetLibSyncList.Operation.RemoveAt:
                     comparingQuests.RemoveAt(index);
