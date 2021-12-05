@@ -127,6 +127,8 @@ namespace MultiplayerARPG
                     syncPassengerIds.Add(0);
                 }
             }
+            // Vehicle must not being destroyed when owner player is disconnect to avoid vehicle exiting issues
+            Identity.DoNotDestroyWhenDisconnect = true;
         }
 
         protected override void EntityUpdate()
