@@ -114,7 +114,8 @@ namespace MultiplayerARPG
                 switch (task.taskType)
                 {
                     case QuestTaskType.CollectItem:
-                        this.DecreaseItems(task.itemAmount.item.DataId, task.itemAmount.amount);
+                        if (!task.doNotDecreaseItemsOnQuestComplete)
+                            this.DecreaseItems(task.itemAmount.item.DataId, task.itemAmount.amount);
                         break;
                 }
             }

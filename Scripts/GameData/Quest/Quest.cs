@@ -150,6 +150,9 @@ namespace MultiplayerARPG
         public MonsterCharacterAmount monsterCharacterAmount;
         [StringShowConditional(nameof(taskType), nameof(QuestTaskType.CollectItem))]
         public ItemAmount itemAmount;
+        [StringShowConditional(nameof(taskType), nameof(QuestTaskType.CollectItem))]
+        [Tooltip("If this is `TRUE`, it will not decrease task items when quest completed")]
+        public bool doNotDecreaseItemsOnQuestComplete;
         [StringShowConditional(nameof(taskType), nameof(QuestTaskType.TalkToNpc))]
         [Tooltip("Have to talk to this NPC to complete task")]
         public NpcEntity npcEntity;
