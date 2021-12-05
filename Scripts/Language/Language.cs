@@ -13,6 +13,8 @@ namespace MultiplayerARPG
         UI_LABEL_NONE,
         // Error - Generic Error
         UI_ERROR_UNKNOW,
+        UI_ERROR_BAD_REQUEST,
+        UI_ERROR_NOT_ALLOWED,
         UI_ERROR_SERVICE_NOT_AVAILABLE,
         UI_ERROR_CONTENT_NOT_AVAILABLE,
         UI_ERROR_REQUEST_TIMEOUT,
@@ -1212,6 +1214,8 @@ namespace MultiplayerARPG
             // Format - UI Crafting
             Texts.Add(UIFormatKeys.UI_FORMAT_CRAFT_DURATION.ToString(), "Duration: {0}");
             // Error - Generic Error
+            Texts.Add(UITextKeys.UI_ERROR_BAD_REQUEST.ToString(), "Bad request");
+            Texts.Add(UITextKeys.UI_ERROR_NOT_ALLOWED.ToString(), "You're not allowed to do that");
             Texts.Add(UITextKeys.UI_ERROR_SERVICE_NOT_AVAILABLE.ToString(), "Service is not available");
             Texts.Add(UITextKeys.UI_ERROR_CONTENT_NOT_AVAILABLE.ToString(), "Content is not available");
             Texts.Add(UITextKeys.UI_ERROR_REQUEST_TIMEOUT.ToString(), "Request timeout");
