@@ -48,11 +48,8 @@ namespace MultiplayerARPG
             get { return mailId; }
             set
             {
-                if (mailId != value)
-                {
-                    mailId = value;
-                    ReadMail();
-                }
+                mailId = value;
+                ReadMail();
             }
         }
 
