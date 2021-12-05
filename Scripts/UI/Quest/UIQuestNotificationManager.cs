@@ -6,6 +6,19 @@ namespace MultiplayerARPG
 {
     public class UIQuestNotificationManager : MonoBehaviour
     {
+        private class QuestRecord
+        {
+            public int dataId;
+            public bool isComplete;
+            public List<QuestTaskRecord> tasks = new List<QuestTaskRecord>();
+        }
+
+        private struct QuestTaskRecord
+        {
+            public int progress;
+            public bool isComplete;
+        }
+
         [Tooltip("Format => {0} = {Exp Amount}")]
         public UILocaleKeySetting formatKeyQuestAccept = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_QUEST_TITLE_ON_GOING);
         public UILocaleKeySetting formatKeyQuestTaskUpdateKillMonster = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_QUEST_TASK_KILL_MONSTER);
@@ -20,7 +33,7 @@ namespace MultiplayerARPG
         public TextWrapper questCompleteMessagePrefab;
         public UIGameMessageHandler messageHandler;
 
-        private List<CharacterQuest> comparingQuests = new List<CharacterQuest>();
+        private List<QuestRecord> comparingQuests = new List<QuestRecord>();
         private HashSet<int> notifyingItemDataIds = new HashSet<int>();
 
         private void OnEnable()
@@ -32,21 +45,36 @@ namespace MultiplayerARPG
         {
             comparingQuests.Clear();
             notifyingItemDataIds.Clear();
-            CharacterQuest tempQuest;
-            foreach (CharacterQuest quest in GameInstance.PlayingCharacterEntity.Quests)
+            foreach (CharacterQuest characterQuest in GameInstance.PlayingCharacterEntity.Quests)
             {
-                tempQuest = quest.Clone();
-                comparingQuests.Add(tempQuest);
-                AddItemDataIdsForNotification(tempQuest);
+                comparingQuests.Add(MakeRecord(characterQuest));
             }
             GameInstance.PlayingCharacterEntity.onQuestsOperation += OnQuestsOperation;
-            GameInstance.PlayingCharacterEntity.onNonEquipItemsOperation += OnNonEquipItemsOperation;
         }
 
         public void Desetup()
         {
             GameInstance.PlayingCharacterEntity.onQuestsOperation -= OnQuestsOperation;
-            GameInstance.PlayingCharacterEntity.onNonEquipItemsOperation += OnNonEquipItemsOperation;
+        }
+
+        private QuestRecord MakeRecord(CharacterQuest characterQuest)
+        {
+            QuestRecord record = new QuestRecord();
+            record.dataId = characterQuest.dataId;
+            record.isComplete = characterQuest.isComplete;
+            Quest questData = characterQuest.GetQuest();
+            QuestTask[] tasks = questData.tasks;
+            for (int i = 0; i < tasks.Length; ++i)
+            {
+                bool isComplete;
+                int progress = characterQuest.GetProgress(GameInstance.PlayingCharacterEntity, i, out _, out _, out isComplete);
+                record.tasks.Add(new QuestTaskRecord()
+                {
+                    progress = progress,
+                    isComplete = isComplete,
+                });
+            }
+            return record;
         }
 
         private void AddItemDataIdsForNotification(CharacterQuest characterQuest)
@@ -60,27 +88,6 @@ namespace MultiplayerARPG
                 {
                     notifyingItemDataIds.Add(task.itemAmount.item.DataId);
                 }
-            }
-        }
-
-        private void OnNonEquipItemsOperation(LiteNetLibSyncList.Operation op, int index)
-        {
-            BasePlayerCharacterEntity character = GameInstance.PlayingCharacterEntity;
-            switch (op)
-            {
-                case LiteNetLibSyncList.Operation.Add:
-                case LiteNetLibSyncList.Operation.Insert:
-                case LiteNetLibSyncList.Operation.Set:
-                case LiteNetLibSyncList.Operation.Dirty:
-                    if (notifyingItemDataIds.Contains(character.NonEquipItems[index].dataId))
-                    {
-                        for (int i = 0; i < character.Quests.Count; ++i)
-                        {
-                            OnQuestsOperation(LiteNetLibSyncList.Operation.Dirty, i);
-                        }
-                        return;
-                    }
-                    break;
             }
         }
 
@@ -101,8 +108,7 @@ namespace MultiplayerARPG
                     tempQuestData = tempCharacterQuest.GetQuest();
                     newMessage = messageHandler.AddMessage(questAcceptMessagePrefab);
                     newMessage.text = string.Format(LanguageManager.GetText(formatKeyQuestAccept.ToString()), tempQuestData.Title);
-                    comparingQuests.Add(tempCharacterQuest);
-                    AddItemDataIdsForNotification(tempCharacterQuest);
+                    comparingQuests.Add(MakeRecord(tempCharacterQuest));
                     break;
                 case LiteNetLibSyncList.Operation.Set:
                 case LiteNetLibSyncList.Operation.Dirty:
@@ -129,8 +135,8 @@ namespace MultiplayerARPG
                             bool updatingIsComplete;
                             int updatingProgress = tempCharacterQuest.GetProgress(character, i, out taskTitle, out maxProgress, out updatingIsComplete);
 
-                            bool comparingIsComplete;
-                            int comparingProgress = comparingQuests[index].GetProgress(character, i, out _, out _, out comparingIsComplete);
+                            bool comparingIsComplete = comparingQuests[index].tasks[i].isComplete;
+                            int comparingProgress = comparingQuests[index].tasks[i].progress;
 
                             if ((comparingIsComplete != updatingIsComplete || comparingProgress != updatingProgress) && !comparingIsComplete)
                             {
@@ -163,7 +169,7 @@ namespace MultiplayerARPG
                             }
                         }
                     }
-                    comparingQuests[index] = tempCharacterQuest.Clone();
+                    comparingQuests[index] = MakeRecord(tempCharacterQuest);
                     break;
                 case LiteNetLibSyncList.Operation.RemoveAt:
                     comparingQuests.RemoveAt(index);
