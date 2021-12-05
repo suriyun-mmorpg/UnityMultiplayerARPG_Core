@@ -897,6 +897,12 @@ namespace MultiplayerARPG
             // This function will sort: near to far, so loop from 0
             float dist = Vector3.Distance(character.CacheTransform.position, interactingEntity.CacheTransform.position);
             Vector3 dir = (interactingEntity.CacheTransform.position - character.CacheTransform.position).normalized;
+            if (interactingEntity is ICraftingQueueSource)
+            {
+                if (!(interactingEntity as ICraftingQueueSource).IsInCraftDistance(character.CacheTransform.position))
+                    return false;
+            }
+            // Find that the entity is behind the wall or not
             int count = character.FindPhysicFunctions.Raycast(character.MeleeDamageTransform.position, dir, dist, GameInstance.Singleton.buildingLayer.Mask, QueryTriggerInteraction.Ignore);
             IGameEntity gameEntity;
             for (int i = 0; i < count; ++i)

@@ -44,8 +44,46 @@ namespace MultiplayerARPG
 
         public void Show(ICraftingQueueSource source)
         {
+            if (IsVisible())
+                UnregisterSourceEvents();
             Source = source;
+            if (IsVisible())
+            {
+                RegisterSourceEvents();
+                UpdateData();
+                if (uiFormulas != null)
+                    uiFormulas.UpdateData();
+            }
             Show();
+        }
+
+        public void ShowPlayerCraftingQueue()
+        {
+            if (IsVisible())
+                UnregisterSourceEvents();
+            Source = null;
+            if (IsVisible())
+            {
+                RegisterSourceEvents();
+                UpdateData();
+                if (uiFormulas != null)
+                    uiFormulas.UpdateData();
+            }
+            Show();
+        }
+
+        public void RegisterSourceEvents()
+        {
+            if (Source == null && GameInstance.PlayingCharacterEntity)
+                Source = GameInstance.PlayingCharacterEntity.Crafting;
+            if (Source != null)
+                Source.QueueItems.onOperation += OnCraftingQueueItemsOperation;
+        }
+
+        public void UnregisterSourceEvents()
+        {
+            if (Source != null)
+                Source.QueueItems.onOperation -= OnCraftingQueueItemsOperation;
         }
 
         protected virtual void OnEnable()
@@ -64,10 +102,7 @@ namespace MultiplayerARPG
                 uiFormulas.CraftingQueueManager = this;
                 uiFormulas.Show();
             }
-            if (Source == null && GameInstance.PlayingCharacterEntity)
-                Source = GameInstance.PlayingCharacterEntity.Crafting;
-            if (Source != null)
-                Source.QueueItems.onOperation += OnCraftingQueueItemsOperation;
+            RegisterSourceEvents();
             UpdateData();
         }
 
@@ -76,11 +111,8 @@ namespace MultiplayerARPG
             if (uiDialog != null)
                 uiDialog.onHide.RemoveListener(OnDialogHide);
             CacheSelectionManager.DeselectSelectedUI();
-            if (Source != null)
-            {
-                Source.QueueItems.onOperation -= OnCraftingQueueItemsOperation;
-                Source = null;
-            }
+            UnregisterSourceEvents();
+            Source = null;
         }
 
         protected virtual void OnDialogHide()
@@ -113,7 +145,7 @@ namespace MultiplayerARPG
             UpdateData();
         }
 
-        protected virtual void UpdateData()
+        public virtual void UpdateData()
         {
             int selectedIdx = CacheSelectionManager.SelectedUI != null ? CacheSelectionManager.IndexOf(CacheSelectionManager.SelectedUI) : -1;
             CacheSelectionManager.DeselectSelectedUI();

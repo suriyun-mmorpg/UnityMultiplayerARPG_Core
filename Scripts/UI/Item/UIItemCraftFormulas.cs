@@ -93,7 +93,7 @@ namespace MultiplayerARPG
             }
         }
 
-        protected virtual void UpdateData()
+        public virtual void UpdateData()
         {
             int sourceId = CraftingQueueManager != null && CraftingQueueManager.Source != null ? CraftingQueueManager.Source.SourceId : 0;
             LoadedList.Clear();

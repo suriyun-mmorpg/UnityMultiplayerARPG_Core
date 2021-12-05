@@ -69,7 +69,7 @@ namespace MultiplayerARPG
         {
             base.EntityUpdate();
             if (IsServer)
-                this.UpdateQueue(craftingDistance, CacheTransform.position);
+                this.UpdateQueue();
         }
 
         public override void PrepareRelatesData()

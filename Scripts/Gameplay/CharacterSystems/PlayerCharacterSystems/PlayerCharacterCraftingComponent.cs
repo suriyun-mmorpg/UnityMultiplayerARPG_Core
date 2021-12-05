@@ -19,6 +19,11 @@ namespace MultiplayerARPG
             get { return queueItems; }
         }
 
+        public float CraftingDistance
+        {
+            get { return 0; }
+        }
+
         public bool CanCraft
         {
             get { return !Entity.IsDead(); }
@@ -38,7 +43,7 @@ namespace MultiplayerARPG
         {
             base.EntityUpdate();
             if (IsServer)
-                this.UpdateQueue(0f, CacheTransform.position);
+                this.UpdateQueue();
         }
     }
 }
