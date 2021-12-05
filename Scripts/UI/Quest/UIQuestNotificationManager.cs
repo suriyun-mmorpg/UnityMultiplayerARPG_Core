@@ -19,14 +19,21 @@ namespace MultiplayerARPG
             public bool isComplete;
         }
 
-        [Tooltip("Format => {0} = {Exp Amount}")]
+        [Tooltip("Format => {0} = {Quest Title}")]
         public UILocaleKeySetting formatKeyQuestAccept = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_QUEST_TITLE_ON_GOING);
+        [Tooltip("Format => {0} = {Quest Title}, {1} = {Progress}, {2} = {Target}")]
         public UILocaleKeySetting formatKeyQuestTaskUpdateKillMonster = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_QUEST_TASK_KILL_MONSTER);
+        [Tooltip("Format => {0} = {Quest Title}, {1} = {Progress}, {2} = {Target}")]
         public UILocaleKeySetting formatKeyQuestTaskUpdateKillMonsterComplete = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_QUEST_TASK_KILL_MONSTER_COMPLETE);
+        [Tooltip("Format => {0} = {Quest Title}, {1} = {Progress}, {2} = {Target}")]
         public UILocaleKeySetting formatKeyQuestTaskUpdateCollectItem = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_QUEST_TASK_COLLECT_ITEM);
+        [Tooltip("Format => {0} = {Quest Title}, {1} = {Progress}, {2} = {Target}")]
         public UILocaleKeySetting formatKeyQuestTaskUpdateCollectItemComplete = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_QUEST_TASK_COLLECT_ITEM_COMPLETE);
+        [Tooltip("Format => {0} = {Quest Title}, {1} = {Progress}, {2} = {Target}")]
         public UILocaleKeySetting formatKeyQuestTaskUpdateTalkToNpc = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_QUEST_TASK_TALK_TO_NPC);
+        [Tooltip("Format => {0} = {Quest Title}, {1} = {Progress}, {2} = {Target}")]
         public UILocaleKeySetting formatKeyQuestTaskUpdateTalkToNpcComplete = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_QUEST_TASK_TALK_TO_NPC_COMPLETE);
+        [Tooltip("Format => {0} = {Quest Title}")]
         public UILocaleKeySetting formatKeyQuestComplete = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_QUEST_TITLE_COMPLETE);
         public TextWrapper questAcceptMessagePrefab;
         public TextWrapper questTaskUpdateMessagePrefab;
@@ -104,13 +111,17 @@ namespace MultiplayerARPG
                         tempTasks = tempQuestData.tasks;
                         for (int j = 0; j < tempTasks.Length; ++j)
                         {
-                            if (tempTasks[j].taskType != QuestTaskType.CollectItem || !tempTasks[j].itemAmount.item || tempTasks[j].itemAmount.amount <= 0)
+                            if (tempTasks[j].taskType != QuestTaskType.CollectItem || !tempTasks[j].itemAmount.item)
                                 continue;
                             string taskTitle;
                             int maxProgress;
                             bool updatingIsComplete;
                             int updatingProgress = tempCharacterQuest.GetProgress(character, j, out taskTitle, out maxProgress, out updatingIsComplete);
-                            if (comparingQuests[i].tasks[j].progress != updatingProgress)
+
+                            bool comparingIsComplete = comparingQuests[i].tasks[j].isComplete;
+                            int comparingProgress = comparingQuests[i].tasks[j].progress;
+
+                            if (comparingIsComplete != updatingIsComplete || comparingProgress != updatingProgress)
                             {
                                 newMessage = messageHandler.AddMessage(questCompleteMessagePrefab);
                                 if (updatingProgress >= maxProgress)
@@ -119,11 +130,11 @@ namespace MultiplayerARPG
                                     newMessage.text = string.Format(LanguageManager.GetText(formatKeyQuestTaskUpdateCollectItem.ToString()), taskTitle, updatingProgress, maxProgress);
                                 comparingQuests[i].tasks[j].progress = updatingProgress;
                                 comparingQuests[i].tasks[j].isComplete = updatingIsComplete;
-                            }
-                            break;
-                        }
+                            } // End if
+                        } // End for
                     }
                     break;
+                case LiteNetLibSyncList.Operation.Clear:
                 case LiteNetLibSyncList.Operation.RemoveAt:
                 case LiteNetLibSyncList.Operation.RemoveFirst:
                 case LiteNetLibSyncList.Operation.RemoveLast:
@@ -136,9 +147,12 @@ namespace MultiplayerARPG
                         tempTasks = tempQuestData.tasks;
                         for (int j = 0; j < tempTasks.Length; ++j)
                         {
-                            if (tempTasks[j].taskType != QuestTaskType.CollectItem || !tempTasks[j].itemAmount.item || tempTasks[j].itemAmount.amount <= 0)
+                            if (tempTasks[j].taskType != QuestTaskType.CollectItem || !tempTasks[j].itemAmount.item)
                                 continue;
-                            comparingQuests[i].tasks[j].progress = character.CountNonEquipItems(character.NonEquipItems[index].dataId);
+                            int progress = character.CountNonEquipItems(tempTasks[j].itemAmount.item.DataId);
+                            bool isComplete = progress >= tempTasks[j].itemAmount.amount;
+                            comparingQuests[i].tasks[j].progress = progress;
+                            comparingQuests[i].tasks[j].isComplete = isComplete;
                             break;
                         }
                     }
@@ -185,19 +199,19 @@ namespace MultiplayerARPG
                     else if (!comparingQuests[index].isComplete)
                     {
                         QuestTask[] tasks = tempQuestData.tasks;
-                        for (int i = 0; i < tasks.Length; ++i)
+                        for (int j = 0; j < tasks.Length; ++j)
                         {
                             string taskTitle;
                             int maxProgress;
                             bool updatingIsComplete;
-                            int updatingProgress = tempCharacterQuest.GetProgress(character, i, out taskTitle, out maxProgress, out updatingIsComplete);
+                            int updatingProgress = tempCharacterQuest.GetProgress(character, j, out taskTitle, out maxProgress, out updatingIsComplete);
 
-                            bool comparingIsComplete = comparingQuests[index].tasks[i].isComplete;
-                            int comparingProgress = comparingQuests[index].tasks[i].progress;
+                            bool comparingIsComplete = comparingQuests[index].tasks[j].isComplete;
+                            int comparingProgress = comparingQuests[index].tasks[j].progress;
 
-                            if ((comparingIsComplete != updatingIsComplete || comparingProgress != updatingProgress) && !comparingIsComplete)
+                            if (comparingIsComplete != updatingIsComplete || comparingProgress != updatingProgress)
                             {
-                                switch (tasks[i].taskType)
+                                switch (tasks[j].taskType)
                                 {
                                     case QuestTaskType.KillMonster:
                                         newMessage = messageHandler.AddMessage(questTaskUpdateMessagePrefab);
@@ -216,9 +230,10 @@ namespace MultiplayerARPG
                                     default:
                                         break;
                                 } // End switch
+                                comparingQuests[index].tasks[j].progress = updatingProgress;
+                                comparingQuests[index].tasks[j].isComplete = updatingIsComplete;
                             } // End if
                         } // End for
-                        comparingQuests[index] = MakeRecord(tempCharacterQuest);
                     }
                     break;
                 case LiteNetLibSyncList.Operation.RemoveAt:
