@@ -105,13 +105,13 @@ namespace MultiplayerARPG
             return GetProgress(character, taskIndex, out _, out _, out isComplete);
         }
 
-        public int GetProgress(IPlayerCharacterData character, int taskIndex, out string targetTitle, out int maxProgress, out bool isComplete)
+        public int GetProgress(IPlayerCharacterData character, int taskIndex, out string targetTitle, out int targetProgress, out bool isComplete)
         {
             Quest quest = GetQuest();
             if (character == null || quest == null || taskIndex < 0 || taskIndex >= quest.tasks.Length)
             {
                 targetTitle = string.Empty;
-                maxProgress = 0;
+                targetProgress = 0;
                 isComplete = false;
                 return 0;
             }
@@ -120,28 +120,28 @@ namespace MultiplayerARPG
             switch (task.taskType)
             {
                 case QuestTaskType.KillMonster:
-                    progress = task.monsterCharacterAmount.monster == null ? 0 : CountKillMonster(task.monsterCharacterAmount.monster.DataId);
                     targetTitle = task.monsterCharacterAmount.monster == null ? string.Empty : task.monsterCharacterAmount.monster.Title;
-                    maxProgress = task.monsterCharacterAmount.amount;
-                    isComplete = progress >= maxProgress;
+                    progress = task.monsterCharacterAmount.monster == null ? 0 : CountKillMonster(task.monsterCharacterAmount.monster.DataId);
+                    targetProgress = task.monsterCharacterAmount.amount;
+                    isComplete = progress >= targetProgress;
                     return progress;
                 case QuestTaskType.CollectItem:
-                    progress = task.itemAmount.item == null ? 0 : character.CountNonEquipItems(task.itemAmount.item.DataId);
                     targetTitle = task.itemAmount.item == null ? string.Empty : task.itemAmount.item.Title;
-                    maxProgress = task.itemAmount.amount;
-                    isComplete = progress >= maxProgress;
+                    progress = task.itemAmount.item == null ? 0 : character.CountNonEquipItems(task.itemAmount.item.DataId);
+                    targetProgress = task.itemAmount.amount;
+                    isComplete = progress >= targetProgress;
                     return progress;
                 case QuestTaskType.TalkToNpc:
-                    progress = CompletedTasks.Contains(taskIndex) ? 1 : 0;
                     targetTitle = task.npcEntity == null ? null : task.npcEntity.Title;
-                    maxProgress = 1;
-                    isComplete = progress >= maxProgress;
+                    progress = CompletedTasks.Contains(taskIndex) ? 1 : 0;
+                    targetProgress = 1;
+                    isComplete = progress >= targetProgress;
                     return progress;
                 case QuestTaskType.Custom:
-                    return task.customQuestTask.GetTaskProgress(character, out targetTitle, out maxProgress, out isComplete);
+                    return task.customQuestTask.GetTaskProgress(character, out targetTitle, out targetProgress, out isComplete);
             }
             targetTitle = string.Empty;
-            maxProgress = 0;
+            targetProgress = 0;
             isComplete = false;
             return 0;
         }
