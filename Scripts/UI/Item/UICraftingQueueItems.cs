@@ -49,10 +49,13 @@ namespace MultiplayerARPG
             Source = source;
             if (IsVisible())
             {
+                if (uiFormulas != null)
+                {
+                    uiFormulas.CraftingQueueManager = this;
+                    uiFormulas.UpdateData();
+                }
                 RegisterSourceEvents();
                 UpdateData();
-                if (uiFormulas != null)
-                    uiFormulas.UpdateData();
             }
             Show();
         }
@@ -64,10 +67,13 @@ namespace MultiplayerARPG
             Source = null;
             if (IsVisible())
             {
+                if (uiFormulas != null)
+                {
+                    uiFormulas.CraftingQueueManager = this;
+                    uiFormulas.UpdateData();
+                }
                 RegisterSourceEvents();
                 UpdateData();
-                if (uiFormulas != null)
-                    uiFormulas.UpdateData();
             }
             Show();
         }
