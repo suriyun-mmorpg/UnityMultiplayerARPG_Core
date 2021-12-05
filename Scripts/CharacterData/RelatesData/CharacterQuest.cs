@@ -102,9 +102,16 @@ namespace MultiplayerARPG
 
         public int GetProgress(IPlayerCharacterData character, int taskIndex, out bool isComplete)
         {
+            return GetProgress(character, taskIndex, out _, out _, out isComplete);
+        }
+
+        public int GetProgress(IPlayerCharacterData character, int taskIndex, out string targetTitle, out int maxProgress, out bool isComplete)
+        {
             Quest quest = GetQuest();
             if (character == null || quest == null || taskIndex < 0 || taskIndex >= quest.tasks.Length)
             {
+                targetTitle = string.Empty;
+                maxProgress = 0;
                 isComplete = false;
                 return 0;
             }
@@ -113,22 +120,28 @@ namespace MultiplayerARPG
             switch (task.taskType)
             {
                 case QuestTaskType.KillMonster:
-                    MonsterCharacterAmount monsterCharacterAmount = task.monsterCharacterAmount;
-                    progress = monsterCharacterAmount.monster == null ? 0 : CountKillMonster(monsterCharacterAmount.monster.DataId);
-                    isComplete = progress >= monsterCharacterAmount.amount;
+                    progress = task.monsterCharacterAmount.monster == null ? 0 : CountKillMonster(task.monsterCharacterAmount.monster.DataId);
+                    targetTitle = task.monsterCharacterAmount.monster == null ? string.Empty : task.monsterCharacterAmount.monster.Title;
+                    maxProgress = task.monsterCharacterAmount.amount;
+                    isComplete = progress >= maxProgress;
                     return progress;
                 case QuestTaskType.CollectItem:
-                    ItemAmount itemAmount = task.itemAmount;
-                    progress = itemAmount.item == null ? 0 : character.CountNonEquipItems(itemAmount.item.DataId);
-                    isComplete = progress >= itemAmount.amount;
+                    progress = task.itemAmount.item == null ? 0 : character.CountNonEquipItems(task.itemAmount.item.DataId);
+                    targetTitle = task.itemAmount.item == null ? string.Empty : task.itemAmount.item.Title;
+                    maxProgress = task.itemAmount.amount;
+                    isComplete = progress >= maxProgress;
                     return progress;
                 case QuestTaskType.TalkToNpc:
                     progress = CompletedTasks.Contains(taskIndex) ? 1 : 0;
-                    isComplete = progress > 0;
+                    targetTitle = task.npcEntity == null ? null : task.npcEntity.Title;
+                    maxProgress = 1;
+                    isComplete = progress >= maxProgress;
                     return progress;
                 case QuestTaskType.Custom:
-                    return task.customQuestTask.GetTaskProgress(character, out isComplete);
+                    return task.customQuestTask.GetTaskProgress(character, out targetTitle, out maxProgress, out isComplete);
             }
+            targetTitle = string.Empty;
+            maxProgress = 0;
             isComplete = false;
             return 0;
         }
@@ -154,6 +167,29 @@ namespace MultiplayerARPG
             if (!KilledMonsters.ContainsKey(monsterDataId))
                 return 0;
             return KilledMonsters[monsterDataId];
+        }
+
+        public CharacterQuest Clone()
+        {
+            CharacterQuest cloneQuest = new CharacterQuest();
+            cloneQuest.dataId = dataId;
+            cloneQuest.isComplete = isComplete;
+            cloneQuest.isTracking = isTracking;
+            // Clone killed monsters
+            Dictionary<int, int> killedMonsters = new Dictionary<int, int>();
+            foreach (KeyValuePair<int, int> cloneEntry in this.killedMonsters)
+            {
+                killedMonsters[cloneEntry.Key] = cloneEntry.Value;
+            }
+            cloneQuest.killedMonsters = killedMonsters;
+            // Clone complete tasks
+            List<int> completedTasks = new List<int>();
+            foreach (int cloneEntry in this.completedTasks)
+            {
+                completedTasks.Add(cloneEntry);
+            }
+            cloneQuest.completedTasks = completedTasks;
+            return cloneQuest;
         }
 
         public static CharacterQuest Create(Quest quest)

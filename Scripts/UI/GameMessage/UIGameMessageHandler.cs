@@ -4,11 +4,6 @@ namespace MultiplayerARPG
 {
     public class UIGameMessageHandler : MonoBehaviour
     {
-        public TextWrapper messagePrefab;
-        public TextWrapper rewardExpPrefab;
-        public TextWrapper rewardGoldPrefab;
-        public TextWrapper rewardItemPrefab;
-        public TextWrapper rewardCurrencyPrefab;
         [Tooltip("Format => {0} = {Exp Amount}")]
         public UILocaleKeySetting formatKeyRewardExp = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_NOTIFY_REWARD_EXP);
         [Tooltip("Format => {0} = {Gold Amount}")]
@@ -17,6 +12,11 @@ namespace MultiplayerARPG
         public UILocaleKeySetting formatKeyRewardItem = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_NOTIFY_REWARD_ITEM);
         [Tooltip("Format => {0} = {Item Title}, {1} => {Amount}")]
         public UILocaleKeySetting formatKeyRewardCurrency = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_NOTIFY_REWARD_CURRENCY);
+        public TextWrapper messagePrefab;
+        public TextWrapper rewardExpPrefab;
+        public TextWrapper rewardGoldPrefab;
+        public TextWrapper rewardItemPrefab;
+        public TextWrapper rewardCurrencyPrefab;
         public Color errorMessageColor = Color.red;
         public Transform messageContainer;
         public float visibleDuration;
@@ -56,14 +56,9 @@ namespace MultiplayerARPG
             if (messagePrefab == null)
                 return;
 
-            TextWrapper newMessage = Instantiate(messagePrefab);
-            newMessage.text = LanguageManager.GetText(message.ToString());
+            TextWrapper newMessage = AddMessage(messagePrefab);
             if (message.ToString().ToUpper().StartsWith("UI_ERROR"))
                 newMessage.color = errorMessageColor;
-            newMessage.transform.SetParent(messageContainer);
-            newMessage.transform.localScale = Vector3.one;
-            newMessage.transform.localRotation = Quaternion.identity;
-            Destroy(newMessage.gameObject, visibleDuration);
         }
 
         private void OnNotifyRewardExp(int exp)
@@ -71,12 +66,8 @@ namespace MultiplayerARPG
             if (rewardExpPrefab == null)
                 return;
 
-            TextWrapper newMessage = Instantiate(rewardExpPrefab);
+            TextWrapper newMessage = AddMessage(rewardExpPrefab);
             newMessage.text = string.Format(LanguageManager.GetText(formatKeyRewardExp.ToString()), exp);
-            newMessage.transform.SetParent(messageContainer);
-            newMessage.transform.localScale = Vector3.one;
-            newMessage.transform.localRotation = Quaternion.identity;
-            Destroy(newMessage.gameObject, visibleDuration);
         }
 
         private void OnNotifyRewardGold(int gold)
@@ -84,12 +75,8 @@ namespace MultiplayerARPG
             if (rewardGoldPrefab == null)
                 return;
 
-            TextWrapper newMessage = Instantiate(rewardGoldPrefab);
+            TextWrapper newMessage = AddMessage(rewardGoldPrefab);
             newMessage.text = string.Format(LanguageManager.GetText(formatKeyRewardGold.ToString()), gold);
-            newMessage.transform.SetParent(messageContainer);
-            newMessage.transform.localScale = Vector3.one;
-            newMessage.transform.localRotation = Quaternion.identity;
-            Destroy(newMessage.gameObject, visibleDuration);
         }
 
         private void OnNotifyRewardItem(int dataId, short amount)
@@ -98,12 +85,8 @@ namespace MultiplayerARPG
             if (rewardItemPrefab == null || !GameInstance.Items.TryGetValue(dataId, out item))
                 return;
 
-            TextWrapper newMessage = Instantiate(rewardItemPrefab);
+            TextWrapper newMessage = AddMessage(rewardItemPrefab);
             newMessage.text = string.Format(LanguageManager.GetText(formatKeyRewardItem.ToString()), item.Title, amount);
-            newMessage.transform.SetParent(messageContainer);
-            newMessage.transform.localScale = Vector3.one;
-            newMessage.transform.localRotation = Quaternion.identity;
-            Destroy(newMessage.gameObject, visibleDuration);
         }
 
         private void OnNotifyRewardCurrency(int dataId, int amount)
@@ -112,12 +95,18 @@ namespace MultiplayerARPG
             if (rewardCurrencyPrefab == null || !GameInstance.Currencies.TryGetValue(dataId, out currency))
                 return;
 
-            TextWrapper newMessage = Instantiate(rewardCurrencyPrefab);
+            TextWrapper newMessage = AddMessage(rewardCurrencyPrefab);
             newMessage.text = string.Format(LanguageManager.GetText(formatKeyRewardCurrency.ToString()), currency.Title, amount);
+        }
+
+        public TextWrapper AddMessage(TextWrapper prefab)
+        {
+            TextWrapper newMessage = Instantiate(prefab);
             newMessage.transform.SetParent(messageContainer);
             newMessage.transform.localScale = Vector3.one;
             newMessage.transform.localRotation = Quaternion.identity;
             Destroy(newMessage.gameObject, visibleDuration);
+            return newMessage;
         }
     }
 }
