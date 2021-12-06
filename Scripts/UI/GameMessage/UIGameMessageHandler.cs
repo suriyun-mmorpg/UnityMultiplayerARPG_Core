@@ -59,6 +59,7 @@ namespace MultiplayerARPG
             TextWrapper newMessage = AddMessage(messagePrefab);
             if (message.ToString().ToUpper().StartsWith("UI_ERROR"))
                 newMessage.color = errorMessageColor;
+            newMessage.text = LanguageManager.GetText(message.ToString());
         }
 
         private void OnNotifyRewardExp(int exp)
