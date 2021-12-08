@@ -36,7 +36,7 @@ namespace MultiplayerARPG
         public int exp;
         public float lockRemainsDuration;
         public long expireTime;
-        public byte randomSeed;
+        public short randomSeed;
         public short ammo;
         public List<int> sockets = new List<int>();
 
@@ -520,7 +520,7 @@ namespace MultiplayerARPG
             {
                 newItem.durability = (tempItem as IEquipmentItem).MaxDurability;
                 newItem.lockRemainsDuration = tempItem.LockDuration;
-                newItem.randomSeed = (byte)Random.Range(0, 255);
+                newItem.randomSeed = (short)Random.Range(short.MinValue, short.MaxValue);
             }
             return newItem;
         }
@@ -598,7 +598,7 @@ namespace MultiplayerARPG
                     }
                 }
 
-                writer.Put(randomSeed);
+                writer.PutPackedShort(randomSeed);
             }
 
             if (isWeapon)
@@ -636,7 +636,7 @@ namespace MultiplayerARPG
                     Sockets.Add(reader.GetPackedInt());
                 }
 
-                randomSeed = reader.GetByte();
+                randomSeed = reader.GetPackedShort();
             }
 
             if (syncState.Has(CharacterItemSyncState.IsWeapon))
