@@ -60,7 +60,7 @@ namespace MultiplayerARPG
             catch { }
             try
             {
-                characterItem.randomSeed = info.GetByte("randomSeed");
+                characterItem.randomSeed = info.GetInt16("randomSeed");
             }
             catch { }
             if (string.IsNullOrEmpty(characterItem.id))
