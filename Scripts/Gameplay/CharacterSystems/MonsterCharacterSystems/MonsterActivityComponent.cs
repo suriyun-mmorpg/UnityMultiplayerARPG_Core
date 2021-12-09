@@ -35,6 +35,7 @@ namespace MultiplayerARPG
         protected bool alreadySetActionState;
         protected bool isLeftHandAttacking;
         protected float lastSetDestinationTime;
+        protected bool previousIsInSafeArea;
 
         public bool IsAggressiveWhileSummonerIdle()
         {
@@ -97,10 +98,17 @@ namespace MultiplayerARPG
                 if (Entity.IsInSafeArea)
                 {
                     // If monster move into safe area, wander to another place
-                    RandomWanderDestination();
+                    randomedWanderElasped += deltaTime;
+                    if (!previousIsInSafeArea || randomedWanderElasped >= randomedWanderDelay)
+                    {
+                        randomedWanderElasped = 0f;
+                        RandomWanderDestination();
+                    }
+                    previousIsInSafeArea = true;
                     startedFollowEnemy = false;
                     return;
                 }
+                previousIsInSafeArea = false;
 
                 if (!UpdateAttackEnemy(deltaTime, currentPosition))
                 {
