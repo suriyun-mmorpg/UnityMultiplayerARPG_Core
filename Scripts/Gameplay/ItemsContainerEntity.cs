@@ -38,7 +38,7 @@ namespace MultiplayerARPG
         {
             get { return items; }
         }
-        public HashSet<uint> Looters { get; protected set; }
+        public HashSet<string> Looters { get; protected set; }
         public override string EntityTitle
         {
             get
@@ -88,9 +88,8 @@ namespace MultiplayerARPG
 
         public bool IsAbleToLoot(BaseCharacterEntity baseCharacterEntity)
         {
-            if ((Looters == null || Looters.Count == 0 || Looters.Contains(baseCharacterEntity.ObjectId) ||
-                Time.unscaledTime - dropTime > CurrentGameInstance.itemLootLockDuration) &&
-                !isDestroyed)
+            if ((Looters == null || Looters.Count == 0 || Looters.Contains(baseCharacterEntity.Id) ||
+                Time.unscaledTime - dropTime > CurrentGameInstance.itemLootLockDuration) && !isDestroyed)
                 return true;
             return false;
         }
@@ -111,7 +110,7 @@ namespace MultiplayerARPG
             NetworkDestroy(destroyDelay);
         }
 
-        public static ItemsContainerEntity DropItems(ItemsContainerEntity prefab, BaseGameEntity dropper, IEnumerable<CharacterItem> dropItems, IEnumerable<uint> looters, float appearDuration, bool randomPosition = false, bool randomRotation = false)
+        public static ItemsContainerEntity DropItems(ItemsContainerEntity prefab, BaseGameEntity dropper, IEnumerable<CharacterItem> dropItems, IEnumerable<string> looters, float appearDuration, bool randomPosition = false, bool randomRotation = false)
         {
             Vector3 dropPosition = dropper.CacheTransform.position;
             Quaternion dropRotation = dropper.CacheTransform.rotation;
@@ -140,7 +139,7 @@ namespace MultiplayerARPG
             return DropItems(prefab, dropper, dropPosition, dropRotation, dropItems, looters, appearDuration);
         }
 
-        public static ItemsContainerEntity DropItems(ItemsContainerEntity prefab, BaseGameEntity dropper, Vector3 dropPosition, Quaternion dropRotation, IEnumerable<CharacterItem> dropItems, IEnumerable<uint> looters, float appearDuration)
+        public static ItemsContainerEntity DropItems(ItemsContainerEntity prefab, BaseGameEntity dropper, Vector3 dropPosition, Quaternion dropRotation, IEnumerable<CharacterItem> dropItems, IEnumerable<string> looters, float appearDuration)
         {
             if (prefab == null)
                 return null;
@@ -155,7 +154,7 @@ namespace MultiplayerARPG
                 dropPosition, dropRotation);
             ItemsContainerEntity itemsContainerEntity = spawnObj.GetComponent<ItemsContainerEntity>();
             itemsContainerEntity.Items.AddRange(dropItems);
-            itemsContainerEntity.Looters = new HashSet<uint>(looters);
+            itemsContainerEntity.Looters = new HashSet<string>(looters);
             itemsContainerEntity.isDestroyed = false;
             itemsContainerEntity.dropTime = Time.unscaledTime;
             itemsContainerEntity.appearDuration = appearDuration;

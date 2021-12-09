@@ -207,7 +207,7 @@ namespace MultiplayerARPG
                 if (!await GameInstance.ServerStorageHandlers.IncreaseStorageItems(storageId, convertedItem))
                 {
                     // Cannot add item to storage, so drop to ground
-                    ItemDropEntity.DropItem(this, convertedItem, new uint[0]);
+                    ItemDropEntity.DropItem(this, convertedItem, new string[0]);
                 }
             }
         }

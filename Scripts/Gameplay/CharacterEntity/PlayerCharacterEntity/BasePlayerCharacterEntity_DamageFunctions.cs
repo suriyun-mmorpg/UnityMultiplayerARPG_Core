@@ -39,14 +39,17 @@ namespace MultiplayerARPG
             NpcAction.ClearNpcDialogData();
 
             // Add killer to looters
-            HashSet<uint> looters = new HashSet<uint>();
-            uint killerObjectId;
+            HashSet<string> looters = new HashSet<string>();
+            string killerObjectId;
             if (lastAttacker.SummonerObjectId > 0)
-                killerObjectId = lastAttacker.SummonerObjectId;
+                killerObjectId = lastAttacker.SummonerId;
             else
-                killerObjectId = lastAttacker.ObjectId;
-            if (killerObjectId > 0)
+                killerObjectId = lastAttacker.Id;
+            if (!string.IsNullOrEmpty(killerObjectId))
                 looters.Add(killerObjectId);
+
+            // Add this character to make players able to get items from their own corpses immediately
+            looters.Add(Id);
 
             // Drop an items
             List<CharacterItem> droppingItems = new List<CharacterItem>();

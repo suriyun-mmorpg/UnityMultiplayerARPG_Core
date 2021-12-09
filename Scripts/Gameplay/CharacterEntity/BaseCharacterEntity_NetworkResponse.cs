@@ -69,15 +69,15 @@ namespace MultiplayerARPG
                 return;
             }
 
-            if (!itemsContainerEntity.IsAbleToLoot(this))
-            {
-                GameInstance.ServerGameMessageHandlers.SendGameMessage(ConnectionId, UITextKeys.UI_ERROR_NOT_ABLE_TO_LOOT);
-                return;
-            }
-
             if (!IsGameEntityInDistance(itemsContainerEntity, CurrentGameInstance.pickUpItemDistance))
             {
                 GameInstance.ServerGameMessageHandlers.SendGameMessage(ConnectionId, UITextKeys.UI_ERROR_CHARACTER_IS_TOO_FAR);
+                return;
+            }
+
+            if (!itemsContainerEntity.IsAbleToLoot(this))
+            {
+                GameInstance.ServerGameMessageHandlers.SendGameMessage(ConnectionId, UITextKeys.UI_ERROR_NOT_ABLE_TO_LOOT);
                 return;
             }
 
@@ -122,15 +122,15 @@ namespace MultiplayerARPG
                 return;
             }
 
-            if (!itemsContainerEntity.IsAbleToLoot(this))
-            {
-                GameInstance.ServerGameMessageHandlers.SendGameMessage(ConnectionId, UITextKeys.UI_ERROR_NOT_ABLE_TO_LOOT);
-                return;
-            }
-
             if (!IsGameEntityInDistance(itemsContainerEntity, CurrentGameInstance.pickUpItemDistance))
             {
                 GameInstance.ServerGameMessageHandlers.SendGameMessage(ConnectionId, UITextKeys.UI_ERROR_CHARACTER_IS_TOO_FAR);
+                return;
+            }
+
+            if (!itemsContainerEntity.IsAbleToLoot(this))
+            {
+                GameInstance.ServerGameMessageHandlers.SendGameMessage(ConnectionId, UITextKeys.UI_ERROR_NOT_ABLE_TO_LOOT);
                 return;
             }
 
@@ -199,10 +199,10 @@ namespace MultiplayerARPG
                     // Drop item to the ground
                     CharacterItem dropData = nonEquipItem.Clone();
                     dropData.amount = amount;
-                    if (!CurrentGameInstance.canPickupItemsWhichDropsByPlayersImmediately)
-                        ItemDropEntity.DropItem(this, dropData, new uint[] { ObjectId });
+                    if (CurrentGameInstance.canPickupItemsWhichDropsByPlayersImmediately)
+                        ItemDropEntity.DropItem(this, dropData, new string[] { Id });
                     else
-                        ItemDropEntity.DropItem(this, dropData, new uint[0]);
+                        ItemDropEntity.DropItem(this, dropData, new string[0]);
                     break;
             }
 #endif

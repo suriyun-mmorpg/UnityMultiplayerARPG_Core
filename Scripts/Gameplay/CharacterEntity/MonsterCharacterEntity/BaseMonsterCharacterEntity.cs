@@ -134,7 +134,7 @@ namespace MultiplayerARPG
 
         // Private variables
         private bool isDestroyed;
-        private readonly HashSet<uint> looters = new HashSet<uint>();
+        private readonly HashSet<string> looters = new HashSet<string>();
         private readonly List<CharacterItem> droppingItems = new List<CharacterItem>();
         private float lastTeleportToSummonerTime = 0f;
 
@@ -520,7 +520,7 @@ namespace MultiplayerARPG
                                     if (makeMostDamage)
                                     {
                                         // Make other member in party able to pickup items
-                                        looters.Add(partyMember.ObjectId);
+                                        looters.Add(partyMember.Id);
                                     }
                                     partyMember.RewardCurrencies(reward, 1f / (float)countNearbyPartyMembers * rewardRate, RewardGivenType.PartyShare);
                                 }
@@ -565,7 +565,7 @@ namespace MultiplayerARPG
                         if (makeMostDamage)
                         {
                             // Make current character able to pick up item because it made most damage
-                            looters.Add(tempPlayerCharacterEntity.ObjectId);
+                            looters.Add(tempPlayerCharacterEntity.Id);
                         }
                     }   // End is `BasePlayerCharacterEntity` condition
                 }   // End for-loop
@@ -577,8 +577,6 @@ namespace MultiplayerARPG
             CharacterDatabase.RandomItems(OnRandomDropItem);
             // Drop currency
             CharacterDatabase.RandomCurrencies(OnRandomDropCurrency);
-            // Clear looters because they are already set to dropped items
-            looters.Clear();
 
             switch (CurrentGameInstance.monsterDeadDropItemMode)
             {
@@ -605,6 +603,9 @@ namespace MultiplayerARPG
                 // If not summoned by someone, destroy and respawn it
                 DestroyAndRespawn();
             }
+
+            // Clear looters because they are already set to dropped items
+            looters.Clear();
         }
 
         private void OnRandomDropItem(BaseItem item, short amount)
@@ -618,9 +619,9 @@ namespace MultiplayerARPG
         private void OnRandomDropCurrency(Currency currency, int amount)
         {
             BasePlayerCharacterEntity playerCharacterEntity;
-            foreach (uint looter in looters)
+            foreach (string looter in looters)
             {
-                if (!Manager.Assets.TryGetSpawnedObject(looter, out playerCharacterEntity))
+                if (GameInstance.ServerUserHandlers.TryGetPlayerCharacterById(looter, out playerCharacterEntity))
                     continue;
                 playerCharacterEntity.IncreaseCurrency(currency, amount);
             }
