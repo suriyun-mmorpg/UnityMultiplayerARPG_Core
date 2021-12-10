@@ -729,7 +729,7 @@ namespace MultiplayerARPG
             returningItems.AddRange(BaseItem.GetDismantleReturnItems(nonEquipItem, amount));
             if (simulatingNonEquipItems.IncreasingItemsWillOverwhelming(
                 returningItems,
-                true,
+                GameInstance.Singleton.IsLimitInventoryWeight,
                 character.GetCaches().LimitItemWeight,
                 character.GetCaches().TotalItemWeight,
                 GameInstance.Singleton.IsLimitInventorySlot,

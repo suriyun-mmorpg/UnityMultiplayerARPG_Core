@@ -932,7 +932,7 @@ namespace MultiplayerARPG
             return this.GetCaches().IsHide;
         }
 
-        public bool CanAttack()
+        public virtual bool CanAttack()
         {
             if (!CanDoActions())
                 return false;
@@ -944,7 +944,7 @@ namespace MultiplayerARPG
             return true;
         }
 
-        public bool CanUseSkill()
+        public virtual bool CanUseSkill()
         {
             if (!CanDoActions())
                 return false;
@@ -956,7 +956,7 @@ namespace MultiplayerARPG
             return true;
         }
 
-        public bool CanUseItem()
+        public virtual bool CanUseItem()
         {
             if (this.IsDead())
                 return false;

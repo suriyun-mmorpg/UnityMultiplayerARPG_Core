@@ -282,6 +282,8 @@ namespace MultiplayerARPG
         public bool canRepairItemByPlayer = false;
         [Tooltip("How player's inventory works")]
         public InventorySystem inventorySystem = InventorySystem.Simple;
+        [Tooltip("If this is `TRUE`, weight limit won't be applied")]
+        public bool noInventoryWeightLimit;
         [Tooltip("If this is `TRUE` it won't fill empty slots")]
         public bool doNotFillEmptySlots = false;
         [Tooltip("Base slot limit for all characters, it will be used when `InventorySystem` is `LimitSlots`")]
@@ -354,6 +356,11 @@ namespace MultiplayerARPG
         public bool IsLimitInventorySlot
         {
             get { return inventorySystem == InventorySystem.LimitSlots; }
+        }
+
+        public bool IsLimitInventoryWeight
+        {
+            get { return !noInventoryWeightLimit; }
         }
 
         public BaseGameSaveSystem SaveSystem

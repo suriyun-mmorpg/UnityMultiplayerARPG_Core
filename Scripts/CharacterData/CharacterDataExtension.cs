@@ -728,6 +728,13 @@ namespace MultiplayerARPG
         #endregion
 
         #region Increasing Items Will Overwhelming
+        public static bool UnEquipItemWillOverwhelming(this ICharacterData data, int unEquipCount = 1)
+        {
+            if (!GameInstance.Singleton.IsLimitInventorySlot)
+                return false;
+            return data.GetCaches().TotalItemSlot + unEquipCount > data.GetCaches().LimitItemSlot;
+        }
+
         public static bool IncreasingItemsWillOverwhelming(this IList<CharacterItem> itemList, int dataId, short amount, bool isLimitWeight, float weightLimit, float totalItemWeight, bool isLimitSlot, short slotLimit)
         {
             BaseItem itemData;
@@ -801,47 +808,6 @@ namespace MultiplayerARPG
             return true;
         }
 
-        public static bool UnEquipItemWillOverwhelming(this ICharacterData data, int unEquipCount = 1)
-        {
-            if (!GameInstance.Singleton.IsLimitInventorySlot)
-                return false;
-            return data.GetCaches().TotalItemSlot + unEquipCount > data.GetCaches().LimitItemSlot;
-        }
-
-        public static bool IncreasingItemsWillOverwhelming(this ICharacterData data, int dataId, short amount)
-        {
-            return data.NonEquipItems.IncreasingItemsWillOverwhelming(
-                dataId,
-                amount,
-                true,
-                data.GetCaches().LimitItemWeight,
-                data.GetCaches().TotalItemWeight,
-                GameInstance.Singleton.IsLimitInventorySlot,
-                data.GetCaches().LimitItemSlot);
-        }
-
-        public static bool IncreasingItemsWillOverwhelming(this ICharacterData data, IEnumerable<ItemAmount> increasingItems)
-        {
-            return data.NonEquipItems.IncreasingItemsWillOverwhelming(
-                increasingItems,
-                true,
-                data.GetCaches().LimitItemWeight,
-                data.GetCaches().TotalItemWeight,
-                GameInstance.Singleton.IsLimitInventorySlot,
-                data.GetCaches().LimitItemSlot);
-        }
-
-        public static bool IncreasingItemsWillOverwhelming(this ICharacterData data, IEnumerable<CharacterItem> increasingItems)
-        {
-            return data.NonEquipItems.IncreasingItemsWillOverwhelming(
-                increasingItems,
-                true,
-                data.GetCaches().LimitItemWeight,
-                data.GetCaches().TotalItemWeight,
-                GameInstance.Singleton.IsLimitInventorySlot,
-                data.GetCaches().LimitItemSlot);
-        }
-
         public static bool IncreasingItemsWillOverwhelming(this IList<CharacterItem> itemList, IEnumerable<ItemAmount> increasingItems, bool isLimitWeight, float weightLimit, float totalItemWeight, bool isLimitSlot, short slotLimit)
         {
             if (itemList == null || increasingItems == null)
@@ -898,6 +864,40 @@ namespace MultiplayerARPG
                 }
             }
             return false;
+        }
+
+        public static bool IncreasingItemsWillOverwhelming(this ICharacterData data, int dataId, short amount)
+        {
+            return data.NonEquipItems.IncreasingItemsWillOverwhelming(
+                dataId,
+                amount,
+                GameInstance.Singleton.IsLimitInventoryWeight,
+                data.GetCaches().LimitItemWeight,
+                data.GetCaches().TotalItemWeight,
+                GameInstance.Singleton.IsLimitInventorySlot,
+                data.GetCaches().LimitItemSlot);
+        }
+
+        public static bool IncreasingItemsWillOverwhelming(this ICharacterData data, IEnumerable<ItemAmount> increasingItems)
+        {
+            return data.NonEquipItems.IncreasingItemsWillOverwhelming(
+                increasingItems,
+                GameInstance.Singleton.IsLimitInventoryWeight,
+                data.GetCaches().LimitItemWeight,
+                data.GetCaches().TotalItemWeight,
+                GameInstance.Singleton.IsLimitInventorySlot,
+                data.GetCaches().LimitItemSlot);
+        }
+
+        public static bool IncreasingItemsWillOverwhelming(this ICharacterData data, IEnumerable<CharacterItem> increasingItems)
+        {
+            return data.NonEquipItems.IncreasingItemsWillOverwhelming(
+                increasingItems,
+                GameInstance.Singleton.IsLimitInventoryWeight,
+                data.GetCaches().LimitItemWeight,
+                data.GetCaches().TotalItemWeight,
+                GameInstance.Singleton.IsLimitInventorySlot,
+                data.GetCaches().LimitItemSlot);
         }
         #endregion
 

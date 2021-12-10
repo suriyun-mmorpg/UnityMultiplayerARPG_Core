@@ -91,7 +91,7 @@ namespace MultiplayerARPG
             LimitItemWeight = GameInstance.Singleton.GameplayRule.GetLimitWeight(characterData, stats);
             LimitItemSlot = GameInstance.Singleton.GameplayRule.GetLimitSlot(characterData, stats);
 
-            IsOverweight = (GameInstance.Singleton.IsLimitInventorySlot && TotalItemSlot > LimitItemSlot) || TotalItemWeight > LimitItemWeight;
+            IsOverweight = (GameInstance.Singleton.IsLimitInventorySlot && TotalItemSlot > LimitItemSlot) || (GameInstance.Singleton.IsLimitInventoryWeight && TotalItemWeight > LimitItemWeight);
             DisallowMove = false;
             DisallowAttack = false;
             DisallowUseSkill = false;
