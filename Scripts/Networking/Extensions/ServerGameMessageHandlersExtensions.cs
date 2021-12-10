@@ -4,6 +4,13 @@ namespace MultiplayerARPG
 {
     public static partial class ServerGameMessageHandlersExtensions
     {
+        public static void SendGameMessageByCharacterId(this IServerGameMessageHandlers handler, string id, UITextKeys message)
+        {
+            long connectionId;
+            if (GameInstance.ServerUserHandlers.TryGetConnectionId(id, out connectionId))
+                handler.SendGameMessage(connectionId, message);
+        }
+
         public static void SendSetPartyData(this IServerGameMessageHandlers handlers, long connectionId, PartyData party)
         {
             if (party == null)

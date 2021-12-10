@@ -29,6 +29,7 @@ namespace MultiplayerARPG
             GameInstance.ClientPartyHandlers.RequestAcceptPartyInvitation(new RequestAcceptPartyInvitationMessage()
             {
                 partyId = Data.PartyId,
+                inviterId = Data.InviterId,
             }, AcceptPartyInvitationCallback);
         }
 
@@ -44,6 +45,7 @@ namespace MultiplayerARPG
             GameInstance.ClientPartyHandlers.RequestDeclinePartyInvitation(new RequestDeclinePartyInvitationMessage()
             {
                 partyId = Data.PartyId,
+                inviterId = Data.InviterId,
             }, DeclinePartyInvitationCallback);
             Hide();
         }

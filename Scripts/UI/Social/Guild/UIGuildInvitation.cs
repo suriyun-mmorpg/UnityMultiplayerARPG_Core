@@ -41,6 +41,7 @@ namespace MultiplayerARPG
             GameInstance.ClientGuildHandlers.RequestAcceptGuildInvitation(new RequestAcceptGuildInvitationMessage()
             {
                 guildId = Data.GuildId,
+                inviterId = Data.InviterId,
             }, AcceptGuildInvitationCallback);
         }
 
@@ -56,6 +57,7 @@ namespace MultiplayerARPG
             GameInstance.ClientGuildHandlers.RequestDeclineGuildInvitation(new RequestDeclineGuildInvitationMessage()
             {
                 guildId = Data.GuildId,
+                inviterId = Data.InviterId,
             }, DeclineGuildInvitationCallback);
             Hide();
         }

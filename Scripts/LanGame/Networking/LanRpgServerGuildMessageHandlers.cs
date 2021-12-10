@@ -35,6 +35,9 @@ namespace MultiplayerARPG
             GameInstance.ServerGuildHandlers.RemoveGuildInvitation(request.guildId, playerCharacter.Id);
             GameInstance.ServerGameMessageHandlers.SendSetFullGuildData(requestHandler.ConnectionId, validateResult.Guild);
             GameInstance.ServerGameMessageHandlers.SendAddGuildMemberToMembers(validateResult.Guild, playerCharacter.Id, playerCharacter.CharacterName, playerCharacter.DataId, playerCharacter.Level);
+            // Send message to inviter
+            GameInstance.ServerGameMessageHandlers.SendGameMessageByCharacterId(request.inviterId, UITextKeys.UI_GUILD_INVITATION_ACCEPTED);
+            // Response to invitee
             result.Invoke(AckResponseCode.Success, new ResponseAcceptGuildInvitationMessage()
             {
                 message = UITextKeys.UI_GUILD_INVITATION_ACCEPTED,
@@ -63,6 +66,9 @@ namespace MultiplayerARPG
                 return;
             }
             GameInstance.ServerGuildHandlers.RemoveGuildInvitation(request.guildId, playerCharacter.Id);
+            // Send message to inviter
+            GameInstance.ServerGameMessageHandlers.SendGameMessageByCharacterId(request.inviterId, UITextKeys.UI_GUILD_INVITATION_DECLINED);
+            // Response to invitee
             result.Invoke(AckResponseCode.Success, new ResponseDeclineGuildInvitationMessage()
             {
                 message = UITextKeys.UI_GUILD_INVITATION_DECLINED,

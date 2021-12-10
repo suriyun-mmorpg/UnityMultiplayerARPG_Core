@@ -35,6 +35,9 @@ namespace MultiplayerARPG
             GameInstance.ServerPartyHandlers.RemovePartyInvitation(request.partyId, playerCharacter.Id);
             GameInstance.ServerGameMessageHandlers.SendSetFullPartyData(requestHandler.ConnectionId, validateResult.Party);
             GameInstance.ServerGameMessageHandlers.SendAddPartyMemberToMembers(validateResult.Party, playerCharacter.Id, playerCharacter.CharacterName, playerCharacter.DataId, playerCharacter.Level);
+            // Send message to inviter
+            GameInstance.ServerGameMessageHandlers.SendGameMessageByCharacterId(request.inviterId, UITextKeys.UI_PARTY_INVITATION_ACCEPTED);
+            // Response to invitee
             result.Invoke(AckResponseCode.Success, new ResponseAcceptPartyInvitationMessage()
             {
                 message = UITextKeys.UI_PARTY_INVITATION_ACCEPTED,
@@ -63,6 +66,9 @@ namespace MultiplayerARPG
                 return;
             }
             GameInstance.ServerPartyHandlers.RemovePartyInvitation(request.partyId, playerCharacter.Id);
+            // Send message to inviter
+            GameInstance.ServerGameMessageHandlers.SendGameMessageByCharacterId(request.inviterId, UITextKeys.UI_PARTY_INVITATION_DECLINED);
+            // Response to invitee
             result.Invoke(AckResponseCode.Success, new ResponseDeclinePartyInvitationMessage()
             {
                 message = UITextKeys.UI_PARTY_INVITATION_DECLINED,
