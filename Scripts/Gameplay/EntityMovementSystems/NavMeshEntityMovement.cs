@@ -168,6 +168,7 @@ namespace MultiplayerARPG
 
         public override void EntityUpdate()
         {
+            CacheNavMeshAgent.speed = Entity.GetMoveSpeed();
             float deltaTime = Time.deltaTime;
             if (targetYRotation.HasValue)
             {
@@ -241,16 +242,10 @@ namespace MultiplayerARPG
 
         private void SetMovePaths(Vector3 position, bool useKeyMovement)
         {
-            SetMovePaths(position, Entity.GetMoveSpeed(), useKeyMovement);
-        }
-
-        private void SetMovePaths(Vector3 position, float moveSpeed, bool useKeyMovement)
-        {
             if (!Entity.CanMove())
                 return;
             CacheNavMeshAgent.updatePosition = true;
             CacheNavMeshAgent.updateRotation = true;
-            CacheNavMeshAgent.speed = moveSpeed;
             if (CacheNavMeshAgent.isOnNavMesh)
             {
                 CacheNavMeshAgent.isStopped = false;
