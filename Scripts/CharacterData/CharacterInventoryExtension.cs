@@ -49,11 +49,21 @@ namespace MultiplayerARPG
                     }
                     else
                     {
-                        // Swapping
-                        CharacterItem storageItem = storageItems[storageItemIndex].Clone(true);
-                        CharacterItem nonEquipItem = playerCharacter.NonEquipItems[inventoryItemIndex].Clone(true);
-                        storageItems[storageItemIndex] = nonEquipItem;
-                        playerCharacter.NonEquipItems[inventoryItemIndex] = storageItem;
+                        if (playerCharacter.NonEquipItems[inventoryItemIndex].IsEmptySlot())
+                        {
+                            // Replace empty slot
+                            playerCharacter.NonEquipItems[inventoryItemIndex] = movingItem;
+                            // Remove from storage
+                            storageItems.DecreaseItemsByIndex(storageItemIndex, storageItemAmount, storageIsLimitSlot);
+                        }
+                        else
+                        {
+                            // Swapping
+                            CharacterItem storageItem = storageItems[storageItemIndex].Clone(true);
+                            CharacterItem nonEquipItem = playerCharacter.NonEquipItems[inventoryItemIndex].Clone(true);
+                            storageItems[storageItemIndex] = nonEquipItem;
+                            playerCharacter.NonEquipItems[inventoryItemIndex] = storageItem;
+                        }
                     }
                     break;
             }
@@ -167,11 +177,21 @@ namespace MultiplayerARPG
                     }
                     else
                     {
-                        // Swapping
-                        CharacterItem storageItem = storageItems[storageItemIndex].Clone(true);
-                        CharacterItem nonEquipItem = playerCharacter.NonEquipItems[inventoryItemIndex].Clone(true);
-                        storageItems[storageItemIndex] = nonEquipItem;
-                        playerCharacter.NonEquipItems[inventoryItemIndex] = storageItem;
+                        if (storageItems[storageItemIndex].IsEmptySlot())
+                        {
+                            // Replace empty slot
+                            storageItems[storageItemIndex] = movingItem;
+                            // Remove from inventory
+                            playerCharacter.DecreaseItemsByIndex(inventoryItemIndex, inventoryItemAmount);
+                        }
+                        else
+                        {
+                            // Swapping
+                            CharacterItem storageItem = storageItems[storageItemIndex].Clone(true);
+                            CharacterItem nonEquipItem = playerCharacter.NonEquipItems[inventoryItemIndex].Clone(true);
+                            storageItems[storageItemIndex] = nonEquipItem;
+                            playerCharacter.NonEquipItems[inventoryItemIndex] = storageItem;
+                        }
                     }
                     break;
             }
