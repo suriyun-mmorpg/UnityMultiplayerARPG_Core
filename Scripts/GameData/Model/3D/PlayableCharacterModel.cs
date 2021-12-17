@@ -5,7 +5,7 @@ using UnityEngine.Playables;
 
 namespace MultiplayerARPG.GameData.Model.Playables
 {
-    public class PlayableCharacterModel : BaseCharacterModel
+    public partial class PlayableCharacterModel : BaseCharacterModel
     {
         [Header("Relates Components")]
         [Tooltip("It will find `Animator` component on automatically if this is NULL")]

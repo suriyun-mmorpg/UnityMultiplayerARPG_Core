@@ -5,7 +5,7 @@ using UnityEditor;
 
 namespace MultiplayerARPG
 {
-    public abstract class BaseRemakeCharacterModel : BaseCharacterModel
+    public abstract partial class BaseRemakeCharacterModel : BaseCharacterModel
     {
         // Clip name variables
         // Move

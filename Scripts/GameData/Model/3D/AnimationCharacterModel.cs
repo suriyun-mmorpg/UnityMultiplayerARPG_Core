@@ -8,7 +8,7 @@ using UnityEditor;
 
 namespace MultiplayerARPG
 {
-    public class AnimationCharacterModel : BaseRemakeCharacterModel
+    public partial class AnimationCharacterModel : BaseRemakeCharacterModel
     {
         [Header("Settings")]
         public float actionClipFadeLength = 0.1f;

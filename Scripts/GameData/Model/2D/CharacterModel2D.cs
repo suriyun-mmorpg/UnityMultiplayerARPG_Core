@@ -8,7 +8,7 @@ using UnityEditor;
 namespace MultiplayerARPG
 {
     [ExecuteInEditMode]
-    public class CharacterModel2D : BaseCharacterModel
+    public partial class CharacterModel2D : BaseCharacterModel
     {
         public enum SampleAnimation
         {

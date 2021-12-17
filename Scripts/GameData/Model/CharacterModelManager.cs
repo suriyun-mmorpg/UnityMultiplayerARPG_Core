@@ -8,7 +8,7 @@ using UnityEditor;
 namespace MultiplayerARPG
 {
     [DisallowMultipleComponent]
-    public class CharacterModelManager : BaseGameEntityComponent<BaseGameEntity>
+    public partial class CharacterModelManager : BaseGameEntityComponent<BaseGameEntity>
     {
         public const byte HIDE_SETTER_ENTITY = 0;
         public const byte HIDE_SETTER_CONTROLLER = 1;
