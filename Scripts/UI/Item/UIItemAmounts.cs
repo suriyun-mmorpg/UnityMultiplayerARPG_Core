@@ -87,11 +87,7 @@ namespace MultiplayerARPG
                     tempCurrentAmount = 0;
                     // Get item amount from character
                     if (GameInstance.PlayingCharacter != null)
-                    {
-                        int indexOfItem = GameInstance.PlayingCharacter.IndexOfNonEquipItem(tempData.DataId);
-                        if (indexOfItem >= 0)
-                            tempCurrentAmount = GameInstance.PlayingCharacter.NonEquipItems[indexOfItem].amount;
-                    }
+                        tempCurrentAmount = GameInstance.PlayingCharacter.CountNonEquipItems(tempData.DataId);
                     // Use difference format by option 
                     switch (displayType)
                     {
