@@ -194,11 +194,6 @@ namespace MultiplayerARPG
         }
         #endregion
 
-        // Equipped items changes checker
-        protected string dirtyEquipWeapons;
-        protected string dirtyEquipItems;
-        protected readonly StringBuilder tempDirtyEquipItems = new StringBuilder();
-
         #region Sync data changes callback
         /// <summary>
         /// Override this to do stuffs when id changes
@@ -485,44 +480,16 @@ namespace MultiplayerARPG
 
         protected void SetEquipWeaponsModels()
         {
-            tempDirtyEquipItems.Clear();
-            if (EquipWeapons.GetRightHandEquipmentItem() != null)
-                tempDirtyEquipItems.Append(0).Append(EquipWeapons.rightHand.dataId).Append(":").Append(EquipWeapons.rightHand.level);
-            if (EquipWeapons.GetLeftHandEquipmentItem() != null)
-                tempDirtyEquipItems.Append(1).Append(EquipWeapons.leftHand.dataId).Append(":").Append(EquipWeapons.leftHand.level);
-
-            if (!tempDirtyEquipItems.ToString().Equals(dirtyEquipWeapons))
-            {
-                CharacterModel.SetEquipWeapons(EquipWeapons);
-                if (FpsModel)
-                    FpsModel.SetEquipWeapons(EquipWeapons);
-                // Set dirty equip weapons for check changes later
-                dirtyEquipWeapons = tempDirtyEquipItems.ToString();
-            }
+            CharacterModel.SetEquipWeapons(EquipWeapons);
+            if (FpsModel)
+                FpsModel.SetEquipWeapons(EquipWeapons);
         }
 
         protected void SetEquipItemsModels()
         {
-            tempDirtyEquipItems.Clear();
-            if (EquipItems != null)
-            {
-                IEquipmentItem armorItem;
-                for (int i = 0; i < EquipItems.Count; ++i)
-                {
-                    armorItem = EquipItems[i].GetArmorItem();
-                    if (armorItem == null) continue;
-                    tempDirtyEquipItems.Append(i).Append(":").Append(EquipItems[i].dataId).Append(":").Append(EquipItems[i].level);
-                }
-            }
-
-            if (!tempDirtyEquipItems.ToString().Equals(dirtyEquipItems))
-            {
-                CharacterModel.SetEquipItems(equipItems);
-                if (FpsModel)
-                    FpsModel.SetEquipItems(equipItems);
-                // Set dirty equip items for check changes later
-                dirtyEquipItems = tempDirtyEquipItems.ToString();
-            }
+            CharacterModel.SetEquipItems(EquipItems);
+            if (FpsModel)
+                FpsModel.SetEquipItems(EquipItems);
         }
     }
 }

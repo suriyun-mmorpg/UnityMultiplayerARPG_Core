@@ -20,6 +20,5 @@ namespace MultiplayerARPG
         public event System.Action<LiteNetLibSyncList.Operation, int> onHotkeysOperation;
         public event System.Action<LiteNetLibSyncList.Operation, int> onQuestsOperation;
         public event System.Action<LiteNetLibSyncList.Operation, int> onCurrenciesOperation;
-        public event System.Action<CharacterItem[]> onStorageItemsChange;
     }
 }

@@ -235,12 +235,6 @@ namespace MultiplayerARPG
             if (onCurrenciesOperation != null)
                 onCurrenciesOperation.Invoke(operation, index);
         }
-
-        protected virtual void OnStorageItemsChange(bool isInitial, CharacterItem[] storageItems)
-        {
-            if (onStorageItemsChange != null)
-                onStorageItemsChange.Invoke(storageItems);
-        }
         #endregion
     }
 }
