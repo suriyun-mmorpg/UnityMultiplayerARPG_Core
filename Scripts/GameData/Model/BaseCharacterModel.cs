@@ -59,22 +59,22 @@ namespace MultiplayerARPG
         public CharacterModelManager Manager { get; private set; }
 
         /// <summary>
-        /// Dictionary[vehicleType(Int32), vehicleCharacterModel(VehicleCharacterModel)]
+        /// { vehicleType(Int32), vehicleCharacterModel(VehicleCharacterModel) }
         /// </summary>
         public Dictionary<int, VehicleCharacterModel> CacheVehicleModels { get; private set; }
 
         /// <summary>
-        /// Dictionary[equipSocket(String), container(EquipmentModelContainer)]
+        /// { equipSocket(String), container(EquipmentModelContainer) }
         /// </summary>
         public Dictionary<string, EquipmentContainer> CacheEquipmentModelContainers { get; private set; }
 
         /// <summary>
-        /// Dictionary[equipPosition(String), Dictionary[equipSocket(String), model(GameObject)]]
+        /// { equipPosition(String), { equipSocket(String), model(GameObject) } }
         /// </summary>
         private readonly Dictionary<string, Dictionary<string, GameObject>> cacheModels = new Dictionary<string, Dictionary<string, GameObject>>();
 
         /// <summary>
-        /// Dictionary[equipPosition(String), List[effect(GameEffect)]]
+        /// { equipPosition(String), [ effect(GameEffect) ] }
         /// </summary>
         private readonly Dictionary<string, List<GameEffect>> cacheEffects = new Dictionary<string, List<GameEffect>>();
 
@@ -84,6 +84,9 @@ namespace MultiplayerARPG
         protected readonly Dictionary<string, List<BaseEquipmentEntity>> equipmentEntities = new Dictionary<string, List<BaseEquipmentEntity>>();
 
         // Item Ids
+        /// <summary>
+        /// { equipPosition(String), itemDataId(Int32) }
+        /// </summary>
         protected readonly Dictionary<string, int> itemIds = new Dictionary<string, int>();
 
         // Protected fields
