@@ -13,6 +13,7 @@ namespace MultiplayerARPG
         IsEquipment = 1 << 1,
         IsWeapon = 1 << 2,
         IsPet = 1 << 3,
+        IsEmpty = 1 << 4,
     }
 
     internal static class CharacterItemSyncStateExtensions
@@ -557,6 +558,11 @@ namespace MultiplayerARPG
 
         public void Serialize(NetDataWriter writer)
         {
+            if (this.IsEmptySlot())
+            {
+                writer.Put((byte)CharacterItemSyncState.IsEmpty);
+                return;
+            }
             bool isEquipment = GetEquipmentItem() != null;
             bool isWeapon = isEquipment && GetWeaponItem() != null;
             bool isPet = GetPetItem() != null;
@@ -615,6 +621,22 @@ namespace MultiplayerARPG
         public void Deserialize(NetDataReader reader)
         {
             CharacterItemSyncState syncState = (CharacterItemSyncState)reader.GetByte();
+            if (syncState == CharacterItemSyncState.IsEmpty)
+            {
+                id = string.Empty;
+                dataId = 0;
+                level = 0;
+                amount = 0;
+                equipSlotIndex = 0;
+                durability = 0;
+                exp = 0;
+                lockRemainsDuration = 0;
+                expireTime = 0;
+                randomSeed = 0;
+                ammo = 0;
+                Sockets.Clear();
+                return;
+            }
 
             id = reader.GetString();
             expireTime = reader.GetPackedLong();
