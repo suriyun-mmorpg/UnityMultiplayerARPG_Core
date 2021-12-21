@@ -157,6 +157,8 @@ namespace MultiplayerARPG
             {
                 dataId = request.dataId,
             });
+
+            await UniTask.Yield();
         }
 
         public async UniTaskVoid HandleRequestCashPackageInfo(
