@@ -110,5 +110,7 @@
         public const ushort ChangeGuildAutoAcceptRequests = 184;
         public const ushort ClaimAllMailsItems = 185;
         public const ushort DeleteAllMails = 186;
+        // Gacha
+        public const ushort OpenGacha = 187;
     }
 }

@@ -102,11 +102,7 @@ namespace MultiplayerARPG
                     // Increase character items
                     if (cashShopItem.ReceiveItems != null && cashShopItem.ReceiveItems.Length > 0)
                     {
-                        foreach (ItemAmount receiveItem in cashShopItem.ReceiveItems)
-                        {
-                            if (receiveItem.item == null || receiveItem.amount <= 0) continue;
-                            playerCharacter.AddOrSetNonEquipItems(CharacterItem.Create(receiveItem.item, 1, receiveItem.amount));
-                        }
+                        playerCharacter.IncreaseItems(cashShopItem.ReceiveItems);
                         playerCharacter.FillEmptySlots();
                     }
                 }

@@ -55,6 +55,7 @@ namespace MultiplayerARPG
         public static IClientStorageHandlers ClientStorageHandlers { get; set; }
         public static IClientPartyHandlers ClientPartyHandlers { get; set; }
         public static IClientGuildHandlers ClientGuildHandlers { get; set; }
+        public static IClientGachaHandlers ClientGachaHandlers { get; set; }
         public static IClientFriendHandlers ClientFriendHandlers { get; set; }
         public static IClientBankHandlers ClientBankHandlers { get; set; }
         public static IClientOnlineCharacterHandlers ClientOnlineCharacterHandlers { get; set; }
@@ -98,6 +99,7 @@ namespace MultiplayerARPG
         public static readonly Dictionary<int, Quest> Quests = new Dictionary<int, Quest>();
         public static readonly Dictionary<int, GuildSkill> GuildSkills = new Dictionary<int, GuildSkill>();
         public static readonly Dictionary<int, GuildIcon> GuildIcons = new Dictionary<int, GuildIcon>();
+        public static readonly Dictionary<int, Gacha> Gachas = new Dictionary<int, Gacha>();
         public static readonly Dictionary<int, StatusEffect> StatusEffects = new Dictionary<int, StatusEffect>();
         public static readonly Dictionary<int, DamageElement> DamageElements = new Dictionary<int, DamageElement>();
         public static readonly Dictionary<int, EquipmentSet> EquipmentSets = new Dictionary<int, EquipmentSet>();
@@ -639,6 +641,7 @@ namespace MultiplayerARPG
             Quests.Clear();
             GuildSkills.Clear();
             GuildIcons.Clear();
+            Gachas.Clear();
             StatusEffects.Clear();
             DamageElements.Clear();
             EquipmentSets.Clear();
@@ -1145,6 +1148,16 @@ namespace MultiplayerARPG
         public static void AddGuildIcons(IEnumerable<GuildIcon> guildIcons)
         {
             AddManyGameData(GuildIcons, guildIcons);
+        }
+
+        public static void AddGachas(params Gacha[] gachas)
+        {
+            AddGachas((IEnumerable<Gacha>)gachas);
+        }
+
+        public static void AddGachas(IEnumerable<Gacha> gachas)
+        {
+            AddManyGameData(Gachas, gachas);
         }
 
         public static void AddStatusEffects(params StatusEffectApplying[] statusEffects)

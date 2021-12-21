@@ -38,6 +38,7 @@ namespace MultiplayerARPG
         protected IServerInventoryMessageHandlers ServerInventoryMessageHandlers { get; set; }
         protected IServerPartyMessageHandlers ServerPartyMessageHandlers { get; set; }
         protected IServerGuildMessageHandlers ServerGuildMessageHandlers { get; set; }
+        protected IServerGachaMessageHandlers ServerGachaMessageHandlers { get; set; }
         protected IServerFriendMessageHandlers ServerFriendMessageHandlers { get; set; }
         protected IServerBankMessageHandlers ServerBankMessageHandlers { get; set; }
         // Client handlers
@@ -48,6 +49,7 @@ namespace MultiplayerARPG
         protected IClientInventoryHandlers ClientInventoryHandlers { get; set; }
         protected IClientPartyHandlers ClientPartyHandlers { get; set; }
         protected IClientGuildHandlers ClientGuildHandlers { get; set; }
+        protected IClientGachaHandlers ClientGachaHandlers { get; set; }
         protected IClientFriendHandlers ClientFriendHandlers { get; set; }
         protected IClientBankHandlers ClientBankHandlers { get; set; }
         protected IClientOnlineCharacterHandlers ClientOnlineCharacterHandlers { get; set; }
@@ -261,6 +263,11 @@ namespace MultiplayerARPG
                 RegisterRequestToServer<EmptyMessage, ResponseGetGuildRequestsMessage>(GameNetworkingConsts.GetGuildRequests, ServerGuildMessageHandlers.HandleRequestGetGuildRequests);
                 RegisterRequestToServer<RequestFindGuildsMessage, ResponseFindGuildsMessage>(GameNetworkingConsts.FindGuilds, ServerGuildMessageHandlers.HandleRequestFindGuilds);
             }
+            // Gacha
+            if (ServerGachaMessageHandlers != null)
+            {
+                RegisterRequestToServer<RequestOpenGachaMessage, ResponseOpenGachaMessage>(GameNetworkingConsts.OpenGacha, ServerGachaMessageHandlers.HandleRequestOpenGacha);
+            }
             // Friend
             if (ServerFriendMessageHandlers != null)
             {
@@ -356,6 +363,7 @@ namespace MultiplayerARPG
             GameInstance.ClientInventoryHandlers = ClientInventoryHandlers;
             GameInstance.ClientPartyHandlers = ClientPartyHandlers;
             GameInstance.ClientGuildHandlers = ClientGuildHandlers;
+            GameInstance.ClientGachaHandlers = ClientGachaHandlers;
             GameInstance.ClientFriendHandlers = ClientFriendHandlers;
             GameInstance.ClientBankHandlers = ClientBankHandlers;
             GameInstance.ClientOnlineCharacterHandlers = ClientOnlineCharacterHandlers;
