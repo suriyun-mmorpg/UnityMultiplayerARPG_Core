@@ -5,7 +5,7 @@ using UnityEngine;
 
 namespace MultiplayerARPG
 {
-    public partial class DefaultServerGachaMessageHandlers : MonoBehaviour, IServerGachaMessageHandlers
+    public partial class LanRpgServerGachaMessageHandlers : MonoBehaviour, IServerGachaMessageHandlers
     {
         public async UniTaskVoid HandleRequestOpenGacha(RequestHandlerData requestHandler, RequestOpenGachaMessage request, RequestProceedResultDelegate<ResponseOpenGachaMessage> result)
         {
@@ -31,7 +31,7 @@ namespace MultiplayerARPG
             }
 
             int price = request.openMode == GachaOpenMode.Multiple ? gacha.MultipleModeOpenPrice : gacha.SingleModeOpenPrice;
-            int cash = playerCharacter.Cash;
+            int cash = playerCharacter.UserCash;
             if (cash < price)
             {
                 result.Invoke(AckResponseCode.Error, new ResponseOpenGachaMessage()
@@ -53,7 +53,7 @@ namespace MultiplayerARPG
             }
             // Decrease cash amount
             cash -= price;
-            playerCharacter.Cash = cash;
+            playerCharacter.UserCash = cash;
             // Increase character items
             playerCharacter.IncreaseItems(itemAmounts);
             playerCharacter.FillEmptySlots();
