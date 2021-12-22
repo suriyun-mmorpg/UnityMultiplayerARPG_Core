@@ -75,12 +75,14 @@ namespace MultiplayerARPG
 
             int characterGold = playerCharacter.Gold;
             int userCash = playerCharacter.UserCash;
-            int priceCash = 0;
             int priceGold = 0;
+            int priceCash = 0;
+            int changeCharacterGold = 0;
+            int changeUserCash = 0;
 
+            // Validate cash
             if (request.currencyType == CashShopItemCurrencyType.CASH)
             {
-                // Validate cash
                 priceCash = cashShopItem.SellPriceCash * request.amount;
                 if (userCash < priceCash)
                 {
@@ -90,11 +92,12 @@ namespace MultiplayerARPG
                     });
                     return;
                 }
+                changeUserCash -= priceCash;
             }
 
+            // Validate gold
             if (request.currencyType == CashShopItemCurrencyType.GOLD)
             {
-                // Validate gold
                 priceGold = cashShopItem.SellPriceGold * request.amount;
                 if (characterGold < priceGold)
                 {
@@ -104,7 +107,12 @@ namespace MultiplayerARPG
                     });
                     return;
                 }
+                changeCharacterGold -= priceGold;
             }
+
+            // Increase gold
+            if (cashShopItem.ReceiveGold > 0)
+                changeCharacterGold = changeCharacterGold.Increase(cashShopItem.ReceiveGold * request.amount);
 
             // Increase items
             if (cashShopItem.ReceiveItems != null &&
@@ -131,24 +139,9 @@ namespace MultiplayerARPG
                 playerCharacter.FillEmptySlots();
             }
 
-            if (request.currencyType == CashShopItemCurrencyType.CASH)
-            {
-                // Reduce cash
-                userCash -= priceCash;
-            }
-
-            if (request.currencyType == CashShopItemCurrencyType.GOLD)
-            {
-                // Reduce gold
-                characterGold -= priceGold;
-            }
-
-            if (cashShopItem.ReceiveGold > 0)
-            {
-                // Increase gold
-                characterGold = characterGold.Increase(cashShopItem.ReceiveGold * request.amount);
-            }
-
+            // Update currency
+            characterGold += changeCharacterGold;
+            userCash += changeUserCash;
             playerCharacter.Gold = characterGold;
             playerCharacter.UserCash = userCash;
 
