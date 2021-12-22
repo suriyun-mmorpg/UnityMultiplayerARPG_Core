@@ -40,6 +40,7 @@ namespace MultiplayerARPG
         public BaseMapInfo[] mapInfos;
         public Quest[] quests;
         public Faction[] factions;
+        public Gacha[] gachas;
 
         [Header("Set Asset Bundle Name Tools")]
         public string attributeBundleName = "attribute";
@@ -51,7 +52,10 @@ namespace MultiplayerARPG
         public string sceneBundleName = "scene";
         public string skillBundleName = "skill";
         public string guildSkillBundleName = "guildSkill";
+        public string guildIconBundleName = "guildIcon";
         public string questBundleName = "quest";
+        public string factionBundleName = "faction";
+        public string gachaBundleName = "gacha";
         public bool setNameForUnnamedAssetsOnly = true;
 
         protected override async UniTask LoadDataImplement(GameInstance gameInstance)
@@ -77,6 +81,7 @@ namespace MultiplayerARPG
             GameInstance.AddMapInfos(mapInfos);
             GameInstance.AddQuests(quests);
             GameInstance.AddFactions(factions);
+            GameInstance.AddGachas(gachas);
             this.InvokeInstanceDevExtMethods("LoadDataImplement", gameInstance);
             await UniTask.Yield();
         }
@@ -174,12 +179,33 @@ namespace MultiplayerARPG
                 if (string.IsNullOrEmpty(assetImporter.assetBundleName))
                     assetImporter.SetAssetBundleNameAndVariant(guildSkillBundleName, "");
             }
+            foreach (GuildIcon asset in GameInstance.GuildIcons.Values)
+            {
+                assetPath = AssetDatabase.GetAssetPath(asset.GetInstanceID());
+                assetImporter = AssetImporter.GetAtPath(assetPath);
+                if (string.IsNullOrEmpty(assetImporter.assetBundleName))
+                    assetImporter.SetAssetBundleNameAndVariant(guildIconBundleName, "");
+            }
             foreach (Quest asset in GameInstance.Quests.Values)
             {
                 assetPath = AssetDatabase.GetAssetPath(asset.GetInstanceID());
                 assetImporter = AssetImporter.GetAtPath(assetPath);
                 if (string.IsNullOrEmpty(assetImporter.assetBundleName))
                     assetImporter.SetAssetBundleNameAndVariant(questBundleName, "");
+            }
+            foreach (Faction asset in GameInstance.Factions.Values)
+            {
+                assetPath = AssetDatabase.GetAssetPath(asset.GetInstanceID());
+                assetImporter = AssetImporter.GetAtPath(assetPath);
+                if (string.IsNullOrEmpty(assetImporter.assetBundleName))
+                    assetImporter.SetAssetBundleNameAndVariant(factionBundleName, "");
+            }
+            foreach (Gacha asset in GameInstance.Gachas.Values)
+            {
+                assetPath = AssetDatabase.GetAssetPath(asset.GetInstanceID());
+                assetImporter = AssetImporter.GetAtPath(assetPath);
+                if (string.IsNullOrEmpty(assetImporter.assetBundleName))
+                    assetImporter.SetAssetBundleNameAndVariant(gachaBundleName, "");
             }
         }
 #endif
@@ -205,6 +231,7 @@ namespace MultiplayerARPG
             GameInstance.AddMapInfos(mapInfos);
             GameInstance.AddQuests(quests);
             GameInstance.AddFactions(factions);
+            GameInstance.AddGachas(gachas);
             GameInstance.AddCharacterEntities(playerCharacterEntities);
             GameInstance.AddCharacterEntities(monsterCharacterEntities);
             GameInstance.AddVehicleEntities(vehicleEntities);
@@ -278,6 +305,9 @@ namespace MultiplayerARPG
 
             List<Faction> tempFactions = new List<Faction>(GameInstance.Factions.Values);
             factions = tempFactions.ToArray();
+
+            List<Gacha> tempGachas = new List<Gacha>(GameInstance.Gachas.Values);
+            gachas = tempGachas.ToArray();
 
             this.InvokeInstanceDevExtMethods("LoadReferredData");
 #if UNITY_EDITOR
