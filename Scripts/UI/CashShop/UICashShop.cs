@@ -23,6 +23,7 @@ namespace MultiplayerARPG
         [FormerlySerializedAs("uiCashShopItemContainer")]
         public Transform uiContainer;
         public TextWrapper uiTextCash;
+        public UIRewarding uiRewarding;
 
         private UIList cacheList;
         public UIList CacheList
@@ -140,7 +141,22 @@ namespace MultiplayerARPG
         {
             ClientCashShopActions.ResponseCashShopBuy(requestHandler, responseCode, response);
             if (responseCode.ShowUnhandledResponseMessageDialog(response.message)) return;
-            UISceneGlobal.Singleton.ShowMessageDialog(LanguageManager.GetText(UITextKeys.UI_LABEL_SUCCESS.ToString()), LanguageManager.GetText(UITextKeys.UI_CASH_SHOP_ITEM_BOUGHT.ToString()));
+            if (uiRewarding != null)
+            {
+                uiRewarding.Data = new UIRewardingData()
+                {
+                    rewardGold = response.rewardGold,
+                    rewardItems = response.rewardItems.ToArray(),
+                    rewardSkins = response.rewardItemSkins.ToArray(),
+                    rewardCostumes = response.rewardCostumes.ToArray(),
+                    rewardCharacters = response.rewardCharacters.ToArray(),
+                    rewardCompanions = response.rewardCompanions.ToArray(),
+                };
+            }
+            else
+            {
+                UISceneGlobal.Singleton.ShowMessageDialog(LanguageManager.GetText(UITextKeys.UI_LABEL_SUCCESS.ToString()), LanguageManager.GetText(UITextKeys.UI_CASH_SHOP_ITEM_BOUGHT.ToString()));
+            }
             Refresh();
         }
 

@@ -33,7 +33,8 @@ namespace MultiplayerARPG
         public TextWrapper uiTextSellPriceCash;
         public TextWrapper uiTextSellPriceGold;
         [FormerlySerializedAs("textRecieveGold")]
-        public TextWrapper uiTextRecieveGold;
+        [FormerlySerializedAs("uiTextRecieveGold")]
+        public TextWrapper uiTextReceiveGold;
         [Tooltip("This will be shown when there is only one kind of item in the package")]
         public TextWrapper uiTextSingleItemAmount;
         public UICurrencyAmounts uiReceiveCurrencies;
@@ -145,9 +146,9 @@ namespace MultiplayerARPG
                 uiTextSellPriceGold.SetGameObjectActive(Data.SellPriceGold > 0);
             }
 
-            if (uiTextRecieveGold != null)
+            if (uiTextReceiveGold != null)
             {
-                uiTextRecieveGold.text = string.Format(
+                uiTextReceiveGold.text = string.Format(
                     LanguageManager.GetText(formatKeyReceiveGold),
                     Data == null ? "0" : Data.ReceiveGold.ToString("N0"));
             }
