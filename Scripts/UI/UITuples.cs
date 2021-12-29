@@ -170,4 +170,21 @@ namespace MultiplayerARPG
             this.maxSocket = maxSocket;
         }
     }
+
+    public struct UIRewardingData
+    {
+        public int rewardExp;
+        public int rewardGold;
+        public int rewardCash;
+        [ArrayElementTitle("item")]
+        public ItemAmount[] rewardItems;
+        [ArrayElementTitle("skin")]
+        public RewardItemSkin[] rewardSkins;
+        [ArrayElementTitle("costume")]
+        public RewardCostume[] rewardCostumes;
+        [ArrayElementTitle("character")]
+        public RewardCharacter[] rewardCharacters;
+        [ArrayElementTitle("companion")]
+        public RewardCompanion[] rewardCompanions;
+    }
 }
