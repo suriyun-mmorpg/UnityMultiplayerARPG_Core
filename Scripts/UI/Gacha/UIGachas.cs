@@ -146,6 +146,7 @@ namespace MultiplayerARPG
                     rewardCharacters = response.rewardCharacters.ToArray(),
                     rewardCompanions = response.rewardCompanions.ToArray(),
                 };
+                uiRewarding.Show();
             }
             else
             {
