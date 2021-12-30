@@ -64,6 +64,7 @@ namespace MultiplayerARPG
             CacheSelectionManager.eventOnDeselect.AddListener(OnDeselect);
             if (uiDialog != null)
                 uiDialog.onHide.AddListener(OnDialogHide);
+            Refresh();
         }
 
         protected virtual void OnDisable()
