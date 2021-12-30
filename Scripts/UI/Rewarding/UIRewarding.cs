@@ -12,8 +12,11 @@ namespace MultiplayerARPG
         public UILocaleKeySetting formatKeyRewardGold = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_REWARD_GOLD);
         [Tooltip("Format => {0} = {Cash Amount}")]
         public UILocaleKeySetting formatKeyRewardCash = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_REWARD_CASH);
+        public GameObject textRewardExpRoot;
         public TextWrapper textRewardExp;
+        public GameObject textRewardGoldRoot;
         public TextWrapper textRewardGold;
+        public GameObject textRewardCashRoot;
         public TextWrapper textRewardCash;
         public UICharacterItems uiRewardItems;
         public UIRewardItemSkins uiRewardSkins;
@@ -23,28 +26,37 @@ namespace MultiplayerARPG
 
         protected override void UpdateData()
         {
+            if (textRewardExpRoot != null)
+                textRewardExpRoot.SetActive(Data.rewardExp != 0);
+
             if (textRewardExp != null)
             {
-                textRewardExp.SetGameObjectActive(Data.rewardExp != 0);
                 textRewardExp.text = string.Format(
                     LanguageManager.GetText(formatKeyRewardExp),
                     Data.rewardExp.ToString("N0"));
+                textRewardExp.SetGameObjectActive(Data.rewardExp != 0);
             }
+
+            if (textRewardGoldRoot != null)
+                textRewardGoldRoot.SetActive(Data.rewardGold != 0);
 
             if (textRewardGold != null)
             {
-                textRewardGold.SetGameObjectActive(Data.rewardGold != 0);
                 textRewardGold.text = string.Format(
                     LanguageManager.GetText(formatKeyRewardGold),
                     Data.rewardGold.ToString("N0"));
+                textRewardGold.SetGameObjectActive(Data.rewardGold != 0);
             }
+
+            if (textRewardCashRoot != null)
+                textRewardCashRoot.SetActive(Data.rewardCash != 0);
 
             if (textRewardCash != null)
             {
-                textRewardCash.SetGameObjectActive(Data.rewardCash != 0);
                 textRewardCash.text = string.Format(
                     LanguageManager.GetText(formatKeyRewardCash),
                     Data.rewardCash.ToString("N0"));
+                textRewardCash.SetGameObjectActive(Data.rewardCash != 0);
             }
 
             if (uiRewardItems != null)

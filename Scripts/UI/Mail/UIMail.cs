@@ -24,7 +24,9 @@ namespace MultiplayerARPG
         public TextWrapper textSenderName;
         public TextWrapper textTitle;
         public TextWrapper textContent;
+        public GameObject textGoldRoot;
         public TextWrapper textGold;
+        public GameObject textCashRoot;
         public TextWrapper textCash;
         public UICharacterCurrencies uiCurrencies;
         public UICharacterItems uiItems;
@@ -138,6 +140,9 @@ namespace MultiplayerARPG
                 textContent.SetGameObjectActive(mail != null);
             }
 
+            if (textGoldRoot != null)
+                textGoldRoot.SetActive(mail != null && mail.Gold != 0);
+
             if (textGold != null)
             {
                 textGold.text = string.Format(
@@ -145,6 +150,9 @@ namespace MultiplayerARPG
                     mail == null ? "0" : mail.Gold.ToString("N0"));
                 textGold.SetGameObjectActive(mail != null && mail.Gold != 0);
             }
+
+            if (textCashRoot != null)
+                textCashRoot.SetActive(mail != null && mail.Cash != 0);
 
             if (textCash != null)
             {
