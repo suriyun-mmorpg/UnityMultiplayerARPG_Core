@@ -111,6 +111,7 @@
         public const ushort ClaimAllMailsItems = 185;
         public const ushort DeleteAllMails = 186;
         // Gacha
-        public const ushort OpenGacha = 187;
+        public const ushort GachaInfo = 187;
+        public const ushort OpenGacha = 188;
     }
 }
