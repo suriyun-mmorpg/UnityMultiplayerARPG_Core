@@ -3,9 +3,14 @@ using UnityEngine;
 
 namespace MultiplayerARPG
 {
-    [CreateAssetMenu(fileName = "Gacha", menuName = "Create CashShop/Gacha", order = -3994)]
+    [CreateAssetMenu(fileName = "Gacha", menuName = "Create GameData/Gacha", order = -4876)]
     public class Gacha : BaseGameData
     {
+        [Category("Gacha Settings")]
+        [SerializeField]
+        private string externalIconUrl = string.Empty;
+        public string ExternalIconUrl { get { return externalIconUrl; } }
+
         [SerializeField]
         private int singleModeOpenPrice = 10;
         public int SingleModeOpenPrice
@@ -27,6 +32,7 @@ namespace MultiplayerARPG
             get { return multipleModeOpenCount; }
         }
 
+        [ArrayElementTitle("item")]
         [SerializeField]
         private ItemRandomByWeight[] randomItems = new ItemRandomByWeight[0];
         public ItemRandomByWeight[] RandomItems
