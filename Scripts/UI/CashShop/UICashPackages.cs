@@ -145,7 +145,7 @@ namespace MultiplayerARPG
 
         public virtual void GenerateList()
         {
-            int selectedIdx = CacheSelectionManager.SelectedUI != null ? CacheSelectionManager.IndexOf(CacheSelectionManager.SelectedUI) : -1;
+            int selectedIdx = CacheSelectionManager.SelectedUI != null ? CacheSelectionManager.IndexOf(CacheSelectionManager.SelectedUI) : 0;
             CacheSelectionManager.DeselectSelectedUI();
             CacheSelectionManager.Clear();
             ConvertFilterCategoriesToTrimedLowerChar();
