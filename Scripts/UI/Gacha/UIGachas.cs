@@ -156,12 +156,13 @@ namespace MultiplayerARPG
 
         public virtual void GenerateList()
         {
-            int selectedIdx = CacheSelectionManager.SelectedUI != null ? CacheSelectionManager.IndexOf(CacheSelectionManager.SelectedUI) : 0;
+            int selectedDataId = CacheSelectionManager.SelectedUI != null ? CacheSelectionManager.SelectedUI.Data.DataId : 0;
             CacheSelectionManager.DeselectSelectedUI();
             CacheSelectionManager.Clear();
             ConvertFilterCategoriesToTrimedLowerChar();
 
             int showingCount = 0;
+            bool selectedOnce = false;
             UIGacha tempUI;
             CacheList.Generate(LoadedList, (index, data, ui) =>
             {
@@ -174,8 +175,11 @@ namespace MultiplayerARPG
                     tempUI.Data = data;
                     tempUI.Show();
                     CacheSelectionManager.Add(tempUI);
-                    if (selectedIdx == index)
+                    if (!selectedOnce || selectedDataId == data.DataId)
+                    {
+                        selectedOnce = true;
                         tempUI.OnClickSelect();
+                    }
                     showingCount++;
                 }
                 else
