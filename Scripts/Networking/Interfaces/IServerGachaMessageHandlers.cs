@@ -8,6 +8,10 @@ namespace MultiplayerARPG
     /// </summary>
     public partial interface IServerGachaMessageHandlers
     {
+        UniTaskVoid HandleRequestGachaInfo(
+            RequestHandlerData requestHandler, EmptyMessage request,
+            RequestProceedResultDelegate<ResponseGachaInfoMessage> result);
+
         UniTaskVoid HandleRequestOpenGacha(
             RequestHandlerData requestHandler, RequestOpenGachaMessage request,
             RequestProceedResultDelegate<ResponseOpenGachaMessage> result);

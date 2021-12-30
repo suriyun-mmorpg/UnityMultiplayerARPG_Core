@@ -7,6 +7,29 @@ namespace MultiplayerARPG
 {
     public partial class LanRpgServerGachaMessageHandlers : MonoBehaviour, IServerGachaMessageHandlers
     {
+        public async UniTaskVoid HandleRequestGachaInfo(
+            RequestHandlerData requestHandler, EmptyMessage request,
+            RequestProceedResultDelegate<ResponseGachaInfoMessage> result)
+        {
+            IPlayerCharacterData playerCharacter;
+            if (!GameInstance.ServerUserHandlers.TryGetPlayerCharacter(requestHandler.ConnectionId, out playerCharacter))
+            {
+                result.Invoke(AckResponseCode.Error, new ResponseGachaInfoMessage()
+                {
+                    message = UITextKeys.UI_ERROR_NOT_LOGGED_IN,
+                });
+                return;
+            }
+
+            result.Invoke(AckResponseCode.Success, new ResponseGachaInfoMessage()
+            {
+                cash = playerCharacter.Cash,
+                gachaIds = new List<int>(GameInstance.Gachas.Keys),
+            });
+
+            await UniTask.Yield();
+        }
+
         public async UniTaskVoid HandleRequestOpenGacha(RequestHandlerData requestHandler, RequestOpenGachaMessage request, RequestProceedResultDelegate<ResponseOpenGachaMessage> result)
         {
             await UniTask.Yield();
