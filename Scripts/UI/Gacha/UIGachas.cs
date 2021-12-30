@@ -84,6 +84,7 @@ namespace MultiplayerARPG
             if (uiDialog != null)
             {
                 uiDialog.selectionManager = CacheSelectionManager;
+                uiDialog.uiGachas = this;
                 uiDialog.Data = ui.Data;
                 uiDialog.Show();
             }
