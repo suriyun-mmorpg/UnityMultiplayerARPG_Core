@@ -168,7 +168,7 @@ namespace MultiplayerARPG
 
         public void HandleUpdateFriends(MessageHandlerData messageHandler)
         {
-            ClientFriendActions.NotifyFriendsUpdated(messageHandler.Reader.GetArray<SocialCharacterData>());
+            ClientFriendActions.NotifyFriendsUpdated(messageHandler.Reader.GetList<SocialCharacterData>());
         }
     }
 }

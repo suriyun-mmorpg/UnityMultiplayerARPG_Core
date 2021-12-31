@@ -1,22 +1,23 @@
 ﻿using LiteNetLib.Utils;
+using System.Collections.Generic;
 
 namespace MultiplayerARPG
 {
     public struct UpdateSocialMembersMessage : INetSerializable
     {
         public int id;
-        public SocialCharacterData[] members;
+        public List<SocialCharacterData> members;
 
         public void Deserialize(NetDataReader reader)
         {
-            id = reader.GetInt();
-            members = reader.GetArray<SocialCharacterData>();
+            id = reader.GetPackedInt();
+            members = reader.GetList<SocialCharacterData>();
         }
 
         public void Serialize(NetDataWriter writer)
         {
-            writer.Put(id);
-            writer.PutArray(members);
+            writer.PutPackedInt(id);
+            writer.PutList(members);
         }
     }
 }

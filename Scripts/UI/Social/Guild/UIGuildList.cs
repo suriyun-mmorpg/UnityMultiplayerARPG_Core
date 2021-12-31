@@ -1,4 +1,5 @@
 ﻿using LiteNetLibManager;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Serialization;
 
@@ -86,7 +87,7 @@ namespace MultiplayerARPG
             }
         }
 
-        protected virtual void UpdateFoundGuildsUIs(GuildListEntry[] foundGuilds)
+        protected virtual void UpdateFoundGuildsUIs(List<GuildListEntry> foundGuilds)
         {
             if (foundGuilds == null)
                 return;
@@ -106,7 +107,7 @@ namespace MultiplayerARPG
                     tempUi.OnClickSelect();
             });
             if (listEmptyObject != null)
-                listEmptyObject.SetActive(foundGuilds.Length == 0);
+                listEmptyObject.SetActive(foundGuilds.Count == 0);
         }
 
         public void OnClickFind()

@@ -1,4 +1,5 @@
 ﻿using LiteNetLibManager;
+using System.Collections.Generic;
 
 namespace MultiplayerARPG
 {
@@ -14,12 +15,12 @@ namespace MultiplayerARPG
             OnClickFindCharacters();
         }
 
-        private void UpdateFoundCharactersUIs(SocialCharacterData[] foundCharacters)
+        private void UpdateFoundCharactersUIs(List<SocialCharacterData> foundCharacters)
         {
             if (foundCharacters == null)
                 return;
 
-            memberAmount = foundCharacters.Length;
+            memberAmount = foundCharacters.Count;
             UpdateUIs();
 
             int selectedIdx = MemberSelectionManager.SelectedUI != null ? MemberSelectionManager.IndexOf(MemberSelectionManager.SelectedUI) : -1;
@@ -37,7 +38,7 @@ namespace MultiplayerARPG
                     uiFoundCharacter.OnClickSelect();
             });
             if (memberListEmptyObject != null)
-                memberListEmptyObject.SetActive(foundCharacters.Length == 0);
+                memberListEmptyObject.SetActive(foundCharacters.Count == 0);
         }
 
         public override bool CanKick(string characterId)

@@ -8,12 +8,12 @@ namespace MultiplayerARPG
 
         public void Deserialize(NetDataReader reader)
         {
-            option = reader.GetInt();
+            option = reader.GetPackedInt();
         }
 
         public void Serialize(NetDataWriter writer)
         {
-            writer.Put(option);
+            writer.PutPackedInt(option);
         }
     }
 }

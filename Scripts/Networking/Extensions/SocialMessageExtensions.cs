@@ -1,5 +1,6 @@
 ﻿using LiteNetLib;
 using LiteNetLib.Utils;
+using System.Collections.Generic;
 
 namespace MultiplayerARPG
 {
@@ -92,7 +93,7 @@ namespace MultiplayerARPG
             client.SendPacket(SOCIAL_MSG_DATA_CHANNEL, DeliveryMethod.ReliableOrdered, msgType, (writer) => writer.PutValue(MakeClearSocialMember(id)));
         }
 
-        public static UpdateSocialMembersMessage MakeSocialMembers(SocialCharacterData[] members)
+        public static UpdateSocialMembersMessage MakeSocialMembers(List<SocialCharacterData> members)
         {
             return new UpdateSocialMembersMessage()
             {
@@ -100,12 +101,12 @@ namespace MultiplayerARPG
             };
         }
 
-        public static void SendSocialMembers(this LiteNetLibManager.LiteNetLibServer server, long connectionId, ushort msgType, SocialCharacterData[] members)
+        public static void SendSocialMembers(this LiteNetLibManager.LiteNetLibServer server, long connectionId, ushort msgType, List<SocialCharacterData> members)
         {
             server.SendPacket(connectionId, SOCIAL_MSG_DATA_CHANNEL, DeliveryMethod.ReliableOrdered, msgType, (writer) => writer.PutValue(MakeSocialMembers(members)));
         }
 
-        public static void SendSocialMembers(this LiteNetLibManager.LiteNetLibClient client, ushort msgType, SocialCharacterData[] members)
+        public static void SendSocialMembers(this LiteNetLibManager.LiteNetLibClient client, ushort msgType, List<SocialCharacterData> members)
         {
             client.SendPacket(SOCIAL_MSG_DATA_CHANNEL, DeliveryMethod.ReliableOrdered, msgType, (writer) => writer.PutValue(MakeSocialMembers(members)));
         }

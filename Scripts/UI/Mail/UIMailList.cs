@@ -122,7 +122,7 @@ namespace MultiplayerARPG
                     tempUi.OnClickSelect();
             });
             if (listEmptyObject != null)
-                listEmptyObject.SetActive(response.mails.Length == 0);
+                listEmptyObject.SetActive(response.mails.Count == 0);
             onRefresh.Invoke();
         }
 

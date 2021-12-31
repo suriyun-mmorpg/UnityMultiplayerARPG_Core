@@ -18,7 +18,7 @@ namespace MultiplayerARPG
             sender = reader.GetString();
             receiver = reader.GetString();
             if (channel == ChatChannel.Party || channel == ChatChannel.Guild)
-                channelId = reader.GetInt();
+                channelId = reader.GetPackedInt();
             sendByServer = reader.GetBool();
         }
 
@@ -29,7 +29,7 @@ namespace MultiplayerARPG
             writer.Put(sender);
             writer.Put(receiver);
             if (channel == ChatChannel.Party || channel == ChatChannel.Guild)
-                writer.Put(channelId);
+                writer.PutPackedInt(channelId);
             writer.Put(sendByServer);
         }
     }

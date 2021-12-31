@@ -1,22 +1,25 @@
 ﻿using LiteNetLib.Utils;
+using System.Collections.Generic;
 
 namespace MultiplayerARPG
 {
     public struct ResponseGetGuildRequestsMessage : INetSerializable
     {
         public UITextKeys message;
-        public SocialCharacterData[] guildRequests;
+        public List<SocialCharacterData> guildRequests;
 
         public void Deserialize(NetDataReader reader)
         {
             message = (UITextKeys)reader.GetPackedUShort();
-            guildRequests = reader.GetArray<SocialCharacterData>();
+            if (message == UITextKeys.NONE)
+                guildRequests = reader.GetList<SocialCharacterData>();
         }
 
         public void Serialize(NetDataWriter writer)
         {
             writer.PutPackedUShort((ushort)message);
-            writer.PutArray(guildRequests);
+            if (message == UITextKeys.NONE)
+                writer.PutList(guildRequests);
         }
     }
 }

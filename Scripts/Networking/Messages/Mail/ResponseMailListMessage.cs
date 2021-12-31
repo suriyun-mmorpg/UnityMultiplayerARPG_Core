@@ -1,22 +1,23 @@
 ﻿using LiteNetLib.Utils;
+using System.Collections.Generic;
 
 namespace MultiplayerARPG
 {
     public struct ResponseMailListMessage : INetSerializable
     {
         public bool onlyNewMails;
-        public MailListEntry[] mails;
+        public List<MailListEntry> mails;
 
         public void Deserialize(NetDataReader reader)
         {
             onlyNewMails = reader.GetBool();
-            mails = reader.GetArray<MailListEntry>();
+            mails = reader.GetList<MailListEntry>();
         }
 
         public void Serialize(NetDataWriter writer)
         {
             writer.Put(onlyNewMails);
-            writer.PutArray(mails);
+            writer.PutList(mails);
         }
     }
 }

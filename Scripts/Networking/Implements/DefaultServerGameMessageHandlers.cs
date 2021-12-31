@@ -222,11 +222,11 @@ namespace MultiplayerARPG
         }
 
         // Friends
-        public void SendSetFriends(long connectionId, SocialCharacterData[] friends)
+        public void SendSetFriends(long connectionId, List<SocialCharacterData> friends)
         {
             Manager.ServerSendPacket(connectionId, 0, DeliveryMethod.ReliableOrdered, GameNetworkingConsts.UpdateFriends, (writer) =>
             {
-                writer.PutArray(friends);
+                writer.PutList(friends);
             });
         }
     }
