@@ -483,21 +483,21 @@ namespace MultiplayerARPG
 
         public CharacterItem Clone(bool generateNewId = false)
         {
-            CharacterItem cloneItem = new CharacterItem();
-            cloneItem.id = generateNewId ? GenericUtils.GetUniqueId() : id;
-            cloneItem.dataId = dataId;
-            cloneItem.level = level;
-            cloneItem.amount = amount;
-            cloneItem.equipSlotIndex = equipSlotIndex;
-            cloneItem.sockets = sockets;
-            cloneItem.durability = durability;
-            cloneItem.exp = exp;
-            cloneItem.lockRemainsDuration = lockRemainsDuration;
-            cloneItem.expireTime = expireTime;
-            cloneItem.randomSeed = randomSeed;
-            cloneItem.ammo = ammo;
-            cloneItem.sockets = new List<int>(sockets);
-            return cloneItem;
+            CharacterItem clone = new CharacterItem();
+            clone.id = generateNewId ? GenericUtils.GetUniqueId() : id;
+            clone.dataId = dataId;
+            clone.level = level;
+            clone.amount = amount;
+            clone.equipSlotIndex = equipSlotIndex;
+            clone.sockets = sockets;
+            clone.durability = durability;
+            clone.exp = exp;
+            clone.lockRemainsDuration = lockRemainsDuration;
+            clone.expireTime = expireTime;
+            clone.randomSeed = randomSeed;
+            clone.ammo = ammo;
+            clone.sockets = new List<int>(sockets);
+            return clone;
         }
 
         public static CharacterItem Create(BaseItem item, short level = 1, short amount = 1)

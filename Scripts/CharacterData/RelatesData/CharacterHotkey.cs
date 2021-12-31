@@ -31,6 +31,15 @@ namespace MultiplayerARPG
             type = (HotkeyType)reader.GetByte();
             relateId = reader.GetString();
         }
+
+        public CharacterHotkey Clone()
+        {
+            CharacterHotkey clone = new CharacterHotkey();
+            clone.hotkeyId = hotkeyId;
+            clone.type = type;
+            clone.relateId = relateId;
+            return clone;
+        }
     }
 
     [System.Serializable]

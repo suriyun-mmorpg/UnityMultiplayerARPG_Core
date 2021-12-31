@@ -101,6 +101,15 @@ namespace MultiplayerARPG
             coolDownRemainsDuration -= deltaTime;
         }
 
+        public CharacterSkillUsage Clone()
+        {
+            CharacterSkillUsage clone = new CharacterSkillUsage();
+            clone.type = type;
+            clone.dataId = dataId;
+            clone.coolDownRemainsDuration = coolDownRemainsDuration;
+            return clone;
+        }
+
         public static CharacterSkillUsage Create(SkillUsageType type, int dataId)
         {
             return new CharacterSkillUsage()

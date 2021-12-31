@@ -35,6 +35,14 @@ namespace MultiplayerARPG
             return cacheSkill;
         }
 
+        public CharacterSkill Clone()
+        {
+            CharacterSkill clone = new CharacterSkill();
+            clone.dataId = dataId;
+            clone.level = level;
+            return clone;
+        }
+
         public static CharacterSkill Create(BaseSkill skill, short level = 1)
         {
             return Create(skill.DataId, level);

@@ -31,6 +31,14 @@ namespace MultiplayerARPG
             return cacheAttribute;
         }
 
+        public CharacterAttribute Clone()
+        {
+            CharacterAttribute clone = new CharacterAttribute();
+            clone.dataId = dataId;
+            clone.amount = amount;
+            return clone;
+        }
+
         public static CharacterAttribute Create(Attribute attribute, short amount = 0)
         {
             return Create(attribute.DataId, amount);

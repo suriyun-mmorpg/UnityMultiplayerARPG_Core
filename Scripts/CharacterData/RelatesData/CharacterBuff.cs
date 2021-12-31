@@ -282,6 +282,17 @@ namespace MultiplayerARPG
             buffRemainsDuration -= deltaTime;
         }
 
+        public CharacterBuff Clone(bool generateNewId = false)
+        {
+            CharacterBuff clone = new CharacterBuff();
+            clone.id = generateNewId ? GenericUtils.GetUniqueId() : id;
+            clone.type = type;
+            clone.dataId = dataId;
+            clone.level = level;
+            clone.buffRemainsDuration = buffRemainsDuration;
+            return clone;
+        }
+
         public static CharacterBuff Create(BuffType type, int dataId, short level = 1)
         {
             return new CharacterBuff()

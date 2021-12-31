@@ -249,6 +249,14 @@ namespace MultiplayerARPG
             currentMp = CurrentMp;
         }
 
+        public CharacterSummon Clone()
+        {
+            CharacterSummon clone = new CharacterSummon();
+            clone.type = type;
+            clone.dataId = dataId;
+            return clone;
+        }
+
         public static CharacterSummon Create(SummonType type, int dataId)
         {
             return new CharacterSummon()

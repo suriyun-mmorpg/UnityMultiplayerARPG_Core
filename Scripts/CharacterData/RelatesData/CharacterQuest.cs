@@ -171,25 +171,25 @@ namespace MultiplayerARPG
 
         public CharacterQuest Clone()
         {
-            CharacterQuest cloneQuest = new CharacterQuest();
-            cloneQuest.dataId = dataId;
-            cloneQuest.isComplete = isComplete;
-            cloneQuest.isTracking = isTracking;
+            CharacterQuest clone = new CharacterQuest();
+            clone.dataId = dataId;
+            clone.isComplete = isComplete;
+            clone.isTracking = isTracking;
             // Clone killed monsters
             Dictionary<int, int> killedMonsters = new Dictionary<int, int>();
             foreach (KeyValuePair<int, int> cloneEntry in this.killedMonsters)
             {
                 killedMonsters[cloneEntry.Key] = cloneEntry.Value;
             }
-            cloneQuest.killedMonsters = killedMonsters;
+            clone.killedMonsters = killedMonsters;
             // Clone complete tasks
             List<int> completedTasks = new List<int>();
             foreach (int cloneEntry in this.completedTasks)
             {
                 completedTasks.Add(cloneEntry);
             }
-            cloneQuest.completedTasks = completedTasks;
-            return cloneQuest;
+            clone.completedTasks = completedTasks;
+            return clone;
         }
 
         public static CharacterQuest Create(Quest quest)
