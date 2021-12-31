@@ -51,17 +51,17 @@ namespace MultiplayerARPG
             to.LastDeadTime = from.LastDeadTime;
             to.UnmuteTime = from.UnmuteTime;
             to.LastUpdate = from.LastUpdate;
-            to.SelectableWeaponSets = new List<EquipWeapons>(from.SelectableWeaponSets);
-            to.Attributes = new List<CharacterAttribute>(from.Attributes);
-            to.Buffs = new List<CharacterBuff>(from.Buffs);
-            to.Hotkeys = new List<CharacterHotkey>(from.Hotkeys);
-            to.Quests = new List<CharacterQuest>(from.Quests);
-            to.Currencies = new List<CharacterCurrency>(from.Currencies);
-            to.EquipItems = new List<CharacterItem>(from.EquipItems);
-            to.NonEquipItems = new List<CharacterItem>(from.NonEquipItems);
-            to.Skills = new List<CharacterSkill>(from.Skills);
-            to.SkillUsages = new List<CharacterSkillUsage>(from.SkillUsages);
-            to.Summons = new List<CharacterSummon>(from.Summons);
+            to.SelectableWeaponSets = from.SelectableWeaponSets.Clone();
+            to.Attributes = from.Attributes.Clone();
+            to.Buffs = from.Buffs.Clone();
+            to.Hotkeys = from.Hotkeys.Clone();
+            to.Quests = from.Quests.Clone();
+            to.Currencies = from.Currencies.Clone();
+            to.EquipItems = from.EquipItems.Clone();
+            to.NonEquipItems = from.NonEquipItems.Clone();
+            to.Skills = from.Skills.Clone();
+            to.SkillUsages = from.SkillUsages.Clone();
+            to.Summons = from.Summons.Clone();
             DevExtUtils.InvokeStaticDevExtMethods(ClassType, "CloneTo", from, to);
             return to;
         }

@@ -31,6 +31,14 @@ namespace MultiplayerARPG
             return cacheCurrency;
         }
 
+        public CharacterCurrency Clone()
+        {
+            CharacterCurrency clone = new CharacterCurrency();
+            clone.dataId = dataId;
+            clone.amount = amount;
+            return clone;
+        }
+
         public static CharacterCurrency Create(Currency currency, int amount = 0)
         {
             return Create(currency.DataId, amount);

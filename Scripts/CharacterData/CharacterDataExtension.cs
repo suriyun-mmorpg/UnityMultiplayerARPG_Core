@@ -1226,6 +1226,16 @@ namespace MultiplayerARPG
             return result;
         }
 
+        public static List<CharacterCurrency> Clone(this IList<CharacterCurrency> src)
+        {
+            List<CharacterCurrency> result = new List<CharacterCurrency>();
+            for (int i = 0; i < src.Count; ++i)
+            {
+                result.Add(src[i].Clone());
+            }
+            return result;
+        }
+
         public static List<CharacterItem> Clone(this IList<CharacterItem> src)
         {
             List<CharacterItem> result = new List<CharacterItem>();
