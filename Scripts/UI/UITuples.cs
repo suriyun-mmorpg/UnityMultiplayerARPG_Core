@@ -178,13 +178,5 @@ namespace MultiplayerARPG
         public int rewardCash;
         [ArrayElementTitle("item")]
         public ItemAmount[] rewardItems;
-        [ArrayElementTitle("skin")]
-        public RewardItemSkin[] rewardSkins;
-        [ArrayElementTitle("costume")]
-        public RewardCostume[] rewardCostumes;
-        [ArrayElementTitle("character")]
-        public RewardCharacter[] rewardCharacters;
-        [ArrayElementTitle("companion")]
-        public RewardCompanion[] rewardCompanions;
     }
 }

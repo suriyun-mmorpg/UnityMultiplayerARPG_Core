@@ -147,10 +147,6 @@ namespace MultiplayerARPG
                 {
                     rewardGold = response.rewardGold,
                     rewardItems = response.rewardItems.ToArray(),
-                    rewardSkins = response.rewardItemSkins.ToArray(),
-                    rewardCostumes = response.rewardCostumes.ToArray(),
-                    rewardCharacters = response.rewardCharacters.ToArray(),
-                    rewardCompanions = response.rewardCompanions.ToArray(),
                 };
                 uiRewarding.Show();
             }

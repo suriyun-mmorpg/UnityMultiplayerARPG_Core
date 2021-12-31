@@ -1,5 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 namespace MultiplayerARPG
@@ -19,10 +17,6 @@ namespace MultiplayerARPG
         public GameObject textRewardCashRoot;
         public TextWrapper textRewardCash;
         public UICharacterItems uiRewardItems;
-        public UIRewardItemSkins uiRewardSkins;
-        public UIRewardCostumes uiRewardCostumes;
-        public UIRewardCharacters uiRewardCharacters;
-        public UIRewardCompanions uiRewardCompanions;
 
         protected override void UpdateData()
         {
@@ -69,58 +63,6 @@ namespace MultiplayerARPG
                 else
                 {
                     uiRewardItems.Hide();
-                }
-            }
-
-            if (uiRewardSkins != null)
-            {
-                if (Data.rewardSkins != null && Data.rewardSkins.Length > 0)
-                {
-                    uiRewardSkins.UpdateData(Data.rewardSkins);
-                    uiRewardSkins.Show();
-                }
-                else
-                {
-                    uiRewardSkins.Hide();
-                }
-            }
-
-            if (uiRewardCostumes != null)
-            {
-                if (Data.rewardCostumes != null && Data.rewardCostumes.Length > 0)
-                {
-                    uiRewardCostumes.UpdateData(Data.rewardCostumes);
-                    uiRewardCostumes.Show();
-                }
-                else
-                {
-                    uiRewardCostumes.Hide();
-                }
-            }
-
-            if (uiRewardCharacters != null)
-            {
-                if (Data.rewardCharacters != null && Data.rewardCharacters.Length > 0)
-                {
-                    uiRewardCharacters.UpdateData(Data.rewardCharacters);
-                    uiRewardCharacters.Show();
-                }
-                else
-                {
-                    uiRewardCharacters.Hide();
-                }
-            }
-
-            if (uiRewardCompanions != null)
-            {
-                if (Data.rewardCompanions != null && Data.rewardCompanions.Length > 0)
-                {
-                    uiRewardCompanions.UpdateData(Data.rewardCompanions);
-                    uiRewardCompanions.Show();
-                }
-                else
-                {
-                    uiRewardCompanions.Hide();
                 }
             }
         }
