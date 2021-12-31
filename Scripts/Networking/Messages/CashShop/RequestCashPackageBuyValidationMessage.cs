@@ -11,14 +11,14 @@ namespace MultiplayerARPG
 
         public void Deserialize(NetDataReader reader)
         {
-            dataId = reader.GetInt();
+            dataId = reader.GetPackedInt();
             platform = (RuntimePlatform)reader.GetByte();
             receipt = reader.GetString();
         }
 
         public void Serialize(NetDataWriter writer)
         {
-            writer.Put(dataId);
+            writer.PutPackedInt(dataId);
             writer.Put((byte)platform);
             writer.Put(receipt);
         }

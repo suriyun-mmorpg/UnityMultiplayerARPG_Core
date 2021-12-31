@@ -1,4 +1,5 @@
 ﻿using LiteNetLib.Utils;
+using System.Collections.Generic;
 
 namespace MultiplayerARPG
 {
@@ -6,19 +7,29 @@ namespace MultiplayerARPG
     {
         public UITextKeys message;
         public int dataId;
+        public int rewardGold;
+        public List<ItemAmount> rewardItems;
 
         public void Deserialize(NetDataReader reader)
         {
             message = (UITextKeys)reader.GetPackedUShort();
             if (message == UITextKeys.NONE)
-                dataId = reader.GetInt();
+            {
+                dataId = reader.GetPackedInt();
+                rewardGold = reader.GetPackedInt();
+                rewardItems = reader.GetList<ItemAmount>();
+            }
         }
 
         public void Serialize(NetDataWriter writer)
         {
             writer.PutPackedUShort((ushort)message);
             if (message == UITextKeys.NONE)
-                writer.Put(dataId);
+            {
+                writer.PutPackedInt(dataId);
+                writer.PutPackedInt(rewardGold);
+                writer.PutList(rewardItems);
+            }
         }
     }
 }

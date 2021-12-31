@@ -13,8 +13,8 @@ namespace MultiplayerARPG
             message = (UITextKeys)reader.GetPackedUShort();
             if (message == UITextKeys.NONE)
             {
-                dataId = reader.GetInt();
-                cash = reader.GetInt();
+                dataId = reader.GetPackedInt();
+                cash = reader.GetPackedInt();
             }
         }
 
@@ -23,8 +23,8 @@ namespace MultiplayerARPG
             writer.PutPackedUShort((ushort)message);
             if (message == UITextKeys.NONE)
             {
-                writer.Put(dataId);
-                writer.Put(cash);
+                writer.PutPackedInt(dataId);
+                writer.PutPackedInt(cash);
             }
         }
     }

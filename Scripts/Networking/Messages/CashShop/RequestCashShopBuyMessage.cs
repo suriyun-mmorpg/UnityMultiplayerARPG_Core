@@ -10,16 +10,16 @@ namespace MultiplayerARPG
 
         public void Deserialize(NetDataReader reader)
         {
-            dataId = reader.GetInt();
+            dataId = reader.GetPackedInt();
             currencyType = (CashShopItemCurrencyType)reader.GetByte();
-            amount = reader.GetInt();
+            amount = reader.GetPackedInt();
         }
 
         public void Serialize(NetDataWriter writer)
         {
-            writer.Put(dataId);
+            writer.PutPackedInt(dataId);
             writer.Put((byte)currencyType);
-            writer.Put(amount);
+            writer.PutPackedInt(amount);
         }
     }
 }

@@ -6,18 +6,27 @@ namespace MultiplayerARPG
     public struct ResponseOpenGachaMessage : INetSerializable
     {
         public UITextKeys message;
+        public int dataId;
         public List<ItemAmount> rewardItems;
 
         public void Deserialize(NetDataReader reader)
         {
             message = (UITextKeys)reader.GetPackedUShort();
-            rewardItems = reader.GetList<ItemAmount>();
+            if (message == UITextKeys.NONE)
+            {
+                dataId = reader.GetPackedInt();
+                rewardItems = reader.GetList<ItemAmount>();
+            }
         }
 
         public void Serialize(NetDataWriter writer)
         {
             writer.PutPackedUShort((ushort)message);
-            writer.PutList(rewardItems);
+            if (message == UITextKeys.NONE)
+            {
+                writer.PutPackedInt(dataId);
+                writer.PutList(rewardItems);
+            }
         }
     }
 }

@@ -24,7 +24,7 @@ namespace MultiplayerARPG
             result.Invoke(AckResponseCode.Success, new ResponseCashShopInfoMessage()
             {
                 cash = playerCharacter.UserCash,
-                cashShopItemIds = new List<int>(GameInstance.CashShopItems.Keys).ToArray(),
+                cashShopItemIds = new List<int>(GameInstance.CashShopItems.Keys),
             });
 
             await UniTask.Yield();
@@ -115,19 +115,19 @@ namespace MultiplayerARPG
                 changeCharacterGold = changeCharacterGold.Increase(cashShopItem.ReceiveGold * request.amount);
 
             // Increase items
+            List<ItemAmount> rewardItems = new List<ItemAmount>();
             if (cashShopItem.ReceiveItems != null &&
                 cashShopItem.ReceiveItems.Length > 0)
             {
-                List<ItemAmount> receiveItems = new List<ItemAmount>();
                 foreach (ItemAmount itemAmount in cashShopItem.ReceiveItems)
                 {
-                    receiveItems.Add(new ItemAmount()
+                    rewardItems.Add(new ItemAmount()
                     {
                         item = itemAmount.item,
                         amount = (short)(itemAmount.amount * request.amount),
                     });
                 }
-                if (playerCharacter.IncreasingItemsWillOverwhelming(receiveItems))
+                if (playerCharacter.IncreasingItemsWillOverwhelming(rewardItems))
                 {
                     result.Invoke(AckResponseCode.Error, new ResponseCashShopBuyMessage()
                     {
@@ -135,7 +135,7 @@ namespace MultiplayerARPG
                     });
                     return;
                 }
-                playerCharacter.IncreaseItems(receiveItems);
+                playerCharacter.IncreaseItems(rewardItems);
                 playerCharacter.FillEmptySlots();
             }
 
@@ -148,7 +148,9 @@ namespace MultiplayerARPG
             // Response to client
             result.Invoke(AckResponseCode.Success, new ResponseCashShopBuyMessage()
             {
-                dataId = request.dataId,
+                dataId = cashShopItem.DataId,
+                rewardGold = cashShopItem.ReceiveGold,
+                rewardItems = rewardItems,
             });
 
             await UniTask.Yield();
@@ -171,7 +173,7 @@ namespace MultiplayerARPG
             result.Invoke(AckResponseCode.Success, new ResponseCashPackageInfoMessage()
             {
                 cash = playerCharacter.UserCash,
-                cashPackageIds = new List<int>(GameInstance.CashPackages.Keys).ToArray(),
+                cashPackageIds = new List<int>(GameInstance.CashPackages.Keys),
             });
 
             await UniTask.Yield();

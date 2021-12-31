@@ -23,7 +23,7 @@ namespace MultiplayerARPG
 
             result.Invoke(AckResponseCode.Success, new ResponseGachaInfoMessage()
             {
-                cash = playerCharacter.Cash,
+                cash = playerCharacter.UserCash,
                 gachaIds = new List<int>(GameInstance.Gachas.Keys),
             });
 
