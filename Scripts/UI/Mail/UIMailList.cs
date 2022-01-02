@@ -111,15 +111,15 @@ namespace MultiplayerARPG
             if (responseCode == AckResponseCode.Unimplemented ||
                 responseCode == AckResponseCode.Timeout)
                 return;
-            UIMailListEntry tempUi;
+            UIMailListEntry tempUI;
             CacheList.Generate(response.mails, (index, data, ui) =>
             {
-                tempUi = ui.GetComponent<UIMailListEntry>();
-                tempUi.Data = data;
-                tempUi.Show();
-                CacheSelectionManager.Add(tempUi);
-                if (!string.IsNullOrEmpty(selectedId) && selectedId == data.Id)
-                    tempUi.OnClickSelect();
+                tempUI = ui.GetComponent<UIMailListEntry>();
+                tempUI.Data = data;
+                tempUI.Show();
+                CacheSelectionManager.Add(tempUI);
+                if (index == 0 && selectedId.Equals(data.Id))
+                    tempUI.OnClickSelect();
             });
             if (listEmptyObject != null)
                 listEmptyObject.SetActive(response.mails.Count == 0);
