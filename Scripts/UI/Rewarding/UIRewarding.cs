@@ -55,7 +55,7 @@ namespace MultiplayerARPG
 
             if (uiRewardItems != null)
             {
-                if (Data.rewardItems != null && Data.rewardItems.Length > 0)
+                if (Data.rewardItems != null && Data.rewardItems.Count > 0)
                 {
                     uiRewardItems.UpdateData(GameInstance.PlayingCharacter, Data.rewardItems);
                     uiRewardItems.Show();

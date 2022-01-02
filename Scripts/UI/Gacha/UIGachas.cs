@@ -140,7 +140,7 @@ namespace MultiplayerARPG
             {
                 uiRewarding.Data = new UIRewardingData()
                 {
-                    rewardItems = response.rewardItems.ToArray(),
+                    rewardItems = response.rewardItems,
                 };
                 uiRewarding.Show();
             }
