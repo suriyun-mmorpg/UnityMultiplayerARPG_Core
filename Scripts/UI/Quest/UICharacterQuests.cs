@@ -1,4 +1,5 @@
 ﻿using LiteNetLibManager;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Serialization;
 
@@ -110,41 +111,34 @@ namespace MultiplayerARPG
 
         public void UpdateData()
         {
-            int selectedQuestId = CacheSelectionManager.SelectedUI != null ? CacheSelectionManager.SelectedUI.Data.dataId : 0;
+            int selectedDataId = CacheSelectionManager.SelectedUI != null ? CacheSelectionManager.SelectedUI.Data.dataId : 0;
             CacheSelectionManager.DeselectSelectedUI();
             CacheSelectionManager.Clear();
-            int showingCount = 0;
-            UICharacterQuest tempUI;
-            bool hasTrackingQuest = false;
-            for (int i = 0; i < GameInstance.PlayingCharacter.Quests.Count; ++i)
+
+            List<CharacterQuest> filteredList = UICharacterQuestsUtils.GetFilteredList(GameInstance.PlayingCharacter.Quests, ShowOnlyTrackingQuests, HideCompleteQuest);
+            if (filteredList.Count == 0)
             {
-                if (GameInstance.PlayingCharacter.Quests[i].isTracking)
-                {
-                    hasTrackingQuest = true;
-                    break;
-                }
+                if (uiDialog != null)
+                    uiDialog.Hide();
+                CacheList.HideAll();
+                if (listEmptyObject != null)
+                    listEmptyObject.SetActive(true);
+                return;
             }
-            CacheList.Generate(GameInstance.PlayingCharacter.Quests, (index, characterQuest, ui) =>
+
+            if (listEmptyObject != null)
+                listEmptyObject.SetActive(false);
+
+            UICharacterQuest tempUI;
+            CacheList.Generate(filteredList, (index, characterQuest, ui) =>
             {
                 tempUI = ui.GetComponent<UICharacterQuest>();
-                if (GameInstance.Quests.ContainsKey(characterQuest.dataId) &&
-                    (!ShowOnlyTrackingQuests || characterQuest.isTracking || !hasTrackingQuest) &&
-                    (!HideCompleteQuest || !characterQuest.isComplete))
-                {
-                    tempUI.Setup(characterQuest, GameInstance.PlayingCharacter, index);
-                    tempUI.Show();
-                    CacheSelectionManager.Add(tempUI);
-                    if (selectedQuestId == characterQuest.dataId)
-                        tempUI.OnClickSelect();
-                    showingCount++;
-                }
-                else
-                {
-                    tempUI.Hide();
-                }
+                tempUI.Setup(characterQuest, GameInstance.PlayingCharacter, index);
+                tempUI.Show();
+                CacheSelectionManager.Add(tempUI);
+                if (index == 0 || selectedDataId == characterQuest.dataId)
+                    tempUI.OnClickSelect();
             });
-            if (listEmptyObject != null)
-                listEmptyObject.SetActive(showingCount == 0);
         }
     }
 }
