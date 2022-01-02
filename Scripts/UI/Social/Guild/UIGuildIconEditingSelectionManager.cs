@@ -1,6 +1,6 @@
 ﻿namespace MultiplayerARPG
 {
-    public class UIGuildIconEditingSelectionManager : UISelectionManager<GuildIcon, UIGuildIcon, GuildIconEditingEntryEvent, UIGuildIconEvent>
+    public class UIGuildIconEditingSelectionManager : UISelectionManager<GuildIcon, UIGuildIcon, GuildIconEvent, UIGuildIconEvent>
     {
     }
 }
