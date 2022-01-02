@@ -103,37 +103,37 @@ namespace MultiplayerARPG
 
         public virtual void UpdateData(ICharacterData character)
         {
-            this.Character = character;
+            Character = character;
             uint selectedSummonObjectId = CacheSelectionManager.SelectedUI != null ? CacheSelectionManager.SelectedUI.CharacterSummon.objectId : 0;
             CacheSelectionManager.DeselectSelectedUI();
             CacheSelectionManager.Clear();
 
             Dictionary<int, UICharacterSummon> stackingSkillSummons = new Dictionary<int, UICharacterSummon>();
-            UICharacterSummon tempUiCharacterSummon;
-            CacheList.Generate(character.Summons, (index, characterSummon, ui) =>
+            UICharacterSummon tempUI;
+            CacheList.Generate(character.Summons, (index, data, ui) =>
             {
-                if (characterSummon.type == SummonType.Skill && stackingSkillSummons.ContainsKey(characterSummon.dataId))
+                if (data.type == SummonType.Skill && stackingSkillSummons.ContainsKey(data.dataId))
                 {
-                    stackingSkillSummons[characterSummon.dataId].AddStackingEntry(characterSummon);
+                    stackingSkillSummons[data.dataId].AddStackingEntry(data);
                     ui.gameObject.SetActive(false);
                 }
                 else
                 {
-                    tempUiCharacterSummon = ui.GetComponent<UICharacterSummon>();
-                    tempUiCharacterSummon.Setup(characterSummon, character, index);
-                    tempUiCharacterSummon.Show();
-                    switch (characterSummon.type)
+                    tempUI = ui.GetComponent<UICharacterSummon>();
+                    tempUI.Setup(data, character, index);
+                    tempUI.Show();
+                    switch (data.type)
                     {
                         case SummonType.Skill:
-                            stackingSkillSummons.Add(characterSummon.dataId, tempUiCharacterSummon);
+                            stackingSkillSummons.Add(data.dataId, tempUI);
                             break;
                         case SummonType.PetItem:
                             ui.transform.SetAsFirstSibling();
                             break;
                     }
-                    CacheSelectionManager.Add(tempUiCharacterSummon);
-                    if (selectedSummonObjectId == characterSummon.objectId)
-                        tempUiCharacterSummon.OnClickSelect();
+                    CacheSelectionManager.Add(tempUI);
+                    if (selectedSummonObjectId == data.objectId)
+                        tempUI.OnClickSelect();
                 }
             });
         }
