@@ -1,5 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
@@ -103,46 +102,35 @@ namespace MultiplayerARPG
 
         public virtual void GenerateList()
         {
-            int selectedIdx = CacheSelectionManager.SelectedUI != null ? CacheSelectionManager.IndexOf(CacheSelectionManager.SelectedUI) : -1;
+            int selectedDataId = CacheSelectionManager.SelectedUI != null ? CacheSelectionManager.SelectedUI.Data.DataId : 0;
             CacheSelectionManager.DeselectSelectedUI();
             CacheSelectionManager.Clear();
-            ConvertFilterCategoriesToTrimedLowerChar();
 
-            int showingCount = 0;
-            UIItemCraftFormula tempUI;
-            CacheList.Generate(LoadedList, (index, data, ui) =>
+            List<ItemCraftFormula> filteredList = UIItemCraftFormulasUtils.GetFilteredList(LoadedList, filterCategories);
+            if (filteredList.Count == 0)
             {
-                tempUI = ui.GetComponent<UIItemCraftFormula>();
-                if (data != null && data.ItemCraft.CraftingItem != null &&
-                    (filterCategories.Count == 0 || 
-                    (!string.IsNullOrEmpty(data.Category) && filterCategories.Contains(data.Category.Trim().ToLower())) ||
-                    (!string.IsNullOrEmpty(data.ItemCraft.CraftingItem.Category) && filterCategories.Contains(data.ItemCraft.CraftingItem.Category.Trim().ToLower()))))
-                {
-                    tempUI.CraftFormulaManager = this;
-                    tempUI.Data = data;
-                    tempUI.Show();
-                    CacheSelectionManager.Add(tempUI);
-                    if (selectedIdx == index)
-                        tempUI.OnClickSelect();
-                    showingCount++;
-                }
-                else
-                {
-                    // Hide because formula's category not matches in the filter list
-                    tempUI.Hide();
-                }
-            });
+                if (uiDialog != null)
+                    uiDialog.Hide();
+                CacheList.HideAll();
+                if (listEmptyObject != null)
+                    listEmptyObject.SetActive(true);
+                return;
+            }
 
             if (listEmptyObject != null)
-                listEmptyObject.SetActive(showingCount == 0);
-        }
+                listEmptyObject.SetActive(false);
 
-        protected void ConvertFilterCategoriesToTrimedLowerChar()
-        {
-            for (int i = 0; i < filterCategories.Count; ++i)
+            UIItemCraftFormula tempUI;
+            CacheList.Generate(filteredList, (index, data, ui) =>
             {
-                filterCategories[i] = filterCategories[i].Trim().ToLower();
-            }
+                tempUI = ui.GetComponent<UIItemCraftFormula>();
+                tempUI.CraftFormulaManager = this;
+                tempUI.Data = data;
+                tempUI.Show();
+                CacheSelectionManager.Add(tempUI);
+                if (index == 0 || selectedDataId == data.DataId)
+                    tempUI.OnClickSelect();
+            });
         }
     }
 }
