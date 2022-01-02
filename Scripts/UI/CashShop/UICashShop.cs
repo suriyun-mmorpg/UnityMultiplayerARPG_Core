@@ -162,46 +162,29 @@ namespace MultiplayerARPG
             int selectedDataId = CacheSelectionManager.SelectedUI != null ? CacheSelectionManager.SelectedUI.Data.DataId : 0;
             CacheSelectionManager.DeselectSelectedUI();
             CacheSelectionManager.Clear();
-            ConvertFilterCategoriesToTrimedLowerChar();
 
-            int showingCount = 0;
-            bool selectedOnce = false;
+            List<CashShopItem> filteredList = UICashShopUtils.GetFilteredList(LoadedList, filterCategories);
+            if (filteredList.Count == 0)
+            {
+                if (uiDialog != null)
+                    uiDialog.Hide();
+                CacheList.HideAll();
+                if (listEmptyObject != null)
+                    listEmptyObject.SetActive(true);
+                return;
+            }
+
             UICashShopItem tempUI;
-            CacheList.Generate(LoadedList, (index, data, ui) =>
+            CacheList.Generate(filteredList, (index, data, ui) =>
             {
                 tempUI = ui.GetComponent<UICashShopItem>();
-                if (data != null &&
-                    (filterCategories.Count == 0 || (!string.IsNullOrEmpty(data.Category) &&
-                    filterCategories.Contains(data.Category.Trim().ToLower()))))
-                {
-                    tempUI.uiCashShop = this;
-                    tempUI.Data = data;
-                    tempUI.Show();
-                    CacheSelectionManager.Add(tempUI);
-                    if (!selectedOnce || selectedDataId == data.DataId)
-                    {
-                        selectedOnce = true;
-                        tempUI.OnClickSelect();
-                    }
-                    showingCount++;
-                }
-                else
-                {
-                    // Hide because item's category not matches in the filter list
-                    tempUI.Hide();
-                }
+                tempUI.uiCashShop = this;
+                tempUI.Data = data;
+                tempUI.Show();
+                CacheSelectionManager.Add(tempUI);
+                if (index == 0 || selectedDataId == data.DataId)
+                    tempUI.OnClickSelect();
             });
-
-            if (listEmptyObject != null)
-                listEmptyObject.SetActive(showingCount == 0);
-        }
-
-        protected void ConvertFilterCategoriesToTrimedLowerChar()
-        {
-            for (int i = 0; i < filterCategories.Count; ++i)
-            {
-                filterCategories[i] = filterCategories[i].Trim().ToLower();
-            }
         }
     }
 }
