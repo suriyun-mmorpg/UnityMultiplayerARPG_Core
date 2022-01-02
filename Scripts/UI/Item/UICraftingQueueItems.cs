@@ -153,23 +153,23 @@ namespace MultiplayerARPG
 
         public virtual void UpdateData()
         {
-            int selectedIdx = CacheSelectionManager.SelectedUI != null ? CacheSelectionManager.IndexOf(CacheSelectionManager.SelectedUI) : -1;
+            int selectedDataId = CacheSelectionManager.SelectedUI != null ? CacheSelectionManager.SelectedUI.Data.dataId : 0;
             CacheSelectionManager.DeselectSelectedUI();
             CacheSelectionManager.Clear();
 
             UICraftingQueueItem tempUI;
-            CacheList.Generate(Source.QueueItems, (index, craftingItem, ui) =>
+            CacheList.Generate(Source.QueueItems, (index, data, ui) =>
             {
                 tempUI = ui.GetComponent<UICraftingQueueItem>();
                 tempUI.CraftingQueueManager = this;
-                tempUI.Setup(craftingItem, GameInstance.PlayingCharacterEntity, index);
+                tempUI.Setup(data, GameInstance.PlayingCharacterEntity, index);
                 tempUI.Show();
                 CacheSelectionManager.Add(tempUI);
-                if (selectedIdx == index)
+                if (index == 0 || selectedDataId == data.dataId)
                     tempUI.OnClickSelect();
             });
             if (listEmptyObject != null)
-                listEmptyObject.SetActive(GameInstance.PlayingCharacterEntity.Crafting.QueueItems.Count == 0);
+                listEmptyObject.SetActive(Source.QueueItems.Count == 0);
         }
     }
 }
