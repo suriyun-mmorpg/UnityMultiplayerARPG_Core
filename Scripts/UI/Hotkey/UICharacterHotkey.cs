@@ -355,7 +355,7 @@ namespace MultiplayerARPG
         {
             if (UICharacterHotkeys.doNotIncludeItems)
                 return false;
-            if (characterItem.IsEmpty() || characterItem.IsEmptySlot())
+            if (characterItem.IsEmptySlot())
                 return false;
             if (UICharacterHotkeys.filterCategories.Count > 0 &&
                 !UICharacterHotkeys.filterCategories.Contains(characterItem.GetItem().Category))
