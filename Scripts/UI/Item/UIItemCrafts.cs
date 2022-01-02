@@ -1,5 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Serialization;
 
@@ -117,19 +116,19 @@ namespace MultiplayerARPG
 
         protected virtual void UpdateData(IList<ItemCraft> itemCrafts)
         {
-            int selectedIdx = CacheSelectionManager.SelectedUI != null ? CacheSelectionManager.IndexOf(CacheSelectionManager.SelectedUI) : -1;
+            int selectedDataId = CacheSelectionManager.SelectedUI != null ? CacheSelectionManager.SelectedUI.Data.CraftingItem.DataId : 0;
             CacheSelectionManager.DeselectSelectedUI();
             CacheSelectionManager.Clear();
 
-            UIItemCraft tempUiCraftItem;
-            CacheList.Generate(itemCrafts, (index, craftItem, ui) =>
+            UIItemCraft tempUI;
+            CacheList.Generate(itemCrafts, (index, data, ui) =>
             {
-                tempUiCraftItem = ui.GetComponent<UIItemCraft>();
-                tempUiCraftItem.Setup(CrafterType, TargetEntity, craftItem);
-                tempUiCraftItem.Show();
-                CacheSelectionManager.Add(tempUiCraftItem);
-                if (selectedIdx == index)
-                    tempUiCraftItem.OnClickSelect();
+                tempUI = ui.GetComponent<UIItemCraft>();
+                tempUI.Setup(CrafterType, TargetEntity, data);
+                tempUI.Show();
+                CacheSelectionManager.Add(tempUI);
+                if (index == 0 || selectedDataId == data.CraftingItem.DataId)
+                    tempUI.OnClickSelect();
             });
             if (listEmptyObject != null)
                 listEmptyObject.SetActive(itemCrafts.Count == 0);
