@@ -47,6 +47,7 @@ namespace MultiplayerARPG
             }
         }
 
+        public System.Action<int, CharacterItem> onGenerateEntry = null;
         public virtual ICharacterData Character { get; protected set; }
         public List<CharacterItem> LoadedList { get; private set; } = new List<CharacterItem>();
 
@@ -149,10 +150,11 @@ namespace MultiplayerARPG
         public virtual void GenerateList()
         {
             string selectedId = CacheSelectionManager.SelectedUI != null ? CacheSelectionManager.SelectedUI.CharacterItem.id : string.Empty;
+            CacheSelectionManager.DeselectSelectedUI();
             CacheSelectionManager.Clear();
-            ConvertFilterCategoriesToTrimedLowerChar();
 
-            if (Character == null || LoadedList.Count == 0)
+            List<KeyValuePair<int, CharacterItem>> filteredList = UICharacterItemsUtils.GetFilteredList(LoadedList, filterCategories, filterItemTypes, doNotShowEmptySlots);
+            if (Character == null || filteredList.Count == 0)
             {
                 if (uiDialog != null)
                     uiDialog.Hide();
@@ -162,77 +164,43 @@ namespace MultiplayerARPG
                 return;
             }
 
-            int showingCount = 0;
+            if (listEmptyObject != null)
+                listEmptyObject.SetActive(false);
+
             UICharacterItem selectedUI = null;
             UICharacterItem tempUI;
-            BaseItem tempItem;
-            CacheList.Generate(LoadedList, (index, data, ui) =>
+            CacheList.Generate(filteredList, (index, data, ui) =>
             {
+                if (onGenerateEntry != null)
+                    onGenerateEntry.Invoke(data.Key, data.Value);
                 tempUI = ui.GetComponent<UICharacterItem>();
-                tempItem = data.GetItem();
-
-                if (!GameInstance.Singleton.IsLimitInventorySlot || doNotShowEmptySlots ||
-                    (filterCategories != null && filterCategories.Count > 0) ||
-                    (filterItemTypes != null && filterItemTypes.Count > 0))
+                tempUI.Setup(new UICharacterItemData(data.Value, inventoryType), Character, data.Key);
+                tempUI.Show();
+                UICharacterItemDragHandler dragHandler = tempUI.GetComponentInChildren<UICharacterItemDragHandler>();
+                if (dragHandler != null)
                 {
-                    // If inventory type isn't limit inventory slot, hide empty slot
-                    if (tempItem == null)
+                    switch (inventoryType)
                     {
-                        tempUI.Hide();
-                        return;
+                        case InventoryType.NonEquipItems:
+                            dragHandler.SetupForNonEquipItems(tempUI);
+                            break;
+                        case InventoryType.EquipItems:
+                        case InventoryType.EquipWeaponRight:
+                        case InventoryType.EquipWeaponLeft:
+                            dragHandler.SetupForEquipItems(tempUI);
+                            break;
+                        case InventoryType.StorageItems:
+                            dragHandler.SetupForStorageItems(tempUI);
+                            break;
+                        case InventoryType.Unknow:
+                            dragHandler.SetupForUnknow(tempUI);
+                            break;
                     }
                 }
-
-                if (tempItem == null ||
-                    (filterCategories.Count == 0 || (!string.IsNullOrEmpty(tempItem.Category) &&
-                    filterCategories.Contains(tempItem.Category.Trim().ToLower()))))
-                {
-                    if (filterItemTypes.Count == 0 ||
-                        filterItemTypes.Contains(tempItem.ItemType))
-                    {
-                        tempUI.Setup(new UICharacterItemData(data, inventoryType), Character, index);
-                        tempUI.Show();
-                        UICharacterItemDragHandler dragHandler = tempUI.GetComponentInChildren<UICharacterItemDragHandler>();
-                        if (dragHandler != null)
-                        {
-                            switch (inventoryType)
-                            {
-                                case InventoryType.NonEquipItems:
-                                    dragHandler.SetupForNonEquipItems(tempUI);
-                                    break;
-                                case InventoryType.EquipItems:
-                                case InventoryType.EquipWeaponRight:
-                                case InventoryType.EquipWeaponLeft:
-                                    dragHandler.SetupForEquipItems(tempUI);
-                                    break;
-                                case InventoryType.StorageItems:
-                                    dragHandler.SetupForStorageItems(tempUI);
-                                    break;
-                                case InventoryType.Unknow:
-                                    dragHandler.SetupForUnknow(tempUI);
-                                    break;
-                            }
-                        }
-                        CacheSelectionManager.Add(tempUI);
-                        if (!string.IsNullOrEmpty(selectedId) && selectedId.Equals(data.id))
-                            selectedUI = tempUI;
-                        showingCount++;
-                    }
-                    else
-                    {
-                        // Hide because item's type not matches in the filter list
-                        tempUI.Hide();
-                    }
-                }
-                else
-                {
-                    // Hide because item's category not matches in the filter list
-                    tempUI.Hide();
-                }
+                CacheSelectionManager.Add(tempUI);
+                if (index == 0 && selectedId.Equals(data.Value.id))
+                    selectedUI = tempUI;
             });
-
-            if (listEmptyObject != null)
-                listEmptyObject.SetActive(showingCount == 0);
 
             if (selectedUI == null)
             {
@@ -246,14 +214,6 @@ namespace MultiplayerARPG
                 selectedUI.OnClickSelect();
                 if (uiDialog != null)
                     uiDialog.dontShowComparingEquipments = defaultDontShowComparingEquipments;
-            }
-        }
-
-        protected void ConvertFilterCategoriesToTrimedLowerChar()
-        {
-            for (int i = 0; i < filterCategories.Count; ++i)
-            {
-                filterCategories[i] = filterCategories[i].Trim().ToLower();
             }
         }
 
