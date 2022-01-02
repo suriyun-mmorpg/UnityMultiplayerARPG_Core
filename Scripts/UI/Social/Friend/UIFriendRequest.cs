@@ -31,23 +31,24 @@ namespace MultiplayerARPG
             memberAmount = friends.Count;
             UpdateUIs();
 
-            int selectedIdx = MemberSelectionManager.SelectedUI != null ? MemberSelectionManager.IndexOf(MemberSelectionManager.SelectedUI) : -1;
+            string selectedId = MemberSelectionManager.SelectedUI != null ? MemberSelectionManager.SelectedUI.Data.id : string.Empty;
             MemberSelectionManager.DeselectSelectedUI();
             MemberSelectionManager.Clear();
 
-            MemberList.Generate(friends, (index, character, ui) =>
+            UISocialCharacter tempUI;
+            MemberList.Generate(friends, (index, data, ui) =>
             {
-                UISocialCharacter uiRequester = ui.GetComponent<UISocialCharacter>();
-                uiRequester.uiSocialGroup = this;
-                uiRequester.Data = character;
-                uiRequester.Show();
-                uiRequester.onFriendRequestAccepted.RemoveListener(Refresh);
-                uiRequester.onFriendRequestAccepted.AddListener(Refresh);
-                uiRequester.onFriendRequestDeclined.RemoveListener(Refresh);
-                uiRequester.onFriendRequestDeclined.AddListener(Refresh);
-                MemberSelectionManager.Add(uiRequester);
-                if (selectedIdx == index)
-                    uiRequester.OnClickSelect();
+                tempUI = ui.GetComponent<UISocialCharacter>();
+                tempUI.uiSocialGroup = this;
+                tempUI.Data = data;
+                tempUI.Show();
+                tempUI.onFriendRequestAccepted.RemoveListener(Refresh);
+                tempUI.onFriendRequestAccepted.AddListener(Refresh);
+                tempUI.onFriendRequestDeclined.RemoveListener(Refresh);
+                tempUI.onFriendRequestDeclined.AddListener(Refresh);
+                MemberSelectionManager.Add(tempUI);
+                if (index == 0 || selectedId.Equals(data.id))
+                    tempUI.OnClickSelect();
             });
             if (memberListEmptyObject != null)
                 memberListEmptyObject.SetActive(friends.Count == 0);

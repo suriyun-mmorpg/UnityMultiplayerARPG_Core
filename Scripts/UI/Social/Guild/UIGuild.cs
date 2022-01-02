@@ -382,25 +382,27 @@ namespace MultiplayerARPG
             memberAmount = guild.CountMember();
             UpdateUIs();
 
-            int selectedIdx = MemberSelectionManager.SelectedUI != null ? MemberSelectionManager.IndexOf(MemberSelectionManager.SelectedUI) : -1;
+            // Members
+            string selectedId = MemberSelectionManager.SelectedUI != null ? MemberSelectionManager.SelectedUI.Data.id : string.Empty;
             MemberSelectionManager.DeselectSelectedUI();
             MemberSelectionManager.Clear();
 
             SocialCharacterData[] members;
             byte[] memberRoles;
             guild.GetSortedMembers(out members, out memberRoles);
-            MemberList.Generate(members, (index, character, ui) =>
+            MemberList.Generate(members, (index, data, ui) =>
             {
                 UIGuildCharacter uiGuildMember = ui.GetComponent<UIGuildCharacter>();
                 uiGuildMember.uiSocialGroup = this;
-                uiGuildMember.Setup(character, memberRoles[index], guild.GetRole(memberRoles[index]));
+                uiGuildMember.Setup(data, memberRoles[index], guild.GetRole(memberRoles[index]));
                 uiGuildMember.Show();
                 MemberSelectionManager.Add(uiGuildMember);
-                if (selectedIdx == index)
+                if (index == 0 || selectedId.Equals(data.id))
                     uiGuildMember.OnClickSelect();
             });
 
-            selectedIdx = RoleSelectionManager.SelectedUI != null ? RoleSelectionManager.IndexOf(RoleSelectionManager.SelectedUI) : -1;
+            // Roles
+            int selectedIdx = RoleSelectionManager.SelectedUI != null ? RoleSelectionManager.IndexOf(RoleSelectionManager.SelectedUI) : -1;
             RoleSelectionManager.DeselectSelectedUI();
             RoleSelectionManager.Clear();
 
@@ -410,11 +412,12 @@ namespace MultiplayerARPG
                 uiGuildRole.Data = guildRole;
                 uiGuildRole.Show();
                 RoleSelectionManager.Add(uiGuildRole);
-                if (selectedIdx == index)
+                if (index == 0 || selectedIdx == index)
                     uiGuildRole.OnClickSelect();
             });
 
-            selectedIdx = SkillSelectionManager.SelectedUI != null ? SkillSelectionManager.IndexOf(SkillSelectionManager.SelectedUI) : -1;
+            // Skills
+            int selectedDataId = SkillSelectionManager.SelectedUI != null ? SkillSelectionManager.SelectedUI.Data.guildSkill.DataId : 0;
             SkillSelectionManager.DeselectSelectedUI();
             SkillSelectionManager.Clear();
 
@@ -424,7 +427,7 @@ namespace MultiplayerARPG
                 uiGuildSkill.Data = new UIGuildSkillData(guildSkill, guild.GetSkillLevel(guildSkill.DataId));
                 uiGuildSkill.Show();
                 SkillSelectionManager.Add(uiGuildSkill);
-                if (selectedIdx == index)
+                if (index == 0 || selectedDataId == guildSkill.DataId)
                     uiGuildSkill.OnClickSelect();
             });
         }

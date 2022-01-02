@@ -56,21 +56,22 @@ namespace MultiplayerARPG
             memberAmount = party.CountMember();
             UpdateUIs();
 
-            int selectedIdx = MemberSelectionManager.SelectedUI != null ? MemberSelectionManager.IndexOf(MemberSelectionManager.SelectedUI) : -1;
+            string selectedId = MemberSelectionManager.SelectedUI != null ? MemberSelectionManager.SelectedUI.Data.id : string.Empty;
             MemberSelectionManager.DeselectSelectedUI();
             MemberSelectionManager.Clear();
 
             SocialCharacterData[] members;
             party.GetSortedMembers(out members);
-            MemberList.Generate(members, (index, character, ui) =>
+            UISocialCharacter tempUI;
+            MemberList.Generate(members, (index, data, ui) =>
             {
-                UISocialCharacter uiPartyMember = ui.GetComponent<UISocialCharacter>();
-                uiPartyMember.uiSocialGroup = this;
-                uiPartyMember.Data = character;
-                uiPartyMember.Show();
-                MemberSelectionManager.Add(uiPartyMember);
-                if (selectedIdx == index)
-                    uiPartyMember.OnClickSelect();
+                tempUI = ui.GetComponent<UISocialCharacter>();
+                tempUI.uiSocialGroup = this;
+                tempUI.Data = data;
+                tempUI.Show();
+                MemberSelectionManager.Add(tempUI);
+                if (index == 0 || selectedId.Equals(data.id))
+                    tempUI.OnClickSelect();
             });
         }
 

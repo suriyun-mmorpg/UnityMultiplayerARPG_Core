@@ -37,10 +37,8 @@ namespace MultiplayerARPG
             get
             {
                 if (cacheSelectionManager == null)
-                {
                     cacheSelectionManager = gameObject.GetOrAddComponent<UIGuildIconEditingSelectionManager>();
-                    cacheSelectionManager.selectionMode = UISelectionMode.Toggle;
-                }
+                cacheSelectionManager.selectionMode = UISelectionMode.SelectSingle;
                 return cacheSelectionManager;
             }
         }
@@ -84,23 +82,24 @@ namespace MultiplayerARPG
 
         public void UpdateData()
         {
-            int selectedId = CacheSelectionManager.SelectedUI != null ? CacheSelectionManager.SelectedUI.Data.DataId : 0;
-            UpdateData(selectedId);
+            int selectedDataId = CacheSelectionManager.SelectedUI != null ? CacheSelectionManager.SelectedUI.Data.DataId : 0;
+            UpdateData(selectedDataId);
         }
 
-        public virtual void UpdateData(int selectedId)
+        public virtual void UpdateData(int selectedDataId)
         {
             CacheSelectionManager.DeselectSelectedUI();
             CacheSelectionManager.Clear();
 
+            UIGuildIcon tempUI;
             CacheList.Generate(GameInstance.GuildIcons.Values, (index, data, ui) =>
             {
-                UIGuildIcon uiGuildIcon = ui.GetComponent<UIGuildIcon>();
-                uiGuildIcon.Data = data;
-                uiGuildIcon.Show();
-                CacheSelectionManager.Add(uiGuildIcon);
-                if (selectedId == data.DataId)
-                    uiGuildIcon.OnClickSelect();
+                tempUI = ui.GetComponent<UIGuildIcon>();
+                tempUI.Data = data;
+                tempUI.Show();
+                CacheSelectionManager.Add(tempUI);
+                if (index == 0 || selectedDataId == data.DataId)
+                    tempUI.OnClickSelect();
             });
         }
 

@@ -96,15 +96,15 @@ namespace MultiplayerARPG
             CacheSelectionManager.DeselectSelectedUI();
             CacheSelectionManager.Clear();
 
-            UIGuildListEntry tempUi;
-            CacheList.Generate(foundGuilds, (index, guildListEntry, ui) =>
+            UIGuildListEntry tempUI;
+            CacheList.Generate(foundGuilds, (index, data, ui) =>
             {
-                tempUi = ui.GetComponent<UIGuildListEntry>();
-                tempUi.Data = guildListEntry;
-                tempUi.Show();
-                CacheSelectionManager.Add(tempUi);
-                if (selectedId == guildListEntry.Id)
-                    tempUi.OnClickSelect();
+                tempUI = ui.GetComponent<UIGuildListEntry>();
+                tempUI.Data = data;
+                tempUI.Show();
+                CacheSelectionManager.Add(tempUI);
+                if (index == 0 || selectedId == data.Id)
+                    tempUI.OnClickSelect();
             });
             if (listEmptyObject != null)
                 listEmptyObject.SetActive(foundGuilds.Count == 0);
