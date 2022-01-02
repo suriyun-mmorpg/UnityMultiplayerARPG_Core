@@ -134,24 +134,26 @@ namespace MultiplayerARPG
         public virtual void UpdateData(IPlayerCharacterData character, IList<CharacterCurrency> characterCurrencies)
         {
             Character = character;
-            int selectedId = CacheSelectionManager.SelectedUI != null ? CacheSelectionManager.SelectedUI.Data.characterCurrency.dataId : 0;
+            int selectedDataId = CacheSelectionManager.SelectedUI != null ? CacheSelectionManager.SelectedUI.Data.characterCurrency.dataId : 0;
             CacheSelectionManager.DeselectSelectedUI();
             CacheSelectionManager.Clear();
 
             if (character == null || characterCurrencies == null || characterCurrencies.Count == 0)
             {
+                if (uiDialog != null)
+                    uiDialog.Hide();
                 CacheList.HideAll();
                 return;
             }
 
             UICharacterCurrency tempUiCharacterCurrency;
-            CacheList.Generate(characterCurrencies, (index, characterCurrency, ui) =>
+            CacheList.Generate(characterCurrencies, (index, data, ui) =>
             {
                 tempUiCharacterCurrency = ui.GetComponent<UICharacterCurrency>();
-                tempUiCharacterCurrency.Setup(new UICharacterCurrencyData(characterCurrency, characterCurrency.amount), Character, index);
+                tempUiCharacterCurrency.Setup(new UICharacterCurrencyData(data, data.amount), Character, index);
                 tempUiCharacterCurrency.Show();
                 CacheSelectionManager.Add(tempUiCharacterCurrency);
-                if (selectedId != 0 && selectedId == characterCurrency.dataId)
+                if (selectedDataId != 0 && selectedDataId == data.dataId)
                     tempUiCharacterCurrency.OnClickSelect();
             });
         }
