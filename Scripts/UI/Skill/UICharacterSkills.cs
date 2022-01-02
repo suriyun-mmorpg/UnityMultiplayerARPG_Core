@@ -208,10 +208,11 @@ namespace MultiplayerARPG
         public virtual void GenerateList()
         {
             int selectedSkillId = CacheSelectionManager.SelectedUI != null ? CacheSelectionManager.SelectedUI.Skill.DataId : 0;
+            CacheSelectionManager.DeselectSelectedUI();
             CacheSelectionManager.Clear();
-            ConvertFilterCategoriesToTrimedLowerChar();
 
-            if (Character == null || LoadedList.Count == 0)
+            Dictionary<BaseSkill, short> filteredList = UICharacterSkillsUtils.GetFilteredList(LoadedList, filterCategories, filterSkillTypes);
+            if (Character == null || filteredList.Count == 0)
             {
                 if (uiDialog != null)
                     uiDialog.Hide();
@@ -221,59 +222,28 @@ namespace MultiplayerARPG
                 return;
             }
 
-            int showingCount = 0;
+            if (listEmptyObject != null)
+                listEmptyObject.SetActive(false);
+
             UICharacterSkill tempUI;
-            BaseSkill tempSkill;
             int tempIndexOfLearnedSkill;
             short tempLearnedSkillLevel;
             // Combine skills from database (skill that can level up) with learned skill and equipment skill
-            CacheList.Generate(LoadedList, (index, data, ui) =>
+            CacheList.Generate(filteredList, (index, data, ui) =>
             {
                 tempUI = ui.GetComponent<UICharacterSkill>();
-                tempSkill = data.Key;
-
-                if (filterCategories.Count == 0 || (!string.IsNullOrEmpty(tempSkill.Category) &&
-                    filterCategories.Contains(tempSkill.Category.Trim().ToLower())))
-                {
-                    if (filterSkillTypes.Count == 0 ||
-                        filterSkillTypes.Contains(tempSkill.SkillType))
-                    {
-                        tempIndexOfLearnedSkill = Character.IndexOfSkill(tempSkill.DataId);
-                        tempLearnedSkillLevel = (short)(tempIndexOfLearnedSkill >= 0 ? Character.Skills[tempIndexOfLearnedSkill].level : 0);
-                        // Set UI data, Create new character skill data based on learned skill, target level is sum of learned skill and equipment skill
-                        tempUI.Setup(new UICharacterSkillData(CharacterSkill.Create(tempSkill, tempLearnedSkillLevel), data.Value), Character, tempIndexOfLearnedSkill);
-                        tempUI.Show();
-                        UICharacterSkillDragHandler dragHandler = tempUI.GetComponentInChildren<UICharacterSkillDragHandler>();
-                        if (dragHandler != null)
-                            dragHandler.SetupForSkills(tempUI);
-                        CacheSelectionManager.Add(tempUI);
-                        if (selectedSkillId == tempSkill.DataId)
-                            tempUI.OnClickSelect();
-                        showingCount++;
-                    }
-                    else
-                    {
-                        // Hide because skill's type not matches in the filter list
-                        tempUI.Hide();
-                    }
-                }
-                else
-                {
-                    // Hide because skill's category not matches in the filter list
-                    tempUI.Hide();
-                }
+                tempIndexOfLearnedSkill = Character.IndexOfSkill(data.Key.DataId);
+                tempLearnedSkillLevel = (short)(tempIndexOfLearnedSkill >= 0 ? Character.Skills[tempIndexOfLearnedSkill].level : 0);
+                // Set UI data, Create new character skill data based on learned skill, target level is sum of learned skill and equipment skill
+                tempUI.Setup(new UICharacterSkillData(CharacterSkill.Create(data.Key, tempLearnedSkillLevel), data.Value), Character, tempIndexOfLearnedSkill);
+                tempUI.Show();
+                UICharacterSkillDragHandler dragHandler = tempUI.GetComponentInChildren<UICharacterSkillDragHandler>();
+                if (dragHandler != null)
+                    dragHandler.SetupForSkills(tempUI);
+                CacheSelectionManager.Add(tempUI);
+                if (index == 0 || selectedSkillId == data.Key.DataId)
+                    tempUI.OnClickSelect();
             });
-
-            if (listEmptyObject != null)
-                listEmptyObject.SetActive(showingCount == 0);
-        }
-
-        protected void ConvertFilterCategoriesToTrimedLowerChar()
-        {
-            for (int i = 0; i < filterCategories.Count; ++i)
-            {
-                filterCategories[i] = filterCategories[i].Trim().ToLower();
-            }
         }
     }
 }
