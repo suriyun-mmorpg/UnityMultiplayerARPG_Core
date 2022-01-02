@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System.Collections.Generic;
+using UnityEngine;
 using UnityEngine.Serialization;
 
 namespace MultiplayerARPG
@@ -85,13 +86,24 @@ namespace MultiplayerARPG
 
         public virtual void UpdateData(ICharacterData character)
         {
-            this.Character = character;
+            Character = character;
             string selectedId = CacheSelectionManager.SelectedUI != null ? CacheSelectionManager.SelectedUI.CharacterBuff.id : string.Empty;
             CacheSelectionManager.DeselectSelectedUI();
             CacheSelectionManager.Clear();
 
             if (character == null || character.CurrentHp <= 0)
             {
+                if (uiDialog != null)
+                    uiDialog.Hide();
+                CacheList.HideAll();
+                return;
+            }
+
+            List<CharacterBuff> filteredList = UICharacterBuffsUtils.GetFilteredList(character.Buffs);
+            if (filteredList.Count == 0)
+            {
+                if (uiDialog != null)
+                    uiDialog.Hide();
                 CacheList.HideAll();
                 return;
             }
@@ -100,18 +112,11 @@ namespace MultiplayerARPG
             CacheList.Generate(character.Buffs, (index, data, ui) =>
             {
                 tempUI = ui.GetComponent<UICharacterBuff>();
-                if (data.buffRemainsDuration > 0)
-                {
-                    tempUI.Setup(data, character, index);
-                    tempUI.Show();
-                    CacheSelectionManager.Add(tempUI);
-                    if (!string.IsNullOrEmpty(selectedId) && selectedId.Equals(data.id))
-                        tempUI.OnClickSelect();
-                }
-                else
-                {
-                    tempUI.Hide();
-                }
+                tempUI.Setup(data, character, index);
+                tempUI.Show();
+                CacheSelectionManager.Add(tempUI);
+                if (index == 0 || selectedId.Equals(data.id))
+                    tempUI.OnClickSelect();
             });
         }
     }
