@@ -113,5 +113,7 @@
         // Gacha
         public const ushort GachaInfo = 187;
         public const ushort OpenGacha = 188;
+        // 1.73
+        public const ushort GetGuildInfo = 189;
     }
 }
