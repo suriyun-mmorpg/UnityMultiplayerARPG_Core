@@ -113,6 +113,7 @@ namespace MultiplayerARPG
             GameInstance.PlayingCharacterEntity.Dealing.onUpdateAnotherDealingState -= UpdateAnotherDealingState;
             GameInstance.PlayingCharacterEntity.Dealing.onUpdateAnotherDealingGold -= UpdateAnotherDealingGold;
             GameInstance.PlayingCharacterEntity.Dealing.onUpdateAnotherDealingItems -= UpdateAnotherDealingItems;
+            GameInstance.PlayingCharacterEntity.Dealing.CallServerCancelDealing();
         }
 
         protected void OnItemDialogHide()
@@ -328,7 +329,7 @@ namespace MultiplayerARPG
 
         public void OnClickCancel()
         {
-            GameInstance.PlayingCharacterEntity.Dealing.CallServerCancelDealing();
+            Hide();
         }
     }
 }
