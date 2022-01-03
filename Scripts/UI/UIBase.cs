@@ -23,8 +23,7 @@ public class UIBase : MonoBehaviour
     {
         get
         {
-            if (root == null)
-                root = gameObject;
+            CacheComponents();
             return root;
         }
     }
@@ -47,7 +46,6 @@ public class UIBase : MonoBehaviour
     {
         if (AlreadyCachedComponents)
             return;
-
         if (root == null)
             root = gameObject;
         AlreadyCachedComponents = true;
@@ -55,7 +53,6 @@ public class UIBase : MonoBehaviour
 
     public virtual bool IsVisible()
     {
-        CacheComponents();
         return CacheRoot.activeSelf;
     }
 
