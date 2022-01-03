@@ -14,6 +14,7 @@ namespace MultiplayerARPG
         public UICharacterQuest uiPrefab;
         [FormerlySerializedAs("uiCharacterQuestContainer")]
         public Transform uiContainer;
+
         [SerializeField]
         private bool hideCompleteQuest;
         public bool HideCompleteQuest
@@ -28,6 +29,7 @@ namespace MultiplayerARPG
                 }
             }
         }
+
         [SerializeField]
         private bool showOnlyTrackingQuests;
         public bool ShowOnlyTrackingQuests
@@ -130,13 +132,13 @@ namespace MultiplayerARPG
                 listEmptyObject.SetActive(false);
 
             UICharacterQuest tempUI;
-            CacheList.Generate(filteredList, (index, characterQuest, ui) =>
+            CacheList.Generate(filteredList, (index, data, ui) =>
             {
                 tempUI = ui.GetComponent<UICharacterQuest>();
-                tempUI.Setup(characterQuest, GameInstance.PlayingCharacter, index);
+                tempUI.Setup(data, GameInstance.PlayingCharacter, index);
                 tempUI.Show();
                 CacheSelectionManager.Add(tempUI);
-                if (index == 0 || selectedDataId == characterQuest.dataId)
+                if (selectedDataId == data.dataId)
                     tempUI.OnClickSelect();
             });
         }

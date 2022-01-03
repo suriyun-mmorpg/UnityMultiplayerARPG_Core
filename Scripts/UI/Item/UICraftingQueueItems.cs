@@ -12,6 +12,7 @@ namespace MultiplayerARPG
         public UICraftingQueueItem uiPrefab;
         public Transform uiContainer;
         public UIItemCraftFormulas uiFormulas;
+        public bool selectFirstEntryByDefault;
 
         public ICraftingQueueSource Source { get; set; }
 
@@ -165,7 +166,7 @@ namespace MultiplayerARPG
                 tempUI.Setup(data, GameInstance.PlayingCharacterEntity, index);
                 tempUI.Show();
                 CacheSelectionManager.Add(tempUI);
-                if (index == 0 || selectedDataId == data.dataId)
+                if ((selectFirstEntryByDefault && index == 0) || selectedDataId == data.dataId)
                     tempUI.OnClickSelect();
             });
             if (listEmptyObject != null)

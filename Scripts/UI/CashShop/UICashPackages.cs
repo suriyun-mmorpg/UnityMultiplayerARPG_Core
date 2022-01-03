@@ -23,6 +23,7 @@ namespace MultiplayerARPG
         [FormerlySerializedAs("uiCashPackageContainer")]
         public Transform uiContainer;
         public TextWrapper uiTextCash;
+        public bool selectFirstEntryByDefault;
 
         private UIList cacheList;
         public UIList CacheList
@@ -169,7 +170,7 @@ namespace MultiplayerARPG
                 tempUI.Data = data;
                 tempUI.Show();
                 CacheSelectionManager.Add(tempUI);
-                if (index == 0 || selectedDataId == data.DataId)
+                if ((selectFirstEntryByDefault && index == 0) || selectedDataId == data.DataId)
                     tempUI.OnClickSelect();
             });
         }

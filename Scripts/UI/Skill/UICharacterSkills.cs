@@ -241,7 +241,7 @@ namespace MultiplayerARPG
                 if (dragHandler != null)
                     dragHandler.SetupForSkills(tempUI);
                 CacheSelectionManager.Add(tempUI);
-                if (index == 0 || selectedSkillId == data.Key.DataId)
+                if (selectedSkillId == data.Key.DataId)
                     tempUI.OnClickSelect();
             });
         }

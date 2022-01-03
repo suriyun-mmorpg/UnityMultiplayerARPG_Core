@@ -47,7 +47,7 @@ namespace MultiplayerARPG
                 tempUI.onFriendRequestDeclined.RemoveListener(Refresh);
                 tempUI.onFriendRequestDeclined.AddListener(Refresh);
                 MemberSelectionManager.Add(tempUI);
-                if (index == 0 || selectedId.Equals(data.id))
+                if (selectedId.Equals(data.id))
                     tempUI.OnClickSelect();
             });
             if (memberListEmptyObject != null)

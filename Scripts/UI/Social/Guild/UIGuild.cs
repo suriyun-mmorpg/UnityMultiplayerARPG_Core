@@ -397,7 +397,7 @@ namespace MultiplayerARPG
                 uiGuildMember.Setup(data, memberRoles[index], guild.GetRole(memberRoles[index]));
                 uiGuildMember.Show();
                 MemberSelectionManager.Add(uiGuildMember);
-                if (index == 0 || selectedId.Equals(data.id))
+                if (selectedId.Equals(data.id))
                     uiGuildMember.OnClickSelect();
             });
 
@@ -412,7 +412,7 @@ namespace MultiplayerARPG
                 uiGuildRole.Data = guildRole;
                 uiGuildRole.Show();
                 RoleSelectionManager.Add(uiGuildRole);
-                if (index == 0 || selectedIdx == index)
+                if (selectedIdx == index)
                     uiGuildRole.OnClickSelect();
             });
 
@@ -427,7 +427,7 @@ namespace MultiplayerARPG
                 uiGuildSkill.Data = new UIGuildSkillData(guildSkill, guild.GetSkillLevel(guildSkill.DataId));
                 uiGuildSkill.Show();
                 SkillSelectionManager.Add(uiGuildSkill);
-                if (index == 0 || selectedDataId == guildSkill.DataId)
+                if (selectedDataId == guildSkill.DataId)
                     uiGuildSkill.OnClickSelect();
             });
         }

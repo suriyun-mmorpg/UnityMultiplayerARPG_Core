@@ -15,6 +15,7 @@ namespace MultiplayerARPG
         public UIItemCraftFormula uiDialog;
         public UIItemCraftFormula uiPrefab;
         public Transform uiContainer;
+        public bool selectFirstEntryByDefault;
 
         private UIList cacheList;
         public UIList CacheList
@@ -128,7 +129,7 @@ namespace MultiplayerARPG
                 tempUI.Data = data;
                 tempUI.Show();
                 CacheSelectionManager.Add(tempUI);
-                if (index == 0 || selectedDataId == data.DataId)
+                if ((selectFirstEntryByDefault && index == 0) || selectedDataId == data.DataId)
                     tempUI.OnClickSelect();
             });
         }
