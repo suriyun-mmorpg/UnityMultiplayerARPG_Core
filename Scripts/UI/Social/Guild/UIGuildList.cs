@@ -131,12 +131,12 @@ namespace MultiplayerARPG
             {
                 fieldOptions = fieldOptions,
                 guildName = guildName,
-            }, GuildListCallback);
+            }, FindGuildsCallback);
         }
 
-        private void GuildListCallback(ResponseHandlerData requestHandler, AckResponseCode responseCode, ResponseFindGuildsMessage response)
+        private void FindGuildsCallback(ResponseHandlerData requestHandler, AckResponseCode responseCode, ResponseFindGuildsMessage response)
         {
-            ClientGuildActions.ResponseGuildList(requestHandler, responseCode, response);
+            ClientGuildActions.ResponseFindGuilds(requestHandler, responseCode, response);
             if (responseCode == AckResponseCode.Success)
                 UpdateFoundGuildsUIs(response.guilds);
         }

@@ -23,6 +23,7 @@ namespace MultiplayerARPG
         public static System.Action<ResponseHandlerData, AckResponseCode, ResponseDeclineGuildRequestMessage> onResponseDeclineGuildRequest;
         public static System.Action<ResponseHandlerData, AckResponseCode, ResponseGetGuildRequestsMessage> onResponseGetGuildRequests;
         public static System.Action<ResponseHandlerData, AckResponseCode, ResponseFindGuildsMessage> onResponseFindGuilds;
+        public static System.Action<ResponseHandlerData, AckResponseCode, ResponseGetGuildInfoMessage> onResponseGetGuildInfo;
         public static System.Action<GuildInvitationData> onNotifyGuildInvitation;
         public static System.Action<GuildData> onNotifyGuildUpdated;
 
@@ -152,11 +153,18 @@ namespace MultiplayerARPG
                 onResponseGetGuildRequests.Invoke(requestHandler, responseCode, response);
         }
 
-        public static void ResponseGuildList(ResponseHandlerData requestHandler, AckResponseCode responseCode, ResponseFindGuildsMessage response)
+        public static void ResponseFindGuilds(ResponseHandlerData requestHandler, AckResponseCode responseCode, ResponseFindGuildsMessage response)
         {
             ClientGenericActions.ClientReceiveGameMessage(response.message);
             if (onResponseFindGuilds != null)
                 onResponseFindGuilds.Invoke(requestHandler, responseCode, response);
+        }
+
+        public static void ResponseGetGuildInfo(ResponseHandlerData requestHandler, AckResponseCode responseCode, ResponseGetGuildInfoMessage response)
+        {
+            ClientGenericActions.ClientReceiveGameMessage(response.message);
+            if (onResponseGetGuildInfo != null)
+                onResponseGetGuildInfo.Invoke(requestHandler, responseCode, response);
         }
 
         public static void NotifyGuildInvitation(GuildInvitationData invitation)
@@ -169,6 +177,21 @@ namespace MultiplayerARPG
         {
             if (onNotifyGuildUpdated != null)
                 onNotifyGuildUpdated.Invoke(guild);
+            GuildInfoCacheManager.SetCache(new GuildListEntry()
+            {
+                Id = guild.id,
+                GuildName = guild.guildName,
+                Level = guild.level,
+                FieldOptions = GuildListFieldOptions.All,
+                GuildMessage = guild.guildMessage,
+                GuildMessage2 = guild.guildMessage2,
+                Score = guild.score,
+                Options = guild.options,
+                AutoAcceptRequests = guild.autoAcceptRequests,
+                Rank = guild.rank,
+                CurrentMembers = guild.CountMember(),
+                MaxMembers = guild.MaxMember(),
+            });
         }
     }
 }
