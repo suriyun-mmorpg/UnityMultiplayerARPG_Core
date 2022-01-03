@@ -198,6 +198,8 @@ namespace MultiplayerARPG
         UI_ERROR_SKILL_REACHED_MAX_LEVEL,
         // Success - UI Cash Shop
         UI_CASH_SHOP_ITEM_BOUGHT,
+        // Success - UI Gacha
+        UI_GACHA_OPENED,
         // UI Character Item
         UI_DROP_ITEM,
         UI_DROP_ITEM_DESCRIPTION,
@@ -1399,6 +1401,8 @@ namespace MultiplayerARPG
             Texts.Add(UITextKeys.UI_ERROR_SKILL_REACHED_MAX_LEVEL.ToString(), "Skill reached max level");
             // Success - UI Cash Shop
             Texts.Add(UITextKeys.UI_CASH_SHOP_ITEM_BOUGHT.ToString(), "Cash shop item purchased");
+            // Success - UI Gacha
+            Texts.Add(UITextKeys.UI_GACHA_OPENED.ToString(), "Gacha opened");
             // UI Character Item
             Texts.Add(UITextKeys.UI_DROP_ITEM.ToString(), "Drop Item");
             Texts.Add(UITextKeys.UI_DROP_ITEM_DESCRIPTION.ToString(), "Enter amount of item");

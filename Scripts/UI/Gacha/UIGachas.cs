@@ -107,7 +107,7 @@ namespace MultiplayerARPG
             {
                 dataId = dataId,
                 openMode = openMode,
-            }, ResponseBuy);
+            }, ResponseOpenGacha);
         }
 
         protected virtual void ResponseInfo(ResponseHandlerData requestHandler, AckResponseCode responseCode, ResponseGachaInfoMessage response)
@@ -133,7 +133,7 @@ namespace MultiplayerARPG
             GenerateList();
         }
 
-        protected virtual void ResponseBuy(ResponseHandlerData requestHandler, AckResponseCode responseCode, ResponseOpenGachaMessage response)
+        protected virtual void ResponseOpenGacha(ResponseHandlerData requestHandler, AckResponseCode responseCode, ResponseOpenGachaMessage response)
         {
             ClientGachaActions.ResponseOpenGacha(requestHandler, responseCode, response);
             if (responseCode.ShowUnhandledResponseMessageDialog(response.message)) return;
@@ -147,7 +147,7 @@ namespace MultiplayerARPG
             }
             else
             {
-                UISceneGlobal.Singleton.ShowMessageDialog(LanguageManager.GetText(UITextKeys.UI_LABEL_SUCCESS.ToString()), LanguageManager.GetText(UITextKeys.UI_CASH_SHOP_ITEM_BOUGHT.ToString()));
+                UISceneGlobal.Singleton.ShowMessageDialog(LanguageManager.GetText(UITextKeys.UI_LABEL_SUCCESS.ToString()), LanguageManager.GetText(UITextKeys.UI_GACHA_OPENED.ToString()));
             }
             Refresh();
         }
