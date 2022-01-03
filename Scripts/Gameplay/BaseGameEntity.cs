@@ -44,18 +44,6 @@ namespace MultiplayerARPG
             set { syncTitle.Value = value; }
         }
 
-        [SerializeField]
-        protected SyncFieldString syncTitleB = new SyncFieldString();
-        public SyncFieldString SyncTitleB
-        {
-            get { return syncTitleB; }
-        }
-        public string TitleB
-        {
-            get { return syncTitleB.Value; }
-            set { syncTitleB.Value = value; }
-        }
-
         [Category(1, "Relative GameObjects/Transforms")]
         [Tooltip("These objects will be hidden on non owner objects")]
         [SerializeField]
@@ -539,8 +527,6 @@ namespace MultiplayerARPG
                 onSetupNetElements.Invoke();
             syncTitle.deliveryMethod = DeliveryMethod.ReliableOrdered;
             syncTitle.syncMode = LiteNetLibSyncField.SyncMode.ServerToClients;
-            syncTitleB.deliveryMethod = DeliveryMethod.ReliableOrdered;
-            syncTitleB.syncMode = LiteNetLibSyncField.SyncMode.ServerToClients;
             // Movement data
             direction2D.deliveryMethod = DeliveryMethod.Sequenced;
             direction2D.syncMode = LiteNetLibSyncField.SyncMode.ServerToClients;

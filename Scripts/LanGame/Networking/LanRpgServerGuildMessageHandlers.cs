@@ -145,11 +145,6 @@ namespace MultiplayerARPG
             playerCharacter.GuildId = guild.id;
             playerCharacter.GuildRole = guild.GetMemberRole(playerCharacter.Id);
             playerCharacter.SharedGuildExp = 0;
-            if (playerCharacter is BasePlayerCharacterEntity)
-            {
-                // Sync guild name to client
-                (playerCharacter as BasePlayerCharacterEntity).GuildName = request.guildName;
-            }
             GameInstance.ServerGameMessageHandlers.SendSetFullGuildData(requestHandler.ConnectionId, guild);
             result.Invoke(AckResponseCode.Success, new ResponseCreateGuildMessage());
         }

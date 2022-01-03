@@ -21,7 +21,6 @@ namespace MultiplayerARPG
 
         [Header("Base Game Entity - UI Elements")]
         public TextWrapper uiTextTitle;
-        public TextWrapper uiTextTitleB;
 
         [Header("Visible Options")]
         public Visibility visibility;
@@ -61,15 +60,6 @@ namespace MultiplayerARPG
                 uiTextTitle.SetGameObjectActive(!string.IsNullOrEmpty(tempTitle));
                 uiTextTitle.text = string.Format(
                     LanguageManager.GetText(formatKeyTitle),
-                    tempTitle);
-            }
-
-            if (uiTextTitleB != null)
-            {
-                tempTitle = Data == null ? string.Empty : Data.TitleB;
-                uiTextTitleB.SetGameObjectActive(!string.IsNullOrEmpty(tempTitle));
-                uiTextTitleB.text = string.Format(
-                    LanguageManager.GetText(formatKeyTitleB),
                     tempTitle);
             }
         }
