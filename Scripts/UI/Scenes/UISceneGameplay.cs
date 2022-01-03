@@ -109,6 +109,29 @@ namespace MultiplayerARPG
         protected override void Awake()
         {
             base.Awake();
+            SetUIComponentsFromChildrenIfEmpty();
+            if (blockControllerUis != null && blockControllerUis.Count > 0)
+            {
+                foreach (UIBase ui in blockControllerUis)
+                {
+                    if (!ui)
+                        continue;
+                    if (ui.gameObject.GetComponent<UIBlockController>())
+                        continue;
+                    ui.gameObject.AddComponent<UIBlockController>();
+                }
+            }
+            this.InvokeInstanceDevExtMethods("Awake");
+        }
+
+        protected void OnDestroy()
+        {
+            this.InvokeInstanceDevExtMethods("OnDestroy");
+        }
+
+        [ContextMenu("Set UI Components From Children If Empty")]
+        public void SetUIComponentsFromChildrenIfEmpty()
+        {
             if (uiNpcDialog == null)
                 uiNpcDialog = gameObject.GetComponentInChildren<UINpcDialog>(true);
             if (uiQuestRewardItemSelection == null)
@@ -159,25 +182,6 @@ namespace MultiplayerARPG
                 uiCraftingQueueItems = gameObject.GetComponentInChildren<UICraftingQueueItems>(true);
             if (uiItemsContainer == null)
                 uiItemsContainer = gameObject.GetComponentInChildren<UIItemsContainer>(true);
-
-            if (blockControllerUis != null && blockControllerUis.Count > 0)
-            {
-                foreach (UIBase ui in blockControllerUis)
-                {
-                    if (!ui)
-                        continue;
-                    if (ui.gameObject.GetComponent<UIBlockController>())
-                        continue;
-                    ui.gameObject.AddComponent<UIBlockController>();
-                }
-            }
-
-            this.InvokeInstanceDevExtMethods("Awake");
-        }
-
-        protected void OnDestroy()
-        {
-            this.InvokeInstanceDevExtMethods("OnDestroy");
         }
 
         protected override void Update()
