@@ -205,6 +205,13 @@ namespace MultiplayerARPG
         {
             base.OnDisable();
             lockRemainsDuration = 0f;
+            if (uiComparingEquipments != null)
+            {
+                foreach (UICharacterItem uiComparingEquipment in uiComparingEquipments)
+                {
+                    uiComparingEquipment.Hide();
+                }
+            }
         }
 
         protected override void Update()
