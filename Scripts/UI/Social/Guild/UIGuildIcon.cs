@@ -16,12 +16,12 @@ namespace MultiplayerARPG
 
         protected override void UpdateData()
         {
-            if (Data == null)
-                Data = GameInstance.GuildIcons.Values.FirstOrDefault();
-
+            GuildIcon icon = Data;
+            if (icon == null)
+                icon = GameInstance.GuildIcons.Values.FirstOrDefault();
             if (imageIcon != null)
             {
-                Sprite iconSprite = Data == null ? null : Data.Icon;
+                Sprite iconSprite = icon == null ? null : icon.Icon;
                 imageIcon.gameObject.SetActive(iconSprite != null);
                 imageIcon.sprite = iconSprite;
                 imageIcon.preserveAspect = true;
