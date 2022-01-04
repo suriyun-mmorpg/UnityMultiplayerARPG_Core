@@ -1,5 +1,9 @@
-﻿using UnityEngine;
+﻿using System.Collections.Generic;
+using UnityEngine;
 using UnityEngine.UI;
+#if UNITY_EDITOR
+using UnityEditor;
+#endif
 
 namespace MultiplayerARPG
 {
@@ -52,11 +56,26 @@ namespace MultiplayerARPG
         public Transform uiQuestTaskContainer;
         [Header("Quest Status")]
         public Toggle toggleQuestTracking;
+        [HideInInspector]
+        [Tooltip("This is a part of `questOnGoingStatusObjects`, just keep it for backward compatibility.")]
         public GameObject questOnGoingStatusObject;
+        public List<GameObject> questOnGoingStatusObjects = new List<GameObject>();
+        [HideInInspector]
+        [Tooltip("This is a part of `questTasksCompleteStatusObjects`, just keep it for backward compatibility.")]
         public GameObject questTasksCompleteStatusObject;
+        public List<GameObject> questTasksCompleteStatusObjects = new List<GameObject>();
+        [HideInInspector]
+        [Tooltip("This is a part of `questCompleteStatusObjects`, just keep it for backward compatibility.")]
         public GameObject questCompleteStatusObject;
+        public List<GameObject> questCompleteStatusObjects = new List<GameObject>();
+        [HideInInspector]
+        [Tooltip("This is a part of `questIsTrackingObjects`, just keep it for backward compatibility.")]
         public GameObject questIsTrackingObject;
+        public List<GameObject> questIsTrackingObjects = new List<GameObject>();
+        [HideInInspector]
+        [Tooltip("This is a part of `questIsNotTrackingObjects`, just keep it for backward compatibility.")]
         public GameObject questIsNotTrackingObject;
+        public List<GameObject> questIsNotTrackingObjects = new List<GameObject>();
 
         private UIList cacheRewardItemList;
         public UIList CacheRewardItemList
@@ -128,6 +147,56 @@ namespace MultiplayerARPG
                 }
                 return cacheQuestTaskList;
             }
+        }
+
+        protected override void Awake()
+        {
+            base.Awake();
+            MigrateStatusObject();
+        }
+
+#if UNITY_EDITOR
+        private void OnValidate()
+        {
+            if (MigrateStatusObject())
+                EditorUtility.SetDirty(this);
+        }
+#endif
+
+        protected bool MigrateStatusObject()
+        {
+            bool hasChanges = false;
+            if (questOnGoingStatusObject != null && !questOnGoingStatusObjects.Contains(questOnGoingStatusObject))
+            {
+                questOnGoingStatusObjects.Add(questOnGoingStatusObject);
+                questOnGoingStatusObject = null;
+                hasChanges = true;
+            }
+            if (questTasksCompleteStatusObject != null && !questTasksCompleteStatusObjects.Contains(questTasksCompleteStatusObject))
+            {
+                questTasksCompleteStatusObjects.Add(questTasksCompleteStatusObject);
+                questTasksCompleteStatusObject = null;
+                hasChanges = true;
+            }
+            if (questCompleteStatusObject != null && !questCompleteStatusObjects.Contains(questCompleteStatusObject))
+            {
+                questCompleteStatusObjects.Add(questCompleteStatusObject);
+                questCompleteStatusObject = null;
+                hasChanges = true;
+            }
+            if (questIsTrackingObject != null && !questIsTrackingObjects.Contains(questIsTrackingObject))
+            {
+                questIsTrackingObjects.Add(questIsTrackingObject);
+                questIsTrackingObject = null;
+                hasChanges = true;
+            }
+            if (questIsNotTrackingObject != null && !questIsNotTrackingObjects.Contains(questIsNotTrackingObject))
+            {
+                questIsNotTrackingObjects.Add(questIsNotTrackingObject);
+                questIsNotTrackingObject = null;
+                hasChanges = true;
+            }
+            return hasChanges;
         }
 
         protected override void OnEnable()
