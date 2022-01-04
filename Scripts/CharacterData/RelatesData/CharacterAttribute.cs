@@ -33,10 +33,11 @@ namespace MultiplayerARPG
 
         public CharacterAttribute Clone()
         {
-            CharacterAttribute clone = new CharacterAttribute();
-            clone.dataId = dataId;
-            clone.amount = amount;
-            return clone;
+            return new CharacterAttribute()
+            {
+                dataId = dataId,
+                amount = amount,
+            };
         }
 
         public static CharacterAttribute Create(Attribute attribute, short amount = 0)

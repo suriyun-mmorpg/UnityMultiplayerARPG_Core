@@ -34,11 +34,12 @@ namespace MultiplayerARPG
 
         public CharacterHotkey Clone()
         {
-            CharacterHotkey clone = new CharacterHotkey();
-            clone.hotkeyId = hotkeyId;
-            clone.type = type;
-            clone.relateId = relateId;
-            return clone;
+            return new CharacterHotkey()
+            {
+                hotkeyId = hotkeyId,
+                type = type,
+                relateId = relateId,
+            };
         }
     }
 

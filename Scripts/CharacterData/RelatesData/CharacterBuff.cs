@@ -284,13 +284,14 @@ namespace MultiplayerARPG
 
         public CharacterBuff Clone(bool generateNewId = false)
         {
-            CharacterBuff clone = new CharacterBuff();
-            clone.id = generateNewId ? GenericUtils.GetUniqueId() : id;
-            clone.type = type;
-            clone.dataId = dataId;
-            clone.level = level;
-            clone.buffRemainsDuration = buffRemainsDuration;
-            return clone;
+            return new CharacterBuff()
+            {
+                id = generateNewId ? GenericUtils.GetUniqueId() : id,
+                type = type,
+                dataId = dataId,
+                level = level,
+                buffRemainsDuration = buffRemainsDuration,
+            };
         }
 
         public static CharacterBuff Create(BuffType type, int dataId, short level = 1)

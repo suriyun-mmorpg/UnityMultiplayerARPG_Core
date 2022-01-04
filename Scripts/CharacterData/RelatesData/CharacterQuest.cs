@@ -183,12 +183,7 @@ namespace MultiplayerARPG
             }
             clone.killedMonsters = killedMonsters;
             // Clone complete tasks
-            List<int> completedTasks = new List<int>();
-            foreach (int cloneEntry in this.completedTasks)
-            {
-                completedTasks.Add(cloneEntry);
-            }
-            clone.completedTasks = completedTasks;
+            clone.completedTasks = new List<int>(completedTasks);
             return clone;
         }
 

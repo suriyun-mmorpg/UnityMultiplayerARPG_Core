@@ -33,10 +33,11 @@ namespace MultiplayerARPG
 
         public CharacterCurrency Clone()
         {
-            CharacterCurrency clone = new CharacterCurrency();
-            clone.dataId = dataId;
-            clone.amount = amount;
-            return clone;
+            return new CharacterCurrency()
+            {
+                dataId = dataId,
+                amount = amount,
+            };
         }
 
         public static CharacterCurrency Create(Currency currency, int amount = 0)

@@ -37,10 +37,11 @@ namespace MultiplayerARPG
 
         public CharacterSkill Clone()
         {
-            CharacterSkill clone = new CharacterSkill();
-            clone.dataId = dataId;
-            clone.level = level;
-            return clone;
+            return new CharacterSkill()
+            {
+                dataId = dataId,
+                level = level,
+            };
         }
 
         public static CharacterSkill Create(BaseSkill skill, short level = 1)

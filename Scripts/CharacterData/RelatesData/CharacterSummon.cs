@@ -251,10 +251,17 @@ namespace MultiplayerARPG
 
         public CharacterSummon Clone()
         {
-            CharacterSummon clone = new CharacterSummon();
-            clone.type = type;
-            clone.dataId = dataId;
-            return clone;
+            return new CharacterSummon()
+            {
+                type = type,
+                dataId = dataId,
+                summonRemainsDuration = summonRemainsDuration,
+                objectId = objectId,
+                level = level,
+                exp = exp,
+                currentHp = currentHp,
+                currentMp = currentMp,
+            };
         }
 
         public static CharacterSummon Create(SummonType type, int dataId)

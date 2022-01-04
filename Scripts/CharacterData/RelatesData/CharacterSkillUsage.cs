@@ -103,11 +103,12 @@ namespace MultiplayerARPG
 
         public CharacterSkillUsage Clone()
         {
-            CharacterSkillUsage clone = new CharacterSkillUsage();
-            clone.type = type;
-            clone.dataId = dataId;
-            clone.coolDownRemainsDuration = coolDownRemainsDuration;
-            return clone;
+            return new CharacterSkillUsage()
+            {
+                type = type,
+                dataId = dataId,
+                coolDownRemainsDuration = coolDownRemainsDuration,
+            };
         }
 
         public static CharacterSkillUsage Create(SkillUsageType type, int dataId)
