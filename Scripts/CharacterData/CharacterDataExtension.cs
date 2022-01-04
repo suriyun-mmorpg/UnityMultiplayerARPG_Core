@@ -860,7 +860,7 @@ namespace MultiplayerARPG
                 else
                 {
                     // Add item to temp list to check it will overwhelming or not later
-                    simulatingItemList.AddOrSetItems(CharacterItem.Create(receiveItem.item, 1, receiveItem.amount, receiveItem.randomSeed));
+                    simulatingItemList.AddOrSetItems(CharacterItem.Create(receiveItem.item, receiveItem.level, receiveItem.amount, receiveItem.randomSeed));
                 }
             }
             return false;
@@ -1088,7 +1088,7 @@ namespace MultiplayerARPG
                 if (increasingItem.item == null || increasingItem.amount <= 0) continue;
                 data.NonEquipItems.IncreaseItems(CharacterItem.Create(increasingItem.item.DataId, 1, increasingItem.amount, increasingItem.randomSeed));
                 if (onIncrease != null)
-                    onIncrease.Invoke(increasingItem.item.DataId, 1, increasingItem.amount, increasingItem.randomSeed);
+                    onIncrease.Invoke(increasingItem.item.DataId, increasingItem.level, increasingItem.amount, increasingItem.randomSeed);
             }
         }
 

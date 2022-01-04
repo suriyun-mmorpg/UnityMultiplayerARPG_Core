@@ -144,7 +144,7 @@ namespace MultiplayerARPG
             LoadedList.Clear();
             foreach (RewardedItem item in items)
             {
-                LoadedList.Add(CharacterItem.Create(item.item, 1, item.amount, item.randomSeed));
+                LoadedList.Add(CharacterItem.Create(item.item, item.level, item.amount, item.randomSeed));
             }
             GenerateList();
         }
