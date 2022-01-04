@@ -4,6 +4,9 @@ using UnityEngine.Profiling;
 using UnityEngine.Tilemaps;
 using LiteNetLibManager;
 using UnityEngine.Events;
+#if UNITY_EDITOR
+using UnityEditor;
+#endif
 
 namespace MultiplayerARPG
 {
@@ -168,20 +171,27 @@ namespace MultiplayerARPG
             gameObject.layer = CurrentGameInstance.buildingLayer;
             isStaticHitBoxes = true;
             isDestroyed = false;
-
-            if (!string.IsNullOrEmpty(buildingType) && !buildingTypes.Contains(buildingType))
-                buildingTypes.Add(buildingType);
+            MigrateBuildingType();
         }
 
+#if UNITY_EDITOR
         protected override void OnValidate()
         {
             base.OnValidate();
-            if (!string.IsNullOrEmpty(buildingType))
+            if (MigrateBuildingType())
+                EditorUtility.SetDirty(this);
+        }
+#endif
+
+        protected bool MigrateBuildingType()
+        {
+            if (!string.IsNullOrEmpty(buildingType) && !buildingTypes.Contains(buildingType))
             {
-                if (!buildingTypes.Contains(buildingType))
-                    buildingTypes.Add(buildingType);
+                buildingTypes.Add(buildingType);
                 buildingType = string.Empty;
+                return true;
             }
+            return false;
         }
 
         protected override void EntityUpdate()
