@@ -370,21 +370,30 @@ namespace MultiplayerARPG
                 uiQuestTaskRoot.SetActive(showQuestTaskList && Quest.tasks.Length > 0);
 
             // Quest status
+            foreach (GameObject obj in questOnGoingStatusObjects)
+            {
+                if (obj != null) obj.SetActive(!isComplete && !isAllTasksDone);
+            }
 
-            if (questCompleteStatusObject != null)
-                questCompleteStatusObject.SetActive(isComplete);
+            foreach (GameObject obj in questTasksCompleteStatusObjects)
+            {
+                if (obj != null) obj.SetActive(!isComplete && isAllTasksDone);
+            }
 
-            if (questTasksCompleteStatusObject != null)
-                questTasksCompleteStatusObject.SetActive(!isComplete && isAllTasksDone);
+            foreach (GameObject obj in questCompleteStatusObjects)
+            {
+                if (obj != null) obj.SetActive(isComplete);
+            }
 
-            if (questOnGoingStatusObject != null)
-                questOnGoingStatusObject.SetActive(!isComplete && !isAllTasksDone);
+            foreach (GameObject obj in questIsTrackingObjects)
+            {
+                if (obj != null) obj.SetActive(isTracking);
+            }
 
-            if (questIsTrackingObject != null)
-                questIsTrackingObject.SetActive(isTracking);
-
-            if (questIsNotTrackingObject != null)
-                questIsNotTrackingObject.SetActive(!isTracking);
+            foreach (GameObject obj in questIsNotTrackingObjects)
+            {
+                if (obj != null) obj.SetActive(!isTracking);
+            }
 
             if (toggleQuestTracking != null)
                 toggleQuestTracking.SetIsOnWithoutNotify(Data.isTracking);
