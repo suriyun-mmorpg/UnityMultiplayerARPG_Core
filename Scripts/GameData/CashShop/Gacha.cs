@@ -40,9 +40,9 @@ namespace MultiplayerARPG
             get { return randomItems; }
         }
 
-        public List<ItemAmount> GetRandomedItems(int count)
+        public List<RewardedItem> GetRandomedItems(int count)
         {
-            List<ItemAmount> rewardItems = new List<ItemAmount>();
+            List<RewardedItem> rewardItems = new List<RewardedItem>();
             Dictionary<ItemRandomByWeight, int> randomItems = new Dictionary<ItemRandomByWeight, int>();
             foreach (ItemRandomByWeight item in RandomItems)
             {
@@ -53,10 +53,11 @@ namespace MultiplayerARPG
             for (int i = 0; i < count; ++i)
             {
                 ItemRandomByWeight randomedItem = WeightedRandomizer.From(randomItems).TakeOne();
-                rewardItems.Add(new ItemAmount()
+                rewardItems.Add(new RewardedItem()
                 {
                     item = randomedItem.item,
                     amount = randomedItem.amount,
+                    randomSeed = (short)Random.Range(short.MinValue, short.MaxValue),
                 });
             }
             return rewardItems;

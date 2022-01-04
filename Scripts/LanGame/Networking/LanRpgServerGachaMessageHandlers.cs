@@ -65,7 +65,7 @@ namespace MultiplayerARPG
             }
 
             int openCount = request.openMode == GachaOpenMode.Multiple ? gacha.MultipleModeOpenCount : 1;
-            List<ItemAmount> rewardItems = gacha.GetRandomedItems(openCount);
+            List<RewardedItem> rewardItems = gacha.GetRandomedItems(openCount);
             if (playerCharacter.IncreasingItemsWillOverwhelming(rewardItems))
             {
                 result.Invoke(AckResponseCode.Error, new ResponseOpenGachaMessage()

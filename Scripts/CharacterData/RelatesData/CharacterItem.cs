@@ -500,16 +500,18 @@ namespace MultiplayerARPG
             return clone;
         }
 
-        public static CharacterItem Create(BaseItem item, short level = 1, short amount = 1)
+        public static CharacterItem Create(BaseItem item, short level = 1, short amount = 1, short? randomSeed = null)
         {
-            return Create(item.DataId, level, amount);
+            return Create(item.DataId, level, amount, randomSeed);
         }
 
-        public static CharacterItem Create(int dataId, short level = 1, short amount = 1)
+        public static CharacterItem Create(int dataId, short level = 1, short amount = 1, short? randomSeed = null)
         {
             CharacterItem newItem = new CharacterItem();
             newItem.id = GenericUtils.GetUniqueId();
             newItem.dataId = dataId;
+            if (level <= 0)
+                level = 1;
             newItem.level = level;
             newItem.amount = amount;
             newItem.durability = 0f;
@@ -521,7 +523,10 @@ namespace MultiplayerARPG
             {
                 newItem.durability = (tempItem as IEquipmentItem).MaxDurability;
                 newItem.lockRemainsDuration = tempItem.LockDuration;
-                newItem.randomSeed = (short)Random.Range(short.MinValue, short.MaxValue);
+                if (randomSeed.HasValue)
+                    newItem.randomSeed = randomSeed.Value;
+                else
+                    newItem.randomSeed = (short)Random.Range(short.MinValue, short.MaxValue);
             }
             return newItem;
         }

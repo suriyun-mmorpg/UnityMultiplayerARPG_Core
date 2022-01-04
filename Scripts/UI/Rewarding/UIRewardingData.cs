@@ -8,6 +8,6 @@ namespace MultiplayerARPG
         public int rewardGold;
         public int rewardCash;
         [ArrayElementTitle("item")]
-        public List<ItemAmount> rewardItems;
+        public List<RewardedItem> rewardItems;
     }
 }

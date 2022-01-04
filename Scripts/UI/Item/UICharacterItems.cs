@@ -138,6 +138,17 @@ namespace MultiplayerARPG
             GenerateList();
         }
 
+        public void UpdateData(ICharacterData character, IList<RewardedItem> items)
+        {
+            Character = character;
+            LoadedList.Clear();
+            foreach (RewardedItem item in items)
+            {
+                LoadedList.Add(CharacterItem.Create(item.item, 1, item.amount, item.randomSeed));
+            }
+            GenerateList();
+        }
+
         public virtual void UpdateData(ICharacterData character, IList<CharacterItem> characterItems)
         {
             Character = character;

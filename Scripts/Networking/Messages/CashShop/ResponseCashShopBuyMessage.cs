@@ -8,7 +8,7 @@ namespace MultiplayerARPG
         public UITextKeys message;
         public int dataId;
         public int rewardGold;
-        public List<ItemAmount> rewardItems;
+        public List<RewardedItem> rewardItems;
 
         public void Deserialize(NetDataReader reader)
         {
@@ -17,7 +17,7 @@ namespace MultiplayerARPG
             {
                 dataId = reader.GetPackedInt();
                 rewardGold = reader.GetPackedInt();
-                rewardItems = reader.GetList<ItemAmount>();
+                rewardItems = reader.GetList<RewardedItem>();
             }
         }
 

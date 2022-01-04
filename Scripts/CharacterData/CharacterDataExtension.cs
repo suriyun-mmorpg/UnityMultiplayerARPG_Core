@@ -837,6 +837,35 @@ namespace MultiplayerARPG
             return false;
         }
 
+        public static bool IncreasingItemsWillOverwhelming(this IList<CharacterItem> itemList, IEnumerable<RewardedItem> increasingItems, bool isLimitWeight, float weightLimit, float totalItemWeight, bool isLimitSlot, short slotLimit)
+        {
+            if (itemList == null || increasingItems == null)
+                return false;
+            List<CharacterItem> simulatingItemList = new List<CharacterItem>(itemList);
+            foreach (RewardedItem receiveItem in increasingItems)
+            {
+                if (receiveItem.item == null || receiveItem.amount <= 0) continue;
+                if (simulatingItemList.IncreasingItemsWillOverwhelming(
+                    receiveItem.item.DataId,
+                    receiveItem.amount,
+                    isLimitWeight,
+                    weightLimit,
+                    totalItemWeight,
+                    isLimitSlot,
+                    slotLimit))
+                {
+                    // Overwhelming
+                    return true;
+                }
+                else
+                {
+                    // Add item to temp list to check it will overwhelming or not later
+                    simulatingItemList.AddOrSetItems(CharacterItem.Create(receiveItem.item, 1, receiveItem.amount, receiveItem.randomSeed));
+                }
+            }
+            return false;
+        }
+
         public static bool IncreasingItemsWillOverwhelming(this IList<CharacterItem> itemList, IEnumerable<CharacterItem> increasingItems, bool isLimitWeight, float weightLimit, float totalItemWeight, bool isLimitSlot, short slotLimit)
         {
             if (itemList == null || increasingItems == null)
@@ -879,6 +908,17 @@ namespace MultiplayerARPG
         }
 
         public static bool IncreasingItemsWillOverwhelming(this ICharacterData data, IEnumerable<ItemAmount> increasingItems)
+        {
+            return data.NonEquipItems.IncreasingItemsWillOverwhelming(
+                increasingItems,
+                GameInstance.Singleton.IsLimitInventoryWeight,
+                data.GetCaches().LimitItemWeight,
+                data.GetCaches().TotalItemWeight,
+                GameInstance.Singleton.IsLimitInventorySlot,
+                data.GetCaches().LimitItemSlot);
+        }
+
+        public static bool IncreasingItemsWillOverwhelming(this ICharacterData data, IEnumerable<RewardedItem> increasingItems)
         {
             return data.NonEquipItems.IncreasingItemsWillOverwhelming(
                 increasingItems,
@@ -1038,6 +1078,17 @@ namespace MultiplayerARPG
                 data.NonEquipItems.IncreaseItems(CharacterItem.Create(increasingItem.item.DataId, 1, increasingItem.amount));
                 if (onIncrease != null)
                     onIncrease.Invoke(increasingItem.item.DataId, 1, increasingItem.amount);
+            }
+        }
+
+        public static void IncreaseItems(this ICharacterData data, IEnumerable<RewardedItem> increasingItems, System.Action<int, short, short, short> onIncrease = null)
+        {
+            foreach (RewardedItem increasingItem in increasingItems)
+            {
+                if (increasingItem.item == null || increasingItem.amount <= 0) continue;
+                data.NonEquipItems.IncreaseItems(CharacterItem.Create(increasingItem.item.DataId, 1, increasingItem.amount, increasingItem.randomSeed));
+                if (onIncrease != null)
+                    onIncrease.Invoke(increasingItem.item.DataId, 1, increasingItem.amount, increasingItem.randomSeed);
             }
         }
 
