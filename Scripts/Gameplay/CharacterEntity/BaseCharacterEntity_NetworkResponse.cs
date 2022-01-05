@@ -41,9 +41,9 @@ namespace MultiplayerARPG
                 return;
             }
 
-            this.IncreaseItems(itemDropEntity.DropItems, (dataId, level, amount) =>
+            this.IncreaseItems(itemDropEntity.DropItems, (characterItem) =>
             {
-                GameInstance.ServerGameMessageHandlers.NotifyRewardItem(ConnectionId, dataId, amount);
+                GameInstance.ServerGameMessageHandlers.NotifyRewardItem(ConnectionId, characterItem.dataId, characterItem.amount);
             });
             this.FillEmptySlots();
             itemDropEntity.PickedUp();
@@ -94,9 +94,9 @@ namespace MultiplayerARPG
                 return;
             }
 
-            this.IncreaseItems(pickingItem, (dataId, level, increaseAmount) =>
+            this.IncreaseItems(pickingItem, (characterItem) =>
             {
-                GameInstance.ServerGameMessageHandlers.NotifyRewardItem(ConnectionId, dataId, increaseAmount);
+                GameInstance.ServerGameMessageHandlers.NotifyRewardItem(ConnectionId, characterItem.dataId, characterItem.amount);
             });
             itemsContainerEntity.Items.DecreaseItemsByIndex(itemsContainerIndex, amount, false);
             itemsContainerEntity.PickedUp();
@@ -143,9 +143,9 @@ namespace MultiplayerARPG
                     break;
                 }
 
-                this.IncreaseItems(pickingItem, (dataId, level, amount) =>
+                this.IncreaseItems(pickingItem, (characterItem) =>
                 {
-                    GameInstance.ServerGameMessageHandlers.NotifyRewardItem(ConnectionId, dataId, amount);
+                    GameInstance.ServerGameMessageHandlers.NotifyRewardItem(ConnectionId, characterItem.dataId, characterItem.amount);
                 });
                 itemsContainerEntity.Items.RemoveAt(0);
             }

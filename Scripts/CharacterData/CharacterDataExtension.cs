@@ -1037,69 +1037,90 @@ namespace MultiplayerARPG
             return true;
         }
 
-        public static void IncreaseItems(this IList<CharacterItem> itemList, IEnumerable<ItemAmount> increasingItems, System.Action<int, short, short> onIncrease = null)
+        public static void IncreaseItems(this IList<CharacterItem> itemList, IEnumerable<ItemAmount> increasingItems, System.Action<CharacterItem> onIncrease = null)
         {
+            CharacterItem increasedItem;
             foreach (ItemAmount increasingItem in increasingItems)
             {
                 if (increasingItem.item == null || increasingItem.amount <= 0) continue;
-                itemList.IncreaseItems(CharacterItem.Create(increasingItem.item.DataId, 1, increasingItem.amount));
+                increasedItem = CharacterItem.Create(increasingItem.item.DataId, 1, increasingItem.amount);
+                itemList.IncreaseItems(increasedItem);
                 if (onIncrease != null)
-                    onIncrease.Invoke(increasingItem.item.DataId, 1, increasingItem.amount);
+                    onIncrease.Invoke(increasedItem);
             }
         }
 
-        public static void IncreaseItems(this IList<CharacterItem> itemList, IEnumerable<CharacterItem> increasingItems, System.Action<int, short, short> onIncrease = null)
+        public static void IncreaseItems(this IList<CharacterItem> itemList, IEnumerable<RewardedItem> increasingItems, System.Action<CharacterItem> onIncrease = null)
         {
+            CharacterItem increasedItem;
+            foreach (RewardedItem increasingItem in increasingItems)
+            {
+                if (increasingItem.item == null || increasingItem.amount <= 0) continue;
+                increasedItem = CharacterItem.Create(increasingItem.item.DataId, increasingItem.level, increasingItem.amount, increasingItem.randomSeed);
+                itemList.IncreaseItems(increasedItem);
+                if (onIncrease != null)
+                    onIncrease.Invoke(increasedItem);
+            }
+        }
+
+        public static void IncreaseItems(this IList<CharacterItem> itemList, IEnumerable<CharacterItem> increasingItems, System.Action<CharacterItem> onIncrease = null)
+        {
+            CharacterItem increasedItem;
             foreach (CharacterItem increasingItem in increasingItems)
             {
                 if (increasingItem.IsEmptySlot()) continue;
-                itemList.IncreaseItems(increasingItem.Clone());
+                increasedItem = increasingItem.Clone();
+                itemList.IncreaseItems(increasedItem);
                 if (onIncrease != null)
-                    onIncrease.Invoke(increasingItem.dataId, increasingItem.level, increasingItem.amount);
+                    onIncrease.Invoke(increasedItem);
             }
         }
 
-        public static bool IncreaseItems(this ICharacterData data, CharacterItem increasingItem, System.Action<int, short, short> onIncrease = null)
+        public static bool IncreaseItems(this ICharacterData data, CharacterItem increasingItem, System.Action<CharacterItem> onIncrease = null)
         {
             if (data.NonEquipItems.IncreaseItems(increasingItem))
             {
                 if (onIncrease != null)
-                    onIncrease.Invoke(increasingItem.dataId, increasingItem.level, increasingItem.amount);
+                    onIncrease.Invoke(increasingItem);
                 return true;
             }
             return false;
         }
 
-        public static void IncreaseItems(this ICharacterData data, IEnumerable<ItemAmount> increasingItems, System.Action<int, short, short> onIncrease = null)
+        public static void IncreaseItems(this ICharacterData data, IEnumerable<ItemAmount> increasingItems, System.Action<CharacterItem> onIncrease = null)
         {
+            CharacterItem increasedItem;
             foreach (ItemAmount increasingItem in increasingItems)
             {
                 if (increasingItem.item == null || increasingItem.amount <= 0) continue;
-                data.NonEquipItems.IncreaseItems(CharacterItem.Create(increasingItem.item.DataId, 1, increasingItem.amount));
+                increasedItem = CharacterItem.Create(increasingItem.item.DataId, 1, increasingItem.amount);
+                data.NonEquipItems.IncreaseItems(increasedItem);
                 if (onIncrease != null)
-                    onIncrease.Invoke(increasingItem.item.DataId, 1, increasingItem.amount);
+                    onIncrease.Invoke(increasedItem);
             }
         }
 
-        public static void IncreaseItems(this ICharacterData data, IEnumerable<RewardedItem> increasingItems, System.Action<int, short, short, short> onIncrease = null)
+        public static void IncreaseItems(this ICharacterData data, IEnumerable<RewardedItem> increasingItems, System.Action<CharacterItem> onIncrease = null)
         {
+            CharacterItem increasedItem;
             foreach (RewardedItem increasingItem in increasingItems)
             {
                 if (increasingItem.item == null || increasingItem.amount <= 0) continue;
-                data.NonEquipItems.IncreaseItems(CharacterItem.Create(increasingItem.item.DataId, 1, increasingItem.amount, increasingItem.randomSeed));
+                increasedItem = CharacterItem.Create(increasingItem.item.DataId, 1, increasingItem.amount, increasingItem.randomSeed);
+                data.NonEquipItems.IncreaseItems(increasedItem);
                 if (onIncrease != null)
-                    onIncrease.Invoke(increasingItem.item.DataId, increasingItem.level, increasingItem.amount, increasingItem.randomSeed);
+                    onIncrease.Invoke(increasedItem);
             }
         }
 
-        public static void IncreaseItems(this ICharacterData data, IEnumerable<CharacterItem> increasingItems, System.Action<int, short, short> onIncrease = null)
+        public static void IncreaseItems(this ICharacterData data, IEnumerable<CharacterItem> increasingItems, System.Action<CharacterItem> onIncrease = null)
         {
             foreach (CharacterItem increasingItem in increasingItems)
             {
                 if (increasingItem.IsEmptySlot()) continue;
                 data.NonEquipItems.IncreaseItems(increasingItem.Clone());
                 if (onIncrease != null)
-                    onIncrease.Invoke(increasingItem.dataId, increasingItem.level, increasingItem.amount);
+                    onIncrease.Invoke(increasingItem);
             }
         }
         #endregion
