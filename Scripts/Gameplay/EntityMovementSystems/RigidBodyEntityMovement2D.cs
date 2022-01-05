@@ -263,10 +263,7 @@ namespace MultiplayerARPG
                 }
                 else if (!IsOwnerClient)
                 {
-                    if (Vector2.Distance(position, CacheTransform.position) > moveThreshold)
-                    {
-                        currentDestination = position;
-                    }
+                    currentDestination = position;
                     MovementState = movementState;
                     ExtraMovementState = extraMovementState;
                 }

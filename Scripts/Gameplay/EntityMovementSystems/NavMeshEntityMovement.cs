@@ -287,10 +287,7 @@ namespace MultiplayerARPG
                     targetYRotation = yAngle;
                     yRotateLerpTime = 0;
                     yRotateLerpDuration = serverSyncTransformInterval;
-                    if (Vector3.Distance(position.GetXZ(), CacheTransform.position.GetXZ()) > moveThreshold)
-                    {
-                        SetMovePaths(position, false);
-                    }
+                    SetMovePaths(position, false);
                     MovementState = movementState;
                     ExtraMovementState = extraMovementState;
                 }
