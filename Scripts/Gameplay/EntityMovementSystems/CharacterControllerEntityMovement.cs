@@ -75,7 +75,6 @@ namespace MultiplayerARPG
         protected float applyJumpForceCountDown;
         protected Collider waterCollider;
         protected float yRotation;
-        protected Vector3 platformMotion;
         protected Transform groundedTransform;
         protected Vector3 groundedLocalPosition;
         protected Vector3 oldGroundedPosition;
@@ -94,20 +93,11 @@ namespace MultiplayerARPG
         protected EntityMovementInput currentInput;
         protected MovementState tempMovementState;
         protected ExtraMovementState tempExtraMovementState;
-        protected Vector3 tempInputDirection;
-        protected Vector3 tempMoveDirection;
-        protected Vector3 tempHorizontalMoveDirection;
-        protected Vector3 tempMoveVelocity;
-        protected Vector3 tempTargetPosition;
-        protected Vector3 tempCurrentPosition;
-        protected Vector3 tempPredictPosition;
+        protected Vector3 inputDirection;
+        protected Vector3 moveDirection;
+        protected float verticalVelocity;
+        protected float? lagMoveSpeedRate;
         protected Vector3 velocityBeforeAirborne;
-        protected float tempVerticalVelocity;
-        protected float tempSqrMagnitude;
-        protected float tempPredictSqrMagnitude;
-        protected float tempTargetDistance;
-        protected float tempEntityMoveSpeed;
-        protected float tempCurrentMoveSpeed;
         protected CollisionFlags collisionFlags;
         protected float pauseMovementCountDown;
         protected bool previouslyGrounded;
@@ -134,14 +124,13 @@ namespace MultiplayerARPG
         public override void EntityStart()
         {
             yRotation = CacheTransform.eulerAngles.y;
-            tempCurrentPosition = CacheTransform.position;
-            tempVerticalVelocity = 0;
+            verticalVelocity = 0;
         }
 
         public override void ComponentOnEnable()
         {
             CacheCharacterController.enabled = true;
-            tempVerticalVelocity = 0;
+            verticalVelocity = 0;
         }
 
         public override void ComponentOnDisable()
@@ -187,6 +176,7 @@ namespace MultiplayerARPG
         private void StopMoveFunction()
         {
             navPaths = null;
+            //calulatingCurrentMoveSpeed = null;
         }
 
         public void KeyMovement(Vector3 moveDirection, MovementState movementState)
@@ -196,9 +186,9 @@ namespace MultiplayerARPG
             if (this.CanPredictMovement())
             {
                 // Always apply movement to owner client (it's client prediction for server auth movement)
-                tempInputDirection = moveDirection;
+                inputDirection = moveDirection;
                 tempMovementState = movementState;
-                if (tempInputDirection.sqrMagnitude > 0)
+                if (inputDirection.sqrMagnitude > 0)
                     navPaths = null;
                 if (!isJumping && !applyingJumpForce)
                     isJumping = CacheCharacterController.isGrounded && tempMovementState.Has(MovementState.IsJump);
@@ -266,7 +256,7 @@ namespace MultiplayerARPG
             UpdateMovement(Time.deltaTime);
             if (IsOwnerClient || (IsServer && Entity.MovementSecure == MovementSecure.ServerAuthoritative))
             {
-                tempMovementState = tempMoveDirection.sqrMagnitude > 0f ? tempMovementState : MovementState.None;
+                tempMovementState = moveDirection.sqrMagnitude > 0f ? tempMovementState : MovementState.None;
                 if (isUnderWater)
                     tempMovementState |= MovementState.IsUnderWater;
                 if (CacheCharacterController.isGrounded || airborneElapsed < airborneDelay)
@@ -349,9 +339,21 @@ namespace MultiplayerARPG
 
         private void UpdateMovement(float deltaTime)
         {
+            float tempSqrMagnitude;
+            float tempPredictSqrMagnitude;
+            float tempTargetDistance;
+            float tempEntityMoveSpeed;
+            float tempCurrentMoveSpeed;
+            float tempMaxMoveSpeed;
+            Vector3 tempHorizontalMoveDirection;
+            Vector3 tempMoveVelocity;
+            Vector3 tempCurrentPosition;
+            Vector3 tempTargetPosition;
+            Vector3 tempPredictPosition;
+
             tempCurrentPosition = CacheTransform.position;
             tempMoveVelocity = Vector3.zero;
-            tempMoveDirection = Vector3.zero;
+            moveDirection = Vector3.zero;
             tempTargetDistance = 0f;
             WaterCheck();
 
@@ -368,7 +370,7 @@ namespace MultiplayerARPG
             {
                 // Set `tempTargetPosition` and `tempCurrentPosition`
                 tempTargetPosition = navPaths.Peek();
-                tempMoveDirection = (tempTargetPosition - tempCurrentPosition).normalized;
+                moveDirection = (tempTargetPosition - tempCurrentPosition).normalized;
                 tempTargetDistance = Vector3.Distance(tempTargetPosition.GetXZ(), tempCurrentPosition.GetXZ());
                 if (tempTargetDistance < StoppingDistance)
                 {
@@ -376,57 +378,61 @@ namespace MultiplayerARPG
                     if (!HasNavPaths)
                     {
                         StopMoveFunction();
-                        tempMoveDirection = Vector3.zero;
+                        moveDirection = Vector3.zero;
                     }
                 }
                 else
                 {
                     // Turn character to destination
-                    yRotation = Quaternion.LookRotation(tempMoveDirection).eulerAngles.y;
+                    yRotation = Quaternion.LookRotation(moveDirection).eulerAngles.y;
                     targetYRotation = null;
                 }
             }
             else if (clientTargetPosition.HasValue)
             {
                 tempTargetPosition = clientTargetPosition.Value;
-                tempMoveDirection = (tempTargetPosition - tempCurrentPosition).normalized;
+                moveDirection = (tempTargetPosition - tempCurrentPosition).normalized;
                 tempTargetDistance = Vector3.Distance(tempTargetPosition.GetXZ(), tempCurrentPosition.GetXZ());
                 if (tempTargetDistance < StoppingDistance)
                 {
                     clientTargetPosition = null;
                     StopMoveFunction();
-                    tempMoveDirection = Vector3.zero;
+                    moveDirection = Vector3.zero;
                 }
             }
-            else if (tempInputDirection.sqrMagnitude > 0f)
+            else if (inputDirection.sqrMagnitude > 0f)
             {
-                tempMoveDirection = tempInputDirection.normalized;
-                tempTargetPosition = tempCurrentPosition + tempMoveDirection;
+                moveDirection = inputDirection.normalized;
+                tempTargetPosition = tempCurrentPosition + moveDirection;
+            }
+            else
+            {
+                tempTargetPosition = tempCurrentPosition;
             }
 
             if (!Entity.CanMove())
             {
-                tempMoveDirection = Vector3.zero;
+                moveDirection = Vector3.zero;
                 isJumping = false;
                 applyingJumpForce = false;
             }
 
             // Prepare movement speed
             tempEntityMoveSpeed = applyingJumpForce ? 0f : Entity.GetMoveSpeed();
-            tempCurrentMoveSpeed = tempEntityMoveSpeed;
+            tempMaxMoveSpeed = tempEntityMoveSpeed;
 
             // Calculate vertical velocity by gravity
             if (!isGrounded && !isUnderWater)
             {
                 if (!useRootMotionForFall)
-                    tempVerticalVelocity = Mathf.MoveTowards(tempVerticalVelocity, -maxFallVelocity, gravity * deltaTime);
+                    verticalVelocity = Mathf.MoveTowards(verticalVelocity, -maxFallVelocity, gravity * deltaTime);
                 else
-                    tempVerticalVelocity = 0f;
+                    verticalVelocity = 0f;
             }
             else
             {
                 // Not falling set verical velocity to 0
-                tempVerticalVelocity = 0f;
+                verticalVelocity = 0f;
             }
 
             // Jumping 
@@ -459,7 +465,7 @@ namespace MultiplayerARPG
                     applyingJumpForce = false;
                     if (!useRootMotionForJump)
                     {
-                        tempVerticalVelocity = CalculateJumpVerticalSpeed();
+                        verticalVelocity = CalculateJumpVerticalSpeed();
                     }
                 }
             }
@@ -468,16 +474,17 @@ namespace MultiplayerARPG
             {
                 velocityBeforeAirborne = Vector3.zero;
             }
-            if (pauseMovementCountDown <= 0f && tempMoveDirection.sqrMagnitude > 0f && (!isAirborne || !doNotChangeVelocityWhileAirborne))
+            if (pauseMovementCountDown <= 0f && moveDirection.sqrMagnitude > 0f && (!isAirborne || !doNotChangeVelocityWhileAirborne))
             {
                 // Calculate only horizontal move direction
-                tempHorizontalMoveDirection = tempMoveDirection;
+                tempHorizontalMoveDirection = moveDirection;
                 tempHorizontalMoveDirection.y = 0;
                 tempHorizontalMoveDirection.Normalize();
 
                 // If character move backward
                 if (Vector3.Angle(tempHorizontalMoveDirection, CacheTransform.forward) > 120)
-                    tempCurrentMoveSpeed *= backwardMoveSpeedRate;
+                    tempMaxMoveSpeed *= backwardMoveSpeedRate;
+                tempCurrentMoveSpeed = CalculateCurrentMoveSpeed(tempMaxMoveSpeed, deltaTime);
 
                 // NOTE: `tempTargetPosition` and `tempCurrentPosition` were set above
                 tempSqrMagnitude = (tempTargetPosition - tempCurrentPosition).sqrMagnitude;
@@ -536,17 +543,18 @@ namespace MultiplayerARPG
             // Updating vertical movement (Fall, WASD inputs under water)
             if (isUnderWater)
             {
-                tempCurrentMoveSpeed = tempEntityMoveSpeed;
+                tempCurrentMoveSpeed = CalculateCurrentMoveSpeed(tempMaxMoveSpeed, deltaTime);
+
                 // Move up to surface while under water
-                if (autoSwimToSurface || Mathf.Abs(tempMoveDirection.y) > 0)
+                if (autoSwimToSurface || Mathf.Abs(moveDirection.y) > 0)
                 {
                     if (autoSwimToSurface)
-                        tempMoveDirection.y = 1f;
+                        moveDirection.y = 1f;
                     tempTargetPosition = Vector3.up * (waterCollider.bounds.max.y - (CacheCharacterController.bounds.size.y * underWaterThreshold));
                     tempCurrentPosition = Vector3.up * CacheTransform.position.y;
                     tempTargetDistance = Vector3.Distance(tempTargetPosition, tempCurrentPosition);
                     tempSqrMagnitude = (tempTargetPosition - tempCurrentPosition).sqrMagnitude;
-                    tempPredictPosition = tempCurrentPosition + (Vector3.up * tempMoveDirection.y * tempCurrentMoveSpeed * deltaTime);
+                    tempPredictPosition = tempCurrentPosition + (Vector3.up * moveDirection.y * tempCurrentMoveSpeed * deltaTime);
                     tempPredictSqrMagnitude = (tempPredictPosition - tempCurrentPosition).sqrMagnitude;
                     // Check `tempSqrMagnitude` against the `tempPredictSqrMagnitude`
                     // if `tempPredictSqrMagnitude` is greater than `tempSqrMagnitude`,
@@ -556,8 +564,8 @@ namespace MultiplayerARPG
                         tempCurrentMoveSpeed *= tempTargetDistance / deltaTime / tempCurrentMoveSpeed;
                     // Swim up to surface
                     if (tempCurrentMoveSpeed < 0.01f)
-                        tempMoveDirection.y = 0f;
-                    tempMoveVelocity.y = tempMoveDirection.y * tempCurrentMoveSpeed;
+                        moveDirection.y = 0f;
+                    tempMoveVelocity.y = moveDirection.y * tempCurrentMoveSpeed;
                     if (!HasNavPaths)
                         currentInput = this.SetInputYPosition(currentInput, tempPredictPosition.y);
                 }
@@ -565,7 +573,7 @@ namespace MultiplayerARPG
             else
             {
                 // Update velocity while not under water
-                tempMoveVelocity.y = tempVerticalVelocity;
+                tempMoveVelocity.y = verticalVelocity;
             }
 
             // Don't applies velocity while using root motion
@@ -577,7 +585,7 @@ namespace MultiplayerARPG
                 tempMoveVelocity.z = 0;
             }
 
-            platformMotion = Vector3.zero;
+            Vector3 platformMotion = Vector3.zero;
             if (isGrounded && !isUnderWater)
             {
                 // Apply platform motion
@@ -607,6 +615,33 @@ namespace MultiplayerARPG
             previouslyGrounded = isGrounded;
             previouslyAirborne = isAirborne;
             previouslyExtraMovementState = tempExtraMovementState;
+        }
+
+        private float CalculateCurrentMoveSpeed(float maxMoveSpeed, float deltaTime)
+        {
+            if (!IsServer && IsOwnerClient && Entity.MovementSecure == MovementSecure.ServerAuthoritative)
+            {
+                float acc = 1f / (0.5f * 0.001f * Entity.Manager.Rtt) * deltaTime;
+                if (!lagMoveSpeedRate.HasValue)
+                    lagMoveSpeedRate = 0f;
+                if (lagMoveSpeedRate < 1f)
+                    lagMoveSpeedRate += acc;
+                if (lagMoveSpeedRate > 1f)
+                    lagMoveSpeedRate = 1f;
+                return maxMoveSpeed * lagMoveSpeedRate.Value;
+            }
+            else if (!IsServer && !IsOwnerClient)
+            {
+                float acc = 1f / (0.5f * 0.001f * Entity.Manager.Rtt) * deltaTime;
+                if (!lagMoveSpeedRate.HasValue)
+                    lagMoveSpeedRate = 1f + (acc * (acc / deltaTime) * 0.5f);
+                if (lagMoveSpeedRate > 1f)
+                    lagMoveSpeedRate -= acc;
+                if (lagMoveSpeedRate < 1f)
+                    lagMoveSpeedRate = 1f;
+                return maxMoveSpeed * lagMoveSpeedRate.Value;
+            }
+            return maxMoveSpeed;
         }
 
         private void UpdateRotation()
@@ -711,10 +746,7 @@ namespace MultiplayerARPG
                     targetYRotation = yAngle;
                     yRotateLerpTime = 0;
                     yRotateLerpDuration = serverSyncTransformInterval;
-                    if (Vector3.Distance(position.GetXZ(), CacheTransform.position.GetXZ()) > moveThreshold)
-                    {
-                        clientTargetPosition = position;
-                    }
+                    clientTargetPosition = position;
                     MovementState = movementState;
                     ExtraMovementState = extraMovementState;
                 }
@@ -897,7 +929,7 @@ namespace MultiplayerARPG
         protected virtual void OnTeleport(Vector3 position)
         {
             airborneElapsed = 0;
-            tempVerticalVelocity = 0;
+            verticalVelocity = 0;
             navPaths = null;
             CacheTransform.position = position;
         }
