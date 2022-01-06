@@ -175,6 +175,9 @@ namespace MultiplayerARPG
                 return;
             }
 
+            if (listEmptyObject != null)
+                listEmptyObject.SetActive(false);
+
             UICashShopItem tempUI;
             CacheList.Generate(filteredList, (index, data, ui) =>
             {
