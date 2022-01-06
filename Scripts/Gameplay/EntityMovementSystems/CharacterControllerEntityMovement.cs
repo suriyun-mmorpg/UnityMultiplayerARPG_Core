@@ -80,7 +80,7 @@ namespace MultiplayerARPG
         protected Vector3 oldGroundedPosition;
         protected long acceptedPositionTimestamp;
         protected long acceptedJumpTimestamp;
-        protected Vector3? clientTargetPosition;
+        protected readonly Queue<Vector3> clientTargetPositions = new Queue<Vector3>();
         protected float? targetYRotation;
         protected float yRotateLerpTime;
         protected float yRotateLerpDuration;
@@ -176,7 +176,8 @@ namespace MultiplayerARPG
         private void StopMoveFunction()
         {
             navPaths = null;
-            //calulatingCurrentMoveSpeed = null;
+            lagMoveSpeedRate = null;
+            clientTargetPositions.Clear();
         }
 
         public void KeyMovement(Vector3 moveDirection, MovementState movementState)
@@ -388,16 +389,19 @@ namespace MultiplayerARPG
                     targetYRotation = null;
                 }
             }
-            else if (clientTargetPosition.HasValue)
+            else if (clientTargetPositions.Count > 0)
             {
-                tempTargetPosition = clientTargetPosition.Value;
+                tempTargetPosition = clientTargetPositions.Peek();
                 moveDirection = (tempTargetPosition - tempCurrentPosition).normalized;
                 tempTargetDistance = Vector3.Distance(tempTargetPosition.GetXZ(), tempCurrentPosition.GetXZ());
                 if (tempTargetDistance < StoppingDistance)
                 {
-                    clientTargetPosition = null;
-                    StopMoveFunction();
-                    moveDirection = Vector3.zero;
+                    clientTargetPositions.Dequeue();
+                    if (clientTargetPositions.Count == 0)
+                    {
+                        StopMoveFunction();
+                        moveDirection = Vector3.zero;
+                    }
                 }
             }
             else if (inputDirection.sqrMagnitude > 0f)
@@ -746,7 +750,7 @@ namespace MultiplayerARPG
                     targetYRotation = yAngle;
                     yRotateLerpTime = 0;
                     yRotateLerpDuration = serverSyncTransformInterval;
-                    clientTargetPosition = position;
+                    clientTargetPositions.Enqueue(position);
                     MovementState = movementState;
                     ExtraMovementState = extraMovementState;
                 }
@@ -815,12 +819,11 @@ namespace MultiplayerARPG
                 navPaths = null;
                 tempMovementState = movementState;
                 tempExtraMovementState = extraMovementState;
-                clientTargetPosition = null;
                 if (inputState.Has(InputState.PositionChanged))
                 {
                     if (inputState.Has(InputState.IsKeyMovement))
                     {
-                        clientTargetPosition = position;
+                        clientTargetPositions.Enqueue(position);
                     }
                     else
                     {
