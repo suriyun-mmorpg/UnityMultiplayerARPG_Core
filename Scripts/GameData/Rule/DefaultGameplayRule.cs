@@ -503,6 +503,8 @@ namespace MultiplayerARPG
 
         public override void OnCharacterReceivedDamage(BaseCharacterEntity attacker, BaseCharacterEntity damageReceiver, CombatAmountType combatAmountType, int damage, CharacterItem weapon, BaseSkill skill, short skillLevel)
         {
+            if (damageReceiver.IsDead())
+                return;
             float decreaseWeaponDurability;
             float decreaseShieldDurability;
             float decreaseArmorDurability;
