@@ -136,113 +136,144 @@ namespace MultiplayerARPG
 
         protected override void UpdateData()
         {
+            CharacterStatsTextGenerateData generateTextData;
             string statsString;
 
+            // Dev Extension
+            // How to implement it?:
+            // /*
+            //  * - Add `customStat1` to `CharacterStats` partial class file
+            //  * - Add `customStat1StatsFormat` to `CharacterStatsTextGenerateData`
+            //  * - Add `uiTextCustomStat1` to `CharacterStatsTextGenerateData`
+            //  * - Add `formatKeyCustomStat1Stats` to `UICharacterStats` partial class file
+            //  * - Add `formatKeyCustomStat1RateStats` to `UICharacterStats` partial class file
+            //  * - Add `uiTextCustomStat1` to `UICharacterStats`
+            //  */
+            // [DevExtMethods("SetStatsGenerateTextData")]
+            // public void SetStatsGenerateTextData_Ext(CharacterStatsTextGenerateData generateTextData)
+            // {
+            //   generateTextData.customStat1StatsFormat = formatKeyCustomStat1Stats;
+            //   generateTextData.uiTextCustomStat1 = uiTextCustomStat1;
+            // }
+            // [DevExtMethods("SetRateStatsGenerateTextData")]
+            // public void SetRateStatsGenerateTextData_Ext(CharacterStatsTextGenerateData generateTextData)
+            // {
+            //   generateTextData.customStat1StatsFormat = formatKeyCustomStat1RateStats;
+            //   generateTextData.uiTextCustomStat1 = uiTextCustomStat1;
+            // }
             switch (displayType)
             {
                 case DisplayType.Rate:
-                    statsString = CharacterStats.GetText(
-                        Data,
-                        true,
-                        isBonus,
-                        formatKeyHpRateStats,
-                        formatKeyHpRecoveryRateStats,
-                        formatKeyHpLeechRateRateStats,
-                        formatKeyMpRateStats,
-                        formatKeyMpRecoveryRateStats,
-                        formatKeyMpLeechRateRateStats,
-                        formatKeyStaminaRateStats,
-                        formatKeyStaminaRecoveryRateStats,
-                        formatKeyStaminaLeechRateRateStats,
-                        formatKeyFoodRateStats,
-                        formatKeyWaterRateStats,
-                        formatKeyAccuracyRateStats,
-                        formatKeyEvasionRateStats,
-                        formatKeyCriRateRateStats,
-                        formatKeyCriDmgRateRateStats,
-                        formatKeyBlockRateRateStats,
-                        formatKeyBlockDmgRateRateStats,
-                        formatKeyMoveSpeedRateStats,
-                        formatKeyAtkSpeedRateStats,
-                        formatKeyWeightLimitRateStats,
-                        formatKeySlotLimitRateStats,
-                        formatKeyGoldRateRateStats,
-                        formatKeyExpRateRateStats,
-                        uiTextHp,
-                        uiTextHpRecovery,
-                        uiTextHpLeechRate,
-                        uiTextMp,
-                        uiTextMpRecovery,
-                        uiTextMpLeechRate,
-                        uiTextStamina,
-                        uiTextStaminaRecovery,
-                        uiTextStaminaLeechRate,
-                        uiTextFood,
-                        uiTextWater,
-                        uiTextAccuracy,
-                        uiTextEvasion,
-                        uiTextCriRate,
-                        uiTextCriDmgRate,
-                        uiTextBlockRate,
-                        uiTextBlockDmgRate,
-                        uiTextMoveSpeed,
-                        uiTextAtkSpeed,
-                        uiTextWeightLimit,
-                        uiTextSlotLimit,
-                        uiTextGoldRate,
-                        uiTextExpRate);
+                    generateTextData = new CharacterStatsTextGenerateData()
+                    {
+                        data = Data,
+                        isRate = true,
+                        isBonus = isBonus,
+                        hpStatsFormat = formatKeyHpRateStats,
+                        hpRecoveryStatsFormat = formatKeyHpRecoveryRateStats,
+                        hpLeechRateStatsFormat = formatKeyHpLeechRateRateStats,
+                        mpStatsFormat = formatKeyMpRateStats,
+                        mpRecoveryStatsFormat = formatKeyMpRecoveryRateStats,
+                        mpLeechRateStatsFormat = formatKeyMpLeechRateRateStats,
+                        staminaStatsFormat = formatKeyStaminaRateStats,
+                        staminaRecoveryStatsFormat = formatKeyStaminaRecoveryRateStats,
+                        staminaLeechRateStatsFormat = formatKeyStaminaLeechRateRateStats,
+                        foodStatsFormat = formatKeyFoodRateStats,
+                        waterStatsFormat = formatKeyWaterRateStats,
+                        accuracyStatsFormat = formatKeyAccuracyRateStats,
+                        evasionStatsFormat = formatKeyEvasionRateStats,
+                        criRateStatsFormat = formatKeyCriRateRateStats,
+                        criDmgRateStatsFormat = formatKeyCriDmgRateRateStats,
+                        blockRateStatsFormat = formatKeyBlockRateRateStats,
+                        blockDmgRateStatsFormat = formatKeyBlockDmgRateRateStats,
+                        moveSpeedStatsFormat = formatKeyMoveSpeedRateStats,
+                        atkSpeedStatsFormat = formatKeyAtkSpeedRateStats,
+                        weightLimitStatsFormat = formatKeyWeightLimitRateStats,
+                        slotLimitStatsFormat = formatKeySlotLimitRateStats,
+                        goldRateStatsFormat = formatKeyGoldRateRateStats,
+                        expRateStatsFormat = formatKeyExpRateRateStats,
+                        uiTextHp = uiTextHp,
+                        uiTextHpRecovery = uiTextHpRecovery,
+                        uiTextHpLeechRate = uiTextHpLeechRate,
+                        uiTextMp = uiTextMp,
+                        uiTextMpRecovery = uiTextMpRecovery,
+                        uiTextMpLeechRate = uiTextMpLeechRate,
+                        uiTextStamina = uiTextStamina,
+                        uiTextStaminaRecovery = uiTextStaminaRecovery,
+                        uiTextStaminaLeechRate = uiTextStaminaLeechRate,
+                        uiTextFood = uiTextFood,
+                        uiTextWater = uiTextWater,
+                        uiTextAccuracy = uiTextAccuracy,
+                        uiTextEvasion = uiTextEvasion,
+                        uiTextCriRate = uiTextCriRate,
+                        uiTextCriDmgRate = uiTextCriDmgRate,
+                        uiTextBlockRate = uiTextBlockRate,
+                        uiTextBlockDmgRate = uiTextBlockDmgRate,
+                        uiTextMoveSpeed = uiTextMoveSpeed,
+                        uiTextAtkSpeed = uiTextAtkSpeed,
+                        uiTextWeightLimit = uiTextWeightLimit,
+                        uiTextSlotLimit = uiTextSlotLimit,
+                        uiTextGoldRate = uiTextGoldRate,
+                        uiTextExpRate = uiTextExpRate,
+                    };
+                    this.InvokeInstanceDevExtMethods("SetRateStatsGenerateTextData", generateTextData);
+                    statsString = generateTextData.GetText();
                     break;
                 default:
-                    statsString = CharacterStats.GetText(
-                        Data,
-                        false,
-                        isBonus,
-                        formatKeyHpStats,
-                        formatKeyHpRecoveryStats,
-                        formatKeyHpLeechRateStats,
-                        formatKeyMpStats,
-                        formatKeyMpRecoveryStats,
-                        formatKeyMpLeechRateStats,
-                        formatKeyStaminaStats,
-                        formatKeyStaminaRecoveryStats,
-                        formatKeyStaminaLeechRateStats,
-                        formatKeyFoodStats,
-                        formatKeyWaterStats,
-                        formatKeyAccuracyStats,
-                        formatKeyEvasionStats,
-                        formatKeyCriRateStats,
-                        formatKeyCriDmgRateStats,
-                        formatKeyBlockRateStats,
-                        formatKeyBlockDmgRateStats,
-                        formatKeyMoveSpeedStats,
-                        formatKeyAtkSpeedStats,
-                        formatKeyWeightLimitStats,
-                        formatKeySlotLimitStats,
-                        formatKeyGoldRateStats,
-                        formatKeyExpRateStats,
-                        uiTextHp,
-                        uiTextHpRecovery,
-                        uiTextHpLeechRate,
-                        uiTextMp,
-                        uiTextMpRecovery,
-                        uiTextMpLeechRate,
-                        uiTextStamina,
-                        uiTextStaminaRecovery,
-                        uiTextStaminaLeechRate,
-                        uiTextFood,
-                        uiTextWater,
-                        uiTextAccuracy,
-                        uiTextEvasion,
-                        uiTextCriRate,
-                        uiTextCriDmgRate,
-                        uiTextBlockRate,
-                        uiTextBlockDmgRate,
-                        uiTextMoveSpeed,
-                        uiTextAtkSpeed,
-                        uiTextWeightLimit,
-                        uiTextSlotLimit,
-                        uiTextGoldRate,
-                        uiTextExpRate);
+                    generateTextData = new CharacterStatsTextGenerateData()
+                    {
+                        data = Data,
+                        isRate = false,
+                        isBonus = isBonus,
+                        hpStatsFormat = formatKeyHpStats,
+                        hpRecoveryStatsFormat = formatKeyHpRecoveryStats,
+                        hpLeechRateStatsFormat = formatKeyHpLeechRateStats,
+                        mpStatsFormat = formatKeyMpStats,
+                        mpRecoveryStatsFormat = formatKeyMpRecoveryStats,
+                        mpLeechRateStatsFormat = formatKeyMpLeechRateStats,
+                        staminaStatsFormat = formatKeyStaminaStats,
+                        staminaRecoveryStatsFormat = formatKeyStaminaRecoveryStats,
+                        staminaLeechRateStatsFormat = formatKeyStaminaLeechRateStats,
+                        foodStatsFormat = formatKeyFoodStats,
+                        waterStatsFormat = formatKeyWaterStats,
+                        accuracyStatsFormat = formatKeyAccuracyStats,
+                        evasionStatsFormat = formatKeyEvasionStats,
+                        criRateStatsFormat = formatKeyCriRateStats,
+                        criDmgRateStatsFormat = formatKeyCriDmgRateStats,
+                        blockRateStatsFormat = formatKeyBlockRateStats,
+                        blockDmgRateStatsFormat = formatKeyBlockDmgRateStats,
+                        moveSpeedStatsFormat = formatKeyMoveSpeedStats,
+                        atkSpeedStatsFormat = formatKeyAtkSpeedStats,
+                        weightLimitStatsFormat = formatKeyWeightLimitStats,
+                        slotLimitStatsFormat = formatKeySlotLimitStats,
+                        goldRateStatsFormat = formatKeyGoldRateStats,
+                        expRateStatsFormat = formatKeyExpRateStats,
+                        uiTextHp = uiTextHp,
+                        uiTextHpRecovery = uiTextHpRecovery,
+                        uiTextHpLeechRate = uiTextHpLeechRate,
+                        uiTextMp = uiTextMp,
+                        uiTextMpRecovery = uiTextMpRecovery,
+                        uiTextMpLeechRate = uiTextMpLeechRate,
+                        uiTextStamina = uiTextStamina,
+                        uiTextStaminaRecovery = uiTextStaminaRecovery,
+                        uiTextStaminaLeechRate = uiTextStaminaLeechRate,
+                        uiTextFood = uiTextFood,
+                        uiTextWater = uiTextWater,
+                        uiTextAccuracy = uiTextAccuracy,
+                        uiTextEvasion = uiTextEvasion,
+                        uiTextCriRate = uiTextCriRate,
+                        uiTextCriDmgRate = uiTextCriDmgRate,
+                        uiTextBlockRate = uiTextBlockRate,
+                        uiTextBlockDmgRate = uiTextBlockDmgRate,
+                        uiTextMoveSpeed = uiTextMoveSpeed,
+                        uiTextAtkSpeed = uiTextAtkSpeed,
+                        uiTextWeightLimit = uiTextWeightLimit,
+                        uiTextSlotLimit = uiTextSlotLimit,
+                        uiTextGoldRate = uiTextGoldRate,
+                        uiTextExpRate = uiTextExpRate,
+                    };
+                    this.InvokeInstanceDevExtMethods("SetStatsGenerateTextData", generateTextData);
+                    statsString = generateTextData.GetText();
                     break;
             }
 

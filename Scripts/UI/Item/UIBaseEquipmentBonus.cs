@@ -121,71 +121,102 @@ namespace MultiplayerARPG
         public string GetEquipmentBonusText(EquipmentBonus equipmentBonus)
         {
             StringBuilder result = new StringBuilder();
-
-            string statsText = CharacterStats.GetText(
-                equipmentBonus.stats,
-                false,
-                true,
-                formatKeyHpStats,
-                formatKeyHpRecoveryStats,
-                formatKeyHpLeechRateStats,
-                formatKeyMpStats,
-                formatKeyMpRecoveryStats,
-                formatKeyMpLeechRateStats,
-                formatKeyStaminaStats,
-                formatKeyStaminaRecoveryStats,
-                formatKeyStaminaLeechRateStats,
-                formatKeyFoodStats,
-                formatKeyWaterStats,
-                formatKeyAccuracyStats,
-                formatKeyEvasionStats,
-                formatKeyCriRateStats,
-                formatKeyCriDmgRateStats,
-                formatKeyBlockRateStats,
-                formatKeyBlockDmgRateStats,
-                formatKeyMoveSpeedStats,
-                formatKeyAtkSpeedStats,
-                formatKeyWeightLimitStats,
-                formatKeySlotLimitStats,
-                formatKeyGoldRateRateStats,
-                formatKeyExpRateRateStats);
-
-            string statsRateText = CharacterStats.GetText(
-                equipmentBonus.statsRate,
-                true,
-                true,
-                formatKeyHpRateStats,
-                formatKeyHpRecoveryRateStats,
-                formatKeyHpLeechRateRateStats,
-                formatKeyMpRateStats,
-                formatKeyMpRecoveryRateStats,
-                formatKeyMpLeechRateRateStats,
-                formatKeyStaminaRateStats,
-                formatKeyStaminaRecoveryRateStats,
-                formatKeyStaminaLeechRateRateStats,
-                formatKeyFoodRateStats,
-                formatKeyWaterRateStats,
-                formatKeyAccuracyRateStats,
-                formatKeyEvasionRateStats,
-                formatKeyCriRateRateStats,
-                formatKeyCriDmgRateRateStats,
-                formatKeyBlockRateRateStats,
-                formatKeyBlockDmgRateRateStats,
-                formatKeyMoveSpeedRateStats,
-                formatKeyAtkSpeedRateStats,
-                formatKeyWeightLimitRateStats,
-                formatKeySlotLimitRateStats,
-                formatKeyGoldRateRateStats,
-                formatKeyExpRateRateStats);
+            CharacterStatsTextGenerateData generateTextData;
+            // Dev Extension
+            // How to implement it?:
+            // /*
+            //  * - Add `customStat1` to `CharacterStats` partial class file
+            //  * - Add `customStat1StatsFormat` to `CharacterStatsTextGenerateData`
+            //  * - Add `uiTextCustomStat1` to `CharacterStatsTextGenerateData`
+            //  * - Add `formatKeyCustomStat1Stats` to `UIBaseEquipmentBonus` partial class file
+            //  * - Add `formatKeyCustomStat1RateStats` to `UIBaseEquipmentBonus` partial class file
+            //  * - Add `uiTextCustomStat1` to `UIBaseEquipmentBonus`
+            //  */
+            // [DevExtMethods("SetStatsGenerateTextData")]
+            // public void SetStatsGenerateTextData_Ext(CharacterStatsTextGenerateData generateTextData)
+            // {
+            //   generateTextData.customStat1StatsFormat = formatKeyCustomStat1Stats;
+            //   generateTextData.uiTextCustomStat1 = uiTextCustomStat1;
+            // }
+            // [DevExtMethods("SetRateStatsGenerateTextData")]
+            // public void SetRateStatsGenerateTextData_Ext(CharacterStatsTextGenerateData generateTextData)
+            // {
+            //   generateTextData.customStat1StatsFormat = formatKeyCustomStat1RateStats;
+            //   generateTextData.uiTextCustomStat1 = uiTextCustomStat1;
+            // }
+            // Non-rate stats
+            generateTextData = new CharacterStatsTextGenerateData()
+            {
+                data = equipmentBonus.stats,
+                isRate = false,
+                isBonus = true,
+                hpStatsFormat = formatKeyHpStats,
+                hpRecoveryStatsFormat = formatKeyHpRecoveryStats,
+                hpLeechRateStatsFormat = formatKeyHpLeechRateStats,
+                mpStatsFormat = formatKeyMpStats,
+                mpRecoveryStatsFormat = formatKeyMpRecoveryStats,
+                mpLeechRateStatsFormat = formatKeyMpLeechRateStats,
+                staminaStatsFormat = formatKeyStaminaStats,
+                staminaRecoveryStatsFormat = formatKeyStaminaRecoveryStats,
+                staminaLeechRateStatsFormat = formatKeyStaminaLeechRateStats,
+                foodStatsFormat = formatKeyFoodStats,
+                waterStatsFormat = formatKeyWaterStats,
+                accuracyStatsFormat = formatKeyAccuracyStats,
+                evasionStatsFormat = formatKeyEvasionStats,
+                criRateStatsFormat = formatKeyCriRateStats,
+                criDmgRateStatsFormat = formatKeyCriDmgRateStats,
+                blockRateStatsFormat = formatKeyBlockRateStats,
+                blockDmgRateStatsFormat = formatKeyBlockDmgRateStats,
+                moveSpeedStatsFormat = formatKeyMoveSpeedStats,
+                atkSpeedStatsFormat = formatKeyAtkSpeedStats,
+                weightLimitStatsFormat = formatKeyWeightLimitStats,
+                slotLimitStatsFormat = formatKeySlotLimitStats,
+                goldRateStatsFormat = formatKeyGoldRateStats,
+                expRateStatsFormat = formatKeyExpRateStats,
+            };
+            this.InvokeInstanceDevExtMethods("SetStatsGenerateTextData", generateTextData);
+            string statsText = generateTextData.GetText();
+            // Rate stats
+            generateTextData = new CharacterStatsTextGenerateData()
+            {
+                data = equipmentBonus.stats,
+                isRate = true,
+                isBonus = true,
+                hpStatsFormat = formatKeyHpRateStats,
+                hpRecoveryStatsFormat = formatKeyHpRecoveryRateStats,
+                hpLeechRateStatsFormat = formatKeyHpLeechRateRateStats,
+                mpStatsFormat = formatKeyMpRateStats,
+                mpRecoveryStatsFormat = formatKeyMpRecoveryRateStats,
+                mpLeechRateStatsFormat = formatKeyMpLeechRateRateStats,
+                staminaStatsFormat = formatKeyStaminaRateStats,
+                staminaRecoveryStatsFormat = formatKeyStaminaRecoveryRateStats,
+                staminaLeechRateStatsFormat = formatKeyStaminaLeechRateRateStats,
+                foodStatsFormat = formatKeyFoodRateStats,
+                waterStatsFormat = formatKeyWaterRateStats,
+                accuracyStatsFormat = formatKeyAccuracyRateStats,
+                evasionStatsFormat = formatKeyEvasionRateStats,
+                criRateStatsFormat = formatKeyCriRateRateStats,
+                criDmgRateStatsFormat = formatKeyCriDmgRateRateStats,
+                blockRateStatsFormat = formatKeyBlockRateRateStats,
+                blockDmgRateStatsFormat = formatKeyBlockDmgRateRateStats,
+                moveSpeedStatsFormat = formatKeyMoveSpeedRateStats,
+                atkSpeedStatsFormat = formatKeyAtkSpeedRateStats,
+                weightLimitStatsFormat = formatKeyWeightLimitRateStats,
+                slotLimitStatsFormat = formatKeySlotLimitRateStats,
+                goldRateStatsFormat = formatKeyGoldRateRateStats,
+                expRateStatsFormat = formatKeyExpRateRateStats,
+            };
+            this.InvokeInstanceDevExtMethods("SetRateStatsGenerateTextData", generateTextData);
+            string rateStatsText = generateTextData.GetText();
 
             if (!string.IsNullOrEmpty(statsText))
                 result.Append(statsText);
 
-            if (!string.IsNullOrEmpty(statsRateText))
+            if (!string.IsNullOrEmpty(rateStatsText))
             {
                 if (result.Length > 0)
                     result.Append('\n');
-                result.Append(statsRateText);
+                result.Append(rateStatsText);
             }
 
             // Attributes
