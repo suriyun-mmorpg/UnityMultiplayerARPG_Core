@@ -177,6 +177,8 @@ namespace MultiplayerARPG
         {
             if (onNotifyGuildUpdated != null)
                 onNotifyGuildUpdated.Invoke(guild);
+            if (guild == null)
+                return;
             GuildInfoCacheManager.SetCache(new GuildListEntry()
             {
                 Id = guild.id,
