@@ -12,19 +12,18 @@ namespace MultiplayerARPG
         private int poolSize = 30;
         public int PoolSize { get { return poolSize; } set { poolSize = value; } }
 
-        public UnityEvent onInitPrefab;
-        public UnityEvent onGetInstance;
+        public UnityEvent onInitPrefab = new UnityEvent();
+        public UnityEvent onGetInstance = new UnityEvent();
+        public UnityEvent onPushBack = new UnityEvent();
 
         public virtual void InitPrefab()
         {
-            if (onInitPrefab != null)
-                onInitPrefab.Invoke();
+            onInitPrefab.Invoke();
         }
 
         public virtual void OnGetInstance()
         {
-            if (onGetInstance != null)
-                onGetInstance.Invoke();
+            onGetInstance.Invoke();
         }
 
         protected void PushBack(float delay)
@@ -46,7 +45,7 @@ namespace MultiplayerARPG
 
         protected virtual void OnPushBack()
         {
-
+            onPushBack.Invoke();
         }
     }
 }
