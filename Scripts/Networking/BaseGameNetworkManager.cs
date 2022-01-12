@@ -350,7 +350,8 @@ namespace MultiplayerARPG
 
         public override bool StartClient(string networkAddress, int networkPort)
         {
-            InitPrefabs();
+            if (!IsServer)
+                InitPrefabs();
             return base.StartClient(networkAddress, networkPort);
         }
 
@@ -585,6 +586,10 @@ namespace MultiplayerARPG
             foreach (BuildingEntity entry in GameInstance.BuildingEntities.Values)
             {
                 spawnablePrefabs.Add(entry.Identity);
+            }
+            foreach (LiteNetLibIdentity identity in GameInstance.OtherNetworkObjectPrefabs.Values)
+            {
+                spawnablePrefabs.Add(identity);
             }
             Assets.spawnablePrefabs = new LiteNetLibIdentity[spawnablePrefabs.Count];
             spawnablePrefabs.CopyTo(Assets.spawnablePrefabs);
