@@ -503,8 +503,6 @@ namespace MultiplayerARPG
 
         public override void OnCharacterReceivedDamage(BaseCharacterEntity attacker, BaseCharacterEntity damageReceiver, CombatAmountType combatAmountType, int damage, CharacterItem weapon, BaseSkill skill, short skillLevel)
         {
-            if (damageReceiver.IsDead())
-                return;
             float decreaseWeaponDurability;
             float decreaseShieldDurability;
             float decreaseArmorDurability;
@@ -884,7 +882,7 @@ namespace MultiplayerARPG
             character.ReceivedDamage(character.CacheTransform.position, EntityInfo.Empty, null, CombatAmountType.NormalDamage, damage, null, null, 0);
             if (character.IsDead())
             {
-                // Dead by itself, so causer is itself
+                // Dead by itself, so instigator is itself
                 character.ValidateRecovery(character.GetInfo());
             }
         }
