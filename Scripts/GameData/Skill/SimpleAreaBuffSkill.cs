@@ -18,16 +18,18 @@ namespace MultiplayerARPG
 
         protected override void ApplySkillImplement(BaseCharacterEntity skillUser, short skillLevel, bool isLeftHand, CharacterItem weapon, int hitIndex, Dictionary<DamageElement, MinMaxFloat> damageAmounts, uint targetObjectId, AimPosition aimPosition, int randomSeed, long? time)
         {
-            // Spawn area entity
-            // Aim position type always is `Position`
-            LiteNetLibIdentity spawnObj = BaseGameNetworkManager.Singleton.Assets.GetObjectInstance(
-                areaBuffEntity.Identity.HashAssetId,
-                aimPosition.position,
-                GameInstance.Singleton.GameplayRule.GetSummonRotation(skillUser));
-            AreaBuffEntity entity = spawnObj.GetComponent<AreaBuffEntity>();
-            entity.Setup(skillUser.GetInfo(), this, skillLevel, areaDuration.GetAmount(skillLevel), applyDuration.GetAmount(skillLevel));
-            BaseGameNetworkManager.Singleton.Assets.NetworkSpawn(spawnObj);
-
+            if (BaseGameNetworkManager.Singleton.IsServer)
+            {
+                // Spawn area entity
+                // Aim position type always is `Position`
+                LiteNetLibIdentity spawnObj = BaseGameNetworkManager.Singleton.Assets.GetObjectInstance(
+                    areaBuffEntity.Identity.HashAssetId,
+                    aimPosition.position,
+                    GameInstance.Singleton.GameplayRule.GetSummonRotation(skillUser));
+                AreaBuffEntity entity = spawnObj.GetComponent<AreaBuffEntity>();
+                entity.Setup(skillUser.GetInfo(), this, skillLevel, areaDuration.GetAmount(skillLevel), applyDuration.GetAmount(skillLevel));
+                BaseGameNetworkManager.Singleton.Assets.NetworkSpawn(spawnObj);
+            }
             // Teleport to aim position
             if (isWarpToAimPosition)
                 skillUser.Teleport(aimPosition.position, skillUser.MovementTransform.rotation);
