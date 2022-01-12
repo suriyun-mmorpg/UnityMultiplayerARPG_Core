@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using LiteNetLibManager;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Rendering;
@@ -116,6 +117,7 @@ namespace MultiplayerARPG
         public static readonly Dictionary<string, List<Npc>> MapNpcs = new Dictionary<string, List<Npc>>();
         public static readonly Dictionary<string, BaseMapInfo> MapInfos = new Dictionary<string, BaseMapInfo>();
         public static readonly Dictionary<int, Faction> Factions = new Dictionary<int, Faction>();
+        public static readonly Dictionary<int, LiteNetLibIdentity> OtherNetworkObjectPrefabs = new Dictionary<int, LiteNetLibIdentity>();
         public static readonly HashSet<IPoolDescriptor> PoolingObjectPrefabs = new HashSet<IPoolDescriptor>();
 
         [Header("Gameplay Systems")]
@@ -659,6 +661,7 @@ namespace MultiplayerARPG
             MapInfos.Clear();
             Factions.Clear();
             PoolingObjectPrefabs.Clear();
+            OtherNetworkObjectPrefabs.Clear();
             GameEntityModel.GeneratingId = 0;
         }
 
@@ -1541,6 +1544,23 @@ namespace MultiplayerARPG
                 if ((poolingObject as Object) == null || PoolingObjectPrefabs.Contains(poolingObject))
                     continue;
                 PoolingObjectPrefabs.Add(poolingObject);
+            }
+        }
+
+        public static void AddOtherNetworkObjects(params LiteNetLibIdentity[] networkObjects)
+        {
+            AddOtherNetworkObjects((IEnumerable<LiteNetLibIdentity>)networkObjects);
+        }
+
+        public static void AddOtherNetworkObjects(IEnumerable<LiteNetLibIdentity> networkObjects)
+        {
+            if (networkObjects == null)
+                return;
+            foreach (LiteNetLibIdentity networkObject in networkObjects)
+            {
+                if (networkObject == null || OtherNetworkObjectPrefabs.ContainsKey(networkObject.HashAssetId))
+                    continue;
+                OtherNetworkObjectPrefabs.Add(networkObject.HashAssetId, networkObject);
             }
         }
 
