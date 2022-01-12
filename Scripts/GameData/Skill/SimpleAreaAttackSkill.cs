@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using LiteNetLibManager;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace MultiplayerARPG
@@ -44,8 +45,13 @@ namespace MultiplayerARPG
         {
             // Spawn area entity
             // Aim position type always is `Position`
-            PoolSystem.GetInstance(areaDamageEntity, aimPosition.position, GameInstance.Singleton.GameplayRule.GetSummonRotation(skillUser))
-                .Setup(skillUser.GetInfo(), weapon, damageAmounts, this, skillLevel, areaDuration.GetAmount(skillLevel), applyDuration.GetAmount(skillLevel));
+            LiteNetLibIdentity spawnObj = BaseGameNetworkManager.Singleton.Assets.GetObjectInstance(
+                areaDamageEntity.Identity.HashAssetId,
+                aimPosition.position,
+                GameInstance.Singleton.GameplayRule.GetSummonRotation(skillUser));
+            AreaDamageEntity entity = spawnObj.GetComponent<AreaDamageEntity>();
+            entity.Setup(skillUser.GetInfo(), weapon, damageAmounts, this, skillLevel, areaDuration.GetAmount(skillLevel), applyDuration.GetAmount(skillLevel));
+            BaseGameNetworkManager.Singleton.Assets.NetworkSpawn(spawnObj);
 
             // Teleport to aim position
             if (isWarpToAimPosition)
@@ -117,7 +123,8 @@ namespace MultiplayerARPG
         public override void PrepareRelatesData()
         {
             base.PrepareRelatesData();
-            GameInstance.AddPoolingObjects(areaDamageEntity);
+            areaDamageEntity.InitPrefab();
+            GameInstance.AddOtherNetworkObjects(areaDamageEntity.Identity);
         }
     }
 }

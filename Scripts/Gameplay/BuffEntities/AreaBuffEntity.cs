@@ -1,13 +1,25 @@
-﻿using System.Collections;
+﻿using LiteNetLibManager;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
 
 namespace MultiplayerARPG
 {
+    [RequireComponent(typeof(LiteNetLibIdentity))]
     public partial class AreaBuffEntity : BaseBuffEntity
     {
         public UnityEvent onDestroy;
+
+        private LiteNetLibIdentity identity;
+        public LiteNetLibIdentity Identity
+        {
+            get
+            {
+                if (identity == null)
+                    identity = GetComponent<LiteNetLibIdentity>();
+                return identity;
+            }
+        }
 
         protected float applyDuration;
         protected float lastAppliedTime;
@@ -17,15 +29,24 @@ namespace MultiplayerARPG
         {
             base.Awake();
             gameObject.layer = PhysicLayers.IgnoreRaycast;
+            Identity.onGetInstance.AddListener(OnGetInstance);
         }
 
-        protected virtual void Start()
+        protected virtual void OnDestroy()
         {
-            lastAppliedTime = Time.unscaledTime;
+            Identity.onGetInstance.RemoveListener(OnGetInstance);
         }
 
+        /// <summary>
+        /// Setup this component data
+        /// </summary>
+        /// <param name="buffApplier"></param>
+        /// <param name="skill">Skill which was used to attack enemy</param>
+        /// <param name="skillLevel">Level of the skill</param>
+        /// <param name="areaDuration"></param>
+        /// <param name="applyDuration"></param>
         public virtual void Setup(
-            BaseCharacterEntity buffApplier,
+            EntityInfo buffApplier,
             BaseSkill skill,
             short skillLevel,
             float areaDuration,
@@ -34,6 +55,7 @@ namespace MultiplayerARPG
             base.Setup(buffApplier, skill, skillLevel);
             PushBack(areaDuration);
             this.applyDuration = applyDuration;
+            lastAppliedTime = Time.unscaledTime;
         }
 
         protected virtual void Update()
@@ -93,6 +115,23 @@ namespace MultiplayerARPG
                 return;
 
             receivingBuffCharacters.Remove(target.ObjectId);
+        }
+
+        public override void InitPrefab()
+        {
+            if (this == null)
+            {
+                Debug.LogWarning("The Base Bufff Entity is null, this should not happens");
+                return;
+            }
+            FxCollection.InitPrefab();
+            Identity.PoolingSize = PoolSize;
+        }
+
+        protected override void PushBack()
+        {
+            OnPushBack();
+            Identity.NetworkDestroy();
         }
     }
 }

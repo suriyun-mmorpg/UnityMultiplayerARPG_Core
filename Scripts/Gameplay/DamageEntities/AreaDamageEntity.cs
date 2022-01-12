@@ -1,13 +1,26 @@
-﻿using System.Collections.Generic;
+﻿using LiteNetLibManager;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
 
 namespace MultiplayerARPG
 {
+    [RequireComponent(typeof(LiteNetLibIdentity))]
     public partial class AreaDamageEntity : BaseDamageEntity
     {
         public bool canApplyDamageToUser;
         public UnityEvent onDestroy;
+
+        private LiteNetLibIdentity identity;
+        public LiteNetLibIdentity Identity
+        {
+            get
+            {
+                if (identity == null)
+                    identity = GetComponent<LiteNetLibIdentity>();
+                return identity;
+            }
+        }
 
         protected float applyDuration;
         protected float lastAppliedTime;
@@ -17,6 +30,12 @@ namespace MultiplayerARPG
         {
             base.Awake();
             gameObject.layer = PhysicLayers.IgnoreRaycast;
+            Identity.onGetInstance.AddListener(OnGetInstance);
+        }
+
+        protected virtual void OnDestroy()
+        {
+            Identity.onGetInstance.RemoveListener(OnGetInstance);
         }
 
         /// <summary>
@@ -119,6 +138,23 @@ namespace MultiplayerARPG
                 return;
 
             receivingDamageHitBoxes.Remove(target.GetObjectId());
+        }
+
+        public override void InitPrefab()
+        {
+            if (this == null)
+            {
+                Debug.LogWarning("The Base Damage Entity is null, this should not happens");
+                return;
+            }
+            FxCollection.InitPrefab();
+            Identity.PoolingSize = PoolSize;
+        }
+
+        protected override void PushBack()
+        {
+            OnPushBack();
+            Identity.NetworkDestroy();
         }
     }
 }
