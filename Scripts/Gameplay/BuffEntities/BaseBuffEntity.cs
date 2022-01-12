@@ -1,15 +1,13 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
 namespace MultiplayerARPG
 {
-    public class BaseBuffEntity : MonoBehaviour, IPoolDescriptor
+    public class BaseBuffEntity : PoolDescriptor
     {
         [Tooltip("If this is `TRUE` buffs will applies to everyone including with an enemies")]
         public bool applyBuffToEveryone;
 
-        protected BaseCharacterEntity buffApplier;
+        protected EntityInfo buffApplier;
         protected BaseSkill skill;
         protected short skillLevel;
 
@@ -37,50 +35,33 @@ namespace MultiplayerARPG
         {
             get { return CurrentGameManager.IsClient; }
         }
-        [SerializeField]
-        private int poolSize = 30;
-        public int PoolSize
-        {
-            get { return poolSize; }
-        }
-
-        public IPoolDescriptor ObjectPrefab
-        {
-            get; set;
-        }
         
         public Transform CacheTransform { get; private set; }
-
-        private ParticleSystem[] particles;
-        private AudioSource[] audioSources;
-        private AudioSourceSetter[] audioSourceSetters;
+        private FxCollection fxCollection;
+        public FxCollection FxCollection
+        {
+            get
+            {
+                if (fxCollection == null)
+                    fxCollection = new FxCollection(gameObject);
+                return fxCollection;
+            }
+        }
+        private bool playFxOnEnable;
 
         protected virtual void Awake()
         {
             CacheTransform = transform;
-            particles = GetComponentsInChildren<ParticleSystem>(true);
-            audioSources = GetComponentsInChildren<AudioSource>(true);
-            audioSourceSetters = GetComponentsInChildren<AudioSourceSetter>(true);
         }
 
-        protected virtual void PushBack(float delay)
+        protected virtual void OnEnable()
         {
-            Invoke(nameof(PushBack), delay);
-        }
-
-        protected virtual void PushBack()
-        {
-            OnPushBack();
-            PoolSystem.PushBack(this);
-        }
-
-        protected virtual void OnPushBack()
-        {
-
+            if (playFxOnEnable)
+                PlayFx();
         }
 
         public virtual void Setup(
-            BaseCharacterEntity buffApplier,
+            EntityInfo buffApplier,
             BaseSkill skill,
             short skillLevel)
         {
@@ -91,76 +72,48 @@ namespace MultiplayerARPG
 
         public virtual void ApplyBuffTo(BaseCharacterEntity target)
         {
-            if (target == null || (!applyBuffToEveryone && !target.IsAlly(buffApplier.GetInfo())))
+            if (target == null || (!applyBuffToEveryone && !target.IsAlly(buffApplier)))
                 return;
-            target.ApplyBuff(skill.DataId, BuffType.SkillBuff, skillLevel, buffApplier.GetInfo());
+            target.ApplyBuff(skill.DataId, BuffType.SkillBuff, skillLevel, buffApplier);
         }
 
-        public virtual void InitPrefab()
+        public override void InitPrefab()
         {
             if (this == null)
             {
                 Debug.LogWarning("The Base Bufff Entity is null, this should not happens");
                 return;
             }
-            // Prepare audio sources
-            audioSources = GetComponentsInChildren<AudioSource>(true);
-            if (audioSources != null && audioSources.Length > 0)
-            {
-                foreach (AudioSource audioSource in audioSources)
-                {
-                    if (!audioSource)
-                        continue;
-                    audioSource.playOnAwake = false;
-                }
-            }
-            // Prepare audio source setters
-            audioSourceSetters = GetComponentsInChildren<AudioSourceSetter>(true);
-            if (audioSourceSetters != null && audioSourceSetters.Length > 0)
-            {
-                foreach (AudioSourceSetter audioSourceSetter in audioSourceSetters)
-                {
-                    if (!audioSourceSetter)
-                        continue;
-                    audioSourceSetter.playOnAwake = false;
-                    audioSourceSetter.playOnEnable = false;
-                }
-            }
+            FxCollection.InitPrefab();
+            base.InitPrefab();
         }
 
-        public virtual void OnGetInstance()
+        public override void OnGetInstance()
         {
-            // Play particles
-            if (particles != null && particles.Length > 0)
+            PlayFx();
+            base.OnGetInstance();
+        }
+
+        protected override void OnPushBack()
+        {
+            StopFx();
+            base.OnPushBack();
+        }
+
+        public virtual void PlayFx()
+        {
+            if (!gameObject.activeInHierarchy)
             {
-                foreach (ParticleSystem particle in particles)
-                {
-                    if (!particle)
-                        continue;
-                    particle.Play();
-                }
+                playFxOnEnable = true;
+                return;
             }
-            // Play audio sources
-            if (audioSourceSetters != null && audioSourceSetters.Length > 0)
-            {
-                foreach (AudioSourceSetter audioSourceSetter in audioSourceSetters)
-                {
-                    if (!audioSourceSetter)
-                        continue;
-                    audioSourceSetter.Play();
-                }
-            }
-            if (audioSources != null && audioSources.Length > 0)
-            {
-                float volume = AudioManager.Singleton == null ? 1f : AudioManager.Singleton.sfxVolumeSetting.Level;
-                foreach (AudioSource audioSource in audioSources)
-                {
-                    if (!audioSource)
-                        continue;
-                    audioSource.volume = volume;
-                    audioSource.Play();
-                }
-            }
+            FxCollection.Play();
+            playFxOnEnable = false;
+        }
+
+        public virtual void StopFx()
+        {
+            FxCollection.Stop();
         }
     }
 }

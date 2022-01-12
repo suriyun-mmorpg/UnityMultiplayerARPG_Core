@@ -17,6 +17,7 @@ namespace MultiplayerARPG
                 return fxCollection;
             }
         }
+        private bool playFxOnEnable;
 
         protected virtual void Awake()
         {
@@ -26,6 +27,12 @@ namespace MultiplayerARPG
         protected virtual void Update()
         {
             transform.position += transform.forward * speed * Time.deltaTime;
+        }
+
+        protected virtual void OnEnable()
+        {
+            if (playFxOnEnable)
+                PlayFx();
         }
 
         public virtual void Setup(float distance, float speed)
@@ -60,7 +67,13 @@ namespace MultiplayerARPG
 
         public virtual void PlayFx()
         {
+            if (!gameObject.activeInHierarchy)
+            {
+                playFxOnEnable = true;
+                return;
+            }
             FxCollection.Play();
+            playFxOnEnable = false;
         }
 
         public virtual void StopFx()
