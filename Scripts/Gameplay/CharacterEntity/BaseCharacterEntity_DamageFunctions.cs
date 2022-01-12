@@ -5,7 +5,7 @@ namespace MultiplayerARPG
 {
     public partial class BaseCharacterEntity
     {
-        public void ValidateRecovery(EntityInfo causer)
+        public void ValidateRecovery(EntityInfo instigator)
         {
             if (!IsServer)
                 return;
@@ -37,7 +37,7 @@ namespace MultiplayerARPG
                 CurrentWater = this.GetCaches().MaxWater;
 
             if (this.IsDead())
-                Killed(causer);
+                Killed(instigator);
         }
 
         public virtual void Killed(EntityInfo lastAttacker)
