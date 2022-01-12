@@ -42,7 +42,6 @@ namespace MultiplayerARPG
         public bool useRootMotionUnderWater;
 
         [Header("Networking Settings")]
-        public float moveThreshold = 0.01f;
         public float snapThreshold = 5.0f;
         [Range(0.00825f, 0.1f)]
         public float clientSyncTransformInterval = 0.05f;
@@ -80,7 +79,7 @@ namespace MultiplayerARPG
         protected Vector3 oldGroundedPosition;
         protected long acceptedPositionTimestamp;
         protected long acceptedJumpTimestamp;
-        protected readonly Queue<Vector3> clientTargetPositions = new Queue<Vector3>();
+        protected Vector3? clientTargetPosition;
         protected float? targetYRotation;
         protected float yRotateLerpTime;
         protected float yRotateLerpDuration;
@@ -177,7 +176,6 @@ namespace MultiplayerARPG
         {
             navPaths = null;
             lagMoveSpeedRate = null;
-            clientTargetPositions.Clear();
         }
 
         public void KeyMovement(Vector3 moveDirection, MovementState movementState)
@@ -389,19 +387,16 @@ namespace MultiplayerARPG
                     targetYRotation = null;
                 }
             }
-            else if (clientTargetPositions.Count > 0)
+            else if (clientTargetPosition.HasValue)
             {
-                tempTargetPosition = clientTargetPositions.Peek();
+                tempTargetPosition = clientTargetPosition.Value;
                 moveDirection = (tempTargetPosition - tempCurrentPosition).normalized;
-                tempTargetDistance = Vector3.Distance(tempTargetPosition.GetXZ(), tempCurrentPosition.GetXZ());
-                if (tempTargetDistance < StoppingDistance)
+                tempTargetDistance = Vector3.Distance(tempTargetPosition, tempCurrentPosition);
+                if (tempTargetDistance < 0.001f)
                 {
-                    clientTargetPositions.Dequeue();
-                    if (clientTargetPositions.Count == 0)
-                    {
-                        StopMoveFunction();
-                        moveDirection = Vector3.zero;
-                    }
+                    clientTargetPosition = null;
+                    StopMoveFunction();
+                    moveDirection = Vector3.zero;
                 }
             }
             else if (inputDirection.sqrMagnitude > 0f)
@@ -494,7 +489,7 @@ namespace MultiplayerARPG
                 tempSqrMagnitude = (tempTargetPosition - tempCurrentPosition).sqrMagnitude;
                 tempPredictPosition = tempCurrentPosition + (tempHorizontalMoveDirection * tempCurrentMoveSpeed * deltaTime);
                 tempPredictSqrMagnitude = (tempPredictPosition - tempCurrentPosition).sqrMagnitude;
-                if (HasNavPaths)
+                if (HasNavPaths || clientTargetPosition.HasValue)
                 {
                     // Check `tempSqrMagnitude` against the `tempPredictSqrMagnitude`
                     // if `tempPredictSqrMagnitude` is greater than `tempSqrMagnitude`,
@@ -623,9 +618,11 @@ namespace MultiplayerARPG
 
         private float CalculateCurrentMoveSpeed(float maxMoveSpeed, float deltaTime)
         {
+            // Adjust speed by rtt
             if (!IsServer && IsOwnerClient && Entity.MovementSecure == MovementSecure.ServerAuthoritative)
             {
-                float acc = 1f / (0.5f * 0.001f * Entity.Manager.Rtt) * deltaTime;
+                float rtt = 0.001f * Entity.Manager.Rtt;
+                float acc = 1f / rtt * deltaTime * 0.5f;
                 if (!lagMoveSpeedRate.HasValue)
                     lagMoveSpeedRate = 0f;
                 if (lagMoveSpeedRate < 1f)
@@ -634,17 +631,7 @@ namespace MultiplayerARPG
                     lagMoveSpeedRate = 1f;
                 return maxMoveSpeed * lagMoveSpeedRate.Value;
             }
-            else if (!IsServer && !IsOwnerClient)
-            {
-                float acc = 1f / (0.5f * 0.001f * Entity.Manager.Rtt) * deltaTime;
-                if (!lagMoveSpeedRate.HasValue)
-                    lagMoveSpeedRate = 1f + (acc * (acc / deltaTime) * 0.5f);
-                if (lagMoveSpeedRate > 1f)
-                    lagMoveSpeedRate -= acc;
-                if (lagMoveSpeedRate < 1f)
-                    lagMoveSpeedRate = 1f;
-                return maxMoveSpeed * lagMoveSpeedRate.Value;
-            }
+            // TODO: Adjust other's client move speed by rtt
             return maxMoveSpeed;
         }
 
@@ -750,7 +737,7 @@ namespace MultiplayerARPG
                     targetYRotation = yAngle;
                     yRotateLerpTime = 0;
                     yRotateLerpDuration = serverSyncTransformInterval;
-                    clientTargetPositions.Enqueue(position);
+                    clientTargetPosition = position;
                     MovementState = movementState;
                     ExtraMovementState = extraMovementState;
                 }
@@ -823,7 +810,7 @@ namespace MultiplayerARPG
                 {
                     if (inputState.Has(InputState.IsKeyMovement))
                     {
-                        clientTargetPositions.Enqueue(position);
+                        clientTargetPosition = position;
                     }
                     else
                     {
@@ -869,18 +856,16 @@ namespace MultiplayerARPG
             {
                 acceptedPositionTimestamp = timestamp;
                 yRotation = yAngle;
-                if (Vector3.Distance(position.GetXZ(), CacheTransform.position.GetXZ()) > moveThreshold)
+                if (!IsClient)
                 {
-                    if (!IsClient)
-                    {
-                        // If it's server only (not a host), set position follows the client immediately
-                        CacheTransform.position = position;
-                    }
-                    else
-                    {
-                        // It's both server and client, translate position
+                    // If it's server only (not a host), set position follows the client immediately
+                    CacheTransform.position = position;
+                }
+                else
+                {
+                    // It's both server and client, translate position
+                    if (Vector3.Distance(position, CacheTransform.position) > 0.01f)
                         SetMovePaths(position, false);
-                    }
                 }
                 MovementState = movementState;
                 ExtraMovementState = extraMovementState;

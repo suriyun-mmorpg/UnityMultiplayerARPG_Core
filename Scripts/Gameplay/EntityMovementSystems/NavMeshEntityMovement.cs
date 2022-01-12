@@ -14,7 +14,6 @@ namespace MultiplayerARPG
         public ObstacleAvoidanceType obstacleAvoidanceWhileStationary = ObstacleAvoidanceType.NoObstacleAvoidance;
 
         [Header("Networking Settings")]
-        public float moveThreshold = 0.01f;
         public float snapThreshold = 5.0f;
         [Range(0.00825f, 0.1f)]
         public float clientSyncTransformInterval = 0.05f;
@@ -385,7 +384,7 @@ namespace MultiplayerARPG
             {
                 acceptedPositionTimestamp = timestamp;
                 CacheTransform.eulerAngles = new Vector3(0, yAngle, 0);
-                if (Vector3.Distance(position.GetXZ(), CacheTransform.position.GetXZ()) > moveThreshold)
+                if (Vector3.Distance(position.GetXZ(), CacheTransform.position.GetXZ()) > 0.01f)
                 {
                     if (!IsClient)
                     {

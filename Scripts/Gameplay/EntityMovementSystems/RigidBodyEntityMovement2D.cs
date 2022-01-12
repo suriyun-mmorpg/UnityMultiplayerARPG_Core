@@ -11,7 +11,6 @@ namespace MultiplayerARPG
         public float stoppingDistance = 0.1f;
 
         [Header("Networking Settings")]
-        public float moveThreshold = 0.01f;
         public float snapThreshold = 5.0f;
         [Range(0.00825f, 0.1f)]
         public float clientSyncTransformInterval = 0.05f;
@@ -339,18 +338,16 @@ namespace MultiplayerARPG
             if (acceptedPositionTimestamp < timestamp)
             {
                 acceptedPositionTimestamp = timestamp;
-                if (Vector2.Distance(position, CacheTransform.position) > moveThreshold)
+                if (!IsClient)
                 {
-                    if (!IsClient)
-                    {
-                        // If it's server only (not a host), set position follows the client immediately
-                        CacheTransform.position = position;
-                    }
-                    else
-                    {
-                        // It's both server and client, translate position
+                    // If it's server only (not a host), set position follows the client immediately
+                    CacheTransform.position = position;
+                }
+                else
+                {
+                    // It's both server and client, translate position
+                    if (Vector3.Distance(position, CacheTransform.position) > 0.01f)
                         currentDestination = position;
-                    }
                 }
                 MovementState = movementState;
                 ExtraMovementState = extraMovementState;
