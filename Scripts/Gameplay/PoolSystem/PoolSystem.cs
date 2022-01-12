@@ -117,7 +117,7 @@ namespace MultiplayerARPG
         {
             if (instance == null)
             {
-                Debug.LogWarning($"[PoolSystem] Cannot push back ({instance.gameObject}). The instance's is empty.");
+                Debug.LogWarning($"[PoolSystem] Cannot push back. The instance's is empty.");
                 return;
             }
             if (instance.ObjectPrefab == null)
