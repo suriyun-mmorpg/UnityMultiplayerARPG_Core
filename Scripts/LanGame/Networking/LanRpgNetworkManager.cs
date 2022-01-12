@@ -138,6 +138,7 @@ namespace MultiplayerARPG
         public override void OnClientDisconnected(DisconnectInfo disconnectInfo)
         {
             base.OnClientDisconnected(disconnectInfo);
+            Save();
             ClientStorageActions.onNotifyStorageItemsUpdated -= NotifyStorageItemsUpdated;
         }
 
@@ -163,29 +164,34 @@ namespace MultiplayerARPG
             await SaveSystem.PreSpawnEntities(selectedCharacter, ServerStorageHandlers.GetAllStorageItems());
         }
 
+        public void Save()
+        {
+            Profiler.BeginSample("LanRpgNetworkManager - Save Data");
+            BasePlayerCharacterEntity owningCharacter = GameInstance.PlayingCharacterEntity;
+            if (owningCharacter != null && IsClientConnected)
+            {
+                SaveSystem.SaveCharacter(owningCharacter);
+                SaveSystem.SaveSummonBuffs(owningCharacter, new List<CharacterSummon>(owningCharacter.Summons));
+                if (IsServer)
+                {
+                    SaveSystem.SaveWorld(owningCharacter, ServerBuildingHandlers.GetBuildings());
+                    SaveSystem.SaveStorage(owningCharacter, ServerStorageHandlers.GetAllStorageItems());
+                }
+                else
+                {
+                    SaveSystem.SavePlayerStorage(owningCharacter, selectedCharacterStorageItems);
+                }
+            }
+            Profiler.EndSample();
+        }
+
         protected override void FixedUpdate()
         {
             base.FixedUpdate();
             float tempTime = Time.fixedTime;
             if (tempTime - lastSaveTime > autoSaveDuration)
             {
-                Profiler.BeginSample("LanRpgNetworkManager - Save Data");
-                BasePlayerCharacterEntity owningCharacter = GameInstance.PlayingCharacterEntity;
-                if (owningCharacter != null && IsClientConnected)
-                {
-                    SaveSystem.SaveCharacter(owningCharacter);
-                    SaveSystem.SaveSummonBuffs(owningCharacter, new List<CharacterSummon>(owningCharacter.Summons));
-                    if (IsServer)
-                    {
-                        SaveSystem.SaveWorld(owningCharacter, ServerBuildingHandlers.GetBuildings());
-                        SaveSystem.SaveStorage(owningCharacter, ServerStorageHandlers.GetAllStorageItems());
-                    }
-                    else
-                    {
-                        SaveSystem.SavePlayerStorage(owningCharacter, selectedCharacterStorageItems);
-                    }
-                }
-                Profiler.EndSample();
+                Save();
                 lastSaveTime = tempTime;
             }
 
