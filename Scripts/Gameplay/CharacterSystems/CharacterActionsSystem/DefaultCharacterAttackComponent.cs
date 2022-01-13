@@ -65,8 +65,6 @@ namespace MultiplayerARPG
         [AllRpc]
         protected void AllPlayAttackAnimation(byte simulateSeed, bool isLeftHand)
         {
-            if (IsOwnerClientOrOwnedByServer)
-                return;
             AttackRoutine(simulateSeed, isLeftHand).Forget();
         }
 
