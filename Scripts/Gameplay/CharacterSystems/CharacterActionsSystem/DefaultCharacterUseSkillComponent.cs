@@ -146,6 +146,7 @@ namespace MultiplayerARPG
             BaseSkill skill;
             if (GameInstance.Skills.TryGetValue(skillDataId, out skill) && skillLevel > 0)
             {
+                Entity.AttackComponent.CancelAttack();
                 UseSkillRoutine(simulateSeed, isLeftHand, skill, skillLevel, targetObjectId, aimPosition).Forget();
             }
             else
@@ -439,15 +440,12 @@ namespace MultiplayerARPG
             }
             finally
             {
-                // Clear action states at clients and server
-                if (!skillCancellationTokenSource.IsCancellationRequested)
-                {
-                    ClearUseSkillStates();
-                    LastUseSkillEndTime = Time.unscaledTime;
-                }
                 skillCancellationTokenSource.Dispose();
                 skillCancellationTokenSources.Remove(skillCancellationTokenSource);
             }
+            // Clear action states at clients and server
+            ClearUseSkillStates();
+            LastUseSkillEndTime = Time.unscaledTime;
         }
 
         public void CancelSkill()
@@ -458,7 +456,6 @@ namespace MultiplayerARPG
                     skillCancellationTokenSources[i].Cancel();
                 skillCancellationTokenSources.RemoveAt(i);
             }
-            Logging.LogError("Cancelled2");
         }
 
         public bool CallAllSimulateLaunchDamageEntity(SimulateLaunchDamageEntityData data)
@@ -494,11 +491,13 @@ namespace MultiplayerARPG
 
         public void UseSkill(int dataId, bool isLeftHand, uint targetObjectId, AimPosition aimPosition)
         {
+            IsUsingSkill = true;
             CallServerUseSkill(dataId, isLeftHand, targetObjectId, aimPosition);
         }
 
         public void UseSkillItem(short itemIndex, bool isLeftHand, uint targetObjectId, AimPosition aimPosition)
         {
+            IsUsingSkill = true;
             CallServerUseSkillItem(itemIndex, isLeftHand, targetObjectId, aimPosition);
         }
     }

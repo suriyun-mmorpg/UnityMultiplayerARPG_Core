@@ -198,7 +198,9 @@ namespace MultiplayerARPG
                         // Play launch sfx
                         if (AnimActionType == AnimActionType.AttackRightHand ||
                             AnimActionType == AnimActionType.AttackLeftHand)
+                        {
                             AudioManager.PlaySfxClipAtAudioSource(weaponItem.LaunchClip, Entity.CharacterModel.GenericAudioSource);
+                        }
                     }
 
                     // Call on attack to extend attack functionality while attacking
@@ -265,15 +267,12 @@ namespace MultiplayerARPG
             }
             finally
             {
-                // Clear action states at clients and server
-                if (!attackCancellationTokenSource.IsCancellationRequested)
-                {
-                    ClearAttackStates();
-                    LastAttackEndTime = Time.unscaledTime;
-                }
                 attackCancellationTokenSource.Dispose();
                 attackCancellationTokenSources.Remove(attackCancellationTokenSource);
             }
+            // Clear action states at clients and server
+            ClearAttackStates();
+            LastAttackEndTime = Time.unscaledTime;
         }
 
         protected virtual void ApplyAttack(bool isLeftHand, CharacterItem weapon, DamageInfo damageInfo, Dictionary<DamageElement, MinMaxFloat> damageAmounts, AimPosition aimPosition, int randomSeed)

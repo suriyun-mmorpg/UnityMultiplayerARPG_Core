@@ -189,14 +189,11 @@ namespace MultiplayerARPG
             }
             finally
             {
-                // Clear action states at clients and server
-                if (!reloadCancellationTokenSource.IsCancellationRequested)
-                {
-                    ClearReloadStates();
-                }
                 reloadCancellationTokenSource.Dispose();
                 reloadCancellationTokenSources.Remove(reloadCancellationTokenSource);
             }
+            // Clear action states at clients and server
+            ClearReloadStates();
         }
 
         public void CancelReload()
@@ -211,6 +208,7 @@ namespace MultiplayerARPG
 
         public void Reload(bool isLeftHand)
         {
+            IsReloading = true;
             CallServerReload(isLeftHand);
         }
     }

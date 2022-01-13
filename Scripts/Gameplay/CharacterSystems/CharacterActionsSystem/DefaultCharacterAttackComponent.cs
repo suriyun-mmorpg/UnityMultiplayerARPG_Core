@@ -31,6 +31,31 @@ namespace MultiplayerARPG
             IsAttacking = false;
         }
 
+        public bool CallServerAttack(bool isLeftHand)
+        {
+            RPC(ServerAttack, BaseCharacterEntity.ACTION_TO_SERVER_DATA_CHANNEL, DeliveryMethod.ReliableOrdered, isLeftHand);
+            return true;
+        }
+
+        /// <summary>
+        /// Is function will be called at server to order character to attack
+        /// </summary>
+        /// <param name="isLeftHand"></param>
+        [ServerRpc]
+        protected void ServerAttack(bool isLeftHand)
+        {
+#if !CLIENT_BUILD
+            // Start attack routine
+            IsAttacking = true;
+
+            // Get simulate seed for simulation validating
+            byte simulateSeed = (byte)Random.Range(byte.MinValue, byte.MaxValue);
+
+            // Play animations
+            CallAllPlayAttackAnimation(simulateSeed, isLeftHand);
+#endif
+        }
+
         public bool CallAllPlayAttackAnimation(byte simulateSeed, bool isLeftHand)
         {
             RPC(AllPlayAttackAnimation, BaseCharacterEntity.ACTION_TO_CLIENT_DATA_CHANNEL, DeliveryMethod.ReliableOrdered, simulateSeed, isLeftHand);
@@ -134,7 +159,9 @@ namespace MultiplayerARPG
                         // Play launch sfx
                         if (AnimActionType == AnimActionType.AttackRightHand ||
                             AnimActionType == AnimActionType.AttackLeftHand)
+                        {
                             AudioManager.PlaySfxClipAtAudioSource(weaponItem.LaunchClip, Entity.CharacterModel.GenericAudioSource);
+                        }
                     }
 
                     // Call on attack to extend attack functionality while attacking
@@ -203,15 +230,12 @@ namespace MultiplayerARPG
             }
             finally
             {
-                // Clear action states at clients and server
-                if (!attackCancellationTokenSource.IsCancellationRequested)
-                {
-                    ClearAttackStates();
-                    LastAttackEndTime = Time.unscaledTime;
-                }
                 attackCancellationTokenSource.Dispose();
                 attackCancellationTokenSources.Remove(attackCancellationTokenSource);
             }
+            // Clear action states at clients and server
+            ClearAttackStates();
+            LastAttackEndTime = Time.unscaledTime;
         }
 
         protected virtual void ApplyAttack(bool isLeftHand, CharacterItem weapon, DamageInfo damageInfo, Dictionary<DamageElement, MinMaxFloat> damageAmounts, AimPosition aimPosition, int randomSeed, long? time)
@@ -297,17 +321,8 @@ namespace MultiplayerARPG
 
         public void Attack(bool isLeftHand)
         {
-            // Start attack routine
             IsAttacking = true;
-
-            // Get simulate seed for simulation validating
-            byte simulateSeed = (byte)Random.Range(byte.MinValue, byte.MaxValue);
-
-            // Play attack animation at owning client immediately
-            AttackRoutine(simulateSeed, isLeftHand).Forget();
-
-            // Broadcast attack animation playing
-            CallAllPlayAttackAnimation(simulateSeed, isLeftHand);
+            CallServerAttack(isLeftHand);
         }
     }
 }
