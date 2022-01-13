@@ -92,8 +92,6 @@ namespace MultiplayerARPG
         public ICharacterUseSkillComponent UseSkillComponent { get; protected set; }
         public ICharacterReloadComponent ReloadComponent { get; protected set; }
         public ICharacterChargeComponent ChargeComponent { get; protected set; }
-        public AnimActionType AnimActionType { get; set; }
-        public int AnimActionDataId { get; set; }
         public bool IsAttacking { get { return AttackComponent.IsAttacking; } }
         public float LastAttackEndTime { get { return AttackComponent.LastAttackEndTime; } }
         public float MoveSpeedRateWhileAttacking { get { return AttackComponent.MoveSpeedRateWhileAttacking; } }
@@ -810,16 +808,12 @@ namespace MultiplayerARPG
         #region Allowed abilities
         public virtual bool IsPlayingAttackOrUseSkillAnimation()
         {
-            return AnimActionType == AnimActionType.AttackRightHand ||
-                AnimActionType == AnimActionType.AttackLeftHand ||
-                AnimActionType == AnimActionType.SkillLeftHand ||
-                AnimActionType == AnimActionType.SkillRightHand;
+            return AttackComponent.IsAttacking || UseSkillComponent.IsUsingSkill;
         }
 
         public virtual bool IsPlayingReloadAnimation()
         {
-            return AnimActionType == AnimActionType.ReloadRightHand ||
-                AnimActionType == AnimActionType.ReloadLeftHand;
+            return ReloadComponent.IsReloading;
         }
 
         public virtual bool IsPlayingActionAnimation()

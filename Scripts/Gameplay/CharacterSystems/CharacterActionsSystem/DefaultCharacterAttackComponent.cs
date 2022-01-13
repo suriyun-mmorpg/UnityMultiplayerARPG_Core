@@ -13,14 +13,16 @@ namespace MultiplayerARPG
         public bool IsAttacking { get; protected set; }
         public float LastAttackEndTime { get; protected set; }
         public float MoveSpeedRateWhileAttacking { get; protected set; }
+        public AnimActionType AnimActionType { get; protected set; }
+        public int AnimActionDataId { get; protected set; }
 
         protected readonly Dictionary<int, SimulatingHit> SimulatingHits = new Dictionary<int, SimulatingHit>();
 
         protected virtual void SetAttackActionStates(AnimActionType animActionType, int animActionDataId)
         {
-            Entity.ClearActionStates();
-            Entity.AnimActionType = animActionType;
-            Entity.AnimActionDataId = animActionDataId;
+            ClearAttackStates();
+            AnimActionType = animActionType;
+            AnimActionDataId = animActionDataId;
             IsAttacking = true;
         }
 
@@ -85,7 +87,7 @@ namespace MultiplayerARPG
             MoveSpeedRateWhileAttacking = Entity.GetMoveSpeedRateWhileAttacking(weaponItem);
 
             // Get play speed multiplier will use it to play animation faster or slower based on attack speed stats
-            animSpeedRate *= Entity.GetAnimSpeedRate(Entity.AnimActionType);
+            animSpeedRate *= Entity.GetAnimSpeedRate(AnimActionType);
 
             try
             {
@@ -93,21 +95,21 @@ namespace MultiplayerARPG
                 if (Entity.CharacterModel && Entity.CharacterModel.gameObject.activeSelf)
                 {
                     // TPS model
-                    Entity.CharacterModel.PlayActionAnimation(Entity.AnimActionType, Entity.AnimActionDataId, animationIndex, animSpeedRate);
+                    Entity.CharacterModel.PlayActionAnimation(AnimActionType, AnimActionDataId, animationIndex, animSpeedRate);
                 }
                 if (Entity.PassengingVehicleEntity != null && Entity.PassengingVehicleEntity.Entity.Model &&
                     Entity.PassengingVehicleEntity.Entity.Model.gameObject.activeSelf &&
                     Entity.PassengingVehicleEntity.Entity.Model is BaseCharacterModel)
                 {
                     // Vehicle model
-                    (Entity.PassengingVehicleEntity.Entity.Model as BaseCharacterModel).PlayActionAnimation(Entity.AnimActionType, Entity.AnimActionDataId, animationIndex, animSpeedRate);
+                    (Entity.PassengingVehicleEntity.Entity.Model as BaseCharacterModel).PlayActionAnimation(AnimActionType, AnimActionDataId, animationIndex, animSpeedRate);
                 }
                 if (IsClient)
                 {
                     if (Entity.FpsModel && Entity.FpsModel.gameObject.activeSelf)
                     {
                         // FPS model
-                        Entity.FpsModel.PlayActionAnimation(Entity.AnimActionType, Entity.AnimActionDataId, animationIndex, animSpeedRate);
+                        Entity.FpsModel.PlayActionAnimation(AnimActionType, AnimActionDataId, animationIndex, animSpeedRate);
                     }
                 }
 
@@ -130,8 +132,8 @@ namespace MultiplayerARPG
                         if (Entity.FpsModel && Entity.FpsModel.gameObject.activeSelf)
                             Entity.FpsModel.PlayEquippedWeaponLaunch(isLeftHand);
                         // Play launch sfx
-                        if (Entity.AnimActionType == AnimActionType.AttackRightHand ||
-                            Entity.AnimActionType == AnimActionType.AttackLeftHand)
+                        if (AnimActionType == AnimActionType.AttackRightHand ||
+                            AnimActionType == AnimActionType.AttackLeftHand)
                             AudioManager.PlaySfxClipAtAudioSource(weaponItem.LaunchClip, Entity.CharacterModel.GenericAudioSource);
                     }
 
@@ -201,12 +203,15 @@ namespace MultiplayerARPG
             }
             finally
             {
+                // Clear action states at clients and server
+                if (!attackCancellationTokenSource.IsCancellationRequested)
+                {
+                    ClearAttackStates();
+                    LastAttackEndTime = Time.unscaledTime;
+                }
                 attackCancellationTokenSource.Dispose();
                 attackCancellationTokenSources.Remove(attackCancellationTokenSource);
             }
-            // Clear action states at clients and server
-            Entity.ClearActionStates();
-            LastAttackEndTime = Time.unscaledTime;
         }
 
         protected virtual void ApplyAttack(bool isLeftHand, CharacterItem weapon, DamageInfo damageInfo, Dictionary<DamageElement, MinMaxFloat> damageAmounts, AimPosition aimPosition, int randomSeed, long? time)

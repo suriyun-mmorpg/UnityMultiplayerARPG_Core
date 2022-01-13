@@ -13,6 +13,7 @@ namespace MultiplayerARPG
         public short ReloadingAmmoAmount { get; protected set; }
         public bool IsReloading { get; protected set; }
         public float MoveSpeedRateWhileReloading { get; protected set; }
+        public AnimActionType AnimActionType { get; protected set; }
 
         public bool CallAllPlayReloadAnimation(bool isLeftHand, short reloadingAmmoAmount)
         {
@@ -73,16 +74,14 @@ namespace MultiplayerARPG
 
         protected virtual void SetReloadActionStates(AnimActionType animActionType, short reloadingAmmoAmount)
         {
-            Entity.ClearActionStates();
-            Entity.AnimActionType = animActionType;
+            ClearReloadStates();
+            AnimActionType = animActionType;
             ReloadingAmmoAmount = reloadingAmmoAmount;
             IsReloading = true;
         }
 
         public virtual void ClearReloadStates()
         {
-            Entity.AnimActionType = AnimActionType.None;
-            Entity.AnimActionDataId = 0;
             ReloadingAmmoAmount = 0;
             IsReloading = false;
         }
@@ -129,21 +128,21 @@ namespace MultiplayerARPG
                 if (Entity.CharacterModel && Entity.CharacterModel.gameObject.activeSelf)
                 {
                     // TPS model
-                    Entity.CharacterModel.PlayActionAnimation(Entity.AnimActionType, animActionDataId, 0);
+                    Entity.CharacterModel.PlayActionAnimation(AnimActionType, animActionDataId, 0);
                 }
                 if (Entity.PassengingVehicleEntity != null && Entity.PassengingVehicleEntity.Entity.Model &&
                     Entity.PassengingVehicleEntity.Entity.Model.gameObject.activeSelf &&
                     Entity.PassengingVehicleEntity.Entity.Model is BaseCharacterModel)
                 {
                     // Vehicle model
-                    (Entity.PassengingVehicleEntity.Entity.Model as BaseCharacterModel).PlayActionAnimation(Entity.AnimActionType, animActionDataId, 0);
+                    (Entity.PassengingVehicleEntity.Entity.Model as BaseCharacterModel).PlayActionAnimation(AnimActionType, animActionDataId, 0);
                 }
                 if (IsClient)
                 {
                     if (Entity.FpsModel && Entity.FpsModel.gameObject.activeSelf)
                     {
                         // FPS model
-                        Entity.FpsModel.PlayActionAnimation(Entity.AnimActionType, animActionDataId, 0);
+                        Entity.FpsModel.PlayActionAnimation(AnimActionType, animActionDataId, 0);
                     }
                 }
 
@@ -156,9 +155,11 @@ namespace MultiplayerARPG
                     if (Entity.FpsModel && Entity.FpsModel.gameObject.activeSelf)
                         Entity.FpsModel.PlayEquippedWeaponReload(isLeftHand);
                     // Play reload sfx
-                    if (Entity.AnimActionType == AnimActionType.ReloadRightHand ||
-                        Entity.AnimActionType == AnimActionType.ReloadLeftHand)
+                    if (AnimActionType == AnimActionType.ReloadRightHand ||
+                        AnimActionType == AnimActionType.ReloadLeftHand)
+                    {
                         AudioManager.PlaySfxClipAtAudioSource(weaponItem.ReloadClip, Entity.CharacterModel.GenericAudioSource);
+                    }
                 }
 
                 for (int i = 0; i < triggerDurations.Length; ++i)
@@ -188,11 +189,14 @@ namespace MultiplayerARPG
             }
             finally
             {
+                // Clear action states at clients and server
+                if (!reloadCancellationTokenSource.IsCancellationRequested)
+                {
+                    ClearReloadStates();
+                }
                 reloadCancellationTokenSource.Dispose();
                 reloadCancellationTokenSources.Remove(reloadCancellationTokenSource);
             }
-            // Clear action states at clients and server
-            Entity.ClearActionStates();
         }
 
         public void CancelReload()

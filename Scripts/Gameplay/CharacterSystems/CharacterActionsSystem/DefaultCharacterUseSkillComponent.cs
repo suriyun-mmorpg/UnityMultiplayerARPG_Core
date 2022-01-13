@@ -19,6 +19,8 @@ namespace MultiplayerARPG
         public float CastingSkillDuration { get; protected set; }
         public float CastingSkillCountDown { get; protected set; }
         public float MoveSpeedRateWhileUsingSkill { get; protected set; }
+        public AnimActionType AnimActionType { get; protected set; }
+        public int AnimActionDataId { get; protected set; }
 
         protected readonly Dictionary<int, SimulatingHit> SimulatingHits = new Dictionary<int, SimulatingHit>();
 
@@ -31,9 +33,9 @@ namespace MultiplayerARPG
 
         protected virtual void SetUseSkillActionStates(AnimActionType animActionType, int animActionDataId, BaseSkill usingSkill, short usingSkillLevel)
         {
-            Entity.ClearActionStates();
-            Entity.AnimActionType = animActionType;
-            Entity.AnimActionDataId = animActionDataId;
+            ClearUseSkillStates();
+            AnimActionType = animActionType;
+            AnimActionDataId = animActionDataId;
             UsingSkill = usingSkill;
             UsingSkillLevel = usingSkillLevel;
             IsUsingSkill = true;
@@ -148,7 +150,7 @@ namespace MultiplayerARPG
             }
             else
             {
-                Entity.ClearActionStates();
+                ClearUseSkillStates();
             }
         }
 
@@ -288,7 +290,7 @@ namespace MultiplayerARPG
             MoveSpeedRateWhileUsingSkill = skill.moveSpeedRateWhileUsingSkill;
 
             // Get play speed multiplier will use it to play animation faster or slower based on attack speed stats
-            animSpeedRate *= Entity.GetAnimSpeedRate(Entity.AnimActionType);
+            animSpeedRate *= Entity.GetAnimSpeedRate(AnimActionType);
 
             // Set doing action data
             IsCastingSkillCanBeInterrupted = skill.canBeInterruptedWhileCasting;
@@ -339,21 +341,21 @@ namespace MultiplayerARPG
                 if (Entity.CharacterModel && Entity.CharacterModel.gameObject.activeSelf)
                 {
                     // TPS model
-                    Entity.CharacterModel.PlayActionAnimation(Entity.AnimActionType, Entity.AnimActionDataId, animationIndex, animSpeedRate);
+                    Entity.CharacterModel.PlayActionAnimation(AnimActionType, AnimActionDataId, animationIndex, animSpeedRate);
                 }
                 if (Entity.PassengingVehicleEntity != null && Entity.PassengingVehicleEntity.Entity.Model &&
                     Entity.PassengingVehicleEntity.Entity.Model.gameObject.activeSelf &&
                     Entity.PassengingVehicleEntity.Entity.Model is BaseCharacterModel)
                 {
                     // Vehicle model
-                    (Entity.PassengingVehicleEntity.Entity.Model as BaseCharacterModel).PlayActionAnimation(Entity.AnimActionType, Entity.AnimActionDataId, animationIndex, animSpeedRate);
+                    (Entity.PassengingVehicleEntity.Entity.Model as BaseCharacterModel).PlayActionAnimation(AnimActionType, AnimActionDataId, animationIndex, animSpeedRate);
                 }
                 if (IsClient)
                 {
                     if (Entity.FpsModel && Entity.FpsModel.gameObject.activeSelf)
                     {
                         // FPS model
-                        Entity.FpsModel.PlayActionAnimation(Entity.AnimActionType, Entity.AnimActionDataId, animationIndex, animSpeedRate);
+                        Entity.FpsModel.PlayActionAnimation(AnimActionType, AnimActionDataId, animationIndex, animSpeedRate);
                     }
                 }
 
@@ -377,9 +379,11 @@ namespace MultiplayerARPG
                             Entity.FpsModel.PlayEquippedWeaponLaunch(isLeftHand);
                         // Play launch sfx
                         if (weaponItem != null &&
-                            (Entity.AnimActionType == AnimActionType.AttackRightHand ||
-                            Entity.AnimActionType == AnimActionType.AttackLeftHand))
+                            (AnimActionType == AnimActionType.AttackRightHand ||
+                            AnimActionType == AnimActionType.AttackLeftHand))
+                        {
                             AudioManager.PlaySfxClipAtAudioSource(weaponItem.LaunchClip, Entity.CharacterModel.GenericAudioSource);
+                        }
                     }
 
                     // Get aim position by character's forward
@@ -424,18 +428,26 @@ namespace MultiplayerARPG
                     await UniTask.Delay((int)(remainsDuration / animSpeedRate * 1000f), true, PlayerLoopTiming.Update, skillCancellationTokenSource.Token);
                 }
             }
-            catch
+            catch (System.OperationCanceledException)
             {
                 // Catch the cancellation
             }
+            catch (System.Exception ex)
+            {
+                // Other errors
+                Logging.LogException(LogTag, ex);
+            }
             finally
             {
+                // Clear action states at clients and server
+                if (!skillCancellationTokenSource.IsCancellationRequested)
+                {
+                    ClearUseSkillStates();
+                    LastUseSkillEndTime = Time.unscaledTime;
+                }
                 skillCancellationTokenSource.Dispose();
                 skillCancellationTokenSources.Remove(skillCancellationTokenSource);
             }
-            // Clear action states at clients and server
-            Entity.ClearActionStates();
-            LastUseSkillEndTime = Time.unscaledTime;
         }
 
         public void CancelSkill()
@@ -446,6 +458,7 @@ namespace MultiplayerARPG
                     skillCancellationTokenSources[i].Cancel();
                 skillCancellationTokenSources.RemoveAt(i);
             }
+            Logging.LogError("Cancelled2");
         }
 
         public bool CallAllSimulateLaunchDamageEntity(SimulateLaunchDamageEntityData data)
