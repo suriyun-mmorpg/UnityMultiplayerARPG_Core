@@ -1602,7 +1602,7 @@ namespace MultiplayerARPG
         private static bool AddGameData<T>(Dictionary<int, T> dict, T data)
             where T : IGameData
         {
-            if (data == null)
+            if ((data as Object) == null)
                 return false;
             if (!dict.ContainsKey(data.DataId))
             {
@@ -1627,7 +1627,7 @@ namespace MultiplayerARPG
         private static bool AddGameEntity<T>(Dictionary<int, T> dict, T entity)
             where T : IGameEntity
         {
-            if (entity == null)
+            if ((entity as Object) == null)
                 return false;
             if (!entity.Identity.IsSceneObject && !dict.ContainsKey(entity.Identity.HashAssetId))
             {
