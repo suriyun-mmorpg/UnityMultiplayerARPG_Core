@@ -388,18 +388,14 @@ namespace MultiplayerARPG
             if (!UpdateLastActionTime())
                 return false;
 
-            BaseSkill skill;
-            short skillLevel;
-            if (!GameInstance.Skills.TryGetValue(dataId, out skill) ||
-                !this.GetCaches().Skills.TryGetValue(skill, out skillLevel))
-                return false;
-
             UITextKeys gameMessage;
-            if (!skill.CanUse(this, skillLevel, isLeftHand, targetObjectId, out gameMessage))
+            if (!this.ValidateSkillToUse(dataId, isLeftHand, targetObjectId, out _, out _, out gameMessage))
             {
-                QueueGameMessage(gameMessage);
+                if (gameMessage != UITextKeys.NONE)
+                    QueueGameMessage(gameMessage);
                 return false;
             }
+
             return true;
         }
 
@@ -411,25 +407,11 @@ namespace MultiplayerARPG
             if (!UpdateLastActionTime())
                 return false;
 
-            if (index >= NonEquipItems.Count)
-                return false;
-
-            if (NonEquipItems[index].IsLock())
-                return false;
-
-            ISkillItem item = NonEquipItems[index].GetSkillItem();
-            if (item == null)
-                return false;
-
-            BaseSkill skill = item.UsingSkill;
-            short skillLevel = item.UsingSkillLevel;
-            if (skill == null)
-                return false;
-
             UITextKeys gameMessage;
-            if (!skill.CanUse(this, skillLevel, isLeftHand, targetObjectId, out gameMessage, true))
+            if (!this.ValidateSkillItemToUse(index, isLeftHand, targetObjectId, out _, out _, out gameMessage))
             {
-                QueueGameMessage(gameMessage);
+                if (gameMessage != UITextKeys.NONE)
+                    QueueGameMessage(gameMessage);
                 return false;
             }
 

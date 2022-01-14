@@ -1,5 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 using LiteNetLibManager;
 
@@ -1970,6 +1969,43 @@ namespace MultiplayerARPG
                 result.Add(CharacterSkill.Create(entry.Key, entry.Value));
             }
             return result;
+        }
+
+        public static bool ValidateSkillToUse(this BaseCharacterEntity character, int dataId, bool isLeftHand, uint targetObjectId, out BaseSkill skill, out short skillLevel, out UITextKeys gameMessage)
+        {
+            skillLevel = 0;
+            gameMessage = UITextKeys.NONE;
+
+            if (!GameInstance.Skills.TryGetValue(dataId, out skill) ||
+                !character.GetCaches().Skills.TryGetValue(skill, out skillLevel) ||
+                !skill.CanUse(character, skillLevel, isLeftHand, targetObjectId, out gameMessage))
+            {
+                return false;
+            }
+
+            return true;
+        }
+
+        public static bool ValidateSkillItemToUse(this BaseCharacterEntity character, short itemIndex, bool isLeftHand, uint targetObjectId, out BaseSkill skill, out short skillLevel, out UITextKeys gameMessage)
+        {
+            skill = null;
+            skillLevel = 0;
+            gameMessage = UITextKeys.NONE;
+
+            if (itemIndex >= character.NonEquipItems.Count ||
+                character.NonEquipItems[itemIndex].IsLock())
+            {
+                return false;
+            }
+
+            ISkillItem item = character.NonEquipItems[itemIndex].GetSkillItem();
+            if (item == null || item.UsingSkill == null ||
+                !item.UsingSkill.CanUse(character, item.UsingSkillLevel, isLeftHand, targetObjectId, out gameMessage, true))
+            {
+                return false;
+            }
+
+            return true;
         }
     }
 }

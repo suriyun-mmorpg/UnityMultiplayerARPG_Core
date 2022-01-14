@@ -48,9 +48,9 @@ namespace MultiplayerARPG
             IsUsingSkill = false;
         }
 
-        public bool CallServerUseSkill(int dataId, bool isLeftHand, uint targetObjectId, AimPosition aimPosition)
+        public bool CallServerUseSkill(byte simulateSeed, int dataId, bool isLeftHand, uint targetObjectId, AimPosition aimPosition)
         {
-            RPC(ServerUseSkill, BaseCharacterEntity.ACTION_TO_SERVER_DATA_CHANNEL, DeliveryMethod.ReliableOrdered, dataId, isLeftHand, targetObjectId, aimPosition);
+            RPC(ServerUseSkill, BaseCharacterEntity.ACTION_TO_SERVER_DATA_CHANNEL, DeliveryMethod.ReliableOrdered, simulateSeed, dataId, isLeftHand, targetObjectId, aimPosition);
             return true;
         }
 
@@ -62,33 +62,29 @@ namespace MultiplayerARPG
         /// <param name="targetObjectId"></param>
         /// <param name="aimPosition"></param>
         [ServerRpc]
-        protected void ServerUseSkill(int dataId, bool isLeftHand, uint targetObjectId, AimPosition aimPosition)
+        protected void ServerUseSkill(byte simulateSeed, int dataId, bool isLeftHand, uint targetObjectId, AimPosition aimPosition)
         {
 #if !CLIENT_BUILD
+            // Validate skill
             BaseSkill skill;
             short skillLevel;
-            if (!GameInstance.Skills.TryGetValue(dataId, out skill) ||
-                !Entity.GetCaches().Skills.TryGetValue(skill, out skillLevel))
+            if (!Entity.ValidateSkillToUse(dataId, isLeftHand, targetObjectId, out skill, out skillLevel, out _))
+            {
+                CallAllOnInterruptCastingSkill();
                 return;
-
-            // Validate mp amount, skill level, 
-            if (!skill.CanUse(Entity, skillLevel, isLeftHand, targetObjectId, out _))
-                return;
+            }
 
             // Start use skill routine
             IsUsingSkill = true;
-
-            // Get simulate seed for simulation validating
-            byte simulateSeed = (byte)Random.Range(byte.MinValue, byte.MaxValue);
 
             // Play animations
             CallAllPlayUseSkillAnimation(simulateSeed, isLeftHand, skill.DataId, skillLevel, targetObjectId, aimPosition);
 #endif
         }
 
-        public bool CallServerUseSkillItem(short index, bool isLeftHand, uint targetObjectId, AimPosition aimPosition)
+        public bool CallServerUseSkillItem(byte simulateSeed, short index, bool isLeftHand, uint targetObjectId, AimPosition aimPosition)
         {
-            RPC(ServerUseSkillItem, index, isLeftHand, targetObjectId, aimPosition);
+            RPC(ServerUseSkillItem, simulateSeed, index, isLeftHand, targetObjectId, aimPosition);
             return true;
         }
 
@@ -100,37 +96,30 @@ namespace MultiplayerARPG
         /// <param name="targetObjectId"></param>
         /// <param name="aimPosition"></param>
         [ServerRpc]
-        protected void ServerUseSkillItem(short itemIndex, bool isLeftHand, uint targetObjectId, AimPosition aimPosition)
+        protected void ServerUseSkillItem(byte simulateSeed, short itemIndex, bool isLeftHand, uint targetObjectId, AimPosition aimPosition)
         {
 #if !CLIENT_BUILD
-            if (itemIndex >= Entity.NonEquipItems.Count)
+            BaseSkill skill;
+            short skillLevel;
+            if (!Entity.ValidateSkillItemToUse(itemIndex, isLeftHand, targetObjectId, out skill, out skillLevel, out _))
+            {
+                CallAllOnInterruptCastingSkill();
                 return;
-
-            // Get item from inventory
-            CharacterItem characterItem = Entity.NonEquipItems[itemIndex];
-            if (characterItem.IsLock())
-                return;
-
-            // Get item data
-            ISkillItem item = characterItem.GetSkillItem();
-
-            // Validate mp amount, skill level
-            if (!item.UsingSkill.CanUse(Entity, item.UsingSkillLevel, isLeftHand, targetObjectId, out _, true))
-                return;
+            }
 
             // Validate skill item
             if (!Entity.DecreaseItemsByIndex(itemIndex, 1))
+            {
+                CallAllOnInterruptCastingSkill();
                 return;
+            }
             Entity.FillEmptySlots();
 
             // Start use skill routine
             IsUsingSkill = true;
 
-            // Get simulate seed for simulation validating
-            byte simulateSeed = (byte)Random.Range(byte.MinValue, byte.MaxValue);
-
             // Play animations
-            CallAllPlayUseSkillAnimation(simulateSeed, isLeftHand, item.UsingSkill.DataId, item.UsingSkillLevel, targetObjectId, aimPosition);
+            CallAllPlayUseSkillAnimation(simulateSeed, isLeftHand, skill.DataId, skillLevel, targetObjectId, aimPosition);
 #endif
         }
 
@@ -491,14 +480,44 @@ namespace MultiplayerARPG
 
         public void UseSkill(int dataId, bool isLeftHand, uint targetObjectId, AimPosition aimPosition)
         {
+            // Validate skill
+            BaseSkill skill;
+            short skillLevel;
+            if (!Entity.ValidateSkillToUse(dataId, isLeftHand, targetObjectId, out skill, out skillLevel, out _))
+                return;
+
+            // Set use skill state
             IsUsingSkill = true;
-            CallServerUseSkill(dataId, isLeftHand, targetObjectId, aimPosition);
+
+            // Get simulate seed for simulation validating
+            byte simulateSeed = (byte)Random.Range(byte.MinValue, byte.MaxValue);
+
+            // Simulate skill using at client immediately
+            UseSkillRoutine(simulateSeed, isLeftHand, skill, skillLevel, targetObjectId, aimPosition).Forget();
+
+            // Tell the server to use skill
+            CallServerUseSkill(simulateSeed, dataId, isLeftHand, targetObjectId, aimPosition);
         }
 
         public void UseSkillItem(short itemIndex, bool isLeftHand, uint targetObjectId, AimPosition aimPosition)
         {
+            // Validate skill item
+            BaseSkill skill;
+            short skillLevel;
+            if (!Entity.ValidateSkillItemToUse(itemIndex, isLeftHand, targetObjectId, out skill, out skillLevel, out _))
+                return;
+
+            // Set use skill state
             IsUsingSkill = true;
-            CallServerUseSkillItem(itemIndex, isLeftHand, targetObjectId, aimPosition);
+
+            // Get simulate seed for simulation validating
+            byte simulateSeed = (byte)Random.Range(byte.MinValue, byte.MaxValue);
+
+            // Simulate skill using at client immediately
+            UseSkillRoutine(simulateSeed, isLeftHand, skill, skillLevel, targetObjectId, aimPosition).Forget();
+
+            // Tell the server to use skill item
+            CallServerUseSkillItem(simulateSeed, itemIndex, isLeftHand, targetObjectId, aimPosition);
         }
     }
 }

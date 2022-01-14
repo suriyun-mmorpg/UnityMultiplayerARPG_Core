@@ -31,25 +31,23 @@ namespace MultiplayerARPG
             IsAttacking = false;
         }
 
-        public bool CallServerAttack(bool isLeftHand)
+        public bool CallServerAttack(byte simulateSeed, bool isLeftHand)
         {
-            RPC(ServerAttack, BaseCharacterEntity.ACTION_TO_SERVER_DATA_CHANNEL, DeliveryMethod.ReliableOrdered, isLeftHand);
+            RPC(ServerAttack, BaseCharacterEntity.ACTION_TO_SERVER_DATA_CHANNEL, DeliveryMethod.ReliableOrdered, simulateSeed, isLeftHand);
             return true;
         }
 
         /// <summary>
-        /// Is function will be called at server to order character to attack
+        /// Is function will be called at server to order character to use skill
         /// </summary>
+        /// <param name="simulateSeed"></param>
         /// <param name="isLeftHand"></param>
         [ServerRpc]
-        protected void ServerAttack(bool isLeftHand)
+        protected void ServerAttack(byte simulateSeed, bool isLeftHand)
         {
 #if !CLIENT_BUILD
-            // Start attack routine
+            // Set attack state
             IsAttacking = true;
-
-            // Get simulate seed for simulation validating
-            byte simulateSeed = (byte)Random.Range(byte.MinValue, byte.MaxValue);
 
             // Play animations
             CallAllPlayAttackAnimation(simulateSeed, isLeftHand);
@@ -65,6 +63,8 @@ namespace MultiplayerARPG
         [AllRpc]
         protected void AllPlayAttackAnimation(byte simulateSeed, bool isLeftHand)
         {
+            if (IsOwnerClientOrOwnedByServer)
+                return;
             AttackRoutine(simulateSeed, isLeftHand).Forget();
         }
 
@@ -319,8 +319,17 @@ namespace MultiplayerARPG
 
         public void Attack(bool isLeftHand)
         {
+            // Set attack state
             IsAttacking = true;
-            CallServerAttack(isLeftHand);
+
+            // Get simulate seed for simulation validating
+            byte simulateSeed = (byte)Random.Range(byte.MinValue, byte.MaxValue);
+
+            // Simulate attacking at client immediately
+            AttackRoutine(simulateSeed, isLeftHand).Forget();
+
+            // Tell the server to attack
+            CallServerAttack(simulateSeed, isLeftHand);
         }
     }
 }
