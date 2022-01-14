@@ -46,6 +46,12 @@ namespace MultiplayerARPG
         protected void ServerAttack(byte simulateSeed, bool isLeftHand)
         {
 #if !CLIENT_BUILD
+            // Speed hack avoidance
+            if (Time.unscaledTime - LastAttackEndTime < -0.05f)
+            {
+                return;
+            }
+
             // Set attack state
             IsAttacking = true;
 
@@ -111,6 +117,9 @@ namespace MultiplayerARPG
 
             // Get play speed multiplier will use it to play animation faster or slower based on attack speed stats
             animSpeedRate *= Entity.GetAnimSpeedRate(AnimActionType);
+
+            // Last attack end time
+            LastAttackEndTime = Time.unscaledTime + (totalDuration / animSpeedRate);
 
             try
             {
@@ -220,6 +229,7 @@ namespace MultiplayerARPG
             catch (System.OperationCanceledException)
             {
                 // Catch the cancellation
+                LastAttackEndTime = Time.unscaledTime;
             }
             catch (System.Exception ex)
             {
@@ -233,7 +243,6 @@ namespace MultiplayerARPG
             }
             // Clear action states at clients and server
             ClearAttackStates();
-            LastAttackEndTime = Time.unscaledTime;
         }
 
         protected virtual void ApplyAttack(bool isLeftHand, CharacterItem weapon, DamageInfo damageInfo, Dictionary<DamageElement, MinMaxFloat> damageAmounts, AimPosition aimPosition, int randomSeed, long? time)
@@ -290,8 +299,8 @@ namespace MultiplayerARPG
         {
             if (IsOwnerClientOrOwnedByServer)
                 return;
-            SimulatingHit simulatingHit = SimulatingHits[data.randomSeed];
-            if (simulatingHit.hitIndex >= simulatingHit.triggerLength)
+            SimulatingHit simulatingHit;
+            if (!SimulatingHits.TryGetValue(data.randomSeed, out simulatingHit) || simulatingHit.hitIndex >= simulatingHit.triggerLength)
                 return;
             int hitIndex = SimulatingHits[data.randomSeed].hitIndex + 1;
             simulatingHit.hitIndex = hitIndex;
@@ -329,7 +338,8 @@ namespace MultiplayerARPG
             AttackRoutine(simulateSeed, isLeftHand).Forget();
 
             // Tell the server to attack
-            CallServerAttack(simulateSeed, isLeftHand);
+            if (!IsServer)
+                CallServerAttack(simulateSeed, isLeftHand);
         }
     }
 }

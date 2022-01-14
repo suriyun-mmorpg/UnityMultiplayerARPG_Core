@@ -65,12 +65,17 @@ namespace MultiplayerARPG
         protected void ServerUseSkill(byte simulateSeed, int dataId, bool isLeftHand, uint targetObjectId, AimPosition aimPosition)
         {
 #if !CLIENT_BUILD
+            // Speed hack avoidance
+            if (Time.unscaledTime - LastUseSkillEndTime < -0.05f)
+            {
+                return;
+            }
+
             // Validate skill
             BaseSkill skill;
             short skillLevel;
             if (!Entity.ValidateSkillToUse(dataId, isLeftHand, targetObjectId, out skill, out skillLevel, out _))
             {
-                CallAllOnInterruptCastingSkill();
                 return;
             }
 
@@ -99,18 +104,22 @@ namespace MultiplayerARPG
         protected void ServerUseSkillItem(byte simulateSeed, short itemIndex, bool isLeftHand, uint targetObjectId, AimPosition aimPosition)
         {
 #if !CLIENT_BUILD
+            // Speed hack avoidance
+            if (Time.unscaledTime - LastUseSkillEndTime < -0.05f)
+            {
+                return;
+            }
+
             BaseSkill skill;
             short skillLevel;
             if (!Entity.ValidateSkillItemToUse(itemIndex, isLeftHand, targetObjectId, out skill, out skillLevel, out _))
             {
-                CallAllOnInterruptCastingSkill();
                 return;
             }
 
             // Validate skill item
             if (!Entity.DecreaseItemsByIndex(itemIndex, 1))
             {
-                CallAllOnInterruptCastingSkill();
                 return;
             }
             Entity.FillEmptySlots();
@@ -132,6 +141,8 @@ namespace MultiplayerARPG
         [AllRpc]
         protected void AllPlayUseSkillAnimation(byte simulateSeed, bool isLeftHand, int skillDataId, short skillLevel, uint targetObjectId, AimPosition aimPosition)
         {
+            if (IsOwnerClientOrOwnedByServer)
+                return;
             BaseSkill skill;
             if (GameInstance.Skills.TryGetValue(skillDataId, out skill) && skillLevel > 0)
             {
@@ -289,6 +300,9 @@ namespace MultiplayerARPG
             // Get cast duration. Then if cast duration more than 0, it will play cast skill animation.
             CastingSkillDuration = CastingSkillCountDown = skill.GetCastDuration(skillLevel);
 
+            // Last use skill end time
+            LastUseSkillEndTime = Time.unscaledTime + (totalDuration / animSpeedRate);
+
             try
             {
                 // Play special effect
@@ -421,6 +435,7 @@ namespace MultiplayerARPG
             catch (System.OperationCanceledException)
             {
                 // Catch the cancellation
+                LastUseSkillEndTime = Time.unscaledTime;
             }
             catch (System.Exception ex)
             {
@@ -434,7 +449,6 @@ namespace MultiplayerARPG
             }
             // Clear action states at clients and server
             ClearUseSkillStates();
-            LastUseSkillEndTime = Time.unscaledTime;
         }
 
         public void CancelSkill()
@@ -458,8 +472,8 @@ namespace MultiplayerARPG
         {
             if (IsOwnerClientOrOwnedByServer)
                 return;
-            SimulatingHit simulatingHit = SimulatingHits[data.randomSeed];
-            if (simulatingHit.hitIndex >= simulatingHit.triggerLength)
+            SimulatingHit simulatingHit;
+            if (!SimulatingHits.TryGetValue(data.randomSeed, out simulatingHit) || simulatingHit.hitIndex >= simulatingHit.triggerLength)
                 return;
             int hitIndex = SimulatingHits[data.randomSeed].hitIndex + 1;
             simulatingHit.hitIndex = hitIndex;
@@ -480,6 +494,9 @@ namespace MultiplayerARPG
 
         public void UseSkill(int dataId, bool isLeftHand, uint targetObjectId, AimPosition aimPosition)
         {
+            if (Time.unscaledTime - LastUseSkillEndTime < 0f)
+                return;
+
             // Validate skill
             BaseSkill skill;
             short skillLevel;
@@ -496,7 +513,8 @@ namespace MultiplayerARPG
             UseSkillRoutine(simulateSeed, isLeftHand, skill, skillLevel, targetObjectId, aimPosition).Forget();
 
             // Tell the server to use skill
-            CallServerUseSkill(simulateSeed, dataId, isLeftHand, targetObjectId, aimPosition);
+            if (!IsServer)
+                CallServerUseSkill(simulateSeed, dataId, isLeftHand, targetObjectId, aimPosition);
         }
 
         public void UseSkillItem(short itemIndex, bool isLeftHand, uint targetObjectId, AimPosition aimPosition)
@@ -517,7 +535,8 @@ namespace MultiplayerARPG
             UseSkillRoutine(simulateSeed, isLeftHand, skill, skillLevel, targetObjectId, aimPosition).Forget();
 
             // Tell the server to use skill item
-            CallServerUseSkillItem(simulateSeed, itemIndex, isLeftHand, targetObjectId, aimPosition);
+            if (!IsServer)
+                CallServerUseSkillItem(simulateSeed, itemIndex, isLeftHand, targetObjectId, aimPosition);
         }
     }
 }
