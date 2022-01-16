@@ -349,7 +349,7 @@ namespace MultiplayerARPG
                     // Find enemy around summoner
                     enemies.AddRange(Entity.FindAliveCharacters<BaseCharacterEntity>(
                         Entity.Summoner.CacheTransform.position,
-                        CharacterDatabase.SummonVisualRange,
+                        CharacterDatabase.SummonedVisualRange,
                         false, /* Don't find an allies */
                         true,  /* Always find an enemies */
                         Entity.IsSummoned && IsAggressiveWhileSummonerIdle() /* Find enemy while summoned and aggresively */));
