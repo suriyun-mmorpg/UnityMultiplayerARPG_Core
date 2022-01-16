@@ -45,6 +45,10 @@ namespace MultiplayerARPG
         [Tooltip("Range to see an enemies and allies")]
         private float visualRange = 5f;
         public float VisualRange { get { return visualRange; } }
+        [SerializeField]
+        [Tooltip("Range to see an enemies and allies while summoned")]
+        private float summonVisualRange = 10f;
+        public float SummonVisualRange { get { return summonVisualRange; } }
 
         [Category(3, "Character Stats")]
         [SerializeField]

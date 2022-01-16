@@ -21,7 +21,8 @@ namespace MultiplayerARPG
         public bool isAttackBuilding = false;
         [Tooltip("If this is TRUE, monster will attacks targets while its summoner still idle")]
         public bool isAggressiveWhileSummonerIdle = false;
-
+        
+        protected readonly List<BaseCharacterEntity> enemies = new List<BaseCharacterEntity>();
         protected bool startedAggressive;
         protected float aggressiveElasped;
         protected float randomedWanderElasped;
@@ -65,7 +66,7 @@ namespace MultiplayerARPG
                     {
                         aggressiveElasped += deltaTime;
                         // Find target when it's time
-                        if (aggressiveElasped >= findEnemyDelay &&
+                        if ((enemies.Count > 0 || aggressiveElasped >= findEnemyDelay) &&
                             FindEnemy(currentPosition))
                         {
                             aggressiveElasped = 0f;
@@ -116,7 +117,7 @@ namespace MultiplayerARPG
                     {
                         aggressiveElasped += deltaTime;
                         // Find target when it's time
-                        if (aggressiveElasped >= findEnemyDelay &&
+                        if ((enemies.Count > 0 || aggressiveElasped >= findEnemyDelay) &&
                             FindEnemy(currentPosition))
                         {
                             aggressiveElasped = 0f;
@@ -332,25 +333,54 @@ namespace MultiplayerARPG
             if (!Entity.TryGetTargetEntity(out targetEntity) || targetEntity.Entity == Entity.Entity ||
                  targetEntity.IsDead() || !targetEntity.CanReceiveDamageFrom(Entity.GetInfo()))
             {
-                // If no target enenmy or target enemy is dead, Find nearby character by layer mask
-                List<BaseCharacterEntity> characterEntities = Entity.FindAliveCharacters<BaseCharacterEntity>(
-                    CharacterDatabase.VisualRange,
-                    false, /* Don't find an allies */
-                    true,  /* Always find an enemies */
-                    Entity.IsSummoned && IsAggressiveWhileSummonerIdle() /* Find enemy while summoned and aggresively */);
-                foreach (BaseCharacterEntity characterEntity in characterEntities)
+                BaseCharacterEntity enemy;
+                for (int i = enemies.Count - 1; i >= 0; --i)
                 {
-                    // Attack target settings
-                    if (characterEntity == null || characterEntity.Entity == Entity.Entity ||
-                        characterEntity.IsDead() || !characterEntity.CanReceiveDamageFrom(Entity.GetInfo()))
+                    enemy = enemies[i];
+                    enemies.RemoveAt(i);
+                    if (enemy != null && enemy.Entity != Entity.Entity && !enemy.IsDead() &&
+                        enemy.CanReceiveDamageFrom(Entity.GetInfo()))
                     {
-                        // If character is null or cannot receive damage from monster, skip it
-                        continue;
+                        // Found target, attack it
+                        Entity.SetAttackTarget(enemy);
+                        return true;
                     }
-                    // Found target, attack it
-                    Entity.SetAttackTarget(characterEntity);
-                    return true;
                 }
+
+                // If no target enenmy or target enemy is dead, Find nearby character by layer mask
+                enemies.Clear();
+                if (Entity.IsSummoned)
+                {
+                    // Find enemy around summoner
+                    enemies.AddRange(Entity.FindAliveCharacters<BaseCharacterEntity>(
+                        Entity.Summoner.CacheTransform.position,
+                        CharacterDatabase.SummonVisualRange,
+                        false, /* Don't find an allies */
+                        true,  /* Always find an enemies */
+                        Entity.IsSummoned && IsAggressiveWhileSummonerIdle() /* Find enemy while summoned and aggresively */));
+                }
+                else
+                {
+                    enemies.AddRange(Entity.FindAliveCharacters<BaseCharacterEntity>(
+                        CharacterDatabase.VisualRange,
+                        false, /* Don't find an allies */
+                        true,  /* Always find an enemies */
+                        Entity.IsSummoned && IsAggressiveWhileSummonerIdle() /* Find enemy while summoned and aggresively */));
+                }
+
+                for (int i = enemies.Count - 1; i >= 0; --i)
+                {
+                    enemy = enemies[i];
+                    enemies.RemoveAt(i);
+                    if (enemy != null && enemy.Entity != Entity.Entity && !enemy.IsDead() &&
+                        enemy.CanReceiveDamageFrom(Entity.GetInfo()))
+                    {
+                        // Found target, attack it
+                        Entity.SetAttackTarget(enemy);
+                        return true;
+                    }
+                }
+
                 if (!isAttackBuilding)
                     return false;
                 // Find building to attack
