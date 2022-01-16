@@ -21,7 +21,7 @@ namespace MultiplayerARPG
         public bool isAttackBuilding = false;
         [Tooltip("If this is TRUE, monster will attacks targets while its summoner still idle")]
         public bool isAggressiveWhileSummonerIdle = false;
-        
+
         protected readonly List<BaseCharacterEntity> enemies = new List<BaseCharacterEntity>();
         protected bool startedAggressive;
         protected float aggressiveElasped;
@@ -62,17 +62,7 @@ namespace MultiplayerARPG
             {
                 if (!UpdateAttackEnemy(deltaTime, currentPosition))
                 {
-                    if (startedAggressive)
-                    {
-                        aggressiveElasped += deltaTime;
-                        // Find target when it's time
-                        if ((enemies.Count > 0 || aggressiveElasped >= findEnemyDelay) &&
-                            FindEnemy(currentPosition))
-                        {
-                            aggressiveElasped = 0f;
-                            startedAggressive = false;
-                        }
-                    }
+                    UpdateEnemyFindingActivity(deltaTime);
 
                     if (Vector3.Distance(currentPosition, Entity.Summoner.CacheTransform.position) > CurrentGameInstance.minFollowSummonerDistance)
                     {
@@ -82,14 +72,7 @@ namespace MultiplayerARPG
                     }
                     else
                     {
-                        // Wandering when it's time
-                        randomedWanderElasped += deltaTime;
-                        if (randomedWanderElasped >= randomedWanderDelay)
-                        {
-                            randomedWanderElasped = 0f;
-                            RandomWanderDestination();
-                            startedAggressive = IsAggressiveWhileSummonerIdle();
-                        }
+                        UpdateWanderDestinationRandomingActivity(deltaTime);
                     }
                     startedFollowEnemy = false;
                 }
@@ -98,13 +81,7 @@ namespace MultiplayerARPG
             {
                 if (Entity.IsInSafeArea)
                 {
-                    // If monster move into safe area, wander to another place
-                    randomedWanderElasped += deltaTime;
-                    if (!previousIsInSafeArea || randomedWanderElasped >= randomedWanderDelay)
-                    {
-                        randomedWanderElasped = 0f;
-                        RandomWanderDestination();
-                    }
+                    UpdateSafeAreaExitingActivity(deltaTime);
                     previousIsInSafeArea = true;
                     startedFollowEnemy = false;
                     return;
@@ -113,28 +90,47 @@ namespace MultiplayerARPG
 
                 if (!UpdateAttackEnemy(deltaTime, currentPosition))
                 {
-                    if (startedAggressive)
-                    {
-                        aggressiveElasped += deltaTime;
-                        // Find target when it's time
-                        if ((enemies.Count > 0 || aggressiveElasped >= findEnemyDelay) &&
-                            FindEnemy(currentPosition))
-                        {
-                            aggressiveElasped = 0f;
-                            startedAggressive = false;
-                        }
-                    }
-
-                    // Wandering when it's time
-                    randomedWanderElasped += deltaTime;
-                    if (randomedWanderElasped >= randomedWanderDelay)
-                    {
-                        randomedWanderElasped = 0f;
-                        RandomWanderDestination();
-                        startedAggressive = true;
-                    }
+                    UpdateEnemyFindingActivity(deltaTime);
+                    UpdateWanderDestinationRandomingActivity(deltaTime);
                     startedFollowEnemy = false;
                 }
+            }
+        }
+
+        protected virtual void UpdateEnemyFindingActivity(float deltaTime)
+        {
+            if (!startedAggressive)
+                return;
+            aggressiveElasped += deltaTime;
+            // Find target when it's time
+            if ((enemies.Count > 0 || aggressiveElasped >= findEnemyDelay) &&
+                FindEnemy())
+            {
+                aggressiveElasped = 0f;
+                startedAggressive = false;
+            }
+        }
+
+        protected virtual void UpdateSafeAreaExitingActivity(float deltaTime)
+        {
+            randomedWanderElasped += deltaTime;
+            // If monster is in safe area, wander to another place
+            if (!previousIsInSafeArea || randomedWanderElasped >= randomedWanderDelay)
+            {
+                randomedWanderElasped = 0f;
+                RandomWanderDestination();
+            }
+        }
+
+        protected virtual void UpdateWanderDestinationRandomingActivity(float deltaTime)
+        {
+            randomedWanderElasped += deltaTime;
+            // Wandering when it's time
+            if (randomedWanderElasped >= randomedWanderDelay)
+            {
+                randomedWanderElasped = 0f;
+                RandomWanderDestination();
+                startedAggressive = true;
             }
         }
 
@@ -320,9 +316,8 @@ namespace MultiplayerARPG
         /// <summary>
         /// Return `TRUE` if found enemy
         /// </summary>
-        /// <param name="currentPosition"></param>
         /// <returns></returns>
-        public virtual bool FindEnemy(Vector3 currentPosition)
+        public virtual bool FindEnemy()
         {
             // Aggressive monster or summoned monster will find target to attack
             if (Entity.Characteristic != MonsterCharacteristic.Aggressive &&
