@@ -48,9 +48,9 @@ namespace MultiplayerARPG
                 // Spawn area entity
                 // Aim position type always is `Position`
                 LiteNetLibIdentity spawnObj = BaseGameNetworkManager.Singleton.Assets.GetObjectInstance(
-                areaDamageEntity.Identity.HashAssetId,
-                aimPosition.position,
-                GameInstance.Singleton.GameplayRule.GetSummonRotation(skillUser));
+                    areaDamageEntity.Identity.HashAssetId,
+                    aimPosition.position,
+                    GameInstance.Singleton.GameplayRule.GetSummonRotation(skillUser));
                 AreaDamageEntity entity = spawnObj.GetComponent<AreaDamageEntity>();
                 entity.Setup(skillUser.GetInfo(), weapon, damageAmounts, this, skillLevel, areaDuration.GetAmount(skillLevel), applyDuration.GetAmount(skillLevel));
                 BaseGameNetworkManager.Singleton.Assets.NetworkSpawn(spawnObj);
