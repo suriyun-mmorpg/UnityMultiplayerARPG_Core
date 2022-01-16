@@ -84,6 +84,7 @@ namespace MultiplayerARPG
         {
             base.EntityAwake();
             gameObject.tag = CurrentGameInstance.playerTag;
+            gameObject.layer = CurrentGameInstance.playerLayer;
         }
 
         public override void InitialRequiredComponents()

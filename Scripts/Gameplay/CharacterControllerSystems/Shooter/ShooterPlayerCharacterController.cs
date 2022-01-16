@@ -858,7 +858,7 @@ namespace MultiplayerARPG
             CacheGameplayCameraController.EnableAimAssist = enableAimAssist && (tempPressAttackRight || tempPressAttackLeft || !aimAssistOnFireOnly) && !(SelectedEntity is IDamageableEntity);
             CacheGameplayCameraController.EnableAimAssistX = enableAimAssistX;
             CacheGameplayCameraController.EnableAimAssistY = enableAimAssistY;
-            CacheGameplayCameraController.AimAssistCharacter = aimAssistCharacter;
+            CacheGameplayCameraController.AimAssistPlayer = aimAssistCharacter;
             CacheGameplayCameraController.AimAssistBuilding = aimAssistBuilding;
             CacheGameplayCameraController.AimAssistHarvestable = aimAssistHarvestable;
             CacheGameplayCameraController.AimAssistRadius = aimAssistRadius;

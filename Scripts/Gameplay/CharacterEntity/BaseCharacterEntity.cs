@@ -166,7 +166,6 @@ namespace MultiplayerARPG
         protected override void EntityAwake()
         {
             base.EntityAwake();
-            gameObject.layer = CurrentGameInstance.characterLayer;
             if (CurrentGameInstance.DimensionType == DimensionType.Dimension3D)
             {
                 AttackPhysicFunctions = new PhysicFunctions(512);
@@ -1034,7 +1033,7 @@ namespace MultiplayerARPG
             where T : BaseCharacterEntity
         {
             List<T> result = new List<T>();
-            int tempOverlapSize = FindPhysicFunctions.OverlapObjects(CacheTransform.position, distance, CurrentGameInstance.characterLayer.Mask);
+            int tempOverlapSize = FindPhysicFunctions.OverlapObjects(CacheTransform.position, distance, CurrentGameInstance.playerLayer.Mask | CurrentGameInstance.monsterLayer.Mask);
             if (tempOverlapSize == 0)
                 return result;
             IDamageableEntity tempBaseEntity;
@@ -1063,7 +1062,7 @@ namespace MultiplayerARPG
         public T FindNearestCharacter<T>(float distance, bool findForAliveOnly, bool findForAlly, bool findForEnemy, bool findForNeutral, bool findInFov = false, float fov = 0)
             where T : BaseCharacterEntity
         {
-            int tempOverlapSize = FindPhysicFunctions.OverlapObjects(CacheTransform.position, distance, CurrentGameInstance.characterLayer.Mask);
+            int tempOverlapSize = FindPhysicFunctions.OverlapObjects(CacheTransform.position, distance, CurrentGameInstance.playerLayer.Mask | CurrentGameInstance.monsterLayer.Mask);
             if (tempOverlapSize == 0)
                 return null;
             float tempDistance;

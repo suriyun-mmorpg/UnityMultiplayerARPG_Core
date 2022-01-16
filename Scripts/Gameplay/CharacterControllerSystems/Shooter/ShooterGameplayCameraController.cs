@@ -8,7 +8,8 @@ namespace MultiplayerARPG
         public bool EnableAimAssist { get { return CameraControls.enableAimAssist; } set { CameraControls.enableAimAssist = value; } }
         public bool EnableAimAssistX { get { return CameraControls.enableAimAssistX; } set { CameraControls.enableAimAssistX = value; } }
         public bool EnableAimAssistY { get { return CameraControls.enableAimAssistY; } set { CameraControls.enableAimAssistY = value; } }
-        public bool AimAssistCharacter { get { return aimAssistCharacter; } set { aimAssistCharacter = value; } }
+        public bool AimAssistPlayer { get { return aimAssistPlayer; } set { aimAssistPlayer = value; } }
+        public bool AimAssistMonster { get { return aimAssistMonster; } set { aimAssistMonster = value; } }
         public bool AimAssistBuilding { get { return aimAssistBuilding; } set { aimAssistBuilding = value; } }
         public bool AimAssistHarvestable { get { return aimAssistHarvestable; } set { aimAssistHarvestable = value; } }
         public float AimAssistRadius { get { return CameraControls.aimAssistRadius; } set { CameraControls.aimAssistRadius = value; } }
@@ -42,8 +43,10 @@ namespace MultiplayerARPG
         protected virtual int GetAimAssistLayerMask()
         {
             int layerMask = 0;
-            if (AimAssistCharacter)
-                layerMask = layerMask | GameInstance.Singleton.characterLayer.Mask;
+            if (AimAssistPlayer)
+                layerMask = layerMask | GameInstance.Singleton.playerLayer.Mask;
+            if (AimAssistMonster)
+                layerMask = layerMask | GameInstance.Singleton.monsterLayer.Mask;
             if (AimAssistBuilding)
                 layerMask = layerMask | GameInstance.Singleton.buildingLayer.Mask;
             if (AimAssistHarvestable)

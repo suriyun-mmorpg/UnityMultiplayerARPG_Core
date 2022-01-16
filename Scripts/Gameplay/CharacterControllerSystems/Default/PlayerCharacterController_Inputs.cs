@@ -661,7 +661,7 @@ namespace MultiplayerARPG
                 float attackDistance = 0f;
                 float attackFov = 0f;
                 GetAttackDistanceAndFov(isLeftHandAttacking, out attackDistance, out attackFov);
-                AttackOrMoveToEntity(targetDamageable, attackDistance, CurrentGameInstance.characterLayer.Mask);
+                AttackOrMoveToEntity(targetDamageable, attackDistance, CurrentGameInstance.playerLayer.Mask | CurrentGameInstance.monsterLayer.Mask);
             }
             else if (TryGetUsingSkillEntity(out targetDamageable))
             {

@@ -96,7 +96,7 @@ namespace MultiplayerARPG
         {
             base.EntityAwake();
             gameObject.tag = CurrentGameInstance.npcTag;
-            gameObject.layer = CurrentGameInstance.characterLayer;
+            gameObject.layer = CurrentGameInstance.npcLayer;
         }
 
         protected override void EntityStart()

@@ -318,7 +318,7 @@ namespace MultiplayerARPG
 
         private int GetGroundDetectionLayerMask()
         {
-            int layerMask = CurrentGameInstance.characterLayer.Mask | CurrentGameInstance.itemDropLayer.Mask;
+            int layerMask = CurrentGameInstance.playerLayer.Mask | CurrentGameInstance.monsterLayer.Mask | CurrentGameInstance.npcLayer.Mask | CurrentGameInstance.vehicleLayer.Mask | CurrentGameInstance.itemDropLayer.Mask;
             return ~layerMask;
         }
 

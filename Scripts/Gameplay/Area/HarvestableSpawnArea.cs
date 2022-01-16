@@ -63,7 +63,10 @@ namespace MultiplayerARPG
                     Collider2D[] overlaps = Physics2D.OverlapCircleAll(spawnPosition, prefab.ColliderDetectionRadius);
                     foreach (Collider2D overlap in overlaps)
                     {
-                        if (overlap.gameObject.layer == CurrentGameInstance.characterLayer ||
+                        if (overlap.gameObject.layer == CurrentGameInstance.playerLayer ||
+                            overlap.gameObject.layer == CurrentGameInstance.monsterLayer ||
+                            overlap.gameObject.layer == CurrentGameInstance.npcLayer ||
+                            overlap.gameObject.layer == CurrentGameInstance.vehicleLayer ||
                             overlap.gameObject.layer == CurrentGameInstance.itemDropLayer ||
                             overlap.gameObject.layer == CurrentGameInstance.buildingLayer ||
                             overlap.gameObject.layer == CurrentGameInstance.harvestableLayer)
@@ -85,7 +88,10 @@ namespace MultiplayerARPG
                     Collider[] overlaps = Physics.OverlapSphere(spawnPosition, prefab.ColliderDetectionRadius);
                     foreach (Collider overlap in overlaps)
                     {
-                        if (overlap.gameObject.layer == CurrentGameInstance.characterLayer ||
+                        if (overlap.gameObject.layer == CurrentGameInstance.playerLayer ||
+                            overlap.gameObject.layer == CurrentGameInstance.monsterLayer ||
+                            overlap.gameObject.layer == CurrentGameInstance.npcLayer ||
+                            overlap.gameObject.layer == CurrentGameInstance.vehicleLayer ||
                             overlap.gameObject.layer == CurrentGameInstance.itemDropLayer ||
                             overlap.gameObject.layer == CurrentGameInstance.buildingLayer ||
                             overlap.gameObject.layer == CurrentGameInstance.harvestableLayer)

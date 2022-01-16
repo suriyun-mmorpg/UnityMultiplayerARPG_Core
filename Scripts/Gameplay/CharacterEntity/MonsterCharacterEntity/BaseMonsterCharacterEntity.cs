@@ -160,6 +160,7 @@ namespace MultiplayerARPG
         {
             base.EntityAwake();
             gameObject.tag = CurrentGameInstance.monsterTag;
+            gameObject.layer = CurrentGameInstance.monsterLayer;
             isDestroyed = false;
         }
 

@@ -80,7 +80,8 @@ namespace MultiplayerARPG
         protected override sealed void EntityAwake()
         {
             base.EntityAwake();
-            gameObject.layer = CurrentGameInstance.characterLayer;
+            gameObject.tag = CurrentGameInstance.vehicleTag;
+            gameObject.layer = CurrentGameInstance.vehicleLayer;
             isDestroyed = false;
             defaultMovementSecure = MovementSecure;
         }

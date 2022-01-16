@@ -5,7 +5,8 @@ namespace MultiplayerARPG
     public class DefaultGameplayCameraController : MonoBehaviour, IGameplayCameraController
     {
         public FollowCameraControls gameplayCameraPrefab = null;
-        public bool aimAssistCharacter = true;
+        public bool aimAssistPlayer = true;
+        public bool aimAssistMonster = true;
         public bool aimAssistBuilding = false;
         public bool aimAssistHarvestable = false;
         public BasePlayerCharacterEntity PlayerCharacterEntity { get; protected set; }

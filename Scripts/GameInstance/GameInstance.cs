@@ -210,14 +210,22 @@ namespace MultiplayerARPG
         public UnityTag monsterTag = new UnityTag("MonsterTag");
         [Tooltip("Tag for NPC entities, this tag will set to NPC entities game object when instantiated")]
         public UnityTag npcTag = new UnityTag("NpcTag");
+        [Tooltip("Tag for vehicle entities, this tag will set to vehicle entities game object when instantiated")]
+        public UnityTag vehicleTag = new UnityTag("VehicleTag");
         [Tooltip("Tag for item drop entities, this tag will set to item drop entities game object when instantiated")]
         public UnityTag itemDropTag = new UnityTag("ItemDropTag");
         [Tooltip("Tag for building entities, this tag will set to building entities game object when instantiated")]
         public UnityTag buildingTag = new UnityTag("BuildingTag");
         [Tooltip("Tag for harvestable entities, this tag will set to harvestable entities game object when instantiated")]
         public UnityTag harvestableTag = new UnityTag("HarvestableTag");
-        [Tooltip("Layer for player character entities and monster character entities, this layer will be set to player character entities and monster character entities game object when instantiated")]
-        public UnityLayer characterLayer = new UnityLayer(8);
+        [Tooltip("Layer for player character entities, this layer will be set to player character entities game object when instantiated")]
+        public UnityLayer playerLayer = new UnityLayer(17);
+        [Tooltip("Layer for monster character entities, this layer will be set to monster character entities game object when instantiated")]
+        public UnityLayer monsterLayer = new UnityLayer(18);
+        [Tooltip("Layer for NPC entities, this layer will be set to NPC entities game object when instantiated")]
+        public UnityLayer npcLayer = new UnityLayer(19);
+        [Tooltip("Layer for vehicle entities, this layer will be set to vehicle entities game object when instantiated")]
+        public UnityLayer vehicleLayer = new UnityLayer(20);
         [Tooltip("Layer for item drop entities, this layer will set to item drop entities game object when instantiated")]
         public UnityLayer itemDropLayer = new UnityLayer(9);
         [Tooltip("Layer for building entities, this layer will set to building entities game object when instantiated")]
@@ -771,26 +779,29 @@ namespace MultiplayerARPG
         /// <returns></returns>
         public bool IsDamageableLayer(int layer)
         {
-            return layer == characterLayer ||
+            return layer == playerLayer ||
+                layer == monsterLayer ||
+                layer == vehicleLayer ||
                 layer == buildingLayer ||
                 layer == harvestableLayer;
         }
 
         /// <summary>
-        /// Only `characterLayer`, `buildingLayer`, `harvestableLayer` will be used for sphere casts
+        /// Only `playerLayer`, `monsterLayer`, `vehicleLayer`, `buildingLayer`, `harvestableLayer` will be used for sphere casts
         /// </summary>
         /// <returns></returns>
         public int GetDamageableLayerMask()
         {
             int layerMask = 0;
-            layerMask = layerMask | characterLayer.Mask;
+            layerMask = layerMask | playerLayer.Mask;
+            layerMask = layerMask | monsterLayer.Mask;
             layerMask = layerMask | buildingLayer.Mask;
             layerMask = layerMask | harvestableLayer.Mask;
             return layerMask;
         }
 
         /// <summary>
-        /// All layers except `characterLayer`, `itemDropLayer, `harvestableLayer`, `TransparentFX`, `IgnoreRaycast`, `Water` will be used for raycasting
+        /// All layers except `playerLayer`, `monsterLayer`, `npcLayer`, `vehicleLayer`, `itemDropLayer, `harvestableLayer`, `TransparentFX`, `IgnoreRaycast`, `Water` will be used for raycasting
         /// </summary>
         /// <returns></returns>
         public int GetBuildLayerMask()
@@ -799,14 +810,17 @@ namespace MultiplayerARPG
             layerMask = layerMask | 1 << PhysicLayers.TransparentFX;
             layerMask = layerMask | 1 << PhysicLayers.Water;
             layerMask = layerMask | 1 << PhysicLayers.IgnoreRaycast;
-            layerMask = layerMask | characterLayer.Mask;
+            layerMask = layerMask | playerLayer.Mask;
+            layerMask = layerMask | monsterLayer.Mask;
+            layerMask = layerMask | npcLayer.Mask;
+            layerMask = layerMask | vehicleLayer.Mask;
             layerMask = layerMask | itemDropLayer.Mask;
             layerMask = layerMask | harvestableLayer.Mask;
             return ~layerMask;
         }
 
         /// <summary>
-        /// All layers except `characterLayer`, `itemDropLayer, `TransparentFX`, `IgnoreRaycast`, `Water` and non-target layers will be used for raycasting
+        /// All layers except `playerLayer`, `monsterLayer`, `npcLayer`, `vehicleLayer`, `itemDropLayer, `TransparentFX`, `IgnoreRaycast`, `Water` and non-target layers will be used for raycasting
         /// </summary>
         /// <returns></returns>
         public int GetItemDropGroundDetectionLayerMask()
@@ -814,14 +828,17 @@ namespace MultiplayerARPG
             int layerMask = 0;
             layerMask = layerMask | 1 << PhysicLayers.TransparentFX;
             layerMask = layerMask | 1 << PhysicLayers.Water;
-            layerMask = layerMask | characterLayer.Mask;
+            layerMask = layerMask | playerLayer.Mask;
+            layerMask = layerMask | monsterLayer.Mask;
+            layerMask = layerMask | npcLayer.Mask;
+            layerMask = layerMask | vehicleLayer.Mask;
             layerMask = layerMask | itemDropLayer.Mask;
             layerMask = MixWithIgnoreRaycastLayers(layerMask);
             return ~layerMask;
         }
 
         /// <summary>
-        /// All layers except `characterLayer`, `itemDropLayer, `TransparentFX`, `IgnoreRaycast`, `Water` and non-target layers will be used for raycasting
+        /// All layers except `playerLayer`, `monsterLayer`, `npcLayer`, `vehicleLayer`, `itemDropLayer, `TransparentFX`, `IgnoreRaycast`, `Water` and non-target layers will be used for raycasting
         /// </summary>
         /// <returns></returns>
         public int GetGameEntityGroundDetectionLayerMask()
@@ -829,14 +846,17 @@ namespace MultiplayerARPG
             int layerMask = 0;
             layerMask = layerMask | 1 << PhysicLayers.TransparentFX;
             layerMask = layerMask | 1 << PhysicLayers.Water;
-            layerMask = layerMask | characterLayer.Mask;
+            layerMask = layerMask | playerLayer.Mask;
+            layerMask = layerMask | monsterLayer.Mask;
+            layerMask = layerMask | npcLayer.Mask;
+            layerMask = layerMask | vehicleLayer.Mask;
             layerMask = layerMask | itemDropLayer.Mask;
             layerMask = MixWithIgnoreRaycastLayers(layerMask);
             return ~layerMask;
         }
 
         /// <summary>
-        /// All layers except `characterLayer`, `itemDropLayer`, `buildingLayer`, `harvestableLayer, `TransparentFX`, `IgnoreRaycast`, `Water` and non-target layers will be used for raycasting
+        /// All layers except `playerLayer`, `monsterLayer`, `npcLayer`, `vehicleLayer`, `itemDropLayer`, `buildingLayer`, `harvestableLayer, `TransparentFX`, `IgnoreRaycast`, `Water` and non-target layers will be used for raycasting
         /// </summary>
         /// <returns></returns>
         public int GetHarvestableSpawnGroundDetectionLayerMask()
@@ -844,7 +864,10 @@ namespace MultiplayerARPG
             int layerMask = 0;
             layerMask = layerMask | 1 << PhysicLayers.TransparentFX;
             layerMask = layerMask | 1 << PhysicLayers.Water;
-            layerMask = layerMask | characterLayer.Mask;
+            layerMask = layerMask | playerLayer.Mask;
+            layerMask = layerMask | monsterLayer.Mask;
+            layerMask = layerMask | npcLayer.Mask;
+            layerMask = layerMask | vehicleLayer.Mask;
             layerMask = layerMask | itemDropLayer.Mask;
             layerMask = layerMask | buildingLayer.Mask;
             layerMask = layerMask | harvestableLayer.Mask;
@@ -853,7 +876,7 @@ namespace MultiplayerARPG
         }
 
         /// <summary>
-        /// All layers except `characterLayer`, `itemDropLayer`, `harvestableLayer, `TransparentFX`, `IgnoreRaycast`, `Water` and non-target layers will be used for raycasting
+        /// All layers except `playerLayer`, `monsterLayer`, `npcLayer`, `vehicleLayer`, `itemDropLayer`, `harvestableLayer, `TransparentFX`, `IgnoreRaycast`, `Water` and non-target layers will be used for raycasting
         /// </summary>
         /// <returns></returns>
         public int GetAreaSkillGroundDetectionLayerMask()
@@ -861,7 +884,10 @@ namespace MultiplayerARPG
             int layerMask = 0;
             layerMask = layerMask | 1 << PhysicLayers.TransparentFX;
             layerMask = layerMask | 1 << PhysicLayers.Water;
-            layerMask = layerMask | characterLayer.Mask;
+            layerMask = layerMask | playerLayer.Mask;
+            layerMask = layerMask | monsterLayer.Mask;
+            layerMask = layerMask | npcLayer.Mask;
+            layerMask = layerMask | vehicleLayer.Mask;
             layerMask = layerMask | itemDropLayer.Mask;
             layerMask = layerMask | harvestableLayer.Mask;
             layerMask = MixWithIgnoreRaycastLayers(layerMask);

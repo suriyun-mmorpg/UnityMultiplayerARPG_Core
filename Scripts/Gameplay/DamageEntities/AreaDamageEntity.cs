@@ -1,5 +1,6 @@
 ﻿using LiteNetLibManager;
 using System.Collections.Generic;
+using System.Reflection;
 using UnityEngine;
 using UnityEngine.Events;
 
@@ -148,6 +149,13 @@ namespace MultiplayerARPG
                 return;
             }
             FxCollection.InitPrefab();
+            if (Identity == null)
+            {
+                Debug.LogWarning($"No `LiteNetLibIdentity` attached with the same game object with `AreaDamageEntity` (prefab name: {name}), it will add new identity component with asset ID which geneared by prefab name.");
+                LiteNetLibIdentity identity = gameObject.AddComponent<LiteNetLibIdentity>();
+                FieldInfo prop = typeof(LiteNetLibIdentity).GetField("assetId", BindingFlags.NonPublic | BindingFlags.Instance);
+                prop.SetValue(identity, $"AreaDamageEntity_{name}");
+            }
             Identity.PoolingSize = PoolSize;
         }
 
