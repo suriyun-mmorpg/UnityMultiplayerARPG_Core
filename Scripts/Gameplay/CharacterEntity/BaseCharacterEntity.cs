@@ -1029,11 +1029,11 @@ namespace MultiplayerARPG
             return FindDamageableEntities<T>(distance, layerMask, true, findInFov, fov);
         }
 
-        public List<T> FindCharacters<T>(float distance, bool findForAlive, bool findForAlly, bool findForEnemy, bool findForNeutral, bool findInFov = false, float fov = 0)
+        public List<T> FindCharacters<T>(Vector3 origin, float distance, bool findForAlive, bool findForAlly, bool findForEnemy, bool findForNeutral, bool findInFov = false, float fov = 0)
             where T : BaseCharacterEntity
         {
             List<T> result = new List<T>();
-            int tempOverlapSize = FindPhysicFunctions.OverlapObjects(CacheTransform.position, distance, CurrentGameInstance.playerLayer.Mask | CurrentGameInstance.monsterLayer.Mask);
+            int tempOverlapSize = FindPhysicFunctions.OverlapObjects(origin, distance, CurrentGameInstance.playerLayer.Mask | CurrentGameInstance.monsterLayer.Mask);
             if (tempOverlapSize == 0)
                 return result;
             IDamageableEntity tempBaseEntity;
@@ -1053,16 +1053,28 @@ namespace MultiplayerARPG
             return result;
         }
 
+        public List<T> FindCharacters<T>(float distance, bool findForAlive, bool findForAlly, bool findForEnemy, bool findForNeutral, bool findInFov = false, float fov = 0)
+            where T : BaseCharacterEntity
+        {
+            return FindCharacters<T>(CacheTransform.position, distance, findForAlive, findForAlly, findForEnemy, findForNeutral, findInFov, fov);
+        }
+
+        public List<T> FindAliveCharacters<T>(Vector3 origin, float distance, bool findForAlly, bool findForEnemy, bool findForNeutral, bool findInFov = false, float fov = 0)
+            where T : BaseCharacterEntity
+        {
+            return FindCharacters<T>(origin, distance, true, findForAlly, findForEnemy, findForNeutral, findInFov, fov);
+        }
+
         public List<T> FindAliveCharacters<T>(float distance, bool findForAlly, bool findForEnemy, bool findForNeutral, bool findInFov = false, float fov = 0)
             where T : BaseCharacterEntity
         {
-            return FindCharacters<T>(distance, true, findForAlly, findForEnemy, findForNeutral, findInFov, fov);
+            return FindAliveCharacters<T>(CacheTransform.position, distance, findForAlly, findForEnemy, findForNeutral, findInFov, fov);
         }
 
-        public T FindNearestCharacter<T>(float distance, bool findForAliveOnly, bool findForAlly, bool findForEnemy, bool findForNeutral, bool findInFov = false, float fov = 0)
+        public T FindNearestCharacter<T>(Vector3 origin, float distance, bool findForAliveOnly, bool findForAlly, bool findForEnemy, bool findForNeutral, bool findInFov = false, float fov = 0)
             where T : BaseCharacterEntity
         {
-            int tempOverlapSize = FindPhysicFunctions.OverlapObjects(CacheTransform.position, distance, CurrentGameInstance.playerLayer.Mask | CurrentGameInstance.monsterLayer.Mask);
+            int tempOverlapSize = FindPhysicFunctions.OverlapObjects(origin, distance, CurrentGameInstance.playerLayer.Mask | CurrentGameInstance.monsterLayer.Mask);
             if (tempOverlapSize == 0)
                 return null;
             float tempDistance;
@@ -1088,10 +1100,16 @@ namespace MultiplayerARPG
             return nearestEntity;
         }
 
+        public T FindNearestAliveCharacter<T>(Vector3 origin, float distance, bool findForAlly, bool findForEnemy, bool findForNeutral, bool findInFov = false, float fov = 0)
+            where T : BaseCharacterEntity
+        {
+            return FindNearestCharacter<T>(origin, distance, true, findForAlly, findForEnemy, findForNeutral, findInFov, fov);
+        }
+
         public T FindNearestAliveCharacter<T>(float distance, bool findForAlly, bool findForEnemy, bool findForNeutral, bool findInFov = false, float fov = 0)
             where T : BaseCharacterEntity
         {
-            return FindNearestCharacter<T>(distance, true, findForAlly, findForEnemy, findForNeutral, findInFov, fov);
+            return FindNearestAliveCharacter<T>(CacheTransform.position, distance, findForAlly, findForEnemy, findForNeutral, findInFov, fov);
         }
 
         private bool IsCharacterWhichLookingFor(BaseCharacterEntity characterEntity, bool findForAlive, bool findForAlly, bool findForEnemy, bool findForNeutral, bool findInFov, float fov)
