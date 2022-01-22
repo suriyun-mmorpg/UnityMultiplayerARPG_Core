@@ -340,6 +340,8 @@ namespace MultiplayerARPG
             // Tell the server to attack
             if (!IsServer)
                 CallServerAttack(simulateSeed, isLeftHand);
+            else if (IsOwnerClientOrOwnedByServer)
+                CallAllPlayAttackAnimation(simulateSeed, isLeftHand);
         }
     }
 }
