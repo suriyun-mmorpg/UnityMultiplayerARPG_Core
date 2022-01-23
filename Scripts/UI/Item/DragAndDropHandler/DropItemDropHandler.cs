@@ -23,10 +23,11 @@ namespace MultiplayerARPG
                 return;
             // Validate dragging UI
             UIDragHandler dragHandler = eventData.pointerDrag.GetComponent<UIDragHandler>();
-            if (dragHandler == null || dragHandler.isDropped)
+            if (dragHandler == null || !dragHandler.CanDrop)
                 return;
-            // Get dragged item UI, if dragging item UI is UI for character item.
-            // try to equip the item
+            // Set UI drop state
+            dragHandler.IsDropped = true;
+            // Get dragged item UI. if dragging item UI is UI for character item, drop the item
             UICharacterItemDragHandler draggedItemUI = dragHandler as UICharacterItemDragHandler;
             if (draggedItemUI != null)
             {

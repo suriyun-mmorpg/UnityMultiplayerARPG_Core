@@ -48,10 +48,9 @@ namespace MultiplayerARPG
                 return;
             // Validate dragging UI
             UIDragHandler dragHandler = eventData.pointerDrag.GetComponent<UIDragHandler>();
-            if (dragHandler == null || dragHandler.isDropped || dragHandler.IsScrolling)
+            if (dragHandler == null || !dragHandler.CanDrop)
                 return;
-            // Get dragged item UI, if dragging item UI is UI for character item.
-            // try to equip the item
+            // Get dragged item UI. If dragging item UI is UI for character item, equip the item
             UICharacterItemDragHandler draggedItemUI = dragHandler as UICharacterItemDragHandler;
             if (draggedItemUI != null && draggedItemUI.uiCharacterItem != uiCharacterItem)
             {
@@ -73,7 +72,7 @@ namespace MultiplayerARPG
         protected virtual void OnDropEquipItem(UICharacterItemDragHandler draggedItemUI)
         {
             // Set UI drop state
-            draggedItemUI.isDropped = true;
+            draggedItemUI.IsDropped = true;
             switch (uiCharacterItem.InventoryType)
             {
                 case InventoryType.NonEquipItems:
@@ -107,7 +106,7 @@ namespace MultiplayerARPG
         protected virtual void OnDropNonEquipItem(UICharacterItemDragHandler draggedItemUI)
         {
             // Set UI drop state
-            draggedItemUI.isDropped = true;
+            draggedItemUI.IsDropped = true;
             StorageType storageType = GameInstance.OpenedStorageType;
             string storageOwnerId = GameInstance.OpenedStorageOwnerId;
             switch (uiCharacterItem.InventoryType)
@@ -149,7 +148,7 @@ namespace MultiplayerARPG
         protected void OnDropStorageItem(UICharacterItemDragHandler draggedItemUI)
         {
             // Set UI drop state
-            draggedItemUI.isDropped = true;
+            draggedItemUI.IsDropped = true;
             StorageType storageType = GameInstance.OpenedStorageType;
             string storageOwnerId = GameInstance.OpenedStorageOwnerId;
             switch (uiCharacterItem.InventoryType)

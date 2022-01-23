@@ -36,11 +36,10 @@ namespace MultiplayerARPG
                 return;
             // Validate dragging UI
             UIDragHandler dragHandler = eventData.pointerDrag.GetComponent<UIDragHandler>();
-            if (dragHandler == null || dragHandler.isDropped || dragHandler.IsScrolling)
+            if (dragHandler == null || !dragHandler.CanDrop)
                 return;
             // Set UI drop state
-            dragHandler.isDropped = true;
-
+            dragHandler.IsDropped = true;
             string swappingHotkeyId = string.Empty;
             HotkeyType swappingType = HotkeyType.None;
             string swappingDataId = string.Empty;

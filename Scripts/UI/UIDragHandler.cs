@@ -27,10 +27,11 @@ public partial class UIDragHandler : MonoBehaviour, IBeginDragHandler, IDragHand
 
     public virtual bool CanDrag { get { return true; } }
 
+    public virtual bool CanDrop { get { return CanDrag && !IsDropped && !IsScrolling; } }
+
     public bool IsScrolling { get; protected set; }
 
-    [System.NonSerialized]
-    public bool isDropped;
+    public bool IsDropped { get; set; }
 
     private int defaultSiblingIndex;
     private Transform defaultParent;
@@ -92,7 +93,7 @@ public partial class UIDragHandler : MonoBehaviour, IBeginDragHandler, IDragHand
             return;
 
         DraggingObjects.Add(gameObject);
-        isDropped = false;
+        IsDropped = false;
         rootTransform.SetParent(CacheCanvas.transform);
         rootTransform.SetAsLastSibling();
 

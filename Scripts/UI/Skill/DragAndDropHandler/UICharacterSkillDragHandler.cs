@@ -72,7 +72,7 @@ namespace MultiplayerARPG
                 return;
             }
             base.OnEndDrag(eventData);
-            if (isDropped || !CanDrag)
+            if (IsDropped || !CanDrag)
                 return;
             if (requireDropArea)
                 return;
