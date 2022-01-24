@@ -187,6 +187,7 @@ namespace MultiplayerARPG
                 return;
             movement.Entity.ClientSendPacket(MOVEMENT_DATA_CHANNEL, DeliveryMethod.ReliableOrdered, GameNetworkingConsts.MovementInput, (writer) =>
             {
+                writer.Put((byte)inputState);
                 writer.Put((byte)movementState);
                 writer.Put((byte)extraMovementState);
                 if (inputState.Has(InputState.PositionChanged))
