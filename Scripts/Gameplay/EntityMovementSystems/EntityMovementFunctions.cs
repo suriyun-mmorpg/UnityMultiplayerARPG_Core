@@ -233,8 +233,9 @@ namespace MultiplayerARPG
             });
         }
 
-        public static void ReadMovementInputMessage2D(this NetDataReader reader, out MovementState movementState, out ExtraMovementState extraMovementState, out Vector2 position, out long timestamp)
+        public static void ReadMovementInputMessage2D(this NetDataReader reader, out InputState inputState, out MovementState movementState, out ExtraMovementState extraMovementState, out Vector2 position, out long timestamp)
         {
+            inputState = (InputState)reader.GetByte();
             movementState = (MovementState)reader.GetByte();
             extraMovementState = (ExtraMovementState)reader.GetByte();
             position = reader.GetVector2();
