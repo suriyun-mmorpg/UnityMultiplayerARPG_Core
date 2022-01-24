@@ -63,10 +63,10 @@ namespace MultiplayerARPG
         public MovementState MovementState { get; protected set; }
         public ExtraMovementState ExtraMovementState { get; protected set; }
 
-        public Queue<Vector3> navPaths { get; private set; }
+        public Queue<Vector3> NavPaths { get; private set; }
         public bool HasNavPaths
         {
-            get { return navPaths != null && navPaths.Count > 0; }
+            get { return NavPaths != null && NavPaths.Count > 0; }
         }
 
         // Movement codes
@@ -196,7 +196,7 @@ namespace MultiplayerARPG
 
         private void StopMoveFunction()
         {
-            navPaths = null;
+            NavPaths = null;
         }
 
         public void KeyMovement(Vector3 moveDirection, MovementState movementState)
@@ -209,7 +209,7 @@ namespace MultiplayerARPG
                 inputDirection = moveDirection;
                 tempMovementState = movementState;
                 if (inputDirection.sqrMagnitude > 0)
-                    navPaths = null;
+                    NavPaths = null;
                 if (!isJumping && !applyingJumpForce)
                     isJumping = CacheOpenCharacterController.isGrounded && tempMovementState.Has(MovementState.IsJump);
             }
@@ -390,14 +390,14 @@ namespace MultiplayerARPG
             if (HasNavPaths)
             {
                 // Set `tempTargetPosition` and `tempCurrentPosition`
-                tempTargetPosition = navPaths.Peek();
+                tempTargetPosition = NavPaths.Peek();
                 moveDirection = (tempTargetPosition - tempCurrentPosition).normalized;
                 tempTargetDistance = Vector3.Distance(tempTargetPosition.GetXZ(), tempCurrentPosition.GetXZ());
                 if (!tempMovementState.Has(MovementState.Forward))
                     tempMovementState |= MovementState.Forward;
                 if (tempTargetDistance < StoppingDistance)
                 {
-                    navPaths.Dequeue();
+                    NavPaths.Dequeue();
                     if (!HasNavPaths)
                     {
                         StopMoveFunction();
@@ -672,16 +672,16 @@ namespace MultiplayerARPG
                 if (NavMesh.SamplePosition(position, out navHit, 5f, NavMesh.AllAreas) &&
                     NavMesh.CalculatePath(CacheTransform.position, navHit.position, NavMesh.AllAreas, navPath))
                 {
-                    navPaths = new Queue<Vector3>(navPath.corners);
+                    NavPaths = new Queue<Vector3>(navPath.corners);
                     // Dequeue first path it's not require for future movement
-                    navPaths.Dequeue();
+                    NavPaths.Dequeue();
                 }
             }
             else
             {
                 // If not use nav mesh, just move to position by direction
-                navPaths = new Queue<Vector3>();
-                navPaths.Enqueue(position);
+                NavPaths = new Queue<Vector3>();
+                NavPaths.Enqueue(position);
             }
         }
 
@@ -825,7 +825,7 @@ namespace MultiplayerARPG
             if (acceptedPositionTimestamp < timestamp)
             {
                 acceptedPositionTimestamp = timestamp;
-                navPaths = null;
+                NavPaths = null;
                 tempMovementState = movementState;
                 tempExtraMovementState = extraMovementState;
                 clientTargetPosition = null;
@@ -942,7 +942,8 @@ namespace MultiplayerARPG
         {
             airborneElapsed = 0;
             verticalVelocity = 0;
-            navPaths = null;
+            clientTargetPosition = null;
+            NavPaths = null;
             CacheOpenCharacterController.SetPosition(position, false);
         }
 
