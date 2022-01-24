@@ -64,6 +64,7 @@ namespace MultiplayerARPG
             lastGrounded = true;
             lastGroundedPosition = CacheTransform.position;
             RespawnGroundedCheckCountDown = RESPAWN_GROUNDED_CHECK_DURATION;
+            RespawnInvincibleCountDown = RESPAWN_INVINCIBLE_DURATION;
             CallAllOnRespawn();
         }
 

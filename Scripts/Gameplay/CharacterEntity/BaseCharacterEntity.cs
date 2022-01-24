@@ -18,6 +18,7 @@ namespace MultiplayerARPG
         public const float ACTION_DELAY = 0.1f;
         public const float COMBATANT_MESSAGE_DELAY = 1f;
         public const float RESPAWN_GROUNDED_CHECK_DURATION = 1f;
+        public const float RESPAWN_INVINCIBLE_DURATION = 1f;
         public const float FIND_ENTITY_DISTANCE_BUFFER = 1f;
 
         protected struct SyncListRecachingState
@@ -110,6 +111,7 @@ namespace MultiplayerARPG
         public bool IsCharging { get { return ChargeComponent.IsCharging; } }
         public float MoveSpeedRateWhileCharging { get { return ChargeComponent.MoveSpeedRateWhileCharging; } }
         public float RespawnGroundedCheckCountDown { get; protected set; }
+        public float RespawnInvincibleCountDown { get; protected set; }
 
         protected float lastMountTime;
         protected float lastUseItemTime;
@@ -121,6 +123,7 @@ namespace MultiplayerARPG
         public IPhysicFunctions AttackPhysicFunctions { get; protected set; }
         public IPhysicFunctions FindPhysicFunctions { get; protected set; }
 
+        public override bool IsImmune { get { return base.IsImmune || RespawnInvincibleCountDown > 0f; } set { base.IsImmune = value; } }
         public override sealed int MaxHp { get { return this.GetCaches().MaxHp; } }
         public int MaxMp { get { return this.GetCaches().MaxMp; } }
         public int MaxStamina { get { return this.GetCaches().MaxStamina; } }
@@ -222,6 +225,7 @@ namespace MultiplayerARPG
         {
             MakeCaches();
             float deltaTime = Time.deltaTime;
+
             if (IsServer && CurrentGameInstance.DimensionType == DimensionType.Dimension3D)
             {
                 // Ground check / ground damage will be calculated at server while dimension type is 3d only
@@ -236,7 +240,12 @@ namespace MultiplayerARPG
             }
 
             bool tempEnableMovement = PassengingVehicleEntity == null;
-            if (RespawnGroundedCheckCountDown <= 0)
+            if (RespawnGroundedCheckCountDown > 0f)
+            {
+                // Character won't receive fall damage
+                RespawnGroundedCheckCountDown -= deltaTime;
+            }
+            else
             {
                 // Killing character when it fall below dead Y
                 if (CurrentGameInstance.DimensionType == DimensionType.Dimension3D &&
@@ -252,9 +261,11 @@ namespace MultiplayerARPG
                     tempEnableMovement = false;
                 }
             }
-            else
+
+            if (RespawnInvincibleCountDown > 0f)
             {
-                RespawnGroundedCheckCountDown -= deltaTime;
+                // Character won't receive damage
+                RespawnInvincibleCountDown -= deltaTime;
             }
 
             // Clear data when character dead
