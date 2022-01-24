@@ -371,6 +371,8 @@ namespace MultiplayerARPG
                 tempTargetPosition = NavPaths.Peek();
                 moveDirection = (tempTargetPosition - tempCurrentPosition).normalized;
                 tempTargetDistance = Vector3.Distance(tempTargetPosition.GetXZ(), tempCurrentPosition.GetXZ());
+                if (!tempMovementState.Has(MovementState.Forward))
+                    tempMovementState |= MovementState.Forward;
                 if (tempTargetDistance < StoppingDistance)
                 {
                     NavPaths.Dequeue();
