@@ -36,13 +36,6 @@ namespace MultiplayerARPG
             get { return NavPaths != null && NavPaths.Count > 0; }
         }
 
-        protected Vector2 tempMoveDirection;
-        protected Vector2 tempCurrentPosition;
-        protected Vector2 tempPredictPosition;
-        protected float tempSqrMagnitude;
-        protected float tempPredictSqrMagnitude;
-        protected float tempTargetDistance;
-        protected float tempCurrentMoveSpeed;
         protected long acceptedPositionTimestamp;
         protected Vector2? clientTargetPosition;
         protected float lastServerSyncTransform;
@@ -226,7 +219,7 @@ namespace MultiplayerARPG
             }
         }
 
-        private void UpdateMovement(float deltaTime)
+        protected virtual void UpdateMovement(float deltaTime)
         {
             float tempSqrMagnitude;
             float tempPredictSqrMagnitude;
