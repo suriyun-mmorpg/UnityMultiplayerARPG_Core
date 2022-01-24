@@ -29,6 +29,7 @@ namespace MultiplayerARPG
         }
         public MovementState MovementState { get; protected set; }
         public ExtraMovementState ExtraMovementState { get; protected set; }
+        public DirectionVector2 Direction2D { get { throw new System.NotImplementedException(); } set { throw new System.NotImplementedException(); } }
 
         protected long acceptedPositionTimestamp;
         protected float lastServerSyncTransform;

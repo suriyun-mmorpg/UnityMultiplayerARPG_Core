@@ -181,15 +181,17 @@ namespace MultiplayerARPG
         #endregion
 
         #region 2D
-        public static void ClientSendMovementInput2D(this IEntityMovement movement, MovementState movementState, ExtraMovementState extraMovementState, Vector2 position)
+        public static void ClientSendMovementInput2D(this IEntityMovement movement, InputState inputState, MovementState movementState, ExtraMovementState extraMovementState, Vector2 position, DirectionVector2 direction2D)
         {
             if (!movement.Entity.IsOwnerClient)
                 return;
             movement.Entity.ClientSendPacket(MOVEMENT_DATA_CHANNEL, DeliveryMethod.ReliableOrdered, GameNetworkingConsts.MovementInput, (writer) =>
             {
-                writer.Put((byte)movement.MovementState);
-                writer.Put((byte)movement.ExtraMovementState);
-                writer.PutVector2(position);
+                writer.Put((byte)movementState);
+                writer.Put((byte)extraMovementState);
+                if (inputState.Has(InputState.PositionChanged))
+                    writer.PutVector2(position);
+                writer.PutValue(direction2D);
                 writer.PutPackedLong(movement.Entity.Manager.ServerTimestamp);
             });
         }
@@ -204,6 +206,7 @@ namespace MultiplayerARPG
                 writer.Put((byte)movement.MovementState);
                 writer.Put((byte)movement.ExtraMovementState);
                 writer.PutVector2(movement.Entity.CacheTransform.position);
+                writer.PutValue(movement.Direction2D);
                 writer.PutPackedLong(movement.Entity.Manager.ServerTimestamp);
             });
         }
@@ -217,6 +220,7 @@ namespace MultiplayerARPG
                 writer.Put((byte)movement.MovementState);
                 writer.Put((byte)movement.ExtraMovementState);
                 writer.PutVector2(movement.Entity.CacheTransform.position);
+                writer.PutValue(movement.Direction2D);
                 writer.PutPackedLong(movement.Entity.Manager.ServerTimestamp);
             });
         }
@@ -233,20 +237,24 @@ namespace MultiplayerARPG
             });
         }
 
-        public static void ReadMovementInputMessage2D(this NetDataReader reader, out InputState inputState, out MovementState movementState, out ExtraMovementState extraMovementState, out Vector2 position, out long timestamp)
+        public static void ReadMovementInputMessage2D(this NetDataReader reader, out InputState inputState, out MovementState movementState, out ExtraMovementState extraMovementState, out Vector2 position, out DirectionVector2 direction2D, out long timestamp)
         {
             inputState = (InputState)reader.GetByte();
             movementState = (MovementState)reader.GetByte();
             extraMovementState = (ExtraMovementState)reader.GetByte();
-            position = reader.GetVector2();
+            position = Vector3.zero;
+            if (inputState.Has(InputState.PositionChanged))
+                position = reader.GetVector2();
+            direction2D = reader.GetValue<DirectionVector2>();
             timestamp = reader.GetPackedLong();
         }
 
-        public static void ReadSyncTransformMessage2D(this NetDataReader reader, out MovementState movementState, out ExtraMovementState extraMovementState, out Vector2 position, out long timestamp)
+        public static void ReadSyncTransformMessage2D(this NetDataReader reader, out MovementState movementState, out ExtraMovementState extraMovementState, out Vector2 position, out DirectionVector2 direction2D, out long timestamp)
         {
             movementState = (MovementState)reader.GetByte();
             extraMovementState = (ExtraMovementState)reader.GetByte();
             position = reader.GetVector2();
+            direction2D = reader.GetValue<DirectionVector2>();
             timestamp = reader.GetPackedLong();
         }
 

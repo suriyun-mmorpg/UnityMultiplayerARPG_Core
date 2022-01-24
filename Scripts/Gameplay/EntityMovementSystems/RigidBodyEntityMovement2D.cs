@@ -28,6 +28,7 @@ namespace MultiplayerARPG
         }
         public MovementState MovementState { get; protected set; }
         public ExtraMovementState ExtraMovementState { get; protected set; }
+        public DirectionVector2 Direction2D { get; set; }
 
         public Queue<Vector2> NavPaths { get; protected set; }
         public bool HasNavPaths
@@ -42,7 +43,6 @@ namespace MultiplayerARPG
         protected float tempPredictSqrMagnitude;
         protected float tempTargetDistance;
         protected float tempCurrentMoveSpeed;
-        protected Quaternion lookRotation;
         protected long acceptedPositionTimestamp;
         protected Vector2? clientTargetPosition;
         protected float lastServerSyncTransform;
@@ -136,18 +136,17 @@ namespace MultiplayerARPG
 
         public virtual void SetLookRotation(Quaternion rotation)
         {
-            lookRotation = rotation;
             if (this.CanPredictMovement())
             {
                 // Always apply movement to owner client (it's client prediction for server auth movement)
                 if (!HasNavPaths)
-                    Entity.SetDirection2D(lookRotation * Vector3.forward);
+                    Direction2D = (Vector2)(rotation * Vector3.forward);
             }
         }
 
         public Quaternion GetLookRotation()
         {
-            return lookRotation;
+            return Quaternion.LookRotation(Direction2D);
         }
 
         public void Teleport(Vector3 position, Quaternion rotation)
@@ -189,7 +188,6 @@ namespace MultiplayerARPG
 
         public override void EntityFixedUpdate()
         {
-            UpdateMovement(Time.fixedDeltaTime);
             SyncTransform();
         }
 
@@ -210,9 +208,8 @@ namespace MultiplayerARPG
                 InputState inputState;
                 if (currentTime - lastClientSendInputs > clientSendInputsInterval && this.DifferInputEnoughToSend(oldInput, currentInput, out inputState))
                 {
-                    currentInput = this.SetInputMovementState(currentInput, MovementState);
                     currentInput = this.SetInputExtraMovementState(currentInput, tempExtraMovementState);
-                    this.ClientSendMovementInput2D(currentInput.MovementState, currentInput.ExtraMovementState, currentInput.Position);
+                    this.ClientSendMovementInput2D(inputState, currentInput.MovementState, currentInput.ExtraMovementState, currentInput.Position, currentInput.Direction2D);
                     oldInput = currentInput;
                     currentInput = null;
                     lastClientSendInputs = currentTime;
@@ -253,6 +250,8 @@ namespace MultiplayerARPG
                 tempTargetPosition = NavPaths.Peek();
                 moveDirection = (tempTargetPosition - tempCurrentPosition).normalized;
                 tempTargetDistance = Vector2.Distance(tempTargetPosition, tempCurrentPosition);
+                if (!tempMovementState.Has(MovementState.Forward))
+                    tempMovementState |= MovementState.Forward;
                 if (tempTargetDistance < StoppingDistance)
                 {
                     NavPaths.Dequeue();
@@ -265,7 +264,7 @@ namespace MultiplayerARPG
                 else
                 {
                     // Turn character to destination
-                    Entity.SetDirection2D(moveDirection);
+                    Direction2D = moveDirection;
                 }
             }
             else if (clientTargetPosition.HasValue)
@@ -320,7 +319,7 @@ namespace MultiplayerARPG
                 }
                 tempMoveVelocity = moveDirection * tempCurrentMoveSpeed;
                 // Set inputs
-                currentInput = this.SetInputMovementState(currentInput, tempMovementState);
+                currentInput = this.SetInputMovementState2D(currentInput, tempMovementState);
                 if (HasNavPaths)
                 {
                     currentInput = this.SetInputPosition(currentInput, tempTargetPosition);
@@ -332,7 +331,7 @@ namespace MultiplayerARPG
                     currentInput = this.SetInputIsKeyMovement(currentInput, true);
                 }
             }
-            currentInput = this.SetInputRotation(currentInput, CacheTransform.rotation);
+            currentInput = this.SetInputDirection2D(currentInput, Direction2D);
             CacheRigidbody2D.velocity = tempMoveVelocity;
         }
 
@@ -372,8 +371,9 @@ namespace MultiplayerARPG
             MovementState movementState;
             ExtraMovementState extraMovementState;
             Vector2 position;
+            DirectionVector2 direction2D;
             long timestamp;
-            messageHandler.Reader.ReadSyncTransformMessage2D(out movementState, out extraMovementState, out position, out timestamp);
+            messageHandler.Reader.ReadSyncTransformMessage2D(out movementState, out extraMovementState, out position, out direction2D, out timestamp);
             if (acceptedPositionTimestamp < timestamp)
             {
                 acceptedPositionTimestamp = timestamp;
@@ -382,6 +382,7 @@ namespace MultiplayerARPG
                 {
                     if (Entity.MovementSecure == MovementSecure.ServerAuthoritative || !IsOwnerClient)
                     {
+                        Direction2D = direction2D;
                         CacheTransform.position = position;
                     }
                     MovementState = movementState;
@@ -389,6 +390,7 @@ namespace MultiplayerARPG
                 }
                 else if (!IsOwnerClient)
                 {
+                    Direction2D = direction2D;
                     clientTargetPosition = position;
                     MovementState = movementState;
                     ExtraMovementState = extraMovementState;
@@ -436,8 +438,9 @@ namespace MultiplayerARPG
             MovementState movementState;
             ExtraMovementState extraMovementState;
             Vector2 position;
+            DirectionVector2 direction2D;
             long timestamp;
-            messageHandler.Reader.ReadMovementInputMessage2D(out inputState, out movementState, out extraMovementState, out position, out timestamp);
+            messageHandler.Reader.ReadMovementInputMessage2D(out inputState, out movementState, out extraMovementState, out position, out direction2D, out timestamp);
             if (acceptedPositionTimestamp < timestamp)
             {
                 acceptedPositionTimestamp = timestamp;
@@ -455,6 +458,7 @@ namespace MultiplayerARPG
                         SetMovePaths(position, true);
                     }
                 }
+                Direction2D = direction2D;
             }
         }
 
@@ -473,11 +477,13 @@ namespace MultiplayerARPG
             MovementState movementState;
             ExtraMovementState extraMovementState;
             Vector2 position;
+            DirectionVector2 direction2D;
             long timestamp;
-            messageHandler.Reader.ReadSyncTransformMessage2D(out movementState, out extraMovementState, out position, out timestamp);
+            messageHandler.Reader.ReadSyncTransformMessage2D(out movementState, out extraMovementState, out position, out direction2D, out timestamp);
             if (acceptedPositionTimestamp < timestamp)
             {
                 acceptedPositionTimestamp = timestamp;
+                Direction2D = direction2D;
                 if (!IsClient)
                 {
                     // If it's server only (not a host), set position follows the client immediately

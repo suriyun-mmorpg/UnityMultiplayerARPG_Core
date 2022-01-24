@@ -55,6 +55,7 @@ namespace MultiplayerARPG
         }
         public MovementState MovementState { get; protected set; }
         public ExtraMovementState ExtraMovementState { get; protected set; }
+        public DirectionVector2 Direction2D { get { throw new System.NotImplementedException(); } set { throw new System.NotImplementedException(); } }
 
         public Queue<Vector3> navPaths { get; private set; }
         public bool HasNavPaths

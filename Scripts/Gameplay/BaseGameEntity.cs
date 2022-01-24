@@ -186,23 +186,6 @@ namespace MultiplayerARPG
 
         [Category("Sync Fields")]
         [SerializeField]
-        [FormerlySerializedAs("currentDirection")]
-        protected SyncFieldDirectionVector2 direction2D = new SyncFieldDirectionVector2();
-        public Vector2 LocalDirection2D { get; set; }
-        public Vector2 Direction2D
-        {
-            get
-            {
-                if (PassengingVehicleEntity != null)
-                    return PassengingVehicleEntity.Entity.Direction2D;
-                if (IsOwnerClient)
-                    return LocalDirection2D;
-                return direction2D.Value;
-            }
-            set { direction2D.Value = value; }
-        }
-
-        [SerializeField]
         protected SyncFieldPassengingVehicle passengingVehicle = new SyncFieldPassengingVehicle();
         public PassengingVehicle PassengingVehicle
         {
@@ -210,9 +193,39 @@ namespace MultiplayerARPG
             set { passengingVehicle.Value = value; }
         }
 
-        public float StoppingDistance { get { return ActiveMovement == null ? 0.1f : ActiveMovement.StoppingDistance; } }
-        public MovementState MovementState { get { return ActiveMovement == null ? MovementState.IsGrounded : ActiveMovement.MovementState; } }
-        public ExtraMovementState ExtraMovementState { get { return ActiveMovement == null ? ExtraMovementState.None : ActiveMovement.ExtraMovementState; } }
+        public float StoppingDistance
+        {
+            get
+            {
+                return ActiveMovement == null ? 0.1f : ActiveMovement.StoppingDistance;
+            }
+        }
+        public MovementState MovementState
+        {
+            get
+            {
+                return ActiveMovement == null ? MovementState.IsGrounded : ActiveMovement.MovementState;
+            }
+        }
+        public ExtraMovementState ExtraMovementState
+        {
+            get
+            {
+                return ActiveMovement == null ? ExtraMovementState.None : ActiveMovement.ExtraMovementState;
+            }
+        }
+        public DirectionVector2 Direction2D
+        {
+            get
+            {
+                return ActiveMovement == null ? (DirectionVector2)Vector2.down : ActiveMovement.Direction2D;
+            }
+            set
+            {
+                if (ActiveMovement != null)
+                    ActiveMovement.Direction2D = value;
+            }
+        }
         public virtual float MoveAnimationSpeedMultiplier { get { return 1f; } }
         public virtual bool MuteFootstepSound { get { return false; } }
         protected bool dirtyIsHide;
@@ -527,10 +540,6 @@ namespace MultiplayerARPG
                 onSetupNetElements.Invoke();
             syncTitle.deliveryMethod = DeliveryMethod.ReliableOrdered;
             syncTitle.syncMode = LiteNetLibSyncField.SyncMode.ServerToClients;
-            // Movement data
-            direction2D.deliveryMethod = DeliveryMethod.Sequenced;
-            direction2D.syncMode = LiteNetLibSyncField.SyncMode.ServerToClients;
-            direction2D.doNotSyncInitialDataImmediately = true;
             passengingVehicle.deliveryMethod = DeliveryMethod.ReliableOrdered;
             passengingVehicle.syncMode = LiteNetLibSyncField.SyncMode.ServerToClients;
             passengingVehicle.doNotSyncInitialDataImmediately = true;
@@ -602,14 +611,6 @@ namespace MultiplayerARPG
         protected void AllPlayPickupAnimation()
         {
             this.PlayPickupAnimation();
-        }
-
-        [ServerRpc]
-        protected void ServerUpdateDirection2D(DirectionVector2 direction)
-        {
-#if !CLIENT_BUILD
-            Direction2D = direction;
-#endif
         }
         #endregion
 
@@ -748,21 +749,6 @@ namespace MultiplayerARPG
         public void CallAllPlayPickupAnimation()
         {
             RPC(AllPlayPickupAnimation);
-        }
-
-        public void SetDirection2D(Vector2 direction)
-        {
-            // Set local movement state which will be used by owner client
-            LocalDirection2D = direction;
-
-            if (IsServer)
-            {
-                Direction2D = direction;
-                return;
-            }
-
-            if (IsOwnerClient)
-                RPC(ServerUpdateDirection2D, 0, DeliveryMethod.Sequenced, new DirectionVector2(LocalDirection2D));
         }
 
         protected bool EnterVehicle(IVehicleEntity vehicle, byte seatIndex)
