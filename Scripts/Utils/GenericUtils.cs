@@ -57,6 +57,7 @@ public static class GenericUtils
     {
         if (gameObject == null)
             return;
+        gameObject.layer = layerIndex;
         Transform[] childrenTransforms = gameObject.GetComponentsInChildren<Transform>(includeInactive);
         foreach (Transform childTransform in childrenTransforms)
         {
