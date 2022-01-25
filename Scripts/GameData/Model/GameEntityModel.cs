@@ -129,10 +129,10 @@ namespace MultiplayerARPG
 
         [SerializeField]
         protected UnityLayer effectLayer;
-        public UnityLayer EffectLayer
+        public int EffectLayer
         {
-            get { return effectLayer; }
-            set { effectLayer = value; }
+            get { return effectLayer.LayerIndex; }
+            set { effectLayer = new UnityLayer(value); }
         }
 
 #if UNITY_EDITOR
@@ -296,7 +296,7 @@ namespace MultiplayerARPG
                 // Setup transform and activate effect
                 tempGameEffect = PoolSystem.GetInstance(effect, tempContainer.transform.position, tempContainer.transform.rotation);
                 tempGameEffect.FollowingTarget = tempContainer.transform;
-                tempGameEffect.gameObject.SetLayerRecursively(EffectLayer.LayerIndex, true);
+                tempGameEffect.gameObject.SetLayerRecursively(EffectLayer, true);
                 AddingNewEffect(tempGameEffect);
                 tempAddingEffects.Add(tempGameEffect);
             }

@@ -50,10 +50,10 @@ namespace MultiplayerARPG
 
         [SerializeField]
         protected UnityLayer equipmentLayer;
-        public UnityLayer EquipmentLayer
+        public int EquipmentLayer
         {
-            get { return equipmentLayer; }
-            set { equipmentLayer = value; }
+            get { return equipmentLayer.LayerIndex; }
+            set { equipmentLayer = new UnityLayer(value); }
         }
 
 #if UNITY_EDITOR
@@ -131,7 +131,8 @@ namespace MultiplayerARPG
             }
             else
             {
-                StartCoroutine(SetLayers());
+                EffectLayer = Manager.Entity.gameObject.layer;
+                EquipmentLayer = Manager.Entity.gameObject.layer;
             }
 
             CacheVehicleModels = new Dictionary<int, VehicleCharacterModel>();
@@ -161,8 +162,6 @@ namespace MultiplayerARPG
         IEnumerator SetLayers()
         {
             yield return new WaitForEndOfFrame();
-            EffectLayer.Set(Manager.Entity.gameObject.layer);
-            EquipmentLayer.Set(Manager.Entity.gameObject.layer);
         }
 
         internal virtual void CopyCacheDataTo(
@@ -524,7 +523,7 @@ namespace MultiplayerARPG
                     tempEquipmentObject.transform.localEulerAngles = tempEquipmentModel.localEulerAngles;
                     tempEquipmentObject.transform.localScale = tempEquipmentModel.localScale.Equals(Vector3.zero) ? Vector3.one : tempEquipmentModel.localScale;
                     tempEquipmentObject.gameObject.SetActive(true);
-                    tempEquipmentObject.gameObject.SetLayerRecursively(EquipmentLayer.LayerIndex, true);
+                    tempEquipmentObject.gameObject.SetLayerRecursively(EquipmentLayer, true);
                     tempEquipmentObject.RemoveComponentsInChildren<Collider>(false);
                     tempEquipmentEntity = tempEquipmentObject.GetComponent<BaseEquipmentEntity>();
                     AddingNewModel(tempEquipmentObject, tempContainer);
