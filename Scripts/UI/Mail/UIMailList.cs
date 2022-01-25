@@ -118,7 +118,7 @@ namespace MultiplayerARPG
                 tempUI.Data = data;
                 tempUI.Show();
                 CacheSelectionManager.Add(tempUI);
-                if (index == 0 && selectedId.Equals(data.Id))
+                if (index == 0 || selectedId.Equals(data.Id))
                     tempUI.OnClickSelect();
             });
             if (listEmptyObject != null)

@@ -209,7 +209,7 @@ namespace MultiplayerARPG
                     }
                 }
                 CacheSelectionManager.Add(tempUI);
-                if (index == 0 && selectedId.Equals(data.Value.id))
+                if (!string.IsNullOrEmpty(selectedId) && selectedId.Equals(data.Value.id))
                     selectedUI = tempUI;
             });
 
