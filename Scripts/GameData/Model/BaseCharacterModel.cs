@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
+using System.Collections;
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
@@ -130,8 +131,7 @@ namespace MultiplayerARPG
             }
             else
             {
-                EffectLayer.Set(Manager.Entity.gameObject.layer);
-                EquipmentLayer.Set(Manager.Entity.gameObject.layer);
+                StartCoroutine(SetLayers());
             }
 
             CacheVehicleModels = new Dictionary<int, VehicleCharacterModel>();
@@ -156,6 +156,13 @@ namespace MultiplayerARPG
                 if (equipmentContainer.transform != null && !CacheEquipmentModelContainers.ContainsKey(equipmentContainer.equipSocket))
                     CacheEquipmentModelContainers[equipmentContainer.equipSocket] = equipmentContainer;
             }
+        }
+
+        IEnumerator SetLayers()
+        {
+            yield return new WaitForEndOfFrame();
+            EffectLayer.Set(Manager.Entity.gameObject.layer);
+            EquipmentLayer.Set(Manager.Entity.gameObject.layer);
         }
 
         internal virtual void CopyCacheDataTo(
