@@ -127,6 +127,9 @@ namespace MultiplayerARPG
             set { effectContainers = value; }
         }
 
+        [Header("Effect Layer Settings")]
+        [SerializeField]
+        protected bool setEffectLayerFollowEntity = true;
         [SerializeField]
         protected UnityLayer effectLayer;
         public int EffectLayer
@@ -140,7 +143,8 @@ namespace MultiplayerARPG
         public bool setEffectContainersBySetters;
 #endif
 
-        public Transform CacheTransform { get; private set; }
+        public Transform CacheTransform { get; protected set; }
+        public BaseGameEntity CacheEntity { get; protected set; }
 
         private Dictionary<string, EffectContainer> cacheEffectContainers = null;
         /// <summary>
@@ -180,6 +184,9 @@ namespace MultiplayerARPG
         protected virtual void Awake()
         {
             CacheTransform = transform;
+            CacheEntity = GetComponentInParent<BaseGameEntity>();
+            if (setEffectLayerFollowEntity && CacheEntity != null)
+                EffectLayer = CacheEntity.gameObject.layer;
             if (genericAudioSource == null)
             {
                 genericAudioSource = gameObject.GetOrAddComponent<AudioSource>((obj) =>

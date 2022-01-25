@@ -56,6 +56,12 @@ namespace MultiplayerARPG
             set { equipmentLayer = new UnityLayer(value); }
         }
 
+        [Header("Layer Settings")]
+        [SerializeField]
+        protected bool setEffectLayerFollowEntity = true;
+        [SerializeField]
+        protected bool setEquipmentLayerFollowEntity = true;
+
 #if UNITY_EDITOR
         [InspectorButton(nameof(SetEquipmentContainersBySetters))]
         public bool setEquipmentContainersBySetters = false;
@@ -126,15 +132,17 @@ namespace MultiplayerARPG
                 Manager = GetComponentInParent<CharacterModelManager>();
             // Can't find manager, this component may attached to non-character entities, so assume that this character model is main model
             if (Manager == null)
-            {
                 MainModel = this;
-            }
             else
-            {
-                EffectLayer = Manager.Entity.gameObject.layer;
-                EquipmentLayer = Manager.Entity.gameObject.layer;
-            }
+                CacheEntity = Manager.Entity;
 
+            // Set layers
+            if (setEffectLayerFollowEntity && CacheEntity != null)
+                EffectLayer = CacheEntity.gameObject.layer;
+            if (setEquipmentLayerFollowEntity && CacheEntity != null)
+                EquipmentLayer = CacheEntity.gameObject.layer;
+
+            // Cache vehicle models 
             CacheVehicleModels = new Dictionary<int, VehicleCharacterModel>();
             if (IsMainModel && vehicleModels != null && vehicleModels.Length > 0)
             {
@@ -151,6 +159,7 @@ namespace MultiplayerARPG
                 }
             }
 
+            // Cache equipment model containers
             CacheEquipmentModelContainers = new Dictionary<string, EquipmentContainer>();
             foreach (EquipmentContainer equipmentContainer in equipmentContainers)
             {
