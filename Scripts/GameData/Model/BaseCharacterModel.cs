@@ -47,6 +47,14 @@ namespace MultiplayerARPG
             set { equipmentContainers = value; }
         }
 
+        [SerializeField]
+        protected UnityLayer equipmentLayer;
+        public UnityLayer EquipmentLayer
+        {
+            get { return equipmentLayer; }
+            set { equipmentLayer = value; }
+        }
+
 #if UNITY_EDITOR
         [InspectorButton(nameof(SetEquipmentContainersBySetters))]
         public bool setEquipmentContainersBySetters = false;
@@ -117,7 +125,14 @@ namespace MultiplayerARPG
                 Manager = GetComponentInParent<CharacterModelManager>();
             // Can't find manager, this component may attached to non-character entities, so assume that this character model is main model
             if (Manager == null)
+            {
                 MainModel = this;
+            }
+            else
+            {
+                EffectLayer = Manager.Entity.layer;
+                EquipmentLayer = Manager.Entity.layer;
+            }
 
             CacheVehicleModels = new Dictionary<int, VehicleCharacterModel>();
             if (IsMainModel && vehicleModels != null && vehicleModels.Length > 0)
@@ -502,7 +517,7 @@ namespace MultiplayerARPG
                     tempEquipmentObject.transform.localEulerAngles = tempEquipmentModel.localEulerAngles;
                     tempEquipmentObject.transform.localScale = tempEquipmentModel.localScale.Equals(Vector3.zero) ? Vector3.one : tempEquipmentModel.localScale;
                     tempEquipmentObject.gameObject.SetActive(true);
-                    tempEquipmentObject.gameObject.SetLayerRecursively(CacheTransform.root.gameObject.layer, true);
+                    tempEquipmentObject.gameObject.SetLayerRecursively(EquipmentLayer.LayerIndex, true);
                     tempEquipmentObject.RemoveComponentsInChildren<Collider>(false);
                     tempEquipmentEntity = tempEquipmentObject.GetComponent<BaseEquipmentEntity>();
                     AddingNewModel(tempEquipmentObject, tempContainer);

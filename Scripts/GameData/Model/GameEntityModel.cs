@@ -75,7 +75,7 @@ namespace MultiplayerARPG
         }
 
         [Tooltip("These objects will be deactivated while entity is invisible")]
-        [SerializeField] 
+        [SerializeField]
         protected GameObject[] hiddingObjects;
         public GameObject[] HiddingObjects
         {
@@ -125,6 +125,14 @@ namespace MultiplayerARPG
         {
             get { return effectContainers; }
             set { effectContainers = value; }
+        }
+
+        [SerializeField]
+        protected UnityLayer effectLayer;
+        public UnityLayer EffectLayer
+        {
+            get { return effectLayer; }
+            set { effectLayer = value; }
         }
 
 #if UNITY_EDITOR
@@ -288,7 +296,7 @@ namespace MultiplayerARPG
                 // Setup transform and activate effect
                 tempGameEffect = PoolSystem.GetInstance(effect, tempContainer.transform.position, tempContainer.transform.rotation);
                 tempGameEffect.FollowingTarget = tempContainer.transform;
-                tempGameEffect.gameObject.SetLayerRecursively(CacheTransform.root.gameObject.layer, true);
+                tempGameEffect.gameObject.SetLayerRecursively(EffectLayer.LayerIndex, true);
                 AddingNewEffect(tempGameEffect);
                 tempAddingEffects.Add(tempGameEffect);
             }

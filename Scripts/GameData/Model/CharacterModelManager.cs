@@ -66,6 +66,11 @@ namespace MultiplayerARPG
             SwitchTpsModel(MainTpsModel);
         }
 
+        public override void EntityStart()
+        {
+            base.EntityStart();
+        }
+
         public bool ValidateMainTpsModel()
         {
             if (MainTpsModel == null)
