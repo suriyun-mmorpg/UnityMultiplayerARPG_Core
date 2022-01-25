@@ -130,8 +130,8 @@ namespace MultiplayerARPG
             }
             else
             {
-                EffectLayer = Manager.Entity.layer;
-                EquipmentLayer = Manager.Entity.layer;
+                EffectLayer.LayerIndex = Manager.Entity.gameObject.layer;
+                EquipmentLayer.LayerIndex = Manager.Entity.gameObject.layer;
             }
 
             CacheVehicleModels = new Dictionary<int, VehicleCharacterModel>();
