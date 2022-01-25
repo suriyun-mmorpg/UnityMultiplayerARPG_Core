@@ -7,6 +7,9 @@ namespace MultiplayerARPG
     public class CameraRotationSpeedScaleSetting : MonoBehaviour
     {
         public Slider slider;
+        public TextWrapper textScaleValue;
+        public float minValue = 0.01f;
+        public float maxValue = 1f;
         public float defaultValue = 1f;
         public string cameraRotationSpeedScaleSaveKey = "DEFAULT_CAMERA_ROTATION_SPEED_SCALE";
         private readonly static Dictionary<string, float> CameraRotationSpeedScales = new Dictionary<string, float>();
@@ -37,8 +40,8 @@ namespace MultiplayerARPG
 
         private void Start()
         {
-            slider.minValue = 0.01f;
-            slider.maxValue = 1f;
+            slider.minValue = minValue;
+            slider.maxValue = maxValue;
             slider.SetValueWithoutNotify(CameraRotationSpeedScale);
             slider.onValueChanged.AddListener(OnValueChanged);
         }
@@ -51,6 +54,8 @@ namespace MultiplayerARPG
         public void OnValueChanged(float value)
         {
             CameraRotationSpeedScale = value;
+            if (textScaleValue != null)
+                textScaleValue.text = value.ToString("N2");
         }
     }
 }
