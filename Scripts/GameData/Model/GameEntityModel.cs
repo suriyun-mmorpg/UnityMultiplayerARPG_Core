@@ -130,6 +130,7 @@ namespace MultiplayerARPG
         [Header("Effect Layer Settings")]
         [SerializeField]
         protected bool setEffectLayerFollowEntity = true;
+
         [SerializeField]
         protected UnityLayer effectLayer;
         public int EffectLayer

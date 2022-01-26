@@ -48,6 +48,10 @@ namespace MultiplayerARPG
             set { equipmentContainers = value; }
         }
 
+        [Header("Equipment Layer Settings")]
+        [SerializeField]
+        protected bool setEquipmentLayerFollowEntity = true;
+
         [SerializeField]
         protected UnityLayer equipmentLayer;
         public int EquipmentLayer
@@ -55,12 +59,6 @@ namespace MultiplayerARPG
             get { return equipmentLayer.LayerIndex; }
             set { equipmentLayer = new UnityLayer(value); }
         }
-
-        [Header("Layer Settings")]
-        [SerializeField]
-        protected bool setEffectLayerFollowEntity = true;
-        [SerializeField]
-        protected bool setEquipmentLayerFollowEntity = true;
 
 #if UNITY_EDITOR
         [InspectorButton(nameof(SetEquipmentContainersBySetters))]
@@ -166,11 +164,6 @@ namespace MultiplayerARPG
                 if (equipmentContainer.transform != null && !CacheEquipmentModelContainers.ContainsKey(equipmentContainer.equipSocket))
                     CacheEquipmentModelContainers[equipmentContainer.equipSocket] = equipmentContainer;
             }
-        }
-
-        IEnumerator SetLayers()
-        {
-            yield return new WaitForEndOfFrame();
         }
 
         internal virtual void CopyCacheDataTo(
