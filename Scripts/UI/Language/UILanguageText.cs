@@ -9,30 +9,18 @@ namespace MultiplayerARPG
         public string dataKey;
         [TextArea(1, 10)]
         public string defaultText;
-
-        private Text unityText;
-        public Text UnityText
-        {
-            get
-            {
-                if (unityText == null)
-                    unityText = GetComponent<Text>();
-                return unityText;
-            }
-        }
-
-        private TextMeshProUGUI textMeshText;
-        public TextMeshProUGUI TextMeshText
-        {
-            get
-            {
-                if (textMeshText == null)
-                    textMeshText = GetComponent<TextMeshProUGUI>();
-                return textMeshText;
-            }
-        }
+        public Text unityText;
+        public TextMeshProUGUI textMeshText;
 
         private string languageKey;
+
+        private void Awake()
+        {
+            if (unityText == null)
+                unityText = GetComponent<Text>();
+            if (textMeshText == null)
+                textMeshText = GetComponent<TextMeshProUGUI>();
+        }
 
         private void Update()
         {
@@ -41,13 +29,17 @@ namespace MultiplayerARPG
                 string text = "";
                 if (LanguageManager.Texts.TryGetValue(dataKey, out text))
                 {
-                    UnityText.text = text;
-                    TextMeshText.text = text;
+                    if (unityText != null)
+                        unityText.text = text;
+                    if (textMeshText != null)
+                        textMeshText.text = text;
                 }
                 else
                 {
-                    UnityText.text = defaultText;
-                    TextMeshText.text = defaultText;
+                    if (unityText != null)
+                        unityText.text = defaultText;
+                    if (textMeshText != null)
+                        textMeshText.text = defaultText;
                 }
                 languageKey = LanguageManager.CurrentLanguageKey;
             }
@@ -55,8 +47,10 @@ namespace MultiplayerARPG
 
         void OnValidate()
         {
-            UnityText.text = defaultText;
-            TextMeshText.text = defaultText;
+            if (unityText != null)
+                unityText.text = defaultText;
+            if (textMeshText != null)
+                textMeshText.text = defaultText;
         }
     }
 }
