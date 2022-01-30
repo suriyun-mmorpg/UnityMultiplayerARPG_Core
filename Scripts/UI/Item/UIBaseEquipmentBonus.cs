@@ -179,7 +179,7 @@ namespace MultiplayerARPG
             // Rate stats
             generateTextData = new CharacterStatsTextGenerateData()
             {
-                data = equipmentBonus.stats,
+                data = equipmentBonus.statsRate,
                 isRate = true,
                 isBonus = true,
                 hpStatsFormat = formatKeyHpRateStats,
