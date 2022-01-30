@@ -287,36 +287,39 @@ namespace MultiplayerARPG
                     playerCharacterEntity.UserLevel = 1;
             }
 
-            // Summon saved summons
-            for (int i = 0; i < playerCharacterEntity.Summons.Count; ++i)
-            {
-                CharacterSummon summon = playerCharacterEntity.Summons[i];
-                summon.Summon(playerCharacterEntity, summon.Level, summon.summonRemainsDuration, summon.Exp, summon.CurrentHp, summon.CurrentMp);
-                for (int j = 0; j < summonBuffs.Count; ++j)
-                {
-                    if (summonBuffs[j].id.StartsWith(i.ToString()))
-                    {
-                        summon.CacheEntity.Buffs.Add(summonBuffs[j]);
-                        summonBuffs.RemoveAt(j);
-                        j--;
-                    }
-                }
-                playerCharacterEntity.Summons[i] = summon;
-            }
-
-            // Summon saved mount entity
-            if (GameInstance.VehicleEntities.ContainsKey(playerCharacterData.MountDataId))
-                playerCharacterEntity.Mount(GameInstance.VehicleEntities[playerCharacterData.MountDataId]);
-
             // Force make caches, to calculate current stats to fill empty slots items
             playerCharacterEntity.ForceMakeCaches();
             playerCharacterEntity.FillEmptySlots();
 
             // Notify clients that this character is spawn or dead
             if (!playerCharacterEntity.IsDead())
+            {
+                // Summon saved summons
+                for (int i = 0; i < playerCharacterEntity.Summons.Count; ++i)
+                {
+                    CharacterSummon summon = playerCharacterEntity.Summons[i];
+                    summon.Summon(playerCharacterEntity, summon.Level, summon.summonRemainsDuration, summon.Exp, summon.CurrentHp, summon.CurrentMp);
+                    for (int j = 0; j < summonBuffs.Count; ++j)
+                    {
+                        if (summonBuffs[j].id.StartsWith(i.ToString()))
+                        {
+                            summon.CacheEntity.Buffs.Add(summonBuffs[j]);
+                            summonBuffs.RemoveAt(j);
+                            j--;
+                        }
+                    }
+                    playerCharacterEntity.Summons[i] = summon;
+                }
+
+                // Summon saved mount entity
+                if (GameInstance.VehicleEntities.ContainsKey(playerCharacterData.MountDataId))
+                    playerCharacterEntity.Mount(GameInstance.VehicleEntities[playerCharacterData.MountDataId]);
                 playerCharacterEntity.CallAllOnRespawn();
+            }
             else
+            {
                 playerCharacterEntity.CallAllOnDead();
+            }
 
             // Register player, will use registered player to send chat / player messages
             RegisterPlayerCharacter(connectionId, playerCharacterEntity);
