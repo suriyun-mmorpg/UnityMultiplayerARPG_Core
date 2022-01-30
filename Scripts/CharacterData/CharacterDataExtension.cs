@@ -2004,6 +2004,8 @@ namespace MultiplayerARPG
             {
                 return false;
             }
+            skill = item.UsingSkill;
+            skillLevel = item.UsingSkillLevel;
 
             return true;
         }

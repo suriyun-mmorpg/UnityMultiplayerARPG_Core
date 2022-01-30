@@ -514,9 +514,13 @@ namespace MultiplayerARPG
 
             // Tell the server to use skill
             if (!IsServer)
+            {
                 CallServerUseSkill(simulateSeed, dataId, isLeftHand, targetObjectId, aimPosition);
+            }
             else if (IsOwnerClientOrOwnedByServer)
+            {
                 CallAllPlayUseSkillAnimation(simulateSeed, isLeftHand, skill.DataId, skillLevel, targetObjectId, aimPosition);
+            }
         }
 
         public void UseSkillItem(short itemIndex, bool isLeftHand, uint targetObjectId, AimPosition aimPosition)
@@ -538,9 +542,19 @@ namespace MultiplayerARPG
 
             // Tell the server to use skill item
             if (!IsServer)
+            {
                 CallServerUseSkillItem(simulateSeed, itemIndex, isLeftHand, targetObjectId, aimPosition);
+            }
             else if (IsOwnerClientOrOwnedByServer)
+            {
+                // Decrease item immediately
+                if (!Entity.DecreaseItemsByIndex(itemIndex, 1))
+                {
+                    return;
+                }
+                Entity.FillEmptySlots();
                 CallAllPlayUseSkillAnimation(simulateSeed, isLeftHand, skill.DataId, skillLevel, targetObjectId, aimPosition);
+            }
         }
     }
 }
