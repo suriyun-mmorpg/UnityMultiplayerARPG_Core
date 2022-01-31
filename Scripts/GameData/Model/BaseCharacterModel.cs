@@ -74,12 +74,14 @@ namespace MultiplayerARPG
         /// <summary>
         /// { vehicleType(Int32), vehicleCharacterModel(VehicleCharacterModel) }
         /// </summary>
-        public Dictionary<int, VehicleCharacterModel> CacheVehicleModels { get; private set; }
+        protected Dictionary<int, VehicleCharacterModel> cacheVehicleModels;
+        public Dictionary<int, VehicleCharacterModel> CacheVehicleModels { get { return MainModel.cacheVehicleModels; } }
 
         /// <summary>
         /// { equipSocket(String), container(EquipmentModelContainer) }
         /// </summary>
-        public Dictionary<string, EquipmentContainer> CacheEquipmentModelContainers { get; private set; }
+        protected Dictionary<string, EquipmentContainer> cacheEquipmentModelContainers;
+        public Dictionary<string, EquipmentContainer> CacheEquipmentModelContainers { get { return MainModel.cacheEquipmentModelContainers; } }
 
         /// <summary>
         /// { equipPosition(String), { equipSocket(String), model(GameObject) } }
@@ -140,29 +142,35 @@ namespace MultiplayerARPG
             if (setEquipmentLayerFollowEntity && CacheEntity != null)
                 EquipmentLayer = CacheEntity.gameObject.layer;
 
-            // Cache vehicle models 
-            CacheVehicleModels = new Dictionary<int, VehicleCharacterModel>();
-            if (IsMainModel && vehicleModels != null && vehicleModels.Length > 0)
+            if (IsMainModel)
             {
-                foreach (VehicleCharacterModel vehicleModel in vehicleModels)
+                // Cache vehicle models 
+                cacheVehicleModels = new Dictionary<int, VehicleCharacterModel>();
+                if (vehicleModels != null && vehicleModels.Length > 0)
                 {
-                    if (!vehicleModel.vehicleType) continue;
-                    for (int i = 0; i < vehicleModel.modelsForEachSeats.Length; ++i)
+                    foreach (VehicleCharacterModel vehicleModel in vehicleModels)
                     {
-                        vehicleModel.modelsForEachSeats[i].MainModel = this;
-                        vehicleModel.modelsForEachSeats[i].IsTpsModel = IsTpsModel;
-                        vehicleModel.modelsForEachSeats[i].IsFpsModel = IsFpsModel;
+                        if (!vehicleModel.vehicleType) continue;
+                        for (int i = 0; i < vehicleModel.modelsForEachSeats.Length; ++i)
+                        {
+                            vehicleModel.modelsForEachSeats[i].MainModel = this;
+                            vehicleModel.modelsForEachSeats[i].IsTpsModel = IsTpsModel;
+                            vehicleModel.modelsForEachSeats[i].IsFpsModel = IsFpsModel;
+                        }
+                        cacheVehicleModels[vehicleModel.vehicleType.DataId] = vehicleModel;
                     }
-                    CacheVehicleModels[vehicleModel.vehicleType.DataId] = vehicleModel;
                 }
-            }
 
-            // Cache equipment model containers
-            CacheEquipmentModelContainers = new Dictionary<string, EquipmentContainer>();
-            foreach (EquipmentContainer equipmentContainer in equipmentContainers)
-            {
-                if (equipmentContainer.transform != null && !CacheEquipmentModelContainers.ContainsKey(equipmentContainer.equipSocket))
-                    CacheEquipmentModelContainers[equipmentContainer.equipSocket] = equipmentContainer;
+                // Cache equipment model containers
+                cacheEquipmentModelContainers = new Dictionary<string, EquipmentContainer>();
+                if (equipmentContainers != null && equipmentContainers.Length > 0)
+                {
+                    foreach (EquipmentContainer equipmentContainer in equipmentContainers)
+                    {
+                        if (equipmentContainer.transform != null && !cacheEquipmentModelContainers.ContainsKey(equipmentContainer.equipSocket))
+                            cacheEquipmentModelContainers[equipmentContainer.equipSocket] = equipmentContainer;
+                    }
+                }
             }
         }
 
