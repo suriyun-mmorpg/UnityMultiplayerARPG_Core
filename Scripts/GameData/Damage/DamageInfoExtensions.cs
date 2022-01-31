@@ -6,6 +6,14 @@ namespace MultiplayerARPG
     {
         public static void GetDamagePositionAndRotation(this IDamageInfo damageInfo, BaseCharacterEntity attacker, bool isLeftHand, AimPosition aimPosition, Vector3 stagger, out Vector3 position, out Vector3 direction, out Quaternion rotation)
         {
+            if (GameInstance.Singleton.DimensionType == DimensionType.Dimension2D)
+            {
+                Transform damageTransform = damageInfo.GetDamageTransform(attacker, isLeftHand);
+                position = damageTransform.position;
+                GetDamageRotation2D(attacker.Direction2D, out rotation);
+                direction = attacker.Direction2D;
+                return;
+            }
             if (aimPosition.type == AimPositionType.Direction)
             {
                 position = aimPosition.position;
@@ -17,16 +25,8 @@ namespace MultiplayerARPG
                 // NOTE: Allow aim position type `None` here, may change it later
                 Transform damageTransform = damageInfo.GetDamageTransform(attacker, isLeftHand);
                 position = damageTransform.position;
-                if (GameInstance.Singleton.DimensionType == DimensionType.Dimension2D)
-                {
-                    GetDamageRotation2D(attacker.Direction2D, out rotation);
-                    direction = attacker.Direction2D;
-                }
-                else
-                {
-                    GetDamageRotation3D(position, aimPosition.position, stagger, out rotation);
-                    direction = rotation * Vector3.forward;
-                }
+                GetDamageRotation3D(position, aimPosition.position, stagger, out rotation);
+                direction = rotation * Vector3.forward;
             }
         }
 
