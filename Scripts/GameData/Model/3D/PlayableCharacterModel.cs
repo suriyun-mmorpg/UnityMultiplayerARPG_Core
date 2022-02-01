@@ -305,7 +305,7 @@ namespace MultiplayerARPG.GameData.Model.Playables
         {
             isDoingAction = true;
             ActionAnimation tempActionAnimation = GetActionAnimation(animActionType, dataId, index);
-            AudioManager.PlaySfxClipAtAudioSource(tempActionAnimation.GetRandomAudioClip(), genericAudioSource);
+            AudioManager.PlaySfxClipAtAudioSource(tempActionAnimation.GetRandomAudioClip(), GenericAudioSource);
             bool hasClip = tempActionAnimation.state.clip != null;
             if (hasClip)
                 Behaviour.PlayAction(tempActionAnimation.state, playSpeedMultiplier);

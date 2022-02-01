@@ -63,6 +63,7 @@ namespace MultiplayerARPG
             MainTpsModel.MainModel = MainTpsModel;
             MainTpsModel.IsTpsModel = true;
             MainTpsModel.IsFpsModel = false;
+            MainTpsModel.InitCacheData();
             SwitchTpsModel(MainTpsModel);
         }
 
@@ -200,6 +201,7 @@ namespace MultiplayerARPG
             MainFpsModel.MainModel = MainFpsModel;
             MainFpsModel.IsFpsModel = true;
             MainFpsModel.IsTpsModel = false;
+            MainFpsModel.InitCacheData();
             MainFpsModel.transform.localPosition = fpsModelPositionOffsets;
             MainFpsModel.transform.localRotation = Quaternion.Euler(fpsModelRotationOffsets);
             MainFpsModel.SetEquipItems(MainTpsModel.equipItems);

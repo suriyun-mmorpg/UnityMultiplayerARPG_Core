@@ -374,7 +374,7 @@ namespace MultiplayerARPG
             CacheAnimatorController[CLIP_ACTION_UP_LEFT] = animation2D.upLeft;
             CacheAnimatorController[CLIP_ACTION_UP_RIGHT] = animation2D.upRight;
             AnimationClip clip = animation2D.GetClipByDirection(DirectionType2D);
-            AudioManager.PlaySfxClipAtAudioSource(animation2D.GetRandomAudioClip(), genericAudioSource);
+            AudioManager.PlaySfxClipAtAudioSource(animation2D.GetRandomAudioClip(), GenericAudioSource);
             animator.SetFloat(ANIM_ACTION_CLIP_MULTIPLIER, playSpeedMultiplier);
             animator.SetBool(ANIM_DO_ACTION, true);
             animator.Play(actionStateNameHash, 0, 0f);

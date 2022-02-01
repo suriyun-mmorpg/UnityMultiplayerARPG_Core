@@ -16,7 +16,7 @@ namespace MultiplayerARPG
 
         [Header("Model Switching Settings")]
         [SerializeField]
-        protected GameObject[] activateObjectsWhenSwitchModel = new GameObject[0];
+        private GameObject[] activateObjectsWhenSwitchModel = new GameObject[0];
         public GameObject[] ActivateObjectsWhenSwitchModel
         {
             get { return activateObjectsWhenSwitchModel; }
@@ -24,7 +24,7 @@ namespace MultiplayerARPG
         }
 
         [SerializeField]
-        protected GameObject[] deactivateObjectsWhenSwitchModel = new GameObject[0];
+        private GameObject[] deactivateObjectsWhenSwitchModel = new GameObject[0];
         public GameObject[] DeactivateObjectsWhenSwitchModel
         {
             get { return deactivateObjectsWhenSwitchModel; }
@@ -32,7 +32,7 @@ namespace MultiplayerARPG
         }
 
         [SerializeField]
-        protected VehicleCharacterModel[] vehicleModels = new VehicleCharacterModel[0];
+        private VehicleCharacterModel[] vehicleModels = new VehicleCharacterModel[0];
         public VehicleCharacterModel[] VehicleModels
         {
             get { return vehicleModels; }
@@ -41,7 +41,7 @@ namespace MultiplayerARPG
 
         [Header("Equipment Containers")]
         [SerializeField]
-        protected EquipmentContainer[] equipmentContainers = new EquipmentContainer[0];
+        private EquipmentContainer[] equipmentContainers = new EquipmentContainer[0];
         public EquipmentContainer[] EquipmentContainers
         {
             get { return equipmentContainers; }
@@ -71,38 +71,80 @@ namespace MultiplayerARPG
 
         public CharacterModelManager Manager { get; private set; }
 
+        public override Dictionary<string, EffectContainer> CacheEffectContainers
+        {
+            get { return IsMainModel ? base.CacheEffectContainers : MainModel.CacheEffectContainers; }
+        }
+
+        private Dictionary<int, VehicleCharacterModel> cacheVehicleModels;
         /// <summary>
         /// { vehicleType(Int32), vehicleCharacterModel(VehicleCharacterModel) }
         /// </summary>
-        protected Dictionary<int, VehicleCharacterModel> cacheVehicleModels;
-        public Dictionary<int, VehicleCharacterModel> CacheVehicleModels { get { return MainModel.cacheVehicleModels; } }
+        public Dictionary<int, VehicleCharacterModel> CacheVehicleModels
+        {
+            get { return IsMainModel ? cacheVehicleModels : MainModel.cacheVehicleModels; }
+        }
 
+        private Dictionary<string, EquipmentContainer> cacheEquipmentModelContainers;
         /// <summary>
         /// { equipSocket(String), container(EquipmentModelContainer) }
         /// </summary>
-        protected Dictionary<string, EquipmentContainer> cacheEquipmentModelContainers;
-        public Dictionary<string, EquipmentContainer> CacheEquipmentModelContainers { get { return MainModel.cacheEquipmentModelContainers; } }
+        public Dictionary<string, EquipmentContainer> CacheEquipmentModelContainers
+        {
+            get { return IsMainModel ? cacheEquipmentModelContainers : MainModel.cacheEquipmentModelContainers; }
+        }
 
+        private Dictionary<string, Dictionary<string, GameObject>> cacheModels;
         /// <summary>
         /// { equipPosition(String), { equipSocket(String), model(GameObject) } }
         /// </summary>
-        private readonly Dictionary<string, Dictionary<string, GameObject>> cacheModels = new Dictionary<string, Dictionary<string, GameObject>>();
+        public Dictionary<string, Dictionary<string, GameObject>> CacheModels
+        {
+            get { return IsMainModel ? cacheModels : MainModel.cacheModels; }
+        }
 
+        private Dictionary<string, List<GameEffect>> cacheEffects = new Dictionary<string, List<GameEffect>>();
         /// <summary>
         /// { equipPosition(String), [ effect(GameEffect) ] }
         /// </summary>
-        private readonly Dictionary<string, List<GameEffect>> cacheEffects = new Dictionary<string, List<GameEffect>>();
+        public Dictionary<string, List<GameEffect>> CacheEffects
+        {
+            get { return IsMainModel ? cacheEffects : MainModel.cacheEffects; }
+        }
 
-        // Equipment entities that will be used to play weapon effects
-        protected BaseEquipmentEntity rightHandEquipmentEntity;
-        protected BaseEquipmentEntity leftHandEquipmentEntity;
-        protected readonly Dictionary<string, List<BaseEquipmentEntity>> equipmentEntities = new Dictionary<string, List<BaseEquipmentEntity>>();
+        private BaseEquipmentEntity cacheRightHandEquipmentEntity;
+        public BaseEquipmentEntity CacheRightHandEquipmentEntity
+        {
+            get { return IsMainModel ? cacheRightHandEquipmentEntity : MainModel.cacheRightHandEquipmentEntity; }
+            set { MainModel.cacheRightHandEquipmentEntity = value; }
+        }
 
-        // Item Ids
+        private BaseEquipmentEntity cacheLeftHandEquipmentEntity;
+        public BaseEquipmentEntity CacheLeftHandEquipmentEntity
+        {
+            get { return IsMainModel ? cacheLeftHandEquipmentEntity : MainModel.cacheLeftHandEquipmentEntity; }
+            set { MainModel.cacheLeftHandEquipmentEntity = value; }
+        }
+
+        private Dictionary<string, List<BaseEquipmentEntity>> cacheEquipmentEntities;
+        /// <summary>
+        /// { equipPosition(String), [ equipmentEntity(BaseEquipmentEntity) ] }
+        /// </summary>
+        public Dictionary<string, List<BaseEquipmentEntity>> CacheEquipmentEntities
+        {
+            get { return IsMainModel ? cacheEquipmentEntities : MainModel.cacheEquipmentEntities; }
+        }
+
         /// <summary>
         /// { equipPosition(String), itemDataId(Int32) }
         /// </summary>
-        protected readonly Dictionary<string, int> itemIds = new Dictionary<string, int>();
+        private Dictionary<string, int> cacheItemIds;
+        public Dictionary<string, int> CacheItemIds
+        {
+            get { return IsMainModel ? cacheItemIds : MainModel.cacheItemIds; }
+        }
+
+        private bool isCacheDataInitialized = false;
 
         // Protected fields
         public EquipWeapons equipWeapons { get; protected set; }
@@ -143,67 +185,45 @@ namespace MultiplayerARPG
                 EquipmentLayer = CacheEntity.gameObject.layer;
 
             if (IsMainModel)
-            {
-                // Cache vehicle models 
-                cacheVehicleModels = new Dictionary<int, VehicleCharacterModel>();
-                if (vehicleModels != null && vehicleModels.Length > 0)
-                {
-                    foreach (VehicleCharacterModel vehicleModel in vehicleModels)
-                    {
-                        if (!vehicleModel.vehicleType) continue;
-                        for (int i = 0; i < vehicleModel.modelsForEachSeats.Length; ++i)
-                        {
-                            vehicleModel.modelsForEachSeats[i].MainModel = this;
-                            vehicleModel.modelsForEachSeats[i].IsTpsModel = IsTpsModel;
-                            vehicleModel.modelsForEachSeats[i].IsFpsModel = IsFpsModel;
-                        }
-                        cacheVehicleModels[vehicleModel.vehicleType.DataId] = vehicleModel;
-                    }
-                }
-
-                // Cache equipment model containers
-                cacheEquipmentModelContainers = new Dictionary<string, EquipmentContainer>();
-                if (equipmentContainers != null && equipmentContainers.Length > 0)
-                {
-                    foreach (EquipmentContainer equipmentContainer in equipmentContainers)
-                    {
-                        if (equipmentContainer.transform != null && !cacheEquipmentModelContainers.ContainsKey(equipmentContainer.equipSocket))
-                            cacheEquipmentModelContainers[equipmentContainer.equipSocket] = equipmentContainer;
-                    }
-                }
-            }
+                InitCacheData();
         }
 
-        internal virtual void CopyCacheDataTo(
-            Dictionary<string, Dictionary<string, GameObject>> destModels,
-            Dictionary<string, List<GameEffect>> destEffects,
-            ref BaseEquipmentEntity destRightHandEquipmentEntity,
-            ref BaseEquipmentEntity destLeftHandEquipmentEntity,
-            Dictionary<string, List<BaseEquipmentEntity>> destEquipmentEntities,
-            Dictionary<string, int> destItemIds)
+        public void InitCacheData()
         {
-            destModels.Clear();
-            foreach (var entry in cacheModels)
+            if (isCacheDataInitialized)
+                return;
+            isCacheDataInitialized = true;
+
+            cacheVehicleModels = new Dictionary<int, VehicleCharacterModel>();
+            if (vehicleModels != null && vehicleModels.Length > 0)
             {
-                destModels.Add(entry.Key, entry.Value);
+                foreach (VehicleCharacterModel vehicleModel in vehicleModels)
+                {
+                    if (!vehicleModel.vehicleType) continue;
+                    for (int i = 0; i < vehicleModel.modelsForEachSeats.Length; ++i)
+                    {
+                        vehicleModel.modelsForEachSeats[i].MainModel = this;
+                        vehicleModel.modelsForEachSeats[i].IsTpsModel = IsTpsModel;
+                        vehicleModel.modelsForEachSeats[i].IsFpsModel = IsFpsModel;
+                    }
+                    cacheVehicleModels[vehicleModel.vehicleType.DataId] = vehicleModel;
+                }
             }
-            destEffects.Clear();
-            foreach (var entry in cacheEffects)
+
+            cacheEquipmentModelContainers = new Dictionary<string, EquipmentContainer>();
+            if (equipmentContainers != null && equipmentContainers.Length > 0)
             {
-                destEffects.Add(entry.Key, entry.Value);
+                foreach (EquipmentContainer equipmentContainer in equipmentContainers)
+                {
+                    if (equipmentContainer.transform != null && !cacheEquipmentModelContainers.ContainsKey(equipmentContainer.equipSocket))
+                        cacheEquipmentModelContainers[equipmentContainer.equipSocket] = equipmentContainer;
+                }
             }
-            destRightHandEquipmentEntity = rightHandEquipmentEntity;
-            destLeftHandEquipmentEntity = leftHandEquipmentEntity;
-            destEquipmentEntities.Clear();
-            foreach (var entry in equipmentEntities)
-            {
-                destEquipmentEntities.Add(entry.Key, entry.Value);
-            }
-            destItemIds.Clear();
-            foreach (var entry in itemIds)
-            {
-                destItemIds.Add(entry.Key, entry.Value);
-            }
+
+            cacheModels = new Dictionary<string, Dictionary<string, GameObject>>();
+            cacheEffects = new Dictionary<string, List<GameEffect>>();
+            cacheEquipmentEntities = new Dictionary<string, List<BaseEquipmentEntity>>();
+            cacheItemIds = new Dictionary<string, int>();
         }
 
         private void UpdateObjectsWhenSwitch()
@@ -252,26 +272,10 @@ namespace MultiplayerARPG
 
         internal virtual void SwitchModel(BaseCharacterModel previousModel)
         {
-            if (!IsMainModel)
-            {
-                // Sub-model will use some data same as main model
-                hiddingObjects = MainModel.hiddingObjects;
-                hiddingRenderers = MainModel.hiddingRenderers;
-                effectContainers = MainModel.effectContainers;
-                equipmentContainers = MainModel.equipmentContainers;
-            }
-
             if (previousModel != null)
             {
                 previousModel.OnSwitchingToAnotherModel();
                 previousModel.RevertObjectsWhenSwitch();
-                previousModel.CopyCacheDataTo(
-                    cacheModels,
-                    cacheEffects,
-                    ref rightHandEquipmentEntity,
-                    ref leftHandEquipmentEntity,
-                    equipmentEntities,
-                    itemIds);
                 SetIsDead(previousModel.isDead);
                 SetDefaultAnimations();
                 SetEquipWeapons(previousModel.equipWeapons);
@@ -339,12 +343,12 @@ namespace MultiplayerARPG
         [ContextMenu("Deactivate Instantiated Objects", false, 1000302)]
         public void DeactivateInstantiatedObjects()
         {
-            if (equipmentContainers != null && equipmentContainers.Length > 0)
+            if (EquipmentContainers != null && EquipmentContainers.Length > 0)
             {
-                for (int i = 0; i < equipmentContainers.Length; ++i)
+                for (int i = 0; i < EquipmentContainers.Length; ++i)
                 {
-                    equipmentContainers[i].DeactivateInstantiatedObjects();
-                    equipmentContainers[i].SetActiveDefaultModel(true);
+                    EquipmentContainers[i].DeactivateInstantiatedObjects();
+                    EquipmentContainers[i].SetActiveDefaultModel(true);
                 }
             }
         }
@@ -352,12 +356,12 @@ namespace MultiplayerARPG
         [ContextMenu("Activate Instantiated Object", false, 1000303)]
         public void ActivateInstantiatedObject()
         {
-            if (equipmentContainers != null && equipmentContainers.Length > 0)
+            if (EquipmentContainers != null && EquipmentContainers.Length > 0)
             {
-                for (int i = 0; i < equipmentContainers.Length; ++i)
+                for (int i = 0; i < EquipmentContainers.Length; ++i)
                 {
-                    equipmentContainers[i].SetActiveDefaultModel(false);
-                    equipmentContainers[i].ActivateInstantiatedObject(equipmentContainers[i].activatingInstantiateObjectIndex);
+                    EquipmentContainers[i].SetActiveDefaultModel(false);
+                    EquipmentContainers[i].ActivateInstantiatedObject(EquipmentContainers[i].activatingInstantiateObjectIndex);
                 }
             }
         }
@@ -369,7 +373,7 @@ namespace MultiplayerARPG
                 return;
 
             Dictionary<string, GameObject> oldModels;
-            if (cacheModels.TryGetValue(equipPosition, out oldModels) &&
+            if (CacheModels.TryGetValue(equipPosition, out oldModels) &&
                 oldModels != null)
             {
                 EquipmentContainer tempContainer;
@@ -382,17 +386,17 @@ namespace MultiplayerARPG
                     tempContainer.DeactivateInstantiatedObjects();
                     tempContainer.SetActiveDefaultModel(true);
                 }
-                cacheModels.Remove(equipPosition);
+                CacheModels.Remove(equipPosition);
             }
-            if (itemIds.ContainsKey(equipPosition))
-                itemIds.Remove(equipPosition);
+            if (CacheItemIds.ContainsKey(equipPosition))
+                CacheItemIds.Remove(equipPosition);
             if (onEquipmentModelsDestroyed != null)
                 onEquipmentModelsDestroyed.Invoke(equipPosition);
         }
 
         private void DestroyCacheModels()
         {
-            foreach (string equipPosition in cacheModels.Keys)
+            foreach (string equipPosition in CacheModels.Keys)
             {
                 DestroyCacheModel(equipPosition);
             }
@@ -413,7 +417,7 @@ namespace MultiplayerARPG
                 tempAddingKeys.Add(GameDataConst.EQUIP_POSITION_LEFT_HAND);
 
             tempCachedKeys.Clear();
-            tempCachedKeys.AddRange(cacheModels.Keys);
+            tempCachedKeys.AddRange(CacheModels.Keys);
             foreach (string equipPosition in tempCachedKeys)
             {
                 // Destroy cache model by the position which not existed in new equipment position (unequipped items)
@@ -423,12 +427,22 @@ namespace MultiplayerARPG
                     DestroyCacheModel(equipPosition);
             }
 
+            BaseEquipmentEntity baseEquipmentEntity;
             if (rightHandItem != null && rightHandItem.IsWeapon())
-                InstantiateEquipModel(GameDataConst.EQUIP_POSITION_RIGHT_HAND, rightHandItem.DataId, equipWeapons.rightHand.level, rightHandItem.EquipmentModels, out rightHandEquipmentEntity);
+            {
+                InstantiateEquipModel(GameDataConst.EQUIP_POSITION_RIGHT_HAND, rightHandItem.DataId, equipWeapons.rightHand.level, rightHandItem.EquipmentModels, out baseEquipmentEntity);
+                CacheRightHandEquipmentEntity = baseEquipmentEntity;
+            }
             if (leftHandItem != null && leftHandItem.IsWeapon())
-                InstantiateEquipModel(GameDataConst.EQUIP_POSITION_LEFT_HAND, leftHandItem.DataId, equipWeapons.leftHand.level, (leftHandItem as IWeaponItem).OffHandEquipmentModels, out leftHandEquipmentEntity);
+            {
+                InstantiateEquipModel(GameDataConst.EQUIP_POSITION_LEFT_HAND, leftHandItem.DataId, equipWeapons.leftHand.level, (leftHandItem as IWeaponItem).OffHandEquipmentModels, out baseEquipmentEntity);
+                CacheLeftHandEquipmentEntity = baseEquipmentEntity;
+            }
             if (leftHandItem != null && leftHandItem.IsShield())
-                InstantiateEquipModel(GameDataConst.EQUIP_POSITION_LEFT_HAND, leftHandItem.DataId, equipWeapons.leftHand.level, leftHandItem.EquipmentModels, out leftHandEquipmentEntity);
+            {
+                InstantiateEquipModel(GameDataConst.EQUIP_POSITION_LEFT_HAND, leftHandItem.DataId, equipWeapons.leftHand.level, leftHandItem.EquipmentModels, out baseEquipmentEntity);
+                CacheLeftHandEquipmentEntity = baseEquipmentEntity;
+            }
         }
 
         public virtual void SetEquipItems(IList<CharacterItem> equipItems)
@@ -447,7 +461,7 @@ namespace MultiplayerARPG
             }
 
             tempCachedKeys.Clear();
-            tempCachedKeys.AddRange(cacheModels.Keys);
+            tempCachedKeys.AddRange(CacheModels.Keys);
             foreach (string equipPosition in tempCachedKeys)
             {
                 // Destroy cache model by the position which not existed in new equipment position (unequipped items)
@@ -473,8 +487,8 @@ namespace MultiplayerARPG
         {
             foundEquipmentEntity = null;
 
-            if (!equipmentEntities.ContainsKey(equipPosition))
-                equipmentEntities.Add(equipPosition, new List<BaseEquipmentEntity>());
+            if (!CacheEquipmentEntities.ContainsKey(equipPosition))
+                CacheEquipmentEntities.Add(equipPosition, new List<BaseEquipmentEntity>());
 
             // Temp variables
             int i;
@@ -482,11 +496,11 @@ namespace MultiplayerARPG
             BaseEquipmentEntity tempEquipmentEntity;
 
             // Same item Id, just change equipment level don't destroy and re-create
-            if (itemIds.ContainsKey(equipPosition) && itemIds[equipPosition] == itemDataId)
+            if (CacheItemIds.ContainsKey(equipPosition) && CacheItemIds[equipPosition] == itemDataId)
             {
-                for (i = 0; i < equipmentEntities[equipPosition].Count; ++i)
+                for (i = 0; i < CacheEquipmentEntities[equipPosition].Count; ++i)
                 {
-                    tempEquipmentEntity = equipmentEntities[equipPosition][i];
+                    tempEquipmentEntity = CacheEquipmentEntities[equipPosition][i];
                     tempEquipmentEntity.Setup(this, equipPosition, itemLevel);
                     if (foundEquipmentEntity == null)
                         foundEquipmentEntity = tempEquipmentEntity;
@@ -495,8 +509,8 @@ namespace MultiplayerARPG
             }
 
             DestroyCacheModel(equipPosition);
-            itemIds[equipPosition] = itemDataId;
-            equipmentEntities[equipPosition].Clear();
+            CacheItemIds[equipPosition] = itemDataId;
+            CacheEquipmentEntities[equipPosition].Clear();
 
             if (equipmentModels == null || equipmentModels.Length == 0)
                 return;
@@ -543,41 +557,41 @@ namespace MultiplayerARPG
                 if (tempEquipmentEntity != null)
                 {
                     tempEquipmentEntity.Setup(this, equipPosition, itemLevel);
-                    equipmentEntities[equipPosition].Add(tempEquipmentEntity);
+                    CacheEquipmentEntities[equipPosition].Add(tempEquipmentEntity);
                     if (foundEquipmentEntity == null)
                         foundEquipmentEntity = tempEquipmentEntity;
                 }
             }
             // Cache Models
-            cacheModels[equipPosition] = tempInstantiatingModels;
+            CacheModels[equipPosition] = tempInstantiatingModels;
             if (onEquipmentModelsInstantiated != null)
                 onEquipmentModelsInstantiated.Invoke(equipPosition);
         }
 
         private void CreateCacheEffect(string buffId, List<GameEffect> effects)
         {
-            if (effects == null || cacheEffects.ContainsKey(buffId))
+            if (effects == null || CacheEffects.ContainsKey(buffId))
                 return;
-            cacheEffects[buffId] = effects;
+            CacheEffects[buffId] = effects;
         }
 
         private void DestroyCacheEffect(string buffId)
         {
             List<GameEffect> oldEffects;
-            if (!string.IsNullOrEmpty(buffId) && cacheEffects.TryGetValue(buffId, out oldEffects) && oldEffects != null)
+            if (!string.IsNullOrEmpty(buffId) && CacheEffects.TryGetValue(buffId, out oldEffects) && oldEffects != null)
             {
                 foreach (GameEffect effect in oldEffects)
                 {
                     if (effect == null) continue;
                     effect.DestroyEffect();
                 }
-                cacheEffects.Remove(buffId);
+                CacheEffects.Remove(buffId);
             }
         }
 
         private void DestroyCacheEffects()
         {
-            foreach (string buffId in cacheEffects.Keys)
+            foreach (string buffId in CacheEffects.Keys)
             {
                 DestroyCacheEffect(buffId);
             }
@@ -588,7 +602,7 @@ namespace MultiplayerARPG
             this.buffs = buffs;
             // Temp old keys
             tempCachedKeys.Clear();
-            tempCachedKeys.AddRange(cacheEffects.Keys);
+            tempCachedKeys.AddRange(CacheEffects.Keys);
             // Prepare data
             tempAddingKeys.Clear();
             // Loop new buffs to prepare adding keys
@@ -714,57 +728,57 @@ namespace MultiplayerARPG
 
         public List<BaseEquipmentEntity> GetEquipmentEntities(string equipPosition)
         {
-            if (!equipmentEntities.ContainsKey(equipPosition))
-                equipmentEntities.Add(equipPosition, new List<BaseEquipmentEntity>());
-            return equipmentEntities[equipPosition];
+            if (!CacheEquipmentEntities.ContainsKey(equipPosition))
+                CacheEquipmentEntities.Add(equipPosition, new List<BaseEquipmentEntity>());
+            return CacheEquipmentEntities[equipPosition];
         }
 
         public BaseEquipmentEntity GetRightHandEquipmentEntity()
         {
-            return rightHandEquipmentEntity;
+            return CacheRightHandEquipmentEntity;
         }
 
         public BaseEquipmentEntity GetLeftHandEquipmentEntity()
         {
-            return leftHandEquipmentEntity;
+            return CacheLeftHandEquipmentEntity;
         }
 
         public Transform GetRightHandMissileDamageTransform()
         {
-            if (rightHandEquipmentEntity != null)
-                return rightHandEquipmentEntity.missileDamageTransform;
+            if (CacheRightHandEquipmentEntity != null)
+                return CacheRightHandEquipmentEntity.missileDamageTransform;
             return null;
         }
 
         public Transform GetLeftHandMissileDamageTransform()
         {
-            if (leftHandEquipmentEntity != null)
-                return leftHandEquipmentEntity.missileDamageTransform;
+            if (CacheLeftHandEquipmentEntity != null)
+                return CacheLeftHandEquipmentEntity.missileDamageTransform;
             return null;
         }
 
         public void PlayEquippedWeaponLaunch(bool isLeftHand)
         {
-            if (!isLeftHand && rightHandEquipmentEntity != null)
-                rightHandEquipmentEntity.PlayLaunch();
-            if (isLeftHand && leftHandEquipmentEntity != null)
-                leftHandEquipmentEntity.PlayLaunch();
+            if (!isLeftHand && CacheRightHandEquipmentEntity != null)
+                CacheRightHandEquipmentEntity.PlayLaunch();
+            if (isLeftHand && CacheLeftHandEquipmentEntity != null)
+                CacheLeftHandEquipmentEntity.PlayLaunch();
         }
 
         public void PlayEquippedWeaponReload(bool isLeftHand)
         {
-            if (!isLeftHand && rightHandEquipmentEntity != null)
-                rightHandEquipmentEntity.PlayReload();
-            if (isLeftHand && leftHandEquipmentEntity != null)
-                leftHandEquipmentEntity.PlayReload();
+            if (!isLeftHand && CacheRightHandEquipmentEntity != null)
+                CacheRightHandEquipmentEntity.PlayReload();
+            if (isLeftHand && CacheLeftHandEquipmentEntity != null)
+                CacheLeftHandEquipmentEntity.PlayReload();
         }
 
         public void PlayEquippedWeaponCharge(bool isLeftHand)
         {
-            if (!isLeftHand && rightHandEquipmentEntity != null)
-                rightHandEquipmentEntity.PlayCharge();
-            if (isLeftHand && leftHandEquipmentEntity != null)
-                leftHandEquipmentEntity.PlayCharge();
+            if (!isLeftHand && CacheRightHandEquipmentEntity != null)
+                CacheRightHandEquipmentEntity.PlayCharge();
+            if (isLeftHand && CacheLeftHandEquipmentEntity != null)
+                CacheLeftHandEquipmentEntity.PlayCharge();
         }
 
         public virtual void AddingNewModel(GameObject newModel, EquipmentContainer equipmentContainer) { }

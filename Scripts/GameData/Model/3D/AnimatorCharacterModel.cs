@@ -730,7 +730,7 @@ namespace MultiplayerARPG
         {
             isDoingAction = true;
             ActionAnimation tempActionAnimation = GetActionAnimation(animActionType, dataId, index);
-            AudioManager.PlaySfxClipAtAudioSource(tempActionAnimation.GetRandomAudioClip(), genericAudioSource);
+            AudioManager.PlaySfxClipAtAudioSource(tempActionAnimation.GetRandomAudioClip(), GenericAudioSource);
             bool hasClip = tempActionAnimation.clip != null && animator.isActiveAndEnabled;
             if (hasClip)
             {
@@ -1750,15 +1750,15 @@ namespace MultiplayerARPG
             model.defaultAnimations = ConvertToPlayableDefaultAnimations(defaultAnimations, oldLeftHandAttackAnims, newLeftHandAttackAnims, oldRightHandAttackAnims, newRightHandAttackAnims);
 
             // Set objects and containers
-            model.HiddingObjects = hiddingObjects;
-            model.HiddingRenderers = hiddingRenderers;
-            model.FpsHiddingObjects = fpsHiddingObjects;
-            model.FpsHiddingRenderers = fpsHiddingRenderers;
-            model.EffectContainers = effectContainers;
-            model.EquipmentContainers = equipmentContainers;
-            model.ActivateObjectsWhenSwitchModel = activateObjectsWhenSwitchModel;
-            model.DeactivateObjectsWhenSwitchModel = deactivateObjectsWhenSwitchModel;
-            model.VehicleModels = vehicleModels;
+            model.HiddingObjects = HiddingObjects;
+            model.HiddingRenderers = HiddingRenderers;
+            model.FpsHiddingObjects = FpsHiddingObjects;
+            model.FpsHiddingRenderers = FpsHiddingRenderers;
+            model.EffectContainers = EffectContainers;
+            model.EquipmentContainers = EquipmentContainers;
+            model.ActivateObjectsWhenSwitchModel = ActivateObjectsWhenSwitchModel;
+            model.DeactivateObjectsWhenSwitchModel = DeactivateObjectsWhenSwitchModel;
+            model.VehicleModels = VehicleModels;
 
             // Set model to manager
             CharacterModelManager manager = GetComponent<CharacterModelManager>();

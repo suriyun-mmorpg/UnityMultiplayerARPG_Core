@@ -49,7 +49,7 @@ namespace MultiplayerARPG
 
         [Tooltip("Materials which will be applied while entity is visible")]
         [SerializeField]
-        protected MaterialCollection[] visibleMaterials;
+        private MaterialCollection[] visibleMaterials;
         public MaterialCollection[] VisibleMaterials
         {
             get { return visibleMaterials; }
@@ -58,8 +58,8 @@ namespace MultiplayerARPG
 
         [Tooltip("Materials which will be applied while entity is invisible")]
         [SerializeField]
-        protected MaterialCollection[] invisibleMaterials;
-        public MaterialCollection[] InvisibleMaterials
+        private MaterialCollection[] invisibleMaterials;
+        public virtual MaterialCollection[] InvisibleMaterials
         {
             get { return invisibleMaterials; }
             set { invisibleMaterials = value; }
@@ -67,7 +67,7 @@ namespace MultiplayerARPG
 
         [Tooltip("Materials which will be applied while view mode is FPS")]
         [SerializeField]
-        protected MaterialCollection[] fpsMaterials;
+        private MaterialCollection[] fpsMaterials;
         public MaterialCollection[] FpsMaterials
         {
             get { return fpsMaterials; }
@@ -76,7 +76,7 @@ namespace MultiplayerARPG
 
         [Tooltip("These objects will be deactivated while entity is invisible")]
         [SerializeField]
-        protected GameObject[] hiddingObjects;
+        private GameObject[] hiddingObjects;
         public GameObject[] HiddingObjects
         {
             get { return hiddingObjects; }
@@ -85,7 +85,7 @@ namespace MultiplayerARPG
 
         [Tooltip("These renderers will be disabled while entity is invisible")]
         [SerializeField]
-        protected Renderer[] hiddingRenderers;
+        private Renderer[] hiddingRenderers;
         public Renderer[] HiddingRenderers
         {
             get { return hiddingRenderers; }
@@ -94,7 +94,7 @@ namespace MultiplayerARPG
 
         [Tooltip("These object will be deactivated while view mode is FPS")]
         [SerializeField]
-        protected GameObject[] fpsHiddingObjects;
+        private GameObject[] fpsHiddingObjects;
         public GameObject[] FpsHiddingObjects
         {
             get { return fpsHiddingObjects; }
@@ -103,7 +103,7 @@ namespace MultiplayerARPG
 
         [Tooltip("These renderers will be disabled while view mode is FPS")]
         [SerializeField]
-        protected Renderer[] fpsHiddingRenderers;
+        private Renderer[] fpsHiddingRenderers;
         public Renderer[] FpsHiddingRenderers
         {
             get { return fpsHiddingRenderers; }
@@ -112,7 +112,7 @@ namespace MultiplayerARPG
 
         [Tooltip("Generic audio source which will be used to play sound effects")]
         [SerializeField]
-        protected AudioSource genericAudioSource;
+        private AudioSource genericAudioSource;
         public AudioSource GenericAudioSource
         {
             get { return genericAudioSource; }
@@ -120,8 +120,8 @@ namespace MultiplayerARPG
 
         [Header("Effect Containers")]
         [SerializeField]
-        protected EffectContainer[] effectContainers;
-        public EffectContainer[] EffectContainers
+        private EffectContainer[] effectContainers;
+        public virtual EffectContainer[] EffectContainers
         {
             get { return effectContainers; }
             set { effectContainers = value; }
@@ -151,21 +151,9 @@ namespace MultiplayerARPG
         /// <summary>
         /// Dictionary[effectSocket(String), container(CharacterModelContainer)]
         /// </summary>
-        public Dictionary<string, EffectContainer> CacheEffectContainers
+        public virtual Dictionary<string, EffectContainer> CacheEffectContainers
         {
-            get
-            {
-                if (cacheEffectContainers == null)
-                {
-                    cacheEffectContainers = new Dictionary<string, EffectContainer>();
-                    foreach (EffectContainer effectContainer in effectContainers)
-                    {
-                        if (effectContainer.transform != null && !cacheEffectContainers.ContainsKey(effectContainer.effectSocket))
-                            cacheEffectContainers[effectContainer.effectSocket] = effectContainer;
-                    }
-                }
-                return cacheEffectContainers;
-            }
+            get { return cacheEffectContainers; }
         }
 
         // Optimize garbage collector
@@ -194,6 +182,15 @@ namespace MultiplayerARPG
                 {
                     obj.spatialBlend = 1f;
                 });
+            }
+            cacheEffectContainers = new Dictionary<string, EffectContainer>();
+            if (effectContainers != null && effectContainers.Length > 0)
+            {
+                foreach (EffectContainer effectContainer in effectContainers)
+                {
+                    if (effectContainer.transform != null && !cacheEffectContainers.ContainsKey(effectContainer.effectSocket))
+                        cacheEffectContainers[effectContainer.effectSocket] = effectContainer;
+                }
             }
         }
 
@@ -242,21 +239,21 @@ namespace MultiplayerARPG
             {
                 case EVisibleState.Visible:
                     // Visible state is Visible, show all objects and renderers
-                    SetHiddingObjectsAndRenderers(hiddingObjects, hiddingRenderers, false);
-                    SetHiddingObjectsAndRenderers(fpsHiddingObjects, fpsHiddingRenderers, false);
-                    visibleMaterials.ApplyMaterials();
+                    SetHiddingObjectsAndRenderers(HiddingObjects, HiddingRenderers, false);
+                    SetHiddingObjectsAndRenderers(FpsHiddingObjects, FpsHiddingRenderers, false);
+                    VisibleMaterials.ApplyMaterials();
                     break;
                 case EVisibleState.Invisible:
                     // Visible state is Invisible, hide all objects and renderers
-                    SetHiddingObjectsAndRenderers(hiddingObjects, hiddingRenderers, true);
-                    SetHiddingObjectsAndRenderers(fpsHiddingObjects, fpsHiddingRenderers, true);
-                    invisibleMaterials.ApplyMaterials();
+                    SetHiddingObjectsAndRenderers(HiddingObjects, HiddingRenderers, true);
+                    SetHiddingObjectsAndRenderers(FpsHiddingObjects, FpsHiddingRenderers, true);
+                    InvisibleMaterials.ApplyMaterials();
                     break;
                 case EVisibleState.Fps:
                     // Visible state is Fps, hide Fps objects and renderers
-                    SetHiddingObjectsAndRenderers(hiddingObjects, hiddingRenderers, false);
-                    SetHiddingObjectsAndRenderers(fpsHiddingObjects, fpsHiddingRenderers, true);
-                    fpsMaterials.ApplyMaterials();
+                    SetHiddingObjectsAndRenderers(HiddingObjects, HiddingRenderers, false);
+                    SetHiddingObjectsAndRenderers(FpsHiddingObjects, FpsHiddingRenderers, true);
+                    FpsMaterials.ApplyMaterials();
                     break;
             }
         }
