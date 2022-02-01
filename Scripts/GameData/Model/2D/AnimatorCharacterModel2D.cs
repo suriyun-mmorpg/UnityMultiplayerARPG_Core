@@ -357,6 +357,9 @@ namespace MultiplayerARPG
 
         public override void PlayActionAnimation(AnimActionType animActionType, int dataId, int index, float playSpeedMultiplier = 1f)
         {
+            StopActionAnimation();
+            StopSkillCastAnimation();
+            StopWeaponChargeAnimation();
             StartedActionCoroutine(StartCoroutine(PlayActionAnimation_Animator(animActionType, dataId, index, playSpeedMultiplier)));
         }
 
@@ -387,6 +390,9 @@ namespace MultiplayerARPG
 
         public override void PlaySkillCastClip(int dataId, float duration)
         {
+            StopActionAnimation();
+            StopSkillCastAnimation();
+            StopWeaponChargeAnimation();
             StartedActionCoroutine(StartCoroutine(PlaySkillCastClip_Animator(dataId, duration)));
         }
 
