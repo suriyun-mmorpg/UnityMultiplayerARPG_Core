@@ -132,6 +132,9 @@ namespace MultiplayerARPG
         [Header("Mount - UI Elements")]
         public TextWrapper uiTextMount;
 
+        [Header("Potion - UI Elements")]
+        public UIBuff uiPotionBuff;
+
         [Header("Skill - UI Elements")]
         public TextWrapper uiTextSkill;
         public TextWrapper uiTextCoolDownDuration;
@@ -996,6 +999,19 @@ namespace MultiplayerARPG
                     uiTextMount.text = string.Format(
                         LanguageManager.GetText(formatKeyMount),
                         MountItem.MountEntity.Title);
+                }
+            }
+
+            if (uiPotionBuff != null)
+            {
+                if (PotionItem == null)
+                {
+                    uiPotionBuff.Hide();
+                }
+                else
+                {
+                    uiPotionBuff.Show();
+                    uiPotionBuff.Data = new UIBuffData(PotionItem.Buff, Level);
                 }
             }
 
