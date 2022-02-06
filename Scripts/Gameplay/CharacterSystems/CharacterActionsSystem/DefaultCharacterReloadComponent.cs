@@ -208,7 +208,6 @@ namespace MultiplayerARPG
 
         public void Reload(bool isLeftHand)
         {
-            IsReloading = true;
             CallServerReload(isLeftHand);
         }
     }
