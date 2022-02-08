@@ -40,6 +40,22 @@ namespace MultiplayerARPG
         private bool playerDeadDropsNonEquipItems = false;
         public virtual bool PlayerDeadDropsNonEquipItems { get { return playerDeadDropsNonEquipItems; } }
 
+        [SerializeField]
+        private Texture2D minimapTexture;
+        public Texture2D MinimapTexture { get { return minimapTexture; } set { minimapTexture = value; } }
+
+        [SerializeField]
+        private Vector3 minimapPosition;
+        public Vector3 MinimapPosition { get { return minimapPosition; } set { minimapPosition = value; } }
+
+        [SerializeField]
+        private Vector3 minimapRotation;
+        public Vector3 MinimapRotation { get { return minimapRotation; } set { minimapRotation = value; } }
+
+        [SerializeField]
+        private float minimapOrthographicSize;
+        public float MinimapOrthographicSize { get { return minimapOrthographicSize; } set { minimapOrthographicSize = value; } }
+
         public virtual bool AutoRespawnWhenDead { get { return false; } }
         public virtual bool SaveCurrentMapPosition { get { return true; } }
 
