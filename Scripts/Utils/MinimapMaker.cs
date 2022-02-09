@@ -16,7 +16,6 @@ namespace MultiplayerARPG
         public int textureWidth = 1024;
         public int textureHeight = 1024;
         public int textureDepth = 24;
-        public float yRotation = 0f;
         public float yPosition = 50f;
         public bool makeByTerrain = false;
         public bool makeByCollider = true;
@@ -84,7 +83,7 @@ namespace MultiplayerARPG
             GameObject cameraGameObject = new GameObject("_MinimapMakerCamera");
             Camera camera = cameraGameObject.AddComponent<Camera>();
             camera.transform.position = new Vector3(bounds.center.x, yPosition, bounds.center.z);
-            camera.transform.eulerAngles = new Vector3(90, yRotation, 0f);
+            camera.transform.eulerAngles = new Vector3(90f, 180f, 0f);
             camera.orthographicSize = Mathf.Max(bounds.extents.x, bounds.extents.z);
             camera.orthographic = true;
 
@@ -125,12 +124,20 @@ namespace MultiplayerARPG
                 File.WriteAllBytes(path, pngData);
             AssetDatabase.Refresh();
 
-            var savedTexture = AssetDatabase.LoadAssetAtPath<Texture2D>(path);
+            TextureImporter tempTextureImporter = AssetImporter.GetAtPath(path) as TextureImporter;
+            tempTextureImporter.textureType = TextureImporterType.Sprite;
+            tempTextureImporter.spriteImportMode = SpriteImportMode.Single;
+            tempTextureImporter.spritePivot = Vector2.one * 0.5f;
+            tempTextureImporter.spritePixelsPerUnit = 100f;
+            EditorUtility.SetDirty(tempTextureImporter);
+            tempTextureImporter.SaveAndReimport();
+            var tempSprite = AssetDatabase.LoadAssetAtPath<Sprite>(path);
             if (targetMapInfo != null)
             {
-                targetMapInfo.MinimapTexture = savedTexture;
+                targetMapInfo.MinimapSprite = tempSprite;
                 targetMapInfo.MinimapPosition = new Vector3(bounds.center.x, 0, bounds.center.z);
-                targetMapInfo.MinimapRotation = new Vector3(90, yRotation, 0f);
+                targetMapInfo.MinimapBoundsSizeX = bounds.size.x;
+                targetMapInfo.MinimapBoundsSizeZ = bounds.size.z;
                 targetMapInfo.MinimapOrthographicSize = Mathf.Max(bounds.extents.x, bounds.extents.z);
                 EditorUtility.SetDirty(targetMapInfo);
             }
