@@ -14,10 +14,13 @@ namespace MultiplayerARPG
         public Mode mode;
         [Tooltip("Marker's anchor min, max and pivot must be 0.5")]
         public RectTransform playingCharacterMarker;
+        public Vector3 playingCharacterRotateOffsets = Vector3.zero;
         [Tooltip("Marker's anchor min, max and pivot must be 0.5")]
         public RectTransform allyCharacterMarkerPrefab;
+        public Vector3 allyCharacterRotateOffsets = Vector3.zero;
         [Tooltip("Marker's anchor min, max and pivot must be 0.5")]
         public RectTransform enemyCharacterMarkerPrefab;
+        public Vector3 enemyCharacterRotateOffsets = Vector3.zero;
         [Tooltip("Image's anchor min, max and pivot must be 0.5")]
         public Image imageMinimap;
         [Tooltip("You can use Unity's plane as mesh minimap")]
@@ -46,7 +49,7 @@ namespace MultiplayerARPG
                     imageMinimap.gameObject.SetActive(false);
                 return;
             }
-            Transform owningCharacterTransform = isTestMode ? testingPlayingCharacterTransform : GameInstance.PlayingCharacterEntity.CacheTransform;
+            Transform playingCharacterTransform = isTestMode ? testingPlayingCharacterTransform : GameInstance.PlayingCharacterEntity.CacheTransform;
             currentMapInfo = mapInfo;
 
             // Use bounds size to calculate transforms
@@ -71,12 +74,13 @@ namespace MultiplayerARPG
                     playingCharacterMarker.SetAsLastSibling();
                     if (mode == Mode.Default)
                     {
-                        playingCharacterMarker.localPosition = new Vector2((owningCharacterTransform.position.x - currentMapInfo.MinimapPosition.x) * sizeRate, (owningCharacterTransform.position.z - currentMapInfo.MinimapPosition.z) * sizeRate);
+                        playingCharacterMarker.localPosition = new Vector2((playingCharacterTransform.position.x - currentMapInfo.MinimapPosition.x) * sizeRate, (playingCharacterTransform.position.z - currentMapInfo.MinimapPosition.z) * sizeRate);
                     }
                     else
                     {
                         playingCharacterMarker.localPosition = Vector2.zero;
                     }
+                    playingCharacterMarker.localEulerAngles = playingCharacterRotateOffsets + (Vector3.back * playingCharacterTransform.eulerAngles.y);
                 }
                 if (mode == Mode.Default)
                 {
@@ -84,7 +88,15 @@ namespace MultiplayerARPG
                 }
                 else
                 {
-                    imageMinimap.transform.localPosition = -new Vector2((owningCharacterTransform.position.x - currentMapInfo.MinimapPosition.x) * sizeRate, (owningCharacterTransform.position.z - currentMapInfo.MinimapPosition.z) * sizeRate);
+                    imageMinimap.transform.localPosition = -new Vector2((playingCharacterTransform.position.x - currentMapInfo.MinimapPosition.x) * sizeRate, (playingCharacterTransform.position.z - currentMapInfo.MinimapPosition.z) * sizeRate);
+                }
+                if (allyCharacterMarkerPrefab != null)
+                {
+
+                }
+                if (enemyCharacterMarkerPrefab != null)
+                {
+
                 }
             }
 
