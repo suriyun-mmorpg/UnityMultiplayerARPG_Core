@@ -5,15 +5,37 @@ namespace MultiplayerARPG
 {
     public class MinimapRenderer : MonoBehaviour
     {
-        public Transform owningCharacterMarker;
+        public enum Mode
+        {
+            Default,
+            FollowPlayingCharacter,
+        }
+        [Header("Settings")]
+        public Mode mode;
+        [Tooltip("Marker's anchor min, max and pivot must be 0.5")]
+        public RectTransform playingCharacterMarker;
+        [Tooltip("Marker's anchor min, max and pivot must be 0.5")]
+        public RectTransform allyCharacterMarkerPrefab;
+        [Tooltip("Marker's anchor min, max and pivot must be 0.5")]
+        public RectTransform enemyCharacterMarkerPrefab;
+        [Tooltip("Image's anchor min, max and pivot must be 0.5")]
         public Image imageMinimap;
-        public MeshRenderer meshMinimap;
+        [Tooltip("You can use Unity's plane as mesh minimap")]
+        public MeshRenderer meshMinimapPrefab;
         public float meshYOffsets = -100f;
         public float meshXZScaling = 0.1f;
+        [Header("Testing")]
         public bool isTestMode;
         public BaseMapInfo testingMapInfo;
-        public Transform testingOwningCharacterTransform;
+        public Transform testingPlayingCharacterTransform;
         private BaseMapInfo currentMapInfo;
+        private MeshRenderer meshMinimap;
+
+        private void Start()
+        {
+            if (meshMinimapPrefab)
+                meshMinimap = Instantiate(meshMinimapPrefab);
+        }
 
         private void Update()
         {
@@ -24,7 +46,7 @@ namespace MultiplayerARPG
                     imageMinimap.gameObject.SetActive(false);
                 return;
             }
-            Transform owningCharacterTransform = isTestMode ? testingOwningCharacterTransform : GameInstance.PlayingCharacterEntity.CacheTransform;
+            Transform owningCharacterTransform = isTestMode ? testingPlayingCharacterTransform : GameInstance.PlayingCharacterEntity.CacheTransform;
             currentMapInfo = mapInfo;
 
             // Use bounds size to calculate transforms
@@ -44,8 +66,26 @@ namespace MultiplayerARPG
                 float minImageSize = Mathf.Min(imageSizeX, imageSizeY);
 
                 float sizeRate = -(minImageSize / maxBoundsSize);
-                if (owningCharacterMarker != null)
-                    owningCharacterMarker.localPosition = new Vector3((owningCharacterTransform.position.x - currentMapInfo.MinimapPosition.x) * sizeRate, (owningCharacterTransform.position.z - currentMapInfo.MinimapPosition.z) * sizeRate, 0f);
+                if (playingCharacterMarker != null)
+                {
+                    playingCharacterMarker.SetAsLastSibling();
+                    if (mode == Mode.Default)
+                    {
+                        playingCharacterMarker.localPosition = new Vector2((owningCharacterTransform.position.x - currentMapInfo.MinimapPosition.x) * sizeRate, (owningCharacterTransform.position.z - currentMapInfo.MinimapPosition.z) * sizeRate);
+                    }
+                    else
+                    {
+                        playingCharacterMarker.localPosition = Vector2.zero;
+                    }
+                }
+                if (mode == Mode.Default)
+                {
+                    imageMinimap.transform.localPosition = Vector2.zero;
+                }
+                else
+                {
+                    imageMinimap.transform.localPosition = -new Vector2((owningCharacterTransform.position.x - currentMapInfo.MinimapPosition.x) * sizeRate, (owningCharacterTransform.position.z - currentMapInfo.MinimapPosition.z) * sizeRate);
+                }
             }
 
             if (meshMinimap != null)
