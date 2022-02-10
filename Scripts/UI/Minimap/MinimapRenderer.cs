@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -31,17 +32,20 @@ namespace MultiplayerARPG
         public RectTransform neutralMarkerPrefab;
         public Vector3 neutralRotateOffsets = Vector3.zero;
         public float allyMarkerDistance = 10000f;
-        public float enemyMarkerDistance = 5f;
+        public float enemyOrNeutralMarkerDistance = 5f;
         [Tooltip("Image's anchor min, max and pivot must be 0.5")]
         public Image imageMinimap;
         [Tooltip("You can use Unity's plane as mesh minimap")]
         public MeshRenderer meshMinimapPrefab;
         public float meshYOffsets = -100f;
         public float meshXZScaling = 0.1f;
+        public float updateMarkerDuration = 1f;
         [Header("Testing")]
         public bool isTestMode;
         public BaseMapInfo testingMapInfo;
         public Transform testingPlayingCharacterTransform;
+
+        private float updateCountdown;
         private BaseMapInfo currentMapInfo;
         private MeshRenderer meshMinimap;
 
@@ -56,6 +60,7 @@ namespace MultiplayerARPG
             BaseMapInfo mapInfo = isTestMode ? testingMapInfo : BaseGameNetworkManager.CurrentMapInfo;
             if (mapInfo == null)
             {
+                updateCountdown = 0f;
                 if (imageMinimap.gameObject.activeSelf)
                     imageMinimap.gameObject.SetActive(false);
                 return;
@@ -80,6 +85,74 @@ namespace MultiplayerARPG
                 float minImageSize = Mathf.Min(imageSizeX, imageSizeY);
 
                 float sizeRate = -(minImageSize / maxBoundsSize);
+
+                updateCountdown -= Time.deltaTime;
+                if (updateCountdown <= 0f)
+                {
+                    updateCountdown = updateMarkerDuration;
+                    if (GameInstance.PlayingCharacterEntity != null)
+                    {
+                        List<BaseCharacterEntity> allies = GameInstance.PlayingCharacterEntity.FindCharacters<BaseCharacterEntity>(allyMarkerDistance, true, true, false, false);
+                        List<BaseCharacterEntity> enemies = GameInstance.PlayingCharacterEntity.FindCharacters<BaseCharacterEntity>(enemyOrNeutralMarkerDistance, true, false, true, true);
+                        EntityInfo entityInfo;
+                        RectTransform markerPrefab;
+                        Vector3 markerRotateOffsets;
+                        foreach (BaseCharacterEntity entry in allies)
+                        {
+                            markerPrefab = null;
+                            markerRotateOffsets = Vector3.zero;
+                            entityInfo = entry.GetInfo();
+                            if (guildMemberMarkerPrefab != null && entityInfo.GuildId > 0 && entityInfo.GuildId == GameInstance.PlayingCharacterEntity.GuildId)
+                            {
+                                markerPrefab = guildMemberMarkerPrefab;
+                                markerRotateOffsets = guildMemberRotateOffsets;
+                            }
+                            else if (partyMemberMarkerPrefab != null && entityInfo.PartyId > 0 && entityInfo.PartyId == GameInstance.PlayingCharacterEntity.PartyId)
+                            {
+                                markerPrefab = partyMemberMarkerPrefab;
+                                markerRotateOffsets = partyMemberRotateOffsets;
+                            }
+                            else if (allyMemberMarkerPrefab != null)
+                            {
+                                markerPrefab = allyMemberMarkerPrefab;
+                                markerRotateOffsets = allyMemberRotateOffsets;
+                            }
+                            if (markerPrefab != null)
+                            {
+                                SetEntityMarker(markerPrefab,
+                                    new Vector2(
+                                        (entry.CacheTransform.position.x - currentMapInfo.MinimapPosition.x) * sizeRate, 
+                                        (entry.CacheTransform.position.z - currentMapInfo.MinimapPosition.z) * sizeRate),
+                                    markerRotateOffsets + (Vector3.back * entry.CacheTransform.eulerAngles.y));
+                            }
+                        }
+                        foreach (BaseCharacterEntity entry in enemies)
+                        {
+                            markerPrefab = null;
+                            markerRotateOffsets = Vector3.zero;
+                            entityInfo = entry.GetInfo();
+                            if (enemyMarkerPrefab != null && GameInstance.PlayingCharacterEntity.IsEnemy(entityInfo))
+                            {
+                                markerPrefab = enemyMarkerPrefab;
+                                markerRotateOffsets = enemyRotateOffsets;
+                            }
+                            else if (neutralMarkerPrefab != null)
+                            {
+                                markerPrefab = neutralMarkerPrefab;
+                                markerRotateOffsets = neutralRotateOffsets;
+                            }
+                            if (markerPrefab != null)
+                            {
+                                SetEntityMarker(markerPrefab,
+                                    new Vector2(
+                                        (entry.CacheTransform.position.x - currentMapInfo.MinimapPosition.x) * sizeRate, 
+                                        (entry.CacheTransform.position.z - currentMapInfo.MinimapPosition.z) * sizeRate),
+                                    markerRotateOffsets + (Vector3.back * entry.CacheTransform.eulerAngles.y));
+                            }
+                        }
+                    }
+                }
+
                 if (playingCharacterMarker != null)
                 {
                     playingCharacterMarker.SetAsLastSibling();
@@ -101,36 +174,6 @@ namespace MultiplayerARPG
                 {
                     imageMinimap.transform.localPosition = -new Vector2((playingCharacterTransform.position.x - currentMapInfo.MinimapPosition.x) * sizeRate, (playingCharacterTransform.position.z - currentMapInfo.MinimapPosition.z) * sizeRate);
                 }
-                if (GameInstance.PlayingCharacterEntity != null)
-                {
-                    GameInstance.PlayingCharacterEntity.FindNearestAliveCharacter(GameInstance.PlayingCharacterEntity.CacheTransform.position, true, false, false);
-                    GameInstance.PlayingCharacterEntity.FindNearestCharacter(GameInstance.PlayingCharacterEntity.CacheTransform.position, false, true, true);
-                    // Update ally
-                    if (allyMemberMarkerPrefab != null)
-                    {
-
-                    }
-                    // Update party members
-                    if (partyMemberMarkerPrefab != null)
-                    {
-
-                    }
-                    // Update guild members
-                    if (guildMemberMarkerPrefab != null)
-                    {
-
-                    }
-                    // Update enemy
-                    if (enemyMarkerPrefab != null)
-                    {
-
-                    }
-                    // Update neutral
-                    if (neutralMarkerPrefab != null)
-                    {
-
-                    }
-                }
             }
 
             if (meshMinimap != null)
@@ -139,6 +182,11 @@ namespace MultiplayerARPG
                 meshMinimap.transform.localScale = (new Vector3(1f, 0f, 1f) * maxBoundsSize * meshXZScaling) + Vector3.up;
                 meshMinimap.material.mainTexture = currentMapInfo.MinimapSprite.texture;
             }
+        }
+
+        private void SetEntityMarker(RectTransform prefab, Vector2 position, Vector3 rotation)
+        {
+
         }
     }
 }
