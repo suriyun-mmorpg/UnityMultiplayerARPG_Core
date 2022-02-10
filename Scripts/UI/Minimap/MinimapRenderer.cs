@@ -31,15 +31,16 @@ namespace MultiplayerARPG
         [Tooltip("Marker's anchor min, max and pivot must be 0.5")]
         public RectTransform neutralMarkerPrefab;
         public Vector3 neutralRotateOffsets = Vector3.zero;
+        public RectTransform nonPlayingCharacterMarkerContainer;
         public float allyMarkerDistance = 10000f;
         public float enemyOrNeutralMarkerDistance = 5f;
+        public float meshYOffsets = -100f;
+        public float meshXZScaling = 0.1f;
+        public float updateMarkerDuration = 1f;
         [Tooltip("Image's anchor min, max and pivot must be 0.5")]
         public Image imageMinimap;
         [Tooltip("You can use Unity's plane as mesh minimap")]
         public MeshRenderer meshMinimapPrefab;
-        public float meshYOffsets = -100f;
-        public float meshXZScaling = 0.1f;
-        public float updateMarkerDuration = 1f;
         [Header("Testing")]
         public bool isTestMode;
         public BaseMapInfo testingMapInfo;
@@ -48,6 +49,7 @@ namespace MultiplayerARPG
         private float updateCountdown;
         private BaseMapInfo currentMapInfo;
         private MeshRenderer meshMinimap;
+        private List<RectTransform> markers = new List<RectTransform>();
 
         private void Start()
         {
@@ -90,6 +92,12 @@ namespace MultiplayerARPG
                 if (updateCountdown <= 0f)
                 {
                     updateCountdown = updateMarkerDuration;
+
+                    for (int i = markers.Count - 1; i >= 0; --i)
+                    {
+                        Destroy(markers[i].gameObject);
+                    }
+
                     if (GameInstance.PlayingCharacterEntity != null)
                     {
                         List<BaseCharacterEntity> allies = GameInstance.PlayingCharacterEntity.FindCharacters<BaseCharacterEntity>(allyMarkerDistance, true, true, false, false);
@@ -119,7 +127,7 @@ namespace MultiplayerARPG
                             }
                             if (markerPrefab != null)
                             {
-                                SetEntityMarker(markerPrefab,
+                                InstantiateEntityMarker(markerPrefab,
                                     new Vector2(
                                         (entry.CacheTransform.position.x - currentMapInfo.MinimapPosition.x) * sizeRate, 
                                         (entry.CacheTransform.position.z - currentMapInfo.MinimapPosition.z) * sizeRate),
@@ -143,7 +151,7 @@ namespace MultiplayerARPG
                             }
                             if (markerPrefab != null)
                             {
-                                SetEntityMarker(markerPrefab,
+                                InstantiateEntityMarker(markerPrefab,
                                     new Vector2(
                                         (entry.CacheTransform.position.x - currentMapInfo.MinimapPosition.x) * sizeRate, 
                                         (entry.CacheTransform.position.z - currentMapInfo.MinimapPosition.z) * sizeRate),
@@ -184,9 +192,13 @@ namespace MultiplayerARPG
             }
         }
 
-        private void SetEntityMarker(RectTransform prefab, Vector2 position, Vector3 rotation)
+        private void InstantiateEntityMarker(RectTransform prefab, Vector2 position, Vector3 eulerAngles)
         {
-
+            RectTransform newMarker = Instantiate(prefab);
+            newMarker.SetParent(nonPlayingCharacterMarkerContainer);
+            newMarker.localPosition = position;
+            newMarker.localEulerAngles = eulerAngles;
+            markers.Add(newMarker);
         }
     }
 }
