@@ -16,11 +16,22 @@ namespace MultiplayerARPG
         public RectTransform playingCharacterMarker;
         public Vector3 playingCharacterRotateOffsets = Vector3.zero;
         [Tooltip("Marker's anchor min, max and pivot must be 0.5")]
-        public RectTransform allyCharacterMarkerPrefab;
-        public Vector3 allyCharacterRotateOffsets = Vector3.zero;
+        public RectTransform allyMemberMarkerPrefab;
+        public Vector3 allyMemberRotateOffsets = Vector3.zero;
         [Tooltip("Marker's anchor min, max and pivot must be 0.5")]
-        public RectTransform enemyCharacterMarkerPrefab;
-        public Vector3 enemyCharacterRotateOffsets = Vector3.zero;
+        public RectTransform partyMemberMarkerPrefab;
+        public Vector3 partyMemberRotateOffsets = Vector3.zero;
+        [Tooltip("Marker's anchor min, max and pivot must be 0.5")]
+        public RectTransform guildMemberMarkerPrefab;
+        public Vector3 guildMemberRotateOffsets = Vector3.zero;
+        [Tooltip("Marker's anchor min, max and pivot must be 0.5")]
+        public RectTransform enemyMarkerPrefab;
+        public Vector3 enemyRotateOffsets = Vector3.zero;
+        [Tooltip("Marker's anchor min, max and pivot must be 0.5")]
+        public RectTransform neutralMarkerPrefab;
+        public Vector3 neutralRotateOffsets = Vector3.zero;
+        public float allyMarkerDistance = 10000f;
+        public float enemyMarkerDistance = 5f;
         [Tooltip("Image's anchor min, max and pivot must be 0.5")]
         public Image imageMinimap;
         [Tooltip("You can use Unity's plane as mesh minimap")]
@@ -90,13 +101,35 @@ namespace MultiplayerARPG
                 {
                     imageMinimap.transform.localPosition = -new Vector2((playingCharacterTransform.position.x - currentMapInfo.MinimapPosition.x) * sizeRate, (playingCharacterTransform.position.z - currentMapInfo.MinimapPosition.z) * sizeRate);
                 }
-                if (allyCharacterMarkerPrefab != null)
+                if (GameInstance.PlayingCharacterEntity != null)
                 {
+                    GameInstance.PlayingCharacterEntity.FindNearestAliveCharacter(GameInstance.PlayingCharacterEntity.CacheTransform.position, true, false, false);
+                    GameInstance.PlayingCharacterEntity.FindNearestCharacter(GameInstance.PlayingCharacterEntity.CacheTransform.position, false, true, true);
+                    // Update ally
+                    if (allyMemberMarkerPrefab != null)
+                    {
 
-                }
-                if (enemyCharacterMarkerPrefab != null)
-                {
+                    }
+                    // Update party members
+                    if (partyMemberMarkerPrefab != null)
+                    {
 
+                    }
+                    // Update guild members
+                    if (guildMemberMarkerPrefab != null)
+                    {
+
+                    }
+                    // Update enemy
+                    if (enemyMarkerPrefab != null)
+                    {
+
+                    }
+                    // Update neutral
+                    if (neutralMarkerPrefab != null)
+                    {
+
+                    }
                 }
             }
 
