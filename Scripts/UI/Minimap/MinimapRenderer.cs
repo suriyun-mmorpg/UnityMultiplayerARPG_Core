@@ -97,6 +97,7 @@ namespace MultiplayerARPG
                     {
                         Destroy(markers[i].gameObject);
                     }
+                    markers.Clear();
 
                     if (GameInstance.PlayingCharacterEntity != null)
                     {
