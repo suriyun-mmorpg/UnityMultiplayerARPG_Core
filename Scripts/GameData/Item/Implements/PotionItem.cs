@@ -24,6 +24,13 @@ namespace MultiplayerARPG
         }
 
         [SerializeField]
+        private string autoUseSettingKey;
+        public string AutoUseSettingKey
+        {
+            get { return autoUseSettingKey; }
+        }
+
+        [SerializeField]
         private float useItemCooldown = 0f;
         public float UseItemCooldown
         {

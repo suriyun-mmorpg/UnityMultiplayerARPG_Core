@@ -6,5 +6,10 @@
         /// Buff which will be applied when use this item
         /// </summary>
         Buff Buff { get; }
+
+        /// <summary>
+        /// Key for auto use setting saving for this item
+        /// </summary>
+        string AutoUseSettingKey { get; }
     }
 }
