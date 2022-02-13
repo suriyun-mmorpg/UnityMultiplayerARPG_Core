@@ -86,7 +86,7 @@ namespace MultiplayerARPG
             RPC(AllOnItemsContainerDestroy);
         }
 
-        public bool IsAbleToLoot(BaseCharacterEntity baseCharacterEntity)
+        public virtual bool IsAbleToLoot(BaseCharacterEntity baseCharacterEntity)
         {
             if ((Looters == null || Looters.Count == 0 || Looters.Contains(baseCharacterEntity.Id) ||
                 Time.unscaledTime - dropTime > CurrentGameInstance.itemLootLockDuration) && !isDestroyed)
@@ -94,7 +94,10 @@ namespace MultiplayerARPG
             return false;
         }
 
-        public void PickedUp()
+        /// <summary>
+        /// This function should be called by server only when picked up some (or all) items from this container
+        /// </summary>
+        public virtual void PickedUp()
         {
             if (!IsServer)
                 return;
