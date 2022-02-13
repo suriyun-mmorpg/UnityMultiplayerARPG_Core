@@ -22,6 +22,7 @@ namespace MultiplayerARPG
         public bool makeByCollider2D = false;
         public bool makeByRenderer = false;
 
+#if UNITY_EDITOR
         [ContextMenu("Make")]
         public void Make()
         {
@@ -146,5 +147,6 @@ namespace MultiplayerARPG
             DestroyImmediate(renderTexture);
             DestroyImmediate(cameraGameObject);
         }
+#endif
     }
 }
