@@ -91,13 +91,17 @@ namespace MultiplayerARPG
             ShowOnEnum(nameof(item.itemType), nameof(Item.LegacyItemType.Shield), nameof(item.destroyIfBroken));
             // Potion
             ShowOnEnum(nameof(item.itemType), nameof(Item.LegacyItemType.Potion), nameof(item.buff));
+            ShowOnEnum(nameof(item.itemType), nameof(Item.LegacyItemType.Potion), nameof(item.useItemCooldown));
+            ShowOnEnum(nameof(item.itemType), nameof(Item.LegacyItemType.Potion), nameof(item.autoUseSettingKey));
             // Ammo
             ShowOnEnum(nameof(item.itemType), nameof(Item.LegacyItemType.Ammo), nameof(item.increaseDamages));
             ShowOnEnum(nameof(item.itemType), nameof(Item.LegacyItemType.Ammo), nameof(item.ammoType));
             // Building
             ShowOnEnum(nameof(item.itemType), nameof(Item.LegacyItemType.Building), nameof(item.buildingEntity));
+            ShowOnEnum(nameof(item.itemType), nameof(Item.LegacyItemType.Building), nameof(item.useItemCooldown));
             // Pet
             ShowOnEnum(nameof(item.itemType), nameof(Item.LegacyItemType.Pet), nameof(item.petEntity));
+            ShowOnEnum(nameof(item.itemType), nameof(Item.LegacyItemType.Pet), nameof(item.useItemCooldown));
             // Socket Enhancer
             ShowOnEnum(nameof(item.itemType), nameof(Item.LegacyItemType.SocketEnhancer), nameof(item.socketEnhanceEffect));
             ShowOnEnum(nameof(item.itemType), nameof(Item.LegacyItemType.SocketEnhancer), nameof(item.selfStatusEffectsWhenAttacking));
@@ -106,12 +110,24 @@ namespace MultiplayerARPG
             ShowOnEnum(nameof(item.itemType), nameof(Item.LegacyItemType.SocketEnhancer), nameof(item.enemyStatusEffectsWhenAttacked));
             // Mount
             ShowOnEnum(nameof(item.itemType), nameof(Item.LegacyItemType.Mount), nameof(item.mountEntity));
+            ShowOnEnum(nameof(item.itemType), nameof(Item.LegacyItemType.Mount), nameof(item.useItemCooldown));
             // Attribute Increase
             ShowOnEnum(nameof(item.itemType), nameof(Item.LegacyItemType.AttributeIncrease), nameof(item.attributeAmount));
+            ShowOnEnum(nameof(item.itemType), nameof(Item.LegacyItemType.AttributeIncrease), nameof(item.useItemCooldown));
+            ShowOnEnum(nameof(item.itemType), nameof(Item.LegacyItemType.AttributeIncrease), nameof(item.autoUseSettingKey));
+            // Attribute Reset
+            ShowOnEnum(nameof(item.itemType), nameof(Item.LegacyItemType.AttributeReset), nameof(item.useItemCooldown));
+            ShowOnEnum(nameof(item.itemType), nameof(Item.LegacyItemType.AttributeReset), nameof(item.autoUseSettingKey));
             // Skill Use
             ShowOnEnum(nameof(item.itemType), nameof(Item.LegacyItemType.Skill), nameof(item.skillLevel));
+            ShowOnEnum(nameof(item.itemType), nameof(Item.LegacyItemType.Skill), nameof(item.useItemCooldown));
             // Skill Learn
             ShowOnEnum(nameof(item.itemType), nameof(Item.LegacyItemType.SkillLearn), nameof(item.skillLevel));
+            ShowOnEnum(nameof(item.itemType), nameof(Item.LegacyItemType.SkillLearn), nameof(item.useItemCooldown));
+            ShowOnEnum(nameof(item.itemType), nameof(Item.LegacyItemType.SkillLearn), nameof(item.autoUseSettingKey));
+            // Skill Reset
+            ShowOnEnum(nameof(item.itemType), nameof(Item.LegacyItemType.SkillReset), nameof(item.useItemCooldown));
+            ShowOnEnum(nameof(item.itemType), nameof(Item.LegacyItemType.SkillReset), nameof(item.autoUseSettingKey));
         }
     }
 }
