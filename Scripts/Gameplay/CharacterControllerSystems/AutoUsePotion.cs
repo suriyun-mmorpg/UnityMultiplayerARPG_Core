@@ -24,7 +24,7 @@ namespace MultiplayerARPG
         {
             if (GameInstance.PlayingCharacterEntity == null)
                 return;
-            useCooldown -= Time.unscaledTime;
+            useCooldown -= Time.unscaledDeltaTime;
             if (useCooldown > 0f)
                 return;
             float rate = 1f;
