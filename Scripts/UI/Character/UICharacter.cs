@@ -9,6 +9,8 @@ namespace MultiplayerARPG
     public partial class UICharacter : UISelectionEntry<ICharacterData>
     {
         [Header("String Formats")]
+        [Tooltip("Format => {0} = {Character Id}")]
+        public UILocaleKeySetting formatKeyId = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_SIMPLE);
         [Tooltip("Format => {0} = {Character Name}")]
         public UILocaleKeySetting formatKeyName = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_SIMPLE);
         [Tooltip("Format => {0} = {Level}")]
@@ -27,6 +29,7 @@ namespace MultiplayerARPG
         public UILocaleKeySetting formatKeyWeaponDamage = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_DAMAGE_AMOUNT);
 
         [Header("UI Elements")]
+        public TextWrapper uiTextId;
         public TextWrapper uiTextName;
         public TextWrapper uiTextLevel;
         public UIGageValue uiGageExp;
@@ -291,6 +294,13 @@ namespace MultiplayerARPG
         protected override void UpdateUI()
         {
             Profiler.BeginSample("UICharacter - Update UI");
+
+            if (uiTextId != null)
+            {
+                uiTextId.text = string.Format(
+                    LanguageManager.GetText(formatKeyId),
+                    Data == null ? LanguageManager.GetUnknowTitle() : Data.Id);
+            }
 
             if (uiTextName != null)
             {
