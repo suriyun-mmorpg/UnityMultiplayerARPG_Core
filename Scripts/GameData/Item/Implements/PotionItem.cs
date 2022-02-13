@@ -25,7 +25,7 @@ namespace MultiplayerARPG
 
         [SerializeField]
         private string autoUseSettingKey;
-        public string AutoUseSettingKey
+        public string AutoUseKey
         {
             get { return autoUseSettingKey; }
         }

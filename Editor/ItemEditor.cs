@@ -92,7 +92,7 @@ namespace MultiplayerARPG
             // Potion
             ShowOnEnum(nameof(item.itemType), nameof(Item.LegacyItemType.Potion), nameof(item.buff));
             ShowOnEnum(nameof(item.itemType), nameof(Item.LegacyItemType.Potion), nameof(item.useItemCooldown));
-            ShowOnEnum(nameof(item.itemType), nameof(Item.LegacyItemType.Potion), nameof(item.autoUseSettingKey));
+            ShowOnEnum(nameof(item.itemType), nameof(Item.LegacyItemType.Potion), nameof(item.autoUseKey));
             // Ammo
             ShowOnEnum(nameof(item.itemType), nameof(Item.LegacyItemType.Ammo), nameof(item.increaseDamages));
             ShowOnEnum(nameof(item.itemType), nameof(Item.LegacyItemType.Ammo), nameof(item.ammoType));
@@ -114,20 +114,20 @@ namespace MultiplayerARPG
             // Attribute Increase
             ShowOnEnum(nameof(item.itemType), nameof(Item.LegacyItemType.AttributeIncrease), nameof(item.attributeAmount));
             ShowOnEnum(nameof(item.itemType), nameof(Item.LegacyItemType.AttributeIncrease), nameof(item.useItemCooldown));
-            ShowOnEnum(nameof(item.itemType), nameof(Item.LegacyItemType.AttributeIncrease), nameof(item.autoUseSettingKey));
+            ShowOnEnum(nameof(item.itemType), nameof(Item.LegacyItemType.AttributeIncrease), nameof(item.autoUseKey));
             // Attribute Reset
             ShowOnEnum(nameof(item.itemType), nameof(Item.LegacyItemType.AttributeReset), nameof(item.useItemCooldown));
-            ShowOnEnum(nameof(item.itemType), nameof(Item.LegacyItemType.AttributeReset), nameof(item.autoUseSettingKey));
+            ShowOnEnum(nameof(item.itemType), nameof(Item.LegacyItemType.AttributeReset), nameof(item.autoUseKey));
             // Skill Use
             ShowOnEnum(nameof(item.itemType), nameof(Item.LegacyItemType.Skill), nameof(item.skillLevel));
             ShowOnEnum(nameof(item.itemType), nameof(Item.LegacyItemType.Skill), nameof(item.useItemCooldown));
             // Skill Learn
             ShowOnEnum(nameof(item.itemType), nameof(Item.LegacyItemType.SkillLearn), nameof(item.skillLevel));
             ShowOnEnum(nameof(item.itemType), nameof(Item.LegacyItemType.SkillLearn), nameof(item.useItemCooldown));
-            ShowOnEnum(nameof(item.itemType), nameof(Item.LegacyItemType.SkillLearn), nameof(item.autoUseSettingKey));
+            ShowOnEnum(nameof(item.itemType), nameof(Item.LegacyItemType.SkillLearn), nameof(item.autoUseKey));
             // Skill Reset
             ShowOnEnum(nameof(item.itemType), nameof(Item.LegacyItemType.SkillReset), nameof(item.useItemCooldown));
-            ShowOnEnum(nameof(item.itemType), nameof(Item.LegacyItemType.SkillReset), nameof(item.autoUseSettingKey));
+            ShowOnEnum(nameof(item.itemType), nameof(Item.LegacyItemType.SkillReset), nameof(item.autoUseKey));
         }
     }
 }

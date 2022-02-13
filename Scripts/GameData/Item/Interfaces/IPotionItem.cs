@@ -10,6 +10,6 @@
         /// <summary>
         /// Key for auto use setting saving for this item
         /// </summary>
-        string AutoUseSettingKey { get; }
+        string AutoUseKey { get; }
     }
 }
