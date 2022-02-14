@@ -328,6 +328,16 @@ namespace MultiplayerARPG
             return requirement.characterLevel.GetAmount((short)(level + 1));
         }
 
+        public float GetRequireCharacterSkillPoint(short level)
+        {
+            return requirement.skillPoint.GetAmount((short)(level + 1));
+        }
+
+        public int GetRequireCharacterGold(short level)
+        {
+            return requirement.gold.GetAmount((short)(level + 1));
+        }
+
         public bool IsAvailable(ICharacterData character)
         {
             short skillLevel;
@@ -518,11 +528,14 @@ namespace MultiplayerARPG
             return false;
         }
 
-        public virtual bool CanLevelUp(IPlayerCharacterData character, short level, out UITextKeys gameMessage, bool checkSkillPoint = true)
+        public virtual bool CanLevelUp(IPlayerCharacterData character, short level, out UITextKeys gameMessage, bool checkSkillPoint = true, bool checkGold = true)
         {
             gameMessage = UITextKeys.NONE;
             if (character == null || !character.GetDatabase().CacheSkillLevels.ContainsKey(this))
+            {
+                gameMessage = UITextKeys.UI_ERROR_INVALID_CHARACTER_DATA;
                 return false;
+            }
 
             if (character.Level < GetRequireCharacterLevel(level))
             {
@@ -536,9 +549,15 @@ namespace MultiplayerARPG
                 return false;
             }
 
-            if (checkSkillPoint && character.SkillPoint <= 0)
+            if (checkSkillPoint && character.SkillPoint <= GetRequireCharacterSkillPoint(level))
             {
                 gameMessage = UITextKeys.UI_ERROR_NOT_ENOUGH_SKILL_POINT;
+                return false;
+            }
+
+            if (checkGold && character.Gold <= GetRequireCharacterGold(level))
+            {
+                gameMessage = UITextKeys.UI_ERROR_NOT_ENOUGH_GOLD;
                 return false;
             }
 

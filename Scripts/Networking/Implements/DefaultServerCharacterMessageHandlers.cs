@@ -51,7 +51,13 @@ namespace MultiplayerARPG
                 });
                 return;
             }
-            playerCharacter.SkillPoint -= 1;
+            int indexOfSkill = playerCharacter.IndexOfSkill(request.dataId);
+            CharacterSkill characterSkill = playerCharacter.Skills[indexOfSkill];
+            BaseSkill skill = characterSkill.GetSkill();
+            float requireSkillPoint = skill.GetRequireCharacterSkillPoint((short)(characterSkill.level - 1));
+            int requireGold = skill.GetRequireCharacterGold((short)(characterSkill.level - 1));
+            playerCharacter.SkillPoint -= requireSkillPoint;
+            playerCharacter.Gold -= requireGold;
             result.Invoke(AckResponseCode.Success, new ResponseIncreaseSkillLevelMessage());
             await UniTask.Yield();
         }

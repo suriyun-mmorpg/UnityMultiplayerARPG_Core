@@ -1055,6 +1055,16 @@ namespace MultiplayerARPG
 
         // 1.71c New Formats
         UI_FORMAT_CORPSE_TITLE,
+        
+        // 1.74 New Formats
+        /// <summary>
+        /// Format => {0} = {Require Skill Point}
+        /// </summary>
+        UI_FORMAT_REQUIRE_SKILL_POINT,
+        /// <summary>
+        /// Format => {0} = {Current Skill Point}, {1} = {Require Skill Point}
+        /// </summary>
+        UI_FORMAT_REQUIRE_SKILL_POINT_NOT_ENOUGH,
     }
 
     public static class DefaultLocale
@@ -1564,6 +1574,9 @@ namespace MultiplayerARPG
             Texts.Add(UIFormatKeys.UI_FORMAT_LOADED_ASSET_BUNDLES_COUNT.ToString(), "Loaded Files: {0}/{1}");
             // Format - 1.71c - Corpse items container
             Texts.Add(UIFormatKeys.UI_FORMAT_CORPSE_TITLE.ToString(), "{0}'s corpse");
+            // 1.74 New Formats
+            Texts.Add(UIFormatKeys.UI_FORMAT_REQUIRE_SKILL_POINT.ToString(), "Require Skill Points: {0}");
+            Texts.Add(UIFormatKeys.UI_FORMAT_REQUIRE_SKILL_POINT_NOT_ENOUGH.ToString(), "Require Skill Points: <color=red>{0}/{1}</color>");
         }
     }
 

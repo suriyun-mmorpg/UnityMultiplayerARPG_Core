@@ -848,14 +848,17 @@ namespace MultiplayerARPG
             gameMessageType = UITextKeys.NONE;
             BaseSkill skill;
             if (!GameInstance.Skills.TryGetValue(dataId, out skill))
+            {
+                gameMessageType = UITextKeys.UI_ERROR_INVALID_SKILL_DATA;
                 return false;
+            }
 
             CharacterSkill characterSkill;
             int index = characterData.IndexOfSkill(dataId);
             if (index < 0)
             {
                 characterSkill = CharacterSkill.Create(skill, 0);
-                if (!skill.CanLevelUp(characterData, (short)(characterSkill.level + level - 1), out gameMessageType, itemIndex < 0))
+                if (!skill.CanLevelUp(characterData, (short)(characterSkill.level + level - 1), out gameMessageType, itemIndex < 0, itemIndex < 0))
                     return false;
                 if (itemIndex >= 0)
                 {
@@ -870,7 +873,7 @@ namespace MultiplayerARPG
             else
             {
                 characterSkill = characterData.Skills[index];
-                if (!skill.CanLevelUp(characterData, (short)(characterSkill.level + level - 1), out gameMessageType, itemIndex < 0))
+                if (!skill.CanLevelUp(characterData, (short)(characterSkill.level + level - 1), out gameMessageType, itemIndex < 0, itemIndex < 0))
                     return false;
                 if (itemIndex >= 0)
                 {

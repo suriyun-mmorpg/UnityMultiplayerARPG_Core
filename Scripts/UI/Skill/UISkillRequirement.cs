@@ -9,9 +9,19 @@ namespace MultiplayerARPG
         public UILocaleKeySetting formatKeyRequireLevel = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_REQUIRE_LEVEL);
         [Tooltip("Format => {0} = {Current Level}, {1} = {Require Level}")]
         public UILocaleKeySetting formatKeyRequireLevelNotEnough = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_REQUIRE_LEVEL_NOT_ENOUGH);
+        [Tooltip("Format => {0} = {Require Skill Point}")]
+        public UILocaleKeySetting formatKeyRequireSkillPoint = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_REQUIRE_SKILL_POINT);
+        [Tooltip("Format => {0} = {Current Skill Point}, {1} = {Require Skill Point}")]
+        public UILocaleKeySetting formatKeyRequireSkillPointNotEnough = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_REQUIRE_SKILL_POINT_NOT_ENOUGH);
+        [Tooltip("Format => {0} = {Require Gold}")]
+        public UILocaleKeySetting formatKeyRequireGold = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_REQUIRE_GOLD);
+        [Tooltip("Format => {0} = {Current Gold}, {1} = {Require Gold}")]
+        public UILocaleKeySetting formatKeyRequireGoldNotEnough = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_REQUIRE_GOLD_NOT_ENOUGH);
 
         [Header("UI Elements")]
         public TextWrapper uiTextRequireLevel;
+        public TextWrapper uiTextRequireSkillPoint;
+        public TextWrapper uiTextRequireGold;
         public UIAttributeAmounts uiRequireAttributeAmounts;
         public UISkillLevels uiRequireSkillLevels;
 
@@ -44,6 +54,62 @@ namespace MultiplayerARPG
                             LanguageManager.GetText(formatKeyRequireLevelNotEnough),
                             characterLevel,
                             requireCharacterLevel.ToString("N0"));
+                    }
+                }
+            }
+
+            if (uiTextRequireSkillPoint != null)
+            {
+                if (skill == null || skill.GetRequireCharacterSkillPoint(level) <= 0)
+                {
+                    // Hide require level label when require level <= 0
+                    uiTextRequireSkillPoint.SetGameObjectActive(false);
+                }
+                else
+                {
+                    uiTextRequireSkillPoint.SetGameObjectActive(true);
+                    float characterSkillPoint = (GameInstance.PlayingCharacter != null ? GameInstance.PlayingCharacter.SkillPoint : 0);
+                    float requireCharacterSkillPoint = skill.GetRequireCharacterSkillPoint(level);
+                    if (characterSkillPoint >= requireCharacterSkillPoint)
+                    {
+                        uiTextRequireSkillPoint.text = string.Format(
+                            LanguageManager.GetText(formatKeyRequireSkillPoint),
+                            requireCharacterSkillPoint.ToString("N0"));
+                    }
+                    else
+                    {
+                        uiTextRequireSkillPoint.text = string.Format(
+                            LanguageManager.GetText(formatKeyRequireSkillPointNotEnough),
+                            characterSkillPoint,
+                            requireCharacterSkillPoint.ToString("N0"));
+                    }
+                }
+            }
+
+            if (uiTextRequireGold != null)
+            {
+                if (skill == null || skill.GetRequireCharacterGold(level) <= 0)
+                {
+                    // Hide require level label when require level <= 0
+                    uiTextRequireGold.SetGameObjectActive(false);
+                }
+                else
+                {
+                    uiTextRequireGold.SetGameObjectActive(true);
+                    float characterGold = (GameInstance.PlayingCharacter != null ? GameInstance.PlayingCharacter.Gold : 0);
+                    float requireCharacterGold = skill.GetRequireCharacterGold(level);
+                    if (characterGold >= requireCharacterGold)
+                    {
+                        uiTextRequireGold.text = string.Format(
+                            LanguageManager.GetText(formatKeyRequireGold),
+                            requireCharacterGold.ToString("N0"));
+                    }
+                    else
+                    {
+                        uiTextRequireGold.text = string.Format(
+                            LanguageManager.GetText(formatKeyRequireGoldNotEnough),
+                            characterGold,
+                            requireCharacterGold.ToString("N0"));
                     }
                 }
             }
