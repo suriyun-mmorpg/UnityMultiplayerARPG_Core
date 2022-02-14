@@ -6,18 +6,8 @@ namespace MultiplayerARPG
     public partial struct Buff
     {
         public static readonly Buff Empty = new Buff();
-        [Tooltip("If duration less than or equals to 0, buff stats won't applied only recovery will be applied. This won't be applied to monster's summoner.")]
-        public IncrementalFloat duration;
-        [Tooltip("Recover character's current HP. This won't be applied to monster's summoner.")]
-        public IncrementalInt recoveryHp;
-        [Tooltip("Recover character's current MP. This won't be applied to monster's summoner.")]
-        public IncrementalInt recoveryMp;
-        [Tooltip("Recover character's current stamina. This won't be applied to monster's summoner.")]
-        public IncrementalInt recoveryStamina;
-        [Tooltip("Recover character's current food. This won't be applied to monster's summoner.")]
-        public IncrementalInt recoveryFood;
-        [Tooltip("Recover character's current water. This won't be applied to monster's summoner.")]
-        public IncrementalInt recoveryWater;
+
+        [Header("Settings for Passive and Active Skills")]
         [Tooltip("Increase character's stats.")]
         public CharacterStatsIncremental increaseStats;
         [Tooltip("Increase character's stats rate.")]
@@ -37,6 +27,20 @@ namespace MultiplayerARPG
         [Tooltip("Increase character's damages.")]
         [ArrayElementTitle("damageElement")]
         public DamageIncremental[] increaseDamages;
+
+        [Header("Settings for Active Skills only")]
+        [Tooltip("If duration less than or equals to 0, buff stats won't applied only recovery will be applied. This won't be applied to monster's summoner.")]
+        public IncrementalFloat duration;
+        [Tooltip("Recover character's current HP. This won't be applied to monster's summoner.")]
+        public IncrementalInt recoveryHp;
+        [Tooltip("Recover character's current MP. This won't be applied to monster's summoner.")]
+        public IncrementalInt recoveryMp;
+        [Tooltip("Recover character's current stamina. This won't be applied to monster's summoner.")]
+        public IncrementalInt recoveryStamina;
+        [Tooltip("Recover character's current food. This won't be applied to monster's summoner.")]
+        public IncrementalInt recoveryFood;
+        [Tooltip("Recover character's current water. This won't be applied to monster's summoner.")]
+        public IncrementalInt recoveryWater;
         [Tooltip("Applies damage within duration to character. This won't be applied to monster's summoner.")]
         [ArrayElementTitle("damageElement")]
         public DamageIncremental[] damageOverTimes;
@@ -64,14 +68,14 @@ namespace MultiplayerARPG
         public StatusEffectApplying[] selfStatusEffectsWhenAttacked;
         [Tooltip("Status effects that can be applied to the enemy when attacked.")]
         public StatusEffectApplying[] enemyStatusEffectsWhenAttacked;
-        [Tooltip("Game effects which appearing on character while applied. This won't be applied to monster's summoner.")]
-        public GameEffect[] effects;
+        [Tooltip("If this is `TRUE` it will not be removed when the character dies")]
+        public bool doNotRemoveOnDead;
         [Tooltip("If this is `TRUE` it will extend duration when applying buff, not remove and re-apply")]
         public bool isExtendDuration;
         [Tooltip("Max stack to applies buff, it won't be used while `isExtendDuration` is `TRUE`")]
         public IncrementalInt maxStack;
-        [Tooltip("If this is `TRUE` it will not be removed when the character dies")]
-        public bool doNotRemoveOnDead;
+        [Tooltip("Game effects which appearing on character while applied. This won't be applied to monster's summoner.")]
+        public GameEffect[] effects;
 
         public void PrepareRelatesData()
         {
