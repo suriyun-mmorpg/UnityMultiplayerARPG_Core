@@ -12,8 +12,11 @@ namespace MultiplayerARPG
             // Skill type
             ShowOnEnum(nameof(skill.skillType), nameof(SkillType.Active), nameof(skill.availableWeapons));
             ShowOnEnum(nameof(skill.skillType), nameof(SkillType.Active), nameof(skill.consumeHp));
+            ShowOnEnum(nameof(skill.skillType), nameof(SkillType.Active), nameof(skill.consumeHpRate));
             ShowOnEnum(nameof(skill.skillType), nameof(SkillType.Active), nameof(skill.consumeMp));
+            ShowOnEnum(nameof(skill.skillType), nameof(SkillType.Active), nameof(skill.consumeMpRate));
             ShowOnEnum(nameof(skill.skillType), nameof(SkillType.Active), nameof(skill.consumeStamina));
+            ShowOnEnum(nameof(skill.skillType), nameof(SkillType.Active), nameof(skill.consumeStaminaRate));
             ShowOnEnum(nameof(skill.skillType), nameof(SkillType.Active), nameof(skill.coolDownDuration));
             ShowOnEnum(nameof(skill.skillType), nameof(SkillType.Active), nameof(skill.skillAttackType));
             ShowOnEnum(nameof(skill.skillType), nameof(SkillType.Active), nameof(skill.skillBuffType));
@@ -30,8 +33,11 @@ namespace MultiplayerARPG
             ShowOnEnum(nameof(skill.skillType), nameof(SkillType.Active), nameof(skill.requireAmmoAmount));
             ShowOnEnum(nameof(skill.skillType), nameof(SkillType.Active), nameof(skill.requireAmmos));
             ShowOnEnum(nameof(skill.skillType), nameof(SkillType.CraftItem), nameof(skill.consumeHp));
+            ShowOnEnum(nameof(skill.skillType), nameof(SkillType.CraftItem), nameof(skill.consumeHpRate));
             ShowOnEnum(nameof(skill.skillType), nameof(SkillType.CraftItem), nameof(skill.consumeMp));
+            ShowOnEnum(nameof(skill.skillType), nameof(SkillType.CraftItem), nameof(skill.consumeMpRate));
             ShowOnEnum(nameof(skill.skillType), nameof(SkillType.CraftItem), nameof(skill.consumeStamina));
+            ShowOnEnum(nameof(skill.skillType), nameof(SkillType.CraftItem), nameof(skill.consumeStaminaRate));
             ShowOnEnum(nameof(skill.skillType), nameof(SkillType.CraftItem), nameof(skill.coolDownDuration));
             ShowOnEnum(nameof(skill.skillType), nameof(SkillType.CraftItem), nameof(skill.moveSpeedRateWhileUsingSkill));
             ShowOnEnum(nameof(skill.skillType), nameof(SkillType.CraftItem), nameof(skill.skillCastEffects));
