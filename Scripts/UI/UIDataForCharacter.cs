@@ -27,7 +27,7 @@
 
         public bool IsOwningCharacter()
         {
-            return Character == GameInstance.PlayingCharacter;
+            return Character != null && GameInstance.PlayingCharacter != null && Character.Id == GameInstance.PlayingCharacter.Id;
         }
     }
 }
