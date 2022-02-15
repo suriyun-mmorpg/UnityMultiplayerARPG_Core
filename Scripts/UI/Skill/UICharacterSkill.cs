@@ -326,9 +326,9 @@ namespace MultiplayerARPG
             if (uiRequirement != null)
             {
                 if (Skill == null ||
-                    (Skill.GetRequireCharacterLevel(Level) == 0 &&
-                    Skill.GetRequireCharacterSkillPoint(Level) == 0 &&
-                    Skill.GetRequireCharacterGold(Level) == 0 &&
+                    (Skill.GetRequireCharacterLevel(Level) <= 0 &&
+                    Skill.GetRequireCharacterSkillPoint(Level) <= 0 &&
+                    Skill.GetRequireCharacterGold(Level) <= 0 &&
                     Skill.CacheRequireAttributeAmounts.Count == 0 &&
                     Skill.CacheRequireSkillLevels.Count == 0))
                 {
