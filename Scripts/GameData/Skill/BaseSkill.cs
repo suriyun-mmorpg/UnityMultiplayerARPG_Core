@@ -549,13 +549,13 @@ namespace MultiplayerARPG
                 return false;
             }
 
-            if (checkSkillPoint && character.SkillPoint <= GetRequireCharacterSkillPoint(level))
+            if (checkSkillPoint && character.SkillPoint < GetRequireCharacterSkillPoint(level))
             {
                 gameMessage = UITextKeys.UI_ERROR_NOT_ENOUGH_SKILL_POINT;
                 return false;
             }
 
-            if (checkGold && character.Gold <= GetRequireCharacterGold(level))
+            if (checkGold && character.Gold < GetRequireCharacterGold(level))
             {
                 gameMessage = UITextKeys.UI_ERROR_NOT_ENOUGH_GOLD;
                 return false;
