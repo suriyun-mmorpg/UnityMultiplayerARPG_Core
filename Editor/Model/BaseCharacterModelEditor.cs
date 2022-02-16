@@ -1,5 +1,4 @@
 ﻿using UnityEditor;
-using UnityEngine;
 
 namespace MultiplayerARPG
 {
@@ -21,7 +20,7 @@ namespace MultiplayerARPG
             }
             else
             {
-                Debug.LogWarning($"[{GetType()}] Can't find `CharacterModelManager` from {name}");
+                model.MainModel = model;
             }
             ShowOnBool(nameof(model.IsMainModel), true, "hiddingObjects");
             ShowOnBool(nameof(model.IsMainModel), true, "hiddingRenderers");
