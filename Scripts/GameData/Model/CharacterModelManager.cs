@@ -23,6 +23,8 @@ namespace MultiplayerARPG
         [SerializeField]
         private BaseCharacterModel fpsModelPrefab = null;
         [SerializeField]
+        private Transform fpsModelContainer = null;
+        [SerializeField]
         [FormerlySerializedAs("fpsModelOffsets")]
         [Tooltip("Position offsets from fps model container (Camera's transform)")]
         private Vector3 fpsModelPositionOffsets = Vector3.zero;
@@ -193,11 +195,16 @@ namespace MultiplayerARPG
                 MainFpsModel.gameObject.SetActive(IsFps);
         }
 
-        public BaseCharacterModel InstantiateFpsModel(Transform container)
+        /// <summary>
+        /// Instantiate `fpsModelPrefab` into `fpsModelContainer`, or `cameraTransform` if `fpsModelContainer` is unset.
+        /// </summary>
+        /// <param name="cameraTransform"></param>
+        /// <returns></returns>
+        public BaseCharacterModel InstantiateFpsModel(Transform cameraTransform)
         {
             if (fpsModelPrefab == null)
                 return null;
-            MainFpsModel = Instantiate(fpsModelPrefab, container);
+            MainFpsModel = Instantiate(fpsModelPrefab, fpsModelContainer != null ? fpsModelContainer : cameraTransform);
             MainFpsModel.MainModel = MainFpsModel;
             MainFpsModel.IsFpsModel = true;
             MainFpsModel.IsTpsModel = false;
