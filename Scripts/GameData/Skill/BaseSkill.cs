@@ -34,7 +34,7 @@ namespace MultiplayerARPG
 
         [Category(11, "Requirement")]
         [Header("Requirements to Levelup")]
-        public SkillRequirement requirement;
+        public SkillRequirement requirement = new SkillRequirement();
 
         [Header("Required Equipments")]
         [Tooltip("If this is `TRUE`, character have to equip shield to use skill")]
