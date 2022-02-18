@@ -6,6 +6,12 @@ namespace MultiplayerARPG
 {
     public class MinimapRenderer : MonoBehaviour
     {
+        private struct MarkerData
+        {
+            public BaseCharacterEntity Character { get; set; }
+            public RectTransform Marker { get; set; }
+            public Vector3 MarkerRotateOffsets { get; set; }
+        }
         public enum Mode
         {
             Default,
@@ -46,10 +52,10 @@ namespace MultiplayerARPG
         public BaseMapInfo testingMapInfo;
         public Transform testingPlayingCharacterTransform;
 
-        private float updateCountdown;
+        private float updateMarkerCountdown;
         private BaseMapInfo currentMapInfo;
         private MeshRenderer meshMinimap;
-        private List<RectTransform> markers = new List<RectTransform>();
+        private List<MarkerData> markers = new List<MarkerData>();
 
         private void Start()
         {
@@ -62,7 +68,7 @@ namespace MultiplayerARPG
             BaseMapInfo mapInfo = isTestMode ? testingMapInfo : BaseGameNetworkManager.CurrentMapInfo;
             if (mapInfo == null)
             {
-                updateCountdown = 0f;
+                updateMarkerCountdown = 0f;
                 if (imageMinimap.gameObject.activeSelf)
                     imageMinimap.gameObject.SetActive(false);
                 return;
@@ -88,79 +94,13 @@ namespace MultiplayerARPG
 
                 float sizeRate = -(minImageSize / maxBoundsSize);
 
-                updateCountdown -= Time.deltaTime;
-                if (updateCountdown <= 0f)
+                updateMarkerCountdown -= Time.deltaTime;
+                if (updateMarkerCountdown <= 0f)
                 {
-                    updateCountdown = updateMarkerDuration;
-
-                    for (int i = markers.Count - 1; i >= 0; --i)
-                    {
-                        Destroy(markers[i].gameObject);
-                    }
-                    markers.Clear();
-
-                    if (GameInstance.PlayingCharacterEntity != null)
-                    {
-                        List<BaseCharacterEntity> allies = GameInstance.PlayingCharacterEntity.FindCharacters<BaseCharacterEntity>(allyMarkerDistance, true, true, false, false);
-                        List<BaseCharacterEntity> enemies = GameInstance.PlayingCharacterEntity.FindCharacters<BaseCharacterEntity>(enemyOrNeutralMarkerDistance, true, false, true, true);
-                        EntityInfo entityInfo;
-                        RectTransform markerPrefab;
-                        Vector3 markerRotateOffsets;
-                        foreach (BaseCharacterEntity entry in allies)
-                        {
-                            markerPrefab = null;
-                            markerRotateOffsets = Vector3.zero;
-                            entityInfo = entry.GetInfo();
-                            if (guildMemberMarkerPrefab != null && entityInfo.GuildId > 0 && entityInfo.GuildId == GameInstance.PlayingCharacterEntity.GuildId)
-                            {
-                                markerPrefab = guildMemberMarkerPrefab;
-                                markerRotateOffsets = guildMemberRotateOffsets;
-                            }
-                            else if (partyMemberMarkerPrefab != null && entityInfo.PartyId > 0 && entityInfo.PartyId == GameInstance.PlayingCharacterEntity.PartyId)
-                            {
-                                markerPrefab = partyMemberMarkerPrefab;
-                                markerRotateOffsets = partyMemberRotateOffsets;
-                            }
-                            else if (allyMemberMarkerPrefab != null)
-                            {
-                                markerPrefab = allyMemberMarkerPrefab;
-                                markerRotateOffsets = allyMemberRotateOffsets;
-                            }
-                            if (markerPrefab != null)
-                            {
-                                InstantiateEntityMarker(markerPrefab,
-                                    new Vector2(
-                                        (entry.CacheTransform.position.x - currentMapInfo.MinimapPosition.x) * sizeRate, 
-                                        (entry.CacheTransform.position.z - currentMapInfo.MinimapPosition.z) * sizeRate),
-                                    markerRotateOffsets + (Vector3.back * entry.CacheTransform.eulerAngles.y));
-                            }
-                        }
-                        foreach (BaseCharacterEntity entry in enemies)
-                        {
-                            markerPrefab = null;
-                            markerRotateOffsets = Vector3.zero;
-                            entityInfo = entry.GetInfo();
-                            if (enemyMarkerPrefab != null && GameInstance.PlayingCharacterEntity.IsEnemy(entityInfo))
-                            {
-                                markerPrefab = enemyMarkerPrefab;
-                                markerRotateOffsets = enemyRotateOffsets;
-                            }
-                            else if (neutralMarkerPrefab != null)
-                            {
-                                markerPrefab = neutralMarkerPrefab;
-                                markerRotateOffsets = neutralRotateOffsets;
-                            }
-                            if (markerPrefab != null)
-                            {
-                                InstantiateEntityMarker(markerPrefab,
-                                    new Vector2(
-                                        (entry.CacheTransform.position.x - currentMapInfo.MinimapPosition.x) * sizeRate, 
-                                        (entry.CacheTransform.position.z - currentMapInfo.MinimapPosition.z) * sizeRate),
-                                    markerRotateOffsets + (Vector3.back * entry.CacheTransform.eulerAngles.y));
-                            }
-                        }
-                    }
+                    updateMarkerCountdown = updateMarkerDuration;
+                    InstantiateEntitiesMarkers(sizeRate);
                 }
+                UpdateEntitiesMarkersPosition(sizeRate);
 
                 if (playingCharacterMarker != null)
                 {
@@ -193,13 +133,101 @@ namespace MultiplayerARPG
             }
         }
 
-        private void InstantiateEntityMarker(RectTransform prefab, Vector2 position, Vector3 eulerAngles)
+        private void UpdateEntitiesMarkersPosition(float sizeRate)
+        {
+            for (int i = markers.Count - 1; i >= 0; --i)
+            {
+                if (markers[i].Character == null)
+                {
+                    Destroy(markers[i].Marker.gameObject);
+                    markers.RemoveAt(i);
+                    continue;
+                }
+
+                markers[i].Marker.localPosition = new Vector2(
+                                            (markers[i].Character.CacheTransform.position.x - currentMapInfo.MinimapPosition.x) * sizeRate,
+                                            (markers[i].Character.CacheTransform.position.z - currentMapInfo.MinimapPosition.z) * sizeRate);
+                markers[i].Marker.localEulerAngles = markers[i].MarkerRotateOffsets + (Vector3.back * markers[i].Character.CacheTransform.eulerAngles.y);
+            }
+        }
+
+        private void InstantiateEntitiesMarkers(float sizeRate)
+        {
+            for (int i = markers.Count - 1; i >= 0; --i)
+            {
+                Destroy(markers[i].Marker.gameObject);
+            }
+            markers.Clear();
+
+            if (GameInstance.PlayingCharacterEntity != null)
+            {
+                List<BaseCharacterEntity> allies = GameInstance.PlayingCharacterEntity.FindCharacters<BaseCharacterEntity>(allyMarkerDistance, true, true, false, false);
+                List<BaseCharacterEntity> enemies = GameInstance.PlayingCharacterEntity.FindCharacters<BaseCharacterEntity>(enemyOrNeutralMarkerDistance, true, false, true, true);
+                EntityInfo entityInfo;
+                RectTransform markerPrefab;
+                Vector3 markerRotateOffsets;
+                foreach (BaseCharacterEntity entry in allies)
+                {
+                    markerPrefab = null;
+                    markerRotateOffsets = Vector3.zero;
+                    entityInfo = entry.GetInfo();
+                    if (guildMemberMarkerPrefab != null && entityInfo.GuildId > 0 && entityInfo.GuildId == GameInstance.PlayingCharacterEntity.GuildId)
+                    {
+                        markerPrefab = guildMemberMarkerPrefab;
+                        markerRotateOffsets = guildMemberRotateOffsets;
+                    }
+                    else if (partyMemberMarkerPrefab != null && entityInfo.PartyId > 0 && entityInfo.PartyId == GameInstance.PlayingCharacterEntity.PartyId)
+                    {
+                        markerPrefab = partyMemberMarkerPrefab;
+                        markerRotateOffsets = partyMemberRotateOffsets;
+                    }
+                    else if (allyMemberMarkerPrefab != null)
+                    {
+                        markerPrefab = allyMemberMarkerPrefab;
+                        markerRotateOffsets = allyMemberRotateOffsets;
+                    }
+                    if (markerPrefab != null)
+                    {
+                        InstantiateEntityMarker(entry, markerRotateOffsets, sizeRate, markerPrefab);
+                    }
+                }
+                foreach (BaseCharacterEntity entry in enemies)
+                {
+                    markerPrefab = null;
+                    markerRotateOffsets = Vector3.zero;
+                    entityInfo = entry.GetInfo();
+                    if (enemyMarkerPrefab != null && GameInstance.PlayingCharacterEntity.IsEnemy(entityInfo))
+                    {
+                        markerPrefab = enemyMarkerPrefab;
+                        markerRotateOffsets = enemyRotateOffsets;
+                    }
+                    else if (neutralMarkerPrefab != null)
+                    {
+                        markerPrefab = neutralMarkerPrefab;
+                        markerRotateOffsets = neutralRotateOffsets;
+                    }
+                    if (markerPrefab != null)
+                    {
+                        InstantiateEntityMarker(entry, markerRotateOffsets, sizeRate, markerPrefab);
+                    }
+                }
+            }
+        }
+
+        private void InstantiateEntityMarker(BaseCharacterEntity character, Vector3 markerRotateOffsets, float sizeRate, RectTransform prefab)
         {
             RectTransform newMarker = Instantiate(prefab);
             newMarker.SetParent(nonPlayingCharacterMarkerContainer);
-            newMarker.localPosition = position;
-            newMarker.localEulerAngles = eulerAngles;
-            markers.Add(newMarker);
+            newMarker.localPosition = new Vector2(
+                                        (character.CacheTransform.position.x - currentMapInfo.MinimapPosition.x) * sizeRate,
+                                        (character.CacheTransform.position.z - currentMapInfo.MinimapPosition.z) * sizeRate);
+            newMarker.localEulerAngles = markerRotateOffsets + (Vector3.back * character.CacheTransform.eulerAngles.y);
+            markers.Add(new MarkerData()
+            {
+                Character = character,
+                Marker = newMarker,
+                MarkerRotateOffsets = markerRotateOffsets,
+            });
         }
     }
 }
