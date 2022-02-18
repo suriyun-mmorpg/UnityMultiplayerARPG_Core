@@ -10,7 +10,7 @@ namespace MultiplayerARPG
         float CameraZoomDistance { get; }
         float CameraMinZoomDistance { get; }
         float CameraMaxZoomDistance { get; }
-        Vector3 CameraTargetOffsets { get; }
+        Vector3 CameraTargetOffset { get; }
         float CameraFov { get; }
         float CameraNearClipPlane { get; }
         float CameraFarClipPlane { get; }

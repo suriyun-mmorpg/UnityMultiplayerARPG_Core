@@ -79,14 +79,11 @@ namespace MultiplayerARPG
         [SerializeField]
         protected float tpsMaxZoomDistance = 3f;
         [SerializeField]
-        [FormerlySerializedAs("tpsTargetOffset")]
-        protected Vector3 tpsTargetOffsets = new Vector3(0.75f, 1.25f, 0f);
+        protected Vector3 tpsTargetOffset = new Vector3(0.75f, 1.25f, 0f);
         [SerializeField]
-        [FormerlySerializedAs("tpsTargetOffsetWhileCrouching")]
-        protected Vector3 tpsTargetOffsetsWhileCrouching = new Vector3(0.75f, 0.75f, 0f);
+        protected Vector3 tpsTargetOffsetWhileCrouching = new Vector3(0.75f, 0.75f, 0f);
         [SerializeField]
-        [FormerlySerializedAs("tpsTargetOffsetWhileCrawling")]
-        protected Vector3 tpsTargetOffsetsWhileCrawling = new Vector3(0.75f, 0.5f, 0f);
+        protected Vector3 tpsTargetOffsetWhileCrawling = new Vector3(0.75f, 0.5f, 0f);
         [SerializeField]
         protected float tpsFov = 60f;
         [SerializeField]
@@ -124,14 +121,11 @@ namespace MultiplayerARPG
         [SerializeField]
         protected float fpsZoomDistance = 0f;
         [SerializeField]
-        [FormerlySerializedAs("fpsTargetOffset")]
-        protected Vector3 fpsTargetOffsets = new Vector3(0f, 0f, 0f);
+        protected Vector3 fpsTargetOffset = new Vector3(0f, 0f, 0f);
         [SerializeField]
-        [FormerlySerializedAs("fpsTargetOffsetsWhileCrouching")]
-        protected Vector3 fpsTargetOffsetsWhileCrouching = new Vector3(0f, -0.25f, 0f);
+        protected Vector3 fpsTargetOffsetWhileCrouching = new Vector3(0f, -0.25f, 0f);
         [SerializeField]
-        [FormerlySerializedAs("fpsTargetOffsetsWhileCrawling")]
-        protected Vector3 fpsTargetOffsetsWhileCrawling = new Vector3(0f, -0.5f, 0f);
+        protected Vector3 fpsTargetOffsetWhileCrawling = new Vector3(0f, -0.5f, 0f);
         [SerializeField]
         protected float fpsFov = 40f;
         [SerializeField]
@@ -218,7 +212,7 @@ namespace MultiplayerARPG
             get { return ViewMode == ShooterControllerViewMode.Tps ? tpsMaxZoomDistance : fpsZoomDistance; }
         }
 
-        public Vector3 CameraTargetOffsets
+        public Vector3 CameraTargetOffset
         {
             get
             {
@@ -226,30 +220,30 @@ namespace MultiplayerARPG
                 {
                     if (PlayerCharacterEntity.ExtraMovementState == ExtraMovementState.IsCrouching)
                     {
-                        return tpsTargetOffsetsWhileCrouching;
+                        return tpsTargetOffsetWhileCrouching;
                     }
                     else if (PlayerCharacterEntity.ExtraMovementState == ExtraMovementState.IsCrawling)
                     {
-                        return tpsTargetOffsetsWhileCrawling;
+                        return tpsTargetOffsetWhileCrawling;
                     }
                     else
                     {
-                        return tpsTargetOffsets;
+                        return tpsTargetOffset;
                     }
                 }
                 else
                 {
                     if (PlayerCharacterEntity.ExtraMovementState == ExtraMovementState.IsCrouching)
                     {
-                        return fpsTargetOffsetsWhileCrouching;
+                        return fpsTargetOffsetWhileCrouching;
                     }
                     else if (PlayerCharacterEntity.ExtraMovementState == ExtraMovementState.IsCrawling)
                     {
-                        return fpsTargetOffsetsWhileCrawling;
+                        return fpsTargetOffsetWhileCrawling;
                     }
                     else
                     {
-                        return fpsTargetOffsets;
+                        return fpsTargetOffset;
                     }
                 }
             }
@@ -523,7 +517,7 @@ namespace MultiplayerARPG
             if (dirtyViewMode != viewMode)
                 UpdateViewMode();
 
-            CacheGameplayCameraController.TargetOffset = CameraTargetOffsets;
+            CacheGameplayCameraController.TargetOffset = CameraTargetOffset;
             CacheGameplayCameraController.EnableWallHitSpring = viewMode == ShooterControllerViewMode.Tps;
             CacheGameplayCameraController.FollowingEntityTransform = ViewMode == ShooterControllerViewMode.Fps ? PlayerCharacterEntity.FpsCameraTargetTransform : PlayerCharacterEntity.CameraTargetTransform;
 
