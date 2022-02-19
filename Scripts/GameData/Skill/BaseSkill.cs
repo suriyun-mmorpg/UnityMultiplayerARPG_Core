@@ -699,19 +699,19 @@ namespace MultiplayerARPG
                 }
             }
 
-            if (character.CurrentHp < GetConsumeHp(level))
+            if (character.CurrentHp < GetTotalConsumeHp(level, character))
             {
                 gameMessage = UITextKeys.UI_ERROR_NOT_ENOUGH_HP;
                 return false;
             }
 
-            if (character.CurrentMp < GetConsumeMp(level))
+            if (character.CurrentMp < GetTotalConsumeMp(level, character))
             {
                 gameMessage = UITextKeys.UI_ERROR_NOT_ENOUGH_MP;
                 return false;
             }
 
-            if (character.CurrentStamina < GetConsumeStamina(level))
+            if (character.CurrentStamina < GetTotalConsumeStamina(level, character))
             {
                 gameMessage = UITextKeys.UI_ERROR_NOT_ENOUGH_STAMINA;
                 return false;
