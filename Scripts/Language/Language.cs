@@ -66,6 +66,7 @@ namespace MultiplayerARPG
         UI_ERROR_INVALID_EMAIL,
         UI_ERROR_EMAIL_ALREADY_IN_USE,
         UI_ERROR_USERNAME_EXISTED,
+        UI_ERROR_INVALID_USERNAME,
         // Error - UI Lobby
         UI_ERROR_ALREADY_CONNECTED_TO_LOBBY,
         UI_ERROR_ALREADY_CONNECTED_TO_GAME,
@@ -81,6 +82,7 @@ namespace MultiplayerARPG
         UI_ERROR_CHARACTER_NAME_TOO_SHORT,
         UI_ERROR_CHARACTER_NAME_TOO_LONG,
         UI_ERROR_CHARACTER_NAME_EXISTED,
+        UI_ERROR_INVALID_CHARACTER_NAME,
         // Error - UI Cash Packages
         UI_ERROR_CANNOT_GET_CASH_PACKAGE_INFO,
         // Error - UI Cash Shop
@@ -89,6 +91,7 @@ namespace MultiplayerARPG
         UI_ERROR_GUILD_NAME_TOO_SHORT,
         UI_ERROR_GUILD_NAME_TOO_LONG,
         UI_ERROR_GUILD_NAME_EXISTED,
+        UI_ERROR_INVALID_GUILD_NAME,
         // Error - UI Guild Role Setting
         UI_ERROR_GUILD_ROLE_NAME_TOO_SHORT,
         UI_ERROR_GUILD_ROLE_NAME_TOO_LONG,
@@ -1279,6 +1282,7 @@ namespace MultiplayerARPG
             Texts.Add(UITextKeys.UI_ERROR_INVALID_EMAIL.ToString(), "Invalid email format");
             Texts.Add(UITextKeys.UI_ERROR_EMAIL_ALREADY_IN_USE.ToString(), "Email is already in use");
             Texts.Add(UITextKeys.UI_ERROR_USERNAME_EXISTED.ToString(), "Username is already existed");
+            Texts.Add(UITextKeys.UI_ERROR_INVALID_USERNAME.ToString(), "Username is invalid, allow only a-z, A-Z, 0-9 and _ for username.");
             // Error - UI Lobby
             Texts.Add(UITextKeys.UI_ERROR_ALREADY_CONNECTED_TO_LOBBY.ToString(), "Already connected to lobby server");
             Texts.Add(UITextKeys.UI_ERROR_ALREADY_CONNECTED_TO_GAME.ToString(), "Already connected to game server");
@@ -1294,6 +1298,7 @@ namespace MultiplayerARPG
             Texts.Add(UITextKeys.UI_ERROR_CHARACTER_NAME_TOO_SHORT.ToString(), "Character name is too short");
             Texts.Add(UITextKeys.UI_ERROR_CHARACTER_NAME_TOO_LONG.ToString(), "Character name is too long");
             Texts.Add(UITextKeys.UI_ERROR_CHARACTER_NAME_EXISTED.ToString(), "Character name is already existed");
+            Texts.Add(UITextKeys.UI_ERROR_INVALID_CHARACTER_NAME.ToString(), "Character name is invalid, allow only a-z, A-Z, 0-9 and _ for character name.");
             // Error - UI Cash Packages
             Texts.Add(UITextKeys.UI_ERROR_CANNOT_GET_CASH_PACKAGE_INFO.ToString(), "Cannot retrieve cash package info");
             // Error - UI Cash Shop
@@ -1302,6 +1307,7 @@ namespace MultiplayerARPG
             Texts.Add(UITextKeys.UI_ERROR_GUILD_NAME_TOO_SHORT.ToString(), "Guild name is too short");
             Texts.Add(UITextKeys.UI_ERROR_GUILD_NAME_TOO_LONG.ToString(), "Guild name is too long");
             Texts.Add(UITextKeys.UI_ERROR_GUILD_NAME_EXISTED.ToString(), "Guild name is already existed");
+            Texts.Add(UITextKeys.UI_ERROR_INVALID_GUILD_NAME.ToString(), "Guild name is invalid, allow only a-z, A-Z, 0-9 and _ for guild name.");
             // Error - UI Guild Role Setting
             Texts.Add(UITextKeys.UI_ERROR_GUILD_ROLE_NAME_TOO_SHORT.ToString(), "Guild role name is too short");
             Texts.Add(UITextKeys.UI_ERROR_GUILD_ROLE_NAME_TOO_LONG.ToString(), "Guild role name is too long");
