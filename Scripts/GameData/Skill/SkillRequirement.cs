@@ -7,8 +7,8 @@
         public IncrementalFloat skillPoint = new IncrementalFloat() { baseAmount = 1, amountIncreaseEachLevel = 0 };
         public IncrementalInt gold = new IncrementalInt() { baseAmount = 0, amountIncreaseEachLevel = 0 };
         [ArrayElementTitle("attribute")]
-        public AttributeAmount[] attributeAmounts;
+        public AttributeAmount[] attributeAmounts = new AttributeAmount[0];
         [ArrayElementTitle("skill")]
-        public SkillLevel[] skillLevels;
+        public SkillLevel[] skillLevels = new SkillLevel[0];
     }
 }
