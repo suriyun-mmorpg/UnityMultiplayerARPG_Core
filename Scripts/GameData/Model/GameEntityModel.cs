@@ -20,11 +20,11 @@ namespace MultiplayerARPG
 
         [SerializeField]
         [HideInInspector]
-        private bool isIdAssigned;
+        protected bool isIdAssigned;
 
         [SerializeField]
         [HideInInspector]
-        private int id;
+        protected int id;
 
         public int Id
         {
@@ -37,7 +37,7 @@ namespace MultiplayerARPG
                 }
                 return id;
             }
-            private set
+            protected set
             {
                 id = value;
                 isIdAssigned = true;
@@ -49,7 +49,7 @@ namespace MultiplayerARPG
 
         [Tooltip("Materials which will be applied while entity is visible")]
         [SerializeField]
-        private MaterialCollection[] visibleMaterials;
+        protected MaterialCollection[] visibleMaterials;
         public MaterialCollection[] VisibleMaterials
         {
             get { return visibleMaterials; }
@@ -58,7 +58,7 @@ namespace MultiplayerARPG
 
         [Tooltip("Materials which will be applied while entity is invisible")]
         [SerializeField]
-        private MaterialCollection[] invisibleMaterials;
+        protected MaterialCollection[] invisibleMaterials;
         public virtual MaterialCollection[] InvisibleMaterials
         {
             get { return invisibleMaterials; }
@@ -67,7 +67,7 @@ namespace MultiplayerARPG
 
         [Tooltip("Materials which will be applied while view mode is FPS")]
         [SerializeField]
-        private MaterialCollection[] fpsMaterials;
+        protected MaterialCollection[] fpsMaterials;
         public MaterialCollection[] FpsMaterials
         {
             get { return fpsMaterials; }
@@ -76,7 +76,7 @@ namespace MultiplayerARPG
 
         [Tooltip("These objects will be deactivated while entity is invisible")]
         [SerializeField]
-        private GameObject[] hiddingObjects;
+        protected GameObject[] hiddingObjects;
         public GameObject[] HiddingObjects
         {
             get { return hiddingObjects; }
@@ -85,7 +85,7 @@ namespace MultiplayerARPG
 
         [Tooltip("These renderers will be disabled while entity is invisible")]
         [SerializeField]
-        private Renderer[] hiddingRenderers;
+        protected Renderer[] hiddingRenderers;
         public Renderer[] HiddingRenderers
         {
             get { return hiddingRenderers; }
@@ -94,7 +94,7 @@ namespace MultiplayerARPG
 
         [Tooltip("These object will be deactivated while view mode is FPS")]
         [SerializeField]
-        private GameObject[] fpsHiddingObjects;
+        protected GameObject[] fpsHiddingObjects;
         public GameObject[] FpsHiddingObjects
         {
             get { return fpsHiddingObjects; }
@@ -103,7 +103,7 @@ namespace MultiplayerARPG
 
         [Tooltip("These renderers will be disabled while view mode is FPS")]
         [SerializeField]
-        private Renderer[] fpsHiddingRenderers;
+        protected Renderer[] fpsHiddingRenderers;
         public Renderer[] FpsHiddingRenderers
         {
             get { return fpsHiddingRenderers; }
@@ -112,7 +112,7 @@ namespace MultiplayerARPG
 
         [Tooltip("Generic audio source which will be used to play sound effects")]
         [SerializeField]
-        private AudioSource genericAudioSource;
+        protected AudioSource genericAudioSource;
         public AudioSource GenericAudioSource
         {
             get { return genericAudioSource; }
@@ -120,7 +120,7 @@ namespace MultiplayerARPG
 
         [Header("Effect Containers")]
         [SerializeField]
-        private EffectContainer[] effectContainers;
+        protected EffectContainer[] effectContainers;
         public virtual EffectContainer[] EffectContainers
         {
             get { return effectContainers; }
@@ -147,7 +147,7 @@ namespace MultiplayerARPG
         public Transform CacheTransform { get; protected set; }
         public BaseGameEntity CacheEntity { get; protected set; }
 
-        private Dictionary<string, EffectContainer> cacheEffectContainers = null;
+        protected Dictionary<string, EffectContainer> cacheEffectContainers = null;
         /// <summary>
         /// Dictionary[effectSocket(String), container(CharacterModelContainer)]
         /// </summary>
@@ -157,7 +157,7 @@ namespace MultiplayerARPG
         }
 
         // Optimize garbage collector
-        private GameEffect tempGameEffect;
+        protected GameEffect tempGameEffect;
 
         internal void AssignId()
         {
@@ -258,7 +258,7 @@ namespace MultiplayerARPG
             }
         }
 
-        private void SetHiddingObjectsAndRenderers(GameObject[] hiddingObjects, Renderer[] hiddingRenderers, bool isHidding)
+        protected void SetHiddingObjectsAndRenderers(GameObject[] hiddingObjects, Renderer[] hiddingRenderers, bool isHidding)
         {
             int i;
             if (hiddingObjects != null && hiddingObjects.Length > 0)

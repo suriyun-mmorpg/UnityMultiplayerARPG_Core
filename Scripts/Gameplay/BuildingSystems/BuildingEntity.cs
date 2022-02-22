@@ -154,15 +154,14 @@ namespace MultiplayerARPG
         public bool IsBuildMode { get; private set; }
         public BasePlayerCharacterEntity Builder { get; private set; }
 
-        // Private variables
-        private readonly List<BaseGameEntity> triggerEntities = new List<BaseGameEntity>();
-        private readonly List<TilemapCollider2D> triggerTilemaps = new List<TilemapCollider2D>();
-        private readonly List<BuildingMaterial> triggerMaterials = new List<BuildingMaterial>();
-        private readonly List<NoConstructionArea> triggerNoConstructionAreas = new List<NoConstructionArea>();
-        private readonly List<BuildingEntity> children = new List<BuildingEntity>();
-        private readonly List<BuildingMaterial> buildingMaterials = new List<BuildingMaterial>();
-        private bool parentFound;
-        private bool isDestroyed;
+        protected readonly List<BaseGameEntity> triggerEntities = new List<BaseGameEntity>();
+        protected readonly List<TilemapCollider2D> triggerTilemaps = new List<TilemapCollider2D>();
+        protected readonly List<BuildingMaterial> triggerMaterials = new List<BuildingMaterial>();
+        protected readonly List<NoConstructionArea> triggerNoConstructionAreas = new List<NoConstructionArea>();
+        protected readonly List<BuildingEntity> children = new List<BuildingEntity>();
+        protected readonly List<BuildingMaterial> buildingMaterials = new List<BuildingMaterial>();
+        protected bool parentFound;
+        protected bool isDestroyed;
 
         protected override void EntityAwake()
         {

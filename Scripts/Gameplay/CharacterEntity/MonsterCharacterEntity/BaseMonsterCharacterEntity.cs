@@ -132,11 +132,10 @@ namespace MultiplayerARPG
             }
         }
 
-        // Private variables
-        private bool isDestroyed;
-        private readonly HashSet<string> looters = new HashSet<string>();
-        private readonly List<CharacterItem> droppingItems = new List<CharacterItem>();
-        private float lastTeleportToSummonerTime = 0f;
+        protected bool isDestroyed;
+        protected readonly HashSet<string> looters = new HashSet<string>();
+        protected readonly List<CharacterItem> droppingItems = new List<CharacterItem>();
+        protected float lastTeleportToSummonerTime = 0f;
 
         public override void PrepareRelatesData()
         {

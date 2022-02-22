@@ -52,8 +52,7 @@ namespace MultiplayerARPG
         public float DestroyDelay { get { return destroyDelay; } }
         public float DestroyRespawnDelay { get { return destroyRespawnDelay; } }
 
-        // Private variables
-        private bool isDestroyed;
+        protected bool isDestroyed;
 
         public override void PrepareRelatesData()
         {

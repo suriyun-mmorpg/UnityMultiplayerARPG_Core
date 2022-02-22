@@ -72,10 +72,9 @@ namespace MultiplayerARPG
         public float DestroyDelay { get { return destroyDelay; } }
         public float DestroyRespawnDelay { get { return destroyRespawnDelay; } }
 
-        // Private variables
-        private readonly Dictionary<byte, BaseGameEntity> passengers = new Dictionary<byte, BaseGameEntity>();
-        private MovementSecure defaultMovementSecure;
-        private bool isDestroyed;
+        protected readonly Dictionary<byte, BaseGameEntity> passengers = new Dictionary<byte, BaseGameEntity>();
+        protected MovementSecure defaultMovementSecure;
+        protected bool isDestroyed;
 
         protected override sealed void EntityAwake()
         {

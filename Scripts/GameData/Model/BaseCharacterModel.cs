@@ -16,7 +16,7 @@ namespace MultiplayerARPG
 
         [Header("Model Switching Settings")]
         [SerializeField]
-        private GameObject[] activateObjectsWhenSwitchModel = new GameObject[0];
+        protected GameObject[] activateObjectsWhenSwitchModel = new GameObject[0];
         public GameObject[] ActivateObjectsWhenSwitchModel
         {
             get { return activateObjectsWhenSwitchModel; }
@@ -24,7 +24,7 @@ namespace MultiplayerARPG
         }
 
         [SerializeField]
-        private GameObject[] deactivateObjectsWhenSwitchModel = new GameObject[0];
+        protected GameObject[] deactivateObjectsWhenSwitchModel = new GameObject[0];
         public GameObject[] DeactivateObjectsWhenSwitchModel
         {
             get { return deactivateObjectsWhenSwitchModel; }
@@ -32,7 +32,7 @@ namespace MultiplayerARPG
         }
 
         [SerializeField]
-        private VehicleCharacterModel[] vehicleModels = new VehicleCharacterModel[0];
+        protected VehicleCharacterModel[] vehicleModels = new VehicleCharacterModel[0];
         public VehicleCharacterModel[] VehicleModels
         {
             get { return vehicleModels; }
@@ -41,7 +41,7 @@ namespace MultiplayerARPG
 
         [Header("Equipment Containers")]
         [SerializeField]
-        private EquipmentContainer[] equipmentContainers = new EquipmentContainer[0];
+        protected EquipmentContainer[] equipmentContainers = new EquipmentContainer[0];
         public EquipmentContainer[] EquipmentContainers
         {
             get { return equipmentContainers; }
@@ -69,14 +69,14 @@ namespace MultiplayerARPG
         public bool activateInstantiatedObject = false;
 #endif
 
-        public CharacterModelManager Manager { get; private set; }
+        public CharacterModelManager Manager { get; protected set; }
 
         public override Dictionary<string, EffectContainer> CacheEffectContainers
         {
             get { return IsMainModel ? base.CacheEffectContainers : MainModel.CacheEffectContainers; }
         }
 
-        private Dictionary<int, VehicleCharacterModel> cacheVehicleModels;
+        protected Dictionary<int, VehicleCharacterModel> cacheVehicleModels;
         /// <summary>
         /// { vehicleType(Int32), vehicleCharacterModel(VehicleCharacterModel) }
         /// </summary>
@@ -85,7 +85,7 @@ namespace MultiplayerARPG
             get { return IsMainModel ? cacheVehicleModels : MainModel.cacheVehicleModels; }
         }
 
-        private Dictionary<string, EquipmentContainer> cacheEquipmentModelContainers;
+        protected Dictionary<string, EquipmentContainer> cacheEquipmentModelContainers;
         /// <summary>
         /// { equipSocket(String), container(EquipmentModelContainer) }
         /// </summary>
@@ -94,7 +94,7 @@ namespace MultiplayerARPG
             get { return IsMainModel ? cacheEquipmentModelContainers : MainModel.cacheEquipmentModelContainers; }
         }
 
-        private Dictionary<string, Dictionary<string, GameObject>> cacheModels;
+        protected Dictionary<string, Dictionary<string, GameObject>> cacheModels;
         /// <summary>
         /// { equipPosition(String), { equipSocket(String), model(GameObject) } }
         /// </summary>
@@ -103,7 +103,7 @@ namespace MultiplayerARPG
             get { return IsMainModel ? cacheModels : MainModel.cacheModels; }
         }
 
-        private Dictionary<string, List<GameEffect>> cacheEffects = new Dictionary<string, List<GameEffect>>();
+        protected Dictionary<string, List<GameEffect>> cacheEffects = new Dictionary<string, List<GameEffect>>();
         /// <summary>
         /// { equipPosition(String), [ effect(GameEffect) ] }
         /// </summary>
@@ -112,21 +112,21 @@ namespace MultiplayerARPG
             get { return IsMainModel ? cacheEffects : MainModel.cacheEffects; }
         }
 
-        private BaseEquipmentEntity cacheRightHandEquipmentEntity;
+        protected BaseEquipmentEntity cacheRightHandEquipmentEntity;
         public BaseEquipmentEntity CacheRightHandEquipmentEntity
         {
             get { return IsMainModel ? cacheRightHandEquipmentEntity : MainModel.cacheRightHandEquipmentEntity; }
             set { MainModel.cacheRightHandEquipmentEntity = value; }
         }
 
-        private BaseEquipmentEntity cacheLeftHandEquipmentEntity;
+        protected BaseEquipmentEntity cacheLeftHandEquipmentEntity;
         public BaseEquipmentEntity CacheLeftHandEquipmentEntity
         {
             get { return IsMainModel ? cacheLeftHandEquipmentEntity : MainModel.cacheLeftHandEquipmentEntity; }
             set { MainModel.cacheLeftHandEquipmentEntity = value; }
         }
 
-        private Dictionary<string, List<BaseEquipmentEntity>> cacheEquipmentEntities;
+        protected Dictionary<string, List<BaseEquipmentEntity>> cacheEquipmentEntities;
         /// <summary>
         /// { equipPosition(String), [ equipmentEntity(BaseEquipmentEntity) ] }
         /// </summary>
@@ -138,13 +138,13 @@ namespace MultiplayerARPG
         /// <summary>
         /// { equipPosition(String), itemDataId(Int32) }
         /// </summary>
-        private Dictionary<string, int> cacheItemIds;
+        protected Dictionary<string, int> cacheItemIds;
         public Dictionary<string, int> CacheItemIds
         {
             get { return IsMainModel ? cacheItemIds : MainModel.cacheItemIds; }
         }
 
-        private bool isCacheDataInitialized = false;
+        protected bool isCacheDataInitialized = false;
 
         // Protected fields
         public EquipWeapons equipWeapons { get; protected set; }
@@ -226,7 +226,7 @@ namespace MultiplayerARPG
             cacheItemIds = new Dictionary<string, int>();
         }
 
-        private void UpdateObjectsWhenSwitch()
+        protected void UpdateObjectsWhenSwitch()
         {
             if (activateObjectsWhenSwitchModel != null &&
                 activateObjectsWhenSwitchModel.Length > 0)
@@ -248,7 +248,7 @@ namespace MultiplayerARPG
             }
         }
 
-        private void RevertObjectsWhenSwitch()
+        protected void RevertObjectsWhenSwitch()
         {
             if (activateObjectsWhenSwitchModel != null &&
                 activateObjectsWhenSwitchModel.Length > 0)
@@ -367,7 +367,7 @@ namespace MultiplayerARPG
         }
 #endif
 
-        private void DestroyCacheModel(string equipPosition)
+        protected void DestroyCacheModel(string equipPosition)
         {
             if (string.IsNullOrEmpty(equipPosition))
                 return;
@@ -394,7 +394,7 @@ namespace MultiplayerARPG
                 onEquipmentModelsDestroyed.Invoke(equipPosition);
         }
 
-        private void DestroyCacheModels()
+        protected void DestroyCacheModels()
         {
             foreach (string equipPosition in CacheModels.Keys)
             {
@@ -568,14 +568,14 @@ namespace MultiplayerARPG
                 onEquipmentModelsInstantiated.Invoke(equipPosition);
         }
 
-        private void CreateCacheEffect(string buffId, List<GameEffect> effects)
+        protected void CreateCacheEffect(string buffId, List<GameEffect> effects)
         {
             if (effects == null || CacheEffects.ContainsKey(buffId))
                 return;
             CacheEffects[buffId] = effects;
         }
 
-        private void DestroyCacheEffect(string buffId)
+        protected void DestroyCacheEffect(string buffId)
         {
             List<GameEffect> oldEffects;
             if (!string.IsNullOrEmpty(buffId) && CacheEffects.TryGetValue(buffId, out oldEffects) && oldEffects != null)
@@ -589,7 +589,7 @@ namespace MultiplayerARPG
             }
         }
 
-        private void DestroyCacheEffects()
+        protected void DestroyCacheEffects()
         {
             foreach (string buffId in CacheEffects.Keys)
             {
