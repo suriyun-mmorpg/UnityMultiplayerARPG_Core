@@ -621,7 +621,7 @@ namespace MultiplayerARPG
             BasePlayerCharacterEntity playerCharacterEntity;
             foreach (string looter in looters)
             {
-                if (GameInstance.ServerUserHandlers.TryGetPlayerCharacterById(looter, out playerCharacterEntity))
+                if (!GameInstance.ServerUserHandlers.TryGetPlayerCharacterById(looter, out playerCharacterEntity))
                     continue;
                 playerCharacterEntity.IncreaseCurrency(currency, amount);
             }
