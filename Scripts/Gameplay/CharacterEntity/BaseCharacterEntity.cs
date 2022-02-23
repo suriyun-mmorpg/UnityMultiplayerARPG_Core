@@ -293,17 +293,14 @@ namespace MultiplayerARPG
             // Update movement animation
             CharacterModel.SetMovementState(MovementState, ExtraMovementState, Direction2D, this.GetCaches().FreezeAnimation);
             // Update FPS model
-            if (IsClient)
+            if (IsClient && FpsModel && FpsModel.gameObject.activeSelf)
             {
-                if (FpsModel && FpsModel.gameObject.activeSelf)
-                {
-                    // Update is dead state
-                    FpsModel.SetIsDead(this.IsDead());
-                    // Update move speed multiplier
-                    FpsModel.SetMoveAnimationSpeedMultiplier(MoveAnimationSpeedMultiplier);
-                    // Update movement animation
-                    FpsModel.SetMovementState(MovementState, ExtraMovementState, Direction2D, this.GetCaches().FreezeAnimation);
-                }
+                // Update is dead state
+                FpsModel.SetIsDead(this.IsDead());
+                // Update move speed multiplier
+                FpsModel.SetMoveAnimationSpeedMultiplier(MoveAnimationSpeedMultiplier);
+                // Update movement animation
+                FpsModel.SetMovementState(MovementState, ExtraMovementState, Direction2D, this.GetCaches().FreezeAnimation);
             }
 
             if (IsOwnerClient)
@@ -324,6 +321,26 @@ namespace MultiplayerARPG
             base.OnTeleport(position, rotation);
             // Clear target entity when teleport
             SetTargetEntity(null);
+        }
+
+        public override void PlayJumpAnimation()
+        {
+            base.PlayJumpAnimation();
+            if (IsClient && FpsModel && FpsModel.gameObject.activeSelf)
+            {
+                if (FpsModel is IJumppableModel)
+                    (FpsModel as IJumppableModel).PlayJumpAnimation();
+            }
+        }
+
+        public override void PlayPickupAnimation()
+        {
+            base.PlayPickupAnimation();
+            if (IsClient && FpsModel && FpsModel.gameObject.activeSelf)
+            {
+                if (FpsModel is IPickupableModel)
+                    (FpsModel as IPickupableModel).PlayPickupAnimation();
+            }
         }
 
         #region Relates Objects

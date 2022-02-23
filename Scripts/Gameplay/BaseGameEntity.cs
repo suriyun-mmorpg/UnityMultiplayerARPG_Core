@@ -601,16 +601,26 @@ namespace MultiplayerARPG
             passengingVehicleEntity = null;
         }
 
+        public void CallAllPlayJumpAnimation()
+        {
+            RPC(AllPlayJumpAnimation);
+        }
+
         [AllRpc]
         protected void AllPlayJumpAnimation()
         {
-            this.PlayJumpAnimation();
+            PlayJumpAnimation();
+        }
+
+        public void CallAllPlayPickupAnimation()
+        {
+            RPC(AllPlayPickupAnimation);
         }
 
         [AllRpc]
         protected void AllPlayPickupAnimation()
         {
-            this.PlayPickupAnimation();
+            PlayPickupAnimation();
         }
         #endregion
 
@@ -741,14 +751,16 @@ namespace MultiplayerARPG
             return true;
         }
 
-        public void CallAllPlayJumpAnimation()
+        public virtual void PlayJumpAnimation()
         {
-            RPC(AllPlayJumpAnimation);
+            if (Model is IJumppableModel)
+                (Model as IJumppableModel).PlayJumpAnimation();
         }
 
-        public void CallAllPlayPickupAnimation()
+        public virtual void PlayPickupAnimation()
         {
-            RPC(AllPlayPickupAnimation);
+            if (Model is IPickupableModel)
+                (Model as IPickupableModel).PlayPickupAnimation();
         }
 
         protected bool EnterVehicle(IVehicleEntity vehicle, byte seatIndex)

@@ -31,19 +31,5 @@ namespace MultiplayerARPG
                 return null;
             return gameEntity.Entity.gameObject;
         }
-
-        public static void PlayJumpAnimation(this IGameEntity gameEntity)
-        {
-            if (gameEntity == null || !gameEntity.Entity || !(gameEntity.Entity.Model is IJumppableModel))
-                return;
-            (gameEntity.Entity.Model as IJumppableModel).PlayJumpAnimation();
-        }
-
-        public static void PlayPickupAnimation(this IGameEntity gameEntity)
-        {
-            if (gameEntity == null || !gameEntity.Entity || !(gameEntity.Entity.Model is IPickupableModel))
-                return;
-            (gameEntity.Entity.Model as IPickupableModel).PlayPickupAnimation();
-        }
     }
 }
