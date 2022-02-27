@@ -23,6 +23,7 @@
         public void OnClickChangeWeaponSet()
         {
             UIWeaponSets.ChangeWeaponSet(Set);
+            UICharacterHotkeys.SetUsingHotkey(null);
         }
     }
 }
