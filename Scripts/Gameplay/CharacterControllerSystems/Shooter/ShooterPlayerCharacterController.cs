@@ -1709,15 +1709,19 @@ namespace MultiplayerARPG
             // Clear area before next find
             ConstructingBuildingEntity.BuildingArea = null;
             // Default aim position (aim to sky/space)
-            aimTargetPosition = centerRay.origin + centerRay.direction * (centerOriginToCharacterDistance + findTargetRaycastDistance);
+            aimTargetPosition = centerRay.origin + centerRay.direction * (centerOriginToCharacterDistance + ConstructingBuildingEntity.BuildDistance - BuildingEntity.BUILD_DISTANCE_BUFFER);
             // Raycast from camera position to center of screen
-            FindConstructingBuildingArea(centerRay, centerOriginToCharacterDistance + findTargetRaycastDistance);
-            // Not hit ground, find ground to snap
-            if (!ConstructingBuildingEntity.HitSurface || !ConstructingBuildingEntity.IsPositionInBuildDistance(CacheTransform.position, aimTargetPosition))
+            FindConstructingBuildingArea(centerRay, centerOriginToCharacterDistance + ConstructingBuildingEntity.BuildDistance - BuildingEntity.BUILD_DISTANCE_BUFFER);
+            // Not hit ground
+            if (!ConstructingBuildingEntity.HitSurface)
             {
-                aimTargetPosition = GameplayUtils.ClampPosition(CacheTransform.position, aimTargetPosition, ConstructingBuildingEntity.BuildDistance - BuildingEntity.BUILD_DISTANCE_BUFFER);
                 // Find nearest grounded position
                 FindConstructingBuildingArea(new Ray(aimTargetPosition, Vector3.down), 100f);
+            }
+            if (!ConstructingBuildingEntity.IsPositionInBuildDistance(CacheTransform.position, aimTargetPosition))
+            {
+                // Clamp building position to be within build distance
+                aimTargetPosition = GameplayUtils.ClampPosition(CacheTransform.position, aimTargetPosition, ConstructingBuildingEntity.BuildDistance - BuildingEntity.BUILD_DISTANCE_BUFFER);
             }
             // Place constructing building
             if ((ConstructingBuildingEntity.BuildingArea && !ConstructingBuildingEntity.BuildingArea.snapBuildingObject) ||
@@ -1762,8 +1766,8 @@ namespace MultiplayerARPG
                 }
 
                 // Find ground position from upper position
-                Vector3 raycastOrigin = new Vector3(tempHitInfo.point.x, tempHitInfo.collider.bounds.center.y + tempHitInfo.collider.bounds.extents.y + 0.01f, tempHitInfo.point.z);
-                RaycastHit[] groundHits = Physics.RaycastAll(raycastOrigin, Vector3.down, tempHitInfo.collider.bounds.size.y + 0.01f, CurrentGameInstance.GetBuildLayerMask());
+                Vector3 raycastOrigin = tempHitInfo.point + Vector3.up * 100f * 0.5f;
+                RaycastHit[] groundHits = Physics.RaycastAll(raycastOrigin, Vector3.down, 100f, CurrentGameInstance.GetBuildLayerMask());
                 for (int j = 0; j < groundHits.Length; ++j)
                 {
                     if (groundHits[j].transform == tempHitInfo.transform)
