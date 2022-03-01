@@ -75,27 +75,20 @@ namespace MultiplayerARPG
         protected override void Awake()
         {
             base.Awake();
-            if (ChatMessages.Count == 0)
+            int index = UIChatHistory.ChatMessages.Count - chatEntrySize;
+            if (index < 0)
+                index = 0;
+            while (index < UIChatHistory.ChatMessages.Count)
             {
-                // No received chat messages, try fill it from global chat messages
-                int index = UIChatHistory.ChatMessages.Count - chatEntrySize;
-                if (index < 0)
-                    index = 0;
-                while (index < UIChatHistory.ChatMessages.Count)
-                {
-                    OnReceiveChat(UIChatHistory.ChatMessages[index]);
-                    index++;
-                }
+                OnReceiveChat(UIChatHistory.ChatMessages[index]);
+                index++;
             }
             SetOnClientReceiveChatMessage();
         }
 
         private void Start()
         {
-            ChatMessages.Clear();
-            ChannelBasedChatMessages.Clear();
             StartCoroutine(VerticalScroll(0f));
-
             HideEnterChatField();
             if (uiMessageField != null)
             {
