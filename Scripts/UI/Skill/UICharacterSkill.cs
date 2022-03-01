@@ -163,14 +163,10 @@ namespace MultiplayerARPG
                     coolDownRemainsDuration = Character.SkillUsages[indexOfSkillUsage].coolDownRemainsDuration;
             }
 
-            if (IsOwningCharacter() && Skill != null && Skill.CanLevelUp(GameInstance.PlayingCharacter, CharacterSkill.level, out _))
-            {
+            if (Character is PlayerCharacterData && Skill != null && Skill.CanLevelUp(Character as PlayerCharacterData, CharacterSkill.level, out _))
                 onAbleToLevelUp.Invoke();
-            }
             else
-            {
                 onUnableToLevelUp.Invoke();
-            }
         }
 
         protected override void UpdateData()
