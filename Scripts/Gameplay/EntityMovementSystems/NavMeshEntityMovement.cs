@@ -31,6 +31,7 @@ namespace MultiplayerARPG
         public ExtraMovementState ExtraMovementState { get; protected set; }
         public DirectionVector2 Direction2D { get { return Vector2.down; } set { } }
 
+        protected float lastServerValidateTransform;
         protected long acceptedPositionTimestamp;
         protected float lastServerSyncTransform;
         protected float lastClientSyncTransform;
@@ -270,7 +271,6 @@ namespace MultiplayerARPG
             messageHandler.Reader.ReadSyncTransformMessage3D(out movementState, out extraMovementState, out position, out yAngle, out timestamp);
             if (acceptedPositionTimestamp < timestamp)
             {
-                acceptedPositionTimestamp = timestamp;
                 // Snap character to the position if character is too far from the position
                 if (Vector3.Distance(position, CacheTransform.position) >= snapThreshold)
                 {
@@ -291,6 +291,7 @@ namespace MultiplayerARPG
                     MovementState = movementState;
                     ExtraMovementState = extraMovementState;
                 }
+                acceptedPositionTimestamp = timestamp;
             }
         }
 
@@ -341,7 +342,6 @@ namespace MultiplayerARPG
             messageHandler.Reader.ReadMovementInputMessage3D(out inputState, out movementState, out extraMovementState, out position, out yAngle, out timestamp);
             if (acceptedPositionTimestamp < timestamp)
             {
-                acceptedPositionTimestamp = timestamp;
                 tempExtraMovementState = extraMovementState;
                 if (inputState.Has(InputState.PositionChanged))
                 {
@@ -360,6 +360,7 @@ namespace MultiplayerARPG
                         CacheTransform.eulerAngles = new Vector3(0, yAngle, 0);
                     }
                 }
+                acceptedPositionTimestamp = timestamp;
             }
         }
 
@@ -383,23 +384,44 @@ namespace MultiplayerARPG
             messageHandler.Reader.ReadSyncTransformMessage3D(out movementState, out extraMovementState, out position, out yAngle, out timestamp);
             if (acceptedPositionTimestamp < timestamp)
             {
-                acceptedPositionTimestamp = timestamp;
                 CacheTransform.eulerAngles = new Vector3(0, yAngle, 0);
+                MovementState = movementState;
+                ExtraMovementState = extraMovementState;
                 if (Vector3.Distance(position.GetXZ(), CacheTransform.position.GetXZ()) > 0.01f)
                 {
                     if (!IsClient)
                     {
                         // If it's server only (not a host), set position follows the client immediately
-                        CacheNavMeshAgent.Warp(position);
+                        float currentTime = Time.unscaledTime;
+                        float t = currentTime - lastServerValidateTransform;
+                        float v = Entity.GetMoveSpeed();
+                        float s = v * t;
+                        Vector3 oldPos = CacheTransform.position.GetXZ();
+                        Vector3 newPos = position.GetXZ();
+                        if (Vector3.Distance(oldPos, newPos) <= s)
+                        {
+                            // Allow to move to the position
+                            CacheNavMeshAgent.Warp(position);
+                        }
+                        else
+                        {
+                            // Client moves too fast, adjust it
+                            Vector3 dir = (newPos - oldPos).normalized;
+                            newPos = oldPos + (dir * s);
+                            newPos.y = position.y;
+                            CacheNavMeshAgent.Warp(position);
+                            // And also adjust client's position
+                            Teleport(newPos, Quaternion.Euler(0f, yAngle, 0f));
+                        }
+                        lastServerValidateTransform = currentTime;
                     }
                     else
                     {
-                        // It's both server and client, translate position
+                        // It's both server and client, translate position (it's a host so don't do speed hack validation)
                         SetMovePaths(position, false);
                     }
                 }
-                MovementState = movementState;
-                ExtraMovementState = extraMovementState;
+                acceptedPositionTimestamp = timestamp;
             }
         }
 

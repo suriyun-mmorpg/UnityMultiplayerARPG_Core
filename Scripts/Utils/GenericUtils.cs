@@ -269,7 +269,12 @@ public static class GenericUtils
 
     public static Vector3 GetXZ(this Vector3 position)
     {
-        return new Vector3(position.x, 0, position.z);
+        return new Vector3(position.x, 0f, position.z);
+    }
+
+    public static Vector3 GetXY(this Vector3 position)
+    {
+        return new Vector3(position.x, position.y, 0f);
     }
 
     public static bool IsPointInBox(Vector3 center, Vector3 half, Vector3 dirX, Vector3 dirY, Vector3 dirZ, Vector3 point)

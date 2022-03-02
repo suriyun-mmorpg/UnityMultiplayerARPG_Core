@@ -36,6 +36,7 @@ namespace MultiplayerARPG
             get { return NavPaths != null && NavPaths.Count > 0; }
         }
 
+        protected float lastServerValidateTransform;
         protected long acceptedPositionTimestamp;
         protected Vector2? clientTargetPosition;
         protected float lastServerSyncTransform;
@@ -369,7 +370,6 @@ namespace MultiplayerARPG
             messageHandler.Reader.ReadSyncTransformMessage2D(out movementState, out extraMovementState, out position, out direction2D, out timestamp);
             if (acceptedPositionTimestamp < timestamp)
             {
-                acceptedPositionTimestamp = timestamp;
                 // Snap character to the position if character is too far from the position
                 if (Vector2.Distance(position, CacheTransform.position) >= snapThreshold)
                 {
@@ -388,6 +388,7 @@ namespace MultiplayerARPG
                     MovementState = movementState;
                     ExtraMovementState = extraMovementState;
                 }
+                acceptedPositionTimestamp = timestamp;
             }
         }
 
@@ -436,7 +437,6 @@ namespace MultiplayerARPG
             messageHandler.Reader.ReadMovementInputMessage2D(out inputState, out movementState, out extraMovementState, out position, out direction2D, out timestamp);
             if (acceptedPositionTimestamp < timestamp)
             {
-                acceptedPositionTimestamp = timestamp;
                 NavPaths = null;
                 tempMovementState = movementState;
                 tempExtraMovementState = extraMovementState;
@@ -452,6 +452,7 @@ namespace MultiplayerARPG
                     }
                 }
                 Direction2D = direction2D;
+                acceptedPositionTimestamp = timestamp;
             }
         }
 
@@ -475,21 +476,42 @@ namespace MultiplayerARPG
             messageHandler.Reader.ReadSyncTransformMessage2D(out movementState, out extraMovementState, out position, out direction2D, out timestamp);
             if (acceptedPositionTimestamp < timestamp)
             {
-                acceptedPositionTimestamp = timestamp;
                 Direction2D = direction2D;
+                MovementState = movementState;
+                ExtraMovementState = extraMovementState;
                 if (!IsClient)
                 {
                     // If it's server only (not a host), set position follows the client immediately
-                    CacheTransform.position = position;
+                    float currentTime = Time.unscaledTime;
+                    float t = currentTime - lastServerValidateTransform;
+                    float v = Entity.GetMoveSpeed();
+                    float s = v * t;
+                    Vector2 oldPos = CacheTransform.position.GetXY();
+                    Vector2 newPos = position;
+                    if (Vector2.Distance(oldPos, newPos) <= s)
+                    {
+                        // Allow to move to the position
+                        CacheTransform.position = position;
+                    }
+                    else
+                    {
+                        // Client moves too fast, adjust it
+                        Vector2 dir = (newPos - oldPos).normalized;
+                        newPos = oldPos + (dir * s);
+                        newPos.y = position.y;
+                        CacheTransform.position = newPos;
+                        // And also adjust client's position
+                        Teleport(newPos, Quaternion.identity);
+                    }
+                    lastServerValidateTransform = currentTime;
                 }
                 else
                 {
-                    // It's both server and client, translate position
+                    // It's both server and client, translate position (it's a host so don't do speed hack validation)
                     if (Vector3.Distance(position, CacheTransform.position) > 0.01f)
                         SetMovePaths(position, false);
                 }
-                MovementState = movementState;
-                ExtraMovementState = extraMovementState;
+                acceptedPositionTimestamp = timestamp;
             }
         }
 

@@ -121,7 +121,7 @@ namespace MultiplayerARPG
             // TODO: Send delta changes
             if (newInput.IsKeyMovement)
                 state |= InputState.IsKeyMovement;
-            if (Vector3.Distance(newInput.Position, oldInput.Position) > entityMovement.StoppingDistance)
+            if (Vector3.Distance(newInput.Position, oldInput.Position) > 0.01f)
                 state |= InputState.PositionChanged;
             if (Quaternion.Angle(newInput.Rotation, oldInput.Rotation) > 1)
                 state |= InputState.RotationChanged;
