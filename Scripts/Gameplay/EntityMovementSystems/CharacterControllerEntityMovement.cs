@@ -865,12 +865,13 @@ namespace MultiplayerARPG
                 {
                     // If it's server only (not a host), set position follows the client immediately
                     float currentTime = Time.unscaledTime;
-                    float t = currentTime - lastServerValidateTransform;
+                    float t = currentTime - lastServerValidateTransform + 0.2f; // +200ms as high ping buffer
                     float v = Entity.GetMoveSpeed();
                     float s = v * t;
                     Vector3 oldPos = CacheTransform.position.GetXZ();
                     Vector3 newPos = position.GetXZ();
-                    if (Vector3.Distance(oldPos, newPos) <= s)
+                    float dist = Vector3.Distance(oldPos, newPos);
+                    if (dist <= s)
                     {
                         // Allow to move to the position
                         CacheTransform.position = position;
