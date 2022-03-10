@@ -25,7 +25,6 @@ namespace MultiplayerARPG
         protected override void Awake()
         {
             base.Awake();
-            gameObject.layer = PhysicLayers.IgnoreRaycast;
             CacheRigidbody = GetComponent<Rigidbody>();
             CacheRigidbody2D = GetComponent<Rigidbody2D>();
         }
