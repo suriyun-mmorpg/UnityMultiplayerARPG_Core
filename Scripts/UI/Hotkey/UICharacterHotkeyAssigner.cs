@@ -103,6 +103,8 @@ namespace MultiplayerARPG
             int tempIndexOfSkill;
             CacheSkillList.Generate(GameInstance.PlayingCharacterEntity.GetCaches().Skills, (index, skillLevel, ui) =>
             {
+                if (!ui)
+                    return;
                 tempUiCharacterSkill = ui.GetComponent<UICharacterSkill>();
                 tempSkill = skillLevel.Key;
                 tempIndexOfSkill = GameInstance.PlayingCharacterEntity.IndexOfSkill(tempSkill.DataId);
@@ -125,6 +127,8 @@ namespace MultiplayerARPG
             UICharacterItem tempUiCharacterItem;
             CacheItemList.Generate(GameInstance.PlayingCharacterEntity.NonEquipItems, (index, characterItem, ui) =>
             {
+                if (!ui)
+                    return;
                 tempUiCharacterItem = ui.GetComponent<UICharacterItem>();
                 if (uiCharacterHotkey.CanAssignCharacterItem(characterItem))
                 {
