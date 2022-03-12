@@ -9,6 +9,9 @@ namespace MultiplayerARPG
         Transform CameraTransform { get; }
         Transform FollowingEntityTransform { get; set; }
         Vector3 TargetOffset { get; set; }
+        float CameraFov { get; set; }
+        float CameraNearClipPlane { get; set; }
+        float CameraFarClipPlane { get; set; }
         float MinZoomDistance { get; set; }
         float MaxZoomDistance { get; set; }
         float CurrentZoomDistance { get; set; }

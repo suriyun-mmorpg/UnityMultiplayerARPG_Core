@@ -212,6 +212,24 @@ namespace MultiplayerARPG
             get { return ViewMode == ShooterControllerViewMode.Tps ? tpsMaxZoomDistance : fpsZoomDistance; }
         }
 
+        public float CurrentCameraZoomDistance
+        {
+            get { return CacheGameplayCameraController.CurrentZoomDistance; }
+            set { CacheGameplayCameraController.CurrentZoomDistance = value; }
+        }
+
+        public float CurrentCameraMinZoomDistance
+        {
+            get { return CacheGameplayCameraController.MinZoomDistance; }
+            set { CacheGameplayCameraController.MinZoomDistance = value; }
+        }
+
+        public float CurrentCameraMaxZoomDistance
+        {
+            get { return CacheGameplayCameraController.MaxZoomDistance; }
+            set { CacheGameplayCameraController.MaxZoomDistance = value; }
+        }
+
         public Vector3 CameraTargetOffset
         {
             get
@@ -266,8 +284,20 @@ namespace MultiplayerARPG
 
         public float CurrentCameraFov
         {
-            get { return CacheGameplayCameraController.Camera.fieldOfView; }
-            set { CacheGameplayCameraController.Camera.fieldOfView = value; }
+            get { return CacheGameplayCameraController.CameraFov; }
+            set { CacheGameplayCameraController.CameraFov = value; }
+        }
+
+        public float CurrentCameraNearClipPlane
+        {
+            get { return CacheGameplayCameraController.CameraNearClipPlane; }
+            set { CacheGameplayCameraController.CameraNearClipPlane = value; }
+        }
+
+        public float CurrentCameraFarClipPlane
+        {
+            get { return CacheGameplayCameraController.CameraFarClipPlane; }
+            set { CacheGameplayCameraController.CameraFarClipPlane = value; }
         }
 
         public float DefaultCameraRotationSpeedScale
@@ -1655,16 +1685,16 @@ namespace MultiplayerARPG
             dirtyViewMode = viewMode;
             UpdateCameraSettings();
             // Update camera zoom distance when change view mode only, to allow zoom controls
-            CacheGameplayCameraController.MinZoomDistance = CameraMinZoomDistance;
-            CacheGameplayCameraController.MaxZoomDistance = CameraMaxZoomDistance;
-            CacheGameplayCameraController.CurrentZoomDistance = CameraZoomDistance;
+            CurrentCameraMinZoomDistance = CameraMinZoomDistance;
+            CurrentCameraMaxZoomDistance = CameraMaxZoomDistance;
+            CurrentCameraZoomDistance = CameraZoomDistance;
         }
 
         public virtual void UpdateCameraSettings()
         {
-            CacheGameplayCameraController.Camera.fieldOfView = CameraFov;
-            CacheGameplayCameraController.Camera.nearClipPlane = CameraNearClipPlane;
-            CacheGameplayCameraController.Camera.farClipPlane = CameraFarClipPlane;
+            CurrentCameraFov = CameraFov;
+            CurrentCameraNearClipPlane = CameraNearClipPlane;
+            CurrentCameraFarClipPlane = CameraFarClipPlane;
             PlayerCharacterEntity.ModelManager.SetIsFps(viewMode == ShooterControllerViewMode.Fps);
         }
 

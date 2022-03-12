@@ -15,9 +15,12 @@ namespace MultiplayerARPG
         public Transform CameraTransform { get { return CameraControls.CacheCameraTransform; } }
         public Transform FollowingEntityTransform { get; set; }
         public Vector3 TargetOffset { get { return CameraControls.targetOffset; } set { CameraControls.targetOffset = value; } }
+        public float CameraFov { get { return Camera.fieldOfView; } set { Camera.fieldOfView = value; } }
+        public float CameraNearClipPlane { get { return Camera.nearClipPlane; } set { Camera.nearClipPlane = value; } }
+        public float CameraFarClipPlane { get { return Camera.farClipPlane; } set { Camera.farClipPlane = value; } }
         public float MinZoomDistance { get { return CameraControls.minZoomDistance; } set { CameraControls.minZoomDistance = value; } }
         public float MaxZoomDistance { get { return CameraControls.maxZoomDistance; } set { CameraControls.maxZoomDistance = value; } }
-        public float CurrentZoomDistance {get { return CameraControls.zoomDistance; } set { CameraControls.zoomDistance = value; } }
+        public float CurrentZoomDistance { get { return CameraControls.zoomDistance; } set { CameraControls.zoomDistance = value; } }
         public bool EnableWallHitSpring { get { return CameraControls.enableWallHitSpring; } set { CameraControls.enableWallHitSpring = value; } }
         public bool UpdateRotation { get { return CameraControls.updateRotation; } set { CameraControls.updateRotation = value; } }
         public bool UpdateRotationX { get { return CameraControls.updateRotationX; } set { CameraControls.updateRotationX = value; } }
