@@ -263,7 +263,7 @@ namespace MultiplayerARPG
                     if (tempAmount < 0)
                         tempAmount = 0;
                     CharacterEntity.CurrentHp -= tempAmount;
-                    CharacterEntity.ReceivedDamage(CharacterEntity.CacheTransform.position, Instigator, DamageOverTimes, CombatAmountType.NormalDamage, tempAmount, null, null, 0);
+                    CharacterEntity.ReceivedDamage(HitBoxPosition.None, CharacterEntity.CacheTransform.position, Instigator, DamageOverTimes, CombatAmountType.NormalDamage, tempAmount, null, null, 0);
                     calculatingTotalDamageOverTime -= tempAmount;
                 }
             }

@@ -224,6 +224,7 @@ namespace MultiplayerARPG
         /// <summary>
         /// Applying damage to this entity
         /// </summary>
+        /// <param name="position"></param>
         /// <param name="fromPosition"></param>
         /// <param name="instigator"></param>
         /// <param name="damageAmounts"></param>
@@ -231,35 +232,37 @@ namespace MultiplayerARPG
         /// <param name="skill"></param>
         /// <param name="skillLevel"></param>
         /// <param name="randomSeed"></param>
-        internal void ApplyDamage(Vector3 fromPosition, EntityInfo instigator, Dictionary<DamageElement, MinMaxFloat> damageAmounts, CharacterItem weapon, BaseSkill skill, short skillLevel, int randomSeed)
+        internal void ApplyDamage(HitBoxPosition position, Vector3 fromPosition, EntityInfo instigator, Dictionary<DamageElement, MinMaxFloat> damageAmounts, CharacterItem weapon, BaseSkill skill, short skillLevel, int randomSeed)
         {
-            ReceivingDamage(fromPosition, instigator, damageAmounts, weapon, skill, skillLevel);
+            ReceivingDamage(position, fromPosition, instigator, damageAmounts, weapon, skill, skillLevel);
             CombatAmountType combatAmountType;
             int totalDamage;
-            ApplyReceiveDamage(fromPosition, instigator, damageAmounts, weapon, skill, skillLevel, randomSeed, out combatAmountType, out totalDamage);
-            ReceivedDamage(fromPosition, instigator, damageAmounts, combatAmountType, totalDamage, weapon, skill, skillLevel);
+            ApplyReceiveDamage(position, fromPosition, instigator, damageAmounts, weapon, skill, skillLevel, randomSeed, out combatAmountType, out totalDamage);
+            ReceivedDamage(position, fromPosition, instigator, damageAmounts, combatAmountType, totalDamage, weapon, skill, skillLevel);
         }
 
         /// <summary>
         /// This function will be called before apply receive damage
         /// </summary>
+        /// <param name="position"></param>
         /// <param name="fromPosition">Where is attacker?</param>
         /// <param name="instigator">Who is attacking this?</param>
         /// <param name="damageAmounts">Damage amounts from attacker</param>
         /// <param name="weapon">Weapon which used to attack</param>
         /// <param name="skill">Skill which used to attack</param>
         /// <param name="skillLevel">Skill level which used to attack</param>
-        public virtual void ReceivingDamage(Vector3 fromPosition, EntityInfo instigator, Dictionary<DamageElement, MinMaxFloat> damageAmounts, CharacterItem weapon, BaseSkill skill, short skillLevel)
+        public virtual void ReceivingDamage(HitBoxPosition position, Vector3 fromPosition, EntityInfo instigator, Dictionary<DamageElement, MinMaxFloat> damageAmounts, CharacterItem weapon, BaseSkill skill, short skillLevel)
         {
             IGameEntity attacker;
             instigator.TryGetEntity(out attacker);
             if (onReceiveDamage != null)
-                onReceiveDamage.Invoke(fromPosition, attacker, damageAmounts, weapon, skill, skillLevel);
+                onReceiveDamage.Invoke(position, fromPosition, attacker, damageAmounts, weapon, skill, skillLevel);
         }
 
         /// <summary>
         /// Apply damage then return damage type and calculated damage amount
         /// </summary>
+        /// <param name="position"></param>
         /// <param name="fromPosition">Where is attacker?</param>
         /// <param name="instigator">Who is attacking this?</param>
         /// <param name="damageAmounts">Damage amounts from attacker</param>
@@ -269,11 +272,12 @@ namespace MultiplayerARPG
         /// <param name="randomSeed">Random seed for damage randoming</param>
         /// <param name="combatAmountType">Result damage type</param>
         /// <param name="totalDamage">Result damage</param>
-        protected abstract void ApplyReceiveDamage(Vector3 fromPosition, EntityInfo instigator, Dictionary<DamageElement, MinMaxFloat> damageAmounts, CharacterItem weapon, BaseSkill skill, short skillLevel, int randomSeed, out CombatAmountType combatAmountType, out int totalDamage);
+        protected abstract void ApplyReceiveDamage(HitBoxPosition position, Vector3 fromPosition, EntityInfo instigator, Dictionary<DamageElement, MinMaxFloat> damageAmounts, CharacterItem weapon, BaseSkill skill, short skillLevel, int randomSeed, out CombatAmountType combatAmountType, out int totalDamage);
 
         /// <summary>
         /// This function will be called after applied receive damage
         /// </summary>
+        /// <param name="position">Which part?</param>
         /// <param name="fromPosition">Where is attacker?</param>
         /// <param name="instigator">Who is attacking this?</param>
         /// <param name="damageAmounts">Damage amount before total damage calculated</param>
@@ -282,7 +286,7 @@ namespace MultiplayerARPG
         /// <param name="weapon">Weapon which used to attack</param>
         /// <param name="skill">Skill which used to attack</param>
         /// <param name="skillLevel">Skill level which used to attack</param>
-        public virtual void ReceivedDamage(Vector3 fromPosition, EntityInfo instigator, Dictionary<DamageElement, MinMaxFloat> damageAmounts, CombatAmountType combatAmountType, int totalDamage, CharacterItem weapon, BaseSkill skill, short skillLevel)
+        public virtual void ReceivedDamage(HitBoxPosition position, Vector3 fromPosition, EntityInfo instigator, Dictionary<DamageElement, MinMaxFloat> damageAmounts, CombatAmountType combatAmountType, int totalDamage, CharacterItem weapon, BaseSkill skill, short skillLevel)
         {
             DamageSource damageSource = DamageSource.None;
             int dataId = 0;
@@ -314,7 +318,7 @@ namespace MultiplayerARPG
             IGameEntity attacker;
             instigator.TryGetEntity(out attacker);
             if (onReceivedDamage != null)
-                onReceivedDamage.Invoke(fromPosition, attacker, combatAmountType, totalDamage, weapon, skill, skillLevel);
+                onReceivedDamage.Invoke(position, fromPosition, attacker, combatAmountType, totalDamage, weapon, skill, skillLevel);
         }
 
         public virtual bool CanReceiveDamageFrom(EntityInfo instigator)

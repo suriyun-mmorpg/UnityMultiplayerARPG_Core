@@ -6,6 +6,7 @@ namespace MultiplayerARPG
     public delegate void NetworkDestroyDelegate(
         byte reasons);
     public delegate void ReceiveDamageDelegate(
+        HitBoxPosition position,
         Vector3 fromPosition,
         IGameEntity attacker,
         Dictionary<DamageElement, MinMaxFloat> damageAmounts,
@@ -13,6 +14,7 @@ namespace MultiplayerARPG
         BaseSkill skill,
         short skillLevel);
     public delegate void ReceivedDamageDelegate(
+        HitBoxPosition position,
         Vector3 fromPosition,
         IGameEntity attacker,
         CombatAmountType combatAmountType,

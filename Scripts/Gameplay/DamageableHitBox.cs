@@ -18,6 +18,9 @@ namespace MultiplayerARPG
         }
 
         [SerializeField]
+        protected HitBoxPosition position;
+
+        [SerializeField]
         protected float damageRate = 1f;
 
         public DamageableEntity DamageableEntity { get; private set; }
@@ -153,7 +156,7 @@ namespace MultiplayerARPG
             {
                 damageAmounts[key] = damageAmounts[key] * damageRate;
             }
-            DamageableEntity.ApplyDamage(fromPosition, instigator, damageAmounts, weapon, skill, skillLevel, randomSeed);
+            DamageableEntity.ApplyDamage(position, fromPosition, instigator, damageAmounts, weapon, skill, skillLevel, randomSeed);
         }
 
         public virtual void PrepareRelatesData()
