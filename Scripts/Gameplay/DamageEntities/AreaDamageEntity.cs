@@ -30,7 +30,6 @@ namespace MultiplayerARPG
         protected override void Awake()
         {
             base.Awake();
-            gameObject.layer = PhysicLayers.IgnoreRaycast;
             Identity.onGetInstance.AddListener(OnGetInstance);
         }
 
