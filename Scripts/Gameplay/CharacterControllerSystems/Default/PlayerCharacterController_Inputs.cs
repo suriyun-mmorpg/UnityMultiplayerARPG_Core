@@ -900,6 +900,7 @@ namespace MultiplayerARPG
                         onAfterUseSkillHotkey.Invoke(relateId, aimPosition);
                     break;
                 case HotkeyType.Item:
+                    HotkeyEquipWeaponSet = PlayerCharacterEntity.EquipWeaponSet;
                     if (onBeforeUseItemHotkey != null)
                         onBeforeUseItemHotkey.Invoke(relateId, aimPosition);
                     UseItem(relateId, aimPosition);
@@ -964,6 +965,7 @@ namespace MultiplayerARPG
                 GameInstance.ClientInventoryHandlers.RequestEquipItem(
                         PlayerCharacterEntity,
                         (short)itemIndex,
+                        HotkeyEquipWeaponSet,
                         ClientInventoryActions.ResponseEquipArmor,
                         ClientInventoryActions.ResponseEquipWeapon);
             }

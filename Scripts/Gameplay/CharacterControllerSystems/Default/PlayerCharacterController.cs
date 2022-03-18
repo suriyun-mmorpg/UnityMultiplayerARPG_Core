@@ -83,6 +83,7 @@ namespace MultiplayerARPG
         public event System.Action<string, AimPosition> onAfterUseItemHotkey;
         #endregion
 
+        public byte HotkeyEquipWeaponSet { get; set; }
         public NearbyEntityDetector ActivatableEntityDetector { get; protected set; }
         public NearbyEntityDetector ItemDropEntityDetector { get; protected set; }
         public NearbyEntityDetector EnemyEntityDetector { get; protected set; }

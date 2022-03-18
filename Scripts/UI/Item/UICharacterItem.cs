@@ -1392,6 +1392,7 @@ namespace MultiplayerARPG
             GameInstance.ClientInventoryHandlers.RequestEquipItem(
                 GameInstance.PlayingCharacter,
                 (short)IndexOfData,
+                GameInstance.PlayingCharacter.EquipWeaponSet,
                 ClientInventoryActions.ResponseEquipArmor,
                 ClientInventoryActions.ResponseEquipWeapon);
         }
