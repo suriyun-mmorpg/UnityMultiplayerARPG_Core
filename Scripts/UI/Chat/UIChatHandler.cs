@@ -9,6 +9,12 @@ namespace MultiplayerARPG
 {
     public partial class UIChatHandler : UIBase
     {
+        public enum EntryClickResponseMode
+        {
+            SetWhisterAsCommand,
+            SetWhisterReceiverToField,
+            Custom,
+        }
         public readonly List<ChatMessage> ChatMessages = new List<ChatMessage>();
         public readonly Dictionary<ChatChannel, List<ChatMessage>> ChannelBasedChatMessages = new Dictionary<ChatChannel, List<ChatMessage>>();
 
@@ -20,6 +26,7 @@ namespace MultiplayerARPG
         public KeyCode enterChatKey = KeyCode.Return;
         [Range(0, UIChatHistory.MAX_CHAT_HISTORY)]
         public int chatEntrySize = 30;
+        public EntryClickResponseMode entryClickResponseMode = EntryClickResponseMode.SetWhisterAsCommand;
 
         [Header("Channel Commands")]
         public string globalCommand = "/a";
@@ -68,6 +75,8 @@ namespace MultiplayerARPG
                 return cacheList;
             }
         }
+
+        public event System.Action<UIChatMessage> onClickChatEntry;
 
         private bool movingToEnd;
         private ChatChannel dirtyChatChannel;
@@ -301,6 +310,26 @@ namespace MultiplayerARPG
                 yield return null;
                 scrollRect.verticalScrollbar.value = normalize;
                 Canvas.ForceUpdateCanvases();
+            }
+        }
+
+        public void OnClickEntry(UIChatMessage uiChatMessage)
+        {
+            if (uiChatMessage == null)
+                return;
+            switch (entryClickResponseMode)
+            {
+                case EntryClickResponseMode.SetWhisterAsCommand:
+                    ShowEnterChatField();
+                    EnterChatMessage = whisperCommand + " " + uiChatMessage.Data.sender;
+                    break;
+                case EntryClickResponseMode.SetWhisterReceiverToField:
+                    ShowEnterChatField();
+                    EnterChatReceiver = uiChatMessage.Data.sender;
+                    break;
+                default:
+                    onClickChatEntry.Invoke(uiChatMessage);
+                    break;
             }
         }
     }

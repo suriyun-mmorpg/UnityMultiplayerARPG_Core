@@ -65,10 +65,7 @@ namespace MultiplayerARPG
         public void OnClickEntry()
         {
             if (uiChatHandler != null)
-            {
-                uiChatHandler.ShowEnterChatField();
-                uiChatHandler.EnterChatMessage = uiChatHandler.whisperCommand + " " + Data.sender;
-            }
+                uiChatHandler.OnClickEntry(this);
         }
     }
 }
