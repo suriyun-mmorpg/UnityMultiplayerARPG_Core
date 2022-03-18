@@ -170,10 +170,22 @@ namespace MultiplayerARPG
         protected float recoilRateWhileSwimming = 0.5f;
 
         #region Events
-        public System.Action<string, AimPosition> onBeforeUseSkillHotkey;
-        public System.Action<string, AimPosition> onAfterUseSkillHotkey;
-        public System.Action<string, AimPosition> onBeforeUseItemHotkey;
-        public System.Action<string, AimPosition> onAfterUseItemHotkey;
+        /// <summary>
+        /// RelateId (string), AimPosition (AimPosition)
+        /// </summary>
+        public event System.Action<string, AimPosition> onBeforeUseSkillHotkey;
+        /// <summary>
+        /// RelateId (string), AimPosition (AimPosition)
+        /// </summary>
+        public event System.Action<string, AimPosition> onAfterUseSkillHotkey;
+        /// <summary>
+        /// RelateId (string), AimPosition (AimPosition)
+        /// </summary>
+        public event System.Action<string, AimPosition> onBeforeUseItemHotkey;
+        /// <summary>
+        /// RelateId (string), AimPosition (AimPosition)
+        /// </summary>
+        public event System.Action<string, AimPosition> onAfterUseItemHotkey;
         #endregion
 
         public bool IsBlockController { get; protected set; }
