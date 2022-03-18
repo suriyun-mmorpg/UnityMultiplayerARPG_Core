@@ -304,6 +304,9 @@ namespace MultiplayerARPG
         /// </summary>
         public void OnClickUse()
         {
+            if (uiCharacterHotkeyAssigner != null && uiCharacterHotkeyAssigner.IsVisible())
+                return;
+
             if (IsChanneledAbility())
                 return;
 
