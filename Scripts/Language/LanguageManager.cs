@@ -83,15 +83,17 @@ namespace MultiplayerARPG
                 languageList.Add(newLang);
             }
 
-            foreach (KeyValuePair<string, string> pair in DefaultLocale.Texts)
+            List<string> keys = new List<string>(DefaultLocale.Texts.Keys);
+            keys.Sort();
+            foreach (string key in keys)
             {
-                if (newLang.ContainKey(pair.Key))
+                if (newLang.ContainKey(key))
                     continue;
 
                 newLang.dataList.Add(new LanguageData()
                 {
-                    key = pair.Key,
-                    value = pair.Value,
+                    key = key,
+                    value = DefaultLocale.Texts[key],
                 });
             }
         }
