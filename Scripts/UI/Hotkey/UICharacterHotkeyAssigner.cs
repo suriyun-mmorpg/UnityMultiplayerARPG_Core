@@ -75,6 +75,7 @@ namespace MultiplayerARPG
 
         public override void Show()
         {
+            UICharacterHotkeys.SetUsingHotkey(null);
             if (GameInstance.PlayingCharacterEntity == null)
             {
                 CacheSkillList.HideAll();
