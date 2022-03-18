@@ -171,7 +171,9 @@ namespace MultiplayerARPG
 
         #region Events
         public System.Action<string, AimPosition> onBeforeUseSkillHotkey;
+        public System.Action<string, AimPosition> onAfterUseSkillHotkey;
         public System.Action<string, AimPosition> onBeforeUseItemHotkey;
+        public System.Action<string, AimPosition> onAfterUseItemHotkey;
         #endregion
 
         public bool IsBlockController { get; protected set; }
@@ -1434,11 +1436,15 @@ namespace MultiplayerARPG
                     if (onBeforeUseSkillHotkey != null)
                         onBeforeUseSkillHotkey.Invoke(relateId, aimPosition);
                     UseSkill(relateId, aimPosition);
+                    if (onAfterUseSkillHotkey != null)
+                        onAfterUseSkillHotkey.Invoke(relateId, aimPosition);
                     break;
                 case HotkeyType.Item:
                     if (onBeforeUseItemHotkey != null)
                         onBeforeUseItemHotkey.Invoke(relateId, aimPosition);
                     UseItem(relateId, aimPosition);
+                    if (onAfterUseItemHotkey != null)
+                        onAfterUseItemHotkey.Invoke(relateId, aimPosition);
                     break;
             }
         }

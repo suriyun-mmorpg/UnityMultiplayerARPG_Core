@@ -66,7 +66,9 @@ namespace MultiplayerARPG
 
         #region Events
         public System.Action<string, AimPosition> onBeforeUseSkillHotkey;
+        public System.Action<string, AimPosition> onAfterUseSkillHotkey;
         public System.Action<string, AimPosition> onBeforeUseItemHotkey;
+        public System.Action<string, AimPosition> onAfterUseItemHotkey;
         #endregion
 
         public NearbyEntityDetector ActivatableEntityDetector { get; protected set; }

@@ -896,11 +896,15 @@ namespace MultiplayerARPG
                     if (onBeforeUseSkillHotkey != null)
                         onBeforeUseSkillHotkey.Invoke(relateId, aimPosition);
                     UseSkill(relateId, aimPosition);
+                    if (onAfterUseSkillHotkey != null)
+                        onAfterUseSkillHotkey.Invoke(relateId, aimPosition);
                     break;
                 case HotkeyType.Item:
                     if (onBeforeUseItemHotkey != null)
                         onBeforeUseItemHotkey.Invoke(relateId, aimPosition);
                     UseItem(relateId, aimPosition);
+                    if (onAfterUseItemHotkey != null)
+                        onAfterUseItemHotkey.Invoke(relateId, aimPosition);
                     break;
             }
         }
