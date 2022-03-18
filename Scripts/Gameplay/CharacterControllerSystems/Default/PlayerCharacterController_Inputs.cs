@@ -893,9 +893,13 @@ namespace MultiplayerARPG
             switch (type)
             {
                 case HotkeyType.Skill:
+                    if (onBeforeUseSkillHotkey != null)
+                        onBeforeUseSkillHotkey.Invoke(relateId, aimPosition);
                     UseSkill(relateId, aimPosition);
                     break;
                 case HotkeyType.Item:
+                    if (onBeforeUseItemHotkey != null)
+                        onBeforeUseItemHotkey.Invoke(relateId, aimPosition);
                     UseItem(relateId, aimPosition);
                     break;
             }

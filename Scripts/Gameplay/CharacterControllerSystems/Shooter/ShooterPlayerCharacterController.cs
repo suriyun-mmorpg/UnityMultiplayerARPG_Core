@@ -169,6 +169,11 @@ namespace MultiplayerARPG
         [SerializeField]
         protected float recoilRateWhileSwimming = 0.5f;
 
+        #region Events
+        public System.Action<string, AimPosition> onBeforeUseSkillHotkey;
+        public System.Action<string, AimPosition> onBeforeUseItemHotkey;
+        #endregion
+
         public bool IsBlockController { get; protected set; }
         public IShooterGameplayCameraController CacheGameplayCameraController { get; protected set; }
         public IMinimapCameraController CacheMinimapCameraController { get; protected set; }
@@ -1426,9 +1431,13 @@ namespace MultiplayerARPG
             switch (type)
             {
                 case HotkeyType.Skill:
+                    if (onBeforeUseSkillHotkey != null)
+                        onBeforeUseSkillHotkey.Invoke(relateId, aimPosition);
                     UseSkill(relateId, aimPosition);
                     break;
                 case HotkeyType.Item:
+                    if (onBeforeUseItemHotkey != null)
+                        onBeforeUseItemHotkey.Invoke(relateId, aimPosition);
                     UseItem(relateId, aimPosition);
                     break;
             }

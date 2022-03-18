@@ -64,6 +64,11 @@ namespace MultiplayerARPG
         [SerializeField]
         protected float buildRotateSpeed = 200f;
 
+        #region Events
+        public System.Action<string, AimPosition> onBeforeUseSkillHotkey;
+        public System.Action<string, AimPosition> onBeforeUseItemHotkey;
+        #endregion
+
         public NearbyEntityDetector ActivatableEntityDetector { get; protected set; }
         public NearbyEntityDetector ItemDropEntityDetector { get; protected set; }
         public NearbyEntityDetector EnemyEntityDetector { get; protected set; }
