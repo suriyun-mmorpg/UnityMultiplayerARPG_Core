@@ -219,7 +219,7 @@ namespace MultiplayerARPG
                         if (time.HasValue)
                             BaseGameNetworkManager.Singleton.LagCompensationManager.BeginSimlateHitBoxes(attacker.ConnectionId, time.Value);
                         else
-                            BaseGameNetworkManager.Singleton.LagCompensationManager.BeginSimlateHitBoxesByRtt(attacker.ConnectionId);
+                            BaseGameNetworkManager.Singleton.LagCompensationManager.BeginSimlateHitBoxesByHalfRtt(attacker.ConnectionId);
                         int tempOverlapSize = attacker.AttackPhysicFunctions.OverlapObjects(damagePosition, hitDistance, damageableLayerMask, true);
                         BaseGameNetworkManager.Singleton.LagCompensationManager.EndSimulateHitBoxes();
                         if (tempOverlapSize == 0)
@@ -304,7 +304,7 @@ namespace MultiplayerARPG
                         if (time.HasValue)
                             BaseGameNetworkManager.Singleton.LagCompensationManager.BeginSimlateHitBoxes(attacker.ConnectionId, time.Value);
                         else
-                            BaseGameNetworkManager.Singleton.LagCompensationManager.BeginSimlateHitBoxesByRtt(attacker.ConnectionId);
+                            BaseGameNetworkManager.Singleton.LagCompensationManager.BeginSimlateHitBoxesByHalfRtt(attacker.ConnectionId);
                         int tempOverlapSize = attacker.AttackPhysicFunctions.OverlapObjects(damagePosition, hitDistance, damageableLayerMask, true);
                         BaseGameNetworkManager.Singleton.LagCompensationManager.EndSimulateHitBoxes();
                         if (tempOverlapSize == 0)
@@ -389,7 +389,7 @@ namespace MultiplayerARPG
                     if (time.HasValue)
                         BaseGameNetworkManager.Singleton.LagCompensationManager.BeginSimlateHitBoxes(attacker.ConnectionId, time.Value);
                     else
-                        BaseGameNetworkManager.Singleton.LagCompensationManager.BeginSimlateHitBoxesByRtt(attacker.ConnectionId);
+                        BaseGameNetworkManager.Singleton.LagCompensationManager.BeginSimlateHitBoxesByHalfRtt(attacker.ConnectionId);
                     int tempRaycastSize = attacker.AttackPhysicFunctions.Raycast(damagePosition, damageDirection, missileDistance, Physics.DefaultRaycastLayers);
                     BaseGameNetworkManager.Singleton.LagCompensationManager.EndSimulateHitBoxes();
                     if (tempRaycastSize > 0)

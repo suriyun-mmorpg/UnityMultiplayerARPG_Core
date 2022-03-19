@@ -1,6 +1,5 @@
 ﻿using LiteNetLibManager;
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -38,9 +37,9 @@ namespace MultiplayerARPG
             return true;
         }
 
-        public bool SimulateHitBoxesByRtt(long connectionId, Action action)
+        public bool SimulateHitBoxesByHalfRtt(long connectionId, Action action)
         {
-            if (action == null || !BeginSimlateHitBoxesByRtt(connectionId))
+            if (action == null || !BeginSimlateHitBoxesByHalfRtt(connectionId))
                 return false;
             action.Invoke();
             EndSimulateHitBoxes();
@@ -55,12 +54,12 @@ namespace MultiplayerARPG
             return InternalBeginSimlateHitBoxes(player, targetTime);
         }
 
-        public bool BeginSimlateHitBoxesByRtt(long connectionId)
+        public bool BeginSimlateHitBoxesByHalfRtt(long connectionId)
         {
             if (!BaseGameNetworkManager.Singleton.IsServer || !BaseGameNetworkManager.Singleton.ContainsPlayer(connectionId))
                 return false;
             LiteNetLibPlayer player = BaseGameNetworkManager.Singleton.GetPlayer(connectionId);
-            long targetTime = BaseGameNetworkManager.Singleton.ServerTimestamp - player.Rtt;
+            long targetTime = BaseGameNetworkManager.Singleton.ServerTimestamp - (player.Rtt / 2);
             return InternalBeginSimlateHitBoxes(player, targetTime);
         }
 
@@ -90,11 +89,11 @@ namespace MultiplayerARPG
             }
         }
 
-        private void FixedUpdate()
+        private void LateUpdate()
         {
             if (!BaseGameNetworkManager.Singleton.IsServer)
                 return;
-            snapShotCountDown -= Time.fixedDeltaTime;
+            snapShotCountDown -= Time.unscaledDeltaTime;
             if (snapShotCountDown > 0)
                 return;
             snapShotCountDown = snapShotInterval;

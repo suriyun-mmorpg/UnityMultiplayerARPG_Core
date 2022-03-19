@@ -1,6 +1,4 @@
-﻿using LiteNetLibManager;
-
-namespace MultiplayerARPG
+﻿namespace MultiplayerARPG
 {
     public interface ILagCompensationManager
     {
@@ -9,8 +7,8 @@ namespace MultiplayerARPG
         bool RemoveHitBoxes(uint objectId);
         bool SimulateHitBoxes(long connectionId, long rewindTime, System.Action action);
         bool BeginSimlateHitBoxes(long connectionId, long rewindTime);
-        bool SimulateHitBoxesByRtt(long connectionId, System.Action action);
-        bool BeginSimlateHitBoxesByRtt(long connectionId);
+        bool SimulateHitBoxesByHalfRtt(long connectionId, System.Action action);
+        bool BeginSimlateHitBoxesByHalfRtt(long connectionId);
         void EndSimulateHitBoxes();
     }
 }
