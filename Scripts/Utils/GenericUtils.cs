@@ -206,7 +206,7 @@ public static class GenericUtils
         }
     }
 
-    public static string GetUniqueId(int length = 12, string mask = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890_-")
+    public static string GetUniqueId(int length = 16, string mask = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890_-")
     {
         return Nanoid.Nanoid.Generate(mask, length);
     }
