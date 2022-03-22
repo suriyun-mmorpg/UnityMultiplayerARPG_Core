@@ -190,15 +190,13 @@ namespace MultiplayerARPG
                         // Apply attack damages
                         if (IsOwnerClientOrOwnedByServer)
                         {
-                            long time = BaseGameNetworkManager.Singleton.ServerTimestamp;
                             int attackSeed = unchecked(simulateSeed + (hitIndex * 16));
-                            ApplyAttack(isLeftHand, weapon, damageInfo, damageAmounts, Entity.AimPosition, attackSeed, time);
+                            ApplyAttack(isLeftHand, weapon, damageInfo, damageAmounts, Entity.AimPosition, attackSeed);
                             SimulateLaunchDamageEntityData simulateData = new SimulateLaunchDamageEntityData();
                             if (isLeftHand)
                                 simulateData.state |= SimulateLaunchDamageEntityState.IsLeftHand;
                             simulateData.randomSeed = simulateSeed;
                             simulateData.aimPosition = Entity.AimPosition;
-                            simulateData.time = time;
                             CallAllSimulateLaunchDamageEntity(simulateData);
                         }
                     }
@@ -245,7 +243,7 @@ namespace MultiplayerARPG
             ClearAttackStates();
         }
 
-        protected virtual void ApplyAttack(bool isLeftHand, CharacterItem weapon, DamageInfo damageInfo, Dictionary<DamageElement, MinMaxFloat> damageAmounts, AimPosition aimPosition, int randomSeed, long? time)
+        protected virtual void ApplyAttack(bool isLeftHand, CharacterItem weapon, DamageInfo damageInfo, Dictionary<DamageElement, MinMaxFloat> damageAmounts, AimPosition aimPosition, int randomSeed)
         {
             if (IsServer)
             {
@@ -283,8 +281,7 @@ namespace MultiplayerARPG
                     randomSeed,
                     aimPosition,
                     stagger,
-                    out _,
-                    time);
+                    out _);
             }
         }
 
@@ -312,7 +309,7 @@ namespace MultiplayerARPG
                 DamageInfo damageInfo = Entity.GetWeaponDamageInfo(weapon.GetWeaponItem());
                 Dictionary<DamageElement, MinMaxFloat> damageAmounts = Entity.GetWeaponDamagesWithBuffs(weapon);
                 int attackSeed = unchecked(data.randomSeed + (hitIndex * 16));
-                ApplyAttack(isLeftHand, weapon, damageInfo, damageAmounts, data.aimPosition, attackSeed, data.time);
+                ApplyAttack(isLeftHand, weapon, damageInfo, damageAmounts, data.aimPosition, attackSeed);
             }
         }
 

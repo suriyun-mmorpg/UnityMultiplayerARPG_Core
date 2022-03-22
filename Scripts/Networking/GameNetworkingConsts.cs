@@ -97,8 +97,6 @@
         public const ushort NotifyRewardCurrency = 171;
         // 1.63c
         public const ushort Respawn = 172;
-        // 1.63g
-        public const ushort SetAimPosition = 173;
         // 1.64
         public const ushort MailNotification = 174;
         public const ushort GetFriendRequests = 175;
@@ -115,5 +113,7 @@
         public const ushort OpenGacha = 188;
         // 1.73
         public const ushort GetGuildInfo = 189;
+        // 1.74
+        public const ushort HitRegistration = 190;
     }
 }

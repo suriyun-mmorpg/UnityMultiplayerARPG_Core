@@ -403,9 +403,8 @@ namespace MultiplayerARPG
                     // Apply skill buffs, summons and attack damages
                     if (IsOwnerClientOrOwnedByServer)
                     {
-                        long time = BaseGameNetworkManager.Singleton.ServerTimestamp;
                         int useSkillSeed = unchecked(simulateSeed + (hitIndex * 16));
-                        skill.ApplySkill(Entity, skillLevel, isLeftHand, weapon, hitIndex, damageAmounts, targetObjectId, aimPosition, useSkillSeed, time);
+                        skill.ApplySkill(Entity, skillLevel, isLeftHand, weapon, hitIndex, damageAmounts, targetObjectId, aimPosition, useSkillSeed);
                         SimulateLaunchDamageEntityData simulateData = new SimulateLaunchDamageEntityData();
                         if (isLeftHand)
                             simulateData.state |= SimulateLaunchDamageEntityState.IsLeftHand;
@@ -415,7 +414,6 @@ namespace MultiplayerARPG
                         simulateData.skillLevel = skillLevel;
                         simulateData.targetObjectId = targetObjectId;
                         simulateData.aimPosition = aimPosition;
-                        simulateData.time = time;
                         CallAllSimulateLaunchDamageEntity(simulateData);
                     }
 
@@ -487,7 +485,7 @@ namespace MultiplayerARPG
                     CharacterItem weapon = Entity.GetAvailableWeapon(ref isLeftHand);
                     Dictionary<DamageElement, MinMaxFloat> damageAmounts = skill.GetAttackDamages(Entity, data.skillLevel, isLeftHand);
                     int useSkillSeed = unchecked(data.randomSeed + (hitIndex * 16));
-                    skill.ApplySkill(Entity, data.skillLevel, isLeftHand, weapon, hitIndex, damageAmounts, data.targetObjectId, data.aimPosition, useSkillSeed, data.time);
+                    skill.ApplySkill(Entity, data.skillLevel, isLeftHand, weapon, hitIndex, damageAmounts, data.targetObjectId, data.aimPosition, useSkillSeed);
                 }
             }
         }

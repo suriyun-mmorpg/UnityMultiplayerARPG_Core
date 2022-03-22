@@ -437,7 +437,6 @@ namespace MultiplayerARPG
         /// <param name="targetObjectId"></param>
         /// <param name="aimPosition"></param>
         /// <param name="randomSeed"></param>
-        /// <param name="time"></param>
         /// <returns></returns>
         public void ApplySkill(
             BaseCharacterEntity skillUser,
@@ -448,8 +447,7 @@ namespace MultiplayerARPG
             Dictionary<DamageElement, MinMaxFloat> damageAmounts,
             uint targetObjectId,
             AimPosition aimPosition,
-            int randomSeed,
-            long? time)
+            int randomSeed)
         {
             if (skillUser == null)
                 return;
@@ -475,8 +473,7 @@ namespace MultiplayerARPG
                 damageAmounts,
                 targetObjectId,
                 aimPosition,
-                randomSeed,
-                time);
+                randomSeed);
         }
 
         /// <summary>
@@ -491,7 +488,6 @@ namespace MultiplayerARPG
         /// <param name="targetObjectId"></param>
         /// <param name="aimPosition"></param>
         /// <param name="randomSeed"></param>
-        /// <param name="time"></param>
         /// <returns></returns>
         protected abstract void ApplySkillImplement(
             BaseCharacterEntity skillUser,
@@ -502,8 +498,7 @@ namespace MultiplayerARPG
             Dictionary<DamageElement, MinMaxFloat> damageAmounts,
             uint targetObjectId,
             AimPosition aimPosition,
-            int randomSeed,
-            long? time);
+            int randomSeed);
 
         /// <summary>
         /// Return TRUE if this will override default attack function

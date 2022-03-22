@@ -57,6 +57,7 @@ namespace MultiplayerARPG
         protected IClientGameMessageHandlers ClientGameMessageHandlers { get; set; }
         // Others
         public ILagCompensationManager LagCompensationManager { get; protected set; }
+        public IHitRegistrationManager HitRegistrationManager { get; protected set; }
 
         public static BaseMapInfo CurrentMapInfo { get; protected set; }
 
@@ -80,7 +81,7 @@ namespace MultiplayerARPG
 
         public override uint PacketVersion()
         {
-            return 31;
+            return 32;
         }
 
         protected override void Awake()
@@ -89,6 +90,7 @@ namespace MultiplayerARPG
             doNotEnterGameOnConnect = false;
             doNotDestroyOnSceneChanges = true;
             LagCompensationManager = gameObject.GetOrAddComponent<ILagCompensationManager, DefaultLagCompensationManager>();
+            HitRegistrationManager = gameObject.GetOrAddComponent<IHitRegistrationManager, DefaultHitRegistrationManager>();
             // Get attached grid manager
             GridManager gridManager = gameObject.GetComponent<GridManager>();
             if (gridManager != null)
@@ -167,7 +169,7 @@ namespace MultiplayerARPG
             RegisterServerMessage(GameNetworkingConsts.SyncTransform, HandleSyncTransformAtServer);
             RegisterServerMessage(GameNetworkingConsts.StopMove, HandleStopMoveAtServer);
             RegisterServerMessage(GameNetworkingConsts.Jump, HandleJumpAtServer);
-            RegisterServerMessage(GameNetworkingConsts.SetAimPosition, HandleSetAimPositionAtServer);
+            RegisterServerMessage(GameNetworkingConsts.HitRegistration, HandleHitRegistrationAtServer);
             if (ServerCharacterHandlers != null)
             {
                 RegisterServerMessage(GameNetworkingConsts.NotifyOnlineCharacter, ServerCharacterHandlers.HandleRequestOnlineCharacter);
@@ -333,8 +335,8 @@ namespace MultiplayerARPG
             GameInstance.ServerMailHandlers = ServerMailHandlers;
             GameInstance.ServerUserHandlers = ServerUserHandlers;
             GameInstance.ServerBuildingHandlers = ServerBuildingHandlers;
-            GameInstance.ServerGameMessageHandlers = ServerGameMessageHandlers;
             GameInstance.ServerCharacterHandlers = ServerCharacterHandlers;
+            GameInstance.ServerGameMessageHandlers = ServerGameMessageHandlers;
             GameInstance.ServerStorageHandlers = ServerStorageHandlers;
             GameInstance.ServerPartyHandlers = ServerPartyHandlers;
             GameInstance.ServerGuildHandlers = ServerGuildHandlers;
@@ -546,11 +548,11 @@ namespace MultiplayerARPG
                 gameEntity.ActiveMovement.HandleJumpAtServer(messageHandler);
         }
 
-        protected void HandleSetAimPositionAtServer(MessageHandlerData messageHandler)
+        protected void HandleHitRegistrationAtServer(MessageHandlerData messageHandler)
         {
             BasePlayerCharacterEntity gameEntity;
             if (ServerUserHandlers.TryGetPlayerCharacter(messageHandler.ConnectionId, out gameEntity))
-                gameEntity.AimPosition = messageHandler.Reader.GetValue<AimPosition>();
+                gameEntity.ActiveMovement.HandleJumpAtServer(messageHandler);
         }
 
         public virtual void InitPrefabs()
