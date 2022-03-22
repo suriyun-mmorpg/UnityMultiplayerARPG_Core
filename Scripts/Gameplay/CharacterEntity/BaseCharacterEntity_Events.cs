@@ -76,10 +76,10 @@ namespace MultiplayerARPG
             int randomSeed,
             AimPosition aimPosition,
             Vector3 stagger,
-            HashSet<DamageHitObjectInfo> hitObjectIds)
+            Dictionary<uint, int> hitBoxes)
         {
             if (onLaunchDamageEntity != null)
-                onLaunchDamageEntity.Invoke(isLeftHand, weapon, damageAmounts, skill, skillLevel, randomSeed, aimPosition, stagger, hitObjectIds);
+                onLaunchDamageEntity.Invoke(isLeftHand, weapon, damageAmounts, skill, skillLevel, randomSeed, aimPosition, stagger, hitBoxes);
         }
 
         public void OnApplyBuff(

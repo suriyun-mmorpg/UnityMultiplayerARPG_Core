@@ -125,21 +125,6 @@ namespace MultiplayerARPG
             return transform;
         }
 
-        /// <summary>
-        /// This function can be called at both client and server
-        /// For server it will instantiates damage entities if needed
-        /// For client it will instantiates special effects
-        /// </summary>
-        /// <param name="attacker"></param>
-        /// <param name="isLeftHand"></param>
-        /// <param name="weapon"></param>
-        /// <param name="damageAmounts"></param>
-        /// <param name="skill"></param>
-        /// <param name="skillLevel"></param>
-        /// <param name="randomSeed"></param>
-        /// <param name="aimPosition"></param>
-        /// <param name="stagger"></param>
-        /// <param name="damageHitObjectInfos"></param>
         public void LaunchDamageEntity(
             BaseCharacterEntity attacker,
             bool isLeftHand,
@@ -150,9 +135,9 @@ namespace MultiplayerARPG
             int randomSeed,
             AimPosition aimPosition,
             Vector3 stagger,
-            out HashSet<DamageHitObjectInfo> damageHitObjectInfos)
+            out Dictionary<uint, int> hitBoxes)
         {
-            damageHitObjectInfos = new HashSet<DamageHitObjectInfo>();
+            hitBoxes = new Dictionary<uint, int>();
             if (attacker == null)
                 return;
 
@@ -169,7 +154,7 @@ namespace MultiplayerARPG
                     randomSeed,
                     aimPosition,
                     stagger,
-                    out damageHitObjectInfos);
+                    out hitBoxes);
                 // Trigger attacker's on launch damage entity event
                 attacker.OnLaunchDamageEntity(
                     isLeftHand,
@@ -180,13 +165,16 @@ namespace MultiplayerARPG
                     randomSeed,
                     aimPosition,
                     stagger,
-                    damageHitObjectInfos);
+                    hitBoxes);
                 // Then break the function because launch damage entity functionality done by custom damage info class
                 return;
             }
 
             bool isServer = attacker.IsServer;
             bool isClient = attacker.IsClient;
+            bool isHost = attacker.IsHost;
+            bool isOwnerClient = attacker.IsOwnerClient;
+            bool isOwnedByServer = attacker.IsOwnedByServer;
             EntityInfo instigator = attacker.GetInfo();
             int damageableLayerMask = GameInstance.Singleton.GetDamageableLayerMask();
 
@@ -226,7 +214,7 @@ namespace MultiplayerARPG
                                 randomSeed,
                                 aimPosition,
                                 stagger,
-                                damageHitObjectInfos);
+                                hitBoxes);
                             // Then break the function because it can't find hitting objects
                             return;
                         }
@@ -246,17 +234,12 @@ namespace MultiplayerARPG
                             if (tempDamageableHitBox.GetObjectId() == attacker.ObjectId)
                                 continue;
 
-                            DamageHitObjectInfo damageHitObjectInfo = new DamageHitObjectInfo()
-                            {
-                                ObjectId = tempDamageableHitBox.GetObjectId(),
-                                HitBoxIndex = tempDamageableHitBox.Index,
-                            };
-                            if (damageHitObjectInfos.Contains(damageHitObjectInfo))
+                            if (hitBoxes.ContainsKey(tempDamageableHitBox.GetObjectId()))
                                 continue;
 
                             // Add entity to table, if it found entity in the table next time it will skip. 
                             // So it won't applies damage to entity repeatly.
-                            damageHitObjectInfos.Add(damageHitObjectInfo);
+                            hitBoxes[tempDamageableHitBox.GetObjectId()] = tempDamageableHitBox.Index;
 
                             // Target won't receive damage if dead or can't receive damage from this character
                             if (tempDamageableHitBox.IsDead() || !tempDamageableHitBox.CanReceiveDamageFrom(instigator) ||
@@ -279,8 +262,13 @@ namespace MultiplayerARPG
                         if (damageReceivingTarget != null)
                         {
                             // Pass all receive damage condition, then apply damages
-                            if (isServer)
+                            if (isOwnedByServer || isHost)
                                 damageReceivingTarget.ReceiveDamage(attacker.CacheTransform.position, instigator, damageAmounts, weapon, skill, skillLevel, randomSeed);
+
+                            if (!isHost && isOwnerClient)
+                            {
+                                // TODO: Implement this, client send hit registration info to server to validate and apply damage
+                            }
 
                             // Instantiate impact effects
                             if (isClient && hasImpactEffects)
@@ -306,7 +294,7 @@ namespace MultiplayerARPG
                                 randomSeed,
                                 aimPosition,
                                 stagger,
-                                damageHitObjectInfos);
+                                hitBoxes);
                             // Then break the function because it can't find hitting objects
                             return;
                         }
@@ -326,17 +314,12 @@ namespace MultiplayerARPG
                             if (tempDamageableHitBox.GetObjectId() == attacker.ObjectId)
                                 continue;
 
-                            DamageHitObjectInfo damageHitObjectInfo = new DamageHitObjectInfo()
-                            {
-                                ObjectId = tempDamageableHitBox.GetObjectId(),
-                                HitBoxIndex = tempDamageableHitBox.Index,
-                            };
-                            if (damageHitObjectInfos.Contains(damageHitObjectInfo))
+                            if (hitBoxes.ContainsKey(tempDamageableHitBox.GetObjectId()))
                                 continue;
 
                             // Add entity to table, if it found entity in the table next time it will skip. 
                             // So it won't applies damage to entity repeatly.
-                            damageHitObjectInfos.Add(damageHitObjectInfo);
+                            hitBoxes[tempDamageableHitBox.GetObjectId()] = tempDamageableHitBox.Index;
 
                             // Target won't receive damage if dead or can't receive damage from this character
                             if (tempDamageableHitBox.IsDead() || !tempDamageableHitBox.CanReceiveDamageFrom(instigator) ||
@@ -344,8 +327,13 @@ namespace MultiplayerARPG
                                 continue;
 
                             // Target receives damages
-                            if (isServer)
+                            if (isOwnedByServer || isHost)
                                 tempDamageableHitBox.ReceiveDamage(attacker.CacheTransform.position, instigator, damageAmounts, weapon, skill, skillLevel, randomSeed);
+
+                            if (!isHost && isOwnerClient)
+                            {
+                                // TODO: Implement this, client send hit registration info to server to validate and apply damage
+                            }
 
                             // Instantiate impact effects
                             if (isClient && hasImpactEffects)
@@ -415,25 +403,25 @@ namespace MultiplayerARPG
                             if (tempDamageableHitBox.GetObjectId() == attacker.ObjectId)
                                 continue;
 
-                            DamageHitObjectInfo damageHitObjectInfo = new DamageHitObjectInfo()
-                            {
-                                ObjectId = tempDamageableHitBox.GetObjectId(),
-                                HitBoxIndex = tempDamageableHitBox.Index,
-                            };
-                            if (damageHitObjectInfos.Contains(damageHitObjectInfo))
+                            if (hitBoxes.ContainsKey(tempDamageableHitBox.GetObjectId()))
                                 continue;
 
                             // Add entity to table, if it found entity in the table next time it will skip. 
                             // So it won't applies damage to entity repeatly.
-                            damageHitObjectInfos.Add(damageHitObjectInfo);
+                            hitBoxes[tempDamageableHitBox.GetObjectId()] = tempDamageableHitBox.Index;
 
                             // Target won't receive damage if dead or can't receive damage from this character
                             if (tempDamageableHitBox.IsDead() || !tempDamageableHitBox.CanReceiveDamageFrom(instigator))
                                 continue;
 
                             // Target receives damages
-                            if (isServer)
+                            if (isOwnedByServer || isHost)
                                 tempDamageableHitBox.ReceiveDamage(attacker.CacheTransform.position, instigator, damageAmounts, weapon, skill, skillLevel, randomSeed);
+
+                            if (!isHost && isOwnerClient)
+                            {
+                                // TODO: Implement this, client send hit registration info to server to validate and apply damage
+                            }
 
                             // Instantiate impact effects
                             if (isClient && hasImpactEffects)
@@ -471,7 +459,7 @@ namespace MultiplayerARPG
                 randomSeed,
                 aimPosition,
                 stagger,
-                damageHitObjectInfos);
+                hitBoxes);
         }
 
         public void PrepareRelatesData()

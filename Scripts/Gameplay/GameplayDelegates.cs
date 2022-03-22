@@ -50,7 +50,7 @@ namespace MultiplayerARPG
         int randomSeed,
         AimPosition aimPosition,
         Vector3 stagger,
-        HashSet<DamageHitObjectInfo> hitObjectIds);
+        Dictionary<uint, int> hitBoxes);
     public delegate void ApplyBuffDelegate(
         int dataId,
         BuffType type,

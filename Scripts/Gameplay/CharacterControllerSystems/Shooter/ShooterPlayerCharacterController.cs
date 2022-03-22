@@ -1356,7 +1356,16 @@ namespace MultiplayerARPG
             }
         }
 
-        protected void OnLaunchDamageEntity(bool isLeftHand, CharacterItem weapon, Dictionary<DamageElement, MinMaxFloat> damageAmounts, BaseSkill skill, short skillLevel, int randomSeed, AimPosition aimPosition, Vector3 stagger, HashSet<DamageHitObjectInfo> hitObjectIds)
+        public void OnLaunchDamageEntity(
+            bool isLeftHand,
+            CharacterItem weapon,
+            Dictionary<DamageElement, MinMaxFloat> damageAmounts,
+            BaseSkill skill,
+            short skillLevel,
+            int randomSeed,
+            AimPosition aimPosition,
+            Vector3 stagger,
+            Dictionary<uint, int> hitBoxes)
         {
             UpdateRecoil();
         }
