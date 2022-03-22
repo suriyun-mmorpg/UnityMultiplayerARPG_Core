@@ -17,8 +17,8 @@ namespace MultiplayerARPG
             if (aimPosition.type == AimPositionType.Direction)
             {
                 position = aimPosition.position;
-                direction = aimPosition.direction;
-                rotation = Quaternion.LookRotation(direction);
+                rotation = Quaternion.Euler(Quaternion.LookRotation(aimPosition.direction).eulerAngles + stagger);
+                direction = rotation * Vector3.forward;
             }
             else
             {
