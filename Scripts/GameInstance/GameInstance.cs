@@ -795,6 +795,7 @@ namespace MultiplayerARPG
             int layerMask = 0;
             layerMask = layerMask | playerLayer.Mask;
             layerMask = layerMask | monsterLayer.Mask;
+            layerMask = layerMask | vehicleLayer.Mask;
             layerMask = layerMask | buildingLayer.Mask;
             layerMask = layerMask | harvestableLayer.Mask;
             return layerMask;
