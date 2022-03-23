@@ -273,9 +273,7 @@ namespace MultiplayerARPG
                                     damageReceivingTarget.ReceiveDamage(attacker.CacheTransform.position, instigator, damageAmounts, weapon, skill, skillLevel, randomSeed);
 
                                 if (!isHost && isOwnerClient)
-                                {
-                                    // TODO: Implement this, client send hit registration info to server to validate and apply damage
-                                }
+                                    BaseGameNetworkManager.Singleton.HitRegistrationManager.PrepareHitRegistration(this, attacker, damageAmounts, weapon, skill, skillLevel, randomSeed);
 
                                 // Instantiate impact effects
                                 if (isClient && hasImpactEffects)
@@ -297,7 +295,7 @@ namespace MultiplayerARPG
                             if (!attacker.TryGetTargetEntity(out tempDamageableHitBox))
                                 tempDamageableHitBox = null;
                         }
-                        // TODO: May move missile ahead of time based on client's RTT
+                        // TODO: May predict and move missile ahead of time based on client's RTT
                         PoolSystem.GetInstance(missileDamageEntity, damagePosition, damageRotation)
                             .Setup(instigator, weapon, damageAmounts, skill, skillLevel, missileDistance, missileSpeed, tempDamageableHitBox);
                     }
@@ -364,9 +362,7 @@ namespace MultiplayerARPG
                                     tempDamageableHitBox.ReceiveDamage(attacker.CacheTransform.position, instigator, damageAmounts, weapon, skill, skillLevel, randomSeed);
 
                                 if (!isHost && isOwnerClient)
-                                {
-                                    // TODO: Implement this, client send hit registration info to server to validate and apply damage
-                                }
+                                    BaseGameNetworkManager.Singleton.HitRegistrationManager.PrepareHitRegistration(this, attacker, damageAmounts, weapon, skill, skillLevel, randomSeed);
 
                                 // Instantiate impact effects
                                 if (isClient && hasImpactEffects)
@@ -389,6 +385,7 @@ namespace MultiplayerARPG
                 case DamageType.Throwable:
                     if (throwableDamageEntity != null)
                     {
+                        // TODO: May predict and move missile ahead of time based on client's RTT
                         PoolSystem.GetInstance(throwableDamageEntity, damagePosition, damageRotation)
                             .Setup(instigator, weapon, damageAmounts, skill, skillLevel, throwForce, throwableLifeTime);
                     }
