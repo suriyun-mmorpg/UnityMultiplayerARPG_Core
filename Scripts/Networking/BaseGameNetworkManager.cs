@@ -552,7 +552,7 @@ namespace MultiplayerARPG
         {
             BasePlayerCharacterEntity gameEntity;
             if (ServerUserHandlers.TryGetPlayerCharacter(messageHandler.ConnectionId, out gameEntity))
-                gameEntity.ActiveMovement.HandleJumpAtServer(messageHandler);
+                HitRegistrationManager.RegisterHit(gameEntity, messageHandler.Reader.GetValue<HitRegisterMessage>());
         }
 
         public virtual void InitPrefabs()

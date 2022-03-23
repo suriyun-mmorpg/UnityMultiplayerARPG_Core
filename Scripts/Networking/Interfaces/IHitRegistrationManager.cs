@@ -5,7 +5,7 @@ namespace MultiplayerARPG
 {
     public interface IHitRegistrationManager
     {
-        void PrepareHitRegistration(DamageInfo damageInfo, BaseCharacterEntity attacker, Dictionary<DamageElement, MinMaxFloat> damageAmounts, CharacterItem weapon, BaseSkill skill, short skillLevel, int randomSeed);
-        void PerformHitRegistration(BaseCharacterEntity attacker, Vector3 origin, Vector3 direction, DamageableEntity target, byte hitBoxIndex, Vector3 hitPoint, int randomSeed);
+        void ValidateHit(DamageInfo damageInfo, byte hitIndex, BaseCharacterEntity attacker, Dictionary<DamageElement, MinMaxFloat> damageAmounts, CharacterItem weapon, BaseSkill skill, short skillLevel, int randomSeed);
+        void RegisterHit(BaseCharacterEntity attacker, HitRegisterMessage message);
     }
 }

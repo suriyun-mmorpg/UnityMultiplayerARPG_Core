@@ -249,13 +249,8 @@ namespace MultiplayerARPG
                                 }
 
                                 // Target receives damages
-                                if (isHost || isOwnedByServer)
+                                if (isServer)
                                     tempDamageableHitBox.ReceiveDamage(attacker.CacheTransform.position, instigator, damageAmounts, weapon, skill, skillLevel, randomSeed);
-
-                                if (!isHost && isOwnerClient)
-                                {
-                                    // TODO: Implement this, client send hit registration info to server to validate and apply damage
-                                }
 
                                 // Instantiate impact effects
                                 if (isClient && hasImpactEffects)
@@ -269,11 +264,8 @@ namespace MultiplayerARPG
                             {
                                 // Only 1 target will receives damages
                                 // Pass all receive damage condition, then apply damages
-                                if (isHost || isOwnedByServer)
+                                if (isServer)
                                     damageReceivingTarget.ReceiveDamage(attacker.CacheTransform.position, instigator, damageAmounts, weapon, skill, skillLevel, randomSeed);
-
-                                if (!isHost && isOwnerClient)
-                                    BaseGameNetworkManager.Singleton.HitRegistrationManager.PrepareHitRegistration(this, attacker, damageAmounts, weapon, skill, skillLevel, randomSeed);
 
                                 // Instantiate impact effects
                                 if (isClient && hasImpactEffects)
@@ -358,11 +350,8 @@ namespace MultiplayerARPG
                                     continue;
 
                                 // Target receives damages
-                                if (isHost || isOwnedByServer)
+                                if (isServer)
                                     tempDamageableHitBox.ReceiveDamage(attacker.CacheTransform.position, instigator, damageAmounts, weapon, skill, skillLevel, randomSeed);
-
-                                if (!isHost && isOwnerClient)
-                                    BaseGameNetworkManager.Singleton.HitRegistrationManager.PrepareHitRegistration(this, attacker, damageAmounts, weapon, skill, skillLevel, randomSeed);
 
                                 // Instantiate impact effects
                                 if (isClient && hasImpactEffects)
