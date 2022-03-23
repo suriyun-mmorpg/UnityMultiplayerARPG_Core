@@ -54,7 +54,7 @@ namespace MultiplayerARPG
         public Rigidbody CacheRigidbody { get; private set; }
         public Collider2D CacheCollider2D { get; private set; }
         public Rigidbody2D CacheRigidbody2D { get; private set; }
-        public int Index { get; private set; }
+        public byte Index { get; private set; }
 
         protected bool isSetup;
         protected Vector3 defaultLocalPosition;
@@ -99,7 +99,7 @@ namespace MultiplayerARPG
             }
         }
 
-        public virtual void Setup(int index)
+        public virtual void Setup(byte index)
         {
             isSetup = true;
             gameObject.tag = DamageableEntity.gameObject.tag;

@@ -409,10 +409,10 @@ namespace MultiplayerARPG
                         if (isLeftHand)
                             simulateData.state |= SimulateLaunchDamageEntityState.IsLeftHand;
                         simulateData.state |= SimulateLaunchDamageEntityState.IsSkill;
-                        simulateData.randomSeed = simulateSeed;
+                        simulateData.randomSeed = useSkillSeed;
+                        simulateData.targetObjectId = targetObjectId;
                         simulateData.skillDataId = skill.DataId;
                         simulateData.skillLevel = skillLevel;
-                        simulateData.targetObjectId = targetObjectId;
                         simulateData.aimPosition = aimPosition;
                         CallAllSimulateLaunchDamageEntity(simulateData);
                     }

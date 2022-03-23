@@ -233,7 +233,6 @@ namespace MultiplayerARPG
 
                                 if (hitOnlySelectedTarget)
                                 {
-                                    // Hit only selected target, will apply damage later (outside this loop)
                                     // Check with selected target
                                     if (hasSelectedTarget && selectedTarget.GetObjectId() == tempDamageableHitBox.GetObjectId())
                                     {
@@ -245,12 +244,19 @@ namespace MultiplayerARPG
                                     // Set damage taken targetit will be used in-case it can't find selected target
                                     damageTakenTargetIndex = tempLoopCounter;
                                     damageReceivingTarget = tempDamageableHitBox;
+                                    // Hit only selected target, will apply damage later (outside this loop)
                                     continue;
                                 }
 
                                 // Target receives damages
-                                if (isServer)
+                                if (isHost || isOwnedByServer)
                                     tempDamageableHitBox.ReceiveDamage(attacker.CacheTransform.position, instigator, damageAmounts, weapon, skill, skillLevel, randomSeed);
+
+                                if (!isHost && isOwnerClient)
+                                    BaseGameNetworkManager.Singleton.HitRegistrationManager.PrepareToRegister(this, randomSeed, attacker, aimPosition, tempDamageableHitBox.GetObjectId(), tempDamageableHitBox.Index, tempDamageableHitBox.transform.position);
+
+                                if (isServer && !isOwnerClient && !isOwnedByServer)
+                                    BaseGameNetworkManager.Singleton.HitRegistrationManager.Validate(this, attacker, damageAmounts, weapon, skill, skillLevel, randomSeed);
 
                                 // Instantiate impact effects
                                 if (isClient && hasImpactEffects)
@@ -264,8 +270,11 @@ namespace MultiplayerARPG
                             {
                                 // Only 1 target will receives damages
                                 // Pass all receive damage condition, then apply damages
-                                if (isServer)
+                                if (isHost || isOwnedByServer)
                                     damageReceivingTarget.ReceiveDamage(attacker.CacheTransform.position, instigator, damageAmounts, weapon, skill, skillLevel, randomSeed);
+
+                                if (!isHost && isOwnerClient)
+                                    BaseGameNetworkManager.Singleton.HitRegistrationManager.PrepareToRegister(this, randomSeed, attacker, aimPosition, tempDamageableHitBox.GetObjectId(), tempDamageableHitBox.Index, tempDamageableHitBox.transform.position);
 
                                 // Instantiate impact effects
                                 if (isClient && hasImpactEffects)
@@ -276,6 +285,8 @@ namespace MultiplayerARPG
                             }
                         }
                     }
+                    if (isServer && !isOwnerClient && !isOwnedByServer)
+                        BaseGameNetworkManager.Singleton.HitRegistrationManager.Validate(this, attacker, damageAmounts, weapon, skill, skillLevel, randomSeed);
                     break;
                 case DamageType.Missile:
                     // Spawn missile damage entity, it will move to target then apply damage when hit
@@ -300,7 +311,7 @@ namespace MultiplayerARPG
                         int tempRaycastSize = attacker.AttackPhysicFunctions.Raycast(damagePosition, damageDirection, missileDistance, Physics.DefaultRaycastLayers);
                         if (tempRaycastSize > 0)
                         {
-                            // Sort index
+                            byte pierceThroughEntities = this.pierceThroughEntities;
                             Vector3 point;
                             Vector3 normal;
                             float distance;
@@ -350,8 +361,11 @@ namespace MultiplayerARPG
                                     continue;
 
                                 // Target receives damages
-                                if (isServer)
+                                if (isHost || isOwnedByServer)
                                     tempDamageableHitBox.ReceiveDamage(attacker.CacheTransform.position, instigator, damageAmounts, weapon, skill, skillLevel, randomSeed);
+
+                                if (!isHost && isOwnerClient)
+                                    BaseGameNetworkManager.Singleton.HitRegistrationManager.PrepareToRegister(this, randomSeed, attacker, aimPosition, tempDamageableHitBox.GetObjectId(), tempDamageableHitBox.Index, point);
 
                                 // Instantiate impact effects
                                 if (isClient && hasImpactEffects)
@@ -370,6 +384,8 @@ namespace MultiplayerARPG
                                 .Setup(minDistance, missileSpeed);
                         }
                     }
+                    if (isServer && !isOwnerClient && !isOwnedByServer)
+                        BaseGameNetworkManager.Singleton.HitRegistrationManager.Validate(this, attacker, damageAmounts, weapon, skill, skillLevel, randomSeed);
                     break;
                 case DamageType.Throwable:
                     if (throwableDamageEntity != null)

@@ -70,7 +70,7 @@ namespace MultiplayerARPG
             if (HitBoxes == null || HitBoxes.Length == 0)
                 HitBoxes = CreateHitBoxes();
             // Assign index to hitboxes
-            for (int i = 0; i < HitBoxes.Length; ++i)
+            for (byte i = 0; i < HitBoxes.Length; ++i)
             {
                 HitBoxes[i].Setup(i);
             }

@@ -97,7 +97,7 @@ namespace MultiplayerARPG
         public NavMeshObstacle CacheNavMeshObstacle { get; private set; }
         private bool dirtyIsBuildMode;
 
-        public override void Setup(int index)
+        public override void Setup(byte index)
         {
             base.Setup(index);
             BuildingEntity = DamageableEntity as BuildingEntity;
