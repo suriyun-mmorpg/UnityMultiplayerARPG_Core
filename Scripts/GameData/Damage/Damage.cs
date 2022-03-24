@@ -255,9 +255,6 @@ namespace MultiplayerARPG
                                 if (!isHost && isOwnerClient)
                                     BaseGameNetworkManager.Singleton.HitRegistrationManager.PrepareToRegister(this, randomSeed, attacker, aimPosition, tempDamageableHitBox.GetObjectId(), tempDamageableHitBox.Index, tempDamageableHitBox.transform.position);
 
-                                if (isServer && !isOwnerClient && !isOwnedByServer)
-                                    BaseGameNetworkManager.Singleton.HitRegistrationManager.Validate(this, attacker, damageAmounts, weapon, skill, skillLevel, randomSeed);
-
                                 // Instantiate impact effects
                                 if (isClient && hasImpactEffects)
                                 {
@@ -285,8 +282,6 @@ namespace MultiplayerARPG
                             }
                         }
                     }
-                    if (isServer && !isOwnerClient && !isOwnedByServer)
-                        BaseGameNetworkManager.Singleton.HitRegistrationManager.Validate(this, attacker, damageAmounts, weapon, skill, skillLevel, randomSeed);
                     break;
                 case DamageType.Missile:
                     // Spawn missile damage entity, it will move to target then apply damage when hit
@@ -384,8 +379,6 @@ namespace MultiplayerARPG
                                 .Setup(minDistance, missileSpeed);
                         }
                     }
-                    if (isServer && !isOwnerClient && !isOwnedByServer)
-                        BaseGameNetworkManager.Singleton.HitRegistrationManager.Validate(this, attacker, damageAmounts, weapon, skill, skillLevel, randomSeed);
                     break;
                 case DamageType.Throwable:
                     if (throwableDamageEntity != null)

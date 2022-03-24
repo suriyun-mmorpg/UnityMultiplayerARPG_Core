@@ -283,6 +283,9 @@ namespace MultiplayerARPG
                     stagger,
                     out _);
             }
+
+            if (IsServer && !IsOwnerClient && !IsOwnedByServer)
+                BaseGameNetworkManager.Singleton.HitRegistrationManager.Validate(damageInfo, randomSeed, fireSpread, Entity, damageAmounts, weapon, null, 0);
         }
 
         public bool CallAllSimulateLaunchDamageEntity(SimulateLaunchDamageEntityData data)
@@ -297,10 +300,10 @@ namespace MultiplayerARPG
             if (IsOwnerClientOrOwnedByServer)
                 return;
             SimulatingHit simulatingHit;
-            if (!SimulatingHits.TryGetValue(data.randomSeed, out simulatingHit) || simulatingHit.hitIndex >= simulatingHit.triggerLength)
+            if (!SimulatingHits.TryGetValue(data.randomSeed, out simulatingHit) || simulatingHit.HitIndex >= simulatingHit.TriggerLength)
                 return;
-            int hitIndex = SimulatingHits[data.randomSeed].hitIndex + 1;
-            simulatingHit.hitIndex = hitIndex;
+            int hitIndex = SimulatingHits[data.randomSeed].HitIndex + 1;
+            simulatingHit.HitIndex = hitIndex;
             SimulatingHits[data.randomSeed] = simulatingHit;
             bool isLeftHand = data.state.HasFlag(SimulateLaunchDamageEntityState.IsLeftHand);
             if (!data.state.HasFlag(SimulateLaunchDamageEntityState.IsSkill))

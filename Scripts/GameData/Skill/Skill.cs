@@ -98,8 +98,9 @@ namespace MultiplayerARPG
             // Apply attack skill
             if (IsAttack)
             {
+                DamageInfo damageInfo = GetDamageInfo(skillUser, isLeftHand);
                 // Launch damage entity to apply damage to other characters
-                GetDamageInfo(skillUser, isLeftHand).LaunchDamageEntity(
+                damageInfo.LaunchDamageEntity(
                     skillUser,
                     isLeftHand,
                     weapon,
@@ -110,6 +111,9 @@ namespace MultiplayerARPG
                     aimPosition,
                     Vector3.zero,
                     out _);
+
+                if (skillUser.IsServer && !skillUser.IsOwnerClient && !skillUser.IsOwnedByServer)
+                    BaseGameNetworkManager.Singleton.HitRegistrationManager.Validate(damageInfo, randomSeed, 0, skillUser, damageAmounts, weapon, this, skillLevel);
             }
         }
 

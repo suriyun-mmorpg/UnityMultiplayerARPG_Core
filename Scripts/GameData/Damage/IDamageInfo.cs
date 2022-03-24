@@ -17,7 +17,7 @@ namespace MultiplayerARPG
         /// <param name="randomSeed">Launch random seed</param>
         /// <param name="aimPosition">Aim position</param>
         /// <param name="stagger">Stagger</param>
-        /// <param name="hitBoxes">Hotboxes(Dictionary(ObjectID(uint), HitboxIndex(int)))</param>
+        /// <param name="hitBoxes">Hitboxes(Dictionary(ObjectID(uint), HitboxIndex(int)))</param>
         void LaunchDamageEntity(
             BaseCharacterEntity attacker,
             bool isLeftHand,

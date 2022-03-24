@@ -6,10 +6,11 @@ namespace MultiplayerARPG
 {
     public class DefaultHitRegistrationManager : MonoBehaviour, IHitRegistrationManager
     {
-        private Dictionary<int, List<HitRegisterData>> preparedHits = new Dictionary<int, List<HitRegisterData>>();
-        private Dictionary<string, List<HitRegisterData>> registeredHits = new Dictionary<string, List<HitRegisterData>>();
+        private static Dictionary<int, List<HitRegisterData>> prepareHits = new Dictionary<int, List<HitRegisterData>>();
+        private static Dictionary<string, List<HitRegisterData>> registerHits = new Dictionary<string, List<HitRegisterData>>();
+        private static Dictionary<string, HitValidateData> validateHits = new Dictionary<string, HitValidateData>();
 
-        public void Validate(DamageInfo damageInfo, BaseCharacterEntity attacker, Dictionary<DamageElement, MinMaxFloat> damageAmounts, CharacterItem weapon, BaseSkill skill, short skillLevel, int randomSeed)
+        public void Validate(DamageInfo damageInfo, int randomSeed, byte fireSpread, BaseCharacterEntity attacker, Dictionary<DamageElement, MinMaxFloat> damageAmounts, CharacterItem weapon, BaseSkill skill, short skillLevel)
         {
             if (!BaseGameNetworkManager.Singleton.IsServer)
             {
@@ -17,33 +18,27 @@ namespace MultiplayerARPG
                 return;
             }
 
+            if (damageInfo.damageType == DamageType.Missile || damageInfo.damageType == DamageType.Throwable)
+            {
+                // Don't validate damage entity based damage types
+                return;
+            }
+
             string id = MakeId(attacker.Id, randomSeed);
-            if (!registeredHits.ContainsKey(id))
+            if (!validateHits.ContainsKey(id))
             {
-                // The hits not registered yet, assume that it doesn't hit
-                // TODO: May performs casting by server
-                return;
+                validateHits.Add(id, new HitValidateData()
+                {
+                    FireSpread = fireSpread,
+                    Attacker = attacker,
+                    DamageAmounts = damageAmounts,
+                    Weapon = weapon,
+                    Skill = skill,
+                    SkillLevel = skillLevel,
+                });
+                DelayRemoveValidateHits(id);
+                PerformValidation(id, randomSeed);
             }
-
-            if (registeredHits[id].Count <= 0)
-            {
-                // No more hitting
-                return;
-            }
-
-            DamageableEntity damageableEntity;
-            if (!BaseGameNetworkManager.Singleton.TryGetEntityByObjectId(registeredHits[id][0].HitObjectId, out damageableEntity) ||
-                damageableEntity.HitBoxes.Length >= registeredHits[id][0].HitBoxIndex)
-            {
-                // Can't find target or invalid hitbox
-                return;
-            }
-
-            // TODO: Valiate hitting
-
-            // Yes, it is hit
-            damageableEntity.HitBoxes[registeredHits[id][0].HitBoxIndex].ReceiveDamage(attacker.CacheTransform.position, attacker.GetInfo(), damageAmounts, weapon, skill, skillLevel, randomSeed);
-            registeredHits[id].RemoveAt(0);
         }
 
         public void Register(BaseCharacterEntity attacker, HitRegisterMessage message)
@@ -53,12 +48,39 @@ namespace MultiplayerARPG
                 // Only server can perform hit registration
                 return;
             }
+
             string id = MakeId(attacker.Id, message.RandomSeed);
-            if (!registeredHits.ContainsKey(id))
+            if (!registerHits.ContainsKey(id))
             {
-                registeredHits.Add(id, message.Hits);
-                DelayUnregisterHits(id);
+                registerHits.Add(id, message.Hits);
+                DelayRemoveRegisterHits(id);
+                PerformValidation(id, message.RandomSeed);
             }
+        }
+
+        private void PerformValidation(string id, int randomSeed)
+        {
+            if (!registerHits.ContainsKey(id) || !validateHits.ContainsKey(id))
+                return;
+
+            while (registerHits[id].Count > 0)
+            {
+                DamageableEntity damageableEntity;
+                if (!BaseGameNetworkManager.Singleton.TryGetEntityByObjectId(registerHits[id][0].HitObjectId, out damageableEntity) ||
+                    damageableEntity.HitBoxes.Length >= registerHits[id][0].HitBoxIndex)
+                {
+                    // Can't find target or invalid hitbox
+                    return;
+                }
+
+                // TODO: Valiate hitting
+
+                // Yes, it is hit
+                damageableEntity.HitBoxes[registerHits[id][0].HitBoxIndex].ReceiveDamage(validateHits[id].Attacker.CacheTransform.position, validateHits[id].Attacker.GetInfo(), validateHits[id].DamageAmounts, validateHits[id].Weapon, validateHits[id].Skill, validateHits[id].SkillLevel, randomSeed);
+            }
+
+            registerHits.Remove(id);
+            validateHits.Remove(id);
         }
 
         public void PrepareToRegister(DamageInfo damageInfo, int randomSeed, BaseCharacterEntity attacker, AimPosition aimPosition, uint hitObjectId, byte hitBoxIndex, Vector3 hitPoint)
@@ -68,9 +90,11 @@ namespace MultiplayerARPG
                 // Only owner client can prepare to register
                 return;
             }
-            if (!preparedHits.ContainsKey(randomSeed))
-                preparedHits.Add(randomSeed, new List<HitRegisterData>());
-            preparedHits[randomSeed].Add(new HitRegisterData()
+
+            if (!prepareHits.ContainsKey(randomSeed))
+                prepareHits.Add(randomSeed, new List<HitRegisterData>());
+
+            prepareHits[randomSeed].Add(new HitRegisterData()
             {
                 AimPosition = aimPosition,
                 HitObjectId = hitObjectId,
@@ -81,28 +105,34 @@ namespace MultiplayerARPG
 
         private void FixedUpdate()
         {
-            if (preparedHits.Count > 0)
+            if (prepareHits.Count > 0)
             {
-                foreach (KeyValuePair<int, List<HitRegisterData>> kv in preparedHits)
+                foreach (KeyValuePair<int, List<HitRegisterData>> kv in prepareHits)
                 {
                     // Send register message to server
-                    BaseGameNetworkManager.Singleton.ClientSendPacket(BaseCharacterEntity.ACTION_TO_CLIENT_DATA_CHANNEL, LiteNetLib.DeliveryMethod.ReliableUnordered, GameNetworkingConsts.HitRegistration, new HitRegisterMessage()
+                    BaseGameNetworkManager.Singleton.ClientSendPacket(BaseCharacterEntity.ACTION_TO_CLIENT_DATA_CHANNEL, LiteNetLib.DeliveryMethod.ReliableOrdered, GameNetworkingConsts.HitRegistration, new HitRegisterMessage()
                     {
                         RandomSeed = kv.Key,
                         Hits = kv.Value,
                     });
                 }
-                preparedHits.Clear();
+                prepareHits.Clear();
             }
         }
 
-        private async void DelayUnregisterHits(string id)
+        private static async void DelayRemoveValidateHits(string id)
         {
             await UniTask.Delay(200);
-            registeredHits.Remove(id);
+            validateHits.Remove(id);
         }
 
-        private string MakeId(string attackerId, int randomSeed)
+        private static async void DelayRemoveRegisterHits(string id)
+        {
+            await UniTask.Delay(200);
+            registerHits.Remove(id);
+        }
+
+        private static string MakeId(string attackerId, int randomSeed)
         {
             return attackerId + "_" + randomSeed;
         }

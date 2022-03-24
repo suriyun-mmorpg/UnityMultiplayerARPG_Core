@@ -2,13 +2,13 @@
 {
     public struct SimulatingHit
     {
-        public int hitIndex { get; set; }
-        public int triggerLength { get; private set; }
+        public int HitIndex { get; set; }
+        public int TriggerLength { get; private set; }
 
         public SimulatingHit(int triggerLength)
         {
-            hitIndex = 0;
-            this.triggerLength = triggerLength;
+            HitIndex = 0;
+            TriggerLength = triggerLength;
         }
     }
 }
