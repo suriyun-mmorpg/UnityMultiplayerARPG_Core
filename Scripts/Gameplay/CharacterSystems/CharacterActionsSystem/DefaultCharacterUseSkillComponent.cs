@@ -484,8 +484,7 @@ namespace MultiplayerARPG
                 {
                     CharacterItem weapon = Entity.GetAvailableWeapon(ref isLeftHand);
                     Dictionary<DamageElement, MinMaxFloat> damageAmounts = skill.GetAttackDamages(Entity, data.skillLevel, isLeftHand);
-                    int useSkillSeed = unchecked(data.randomSeed + (hitIndex * 16));
-                    skill.ApplySkill(Entity, data.skillLevel, isLeftHand, weapon, hitIndex, damageAmounts, data.targetObjectId, data.aimPosition, useSkillSeed);
+                    skill.ApplySkill(Entity, data.skillLevel, isLeftHand, weapon, hitIndex, damageAmounts, data.targetObjectId, data.aimPosition, data.randomSeed);
                 }
             }
         }

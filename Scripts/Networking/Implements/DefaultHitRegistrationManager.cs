@@ -67,16 +67,19 @@ namespace MultiplayerARPG
             {
                 DamageableEntity damageableEntity;
                 if (!BaseGameNetworkManager.Singleton.TryGetEntityByObjectId(registerHits[id][0].HitObjectId, out damageableEntity) ||
-                    damageableEntity.HitBoxes.Length >= registerHits[id][0].HitBoxIndex)
+                    registerHits[id][0].HitBoxIndex >= damageableEntity.HitBoxes.Length)
                 {
                     // Can't find target or invalid hitbox
-                    return;
+                    registerHits[id].RemoveAt(0);
+                    continue;
                 }
 
                 // TODO: Valiate hitting
 
+
                 // Yes, it is hit
                 damageableEntity.HitBoxes[registerHits[id][0].HitBoxIndex].ReceiveDamage(validateHits[id].Attacker.CacheTransform.position, validateHits[id].Attacker.GetInfo(), validateHits[id].DamageAmounts, validateHits[id].Weapon, validateHits[id].Skill, validateHits[id].SkillLevel, randomSeed);
+                registerHits[id].RemoveAt(0);
             }
 
             registerHits.Remove(id);
@@ -110,7 +113,7 @@ namespace MultiplayerARPG
                 foreach (KeyValuePair<int, List<HitRegisterData>> kv in prepareHits)
                 {
                     // Send register message to server
-                    BaseGameNetworkManager.Singleton.ClientSendPacket(BaseCharacterEntity.ACTION_TO_CLIENT_DATA_CHANNEL, LiteNetLib.DeliveryMethod.ReliableOrdered, GameNetworkingConsts.HitRegistration, new HitRegisterMessage()
+                    BaseGameNetworkManager.Singleton.ClientSendPacket(BaseCharacterEntity.ACTION_TO_CLIENT_DATA_CHANNEL, LiteNetLib.DeliveryMethod.ReliableUnordered, GameNetworkingConsts.HitRegistration, new HitRegisterMessage()
                     {
                         RandomSeed = kv.Key,
                         Hits = kv.Value,

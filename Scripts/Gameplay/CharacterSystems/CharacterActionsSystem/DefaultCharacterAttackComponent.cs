@@ -311,8 +311,7 @@ namespace MultiplayerARPG
                 CharacterItem weapon = Entity.GetAvailableWeapon(ref isLeftHand);
                 DamageInfo damageInfo = Entity.GetWeaponDamageInfo(weapon.GetWeaponItem());
                 Dictionary<DamageElement, MinMaxFloat> damageAmounts = Entity.GetWeaponDamagesWithBuffs(weapon);
-                int attackSeed = unchecked(data.randomSeed + (hitIndex * 16));
-                ApplyAttack(isLeftHand, weapon, damageInfo, damageAmounts, data.aimPosition, attackSeed);
+                ApplyAttack(isLeftHand, weapon, damageInfo, damageAmounts, data.aimPosition, data.randomSeed);
             }
         }
 
