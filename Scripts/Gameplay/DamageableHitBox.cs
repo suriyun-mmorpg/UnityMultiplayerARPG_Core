@@ -17,8 +17,50 @@ namespace MultiplayerARPG
             public Quaternion Rotation { get; set; }
         }
 
+        [System.Serializable]
+        public struct BoundsSize
+        {
+            public static implicit operator BoundsSize(Vector3 value) { return new BoundsSize(value); }
+            public static implicit operator Vector3(BoundsSize value) { return new Vector3(value.x, value.y, value.z); }
+
+            [Min(0f)]
+            public float x;
+            [Min(0f)]
+            public float y;
+            [Min(0f)]
+            public float z;
+
+            public BoundsSize(Vector3 vector3)
+            {
+                x = vector3.x;
+                y = vector3.y;
+                z = vector3.z;
+            }
+
+            public bool HasValue()
+            {
+                return x > 0f || y > 0f || z > 0f;
+            }
+        }
+
+        [System.Serializable]
+        public struct HitBoxBounds
+        {
+            public Vector3 offsets;
+            public BoundsSize size;
+
+            public bool HasValue()
+            {
+                return size.HasValue();
+            }
+        }
+
         [SerializeField]
         protected HitBoxPosition position;
+
+        [SerializeField]
+        [Tooltip("If this size is 0, 0, 0 it will make bounds based on collider")]
+        protected HitBoxBounds bounds = new HitBoxBounds();
 
         [SerializeField]
         protected float damageRate = 1f;
@@ -55,6 +97,7 @@ namespace MultiplayerARPG
         public Collider2D CacheCollider2D { get; private set; }
         public Rigidbody2D CacheRigidbody2D { get; private set; }
         public byte Index { get; private set; }
+        public HitBoxBounds Bounds { get { return bounds; } }
 
         protected bool isSetup;
         protected Vector3 defaultLocalPosition;
@@ -67,8 +110,6 @@ namespace MultiplayerARPG
         public Color debugRewindColor = new Color(0, 0, 1, 0.5f);
         private Vector3? debugRewindPosition;
         private Quaternion? debugRewindRotation;
-        private Vector3? debugRewindCenter;
-        private Vector3? debugRewindSize;
 #endif
 
         private void Awake()
@@ -80,10 +121,14 @@ namespace MultiplayerARPG
                 CacheRigidbody = gameObject.GetOrAddComponent<Rigidbody>();
                 CacheRigidbody.useGravity = false;
                 CacheRigidbody.isKinematic = true;
-#if UNITY_EDITOR
-                debugRewindCenter = CacheCollider.bounds.center - transform.position;
-                debugRewindSize = CacheCollider.bounds.size;
-#endif
+                if (!bounds.HasValue())
+                {
+                    bounds = new HitBoxBounds()
+                    {
+                        offsets = CacheCollider.bounds.center - transform.position,
+                        size = CacheCollider.bounds.size,
+                    };
+                }
                 return;
             }
             CacheCollider2D = GetComponent<Collider2D>();
@@ -92,10 +137,14 @@ namespace MultiplayerARPG
                 CacheRigidbody2D = gameObject.GetOrAddComponent<Rigidbody2D>();
                 CacheRigidbody2D.gravityScale = 0;
                 CacheRigidbody2D.isKinematic = true;
-#if UNITY_EDITOR
-                debugRewindCenter = CacheCollider2D.bounds.center - transform.position;
-                debugRewindSize = CacheCollider2D.bounds.size;
-#endif
+                if (!bounds.HasValue())
+                {
+                    bounds = new HitBoxBounds()
+                    {
+                        offsets = CacheCollider2D.bounds.center - transform.position,
+                        size = CacheCollider2D.bounds.size,
+                    };
+                }
             }
         }
 
@@ -112,27 +161,23 @@ namespace MultiplayerARPG
 #if UNITY_EDITOR
         protected virtual void OnDrawGizmos()
         {
-            if (debugRewindCenter.HasValue &&
-                debugRewindSize.HasValue)
+            Matrix4x4 oldGizmosMatrix = Gizmos.matrix;
+            foreach (TransformHistory history in histories)
             {
-                Matrix4x4 oldGizmosMatrix = Gizmos.matrix;
-                foreach (TransformHistory history in histories)
-                {
-                    Matrix4x4 transformMatrix = Matrix4x4.TRS(history.Position + debugRewindCenter.Value, history.Rotation, debugRewindSize.Value);
-                    Gizmos.color = debugHistoryColor;
-                    Gizmos.matrix = transformMatrix;
-                    Gizmos.DrawWireCube(Vector3.zero, Vector3.one);
-                }
-                if (debugRewindPosition.HasValue &&
-                    debugRewindRotation.HasValue)
-                {
-                    Matrix4x4 transformMatrix = Matrix4x4.TRS(debugRewindPosition.Value + debugRewindCenter.Value, debugRewindRotation.Value, debugRewindSize.Value);
-                    Gizmos.color = debugRewindColor;
-                    Gizmos.matrix = transformMatrix;
-                    Gizmos.DrawCube(Vector3.zero, Vector3.one);
-                }
-                Gizmos.matrix = oldGizmosMatrix;
+                Matrix4x4 transformMatrix = Matrix4x4.TRS(history.Position + bounds.offsets, history.Rotation, bounds.size);
+                Gizmos.color = debugHistoryColor;
+                Gizmos.matrix = transformMatrix;
+                Gizmos.DrawWireCube(Vector3.zero, Vector3.one);
             }
+            if (debugRewindPosition.HasValue &&
+                debugRewindRotation.HasValue)
+            {
+                Matrix4x4 transformMatrix = Matrix4x4.TRS(debugRewindPosition.Value + bounds.offsets, debugRewindRotation.Value, bounds.size);
+                Gizmos.color = debugRewindColor;
+                Gizmos.matrix = transformMatrix;
+                Gizmos.DrawCube(Vector3.zero, Vector3.one);
+            }
+            Gizmos.matrix = oldGizmosMatrix;
             Handles.Label(transform.position, name + "(HitBox)");
         }
 #endif
@@ -169,7 +214,7 @@ namespace MultiplayerARPG
             return DamageableEntity.GetInfo();
         }
 
-        internal void Rewind(long currentTime, long rewindTime)
+        public TransformHistory GetTransformHistory(long currentTime, long rewindTime)
         {
             TransformHistory beforeRewind = default;
             TransformHistory afterRewind = default;
@@ -197,15 +242,26 @@ namespace MultiplayerARPG
             long durationToRewindTime = rewindTime - beforeRewind.Time;
             long durationBetweenRewindTime = afterRewind.Time - beforeRewind.Time;
             float lerpProgress = (float)durationToRewindTime / (float)durationBetweenRewindTime;
-            transform.position = Vector3.Lerp(beforeRewind.Position, afterRewind.Position, lerpProgress);
-            transform.rotation = Quaternion.Slerp(beforeRewind.Rotation, afterRewind.Rotation, lerpProgress);
+            return new TransformHistory()
+            {
+                Time = rewindTime,
+                Position = Vector3.Lerp(beforeRewind.Position, afterRewind.Position, lerpProgress),
+                Rotation = Quaternion.Slerp(beforeRewind.Rotation, afterRewind.Rotation, lerpProgress),
+            };
+        }
+
+        public void Rewind(long currentTime, long rewindTime)
+        {
+            TransformHistory transformHistory = GetTransformHistory(currentTime, rewindTime);
+            transform.position = transformHistory.Position;
+            transform.rotation = transformHistory.Rotation;
 #if UNITY_EDITOR
             debugRewindPosition = transform.position;
             debugRewindRotation = transform.rotation;
 #endif
         }
 
-        internal void Restore()
+        public void Restore()
         {
             transform.localPosition = defaultLocalPosition;
             transform.localRotation = defaultLocalRotation;

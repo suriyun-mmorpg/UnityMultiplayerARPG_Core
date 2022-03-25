@@ -74,16 +74,31 @@ namespace MultiplayerARPG
                     continue;
                 }
 
-                // TODO: Valiate hitting
-
-
-                // Yes, it is hit
-                damageableEntity.HitBoxes[registerHits[id][0].HitBoxIndex].ReceiveDamage(validateHits[id].Attacker.CacheTransform.position, validateHits[id].Attacker.GetInfo(), validateHits[id].DamageAmounts, validateHits[id].Weapon, validateHits[id].Skill, validateHits[id].SkillLevel, randomSeed);
+                DamageableHitBox hitBox = damageableEntity.HitBoxes[registerHits[id][0].HitBoxIndex];
+                // Valiate hitting
+                if (IsHit(validateHits[id], registerHits[id][0], hitBox))
+                {
+                    // Yes, it is hit
+                    hitBox.ReceiveDamage(validateHits[id].Attacker.CacheTransform.position, validateHits[id].Attacker.GetInfo(), validateHits[id].DamageAmounts, validateHits[id].Weapon, validateHits[id].Skill, validateHits[id].SkillLevel, randomSeed);
+                }
                 registerHits[id].RemoveAt(0);
             }
 
             registerHits.Remove(id);
             validateHits.Remove(id);
+        }
+
+        private bool IsHit(HitValidateData validateHitdata, HitRegisterData registerData, DamageableHitBox hitBox)
+        {
+            long halfRtt = validateHitdata.Attacker.Player != null ? (validateHitdata.Attacker.Player.Rtt / 2) : 0;
+            long serverTime = BaseGameNetworkManager.Singleton.ServerTimestamp;
+            long targetTime = serverTime - halfRtt;
+            hitBox.Rewind(serverTime, targetTime);
+            Vector3 pointInHitBoxSpace = hitBox.transform.InverseTransformPoint(registerData.HitPoint);
+            Bounds bounds = new Bounds(hitBox.Bounds.offsets, hitBox.Bounds.size);
+            bool isHit = bounds.Contains(pointInHitBoxSpace) || Vector3.Distance(bounds.ClosestPoint(pointInHitBoxSpace), pointInHitBoxSpace) < 0.25f;
+            hitBox.Restore();
+            return isHit;
         }
 
         public void PrepareToRegister(DamageInfo damageInfo, int randomSeed, BaseCharacterEntity attacker, AimPosition aimPosition, uint hitObjectId, byte hitBoxIndex, Vector3 hitPoint)
