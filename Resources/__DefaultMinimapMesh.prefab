@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 7778497053876014736}
   - component: {fileID: 4582583302748027498}
   m_Layer: 10
-  m_Name: DefaultMinimapMesh
+  m_Name: __DefaultMinimapMesh
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

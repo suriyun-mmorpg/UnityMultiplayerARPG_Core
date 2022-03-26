@@ -4,7 +4,7 @@ using UnityEngine.UI;
 
 namespace MultiplayerARPG
 {
-    public class MinimapRenderer : MonoBehaviour
+    public class UIMinimapRenderer : MonoBehaviour
     {
         private struct MarkerData
         {
@@ -40,13 +40,9 @@ namespace MultiplayerARPG
         public RectTransform nonPlayingCharacterMarkerContainer;
         public float allyMarkerDistance = 10000f;
         public float enemyOrNeutralMarkerDistance = 5f;
-        public float meshYOffsets = -100f;
-        public float meshXZScaling = 0.1f;
         public float updateMarkerDuration = 1f;
         [Tooltip("Image's anchor min, max and pivot must be 0.5")]
         public Image imageMinimap;
-        [Tooltip("You can use Unity's plane as mesh minimap")]
-        public MeshRenderer meshMinimapPrefab;
         [Header("Testing")]
         public bool isTestMode;
         public BaseMapInfo testingMapInfo;
@@ -54,14 +50,7 @@ namespace MultiplayerARPG
 
         private float updateMarkerCountdown;
         private BaseMapInfo currentMapInfo;
-        private MeshRenderer meshMinimap;
         private List<MarkerData> markers = new List<MarkerData>();
-
-        private void Start()
-        {
-            if (meshMinimapPrefab)
-                meshMinimap = Instantiate(meshMinimapPrefab);
-        }
 
         private void Update()
         {
@@ -73,8 +62,9 @@ namespace MultiplayerARPG
                     imageMinimap.gameObject.SetActive(false);
                 return;
             }
-            Transform playingCharacterTransform = isTestMode ? testingPlayingCharacterTransform : GameInstance.PlayingCharacterEntity.CacheTransform;
             currentMapInfo = mapInfo;
+
+            Transform playingCharacterTransform = isTestMode ? testingPlayingCharacterTransform : GameInstance.PlayingCharacterEntity.CacheTransform;
 
             // Use bounds size to calculate transforms
             float boundsSizeX = currentMapInfo.MinimapBoundsSizeX;
@@ -123,13 +113,6 @@ namespace MultiplayerARPG
                 {
                     imageMinimap.transform.localPosition = -new Vector2((playingCharacterTransform.position.x - currentMapInfo.MinimapPosition.x) * sizeRate, (playingCharacterTransform.position.z - currentMapInfo.MinimapPosition.z) * sizeRate);
                 }
-            }
-
-            if (meshMinimap != null)
-            {
-                meshMinimap.transform.position = currentMapInfo.MinimapPosition + (Vector3.up * meshYOffsets);
-                meshMinimap.transform.localScale = (new Vector3(1f, 0f, 1f) * maxBoundsSize * meshXZScaling) + Vector3.up;
-                meshMinimap.material.mainTexture = currentMapInfo.MinimapSprite.texture;
             }
         }
 
