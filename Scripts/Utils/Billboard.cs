@@ -1,6 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
 namespace UtilsComponents
 {
@@ -9,7 +7,6 @@ namespace UtilsComponents
         public Camera targetCamera;
 
         public Transform CacheTransform { get; private set; }
-        public Transform CacheCameraTransform { get; private set; }
 
         private void OnEnable()
         {
@@ -20,11 +17,7 @@ namespace UtilsComponents
         private bool SetupCamera()
         {
             if (targetCamera == null)
-            {
                 targetCamera = Camera.main;
-                if (targetCamera != null)
-                    CacheCameraTransform = targetCamera.transform;
-            }
             return targetCamera != null;
         }
 
@@ -32,7 +25,7 @@ namespace UtilsComponents
         {
             if (!SetupCamera())
                 return;
-            CacheTransform.rotation = Quaternion.Euler(Quaternion.LookRotation(CacheCameraTransform.forward, CacheCameraTransform.up).eulerAngles);
+            CacheTransform.rotation = Quaternion.Euler(Quaternion.LookRotation(targetCamera.transform.forward, targetCamera.transform.up).eulerAngles);
         }
     }
 }
