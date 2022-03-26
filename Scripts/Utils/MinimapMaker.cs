@@ -1,8 +1,5 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using System.IO;
-using System.Reflection;
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
@@ -12,15 +9,23 @@ namespace MultiplayerARPG
     public class MinimapMaker : MonoBehaviour
     {
         public BaseMapInfo targetMapInfo;
+        public DimensionType dimensionType;
+        public LayerMask cullingMask = ~0;
+        public Color clearFlagsBackgroundColor = Color.black;
         public string minimapSuffix = "_minimap";
         public int textureWidth = 1024;
         public int textureHeight = 1024;
         public int textureDepth = 24;
+        [StringShowConditional(nameof(dimensionType), nameof(DimensionType.Dimension3D))]
         public float yPosition = 50f;
+        [StringShowConditional(nameof(dimensionType), nameof(DimensionType.Dimension2D))]
+        public float zPosition = -1f;
         public bool makeByTerrain = false;
         public bool makeByCollider = true;
-        public bool makeByCollider2D = false;
+        public bool makeByCollider2D = true;
         public bool makeByRenderer = false;
+        [InspectorButton(nameof(Make))]
+        public bool make;
 
 #if UNITY_EDITOR
         [ContextMenu("Make")]
@@ -83,10 +88,23 @@ namespace MultiplayerARPG
             // Create camera
             GameObject cameraGameObject = new GameObject("_MinimapMakerCamera");
             Camera camera = cameraGameObject.AddComponent<Camera>();
-            camera.transform.position = new Vector3(bounds.center.x, yPosition, bounds.center.z);
-            camera.transform.eulerAngles = new Vector3(90f, 180f, 0f);
-            camera.orthographicSize = Mathf.Max(bounds.extents.x, bounds.extents.z);
+            switch (dimensionType)
+            {
+                case DimensionType.Dimension2D:
+                    camera.transform.position = new Vector3(bounds.center.x, bounds.center.y, zPosition);
+                    camera.transform.eulerAngles = Vector3.zero;
+                    camera.orthographicSize = Mathf.Max(bounds.extents.x, bounds.extents.y);
+                    break;
+                default:
+                    camera.transform.position = new Vector3(bounds.center.x, yPosition, bounds.center.z);
+                    camera.transform.eulerAngles = new Vector3(90f, 180f, 0f);
+                    camera.orthographicSize = Mathf.Max(bounds.extents.x, bounds.extents.z);
+                    break;
+            }
+            camera.clearFlags = CameraClearFlags.SolidColor;
+            camera.backgroundColor = clearFlagsBackgroundColor;
             camera.orthographic = true;
+            camera.cullingMask = cullingMask.value;
 
             // Make texture
             RenderTexture renderTexture = new RenderTexture(textureWidth, textureHeight, textureDepth);
