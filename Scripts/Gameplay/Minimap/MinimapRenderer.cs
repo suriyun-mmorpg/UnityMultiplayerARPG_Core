@@ -9,6 +9,8 @@ namespace MultiplayerARPG
         public MeshRenderer meshMinimapPrefab;
         public float meshYOffsets = -100f;
         public float meshXZScaling = 0.1f;
+        public Texture noMinimapTexture = null;
+        public Color noMinimapColor = Color.black;
 
         [Header("Testing")]
         public bool isTestMode;
@@ -27,7 +29,7 @@ namespace MultiplayerARPG
         private void Update()
         {
             BaseMapInfo mapInfo = isTestMode ? testingMapInfo : BaseGameNetworkManager.CurrentMapInfo;
-            if (mapInfo == null)
+            if (mapInfo == null || mapInfo == currentMapInfo)
                 return;
             currentMapInfo = mapInfo;
 
@@ -40,8 +42,16 @@ namespace MultiplayerARPG
             {
                 meshMinimap.transform.position = currentMapInfo.MinimapPosition + (Vector3.up * meshYOffsets);
                 meshMinimap.transform.localScale = (new Vector3(1f, 0f, 1f) * maxBoundsSize * meshXZScaling) + Vector3.up;
-                meshMinimap.material.mainTexture = currentMapInfo.MinimapSprite.texture;
-                meshMinimap.material.color = Color.white;
+                if (currentMapInfo.MinimapSprite != null)
+                {
+                    meshMinimap.material.mainTexture = currentMapInfo.MinimapSprite.texture;
+                    meshMinimap.material.color = Color.white;
+                }
+                else
+                {
+                    meshMinimap.material.mainTexture = noMinimapTexture;
+                    meshMinimap.material.color = noMinimapColor;
+                }
             }
         }
     }

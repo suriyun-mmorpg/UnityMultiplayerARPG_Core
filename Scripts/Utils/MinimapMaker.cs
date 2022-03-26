@@ -17,9 +17,9 @@ namespace MultiplayerARPG
         public int textureHeight = 1024;
         public int textureDepth = 24;
         [StringShowConditional(nameof(dimensionType), nameof(DimensionType.Dimension3D))]
-        public float yPosition = 50f;
+        public float cameraYPosition = 50f;
         [StringShowConditional(nameof(dimensionType), nameof(DimensionType.Dimension2D))]
-        public float zPosition = -1f;
+        public float cameraZPosition = -1f;
         public bool makeByTerrain = false;
         public bool makeByCollider = true;
         public bool makeByCollider2D = true;
@@ -91,12 +91,12 @@ namespace MultiplayerARPG
             switch (dimensionType)
             {
                 case DimensionType.Dimension2D:
-                    camera.transform.position = new Vector3(bounds.center.x, bounds.center.y, zPosition);
+                    camera.transform.position = new Vector3(bounds.center.x, bounds.center.y, cameraZPosition);
                     camera.transform.eulerAngles = Vector3.zero;
                     camera.orthographicSize = Mathf.Max(bounds.extents.x, bounds.extents.y);
                     break;
                 default:
-                    camera.transform.position = new Vector3(bounds.center.x, yPosition, bounds.center.z);
+                    camera.transform.position = new Vector3(bounds.center.x, cameraYPosition, bounds.center.z);
                     camera.transform.eulerAngles = new Vector3(90f, 180f, 0f);
                     camera.orthographicSize = Mathf.Max(bounds.extents.x, bounds.extents.z);
                     break;

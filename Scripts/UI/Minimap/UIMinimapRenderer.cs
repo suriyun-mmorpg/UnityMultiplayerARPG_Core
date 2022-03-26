@@ -64,12 +64,13 @@ namespace MultiplayerARPG
             }
             currentMapInfo = mapInfo;
 
-            Transform playingCharacterTransform = isTestMode ? testingPlayingCharacterTransform : GameInstance.PlayingCharacterEntity.CacheTransform;
-
             // Use bounds size to calculate transforms
             float boundsSizeX = currentMapInfo.MinimapBoundsSizeX;
             float boundsSizeZ = currentMapInfo.MinimapBoundsSizeZ;
             float maxBoundsSize = Mathf.Max(boundsSizeX, boundsSizeZ);
+
+            // Prepare target transform to follow
+            Transform playingCharacterTransform = isTestMode ? testingPlayingCharacterTransform : GameInstance.PlayingCharacterEntity.CacheTransform;
 
             if (imageMinimap != null)
             {
