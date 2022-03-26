@@ -6,6 +6,7 @@ namespace MultiplayerARPG
 {
     public class DefaultHitRegistrationManager : MonoBehaviour, IHitRegistrationManager
     {
+        public float hitDistanceBuffer = 0.5f;
         private static Dictionary<int, List<HitRegisterData>> prepareHits = new Dictionary<int, List<HitRegisterData>>();
         private static Dictionary<string, List<HitRegisterData>> registerHits = new Dictionary<string, List<HitRegisterData>>();
         private static Dictionary<string, HitValidateData> validateHits = new Dictionary<string, HitValidateData>();
@@ -96,7 +97,7 @@ namespace MultiplayerARPG
             hitBox.Rewind(serverTime, targetTime);
             Vector3 pointInHitBoxSpace = hitBox.transform.InverseTransformPoint(registerData.HitPoint);
             Bounds bounds = new Bounds(hitBox.Bounds.offsets, hitBox.Bounds.size);
-            bool isHit = bounds.Contains(pointInHitBoxSpace) || Vector3.Distance(bounds.ClosestPoint(pointInHitBoxSpace), pointInHitBoxSpace) < 0.25f;
+            bool isHit = bounds.Contains(pointInHitBoxSpace) || Vector3.Distance(bounds.ClosestPoint(pointInHitBoxSpace), pointInHitBoxSpace) < hitDistanceBuffer;
             hitBox.Restore();
             return isHit;
         }
