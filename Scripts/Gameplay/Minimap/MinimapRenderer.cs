@@ -6,24 +6,23 @@ namespace MultiplayerARPG
     {
         [Header("Settings")]
         [Tooltip("You can use Unity's plane as mesh minimap")]
-        public MeshRenderer meshMinimapPrefab;
-        public float meshYOffsets = -100f;
-        public float meshXZScaling = 0.1f;
-        public Texture noMinimapTexture = null;
-        public Color noMinimapColor = Color.black;
+        public float spriteOffsets3D = -100f;
+        public float spriteOffsets2D = 1f;
+        public Sprite noMinimapSprite = null;
+        public UnityLayer layer;
 
         [Header("Testing")]
         public bool isTestMode;
         public BaseMapInfo testingMapInfo;
+        public DimensionType testingDimensionType;
 
         private BaseMapInfo currentMapInfo;
-        private MeshRenderer meshMinimap;
+        private SpriteRenderer spriteRenderer;
 
         private void Start()
         {
-            if (!meshMinimapPrefab)
-                meshMinimapPrefab = Resources.Load<MeshRenderer>("__DefaultMinimapMesh");
-            meshMinimap = Instantiate(meshMinimapPrefab);
+            spriteRenderer = new GameObject("__MinimapRenderer").AddComponent<SpriteRenderer>();
+            spriteRenderer.gameObject.layer = layer.LayerIndex;
         }
 
         private void Update()
@@ -34,24 +33,29 @@ namespace MultiplayerARPG
             currentMapInfo = mapInfo;
 
             // Use bounds size to calculate transforms
-            float boundsSizeX = currentMapInfo.MinimapBoundsSizeX;
-            float boundsSizeZ = currentMapInfo.MinimapBoundsSizeZ;
+            float boundsSizeX = currentMapInfo.MinimapBoundsWidth;
+            float boundsSizeZ = currentMapInfo.MinimapBoundsLength;
             float maxBoundsSize = Mathf.Max(boundsSizeX, boundsSizeZ);
 
-            if (meshMinimap != null)
+            // Set dimention type
+            DimensionType dimensionType = GameInstance.Singleton == null || isTestMode ? testingDimensionType : GameInstance.Singleton.DimensionType;
+
+            if (spriteRenderer != null)
             {
-                meshMinimap.transform.position = currentMapInfo.MinimapPosition + (Vector3.up * meshYOffsets);
-                meshMinimap.transform.localScale = (new Vector3(1f, 0f, 1f) * maxBoundsSize * meshXZScaling) + Vector3.up;
-                if (currentMapInfo.MinimapSprite != null)
+                switch (dimensionType)
                 {
-                    meshMinimap.material.mainTexture = currentMapInfo.MinimapSprite.texture;
-                    meshMinimap.material.color = Color.white;
+                    case DimensionType.Dimension2D:
+                        spriteRenderer.transform.position = currentMapInfo.MinimapPosition + (Vector3.forward * spriteOffsets2D);
+                        spriteRenderer.transform.eulerAngles = Vector3.zero;
+                        break;
+                    default:
+                        spriteRenderer.transform.position = currentMapInfo.MinimapPosition + (Vector3.up * spriteOffsets3D);
+                        spriteRenderer.transform.eulerAngles = Vector3.right * 90f;
+                        break;
                 }
-                else
-                {
-                    meshMinimap.material.mainTexture = noMinimapTexture;
-                    meshMinimap.material.color = noMinimapColor;
-                }
+                spriteRenderer.sprite = currentMapInfo.MinimapSprite != null ? currentMapInfo.MinimapSprite : noMinimapSprite;
+                if (spriteRenderer.sprite != null)
+                    spriteRenderer.transform.localScale = new Vector3(1f, 1f) * maxBoundsSize * spriteRenderer.sprite.pixelsPerUnit / Mathf.Max(spriteRenderer.sprite.rect.width, spriteRenderer.sprite.rect.height);
             }
         }
     }

@@ -65,9 +65,9 @@ namespace MultiplayerARPG
             currentMapInfo = mapInfo;
 
             // Use bounds size to calculate transforms
-            float boundsSizeX = currentMapInfo.MinimapBoundsSizeX;
-            float boundsSizeZ = currentMapInfo.MinimapBoundsSizeZ;
-            float maxBoundsSize = Mathf.Max(boundsSizeX, boundsSizeZ);
+            float boundsWidth = currentMapInfo.MinimapBoundsWidth;
+            float boundsLength = currentMapInfo.MinimapBoundsLength;
+            float maxBoundsSize = Mathf.Max(boundsWidth, boundsLength);
 
             // Prepare target transform to follow
             Transform playingCharacterTransform = isTestMode ? testingPlayingCharacterTransform : GameInstance.PlayingCharacterEntity.CacheTransform;

@@ -49,12 +49,12 @@ namespace MultiplayerARPG
         public Vector3 MinimapPosition { get { return minimapPosition; } set { minimapPosition = value; } }
 
         [SerializeField]
-        private float minimapBoundsSizeX;
-        public float MinimapBoundsSizeX { get { return minimapBoundsSizeX; } set { minimapBoundsSizeX = value; } }
+        private float minimapBoundsWidth;
+        public float MinimapBoundsWidth { get { return minimapBoundsWidth; } set { minimapBoundsWidth = value; } }
 
         [SerializeField]
-        private float minimapBoundsSizeZ;
-        public float MinimapBoundsSizeZ { get { return minimapBoundsSizeZ; } set { minimapBoundsSizeZ = value; } }
+        private float minimapBoundsLength;
+        public float MinimapBoundsLength { get { return minimapBoundsLength; } set { minimapBoundsLength = value; } }
 
         [SerializeField]
         private float minimapOrthographicSize;

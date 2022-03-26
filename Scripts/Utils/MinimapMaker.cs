@@ -8,14 +8,15 @@ namespace MultiplayerARPG
 {
     public class MinimapMaker : MonoBehaviour
     {
+        public const int TEXTURE_WIDTH = 1024;
+        public const int TEXTURE_HEIGHT = 1024;
+        public const int TEXTURE_DEPTH = 24;
+        public const float SPRITE_PIXELS_PER_UNIT = 100f;
         public BaseMapInfo targetMapInfo;
         public DimensionType dimensionType;
         public LayerMask cullingMask = ~0;
         public Color clearFlagsBackgroundColor = Color.black;
         public string minimapSuffix = "_minimap";
-        public int textureWidth = 1024;
-        public int textureHeight = 1024;
-        public int textureDepth = 24;
         [StringShowConditional(nameof(dimensionType), nameof(DimensionType.Dimension3D))]
         public float cameraYPosition = 50f;
         [StringShowConditional(nameof(dimensionType), nameof(DimensionType.Dimension2D))]
@@ -107,9 +108,9 @@ namespace MultiplayerARPG
             camera.cullingMask = cullingMask.value;
 
             // Make texture
-            RenderTexture renderTexture = new RenderTexture(textureWidth, textureHeight, textureDepth);
-            Rect rect = new Rect(0, 0, textureWidth, textureHeight);
-            Texture2D texture = new Texture2D(textureWidth, textureHeight, TextureFormat.RGBA32, false);
+            RenderTexture renderTexture = new RenderTexture(TEXTURE_WIDTH, TEXTURE_HEIGHT, TEXTURE_DEPTH);
+            Rect rect = new Rect(0, 0, TEXTURE_WIDTH, TEXTURE_HEIGHT);
+            Texture2D texture = new Texture2D(TEXTURE_WIDTH, TEXTURE_HEIGHT, TextureFormat.RGBA32, false);
 
             camera.targetTexture = renderTexture;
             camera.Render();
@@ -147,17 +148,28 @@ namespace MultiplayerARPG
             tempTextureImporter.textureType = TextureImporterType.Sprite;
             tempTextureImporter.spriteImportMode = SpriteImportMode.Single;
             tempTextureImporter.spritePivot = Vector2.one * 0.5f;
-            tempTextureImporter.spritePixelsPerUnit = 100f;
+            tempTextureImporter.spritePixelsPerUnit = SPRITE_PIXELS_PER_UNIT;
             EditorUtility.SetDirty(tempTextureImporter);
             tempTextureImporter.SaveAndReimport();
             var tempSprite = AssetDatabase.LoadAssetAtPath<Sprite>(path);
             if (targetMapInfo != null)
             {
                 targetMapInfo.MinimapSprite = tempSprite;
-                targetMapInfo.MinimapPosition = new Vector3(bounds.center.x, 0, bounds.center.z);
-                targetMapInfo.MinimapBoundsSizeX = bounds.size.x;
-                targetMapInfo.MinimapBoundsSizeZ = bounds.size.z;
-                targetMapInfo.MinimapOrthographicSize = Mathf.Max(bounds.extents.x, bounds.extents.z);
+                switch (dimensionType)
+                {
+                    case DimensionType.Dimension2D:
+                        targetMapInfo.MinimapPosition = new Vector3(bounds.center.x, bounds.center.y, 0);
+                        targetMapInfo.MinimapBoundsWidth = bounds.size.x;
+                        targetMapInfo.MinimapBoundsLength = bounds.size.y;
+                        targetMapInfo.MinimapOrthographicSize = Mathf.Max(bounds.extents.x, bounds.extents.y);
+                        break;
+                    default:
+                        targetMapInfo.MinimapPosition = new Vector3(bounds.center.x, 0, bounds.center.z);
+                        targetMapInfo.MinimapBoundsWidth = bounds.size.x;
+                        targetMapInfo.MinimapBoundsLength = bounds.size.z;
+                        targetMapInfo.MinimapOrthographicSize = Mathf.Max(bounds.extents.x, bounds.extents.z);
+                        break;
+                }
                 EditorUtility.SetDirty(targetMapInfo);
             }
 
