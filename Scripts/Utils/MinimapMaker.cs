@@ -25,8 +25,10 @@ namespace MultiplayerARPG
         public bool makeByCollider = true;
         public bool makeByCollider2D = true;
         public bool makeByRenderer = false;
+#if UNITY_EDITOR
         [InspectorButton(nameof(Make))]
         public bool make;
+#endif
 
 #if UNITY_EDITOR
         [ContextMenu("Make")]
