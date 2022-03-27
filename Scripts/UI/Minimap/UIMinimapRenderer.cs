@@ -96,15 +96,7 @@ namespace MultiplayerARPG
                 if (playingCharacterMarker != null)
                 {
                     playingCharacterMarker.SetAsLastSibling();
-                    if (mode == Mode.Default)
-                    {
-                        playingCharacterMarker.localPosition = new Vector2((currentMapInfo.MinimapPosition.x - playingCharacterTransform.position.x) * sizeRate, (currentMapInfo.MinimapPosition.z - playingCharacterTransform.position.z) * sizeRate);
-                    }
-                    else
-                    {
-                        playingCharacterMarker.localPosition = Vector2.zero;
-                    }
-                    playingCharacterMarker.localEulerAngles = playingCharacterRotateOffsets + (Vector3.back * playingCharacterTransform.eulerAngles.y);
+                    SetMarkerPositionAndRotation(playingCharacterMarker, playingCharacterTransform, sizeRate, playingCharacterRotateOffsets);
                 }
                 if (mode == Mode.Default)
                 {
@@ -128,10 +120,7 @@ namespace MultiplayerARPG
                     continue;
                 }
 
-                markers[i].Marker.localPosition = new Vector2(
-                                            (currentMapInfo.MinimapPosition.x - markers[i].Character.CacheTransform.position.x) * sizeRate,
-                                            (currentMapInfo.MinimapPosition.z - markers[i].Character.CacheTransform.position.z) * sizeRate);
-                markers[i].Marker.localEulerAngles = markers[i].MarkerRotateOffsets + (Vector3.back * markers[i].Character.CacheTransform.eulerAngles.y);
+                SetMarkerPositionAndRotation(markers[i].Marker, markers[i].Character.CacheTransform, sizeRate, markers[i].MarkerRotateOffsets);
             }
         }
 
@@ -202,16 +191,32 @@ namespace MultiplayerARPG
         {
             RectTransform newMarker = Instantiate(prefab);
             newMarker.SetParent(nonPlayingCharacterMarkerContainer);
-            newMarker.localPosition = new Vector2(
-                                        (currentMapInfo.MinimapPosition.x - character.CacheTransform.position.x) * sizeRate,
-                                        (currentMapInfo.MinimapPosition.z - character.CacheTransform.position.z) * sizeRate);
-            newMarker.localEulerAngles = markerRotateOffsets + (Vector3.back * character.CacheTransform.eulerAngles.y);
+            SetMarkerPositionAndRotation(newMarker, character.CacheTransform, sizeRate, markerRotateOffsets);
             markers.Add(new MarkerData()
             {
                 Character = character,
                 Marker = newMarker,
                 MarkerRotateOffsets = markerRotateOffsets,
             });
+        }
+
+        private void SetMarkerPositionAndRotation(RectTransform makerTransform, Transform entityTransform, float sizeRate, Vector3 markerRotateOffsets)
+        {
+            switch (GameInstance.Singleton.DimensionType)
+            {
+                case DimensionType.Dimension2D:
+                    makerTransform.localPosition = new Vector2(
+                                                (currentMapInfo.MinimapPosition.x - entityTransform.position.x) * sizeRate,
+                                                (currentMapInfo.MinimapPosition.y - entityTransform.position.y) * sizeRate);
+                    makerTransform.localEulerAngles = Vector3.zero;
+                    break;
+                default:
+                    makerTransform.localPosition = new Vector2(
+                                                (currentMapInfo.MinimapPosition.x - entityTransform.position.x) * sizeRate,
+                                                (currentMapInfo.MinimapPosition.z - entityTransform.position.z) * sizeRate);
+                    makerTransform.localEulerAngles = markerRotateOffsets + (Vector3.back * entityTransform.eulerAngles.y);
+                    break;
+            }
         }
     }
 }
