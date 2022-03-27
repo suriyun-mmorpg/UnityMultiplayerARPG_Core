@@ -98,7 +98,7 @@ namespace MultiplayerARPG
                     playingCharacterMarker.SetAsLastSibling();
                     if (mode == Mode.Default)
                     {
-                        playingCharacterMarker.localPosition = new Vector2((playingCharacterTransform.position.x - currentMapInfo.MinimapPosition.x) * sizeRate, (playingCharacterTransform.position.z - currentMapInfo.MinimapPosition.z) * sizeRate);
+                        playingCharacterMarker.localPosition = new Vector2((currentMapInfo.MinimapPosition.x - playingCharacterTransform.position.x) * sizeRate, (currentMapInfo.MinimapPosition.z - playingCharacterTransform.position.z) * sizeRate);
                     }
                     else
                     {
@@ -112,7 +112,7 @@ namespace MultiplayerARPG
                 }
                 else
                 {
-                    imageMinimap.transform.localPosition = -new Vector2((playingCharacterTransform.position.x - currentMapInfo.MinimapPosition.x) * sizeRate, (playingCharacterTransform.position.z - currentMapInfo.MinimapPosition.z) * sizeRate);
+                    imageMinimap.transform.localPosition = -new Vector2((currentMapInfo.MinimapPosition.x - playingCharacterTransform.position.x) * sizeRate, (currentMapInfo.MinimapPosition.z - playingCharacterTransform.position.z) * sizeRate);
                 }
             }
         }
@@ -129,8 +129,8 @@ namespace MultiplayerARPG
                 }
 
                 markers[i].Marker.localPosition = new Vector2(
-                                            (markers[i].Character.CacheTransform.position.x - currentMapInfo.MinimapPosition.x) * sizeRate,
-                                            (markers[i].Character.CacheTransform.position.z - currentMapInfo.MinimapPosition.z) * sizeRate);
+                                            (currentMapInfo.MinimapPosition.x - markers[i].Character.CacheTransform.position.x) * sizeRate,
+                                            (currentMapInfo.MinimapPosition.z - markers[i].Character.CacheTransform.position.z) * sizeRate);
                 markers[i].Marker.localEulerAngles = markers[i].MarkerRotateOffsets + (Vector3.back * markers[i].Character.CacheTransform.eulerAngles.y);
             }
         }
@@ -203,8 +203,8 @@ namespace MultiplayerARPG
             RectTransform newMarker = Instantiate(prefab);
             newMarker.SetParent(nonPlayingCharacterMarkerContainer);
             newMarker.localPosition = new Vector2(
-                                        (character.CacheTransform.position.x - currentMapInfo.MinimapPosition.x) * sizeRate,
-                                        (character.CacheTransform.position.z - currentMapInfo.MinimapPosition.z) * sizeRate);
+                                        (currentMapInfo.MinimapPosition.x - character.CacheTransform.position.x) * sizeRate,
+                                        (currentMapInfo.MinimapPosition.z - character.CacheTransform.position.z) * sizeRate);
             newMarker.localEulerAngles = markerRotateOffsets + (Vector3.back * character.CacheTransform.eulerAngles.y);
             markers.Add(new MarkerData()
             {
