@@ -50,7 +50,7 @@ namespace MultiplayerARPG
                         break;
                     default:
                         spriteRenderer.transform.position = currentMapInfo.MinimapPosition + (Vector3.up * spriteOffsets3D);
-                        spriteRenderer.transform.eulerAngles = new Vector3(90f, 180f, 0f);
+                        spriteRenderer.transform.eulerAngles = new Vector3(90f, 0f, 0f);
                         break;
                 }
                 spriteRenderer.sprite = currentMapInfo.MinimapSprite != null ? currentMapInfo.MinimapSprite : noMinimapSprite;

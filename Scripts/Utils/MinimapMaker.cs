@@ -98,7 +98,7 @@ namespace MultiplayerARPG
                     break;
                 default:
                     camera.transform.position = new Vector3(bounds.center.x, cameraYPosition, bounds.center.z);
-                    camera.transform.eulerAngles = new Vector3(90f, 180f, 0f);
+                    camera.transform.eulerAngles = new Vector3(90f, 0f, 0f);
                     camera.orthographicSize = Mathf.Max(bounds.extents.x, bounds.extents.z);
                     break;
             }
