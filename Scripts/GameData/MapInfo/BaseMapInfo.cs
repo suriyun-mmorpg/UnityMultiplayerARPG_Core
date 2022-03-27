@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace MultiplayerARPG
 {
@@ -49,10 +50,12 @@ namespace MultiplayerARPG
         public Vector3 MinimapPosition { get { return minimapPosition; } set { minimapPosition = value; } }
 
         [SerializeField]
+        [FormerlySerializedAs("minimapBoundsSizeX")]
         private float minimapBoundsWidth;
         public float MinimapBoundsWidth { get { return minimapBoundsWidth; } set { minimapBoundsWidth = value; } }
 
         [SerializeField]
+        [FormerlySerializedAs("minimapBoundsSizeZ")]
         private float minimapBoundsLength;
         public float MinimapBoundsLength { get { return minimapBoundsLength; } set { minimapBoundsLength = value; } }
 

@@ -33,9 +33,9 @@ namespace MultiplayerARPG
             currentMapInfo = mapInfo;
 
             // Use bounds size to calculate transforms
-            float boundsSizeX = currentMapInfo.MinimapBoundsWidth;
-            float boundsSizeZ = currentMapInfo.MinimapBoundsLength;
-            float maxBoundsSize = Mathf.Max(boundsSizeX, boundsSizeZ);
+            float boundsWidth = currentMapInfo.MinimapBoundsWidth;
+            float boundsLength = currentMapInfo.MinimapBoundsLength;
+            float maxBoundsSize = Mathf.Max(boundsWidth, boundsLength);
 
             // Set dimention type
             DimensionType dimensionType = GameInstance.Singleton == null || isTestMode ? testingDimensionType : GameInstance.Singleton.DimensionType;
@@ -50,12 +50,12 @@ namespace MultiplayerARPG
                         break;
                     default:
                         spriteRenderer.transform.position = currentMapInfo.MinimapPosition + (Vector3.up * spriteOffsets3D);
-                        spriteRenderer.transform.eulerAngles = Vector3.right * 90f;
+                        spriteRenderer.transform.eulerAngles = new Vector3(90f, 180f, 0f);
                         break;
                 }
                 spriteRenderer.sprite = currentMapInfo.MinimapSprite != null ? currentMapInfo.MinimapSprite : noMinimapSprite;
                 if (spriteRenderer.sprite != null)
-                    spriteRenderer.transform.localScale = new Vector3(1f, 1f) * maxBoundsSize * spriteRenderer.sprite.pixelsPerUnit / Mathf.Max(spriteRenderer.sprite.rect.width, spriteRenderer.sprite.rect.height);
+                    spriteRenderer.transform.localScale = new Vector3(1f, 1f) * maxBoundsSize * spriteRenderer.sprite.pixelsPerUnit / Mathf.Max(spriteRenderer.sprite.texture.width, spriteRenderer.sprite.texture.height);
             }
         }
     }
