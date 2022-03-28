@@ -511,18 +511,24 @@ namespace MultiplayerARPG
                                 // If share exp, every party member will receive devided exp
                                 // If not share exp, character who make damage will receive non-devided exp
                                 if (tempPartyData.shareExp)
-                                    partyMember.RewardExp(reward, (1f - shareGuildExpRate) / (float)countNearbyPartyMembers * rewardRate, RewardGivenType.PartyShare);
+                                {
+                                    if (GameInstance.Singleton.partyShareExpDistance <= 0f || Vector3.Distance(tempPlayerCharacterEntity.CacheTransform.position, partyMember.CacheTransform.position) <= GameInstance.Singleton.partyShareExpDistance)
+                                        partyMember.RewardExp(reward, (1f - shareGuildExpRate) / (float)countNearbyPartyMembers * rewardRate, RewardGivenType.PartyShare);
+                                }
 
                                 // If share item, every party member will receive devided gold
                                 // If not share item, character who make damage will receive non-devided gold
                                 if (tempPartyData.shareItem)
                                 {
-                                    if (makeMostDamage)
+                                    if (GameInstance.Singleton.partyShareItemDistance <= 0f || Vector3.Distance(tempPlayerCharacterEntity.CacheTransform.position, partyMember.CacheTransform.position) <= GameInstance.Singleton.partyShareItemDistance)
                                     {
-                                        // Make other member in party able to pickup items
-                                        looters.Add(partyMember.Id);
+                                        if (makeMostDamage)
+                                        {
+                                            // Make other member in party able to pickup items
+                                            looters.Add(partyMember.Id);
+                                        }
+                                        partyMember.RewardCurrencies(reward, 1f / (float)countNearbyPartyMembers * rewardRate, RewardGivenType.PartyShare);
                                     }
-                                    partyMember.RewardCurrencies(reward, 1f / (float)countNearbyPartyMembers * rewardRate, RewardGivenType.PartyShare);
                                 }
                             }
                             // Shared exp has been given, so do not give it to character again

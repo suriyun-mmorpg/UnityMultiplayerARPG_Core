@@ -257,6 +257,10 @@ namespace MultiplayerARPG
         public float localChatDistance = 10f;
         [Tooltip("This is a distance from controlling character that combat texts will instantiates")]
         public float combatTextDistance = 20f;
+        [Tooltip("This is a distance from monster killer to other characters in party to share EXP, if this value is <= 0, it will share EXP to all other characters in the same map")]
+        public float partyShareExpDistance = 0f;
+        [Tooltip("This is a distance from monster killer to other characters in party to share item (allow other characters to pickup item immediately), if this value is <= 0, it will share item to all other characters in the same map")]
+        public float partyShareItemDistance = 0f;
         [Tooltip("Maximum number of equip weapon set")]
         [Range(1, 16)]
         public byte maxEquipWeaponSet = 2;
