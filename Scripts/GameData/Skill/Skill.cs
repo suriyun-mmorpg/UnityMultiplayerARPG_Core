@@ -44,6 +44,8 @@ namespace MultiplayerARPG
         [Category(4, "Buff")]
         public SkillBuffType skillBuffType;
         public IncrementalFloat buffDistance;
+        public bool buffToUserIfNoTarget = true;
+        public bool cannotBuffEnemy = true;
         public Buff buff;
 
         [Category(5, "Summon/Mount/Item Craft")]
@@ -146,10 +148,10 @@ namespace MultiplayerARPG
                     skillUser.ApplyBuff(DataId, BuffType.SkillBuff, skillLevel, instigator);
                     break;
                 case SkillBuffType.BuffToTarget:
-                    BaseCharacterEntity targetEntity;
-                    if (!skillUser.CurrentGameManager.TryGetEntityByObjectId(targetObjectId, out targetEntity))
+                    BaseCharacterEntity targetEntity = null;
+                    if (buffToUserIfNoTarget && !skillUser.CurrentGameManager.TryGetEntityByObjectId(targetObjectId, out targetEntity))
                         targetEntity = skillUser;
-                    if (!targetEntity.IsDead())
+                    if (targetEntity != null && !targetEntity.IsDead())
                         targetEntity.ApplyBuff(DataId, BuffType.SkillBuff, skillLevel, instigator);
                     break;
                 case SkillBuffType.Toggle:
@@ -358,8 +360,15 @@ namespace MultiplayerARPG
 
         public override bool CanUse(BaseCharacterEntity character, short level, bool isLeftHand, uint targetObjectId, out UITextKeys gameMessage, bool isItem = false)
         {
+            BaseCharacterEntity targetEntity;
+            if (RequiredTarget && !cannotBuffEnemy && character.CurrentGameManager.TryGetEntityByObjectId(targetObjectId, out targetEntity) && targetEntity.IsEnemy(character.GetInfo()))
+            {
+                // Cannot buff enemy
+                gameMessage = UITextKeys.UI_ERROR_NO_SKILL_TARGET;
+                return false;
+            }
             bool canUse = base.CanUse(character, level, isLeftHand, targetObjectId, out gameMessage, isItem);
-            if (!canUse && gameMessage == UITextKeys.UI_ERROR_NO_SKILL_TARGET)
+            if (!canUse && gameMessage == UITextKeys.UI_ERROR_NO_SKILL_TARGET && buffToUserIfNoTarget)
             {
                 // Still allow to use skill but it's going to set applies target to skill user
                 gameMessage = UITextKeys.NONE;

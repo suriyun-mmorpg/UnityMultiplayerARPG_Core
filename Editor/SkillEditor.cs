@@ -77,6 +77,8 @@ namespace MultiplayerARPG
             ShowOnEnum(nameof(skill.skillBuffType), nameof(Skill.SkillBuffType.BuffToNearbyAllies), nameof(skill.buffDistance));
             ShowOnEnum(nameof(skill.skillBuffType), nameof(Skill.SkillBuffType.BuffToNearbyCharacters), nameof(skill.buffDistance));
             ShowOnEnum(nameof(skill.skillBuffType), nameof(Skill.SkillBuffType.BuffToTarget), nameof(skill.buffDistance));
+            ShowOnEnum(nameof(skill.skillBuffType), nameof(Skill.SkillBuffType.BuffToTarget), nameof(skill.buffToUserIfNoTarget));
+            ShowOnEnum(nameof(skill.skillBuffType), nameof(Skill.SkillBuffType.BuffToTarget), nameof(skill.cannotBuffEnemy));
             ShowOnEnum(nameof(skill.skillBuffType), nameof(Skill.SkillBuffType.BuffToUser), nameof(skill.buff));
             ShowOnEnum(nameof(skill.skillBuffType), nameof(Skill.SkillBuffType.BuffToNearbyAllies), nameof(skill.buff));
             ShowOnEnum(nameof(skill.skillBuffType), nameof(Skill.SkillBuffType.BuffToNearbyCharacters), nameof(skill.buff));
