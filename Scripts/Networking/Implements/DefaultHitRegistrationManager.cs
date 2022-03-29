@@ -66,21 +66,30 @@ namespace MultiplayerARPG
 
             while (registerHits[id].Count > 0)
             {
-                DamageableEntity damageableEntity;
-                if (!BaseGameNetworkManager.Singleton.TryGetEntityByObjectId(registerHits[id][0].HitObjectId, out damageableEntity) ||
-                    registerHits[id][0].HitBoxIndex >= damageableEntity.HitBoxes.Length)
+                if (registerHits[id].Count > validateHits[id].FireSpread + 1)
                 {
-                    // Can't find target or invalid hitbox
+                    // Over firespread? player try to hack?, don't allow it
                     registerHits[id].RemoveAt(0);
                     continue;
                 }
-
-                DamageableHitBox hitBox = damageableEntity.HitBoxes[registerHits[id][0].HitBoxIndex];
-                // Valiate hitting
-                if (IsHit(validateHits[id], registerHits[id][0], hitBox))
+                DamageableEntity damageableEntity;
+                for (int i = 0; i < registerHits[id][0].HitDataCollection.Count; ++i)
                 {
-                    // Yes, it is hit
-                    hitBox.ReceiveDamage(validateHits[id].Attacker.CacheTransform.position, validateHits[id].Attacker.GetInfo(), validateHits[id].DamageAmounts, validateHits[id].Weapon, validateHits[id].Skill, validateHits[id].SkillLevel, randomSeed);
+                    if (!BaseGameNetworkManager.Singleton.TryGetEntityByObjectId(registerHits[id][0].HitDataCollection[i].HitObjectId, out damageableEntity) ||
+                        registerHits[id][0].HitDataCollection[i].HitBoxIndex >= damageableEntity.HitBoxes.Length)
+                    {
+                        // Can't find target or invalid hitbox
+                        registerHits[id].RemoveAt(0);
+                        continue;
+                    }
+
+                    DamageableHitBox hitBox = damageableEntity.HitBoxes[registerHits[id][0].HitDataCollection[i].HitBoxIndex];
+                    // Valiate hitting
+                    if (IsHit(validateHits[id], registerHits[id][0], registerHits[id][0].HitDataCollection[i], hitBox))
+                    {
+                        // Yes, it is hit
+                        hitBox.ReceiveDamage(validateHits[id].Attacker.CacheTransform.position, validateHits[id].Attacker.GetInfo(), validateHits[id].DamageAmounts, validateHits[id].Weapon, validateHits[id].Skill, validateHits[id].SkillLevel, randomSeed);
+                    }
                 }
                 registerHits[id].RemoveAt(0);
             }
@@ -89,20 +98,20 @@ namespace MultiplayerARPG
             validateHits.Remove(id);
         }
 
-        private bool IsHit(HitValidateData validateHitdata, HitRegisterData registerData, DamageableHitBox hitBox)
+        private bool IsHit(HitValidateData validateHitdata, HitRegisterData registerData, HitData hitData, DamageableHitBox hitBox)
         {
             long halfRtt = validateHitdata.Attacker.Player != null ? (validateHitdata.Attacker.Player.Rtt / 2) : 0;
             long serverTime = BaseGameNetworkManager.Singleton.ServerTimestamp;
             long targetTime = serverTime - halfRtt;
             hitBox.Rewind(serverTime, targetTime);
-            Vector3 pointInHitBoxSpace = hitBox.transform.InverseTransformPoint(registerData.HitPoint);
+            Vector3 pointInHitBoxSpace = hitBox.transform.InverseTransformPoint(hitData.HitPoint);
             Bounds bounds = new Bounds(hitBox.Bounds.offsets, hitBox.Bounds.size);
             bool isHit = bounds.Contains(pointInHitBoxSpace) || Vector3.Distance(bounds.ClosestPoint(pointInHitBoxSpace), pointInHitBoxSpace) < hitDistanceBuffer;
             hitBox.Restore();
             return isHit;
         }
 
-        public void PrepareToRegister(DamageInfo damageInfo, int randomSeed, BaseCharacterEntity attacker, AimPosition aimPosition, uint hitObjectId, byte hitBoxIndex, Vector3 hitPoint)
+        public void PrepareToRegister(DamageInfo damageInfo, int randomSeed, BaseCharacterEntity attacker, AimPosition aimPosition, List<HitData> hitDataCollection)
         {
             if (!attacker.IsOwnerClient)
             {
@@ -116,9 +125,7 @@ namespace MultiplayerARPG
             prepareHits[randomSeed].Add(new HitRegisterData()
             {
                 AimPosition = aimPosition,
-                HitObjectId = hitObjectId,
-                HitBoxIndex = hitBoxIndex,
-                HitPoint = hitPoint,
+                HitDataCollection = hitDataCollection,
             });
         }
 

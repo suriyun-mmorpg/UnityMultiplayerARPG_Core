@@ -200,6 +200,7 @@ namespace MultiplayerARPG
                         int tempOverlapSize = attacker.AttackPhysicFunctions.OverlapObjects(damagePosition, hitDistance, damageableLayerMask, true);
                         if (tempOverlapSize > 0)
                         {
+                            List<HitData> hitDataCollection = new List<HitData>();
                             int damageTakenTargetIndex = 0;
                             DamageableHitBox damageReceivingTarget = null;
                             DamageableEntity selectedTarget = null;
@@ -252,8 +253,16 @@ namespace MultiplayerARPG
                                 if (isHost || isOwnedByServer)
                                     tempDamageableHitBox.ReceiveDamage(attacker.CacheTransform.position, instigator, damageAmounts, weapon, skill, skillLevel, randomSeed);
 
+                                // It hit something, store data for hit register preparation later
                                 if (!isHost && isOwnerClient)
-                                    BaseGameNetworkManager.Singleton.HitRegistrationManager.PrepareToRegister(this, randomSeed, attacker, aimPosition, tempDamageableHitBox.GetObjectId(), tempDamageableHitBox.Index, tempDamageableHitBox.transform.position);
+                                {
+                                    hitDataCollection.Add(new HitData()
+                                    {
+                                        HitObjectId = tempDamageableHitBox.GetObjectId(),
+                                        HitBoxIndex = tempDamageableHitBox.Index,
+                                        HitPoint = tempDamageableHitBox.transform.position,
+                                    });
+                                }
 
                                 // Instantiate impact effects
                                 if (isClient && hasImpactEffects)
@@ -270,8 +279,16 @@ namespace MultiplayerARPG
                                 if (isHost || isOwnedByServer)
                                     damageReceivingTarget.ReceiveDamage(attacker.CacheTransform.position, instigator, damageAmounts, weapon, skill, skillLevel, randomSeed);
 
+                                // It hit something, store data for hit register preparation later
                                 if (!isHost && isOwnerClient)
-                                    BaseGameNetworkManager.Singleton.HitRegistrationManager.PrepareToRegister(this, randomSeed, attacker, aimPosition, tempDamageableHitBox.GetObjectId(), tempDamageableHitBox.Index, tempDamageableHitBox.transform.position);
+                                {
+                                    hitDataCollection.Add(new HitData()
+                                    {
+                                        HitObjectId = tempDamageableHitBox.GetObjectId(),
+                                        HitBoxIndex = tempDamageableHitBox.Index,
+                                        HitPoint = tempDamageableHitBox.transform.position,
+                                    });
+                                }
 
                                 // Instantiate impact effects
                                 if (isClient && hasImpactEffects)
@@ -280,6 +297,9 @@ namespace MultiplayerARPG
                                     PoolSystem.GetInstance(impactEffects.TryGetEffect(damageReceivingTarget.tag), closestPoint, Quaternion.LookRotation((closestPoint - damagePosition).normalized));
                                 }
                             }
+                            // Prepare hit registration
+                            if (!isHost && isOwnerClient && hitDataCollection.Count > 0)
+                                BaseGameNetworkManager.Singleton.HitRegistrationManager.PrepareToRegister(this, randomSeed, attacker, aimPosition, hitDataCollection);
                         }
                     }
                     break;
@@ -306,6 +326,7 @@ namespace MultiplayerARPG
                         int tempRaycastSize = attacker.AttackPhysicFunctions.Raycast(damagePosition, damageDirection, missileDistance, Physics.DefaultRaycastLayers);
                         if (tempRaycastSize > 0)
                         {
+                            List<HitData> hitDataCollection = new List<HitData>();
                             byte pierceThroughEntities = this.pierceThroughEntities;
                             Vector3 point;
                             Vector3 normal;
@@ -359,8 +380,16 @@ namespace MultiplayerARPG
                                 if (isHost || isOwnedByServer)
                                     tempDamageableHitBox.ReceiveDamage(attacker.CacheTransform.position, instigator, damageAmounts, weapon, skill, skillLevel, randomSeed);
 
+                                // It hit something, store data for hit register preparation later
                                 if (!isHost && isOwnerClient)
-                                    BaseGameNetworkManager.Singleton.HitRegistrationManager.PrepareToRegister(this, randomSeed, attacker, aimPosition, tempDamageableHitBox.GetObjectId(), tempDamageableHitBox.Index, point);
+                                {
+                                    hitDataCollection.Add(new HitData()
+                                    {
+                                        HitObjectId = tempDamageableHitBox.GetObjectId(),
+                                        HitBoxIndex = tempDamageableHitBox.Index,
+                                        HitPoint = point,
+                                    });
+                                }
 
                                 // Instantiate impact effects
                                 if (isClient && hasImpactEffects)
@@ -370,7 +399,10 @@ namespace MultiplayerARPG
                                 if (pierceThroughEntities <= 0)
                                     break;
                                 --pierceThroughEntities;
-                            } // End of for...loop (raycast result)
+                            }
+                            // Prepare hit registration
+                            if (!isHost && isOwnerClient && hitDataCollection.Count > 0)
+                                BaseGameNetworkManager.Singleton.HitRegistrationManager.PrepareToRegister(this, randomSeed, attacker, aimPosition, hitDataCollection);
                         }
                         // Spawn projectile effect, it will move to target but it won't apply damage because it is just effect
                         if (isClient && projectileEffect != null)
