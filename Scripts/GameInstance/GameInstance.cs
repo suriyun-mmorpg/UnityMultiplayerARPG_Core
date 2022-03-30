@@ -282,6 +282,8 @@ namespace MultiplayerARPG
         public float mountDelay = 1f;
         [Tooltip("Delay before use item again")]
         public float useItemDelay = 0.25f;
+        [Tooltip("If this is `TRUE`, it will clear skills cooldown when character dead")]
+        public bool clearSkillCooldownOnDead = true;
 
         [Header("Gameplay Configs - Items, Inventory and Storage")]
         public ItemTypeFilter dismantleFilter = new ItemTypeFilter()

@@ -53,7 +53,10 @@ namespace MultiplayerARPG
                 summons[i].UnSummon(this);
                 summons.RemoveAt(i);
             }
-            skillUsages.Clear();
+            if (CurrentGameInstance.clearSkillCooldownOnDead)
+            {
+                skillUsages.Clear();
+            }
             CallAllOnDead();
         }
 
