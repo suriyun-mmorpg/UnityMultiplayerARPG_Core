@@ -108,10 +108,13 @@ namespace MultiplayerARPG.GameData.Model.Playables
         private readonly Dictionary<string, BaseStateInfo> baseStates = new Dictionary<string, BaseStateInfo>();
         private int baseLayerInputPortCount = 0;
         private bool readyToPlay = false;
+        private float awakenTime;
+        private float deadClipLength;
 
         public void Setup(PlayableCharacterModel characterModel)
         {
             CharacterModel = characterModel;
+            awakenTime = Time.unscaledTime;
             // Setup clips by settings in character model
             // Default
             SetupDefaultAnimations(characterModel.defaultAnimations);
@@ -403,43 +406,67 @@ namespace MultiplayerARPG.GameData.Model.Playables
             // Update freezing state
             BaseLayerMixer.GetInput(baseInputPort).SetSpeed(IsFreeze ? 0 : baseLayerClipSpeed);
 
-            // Update transition
             float weight;
-            float weightUpdate = info.deltaTime / baseTransitionDuration;
-            int inputCount = BaseLayerMixer.GetInputCount();
-            for (int i = 0; i < inputCount; ++i)
+            float weightUpdate;
+            // Update dead state
+            if (CharacterModel.isDead && Time.unscaledTime - awakenTime < 1f)
             {
-                weight = BaseLayerMixer.GetInputWeight(i);
-                if (i != baseInputPort)
+                BaseLayerMixer.GetInput(baseInputPort).SetTime(baseStates[playingStateId].state.clip.length);
+                int inputCount = BaseLayerMixer.GetInputCount();
+                for (int i = 0; i < inputCount; ++i)
                 {
-                    weight -= weightUpdate;
-                    if (weight < 0f)
-                        weight = 0f;
-                }
-                else
-                {
-                    weight += weightUpdate;
-                    if (weight > 1f)
-                        weight = 1f;
-                }
-                BaseLayerMixer.SetInputWeight(i, weight);
-                if (weight <= 0)
-                {
-                    BaseLayerMixer.GetInput(i).Pause();
-                    BaseLayerMixer.GetInput(i).SetTime(0);
+                    weight = BaseLayerMixer.GetInputWeight(i);
+                    if (i != baseInputPort)
+                        BaseLayerMixer.SetInputWeight(i, 0f);
+                    else
+                        BaseLayerMixer.SetInputWeight(i, 1f);
+
+                    if (weight <= 0f)
+                    {
+                        BaseLayerMixer.GetInput(i).Pause();
+                        BaseLayerMixer.GetInput(i).SetTime(0f);
+                    }
                 }
             }
+            else
+            {
+                // Update transition
+                weightUpdate = info.deltaTime / baseTransitionDuration;
+                int inputCount = BaseLayerMixer.GetInputCount();
+                for (int i = 0; i < inputCount; ++i)
+                {
+                    weight = BaseLayerMixer.GetInputWeight(i);
+                    if (i != baseInputPort)
+                    {
+                        weight -= weightUpdate;
+                        if (weight < 0f)
+                            weight = 0f;
+                    }
+                    else
+                    {
+                        weight += weightUpdate;
+                        if (weight > 1f)
+                            weight = 1f;
+                    }
+                    BaseLayerMixer.SetInputWeight(i, weight);
+                    if (weight <= 0f)
+                    {
+                        BaseLayerMixer.GetInput(i).Pause();
+                        BaseLayerMixer.GetInput(i).SetTime(0f);
+                    }
+                }
 
-            // Update playing state
-            basePlayElapsed += info.deltaTime;
+                // Update playing state
+                basePlayElapsed += info.deltaTime;
 
-            // It will change state to fall in next frame
-            if (playingJumpState == PlayingJumpState.Playing && basePlayElapsed >= baseClipLength)
-                playingJumpState = PlayingJumpState.None;
+                // It will change state to fall in next frame
+                if (playingJumpState == PlayingJumpState.Playing && basePlayElapsed >= baseClipLength)
+                    playingJumpState = PlayingJumpState.None;
 
-            // It will change state to movement in next frame
-            if (playingLandedState && basePlayElapsed >= baseClipLength)
-                playingLandedState = false;
+                // It will change state to movement in next frame
+                if (playingLandedState && basePlayElapsed >= baseClipLength)
+                    playingLandedState = false;
+            }
             #endregion
 
             #region Update action state

@@ -127,10 +127,12 @@ namespace MultiplayerARPG
         private bool isSetupComponent;
         private int actionStateNameHash;
         private int castSkillStateNameHash;
+        private float awakenTime;
 
         protected override void Awake()
         {
             base.Awake();
+            awakenTime = Time.unscaledTime;
             SetupComponent();
         }
 
@@ -311,6 +313,11 @@ namespace MultiplayerARPG
             animator.SetFloat(ANIM_DIRECTION_X, direction2D.x);
             animator.SetFloat(ANIM_DIRECTION_Y, direction2D.y);
             animator.SetBool(ANIM_IS_DEAD, isDead);
+            if (isDead && Time.unscaledTime - awakenTime < 1f)
+            {
+                AnimatorStateInfo stateInfo = animator.GetCurrentAnimatorStateInfo(0);
+                animator.Play(stateInfo.fullPathHash, 0, 1f);
+            }
         }
 
         private AnimatorActionAnimation2D GetActionAnimation(AnimActionType animActionType, int dataId)

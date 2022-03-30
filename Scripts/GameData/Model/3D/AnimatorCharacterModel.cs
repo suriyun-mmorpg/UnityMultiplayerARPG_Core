@@ -93,10 +93,12 @@ namespace MultiplayerARPG
         private float hurtAnimSpeedRate;
         private float deadAnimSpeedRate;
         private float pickupAnimSpeedRate;
+        private float awakenTime;
 
         protected override void Awake()
         {
             base.Awake();
+            awakenTime = Time.unscaledTime;
             SetupComponent();
         }
 
@@ -712,6 +714,11 @@ namespace MultiplayerARPG
             animator.SetFloat(ANIM_LANDED_CLIP_MULTIPLIER, landedAnimSpeedRate);
             animator.SetFloat(ANIM_PICKUP_CLIP_MULTIPLIER, pickupAnimSpeedRate);
             animator.SetBool(ANIM_IS_DEAD, isDead);
+            if (isDead && Time.unscaledTime - awakenTime < 1f)
+            {
+                AnimatorStateInfo stateInfo = animator.GetCurrentAnimatorStateInfo(0);
+                animator.Play(stateInfo.fullPathHash, 0, 1f);
+            }
             animator.SetBool(ANIM_IS_GROUNDED, isGrounded);
             animator.SetBool(ANIM_IS_UNDER_WATER, isUnderWater);
             animator.SetInteger(ANIM_MOVE_TYPE, moveType);
