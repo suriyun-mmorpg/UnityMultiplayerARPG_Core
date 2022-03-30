@@ -163,7 +163,10 @@ namespace MultiplayerARPG
                     coolDownRemainsDuration = Character.SkillUsages[indexOfSkillUsage].coolDownRemainsDuration;
             }
 
-            if (Character is PlayerCharacterData && Skill != null && Skill.CanLevelUp(Character as PlayerCharacterData, CharacterSkill.level, out _))
+            IPlayerCharacterData targetPlayer = Character as IPlayerCharacterData;
+            if (targetPlayer == null)
+                targetPlayer = GameInstance.PlayingCharacter;
+            if (targetPlayer != null && Skill != null && Skill.CanLevelUp(targetPlayer, CharacterSkill.level, out _))
                 onAbleToLevelUp.Invoke();
             else
                 onUnableToLevelUp.Invoke();
