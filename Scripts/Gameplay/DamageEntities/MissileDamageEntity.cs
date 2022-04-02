@@ -6,6 +6,15 @@ namespace MultiplayerARPG
 {
     public partial class MissileDamageEntity : BaseDamageEntity
     {
+        public enum HitDetectionMode
+        {
+            Raycast,
+            SphereCast,
+            BoxCast,
+        }
+        public HitDetectionMode hitDetectionMode = HitDetectionMode.Raycast;
+        public float sphereRadius = 1f;
+        public Vector3 boxSize = Vector3.one;
         public float destroyDelay;
         public UnityEvent onExploded;
         public UnityEvent onDestroy;
@@ -24,6 +33,8 @@ namespace MultiplayerARPG
         protected float missileDuration;
         protected bool destroying;
         protected Vector3? previousPosition;
+        protected RaycastHit2D[] hits2D = new RaycastHit2D[8];
+        protected RaycastHit[] hits3D = new RaycastHit[8];
 
         protected override void Awake()
         {
@@ -72,6 +83,24 @@ namespace MultiplayerARPG
             missileDuration = (missileDistance / missileSpeed) + 0.1f;
         }
 
+#if UNITY_EDITOR
+        protected virtual void OnDrawGizmos()
+        {
+            Color defaultColor = Gizmos.color;
+            Gizmos.color = Color.green;
+            switch (hitDetectionMode)
+            {
+                case HitDetectionMode.SphereCast:
+                    Gizmos.DrawWireSphere(transform.position, sphereRadius);
+                    break;
+                case HitDetectionMode.BoxCast:
+                    Gizmos.DrawWireCube(transform.position, boxSize);
+                    break;
+            }
+            Gizmos.color = defaultColor;
+        }
+#endif
+
         protected virtual void Update()
         {
             if (destroying)
@@ -88,21 +117,39 @@ namespace MultiplayerARPG
             {
                 if (previousPosition.HasValue)
                 {
+                    int hitCount = 0;
+                    int layerMask = GameInstance.Singleton.GetDamageEntityHitLayerMask();
                     Vector3 dir = (previousPosition.Value - CacheTransform.position).normalized;
                     float dist = Vector3.Distance(CacheTransform.position, previousPosition.Value);
                     // Raycast to previous position to check is it hitting something or not
                     // If hit, explode
-                    if (CurrentGameInstance.DimensionType == DimensionType.Dimension2D)
+                    switch (hitDetectionMode)
                     {
-                        RaycastHit2D hit = Physics2D.Raycast(previousPosition.Value, dir, dist);
-                        if (hit.transform != null)
-                            TriggerEnter(hit.transform.gameObject);
+                        case HitDetectionMode.Raycast:
+                            if (CurrentGameInstance.DimensionType == DimensionType.Dimension2D)
+                                hitCount = Physics2D.RaycastNonAlloc(previousPosition.Value, dir, hits2D, dist, layerMask);
+                            else
+                                hitCount = Physics.RaycastNonAlloc(previousPosition.Value, dir, hits3D, dist, layerMask);
+                            break;
+                        case HitDetectionMode.SphereCast:
+                            if (CurrentGameInstance.DimensionType == DimensionType.Dimension2D)
+                                hitCount = Physics2D.CircleCastNonAlloc(previousPosition.Value, sphereRadius, dir, hits2D, dist, layerMask);
+                            else
+                                hitCount = Physics.SphereCastNonAlloc(previousPosition.Value, sphereRadius, dir, hits3D, dist, layerMask);
+                            break;
+                        case HitDetectionMode.BoxCast:
+                            if (CurrentGameInstance.DimensionType == DimensionType.Dimension2D)
+                                hitCount = Physics2D.BoxCastNonAlloc(previousPosition.Value, new Vector2(boxSize.x, boxSize.y), Vector2.SignedAngle(Vector2.zero, dir), dir, hits2D, dist, layerMask);
+                            else
+                                hitCount = Physics.BoxCastNonAlloc(previousPosition.Value, boxSize * 0.5f, dir, hits3D, CacheTransform.rotation, dist, layerMask);
+                            break;
                     }
-                    else
+                    for (int i = 0; i < hitCount; ++i)
                     {
-                        RaycastHit hit;
-                        if (Physics.Raycast(previousPosition.Value, dir, out hit, dist))
-                            TriggerEnter(hit.transform.gameObject);
+                        if (CurrentGameInstance.DimensionType == DimensionType.Dimension2D && hits2D[i].transform != null)
+                            TriggerEnter(hits2D[i].transform.gameObject);
+                        if (CurrentGameInstance.DimensionType == DimensionType.Dimension3D && hits3D[i].transform != null)
+                            TriggerEnter(hits3D[i].transform.gameObject);
                     }
                 }
                 previousPosition = CacheTransform.position;
@@ -157,25 +204,9 @@ namespace MultiplayerARPG
             base.OnPushBack();
         }
 
-        protected virtual void OnTriggerEnter(Collider other)
-        {
-            TriggerEnter(other.gameObject);
-        }
-
-        protected virtual void OnTriggerEnter2D(Collider2D other)
-        {
-            TriggerEnter(other.gameObject);
-        }
-
         protected virtual void TriggerEnter(GameObject other)
         {
             if (destroying)
-                return;
-
-            if (other.layer == CurrentGameInstance.itemDropLayer ||
-                other.layer == PhysicLayers.TransparentFX ||
-                other.layer == PhysicLayers.IgnoreRaycast ||
-                other.layer == PhysicLayers.Water)
                 return;
 
             if (other.GetComponent<IUnHittable>() != null)

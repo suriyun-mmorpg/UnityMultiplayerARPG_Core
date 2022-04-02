@@ -793,7 +793,7 @@ namespace MultiplayerARPG
         }
 
         /// <summary>
-        /// Only `playerLayer`, `monsterLayer`, `vehicleLayer`, `buildingLayer`, `harvestableLayer` will be used for sphere casts
+        /// Only `playerLayer`, `monsterLayer`, `vehicleLayer`, `buildingLayer`, `harvestableLayer` will be used for hit detection casting
         /// </summary>
         /// <returns></returns>
         public int GetDamageableLayerMask()
@@ -804,6 +804,23 @@ namespace MultiplayerARPG
             layerMask = layerMask | vehicleLayer.Mask;
             layerMask = layerMask | buildingLayer.Mask;
             layerMask = layerMask | harvestableLayer.Mask;
+            return layerMask;
+        }
+
+        /// <summary>
+        /// Only `playerLayer`, `monsterLayer`, `vehicleLayer`, `buildingLayer`, `harvestableLayer` and wall layers will be used for hit detection casting
+        /// </summary>
+        /// <returns></returns>
+        public int GetDamageEntityHitLayerMask()
+        {
+            int layerMask = 0;
+            layerMask = layerMask | playerLayer.Mask;
+            layerMask = layerMask | monsterLayer.Mask;
+            layerMask = layerMask | vehicleLayer.Mask;
+            layerMask = layerMask | buildingLayer.Mask;
+            layerMask = layerMask | harvestableLayer.Mask;
+            layerMask = layerMask |= PhysicLayers.Default;
+            // TODO: May allow users to set their wall layers
             return layerMask;
         }
 
