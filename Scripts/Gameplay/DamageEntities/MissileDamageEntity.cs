@@ -13,8 +13,8 @@ namespace MultiplayerARPG
             BoxCast,
         }
         public HitDetectionMode hitDetectionMode = HitDetectionMode.Raycast;
-        public float sphereRadius = 1f;
-        public Vector3 boxSize = Vector3.one;
+        public float sphereCastRadius = 1f;
+        public Vector3 boxCastSize = Vector3.one;
         public float destroyDelay;
         public UnityEvent onExploded;
         public UnityEvent onDestroy;
@@ -91,10 +91,10 @@ namespace MultiplayerARPG
             switch (hitDetectionMode)
             {
                 case HitDetectionMode.SphereCast:
-                    Gizmos.DrawWireSphere(transform.position, sphereRadius);
+                    Gizmos.DrawWireSphere(transform.position, sphereCastRadius);
                     break;
                 case HitDetectionMode.BoxCast:
-                    Gizmos.DrawWireCube(transform.position, boxSize);
+                    Gizmos.DrawWireCube(transform.position, boxCastSize);
                     break;
             }
             Gizmos.color = defaultColor;
@@ -113,6 +113,14 @@ namespace MultiplayerARPG
                 destroying = true;
             }
 
+            HitDetect();
+        }
+
+        /// <summary>
+        /// RayCast/SphereCast/BoxCast from current position back to previous frame position to detect hit target
+        /// </summary>
+        public virtual void HitDetect()
+        {
             if (!destroying)
             {
                 if (previousPosition.HasValue)
@@ -133,15 +141,15 @@ namespace MultiplayerARPG
                             break;
                         case HitDetectionMode.SphereCast:
                             if (CurrentGameInstance.DimensionType == DimensionType.Dimension2D)
-                                hitCount = Physics2D.CircleCastNonAlloc(previousPosition.Value, sphereRadius, dir, hits2D, dist, layerMask);
+                                hitCount = Physics2D.CircleCastNonAlloc(previousPosition.Value, sphereCastRadius, dir, hits2D, dist, layerMask);
                             else
-                                hitCount = Physics.SphereCastNonAlloc(previousPosition.Value, sphereRadius, dir, hits3D, dist, layerMask);
+                                hitCount = Physics.SphereCastNonAlloc(previousPosition.Value, sphereCastRadius, dir, hits3D, dist, layerMask);
                             break;
                         case HitDetectionMode.BoxCast:
                             if (CurrentGameInstance.DimensionType == DimensionType.Dimension2D)
-                                hitCount = Physics2D.BoxCastNonAlloc(previousPosition.Value, new Vector2(boxSize.x, boxSize.y), Vector2.SignedAngle(Vector2.zero, dir), dir, hits2D, dist, layerMask);
+                                hitCount = Physics2D.BoxCastNonAlloc(previousPosition.Value, new Vector2(boxCastSize.x, boxCastSize.y), Vector2.SignedAngle(Vector2.zero, dir), dir, hits2D, dist, layerMask);
                             else
-                                hitCount = Physics.BoxCastNonAlloc(previousPosition.Value, boxSize * 0.5f, dir, hits3D, CacheTransform.rotation, dist, layerMask);
+                                hitCount = Physics.BoxCastNonAlloc(previousPosition.Value, boxCastSize * 0.5f, dir, hits3D, CacheTransform.rotation, dist, layerMask);
                             break;
                     }
                     for (int i = 0; i < hitCount; ++i)
