@@ -49,8 +49,8 @@ namespace MultiplayerARPG
                         {
                             for (int i = 0; i < colliders2D.Length; ++i)
                             {
-                                if (yPosition < colliders2D[i].bounds.center.y)
-                                    yPosition = colliders2D[i].bounds.center.y;
+                                if (yPosition < colliders2D[i].bounds.center.y + colliders2D[i].bounds.extents.y)
+                                    yPosition = colliders2D[i].bounds.center.y + colliders2D[i].bounds.extents.y;
                             }
                         }
                     }
@@ -60,8 +60,8 @@ namespace MultiplayerARPG
                         {
                             for (int i = 0; i < colliders.Length; ++i)
                             {
-                                if (yPosition < colliders[i].bounds.center.y)
-                                    yPosition = colliders[i].bounds.center.y;
+                                if (yPosition < colliders[i].bounds.center.y + colliders[i].bounds.extents.y)
+                                    yPosition = colliders[i].bounds.center.y + colliders[i].bounds.extents.y;
                             }
                         }
                     }
