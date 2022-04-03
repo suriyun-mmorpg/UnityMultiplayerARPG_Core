@@ -24,6 +24,7 @@ namespace MultiplayerARPG
         public UIChatHandler uiChatHandler;
         public UnityEvent onIsTypeWriter = new UnityEvent();
         public UnityEvent onNotTypeWriter = new UnityEvent();
+
         protected override void UpdateData()
         {
             if (uiTextMessage != null)
@@ -61,8 +62,16 @@ namespace MultiplayerARPG
                         onNotTypeWriter.Invoke();
                 }
             }
+            InvokeRepeating(nameof(UpdateTimestamp), 0f, 5f);
+        }
+
+        private void UpdateTimestamp()
+        {
             if (uiTextTimestamp != null)
-                uiTextTimestamp.text = new System.DateTime(Data.timestamp).GetPrettyDate();
+            {
+                System.DateTime dateTime = new System.DateTime(1970, 1, 1, 0, 0, 0, 0, System.DateTimeKind.Utc).AddMilliseconds(Data.timestamp).ToLocalTime();
+                uiTextTimestamp.text = new System.DateTime(dateTime.Ticks).GetPrettyDate();
+            }
         }
 
         public void OnClickEntry()
