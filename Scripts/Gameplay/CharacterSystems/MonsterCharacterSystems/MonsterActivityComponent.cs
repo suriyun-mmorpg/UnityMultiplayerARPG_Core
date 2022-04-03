@@ -17,6 +17,8 @@ namespace MultiplayerARPG
         public float followTargetDuration = 5f;
         [Tooltip("Turn to enemy speed")]
         public float turnToEnemySpeed = 800f;
+        [Tooltip("Duration to pausing after received damage")]
+        public float miniStunDuration = 0f;
         [Tooltip("If this is TRUE, monster will attacks buildings")]
         public bool isAttackBuilding = false;
         [Tooltip("If this is TRUE, monster will attacks targets while its summoner still idle")]
@@ -37,6 +39,7 @@ namespace MultiplayerARPG
         protected bool isLeftHandAttacking;
         protected float lastSetDestinationTime;
         protected bool previousIsInSafeArea;
+        protected float pauseCountdown;
 
         public bool IsAggressiveWhileSummonerIdle()
         {
@@ -56,6 +59,14 @@ namespace MultiplayerARPG
             }
 
             float deltaTime = Time.unscaledDeltaTime;
+            if (pauseCountdown > 0f)
+            {
+                pauseCountdown -= deltaTime;
+                if (pauseCountdown <= 0f)
+                    pauseCountdown = 0f;
+                Entity.StopMove();
+                return;
+            }
 
             Vector3 currentPosition = Entity.MovementTransform.position;
             if (Entity.Summoner != null)
