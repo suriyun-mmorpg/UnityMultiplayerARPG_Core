@@ -10,6 +10,7 @@ namespace MultiplayerARPG
     public partial class AreaDamageEntity : BaseDamageEntity
     {
         public bool canApplyDamageToUser;
+        public bool canApplyDamageToAllies;
         public UnityEvent onDestroy;
 
         private LiteNetLibIdentity identity;
@@ -65,6 +66,9 @@ namespace MultiplayerARPG
 
         protected virtual void Update()
         {
+            if (!IsServer)
+                return;
+
             if (Time.unscaledTime - lastAppliedTime >= applyDuration)
             {
                 lastAppliedTime = Time.unscaledTime;
@@ -80,14 +84,16 @@ namespace MultiplayerARPG
 
         public override void ApplyDamageTo(DamageableHitBox target)
         {
-            if (canApplyDamageToUser)
-            {
-                if (!IsServer || target == null || target.IsDead() || target.IsImmune || instigator.IsInSafeArea)
-                    return;
-                target.ReceiveDamageWithoutConditionCheck(CacheTransform.position, instigator, damageAmounts, weapon, skill, skillLevel, Random.Range(0, 255));
+            if (target == null || target.IsDead() || target.IsImmune || target.IsInSafeArea)
                 return;
-            }
-            base.ApplyDamageTo(target);
+
+            if (!canApplyDamageToUser && target.GetObjectId() == instigator.ObjectId)
+                return;
+
+            if (!canApplyDamageToAllies && target.DamageableEntity is BaseCharacterEntity && (target.DamageableEntity as BaseCharacterEntity).IsAlly(instigator))
+                return;
+
+            target.ReceiveDamageWithoutConditionCheck(CacheTransform.position, instigator, damageAmounts, weapon, skill, skillLevel, Random.Range(0, 255));
         }
 
         protected override void OnPushBack()

@@ -7,6 +7,8 @@ namespace MultiplayerARPG
 {
     public class ThrowableDamageEntity : BaseDamageEntity
     {
+        public bool canApplyDamageToUser;
+        public bool canApplyDamageToAllies;
         public float destroyDelay;
         public UnityEvent onExploded;
         public UnityEvent onDestroy;
@@ -106,8 +108,23 @@ namespace MultiplayerARPG
 
             target = other.GetComponent<DamageableHitBox>();
 
-            if (target == null || target.IsDead() || !target.CanReceiveDamageFrom(instigator))
+            if (target == null || target.IsDead() || target.IsImmune || target.IsInSafeArea)
+            {
+                target = null;
                 return false;
+            }
+
+            if (!canApplyDamageToUser && target.GetObjectId() == instigator.ObjectId)
+            {
+                target = null;
+                return false;
+            }
+
+            if (!canApplyDamageToAllies && target.DamageableEntity is BaseCharacterEntity && (target.DamageableEntity as BaseCharacterEntity).IsAlly(instigator))
+            {
+                target = null;
+                return false;
+            }
 
             return true;
         }
@@ -117,7 +134,7 @@ namespace MultiplayerARPG
             DamageableHitBox target;
             if (FindTargetHitBox(other, out target))
             {
-                ApplyDamageTo(target);
+                target.ReceiveDamageWithoutConditionCheck(CacheTransform.position, instigator, damageAmounts, weapon, skill, skillLevel, Random.Range(0, 255));
                 return true;
             }
             return false;
