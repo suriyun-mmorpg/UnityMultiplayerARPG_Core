@@ -1,0 +1,80 @@
+using UnityEngine;
+
+namespace MultiplayerARPG
+{
+    public class CharacterTargetIndicator : MonoBehaviour
+    {
+        public enum FollowTargetMode
+        {
+            FollowPosition,
+            FollowTopBound,
+        }
+        public GameObject indicatorPrefab;
+        public FollowTargetMode followTargetMode;
+        public Vector3 offsets;
+        public bool followTargetRotation;
+
+        private GameObject indicatorObject;
+        private BaseGameEntity currentTarget;
+        private Collider2D[] colliders2D;
+        private Collider[] colliders;
+
+        private void Start()
+        {
+            indicatorObject = Instantiate(indicatorPrefab);
+        }
+
+        private void LateUpdate()
+        {
+            if (currentTarget != GameInstance.PlayingCharacterEntity.GetTargetEntity())
+            {
+                currentTarget = GameInstance.PlayingCharacterEntity.GetTargetEntity();
+                if (currentTarget != null)
+                {
+                    colliders2D = currentTarget.GetComponentsInChildren<Collider2D>();
+                    colliders = currentTarget.GetComponentsInChildren<Collider>();
+                }
+            }
+
+            if (currentTarget != null)
+            {
+                float xPosition = currentTarget.transform.position.x;
+                float yPosition = currentTarget.transform.position.y;
+                float zPosition = currentTarget.transform.position.z;
+                if (followTargetMode == FollowTargetMode.FollowTopBound)
+                {
+                    if (GameInstance.Singleton.DimensionType == DimensionType.Dimension2D)
+                    {
+                        if (colliders2D != null && colliders2D.Length > 0)
+                        {
+                            for (int i = 0; i < colliders2D.Length; ++i)
+                            {
+                                if (yPosition < colliders2D[i].bounds.center.y)
+                                    yPosition = colliders2D[i].bounds.center.y;
+                            }
+                        }
+                    }
+                    else
+                    {
+                        if (colliders != null && colliders.Length > 0)
+                        {
+                            for (int i = 0; i < colliders.Length; ++i)
+                            {
+                                if (yPosition < colliders[i].bounds.center.y)
+                                    yPosition = colliders[i].bounds.center.y;
+                            }
+                        }
+                    }
+                }
+                indicatorObject.transform.position = new Vector3(xPosition, yPosition, zPosition) + offsets;
+                if (followTargetRotation)
+                    indicatorObject.transform.rotation = currentTarget.transform.rotation;
+                indicatorObject.gameObject.SetActive(true);
+            }
+            else
+            {
+                indicatorObject.gameObject.SetActive(false);
+            }
+        }
+    }
+}
