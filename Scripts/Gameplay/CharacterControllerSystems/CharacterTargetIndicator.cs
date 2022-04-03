@@ -38,6 +38,11 @@ namespace MultiplayerARPG
 
             if (currentTarget != null)
             {
+                if ((currentTarget is DamageableEntity) && (currentTarget as DamageableEntity).IsDead())
+                {
+                    indicatorObject.gameObject.SetActive(false);
+                    return;
+                }
                 float xPosition = currentTarget.transform.position.x;
                 float yPosition = currentTarget.transform.position.y;
                 float zPosition = currentTarget.transform.position.z;
