@@ -20,6 +20,7 @@ namespace MultiplayerARPG
         public string formatSystem = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_CHAT_SYSTEM);
 
         public TextWrapper uiTextMessage;
+        public TextWrapper uiTextTimestamp;
         public UIChatHandler uiChatHandler;
         public UnityEvent onIsTypeWriter = new UnityEvent();
         public UnityEvent onNotTypeWriter = new UnityEvent();
@@ -60,6 +61,8 @@ namespace MultiplayerARPG
                         onNotTypeWriter.Invoke();
                 }
             }
+            if (uiTextTimestamp != null)
+                uiTextTimestamp.text = new System.DateTime(Data.timestamp).GetPrettyDate();
         }
 
         public void OnClickEntry()

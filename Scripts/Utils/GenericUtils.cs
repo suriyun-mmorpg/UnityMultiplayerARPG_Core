@@ -497,7 +497,8 @@ public static class GenericUtils
         string formatHoursAgo = "{0} Hours ago",
         string formatDaysAgo = "{0} Days ago",
         string formatWeeksAgo = "{0} Weeks ago",
-        string formatMonthsAgo = "{0} Months ago")
+        string formatMonthsAgo = "{0} Months ago",
+        string textUnknow = "Unknow")
     {
         System.TimeSpan dateTimeDiff = System.DateTime.Now.Subtract(dateTime);
         int monthDiff = (int)(dateTimeDiff.TotalDays / 30);
@@ -506,7 +507,7 @@ public static class GenericUtils
 
         // Don't allow out of range values.
         if (dayDiff < 0)
-            return "Unknow";
+            return textUnknow;
 
         // Handle same-day times.
         if (dayDiff == 0)
@@ -536,7 +537,8 @@ public static class GenericUtils
             return string.Format(formatWeeksAgo, Mathf.CeilToInt((float)dayDiff / 7f));
         if (monthDiff < 12)
             return string.Format(formatMonthsAgo, monthDiff);
-        return dateTime.ToShortDateString();
+
+        return textUnknow;
     }
 
     public static System.Uri Append(this System.Uri uri, params string[] paths)
