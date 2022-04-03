@@ -10,6 +10,7 @@ namespace MultiplayerARPG
         public string receiver;
         public int channelId;
         public bool sendByServer;
+        public long timestamp;
 
         public void Deserialize(NetDataReader reader)
         {
@@ -20,6 +21,7 @@ namespace MultiplayerARPG
             if (channel == ChatChannel.Party || channel == ChatChannel.Guild)
                 channelId = reader.GetPackedInt();
             sendByServer = reader.GetBool();
+            timestamp = reader.GetPackedLong();
         }
 
         public void Serialize(NetDataWriter writer)
@@ -31,6 +33,7 @@ namespace MultiplayerARPG
             if (channel == ChatChannel.Party || channel == ChatChannel.Guild)
                 writer.PutPackedInt(channelId);
             writer.Put(sendByServer);
+            writer.PutPackedLong(timestamp);
         }
     }
 }

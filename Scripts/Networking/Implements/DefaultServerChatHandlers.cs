@@ -15,6 +15,7 @@ namespace MultiplayerARPG
 
         public void OnChatMessage(ChatMessage message)
         {
+            message.timestamp = BaseGameNetworkManager.Singleton.ServerTimestamp;
             long connectionId;
             switch (message.channel)
             {
@@ -38,6 +39,7 @@ namespace MultiplayerARPG
                                 {
                                     channel = ChatChannel.System,
                                     message = response,
+                                    timestamp = message.timestamp,
                                 });
                             }
                         }
