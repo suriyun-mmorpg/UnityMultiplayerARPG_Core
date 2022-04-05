@@ -55,9 +55,44 @@ public static class PhysicUtils
     /// <param name="distance"></param>
     /// <param name="layerMask"></param>
     /// <returns></returns>
-    public static int SortedRaycastNonAlloc2D(Vector3 origin, Vector3 direction, RaycastHit2D[] hits, float distance, int layerMask)
+    public static int SortedRaycastNonAlloc2D(Vector2 origin, Vector2 direction, RaycastHit2D[] hits, float distance, int layerMask)
     {
         int count = Physics2D.RaycastNonAlloc(origin, direction, hits, distance, layerMask);
+        System.Array.Sort(hits, 0, count, new RaycastHitComparer());
+        return count;
+    }
+
+    /// <summary>
+    /// Physics2D.CircleCastNonAlloc then sort ASC
+    /// </summary>
+    /// <param name="origin"></param>
+    /// <param name="radius"></param>
+    /// <param name="direction"></param>
+    /// <param name="hits"></param>
+    /// <param name="distance"></param>
+    /// <param name="layerMask"></param>
+    /// <returns></returns>
+    public static int SortedCastNonNonAlloc3D(Vector2 origin, float radius, Vector2 direction, RaycastHit2D[] hits, float distance, int layerMask)
+    {
+        int count = Physics2D.CircleCastNonAlloc(origin, radius, direction, hits, distance, layerMask);
+        System.Array.Sort(hits, 0, count, new RaycastHitComparer());
+        return count;
+    }
+
+    /// <summary>
+    /// Physics2D.BoxCastNonAlloc then sort ASC
+    /// </summary>
+    /// <param name="origin"></param>
+    /// <param name="size"></param>
+    /// <param name="angle"></param>
+    /// <param name="direction"></param>
+    /// <param name="hits"></param>
+    /// <param name="distance"></param>
+    /// <param name="layerMask"></param>
+    /// <returns></returns>
+    public static int SortedBoxCastNonAlloc3D(Vector2 origin, Vector2 size, float angle, Vector2 direction, RaycastHit2D[] hits, float distance, int layerMask)
+    {
+        int count = Physics2D.BoxCastNonAlloc(origin, size, angle, direction, hits, distance, layerMask);
         System.Array.Sort(hits, 0, count, new RaycastHitComparer());
         return count;
     }
@@ -69,6 +104,7 @@ public static class PhysicUtils
     /// <param name="hits"></param>
     /// <param name="distance"></param>
     /// <param name="layerMask"></param>
+    /// <param name="queryTriggerInteraction"></param>
     /// <returns></returns>
     public static int SortedRaycastNonAlloc3D(Ray ray, RaycastHit[] hits, float distance, int layerMask, QueryTriggerInteraction queryTriggerInteraction = QueryTriggerInteraction.UseGlobal)
     {
@@ -83,10 +119,48 @@ public static class PhysicUtils
     /// <param name="hits"></param>
     /// <param name="distance"></param>
     /// <param name="layerMask"></param>
+    /// <param name="queryTriggerInteraction"></param>
     /// <returns></returns>
     public static int SortedRaycastNonAlloc3D(Vector3 origin, Vector3 direction, RaycastHit[] hits, float distance, int layerMask, QueryTriggerInteraction queryTriggerInteraction = QueryTriggerInteraction.UseGlobal)
     {
         int count = Physics.RaycastNonAlloc(origin, direction, hits, distance, layerMask, queryTriggerInteraction);
+        System.Array.Sort(hits, 0, count, new RaycastHitComparer());
+        return count;
+    }
+
+    /// <summary>
+    /// Physics.SphereCastNonAlloc then sort ASC
+    /// </summary>
+    /// <param name="origin"></param>
+    /// <param name="radius"></param>
+    /// <param name="direction"></param>
+    /// <param name="hits"></param>
+    /// <param name="distance"></param>
+    /// <param name="layerMask"></param>
+    /// <param name="queryTriggerInteraction"></param>
+    /// <returns></returns>
+    public static int SortedSphereCastNonAlloc3D(Vector3 origin, float radius, Vector3 direction, RaycastHit[] hits, float distance, int layerMask, QueryTriggerInteraction queryTriggerInteraction = QueryTriggerInteraction.UseGlobal)
+    {
+        int count = Physics.SphereCastNonAlloc(origin, radius, direction, hits, distance, layerMask, queryTriggerInteraction);
+        System.Array.Sort(hits, 0, count, new RaycastHitComparer());
+        return count;
+    }
+
+    /// <summary>
+    /// Physics.BoxCastNonAlloc then sort ASC
+    /// </summary>
+    /// <param name="origin"></param>
+    /// <param name="halfExtents"></param>
+    /// <param name="direction"></param>
+    /// <param name="hits"></param>
+    /// <param name="orientation"></param>
+    /// <param name="distance"></param>
+    /// <param name="layerMask"></param>
+    /// <param name="queryTriggerInteraction"></param>
+    /// <returns></returns>
+    public static int SortedBoxCastNonAlloc3D(Vector3 origin, Vector3 halfExtents, Vector3 direction, RaycastHit[] hits, Quaternion orientation, float distance, int layerMask, QueryTriggerInteraction queryTriggerInteraction = QueryTriggerInteraction.UseGlobal)
+    {
+        int count = Physics.BoxCastNonAlloc(origin, halfExtents, direction, hits, orientation, distance, layerMask, queryTriggerInteraction);
         System.Array.Sort(hits, 0, count, new RaycastHitComparer());
         return count;
     }
