@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using UnityEngine.AI;
+using UnityEngine.Rendering;
 using UnityEngine.Tilemaps;
 
 namespace MultiplayerARPG
@@ -14,6 +15,8 @@ namespace MultiplayerARPG
             CannotBuild,
         }
         private Material[] defaultMaterials;
+        private ShadowCastingMode defaultShadowCastingMode;
+        private bool defaultReceiveShadows;
         private Color defaultColor;
 
         [Header("Materials Settings (for 3D)")]
@@ -49,12 +52,18 @@ namespace MultiplayerARPG
                     {
                         case State.Default:
                             meshRenderer.sharedMaterials = defaultMaterials;
+                            meshRenderer.shadowCastingMode = defaultShadowCastingMode;
+                            meshRenderer.receiveShadows = defaultReceiveShadows;
                             break;
                         case State.CanBuild:
                             meshRenderer.sharedMaterials = canBuildMaterials;
+                            meshRenderer.shadowCastingMode = ShadowCastingMode.Off;
+                            meshRenderer.receiveShadows = false;
                             break;
                         case State.CannotBuild:
                             meshRenderer.sharedMaterials = cannotBuildMaterials;
+                            meshRenderer.shadowCastingMode = ShadowCastingMode.Off;
+                            meshRenderer.receiveShadows = false;
                             break;
                     }
                 }
@@ -65,12 +74,18 @@ namespace MultiplayerARPG
                     {
                         case State.Default:
                             spriteRenderer.color = defaultColor;
+                            spriteRenderer.shadowCastingMode = defaultShadowCastingMode;
+                            spriteRenderer.receiveShadows = defaultReceiveShadows;
                             break;
                         case State.CanBuild:
                             spriteRenderer.color = canBuildColor;
+                            spriteRenderer.shadowCastingMode = ShadowCastingMode.Off;
+                            spriteRenderer.receiveShadows = false;
                             break;
                         case State.CannotBuild:
                             spriteRenderer.color = cannotBuildColor;
+                            spriteRenderer.shadowCastingMode = ShadowCastingMode.Off;
+                            spriteRenderer.receiveShadows = false;
                             break;
                     }
                 }
@@ -107,12 +122,20 @@ namespace MultiplayerARPG
             if (meshRenderer == null)
                 meshRenderer = GetComponent<MeshRenderer>();
             if (meshRenderer != null)
+            {
                 defaultMaterials = meshRenderer.sharedMaterials;
+                defaultShadowCastingMode = meshRenderer.shadowCastingMode;
+                defaultReceiveShadows = meshRenderer.receiveShadows;
+            }
 
             if (spriteRenderer == null)
                 spriteRenderer = GetComponent<SpriteRenderer>();
             if (spriteRenderer != null)
+            {
                 defaultColor = spriteRenderer.color;
+                defaultShadowCastingMode = spriteRenderer.shadowCastingMode;
+                defaultReceiveShadows = spriteRenderer.receiveShadows;
+            }
 
             if (tilemap == null)
                 tilemap = GetComponent<Tilemap>();
