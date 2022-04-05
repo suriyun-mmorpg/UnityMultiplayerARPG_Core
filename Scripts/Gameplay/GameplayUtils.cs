@@ -23,6 +23,15 @@ namespace MultiplayerARPG
             return centerPosition + Vector3.ClampMagnitude(offset, distance);
         }
 
+        public static Vector3 ClampPositionXZ(Vector3 centerPosition, Vector3 validatingPosition, float distance)
+        {
+            float y = centerPosition.y;
+            centerPosition.y = 0;
+            validatingPosition.y = 0;
+            Vector3 offset = validatingPosition - centerPosition;
+            return centerPosition + Vector3.ClampMagnitude(offset, distance) + (Vector3.up * y);
+        }
+
         public static Vector3 GetDirectionByAxes(Transform cameraTransform, float xAxis, float yAxis)
         {
             Vector3 aimDirection = Vector3.zero;
