@@ -328,6 +328,11 @@ namespace MultiplayerARPG
 
         public bool CanBuild()
         {
+            if (Builder == null)
+            {
+                // Builder destroyed?
+                return false;
+            }
             if (!IsPositionInBuildDistance(Builder.CacheTransform.position, CacheTransform.position))
             {
                 // Too far from buildiner?
