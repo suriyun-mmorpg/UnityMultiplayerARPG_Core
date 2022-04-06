@@ -171,5 +171,15 @@ namespace MultiplayerARPG
         {
             return Vector3.Distance(a.ClosestPoint(b), b);
         }
+
+        public static float GetPitchBetween(Vector3 origin, Vector3 target)
+        {
+            return GetPitchByDirection((target - origin).normalized);
+        }
+
+        public static float GetPitchByDirection(Vector3 direction)
+        {
+            return Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
+        }
     }
 }
