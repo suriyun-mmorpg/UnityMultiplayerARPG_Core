@@ -1744,6 +1744,11 @@ namespace MultiplayerARPG
 
         public override AimPosition UpdateBuildAimControls(Vector2 aimAxes, BuildingEntity prefab)
         {
+            if (PlayerCharacterEntity == null)
+            {
+                // Character destroyed, can't controls
+                return AimPosition.CreatePosition(Vector3.zero);
+            }
             // Instantiate constructing building
             if (ConstructingBuildingEntity == null)
             {
