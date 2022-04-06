@@ -33,6 +33,7 @@ namespace MultiplayerARPG
         {
             ConstructingBuildingEntity.BuildingArea = null;
             ConstructingBuildingEntity.HitSurface = false;
+            ConstructingBuildingEntity.HitSurfaceNormal = Vector3.down;
             BuildingEntity buildingEntity;
             BuildingArea buildingArea;
             Transform tempTransform;
@@ -83,6 +84,7 @@ namespace MultiplayerARPG
                     // Hit surface which is not building area or building entity
                     ConstructingBuildingEntity.BuildingArea = null;
                     ConstructingBuildingEntity.HitSurface = true;
+                    ConstructingBuildingEntity.HitSurfaceNormal = physicFunctions.GetRaycastNormal(tempCounter);
                     break;
                 }
 
@@ -94,6 +96,7 @@ namespace MultiplayerARPG
 
                 ConstructingBuildingEntity.BuildingArea = buildingArea;
                 ConstructingBuildingEntity.HitSurface = true;
+                ConstructingBuildingEntity.HitSurfaceNormal = physicFunctions.GetRaycastNormal(tempCounter);
                 return true;
             }
             ConstructingBuildingEntity.Position = GetBuildingPlacePosition(snappedPosition);

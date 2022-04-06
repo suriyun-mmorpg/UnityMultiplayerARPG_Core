@@ -1786,7 +1786,7 @@ namespace MultiplayerARPG
             if (!ConstructingBuildingEntity.HitSurface)
             {
                 // Find nearest grounded position
-                FindConstructingBuildingArea(new Ray(aimTargetPosition, Vector3.down), 100f);
+                FindConstructingBuildingArea(new Ray(aimTargetPosition, Vector3.down), 8f);
             }
             // Place constructing building
             if ((ConstructingBuildingEntity.BuildingArea && !ConstructingBuildingEntity.BuildingArea.snapBuildingObject) ||
@@ -1809,6 +1809,7 @@ namespace MultiplayerARPG
         {
             ConstructingBuildingEntity.BuildingArea = null;
             ConstructingBuildingEntity.HitSurface = false;
+            ConstructingBuildingEntity.HitSurfaceNormal = Vector3.down;
             int tempCount = PhysicUtils.SortedRaycastNonAlloc3D(ray.origin, ray.direction, raycasts, distance, CurrentGameInstance.GetBuildLayerMask());
             RaycastHit tempHitInfo;
             BuildingEntity buildingEntity;
@@ -1844,6 +1845,7 @@ namespace MultiplayerARPG
                     // Hit surface which is not building area or building entity
                     ConstructingBuildingEntity.BuildingArea = null;
                     ConstructingBuildingEntity.HitSurface = true;
+                    ConstructingBuildingEntity.HitSurfaceNormal = tempHitInfo.normal;
                     break;
                 }
 
@@ -1856,6 +1858,7 @@ namespace MultiplayerARPG
                 // Found building area which can construct the building
                 ConstructingBuildingEntity.BuildingArea = buildingArea;
                 ConstructingBuildingEntity.HitSurface = true;
+                ConstructingBuildingEntity.HitSurfaceNormal = tempHitInfo.normal;
                 break;
             }
             return tempCount;

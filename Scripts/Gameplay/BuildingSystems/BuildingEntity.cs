@@ -19,6 +19,16 @@ namespace MultiplayerARPG
         [Tooltip("If this is `TRUE` this building entity will be able to build on any surface. But when constructing, if player aimming on building area it will place on building area")]
         protected bool canBuildOnAnySurface = false;
 
+        [SerializeField]
+        [Tooltip("If this is `TRUE` this building entity will be able to build on limited surface hit normal angle (default up angle is 90)")]
+        protected bool limitSurfaceHitNormalAngle = false;
+
+        [SerializeField]
+        protected float limitSurfaceHitNormalAngleMin = 80f;
+
+        [SerializeField]
+        protected float limitSurfaceHitNormalAngleMax = 100f;
+
         [HideInInspector]
         [SerializeField]
         [Tooltip("Type of building you can set it as Foundation, Wall, Door anything as you wish. This is a part of `buildingTypes`, just keep it for backward compatibility.")]
@@ -59,6 +69,9 @@ namespace MultiplayerARPG
         protected UnityEvent onBuildingConstruct = new UnityEvent();
 
         public bool CanBuildOnAnySurface { get { return canBuildOnAnySurface; } }
+        public bool LimitSurfaceHitNormalAngle { get { return limitSurfaceHitNormalAngle; } }
+        public float LimitSurfaceHitNormalAngleMin { get { return limitSurfaceHitNormalAngleMin; } }
+        public float LimitSurfaceHitNormalAngleMax { get { return limitSurfaceHitNormalAngleMax; } }
         public List<string> BuildingTypes { get { return buildingTypes; } }
         public float BuildDistance { get { return buildDistance; } }
         public float BuildYRotation { get; set; }
@@ -74,6 +87,11 @@ namespace MultiplayerARPG
         /// Use this as reference for hit surface state while in build mode
         /// </summary>
         public bool HitSurface { get; set; }
+
+        /// <summary>
+        /// Use this as reference for hit surface normal while in build mode
+        /// </summary>
+        public Vector3 HitSurfaceNormal { get; set; }
 
         [Category("Sync Fields")]
         [SerializeField]
@@ -319,6 +337,12 @@ namespace MultiplayerARPG
             {
                 // Triggered something?
                 return false;
+            }
+            if (LimitSurfaceHitNormalAngle && CurrentGameInstance.DimensionType == DimensionType.Dimension3D)
+            {
+                float angle = GameplayUtils.GetPitchByDirection(HitSurfaceNormal);
+                if (angle < LimitSurfaceHitNormalAngleMin || angle > LimitSurfaceHitNormalAngleMax)
+                    return false;
             }
             if (BuildingArea != null)
             {
