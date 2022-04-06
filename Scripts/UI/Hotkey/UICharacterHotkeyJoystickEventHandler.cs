@@ -48,7 +48,7 @@ namespace MultiplayerARPG
             // Can dragging only 1 hotkey each time, so check with latest dragging hotkey
             // If it's not this hotkey then set dragging state to false 
             // To check joystick's started dragging state next time
-            if (UICharacterHotkeys.UsingHotkey != UICharacterHotkey)
+            if (UICharacterHotkeys.UsingHotkey == null || UICharacterHotkeys.UsingHotkey != UICharacterHotkey)
             {
                 IsDragging = false;
                 return;
