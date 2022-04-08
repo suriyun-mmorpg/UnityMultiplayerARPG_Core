@@ -51,6 +51,11 @@ namespace MultiplayerARPG
         [Header("Equipment Layer Settings")]
         [SerializeField]
         protected bool setEquipmentLayerFollowEntity = true;
+        public bool SetEquipmentLayerFollowEntity
+        {
+            get { return setEquipmentLayerFollowEntity; }
+            set { setEquipmentLayerFollowEntity = value; }
+        }
 
         [SerializeField]
         protected UnityLayer equipmentLayer;
@@ -177,12 +182,6 @@ namespace MultiplayerARPG
                 MainModel = this;
             else
                 CacheEntity = Manager.Entity;
-
-            // Set layers
-            if (setEffectLayerFollowEntity && CacheEntity != null)
-                EffectLayer = CacheEntity.gameObject.layer;
-            if (setEquipmentLayerFollowEntity && CacheEntity != null)
-                EquipmentLayer = CacheEntity.gameObject.layer;
 
             if (IsMainModel)
                 InitCacheData();
@@ -547,7 +546,10 @@ namespace MultiplayerARPG
                     tempEquipmentObject.transform.localEulerAngles = tempEquipmentModel.localEulerAngles;
                     tempEquipmentObject.transform.localScale = tempEquipmentModel.localScale.Equals(Vector3.zero) ? Vector3.one : tempEquipmentModel.localScale;
                     tempEquipmentObject.gameObject.SetActive(true);
-                    tempEquipmentObject.gameObject.SetLayerRecursively(EquipmentLayer, true);
+                    if (SetEquipmentLayerFollowEntity)
+                        tempEquipmentObject.gameObject.GetOrAddComponent<SetLayerFollowGameObject>((comp) => comp.source = CacheEntity.gameObject);
+                    else
+                        tempEquipmentObject.gameObject.SetLayerRecursively(EquipmentLayer, true);
                     tempEquipmentObject.RemoveComponentsInChildren<Collider>(false);
                     tempEquipmentEntity = tempEquipmentObject.GetComponent<BaseEquipmentEntity>();
                     AddingNewModel(tempEquipmentObject, tempContainer);

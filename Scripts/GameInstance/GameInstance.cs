@@ -220,6 +220,8 @@ namespace MultiplayerARPG
         public UnityTag harvestableTag = new UnityTag("HarvestableTag");
         [Tooltip("Layer for player character entities, this layer will be set to player character entities game object when instantiated")]
         public UnityLayer playerLayer = new UnityLayer(17);
+        [Tooltip("Layer for playing character entities, this layer will be set to playing character entities game object when instantiated")]
+        public UnityLayer playingLayer = new UnityLayer(17);
         [Tooltip("Layer for monster character entities, this layer will be set to monster character entities game object when instantiated")]
         public UnityLayer monsterLayer = new UnityLayer(18);
         [Tooltip("Layer for NPC entities, this layer will be set to NPC entities game object when instantiated")]
@@ -786,6 +788,7 @@ namespace MultiplayerARPG
         public bool IsDamageableLayer(int layer)
         {
             return layer == playerLayer ||
+                layer == playingLayer ||
                 layer == monsterLayer ||
                 layer == vehicleLayer ||
                 layer == buildingLayer ||
@@ -800,6 +803,7 @@ namespace MultiplayerARPG
         {
             int layerMask = 0;
             layerMask = layerMask | playerLayer.Mask;
+            layerMask = layerMask | playingLayer.Mask;
             layerMask = layerMask | monsterLayer.Mask;
             layerMask = layerMask | vehicleLayer.Mask;
             layerMask = layerMask | buildingLayer.Mask;
@@ -815,6 +819,7 @@ namespace MultiplayerARPG
         {
             int layerMask = 0;
             layerMask = layerMask | playerLayer.Mask;
+            layerMask = layerMask | playingLayer.Mask;
             layerMask = layerMask | monsterLayer.Mask;
             layerMask = layerMask | vehicleLayer.Mask;
             layerMask = layerMask | buildingLayer.Mask;
@@ -835,6 +840,7 @@ namespace MultiplayerARPG
             layerMask = layerMask | 1 << PhysicLayers.Water;
             layerMask = layerMask | 1 << PhysicLayers.IgnoreRaycast;
             layerMask = layerMask | playerLayer.Mask;
+            layerMask = layerMask | playingLayer.Mask;
             layerMask = layerMask | monsterLayer.Mask;
             layerMask = layerMask | npcLayer.Mask;
             layerMask = layerMask | vehicleLayer.Mask;
@@ -853,6 +859,7 @@ namespace MultiplayerARPG
             layerMask = layerMask | 1 << PhysicLayers.TransparentFX;
             layerMask = layerMask | 1 << PhysicLayers.Water;
             layerMask = layerMask | playerLayer.Mask;
+            layerMask = layerMask | playingLayer.Mask;
             layerMask = layerMask | monsterLayer.Mask;
             layerMask = layerMask | npcLayer.Mask;
             layerMask = layerMask | vehicleLayer.Mask;
@@ -871,6 +878,7 @@ namespace MultiplayerARPG
             layerMask = layerMask | 1 << PhysicLayers.TransparentFX;
             layerMask = layerMask | 1 << PhysicLayers.Water;
             layerMask = layerMask | playerLayer.Mask;
+            layerMask = layerMask | playingLayer.Mask;
             layerMask = layerMask | monsterLayer.Mask;
             layerMask = layerMask | npcLayer.Mask;
             layerMask = layerMask | vehicleLayer.Mask;
@@ -889,6 +897,7 @@ namespace MultiplayerARPG
             layerMask = layerMask | 1 << PhysicLayers.TransparentFX;
             layerMask = layerMask | 1 << PhysicLayers.Water;
             layerMask = layerMask | playerLayer.Mask;
+            layerMask = layerMask | playingLayer.Mask;
             layerMask = layerMask | monsterLayer.Mask;
             layerMask = layerMask | npcLayer.Mask;
             layerMask = layerMask | vehicleLayer.Mask;
@@ -909,6 +918,7 @@ namespace MultiplayerARPG
             layerMask = layerMask | 1 << PhysicLayers.TransparentFX;
             layerMask = layerMask | 1 << PhysicLayers.Water;
             layerMask = layerMask | playerLayer.Mask;
+            layerMask = layerMask | playingLayer.Mask;
             layerMask = layerMask | monsterLayer.Mask;
             layerMask = layerMask | npcLayer.Mask;
             layerMask = layerMask | vehicleLayer.Mask;

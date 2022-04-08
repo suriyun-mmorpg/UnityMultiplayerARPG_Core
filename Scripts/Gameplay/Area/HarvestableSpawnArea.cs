@@ -64,6 +64,7 @@ namespace MultiplayerARPG
                     foreach (Collider2D overlap in overlaps)
                     {
                         if (overlap.gameObject.layer == CurrentGameInstance.playerLayer ||
+                            overlap.gameObject.layer == CurrentGameInstance.playingLayer ||
                             overlap.gameObject.layer == CurrentGameInstance.monsterLayer ||
                             overlap.gameObject.layer == CurrentGameInstance.npcLayer ||
                             overlap.gameObject.layer == CurrentGameInstance.vehicleLayer ||
@@ -89,6 +90,7 @@ namespace MultiplayerARPG
                     foreach (Collider overlap in overlaps)
                     {
                         if (overlap.gameObject.layer == CurrentGameInstance.playerLayer ||
+                            overlap.gameObject.layer == CurrentGameInstance.playingLayer ||
                             overlap.gameObject.layer == CurrentGameInstance.monsterLayer ||
                             overlap.gameObject.layer == CurrentGameInstance.npcLayer ||
                             overlap.gameObject.layer == CurrentGameInstance.vehicleLayer ||

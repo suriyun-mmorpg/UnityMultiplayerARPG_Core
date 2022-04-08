@@ -87,6 +87,12 @@ namespace MultiplayerARPG
             gameObject.layer = CurrentGameInstance.playerLayer;
         }
 
+        public override void OnSetOwnerClient(bool isOwnerClient)
+        {
+            base.OnSetOwnerClient(isOwnerClient);
+            gameObject.layer = isOwnerClient ? CurrentGameInstance.playingLayer : CurrentGameInstance.playerLayer;
+        }
+
         public override void InitialRequiredComponents()
         {
             base.InitialRequiredComponents();
