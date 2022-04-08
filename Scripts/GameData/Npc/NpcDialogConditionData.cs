@@ -1,10 +1,7 @@
-﻿using UnityEngine;
-using System.Collections;
-
-namespace MultiplayerARPG
+﻿namespace MultiplayerARPG
 {
     [System.Serializable]
-    public class NpcDialogConditionData : SerializableCallback<IPlayerCharacterData, bool>
+    public class NpcDialogConditionData : SerializableCallback<string, bool>
     {
     }
 }

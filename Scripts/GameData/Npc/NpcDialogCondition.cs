@@ -52,7 +52,7 @@ namespace MultiplayerARPG
                 case NpcDialogConditionType.PlayerCharacterIs:
                     return character.DataId == playerCharacter.DataId;
                 case NpcDialogConditionType.Custom:
-                    return conditionData.Invoke(character);
+                    return conditionData.Invoke(character.Id);
             }
             return true;
         }
