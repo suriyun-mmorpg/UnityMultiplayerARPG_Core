@@ -129,12 +129,13 @@ namespace MultiplayerARPG
             return true;
         }
 
-        protected virtual bool FindAndApplyDamage(GameObject other)
+        protected virtual bool FindAndApplyDamage(GameObject other, HashSet<uint> alreadyHitObjects)
         {
             DamageableHitBox target;
-            if (FindTargetHitBox(other, out target))
+            if (FindTargetHitBox(other, out target) && !alreadyHitObjects.Contains(target.GetObjectId()))
             {
                 target.ReceiveDamageWithoutConditionCheck(CacheTransform.position, instigator, damageAmounts, weapon, skill, skillLevel, Random.Range(0, 255));
+                alreadyHitObjects.Add(target.GetObjectId());
                 return true;
             }
             return false;
@@ -160,18 +161,20 @@ namespace MultiplayerARPG
         {
             if (CurrentGameInstance.DimensionType == DimensionType.Dimension2D)
             {
+                HashSet<uint> alreadyHitObjects = new HashSet<uint>();
                 Collider2D[] colliders2D = Physics2D.OverlapCircleAll(CacheTransform.position, explodeDistance);
                 foreach (Collider2D collider in colliders2D)
                 {
-                    FindAndApplyDamage(collider.gameObject);
+                    FindAndApplyDamage(collider.gameObject, alreadyHitObjects);
                 }
             }
             else
             {
+                HashSet<uint> alreadyHitObjects = new HashSet<uint>();
                 Collider[] colliders = Physics.OverlapSphere(CacheTransform.position, explodeDistance);
                 foreach (Collider collider in colliders)
                 {
-                    FindAndApplyDamage(collider.gameObject);
+                    FindAndApplyDamage(collider.gameObject, alreadyHitObjects);
                 }
             }
         }
