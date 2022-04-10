@@ -15,7 +15,7 @@ namespace MultiplayerARPG
             if (type != AimPositionType.None)
                 writer.PutVector3(position);
             if (type == AimPositionType.Direction)
-                direction.Serialize(writer);
+                writer.Put(direction);
         }
 
         public void Deserialize(NetDataReader reader)
@@ -24,7 +24,7 @@ namespace MultiplayerARPG
             if (type != AimPositionType.None)
                 position = reader.GetVector3();
             if (type == AimPositionType.Direction)
-                direction.Deserialize(reader);
+                direction = reader.Get<DirectionVector3>();
         }
 
         public static AimPosition CreatePosition(Vector3 position)
