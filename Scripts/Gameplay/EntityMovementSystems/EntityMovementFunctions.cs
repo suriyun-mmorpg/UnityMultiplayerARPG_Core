@@ -192,7 +192,7 @@ namespace MultiplayerARPG
                 writer.Put((byte)extraMovementState);
                 if (inputState.Has(InputState.PositionChanged))
                     writer.PutVector2(position);
-                writer.PutValue(direction2D);
+                writer.Put(direction2D);
                 writer.PutPackedLong(movement.Entity.Manager.ServerTimestamp);
             });
         }
@@ -207,7 +207,7 @@ namespace MultiplayerARPG
                 writer.Put((byte)movement.MovementState);
                 writer.Put((byte)movement.ExtraMovementState);
                 writer.PutVector2(movement.Entity.CacheTransform.position);
-                writer.PutValue(movement.Direction2D);
+                writer.Put(movement.Direction2D);
                 writer.PutPackedLong(movement.Entity.Manager.ServerTimestamp);
             });
         }
@@ -221,7 +221,7 @@ namespace MultiplayerARPG
                 writer.Put((byte)movement.MovementState);
                 writer.Put((byte)movement.ExtraMovementState);
                 writer.PutVector2(movement.Entity.CacheTransform.position);
-                writer.PutValue(movement.Direction2D);
+                writer.Put(movement.Direction2D);
                 writer.PutPackedLong(movement.Entity.Manager.ServerTimestamp);
             });
         }
@@ -246,7 +246,7 @@ namespace MultiplayerARPG
             position = Vector3.zero;
             if (inputState.Has(InputState.PositionChanged))
                 position = reader.GetVector2();
-            direction2D = reader.GetValue<DirectionVector2>();
+            direction2D = reader.Get<DirectionVector2>();
             timestamp = reader.GetPackedLong();
         }
 
@@ -255,7 +255,7 @@ namespace MultiplayerARPG
             movementState = (MovementState)reader.GetByte();
             extraMovementState = (ExtraMovementState)reader.GetByte();
             position = reader.GetVector2();
-            direction2D = reader.GetValue<DirectionVector2>();
+            direction2D = reader.Get<DirectionVector2>();
             timestamp = reader.GetPackedLong();
         }
 
