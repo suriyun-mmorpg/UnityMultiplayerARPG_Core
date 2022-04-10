@@ -157,6 +157,16 @@ namespace MultiplayerARPG
 
         public TransformHistory GetTransformHistory(long currentTime, long rewindTime)
         {
+            if (histories.Count == 0)
+            {
+                return new TransformHistory()
+                {
+                    Time = currentTime,
+                    Position = transform.position,
+                    Rotation = transform.rotation,
+                    Bounds = Bounds,
+                };
+            }
             TransformHistory beforeRewind = default;
             TransformHistory afterRewind = default;
             for (int i = 0; i < histories.Count; ++i)
@@ -175,10 +185,10 @@ namespace MultiplayerARPG
                     // No stored history, so use current value
                     afterRewind = new TransformHistory()
                     {
+                        Time = currentTime,
                         Position = transform.position,
                         Rotation = transform.rotation,
                         Bounds = Bounds,
-                        Time = currentTime,
                     };
                 }
             }
