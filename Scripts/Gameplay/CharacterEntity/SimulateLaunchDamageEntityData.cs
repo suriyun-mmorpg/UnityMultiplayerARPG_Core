@@ -21,7 +21,7 @@ namespace MultiplayerARPG
                 writer.PutPackedInt(skillDataId);
                 writer.PutPackedShort(skillLevel);
             }
-            writer.PutValue(aimPosition);
+            writer.Put(aimPosition);
         }
 
         public void Deserialize(NetDataReader reader)
@@ -34,7 +34,7 @@ namespace MultiplayerARPG
                 skillDataId = reader.GetPackedInt();
                 skillLevel = reader.GetPackedShort();
             }
-            aimPosition = reader.GetValue<AimPosition>();
+            aimPosition = reader.Get<AimPosition>();
         }
 
         public BaseSkill GetSkill()
