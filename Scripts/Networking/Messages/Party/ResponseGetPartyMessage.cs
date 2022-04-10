@@ -10,10 +10,7 @@ namespace MultiplayerARPG
         {
             bool notNull = reader.GetBool();
             if (notNull)
-            {
-                party = new PartyData();
-                party.Deserialize(reader);
-            }
+                party = reader.Get<PartyData>();
         }
 
         public void Serialize(NetDataWriter writer)
@@ -21,7 +18,7 @@ namespace MultiplayerARPG
             bool notNull = party != null;
             writer.Put(notNull);
             if (notNull)
-                party.Serialize(writer);
+                writer.Put(party);
         }
     }
 }
