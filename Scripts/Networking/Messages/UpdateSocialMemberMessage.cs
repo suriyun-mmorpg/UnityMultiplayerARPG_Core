@@ -24,7 +24,7 @@ namespace MultiplayerARPG
             {
                 case UpdateType.Add:
                 case UpdateType.Update:
-                    character.Deserialize(reader);
+                    character = reader.Get<SocialCharacterData>();
                     break;
                 case UpdateType.Remove:
                     character.id = reader.GetString();
@@ -41,7 +41,7 @@ namespace MultiplayerARPG
             {
                 case UpdateType.Add:
                 case UpdateType.Update:
-                    character.Serialize(writer);
+                    writer.Put(character);
                     break;
                 case UpdateType.Remove:
                     writer.Put(character.id);
