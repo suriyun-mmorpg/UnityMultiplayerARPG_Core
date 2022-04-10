@@ -23,16 +23,14 @@ namespace MultiplayerARPG
         {
             writer.Put((byte)storageType);
             writer.Put(storageOwnerId);
-            characterItem.Serialize(writer);
+            writer.Put(characterItem);
         }
 
         public void Deserialize(NetDataReader reader)
         {
             storageType = (StorageType)reader.GetByte();
             storageOwnerId = reader.GetString();
-            CharacterItem tempCharacterItem = new CharacterItem();
-            tempCharacterItem.Deserialize(reader);
-            characterItem = tempCharacterItem;
+            characterItem = reader.Get<CharacterItem>();
         }
     }
 
