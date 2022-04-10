@@ -26,12 +26,12 @@ namespace MultiplayerARPG
 
         public static void SendAddSocialMember(this LiteNetLibManager.LiteNetLibServer server, long connectionId, ushort msgType, int id, string characterId, string characterName, int dataId, short level)
         {
-            server.SendPacket(connectionId, SOCIAL_MSG_DATA_CHANNEL, DeliveryMethod.ReliableOrdered, msgType, (writer) => writer.PutValue(MakeAddSocialMember(id, characterId, characterName, dataId, level)));
+            server.SendPacket(connectionId, SOCIAL_MSG_DATA_CHANNEL, DeliveryMethod.ReliableOrdered, msgType, (writer) => writer.Put(MakeAddSocialMember(id, characterId, characterName, dataId, level)));
         }
 
         public static void SendAddSocialMember(this LiteNetLibManager.LiteNetLibClient client, ushort msgType, int id, string characterId, string characterName, int dataId, short level)
         {
-            client.SendPacket(SOCIAL_MSG_DATA_CHANNEL, DeliveryMethod.ReliableOrdered, msgType, (writer) => writer.PutValue(MakeAddSocialMember(id, characterId, characterName, dataId, level)));
+            client.SendPacket(SOCIAL_MSG_DATA_CHANNEL, DeliveryMethod.ReliableOrdered, msgType, (writer) => writer.Put(MakeAddSocialMember(id, characterId, characterName, dataId, level)));
         }
 
         public static UpdateSocialMemberMessage MakeUpdateSocialMember(int id, SocialCharacterData member)
@@ -46,12 +46,12 @@ namespace MultiplayerARPG
 
         public static void SendUpdateSocialMember(this LiteNetLibManager.LiteNetLibServer server, long connectionId, ushort msgType, int id, SocialCharacterData member)
         {
-            server.SendPacket(connectionId, SOCIAL_MSG_DATA_CHANNEL, DeliveryMethod.ReliableOrdered, msgType, (writer) => writer.PutValue(MakeUpdateSocialMember(id, member)));
+            server.SendPacket(connectionId, SOCIAL_MSG_DATA_CHANNEL, DeliveryMethod.ReliableOrdered, msgType, (writer) => writer.Put(MakeUpdateSocialMember(id, member)));
         }
 
         public static void SendUpdateSocialMember(this LiteNetLibManager.LiteNetLibClient client, ushort msgType, int id, SocialCharacterData member)
         {
-            client.SendPacket(SOCIAL_MSG_DATA_CHANNEL, DeliveryMethod.ReliableOrdered, msgType, (writer) => writer.PutValue(MakeUpdateSocialMember(id, member)));
+            client.SendPacket(SOCIAL_MSG_DATA_CHANNEL, DeliveryMethod.ReliableOrdered, msgType, (writer) => writer.Put(MakeUpdateSocialMember(id, member)));
         }
 
         public static UpdateSocialMemberMessage MakeRemoveSocialMember(int id, string characterId)
@@ -66,12 +66,12 @@ namespace MultiplayerARPG
 
         public static void SendRemoveSocialMember(this LiteNetLibManager.LiteNetLibServer server, long connectionId, ushort msgType, int id, string characterId)
         {
-            server.SendPacket(connectionId, SOCIAL_MSG_DATA_CHANNEL, DeliveryMethod.ReliableOrdered, msgType, (writer) => writer.PutValue(MakeRemoveSocialMember(id, characterId)));
+            server.SendPacket(connectionId, SOCIAL_MSG_DATA_CHANNEL, DeliveryMethod.ReliableOrdered, msgType, (writer) => writer.Put(MakeRemoveSocialMember(id, characterId)));
         }
 
         public static void SendRemoveSocialMember(this LiteNetLibManager.LiteNetLibClient client, ushort msgType, int id, string characterId)
         {
-            client.SendPacket(SOCIAL_MSG_DATA_CHANNEL, DeliveryMethod.ReliableOrdered, msgType, (writer) => writer.PutValue(MakeRemoveSocialMember(id, characterId)));
+            client.SendPacket(SOCIAL_MSG_DATA_CHANNEL, DeliveryMethod.ReliableOrdered, msgType, (writer) => writer.Put(MakeRemoveSocialMember(id, characterId)));
         }
 
         public static UpdateSocialMemberMessage MakeClearSocialMember(int id)
@@ -85,12 +85,12 @@ namespace MultiplayerARPG
 
         public static void SendClearSocialMember(this LiteNetLibManager.LiteNetLibServer server, long connectionId, ushort msgType, int id)
         {
-            server.SendPacket(connectionId, SOCIAL_MSG_DATA_CHANNEL, DeliveryMethod.ReliableOrdered, msgType, (writer) => writer.PutValue(MakeClearSocialMember(id)));
+            server.SendPacket(connectionId, SOCIAL_MSG_DATA_CHANNEL, DeliveryMethod.ReliableOrdered, msgType, (writer) => writer.Put(MakeClearSocialMember(id)));
         }
 
         public static void SendClearSocialMember(this LiteNetLibManager.LiteNetLibClient client, ushort msgType, int id)
         {
-            client.SendPacket(SOCIAL_MSG_DATA_CHANNEL, DeliveryMethod.ReliableOrdered, msgType, (writer) => writer.PutValue(MakeClearSocialMember(id)));
+            client.SendPacket(SOCIAL_MSG_DATA_CHANNEL, DeliveryMethod.ReliableOrdered, msgType, (writer) => writer.Put(MakeClearSocialMember(id)));
         }
 
         public static UpdateSocialMembersMessage MakeSocialMembers(List<SocialCharacterData> members)
@@ -103,12 +103,12 @@ namespace MultiplayerARPG
 
         public static void SendSocialMembers(this LiteNetLibManager.LiteNetLibServer server, long connectionId, ushort msgType, List<SocialCharacterData> members)
         {
-            server.SendPacket(connectionId, SOCIAL_MSG_DATA_CHANNEL, DeliveryMethod.ReliableOrdered, msgType, (writer) => writer.PutValue(MakeSocialMembers(members)));
+            server.SendPacket(connectionId, SOCIAL_MSG_DATA_CHANNEL, DeliveryMethod.ReliableOrdered, msgType, (writer) => writer.Put(MakeSocialMembers(members)));
         }
 
         public static void SendSocialMembers(this LiteNetLibManager.LiteNetLibClient client, ushort msgType, List<SocialCharacterData> members)
         {
-            client.SendPacket(SOCIAL_MSG_DATA_CHANNEL, DeliveryMethod.ReliableOrdered, msgType, (writer) => writer.PutValue(MakeSocialMembers(members)));
+            client.SendPacket(SOCIAL_MSG_DATA_CHANNEL, DeliveryMethod.ReliableOrdered, msgType, (writer) => writer.Put(MakeSocialMembers(members)));
         }
 
         public static UpdatePartyMessage MakeCreateParty(int id, bool shareExp, bool shareItem, string characterId)
@@ -125,12 +125,12 @@ namespace MultiplayerARPG
 
         public static void SendCreateParty(this LiteNetLibManager.LiteNetLibServer server, long connectionId, ushort msgType, int id, bool shareExp, bool shareItem, string characterId)
         {
-            server.SendPacket(connectionId, SOCIAL_MSG_DATA_CHANNEL, DeliveryMethod.ReliableOrdered, msgType, (writer) => writer.PutValue(MakeCreateParty(id, shareExp, shareItem, characterId)));
+            server.SendPacket(connectionId, SOCIAL_MSG_DATA_CHANNEL, DeliveryMethod.ReliableOrdered, msgType, (writer) => writer.Put(MakeCreateParty(id, shareExp, shareItem, characterId)));
         }
 
         public static void SendCreateParty(this LiteNetLibManager.LiteNetLibClient client, ushort msgType, int id, bool shareExp, bool shareItem, string characterId)
         {
-            client.SendPacket(SOCIAL_MSG_DATA_CHANNEL, DeliveryMethod.ReliableOrdered, msgType, (writer) => writer.PutValue(MakeCreateParty(id, shareExp, shareItem, characterId)));
+            client.SendPacket(SOCIAL_MSG_DATA_CHANNEL, DeliveryMethod.ReliableOrdered, msgType, (writer) => writer.Put(MakeCreateParty(id, shareExp, shareItem, characterId)));
         }
 
         public static UpdatePartyMessage MakeChangePartyLeader(int id, string characterId)
@@ -145,12 +145,12 @@ namespace MultiplayerARPG
 
         public static void SendChangePartyLeader(this LiteNetLibManager.LiteNetLibServer server, long connectionId, ushort msgType, int id, string characterId)
         {
-            server.SendPacket(connectionId, SOCIAL_MSG_DATA_CHANNEL, DeliveryMethod.ReliableOrdered, msgType, (writer) => writer.PutValue(MakeChangePartyLeader(id, characterId)));
+            server.SendPacket(connectionId, SOCIAL_MSG_DATA_CHANNEL, DeliveryMethod.ReliableOrdered, msgType, (writer) => writer.Put(MakeChangePartyLeader(id, characterId)));
         }
 
         public static void SendChangePartyLeader(this LiteNetLibManager.LiteNetLibClient client, ushort msgType, int id, string characterId)
         {
-            client.SendPacket(SOCIAL_MSG_DATA_CHANNEL, DeliveryMethod.ReliableOrdered, msgType, (writer) => writer.PutValue(MakeChangePartyLeader(id, characterId)));
+            client.SendPacket(SOCIAL_MSG_DATA_CHANNEL, DeliveryMethod.ReliableOrdered, msgType, (writer) => writer.Put(MakeChangePartyLeader(id, characterId)));
         }
 
         public static UpdatePartyMessage MakePartySetting(int id, bool shareExp, bool shareItem)
@@ -166,12 +166,12 @@ namespace MultiplayerARPG
 
         public static void SendPartySetting(this LiteNetLibManager.LiteNetLibServer server, long connectionId, ushort msgType, int id, bool shareExp, bool shareItem)
         {
-            server.SendPacket(connectionId, SOCIAL_MSG_DATA_CHANNEL, DeliveryMethod.ReliableOrdered, msgType, (writer) => writer.PutValue(MakePartySetting(id, shareExp, shareItem)));
+            server.SendPacket(connectionId, SOCIAL_MSG_DATA_CHANNEL, DeliveryMethod.ReliableOrdered, msgType, (writer) => writer.Put(MakePartySetting(id, shareExp, shareItem)));
         }
 
         public static void SendPartySetting(this LiteNetLibManager.LiteNetLibClient client, ushort msgType, int id, bool shareExp, bool shareItem)
         {
-            client.SendPacket(SOCIAL_MSG_DATA_CHANNEL, DeliveryMethod.ReliableOrdered, msgType, (writer) => writer.PutValue(MakePartySetting(id, shareExp, shareItem)));
+            client.SendPacket(SOCIAL_MSG_DATA_CHANNEL, DeliveryMethod.ReliableOrdered, msgType, (writer) => writer.Put(MakePartySetting(id, shareExp, shareItem)));
         }
 
         public static UpdatePartyMessage MakePartyTerminate(int id)
@@ -185,12 +185,12 @@ namespace MultiplayerARPG
 
         public static void SendPartyTerminate(this LiteNetLibManager.LiteNetLibServer server, long connectionId, ushort msgType, int id)
         {
-            server.SendPacket(connectionId, SOCIAL_MSG_DATA_CHANNEL, DeliveryMethod.ReliableOrdered, msgType, (writer) => writer.PutValue(MakePartyTerminate(id)));
+            server.SendPacket(connectionId, SOCIAL_MSG_DATA_CHANNEL, DeliveryMethod.ReliableOrdered, msgType, (writer) => writer.Put(MakePartyTerminate(id)));
         }
 
         public static void SendPartyTerminate(this LiteNetLibManager.LiteNetLibClient client, ushort msgType, int id)
         {
-            client.SendPacket(SOCIAL_MSG_DATA_CHANNEL, DeliveryMethod.ReliableOrdered, msgType, (writer) => writer.PutValue(MakePartyTerminate(id)));
+            client.SendPacket(SOCIAL_MSG_DATA_CHANNEL, DeliveryMethod.ReliableOrdered, msgType, (writer) => writer.Put(MakePartyTerminate(id)));
         }
 
         public static UpdateGuildMessage MakeCreateGuild(int id, string guildName, string characterId)
@@ -206,12 +206,12 @@ namespace MultiplayerARPG
 
         public static void SendCreateGuild(this LiteNetLibManager.LiteNetLibServer server, long connectionId, ushort msgType, int id, string guildName, string characterId)
         {
-            server.SendPacket(connectionId, SOCIAL_MSG_DATA_CHANNEL, DeliveryMethod.ReliableOrdered, msgType, (writer) => writer.PutValue(MakeCreateGuild(id, guildName, characterId)));
+            server.SendPacket(connectionId, SOCIAL_MSG_DATA_CHANNEL, DeliveryMethod.ReliableOrdered, msgType, (writer) => writer.Put(MakeCreateGuild(id, guildName, characterId)));
         }
 
         public static void SendCreateGuild(this LiteNetLibManager.LiteNetLibClient client, ushort msgType, int id, string guildName, string characterId)
         {
-            client.SendPacket(SOCIAL_MSG_DATA_CHANNEL, DeliveryMethod.ReliableOrdered, msgType, (writer) => writer.PutValue(MakeCreateGuild(id, guildName, characterId)));
+            client.SendPacket(SOCIAL_MSG_DATA_CHANNEL, DeliveryMethod.ReliableOrdered, msgType, (writer) => writer.Put(MakeCreateGuild(id, guildName, characterId)));
         }
 
         public static UpdateGuildMessage MakeChangeGuildLeader(int id, string characterId)
@@ -226,12 +226,12 @@ namespace MultiplayerARPG
 
         public static void SendChangeGuildLeader(this LiteNetLibManager.LiteNetLibServer server, long connectionId, ushort msgType, int id, string characterId)
         {
-            server.SendPacket(connectionId, SOCIAL_MSG_DATA_CHANNEL, DeliveryMethod.ReliableOrdered, msgType, (writer) => writer.PutValue(MakeChangeGuildLeader(id, characterId)));
+            server.SendPacket(connectionId, SOCIAL_MSG_DATA_CHANNEL, DeliveryMethod.ReliableOrdered, msgType, (writer) => writer.Put(MakeChangeGuildLeader(id, characterId)));
         }
 
         public static void SendChangeGuildLeader(this LiteNetLibManager.LiteNetLibClient client, ushort msgType, int id, string characterId)
         {
-            client.SendPacket(SOCIAL_MSG_DATA_CHANNEL, DeliveryMethod.ReliableOrdered, msgType, (writer) => writer.PutValue(MakeChangeGuildLeader(id, characterId)));
+            client.SendPacket(SOCIAL_MSG_DATA_CHANNEL, DeliveryMethod.ReliableOrdered, msgType, (writer) => writer.Put(MakeChangeGuildLeader(id, characterId)));
         }
 
         public static UpdateGuildMessage MakeSetGuildMessage(int id, string message)
@@ -246,12 +246,12 @@ namespace MultiplayerARPG
 
         public static void SendSetGuildMessage(this LiteNetLibManager.LiteNetLibServer server, long connectionId, ushort msgType, int id, string message)
         {
-            server.SendPacket(connectionId, SOCIAL_MSG_DATA_CHANNEL, DeliveryMethod.ReliableOrdered, msgType, (writer) => writer.PutValue(MakeSetGuildMessage(id, message)));
+            server.SendPacket(connectionId, SOCIAL_MSG_DATA_CHANNEL, DeliveryMethod.ReliableOrdered, msgType, (writer) => writer.Put(MakeSetGuildMessage(id, message)));
         }
 
         public static void SendSetGuildMessage(this LiteNetLibManager.LiteNetLibClient client, ushort msgType, int id, string message)
         {
-            client.SendPacket(SOCIAL_MSG_DATA_CHANNEL, DeliveryMethod.ReliableOrdered, msgType, (writer) => writer.PutValue(MakeSetGuildMessage(id, message)));
+            client.SendPacket(SOCIAL_MSG_DATA_CHANNEL, DeliveryMethod.ReliableOrdered, msgType, (writer) => writer.Put(MakeSetGuildMessage(id, message)));
         }
 
         public static UpdateGuildMessage MakeSetGuildMessage2(int id, string message)
@@ -266,12 +266,12 @@ namespace MultiplayerARPG
 
         public static void SendSetGuildMessage2(this LiteNetLibManager.LiteNetLibServer server, long connectionId, ushort msgType, int id, string message)
         {
-            server.SendPacket(connectionId, SOCIAL_MSG_DATA_CHANNEL, DeliveryMethod.ReliableOrdered, msgType, (writer) => writer.PutValue(MakeSetGuildMessage2(id, message)));
+            server.SendPacket(connectionId, SOCIAL_MSG_DATA_CHANNEL, DeliveryMethod.ReliableOrdered, msgType, (writer) => writer.Put(MakeSetGuildMessage2(id, message)));
         }
 
         public static void SendSetGuildMessage2(this LiteNetLibManager.LiteNetLibClient client, ushort msgType, int id, string message)
         {
-            client.SendPacket(SOCIAL_MSG_DATA_CHANNEL, DeliveryMethod.ReliableOrdered, msgType, (writer) => writer.PutValue(MakeSetGuildMessage2(id, message)));
+            client.SendPacket(SOCIAL_MSG_DATA_CHANNEL, DeliveryMethod.ReliableOrdered, msgType, (writer) => writer.Put(MakeSetGuildMessage2(id, message)));
         }
 
         public static UpdateGuildMessage MakeSetGuildRole(int id, byte guildRole, string roleName, bool canInvite, bool canKick, byte shareExpPercentage)
@@ -290,12 +290,12 @@ namespace MultiplayerARPG
 
         public static void SendSetGuildRole(this LiteNetLibManager.LiteNetLibServer server, long connectionId, ushort msgType, int id, byte guildRole, string roleName, bool canInvite, bool canKick, byte shareExpPercentage)
         {
-            server.SendPacket(connectionId, SOCIAL_MSG_DATA_CHANNEL, DeliveryMethod.ReliableOrdered, msgType, (writer) => writer.PutValue(MakeSetGuildRole(id, guildRole, roleName, canInvite, canKick, shareExpPercentage)));
+            server.SendPacket(connectionId, SOCIAL_MSG_DATA_CHANNEL, DeliveryMethod.ReliableOrdered, msgType, (writer) => writer.Put(MakeSetGuildRole(id, guildRole, roleName, canInvite, canKick, shareExpPercentage)));
         }
 
         public static void SendSetGuildRole(this LiteNetLibManager.LiteNetLibClient client, ushort msgType, int id, byte guildRole, string roleName, bool canInvite, bool canKick, byte shareExpPercentage)
         {
-            client.SendPacket(SOCIAL_MSG_DATA_CHANNEL, DeliveryMethod.ReliableOrdered, msgType, (writer) => writer.PutValue(MakeSetGuildRole(id, guildRole, roleName, canInvite, canKick, shareExpPercentage)));
+            client.SendPacket(SOCIAL_MSG_DATA_CHANNEL, DeliveryMethod.ReliableOrdered, msgType, (writer) => writer.Put(MakeSetGuildRole(id, guildRole, roleName, canInvite, canKick, shareExpPercentage)));
         }
 
         public static UpdateGuildMessage MakeSetGuildMemberRole(int id, string characterId, byte guildRole)
@@ -311,12 +311,12 @@ namespace MultiplayerARPG
 
         public static void SendSetGuildMemberRole(this LiteNetLibManager.LiteNetLibServer server, long connectionId, ushort msgType, int id, string characterId, byte guildRole)
         {
-            server.SendPacket(connectionId, SOCIAL_MSG_DATA_CHANNEL, DeliveryMethod.ReliableOrdered, msgType, (writer) => writer.PutValue(MakeSetGuildMemberRole(id, characterId, guildRole)));
+            server.SendPacket(connectionId, SOCIAL_MSG_DATA_CHANNEL, DeliveryMethod.ReliableOrdered, msgType, (writer) => writer.Put(MakeSetGuildMemberRole(id, characterId, guildRole)));
         }
 
         public static void SendSetGuildMemberRole(this LiteNetLibManager.LiteNetLibClient client, ushort msgType, int id, string characterId, byte guildRole)
         {
-            client.SendPacket(SOCIAL_MSG_DATA_CHANNEL, DeliveryMethod.ReliableOrdered, msgType, (writer) => writer.PutValue(MakeSetGuildMemberRole(id, characterId, guildRole)));
+            client.SendPacket(SOCIAL_MSG_DATA_CHANNEL, DeliveryMethod.ReliableOrdered, msgType, (writer) => writer.Put(MakeSetGuildMemberRole(id, characterId, guildRole)));
         }
 
         public static UpdateGuildMessage MakeGuildTerminate(int id)
@@ -330,12 +330,12 @@ namespace MultiplayerARPG
 
         public static void SendGuildTerminate(this LiteNetLibManager.LiteNetLibServer server, long connectionId, ushort msgType, int id)
         {
-            server.SendPacket(connectionId, SOCIAL_MSG_DATA_CHANNEL, DeliveryMethod.ReliableOrdered, msgType, (writer) => writer.PutValue(MakeGuildTerminate(id)));
+            server.SendPacket(connectionId, SOCIAL_MSG_DATA_CHANNEL, DeliveryMethod.ReliableOrdered, msgType, (writer) => writer.Put(MakeGuildTerminate(id)));
         }
 
         public static void SendGuildTerminate(this LiteNetLibManager.LiteNetLibClient client, ushort msgType, int id)
         {
-            client.SendPacket(SOCIAL_MSG_DATA_CHANNEL, DeliveryMethod.ReliableOrdered, msgType, (writer) => writer.PutValue(MakeGuildTerminate(id)));
+            client.SendPacket(SOCIAL_MSG_DATA_CHANNEL, DeliveryMethod.ReliableOrdered, msgType, (writer) => writer.Put(MakeGuildTerminate(id)));
         }
 
         public static UpdateGuildMessage MakeSetGuildLevelExpSkillPoint(int id, short level, int exp, short skillPoint)
@@ -352,12 +352,12 @@ namespace MultiplayerARPG
 
         public static void SendSetGuildLevelExpSkillPoint(this LiteNetLibManager.LiteNetLibServer server, long connectionId, ushort msgType, int id, short level, int exp, short skillPoint)
         {
-            server.SendPacket(connectionId, SOCIAL_MSG_DATA_CHANNEL, DeliveryMethod.ReliableOrdered, msgType, (writer) => writer.PutValue(MakeSetGuildLevelExpSkillPoint(id, level, exp, skillPoint)));
+            server.SendPacket(connectionId, SOCIAL_MSG_DATA_CHANNEL, DeliveryMethod.ReliableOrdered, msgType, (writer) => writer.Put(MakeSetGuildLevelExpSkillPoint(id, level, exp, skillPoint)));
         }
 
         public static void SendSetGuildLevelExpSkillPoint(this LiteNetLibManager.LiteNetLibClient client, ushort msgType, int id, short level, int exp, short skillPoint)
         {
-            client.SendPacket(SOCIAL_MSG_DATA_CHANNEL, DeliveryMethod.ReliableOrdered, msgType, (writer) => writer.PutValue(MakeSetGuildLevelExpSkillPoint(id, level, exp, skillPoint)));
+            client.SendPacket(SOCIAL_MSG_DATA_CHANNEL, DeliveryMethod.ReliableOrdered, msgType, (writer) => writer.Put(MakeSetGuildLevelExpSkillPoint(id, level, exp, skillPoint)));
         }
 
         public static UpdateGuildMessage MakeSetGuildSkillLevel(int id, int dataId, short level)
@@ -373,12 +373,12 @@ namespace MultiplayerARPG
 
         public static void SendSetGuildSkillLevel(this LiteNetLibManager.LiteNetLibServer server, long connectionId, ushort msgType, int id, int dataId, short level)
         {
-            server.SendPacket(connectionId, SOCIAL_MSG_DATA_CHANNEL, DeliveryMethod.ReliableOrdered, msgType, (writer) => writer.PutValue(MakeSetGuildSkillLevel(id, dataId, level)));
+            server.SendPacket(connectionId, SOCIAL_MSG_DATA_CHANNEL, DeliveryMethod.ReliableOrdered, msgType, (writer) => writer.Put(MakeSetGuildSkillLevel(id, dataId, level)));
         }
 
         public static void SendSetGuildSkillLevel(this LiteNetLibManager.LiteNetLibClient client, ushort msgType, int id, int dataId, short level)
         {
-            client.SendPacket(SOCIAL_MSG_DATA_CHANNEL, DeliveryMethod.ReliableOrdered, msgType, (writer) => writer.PutValue(MakeSetGuildSkillLevel(id, dataId, level)));
+            client.SendPacket(SOCIAL_MSG_DATA_CHANNEL, DeliveryMethod.ReliableOrdered, msgType, (writer) => writer.Put(MakeSetGuildSkillLevel(id, dataId, level)));
         }
 
         public static UpdateGuildMessage MakeSetGuildGold(int id, int gold)
@@ -393,12 +393,12 @@ namespace MultiplayerARPG
 
         public static void SendSetGuildGold(this LiteNetLibManager.LiteNetLibServer server, long connectionId, ushort msgType, int id, int gold)
         {
-            server.SendPacket(connectionId, SOCIAL_MSG_DATA_CHANNEL, DeliveryMethod.ReliableOrdered, msgType, (writer) => writer.PutValue(MakeSetGuildGold(id, gold)));
+            server.SendPacket(connectionId, SOCIAL_MSG_DATA_CHANNEL, DeliveryMethod.ReliableOrdered, msgType, (writer) => writer.Put(MakeSetGuildGold(id, gold)));
         }
 
         public static void SendSetGuildGold(this LiteNetLibManager.LiteNetLibClient client, ushort msgType, int id, int gold)
         {
-            client.SendPacket(SOCIAL_MSG_DATA_CHANNEL, DeliveryMethod.ReliableOrdered, msgType, (writer) => writer.PutValue(MakeSetGuildGold(id, gold)));
+            client.SendPacket(SOCIAL_MSG_DATA_CHANNEL, DeliveryMethod.ReliableOrdered, msgType, (writer) => writer.Put(MakeSetGuildGold(id, gold)));
         }
 
         public static UpdateGuildMessage MakeSetGuildScore(int id, int score)
@@ -413,12 +413,12 @@ namespace MultiplayerARPG
 
         public static void SendSetGuildScore(this LiteNetLibManager.LiteNetLibServer server, long connectionId, ushort msgType, int id, int score)
         {
-            server.SendPacket(connectionId, SOCIAL_MSG_DATA_CHANNEL, DeliveryMethod.ReliableOrdered, msgType, (writer) => writer.PutValue(MakeSetGuildScore(id, score)));
+            server.SendPacket(connectionId, SOCIAL_MSG_DATA_CHANNEL, DeliveryMethod.ReliableOrdered, msgType, (writer) => writer.Put(MakeSetGuildScore(id, score)));
         }
 
         public static void SendSetGuildScore(this LiteNetLibManager.LiteNetLibClient client, ushort msgType, int id, int score)
         {
-            client.SendPacket(SOCIAL_MSG_DATA_CHANNEL, DeliveryMethod.ReliableOrdered, msgType, (writer) => writer.PutValue(MakeSetGuildScore(id, score)));
+            client.SendPacket(SOCIAL_MSG_DATA_CHANNEL, DeliveryMethod.ReliableOrdered, msgType, (writer) => writer.Put(MakeSetGuildScore(id, score)));
         }
 
         public static UpdateGuildMessage MakeSetGuildOptions(int id, string options)
@@ -433,12 +433,12 @@ namespace MultiplayerARPG
 
         public static void SendSetGuildOptions(this LiteNetLibManager.LiteNetLibServer server, long connectionId, ushort msgType, int id, string options)
         {
-            server.SendPacket(connectionId, SOCIAL_MSG_DATA_CHANNEL, DeliveryMethod.ReliableOrdered, msgType, (writer) => writer.PutValue(MakeSetGuildOptions(id, options)));
+            server.SendPacket(connectionId, SOCIAL_MSG_DATA_CHANNEL, DeliveryMethod.ReliableOrdered, msgType, (writer) => writer.Put(MakeSetGuildOptions(id, options)));
         }
 
         public static void SendSetGuildOptions(this LiteNetLibManager.LiteNetLibClient client, ushort msgType, int id, string options)
         {
-            client.SendPacket(SOCIAL_MSG_DATA_CHANNEL, DeliveryMethod.ReliableOrdered, msgType, (writer) => writer.PutValue(MakeSetGuildOptions(id, options)));
+            client.SendPacket(SOCIAL_MSG_DATA_CHANNEL, DeliveryMethod.ReliableOrdered, msgType, (writer) => writer.Put(MakeSetGuildOptions(id, options)));
         }
 
         public static UpdateGuildMessage MakeSetGuildAutoAcceptRequests(int id, bool autoAcceptRequests)
@@ -453,12 +453,12 @@ namespace MultiplayerARPG
 
         public static void SendSetGuildAutoAcceptRequests(this LiteNetLibManager.LiteNetLibServer server, long connectionId, ushort msgType, int id, bool autoAcceptRequests)
         {
-            server.SendPacket(connectionId, SOCIAL_MSG_DATA_CHANNEL, DeliveryMethod.ReliableOrdered, msgType, (writer) => writer.PutValue(MakeSetGuildAutoAcceptRequests(id, autoAcceptRequests)));
+            server.SendPacket(connectionId, SOCIAL_MSG_DATA_CHANNEL, DeliveryMethod.ReliableOrdered, msgType, (writer) => writer.Put(MakeSetGuildAutoAcceptRequests(id, autoAcceptRequests)));
         }
 
         public static void SendSetGuildAutoAcceptRequests(this LiteNetLibManager.LiteNetLibClient client, ushort msgType, int id, bool autoAcceptRequests)
         {
-            client.SendPacket(SOCIAL_MSG_DATA_CHANNEL, DeliveryMethod.ReliableOrdered, msgType, (writer) => writer.PutValue(MakeSetGuildAutoAcceptRequests(id, autoAcceptRequests)));
+            client.SendPacket(SOCIAL_MSG_DATA_CHANNEL, DeliveryMethod.ReliableOrdered, msgType, (writer) => writer.Put(MakeSetGuildAutoAcceptRequests(id, autoAcceptRequests)));
         }
 
         public static UpdateGuildMessage MakeSetGuildRank(int id, int rank)
@@ -473,12 +473,12 @@ namespace MultiplayerARPG
 
         public static void SendSetGuildRank(this LiteNetLibManager.LiteNetLibServer server, long connectionId, ushort msgType, int id, int rank)
         {
-            server.SendPacket(connectionId, SOCIAL_MSG_DATA_CHANNEL, DeliveryMethod.ReliableOrdered, msgType, (writer) => writer.PutValue(MakeSetGuildRank(id, rank)));
+            server.SendPacket(connectionId, SOCIAL_MSG_DATA_CHANNEL, DeliveryMethod.ReliableOrdered, msgType, (writer) => writer.Put(MakeSetGuildRank(id, rank)));
         }
 
         public static void SendSetGuildRank(this LiteNetLibManager.LiteNetLibClient client, ushort msgType, int id, int rank)
         {
-            client.SendPacket(SOCIAL_MSG_DATA_CHANNEL, DeliveryMethod.ReliableOrdered, msgType, (writer) => writer.PutValue(MakeSetGuildRank(id, rank)));
+            client.SendPacket(SOCIAL_MSG_DATA_CHANNEL, DeliveryMethod.ReliableOrdered, msgType, (writer) => writer.Put(MakeSetGuildRank(id, rank)));
         }
     }
 }
