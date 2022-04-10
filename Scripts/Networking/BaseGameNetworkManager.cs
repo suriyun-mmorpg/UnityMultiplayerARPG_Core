@@ -552,7 +552,7 @@ namespace MultiplayerARPG
         {
             BasePlayerCharacterEntity gameEntity;
             if (ServerUserHandlers.TryGetPlayerCharacter(messageHandler.ConnectionId, out gameEntity))
-                HitRegistrationManager.Register(gameEntity, messageHandler.Reader.GetValue<HitRegisterMessage>());
+                HitRegistrationManager.Register(gameEntity, messageHandler.Reader.Get<HitRegisterMessage>());
         }
 
         public virtual void InitPrefabs()
@@ -961,14 +961,13 @@ namespace MultiplayerARPG
             if (!IsServer)
                 return;
             NetDataWriter writer = new NetDataWriter();
-            ChatMessage chatMessage = new ChatMessage()
+            writer.Put(new ChatMessage()
             {
                 channel = ChatChannel.System,
                 sender = CHAT_SYSTEM_ANNOUNCER_SENDER,
                 message = message,
                 sendByServer = true,
-            };
-            chatMessage.Serialize(writer);
+            });
             HandleChatAtServer(new MessageHandlerData(GameNetworkingConsts.Chat, Server, -1, new NetDataReader(writer.CopyData())));
         }
 
@@ -977,14 +976,13 @@ namespace MultiplayerARPG
             if (!IsServer)
                 return;
             NetDataWriter writer = new NetDataWriter();
-            ChatMessage chatMessage = new ChatMessage()
+            writer.Put(new ChatMessage()
             {
                 channel = ChatChannel.Local,
                 sender = sender,
                 message = message,
                 sendByServer = true,
-            };
-            chatMessage.Serialize(writer);
+            });
             HandleChatAtServer(new MessageHandlerData(GameNetworkingConsts.Chat, Server, -1, new NetDataReader(writer.CopyData())));
         }
     }
