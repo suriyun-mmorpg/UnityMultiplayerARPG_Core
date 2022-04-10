@@ -11,14 +11,14 @@ namespace MultiplayerARPG
         {
             message = (UITextKeys)reader.GetPackedUShort();
             if (message == UITextKeys.NONE)
-                mail = reader.GetValue<Mail>();
+                mail = reader.Get<Mail>();
         }
 
         public void Serialize(NetDataWriter writer)
         {
             writer.PutPackedUShort((ushort)message);
             if (message == UITextKeys.NONE)
-                writer.PutValue(mail);
+                writer.Put(mail);
         }
     }
 }
