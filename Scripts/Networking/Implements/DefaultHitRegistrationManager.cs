@@ -98,16 +98,23 @@ namespace MultiplayerARPG
             validateHits.Remove(id);
         }
 
-        private bool IsHit(HitValidateData validateHitdata, HitRegisterData registerData, HitData hitData, DamageableHitBox hitBox)
+        private bool IsHit(HitValidateData validateHitData, HitRegisterData registerData, HitData hitData, DamageableHitBox hitBox)
         {
-            long halfRtt = validateHitdata.Attacker.Player != null ? (validateHitdata.Attacker.Player.Rtt / 2) : 0;
+            long halfRtt = validateHitData.Attacker.Player != null ? (validateHitData.Attacker.Player.Rtt / 2) : 0;
             long serverTime = BaseGameNetworkManager.Singleton.ServerTimestamp;
             long targetTime = serverTime - halfRtt;
-            hitBox.Rewind(serverTime, targetTime);
-            Vector3 pointInHitBoxSpace = hitBox.transform.InverseTransformPoint(hitData.HitPoint);
-            Bounds bounds = new Bounds(hitBox.Bounds.offsets, hitBox.Bounds.size);
-            bool isHit = bounds.Contains(pointInHitBoxSpace) || Vector3.Distance(bounds.ClosestPoint(pointInHitBoxSpace), pointInHitBoxSpace) < hitDistanceBuffer;
-            hitBox.Restore();
+            bool isHit;
+            DamageableHitBox.TransformHistory transformHistory = hitBox.GetTransformHistory(serverTime, targetTime);
+            if (registerData.AimPosition.type == AimPositionType.Direction)
+            {
+                isHit = transformHistory.Bounds.IntersectRay(new Ray(registerData.AimPosition.position, (hitData.HitPoint - registerData.AimPosition.position).normalized));
+                Debug.LogError("0 " + isHit);
+            }
+            else
+            {
+                isHit = transformHistory.Bounds.Contains(registerData.AimPosition.position);
+                Debug.LogError("1 " + isHit);
+            }
             return isHit;
         }
 
