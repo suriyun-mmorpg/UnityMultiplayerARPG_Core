@@ -28,18 +28,18 @@ namespace MultiplayerARPG
         {
             Validate();
             // Right hand
-            rightHand.Serialize(writer);
+            writer.Put(rightHand);
             // Left hand
-            leftHand.Serialize(writer);
+            writer.Put(leftHand);
         }
 
         public void Deserialize(NetDataReader reader)
         {
             Validate();
             // Right hand
-            rightHand.Deserialize(reader);
+            rightHand = reader.Get<CharacterItem>();
             // Left hand
-            leftHand.Deserialize(reader);
+            leftHand = reader.Get<CharacterItem>();
         }
 
         public void Deserialize(NetDataReader reader, LiteNetLibElement element)
