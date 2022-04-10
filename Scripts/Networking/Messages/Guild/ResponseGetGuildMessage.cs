@@ -10,10 +10,7 @@ namespace MultiplayerARPG
         {
             bool notNull = reader.GetBool();
             if (notNull)
-            {
-                guild = new GuildData();
-                guild.Deserialize(reader);
-            }
+                guild = reader.Get<GuildData>();
         }
 
         public void Serialize(NetDataWriter writer)
@@ -21,7 +18,7 @@ namespace MultiplayerARPG
             bool notNull = guild != null;
             writer.Put(notNull);
             if (notNull)
-                guild.Serialize(writer);
+                writer.Put(guild);
         }
     }
 }
