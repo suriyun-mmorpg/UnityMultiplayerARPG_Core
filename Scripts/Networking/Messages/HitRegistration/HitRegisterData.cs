@@ -11,13 +11,13 @@ namespace MultiplayerARPG
 
         public void Serialize(NetDataWriter writer)
         {
-            AimPosition.Serialize(writer);
+            writer.Put(AimPosition);
             writer.PutList(HitDataCollection);
         }
 
         public void Deserialize(NetDataReader reader)
         {
-            AimPosition.Deserialize(reader);
+            AimPosition = reader.Get<AimPosition>();
             HitDataCollection = reader.GetList<HitData>();
         }
     }
