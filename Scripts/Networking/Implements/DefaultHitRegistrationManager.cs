@@ -6,7 +6,7 @@ namespace MultiplayerARPG
 {
     public class DefaultHitRegistrationManager : MonoBehaviour, IHitRegistrationManager
     {
-        public float hitDistanceBuffer = 0.5f;
+        public float hitValidationBuffer = 2f;
         private static Dictionary<int, List<HitRegisterData>> prepareHits = new Dictionary<int, List<HitRegisterData>>();
         private static Dictionary<string, List<HitRegisterData>> registerHits = new Dictionary<string, List<HitRegisterData>>();
         private static Dictionary<string, HitValidateData> validateHits = new Dictionary<string, HitValidateData>();
@@ -26,6 +26,7 @@ namespace MultiplayerARPG
             }
 
             string id = MakeId(attacker.Id, randomSeed);
+            Debug.LogError("Validate " + id);
             if (!validateHits.ContainsKey(id))
             {
                 validateHits.Add(id, new HitValidateData()
@@ -82,7 +83,6 @@ namespace MultiplayerARPG
                         registerHits[id].RemoveAt(0);
                         continue;
                     }
-
                     DamageableHitBox hitBox = damageableEntity.HitBoxes[registerHits[id][0].HitDataCollection[i].HitBoxIndex];
                     // Valiate hitting
                     if (IsHit(validateHits[id], registerHits[id][0], registerHits[id][0].HitDataCollection[i], hitBox))
@@ -103,18 +103,8 @@ namespace MultiplayerARPG
             long halfRtt = validateHitData.Attacker.Player != null ? (validateHitData.Attacker.Player.Rtt / 2) : 0;
             long serverTime = BaseGameNetworkManager.Singleton.ServerTimestamp;
             long targetTime = serverTime - halfRtt;
-            bool isHit;
             DamageableHitBox.TransformHistory transformHistory = hitBox.GetTransformHistory(serverTime, targetTime);
-            if (registerData.AimPosition.type == AimPositionType.Direction)
-            {
-                isHit = transformHistory.Bounds.IntersectRay(new Ray(registerData.AimPosition.position, (hitData.HitPoint - registerData.AimPosition.position).normalized));
-                Debug.LogError("0 " + isHit);
-            }
-            else
-            {
-                isHit = transformHistory.Bounds.Contains(registerData.AimPosition.position);
-                Debug.LogError("1 " + isHit);
-            }
+            bool isHit = Vector3.Distance(hitData.HitPoint, transformHistory.Position) <= Mathf.Max(transformHistory.Bounds.extents.x, transformHistory.Bounds.extents.y, transformHistory.Bounds.extents.z) + hitValidationBuffer;
             return isHit;
         }
 
