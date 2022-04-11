@@ -109,13 +109,16 @@ namespace MultiplayerARPG
         protected float turnSpeedWhileCrouching = 0f;
         [SerializeField]
         [Tooltip("Use this to turn character smoothly, Set this <= 0 to turn immediately")]
-        protected float turnSpeedWileCrawling = 0f;
+        [FormerlySerializedAs("turnSpeedWileCrawling")]
+        protected float turnSpeedWhileCrawling = 0f;
         [SerializeField]
         [Tooltip("Use this to turn character smoothly, Set this <= 0 to turn immediately")]
-        protected float turnSpeedWileSwimming = 0f;
+        [FormerlySerializedAs("turnSpeedWileSwimming")]
+        protected float turnSpeedWhileSwimming = 0f;
         [SerializeField]
         [Tooltip("Use this to turn character smoothly, Set this <= 0 to turn immediately")]
-        protected float turnSpeedWileDoingAction = 0f;
+        [FormerlySerializedAs("turnSpeedWileDoingAction")]
+        protected float turnSpeedWhileDoingAction = 0f;
 
         [Header("FPS Settings")]
         [SerializeField]
@@ -338,7 +341,7 @@ namespace MultiplayerARPG
             get
             {
                 if (PlayerCharacterEntity.MovementState.Has(MovementState.IsUnderWater))
-                    return turnSpeedWileSwimming;
+                    return turnSpeedWhileSwimming;
                 switch (PlayerCharacterEntity.ExtraMovementState)
                 {
                     case ExtraMovementState.IsSprinting:
@@ -348,7 +351,7 @@ namespace MultiplayerARPG
                     case ExtraMovementState.IsCrouching:
                         return turnSpeedWhileCrouching;
                     case ExtraMovementState.IsCrawling:
-                        return turnSpeedWileCrawling;
+                        return turnSpeedWhileCrawling;
                 }
                 return turnSpeed;
             }
@@ -1395,11 +1398,11 @@ namespace MultiplayerARPG
                 case ShooterControllerViewMode.Tps:
                     // Just look at camera forward while character playing action animation while `turnForwardWhileDoingAction` is `true`
                     Vector3 doActionLookDirection = turnForwardWhileDoingAction ? cameraForward : turnDirection;
-                    if (turnSpeedWileDoingAction > 0f)
+                    if (turnSpeedWhileDoingAction > 0f)
                     {
                         Quaternion currentRot = Quaternion.LookRotation(targetLookDirection);
                         Quaternion targetRot = Quaternion.LookRotation(doActionLookDirection);
-                        currentRot = Quaternion.Slerp(currentRot, targetRot, turnSpeedWileDoingAction * Time.deltaTime);
+                        currentRot = Quaternion.Slerp(currentRot, targetRot, turnSpeedWhileDoingAction * Time.deltaTime);
                         targetLookDirection = currentRot * Vector3.forward;
                         return Quaternion.Angle(currentRot, targetRot) <= 15f && PlayerCharacterEntity.CanDoNextAction();
                     }
