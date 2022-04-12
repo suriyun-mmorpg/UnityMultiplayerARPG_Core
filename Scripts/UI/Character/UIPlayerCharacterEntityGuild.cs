@@ -62,7 +62,7 @@ namespace MultiplayerARPG
             if (textGuildName != null)
             {
                 textGuildName.SetGameObjectActive(true);
-                textGuildName.text = guild.GuildName;
+                textGuildName.text = string.Format(LanguageManager.GetText(formatKeyTitle), guild.GuildName);
             }
             if (uiGuildIcon != null)
                 uiGuildIcon.SetDataByDataId(options.iconDataId);
