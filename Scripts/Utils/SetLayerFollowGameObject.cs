@@ -10,7 +10,7 @@ namespace MultiplayerARPG
 
         private void LateUpdate()
         {
-            if (source.layer != dirtyLayer)
+            if (source != null && source.layer != dirtyLayer)
             {
                 dirtyLayer = source.layer;
                 gameObject.layer = dirtyLayer;
