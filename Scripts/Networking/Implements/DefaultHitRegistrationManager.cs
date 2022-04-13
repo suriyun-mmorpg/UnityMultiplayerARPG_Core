@@ -26,7 +26,6 @@ namespace MultiplayerARPG
             }
 
             string id = MakeId(attacker.Id, randomSeed);
-            Debug.LogError("Validate " + id);
             if (!validateHits.ContainsKey(id))
             {
                 validateHits.Add(id, new HitValidateData()
