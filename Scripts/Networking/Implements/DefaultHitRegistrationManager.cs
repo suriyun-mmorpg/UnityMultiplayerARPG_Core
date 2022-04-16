@@ -132,7 +132,7 @@ namespace MultiplayerARPG
                 foreach (KeyValuePair<int, List<HitRegisterData>> kv in prepareHits)
                 {
                     // Send register message to server
-                    BaseGameNetworkManager.Singleton.ClientSendPacket(BaseCharacterEntity.ACTION_TO_CLIENT_DATA_CHANNEL, LiteNetLib.DeliveryMethod.ReliableUnordered, GameNetworkingConsts.HitRegistration, new HitRegisterMessage()
+                    BaseGameNetworkManager.Singleton.ClientSendPacket(BaseGameEntity.CLIENT_STATE_DATA_CHANNEL, LiteNetLib.DeliveryMethod.ReliableUnordered, GameNetworkingConsts.HitRegistration, new HitRegisterMessage()
                     {
                         RandomSeed = kv.Key,
                         Hits = kv.Value,
