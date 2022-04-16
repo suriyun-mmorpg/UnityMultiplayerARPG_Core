@@ -334,7 +334,7 @@ namespace MultiplayerARPG
                 sendingServerAttack = false;
                 return true;
             }
-            return true;
+            return false;
         }
 
         public void ReadClientAttackStateAtServer(NetDataReader reader)
