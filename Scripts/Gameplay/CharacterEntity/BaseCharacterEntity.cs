@@ -389,17 +389,17 @@ namespace MultiplayerARPG
             // Actions
             if (inputState.Has(CharacterInputState.IsAttacking))
                 AttackComponent.ReadClientAttackStateAtServer(reader);
-            else if (inputState.Has(CharacterInputState.IsUsingSkillInterrupted))
+            if (inputState.Has(CharacterInputState.IsUsingSkillInterrupted))
                 UseSkillComponent.ReadClientUseSkillInterruptedStateAtServer(reader);
-            else if (inputState.Has(CharacterInputState.IsUsingSkillItem))
+            if (inputState.Has(CharacterInputState.IsUsingSkillItem))
                 UseSkillComponent.ReadClientUseSkillItemStateAtServer(reader);
-            else if (inputState.Has(CharacterInputState.IsUsingSkill))
+            if (inputState.Has(CharacterInputState.IsUsingSkill))
                 UseSkillComponent.ReadClientUseSkillStateAtServer(reader);
-            else if (inputState.Has(CharacterInputState.IsReloading))
+            if (inputState.Has(CharacterInputState.IsReloading))
                 ReloadComponent.ReadClientReloadStateAtServer(reader);
-            else if (inputState.Has(CharacterInputState.IsChargeStopping))
+            if (inputState.Has(CharacterInputState.IsChargeStopping))
                 ChargeComponent.ReadClientStopChargeStateAtServer(reader);
-            else if (inputState.Has(CharacterInputState.IsChargeStarting))
+            if (inputState.Has(CharacterInputState.IsChargeStarting))
                 ChargeComponent.ReadClientStartChargeStateAtServer(reader);
             // Movement
             if (inputState.Has(CharacterInputState.IsMoving) && ActiveMovement != null)
@@ -412,17 +412,17 @@ namespace MultiplayerARPG
             // Actions
             if (inputState.Has(CharacterInputState.IsAttacking))
                 AttackComponent.ReadServerAttackStateAtClient(reader);
-            else if (inputState.Has(CharacterInputState.IsUsingSkillInterrupted))
+            if (inputState.Has(CharacterInputState.IsUsingSkillInterrupted))
                 UseSkillComponent.ReadServerUseSkillInterruptedStateAtClient(reader);
-            else if (inputState.Has(CharacterInputState.IsUsingSkillItem))
+            if (inputState.Has(CharacterInputState.IsUsingSkillItem))
                 UseSkillComponent.ReadServerUseSkillItemStateAtClient(reader);
-            else if (inputState.Has(CharacterInputState.IsUsingSkill))
+            if (inputState.Has(CharacterInputState.IsUsingSkill))
                 UseSkillComponent.ReadServerUseSkillStateAtClient(reader);
-            else if (inputState.Has(CharacterInputState.IsReloading))
+            if (inputState.Has(CharacterInputState.IsReloading))
                 ReloadComponent.ReadServerReloadStateAtClient(reader);
-            else if (inputState.Has(CharacterInputState.IsChargeStopping))
+            if (inputState.Has(CharacterInputState.IsChargeStopping))
                 ChargeComponent.ReadServerStopChargeStateAtClient(reader);
-            else if (inputState.Has(CharacterInputState.IsChargeStarting))
+            if (inputState.Has(CharacterInputState.IsChargeStarting))
                 ChargeComponent.ReadServerStartChargeStateAtClient(reader);
             // Movement
             if (inputState.Has(CharacterInputState.IsMoving) && ActiveMovement != null)
