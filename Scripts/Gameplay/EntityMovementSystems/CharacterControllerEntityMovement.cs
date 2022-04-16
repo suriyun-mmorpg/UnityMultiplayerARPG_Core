@@ -81,7 +81,8 @@ namespace MultiplayerARPG
         protected float yRotateLerpDuration;
         protected bool acceptedJump;
         protected bool sendingJump;
-        protected float lastServerValidateTransform;
+        protected float lastServerValidateTransformTime;
+        protected float lastServerValidateTransformMoveSpeed;
         protected EntityMovementInput oldInput;
         protected EntityMovementInput currentInput;
         protected MovementState tempMovementState;
@@ -860,9 +861,9 @@ namespace MultiplayerARPG
                 {
                     // If it's server only (not a host), set position follows the client immediately
                     float currentTime = Time.unscaledTime;
-                    float t = currentTime - lastServerValidateTransform + 0.2f; // +200ms as high ping buffer
-                    float v = Entity.GetMoveSpeed(false);
-                    float s = v * t;
+                    float t = currentTime - lastServerValidateTransformTime;
+                    float v = Entity.GetMoveSpeed();
+                    float s = (lastServerValidateTransformMoveSpeed * t) + (v * (t + 0.2f)); // +200ms as high ping buffer
                     if (s < 0.001f)
                         s = 0.001f;
                     Vector3 oldPos = CacheTransform.position.GetXZ();
@@ -883,7 +884,8 @@ namespace MultiplayerARPG
                         // And also adjust client's position
                         Teleport(newPos, Quaternion.Euler(0f, yRotation, 0f));
                     }
-                    lastServerValidateTransform = currentTime;
+                    lastServerValidateTransformTime = currentTime;
+                    lastServerValidateTransformMoveSpeed = v;
                 }
                 else
                 {

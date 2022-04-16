@@ -26,7 +26,8 @@ namespace MultiplayerARPG
         public ExtraMovementState ExtraMovementState { get; protected set; }
         public DirectionVector2 Direction2D { get { return Vector2.down; } set { } }
 
-        protected float lastServerValidateTransform;
+        protected float lastServerValidateTransformTime;
+        protected float lastServerValidateTransformMoveSpeed;
         protected long acceptedPositionTimestamp;
         protected float? targetYRotation;
         protected float yRotateLerpTime;
@@ -387,9 +388,9 @@ namespace MultiplayerARPG
                     {
                         // If it's server only (not a host), set position follows the client immediately
                         float currentTime = Time.unscaledTime;
-                        float t = currentTime - lastServerValidateTransform + 0.2f; // +200ms as high ping buffer
-                        float v = Entity.GetMoveSpeed(false);
-                        float s = v * t;
+                        float t = currentTime - lastServerValidateTransformTime;
+                        float v = Entity.GetMoveSpeed();
+                        float s = (lastServerValidateTransformMoveSpeed * t) + (v * (t + 0.2f)); // +200ms as high ping buffer
                         if (s < 0.001f)
                             s = 0.001f;
                         Vector3 oldPos = CacheTransform.position.GetXZ();
@@ -409,7 +410,8 @@ namespace MultiplayerARPG
                             // And also adjust client's position
                             Teleport(newPos, Quaternion.Euler(0f, yAngle, 0f));
                         }
-                        lastServerValidateTransform = currentTime;
+                        lastServerValidateTransformTime = currentTime;
+                        lastServerValidateTransformMoveSpeed = v;
                     }
                     else
                     {
