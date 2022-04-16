@@ -511,10 +511,9 @@ namespace MultiplayerARPG
             if (ActiveMovement != null)
             {
                 bool shouldSendReliably;
-                ClientStateWriter.Reset();
                 TransportHandler.WritePacket(ClientStateWriter, GameNetworkingConsts.EntityState);
                 if (ActiveMovement.WriteClientState(ClientStateWriter, out shouldSendReliably))
-                    ClientSendMessage(CLIENT_STATE_DATA_CHANNEL, shouldSendReliably ? DeliveryMethod.ReliableOrdered : DeliveryMethod.Unreliable, ClientStateWriter);
+                    ClientSendMessage(CLIENT_STATE_DATA_CHANNEL, shouldSendReliably ? DeliveryMethod.ReliableOrdered : DeliveryMethod.Sequenced, ClientStateWriter);
             }
         }
 
@@ -523,10 +522,9 @@ namespace MultiplayerARPG
             if (ActiveMovement != null)
             {
                 bool shouldSendReliably;
-                ServerStateWriter.Reset();
                 TransportHandler.WritePacket(ServerStateWriter, GameNetworkingConsts.EntityState);
                 if (ActiveMovement.WriteServerState(ServerStateWriter, out shouldSendReliably))
-                    ServerSendMessageToSubscribers(SERVER_STATE_DATA_CHANNEL, shouldSendReliably ? DeliveryMethod.ReliableOrdered : DeliveryMethod.Unreliable, ServerStateWriter);
+                    ServerSendMessageToSubscribers(SERVER_STATE_DATA_CHANNEL, shouldSendReliably ? DeliveryMethod.ReliableOrdered : DeliveryMethod.Sequenced, ServerStateWriter);
             }
         }
 
