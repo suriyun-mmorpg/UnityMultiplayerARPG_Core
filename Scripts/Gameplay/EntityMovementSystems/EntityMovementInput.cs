@@ -121,34 +121,34 @@ namespace MultiplayerARPG
             return input;
         }
 
-        public static bool DifferInputEnoughToSend(this IEntityMovementComponent entityMovement, EntityMovementInput oldInput, EntityMovementInput newInput, out InputState state)
+        public static bool DifferInputEnoughToSend(this IEntityMovementComponent entityMovement, EntityMovementInput oldInput, EntityMovementInput newInput, out EntityMovementInputState state)
         {
-            state = InputState.None;
+            state = EntityMovementInputState.None;
             if (newInput == null)
                 return false;
             if (oldInput == null)
             {
-                state = InputState.PositionChanged | InputState.RotationChanged;
+                state = EntityMovementInputState.PositionChanged | EntityMovementInputState.RotationChanged;
                 if (newInput.IsStopped)
-                    state |= InputState.IsStopped;
+                    state |= EntityMovementInputState.IsStopped;
                 if (newInput.IsKeyMovement)
-                    state |= InputState.IsKeyMovement;
+                    state |= EntityMovementInputState.IsKeyMovement;
                 if (newInput.MovementState.Has(MovementState.IsJump))
-                    state |= InputState.IsJump;
+                    state |= EntityMovementInputState.IsJump;
                 return true;
             }
             // TODO: Send delta changes
             if (newInput.IsStopped)
-                state |= InputState.IsStopped;
+                state |= EntityMovementInputState.IsStopped;
             if (newInput.IsKeyMovement)
-                state |= InputState.IsKeyMovement;
+                state |= EntityMovementInputState.IsKeyMovement;
             if (Vector3.Distance(newInput.Position, oldInput.Position) > 0.01f)
-                state |= InputState.PositionChanged;
+                state |= EntityMovementInputState.PositionChanged;
             if (Quaternion.Angle(newInput.Rotation, oldInput.Rotation) > 1)
-                state |= InputState.RotationChanged;
+                state |= EntityMovementInputState.RotationChanged;
             if (newInput.MovementState.Has(MovementState.IsJump))
-                state |= InputState.IsJump;
-            return state != InputState.None;
+                state |= EntityMovementInputState.IsJump;
+            return state != EntityMovementInputState.None;
         }
     }
 }

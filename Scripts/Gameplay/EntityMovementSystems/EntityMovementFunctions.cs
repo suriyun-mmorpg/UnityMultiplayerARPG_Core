@@ -47,18 +47,18 @@ namespace MultiplayerARPG
         #endregion
 
         #region 3D
-        public static void ClientWriteMovementInput3D(this IEntityMovement movement, NetDataWriter writer, InputState inputState, MovementState movementState, ExtraMovementState extraMovementState, Vector3 position, Quaternion rotation)
+        public static void ClientWriteMovementInput3D(this IEntityMovement movement, NetDataWriter writer, EntityMovementInputState inputState, MovementState movementState, ExtraMovementState extraMovementState, Vector3 position, Quaternion rotation)
         {
             if (!movement.Entity.IsOwnerClient)
                 return;
             writer.Put((byte)inputState);
-            if (!inputState.Has(InputState.IsStopped))
+            if (!inputState.Has(EntityMovementInputState.IsStopped))
             {
                 writer.Put((byte)movementState);
                 writer.Put((byte)extraMovementState);
-                if (inputState.Has(InputState.PositionChanged))
+                if (inputState.Has(EntityMovementInputState.PositionChanged))
                     writer.PutVector3(position);
-                if (inputState.Has(InputState.RotationChanged))
+                if (inputState.Has(EntityMovementInputState.RotationChanged))
                     writer.PutPackedInt(GetCompressedAngle(rotation.eulerAngles.y));
             }
             writer.PutPackedLong(movement.Entity.Manager.ServerTimestamp);
@@ -87,18 +87,18 @@ namespace MultiplayerARPG
             writer.PutPackedLong(movement.Entity.Manager.ServerTimestamp);
         }
 
-        public static void ReadMovementInputMessage3D(this NetDataReader reader, out InputState inputState, out MovementState movementState, out ExtraMovementState extraMovementState, out Vector3 position, out float yAngle, out long timestamp)
+        public static void ReadMovementInputMessage3D(this NetDataReader reader, out EntityMovementInputState inputState, out MovementState movementState, out ExtraMovementState extraMovementState, out Vector3 position, out float yAngle, out long timestamp)
         {
-            inputState = (InputState)reader.GetByte();
-            if (!inputState.Has(InputState.IsStopped))
+            inputState = (EntityMovementInputState)reader.GetByte();
+            if (!inputState.Has(EntityMovementInputState.IsStopped))
             {
                 movementState = (MovementState)reader.GetByte();
                 extraMovementState = (ExtraMovementState)reader.GetByte();
                 position = Vector3.zero;
-                if (inputState.Has(InputState.PositionChanged))
+                if (inputState.Has(EntityMovementInputState.PositionChanged))
                     position = reader.GetVector3();
                 yAngle = 0f;
-                if (inputState.Has(InputState.RotationChanged))
+                if (inputState.Has(EntityMovementInputState.RotationChanged))
                     yAngle = GetDecompressedAngle(reader.GetPackedInt());
             }
             else
@@ -122,16 +122,16 @@ namespace MultiplayerARPG
         #endregion
 
         #region 2D
-        public static void ClientWriteMovementInput2D(this IEntityMovement movement, NetDataWriter writer, InputState inputState, MovementState movementState, ExtraMovementState extraMovementState, Vector2 position, DirectionVector2 direction2D)
+        public static void ClientWriteMovementInput2D(this IEntityMovement movement, NetDataWriter writer, EntityMovementInputState inputState, MovementState movementState, ExtraMovementState extraMovementState, Vector2 position, DirectionVector2 direction2D)
         {
             if (!movement.Entity.IsOwnerClient)
                 return;
             writer.Put((byte)inputState);
-            if (!inputState.Has(InputState.IsStopped))
+            if (!inputState.Has(EntityMovementInputState.IsStopped))
             {
                 writer.Put((byte)movementState);
                 writer.Put((byte)extraMovementState);
-                if (inputState.Has(InputState.PositionChanged))
+                if (inputState.Has(EntityMovementInputState.PositionChanged))
                     writer.PutVector2(position);
                 writer.Put(direction2D);
             }
@@ -161,15 +161,15 @@ namespace MultiplayerARPG
             writer.PutPackedLong(movement.Entity.Manager.ServerTimestamp);
         }
 
-        public static void ReadMovementInputMessage2D(this NetDataReader reader, out InputState inputState, out MovementState movementState, out ExtraMovementState extraMovementState, out Vector2 position, out DirectionVector2 direction2D, out long timestamp)
+        public static void ReadMovementInputMessage2D(this NetDataReader reader, out EntityMovementInputState inputState, out MovementState movementState, out ExtraMovementState extraMovementState, out Vector2 position, out DirectionVector2 direction2D, out long timestamp)
         {
-            inputState = (InputState)reader.GetByte();
-            if (!inputState.Has(InputState.IsStopped))
+            inputState = (EntityMovementInputState)reader.GetByte();
+            if (!inputState.Has(EntityMovementInputState.IsStopped))
             {
                 movementState = (MovementState)reader.GetByte();
                 extraMovementState = (ExtraMovementState)reader.GetByte();
                 position = Vector3.zero;
-                if (inputState.Has(InputState.PositionChanged))
+                if (inputState.Has(EntityMovementInputState.PositionChanged))
                     position = reader.GetVector2();
                 direction2D = reader.Get<DirectionVector2>();
             }

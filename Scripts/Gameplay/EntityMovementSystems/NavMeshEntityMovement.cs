@@ -219,7 +219,7 @@ namespace MultiplayerARPG
             }
             if (Entity.MovementSecure == MovementSecure.ServerAuthoritative && IsOwnerClient && !IsServer)
             {
-                InputState inputState;
+                EntityMovementInputState inputState;
                 if (this.DifferInputEnoughToSend(oldInput, currentInput, out inputState))
                 {
                     currentInput = this.SetInputExtraMovementState(currentInput, tempExtraMovementState);
@@ -320,7 +320,7 @@ namespace MultiplayerARPG
             }
             if (!Entity.CanMove())
                 return;
-            InputState inputState;
+            EntityMovementInputState inputState;
             MovementState movementState;
             ExtraMovementState extraMovementState;
             Vector3 position;
@@ -329,14 +329,14 @@ namespace MultiplayerARPG
             reader.ReadMovementInputMessage3D(out inputState, out movementState, out extraMovementState, out position, out yAngle, out timestamp);
             if (acceptedPositionTimestamp < timestamp)
             {
-                if (!inputState.Has(InputState.IsStopped))
+                if (!inputState.Has(EntityMovementInputState.IsStopped))
                 {
                     tempExtraMovementState = extraMovementState;
-                    if (inputState.Has(InputState.PositionChanged))
+                    if (inputState.Has(EntityMovementInputState.PositionChanged))
                     {
-                        SetMovePaths(position, inputState.Has(InputState.IsKeyMovement));
+                        SetMovePaths(position, inputState.Has(EntityMovementInputState.IsKeyMovement));
                     }
-                    if (inputState.Has(InputState.RotationChanged))
+                    if (inputState.Has(EntityMovementInputState.RotationChanged))
                     {
                         if (IsClient)
                         {

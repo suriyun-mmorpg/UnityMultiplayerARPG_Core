@@ -1,7 +1,7 @@
 ﻿namespace MultiplayerARPG
 {
     [System.Flags]
-    public enum InputState : byte
+    public enum EntityMovementInputState : byte
     {
         None = 0,
         IsKeyMovement = 1 << 0,
@@ -11,9 +11,9 @@
         IsStopped = 1 << 4,
     }
 
-    public static class InputStateExtensions
+    public static class EntityMovementInputStateExtensions
     {
-        public static bool Has(this InputState self, InputState flag)
+        public static bool Has(this EntityMovementInputState self, EntityMovementInputState flag)
         {
             return (self & flag) == flag;
         }
