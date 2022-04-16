@@ -43,9 +43,23 @@ namespace MultiplayerARPG
         /// <param name="writer"></param>
         /// <returns></returns>
         bool WriteServerUseSkillItemState(NetDataWriter writer);
+        /// <summary>
+        /// Return `TRUE` if it have something written
+        /// </summary>
+        /// <param name="writer"></param>
+        /// <returns></returns>
+        bool WriteClientUseSkillInterruptedState(NetDataWriter writer);
+        /// <summary>
+        /// Return `TRUE` if it have something written
+        /// </summary>
+        /// <param name="writer"></param>
+        /// <returns></returns>
+        bool WriteServerUseSkillInterruptedState(NetDataWriter writer);
         void ReadClientUseSkillStateAtServer(NetDataReader reader);
         void ReadServerUseSkillStateAtClient(NetDataReader reader);
         void ReadClientUseSkillItemStateAtServer(NetDataReader reader);
         void ReadServerUseSkillItemStateAtClient(NetDataReader reader);
+        void ReadClientUseSkillInterruptedStateAtServer(NetDataReader reader);
+        void ReadServerUseSkillInterruptedStateAtClient(NetDataReader reader);
     }
 }

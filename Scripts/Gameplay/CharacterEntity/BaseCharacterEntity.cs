@@ -320,30 +320,32 @@ namespace MultiplayerARPG
         {
             bool shouldSendReliably = false;
             CharacterInputState inputState = CharacterInputState.None;
-            TransportHandler.WritePacket(ClientStateWriter, GameNetworkingConsts.EntityState);
-            int stateMsgPos = ClientStateWriter.Length;
+            EntityStateDataWriter.Reset();
             // Actions (can do only 1 action)
-            if (AttackComponent.WriteClientAttackState(ClientStateWriter))
+            if (AttackComponent.WriteClientAttackState(writer))
                 inputState |= CharacterInputState.IsAttacking;
-            else if (UseSkillComponent.WriteClientUseSkillItemState(ClientStateWriter))
+            else if (UseSkillComponent.WriteClientUseSkillInterruptedState(writer))
+                inputState |= CharacterInputState.IsUsingSkillInterrupted;
+            else if (UseSkillComponent.WriteClientUseSkillItemState(writer))
                 inputState |= CharacterInputState.IsUsingSkillItem;
-            else if (UseSkillComponent.WriteClientUseSkillState(ClientStateWriter))
+            else if (UseSkillComponent.WriteClientUseSkillState(writer))
                 inputState |= CharacterInputState.IsUsingSkill;
-            else if (ReloadComponent.WriteClientReloadState(ClientStateWriter))
+            else if (ReloadComponent.WriteClientReloadState(writer))
                 inputState |= CharacterInputState.IsReloading;
-            else if (ChargeComponent.WriteClientStopChargeState(ClientStateWriter))
+            else if (ChargeComponent.WriteClientStopChargeState(writer))
                 inputState |= CharacterInputState.IsChargeStopping;
-            else if (ChargeComponent.WriteClientStartChargeState(ClientStateWriter))
+            else if (ChargeComponent.WriteClientStartChargeState(writer))
                 inputState |= CharacterInputState.IsChargeStarting;
             // Movement
-            if (ActiveMovement != null && ActiveMovement.WriteClientState(ClientStateWriter, out shouldSendReliably))
+            if (ActiveMovement != null && ActiveMovement.WriteClientState(EntityStateDataWriter, out shouldSendReliably))
                 inputState |= CharacterInputState.IsMoving;
             // Set input state and send to clients
             if (inputState != CharacterInputState.None)
             {
-                ClientStateWriter.SetPosition(stateMsgPos);
-                ClientStateWriter.PutPackedUShort((ushort)inputState);
-                ClientSendMessage(CLIENT_STATE_DATA_CHANNEL, (shouldSendReliably || (ushort)inputState > 1 << 0) ? DeliveryMethod.ReliableOrdered : DeliveryMethod.Sequenced, ClientStateWriter);
+                TransportHandler.WritePacket(EntityStateMessageWriter, GameNetworkingConsts.EntityState);
+                EntityStateMessageWriter.PutPackedUShort((ushort)inputState);
+                EntityStateMessageWriter.Put(EntityStateDataWriter.Data, 0, EntityStateDataWriter.Length);
+                ClientSendMessage(CLIENT_STATE_DATA_CHANNEL, (shouldSendReliably || (ushort)inputState > 1 << 0) ? DeliveryMethod.ReliableOrdered : DeliveryMethod.Sequenced, EntityStateMessageWriter);
             }
         }
 
@@ -351,30 +353,33 @@ namespace MultiplayerARPG
         {
             bool shouldSendReliably = false;
             CharacterInputState inputState = CharacterInputState.None;
-            TransportHandler.WritePacket(ServerStateWriter, GameNetworkingConsts.EntityState);
-            int stateMsgPos = ServerStateWriter.Length;
+            EntityStateDataWriter.Reset();
             // Actions (can do only 1 action)
-            if (AttackComponent.WriteServerAttackState(ServerStateWriter))
+            if (AttackComponent.WriteServerAttackState(writer))
                 inputState |= CharacterInputState.IsAttacking;
-            else if (UseSkillComponent.WriteServerUseSkillItemState(ServerStateWriter))
+            else if (UseSkillComponent.WriteServerUseSkillInterruptedState(writer))
+                inputState |= CharacterInputState.IsUsingSkillInterrupted;
+            else if (UseSkillComponent.WriteServerUseSkillItemState(writer))
                 inputState |= CharacterInputState.IsUsingSkillItem;
-            else if (UseSkillComponent.WriteServerUseSkillState(ServerStateWriter))
+            else if (UseSkillComponent.WriteServerUseSkillState(writer))
                 inputState |= CharacterInputState.IsUsingSkill;
-            else if (ReloadComponent.WriteServerReloadState(ServerStateWriter))
+            else if (ReloadComponent.WriteServerReloadState(writer))
                 inputState |= CharacterInputState.IsReloading;
-            else if (ChargeComponent.WriteServerStopChargeState(ServerStateWriter))
+            else if (ChargeComponent.WriteServerStopChargeState(writer))
                 inputState |= CharacterInputState.IsChargeStopping;
-            else if (ChargeComponent.WriteServerStartChargeState(ServerStateWriter))
+            else if (ChargeComponent.WriteServerStartChargeState(writer))
                 inputState |= CharacterInputState.IsChargeStarting;
             // Movement
-            if (ActiveMovement != null && ActiveMovement.WriteServerState(ServerStateWriter, out shouldSendReliably))
+            if (ActiveMovement != null && ActiveMovement.WriteServerState(EntityStateDataWriter, out shouldSendReliably))
                 inputState |= CharacterInputState.IsMoving;
             // Set input state and send to clients
             if (inputState != CharacterInputState.None)
             {
-                ServerStateWriter.SetPosition(stateMsgPos);
-                ServerStateWriter.PutPackedUShort((ushort)inputState);
-                ServerSendMessageToSubscribers(SERVER_STATE_DATA_CHANNEL, (shouldSendReliably || (ushort)inputState > 1 << 0) ? DeliveryMethod.ReliableOrdered : DeliveryMethod.Sequenced, ServerStateWriter);
+                TransportHandler.WritePacket(EntityStateMessageWriter, GameNetworkingConsts.EntityState);
+                EntityStateMessageWriter.PutPackedUInt(ObjectId);
+                EntityStateMessageWriter.PutPackedUShort((ushort)inputState);
+                EntityStateMessageWriter.Put(EntityStateDataWriter.Data, 0, EntityStateDataWriter.Length);
+                ServerSendMessageToSubscribers(SERVER_STATE_DATA_CHANNEL, (shouldSendReliably || (ushort)inputState > 1 << 0) ? DeliveryMethod.ReliableOrdered : DeliveryMethod.Sequenced, EntityStateMessageWriter);
             }
         }
 
@@ -384,15 +389,17 @@ namespace MultiplayerARPG
             // Actions
             if (inputState.Has(CharacterInputState.IsAttacking))
                 AttackComponent.ReadClientAttackStateAtServer(reader);
-            if (inputState.Has(CharacterInputState.IsUsingSkillItem))
+            else if (inputState.Has(CharacterInputState.IsUsingSkillInterrupted))
+                UseSkillComponent.ReadClientUseSkillInterruptedStateAtServer(reader);
+            else if (inputState.Has(CharacterInputState.IsUsingSkillItem))
                 UseSkillComponent.ReadClientUseSkillItemStateAtServer(reader);
-            if (inputState.Has(CharacterInputState.IsUsingSkill))
+            else if (inputState.Has(CharacterInputState.IsUsingSkill))
                 UseSkillComponent.ReadClientUseSkillStateAtServer(reader);
-            if (inputState.Has(CharacterInputState.IsReloading))
+            else if (inputState.Has(CharacterInputState.IsReloading))
                 ReloadComponent.ReadClientReloadStateAtServer(reader);
-            if (inputState.Has(CharacterInputState.IsChargeStopping))
+            else if (inputState.Has(CharacterInputState.IsChargeStopping))
                 ChargeComponent.ReadClientStopChargeStateAtServer(reader);
-            if (inputState.Has(CharacterInputState.IsChargeStarting))
+            else if (inputState.Has(CharacterInputState.IsChargeStarting))
                 ChargeComponent.ReadClientStartChargeStateAtServer(reader);
             // Movement
             if (inputState.Has(CharacterInputState.IsMoving) && ActiveMovement != null)
@@ -405,15 +412,17 @@ namespace MultiplayerARPG
             // Actions
             if (inputState.Has(CharacterInputState.IsAttacking))
                 AttackComponent.ReadServerAttackStateAtClient(reader);
-            if (inputState.Has(CharacterInputState.IsUsingSkillItem))
+            else if (inputState.Has(CharacterInputState.IsUsingSkillInterrupted))
+                UseSkillComponent.ReadServerUseSkillInterruptedStateAtClient(reader);
+            else if (inputState.Has(CharacterInputState.IsUsingSkillItem))
                 UseSkillComponent.ReadServerUseSkillItemStateAtClient(reader);
-            if (inputState.Has(CharacterInputState.IsUsingSkill))
+            else if (inputState.Has(CharacterInputState.IsUsingSkill))
                 UseSkillComponent.ReadServerUseSkillStateAtClient(reader);
-            if (inputState.Has(CharacterInputState.IsReloading))
+            else if (inputState.Has(CharacterInputState.IsReloading))
                 ReloadComponent.ReadServerReloadStateAtClient(reader);
-            if (inputState.Has(CharacterInputState.IsChargeStopping))
+            else if (inputState.Has(CharacterInputState.IsChargeStopping))
                 ChargeComponent.ReadServerStopChargeStateAtClient(reader);
-            if (inputState.Has(CharacterInputState.IsChargeStarting))
+            else if (inputState.Has(CharacterInputState.IsChargeStarting))
                 ChargeComponent.ReadServerStartChargeStateAtClient(reader);
             // Movement
             if (inputState.Has(CharacterInputState.IsMoving) && ActiveMovement != null)

@@ -68,7 +68,6 @@ namespace MultiplayerARPG
         {
             if (!movement.Entity.IsServer)
                 return;
-            writer.PutPackedUInt(movement.Entity.ObjectId);
             writer.Put((byte)movement.MovementState);
             writer.Put((byte)movement.ExtraMovementState);
             writer.PutVector3(movement.Entity.CacheTransform.position);
@@ -142,7 +141,6 @@ namespace MultiplayerARPG
         {
             if (!movement.Entity.IsServer)
                 return;
-            writer.PutPackedUInt(movement.Entity.ObjectId);
             writer.Put((byte)movement.MovementState);
             writer.Put((byte)movement.ExtraMovementState);
             writer.PutVector2(movement.Entity.CacheTransform.position);

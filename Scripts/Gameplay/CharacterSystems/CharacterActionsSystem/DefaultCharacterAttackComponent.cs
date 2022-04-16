@@ -1,5 +1,6 @@
 ﻿using Cysharp.Threading.Tasks;
 using LiteNetLib;
+using LiteNetLib.Utils;
 using LiteNetLibManager;
 using System.Collections.Generic;
 using System.Threading;
@@ -17,6 +18,10 @@ namespace MultiplayerARPG
         public int AnimActionDataId { get; protected set; }
 
         protected readonly Dictionary<int, SimulatingHit> SimulatingHits = new Dictionary<int, SimulatingHit>();
+        protected bool sendingClientAttack;
+        protected bool sendingServerAttack;
+        protected byte sendingSeed;
+        protected bool sendingIsLeftHand;
 
         protected virtual void SetAttackActionStates(AnimActionType animActionType, int animActionDataId)
         {
@@ -29,49 +34,6 @@ namespace MultiplayerARPG
         public virtual void ClearAttackStates()
         {
             IsAttacking = false;
-        }
-
-        public bool CallServerAttack(byte simulateSeed, bool isLeftHand)
-        {
-            RPC(ServerAttack, BaseCharacterEntity.ACTION_TO_SERVER_DATA_CHANNEL, DeliveryMethod.ReliableOrdered, simulateSeed, isLeftHand);
-            return true;
-        }
-
-        /// <summary>
-        /// Is function will be called at server to order character to use skill
-        /// </summary>
-        /// <param name="simulateSeed"></param>
-        /// <param name="isLeftHand"></param>
-        [ServerRpc]
-        protected void ServerAttack(byte simulateSeed, bool isLeftHand)
-        {
-#if !CLIENT_BUILD
-            // Speed hack avoidance
-            if (Time.unscaledTime - LastAttackEndTime < -0.05f)
-            {
-                return;
-            }
-
-            // Set attack state
-            IsAttacking = true;
-
-            // Play animations
-            CallAllPlayAttackAnimation(simulateSeed, isLeftHand);
-#endif
-        }
-
-        public bool CallAllPlayAttackAnimation(byte simulateSeed, bool isLeftHand)
-        {
-            RPC(AllPlayAttackAnimation, BaseCharacterEntity.ACTION_TO_CLIENT_DATA_CHANNEL, DeliveryMethod.ReliableOrdered, simulateSeed, isLeftHand);
-            return true;
-        }
-
-        [AllRpc]
-        protected void AllPlayAttackAnimation(byte simulateSeed, bool isLeftHand)
-        {
-            if (IsOwnerClientOrOwnedByServer)
-                return;
-            AttackRoutine(simulateSeed, isLeftHand).Forget();
         }
 
         protected async UniTaskVoid AttackRoutine(byte simulateSeed, bool isLeftHand)
@@ -290,7 +252,7 @@ namespace MultiplayerARPG
 
         public bool CallAllSimulateLaunchDamageEntity(SimulateLaunchDamageEntityData data)
         {
-            RPC(AllSimulateLaunchDamageEntity, BaseCharacterEntity.ACTION_TO_CLIENT_DATA_CHANNEL, DeliveryMethod.ReliableOrdered, data);
+            RPC(AllSimulateLaunchDamageEntity, BaseGameEntity.SERVER_STATE_DATA_CHANNEL, DeliveryMethod.ReliableOrdered, data);
             return true;
         }
 
@@ -338,9 +300,73 @@ namespace MultiplayerARPG
 
             // Tell the server to attack
             if (!IsServer)
-                CallServerAttack(simulateSeed, isLeftHand);
+            {
+                sendingClientAttack = true;
+                sendingSeed = simulateSeed;
+                sendingIsLeftHand = isLeftHand;
+            }
             else if (IsOwnerClientOrOwnedByServer)
-                CallAllPlayAttackAnimation(simulateSeed, isLeftHand);
+            {
+                sendingServerAttack = true;
+                sendingSeed = simulateSeed;
+                sendingIsLeftHand = isLeftHand;
+            }
+        }
+
+        public bool WriteClientAttackState(NetDataWriter writer)
+        {
+            if (sendingClientAttack)
+            {
+                writer.Put(sendingSeed);
+                writer.Put(sendingIsLeftHand);
+                sendingClientAttack = false;
+                return true;
+            }
+            return false;
+        }
+
+        public bool WriteServerAttackState(NetDataWriter writer)
+        {
+            if (sendingServerAttack)
+            {
+                writer.Put(sendingSeed);
+                writer.Put(sendingIsLeftHand);
+                sendingServerAttack = false;
+                return true;
+            }
+            return true;
+        }
+
+        public void ReadClientAttackStateAtServer(NetDataReader reader)
+        {
+            byte simulateSeed = reader.GetByte();
+            bool isLeftHand = reader.GetBool();
+#if !CLIENT_BUILD
+            // Speed hack avoidance
+            if (Time.unscaledTime - LastAttackEndTime < -0.05f)
+                return;
+            // Set attack state
+            IsAttacking = true;
+            // Play attack animation at server immediately
+            AttackRoutine(simulateSeed, isLeftHand).Forget();
+            // Tell clients to play animation later
+            sendingServerAttack = true;
+            sendingSeed = simulateSeed;
+            sendingIsLeftHand = isLeftHand;
+#endif
+        }
+
+        public void ReadServerAttackStateAtClient(NetDataReader reader)
+        {
+            byte simulateSeed = reader.GetByte();
+            bool isLeftHand = reader.GetBool();
+            if (IsOwnerClientOrOwnedByServer)
+            {
+                // Don't play attack animation again (it already played in `Attack` function)
+                return;
+            }
+            // Play attack animation at client
+            AttackRoutine(simulateSeed, isLeftHand).Forget();
         }
     }
 }

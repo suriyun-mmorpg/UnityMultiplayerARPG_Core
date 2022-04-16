@@ -1,5 +1,6 @@
 ﻿using Cysharp.Threading.Tasks;
 using LiteNetLib;
+using LiteNetLib.Utils;
 using LiteNetLibManager;
 using System.Collections.Generic;
 using System.Threading;
@@ -23,6 +24,18 @@ namespace MultiplayerARPG
         public int AnimActionDataId { get; protected set; }
 
         protected readonly Dictionary<int, SimulatingHit> SimulatingHits = new Dictionary<int, SimulatingHit>();
+        protected bool sendingClientUseSkill;
+        protected bool sendingClientUseSkillItem;
+        protected bool sendingClientUseSkillInterrupted;
+        protected bool sendingServerUseSkill;
+        protected bool sendingServerUseSkillInterrupted;
+        protected byte sendingSeed;
+        protected int sendingSkillDataId;
+        protected short sendingSkillLevel;
+        protected short sendingItemIndex;
+        protected bool sendingIsLeftHand;
+        protected uint sendingTargetObjectId;
+        protected AimPosition sendingAimPosition;
 
         public override void EntityUpdate()
         {
@@ -48,185 +61,17 @@ namespace MultiplayerARPG
             IsUsingSkill = false;
         }
 
-        public bool CallServerUseSkill(byte simulateSeed, int dataId, bool isLeftHand, uint targetObjectId, AimPosition aimPosition)
-        {
-            RPC(ServerUseSkill, BaseCharacterEntity.ACTION_TO_SERVER_DATA_CHANNEL, DeliveryMethod.ReliableOrdered, simulateSeed, dataId, isLeftHand, targetObjectId, aimPosition);
-            return true;
-        }
-
-        /// <summary>
-        /// Is function will be called at server to order character to use skill
-        /// </summary>
-        /// <param name="dataId"></param>
-        /// <param name="isLeftHand"></param>
-        /// <param name="targetObjectId"></param>
-        /// <param name="aimPosition"></param>
-        [ServerRpc]
-        protected void ServerUseSkill(byte simulateSeed, int dataId, bool isLeftHand, uint targetObjectId, AimPosition aimPosition)
-        {
-#if !CLIENT_BUILD
-            // Speed hack avoidance
-            if (Time.unscaledTime - LastUseSkillEndTime < -0.05f)
-            {
-                return;
-            }
-
-            // Validate skill
-            BaseSkill skill;
-            short skillLevel;
-            if (!Entity.ValidateSkillToUse(dataId, isLeftHand, targetObjectId, out skill, out skillLevel, out _))
-            {
-                return;
-            }
-
-            // Start use skill routine
-            IsUsingSkill = true;
-
-            // Play animations
-            CallAllPlayUseSkillAnimation(simulateSeed, isLeftHand, skill.DataId, skillLevel, targetObjectId, aimPosition);
-#endif
-        }
-
-        public bool CallServerUseSkillItem(byte simulateSeed, short index, bool isLeftHand, uint targetObjectId, AimPosition aimPosition)
-        {
-            RPC(ServerUseSkillItem, simulateSeed, index, isLeftHand, targetObjectId, aimPosition);
-            return true;
-        }
-
-        /// <summary>
-        /// This function will be called at server to order character to use item
-        /// </summary>
-        /// <param name="itemIndex"></param>
-        /// <param name="isLeftHand"></param>
-        /// <param name="targetObjectId"></param>
-        /// <param name="aimPosition"></param>
-        [ServerRpc]
-        protected void ServerUseSkillItem(byte simulateSeed, short itemIndex, bool isLeftHand, uint targetObjectId, AimPosition aimPosition)
-        {
-#if !CLIENT_BUILD
-            // Speed hack avoidance
-            if (Time.unscaledTime - LastUseSkillEndTime < -0.05f)
-            {
-                return;
-            }
-
-            BaseSkill skill;
-            short skillLevel;
-            if (!Entity.ValidateSkillItemToUse(itemIndex, isLeftHand, targetObjectId, out skill, out skillLevel, out _))
-            {
-                return;
-            }
-
-            // Validate skill item
-            if (!Entity.DecreaseItemsByIndex(itemIndex, 1))
-            {
-                return;
-            }
-            Entity.FillEmptySlots();
-
-            // Start use skill routine
-            IsUsingSkill = true;
-
-            // Play animations
-            CallAllPlayUseSkillAnimation(simulateSeed, isLeftHand, skill.DataId, skillLevel, targetObjectId, aimPosition);
-#endif
-        }
-
-        public bool CallAllPlayUseSkillAnimation(byte simulateSeed, bool isLeftHand, int skillDataId, short skillLevel, uint targetObjectId, AimPosition aimPosition)
-        {
-            RPC(AllPlayUseSkillAnimation, BaseCharacterEntity.ACTION_TO_CLIENT_DATA_CHANNEL, DeliveryMethod.ReliableOrdered, simulateSeed, isLeftHand, skillDataId, skillLevel, targetObjectId, aimPosition);
-            return true;
-        }
-
-        [AllRpc]
-        protected void AllPlayUseSkillAnimation(byte simulateSeed, bool isLeftHand, int skillDataId, short skillLevel, uint targetObjectId, AimPosition aimPosition)
-        {
-            if (IsOwnerClientOrOwnedByServer)
-                return;
-            BaseSkill skill;
-            if (GameInstance.Skills.TryGetValue(skillDataId, out skill) && skillLevel > 0)
-            {
-                Entity.AttackComponent.CancelAttack();
-                UseSkillRoutine(simulateSeed, isLeftHand, skill, skillLevel, targetObjectId, aimPosition).Forget();
-            }
-            else
-            {
-                ClearUseSkillStates();
-            }
-        }
-
         public void InterruptCastingSkill()
         {
             if (!IsServer)
             {
-                CallServerInterruptCastingSkill();
+                sendingClientUseSkillInterrupted = true;
                 return;
             }
             if (IsCastingSkillCanBeInterrupted && !IsCastingSkillInterrupted)
             {
                 IsCastingSkillInterrupted = true;
-                CallAllOnInterruptCastingSkill();
-            }
-        }
-
-        public bool CallServerInterruptCastingSkill()
-        {
-            RPC(ServerInterruptCastingSkill, BaseCharacterEntity.ACTION_TO_CLIENT_DATA_CHANNEL, DeliveryMethod.ReliableOrdered);
-            return true;
-        }
-
-        /// <summary>
-        /// This will be called at server by owner client to stop playing skill casting
-        /// </summary>
-        [ServerRpc]
-        protected virtual void ServerInterruptCastingSkill()
-        {
-#if !CLIENT_BUILD
-            InterruptCastingSkill();
-#endif
-        }
-
-        public bool CallAllOnInterruptCastingSkill()
-        {
-            RPC(AllOnInterruptCastingSkill, BaseCharacterEntity.ACTION_TO_CLIENT_DATA_CHANNEL, DeliveryMethod.ReliableOrdered);
-            return true;
-        }
-
-        /// <summary>
-        /// This will be called at clients to stop playing skill casting
-        /// </summary>
-        [AllRpc]
-        protected virtual void AllOnInterruptCastingSkill()
-        {
-            IsCastingSkillInterrupted = true;
-            IsUsingSkill = false;
-            CastingSkillDuration = CastingSkillCountDown = 0;
-            CancelSkill();
-            if (Entity.CharacterModel && Entity.CharacterModel.gameObject.activeSelf)
-            {
-                // TPS model
-                Entity.CharacterModel.StopActionAnimation();
-                Entity.CharacterModel.StopSkillCastAnimation();
-                Entity.CharacterModel.StopWeaponChargeAnimation();
-            }
-            if (Entity.PassengingVehicleEntity != null && Entity.PassengingVehicleEntity.Entity.Model &&
-                Entity.PassengingVehicleEntity.Entity.Model.gameObject.activeSelf &&
-                Entity.PassengingVehicleEntity.Entity.Model is BaseCharacterModel)
-            {
-                // Vehicle model
-                (Entity.PassengingVehicleEntity.Entity.Model as BaseCharacterModel).StopActionAnimation();
-                (Entity.PassengingVehicleEntity.Entity.Model as BaseCharacterModel).StopSkillCastAnimation();
-                (Entity.PassengingVehicleEntity.Entity.Model as BaseCharacterModel).StopWeaponChargeAnimation();
-            }
-            if (IsClient)
-            {
-                if (Entity.FpsModel && Entity.FpsModel.gameObject.activeSelf)
-                {
-                    // FPS model
-                    Entity.FpsModel.StopActionAnimation();
-                    Entity.FpsModel.StopSkillCastAnimation();
-                    Entity.FpsModel.StopWeaponChargeAnimation();
-                }
+                sendingServerUseSkillInterrupted = true;
             }
         }
 
@@ -461,7 +306,7 @@ namespace MultiplayerARPG
 
         public bool CallAllSimulateLaunchDamageEntity(SimulateLaunchDamageEntityData data)
         {
-            RPC(AllSimulateLaunchDamageEntity, BaseCharacterEntity.ACTION_TO_CLIENT_DATA_CHANNEL, DeliveryMethod.ReliableOrdered, data);
+            RPC(AllSimulateLaunchDamageEntity, BaseGameEntity.SERVER_STATE_DATA_CHANNEL, DeliveryMethod.ReliableOrdered, data);
             return true;
         }
 
@@ -491,66 +336,278 @@ namespace MultiplayerARPG
 
         public void UseSkill(int dataId, bool isLeftHand, uint targetObjectId, AimPosition aimPosition)
         {
-            if (Time.unscaledTime - LastUseSkillEndTime < 0f)
-                return;
-
-            // Validate skill
-            BaseSkill skill;
-            short skillLevel;
-            if (!Entity.ValidateSkillToUse(dataId, isLeftHand, targetObjectId, out skill, out skillLevel, out _))
-                return;
-
-            // Set use skill state
-            IsUsingSkill = true;
-
             // Get simulate seed for simulation validating
             byte simulateSeed = (byte)Random.Range(byte.MinValue, byte.MaxValue);
-
-            // Simulate skill using at client immediately
-            UseSkillRoutine(simulateSeed, isLeftHand, skill, skillLevel, targetObjectId, aimPosition).Forget();
-
-            // Tell the server to use skill
-            if (!IsServer)
+            if (!IsServer && IsOwnerClient)
             {
-                CallServerUseSkill(simulateSeed, dataId, isLeftHand, targetObjectId, aimPosition);
+                // Validate skill
+                BaseSkill skill;
+                short skillLevel;
+                if (!Entity.ValidateSkillToUse(dataId, isLeftHand, targetObjectId, out skill, out skillLevel, out _))
+                    return;
+                // Set use skill state
+                IsUsingSkill = true;
+                // Simulate skill using at client immediately
+                UseSkillRoutine(simulateSeed, isLeftHand, skill, skillLevel, targetObjectId, aimPosition).Forget();
+                // Tell server that this client use skill
+                sendingClientUseSkill = true;
+                sendingSeed = simulateSeed;
+                sendingSkillDataId = dataId;
+                sendingIsLeftHand = isLeftHand;
+                sendingTargetObjectId = targetObjectId;
+                sendingAimPosition = aimPosition;
             }
             else if (IsOwnerClientOrOwnedByServer)
             {
-                CallAllPlayUseSkillAnimation(simulateSeed, isLeftHand, skill.DataId, skillLevel, targetObjectId, aimPosition);
+                // Use skill immediately at server
+                ProceedUseSkillState(simulateSeed, dataId, isLeftHand, targetObjectId, aimPosition);
             }
         }
 
         public void UseSkillItem(short itemIndex, bool isLeftHand, uint targetObjectId, AimPosition aimPosition)
         {
+            // Get simulate seed for simulation validating
+            byte simulateSeed = (byte)Random.Range(byte.MinValue, byte.MaxValue);
+            if (!IsServer && IsOwnerClient)
+            {
+                // Validate skill
+                BaseSkill skill;
+                short skillLevel;
+                if (!Entity.ValidateSkillItemToUse(itemIndex, isLeftHand, targetObjectId, out skill, out skillLevel, out _))
+                    return;
+                // Set use skill state
+                IsUsingSkill = true;
+                // Simulate skill using at client immediately
+                UseSkillRoutine(simulateSeed, isLeftHand, skill, skillLevel, targetObjectId, aimPosition).Forget();
+                // Tell server that this client use skill
+                sendingClientUseSkillItem = true;
+                sendingSeed = simulateSeed;
+                sendingItemIndex = itemIndex;
+                sendingIsLeftHand = isLeftHand;
+                sendingTargetObjectId = targetObjectId;
+                sendingAimPosition = aimPosition;
+            }
+            else if (IsOwnerClientOrOwnedByServer)
+            {
+                // Use skill immediately at server
+                ProceedUseSkillItemState(simulateSeed, itemIndex, isLeftHand, targetObjectId, aimPosition);
+            }
+        }
+
+        public bool WriteClientUseSkillState(NetDataWriter writer)
+        {
+            if (sendingClientUseSkill)
+            {
+                writer.Put(sendingSeed);
+                writer.PutPackedInt(sendingSkillDataId);
+                writer.Put(sendingIsLeftHand);
+                writer.PutPackedUInt(sendingTargetObjectId);
+                writer.Put(sendingAimPosition);
+                sendingClientUseSkill = false;
+                return true;
+            }
+            return false;
+        }
+
+        public bool WriteServerUseSkillState(NetDataWriter writer)
+        {
+            if (sendingServerUseSkill)
+            {
+                writer.Put(sendingSeed);
+                writer.PutPackedInt(sendingSkillDataId);
+                writer.PutPackedShort(sendingSkillLevel);
+                writer.Put(sendingIsLeftHand);
+                writer.PutPackedUInt(sendingTargetObjectId);
+                writer.Put(sendingAimPosition);
+                sendingServerUseSkill = false;
+                return true;
+            }
+            return false;
+        }
+
+        public bool WriteClientUseSkillItemState(NetDataWriter writer)
+        {
+            if (sendingClientUseSkillItem)
+            {
+                writer.Put(sendingSeed);
+                writer.PutPackedShort(sendingItemIndex);
+                writer.Put(sendingIsLeftHand);
+                writer.PutPackedUInt(sendingTargetObjectId);
+                writer.Put(sendingAimPosition);
+                sendingClientUseSkillItem = false;
+                return true;
+            }
+            return false;
+        }
+
+        public bool WriteServerUseSkillItemState(NetDataWriter writer)
+        {
+            // It's the same behaviour with `use skill` (just play animation at clients)
+            // So just send `use skill` state (see `ReadClientUseSkillItemStateAtServer` function)
+            return false;
+        }
+
+        public bool WriteClientUseSkillInterruptedState(NetDataWriter writer)
+        {
+            if (sendingClientUseSkillInterrupted)
+            {
+                sendingClientUseSkillInterrupted = false;
+                return true;
+            }
+            return false;
+        }
+
+        public bool WriteServerUseSkillInterruptedState(NetDataWriter writer)
+        {
+            if (sendingServerUseSkillInterrupted)
+            {
+                sendingServerUseSkillInterrupted = false;
+                return true;
+            }
+            return false;
+        }
+
+        public void ReadClientUseSkillStateAtServer(NetDataReader reader)
+        {
+            byte simulateSeed = reader.GetByte();
+            int dataId = reader.GetPackedInt();
+            bool isLeftHand = reader.GetBool();
+            uint targetObjectId = reader.GetPackedUInt();
+            AimPosition aimPosition = reader.Get<AimPosition>();
+            ProceedUseSkillState(simulateSeed, dataId, isLeftHand, targetObjectId, aimPosition);
+        }
+
+        protected void ProceedUseSkillState(byte simulateSeed, int dataId, bool isLeftHand, uint targetObjectId, AimPosition aimPosition)
+        {
+#if !CLIENT_BUILD
+            // Speed hack avoidance
+            if (Time.unscaledTime - LastUseSkillEndTime < -0.05f)
+                return;
+            // Validate skill
+            BaseSkill skill;
+            short skillLevel;
+            if (!Entity.ValidateSkillToUse(dataId, isLeftHand, targetObjectId, out skill, out skillLevel, out _))
+                return;
+            // Start use skill
+            IsUsingSkill = true;
+            // Play animation at server immediately
+            UseSkillRoutine(simulateSeed, isLeftHand, skill, skillLevel, targetObjectId, aimPosition).Forget();
+            // Tell clients to play animation later
+            sendingServerUseSkill = true;
+            sendingSeed = simulateSeed;
+            sendingSkillDataId = dataId;
+            sendingSkillLevel = skillLevel;
+            sendingIsLeftHand = isLeftHand;
+            sendingTargetObjectId = targetObjectId;
+            sendingAimPosition = aimPosition;
+#endif
+        }
+
+        public void ReadServerUseSkillStateAtClient(NetDataReader reader)
+        {
+            byte simulateSeed = reader.GetByte();
+            int skillDataId = reader.GetPackedInt();
+            short skillLevel = reader.GetPackedShort();
+            bool isLeftHand = reader.GetBool();
+            uint targetObjectId = reader.GetPackedUInt();
+            AimPosition aimPosition = reader.Get<AimPosition>();
+            if (IsOwnerClientOrOwnedByServer)
+            {
+                // Don't play use skill animation again (it already played in `UseSkill` and `UseSkillItem` function)
+                return;
+            }
+            BaseSkill skill;
+            if (!GameInstance.Skills.TryGetValue(skillDataId, out skill) && skillLevel > 0)
+                ClearUseSkillStates();
+            Entity.AttackComponent.CancelAttack();
+            UseSkillRoutine(simulateSeed, isLeftHand, skill, skillLevel, targetObjectId, aimPosition).Forget();
+        }
+
+        public void ReadClientUseSkillItemStateAtServer(NetDataReader reader)
+        {
+            byte simulateSeed = reader.GetByte();
+            short itemIndex = reader.GetPackedShort();
+            bool isLeftHand = reader.GetBool();
+            uint targetObjectId = reader.GetPackedUInt();
+            AimPosition aimPosition = reader.Get<AimPosition>();
+            ProceedUseSkillItemState(simulateSeed, itemIndex, isLeftHand, targetObjectId, aimPosition);
+        }
+
+        protected void ProceedUseSkillItemState(byte simulateSeed, short itemIndex, bool isLeftHand, uint targetObjectId, AimPosition aimPosition)
+        {
+#if !CLIENT_BUILD
+            // Speed hack avoidance
+            if (Time.unscaledTime - LastUseSkillEndTime < -0.05f)
+                return;
             // Validate skill item
             BaseSkill skill;
             short skillLevel;
             if (!Entity.ValidateSkillItemToUse(itemIndex, isLeftHand, targetObjectId, out skill, out skillLevel, out _))
                 return;
-
-            // Set use skill state
+            if (!Entity.DecreaseItemsByIndex(itemIndex, 1))
+                return;
+            Entity.FillEmptySlots();
+            // Start use skill routine
             IsUsingSkill = true;
-
-            // Get simulate seed for simulation validating
-            byte simulateSeed = (byte)Random.Range(byte.MinValue, byte.MaxValue);
-
-            // Simulate skill using at client immediately
+            // Tell clients to play animation later
+            sendingServerUseSkill = true;
+            sendingSeed = simulateSeed;
+            sendingSkillDataId = skill.DataId;
+            sendingSkillLevel = skillLevel;
+            sendingIsLeftHand = isLeftHand;
+            sendingTargetObjectId = targetObjectId;
+            sendingAimPosition = aimPosition;
+            // Play animation at server immediately
             UseSkillRoutine(simulateSeed, isLeftHand, skill, skillLevel, targetObjectId, aimPosition).Forget();
+#endif
+        }
 
-            // Tell the server to use skill item
-            if (!IsServer)
+        public void ReadServerUseSkillItemStateAtClient(NetDataReader reader)
+        {
+            // See `ReadServerUseSkillStateAtClient`
+        }
+
+        public void ReadClientUseSkillInterruptedStateAtServer(NetDataReader reader)
+        {
+            ProceedUseSkillInterruptedState();
+        }
+
+        public void ReadServerUseSkillInterruptedStateAtClient(NetDataReader reader)
+        {
+            ProceedUseSkillInterruptedState();
+        }
+
+        protected void ProceedUseSkillInterruptedState()
+        {
+            IsCastingSkillInterrupted = true;
+            IsUsingSkill = false;
+            CastingSkillDuration = CastingSkillCountDown = 0;
+            CancelSkill();
+            if (Entity.CharacterModel && Entity.CharacterModel.gameObject.activeSelf)
             {
-                CallServerUseSkillItem(simulateSeed, itemIndex, isLeftHand, targetObjectId, aimPosition);
+                // TPS model
+                Entity.CharacterModel.StopActionAnimation();
+                Entity.CharacterModel.StopSkillCastAnimation();
+                Entity.CharacterModel.StopWeaponChargeAnimation();
             }
-            else if (IsOwnerClientOrOwnedByServer)
+            if (Entity.PassengingVehicleEntity != null && Entity.PassengingVehicleEntity.Entity.Model &&
+                Entity.PassengingVehicleEntity.Entity.Model.gameObject.activeSelf &&
+                Entity.PassengingVehicleEntity.Entity.Model is BaseCharacterModel)
             {
-                // Decrease item immediately
-                if (!Entity.DecreaseItemsByIndex(itemIndex, 1))
+                // Vehicle model
+                (Entity.PassengingVehicleEntity.Entity.Model as BaseCharacterModel).StopActionAnimation();
+                (Entity.PassengingVehicleEntity.Entity.Model as BaseCharacterModel).StopSkillCastAnimation();
+                (Entity.PassengingVehicleEntity.Entity.Model as BaseCharacterModel).StopWeaponChargeAnimation();
+            }
+            if (IsClient)
+            {
+                if (Entity.FpsModel && Entity.FpsModel.gameObject.activeSelf)
                 {
-                    return;
+                    // FPS model
+                    Entity.FpsModel.StopActionAnimation();
+                    Entity.FpsModel.StopSkillCastAnimation();
+                    Entity.FpsModel.StopWeaponChargeAnimation();
                 }
-                Entity.FillEmptySlots();
-                CallAllPlayUseSkillAnimation(simulateSeed, isLeftHand, skill.DataId, skillLevel, targetObjectId, aimPosition);
             }
         }
     }

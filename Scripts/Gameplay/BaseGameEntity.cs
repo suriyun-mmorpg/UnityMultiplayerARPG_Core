@@ -265,8 +265,8 @@ namespace MultiplayerARPG
 
         protected IGameEntityComponent[] EntityComponents { get; private set; }
         protected virtual bool UpdateEntityComponents { get { return true; } }
-        protected NetDataWriter ClientStateWriter { get; private set; } = new NetDataWriter();
-        protected NetDataWriter ServerStateWriter { get; private set; } = new NetDataWriter();
+        protected NetDataWriter EntityStateMessageWriter { get; private set; } = new NetDataWriter();
+        protected NetDataWriter EntityStateDataWriter { get; private set; } = new NetDataWriter();
 
         #region Events
         public event System.Action onStart;
@@ -511,9 +511,13 @@ namespace MultiplayerARPG
             if (ActiveMovement != null)
             {
                 bool shouldSendReliably;
-                TransportHandler.WritePacket(ClientStateWriter, GameNetworkingConsts.EntityState);
-                if (ActiveMovement.WriteClientState(ClientStateWriter, out shouldSendReliably))
-                    ClientSendMessage(CLIENT_STATE_DATA_CHANNEL, shouldSendReliably ? DeliveryMethod.ReliableOrdered : DeliveryMethod.Sequenced, ClientStateWriter);
+                EntityStateDataWriter.Reset();
+                if (ActiveMovement.WriteClientState(EntityStateDataWriter, out shouldSendReliably))
+                {
+                    TransportHandler.WritePacket(EntityStateMessageWriter, GameNetworkingConsts.EntityState);
+                    EntityStateMessageWriter.Put(EntityStateDataWriter.Data, 0, EntityStateDataWriter.Length);
+                    ClientSendMessage(CLIENT_STATE_DATA_CHANNEL, shouldSendReliably ? DeliveryMethod.ReliableOrdered : DeliveryMethod.Sequenced, EntityStateMessageWriter);
+                }
             }
         }
 
@@ -522,9 +526,14 @@ namespace MultiplayerARPG
             if (ActiveMovement != null)
             {
                 bool shouldSendReliably;
-                TransportHandler.WritePacket(ServerStateWriter, GameNetworkingConsts.EntityState);
-                if (ActiveMovement.WriteServerState(ServerStateWriter, out shouldSendReliably))
-                    ServerSendMessageToSubscribers(SERVER_STATE_DATA_CHANNEL, shouldSendReliably ? DeliveryMethod.ReliableOrdered : DeliveryMethod.Sequenced, ServerStateWriter);
+                EntityStateDataWriter.Reset();
+                if (ActiveMovement.WriteServerState(EntityStateDataWriter, out shouldSendReliably))
+                {
+                    TransportHandler.WritePacket(EntityStateMessageWriter, GameNetworkingConsts.EntityState);
+                    EntityStateMessageWriter.PutPackedUInt(ObjectId);
+                    EntityStateMessageWriter.Put(EntityStateDataWriter.Data, 0, EntityStateDataWriter.Length);
+                    ServerSendMessageToSubscribers(SERVER_STATE_DATA_CHANNEL, shouldSendReliably ? DeliveryMethod.ReliableOrdered : DeliveryMethod.Sequenced, EntityStateMessageWriter);
+                }
             }
         }
 

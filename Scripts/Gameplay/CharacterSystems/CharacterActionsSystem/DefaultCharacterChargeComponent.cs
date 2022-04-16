@@ -1,5 +1,4 @@
-﻿using LiteNetLib;
-using LiteNetLibManager;
+﻿using LiteNetLib.Utils;
 
 namespace MultiplayerARPG
 {
@@ -8,20 +7,18 @@ namespace MultiplayerARPG
         public bool IsCharging { get; protected set; }
         public float MoveSpeedRateWhileCharging { get; protected set; }
 
+        protected bool sendingClientStartCharge;
+        protected bool sendingClientStopCharge;
+        protected bool sendingServerStartCharge;
+        protected bool sendingServerStopCharge;
+        protected bool sendingIsLeftHand;
+
         public virtual void ClearChargeStates()
         {
             IsCharging = false;
         }
-        public bool CallAllPlayChargeAnimation(bool isLeftHand)
-        {
-            if (Entity.IsDead())
-                return false;
-            RPC(AllPlayChargeAnimation, BaseCharacterEntity.ACTION_TO_CLIENT_DATA_CHANNEL, DeliveryMethod.ReliableOrdered, isLeftHand);
-            return true;
-        }
 
-        [AllRpc]
-        protected void AllPlayChargeAnimation(bool isLeftHand)
+        protected void PlayChargeAnimation(bool isLeftHand)
         {
             // Get weapon type data
             IWeaponItem weaponItem = Entity.GetAvailableWeapon(ref isLeftHand).GetWeaponItem();
@@ -55,16 +52,7 @@ namespace MultiplayerARPG
             IsCharging = true;
         }
 
-        public bool CallAllStopChargeAnimation()
-        {
-            if (Entity.IsDead())
-                return false;
-            RPC(AllStopChargeAnimation, BaseCharacterEntity.ACTION_TO_CLIENT_DATA_CHANNEL, DeliveryMethod.ReliableOrdered);
-            return true;
-        }
-
-        [AllRpc]
-        protected void AllStopChargeAnimation()
+        protected void StopChargeAnimation()
         {
             // Play animation
             if (Entity.CharacterModel && Entity.CharacterModel.gameObject.activeSelf)
@@ -82,47 +70,123 @@ namespace MultiplayerARPG
             IsCharging = false;
         }
 
-
-        public bool CallServerStartWeaponCharge(bool isLeftHand)
-        {
-            RPC(ServerStartWeaponCharge, isLeftHand);
-            return true;
-        }
-
-        /// <summary>
-        /// Is function will be called at server to order character to start weapon charging
-        /// </summary>
-        [ServerRpc]
-        protected virtual void ServerStartWeaponCharge(bool isLeftHand)
-        {
-            // TODO: May have charge power which increase attack damage
-            CallAllPlayChargeAnimation(isLeftHand);
-        }
-
-        public bool CallServerStopWeaponCharge()
-        {
-            RPC(ServerStopWeaponCharge);
-            return true;
-        }
-
-        /// <summary>
-        /// Is function will be called at server to order character to stop weapon charging
-        /// </summary>
-        [ServerRpc]
-        protected virtual void ServerStopWeaponCharge()
-        {
-            // TODO: If there is charge power, stop it. But there is no charge power yet so just stop playing animation
-            CallAllStopChargeAnimation();
-        }
-
         public void StartCharge(bool isLeftHand)
         {
-            CallServerStartWeaponCharge(isLeftHand);
+            // Simulate start charge at client immediately
+            PlayChargeAnimation(isLeftHand);
+
+            // Tell the server to attack
+            if (!IsServer)
+            {
+                sendingClientStartCharge = true;
+                sendingIsLeftHand = isLeftHand;
+            }
+            else if (IsOwnerClientOrOwnedByServer)
+            {
+                sendingServerStartCharge = true;
+                sendingIsLeftHand = isLeftHand;
+            }
         }
 
         public void StopCharge()
         {
-            CallServerStopWeaponCharge();
+            // Simulate stop charge at client immediately
+            StopChargeAnimation();
+
+            // Tell the server to attack
+            if (!IsServer)
+            {
+                sendingClientStopCharge = true;
+            }
+            else if (IsOwnerClientOrOwnedByServer)
+            {
+                sendingServerStopCharge = true;
+            }
+        }
+
+        public bool WriteClientStartChargeState(NetDataWriter writer)
+        {
+            if (sendingClientStartCharge)
+            {
+                writer.Put(sendingIsLeftHand);
+                sendingClientStartCharge = false;
+                return true;
+            }
+            return false;
+        }
+
+        public bool WriteServerStartChargeState(NetDataWriter writer)
+        {
+            if (sendingServerStartCharge)
+            {
+                writer.Put(sendingIsLeftHand);
+                sendingServerStartCharge = false;
+                return true;
+            }
+            return false;
+        }
+
+        public bool WriteClientStopChargeState(NetDataWriter writer)
+        {
+            if (sendingClientStopCharge)
+            {
+                sendingClientStopCharge = false;
+                return true;
+            }
+            return false;
+        }
+
+        public bool WriteServerStopChargeState(NetDataWriter writer)
+        {
+            if (sendingServerStopCharge)
+            {
+                sendingServerStopCharge = false;
+                return true;
+            }
+            return false;
+        }
+
+        public void ReadClientStartChargeStateAtServer(NetDataReader reader)
+        {
+            bool isLeftHand = reader.GetBool();
+#if !CLIENT_BUILD
+            // Tell clients to start charge later
+            sendingServerStartCharge = true;
+            sendingIsLeftHand = isLeftHand;
+            // Start charge at server immediately
+            PlayChargeAnimation(isLeftHand);
+#endif
+        }
+
+        public void ReadServerStartChargeStateAtClient(NetDataReader reader)
+        {
+            bool isLeftHand = reader.GetBool();
+            if (IsOwnerClient)
+            {
+                // Don't start charge again (it already played in `StartCharge` function)
+                return;
+            }
+            PlayChargeAnimation(isLeftHand);
+        }
+
+        public void ReadClientStopChargeStateAtServer(NetDataReader reader)
+        {
+#if !CLIENT_BUILD
+            // Tell clients to stop charge later
+            sendingServerStopCharge = true;
+            // Stop charge at server immediately
+            StopChargeAnimation();
+#endif
+        }
+
+        public void ReadServerStopChargeStateAtClient(NetDataReader reader)
+        {
+            if (IsOwnerClient)
+            {
+                // Don't stop charge again (it already played in `StopCharge` function)
+                return;
+            }
+            StopChargeAnimation();
         }
     }
 }

@@ -8,9 +8,10 @@
         IsAttacking = 1 << 1,
         IsUsingSkill = 1 << 2,
         IsUsingSkillItem = 1 << 3,
-        IsReloading = 1 << 4,
-        IsChargeStarting = 1 << 5,
-        IsChargeStopping = 1 << 6,
+        IsUsingSkillInterrupted = 1 << 4,
+        IsReloading = 1 << 5,
+        IsChargeStarting = 1 << 6,
+        IsChargeStopping = 1 << 7,
     }
 
     public static class CharacterInputStateExtensions
