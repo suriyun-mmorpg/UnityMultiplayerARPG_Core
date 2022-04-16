@@ -1872,13 +1872,6 @@ namespace MultiplayerARPG
             Dictionary<DamageElement, MinMaxFloat> resultIncreaseDamages,
             Dictionary<BaseSkill, short> resultSkills,
             Dictionary<EquipmentSet, int> resultEquipmentSets,
-            out int resultMaxHp,
-            out int resultMaxMp,
-            out int resultMaxStamina,
-            out int resultMaxFood,
-            out int resultMaxWater,
-            out float resultAtkSpeed,
-            out float resultMoveSpeed,
             bool combine)
         {
             if (!combine)
@@ -1900,14 +1893,6 @@ namespace MultiplayerARPG
             resultStats = resultStats + data.GetStats(true, true, resultSkills);
             // Prepare equipment set bonus
             data.GetEquipmentSetBonus(ref resultStats, resultAttributes, resultResistances, resultArmors, resultIncreaseDamages, resultSkills, resultEquipmentSets, true);
-            // Separated stats results
-            resultMaxHp = (int)resultStats.hp;
-            resultMaxMp = (int)resultStats.mp;
-            resultMaxStamina = (int)resultStats.stamina;
-            resultMaxFood = (int)resultStats.food;
-            resultMaxWater = (int)resultStats.water;
-            resultAtkSpeed = resultStats.atkSpeed;
-            resultMoveSpeed = resultStats.moveSpeed;
             // Validate max amount
             foreach (Attribute attribute in new List<Attribute>(resultAttributes.Keys))
             {

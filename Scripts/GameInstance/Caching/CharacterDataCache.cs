@@ -13,20 +13,13 @@ namespace MultiplayerARPG
         public Dictionary<DamageElement, float> Armors { get; }
         public Dictionary<DamageElement, MinMaxFloat> IncreaseDamages { get; }
         public Dictionary<EquipmentSet, int> EquipmentSets { get; }
-        private int maxHp;
-        public int MaxHp => maxHp;
-        private int maxMp;
-        public int MaxMp => maxMp;
-        private int maxStamina;
-        public int MaxStamina => maxStamina;
-        private int maxFood;
-        public int MaxFood => maxFood;
-        private int maxWater;
-        public int MaxWater => maxWater;
-        private float atkSpeed;
-        public float AtkSpeed => atkSpeed;
-        private float moveSpeed;
-        public float MoveSpeed => moveSpeed;
+        public int MaxHp => (int)stats.hp;
+        public int MaxMp => (int)stats.mp;
+        public int MaxStamina => (int)stats.stamina;
+        public int MaxFood => (int)stats.food;
+        public int MaxWater => (int)stats.water;
+        public float AtkSpeed => stats.atkSpeed;
+        public float MoveSpeed => stats.moveSpeed;
         public float BaseMoveSpeed { get; private set; }
         public float TotalItemWeight { get; private set; }
         public short TotalItemSlot { get; private set; }
@@ -73,13 +66,6 @@ namespace MultiplayerARPG
                 IncreaseDamages,
                 Skills,
                 EquipmentSets,
-                out maxHp,
-                out maxMp,
-                out maxStamina,
-                out maxFood,
-                out maxWater,
-                out atkSpeed,
-                out moveSpeed,
                 false);
 
             if (characterData.GetDatabase() != null)
