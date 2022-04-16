@@ -336,8 +336,6 @@ namespace MultiplayerARPG
 
         public void UseSkill(int dataId, bool isLeftHand, uint targetObjectId, AimPosition aimPosition)
         {
-            // Get simulate seed for simulation validating
-            byte simulateSeed = (byte)Random.Range(byte.MinValue, byte.MaxValue);
             if (!IsServer && IsOwnerClient)
             {
                 // Validate skill
@@ -345,6 +343,8 @@ namespace MultiplayerARPG
                 short skillLevel;
                 if (!Entity.ValidateSkillToUse(dataId, isLeftHand, targetObjectId, out skill, out skillLevel, out _))
                     return;
+                // Get simulate seed for simulation validating
+                byte simulateSeed = (byte)Random.Range(byte.MinValue, byte.MaxValue);
                 // Set use skill state
                 IsUsingSkill = true;
                 // Simulate skill using at client immediately
@@ -359,15 +359,15 @@ namespace MultiplayerARPG
             }
             else if (IsOwnerClientOrOwnedByServer)
             {
+                // Get simulate seed for simulation validating
+                byte simulateSeed = (byte)Random.Range(byte.MinValue, byte.MaxValue);
                 // Use skill immediately at server
-                ProceedUseSkillState(simulateSeed, dataId, isLeftHand, targetObjectId, aimPosition);
+                ProceedUseSkillStateAtServer(simulateSeed, dataId, isLeftHand, targetObjectId, aimPosition);
             }
         }
 
         public void UseSkillItem(short itemIndex, bool isLeftHand, uint targetObjectId, AimPosition aimPosition)
         {
-            // Get simulate seed for simulation validating
-            byte simulateSeed = (byte)Random.Range(byte.MinValue, byte.MaxValue);
             if (!IsServer && IsOwnerClient)
             {
                 // Validate skill
@@ -375,6 +375,8 @@ namespace MultiplayerARPG
                 short skillLevel;
                 if (!Entity.ValidateSkillItemToUse(itemIndex, isLeftHand, targetObjectId, out skill, out skillLevel, out _))
                     return;
+                // Get simulate seed for simulation validating
+                byte simulateSeed = (byte)Random.Range(byte.MinValue, byte.MaxValue);
                 // Set use skill state
                 IsUsingSkill = true;
                 // Simulate skill using at client immediately
@@ -389,8 +391,10 @@ namespace MultiplayerARPG
             }
             else if (IsOwnerClientOrOwnedByServer)
             {
+                // Get simulate seed for simulation validating
+                byte simulateSeed = (byte)Random.Range(byte.MinValue, byte.MaxValue);
                 // Use skill immediately at server
-                ProceedUseSkillItemState(simulateSeed, itemIndex, isLeftHand, targetObjectId, aimPosition);
+                ProceedUseSkillItemStateAtServer(simulateSeed, itemIndex, isLeftHand, targetObjectId, aimPosition);
             }
         }
 
@@ -474,10 +478,10 @@ namespace MultiplayerARPG
             bool isLeftHand = reader.GetBool();
             uint targetObjectId = reader.GetPackedUInt();
             AimPosition aimPosition = reader.Get<AimPosition>();
-            ProceedUseSkillState(simulateSeed, dataId, isLeftHand, targetObjectId, aimPosition);
+            ProceedUseSkillStateAtServer(simulateSeed, dataId, isLeftHand, targetObjectId, aimPosition);
         }
 
-        protected void ProceedUseSkillState(byte simulateSeed, int dataId, bool isLeftHand, uint targetObjectId, AimPosition aimPosition)
+        protected void ProceedUseSkillStateAtServer(byte simulateSeed, int dataId, bool isLeftHand, uint targetObjectId, AimPosition aimPosition)
         {
 #if !CLIENT_BUILD
             // Speed hack avoidance
@@ -488,7 +492,7 @@ namespace MultiplayerARPG
             short skillLevel;
             if (!Entity.ValidateSkillToUse(dataId, isLeftHand, targetObjectId, out skill, out skillLevel, out _))
                 return;
-            // Start use skill
+            // Set use skill state
             IsUsingSkill = true;
             // Play animation at server immediately
             UseSkillRoutine(simulateSeed, isLeftHand, skill, skillLevel, targetObjectId, aimPosition).Forget();
@@ -530,10 +534,10 @@ namespace MultiplayerARPG
             bool isLeftHand = reader.GetBool();
             uint targetObjectId = reader.GetPackedUInt();
             AimPosition aimPosition = reader.Get<AimPosition>();
-            ProceedUseSkillItemState(simulateSeed, itemIndex, isLeftHand, targetObjectId, aimPosition);
+            ProceedUseSkillItemStateAtServer(simulateSeed, itemIndex, isLeftHand, targetObjectId, aimPosition);
         }
 
-        protected void ProceedUseSkillItemState(byte simulateSeed, short itemIndex, bool isLeftHand, uint targetObjectId, AimPosition aimPosition)
+        protected void ProceedUseSkillItemStateAtServer(byte simulateSeed, short itemIndex, bool isLeftHand, uint targetObjectId, AimPosition aimPosition)
         {
 #if !CLIENT_BUILD
             // Speed hack avoidance
@@ -547,8 +551,10 @@ namespace MultiplayerARPG
             if (!Entity.DecreaseItemsByIndex(itemIndex, 1))
                 return;
             Entity.FillEmptySlots();
-            // Start use skill routine
+            // Set use skill state
             IsUsingSkill = true;
+            // Play animation at server immediately
+            UseSkillRoutine(simulateSeed, isLeftHand, skill, skillLevel, targetObjectId, aimPosition).Forget();
             // Tell clients to play animation later
             sendingServerUseSkill = true;
             sendingSeed = simulateSeed;
@@ -557,8 +563,6 @@ namespace MultiplayerARPG
             sendingIsLeftHand = isLeftHand;
             sendingTargetObjectId = targetObjectId;
             sendingAimPosition = aimPosition;
-            // Play animation at server immediately
-            UseSkillRoutine(simulateSeed, isLeftHand, skill, skillLevel, targetObjectId, aimPosition).Forget();
 #endif
         }
 

@@ -155,7 +155,7 @@ namespace MultiplayerARPG
 
         public void Reload(bool isLeftHand)
         {
-            if (!IsServer)
+            if (!IsServer && IsOwnerClient)
             {
                 sendingClientReload = true;
                 sendingIsLeftHand = isLeftHand;
@@ -191,7 +191,8 @@ namespace MultiplayerARPG
 
         public void ReadClientReloadStateAtServer(NetDataReader reader)
         {
-            ProceedReloadStateAtServer(reader.GetBool());
+            bool isLeftHand = reader.GetBool();
+            ProceedReloadStateAtServer(isLeftHand);
         }
 
         private void ProceedReloadStateAtServer(bool isLeftHand)
@@ -199,12 +200,10 @@ namespace MultiplayerARPG
 #if !CLIENT_BUILD
             if (!Entity.CanDoActions())
                 return;
-
+            // Get weapon to reload
             CharacterItem reloadingWeapon = isLeftHand ? Entity.EquipWeapons.leftHand : Entity.EquipWeapons.rightHand;
-
             if (reloadingWeapon.IsEmptySlot())
                 return;
-
             IWeaponItem reloadingWeaponItem = reloadingWeapon.GetWeaponItem();
             if (reloadingWeaponItem == null ||
                 reloadingWeaponItem.WeaponType == null ||
@@ -212,26 +211,21 @@ namespace MultiplayerARPG
                 reloadingWeaponItem.AmmoCapacity <= 0 ||
                 reloadingWeapon.ammo >= reloadingWeaponItem.AmmoCapacity)
                 return;
-
             // Prepare reload data
             short reloadingAmmoAmount = (short)(reloadingWeaponItem.AmmoCapacity - reloadingWeapon.ammo);
             int inventoryAmount = Entity.CountAmmos(reloadingWeaponItem.WeaponType.RequireAmmoType);
             if (inventoryAmount < reloadingAmmoAmount)
                 reloadingAmmoAmount = (short)inventoryAmount;
-
             if (reloadingAmmoAmount <= 0)
                 return;
-
-            // Start reload routine
+            // Set reload state
             IsReloading = true;
-
+            // Play animation at server immediately
+            ReloadRoutine(isLeftHand, reloadingAmmoAmount).Forget();
             // Tell clients to play animation later
             sendingServerReload = true;
             sendingIsLeftHand = isLeftHand;
             sendingReloadingAmmoAmount = reloadingAmmoAmount;
-
-            // Play reload animation at server immediately
-            ReloadRoutine(isLeftHand, reloadingAmmoAmount).Forget();
 #endif
         }
 

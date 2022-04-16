@@ -72,35 +72,32 @@ namespace MultiplayerARPG
 
         public void StartCharge(bool isLeftHand)
         {
-            // Simulate start charge at client immediately
-            PlayChargeAnimation(isLeftHand);
-
-            // Tell the server to attack
-            if (!IsServer)
+            if (!IsServer && IsOwnerClient)
             {
+                // Simulate start charge at client immediately
+                PlayChargeAnimation(isLeftHand);
+                // Tell the server to start charge
                 sendingClientStartCharge = true;
                 sendingIsLeftHand = isLeftHand;
             }
             else if (IsOwnerClientOrOwnedByServer)
             {
-                sendingServerStartCharge = true;
-                sendingIsLeftHand = isLeftHand;
+                ProceedStartChargeStateAtServer(isLeftHand);
             }
         }
 
         public void StopCharge()
         {
-            // Simulate stop charge at client immediately
-            StopChargeAnimation();
-
-            // Tell the server to attack
-            if (!IsServer)
+            if (!IsServer && IsOwnerClient)
             {
+                // Simulate stop charge at client immediately
+                StopChargeAnimation();
+                // Tell the server to stop charge
                 sendingClientStopCharge = true;
             }
             else if (IsOwnerClientOrOwnedByServer)
             {
-                sendingServerStopCharge = true;
+                ProceedStopChargeStateAtServer();
             }
         }
 
@@ -149,19 +146,24 @@ namespace MultiplayerARPG
         public void ReadClientStartChargeStateAtServer(NetDataReader reader)
         {
             bool isLeftHand = reader.GetBool();
+            ProceedStartChargeStateAtServer(isLeftHand);
+        }
+
+        protected void ProceedStartChargeStateAtServer(bool isLeftHand)
+        {
 #if !CLIENT_BUILD
+            // Start charge at server immediately
+            PlayChargeAnimation(isLeftHand);
             // Tell clients to start charge later
             sendingServerStartCharge = true;
             sendingIsLeftHand = isLeftHand;
-            // Start charge at server immediately
-            PlayChargeAnimation(isLeftHand);
 #endif
         }
 
         public void ReadServerStartChargeStateAtClient(NetDataReader reader)
         {
             bool isLeftHand = reader.GetBool();
-            if (IsOwnerClient)
+            if (IsOwnerClientOrOwnedByServer)
             {
                 // Don't start charge again (it already played in `StartCharge` function)
                 return;
@@ -171,17 +173,22 @@ namespace MultiplayerARPG
 
         public void ReadClientStopChargeStateAtServer(NetDataReader reader)
         {
+            ProceedStopChargeStateAtServer();
+        }
+
+        protected void ProceedStopChargeStateAtServer()
+        {
 #if !CLIENT_BUILD
-            // Tell clients to stop charge later
-            sendingServerStopCharge = true;
             // Stop charge at server immediately
             StopChargeAnimation();
+            // Tell clients to stop charge later
+            sendingServerStopCharge = true;
 #endif
         }
 
         public void ReadServerStopChargeStateAtClient(NetDataReader reader)
         {
-            if (IsOwnerClient)
+            if (IsOwnerClientOrOwnedByServer)
             {
                 // Don't stop charge again (it already played in `StopCharge` function)
                 return;

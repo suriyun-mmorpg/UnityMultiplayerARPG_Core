@@ -289,27 +289,25 @@ namespace MultiplayerARPG
 
         public void Attack(bool isLeftHand)
         {
-            // Set attack state
-            IsAttacking = true;
-
-            // Get simulate seed for simulation validating
-            byte simulateSeed = (byte)Random.Range(byte.MinValue, byte.MaxValue);
-
-            // Simulate attacking at client immediately
-            AttackRoutine(simulateSeed, isLeftHand).Forget();
-
-            // Tell the server to attack
-            if (!IsServer)
+            if (!IsServer && IsOwnerClient)
             {
+                // Get simulate seed for simulation validating
+                byte simulateSeed = (byte)Random.Range(byte.MinValue, byte.MaxValue);
+                // Set attack state
+                IsAttacking = true;
+                // Simulate attacking at client immediately
+                AttackRoutine(simulateSeed, isLeftHand).Forget();
+                // Tell server that this client attack
                 sendingClientAttack = true;
                 sendingSeed = simulateSeed;
                 sendingIsLeftHand = isLeftHand;
             }
             else if (IsOwnerClientOrOwnedByServer)
             {
-                sendingServerAttack = true;
-                sendingSeed = simulateSeed;
-                sendingIsLeftHand = isLeftHand;
+                // Get simulate seed for simulation validating
+                byte simulateSeed = (byte)Random.Range(byte.MinValue, byte.MaxValue);
+                // Attack immediately at server
+                ProceedAttackStateAtServer(simulateSeed, isLeftHand);
             }
         }
 
@@ -341,6 +339,11 @@ namespace MultiplayerARPG
         {
             byte simulateSeed = reader.GetByte();
             bool isLeftHand = reader.GetBool();
+            ProceedAttackStateAtServer(simulateSeed, isLeftHand);
+        }
+
+        protected void ProceedAttackStateAtServer(byte simulateSeed, bool isLeftHand)
+        {
 #if !CLIENT_BUILD
             // Speed hack avoidance
             if (Time.unscaledTime - LastAttackEndTime < -0.05f)
