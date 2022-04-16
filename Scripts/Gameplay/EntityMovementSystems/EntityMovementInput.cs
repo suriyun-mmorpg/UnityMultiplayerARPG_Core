@@ -5,6 +5,7 @@ namespace MultiplayerARPG
     public class EntityMovementInput
     {
         public bool IsKeyMovement { get; set; }
+        public bool IsStopped { get; set; }
         public MovementState MovementState { get; set; }
         public ExtraMovementState ExtraMovementState { get; set; }
         public Vector3 Position { get; set; }
@@ -35,6 +36,7 @@ namespace MultiplayerARPG
         {
             if (input == null)
                 input = entityMovement.InitInput();
+            input.IsStopped = false;
             bool isJump = input.MovementState.Has(MovementState.IsJump);
             input.MovementState = movementState;
             if (isJump)
@@ -48,6 +50,7 @@ namespace MultiplayerARPG
         {
             if (input == null)
                 input = entityMovement.InitInput();
+            input.IsStopped = false;
             input.MovementState = movementState;
             // Update extra movement state because some movement state can affect extra movement state
             input = SetInputExtraMovementState(entityMovement, input, input.ExtraMovementState);
@@ -58,6 +61,7 @@ namespace MultiplayerARPG
         {
             if (input == null)
                 input = entityMovement.InitInput();
+            input.IsStopped = false;
             input.ExtraMovementState = entityMovement.ValidateExtraMovementState(input.MovementState, extraMovementState);
             return input;
         }
@@ -66,6 +70,7 @@ namespace MultiplayerARPG
         {
             if (input == null)
                 input = entityMovement.InitInput();
+            input.IsStopped = false;
             input.Position = position;
             return input;
         }
@@ -74,6 +79,7 @@ namespace MultiplayerARPG
         {
             if (input == null)
                 input = entityMovement.InitInput();
+            input.IsStopped = false;
             Vector3 position = input.Position;
             position.y = yPosition;
             input.Position = position;
@@ -84,6 +90,7 @@ namespace MultiplayerARPG
         {
             if (input == null)
                 input = entityMovement.InitInput();
+            input.IsStopped = false;
             input.Rotation = rotation;
             return input;
         }
@@ -92,6 +99,7 @@ namespace MultiplayerARPG
         {
             if (input == null)
                 input = entityMovement.InitInput();
+            input.IsStopped = false;
             input.Direction2D = direction2D;
             return input;
         }
@@ -100,7 +108,16 @@ namespace MultiplayerARPG
         {
             if (input == null)
                 input = entityMovement.InitInput();
+            input.IsStopped = false;
             input.MovementState = input.MovementState | MovementState.IsJump;
+            return input;
+        }
+
+        public static EntityMovementInput SetInputStop(this IEntityMovementComponent entityMovement, EntityMovementInput input)
+        {
+            if (input == null)
+                input = entityMovement.InitInput();
+            input.IsStopped = true;
             return input;
         }
 
@@ -112,6 +129,8 @@ namespace MultiplayerARPG
             if (oldInput == null)
             {
                 state = InputState.PositionChanged | InputState.RotationChanged;
+                if (newInput.IsStopped)
+                    state |= InputState.IsStopped;
                 if (newInput.IsKeyMovement)
                     state |= InputState.IsKeyMovement;
                 if (newInput.MovementState.Has(MovementState.IsJump))
@@ -119,6 +138,8 @@ namespace MultiplayerARPG
                 return true;
             }
             // TODO: Send delta changes
+            if (newInput.IsStopped)
+                state |= InputState.IsStopped;
             if (newInput.IsKeyMovement)
                 state |= InputState.IsKeyMovement;
             if (Vector3.Distance(newInput.Position, oldInput.Position) > 0.01f)

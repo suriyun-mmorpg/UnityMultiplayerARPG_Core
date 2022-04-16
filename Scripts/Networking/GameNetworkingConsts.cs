@@ -88,11 +88,7 @@
         public const ushort AcceptGuildRequest = 162;
         public const ushort DeclineGuildRequest = 163;
         // Entity movement
-        public const ushort MovementInput = 165;
-        public const ushort SyncTransform = 167;
-        public const ushort Teleport = 168;
-        public const ushort StopMove = 169;
-        public const ushort Jump = 170;
+        public const ushort EntityState = 165;
         // New notify type
         public const ushort NotifyRewardCurrency = 171;
         // 1.63c
@@ -114,6 +110,6 @@
         // 1.73
         public const ushort GetGuildInfo = 189;
         // 1.74
-        public const ushort HitRegistration = 190;
+        public const ushort HitRegistration = 166;
     }
 }

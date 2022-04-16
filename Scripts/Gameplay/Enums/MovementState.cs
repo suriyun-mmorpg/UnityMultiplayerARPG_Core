@@ -11,6 +11,7 @@
         IsGrounded = 1 << 4,
         IsUnderWater = 1 << 5,
         IsJump = 1 << 6,
+        IsTeleport = 1 << 7,
     }
 
     public static class MovementStateExtensions

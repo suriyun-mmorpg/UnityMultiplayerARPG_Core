@@ -146,13 +146,13 @@ namespace MultiplayerARPG
             }
         }
 
-        public override sealed float GetMoveSpeed()
+        public override sealed float GetMoveSpeed(bool calculateWithAction = true)
         {
             if (moveSpeedType == VehicleMoveSpeedType.FixedMovedSpeed)
                 return moveSpeed;
             BaseGameEntity driver;
             if (passengers.TryGetValue(0, out driver))
-                return driver.GetMoveSpeed() * driverMoveSpeedRate;
+                return driver.GetMoveSpeed(calculateWithAction) * driverMoveSpeedRate;
             return 0f;
         }
 

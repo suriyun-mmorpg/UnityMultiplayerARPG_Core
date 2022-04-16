@@ -6,8 +6,6 @@ namespace MultiplayerARPG
 {
     public static class EntityMovementFunctions
     {
-        public const byte MOVEMENT_DATA_CHANNEL = 2;
-
         #region Generic Functions
         public static bool CanPredictMovement(this IEntityMovement movement)
         {
@@ -49,107 +47,67 @@ namespace MultiplayerARPG
         #endregion
 
         #region 3D
-        public static void ClientSendMovementInput3D(this IEntityMovement movement, InputState inputState, MovementState movementState, ExtraMovementState extraMovementState, Vector3 position, Quaternion rotation)
+        public static void ClientWriteMovementInput3D(this IEntityMovement movement, NetDataWriter writer, InputState inputState, MovementState movementState, ExtraMovementState extraMovementState, Vector3 position, Quaternion rotation)
         {
             if (!movement.Entity.IsOwnerClient)
                 return;
-            movement.Entity.ClientSendPacket(MOVEMENT_DATA_CHANNEL, DeliveryMethod.ReliableOrdered, GameNetworkingConsts.MovementInput, (writer) =>
+            writer.Put((byte)inputState);
+            if (!inputState.Has(InputState.IsStopped))
             {
-                writer.Put((byte)inputState);
                 writer.Put((byte)movementState);
                 writer.Put((byte)extraMovementState);
                 if (inputState.Has(InputState.PositionChanged))
                     writer.PutVector3(position);
                 if (inputState.Has(InputState.RotationChanged))
                     writer.PutPackedInt(GetCompressedAngle(rotation.eulerAngles.y));
-                writer.PutPackedLong(movement.Entity.Manager.ServerTimestamp);
-            });
+            }
+            writer.PutPackedLong(movement.Entity.Manager.ServerTimestamp);
         }
 
-        public static void ServerSendSyncTransform3D(this IEntityMovement movement)
+        public static void ServerWriteSyncTransform3D(this IEntityMovement movement, NetDataWriter writer)
         {
             if (!movement.Entity.IsServer)
                 return;
-            movement.Entity.ServerSendPacketToSubscribers(MOVEMENT_DATA_CHANNEL, DeliveryMethod.Unreliable, GameNetworkingConsts.SyncTransform, (writer) =>
-            {
-                writer.PutPackedUInt(movement.Entity.ObjectId);
-                writer.Put((byte)movement.MovementState);
-                writer.Put((byte)movement.ExtraMovementState);
-                writer.PutVector3(movement.Entity.CacheTransform.position);
-                writer.PutPackedInt(GetCompressedAngle(movement.Entity.CacheTransform.eulerAngles.y));
-                writer.PutPackedLong(movement.Entity.Manager.ServerTimestamp);
-            });
+            writer.PutPackedUInt(movement.Entity.ObjectId);
+            writer.Put((byte)movement.MovementState);
+            writer.Put((byte)movement.ExtraMovementState);
+            writer.PutVector3(movement.Entity.CacheTransform.position);
+            writer.PutPackedInt(GetCompressedAngle(movement.Entity.CacheTransform.eulerAngles.y));
+            writer.PutPackedLong(movement.Entity.Manager.ServerTimestamp);
         }
 
-        public static void ClientSendSyncTransform3D(this IEntityMovement movement)
+        public static void ClientWriteSyncTransform3D(this IEntityMovement movement, NetDataWriter writer)
         {
             if (!movement.Entity.IsOwnerClient)
                 return;
-            movement.Entity.ClientSendPacket(MOVEMENT_DATA_CHANNEL, DeliveryMethod.Unreliable, GameNetworkingConsts.SyncTransform, (writer) =>
-            {
-                writer.Put((byte)movement.MovementState);
-                writer.Put((byte)movement.ExtraMovementState);
-                writer.PutVector3(movement.Entity.CacheTransform.position);
-                writer.PutPackedInt(GetCompressedAngle(movement.Entity.CacheTransform.eulerAngles.y));
-                writer.PutPackedLong(movement.Entity.Manager.ServerTimestamp);
-            });
-        }
-
-        public static void ServerSendTeleport3D(this IEntityMovement movement, Vector3 position, Quaternion rotation)
-        {
-            if (!movement.Entity.IsServer)
-                return;
-            movement.Entity.ServerSendPacketToSubscribers(MOVEMENT_DATA_CHANNEL, DeliveryMethod.ReliableUnordered, GameNetworkingConsts.Teleport, (writer) =>
-            {
-                writer.PutPackedUInt(movement.Entity.ObjectId);
-                writer.PutVector3(position);
-                writer.PutPackedInt(GetCompressedAngle(rotation.eulerAngles.y));
-                writer.PutPackedLong(movement.Entity.Manager.ServerTimestamp);
-            });
-        }
-
-        public static void ClientSendStopMove(this IEntityMovement movement)
-        {
-            if (!movement.Entity.IsOwnerClient)
-                return;
-            movement.Entity.ClientSendPacket(MOVEMENT_DATA_CHANNEL, DeliveryMethod.ReliableOrdered, GameNetworkingConsts.StopMove, (writer) =>
-            {
-                writer.PutPackedLong(movement.Entity.Manager.ServerTimestamp);
-            });
-        }
-
-        public static void ServerSendJump(this IEntityMovement movement)
-        {
-            if (!movement.Entity.IsServer)
-                return;
-            movement.Entity.ServerSendPacketToSubscribers(MOVEMENT_DATA_CHANNEL, DeliveryMethod.ReliableUnordered, GameNetworkingConsts.Jump, (writer) =>
-            {
-                writer.PutPackedUInt(movement.Entity.ObjectId);
-                writer.PutPackedLong(movement.Entity.Manager.ServerTimestamp);
-            });
-        }
-
-        public static void ClientSendJump(this IEntityMovement movement)
-        {
-            if (!movement.Entity.IsOwnerClient)
-                return;
-            movement.Entity.ClientSendPacket(MOVEMENT_DATA_CHANNEL, DeliveryMethod.ReliableOrdered, GameNetworkingConsts.Jump, (writer) =>
-            {
-                writer.PutPackedLong(movement.Entity.Manager.ServerTimestamp);
-            });
+            writer.Put((byte)movement.MovementState);
+            writer.Put((byte)movement.ExtraMovementState);
+            writer.PutVector3(movement.Entity.CacheTransform.position);
+            writer.PutPackedInt(GetCompressedAngle(movement.Entity.CacheTransform.eulerAngles.y));
+            writer.PutPackedLong(movement.Entity.Manager.ServerTimestamp);
         }
 
         public static void ReadMovementInputMessage3D(this NetDataReader reader, out InputState inputState, out MovementState movementState, out ExtraMovementState extraMovementState, out Vector3 position, out float yAngle, out long timestamp)
         {
             inputState = (InputState)reader.GetByte();
-            movementState = (MovementState)reader.GetByte();
-            extraMovementState = (ExtraMovementState)reader.GetByte();
-            position = Vector3.zero;
-            if (inputState.Has(InputState.PositionChanged))
-                position = reader.GetVector3();
-            yAngle = 0f;
-            if (inputState.Has(InputState.RotationChanged))
-                yAngle = GetDecompressedAngle(reader.GetPackedInt());
+            if (!inputState.Has(InputState.IsStopped))
+            {
+                movementState = (MovementState)reader.GetByte();
+                extraMovementState = (ExtraMovementState)reader.GetByte();
+                position = Vector3.zero;
+                if (inputState.Has(InputState.PositionChanged))
+                    position = reader.GetVector3();
+                yAngle = 0f;
+                if (inputState.Has(InputState.RotationChanged))
+                    yAngle = GetDecompressedAngle(reader.GetPackedInt());
+            }
+            else
+            {
+                movementState = MovementState.None;
+                extraMovementState = ExtraMovementState.None;
+                position = Vector2.zero;
+                yAngle = 0f;
+            }
             timestamp = reader.GetPackedLong();
         }
 
@@ -161,92 +119,67 @@ namespace MultiplayerARPG
             yAngle = GetDecompressedAngle(reader.GetPackedInt());
             timestamp = reader.GetPackedLong();
         }
-
-        public static void ReadTeleportMessage3D(this NetDataReader reader, out Vector3 position, out float yAngle, out long timestamp)
-        {
-            position = reader.GetVector3();
-            yAngle = GetDecompressedAngle(reader.GetPackedInt());
-            timestamp = reader.GetPackedLong();
-        }
-
-        public static void ReadStopMoveMessage(this NetDataReader reader, out long timestamp)
-        {
-            timestamp = reader.GetPackedLong();
-        }
-
-        public static void ReadJumpMessage(this NetDataReader reader, out long timestamp)
-        {
-            timestamp = reader.GetPackedLong();
-        }
         #endregion
 
         #region 2D
-        public static void ClientSendMovementInput2D(this IEntityMovement movement, InputState inputState, MovementState movementState, ExtraMovementState extraMovementState, Vector2 position, DirectionVector2 direction2D)
+        public static void ClientWriteMovementInput2D(this IEntityMovement movement, NetDataWriter writer, InputState inputState, MovementState movementState, ExtraMovementState extraMovementState, Vector2 position, DirectionVector2 direction2D)
         {
             if (!movement.Entity.IsOwnerClient)
                 return;
-            movement.Entity.ClientSendPacket(MOVEMENT_DATA_CHANNEL, DeliveryMethod.ReliableOrdered, GameNetworkingConsts.MovementInput, (writer) =>
+            writer.Put((byte)inputState);
+            if (!inputState.Has(InputState.IsStopped))
             {
-                writer.Put((byte)inputState);
                 writer.Put((byte)movementState);
                 writer.Put((byte)extraMovementState);
                 if (inputState.Has(InputState.PositionChanged))
                     writer.PutVector2(position);
                 writer.Put(direction2D);
-                writer.PutPackedLong(movement.Entity.Manager.ServerTimestamp);
-            });
+            }
+            writer.PutPackedLong(movement.Entity.Manager.ServerTimestamp);
         }
 
-        public static void ServerSendSyncTransform2D(this IEntityMovement movement)
+        public static void ServerWriteSyncTransform2D(this IEntityMovement movement, NetDataWriter writer)
         {
             if (!movement.Entity.IsServer)
                 return;
-            movement.Entity.ServerSendPacketToSubscribers(MOVEMENT_DATA_CHANNEL, DeliveryMethod.Unreliable, GameNetworkingConsts.SyncTransform, (writer) =>
-            {
-                writer.PutPackedUInt(movement.Entity.ObjectId);
-                writer.Put((byte)movement.MovementState);
-                writer.Put((byte)movement.ExtraMovementState);
-                writer.PutVector2(movement.Entity.CacheTransform.position);
-                writer.Put(movement.Direction2D);
-                writer.PutPackedLong(movement.Entity.Manager.ServerTimestamp);
-            });
+            writer.PutPackedUInt(movement.Entity.ObjectId);
+            writer.Put((byte)movement.MovementState);
+            writer.Put((byte)movement.ExtraMovementState);
+            writer.PutVector2(movement.Entity.CacheTransform.position);
+            writer.Put(movement.Direction2D);
+            writer.PutPackedLong(movement.Entity.Manager.ServerTimestamp);
         }
 
-        public static void ClientSendSyncTransform2D(this IEntityMovement movement)
+        public static void ClientWriteSyncTransform2D(this IEntityMovement movement, NetDataWriter writer)
         {
             if (!movement.Entity.IsOwnerClient)
                 return;
-            movement.Entity.ClientSendPacket(MOVEMENT_DATA_CHANNEL, DeliveryMethod.Unreliable, GameNetworkingConsts.SyncTransform, (writer) =>
-            {
-                writer.Put((byte)movement.MovementState);
-                writer.Put((byte)movement.ExtraMovementState);
-                writer.PutVector2(movement.Entity.CacheTransform.position);
-                writer.Put(movement.Direction2D);
-                writer.PutPackedLong(movement.Entity.Manager.ServerTimestamp);
-            });
-        }
-
-        public static void ServerSendTeleport2D(this IEntityMovement movement, Vector2 position)
-        {
-            if (!movement.Entity.IsServer)
-                return;
-            movement.Entity.ServerSendPacketToSubscribers(MOVEMENT_DATA_CHANNEL, DeliveryMethod.ReliableUnordered, GameNetworkingConsts.Teleport, (writer) =>
-            {
-                writer.PutPackedUInt(movement.Entity.ObjectId);
-                writer.PutVector2(position);
-                writer.PutPackedLong(movement.Entity.Manager.ServerTimestamp);
-            });
+            writer.Put((byte)movement.MovementState);
+            writer.Put((byte)movement.ExtraMovementState);
+            writer.PutVector2(movement.Entity.CacheTransform.position);
+            writer.Put(movement.Direction2D);
+            writer.PutPackedLong(movement.Entity.Manager.ServerTimestamp);
         }
 
         public static void ReadMovementInputMessage2D(this NetDataReader reader, out InputState inputState, out MovementState movementState, out ExtraMovementState extraMovementState, out Vector2 position, out DirectionVector2 direction2D, out long timestamp)
         {
             inputState = (InputState)reader.GetByte();
-            movementState = (MovementState)reader.GetByte();
-            extraMovementState = (ExtraMovementState)reader.GetByte();
-            position = Vector3.zero;
-            if (inputState.Has(InputState.PositionChanged))
-                position = reader.GetVector2();
-            direction2D = reader.Get<DirectionVector2>();
+            if (!inputState.Has(InputState.IsStopped))
+            {
+                movementState = (MovementState)reader.GetByte();
+                extraMovementState = (ExtraMovementState)reader.GetByte();
+                position = Vector3.zero;
+                if (inputState.Has(InputState.PositionChanged))
+                    position = reader.GetVector2();
+                direction2D = reader.Get<DirectionVector2>();
+            }
+            else
+            {
+                movementState = MovementState.None;
+                extraMovementState = ExtraMovementState.None;
+                position = Vector2.zero;
+                direction2D = Vector2.zero;
+            }
             timestamp = reader.GetPackedLong();
         }
 
@@ -256,12 +189,6 @@ namespace MultiplayerARPG
             extraMovementState = (ExtraMovementState)reader.GetByte();
             position = reader.GetVector2();
             direction2D = reader.Get<DirectionVector2>();
-            timestamp = reader.GetPackedLong();
-        }
-
-        public static void ReadTeleportMessage2D(this NetDataReader reader, out Vector2 position, out long timestamp)
-        {
-            position = reader.GetVector2();
             timestamp = reader.GetPackedLong();
         }
         #endregion

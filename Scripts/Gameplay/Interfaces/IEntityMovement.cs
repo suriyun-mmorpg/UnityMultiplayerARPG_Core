@@ -1,4 +1,5 @@
-﻿using LiteNetLibManager;
+﻿using LiteNetLib.Utils;
+using LiteNetLibManager;
 using UnityEngine;
 
 namespace MultiplayerARPG
@@ -22,12 +23,21 @@ namespace MultiplayerARPG
 
     public interface IEntityMovementComponent : IEntityMovement, IGameEntityComponent
     {
-        void HandleSyncTransformAtClient(MessageHandlerData messageHandler);
-        void HandleTeleportAtClient(MessageHandlerData messageHandler);
-        void HandleJumpAtClient(MessageHandlerData messageHandler);
-        void HandleMovementInputAtServer(MessageHandlerData messageHandler);
-        void HandleSyncTransformAtServer(MessageHandlerData messageHandler);
-        void HandleStopMoveAtServer(MessageHandlerData messageHandler);
-        void HandleJumpAtServer(MessageHandlerData messageHandler);
+        /// <summary>
+        /// Return `TRUE` if it have something written
+        /// </summary>
+        /// <param name="writer"></param>
+        /// <param name="shouldSendReliably"></param>
+        /// <returns></returns>
+        bool WriteClientState(NetDataWriter writer, out bool shouldSendReliably);
+        /// <summary>
+        /// Return `TRUE` if it have something written
+        /// </summary>
+        /// <param name="writer"></param>
+        /// <param name="shouldSendReliably"></param>
+        /// <returns></returns>
+        bool WriteServerState(NetDataWriter writer, out bool shouldSendReliably);
+        void ReadClientStateAtServer(NetDataReader reader);
+        void ReadServerStateAtClient(NetDataReader reader);
     }
 }

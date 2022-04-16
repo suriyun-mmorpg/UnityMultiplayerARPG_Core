@@ -3,6 +3,7 @@ using UnityEngine.Profiling;
 using UnityEngine.Serialization;
 using LiteNetLib;
 using LiteNetLibManager;
+using LiteNetLib.Utils;
 
 namespace MultiplayerARPG
 {
@@ -11,6 +12,8 @@ namespace MultiplayerARPG
     public abstract class BaseGameEntity : LiteNetLibBehaviour, IGameEntity, IEntityMovement
     {
         public const float GROUND_DETECTION_DISTANCE = 30f;
+        public const byte CLIENT_STATE_DATA_CHANNEL = 3;
+        public const byte SERVER_STATE_DATA_CHANNEL = 3;
 
         public int EntityId
         {
@@ -262,6 +265,8 @@ namespace MultiplayerARPG
 
         protected IGameEntityComponent[] EntityComponents { get; private set; }
         protected virtual bool UpdateEntityComponents { get { return true; } }
+        protected NetDataWriter ClientStateWriter { get; private set; } = new NetDataWriter();
+        protected NetDataWriter ServerStateWriter { get; private set; } = new NetDataWriter();
 
         #region Events
         public event System.Action onStart;
@@ -494,8 +499,48 @@ namespace MultiplayerARPG
             EntityFixedUpdate();
             if (onFixedUpdate != null)
                 onFixedUpdate.Invoke();
+            if (IsOwnerClient)
+                SendClientState();
+            if (IsServer)
+                SendServerState();
         }
         protected virtual void EntityFixedUpdate() { }
+
+        public virtual void SendClientState()
+        {
+            if (ActiveMovement != null)
+            {
+                bool shouldSendReliably;
+                ClientStateWriter.Reset();
+                TransportHandler.WritePacket(ClientStateWriter, GameNetworkingConsts.EntityState);
+                if (ActiveMovement.WriteClientState(ClientStateWriter, out shouldSendReliably))
+                    ClientSendMessage(CLIENT_STATE_DATA_CHANNEL, shouldSendReliably ? DeliveryMethod.ReliableOrdered : DeliveryMethod.Unreliable, ClientStateWriter);
+            }
+        }
+
+        public virtual void SendServerState()
+        {
+            if (ActiveMovement != null)
+            {
+                bool shouldSendReliably;
+                ServerStateWriter.Reset();
+                TransportHandler.WritePacket(ServerStateWriter, GameNetworkingConsts.EntityState);
+                if (ActiveMovement.WriteServerState(ServerStateWriter, out shouldSendReliably))
+                    ServerSendMessageToSubscribers(SERVER_STATE_DATA_CHANNEL, shouldSendReliably ? DeliveryMethod.ReliableOrdered : DeliveryMethod.Unreliable, ServerStateWriter);
+            }
+        }
+
+        public virtual void ReadClientStateAtServer(NetDataReader reader)
+        {
+            if (ActiveMovement != null)
+                ActiveMovement.ReadClientStateAtServer(reader);
+        }
+
+        public virtual void ReadServerStateAtClient(NetDataReader reader)
+        {
+            if (ActiveMovement != null)
+                ActiveMovement.ReadServerStateAtClient(reader);
+        }
 
         private void OnDestroy()
         {
@@ -648,7 +693,7 @@ namespace MultiplayerARPG
                 onNetworkDestroy.Invoke(reasons);
         }
 
-        public virtual float GetMoveSpeed()
+        public virtual float GetMoveSpeed(bool calculateWithAction = true)
         {
             return 0;
         }
