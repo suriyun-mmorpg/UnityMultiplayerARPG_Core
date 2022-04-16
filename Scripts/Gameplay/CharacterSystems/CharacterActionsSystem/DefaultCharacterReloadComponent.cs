@@ -237,8 +237,15 @@ namespace MultiplayerARPG
 
         public void ReadServerReloadStateAtClient(NetDataReader reader)
         {
+            bool isLeftHand = reader.GetBool();
+            short reloadingAmmoAmount = reader.GetPackedShort();
+            if (IsOwnerClientOrOwnedByServer)
+            {
+                // Don't play reload animation again (it already played in `Reload` function)
+                return;
+            }
             // Play reload animation at client
-            ReloadRoutine(reader.GetBool(), reader.GetPackedShort()).Forget();
+            ReloadRoutine(isLeftHand, reloadingAmmoAmount).Forget();
         }
     }
 }
