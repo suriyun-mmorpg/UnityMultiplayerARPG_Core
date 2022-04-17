@@ -6,6 +6,7 @@ using UnityEditor.SceneManagement;
 using UnityEngine.AI;
 using StandardAssets.Characters.Physics;
 using LiteNetLibManager;
+using MultiplayerARPG.GameData.Model.Playables;
 
 namespace MultiplayerARPG
 {
@@ -13,6 +14,7 @@ namespace MultiplayerARPG
     {
         public enum CharacterModelType
         {
+            PlayableCharacterModel,
             AnimatorCharacterModel,
             AnimationCharacterModel,
         }
@@ -56,8 +58,8 @@ namespace MultiplayerARPG
             Vector2 wndRect = new Vector2(500, 500);
             maxSize = wndRect;
             minSize = wndRect;
-            titleContent = new GUIContent("Character Entity", null, "Character Entity Creator (3D)");
-            GUILayout.BeginVertical("Character Entity Creator", "window");
+            titleContent = new GUIContent("Vehicle Entity", null, "Vehicle Entity Creator (3D)");
+            GUILayout.BeginVertical("Vehicle Entity Creator", "window");
             {
                 GUILayout.BeginVertical("box");
                 {
@@ -92,12 +94,24 @@ namespace MultiplayerARPG
             var newObject = Instantiate(fbx, Vector3.zero, Quaternion.identity);
             newObject.AddComponent<LiteNetLibIdentity>();
 
+            Animator animator;
             BaseCharacterModel characterModel = null;
             switch (characterModelType)
             {
+                case CharacterModelType.PlayableCharacterModel:
+                    characterModel = newObject.AddComponent<PlayableCharacterModel>();
+                    animator = newObject.GetComponentInChildren<Animator>();
+                    if (animator == null)
+                    {
+                        Debug.LogError("Cannot create new entity with `PlayableCharacterModel`, can't find `Animator` component");
+                        DestroyImmediate(newObject);
+                        return;
+                    }
+                    (characterModel as PlayableCharacterModel).animator = animator;
+                    break;
                 case CharacterModelType.AnimatorCharacterModel:
                     characterModel = newObject.AddComponent<AnimatorCharacterModel>();
-                    var animator = newObject.GetComponentInChildren<Animator>();
+                    animator = newObject.GetComponentInChildren<Animator>();
                     if (animator == null)
                     {
                         Debug.LogError("Cannot create new entity with `AnimatorCharacterModel`, can't find `Animator` component");
