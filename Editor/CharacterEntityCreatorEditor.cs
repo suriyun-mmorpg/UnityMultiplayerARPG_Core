@@ -40,7 +40,7 @@ namespace MultiplayerARPG
         private GameDatabase gameDatabase;
         private GameObject fbx;
 
-        [MenuItem("MMORPG KIT/Character Entity Creator (3D)", false, 101)]
+        [MenuItem(EditorMenu.CHARACTER_ENTITY_CREATOR_MENU, false, EditorMenu.CHARACTER_ENTITY_CREATOR_ORDER)]
         public static void CreateNewCharacterEntity()
         {
             bool gettingWindow;

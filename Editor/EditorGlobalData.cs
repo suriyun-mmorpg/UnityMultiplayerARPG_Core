@@ -1,6 +1,7 @@
 ﻿using UnityEngine.SceneManagement;
 
-namespace MultiplayerARPG {
+namespace MultiplayerARPG
+{
     public class EditorGlobalData
     {
         public static Scene? EditorScene { get; set; }

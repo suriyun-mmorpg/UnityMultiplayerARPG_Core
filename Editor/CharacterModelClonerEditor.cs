@@ -16,7 +16,7 @@ namespace MultiplayerARPG
         private bool cloneWeaponAnimations;
         private bool cloneSkillAnimations;
 
-        [MenuItem("MMORPG KIT/Character Model Cloner (3D)", false, 100)]
+        [MenuItem(EditorMenu.CHARACTER_MODEL_CLONER_MENU, false, EditorMenu.CHARACTER_MODEL_CLONER_ORDER)]
         public static void CreateNewEditor()
         {
             GetWindow<CharacterModelClonerEditor>();
