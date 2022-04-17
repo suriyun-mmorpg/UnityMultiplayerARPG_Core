@@ -2,7 +2,7 @@
 
 namespace MultiplayerARPG
 {
-    public static class CharacterInventoryExtension
+    public static class CharacterInventoryExtensions
     {
         public static bool MoveItemFromStorage(
             this IPlayerCharacterData playerCharacter,

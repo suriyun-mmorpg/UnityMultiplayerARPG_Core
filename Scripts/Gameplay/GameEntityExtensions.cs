@@ -2,7 +2,7 @@
 
 namespace MultiplayerARPG
 {
-    public static class GameEntityExtension
+    public static class GameEntityExtensions
     {
         public static long GetConnectionId(this IGameEntity gameEntity)
         {

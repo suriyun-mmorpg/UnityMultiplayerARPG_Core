@@ -1,6 +1,6 @@
 ﻿namespace MultiplayerARPG
 {
-    public static class VehicleEntityExtension
+    public static class VehicleEntityExtensions
     {
         public static bool IsDriver(this IVehicleEntity vehicleEntity, byte seatIndex)
         {

@@ -1,6 +1,6 @@
 ﻿namespace MultiplayerARPG
 {
-    public static class DamageableEntityExtension
+    public static class DamageableEntityExtensions
     {
         public static bool IsDead(this IDamageableEntity damageableEntity)
         {

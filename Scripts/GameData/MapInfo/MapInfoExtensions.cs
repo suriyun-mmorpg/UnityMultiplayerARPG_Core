@@ -1,9 +1,6 @@
-﻿using UnityEngine;
-using System.Collections;
-
-namespace MultiplayerARPG
+﻿namespace MultiplayerARPG
 {
-    public static class MapInfoExtension
+    public static class MapInfoExtensions
     {
         public static bool IsSceneSet(this BaseMapInfo mapInfo)
         {

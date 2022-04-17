@@ -2,7 +2,7 @@
 
 namespace MultiplayerARPG
 {
-    public static class ItemExtension
+    public static class ItemExtensions
     {
         #region Item Type Extension
 

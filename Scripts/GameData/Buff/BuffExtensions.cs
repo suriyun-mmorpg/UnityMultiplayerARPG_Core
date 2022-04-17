@@ -1,10 +1,8 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using System.Collections.Generic;
 
 namespace MultiplayerARPG
 {
-    public static class BuffExtension
+    public static class BuffExtensions
     {
         #region Buff Extension
         public static float GetDuration(this Buff buff, short level)

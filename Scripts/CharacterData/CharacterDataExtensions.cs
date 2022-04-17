@@ -4,13 +4,13 @@ using LiteNetLibManager;
 
 namespace MultiplayerARPG
 {
-    public static partial class CharacterDataExtension
+    public static partial class CharacterDataExtensions
     {
         public static System.Type ClassType { get; private set; }
 
-        static CharacterDataExtension()
+        static CharacterDataExtensions()
         {
-            ClassType = typeof(CharacterDataExtension);
+            ClassType = typeof(CharacterDataExtensions);
         }
 
         public static BaseCharacter GetDatabase(this ICharacterData data)

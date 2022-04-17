@@ -2,7 +2,7 @@
 
 namespace MultiplayerARPG
 {
-    public static class CraftingQueueSourceExtension
+    public static class CraftingQueueSourceExtensions
     {
         public static bool IsInCraftDistance(this ICraftingQueueSource source, Vector3 crafterPosition)
         {

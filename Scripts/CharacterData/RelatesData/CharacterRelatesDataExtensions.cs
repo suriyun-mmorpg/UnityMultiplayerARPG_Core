@@ -1,6 +1,6 @@
 ﻿namespace MultiplayerARPG
 {
-    public static class CharacterRelatesDataExtension
+    public static class CharacterRelatesDataExtensions
     {
         public static bool IsEmpty(this CharacterStats data)
         {

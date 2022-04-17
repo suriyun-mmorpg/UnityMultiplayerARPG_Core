@@ -2,7 +2,7 @@
 
 namespace MultiplayerARPG
 {
-    public static partial class BuildingSaveDataExtension
+    public static class BuildingSaveDataExtensions
     {
         private static System.Type classType;
         public static System.Type ClassType
@@ -10,7 +10,7 @@ namespace MultiplayerARPG
             get
             {
                 if (classType == null)
-                    classType = typeof(BuildingSaveDataExtension);
+                    classType = typeof(BuildingSaveDataExtensions);
                 return classType;
             }
         }

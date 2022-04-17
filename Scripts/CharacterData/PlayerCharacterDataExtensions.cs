@@ -1,5 +1,4 @@
 ﻿using LiteNetLib.Utils;
-using LiteNetLibManager;
 using System.Collections.Generic;
 using System.IO;
 using System.Runtime.Serialization;
@@ -8,13 +7,13 @@ using UnityEngine;
 
 namespace MultiplayerARPG
 {
-    public static partial class PlayerCharacterDataExtension
+    public static partial class PlayerCharacterDataExtensions
     {
         public static System.Type ClassType { get; private set; }
 
-        static PlayerCharacterDataExtension()
+        static PlayerCharacterDataExtensions()
         {
-            ClassType = typeof(PlayerCharacterDataExtension);
+            ClassType = typeof(PlayerCharacterDataExtensions);
         }
 
         public static T CloneTo<T>(this IPlayerCharacterData from, T to) where T : IPlayerCharacterData

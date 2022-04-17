@@ -53,7 +53,7 @@ namespace MultiplayerARPG
 
         public override List<PlayerCharacterData> LoadCharacters()
         {
-            return PlayerCharacterDataExtension.LoadAllPersistentCharacterData();
+            return PlayerCharacterDataExtensions.LoadAllPersistentCharacterData();
         }
 
         public override List<CharacterBuff> LoadSummonBuffs(IPlayerCharacterData playerCharacterData)

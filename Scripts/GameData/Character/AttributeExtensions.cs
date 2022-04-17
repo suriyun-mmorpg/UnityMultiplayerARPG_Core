@@ -1,9 +1,6 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-
-namespace MultiplayerARPG
+﻿namespace MultiplayerARPG
 {
-    public static class AttributeExtension
+    public static class AttributeExtensions
     {
         public static CharacterStats GetStats(this Attribute attribute, float level)
         {
