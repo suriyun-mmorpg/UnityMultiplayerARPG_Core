@@ -6,12 +6,13 @@ using UnityEditor;
 
 namespace MultiplayerARPG
 {
-    public class MinimapMaker : MonoBehaviour
+    public class MinimapCreator : MonoBehaviour
     {
         public const int TEXTURE_WIDTH = 1024;
         public const int TEXTURE_HEIGHT = 1024;
         public const int TEXTURE_DEPTH = 24;
         public const float SPRITE_PIXELS_PER_UNIT = 100f;
+
         public BaseMapInfo targetMapInfo;
         public DimensionType dimensionType;
         public LayerMask cullingMask = ~0;
@@ -26,13 +27,40 @@ namespace MultiplayerARPG
         public bool makeByCollider2D = true;
         public bool makeByRenderer = false;
 #if UNITY_EDITOR
-        [InspectorButton(nameof(Make))]
-        public bool make;
+        [InspectorButton(nameof(Create))]
+        public bool create;
 #endif
 
 #if UNITY_EDITOR
-        [ContextMenu("Make")]
-        public void Make()
+        [ContextMenu("Create")]
+        public void Create()
+        {
+            Create(
+                targetMapInfo,
+                dimensionType,
+                cullingMask,
+                clearFlagsBackgroundColor,
+                minimapSuffix,
+                cameraYPosition,
+                cameraZPosition,
+                makeByTerrain,
+                makeByCollider,
+                makeByCollider2D,
+                makeByRenderer);
+        }
+
+        public static void Create(
+            BaseMapInfo targetMapInfo,
+            DimensionType dimensionType,
+            LayerMask cullingMask,
+            Color clearFlagsBackgroundColor,
+            string minimapSuffix,
+            float cameraYPosition,
+            float cameraZPosition,
+            bool makeByTerrain,
+            bool makeByCollider,
+            bool makeByCollider2D,
+            bool makeByRenderer)
         {
             // Find bounds
             Bounds bounds = default;
