@@ -154,11 +154,6 @@ namespace MultiplayerARPG
             }
         }
 
-        /// <summary>
-        /// Return `TRUE` if applied amount reached `maxRandomStatsAmount`
-        /// </summary>
-        /// <param name=""></param>
-        /// <returns></returns>
         public void RandomCharacterStats(System.Random random, ItemRandomBonus randomBonus, RandomCharacterStats randomStats, ref CharacterStats stats, ref int appliedAmount)
         {
             if (randomBonus.maxRandomStatsAmount > 0 && appliedAmount >= randomBonus.maxRandomStatsAmount)
