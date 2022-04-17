@@ -2,7 +2,7 @@
 
 namespace MultiplayerARPG
 {
-    [CreateAssetMenu(fileName = "Status Effect", menuName = "Create GameData/Status Effect", order = -4991)]
+    [CreateAssetMenu(fileName = GameDataMenuConsts.STATUS_EFFECT_FILE, menuName = GameDataMenuConsts.STATUS_EFFECT_MENU, order = GameDataMenuConsts.STATUS_EFFECT_ORDER)]
     public class StatusEffect : BaseGameData
     {
         [Category("Status Effect Settings")]

@@ -2,7 +2,7 @@
 
 namespace MultiplayerARPG
 {
-    [CreateAssetMenu(fileName = "Item Drop Table", menuName = "Create GameData/Item Drop Table", order = -4993)]
+    [CreateAssetMenu(fileName = GameDataMenuConsts.ITEM_DROP_TABLE_FILE, menuName = GameDataMenuConsts.ITEM_DROP_TABLE_MENU, order = GameDataMenuConsts.ITEM_DROP_TABLE_ORDER)]
     public class ItemDropTable : ScriptableObject
     {
         [ArrayElementTitle("item")]

@@ -2,7 +2,7 @@
 
 namespace MultiplayerARPG
 {
-    [CreateAssetMenu(fileName = "Mount Item", menuName = "Create GameData/Item/Mount Item", order = -4883)]
+    [CreateAssetMenu(fileName = GameDataMenuConsts.MOUNT_ITEM_FILE, menuName = GameDataMenuConsts.MOUNT_ITEM_MENU, order = GameDataMenuConsts.MOUNT_ITEM_ORDER)]
     public partial class MountItem : BaseItem, IMountItem
     {
         public override string TypeTitle

@@ -4,8 +4,7 @@ using UnityEngine;
 
 namespace MultiplayerARPG
 {
-
-    [CreateAssetMenu(fileName = "Item Craft Formula", menuName = "Create GameData/Item Craft Formula", order = -4880)]
+    [CreateAssetMenu(fileName = GameDataMenuConsts.ITEM_CRAFT_FORMULA_FILE, menuName = GameDataMenuConsts.ITEM_CRAFT_FORMULA_MENU, order = GameDataMenuConsts.ITEM_CRAFT_FORMULA_ORDER)]
     public class ItemCraftFormula : BaseGameData
     {
         [Category("Item Craft Formula Settings")]

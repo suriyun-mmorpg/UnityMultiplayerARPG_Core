@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace MultiplayerARPG
 {
-    [CreateAssetMenu(fileName = "Gacha", menuName = "Create GameData/Gacha", order = -4876)]
+    [CreateAssetMenu(fileName = GameDataMenuConsts.GACHA_FILE, menuName = GameDataMenuConsts.GACHA_MENU, order = GameDataMenuConsts.GACHA_ORDER)]
     public class Gacha : BaseGameData
     {
         [Category("Gacha Settings")]

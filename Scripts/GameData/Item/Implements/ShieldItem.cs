@@ -2,7 +2,7 @@
 
 namespace MultiplayerARPG
 {
-    [CreateAssetMenu(fileName = "Shield Item", menuName = "Create GameData/Item/Shield Item", order = -4888)]
+    [CreateAssetMenu(fileName = GameDataMenuConsts.SHIELD_ITEM_FILE, menuName = GameDataMenuConsts.SHIELD_ITEM_MENU, order = GameDataMenuConsts.SHIELD_ITEM_ORDER)]
     public partial class ShieldItem : BaseDefendEquipmentItem, IShieldItem
     {
         public override string TypeTitle

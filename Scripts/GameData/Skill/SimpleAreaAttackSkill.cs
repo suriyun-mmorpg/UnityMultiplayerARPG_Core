@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace MultiplayerARPG
 {
-    [CreateAssetMenu(fileName = "Simple Area Attack Skill", menuName = "Create GameData/Skill/Simple Area Attack Skill", order = -4988)]
+    [CreateAssetMenu(fileName = GameDataMenuConsts.SIMPLE_AREA_ATTACK_SKILL_FILE, menuName = GameDataMenuConsts.SIMPLE_AREA_ATTACK_SKILL_MENU, order = GameDataMenuConsts.SIMPLE_AREA_ATTACK_SKILL_ORDER)]
     public partial class SimpleAreaAttackSkill : BaseAreaSkill
     {
         public enum SkillAttackType : byte

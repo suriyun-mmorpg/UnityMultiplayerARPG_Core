@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace MultiplayerARPG
 {
-    [CreateAssetMenu(fileName = "Item Refine Info", menuName = "Create GameData/Item Refine", order = -4898)]
+    [CreateAssetMenu(fileName = GameDataMenuConsts.ITEM_REFINE_FILE, menuName = GameDataMenuConsts.ITEM_REFINE_MENU, order = GameDataMenuConsts.ITEM_REFINE_ORDER)]
     public partial class ItemRefine : BaseGameData
     {
         [Category("Item Refine Settings")]

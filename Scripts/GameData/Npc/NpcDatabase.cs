@@ -2,7 +2,7 @@
 
 namespace MultiplayerARPG
 {
-    [CreateAssetMenu(fileName = "Npc Database", menuName = "Create GameDatabase/Npc Database", order = -5899)]
+    [CreateAssetMenu(fileName = GameDataMenuConsts.NPC_DATABASE_FILE, menuName = GameDataMenuConsts.NPC_DATABASE_MENU, order = GameDataMenuConsts.NPC_DATABASE_ORDER)]
     public class NpcDatabase : ScriptableObject
     {
         public Npcs[] maps;

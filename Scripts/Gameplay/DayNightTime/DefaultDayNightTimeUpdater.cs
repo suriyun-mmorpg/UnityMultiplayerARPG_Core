@@ -1,11 +1,9 @@
 ﻿using System;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 namespace MultiplayerARPG
 {
-    [CreateAssetMenu(fileName = "Default Day Night Time Updater", menuName = "Create DayNightTimeUpdater/Default Day Night Time Updater", order = -2099)]
+    [CreateAssetMenu(fileName = GameDataMenuConsts.DEFAULT_DAY_NIGHT_TIME_UPDATER_FILE, menuName = GameDataMenuConsts.DEFAULT_DAY_NIGHT_TIME_UPDATER_MENU, order = GameDataMenuConsts.DEFAULT_DAY_NIGHT_TIME_UPDATER_ORDER)]
     public class DefaultDayNightTimeUpdater : BaseDayNightTimeUpdater
     {
         [SerializeField]

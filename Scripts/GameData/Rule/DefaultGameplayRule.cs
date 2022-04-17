@@ -4,7 +4,7 @@ using UnityEngine.Serialization;
 
 namespace MultiplayerARPG
 {
-    [CreateAssetMenu(fileName = "Default Gameplay Rule", menuName = "Create GameplayRule/Default Gameplay Rule", order = -2999)]
+    [CreateAssetMenu(fileName = GameDataMenuConsts.DEFAULT_GAMEPLAY_RULE_FILE, menuName = GameDataMenuConsts.DEFAULT_GAMEPLAY_RULE_MENU, order = GameDataMenuConsts.DEFAULT_GAMEPLAY_RULE_ORDER)]
     public partial class DefaultGameplayRule : BaseGameplayRule
     {
         [Header("Levelling/Stat/Skill")]

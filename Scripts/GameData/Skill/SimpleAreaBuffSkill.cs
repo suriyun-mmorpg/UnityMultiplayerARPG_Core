@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace MultiplayerARPG
 {
-    [CreateAssetMenu(fileName = "Simple Area Buff Skill", menuName = "Create GameData/Skill/Simple Area Buff Skill", order = -4987)]
+    [CreateAssetMenu(fileName = GameDataMenuConsts.SIMPLE_AREA_BUFF_SKILL_FILE, menuName = GameDataMenuConsts.SIMPLE_AREA_BUFF_SKILL_MENU, order = GameDataMenuConsts.SIMPLE_AREA_BUFF_SKILL_ORDER)]
     public partial class SimpleAreaBuffSkill : BaseAreaSkill
     {
         [Category("Area Settings")]

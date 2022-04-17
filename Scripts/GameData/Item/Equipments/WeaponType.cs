@@ -12,7 +12,7 @@ namespace MultiplayerARPG
         OffHandOnly,
     }
 
-    [CreateAssetMenu(fileName = "Weapon Type", menuName = "Create GameData/Weapon Type", order = -4895)]
+    [CreateAssetMenu(fileName = GameDataMenuConsts.WEAPON_TYPE_FILE, menuName = GameDataMenuConsts.WEAPON_TYPE_MENU, order = GameDataMenuConsts.WEAPON_TYPE_ORDER)]
     public partial class WeaponType : BaseGameData
     {
         [Category("Weapon Type Settings")]

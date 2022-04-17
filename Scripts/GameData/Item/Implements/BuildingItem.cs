@@ -2,7 +2,7 @@
 
 namespace MultiplayerARPG
 {
-    [CreateAssetMenu(fileName = "Building Item", menuName = "Create GameData/Item/Building Item", order = -4885)]
+    [CreateAssetMenu(fileName = GameDataMenuConsts.BUILDING_ITEM_FILE, menuName = GameDataMenuConsts.BUILDING_ITEM_MENU, order = GameDataMenuConsts.BUILDING_ITEM_ORDER)]
     public partial class BuildingItem : BaseItem, IBuildingItem
     {
         public override string TypeTitle

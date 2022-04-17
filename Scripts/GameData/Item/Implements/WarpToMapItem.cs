@@ -2,7 +2,7 @@
 
 namespace MultiplayerARPG
 {
-    [CreateAssetMenu(fileName = "Warp To Map Item", menuName = "Create GameData/Item/Warp To Map Item", order = -4879)]
+    [CreateAssetMenu(fileName = GameDataMenuConsts.WARP_TO_MAP_ITEM_FILE, menuName = GameDataMenuConsts.WARP_TO_MAP_ITEM_MENU, order = GameDataMenuConsts.WARP_TO_MAP_ITEM_ORDER)]
     public class WarpToMapItem : BaseItem, IUsableItem
     {
         [SerializeField]

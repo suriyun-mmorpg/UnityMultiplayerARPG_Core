@@ -2,7 +2,7 @@
 
 namespace MultiplayerARPG
 {
-    [CreateAssetMenu(fileName = "Armor Type", menuName = "Create GameData/Armor Type", order = -4896)]
+    [CreateAssetMenu(fileName = GameDataMenuConsts.ARMOR_TYPE_FILE, menuName = GameDataMenuConsts.ARMOR_TYPE_MENU, order = GameDataMenuConsts.ARMOR_TYPE_ORDER)]
     public partial class ArmorType : BaseGameData
     {
         [Category("Armor Type Settings")]

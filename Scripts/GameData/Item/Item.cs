@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace MultiplayerARPG
 {
-    [CreateAssetMenu(fileName = "Item", menuName = "Create GameData/Legacy Item", order = -4899)]
+    [CreateAssetMenu(fileName = GameDataMenuConsts.LEGACY_ITEM_FILE, menuName = GameDataMenuConsts.LEGACY_ITEM_MENU, order = GameDataMenuConsts.LEGACY_ITEM_ORDER)]
     public partial class Item : BaseItem,
         IAmmoItem, IArmorItem, IShieldItem, IWeaponItem,
         IPotionItem, IBuildingItem, IPetItem, IMountItem, ISkillItem,

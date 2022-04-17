@@ -4,7 +4,7 @@ using UnityEngine.Serialization;
 
 namespace MultiplayerARPG
 {
-    [CreateAssetMenu(fileName = "Cash Shop Item", menuName = "Create CashShop/Cash Shop Item", order = -3996)]
+    [CreateAssetMenu(fileName = GameDataMenuConsts.CASH_SHOP_ITEM_FILE, menuName = GameDataMenuConsts.CASH_SHOP_ITEM_MENU, order = GameDataMenuConsts.CASH_SHOP_ITEM_ORDER)]
     public class CashShopItem : BaseGameData
     {
         [Category("Cash Shop Item Settings")]

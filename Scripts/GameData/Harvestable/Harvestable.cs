@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace MultiplayerARPG
 {
-    [CreateAssetMenu(fileName = "Harvestable", menuName = "Create GameData/Harvestable", order = -4795)]
+    [CreateAssetMenu(fileName = GameDataMenuConsts.HARVESTABLE_FILE, menuName = GameDataMenuConsts.HARVESTABLE_MENU, order = GameDataMenuConsts.HARVESTABLE_ORDER)]
     public partial class Harvestable : BaseGameData
     {
         [Category("Harvestable Settings")]

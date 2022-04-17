@@ -2,7 +2,7 @@
 
 namespace MultiplayerARPG
 {
-    [CreateAssetMenu(fileName = "Socket Enhancer Item", menuName = "Create GameData/Item/Socket Enhancer Item", order = -4881)]
+    [CreateAssetMenu(fileName = GameDataMenuConsts.SOCKET_ENHANCER_ITEM_FILE, menuName = GameDataMenuConsts.SOCKET_ENHANCER_ITEM_MENU, order = GameDataMenuConsts.SOCKET_ENHANCER_ITEM_ORDER)]
     public partial class SocketEnhancerItem : BaseItem, ISocketEnhancerItem
     {
         public override string TypeTitle

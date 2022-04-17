@@ -4,7 +4,7 @@ using UnityEngine.Serialization;
 
 namespace MultiplayerARPG
 {
-    [CreateAssetMenu(fileName = "Skill", menuName = "Create GameData/Skill/Skill", order = -4989)]
+    [CreateAssetMenu(fileName = GameDataMenuConsts.SKILL_FILE, menuName = GameDataMenuConsts.SKILL_MENU, order = GameDataMenuConsts.SKILL_ORDER)]
     public partial class Skill : BaseSkill
     {
         public enum SkillAttackType : byte

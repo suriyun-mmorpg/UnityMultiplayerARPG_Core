@@ -1,15 +1,11 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using LiteNetLibManager;
 using UnityEngine;
-#if UNITY_EDITOR
-using UnityEditor;
-#endif
 
 namespace MultiplayerARPG
 {
-    [CreateAssetMenu(fileName = "Player Character", menuName = "Create GameData/Player Character", order = -4999)]
+    [CreateAssetMenu(fileName = GameDataMenuConsts.PLAYER_CHARACTER_FILE, menuName = GameDataMenuConsts.PLAYER_CHARACTER_MENU, order = GameDataMenuConsts.PLAYER_CHARACTER_ORDER)]
     public partial class PlayerCharacter : BaseCharacter
     {
         [Category(3, "Character Stats")]

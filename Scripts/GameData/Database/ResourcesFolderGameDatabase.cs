@@ -1,6 +1,4 @@
 ﻿using Cysharp.Threading.Tasks;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 namespace MultiplayerARPG
@@ -8,7 +6,7 @@ namespace MultiplayerARPG
     /// <summary>
     /// This game database will load and setup game data from Resources folder
     /// </summary>
-    [CreateAssetMenu(fileName = "Resources Folder Game Database", menuName = "Create GameDatabase/Resources Folder Game Database", order = -5998)]
+    [CreateAssetMenu(fileName = GameDataMenuConsts.RES_GAME_DATABASE_FILE, menuName = GameDataMenuConsts.RES_GAME_DATABASE_MENU, order = GameDataMenuConsts.RES_GAME_DATABASE_ORDER)]
     public partial class ResourcesFolderGameDatabase : BaseGameDatabase
     {
         protected override async UniTask LoadDataImplement(GameInstance gameInstance)

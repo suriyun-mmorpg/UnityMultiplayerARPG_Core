@@ -3,7 +3,7 @@ using UnityEngine.Serialization;
 
 namespace MultiplayerARPG
 {
-    [CreateAssetMenu(fileName = "Zoom Weapon Ability", menuName = "Create GameData/Weapon Ability/Zoom Weapon Ability", order = -4890)]
+    [CreateAssetMenu(fileName = GameDataMenuConsts.ZOOM_WEAPON_ABILITY_FILE, menuName = GameDataMenuConsts.ZOOM_WEAPON_ABILITY_MENU, order = GameDataMenuConsts.ZOOM_WEAPON_ABILITY_ORDER)]
     public class ZoomWeaponAbility : BaseWeaponAbility
     {
         const float ZOOM_SPEED = 1.25f;

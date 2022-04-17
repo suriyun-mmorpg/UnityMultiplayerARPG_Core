@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace MultiplayerARPG
 {
-    [CreateAssetMenu(fileName = "Default Game Save System", menuName = "Create Game Save System/Default Game Save System", order = -2499)]
+    [CreateAssetMenu(fileName = GameDataMenuConsts.DEFAULT_GAME_SAVE_SYSTEM_FILE, menuName = GameDataMenuConsts.DEFAULT_GAME_SAVE_SYSTEM_MENU, order = GameDataMenuConsts.DEFAULT_GAME_SAVE_SYSTEM_ORDER)]
     public class DefaultGameSaveSystem : BaseGameSaveSystem
     {
         private readonly WorldSaveData worldSaveData = new WorldSaveData();

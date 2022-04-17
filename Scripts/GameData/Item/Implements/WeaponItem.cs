@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace MultiplayerARPG
 {
-    [CreateAssetMenu(fileName = "Weapon Item", menuName = "Create GameData/Item/Weapon Item", order = -4889)]
+    [CreateAssetMenu(fileName = GameDataMenuConsts.WEAPON_ITEM_FILE, menuName = GameDataMenuConsts.WEAPON_ITEM_MENU, order = GameDataMenuConsts.WEAPON_ITEM_ORDER)]
     public partial class WeaponItem : BaseEquipmentItem, IWeaponItem
     {
         public override string TypeTitle

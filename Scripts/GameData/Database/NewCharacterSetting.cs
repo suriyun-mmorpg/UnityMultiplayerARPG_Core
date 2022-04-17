@@ -2,7 +2,7 @@
 
 namespace MultiplayerARPG
 {
-    [CreateAssetMenu(fileName = "New Character Setting", menuName = "Create GameData/New Character Setting", order = -4695)]
+    [CreateAssetMenu(fileName = GameDataMenuConsts.NEW_CHARACTER_SETTING_FILE, menuName = GameDataMenuConsts.NEW_CHARACTER_SETTING_MENU, order = GameDataMenuConsts.NEW_CHARACTER_SETTING_ORDER)]
     public partial class NewCharacterSetting : ScriptableObject
     {
         [Header("New Character Configs")]

@@ -11,7 +11,7 @@ namespace MultiplayerARPG
         Custom = 254,
     }
 
-    [CreateAssetMenu(fileName = "Quest", menuName = "Create GameData/Quest", order = -4796)]
+    [CreateAssetMenu(fileName = GameDataMenuConsts.QUEST_FILE, menuName = GameDataMenuConsts.QUEST_MENU, order = GameDataMenuConsts.QUEST_ORDER)]
     public partial class Quest : BaseGameData
     {
         [Category("Quest Settings")]

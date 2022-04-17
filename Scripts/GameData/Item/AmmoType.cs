@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace MultiplayerARPG
 {
-    [CreateAssetMenu(fileName = "Ammo Type", menuName = "Create GameData/Ammo Type", order = -4894)]
+    [CreateAssetMenu(fileName = GameDataMenuConsts.AMMO_TYPE_FILE, menuName = GameDataMenuConsts.AMMO_TYPE_MENU, order = GameDataMenuConsts.AMMO_TYPE_ORDER)]
     public partial class AmmoType : BaseGameData
     {
     }

@@ -2,7 +2,7 @@
 
 namespace MultiplayerARPG
 {
-    [CreateAssetMenu(fileName = "Guild Icon", menuName = "Create GameData/Guild Icon", order = -4697)]
+    [CreateAssetMenu(fileName = GameDataMenuConsts.GUILD_ICON_FILE, menuName = GameDataMenuConsts.GUILD_ICON_MENU, order = GameDataMenuConsts.GUILD_ICON_ORDER)]
     public class GuildIcon : BaseGameData
     {
     }

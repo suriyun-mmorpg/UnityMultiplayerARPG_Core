@@ -6,7 +6,7 @@ using UnityEngine.Purchasing;
 
 namespace MultiplayerARPG
 {
-    [CreateAssetMenu(fileName = "Cash Package", menuName = "Create CashShop/Cash Package", order = -3995)]
+    [CreateAssetMenu(fileName = GameDataMenuConsts.CASH_PACKAGE_FILE, menuName = GameDataMenuConsts.CASH_PACKAGE_MENU, order = GameDataMenuConsts.CASH_PACKAGE_ORDER)]
     public class CashPackage : BaseGameData
     {
         [Category("Cash Package Settings")]

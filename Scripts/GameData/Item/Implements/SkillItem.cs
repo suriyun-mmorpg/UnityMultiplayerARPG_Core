@@ -2,7 +2,7 @@
 
 namespace MultiplayerARPG
 {
-    [CreateAssetMenu(fileName = "Skill Item", menuName = "Create GameData/Item/Skill Item", order = -4882)]
+    [CreateAssetMenu(fileName = GameDataMenuConsts.SKILL_ITEM_FILE, menuName = GameDataMenuConsts.SKILL_ITEM_MENU, order = GameDataMenuConsts.SKILL_ITEM_ORDER)]
     public partial class SkillItem : BaseItem, ISkillItem
     {
         public override string TypeTitle

@@ -2,7 +2,7 @@
 
 namespace MultiplayerARPG
 {
-    [CreateAssetMenu(fileName = "Potion Item", menuName = "Create GameData/Item/Potion Item", order = -4886)]
+    [CreateAssetMenu(fileName = GameDataMenuConsts.POTION_ITEM_FILE, menuName = GameDataMenuConsts.POTION_ITEM_MENU, order = GameDataMenuConsts.POTION_ITEM_ORDER)]
     public partial class PotionItem : BaseItem, IPotionItem
     {
         public override string TypeTitle

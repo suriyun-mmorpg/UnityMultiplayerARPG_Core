@@ -5,7 +5,7 @@ using XNode;
 
 namespace MultiplayerARPG
 {
-    [CreateAssetMenu(fileName = "Npc Dialog", menuName = "Create GameData/Npc Dialog", order = -4798)]
+    [CreateAssetMenu(fileName = GameDataMenuConsts.NPC_DIALOG_FILE, menuName = GameDataMenuConsts.NPC_DIALOG_MENU, order = GameDataMenuConsts.NPC_DIALOG_ORDER)]
     public partial class NpcDialog : BaseNpcDialog
     {
         public const int QUEST_ACCEPT_MENU_INDEX = 0;

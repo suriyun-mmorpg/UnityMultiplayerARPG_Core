@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace MultiplayerARPG
 {
-    [CreateAssetMenu(fileName = "Simple Resurrection Skill", menuName = "Create GameData/Skill/Simple Resurrection Skill", order = -4986)]
+    [CreateAssetMenu(fileName = GameDataMenuConsts.SIMPLE_RESURRECTION_SKILL_FILE, menuName = GameDataMenuConsts.SIMPLE_RESURRECTION_SKILL_MENU, order = GameDataMenuConsts.SIMPLE_RESURRECTION_SKILL_ORDER)]
     public class SimpleResurrectionSkill : BaseSkill
     {
         [Category("Buff")]

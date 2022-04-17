@@ -2,7 +2,7 @@
 
 namespace MultiplayerARPG
 {
-    [CreateAssetMenu(fileName = "Warp To Respawn Point Item", menuName = "Create GameData/Item/Warp To Respawn Point Item", order = -4878)]
+    [CreateAssetMenu(fileName = GameDataMenuConsts.WARP_TO_RESPAWN_POINT_ITEM_FILE, menuName = GameDataMenuConsts.WARP_TO_RESPAWN_POINT_ITEM_MENU, order = GameDataMenuConsts.WARP_TO_RESPAWN_POINT_ITEM_ORDER)]
     public class WarpToRespawnPointItem : BaseItem, IUsableItem
     {
         [SerializeField]

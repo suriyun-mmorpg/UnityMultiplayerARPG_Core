@@ -4,7 +4,7 @@ using UnityEngine.Serialization;
 
 namespace MultiplayerARPG
 {
-    [CreateAssetMenu(fileName = "Map Info", menuName = "Create GameData/Map Info", order = -4799)]
+    [CreateAssetMenu(fileName = GameDataMenuConsts.MAP_INFO_FILE, menuName = GameDataMenuConsts.MAP_INFO_MENU, order = GameDataMenuConsts.MAP_INFO_ORDER)]
     public partial class MapInfo : BaseMapInfo
     {
         public enum PvpMode

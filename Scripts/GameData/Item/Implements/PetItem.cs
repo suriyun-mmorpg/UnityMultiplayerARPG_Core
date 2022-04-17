@@ -2,7 +2,7 @@
 
 namespace MultiplayerARPG
 {
-    [CreateAssetMenu(fileName = "Pet Item", menuName = "Create GameData/Item/Pet Item", order = -4884)]
+    [CreateAssetMenu(fileName = GameDataMenuConsts.PET_ITEM_FILE, menuName = GameDataMenuConsts.PET_ITEM_MENU, order = GameDataMenuConsts.PET_ITEM_ORDER)]
     public partial class PetItem : BaseItem, IPetItem
     {
         public override string TypeTitle
