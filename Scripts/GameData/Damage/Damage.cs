@@ -21,6 +21,9 @@ namespace MultiplayerARPG
         [Tooltip("If this is TRUE, it will hit only selected target, if no selected target it will hit 1 random target")]
         public bool hitOnlySelectedTarget;
 
+        [Tooltip("Distance to start attack, this is NOT distance to hit and apply damage, this value should less than `hitDistance` or `missileDistance` to make sure it will hit enemy properly. If this value <= 0 or > `hitDistance` or `missileDistance` it will re-calculate by `hitDistance` or `missileDistance`")]
+        public float startAttackDistance;
+
         [StringShowConditional(nameof(damageType), new string[] { nameof(DamageType.Melee) })]
         public float hitDistance;
         [StringShowConditional(nameof(damageType), new string[] { nameof(DamageType.Melee) })]
@@ -53,22 +56,31 @@ namespace MultiplayerARPG
 
         public float GetDistance()
         {
+            float calculatedDistance = startAttackDistance;
             switch (damageType)
             {
                 case DamageType.Melee:
-                    return hitDistance;
+                    if (calculatedDistance <= 0f || calculatedDistance > hitDistance)
+                        calculatedDistance = hitDistance - (hitDistance * 0.1f);
+                    break;
                 case DamageType.Missile:
                 case DamageType.Raycast:
-                    return missileDistance;
+                    if (calculatedDistance <= 0f || calculatedDistance > missileDistance)
+                        calculatedDistance = missileDistance - (missileDistance * 0.1f);
+                    break;
                 case DamageType.Throwable:
                     // NOTE: It is actually can't find actual distance by simple math because it has many factors,
                     // Such as thrown position, distance from ground, gravity. 
                     // So all throwable weapons are suited for shooter games only.
-                    return throwForce * 0.5f;
+                    if (calculatedDistance <= 0f)
+                        calculatedDistance = throwForce * 0.5f;
+                    break;
                 case DamageType.Custom:
-                    return customDamageInfo.GetDistance();
+                    if (calculatedDistance <= 0f)
+                        calculatedDistance = customDamageInfo.GetDistance();
+                    break;
             }
-            return 0f;
+            return calculatedDistance;
         }
 
         public float GetFov()
