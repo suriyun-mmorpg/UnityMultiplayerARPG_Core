@@ -25,7 +25,7 @@ namespace MultiplayerARPG
         private Vector3 entityRotation;
         private GameObject fbx;
 
-        [MenuItem(EditorMenu.NPC_ENTITY_CREATOR_MENU, false, EditorMenu.NPC_ENTITY_CREATOR_ORDER)]
+        [MenuItem(EditorMenuConsts.NPC_ENTITY_CREATOR_MENU, false, EditorMenuConsts.NPC_ENTITY_CREATOR_ORDER)]
         public static void CreateNewNpcEntity()
         {
             bool gettingWindow;

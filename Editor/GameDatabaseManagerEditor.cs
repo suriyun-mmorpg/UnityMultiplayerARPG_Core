@@ -13,7 +13,7 @@ namespace MultiplayerARPG
         private int selectedMenuIndex;
         private GameDatabase selectedDatabase;
 
-        [MenuItem(EditorMenu.GAME_DATABASE_MENU, false, EditorMenu.GAME_DATABASE_ORDER)]
+        [MenuItem(EditorMenuConsts.GAME_DATABASE_MENU, false, EditorMenuConsts.GAME_DATABASE_ORDER)]
         public static void CreateNewEditor()
         {
             GetWindow<GameDatabaseManagerEditor>();

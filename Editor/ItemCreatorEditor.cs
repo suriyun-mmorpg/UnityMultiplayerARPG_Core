@@ -26,7 +26,7 @@ namespace MultiplayerARPG
         private static Vector3 savedDropModelOffsets;
         private static Vector3 savedDropModelRotateOffsets;
 
-        [MenuItem(EditorMenu.ITEM_CREATOR_MENU, false, EditorMenu.ITEM_CREATOR_ORDER)]
+        [MenuItem(EditorMenuConsts.ITEM_CREATOR_MENU, false, EditorMenuConsts.ITEM_CREATOR_ORDER)]
         public static void CreateNewEditor()
         {
             bool gettingWindow;

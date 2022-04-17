@@ -40,7 +40,7 @@ namespace MultiplayerARPG
         private GameDatabase gameDatabase;
         private GameObject fbx;
 
-        [MenuItem(EditorMenu.CHARACTER_ENTITY_CREATOR_MENU, false, EditorMenu.CHARACTER_ENTITY_CREATOR_ORDER)]
+        [MenuItem(EditorMenuConsts.CHARACTER_ENTITY_CREATOR_MENU, false, EditorMenuConsts.CHARACTER_ENTITY_CREATOR_ORDER)]
         public static void CreateNewCharacterEntity()
         {
             bool gettingWindow;

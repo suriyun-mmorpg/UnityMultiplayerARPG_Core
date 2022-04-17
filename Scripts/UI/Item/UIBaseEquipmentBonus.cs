@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace MultiplayerARPG
 {
-    public abstract class UIBaseEquipmentBonus<T> : UISelectionEntry<T>
+    public abstract partial class UIBaseEquipmentBonus<T> : UISelectionEntry<T>
     {
         [Header("String Formats (Stats)")]
         [Tooltip("Format => {0} = {Amount}")]

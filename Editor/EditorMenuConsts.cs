@@ -1,6 +1,6 @@
 namespace MultiplayerARPG
 {
-    public partial class EditorMenu
+    public partial class EditorMenuConsts
     {
         #region Database
         public const string GAME_DATABASE_MENU = "MMORPG KIT/Game Database";

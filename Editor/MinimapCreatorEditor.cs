@@ -19,7 +19,7 @@ namespace MultiplayerARPG
         private bool makeByCollider2D = true;
         private bool makeByRenderer = false;
 
-        [MenuItem(EditorMenu.MINIMAP_CREATOR_MENU, false, EditorMenu.MINIMAP_CREATOR_ORDER)]
+        [MenuItem(EditorMenuConsts.MINIMAP_CREATOR_MENU, false, EditorMenuConsts.MINIMAP_CREATOR_ORDER)]
         public static void CreateNewMinimap()
         {
             GetWindow<MinimapCreatorEditor>();
