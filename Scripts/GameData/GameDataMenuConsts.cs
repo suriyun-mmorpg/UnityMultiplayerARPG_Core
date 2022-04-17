@@ -101,37 +101,41 @@ namespace MultiplayerARPG
         public const string POTION_ITEM_MENU = "Create GameData/Item/Potion Item";
         public const int POTION_ITEM_ORDER = -5694;
 
+        public const string EXP_POTION_ITEM_FILE = "Exp Potion Item";
+        public const string EXP_POTION_ITEM_MENU = "Create GameData/Item/Exp Potion Item";
+        public const int EXP_POTION_ITEM_ORDER = -5693;
+
         public const string BUILDING_ITEM_FILE = "Building Item";
         public const string BUILDING_ITEM_MENU = "Create GameData/Item/Building Item";
-        public const int BUILDING_ITEM_ORDER = -5693;
+        public const int BUILDING_ITEM_ORDER = -5692;
 
         public const string PET_ITEM_FILE = "Pet Item";
         public const string PET_ITEM_MENU = "Create GameData/Item/Pet Item";
-        public const int PET_ITEM_ORDER = -5692;
+        public const int PET_ITEM_ORDER = -5691;
 
         public const string MOUNT_ITEM_FILE = "Mount Item";
         public const string MOUNT_ITEM_MENU = "Create GameData/Item/Mount Item";
-        public const int MOUNT_ITEM_ORDER = -5691;
+        public const int MOUNT_ITEM_ORDER = -5690;
 
         public const string SKILL_ITEM_FILE = "Skill Item";
         public const string SKILL_ITEM_MENU = "Create GameData/Item/Skill Item";
-        public const int SKILL_ITEM_ORDER = -5690;
+        public const int SKILL_ITEM_ORDER = -5689;
 
         public const string SOCKET_ENHANCER_ITEM_FILE = "Socket Enhancer Item";
         public const string SOCKET_ENHANCER_ITEM_MENU = "Create GameData/Item/Socket Enhancer Item";
-        public const int SOCKET_ENHANCER_ITEM_ORDER = -5689;
+        public const int SOCKET_ENHANCER_ITEM_ORDER = -5688;
 
         public const string AMMO_ITEM_FILE = "Ammo Item";
         public const string AMMO_ITEM_MENU = "Create GameData/Item/Ammo Item";
-        public const int AMMO_ITEM_ORDER = -5688;
+        public const int AMMO_ITEM_ORDER = -5687;
 
         public const string WARP_TO_MAP_ITEM_FILE = "Warp To Map Item";
         public const string WARP_TO_MAP_ITEM_MENU = "Create GameData/Item/Warp To Map Item";
-        public const int WARP_TO_MAP_ITEM_ORDER = -5687;
+        public const int WARP_TO_MAP_ITEM_ORDER = -5686;
 
         public const string WARP_TO_RESPAWN_POINT_ITEM_FILE = "Warp To Respawn Point Item";
         public const string WARP_TO_RESPAWN_POINT_ITEM_MENU = "Create GameData/Item/Warp To Respawn Point Item";
-        public const int WARP_TO_RESPAWN_POINT_ITEM_ORDER = -5686;
+        public const int WARP_TO_RESPAWN_POINT_ITEM_ORDER = -5685;
 
         public const string ITEM_REFINE_FILE = "Item Refine";
         public const string ITEM_REFINE_MENU = "Create GameData/Item Refine";
@@ -185,9 +189,13 @@ namespace MultiplayerARPG
         public const string QUEST_MENU = "Create GameData/Quest";
         public const int QUEST_ORDER = -5299;
 
-        public const string HARVESTABLE_FILE = "Faction";
-        public const string HARVESTABLE_MENU = "Create GameData/Faction";
+        public const string HARVESTABLE_FILE = "Harvestable";
+        public const string HARVESTABLE_MENU = "Create GameData/Harvestable";
         public const int HARVESTABLE_ORDER = -5298;
+
+        public const string FACTION_FILE = "Faction";
+        public const string FACTION_MENU = "Create GameData/Faction";
+        public const int FACTION_ORDER = -5297;
 
         public const string GUILD_SKILL_FILE = "Guild Skill";
         public const string GUILD_SKILL_MENU = "Create GameData/Guild Skill";
@@ -201,8 +209,8 @@ namespace MultiplayerARPG
         public const string SOCIAL_SYSTEM_SETTING_MENU = "Create GameData/Social System Setting";
         public const int SOCIAL_SYSTEM_SETTING_ORDER = -5197;
 
-        public const string NEW_CHARACTER_SETTING_FILE = "new Character Setting";
-        public const string NEW_CHARACTER_SETTING_MENU = "Create GameData/new Character Setting";
+        public const string NEW_CHARACTER_SETTING_FILE = "New Character Setting";
+        public const string NEW_CHARACTER_SETTING_MENU = "Create GameData/New Character Setting";
         public const int NEW_CHARACTER_SETTING_ORDER = -5196;
         #endregion
 

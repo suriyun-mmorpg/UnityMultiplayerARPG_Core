@@ -2,7 +2,7 @@
 
 namespace MultiplayerARPG
 {
-    [CreateAssetMenu(fileName = "Faction", menuName = "Create GameData/Faction", order = -4794)]
+    [CreateAssetMenu(fileName = GameDataMenuConsts.FACTION_FILE, menuName = GameDataMenuConsts.FACTION_MENU, order = GameDataMenuConsts.FACTION_ORDER)]
     public partial class Faction : BaseGameData
     {
     }

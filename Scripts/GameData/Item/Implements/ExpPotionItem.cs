@@ -2,7 +2,7 @@
 
 namespace MultiplayerARPG
 {
-    [CreateAssetMenu(fileName = "Exp Potion Item", menuName = "Create GameData/Item/Exp Potion Item", order = -4886)]
+    [CreateAssetMenu(fileName = GameDataMenuConsts.EXP_POTION_ITEM_FILE, menuName = GameDataMenuConsts.EXP_POTION_ITEM_MENU, order = GameDataMenuConsts.EXP_POTION_ITEM_ORDER)]
     public class ExpPotionItem : BaseItem, IPotionItem
     {
         public override string TypeTitle
