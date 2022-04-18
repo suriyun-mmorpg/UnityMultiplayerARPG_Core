@@ -83,6 +83,12 @@ namespace MultiplayerARPG
             missileDuration = (missileDistance / missileSpeed) + 0.1f;
         }
 
+        protected override void OnEnable()
+        {
+            base.OnEnable();
+            previousPosition = CacheTransform.position;
+        }
+
 #if UNITY_EDITOR
         protected virtual void OnDrawGizmos()
         {
@@ -127,7 +133,7 @@ namespace MultiplayerARPG
                 {
                     int hitCount = 0;
                     int layerMask = GameInstance.Singleton.GetDamageEntityHitLayerMask();
-                    Vector3 dir = (previousPosition.Value - CacheTransform.position).normalized;
+                    Vector3 dir = (CacheTransform.position - previousPosition.Value).normalized;
                     float dist = Vector3.Distance(CacheTransform.position, previousPosition.Value);
                     // Raycast to previous position to check is it hitting something or not
                     // If hit, explode
