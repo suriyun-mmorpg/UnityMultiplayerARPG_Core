@@ -596,8 +596,7 @@ namespace MultiplayerARPG
                 {
                     if (SelectedEntity == null)
                     {
-                        PlayerCharacterEntity.QueueGameMessage(UITextKeys.UI_ERROR_NO_SKILL_TARGET);
-                        ClearQueueUsingSkill();
+                        RequestUsePendingSkill();
                         isFollowingTarget = false;
                         return;
                     }
