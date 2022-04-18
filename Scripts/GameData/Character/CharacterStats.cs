@@ -32,103 +32,94 @@ namespace MultiplayerARPG
         public float goldRate;
         public float expRate;
 
-        public CharacterStats Add(CharacterStats b)
-        {
-            hp = hp + b.hp;
-            hpRecovery = hpRecovery + b.hpRecovery;
-            hpLeechRate = hpLeechRate + b.hpLeechRate;
-            mp = mp + b.mp;
-            mpRecovery = mpRecovery + b.mpRecovery;
-            mpLeechRate = mpLeechRate + b.mpLeechRate;
-            stamina = stamina + b.stamina;
-            staminaRecovery = staminaRecovery + b.staminaRecovery;
-            staminaLeechRate = staminaLeechRate + b.staminaLeechRate;
-            food = food + b.food;
-            water = water + b.water;
-            accuracy = accuracy + b.accuracy;
-            evasion = evasion + b.evasion;
-            criRate = criRate + b.criRate;
-            criDmgRate = criDmgRate + b.criDmgRate;
-            blockRate = blockRate + b.blockRate;
-            blockDmgRate = blockDmgRate + b.blockDmgRate;
-            moveSpeed = moveSpeed + b.moveSpeed;
-            atkSpeed = atkSpeed + b.atkSpeed;
-            weightLimit = weightLimit + b.weightLimit;
-            slotLimit = slotLimit + b.slotLimit;
-            goldRate = goldRate + b.goldRate;
-            expRate = expRate + b.expRate;
-            return this.InvokeInstanceDevExtMethodsLoopItself("Add", b);
-        }
-
-        public CharacterStats Multiply(float multiplier)
-        {
-            hp = hp * multiplier;
-            hpRecovery = hpRecovery * multiplier;
-            hpLeechRate = hpLeechRate * multiplier;
-            mp = mp * multiplier;
-            mpRecovery = mpRecovery * multiplier;
-            mpLeechRate = mpLeechRate * multiplier;
-            stamina = stamina * multiplier;
-            staminaRecovery = staminaRecovery * multiplier;
-            staminaLeechRate = staminaLeechRate * multiplier;
-            food = food * multiplier;
-            water = water * multiplier;
-            accuracy = accuracy * multiplier;
-            evasion = evasion * multiplier;
-            criRate = criRate * multiplier;
-            criDmgRate = criDmgRate * multiplier;
-            blockRate = blockRate * multiplier;
-            blockDmgRate = blockDmgRate * multiplier;
-            moveSpeed = moveSpeed * multiplier;
-            atkSpeed = atkSpeed * multiplier;
-            weightLimit = weightLimit * multiplier;
-            slotLimit = slotLimit * multiplier;
-            goldRate = goldRate * multiplier;
-            expRate = expRate * multiplier;
-            return this.InvokeInstanceDevExtMethodsLoopItself("Multiply", multiplier);
-        }
-
-        public CharacterStats MultiplyStats(CharacterStats b)
-        {
-            hp = hp * b.hp;
-            hpRecovery = hpRecovery * b.hpRecovery;
-            hpLeechRate = hpLeechRate * b.hpLeechRate;
-            mp = mp * b.mp;
-            mpRecovery = mpRecovery * b.mpRecovery;
-            mpLeechRate = mpLeechRate * b.mpLeechRate;
-            stamina = stamina * b.stamina;
-            staminaRecovery = staminaRecovery * b.staminaRecovery;
-            staminaLeechRate = staminaLeechRate * b.staminaLeechRate;
-            food = food * b.food;
-            water = water * b.water;
-            accuracy = accuracy * b.accuracy;
-            evasion = evasion * b.evasion;
-            criRate = criRate * b.criRate;
-            criDmgRate = criDmgRate * b.criDmgRate;
-            blockRate = blockRate * b.blockRate;
-            blockDmgRate = blockDmgRate * b.blockDmgRate;
-            moveSpeed = moveSpeed * b.moveSpeed;
-            atkSpeed = atkSpeed * b.atkSpeed;
-            weightLimit = weightLimit * b.weightLimit;
-            slotLimit = slotLimit * b.slotLimit;
-            goldRate = goldRate * b.slotLimit;
-            expRate = expRate * b.slotLimit;
-            return this.InvokeInstanceDevExtMethodsLoopItself("MultiplyStats", b);
-        }
-
         public static CharacterStats operator +(CharacterStats a, CharacterStats b)
         {
-            return a.Add(b);
+            a.hp = a.hp + b.hp;
+            a.hpRecovery = a.hpRecovery + b.hpRecovery;
+            a.hpLeechRate = a.hpLeechRate + b.hpLeechRate;
+            a.mp = a.mp + b.mp;
+            a.mpRecovery = a.mpRecovery + b.mpRecovery;
+            a.mpLeechRate = a.mpLeechRate + b.mpLeechRate;
+            a.stamina = a.stamina + b.stamina;
+            a.staminaRecovery = a.staminaRecovery + b.staminaRecovery;
+            a.staminaLeechRate = a.staminaLeechRate + b.staminaLeechRate;
+            a.food = a.food + b.food;
+            a.water = a.water + b.water;
+            a.accuracy = a.accuracy + b.accuracy;
+            a.evasion = a.evasion + b.evasion;
+            a.criRate = a.criRate + b.criRate;
+            a.criDmgRate = a.criDmgRate + b.criDmgRate;
+            a.blockRate = a.blockRate + b.blockRate;
+            a.blockDmgRate = a.blockDmgRate + b.blockDmgRate;
+            a.moveSpeed = a.moveSpeed + b.moveSpeed;
+            a.atkSpeed = a.atkSpeed + b.atkSpeed;
+            a.weightLimit = a.weightLimit + b.weightLimit;
+            a.slotLimit = a.slotLimit + b.slotLimit;
+            a.goldRate = a.goldRate + b.goldRate;
+            a.expRate = a.expRate + b.expRate;
+            if (GameExtensionInstance.onAddCharacterStats != null)
+                GameExtensionInstance.onAddCharacterStats(ref a, b);
+            return a;
         }
 
         public static CharacterStats operator *(CharacterStats a, float multiplier)
         {
-            return a.Multiply(multiplier);
+            a.hp = a.hp * multiplier;
+            a.hpRecovery = a.hpRecovery * multiplier;
+            a.hpLeechRate = a.hpLeechRate * multiplier;
+            a.mp = a.mp * multiplier;
+            a.mpRecovery = a.mpRecovery * multiplier;
+            a.mpLeechRate = a.mpLeechRate * multiplier;
+            a.stamina = a.stamina * multiplier;
+            a.staminaRecovery = a.staminaRecovery * multiplier;
+            a.staminaLeechRate = a.staminaLeechRate * multiplier;
+            a.food = a.food * multiplier;
+            a.water = a.water * multiplier;
+            a.accuracy = a.accuracy * multiplier;
+            a.evasion = a.evasion * multiplier;
+            a.criRate = a.criRate * multiplier;
+            a.criDmgRate = a.criDmgRate * multiplier;
+            a.blockRate = a.blockRate * multiplier;
+            a.blockDmgRate = a.blockDmgRate * multiplier;
+            a.moveSpeed = a.moveSpeed * multiplier;
+            a.atkSpeed = a.atkSpeed * multiplier;
+            a.weightLimit = a.weightLimit * multiplier;
+            a.slotLimit = a.slotLimit * multiplier;
+            a.goldRate = a.goldRate * multiplier;
+            a.expRate = a.expRate * multiplier;
+            if (GameExtensionInstance.onMultiplyCharacterStatsWithNumber != null)
+                GameExtensionInstance.onMultiplyCharacterStatsWithNumber(ref a, multiplier);
+            return a;
         }
 
         public static CharacterStats operator *(CharacterStats a, CharacterStats b)
         {
-            return a.MultiplyStats(b);
+            a.hp = a.hp * b.hp;
+            a.hpRecovery = a.hpRecovery * b.hpRecovery;
+            a.hpLeechRate = a.hpLeechRate * b.hpLeechRate;
+            a.mp = a.mp * b.mp;
+            a.mpRecovery = a.mpRecovery * b.mpRecovery;
+            a.mpLeechRate = a.mpLeechRate * b.mpLeechRate;
+            a.stamina = a.stamina * b.stamina;
+            a.staminaRecovery = a.staminaRecovery * b.staminaRecovery;
+            a.staminaLeechRate = a.staminaLeechRate * b.staminaLeechRate;
+            a.food = a.food * b.food;
+            a.water = a.water * b.water;
+            a.accuracy = a.accuracy * b.accuracy;
+            a.evasion = a.evasion * b.evasion;
+            a.criRate = a.criRate * b.criRate;
+            a.criDmgRate = a.criDmgRate * b.criDmgRate;
+            a.blockRate = a.blockRate * b.blockRate;
+            a.blockDmgRate = a.blockDmgRate * b.blockDmgRate;
+            a.moveSpeed = a.moveSpeed * b.moveSpeed;
+            a.atkSpeed = a.atkSpeed * b.atkSpeed;
+            a.weightLimit = a.weightLimit * b.weightLimit;
+            a.slotLimit = a.slotLimit * b.slotLimit;
+            a.goldRate = a.goldRate * b.slotLimit;
+            a.expRate = a.expRate * b.slotLimit;
+            if (GameExtensionInstance.onMultiplyCharacterStats != null)
+                GameExtensionInstance.onMultiplyCharacterStats(ref a, b);
+            return a;
         }
     }
 

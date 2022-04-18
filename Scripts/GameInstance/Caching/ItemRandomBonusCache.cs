@@ -342,6 +342,9 @@ namespace MultiplayerARPG
                 if (randomBonus.maxRandomStatsAmount > 0 && appliedAmount >= randomBonus.maxRandomStatsAmount)
                     return;
             }
+
+            if (GameExtensionInstance.onRandomCharacterStats != null)
+                GameExtensionInstance.onRandomCharacterStats(random, randomBonus, randomStats, ref stats, ref appliedAmount);
         }
     }
 }

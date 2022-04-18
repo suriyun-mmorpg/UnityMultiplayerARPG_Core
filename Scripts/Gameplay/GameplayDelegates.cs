@@ -55,4 +55,16 @@ namespace MultiplayerARPG
         int dataId,
         BuffType type,
         short level);
+    public delegate void CharacterStatsDelegate(
+        ref CharacterStats a,
+        CharacterStats b);
+    public delegate void CharacterStatsAndNumberDelegate(
+        ref CharacterStats a,
+        float b);
+    public delegate void RandomCharacterStatsDelegate(
+        System.Random random,
+        ItemRandomBonus randomBonus,
+        RandomCharacterStats randomStats,
+        ref CharacterStats stats,
+        ref int appliedAmount);
 }
