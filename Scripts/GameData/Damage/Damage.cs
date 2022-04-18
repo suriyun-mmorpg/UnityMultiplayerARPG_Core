@@ -21,7 +21,7 @@ namespace MultiplayerARPG
         [Tooltip("If this is TRUE, it will hit only selected target, if no selected target it will hit 1 random target")]
         public bool hitOnlySelectedTarget;
 
-        [Tooltip("Distance to start attack, this is NOT distance to hit and apply damage, this value should less than `hitDistance` or `missileDistance` to make sure it will hit enemy properly. If this value <= 0 or > `hitDistance` or `missileDistance` it will re-calculate by `hitDistance` or `missileDistance`")]
+        [Tooltip("Distance to start an attack, this does NOT distance to hit and apply damage, this value should be less than `hitDistance` or `missileDistance` to make sure it will hit the enemy properly. If this value <= 0 or > `hitDistance` or `missileDistance` it will re-calculate by `hitDistance` or `missileDistance`")]
         public float startAttackDistance;
 
         [StringShowConditional(nameof(damageType), new string[] { nameof(DamageType.Melee) })]
