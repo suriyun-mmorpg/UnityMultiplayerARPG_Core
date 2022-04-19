@@ -248,13 +248,13 @@ namespace MultiplayerARPG
                     // Apply skill buffs, summons and attack damages
                     if (IsOwnerClientOrOwnedByServer)
                     {
-                        int useSkillSeed = unchecked(simulateSeed + (hitIndex * 16));
-                        skill.ApplySkill(Entity, skillLevel, isLeftHand, weapon, hitIndex, damageAmounts, targetObjectId, aimPosition, useSkillSeed);
+                        int applySeed = unchecked(simulateSeed + (hitIndex * 16));
+                        skill.ApplySkill(Entity, skillLevel, isLeftHand, weapon, hitIndex, damageAmounts, targetObjectId, aimPosition, applySeed);
                         SimulateLaunchDamageEntityData simulateData = new SimulateLaunchDamageEntityData();
                         if (isLeftHand)
                             simulateData.state |= SimulateLaunchDamageEntityState.IsLeftHand;
                         simulateData.state |= SimulateLaunchDamageEntityState.IsSkill;
-                        simulateData.randomSeed = useSkillSeed;
+                        simulateData.randomSeed = simulateSeed;
                         simulateData.targetObjectId = targetObjectId;
                         simulateData.skillDataId = skill.DataId;
                         simulateData.skillLevel = skillLevel;
@@ -318,7 +318,9 @@ namespace MultiplayerARPG
             SimulatingHit simulatingHit;
             if (!SimulatingHits.TryGetValue(data.randomSeed, out simulatingHit) || simulatingHit.HitIndex >= simulatingHit.TriggerLength)
                 return;
-            int hitIndex = SimulatingHits[data.randomSeed].HitIndex + 1;
+            int hitIndex = SimulatingHits[data.randomSeed].HitIndex;
+            int applySeed = unchecked(data.randomSeed + (hitIndex * 16));
+            hitIndex++;
             simulatingHit.HitIndex = hitIndex;
             SimulatingHits[data.randomSeed] = simulatingHit;
             bool isLeftHand = data.state.HasFlag(SimulateLaunchDamageEntityState.IsLeftHand);
@@ -329,7 +331,7 @@ namespace MultiplayerARPG
                 {
                     CharacterItem weapon = Entity.GetAvailableWeapon(ref isLeftHand);
                     Dictionary<DamageElement, MinMaxFloat> damageAmounts = skill.GetAttackDamages(Entity, data.skillLevel, isLeftHand);
-                    skill.ApplySkill(Entity, data.skillLevel, isLeftHand, weapon, hitIndex, damageAmounts, data.targetObjectId, data.aimPosition, data.randomSeed);
+                    skill.ApplySkill(Entity, data.skillLevel, isLeftHand, weapon, hitIndex, damageAmounts, data.targetObjectId, data.aimPosition, applySeed);
                 }
             }
         }

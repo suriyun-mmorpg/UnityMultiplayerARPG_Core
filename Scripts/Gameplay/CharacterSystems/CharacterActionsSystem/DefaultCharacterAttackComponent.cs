@@ -152,12 +152,12 @@ namespace MultiplayerARPG
                         // Apply attack damages
                         if (IsOwnerClientOrOwnedByServer)
                         {
-                            int attackSeed = unchecked(simulateSeed + (hitIndex * 16));
-                            ApplyAttack(isLeftHand, weapon, damageInfo, damageAmounts, Entity.AimPosition, attackSeed);
+                            int applySeed = unchecked(simulateSeed + (hitIndex * 16));
+                            ApplyAttack(isLeftHand, weapon, damageInfo, damageAmounts, Entity.AimPosition, applySeed);
                             SimulateLaunchDamageEntityData simulateData = new SimulateLaunchDamageEntityData();
                             if (isLeftHand)
                                 simulateData.state |= SimulateLaunchDamageEntityState.IsLeftHand;
-                            simulateData.randomSeed = attackSeed;
+                            simulateData.randomSeed = simulateSeed;
                             simulateData.aimPosition = Entity.AimPosition;
                             CallAllSimulateLaunchDamageEntity(simulateData);
                         }
@@ -264,7 +264,9 @@ namespace MultiplayerARPG
             SimulatingHit simulatingHit;
             if (!SimulatingHits.TryGetValue(data.randomSeed, out simulatingHit) || simulatingHit.HitIndex >= simulatingHit.TriggerLength)
                 return;
-            int hitIndex = SimulatingHits[data.randomSeed].HitIndex + 1;
+            int hitIndex = SimulatingHits[data.randomSeed].HitIndex;
+            int applySeed = unchecked(data.randomSeed + (hitIndex * 16));
+            hitIndex++;
             simulatingHit.HitIndex = hitIndex;
             SimulatingHits[data.randomSeed] = simulatingHit;
             bool isLeftHand = data.state.HasFlag(SimulateLaunchDamageEntityState.IsLeftHand);
@@ -273,7 +275,7 @@ namespace MultiplayerARPG
                 CharacterItem weapon = Entity.GetAvailableWeapon(ref isLeftHand);
                 DamageInfo damageInfo = Entity.GetWeaponDamageInfo(weapon.GetWeaponItem());
                 Dictionary<DamageElement, MinMaxFloat> damageAmounts = Entity.GetWeaponDamagesWithBuffs(weapon);
-                ApplyAttack(isLeftHand, weapon, damageInfo, damageAmounts, data.aimPosition, data.randomSeed);
+                ApplyAttack(isLeftHand, weapon, damageInfo, damageAmounts, data.aimPosition, applySeed);
             }
         }
 
