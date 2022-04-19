@@ -27,13 +27,13 @@ namespace MultiplayerARPG
         public bool makeByCollider2D = true;
         public bool makeByRenderer = false;
 #if UNITY_EDITOR
-        [InspectorButton(nameof(Create))]
+        [InspectorButton(nameof(CreateByComponent))]
         public bool create;
 #endif
 
 #if UNITY_EDITOR
         [ContextMenu("Create")]
-        public void Create()
+        public void CreateByComponent()
         {
             Create(
                 targetMapInfo,
