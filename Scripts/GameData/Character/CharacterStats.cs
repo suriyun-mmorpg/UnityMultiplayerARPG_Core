@@ -115,8 +115,8 @@ namespace MultiplayerARPG
             a.atkSpeed = a.atkSpeed * b.atkSpeed;
             a.weightLimit = a.weightLimit * b.weightLimit;
             a.slotLimit = a.slotLimit * b.slotLimit;
-            a.goldRate = a.goldRate * b.slotLimit;
-            a.expRate = a.expRate * b.slotLimit;
+            a.goldRate = a.goldRate * b.goldRate;
+            a.expRate = a.expRate * b.expRate;
             if (GameExtensionInstance.onMultiplyCharacterStats != null)
                 GameExtensionInstance.onMultiplyCharacterStats(ref a, b);
             return a;
