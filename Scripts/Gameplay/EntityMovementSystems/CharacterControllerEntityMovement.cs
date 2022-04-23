@@ -768,7 +768,7 @@ namespace MultiplayerARPG
                 }
                 acceptedPositionTimestamp = timestamp;
             }
-            if (movementState.Has(MovementState.IsJump))
+            if (!IsOwnerClient && movementState.Has(MovementState.IsJump))
                 acceptedJump = true;
         }
 
