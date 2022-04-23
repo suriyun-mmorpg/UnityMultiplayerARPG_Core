@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
 namespace MultiplayerARPG
 {
@@ -7,31 +6,33 @@ namespace MultiplayerARPG
     {
         [Category("Item Settings")]
         [SerializeField]
-        protected int sellPrice;
+        [Min(0)]
+        protected int sellPrice = 0;
         [SerializeField]
-        protected float weight;
+        [Min(0f)]
+        protected float weight = 0f;
         [SerializeField]
-        [Range(1, 1000)]
+        [Min(1)]
         protected short maxStack = 1;
         [SerializeField]
-        protected ItemRefine itemRefine;
+        protected ItemRefine itemRefine = null;
         [SerializeField]
         [Tooltip("This is duration to lock item at first time when pick up dropped item or bought it from NPC or IAP system")]
-        protected float lockDuration;
+        protected float lockDuration = 0;
 
         [Category(10, "In-Scene Objects/Appearance")]
         [SerializeField]
-        protected GameObject dropModel;
+        protected GameObject dropModel = null;
 
         [Category(50, "Dismantle Settings")]
         [SerializeField]
-        protected int dismantleReturnGold;
+        protected int dismantleReturnGold = 0;
         [SerializeField]
-        protected ItemAmount[] dismantleReturnItems;
+        protected ItemAmount[] dismantleReturnItems = new ItemAmount[0];
 
         [Category(100, "Cash Shop Generating Settings")]
         [SerializeField]
-        protected CashShopItemGeneratingData[] cashShopItemGeneratingList;
+        protected CashShopItemGeneratingData[] cashShopItemGeneratingList = new CashShopItemGeneratingData[0];
 
         public override string Title
         {
