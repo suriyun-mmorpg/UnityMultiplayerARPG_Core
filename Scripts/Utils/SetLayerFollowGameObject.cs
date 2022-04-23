@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace MultiplayerARPG
+namespace UtilsComponents
 {
     public class SetLayerFollowGameObject : MonoBehaviour
     {
