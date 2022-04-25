@@ -866,8 +866,8 @@ namespace MultiplayerARPG
                     float s = (lastServerValidateTransformMoveSpeed * t) + (v * (t + 0.2f)); // +200ms as high ping buffer
                     if (s < 0.001f)
                         s = 0.001f;
-                    Vector3 oldPos = CacheTransform.position.GetXZ();
-                    Vector3 newPos = position.GetXZ();
+                    Vector3 oldPos = CacheTransform.position;
+                    Vector3 newPos = position;
                     float dist = Vector3.Distance(oldPos, newPos);
                     if (dist <= s)
                     {
@@ -879,7 +879,6 @@ namespace MultiplayerARPG
                         // Client moves too fast, adjust it
                         Vector3 dir = (newPos - oldPos).normalized;
                         newPos = oldPos + (dir * s);
-                        newPos.y = position.y;
                         CacheTransform.position = newPos;
                         // And also adjust client's position
                         Teleport(newPos, Quaternion.Euler(0f, yRotation, 0f));
