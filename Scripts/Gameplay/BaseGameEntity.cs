@@ -515,6 +515,7 @@ namespace MultiplayerARPG
                 if (ActiveMovement.WriteClientState(EntityStateDataWriter, out shouldSendReliably))
                 {
                     TransportHandler.WritePacket(EntityStateMessageWriter, GameNetworkingConsts.EntityState);
+                    EntityStateMessageWriter.PutPackedUInt(ObjectId);
                     EntityStateMessageWriter.Put(EntityStateDataWriter.Data, 0, EntityStateDataWriter.Length);
                     ClientSendMessage(CLIENT_STATE_DATA_CHANNEL, shouldSendReliably ? DeliveryMethod.ReliableOrdered : DeliveryMethod.Sequenced, EntityStateMessageWriter);
                 }

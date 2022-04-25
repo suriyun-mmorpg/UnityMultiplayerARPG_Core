@@ -343,6 +343,7 @@ namespace MultiplayerARPG
             if (inputState != CharacterInputState.None)
             {
                 TransportHandler.WritePacket(EntityStateMessageWriter, GameNetworkingConsts.EntityState);
+                EntityStateMessageWriter.PutPackedUInt(ObjectId);
                 EntityStateMessageWriter.PutPackedUShort((ushort)inputState);
                 EntityStateMessageWriter.Put(EntityStateDataWriter.Data, 0, EntityStateDataWriter.Length);
                 ClientSendMessage(CLIENT_STATE_DATA_CHANNEL, (shouldSendReliably || (ushort)inputState > 1 << 0) ? DeliveryMethod.ReliableOrdered : DeliveryMethod.Sequenced, EntityStateMessageWriter);

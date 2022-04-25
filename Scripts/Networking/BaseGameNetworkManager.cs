@@ -501,8 +501,9 @@ namespace MultiplayerARPG
 
         protected void HandleClientEntityStateAtServer(MessageHandlerData messageHandler)
         {
+            uint objectId = messageHandler.Reader.GetPackedUInt();
             BasePlayerCharacterEntity gameEntity;
-            if (ServerUserHandlers.TryGetPlayerCharacter(messageHandler.ConnectionId, out gameEntity))
+            if (Assets.TryGetSpawnedObject(objectId, out gameEntity) && gameEntity.Identity.ConnectionId == messageHandler.ConnectionId)
                 gameEntity.ReadClientStateAtServer(messageHandler.Reader);
         }
 
