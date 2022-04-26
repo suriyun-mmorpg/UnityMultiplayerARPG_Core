@@ -498,38 +498,48 @@ namespace MultiplayerARPG
                         // Try find party data from player character
                         if (tempPlayerCharacterEntity.PartyId > 0 && GameInstance.ServerPartyHandlers.TryGetParty(tempPlayerCharacterEntity.PartyId, out tempPartyData))
                         {
-                            List<BasePlayerCharacterEntity> nearbyPartyMembers = new List<BasePlayerCharacterEntity>();
+                            List<BasePlayerCharacterEntity> sharingExpMembers = new List<BasePlayerCharacterEntity>();
+                            List<BasePlayerCharacterEntity> sharingItemMembers = new List<BasePlayerCharacterEntity>();
                             BasePlayerCharacterEntity nearbyPartyMember;
                             foreach (string memberId in tempPartyData.GetMemberIds())
                             {
                                 if (GameInstance.ServerUserHandlers.TryGetPlayerCharacterById(memberId, out nearbyPartyMember))
-                                    nearbyPartyMembers.Add(nearbyPartyMember);
-                            }
-                            int countNearbyPartyMembers = nearbyPartyMembers.Count;
-                            foreach (BasePlayerCharacterEntity partyMember in nearbyPartyMembers)
-                            {
-                                // If share exp, every party member will receive devided exp
-                                // If not share exp, character who make damage will receive non-devided exp
-                                if (tempPartyData.shareExp)
                                 {
-                                    if (GameInstance.Singleton.partyShareExpDistance <= 0f || Vector3.Distance(tempPlayerCharacterEntity.CacheTransform.position, partyMember.CacheTransform.position) <= GameInstance.Singleton.partyShareExpDistance)
-                                        partyMember.RewardExp(reward, (1f - shareGuildExpRate) / (float)countNearbyPartyMembers * rewardRate, RewardGivenType.PartyShare);
-                                }
-
-                                // If share item, every party member will receive devided gold
-                                // If not share item, character who make damage will receive non-devided gold
-                                if (tempPartyData.shareItem)
-                                {
-                                    if (GameInstance.Singleton.partyShareItemDistance <= 0f || Vector3.Distance(tempPlayerCharacterEntity.CacheTransform.position, partyMember.CacheTransform.position) <= GameInstance.Singleton.partyShareItemDistance)
+                                    if (tempPartyData.shareExp)
                                     {
-                                        if (makeMostDamage)
-                                        {
-                                            // Make other member in party able to pickup items
-                                            looters.Add(partyMember.Id);
-                                        }
-                                        partyMember.RewardCurrencies(reward, 1f / (float)countNearbyPartyMembers * rewardRate, RewardGivenType.PartyShare);
+                                        if (GameInstance.Singleton.partyShareExpDistance <= 0f || Vector3.Distance(tempPlayerCharacterEntity.CacheTransform.position, nearbyPartyMember.CacheTransform.position) <= GameInstance.Singleton.partyShareExpDistance)
+                                            sharingExpMembers.Add(nearbyPartyMember);
+                                    }
+                                    if (tempPartyData.shareItem)
+                                    {
+                                        if (GameInstance.Singleton.partyShareItemDistance <= 0f || Vector3.Distance(tempPlayerCharacterEntity.CacheTransform.position, nearbyPartyMember.CacheTransform.position) <= GameInstance.Singleton.partyShareItemDistance)
+                                            sharingItemMembers.Add(nearbyPartyMember);
                                     }
                                 }
+                            }
+                            int countNearbyPartyMembers;
+                            // Share EXP to party members
+                            countNearbyPartyMembers = sharingExpMembers.Count;
+                            for (int i = 0; i < sharingExpMembers.Count; ++i)
+                            {
+                                nearbyPartyMember = sharingExpMembers[i];
+                                // If share exp, every party member will receive devided exp
+                                // If not share exp, character who make damage will receive non-devided exp
+                                nearbyPartyMember.RewardExp(reward, (1f - shareGuildExpRate) / (float)countNearbyPartyMembers * rewardRate, RewardGivenType.PartyShare);
+                            }
+                            // Share Items to party members
+                            countNearbyPartyMembers = sharingItemMembers.Count;
+                            for (int i = 0; i < sharingItemMembers.Count; ++i)
+                            {
+                                nearbyPartyMember = sharingItemMembers[i];
+                                // If share item, every party member will receive devided gold
+                                // If not share item, character who make damage will receive non-devided gold
+                                if (makeMostDamage)
+                                {
+                                    // Make other member in party able to pickup items
+                                    looters.Add(nearbyPartyMember.Id);
+                                }
+                                nearbyPartyMember.RewardCurrencies(reward, 1f / (float)countNearbyPartyMembers * rewardRate, RewardGivenType.PartyShare);
                             }
                             // Shared exp has been given, so do not give it to character again
                             if (tempPartyData.shareExp)
