@@ -133,6 +133,13 @@ namespace MultiplayerARPG
             CacheCharacterController.enabled = false;
         }
 
+        public override void OnSetOwnerClient(bool isOwnerClient)
+        {
+            base.OnSetOwnerClient(isOwnerClient);
+            clientTargetPosition = null;
+            NavPaths = null;
+        }
+
         private void OnAnimatorMove()
         {
             if (!CacheAnimator)

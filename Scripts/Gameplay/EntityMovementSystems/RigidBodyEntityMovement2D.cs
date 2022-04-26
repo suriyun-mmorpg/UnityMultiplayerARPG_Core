@@ -70,6 +70,13 @@ namespace MultiplayerARPG
             CacheRigidbody2D.constraints = RigidbodyConstraints2D.FreezeAll;
         }
 
+        public override void OnSetOwnerClient(bool isOwnerClient)
+        {
+            base.OnSetOwnerClient(isOwnerClient);
+            clientTargetPosition = null;
+            NavPaths = null;
+        }
+
         public virtual void StopMove()
         {
             if (Entity.MovementSecure == MovementSecure.ServerAuthoritative)
