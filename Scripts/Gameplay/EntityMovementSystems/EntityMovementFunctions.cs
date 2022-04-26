@@ -61,7 +61,7 @@ namespace MultiplayerARPG
                 if (inputState.Has(EntityMovementInputState.RotationChanged))
                     writer.PutPackedInt(GetCompressedAngle(rotation.eulerAngles.y));
             }
-            writer.PutPackedLong(movement.Entity.Manager.ServerTimestamp);
+            writer.PutPackedLong(BaseGameNetworkManager.Singleton.ServerTimestamp);
         }
 
         public static void ServerWriteSyncTransform3D(this IEntityMovement movement, NetDataWriter writer)
@@ -72,7 +72,7 @@ namespace MultiplayerARPG
             writer.Put((byte)movement.ExtraMovementState);
             writer.PutVector3(movement.Entity.CacheTransform.position);
             writer.PutPackedInt(GetCompressedAngle(movement.Entity.CacheTransform.eulerAngles.y));
-            writer.PutPackedLong(movement.Entity.Manager.ServerTimestamp);
+            writer.PutPackedLong(BaseGameNetworkManager.Singleton.ServerTimestamp);
         }
 
         public static void ClientWriteSyncTransform3D(this IEntityMovement movement, NetDataWriter writer)
@@ -83,7 +83,7 @@ namespace MultiplayerARPG
             writer.Put((byte)movement.ExtraMovementState);
             writer.PutVector3(movement.Entity.CacheTransform.position);
             writer.PutPackedInt(GetCompressedAngle(movement.Entity.CacheTransform.eulerAngles.y));
-            writer.PutPackedLong(movement.Entity.Manager.ServerTimestamp);
+            writer.PutPackedLong(BaseGameNetworkManager.Singleton.ServerTimestamp);
         }
 
         public static void ReadMovementInputMessage3D(this NetDataReader reader, out EntityMovementInputState inputState, out MovementState movementState, out ExtraMovementState extraMovementState, out Vector3 position, out float yAngle, out long timestamp)
@@ -134,7 +134,7 @@ namespace MultiplayerARPG
                     writer.PutVector2(position);
                 writer.Put(direction2D);
             }
-            writer.PutPackedLong(movement.Entity.Manager.ServerTimestamp);
+            writer.PutPackedLong(BaseGameNetworkManager.Singleton.ServerTimestamp);
         }
 
         public static void ServerWriteSyncTransform2D(this IEntityMovement movement, NetDataWriter writer)
@@ -145,7 +145,7 @@ namespace MultiplayerARPG
             writer.Put((byte)movement.ExtraMovementState);
             writer.PutVector2(movement.Entity.CacheTransform.position);
             writer.Put(movement.Direction2D);
-            writer.PutPackedLong(movement.Entity.Manager.ServerTimestamp);
+            writer.PutPackedLong(BaseGameNetworkManager.Singleton.ServerTimestamp);
         }
 
         public static void ClientWriteSyncTransform2D(this IEntityMovement movement, NetDataWriter writer)
@@ -156,7 +156,7 @@ namespace MultiplayerARPG
             writer.Put((byte)movement.ExtraMovementState);
             writer.PutVector2(movement.Entity.CacheTransform.position);
             writer.Put(movement.Direction2D);
-            writer.PutPackedLong(movement.Entity.Manager.ServerTimestamp);
+            writer.PutPackedLong(BaseGameNetworkManager.Singleton.ServerTimestamp);
         }
 
         public static void ReadMovementInputMessage2D(this NetDataReader reader, out EntityMovementInputState inputState, out MovementState movementState, out ExtraMovementState extraMovementState, out Vector2 position, out DirectionVector2 direction2D, out long timestamp)
