@@ -740,6 +740,11 @@ namespace MultiplayerARPG
             float yAngle;
             long timestamp;
             reader.ReadSyncTransformMessage3D(out movementState, out extraMovementState, out position, out yAngle, out timestamp);
+            if (Mathf.Abs(timestamp - BaseGameNetworkManager.Singleton.ServerTimestamp) > System.TimeSpan.TicksPerMillisecond)
+            {
+                // Timestamp is a lot difference to server's timestamp, player might try to hack a game or packet may corrupted occurring, so skip it
+                return;
+            }
             if (acceptedPositionTimestamp < timestamp)
             {
                 // Snap character to the position if character is too far from the position
@@ -793,6 +798,11 @@ namespace MultiplayerARPG
             float yAngle;
             long timestamp;
             reader.ReadMovementInputMessage3D(out inputState, out movementState, out extraMovementState, out position, out yAngle, out timestamp);
+            if (Mathf.Abs(timestamp - BaseGameNetworkManager.Singleton.ServerTimestamp) > System.TimeSpan.TicksPerMillisecond)
+            {
+                // Timestamp is a lot difference to server's timestamp, player might try to hack a game or packet may corrupted occurring, so skip it
+                return;
+            }
             if (acceptedPositionTimestamp < timestamp)
             {
                 if (!inputState.Has(EntityMovementInputState.IsStopped))
@@ -852,6 +862,11 @@ namespace MultiplayerARPG
             float yAngle;
             long timestamp;
             reader.ReadSyncTransformMessage3D(out movementState, out extraMovementState, out position, out yAngle, out timestamp);
+            if (Mathf.Abs(timestamp - BaseGameNetworkManager.Singleton.ServerTimestamp) > System.TimeSpan.TicksPerMillisecond)
+            {
+                // Timestamp is a lot difference to server's timestamp, player might try to hack a game or packet may corrupted occurring, so skip it
+                return;
+            }
             if (acceptedPositionTimestamp < timestamp)
             {
                 yRotation = yAngle;

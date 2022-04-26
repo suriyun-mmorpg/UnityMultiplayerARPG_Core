@@ -377,6 +377,11 @@ namespace MultiplayerARPG
             DirectionVector2 direction2D;
             long timestamp;
             reader.ReadSyncTransformMessage2D(out movementState, out extraMovementState, out position, out direction2D, out timestamp);
+            if (Mathf.Abs(timestamp - BaseGameNetworkManager.Singleton.ServerTimestamp) > System.TimeSpan.TicksPerMillisecond)
+            {
+                // Timestamp is a lot difference to server's timestamp, player might try to hack a game or packet may corrupted occurring, so skip it
+                return;
+            }
             if (acceptedPositionTimestamp < timestamp)
             {
                 // Snap character to the position if character is too far from the position
@@ -426,6 +431,11 @@ namespace MultiplayerARPG
             DirectionVector2 direction2D;
             long timestamp;
             reader.ReadMovementInputMessage2D(out inputState, out movementState, out extraMovementState, out position, out direction2D, out timestamp);
+            if (Mathf.Abs(timestamp - BaseGameNetworkManager.Singleton.ServerTimestamp) > System.TimeSpan.TicksPerMillisecond)
+            {
+                // Timestamp is a lot difference to server's timestamp, player might try to hack a game or packet may corrupted occurring, so skip it
+                return;
+            }
             if (acceptedPositionTimestamp < timestamp)
             {
                 if (!inputState.Has(EntityMovementInputState.IsStopped))
@@ -472,6 +482,11 @@ namespace MultiplayerARPG
             DirectionVector2 direction2D;
             long timestamp;
             reader.ReadSyncTransformMessage2D(out movementState, out extraMovementState, out position, out direction2D, out timestamp);
+            if (Mathf.Abs(timestamp - BaseGameNetworkManager.Singleton.ServerTimestamp) > System.TimeSpan.TicksPerMillisecond)
+            {
+                // Timestamp is a lot difference to server's timestamp, player might try to hack a game or packet may corrupted occurring, so skip it
+                return;
+            }
             if (acceptedPositionTimestamp < timestamp)
             {
                 Direction2D = direction2D;
