@@ -508,11 +508,11 @@ namespace MultiplayerARPG
 
         public virtual void SendClientState()
         {
-            if (ActiveMovement != null)
+            if (Movement != null && Movement.Enabled)
             {
                 bool shouldSendReliably;
                 EntityStateDataWriter.Reset();
-                if (ActiveMovement.WriteClientState(EntityStateDataWriter, out shouldSendReliably))
+                if (Movement.WriteClientState(EntityStateDataWriter, out shouldSendReliably))
                 {
                     TransportHandler.WritePacket(EntityStateMessageWriter, GameNetworkingConsts.EntityState);
                     EntityStateMessageWriter.PutPackedUInt(ObjectId);
@@ -524,11 +524,11 @@ namespace MultiplayerARPG
 
         public virtual void SendServerState()
         {
-            if (ActiveMovement != null)
+            if (Movement != null && Movement.Enabled)
             {
                 bool shouldSendReliably;
                 EntityStateDataWriter.Reset();
-                if (ActiveMovement.WriteServerState(EntityStateDataWriter, out shouldSendReliably))
+                if (Movement.WriteServerState(EntityStateDataWriter, out shouldSendReliably))
                 {
                     TransportHandler.WritePacket(EntityStateMessageWriter, GameNetworkingConsts.EntityState);
                     EntityStateMessageWriter.PutPackedUInt(ObjectId);
@@ -540,14 +540,14 @@ namespace MultiplayerARPG
 
         public virtual void ReadClientStateAtServer(NetDataReader reader)
         {
-            if (ActiveMovement != null)
-                ActiveMovement.ReadClientStateAtServer(reader);
+            if (Movement != null)
+                Movement.ReadClientStateAtServer(reader);
         }
 
         public virtual void ReadServerStateAtClient(NetDataReader reader)
         {
-            if (ActiveMovement != null)
-                ActiveMovement.ReadServerStateAtClient(reader);
+            if (Movement != null)
+                Movement.ReadServerStateAtClient(reader);
         }
 
         private void OnDestroy()

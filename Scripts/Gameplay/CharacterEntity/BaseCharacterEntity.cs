@@ -337,7 +337,7 @@ namespace MultiplayerARPG
             else if (ChargeComponent.WriteClientStartChargeState(EntityStateDataWriter))
                 inputState |= CharacterInputState.IsChargeStarting;
             // Movement
-            if (ActiveMovement != null && ActiveMovement.WriteClientState(EntityStateDataWriter, out shouldSendReliably))
+            if (Movement != null && Movement.Enabled && Movement.WriteClientState(EntityStateDataWriter, out shouldSendReliably))
                 inputState |= CharacterInputState.IsMoving;
             // Set input state and send to clients
             if (inputState != CharacterInputState.None)
@@ -371,7 +371,7 @@ namespace MultiplayerARPG
             else if (ChargeComponent.WriteServerStartChargeState(EntityStateDataWriter))
                 inputState |= CharacterInputState.IsChargeStarting;
             // Movement
-            if (ActiveMovement != null && ActiveMovement.WriteServerState(EntityStateDataWriter, out shouldSendReliably))
+            if (Movement != null && Movement.Enabled && Movement.WriteServerState(EntityStateDataWriter, out shouldSendReliably))
                 inputState |= CharacterInputState.IsMoving;
             // Set input state and send to clients
             if (inputState != CharacterInputState.None)
@@ -403,8 +403,8 @@ namespace MultiplayerARPG
             if (inputState.Has(CharacterInputState.IsChargeStarting))
                 ChargeComponent.ReadClientStartChargeStateAtServer(reader);
             // Movement
-            if (inputState.Has(CharacterInputState.IsMoving) && ActiveMovement != null)
-                ActiveMovement.ReadClientStateAtServer(reader);
+            if (inputState.Has(CharacterInputState.IsMoving) && Movement != null)
+                Movement.ReadClientStateAtServer(reader);
         }
 
         public override void ReadServerStateAtClient(NetDataReader reader)
@@ -426,8 +426,8 @@ namespace MultiplayerARPG
             if (inputState.Has(CharacterInputState.IsChargeStarting))
                 ChargeComponent.ReadServerStartChargeStateAtClient(reader);
             // Movement
-            if (inputState.Has(CharacterInputState.IsMoving) && ActiveMovement != null)
-                ActiveMovement.ReadServerStateAtClient(reader);
+            if (inputState.Has(CharacterInputState.IsMoving) && Movement != null)
+                Movement.ReadServerStateAtClient(reader);
         }
 
         protected override void OnTeleport(Vector3 position, Quaternion rotation)
