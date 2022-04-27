@@ -1,7 +1,7 @@
 ﻿namespace MultiplayerARPG
 {
     [System.Flags]
-    public enum SimulateLaunchDamageEntityState : byte
+    public enum SimulateActionTriggerState : byte
     {
         None = 0,
         IsLeftHand = 1 << 0,

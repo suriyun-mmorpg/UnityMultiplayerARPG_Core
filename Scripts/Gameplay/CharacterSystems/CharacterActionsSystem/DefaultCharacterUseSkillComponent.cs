@@ -23,7 +23,8 @@ namespace MultiplayerARPG
         public AnimActionType AnimActionType { get; protected set; }
         public int AnimActionDataId { get; protected set; }
 
-        protected readonly Dictionary<int, SimulatingHit> SimulatingHits = new Dictionary<int, SimulatingHit>();
+        protected readonly Dictionary<int, SimulatingActionTriggerHistory> SimulatingActionTriggerHistories = new Dictionary<int, SimulatingActionTriggerHistory>();
+        protected readonly Dictionary<int, List<SimulateActionTriggerData>> SimlatingActionTriggerDataList = new Dictionary<int, List<SimulateActionTriggerData>>();
         protected bool sendingClientUseSkill;
         protected bool sendingClientUseSkillItem;
         protected bool sendingClientUseSkillInterrupted;
@@ -210,7 +211,15 @@ namespace MultiplayerARPG
 
                 float remainsDuration = totalDuration;
                 float tempTriggerDuration;
-                SimulatingHits[simulateSeed] = new SimulatingHit(triggerDurations.Length);
+                SimulatingActionTriggerHistories[simulateSeed] = new SimulatingActionTriggerHistory(triggerDurations.Length);
+                if (SimlatingActionTriggerDataList.ContainsKey(simulateSeed))
+                {
+                    foreach (SimulateActionTriggerData data in SimlatingActionTriggerDataList[simulateSeed])
+                    {
+                        ProceedSimulateActionTrigger(data);
+                    }
+                }
+                SimlatingActionTriggerDataList.Clear();
                 for (int hitIndex = 0; hitIndex < triggerDurations.Length; ++hitIndex)
                 {
                     // Play special effects after trigger duration
@@ -250,16 +259,16 @@ namespace MultiplayerARPG
                     {
                         int applySeed = unchecked(simulateSeed + (hitIndex * 16));
                         skill.ApplySkill(Entity, skillLevel, isLeftHand, weapon, hitIndex, damageAmounts, targetObjectId, aimPosition, applySeed);
-                        SimulateLaunchDamageEntityData simulateData = new SimulateLaunchDamageEntityData();
+                        SimulateActionTriggerData simulateData = new SimulateActionTriggerData();
                         if (isLeftHand)
-                            simulateData.state |= SimulateLaunchDamageEntityState.IsLeftHand;
-                        simulateData.state |= SimulateLaunchDamageEntityState.IsSkill;
+                            simulateData.state |= SimulateActionTriggerState.IsLeftHand;
+                        simulateData.state |= SimulateActionTriggerState.IsSkill;
                         simulateData.randomSeed = simulateSeed;
                         simulateData.targetObjectId = targetObjectId;
                         simulateData.skillDataId = skill.DataId;
                         simulateData.skillLevel = skillLevel;
                         simulateData.aimPosition = aimPosition;
-                        CallAllSimulateLaunchDamageEntity(simulateData);
+                        RPC(AllSimulateActionTrigger, BaseGameEntity.SERVER_STATE_DATA_CHANNEL, DeliveryMethod.ReliableOrdered, simulateData);
                     }
 
                     if (remainsDuration <= 0f)
@@ -304,27 +313,31 @@ namespace MultiplayerARPG
             }
         }
 
-        public bool CallAllSimulateLaunchDamageEntity(SimulateLaunchDamageEntityData data)
-        {
-            RPC(AllSimulateLaunchDamageEntity, BaseGameEntity.SERVER_STATE_DATA_CHANNEL, DeliveryMethod.ReliableOrdered, data);
-            return true;
-        }
-
         [AllRpc]
-        protected void AllSimulateLaunchDamageEntity(SimulateLaunchDamageEntityData data)
+        protected void AllSimulateActionTrigger(SimulateActionTriggerData data)
         {
             if (IsOwnerClientOrOwnedByServer)
                 return;
-            SimulatingHit simulatingHit;
-            if (!SimulatingHits.TryGetValue(data.randomSeed, out simulatingHit) || simulatingHit.HitIndex >= simulatingHit.TriggerLength)
-                return;
-            int hitIndex = SimulatingHits[data.randomSeed].HitIndex;
+            if (!ProceedSimulateActionTrigger(data))
+            {
+                if (!SimlatingActionTriggerDataList.ContainsKey(data.randomSeed))
+                    SimlatingActionTriggerDataList[data.randomSeed] = new List<SimulateActionTriggerData>();
+                SimlatingActionTriggerDataList[data.randomSeed].Add(data);
+            }
+        }
+
+        protected bool ProceedSimulateActionTrigger(SimulateActionTriggerData data)
+        {
+            SimulatingActionTriggerHistory simulatingHit;
+            if (!SimulatingActionTriggerHistories.TryGetValue(data.randomSeed, out simulatingHit) || simulatingHit.TriggeredIndex >= simulatingHit.TriggerLength)
+                return false;
+            int hitIndex = SimulatingActionTriggerHistories[data.randomSeed].TriggeredIndex;
             int applySeed = unchecked(data.randomSeed + (hitIndex * 16));
             hitIndex++;
-            simulatingHit.HitIndex = hitIndex;
-            SimulatingHits[data.randomSeed] = simulatingHit;
-            bool isLeftHand = data.state.HasFlag(SimulateLaunchDamageEntityState.IsLeftHand);
-            if (data.state.HasFlag(SimulateLaunchDamageEntityState.IsSkill))
+            simulatingHit.TriggeredIndex = hitIndex;
+            SimulatingActionTriggerHistories[data.randomSeed] = simulatingHit;
+            bool isLeftHand = data.state.HasFlag(SimulateActionTriggerState.IsLeftHand);
+            if (data.state.HasFlag(SimulateActionTriggerState.IsSkill))
             {
                 BaseSkill skill = data.GetSkill();
                 if (skill != null)
@@ -334,6 +347,7 @@ namespace MultiplayerARPG
                     skill.ApplySkill(Entity, data.skillLevel, isLeftHand, weapon, hitIndex, damageAmounts, data.targetObjectId, data.aimPosition, applySeed);
                 }
             }
+            return true;
         }
 
         public void UseSkill(int dataId, bool isLeftHand, uint targetObjectId, AimPosition aimPosition)

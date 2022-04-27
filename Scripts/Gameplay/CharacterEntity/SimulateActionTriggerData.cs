@@ -2,9 +2,9 @@
 
 namespace MultiplayerARPG
 {
-    public struct SimulateLaunchDamageEntityData : INetSerializable
+    public struct SimulateActionTriggerData : INetSerializable
     {
-        public SimulateLaunchDamageEntityState state;
+        public SimulateActionTriggerState state;
         public int randomSeed;
         public uint targetObjectId;
         public int skillDataId;
@@ -15,7 +15,7 @@ namespace MultiplayerARPG
         {
             writer.Put((byte)state);
             writer.PutPackedInt(randomSeed);
-            if (state.HasFlag(SimulateLaunchDamageEntityState.IsSkill))
+            if (state.HasFlag(SimulateActionTriggerState.IsSkill))
             {
                 writer.PutPackedUInt(targetObjectId);
                 writer.PutPackedInt(skillDataId);
@@ -26,9 +26,9 @@ namespace MultiplayerARPG
 
         public void Deserialize(NetDataReader reader)
         {
-            state = (SimulateLaunchDamageEntityState)reader.GetByte();
+            state = (SimulateActionTriggerState)reader.GetByte();
             randomSeed = reader.GetPackedInt();
-            if (state.HasFlag(SimulateLaunchDamageEntityState.IsSkill))
+            if (state.HasFlag(SimulateActionTriggerState.IsSkill))
             {
                 targetObjectId = reader.GetPackedUInt();
                 skillDataId = reader.GetPackedInt();
@@ -39,7 +39,7 @@ namespace MultiplayerARPG
 
         public BaseSkill GetSkill()
         {
-            if (state.HasFlag(SimulateLaunchDamageEntityState.IsSkill))
+            if (state.HasFlag(SimulateActionTriggerState.IsSkill))
             {
                 BaseSkill skill;
                 if (GameInstance.Skills.TryGetValue(skillDataId, out skill))
