@@ -129,16 +129,23 @@ namespace MultiplayerARPG
 
         public override void OnStopHost()
         {
-            base.OnStopHost();
             // Stop both client and server
             CacheDiscovery.StopClient();
             CacheDiscovery.StopServer();
+            base.OnStopHost();
         }
 
         public override void OnClientDisconnected(DisconnectInfo disconnectInfo)
         {
-            base.OnClientDisconnected(disconnectInfo);
             Save();
+            base.OnClientDisconnected(disconnectInfo);
+            ClientStorageActions.onNotifyStorageItemsUpdated -= NotifyStorageItemsUpdated;
+        }
+
+        public override void OnStopClient()
+        {
+            Save();
+            base.OnStopClient();
             ClientStorageActions.onNotifyStorageItemsUpdated -= NotifyStorageItemsUpdated;
         }
 
@@ -168,7 +175,7 @@ namespace MultiplayerARPG
         {
             Profiler.BeginSample("LanRpgNetworkManager - Save Data");
             BasePlayerCharacterEntity owningCharacter = GameInstance.PlayingCharacterEntity;
-            if (owningCharacter != null && IsClientConnected)
+            if (owningCharacter != null)
             {
                 SaveSystem.SaveCharacter(owningCharacter);
                 SaveSystem.SaveSummonBuffs(owningCharacter, new List<CharacterSummon>(owningCharacter.Summons));
