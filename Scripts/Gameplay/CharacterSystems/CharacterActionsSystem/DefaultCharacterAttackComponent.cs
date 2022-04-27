@@ -118,6 +118,7 @@ namespace MultiplayerARPG
                         ProceedSimulateActionTrigger(data);
                     }
                 }
+                SimlatingActionTriggerDataList.Clear();
                 for (int hitIndex = 0; hitIndex < triggerDurations.Length; ++hitIndex)
                 {
                     // Play special effects after trigger duration
