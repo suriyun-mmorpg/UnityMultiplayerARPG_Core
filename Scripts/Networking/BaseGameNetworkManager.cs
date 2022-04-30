@@ -293,6 +293,10 @@ namespace MultiplayerARPG
             this.InvokeInstanceDevExtMethods("RegisterClientMessages");
             this.InvokeInstanceDevExtMethods("RegisterServerMessages");
             this.InvokeInstanceDevExtMethods("RegisterMessages");
+            foreach (BaseGameNetworkManagerComponent component in ManagerComponents)
+            {
+                component.RegisterMessages(this);
+            }
         }
 
         protected virtual void Clean()
@@ -318,6 +322,10 @@ namespace MultiplayerARPG
             CurrentMapInfo = null;
             // Extensions
             this.InvokeInstanceDevExtMethods("Clean");
+            foreach (BaseGameNetworkManagerComponent component in ManagerComponents)
+            {
+                component.Clean(this);
+            }
         }
 
         public override bool StartServer()
@@ -329,6 +337,10 @@ namespace MultiplayerARPG
         public override void OnStartServer()
         {
             this.InvokeInstanceDevExtMethods("OnStartServer");
+            foreach (BaseGameNetworkManagerComponent component in ManagerComponents)
+            {
+                component.OnStartServer(this);
+            }
             GameInstance.ServerMailHandlers = ServerMailHandlers;
             GameInstance.ServerUserHandlers = ServerUserHandlers;
             GameInstance.ServerBuildingHandlers = ServerBuildingHandlers;
@@ -345,6 +357,10 @@ namespace MultiplayerARPG
         public override void OnStopServer()
         {
             this.InvokeInstanceDevExtMethods("OnStopServer");
+            foreach (BaseGameNetworkManagerComponent component in ManagerComponents)
+            {
+                component.OnStopServer(this);
+            }
             Clean();
             base.OnStopServer();
         }
@@ -360,6 +376,10 @@ namespace MultiplayerARPG
         public override void OnStartClient(LiteNetLibClient client)
         {
             this.InvokeInstanceDevExtMethods("OnStartClient", client);
+            foreach (BaseGameNetworkManagerComponent component in ManagerComponents)
+            {
+                component.OnStartClient(this, client);
+            }
             GameInstance.ClientCashShopHandlers = ClientCashShopHandlers;
             GameInstance.ClientMailHandlers = ClientMailHandlers;
             GameInstance.ClientStorageHandlers = ClientStorageHandlers;
@@ -378,6 +398,10 @@ namespace MultiplayerARPG
         public override void OnStopClient()
         {
             this.InvokeInstanceDevExtMethods("OnStopClient");
+            foreach (BaseGameNetworkManagerComponent component in ManagerComponents)
+            {
+                component.OnStopClient(this);
+            }
             ClientGenericActions.ClientStopped();
             if (!IsServer)
                 Clean();
@@ -560,6 +584,10 @@ namespace MultiplayerARPG
             Assets.spawnablePrefabs = new LiteNetLibIdentity[spawnablePrefabs.Count];
             spawnablePrefabs.CopyTo(Assets.spawnablePrefabs);
             this.InvokeInstanceDevExtMethods("InitPrefabs");
+            foreach (BaseGameNetworkManagerComponent component in ManagerComponents)
+            {
+                component.InitPrefabs(this);
+            }
         }
 
         public void Quit()
@@ -612,6 +640,10 @@ namespace MultiplayerARPG
         public override void OnClientOnlineSceneLoaded()
         {
             this.InvokeInstanceDevExtMethods("OnClientOnlineSceneLoaded");
+            foreach (BaseGameNetworkManagerComponent component in ManagerComponents)
+            {
+                component.OnClientOnlineSceneLoaded(this);
+            }
             // Server will register entities later, so don't register entities now
             if (!IsServer)
                 RegisterEntities();
@@ -620,6 +652,10 @@ namespace MultiplayerARPG
         public override void OnServerOnlineSceneLoaded()
         {
             this.InvokeInstanceDevExtMethods("OnServerOnlineSceneLoaded");
+            foreach (BaseGameNetworkManagerComponent component in ManagerComponents)
+            {
+                component.OnServerOnlineSceneLoaded(this);
+            }
             readyToInstantiateObjectsStates.Clear();
             isReadyToInstantiateObjects = false;
             isReadyToInstantiatePlayers = false;
