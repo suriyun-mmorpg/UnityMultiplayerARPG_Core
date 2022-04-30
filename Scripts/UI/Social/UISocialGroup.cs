@@ -50,6 +50,8 @@ namespace MultiplayerARPG
         public UnityEvent onFriendRequested = new UnityEvent();
         public UnityEvent onFriendRequestAccepted = new UnityEvent();
         public UnityEvent onFriendRequestDeclined = new UnityEvent();
+        public UnityEvent onPartyInvited = new UnityEvent();
+        public UnityEvent onGuildInvited = new UnityEvent();
 
 
         protected int currentSocialId = 0;
@@ -296,6 +298,44 @@ namespace MultiplayerARPG
             ClientFriendActions.ResponseDeclineFriendRequest(responseHandler, responseCode, response);
             if (responseCode.ShowUnhandledResponseMessageDialog(response.message)) return;
             onFriendRequestDeclined.Invoke();
+        }
+
+        public void OnClickSendPartyInvitation()
+        {
+            if (MemberSelectionManager.SelectedUI == null)
+                return;
+
+            SocialCharacterData character = MemberSelectionManager.SelectedUI.Data;
+            GameInstance.ClientPartyHandlers.RequestSendPartyInvitation(new RequestSendPartyInvitationMessage()
+            {
+                inviteeId = character.id,
+            }, SendPartyInvitationCallback);
+        }
+
+        private void SendPartyInvitationCallback(ResponseHandlerData responseHandler, AckResponseCode responseCode, ResponseSendPartyInvitationMessage response)
+        {
+            ClientPartyActions.ResponseSendPartyInvitation(responseHandler, responseCode, response);
+            if (responseCode.ShowUnhandledResponseMessageDialog(response.message)) return;
+            onPartyInvited.Invoke();
+        }
+
+        public void OnClickSendGuildInvitation()
+        {
+            if (MemberSelectionManager.SelectedUI == null)
+                return;
+
+            SocialCharacterData character = MemberSelectionManager.SelectedUI.Data;
+            GameInstance.ClientGuildHandlers.RequestSendGuildInvitation(new RequestSendGuildInvitationMessage()
+            {
+                inviteeId = character.id,
+            }, SendGuildInvitationCallback);
+        }
+
+        private void SendGuildInvitationCallback(ResponseHandlerData responseHandler, AckResponseCode responseCode, ResponseSendGuildInvitationMessage response)
+        {
+            ClientGuildActions.ResponseSendGuildInvitation(responseHandler, responseCode, response);
+            if (responseCode.ShowUnhandledResponseMessageDialog(response.message)) return;
+            onGuildInvited.Invoke();
         }
     }
 }
