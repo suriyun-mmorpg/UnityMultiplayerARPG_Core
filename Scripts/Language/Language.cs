@@ -1466,7 +1466,7 @@ namespace MultiplayerARPG
             Texts.Add(UITextKeys.UI_GUILD_REQUEST_DESCRIPTION.ToString(), "You want to request to join guild {0}?");
             Texts.Add(UITextKeys.UI_GUILD_REQUESTED.ToString(), "Guild request was sent to the guild");
             Texts.Add(UITextKeys.UI_GUILD_REQUEST_ACCEPTED.ToString(), "Guild request accepted");
-            Texts.Add(UITextKeys.UI_GUILD_REQUEST_DECLINED.ToString(), "Guild request accepted");
+            Texts.Add(UITextKeys.UI_GUILD_REQUEST_DECLINED.ToString(), "Guild request declined");
             // UI Guild Role
             Texts.Add(UITextKeys.UI_GUILD_ROLE_CAN_INVITE.ToString(), "Can invite");
             Texts.Add(UITextKeys.UI_GUILD_ROLE_CANNOT_INVITE.ToString(), "Cannot invite");
