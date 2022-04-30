@@ -5,7 +5,7 @@ using UnityEngine.Serialization;
 
 namespace MultiplayerARPG
 {
-    public abstract class UISocialGroup : UIBase
+    public abstract partial class UISocialGroup : UIBase
     {
         public abstract int GetSocialId();
         public abstract int GetMaxMemberAmount();
