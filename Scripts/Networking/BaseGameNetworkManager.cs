@@ -58,6 +58,7 @@ namespace MultiplayerARPG
         // Others
         public ILagCompensationManager LagCompensationManager { get; protected set; }
         public IHitRegistrationManager HitRegistrationManager { get; protected set; }
+        public BaseGameNetworkManagerComponent[] ManagerComponents { get; private set; }
 
         public static BaseMapInfo CurrentMapInfo { get; protected set; }
 
@@ -91,6 +92,7 @@ namespace MultiplayerARPG
             doNotDestroyOnSceneChanges = true;
             LagCompensationManager = gameObject.GetOrAddComponent<ILagCompensationManager, DefaultLagCompensationManager>();
             HitRegistrationManager = gameObject.GetOrAddComponent<IHitRegistrationManager, DefaultHitRegistrationManager>();
+            ManagerComponents = GetComponents<BaseGameNetworkManagerComponent>();
             // Get attached grid manager
             GridManager gridManager = gameObject.GetComponent<GridManager>();
             if (gridManager != null)
@@ -295,7 +297,6 @@ namespace MultiplayerARPG
 
         protected virtual void Clean()
         {
-            this.InvokeInstanceDevExtMethods("Clean");
             // Server components
             if (ServerUserHandlers != null)
                 ServerUserHandlers.ClearUsersAndPlayerCharacters();
@@ -315,6 +316,8 @@ namespace MultiplayerARPG
             if (ClientOnlineCharacterHandlers != null)
                 ClientOnlineCharacterHandlers.ClearOnlineCharacters();
             CurrentMapInfo = null;
+            // Extensions
+            this.InvokeInstanceDevExtMethods("Clean");
         }
 
         public override bool StartServer()
@@ -326,7 +329,6 @@ namespace MultiplayerARPG
         public override void OnStartServer()
         {
             this.InvokeInstanceDevExtMethods("OnStartServer");
-            base.OnStartServer();
             GameInstance.ServerMailHandlers = ServerMailHandlers;
             GameInstance.ServerUserHandlers = ServerUserHandlers;
             GameInstance.ServerBuildingHandlers = ServerBuildingHandlers;
@@ -337,16 +339,19 @@ namespace MultiplayerARPG
             GameInstance.ServerGuildHandlers = ServerGuildHandlers;
             GameInstance.ServerChatHandlers = ServerChatHandlers;
             CurrentGameInstance.DayNightTimeUpdater.InitTimeOfDay(this);
+            base.OnStartServer();
         }
 
         public override void OnStopServer()
         {
+            this.InvokeInstanceDevExtMethods("OnStopServer");
             Clean();
             base.OnStopServer();
         }
 
         public override bool StartClient(string networkAddress, int networkPort)
         {
+            // Server will call init prefabs function too, so don't call it again
             if (!IsServer)
                 InitPrefabs();
             return base.StartClient(networkAddress, networkPort);
@@ -355,7 +360,6 @@ namespace MultiplayerARPG
         public override void OnStartClient(LiteNetLibClient client)
         {
             this.InvokeInstanceDevExtMethods("OnStartClient", client);
-            base.OnStartClient(client);
             GameInstance.ClientCashShopHandlers = ClientCashShopHandlers;
             GameInstance.ClientMailHandlers = ClientMailHandlers;
             GameInstance.ClientStorageHandlers = ClientStorageHandlers;
@@ -368,35 +372,36 @@ namespace MultiplayerARPG
             GameInstance.ClientBankHandlers = ClientBankHandlers;
             GameInstance.ClientOnlineCharacterHandlers = ClientOnlineCharacterHandlers;
             GameInstance.ClientChatHandlers = ClientChatHandlers;
+            base.OnStartClient(client);
         }
 
         public override void OnStopClient()
         {
+            this.InvokeInstanceDevExtMethods("OnStopClient");
+            ClientGenericActions.ClientStopped();
             if (!IsServer)
                 Clean();
             base.OnStopClient();
-            ClientGenericActions.ClientStopped();
         }
 
         public override void OnClientConnected()
         {
-            base.OnClientConnected();
             ClientGenericActions.ClientConnected();
+            base.OnClientConnected();
         }
 
         public override void OnClientDisconnected(DisconnectInfo disconnectInfo)
         {
-            base.OnClientDisconnected(disconnectInfo);
-            ClientGenericActions.ClientDisconnected(disconnectInfo);
             UISceneGlobal.Singleton.ShowDisconnectDialog(disconnectInfo);
+            ClientGenericActions.ClientDisconnected(disconnectInfo);
+            base.OnClientDisconnected(disconnectInfo);
         }
 
         public override void OnPeerConnected(long connectionId)
         {
-            this.InvokeInstanceDevExtMethods("OnPeerConnected", connectionId);
-            base.OnPeerConnected(connectionId);
             SendMapInfo(connectionId);
             SendTimeOfDay(connectionId);
+            base.OnPeerConnected(connectionId);
         }
 
         protected virtual void UpdateOnlineCharacter(BasePlayerCharacterEntity playerCharacterEntity)
@@ -606,7 +611,6 @@ namespace MultiplayerARPG
 
         public override void OnClientOnlineSceneLoaded()
         {
-            base.OnClientOnlineSceneLoaded();
             this.InvokeInstanceDevExtMethods("OnClientOnlineSceneLoaded");
             // Server will register entities later, so don't register entities now
             if (!IsServer)
@@ -615,12 +619,11 @@ namespace MultiplayerARPG
 
         public override void OnServerOnlineSceneLoaded()
         {
-            base.OnServerOnlineSceneLoaded();
+            this.InvokeInstanceDevExtMethods("OnServerOnlineSceneLoaded");
             readyToInstantiateObjectsStates.Clear();
             isReadyToInstantiateObjects = false;
             isReadyToInstantiatePlayers = false;
             serverSceneLoadedTime = Time.unscaledTime;
-            this.InvokeInstanceDevExtMethods("OnServerOnlineSceneLoaded");
             SpawnEntities().Forget();
         }
 
@@ -904,7 +907,6 @@ namespace MultiplayerARPG
             if (!isReadyToInstantiateObjects)
             {
                 readyToInstantiateObjectsStates[INSTANTIATES_OBJECTS_DELAY_STATE_KEY] = Time.unscaledTime - serverSceneLoadedTime >= INSTANTIATES_OBJECTS_DELAY;
-                this.InvokeInstanceDevExtMethods("UpdateReadyToInstantiateObjectsStates");
                 foreach (bool value in readyToInstantiateObjectsStates.Values)
                 {
                     if (!value)
