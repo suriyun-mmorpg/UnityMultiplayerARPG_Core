@@ -15,7 +15,7 @@ namespace MultiplayerARPG
         public abstract bool OwningCharacterCanKick();
     }
     
-    public abstract class UISocialGroup<T> : UISocialGroup
+    public abstract partial class UISocialGroup<T> : UISocialGroup
         where T : UISocialCharacter
     {
         [Header("String Formats")]
