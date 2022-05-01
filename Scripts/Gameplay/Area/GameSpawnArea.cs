@@ -73,7 +73,10 @@ namespace MultiplayerARPG
 
         public virtual void SpawnAll()
         {
-            SpawnByAmount(prefab, (short)Random.Range(minLevel, maxLevel), amount);
+            for (int i = 0; i < amount; ++i)
+            {
+                Spawn(prefab, (short)Random.Range(minLevel, maxLevel + 1), 0);
+            }
             foreach (SpawnPrefabData<T> spawningPrefab in SpawningPrefabs)
             {
                 SpawnByAmount(spawningPrefab.prefab, spawningPrefab.level, spawningPrefab.amount);
