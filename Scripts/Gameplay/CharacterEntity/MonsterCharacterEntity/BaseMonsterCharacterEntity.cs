@@ -503,7 +503,7 @@ namespace MultiplayerARPG
                             BasePlayerCharacterEntity nearbyPartyMember;
                             foreach (string memberId in tempPartyData.GetMemberIds())
                             {
-                                if (GameInstance.ServerUserHandlers.TryGetPlayerCharacterById(memberId, out nearbyPartyMember))
+                                if (GameInstance.ServerUserHandlers.TryGetPlayerCharacterById(memberId, out nearbyPartyMember) && !nearbyPartyMember.IsDead())
                                 {
                                     if (tempPartyData.shareExp)
                                     {
