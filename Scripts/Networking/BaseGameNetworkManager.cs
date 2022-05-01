@@ -496,6 +496,11 @@ namespace MultiplayerARPG
                 return;
             UpdateMapInfoMessage message = messageHandler.ReadMessage<UpdateMapInfoMessage>();
             SetMapInfo(message.mapId);
+            this.InvokeInstanceDevExtMethods("ReadMapInfoExtra", messageHandler.Reader);
+            foreach (BaseGameNetworkManagerComponent component in ManagerComponents)
+            {
+                component.ReadMapInfoExtra(this, messageHandler.Reader);
+            }
         }
 
         protected void HandleServerEntityStateAtClient(MessageHandlerData messageHandler)
@@ -914,9 +919,17 @@ namespace MultiplayerARPG
         {
             if (!IsServer || CurrentMapInfo == null)
                 return;
-            UpdateMapInfoMessage message = new UpdateMapInfoMessage();
-            message.mapId = CurrentMapInfo.Id;
-            ServerSendPacket(connectionId, 0, DeliveryMethod.ReliableOrdered, GameNetworkingConsts.UpdateMapInfo, message);
+            ServerSendPacket(connectionId, 0, DeliveryMethod.ReliableOrdered, GameNetworkingConsts.UpdateMapInfo, new UpdateMapInfoMessage()
+            {
+                mapId = CurrentMapInfo.Id,
+            }, (writer) =>
+            {
+                this.InvokeInstanceDevExtMethods("WriteMapInfoExtra", writer);
+                foreach (BaseGameNetworkManagerComponent component in ManagerComponents)
+                {
+                    component.WriteMapInfoExtra(this, writer);
+                }
+            });
         }
 
         public void SendTimeOfDay()
@@ -933,9 +946,10 @@ namespace MultiplayerARPG
         {
             if (!IsServer)
                 return;
-            UpdateTimeOfDayMessage message = new UpdateTimeOfDayMessage();
-            message.timeOfDay = CurrentGameInstance.DayNightTimeUpdater.TimeOfDay;
-            ServerSendPacket(connectionId, 0, DeliveryMethod.ReliableOrdered, GameNetworkingConsts.UpdateTimeOfDay, message);
+            ServerSendPacket(connectionId, 0, DeliveryMethod.ReliableOrdered, GameNetworkingConsts.UpdateTimeOfDay, new UpdateTimeOfDayMessage()
+            {
+                timeOfDay = CurrentGameInstance.DayNightTimeUpdater.TimeOfDay,
+            });
         }
 
         public bool IsReadyToInstantiateObjects()
@@ -943,6 +957,11 @@ namespace MultiplayerARPG
             if (!isReadyToInstantiateObjects)
             {
                 readyToInstantiateObjectsStates[INSTANTIATES_OBJECTS_DELAY_STATE_KEY] = Time.unscaledTime - serverSceneLoadedTime >= INSTANTIATES_OBJECTS_DELAY;
+                this.InvokeInstanceDevExtMethods("UpdateReadyToInstantiateObjectsStates", readyToInstantiateObjectsStates);
+                foreach (BaseGameNetworkManagerComponent component in ManagerComponents)
+                {
+                    component.UpdateReadyToInstantiateObjectsStates(this, readyToInstantiateObjectsStates);
+                }
                 foreach (bool value in readyToInstantiateObjectsStates.Values)
                 {
                     if (!value)
