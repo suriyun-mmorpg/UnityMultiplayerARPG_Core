@@ -7,7 +7,7 @@ namespace MultiplayerARPG
     {
 
         [Header("Options")]
-        [Tooltip("Visible when hit duration for non owning character")]
+        [Tooltip("This is duration before this will be invisible, if this is <= 0f it will always visible")]
         public float visibleWhenHitDuration = 2f;
 
         [Header("Damageable Entity - UI Elements")]
@@ -18,6 +18,21 @@ namespace MultiplayerARPG
 
         protected int currentHp;
         protected int maxHp;
+        protected float receivedDamageTime;
+        protected T previousEntity;
+
+        protected override void OnEnable()
+        {
+            base.OnEnable();
+            receivedDamageTime = 0f;
+        }
+
+        protected override void OnDisable()
+        {
+            base.OnDisable();
+            if (previousEntity != null)
+                previousEntity.onReceivedDamage -= OnReceivedDamage;
+        }
 
         protected override void Update()
         {
@@ -39,7 +54,30 @@ namespace MultiplayerARPG
 
         protected override bool ValidateToUpdateUI()
         {
-            return base.ValidateToUpdateUI() && (!hideWhileDead || !Data.IsDead()) && Data.IsClient;
+            return base.ValidateToUpdateUI() && (!hideWhileDead || !Data.IsDead()) && Data.IsClient && (Time.unscaledTime - receivedDamageTime < visibleWhenHitDuration || visibleWhenHitDuration <= 0f);
+        }
+
+        protected override void UpdateData()
+        {
+            base.UpdateData();
+            if (previousEntity != null)
+                previousEntity.onReceivedDamage -= OnReceivedDamage;
+            if (Data != null)
+                Data.onReceivedDamage += OnReceivedDamage;
+            previousEntity = Data;
+        }
+
+        private void OnReceivedDamage(
+            HitBoxPosition position,
+            Vector3 fromPosition,
+            IGameEntity attacker,
+            CombatAmountType combatAmountType,
+            int totalDamage,
+            CharacterItem weapon,
+            BaseSkill skill,
+            short skillLevel)
+        {
+            receivedDamageTime = Time.unscaledTime;
         }
     }
 
