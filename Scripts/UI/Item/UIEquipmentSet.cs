@@ -29,7 +29,7 @@ namespace MultiplayerARPG
                         effectCount <= Data.equippedCount ?
                             LanguageManager.GetText(formatKeyAppliedEffect) :
                             LanguageManager.GetText(formatKeyUnappliedEffect),
-                        effectCount.ToString("N0"),
+                        (effectCount + 1).ToString("N0"),
                         tempText);
                 }
                 ++effectCount;
