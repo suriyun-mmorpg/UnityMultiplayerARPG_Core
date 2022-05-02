@@ -234,7 +234,8 @@ namespace MultiplayerARPG
             GameInstance.AddPoolingObjects(Debuff.effects);
             Buff.PrepareRelatesData();
             Debuff.PrepareRelatesData();
-            MakeRequirementEachLevels();
+            if (requirementEachLevels.Count <= 0)
+                MakeRequirementEachLevels();
         }
 
         public GameEffect[] SkillCastEffect
@@ -307,37 +308,37 @@ namespace MultiplayerARPG
 
         public short GetRequireCharacterLevel(short level)
         {
-            if (level > maxLevel)
-                return 0;
+            if (level >= requirementEachLevels.Count)
+                return requirementEachLevels[requirementEachLevels.Count - 1].characterLevel;
             return requirementEachLevels[level].characterLevel;
         }
 
         public float GetRequireCharacterSkillPoint(short level)
         {
-            if (level > maxLevel)
-                return 0;
+            if (level >= requirementEachLevels.Count)
+                return requirementEachLevels[requirementEachLevels.Count - 1].skillPoint;
             return requirementEachLevels[level].skillPoint;
         }
 
         public int GetRequireCharacterGold(short level)
         {
-            if (level > maxLevel)
-                return 0;
+            if (level >= requirementEachLevels.Count)
+                return requirementEachLevels[requirementEachLevels.Count - 1].gold;
             return requirementEachLevels[level].gold;
         }
 
         public Dictionary<BaseSkill, short> GetRequireSkillLevels(short level)
         {
-            if (level > maxLevel)
-                return new Dictionary<BaseSkill, short>();
-            return GameDataHelpers.CombineSkills(requirementEachLevels[level - 1].skillLevels, null);
+            if (level >= requirementEachLevels.Count)
+                return GameDataHelpers.CombineSkills(requirementEachLevels[requirementEachLevels.Count - 1].skillLevels, null);
+            return GameDataHelpers.CombineSkills(requirementEachLevels[level].skillLevels, null);
         }
 
         public Dictionary<Attribute, float> GetRequireAttributeAmounts(short level)
         {
-            if (level > maxLevel)
-                return new Dictionary<Attribute, float>();
-            return GameDataHelpers.CombineAttributes(requirementEachLevels[level - 1].attributeAmounts, null, 1f);
+            if (level >= requirementEachLevels.Count)
+                return GameDataHelpers.CombineAttributes(requirementEachLevels[requirementEachLevels.Count - 1].attributeAmounts, null, 1f);
+            return GameDataHelpers.CombineAttributes(requirementEachLevels[level].attributeAmounts, null, 1f);
         }
 
         public bool IsAvailable(ICharacterData character)
