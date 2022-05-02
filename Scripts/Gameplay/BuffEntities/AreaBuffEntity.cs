@@ -50,10 +50,11 @@ namespace MultiplayerARPG
             EntityInfo buffApplier,
             BaseSkill skill,
             short skillLevel,
+            bool applyBuffToEveryone,
             float areaDuration,
             float applyDuration)
         {
-            base.Setup(buffApplier, skill, skillLevel);
+            base.Setup(buffApplier, skill, skillLevel, applyBuffToEveryone);
             PushBack(areaDuration);
             this.applyDuration = applyDuration;
             lastAppliedTime = Time.unscaledTime;

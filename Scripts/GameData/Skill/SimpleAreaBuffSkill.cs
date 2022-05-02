@@ -12,6 +12,8 @@ namespace MultiplayerARPG
 
         [Category(3, "Buff")]
         public Buff buff;
+        [Tooltip("If this is `TRUE` buffs will applies to everyone including with an enemies")]
+        public bool applyBuffToEveryone;
 
         [Category(4, "Warp Settings")]
         public bool isWarpToAimPosition;
@@ -27,7 +29,7 @@ namespace MultiplayerARPG
                     aimPosition.position,
                     GameInstance.Singleton.GameplayRule.GetSummonRotation(skillUser));
                 AreaBuffEntity entity = spawnObj.GetComponent<AreaBuffEntity>();
-                entity.Setup(skillUser.GetInfo(), this, skillLevel, areaDuration.GetAmount(skillLevel), applyDuration.GetAmount(skillLevel));
+                entity.Setup(skillUser.GetInfo(), this, skillLevel, applyBuffToEveryone, areaDuration.GetAmount(skillLevel), applyDuration.GetAmount(skillLevel));
                 BaseGameNetworkManager.Singleton.Assets.NetworkSpawn(spawnObj);
             }
             // Teleport to aim position

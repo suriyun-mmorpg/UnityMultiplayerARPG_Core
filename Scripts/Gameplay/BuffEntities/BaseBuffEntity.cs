@@ -4,9 +4,10 @@ namespace MultiplayerARPG
 {
     public class BaseBuffEntity : PoolDescriptor
     {
-        [Tooltip("If this is `TRUE` buffs will applies to everyone including with an enemies")]
-        public bool applyBuffToEveryone;
-
+        /// <summary>
+        /// If this is `TRUE` buffs will applies to everyone including with an enemies
+        /// </summary>
+        protected bool applyBuffToEveryone;
         protected EntityInfo buffApplier;
         protected BaseSkill skill;
         protected short skillLevel;
@@ -63,11 +64,13 @@ namespace MultiplayerARPG
         public virtual void Setup(
             EntityInfo buffApplier,
             BaseSkill skill,
-            short skillLevel)
+            short skillLevel,
+            bool applyBuffToEveryone)
         {
             this.buffApplier = buffApplier;
             this.skill = skill;
             this.skillLevel = skillLevel;
+            this.applyBuffToEveryone = applyBuffToEveryone;
         }
 
         public virtual void ApplyBuffTo(BaseCharacterEntity target)
