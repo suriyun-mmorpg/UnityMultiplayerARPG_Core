@@ -404,7 +404,7 @@ namespace MultiplayerARPG
                         // If it's server only (not a host), set position follows the client immediately
                         float currentTime = Time.unscaledTime;
                         float t = currentTime - lastServerValidateTransformTime;
-                        float v = Entity.GetMoveSpeed(true);
+                        float v = Entity.GetMoveSpeed();
                         float s = (lastServerValidateTransformMoveSpeed * t) + (v * (t + 0.2f)); // +200ms as high ping buffer
                         if (s < 0.001f)
                             s = 0.001f;
