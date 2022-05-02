@@ -24,9 +24,6 @@ namespace MultiplayerARPG
         public Visibility visibility;
         public float visibleDistance = 30f;
 
-        private BasePlayerCharacterEntity tempOwningCharacter;
-        private BaseGameEntity tempTargetEntity;
-
         private Canvas cacheCanvas;
         public Canvas CacheCanvas
         {
@@ -76,8 +73,8 @@ namespace MultiplayerARPG
             }
 
             Profiler.BeginSample("UIBaseGameEntity - Update UI");
-            tempOwningCharacter = GameInstance.PlayingCharacterEntity;
-            if (tempOwningCharacter == Data)
+            BasePlayerCharacterEntity tempPlayingCharacter = GameInstance.PlayingCharacterEntity;
+            if (tempPlayingCharacter == Data)
             {
                 // Always show the UI when character is owning character
                 CacheCanvas.enabled = true;
@@ -87,13 +84,13 @@ namespace MultiplayerARPG
                 switch (visibility)
                 {
                     case Visibility.VisibleWhenSelected:
-                        tempTargetEntity = BasePlayerCharacterController.Singleton.SelectedEntity;
+                        BaseGameEntity tempTargetEntity = BasePlayerCharacterController.Singleton.SelectedEntity;
                         CacheCanvas.enabled = tempTargetEntity != null &&
                             tempTargetEntity.ObjectId == Data.ObjectId &&
-                            Vector3.Distance(tempOwningCharacter.CacheTransform.position, Data.CacheTransform.position) <= visibleDistance;
+                            Vector3.Distance(tempPlayingCharacter.CacheTransform.position, Data.CacheTransform.position) <= visibleDistance;
                         break;
                     case Visibility.VisibleWhenNearby:
-                        CacheCanvas.enabled = Vector3.Distance(tempOwningCharacter.CacheTransform.position, Data.CacheTransform.position) <= visibleDistance;
+                        CacheCanvas.enabled = Vector3.Distance(tempPlayingCharacter.CacheTransform.position, Data.CacheTransform.position) <= visibleDistance;
                         break;
                     case Visibility.AlwaysVisible:
                         CacheCanvas.enabled = true;
