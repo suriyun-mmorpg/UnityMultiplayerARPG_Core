@@ -2,6 +2,9 @@
 using System.Text;
 using UnityEngine;
 using UnityEngine.Serialization;
+#if UNITY_EDITOR
+using UnityEditor;
+#endif
 
 namespace MultiplayerARPG
 {
@@ -35,8 +38,10 @@ namespace MultiplayerARPG
         [Category(11, "Requirement")]
         [Header("Requirements to Levelup (Tools)")]
         public SkillRequirement requirement = new SkillRequirement();
+#if UNITY_EDITOR
         [InspectorButton(nameof(MakeRequirementEachLevels))]
         public bool makeRequirementEachLevels;
+#endif
 
         [Header("Requirements to Levelup (Data)")]
         public List<SkillRequirementEntry> requirementEachLevels = new List<SkillRequirementEntry>();
@@ -865,6 +870,10 @@ namespace MultiplayerARPG
                     skillLevels = requirement.skillLevels,
                 });
             }
+#if UNITY_EDITOR
+            if (!Application.isPlaying)
+                EditorUtility.SetDirty(this);
+#endif
         }
     }
 }
