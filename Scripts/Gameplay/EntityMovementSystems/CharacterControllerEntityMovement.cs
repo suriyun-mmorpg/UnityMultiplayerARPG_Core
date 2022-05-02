@@ -885,7 +885,7 @@ namespace MultiplayerARPG
                     float currentTime = Time.unscaledTime;
                     float t = currentTime - lastServerValidateTransformTime;
                     float v = Entity.GetMoveSpeed();
-                    float s = (lastServerValidateTransformMoveSpeed * t) + (v * (t + 0.2f)); // +200ms as high ping buffer
+                    float s = (lastServerValidateTransformMoveSpeed * (t + 0.2f)) + (v * t); // +200ms as high ping buffer
                     if (s < 0.001f)
                         s = 0.001f;
                     Vector3 oldPos = CacheTransform.position;
