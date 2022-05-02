@@ -79,15 +79,18 @@ namespace MultiplayerARPG
             }
         }
 
-        public static void AppendCraftingQueueItem(this ICraftingQueueSource source, uint crafterId, int dataId, short amount)
+        public static bool AppendCraftingQueueItem(this ICraftingQueueSource source, IPlayerCharacterData crafter, uint crafterId, int dataId, short amount, out UITextKeys errorMessage)
         {
+            errorMessage = UITextKeys.NONE;
             if (!source.CanCraft)
-                return;
+                return false;
             ItemCraftFormula itemCraftFormula;
             if (!GameInstance.ItemCraftFormulas.TryGetValue(dataId, out itemCraftFormula))
-                return;
+                return false;
+            if (!itemCraftFormula.ItemCraft.CanCraft(crafter, out errorMessage))
+                return false;
             if (source.QueueItems.Count >= source.MaxQueueSize)
-                return;
+                return false;
             source.QueueItems.Add(new CraftingQueueItem()
             {
                 crafterId = crafterId,
@@ -95,6 +98,7 @@ namespace MultiplayerARPG
                 amount = amount,
                 craftRemainsDuration = itemCraftFormula.CraftDuration,
             });
+            return true;
         }
 
         public static void ChangeCraftingQueueItem(this ICraftingQueueSource source, uint crafterId, int index, short amount)

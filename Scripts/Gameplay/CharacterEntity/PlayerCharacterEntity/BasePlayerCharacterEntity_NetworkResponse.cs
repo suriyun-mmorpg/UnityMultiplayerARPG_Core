@@ -134,13 +134,16 @@ namespace MultiplayerARPG
         [ServerRpc]
         protected void ServerAppendCraftingQueueItem(uint sourceObjectId, int dataId, short amount)
         {
+            UITextKeys errorMessage;
             if (sourceObjectId == ObjectId)
             {
-                Crafting.AppendCraftingQueueItem(ObjectId, dataId, amount);
+                if (!Crafting.AppendCraftingQueueItem(this, ObjectId, dataId, amount, out errorMessage))
+                    GameInstance.ServerGameMessageHandlers.SendGameMessage(ConnectionId, errorMessage);
             }
             else if (CurrentGameManager.TryGetEntityByObjectId(sourceObjectId, out ICraftingQueueSource source))
             {
-                source.AppendCraftingQueueItem(ObjectId, dataId, amount);
+                if (!source.AppendCraftingQueueItem(this, ObjectId, dataId, amount, out errorMessage))
+                    GameInstance.ServerGameMessageHandlers.SendGameMessage(ConnectionId, errorMessage);
             }
         }
 
