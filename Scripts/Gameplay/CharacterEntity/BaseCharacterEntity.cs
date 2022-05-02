@@ -68,6 +68,15 @@ namespace MultiplayerARPG
             set { miniMapUiTransform = value; }
         }
 
+        [Tooltip("Chat bubble will instantiates to this transform")]
+        [SerializeField]
+        private Transform chatBubbleTransform;
+        public Transform ChatBubbleTransform
+        {
+            get { return chatBubbleTransform; }
+            set { chatBubbleTransform = value; }
+        }
+
 #if UNITY_EDITOR
         [Category(200, "Debugging", false)]
         [FormerlySerializedAs("debugFovColor")]
@@ -89,6 +98,7 @@ namespace MultiplayerARPG
 
         #region Protected data
         public UICharacterEntity UICharacterEntity { get; protected set; }
+        public UIChatMessage UIChatBubble { get; protected set; }
         public ICharacterAttackComponent AttackComponent { get; protected set; }
         public ICharacterUseSkillComponent UseSkillComponent { get; protected set; }
         public ICharacterReloadComponent ReloadComponent { get; protected set; }
@@ -157,6 +167,8 @@ namespace MultiplayerARPG
                 characterUiTransform = CacheTransform;
             if (miniMapUiTransform == null)
                 miniMapUiTransform = CacheTransform;
+            if (chatBubbleTransform == null)
+                chatBubbleTransform = CacheTransform;
             ModelManager = gameObject.GetOrAddComponent<CharacterModelManager>();
             AttackComponent = gameObject.GetOrAddComponent<ICharacterAttackComponent, DefaultCharacterAttackComponent>();
             UseSkillComponent = gameObject.GetOrAddComponent<ICharacterUseSkillComponent, DefaultCharacterUseSkillComponent>();
@@ -467,6 +479,18 @@ namespace MultiplayerARPG
             UICharacterEntity = Instantiate(prefab, CharacterUiTransform);
             UICharacterEntity.transform.localPosition = Vector3.zero;
             UICharacterEntity.Data = this;
+        }
+
+        public virtual void InstantiateChatBubble(UIChatMessage prefab, ChatMessage chatMessage, float destroyDelay)
+        {
+            if (prefab == null)
+                return;
+            if (UIChatBubble != null)
+                Destroy(UIChatBubble.gameObject);
+            UIChatBubble = Instantiate(prefab, ChatBubbleTransform);
+            UIChatBubble.transform.localPosition = Vector3.zero;
+            UIChatBubble.Data = chatMessage;
+            Destroy(UIChatBubble.gameObject, destroyDelay);
         }
         #endregion
 

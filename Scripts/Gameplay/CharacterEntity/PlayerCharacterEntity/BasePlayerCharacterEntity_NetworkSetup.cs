@@ -67,7 +67,7 @@ namespace MultiplayerARPG
             currencies.onOperation += OnCurrenciesOperation;
             // Subscribe this entity
             if (GameInstance.ClientCharacterHandlers != null)
-                GameInstance.ClientCharacterHandlers.SubscribePlayerCharacter(Id, this);
+                GameInstance.ClientCharacterHandlers.SubscribePlayerCharacter(this);
         }
 
         protected override void EntityOnSetOwnerClient()
@@ -146,7 +146,7 @@ namespace MultiplayerARPG
             currencies.onOperation -= OnCurrenciesOperation;
             // Unsubscribe this entity
             if (GameInstance.ClientCharacterHandlers != null)
-                GameInstance.ClientCharacterHandlers.UnsubscribePlayerCharacter(Id);
+                GameInstance.ClientCharacterHandlers.UnsubscribePlayerCharacter(this);
 
             if (IsOwnerClient && BasePlayerCharacterController.Singleton != null)
                 Destroy(BasePlayerCharacterController.Singleton.gameObject);

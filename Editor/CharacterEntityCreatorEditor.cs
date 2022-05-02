@@ -336,6 +336,13 @@ namespace MultiplayerARPG
                 miniMapUiObj.transform.localScale = Vector3.one;
                 baseCharacterEntity.MiniMapUiTransform = miniMapUiObj.transform;
 
+                var bubbleChat = new GameObject("_ChatBubble");
+                bubbleChat.transform.parent = baseCharacterEntity.transform;
+                bubbleChat.transform.localPosition = Vector3.zero + (Vector3.up * bounds.size.y);
+                bubbleChat.transform.localRotation = Quaternion.identity;
+                bubbleChat.transform.localScale = Vector3.one;
+                baseCharacterEntity.ChatBubbleTransform = bubbleChat.transform;
+
                 var savePath = path + "\\" + fileName + ".prefab";
                 Debug.Log("Saving character entity to " + savePath);
                 AssetDatabase.DeleteAsset(savePath);

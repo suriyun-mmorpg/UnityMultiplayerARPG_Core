@@ -6,7 +6,8 @@ namespace MultiplayerARPG
 {
     public partial class DefaultClientCharacterHandlers : MonoBehaviour, IClientCharacterHandlers
     {
-        public static readonly Dictionary<string, IPlayerCharacterData> SubscribedPlayerCharacters = new Dictionary<string, IPlayerCharacterData>();
+        public static readonly Dictionary<string, IPlayerCharacterData> SubscribedPlayerCharactersById = new Dictionary<string, IPlayerCharacterData>();
+        public static readonly Dictionary<string, IPlayerCharacterData> SubscribedPlayerCharactersByName = new Dictionary<string, IPlayerCharacterData>();
 
         public LiteNetLibManager.LiteNetLibManager Manager { get; private set; }
 
@@ -30,24 +31,36 @@ namespace MultiplayerARPG
             return Manager.ClientSendRequest(GameNetworkingConsts.Respawn, data, responseDelegate: callback);
         }
 
-        public void SubscribePlayerCharacter(string characterId, IPlayerCharacterData playerCharacter)
+        public void SubscribePlayerCharacter(IPlayerCharacterData playerCharacter)
         {
-            SubscribedPlayerCharacters[characterId] = playerCharacter;
+            if (playerCharacter == null)
+                return;
+            SubscribedPlayerCharactersById[playerCharacter.Id] = playerCharacter;
+            SubscribedPlayerCharactersByName[playerCharacter.CharacterName] = playerCharacter;
         }
 
-        public void UnsubscribePlayerCharacter(string characterId)
+        public void UnsubscribePlayerCharacter(IPlayerCharacterData playerCharacter)
         {
-            SubscribedPlayerCharacters.Remove(characterId);
+            if (playerCharacter == null)
+                return;
+            SubscribedPlayerCharactersById.Remove(playerCharacter.Id);
+            SubscribedPlayerCharactersByName.Remove(playerCharacter.CharacterName);
         }
 
-        public bool TryGetSubscribedPlayerCharacter(string characterId, out IPlayerCharacterData playerCharacter)
+        public bool TryGetSubscribedPlayerCharacterById(string characterId, out IPlayerCharacterData playerCharacter)
         {
-            return SubscribedPlayerCharacters.TryGetValue(characterId, out playerCharacter);
+            return SubscribedPlayerCharactersById.TryGetValue(characterId, out playerCharacter);
+        }
+
+        public bool TryGetSubscribedPlayerCharacterByName(string characterName, out IPlayerCharacterData playerCharacter)
+        {
+            return SubscribedPlayerCharactersByName.TryGetValue(characterName, out playerCharacter);
         }
 
         public void ClearSubscribedPlayerCharacters()
         {
-            SubscribedPlayerCharacters.Clear();
+            SubscribedPlayerCharactersById.Clear();
+            SubscribedPlayerCharactersByName.Clear();
         }
     }
 }
