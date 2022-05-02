@@ -263,16 +263,16 @@ namespace MultiplayerARPG
 
                                 // Target receives damages
                                 if (isHost || isOwnedByServer)
-                                    tempDamageableHitBox.ReceiveDamage(attacker.CacheTransform.position, instigator, damageAmounts, weapon, skill, skillLevel, randomSeed);
+                                    damageReceivingTarget.ReceiveDamage(attacker.CacheTransform.position, instigator, damageAmounts, weapon, skill, skillLevel, randomSeed);
 
                                 // It hit something, store data for hit register preparation later
                                 if (!isHost && isOwnerClient)
                                 {
                                     hitDataCollection.Add(new HitData()
                                     {
-                                        HitObjectId = tempDamageableHitBox.GetObjectId(),
-                                        HitBoxIndex = tempDamageableHitBox.Index,
-                                        HitPoint = tempDamageableHitBox.transform.position,
+                                        HitObjectId = damageReceivingTarget.GetObjectId(),
+                                        HitBoxIndex = damageReceivingTarget.Index,
+                                        HitPoint = damageReceivingTarget.transform.position,
                                     });
                                 }
 
@@ -296,9 +296,9 @@ namespace MultiplayerARPG
                                 {
                                     hitDataCollection.Add(new HitData()
                                     {
-                                        HitObjectId = tempDamageableHitBox.GetObjectId(),
-                                        HitBoxIndex = tempDamageableHitBox.Index,
-                                        HitPoint = tempDamageableHitBox.transform.position,
+                                        HitObjectId = damageReceivingTarget.GetObjectId(),
+                                        HitBoxIndex = damageReceivingTarget.Index,
+                                        HitPoint = damageReceivingTarget.transform.position,
                                     });
                                 }
 
