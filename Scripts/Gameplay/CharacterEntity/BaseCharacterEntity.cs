@@ -959,25 +959,28 @@ namespace MultiplayerARPG
             return atkSpeed;
         }
 
-        protected float GetMoveSpeed(MovementState movementState, ExtraMovementState extraMovementState)
+        protected float GetMoveSpeed(MovementState movementState, ExtraMovementState extraMovementState, bool calculateWithAction = true)
         {
             float moveSpeed = this.GetCaches().MoveSpeed;
-            float time = Time.unscaledTime;
-            if (IsAttacking || time - LastAttackEndTime < CurrentGameInstance.returnMoveSpeedDelayAfterAction)
+            if (calculateWithAction)
             {
-                moveSpeed *= MoveSpeedRateWhileAttacking;
-            }
-            else if (IsUsingSkill || time - LastUseSkillEndTime < CurrentGameInstance.returnMoveSpeedDelayAfterAction)
-            {
-                moveSpeed *= MoveSpeedRateWhileUsingSkill;
-            }
-            else if (IsReloading)
-            {
-                moveSpeed *= MoveSpeedRateWhileReloading;
-            }
-            else if (IsCharging)
-            {
-                moveSpeed *= MoveSpeedRateWhileCharging;
+                float time = Time.unscaledTime;
+                if (IsAttacking || time - LastAttackEndTime < CurrentGameInstance.returnMoveSpeedDelayAfterAction)
+                {
+                    moveSpeed *= MoveSpeedRateWhileAttacking;
+                }
+                else if (IsUsingSkill || time - LastUseSkillEndTime < CurrentGameInstance.returnMoveSpeedDelayAfterAction)
+                {
+                    moveSpeed *= MoveSpeedRateWhileUsingSkill;
+                }
+                else if (IsReloading)
+                {
+                    moveSpeed *= MoveSpeedRateWhileReloading;
+                }
+                else if (IsCharging)
+                {
+                    moveSpeed *= MoveSpeedRateWhileCharging;
+                }
             }
             if (movementState.Has(MovementState.IsUnderWater))
             {
@@ -1008,9 +1011,9 @@ namespace MultiplayerARPG
             return moveSpeed;
         }
 
-        public override float GetMoveSpeed()
+        public override float GetMoveSpeed(bool calculateWithAction = true)
         {
-            return GetMoveSpeed(MovementState, ExtraMovementState);
+            return GetMoveSpeed(MovementState, ExtraMovementState, calculateWithAction);
         }
 
         public override sealed bool CanMove()

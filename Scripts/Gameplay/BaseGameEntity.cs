@@ -701,7 +701,7 @@ namespace MultiplayerARPG
                 onNetworkDestroy.Invoke(reasons);
         }
 
-        public virtual float GetMoveSpeed()
+        public virtual float GetMoveSpeed(bool calculateWithAction = true)
         {
             return 0;
         }
