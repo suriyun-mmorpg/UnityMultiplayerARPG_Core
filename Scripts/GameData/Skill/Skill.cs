@@ -45,7 +45,8 @@ namespace MultiplayerARPG
         public SkillBuffType skillBuffType;
         public IncrementalFloat buffDistance;
         public bool buffToUserIfNoTarget = true;
-        public bool cannotBuffEnemy = true;
+        [FormerlySerializedAs("canBuffEnemy")]
+        public bool canBuffEnemy = false;
         public Buff buff;
 
         [Category(5, "Summon/Mount/Item Craft")]
@@ -361,7 +362,7 @@ namespace MultiplayerARPG
         public override bool CanUse(BaseCharacterEntity character, short level, bool isLeftHand, uint targetObjectId, out UITextKeys gameMessage, bool isItem = false)
         {
             BaseCharacterEntity targetEntity;
-            if (RequiredTarget && !cannotBuffEnemy && character.CurrentGameManager.TryGetEntityByObjectId(targetObjectId, out targetEntity) && targetEntity.IsEnemy(character.GetInfo()))
+            if (RequiredTarget && !canBuffEnemy && character.CurrentGameManager.TryGetEntityByObjectId(targetObjectId, out targetEntity) && targetEntity.IsEnemy(character.GetInfo()))
             {
                 // Cannot buff enemy
                 gameMessage = UITextKeys.UI_ERROR_NO_SKILL_TARGET;
