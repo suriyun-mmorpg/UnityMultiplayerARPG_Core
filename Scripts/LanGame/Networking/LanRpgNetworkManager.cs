@@ -135,13 +135,6 @@ namespace MultiplayerARPG
             base.OnStopHost();
         }
 
-        public override void OnClientDisconnected(DisconnectInfo disconnectInfo)
-        {
-            Save();
-            base.OnClientDisconnected(disconnectInfo);
-            ClientStorageActions.onNotifyStorageItemsUpdated -= NotifyStorageItemsUpdated;
-        }
-
         public override void OnStopClient()
         {
             Save();
