@@ -33,8 +33,13 @@ namespace MultiplayerARPG
         public GameEffect[] damageHitEffects;
 
         [Category(11, "Requirement")]
-        [Header("Requirements to Levelup")]
+        [Header("Requirements to Levelup (Tools)")]
         public SkillRequirement requirement = new SkillRequirement();
+        [InspectorButton(nameof(MakeRequirementEachLevels))]
+        public bool makeRequirementEachLevels;
+
+        [Header("Requirements to Levelup (Data)")]
+        public List<SkillRequirementEntry> requirementEachLevels = new List<SkillRequirementEntry>();
 
         [Header("Required Equipments")]
         [Tooltip("If this is `TRUE`, character have to equip shield to use skill")]
@@ -76,30 +81,6 @@ namespace MultiplayerARPG
                     default:
                         return LanguageManager.GetUnknowTitle();
                 }
-            }
-        }
-
-        [System.NonSerialized]
-        private Dictionary<Attribute, float> cacheRequireAttributeAmounts;
-        public Dictionary<Attribute, float> CacheRequireAttributeAmounts
-        {
-            get
-            {
-                if (cacheRequireAttributeAmounts == null)
-                    cacheRequireAttributeAmounts = GameDataHelpers.CombineAttributes(requirement.attributeAmounts, new Dictionary<Attribute, float>(), 1f);
-                return cacheRequireAttributeAmounts;
-            }
-        }
-
-        [System.NonSerialized]
-        private Dictionary<BaseSkill, short> cacheRequireSkillLevels;
-        public Dictionary<BaseSkill, short> CacheRequireSkillLevels
-        {
-            get
-            {
-                if (cacheRequireSkillLevels == null)
-                    cacheRequireSkillLevels = GameDataHelpers.CombineSkills(requirement.skillLevels, new Dictionary<BaseSkill, short>());
-                return cacheRequireSkillLevels;
             }
         }
 
@@ -253,6 +234,7 @@ namespace MultiplayerARPG
             GameInstance.AddPoolingObjects(Debuff.effects);
             Buff.PrepareRelatesData();
             Debuff.PrepareRelatesData();
+            MakeRequirementEachLevels();
         }
 
         public GameEffect[] SkillCastEffect
@@ -325,17 +307,37 @@ namespace MultiplayerARPG
 
         public short GetRequireCharacterLevel(short level)
         {
-            return requirement.characterLevel.GetAmount((short)(level + 1));
+            if (level > maxLevel)
+                return 0;
+            return requirementEachLevels[level].characterLevel;
         }
 
         public float GetRequireCharacterSkillPoint(short level)
         {
-            return requirement.skillPoint.GetAmount((short)(level + 1));
+            if (level > maxLevel)
+                return 0;
+            return requirementEachLevels[level].skillPoint;
         }
 
         public int GetRequireCharacterGold(short level)
         {
-            return requirement.gold.GetAmount((short)(level + 1));
+            if (level > maxLevel)
+                return 0;
+            return requirementEachLevels[level].gold;
+        }
+
+        public Dictionary<BaseSkill, short> GetRequireSkillLevels(short level)
+        {
+            if (level > maxLevel)
+                return new Dictionary<BaseSkill, short>();
+            return GameDataHelpers.CombineSkills(requirementEachLevels[level - 1].skillLevels, null);
+        }
+
+        public Dictionary<Attribute, float> GetRequireAttributeAmounts(short level)
+        {
+            if (level > maxLevel)
+                return new Dictionary<Attribute, float>();
+            return GameDataHelpers.CombineAttributes(requirementEachLevels[level - 1].attributeAmounts, null, 1f);
         }
 
         public bool IsAvailable(ICharacterData character)
@@ -557,11 +559,12 @@ namespace MultiplayerARPG
             }
 
             // Check is it pass skill level requirement or not
+            Dictionary<BaseSkill, short> requiredSkillLevels = GetRequireSkillLevels(level);
             Dictionary<BaseSkill, short> currentSkillLevels = character.GetSkills(false);
-            foreach (BaseSkill requireSkill in CacheRequireSkillLevels.Keys)
+            foreach (BaseSkill requireSkill in requiredSkillLevels.Keys)
             {
                 if (!currentSkillLevels.ContainsKey(requireSkill) ||
-                    currentSkillLevels[requireSkill] < CacheRequireSkillLevels[requireSkill])
+                    currentSkillLevels[requireSkill] < requiredSkillLevels[requireSkill])
                 {
                     gameMessage = UITextKeys.UI_ERROR_NOT_ENOUGH_SKILL_LEVELS;
                     return false;
@@ -569,9 +572,9 @@ namespace MultiplayerARPG
             }
 
             // Check is it pass attribute requirement or not
+            Dictionary<Attribute, float> requiredAttributeAmounts = GetRequireAttributeAmounts(level);
             Dictionary<Attribute, float> currentAttributeAmounts = character.GetAttributes(false, false, currentSkillLevels);
-            Dictionary<Attribute, float> requireAttributeAmounts = CacheRequireAttributeAmounts;
-            foreach (KeyValuePair<Attribute, float> requireAttributeAmount in requireAttributeAmounts)
+            foreach (KeyValuePair<Attribute, float> requireAttributeAmount in requiredAttributeAmounts)
             {
                 if (!currentAttributeAmounts.ContainsKey(requireAttributeAmount.Key) ||
                     currentAttributeAmounts[requireAttributeAmount.Key] < requireAttributeAmount.Value)
@@ -845,6 +848,22 @@ namespace MultiplayerARPG
         public virtual Transform GetApplyTransform(BaseCharacterEntity skillUser, bool isLeftHand)
         {
             return skillUser.MovementTransform;
+        }
+
+        public void MakeRequirementEachLevels()
+        {
+            requirementEachLevels.Clear();
+            for (short i = 1; i <= maxLevel; ++i)
+            {
+                requirementEachLevels.Add(new SkillRequirementEntry()
+                {
+                    characterLevel = requirement.characterLevel.GetAmount(i),
+                    skillPoint = requirement.skillPoint.GetAmount(i),
+                    gold = requirement.gold.GetAmount(i),
+                    attributeAmounts = requirement.attributeAmounts,
+                    skillLevels = requirement.skillLevels,
+                });
+            }
         }
     }
 }

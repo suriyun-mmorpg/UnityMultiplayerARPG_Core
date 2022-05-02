@@ -128,7 +128,7 @@ namespace MultiplayerARPG
                     uiRequireAttributeAmounts.includeSkillsForCurrentAmounts = true;
                     uiRequireAttributeAmounts.isBonus = false;
                     uiRequireAttributeAmounts.Show();
-                    uiRequireAttributeAmounts.Data = skill.CacheRequireAttributeAmounts;
+                    uiRequireAttributeAmounts.Data = skill.GetRequireAttributeAmounts(level);
                 }
             }
 
@@ -144,7 +144,7 @@ namespace MultiplayerARPG
                     uiRequireSkillLevels.includeEquipmentsForCurrentLevels = false;
                     uiRequireSkillLevels.isBonus = false;
                     uiRequireSkillLevels.Show();
-                    uiRequireSkillLevels.Data = skill.CacheRequireSkillLevels;
+                    uiRequireSkillLevels.Data = skill.GetRequireSkillLevels(level);
                 }
             }
         }
