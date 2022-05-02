@@ -9,6 +9,7 @@ namespace MultiplayerARPG
         public static BaseUISceneGameplay Singleton { get; private set; }
 
         [Header("Combat Text")]
+        public bool instantiateCombatTextToWorldTransform;
         public Transform combatTextTransform;
         public UICombatText uiCombatTextMiss;
         public UICombatText uiCombatTextNormalDamage;
@@ -127,12 +128,21 @@ namespace MultiplayerARPG
 
         public void SpawnCombatText(Transform followingTransform, UICombatText prefab, int amount)
         {
-            if (combatTextTransform == null || prefab == null)
+            if (prefab == null)
                 return;
 
-            UICombatText combatText = Instantiate(prefab, combatTextTransform);
-            combatText.transform.localScale = Vector3.one;
-            combatText.CacheObjectFollower.TargetObject = followingTransform;
+            UICombatText combatText;
+            if (!instantiateCombatTextToWorldTransform && combatTextTransform)
+            {
+                combatText = Instantiate(prefab, combatTextTransform);
+                combatText.transform.localScale = Vector3.one;
+                combatText.gameObject.GetOrAddComponent<UIFollowWorldObject>().TargetObject = followingTransform;
+            }
+            else
+            {
+                combatText = Instantiate(prefab);
+                combatText.transform.position = followingTransform.position;
+            }
             combatText.Amount = amount;
         }
 

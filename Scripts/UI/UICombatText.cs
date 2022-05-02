@@ -4,17 +4,12 @@ using TMPro;
 
 namespace MultiplayerARPG
 {
-    [RequireComponent(typeof(UIFollowWorldObject))]
-    [RequireComponent(typeof(TextWrapper))]
     public class UICombatText : MonoBehaviour
     {
         public float lifeTime = 2f;
         public string format = "{0}";
         public bool showPositiveSign;
-
-        public UIFollowWorldObject CacheObjectFollower { get; private set; }
-
-        public TextWrapper CacheText { get; private set; }
+        public TextWrapper textComponent;
 
         private int amount;
         public int Amount
@@ -23,11 +18,9 @@ namespace MultiplayerARPG
             set
             {
                 amount = value;
-                CacheText.text = string.Format(format, (showPositiveSign && amount > 0 ? "+" : string.Empty) + amount.ToString("N0"));
+                textComponent.text = string.Format(format, (showPositiveSign && amount > 0 ? "+" : string.Empty) + amount.ToString("N0"));
             }
         }
-
-        public bool AlreadyCachedComponents { get; private set; }
 
         private void Awake()
         {
@@ -37,16 +30,15 @@ namespace MultiplayerARPG
 
         private void CacheComponents()
         {
-            if (AlreadyCachedComponents)
-                return;
-
-            CacheObjectFollower = GetComponent<UIFollowWorldObject>();
-            CacheText = gameObject.GetOrAddComponent<TextWrapper>((comp) =>
+            if (textComponent == null)
             {
-                comp.unityText = GetComponent<Text>();
-                comp.textMeshText = GetComponent<TextMeshProUGUI>();
-            });
-            AlreadyCachedComponents = true;
+                // Try get component which attached to this game object if `textComponent` was not set.
+                textComponent = gameObject.GetOrAddComponent<TextWrapper>((comp) =>
+                {
+                    comp.unityText = GetComponent<Text>();
+                    comp.textMeshText = GetComponent<TextMeshProUGUI>();
+                });
+            }
         }
     }
 }
