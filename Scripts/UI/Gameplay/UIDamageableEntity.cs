@@ -54,7 +54,7 @@ namespace MultiplayerARPG
 
         protected override bool ValidateToUpdateUI()
         {
-            return base.ValidateToUpdateUI() && (!hideWhileDead || !Data.IsDead()) && Data.IsClient && (Time.unscaledTime - receivedDamageTime < visibleWhenHitDuration || visibleWhenHitDuration <= 0f);
+            return base.ValidateToUpdateUI() && (!hideWhileDead || !Data.IsDead());
         }
 
         protected override void UpdateData()
@@ -78,6 +78,23 @@ namespace MultiplayerARPG
             short skillLevel)
         {
             receivedDamageTime = Time.unscaledTime;
+        }
+
+        protected override void UpdateUI()
+        {
+            if (!ValidateToUpdateUI())
+            {
+                CacheCanvas.enabled = false;
+                return;
+            }
+
+            if (Time.unscaledTime - receivedDamageTime < visibleWhenHitDuration || visibleWhenHitDuration <= 0f)
+            {
+                CacheCanvas.enabled = true;
+                return;
+            }
+
+            base.UpdateUI();
         }
     }
 
