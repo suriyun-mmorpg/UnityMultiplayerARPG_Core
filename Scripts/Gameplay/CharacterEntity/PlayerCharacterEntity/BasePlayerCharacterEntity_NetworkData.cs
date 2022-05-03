@@ -155,6 +155,20 @@ namespace MultiplayerARPG
         #endregion
 
         #region Sync data changes callback
+        protected override void OnIdChange(bool isInitial, string id)
+        {
+            base.OnIdChange(isInitial, id);
+            if (!string.IsNullOrEmpty(id) && !string.IsNullOrEmpty(CharacterName) && GameInstance.ClientCharacterHandlers != null)
+                GameInstance.ClientCharacterHandlers.SubscribePlayerCharacter(this);
+        }
+
+        protected override void OnCharacterNameChange(bool isInitial, string characterName)
+        {
+            base.OnCharacterNameChange(isInitial, characterName);
+            if (!string.IsNullOrEmpty(Id) && !string.IsNullOrEmpty(characterName) && GameInstance.ClientCharacterHandlers != null)
+                GameInstance.ClientCharacterHandlers.SubscribePlayerCharacter(this);
+        }
+
         protected virtual void OnDataIdChange(bool isInitial, int dataId)
         {
             if (onDataIdChange != null)

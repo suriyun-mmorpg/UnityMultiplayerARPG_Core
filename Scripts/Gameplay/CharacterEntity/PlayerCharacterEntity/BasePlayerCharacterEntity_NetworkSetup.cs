@@ -65,9 +65,32 @@ namespace MultiplayerARPG
             hotkeys.onOperation += OnHotkeysOperation;
             quests.onOperation += OnQuestsOperation;
             currencies.onOperation += OnCurrenciesOperation;
-            // Subscribe this entity
+        }
+
+        protected override void EntityOnDestroy()
+        {
+            base.EntityOnDestroy();
+            // On data changes events
+            dataId.onChange -= OnDataIdChange;
+            factionId.onChange -= OnFactionIdChange;
+            statPoint.onChange -= OnStatPointChange;
+            skillPoint.onChange -= OnSkillPointChange;
+            gold.onChange -= OnGoldChange;
+            userGold.onChange -= OnUserGoldChange;
+            userCash.onChange -= OnUserCashChange;
+            partyId.onChange -= OnPartyIdChange;
+            guildId.onChange -= OnGuildIdChange;
+            isWarping.onChange -= OnIsWarpingChange;
+            // On list changes events
+            hotkeys.onOperation -= OnHotkeysOperation;
+            quests.onOperation -= OnQuestsOperation;
+            currencies.onOperation -= OnCurrenciesOperation;
+            // Unsubscribe this entity
             if (GameInstance.ClientCharacterHandlers != null)
-                GameInstance.ClientCharacterHandlers.SubscribePlayerCharacter(this);
+                GameInstance.ClientCharacterHandlers.UnsubscribePlayerCharacter(this);
+
+            if (IsOwnerClient && BasePlayerCharacterController.Singleton != null)
+                Destroy(BasePlayerCharacterController.Singleton.gameObject);
         }
 
         protected override void EntityOnSetOwnerClient()
@@ -124,32 +147,6 @@ namespace MultiplayerARPG
                 if (CurrentGameInstance.nonOwningCharacterUI != null)
                     InstantiateUI(CurrentGameInstance.nonOwningCharacterUI);
             }
-        }
-
-        protected override void EntityOnDestroy()
-        {
-            base.EntityOnDestroy();
-            // On data changes events
-            dataId.onChange -= OnDataIdChange;
-            factionId.onChange -= OnFactionIdChange;
-            statPoint.onChange -= OnStatPointChange;
-            skillPoint.onChange -= OnSkillPointChange;
-            gold.onChange -= OnGoldChange;
-            userGold.onChange -= OnUserGoldChange;
-            userCash.onChange -= OnUserCashChange;
-            partyId.onChange -= OnPartyIdChange;
-            guildId.onChange -= OnGuildIdChange;
-            isWarping.onChange -= OnIsWarpingChange;
-            // On list changes events
-            hotkeys.onOperation -= OnHotkeysOperation;
-            quests.onOperation -= OnQuestsOperation;
-            currencies.onOperation -= OnCurrenciesOperation;
-            // Unsubscribe this entity
-            if (GameInstance.ClientCharacterHandlers != null)
-                GameInstance.ClientCharacterHandlers.UnsubscribePlayerCharacter(this);
-
-            if (IsOwnerClient && BasePlayerCharacterController.Singleton != null)
-                Destroy(BasePlayerCharacterController.Singleton.gameObject);
         }
     }
 }

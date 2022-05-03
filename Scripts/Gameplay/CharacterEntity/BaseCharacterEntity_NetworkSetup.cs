@@ -46,6 +46,7 @@ namespace MultiplayerARPG
             base.OnSetup();
             // On data changes events
             id.onChange += OnIdChange;
+            syncTitle.onChange += OnCharacterNameChange;
             level.onChange += OnLevelChange;
             exp.onChange += OnExpChange;
             isImmune.onChange += OnIsImmuneChange;
@@ -72,6 +73,7 @@ namespace MultiplayerARPG
             base.EntityOnDestroy();
             // On data changes events
             id.onChange -= OnIdChange;
+            syncTitle.onChange -= OnCharacterNameChange;
             level.onChange -= OnLevelChange;
             exp.onChange -= OnExpChange;
             isImmune.onChange -= OnIsImmuneChange;
