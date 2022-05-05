@@ -780,7 +780,7 @@ namespace MultiplayerARPG
                 return false;
             if (sellItem.sellPrices == null || sellItem.sellPrices.Length == 0)
                 return true;
-            return character.HasEnoughCurrencies(sellItem.sellPrices, amount);
+            return character.HasEnoughCurrencyAmounts(GameDataHelpers.CombineCurrencies(sellItem.sellPrices, null), out _, out _, amount);
         }
 
         public override void DecreaseCurrenciesWhenBuyItem(IPlayerCharacterData character, NpcSellItem sellItem, short amount)
