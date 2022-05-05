@@ -19,6 +19,7 @@ namespace MultiplayerARPG
         [Header("UI Elements")]
         public UICharacterItem uiCraftingItem;
         public UIItemAmounts uiRequireItemAmounts;
+        public UICurrencyAmounts uiRequireCurrencyAmounts;
         public TextWrapper uiTextRequireGold;
         public TextWrapper uiTextSimpleRequireGold;
 
@@ -38,7 +39,7 @@ namespace MultiplayerARPG
 
             if (uiRequireItemAmounts != null)
             {
-                if (CraftingItem == null)
+                if (CraftingItem == null || ItemCraft.RequireItems == null || ItemCraft.RequireItems.Length == 0)
                 {
                     uiRequireItemAmounts.Hide();
                 }
@@ -46,7 +47,21 @@ namespace MultiplayerARPG
                 {
                     uiRequireItemAmounts.displayType = UIItemAmounts.DisplayType.Requirement;
                     uiRequireItemAmounts.Show();
-                    uiRequireItemAmounts.Data = ItemCraft.CacheCraftRequirements;
+                    uiRequireItemAmounts.Data = GameDataHelpers.CombineItems(ItemCraft.RequireItems, null);
+                }
+            }
+
+            if (uiRequireCurrencyAmounts != null)
+            {
+                if (CraftingItem == null || ItemCraft.RequireCurrencies == null || ItemCraft.RequireCurrencies.Length == 0)
+                {
+                    uiRequireCurrencyAmounts.Hide();
+                }
+                else
+                {
+                    uiRequireCurrencyAmounts.displayType = UICurrencyAmounts.DisplayType.Requirement;
+                    uiRequireCurrencyAmounts.Show();
+                    uiRequireCurrencyAmounts.Data = GameDataHelpers.CombineCurrencies(ItemCraft.RequireCurrencies, null);
                 }
             }
 

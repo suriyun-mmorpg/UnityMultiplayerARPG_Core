@@ -107,22 +107,36 @@ namespace MultiplayerARPG
 
         public virtual bool CurrenciesEnoughToCraftItem(IPlayerCharacterData character, ItemCraft itemCraft)
         {
-            return character.Gold >= itemCraft.RequireGold;
+            if (character.Gold < itemCraft.RequireGold)
+                return false;
+            if (itemCraft.RequireCurrencies == null || itemCraft.RequireCurrencies.Length == 0)
+                return true;
+            return character.HasEnoughCurrencyAmounts(GameDataHelpers.CombineCurrencies(itemCraft.RequireCurrencies, null), out _, out _);
         }
 
         public virtual void DecreaseCurrenciesWhenCraftItem(IPlayerCharacterData character, ItemCraft itemCraft)
         {
             character.Gold -= itemCraft.RequireGold;
+            if (itemCraft.RequireCurrencies == null || itemCraft.RequireCurrencies.Length == 0)
+                return;
+            character.DecreaseCurrencies(itemCraft.RequireCurrencies);
         }
 
         public virtual bool CurrenciesEnoughToRemoveEnhancer(IPlayerCharacterData character)
         {
-            return character.Gold >= GameInstance.Singleton.enhancerRemoval.RequireGold;
+            if (character.Gold < GameInstance.Singleton.enhancerRemoval.RequireGold)
+                return false;
+            if (GameInstance.Singleton.enhancerRemoval.RequireCurrencies == null || GameInstance.Singleton.enhancerRemoval.RequireCurrencies.Length == 0)
+                return true;
+            return character.HasEnoughCurrencyAmounts(GameDataHelpers.CombineCurrencies(GameInstance.Singleton.enhancerRemoval.RequireCurrencies, null), out _, out _);
         }
 
         public virtual void DecreaseCurrenciesWhenRemoveEnhancer(IPlayerCharacterData character)
         {
             character.Gold -= GameInstance.Singleton.enhancerRemoval.RequireGold;
+            if (GameInstance.Singleton.enhancerRemoval.RequireCurrencies == null || GameInstance.Singleton.enhancerRemoval.RequireCurrencies.Length == 0)
+                return;
+            character.DecreaseCurrencies(GameInstance.Singleton.enhancerRemoval.RequireCurrencies);
         }
 
         public virtual bool CurrenciesEnoughToCreateGuild(IPlayerCharacterData character, SocialSystemSetting setting)

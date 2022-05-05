@@ -10,12 +10,27 @@ namespace MultiplayerARPG
         public bool ReturnEnhancerItem { get { return returnEnhancerItem; } }
 
         [SerializeField]
+        [ArrayElementTitle("item")]
+        private ItemAmount[] requireItems;
+        public ItemAmount[] RequireItems { get { return requireItems; } }
+
+        [ArrayElementTitle("currency")]
+        private CurrencyAmount[] requireCurrencies;
+        public CurrencyAmount[] RequireCurrencies { get { return requireCurrencies; } }
+
+        [SerializeField]
         private int requireGold;
         public int RequireGold { get { return requireGold; } }
 
-        public EnhancerRemoval(bool returnEnhancerItem, int requireGold)
+        public EnhancerRemoval(
+            bool returnEnhancerItem,
+            ItemAmount[] requireItems,
+            CurrencyAmount[] requireCurrencies,
+            int requireGold)
         {
             this.returnEnhancerItem = returnEnhancerItem;
+            this.requireItems = requireItems;
+            this.requireCurrencies = requireCurrencies;
             this.requireGold = requireGold;
         }
 
@@ -29,8 +44,19 @@ namespace MultiplayerARPG
             gameMessage = UITextKeys.NONE;
             if (!GameInstance.Singleton.GameplayRule.CurrenciesEnoughToRemoveEnhancer(character))
             {
-                gameMessage = UITextKeys.UI_ERROR_NOT_ENOUGH_GOLD;
+                gameMessage = UITextKeys.UI_ERROR_NOT_ENOUGH_CURRENCY_AMOUNTS;
                 return false;
+            }
+            if (requireItems == null || requireItems.Length == 0)
+                return true;
+            // Count required items
+            foreach (ItemAmount requireItem in requireItems)
+            {
+                if (requireItem.item != null && character.CountNonEquipItems(requireItem.item.DataId) < requireItem.amount)
+                {
+                    gameMessage = UITextKeys.UI_ERROR_NOT_ENOUGH_ITEMS;
+                    return false;
+                }
             }
             return true;
         }
