@@ -887,7 +887,7 @@ namespace MultiplayerARPG
             return true;
         }
 
-        public static Dictionary<Currency, int> GetCharacterCurrencies(this IPlayerCharacterData data)
+        public static Dictionary<Currency, int> GetCurrencies(this IPlayerCharacterData data)
         {
             if (data == null)
                 return new Dictionary<Currency, int>();
@@ -999,19 +999,18 @@ namespace MultiplayerARPG
             }
         }
 
-        public static bool HasEnoughCurrencies(this IPlayerCharacterData character, IEnumerable<CurrencyAmount> currencyAmounts, float multiplier = 1)
+        public static bool HasEnoughCurrencyAmounts(this IPlayerCharacterData data, Dictionary<Currency, int> requiredCurrencyAmounts, out UITextKeys gameMessage, out Dictionary<Currency, int> currentCurrencyAmounts, float multiplier = 1)
         {
-            if (currencyAmounts == null)
-                return true;
-            foreach (CurrencyAmount currencyAmount in currencyAmounts)
+            gameMessage = UITextKeys.NONE;
+            currentCurrencyAmounts = data.GetCurrencies();
+            foreach (Currency requireCurrency in requiredCurrencyAmounts.Keys)
             {
-                if (currencyAmount.currency == null ||
-                    currencyAmount.amount == 0)
-                    continue;
-                int indexOfCurrency = character.IndexOfCurrency(currencyAmount.currency.DataId);
-                int checkAmount = Mathf.CeilToInt(currencyAmount.amount * multiplier);
-                if (indexOfCurrency < 0 || character.Currencies[indexOfCurrency].amount < checkAmount)
+                if (!currentCurrencyAmounts.ContainsKey(requireCurrency) ||
+                    currentCurrencyAmounts[requireCurrency] < Mathf.CeilToInt(requiredCurrencyAmounts[requireCurrency] * multiplier))
+                {
+                    gameMessage = UITextKeys.UI_ERROR_NOT_ENOUGH_CURRENCY_AMOUNTS;
                     return false;
+                }
             }
             return true;
         }
