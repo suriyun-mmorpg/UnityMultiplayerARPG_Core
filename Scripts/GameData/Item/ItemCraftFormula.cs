@@ -23,5 +23,13 @@ namespace MultiplayerARPG
         }
 
         public HashSet<int> SourceIds { get; private set; } = new HashSet<int>();
+
+        public override void PrepareRelatesData()
+        {
+            base.PrepareRelatesData();
+            GameInstance.AddItems(ItemCraft.CraftingItem);
+            GameInstance.AddItems(ItemCraft.RequireItems);
+            GameInstance.AddCurrencies(ItemCraft.RequireCurrencies);
+        }
     }
 }

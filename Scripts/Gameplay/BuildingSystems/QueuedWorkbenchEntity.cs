@@ -76,16 +76,7 @@ namespace MultiplayerARPG
         {
             base.PrepareRelatesData();
             if (CacheItemCraftFormulas.Count > 0)
-            {
-                List<BaseItem> items = new List<BaseItem>();
-                foreach (ItemCraftFormula itemCraftFormula in CacheItemCraftFormulas.Values)
-                {
-                    items.Add(itemCraftFormula.ItemCraft.CraftingItem);
-                    items.AddRange(itemCraftFormula.ItemCraft.CacheCraftRequirements.Keys);
-                }
-                GameInstance.AddItems(items);
                 GameInstance.AddItemCraftFormulas(SourceId, CacheItemCraftFormulas.Values);
-            }
         }
     }
 }

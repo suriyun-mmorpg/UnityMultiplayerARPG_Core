@@ -348,7 +348,8 @@ namespace MultiplayerARPG
             GameInstance.AddCharacterEntities(summon.MonsterEntity);
             GameInstance.AddVehicleEntities(mount.MountEntity);
             GameInstance.AddItems(itemCraft.CraftingItem);
-            GameInstance.AddItems(itemCraft.CacheCraftRequirements.Keys);
+            GameInstance.AddItems(itemCraft.RequireItems);
+            GameInstance.AddCurrencies(itemCraft.RequireCurrencies);
             damageInfo.PrepareRelatesData();
         }
 
