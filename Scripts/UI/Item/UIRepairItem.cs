@@ -19,6 +19,8 @@ namespace MultiplayerARPG
 
         [Header("UI Elements for UI Repair Item")]
         public TextWrapper uiTextRequireGold;
+        public UIItemAmounts uiRequireItemAmounts;
+        public UICurrencyAmounts uiRequireCurrencyAmounts;
         public TextWrapper uiTextSimpleRequireGold;
         public TextWrapper uiTextDurability;
 
@@ -43,9 +45,9 @@ namespace MultiplayerARPG
 
             CanRepair = false;
             float maxDurability = 0f;
-            ItemRepairPrice itemRepairPrice = default(ItemRepairPrice);
+            ItemRepairPrice repairPrice = default(ItemRepairPrice);
             if (!characterItem.IsEmptySlot())
-                CanRepair = EquipmentItem != null && characterItem.GetItem().CanRepair(GameInstance.PlayingCharacter, characterItem.durability, out maxDurability, out itemRepairPrice);
+                CanRepair = EquipmentItem != null && characterItem.GetItem().CanRepair(GameInstance.PlayingCharacter, characterItem.durability, out maxDurability, out repairPrice);
 
             if (uiCharacterItem != null)
             {
@@ -57,6 +59,34 @@ namespace MultiplayerARPG
                 {
                     uiCharacterItem.Setup(new UICharacterItemData(characterItem, InventoryType), GameInstance.PlayingCharacter, IndexOfData);
                     uiCharacterItem.Show();
+                }
+            }
+
+            if (uiRequireItemAmounts != null)
+            {
+                if (repairPrice.RequireItems == null || repairPrice.RequireItems.Length == 0)
+                {
+                    uiRequireItemAmounts.Hide();
+                }
+                else
+                {
+                    uiRequireItemAmounts.displayType = UIItemAmounts.DisplayType.Requirement;
+                    uiRequireItemAmounts.Show();
+                    uiRequireItemAmounts.Data = GameDataHelpers.CombineItems(repairPrice.RequireItems, null);
+                }
+            }
+
+            if (uiRequireCurrencyAmounts != null)
+            {
+                if (repairPrice.RequireCurrencies == null || repairPrice.RequireCurrencies.Length == 0)
+                {
+                    uiRequireCurrencyAmounts.Hide();
+                }
+                else
+                {
+                    uiRequireCurrencyAmounts.displayType = UICurrencyAmounts.DisplayType.Requirement;
+                    uiRequireCurrencyAmounts.Show();
+                    uiRequireCurrencyAmounts.Data = GameDataHelpers.CombineCurrencies(repairPrice.RequireCurrencies, null);
                 }
             }
 
@@ -72,16 +102,16 @@ namespace MultiplayerARPG
                 else
                 {
                     uiTextRequireGold.text = string.Format(
-                        GameInstance.PlayingCharacter.Gold >= itemRepairPrice.RequireGold ?
+                        GameInstance.PlayingCharacter.Gold >= repairPrice.RequireGold ?
                             LanguageManager.GetText(formatKeyRequireGold) :
                             LanguageManager.GetText(formatKeyRequireGoldNotEnough),
                         GameInstance.PlayingCharacter.Gold.ToString("N0"),
-                        itemRepairPrice.RequireGold.ToString("N0"));
+                        repairPrice.RequireGold.ToString("N0"));
                 }
             }
 
             if (uiTextSimpleRequireGold != null)
-                uiTextSimpleRequireGold.text = string.Format(LanguageManager.GetText(formatKeySimpleRequireGold), maxDurability <= 0 ? "0" : itemRepairPrice.RequireGold.ToString("N0"));
+                uiTextSimpleRequireGold.text = string.Format(LanguageManager.GetText(formatKeySimpleRequireGold), maxDurability <= 0 ? "0" : repairPrice.RequireGold.ToString("N0"));
 
             if (uiTextDurability != null)
             {

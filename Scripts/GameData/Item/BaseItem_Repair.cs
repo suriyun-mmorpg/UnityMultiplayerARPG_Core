@@ -113,6 +113,12 @@ namespace MultiplayerARPG
             // Repair item
             repairingItem.durability = maxDurability;
             onRepaired.Invoke(repairingItem);
+            if (repairPrice.RequireItems != null)
+            {
+                // Decrease required items
+                character.DecreaseItems(repairPrice.RequireItems);
+                character.FillEmptySlots();
+            }
             // Decrease required gold
             GameInstance.Singleton.GameplayRule.DecreaseCurrenciesWhenRepairItem(character, repairPrice);
             return true;

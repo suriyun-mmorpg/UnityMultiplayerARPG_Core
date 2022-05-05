@@ -815,12 +815,19 @@ namespace MultiplayerARPG
 
         public override bool CurrenciesEnoughToRepairItem(IPlayerCharacterData character, ItemRepairPrice repairPrice)
         {
-            return character.Gold >= repairPrice.RequireGold;
+            if (character.Gold < repairPrice.RequireGold)
+                return false;
+            if (repairPrice.RequireCurrencies == null || repairPrice.RequireCurrencies.Length == 0)
+                return true;
+            return character.HasEnoughCurrencyAmounts(GameDataHelpers.CombineCurrencies(repairPrice.RequireCurrencies, null), out _, out _);
         }
 
         public override void DecreaseCurrenciesWhenRepairItem(IPlayerCharacterData character, ItemRepairPrice repairPrice)
         {
             character.Gold -= repairPrice.RequireGold;
+            if (repairPrice.RequireCurrencies == null || repairPrice.RequireCurrencies.Length == 0)
+                return;
+            character.DecreaseCurrencies(repairPrice.RequireCurrencies);
         }
 
         public override bool CurrenciesEnoughToCraftItem(IPlayerCharacterData character, ItemCraft itemCraft)
