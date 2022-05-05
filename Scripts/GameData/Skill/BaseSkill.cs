@@ -311,6 +311,13 @@ namespace MultiplayerARPG
             return duration;
         }
 
+        public bool IsDisallowToLevelUp(short level)
+        {
+            if (level >= requirementEachLevels.Count)
+                return requirementEachLevels[requirementEachLevels.Count - 1].disallow;
+            return requirementEachLevels[level].disallow;
+        }
+
         public short GetRequireCharacterLevel(short level)
         {
             if (level >= requirementEachLevels.Count)
@@ -351,6 +358,13 @@ namespace MultiplayerARPG
             if (level >= requirementEachLevels.Count)
                 return GameDataHelpers.CombineCurrencies(requirementEachLevels[requirementEachLevels.Count - 1].currencyAmounts, null);
             return GameDataHelpers.CombineCurrencies(requirementEachLevels[level].currencyAmounts, null);
+        }
+
+        public Dictionary<BaseItem, short> GetRequireItemAmounts(short level)
+        {
+            if (level >= requirementEachLevels.Count)
+                return GameDataHelpers.CombineItems(requirementEachLevels[requirementEachLevels.Count - 1].itemAmounts, null);
+            return GameDataHelpers.CombineItems(requirementEachLevels[level].itemAmounts, null);
         }
 
         public bool IsAvailable(ICharacterData character)
@@ -547,6 +561,12 @@ namespace MultiplayerARPG
                 return false;
             }
 
+            if (IsDisallowToLevelUp(level))
+            {
+                gameMessage = UITextKeys.UI_ERROR_DISALLOW_SKILL_LEVEL_UP;
+                return false;
+            }
+
             if (character.Level < GetRequireCharacterLevel(level))
             {
                 gameMessage = UITextKeys.UI_ERROR_NOT_ENOUGH_LEVEL;
@@ -572,43 +592,21 @@ namespace MultiplayerARPG
             }
 
             // Check is it pass skill level requirement or not
-            Dictionary<BaseSkill, short> requiredSkillLevels = GetRequireSkillLevels(level);
-            Dictionary<BaseSkill, short> currentSkillLevels = character.GetSkills(false);
-            foreach (BaseSkill requireSkill in requiredSkillLevels.Keys)
-            {
-                if (!currentSkillLevels.ContainsKey(requireSkill) ||
-                    currentSkillLevels[requireSkill] < requiredSkillLevels[requireSkill])
-                {
-                    gameMessage = UITextKeys.UI_ERROR_NOT_ENOUGH_SKILL_LEVELS;
-                    return false;
-                }
-            }
+            Dictionary<BaseSkill, short> currentSkillLevels;
+            if (!character.HasEnoughSkillLevels(GetRequireSkillLevels(level), false, out gameMessage, out currentSkillLevels))
+                return false;
 
             // Check is it pass attribute requirement or not
-            Dictionary<Attribute, float> requiredAttributeAmounts = GetRequireAttributeAmounts(level);
-            Dictionary<Attribute, float> currentAttributeAmounts = character.GetAttributes(false, false, currentSkillLevels);
-            foreach (KeyValuePair<Attribute, float> requireAttributeAmount in requiredAttributeAmounts)
-            {
-                if (!currentAttributeAmounts.ContainsKey(requireAttributeAmount.Key) ||
-                    currentAttributeAmounts[requireAttributeAmount.Key] < requireAttributeAmount.Value)
-                {
-                    gameMessage = UITextKeys.UI_ERROR_NOT_ENOUGH_ATTRIBUTE_AMOUNTS;
-                    return false;
-                }
-            }
+            if (!character.HasEnoughAttributeAmounts(GetRequireAttributeAmounts(level), false, false, currentSkillLevels, out gameMessage, out _))
+                return false;
 
             // Check is it pass currency requirement or not
-            Dictionary<Currency, int> requiredCurrencyAmounts = GetRequireCurrencyAmounts(level);
-            Dictionary<Currency, int> currentCurrencyAmounts = character.GetCharacterCurrencies();
-            foreach (KeyValuePair<Currency, int> requireCurrencyAmount in requiredCurrencyAmounts)
-            {
-                if (!currentCurrencyAmounts.ContainsKey(requireCurrencyAmount.Key) ||
-                    currentCurrencyAmounts[requireCurrencyAmount.Key] < requireCurrencyAmount.Value)
-                {
-                    gameMessage = UITextKeys.UI_ERROR_NOT_ENOUGH_CURRENCY_AMOUNTS;
-                    return false;
-                }
-            }
+            if (!character.HasEnoughCurrencyAmounts(GetRequireCurrencyAmounts(level), out gameMessage, out _))
+                return false;
+
+            // Check is it pass item requirement or not
+            if (!character.HasEnoughNonEquipItemAmounts(GetRequireItemAmounts(level), out gameMessage, out _))
+                return false;
 
             return true;
         }
@@ -883,12 +881,14 @@ namespace MultiplayerARPG
             {
                 requirementEachLevels.Add(new SkillRequirementEntry()
                 {
+                    disallow = requirement.cannotLevelUp,
                     characterLevel = requirement.characterLevel.GetAmount(i),
                     skillPoint = requirement.skillPoint.GetAmount(i),
                     gold = requirement.gold.GetAmount(i),
                     attributeAmounts = requirement.attributeAmounts,
                     skillLevels = requirement.skillLevels,
                     currencyAmounts = requirement.currencyAmounts,
+                    itemAmounts = requirement.itemAmounts,
                 });
             }
 #if UNITY_EDITOR

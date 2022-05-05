@@ -36,6 +36,7 @@ namespace MultiplayerARPG
         UI_ERROR_NOT_ENOUGH_ITEMS,
         UI_ERROR_NOT_ENOUGH_STAT_POINT,
         UI_ERROR_NOT_ENOUGH_SKILL_POINT,
+        UI_ERROR_DISALLOW_SKILL_LEVEL_UP,
         UI_ERROR_NOT_LOGGED_IN,
         UI_ERROR_USERNAME_IS_EMPTY,
         UI_ERROR_PASSWORD_IS_EMPTY,
@@ -1253,6 +1254,7 @@ namespace MultiplayerARPG
             Texts.Add(UITextKeys.UI_ERROR_NOT_ENOUGH_ITEMS.ToString(), "Not enough items");
             Texts.Add(UITextKeys.UI_ERROR_NOT_ENOUGH_STAT_POINT.ToString(), "Not enough stat points");
             Texts.Add(UITextKeys.UI_ERROR_NOT_ENOUGH_SKILL_POINT.ToString(), "Not enough skill points");
+            Texts.Add(UITextKeys.UI_ERROR_DISALLOW_SKILL_LEVEL_UP.ToString(), "Disallow to level up");
             Texts.Add(UITextKeys.UI_ERROR_NOT_LOGGED_IN.ToString(), "Not logged in");
             Texts.Add(UITextKeys.UI_ERROR_USERNAME_IS_EMPTY.ToString(), "Username is empty");
             Texts.Add(UITextKeys.UI_ERROR_PASSWORD_IS_EMPTY.ToString(), "Password is empty");

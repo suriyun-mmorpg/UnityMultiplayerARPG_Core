@@ -55,12 +55,15 @@ namespace MultiplayerARPG
             int indexOfSkill = playerCharacter.IndexOfSkill(request.dataId);
             CharacterSkill characterSkill = playerCharacter.Skills[indexOfSkill];
             BaseSkill skill = characterSkill.GetSkill();
-            float requireSkillPoint = skill.GetRequireCharacterSkillPoint((short)(characterSkill.level - 1));
-            int requireGold = skill.GetRequireCharacterGold((short)(characterSkill.level - 1));
-            Dictionary<Currency, int> requireCurrencies = skill.GetRequireCurrencyAmounts((short)(characterSkill.level - 1));
+            short learnLevel = (short)(characterSkill.level - 1);
+            float requireSkillPoint = skill.GetRequireCharacterSkillPoint(learnLevel);
+            int requireGold = skill.GetRequireCharacterGold(learnLevel);
+            Dictionary<Currency, int> requireCurrencies = skill.GetRequireCurrencyAmounts(learnLevel);
+            Dictionary<BaseItem, short> requireItems = skill.GetRequireItemAmounts(learnLevel);
             playerCharacter.SkillPoint -= requireSkillPoint;
             playerCharacter.Gold -= requireGold;
             playerCharacter.DecreaseCurrencies(requireCurrencies);
+            playerCharacter.DecreaseItems(requireItems);
             result.Invoke(AckResponseCode.Success, new ResponseIncreaseSkillLevelMessage());
             await UniTask.Yield();
         }

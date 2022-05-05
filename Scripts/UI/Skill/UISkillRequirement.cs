@@ -25,6 +25,8 @@ namespace MultiplayerARPG
         public UIAttributeAmounts uiRequireAttributeAmounts;
         public UISkillLevels uiRequireSkillLevels;
         public UICurrencyAmounts uiRequireCurrencyAmounts;
+        public UIItemAmounts uiRequireItemAmounts;
+        public GameObject[] disallowStateObjects = new GameObject[0];
 
         protected override void UpdateData()
         {
@@ -161,6 +163,32 @@ namespace MultiplayerARPG
                     uiRequireCurrencyAmounts.isBonus = false;
                     uiRequireCurrencyAmounts.Show();
                     uiRequireCurrencyAmounts.Data = skill.GetRequireCurrencyAmounts(level);
+                }
+            }
+
+            if (uiRequireItemAmounts != null)
+            {
+                if (skill == null)
+                {
+                    uiRequireItemAmounts.Hide();
+                }
+                else
+                {
+                    uiRequireItemAmounts.displayType = UIItemAmounts.DisplayType.Requirement;
+                    uiRequireItemAmounts.isBonus = false;
+                    uiRequireItemAmounts.Show();
+                    uiRequireItemAmounts.Data = skill.GetRequireItemAmounts(level);
+                }
+            }
+
+            if (disallowStateObjects != null && disallowStateObjects.Length > 0)
+            {
+                bool disallow = skill.IsDisallowToLevelUp(level);
+                foreach (GameObject obj in disallowStateObjects)
+                {
+                    if (obj == null)
+                        continue;
+                    obj.SetActive(disallow);
                 }
             }
         }

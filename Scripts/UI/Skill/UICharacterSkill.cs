@@ -325,12 +325,14 @@ namespace MultiplayerARPG
             if (uiRequirement != null)
             {
                 if (Skill == null ||
-                    (Skill.GetRequireCharacterLevel(Level) <= 0 &&
+                    (!Skill.IsDisallowToLevelUp(Level) &&
+                    Skill.GetRequireCharacterLevel(Level) <= 0 &&
                     Skill.GetRequireCharacterSkillPoint(Level) <= 0 &&
                     Skill.GetRequireCharacterGold(Level) <= 0 &&
                     Skill.GetRequireAttributeAmounts(Level).Count == 0) &&
                     Skill.GetRequireSkillLevels(Level).Count == 0 &&
-                    Skill.GetRequireCurrencyAmounts(Level).Count == 0)
+                    Skill.GetRequireCurrencyAmounts(Level).Count == 0 &&
+                    Skill.GetRequireItemAmounts(Level).Count == 0)
                 {
                     uiRequirement.Hide();
                 }
