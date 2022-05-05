@@ -96,7 +96,8 @@ namespace MultiplayerARPG
                 }
             }
             GameInstance.AddItems(itemCraft.CraftingItem);
-            GameInstance.AddItems(itemCraft.CacheCraftRequirements.Keys);
+            GameInstance.AddItems(itemCraft.RequireItems);
+            GameInstance.AddCurrencies(itemCraft.RequireCurrencies);
             GameInstance.AddQuests(quest);
         }
 
