@@ -5,6 +5,7 @@ namespace MultiplayerARPG
 {
     public delegate void NetworkDestroyDelegate(
         byte reasons);
+
     public delegate void ReceiveDamageDelegate(
         HitBoxPosition position,
         Vector3 fromPosition,
@@ -13,6 +14,7 @@ namespace MultiplayerARPG
         CharacterItem weapon,
         BaseSkill skill,
         short skillLevel);
+
     public delegate void ReceivedDamageDelegate(
         HitBoxPosition position,
         Vector3 fromPosition,
@@ -22,9 +24,11 @@ namespace MultiplayerARPG
         CharacterItem weapon,
         BaseSkill skill,
         short skillLevel);
+
     public delegate void AppliedRecoveryAmountDelegate(
         EntityInfo causer,
         int amount);
+
     public delegate void AttackRoutineDelegate(
         bool isLeftHand,
         CharacterItem weapon,
@@ -32,6 +36,7 @@ namespace MultiplayerARPG
         DamageInfo damageInfo,
         Dictionary<DamageElement, MinMaxFloat> damageAmounts,
         AimPosition aimPosition);
+
     public delegate void UseSkillRoutineDelegate(
         BaseSkill skill,
         short level,
@@ -41,6 +46,7 @@ namespace MultiplayerARPG
         Dictionary<DamageElement, MinMaxFloat> damageAmounts,
         uint targetObjectId,
         AimPosition aimPosition);
+
     public delegate void LaunchDamageEntityDelegate(
         bool isLeftHand,
         CharacterItem weapon,
@@ -51,16 +57,20 @@ namespace MultiplayerARPG
         AimPosition aimPosition,
         Vector3 stagger,
         Dictionary<uint, int> hitBoxes);
+
     public delegate void ApplyBuffDelegate(
         int dataId,
         BuffType type,
         short level);
+
     public delegate void CharacterStatsDelegate(
         ref CharacterStats a,
         CharacterStats b);
+
     public delegate void CharacterStatsAndNumberDelegate(
         ref CharacterStats a,
         float b);
+
     public delegate void RandomCharacterStatsDelegate(
         System.Random random,
         ItemRandomBonus randomBonus,
