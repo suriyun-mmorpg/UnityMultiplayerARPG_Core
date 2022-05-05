@@ -54,6 +54,9 @@ namespace MultiplayerARPG
         [ArrayElementTitle("item")]
         private ItemAmount[] createGuildRequireItems = new ItemAmount[0];
         [SerializeField]
+        [ArrayElementTitle("currency")]
+        private CurrencyAmount[] createGuildRequireCurrencies = new CurrencyAmount[0];
+        [SerializeField]
         private int createGuildRequiredGold = 1000;
         [SerializeField]
         private int[] guildExpTree;
@@ -85,6 +88,18 @@ namespace MultiplayerARPG
             }
         }
 
+        [System.NonSerialized]
+        private Dictionary<Currency, int> cacheCreateGuildRequireCurrencies;
+        public Dictionary<Currency, int> CacheCreateGuildRequireCurrencies
+        {
+            get
+            {
+                if (cacheCreateGuildRequireCurrencies == null)
+                    cacheCreateGuildRequireCurrencies = GameDataHelpers.CombineCurrencies(createGuildRequireCurrencies, new Dictionary<Currency, int>());
+                return cacheCreateGuildRequireCurrencies;
+            }
+        }
+
         public int CreateGuildRequiredGold { get { return createGuildRequiredGold; } }
 
         public int[] GuildExpTree
@@ -112,7 +127,7 @@ namespace MultiplayerARPG
             gameMessage = UITextKeys.NONE;
             if (!GameInstance.Singleton.GameplayRule.CurrenciesEnoughToCreateGuild(character, this))
             {
-                gameMessage = UITextKeys.UI_ERROR_NOT_ENOUGH_GOLD;
+                gameMessage = UITextKeys.UI_ERROR_NOT_ENOUGH_CURRENCY_AMOUNTS;
                 return false;
             }
             if (createGuildRequireItems == null || createGuildRequireItems.Length == 0)

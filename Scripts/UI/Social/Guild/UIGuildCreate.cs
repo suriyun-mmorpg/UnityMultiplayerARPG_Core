@@ -19,6 +19,7 @@ namespace MultiplayerARPG
         public InputFieldWrapper inputFieldGuildName;
         [FormerlySerializedAs("uiRequireItems")]
         public UIItemAmounts uiRequireItemAmounts;
+        public UICurrencyAmounts uiRequireCurrencyAmounts;
         [FormerlySerializedAs("textRequireGold")]
         public TextWrapper uiTextRequireGold;
         public TextWrapper uiTextSimpleRequireGold;
@@ -45,7 +46,15 @@ namespace MultiplayerARPG
             if (uiRequireItemAmounts != null)
             {
                 uiRequireItemAmounts.displayType = UIItemAmounts.DisplayType.Requirement;
+                uiRequireItemAmounts.Show();
                 uiRequireItemAmounts.Data = systemSetting.CacheCreateGuildRequireItems;
+            }
+
+            if (uiRequireCurrencyAmounts != null)
+            {
+                uiRequireCurrencyAmounts.displayType = UICurrencyAmounts.DisplayType.Requirement;
+                uiRequireCurrencyAmounts.Show();
+                uiRequireCurrencyAmounts.Data = systemSetting.CacheCreateGuildRequireCurrencies;
             }
         }
 
