@@ -20,6 +20,27 @@ namespace MultiplayerARPG
         [Tooltip("This is repair prices, should order from high to low durability rate")]
         private ItemRepairPrice[] repairPrices = new ItemRepairPrice[0];
         public ItemRepairPrice[] RepairPrices { get { return repairPrices; } }
+
+        public override void PrepareRelatesData()
+        {
+            base.PrepareRelatesData();
+            if (Levels != null && Levels.Length > 0)
+            {
+                foreach (ItemRefineLevel entry in Levels)
+                {
+                    GameInstance.AddItems(entry.RequireItems);
+                    GameInstance.AddCurrencies(entry.RequireCurrencies);
+                }
+            }
+            if (RepairPrices != null && RepairPrices.Length > 0)
+            {
+                foreach (ItemRefineLevel entry in RepairPrices)
+                {
+                    GameInstance.AddItems(entry.RequireItems);
+                    GameInstance.AddCurrencies(entry.RequireCurrencies);
+                }
+            }
+        }
     }
 
     [System.Serializable]

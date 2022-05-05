@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace MultiplayerARPG
 {
@@ -20,33 +21,27 @@ namespace MultiplayerARPG
         public int RequireGold { get { return requireGold; } }
 
         [SerializeField]
+        [FormerlySerializedAs("craftRequirements")]
         [ArrayElementTitle("item")]
-        private ItemAmount[] craftRequirements;
+        private ItemAmount[] requireItems;
+        public ItemAmount[] RequireItems { get { return requireItems; } }
 
-
-        [System.NonSerialized]
-        private Dictionary<BaseItem, short> cacheCraftRequirements;
-        public Dictionary<BaseItem, short> CacheCraftRequirements
-        {
-            get
-            {
-                if (cacheCraftRequirements == null)
-                    cacheCraftRequirements = GameDataHelpers.CombineItems(craftRequirements, new Dictionary<BaseItem, short>());
-                return cacheCraftRequirements;
-            }
-        }
+        [ArrayElementTitle("currency")]
+        private CurrencyAmount[] requireCurrencies;
+        public CurrencyAmount[] RequireCurrencies { get { return requireCurrencies; } }
 
         public ItemCraft(
             BaseItem craftingItem,
             short amount,
             int requireGold,
-            ItemAmount[] craftRequirements)
+            ItemAmount[] requireItems,
+            CurrencyAmount[] requireCurrencies)
         {
             this.craftingItem = craftingItem;
             this.amount = amount;
             this.requireGold = requireGold;
-            this.craftRequirements = craftRequirements;
-            cacheCraftRequirements = null;
+            this.requireItems = requireItems;
+            this.requireCurrencies = requireCurrencies;
         }
 
         public bool CanCraft(IPlayerCharacterData character)
@@ -64,7 +59,7 @@ namespace MultiplayerARPG
             }
             if (!GameInstance.Singleton.GameplayRule.CurrenciesEnoughToCraftItem(character, this))
             {
-                gameMessage = UITextKeys.UI_ERROR_NOT_ENOUGH_GOLD;
+                gameMessage = UITextKeys.UI_ERROR_NOT_ENOUGH_CURRENCY_AMOUNTS;
                 return false;
             }
             if (character.IncreasingItemsWillOverwhelming(craftingItem.DataId, Amount))
@@ -72,12 +67,12 @@ namespace MultiplayerARPG
                 gameMessage = UITextKeys.UI_ERROR_WILL_OVERWHELMING;
                 return false;
             }
-            if (craftRequirements == null || craftRequirements.Length == 0)
+            if (requireItems == null || requireItems.Length == 0)
             {
                 // No required items
                 return true;
             }
-            foreach (ItemAmount craftRequirement in craftRequirements)
+            foreach (ItemAmount craftRequirement in requireItems)
             {
                 if (craftRequirement.item != null && character.CountNonEquipItems(craftRequirement.item.DataId) < craftRequirement.amount)
                 {
@@ -96,7 +91,7 @@ namespace MultiplayerARPG
                 if (character is BasePlayerCharacterEntity)
                     GameInstance.ServerGameMessageHandlers.NotifyRewardItem((character as BasePlayerCharacterEntity).ConnectionId, craftingItem.DataId, Amount);
                 // Reduce item when able to increase craft item
-                foreach (ItemAmount craftRequirement in craftRequirements)
+                foreach (ItemAmount craftRequirement in requireItems)
                 {
                     if (craftRequirement.item != null && craftRequirement.amount > 0)
                         character.DecreaseItems(craftRequirement.item.DataId, craftRequirement.amount);
