@@ -476,16 +476,22 @@ namespace MultiplayerARPG
             }
         }
 
-        public virtual void RandomCurrencies(System.Action<Currency, int> onRandomCurrency)
+        public virtual CurrencyAmount[] RandomCurrencies()
         {
             if (CacheRandomCurrencies.Count == 0)
-                return;
+                return new CurrencyAmount[0];
+            List<CurrencyAmount> currencies = new List<CurrencyAmount>();
             CurrencyRandomAmount randomCurrency;
             for (int count = 0; count < CacheRandomCurrencies.Count; ++count)
             {
                 randomCurrency = CacheRandomCurrencies[count];
-                onRandomCurrency.Invoke(randomCurrency.currency, Random.Range(randomCurrency.minAmount, randomCurrency.maxAmount));
+                currencies.Add(new CurrencyAmount()
+                {
+                    currency = randomCurrency.currency,
+                    amount = Random.Range(randomCurrency.minAmount, randomCurrency.maxAmount),
+                });
             }
+            return currencies.ToArray();
         }
 
         public virtual bool RandomSkill(BaseMonsterCharacterEntity entity, out BaseSkill skill, out short level)

@@ -43,26 +43,116 @@ namespace MultiplayerARPG
         public abstract void OnCharacterRespawn(ICharacterData character);
         public abstract void OnCharacterReceivedDamage(BaseCharacterEntity attacker, BaseCharacterEntity damageReceiver, CombatAmountType combatAmountType, int damage, CharacterItem weapon, BaseSkill skill, short skillLevel);
         public abstract void OnHarvestableReceivedDamage(BaseCharacterEntity attacker, HarvestableEntity damageReceiver, CombatAmountType combatAmountType, int damage, CharacterItem weapon, BaseSkill skill, short skillLevel);
-        public abstract bool CurrenciesEnoughToBuyItem(IPlayerCharacterData character, NpcSellItem sellItem, short amount);
-        public abstract void DecreaseCurrenciesWhenBuyItem(IPlayerCharacterData character, NpcSellItem sellItem, short amount);
-        public abstract void IncreaseCurrenciesWhenSellItem(IPlayerCharacterData character, BaseItem item, short amount);
-        public abstract bool CurrenciesEnoughToRefineItem(IPlayerCharacterData character, ItemRefineLevel refineLevel);
-        public abstract void DecreaseCurrenciesWhenRefineItem(IPlayerCharacterData character, ItemRefineLevel refineLevel);
-        public abstract bool CurrenciesEnoughToRepairItem(IPlayerCharacterData character, ItemRepairPrice repairPrice);
-        public abstract void DecreaseCurrenciesWhenRepairItem(IPlayerCharacterData character, ItemRepairPrice repairPrice);
-        public abstract bool CurrenciesEnoughToCraftItem(IPlayerCharacterData character, ItemCraft itemCraft);
-        public abstract void DecreaseCurrenciesWhenCraftItem(IPlayerCharacterData character, ItemCraft itemCraft);
-        public abstract bool CurrenciesEnoughToRemoveEnhancer(IPlayerCharacterData character);
-        public abstract void DecreaseCurrenciesWhenRemoveEnhancer(IPlayerCharacterData character);
-        public abstract bool CurrenciesEnoughToCreateGuild(IPlayerCharacterData character, SocialSystemSetting setting);
-        public abstract void DecreaseCurrenciesWhenCreateGuild(IPlayerCharacterData character, SocialSystemSetting setting);
-        public abstract Reward MakeMonsterReward(MonsterCharacter monster, short level);
-        public abstract Reward MakeQuestReward(Quest quest);
         public abstract float GetRecoveryUpdateDuration();
         public abstract void ApplyFallDamage(BaseCharacterEntity character, Vector3 lastGroundedPosition);
         public abstract bool CanInteractEntity(BaseCharacterEntity character, uint objectId);
         public abstract Vector3 GetSummonPosition(BaseCharacterEntity character);
         public abstract Quaternion GetSummonRotation(BaseCharacterEntity character);
+
+        public virtual bool CurrenciesEnoughToBuyItem(IPlayerCharacterData character, NpcSellItem sellItem, short amount)
+        {
+            if (character.Gold < sellItem.sellPrice * amount)
+                return false;
+            if (sellItem.sellPrices == null || sellItem.sellPrices.Length == 0)
+                return true;
+            return character.HasEnoughCurrencyAmounts(GameDataHelpers.CombineCurrencies(sellItem.sellPrices, null), out _, out _, amount);
+        }
+
+        public virtual void DecreaseCurrenciesWhenBuyItem(IPlayerCharacterData character, NpcSellItem sellItem, short amount)
+        {
+            character.Gold -= sellItem.sellPrice * amount;
+            if (sellItem.sellPrices == null || sellItem.sellPrices.Length == 0)
+                return;
+            character.DecreaseCurrencies(sellItem.sellPrices, amount);
+        }
+
+        public virtual void IncreaseCurrenciesWhenSellItem(IPlayerCharacterData character, BaseItem item, short amount)
+        {
+            character.Gold = character.Gold.Increase(item.SellPrice * amount);
+        }
+
+        public virtual bool CurrenciesEnoughToRefineItem(IPlayerCharacterData character, ItemRefineLevel refineLevel)
+        {
+            if (character.Gold < refineLevel.RequireGold)
+                return false;
+            if (refineLevel.RequireCurrencies == null || refineLevel.RequireCurrencies.Length == 0)
+                return true;
+            return character.HasEnoughCurrencyAmounts(GameDataHelpers.CombineCurrencies(refineLevel.RequireCurrencies, null), out _, out _);
+        }
+
+        public virtual void DecreaseCurrenciesWhenRefineItem(IPlayerCharacterData character, ItemRefineLevel refineLevel)
+        {
+            character.Gold -= refineLevel.RequireGold;
+            if (refineLevel.RequireCurrencies == null || refineLevel.RequireCurrencies.Length == 0)
+                return;
+            character.DecreaseCurrencies(refineLevel.RequireCurrencies);
+        }
+
+        public virtual bool CurrenciesEnoughToRepairItem(IPlayerCharacterData character, ItemRepairPrice repairPrice)
+        {
+            if (character.Gold < repairPrice.RequireGold)
+                return false;
+            if (repairPrice.RequireCurrencies == null || repairPrice.RequireCurrencies.Length == 0)
+                return true;
+            return character.HasEnoughCurrencyAmounts(GameDataHelpers.CombineCurrencies(repairPrice.RequireCurrencies, null), out _, out _);
+        }
+
+        public virtual void DecreaseCurrenciesWhenRepairItem(IPlayerCharacterData character, ItemRepairPrice repairPrice)
+        {
+            character.Gold -= repairPrice.RequireGold;
+            if (repairPrice.RequireCurrencies == null || repairPrice.RequireCurrencies.Length == 0)
+                return;
+            character.DecreaseCurrencies(repairPrice.RequireCurrencies);
+        }
+
+        public virtual bool CurrenciesEnoughToCraftItem(IPlayerCharacterData character, ItemCraft itemCraft)
+        {
+            return character.Gold >= itemCraft.RequireGold;
+        }
+
+        public virtual void DecreaseCurrenciesWhenCraftItem(IPlayerCharacterData character, ItemCraft itemCraft)
+        {
+            character.Gold -= itemCraft.RequireGold;
+        }
+
+        public virtual bool CurrenciesEnoughToRemoveEnhancer(IPlayerCharacterData character)
+        {
+            return character.Gold >= GameInstance.Singleton.enhancerRemoval.RequireGold;
+        }
+
+        public virtual void DecreaseCurrenciesWhenRemoveEnhancer(IPlayerCharacterData character)
+        {
+            character.Gold -= GameInstance.Singleton.enhancerRemoval.RequireGold;
+        }
+
+        public virtual bool CurrenciesEnoughToCreateGuild(IPlayerCharacterData character, SocialSystemSetting setting)
+        {
+            return character.Gold >= setting.CreateGuildRequiredGold;
+        }
+
+        public virtual void DecreaseCurrenciesWhenCreateGuild(IPlayerCharacterData character, SocialSystemSetting setting)
+        {
+            character.Gold -= setting.CreateGuildRequiredGold;
+        }
+
+        public virtual Reward MakeMonsterReward(MonsterCharacter monster, short level)
+        {
+            Reward result = new Reward();
+            result.exp = monster.RandomExp(level);
+            result.gold = monster.RandomGold(level);
+            result.currencies = monster.RandomCurrencies();
+            return result;
+        }
+
+        public virtual Reward MakeQuestReward(Quest quest)
+        {
+            Reward result = new Reward();
+            result.exp = quest.rewardExp;
+            result.gold = quest.rewardGold;
+            result.currencies = quest.rewardCurrencies;
+            return result;
+        }
+
         public virtual byte GetItemMaxSocket(IPlayerCharacterData character, CharacterItem characterItem)
         {
             IEquipmentItem item = characterItem.GetEquipmentItem();

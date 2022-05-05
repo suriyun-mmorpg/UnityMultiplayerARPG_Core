@@ -591,8 +591,6 @@ namespace MultiplayerARPG
             droppingItems.Clear();
             // Drop items
             CharacterDatabase.RandomItems(OnRandomDropItem);
-            // Drop currency
-            CharacterDatabase.RandomCurrencies(OnRandomDropCurrency);
 
             switch (CurrentGameInstance.monsterDeadDropItemMode)
             {
@@ -630,17 +628,6 @@ namespace MultiplayerARPG
             if (amount > item.MaxStack)
                 amount = item.MaxStack;
             droppingItems.Add(CharacterItem.Create(item, 1, amount));
-        }
-
-        private void OnRandomDropCurrency(Currency currency, int amount)
-        {
-            BasePlayerCharacterEntity playerCharacterEntity;
-            foreach (string looter in looters)
-            {
-                if (!GameInstance.ServerUserHandlers.TryGetPlayerCharacterById(looter, out playerCharacterEntity))
-                    continue;
-                playerCharacterEntity.IncreaseCurrency(currency, amount);
-            }
         }
 
         public virtual void DestroyAndRespawn()
