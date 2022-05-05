@@ -3,7 +3,7 @@
     [System.Serializable]
     public class SkillRequirement
     {
-        public bool cannotLevelUp;
+        public bool disallow;
         public IncrementalShort characterLevel = new IncrementalShort() { baseAmount = 0, amountIncreaseEachLevel = 0 };
         public IncrementalFloat skillPoint = new IncrementalFloat() { baseAmount = 1, amountIncreaseEachLevel = 0 };
         public IncrementalInt gold = new IncrementalInt() { baseAmount = 0, amountIncreaseEachLevel = 0 };

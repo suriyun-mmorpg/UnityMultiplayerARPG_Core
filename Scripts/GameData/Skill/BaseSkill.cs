@@ -881,7 +881,7 @@ namespace MultiplayerARPG
             {
                 requirementEachLevels.Add(new SkillRequirementEntry()
                 {
-                    disallow = requirement.cannotLevelUp,
+                    disallow = requirement.disallow,
                     characterLevel = requirement.characterLevel.GetAmount(i),
                     skillPoint = requirement.skillPoint.GetAmount(i),
                     gold = requirement.gold.GetAmount(i),
