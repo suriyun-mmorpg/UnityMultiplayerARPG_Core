@@ -798,12 +798,19 @@ namespace MultiplayerARPG
 
         public override bool CurrenciesEnoughToRefineItem(IPlayerCharacterData character, ItemRefineLevel refineLevel)
         {
-            return character.Gold >= refineLevel.RequireGold;
+            if (character.Gold < refineLevel.RequireGold)
+                return false;
+            if (refineLevel.RequireCurrencies == null || refineLevel.RequireCurrencies.Length == 0)
+                return true;
+            return character.HasEnoughCurrencyAmounts(GameDataHelpers.CombineCurrencies(refineLevel.RequireCurrencies, null), out _, out _);
         }
 
         public override void DecreaseCurrenciesWhenRefineItem(IPlayerCharacterData character, ItemRefineLevel refineLevel)
         {
             character.Gold -= refineLevel.RequireGold;
+            if (refineLevel.RequireCurrencies == null || refineLevel.RequireCurrencies.Length == 0)
+                return;
+            character.DecreaseCurrencies(refineLevel.RequireCurrencies);
         }
 
         public override bool CurrenciesEnoughToRepairItem(IPlayerCharacterData character, ItemRepairPrice repairPrice)
