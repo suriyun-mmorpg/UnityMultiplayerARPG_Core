@@ -62,7 +62,7 @@ namespace MultiplayerARPG
             get
             {
                 if (cacheRewardCurrencies == null)
-                    cacheRewardCurrencies = GameDataHelpers.CombineCurrencies(rewardCurrencies, new Dictionary<Currency, int>());
+                    cacheRewardCurrencies = GameDataHelpers.CombineCurrencies(rewardCurrencies, null);
                 return cacheRewardCurrencies;
             }
         }
