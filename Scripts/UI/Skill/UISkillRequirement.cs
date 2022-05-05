@@ -24,6 +24,7 @@ namespace MultiplayerARPG
         public TextWrapper uiTextRequireGold;
         public UIAttributeAmounts uiRequireAttributeAmounts;
         public UISkillLevels uiRequireSkillLevels;
+        public UICurrencyAmounts uiRequireCurrencyAmounts;
 
         protected override void UpdateData()
         {
@@ -145,6 +146,21 @@ namespace MultiplayerARPG
                     uiRequireSkillLevels.isBonus = false;
                     uiRequireSkillLevels.Show();
                     uiRequireSkillLevels.Data = skill.GetRequireSkillLevels(level);
+                }
+            }
+
+            if (uiRequireCurrencyAmounts != null)
+            {
+                if (skill == null)
+                {
+                    uiRequireCurrencyAmounts.Hide();
+                }
+                else
+                {
+                    uiRequireCurrencyAmounts.displayType = UICurrencyAmounts.DisplayType.Requirement;
+                    uiRequireCurrencyAmounts.isBonus = false;
+                    uiRequireCurrencyAmounts.Show();
+                    uiRequireCurrencyAmounts.Data = skill.GetRequireCurrencyAmounts(level);
                 }
             }
         }

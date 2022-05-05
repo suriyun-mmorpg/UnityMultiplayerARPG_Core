@@ -887,6 +887,36 @@ namespace MultiplayerARPG
             return true;
         }
 
+        public static Dictionary<Currency, int> GetCharacterCurrencies(this IPlayerCharacterData data)
+        {
+            if (data == null)
+                return new Dictionary<Currency, int>();
+            Dictionary<Currency, int> result = new Dictionary<Currency, int>();
+            foreach (CharacterCurrency characterCurrency in data.Currencies)
+            {
+                Currency key = characterCurrency.GetCurrency();
+                int value = characterCurrency.amount;
+                if (key == null)
+                    continue;
+                if (!result.ContainsKey(key))
+                    result[key] = value;
+                else
+                    result[key] += value;
+            }
+
+            return result;
+        }
+
+        public static void IncreaseCurrencies(this IPlayerCharacterData character, Dictionary<Currency, int> currencyAmounts, float multiplier = 1)
+        {
+            if (currencyAmounts == null)
+                return;
+            foreach (KeyValuePair<Currency, int> currencyAmount in currencyAmounts)
+            {
+                character.IncreaseCurrency(currencyAmount.Key, Mathf.CeilToInt(currencyAmount.Value * multiplier));
+            }
+        }
+
         public static void IncreaseCurrencies(this IPlayerCharacterData character, IEnumerable<CurrencyAmount> currencyAmounts, float multiplier = 1)
         {
             if (currencyAmounts == null)
@@ -923,6 +953,16 @@ namespace MultiplayerARPG
             }
         }
 
+        public static void DecreaseCurrencies(this IPlayerCharacterData character, Dictionary<Currency, int> currencyAmounts, float multiplier = 1)
+        {
+            if (currencyAmounts == null)
+                return;
+            foreach (KeyValuePair<Currency, int> currencyAmount in currencyAmounts)
+            {
+                character.DecreaseCurrency(currencyAmount.Key, Mathf.CeilToInt(currencyAmount.Value * multiplier));
+            }
+        }
+
         public static void DecreaseCurrencies(this IPlayerCharacterData character, IEnumerable<CurrencyAmount> currencyAmounts, float multiplier = 1)
         {
             if (currencyAmounts == null)
@@ -930,6 +970,16 @@ namespace MultiplayerARPG
             foreach (CurrencyAmount currencyAmount in currencyAmounts)
             {
                 character.DecreaseCurrency(currencyAmount.currency, Mathf.CeilToInt(currencyAmount.amount * multiplier));
+            }
+        }
+
+        public static void DecreaseCurrencies(this IPlayerCharacterData character, IEnumerable<CharacterCurrency> currencies, float multiplier = 1)
+        {
+            if (currencies == null)
+                return;
+            foreach (CharacterCurrency currency in currencies)
+            {
+                character.DecreaseCurrency(currency.GetCurrency(), Mathf.CeilToInt(currency.amount * multiplier));
             }
         }
 

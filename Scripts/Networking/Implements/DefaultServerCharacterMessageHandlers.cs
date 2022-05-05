@@ -1,5 +1,6 @@
 ﻿using Cysharp.Threading.Tasks;
 using LiteNetLibManager;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace MultiplayerARPG
@@ -56,8 +57,10 @@ namespace MultiplayerARPG
             BaseSkill skill = characterSkill.GetSkill();
             float requireSkillPoint = skill.GetRequireCharacterSkillPoint((short)(characterSkill.level - 1));
             int requireGold = skill.GetRequireCharacterGold((short)(characterSkill.level - 1));
+            Dictionary<Currency, int> requireCurrencies = skill.GetRequireCurrencyAmounts((short)(characterSkill.level - 1));
             playerCharacter.SkillPoint -= requireSkillPoint;
             playerCharacter.Gold -= requireGold;
+            playerCharacter.DecreaseCurrencies(requireCurrencies);
             result.Invoke(AckResponseCode.Success, new ResponseIncreaseSkillLevelMessage());
             await UniTask.Yield();
         }

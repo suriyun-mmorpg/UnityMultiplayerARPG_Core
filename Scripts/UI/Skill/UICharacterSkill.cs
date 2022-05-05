@@ -328,8 +328,9 @@ namespace MultiplayerARPG
                     (Skill.GetRequireCharacterLevel(Level) <= 0 &&
                     Skill.GetRequireCharacterSkillPoint(Level) <= 0 &&
                     Skill.GetRequireCharacterGold(Level) <= 0 &&
+                    Skill.GetRequireAttributeAmounts(Level).Count == 0) &&
                     Skill.GetRequireSkillLevels(Level).Count == 0 &&
-                    Skill.GetRequireAttributeAmounts(Level).Count == 0))
+                    Skill.GetRequireCurrencyAmounts(Level).Count == 0)
                 {
                     uiRequirement.Hide();
                 }

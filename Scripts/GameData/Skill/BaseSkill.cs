@@ -332,6 +332,13 @@ namespace MultiplayerARPG
             return requirementEachLevels[level].gold;
         }
 
+        public Dictionary<Attribute, float> GetRequireAttributeAmounts(short level)
+        {
+            if (level >= requirementEachLevels.Count)
+                return GameDataHelpers.CombineAttributes(requirementEachLevels[requirementEachLevels.Count - 1].attributeAmounts, null, 1f);
+            return GameDataHelpers.CombineAttributes(requirementEachLevels[level].attributeAmounts, null, 1f);
+        }
+
         public Dictionary<BaseSkill, short> GetRequireSkillLevels(short level)
         {
             if (level >= requirementEachLevels.Count)
@@ -339,11 +346,11 @@ namespace MultiplayerARPG
             return GameDataHelpers.CombineSkills(requirementEachLevels[level].skillLevels, null);
         }
 
-        public Dictionary<Attribute, float> GetRequireAttributeAmounts(short level)
+        public Dictionary<Currency, int> GetRequireCurrencyAmounts(short level)
         {
             if (level >= requirementEachLevels.Count)
-                return GameDataHelpers.CombineAttributes(requirementEachLevels[requirementEachLevels.Count - 1].attributeAmounts, null, 1f);
-            return GameDataHelpers.CombineAttributes(requirementEachLevels[level].attributeAmounts, null, 1f);
+                return GameDataHelpers.CombineCurrencies(requirementEachLevels[requirementEachLevels.Count - 1].currencyAmounts, null);
+            return GameDataHelpers.CombineCurrencies(requirementEachLevels[level].currencyAmounts, null);
         }
 
         public bool IsAvailable(ICharacterData character)
@@ -586,6 +593,19 @@ namespace MultiplayerARPG
                     currentAttributeAmounts[requireAttributeAmount.Key] < requireAttributeAmount.Value)
                 {
                     gameMessage = UITextKeys.UI_ERROR_NOT_ENOUGH_ATTRIBUTE_AMOUNTS;
+                    return false;
+                }
+            }
+
+            // Check is it pass currency requirement or not
+            Dictionary<Currency, int> requiredCurrencyAmounts = GetRequireCurrencyAmounts(level);
+            Dictionary<Currency, int> currentCurrencyAmounts = character.GetCharacterCurrencies();
+            foreach (KeyValuePair<Currency, int> requireCurrencyAmount in requiredCurrencyAmounts)
+            {
+                if (!currentCurrencyAmounts.ContainsKey(requireCurrencyAmount.Key) ||
+                    currentCurrencyAmounts[requireCurrencyAmount.Key] < requireCurrencyAmount.Value)
+                {
+                    gameMessage = UITextKeys.UI_ERROR_NOT_ENOUGH_CURRENCY_AMOUNTS;
                     return false;
                 }
             }
@@ -868,6 +888,7 @@ namespace MultiplayerARPG
                     gold = requirement.gold.GetAmount(i),
                     attributeAmounts = requirement.attributeAmounts,
                     skillLevels = requirement.skillLevels,
+                    currencyAmounts = requirement.currencyAmounts,
                 });
             }
 #if UNITY_EDITOR

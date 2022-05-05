@@ -10,5 +10,7 @@
         public AttributeAmount[] attributeAmounts = new AttributeAmount[0];
         [ArrayElementTitle("skill")]
         public SkillLevel[] skillLevels = new SkillLevel[0];
+        [ArrayElementTitle("currency")]
+        public CurrencyAmount[] currencyAmounts = new CurrencyAmount[0];
     }
 }

@@ -197,6 +197,7 @@ namespace MultiplayerARPG
         UI_ERROR_NOT_MATCH_CHARACTER_CLASS,
         UI_ERROR_NOT_ENOUGH_ATTRIBUTE_AMOUNTS,
         UI_ERROR_NOT_ENOUGH_SKILL_LEVELS,
+        UI_ERROR_NOT_ENOUGH_CURRENCY_AMOUNTS,
         UI_ERROR_ATTRIBUTE_REACHED_MAX_AMOUNT,
         UI_ERROR_SKILL_REACHED_MAX_LEVEL,
         // Success - UI Cash Shop
@@ -1413,6 +1414,7 @@ namespace MultiplayerARPG
             Texts.Add(UITextKeys.UI_ERROR_NOT_MATCH_CHARACTER_CLASS.ToString(), "Not match character class");
             Texts.Add(UITextKeys.UI_ERROR_NOT_ENOUGH_ATTRIBUTE_AMOUNTS.ToString(), "Not enough attribute amounts");
             Texts.Add(UITextKeys.UI_ERROR_NOT_ENOUGH_SKILL_LEVELS.ToString(), "Not enough skill levels");
+            Texts.Add(UITextKeys.UI_ERROR_NOT_ENOUGH_CURRENCY_AMOUNTS.ToString(), "Not enough currency amounts");
             Texts.Add(UITextKeys.UI_ERROR_ATTRIBUTE_REACHED_MAX_AMOUNT.ToString(), "Attribute reached max amount");
             Texts.Add(UITextKeys.UI_ERROR_SKILL_REACHED_MAX_LEVEL.ToString(), "Skill reached max level");
             // Success - UI Cash Shop
