@@ -34,7 +34,7 @@ namespace MultiplayerARPG
             }
             if (RepairPrices != null && RepairPrices.Length > 0)
             {
-                foreach (ItemRefineLevel entry in RepairPrices)
+                foreach (ItemRepairPrice entry in RepairPrices)
                 {
                     GameInstance.AddItems(entry.RequireItems);
                     GameInstance.AddCurrencies(entry.RequireCurrencies);
