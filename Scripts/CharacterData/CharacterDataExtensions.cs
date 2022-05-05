@@ -1177,6 +1177,26 @@ namespace MultiplayerARPG
                 character.DecreaseItems(itemAmount.Key.DataId, (short)Mathf.CeilToInt(itemAmount.Value * multiplier), out _);
             }
         }
+
+        public static void DecreaseItems(this ICharacterData character, IEnumerable<ItemAmount> itemAmounts, float multiplier = 1)
+        {
+            if (itemAmounts == null)
+                return;
+            foreach (ItemAmount itemAmount in itemAmounts)
+            {
+                character.DecreaseItems(itemAmount.item.DataId, (short)Mathf.CeilToInt(itemAmount.amount * multiplier), out _);
+            }
+        }
+
+        public static void DecreaseItems(this ICharacterData character, IEnumerable<CharacterItem> characterItems, float multiplier = 1)
+        {
+            if (characterItems == null)
+                return;
+            foreach (CharacterItem characterItem in characterItems)
+            {
+                character.DecreaseItems(characterItem.dataId, (short)Mathf.CeilToInt(characterItem.amount * multiplier), out _);
+            }
+        }
         #endregion
 
         #region Ammo Functions
