@@ -1167,6 +1167,16 @@ namespace MultiplayerARPG
         {
             return DecreaseItems(data, dataId, amount, out _);
         }
+
+        public static void DecreaseItems(this ICharacterData character, Dictionary<BaseItem, short> itemAmounts, float multiplier = 1)
+        {
+            if (itemAmounts == null)
+                return;
+            foreach (KeyValuePair<BaseItem, short> itemAmount in itemAmounts)
+            {
+                character.DecreaseItems(itemAmount.Key.DataId, (short)Mathf.CeilToInt(itemAmount.Value * multiplier), out _);
+            }
+        }
         #endregion
 
         #region Ammo Functions
@@ -1567,6 +1577,80 @@ namespace MultiplayerARPG
                     return i;
             }
             return -1;
+        }
+
+        public static bool HasEnoughAttributeAmounts(this ICharacterData data, Dictionary<Attribute, float> requiredAttributeAmounts, bool sumWithEquipments, bool sumWithBuffs, bool sumWithSkills, out UITextKeys gameMessage, out Dictionary<Attribute, float> currentAttributeAmounts, float multiplier = 1)
+        {
+            Dictionary<BaseSkill, short> currentSkillLevels = sumWithSkills ? data.GetSkills(sumWithEquipments) : new Dictionary<BaseSkill, short>();
+            return data.HasEnoughAttributeAmounts(requiredAttributeAmounts, sumWithEquipments, sumWithBuffs, currentSkillLevels, out gameMessage, out currentAttributeAmounts, multiplier);
+        }
+
+        public static bool HasEnoughAttributeAmounts(this ICharacterData data, Dictionary<Attribute, float> requiredAttributeAmounts, bool sumWithEquipments, bool sumWithBuffs, Dictionary<BaseSkill, short> currentSkillLevels, out UITextKeys gameMessage, out Dictionary<Attribute, float> currentAttributeAmounts, float multiplier = 1)
+        {
+            gameMessage = UITextKeys.NONE;
+            currentAttributeAmounts = data.GetAttributes(sumWithEquipments, sumWithBuffs, currentSkillLevels);
+            foreach (Attribute requireAttribute in requiredAttributeAmounts.Keys)
+            {
+                if (!currentAttributeAmounts.ContainsKey(requireAttribute) ||
+                    currentAttributeAmounts[requireAttribute] < Mathf.CeilToInt(requiredAttributeAmounts[requireAttribute] * multiplier))
+                {
+                    gameMessage = UITextKeys.UI_ERROR_NOT_ENOUGH_ATTRIBUTE_AMOUNTS;
+                    return false;
+                }
+            }
+            return true;
+        }
+
+        public static bool HasEnoughSkillLevels(this ICharacterData data, Dictionary<BaseSkill, short> requiredSkillLevels, bool sumWithEquipments, out UITextKeys gameMessage, out Dictionary<BaseSkill, short> currentSkillLevels, float multiplier = 1)
+        {
+            gameMessage = UITextKeys.NONE;
+            currentSkillLevels = data.GetSkills(sumWithEquipments);
+            foreach (BaseSkill requireSkill in requiredSkillLevels.Keys)
+            {
+                if (!currentSkillLevels.ContainsKey(requireSkill) ||
+                    currentSkillLevels[requireSkill] < Mathf.CeilToInt(requiredSkillLevels[requireSkill] * multiplier))
+                {
+                    gameMessage = UITextKeys.UI_ERROR_NOT_ENOUGH_SKILL_LEVELS;
+                    return false;
+                }
+            }
+            return true;
+        }
+
+        public static Dictionary<BaseItem, short> GetNonEquipItems(this ICharacterData data)
+        {
+            if (data == null)
+                return new Dictionary<BaseItem, short>();
+            Dictionary<BaseItem, short> result = new Dictionary<BaseItem, short>();
+            foreach (CharacterItem characterItem in data.NonEquipItems)
+            {
+                BaseItem key = characterItem.GetItem();
+                short value = characterItem.amount;
+                if (key == null)
+                    continue;
+                if (!result.ContainsKey(key))
+                    result[key] = value;
+                else
+                    result[key] += value;
+            }
+
+            return result;
+        }
+
+        public static bool HasEnoughNonEquipItemAmounts(this ICharacterData data, Dictionary<BaseItem, short> requiredItemAmounts, out UITextKeys gameMessage, out Dictionary<BaseItem, short> currentItemAmounts, float multiplier = 1)
+        {
+            gameMessage = UITextKeys.NONE;
+            currentItemAmounts = data.GetNonEquipItems();
+            foreach (BaseItem requireItem in requiredItemAmounts.Keys)
+            {
+                if (!currentItemAmounts.ContainsKey(requireItem) ||
+                    currentItemAmounts[requireItem] < Mathf.CeilToInt(requiredItemAmounts[requireItem] * multiplier))
+                {
+                    gameMessage = UITextKeys.UI_ERROR_NOT_ENOUGH_ITEMS;
+                    return false;
+                }
+            }
+            return true;
         }
 
         public static bool FindItemById(
