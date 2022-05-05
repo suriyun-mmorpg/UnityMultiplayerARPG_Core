@@ -48,5 +48,9 @@ namespace MultiplayerARPG
         /// Returning items after this item was dismantled
         /// </summary>
         ItemAmount[] DismantleReturnItems { get; }
+        /// <summary>
+        /// Returning currencies after this item was dismantled
+        /// </summary>
+        CurrencyAmount[] DismantleReturnCurrencies { get; }
     }
 }

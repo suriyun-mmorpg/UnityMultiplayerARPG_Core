@@ -29,6 +29,8 @@ namespace MultiplayerARPG
         protected int dismantleReturnGold = 0;
         [SerializeField]
         protected ItemAmount[] dismantleReturnItems = new ItemAmount[0];
+        [SerializeField]
+        protected CurrencyAmount[] dismantleReturnCurrencies = new CurrencyAmount[0];
 
         [Category(100, "Cash Shop Generating Settings")]
         [SerializeField]
@@ -73,6 +75,8 @@ namespace MultiplayerARPG
         public int DismantleReturnGold { get { return dismantleReturnGold; } }
 
         public ItemAmount[] DismantleReturnItems { get { return dismantleReturnItems; } }
+
+        public CurrencyAmount[] DismantleReturnCurrencies { get { return dismantleReturnCurrencies; } }
 
         public int MaxLevel
         {

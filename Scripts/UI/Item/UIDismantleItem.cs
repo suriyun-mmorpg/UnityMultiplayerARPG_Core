@@ -14,6 +14,7 @@ namespace MultiplayerARPG
 
         [Header("UI Elements for UI Dismantle Item")]
         public UIItemAmounts uiReturnItems;
+        public UICurrencyAmounts uiReturnCurrencies;
         public TextWrapper uiTextReturnGold;
         public TextWrapper uiTextDismantleAmount;
 
@@ -67,7 +68,10 @@ namespace MultiplayerARPG
                 }
             }
 
-            List<ItemAmount> returningItems = BaseItem.GetDismantleReturnItems(characterItem, DismantleAmount);
+            List<ItemAmount> returningItems;
+            List<CurrencyAmount> returningCurrencies;
+            BaseItem.GetDismantleReturnItems(characterItem, DismantleAmount, out returningItems, out returningCurrencies);
+
             if (uiReturnItems != null)
             {
                 if (characterItem.IsEmptySlot() || returningItems.Count == 0)
@@ -78,7 +82,21 @@ namespace MultiplayerARPG
                 {
                     uiReturnItems.displayType = UIItemAmounts.DisplayType.Simple;
                     uiReturnItems.Show();
-                    uiReturnItems.Data = GameDataHelpers.CombineItems(returningItems.ToArray(), new Dictionary<BaseItem, short>()); ;
+                    uiReturnItems.Data = GameDataHelpers.CombineItems(returningItems, null);
+                }
+            }
+
+            if (uiReturnCurrencies != null)
+            {
+                if (returningCurrencies.Count == 0)
+                {
+                    uiReturnCurrencies.Hide();
+                }
+                else
+                {
+                    uiReturnCurrencies.displayType = UICurrencyAmounts.DisplayType.Simple;
+                    uiReturnCurrencies.Show();
+                    uiReturnCurrencies.Data = GameDataHelpers.CombineCurrencies(returningCurrencies, null);
                 }
             }
 

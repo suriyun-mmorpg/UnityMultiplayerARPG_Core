@@ -28,6 +28,7 @@ namespace MultiplayerARPG
         [HideInInspector]
         public UICharacterItem uiRefiningItem;
         public UIItemAmounts uiRequireItemAmounts;
+        public UICurrencyAmounts uiRequireCurrencyAmounts;
         public TextWrapper uiTextRequireGold;
         public TextWrapper uiTextSimpleRequireGold;
         public TextWrapper uiTextSuccessRate;
@@ -109,10 +110,9 @@ namespace MultiplayerARPG
                 }
             }
 
-
             if (uiRequireItemAmounts != null)
             {
-                if (!refineLevel.HasValue || refineLevel.Value.CacheRequireItems.Count == 0)
+                if (!refineLevel.HasValue || refineLevel.Value.RequireItems == null || refineLevel.Value.RequireItems.Length == 0)
                 {
                     uiRequireItemAmounts.Hide();
                 }
@@ -120,7 +120,21 @@ namespace MultiplayerARPG
                 {
                     uiRequireItemAmounts.displayType = UIItemAmounts.DisplayType.Requirement;
                     uiRequireItemAmounts.Show();
-                    uiRequireItemAmounts.Data = refineLevel.Value.CacheRequireItems;
+                    uiRequireItemAmounts.Data = GameDataHelpers.CombineItems(refineLevel.Value.RequireItems, null);
+                }
+            }
+
+            if (uiRequireCurrencyAmounts != null)
+            {
+                if (!refineLevel.HasValue || refineLevel.Value.RequireCurrencies == null || refineLevel.Value.RequireCurrencies.Length == 0)
+                {
+                    uiRequireCurrencyAmounts.Hide();
+                }
+                else
+                {
+                    uiRequireCurrencyAmounts.displayType = UICurrencyAmounts.DisplayType.Requirement;
+                    uiRequireCurrencyAmounts.Show();
+                    uiRequireCurrencyAmounts.Data = GameDataHelpers.CombineCurrencies(refineLevel.Value.RequireCurrencies, null);
                 }
             }
 

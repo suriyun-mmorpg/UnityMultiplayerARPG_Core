@@ -35,6 +35,10 @@ namespace MultiplayerARPG
         private ItemAmount[] requireItems;
         public ItemAmount[] RequireItems { get { return requireItems; } }
 
+        [ArrayElementTitle("currency")]
+        private CurrencyAmount[] requireCurrencies;
+        public CurrencyAmount[] RequireCurrencies { get { return requireCurrencies; } }
+
         [SerializeField]
         private int requireGold;
         public int RequireGold { get { return requireGold; } }
@@ -49,31 +53,20 @@ namespace MultiplayerARPG
         private bool refineFailDestroyItem;
         public bool RefineFailDestroyItem { get { return refineFailDestroyItem; } }
 
-        [System.NonSerialized]
-        private Dictionary<BaseItem, short> cacheRequireItems;
-        public Dictionary<BaseItem, short> CacheRequireItems
-        {
-            get
-            {
-                if (cacheRequireItems == null)
-                    cacheRequireItems = GameDataHelpers.CombineItems(requireItems, new Dictionary<BaseItem, short>());
-                return cacheRequireItems;
-            }
-        }
-
         public ItemRefineLevel(
             float successRate,
             ItemAmount[] requireItems,
+            CurrencyAmount[] requireCurrencies,
             int requireGold,
             short refineFailDecreaseLevels,
             bool refineFailDestroyItem)
         {
             this.successRate = successRate;
             this.requireItems = requireItems;
+            this.requireCurrencies = requireCurrencies;
             this.requireGold = requireGold;
             this.refineFailDecreaseLevels = refineFailDecreaseLevels;
             this.refineFailDestroyItem = refineFailDestroyItem;
-            cacheRequireItems = null;
         }
 
         public bool CanRefine(IPlayerCharacterData character)

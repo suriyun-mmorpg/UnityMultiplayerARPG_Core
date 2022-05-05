@@ -4,19 +4,21 @@ namespace MultiplayerARPG
 {
     public partial class BaseItem
     {
-        public static List<ItemAmount> GetDismantleReturnItems(CharacterItem dismantlingItem, short amount)
+        public static void GetDismantleReturnItems(CharacterItem dismantlingItem, short amount, out List<ItemAmount> items, out List<CurrencyAmount> currencies)
         {
+            items = new List<ItemAmount>();
+            currencies = new List<CurrencyAmount>();
             if (dismantlingItem.IsEmptySlot() || amount == 0)
-                return new List<ItemAmount>();
+                return;
 
             if (amount < 0 || amount > dismantlingItem.amount)
                 amount = dismantlingItem.amount;
 
-            List<ItemAmount> result = new List<ItemAmount>();
+            // Returning items
             ItemAmount[] dismantleReturnItems = dismantlingItem.GetItem().dismantleReturnItems;
             for (int i = 0; i < dismantleReturnItems.Length; ++i)
             {
-                result.Add(new ItemAmount()
+                items.Add(new ItemAmount()
                 {
                     item = dismantleReturnItems[i].item,
                     amount = (short)(dismantleReturnItems[i].amount * amount)
@@ -29,14 +31,24 @@ namespace MultiplayerARPG
                 {
                     if (!GameInstance.Items.TryGetValue(dismantlingItem.Sockets[i], out socketItem))
                         continue;
-                    result.Add(new ItemAmount()
+                    items.Add(new ItemAmount()
                     {
                         item = socketItem,
                         amount = 1,
                     });
                 }
             }
-            return result;
+
+            // Returning currencies
+            CurrencyAmount[] dismantleReturnCurrencies = dismantlingItem.GetItem().dismantleReturnCurrencies;
+            for (int i = 0; i < dismantleReturnCurrencies.Length; ++i)
+            {
+                currencies.Add(new CurrencyAmount()
+                {
+                    currency = dismantleReturnCurrencies[i].currency,
+                    amount = (short)(dismantleReturnCurrencies[i].amount * amount)
+                });
+            }
         }
     }
 }

@@ -13,6 +13,7 @@ namespace MultiplayerARPG
         [Tooltip("UI which showing items in inventory, will use it to select items to dismantle")]
         public UINonEquipItems uiNonEquipItems;
         public UIItemAmounts uiReturnItems;
+        public UICurrencyAmounts uiReturnCurrencies;
         public TextWrapper uiTextReturnGold;
 
         private void OnEnable()
@@ -35,14 +36,19 @@ namespace MultiplayerARPG
         {
             int returnGold = 0;
             List<ItemAmount> returningItems = new List<ItemAmount>();
+            List<CurrencyAmount> returningCurrencies = new List<CurrencyAmount>();
             CharacterItem tempCharacterItem;
             List<UICharacterItem> selectedUIs = uiNonEquipItems.CacheSelectionManager.GetSelectedUIs();
+            List<ItemAmount> tempReturningItems;
+            List<CurrencyAmount> tempReturningCurrencies;
             foreach (UICharacterItem selectedUI in selectedUIs)
             {
                 tempCharacterItem = selectedUI.Data.characterItem;
                 if (tempCharacterItem.IsEmptySlot() || selectedUI.InventoryType != InventoryType.NonEquipItems)
                     continue;
-                returningItems.AddRange(BaseItem.GetDismantleReturnItems(tempCharacterItem, tempCharacterItem.amount));
+                BaseItem.GetDismantleReturnItems(tempCharacterItem, tempCharacterItem.amount, out tempReturningItems, out tempReturningCurrencies);
+                returningItems.AddRange(tempReturningItems);
+                returningCurrencies.AddRange(tempReturningCurrencies);
                 returnGold += tempCharacterItem.GetItem().DismantleReturnGold * tempCharacterItem.amount;
             }
 
@@ -56,7 +62,21 @@ namespace MultiplayerARPG
                 {
                     uiReturnItems.displayType = UIItemAmounts.DisplayType.Simple;
                     uiReturnItems.Show();
-                    uiReturnItems.Data = GameDataHelpers.CombineItems(returningItems.ToArray(), new Dictionary<BaseItem, short>()); ;
+                    uiReturnItems.Data = GameDataHelpers.CombineItems(returningItems, null);
+                }
+            }
+
+            if (uiReturnCurrencies != null)
+            {
+                if (returningCurrencies.Count == 0)
+                {
+                    uiReturnCurrencies.Hide();
+                }
+                else
+                {
+                    uiReturnCurrencies.displayType = UICurrencyAmounts.DisplayType.Simple;
+                    uiReturnCurrencies.Show();
+                    uiReturnCurrencies.Data = GameDataHelpers.CombineCurrencies(returningCurrencies, null);
                 }
             }
 

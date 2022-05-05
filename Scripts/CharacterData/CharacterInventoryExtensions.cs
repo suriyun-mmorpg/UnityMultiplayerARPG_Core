@@ -713,11 +713,12 @@ namespace MultiplayerARPG
             return true;
         }
 
-        public static bool VerifyDismantleItem(this IPlayerCharacterData character, short index, short amount, List<CharacterItem> simulatingNonEquipItems, out UITextKeys gameMessage, out int returningGold, out List<ItemAmount> returningItems)
+        public static bool VerifyDismantleItem(this IPlayerCharacterData character, short index, short amount, List<CharacterItem> simulatingNonEquipItems, out UITextKeys gameMessage, out int returningGold, out List<ItemAmount> returningItems, out List<CurrencyAmount> returningCurrencies)
         {
             gameMessage = UITextKeys.NONE;
             returningGold = 0;
-            returningItems = new List<ItemAmount>();
+            returningItems = null;
+            returningCurrencies = null;
 
             if (index < 0 || index >= character.NonEquipItems.Count)
             {
@@ -735,6 +736,7 @@ namespace MultiplayerARPG
 
             if (!GameInstance.Singleton.dismantleFilter.Filter(nonEquipItem))
             {
+                gameMessage = UITextKeys.UI_ERROR_INVALID_ITEM_DATA;
                 return false;
             }
 
@@ -746,7 +748,7 @@ namespace MultiplayerARPG
             }
 
             // Character can receives all items or not?
-            returningItems.AddRange(BaseItem.GetDismantleReturnItems(nonEquipItem, amount));
+            BaseItem.GetDismantleReturnItems(nonEquipItem, amount, out returningItems, out returningCurrencies);
             if (simulatingNonEquipItems.IncreasingItemsWillOverwhelming(
                 returningItems,
                 GameInstance.Singleton.IsLimitInventoryWeight,
@@ -770,13 +772,15 @@ namespace MultiplayerARPG
 #if !CLIENT_BUILD
             int returningGold;
             List<ItemAmount> returningItems;
+            List<CurrencyAmount> returningCurrencies;
             List<CharacterItem> simulatingNonEquipItems = character.NonEquipItems.Clone();
-            if (!character.VerifyDismantleItem(index, amount, simulatingNonEquipItems, out gameMessage, out returningGold, out returningItems))
+            if (!character.VerifyDismantleItem(index, amount, simulatingNonEquipItems, out gameMessage, out returningGold, out returningItems, out returningCurrencies))
                 return false;
 
             character.Gold = character.Gold.Increase(returningGold);
             character.DecreaseItemsByIndex(index, amount);
             character.IncreaseItems(returningItems);
+            character.IncreaseCurrencies(returningCurrencies);
             character.FillEmptySlots();
             return true;
 #else
@@ -795,10 +799,12 @@ namespace MultiplayerARPG
             List<CharacterItem> simulatingNonEquipItems = character.NonEquipItems.Clone();
             int returningGold = 0;
             List<ItemAmount> returningItems = new List<ItemAmount>();
+            List<CurrencyAmount> returningCurrencies = new List<CurrencyAmount>();
             short tempIndex;
             short tempAmount;
             int tempReturningGold;
             List<ItemAmount> tempReturningItems;
+            List<CurrencyAmount> tempReturningCurrencies;
             for (int i = indexes.Count - 1; i >= 0; --i)
             {
                 tempIndex = indexes[i];
@@ -807,10 +813,11 @@ namespace MultiplayerARPG
                 if (tempIndex >= character.NonEquipItems.Count)
                     continue;
                 tempAmount = character.NonEquipItems[tempIndex].amount;
-                if (!character.VerifyDismantleItem(tempIndex, tempAmount, simulatingNonEquipItems, out gameMessage, out tempReturningGold, out tempReturningItems))
+                if (!character.VerifyDismantleItem(tempIndex, tempAmount, simulatingNonEquipItems, out gameMessage, out tempReturningGold, out tempReturningItems, out tempReturningCurrencies))
                     return false;
                 returningGold += tempReturningGold;
                 returningItems.AddRange(tempReturningItems);
+                returningCurrencies.AddRange(tempReturningCurrencies);
                 indexAmountPairs.Add(tempIndex, tempAmount);
             }
             character.Gold = character.Gold.Increase(returningGold);
@@ -822,6 +829,7 @@ namespace MultiplayerARPG
                 character.DecreaseItemsByIndex(indexes[i], indexAmountPairs[indexes[i]]);
             }
             character.IncreaseItems(returningItems);
+            character.IncreaseCurrencies(returningCurrencies);
             character.FillEmptySlots();
             return true;
 #else

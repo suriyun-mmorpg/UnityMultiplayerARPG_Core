@@ -136,12 +136,13 @@ namespace MultiplayerARPG
             if (refineLevel.RequireItems != null)
             {
                 // Decrease required items
-                foreach (ItemAmount requireItem in refineLevel.RequireItems)
-                {
-                    if (requireItem.item != null && requireItem.amount > 0)
-                        character.DecreaseItems(requireItem.item.DataId, requireItem.amount);
-                }
+                character.DecreaseItems(refineLevel.RequireItems);
                 character.FillEmptySlots();
+            }
+            if (refineLevel.RequireCurrencies != null)
+            {
+                // Decrease required currencies
+                character.DecreaseCurrencies(refineLevel.RequireCurrencies);
             }
             // Decrease required gold
             GameInstance.Singleton.GameplayRule.DecreaseCurrenciesWhenRefineItem(character, refineLevel);
