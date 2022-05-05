@@ -109,6 +109,15 @@ namespace MultiplayerARPG
             return hasChanges;
         }
 
+        public override void PrepareRelatesData()
+        {
+            base.PrepareRelatesData();
+            if (ItemRefine != null)
+                ItemRefine.PrepareRelatesData();
+            GameInstance.AddItems(DismantleReturnItems);
+            GameInstance.AddCurrencies(DismantleReturnCurrencies);
+        }
+
         public void GenerateCashShopItems()
         {
             if (cashShopItemGeneratingList == null || cashShopItemGeneratingList.Length == 0)
