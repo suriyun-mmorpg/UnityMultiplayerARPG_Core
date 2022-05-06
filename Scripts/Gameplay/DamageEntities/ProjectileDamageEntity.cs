@@ -10,7 +10,6 @@ namespace MultiplayerARPG
         public UnityEvent onProjectileDisappear = new UnityEvent();
 
         [Header("Configuration")]
-        public bool isOffline = false;
         public LayerMask hitLayers;
         [Tooltip("if you don't set it, you better don't change destroy delay.")]
         [FormerlySerializedAs("ProjectileObject")]
@@ -48,7 +47,7 @@ namespace MultiplayerARPG
         public GameObject disappearEffect;
 
         private Vector3 initialPosition;
-        private bool collided;
+        private bool impacted;
         private Vector3 normal;
         private Vector3 hitPos;
         private Vector3 iniImpactEffectPos;
@@ -67,7 +66,7 @@ namespace MultiplayerARPG
 
             // Initial configuration
             initialPosition = CacheTransform.position;
-            collided = false;
+            impacted = false;
 
             // Configuration bullet and effects
             if (projectileObject) projectileObject.SetActive(true);
@@ -91,7 +90,6 @@ namespace MultiplayerARPG
             if (useAngle) CacheTransform.eulerAngles = new Vector3(CacheTransform.eulerAngles.x - angle, CacheTransform.eulerAngles.y, CacheTransform.eulerAngles.z);
 
             bulletVelocity = CacheTransform.forward * missileSpeed;
-
         }
 
         public float LaunchSpeed(float distance, float yOffset, float gravity, float angle)
@@ -108,7 +106,7 @@ namespace MultiplayerARPG
         protected override void FixedUpdate()
         {
             // Don't move if exploded or collided
-            if (isExploded || collided) return;
+            if (isExploded || impacted) return;
 
             Vector3 point1 = CacheTransform.position;
             float stepSize = 1.0f / predictionStepPerFrame;
@@ -123,28 +121,22 @@ namespace MultiplayerARPG
                 }
 
                 Vector3 point2 = point1 + bulletVelocity * stepSize * Time.deltaTime;
-                float dist = Vector3.Distance(initialPosition, transform.position);
-                if (dist > missileDistance)
-                {
-                    NoImpact();
-                    return;
-                }
 
                 int hitCount = 0;
                 RaycastHit hit;
                 Vector3 origin = point1;
-                Vector3 dir = point2 - point1;
-                float hitDist = missileSpeed * Time.deltaTime;
+                Vector3 dir = (point2 - point1).normalized;
+                float dist = Vector3.Distance(point2, point1);
                 switch (hitDetectionMode)
                 {
                     case HitDetectionMode.Raycast:
-                        hitCount = Physics.RaycastNonAlloc(origin, dir, hits3D, hitDist, hitLayers);
+                        hitCount = Physics.RaycastNonAlloc(origin, dir, hits3D, dist, hitLayers);
                         break;
                     case HitDetectionMode.SphereCast:
-                        hitCount = Physics.SphereCastNonAlloc(origin, sphereCastRadius, dir, hits3D, hitDist, hitLayers);
+                        hitCount = Physics.SphereCastNonAlloc(origin, sphereCastRadius, dir, hits3D, dist, hitLayers);
                         break;
                     case HitDetectionMode.BoxCast:
-                        hitCount = Physics.BoxCastNonAlloc(origin, boxCastSize * 0.5f, dir, hits3D, CacheTransform.rotation, hitDist, hitLayers);
+                        hitCount = Physics.BoxCastNonAlloc(origin, boxCastSize * 0.5f, dir, hits3D, CacheTransform.rotation, dist, hitLayers);
                         break;
                 }
 
@@ -155,7 +147,7 @@ namespace MultiplayerARPG
                         normal = hit.normal;
                     hitPos = hit.point;
 
-                    // Hit itself, don't explode
+                    // Hit itself, no impact
                     BaseGameEntity instigatorEntity;
                     if (instigator.Id != null && instigator.TryGetEntity(out instigatorEntity) && instigatorEntity.transform.root == hit.transform.root)
                         continue;
@@ -163,14 +155,17 @@ namespace MultiplayerARPG
                     Impact(hit.collider.transform.gameObject);
                     if (destroying)
                         return;
+                }
 
-                    // Impacted, skip next iteration
-                    goto endOfPredictLoop;
+                // Moved too far from `initialPosition`
+                if (Vector3.Distance(initialPosition, point2) > missileDistance)
+                {
+                    NoImpact();
+                    return;
                 }
 
                 point1 = point2;
             }
-        endOfPredictLoop:
             CacheTransform.rotation = Quaternion.LookRotation(bulletVelocity);
             CacheTransform.position = point1;
         }
@@ -180,7 +175,7 @@ namespace MultiplayerARPG
             if (destroying)
                 return;
 
-            if (!IsServer && disappearEffect || isOffline && disappearEffect)
+            if (disappearEffect && IsClient)
             {
                 if (onProjectileDisappear != null)
                     onProjectileDisappear.Invoke();
@@ -199,15 +194,14 @@ namespace MultiplayerARPG
             }
             PushBack();
             destroying = true;
-            return;
         }
 
         protected void Impact(GameObject hitted)
         {
             // Spawn impact effect
-            if (!IsServer && impactEffect || isOffline && impactEffect)
+            if (impactEffect && IsClient)
             {
-                if (projectileObject) 
+                if (projectileObject)
                     projectileObject.SetActive(false);
 
                 if (instantiateImpact)
@@ -241,11 +235,15 @@ namespace MultiplayerARPG
                     // If this is not going to explode, just apply damage to target
                     ApplyDamageTo(target);
                 }
-                collided = true;
+                impacted = true;
                 PushBack(destroyDelay);
                 destroying = true;
                 return;
             }
+
+            // Hit damageable entity but it is not hitbox, skip it
+            if (hitted.GetComponent<DamageableEntity>() != null)
+                return;
 
             if (explodeDistance > 0f)
             {
@@ -253,7 +251,7 @@ namespace MultiplayerARPG
                 Explode();
             }
 
-            collided = true;
+            impacted = true;
             PushBack(destroyDelay);
             destroying = true;
         }
