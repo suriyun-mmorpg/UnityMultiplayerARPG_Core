@@ -306,7 +306,7 @@ namespace MultiplayerARPG
                 uiRoleDialog.onHide.AddListener(OnRoleDialogHide);
             if (uiSkillDialog != null)
                 uiSkillDialog.onHide.AddListener(OnSkillDialogHide);
-            UpdateGuildUIs(Guild);
+            UpdateGuildUIs(UpdateGuildMessage.UpdateType.Member, Guild);
             ClientGuildActions.onNotifyGuildUpdated += UpdateGuildUIs;
         }
 
@@ -374,7 +374,7 @@ namespace MultiplayerARPG
             }
         }
 
-        private void UpdateGuildUIs(GuildData guild)
+        private void UpdateGuildUIs(UpdateGuildMessage.UpdateType updateType, GuildData guild)
         {
             if (guild == null)
                 return;

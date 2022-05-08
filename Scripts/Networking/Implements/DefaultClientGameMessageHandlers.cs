@@ -68,9 +68,11 @@ namespace MultiplayerARPG
 
         public void HandleUpdatePartyMember(MessageHandlerData messageHandler)
         {
+            UpdateSocialMemberMessage updateMessage = messageHandler.ReadMessage<UpdateSocialMemberMessage>();
             if (GameInstance.JoinedParty != null)
-                GameInstance.JoinedParty.UpdateSocialGroupMember(messageHandler.ReadMessage<UpdateSocialMemberMessage>());
-            ClientPartyActions.NotifyPartyUpdated(GameInstance.JoinedParty);
+                GameInstance.JoinedParty.UpdateSocialGroupMember(updateMessage);
+            ClientPartyActions.NotifyPartyMemberUpdated(updateMessage.type, updateMessage.socialId, updateMessage.character);
+            ClientPartyActions.NotifyPartyUpdated(UpdatePartyMessage.UpdateType.Member, GameInstance.JoinedParty);
         }
 
         public void HandleUpdateParty(MessageHandlerData messageHandler)
@@ -95,14 +97,16 @@ namespace MultiplayerARPG
                         break;
                 }
             }
-            ClientPartyActions.NotifyPartyUpdated(GameInstance.JoinedParty);
+            ClientPartyActions.NotifyPartyUpdated(message.type, GameInstance.JoinedParty);
         }
 
         public void HandleUpdateGuildMember(MessageHandlerData messageHandler)
         {
+            UpdateSocialMemberMessage updateMessage = messageHandler.ReadMessage<UpdateSocialMemberMessage>();
             if (GameInstance.JoinedGuild != null)
-                GameInstance.JoinedGuild.UpdateSocialGroupMember(messageHandler.ReadMessage<UpdateSocialMemberMessage>());
-            ClientGuildActions.NotifyGuildUpdated(GameInstance.JoinedGuild);
+                GameInstance.JoinedGuild.UpdateSocialGroupMember(updateMessage);
+            ClientGuildActions.NotifyGuildMemberUpdated(updateMessage.type, updateMessage.socialId, updateMessage.character);
+            ClientGuildActions.NotifyGuildUpdated(UpdateGuildMessage.UpdateType.Member, GameInstance.JoinedGuild);
         }
 
         public void HandleUpdateGuild(MessageHandlerData messageHandler)
@@ -163,7 +167,7 @@ namespace MultiplayerARPG
                         break;
                 }
             }
-            ClientGuildActions.NotifyGuildUpdated(GameInstance.JoinedGuild);
+            ClientGuildActions.NotifyGuildUpdated(message.type, GameInstance.JoinedGuild);
         }
 
         public void HandleUpdateFriends(MessageHandlerData messageHandler)

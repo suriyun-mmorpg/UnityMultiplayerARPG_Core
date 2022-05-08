@@ -25,7 +25,8 @@ namespace MultiplayerARPG
         public static System.Action<ResponseHandlerData, AckResponseCode, ResponseFindGuildsMessage> onResponseFindGuilds;
         public static System.Action<ResponseHandlerData, AckResponseCode, ResponseGetGuildInfoMessage> onResponseGetGuildInfo;
         public static System.Action<GuildInvitationData> onNotifyGuildInvitation;
-        public static System.Action<GuildData> onNotifyGuildUpdated;
+        public static System.Action<UpdateGuildMessage.UpdateType, GuildData> onNotifyGuildUpdated;
+        public static System.Action<UpdateSocialMemberMessage.UpdateType, int, SocialCharacterData> onNotifyGuildMemberUpdated;
 
         public static void ResponseSendGuildInvitation(ResponseHandlerData requestHandler, AckResponseCode responseCode, ResponseSendGuildInvitationMessage response)
         {
@@ -173,10 +174,10 @@ namespace MultiplayerARPG
                 onNotifyGuildInvitation.Invoke(invitation);
         }
 
-        public static void NotifyGuildUpdated(GuildData guild)
+        public static void NotifyGuildUpdated(UpdateGuildMessage.UpdateType updateType, GuildData guild)
         {
             if (onNotifyGuildUpdated != null)
-                onNotifyGuildUpdated.Invoke(guild);
+                onNotifyGuildUpdated.Invoke(updateType, guild);
             if (guild == null)
                 return;
             GuildInfoCacheManager.SetCache(new GuildListEntry()
@@ -194,6 +195,12 @@ namespace MultiplayerARPG
                 CurrentMembers = guild.CountMember(),
                 MaxMembers = guild.MaxMember(),
             });
+        }
+
+        public static void NotifyGuildMemberUpdated(UpdateSocialMemberMessage.UpdateType updateType, int socialId, SocialCharacterData character)
+        {
+            if (onNotifyGuildMemberUpdated != null)
+                onNotifyGuildMemberUpdated.Invoke(updateType, socialId, character);
         }
     }
 }

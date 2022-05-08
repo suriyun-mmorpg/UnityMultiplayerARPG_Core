@@ -10,6 +10,7 @@ namespace MultiplayerARPG
             ChangeLeader,
             Setting,
             Terminate,
+            Member,
         }
         public UpdateType type;
         public int id;

@@ -34,7 +34,7 @@ namespace MultiplayerARPG
         protected override void OnEnable()
         {
             base.OnEnable();
-            UpdatePartyUIs(Party);
+            UpdatePartyUIs(UpdatePartyMessage.UpdateType.Member, Party);
             ClientPartyActions.onNotifyPartyUpdated += UpdatePartyUIs;
         }
 
@@ -48,7 +48,7 @@ namespace MultiplayerARPG
             ClientPartyActions.onNotifyPartyUpdated -= UpdatePartyUIs;
         }
 
-        private void UpdatePartyUIs(PartyData party)
+        private void UpdatePartyUIs(UpdatePartyMessage.UpdateType updateType, PartyData party)
         {
             if (party == null)
                 return;

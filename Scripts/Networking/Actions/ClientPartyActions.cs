@@ -13,7 +13,8 @@ namespace MultiplayerARPG
         public static System.Action<ResponseHandlerData, AckResponseCode, ResponseLeavePartyMessage> onResponseLeaveParty;
         public static System.Action<ResponseHandlerData, AckResponseCode, ResponseChangePartySettingMessage> onResponseChangePartySetting;
         public static System.Action<PartyInvitationData> onNotifyPartyInvitation;
-        public static System.Action<PartyData> onNotifyPartyUpdated;
+        public static System.Action<UpdatePartyMessage.UpdateType, PartyData> onNotifyPartyUpdated;
+        public static System.Action<UpdateSocialMemberMessage.UpdateType, int, SocialCharacterData> onNotifyPartyMemberUpdated;
 
         public static void ResponseSendPartyInvitation(ResponseHandlerData requestHandler, AckResponseCode responseCode, ResponseSendPartyInvitationMessage response)
         {
@@ -77,10 +78,16 @@ namespace MultiplayerARPG
                 onNotifyPartyInvitation.Invoke(invitation);
         }
 
-        public static void NotifyPartyUpdated(PartyData party)
+        public static void NotifyPartyUpdated(UpdatePartyMessage.UpdateType updateType, PartyData party)
         {
             if (onNotifyPartyUpdated != null)
-                onNotifyPartyUpdated.Invoke(party);
+                onNotifyPartyUpdated.Invoke(updateType, party);
+        }
+
+        public static void NotifyPartyMemberUpdated(UpdateSocialMemberMessage.UpdateType updateType, int socialId, SocialCharacterData character)
+        {
+            if (onNotifyPartyMemberUpdated != null)
+                onNotifyPartyMemberUpdated.Invoke(updateType, socialId, character);
         }
     }
 }

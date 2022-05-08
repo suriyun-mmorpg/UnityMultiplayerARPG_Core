@@ -21,6 +21,7 @@ namespace MultiplayerARPG
             SetAutoAcceptRequests,
             SetRank,
             UpdateStorage,
+            Member,
         }
         public UpdateType type;
         public int id;
