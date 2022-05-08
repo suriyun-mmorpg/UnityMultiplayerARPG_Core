@@ -29,6 +29,14 @@ namespace MultiplayerARPG
         public GameObject[] memberIsLeaderObjects;
         [Tooltip("These objects will be activated when this social member is not leader")]
         public GameObject[] memberIsNotLeaderObjects;
+        [Tooltip("These objects will be activated when owning character is leader")]
+        public GameObject[] owningCharacterIsLeaderObjects;
+        [Tooltip("These objects will be activated when owning character is not leader")]
+        public GameObject[] owningCharacterIsNotLeaderObjects;
+        [Tooltip("These objects will be activated when owning character can kick")]
+        public GameObject[] owningCharacterCanKickObjects;
+        [Tooltip("These objects will be activated when owning character cannot kick")]
+        public GameObject[] owningCharacterCannotKickObjects;
         public UICharacterClass uiCharacterClass;
 
         [Header("Events")]
@@ -39,6 +47,10 @@ namespace MultiplayerARPG
         public UnityEvent onFriendRequestDeclined = new UnityEvent();
         public UnityEvent onGuildRequestAccepted = new UnityEvent();
         public UnityEvent onGuildRequestDeclined = new UnityEvent();
+        public UnityEvent onPartyInvitationSent = new UnityEvent();
+        public UnityEvent onGuildInvitationSent = new UnityEvent();
+        public UnityEvent onPartyMemberKicked = new UnityEvent();
+        public UnityEvent onGuildMemberKicked = new UnityEvent();
 
         private string dirtyCharacterId;
         private IPlayerCharacterData characterEntity;
@@ -135,6 +147,30 @@ namespace MultiplayerARPG
             {
                 if (obj != null)
                     obj.SetActive(string.IsNullOrEmpty(Data.id) || !uiSocialGroup.IsLeader(Data.id));
+            }
+
+            foreach (GameObject obj in owningCharacterIsLeaderObjects)
+            {
+                if (obj != null)
+                    obj.SetActive(uiSocialGroup.OwningCharacterIsLeader());
+            }
+
+            foreach (GameObject obj in owningCharacterIsNotLeaderObjects)
+            {
+                if (obj != null)
+                    obj.SetActive(!uiSocialGroup.OwningCharacterIsLeader());
+            }
+
+            foreach (GameObject obj in owningCharacterCanKickObjects)
+            {
+                if (obj != null)
+                    obj.SetActive(uiSocialGroup.OwningCharacterCanKick());
+            }
+
+            foreach (GameObject obj in owningCharacterCannotKickObjects)
+            {
+                if (obj != null)
+                    obj.SetActive(!uiSocialGroup.OwningCharacterCanKick());
             }
 
             // Character class data
@@ -263,6 +299,72 @@ namespace MultiplayerARPG
             ClientGuildActions.ResponseDeclineGuildRequest(responseHandler, responseCode, response);
             if (responseCode.ShowUnhandledResponseMessageDialog(response.message)) return;
             onGuildRequestDeclined.Invoke();
+        }
+
+        public void OnClickSendPartyInvitation()
+        {
+            GameInstance.ClientPartyHandlers.RequestSendPartyInvitation(new RequestSendPartyInvitationMessage()
+            {
+                inviteeId = Data.id,
+            }, SendPartyInvitationCallback);
+        }
+
+        private void SendPartyInvitationCallback(ResponseHandlerData responseHandler, AckResponseCode responseCode, ResponseSendPartyInvitationMessage response)
+        {
+            ClientPartyActions.ResponseSendPartyInvitation(responseHandler, responseCode, response);
+            if (responseCode.ShowUnhandledResponseMessageDialog(response.message)) return;
+            onPartyInvitationSent.Invoke();
+        }
+
+        public void OnClickSendGuildInvitation()
+        {
+            GameInstance.ClientGuildHandlers.RequestSendGuildInvitation(new RequestSendGuildInvitationMessage()
+            {
+                inviteeId = Data.id,
+            }, SendGuildInvitationCallback);
+        }
+
+        private void SendGuildInvitationCallback(ResponseHandlerData responseHandler, AckResponseCode responseCode, ResponseSendGuildInvitationMessage response)
+        {
+            ClientGuildActions.ResponseSendGuildInvitation(responseHandler, responseCode, response);
+            if (responseCode.ShowUnhandledResponseMessageDialog(response.message)) return;
+            onGuildInvitationSent.Invoke();
+        }
+
+        public void OnClickKickFromParty()
+        {
+            UISceneGlobal.Singleton.ShowMessageDialog(LanguageManager.GetText(UITextKeys.UI_PARTY_KICK_MEMBER.ToString()), string.Format(LanguageManager.GetText(UITextKeys.UI_PARTY_KICK_MEMBER_DESCRIPTION.ToString()), Data.characterName), false, true, true, false, null, () =>
+            {
+                GameInstance.ClientPartyHandlers.RequestKickMemberFromParty(new RequestKickMemberFromPartyMessage()
+                {
+                    memberId = Data.id,
+                }, KickMemberFromPartyCallback);
+            });
+        }
+
+        private void KickMemberFromPartyCallback(ResponseHandlerData requestHandler, AckResponseCode responseCode, ResponseKickMemberFromPartyMessage response)
+        {
+            ClientPartyActions.ResponseKickMemberFromParty(requestHandler, responseCode, response);
+            if (responseCode.ShowUnhandledResponseMessageDialog(response.message)) return;
+            onPartyMemberKicked.Invoke();
+        }
+
+        public void OnClickKickFromGuild()
+        {
+            UISceneGlobal.Singleton.ShowMessageDialog(LanguageManager.GetText(UITextKeys.UI_GUILD_KICK_MEMBER.ToString()), string.Format(LanguageManager.GetText(UITextKeys.UI_GUILD_KICK_MEMBER_DESCRIPTION.ToString()), Data.characterName), false, true, true, false, null, () =>
+            {
+                GameInstance.ClientGuildHandlers.RequestKickMemberFromGuild(new RequestKickMemberFromGuildMessage()
+                {
+                    memberId = Data.id,
+                }, KickMemberFromGuildCallback);
+            });
+        }
+
+        private void KickMemberFromGuildCallback(ResponseHandlerData requestHandler, AckResponseCode responseCode, ResponseKickMemberFromGuildMessage response)
+        {
+            ClientGuildActions.ResponseKickMemberFromGuild(requestHandler, responseCode, response);
+            if (responseCode.ShowUnhandledResponseMessageDialog(response.message)) return;
+            onGuildMemberKicked.Invoke();
         }
     }
 }

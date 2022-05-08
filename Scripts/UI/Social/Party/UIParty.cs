@@ -118,28 +118,6 @@ namespace MultiplayerARPG
                 uiPartySetting.Show(Party.shareExp, Party.shareItem);
         }
 
-        public void OnClickKickFromParty()
-        {
-            // If not in the party or not leader, return
-            if (!OwningCharacterCanKick() || MemberSelectionManager.SelectedUI == null)
-                return;
-
-            SocialCharacterData partyMember = MemberSelectionManager.SelectedUI.Data;
-            UISceneGlobal.Singleton.ShowMessageDialog(LanguageManager.GetText(UITextKeys.UI_PARTY_KICK_MEMBER.ToString()), string.Format(LanguageManager.GetText(UITextKeys.UI_PARTY_KICK_MEMBER_DESCRIPTION.ToString()), partyMember.characterName), false, true, true, false, null, () =>
-            {
-                GameInstance.ClientPartyHandlers.RequestKickMemberFromParty(new RequestKickMemberFromPartyMessage()
-                {
-                    memberId = partyMember.id,
-                }, KickMemberFromPartyCallback);
-            });
-        }
-
-        private void KickMemberFromPartyCallback(ResponseHandlerData requestHandler, AckResponseCode responseCode, ResponseKickMemberFromPartyMessage response)
-        {
-            ClientPartyActions.ResponseKickMemberFromParty(requestHandler, responseCode, response);
-            if (responseCode.ShowUnhandledResponseMessageDialog(response.message)) return;
-        }
-
         public void OnClickLeaveParty()
         {
             UISceneGlobal.Singleton.ShowMessageDialog(LanguageManager.GetText(UITextKeys.UI_PARTY_LEAVE.ToString()), LanguageManager.GetText(UITextKeys.UI_PARTY_LEAVE_DESCRIPTION.ToString()), false, true, true, false, null, () =>

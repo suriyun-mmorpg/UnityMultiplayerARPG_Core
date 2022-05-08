@@ -50,9 +50,12 @@ namespace MultiplayerARPG
         public UnityEvent onFriendRequested = new UnityEvent();
         public UnityEvent onFriendRequestAccepted = new UnityEvent();
         public UnityEvent onFriendRequestDeclined = new UnityEvent();
-        public UnityEvent onPartyInvited = new UnityEvent();
-        public UnityEvent onGuildInvited = new UnityEvent();
-
+        public UnityEvent onGuildRequestAccepted = new UnityEvent();
+        public UnityEvent onGuildRequestDeclined = new UnityEvent();
+        public UnityEvent onPartyInvitationSent = new UnityEvent();
+        public UnityEvent onGuildInvitationSent = new UnityEvent();
+        public UnityEvent onPartyMemberKicked = new UnityEvent();
+        public UnityEvent onGuildMemberKicked = new UnityEvent();
 
         protected int currentSocialId = 0;
         public int memberAmount { get; protected set; }
@@ -300,6 +303,44 @@ namespace MultiplayerARPG
             onFriendRequestDeclined.Invoke();
         }
 
+        public void OnClickAcceptGuildRequest()
+        {
+            if (MemberSelectionManager.SelectedUI == null)
+                return;
+
+            SocialCharacterData character = MemberSelectionManager.SelectedUI.Data;
+            GameInstance.ClientGuildHandlers.RequestAcceptGuildRequest(new RequestAcceptGuildRequestMessage()
+            {
+                requesterId = character.id,
+            }, AcceptGuildRequestCallback);
+        }
+
+        private void AcceptGuildRequestCallback(ResponseHandlerData responseHandler, AckResponseCode responseCode, ResponseAcceptGuildRequestMessage response)
+        {
+            ClientGuildActions.ResponseAcceptGuildRequest(responseHandler, responseCode, response);
+            if (responseCode.ShowUnhandledResponseMessageDialog(response.message)) return;
+            onGuildRequestAccepted.Invoke();
+        }
+
+        public void OnClickDeclineGuildRequest()
+        {
+            if (MemberSelectionManager.SelectedUI == null)
+                return;
+
+            SocialCharacterData character = MemberSelectionManager.SelectedUI.Data;
+            GameInstance.ClientGuildHandlers.RequestDeclineGuildRequest(new RequestDeclineGuildRequestMessage()
+            {
+                requesterId = character.id,
+            }, DeclineGuildRequestCallback);
+        }
+
+        private void DeclineGuildRequestCallback(ResponseHandlerData responseHandler, AckResponseCode responseCode, ResponseDeclineGuildRequestMessage response)
+        {
+            ClientGuildActions.ResponseDeclineGuildRequest(responseHandler, responseCode, response);
+            if (responseCode.ShowUnhandledResponseMessageDialog(response.message)) return;
+            onGuildRequestDeclined.Invoke();
+        }
+
         public void OnClickSendPartyInvitation()
         {
             if (MemberSelectionManager.SelectedUI == null)
@@ -316,7 +357,7 @@ namespace MultiplayerARPG
         {
             ClientPartyActions.ResponseSendPartyInvitation(responseHandler, responseCode, response);
             if (responseCode.ShowUnhandledResponseMessageDialog(response.message)) return;
-            onPartyInvited.Invoke();
+            onPartyInvitationSent.Invoke();
         }
 
         public void OnClickSendGuildInvitation()
@@ -335,7 +376,51 @@ namespace MultiplayerARPG
         {
             ClientGuildActions.ResponseSendGuildInvitation(responseHandler, responseCode, response);
             if (responseCode.ShowUnhandledResponseMessageDialog(response.message)) return;
-            onGuildInvited.Invoke();
+            onGuildInvitationSent.Invoke();
+        }
+
+        public void OnClickKickFromParty()
+        {
+            if (MemberSelectionManager.SelectedUI == null)
+                return;
+
+            SocialCharacterData partyMember = MemberSelectionManager.SelectedUI.Data;
+            UISceneGlobal.Singleton.ShowMessageDialog(LanguageManager.GetText(UITextKeys.UI_PARTY_KICK_MEMBER.ToString()), string.Format(LanguageManager.GetText(UITextKeys.UI_PARTY_KICK_MEMBER_DESCRIPTION.ToString()), partyMember.characterName), false, true, true, false, null, () =>
+            {
+                GameInstance.ClientPartyHandlers.RequestKickMemberFromParty(new RequestKickMemberFromPartyMessage()
+                {
+                    memberId = partyMember.id,
+                }, KickMemberFromPartyCallback);
+            });
+        }
+
+        private void KickMemberFromPartyCallback(ResponseHandlerData requestHandler, AckResponseCode responseCode, ResponseKickMemberFromPartyMessage response)
+        {
+            ClientPartyActions.ResponseKickMemberFromParty(requestHandler, responseCode, response);
+            if (responseCode.ShowUnhandledResponseMessageDialog(response.message)) return;
+            onPartyMemberKicked.Invoke();
+        }
+
+        public void OnClickKickFromGuild()
+        {
+            if (MemberSelectionManager.SelectedUI == null)
+                return;
+
+            SocialCharacterData guildMember = MemberSelectionManager.SelectedUI.Data;
+            UISceneGlobal.Singleton.ShowMessageDialog(LanguageManager.GetText(UITextKeys.UI_GUILD_KICK_MEMBER.ToString()), string.Format(LanguageManager.GetText(UITextKeys.UI_GUILD_KICK_MEMBER_DESCRIPTION.ToString()), guildMember.characterName), false, true, true, false, null, () =>
+            {
+                GameInstance.ClientGuildHandlers.RequestKickMemberFromGuild(new RequestKickMemberFromGuildMessage()
+                {
+                    memberId = guildMember.id,
+                }, KickMemberFromGuildCallback);
+            });
+        }
+
+        private void KickMemberFromGuildCallback(ResponseHandlerData requestHandler, AckResponseCode responseCode, ResponseKickMemberFromGuildMessage response)
+        {
+            ClientGuildActions.ResponseKickMemberFromGuild(requestHandler, responseCode, response);
+            if (responseCode.ShowUnhandledResponseMessageDialog(response.message)) return;
+            onGuildMemberKicked.Invoke();
         }
     }
 }

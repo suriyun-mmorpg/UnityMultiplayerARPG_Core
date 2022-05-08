@@ -518,28 +518,6 @@ namespace MultiplayerARPG
             GuildIconUpdater.UpdateData();
         }
 
-        public void OnClickKickFromGuild()
-        {
-            // If not in the guild or not leader, return
-            if (!OwningCharacterCanKick() || MemberSelectionManager.SelectedUI == null)
-                return;
-
-            SocialCharacterData guildMember = MemberSelectionManager.SelectedUI.Data;
-            UISceneGlobal.Singleton.ShowMessageDialog(LanguageManager.GetText(UITextKeys.UI_GUILD_KICK_MEMBER.ToString()), string.Format(LanguageManager.GetText(UITextKeys.UI_GUILD_KICK_MEMBER_DESCRIPTION.ToString()), guildMember.characterName), false, true, true, false, null, () =>
-            {
-                GameInstance.ClientGuildHandlers.RequestKickMemberFromGuild(new RequestKickMemberFromGuildMessage()
-                {
-                    memberId = guildMember.id,
-                }, KickMemberFromGuildCallback);
-            });
-        }
-
-        private void KickMemberFromGuildCallback(ResponseHandlerData requestHandler, AckResponseCode responseCode, ResponseKickMemberFromGuildMessage response)
-        {
-            ClientGuildActions.ResponseKickMemberFromGuild(requestHandler, responseCode, response);
-            if (responseCode.ShowUnhandledResponseMessageDialog(response.message)) return;
-        }
-
         public void OnClickLeaveGuild()
         {
             UISceneGlobal.Singleton.ShowMessageDialog(LanguageManager.GetText(UITextKeys.UI_GUILD_LEAVE.ToString()), LanguageManager.GetText(UITextKeys.UI_GUILD_LEAVE_DESCRIPTION.ToString()), false, true, true, false, null, () =>
