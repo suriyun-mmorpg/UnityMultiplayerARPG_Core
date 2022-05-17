@@ -324,7 +324,7 @@ namespace MultiplayerARPG
 
             if (uiRequirement != null)
             {
-                if (Skill == null ||
+                if (Skill == null || Level <= 0 ||
                     (!Skill.IsDisallowToLevelUp(Level) &&
                     Skill.GetRequireCharacterLevel(Level) <= 0 &&
                     Skill.GetRequireCharacterSkillPoint(Level) <= 0 &&
