@@ -134,7 +134,7 @@ namespace MultiplayerARPG
             switch (type)
             {
                 case NpcDialogType.Normal:
-                    if (uiNpcDialog.onSwitchToNormalDialog == null)
+                    if (uiNpcDialog.onSwitchToNormalDialog != null)
                         uiNpcDialog.onSwitchToNormalDialog.Invoke();
                     for (int i = 0; i < menus.Length; ++i)
                     {
@@ -149,7 +149,7 @@ namespace MultiplayerARPG
                     }
                     break;
                 case NpcDialogType.Quest:
-                    if (uiNpcDialog.onSwitchToQuestDialog == null)
+                    if (uiNpcDialog.onSwitchToQuestDialog != null)
                         uiNpcDialog.onSwitchToQuestDialog.Invoke();
                     if (uiNpcDialog.uiCharacterQuest != null)
                     {
@@ -190,7 +190,7 @@ namespace MultiplayerARPG
                     }
                     break;
                 case NpcDialogType.Shop:
-                    if (uiNpcDialog.onSwitchToSellItemDialog == null)
+                    if (uiNpcDialog.onSwitchToSellItemDialog != null)
                         uiNpcDialog.onSwitchToSellItemDialog.Invoke();
                     if (uiNpcDialog.uiSellItemRoot != null)
                         uiNpcDialog.uiSellItemRoot.SetActive(true);
@@ -204,7 +204,7 @@ namespace MultiplayerARPG
                     });
                     break;
                 case NpcDialogType.CraftItem:
-                    if (uiNpcDialog.onSwitchToCraftItemDialog == null)
+                    if (uiNpcDialog.onSwitchToCraftItemDialog != null)
                         uiNpcDialog.onSwitchToCraftItemDialog.Invoke();
                     if (uiNpcDialog.uiCraftItem != null)
                     {
