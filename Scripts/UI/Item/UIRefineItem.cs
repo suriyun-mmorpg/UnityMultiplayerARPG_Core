@@ -91,6 +91,7 @@ namespace MultiplayerARPG
                             break;
                         case UITextKeys.UI_ERROR_NOT_ENOUGH_GOLD:
                         case UITextKeys.UI_ERROR_NOT_ENOUGH_ITEMS:
+                        case UITextKeys.UI_ERROR_NOT_ENOUGH_CURRENCY_AMOUNTS:
                             refineLevel = EquipmentItem.ItemRefine.Levels[Level - 1];
                             break;
                     }
