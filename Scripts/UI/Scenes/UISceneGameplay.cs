@@ -186,10 +186,10 @@ namespace MultiplayerARPG
 
         protected override void Update()
         {
+            base.Update();
+
             if (GenericUtils.IsFocusInputField())
                 return;
-
-            base.Update();
 
             foreach (UIToggleUI toggleUi in toggleUis)
             {
