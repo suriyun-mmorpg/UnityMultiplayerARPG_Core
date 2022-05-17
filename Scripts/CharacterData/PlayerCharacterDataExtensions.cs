@@ -876,11 +876,16 @@ namespace MultiplayerARPG
             }
 
             short countSkillPoint = 0;
+            BaseSkill skill;
             CharacterSkill characterSkill;
             for (int i = 0; i < characterData.Skills.Count; ++i)
             {
                 characterSkill = characterData.Skills[i];
-                countSkillPoint += characterSkill.level;
+                skill = characterSkill.GetSkill();
+                for (short j = 0; j < characterSkill.level; ++j)
+                {
+                    countSkillPoint += (short)Mathf.CeilToInt(skill.GetRequireCharacterSkillPoint(j));
+                }
             }
             characterData.Skills.Clear();
             characterData.SkillPoint += countSkillPoint;
