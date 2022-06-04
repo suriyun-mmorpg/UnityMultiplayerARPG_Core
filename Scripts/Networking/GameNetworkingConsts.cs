@@ -22,6 +22,9 @@
         public const ushort NotifyStorageItemsUpdated = 116;
         public const ushort NotifyPartyInvitation = 117;
         public const ushort NotifyGuildInvitation = 118;
+        public const ushort NotifyRewardCurrency = 171;
+        public const ushort EntityState = 165;
+        public const ushort HitRegistration = 166;
         // Networking requests/responses
         public const ushort CashShopInfo = 100;
         public const ushort CashShopBuy = 101;
@@ -87,10 +90,6 @@
         public const ushort SendGuildRequest = 161;
         public const ushort AcceptGuildRequest = 162;
         public const ushort DeclineGuildRequest = 163;
-        // Entity movement
-        public const ushort EntityState = 165;
-        // New notify type
-        public const ushort NotifyRewardCurrency = 171;
         // 1.63c
         public const ushort Respawn = 172;
         // 1.64
@@ -109,7 +108,5 @@
         public const ushort OpenGacha = 188;
         // 1.73
         public const ushort GetGuildInfo = 189;
-        // 1.74
-        public const ushort HitRegistration = 166;
     }
 }
