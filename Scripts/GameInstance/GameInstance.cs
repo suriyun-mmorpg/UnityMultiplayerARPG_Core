@@ -38,7 +38,8 @@ namespace MultiplayerARPG
     public enum TestInEditorMode
     {
         Standalone,
-        Mobile
+        Mobile,
+        MobileWithKeyInputs,
     } // TODO: Add console mode
 
     [DefaultExecutionOrder(-999)]
@@ -422,7 +423,7 @@ namespace MultiplayerARPG
         {
             get
             {
-                if ((Application.isMobilePlatform || (testInEditorMode == TestInEditorMode.Mobile && Application.isEditor)) && uiSceneGameplayMobilePrefab != null)
+                if ((Application.isMobilePlatform || IsMobileTestInEditor()) && uiSceneGameplayMobilePrefab != null)
                     return uiSceneGameplayMobilePrefab;
                 return uiSceneGameplayPrefab;
             }
@@ -432,7 +433,7 @@ namespace MultiplayerARPG
         {
             get
             {
-                if ((Application.isMobilePlatform || (testInEditorMode == TestInEditorMode.Mobile && Application.isEditor)) && homeMobileScene.IsSet())
+                if ((Application.isMobilePlatform || IsMobileTestInEditor()) && homeMobileScene.IsSet())
                     return homeMobileScene;
                 return homeScene;
             }
@@ -556,7 +557,8 @@ namespace MultiplayerARPG
             DontDestroyOnLoad(gameObject);
             Singleton = this;
 
-            InputManager.useMobileInputOnNonMobile = testInEditorMode == TestInEditorMode.Mobile && Application.isEditor;
+            InputManager.useMobileInputOnNonMobile = IsMobileTestInEditor();
+            InputManager.useNonMobileInput = testInEditorMode == TestInEditorMode.MobileWithKeyInputs && Application.isEditor;
 
             DefaultArmorType = ScriptableObject.CreateInstance<ArmorType>()
                 .GenerateDefaultArmorType();
@@ -679,6 +681,11 @@ namespace MultiplayerARPG
             PoolingObjectPrefabs.Clear();
             OtherNetworkObjectPrefabs.Clear();
             GameEntityModel.GeneratingId = 0;
+        }
+
+        public bool IsMobileTestInEditor()
+        {
+            return (testInEditorMode == TestInEditorMode.Mobile || testInEditorMode == TestInEditorMode.MobileWithKeyInputs) && Application.isEditor;
         }
 
         public void LoadedGameData()
