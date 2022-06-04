@@ -2,6 +2,6 @@
 {
     public partial class BaseCharacterEntity
     {
-        // NOTE: This file will be removed in the future version
+        // TODO: This file will be removed in future version (codes were moved to _NetworkData)
     }
 }

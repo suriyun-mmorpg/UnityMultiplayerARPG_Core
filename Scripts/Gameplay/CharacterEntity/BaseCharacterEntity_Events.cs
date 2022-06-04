@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using LiteNetLibManager;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
 
@@ -12,10 +13,44 @@ namespace MultiplayerARPG
         public UnityEvent onDead = new UnityEvent();
         public UnityEvent onRespawn = new UnityEvent();
         public UnityEvent onLevelUp = new UnityEvent();
+        // Sync variables
+        public event System.Action<string> onIdChange;
+        public event System.Action<string> onCharacterNameChange;
+        public event System.Action<short> onLevelChange;
+        public event System.Action<int> onExpChange;
+        public event System.Action<bool> onIsImmuneChange;
+        public event System.Action<int> onCurrentHpChange;
+        public event System.Action<int> onCurrentMpChange;
+        public event System.Action<int> onCurrentFoodChange;
+        public event System.Action<int> onCurrentWaterChange;
+        public event System.Action<byte> onEquipWeaponSetChange;
+        public event System.Action<byte> onPitchChange;
+        public event System.Action<uint> onTargetEntityIdChange;
+        // Sync lists
+        public event System.Action<LiteNetLibSyncList.Operation, int> onSelectableWeaponSetsOperation;
+        public event System.Action<LiteNetLibSyncList.Operation, int> onAttributesOperation;
+        public event System.Action<LiteNetLibSyncList.Operation, int> onSkillsOperation;
+        public event System.Action<LiteNetLibSyncList.Operation, int> onSkillUsagesOperation;
+        public event System.Action<LiteNetLibSyncList.Operation, int> onBuffsOperation;
+        public event System.Action<LiteNetLibSyncList.Operation, int> onEquipItemsOperation;
+        public event System.Action<LiteNetLibSyncList.Operation, int> onNonEquipItemsOperation;
+        public event System.Action<LiteNetLibSyncList.Operation, int> onSummonsOperation;
         // Action events
         public event AttackRoutineDelegate onAttackRoutine;
         public event UseSkillRoutineDelegate onUseSkillRoutine;
         public event LaunchDamageEntityDelegate onLaunchDamageEntity;
+        // Buff events
+        public event ApplyBuffDelegate onApplyBuff;
+        public event AppliedRecoveryAmountDelegate onBuffHpRecovery;
+        public event AppliedRecoveryAmountDelegate onBuffHpDecrease;
+        public event AppliedRecoveryAmountDelegate onBuffMpRecovery;
+        public event AppliedRecoveryAmountDelegate onBuffMpDecrease;
+        public event AppliedRecoveryAmountDelegate onBuffStaminaRecovery;
+        public event AppliedRecoveryAmountDelegate onBuffStaminaDecrease;
+        public event AppliedRecoveryAmountDelegate onBuffFoodRecovery;
+        public event AppliedRecoveryAmountDelegate onBuffFoodDecrease;
+        public event AppliedRecoveryAmountDelegate onBuffWaterRecovery;
+        public event AppliedRecoveryAmountDelegate onBuffWaterDecrease;
 
         public void OnAttackRoutine(
             bool isLeftHand,

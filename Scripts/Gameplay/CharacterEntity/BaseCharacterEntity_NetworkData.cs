@@ -194,31 +194,6 @@ namespace MultiplayerARPG
         }
         #endregion
 
-        #region Events
-        // Sync variables
-        public event System.Action<string> onIdChange;
-        public event System.Action<string> onCharacterNameChange;
-        public event System.Action<short> onLevelChange;
-        public event System.Action<int> onExpChange;
-        public event System.Action<bool> onIsImmuneChange;
-        public event System.Action<int> onCurrentHpChange;
-        public event System.Action<int> onCurrentMpChange;
-        public event System.Action<int> onCurrentFoodChange;
-        public event System.Action<int> onCurrentWaterChange;
-        public event System.Action<byte> onEquipWeaponSetChange;
-        public event System.Action<byte> onPitchChange;
-        public event System.Action<uint> onTargetEntityIdChange;
-        // Sync lists
-        public event System.Action<LiteNetLibSyncList.Operation, int> onSelectableWeaponSetsOperation;
-        public event System.Action<LiteNetLibSyncList.Operation, int> onAttributesOperation;
-        public event System.Action<LiteNetLibSyncList.Operation, int> onSkillsOperation;
-        public event System.Action<LiteNetLibSyncList.Operation, int> onSkillUsagesOperation;
-        public event System.Action<LiteNetLibSyncList.Operation, int> onBuffsOperation;
-        public event System.Action<LiteNetLibSyncList.Operation, int> onEquipItemsOperation;
-        public event System.Action<LiteNetLibSyncList.Operation, int> onNonEquipItemsOperation;
-        public event System.Action<LiteNetLibSyncList.Operation, int> onSummonsOperation;
-        #endregion
-
         #region Network setup functions
         protected override void SetupNetElements()
         {
@@ -598,6 +573,7 @@ namespace MultiplayerARPG
         }
         #endregion
 
+        #region Other functions
         protected void SetEquipWeaponsModels()
         {
             CharacterModel.SetEquipWeapons(EquipWeapons);
@@ -611,5 +587,6 @@ namespace MultiplayerARPG
             if (FpsModel)
                 FpsModel.SetEquipItems(EquipItems);
         }
+        #endregion
     }
 }

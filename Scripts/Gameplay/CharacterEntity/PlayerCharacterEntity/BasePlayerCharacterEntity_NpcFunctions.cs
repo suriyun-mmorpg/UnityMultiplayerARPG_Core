@@ -1,6 +1,4 @@
-﻿using LiteNetLibManager;
-
-namespace MultiplayerARPG
+﻿namespace MultiplayerARPG
 {
     public partial class BasePlayerCharacterEntity
     {
