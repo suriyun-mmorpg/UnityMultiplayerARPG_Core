@@ -61,7 +61,8 @@ namespace MultiplayerARPG
     public delegate void ApplyBuffDelegate(
         int dataId,
         BuffType type,
-        short level);
+        short level,
+        EntityInfo buffApplier);
 
     public delegate void CharacterStatsDelegate(
         ref CharacterStats a,

@@ -4,6 +4,8 @@ namespace MultiplayerARPG
 {
     public partial class BaseCharacterEntity
     {
+        #region Events
+        public event ApplyBuffDelegate onApplyBuff;
         public event AppliedRecoveryAmountDelegate onBuffHpRecovery;
         public event AppliedRecoveryAmountDelegate onBuffHpDecrease;
         public event AppliedRecoveryAmountDelegate onBuffMpRecovery;
@@ -14,8 +16,9 @@ namespace MultiplayerARPG
         public event AppliedRecoveryAmountDelegate onBuffFoodDecrease;
         public event AppliedRecoveryAmountDelegate onBuffWaterRecovery;
         public event AppliedRecoveryAmountDelegate onBuffWaterDecrease;
+        #endregion
 
-        public void ApplyBuff(int dataId, BuffType type, short level, EntityInfo buffApplier)
+        public virtual void ApplyBuff(int dataId, BuffType type, short level, EntityInfo buffApplier)
         {
             if (!IsServer || this.IsDead())
                 return;
@@ -109,7 +112,8 @@ namespace MultiplayerARPG
                 recoveryData.Apply(1f);
             }
 
-            OnApplyBuff(dataId, type, level);
+            if (onApplyBuff != null)
+                onApplyBuff.Invoke(dataId, type, level, buffApplier);
         }
 
         public virtual void OnBuffHpRecovery(EntityInfo causer, int amount)

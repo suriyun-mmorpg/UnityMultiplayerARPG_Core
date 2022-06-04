@@ -1,5 +1,4 @@
-﻿using LiteNetLibManager;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
 
@@ -17,29 +16,6 @@ namespace MultiplayerARPG
         public event AttackRoutineDelegate onAttackRoutine;
         public event UseSkillRoutineDelegate onUseSkillRoutine;
         public event LaunchDamageEntityDelegate onLaunchDamageEntity;
-        public event ApplyBuffDelegate onApplyBuff;
-        // Sync variables
-        public event System.Action<string> onIdChange;
-        public event System.Action<string> onCharacterNameChange;
-        public event System.Action<short> onLevelChange;
-        public event System.Action<int> onExpChange;
-        public event System.Action<bool> onIsImmuneChange;
-        public event System.Action<int> onCurrentHpChange;
-        public event System.Action<int> onCurrentMpChange;
-        public event System.Action<int> onCurrentFoodChange;
-        public event System.Action<int> onCurrentWaterChange;
-        public event System.Action<byte> onEquipWeaponSetChange;
-        public event System.Action<byte> onPitchChange;
-        public event System.Action<uint> onTargetEntityIdChange;
-        // Sync lists
-        public event System.Action<LiteNetLibSyncList.Operation, int> onSelectableWeaponSetsOperation;
-        public event System.Action<LiteNetLibSyncList.Operation, int> onAttributesOperation;
-        public event System.Action<LiteNetLibSyncList.Operation, int> onSkillsOperation;
-        public event System.Action<LiteNetLibSyncList.Operation, int> onSkillUsagesOperation;
-        public event System.Action<LiteNetLibSyncList.Operation, int> onBuffsOperation;
-        public event System.Action<LiteNetLibSyncList.Operation, int> onEquipItemsOperation;
-        public event System.Action<LiteNetLibSyncList.Operation, int> onNonEquipItemsOperation;
-        public event System.Action<LiteNetLibSyncList.Operation, int> onSummonsOperation;
 
         public void OnAttackRoutine(
             bool isLeftHand,
@@ -80,15 +56,6 @@ namespace MultiplayerARPG
         {
             if (onLaunchDamageEntity != null)
                 onLaunchDamageEntity.Invoke(isLeftHand, weapon, damageAmounts, skill, skillLevel, randomSeed, aimPosition, stagger, hitBoxes);
-        }
-
-        public void OnApplyBuff(
-            int dataId,
-            BuffType type,
-            short level)
-        {
-            if (onApplyBuff != null)
-                onApplyBuff.Invoke(dataId, type, level);
         }
     }
 }
