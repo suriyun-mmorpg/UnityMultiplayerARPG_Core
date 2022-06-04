@@ -127,6 +127,9 @@ namespace MultiplayerARPG
         protected float lastUseItemTime;
         protected float lastActionTime;
         protected float pushGameMessageCountDown;
+        protected bool canCheckGrounded;
+        protected bool lastGrounded;
+        protected Vector3 lastGroundedPosition;
         protected readonly Queue<UITextKeys> pushingGameMessages = new Queue<UITextKeys>();
         #endregion
 
@@ -241,10 +244,17 @@ namespace MultiplayerARPG
             if (IsServer && CurrentGameInstance.DimensionType == DimensionType.Dimension3D)
             {
                 // Ground check / ground damage will be calculated at server while dimension type is 3d only
-                if (!lastGrounded && MovementState.Has(MovementState.IsGrounded))
+                if (!canCheckGrounded)
                 {
-                    // Apply fall damage when not passenging vehicle
-                    CurrentGameplayRule.ApplyFallDamage(this, lastGroundedPosition);
+                    canCheckGrounded = true;
+                }
+                else
+                {
+                    if (!lastGrounded && MovementState.Has(MovementState.IsGrounded))
+                    {
+                        // Apply fall damage when not passenging vehicle
+                        CurrentGameplayRule.ApplyFallDamage(this, lastGroundedPosition);
+                    }
                 }
                 lastGrounded = MovementState.Has(MovementState.IsGrounded);
                 if (lastGrounded)
@@ -447,6 +457,10 @@ namespace MultiplayerARPG
             base.OnTeleport(position, rotation);
             // Clear target entity when teleport
             SetTargetEntity(null);
+            // Setup ground check data
+            canCheckGrounded = true;
+            lastGrounded = true;
+            lastGroundedPosition = position;
         }
 
         public override void PlayJumpAnimation()

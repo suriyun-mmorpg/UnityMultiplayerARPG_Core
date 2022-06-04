@@ -235,8 +235,6 @@ namespace MultiplayerARPG
         protected bool isTeleporting;
         protected Vector3 teleportingPosition;
         protected Quaternion teleportingRotation;
-        protected bool lastGrounded;
-        protected Vector3 lastGroundedPosition;
 
         public GameInstance CurrentGameInstance
         {
@@ -415,14 +413,6 @@ namespace MultiplayerARPG
 
         protected virtual void EntityUpdate()
         {
-            if (IsServer && CurrentGameInstance.DimensionType == DimensionType.Dimension3D)
-            {
-                // Ground check / ground damage will be calculated at server while dimension type is 3d only
-                lastGrounded = MovementState.Has(MovementState.IsGrounded);
-                if (lastGrounded)
-                    lastGroundedPosition = CacheTransform.position;
-            }
-
             if (Movement != null)
             {
                 bool tempEnableMovement = PassengingVehicleEntity == null;
@@ -780,15 +770,9 @@ namespace MultiplayerARPG
             Vector3 groundedPosition;
             if (FindGroundedPosition(position, GROUND_DETECTION_DISTANCE, out groundedPosition))
                 position = groundedPosition;
-            OnTeleport(position, rotation);
             if (IsServer)
                 ActiveMovement.Teleport(position, rotation);
-            if (IsServer && CurrentGameInstance.DimensionType == DimensionType.Dimension3D)
-            {
-                // Ground check / ground damage will be calculated at server while dimension type is 3d only
-                lastGrounded = true;
-                lastGroundedPosition = position;
-            }
+            OnTeleport(position, rotation);
         }
 
         protected virtual void OnTeleport(Vector3 position, Quaternion rotation)
