@@ -50,6 +50,26 @@ namespace MultiplayerARPG.GameData.Model.Playables
                 Graph.Stop();
         }
 
+        public override void AddingNewModel(GameObject newModel, EquipmentContainer equipmentContainer)
+        {
+            base.AddingNewModel(newModel, equipmentContainer);
+            SkinnedMeshRenderer skinnedMesh = newModel.GetComponentInChildren<SkinnedMeshRenderer>();
+            if (skinnedMesh != null && skinnedMeshRenderer != null)
+            {
+                skinnedMesh.bones = skinnedMeshRenderer.bones;
+                skinnedMesh.rootBone = skinnedMeshRenderer.rootBone;
+                if (equipmentContainer.defaultModel != null)
+                {
+                    SkinnedMeshRenderer defaultSkinnedMesh = equipmentContainer.defaultModel.GetComponentInChildren<SkinnedMeshRenderer>();
+                    if (defaultSkinnedMesh != null)
+                    {
+                        skinnedMesh.bones = defaultSkinnedMesh.bones;
+                        skinnedMesh.rootBone = defaultSkinnedMesh.rootBone;
+                    }
+                }
+            }
+        }
+
         protected void CreateGraph()
         {
             Graph = PlayableGraph.Create($"{name}.PlayableCharacterModel");
