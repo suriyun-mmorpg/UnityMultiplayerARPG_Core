@@ -2,6 +2,7 @@
 using UnityEngine;
 using UnityEngine.Serialization;
 using Cysharp.Threading.Tasks;
+using LiteNetLibManager;
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
@@ -20,6 +21,7 @@ namespace MultiplayerARPG
         public BaseMonsterCharacterEntity[] monsterCharacterEntities;
         [FormerlySerializedAs("mountEntities")]
         public VehicleEntity[] vehicleEntities;
+        public LiteNetLibIdentity[] otherNetworkObjects;
 
         [Header("Game Data")]
         public Attribute[] attributes;
@@ -63,6 +65,7 @@ namespace MultiplayerARPG
             GameInstance.AddCharacterEntities(playerCharacterEntities);
             GameInstance.AddCharacterEntities(monsterCharacterEntities);
             GameInstance.AddVehicleEntities(vehicleEntities);
+            GameInstance.AddOtherNetworkObjects(otherNetworkObjects);
             GameInstance.AddAttributes(attributes);
             GameInstance.AddCurrencies(currencies);
             GameInstance.AddDamageElements(damageElements);
