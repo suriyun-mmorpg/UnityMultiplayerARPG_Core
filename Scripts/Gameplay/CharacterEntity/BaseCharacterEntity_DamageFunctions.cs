@@ -105,14 +105,14 @@ namespace MultiplayerARPG
 
         protected override void ApplyReceiveDamage(HitBoxPosition position, Vector3 fromPosition, EntityInfo instigator, Dictionary<DamageElement, MinMaxFloat> damageAmounts, CharacterItem weapon, BaseSkill skill, short skillLevel, int randomSeed, out CombatAmountType combatAmountType, out int totalDamage)
         {
-            BaseCharacterEntity attackerCharacter = null;
+            BaseCharacterEntity attackerCharacter;
             if (instigator.TryGetEntity(out attackerCharacter))
             {
                 // Notify enemy spotted when received damage from enemy
-                NotifyEnemySpottedToAllies(attackerCharacter);
+                NotifyEnemySpotted(attackerCharacter);
 
                 // Notify enemy spotted when damage taken to enemy
-                attackerCharacter.NotifyEnemySpottedToAllies(this);
+                attackerCharacter.NotifyEnemySpotted(this);
             }
 
             bool isCritical;

@@ -25,6 +25,13 @@ namespace MultiplayerARPG
         BaseSkill skill,
         short skillLevel);
 
+    public delegate void NotifyEnemySpottedDelegate(
+        BaseCharacterEntity enemy);
+
+    public delegate void NotifyEnemySpottedByAllyDelegate(
+        BaseCharacterEntity ally,
+        BaseCharacterEntity enemy);
+
     public delegate void AppliedRecoveryAmountDelegate(
         EntityInfo causer,
         int amount);

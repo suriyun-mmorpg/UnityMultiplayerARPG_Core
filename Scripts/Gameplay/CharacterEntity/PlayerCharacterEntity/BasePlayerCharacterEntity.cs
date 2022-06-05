@@ -119,10 +119,5 @@ namespace MultiplayerARPG
         {
             return base.CanDoActions() && Dealing.DealingState == DealingState.None;
         }
-
-        public override void NotifyEnemySpotted(BaseCharacterEntity ally, BaseCharacterEntity attacker)
-        {
-            // TODO: May send data to client
-        }
     }
 }

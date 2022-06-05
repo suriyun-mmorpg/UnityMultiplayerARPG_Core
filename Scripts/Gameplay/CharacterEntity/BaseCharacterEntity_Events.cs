@@ -51,6 +51,9 @@ namespace MultiplayerARPG
         public event AppliedRecoveryAmountDelegate onBuffFoodDecrease;
         public event AppliedRecoveryAmountDelegate onBuffWaterRecovery;
         public event AppliedRecoveryAmountDelegate onBuffWaterDecrease;
+        // Enemy spotted events
+        public event NotifyEnemySpottedDelegate onNotifyEnemySpotted;
+        public event NotifyEnemySpottedByAllyDelegate onNotifyEnemySpottedByAlly;
 
         public void OnAttackRoutine(
             bool isLeftHand,

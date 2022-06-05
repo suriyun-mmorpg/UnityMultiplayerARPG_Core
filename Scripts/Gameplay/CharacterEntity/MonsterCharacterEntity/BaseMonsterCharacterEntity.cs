@@ -279,31 +279,6 @@ namespace MultiplayerARPG
             return base.GetMoveSpeed();
         }
 
-        protected override void ApplyReceiveDamage(HitBoxPosition position, Vector3 fromPosition, EntityInfo instigator, Dictionary<DamageElement, MinMaxFloat> damageAmounts, CharacterItem weapon, BaseSkill skill, short skillLevel, int randomSeed, out CombatAmountType combatAmountType, out int totalDamage)
-        {
-            base.ApplyReceiveDamage(position, fromPosition, instigator, damageAmounts, weapon, skill, skillLevel, randomSeed, out combatAmountType, out totalDamage);
-
-            BaseCharacterEntity attackerCharacter;
-            if (instigator.TryGetEntity(out attackerCharacter))
-            {
-                // If character is not dead, try to attack
-                if (!this.IsDead())
-                {
-                    BaseCharacterEntity targetEntity;
-                    if (!TryGetTargetEntity(out targetEntity))
-                    {
-                        // If no target enemy, set target enemy as attacker
-                        SetAttackTarget(attackerCharacter);
-                    }
-                    else if (attackerCharacter != targetEntity && Random.value > 0.5f)
-                    {
-                        // Random 50% to change target when receive damage from anyone
-                        SetAttackTarget(attackerCharacter);
-                    }
-                }
-            }
-        }
-
         public override void ReceivedDamage(HitBoxPosition position, Vector3 fromPosition, EntityInfo instigator, Dictionary<DamageElement, MinMaxFloat> damageAmounts, CombatAmountType damageAmountType, int totalDamage, CharacterItem weapon, BaseSkill skill, short skillLevel)
         {
             RecordRecivingDamage(instigator, totalDamage);
@@ -672,26 +647,6 @@ namespace MultiplayerARPG
         {
             // TODO: May play teleport effects
             NetworkDestroy();
-        }
-
-        public override void NotifyEnemySpottedToAllies(BaseCharacterEntity enemy)
-        {
-            if (Characteristic != MonsterCharacteristic.Assist)
-                return;
-            // Warn that this character received damage to nearby characters
-            List<BaseCharacterEntity> foundCharacters = FindAliveCharacters<BaseCharacterEntity>(CharacterDatabase.VisualRange, true, false, false);
-            if (foundCharacters == null || foundCharacters.Count == 0) return;
-            foreach (BaseCharacterEntity foundCharacter in foundCharacters)
-            {
-                foundCharacter.NotifyEnemySpotted(this, enemy);
-            }
-        }
-
-        public override void NotifyEnemySpotted(BaseCharacterEntity ally, BaseCharacterEntity attacker)
-        {
-            if ((Summoner && Summoner == ally) ||
-                Characteristic == MonsterCharacteristic.Assist)
-                SetAttackTarget(attacker);
         }
     }
 

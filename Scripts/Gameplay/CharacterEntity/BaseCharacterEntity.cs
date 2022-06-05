@@ -1378,14 +1378,22 @@ namespace MultiplayerARPG
         }
         #endregion
 
-        public virtual void NotifyEnemySpottedToAllies(BaseCharacterEntity enemy)
+        public void NotifyEnemySpotted(BaseCharacterEntity enemy)
         {
             foreach (CharacterSummon summon in Summons)
             {
                 if (summon.CacheEntity == null)
                     continue;
-                summon.CacheEntity.NotifyEnemySpotted(this, enemy);
+                summon.CacheEntity.NotifyEnemySpottedByAlly(this, enemy);
             }
+            if (onNotifyEnemySpotted != null)
+                onNotifyEnemySpotted(this);
+        }
+
+        public void NotifyEnemySpottedByAlly(BaseCharacterEntity ally, BaseCharacterEntity enemy)
+        {
+            if (onNotifyEnemySpottedByAlly != null)
+                onNotifyEnemySpottedByAlly(ally, enemy);
         }
 
         public bool IsNeutral(EntityInfo instigator)
@@ -1426,7 +1434,5 @@ namespace MultiplayerARPG
             // Enqueue error, it will be pushing on screen in Update()
             pushingGameMessages.Enqueue(error);
         }
-
-        public abstract void NotifyEnemySpotted(BaseCharacterEntity ally, BaseCharacterEntity attacker);
     }
 }
