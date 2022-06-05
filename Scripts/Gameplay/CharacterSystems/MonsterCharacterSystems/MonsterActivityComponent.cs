@@ -90,13 +90,12 @@ namespace MultiplayerARPG
             // If character is not dead, try to attack
             if (!Entity.IsDead())
             {
-                BaseCharacterEntity targetEntity;
-                if (!Entity.TryGetTargetEntity(out targetEntity))
+                if (Entity.GetTargetEntity() == null)
                 {
                     // If no target enemy, set target enemy as attacker
                     Entity.SetAttackTarget(attackerCharacter);
                 }
-                else if (attackerCharacter != targetEntity && Random.value > 0.5f)
+                else if (Random.value > 0.5f)
                 {
                     // Random 50% to change target when receive damage from anyone
                     Entity.SetAttackTarget(attackerCharacter);
