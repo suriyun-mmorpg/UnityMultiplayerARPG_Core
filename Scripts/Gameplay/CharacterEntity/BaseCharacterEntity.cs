@@ -1378,7 +1378,7 @@ namespace MultiplayerARPG
         }
         #endregion
 
-        public void NotifyEnemySpotted(BaseCharacterEntity enemy)
+        public virtual void NotifyEnemySpotted(BaseCharacterEntity enemy)
         {
             foreach (CharacterSummon summon in Summons)
             {
@@ -1387,10 +1387,10 @@ namespace MultiplayerARPG
                 summon.CacheEntity.NotifyEnemySpottedByAlly(this, enemy);
             }
             if (onNotifyEnemySpotted != null)
-                onNotifyEnemySpotted(this);
+                onNotifyEnemySpotted(enemy);
         }
 
-        public void NotifyEnemySpottedByAlly(BaseCharacterEntity ally, BaseCharacterEntity enemy)
+        public virtual void NotifyEnemySpottedByAlly(BaseCharacterEntity ally, BaseCharacterEntity enemy)
         {
             if (onNotifyEnemySpottedByAlly != null)
                 onNotifyEnemySpottedByAlly(ally, enemy);
