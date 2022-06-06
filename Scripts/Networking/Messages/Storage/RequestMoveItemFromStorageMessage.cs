@@ -31,7 +31,7 @@ namespace MultiplayerARPG
             writer.PutPackedShort(storageItemAmount);
             writer.PutPackedShort(inventoryItemIndex);
             writer.Put((byte)inventoryType);
-            writer.PutPackedShort(equipSlotIndexOrWeaponSet);
+            writer.Put(equipSlotIndexOrWeaponSet);
         }
     }
 }
