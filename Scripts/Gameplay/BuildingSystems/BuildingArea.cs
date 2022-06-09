@@ -12,6 +12,8 @@ namespace MultiplayerARPG
         public string buildingType;
         public bool snapBuildingObject;
         public bool allowRotateInSocket;
+        [Tooltip("Add some conditions to build another building here")]
+        public BaseBuildConditionForBuildingArea[] buildConditions = new BaseBuildConditionForBuildingArea[0];
         public Collider CacheCollider { get; private set; }
         public Rigidbody CacheRigidbody { get; private set; }
         public Collider2D CacheCollider2D { get; private set; }
@@ -54,6 +56,23 @@ namespace MultiplayerARPG
             if (entity == null)
                 return 0;
             return entity.ObjectId;
+        }
+
+        public virtual bool AllowToBuild(BuildingEntity newBuilding)
+        {
+            if (entity != null && !entity.IsCreator(newBuilding.Builder))
+                return false;
+            if (!newBuilding.BuildingTypes.Contains(buildingType))
+                return false;
+            if (buildConditions != null && buildConditions.Length > 0)
+            {
+                for (int i = 0; i < buildConditions.Length; ++i)
+                {
+                    if (!buildConditions[i].AllowToBuild(this, newBuilding))
+                        return false;
+                }
+            }
+            return true;
         }
     }
 }

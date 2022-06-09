@@ -352,9 +352,7 @@ namespace MultiplayerARPG
             if (BuildingArea != null)
             {
                 // Must build on building area
-                if (BuildingArea.entity != null && !BuildingArea.entity.IsCreator(Builder))
-                    return false;
-                return BuildingTypes.Contains(BuildingArea.buildingType);
+                return BuildingArea.AllowToBuild(this);
             }
             else
             {
@@ -514,7 +512,7 @@ namespace MultiplayerARPG
 
         public bool IsCreator(IPlayerCharacterData playerCharacter)
         {
-            return IsCreator(playerCharacter.Id);
+            return playerCharacter != null && IsCreator(playerCharacter.Id);
         }
 
         public bool IsCreator(string playerCharacterId)
