@@ -69,7 +69,6 @@ namespace MultiplayerARPG
             ShowOnEnum(nameof(skill.skillAttackType), nameof(Skill.SkillAttackType.BasedOnWeapon), nameof(skill.isDebuff));
             ShowOnEnum(nameof(skill.skillAttackType), nameof(Skill.SkillAttackType.BasedOnWeapon), nameof(skill.harvestType));
             // Harvest
-            ShowOnEnum(nameof(skill.harvestType), nameof(HarvestType.BasedOnWeapon), nameof(skill.harvestDamageAmount));
             ShowOnEnum(nameof(skill.harvestType), nameof(HarvestType.BasedOnSkill), nameof(skill.harvestDamageAmount));
             // Debuff
             ShowOnBool(nameof(skill.isDebuff), true, nameof(skill.debuff));
