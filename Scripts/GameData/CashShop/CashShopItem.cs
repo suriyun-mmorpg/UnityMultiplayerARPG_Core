@@ -36,6 +36,34 @@ namespace MultiplayerARPG
         private ItemAmount[] receiveItems = new ItemAmount[0];
         public ItemAmount[] ReceiveItems { get { return receiveItems; } }
 
+        public override bool Validate()
+        {
+            bool hasChanges = false;
+            for (int i = 0; i < receiveCurrencies.Length; ++i)
+            {
+                if (receiveCurrencies[i].amount <= 0)
+                {
+                    Debug.LogWarning("[CashShopItem] Receive Currencies [" + i + "], amount is " + receiveCurrencies[i].amount + " will be changed to 1 (Minimum Value)");
+                    hasChanges = true;
+                    CurrencyAmount receive = receiveCurrencies[i];
+                    receive.amount = 1;
+                    receiveCurrencies[i] = receive;
+                }
+            }
+            for (int i = 0; i < receiveItems.Length; ++i)
+            {
+                if (receiveItems[i].amount <= 0)
+                {
+                    Debug.LogWarning("[CashShopItem] Receive Items [" + i + "], amount is " + receiveItems[i].amount + " will be changed to 1 (Minimum Value)");
+                    hasChanges = true;
+                    ItemAmount receive = receiveItems[i];
+                    receive.amount = 1;
+                    receiveItems[i] = receive;
+                }
+            }
+            return hasChanges || base.Validate();
+        }
+
         public CashShopItem GenerateByItem(BaseItem item, CashShopItemGeneratingData generatingData)
         {
             List<string> languageKeys = new List<string>(LanguageManager.Languages.Keys);
