@@ -26,13 +26,13 @@ namespace MultiplayerARPG
         private int receiveGold = 0;
         public int ReceiveGold { get { return receiveGold; } }
 
-        [ArrayElementTitle("currency")]
         [SerializeField]
+        [ArrayElementTitle("currency")]
         private CurrencyAmount[] receiveCurrencies = new CurrencyAmount[0];
         public CurrencyAmount[] ReceiveCurrencies { get { return receiveCurrencies; } }
 
-        [ArrayElementTitle("item")]
         [SerializeField]
+        [ArrayElementTitle("item")]
         private ItemAmount[] receiveItems = new ItemAmount[0];
         public ItemAmount[] ReceiveItems { get { return receiveItems; } }
 

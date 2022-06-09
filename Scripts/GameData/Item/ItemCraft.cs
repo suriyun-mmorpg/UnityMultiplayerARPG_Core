@@ -26,6 +26,7 @@ namespace MultiplayerARPG
         private ItemAmount[] requireItems;
         public ItemAmount[] RequireItems { get { return requireItems; } }
 
+        [SerializeField]
         [ArrayElementTitle("currency")]
         private CurrencyAmount[] requireCurrencies;
         public CurrencyAmount[] RequireCurrencies { get { return requireCurrencies; } }
