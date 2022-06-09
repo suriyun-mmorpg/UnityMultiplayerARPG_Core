@@ -484,13 +484,13 @@ namespace MultiplayerARPG
             int unEquippedIndexRightHand = -1;
             if (shouldUnequipRightHand)
             {
-                if (!character.UnEquipWeapon(equipWeaponSet, false, true, out gameMessage, out unEquippedIndexRightHand))
+                if (!character.UnEquipWeapon(equipWeaponSet, false, true, out gameMessage, out unEquippedIndexRightHand, fillEmptySlots: false))
                     return false;
             }
             int unEquippedIndexLeftHand = -1;
             if (shouldUnequipLeftHand)
             {
-                if (!character.UnEquipWeapon(equipWeaponSet, true, true, out gameMessage, out unEquippedIndexLeftHand))
+                if (!character.UnEquipWeapon(equipWeaponSet, true, true, out gameMessage, out unEquippedIndexLeftHand, fillEmptySlots: false))
                     return false;
             }
 
@@ -556,7 +556,7 @@ namespace MultiplayerARPG
             return true;
         }
 
-        public static bool UnEquipWeapon(this ICharacterData character, byte equipWeaponSet, bool isLeftHand, bool doNotValidate, out UITextKeys gameMessage, out int unEquippedIndex, int expectedUnequippedIndex = -1)
+        public static bool UnEquipWeapon(this ICharacterData character, byte equipWeaponSet, bool isLeftHand, bool doNotValidate, out UITextKeys gameMessage, out int unEquippedIndex, int expectedUnequippedIndex = -1, bool fillEmptySlots = true)
         {
             unEquippedIndex = -1;
             character.FillWeaponSetsIfNeeded(equipWeaponSet);
@@ -593,7 +593,8 @@ namespace MultiplayerARPG
             if (unEquipItem.NotEmptySlot())
             {
                 character.AddOrSetNonEquipItems(unEquipItem, out unEquippedIndex, expectedUnequippedIndex);
-                character.FillEmptySlots(true);
+                if (fillEmptySlots)
+                    character.FillEmptySlots(true);
             }
             gameMessage = UITextKeys.NONE;
             return true;
@@ -613,7 +614,7 @@ namespace MultiplayerARPG
                 return false;
 
             int unEquippedIndex = -1;
-            if (unEquippingIndex >= 0 && !character.UnEquipArmor(unEquippingIndex, true, out gameMessage, out unEquippedIndex))
+            if (unEquippingIndex >= 0 && !character.UnEquipArmor(unEquippingIndex, true, out gameMessage, out unEquippedIndex, fillEmptySlots: false))
                 return false;
 
             // Can equip the item when there is no equipped item or able to unequip the equipped item
@@ -642,7 +643,7 @@ namespace MultiplayerARPG
             return true;
         }
 
-        public static bool UnEquipArmor(this ICharacterData character, int index, bool doNotValidate, out UITextKeys gameMessage, out int unEquippedIndex, int expectedUnequippedIndex = -1)
+        public static bool UnEquipArmor(this ICharacterData character, int index, bool doNotValidate, out UITextKeys gameMessage, out int unEquippedIndex, int expectedUnequippedIndex = -1, bool fillEmptySlots = true)
         {
             unEquippedIndex = -1;
             if (index < 0 || index >= character.EquipItems.Count)
@@ -662,7 +663,8 @@ namespace MultiplayerARPG
             if (unEquipItem.NotEmptySlot())
             {
                 character.AddOrSetNonEquipItems(unEquipItem, out unEquippedIndex, expectedUnequippedIndex);
-                character.FillEmptySlots(true);
+                if (fillEmptySlots)
+                    character.FillEmptySlots(true);
             }
             gameMessage = UITextKeys.NONE;
             return true;
