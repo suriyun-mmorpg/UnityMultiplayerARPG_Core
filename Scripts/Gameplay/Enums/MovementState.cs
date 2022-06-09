@@ -20,5 +20,13 @@
         {
             return (self & flag) == flag;
         }
+
+        public static bool HasDirectionMovement(this MovementState self)
+        {
+            return self.Has(MovementState.Forward) ||
+                self.Has(MovementState.Backward) ||
+                self.Has(MovementState.Right) ||
+                self.Has(MovementState.Left);
+        }
     }
 }

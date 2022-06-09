@@ -24,6 +24,7 @@ namespace MultiplayerARPG
         public MovementState MovementState { get; protected set; }
         public ExtraMovementState ExtraMovementState { get; protected set; }
         public DirectionVector2 Direction2D { get; set; }
+        public float CurrentMoveSpeed { get; private set; }
 
         public Queue<Vector2> NavPaths { get; protected set; }
         public bool HasNavPaths
@@ -187,7 +188,6 @@ namespace MultiplayerARPG
             float tempPredictSqrMagnitude;
             float tempTargetDistance;
             float tempEntityMoveSpeed;
-            float tempCurrentMoveSpeed;
             float tempMaxMoveSpeed;
             Vector2 tempMoveVelocity;
             Vector2 tempCurrentPosition;
@@ -257,11 +257,11 @@ namespace MultiplayerARPG
             if (moveDirection.sqrMagnitude > 0f)
             {
                 // If character move backward
-                tempCurrentMoveSpeed = CalculateCurrentMoveSpeed(tempMaxMoveSpeed, deltaTime);
+                CurrentMoveSpeed = CalculateCurrentMoveSpeed(tempMaxMoveSpeed, deltaTime);
 
                 // NOTE: `tempTargetPosition` and `tempCurrentPosition` were set above
                 tempSqrMagnitude = (tempTargetPosition - tempCurrentPosition).sqrMagnitude;
-                tempPredictPosition = tempCurrentPosition + (moveDirection * tempCurrentMoveSpeed * deltaTime);
+                tempPredictPosition = tempCurrentPosition + (moveDirection * CurrentMoveSpeed * deltaTime);
                 tempPredictSqrMagnitude = (tempPredictPosition - tempCurrentPosition).sqrMagnitude;
                 if (HasNavPaths || clientTargetPosition.HasValue)
                 {
@@ -270,9 +270,9 @@ namespace MultiplayerARPG
                     // rigidbody will reaching target and character is moving pass it,
                     // so adjust move speed by distance and time (with physic formula: v=s/t)
                     if (tempPredictSqrMagnitude >= tempSqrMagnitude)
-                        tempCurrentMoveSpeed *= tempTargetDistance / deltaTime / tempCurrentMoveSpeed;
+                        CurrentMoveSpeed *= tempTargetDistance / deltaTime / CurrentMoveSpeed;
                 }
-                tempMoveVelocity = moveDirection * tempCurrentMoveSpeed;
+                tempMoveVelocity = moveDirection * CurrentMoveSpeed;
                 // Set inputs
                 currentInput = this.SetInputMovementState2D(currentInput, tempMovementState);
                 if (HasNavPaths)

@@ -11,6 +11,7 @@ namespace MultiplayerARPG
         MovementState MovementState { get; }
         ExtraMovementState ExtraMovementState { get; }
         DirectionVector2 Direction2D { get; set; }
+        float CurrentMoveSpeed { get; }
         void StopMove();
         void KeyMovement(Vector3 moveDirection, MovementState movementState);
         void PointClickMovement(Vector3 position);

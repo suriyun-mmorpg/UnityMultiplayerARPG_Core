@@ -55,6 +55,7 @@ namespace MultiplayerARPG
         public MovementState MovementState { get; protected set; }
         public ExtraMovementState ExtraMovementState { get; protected set; }
         public DirectionVector2 Direction2D { get { return Vector2.down; } set { } }
+        public float CurrentMoveSpeed { get; private set; }
 
         public Queue<Vector3> NavPaths { get; private set; }
         public bool HasNavPaths
@@ -294,7 +295,6 @@ namespace MultiplayerARPG
             float tempPredictSqrMagnitude;
             float tempTargetDistance;
             float tempEntityMoveSpeed;
-            float tempCurrentMoveSpeed;
             float tempMaxMoveSpeed;
             Vector3 tempHorizontalMoveDirection;
             Vector3 tempMoveVelocity;
@@ -437,11 +437,11 @@ namespace MultiplayerARPG
                 // If character move backward
                 if (Vector3.Angle(tempHorizontalMoveDirection, CacheTransform.forward) > 120)
                     tempMaxMoveSpeed *= backwardMoveSpeedRate;
-                tempCurrentMoveSpeed = CalculateCurrentMoveSpeed(tempMaxMoveSpeed, deltaTime);
+                CurrentMoveSpeed = CalculateCurrentMoveSpeed(tempMaxMoveSpeed, deltaTime);
 
                 // NOTE: `tempTargetPosition` and `tempCurrentPosition` were set above
                 tempSqrMagnitude = (tempTargetPosition - tempCurrentPosition).sqrMagnitude;
-                tempPredictPosition = tempCurrentPosition + (tempHorizontalMoveDirection * tempCurrentMoveSpeed * deltaTime);
+                tempPredictPosition = tempCurrentPosition + (tempHorizontalMoveDirection * CurrentMoveSpeed * deltaTime);
                 tempPredictSqrMagnitude = (tempPredictPosition - tempCurrentPosition).sqrMagnitude;
                 if (HasNavPaths || clientTargetPosition.HasValue)
                 {
@@ -450,9 +450,9 @@ namespace MultiplayerARPG
                     // rigidbody will reaching target and character is moving pass it,
                     // so adjust move speed by distance and time (with physic formula: v=s/t)
                     if (tempPredictSqrMagnitude >= tempSqrMagnitude)
-                        tempCurrentMoveSpeed *= tempTargetDistance / deltaTime / tempCurrentMoveSpeed;
+                        CurrentMoveSpeed *= tempTargetDistance / deltaTime / CurrentMoveSpeed;
                 }
-                tempMoveVelocity = tempHorizontalMoveDirection * tempCurrentMoveSpeed;
+                tempMoveVelocity = tempHorizontalMoveDirection * CurrentMoveSpeed;
                 velocityBeforeAirborne = tempMoveVelocity;
                 // Set inputs
                 currentInput = this.SetInputMovementState(currentInput, tempMovementState);
@@ -496,7 +496,7 @@ namespace MultiplayerARPG
             // Updating vertical movement (Fall, WASD inputs under water)
             if (isUnderWater)
             {
-                tempCurrentMoveSpeed = CalculateCurrentMoveSpeed(tempMaxMoveSpeed, deltaTime);
+                CurrentMoveSpeed = CalculateCurrentMoveSpeed(tempMaxMoveSpeed, deltaTime);
 
                 // Move up to surface while under water
                 if (autoSwimToSurface || Mathf.Abs(moveDirection.y) > 0)
@@ -507,18 +507,18 @@ namespace MultiplayerARPG
                     tempCurrentPosition = Vector3.up * CacheTransform.position.y;
                     tempTargetDistance = Vector3.Distance(tempTargetPosition, tempCurrentPosition);
                     tempSqrMagnitude = (tempTargetPosition - tempCurrentPosition).sqrMagnitude;
-                    tempPredictPosition = tempCurrentPosition + (Vector3.up * moveDirection.y * tempCurrentMoveSpeed * deltaTime);
+                    tempPredictPosition = tempCurrentPosition + (Vector3.up * moveDirection.y * CurrentMoveSpeed * deltaTime);
                     tempPredictSqrMagnitude = (tempPredictPosition - tempCurrentPosition).sqrMagnitude;
                     // Check `tempSqrMagnitude` against the `tempPredictSqrMagnitude`
                     // if `tempPredictSqrMagnitude` is greater than `tempSqrMagnitude`,
                     // rigidbody will reaching target and character is moving pass it,
                     // so adjust move speed by distance and time (with physic formula: v=s/t)
                     if (tempPredictSqrMagnitude >= tempSqrMagnitude)
-                        tempCurrentMoveSpeed *= tempTargetDistance / deltaTime / tempCurrentMoveSpeed;
+                        CurrentMoveSpeed *= tempTargetDistance / deltaTime / CurrentMoveSpeed;
                     // Swim up to surface
-                    if (tempCurrentMoveSpeed < 0.01f)
+                    if (CurrentMoveSpeed < 0.01f)
                         moveDirection.y = 0f;
-                    tempMoveVelocity.y = moveDirection.y * tempCurrentMoveSpeed;
+                    tempMoveVelocity.y = moveDirection.y * CurrentMoveSpeed;
                     if (!HasNavPaths)
                         currentInput = this.SetInputYPosition(currentInput, tempPredictPosition.y);
                 }

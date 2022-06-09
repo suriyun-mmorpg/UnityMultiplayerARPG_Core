@@ -229,6 +229,13 @@ namespace MultiplayerARPG
                     ActiveMovement.Direction2D = value;
             }
         }
+        public float CurrentMoveSpeed
+        {
+            get
+            {
+                return ActiveMovement == null ? 0f : ActiveMovement.CurrentMoveSpeed;
+            }
+        }
         public virtual float MoveAnimationSpeedMultiplier { get { return 1f; } }
         public virtual bool MuteFootstepSound { get { return false; } }
         protected bool dirtyIsHide;
