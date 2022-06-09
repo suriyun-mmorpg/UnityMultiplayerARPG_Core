@@ -67,6 +67,56 @@ namespace MultiplayerARPG
             }
         }
 
+        public override bool Validate()
+        {
+            bool hasChanges = false;
+            for (int i = 0; i < rewardCurrencies.Length; ++i)
+            {
+                if (rewardCurrencies[i].amount <= 0)
+                {
+                    Debug.LogWarning("[Quest] Reward Currencies [" + i + "], amount is " + rewardCurrencies[i].amount + " will be changed to 1 (Minimum Value)");
+                    hasChanges = true;
+                    CurrencyAmount reward = rewardCurrencies[i];
+                    reward.amount = 1;
+                    rewardCurrencies[i] = reward;
+                }
+            }
+            for (int i = 0; i < rewardItems.Length; ++i)
+            {
+                if (rewardItems[i].amount <= 0)
+                {
+                    Debug.LogWarning("[Quest] Reward Items [" + i + "], amount is " + rewardItems[i].amount + " will be changed to 1 (Minimum Value)");
+                    hasChanges = true;
+                    ItemAmount reward = rewardItems[i];
+                    reward.amount = 1;
+                    rewardItems[i] = reward;
+                }
+            }
+            for (int i = 0; i < selectableRewardItems.Length; ++i)
+            {
+                if (selectableRewardItems[i].amount <= 0)
+                {
+                    Debug.LogWarning("[Quest] Selectable Reward Items [" + i + "], amount is " + selectableRewardItems[i].amount + " will be changed to 1 (Minimum Value)");
+                    hasChanges = true;
+                    ItemAmount reward = selectableRewardItems[i];
+                    reward.amount = 1;
+                    selectableRewardItems[i] = reward;
+                }
+            }
+            for (int i = 0; i < randomRewardItems.Length; ++i)
+            {
+                if (randomRewardItems[i].amount <= 0)
+                {
+                    Debug.LogWarning("[Quest] Random Reward Items [" + i + "], amount is " + randomRewardItems[i].amount + " will be changed to 1 (Minimum Value)");
+                    hasChanges = true;
+                    ItemRandomByWeight reward = randomRewardItems[i];
+                    reward.amount = 1;
+                    randomRewardItems[i] = reward;
+                }
+            }
+            return hasChanges || base.Validate();
+        }
+
         public override void PrepareRelatesData()
         {
             base.PrepareRelatesData();
