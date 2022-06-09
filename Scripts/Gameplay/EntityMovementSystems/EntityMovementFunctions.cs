@@ -30,11 +30,17 @@ namespace MultiplayerARPG
                 switch (extraMovementState)
                 {
                     case ExtraMovementState.IsSprinting:
-                        if (!movement.Entity.CanSprint())
+                        if (!movementState.HasDirectionMovement())
+                            extraMovementState = ExtraMovementState.None;
+                        else if (!movement.Entity.CanSprint())
                             extraMovementState = ExtraMovementState.None;
                         else if (!movement.Entity.CanSideSprint && (movementState.Has(MovementState.Left) || movementState.Has(MovementState.Right)))
                             extraMovementState = ExtraMovementState.None;
                         else if (!movement.Entity.CanBackwardSprint && movementState.Has(MovementState.Backward))
+                            extraMovementState = ExtraMovementState.None;
+                        break;
+                    case ExtraMovementState.IsWalking:
+                        if (!movementState.HasDirectionMovement())
                             extraMovementState = ExtraMovementState.None;
                         break;
                     case ExtraMovementState.IsCrouching:
