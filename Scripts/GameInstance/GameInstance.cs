@@ -235,6 +235,11 @@ namespace MultiplayerARPG
         public UnityLayer buildingLayer = new UnityLayer(13);
         [Tooltip("Layer for harvestable entities, this layer will set to harvestable entities game object when instantiated")]
         public UnityLayer harvestableLayer = new UnityLayer(14);
+        [Tooltip("Layers which will be used when raycasting to find hitting obstacle/wall/floor/ceil when attacking damageable objects")]
+        public UnityLayer[] attackObstacleLayers = new UnityLayer[]
+        {
+            new UnityLayer(0),
+        };
         [Tooltip("Layers which will be ignored when raycasting")]
         [FormerlySerializedAs("nonTargetingLayers")]
         public UnityLayer[] ignoreRaycastLayers = new UnityLayer[] {
@@ -760,13 +765,25 @@ namespace MultiplayerARPG
             return mapIds;
         }
 
+        private int MixWithAttackObstacleLayers(int layerMask)
+        {
+            if (attackObstacleLayers.Length > 0)
+            {
+                foreach (UnityLayer attackObstacleLayer in attackObstacleLayers)
+                {
+                    layerMask = layerMask | attackObstacleLayer.Mask;
+                }
+            }
+            return layerMask;
+        }
+
         private int MixWithIgnoreRaycastLayers(int layerMask)
         {
             if (ignoreRaycastLayers.Length > 0)
             {
-                foreach (UnityLayer nonTargetingLayer in ignoreRaycastLayers)
+                foreach (UnityLayer ignoreRaycastLayer in ignoreRaycastLayers)
                 {
-                    layerMask = layerMask | nonTargetingLayer.Mask;
+                    layerMask = layerMask | ignoreRaycastLayer.Mask;
                 }
             }
             layerMask = layerMask | 1 << PhysicLayers.IgnoreRaycast;
@@ -803,7 +820,7 @@ namespace MultiplayerARPG
         }
 
         /// <summary>
-        /// Only `playerLayer`, `monsterLayer`, `vehicleLayer`, `buildingLayer`, `harvestableLayer` will be used for hit detection casting
+        /// Only `playerLayer`, `playingLayer`, `monsterLayer`, `vehicleLayer`, `buildingLayer`, `harvestableLayer` will be used for hit detection casting
         /// </summary>
         /// <returns></returns>
         public int GetDamageableLayerMask()
@@ -819,7 +836,7 @@ namespace MultiplayerARPG
         }
 
         /// <summary>
-        /// Only `playerLayer`, `monsterLayer`, `vehicleLayer`, `buildingLayer`, `harvestableLayer` and wall layers will be used for hit detection casting
+        /// Only `playerLayer`, `playingLayer`, `monsterLayer`, `vehicleLayer`, `buildingLayer`, `harvestableLayer` and wall layers will be used for hit detection casting
         /// </summary>
         /// <returns></returns>
         public int GetDamageEntityHitLayerMask()
@@ -831,13 +848,12 @@ namespace MultiplayerARPG
             layerMask = layerMask | vehicleLayer.Mask;
             layerMask = layerMask | buildingLayer.Mask;
             layerMask = layerMask | harvestableLayer.Mask;
-            layerMask = layerMask |= PhysicLayers.Default;
-            // TODO: May allow users to set their wall layers
+            layerMask = MixWithAttackObstacleLayers(layerMask);
             return layerMask;
         }
 
         /// <summary>
-        /// All layers except `playerLayer`, `monsterLayer`, `npcLayer`, `vehicleLayer`, `itemDropLayer, `harvestableLayer`, `TransparentFX`, `IgnoreRaycast`, `Water` will be used for raycasting
+        /// All layers except `playerLayer`, `playingLayer`, `monsterLayer`, `npcLayer`, `vehicleLayer`, `itemDropLayer, `harvestableLayer`, `TransparentFX`, `IgnoreRaycast`, `Water` will be used for raycasting
         /// </summary>
         /// <returns></returns>
         public int GetBuildLayerMask()
@@ -857,7 +873,7 @@ namespace MultiplayerARPG
         }
 
         /// <summary>
-        /// All layers except `playerLayer`, `monsterLayer`, `npcLayer`, `vehicleLayer`, `itemDropLayer, `TransparentFX`, `IgnoreRaycast`, `Water` and non-target layers will be used for raycasting
+        /// All layers except `playerLayer`, `playingLayer`, `monsterLayer`, `npcLayer`, `vehicleLayer`, `itemDropLayer, `TransparentFX`, `IgnoreRaycast`, `Water` and non-target layers will be used for raycasting
         /// </summary>
         /// <returns></returns>
         public int GetItemDropGroundDetectionLayerMask()
@@ -876,7 +892,7 @@ namespace MultiplayerARPG
         }
 
         /// <summary>
-        /// All layers except `playerLayer`, `monsterLayer`, `npcLayer`, `vehicleLayer`, `itemDropLayer, `TransparentFX`, `IgnoreRaycast`, `Water` and non-target layers will be used for raycasting
+        /// All layers except `playerLayer`, `playingLayer`, `monsterLayer`, `npcLayer`, `vehicleLayer`, `itemDropLayer, `TransparentFX`, `IgnoreRaycast`, `Water` and non-target layers will be used for raycasting
         /// </summary>
         /// <returns></returns>
         public int GetGameEntityGroundDetectionLayerMask()
@@ -895,7 +911,7 @@ namespace MultiplayerARPG
         }
 
         /// <summary>
-        /// All layers except `playerLayer`, `monsterLayer`, `npcLayer`, `vehicleLayer`, `itemDropLayer`, `buildingLayer`, `harvestableLayer, `TransparentFX`, `IgnoreRaycast`, `Water` and non-target layers will be used for raycasting
+        /// All layers except `playerLayer`, `playingLayer`, `monsterLayer`, `npcLayer`, `vehicleLayer`, `itemDropLayer`, `buildingLayer`, `harvestableLayer, `TransparentFX`, `IgnoreRaycast`, `Water` and non-target layers will be used for raycasting
         /// </summary>
         /// <returns></returns>
         public int GetHarvestableSpawnGroundDetectionLayerMask()
@@ -916,7 +932,7 @@ namespace MultiplayerARPG
         }
 
         /// <summary>
-        /// All layers except `playerLayer`, `monsterLayer`, `npcLayer`, `vehicleLayer`, `itemDropLayer`, `harvestableLayer, `TransparentFX`, `IgnoreRaycast`, `Water` and non-target layers will be used for raycasting
+        /// All layers except `playerLayer`, `playingLayer`, `monsterLayer`, `npcLayer`, `vehicleLayer`, `itemDropLayer`, `harvestableLayer, `TransparentFX`, `IgnoreRaycast`, `Water` and non-target layers will be used for raycasting
         /// </summary>
         /// <returns></returns>
         public int GetAreaSkillGroundDetectionLayerMask()

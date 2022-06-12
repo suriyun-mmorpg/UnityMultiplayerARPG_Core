@@ -335,7 +335,7 @@ namespace MultiplayerARPG
                     {
                         float minDistance = missileDistance;
                         // Just raycast to any entity to apply damage
-                        int tempRaycastSize = attacker.AttackPhysicFunctions.Raycast(damagePosition, damageDirection, missileDistance, Physics.DefaultRaycastLayers);
+                        int tempRaycastSize = attacker.AttackPhysicFunctions.Raycast(damagePosition, damageDirection, missileDistance, GameInstance.Singleton.GetDamageEntityHitLayerMask());
                         if (tempRaycastSize > 0)
                         {
                             List<HitData> hitDataCollection = new List<HitData>();
@@ -350,12 +350,6 @@ namespace MultiplayerARPG
                                 normal = attacker.AttackPhysicFunctions.GetRaycastNormal(tempLoopCounter);
                                 distance = attacker.AttackPhysicFunctions.GetRaycastDistance(tempLoopCounter);
                                 tempGameObject = attacker.AttackPhysicFunctions.GetRaycastObject(tempLoopCounter);
-
-                                if (tempGameObject.layer == GameInstance.Singleton.itemDropLayer ||
-                                    tempGameObject.layer == PhysicLayers.TransparentFX ||
-                                    tempGameObject.layer == PhysicLayers.IgnoreRaycast ||
-                                    tempGameObject.layer == PhysicLayers.Water)
-                                    continue;
 
                                 if (tempGameObject.GetComponent<IUnHittable>() != null)
                                     continue;
