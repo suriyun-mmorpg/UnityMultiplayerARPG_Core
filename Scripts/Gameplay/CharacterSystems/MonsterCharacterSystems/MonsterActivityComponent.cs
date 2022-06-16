@@ -23,6 +23,8 @@ namespace MultiplayerARPG
         public bool isAttackBuilding = false;
         [Tooltip("If this is TRUE, monster will attacks targets while its summoner still idle")]
         public bool isAggressiveWhileSummonerIdle = false;
+        [Tooltip("Delay before it can switch target again")]
+        public float switchTargetDelay = 3;
 
         protected readonly List<BaseCharacterEntity> enemies = new List<BaseCharacterEntity>();
         protected bool startedAggressive;
@@ -40,6 +42,7 @@ namespace MultiplayerARPG
         protected float lastSetDestinationTime;
         protected bool previousIsInSafeArea;
         protected float pauseCountdown;
+        protected float lastSwitchTargetTime;
 
         public bool IsAggressiveWhileSummonerIdle()
         {
@@ -95,9 +98,10 @@ namespace MultiplayerARPG
                     // If no target enemy, set target enemy as attacker
                     Entity.SetAttackTarget(attackerCharacter);
                 }
-                else if (Random.value > 0.5f)
+                else if (attackerCharacter != Entity.GetTargetEntity() && Random.value > 0.5f && Time.unscaledTime - lastSwitchTargetTime > switchTargetDelay)
                 {
                     // Random 50% to change target when receive damage from anyone
+                    lastSwitchTargetTime = Time.unscaledTime;
                     Entity.SetAttackTarget(attackerCharacter);
                 }
             }

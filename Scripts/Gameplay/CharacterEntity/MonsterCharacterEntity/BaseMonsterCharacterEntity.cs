@@ -264,11 +264,6 @@ namespace MultiplayerARPG
             if (target == null || target.Entity == Entity ||
                 target.IsDead() || !target.CanReceiveDamageFrom(GetInfo()))
                 return;
-            // Already have target so don't set target
-            IDamageableEntity oldTarget;
-            if (TryGetTargetEntity(out oldTarget) && !oldTarget.IsDead())
-                return;
-            // Set target to attack
             SetTargetEntity(target.Entity);
         }
 
