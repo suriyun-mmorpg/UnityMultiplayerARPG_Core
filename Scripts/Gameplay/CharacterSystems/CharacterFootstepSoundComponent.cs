@@ -9,11 +9,32 @@ namespace MultiplayerARPG
     public class CharacterFootstepSoundComponent : BaseGameEntityComponent<BaseGameEntity>
     {
         public AudioSource audioSource;
+        public AudioComponentSettingType settingType = AudioComponentSettingType.Sfx;
+        public string otherSettingId;
         public FootstepSettings moveFootstepSettings;
         public FootstepSettings sprintFootstepSettings;
         public FootstepSettings crouchFootstepSettings;
         public FootstepSettings crawlFootstepSettings;
         public FootstepSettings swimFootstepSettings;
+
+        public string SettingId
+        {
+            get
+            {
+                switch (settingType)
+                {
+                    case AudioComponentSettingType.Master:
+                        return AudioManager.Singleton.masterVolumeSetting.id;
+                    case AudioComponentSettingType.Bgm:
+                        return AudioManager.Singleton.bgmVolumeSetting.id;
+                    case AudioComponentSettingType.Sfx:
+                        return AudioManager.Singleton.sfxVolumeSetting.id;
+                    case AudioComponentSettingType.Ambient:
+                        return AudioManager.Singleton.ambientVolumeSetting.id;
+                }
+                return otherSettingId;
+            }
+        }
 
         #region Deprecated settings
         [HideInInspector]
@@ -151,7 +172,7 @@ namespace MultiplayerARPG
 
             audioSource.clip = currentFootstepSettings.soundData.GetRandomedAudioClip();
             audioSource.pitch = Random.Range(currentFootstepSettings.randomPitchMin, currentFootstepSettings.randomPitchMax);
-            audioSource.volume = Random.Range(currentFootstepSettings.randomVolumeMin, currentFootstepSettings.randomVolumeMax) * (AudioManager.Singleton == null ? 1f : AudioManager.Singleton.sfxVolumeSetting.Level);
+            audioSource.volume = Random.Range(currentFootstepSettings.randomVolumeMin, currentFootstepSettings.randomVolumeMax) * AudioManager.Singleton.GetVolumeLevel(SettingId);
             audioSource.Play();
         }
     }
