@@ -53,6 +53,8 @@ namespace MultiplayerARPG
             CacheSelectionManager.eventOnDeselect.AddListener(OnDeselect);
             if (uiDialog != null)
                 uiDialog.onHide.AddListener(OnDialogHide);
+            if (inputFind)
+                inputFind.text = string.Empty;
             OnClickFind();
         }
 
