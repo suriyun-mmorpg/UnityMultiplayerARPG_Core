@@ -10,6 +10,10 @@ namespace MultiplayerARPG
         protected override void OnEnable()
         {
             base.OnEnable();
+            onFriendRequested.RemoveListener(OnClickFindCharacters);
+            onFriendRequested.AddListener(OnClickFindCharacters);
+            onFriendAdded.RemoveListener(OnClickFindCharacters);
+            onFriendAdded.AddListener(OnClickFindCharacters);
             if (inputCharacterName)
                 inputCharacterName.text = string.Empty;
             OnClickFindCharacters();
@@ -34,6 +38,10 @@ namespace MultiplayerARPG
                 tempUI.uiSocialGroup = this;
                 tempUI.Data = data;
                 tempUI.Show();
+                tempUI.onFriendRequested.RemoveListener(OnClickFindCharacters);
+                tempUI.onFriendRequested.AddListener(OnClickFindCharacters);
+                tempUI.onFriendAdded.RemoveListener(OnClickFindCharacters);
+                tempUI.onFriendAdded.AddListener(OnClickFindCharacters);
                 MemberSelectionManager.Add(tempUI);
                 if (selectedId.Equals(data.id))
                     tempUI.OnClickSelect();
