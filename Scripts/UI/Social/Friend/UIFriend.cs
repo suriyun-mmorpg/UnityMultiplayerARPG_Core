@@ -8,6 +8,8 @@ namespace MultiplayerARPG
         protected override void OnEnable()
         {
             base.OnEnable();
+            onFriendRemoved.RemoveListener(Refresh);
+            onFriendRemoved.AddListener(Refresh);
             Refresh();
         }
 
@@ -42,6 +44,8 @@ namespace MultiplayerARPG
                 tempUI.uiSocialGroup = this;
                 tempUI.Data = data;
                 tempUI.Show();
+                tempUI.onFriendRemoved.RemoveListener(Refresh);
+                tempUI.onFriendRemoved.AddListener(Refresh);
                 MemberSelectionManager.Add(tempUI);
                 if (selectedId.Equals(data.id))
                     tempUI.OnClickSelect();
