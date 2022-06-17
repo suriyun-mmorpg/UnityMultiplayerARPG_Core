@@ -8,6 +8,10 @@ namespace MultiplayerARPG
         protected override void OnEnable()
         {
             base.OnEnable();
+            onGuildRequestAccepted.RemoveListener(Refresh);
+            onGuildRequestAccepted.AddListener(Refresh);
+            onGuildRequestDeclined.RemoveListener(Refresh);
+            onGuildRequestDeclined.AddListener(Refresh);
             Refresh();
         }
 
