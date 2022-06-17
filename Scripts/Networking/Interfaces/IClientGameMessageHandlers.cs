@@ -9,7 +9,6 @@ namespace MultiplayerARPG
         void HandleUpdateParty(MessageHandlerData messageHandler);
         void HandleUpdateGuildMember(MessageHandlerData messageHandler);
         void HandleUpdateGuild(MessageHandlerData messageHandler);
-        void HandleUpdateFriends(MessageHandlerData messageHandler);
         void HandleNotifyRewardExp(MessageHandlerData messageHandler);
         void HandleNotifyRewardGold(MessageHandlerData messageHandler);
         void HandleNotifyRewardItem(MessageHandlerData messageHandler);

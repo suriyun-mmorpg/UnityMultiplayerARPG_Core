@@ -10,21 +10,20 @@
         public const ushort UpdateParty = 104;
         public const ushort UpdateGuildMember = 105;
         public const ushort UpdateGuild = 106;
-        public const ushort UpdateFriends = 107;
-        public const ushort UpdateMapInfo = 108;
-        public const ushort NotifyOnlineCharacter = 109;
-        public const ushort NotifyRewardExp = 110;
-        public const ushort NotifyRewardGold = 111;
-        public const ushort NotifyRewardItem = 112;
-        public const ushort UpdateTimeOfDay = 113;
-        public const ushort NotifyStorageOpened = 114;
-        public const ushort NotifyStorageClosed = 115;
-        public const ushort NotifyStorageItemsUpdated = 116;
-        public const ushort NotifyPartyInvitation = 117;
-        public const ushort NotifyGuildInvitation = 118;
-        public const ushort NotifyRewardCurrency = 171;
-        public const ushort EntityState = 165;
-        public const ushort HitRegistration = 166;
+        public const ushort UpdateMapInfo = 107;
+        public const ushort NotifyOnlineCharacter = 108;
+        public const ushort NotifyRewardExp = 109;
+        public const ushort NotifyRewardGold = 110;
+        public const ushort NotifyRewardItem = 111;
+        public const ushort UpdateTimeOfDay = 112;
+        public const ushort NotifyStorageOpened = 113;
+        public const ushort NotifyStorageClosed = 114;
+        public const ushort NotifyStorageItemsUpdated = 115;
+        public const ushort NotifyPartyInvitation = 116;
+        public const ushort NotifyGuildInvitation = 117;
+        public const ushort NotifyRewardCurrency = 118;
+        public const ushort EntityState = 119;
+        public const ushort HitRegistration = 120;
         // Networking requests/responses
         public const ushort CashShopInfo = 100;
         public const ushort CashShopBuy = 101;
@@ -90,23 +89,18 @@
         public const ushort SendGuildRequest = 161;
         public const ushort AcceptGuildRequest = 162;
         public const ushort DeclineGuildRequest = 163;
-        // 1.63c
-        public const ushort Respawn = 172;
-        // 1.64
-        public const ushort MailNotification = 174;
-        public const ushort GetFriendRequests = 175;
-        public const ushort GetGuildRequests = 176;
-        public const ushort FindGuilds = 177;
-        // 1.67
-        public const ushort ChangeGuildMessage2 = 178;
-        public const ushort ChangeGuildOptions = 179;
-        public const ushort ChangeGuildAutoAcceptRequests = 184;
-        public const ushort ClaimAllMailsItems = 185;
-        public const ushort DeleteAllMails = 186;
-        // Gacha
-        public const ushort GachaInfo = 187;
-        public const ushort OpenGacha = 188;
-        // 1.73
-        public const ushort GetGuildInfo = 189;
+        public const ushort Respawn = 164;
+        public const ushort MailNotification = 165;
+        public const ushort GetFriendRequests = 166;
+        public const ushort GetGuildRequests = 167;
+        public const ushort FindGuilds = 168;
+        public const ushort ChangeGuildMessage2 = 169;
+        public const ushort ChangeGuildOptions = 170;
+        public const ushort ChangeGuildAutoAcceptRequests = 171;
+        public const ushort ClaimAllMailsItems = 172;
+        public const ushort DeleteAllMails = 173;
+        public const ushort GachaInfo = 174;
+        public const ushort OpenGacha = 175;
+        public const ushort GetGuildInfo = 176;
     }
 }

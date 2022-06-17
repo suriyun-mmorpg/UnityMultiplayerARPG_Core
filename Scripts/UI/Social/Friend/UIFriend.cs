@@ -8,14 +8,7 @@ namespace MultiplayerARPG
         protected override void OnEnable()
         {
             base.OnEnable();
-            ClientFriendActions.onNotifyFriendsUpdated += UpdateFriendsUIs;
             Refresh();
-        }
-
-        protected override void OnDisable()
-        {
-            base.OnDisable();
-            ClientFriendActions.onNotifyFriendsUpdated -= UpdateFriendsUIs;
         }
 
         public void Refresh()

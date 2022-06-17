@@ -220,14 +220,5 @@ namespace MultiplayerARPG
         {
             Manager.ServerSendPacket(connectionId, 0, DeliveryMethod.ReliableOrdered, GameNetworkingConsts.NotifyGuildInvitation, invitation);
         }
-
-        // Friends
-        public void SendSetFriends(long connectionId, List<SocialCharacterData> friends)
-        {
-            Manager.ServerSendPacket(connectionId, 0, DeliveryMethod.ReliableOrdered, GameNetworkingConsts.UpdateFriends, (writer) =>
-            {
-                writer.PutList(friends);
-            });
-        }
     }
 }

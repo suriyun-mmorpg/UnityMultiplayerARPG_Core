@@ -169,10 +169,5 @@ namespace MultiplayerARPG
             }
             ClientGuildActions.NotifyGuildUpdated(message.type, GameInstance.JoinedGuild);
         }
-
-        public void HandleUpdateFriends(MessageHandlerData messageHandler)
-        {
-            ClientFriendActions.NotifyFriendsUpdated(messageHandler.Reader.GetList<SocialCharacterData>());
-        }
     }
 }

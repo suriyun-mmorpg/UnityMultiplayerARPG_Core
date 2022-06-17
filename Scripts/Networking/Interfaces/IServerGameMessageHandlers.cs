@@ -41,7 +41,5 @@ namespace MultiplayerARPG
         void SendSetGuildGold(long connectionId, int id, int gold);
         void SendSetGuildLevelExpSkillPoint(long connectionId, int id, short level, int exp, short skillPoint);
         void SendNotifyGuildInvitation(long connectionId, GuildInvitationData invitation);
-        // Friends
-        void SendSetFriends(long connectionId, List<SocialCharacterData> friends);
     }
 }
