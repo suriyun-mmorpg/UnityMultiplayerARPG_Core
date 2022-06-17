@@ -524,5 +524,11 @@ namespace MultiplayerARPG
             });
             await UniTask.Yield();
         }
+
+        public async UniTaskVoid HandleRequestGuildRequestNotification(RequestHandlerData requestHandler, EmptyMessage request, RequestProceedResultDelegate<ResponseGuildRequestNotificationMessage> result)
+        {
+            result.Invoke(AckResponseCode.Unimplemented, new ResponseGuildRequestNotificationMessage());
+            await UniTask.Yield();
+        }
     }
 }

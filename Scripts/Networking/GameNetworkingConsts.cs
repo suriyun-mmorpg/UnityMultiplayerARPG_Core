@@ -102,5 +102,7 @@
         public const ushort GachaInfo = 174;
         public const ushort OpenGacha = 175;
         public const ushort GetGuildInfo = 176;
+        public const ushort FriendRequestNotification = 177;
+        public const ushort GuildRequestNotification = 178;
     }
 }

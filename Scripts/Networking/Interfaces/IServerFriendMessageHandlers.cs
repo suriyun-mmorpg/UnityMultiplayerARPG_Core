@@ -39,5 +39,9 @@ namespace MultiplayerARPG
         UniTaskVoid HandleRequestGetFriendRequests(
             RequestHandlerData requestHandler, EmptyMessage request,
             RequestProceedResultDelegate<ResponseGetFriendRequestsMessage> result);
+
+        UniTaskVoid HandleRequestFriendRequestNotification(
+            RequestHandlerData requestHandler, EmptyMessage request,
+            RequestProceedResultDelegate<ResponseFriendRequestNotificationMessage> result);
     }
 }

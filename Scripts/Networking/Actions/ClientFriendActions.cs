@@ -1,5 +1,4 @@
 ﻿using LiteNetLibManager;
-using System.Collections.Generic;
 
 namespace MultiplayerARPG
 {
@@ -13,6 +12,7 @@ namespace MultiplayerARPG
         public static System.Action<ResponseHandlerData, AckResponseCode, ResponseAcceptFriendRequestMessage> onResponseAcceptFriendRequest;
         public static System.Action<ResponseHandlerData, AckResponseCode, ResponseDeclineFriendRequestMessage> onResponseDeclineFriendRequest;
         public static System.Action<ResponseHandlerData, AckResponseCode, ResponseGetFriendRequestsMessage> onResponseGetFriendRequests;
+        public static System.Action<ResponseHandlerData, AckResponseCode, ResponseFriendRequestNotificationMessage> onResponseFriendRequestNotification;
 
         public static void ResponseFindCharacters(ResponseHandlerData requestHandler, AckResponseCode responseCode, ResponseSocialCharacterListMessage response)
         {
@@ -68,6 +68,13 @@ namespace MultiplayerARPG
             ClientGenericActions.ClientReceiveGameMessage(response.message);
             if (onResponseGetFriendRequests != null)
                 onResponseGetFriendRequests.Invoke(requestHandler, responseCode, response);
+        }
+
+        public static void ResponseFriendRequestNotification(ResponseHandlerData requestHandler, AckResponseCode responseCode, ResponseFriendRequestNotificationMessage response)
+        {
+            ClientGenericActions.ClientReceiveGameMessage(response.message);
+            if (onResponseFriendRequestNotification != null)
+                onResponseFriendRequestNotification.Invoke(requestHandler, responseCode, response);
         }
     }
 }

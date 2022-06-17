@@ -50,5 +50,10 @@ namespace MultiplayerARPG
         {
             return Manager.ClientSendRequest(GameNetworkingConsts.GetFriendRequests, EmptyMessage.Value, responseDelegate: callback);
         }
+
+        public bool RequestFriendRequestNotification(ResponseDelegate<ResponseFriendRequestNotificationMessage> callback)
+        {
+            return Manager.ClientSendRequest(GameNetworkingConsts.FriendRequestNotification, EmptyMessage.Value, responseDelegate: callback);
+        }
     }
 }

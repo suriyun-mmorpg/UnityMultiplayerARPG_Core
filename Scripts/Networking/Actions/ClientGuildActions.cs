@@ -24,6 +24,7 @@ namespace MultiplayerARPG
         public static System.Action<ResponseHandlerData, AckResponseCode, ResponseGetGuildRequestsMessage> onResponseGetGuildRequests;
         public static System.Action<ResponseHandlerData, AckResponseCode, ResponseFindGuildsMessage> onResponseFindGuilds;
         public static System.Action<ResponseHandlerData, AckResponseCode, ResponseGetGuildInfoMessage> onResponseGetGuildInfo;
+        public static System.Action<ResponseHandlerData, AckResponseCode, ResponseGuildRequestNotificationMessage> onResponseGuildRequestNotification;
         public static System.Action<GuildInvitationData> onNotifyGuildInvitation;
         public static System.Action<UpdateGuildMessage.UpdateType, GuildData> onNotifyGuildUpdated;
         public static System.Action<UpdateSocialMemberMessage.UpdateType, int, SocialCharacterData> onNotifyGuildMemberUpdated;
@@ -166,6 +167,13 @@ namespace MultiplayerARPG
             ClientGenericActions.ClientReceiveGameMessage(response.message);
             if (onResponseGetGuildInfo != null)
                 onResponseGetGuildInfo.Invoke(requestHandler, responseCode, response);
+        }
+
+        public static void ResponseGuildRequestNotification(ResponseHandlerData requestHandler, AckResponseCode responseCode, ResponseGuildRequestNotificationMessage response)
+        {
+            ClientGenericActions.ClientReceiveGameMessage(response.message);
+            if (onResponseGuildRequestNotification != null)
+                onResponseGuildRequestNotification.Invoke(requestHandler, responseCode, response);
         }
 
         public static void NotifyGuildInvitation(GuildInvitationData invitation)
