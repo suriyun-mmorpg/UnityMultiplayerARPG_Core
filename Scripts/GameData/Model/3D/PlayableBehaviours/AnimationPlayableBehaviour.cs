@@ -109,7 +109,6 @@ namespace MultiplayerARPG.GameData.Model.Playables
         private int baseLayerInputPortCount = 0;
         private bool readyToPlay = false;
         private float awakenTime;
-        private float deadClipLength;
 
         public void Setup(PlayableCharacterModel characterModel)
         {
