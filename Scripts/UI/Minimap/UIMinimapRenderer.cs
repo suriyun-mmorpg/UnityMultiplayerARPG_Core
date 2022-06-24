@@ -191,6 +191,7 @@ namespace MultiplayerARPG
         {
             RectTransform newMarker = Instantiate(prefab);
             newMarker.SetParent(nonPlayingCharacterMarkerContainer);
+            newMarker.transform.localScale = Vector3.one;
             SetMarkerPositionAndRotation(newMarker, character.CacheTransform, sizeRate, markerRotateOffsets);
             markers.Add(new MarkerData()
             {
