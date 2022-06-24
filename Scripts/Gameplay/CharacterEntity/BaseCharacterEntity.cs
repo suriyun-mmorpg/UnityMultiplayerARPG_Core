@@ -465,7 +465,8 @@ namespace MultiplayerARPG
 
         public override void PlayJumpAnimation()
         {
-            base.PlayJumpAnimation();
+            if (CharacterModel is IJumppableModel)
+                (CharacterModel as IJumppableModel).PlayJumpAnimation();
             if (IsClient && FpsModel && FpsModel.gameObject.activeSelf)
             {
                 if (FpsModel is IJumppableModel)
@@ -475,7 +476,8 @@ namespace MultiplayerARPG
 
         public override void PlayPickupAnimation()
         {
-            base.PlayPickupAnimation();
+            if (CharacterModel is IPickupableModel)
+                (CharacterModel as IPickupableModel).PlayPickupAnimation();
             if (IsClient && FpsModel && FpsModel.gameObject.activeSelf)
             {
                 if (FpsModel is IPickupableModel)
