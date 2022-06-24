@@ -11,7 +11,7 @@ namespace MultiplayerARPG
             ChangeQuestTracking(questDataId, isTracking);
         }
 
-        public void ChangeQuestTracking(int questDataId, bool isTracking)
+        public virtual void ChangeQuestTracking(int questDataId, bool isTracking)
         {
             int indexOfQuest = this.IndexOfQuest(questDataId);
             Quest quest;
@@ -22,7 +22,7 @@ namespace MultiplayerARPG
             quests[indexOfQuest] = characterQuest;
         }
 
-        public void AcceptQuest(int questDataId)
+        public virtual void AcceptQuest(int questDataId)
         {
             int indexOfQuest = this.IndexOfQuest(questDataId);
             Quest quest;
@@ -39,7 +39,7 @@ namespace MultiplayerARPG
             quests.Add(characterQuest);
         }
 
-        public void AbandonQuest(int questDataId)
+        public virtual void AbandonQuest(int questDataId)
         {
             int indexOfQuest = this.IndexOfQuest(questDataId);
             Quest quest;
@@ -51,7 +51,7 @@ namespace MultiplayerARPG
             quests.RemoveAt(indexOfQuest);
         }
 
-        public bool CompleteQuest(int questDataId, byte selectedRewardIndex)
+        public virtual bool CompleteQuest(int questDataId, byte selectedRewardIndex)
         {
             int indexOfQuest = this.IndexOfQuest(questDataId);
             Quest quest;
