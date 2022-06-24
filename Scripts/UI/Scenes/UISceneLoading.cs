@@ -11,8 +11,10 @@ namespace MultiplayerARPG
         public GameObject rootObject;
         public TextWrapper uiTextProgress;
         public Image imageGage;
+        [Tooltip("Delay before deactivate `rootObject`")]
+        public float finishedDelay = 0.25f;
 
-        private void Awake()
+        protected virtual void Awake()
         {
             if (Singleton != null)
             {
@@ -27,12 +29,12 @@ namespace MultiplayerARPG
                 rootObject.SetActive(false);
         }
 
-        public Coroutine LoadScene(string sceneName)
+        public virtual Coroutine LoadScene(string sceneName)
         {
             return StartCoroutine(LoadSceneRoutine(sceneName));
         }
 
-        IEnumerator LoadSceneRoutine(string sceneName)
+        protected virtual IEnumerator LoadSceneRoutine(string sceneName)
         {
             if (SceneManager.GetActiveScene().name.Equals(sceneName))
                 yield break;
@@ -57,7 +59,7 @@ namespace MultiplayerARPG
                 uiTextProgress.text = "100.00%";
             if (imageGage != null)
                 imageGage.fillAmount = 1;
-            yield return new WaitForSecondsRealtime(0.25f);
+            yield return new WaitForSecondsRealtime(finishedDelay);
             if (rootObject != null)
                 rootObject.SetActive(false);
         }
