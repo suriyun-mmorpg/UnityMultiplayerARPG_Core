@@ -42,7 +42,7 @@ namespace MultiplayerARPG
                 case NpcDialogConditionType.QuestNotStarted:
                     return indexOfQuest < 0;
                 case NpcDialogConditionType.QuestOngoing:
-                    return indexOfQuest >= 0 && !questTasksCompleted && !questCompleted;
+                    return indexOfQuest >= 0 && !questCompleted;
                 case NpcDialogConditionType.QuestTasksCompleted:
                     return indexOfQuest >= 0 && questTasksCompleted && !questCompleted;
                 case NpcDialogConditionType.QuestCompleted:
