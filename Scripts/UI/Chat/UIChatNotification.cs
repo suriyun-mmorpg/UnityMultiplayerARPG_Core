@@ -21,6 +21,7 @@ namespace MultiplayerARPG
         {
             base.Awake();
             SetOnClientReceiveChatMessage();
+            SetNotificationCount(0);
         }
 
         private void OnDestroy()
@@ -34,6 +35,11 @@ namespace MultiplayerARPG
             {
                 if (objectsToStopCounting[i].activeSelf)
                 {
+                    if (!StopCounting)
+                    {
+                        notificationCount = 0;
+                        SetNotificationCount(notificationCount);
+                    }
                     StopCounting = true;
                     return;
                 }
@@ -42,6 +48,11 @@ namespace MultiplayerARPG
             {
                 if (togglesToStopCounting[i].isOn)
                 {
+                    if (!StopCounting)
+                    {
+                        notificationCount = 0;
+                        SetNotificationCount(notificationCount);
+                    }
                     StopCounting = true;
                     return;
                 }
@@ -64,8 +75,6 @@ namespace MultiplayerARPG
         {
             if (StopCounting)
             {
-                notificationCount = 0;
-                SetNotificationCount(notificationCount);
                 return;
             }
             if (notifyForAllChannels)
