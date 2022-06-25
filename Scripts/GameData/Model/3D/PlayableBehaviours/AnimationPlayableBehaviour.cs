@@ -41,6 +41,7 @@ namespace MultiplayerARPG.GameData.Model.Playables
             None,
             Playing,
             Stopping,
+            Looping,
         }
 
         // Clip name variables
@@ -487,6 +488,7 @@ namespace MultiplayerARPG.GameData.Model.Playables
             switch (playingActionState)
             {
                 case PlayingActionState.Playing:
+                case PlayingActionState.Looping:
                     weight += weightUpdate;
                     if (weight > 1f)
                         weight = 1f;
@@ -531,7 +533,7 @@ namespace MultiplayerARPG.GameData.Model.Playables
             playingJumpState = PlayingJumpState.Starting;
         }
 
-        public void PlayAction(ActionState actionState, float speedRate, float duration = 0f)
+        public void PlayAction(ActionState actionState, float speedRate, float duration = 0f, bool loop = false)
         {
             if (IsFreeze || CharacterModel.isDead)
                 return;
@@ -574,12 +576,16 @@ namespace MultiplayerARPG.GameData.Model.Playables
             // Reset play elapsed
             actionPlayElapsed = 0f;
 
-            playingActionState = PlayingActionState.Playing;
+            if (loop)
+                playingActionState = PlayingActionState.Looping;
+            else
+                playingActionState = PlayingActionState.Playing;
         }
 
         public void StopAction()
         {
-            if (playingActionState == PlayingActionState.Playing)
+            if (playingActionState == PlayingActionState.Playing ||
+                playingActionState == PlayingActionState.Looping)
                 playingActionState = PlayingActionState.Stopping;
         }
     }

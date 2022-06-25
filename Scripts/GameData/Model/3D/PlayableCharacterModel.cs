@@ -355,19 +355,19 @@ namespace MultiplayerARPG.GameData.Model.Playables
             {
                 if (isLeftHand && weaponAnimations.leftHandChargeState.clip != null)
                 {
-                    Behaviour.PlayAction(weaponAnimations.leftHandChargeState, 1f);
+                    Behaviour.PlayAction(weaponAnimations.leftHandChargeState, 1f, loop: true);
                     return;
                 }
                 if (!isLeftHand && weaponAnimations.rightHandChargeState.clip != null)
                 {
-                    Behaviour.PlayAction(weaponAnimations.rightHandChargeState, 1f);
+                    Behaviour.PlayAction(weaponAnimations.rightHandChargeState, 1f, loop: true);
                     return;
                 }
             }
             if (isLeftHand)
-                Behaviour.PlayAction(defaultAnimations.leftHandChargeState, 1f);
+                Behaviour.PlayAction(defaultAnimations.leftHandChargeState, 1f, loop: true);
             else
-                Behaviour.PlayAction(defaultAnimations.rightHandChargeState, 1f);
+                Behaviour.PlayAction(defaultAnimations.rightHandChargeState, 1f, loop: true);
         }
 
         public override void StopWeaponChargeAnimation()
