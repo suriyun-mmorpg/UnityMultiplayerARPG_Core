@@ -5,8 +5,8 @@ namespace MultiplayerARPG
 {
     public class UIGuildRequestNotification : UIBase
     {
-        public GameObject[] notificationObjects;
-        public TextWrapper[] notificationCountTexts;
+        public GameObject[] notificationObjects = new GameObject[0];
+        public TextWrapper[] notificationCountTexts = new TextWrapper[0];
 
         private void OnEnable()
         {
