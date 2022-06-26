@@ -16,11 +16,13 @@ namespace MultiplayerARPG
         public abstract bool OwningCharacterCanKick();
         public abstract void UpdateOnlineMember(string id, bool isOnline);
     }
-    
+
     public abstract partial class UISocialGroup<T> : UISocialGroup
         where T : UISocialCharacter
     {
         [Header("String Formats")]
+        [Tooltip("Format => {0} = {Social ID}")]
+        public UILocaleKeySetting formatKeySocialId = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_SIMPLE);
         [Tooltip("Format => {0} = {Current Amount}, {1} = {Max Amount}")]
         public UILocaleKeySetting formatKeyMemberAmount = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_SOCIAL_MEMBER_AMOUNT);
         [Tooltip("Format => {0} = {Current Amount}")]
@@ -34,6 +36,7 @@ namespace MultiplayerARPG
         public T uiMemberDialog;
         public T uiMemberPrefab;
         public Transform uiMemberContainer;
+        public TextWrapper textSocialId;
         public TextWrapper textMemberAmount;
         public TextWrapper textOnlineMemberAmount;
         [Tooltip("These objects will be activated when owning character is in social group")]
@@ -108,6 +111,13 @@ namespace MultiplayerARPG
 
         protected virtual void UpdateUIs()
         {
+            if (textSocialId != null)
+            {
+                textSocialId.text = string.Format(
+                        LanguageManager.GetText(formatKeySocialId),
+                        GetSocialId().ToString("N0"));
+            }
+
             if (textMemberAmount != null)
             {
                 if (GetMaxMemberAmount() > 0)
@@ -132,7 +142,7 @@ namespace MultiplayerARPG
                     onlineMembers.Count.ToString("N0"),
                     memberAmount.ToString("N0"));
             }
-            
+
             foreach (GameObject obj in owningCharacterIsInGroupObjects)
             {
                 if (obj != null)
