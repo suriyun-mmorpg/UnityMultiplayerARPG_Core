@@ -1,4 +1,5 @@
 ﻿using LiteNetLibManager;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.Serialization;
@@ -13,6 +14,7 @@ namespace MultiplayerARPG
         public abstract bool CanKick(string characterId);
         public abstract bool OwningCharacterIsLeader();
         public abstract bool OwningCharacterCanKick();
+        public abstract void UpdateOnlineMember(string id, bool isOnline);
     }
     
     public abstract partial class UISocialGroup<T> : UISocialGroup
@@ -23,6 +25,8 @@ namespace MultiplayerARPG
         public UILocaleKeySetting formatKeyMemberAmount = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_SOCIAL_MEMBER_AMOUNT);
         [Tooltip("Format => {0} = {Current Amount}")]
         public UILocaleKeySetting formatKeyMemberAmountNoLimit = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_SOCIAL_MEMBER_AMOUNT_NO_LIMIT);
+        [Tooltip("Format => {0} = {Current Amount}, {1} = {Max Amount}")]
+        public UILocaleKeySetting formatKeyOnlineMemberAmount = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_SOCIAL_MEMBER_AMOUNT);
 
         [Header("UI Elements")]
         [FormerlySerializedAs("listEmptyObject")]
@@ -31,6 +35,7 @@ namespace MultiplayerARPG
         public T uiMemberPrefab;
         public Transform uiMemberContainer;
         public TextWrapper textMemberAmount;
+        public TextWrapper textOnlineMemberAmount;
         [Tooltip("These objects will be activated when owning character is in social group")]
         public GameObject[] owningCharacterIsInGroupObjects;
         [Tooltip("These objects will be activated when owning character is not in social group")]
@@ -59,6 +64,7 @@ namespace MultiplayerARPG
 
         protected int currentSocialId = 0;
         public int memberAmount { get; protected set; }
+        public HashSet<string> onlineMembers { get; protected set; } = new HashSet<string>();
 
         private UIList memberList;
         public UIList MemberList
@@ -118,6 +124,14 @@ namespace MultiplayerARPG
                         memberAmount.ToString("N0"));
                 }
             }
+
+            if (textOnlineMemberAmount != null)
+            {
+                textOnlineMemberAmount.text = string.Format(
+                    LanguageManager.GetText(formatKeyOnlineMemberAmount),
+                    onlineMembers.Count.ToString("N0"),
+                    memberAmount.ToString("N0"));
+            }
             
             foreach (GameObject obj in owningCharacterIsInGroupObjects)
             {
@@ -154,6 +168,14 @@ namespace MultiplayerARPG
                 if (obj != null)
                     obj.SetActive(!OwningCharacterCanKick());
             }
+        }
+
+        public override void UpdateOnlineMember(string id, bool isOnline)
+        {
+            if (isOnline)
+                onlineMembers.Add(id);
+            else
+                onlineMembers.Remove(id);
         }
 
         protected virtual void OnEnable()

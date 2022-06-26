@@ -55,11 +55,20 @@ namespace MultiplayerARPG
         private string dirtyCharacterId;
         private IPlayerCharacterData characterEntity;
 
+        protected override void OnDisable()
+        {
+            base.OnDisable();
+            if (uiSocialGroup != null)
+                uiSocialGroup.UpdateOnlineMember(Data.id, false);
+        }
+
         protected override void UpdateUI()
         {
             base.UpdateUI();
 
             bool isOnline = GameInstance.ClientOnlineCharacterHandlers.IsCharacterOnline(Data.id);
+            if (uiSocialGroup != null)
+                uiSocialGroup.UpdateOnlineMember(Data.id, isOnline);
             int offlineOffsets = GameInstance.ClientOnlineCharacterHandlers.GetCharacterOfflineOffsets(Data.id);
 
             if (uiTextOnlineStatus != null)
