@@ -1,6 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
 namespace MultiplayerARPG
 {
@@ -29,12 +27,19 @@ namespace MultiplayerARPG
 
             if (shooterController != null && shooterController.SelectedEntity != null)
             {
-                canActivate = shooterController.SelectedEntity is BasePlayerCharacterEntity || shooterController.SelectedEntity is NpcEntity;
+                if ((shooterController.SelectedEntity is BasePlayerCharacterEntity || shooterController.SelectedEntity is NpcEntity) &&
+                    Vector3.Distance(shooterController.SelectedEntity.CacheTransform.position, shooterController.PlayerCharacterEntity.CacheTransform.position) <= GameInstance.Singleton.conversationDistance)
+                {
+                    canActivate = true;
+                }
+
                 if (!canActivate)
                 {
                     BuildingEntity buildingEntity = shooterController.SelectedEntity as BuildingEntity;
                     if (buildingEntity != null && !buildingEntity.IsBuildMode && buildingEntity.Activatable)
+                    {
                         canActivate = true;
+                    }
                 }
             }
 
