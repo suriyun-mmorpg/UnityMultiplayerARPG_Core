@@ -107,42 +107,45 @@ namespace MultiplayerARPG
                 if (currentSocialId <= 0)
                     MemberList.HideAll();
             }
+
+            if (currentSocialId > 0)
+            {
+                if (textSocialId != null)
+                {
+                    textSocialId.text = string.Format(
+                            LanguageManager.GetText(formatKeySocialId),
+                            GetSocialId().ToString("N0"));
+                }
+
+                if (textMemberAmount != null)
+                {
+                    if (GetMaxMemberAmount() > 0)
+                    {
+                        textMemberAmount.text = string.Format(
+                            LanguageManager.GetText(formatKeyMemberAmount),
+                            memberAmount.ToString("N0"),
+                            GetMaxMemberAmount().ToString("N0"));
+                    }
+                    else
+                    {
+                        textMemberAmount.text = string.Format(
+                            LanguageManager.GetText(formatKeyMemberAmountNoLimit),
+                            memberAmount.ToString("N0"));
+                    }
+                }
+
+                if (textOnlineMemberAmount != null)
+                {
+                    textOnlineMemberAmount.text = string.Format(
+                        LanguageManager.GetText(formatKeyOnlineMemberAmount),
+                        onlineMembers.Count.ToString("N0"),
+                        memberAmount.ToString("N0"));
+                }
+            }
         }
 
         protected virtual void UpdateUIs()
         {
-            if (textSocialId != null)
-            {
-                textSocialId.text = string.Format(
-                        LanguageManager.GetText(formatKeySocialId),
-                        GetSocialId().ToString("N0"));
-            }
-
-            if (textMemberAmount != null)
-            {
-                if (GetMaxMemberAmount() > 0)
-                {
-                    textMemberAmount.text = string.Format(
-                        LanguageManager.GetText(formatKeyMemberAmount),
-                        memberAmount.ToString("N0"),
-                        GetMaxMemberAmount().ToString("N0"));
-                }
-                else
-                {
-                    textMemberAmount.text = string.Format(
-                        LanguageManager.GetText(formatKeyMemberAmountNoLimit),
-                        memberAmount.ToString("N0"));
-                }
-            }
-
-            if (textOnlineMemberAmount != null)
-            {
-                textOnlineMemberAmount.text = string.Format(
-                    LanguageManager.GetText(formatKeyOnlineMemberAmount),
-                    onlineMembers.Count.ToString("N0"),
-                    memberAmount.ToString("N0"));
-            }
-
             foreach (GameObject obj in owningCharacterIsInGroupObjects)
             {
                 if (obj != null)
