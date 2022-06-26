@@ -11,14 +11,15 @@ public class UIList : MonoBehaviour
     public int ListCount { get; protected set; } = 0;
     public System.Action<int, object, GameObject> onGenerateEntry = null;
     protected readonly List<GameObject> uis = new List<GameObject>();
-    protected bool removedContainerChildren;
 
     public void RemoveContainerChildren()
     {
-        if (removedContainerChildren || doNotRemoveContainerChildren)
+        if (doNotRemoveContainerChildren)
             return;
-        removedContainerChildren = true;
-        uiContainer.RemoveChildren();
+        for (int i = 0; i < uiContainer.childCount; ++i)
+        {
+            uiContainer.GetChild(i).gameObject.SetActive(false);
+        }
     }
 
     public void Generate<T>(IEnumerable<T> list, System.Action<int, T, GameObject> onGenerateEntry)
@@ -34,6 +35,7 @@ public class UIList : MonoBehaviour
             if (i < uis.Count)
             {
                 ui = uis[i];
+                ui.transform.SetSiblingIndex(i);
                 ui.SetActive(true);
             }
             else
@@ -45,7 +47,7 @@ public class UIList : MonoBehaviour
                     ui.transform.localPosition = Vector3.zero;
                     ui.transform.localRotation = Quaternion.identity;
                     ui.transform.localScale = Vector3.one;
-                    ui.transform.SetAsLastSibling();
+                    ui.transform.SetSiblingIndex(i);
                     uis.Add(ui);
                     ui.SetActive(true);
                 }
