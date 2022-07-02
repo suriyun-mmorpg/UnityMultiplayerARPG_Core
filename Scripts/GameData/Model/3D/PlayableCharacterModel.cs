@@ -21,8 +21,12 @@ namespace MultiplayerARPG.GameData.Model.Playables
         [Tooltip("If `transitionDuration` in state settings is <= 0, it will use this value")]
         public float transitionDuration = 0.1f;
         public DefaultAnimations defaultAnimations;
+        [Tooltip("Default animations will be overrided by these animations while wielding weapon with the same type")]
         [ArrayElementTitle("weaponType")]
         public WeaponAnimations[] weaponAnimations = new WeaponAnimations[0];
+        [Tooltip("Weapon animations will be overrided by these animations while wielding weapon with the same type at left-hand")]
+        [ArrayElementTitle("weaponType")]
+        public AlternativeWeaponAnimations[] leftHandWieldingWeaponAnimations = new AlternativeWeaponAnimations[0];
         [ArrayElementTitle("skill")]
         public SkillAnimations[] skillAnimations = new SkillAnimations[0];
         [ArrayElementTitle("clip")]

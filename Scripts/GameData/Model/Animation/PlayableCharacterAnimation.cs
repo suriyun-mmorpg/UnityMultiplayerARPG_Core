@@ -44,6 +44,19 @@ namespace MultiplayerARPG.GameData.Model.Playables
     }
 
     [System.Serializable]
+    public struct WieldMoveStates
+    {
+        public ActionState forwardState;
+        public ActionState backwardState;
+        public ActionState leftState;
+        public ActionState rightState;
+        public ActionState forwardLeftState;
+        public ActionState forwardRightState;
+        public ActionState backwardLeftState;
+        public ActionState backwardRightState;
+    }
+
+    [System.Serializable]
     public struct ActionAnimation
     {
         public ActionState state;
@@ -164,6 +177,50 @@ namespace MultiplayerARPG.GameData.Model.Playables
         [Header("Reload(Gun) animations")]
         public ActionAnimation rightHandReloadAnimation;
         public ActionAnimation leftHandReloadAnimation;
+
+        public WeaponType Data { get { return weaponType; } }
+    }
+
+    [System.Serializable]
+    public struct AlternativeWeaponAnimations : IWeaponAnims
+    {
+        public WeaponType weaponType;
+
+        [Header("Movements while standing")]
+        public ActionState idleState;
+        public WieldMoveStates moveStates;
+        public WieldMoveStates sprintStates;
+        public WieldMoveStates walkStates;
+
+        [Header("Movements while crouching")]
+        public ActionState crouchIdleState;
+        public WieldMoveStates crouchMoveStates;
+
+        [Header("Movements while crawling")]
+        public ActionState crawlIdleState;
+        public WieldMoveStates crawlMoveStates;
+
+        [Header("Movements while swimming")]
+        public ActionState swimIdleState;
+        public WieldMoveStates swimMoveStates;
+
+        [Header("Jump")]
+        public ActionState jumpState;
+
+        [Header("Fall")]
+        public ActionState fallState;
+
+        [Header("Landed")]
+        public ActionState landedState;
+
+        [Header("Hurt")]
+        public ActionState hurtState;
+
+        [Header("Dead")]
+        public ActionState deadState;
+
+        [Header("Pickup")]
+        public ActionState pickupState;
 
         public WeaponType Data { get { return weaponType; } }
     }
