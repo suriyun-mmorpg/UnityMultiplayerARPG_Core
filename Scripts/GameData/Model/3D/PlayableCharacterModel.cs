@@ -16,8 +16,6 @@ namespace MultiplayerARPG.GameData.Model.Playables
         public SkinnedMeshRenderer skinnedMeshRenderer;
 
         [Header("Animations")]
-        [Tooltip("If `avatarMask` in base state (idle and movement) settings is `null`, it will use this value")]
-        public AvatarMask baseAvatarMask;
         [Tooltip("If `avatarMask` in action state settings is `null`, it will use this value")]
         public AvatarMask actionAvatarMask;
         [Tooltip("If `transitionDuration` in state settings is <= 0, it will use this value")]
