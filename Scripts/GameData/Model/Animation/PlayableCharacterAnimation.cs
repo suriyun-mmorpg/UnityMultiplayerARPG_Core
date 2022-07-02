@@ -2,7 +2,6 @@
 
 namespace MultiplayerARPG.GameData.Model.Playables
 {
-
     [System.Serializable]
     public struct AnimState
     {

@@ -69,10 +69,6 @@ namespace MultiplayerARPG.GameData.Model.Playables
         public const string CLIP_LANDED = "__Landed";
         public const string CLIP_HURT = "__Hurt";
         public const string CLIP_DEAD = "__Dead";
-        public const string CLIP_ACTION = "__Action";
-        public const string CLIP_CAST_SKILL = "__CastSkill";
-        public const string CLIP_WEAPON_CHARGE = "__WeaponCharge";
-        public const string CLIP_PICKUP = "__Pickup";
 
         public Playable Self { get; private set; }
         public PlayableGraph Graph { get; private set; }

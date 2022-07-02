@@ -5,7 +5,7 @@ using UnityEngine.Playables;
 
 namespace MultiplayerARPG.GameData.Model.Playables
 {
-    public partial class PlayableCharacterModel : BaseCharacterModel
+    public partial class PlayableCharacterModel : BaseCharacterModel, ICustomAnimationPlayableModel
     {
         [Header("Relates Components")]
         [Tooltip("It will find `Animator` component on automatically if this is NULL")]
@@ -24,9 +24,11 @@ namespace MultiplayerARPG.GameData.Model.Playables
         public float transitionDuration = 0.1f;
         public DefaultAnimations defaultAnimations;
         [ArrayElementTitle("weaponType")]
-        public WeaponAnimations[] weaponAnimations;
+        public WeaponAnimations[] weaponAnimations = new WeaponAnimations[0];
         [ArrayElementTitle("skill")]
-        public SkillAnimations[] skillAnimations;
+        public SkillAnimations[] skillAnimations = new SkillAnimations[0];
+        [ArrayElementTitle("clip")]
+        public ActionState[] customAnimations = new ActionState[0];
 
         public PlayableGraph Graph { get; protected set; }
         public AnimationPlayableBehaviour Template { get; protected set; }
@@ -418,6 +420,15 @@ namespace MultiplayerARPG.GameData.Model.Playables
             }
             if (defaultAnimations.pickupState.clip != null)
                 Behaviour.PlayAction(defaultAnimations.pickupState, 1f);
+        }
+
+        public void PlayCustomAnimation(int id)
+        {
+            if (id < 0 || id >= customAnimations.Length)
+                return;
+            if (isDoingAction)
+                return;
+            Behaviour.PlayAction(customAnimations[id], 1f);
         }
         #endregion
 
