@@ -92,12 +92,6 @@ namespace MultiplayerARPG.GameData.Model.Playables
         private float actionTransitionDuration = 0f;
         private float actionClipLength = 0f;
         private float actionPlayElapsed = 0f;
-        private AnimActionType animActionType = AnimActionType.None;
-        private int animDataId = 0;
-        private int actionAnimIndex = 0;
-        private float actionPlaySpeedMultiplier = 0;
-        private float skillCastDuration = 0f;
-        private bool isLeftHand = false;
         private float baseLayerClipSpeed = 0f;
         private float actionLayerClipSpeed = 0f;
         private readonly StringBuilder stringBuilder = new StringBuilder();
