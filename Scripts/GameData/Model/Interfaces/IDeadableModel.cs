@@ -1,6 +1,6 @@
 ﻿namespace MultiplayerARPG
 {
-    public interface IDeadlyModel
+    public interface IDeadableModel
     {
         void SetIsDead(bool isDead);
     }

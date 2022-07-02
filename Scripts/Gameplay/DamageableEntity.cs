@@ -143,10 +143,10 @@ namespace MultiplayerARPG
         protected override void EntityUpdate()
         {
             base.EntityUpdate();
-            if (Model != null && Model is IDeadlyModel)
+            if (Model != null && Model is IDeadableModel)
             {
                 // Update dead animation
-                (Model as IDeadlyModel).SetIsDead(this.IsDead());
+                (Model as IDeadableModel).SetIsDead(this.IsDead());
             }
         }
 
