@@ -26,6 +26,8 @@ namespace MultiplayerARPG.GameData.Model.Playables
             public AnimationClip GetClip();
             public float GetTransitionDuration();
             public bool IsAdditive();
+            public bool ApplyFootIk();
+            public bool ApplyPlayableIk();
             public AvatarMask GetAvatarMask();
         }
 
@@ -56,6 +58,16 @@ namespace MultiplayerARPG.GameData.Model.Playables
             public bool IsAdditive()
             {
                 return State.isAdditive;
+            }
+
+            public bool ApplyFootIk()
+            {
+                return State.applyFootIk;
+            }
+
+            public bool ApplyPlayableIk()
+            {
+                return State.applyPlayableIk;
             }
 
             public AvatarMask GetAvatarMask()
@@ -91,6 +103,16 @@ namespace MultiplayerARPG.GameData.Model.Playables
             public bool IsAdditive()
             {
                 return State.isAdditive;
+            }
+
+            public bool ApplyFootIk()
+            {
+                return State.applyFootIk;
+            }
+
+            public bool ApplyPlayableIk()
+            {
+                return State.applyPlayableIk;
             }
 
             public AvatarMask GetAvatarMask()
@@ -307,34 +329,10 @@ namespace MultiplayerARPG.GameData.Model.Playables
             Graph.Connect(BaseLayerMixer, 0, LayerMixer, BASE_LAYER);
             LayerMixer.SetInputWeight(BASE_LAYER, 1);
 
-            // Connect to base layer states
-            BaseLayerMixer.SetInputCount(baseLayerInputPortCount);
-            foreach (BaseStateInfo stateInfo in baseStates.Values)
-            {
-                AnimationClipPlayable clipPlayable = AnimationClipPlayable.Create(Graph, stateInfo.State.clip);
-                clipPlayable.SetApplyFootIK(stateInfo.State.applyFootIk);
-                clipPlayable.SetApplyPlayableIK(stateInfo.State.applyPlayableIk);
-                Graph.Connect(clipPlayable, 0, BaseLayerMixer, stateInfo.InputPort);
-            }
-            if (BaseLayerMixer.GetInputCount() > 0)
-                BaseLayerMixer.SetInputWeight(0, 1);
-
             // Create and connect left-hand wielding layer mixer to layer mixer
             LeftHandWieldingLayerMixer = AnimationMixerPlayable.Create(Graph, 0, true);
             Graph.Connect(LeftHandWieldingLayerMixer, 0, LayerMixer, LEFT_HAND_WIELDING_LAYER);
             LayerMixer.SetInputWeight(LEFT_HAND_WIELDING_LAYER, 0);
-
-            // Connect to left-hand wielding layer states
-            LeftHandWieldingLayerMixer.SetInputCount(leftHandWieldingLayerInputPortCount);
-            foreach (LeftHandWieldingStateInfo stateInfo in leftHandWieldingStates.Values)
-            {
-                AnimationClipPlayable clipPlayable = AnimationClipPlayable.Create(Graph, stateInfo.State.clip);
-                clipPlayable.SetApplyFootIK(stateInfo.State.applyFootIk);
-                clipPlayable.SetApplyPlayableIK(stateInfo.State.applyPlayableIk);
-                Graph.Connect(clipPlayable, 0, LeftHandWieldingLayerMixer, stateInfo.InputPort);
-            }
-            if (LeftHandWieldingLayerMixer.GetInputCount() > 0)
-                LeftHandWieldingLayerMixer.SetInputWeight(0, 0);
 
             readyToPlay = true;
         }
@@ -600,11 +598,12 @@ namespace MultiplayerARPG.GameData.Model.Playables
 
         private void PrepareForNewState<T>(AnimationMixerPlayable mixer, uint layer, Dictionary<string, T> stateInfos, StateUpdateData stateUpdateData) where T : IStateInfo
         {
-            if (mixer.GetInputCount() == 0)
+            // No animation states?
+            if (stateInfos.Count == 0)
                 return;
 
             // Change state only when previous animation weight >= 1f
-            if (mixer.GetInputWeight(stateUpdateData.inputPort) < 1f)
+            if (mixer.GetInputCount() > 0 && mixer.GetInputWeight(stateUpdateData.inputPort) < 1f)
                 return;
 
             string playingStateId = GetPlayingStateId(stateUpdateData.WeaponTypeId, stateInfos, stateUpdateData);
@@ -626,8 +625,26 @@ namespace MultiplayerARPG.GameData.Model.Playables
             {
                 stateUpdateData.playingStateId = playingStateId;
 
+                // Play new state
+                int inputCount = mixer.GetInputCount() + 1;
+                mixer.SetInputCount(inputCount);
+                AnimationClipPlayable playable = AnimationClipPlayable.Create(Graph, stateInfos[playingStateId].GetClip());
+                playable.SetApplyFootIK(stateInfos[playingStateId].ApplyFootIk());
+                playable.SetApplyPlayableIK(stateInfos[playingStateId].ApplyPlayableIk());
+                Graph.Connect(playable, 0, mixer, inputCount - 1);
+                if (inputCount > 1)
+                {
+                    // Set weight to 0 for transition
+                    mixer.SetInputWeight(inputCount - 1, 0f);
+                }
+                else
+                {
+                    // Set weight to 1 for immediately playing
+                    mixer.SetInputWeight(inputCount - 1, 1f);
+                }
+
                 // Get input port from new playing state ID
-                stateUpdateData.inputPort = stateInfos[playingStateId].InputPort;
+                stateUpdateData.inputPort = inputCount - 1;
 
                 // Set avatar mask
                 AvatarMask avatarMask = stateInfos[playingStateId].GetAvatarMask();
@@ -655,30 +672,29 @@ namespace MultiplayerARPG.GameData.Model.Playables
 
         private void UpdateState(AnimationMixerPlayable mixer, StateUpdateData stateUpdateData, float deltaTime)
         {
-            if (mixer.GetInputCount() == 0)
+            int inputCount = mixer.GetInputCount();
+            if (inputCount == 0)
                 return;
 
             mixer.GetInput(stateUpdateData.inputPort).SetSpeed(IsFreeze ? 0 : stateUpdateData.clipSpeed);
 
             float weight;
             float weightUpdate;
-            // Update dead state
+            bool transitionEnded = false;
             if (CharacterModel.isDead && Time.unscaledTime - awakenTime < 1f)
             {
+                // Play dead animation at end frame immediately
                 mixer.GetInput(stateUpdateData.inputPort).SetTime(baseStates[stateUpdateData.playingStateId].State.clip.length);
-                int inputCount = mixer.GetInputCount();
                 for (int i = 0; i < inputCount; ++i)
                 {
-                    weight = mixer.GetInputWeight(i);
                     if (i != stateUpdateData.inputPort)
-                        mixer.SetInputWeight(i, 0f);
-                    else
-                        mixer.SetInputWeight(i, 1f);
-
-                    if (weight <= 0f)
                     {
-                        mixer.GetInput(i).Pause();
-                        mixer.GetInput(i).SetTime(0f);
+                        mixer.SetInputWeight(i, 0f);
+                    }
+                    else
+                    {
+                        mixer.SetInputWeight(i, 1f);
+                        transitionEnded = true;
                     }
                 }
             }
@@ -686,7 +702,6 @@ namespace MultiplayerARPG.GameData.Model.Playables
             {
                 // Update transition
                 weightUpdate = deltaTime / stateUpdateData.transitionDuration;
-                int inputCount = mixer.GetInputCount();
                 for (int i = 0; i < inputCount; ++i)
                 {
                     weight = mixer.GetInputWeight(i);
@@ -700,14 +715,12 @@ namespace MultiplayerARPG.GameData.Model.Playables
                     {
                         weight += weightUpdate;
                         if (weight > 1f)
+                        {
                             weight = 1f;
+                            transitionEnded = true;
+                        }
                     }
                     mixer.SetInputWeight(i, weight);
-                    if (weight <= 0f)
-                    {
-                        mixer.GetInput(i).Pause();
-                        mixer.GetInput(i).SetTime(0f);
-                    }
                 }
 
                 // Update playing state
@@ -720,6 +733,25 @@ namespace MultiplayerARPG.GameData.Model.Playables
                 // It will change state to movement in next frame
                 if (stateUpdateData.PlayingLandedState && stateUpdateData.playElapsed >= stateUpdateData.clipLength)
                     stateUpdateData.PlayingLandedState = false;
+            }
+
+            if (inputCount > 1 && transitionEnded)
+            {
+                // Disconnect and destroy all input except the last one
+                Playable tempPlayable;
+                for (int i = 0; i < inputCount - 1; ++i)
+                {
+                    tempPlayable = mixer.GetInput(i);
+                    Graph.Disconnect(mixer, i);
+                    if (tempPlayable.IsValid())
+                        tempPlayable.Destroy();
+                }
+                // Get last input connect to mixer at index-0
+                tempPlayable = mixer.GetInput(inputCount - 1);
+                Graph.Disconnect(mixer, inputCount - 1);
+                Graph.Connect(tempPlayable, 0, mixer, 0);
+                mixer.SetInputCount(1);
+                stateUpdateData.inputPort = 0;
             }
         }
 
