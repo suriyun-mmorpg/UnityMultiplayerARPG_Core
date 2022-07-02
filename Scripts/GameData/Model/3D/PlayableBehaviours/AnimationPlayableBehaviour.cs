@@ -146,6 +146,7 @@ namespace MultiplayerARPG.GameData.Model.Playables
             public float clipSpeed = 0f;
 
             public bool HasChanges { get; set; } = true;
+            public bool ForcePlay { get; set; } = false;
 
             private string _weaponTypeId;
             public string WeaponTypeId
@@ -473,6 +474,7 @@ namespace MultiplayerARPG.GameData.Model.Playables
             {
                 stateUpdateData.PlayingJumpState = PlayingJumpState.Playing;
                 stateUpdateData.IsPreviouslyGrounded = false;
+                stateUpdateData.ForcePlay = true;
                 // Get jump state by weapon type
                 string stateId = stringBuilder.Clear().Append(weaponTypeId).Append(CLIP_JUMP).ToString();
                 // State not found, use jump state from default animations
@@ -480,7 +482,7 @@ namespace MultiplayerARPG.GameData.Model.Playables
                     stateId = CLIP_JUMP;
                 return stateId;
             }
-            else if (stateUpdateData.MovementState.Has(MovementState.IsUnderWater) || CharacterModel.movementState.Has(MovementState.IsGrounded))
+            else if (stateUpdateData.MovementState.Has(MovementState.IsUnderWater) || stateUpdateData.MovementState.Has(MovementState.IsGrounded))
             {
                 if (stateUpdateData.PlayingLandedState || stateUpdateData.PlayingJumpState == PlayingJumpState.Playing)
                 {
@@ -621,9 +623,10 @@ namespace MultiplayerARPG.GameData.Model.Playables
                 return;
             }
 
-            if (!stateUpdateData.playingStateId.Equals(playingStateId))
+            if (!stateUpdateData.playingStateId.Equals(playingStateId) || stateUpdateData.ForcePlay)
             {
                 stateUpdateData.playingStateId = playingStateId;
+                stateUpdateData.ForcePlay = false;
 
                 // Play new state
                 int inputCount = mixer.GetInputCount() + 1;
