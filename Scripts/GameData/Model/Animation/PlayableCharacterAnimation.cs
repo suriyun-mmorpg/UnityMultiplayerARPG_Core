@@ -182,7 +182,7 @@ namespace MultiplayerARPG.GameData.Model.Playables
     }
 
     [System.Serializable]
-    public struct AlternativeWeaponAnimations : IWeaponAnims
+    public struct WieldWeaponAnimations : IWeaponAnims
     {
         public WeaponType weaponType;
 

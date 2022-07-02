@@ -26,7 +26,7 @@ namespace MultiplayerARPG.GameData.Model.Playables
         public WeaponAnimations[] weaponAnimations = new WeaponAnimations[0];
         [Tooltip("Weapon animations will be overrided by these animations while wielding weapon with the same type at left-hand")]
         [ArrayElementTitle("weaponType")]
-        public AlternativeWeaponAnimations[] leftHandWieldingWeaponAnimations = new AlternativeWeaponAnimations[0];
+        public WieldWeaponAnimations[] leftHandWieldingWeaponAnimations = new WieldWeaponAnimations[0];
         [ArrayElementTitle("skill")]
         public SkillAnimations[] skillAnimations = new SkillAnimations[0];
         [ArrayElementTitle("clip")]
@@ -157,15 +157,16 @@ namespace MultiplayerARPG.GameData.Model.Playables
         {
             base.SetEquipWeapons(equipWeapons);
             // Get one equipped weapon from right-hand or left-hand
-            IWeaponItem weaponItem = equipWeapons.GetRightHandWeaponItem();
-            if (weaponItem == null)
-                weaponItem = equipWeapons.GetLeftHandWeaponItem();
+            IWeaponItem rightWeaponItem = equipWeapons.GetRightHandWeaponItem();
+            IWeaponItem leftWeaponItem = equipWeapons.GetLeftHandWeaponItem();
+            if (rightWeaponItem == null)
+                rightWeaponItem = leftWeaponItem;
             // Set equipped weapon type, it will be used to get animations by id
             equippedWeaponType = null;
-            if (weaponItem != null)
-                equippedWeaponType = weaponItem.WeaponType;
+            if (rightWeaponItem != null)
+                equippedWeaponType = rightWeaponItem.WeaponType;
             if (Behaviour != null)
-                Behaviour.SetPlayingWeaponTypeId(weaponItem);
+                Behaviour.SetPlayingWeaponTypeId(rightWeaponItem, leftWeaponItem);
         }
 
         #region Right-hand animations
