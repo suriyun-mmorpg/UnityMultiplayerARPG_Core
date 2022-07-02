@@ -384,6 +384,15 @@ namespace MultiplayerARPG.GameData.Model.Playables
                             previousStateId = playingStateId;
                         // Get input port from new playing state ID
                         baseInputPort = baseStates[playingStateId].inputPort;
+
+                        // Set avatar mask
+                        AvatarMask avatarMask = baseStates[playingStateId].state.avatarMask;
+                        if (avatarMask == null)
+                            avatarMask = CharacterModel.baseAvatarMask;
+                        if (avatarMask == null)
+                            avatarMask = EmptyMask;
+                        LayerMixer.SetLayerMaskFromAvatarMask(0, avatarMask);
+
                         // Set clip info 
                         baseLayerClipSpeed = baseStates[playingStateId].GetSpeed(1);
                         // Set transition duration
@@ -397,6 +406,7 @@ namespace MultiplayerARPG.GameData.Model.Playables
                         LayerMixer.SetLayerAdditive(0, baseStates[playingStateId].state.isAdditive);
                         // Reset play elapsed
                         basePlayElapsed = 0f;
+
                         // Set previous state Id for next state change updating
                         previousStateId = playingStateId;
                     }

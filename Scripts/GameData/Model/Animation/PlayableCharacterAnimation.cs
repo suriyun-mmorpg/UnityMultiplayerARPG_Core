@@ -7,6 +7,8 @@ namespace MultiplayerARPG.GameData.Model.Playables
     public struct AnimState
     {
         public AnimationClip clip;
+        [Tooltip("If this is `null`, it will use default avatar mask setting from model component")]
+        public AvatarMask avatarMask;
         [Tooltip("If this <= 0, it will not be used to calculate with animation speed multiplier")]
         public float animSpeedRate;
         [Tooltip("If this <= 0, it will use default transition duration setting from model component")]
