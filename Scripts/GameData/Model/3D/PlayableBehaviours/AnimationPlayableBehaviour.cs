@@ -117,19 +117,104 @@ namespace MultiplayerARPG.GameData.Model.Playables
         private class StateUpdateData
         {
             public string playingStateId = string.Empty;
-            public PlayingJumpState playingJumpState = PlayingJumpState.None;
-            public bool isPreviouslyGrounded = true;
-            public bool playingLandedState = false;
             public int inputPort = 0;
             public float transitionDuration = 0f;
             public float clipLength = 0f;
             public float playElapsed = 0f;
             public float clipSpeed = 0f;
-            public bool previousIsDead = false;
-            public MovementState previousMovementState = MovementState.None;
-            public ExtraMovementState previousExtraMovementState = ExtraMovementState.None;
-            public PlayingJumpState previousPlayingJumpState = PlayingJumpState.None;
-            public string previousWeaponTypeId = string.Empty;
+
+            public bool HasChanges { get; set; } = true;
+
+            private string _weaponTypeId;
+            public string WeaponTypeId
+            {
+                get { return _weaponTypeId; }
+                set
+                {
+                    if (_weaponTypeId == value)
+                        return;
+                    _weaponTypeId = value;
+                    HasChanges = true;
+                }
+            }
+
+            private bool _isDead;
+            public bool IsDead
+            {
+                get { return _isDead; }
+                set
+                {
+                    if (_isDead == value)
+                        return;
+                    _isDead = value;
+                    HasChanges = true;
+                }
+            }
+
+            private MovementState _movementState;
+            public MovementState MovementState
+            {
+                get { return _movementState; }
+                set
+                {
+                    if (_movementState == value)
+                        return;
+                    _movementState = value;
+                    HasChanges = true;
+                }
+            }
+
+            private ExtraMovementState _extraMovementState;
+            public ExtraMovementState ExtraMovementState
+            {
+                get { return _extraMovementState; }
+                set
+                {
+                    if (_extraMovementState == value)
+                        return;
+                    _extraMovementState = value;
+                    HasChanges = true;
+                }
+            }
+
+            private PlayingJumpState _playingJumpState = PlayingJumpState.None;
+            public PlayingJumpState PlayingJumpState
+            {
+                get { return _playingJumpState; }
+                set
+                {
+                    if (_playingJumpState == value)
+                        return;
+                    _playingJumpState = value;
+                    HasChanges = true;
+                }
+            }
+
+            private bool _isPreviouslyGrounded = true;
+            public bool IsPreviouslyGrounded
+            {
+                get { return _isPreviouslyGrounded; }
+                set
+                {
+                    if (_isPreviouslyGrounded == value)
+                        return;
+                    _isPreviouslyGrounded = value;
+                    HasChanges = true;
+                }
+            }
+
+            private bool _playingLandedState = false;
+            public bool PlayingLandedState
+            {
+                get { return _playingLandedState; }
+                set
+                {
+                    if (_playingLandedState == value)
+                        return;
+                    _playingLandedState = value;
+                    HasChanges = true;
+                }
+            }
         }
 
         // Clip name variables
@@ -167,8 +252,6 @@ namespace MultiplayerARPG.GameData.Model.Playables
         public PlayableCharacterModel CharacterModel { get; private set; }
         public bool IsFreeze { get; set; }
 
-        private string currentWeaponTypeId = string.Empty;
-        private string leftHandWeaponTypeId = string.Empty;
         private readonly StateUpdateData baseStateUpdateData = new StateUpdateData();
         private readonly StateUpdateData leftHandWieldingStateUpdateData = new StateUpdateData();
         private PlayingActionState playingActionState = PlayingActionState.None;
@@ -369,32 +452,18 @@ namespace MultiplayerARPG.GameData.Model.Playables
             };
         }
 
-        private bool DetectStateChange(string weaponTypeId, StateUpdateData stateUpdateData)
-        {
-            if (stateUpdateData.previousIsDead != CharacterModel.isDead ||
-                stateUpdateData.previousMovementState != CharacterModel.movementState ||
-                stateUpdateData.previousExtraMovementState != CharacterModel.extraMovementState ||
-                stateUpdateData.previousPlayingJumpState != stateUpdateData.playingJumpState ||
-                stateUpdateData.previousWeaponTypeId != weaponTypeId)
-            {
-                stateUpdateData.previousIsDead = CharacterModel.isDead;
-                stateUpdateData.previousMovementState = CharacterModel.movementState;
-                stateUpdateData.previousExtraMovementState = CharacterModel.extraMovementState;
-                stateUpdateData.previousPlayingJumpState = stateUpdateData.playingJumpState;
-                stateUpdateData.previousWeaponTypeId = weaponTypeId;
-                return true;
-            }
-            return false;
-        }
-
         private string GetPlayingStateId<T>(string weaponTypeId, Dictionary<string, T> stateInfos, StateUpdateData stateUpdateData) where T : IStateInfo
         {
-            if (!DetectStateChange(weaponTypeId, stateUpdateData))
+            stateUpdateData.IsDead = CharacterModel.isDead;
+            stateUpdateData.MovementState = CharacterModel.movementState;
+            stateUpdateData.ExtraMovementState = CharacterModel.extraMovementState;
+
+            if (!stateUpdateData.HasChanges)
                 return stateUpdateData.playingStateId;
 
-            if (CharacterModel.isDead)
+            if (stateUpdateData.IsDead)
             {
-                stateUpdateData.playingJumpState = PlayingJumpState.None;
+                stateUpdateData.PlayingJumpState = PlayingJumpState.None;
                 // Get dead state by weapon type
                 string stateId = stringBuilder.Clear().Append(weaponTypeId).Append(CLIP_DEAD).ToString();
                 // State not found, use dead state from default animations
@@ -402,10 +471,10 @@ namespace MultiplayerARPG.GameData.Model.Playables
                     stateId = CLIP_DEAD;
                 return stateId;
             }
-            else if (stateUpdateData.playingJumpState == PlayingJumpState.Starting)
+            else if (stateUpdateData.PlayingJumpState == PlayingJumpState.Starting)
             {
-                stateUpdateData.playingJumpState = PlayingJumpState.Playing;
-                stateUpdateData.isPreviouslyGrounded = false;
+                stateUpdateData.PlayingJumpState = PlayingJumpState.Playing;
+                stateUpdateData.IsPreviouslyGrounded = false;
                 // Get jump state by weapon type
                 string stateId = stringBuilder.Clear().Append(weaponTypeId).Append(CLIP_JUMP).ToString();
                 // State not found, use jump state from default animations
@@ -413,16 +482,16 @@ namespace MultiplayerARPG.GameData.Model.Playables
                     stateId = CLIP_JUMP;
                 return stateId;
             }
-            else if (CharacterModel.movementState.Has(MovementState.IsUnderWater) || CharacterModel.movementState.Has(MovementState.IsGrounded))
+            else if (stateUpdateData.MovementState.Has(MovementState.IsUnderWater) || CharacterModel.movementState.Has(MovementState.IsGrounded))
             {
-                if (stateUpdateData.playingLandedState || stateUpdateData.playingJumpState == PlayingJumpState.Playing)
+                if (stateUpdateData.PlayingLandedState || stateUpdateData.PlayingJumpState == PlayingJumpState.Playing)
                 {
                     // Don't change state because character is just landed, landed animation has to be played before change to move state
                     return stateUpdateData.playingStateId;
                 }
-                if (CharacterModel.movementState.Has(MovementState.IsGrounded) && !stateUpdateData.isPreviouslyGrounded)
+                if (stateUpdateData.MovementState.Has(MovementState.IsGrounded) && !stateUpdateData.IsPreviouslyGrounded)
                 {
-                    stateUpdateData.isPreviouslyGrounded = true;
+                    stateUpdateData.IsPreviouslyGrounded = true;
                     // Get landed state by weapon type
                     string stateId = stringBuilder.Clear().Append(weaponTypeId).Append(CLIP_LANDED).ToString();
                     // State not found, use landed state from default animations
@@ -431,16 +500,16 @@ namespace MultiplayerARPG.GameData.Model.Playables
                     // State found, use this state Id. If it not, use move state
                     if (stateInfos.ContainsKey(stateId))
                     {
-                        stateUpdateData.playingLandedState = true;
+                        stateUpdateData.PlayingLandedState = true;
                         return stateId;
                     }
                 }
                 // Get movement state
                 stringBuilder.Clear();
-                bool movingForward = CharacterModel.movementState.Has(MovementState.Forward);
-                bool movingBackward = CharacterModel.movementState.Has(MovementState.Backward);
-                bool movingLeft = CharacterModel.movementState.Has(MovementState.Left);
-                bool movingRight = CharacterModel.movementState.Has(MovementState.Right);
+                bool movingForward = stateUpdateData.MovementState.Has(MovementState.Forward);
+                bool movingBackward = stateUpdateData.MovementState.Has(MovementState.Backward);
+                bool movingLeft = stateUpdateData.MovementState.Has(MovementState.Left);
+                bool movingRight = stateUpdateData.MovementState.Has(MovementState.Right);
                 bool moving = (movingForward || movingBackward || movingLeft || movingRight) && CharacterModel.moveAnimationSpeedMultiplier > 0f;
                 if (moving)
                 {
@@ -455,7 +524,7 @@ namespace MultiplayerARPG.GameData.Model.Playables
                 }
                 // Set state without move type, it will be used if state with move type not found
                 string stateWithoutWeaponIdAndMoveType = stringBuilder.ToString();
-                if (CharacterModel.movementState.Has(MovementState.IsUnderWater))
+                if (stateUpdateData.MovementState.Has(MovementState.IsUnderWater))
                 {
                     if (!moving)
                         stringBuilder.Append(CLIP_SWIM_IDLE);
@@ -464,7 +533,7 @@ namespace MultiplayerARPG.GameData.Model.Playables
                 }
                 else
                 {
-                    switch (CharacterModel.extraMovementState)
+                    switch (stateUpdateData.ExtraMovementState)
                     {
                         case ExtraMovementState.IsSprinting:
                             if (!moving)
@@ -512,14 +581,14 @@ namespace MultiplayerARPG.GameData.Model.Playables
                 // State still not found, use state without weapon type and move type
                 return stateWithoutWeaponIdAndMoveType;
             }
-            else if (stateUpdateData.playingJumpState == PlayingJumpState.Playing)
+            else if (stateUpdateData.PlayingJumpState == PlayingJumpState.Playing)
             {
                 // Don't change state because character is jumping, it will change to fall when jump animation played
                 return stateUpdateData.playingStateId;
             }
             else
             {
-                stateUpdateData.isPreviouslyGrounded = false;
+                stateUpdateData.IsPreviouslyGrounded = false;
                 // Get fall state by weapon type
                 string stateId = stringBuilder.Clear().Append(weaponTypeId).Append(CLIP_FALL).ToString();
                 // State not found, use fall state from default animations
@@ -529,7 +598,7 @@ namespace MultiplayerARPG.GameData.Model.Playables
             }
         }
 
-        private void PrepareForNewState<T>(AnimationMixerPlayable mixer, uint layer, string weaponTypeId, Dictionary<string, T> stateInfos, StateUpdateData stateUpdateData) where T : IStateInfo
+        private void PrepareForNewState<T>(AnimationMixerPlayable mixer, uint layer, Dictionary<string, T> stateInfos, StateUpdateData stateUpdateData) where T : IStateInfo
         {
             if (mixer.GetInputCount() == 0)
                 return;
@@ -538,10 +607,10 @@ namespace MultiplayerARPG.GameData.Model.Playables
             if (mixer.GetInputWeight(stateUpdateData.inputPort) < 1f)
                 return;
 
-            string playingStateId = GetPlayingStateId(weaponTypeId, stateInfos, stateUpdateData);
+            string playingStateId = GetPlayingStateId(stateUpdateData.WeaponTypeId, stateInfos, stateUpdateData);
             // State not found, use idle state (with weapon type)
             if (!stateInfos.ContainsKey(playingStateId))
-                playingStateId = stringBuilder.Clear().Append(weaponTypeId).Append(CLIP_IDLE).ToString();
+                playingStateId = stringBuilder.Clear().Append(stateUpdateData.WeaponTypeId).Append(CLIP_IDLE).ToString();
             // State still not found, use idle state from default states (without weapon type)
             if (!stateInfos.ContainsKey(playingStateId))
                 playingStateId = CLIP_IDLE;
@@ -645,12 +714,12 @@ namespace MultiplayerARPG.GameData.Model.Playables
                 stateUpdateData.playElapsed += deltaTime;
 
                 // It will change state to fall in next frame
-                if (stateUpdateData.playingJumpState == PlayingJumpState.Playing && stateUpdateData.playElapsed >= stateUpdateData.clipLength)
-                    stateUpdateData.playingJumpState = PlayingJumpState.None;
+                if (stateUpdateData.PlayingJumpState == PlayingJumpState.Playing && stateUpdateData.playElapsed >= stateUpdateData.clipLength)
+                    stateUpdateData.PlayingJumpState = PlayingJumpState.None;
 
                 // It will change state to movement in next frame
-                if (stateUpdateData.playingLandedState && stateUpdateData.playElapsed >= stateUpdateData.clipLength)
-                    stateUpdateData.playingLandedState = false;
+                if (stateUpdateData.PlayingLandedState && stateUpdateData.playElapsed >= stateUpdateData.clipLength)
+                    stateUpdateData.PlayingLandedState = false;
             }
         }
 
@@ -662,8 +731,8 @@ namespace MultiplayerARPG.GameData.Model.Playables
             #region Update base state and left-hand wielding
             if (!IsFreeze)
             {
-                PrepareForNewState(BaseLayerMixer, BASE_LAYER, currentWeaponTypeId, baseStates, baseStateUpdateData);
-                PrepareForNewState(LeftHandWieldingLayerMixer, LEFT_HAND_WIELDING_LAYER, leftHandWeaponTypeId, leftHandWieldingStates, leftHandWieldingStateUpdateData);
+                PrepareForNewState(BaseLayerMixer, BASE_LAYER, baseStates, baseStateUpdateData);
+                PrepareForNewState(LeftHandWieldingLayerMixer, LEFT_HAND_WIELDING_LAYER, leftHandWieldingStates, leftHandWieldingStateUpdateData);
             }
 
             UpdateState(BaseLayerMixer, baseStateUpdateData, info.deltaTime);
@@ -724,19 +793,19 @@ namespace MultiplayerARPG.GameData.Model.Playables
 
         public void SetPlayingWeaponTypeId(IWeaponItem rightHand, IWeaponItem leftHand)
         {
-            currentWeaponTypeId = string.Empty;
+            baseStateUpdateData.WeaponTypeId = string.Empty;
             if (rightHand != null && weaponTypeIds.Contains(rightHand.WeaponType.Id))
-                currentWeaponTypeId = rightHand.WeaponType.Id;
+                baseStateUpdateData.WeaponTypeId = rightHand.WeaponType.Id;
 
-            leftHandWeaponTypeId = string.Empty;
+            leftHandWieldingStateUpdateData.WeaponTypeId = string.Empty;
             if (leftHand != null && leftHandWeaponTypeIds.Contains(leftHand.WeaponType.Id))
-                leftHandWeaponTypeId = leftHand.WeaponType.Id;
+                leftHandWieldingStateUpdateData.WeaponTypeId = leftHand.WeaponType.Id;
         }
 
         public void PlayJump()
         {
-            baseStateUpdateData.playingJumpState = PlayingJumpState.Starting;
-            leftHandWieldingStateUpdateData.playingJumpState = PlayingJumpState.Starting;
+            baseStateUpdateData.PlayingJumpState = PlayingJumpState.Starting;
+            leftHandWieldingStateUpdateData.PlayingJumpState = PlayingJumpState.Starting;
         }
 
         public void PlayAction(ActionState actionState, float speedRate, float duration = 0f, bool loop = false)
