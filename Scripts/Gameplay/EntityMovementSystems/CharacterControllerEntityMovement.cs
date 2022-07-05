@@ -115,6 +115,7 @@ namespace MultiplayerARPG
                 disablingComp.enabled = false;
             }
             // Setup
+            yAngle = targetYAngle = CacheTransform.eulerAngles.y;
             StopMoveFunction();
         }
 
