@@ -38,7 +38,7 @@ namespace MultiplayerARPG
         protected EntityMovementInput currentInput;
         protected ExtraMovementState tempExtraMovementState;
         protected Vector3? inputDirection;
-        protected Vector3? inputPosition;
+        protected bool moveByDestination = false;
         protected bool isTeleporting;
 
         public override void EntityAwake()
@@ -80,6 +80,7 @@ namespace MultiplayerARPG
             {
                 // Always apply movement to owner client (it's client prediction for server auth movement)
                 inputDirection = moveDirection;
+                moveByDestination = false;
                 CacheNavMeshAgent.updatePosition = true;
                 CacheNavMeshAgent.updateRotation = true;
                 if (CacheNavMeshAgent.isOnNavMesh)
@@ -121,6 +122,8 @@ namespace MultiplayerARPG
 
         private void StopMoveFunction()
         {
+            inputDirection = null;
+            moveByDestination = false;
             CacheNavMeshAgent.updatePosition = false;
             CacheNavMeshAgent.updateRotation = false;
             if (CacheNavMeshAgent.isOnNavMesh)
@@ -192,6 +195,7 @@ namespace MultiplayerARPG
                 if (inputDirection.HasValue)
                 {
                     CacheNavMeshAgent.Move(inputDirection.Value * CacheNavMeshAgent.speed * deltaTime);
+                    CacheNavMeshAgent.SetDestination(CacheTransform.position);
                     MovementState = MovementState.Forward | MovementState.IsGrounded;
                 }
                 else
@@ -209,7 +213,7 @@ namespace MultiplayerARPG
                     currentInput = this.SetInputIsKeyMovement(currentInput, true);
                     currentInput = this.SetInputPosition(currentInput, CacheTransform.position);
                 }
-                else
+                else if (moveByDestination)
                 {
                     currentInput = this.SetInputIsKeyMovement(currentInput, false);
                     currentInput = this.SetInputPosition(currentInput, CacheNavMeshAgent.destination);
@@ -227,6 +231,7 @@ namespace MultiplayerARPG
             if (!Entity.CanMove())
                 return;
             inputDirection = null;
+            moveByDestination = true;
             CacheNavMeshAgent.updatePosition = true;
             CacheNavMeshAgent.updateRotation = true;
             if (CacheNavMeshAgent.isOnNavMesh)
@@ -465,8 +470,11 @@ namespace MultiplayerARPG
 
         protected virtual void OnTeleport(Vector3 position, float yAngle)
         {
-            CacheNavMeshAgent.isStopped = true;
+            inputDirection = null;
+            moveByDestination = false;
             CacheNavMeshAgent.Warp(position);
+            if (CacheNavMeshAgent.isOnNavMesh)
+                CacheNavMeshAgent.isStopped = true;
             CacheTransform.rotation = Quaternion.Euler(0f, yAngle, 0f);
         }
     }
