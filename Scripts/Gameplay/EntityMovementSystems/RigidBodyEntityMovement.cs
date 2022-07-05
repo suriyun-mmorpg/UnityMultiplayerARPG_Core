@@ -13,6 +13,8 @@ namespace MultiplayerARPG
     public class RigidBodyEntityMovement : BaseNetworkedGameEntityComponent<BaseGameEntity>, IEntityMovementComponent
     {
         protected static readonly RaycastHit[] findGroundRaycastHits = new RaycastHit[25];
+        protected static readonly long lagBuffer = System.TimeSpan.TicksPerMillisecond * 200;
+        protected static readonly float lagBufferUnityTime = 0.2f;
 
         [Header("Movement AI")]
         [Range(0.01f, 1f)]
@@ -412,7 +414,6 @@ namespace MultiplayerARPG
             // Jumping 
             if (acceptedJump || (pauseMovementCountDown <= 0f && isGrounded && isJumping && !CacheOpenCharacterController.startedSlide))
             {
-                currentInput = this.SetInputJump(currentInput);
                 sendingJump = true;
                 airborneElapsed = airborneDelay;
                 Entity.PlayJumpAnimation();
@@ -700,11 +701,16 @@ namespace MultiplayerARPG
             if (Entity.MovementSecure == MovementSecure.ServerAuthoritative && IsOwnerClient && !IsServer)
             {
                 EntityMovementInputState inputState;
-                if (this.DifferInputEnoughToSend(oldInput, currentInput, out inputState))
+                if (this.DifferInputEnoughToSend(oldInput, currentInput, out inputState) || sendingJump)
                 {
-                    shouldSendReliably = currentInput.MovementState.Has(MovementState.IsJump);
+                    shouldSendReliably = true;
                     currentInput = this.SetInputExtraMovementState(currentInput, tempExtraMovementState);
+                    if (sendingJump)
+                        currentInput = this.SetInputJump(currentInput);
+                    else
+                        currentInput = this.ClearInputJump(currentInput);
                     this.ClientWriteMovementInput3D(writer, inputState, currentInput.MovementState, currentInput.ExtraMovementState, currentInput.Position, currentInput.Rotation);
+                    sendingJump = false;
                     oldInput = currentInput;
                     currentInput = null;
                     return true;
@@ -767,7 +773,7 @@ namespace MultiplayerARPG
             float yAngle;
             long timestamp;
             reader.ReadSyncTransformMessage3D(out movementState, out extraMovementState, out position, out yAngle, out timestamp);
-            if (Mathf.Abs(timestamp - BaseGameNetworkManager.Singleton.ServerTimestamp) > System.TimeSpan.TicksPerMillisecond)
+            if (Mathf.Abs(timestamp - BaseGameNetworkManager.Singleton.ServerTimestamp) > lagBuffer)
             {
                 // Timestamp is a lot difference to server's timestamp, player might try to hack a game or packet may corrupted occurring, so skip it
                 return;
@@ -825,7 +831,7 @@ namespace MultiplayerARPG
             float yAngle;
             long timestamp;
             reader.ReadMovementInputMessage3D(out inputState, out movementState, out extraMovementState, out position, out yAngle, out timestamp);
-            if (Mathf.Abs(timestamp - BaseGameNetworkManager.Singleton.ServerTimestamp) > System.TimeSpan.TicksPerMillisecond)
+            if (Mathf.Abs(timestamp - BaseGameNetworkManager.Singleton.ServerTimestamp) > lagBuffer)
             {
                 // Timestamp is a lot difference to server's timestamp, player might try to hack a game or packet may corrupted occurring, so skip it
                 return;
@@ -863,7 +869,8 @@ namespace MultiplayerARPG
                             yRotation = yAngle;
                         }
                     }
-                    isJumping = inputState.Has(EntityMovementInputState.IsJump);
+                    if (movementState.Has(MovementState.IsJump))
+                        acceptedJump = true;
                 }
                 else
                 {
@@ -891,7 +898,7 @@ namespace MultiplayerARPG
             float yAngle;
             long timestamp;
             reader.ReadSyncTransformMessage3D(out movementState, out extraMovementState, out position, out yAngle, out timestamp);
-            if (Mathf.Abs(timestamp - BaseGameNetworkManager.Singleton.ServerTimestamp) > System.TimeSpan.TicksPerMillisecond)
+            if (Mathf.Abs(timestamp - BaseGameNetworkManager.Singleton.ServerTimestamp) > lagBuffer)
             {
                 // Timestamp is a lot difference to server's timestamp, player might try to hack a game or packet may corrupted occurring, so skip it
                 return;
@@ -907,7 +914,7 @@ namespace MultiplayerARPG
                     float currentTime = Time.unscaledTime;
                     float t = currentTime - lastServerValidateTransformTime;
                     float v = Entity.GetMoveSpeed();
-                    float s = (lastServerValidateTransformMoveSpeed * (t + 0.2f)) + (v * t); // +200ms as high ping buffer
+                    float s = (lastServerValidateTransformMoveSpeed * (t + lagBufferUnityTime)) + (v * t); // +`lagBufferUnityTime` as high ping buffer
                     if (s < 0.001f)
                         s = 0.001f;
                     Vector3 oldPos = CacheTransform.position;

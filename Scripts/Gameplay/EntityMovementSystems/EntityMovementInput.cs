@@ -109,7 +109,16 @@ namespace MultiplayerARPG
             if (input == null)
                 input = entityMovement.InitInput();
             input.IsStopped = false;
-            input.MovementState = input.MovementState | MovementState.IsJump;
+            input.MovementState |= MovementState.IsJump;
+            return input;
+        }
+
+        public static EntityMovementInput ClearInputJump(this IEntityMovementComponent entityMovement, EntityMovementInput input)
+        {
+            if (input == null)
+                input = entityMovement.InitInput();
+            input.IsStopped = false;
+            input.MovementState &= ~MovementState.IsJump;
             return input;
         }
 
