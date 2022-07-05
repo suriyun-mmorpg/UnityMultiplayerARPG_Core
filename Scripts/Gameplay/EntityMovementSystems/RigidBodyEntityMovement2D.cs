@@ -8,6 +8,9 @@ namespace MultiplayerARPG
     [RequireComponent(typeof(Rigidbody2D))]
     public class RigidBodyEntityMovement2D : BaseNetworkedGameEntityComponent<BaseGameEntity>, IEntityMovementComponent
     {
+        protected static readonly long lagBuffer = System.TimeSpan.TicksPerMillisecond * 200;
+        protected static readonly float lagBufferUnityTime = 0.2f;
+
         [Header("Movement Settings")]
         [Range(0.01f, 1f)]
         public float stoppingDistance = 0.1f;
@@ -384,7 +387,7 @@ namespace MultiplayerARPG
             DirectionVector2 direction2D;
             long timestamp;
             reader.ReadSyncTransformMessage2D(out movementState, out extraMovementState, out position, out direction2D, out timestamp);
-            if (Mathf.Abs(timestamp - BaseGameNetworkManager.Singleton.ServerTimestamp) > System.TimeSpan.TicksPerMillisecond)
+            if (Mathf.Abs(timestamp - BaseGameNetworkManager.Singleton.ServerTimestamp) > lagBuffer)
             {
                 // Timestamp is a lot difference to server's timestamp, player might try to hack a game or packet may corrupted occurring, so skip it
                 return;
@@ -438,7 +441,7 @@ namespace MultiplayerARPG
             DirectionVector2 direction2D;
             long timestamp;
             reader.ReadMovementInputMessage2D(out inputState, out movementState, out extraMovementState, out position, out direction2D, out timestamp);
-            if (Mathf.Abs(timestamp - BaseGameNetworkManager.Singleton.ServerTimestamp) > System.TimeSpan.TicksPerMillisecond)
+            if (Mathf.Abs(timestamp - BaseGameNetworkManager.Singleton.ServerTimestamp) > lagBuffer)
             {
                 // Timestamp is a lot difference to server's timestamp, player might try to hack a game or packet may corrupted occurring, so skip it
                 return;
@@ -489,7 +492,7 @@ namespace MultiplayerARPG
             DirectionVector2 direction2D;
             long timestamp;
             reader.ReadSyncTransformMessage2D(out movementState, out extraMovementState, out position, out direction2D, out timestamp);
-            if (Mathf.Abs(timestamp - BaseGameNetworkManager.Singleton.ServerTimestamp) > System.TimeSpan.TicksPerMillisecond)
+            if (Mathf.Abs(timestamp - BaseGameNetworkManager.Singleton.ServerTimestamp) > lagBuffer)
             {
                 // Timestamp is a lot difference to server's timestamp, player might try to hack a game or packet may corrupted occurring, so skip it
                 return;
@@ -505,7 +508,7 @@ namespace MultiplayerARPG
                     float currentTime = Time.unscaledTime;
                     float t = currentTime - lastServerValidateTransformTime;
                     float v = Entity.GetMoveSpeed();
-                    float s = (lastServerValidateTransformMoveSpeed * (t + 0.2f)) + (v * t); // +200ms as high ping buffer
+                    float s = (lastServerValidateTransformMoveSpeed * (t + lagBufferUnityTime)) + (v * t); // +`lagBufferUnityTime` as high ping buffer
                     if (s < 0.001f)
                         s = 0.001f;
                     Vector2 oldPos = CacheTransform.position.GetXY();
