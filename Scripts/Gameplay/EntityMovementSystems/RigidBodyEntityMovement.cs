@@ -665,7 +665,7 @@ namespace MultiplayerARPG
         {
             if (CacheOpenCharacterController.isGrounded)
             {
-                if (platformLayerMask == (platformLayerMask | (1 << info.gameObject.layer)))
+                if (platformLayerMask == (platformLayerMask | (1 << info.gameObject.layer)) && info.point.y < CacheTransform.position.y + 0.1f)
                 {
                     groundedTransform = info.collider.transform;
                     oldGroundedPosition = info.point;

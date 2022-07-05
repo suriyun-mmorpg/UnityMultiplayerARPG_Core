@@ -646,7 +646,7 @@ namespace MultiplayerARPG
             if (CacheCharacterController.isGrounded)
             {
                 RaycastHit raycastHit;
-                if (Physics.SphereCast(transform.position + Vector3.up * 0.8f, 0.8f, Vector3.down, out raycastHit, 0.1f, platformLayerMask, QueryTriggerInteraction.Ignore))
+                if (Physics.SphereCast(CacheTransform.position + Vector3.up * 0.8f, 0.8f, Vector3.down, out raycastHit, 0.1f, platformLayerMask, QueryTriggerInteraction.Ignore) && raycastHit.point.y < CacheTransform.position.y + 0.1f)
                 {
                     groundedTransform = raycastHit.collider.transform;
                     oldGroundedPosition = raycastHit.point;
