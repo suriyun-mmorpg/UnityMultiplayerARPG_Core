@@ -702,6 +702,7 @@ namespace MultiplayerARPG
                 EntityMovementInputState inputState;
                 if (this.DifferInputEnoughToSend(oldInput, currentInput, out inputState))
                 {
+                    shouldSendReliably = currentInput.MovementState.Has(MovementState.IsJump);
                     currentInput = this.SetInputExtraMovementState(currentInput, tempExtraMovementState);
                     this.ClientWriteMovementInput3D(writer, inputState, currentInput.MovementState, currentInput.ExtraMovementState, currentInput.Position, currentInput.Rotation);
                     oldInput = currentInput;
