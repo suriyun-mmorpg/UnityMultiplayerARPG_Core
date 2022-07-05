@@ -176,6 +176,9 @@ namespace MultiplayerARPG
                 MovementState = tempMovementState;
                 // Update extra movement state
                 ExtraMovementState = this.ValidateExtraMovementState(MovementState, tempExtraMovementState);
+                // Set current input
+                currentInput = this.SetInputMovementState(currentInput, MovementState);
+                currentInput = this.SetInputExtraMovementState(currentInput, ExtraMovementState);
             }
             else
             {
@@ -277,7 +280,6 @@ namespace MultiplayerARPG
                 }
                 tempMoveVelocity = moveDirection * CurrentMoveSpeed;
                 // Set inputs
-                currentInput = this.SetInputMovementState2D(currentInput, tempMovementState);
                 if (HasNavPaths)
                 {
                     currentInput = this.SetInputPosition(currentInput, tempTargetPosition);
@@ -333,7 +335,11 @@ namespace MultiplayerARPG
                 EntityMovementInputState inputState;
                 if (this.DifferInputEnoughToSend(oldInput, currentInput, out inputState))
                 {
-                    currentInput = this.SetInputExtraMovementState(currentInput, tempExtraMovementState);
+                    if (!currentInput.IsKeyMovement)
+                    {
+                        // Point click should be reliably
+                        shouldSendReliably = true;
+                    }
                     this.ClientWriteMovementInput2D(writer, inputState, currentInput.MovementState, currentInput.ExtraMovementState, currentInput.Position, currentInput.Direction2D);
                     oldInput = currentInput;
                     currentInput = null;
