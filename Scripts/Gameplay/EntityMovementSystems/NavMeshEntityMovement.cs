@@ -12,8 +12,6 @@ namespace MultiplayerARPG
         protected static readonly float lagBufferUnityTime = 0.2f;
 
         [Header("Movement Settings")]
-        [Tooltip("If calculated paths +1 higher than this value, it will stop moving. If this is 0 it will not applies")]
-        public byte maxPathsForKeyMovement = 1;
         public ObstacleAvoidanceType obstacleAvoidanceWhileMoving = ObstacleAvoidanceType.MedQualityObstacleAvoidance;
         public ObstacleAvoidanceType obstacleAvoidanceWhileStationary = ObstacleAvoidanceType.NoObstacleAvoidance;
 
@@ -39,6 +37,8 @@ namespace MultiplayerARPG
         protected EntityMovementInput oldInput;
         protected EntityMovementInput currentInput;
         protected ExtraMovementState tempExtraMovementState;
+        protected Vector3? inputDirection;
+        protected Vector3? inputPosition;
         protected bool isTeleporting;
 
         public override void EntityAwake()
@@ -76,9 +76,7 @@ namespace MultiplayerARPG
             if (this.CanPredictMovement())
             {
                 // Always apply movement to owner client (it's client prediction for server auth movement)
-                SetMovePaths(CacheTransform.position + moveDirection, true);
-                currentInput = this.SetInputPosition(currentInput, CacheTransform.position + moveDirection);
-                currentInput = this.SetInputIsKeyMovement(currentInput, true);
+                inputDirection = moveDirection;
             }
         }
 
@@ -89,9 +87,7 @@ namespace MultiplayerARPG
             if (this.CanPredictMovement())
             {
                 // Always apply movement to owner client (it's client prediction for server auth movement)
-                SetMovePaths(position, false);
-                currentInput = this.SetInputPosition(currentInput, position);
-                currentInput = this.SetInputIsKeyMovement(currentInput, false);
+                SetMovePaths(position);
             }
         }
 
@@ -186,6 +182,8 @@ namespace MultiplayerARPG
             CacheNavMeshAgent.obstacleAvoidanceType = isStationary ? obstacleAvoidanceWhileStationary : obstacleAvoidanceWhileMoving;
             if (IsOwnerClient || (IsServer && Entity.MovementSecure == MovementSecure.ServerAuthoritative))
             {
+                if (inputDirection.HasValue)
+                    CacheNavMeshAgent.Move(inputDirection.Value * CacheNavMeshAgent.speed * deltaTime);
                 // Update movement state
                 MovementState = (CacheNavMeshAgent.velocity.sqrMagnitude > 0 ? MovementState.Forward : MovementState.None) | MovementState.IsGrounded;
                 // Update extra movement state
@@ -193,6 +191,16 @@ namespace MultiplayerARPG
                 // Set current input
                 currentInput = this.SetInputMovementState(currentInput, MovementState);
                 currentInput = this.SetInputExtraMovementState(currentInput, ExtraMovementState);
+                if (inputDirection.HasValue)
+                {
+                    currentInput = this.SetInputIsKeyMovement(currentInput, true);
+                    currentInput = this.SetInputPosition(currentInput, CacheTransform.position);
+                }
+                else
+                {
+                    currentInput = this.SetInputIsKeyMovement(currentInput, false);
+                    currentInput = this.SetInputPosition(currentInput, CacheNavMeshAgent.destination);
+                }
             }
             else
             {
@@ -201,18 +209,17 @@ namespace MultiplayerARPG
             }
         }
 
-        private void SetMovePaths(Vector3 position, bool useKeyMovement)
+        private void SetMovePaths(Vector3 position)
         {
             if (!Entity.CanMove())
                 return;
+            inputDirection = null;
             CacheNavMeshAgent.updatePosition = true;
             CacheNavMeshAgent.updateRotation = true;
             if (CacheNavMeshAgent.isOnNavMesh)
             {
                 CacheNavMeshAgent.isStopped = false;
                 CacheNavMeshAgent.SetDestination(position);
-                if (useKeyMovement && maxPathsForKeyMovement > 0 && CacheNavMeshAgent.path.corners.Length > maxPathsForKeyMovement + 1)
-                    CacheNavMeshAgent.isStopped = true;
             }
         }
 
@@ -310,7 +317,7 @@ namespace MultiplayerARPG
                     targetYRotation = yAngle;
                     yRotateLerpTime = 0;
                     yRotateLerpDuration = Time.fixedDeltaTime;
-                    SetMovePaths(position, false);
+                    SetMovePaths(position);
                     MovementState = movementState;
                     ExtraMovementState = extraMovementState;
                 }
@@ -351,7 +358,7 @@ namespace MultiplayerARPG
                     tempExtraMovementState = extraMovementState;
                     if (inputState.Has(EntityMovementInputState.PositionChanged))
                     {
-                        SetMovePaths(position, inputState.Has(EntityMovementInputState.IsKeyMovement));
+                        SetMovePaths(position);
                     }
                     if (inputState.Has(EntityMovementInputState.RotationChanged))
                     {
@@ -436,7 +443,7 @@ namespace MultiplayerARPG
                     else
                     {
                         // It's both server and client, translate position (it's a host so don't do speed hack validation)
-                        SetMovePaths(position, false);
+                        SetMovePaths(position);
                     }
                 }
                 acceptedPositionTimestamp = timestamp;
