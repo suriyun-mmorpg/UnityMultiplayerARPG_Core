@@ -72,11 +72,18 @@ namespace MultiplayerARPG
             if (!Entity.CanMove())
                 return;
             if (moveDirection.sqrMagnitude <= 0)
+            {
+                inputDirection = null;
                 return;
+            }
             if (this.CanPredictMovement())
             {
                 // Always apply movement to owner client (it's client prediction for server auth movement)
                 inputDirection = moveDirection;
+                CacheNavMeshAgent.updatePosition = true;
+                CacheNavMeshAgent.updateRotation = true;
+                if (CacheNavMeshAgent.isOnNavMesh)
+                    CacheNavMeshAgent.isStopped = true;
             }
         }
 
@@ -183,9 +190,15 @@ namespace MultiplayerARPG
             if (IsOwnerClient || (IsServer && Entity.MovementSecure == MovementSecure.ServerAuthoritative))
             {
                 if (inputDirection.HasValue)
+                {
                     CacheNavMeshAgent.Move(inputDirection.Value * CacheNavMeshAgent.speed * deltaTime);
-                // Update movement state
-                MovementState = (CacheNavMeshAgent.velocity.sqrMagnitude > 0 ? MovementState.Forward : MovementState.None) | MovementState.IsGrounded;
+                    MovementState = MovementState.Forward | MovementState.IsGrounded;
+                }
+                else
+                {
+                    // Update movement state
+                    MovementState = (CacheNavMeshAgent.velocity.sqrMagnitude > 0 ? MovementState.Forward : MovementState.None) | MovementState.IsGrounded;
+                }
                 // Update extra movement state
                 ExtraMovementState = this.ValidateExtraMovementState(MovementState, tempExtraMovementState);
                 // Set current input
