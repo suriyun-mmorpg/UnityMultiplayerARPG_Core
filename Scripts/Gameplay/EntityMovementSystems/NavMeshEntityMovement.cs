@@ -138,11 +138,7 @@ namespace MultiplayerARPG
             {
                 // Always apply movement to owner client (it's client prediction for server auth movement)
                 if (CacheNavMeshAgent.remainingDistance <= StoppingDistance)
-                {
                     targetYAngle = rotation.eulerAngles.y;
-                    if (!inputDirection.HasValue)
-                        yAngle = targetYAngle.Value;
-                }
             }
         }
 
