@@ -190,6 +190,9 @@ namespace MultiplayerARPG
                 MovementState = (CacheNavMeshAgent.velocity.sqrMagnitude > 0 ? MovementState.Forward : MovementState.None) | MovementState.IsGrounded;
                 // Update extra movement state
                 ExtraMovementState = this.ValidateExtraMovementState(MovementState, tempExtraMovementState);
+                // Set current input
+                currentInput = this.SetInputMovementState(currentInput, MovementState);
+                currentInput = this.SetInputExtraMovementState(currentInput, ExtraMovementState);
             }
             else
             {
@@ -227,7 +230,6 @@ namespace MultiplayerARPG
                 EntityMovementInputState inputState;
                 if (this.DifferInputEnoughToSend(oldInput, currentInput, out inputState))
                 {
-                    currentInput = this.SetInputExtraMovementState(currentInput, tempExtraMovementState);
                     this.ClientWriteMovementInput3D(writer, inputState, currentInput.MovementState, currentInput.ExtraMovementState, currentInput.Position, currentInput.Rotation);
                     oldInput = currentInput;
                     currentInput = null;
