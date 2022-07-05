@@ -369,7 +369,7 @@ namespace MultiplayerARPG
                 tempTargetPosition = clientTargetPosition.Value;
                 moveDirection = (tempTargetPosition - tempCurrentPosition).normalized;
                 tempTargetDistance = Vector3.Distance(tempTargetPosition, tempCurrentPosition);
-                if (tempTargetDistance < 0.001f)
+                if (tempTargetDistance < 0.01f)
                 {
                     clientTargetPosition = null;
                     StopMoveFunction();
@@ -800,7 +800,10 @@ namespace MultiplayerARPG
                     targetYRotation = yAngle;
                     yRotateLerpTime = 0;
                     yRotateLerpDuration = Time.fixedDeltaTime;
-                    clientTargetPosition = position;
+                    if (Vector3.Distance(position.GetXZ(), CacheTransform.position.GetXZ()) > 0.01f)
+                        clientTargetPosition = position;
+                    else
+                        clientTargetPosition = null;
                     MovementState = movementState;
                     ExtraMovementState = extraMovementState;
                 }
@@ -853,6 +856,7 @@ namespace MultiplayerARPG
                         }
                         else
                         {
+                            clientTargetPosition = null;
                             SetMovePaths(position, true);
                         }
                     }
