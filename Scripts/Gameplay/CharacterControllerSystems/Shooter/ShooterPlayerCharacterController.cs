@@ -720,6 +720,7 @@ namespace MultiplayerARPG
             }
             PlayerCharacterEntity.KeyMovement(moveDirection, movementState);
             PlayerCharacterEntity.SetExtraMovementState(extraMovementState);
+            PlayerCharacterEntity.SetSmoothTurnSpeed(0f);
             UpdateLookAtTarget();
 
             if (canSwitchViewMode && InputManager.GetButtonDown("SwitchViewMode"))

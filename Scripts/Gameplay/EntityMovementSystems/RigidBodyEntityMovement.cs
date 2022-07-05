@@ -75,15 +75,14 @@ namespace MultiplayerARPG
         protected bool applyingJumpForce;
         protected float applyJumpForceCountDown;
         protected Collider waterCollider;
-        protected float yRotation;
         protected Transform groundedTransform;
         protected Vector3 groundedLocalPosition;
         protected Vector3 oldGroundedPosition;
         protected long acceptedPositionTimestamp;
         protected Vector3? clientTargetPosition;
-        protected float? targetYRotation;
-        protected float yRotateLerpTime;
-        protected float yRotateLerpDuration;
+        protected float yAngle;
+        protected float targetYAngle;
+        protected float yTurnSpeed;
         protected bool acceptedJump;
         protected bool sendingJump;
         protected float lastServerValidateTransformTime;
@@ -134,7 +133,7 @@ namespace MultiplayerARPG
 
         public override void EntityStart()
         {
-            yRotation = CacheTransform.eulerAngles.y;
+            yAngle = CacheTransform.eulerAngles.y;
             CacheOpenCharacterController.SetPosition(CacheTransform.position, true);
             verticalVelocity = 0;
         }
@@ -250,13 +249,23 @@ namespace MultiplayerARPG
             {
                 // Always apply movement to owner client (it's client prediction for server auth movement)
                 if (!HasNavPaths)
-                    yRotation = rotation.eulerAngles.y;
+                    targetYAngle = rotation.eulerAngles.y;
             }
         }
 
         public Quaternion GetLookRotation()
         {
-            return Quaternion.Euler(0f, yRotation, 0f);
+            return Quaternion.Euler(0f, yAngle, 0f);
+        }
+
+        public void SetSmoothTurnSpeed(float turnDuration)
+        {
+            yTurnSpeed = turnDuration;
+        }
+
+        public float GetSmoothTurnSpeed()
+        {
+            return yTurnSpeed;
         }
 
         public void Teleport(Vector3 position, Quaternion rotation)
@@ -357,12 +366,6 @@ namespace MultiplayerARPG
                         moveDirection = Vector3.zero;
                     }
                 }
-                else
-                {
-                    // Turn character to destination
-                    yRotation = Quaternion.LookRotation(moveDirection).eulerAngles.y;
-                    targetYRotation = null;
-                }
             }
             else if (clientTargetPosition.HasValue)
             {
@@ -384,6 +387,11 @@ namespace MultiplayerARPG
             else
             {
                 tempTargetPosition = tempCurrentPosition;
+            }
+            if (moveDirection.sqrMagnitude > 0f)
+            {
+                // Turn character by move direction
+                targetYAngle = Quaternion.LookRotation(moveDirection).eulerAngles.y;
             }
 
             if (!Entity.CanMove())
@@ -574,14 +582,10 @@ namespace MultiplayerARPG
 
             collisionFlags = CacheOpenCharacterController.Move((tempMoveVelocity + platformMotion) * deltaTime);
 
-            if (targetYRotation.HasValue)
-            {
-                yRotateLerpTime += deltaTime;
-                float lerpTimeRate = yRotateLerpTime / yRotateLerpDuration;
-                yRotation = Mathf.LerpAngle(yRotation, targetYRotation.Value, lerpTimeRate);
-                if (lerpTimeRate >= 1f)
-                    targetYRotation = null;
-            }
+            if (yTurnSpeed <= 0f)
+                yAngle = targetYAngle;
+            else if (Mathf.Abs(yAngle - targetYAngle) > 1f)
+                yAngle = Mathf.LerpAngle(yAngle, targetYAngle, yTurnSpeed * deltaTime);
             UpdateRotation();
             currentInput = this.SetInputRotation(currentInput, CacheTransform.rotation);
             isJumping = false;
@@ -612,7 +616,7 @@ namespace MultiplayerARPG
 
         private void UpdateRotation()
         {
-            CacheTransform.eulerAngles = new Vector3(0f, yRotation, 0f);
+            CacheTransform.eulerAngles = new Vector3(0f, yAngle, 0f);
         }
 
         private void SetMovePaths(Vector3 position, bool useNavMesh)
@@ -798,7 +802,7 @@ namespace MultiplayerARPG
                 {
                     if (Entity.MovementSecure == MovementSecure.ServerAuthoritative || !IsOwnerClient)
                     {
-                        yRotation = yAngle;
+                        this.yAngle = yAngle;
                         CacheOpenCharacterController.SetPosition(position, false);
                     }
                     MovementState = movementState;
@@ -806,9 +810,8 @@ namespace MultiplayerARPG
                 }
                 else if (!IsOwnerClient)
                 {
-                    targetYRotation = yAngle;
-                    yRotateLerpTime = 0;
-                    yRotateLerpDuration = Time.fixedDeltaTime;
+                    targetYAngle = yAngle;
+                    yTurnSpeed = 1f / Time.fixedDeltaTime;
                     if (Vector3.Distance(position.GetXZ(), CacheTransform.position.GetXZ()) > 0.01f)
                         clientTargetPosition = position;
                     else
@@ -852,15 +855,14 @@ namespace MultiplayerARPG
             {
                 if (!inputState.Has(EntityMovementInputState.IsStopped))
                 {
-                    NavPaths = null;
                     tempMovementState = movementState;
                     tempExtraMovementState = extraMovementState;
                     clientTargetPosition = null;
-                    targetYRotation = null;
                     if (inputState.Has(EntityMovementInputState.PositionChanged))
                     {
                         if (inputState.Has(EntityMovementInputState.IsKeyMovement))
                         {
+                            NavPaths = null;
                             clientTargetPosition = position;
                         }
                         else
@@ -873,13 +875,12 @@ namespace MultiplayerARPG
                     {
                         if (IsClient)
                         {
-                            targetYRotation = yAngle;
-                            yRotateLerpTime = 0;
-                            yRotateLerpDuration = Time.fixedDeltaTime;
+                            targetYAngle = yAngle;
+                            yTurnSpeed = 1f / Time.fixedDeltaTime;
                         }
                         else
                         {
-                            yRotation = yAngle;
+                            this.yAngle = yAngle;
                         }
                     }
                     if (movementState.Has(MovementState.IsJump))
@@ -918,7 +919,7 @@ namespace MultiplayerARPG
             }
             if (acceptedPositionTimestamp < timestamp)
             {
-                yRotation = yAngle;
+                this.yAngle = yAngle;
                 MovementState = movementState;
                 ExtraMovementState = extraMovementState;
                 if (!IsClient)
@@ -945,7 +946,7 @@ namespace MultiplayerARPG
                         newPos = oldPos + (dir * s);
                         CacheTransform.position = newPos;
                         // And also adjust client's position
-                        Teleport(newPos, Quaternion.Euler(0f, yRotation, 0f));
+                        Teleport(newPos, Quaternion.Euler(0f, this.yAngle, 0f));
                     }
                     lastServerValidateTransformTime = currentTime;
                     lastServerValidateTransformMoveSpeed = v;
@@ -969,7 +970,7 @@ namespace MultiplayerARPG
             clientTargetPosition = null;
             NavPaths = null;
             CacheOpenCharacterController.SetPosition(position, false);
-            yRotation = yAngle;
+            this.yAngle = targetYAngle = yAngle;
         }
 
 #if UNITY_EDITOR

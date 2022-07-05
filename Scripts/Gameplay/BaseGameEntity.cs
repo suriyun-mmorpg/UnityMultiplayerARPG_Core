@@ -765,6 +765,19 @@ namespace MultiplayerARPG
             return Quaternion.identity;
         }
 
+        public void SetSmoothTurnSpeed(float speed)
+        {
+            if (ActiveMovement != null)
+                ActiveMovement.SetSmoothTurnSpeed(speed);
+        }
+
+        public float GetSmoothTurnSpeed()
+        {
+            if (ActiveMovement != null)
+                return ActiveMovement.GetSmoothTurnSpeed();
+            return 0f;
+        }
+
         public void Teleport(Vector3 position, Quaternion rotation)
         {
             if (ActiveMovement == null)

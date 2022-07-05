@@ -148,6 +148,17 @@ namespace MultiplayerARPG
             return Quaternion.LookRotation(Direction2D);
         }
 
+        public void SetSmoothTurnSpeed(float speed)
+        {
+            // 2D, do nothing
+        }
+
+        public float GetSmoothTurnSpeed()
+        {
+            // 2D, do nothing
+            return 0f;
+        }
+
         public void Teleport(Vector3 position, Quaternion rotation)
         {
             if (!IsServer)

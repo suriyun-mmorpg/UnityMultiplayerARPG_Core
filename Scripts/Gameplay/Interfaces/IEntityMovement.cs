@@ -1,5 +1,4 @@
 ﻿using LiteNetLib.Utils;
-using LiteNetLibManager;
 using UnityEngine;
 
 namespace MultiplayerARPG
@@ -18,6 +17,8 @@ namespace MultiplayerARPG
         void SetExtraMovementState(ExtraMovementState extraMovementState);
         void SetLookRotation(Quaternion rotation);
         Quaternion GetLookRotation();
+        void SetSmoothTurnSpeed(float speed);
+        float GetSmoothTurnSpeed();
         void Teleport(Vector3 position, Quaternion rotation);
         bool FindGroundedPosition(Vector3 fromPosition, float findDistance, out Vector3 result);
     }

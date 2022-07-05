@@ -46,6 +46,8 @@ namespace MultiplayerARPG
         [Tooltip("Set this to TRUE to interrupt casting skill when click on ground to move")]
         [SerializeField]
         protected bool pointClickInterruptCastingSkill;
+        [SerializeField]
+        protected float turnSmoothSpeed = 10f;
         [Tooltip("The object which will represent where character is moving to")]
         [SerializeField]
         protected GameObject targetObjectPrefab;
@@ -249,6 +251,7 @@ namespace MultiplayerARPG
             UpdateInput();
             UpdateFollowTarget();
             PlayerCharacterEntity.AimPosition = PlayerCharacterEntity.GetAttackAimPosition(ref isLeftHandAttacking);
+            PlayerCharacterEntity.SetSmoothTurnSpeed(turnSmoothSpeed);
         }
 
         private Vector3 GetBuildingPlacePosition(Vector3 position)
