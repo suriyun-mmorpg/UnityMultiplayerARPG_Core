@@ -168,12 +168,10 @@ namespace MultiplayerARPG
                         // TPS model
                         Entity.CharacterModel.PlaySkillCastClip(skill.DataId, CastingSkillDuration);
                     }
-                    if (Entity.PassengingVehicleEntity != null && Entity.PassengingVehicleEntity.Entity.Model &&
-                        Entity.PassengingVehicleEntity.Entity.Model.gameObject.activeSelf &&
-                        Entity.PassengingVehicleEntity.Entity.Model is BaseCharacterModel)
+                    if (Entity.PassengingVehicleModel && Entity.PassengingVehicleModel is BaseCharacterModel)
                     {
                         // Vehicle model
-                        (Entity.PassengingVehicleEntity.Entity.Model as BaseCharacterModel).PlaySkillCastClip(skill.DataId, CastingSkillDuration);
+                        (Entity.PassengingVehicleModel as BaseCharacterModel).PlaySkillCastClip(skill.DataId, CastingSkillDuration);
                     }
                     if (IsClient)
                     {
@@ -193,12 +191,10 @@ namespace MultiplayerARPG
                     // TPS model
                     Entity.CharacterModel.PlayActionAnimation(AnimActionType, AnimActionDataId, animationIndex, animSpeedRate);
                 }
-                if (Entity.PassengingVehicleEntity != null && Entity.PassengingVehicleEntity.Entity.Model &&
-                    Entity.PassengingVehicleEntity.Entity.Model.gameObject.activeSelf &&
-                    Entity.PassengingVehicleEntity.Entity.Model is BaseCharacterModel)
+                if (Entity.PassengingVehicleModel && Entity.PassengingVehicleModel is BaseCharacterModel)
                 {
                     // Vehicle model
-                    (Entity.PassengingVehicleEntity.Entity.Model as BaseCharacterModel).PlayActionAnimation(AnimActionType, AnimActionDataId, animationIndex, animSpeedRate);
+                    (Entity.PassengingVehicleModel as BaseCharacterModel).PlayActionAnimation(AnimActionType, AnimActionDataId, animationIndex, animSpeedRate);
                 }
                 if (IsClient)
                 {
@@ -610,14 +606,12 @@ namespace MultiplayerARPG
                 Entity.CharacterModel.StopSkillCastAnimation();
                 Entity.CharacterModel.StopWeaponChargeAnimation();
             }
-            if (Entity.PassengingVehicleEntity != null && Entity.PassengingVehicleEntity.Entity.Model &&
-                Entity.PassengingVehicleEntity.Entity.Model.gameObject.activeSelf &&
-                Entity.PassengingVehicleEntity.Entity.Model is BaseCharacterModel)
+            if (Entity.PassengingVehicleModel && Entity.PassengingVehicleModel is BaseCharacterModel)
             {
                 // Vehicle model
-                (Entity.PassengingVehicleEntity.Entity.Model as BaseCharacterModel).StopActionAnimation();
-                (Entity.PassengingVehicleEntity.Entity.Model as BaseCharacterModel).StopSkillCastAnimation();
-                (Entity.PassengingVehicleEntity.Entity.Model as BaseCharacterModel).StopWeaponChargeAnimation();
+                (Entity.PassengingVehicleModel as BaseCharacterModel).StopActionAnimation();
+                (Entity.PassengingVehicleModel as BaseCharacterModel).StopSkillCastAnimation();
+                (Entity.PassengingVehicleModel as BaseCharacterModel).StopWeaponChargeAnimation();
             }
             if (IsClient)
             {

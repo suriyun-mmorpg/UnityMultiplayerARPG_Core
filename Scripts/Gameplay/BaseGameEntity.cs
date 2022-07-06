@@ -177,6 +177,16 @@ namespace MultiplayerARPG
             }
         }
 
+        public GameEntityModel PassengingVehicleModel
+        {
+            get
+            {
+                if (PassengingVehicleEntity != null)
+                    return PassengingVehicleEntity.Entity.Model;
+                return null;
+            }
+        }
+
         public IEntityMovementComponent ActiveMovement
         {
             get
@@ -433,7 +443,7 @@ namespace MultiplayerARPG
                 }
             }
 
-            if (Model != null && Model is IMoveableModel)
+            if (Model is IMoveableModel)
             {
                 // Update movement animation
                 (Model as IMoveableModel).SetMoveAnimationSpeedMultiplier(MoveAnimationSpeedMultiplier);

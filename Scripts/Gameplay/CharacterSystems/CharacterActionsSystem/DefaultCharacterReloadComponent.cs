@@ -77,12 +77,10 @@ namespace MultiplayerARPG
                     // TPS model
                     Entity.CharacterModel.PlayActionAnimation(AnimActionType, animActionDataId, 0);
                 }
-                if (Entity.PassengingVehicleEntity != null && Entity.PassengingVehicleEntity.Entity.Model &&
-                    Entity.PassengingVehicleEntity.Entity.Model.gameObject.activeSelf &&
-                    Entity.PassengingVehicleEntity.Entity.Model is BaseCharacterModel)
+                if (Entity.PassengingVehicleModel && Entity.PassengingVehicleModel is BaseCharacterModel)
                 {
                     // Vehicle model
-                    (Entity.PassengingVehicleEntity.Entity.Model as BaseCharacterModel).PlayActionAnimation(AnimActionType, animActionDataId, 0);
+                    (Entity.PassengingVehicleModel as BaseCharacterModel).PlayActionAnimation(AnimActionType, animActionDataId, 0);
                 }
                 if (IsClient)
                 {

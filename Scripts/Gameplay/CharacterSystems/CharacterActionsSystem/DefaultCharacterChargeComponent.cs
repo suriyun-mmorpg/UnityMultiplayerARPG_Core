@@ -30,13 +30,11 @@ namespace MultiplayerARPG
                 Entity.CharacterModel.PlayWeaponChargeClip(weaponTypeDataId, isLeftHand);
                 Entity.CharacterModel.PlayEquippedWeaponCharge(isLeftHand);
             }
-            if (Entity.PassengingVehicleEntity != null && Entity.PassengingVehicleEntity.Entity.Model &&
-                Entity.PassengingVehicleEntity.Entity.Model.gameObject.activeSelf &&
-                Entity.PassengingVehicleEntity.Entity.Model is BaseCharacterModel)
+            if (Entity.PassengingVehicleModel && Entity.PassengingVehicleModel is BaseCharacterModel)
             {
                 // Vehicle model
-                (Entity.PassengingVehicleEntity.Entity.Model as BaseCharacterModel).PlayWeaponChargeClip(weaponTypeDataId, isLeftHand);
-                (Entity.PassengingVehicleEntity.Entity.Model as BaseCharacterModel).PlayEquippedWeaponCharge(isLeftHand);
+                (Entity.PassengingVehicleModel as BaseCharacterModel).PlayWeaponChargeClip(weaponTypeDataId, isLeftHand);
+                (Entity.PassengingVehicleModel as BaseCharacterModel).PlayEquippedWeaponCharge(isLeftHand);
             }
             if (IsClient)
             {
@@ -56,15 +54,22 @@ namespace MultiplayerARPG
         {
             // Play animation
             if (Entity.CharacterModel && Entity.CharacterModel.gameObject.activeSelf)
+            {
+                // TPS model
                 Entity.CharacterModel.StopWeaponChargeAnimation();
-            if (Entity.PassengingVehicleEntity != null && Entity.PassengingVehicleEntity.Entity.Model &&
-                Entity.PassengingVehicleEntity.Entity.Model.gameObject.activeSelf &&
-                Entity.PassengingVehicleEntity.Entity.Model is BaseCharacterModel)
-                (Entity.PassengingVehicleEntity.Entity.Model as BaseCharacterModel).StopWeaponChargeAnimation();
+            }
+            if (Entity.PassengingVehicleModel && Entity.PassengingVehicleModel is BaseCharacterModel)
+            {
+                // Vehicle model
+                (Entity.PassengingVehicleModel as BaseCharacterModel).StopWeaponChargeAnimation();
+            }
             if (IsClient)
             {
                 if (Entity.FpsModel && Entity.FpsModel.gameObject.activeSelf)
+                {
+                    // FPS model
                     Entity.FpsModel.StopWeaponChargeAnimation();
+                }
             }
             // Set weapon charging state
             IsCharging = false;
