@@ -415,20 +415,20 @@ namespace MultiplayerARPG
         {
             CharacterInputState inputState = (CharacterInputState)reader.GetPackedUShort();
             // Actions
-            if (inputState.Has(CharacterInputState.IsAttacking))
-                AttackComponent.ReadClientAttackStateAtServer(reader);
-            if (inputState.Has(CharacterInputState.IsUsingSkillInterrupted))
-                UseSkillComponent.ReadClientUseSkillInterruptedStateAtServer(reader);
-            if (inputState.Has(CharacterInputState.IsUsingSkillItem))
-                UseSkillComponent.ReadClientUseSkillItemStateAtServer(reader);
-            if (inputState.Has(CharacterInputState.IsUsingSkill))
-                UseSkillComponent.ReadClientUseSkillStateAtServer(reader);
             if (inputState.Has(CharacterInputState.IsReloading))
                 ReloadComponent.ReadClientReloadStateAtServer(reader);
             if (inputState.Has(CharacterInputState.IsChargeStopping))
                 ChargeComponent.ReadClientStopChargeStateAtServer(reader);
             if (inputState.Has(CharacterInputState.IsChargeStarting))
                 ChargeComponent.ReadClientStartChargeStateAtServer(reader);
+            if (inputState.Has(CharacterInputState.IsUsingSkillInterrupted))
+                UseSkillComponent.ReadClientUseSkillInterruptedStateAtServer(reader);
+            if (inputState.Has(CharacterInputState.IsAttacking))
+                AttackComponent.ReadClientAttackStateAtServer(reader);
+            if (inputState.Has(CharacterInputState.IsUsingSkillItem))
+                UseSkillComponent.ReadClientUseSkillItemStateAtServer(reader);
+            if (inputState.Has(CharacterInputState.IsUsingSkill))
+                UseSkillComponent.ReadClientUseSkillStateAtServer(reader);
             // Movement
             if (inputState.Has(CharacterInputState.IsMoving) && Movement != null)
                 Movement.ReadClientStateAtServer(reader);
@@ -438,20 +438,20 @@ namespace MultiplayerARPG
         {
             CharacterInputState inputState = (CharacterInputState)reader.GetPackedUShort();
             // Actions
-            if (inputState.Has(CharacterInputState.IsAttacking))
-                AttackComponent.ReadServerAttackStateAtClient(reader);
-            if (inputState.Has(CharacterInputState.IsUsingSkillInterrupted))
-                UseSkillComponent.ReadServerUseSkillInterruptedStateAtClient(reader);
-            if (inputState.Has(CharacterInputState.IsUsingSkillItem))
-                UseSkillComponent.ReadServerUseSkillItemStateAtClient(reader);
-            if (inputState.Has(CharacterInputState.IsUsingSkill))
-                UseSkillComponent.ReadServerUseSkillStateAtClient(reader);
             if (inputState.Has(CharacterInputState.IsReloading))
                 ReloadComponent.ReadServerReloadStateAtClient(reader);
             if (inputState.Has(CharacterInputState.IsChargeStopping))
                 ChargeComponent.ReadServerStopChargeStateAtClient(reader);
             if (inputState.Has(CharacterInputState.IsChargeStarting))
                 ChargeComponent.ReadServerStartChargeStateAtClient(reader);
+            if (inputState.Has(CharacterInputState.IsUsingSkillInterrupted))
+                UseSkillComponent.ReadServerUseSkillInterruptedStateAtClient(reader);
+            if (inputState.Has(CharacterInputState.IsAttacking))
+                AttackComponent.ReadServerAttackStateAtClient(reader);
+            if (inputState.Has(CharacterInputState.IsUsingSkillItem))
+                UseSkillComponent.ReadServerUseSkillItemStateAtClient(reader);
+            if (inputState.Has(CharacterInputState.IsUsingSkill))
+                UseSkillComponent.ReadServerUseSkillStateAtClient(reader);
             // Movement
             if (inputState.Has(CharacterInputState.IsMoving) && Movement != null)
                 Movement.ReadServerStateAtClient(reader);
@@ -631,6 +631,7 @@ namespace MultiplayerARPG
                 return false;
             if (ValidateAttack(isLeftHand))
             {
+                StopCharge();
                 AttackComponent.Attack(isLeftHand);
                 return true;
             }
@@ -643,6 +644,7 @@ namespace MultiplayerARPG
                 return false;
             if (ValidateUseSkill(dataId, isLeftHand, targetObjectId))
             {
+                StopCharge();
                 UseSkillComponent.UseSkill(dataId, isLeftHand, targetObjectId, aimPosition);
                 return true;
             }
@@ -655,6 +657,7 @@ namespace MultiplayerARPG
                 return false;
             if (ValidateUseSkillItem(itemIndex, isLeftHand, targetObjectId))
             {
+                StopCharge();
                 UseSkillComponent.UseSkillItem(itemIndex, isLeftHand, targetObjectId, aimPosition);
                 return true;
             }
@@ -682,8 +685,12 @@ namespace MultiplayerARPG
         {
             if (!IsOwnerClientOrOwnedByServer)
                 return false;
-            ChargeComponent.StopCharge();
-            return true;
+            if (IsCharging)
+            {
+                ChargeComponent.StopCharge();
+                return true;
+            }
+            return false;
         }
 
         public bool Reload(bool isLeftHand)
