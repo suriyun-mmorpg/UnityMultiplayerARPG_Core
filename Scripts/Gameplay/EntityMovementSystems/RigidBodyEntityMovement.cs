@@ -249,8 +249,7 @@ namespace MultiplayerARPG
             if (this.CanPredictMovement())
             {
                 // Always apply movement to owner client (it's client prediction for server auth movement)
-                if (!HasNavPaths)
-                    targetYAngle = rotation.eulerAngles.y;
+                targetYAngle = rotation.eulerAngles.y;
             }
         }
 
