@@ -83,6 +83,7 @@ namespace MultiplayerARPG
         protected float yAngle;
         protected float targetYAngle;
         protected float yTurnSpeed;
+        protected bool lookRotationApplied;
         protected bool acceptedJump;
         protected bool sendingJump;
         protected float lastServerValidateTransformTime;
@@ -129,6 +130,7 @@ namespace MultiplayerARPG
             }
             // Setup
             yAngle = targetYAngle = CacheTransform.eulerAngles.y;
+            lookRotationApplied = true;
             StopMoveFunction();
         }
 
@@ -250,6 +252,7 @@ namespace MultiplayerARPG
             {
                 // Always apply movement to owner client (it's client prediction for server auth movement)
                 targetYAngle = rotation.eulerAngles.y;
+                lookRotationApplied = false;
             }
         }
 
@@ -388,11 +391,12 @@ namespace MultiplayerARPG
             {
                 tempTargetPosition = tempCurrentPosition;
             }
-            if (moveDirection.sqrMagnitude > 0f)
+            if (lookRotationApplied && moveDirection.sqrMagnitude > 0f)
             {
                 // Turn character by move direction
                 targetYAngle = Quaternion.LookRotation(moveDirection).eulerAngles.y;
             }
+            lookRotationApplied = true;
 
             if (!Entity.CanMove())
             {

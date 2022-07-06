@@ -34,6 +34,7 @@ namespace MultiplayerARPG
         protected float yAngle;
         protected float targetYAngle;
         protected float yTurnSpeed;
+        protected bool lookRotationApplied;
         protected EntityMovementInput oldInput;
         protected EntityMovementInput currentInput;
         protected ExtraMovementState tempExtraMovementState;
@@ -55,6 +56,7 @@ namespace MultiplayerARPG
             }
             // Setup
             yAngle = targetYAngle = CacheTransform.eulerAngles.y;
+            lookRotationApplied = true;
             StopMoveFunction();
         }
 
@@ -139,6 +141,7 @@ namespace MultiplayerARPG
             {
                 // Always apply movement to owner client (it's client prediction for server auth movement)
                 targetYAngle = rotation.eulerAngles.y;
+                lookRotationApplied = false;
             }
         }
 
@@ -194,16 +197,18 @@ namespace MultiplayerARPG
                     //CacheNavMeshAgent.SetDestination(CacheTransform.position);
                     MovementState = MovementState.Forward | MovementState.IsGrounded;
                     // Turn character to destination
-                    targetYAngle = Quaternion.LookRotation(inputDirection.Value).eulerAngles.y;
+                    if (lookRotationApplied)
+                        targetYAngle = Quaternion.LookRotation(inputDirection.Value).eulerAngles.y;
                 }
                 else
                 {
                     // Update movement state
                     MovementState = (CacheNavMeshAgent.velocity.sqrMagnitude > 0f ? MovementState.Forward : MovementState.None) | MovementState.IsGrounded;
                     // Turn character to destination
-                    if (CacheNavMeshAgent.velocity.sqrMagnitude > 0f)
+                    if (lookRotationApplied && CacheNavMeshAgent.velocity.sqrMagnitude > 0f)
                         targetYAngle = Quaternion.LookRotation(CacheNavMeshAgent.velocity.normalized).eulerAngles.y;
                 }
+                lookRotationApplied = true;
                 // Update extra movement state
                 ExtraMovementState = this.ValidateExtraMovementState(MovementState, tempExtraMovementState);
                 // Set current input
