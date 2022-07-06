@@ -32,7 +32,7 @@ namespace MultiplayerARPG
         protected float lastServerValidateTransformMoveSpeed;
         protected long acceptedPositionTimestamp;
         protected float yAngle;
-        protected float? targetYAngle;
+        protected float targetYAngle;
         protected float yTurnSpeed;
         protected EntityMovementInput oldInput;
         protected EntityMovementInput currentInput;
@@ -54,8 +54,7 @@ namespace MultiplayerARPG
                 disablingComp.enabled = false;
             }
             // Setup
-            targetYAngle = null;
-            yAngle = CacheTransform.eulerAngles.y;
+            yAngle = targetYAngle = CacheTransform.eulerAngles.y;
             StopMoveFunction();
         }
 
@@ -84,7 +83,7 @@ namespace MultiplayerARPG
                 inputDirection = moveDirection;
                 moveByDestination = false;
                 CacheNavMeshAgent.updatePosition = true;
-                CacheNavMeshAgent.updateRotation = true;
+                CacheNavMeshAgent.updateRotation = false;
                 if (CacheNavMeshAgent.isOnNavMesh)
                     CacheNavMeshAgent.isStopped = true;
             }
@@ -192,25 +191,18 @@ namespace MultiplayerARPG
                 if (inputDirection.HasValue)
                 {
                     CacheNavMeshAgent.Move(inputDirection.Value * CacheNavMeshAgent.speed * deltaTime);
-                    CacheNavMeshAgent.SetDestination(CacheTransform.position);
+                    //CacheNavMeshAgent.SetDestination(CacheTransform.position);
                     MovementState = MovementState.Forward | MovementState.IsGrounded;
                     // Turn character to destination
-                    if (yTurnSpeed <= 0f)
-                    {
-                        targetYAngle = null;
-                        yAngle = Quaternion.LookRotation(inputDirection.Value).eulerAngles.y;
-                    }
-                    else
-                    {
-                        targetYAngle = Quaternion.LookRotation(inputDirection.Value).eulerAngles.y;
-                    }
+                    targetYAngle = Quaternion.LookRotation(inputDirection.Value).eulerAngles.y;
                 }
                 else
                 {
                     // Update movement state
-                    MovementState = (CacheNavMeshAgent.velocity.sqrMagnitude > 0 ? MovementState.Forward : MovementState.None) | MovementState.IsGrounded;
-                    // Use nav mesh agent to turn character
-                    targetYAngle = null;
+                    MovementState = (CacheNavMeshAgent.velocity.sqrMagnitude > 0f ? MovementState.Forward : MovementState.None) | MovementState.IsGrounded;
+                    // Turn character to destination
+                    if (CacheNavMeshAgent.velocity.sqrMagnitude > 0f)
+                        targetYAngle = Quaternion.LookRotation(CacheNavMeshAgent.velocity.normalized).eulerAngles.y;
                 }
                 // Update extra movement state
                 ExtraMovementState = this.ValidateExtraMovementState(MovementState, tempExtraMovementState);
@@ -234,19 +226,17 @@ namespace MultiplayerARPG
                 MovementState = (CacheNavMeshAgent.velocity.sqrMagnitude > 0 ? MovementState.Forward : MovementState.None) | MovementState.IsGrounded;
             }
             // Update rotating
-            if (targetYAngle.HasValue)
-            {
-                CacheNavMeshAgent.updateRotation = false;
-                yAngle = Mathf.LerpAngle(yAngle, targetYAngle.Value, yTurnSpeed * deltaTime);
-                if (Mathf.Abs(yAngle - targetYAngle.Value) < 1f)
-                {
-                    CacheNavMeshAgent.updateRotation = true;
-                    targetYAngle = null;
-                }
-            }
-            if (!CacheNavMeshAgent.updateRotation)
-                CacheTransform.eulerAngles = new Vector3(0f, yAngle, 0f);
+            if (yTurnSpeed <= 0f)
+                yAngle = targetYAngle;
+            else if (Mathf.Abs(yAngle - targetYAngle) > 1f)
+                yAngle = Mathf.LerpAngle(yAngle, targetYAngle, yTurnSpeed * deltaTime);
+            UpdateRotation();
             currentInput = this.SetInputRotation(currentInput, CacheTransform.rotation);
+        }
+
+        private void UpdateRotation()
+        {
+            CacheTransform.eulerAngles = new Vector3(0f, yAngle, 0f);
         }
 
         private void SetMovePaths(Vector3 position)
@@ -256,7 +246,7 @@ namespace MultiplayerARPG
             inputDirection = null;
             moveByDestination = true;
             CacheNavMeshAgent.updatePosition = true;
-            CacheNavMeshAgent.updateRotation = true;
+            CacheNavMeshAgent.updateRotation = false;
             if (CacheNavMeshAgent.isOnNavMesh)
             {
                 CacheNavMeshAgent.isStopped = false;
@@ -414,8 +404,7 @@ namespace MultiplayerARPG
                         }
                         else
                         {
-                            CacheTransform.eulerAngles = new Vector3(0, yAngle, 0);
-                            targetYAngle = null;
+                            this.yAngle = yAngle;
                         }
                     }
                 }
@@ -502,8 +491,7 @@ namespace MultiplayerARPG
             CacheNavMeshAgent.Warp(position);
             if (CacheNavMeshAgent.isOnNavMesh)
                 CacheNavMeshAgent.isStopped = true;
-            this.yAngle = yAngle;
-            targetYAngle = null;
+            this.yAngle = targetYAngle = yAngle;
         }
     }
 }
