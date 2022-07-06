@@ -143,11 +143,7 @@ namespace MultiplayerARPG
         protected override void EntityUpdate()
         {
             base.EntityUpdate();
-            if (Model != null && Model is IDeadableModel)
-            {
-                // Update dead animation
-                (Model as IDeadableModel).SetIsDead(this.IsDead());
-            }
+            SetModelIsDead(this.IsDead());
         }
 
         /// <summary>
@@ -209,8 +205,8 @@ namespace MultiplayerARPG
                             }
                             break;
                     }
-                    if (damageSource != DamageSource.None && Model is IHittableModel)
-                        (Model as IHittableModel).PlayHitAnimation();
+                    if (damageSource != DamageSource.None)
+                        PlayHitAnimation();
                     Model.InstantiateEffect(effects);
                 }
             }
@@ -342,6 +338,18 @@ namespace MultiplayerARPG
             }
 
             return true;
+        }
+
+        public virtual void PlayHitAnimation()
+        {
+            if (Model is IHittableModel)
+                (Model as IHittableModel).PlayHitAnimation();
+        }
+
+        public virtual void SetModelIsDead(bool isDead)
+        {
+            if (Model is IDeadableModel)
+                (Model as IDeadableModel).SetIsDead(isDead);
         }
     }
 }

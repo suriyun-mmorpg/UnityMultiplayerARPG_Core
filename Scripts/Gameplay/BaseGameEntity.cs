@@ -72,7 +72,7 @@ namespace MultiplayerARPG
         [Category(2, "Components")]
         [SerializeField]
         protected GameEntityModel model = null;
-        public GameEntityModel Model
+        public virtual GameEntityModel Model
         {
             get { return model; }
         }

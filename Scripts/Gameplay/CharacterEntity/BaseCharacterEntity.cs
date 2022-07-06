@@ -148,6 +148,11 @@ namespace MultiplayerARPG
 
         public CharacterModelManager ModelManager { get; private set; }
 
+        public override GameEntityModel Model
+        {
+            get { return ModelManager.ActiveTpsModel; }
+        }
+
         public BaseCharacterModel CharacterModel
         {
             get { return ModelManager.ActiveTpsModel; }
@@ -465,24 +470,34 @@ namespace MultiplayerARPG
 
         public override void PlayJumpAnimation()
         {
-            if (CharacterModel is IJumppableModel)
-                (CharacterModel as IJumppableModel).PlayJumpAnimation();
+            if (CharacterModel && CharacterModel.gameObject.activeSelf)
+                CharacterModel.PlayJumpAnimation();
             if (IsClient && FpsModel && FpsModel.gameObject.activeSelf)
-            {
-                if (FpsModel is IJumppableModel)
-                    (FpsModel as IJumppableModel).PlayJumpAnimation();
-            }
+                FpsModel.PlayJumpAnimation();
         }
 
         public override void PlayPickupAnimation()
         {
-            if (CharacterModel is IPickupableModel)
-                (CharacterModel as IPickupableModel).PlayPickupAnimation();
+            if (CharacterModel && CharacterModel.gameObject.activeSelf)
+                CharacterModel.PlayPickupAnimation();
             if (IsClient && FpsModel && FpsModel.gameObject.activeSelf)
-            {
-                if (FpsModel is IPickupableModel)
-                    (FpsModel as IPickupableModel).PlayPickupAnimation();
-            }
+                FpsModel.PlayPickupAnimation();
+        }
+
+        public override void PlayHitAnimation()
+        {
+            if (CharacterModel && CharacterModel.gameObject.activeSelf)
+                CharacterModel.PlayHitAnimation();
+            if (IsClient && FpsModel && FpsModel.gameObject.activeSelf)
+                FpsModel.PlayHitAnimation();
+        }
+
+        public override void SetModelIsDead(bool isDead)
+        {
+            if (CharacterModel && CharacterModel.gameObject.activeSelf)
+                CharacterModel.SetIsDead(isDead);
+            if (IsClient && FpsModel && FpsModel.gameObject.activeSelf)
+                FpsModel.SetIsDead(isDead);
         }
 
         #region Relates Objects
