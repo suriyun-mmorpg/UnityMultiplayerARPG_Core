@@ -73,9 +73,7 @@ namespace MultiplayerARPG
 
         public void PlaySound()
         {
-            audioSource.clip = soundData.GetRandomedAudioClip();
-            audioSource.volume = AudioManager.Singleton.GetVolumeLevel(SettingId);
-            audioSource.Play();
+            audioSource.PlayOneShot(soundData.GetRandomedAudioClip(), AudioManager.Singleton.GetVolumeLevel(SettingId));
         }
     }
 }
