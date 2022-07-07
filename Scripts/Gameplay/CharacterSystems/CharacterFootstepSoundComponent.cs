@@ -153,9 +153,8 @@ namespace MultiplayerARPG
             delayCounter += Time.deltaTime;
             if (delayCounter >= currentFootstepSettings.stepDelay / Entity.MoveAnimationSpeedMultiplier)
             {
-                if (Entity.MovementState.Has(MovementState.IsGrounded))
+                if (Entity.MovementState.Has(MovementState.IsUnderWater) || Entity.MovementState.Has(MovementState.IsGrounded))
                     PlaySound();
-
                 delayCounter = 0f;
             }
         }
@@ -170,10 +169,8 @@ namespace MultiplayerARPG
             if (Entity.PassengingVehicleEntity != null)
                 return;
 
-            audioSource.clip = currentFootstepSettings.soundData.GetRandomedAudioClip();
             audioSource.pitch = Random.Range(currentFootstepSettings.randomPitchMin, currentFootstepSettings.randomPitchMax);
-            audioSource.volume = Random.Range(currentFootstepSettings.randomVolumeMin, currentFootstepSettings.randomVolumeMax) * AudioManager.Singleton.GetVolumeLevel(SettingId);
-            audioSource.Play();
+            audioSource.PlayOneShot(currentFootstepSettings.soundData.GetRandomedAudioClip(), Random.Range(currentFootstepSettings.randomVolumeMin, currentFootstepSettings.randomVolumeMax) * AudioManager.Singleton.GetVolumeLevel(SettingId));
         }
     }
 
