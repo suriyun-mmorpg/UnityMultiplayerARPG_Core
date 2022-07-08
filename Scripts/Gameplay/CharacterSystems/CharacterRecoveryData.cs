@@ -6,7 +6,6 @@ namespace MultiplayerARPG
     public class CharacterRecoveryData
     {
         public BaseCharacterEntity CharacterEntity { get; private set; }
-        public EntityInfo Instigator { get; private set; }
         public float RecoveryingHp { get; set; } = 0f;
         public float RecoveryingMp { get; set; } = 0f;
         public float RecoveryingStamina { get; set; } = 0f;
@@ -31,15 +30,17 @@ namespace MultiplayerARPG
         private float calculatingDecreasingFood = 0f;
         private float calculatingDecreasingWater = 0f;
         private float calculatingTotalDamageOverTime = 0f;
+        private CharacterBuff buff;
 
-        public CharacterRecoveryData(BaseCharacterEntity characterEntity, EntityInfo instigator)
+        public CharacterRecoveryData(BaseCharacterEntity characterEntity)
         {
             CharacterEntity = characterEntity;
-            Instigator = instigator;
         }
 
-        public void Setup(CharacterBuff buff)
+        public void SetupByBuff(CharacterBuff buff)
         {
+            this.buff = buff;
+
             // Damage over time
             TotalDamageOverTime = 0f;
             DamageOverTimes = buff.GetDamageOverTimes();
@@ -82,6 +83,7 @@ namespace MultiplayerARPG
 
         public void Clear()
         {
+            buff = null;
             RecoveryingHp = 0f;
             RecoveryingMp = 0f;
             RecoveryingStamina = 0f;
@@ -109,6 +111,8 @@ namespace MultiplayerARPG
 
         public void Apply(float rate)
         {
+            EntityInfo instigator = buff != null ? buff.BuffApplier : EntityInfo.Empty;
+
             int tempAmount;
             // Hp
             if (CharacterEntity.CurrentHp < CharacterEntity.MaxHp)
@@ -119,7 +123,7 @@ namespace MultiplayerARPG
                     tempAmount = (int)calculatingRecoveryingHp;
                     if (tempAmount < 0)
                         tempAmount = 0;
-                    CharacterEntity.OnBuffHpRecovery(Instigator, tempAmount);
+                    CharacterEntity.OnBuffHpRecovery(instigator, tempAmount);
                     calculatingRecoveryingHp -= tempAmount;
                 }
             }
@@ -133,7 +137,7 @@ namespace MultiplayerARPG
                     tempAmount = (int)calculatingDecreasingHp;
                     if (tempAmount < 0)
                         tempAmount = 0;
-                    CharacterEntity.OnBuffHpDecrease(Instigator, tempAmount);
+                    CharacterEntity.OnBuffHpDecrease(instigator, tempAmount);
                     calculatingDecreasingHp -= tempAmount;
                 }
             }
@@ -147,7 +151,7 @@ namespace MultiplayerARPG
                     tempAmount = (int)calculatingRecoveryingMp;
                     if (tempAmount < 0)
                         tempAmount = 0;
-                    CharacterEntity.OnBuffMpRecovery(Instigator, tempAmount);
+                    CharacterEntity.OnBuffMpRecovery(instigator, tempAmount);
                     calculatingRecoveryingMp -= tempAmount;
                 }
             }
@@ -161,7 +165,7 @@ namespace MultiplayerARPG
                     tempAmount = (int)calculatingDecreasingMp;
                     if (tempAmount < 0)
                         tempAmount = 0;
-                    CharacterEntity.OnBuffMpDecrease(Instigator, tempAmount);
+                    CharacterEntity.OnBuffMpDecrease(instigator, tempAmount);
                     calculatingDecreasingMp -= tempAmount;
                 }
             }
@@ -175,7 +179,7 @@ namespace MultiplayerARPG
                     tempAmount = (int)calculatingRecoveryingStamina;
                     if (tempAmount < 0)
                         tempAmount = 0;
-                    CharacterEntity.OnBuffStaminaRecovery(Instigator, tempAmount);
+                    CharacterEntity.OnBuffStaminaRecovery(instigator, tempAmount);
                     calculatingRecoveryingStamina -= tempAmount;
                 }
             }
@@ -189,7 +193,7 @@ namespace MultiplayerARPG
                     tempAmount = (int)calculatingDecreasingStamina;
                     if (tempAmount < 0)
                         tempAmount = 0;
-                    CharacterEntity.OnBuffStaminaDecrease(Instigator, tempAmount);
+                    CharacterEntity.OnBuffStaminaDecrease(instigator, tempAmount);
                     calculatingDecreasingStamina -= tempAmount;
                 }
             }
@@ -203,7 +207,7 @@ namespace MultiplayerARPG
                     tempAmount = (int)calculatingRecoveryingFood;
                     if (tempAmount < 0)
                         tempAmount = 0;
-                    CharacterEntity.OnBuffFoodRecovery(Instigator, tempAmount);
+                    CharacterEntity.OnBuffFoodRecovery(instigator, tempAmount);
                     calculatingRecoveryingFood -= tempAmount;
                 }
             }
@@ -217,7 +221,7 @@ namespace MultiplayerARPG
                     tempAmount = (int)calculatingDecreasingFood;
                     if (tempAmount < 0)
                         tempAmount = 0;
-                    CharacterEntity.OnBuffFoodDecrease(Instigator, tempAmount);
+                    CharacterEntity.OnBuffFoodDecrease(instigator, tempAmount);
                     calculatingDecreasingFood -= tempAmount;
                 }
             }
@@ -231,7 +235,7 @@ namespace MultiplayerARPG
                     tempAmount = (int)calculatingRecoveryingWater;
                     if (tempAmount < 0)
                         tempAmount = 0;
-                    CharacterEntity.OnBuffWaterRecovery(Instigator, tempAmount);
+                    CharacterEntity.OnBuffWaterRecovery(instigator, tempAmount);
                     calculatingRecoveryingWater -= tempAmount;
                 }
             }
@@ -245,13 +249,13 @@ namespace MultiplayerARPG
                     tempAmount = (int)calculatingDecreasingWater;
                     if (tempAmount < 0)
                         tempAmount = 0;
-                    CharacterEntity.OnBuffWaterDecrease(Instigator, tempAmount);
+                    CharacterEntity.OnBuffWaterDecrease(instigator, tempAmount);
                     calculatingDecreasingWater -= tempAmount;
                 }
             }
 
             // Validate and do something if character dead
-            CharacterEntity.ValidateRecovery(Instigator);
+            CharacterEntity.ValidateRecovery(instigator);
 
             // Apply damage overtime
             if (CharacterEntity.CurrentHp > 0)
@@ -259,11 +263,20 @@ namespace MultiplayerARPG
                 calculatingTotalDamageOverTime += TotalDamageOverTime * rate;
                 if (calculatingTotalDamageOverTime >= 1)
                 {
+                    CharacterItem weapon = null;
+                    BaseSkill skill = null;
+                    short skillLevel = 0;
+                    if (buff != null)
+                    {
+                        weapon = buff.BuffApplierWeapon;
+                        skill = buff.GetSkill();
+                        skillLevel = buff.level;
+                    }
                     tempAmount = (int)calculatingTotalDamageOverTime;
                     if (tempAmount < 0)
                         tempAmount = 0;
                     CharacterEntity.CurrentHp -= tempAmount;
-                    CharacterEntity.ReceivedDamage(HitBoxPosition.None, CharacterEntity.CacheTransform.position, Instigator, DamageOverTimes, CombatAmountType.NormalDamage, tempAmount, null, null, 0);
+                    CharacterEntity.ReceivedDamage(HitBoxPosition.None, CharacterEntity.CacheTransform.position, instigator, DamageOverTimes, CombatAmountType.NormalDamage, tempAmount, weapon, skill, skillLevel);
                     calculatingTotalDamageOverTime -= tempAmount;
                 }
             }

@@ -612,24 +612,25 @@ namespace MultiplayerARPG
 
         private void ApplyStatusEffectsWhenAttacking(CharacterItem characterItem, IEquipmentItem equipmentItem, EntityInfo attackerInfo, BaseCharacterEntity attacker, BaseCharacterEntity damageReceiver)
         {
-            equipmentItem.ApplySelfStatusEffectsWhenAttacking(characterItem.level, attackerInfo, attacker);
-            equipmentItem.ApplyEnemyStatusEffectsWhenAttacking(characterItem.level, attackerInfo, damageReceiver);
+            bool isWeapon = equipmentItem is IWeaponItem;
+            equipmentItem.ApplySelfStatusEffectsWhenAttacking(characterItem.level, attackerInfo, isWeapon ? characterItem : null, attacker);
+            equipmentItem.ApplyEnemyStatusEffectsWhenAttacking(characterItem.level, attackerInfo, isWeapon ? characterItem : null, damageReceiver);
             if (characterItem.Sockets.Count > 0)
             {
                 foreach (int socketItemDataId in characterItem.Sockets)
                 {
-                    ApplyStatusEffectsWhenAttacking(socketItemDataId, attackerInfo, attacker, damageReceiver);
+                    ApplyStatusEffectsWhenAttacking(isWeapon ? characterItem : null, socketItemDataId, attackerInfo, attacker, damageReceiver);
                 }
             }
         }
 
-        private void ApplyStatusEffectsWhenAttacking(int socketItemDataId, EntityInfo attackerInfo, BaseCharacterEntity attacker, BaseCharacterEntity damageReceiver)
+        private void ApplyStatusEffectsWhenAttacking(CharacterItem weapon, int socketItemDataId, EntityInfo attackerInfo, BaseCharacterEntity attacker, BaseCharacterEntity damageReceiver)
         {
             if (!GameInstance.Items.ContainsKey(socketItemDataId))
                 return;
             ISocketEnhancerItem tempSocketEnhancerItem = GameInstance.Items[socketItemDataId] as ISocketEnhancerItem;
-            tempSocketEnhancerItem.ApplySelfStatusEffectsWhenAttacking(attackerInfo, attacker);
-            tempSocketEnhancerItem.ApplyEnemyStatusEffectsWhenAttacking(attackerInfo, damageReceiver);
+            tempSocketEnhancerItem.ApplySelfStatusEffectsWhenAttacking(attackerInfo, weapon, attacker);
+            tempSocketEnhancerItem.ApplyEnemyStatusEffectsWhenAttacking(attackerInfo, weapon, damageReceiver);
         }
 
         private void ApplyStatusEffectsWhenAttacked(CharacterItem characterItem, IEquipmentItem equipmentItem, EntityInfo damageReceiverInfo, BaseCharacterEntity attacker, BaseCharacterEntity damageReceiver)

@@ -578,7 +578,7 @@ namespace MultiplayerARPG
             if (!character.CanUseItem() || level <= 0 || !character.DecreaseItemsByIndex(itemIndex, 1))
                 return;
             character.FillEmptySlots();
-            character.ApplyBuff(DataId, BuffType.PotionBuff, level, character.GetInfo());
+            character.ApplyBuff(DataId, BuffType.PotionBuff, level, character.GetInfo(), null);
         }
 
         protected void UseItemPet(BaseCharacterEntity character, short itemIndex, short level, int exp)

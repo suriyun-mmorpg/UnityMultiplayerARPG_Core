@@ -11,7 +11,7 @@ namespace MultiplayerARPG
 
         public override void EntityStart()
         {
-            recoveryData = new CharacterRecoveryData(Entity, EntityInfo.Empty);
+            recoveryData = new CharacterRecoveryData(Entity);
         }
 
         public override sealed void EntityUpdate()

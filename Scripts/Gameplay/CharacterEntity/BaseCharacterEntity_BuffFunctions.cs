@@ -4,7 +4,7 @@ namespace MultiplayerARPG
 {
     public partial class BaseCharacterEntity
     {
-        public virtual void ApplyBuff(int dataId, BuffType type, short level, EntityInfo buffApplier)
+        public virtual void ApplyBuff(int dataId, BuffType type, short level, EntityInfo buffApplier, CharacterItem buffApplierWeapon)
         {
             if (!IsServer || this.IsDead())
                 return;
@@ -59,6 +59,7 @@ namespace MultiplayerARPG
                     CharacterBuff characterBuff = buffs[buffIndex];
                     characterBuff.level = level;
                     characterBuff.buffRemainsDuration += buffs[buffIndex].GetDuration();
+                    characterBuff.SetApplier(buffApplier, buffApplierWeapon);
                     buffs[buffIndex] = characterBuff;
                     return;
                 }
@@ -86,15 +87,15 @@ namespace MultiplayerARPG
             }
 
             CharacterBuff newBuff = CharacterBuff.Create(type, dataId, level);
-            newBuff.Apply(buffApplier);
+            newBuff.Apply(buffApplier, buffApplierWeapon);
             buffs.Add(newBuff);
             if (newBuff.GetBuff().disallowMove)
                 StopMove();
 
             if (newBuff.GetDuration() <= 0f)
             {
-                CharacterRecoveryData recoveryData = new CharacterRecoveryData(this, buffApplier);
-                recoveryData.Setup(newBuff);
+                CharacterRecoveryData recoveryData = new CharacterRecoveryData(this);
+                recoveryData.SetupByBuff(newBuff);
                 recoveryData.Apply(1f);
             }
 

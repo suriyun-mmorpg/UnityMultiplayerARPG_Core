@@ -84,28 +84,28 @@ namespace MultiplayerARPG
         {
             if (level <= 0 || target == null)
                 return;
-            buff.selfStatusEffectsWhenAttacking.ApplyStatusEffect(level, applier, target);
+            buff.selfStatusEffectsWhenAttacking.ApplyStatusEffect(level, applier, null, target);
         }
 
         public static void ApplyEnemyStatusEffectsWhenAttacking(this Buff buff, short level, EntityInfo applier, BaseCharacterEntity target)
         {
             if (level <= 0 || target == null)
                 return;
-            buff.enemyStatusEffectsWhenAttacking.ApplyStatusEffect(level, applier, target);
+            buff.enemyStatusEffectsWhenAttacking.ApplyStatusEffect(level, applier, null, target);
         }
 
         public static void ApplySelfStatusEffectsWhenAttacked(this Buff buff, short level, EntityInfo applier, BaseCharacterEntity target)
         {
             if (level <= 0 || target == null)
                 return;
-            buff.selfStatusEffectsWhenAttacked.ApplyStatusEffect(level, applier, target);
+            buff.selfStatusEffectsWhenAttacked.ApplyStatusEffect(level, applier, null, target);
         }
 
         public static void ApplyEnemyStatusEffectsWhenAttacked(this Buff buff, short level, EntityInfo applier, BaseCharacterEntity target)
         {
             if (level <= 0 || target == null)
                 return;
-            buff.enemyStatusEffectsWhenAttacked.ApplyStatusEffect(level, applier, target);
+            buff.enemyStatusEffectsWhenAttacked.ApplyStatusEffect(level, applier, null, target);
         }
         #endregion
     }

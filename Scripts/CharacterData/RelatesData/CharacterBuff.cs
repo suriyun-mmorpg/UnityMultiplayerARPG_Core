@@ -74,6 +74,7 @@ namespace MultiplayerARPG
         private string cacheKey;
 
         public EntityInfo BuffApplier { get; private set; }
+        public CharacterItem BuffApplierWeapon { get; private set; }
 
         private void MakeCache()
         {
@@ -271,10 +272,16 @@ namespace MultiplayerARPG
             return buffRemainsDuration <= 0f;
         }
 
-        public void Apply(EntityInfo buffApplier)
+        public void Apply(EntityInfo buffApplier, CharacterItem buffApplierWeapon)
+        {
+            SetApplier(buffApplier, buffApplierWeapon);
+            buffRemainsDuration = GetDuration();
+        }
+
+        public void SetApplier(EntityInfo buffApplier, CharacterItem buffApplierWeapon)
         {
             BuffApplier = buffApplier;
-            buffRemainsDuration = GetDuration();
+            BuffApplierWeapon = buffApplierWeapon;
         }
 
         public void Update(float deltaTime)

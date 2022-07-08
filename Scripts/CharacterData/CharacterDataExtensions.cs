@@ -2005,7 +2005,7 @@ namespace MultiplayerARPG
             }
         }
 
-        public static void ApplyStatusEffect(this IEnumerable<StatusEffectApplying> statusEffects, short level, EntityInfo applier, BaseCharacterEntity target)
+        public static void ApplyStatusEffect(this IEnumerable<StatusEffectApplying> statusEffects, short level, EntityInfo applier, CharacterItem weapon, BaseCharacterEntity target)
         {
             if (level <= 0 || target == null || statusEffects == null)
                 return;
@@ -2015,7 +2015,7 @@ namespace MultiplayerARPG
                 if (Random.value <= effect.chance.GetAmount(level))
                 {
                     // Apply buffs
-                    target.ApplyBuff(effect.statusEffect.DataId, BuffType.StatusEffect, effect.buffLevel.GetAmount(level), applier);
+                    target.ApplyBuff(effect.statusEffect.DataId, BuffType.StatusEffect, effect.buffLevel.GetAmount(level), applier, weapon);
                 }
             }
         }

@@ -202,20 +202,20 @@ namespace MultiplayerARPG
             return result;
         }
 
-        public static void ApplySelfStatusEffectsWhenAttacking<T>(this T equipmentItem, short level, EntityInfo applier, BaseCharacterEntity target)
+        public static void ApplySelfStatusEffectsWhenAttacking<T>(this T equipmentItem, short level, EntityInfo applier, CharacterItem weapon, BaseCharacterEntity target)
             where T : IEquipmentItem
         {
             if (level <= 0 || target == null || equipmentItem == null || !equipmentItem.IsEquipment())
                 return;
-            equipmentItem.SelfStatusEffectsWhenAttacking.ApplyStatusEffect(level, applier, target);
+            equipmentItem.SelfStatusEffectsWhenAttacking.ApplyStatusEffect(level, applier, weapon, target);
         }
 
-        public static void ApplyEnemyStatusEffectsWhenAttacking<T>(this T equipmentItem, short level, EntityInfo applier, BaseCharacterEntity target)
+        public static void ApplyEnemyStatusEffectsWhenAttacking<T>(this T equipmentItem, short level, EntityInfo applier, CharacterItem weapon, BaseCharacterEntity target)
             where T : IEquipmentItem
         {
             if (level <= 0 || target == null || equipmentItem == null || !equipmentItem.IsEquipment())
                 return;
-            equipmentItem.EnemyStatusEffectsWhenAttacking.ApplyStatusEffect(level, applier, target);
+            equipmentItem.EnemyStatusEffectsWhenAttacking.ApplyStatusEffect(level, applier, weapon, target);
         }
 
         public static void ApplySelfStatusEffectsWhenAttacked<T>(this T equipmentItem, short level, EntityInfo applier, BaseCharacterEntity target)
@@ -223,7 +223,7 @@ namespace MultiplayerARPG
         {
             if (level <= 0 || target == null || equipmentItem == null || !equipmentItem.IsEquipment())
                 return;
-            equipmentItem.SelfStatusEffectsWhenAttacked.ApplyStatusEffect(level, applier, target);
+            equipmentItem.SelfStatusEffectsWhenAttacked.ApplyStatusEffect(level, applier, null, target);
         }
 
         public static void ApplyEnemyStatusEffectsWhenAttacked<T>(this T equipmentItem, short level, EntityInfo applier, BaseCharacterEntity target)
@@ -231,7 +231,7 @@ namespace MultiplayerARPG
         {
             if (level <= 0 || target == null || equipmentItem == null || !equipmentItem.IsEquipment())
                 return;
-            equipmentItem.EnemyStatusEffectsWhenAttacked.ApplyStatusEffect(level, applier, target);
+            equipmentItem.EnemyStatusEffectsWhenAttacked.ApplyStatusEffect(level, applier, null, target);
         }
         #endregion
 
@@ -298,20 +298,20 @@ namespace MultiplayerARPG
         #endregion
 
         #region Socket Enhancer Extension
-        public static void ApplySelfStatusEffectsWhenAttacking<T>(this T socketEnhancerItem, EntityInfo applier, BaseCharacterEntity target)
+        public static void ApplySelfStatusEffectsWhenAttacking<T>(this T socketEnhancerItem, EntityInfo applier, CharacterItem weapon, BaseCharacterEntity target)
             where T : ISocketEnhancerItem
         {
             if (target == null || socketEnhancerItem == null || !socketEnhancerItem.IsSocketEnhancer())
                 return;
-            socketEnhancerItem.SelfStatusEffectsWhenAttacking.ApplyStatusEffect(1, applier, target);
+            socketEnhancerItem.SelfStatusEffectsWhenAttacking.ApplyStatusEffect(1, applier, weapon, target);
         }
 
-        public static void ApplyEnemyStatusEffectsWhenAttacking<T>(this T socketEnhancerItem, EntityInfo applier, BaseCharacterEntity target)
+        public static void ApplyEnemyStatusEffectsWhenAttacking<T>(this T socketEnhancerItem, EntityInfo applier, CharacterItem weapon, BaseCharacterEntity target)
             where T : ISocketEnhancerItem
         {
             if (target == null || socketEnhancerItem == null || !socketEnhancerItem.IsSocketEnhancer())
                 return;
-            socketEnhancerItem.EnemyStatusEffectsWhenAttacking.ApplyStatusEffect(1, applier, target);
+            socketEnhancerItem.EnemyStatusEffectsWhenAttacking.ApplyStatusEffect(1, applier, weapon, target);
         }
 
         public static void ApplySelfStatusEffectsWhenAttacked<T>(this T socketEnhancerItem, EntityInfo applier, BaseCharacterEntity target)
@@ -319,7 +319,7 @@ namespace MultiplayerARPG
         {
             if (target == null || socketEnhancerItem == null || !socketEnhancerItem.IsSocketEnhancer())
                 return;
-            socketEnhancerItem.SelfStatusEffectsWhenAttacked.ApplyStatusEffect(1, applier, target);
+            socketEnhancerItem.SelfStatusEffectsWhenAttacked.ApplyStatusEffect(1, applier, null, target);
         }
 
         public static void ApplyEnemyStatusEffectsWhenAttacked<T>(this T socketEnhancerItem, EntityInfo applier, BaseCharacterEntity target)
@@ -327,7 +327,7 @@ namespace MultiplayerARPG
         {
             if (target == null || socketEnhancerItem == null || !socketEnhancerItem.IsSocketEnhancer())
                 return;
-            socketEnhancerItem.EnemyStatusEffectsWhenAttacked.ApplyStatusEffect(1, applier, target);
+            socketEnhancerItem.EnemyStatusEffectsWhenAttacked.ApplyStatusEffect(1, applier, null, target);
         }
         #endregion
 

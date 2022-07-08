@@ -77,7 +77,7 @@ namespace MultiplayerARPG
         {
             if (!IsServer || target == null || target.IsDead() || (!applyBuffToEveryone && !target.IsAlly(buffApplier)))
                 return;
-            target.ApplyBuff(skill.DataId, BuffType.SkillBuff, skillLevel, buffApplier);
+            target.ApplyBuff(skill.DataId, BuffType.SkillBuff, skillLevel, buffApplier, null);
         }
 
         public override void InitPrefab()

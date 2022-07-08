@@ -184,7 +184,7 @@ namespace MultiplayerARPG
             {
                 // Apply debuff if character is not dead
                 if (skill != null && skill.IsDebuff)
-                    ApplyBuff(skill.DataId, BuffType.SkillDebuff, skillLevel, instigator);
+                    ApplyBuff(skill.DataId, BuffType.SkillDebuff, skillLevel, instigator, weapon);
             }
         }
     }

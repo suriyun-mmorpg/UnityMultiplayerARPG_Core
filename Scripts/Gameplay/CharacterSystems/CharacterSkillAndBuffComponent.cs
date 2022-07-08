@@ -87,8 +87,8 @@ namespace MultiplayerARPG
                         CharacterRecoveryData recoveryData;
                         if (!recoveryBuffs.TryGetValue(buff.id, out recoveryData))
                         {
-                            recoveryData = new CharacterRecoveryData(Entity, buff.BuffApplier);
-                            recoveryData.Setup(buff);
+                            recoveryData = new CharacterRecoveryData(Entity);
+                            recoveryData.SetupByBuff(buff);
                             recoveryBuffs.Add(buff.id, recoveryData);
                         }
                         recoveryData.Apply(1 / duration * updatingTime);

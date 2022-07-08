@@ -93,7 +93,7 @@ namespace MultiplayerARPG
             // Apply buff, summons at server only
             if (skillUser.IsServer)
             {
-                ApplySkillBuff(skillUser, skillLevel, targetObjectId);
+                ApplySkillBuff(skillUser, skillLevel, weapon, targetObjectId);
                 ApplySkillSummon(skillUser, skillLevel);
                 ApplySkillMount(skillUser, skillLevel);
             }
@@ -120,7 +120,7 @@ namespace MultiplayerARPG
             }
         }
 
-        protected void ApplySkillBuff(BaseCharacterEntity skillUser, short skillLevel, uint targetObjectId)
+        protected void ApplySkillBuff(BaseCharacterEntity skillUser, short skillLevel, CharacterItem weapon, uint targetObjectId)
         {
             if (skillUser.IsDead() || !skillUser.IsServer || skillLevel <= 0)
                 return;
@@ -130,37 +130,37 @@ namespace MultiplayerARPG
             switch (skillBuffType)
             {
                 case SkillBuffType.BuffToUser:
-                    skillUser.ApplyBuff(DataId, BuffType.SkillBuff, skillLevel, instigator);
+                    skillUser.ApplyBuff(DataId, BuffType.SkillBuff, skillLevel, instigator, weapon);
                     break;
                 case SkillBuffType.BuffToNearbyAllies:
                     tempCharacters = skillUser.FindAliveCharacters<BaseCharacterEntity>(buffDistance.GetAmount(skillLevel), true, false, false);
                     foreach (BaseCharacterEntity applyBuffCharacter in tempCharacters)
                     {
-                        applyBuffCharacter.ApplyBuff(DataId, BuffType.SkillBuff, skillLevel, instigator);
+                        applyBuffCharacter.ApplyBuff(DataId, BuffType.SkillBuff, skillLevel, instigator, weapon);
                     }
-                    skillUser.ApplyBuff(DataId, BuffType.SkillBuff, skillLevel, instigator);
+                    skillUser.ApplyBuff(DataId, BuffType.SkillBuff, skillLevel, instigator, weapon);
                     break;
                 case SkillBuffType.BuffToNearbyCharacters:
                     tempCharacters = skillUser.FindAliveCharacters<BaseCharacterEntity>(buffDistance.GetAmount(skillLevel), true, false, true);
                     foreach (BaseCharacterEntity applyBuffCharacter in tempCharacters)
                     {
-                        applyBuffCharacter.ApplyBuff(DataId, BuffType.SkillBuff, skillLevel, instigator);
+                        applyBuffCharacter.ApplyBuff(DataId, BuffType.SkillBuff, skillLevel, instigator, weapon);
                     }
-                    skillUser.ApplyBuff(DataId, BuffType.SkillBuff, skillLevel, instigator);
+                    skillUser.ApplyBuff(DataId, BuffType.SkillBuff, skillLevel, instigator, weapon);
                     break;
                 case SkillBuffType.BuffToTarget:
                     BaseCharacterEntity targetEntity = null;
                     if (buffToUserIfNoTarget && !skillUser.CurrentGameManager.TryGetEntityByObjectId(targetObjectId, out targetEntity))
                         targetEntity = skillUser;
                     if (targetEntity != null && !targetEntity.IsDead())
-                        targetEntity.ApplyBuff(DataId, BuffType.SkillBuff, skillLevel, instigator);
+                        targetEntity.ApplyBuff(DataId, BuffType.SkillBuff, skillLevel, instigator, weapon);
                     break;
                 case SkillBuffType.Toggle:
                     int indexOfBuff = skillUser.IndexOfBuff(DataId, BuffType.SkillBuff);
                     if (indexOfBuff >= 0)
                         skillUser.Buffs.RemoveAt(indexOfBuff);
                     else
-                        skillUser.ApplyBuff(DataId, BuffType.SkillBuff, skillLevel, instigator);
+                        skillUser.ApplyBuff(DataId, BuffType.SkillBuff, skillLevel, instigator, weapon);
                     break;
             }
         }
