@@ -109,7 +109,7 @@ namespace MultiplayerARPG
             }
 
             UICharacterBuff tempUI;
-            CacheList.Generate(character.Buffs, (index, data, ui) =>
+            CacheList.Generate(filteredList, (index, data, ui) =>
             {
                 tempUI = ui.GetComponent<UICharacterBuff>();
                 tempUI.Setup(data, character, index);
