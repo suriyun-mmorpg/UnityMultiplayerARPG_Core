@@ -11,6 +11,8 @@ namespace MultiplayerARPG
         public float randomWanderDelayMax = 5f;
         [Tooltip("Random distance around spawn position to wander")]
         public float randomWanderDistance = 2f;
+        [Tooltip("Max distance it can move from spawn point, if it's <= 0, it will be determined that it is no limit")]
+        public float maxDistanceFromSpawnPoint = 5f;
         [Tooltip("Delay before find enemy again")]
         public float findEnemyDelay = 1f;
         [Tooltip("If following target time reached this value it will stop following target")]
@@ -40,7 +42,8 @@ namespace MultiplayerARPG
         protected bool alreadySetActionState;
         protected bool isLeftHandAttacking;
         protected float lastSetDestinationTime;
-        protected bool previousIsInSafeArea;
+        protected bool previouslyExitFromSafeArea;
+        protected bool previouslyMoveBackToSpawnPoint;
         protected float pauseCountdown;
         protected float lastSwitchTargetTime;
 
@@ -153,12 +156,19 @@ namespace MultiplayerARPG
             {
                 if (Entity.IsInSafeArea)
                 {
-                    UpdateSafeAreaExitingActivity(deltaTime);
-                    previousIsInSafeArea = true;
+                    UpdateExitFromSafeAreaActivity(deltaTime);
                     startedFollowEnemy = false;
                     return;
                 }
-                previousIsInSafeArea = false;
+                previouslyExitFromSafeArea = false;
+
+                if (maxDistanceFromSpawnPoint > 0f && Vector3.Distance(Entity.SpawnPosition, currentPosition) >= maxDistanceFromSpawnPoint)
+                {
+                    UpdateMoveBackToSpawnPointActivity(deltaTime);
+                    startedFollowEnemy = false;
+                    return;
+                }
+                previouslyMoveBackToSpawnPoint = false;
 
                 if (!UpdateAttackEnemy(deltaTime, currentPosition))
                 {
@@ -183,14 +193,27 @@ namespace MultiplayerARPG
             }
         }
 
-        protected virtual void UpdateSafeAreaExitingActivity(float deltaTime)
+        protected virtual void UpdateExitFromSafeAreaActivity(float deltaTime)
         {
             randomedWanderElasped += deltaTime;
-            // If monster is in safe area, wander to another place
-            if (!previousIsInSafeArea || randomedWanderElasped >= randomedWanderDelay)
+            if (!previouslyExitFromSafeArea || randomedWanderElasped >= randomedWanderDelay)
             {
                 randomedWanderElasped = 0f;
                 RandomWanderDestination();
+                previouslyExitFromSafeArea = true;
+                return;
+            }
+        }
+
+        protected virtual void UpdateMoveBackToSpawnPointActivity(float deltaTime)
+        {
+            randomedWanderElasped += deltaTime;
+            if (!previouslyMoveBackToSpawnPoint || randomedWanderElasped >= randomedWanderDelay)
+            {
+                randomedWanderElasped = 0f;
+                RandomWanderDestination();
+                previouslyMoveBackToSpawnPoint = true;
+                return;
             }
         }
 
