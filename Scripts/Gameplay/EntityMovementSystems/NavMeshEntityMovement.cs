@@ -208,7 +208,6 @@ namespace MultiplayerARPG
                     if (lookRotationApplied && CacheNavMeshAgent.velocity.sqrMagnitude > 0f)
                         targetYAngle = Quaternion.LookRotation(CacheNavMeshAgent.velocity.normalized).eulerAngles.y;
                 }
-                lookRotationApplied = true;
                 // Update extra movement state
                 ExtraMovementState = this.ValidateExtraMovementState(MovementState, tempExtraMovementState);
                 // Set current input
@@ -236,6 +235,7 @@ namespace MultiplayerARPG
             else if (Mathf.Abs(yAngle - targetYAngle) > 1f)
                 yAngle = Mathf.LerpAngle(yAngle, targetYAngle, yTurnSpeed * deltaTime);
             UpdateRotation();
+            lookRotationApplied = true;
             currentInput = this.SetInputRotation(currentInput, CacheTransform.rotation);
         }
 

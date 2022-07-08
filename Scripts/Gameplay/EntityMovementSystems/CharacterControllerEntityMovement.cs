@@ -348,6 +348,11 @@ namespace MultiplayerARPG
                         moveDirection = Vector3.zero;
                     }
                 }
+                if (lookRotationApplied && moveDirection.sqrMagnitude > 0f)
+                {
+                    // Turn character by move direction
+                    targetYAngle = Quaternion.LookRotation(moveDirection).eulerAngles.y;
+                }
             }
             else if (clientTargetPosition.HasValue)
             {
@@ -370,12 +375,6 @@ namespace MultiplayerARPG
             {
                 tempTargetPosition = tempCurrentPosition;
             }
-            if (lookRotationApplied && moveDirection.sqrMagnitude > 0f)
-            {
-                // Turn character by move direction
-                targetYAngle = Quaternion.LookRotation(moveDirection).eulerAngles.y;
-            }
-            lookRotationApplied = true;
 
             if (!Entity.CanMove())
             {
@@ -571,6 +570,7 @@ namespace MultiplayerARPG
             else if (Mathf.Abs(yAngle - targetYAngle) > 1f)
                 yAngle = Mathf.LerpAngle(yAngle, targetYAngle, yTurnSpeed * deltaTime);
             UpdateRotation();
+            lookRotationApplied = true;
             currentInput = this.SetInputRotation(currentInput, CacheTransform.rotation);
             isJumping = false;
             acceptedJump = false;
