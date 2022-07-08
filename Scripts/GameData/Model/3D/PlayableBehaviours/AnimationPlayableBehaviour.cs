@@ -142,6 +142,7 @@ namespace MultiplayerARPG.GameData.Model.Playables
             public float clipLength = 0f;
             public float playElapsed = 0f;
             public float clipSpeed = 0f;
+            public AnimationClip previousClip;
 
             public bool HasChanges { get; set; } = true;
             public bool ForcePlay { get; set; } = false;
@@ -623,21 +624,28 @@ namespace MultiplayerARPG.GameData.Model.Playables
                 stateUpdateData.ForcePlay = false;
 
                 // Play new state
-                int inputCount = mixer.GetInputCount() + 1;
-                mixer.SetInputCount(inputCount);
-                AnimationClipPlayable playable = AnimationClipPlayable.Create(Graph, stateInfos[playingStateId].GetClip());
-                playable.SetApplyFootIK(stateInfos[playingStateId].ApplyFootIk());
-                playable.SetApplyPlayableIK(stateInfos[playingStateId].ApplyPlayableIk());
-                Graph.Connect(playable, 0, mixer, inputCount - 1);
-                if (inputCount > 1)
+                int inputCount = mixer.GetInputCount();
+                AnimationClip newClip = stateInfos[playingStateId].GetClip();
+                if (newClip != stateUpdateData.previousClip)
                 {
-                    // Set weight to 0 for transition
-                    mixer.SetInputWeight(inputCount - 1, 0f);
-                }
-                else
-                {
-                    // Set weight to 1 for immediately playing
-                    mixer.SetInputWeight(inputCount - 1, 1f);
+                    inputCount += 1;
+                    mixer.SetInputCount(inputCount);
+                    AnimationClipPlayable playable = AnimationClipPlayable.Create(Graph, newClip);
+                    playable.SetApplyFootIK(stateInfos[playingStateId].ApplyFootIk());
+                    playable.SetApplyPlayableIK(stateInfos[playingStateId].ApplyPlayableIk());
+                    Graph.Connect(playable, 0, mixer, inputCount - 1);
+                    if (inputCount > 1)
+                    {
+                        // Set weight to 0 for transition
+                        mixer.SetInputWeight(inputCount - 1, 0f);
+                    }
+                    else
+                    {
+                        // Set weight to 1 for immediately playing
+                        mixer.SetInputWeight(inputCount - 1, 1f);
+                    }
+                    // Reset play elapsed
+                    stateUpdateData.playElapsed = 0f;
                 }
 
                 // Get input port from new playing state ID
@@ -658,12 +666,10 @@ namespace MultiplayerARPG.GameData.Model.Playables
                 stateUpdateData.transitionDuration /= stateUpdateData.clipSpeed;
                 mixer.GetInput(stateUpdateData.inputPort).Play();
                 stateUpdateData.clipLength = stateInfos[playingStateId].GetClipLength(1);
+                stateUpdateData.previousClip = newClip;
 
                 // Set layer additive
                 LayerMixer.SetLayerAdditive(layer, stateInfos[playingStateId].IsAdditive());
-
-                // Reset play elapsed
-                stateUpdateData.playElapsed = 0f;
             }
         }
 
