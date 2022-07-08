@@ -16,7 +16,12 @@ namespace MultiplayerARPG
         }
 
         [Tooltip("If this is `TRUE`, it have to be dropped on drop handler to proceed activities")]
-        public bool requireDropArea;
+        public bool requireDropArea = false;
+        public bool enableDropItemAction = true;
+        public bool enableUnequipItemAction = true;
+        public bool enableMoveFromStorageAction = true;
+        public bool enablePickupFromContainerAction = true;
+        public bool enableUnassignHotkeyAction = true;
 
         public SourceLocation sourceLocation { get; protected set; }
         // Non Equip / Equip items data
@@ -107,15 +112,15 @@ namespace MultiplayerARPG
                 return;
             if (requireDropArea)
                 return;
-            if (sourceLocation == SourceLocation.NonEquipItems && (!EventSystem.current.IsPointerOverGameObject() || EventSystem.current.currentSelectedGameObject.GetComponent<IMobileInputArea>() != null))
+            if (enableDropItemAction && sourceLocation == SourceLocation.NonEquipItems && (!EventSystem.current.IsPointerOverGameObject() || EventSystem.current.currentSelectedGameObject.GetComponent<IMobileInputArea>() != null))
                 uiCharacterItem.OnClickDrop();
-            if (sourceLocation == SourceLocation.EquipItems && EventSystem.current.IsPointerOverGameObject())
+            if (enableUnequipItemAction && sourceLocation == SourceLocation.EquipItems && EventSystem.current.IsPointerOverGameObject())
                 uiCharacterItem.OnClickUnEquip();
-            if (sourceLocation == SourceLocation.StorageItems)
+            if (enableMoveFromStorageAction && sourceLocation == SourceLocation.StorageItems)
                 uiCharacterItem.OnClickMoveFromStorage();
-            if (sourceLocation == SourceLocation.ItemsContainer)
+            if (enablePickupFromContainerAction && sourceLocation == SourceLocation.ItemsContainer)
                 uiCharacterItem.OnClickPickUpFromContainer();
-            if (sourceLocation == SourceLocation.Hotkey)
+            if (enableUnassignHotkeyAction && sourceLocation == SourceLocation.Hotkey)
                 GameInstance.PlayingCharacterEntity.UnAssignHotkey(uiCharacterHotkey.hotkeyId);
         }
     }

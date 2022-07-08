@@ -12,7 +12,8 @@ namespace MultiplayerARPG
         }
 
         [Tooltip("If this is `TRUE`, it have to be dropped on drop handler to proceed activities")]
-        public bool requireDropArea;
+        public bool requireDropArea = false;
+        public bool enableUnassignHotkeyAction = true;
 
         public SourceLocation sourceLocation { get; protected set; }
         // Skills data
@@ -76,7 +77,7 @@ namespace MultiplayerARPG
                 return;
             if (requireDropArea)
                 return;
-            if (sourceLocation == SourceLocation.Hotkey)
+            if (enableUnassignHotkeyAction && sourceLocation == SourceLocation.Hotkey)
                 GameInstance.PlayingCharacterEntity.UnAssignHotkey(uiCharacterHotkey.hotkeyId);
         }
     }
