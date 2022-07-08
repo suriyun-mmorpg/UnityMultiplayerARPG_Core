@@ -20,7 +20,6 @@ namespace MultiplayerARPG.GameData.Model.Playables
 
         private interface IStateInfo
         {
-            public int InputPort { get; set; }
             public float GetSpeed(float rate);
             public float GetClipLength(float rate);
             public AnimationClip GetClip();
@@ -33,7 +32,6 @@ namespace MultiplayerARPG.GameData.Model.Playables
 
         private struct BaseStateInfo : IStateInfo
         {
-            public int InputPort { get; set; }
             public AnimState State { get; set; }
             public float GetSpeed(float rate)
             {
@@ -287,8 +285,6 @@ namespace MultiplayerARPG.GameData.Model.Playables
         private readonly HashSet<string> leftHandWeaponTypeIds = new HashSet<string>();
         private readonly Dictionary<string, BaseStateInfo> baseStates = new Dictionary<string, BaseStateInfo>();
         private readonly Dictionary<string, LeftHandWieldingStateInfo> leftHandWieldingStates = new Dictionary<string, LeftHandWieldingStateInfo>();
-        private int baseLayerInputPortCount = 0;
-        private int leftHandWieldingLayerInputPortCount = 0;
         private bool readyToPlay = false;
         private float awakenTime;
 
@@ -423,7 +419,6 @@ namespace MultiplayerARPG.GameData.Model.Playables
             }
             baseStates[id] = new BaseStateInfo()
             {
-                InputPort = baseLayerInputPortCount++,
                 State = state,
             };
         }
@@ -446,7 +441,6 @@ namespace MultiplayerARPG.GameData.Model.Playables
                 return;
             leftHandWieldingStates[id] = new LeftHandWieldingStateInfo()
             {
-                InputPort = leftHandWieldingLayerInputPortCount++,
                 State = state,
             };
         }
