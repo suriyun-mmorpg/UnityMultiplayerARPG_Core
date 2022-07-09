@@ -348,11 +348,6 @@ namespace MultiplayerARPG
                         moveDirection = Vector3.zero;
                     }
                 }
-                if (lookRotationApplied && moveDirection.sqrMagnitude > 0f)
-                {
-                    // Turn character by move direction
-                    targetYAngle = Quaternion.LookRotation(moveDirection).eulerAngles.y;
-                }
             }
             else if (clientTargetPosition.HasValue)
             {
@@ -374,6 +369,11 @@ namespace MultiplayerARPG
             else
             {
                 tempTargetPosition = tempCurrentPosition;
+            }
+            if (IsOwnerClientOrOwnedByServer && lookRotationApplied && moveDirection.sqrMagnitude > 0f)
+            {
+                // Turn character by move direction
+                targetYAngle = Quaternion.LookRotation(moveDirection).eulerAngles.y;
             }
 
             if (!Entity.CanMove())
@@ -787,7 +787,7 @@ namespace MultiplayerARPG
                 {
                     if (Entity.MovementSecure == MovementSecure.ServerAuthoritative || !IsOwnerClient)
                     {
-                        this.yAngle = yAngle;
+                        this.yAngle = targetYAngle = yAngle;
                         CacheTransform.position = position;
                     }
                     MovementState = movementState;
@@ -864,7 +864,7 @@ namespace MultiplayerARPG
                         }
                         else
                         {
-                            this.yAngle = yAngle;
+                            this.yAngle = targetYAngle = yAngle;
                         }
                     }
                     if (movementState.Has(MovementState.IsJump))
@@ -903,7 +903,15 @@ namespace MultiplayerARPG
             }
             if (acceptedPositionTimestamp < timestamp)
             {
-                this.yAngle = yAngle;
+                if (IsClient)
+                {
+                    targetYAngle = yAngle;
+                    yTurnSpeed = 1f / Time.fixedDeltaTime;
+                }
+                else
+                {
+                    this.yAngle = targetYAngle = yAngle;
+                }
                 MovementState = movementState;
                 ExtraMovementState = extraMovementState;
                 if (!IsClient)
