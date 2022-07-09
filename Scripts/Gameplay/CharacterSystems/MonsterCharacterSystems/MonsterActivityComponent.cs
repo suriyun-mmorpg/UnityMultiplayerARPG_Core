@@ -5,6 +5,8 @@ namespace MultiplayerARPG
 {
     public class MonsterActivityComponent : BaseMonsterActivityComponent
     {
+        [SerializeField]
+        protected float turnSmoothSpeed = 10f;
         [Tooltip("Min random delay for next wander")]
         public float randomWanderDelayMin = 2f;
         [Tooltip("Max random delay for next wander")]
@@ -131,6 +133,8 @@ namespace MultiplayerARPG
                 Entity.StopMove();
                 return;
             }
+
+            Entity.SetSmoothTurnSpeed(turnSmoothSpeed);
 
             Vector3 currentPosition = Entity.MovementTransform.position;
             if (Entity.Summoner != null)

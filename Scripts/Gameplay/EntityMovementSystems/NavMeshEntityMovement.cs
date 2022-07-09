@@ -409,7 +409,7 @@ namespace MultiplayerARPG
                         }
                         else
                         {
-                            this.yAngle = yAngle;
+                            this.yAngle = targetYAngle = yAngle;
                         }
                     }
                 }
@@ -446,7 +446,15 @@ namespace MultiplayerARPG
             }
             if (acceptedPositionTimestamp < timestamp)
             {
-                CacheTransform.eulerAngles = new Vector3(0, yAngle, 0);
+                if (IsClient)
+                {
+                    targetYAngle = yAngle;
+                    yTurnSpeed = 1f / Time.fixedDeltaTime;
+                }
+                else
+                {
+                    this.yAngle = targetYAngle = yAngle;
+                }
                 MovementState = movementState;
                 ExtraMovementState = extraMovementState;
                 if (Vector3.Distance(position.GetXZ(), CacheTransform.position.GetXZ()) > 0.01f)
