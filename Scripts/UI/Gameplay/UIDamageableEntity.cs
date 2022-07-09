@@ -75,7 +75,8 @@ namespace MultiplayerARPG
             int totalDamage,
             CharacterItem weapon,
             BaseSkill skill,
-            short skillLevel)
+            short skillLevel,
+            CharacterBuff buff)
         {
             receivedDamageTime = Time.unscaledTime;
         }

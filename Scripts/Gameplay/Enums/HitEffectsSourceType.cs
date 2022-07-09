@@ -1,9 +1,9 @@
 ﻿namespace MultiplayerARPG
 {
-    public enum DamageSource : byte
+    public enum HitEffectsSourceType : byte
     {
         None,
-        Weapon,
+        DamageElement,
         Skill
     }
 }

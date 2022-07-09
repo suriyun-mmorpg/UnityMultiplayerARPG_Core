@@ -157,9 +157,9 @@ namespace MultiplayerARPG
             CurrentHp -= totalDamage;
         }
 
-        public override void ReceivedDamage(HitBoxPosition position, Vector3 fromPosition, EntityInfo instigator, Dictionary<DamageElement, MinMaxFloat> damageAmounts, CombatAmountType combatAmountType, int totalDamage, CharacterItem weapon, BaseSkill skill, short skillLevel)
+        public override void ReceivedDamage(HitBoxPosition position, Vector3 fromPosition, EntityInfo instigator, Dictionary<DamageElement, MinMaxFloat> damageAmounts, CombatAmountType combatAmountType, int totalDamage, CharacterItem weapon, BaseSkill skill, short skillLevel, CharacterBuff buff)
         {
-            base.ReceivedDamage(position, fromPosition, instigator, damageAmounts, combatAmountType, totalDamage, weapon, skill, skillLevel);
+            base.ReceivedDamage(position, fromPosition, instigator, damageAmounts, combatAmountType, totalDamage, weapon, skill, skillLevel, buff);
             BaseCharacterEntity attackerCharacter;
             instigator.TryGetEntity(out attackerCharacter);
             CurrentGameInstance.GameplayRule.OnCharacterReceivedDamage(attackerCharacter, this, combatAmountType, totalDamage, weapon, skill, skillLevel);
@@ -183,7 +183,7 @@ namespace MultiplayerARPG
             else
             {
                 // Apply debuff if character is not dead
-                if (skill != null && skill.IsDebuff)
+                if (buff == null && skill != null && skill.IsDebuff)
                     ApplyBuff(skill.DataId, BuffType.SkillDebuff, skillLevel, instigator, weapon);
             }
         }
