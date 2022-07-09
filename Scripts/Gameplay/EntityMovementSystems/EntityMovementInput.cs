@@ -153,7 +153,7 @@ namespace MultiplayerARPG
                 state |= EntityMovementInputState.IsKeyMovement;
             if (Vector3.Distance(newInput.Position, oldInput.Position) > 0.01f)
                 state |= EntityMovementInputState.PositionChanged;
-            if (Quaternion.Angle(newInput.Rotation, oldInput.Rotation) > 1f)
+            if (Quaternion.Angle(newInput.Rotation, oldInput.Rotation) > 0.01f)
                 state |= EntityMovementInputState.RotationChanged;
             if (newInput.MovementState.Has(MovementState.IsJump))
                 state |= EntityMovementInputState.IsJump;
