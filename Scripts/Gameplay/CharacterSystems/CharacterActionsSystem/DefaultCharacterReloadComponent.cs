@@ -157,6 +157,7 @@ namespace MultiplayerARPG
             {
                 sendingClientReload = true;
                 sendingIsLeftHand = isLeftHand;
+                ReloadRoutine(isLeftHand, 0).Forget();
             }
             else if (IsOwnerClientOrOwnedByServer)
             {
