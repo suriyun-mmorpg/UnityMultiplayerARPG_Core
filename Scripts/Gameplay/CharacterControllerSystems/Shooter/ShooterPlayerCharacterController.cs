@@ -1581,10 +1581,11 @@ namespace MultiplayerARPG
             if (WeaponAbility != null && WeaponAbility.ShouldDeactivateWhenReload)
                 WeaponAbility.ForceDeactivated();
             // Reload ammo at server
-            if (!PlayerCharacterEntity.EquipWeapons.rightHand.IsAmmoFull())
+            if (!PlayerCharacterEntity.EquipWeapons.rightHand.IsAmmoFull() && PlayerCharacterEntity.EquipWeapons.rightHand.HasAmmoToReload(PlayerCharacterEntity))
                 PlayerCharacterEntity.Reload(false);
-            else if (!PlayerCharacterEntity.EquipWeapons.leftHand.IsAmmoFull())
+            else if (!PlayerCharacterEntity.EquipWeapons.leftHand.IsAmmoFull() && PlayerCharacterEntity.EquipWeapons.leftHand.HasAmmoToReload(PlayerCharacterEntity))
                 PlayerCharacterEntity.Reload(true);
+            // TODO: do something to improve performance?
         }
 
         public virtual void ActivateWeaponAbility()

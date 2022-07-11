@@ -618,9 +618,9 @@ namespace MultiplayerARPG
         {
             if (!CanDoActions())
                 return false;
-            if (!isLeftHand && EquipWeapons.rightHand.IsAmmoFull())
+            if (!isLeftHand && (EquipWeapons.rightHand.IsAmmoFull() || !EquipWeapons.rightHand.HasAmmoToReload(this)))
                 return false;
-            if (isLeftHand && EquipWeapons.leftHand.IsAmmoFull())
+            if (isLeftHand && (EquipWeapons.leftHand.IsAmmoFull() || !EquipWeapons.leftHand.HasAmmoToReload(this)))
                 return false;
             return true;
         }

@@ -269,6 +269,14 @@ namespace MultiplayerARPG
             return true;
         }
 
+        public bool HasAmmoToReload(ICharacterData character)
+        {
+            IWeaponItem item = GetWeaponItem();
+            if (item != null)
+                return character.CountAmmos(item.WeaponType.RequireAmmoType) > 0;
+            return false;
+        }
+
         public void Lock(float duration)
         {
             lockRemainsDuration = duration;
