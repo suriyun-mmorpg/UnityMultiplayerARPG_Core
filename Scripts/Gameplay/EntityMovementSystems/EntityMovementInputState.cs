@@ -7,8 +7,8 @@
         IsKeyMovement = 1 << 0,
         PositionChanged = 1 << 1,
         RotationChanged = 1 << 2,
-        IsJump = 1 << 3,
-        IsStopped = 1 << 4,
+        IsStopped = 1 << 3,
+        Other = 1 << 4,
     }
 
     public static class EntityMovementInputStateExtensions
