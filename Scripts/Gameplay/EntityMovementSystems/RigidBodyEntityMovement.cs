@@ -709,9 +709,9 @@ namespace MultiplayerARPG
             if (Entity.MovementSecure == MovementSecure.ServerAuthoritative && IsOwnerClient && !IsServer)
             {
                 EntityMovementInputState inputState;
+                currentInput = this.SetInputExtraMovementState(currentInput, tempExtraMovementState);
                 if (this.DifferInputEnoughToSend(oldInput, currentInput, out inputState) || sendingJump)
                 {
-                    currentInput = this.SetInputExtraMovementState(currentInput, tempExtraMovementState);
                     if (sendingJump)
                     {
                         shouldSendReliably = true;
