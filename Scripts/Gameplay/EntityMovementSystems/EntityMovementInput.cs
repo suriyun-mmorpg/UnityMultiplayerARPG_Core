@@ -156,10 +156,7 @@ namespace MultiplayerARPG
             if (newInput.MovementState.Has(MovementState.IsJump))
                 state |= EntityMovementInputState.Other;
             if (newInput.ExtraMovementState != oldInput.ExtraMovementState)
-            {
-                Debug.LogError("ex " + newInput.ExtraMovementState);
                 state |= EntityMovementInputState.Other;
-            }
             return state != EntityMovementInputState.None;
         }
     }
