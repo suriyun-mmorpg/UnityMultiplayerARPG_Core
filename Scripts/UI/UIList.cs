@@ -17,7 +17,7 @@ public class UIList : MonoBehaviour
     {
         if (!ChildPrefabsCount.HasValue)
             ChildPrefabsCount = uiContainer != null ? uiContainer.childCount : 0;
-        if (doNotRemoveContainerChildren)
+        if (doNotRemoveContainerChildren || uiContainer == null)
             return;
         for (int i = 0; i < ChildPrefabsCount.Value; ++i)
         {
