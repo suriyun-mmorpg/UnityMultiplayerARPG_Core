@@ -59,5 +59,10 @@ namespace MultiplayerARPG
                 GameInstance.AddItems(items);
             }
         }
+
+        public override void OnInteract()
+        {
+            BaseUISceneGameplay.Singleton.ShowWorkbenchDialog(this);
+        }
     }
 }

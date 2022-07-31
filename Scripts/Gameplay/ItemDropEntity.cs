@@ -7,7 +7,7 @@ using Cysharp.Threading.Tasks;
 
 namespace MultiplayerARPG
 {
-    public class ItemDropEntity : BaseGameEntity
+    public class ItemDropEntity : BaseGameEntity, IInteractableEntity
     {
         public const float GROUND_DETECTION_Y_OFFSETS = 3f;
         private static readonly RaycastHit[] findGroundRaycastHits = new RaycastHit[1000];
@@ -336,6 +336,36 @@ namespace MultiplayerARPG
             BaseGameNetworkManager.Singleton.Assets.NetworkSpawn(spawnObj);
             itemDropEntity.InitDropItems();
             return itemDropEntity;
+        }
+
+        public virtual float GetInteractableDistance()
+        {
+            return GameInstance.Singleton.pickUpItemDistance;
+        }
+
+        public virtual bool ShouldBeAttackTarget()
+        {
+            return false;
+        }
+
+        public virtual bool CanInteract()
+        {
+            return true;
+        }
+
+        public virtual void OnInteract()
+        {
+            GameInstance.PlayingCharacterEntity.CallServerPickupItem(ObjectId);
+        }
+
+        public virtual bool CanHoldInteract()
+        {
+            return CanInteract();
+        }
+
+        public virtual void OnHoldInteract()
+        {
+            OnInteract();
         }
     }
 }

@@ -78,5 +78,10 @@ namespace MultiplayerARPG
             if (CacheItemCraftFormulas.Count > 0)
                 GameInstance.AddItemCraftFormulas(SourceId, CacheItemCraftFormulas.Values);
         }
+
+        public override void OnInteract()
+        {
+            BaseUISceneGameplay.Singleton.ShowCraftingQueueItemsDialog(this);
+        }
     }
 }

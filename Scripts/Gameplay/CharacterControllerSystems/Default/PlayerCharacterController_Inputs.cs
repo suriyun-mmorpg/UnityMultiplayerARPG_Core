@@ -65,7 +65,7 @@ namespace MultiplayerARPG
                     {
                         // Use building
                         SelectedEntity = targetBuilding;
-                        ActivateBuilding(targetBuilding);
+                        ActivateBuilding();
                     }
                     else if (targetVehicle != null)
                     {
@@ -316,7 +316,7 @@ namespace MultiplayerARPG
                         else if (targetVehicle)
                         {
                             // Found activating entity as vehicle entity
-                            if (targetVehicle.ShouldBeAttackTarget)
+                            if (targetVehicle.ShouldBeAttackTarget())
                                 SetTarget(targetVehicle, TargetActionType.Attack);
                             else
                                 SetTarget(targetVehicle, TargetActionType.Activate);
@@ -716,7 +716,7 @@ namespace MultiplayerARPG
                     if (!didActionOnTarget)
                     {
                         didActionOnTarget = true;
-                        ActivateBuilding(targetBuilding);
+                        ActivateBuilding();
                     }
                 });
             }

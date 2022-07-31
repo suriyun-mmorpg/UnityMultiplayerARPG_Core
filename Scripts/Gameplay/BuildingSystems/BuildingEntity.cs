@@ -4,13 +4,14 @@ using UnityEngine.Profiling;
 using UnityEngine.Tilemaps;
 using LiteNetLibManager;
 using UnityEngine.Events;
+using UnityEngine.UI;
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
 
 namespace MultiplayerARPG
 {
-    public class BuildingEntity : DamageableEntity, IBuildingSaveData
+    public class BuildingEntity : DamageableEntity, IBuildingSaveData, IInteractableEntity
     {
         public const float BUILD_DISTANCE_BUFFER = 0.1f;
 
@@ -61,6 +62,14 @@ namespace MultiplayerARPG
         [SerializeField]
         [Tooltip("Delay before the entity destroyed, you may set some delay to play destroyed animation by `onBuildingDestroy` event before it's going to be destroyed from the game.")]
         protected float destroyDelay = 2f;
+
+        [SerializeField]
+        protected InputField.ContentType passwordContentType = InputField.ContentType.Pin;
+        public InputField.ContentType PasswordContentType { get { return passwordContentType; } }
+
+        [SerializeField]
+        protected int passwordLength = 6;
+        public int PasswordLength { get { return passwordLength; } }
 
         [Category("Events")]
         [SerializeField]
@@ -518,6 +527,36 @@ namespace MultiplayerARPG
         public bool IsCreator(string playerCharacterId)
         {
             return CreatorId.Equals(playerCharacterId);
+        }
+
+        public virtual float GetInteractableDistance()
+        {
+            return GameInstance.Singleton.conversationDistance;
+        }
+
+        public virtual bool ShouldBeAttackTarget()
+        {
+            return false;
+        }
+
+        public virtual bool CanInteract()
+        {
+            return !this.IsDead() && Activatable;
+        }
+
+        public virtual void OnInteract()
+        {
+            // Do nothing, override this function to do something
+        }
+
+        public virtual bool CanHoldInteract()
+        {
+            return !this.IsDead();
+        }
+
+        public virtual void OnHoldInteract()
+        {
+            BaseUISceneGameplay.Singleton.ShowCurrentBuildingDialog(this);
         }
     }
 }

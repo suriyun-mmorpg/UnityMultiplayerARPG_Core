@@ -4,7 +4,7 @@ using UnityEngine.Serialization;
 
 namespace MultiplayerARPG
 {
-    public class NpcEntity : BaseGameEntity
+    public class NpcEntity : BaseGameEntity, IInteractableEntity
     {
         [Category(5, "NPC Settings")]
         [SerializeField]
@@ -271,6 +271,36 @@ namespace MultiplayerARPG
                     return true;
             }
             return false;
+        }
+
+        public virtual float GetInteractableDistance()
+        {
+            return GameInstance.Singleton.conversationDistance;
+        }
+
+        public virtual bool ShouldBeAttackTarget()
+        {
+            return false;
+        }
+
+        public virtual bool CanInteract()
+        {
+            return true;
+        }
+
+        public virtual void OnInteract()
+        {
+            GameInstance.PlayingCharacterEntity.NpcAction.CallServerNpcActivate(ObjectId);
+        }
+
+        public virtual bool CanHoldInteract()
+        {
+            return CanInteract();
+        }
+
+        public virtual void OnHoldInteract()
+        {
+            OnInteract();
         }
     }
 }

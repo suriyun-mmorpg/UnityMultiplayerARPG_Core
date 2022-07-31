@@ -1639,7 +1639,7 @@ namespace MultiplayerARPG
             else if (targetNpc != null)
                 PlayerCharacterEntity.NpcAction.CallServerNpcActivate(targetNpc.ObjectId);
             else if (targetBuilding != null)
-                ActivateBuilding(targetBuilding);
+                ActivateBuilding();
             else if (targetVehicle != null)
                 PlayerCharacterEntity.CallServerEnterVehicle(targetVehicle.ObjectId);
             else if (targetWarpPortal != null)

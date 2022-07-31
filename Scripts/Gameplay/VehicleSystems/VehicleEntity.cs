@@ -6,7 +6,7 @@ using UnityEngine.Events;
 
 namespace MultiplayerARPG
 {
-    public class VehicleEntity : DamageableEntity, IVehicleEntity
+    public class VehicleEntity : DamageableEntity, IVehicleEntity, IInteractableEntity
     {
         [Category(5, "Vehicle Settings")]
         [SerializeField]
@@ -63,7 +63,6 @@ namespace MultiplayerARPG
 
         public virtual bool IsDestroyWhenDriverExit { get { return false; } }
         public virtual bool HasDriver { get { return passengers.ContainsKey(0); } }
-        public virtual bool ShouldBeAttackTarget { get { return HasDriver && canBeAttacked && !this.IsDead(); } }
         public Dictionary<DamageElement, float> Resistances { get; private set; }
         public Dictionary<DamageElement, float> Armors { get; private set; }
         public override bool IsImmune { get { return base.IsImmune || !canBeAttacked; } set { base.IsImmune = value; } }
@@ -323,6 +322,36 @@ namespace MultiplayerARPG
                 Identity.ObjectId,
                 SpawnPosition,
                 CurrentGameInstance.DimensionType == DimensionType.Dimension3D ? Quaternion.Euler(Vector3.up * Random.Range(0, 360)) : Quaternion.identity);
+        }
+
+        public virtual float GetInteractableDistance()
+        {
+            return GameInstance.Singleton.conversationDistance;
+        }
+
+        public virtual bool ShouldBeAttackTarget()
+        {
+            return HasDriver && canBeAttacked && !this.IsDead();
+        }
+
+        public virtual bool CanInteract()
+        {
+            return !this.IsDead();
+        }
+
+        public virtual void OnInteract()
+        {
+            GameInstance.PlayingCharacterEntity.CallServerEnterVehicle(ObjectId);
+        }
+
+        public virtual bool CanHoldInteract()
+        {
+            return CanInteract();
+        }
+
+        public virtual void OnHoldInteract()
+        {
+            OnInteract();
         }
     }
 }

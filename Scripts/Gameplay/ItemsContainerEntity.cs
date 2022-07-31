@@ -5,7 +5,7 @@ using UnityEngine.Events;
 
 namespace MultiplayerARPG
 {
-    public class ItemsContainerEntity : BaseGameEntity
+    public class ItemsContainerEntity : BaseGameEntity, IInteractableEntity
     {
         public const float GROUND_DETECTION_Y_OFFSETS = 3f;
 
@@ -170,6 +170,36 @@ namespace MultiplayerARPG
             }
             BaseGameNetworkManager.Singleton.Assets.NetworkSpawn(spawnObj);
             return itemsContainerEntity;
+        }
+
+        public virtual float GetInteractableDistance()
+        {
+            return GameInstance.Singleton.pickUpItemDistance;
+        }
+
+        public virtual bool ShouldBeAttackTarget()
+        {
+            return false;
+        }
+
+        public virtual bool CanInteract()
+        {
+            return true;
+        }
+
+        public virtual void OnInteract()
+        {
+            BaseUISceneGameplay.Singleton.ShowItemsContainerDialog(this);
+        }
+
+        public virtual bool CanHoldInteract()
+        {
+            return CanInteract();
+        }
+
+        public virtual void OnHoldInteract()
+        {
+            OnInteract();
         }
     }
 }

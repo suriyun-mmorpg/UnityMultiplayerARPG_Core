@@ -34,13 +34,8 @@ namespace MultiplayerARPG
         /// Controlled character, can use `GameInstance.PlayingCharacter` or `GameInstance.PlayingCharacterEntity` instead.
         /// </summary>
         public static BasePlayerCharacterEntity OwningCharacter { get { return Singleton == null ? null : Singleton.PlayerCharacterEntity; } }
-        [SerializeField]
-        protected InputField.ContentType buildingPasswordContentType = InputField.ContentType.Pin;
-        [SerializeField]
-        protected int buildingPasswordLength = 6;
         public System.Action<BasePlayerCharacterController> onSetup;
         public System.Action<BasePlayerCharacterController> onDesetup;
-        public System.Action<BuildingEntity> onActivateBuilding;
 
         public BasePlayerCharacterEntity PlayerCharacterEntity
         {
@@ -195,7 +190,7 @@ namespace MultiplayerARPG
                 (password) =>
                 {
                     PlayerCharacterEntity.Building.CallServerSetBuildingPassword(objectId, password);
-                }, string.Empty, buildingPasswordContentType, buildingPasswordLength);
+                }, string.Empty, TargetBuildingEntity.PasswordContentType, TargetBuildingEntity.PasswordLength);
             DeselectBuilding();
         }
 
@@ -260,70 +255,8 @@ namespace MultiplayerARPG
         {
             if (TargetBuildingEntity == null)
                 return;
-            ActivateBuilding(TargetBuildingEntity);
+            TargetBuildingEntity.OnInteract();
             DeselectBuilding();
-        }
-
-        public void ActivateBuilding(BuildingEntity buildingEntity)
-        {
-            uint objectId = buildingEntity.ObjectId;
-            if (buildingEntity is DoorEntity)
-            {
-                if (!(buildingEntity as DoorEntity).IsOpen)
-                {
-                    if (!buildingEntity.Lockable || !buildingEntity.IsLocked)
-                    {
-                        OwningCharacter.Building.CallServerOpenDoor(objectId, string.Empty);
-                    }
-                    else
-                    {
-                        UISceneGlobal.Singleton.ShowPasswordDialog(
-                            LanguageManager.GetText(UITextKeys.UI_ENTER_BUILDING_PASSWORD.ToString()),
-                            LanguageManager.GetText(UITextKeys.UI_ENTER_BUILDING_PASSWORD_DESCRIPTION.ToString()),
-                            (password) =>
-                            {
-                                OwningCharacter.Building.CallServerOpenDoor(objectId, password);
-                            }, string.Empty, buildingPasswordContentType, buildingPasswordLength);
-                    }
-                }
-                else
-                {
-                    OwningCharacter.Building.CallServerCloseDoor(objectId);
-                }
-            }
-
-            if (buildingEntity is StorageEntity)
-            {
-                if (!buildingEntity.Lockable || !buildingEntity.IsLocked)
-                {
-                    OwningCharacter.CallServerOpenStorage(objectId, string.Empty);
-                }
-                else
-                {
-                    UISceneGlobal.Singleton.ShowPasswordDialog(
-                            LanguageManager.GetText(UITextKeys.UI_ENTER_BUILDING_PASSWORD.ToString()),
-                            LanguageManager.GetText(UITextKeys.UI_ENTER_BUILDING_PASSWORD_DESCRIPTION.ToString()),
-                        (password) =>
-                        {
-                            OwningCharacter.CallServerOpenStorage(objectId, password);
-                        }, string.Empty, buildingPasswordContentType, buildingPasswordLength);
-                }
-            }
-
-            if (buildingEntity is WorkbenchEntity)
-            {
-                CacheUISceneGameplay.ShowWorkbenchDialog(buildingEntity as WorkbenchEntity);
-            }
-
-            if (buildingEntity is QueuedWorkbenchEntity)
-            {
-                CacheUISceneGameplay.ShowCraftingQueueItemsDialog(buildingEntity as QueuedWorkbenchEntity);
-            }
-
-            // Action when activate building for custom buildings
-            // Can add event by `Awake` dev extension.
-            if (onActivateBuilding != null)
-                onActivateBuilding.Invoke(buildingEntity);
         }
 
         public void SetQueueUsingSkill(AimPosition aimPosition, BaseSkill skill, short level)

@@ -11,9 +11,11 @@ namespace MultiplayerARPG
         [SerializeField]
         protected Storage storage = new Storage();
         public Storage Storage { get { return storage; } }
+
         [SerializeField]
         protected bool lockable = false;
         public override bool Lockable { get { return lockable; } }
+
         [SerializeField]
         protected bool canUseByEveryone = false;
         public bool CanUseByEveryone { get { return canUseByEveryone; } }
@@ -83,6 +85,24 @@ namespace MultiplayerARPG
                     dirtyIsOpen = updatingIsOpen;
                     isOpen.Value = updatingIsOpen;
                 }
+            }
+        }
+
+        public override void OnInteract()
+        {
+            if (!Lockable || !IsLocked)
+            {
+                GameInstance.PlayingCharacterEntity.CallServerOpenStorage(ObjectId, string.Empty);
+            }
+            else
+            {
+                UISceneGlobal.Singleton.ShowPasswordDialog(
+                    LanguageManager.GetText(UITextKeys.UI_ENTER_BUILDING_PASSWORD.ToString()),
+                    LanguageManager.GetText(UITextKeys.UI_ENTER_BUILDING_PASSWORD_DESCRIPTION.ToString()),
+                    (password) =>
+                    {
+                        GameInstance.PlayingCharacterEntity.CallServerOpenStorage(ObjectId, password);
+                    }, string.Empty, PasswordContentType, PasswordLength);
             }
         }
     }

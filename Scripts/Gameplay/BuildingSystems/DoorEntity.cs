@@ -70,5 +70,30 @@ namespace MultiplayerARPG
                     onClose.Invoke();
             }
         }
+
+        public override void OnInteract()
+        {
+            if (!IsOpen)
+            {
+                if (!Lockable || !IsLocked)
+                {
+                    GameInstance.PlayingCharacterEntity.Building.CallServerOpenDoor(ObjectId, string.Empty);
+                }
+                else
+                {
+                    UISceneGlobal.Singleton.ShowPasswordDialog(
+                        LanguageManager.GetText(UITextKeys.UI_ENTER_BUILDING_PASSWORD.ToString()),
+                        LanguageManager.GetText(UITextKeys.UI_ENTER_BUILDING_PASSWORD_DESCRIPTION.ToString()),
+                        (password) =>
+                        {
+                            GameInstance.PlayingCharacterEntity.Building.CallServerOpenDoor(ObjectId, password);
+                        }, string.Empty, PasswordContentType, PasswordLength);
+                }
+            }
+            else
+            {
+                GameInstance.PlayingCharacterEntity.Building.CallServerCloseDoor(ObjectId);
+            }
+        }
     }
 }
