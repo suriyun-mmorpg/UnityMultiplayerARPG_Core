@@ -4,7 +4,7 @@ using UnityEngine.Serialization;
 
 namespace MultiplayerARPG
 {
-    public class NpcEntity : BaseGameEntity, IInteractableEntity
+    public class NpcEntity : BaseGameEntity, IActivatePressActivatableEntity, IClickActivatableEntity
     {
         [Category(5, "NPC Settings")]
         [SerializeField]
@@ -273,7 +273,7 @@ namespace MultiplayerARPG
             return false;
         }
 
-        public virtual float GetInteractableDistance()
+        public virtual float GetActivatableDistance()
         {
             return GameInstance.Singleton.conversationDistance;
         }
@@ -283,24 +283,24 @@ namespace MultiplayerARPG
             return false;
         }
 
-        public virtual bool CanInteract()
+        public virtual bool CanKeyPressActivate()
         {
             return true;
         }
 
-        public virtual void OnInteract()
+        public virtual void OnKeyPressActivate()
         {
             GameInstance.PlayingCharacterEntity.NpcAction.CallServerNpcActivate(ObjectId);
         }
 
-        public virtual bool CanHoldInteract()
+        public virtual bool CanClickActivate()
         {
-            return CanInteract();
+            return CanKeyPressActivate();
         }
 
-        public virtual void OnHoldInteract()
+        public virtual void OnClickActivate()
         {
-            OnInteract();
+            OnKeyPressActivate();
         }
     }
 }

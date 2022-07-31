@@ -6,7 +6,7 @@ using UnityEngine.Events;
 
 namespace MultiplayerARPG
 {
-    public class VehicleEntity : DamageableEntity, IVehicleEntity, IInteractableEntity
+    public class VehicleEntity : DamageableEntity, IVehicleEntity, IActivatePressActivatableEntity, IClickActivatableEntity
     {
         [Category(5, "Vehicle Settings")]
         [SerializeField]
@@ -324,7 +324,7 @@ namespace MultiplayerARPG
                 CurrentGameInstance.DimensionType == DimensionType.Dimension3D ? Quaternion.Euler(Vector3.up * Random.Range(0, 360)) : Quaternion.identity);
         }
 
-        public virtual float GetInteractableDistance()
+        public virtual float GetActivatableDistance()
         {
             return GameInstance.Singleton.conversationDistance;
         }
@@ -334,24 +334,24 @@ namespace MultiplayerARPG
             return HasDriver && canBeAttacked && !this.IsDead();
         }
 
-        public virtual bool CanInteract()
+        public virtual bool CanKeyPressActivate()
         {
             return !this.IsDead();
         }
 
-        public virtual void OnInteract()
+        public virtual void OnKeyPressActivate()
         {
             GameInstance.PlayingCharacterEntity.CallServerEnterVehicle(ObjectId);
         }
 
-        public virtual bool CanHoldInteract()
+        public virtual bool CanClickActivate()
         {
-            return CanInteract();
+            return CanKeyPressActivate();
         }
 
-        public virtual void OnHoldInteract()
+        public virtual void OnClickActivate()
         {
-            OnInteract();
+            OnKeyPressActivate();
         }
     }
 }

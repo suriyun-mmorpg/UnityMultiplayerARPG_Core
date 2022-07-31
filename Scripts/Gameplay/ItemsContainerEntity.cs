@@ -5,7 +5,7 @@ using UnityEngine.Events;
 
 namespace MultiplayerARPG
 {
-    public class ItemsContainerEntity : BaseGameEntity, IInteractableEntity
+    public class ItemsContainerEntity : BaseGameEntity, IActivatePressActivatableEntity, IClickActivatableEntity
     {
         public const float GROUND_DETECTION_Y_OFFSETS = 3f;
 
@@ -172,7 +172,7 @@ namespace MultiplayerARPG
             return itemsContainerEntity;
         }
 
-        public virtual float GetInteractableDistance()
+        public virtual float GetActivatableDistance()
         {
             return GameInstance.Singleton.pickUpItemDistance;
         }
@@ -182,24 +182,24 @@ namespace MultiplayerARPG
             return false;
         }
 
-        public virtual bool CanInteract()
+        public virtual bool CanKeyPressActivate()
         {
             return true;
         }
 
-        public virtual void OnInteract()
+        public virtual void OnKeyPressActivate()
         {
             BaseUISceneGameplay.Singleton.ShowItemsContainerDialog(this);
         }
 
-        public virtual bool CanHoldInteract()
+        public virtual bool CanClickActivate()
         {
-            return CanInteract();
+            return CanKeyPressActivate();
         }
 
-        public virtual void OnHoldInteract()
+        public virtual void OnClickActivate()
         {
-            OnInteract();
+            OnKeyPressActivate();
         }
     }
 }

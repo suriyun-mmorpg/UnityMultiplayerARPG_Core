@@ -7,7 +7,7 @@ using Cysharp.Threading.Tasks;
 
 namespace MultiplayerARPG
 {
-    public class ItemDropEntity : BaseGameEntity, IInteractableEntity
+    public class ItemDropEntity : BaseGameEntity, IPickupPressActivatableEntity, IClickActivatableEntity
     {
         public const float GROUND_DETECTION_Y_OFFSETS = 3f;
         private static readonly RaycastHit[] findGroundRaycastHits = new RaycastHit[1000];
@@ -338,7 +338,7 @@ namespace MultiplayerARPG
             return itemDropEntity;
         }
 
-        public virtual float GetInteractableDistance()
+        public virtual float GetActivatableDistance()
         {
             return GameInstance.Singleton.pickUpItemDistance;
         }
@@ -348,24 +348,24 @@ namespace MultiplayerARPG
             return false;
         }
 
-        public virtual bool CanInteract()
+        public virtual bool CanPickupPressActivate()
         {
             return true;
         }
 
-        public virtual void OnInteract()
+        public virtual void OnPickupPressActivate()
         {
             GameInstance.PlayingCharacterEntity.CallServerPickupItem(ObjectId);
         }
 
-        public virtual bool CanHoldInteract()
+        public virtual bool CanClickActivate()
         {
-            return CanInteract();
+            return CanPickupPressActivate();
         }
 
-        public virtual void OnHoldInteract()
+        public virtual void OnClickActivate()
         {
-            OnInteract();
+            OnPickupPressActivate();
         }
     }
 }

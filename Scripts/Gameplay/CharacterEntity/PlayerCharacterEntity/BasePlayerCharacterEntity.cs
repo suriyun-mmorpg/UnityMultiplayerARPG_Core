@@ -8,7 +8,7 @@ namespace MultiplayerARPG
     [RequireComponent(typeof(PlayerCharacterCraftingComponent))]
     [RequireComponent(typeof(PlayerCharacterDealingComponent))]
     [RequireComponent(typeof(PlayerCharacterNpcActionComponent))]
-    public abstract partial class BasePlayerCharacterEntity : BaseCharacterEntity, IPlayerCharacterData, IInteractableEntity
+    public abstract partial class BasePlayerCharacterEntity : BaseCharacterEntity, IPlayerCharacterData, IActivatePressActivatableEntity
     {
         [Category("Character Settings")]
         [Tooltip("This is list which used as choice of character classes when create character")]
@@ -120,7 +120,7 @@ namespace MultiplayerARPG
             return base.CanDoActions() && Dealing.DealingState == DealingState.None;
         }
 
-        public virtual float GetInteractableDistance()
+        public virtual float GetActivatableDistance()
         {
             return GameInstance.Singleton.conversationDistance;
         }
@@ -130,24 +130,14 @@ namespace MultiplayerARPG
             return !this.IsHideOrDead() && !IsAlly(GameInstance.PlayingCharacterEntity.GetInfo());
         }
 
-        public virtual bool CanInteract()
+        public virtual bool CanKeyPressActivate()
         {
             return true;
         }
 
-        public virtual void OnInteract()
+        public virtual void OnKeyPressActivate()
         {
             BaseUISceneGameplay.Singleton.SetActivePlayerCharacter(this);
-        }
-
-        public virtual bool CanHoldInteract()
-        {
-            return CanInteract();
-        }
-
-        public virtual void OnHoldInteract()
-        {
-            OnInteract();
         }
     }
 }

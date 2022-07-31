@@ -7,7 +7,7 @@ using UnityEditor;
 
 namespace MultiplayerARPG
 {
-    public class DamageableHitBox : MonoBehaviour, IDamageableEntity, IInteractableEntity
+    public class DamageableHitBox : MonoBehaviour, IDamageableEntity, IActivatePressActivatableEntity, IClickActivatableEntity, IHoldClickActivatableEntity
     {
         [System.Serializable]
         public struct TransformHistory
@@ -29,12 +29,30 @@ namespace MultiplayerARPG
         {
             get { return DamageableEntity.Entity; }
         }
-        public IInteractableEntity InteractableEntity
+        public IActivatePressActivatableEntity ActivatePressActivatableEntity
         {
             get
             {
-                if (DamageableEntity is IInteractableEntity)
-                    return DamageableEntity as IInteractableEntity;
+                if (DamageableEntity is IActivatePressActivatableEntity)
+                    return DamageableEntity as IActivatePressActivatableEntity;
+                return null;
+            }
+        }
+        public IClickActivatableEntity ClickActivatableEntity
+        {
+            get
+            {
+                if (DamageableEntity is IClickActivatableEntity)
+                    return DamageableEntity as IClickActivatableEntity;
+                return null;
+            }
+        }
+        public IHoldClickActivatableEntity HoldClickActivatableEntity
+        {
+            get
+            {
+                if (DamageableEntity is IHoldClickActivatableEntity)
+                    return DamageableEntity as IHoldClickActivatableEntity;
                 return null;
             }
         }
@@ -239,44 +257,65 @@ namespace MultiplayerARPG
             });
         }
 
-        public float GetInteractableDistance()
+        public float GetActivatableDistance()
         {
-            if (InteractableEntity != null)
-                return InteractableEntity.GetInteractableDistance();
+            if (ActivatePressActivatableEntity != null)
+                return ActivatePressActivatableEntity.GetActivatableDistance();
+            if (ClickActivatableEntity != null)
+                return ClickActivatableEntity.GetActivatableDistance();
+            if (HoldClickActivatableEntity != null)
+                return HoldClickActivatableEntity.GetActivatableDistance();
             return 0f;
         }
 
         public bool ShouldBeAttackTarget()
         {
-            if (InteractableEntity != null)
-                return InteractableEntity.ShouldBeAttackTarget();
+            if (ActivatePressActivatableEntity != null)
+                return ActivatePressActivatableEntity.ShouldBeAttackTarget();
+            if (ClickActivatableEntity != null)
+                return ClickActivatableEntity.ShouldBeAttackTarget();
+            if (HoldClickActivatableEntity != null)
+                return HoldClickActivatableEntity.ShouldBeAttackTarget();
             return true;
         }
 
-        public bool CanInteract()
+        public bool CanKeyPressActivate()
         {
-            if (InteractableEntity != null)
-                return InteractableEntity.CanInteract();
+            if (ActivatePressActivatableEntity != null)
+                return ActivatePressActivatableEntity.CanKeyPressActivate();
             return false;
         }
 
-        public void OnInteract()
+        public void OnKeyPressActivate()
         {
-            if (InteractableEntity != null)
-                InteractableEntity.OnInteract();
+            if (ActivatePressActivatableEntity != null)
+                ActivatePressActivatableEntity.OnKeyPressActivate();
         }
 
-        public bool CanHoldInteract()
+        public bool CanClickActivate()
         {
-            if (InteractableEntity != null)
-                return InteractableEntity.CanHoldInteract();
+            if (ClickActivatableEntity != null)
+                return ClickActivatableEntity.CanClickActivate();
             return false;
         }
 
-        public void OnHoldInteract()
+        public void OnClickActivate()
         {
-            if (InteractableEntity != null)
-                InteractableEntity.OnHoldInteract();
+            if (ClickActivatableEntity != null)
+                ClickActivatableEntity.OnClickActivate();
+        }
+
+        public bool CanHoldClickActivate()
+        {
+            if (HoldClickActivatableEntity != null)
+                return HoldClickActivatableEntity.CanHoldClickActivate();
+            return false;
+        }
+
+        public void OnHoldClickActivate()
+        {
+            if (HoldClickActivatableEntity != null)
+                HoldClickActivatableEntity.OnHoldClickActivate();
         }
     }
 }
