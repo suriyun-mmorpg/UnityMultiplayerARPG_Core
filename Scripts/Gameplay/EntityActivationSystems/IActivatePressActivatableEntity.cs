@@ -1,9 +1,7 @@
 namespace MultiplayerARPG
 {
-    public interface IActivatePressActivatableEntity
+    public interface IActivatePressActivatableEntity : IBaseActivatableEntity
     {
-        float GetActivatableDistance();
-        bool ShouldBeAttackTarget();
         bool CanKeyPressActivate();
         void OnKeyPressActivate();
     }

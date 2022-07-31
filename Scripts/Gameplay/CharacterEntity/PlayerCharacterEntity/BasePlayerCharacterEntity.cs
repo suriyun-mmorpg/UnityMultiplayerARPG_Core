@@ -120,6 +120,11 @@ namespace MultiplayerARPG
             return base.CanDoActions() && Dealing.DealingState == DealingState.None;
         }
 
+        public virtual byte GetActivatablePriority()
+        {
+            return 0;
+        }
+
         public virtual float GetActivatableDistance()
         {
             return GameInstance.Singleton.conversationDistance;
@@ -132,7 +137,7 @@ namespace MultiplayerARPG
 
         public virtual bool CanKeyPressActivate()
         {
-            return true;
+            return !IsOwnerClient;
         }
 
         public virtual void OnKeyPressActivate()

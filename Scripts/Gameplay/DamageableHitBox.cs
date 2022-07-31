@@ -7,7 +7,7 @@ using UnityEditor;
 
 namespace MultiplayerARPG
 {
-    public class DamageableHitBox : MonoBehaviour, IDamageableEntity, IActivatePressActivatableEntity, IClickActivatableEntity, IHoldClickActivatableEntity
+    public class DamageableHitBox : MonoBehaviour, IDamageableEntity, IBaseActivatableEntity, IActivatePressActivatableEntity, IClickActivatableEntity, IHoldClickActivatableEntity
     {
         [System.Serializable]
         public struct TransformHistory
@@ -28,6 +28,15 @@ namespace MultiplayerARPG
         public BaseGameEntity Entity
         {
             get { return DamageableEntity.Entity; }
+        }
+        public IBaseActivatableEntity BaseActivatableEntity
+        {
+            get
+            {
+                if (DamageableEntity is IBaseActivatableEntity)
+                    return DamageableEntity as IBaseActivatableEntity;
+                return null;
+            }
         }
         public IActivatePressActivatableEntity ActivatePressActivatableEntity
         {
@@ -257,25 +266,24 @@ namespace MultiplayerARPG
             });
         }
 
+        public byte GetActivatablePriority()
+        {
+            if (BaseActivatableEntity != null)
+                return BaseActivatableEntity.GetActivatablePriority();
+            return 255;
+        }
+
         public float GetActivatableDistance()
         {
-            if (ActivatePressActivatableEntity != null)
-                return ActivatePressActivatableEntity.GetActivatableDistance();
-            if (ClickActivatableEntity != null)
-                return ClickActivatableEntity.GetActivatableDistance();
-            if (HoldClickActivatableEntity != null)
-                return HoldClickActivatableEntity.GetActivatableDistance();
+            if (BaseActivatableEntity != null)
+                return BaseActivatableEntity.GetActivatableDistance();
             return 0f;
         }
 
         public bool ShouldBeAttackTarget()
         {
-            if (ActivatePressActivatableEntity != null)
-                return ActivatePressActivatableEntity.ShouldBeAttackTarget();
-            if (ClickActivatableEntity != null)
-                return ClickActivatableEntity.ShouldBeAttackTarget();
-            if (HoldClickActivatableEntity != null)
-                return HoldClickActivatableEntity.ShouldBeAttackTarget();
+            if (BaseActivatableEntity != null)
+                return BaseActivatableEntity.ShouldBeAttackTarget();
             return true;
         }
 

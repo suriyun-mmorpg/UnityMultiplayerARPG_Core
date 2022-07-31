@@ -172,6 +172,11 @@ namespace MultiplayerARPG
             return itemsContainerEntity;
         }
 
+        public virtual byte GetActivatablePriority()
+        {
+            return 5;
+        }
+
         public virtual float GetActivatableDistance()
         {
             return GameInstance.Singleton.pickUpItemDistance;

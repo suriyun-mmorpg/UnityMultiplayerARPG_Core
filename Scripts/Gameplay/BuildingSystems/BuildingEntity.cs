@@ -529,6 +529,11 @@ namespace MultiplayerARPG
             return CreatorId.Equals(playerCharacterId);
         }
 
+        public virtual byte GetActivatablePriority()
+        {
+            return 2;
+        }
+
         public virtual float GetActivatableDistance()
         {
             return GameInstance.Singleton.conversationDistance;

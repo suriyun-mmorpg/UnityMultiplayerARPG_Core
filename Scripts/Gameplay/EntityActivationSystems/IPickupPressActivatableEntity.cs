@@ -1,9 +1,7 @@
 namespace MultiplayerARPG
 {
-    public interface IPickupPressActivatableEntity
+    public interface IPickupPressActivatableEntity : IBaseActivatableEntity
     {
-        float GetActivatableDistance();
-        bool ShouldBeAttackTarget();
         bool CanPickupPressActivate();
         void OnPickupPressActivate();
     }

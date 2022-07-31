@@ -1,9 +1,7 @@
 namespace MultiplayerARPG
 {
-    public interface IHoldClickActivatableEntity
+    public interface IHoldClickActivatableEntity : IBaseActivatableEntity
     {
-        float GetActivatableDistance();
-        bool ShouldBeAttackTarget();
         bool CanHoldClickActivate();
         void OnHoldClickActivate();
     }

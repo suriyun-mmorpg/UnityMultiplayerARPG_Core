@@ -324,6 +324,11 @@ namespace MultiplayerARPG
                 CurrentGameInstance.DimensionType == DimensionType.Dimension3D ? Quaternion.Euler(Vector3.up * Random.Range(0, 360)) : Quaternion.identity);
         }
 
+        public virtual byte GetActivatablePriority()
+        {
+            return 3;
+        }
+
         public virtual float GetActivatableDistance()
         {
             return GameInstance.Singleton.conversationDistance;

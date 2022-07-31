@@ -1,9 +1,7 @@
 namespace MultiplayerARPG
 {
-    public interface IClickActivatableEntity
+    public interface IClickActivatableEntity : IBaseActivatableEntity
     {
-        float GetActivatableDistance();
-        bool ShouldBeAttackTarget();
         bool CanClickActivate();
         void OnClickActivate();
     }
