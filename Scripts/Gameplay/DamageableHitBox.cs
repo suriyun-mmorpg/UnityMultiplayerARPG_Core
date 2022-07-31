@@ -7,7 +7,7 @@ using UnityEditor;
 
 namespace MultiplayerARPG
 {
-    public class DamageableHitBox : MonoBehaviour, IDamageableEntity
+    public class DamageableHitBox : MonoBehaviour, IDamageableEntity, IInteractableEntity
     {
         [System.Serializable]
         public struct TransformHistory
@@ -28,6 +28,15 @@ namespace MultiplayerARPG
         public BaseGameEntity Entity
         {
             get { return DamageableEntity.Entity; }
+        }
+        public IInteractableEntity InteractableEntity
+        {
+            get
+            {
+                if (DamageableEntity is IInteractableEntity)
+                    return DamageableEntity as IInteractableEntity;
+                return null;
+            }
         }
         public bool IsImmune
         {
@@ -228,6 +237,46 @@ namespace MultiplayerARPG
                 Rotation = transform.rotation,
                 Bounds = Bounds,
             });
+        }
+
+        public float GetInteractableDistance()
+        {
+            if (InteractableEntity != null)
+                return InteractableEntity.GetInteractableDistance();
+            return 0f;
+        }
+
+        public bool ShouldBeAttackTarget()
+        {
+            if (InteractableEntity != null)
+                return InteractableEntity.ShouldBeAttackTarget();
+            return true;
+        }
+
+        public bool CanInteract()
+        {
+            if (InteractableEntity != null)
+                return InteractableEntity.CanInteract();
+            return false;
+        }
+
+        public void OnInteract()
+        {
+            if (InteractableEntity != null)
+                InteractableEntity.OnInteract();
+        }
+
+        public bool CanHoldInteract()
+        {
+            if (InteractableEntity != null)
+                return InteractableEntity.CanHoldInteract();
+            return false;
+        }
+
+        public void OnHoldInteract()
+        {
+            if (InteractableEntity != null)
+                InteractableEntity.OnHoldInteract();
         }
     }
 }

@@ -5,7 +5,7 @@ using UnityEngine.Tilemaps;
 
 namespace MultiplayerARPG
 {
-    public class BuildingMaterial : DamageableHitBox, IInteractableEntity
+    public class BuildingMaterial : DamageableHitBox
     {
         public enum State
         {
@@ -259,36 +259,6 @@ namespace MultiplayerARPG
         public bool ValidateTriggerLayer(GameObject gameObject)
         {
             return gameObject.layer != PhysicLayers.TransparentFX;
-        }
-
-        public float GetInteractableDistance()
-        {
-            return BuildingEntity.GetInteractableDistance();
-        }
-
-        public bool ShouldBeAttackTarget()
-        {
-            return BuildingEntity.ShouldBeAttackTarget();
-        }
-
-        public bool CanInteract()
-        {
-            return BuildingEntity.CanInteract();
-        }
-
-        public void OnInteract()
-        {
-            BuildingEntity.OnInteract();
-        }
-
-        public bool CanHoldInteract()
-        {
-            return BuildingEntity.CanHoldInteract();
-        }
-
-        public void OnHoldInteract()
-        {
-            BuildingEntity.OnHoldInteract();
         }
     }
 }

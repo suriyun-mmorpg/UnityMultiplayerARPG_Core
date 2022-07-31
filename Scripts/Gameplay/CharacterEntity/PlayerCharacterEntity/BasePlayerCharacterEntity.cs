@@ -8,7 +8,7 @@ namespace MultiplayerARPG
     [RequireComponent(typeof(PlayerCharacterCraftingComponent))]
     [RequireComponent(typeof(PlayerCharacterDealingComponent))]
     [RequireComponent(typeof(PlayerCharacterNpcActionComponent))]
-    public abstract partial class BasePlayerCharacterEntity : BaseCharacterEntity, IPlayerCharacterData
+    public abstract partial class BasePlayerCharacterEntity : BaseCharacterEntity, IPlayerCharacterData, IInteractableEntity
     {
         [Category("Character Settings")]
         [Tooltip("This is list which used as choice of character classes when create character")]
@@ -118,6 +118,36 @@ namespace MultiplayerARPG
         public override bool CanDoActions()
         {
             return base.CanDoActions() && Dealing.DealingState == DealingState.None;
+        }
+
+        public virtual float GetInteractableDistance()
+        {
+            return GameInstance.Singleton.conversationDistance;
+        }
+
+        public virtual bool ShouldBeAttackTarget()
+        {
+            return !this.IsHideOrDead() && !IsAlly(GameInstance.PlayingCharacterEntity.GetInfo());
+        }
+
+        public virtual bool CanInteract()
+        {
+            return true;
+        }
+
+        public virtual void OnInteract()
+        {
+            BaseUISceneGameplay.Singleton.SetActivePlayerCharacter(this);
+        }
+
+        public virtual bool CanHoldInteract()
+        {
+            return CanInteract();
+        }
+
+        public virtual void OnHoldInteract()
+        {
+            OnInteract();
         }
     }
 }
