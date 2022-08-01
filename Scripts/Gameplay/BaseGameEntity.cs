@@ -104,8 +104,6 @@ namespace MultiplayerARPG
             set { fpsCameraTargetTransform = value; }
         }
 
-        public Transform CacheTransform { get; private set; }
-
         [Category(3, "Entity Movement")]
         [SerializeField]
         private MovementSecure movementSecure = MovementSecure.NotSecure;
@@ -128,9 +126,9 @@ namespace MultiplayerARPG
                 if (PassengingVehicleEntity != null)
                 {
                     // Track movement position by vehicle entity
-                    return PassengingVehicleEntity.Entity.CacheTransform;
+                    return PassengingVehicleEntity.Entity.EntityTransform;
                 }
-                return CacheTransform;
+                return EntityTransform;
             }
         }
 
@@ -277,12 +275,10 @@ namespace MultiplayerARPG
         {
             get { return this; }
         }
-
         public Transform EntityTransform
         {
-            get { return CacheTransform; }
+            get { return transform; }
         }
-
         public GameObject EntityGameObject
         {
             get { return gameObject; }
@@ -326,13 +322,12 @@ namespace MultiplayerARPG
         public virtual void InitialRequiredComponents()
         {
             // Cache components
-            CacheTransform = transform;
             if (model == null)
                 model = GetComponent<GameEntityModel>();
             if (cameraTargetTransform == null)
-                cameraTargetTransform = CacheTransform;
+                cameraTargetTransform = EntityTransform;
             if (fpsCameraTargetTransform == null)
-                fpsCameraTargetTransform = CacheTransform;
+                fpsCameraTargetTransform = EntityTransform;
             Movement = GetComponent<IEntityMovementComponent>();
         }
 
@@ -357,7 +352,7 @@ namespace MultiplayerARPG
 
         public virtual Bounds MakeLocalBounds()
         {
-            return GameplayUtils.MakeLocalBoundsByCollider(CacheTransform);
+            return GameplayUtils.MakeLocalBoundsByCollider(EntityTransform);
         }
 
         protected virtual void EntityAwake() { }
@@ -490,8 +485,8 @@ namespace MultiplayerARPG
             if (PassengingVehicleSeat.passengingTransform != null)
             {
                 // Snap character to vehicle seat
-                CacheTransform.position = PassengingVehicleSeat.passengingTransform.position;
-                CacheTransform.rotation = PassengingVehicleSeat.passengingTransform.rotation;
+                EntityTransform.position = PassengingVehicleSeat.passengingTransform.position;
+                EntityTransform.rotation = PassengingVehicleSeat.passengingTransform.rotation;
             }
 
             if (isTeleporting && ActiveMovement != null)
@@ -822,7 +817,7 @@ namespace MultiplayerARPG
 
         public bool FindGroundedPosition(Vector3 fromPosition, float findDistance, out Vector3 result)
         {
-            result = CacheTransform.position;
+            result = EntityTransform.position;
             if (ActiveMovement != null)
                 return ActiveMovement.FindGroundedPosition(fromPosition, findDistance, out result);
             return true;

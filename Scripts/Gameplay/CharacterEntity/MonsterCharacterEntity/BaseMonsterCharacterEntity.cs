@@ -184,7 +184,7 @@ namespace MultiplayerARPG
                     else
                     {
                         float currentTime = Time.unscaledTime;
-                        if (Vector3.Distance(CacheTransform.position, Summoner.CacheTransform.position) > CurrentGameInstance.maxFollowSummonerDistance &&
+                        if (Vector3.Distance(EntityTransform.position, Summoner.EntityTransform.position) > CurrentGameInstance.maxFollowSummonerDistance &&
                             currentTime - lastTeleportToSummonerTime > TELEPORT_TO_SUMMONER_DELAY)
                         {
                             // Teleport to summoner if too far from summoner
@@ -256,7 +256,7 @@ namespace MultiplayerARPG
             // Initial default data
             InitStats();
             if (SpawnArea == null)
-                SpawnPosition = CacheTransform.position;
+                SpawnPosition = EntityTransform.position;
         }
 
         public void SetAttackTarget(IDamageableEntity target)
@@ -477,12 +477,12 @@ namespace MultiplayerARPG
                                 {
                                     if (tempPartyData.shareExp)
                                     {
-                                        if (GameInstance.Singleton.partyShareExpDistance <= 0f || Vector3.Distance(tempPlayerCharacterEntity.CacheTransform.position, nearbyPartyMember.CacheTransform.position) <= GameInstance.Singleton.partyShareExpDistance)
+                                        if (GameInstance.Singleton.partyShareExpDistance <= 0f || Vector3.Distance(tempPlayerCharacterEntity.EntityTransform.position, nearbyPartyMember.EntityTransform.position) <= GameInstance.Singleton.partyShareExpDistance)
                                             sharingExpMembers.Add(nearbyPartyMember);
                                     }
                                     if (tempPartyData.shareItem)
                                     {
-                                        if (GameInstance.Singleton.partyShareItemDistance <= 0f || Vector3.Distance(tempPlayerCharacterEntity.CacheTransform.position, nearbyPartyMember.CacheTransform.position) <= GameInstance.Singleton.partyShareItemDistance)
+                                        if (GameInstance.Singleton.partyShareItemDistance <= 0f || Vector3.Distance(tempPlayerCharacterEntity.EntityTransform.position, nearbyPartyMember.EntityTransform.position) <= GameInstance.Singleton.partyShareItemDistance)
                                             sharingItemMembers.Add(nearbyPartyMember);
                                     }
                                 }
@@ -622,7 +622,7 @@ namespace MultiplayerARPG
         {
             await UniTask.Delay(Mathf.CeilToInt(delay * 1000));
             InitStats();
-            Teleport(SpawnPosition, CacheTransform.rotation);
+            Teleport(SpawnPosition, EntityTransform.rotation);
             Manager.Assets.NetworkSpawnScene(
                 Identity.ObjectId,
                 SpawnPosition,

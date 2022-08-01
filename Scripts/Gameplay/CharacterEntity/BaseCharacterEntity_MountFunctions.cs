@@ -12,17 +12,17 @@ namespace MultiplayerARPG
 
             lastMountTime = Time.unscaledTime;
 
-            Vector3 enterPosition = CacheTransform.position;
+            Vector3 enterPosition = EntityTransform.position;
             if (PassengingVehicleEntity != null)
             {
-                enterPosition = PassengingVehicleEntity.Entity.CacheTransform.position;
+                enterPosition = PassengingVehicleEntity.Entity.EntityTransform.position;
                 ExitVehicle();
             }
 
             // Instantiate new mount entity
             LiteNetLibIdentity spawnObj = BaseGameNetworkManager.Singleton.Assets.GetObjectInstance(
                 mountEntityPrefab.Identity.HashAssetId, enterPosition,
-                Quaternion.Euler(0, CacheTransform.eulerAngles.y, 0));
+                Quaternion.Euler(0, EntityTransform.eulerAngles.y, 0));
             VehicleEntity vehicle = spawnObj.GetComponent<VehicleEntity>();
             BaseGameNetworkManager.Singleton.Assets.NetworkSpawn(spawnObj, 0, ConnectionId);
 

@@ -58,7 +58,7 @@ namespace MultiplayerARPG
             get
             {
                 if (characterUiTransform == null)
-                    characterUiTransform = CacheTransform;
+                    characterUiTransform = EntityTransform;
                 return characterUiTransform;
             }
         }
@@ -68,7 +68,7 @@ namespace MultiplayerARPG
             get
             {
                 if (miniMapUiTransform == null)
-                    miniMapUiTransform = CacheTransform;
+                    miniMapUiTransform = EntityTransform;
                 return miniMapUiTransform;
             }
         }
@@ -78,7 +78,7 @@ namespace MultiplayerARPG
             get
             {
                 if (questIndicatorContainer == null)
-                    questIndicatorContainer = CacheTransform;
+                    questIndicatorContainer = EntityTransform;
                 return questIndicatorContainer;
             }
         }

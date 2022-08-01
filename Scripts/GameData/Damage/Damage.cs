@@ -263,7 +263,7 @@ namespace MultiplayerARPG
 
                                 // Target receives damages
                                 if (isHost || isOwnedByServer)
-                                    tempDamageableHitBox.ReceiveDamage(attacker.CacheTransform.position, instigator, damageAmounts, weapon, skill, skillLevel, randomSeed);
+                                    tempDamageableHitBox.ReceiveDamage(attacker.EntityTransform.position, instigator, damageAmounts, weapon, skill, skillLevel, randomSeed);
 
                                 // It hit something, store data for hit register preparation later
                                 if (!isHost && isOwnerClient)
@@ -289,7 +289,7 @@ namespace MultiplayerARPG
                                 // Only 1 target will receives damages
                                 // Pass all receive damage condition, then apply damages
                                 if (isHost || isOwnedByServer)
-                                    damageReceivingTarget.ReceiveDamage(attacker.CacheTransform.position, instigator, damageAmounts, weapon, skill, skillLevel, randomSeed);
+                                    damageReceivingTarget.ReceiveDamage(attacker.EntityTransform.position, instigator, damageAmounts, weapon, skill, skillLevel, randomSeed);
 
                                 // It hit something, store data for hit register preparation later
                                 if (!isHost && isOwnerClient)
@@ -384,7 +384,7 @@ namespace MultiplayerARPG
 
                                 // Target receives damages
                                 if (isHost || isOwnedByServer)
-                                    tempDamageableHitBox.ReceiveDamage(attacker.CacheTransform.position, instigator, damageAmounts, weapon, skill, skillLevel, randomSeed);
+                                    tempDamageableHitBox.ReceiveDamage(attacker.EntityTransform.position, instigator, damageAmounts, weapon, skill, skillLevel, randomSeed);
 
                                 // It hit something, store data for hit register preparation later
                                 if (!isHost && isOwnerClient)

@@ -19,8 +19,8 @@ namespace MultiplayerARPG
         {
             return new EntityMovementInput()
             {
-                Position = entityMovement.Entity.CacheTransform.position,
-                Rotation = entityMovement.Entity.CacheTransform.rotation,
+                Position = entityMovement.Entity.EntityTransform.position,
+                Rotation = entityMovement.Entity.EntityTransform.rotation,
             };
         }
 

@@ -479,7 +479,7 @@ namespace MultiplayerARPG
                 ClearQueueUsingSkill();
                 destination = null;
                 isFollowingTarget = false;
-                if (TargetGameEntity != null && Vector3.Distance(EntityTransform.position, TargetGameEntity.CacheTransform.position) >= wasdClearTargetDistance)
+                if (TargetGameEntity != null && Vector3.Distance(EntityTransform.position, TargetGameEntity.EntityTransform.position) >= wasdClearTargetDistance)
                 {
                     // Clear target when character moved far from target
                     ClearTarget();
@@ -943,7 +943,7 @@ namespace MultiplayerARPG
         {
             if (entity == null)
                 return;
-            TurnCharacterToPosition(entity.CacheTransform.position);
+            TurnCharacterToPosition(entity.EntityTransform.position);
         }
 
         protected void TurnCharacterToPosition(Vector3 position)

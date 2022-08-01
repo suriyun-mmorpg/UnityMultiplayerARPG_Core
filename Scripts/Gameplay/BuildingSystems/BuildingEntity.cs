@@ -148,14 +148,14 @@ namespace MultiplayerARPG
 
         public Vector3 Position
         {
-            get { return CacheTransform.position; }
-            set { CacheTransform.position = value; }
+            get { return EntityTransform.position; }
+            set { EntityTransform.position = value; }
         }
 
         public Quaternion Rotation
         {
-            get { return CacheTransform.rotation; }
-            set { CacheTransform.rotation = value; }
+            get { return EntityTransform.rotation; }
+            set { EntityTransform.rotation = value; }
         }
 
         public string CreatorId
@@ -228,14 +228,14 @@ namespace MultiplayerARPG
             {
                 if (BuildingArea != null && BuildingArea.snapBuildingObject)
                 {
-                    CacheTransform.position = BuildingArea.transform.position;
-                    CacheTransform.rotation = BuildingArea.transform.rotation;
+                    EntityTransform.position = BuildingArea.transform.position;
+                    EntityTransform.rotation = BuildingArea.transform.rotation;
                     if (BuildingArea.allowRotateInSocket)
                     {
-                        CacheTransform.localEulerAngles = new Vector3(
-                            CacheTransform.localEulerAngles.x,
-                            CacheTransform.localEulerAngles.y + BuildYRotation,
-                            CacheTransform.localEulerAngles.z);
+                        EntityTransform.localEulerAngles = new Vector3(
+                            EntityTransform.localEulerAngles.x,
+                            EntityTransform.localEulerAngles.y + BuildYRotation,
+                            EntityTransform.localEulerAngles.z);
                     }
                 }
                 bool canBuild = CanBuild();
@@ -342,7 +342,7 @@ namespace MultiplayerARPG
                 // Builder destroyed?
                 return false;
             }
-            if (!IsPositionInBuildDistance(Builder.CacheTransform.position, CacheTransform.position))
+            if (!IsPositionInBuildDistance(Builder.EntityTransform.position, EntityTransform.position))
             {
                 // Too far from buildiner?
                 return false;

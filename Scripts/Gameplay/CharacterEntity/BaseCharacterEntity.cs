@@ -168,15 +168,15 @@ namespace MultiplayerARPG
             base.InitialRequiredComponents();
             // Cache components
             if (meleeDamageTransform == null)
-                meleeDamageTransform = CacheTransform;
+                meleeDamageTransform = EntityTransform;
             if (missileDamageTransform == null)
                 missileDamageTransform = MeleeDamageTransform;
             if (characterUiTransform == null)
-                characterUiTransform = CacheTransform;
+                characterUiTransform = EntityTransform;
             if (miniMapUiTransform == null)
-                miniMapUiTransform = CacheTransform;
+                miniMapUiTransform = EntityTransform;
             if (chatBubbleTransform == null)
-                chatBubbleTransform = CacheTransform;
+                chatBubbleTransform = EntityTransform;
             ModelManager = gameObject.GetOrAddComponent<CharacterModelManager>();
             AttackComponent = gameObject.GetOrAddComponent<ICharacterAttackComponent, DefaultCharacterAttackComponent>();
             UseSkillComponent = gameObject.GetOrAddComponent<ICharacterUseSkillComponent, DefaultCharacterUseSkillComponent>();
@@ -263,7 +263,7 @@ namespace MultiplayerARPG
                 }
                 lastGrounded = MovementState.Has(MovementState.IsGrounded);
                 if (lastGrounded)
-                    lastGroundedPosition = CacheTransform.position;
+                    lastGroundedPosition = EntityTransform.position;
             }
 
             bool tempEnableMovement = PassengingVehicleEntity == null;
@@ -276,7 +276,7 @@ namespace MultiplayerARPG
             {
                 // Killing character when it fall below dead Y
                 if (CurrentGameInstance.DimensionType == DimensionType.Dimension3D &&
-                    CurrentMapInfo != null && CacheTransform.position.y <= CurrentMapInfo.DeadY)
+                    CurrentMapInfo != null && EntityTransform.position.y <= CurrentMapInfo.DeadY)
                 {
                     if (IsServer && !this.IsDead())
                     {
@@ -740,7 +740,7 @@ namespace MultiplayerARPG
         public AimPosition GetAttackAimPosition(DamageInfo damageInfo, bool isLeftHand)
         {
             Vector3 position = damageInfo.GetDamageTransform(this, isLeftHand).position;
-            Vector3 direction = CacheTransform.forward;
+            Vector3 direction = EntityTransform.forward;
             BaseGameEntity targetEntity = GetTargetEntity();
             if (targetEntity && targetEntity != Entity)
             {
@@ -750,7 +750,7 @@ namespace MultiplayerARPG
                 }
                 else
                 {
-                    return GetAttackAimPosition(position, targetEntity.CacheTransform.position);
+                    return GetAttackAimPosition(position, targetEntity.EntityTransform.position);
                 }
             }
             return AimPosition.CreateDirection(position, direction);
@@ -1154,7 +1154,7 @@ namespace MultiplayerARPG
         #region Find objects helpers
         public bool IsPositionInFov(float fov, Vector3 position)
         {
-            return IsPositionInFov(fov, position, CacheTransform.forward);
+            return IsPositionInFov(fov, position, EntityTransform.forward);
         }
 
         public bool IsPositionInFov(float fov, Vector3 position, Vector3 forward)
@@ -1166,7 +1166,7 @@ namespace MultiplayerARPG
 
         protected bool IsPositionInFov2D(float fov, Vector3 position, Vector3 forward)
         {
-            Vector2 targetDir = position - CacheTransform.position;
+            Vector2 targetDir = position - EntityTransform.position;
             targetDir.Normalize();
             float angle = Vector2.Angle(targetDir, Direction2D);
             // Angle in forward position is 180 so we use this value to determine that target is in hit fov or not
@@ -1178,7 +1178,7 @@ namespace MultiplayerARPG
             // This is unsigned angle, so angle found from this function is 0 - 180
             // if position forward from character this value will be 180
             // so just find for angle > 180 - halfFov
-            Vector3 targetDir = position - CacheTransform.position;
+            Vector3 targetDir = position - EntityTransform.position;
             targetDir.y = 0;
             forward.y = 0;
             targetDir.Normalize();
@@ -1189,20 +1189,20 @@ namespace MultiplayerARPG
         public bool IsGameEntityInDistance<T>(T targetEntity, float distance, bool includeUnHittable = true)
             where T : class, IGameEntity
         {
-            return FindPhysicFunctions.IsGameEntityInDistance(targetEntity, CacheTransform.position, distance + FIND_ENTITY_DISTANCE_BUFFER, includeUnHittable);
+            return FindPhysicFunctions.IsGameEntityInDistance(targetEntity, EntityTransform.position, distance + FIND_ENTITY_DISTANCE_BUFFER, includeUnHittable);
         }
 
         public List<T> FindGameEntitiesInDistance<T>(float distance, int layerMask)
             where T : class, IGameEntity
         {
-            return FindPhysicFunctions.FindGameEntitiesInDistance<T>(CacheTransform.position, distance + FIND_ENTITY_DISTANCE_BUFFER, layerMask);
+            return FindPhysicFunctions.FindGameEntitiesInDistance<T>(EntityTransform.position, distance + FIND_ENTITY_DISTANCE_BUFFER, layerMask);
         }
 
         public List<T> FindDamageableEntities<T>(float distance, int layerMask, bool findForAlive, bool findInFov = false, float fov = 0)
             where T : class, IDamageableEntity
         {
             List<T> result = new List<T>();
-            int tempOverlapSize = FindPhysicFunctions.OverlapObjects(CacheTransform.position, distance, layerMask);
+            int tempOverlapSize = FindPhysicFunctions.OverlapObjects(EntityTransform.position, distance, layerMask);
             if (tempOverlapSize == 0)
                 return result;
             IDamageableEntity tempBaseEntity;
@@ -1259,7 +1259,7 @@ namespace MultiplayerARPG
         public List<T> FindCharacters<T>(float distance, bool findForAlive, bool findForAlly, bool findForEnemy, bool findForNeutral, bool findInFov = false, float fov = 0)
             where T : BaseCharacterEntity
         {
-            return FindCharacters<T>(CacheTransform.position, distance, findForAlive, findForAlly, findForEnemy, findForNeutral, findInFov, fov);
+            return FindCharacters<T>(EntityTransform.position, distance, findForAlive, findForAlly, findForEnemy, findForNeutral, findInFov, fov);
         }
 
         public List<T> FindAliveCharacters<T>(Vector3 origin, float distance, bool findForAlly, bool findForEnemy, bool findForNeutral, bool findInFov = false, float fov = 0)
@@ -1271,7 +1271,7 @@ namespace MultiplayerARPG
         public List<T> FindAliveCharacters<T>(float distance, bool findForAlly, bool findForEnemy, bool findForNeutral, bool findInFov = false, float fov = 0)
             where T : BaseCharacterEntity
         {
-            return FindAliveCharacters<T>(CacheTransform.position, distance, findForAlly, findForEnemy, findForNeutral, findInFov, fov);
+            return FindAliveCharacters<T>(EntityTransform.position, distance, findForAlly, findForEnemy, findForNeutral, findInFov, fov);
         }
 
         public T FindNearestCharacter<T>(Vector3 origin, float distance, bool findForAliveOnly, bool findForAlly, bool findForEnemy, bool findForNeutral, bool findInFov = false, float fov = 0)
@@ -1293,7 +1293,7 @@ namespace MultiplayerARPG
                 tempEntity = tempBaseEntity.Entity as T;
                 if (!IsCharacterWhichLookingFor(tempEntity, findForAliveOnly, findForAlly, findForEnemy, findForNeutral, findInFov, fov))
                     continue;
-                tempDistance = Vector3.Distance(CacheTransform.position, tempEntity.CacheTransform.position);
+                tempDistance = Vector3.Distance(EntityTransform.position, tempEntity.EntityTransform.position);
                 if (tempDistance < nearestDistance)
                 {
                     nearestDistance = tempDistance;
@@ -1312,7 +1312,7 @@ namespace MultiplayerARPG
         public T FindNearestAliveCharacter<T>(float distance, bool findForAlly, bool findForEnemy, bool findForNeutral, bool findInFov = false, float fov = 0)
             where T : BaseCharacterEntity
         {
-            return FindNearestAliveCharacter<T>(CacheTransform.position, distance, findForAlly, findForEnemy, findForNeutral, findInFov, fov);
+            return FindNearestAliveCharacter<T>(EntityTransform.position, distance, findForAlly, findForEnemy, findForNeutral, findInFov, fov);
         }
 
         private bool IsCharacterWhichLookingFor(BaseCharacterEntity characterEntity, bool findForAlive, bool findForAlly, bool findForEnemy, bool findForNeutral, bool findInFov, float fov)
@@ -1321,7 +1321,7 @@ namespace MultiplayerARPG
                 return false;
             if (findForAlive && characterEntity.IsDead())
                 return false;
-            if (findInFov && !IsPositionInFov(fov, characterEntity.CacheTransform.position))
+            if (findInFov && !IsPositionInFov(fov, characterEntity.EntityTransform.position))
                 return false;
             EntityInfo instigator = GetInfo();
             return (findForAlly && characterEntity.IsAlly(instigator)) ||

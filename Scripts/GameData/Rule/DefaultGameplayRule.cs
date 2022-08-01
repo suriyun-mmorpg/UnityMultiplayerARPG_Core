@@ -782,16 +782,16 @@ namespace MultiplayerARPG
 
         public override void ApplyFallDamage(BaseCharacterEntity character, Vector3 lastGroundedPosition)
         {
-            if (character.CacheTransform.position.y >= lastGroundedPosition.y)
+            if (character.EntityTransform.position.y >= lastGroundedPosition.y)
                 return;
-            float dist = lastGroundedPosition.y - character.CacheTransform.position.y;
+            float dist = lastGroundedPosition.y - character.EntityTransform.position.y;
             if (dist < fallDamageMinDistance)
                 return;
             int damage = Mathf.CeilToInt(character.MaxHp * (float)(dist - fallDamageMinDistance) / (float)(fallDamageMaxDistance - fallDamageMinDistance));
             if (damage < 0)
                 damage = 0;
             character.CurrentHp -= damage;
-            character.ReceivedDamage(HitBoxPosition.None, character.CacheTransform.position, EntityInfo.Empty, null, CombatAmountType.NormalDamage, damage, null, null, 0, null);
+            character.ReceivedDamage(HitBoxPosition.None, character.EntityTransform.position, EntityInfo.Empty, null, CombatAmountType.NormalDamage, damage, null, null, 0, null);
             if (character.IsDead())
             {
                 // Dead by itself, so instigator is itself
@@ -807,11 +807,11 @@ namespace MultiplayerARPG
             if (!character.Manager.Assets.TryGetSpawnedObject(objectId, out interactingEntity))
                 return false;
             // This function will sort: near to far, so loop from 0
-            float dist = Vector3.Distance(character.CacheTransform.position, interactingEntity.CacheTransform.position);
-            Vector3 dir = (interactingEntity.CacheTransform.position - character.CacheTransform.position).normalized;
+            float dist = Vector3.Distance(character.EntityTransform.position, interactingEntity.EntityTransform.position);
+            Vector3 dir = (interactingEntity.EntityTransform.position - character.EntityTransform.position).normalized;
             if (interactingEntity is ICraftingQueueSource)
             {
-                if (!(interactingEntity as ICraftingQueueSource).IsInCraftDistance(character.CacheTransform.position))
+                if (!(interactingEntity as ICraftingQueueSource).IsInCraftDistance(character.EntityTransform.position))
                     return false;
             }
             // Find that the entity is behind the wall or not
@@ -851,15 +851,15 @@ namespace MultiplayerARPG
             else if (randomCircle.y > 0 && randomCircle.y < halfDist)
                 randomCircle.y = halfDist;
             if (GameInstance.Singleton.DimensionType == DimensionType.Dimension2D)
-                return character.CacheTransform.position + new Vector3(randomCircle.x, randomCircle.y, 0f);
-            return character.CacheTransform.position + new Vector3(randomCircle.x, 0f, randomCircle.y);
+                return character.EntityTransform.position + new Vector3(randomCircle.x, randomCircle.y, 0f);
+            return character.EntityTransform.position + new Vector3(randomCircle.x, 0f, randomCircle.y);
         }
 
         public override Quaternion GetSummonRotation(BaseCharacterEntity character)
         {
             if (GameInstance.Singleton.DimensionType == DimensionType.Dimension2D)
                 return Quaternion.identity;
-            return character.CacheTransform.rotation;
+            return character.EntityTransform.rotation;
         }
     }
 }

@@ -26,7 +26,7 @@ namespace MultiplayerARPG
         public GameInstance CurrentGameInstance { get { return Entity.CurrentGameInstance; } }
         public BaseGameplayRule CurrentGameplayRule { get { return Entity.CurrentGameplayRule; } }
         public BaseGameNetworkManager CurrentGameManager { get { return Entity.CurrentGameManager; } }
-        public Transform CacheTransform { get { return Entity.CacheTransform; } }
+        public Transform CacheTransform { get { return Entity.EntityTransform; } }
 
         private bool isEnabled;
         public bool Enabled

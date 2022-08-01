@@ -115,8 +115,8 @@ namespace MultiplayerARPG
 
         public static ItemsContainerEntity DropItems(ItemsContainerEntity prefab, BaseGameEntity dropper, IEnumerable<CharacterItem> dropItems, IEnumerable<string> looters, float appearDuration, bool randomPosition = false, bool randomRotation = false)
         {
-            Vector3 dropPosition = dropper.CacheTransform.position;
-            Quaternion dropRotation = dropper.CacheTransform.rotation;
+            Vector3 dropPosition = dropper.EntityTransform.position;
+            Quaternion dropRotation = dropper.EntityTransform.rotation;
             switch (GameInstance.Singleton.DimensionType)
             {
                 case DimensionType.Dimension3D:

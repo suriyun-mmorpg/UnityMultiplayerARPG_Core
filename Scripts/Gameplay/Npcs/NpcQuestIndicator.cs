@@ -29,7 +29,7 @@ namespace MultiplayerARPG
         {
             if (npcEntity == null ||
                 GameInstance.PlayingCharacterEntity == null ||
-                Vector3.Distance(npcEntity.CacheTransform.position, GameInstance.PlayingCharacterEntity.CacheTransform.position) > updateWithinRange)
+                Vector3.Distance(npcEntity.EntityTransform.position, GameInstance.PlayingCharacterEntity.EntityTransform.position) > updateWithinRange)
             {
                 if (haveTasksDoneQuestsIndicator != null && haveTasksDoneQuestsIndicator.activeSelf)
                     haveTasksDoneQuestsIndicator.SetActive(false);

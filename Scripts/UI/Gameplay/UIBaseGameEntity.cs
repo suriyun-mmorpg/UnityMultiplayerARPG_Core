@@ -87,10 +87,10 @@ namespace MultiplayerARPG
                         BaseGameEntity tempTargetEntity = BasePlayerCharacterController.Singleton.SelectedGameEntity;
                         CacheCanvas.enabled = tempTargetEntity != null &&
                             tempTargetEntity.ObjectId == Data.ObjectId &&
-                            Vector3.Distance(tempPlayingCharacter.CacheTransform.position, Data.CacheTransform.position) <= visibleDistance;
+                            Vector3.Distance(tempPlayingCharacter.EntityTransform.position, Data.EntityTransform.position) <= visibleDistance;
                         break;
                     case Visibility.VisibleWhenNearby:
-                        CacheCanvas.enabled = Vector3.Distance(tempPlayingCharacter.CacheTransform.position, Data.CacheTransform.position) <= visibleDistance;
+                        CacheCanvas.enabled = Vector3.Distance(tempPlayingCharacter.EntityTransform.position, Data.EntityTransform.position) <= visibleDistance;
                         break;
                     case Visibility.AlwaysVisible:
                         CacheCanvas.enabled = true;

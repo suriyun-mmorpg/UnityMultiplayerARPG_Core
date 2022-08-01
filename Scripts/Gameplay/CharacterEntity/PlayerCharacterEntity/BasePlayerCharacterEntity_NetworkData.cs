@@ -72,14 +72,14 @@ namespace MultiplayerARPG
             get
             {
                 if (CurrentGameInstance.DimensionType == DimensionType.Dimension3D)
-                    return CacheTransform.eulerAngles;
+                    return EntityTransform.eulerAngles;
                 return Quaternion.LookRotation(Direction2D).eulerAngles;
             }
             set
             {
                 if (CurrentGameInstance.DimensionType == DimensionType.Dimension3D)
                 {
-                    CacheTransform.eulerAngles = value;
+                    EntityTransform.eulerAngles = value;
                     return;
                 }
                 Direction2D = Quaternion.Euler(value) * Vector3.forward;
@@ -270,7 +270,7 @@ namespace MultiplayerARPG
                     foreach (GameObject obj in CurrentGameInstance.owningCharacterObjects)
                     {
                         if (obj == null) continue;
-                        Instantiate(obj, CacheTransform.position, CacheTransform.rotation, CacheTransform);
+                        Instantiate(obj, EntityTransform.position, EntityTransform.rotation, EntityTransform);
                     }
                 }
                 if (CurrentGameInstance.owningCharacterMiniMapObjects != null && CurrentGameInstance.owningCharacterMiniMapObjects.Length > 0)

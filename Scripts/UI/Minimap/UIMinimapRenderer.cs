@@ -70,7 +70,7 @@ namespace MultiplayerARPG
             float maxBoundsSize = Mathf.Max(boundsWidth, boundsLength);
 
             // Prepare target transform to follow
-            Transform playingCharacterTransform = isTestMode ? testingPlayingCharacterTransform : GameInstance.PlayingCharacterEntity.CacheTransform;
+            Transform playingCharacterTransform = isTestMode ? testingPlayingCharacterTransform : GameInstance.PlayingCharacterEntity.EntityTransform;
 
             if (imageMinimap != null)
             {
@@ -120,7 +120,7 @@ namespace MultiplayerARPG
                     continue;
                 }
 
-                SetMarkerPositionAndRotation(markers[i].Marker, markers[i].Character.CacheTransform, sizeRate, markers[i].MarkerRotateOffsets);
+                SetMarkerPositionAndRotation(markers[i].Marker, markers[i].Character.EntityTransform, sizeRate, markers[i].MarkerRotateOffsets);
             }
         }
 
@@ -192,7 +192,7 @@ namespace MultiplayerARPG
             RectTransform newMarker = Instantiate(prefab);
             newMarker.SetParent(nonPlayingCharacterMarkerContainer);
             newMarker.transform.localScale = Vector3.one;
-            SetMarkerPositionAndRotation(newMarker, character.CacheTransform, sizeRate, markerRotateOffsets);
+            SetMarkerPositionAndRotation(newMarker, character.EntityTransform, sizeRate, markerRotateOffsets);
             markers.Add(new MarkerData()
             {
                 Character = character,

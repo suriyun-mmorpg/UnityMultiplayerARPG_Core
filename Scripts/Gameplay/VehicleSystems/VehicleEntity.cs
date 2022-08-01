@@ -105,7 +105,7 @@ namespace MultiplayerARPG
         {
             base.OnSetup();
             InitStats();
-            SpawnPosition = CacheTransform.position;
+            SpawnPosition = EntityTransform.position;
             syncPassengerIds.onOperation = (op, index) =>
             {
                 LiteNetLibIdentity identity;

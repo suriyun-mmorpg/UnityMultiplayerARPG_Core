@@ -87,7 +87,7 @@ namespace MultiplayerARPG
                     if (IsHit(validateHits[id], registerHits[id][0], registerHits[id][0].HitDataCollection[i], hitBox))
                     {
                         // Yes, it is hit
-                        hitBox.ReceiveDamage(validateHits[id].Attacker.CacheTransform.position, validateHits[id].Attacker.GetInfo(), validateHits[id].DamageAmounts, validateHits[id].Weapon, validateHits[id].Skill, validateHits[id].SkillLevel, randomSeed);
+                        hitBox.ReceiveDamage(validateHits[id].Attacker.EntityTransform.position, validateHits[id].Attacker.GetInfo(), validateHits[id].DamageAmounts, validateHits[id].Weapon, validateHits[id].Skill, validateHits[id].SkillLevel, randomSeed);
                     }
                 }
                 registerHits[id].RemoveAt(0);

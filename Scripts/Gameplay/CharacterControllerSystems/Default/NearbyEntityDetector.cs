@@ -82,7 +82,7 @@ namespace MultiplayerARPG
             else
                 cacheCollider2D.radius = detectingRadius;
 
-            CacheTransform.position = GameInstance.PlayingCharacterEntity.CacheTransform.position;
+            CacheTransform.position = GameInstance.PlayingCharacterEntity.EntityTransform.position;
             // Find nearby entities
             RemoveInactiveAndSortNearestEntity(characters);
             RemoveInactiveAndSortNearestEntity(players);

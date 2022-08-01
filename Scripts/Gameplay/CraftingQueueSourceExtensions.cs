@@ -34,7 +34,7 @@ namespace MultiplayerARPG
                 return;
             }
 
-            if (!source.IsInCraftDistance(crafter.CacheTransform.position))
+            if (!source.IsInCraftDistance(crafter.EntityTransform.position))
             {
                 // Crafter too far from crafting source
                 source.QueueItems.RemoveAt(0);

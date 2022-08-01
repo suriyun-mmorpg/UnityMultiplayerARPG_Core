@@ -143,7 +143,7 @@ namespace MultiplayerARPG
                 {
                     UpdateEnemyFindingActivity(deltaTime);
 
-                    if (Vector3.Distance(currentPosition, Entity.Summoner.CacheTransform.position) > CurrentGameInstance.minFollowSummonerDistance)
+                    if (Vector3.Distance(currentPosition, Entity.Summoner.EntityTransform.position) > CurrentGameInstance.minFollowSummonerDistance)
                     {
                         // Follow summoner
                         FollowSummoner();
@@ -447,7 +447,7 @@ namespace MultiplayerARPG
                 {
                     // Find enemy around summoner
                     enemies.AddRange(Entity.FindAliveCharacters<BaseCharacterEntity>(
-                        Entity.Summoner.CacheTransform.position,
+                        Entity.Summoner.EntityTransform.position,
                         CharacterDatabase.SummonedVisualRange,
                         false, /* Don't find an allies */
                         true,  /* Always find an enemies */

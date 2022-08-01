@@ -1810,7 +1810,7 @@ namespace MultiplayerARPG
                 Vector3 direction = aimTargetPosition - CacheGameplayCameraController.CameraTransform.position;
                 direction.y = 0f;
                 direction.Normalize();
-                ConstructingBuildingEntity.CacheTransform.eulerAngles = Quaternion.LookRotation(direction).eulerAngles + (Vector3.up * buildYRotate);
+                ConstructingBuildingEntity.EntityTransform.eulerAngles = Quaternion.LookRotation(direction).eulerAngles + (Vector3.up * buildYRotate);
             }
             return AimPosition.CreatePosition(ConstructingBuildingEntity.Position);
         }
@@ -1827,7 +1827,7 @@ namespace MultiplayerARPG
             for (int tempCounter = 0; tempCounter < tempCount; ++tempCounter)
             {
                 tempHitInfo = raycasts[tempCounter];
-                if (ConstructingBuildingEntity.CacheTransform.root == tempHitInfo.transform.root)
+                if (ConstructingBuildingEntity.EntityTransform.root == tempHitInfo.transform.root)
                 {
                     // Hit collider which is part of constructing building entity, skip it
                     continue;

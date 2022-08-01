@@ -69,7 +69,7 @@ namespace MultiplayerARPG
 
         public void PrepareCombatText(DamageableEntity damageableEntity, CombatAmountType combatAmountType, int amount)
         {
-            if (Vector3.Distance(GameInstance.PlayingCharacterEntity.CacheTransform.position, damageableEntity.CacheTransform.position) > GameInstance.Singleton.combatTextDistance)
+            if (Vector3.Distance(GameInstance.PlayingCharacterEntity.EntityTransform.position, damageableEntity.EntityTransform.position) > GameInstance.Singleton.combatTextDistance)
                 return;
 
             if (!spawningCombatTexts.ContainsKey(damageableEntity))

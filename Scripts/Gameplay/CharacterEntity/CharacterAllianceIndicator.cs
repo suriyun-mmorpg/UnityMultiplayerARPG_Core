@@ -36,7 +36,7 @@ namespace MultiplayerARPG
             if (characterEntity == null || !characterEntity.IsClient ||
                 GameInstance.PlayingCharacterEntity == null ||
                 (characterEntity.IsServer && characterEntity.Identity.CountSubscribers() == 0) ||
-                Vector3.Distance(characterEntity.CacheTransform.position, GameInstance.PlayingCharacterEntity.CacheTransform.position) > updateWithinRange)
+                Vector3.Distance(characterEntity.EntityTransform.position, GameInstance.PlayingCharacterEntity.EntityTransform.position) > updateWithinRange)
             {
                 if (owningIndicator != null && owningIndicator.activeSelf)
                     owningIndicator.SetActive(false);

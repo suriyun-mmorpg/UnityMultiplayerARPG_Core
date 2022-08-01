@@ -141,7 +141,7 @@ namespace MultiplayerARPG
                 uint parentObjectId = 0;
                 if (ConstructingBuildingEntity.BuildingArea != null)
                     parentObjectId = ConstructingBuildingEntity.BuildingArea.GetEntityObjectId();
-                PlayingCharacterEntity.Building.CallServerConstructBuilding((short)buildingItemIndex, ConstructingBuildingEntity.CacheTransform.position, ConstructingBuildingEntity.CacheTransform.rotation, parentObjectId);
+                PlayingCharacterEntity.Building.CallServerConstructBuilding((short)buildingItemIndex, ConstructingBuildingEntity.EntityTransform.position, ConstructingBuildingEntity.EntityTransform.rotation, parentObjectId);
             }
             DestroyConstructingBuilding();
         }
@@ -155,7 +155,7 @@ namespace MultiplayerARPG
         {
             ConstructingBuildingEntity = Instantiate(prefab);
             ConstructingBuildingEntity.SetupAsBuildMode(PlayingCharacterEntity);
-            ConstructingBuildingEntity.CacheTransform.parent = null;
+            ConstructingBuildingEntity.EntityTransform.parent = null;
             return ConstructingBuildingEntity;
         }
 

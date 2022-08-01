@@ -91,7 +91,7 @@ namespace MultiplayerARPG
             // Initial default data
             InitStats();
             if (SpawnArea == null)
-                SpawnPosition = CacheTransform.position;
+                SpawnPosition = EntityTransform.position;
         }
 
         [AllRpc]

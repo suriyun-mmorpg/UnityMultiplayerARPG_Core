@@ -36,7 +36,7 @@ namespace MultiplayerARPG
             if (CurrentGameInstance.currentPositionSaveMode == CurrentPositionSaveMode.UseRespawnPosition ||
                 !CurrentMapInfo.SaveCurrentMapPosition)
                 return playerCharacterEntity.RespawnPosition;
-            return playerCharacterEntity.CacheTransform.position;
+            return playerCharacterEntity.EntityTransform.position;
         }
 
         public virtual void SetCurrentPosition(BasePlayerCharacterEntity playerCharacterEntity, Vector3 position)

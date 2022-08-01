@@ -283,7 +283,7 @@ namespace MultiplayerARPG
             await UniTask.Delay(Mathf.CeilToInt(delay * 1000));
             Manager.Assets.NetworkSpawnScene(
                 Identity.ObjectId,
-                CacheTransform.position,
+                EntityTransform.position,
                 CurrentGameInstance.DimensionType == DimensionType.Dimension3D ? Quaternion.Euler(Vector3.up * Random.Range(0, 360)) : Quaternion.identity);
             InitDropItems();
         }
@@ -295,7 +295,7 @@ namespace MultiplayerARPG
 
         public static ItemDropEntity DropItem(ItemDropEntity prefab, BaseGameEntity dropper, CharacterItem dropData, IEnumerable<string> looters, float appearDuration)
         {
-            Vector3 dropPosition = dropper.CacheTransform.position;
+            Vector3 dropPosition = dropper.EntityTransform.position;
             Quaternion dropRotation = Quaternion.identity;
             switch (GameInstance.Singleton.DimensionType)
             {

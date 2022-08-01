@@ -81,8 +81,8 @@ namespace MultiplayerARPG
                 return;
             writer.Put((byte)movement.MovementState);
             writer.Put((byte)movement.ExtraMovementState);
-            writer.PutVector3(movement.Entity.CacheTransform.position);
-            writer.PutPackedInt(GetCompressedAngle(movement.Entity.CacheTransform.eulerAngles.y));
+            writer.PutVector3(movement.Entity.EntityTransform.position);
+            writer.PutPackedInt(GetCompressedAngle(movement.Entity.EntityTransform.eulerAngles.y));
             writer.PutPackedLong(BaseGameNetworkManager.Singleton.ServerTimestamp);
         }
 
@@ -92,8 +92,8 @@ namespace MultiplayerARPG
                 return;
             writer.Put((byte)movement.MovementState);
             writer.Put((byte)movement.ExtraMovementState);
-            writer.PutVector3(movement.Entity.CacheTransform.position);
-            writer.PutPackedInt(GetCompressedAngle(movement.Entity.CacheTransform.eulerAngles.y));
+            writer.PutVector3(movement.Entity.EntityTransform.position);
+            writer.PutPackedInt(GetCompressedAngle(movement.Entity.EntityTransform.eulerAngles.y));
             writer.PutPackedLong(BaseGameNetworkManager.Singleton.ServerTimestamp);
         }
 
@@ -154,7 +154,7 @@ namespace MultiplayerARPG
                 return;
             writer.Put((byte)movement.MovementState);
             writer.Put((byte)movement.ExtraMovementState);
-            writer.PutVector2(movement.Entity.CacheTransform.position);
+            writer.PutVector2(movement.Entity.EntityTransform.position);
             writer.Put(movement.Direction2D);
             writer.PutPackedLong(BaseGameNetworkManager.Singleton.ServerTimestamp);
         }
@@ -165,7 +165,7 @@ namespace MultiplayerARPG
                 return;
             writer.Put((byte)movement.MovementState);
             writer.Put((byte)movement.ExtraMovementState);
-            writer.PutVector2(movement.Entity.CacheTransform.position);
+            writer.PutVector2(movement.Entity.EntityTransform.position);
             writer.Put(movement.Direction2D);
             writer.PutPackedLong(BaseGameNetworkManager.Singleton.ServerTimestamp);
         }

@@ -57,7 +57,7 @@ namespace MultiplayerARPG
             base.InitialRequiredComponents();
             // Cache components
             if (combatTextTransform == null)
-                combatTextTransform = CacheTransform;
+                combatTextTransform = EntityTransform;
             if (opponentAimTransform == null)
                 opponentAimTransform = CombatTextTransform;
         }
@@ -85,7 +85,7 @@ namespace MultiplayerARPG
             if (CurrentGameInstance.DimensionType == DimensionType.Dimension3D)
             {
                 GameObject obj = new GameObject("_HitBoxes");
-                obj.transform.parent = CacheTransform;
+                obj.transform.parent = EntityTransform;
                 Collider[] colliders = GetComponents<Collider>();
                 Bounds bounds = default;
                 for (int i = 0; i < colliders.Length; ++i)
@@ -100,7 +100,7 @@ namespace MultiplayerARPG
                     }
                 }
                 BoxCollider newCollider = obj.AddComponent<BoxCollider>();
-                newCollider.center = bounds.center - CacheTransform.position;
+                newCollider.center = bounds.center - EntityTransform.position;
                 newCollider.size = bounds.size;
                 newCollider.isTrigger = true;
                 obj.transform.localPosition = Vector3.zero;
@@ -110,7 +110,7 @@ namespace MultiplayerARPG
             else
             {
                 GameObject obj = new GameObject("_HitBoxes");
-                obj.transform.parent = CacheTransform;
+                obj.transform.parent = EntityTransform;
                 Collider2D[] colliders = GetComponents<Collider2D>();
                 Bounds bounds = default;
                 for (int i = 0; i < colliders.Length; ++i)
@@ -125,7 +125,7 @@ namespace MultiplayerARPG
                     }
                 }
                 BoxCollider2D newCollider = obj.AddComponent<BoxCollider2D>();
-                newCollider.offset = bounds.center - CacheTransform.position;
+                newCollider.offset = bounds.center - EntityTransform.position;
                 newCollider.size = bounds.size;
                 newCollider.isTrigger = true;
                 obj.transform.localPosition = Vector3.zero;
