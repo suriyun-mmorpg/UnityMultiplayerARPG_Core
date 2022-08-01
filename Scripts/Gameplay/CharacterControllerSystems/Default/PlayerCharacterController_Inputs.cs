@@ -30,82 +30,35 @@ namespace MultiplayerARPG
                 // Activate nearby npcs / players / activable buildings
                 if (InputManager.GetButtonDown("Activate"))
                 {
-                    /*
-                    targetPlayer = null;
-                    if (ActivatableEntityDetector.players.Count > 0)
-                        targetPlayer = ActivatableEntityDetector.players[0];
-                    targetNpc = null;
-                    if (ActivatableEntityDetector.npcs.Count > 0)
-                        targetNpc = ActivatableEntityDetector.npcs[0];
-                    targetBuilding = null;
-                    if (ActivatableEntityDetector.buildings.Count > 0)
-                        targetBuilding = ActivatableEntityDetector.buildings[0];
-                    targetVehicle = null;
-                    if (ActivatableEntityDetector.vehicles.Count > 0)
-                        targetVehicle = ActivatableEntityDetector.vehicles[0];
-                    targetWarpPortal = null;
-                    if (ActivatableEntityDetector.warpPortals.Count > 0)
-                        targetWarpPortal = ActivatableEntityDetector.warpPortals[0];
-                    targetItemsContainer = null;
-                    if (ItemDropEntityDetector.itemsContainers.Count > 0)
-                        targetItemsContainer = ItemDropEntityDetector.itemsContainers[0];
-                    // Priority Player -> Npc -> Buildings
-                    if (targetPlayer != null)
-                    {
-                        // Show dealing, invitation menu
-                        SelectedEntity = targetPlayer;
-                        CacheUISceneGameplay.SetActivePlayerCharacter(targetPlayer);
-                    }
-                    else if (targetNpc != null)
-                    {
-                        // Talk to NPC
-                        SelectedEntity = targetNpc;
-                        PlayerCharacterEntity.NpcAction.CallServerNpcActivate(targetNpc.ObjectId);
-                    }
-                    else if (targetBuilding != null)
-                    {
-                        // Use building
-                        SelectedEntity = targetBuilding;
-                        ActivateBuilding();
-                    }
-                    else if (targetVehicle != null)
-                    {
-                        // Enter vehicle
-                        PlayerCharacterEntity.CallServerEnterVehicle(targetVehicle.ObjectId);
-                    }
-                    else if (targetWarpPortal != null)
-                    {
-                        // Enter warp, For some warp portals that `warpImmediatelyWhenEnter` is FALSE
-                        PlayerCharacterEntity.CallServerEnterWarp(targetWarpPortal.ObjectId);
-                    }
-                    else if (targetItemsContainer != null)
-                    {
-                        // Show items
-                        ShowItemsContainerDialog(targetItemsContainer);
-                    }
-                    */
                     if (ActivatableEntityDetector.activatePressActivatableEntities.Count > 0)
                     {
-                        IActivatePressActivatableEntity activatable = ActivatableEntityDetector.activatePressActivatableEntities[0];
-                        if (activatable.CanActivateByActivateKey())
-                            activatable.OnActivateByActivateKey();
+                        IActivatePressActivatableEntity activatable;
+                        for (int i = 0; i < ActivatableEntityDetector.activatePressActivatableEntities.Count; ++i)
+                        {
+                            activatable = ActivatableEntityDetector.activatePressActivatableEntities[i];
+                            if (activatable.CanActivateByActivateKey())
+                            {
+                                activatable.OnActivateByActivateKey();
+                                break;
+                            }
+                        }
                     }
                 }
                 // Pick up nearby items
                 if (InputManager.GetButtonDown("PickUpItem"))
                 {
-                    /*
-                    targetItemDrop = null;
-                    if (ItemDropEntityDetector.itemDrops.Count > 0)
-                        targetItemDrop = ItemDropEntityDetector.itemDrops[0];
-                    if (targetItemDrop != null)
-                        PlayerCharacterEntity.CallServerPickupItem(targetItemDrop.ObjectId);
-                    */
-                    if (ActivatableEntityDetector.pickupPressActivatableEntities.Count > 0)
+                    if (ItemDropEntityDetector.pickupPressActivatableEntities.Count > 0)
                     {
-                        IPickupPressActivatableEntity activatable = ActivatableEntityDetector.pickupPressActivatableEntities[0];
-                        if (activatable.CanActivateByPickupKey())
-                            activatable.OnActivateByPickupKey();
+                        IPickupPressActivatableEntity activatable;
+                        for (int i = 0; i < ItemDropEntityDetector.pickupPressActivatableEntities.Count; ++i)
+                        {
+                            activatable = ItemDropEntityDetector.pickupPressActivatableEntities[i];
+                            if (activatable.CanActivateByPickupKey())
+                            {
+                                activatable.OnActivateByPickupKey();
+                                break;
+                            }
+                        }
                     }
                 }
                 // Reload
@@ -244,23 +197,10 @@ namespace MultiplayerARPG
                     // When holding on target, or already enter edit building mode
                     if (isMouseHoldAndNotDrag)
                     {
-                        /*
-                        targetBuilding = null;
-                        tempBuildingMaterial = tempTransform.GetComponent<BuildingMaterial>();
-                        if (tempBuildingMaterial != null)
-                            targetBuilding = tempBuildingMaterial.BuildingEntity;
-                        if (targetBuilding && !targetBuilding.IsDead())
-                        {
-                            SetTarget(targetBuilding, TargetActionType.ViewOptions);
-                            isFollowingTarget = true;
-                            tempHasMapPosition = false;
-                            break;
-                        }
-                        */
                         IHoldClickActivatableEntity activatable = tempTransform.GetComponent<IHoldClickActivatableEntity>();
                         if (activatable != null && activatable.CanActivateByHoldClick())
                         {
-                            SetTarget(activatable, TargetActionType.ViewOptions);
+                            SetTarget(activatable, TargetActionType.HoldClickActivate);
                             isFollowingTarget = true;
                             tempHasMapPosition = false;
                             break;
@@ -268,96 +208,22 @@ namespace MultiplayerARPG
                     }
                     else if (mouseUpOnTarget)
                     {
-                        /*
-                        targetPlayer = tempTransform.GetComponent<BasePlayerCharacterEntity>();
-                        targetMonster = tempTransform.GetComponent<BaseMonsterCharacterEntity>();
-                        targetNpc = tempTransform.GetComponent<NpcEntity>();
-                        targetItemDrop = tempTransform.GetComponent<ItemDropEntity>();
-                        targetItemsContainer = tempTransform.GetComponent<ItemsContainerEntity>();
-                        targetHarvestable = tempTransform.GetComponent<HarvestableEntity>();
-                        targetBuilding = null;
-                        tempBuildingMaterial = tempTransform.GetComponent<BuildingMaterial>();
-                        if (tempBuildingMaterial != null)
-                            targetBuilding = tempBuildingMaterial.BuildingEntity;
-                        targetVehicle = tempTransform.GetComponent<VehicleEntity>();
-                        if (targetPlayer)
-                        {
-                            // Found activating entity as player character entity
-                            if (!targetPlayer.IsHideOrDead() && !targetPlayer.IsAlly(PlayerCharacterEntity.GetInfo()))
-                                SetTarget(targetPlayer, TargetActionType.Attack);
-                            else
-                                SetTarget(targetPlayer, TargetActionType.Activate);
-                            isFollowingTarget = true;
-                            tempHasMapPosition = false;
-                            break;
-                        }
-                        else if (targetMonster && !targetMonster.IsHideOrDead())
-                        {
-                            // Found activating entity as monster character entity
-                            SetTarget(targetMonster, TargetActionType.Attack);
-                            isFollowingTarget = true;
-                            tempHasMapPosition = false;
-                            break;
-                        }
-                        else if (targetNpc)
-                        {
-                            // Found activating entity as npc entity
-                            SetTarget(targetNpc, TargetActionType.Activate);
-                            isFollowingTarget = true;
-                            tempHasMapPosition = false;
-                            break;
-                        }
-                        else if (targetItemDrop)
-                        {
-                            // Found activating entity as item drop entity
-                            SetTarget(targetItemDrop, TargetActionType.Activate);
-                            isFollowingTarget = true;
-                            tempHasMapPosition = false;
-                            break;
-                        }
-                        else if (targetItemsContainer)
-                        {
-                            // Found activating entity as items container entity
-                            SetTarget(targetItemsContainer, TargetActionType.Activate);
-                            isFollowingTarget = true;
-                            tempHasMapPosition = false;
-                            break;
-                        }
-                        else if (targetHarvestable && !targetHarvestable.IsDead())
-                        {
-                            // Found activating entity as harvestable entity
-                            SetTarget(targetHarvestable, TargetActionType.Attack);
-                            isFollowingTarget = true;
-                            tempHasMapPosition = false;
-                            break;
-                        }
-                        else if (targetBuilding && !targetBuilding.IsDead() && targetBuilding.Activatable)
-                        {
-                            // Found activating entity as building entity
-                            SetTarget(targetBuilding, TargetActionType.Activate);
-                            isFollowingTarget = true;
-                            tempHasMapPosition = false;
-                            break;
-                        }
-                        else if (targetVehicle)
-                        {
-                            // Found activating entity as vehicle entity
-                            if (targetVehicle.ShouldBeAttackTarget())
-                                SetTarget(targetVehicle, TargetActionType.Attack);
-                            else
-                                SetTarget(targetVehicle, TargetActionType.Activate);
-                            isFollowingTarget = true;
-                            tempHasMapPosition = false;
-                            break;
-                        }
-                        */
-                        IClickActivatableEntity activatable = tempTransform.GetComponent<IClickActivatableEntity>();
+                        ITargetableEntity targetable = tempTransform.GetComponent<ITargetableEntity>();
+                        IClickActivatableEntity activatable = targetable as IClickActivatableEntity;
+                        IDamageableEntity damageable = targetable as IDamageableEntity;
                         if (activatable != null && activatable.CanActivateByClick())
                         {
                             if (activatable.ShouldBeAttackTarget())
                                 SetTarget(activatable, TargetActionType.Attack);
                             else
-                                SetTarget(activatable, TargetActionType.Activate);
+                                SetTarget(activatable, TargetActionType.ClickActivate);
+                            isFollowingTarget = true;
+                            tempHasMapPosition = false;
+                            break;
+                        }
+                        else if (damageable != null && !damageable.IsDead())
+                        {
+                            SetTarget(damageable, TargetActionType.Attack);
                             isFollowingTarget = true;
                             tempHasMapPosition = false;
                             break;
@@ -435,13 +301,14 @@ namespace MultiplayerARPG
                 return;
             }
             if (pointClickSetTargetImmediately ||
-                (entity != null && SelectedEntity == entity) ||
+                (entity != null && SelectedEntity != null && entity.EntityGameObject == SelectedEntity.EntityGameObject) ||
                 (entity != null && entity.ShouldSetAsTargetInOneClick()))
             {
                 this.targetActionType = targetActionType;
                 destination = null;
                 TargetEntity = entity;
-                PlayingCharacterEntity.SetTargetEntity(entity as BaseGameEntity);
+                if (entity is IGameEntity)
+                    PlayingCharacterEntity.SetTargetEntity((entity as IGameEntity).Entity);
             }
             SelectedEntity = entity;
         }
@@ -453,7 +320,7 @@ namespace MultiplayerARPG
             TargetEntity = null;
             PlayingCharacterEntity.SetTargetEntity(null);
             targetPosition = null;
-            targetActionType = TargetActionType.Activate;
+            targetActionType = TargetActionType.ClickActivate;
         }
 
         public override void DeselectBuilding()
@@ -716,7 +583,7 @@ namespace MultiplayerARPG
                 GetUseSkillDistanceAndFov(isLeftHandAttacking, out castDistance, out castFov);
                 UseSkillOrMoveToEntity(targetDamageable, castDistance);
             }
-            else if (TryGetDoActionEntity(out clickActivatableEntity, TargetActionType.Activate))
+            else if (TryGetDoActionEntity(out clickActivatableEntity, TargetActionType.ClickActivate))
             {
                 DoActionOrMoveToEntity(clickActivatableEntity, clickActivatableEntity.GetActivatableDistance(), () =>
                 {
@@ -729,7 +596,7 @@ namespace MultiplayerARPG
                     }
                 });
             }
-            else if (TryGetDoActionEntity(out holdClickActivatableEntity, TargetActionType.ViewOptions))
+            else if (TryGetDoActionEntity(out holdClickActivatableEntity, TargetActionType.HoldClickActivate))
             {
                 DoActionOrMoveToEntity(holdClickActivatableEntity, holdClickActivatableEntity.GetActivatableDistance(), () =>
                 {
@@ -894,7 +761,7 @@ namespace MultiplayerARPG
                     OverlappedEntityHitBox(entity.Entity, sourcePosition, targetPosition, distance))
                 {
                     // Set next frame target action type
-                    targetActionType = queueUsingSkill.skill.IsAttack ? TargetActionType.Attack : TargetActionType.Activate;
+                    targetActionType = queueUsingSkill.skill.IsAttack ? TargetActionType.Attack : TargetActionType.ClickActivate;
                     // Stop movement to use skill
                     PlayingCharacterEntity.StopMove();
                     // Turn character to attacking target
@@ -913,7 +780,7 @@ namespace MultiplayerARPG
             else
             {
                 // Can't use skill
-                targetActionType = TargetActionType.Activate;
+                targetActionType = TargetActionType.ClickActivate;
                 ClearQueueUsingSkill();
                 return;
             }

@@ -13,10 +13,10 @@ namespace MultiplayerARPG
 
         public enum TargetActionType
         {
-            Activate,
+            ClickActivate,
             Attack,
             UseSkill,
-            ViewOptions,
+            HoldClickActivate,
         }
 
         public const float DETECT_MOUSE_DRAG_DISTANCE_SQUARED = 100f;
@@ -285,7 +285,7 @@ namespace MultiplayerARPG
         {
             if (!TryGetDoActionEntity(out entity, TargetActionType.Attack))
                 return false;
-            if (entity == PlayingCharacterEntity || !entity.CanReceiveDamageFrom(PlayingCharacterEntity.GetInfo()))
+            if (entity.Entity == PlayingCharacterEntity.Entity || !entity.CanReceiveDamageFrom(PlayingCharacterEntity.GetInfo()))
             {
                 entity = null;
                 return false;
@@ -306,15 +306,15 @@ namespace MultiplayerARPG
             return true;
         }
 
-        public bool TryGetDoActionEntity<T>(out T entity, TargetActionType actionType = TargetActionType.Activate)
-            where T : ITargetableEntity
+        public bool TryGetDoActionEntity<T>(out T entity, TargetActionType actionType = TargetActionType.ClickActivate)
+            where T : class, ITargetableEntity
         {
             entity = default;
             if (targetActionType != actionType)
                 return false;
             if (TargetEntity == null)
                 return false;
-            entity = (T)TargetEntity;
+            entity = TargetEntity as T;
             if (entity == null)
                 return false;
             return true;
