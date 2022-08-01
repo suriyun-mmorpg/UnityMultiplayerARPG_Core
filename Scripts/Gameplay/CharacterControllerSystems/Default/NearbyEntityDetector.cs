@@ -348,11 +348,19 @@ namespace MultiplayerARPG
                     itemsContainer = gameEntity.Entity as ItemsContainerEntity;
             }
 
-            if (findItemsContainer)
+            if (findActivatePressActivatableEntity)
+            {
                 activatePressActivatableEntity = other.GetComponent<IActivatePressActivatableEntity>();
+                if (activatePressActivatableEntity != null && activatePressActivatableEntity.EntityGameObject == GameInstance.PlayingCharacterEntity.EntityGameObject)
+                    activatePressActivatableEntity = null;
+            }
 
-            if (findItemsContainer)
+            if (findPickupPressActivatableEntity)
+            {
                 pickupPressActivatableEntity = other.GetComponent<IPickupPressActivatableEntity>();
+                if (pickupPressActivatableEntity != null && pickupPressActivatableEntity.EntityGameObject == GameInstance.PlayingCharacterEntity.EntityGameObject)
+                    pickupPressActivatableEntity = null;
+            }
         }
 
         private void RemoveInactiveAndSortNearestEntity<T>(List<T> entities) where T : BaseGameEntity
@@ -390,7 +398,8 @@ namespace MultiplayerARPG
             bool hasUpdate = false;
             for (int i = entities.Count - 1; i >= 0; --i)
             {
-                if (entities[i] == null || !entities[i].EntityGameObject.activeInHierarchy)
+                if (entities[i] == null || (entities[i] is Object && (entities[i] as Object) == null) ||
+                    !entities[i].EntityGameObject.activeInHierarchy)
                 {
                     entities.RemoveAt(i);
                     hasUpdate = true;
