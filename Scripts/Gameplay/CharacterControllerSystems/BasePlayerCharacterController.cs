@@ -32,11 +32,11 @@ namespace MultiplayerARPG
         /// <summary>
         /// Controlled character, can use `GameInstance.PlayingCharacter` or `GameInstance.PlayingCharacterEntity` instead.
         /// </summary>
-        public static BasePlayerCharacterEntity OwningCharacter { get { return Singleton == null ? null : Singleton.PlayerCharacterEntity; } }
+        public static BasePlayerCharacterEntity OwningCharacter { get { return Singleton == null ? null : Singleton.PlayingCharacterEntity; } }
         public System.Action<BasePlayerCharacterController> onSetup;
         public System.Action<BasePlayerCharacterController> onDesetup;
 
-        public BasePlayerCharacterEntity PlayerCharacterEntity
+        public BasePlayerCharacterEntity PlayingCharacterEntity
         {
             get { return GameInstance.PlayingCharacterEntity; }
             set
@@ -54,22 +54,22 @@ namespace MultiplayerARPG
 
         public Transform CameraTargetTransform
         {
-            get { return PlayerCharacterEntity.CameraTargetTransform; }
+            get { return PlayingCharacterEntity.CameraTargetTransform; }
         }
 
         public Transform CacheTransform
         {
-            get { return PlayerCharacterEntity.CacheTransform; }
+            get { return PlayingCharacterEntity.CacheTransform; }
         }
 
         public Transform MovementTransform
         {
-            get { return PlayerCharacterEntity.MovementTransform; }
+            get { return PlayingCharacterEntity.MovementTransform; }
         }
 
         public float StoppingDistance
         {
-            get { return PlayerCharacterEntity.StoppingDistance; }
+            get { return PlayingCharacterEntity.StoppingDistance; }
         }
 
         public BaseUISceneGameplay CacheUISceneGameplay { get; protected set; }
@@ -128,7 +128,7 @@ namespace MultiplayerARPG
 
         protected virtual void OnDestroy()
         {
-            Desetup(PlayerCharacterEntity);
+            Desetup(PlayingCharacterEntity);
             this.InvokeInstanceDevExtMethods("OnDestroy");
         }
 
@@ -141,7 +141,7 @@ namespace MultiplayerARPG
                 uint parentObjectId = 0;
                 if (ConstructingBuildingEntity.BuildingArea != null)
                     parentObjectId = ConstructingBuildingEntity.BuildingArea.GetEntityObjectId();
-                PlayerCharacterEntity.Building.CallServerConstructBuilding((short)buildingItemIndex, ConstructingBuildingEntity.CacheTransform.position, ConstructingBuildingEntity.CacheTransform.rotation, parentObjectId);
+                PlayingCharacterEntity.Building.CallServerConstructBuilding((short)buildingItemIndex, ConstructingBuildingEntity.CacheTransform.position, ConstructingBuildingEntity.CacheTransform.rotation, parentObjectId);
             }
             DestroyConstructingBuilding();
         }
@@ -154,7 +154,7 @@ namespace MultiplayerARPG
         public virtual BuildingEntity InstantiateConstructingBuilding(BuildingEntity prefab)
         {
             ConstructingBuildingEntity = Instantiate(prefab);
-            ConstructingBuildingEntity.SetupAsBuildMode(PlayerCharacterEntity);
+            ConstructingBuildingEntity.SetupAsBuildMode(PlayingCharacterEntity);
             ConstructingBuildingEntity.CacheTransform.parent = null;
             return ConstructingBuildingEntity;
         }
@@ -176,7 +176,7 @@ namespace MultiplayerARPG
         {
             if (TargetBuildingEntity == null)
                 return;
-            PlayerCharacterEntity.Building.CallServerDestroyBuilding(TargetBuildingEntity.ObjectId);
+            PlayingCharacterEntity.Building.CallServerDestroyBuilding(TargetBuildingEntity.ObjectId);
             DeselectBuilding();
         }
 
@@ -190,7 +190,7 @@ namespace MultiplayerARPG
                 LanguageManager.GetText(UITextKeys.UI_SET_BUILDING_PASSWORD_DESCRIPTION.ToString()),
                 (password) =>
                 {
-                    PlayerCharacterEntity.Building.CallServerSetBuildingPassword(objectId, password);
+                    PlayingCharacterEntity.Building.CallServerSetBuildingPassword(objectId, password);
                 }, string.Empty, TargetBuildingEntity.PasswordContentType, TargetBuildingEntity.PasswordLength);
             DeselectBuilding();
         }
@@ -199,7 +199,7 @@ namespace MultiplayerARPG
         {
             if (TargetBuildingEntity == null)
                 return;
-            PlayerCharacterEntity.Building.CallServerLockBuilding(TargetBuildingEntity.ObjectId);
+            PlayingCharacterEntity.Building.CallServerLockBuilding(TargetBuildingEntity.ObjectId);
             DeselectBuilding();
         }
 
@@ -207,7 +207,7 @@ namespace MultiplayerARPG
         {
             if (TargetBuildingEntity == null)
                 return;
-            PlayerCharacterEntity.Building.CallServerUnlockBuilding(TargetBuildingEntity.ObjectId);
+            PlayingCharacterEntity.Building.CallServerUnlockBuilding(TargetBuildingEntity.ObjectId);
             DeselectBuilding();
         }
 

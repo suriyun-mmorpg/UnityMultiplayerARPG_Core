@@ -57,25 +57,25 @@ namespace MultiplayerARPG
             if (buttonDestroy != null)
             {
                 buttonDestroy.interactable = Controller.TargetBuildingEntity != null &&
-                    Controller.TargetBuildingEntity.IsCreator(Controller.PlayerCharacterEntity);
+                    Controller.TargetBuildingEntity.IsCreator(Controller.PlayingCharacterEntity);
             }
             if (buttonSetPassword != null)
             {
                 buttonSetPassword.interactable = Controller.TargetBuildingEntity != null &&
                     Controller.TargetBuildingEntity.Lockable &&
-                    Controller.TargetBuildingEntity.IsCreator(Controller.PlayerCharacterEntity);
+                    Controller.TargetBuildingEntity.IsCreator(Controller.PlayingCharacterEntity);
             }
             if (buttonLock != null)
             {
                 buttonLock.interactable = Controller.TargetBuildingEntity != null &&
                     Controller.TargetBuildingEntity.Lockable &&
-                    Controller.TargetBuildingEntity.IsCreator(Controller.PlayerCharacterEntity);
+                    Controller.TargetBuildingEntity.IsCreator(Controller.PlayingCharacterEntity);
             }
             if (buttonUnlock != null)
             {
                 buttonUnlock.interactable = Controller.TargetBuildingEntity != null &&
                     Controller.TargetBuildingEntity.Lockable &&
-                    Controller.TargetBuildingEntity.IsCreator(Controller.PlayerCharacterEntity);
+                    Controller.TargetBuildingEntity.IsCreator(Controller.PlayingCharacterEntity);
             }
             if (buttonActivate != null)
             {

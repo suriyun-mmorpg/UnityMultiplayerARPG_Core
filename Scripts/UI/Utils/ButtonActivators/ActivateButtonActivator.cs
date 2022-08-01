@@ -28,7 +28,7 @@ namespace MultiplayerARPG
             if (shooterController != null && shooterController.SelectedGameEntity != null)
             {
                 if ((shooterController.SelectedGameEntity is BasePlayerCharacterEntity || shooterController.SelectedGameEntity is NpcEntity) &&
-                    Vector3.Distance(shooterController.SelectedGameEntity.CacheTransform.position, shooterController.PlayerCharacterEntity.CacheTransform.position) <= GameInstance.Singleton.conversationDistance)
+                    Vector3.Distance(shooterController.SelectedGameEntity.CacheTransform.position, shooterController.PlayingCharacterEntity.CacheTransform.position) <= GameInstance.Singleton.conversationDistance)
                 {
                     canActivate = true;
                 }

@@ -210,7 +210,7 @@ namespace MultiplayerARPG
 
         protected override void Update()
         {
-            if (PlayerCharacterEntity == null || !PlayerCharacterEntity.IsOwnerClient)
+            if (PlayingCharacterEntity == null || !PlayingCharacterEntity.IsOwnerClient)
                 return;
 
             CacheGameplayCameraController.FollowingEntityTransform = CameraTargetTransform;
@@ -220,7 +220,7 @@ namespace MultiplayerARPG
             if (CacheTargetObject != null)
                 CacheTargetObject.gameObject.SetActive(destination.HasValue);
 
-            if (PlayerCharacterEntity.IsDead())
+            if (PlayingCharacterEntity.IsDead())
             {
                 ClearQueueUsingSkill();
                 destination = null;
@@ -243,8 +243,8 @@ namespace MultiplayerARPG
 
             UpdateInput();
             UpdateFollowTarget();
-            PlayerCharacterEntity.AimPosition = PlayerCharacterEntity.GetAttackAimPosition(ref isLeftHandAttacking);
-            PlayerCharacterEntity.SetSmoothTurnSpeed(turnSmoothSpeed);
+            PlayingCharacterEntity.AimPosition = PlayingCharacterEntity.GetAttackAimPosition(ref isLeftHandAttacking);
+            PlayingCharacterEntity.SetSmoothTurnSpeed(turnSmoothSpeed);
         }
 
         private Vector3 GetBuildingPlacePosition(Vector3 position)
@@ -269,8 +269,8 @@ namespace MultiplayerARPG
             {
                 character = SelectedGameEntity as BaseCharacterEntity;
                 if (character == null ||
-                    character == PlayerCharacterEntity ||
-                    !character.CanReceiveDamageFrom(PlayerCharacterEntity.GetInfo()))
+                    character == PlayingCharacterEntity ||
+                    !character.CanReceiveDamageFrom(PlayingCharacterEntity.GetInfo()))
                 {
                     character = null;
                     return false;
@@ -285,7 +285,7 @@ namespace MultiplayerARPG
         {
             if (!TryGetDoActionEntity(out entity, TargetActionType.Attack))
                 return false;
-            if (entity == PlayerCharacterEntity || !entity.CanReceiveDamageFrom(PlayerCharacterEntity.GetInfo()))
+            if (entity == PlayingCharacterEntity || !entity.CanReceiveDamageFrom(PlayingCharacterEntity.GetInfo()))
             {
                 entity = null;
                 return false;
@@ -322,9 +322,9 @@ namespace MultiplayerARPG
 
         public void GetAttackDistanceAndFov(bool isLeftHand, out float attackDistance, out float attackFov)
         {
-            attackDistance = PlayerCharacterEntity.GetAttackDistance(isLeftHand);
-            attackFov = PlayerCharacterEntity.GetAttackFov(isLeftHand);
-            attackDistance -= PlayerCharacterEntity.StoppingDistance;
+            attackDistance = PlayingCharacterEntity.GetAttackDistance(isLeftHand);
+            attackFov = PlayingCharacterEntity.GetAttackFov(isLeftHand);
+            attackDistance -= PlayingCharacterEntity.StoppingDistance;
         }
 
         public void GetUseSkillDistanceAndFov(bool isLeftHand, out float castDistance, out float castFov)
@@ -334,10 +334,10 @@ namespace MultiplayerARPG
             if (queueUsingSkill.skill != null)
             {
                 // If skill is attack skill, set distance and fov by skill
-                castDistance = queueUsingSkill.skill.GetCastDistance(PlayerCharacterEntity, queueUsingSkill.level, isLeftHand);
-                castFov = queueUsingSkill.skill.GetCastFov(PlayerCharacterEntity, queueUsingSkill.level, isLeftHand);
+                castDistance = queueUsingSkill.skill.GetCastDistance(PlayingCharacterEntity, queueUsingSkill.level, isLeftHand);
+                castFov = queueUsingSkill.skill.GetCastFov(PlayingCharacterEntity, queueUsingSkill.level, isLeftHand);
             }
-            castDistance -= PlayerCharacterEntity.StoppingDistance;
+            castDistance -= PlayingCharacterEntity.StoppingDistance;
         }
 
         public Vector3 GetMoveDirection(float horizontalInput, float verticalInput)
@@ -367,34 +367,34 @@ namespace MultiplayerARPG
 
         public void RequestAttack()
         {
-            if (PlayerCharacterEntity.Attack(isLeftHandAttacking))
+            if (PlayingCharacterEntity.Attack(isLeftHandAttacking))
                 isLeftHandAttacking = !isLeftHandAttacking;
         }
 
         public void RequestUsePendingSkill()
         {
-            if (PlayerCharacterEntity.IsDead() ||
-                PlayerCharacterEntity.Dealing.DealingState != DealingState.None)
+            if (PlayingCharacterEntity.IsDead() ||
+                PlayingCharacterEntity.Dealing.DealingState != DealingState.None)
             {
                 ClearQueueUsingSkill();
                 return;
             }
 
             if (queueUsingSkill.skill != null &&
-                !PlayerCharacterEntity.IsPlayingActionAnimation() &&
-                !PlayerCharacterEntity.IsAttacking &&
-                !PlayerCharacterEntity.IsUsingSkill)
+                !PlayingCharacterEntity.IsPlayingActionAnimation() &&
+                !PlayingCharacterEntity.IsAttacking &&
+                !PlayingCharacterEntity.IsUsingSkill)
             {
                 if (queueUsingSkill.itemIndex >= 0)
                 {
-                    if (PlayerCharacterEntity.UseSkillItem(queueUsingSkill.itemIndex, isLeftHandAttacking, SelectedGameEntityObjectId, queueUsingSkill.aimPosition))
+                    if (PlayingCharacterEntity.UseSkillItem(queueUsingSkill.itemIndex, isLeftHandAttacking, SelectedGameEntityObjectId, queueUsingSkill.aimPosition))
                     {
                         isLeftHandAttacking = !isLeftHandAttacking;
                     }
                 }
                 else
                 {
-                    if (PlayerCharacterEntity.UseSkill(queueUsingSkill.skill.DataId, isLeftHandAttacking, SelectedGameEntityObjectId, queueUsingSkill.aimPosition))
+                    if (PlayingCharacterEntity.UseSkill(queueUsingSkill.skill.DataId, isLeftHandAttacking, SelectedGameEntityObjectId, queueUsingSkill.aimPosition))
                     {
                         isLeftHandAttacking = !isLeftHandAttacking;
                     }
