@@ -57,9 +57,9 @@ namespace MultiplayerARPG
             get { return PlayingCharacterEntity.CameraTargetTransform; }
         }
 
-        public Transform CacheTransform
+        public Transform EntityTransform
         {
-            get { return PlayingCharacterEntity.CacheTransform; }
+            get { return PlayingCharacterEntity.EntityTransform; }
         }
 
         public Transform MovementTransform

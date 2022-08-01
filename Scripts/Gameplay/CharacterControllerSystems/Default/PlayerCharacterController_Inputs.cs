@@ -479,7 +479,7 @@ namespace MultiplayerARPG
                 ClearQueueUsingSkill();
                 destination = null;
                 isFollowingTarget = false;
-                if (TargetGameEntity != null && Vector3.Distance(CacheTransform.position, TargetGameEntity.CacheTransform.position) >= wasdClearTargetDistance)
+                if (TargetGameEntity != null && Vector3.Distance(EntityTransform.position, TargetGameEntity.CacheTransform.position) >= wasdClearTargetDistance)
                 {
                     // Clear target when character moved far from target
                     ClearTarget();
@@ -832,7 +832,7 @@ namespace MultiplayerARPG
 
         protected virtual void DoActionOrMoveToEntity(ITargetableEntity entity, float distance, System.Action action)
         {
-            Vector3 sourcePosition = CacheTransform.position;
+            Vector3 sourcePosition = EntityTransform.position;
             Vector3 targetPosition = entity.EntityTransform.position;
             if (OverlappedEntity(entity, sourcePosition, targetPosition, distance))
             {
@@ -948,7 +948,7 @@ namespace MultiplayerARPG
 
         protected void TurnCharacterToPosition(Vector3 position)
         {
-            Vector3 lookAtDirection = (position - CacheTransform.position).normalized;
+            Vector3 lookAtDirection = (position - EntityTransform.position).normalized;
             if (lookAtDirection.sqrMagnitude > 0)
                 PlayingCharacterEntity.SetLookRotation(Quaternion.LookRotation(lookAtDirection));
         }
