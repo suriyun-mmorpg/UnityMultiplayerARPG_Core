@@ -338,11 +338,6 @@ namespace MultiplayerARPG
             return itemDropEntity;
         }
 
-        public virtual byte GetActivatablePriority()
-        {
-            return 6;
-        }
-
         public virtual float GetActivatableDistance()
         {
             return GameInstance.Singleton.pickUpItemDistance;
@@ -353,24 +348,24 @@ namespace MultiplayerARPG
             return false;
         }
 
-        public virtual bool CanPickupPressActivate()
+        public virtual bool CanActivateByPickupKey()
         {
             return true;
         }
 
-        public virtual void OnPickupPressActivate()
+        public virtual void OnActivateByPickupKey()
         {
             GameInstance.PlayingCharacterEntity.CallServerPickupItem(ObjectId);
         }
 
-        public virtual bool CanClickActivate()
+        public virtual bool CanActivateByClick()
         {
-            return CanPickupPressActivate();
+            return CanActivateByPickupKey();
         }
 
-        public virtual void OnClickActivate()
+        public virtual void OnActivateByClick()
         {
-            OnPickupPressActivate();
+            OnActivateByPickupKey();
         }
     }
 }

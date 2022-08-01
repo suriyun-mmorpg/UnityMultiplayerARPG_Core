@@ -2,7 +2,7 @@ namespace MultiplayerARPG
 {
     public interface IPickupPressActivatableEntity : IBaseActivatableEntity
     {
-        bool CanPickupPressActivate();
-        void OnPickupPressActivate();
+        bool CanActivateByPickupKey();
+        void OnActivateByPickupKey();
     }
 }

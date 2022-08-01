@@ -607,7 +607,7 @@ namespace MultiplayerARPG
                 CacheGameplayCameraController.UpdateZoom = !IsBlockController;
             }
             // Clear selected entity
-            SelectedEntity = null;
+            SelectedGameEntity = null;
 
             // Update crosshair (with states from last update)
             UpdateCrosshair();
@@ -866,12 +866,12 @@ namespace MultiplayerARPG
 
                 // Entity is in front of character, so this is target
                 aimTargetPosition = tempHitInfo.point;
-                SelectedEntity = tempGameEntity.Entity;
+                SelectedGameEntity = tempGameEntity.Entity;
                 break;
             }
 
             // Aim to activateable entities if it can't find attacking target
-            if (SelectedEntity == null)
+            if (SelectedGameEntity == null)
             {
                 // Default aim position (aim to sky/space)
                 aimTargetPosition = centerRay.origin + centerRay.direction * (centerOriginToCharacterDistance + findTargetRaycastDistance);
@@ -904,7 +904,7 @@ namespace MultiplayerARPG
                         // Entity is in front of character, so this is target
                         if (!turnForwardWhileDoingAction || IsInFront(tempHitInfo.point))
                             aimTargetPosition = tempHitInfo.point;
-                        SelectedEntity = tempGameEntity.Entity;
+                        SelectedGameEntity = tempGameEntity.Entity;
                         break;
                     }
                     // Find activatable entity (NPC/Building/Mount/Etc)
@@ -913,7 +913,7 @@ namespace MultiplayerARPG
                         // Entity is in front of character, so this is target
                         if (!turnForwardWhileDoingAction || IsInFront(tempHitInfo.point))
                             aimTargetPosition = tempHitInfo.point;
-                        SelectedEntity = tempGameEntity.Entity;
+                        SelectedGameEntity = tempGameEntity.Entity;
                         break;
                     }
                 }
@@ -924,10 +924,10 @@ namespace MultiplayerARPG
             turnDirection.y = 0f;
             turnDirection.Normalize();
             // Show target hp/mp
-            CacheUISceneGameplay.SetTargetEntity(SelectedEntity);
-            PlayerCharacterEntity.SetTargetEntity(SelectedEntity);
+            CacheUISceneGameplay.SetTargetEntity(SelectedGameEntity);
+            PlayerCharacterEntity.SetTargetEntity(SelectedGameEntity);
             // Update aim assist
-            CacheGameplayCameraController.EnableAimAssist = enableAimAssist && (tempPressAttackRight || tempPressAttackLeft || !aimAssistOnFireOnly) && !(SelectedEntity is IDamageableEntity);
+            CacheGameplayCameraController.EnableAimAssist = enableAimAssist && (tempPressAttackRight || tempPressAttackLeft || !aimAssistOnFireOnly) && !(SelectedGameEntity is IDamageableEntity);
             CacheGameplayCameraController.EnableAimAssistX = enableAimAssistX;
             CacheGameplayCameraController.EnableAimAssistY = enableAimAssistY;
             CacheGameplayCameraController.AimAssistPlayer = aimAssistCharacter;
@@ -1057,14 +1057,14 @@ namespace MultiplayerARPG
                 {
                     if (activateInput.IsHold)
                     {
-                        if (SelectedEntity is BuildingEntity)
+                        if (SelectedGameEntity is BuildingEntity)
                         {
-                            targetBuilding = SelectedEntity as BuildingEntity;
+                            targetBuilding = SelectedGameEntity as BuildingEntity;
                         }
                     }
                     else if (activateInput.IsRelease)
                     {
-                        if (SelectedEntity == null)
+                        if (SelectedGameEntity == null)
                         {
                             if (warpPortalEntityDetector?.warpPortals.Count > 0)
                             {
@@ -1074,29 +1074,29 @@ namespace MultiplayerARPG
                         }
                         else
                         {
-                            if (SelectedEntity is BasePlayerCharacterEntity)
+                            if (SelectedGameEntity is BasePlayerCharacterEntity)
                             {
-                                targetPlayer = SelectedEntity as BasePlayerCharacterEntity;
+                                targetPlayer = SelectedGameEntity as BasePlayerCharacterEntity;
                             }
-                            if (SelectedEntity is NpcEntity)
+                            if (SelectedGameEntity is NpcEntity)
                             {
-                                targetNpc = SelectedEntity as NpcEntity;
+                                targetNpc = SelectedGameEntity as NpcEntity;
                             }
-                            if (SelectedEntity is BuildingEntity)
+                            if (SelectedGameEntity is BuildingEntity)
                             {
-                                targetBuilding = SelectedEntity as BuildingEntity;
+                                targetBuilding = SelectedGameEntity as BuildingEntity;
                             }
-                            if (SelectedEntity is VehicleEntity)
+                            if (SelectedGameEntity is VehicleEntity)
                             {
-                                targetVehicle = SelectedEntity as VehicleEntity;
+                                targetVehicle = SelectedGameEntity as VehicleEntity;
                             }
-                            if (SelectedEntity is WarpPortalEntity)
+                            if (SelectedGameEntity is WarpPortalEntity)
                             {
-                                targetWarpPortal = SelectedEntity as WarpPortalEntity;
+                                targetWarpPortal = SelectedGameEntity as WarpPortalEntity;
                             }
-                            if (SelectedEntity is ItemsContainerEntity)
+                            if (SelectedGameEntity is ItemsContainerEntity)
                             {
-                                targetItemsContainer = SelectedEntity as ItemsContainerEntity;
+                                targetItemsContainer = SelectedGameEntity as ItemsContainerEntity;
                             }
                         }
                     }
@@ -1177,9 +1177,9 @@ namespace MultiplayerARPG
             {
                 anyKeyPressed = true;
                 // Find for item to pick up
-                if (SelectedEntity != null && SelectedEntity is ItemDropEntity)
+                if (SelectedGameEntity != null && SelectedGameEntity is ItemDropEntity)
                 {
-                    PlayerCharacterEntity.CallServerPickupItem(SelectedEntity.ObjectId);
+                    PlayerCharacterEntity.CallServerPickupItem(SelectedGameEntity.ObjectId);
                 }
             }
 
@@ -1626,7 +1626,7 @@ namespace MultiplayerARPG
         {
             if (targetBuilding != null)
             {
-                TargetEntity = targetBuilding;
+                TargetGameEntity = targetBuilding;
                 ShowCurrentBuildingDialog();
             }
         }
@@ -1656,11 +1656,11 @@ namespace MultiplayerARPG
             {
                 if (queueUsingSkill.itemIndex >= 0)
                 {
-                    PlayerCharacterEntity.UseSkillItem(queueUsingSkill.itemIndex, isLeftHand, SelectedEntityObjectId, queueUsingSkill.aimPosition);
+                    PlayerCharacterEntity.UseSkillItem(queueUsingSkill.itemIndex, isLeftHand, SelectedGameEntityObjectId, queueUsingSkill.aimPosition);
                 }
                 else
                 {
-                    PlayerCharacterEntity.UseSkill(queueUsingSkill.skill.DataId, isLeftHand, SelectedEntityObjectId, queueUsingSkill.aimPosition);
+                    PlayerCharacterEntity.UseSkill(queueUsingSkill.skill.DataId, isLeftHand, SelectedGameEntityObjectId, queueUsingSkill.aimPosition);
                 }
             }
             ClearQueueUsingSkill();

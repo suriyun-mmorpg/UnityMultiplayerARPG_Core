@@ -273,11 +273,6 @@ namespace MultiplayerARPG
             return false;
         }
 
-        public virtual byte GetActivatablePriority()
-        {
-            return 1;
-        }
-
         public virtual float GetActivatableDistance()
         {
             return GameInstance.Singleton.conversationDistance;
@@ -288,24 +283,24 @@ namespace MultiplayerARPG
             return false;
         }
 
-        public virtual bool CanKeyPressActivate()
+        public virtual bool CanActivateByActivateKey()
         {
             return true;
         }
 
-        public virtual void OnKeyPressActivate()
+        public virtual void OnActivateByActivateKey()
         {
             GameInstance.PlayingCharacterEntity.NpcAction.CallServerNpcActivate(ObjectId);
         }
 
-        public virtual bool CanClickActivate()
+        public virtual bool CanActivateByClick()
         {
-            return CanKeyPressActivate();
+            return CanActivateByActivateKey();
         }
 
-        public virtual void OnClickActivate()
+        public virtual void OnActivateByClick()
         {
-            OnKeyPressActivate();
+            OnActivateByActivateKey();
         }
     }
 }

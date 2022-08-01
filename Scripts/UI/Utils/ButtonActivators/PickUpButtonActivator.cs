@@ -24,9 +24,9 @@ namespace MultiplayerARPG
                 canActivate = controller.ItemDropEntityDetector.itemDrops.Count > 0;
             }
 
-            if (shooterController != null && shooterController.SelectedEntity != null)
+            if (shooterController != null && shooterController.SelectedGameEntity != null)
             {
-                canActivate = shooterController.SelectedEntity is ItemDropEntity;
+                canActivate = shooterController.SelectedGameEntity is ItemDropEntity;
             }
 
             foreach (GameObject obj in activateObjects)

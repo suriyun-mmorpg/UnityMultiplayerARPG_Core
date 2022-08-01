@@ -266,13 +266,6 @@ namespace MultiplayerARPG
             });
         }
 
-        public byte GetActivatablePriority()
-        {
-            if (BaseActivatableEntity != null)
-                return BaseActivatableEntity.GetActivatablePriority();
-            return 255;
-        }
-
         public float GetActivatableDistance()
         {
             if (BaseActivatableEntity != null)
@@ -287,43 +280,43 @@ namespace MultiplayerARPG
             return true;
         }
 
-        public bool CanKeyPressActivate()
+        public bool CanActivateByActivateKey()
         {
             if (ActivatePressActivatableEntity != null)
-                return ActivatePressActivatableEntity.CanKeyPressActivate();
+                return ActivatePressActivatableEntity.CanActivateByActivateKey();
             return false;
         }
 
-        public void OnKeyPressActivate()
+        public void OnActivateByActivateKey()
         {
             if (ActivatePressActivatableEntity != null)
-                ActivatePressActivatableEntity.OnKeyPressActivate();
+                ActivatePressActivatableEntity.OnActivateByActivateKey();
         }
 
-        public bool CanClickActivate()
+        public bool CanActivateByClick()
         {
             if (ClickActivatableEntity != null)
-                return ClickActivatableEntity.CanClickActivate();
+                return ClickActivatableEntity.CanActivateByClick();
             return false;
         }
 
-        public void OnClickActivate()
+        public void OnActivateByClick()
         {
             if (ClickActivatableEntity != null)
-                ClickActivatableEntity.OnClickActivate();
+                ClickActivatableEntity.OnActivateByClick();
         }
 
-        public bool CanHoldClickActivate()
+        public bool CanActivateByHoldClick()
         {
             if (HoldClickActivatableEntity != null)
-                return HoldClickActivatableEntity.CanHoldClickActivate();
+                return HoldClickActivatableEntity.CanActivateByHoldClick();
             return false;
         }
 
-        public void OnHoldClickActivate()
+        public void OnActivateByHoldClick()
         {
             if (HoldClickActivatableEntity != null)
-                HoldClickActivatableEntity.OnHoldClickActivate();
+                HoldClickActivatableEntity.OnActivateByHoldClick();
         }
     }
 }

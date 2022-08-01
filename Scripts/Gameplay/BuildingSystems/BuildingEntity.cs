@@ -529,11 +529,6 @@ namespace MultiplayerARPG
             return CreatorId.Equals(playerCharacterId);
         }
 
-        public virtual byte GetActivatablePriority()
-        {
-            return 2;
-        }
-
         public virtual float GetActivatableDistance()
         {
             return GameInstance.Singleton.conversationDistance;
@@ -544,32 +539,32 @@ namespace MultiplayerARPG
             return false;
         }
 
-        public virtual bool CanKeyPressActivate()
+        public virtual bool CanActivateByActivateKey()
         {
             return !this.IsDead() && Activatable;
         }
 
-        public virtual void OnKeyPressActivate()
+        public virtual void OnActivateByActivateKey()
         {
             // Do nothing, override this function to do something
         }
 
-        public virtual bool CanClickActivate()
+        public virtual bool CanActivateByClick()
         {
             return !this.IsDead() && Activatable;
         }
 
-        public virtual void OnClickActivate()
+        public virtual void OnActivateByClick()
         {
             // Do nothing, override this function to do something
         }
 
-        public virtual bool CanHoldClickActivate()
+        public virtual bool CanActivateByHoldClick()
         {
             return !this.IsDead();
         }
 
-        public virtual void OnHoldClickActivate()
+        public virtual void OnActivateByHoldClick()
         {
             BaseUISceneGameplay.Singleton.ShowCurrentBuildingDialog(this);
         }

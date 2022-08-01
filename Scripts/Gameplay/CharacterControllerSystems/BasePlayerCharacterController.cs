@@ -75,17 +75,19 @@ namespace MultiplayerARPG
 
         public BaseUISceneGameplay CacheUISceneGameplay { get; protected set; }
         public GameInstance CurrentGameInstance { get { return GameInstance.Singleton; } }
-        public BaseGameEntity SelectedEntity { get; protected set; }
-        public uint SelectedEntityObjectId { get { return SelectedEntity != null ? SelectedEntity.ObjectId : 0; } }
-        public BaseGameEntity TargetEntity { get; protected set; }
-        public uint TargetEntityObjectId { get { return TargetEntity != null ? TargetEntity.ObjectId : 0; } }
+        public ITargetableEntity SelectedEntity { get; protected set; }
+        public BaseGameEntity SelectedGameEntity { get { return SelectedEntity as BaseGameEntity; } }
+        public uint SelectedGameEntityObjectId { get { return SelectedGameEntity != null ? SelectedGameEntity.ObjectId : 0; } }
+        public ITargetableEntity TargetEntity { get; protected set; }
+        public BaseGameEntity TargetGameEntity { get { return TargetEntity as BaseGameEntity; } }
+        public uint TargetGameEntityObjectId { get { return TargetGameEntity != null ? TargetGameEntity.ObjectId : 0; } }
         public BuildingEntity ConstructingBuildingEntity { get; protected set; }
         public BuildingEntity TargetBuildingEntity
         {
             get
             {
-                if (TargetEntity is BuildingEntity)
-                    return TargetEntity as BuildingEntity;
+                if (TargetGameEntity is BuildingEntity)
+                    return TargetGameEntity as BuildingEntity;
                 return null;
             }
         }
@@ -255,7 +257,7 @@ namespace MultiplayerARPG
         {
             if (TargetBuildingEntity == null)
                 return;
-            TargetBuildingEntity.OnClickActivate();
+            TargetBuildingEntity.OnActivateByClick();
             DeselectBuilding();
         }
 

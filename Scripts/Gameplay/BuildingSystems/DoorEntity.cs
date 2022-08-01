@@ -71,7 +71,7 @@ namespace MultiplayerARPG
             }
         }
 
-        public override void OnKeyPressActivate()
+        public override void OnActivateByActivateKey()
         {
             if (IsOpen)
             {
@@ -94,9 +94,9 @@ namespace MultiplayerARPG
             }
         }
 
-        public override void OnClickActivate()
+        public override void OnActivateByClick()
         {
-            OnKeyPressActivate();
+            OnActivateByActivateKey();
         }
     }
 }

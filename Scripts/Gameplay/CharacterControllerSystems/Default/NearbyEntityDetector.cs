@@ -23,6 +23,8 @@ namespace MultiplayerARPG
         public bool findVehicle;
         public bool findWarpPortal;
         public bool findItemsContainer;
+        public bool findActivatePressActivatableEntity;
+        public bool findPickupPressActivatableEntity;
         public readonly List<BaseCharacterEntity> characters = new List<BaseCharacterEntity>();
         public readonly List<BasePlayerCharacterEntity> players = new List<BasePlayerCharacterEntity>();
         public readonly List<BaseMonsterCharacterEntity> monsters = new List<BaseMonsterCharacterEntity>();
@@ -32,6 +34,8 @@ namespace MultiplayerARPG
         public readonly List<VehicleEntity> vehicles = new List<VehicleEntity>();
         public readonly List<WarpPortalEntity> warpPortals = new List<WarpPortalEntity>();
         public readonly List<ItemsContainerEntity> itemsContainers = new List<ItemsContainerEntity>();
+        public readonly List<IActivatePressActivatableEntity> activatePressActivatableEntities = new List<IActivatePressActivatableEntity>();
+        public readonly List<IPickupPressActivatableEntity> pickupPressActivatableEntities = new List<IPickupPressActivatableEntity>();
         private readonly HashSet<Collider> excludeColliders = new HashSet<Collider>();
         private readonly HashSet<Collider2D> excludeCollider2Ds = new HashSet<Collider2D>();
         private SphereCollider cacheCollider;
@@ -89,6 +93,8 @@ namespace MultiplayerARPG
             RemoveInactiveAndSortNearestEntity(vehicles);
             RemoveInactiveAndSortNearestEntity(warpPortals);
             RemoveInactiveAndSortNearestEntity(itemsContainers);
+            RemoveInactiveAndSortNearestActivatableEntity(activatePressActivatableEntities);
+            RemoveInactiveAndSortNearestActivatableEntity(pickupPressActivatableEntities);
         }
 
         public void ClearExcludeColliders()
@@ -153,7 +159,9 @@ namespace MultiplayerARPG
             VehicleEntity vehicle;
             WarpPortalEntity warpPortal;
             ItemsContainerEntity itemsContainer;
-            FindEntity(other, out player, out monster, out npc, out itemDrop, out building, out vehicle, out warpPortal, out itemsContainer);
+            IActivatePressActivatableEntity activatePressActivatableEntity;
+            IPickupPressActivatableEntity pickupPressActivatableEntity;
+            FindEntity(other, out player, out monster, out npc, out itemDrop, out building, out vehicle, out warpPortal, out itemsContainer, out activatePressActivatableEntity, out pickupPressActivatableEntity);
 
             if (player != null)
             {
@@ -207,6 +215,18 @@ namespace MultiplayerARPG
                     itemsContainers.Add(itemsContainer);
                 return true;
             }
+            if (activatePressActivatableEntity != null)
+            {
+                if (!activatePressActivatableEntities.Contains(activatePressActivatableEntity))
+                    activatePressActivatableEntities.Add(activatePressActivatableEntity);
+                return true;
+            }
+            if (pickupPressActivatableEntity != null)
+            {
+                if (!pickupPressActivatableEntities.Contains(pickupPressActivatableEntity))
+                    pickupPressActivatableEntities.Add(pickupPressActivatableEntity);
+                return true;
+            }
             return false;
         }
 
@@ -220,7 +240,9 @@ namespace MultiplayerARPG
             VehicleEntity vehicle;
             WarpPortalEntity warpPortal;
             ItemsContainerEntity itemsContainer;
-            FindEntity(other, out player, out monster, out npc, out itemDrop, out building, out vehicle, out warpPortal, out itemsContainer, false);
+            IActivatePressActivatableEntity activatePressActivatableEntity;
+            IPickupPressActivatableEntity pickupPressActivatableEntity;
+            FindEntity(other, out player, out monster, out npc, out itemDrop, out building, out vehicle, out warpPortal, out itemsContainer, out activatePressActivatableEntity, out pickupPressActivatableEntity, false);
 
             if (player != null)
                 return characters.Remove(player) && players.Remove(player);
@@ -238,6 +260,10 @@ namespace MultiplayerARPG
                 return warpPortals.Remove(warpPortal);
             if (itemsContainer != null)
                 return itemsContainers.Remove(itemsContainer);
+            if (activatePressActivatableEntity != null)
+                return activatePressActivatableEntities.Remove(activatePressActivatableEntity);
+            if (pickupPressActivatableEntity != null)
+                return pickupPressActivatableEntities.Remove(pickupPressActivatableEntity);
             return false;
         }
 
@@ -250,6 +276,8 @@ namespace MultiplayerARPG
             out VehicleEntity vehicle,
             out WarpPortalEntity warpPortal,
             out ItemsContainerEntity itemsContainer,
+            out IActivatePressActivatableEntity activatePressActivatableEntity,
+            out IPickupPressActivatableEntity pickupPressActivatableEntity,
             bool findWithAdvanceOptions = true)
         {
             player = null;
@@ -260,63 +288,71 @@ namespace MultiplayerARPG
             vehicle = null;
             warpPortal = null;
             itemsContainer = null;
+            activatePressActivatableEntity = null;
+            pickupPressActivatableEntity = null;
 
             IGameEntity gameEntity = other.GetComponent<IGameEntity>();
-            if (gameEntity == null)
-                return;
-
-            if (findPlayer)
+            if (gameEntity != null)
             {
-                player = gameEntity.Entity as BasePlayerCharacterEntity;
-                if (player == GameInstance.PlayingCharacterEntity)
-                    player = null;
-                if (findWithAdvanceOptions)
+                if (findPlayer)
                 {
-                    if (findOnlyAlivePlayers && player != null && player.IsDead())
+                    player = gameEntity.Entity as BasePlayerCharacterEntity;
+                    if (player == GameInstance.PlayingCharacterEntity)
                         player = null;
-                    if (findPlayerToAttack && player != null && !player.CanReceiveDamageFrom(GameInstance.PlayingCharacterEntity.GetInfo()))
-                        player = null;
+                    if (findWithAdvanceOptions)
+                    {
+                        if (findOnlyAlivePlayers && player != null && player.IsDead())
+                            player = null;
+                        if (findPlayerToAttack && player != null && !player.CanReceiveDamageFrom(GameInstance.PlayingCharacterEntity.GetInfo()))
+                            player = null;
+                    }
                 }
-            }
 
-            if (findMonster)
-            {
-                monster = gameEntity.Entity as BaseMonsterCharacterEntity;
-                if (findWithAdvanceOptions)
+                if (findMonster)
                 {
-                    if (findOnlyAliveMonsters && monster != null && monster.IsDead())
-                        monster = null;
-                    if (findMonsterToAttack && monster != null && !monster.CanReceiveDamageFrom(GameInstance.PlayingCharacterEntity.GetInfo()))
-                        monster = null;
+                    monster = gameEntity.Entity as BaseMonsterCharacterEntity;
+                    if (findWithAdvanceOptions)
+                    {
+                        if (findOnlyAliveMonsters && monster != null && monster.IsDead())
+                            monster = null;
+                        if (findMonsterToAttack && monster != null && !monster.CanReceiveDamageFrom(GameInstance.PlayingCharacterEntity.GetInfo()))
+                            monster = null;
+                    }
                 }
-            }
 
-            if (findNpc)
-                npc = gameEntity.Entity as NpcEntity;
+                if (findNpc)
+                    npc = gameEntity.Entity as NpcEntity;
 
-            if (findItemDrop)
-                itemDrop = gameEntity.Entity as ItemDropEntity;
+                if (findItemDrop)
+                    itemDrop = gameEntity.Entity as ItemDropEntity;
 
-            if (findBuilding)
-            {
-                building = gameEntity.Entity as BuildingEntity;
-                if (findWithAdvanceOptions)
+                if (findBuilding)
                 {
-                    if (findOnlyAliveBuildings && building != null && building.IsDead())
-                        building = null;
-                    if (findOnlyActivatableBuildings && building != null && !building.Activatable)
-                        building = null;
+                    building = gameEntity.Entity as BuildingEntity;
+                    if (findWithAdvanceOptions)
+                    {
+                        if (findOnlyAliveBuildings && building != null && building.IsDead())
+                            building = null;
+                        if (findOnlyActivatableBuildings && building != null && !building.Activatable)
+                            building = null;
+                    }
                 }
+
+                if (findVehicle)
+                    vehicle = gameEntity.Entity as VehicleEntity;
+
+                if (findWarpPortal)
+                    warpPortal = gameEntity.Entity as WarpPortalEntity;
+
+                if (findItemsContainer)
+                    itemsContainer = gameEntity.Entity as ItemsContainerEntity;
             }
-
-            if (findVehicle)
-                vehicle = gameEntity.Entity as VehicleEntity;
-
-            if (findWarpPortal)
-                warpPortal = gameEntity.Entity as WarpPortalEntity;
 
             if (findItemsContainer)
-                itemsContainer = gameEntity.Entity as ItemsContainerEntity;
+                activatePressActivatableEntity = other.GetComponent<IActivatePressActivatableEntity>();
+
+            if (findItemsContainer)
+                pickupPressActivatableEntity = other.GetComponent<IPickupPressActivatableEntity>();
         }
 
         private void RemoveInactiveAndSortNearestEntity<T>(List<T> entities) where T : BaseGameEntity
@@ -337,8 +373,37 @@ namespace MultiplayerARPG
             {
                 for (int j = 0; j < entities.Count - 1; j++)
                 {
-                    if (Vector3.Distance(entities[j].CacheTransform.position, CacheTransform.position) >
-                        Vector3.Distance(entities[j + 1].CacheTransform.position, CacheTransform.position))
+                    if (Vector3.Distance(entities[j].transform.position, CacheTransform.position) >
+                        Vector3.Distance(entities[j + 1].transform.position, CacheTransform.position))
+                    {
+                        temp = entities[j + 1];
+                        entities[j + 1] = entities[j];
+                        entities[j] = temp;
+                    }
+                }
+            }
+        }
+
+        private void RemoveInactiveAndSortNearestActivatableEntity<T>(List<T> entities) where T : IBaseActivatableEntity
+        {
+            T temp;
+            bool hasUpdate = false;
+            for (int i = entities.Count - 1; i >= 0; --i)
+            {
+                if (entities[i] == null || !entities[i].gameObject.activeInHierarchy)
+                {
+                    entities.RemoveAt(i);
+                    hasUpdate = true;
+                }
+            }
+            if (hasUpdate && onUpdateList != null)
+                onUpdateList.Invoke();
+            for (int i = 0; i < entities.Count; i++)
+            {
+                for (int j = 0; j < entities.Count - 1; j++)
+                {
+                    if (Vector3.Distance(entities[j].transform.position, CacheTransform.position) >
+                        Vector3.Distance(entities[j + 1].transform.position, CacheTransform.position))
                     {
                         temp = entities[j + 1];
                         entities[j + 1] = entities[j];

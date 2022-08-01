@@ -30,6 +30,7 @@ namespace MultiplayerARPG
                 // Activate nearby npcs / players / activable buildings
                 if (InputManager.GetButtonDown("Activate"))
                 {
+                    /*
                     targetPlayer = null;
                     if (ActivatableEntityDetector.players.Count > 0)
                         targetPlayer = ActivatableEntityDetector.players[0];
@@ -82,15 +83,30 @@ namespace MultiplayerARPG
                         // Show items
                         ShowItemsContainerDialog(targetItemsContainer);
                     }
+                    */
+                    if (ActivatableEntityDetector.activatePressActivatableEntities.Count > 0)
+                    {
+                        IActivatePressActivatableEntity activatable = ActivatableEntityDetector.activatePressActivatableEntities[0];
+                        if (activatable.CanActivateByActivateKey())
+                            activatable.OnActivateByActivateKey();
+                    }
                 }
                 // Pick up nearby items
                 if (InputManager.GetButtonDown("PickUpItem"))
                 {
+                    /*
                     targetItemDrop = null;
                     if (ItemDropEntityDetector.itemDrops.Count > 0)
                         targetItemDrop = ItemDropEntityDetector.itemDrops[0];
                     if (targetItemDrop != null)
                         PlayerCharacterEntity.CallServerPickupItem(targetItemDrop.ObjectId);
+                    */
+                    if (ActivatableEntityDetector.pickupPressActivatableEntities.Count > 0)
+                    {
+                        IPickupPressActivatableEntity activatable = ActivatableEntityDetector.pickupPressActivatableEntities[0];
+                        if (activatable.CanActivateByPickupKey())
+                            activatable.OnActivateByPickupKey();
+                    }
                 }
                 // Reload
                 if (InputManager.GetButtonDown("Reload"))
@@ -110,10 +126,10 @@ namespace MultiplayerARPG
                         if (!EnemyEntityDetector.characters[findingEnemyIndex].IsHideOrDead())
                         {
                             SetTarget(EnemyEntityDetector.characters[findingEnemyIndex], TargetActionType.Attack);
-                            if (SelectedEntity != null)
+                            if (SelectedGameEntity != null)
                             {
                                 // Turn character to enemy but does not move or attack yet.
-                                TurnCharacterToEntity(SelectedEntity);
+                                TurnCharacterToEntity(SelectedGameEntity);
                             }
                         }
                     }
@@ -219,7 +235,6 @@ namespace MultiplayerARPG
                 Vector3 tempVector3;
                 bool tempHasMapPosition = false;
                 Vector3 tempMapPosition = Vector3.zero;
-                BuildingMaterial tempBuildingMaterial;
                 // If mouse up while cursor point to target (character, item, npc and so on)
                 bool mouseUpOnTarget = getMouseUp && !isMouseDragOrHoldOrOverUI;
                 int tempCount = FindClickObjects(out tempVector3);
@@ -229,6 +244,7 @@ namespace MultiplayerARPG
                     // When holding on target, or already enter edit building mode
                     if (isMouseHoldAndNotDrag)
                     {
+                        /*
                         targetBuilding = null;
                         tempBuildingMaterial = tempTransform.GetComponent<BuildingMaterial>();
                         if (tempBuildingMaterial != null)
@@ -240,9 +256,19 @@ namespace MultiplayerARPG
                             tempHasMapPosition = false;
                             break;
                         }
+                        */
+                        IHoldClickActivatableEntity activatable = tempTransform.GetComponent<IHoldClickActivatableEntity>();
+                        if (activatable != null && activatable.CanActivateByHoldClick())
+                        {
+                            SetTarget(activatable, TargetActionType.ViewOptions);
+                            isFollowingTarget = true;
+                            tempHasMapPosition = false;
+                            break;
+                        }
                     }
                     else if (mouseUpOnTarget)
                     {
+                        /*
                         targetPlayer = tempTransform.GetComponent<BasePlayerCharacterEntity>();
                         targetMonster = tempTransform.GetComponent<BaseMonsterCharacterEntity>();
                         targetNpc = tempTransform.GetComponent<NpcEntity>();
@@ -324,6 +350,18 @@ namespace MultiplayerARPG
                             tempHasMapPosition = false;
                             break;
                         }
+                        */
+                        IClickActivatableEntity activatable = tempTransform.GetComponent<IClickActivatableEntity>();
+                        if (activatable != null && activatable.CanActivateByClick())
+                        {
+                            if (activatable.ShouldBeAttackTarget())
+                                SetTarget(activatable, TargetActionType.Attack);
+                            else
+                                SetTarget(activatable, TargetActionType.Activate);
+                            isFollowingTarget = true;
+                            tempHasMapPosition = false;
+                            break;
+                        }
                         else if (!physicFunctions.GetRaycastIsTrigger(tempCounter))
                         {
                             // Set clicked map position, it will be used if no activating entity found
@@ -386,7 +424,7 @@ namespace MultiplayerARPG
             }
         }
 
-        protected virtual void SetTarget(BaseGameEntity entity, TargetActionType targetActionType, bool checkControllerMode = true)
+        protected virtual void SetTarget(ITargetableEntity entity, TargetActionType targetActionType, bool checkControllerMode = true)
         {
             targetPosition = null;
             if (checkControllerMode && controllerMode == PlayerCharacterControllerMode.WASD)
@@ -398,12 +436,12 @@ namespace MultiplayerARPG
             }
             if (pointClickSetTargetImmediately ||
                 (entity != null && SelectedEntity == entity) ||
-                (entity != null && entity is ItemDropEntity))
+                (entity != null && entity.ShouldSetAsTargetImmediately()))
             {
                 this.targetActionType = targetActionType;
                 destination = null;
                 TargetEntity = entity;
-                PlayerCharacterEntity.SetTargetEntity(entity);
+                PlayerCharacterEntity.SetTargetEntity(entity as BaseGameEntity);
             }
             SelectedEntity = entity;
         }
@@ -441,7 +479,7 @@ namespace MultiplayerARPG
                 ClearQueueUsingSkill();
                 destination = null;
                 isFollowingTarget = false;
-                if (TargetEntity != null && Vector3.Distance(CacheTransform.position, TargetEntity.CacheTransform.position) >= wasdClearTargetDistance)
+                if (TargetGameEntity != null && Vector3.Distance(CacheTransform.position, TargetGameEntity.CacheTransform.position) >= wasdClearTargetDistance)
                 {
                     // Clear target when character moved far from target
                     ClearTarget();
@@ -504,10 +542,10 @@ namespace MultiplayerARPG
                     false,
                     true,
                     false);
-                if (SelectedEntity != null)
+                if (SelectedGameEntity != null)
                 {
                     // Look at target and attack
-                    TurnCharacterToEntity(SelectedEntity);
+                    TurnCharacterToEntity(SelectedGameEntity);
                 }
                 // Not lock target, so not finding target and attack immediately
                 RequestAttack();
@@ -579,10 +617,10 @@ namespace MultiplayerARPG
                         false,
                         true,
                         false);
-                    if (SelectedEntity != null)
+                    if (SelectedGameEntity != null)
                     {
                         // Look at target and attack
-                        TurnCharacterToEntity(SelectedEntity);
+                        TurnCharacterToEntity(SelectedGameEntity);
                     }
                     // Not lock target, so not finding target and use skill immediately
                     RequestUsePendingSkill();
@@ -594,7 +632,7 @@ namespace MultiplayerARPG
                 // Not attack skill, so use skill immediately
                 if (skill.RequiredTarget)
                 {
-                    if (SelectedEntity == null)
+                    if (SelectedGameEntity == null)
                     {
                         RequestUsePendingSkill();
                         isFollowingTarget = false;
@@ -603,9 +641,9 @@ namespace MultiplayerARPG
                     if (wasdLockAttackTarget)
                     {
                         // Set target, then use skill later when moved nearby target
-                        if (SelectedEntity is BaseCharacterEntity)
+                        if (SelectedGameEntity is BaseCharacterEntity)
                         {
-                            SetTarget(SelectedEntity, TargetActionType.UseSkill, false);
+                            SetTarget(SelectedGameEntity, TargetActionType.UseSkill, false);
                             isFollowingTarget = true;
                         }
                         else
@@ -617,12 +655,12 @@ namespace MultiplayerARPG
                     else
                     {
                         // Try apply skill to selected entity immediately, it will fail if selected entity is far from the character
-                        if (SelectedEntity is BaseCharacterEntity)
+                        if (SelectedGameEntity is BaseCharacterEntity)
                         {
-                            if (SelectedEntity != PlayerCharacterEntity)
+                            if (SelectedGameEntity != PlayerCharacterEntity)
                             {
                                 // Look at target and use skill
-                                TurnCharacterToEntity(SelectedEntity);
+                                TurnCharacterToEntity(SelectedGameEntity);
                             }
                             RequestUsePendingSkill();
                             isFollowingTarget = false;
@@ -657,8 +695,8 @@ namespace MultiplayerARPG
                     ClearTarget();
                     return;
                 }
-                float attackDistance = 0f;
-                float attackFov = 0f;
+                float attackDistance;
+                float attackFov;
                 GetAttackDistanceAndFov(isLeftHandAttacking, out attackDistance, out attackFov);
                 AttackOrMoveToEntity(targetDamageable, attackDistance, CurrentGameInstance.playerLayer.Mask | CurrentGameInstance.monsterLayer.Mask);
             }
@@ -671,11 +709,12 @@ namespace MultiplayerARPG
                     ClearTarget();
                     return;
                 }
-                float castDistance = 0f;
-                float castFov = 0f;
+                float castDistance;
+                float castFov;
                 GetUseSkillDistanceAndFov(isLeftHandAttacking, out castDistance, out castFov);
                 UseSkillOrMoveToEntity(targetDamageable, castDistance);
             }
+            /*
             else if (TryGetDoActionEntity(out targetPlayer))
             {
                 DoActionOrMoveToEntity(targetPlayer, CurrentGameInstance.conversationDistance, () =>
@@ -739,6 +778,7 @@ namespace MultiplayerARPG
                     ClearTarget();
                 });
             }
+            */
         }
 
         protected virtual bool OverlappedEntity<T>(T entity, Vector3 sourcePosition, Vector3 targetPosition, float distance)

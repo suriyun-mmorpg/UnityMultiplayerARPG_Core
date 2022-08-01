@@ -13,7 +13,7 @@ namespace MultiplayerARPG
 
         private void LateUpdate()
         {
-            bool hit = BasePlayerCharacterController.Singleton.SelectedEntity && BasePlayerCharacterController.Singleton.SelectedEntity is IDamageableEntity;
+            bool hit = BasePlayerCharacterController.Singleton.SelectedGameEntity && BasePlayerCharacterController.Singleton.SelectedGameEntity is IDamageableEntity;
             foreach (Image crosshairImage in crosshairImages)
             {
                 crosshairImage.color = hit ? hitColor : notHitColor;

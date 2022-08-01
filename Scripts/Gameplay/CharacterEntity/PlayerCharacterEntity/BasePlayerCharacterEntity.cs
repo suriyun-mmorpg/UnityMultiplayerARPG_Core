@@ -120,11 +120,6 @@ namespace MultiplayerARPG
             return base.CanDoActions() && Dealing.DealingState == DealingState.None;
         }
 
-        public virtual byte GetActivatablePriority()
-        {
-            return 0;
-        }
-
         public virtual float GetActivatableDistance()
         {
             return GameInstance.Singleton.conversationDistance;
@@ -135,12 +130,12 @@ namespace MultiplayerARPG
             return !this.IsHideOrDead() && !IsAlly(GameInstance.PlayingCharacterEntity.GetInfo());
         }
 
-        public virtual bool CanKeyPressActivate()
+        public virtual bool CanActivateByActivateKey()
         {
             return !IsOwnerClient;
         }
 
-        public virtual void OnKeyPressActivate()
+        public virtual void OnActivateByActivateKey()
         {
             BaseUISceneGameplay.Singleton.SetActivePlayerCharacter(this);
         }

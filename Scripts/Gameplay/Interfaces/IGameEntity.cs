@@ -1,8 +1,9 @@
 ﻿using LiteNetLibManager;
+using UnityEngine;
 
 namespace MultiplayerARPG
 {
-    public interface IGameEntity
+    public interface IGameEntity : ITargetableEntity
     {
         BaseGameEntity Entity { get; }
         LiteNetLibIdentity Identity { get; }

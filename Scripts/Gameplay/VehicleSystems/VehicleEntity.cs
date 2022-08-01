@@ -324,11 +324,6 @@ namespace MultiplayerARPG
                 CurrentGameInstance.DimensionType == DimensionType.Dimension3D ? Quaternion.Euler(Vector3.up * Random.Range(0, 360)) : Quaternion.identity);
         }
 
-        public virtual byte GetActivatablePriority()
-        {
-            return 3;
-        }
-
         public virtual float GetActivatableDistance()
         {
             return GameInstance.Singleton.conversationDistance;
@@ -339,24 +334,24 @@ namespace MultiplayerARPG
             return HasDriver && canBeAttacked && !this.IsDead();
         }
 
-        public virtual bool CanKeyPressActivate()
+        public virtual bool CanActivateByActivateKey()
         {
             return !this.IsDead();
         }
 
-        public virtual void OnKeyPressActivate()
+        public virtual void OnActivateByActivateKey()
         {
             GameInstance.PlayingCharacterEntity.CallServerEnterVehicle(ObjectId);
         }
 
-        public virtual bool CanClickActivate()
+        public virtual bool CanActivateByClick()
         {
-            return CanKeyPressActivate();
+            return CanActivateByActivateKey();
         }
 
-        public virtual void OnClickActivate()
+        public virtual void OnActivateByClick()
         {
-            OnKeyPressActivate();
+            OnActivateByActivateKey();
         }
     }
 }

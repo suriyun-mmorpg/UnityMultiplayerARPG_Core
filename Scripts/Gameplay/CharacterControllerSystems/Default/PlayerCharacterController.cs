@@ -66,6 +66,14 @@ namespace MultiplayerARPG
         [SerializeField]
         protected float buildRotateSpeed = 200f;
 
+        [Header("Entity Activating Settings")]
+        [SerializeField]
+        [Tooltip("If this value is `0`, this value will be set as `GameInstance` -> `conversationDistance`")]
+        protected float distanceToActivateByActivateKey = 0f;
+        [SerializeField]
+        [Tooltip("If this value is `0`, this value will be set as `GameInstance` -> `pickUpItemDistance`")]
+        protected float distanceToActivateByPickupKey = 0f;
+
         #region Events
         /// <summary>
         /// RelateId (string), AimPosition (AimPosition)
@@ -111,15 +119,6 @@ namespace MultiplayerARPG
         protected TargetActionType targetActionType;
         protected IPhysicFunctions physicFunctions;
         protected DamageableEntity targetDamageable;
-        protected BasePlayerCharacterEntity targetPlayer;
-        protected BaseMonsterCharacterEntity targetMonster;
-        protected NpcEntity targetNpc;
-        protected ItemDropEntity targetItemDrop;
-        protected BuildingEntity targetBuilding;
-        protected VehicleEntity targetVehicle;
-        protected WarpPortalEntity targetWarpPortal;
-        protected HarvestableEntity targetHarvestable;
-        protected ItemsContainerEntity targetItemsContainer;
         protected Vector3 previousPointClickPosition = Vector3.positiveInfinity;
         protected int findingEnemyIndex;
         protected bool isLeftHandAttacking;
@@ -152,25 +151,23 @@ namespace MultiplayerARPG
                 CacheTargetObject = Instantiate(targetObjectPrefab);
                 CacheTargetObject.SetActive(false);
             }
-            // This entity detector will be find entities to use when pressed activate key
-            GameObject tempGameObject = new GameObject("_ActivatingEntityDetector");
-            ActivatableEntityDetector = tempGameObject.AddComponent<NearbyEntityDetector>();
-            ActivatableEntityDetector.detectingRadius = CurrentGameInstance.conversationDistance;
-            ActivatableEntityDetector.findPlayer = true;
-            ActivatableEntityDetector.findOnlyAlivePlayers = true;
-            ActivatableEntityDetector.findNpc = true;
-            ActivatableEntityDetector.findBuilding = true;
-            ActivatableEntityDetector.findOnlyAliveBuildings = true;
-            ActivatableEntityDetector.findOnlyActivatableBuildings = true;
-            ActivatableEntityDetector.findVehicle = true;
-            ActivatableEntityDetector.findWarpPortal = true;
             // This entity detector will be find item drop entities to use when pressed pickup key
+            if (distanceToActivateByActivateKey <= 0f)
+                distanceToActivateByActivateKey = GameInstance.Singleton.conversationDistance;
+            if (distanceToActivateByPickupKey <= 0f)
+                distanceToActivateByPickupKey = GameInstance.Singleton.pickUpItemDistance;
+            GameObject tempGameObject;
+            // This entity detector will find for an entities to activate when pressed activate key
+            tempGameObject = new GameObject("_ActivatingEntityDetector");
+            ActivatableEntityDetector = tempGameObject.AddComponent<NearbyEntityDetector>();
+            ActivatableEntityDetector.detectingRadius = distanceToActivateByActivateKey;
+            ActivatableEntityDetector.findActivatePressActivatableEntity = true;
+            // This entity detector will find for an item drop entities to activate when pressed pickup key
             tempGameObject = new GameObject("_ItemDropEntityDetector");
             ItemDropEntityDetector = tempGameObject.AddComponent<NearbyEntityDetector>();
-            ItemDropEntityDetector.detectingRadius = CurrentGameInstance.pickUpItemDistance;
-            ItemDropEntityDetector.findItemDrop = true;
-            ItemDropEntityDetector.findItemsContainer = true;
-            // This entity detector will be find item drop entities to use when pressed pickup key
+            ItemDropEntityDetector.detectingRadius = distanceToActivateByPickupKey;
+            ItemDropEntityDetector.findPickupPressActivatableEntity = true;
+            // This entity detector will 
             tempGameObject = new GameObject("_EnemyEntityDetector");
             EnemyEntityDetector = tempGameObject.AddComponent<NearbyEntityDetector>();
             EnemyEntityDetector.findPlayer = true;
@@ -207,10 +204,6 @@ namespace MultiplayerARPG
             Destroy(CacheMinimapCameraController.gameObject);
             if (CacheTargetObject != null)
                 Destroy(CacheTargetObject.gameObject);
-            if (ActivatableEntityDetector != null)
-                Destroy(ActivatableEntityDetector.gameObject);
-            if (ItemDropEntityDetector != null)
-                Destroy(ItemDropEntityDetector.gameObject);
             if (EnemyEntityDetector != null)
                 Destroy(EnemyEntityDetector.gameObject);
         }
@@ -237,7 +230,7 @@ namespace MultiplayerARPG
             }
             else
             {
-                CacheUISceneGameplay.SetTargetEntity(SelectedEntity);
+                CacheUISceneGameplay.SetTargetEntity(SelectedGameEntity);
             }
 
             if (destination.HasValue)
@@ -272,9 +265,9 @@ namespace MultiplayerARPG
         public bool TryGetSelectedTargetAsAttackingEntity(out BaseCharacterEntity character)
         {
             character = null;
-            if (SelectedEntity != null)
+            if (SelectedGameEntity != null)
             {
-                character = SelectedEntity as BaseCharacterEntity;
+                character = SelectedGameEntity as BaseCharacterEntity;
                 if (character == null ||
                     character == PlayerCharacterEntity ||
                     !character.CanReceiveDamageFrom(PlayerCharacterEntity.GetInfo()))
@@ -319,9 +312,9 @@ namespace MultiplayerARPG
             entity = null;
             if (targetActionType != actionType)
                 return false;
-            if (TargetEntity == null)
+            if (TargetGameEntity == null)
                 return false;
-            entity = TargetEntity as T;
+            entity = TargetGameEntity as T;
             if (entity == null)
                 return false;
             return true;
@@ -394,14 +387,14 @@ namespace MultiplayerARPG
             {
                 if (queueUsingSkill.itemIndex >= 0)
                 {
-                    if (PlayerCharacterEntity.UseSkillItem(queueUsingSkill.itemIndex, isLeftHandAttacking, SelectedEntityObjectId, queueUsingSkill.aimPosition))
+                    if (PlayerCharacterEntity.UseSkillItem(queueUsingSkill.itemIndex, isLeftHandAttacking, SelectedGameEntityObjectId, queueUsingSkill.aimPosition))
                     {
                         isLeftHandAttacking = !isLeftHandAttacking;
                     }
                 }
                 else
                 {
-                    if (PlayerCharacterEntity.UseSkill(queueUsingSkill.skill.DataId, isLeftHandAttacking, SelectedEntityObjectId, queueUsingSkill.aimPosition))
+                    if (PlayerCharacterEntity.UseSkill(queueUsingSkill.skill.DataId, isLeftHandAttacking, SelectedGameEntityObjectId, queueUsingSkill.aimPosition))
                     {
                         isLeftHandAttacking = !isLeftHandAttacking;
                     }

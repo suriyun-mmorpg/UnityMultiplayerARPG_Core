@@ -60,14 +60,14 @@ namespace MultiplayerARPG
             }
         }
 
-        public override void OnKeyPressActivate()
+        public override void OnActivateByActivateKey()
         {
             BaseUISceneGameplay.Singleton.ShowWorkbenchDialog(this);
         }
 
-        public override void OnClickActivate()
+        public override void OnActivateByClick()
         {
-            OnKeyPressActivate();
+            OnActivateByActivateKey();
         }
     }
 }

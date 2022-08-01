@@ -88,7 +88,7 @@ namespace MultiplayerARPG
             }
         }
 
-        public override void OnKeyPressActivate()
+        public override void OnActivateByActivateKey()
         {
             if (!Lockable || !IsLocked)
             {
@@ -106,9 +106,9 @@ namespace MultiplayerARPG
             }
         }
 
-        public override void OnClickActivate()
+        public override void OnActivateByClick()
         {
-            OnKeyPressActivate();
+            OnActivateByActivateKey();
         }
     }
 }
