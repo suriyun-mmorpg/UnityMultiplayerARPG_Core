@@ -334,6 +334,11 @@ namespace MultiplayerARPG
             return HasDriver && canBeAttacked && !this.IsDead();
         }
 
+        public virtual bool ShouldClearTargetAfterActivated()
+        {
+            return true;
+        }
+
         public virtual bool CanActivateByActivateKey()
         {
             return !this.IsDead();

@@ -390,7 +390,7 @@ namespace MultiplayerARPG
             bool hasUpdate = false;
             for (int i = entities.Count - 1; i >= 0; --i)
             {
-                if (entities[i] == null || !entities[i].gameObject.activeInHierarchy)
+                if (entities[i] == null || !entities[i].EntityGameObject.activeInHierarchy)
                 {
                     entities.RemoveAt(i);
                     hasUpdate = true;
@@ -402,8 +402,8 @@ namespace MultiplayerARPG
             {
                 for (int j = 0; j < entities.Count - 1; j++)
                 {
-                    if (Vector3.Distance(entities[j].transform.position, CacheTransform.position) >
-                        Vector3.Distance(entities[j + 1].transform.position, CacheTransform.position))
+                    if (Vector3.Distance(entities[j].EntityTransform.position, CacheTransform.position) >
+                        Vector3.Distance(entities[j + 1].EntityTransform.position, CacheTransform.position))
                     {
                         temp = entities[j + 1];
                         entities[j + 1] = entities[j];

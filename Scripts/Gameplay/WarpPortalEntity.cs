@@ -158,6 +158,11 @@ namespace MultiplayerARPG
             return false;
         }
 
+        public virtual bool ShouldClearTargetAfterActivated()
+        {
+            return true;
+        }
+
         public virtual bool CanActivateByActivateKey()
         {
             return true;

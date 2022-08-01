@@ -130,6 +130,11 @@ namespace MultiplayerARPG
             return !this.IsHideOrDead() && !IsAlly(GameInstance.PlayingCharacterEntity.GetInfo());
         }
 
+        public virtual bool ShouldClearTargetAfterActivated()
+        {
+            return false;
+        }
+
         public virtual bool CanActivateByActivateKey()
         {
             return !IsOwnerClient;

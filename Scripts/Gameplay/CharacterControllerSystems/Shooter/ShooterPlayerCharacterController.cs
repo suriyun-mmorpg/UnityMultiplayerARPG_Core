@@ -607,7 +607,7 @@ namespace MultiplayerARPG
                 CacheGameplayCameraController.UpdateZoom = !IsBlockController;
             }
             // Clear selected entity
-            SelectedGameEntity = null;
+            SelectedEntity = null;
 
             // Update crosshair (with states from last update)
             UpdateCrosshair();
@@ -866,7 +866,7 @@ namespace MultiplayerARPG
 
                 // Entity is in front of character, so this is target
                 aimTargetPosition = tempHitInfo.point;
-                SelectedGameEntity = tempGameEntity.Entity;
+                SelectedEntity = tempGameEntity.Entity;
                 break;
             }
 
@@ -904,7 +904,7 @@ namespace MultiplayerARPG
                         // Entity is in front of character, so this is target
                         if (!turnForwardWhileDoingAction || IsInFront(tempHitInfo.point))
                             aimTargetPosition = tempHitInfo.point;
-                        SelectedGameEntity = tempGameEntity.Entity;
+                        SelectedEntity = tempGameEntity.Entity;
                         break;
                     }
                     // Find activatable entity (NPC/Building/Mount/Etc)
@@ -913,7 +913,7 @@ namespace MultiplayerARPG
                         // Entity is in front of character, so this is target
                         if (!turnForwardWhileDoingAction || IsInFront(tempHitInfo.point))
                             aimTargetPosition = tempHitInfo.point;
-                        SelectedGameEntity = tempGameEntity.Entity;
+                        SelectedEntity = tempGameEntity.Entity;
                         break;
                     }
                 }
@@ -1626,7 +1626,7 @@ namespace MultiplayerARPG
         {
             if (targetBuilding != null)
             {
-                TargetGameEntity = targetBuilding;
+                TargetEntity = targetBuilding;
                 ShowCurrentBuildingDialog();
             }
         }

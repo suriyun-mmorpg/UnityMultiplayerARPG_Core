@@ -307,14 +307,14 @@ namespace MultiplayerARPG
         }
 
         public bool TryGetDoActionEntity<T>(out T entity, TargetActionType actionType = TargetActionType.Activate)
-            where T : BaseGameEntity
+            where T : ITargetableEntity
         {
-            entity = null;
+            entity = default;
             if (targetActionType != actionType)
                 return false;
-            if (TargetGameEntity == null)
+            if (TargetEntity == null)
                 return false;
-            entity = TargetGameEntity as T;
+            entity = (T)TargetEntity;
             if (entity == null)
                 return false;
             return true;

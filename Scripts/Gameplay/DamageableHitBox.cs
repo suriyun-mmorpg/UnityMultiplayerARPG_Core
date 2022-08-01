@@ -29,6 +29,14 @@ namespace MultiplayerARPG
         {
             get { return DamageableEntity.Entity; }
         }
+        public Transform EntityTransform
+        {
+            get { return DamageableEntity.EntityTransform; }
+        }
+        public GameObject EntityGameObject
+        {
+            get { return DamageableEntity.EntityGameObject; }
+        }
         public IBaseActivatableEntity BaseActivatableEntity
         {
             get
@@ -266,6 +274,13 @@ namespace MultiplayerARPG
             });
         }
 
+        public bool ShouldSetAsTargetInOneClick()
+        {
+            if (BaseActivatableEntity != null)
+                return BaseActivatableEntity.ShouldSetAsTargetInOneClick();
+            return false;
+        }
+
         public float GetActivatableDistance()
         {
             if (BaseActivatableEntity != null)
@@ -278,6 +293,13 @@ namespace MultiplayerARPG
             if (BaseActivatableEntity != null)
                 return BaseActivatableEntity.ShouldBeAttackTarget();
             return true;
+        }
+
+        public virtual bool ShouldClearTargetAfterActivated()
+        {
+            if (BaseActivatableEntity != null)
+                return BaseActivatableEntity.ShouldClearTargetAfterActivated();
+            return false;
         }
 
         public bool CanActivateByActivateKey()

@@ -338,6 +338,11 @@ namespace MultiplayerARPG
             return itemDropEntity;
         }
 
+        public override bool ShouldSetAsTargetInOneClick()
+        {
+            return true;
+        }
+
         public virtual float GetActivatableDistance()
         {
             return GameInstance.Singleton.pickUpItemDistance;
@@ -346,6 +351,11 @@ namespace MultiplayerARPG
         public virtual bool ShouldBeAttackTarget()
         {
             return false;
+        }
+
+        public virtual bool ShouldClearTargetAfterActivated()
+        {
+            return true;
         }
 
         public virtual bool CanActivateByPickupKey()

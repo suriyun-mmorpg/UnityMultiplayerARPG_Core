@@ -436,7 +436,7 @@ namespace MultiplayerARPG
             }
             if (pointClickSetTargetImmediately ||
                 (entity != null && SelectedEntity == entity) ||
-                (entity != null && entity.ShouldSetAsTargetImmediately()))
+                (entity != null && entity.ShouldSetAsTargetInOneClick()))
             {
                 this.targetActionType = targetActionType;
                 destination = null;
@@ -686,6 +686,8 @@ namespace MultiplayerARPG
             if (!isFollowingTarget)
                 return;
 
+            IClickActivatableEntity clickActivatableEntity;
+            IHoldClickActivatableEntity holdClickActivatableEntity;
             if (TryGetAttackingEntity(out targetDamageable))
             {
                 if (targetDamageable.IsHideOrDead())
@@ -713,6 +715,32 @@ namespace MultiplayerARPG
                 float castFov;
                 GetUseSkillDistanceAndFov(isLeftHandAttacking, out castDistance, out castFov);
                 UseSkillOrMoveToEntity(targetDamageable, castDistance);
+            }
+            else if (TryGetDoActionEntity(out clickActivatableEntity, TargetActionType.Activate))
+            {
+                DoActionOrMoveToEntity(clickActivatableEntity, clickActivatableEntity.GetActivatableDistance(), () =>
+                {
+                    if (!didActionOnTarget)
+                    {
+                        didActionOnTarget = true;
+                        clickActivatableEntity.OnActivateByClick();
+                        if (clickActivatableEntity.ShouldClearTargetAfterActivated())
+                            ClearTarget();
+                    }
+                });
+            }
+            else if (TryGetDoActionEntity(out holdClickActivatableEntity, TargetActionType.ViewOptions))
+            {
+                DoActionOrMoveToEntity(holdClickActivatableEntity, holdClickActivatableEntity.GetActivatableDistance(), () =>
+                {
+                    if (!didActionOnTarget)
+                    {
+                        didActionOnTarget = true;
+                        holdClickActivatableEntity.OnActivateByHoldClick();
+                        if (holdClickActivatableEntity.ShouldClearTargetAfterActivated())
+                            ClearTarget();
+                    }
+                });
             }
             /*
             else if (TryGetDoActionEntity(out targetPlayer))
@@ -781,8 +809,7 @@ namespace MultiplayerARPG
             */
         }
 
-        protected virtual bool OverlappedEntity<T>(T entity, Vector3 sourcePosition, Vector3 targetPosition, float distance)
-            where T : BaseGameEntity
+        protected virtual bool OverlappedEntity(ITargetableEntity entity, Vector3 sourcePosition, Vector3 targetPosition, float distance)
         {
             if (Vector3.Distance(sourcePosition, targetPosition) <= distance)
                 return true;
@@ -803,10 +830,10 @@ namespace MultiplayerARPG
             return physicFunctions.IsGameEntityHitBoxInDistance(entity, sourcePosition, distance, false);
         }
 
-        protected virtual void DoActionOrMoveToEntity(BaseGameEntity entity, float distance, System.Action action)
+        protected virtual void DoActionOrMoveToEntity(ITargetableEntity entity, float distance, System.Action action)
         {
             Vector3 sourcePosition = CacheTransform.position;
-            Vector3 targetPosition = entity.CacheTransform.position;
+            Vector3 targetPosition = entity.EntityTransform.position;
             if (OverlappedEntity(entity, sourcePosition, targetPosition, distance))
             {
                 // Stop movement to do action

@@ -278,6 +278,16 @@ namespace MultiplayerARPG
             get { return this; }
         }
 
+        public Transform EntityTransform
+        {
+            get { return CacheTransform; }
+        }
+
+        public GameObject EntityGameObject
+        {
+            get { return gameObject; }
+        }
+
         protected IGameEntityComponent[] EntityComponents { get; private set; }
         protected virtual bool UpdateEntityComponents { get { return true; } }
         protected NetDataWriter EntityStateMessageWriter { get; private set; } = new NetDataWriter();
@@ -895,6 +905,11 @@ namespace MultiplayerARPG
 
             // Teleport to exit transform
             Teleport(exitPosition, exitRotation);
+        }
+
+        public virtual bool ShouldSetAsTargetInOneClick()
+        {
+            return false;
         }
     }
 }
