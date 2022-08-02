@@ -371,12 +371,8 @@ namespace MultiplayerARPG
         protected RaycastHit[] raycasts = new RaycastHit[100];
         protected Collider[] overlapColliders = new Collider[200];
         // Temp target
-        protected BasePlayerCharacterEntity targetPlayer;
-        protected NpcEntity targetNpc;
-        protected BuildingEntity targetBuilding;
-        protected VehicleEntity targetVehicle;
-        protected WarpPortalEntity targetWarpPortal;
-        protected ItemsContainerEntity targetItemsContainer;
+        protected IActivatableEntity clickActivatableEntity;
+        protected IHoldActivatableEntity holdClickActivatableEntity;
         // Temp data
         protected IGameEntity tempGameEntity;
         protected Ray centerRay;
@@ -1045,58 +1041,32 @@ namespace MultiplayerARPG
                 PlayingCharacterEntity.IsPlayingAttackOrUseSkillAnimation())
             {
                 anyKeyPressed = true;
-                // Find forward character / npc / building / warp entity from camera center
-                // Check is character playing action animation to turn character forwarding to aim position
-                targetPlayer = null;
-                targetNpc = null;
-                targetBuilding = null;
-                targetVehicle = null;
-                targetWarpPortal = null;
-                targetItemsContainer = null;
+                // Find activatable entities in front of playing character from camera center
+                // Check the playing character is playing action animation to turn character forwarding to aim position
                 if (!tempPressAttackRight && !tempPressAttackLeft)
                 {
                     if (activateInput.IsHold)
                     {
-                        if (SelectedGameEntity is BuildingEntity)
+                        if (SelectedEntity is IHoldActivatableEntity)
                         {
-                            targetBuilding = SelectedGameEntity as BuildingEntity;
+                            holdClickActivatableEntity = SelectedEntity as IHoldActivatableEntity;
                         }
                     }
                     else if (activateInput.IsRelease)
                     {
-                        if (SelectedGameEntity == null)
+                        if (SelectedEntity == null)
                         {
                             if (warpPortalEntityDetector?.warpPortals.Count > 0)
                             {
                                 // It may not able to raycast from inside warp portal, so try to get it from the detector
-                                targetWarpPortal = warpPortalEntityDetector.warpPortals[0];
+                                clickActivatableEntity = warpPortalEntityDetector.warpPortals[0];
                             }
                         }
                         else
                         {
-                            if (SelectedGameEntity is BasePlayerCharacterEntity)
+                            if (SelectedEntity is IActivatableEntity)
                             {
-                                targetPlayer = SelectedGameEntity as BasePlayerCharacterEntity;
-                            }
-                            if (SelectedGameEntity is NpcEntity)
-                            {
-                                targetNpc = SelectedGameEntity as NpcEntity;
-                            }
-                            if (SelectedGameEntity is BuildingEntity)
-                            {
-                                targetBuilding = SelectedGameEntity as BuildingEntity;
-                            }
-                            if (SelectedGameEntity is VehicleEntity)
-                            {
-                                targetVehicle = SelectedGameEntity as VehicleEntity;
-                            }
-                            if (SelectedGameEntity is WarpPortalEntity)
-                            {
-                                targetWarpPortal = SelectedGameEntity as WarpPortalEntity;
-                            }
-                            if (SelectedGameEntity is ItemsContainerEntity)
-                            {
-                                targetItemsContainer = SelectedGameEntity as ItemsContainerEntity;
+                                clickActivatableEntity = SelectedEntity as IActivatableEntity;
                             }
                         }
                     }
@@ -1624,28 +1594,14 @@ namespace MultiplayerARPG
 
         public virtual void HoldActivate()
         {
-            if (targetBuilding != null)
-            {
-                TargetEntity = targetBuilding;
-                ShowCurrentBuildingDialog();
-            }
+            if (holdClickActivatableEntity != null)
+                holdClickActivatableEntity.OnHoldActivate();
         }
 
         public virtual void Activate()
         {
-            // Priority Player -> Npc -> Buildings
-            if (targetPlayer != null)
-                CacheUISceneGameplay.SetActivePlayerCharacter(targetPlayer);
-            else if (targetNpc != null)
-                PlayingCharacterEntity.NpcAction.CallServerNpcActivate(targetNpc.ObjectId);
-            else if (targetBuilding != null)
-                ActivateBuilding();
-            else if (targetVehicle != null)
-                PlayingCharacterEntity.CallServerEnterVehicle(targetVehicle.ObjectId);
-            else if (targetWarpPortal != null)
-                PlayingCharacterEntity.CallServerEnterWarp(targetWarpPortal.ObjectId);
-            else if (targetItemsContainer != null)
-                ShowItemsContainerDialog(targetItemsContainer);
+            if (clickActivatableEntity != null)
+                clickActivatableEntity.OnActivate();
         }
 
         public virtual void UseSkill(bool isLeftHand)

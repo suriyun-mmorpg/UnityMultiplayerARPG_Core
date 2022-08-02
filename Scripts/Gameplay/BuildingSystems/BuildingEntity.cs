@@ -11,7 +11,7 @@ using UnityEditor;
 
 namespace MultiplayerARPG
 {
-    public class BuildingEntity : DamageableEntity, IBuildingSaveData, IActivatePressActivatableEntity, IClickActivatableEntity, IHoldClickActivatableEntity
+    public class BuildingEntity : DamageableEntity, IBuildingSaveData, IActivatableEntity, IHoldActivatableEntity
     {
         public const float BUILD_DISTANCE_BUFFER = 0.1f;
 
@@ -544,32 +544,22 @@ namespace MultiplayerARPG
             return false;
         }
 
-        public virtual bool CanActivateByActivateKey()
+        public virtual bool CanActivate()
         {
             return !this.IsDead() && Activatable;
         }
 
-        public virtual void OnActivateByActivateKey()
+        public virtual void OnActivate()
         {
             // Do nothing, override this function to do something
         }
 
-        public virtual bool CanActivateByClick()
-        {
-            return !this.IsDead() && Activatable;
-        }
-
-        public virtual void OnActivateByClick()
-        {
-            // Do nothing, override this function to do something
-        }
-
-        public virtual bool CanActivateByHoldClick()
+        public virtual bool CanHoldActivate()
         {
             return !this.IsDead();
         }
 
-        public virtual void OnActivateByHoldClick()
+        public virtual void OnHoldActivate()
         {
             BaseUISceneGameplay.Singleton.ShowCurrentBuildingDialog(this);
         }
