@@ -127,7 +127,7 @@ namespace MultiplayerARPG
 
         public virtual bool ShouldBeAttackTarget()
         {
-            return !this.IsHideOrDead() && CanReceiveDamageFrom(GameInstance.PlayingCharacterEntity.GetInfo());
+            return !IsOwnerClient && !this.IsHideOrDead() && CanReceiveDamageFrom(GameInstance.PlayingCharacterEntity.GetInfo());
         }
 
         public virtual bool ShouldClearTargetAfterActivated()
