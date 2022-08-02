@@ -439,7 +439,7 @@ namespace MultiplayerARPG
             {
                 velocityBeforeAirborne = Vector3.zero;
             }
-            if (pauseMovementCountDown <= 0f && moveDirection.sqrMagnitude > 0f && (!isAirborne || !doNotChangeVelocityWhileAirborne))
+            if (pauseMovementCountDown <= 0f && moveDirection.sqrMagnitude > 0f && (!isAirborne || !doNotChangeVelocityWhileAirborne || !IsOwnerClientOrOwnedByServer))
             {
                 // Calculate only horizontal move direction
                 tempHorizontalMoveDirection = moveDirection;
@@ -479,31 +479,34 @@ namespace MultiplayerARPG
                     currentInput = this.SetInputIsKeyMovement(currentInput, true);
                 }
             }
-            if (isGrounded && previouslyAirborne)
+            if (IsOwnerClientOrOwnedByServer)
             {
-                pauseMovementCountDown = landedPauseMovementDuration;
-            }
-            else if (isGrounded && previouslyExtraMovementState != ExtraMovementState.IsCrawling && tempExtraMovementState == ExtraMovementState.IsCrawling)
-            {
-                pauseMovementCountDown = beforeCrawlingPauseMovementDuration;
-            }
-            else if (isGrounded && previouslyExtraMovementState == ExtraMovementState.IsCrawling && tempExtraMovementState != ExtraMovementState.IsCrawling)
-            {
-                pauseMovementCountDown = afterCrawlingPauseMovementDuration;
-            }
-            else if (isAirborne && doNotChangeVelocityWhileAirborne)
-            {
-                tempMoveVelocity = velocityBeforeAirborne;
-            }
-            else
-            {
+                if (isGrounded && previouslyAirborne)
+                {
+                    pauseMovementCountDown = landedPauseMovementDuration;
+                }
+                else if (isGrounded && previouslyExtraMovementState != ExtraMovementState.IsCrawling && tempExtraMovementState == ExtraMovementState.IsCrawling)
+                {
+                    pauseMovementCountDown = beforeCrawlingPauseMovementDuration;
+                }
+                else if (isGrounded && previouslyExtraMovementState == ExtraMovementState.IsCrawling && tempExtraMovementState != ExtraMovementState.IsCrawling)
+                {
+                    pauseMovementCountDown = afterCrawlingPauseMovementDuration;
+                }
+                else if (isAirborne && doNotChangeVelocityWhileAirborne)
+                {
+                    tempMoveVelocity = velocityBeforeAirborne;
+                }
+                else
+                {
+                    if (pauseMovementCountDown > 0f)
+                        pauseMovementCountDown -= deltaTime;
+                }
                 if (pauseMovementCountDown > 0f)
-                    pauseMovementCountDown -= deltaTime;
-            }
-            if (pauseMovementCountDown > 0f)
-            {
-                // Remove movement from movestate while pausing movement
-                tempMovementState ^= MovementState.Forward | MovementState.Backward | MovementState.Right | MovementState.Right;
+                {
+                    // Remove movement from movestate while pausing movement
+                    tempMovementState ^= MovementState.Forward | MovementState.Backward | MovementState.Right | MovementState.Right;
+                }
             }
             // Updating vertical movement (Fall, WASD inputs under water)
             if (isUnderWater)
