@@ -323,12 +323,12 @@ namespace MultiplayerARPG.GameData.Model.Playables
             Graph.Connect(LayerMixer, 0, Self, 0);
 
             // Create and connect base layer mixer to layer mixer
-            BaseLayerMixer = AnimationMixerPlayable.Create(Graph, 0, true);
+            BaseLayerMixer = AnimationMixerPlayable.Create(Graph, 0);
             Graph.Connect(BaseLayerMixer, 0, LayerMixer, BASE_LAYER);
             LayerMixer.SetInputWeight(BASE_LAYER, 1);
 
             // Create and connect left-hand wielding layer mixer to layer mixer
-            LeftHandWieldingLayerMixer = AnimationMixerPlayable.Create(Graph, 0, true);
+            LeftHandWieldingLayerMixer = AnimationMixerPlayable.Create(Graph, 0);
             Graph.Connect(LeftHandWieldingLayerMixer, 0, LayerMixer, LEFT_HAND_WIELDING_LAYER);
             LayerMixer.SetInputWeight(LEFT_HAND_WIELDING_LAYER, 0);
 
@@ -852,7 +852,7 @@ namespace MultiplayerARPG.GameData.Model.Playables
             if (ActionLayerMixer.IsValid())
                 ActionLayerMixer.Destroy();
 
-            ActionLayerMixer = AnimationMixerPlayable.Create(Graph, 1, true);
+            ActionLayerMixer = AnimationMixerPlayable.Create(Graph, 1);
             Graph.Connect(ActionLayerMixer, 0, LayerMixer, ACTION_LAYER);
             LayerMixer.SetInputWeight(ACTION_LAYER, 0f);
 
