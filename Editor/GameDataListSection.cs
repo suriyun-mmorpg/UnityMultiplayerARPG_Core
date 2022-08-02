@@ -40,12 +40,12 @@ namespace MultiplayerARPG
             T[] arr = (T[])EditorGlobalData.WorkingDatabase.GetType().GetField(fieldName, BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic).GetValue(EditorGlobalData.WorkingDatabase);
             // Prepare GUI styles
             GUIStyle leftMenuButton = new GUIStyle(EditorStyles.label);
-            leftMenuButton.fontSize = 10;
-            leftMenuButton.alignment = TextAnchor.MiddleCenter;
+            leftMenuButton.fontSize = 12;
+            leftMenuButton.alignment = TextAnchor.MiddleLeft;
 
             GUIStyle selectedLeftMenuButton = new GUIStyle(EditorStyles.label);
-            selectedLeftMenuButton.fontSize = 10;
-            selectedLeftMenuButton.alignment = TextAnchor.MiddleCenter;
+            selectedLeftMenuButton.fontSize = 12;
+            selectedLeftMenuButton.alignment = TextAnchor.MiddleLeft;
             var background = new Texture2D(1, 1, TextureFormat.RGBA32, false);
             background.SetPixel(0, 0, EditorGUIUtility.isProSkin ? new Color(0.243f, 0.373f, 0.588f) : new Color(0.247f, 0.494f, 0.871f));
             background.Apply();
@@ -76,6 +76,8 @@ namespace MultiplayerARPG
             }
             GUILayout.EndArea();
 
+            Color defaultBackgroundColor = GUI.backgroundColor;
+
             // Buttons
             GUILayout.BeginArea(new Rect(200, 0, width - 200, 30), string.Empty);
             {
@@ -85,30 +87,43 @@ namespace MultiplayerARPG
                     selectedUnlistedObject = EditorGUILayout.ObjectField("Adding Unlisted Data", selectedUnlistedObject, typeof(T), true) as T;
                     if (selectedUnlistedObject != null)
                     {
+                        // Add button
+                        GUI.backgroundColor = Color.green;
                         if (GUILayout.Button("Add", GUILayout.Width(100)))
                         {
                             Add(arr);
                             return;
                         }
+                        GUI.backgroundColor = defaultBackgroundColor;
                     }
+
+                    // Create button
+                    GUI.backgroundColor = Color.green;
                     if (GUILayout.Button("Create", GUILayout.Width(100)))
                     {
                         Create(arr);
                         return;
                     }
+                    GUI.backgroundColor = defaultBackgroundColor;
+
                     if (arr.Length > 0)
                     {
-                        GUILayout.Space(100);
+                        // Duplicate button
+                        GUI.backgroundColor = Color.yellow;
                         if (GUILayout.Button("Duplicate", GUILayout.Width(100)))
                         {
                             Duplicate(arr);
                             return;
                         }
+                        GUI.backgroundColor = defaultBackgroundColor;
+                        // Delete button
+                        GUI.backgroundColor = Color.red;
                         if (GUILayout.Button("Delete", GUILayout.Width(100)))
                         {
                             Delete(arr);
                             return;
                         }
+                        GUI.backgroundColor = defaultBackgroundColor;
                     }
                 }
                 GUILayout.EndHorizontal();
@@ -116,6 +131,7 @@ namespace MultiplayerARPG
             GUILayout.EndArea();
 
             // Selected Content
+            GUI.backgroundColor = Color.grey;//
             GUILayout.BeginArea(new Rect(200, 30, width - 200, height - 30), string.Empty, "window");
             {
                 contentScrollPosition = GUILayout.BeginScrollView(contentScrollPosition);
@@ -133,6 +149,7 @@ namespace MultiplayerARPG
                 GUILayout.EndScrollView();
             }
             GUILayout.EndArea();
+            GUI.backgroundColor = defaultBackgroundColor;
         }
 
         protected virtual void Add(T[] arr)

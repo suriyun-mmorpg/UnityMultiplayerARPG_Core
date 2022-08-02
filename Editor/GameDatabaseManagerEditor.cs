@@ -63,7 +63,7 @@ namespace MultiplayerARPG
                     GUILayout.BeginVertical("box");
                     {
                         if (EditorGlobalData.WorkingDatabase == null)
-                            EditorGUILayout.HelpBox("Select your game database which you want to manage", MessageType.Info);
+                            EditorGUILayout.HelpBox("Select the game database that you want to edit", MessageType.Info);
                         EditorGlobalData.WorkingDatabase = EditorGUILayout.ObjectField("Game database", EditorGlobalData.WorkingDatabase, typeof(GameDatabase), true, GUILayout.ExpandWidth(true)) as GameDatabase;
                     }
                     GUILayout.EndVertical();
@@ -85,19 +85,19 @@ namespace MultiplayerARPG
 
             // Prepare GUI styles
             GUIStyle leftMenuButton = new GUIStyle(EditorStyles.label);
-            leftMenuButton.fontSize = 10;
-            leftMenuButton.alignment = TextAnchor.MiddleRight;
+            leftMenuButton.fontSize = 12;
+            leftMenuButton.alignment = TextAnchor.MiddleLeft;
 
             GUIStyle selectedLeftMenuButton = new GUIStyle(EditorStyles.label);
-            selectedLeftMenuButton.fontSize = 10;
-            selectedLeftMenuButton.alignment = TextAnchor.MiddleRight;
+            selectedLeftMenuButton.fontSize = 12;
+            selectedLeftMenuButton.alignment = TextAnchor.MiddleLeft;
             var background = new Texture2D(1, 1, TextureFormat.RGBA32, false);
             background.SetPixel(0, 0, EditorGUIUtility.isProSkin ? new Color(0.243f, 0.373f, 0.588f) : new Color(0.247f, 0.494f, 0.871f));
             background.Apply();
             selectedLeftMenuButton.active.background = selectedLeftMenuButton.normal.background = background;
 
             // Left menu
-            GUILayout.BeginArea(new Rect(0, 0, 120, position.height), string.Empty, "box");
+            GUILayout.BeginArea(new Rect(0, 0, 145, position.height), string.Empty, "box");
             {
                 menuScrollPosition = GUILayout.BeginScrollView(menuScrollPosition);
                 GUILayout.BeginVertical();
@@ -116,9 +116,9 @@ namespace MultiplayerARPG
             GUILayout.EndArea();
 
             // Content
-            GUILayout.BeginArea(new Rect(120, 0, position.width - 120, position.height), string.Empty);
+            GUILayout.BeginArea(new Rect(145, 0, position.width - 145, position.height), string.Empty);
             {
-                sections[selectedMenuIndex].OnGUI(position.width - 120, position.height);
+                sections[selectedMenuIndex].OnGUI(position.width - 145, position.height);
             }
             GUILayout.EndArea();
         }
