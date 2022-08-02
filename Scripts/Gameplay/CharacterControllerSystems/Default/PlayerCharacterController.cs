@@ -118,7 +118,6 @@ namespace MultiplayerARPG
         protected Vector3? targetPosition;
         protected TargetActionType targetActionType;
         protected IPhysicFunctions physicFunctions;
-        protected DamageableEntity targetDamageable;
         protected Vector3 previousPointClickPosition = Vector3.positiveInfinity;
         protected int findingEnemyIndex;
         protected bool isLeftHandAttacking;
@@ -281,7 +280,7 @@ namespace MultiplayerARPG
         }
 
         public bool TryGetAttackingEntity<T>(out T entity)
-            where T : DamageableEntity
+            where T : class, IDamageableEntity
         {
             if (!TryGetDoActionEntity(out entity, TargetActionType.Attack))
                 return false;
@@ -294,7 +293,7 @@ namespace MultiplayerARPG
         }
 
         public bool TryGetUsingSkillEntity<T>(out T entity)
-            where T : DamageableEntity
+            where T : class, IDamageableEntity
         {
             if (!TryGetDoActionEntity(out entity, TargetActionType.UseSkill))
                 return false;

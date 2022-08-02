@@ -553,6 +553,7 @@ namespace MultiplayerARPG
             if (!isFollowingTarget)
                 return;
 
+            IDamageableEntity targetDamageable;
             IClickActivatableEntity clickActivatableEntity;
             IHoldClickActivatableEntity holdClickActivatableEntity;
             if (TryGetAttackingEntity(out targetDamageable))
@@ -609,71 +610,6 @@ namespace MultiplayerARPG
                     }
                 });
             }
-            /*
-            else if (TryGetDoActionEntity(out targetPlayer))
-            {
-                DoActionOrMoveToEntity(targetPlayer, CurrentGameInstance.conversationDistance, () =>
-                {
-                    // TODO: Do something
-                });
-            }
-            else if (TryGetDoActionEntity(out targetNpc))
-            {
-                DoActionOrMoveToEntity(targetNpc, CurrentGameInstance.conversationDistance, () =>
-                {
-                    if (!didActionOnTarget)
-                    {
-                        didActionOnTarget = true;
-                        PlayerCharacterEntity.NpcAction.CallServerNpcActivate(targetNpc.ObjectId);
-                    }
-                });
-            }
-            else if (TryGetDoActionEntity(out targetItemDrop))
-            {
-                DoActionOrMoveToEntity(targetItemDrop, CurrentGameInstance.pickUpItemDistance, () =>
-                {
-                    PlayerCharacterEntity.CallServerPickupItem(targetItemDrop.ObjectId);
-                    ClearTarget();
-                });
-            }
-            else if (TryGetDoActionEntity(out targetItemsContainer))
-            {
-                DoActionOrMoveToEntity(targetItemsContainer, CurrentGameInstance.pickUpItemDistance, () =>
-                {
-                    ShowItemsContainerDialog(targetItemsContainer);
-                });
-            }
-            else if (TryGetDoActionEntity(out targetBuilding, TargetActionType.Activate))
-            {
-                DoActionOrMoveToEntity(targetBuilding, CurrentGameInstance.conversationDistance, () =>
-                {
-                    if (!didActionOnTarget)
-                    {
-                        didActionOnTarget = true;
-                        ActivateBuilding();
-                    }
-                });
-            }
-            else if (TryGetDoActionEntity(out targetBuilding, TargetActionType.ViewOptions))
-            {
-                DoActionOrMoveToEntity(targetBuilding, CurrentGameInstance.conversationDistance, () =>
-                {
-                    if (!didActionOnTarget)
-                    {
-                        didActionOnTarget = true;
-                        ShowCurrentBuildingDialog();
-                    }
-                });
-            }
-            else if (TryGetDoActionEntity(out targetVehicle))
-            {
-                DoActionOrMoveToEntity(targetVehicle, CurrentGameInstance.conversationDistance, () =>
-                {
-                    PlayerCharacterEntity.CallServerEnterVehicle(targetVehicle.ObjectId);
-                    ClearTarget();
-                });
-            }
-            */
         }
 
         protected virtual bool OverlappedEntity(ITargetableEntity entity, Vector3 sourcePosition, Vector3 targetPosition, float distance)
