@@ -203,9 +203,9 @@ namespace MultiplayerARPG
             if (!previouslyExitFromSafeArea || randomedWanderElasped >= randomedWanderDelay)
             {
                 randomedWanderElasped = 0f;
+                lastSetDestinationTime = 0f;
                 RandomWanderDestination();
                 previouslyExitFromSafeArea = true;
-                return;
             }
         }
 
@@ -215,9 +215,9 @@ namespace MultiplayerARPG
             if (!previouslyMoveBackToSpawnPoint || randomedWanderElasped >= randomedWanderDelay)
             {
                 randomedWanderElasped = 0f;
+                lastSetDestinationTime = 0f;
                 RandomWanderDestination();
                 previouslyMoveBackToSpawnPoint = true;
-                return;
             }
         }
 
