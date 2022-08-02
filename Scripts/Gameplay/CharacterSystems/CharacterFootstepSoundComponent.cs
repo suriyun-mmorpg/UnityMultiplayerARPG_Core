@@ -11,6 +11,7 @@ namespace MultiplayerARPG
         public AudioSource audioSource;
         public AudioComponentSettingType settingType = AudioComponentSettingType.Sfx;
         public string otherSettingId;
+        public FootstepSettings walkFootstepSettings;
         public FootstepSettings moveFootstepSettings;
         public FootstepSettings sprintFootstepSettings;
         public FootstepSettings crouchFootstepSettings;
@@ -125,6 +126,9 @@ namespace MultiplayerARPG
             {
                 switch (Entity.ExtraMovementState)
                 {
+                    case ExtraMovementState.IsWalking:
+                        currentFootstepSettings = walkFootstepSettings;
+                        break;
                     case ExtraMovementState.IsSprinting:
                         currentFootstepSettings = sprintFootstepSettings;
                         break;
