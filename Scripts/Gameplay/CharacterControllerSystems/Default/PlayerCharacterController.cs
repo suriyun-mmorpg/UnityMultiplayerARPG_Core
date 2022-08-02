@@ -150,7 +150,7 @@ namespace MultiplayerARPG
                 CacheTargetObject = Instantiate(targetObjectPrefab);
                 CacheTargetObject.SetActive(false);
             }
-            // This entity detector will be find item drop entities to use when pressed pickup key
+            // Setup activate distance
             if (distanceToActivateByActivateKey <= 0f)
                 distanceToActivateByActivateKey = GameInstance.Singleton.conversationDistance;
             if (distanceToActivateByPickupKey <= 0f)
@@ -160,12 +160,12 @@ namespace MultiplayerARPG
             tempGameObject = new GameObject("_ActivatingEntityDetector");
             ActivatableEntityDetector = tempGameObject.AddComponent<NearbyEntityDetector>();
             ActivatableEntityDetector.detectingRadius = distanceToActivateByActivateKey;
-            ActivatableEntityDetector.findActivatePressActivatableEntity = true;
+            ActivatableEntityDetector.findActivatableEntity = true;
             // This entity detector will find for an item drop entities to activate when pressed pickup key
             tempGameObject = new GameObject("_ItemDropEntityDetector");
             ItemDropEntityDetector = tempGameObject.AddComponent<NearbyEntityDetector>();
             ItemDropEntityDetector.detectingRadius = distanceToActivateByPickupKey;
-            ItemDropEntityDetector.findPickupPressActivatableEntity = true;
+            ItemDropEntityDetector.findPickupActivatableEntity = true;
             // This entity detector will 
             tempGameObject = new GameObject("_EnemyEntityDetector");
             EnemyEntityDetector = tempGameObject.AddComponent<NearbyEntityDetector>();

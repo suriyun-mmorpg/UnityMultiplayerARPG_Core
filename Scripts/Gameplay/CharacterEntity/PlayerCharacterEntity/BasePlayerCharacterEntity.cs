@@ -8,7 +8,7 @@ namespace MultiplayerARPG
     [RequireComponent(typeof(PlayerCharacterCraftingComponent))]
     [RequireComponent(typeof(PlayerCharacterDealingComponent))]
     [RequireComponent(typeof(PlayerCharacterNpcActionComponent))]
-    public abstract partial class BasePlayerCharacterEntity : BaseCharacterEntity, IPlayerCharacterData, IActivatePressActivatableEntity
+    public abstract partial class BasePlayerCharacterEntity : BaseCharacterEntity, IPlayerCharacterData, IActivatableEntity
     {
         [Category("Character Settings")]
         [Tooltip("This is list which used as choice of character classes when create character")]
@@ -135,12 +135,12 @@ namespace MultiplayerARPG
             return false;
         }
 
-        public virtual bool CanActivateByActivateKey()
+        public virtual bool CanActivate()
         {
             return !IsOwnerClient;
         }
 
-        public virtual void OnActivateByActivateKey()
+        public virtual void OnActivate()
         {
             BaseUISceneGameplay.Singleton.SetActivePlayerCharacter(this);
         }

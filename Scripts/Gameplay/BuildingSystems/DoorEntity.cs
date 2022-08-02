@@ -71,7 +71,7 @@ namespace MultiplayerARPG
             }
         }
 
-        public override void OnActivateByActivateKey()
+        public override void OnActivate()
         {
             if (IsOpen)
             {
@@ -92,11 +92,6 @@ namespace MultiplayerARPG
                         GameInstance.PlayingCharacterEntity.Building.CallServerOpenDoor(ObjectId, password);
                     }, string.Empty, PasswordContentType, PasswordLength);
             }
-        }
-
-        public override void OnActivateByClick()
-        {
-            OnActivateByActivateKey();
         }
     }
 }

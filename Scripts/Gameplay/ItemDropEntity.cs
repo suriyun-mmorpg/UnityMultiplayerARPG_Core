@@ -7,7 +7,7 @@ using Cysharp.Threading.Tasks;
 
 namespace MultiplayerARPG
 {
-    public class ItemDropEntity : BaseGameEntity, IPickupPressActivatableEntity, IClickActivatableEntity
+    public class ItemDropEntity : BaseGameEntity, IPickupActivatableEntity, IActivatableEntity
     {
         public const float GROUND_DETECTION_Y_OFFSETS = 3f;
         private static readonly RaycastHit[] findGroundRaycastHits = new RaycastHit[1000];
@@ -358,24 +358,24 @@ namespace MultiplayerARPG
             return true;
         }
 
-        public virtual bool CanActivateByPickupKey()
+        public virtual bool CanPickupActivate()
         {
             return true;
         }
 
-        public virtual void OnActivateByPickupKey()
+        public virtual void OnPickupActivate()
         {
             GameInstance.PlayingCharacterEntity.CallServerPickupItem(ObjectId);
         }
 
-        public virtual bool CanActivateByClick()
+        public virtual bool CanActivate()
         {
-            return CanActivateByPickupKey();
+            return CanPickupActivate();
         }
 
-        public virtual void OnActivateByClick()
+        public virtual void OnActivate()
         {
-            OnActivateByPickupKey();
+            OnPickupActivate();
         }
     }
 }

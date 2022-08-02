@@ -79,14 +79,9 @@ namespace MultiplayerARPG
                 GameInstance.AddItemCraftFormulas(SourceId, CacheItemCraftFormulas.Values);
         }
 
-        public override void OnActivateByActivateKey()
+        public override void OnActivate()
         {
             BaseUISceneGameplay.Singleton.ShowCraftingQueueItemsDialog(this);
-        }
-
-        public override void OnActivateByClick()
-        {
-            OnActivateByActivateKey();
         }
     }
 }

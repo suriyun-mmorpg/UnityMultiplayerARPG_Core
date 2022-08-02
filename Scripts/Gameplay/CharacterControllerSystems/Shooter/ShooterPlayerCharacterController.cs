@@ -371,8 +371,8 @@ namespace MultiplayerARPG
         protected RaycastHit[] raycasts = new RaycastHit[100];
         protected Collider[] overlapColliders = new Collider[200];
         // Temp target
-        protected IActivatePressActivatableEntity activatePressActivatableEntity;
-        protected IHoldClickActivatableEntity holdClickActivatableEntity;
+        protected IActivatableEntity clickActivatableEntity;
+        protected IHoldActivatableEntity holdClickActivatableEntity;
         // Temp data
         protected IGameEntity tempGameEntity;
         protected Ray centerRay;
@@ -1047,9 +1047,9 @@ namespace MultiplayerARPG
                 {
                     if (activateInput.IsHold)
                     {
-                        if (SelectedEntity is IHoldClickActivatableEntity)
+                        if (SelectedEntity is IHoldActivatableEntity)
                         {
-                            holdClickActivatableEntity = SelectedEntity as IHoldClickActivatableEntity;
+                            holdClickActivatableEntity = SelectedEntity as IHoldActivatableEntity;
                         }
                     }
                     else if (activateInput.IsRelease)
@@ -1059,14 +1059,14 @@ namespace MultiplayerARPG
                             if (warpPortalEntityDetector?.warpPortals.Count > 0)
                             {
                                 // It may not able to raycast from inside warp portal, so try to get it from the detector
-                                activatePressActivatableEntity = warpPortalEntityDetector.warpPortals[0];
+                                clickActivatableEntity = warpPortalEntityDetector.warpPortals[0];
                             }
                         }
                         else
                         {
-                            if (SelectedEntity is IActivatePressActivatableEntity)
+                            if (SelectedEntity is IActivatableEntity)
                             {
-                                activatePressActivatableEntity = SelectedEntity as IActivatePressActivatableEntity;
+                                clickActivatableEntity = SelectedEntity as IActivatableEntity;
                             }
                         }
                     }
@@ -1595,13 +1595,13 @@ namespace MultiplayerARPG
         public virtual void HoldActivate()
         {
             if (holdClickActivatableEntity != null)
-                holdClickActivatableEntity.OnActivateByHoldClick();
+                holdClickActivatableEntity.OnHoldActivate();
         }
 
         public virtual void Activate()
         {
-            if (activatePressActivatableEntity != null)
-                activatePressActivatableEntity.OnActivateByActivateKey();
+            if (clickActivatableEntity != null)
+                clickActivatableEntity.OnActivate();
         }
 
         public virtual void UseSkill(bool isLeftHand)

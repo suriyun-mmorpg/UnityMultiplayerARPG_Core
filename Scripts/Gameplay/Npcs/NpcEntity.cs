@@ -4,7 +4,7 @@ using UnityEngine.Serialization;
 
 namespace MultiplayerARPG
 {
-    public class NpcEntity : BaseGameEntity, IActivatePressActivatableEntity, IClickActivatableEntity
+    public class NpcEntity : BaseGameEntity, IActivatableEntity
     {
         [Category(5, "NPC Settings")]
         [SerializeField]
@@ -288,24 +288,14 @@ namespace MultiplayerARPG
             return false;
         }
 
-        public virtual bool CanActivateByActivateKey()
+        public virtual bool CanActivate()
         {
             return true;
         }
 
-        public virtual void OnActivateByActivateKey()
+        public virtual void OnActivate()
         {
             GameInstance.PlayingCharacterEntity.NpcAction.CallServerNpcActivate(ObjectId);
-        }
-
-        public virtual bool CanActivateByClick()
-        {
-            return CanActivateByActivateKey();
-        }
-
-        public virtual void OnActivateByClick()
-        {
-            OnActivateByActivateKey();
         }
     }
 }
