@@ -30,15 +30,15 @@ namespace MultiplayerARPG
                 // Activate nearby npcs / players / activable buildings
                 if (InputManager.GetButtonDown("Activate"))
                 {
-                    if (ActivatableEntityDetector.activatableEntities.Count > 0)
+                    if (ActivatableEntityDetector.activatePressActivatableEntities.Count > 0)
                     {
-                        IActivatableEntity activatable;
-                        for (int i = 0; i < ActivatableEntityDetector.activatableEntities.Count; ++i)
+                        IActivatePressActivatableEntity activatable;
+                        for (int i = 0; i < ActivatableEntityDetector.activatePressActivatableEntities.Count; ++i)
                         {
-                            activatable = ActivatableEntityDetector.activatableEntities[i];
-                            if (activatable.CanActivate())
+                            activatable = ActivatableEntityDetector.activatePressActivatableEntities[i];
+                            if (activatable.CanActivateByActivateKey())
                             {
-                                activatable.OnActivate();
+                                activatable.OnActivateByActivateKey();
                                 break;
                             }
                         }
@@ -47,15 +47,15 @@ namespace MultiplayerARPG
                 // Pick up nearby items
                 if (InputManager.GetButtonDown("PickUpItem"))
                 {
-                    if (ItemDropEntityDetector.pickupActivatableEntities.Count > 0)
+                    if (ItemDropEntityDetector.pickupPressActivatableEntities.Count > 0)
                     {
-                        IPickupActivatableEntity activatable;
-                        for (int i = 0; i < ItemDropEntityDetector.pickupActivatableEntities.Count; ++i)
+                        IPickupPressActivatableEntity activatable;
+                        for (int i = 0; i < ItemDropEntityDetector.pickupPressActivatableEntities.Count; ++i)
                         {
-                            activatable = ItemDropEntityDetector.pickupActivatableEntities[i];
-                            if (activatable.CanPickupActivate())
+                            activatable = ItemDropEntityDetector.pickupPressActivatableEntities[i];
+                            if (activatable.CanActivateByPickupKey())
                             {
-                                activatable.OnPickupActivate();
+                                activatable.OnActivateByPickupKey();
                                 break;
                             }
                         }
@@ -197,8 +197,8 @@ namespace MultiplayerARPG
                     // When holding on target, or already enter edit building mode
                     if (isMouseHoldAndNotDrag)
                     {
-                        IHoldActivatableEntity activatable = tempTransform.GetComponent<IHoldActivatableEntity>();
-                        if (activatable != null && activatable.CanHoldActivate())
+                        IHoldClickActivatableEntity activatable = tempTransform.GetComponent<IHoldClickActivatableEntity>();
+                        if (activatable != null && activatable.CanActivateByHoldClick())
                         {
                             SetTarget(activatable, TargetActionType.HoldClickActivate);
                             isFollowingTarget = true;
@@ -209,9 +209,9 @@ namespace MultiplayerARPG
                     else if (mouseUpOnTarget)
                     {
                         ITargetableEntity targetable = tempTransform.GetComponent<ITargetableEntity>();
-                        IActivatableEntity activatable = targetable as IActivatableEntity;
+                        IClickActivatableEntity activatable = targetable as IClickActivatableEntity;
                         IDamageableEntity damageable = targetable as IDamageableEntity;
-                        if (activatable != null && activatable.CanActivate())
+                        if (activatable != null && activatable.CanActivateByClick())
                         {
                             if (activatable.ShouldBeAttackTarget())
                                 SetTarget(activatable, TargetActionType.Attack);
@@ -554,8 +554,8 @@ namespace MultiplayerARPG
                 return;
 
             IDamageableEntity targetDamageable;
-            IActivatableEntity clickActivatableEntity;
-            IHoldActivatableEntity holdClickActivatableEntity;
+            IClickActivatableEntity clickActivatableEntity;
+            IHoldClickActivatableEntity holdClickActivatableEntity;
             if (TryGetAttackingEntity(out targetDamageable))
             {
                 if (targetDamageable.IsHideOrDead())
@@ -591,7 +591,7 @@ namespace MultiplayerARPG
                     if (!didActionOnTarget)
                     {
                         didActionOnTarget = true;
-                        clickActivatableEntity.OnActivate();
+                        clickActivatableEntity.OnActivateByClick();
                         if (clickActivatableEntity.ShouldClearTargetAfterActivated())
                             ClearTarget();
                     }
@@ -604,7 +604,7 @@ namespace MultiplayerARPG
                     if (!didActionOnTarget)
                     {
                         didActionOnTarget = true;
-                        holdClickActivatableEntity.OnHoldActivate();
+                        holdClickActivatableEntity.OnActivateByHoldClick();
                         if (holdClickActivatableEntity.ShouldClearTargetAfterActivated())
                             ClearTarget();
                     }

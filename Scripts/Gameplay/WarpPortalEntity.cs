@@ -4,7 +4,7 @@ using UnityEngine.Serialization;
 
 namespace MultiplayerARPG
 {
-    public class WarpPortalEntity : BaseGameEntity, IActivatableEntity
+    public class WarpPortalEntity : BaseGameEntity, IActivatePressActivatableEntity, IClickActivatableEntity
     {
         [Category(5, "Warp Portal Settings")]
         [Tooltip("Signal to tell players that their character can enter the portal")]
@@ -163,14 +163,24 @@ namespace MultiplayerARPG
             return true;
         }
 
-        public virtual bool CanActivate()
+        public virtual bool CanActivateByActivateKey()
         {
             return true;
         }
 
-        public virtual void OnActivate()
+        public virtual void OnActivateByActivateKey()
         {
             GameInstance.PlayingCharacterEntity.CallServerEnterWarp(ObjectId);
+        }
+
+        public virtual bool CanActivateByClick()
+        {
+            return CanActivateByActivateKey();
+        }
+
+        public virtual void OnActivateByClick()
+        {
+            OnActivateByActivateKey();
         }
     }
 }

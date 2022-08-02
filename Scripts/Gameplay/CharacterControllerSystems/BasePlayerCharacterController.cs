@@ -264,7 +264,7 @@ namespace MultiplayerARPG
         {
             if (TargetBuildingEntity == null)
                 return;
-            TargetBuildingEntity.OnActivate();
+            TargetBuildingEntity.OnActivateByClick();
             DeselectBuilding();
         }
 

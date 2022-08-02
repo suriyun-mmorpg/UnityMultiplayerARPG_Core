@@ -6,7 +6,7 @@ using UnityEngine.Events;
 
 namespace MultiplayerARPG
 {
-    public class VehicleEntity : DamageableEntity, IVehicleEntity, IActivatableEntity
+    public class VehicleEntity : DamageableEntity, IVehicleEntity, IActivatePressActivatableEntity, IClickActivatableEntity
     {
         [Category(5, "Vehicle Settings")]
         [SerializeField]
@@ -339,14 +339,24 @@ namespace MultiplayerARPG
             return true;
         }
 
-        public virtual bool CanActivate()
+        public virtual bool CanActivateByActivateKey()
         {
             return !this.IsDead();
         }
 
-        public virtual void OnActivate()
+        public virtual void OnActivateByActivateKey()
         {
             GameInstance.PlayingCharacterEntity.CallServerEnterVehicle(ObjectId);
+        }
+
+        public virtual bool CanActivateByClick()
+        {
+            return CanActivateByActivateKey();
+        }
+
+        public virtual void OnActivateByClick()
+        {
+            OnActivateByActivateKey();
         }
     }
 }

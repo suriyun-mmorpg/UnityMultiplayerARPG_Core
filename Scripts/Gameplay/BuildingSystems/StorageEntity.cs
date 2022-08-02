@@ -88,7 +88,7 @@ namespace MultiplayerARPG
             }
         }
 
-        public override void OnActivate()
+        public override void OnActivateByActivateKey()
         {
             if (!Lockable || !IsLocked)
             {
@@ -104,6 +104,11 @@ namespace MultiplayerARPG
                         GameInstance.PlayingCharacterEntity.CallServerOpenStorage(ObjectId, password);
                     }, string.Empty, PasswordContentType, PasswordLength);
             }
+        }
+
+        public override void OnActivateByClick()
+        {
+            OnActivateByActivateKey();
         }
     }
 }

@@ -7,7 +7,7 @@ using UnityEditor;
 
 namespace MultiplayerARPG
 {
-    public class DamageableHitBox : MonoBehaviour, IDamageableEntity, IBaseActivatableEntity, IActivatableEntity, IHoldActivatableEntity
+    public class DamageableHitBox : MonoBehaviour, IDamageableEntity, IBaseActivatableEntity, IActivatePressActivatableEntity, IClickActivatableEntity, IHoldClickActivatableEntity
     {
         [System.Serializable]
         public struct TransformHistory
@@ -46,21 +46,30 @@ namespace MultiplayerARPG
                 return null;
             }
         }
-        public IActivatableEntity ActivatableEntity
+        public IActivatePressActivatableEntity ActivatePressActivatableEntity
         {
             get
             {
-                if (DamageableEntity is IActivatableEntity)
-                    return DamageableEntity as IActivatableEntity;
+                if (DamageableEntity is IActivatePressActivatableEntity)
+                    return DamageableEntity as IActivatePressActivatableEntity;
                 return null;
             }
         }
-        public IHoldActivatableEntity HoldActivatableEntity
+        public IClickActivatableEntity ClickActivatableEntity
         {
             get
             {
-                if (DamageableEntity is IHoldActivatableEntity)
-                    return DamageableEntity as IHoldActivatableEntity;
+                if (DamageableEntity is IClickActivatableEntity)
+                    return DamageableEntity as IClickActivatableEntity;
+                return null;
+            }
+        }
+        public IHoldClickActivatableEntity HoldClickActivatableEntity
+        {
+            get
+            {
+                if (DamageableEntity is IHoldClickActivatableEntity)
+                    return DamageableEntity as IHoldClickActivatableEntity;
                 return null;
             }
         }
@@ -293,30 +302,43 @@ namespace MultiplayerARPG
             return false;
         }
 
-        public bool CanActivate()
+        public bool CanActivateByActivateKey()
         {
-            if (ActivatableEntity != null)
-                return ActivatableEntity.CanActivate();
+            if (ActivatePressActivatableEntity != null)
+                return ActivatePressActivatableEntity.CanActivateByActivateKey();
             return false;
         }
 
-        public void OnActivate()
+        public void OnActivateByActivateKey()
         {
-            if (ActivatableEntity != null)
-                ActivatableEntity.OnActivate();
+            if (ActivatePressActivatableEntity != null)
+                ActivatePressActivatableEntity.OnActivateByActivateKey();
         }
 
-        public bool CanHoldActivate()
+        public bool CanActivateByClick()
         {
-            if (HoldActivatableEntity != null)
-                return HoldActivatableEntity.CanHoldActivate();
+            if (ClickActivatableEntity != null)
+                return ClickActivatableEntity.CanActivateByClick();
             return false;
         }
 
-        public void OnHoldActivate()
+        public void OnActivateByClick()
         {
-            if (HoldActivatableEntity != null)
-                HoldActivatableEntity.OnHoldActivate();
+            if (ClickActivatableEntity != null)
+                ClickActivatableEntity.OnActivateByClick();
+        }
+
+        public bool CanActivateByHoldClick()
+        {
+            if (HoldClickActivatableEntity != null)
+                return HoldClickActivatableEntity.CanActivateByHoldClick();
+            return false;
+        }
+
+        public void OnActivateByHoldClick()
+        {
+            if (HoldClickActivatableEntity != null)
+                HoldClickActivatableEntity.OnActivateByHoldClick();
         }
     }
 }
