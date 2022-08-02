@@ -221,7 +221,7 @@ namespace MultiplayerARPG
                             tempHasMapPosition = false;
                             break;
                         }
-                        else if (damageable != null && !damageable.IsHideOrDead() && damageable.CanReceiveDamageFrom(PlayingCharacterEntity.GetInfo()))
+                        else if (damageable != null && !damageable.IsHideOrDead())
                         {
                             SetTarget(damageable, TargetActionType.Attack);
                             isFollowingTarget = true;
