@@ -210,6 +210,7 @@ namespace MultiplayerARPG
                     {
                         ITargetableEntity targetable = tempTransform.GetComponent<ITargetableEntity>();
                         IActivatableEntity activatable = targetable as IActivatableEntity;
+                        IPickupActivatableEntity pickupActivatable = targetable as IPickupActivatableEntity;
                         IDamageableEntity damageable = targetable as IDamageableEntity;
                         if (activatable != null && activatable.CanActivate())
                         {
@@ -217,6 +218,13 @@ namespace MultiplayerARPG
                                 SetTarget(activatable, TargetActionType.Attack);
                             else
                                 SetTarget(activatable, TargetActionType.ClickActivate);
+                            isFollowingTarget = true;
+                            tempHasMapPosition = false;
+                            break;
+                        }
+                        else if (pickupActivatable != null && pickupActivatable.CanPickupActivate())
+                        {
+                            SetTarget(pickupActivatable, TargetActionType.ClickActivate);
                             isFollowingTarget = true;
                             tempHasMapPosition = false;
                             break;
@@ -554,8 +562,9 @@ namespace MultiplayerARPG
                 return;
 
             IDamageableEntity targetDamageable;
-            IActivatableEntity clickActivatableEntity;
-            IHoldActivatableEntity holdClickActivatableEntity;
+            IActivatableEntity activatableEntity;
+            IHoldActivatableEntity holdActivatableEntity;
+            IPickupActivatableEntity pickupActivatableEntity;
             if (TryGetAttackingEntity(out targetDamageable))
             {
                 if (targetDamageable.IsHideOrDead())
@@ -584,28 +593,46 @@ namespace MultiplayerARPG
                 GetUseSkillDistanceAndFov(isLeftHandAttacking, out castDistance, out castFov);
                 UseSkillOrMoveToEntity(targetDamageable, castDistance);
             }
-            else if (TryGetDoActionEntity(out clickActivatableEntity, TargetActionType.ClickActivate))
+            else if (TryGetDoActionEntity(out activatableEntity, TargetActionType.ClickActivate))
             {
-                DoActionOrMoveToEntity(clickActivatableEntity, clickActivatableEntity.GetActivatableDistance(), () =>
+                DoActionOrMoveToEntity(activatableEntity, activatableEntity.GetActivatableDistance(), () =>
                 {
+                    if (activatableEntity.ShouldNotActivateAfterFollowed())
+                        return;
                     if (!didActionOnTarget)
                     {
                         didActionOnTarget = true;
-                        clickActivatableEntity.OnActivate();
-                        if (clickActivatableEntity.ShouldClearTargetAfterActivated())
+                        if (activatableEntity.CanActivate())
+                            activatableEntity.OnActivate();
+                        if (activatableEntity.ShouldClearTargetAfterActivated())
                             ClearTarget();
                     }
                 });
             }
-            else if (TryGetDoActionEntity(out holdClickActivatableEntity, TargetActionType.HoldClickActivate))
+            else if (TryGetDoActionEntity(out holdActivatableEntity, TargetActionType.HoldClickActivate))
             {
-                DoActionOrMoveToEntity(holdClickActivatableEntity, holdClickActivatableEntity.GetActivatableDistance(), () =>
+                DoActionOrMoveToEntity(holdActivatableEntity, holdActivatableEntity.GetActivatableDistance(), () =>
                 {
                     if (!didActionOnTarget)
                     {
                         didActionOnTarget = true;
-                        holdClickActivatableEntity.OnHoldActivate();
-                        if (holdClickActivatableEntity.ShouldClearTargetAfterActivated())
+                        if (holdActivatableEntity.CanHoldActivate())
+                            holdActivatableEntity.OnHoldActivate();
+                        if (holdActivatableEntity.ShouldClearTargetAfterActivated())
+                            ClearTarget();
+                    }
+                });
+            }
+            else if (TryGetDoActionEntity(out pickupActivatableEntity, TargetActionType.ClickActivate))
+            {
+                DoActionOrMoveToEntity(pickupActivatableEntity, pickupActivatableEntity.GetActivatableDistance(), () =>
+                {
+                    if (!didActionOnTarget)
+                    {
+                        didActionOnTarget = true;
+                        if (pickupActivatableEntity.CanPickupActivate())
+                            pickupActivatableEntity.OnPickupActivate();
+                        if (pickupActivatableEntity.ShouldClearTargetAfterActivated())
                             ClearTarget();
                     }
                 });

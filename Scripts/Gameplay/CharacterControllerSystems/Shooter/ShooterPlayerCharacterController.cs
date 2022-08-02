@@ -371,8 +371,8 @@ namespace MultiplayerARPG
         protected RaycastHit[] raycasts = new RaycastHit[100];
         protected Collider[] overlapColliders = new Collider[200];
         // Temp target
-        protected IActivatableEntity clickActivatableEntity;
-        protected IHoldActivatableEntity holdClickActivatableEntity;
+        protected IActivatableEntity activatableEntity;
+        protected IHoldActivatableEntity holdActivatableEntity;
         // Temp data
         protected IGameEntity tempGameEntity;
         protected Ray centerRay;
@@ -1049,7 +1049,7 @@ namespace MultiplayerARPG
                     {
                         if (SelectedEntity is IHoldActivatableEntity)
                         {
-                            holdClickActivatableEntity = SelectedEntity as IHoldActivatableEntity;
+                            holdActivatableEntity = SelectedEntity as IHoldActivatableEntity;
                         }
                     }
                     else if (activateInput.IsRelease)
@@ -1059,14 +1059,14 @@ namespace MultiplayerARPG
                             if (warpPortalEntityDetector?.warpPortals.Count > 0)
                             {
                                 // It may not able to raycast from inside warp portal, so try to get it from the detector
-                                clickActivatableEntity = warpPortalEntityDetector.warpPortals[0];
+                                activatableEntity = warpPortalEntityDetector.warpPortals[0];
                             }
                         }
                         else
                         {
                             if (SelectedEntity is IActivatableEntity)
                             {
-                                clickActivatableEntity = SelectedEntity as IActivatableEntity;
+                                activatableEntity = SelectedEntity as IActivatableEntity;
                             }
                         }
                     }
@@ -1147,9 +1147,11 @@ namespace MultiplayerARPG
             {
                 anyKeyPressed = true;
                 // Find for item to pick up
-                if (SelectedGameEntity != null && SelectedGameEntity is ItemDropEntity)
+                if (SelectedEntity is IPickupActivatableEntity)
                 {
-                    PlayingCharacterEntity.CallServerPickupItem(SelectedGameEntity.ObjectId);
+                    IPickupActivatableEntity pickupActivatableEntity = SelectedEntity as IPickupActivatableEntity;
+                    if (pickupActivatableEntity != null && pickupActivatableEntity.CanPickupActivate())
+                        pickupActivatableEntity.OnPickupActivate();
                 }
             }
 
@@ -1594,14 +1596,14 @@ namespace MultiplayerARPG
 
         public virtual void HoldActivate()
         {
-            if (holdClickActivatableEntity != null)
-                holdClickActivatableEntity.OnHoldActivate();
+            if (holdActivatableEntity != null && holdActivatableEntity.CanHoldActivate())
+                holdActivatableEntity.OnHoldActivate();
         }
 
         public virtual void Activate()
         {
-            if (clickActivatableEntity != null)
-                clickActivatableEntity.OnActivate();
+            if (activatableEntity != null && activatableEntity.CanActivate())
+                activatableEntity.OnActivate();
         }
 
         public virtual void UseSkill(bool isLeftHand)

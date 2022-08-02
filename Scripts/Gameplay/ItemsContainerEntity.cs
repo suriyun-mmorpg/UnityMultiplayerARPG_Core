@@ -177,12 +177,17 @@ namespace MultiplayerARPG
             return GameInstance.Singleton.pickUpItemDistance;
         }
 
+        public virtual bool ShouldClearTargetAfterActivated()
+        {
+            return false;
+        }
+
         public virtual bool ShouldBeAttackTarget()
         {
             return false;
         }
 
-        public virtual bool ShouldClearTargetAfterActivated()
+        public virtual bool ShouldNotActivateAfterFollowed()
         {
             return false;
         }

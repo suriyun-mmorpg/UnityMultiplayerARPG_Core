@@ -125,14 +125,19 @@ namespace MultiplayerARPG
             return GameInstance.Singleton.conversationDistance;
         }
 
+        public virtual bool ShouldClearTargetAfterActivated()
+        {
+            return false;
+        }
+
         public virtual bool ShouldBeAttackTarget()
         {
             return !IsOwnerClient && !this.IsHideOrDead() && CanReceiveDamageFrom(GameInstance.PlayingCharacterEntity.GetInfo());
         }
 
-        public virtual bool ShouldClearTargetAfterActivated()
+        public virtual bool ShouldNotActivateAfterFollowed()
         {
-            return false;
+            return true;
         }
 
         public virtual bool CanActivate()

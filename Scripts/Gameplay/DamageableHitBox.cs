@@ -279,17 +279,24 @@ namespace MultiplayerARPG
             return 0f;
         }
 
-        public bool ShouldBeAttackTarget()
-        {
-            if (BaseActivatableEntity != null)
-                return BaseActivatableEntity.ShouldBeAttackTarget();
-            return true;
-        }
-
         public virtual bool ShouldClearTargetAfterActivated()
         {
             if (BaseActivatableEntity != null)
                 return BaseActivatableEntity.ShouldClearTargetAfterActivated();
+            return false;
+        }
+
+        public bool ShouldBeAttackTarget()
+        {
+            if (ActivatableEntity != null)
+                return ActivatableEntity.ShouldBeAttackTarget();
+            return true;
+        }
+
+        public virtual bool ShouldNotActivateAfterFollowed()
+        {
+            if (ActivatableEntity != null)
+                return ActivatableEntity.ShouldNotActivateAfterFollowed();
             return false;
         }
 

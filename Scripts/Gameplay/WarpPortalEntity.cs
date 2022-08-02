@@ -153,14 +153,19 @@ namespace MultiplayerARPG
             return GameInstance.Singleton.conversationDistance;
         }
 
+        public virtual bool ShouldClearTargetAfterActivated()
+        {
+            return true;
+        }
+
         public virtual bool ShouldBeAttackTarget()
         {
             return false;
         }
 
-        public virtual bool ShouldClearTargetAfterActivated()
+        public virtual bool ShouldNotActivateAfterFollowed()
         {
-            return true;
+            return false;
         }
 
         public virtual bool CanActivate()
