@@ -50,7 +50,7 @@ namespace MultiplayerARPG
         private bool impacted;
         private Vector3 normal;
         private Vector3 hitPos;
-        private Vector3 iniImpactEffectPos;
+        private Vector3 defaultImpactEffectPosition;
 
         public override void Setup(
             EntityInfo instigator,
@@ -73,7 +73,7 @@ namespace MultiplayerARPG
             if (impactEffect && !instantiateImpact)
             {
                 impactEffect.SetActive(false);
-                iniImpactEffectPos = impactEffect.transform.localPosition;
+                defaultImpactEffectPosition = impactEffect.transform.localPosition;
             }
             if (disappearEffect && !instantiateDisappear) disappearEffect.SetActive(false);
 
@@ -154,7 +154,10 @@ namespace MultiplayerARPG
 
                     Impact(hit.collider.transform.gameObject);
                     if (destroying)
+                    {
+                        // Already hit something
                         return;
+                    }
                 }
 
                 // Moved too far from `initialPosition`
@@ -198,6 +201,30 @@ namespace MultiplayerARPG
 
         protected void Impact(GameObject hitted)
         {
+            // Check target
+            DamageableHitBox target;
+            if (FindTargetHitBox(hitted, out target))
+            {
+                // Hit a hitbox
+                if (explodeDistance <= 0f)
+                {
+                    // If this is not going to explode, just apply damage to target
+                    ApplyDamageTo(target);
+                }
+                OnHit(hitted);
+                return;
+            }
+
+            // Hit damageable entity but it is not hitbox, skip it
+            if (hitted.GetComponent<DamageableEntity>() != null)
+                return;
+
+            // Hit ground, wall, tree, etc.
+            OnHit(hitted);
+        }
+
+        protected void OnHit(GameObject hitted)
+        {
             // Spawn impact effect
             if (impactEffect && IsClient)
             {
@@ -206,45 +233,26 @@ namespace MultiplayerARPG
 
                 if (instantiateImpact)
                 {
-                    Quaternion rot = Quaternion.identity;
-                    if (useNormal) rot = Quaternion.FromToRotation(Vector3.forward, normal);
-                    GameObject impact = Instantiate(impactEffect, hitPos, rot);
-                    if (stickTo) impact.transform.parent = hitted.transform;
-
+                    Quaternion hitRot = Quaternion.identity;
+                    if (useNormal)
+                        hitRot = Quaternion.FromToRotation(Vector3.forward, normal);
+                    GameObject newImpactEffect = Instantiate(impactEffect, hitPos, hitRot);
+                    if (stickTo)
+                        newImpactEffect.transform.parent = hitted.transform;
+                    newImpactEffect.SetActive(true);
                 }
                 else
                 {
-                    if (useNormal) impactEffect.transform.rotation = Quaternion.FromToRotation(Vector3.forward, normal);
+                    if (useNormal)
+                        impactEffect.transform.rotation = Quaternion.FromToRotation(Vector3.forward, normal);
                     impactEffect.transform.position = hitPos;
-                    if (stickTo) impactEffect.transform.parent = hitted.transform;
+                    if (stickTo)
+                        impactEffect.transform.parent = hitted.transform;
                     impactEffect.SetActive(true);
                 }
             }
 
-            // Check target
-            DamageableHitBox target;
-            if (FindTargetHitBox(hitted, out target))
-            {
-                if (explodeDistance > 0f)
-                {
-                    // Explode immediately when hit something
-                    Explode();
-                }
-                else
-                {
-                    // If this is not going to explode, just apply damage to target
-                    ApplyDamageTo(target);
-                }
-                impacted = true;
-                PushBack(destroyDelay);
-                destroying = true;
-                return;
-            }
-
-            // Hit damageable entity but it is not hitbox, skip it
-            if (hitted.GetComponent<DamageableEntity>() != null)
-                return;
-
+            // Hit something
             if (explodeDistance > 0f)
             {
                 // Explode immediately when hit something
@@ -261,7 +269,7 @@ namespace MultiplayerARPG
             if (impactEffect && stickTo && !instantiateImpact)
             {
                 impactEffect.transform.parent = CacheTransform;
-                impactEffect.transform.localPosition = iniImpactEffectPos;
+                impactEffect.transform.localPosition = defaultImpactEffectPosition;
             }
             base.OnPushBack();
         }
