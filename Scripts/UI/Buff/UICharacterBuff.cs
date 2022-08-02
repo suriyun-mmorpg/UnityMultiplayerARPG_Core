@@ -83,7 +83,7 @@ namespace MultiplayerARPG
         protected override void UpdateData()
         {
             // Update remains duration
-            if (CharacterBuff != null && CharacterBuff.buffRemainsDuration - buffRemainsDuration > 1)
+            if (CharacterBuff != null && Mathf.Abs(CharacterBuff.buffRemainsDuration - buffRemainsDuration) > 1)
                 buffRemainsDuration = CharacterBuff.buffRemainsDuration;
 
             BaseGameData tempGameData = null;

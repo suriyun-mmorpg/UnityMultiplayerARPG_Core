@@ -98,7 +98,7 @@ namespace MultiplayerARPG
         protected override void UpdateData()
         {
             // Update remains duration
-            if (Data.craftRemainsDuration - craftRemainsDuration > 1)
+            if (Mathf.Abs(Data.craftRemainsDuration - craftRemainsDuration) > 1)
                 craftRemainsDuration = Data.craftRemainsDuration;
 
             ItemCraftFormula formula;

@@ -371,7 +371,7 @@ namespace MultiplayerARPG
             if (Character != null && SkillItem != null && SkillItem.UsingSkill != null)
             {
                 int indexOfSkillUsage = Character.IndexOfSkillUsage(SkillItem.UsingSkill.DataId, SkillUsageType.Skill);
-                if (indexOfSkillUsage >= 0 && Character.SkillUsages[indexOfSkillUsage].coolDownRemainsDuration - coolDownRemainsDuration > 1)
+                if (indexOfSkillUsage >= 0 && Mathf.Abs(Character.SkillUsages[indexOfSkillUsage].coolDownRemainsDuration - coolDownRemainsDuration) > 1)
                     coolDownRemainsDuration = Character.SkillUsages[indexOfSkillUsage].coolDownRemainsDuration;
             }
 
