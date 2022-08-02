@@ -78,20 +78,23 @@ namespace MultiplayerARPG
 
         public event System.Action<UIChatMessage> onClickChatEntry;
 
+        private bool aleradySetupReceiveEvent;
         private bool movingToEnd;
         private ChatChannel dirtyChatChannel;
-        private int notificationCount;
 
         protected override void Awake()
         {
             base.Awake();
-            int index = UIChatHistory.ChatMessages.Count - chatEntrySize;
-            if (index < 0)
-                index = 0;
-            while (index < UIChatHistory.ChatMessages.Count)
+            if (!aleradySetupReceiveEvent)
             {
-                OnReceiveChat(UIChatHistory.ChatMessages[index]);
-                index++;
+                int index = UIChatHistory.ChatMessages.Count - chatEntrySize;
+                if (index < 0)
+                    index = 0;
+                while (index < UIChatHistory.ChatMessages.Count)
+                {
+                    OnReceiveChat(UIChatHistory.ChatMessages[index]);
+                    index++;
+                }
             }
             SetOnClientReceiveChatMessage();
         }
@@ -121,11 +124,13 @@ namespace MultiplayerARPG
         {
             RemoveOnClientReceiveChatMessage();
             ClientGenericActions.onClientReceiveChatMessage += OnReceiveChat;
+            aleradySetupReceiveEvent = true;
         }
 
         public void RemoveOnClientReceiveChatMessage()
         {
             ClientGenericActions.onClientReceiveChatMessage -= OnReceiveChat;
+            aleradySetupReceiveEvent = false;
         }
 
         private void Update()
