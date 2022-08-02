@@ -75,10 +75,26 @@ namespace MultiplayerARPG
         public BaseUISceneGameplay CacheUISceneGameplay { get; protected set; }
         public GameInstance CurrentGameInstance { get { return GameInstance.Singleton; } }
         public ITargetableEntity SelectedEntity { get; protected set; }
-        public BaseGameEntity SelectedGameEntity { get { return SelectedEntity as BaseGameEntity; } }
+        public BaseGameEntity SelectedGameEntity
+        {
+            get
+            {
+                if (SelectedEntity is IGameEntity)
+                    return (SelectedEntity as IGameEntity).Entity;
+                return null;
+            }
+        }
         public uint SelectedGameEntityObjectId { get { return SelectedGameEntity != null ? SelectedGameEntity.ObjectId : 0; } }
         public ITargetableEntity TargetEntity { get; protected set; }
-        public BaseGameEntity TargetGameEntity { get { return TargetEntity as BaseGameEntity; } }
+        public BaseGameEntity TargetGameEntity
+        {
+            get
+            {
+                if (TargetEntity is IGameEntity)
+                    return (TargetEntity as IGameEntity).Entity;
+                return null;
+            }
+        }
         public uint TargetGameEntityObjectId { get { return TargetGameEntity != null ? TargetGameEntity.ObjectId : 0; } }
         public BuildingEntity ConstructingBuildingEntity { get; protected set; }
         public BuildingEntity TargetBuildingEntity { get { return TargetGameEntity as BuildingEntity; } }
