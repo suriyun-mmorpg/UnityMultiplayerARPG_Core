@@ -26,7 +26,7 @@ namespace MultiplayerARPG
         [SerializeField]
         protected SyncFieldByte equipWeaponSet = new SyncFieldByte();
         [SerializeField]
-        protected SyncFieldByte pitch = new SyncFieldByte();
+        protected SyncFieldUShort pitch = new SyncFieldUShort();
         [SerializeField]
         protected SyncFieldUInt targetEntityId = new SyncFieldUInt();
 
@@ -77,11 +77,11 @@ namespace MultiplayerARPG
         {
             get
             {
-                return (float)pitch.Value * 0.01f * 360f;
+                return (float)pitch.Value * 0.0001f * 360f;
             }
             set
             {
-                pitch.Value = (byte)(value / 360f * 100);
+                pitch.Value = (ushort)(value / 360f * 10000);
             }
         }
         public AimPosition AimPosition { get; set; }
@@ -398,7 +398,7 @@ namespace MultiplayerARPG
         /// Override this to do stuffs when pitch changes
         /// </summary>
         /// <param name="pitch"></param>
-        protected virtual void OnPitchChange(bool isInitial, byte pitch)
+        protected virtual void OnPitchChange(bool isInitial, ushort pitch)
         {
             if (onPitchChange != null)
                 onPitchChange.Invoke(pitch);
