@@ -538,7 +538,10 @@ namespace MultiplayerARPG
                     damageReceiver.CurrentStamina = Mathf.Clamp(damageReceiver.CurrentStamina, 0, damageReceiver.MaxStamina);
                 }
                 // Applies status effects
+                int i;
                 IEquipmentItem tempEquipmentItem;
+                CharacterItem tempCharacterItem;
+                CharacterBuff tempCharacterBuff;
                 Buff tempBuff;
                 BaseSkill tempSkill;
                 EntityInfo attackerInfo = attacker.GetInfo();
@@ -547,10 +550,11 @@ namespace MultiplayerARPG
                 if (!attacker.IsDead())
                 {
                     // Armors
-                    foreach (CharacterItem armorItem in attacker.EquipItems)
+                    for (i = 0; i < attacker.EquipItems.Count; ++i)
                     {
-                        tempEquipmentItem = armorItem.GetEquipmentItem();
-                        ApplyStatusEffectsWhenAttacking(armorItem, tempEquipmentItem, attackerInfo, attacker, damageReceiver);
+                        tempCharacterItem = attacker.EquipItems[i];
+                        tempEquipmentItem = tempCharacterItem.GetEquipmentItem();
+                        ApplyStatusEffectsWhenAttacking(tempCharacterItem, tempEquipmentItem, attackerInfo, attacker, damageReceiver);
                         if (attacker.IsDead())
                             break;
                     }
@@ -576,11 +580,12 @@ namespace MultiplayerARPG
                 if (!attacker.IsDead())
                 {
                     // Buffs/Debuffs
-                    foreach (CharacterBuff characterBuff in attacker.Buffs)
+                    for (i = 0; i < attacker.Buffs.Count; ++i)
                     {
-                        tempBuff = characterBuff.GetBuff();
-                        tempBuff.ApplySelfStatusEffectsWhenAttacking(characterBuff.level, attackerInfo, attacker);
-                        tempBuff.ApplyEnemyStatusEffectsWhenAttacking(characterBuff.level, attackerInfo, damageReceiver);
+                        tempCharacterBuff = attacker.Buffs[i];
+                        tempBuff = tempCharacterBuff.GetBuff();
+                        tempBuff.ApplySelfStatusEffectsWhenAttacking(tempCharacterBuff.level, attackerInfo, attacker);
+                        tempBuff.ApplyEnemyStatusEffectsWhenAttacking(tempCharacterBuff.level, attackerInfo, damageReceiver);
                         if (attacker.IsDead())
                             break;
                     }
@@ -603,10 +608,11 @@ namespace MultiplayerARPG
                 if (!damageReceiver.IsDead())
                 {
                     // Armors
-                    foreach (CharacterItem armorItem in damageReceiver.EquipItems)
+                    for (i = 0; i < damageReceiver.EquipItems.Count; ++i)
                     {
-                        tempEquipmentItem = armorItem.GetEquipmentItem();
-                        ApplyStatusEffectsWhenAttacked(armorItem, tempEquipmentItem, damageReceiverInfo, attacker, damageReceiver);
+                        tempCharacterItem = damageReceiver.EquipItems[i];
+                        tempEquipmentItem = tempCharacterItem.GetEquipmentItem();
+                        ApplyStatusEffectsWhenAttacked(tempCharacterItem, tempEquipmentItem, damageReceiverInfo, attacker, damageReceiver);
                         if (damageReceiver.IsDead())
                             break;
                     }
@@ -632,11 +638,12 @@ namespace MultiplayerARPG
                 if (!damageReceiver.IsDead())
                 {
                     // Buffs/Debuffs
-                    foreach (CharacterBuff characterBuff in damageReceiver.Buffs)
+                    for (i = 0; i < damageReceiver.Buffs.Count; ++i)
                     {
-                        tempBuff = characterBuff.GetBuff();
-                        tempBuff.ApplySelfStatusEffectsWhenAttacked(characterBuff.level, damageReceiverInfo, damageReceiver);
-                        tempBuff.ApplyEnemyStatusEffectsWhenAttacked(characterBuff.level, damageReceiverInfo, attacker);
+                        tempCharacterBuff = damageReceiver.Buffs[i];
+                        tempBuff = tempCharacterBuff.GetBuff();
+                        tempBuff.ApplySelfStatusEffectsWhenAttacked(tempCharacterBuff.level, damageReceiverInfo, damageReceiver);
+                        tempBuff.ApplyEnemyStatusEffectsWhenAttacked(tempCharacterBuff.level, damageReceiverInfo, attacker);
                         if (damageReceiver.IsDead())
                             break;
                     }
