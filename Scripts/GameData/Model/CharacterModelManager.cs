@@ -188,7 +188,7 @@ namespace MultiplayerARPG
                 mainModelVisibleState = GameEntityModel.EVisibleState.Invisible;
             // Set visible state to main model
             MainTpsModel.SetVisibleState(mainModelVisibleState);
-            // FPS model will hide when it's not FPS mode
+            // FPS model will be hidden when it's not FPS mode
             if (MainFpsModel != null)
                 MainFpsModel.gameObject.SetActive(IsFps);
         }
