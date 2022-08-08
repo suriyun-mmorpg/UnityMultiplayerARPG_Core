@@ -283,11 +283,12 @@ namespace MultiplayerARPG
         /// <param name="skill">Which skill is the source of damages</param>
         /// <param name="skillLevel">Level of the skill</param>
         /// <param name="buff">Which buff is the source of damages</param>
-        public virtual void ReceivedDamage(HitBoxPosition position, Vector3 fromPosition, EntityInfo instigator, Dictionary<DamageElement, MinMaxFloat> damageAmounts, CombatAmountType combatAmountType, int totalDamage, CharacterItem weapon, BaseSkill skill, short skillLevel, CharacterBuff buff)
+        /// <param name="isDamageOverTime">Received from damage over time debuff</param>
+        public virtual void ReceivedDamage(HitBoxPosition position, Vector3 fromPosition, EntityInfo instigator, Dictionary<DamageElement, MinMaxFloat> damageAmounts, CombatAmountType combatAmountType, int totalDamage, CharacterItem weapon, BaseSkill skill, short skillLevel, CharacterBuff buff, bool isDamageOverTime = false)
         {
             HitEffectsSourceType hitEffectsSourceType = HitEffectsSourceType.None;
             int hitEffectsSourceDataId = 0;
-            if (combatAmountType != CombatAmountType.Miss)
+            if (!isDamageOverTime && combatAmountType != CombatAmountType.Miss)
             {
                 hitEffectsSourceType = skill == null ? HitEffectsSourceType.DamageElement : HitEffectsSourceType.Skill;
                 switch (hitEffectsSourceType)
@@ -315,7 +316,7 @@ namespace MultiplayerARPG
             IGameEntity attacker;
             instigator.TryGetEntity(out attacker);
             if (onReceivedDamage != null)
-                onReceivedDamage.Invoke(position, fromPosition, attacker, combatAmountType, totalDamage, weapon, skill, skillLevel, buff);
+                onReceivedDamage.Invoke(position, fromPosition, attacker, combatAmountType, totalDamage, weapon, skill, skillLevel, buff, isDamageOverTime);
         }
 
         public virtual bool CanReceiveDamageFrom(EntityInfo instigator)

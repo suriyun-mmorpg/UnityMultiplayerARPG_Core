@@ -76,7 +76,8 @@ namespace MultiplayerARPG
             CharacterItem weapon,
             BaseSkill skill,
             short skillLevel,
-            CharacterBuff buff)
+            CharacterBuff buff,
+            bool isDamageOverTime)
         {
             receivedDamageTime = Time.unscaledTime;
         }

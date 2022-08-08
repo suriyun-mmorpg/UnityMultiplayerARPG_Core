@@ -24,7 +24,8 @@ namespace MultiplayerARPG
         CharacterItem weapon,
         BaseSkill skill,
         short skillLevel,
-        CharacterBuff buff);
+        CharacterBuff buff,
+        bool isDamageOverTime);
 
     public delegate void NotifyEnemySpottedDelegate(
         BaseCharacterEntity enemy);
