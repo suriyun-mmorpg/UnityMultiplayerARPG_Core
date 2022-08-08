@@ -544,64 +544,116 @@ namespace MultiplayerARPG
                 EntityInfo attackerInfo = attacker.GetInfo();
                 EntityInfo damageReceiverInfo = damageReceiver.GetInfo();
                 // Attacker
-                foreach (CharacterItem armorItem in attacker.EquipItems)
+                if (!attacker.IsDead())
                 {
-                    tempEquipmentItem = armorItem.GetEquipmentItem();
-                    ApplyStatusEffectsWhenAttacking(armorItem, tempEquipmentItem, attackerInfo, attacker, damageReceiver);
+                    // Armors
+                    foreach (CharacterItem armorItem in attacker.EquipItems)
+                    {
+                        tempEquipmentItem = armorItem.GetEquipmentItem();
+                        ApplyStatusEffectsWhenAttacking(armorItem, tempEquipmentItem, attackerInfo, attacker, damageReceiver);
+                        if (attacker.IsDead())
+                            break;
+                    }
                 }
-                tempEquipmentItem = attacker.EquipWeapons.GetRightHandEquipmentItem();
-                if (tempEquipmentItem != null)
+                if (!attacker.IsDead())
                 {
-                    ApplyStatusEffectsWhenAttacking(attacker.EquipWeapons.rightHand, tempEquipmentItem, attackerInfo, attacker, damageReceiver);
+                    // Right-hand weapon
+                    tempEquipmentItem = attacker.EquipWeapons.GetRightHandEquipmentItem();
+                    if (tempEquipmentItem != null)
+                    {
+                        ApplyStatusEffectsWhenAttacking(attacker.EquipWeapons.rightHand, tempEquipmentItem, attackerInfo, attacker, damageReceiver);
+                    }
                 }
-                tempEquipmentItem = attacker.EquipWeapons.GetLeftHandEquipmentItem();
-                if (tempEquipmentItem != null)
+                if (!attacker.IsDead())
                 {
-                    ApplyStatusEffectsWhenAttacking(attacker.EquipWeapons.leftHand, tempEquipmentItem, attackerInfo, attacker, damageReceiver);
+                    // Left-hand weapon / shield
+                    tempEquipmentItem = attacker.EquipWeapons.GetLeftHandEquipmentItem();
+                    if (tempEquipmentItem != null)
+                    {
+                        ApplyStatusEffectsWhenAttacking(attacker.EquipWeapons.leftHand, tempEquipmentItem, attackerInfo, attacker, damageReceiver);
+                    }
                 }
-                foreach (CharacterBuff characterBuff in attacker.Buffs)
+                if (!attacker.IsDead())
                 {
-                    tempBuff = characterBuff.GetBuff();
-                    tempBuff.ApplySelfStatusEffectsWhenAttacking(characterBuff.level, attackerInfo, attacker);
-                    tempBuff.ApplyEnemyStatusEffectsWhenAttacking(characterBuff.level, attackerInfo, damageReceiver);
+                    // Buffs/Debuffs
+                    foreach (CharacterBuff characterBuff in attacker.Buffs)
+                    {
+                        tempBuff = characterBuff.GetBuff();
+                        tempBuff.ApplySelfStatusEffectsWhenAttacking(characterBuff.level, attackerInfo, attacker);
+                        tempBuff.ApplyEnemyStatusEffectsWhenAttacking(characterBuff.level, attackerInfo, damageReceiver);
+                        if (attacker.IsDead())
+                            break;
+                    }
                 }
-                foreach (KeyValuePair<BaseSkill, short> characterSkill in attacker.GetCaches().Skills)
+                if (!attacker.IsDead())
                 {
-                    tempSkill = characterSkill.Key;
-                    if (!tempSkill.IsPassive)
-                        continue;
-                    tempSkill.Buff.ApplySelfStatusEffectsWhenAttacking(characterSkill.Value, attackerInfo, attacker);
-                    tempSkill.Buff.ApplyEnemyStatusEffectsWhenAttacking(characterSkill.Value, attackerInfo, damageReceiver);
+                    // Passive skills
+                    foreach (KeyValuePair<BaseSkill, short> characterSkill in attacker.GetCaches().Skills)
+                    {
+                        tempSkill = characterSkill.Key;
+                        if (!tempSkill.IsPassive)
+                            continue;
+                        tempSkill.Buff.ApplySelfStatusEffectsWhenAttacking(characterSkill.Value, attackerInfo, attacker);
+                        tempSkill.Buff.ApplyEnemyStatusEffectsWhenAttacking(characterSkill.Value, attackerInfo, damageReceiver);
+                        if (attacker.IsDead())
+                            break;
+                    }
                 }
                 // Damage Receiver
-                foreach (CharacterItem armorItem in damageReceiver.EquipItems)
+                if (!damageReceiver.IsDead())
                 {
-                    tempEquipmentItem = armorItem.GetEquipmentItem();
-                    ApplyStatusEffectsWhenAttacked(armorItem, tempEquipmentItem, damageReceiverInfo, attacker, damageReceiver);
+                    // Armors
+                    foreach (CharacterItem armorItem in damageReceiver.EquipItems)
+                    {
+                        tempEquipmentItem = armorItem.GetEquipmentItem();
+                        ApplyStatusEffectsWhenAttacked(armorItem, tempEquipmentItem, damageReceiverInfo, attacker, damageReceiver);
+                        if (damageReceiver.IsDead())
+                            break;
+                    }
                 }
-                tempEquipmentItem = damageReceiver.EquipWeapons.GetRightHandEquipmentItem();
-                if (tempEquipmentItem != null)
+                if (!damageReceiver.IsDead())
                 {
-                    ApplyStatusEffectsWhenAttacked(damageReceiver.EquipWeapons.rightHand, tempEquipmentItem, damageReceiverInfo, attacker, damageReceiver);
+                    // Right-hand weapon
+                    tempEquipmentItem = damageReceiver.EquipWeapons.GetRightHandEquipmentItem();
+                    if (tempEquipmentItem != null)
+                    {
+                        ApplyStatusEffectsWhenAttacked(damageReceiver.EquipWeapons.rightHand, tempEquipmentItem, damageReceiverInfo, attacker, damageReceiver);
+                    }
                 }
-                tempEquipmentItem = damageReceiver.EquipWeapons.GetLeftHandEquipmentItem();
-                if (tempEquipmentItem != null)
+                if (!damageReceiver.IsDead())
                 {
-                    ApplyStatusEffectsWhenAttacked(damageReceiver.EquipWeapons.leftHand, tempEquipmentItem, damageReceiverInfo, attacker, damageReceiver);
+                    // Left-hand weapon / shield
+                    tempEquipmentItem = damageReceiver.EquipWeapons.GetLeftHandEquipmentItem();
+                    if (tempEquipmentItem != null)
+                    {
+                        ApplyStatusEffectsWhenAttacked(damageReceiver.EquipWeapons.leftHand, tempEquipmentItem, damageReceiverInfo, attacker, damageReceiver);
+                    }
                 }
-                foreach (CharacterBuff characterBuff in damageReceiver.Buffs)
+                if (!damageReceiver.IsDead())
                 {
-                    tempBuff = characterBuff.GetBuff();
-                    tempBuff.ApplySelfStatusEffectsWhenAttacked(characterBuff.level, damageReceiverInfo, damageReceiver);
-                    tempBuff.ApplyEnemyStatusEffectsWhenAttacked(characterBuff.level, damageReceiverInfo, attacker);
+                    // Buffs/Debuffs
+                    foreach (CharacterBuff characterBuff in damageReceiver.Buffs)
+                    {
+                        tempBuff = characterBuff.GetBuff();
+                        tempBuff.ApplySelfStatusEffectsWhenAttacked(characterBuff.level, damageReceiverInfo, damageReceiver);
+                        tempBuff.ApplyEnemyStatusEffectsWhenAttacked(characterBuff.level, damageReceiverInfo, attacker);
+                        if (damageReceiver.IsDead())
+                            break;
+                    }
                 }
-                foreach (KeyValuePair<BaseSkill, short> characterSkill in damageReceiver.GetCaches().Skills)
+                if (!damageReceiver.IsDead())
                 {
-                    tempSkill = characterSkill.Key;
-                    if (!tempSkill.IsPassive)
-                        continue;
-                    tempSkill.Buff.ApplySelfStatusEffectsWhenAttacked(characterSkill.Value, damageReceiverInfo, damageReceiver);
-                    tempSkill.Buff.ApplyEnemyStatusEffectsWhenAttacked(characterSkill.Value, damageReceiverInfo, attacker);
+                    // Passive skills
+                    foreach (KeyValuePair<BaseSkill, short> characterSkill in damageReceiver.GetCaches().Skills)
+                    {
+                        tempSkill = characterSkill.Key;
+                        if (!tempSkill.IsPassive)
+                            continue;
+                        tempSkill.Buff.ApplySelfStatusEffectsWhenAttacked(characterSkill.Value, damageReceiverInfo, damageReceiver);
+                        tempSkill.Buff.ApplyEnemyStatusEffectsWhenAttacked(characterSkill.Value, damageReceiverInfo, attacker);
+                        if (damageReceiver.IsDead())
+                            break;
+                    }
                 }
             }
             // Decrease Shield Durability
