@@ -354,7 +354,7 @@ namespace MultiplayerARPG
                         if (hasRightHandItem)
                             shouldUnequipRightHand = true;
                         // Unequip left-hand weapon, don't unequip shield
-                        if (hasLeftHandItem && leftHandEquipType != WeaponItemEquipType.OffHandOnly)
+                        if (hasLeftHandItem && tempEquipWeapons.GetLeftHandWeaponItem() != null)
                             shouldUnequipLeftHand = true;
                         break;
                     case WeaponItemEquipType.DualWieldable:
@@ -373,6 +373,12 @@ namespace MultiplayerARPG
                             if (rightHandEquipType == WeaponItemEquipType.MainHandOnly ||
                                 rightHandEquipType == WeaponItemEquipType.TwoHand)
                                 shouldUnequipRightHand = true;
+                        }
+                        // Unequip item if left hand weapon is off-hand only when equipping at right-hand
+                        if (!isLeftHand && hasLeftHandItem)
+                        {
+                            if (leftHandEquipType == WeaponItemEquipType.OffHandOnly)
+                                shouldUnequipLeftHand = true;
                         }
                         break;
                     case WeaponItemEquipType.TwoHand:
@@ -395,12 +401,9 @@ namespace MultiplayerARPG
                             gameMessage = UITextKeys.UI_ERROR_INVALID_EQUIP_POSITION_LEFT_HAND;
                             return false;
                         }
-                        // Unequip right hand only when it is two hand weapon type
+                        // Unequip both left and right hand (there is no shield for main-hand)
                         if (hasRightHandItem)
-                        {
-                            if (rightHandEquipType == WeaponItemEquipType.TwoHand)
-                                shouldUnequipRightHand = true;
-                        }
+                            shouldUnequipRightHand = true;
                         if (hasLeftHandItem)
                             shouldUnequipLeftHand = true;
                         break;
