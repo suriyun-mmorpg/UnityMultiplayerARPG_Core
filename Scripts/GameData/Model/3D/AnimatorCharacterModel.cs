@@ -984,7 +984,7 @@ namespace MultiplayerARPG
             };
         }
 
-        private Playables.DefaultAnimations ConvertToPlayableDefaultAnimations(
+        protected Playables.DefaultAnimations ConvertToPlayableDefaultAnimations(
             DefaultAnimations oldDefaultAnim,
             List<ActionAnimation> oldLeftHandAttackAnims,
             List<Playables.ActionAnimation> newLeftHandAttackAnims,
@@ -1340,7 +1340,7 @@ namespace MultiplayerARPG
             };
         }
 
-        private Playables.WeaponAnimations ConvertToPlayableWeaponAnimations(
+        protected Playables.WeaponAnimations ConvertToPlayableWeaponAnimations(
             WeaponAnimations oldWeaponAnim,
             List<ActionAnimation> oldLeftHandAttackAnims,
             List<Playables.ActionAnimation> newLeftHandAttackAnims,
@@ -1691,7 +1691,7 @@ namespace MultiplayerARPG
             };
         }
 
-        private Playables.SkillAnimations ConvertToPlayableSkillAnimations(SkillAnimations oldSkillAnim)
+        protected Playables.SkillAnimations ConvertToPlayableSkillAnimations(SkillAnimations oldSkillAnim)
         {
             return new Playables.SkillAnimations()
             {
@@ -1723,9 +1723,14 @@ namespace MultiplayerARPG
             }
         }
 
-        public void ConvertToPlayableCharacterModelImplement()
+        public virtual void ConvertToPlayableCharacterModelImplement()
         {
-            Playables.PlayableCharacterModel model = gameObject.GetOrAddComponent<Playables.PlayableCharacterModel>();
+            ConvertToPlayableCharacterModelGeneric<Playables.PlayableCharacterModel>();
+        }
+
+        public virtual void ConvertToPlayableCharacterModelGeneric<T>() where T : Playables.PlayableCharacterModel
+        {
+            T model = gameObject.GetOrAddComponent<T>();
             model.animator = animator;
             model.skinnedMeshRenderer = skinnedMeshRenderer;
 

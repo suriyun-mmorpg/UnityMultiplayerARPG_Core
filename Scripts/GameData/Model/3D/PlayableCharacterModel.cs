@@ -50,7 +50,7 @@ namespace MultiplayerARPG.GameData.Model.Playables
             CreateGraph();
         }
 
-        private void Start()
+        protected virtual void Start()
         {
             if (!IsMainModel)
                 Graph.Stop();
