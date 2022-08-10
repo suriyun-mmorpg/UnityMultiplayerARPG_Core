@@ -1,5 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 
 namespace MultiplayerARPG
@@ -12,6 +11,13 @@ namespace MultiplayerARPG
         OffHandOnly,
     }
 
+    public enum DualWieldRestriction : byte
+    {
+        None,
+        MainHandRestricted,
+        OffHandRestricted,
+    }
+
     [CreateAssetMenu(fileName = GameDataMenuConsts.WEAPON_TYPE_FILE, menuName = GameDataMenuConsts.WEAPON_TYPE_MENU, order = GameDataMenuConsts.WEAPON_TYPE_ORDER)]
     public partial class WeaponType : BaseGameData
     {
@@ -19,6 +25,9 @@ namespace MultiplayerARPG
         [SerializeField]
         private WeaponItemEquipType equipType = WeaponItemEquipType.MainHandOnly;
         public WeaponItemEquipType EquipType { get { return equipType; } }
+        [SerializeField]
+        private DualWieldRestriction dualWieldRestriction = DualWieldRestriction.None;
+        public DualWieldRestriction DualWieldRestriction { get { return dualWieldRestriction; } }
         [SerializeField]
         private DamageInfo damageInfo = default(DamageInfo);
         public DamageInfo DamageInfo { get { return damageInfo; } }
