@@ -358,6 +358,17 @@ namespace MultiplayerARPG
                             shouldUnequipLeftHand = true;
                         break;
                     case WeaponItemEquipType.DualWieldable:
+                        DualWieldRestriction dualWieldRestriction = equippingWeaponItem.GetDualWieldRestriction();
+                        if (dualWieldRestriction == DualWieldRestriction.MainHandRestricted && !isLeftHand)
+                        {
+                            gameMessage = UITextKeys.UI_ERROR_INVALID_EQUIP_POSITION_LEFT_HAND;
+                            return false;
+                        }
+                        if (dualWieldRestriction == DualWieldRestriction.OffHandRestricted && isLeftHand)
+                        {
+                            gameMessage = UITextKeys.UI_ERROR_INVALID_EQUIP_POSITION_RIGHT_HAND;
+                            return false;
+                        }
                         // If weapon is one hand can dual its equip position must be right or left hand
                         if (!isLeftHand && hasRightHandItem)
                         {
