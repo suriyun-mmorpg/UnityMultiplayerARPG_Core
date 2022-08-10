@@ -262,6 +262,14 @@ namespace MultiplayerARPG
             return weaponItem.WeaponType.EquipType;
         }
 
+        public static DualWieldRestriction GetDualWieldRestriction<T>(this T weaponItem)
+            where T : IWeaponItem
+        {
+            if (weaponItem == null || !weaponItem.IsWeapon() || !weaponItem.WeaponType)
+                return DualWieldRestriction.None;
+            return weaponItem.WeaponType.DualWieldRestriction;
+        }
+
         public static KeyValuePair<DamageElement, MinMaxFloat> GetDamageAmount<T>(this T weaponItem, short itemLevel, float statsRate, ICharacterData character)
             where T : IWeaponItem
         {
@@ -285,6 +293,16 @@ namespace MultiplayerARPG
             if (weaponItem == null || !weaponItem.IsWeapon())
                 return false;
             equipType = weaponItem.GetEquipType();
+            return true;
+        }
+
+        public static bool TryGetWeaponItemDualWieldRestriction<T>(this T weaponItem, out DualWieldRestriction dualWieldRestriction)
+            where T : IWeaponItem
+        {
+            dualWieldRestriction = DualWieldRestriction.None;
+            if (weaponItem == null || !weaponItem.IsWeapon())
+                return false;
+            dualWieldRestriction = weaponItem.GetDualWieldRestriction();
             return true;
         }
 
