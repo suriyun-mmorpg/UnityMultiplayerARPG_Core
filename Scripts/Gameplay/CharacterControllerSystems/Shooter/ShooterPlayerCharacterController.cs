@@ -192,7 +192,6 @@ namespace MultiplayerARPG
         #endregion
 
         public byte HotkeyEquipWeaponSet { get; set; }
-        public bool IsBlockController { get; protected set; }
         public IShooterGameplayCameraController CacheGameplayCameraController { get; protected set; }
         public IMinimapCameraController CacheMinimapCameraController { get; protected set; }
         public BaseCharacterModel CacheFpsModel { get; protected set; }
@@ -581,7 +580,7 @@ namespace MultiplayerARPG
             switchEquipWeaponSetInput.OnUpdate(tempDeltaTime);
 
             // Check is any UIs block controller or not?
-            IsBlockController = CacheUISceneGameplay.IsBlockController();
+            bool isBlockController = CacheUISceneGameplay.IsBlockController();
 
             // Lock cursor when not show UIs
             if (InputManager.useMobileInputOnNonMobile || Application.isMobilePlatform)
@@ -592,16 +591,18 @@ namespace MultiplayerARPG
                 CacheGameplayCameraController.UpdateRotationX = false;
                 CacheGameplayCameraController.UpdateRotationY = false;
                 CacheGameplayCameraController.UpdateRotation = InputManager.GetButton("CameraRotate");
-                CacheGameplayCameraController.UpdateZoom = !IsBlockController;
+                CacheGameplayCameraController.UpdateZoom = !isBlockController;
             }
             else
             {
                 // Control camera by mouse-move
-                Cursor.lockState = !IsBlockController ? CursorLockMode.Locked : CursorLockMode.None;
-                Cursor.visible = IsBlockController;
-                CacheGameplayCameraController.UpdateRotation = !IsBlockController;
-                CacheGameplayCameraController.UpdateZoom = !IsBlockController;
+                Cursor.lockState = !isBlockController ? CursorLockMode.Locked : CursorLockMode.None;
+                Cursor.visible = isBlockController;
+                CacheGameplayCameraController.UpdateRotation = !isBlockController;
+                CacheGameplayCameraController.UpdateZoom = !isBlockController;
             }
+            isBlockController |= GenericUtils.IsFocusInputField();
+
             // Clear selected entity
             SelectedEntity = null;
 
@@ -613,14 +614,6 @@ namespace MultiplayerARPG
             extraMovementState = ExtraMovementState.None;
             CacheGameplayCameraController.CameraRotationSpeedScale = DefaultCameraRotationSpeedScale;
             UpdateWeaponAbilityActivation(tempDeltaTime);
-
-            if (IsBlockController || GenericUtils.IsFocusInputField())
-            {
-                mustReleaseFireKey = false;
-                PlayingCharacterEntity.KeyMovement(Vector3.zero, MovementState.None);
-                DeactivateWeaponAbility();
-                return;
-            }
 
             // Prepare variables to find nearest raycasted hit point
             centerRay = CacheGameplayCameraController.Camera.ViewportPointToRay(new Vector3(0.5f, 0.5f, 0));
@@ -634,12 +627,21 @@ namespace MultiplayerARPG
 
             // Update look target and aim position
             if (ConstructingBuildingEntity == null)
-                UpdateTarget_BattleMode();
+                UpdateTarget_BattleMode(isBlockController);
             else
-                UpdateTarget_BuildMode();
+                UpdateTarget_BuildMode(isBlockController);
 
-            // Update movement and camera pitch
-            UpdateMovementInputs();
+            // Update movement inputs
+            if (isBlockController)
+            {
+                PlayingCharacterEntity.KeyMovement(Vector3.zero, MovementState.None);
+                DeactivateWeaponAbility();
+            }
+            else
+            {
+                // Update movement and camera pitch
+                UpdateMovementInputs();
+            }
 
             // Update aim position
             PlayingCharacterEntity.AimPosition = PlayingCharacterEntity.GetAttackAimPosition(ref isLeftHandAttacking, aimTargetPosition);
@@ -649,9 +651,9 @@ namespace MultiplayerARPG
             if (!updatingInputs)
             {
                 if (ConstructingBuildingEntity == null)
-                    UpdateInputs_BattleMode().Forget();
+                    UpdateInputs_BattleMode(isBlockController).Forget();
                 else
-                    UpdateInputs_BuildMode().Forget();
+                    UpdateInputs_BuildMode(isBlockController).Forget();
             }
 
             // Hide Npc UIs when move
@@ -766,7 +768,7 @@ namespace MultiplayerARPG
             return state;
         }
 
-        protected virtual void UpdateTarget_BattleMode()
+        protected virtual void UpdateTarget_BattleMode(bool isBlockController)
         {
             // Prepare raycast distance / fov
             float attackDistance = 0f;
@@ -778,16 +780,16 @@ namespace MultiplayerARPG
             else
             {
                 // Attack with right hand weapon
-                tempPressAttackRight = GetPrimaryAttackButton();
+                tempPressAttackRight = !isBlockController && GetPrimaryAttackButton();
                 if (WeaponAbility == null && leftHandWeapon != null)
                 {
                     // Attack with left hand weapon if left hand weapon not empty
-                    tempPressAttackLeft = GetSecondaryAttackButton();
+                    tempPressAttackLeft = !isBlockController && GetSecondaryAttackButton();
                 }
                 else if (WeaponAbility != null)
                 {
                     // Use weapon ability if it can
-                    tempPressWeaponAbility = GetSecondaryAttackButtonDown();
+                    tempPressWeaponAbility = !isBlockController && GetSecondaryAttackButtonDown();
                 }
 
                 attacking = tempPressAttackRight || tempPressAttackLeft;
@@ -935,7 +937,7 @@ namespace MultiplayerARPG
             CacheGameplayCameraController.AimAssistMaxAngleFromFollowingTarget = 115f;
         }
 
-        protected virtual void UpdateTarget_BuildMode()
+        protected virtual void UpdateTarget_BuildMode(bool isBlockController)
         {
             // Disable aim assist while constucting the building
             CacheGameplayCameraController.EnableAimAssist = false;
@@ -985,7 +987,7 @@ namespace MultiplayerARPG
             moveDirection.Normalize();
         }
 
-        protected virtual async UniTaskVoid UpdateInputs_BattleMode()
+        protected virtual async UniTaskVoid UpdateInputs_BattleMode(bool isBlockController)
         {
             updatingInputs = true;
             // Prepare fire type data
@@ -1005,10 +1007,10 @@ namespace MultiplayerARPG
             {
                 tempPressAttackRight = false;
                 tempPressAttackLeft = false;
+                bool isButtonReleased;
                 // If release fire key while charging, attack
-                if (!isLeftHandAttacking &&
-                    (GetPrimaryAttackButtonUp() ||
-                    !GetPrimaryAttackButton()))
+                isButtonReleased = isBlockController || GetPrimaryAttackButtonUp() || !GetPrimaryAttackButton();
+                if (!isLeftHandAttacking && isButtonReleased)
                 {
                     mustReleaseFireKey = false;
                     await Aimming();
@@ -1018,9 +1020,8 @@ namespace MultiplayerARPG
                     isCharging = false;
                 }
                 // If release fire key while charging, attack
-                if (isLeftHandAttacking &&
-                    (GetSecondaryAttackButtonUp() ||
-                    !GetSecondaryAttackButton()))
+                isButtonReleased = isBlockController || GetSecondaryAttackButtonUp() || !GetSecondaryAttackButton();
+                if (isLeftHandAttacking && isButtonReleased)
                 {
                     mustReleaseFireKey = false;
                     await Aimming();
@@ -1227,7 +1228,7 @@ namespace MultiplayerARPG
             updatingInputs = false;
         }
 
-        protected virtual async UniTaskVoid UpdateInputs_BuildMode()
+        protected virtual async UniTaskVoid UpdateInputs_BuildMode(bool isBlockController)
         {
             SetTargetLookDirectionWhileMoving();
             updatingInputs = false;
@@ -1370,7 +1371,7 @@ namespace MultiplayerARPG
                     return PlayingCharacterEntity.CanDoNextAction();
                 case ShooterControllerViewMode.Tps:
                     // Just look at camera forward while character playing action animation while `turnForwardWhileDoingAction` is `true`
-                    Vector3 doActionLookDirection = turnForwardWhileDoingAction ? cameraForward : turnDirection;
+                    Vector3 doActionLookDirection = turnForwardWhileDoingAction ? cameraForward : (moveLookDirection.sqrMagnitude > 0f ? moveLookDirection : targetLookDirection);
                     if (turnSpeedWhileDoingAction > 0f)
                     {
                         Quaternion currentRot = Quaternion.LookRotation(targetLookDirection);
@@ -1643,13 +1644,7 @@ namespace MultiplayerARPG
         public bool IsUsingHotkey()
         {
             // Check using hotkey for PC only
-            if (!InputManager.useMobileInputOnNonMobile &&
-                !Application.isMobilePlatform &&
-                UICharacterHotkeys.UsingHotkey != null)
-            {
-                return true;
-            }
-            return false;
+            return !InputManager.useMobileInputOnNonMobile && !Application.isMobilePlatform && UICharacterHotkeys.UsingHotkey != null;
         }
 
         public virtual bool GetPrimaryAttackButton()
