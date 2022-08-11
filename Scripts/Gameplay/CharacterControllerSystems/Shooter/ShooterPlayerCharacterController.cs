@@ -1117,13 +1117,19 @@ namespace MultiplayerARPG
                 }
                 else if (activateInput.IsHold)
                 {
-                    await Aimming();
-                    HoldActivate();
+                    if (holdActivatableEntity != null && holdActivatableEntity.CanHoldActivate())
+                    {
+                        await Aimming();
+                        HoldActivate();
+                    }
                 }
                 else if (activateInput.IsRelease)
                 {
-                    await Aimming();
-                    Activate();
+                    if (activatableEntity != null && activatableEntity.CanActivate())
+                    {
+                        await Aimming();
+                        Activate();
+                    }
                 }
             }
 
