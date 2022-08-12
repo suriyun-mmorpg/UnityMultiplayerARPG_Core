@@ -401,8 +401,18 @@ namespace MultiplayerARPG
             CharacterItem leftHandItem = Data.EquipWeapons.leftHand;
             IWeaponItem rightHandWeapon = rightHandItem.GetWeaponItem();
             IWeaponItem leftHandWeapon = leftHandItem.GetWeaponItem();
-            Dictionary<DamageElement, MinMaxFloat> rightHandDamages = rightHandWeapon != null ? GameDataHelpers.CombineDamages(cacheDamages, rightHandItem.GetDamageAmount(Data)) : null;
-            Dictionary<DamageElement, MinMaxFloat> leftHandDamages = leftHandWeapon != null ? GameDataHelpers.CombineDamages(cacheDamages, leftHandItem.GetDamageAmount(Data)) : null;
+            Dictionary<DamageElement, MinMaxFloat> rightHandDamages = null;
+            Dictionary<DamageElement, MinMaxFloat> leftHandDamages = null;
+            if (rightHandWeapon != null)
+            {
+                rightHandDamages = GameDataHelpers.CombineDamages(null, cacheDamages);
+                rightHandDamages = GameDataHelpers.CombineDamages(rightHandDamages, rightHandItem.GetDamageAmount(Data));
+            }
+            if (leftHandWeapon != null)
+            {
+                leftHandDamages = GameDataHelpers.CombineDamages(null, cacheDamages);
+                leftHandDamages = GameDataHelpers.CombineDamages(leftHandDamages, leftHandItem.GetDamageAmount(Data));
+            }
 
             if (uiTextWeaponDamages != null)
             {
