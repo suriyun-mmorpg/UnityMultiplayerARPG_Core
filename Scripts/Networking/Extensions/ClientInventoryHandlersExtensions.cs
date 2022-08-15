@@ -18,21 +18,27 @@ namespace MultiplayerARPG
                 if (equippingWeaponItem.GetEquipType() == WeaponItemEquipType.DualWieldable)
                 {
                     IWeaponItem rightWeapon = playerCharacter.EquipWeapons.GetRightHandWeaponItem();
-                    // Equip at left-hand if able to do it
-                    if (rightWeapon != null && rightWeapon.GetEquipType() == WeaponItemEquipType.DualWieldable)
+
+                    if ((rightWeapon != null && rightWeapon.GetEquipType() == WeaponItemEquipType.DualWieldable && equippingWeaponItem.GetDualWieldRestriction() != DualWieldRestriction.OffHandRestricted) ||
+                        (rightWeapon == null && equippingWeaponItem.GetDualWieldRestriction() == DualWieldRestriction.MainHandRestricted))
+                    {
+                        // Has equipped weapon in main-hand slot or if selected weapon is main-head restricted, try equip selected weapon to off-hand slot
                         handlers.RequestEquipWeapon(new RequestEquipWeaponMessage()
                         {
                             nonEquipIndex = nonEquipIndex,
                             equipWeaponSet = equipWeaponSet,
                             isLeftHand = true,
                         }, responseEquipWeapon);
+                    }
                     else
+                    {
                         handlers.RequestEquipWeapon(new RequestEquipWeaponMessage()
                         {
                             nonEquipIndex = nonEquipIndex,
                             equipWeaponSet = equipWeaponSet,
                             isLeftHand = false,
                         }, responseEquipWeapon);
+                    }
                 }
                 else if (equippingWeaponItem.GetEquipType() == WeaponItemEquipType.OffHandOnly)
                 {
