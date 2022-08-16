@@ -847,7 +847,7 @@ namespace MultiplayerARPG
                 // Get damageable hit box component from hit target
                 tempGameEntity = tempHitInfo.collider.GetComponent<DamageableHitBox>();
 
-                if (tempGameEntity == null || !tempGameEntity.Entity || tempGameEntity.Entity.IsHide() ||
+                if (tempGameEntity == null || !tempGameEntity.Entity || tempGameEntity.IsHide() ||
                     tempGameEntity.GetObjectId() == PlayingCharacterEntity.ObjectId)
                 {
                     // Skip empty game entity / hiddeing entity / controlling player's entity
@@ -888,7 +888,7 @@ namespace MultiplayerARPG
                     tempDistance = Vector3.Distance(EntityTransform.position, tempHitInfo.point);
                     tempGameEntity = tempHitInfo.collider.GetComponent<IGameEntity>();
 
-                    if (tempGameEntity == null || !tempGameEntity.Entity || tempGameEntity.Entity.IsHide() ||
+                    if (tempGameEntity == null || !tempGameEntity.Entity || tempGameEntity.IsHide() ||
                         tempGameEntity.GetObjectId() == PlayingCharacterEntity.ObjectId)
                     {
                         // Skip empty game entity / hiddeing entity / controlling player's entity

@@ -9,7 +9,7 @@
 
         public static bool IsHideOrDead(this IDamageableEntity damageableEntity)
         {
-            return damageableEntity.IsDead() || damageableEntity.Entity.IsHide();
+            return damageableEntity.IsDead() || damageableEntity.IsHide();
         }
     }
 }
