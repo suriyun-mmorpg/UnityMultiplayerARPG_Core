@@ -746,7 +746,7 @@ namespace MultiplayerARPG
             {
                 if (targetEntity is DamageableEntity)
                 {
-                    if (!(targetEntity as DamageableEntity).IsDead())
+                    if (!(targetEntity as DamageableEntity).IsHideOrDead())
                         return GetAttackAimPosition(position, (targetEntity as DamageableEntity).OpponentAimTransform.position);
                 }
                 else
