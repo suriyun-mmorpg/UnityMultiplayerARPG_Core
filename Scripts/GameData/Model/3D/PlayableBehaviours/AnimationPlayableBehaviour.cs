@@ -139,9 +139,10 @@ namespace MultiplayerARPG.GameData.Model.Playables
             public string playingStateId = string.Empty;
             public int inputPort = 0;
             public float transitionDuration = 0f;
-            public float clipLength = 0f;
             public float playElapsed = 0f;
             public float clipSpeed = 0f;
+            public float clipLength = 0f;
+            public bool isMoving = false;
             public AnimationClip previousClip;
 
             public bool HasChanges { get; set; } = true;
@@ -505,8 +506,8 @@ namespace MultiplayerARPG.GameData.Model.Playables
                 bool movingBackward = stateUpdateData.MovementState.Has(MovementState.Backward);
                 bool movingLeft = stateUpdateData.MovementState.Has(MovementState.Left);
                 bool movingRight = stateUpdateData.MovementState.Has(MovementState.Right);
-                bool moving = (movingForward || movingBackward || movingLeft || movingRight) && CharacterModel.moveAnimationSpeedMultiplier > 0f;
-                if (moving)
+                stateUpdateData.isMoving = (movingForward || movingBackward || movingLeft || movingRight) && CharacterModel.moveAnimationSpeedMultiplier > 0f;
+                if (stateUpdateData.isMoving)
                 {
                     if (movingForward)
                         stringBuilder.Append(DIR_FORWARD);
@@ -521,7 +522,7 @@ namespace MultiplayerARPG.GameData.Model.Playables
                 string stateWithoutWeaponIdAndMoveType = stringBuilder.ToString();
                 if (stateUpdateData.MovementState.Has(MovementState.IsUnderWater))
                 {
-                    if (!moving)
+                    if (!stateUpdateData.isMoving)
                         stringBuilder.Append(CLIP_SWIM_IDLE);
                     else
                         stringBuilder.Append(MOVE_TYPE_SWIM);
@@ -531,31 +532,31 @@ namespace MultiplayerARPG.GameData.Model.Playables
                     switch (stateUpdateData.ExtraMovementState)
                     {
                         case ExtraMovementState.IsSprinting:
-                            if (!moving)
+                            if (!stateUpdateData.isMoving)
                                 stringBuilder.Append(CLIP_IDLE);
                             else
                                 stringBuilder.Append(MOVE_TYPE_SPRINT);
                             break;
                         case ExtraMovementState.IsWalking:
-                            if (!moving)
+                            if (!stateUpdateData.isMoving)
                                 stringBuilder.Append(CLIP_IDLE);
                             else
                                 stringBuilder.Append(MOVE_TYPE_WALK);
                             break;
                         case ExtraMovementState.IsCrouching:
-                            if (!moving)
+                            if (!stateUpdateData.isMoving)
                                 stringBuilder.Append(CLIP_CROUCH_IDLE);
                             else
                                 stringBuilder.Append(MOVE_TYPE_CROUCH);
                             break;
                         case ExtraMovementState.IsCrawling:
-                            if (!moving)
+                            if (!stateUpdateData.isMoving)
                                 stringBuilder.Append(CLIP_CRAWL_IDLE);
                             else
                                 stringBuilder.Append(MOVE_TYPE_CRAWL);
                             break;
                         default:
-                            if (!moving)
+                            if (!stateUpdateData.isMoving)
                                 stringBuilder.Append(CLIP_IDLE);
                             break;
                     }
@@ -658,7 +659,7 @@ namespace MultiplayerARPG.GameData.Model.Playables
                 LayerMixer.SetLayerMaskFromAvatarMask(layer, avatarMask);
 
                 // Set clip info 
-                stateUpdateData.clipSpeed = stateInfos[playingStateId].GetSpeed(1);
+                stateUpdateData.clipSpeed = stateInfos[playingStateId].GetSpeed(stateUpdateData.isMoving ? CharacterModel.moveAnimationSpeedMultiplier : 1);
                 // Set transition duration
                 stateUpdateData.transitionDuration = stateInfos[playingStateId].GetTransitionDuration();
                 if (stateUpdateData.transitionDuration <= 0f)
