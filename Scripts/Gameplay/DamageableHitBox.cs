@@ -190,6 +190,11 @@ namespace MultiplayerARPG
             return DamageableEntity.GetInfo();
         }
 
+        public bool IsHide()
+        {
+            return DamageableEntity.IsHide();
+        }
+
         public TransformHistory GetTransformHistory(long currentTime, long rewindTime)
         {
             if (histories.Count == 0)
