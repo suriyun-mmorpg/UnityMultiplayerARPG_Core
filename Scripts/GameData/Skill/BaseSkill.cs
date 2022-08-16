@@ -573,7 +573,7 @@ namespace MultiplayerARPG
                 return false;
             }
 
-            if (maxLevel > 0 && level >= maxLevel)
+            if (maxLevel > 0 && level + character.GetDatabase().CacheSkillLevels[this] >= maxLevel)
             {
                 gameMessage = UITextKeys.UI_ERROR_SKILL_REACHED_MAX_LEVEL;
                 return false;
