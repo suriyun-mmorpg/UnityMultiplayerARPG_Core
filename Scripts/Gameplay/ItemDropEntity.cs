@@ -104,7 +104,7 @@ namespace MultiplayerARPG
             get
             {
                 if (modelContainer == null)
-                    modelContainer = GetComponent<Transform>();
+                    modelContainer = transform;
                 return modelContainer;
             }
         }
@@ -142,6 +142,13 @@ namespace MultiplayerARPG
             base.EntityAwake();
             gameObject.tag = CurrentGameInstance.itemDropTag;
             gameObject.layer = CurrentGameInstance.itemDropLayer;
+            CacheModelContainer.gameObject.SetActive(false);
+        }
+
+        protected override void EntityOnDisable()
+        {
+            base.EntityOnDisable();
+            CacheModelContainer.gameObject.SetActive(false);
         }
 
         protected virtual void InitDropItems()
@@ -236,12 +243,12 @@ namespace MultiplayerARPG
             // Instantiate model at clients
             if (!IsClient)
                 return;
+            // Activate container to show item drop model
+            CacheModelContainer.gameObject.SetActive(true);
             if (dropModel != null)
                 Destroy(dropModel);
             BaseItem item;
-            if (CacheModelContainer != null && itemDropData.putOnPlaceholder &&
-                GameInstance.Items.TryGetValue(itemDropData.dataId, out item) &&
-                item.DropModel != null)
+            if (itemDropData.putOnPlaceholder && GameInstance.Items.TryGetValue(itemDropData.dataId, out item) && item.DropModel != null)
             {
                 dropModel = Instantiate(item.DropModel, CacheModelContainer);
                 dropModel.gameObject.SetLayerRecursively(CurrentGameInstance.itemDropLayer, true);
