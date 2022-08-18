@@ -98,6 +98,7 @@ namespace MultiplayerARPG
 
         protected override void OnPushBack()
         {
+            receivingDamageHitBoxes.Clear();
             if (onDestroy != null)
                 onDestroy.Invoke();
         }

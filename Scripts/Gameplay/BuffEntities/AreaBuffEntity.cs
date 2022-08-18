@@ -75,6 +75,13 @@ namespace MultiplayerARPG
             }
         }
 
+        protected override void OnPushBack()
+        {
+            receivingBuffCharacters.Clear();
+            if (onDestroy != null)
+                onDestroy.Invoke();
+        }
+
         protected virtual void OnTriggerEnter(Collider other)
         {
             TriggerEnter(other.gameObject);
