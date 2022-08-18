@@ -17,6 +17,7 @@ namespace MultiplayerARPG.GameData.Model.Playables
         public const int BASE_LAYER = 0;
         public const int LEFT_HAND_WIELDING_LAYER = 1;
         public const int ACTION_LAYER = 2;
+        public const string SHILED_WEAPON_TYPE_ID = "<SHIELD>";
 
         private interface IStateInfo
         {
@@ -307,6 +308,8 @@ namespace MultiplayerARPG.GameData.Model.Playables
             {
                 SetupLeftHandWieldingWeaponAnimations(characterModel.leftHandWieldingWeaponAnimations[i]);
             }
+            // Clips based on equipped shield in left-hand
+            SetupLeftHandWieldingWeaponAnimations(characterModel.leftHandShieldAnimations, SHILED_WEAPON_TYPE_ID);
         }
 
         public override void OnPlayableCreate(Playable playable)
@@ -354,46 +357,50 @@ namespace MultiplayerARPG.GameData.Model.Playables
             SetBaseState(stringBuilder.Clear().Append(CLIP_DEAD).ToString(), defaultAnimations.deadState);
         }
 
-        private void SetupWeaponAnimations(WeaponAnimations weaponAnimations)
+        private void SetupWeaponAnimations(WeaponAnimations weaponAnimations, string overrideWeaponTypeId = "")
         {
-            if (weaponAnimations.weaponType == null)
+            bool emptyOverrideId = string.IsNullOrEmpty(overrideWeaponTypeId);
+            if (emptyOverrideId && weaponAnimations.weaponType == null)
                 return;
-            weaponTypeIds.Add(weaponAnimations.weaponType.Id);
-            SetBaseState(stringBuilder.Clear().Append(weaponAnimations.weaponType.Id).Append(CLIP_IDLE).ToString(), weaponAnimations.idleState);
-            SetMoveStates(weaponAnimations.weaponType.Id, string.Empty, weaponAnimations.moveStates);
-            SetMoveStates(weaponAnimations.weaponType.Id, MOVE_TYPE_SPRINT, weaponAnimations.sprintStates);
-            SetMoveStates(weaponAnimations.weaponType.Id, MOVE_TYPE_WALK, weaponAnimations.walkStates);
-            SetBaseState(stringBuilder.Clear().Append(weaponAnimations.weaponType.Id).Append(CLIP_CROUCH_IDLE).ToString(), weaponAnimations.crouchIdleState);
-            SetMoveStates(weaponAnimations.weaponType.Id, MOVE_TYPE_CROUCH, weaponAnimations.crouchMoveStates);
-            SetBaseState(stringBuilder.Clear().Append(weaponAnimations.weaponType.Id).Append(CLIP_CRAWL_IDLE).ToString(), weaponAnimations.crawlIdleState);
-            SetMoveStates(weaponAnimations.weaponType.Id, MOVE_TYPE_CRAWL, weaponAnimations.crawlMoveStates);
-            SetBaseState(stringBuilder.Clear().Append(weaponAnimations.weaponType.Id).Append(CLIP_SWIM_IDLE).ToString(), weaponAnimations.swimIdleState);
-            SetMoveStates(weaponAnimations.weaponType.Id, MOVE_TYPE_SWIM, weaponAnimations.swimMoveStates);
-            SetBaseState(stringBuilder.Clear().Append(weaponAnimations.weaponType.Id).Append(CLIP_JUMP).ToString(), weaponAnimations.jumpState);
-            SetBaseState(stringBuilder.Clear().Append(weaponAnimations.weaponType.Id).Append(CLIP_FALL).ToString(), weaponAnimations.fallState);
-            SetBaseState(stringBuilder.Clear().Append(weaponAnimations.weaponType.Id).Append(CLIP_LANDED).ToString(), weaponAnimations.landedState);
-            SetBaseState(stringBuilder.Clear().Append(weaponAnimations.weaponType.Id).Append(CLIP_DEAD).ToString(), weaponAnimations.deadState);
+            string weaponTypeId = emptyOverrideId ? weaponAnimations.weaponType.Id : overrideWeaponTypeId;
+            weaponTypeIds.Add(weaponTypeId);
+            SetBaseState(stringBuilder.Clear().Append(weaponTypeId).Append(CLIP_IDLE).ToString(), weaponAnimations.idleState);
+            SetMoveStates(weaponTypeId, string.Empty, weaponAnimations.moveStates);
+            SetMoveStates(weaponTypeId, MOVE_TYPE_SPRINT, weaponAnimations.sprintStates);
+            SetMoveStates(weaponTypeId, MOVE_TYPE_WALK, weaponAnimations.walkStates);
+            SetBaseState(stringBuilder.Clear().Append(weaponTypeId).Append(CLIP_CROUCH_IDLE).ToString(), weaponAnimations.crouchIdleState);
+            SetMoveStates(weaponTypeId, MOVE_TYPE_CROUCH, weaponAnimations.crouchMoveStates);
+            SetBaseState(stringBuilder.Clear().Append(weaponTypeId).Append(CLIP_CRAWL_IDLE).ToString(), weaponAnimations.crawlIdleState);
+            SetMoveStates(weaponTypeId, MOVE_TYPE_CRAWL, weaponAnimations.crawlMoveStates);
+            SetBaseState(stringBuilder.Clear().Append(weaponTypeId).Append(CLIP_SWIM_IDLE).ToString(), weaponAnimations.swimIdleState);
+            SetMoveStates(weaponTypeId, MOVE_TYPE_SWIM, weaponAnimations.swimMoveStates);
+            SetBaseState(stringBuilder.Clear().Append(weaponTypeId).Append(CLIP_JUMP).ToString(), weaponAnimations.jumpState);
+            SetBaseState(stringBuilder.Clear().Append(weaponTypeId).Append(CLIP_FALL).ToString(), weaponAnimations.fallState);
+            SetBaseState(stringBuilder.Clear().Append(weaponTypeId).Append(CLIP_LANDED).ToString(), weaponAnimations.landedState);
+            SetBaseState(stringBuilder.Clear().Append(weaponTypeId).Append(CLIP_DEAD).ToString(), weaponAnimations.deadState);
         }
 
-        private void SetupLeftHandWieldingWeaponAnimations(WieldWeaponAnimations weaponAnimations)
+        private void SetupLeftHandWieldingWeaponAnimations(WieldWeaponAnimations weaponAnimations, string overrideWeaponTypeId = "")
         {
-            if (weaponAnimations.weaponType == null)
+            bool emptyOverrideId = string.IsNullOrEmpty(overrideWeaponTypeId);
+            if (emptyOverrideId && weaponAnimations.weaponType == null)
                 return;
-            leftHandWeaponTypeIds.Add(weaponAnimations.weaponType.Id);
-            SetLeftHandWieldingState(stringBuilder.Clear().Append(weaponAnimations.weaponType.Id).Append(CLIP_IDLE).ToString(), weaponAnimations.idleState);
-            SetLeftHandWieldingMoveStates(weaponAnimations.weaponType.Id, string.Empty, weaponAnimations.moveStates);
-            SetLeftHandWieldingMoveStates(weaponAnimations.weaponType.Id, MOVE_TYPE_SPRINT, weaponAnimations.sprintStates);
-            SetLeftHandWieldingMoveStates(weaponAnimations.weaponType.Id, MOVE_TYPE_WALK, weaponAnimations.walkStates);
-            SetLeftHandWieldingState(stringBuilder.Clear().Append(weaponAnimations.weaponType.Id).Append(CLIP_CROUCH_IDLE).ToString(), weaponAnimations.crouchIdleState);
-            SetLeftHandWieldingMoveStates(weaponAnimations.weaponType.Id, MOVE_TYPE_CROUCH, weaponAnimations.crouchMoveStates);
-            SetLeftHandWieldingState(stringBuilder.Clear().Append(weaponAnimations.weaponType.Id).Append(CLIP_CRAWL_IDLE).ToString(), weaponAnimations.crawlIdleState);
-            SetLeftHandWieldingMoveStates(weaponAnimations.weaponType.Id, MOVE_TYPE_CRAWL, weaponAnimations.crawlMoveStates);
-            SetLeftHandWieldingState(stringBuilder.Clear().Append(weaponAnimations.weaponType.Id).Append(CLIP_SWIM_IDLE).ToString(), weaponAnimations.swimIdleState);
-            SetLeftHandWieldingMoveStates(weaponAnimations.weaponType.Id, MOVE_TYPE_SWIM, weaponAnimations.swimMoveStates);
-            SetLeftHandWieldingState(stringBuilder.Clear().Append(weaponAnimations.weaponType.Id).Append(CLIP_JUMP).ToString(), weaponAnimations.jumpState);
-            SetLeftHandWieldingState(stringBuilder.Clear().Append(weaponAnimations.weaponType.Id).Append(CLIP_FALL).ToString(), weaponAnimations.fallState);
-            SetLeftHandWieldingState(stringBuilder.Clear().Append(weaponAnimations.weaponType.Id).Append(CLIP_LANDED).ToString(), weaponAnimations.landedState);
-            SetLeftHandWieldingState(stringBuilder.Clear().Append(weaponAnimations.weaponType.Id).Append(CLIP_DEAD).ToString(), weaponAnimations.deadState);
+            string weaponTypeId = emptyOverrideId ? weaponAnimations.weaponType.Id : overrideWeaponTypeId;
+            leftHandWeaponTypeIds.Add(weaponTypeId);
+            SetLeftHandWieldingState(stringBuilder.Clear().Append(weaponTypeId).Append(CLIP_IDLE).ToString(), weaponAnimations.idleState);
+            SetLeftHandWieldingMoveStates(weaponTypeId, string.Empty, weaponAnimations.moveStates);
+            SetLeftHandWieldingMoveStates(weaponTypeId, MOVE_TYPE_SPRINT, weaponAnimations.sprintStates);
+            SetLeftHandWieldingMoveStates(weaponTypeId, MOVE_TYPE_WALK, weaponAnimations.walkStates);
+            SetLeftHandWieldingState(stringBuilder.Clear().Append(weaponTypeId).Append(CLIP_CROUCH_IDLE).ToString(), weaponAnimations.crouchIdleState);
+            SetLeftHandWieldingMoveStates(weaponTypeId, MOVE_TYPE_CROUCH, weaponAnimations.crouchMoveStates);
+            SetLeftHandWieldingState(stringBuilder.Clear().Append(weaponTypeId).Append(CLIP_CRAWL_IDLE).ToString(), weaponAnimations.crawlIdleState);
+            SetLeftHandWieldingMoveStates(weaponTypeId, MOVE_TYPE_CRAWL, weaponAnimations.crawlMoveStates);
+            SetLeftHandWieldingState(stringBuilder.Clear().Append(weaponTypeId).Append(CLIP_SWIM_IDLE).ToString(), weaponAnimations.swimIdleState);
+            SetLeftHandWieldingMoveStates(weaponTypeId, MOVE_TYPE_SWIM, weaponAnimations.swimMoveStates);
+            SetLeftHandWieldingState(stringBuilder.Clear().Append(weaponTypeId).Append(CLIP_JUMP).ToString(), weaponAnimations.jumpState);
+            SetLeftHandWieldingState(stringBuilder.Clear().Append(weaponTypeId).Append(CLIP_FALL).ToString(), weaponAnimations.fallState);
+            SetLeftHandWieldingState(stringBuilder.Clear().Append(weaponTypeId).Append(CLIP_LANDED).ToString(), weaponAnimations.landedState);
+            SetLeftHandWieldingState(stringBuilder.Clear().Append(weaponTypeId).Append(CLIP_DEAD).ToString(), weaponAnimations.deadState);
         }
 
         private void SetMoveStates(string weaponTypeId, string moveType, MoveStates moveStates)
@@ -674,7 +681,7 @@ namespace MultiplayerARPG.GameData.Model.Playables
             }
         }
 
-        private void UpdateState(AnimationMixerPlayable mixer, StateUpdateData stateUpdateData, float deltaTime)
+        private void UpdateState(AnimationMixerPlayable mixer, StateUpdateData stateUpdateData, float deltaTime, bool isLeftHand)
         {
             int inputCount = mixer.GetInputCount();
             if (inputCount == 0)
@@ -701,6 +708,9 @@ namespace MultiplayerARPG.GameData.Model.Playables
                         transitionEnded = true;
                     }
                 }
+                // Update left-hand weight
+                if (isLeftHand)
+                    LayerMixer.SetInputWeight(LEFT_HAND_WIELDING_LAYER, 0f);
             }
             else
             {
@@ -737,6 +747,16 @@ namespace MultiplayerARPG.GameData.Model.Playables
                 // It will change state to movement in next frame
                 if (stateUpdateData.PlayingLandedState && stateUpdateData.playElapsed >= stateUpdateData.clipLength)
                     stateUpdateData.PlayingLandedState = false;
+
+                // Update left-hand weight
+                if (isLeftHand)
+                {
+                    // TODO: May set weight smoothly
+                    if (string.IsNullOrEmpty(stateUpdateData.WeaponTypeId))
+                        LayerMixer.SetInputWeight(LEFT_HAND_WIELDING_LAYER, 0f);
+                    else
+                        LayerMixer.SetInputWeight(LEFT_HAND_WIELDING_LAYER, 1f);
+                }
             }
 
             if (inputCount > 1 && transitionEnded)
@@ -771,8 +791,8 @@ namespace MultiplayerARPG.GameData.Model.Playables
                 PrepareForNewState(LeftHandWieldingLayerMixer, LEFT_HAND_WIELDING_LAYER, leftHandWieldingStates, leftHandWieldingStateUpdateData);
             }
 
-            UpdateState(BaseLayerMixer, baseStateUpdateData, info.deltaTime);
-            UpdateState(LeftHandWieldingLayerMixer, leftHandWieldingStateUpdateData, info.deltaTime);
+            UpdateState(BaseLayerMixer, baseStateUpdateData, info.deltaTime, false);
+            UpdateState(LeftHandWieldingLayerMixer, leftHandWieldingStateUpdateData, info.deltaTime, true);
             #endregion
 
             #region Update action state
@@ -827,7 +847,7 @@ namespace MultiplayerARPG.GameData.Model.Playables
             #endregion
         }
 
-        public void SetPlayingWeaponTypeId(IWeaponItem rightHand, IWeaponItem leftHand)
+        public void SetPlayingWeaponTypeId(IWeaponItem rightHand, IWeaponItem leftHand, IShieldItem leftHandShield)
         {
             baseStateUpdateData.WeaponTypeId = string.Empty;
             if (rightHand != null && weaponTypeIds.Contains(rightHand.WeaponType.Id))
@@ -836,6 +856,9 @@ namespace MultiplayerARPG.GameData.Model.Playables
             leftHandWieldingStateUpdateData.WeaponTypeId = string.Empty;
             if (leftHand != null && leftHandWeaponTypeIds.Contains(leftHand.WeaponType.Id))
                 leftHandWieldingStateUpdateData.WeaponTypeId = leftHand.WeaponType.Id;
+
+            if (leftHandShield != null && leftHandWeaponTypeIds.Contains(SHILED_WEAPON_TYPE_ID))
+                leftHandWieldingStateUpdateData.WeaponTypeId = SHILED_WEAPON_TYPE_ID;
         }
 
         public void PlayJump()
