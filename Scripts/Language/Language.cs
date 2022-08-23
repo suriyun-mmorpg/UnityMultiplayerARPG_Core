@@ -1060,7 +1060,7 @@ namespace MultiplayerARPG
 
         // 1.71c New Formats
         UI_FORMAT_CORPSE_TITLE,
-        
+
         // 1.74 New Formats
         /// <summary>
         /// Format => {0} = {Require Skill Point}
@@ -1070,6 +1070,24 @@ namespace MultiplayerARPG
         /// Format => {0} = {Current Skill Point}, {1} = {Require Skill Point}
         /// </summary>
         UI_FORMAT_REQUIRE_SKILL_POINT_NOT_ENOUGH,
+
+        // 1.78 UI Chat Message With Guild Name
+        /// <summary>
+        /// Format => {0} = {Character Name}, {1} = {Message}, {2} = {Guild Name}
+        /// </summary>
+        UI_FORMAT_CHAT_LOCAL_WITH_GUILD_NAME,
+        /// <summary>
+        /// Format => {0} = {Character Name}, {1} = {Message}, {2} = {Guild Name}
+        /// </summary>
+        UI_FORMAT_CHAT_GLOBAL_WITH_GUILD_NAME,
+        /// <summary>
+        /// Format => {0} = {Character Name}, {1} = {Message}, {2} = {Guild Name}
+        /// </summary>
+        UI_FORMAT_CHAT_WHISPER_WITH_GUILD_NAME,
+        /// <summary>
+        /// Format => {0} = {Character Name}, {1} = {Message}, {2} = {Guild Name}
+        /// </summary>
+        UI_FORMAT_CHAT_PARTY_WITH_GUILD_NAME,
     }
 
     public static class DefaultLocale
@@ -1587,6 +1605,11 @@ namespace MultiplayerARPG
             // 1.74 New Formats
             Texts.Add(UIFormatKeys.UI_FORMAT_REQUIRE_SKILL_POINT.ToString(), "Require Skill Points: {0}");
             Texts.Add(UIFormatKeys.UI_FORMAT_REQUIRE_SKILL_POINT_NOT_ENOUGH.ToString(), "Require Skill Points: <color=red>{0}/{1}</color>");
+            // 1.78 UI Chat Message With Guild Name
+            Texts.Add(UIFormatKeys.UI_FORMAT_CHAT_LOCAL_WITH_GUILD_NAME.ToString(), "<color=white>(LOCAL) {0}({2}): {1}</color>");
+            Texts.Add(UIFormatKeys.UI_FORMAT_CHAT_GLOBAL_WITH_GUILD_NAME.ToString(), "<color=white>(GLOBAL) {0}({2}): {1}</color>");
+            Texts.Add(UIFormatKeys.UI_FORMAT_CHAT_WHISPER_WITH_GUILD_NAME.ToString(), "<color=green>(WHISPER) {0}({2}): {1}</color>");
+            Texts.Add(UIFormatKeys.UI_FORMAT_CHAT_PARTY_WITH_GUILD_NAME.ToString(), "<color=cyan>(PARTY) {0}({2}): {1}</color>");
         }
     }
 

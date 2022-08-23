@@ -18,6 +18,14 @@ namespace MultiplayerARPG
         public string formatGuild = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_CHAT_GUILD);
         [Tooltip("Format {0} = Message")]
         public string formatSystem = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_CHAT_SYSTEM);
+        [Tooltip("Format {0} = Character Name, {1} = Message, {2} = Guild Name")]
+        public string formatLocalWithGuildName = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_CHAT_LOCAL_WITH_GUILD_NAME);
+        [Tooltip("Format {0} = Character Name, {1} = Message, {2} = Guild Name")]
+        public string formatGlobalWithGuildName = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_CHAT_GLOBAL_WITH_GUILD_NAME);
+        [Tooltip("Format {0} = Character Name, {1} = Message, {2} = Guild Name")]
+        public string formatWhisperWithGuildName = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_CHAT_WHISPER_WITH_GUILD_NAME);
+        [Tooltip("Format {0} = Character Name, {1} = Message, {2} = Guild Name")]
+        public string formatPartyWithGuildName = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_CHAT_PARTY_WITH_GUILD_NAME);
 
         public TextWrapper uiTextMessage;
         public TextWrapper uiTextSenderOnly;
@@ -31,25 +39,6 @@ namespace MultiplayerARPG
         {
             if (uiTextMessage != null)
             {
-                string format = string.Empty;
-                switch (Data.channel)
-                {
-                    case ChatChannel.Local:
-                        format = LanguageManager.GetText(formatLocal);
-                        break;
-                    case ChatChannel.Global:
-                        format = LanguageManager.GetText(formatGlobal);
-                        break;
-                    case ChatChannel.Whisper:
-                        format = LanguageManager.GetText(formatWhisper);
-                        break;
-                    case ChatChannel.Party:
-                        format = LanguageManager.GetText(formatParty);
-                        break;
-                    case ChatChannel.Guild:
-                        format = LanguageManager.GetText(formatGuild);
-                        break;
-                }
                 if (Data.channel == ChatChannel.System)
                 {
                     uiTextMessage.text = string.Format(LanguageManager.GetText(formatSystem), Data.message);
@@ -57,7 +46,38 @@ namespace MultiplayerARPG
                 }
                 else
                 {
-                    uiTextMessage.text = string.Format(format, Data.sender, Data.message);
+                    string format = string.Empty;
+                    switch (Data.channel)
+                    {
+                        case ChatChannel.Local:
+                            if (string.IsNullOrWhiteSpace(Data.guildName))
+                                format = LanguageManager.GetText(formatLocal);
+                            else
+                                format = LanguageManager.GetText(formatLocalWithGuildName);
+                            break;
+                        case ChatChannel.Global:
+                            if (string.IsNullOrWhiteSpace(Data.guildName))
+                                format = LanguageManager.GetText(formatGlobal);
+                            else
+                                format = LanguageManager.GetText(formatGlobalWithGuildName);
+                            break;
+                        case ChatChannel.Whisper:
+                            if (string.IsNullOrWhiteSpace(Data.guildName))
+                                format = LanguageManager.GetText(formatWhisper);
+                            else
+                                format = LanguageManager.GetText(formatWhisperWithGuildName);
+                            break;
+                        case ChatChannel.Party:
+                            if (string.IsNullOrWhiteSpace(Data.guildName))
+                                format = LanguageManager.GetText(formatParty);
+                            else
+                                format = LanguageManager.GetText(formatPartyWithGuildName);
+                            break;
+                        case ChatChannel.Guild:
+                            format = LanguageManager.GetText(formatGuild);
+                            break;
+                    }
+                    uiTextMessage.text = string.Format(format, Data.sender, Data.message, Data.guildName);
                     if (GameInstance.PlayingCharacter != null && GameInstance.PlayingCharacter.CharacterName.Equals(Data.sender))
                         onIsTypeWriter.Invoke();
                     else
