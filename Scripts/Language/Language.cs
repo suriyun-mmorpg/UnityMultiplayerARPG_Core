@@ -1606,10 +1606,10 @@ namespace MultiplayerARPG
             Texts.Add(UIFormatKeys.UI_FORMAT_REQUIRE_SKILL_POINT.ToString(), "Require Skill Points: {0}");
             Texts.Add(UIFormatKeys.UI_FORMAT_REQUIRE_SKILL_POINT_NOT_ENOUGH.ToString(), "Require Skill Points: <color=red>{0}/{1}</color>");
             // 1.78 UI Chat Message With Guild Name
-            Texts.Add(UIFormatKeys.UI_FORMAT_CHAT_LOCAL_WITH_GUILD_NAME.ToString(), "<color=white>(LOCAL) {0}({2}): {1}</color>");
-            Texts.Add(UIFormatKeys.UI_FORMAT_CHAT_GLOBAL_WITH_GUILD_NAME.ToString(), "<color=white>(GLOBAL) {0}({2}): {1}</color>");
-            Texts.Add(UIFormatKeys.UI_FORMAT_CHAT_WHISPER_WITH_GUILD_NAME.ToString(), "<color=green>(WHISPER) {0}({2}): {1}</color>");
-            Texts.Add(UIFormatKeys.UI_FORMAT_CHAT_PARTY_WITH_GUILD_NAME.ToString(), "<color=cyan>(PARTY) {0}({2}): {1}</color>");
+            Texts.Add(UIFormatKeys.UI_FORMAT_CHAT_LOCAL_WITH_GUILD_NAME.ToString(), "<color=white>(LOCAL) {0}[{2}]: {1}</color>");
+            Texts.Add(UIFormatKeys.UI_FORMAT_CHAT_GLOBAL_WITH_GUILD_NAME.ToString(), "<color=white>(GLOBAL) {0}[{2}]: {1}</color>");
+            Texts.Add(UIFormatKeys.UI_FORMAT_CHAT_WHISPER_WITH_GUILD_NAME.ToString(), "<color=green>(WHISPER) {0}[{2}]: {1}</color>");
+            Texts.Add(UIFormatKeys.UI_FORMAT_CHAT_PARTY_WITH_GUILD_NAME.ToString(), "<color=cyan>(PARTY) {0}[{2}]: {1}</color>");
         }
     }
 
