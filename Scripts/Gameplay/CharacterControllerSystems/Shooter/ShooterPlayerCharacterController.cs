@@ -644,7 +644,22 @@ namespace MultiplayerARPG
             }
 
             // Update aim position
-            PlayingCharacterEntity.AimPosition = PlayingCharacterEntity.GetAttackAimPosition(ref isLeftHandAttacking, aimTargetPosition);
+            bool isCharacterTurnForwarding = Mathf.Abs(PlayingCharacterEntity.EntityTransform.eulerAngles.y - CacheGameplayCameraController.CameraTransform.eulerAngles.y) < 15f;
+            bool isAimingToCenterOfScreen = Mode == ControllerMode.Combat || turnForwardWhileDoingAction || isCharacterTurnForwarding;
+            if (isAimingToCenterOfScreen)
+            {
+                // Aim to center of screen
+                PlayingCharacterEntity.AimPosition = PlayingCharacterEntity.GetAttackAimPosition(ref isLeftHandAttacking, aimTargetPosition);
+            }
+            else
+            {
+                // Aim to character direction
+                Vector3 direction = PlayingCharacterEntity.EntityTransform.forward;
+                Vector3 angles = Quaternion.LookRotation(direction, Vector3.up).eulerAngles;
+                angles = new Vector3(CacheGameplayCameraController.CameraTransform.eulerAngles.x, angles.y, angles.z);
+                direction = Quaternion.Euler(angles) * Vector3.forward;
+                PlayingCharacterEntity.AimPosition = PlayingCharacterEntity.GetAttackAimPositionByDirection(ref isLeftHandAttacking, direction, false);
+            }
 
             isAimming = false;
             // Update input

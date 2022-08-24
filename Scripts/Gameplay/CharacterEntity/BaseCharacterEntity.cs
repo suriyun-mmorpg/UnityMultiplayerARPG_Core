@@ -737,21 +737,33 @@ namespace MultiplayerARPG
             return GetAttackAimPosition(this.GetWeaponDamageInfo(ref isLeftHand), isLeftHand, targetPosition);
         }
 
-        public AimPosition GetAttackAimPosition(DamageInfo damageInfo, bool isLeftHand)
+        public AimPosition GetAttackAimPositionByDirection(ref bool isLeftHand, Vector3 direction, bool aimToTargetIfExisted = true)
+        {
+            return GetAttackAimPositionByDirection(this.GetWeaponDamageInfo(ref isLeftHand), isLeftHand, direction, aimToTargetIfExisted);
+        }
+
+        public AimPosition GetAttackAimPosition(DamageInfo damageInfo, bool isLeftHand, bool aimToTargetIfExisted = true)
+        {
+            return GetAttackAimPositionByDirection(damageInfo, isLeftHand, EntityTransform.forward, aimToTargetIfExisted);
+        }
+
+        public AimPosition GetAttackAimPositionByDirection(DamageInfo damageInfo, bool isLeftHand, Vector3 direction, bool aimToTargetIfExisted = true)
         {
             Vector3 position = damageInfo.GetDamageTransform(this, isLeftHand).position;
-            Vector3 direction = EntityTransform.forward;
-            BaseGameEntity targetEntity = GetTargetEntity();
-            if (targetEntity && targetEntity != Entity)
+            if (aimToTargetIfExisted)
             {
-                if (targetEntity is DamageableEntity)
+                BaseGameEntity targetEntity = GetTargetEntity();
+                if (targetEntity != null && targetEntity != Entity)
                 {
-                    if (!(targetEntity as DamageableEntity).IsHideOrDead())
-                        return GetAttackAimPosition(position, (targetEntity as DamageableEntity).OpponentAimTransform.position);
-                }
-                else
-                {
-                    return GetAttackAimPosition(position, targetEntity.EntityTransform.position);
+                    if (targetEntity is DamageableEntity)
+                    {
+                        if (!(targetEntity as DamageableEntity).IsHideOrDead())
+                            return GetAttackAimPosition(position, (targetEntity as DamageableEntity).OpponentAimTransform.position);
+                    }
+                    else
+                    {
+                        return GetAttackAimPosition(position, targetEntity.EntityTransform.position);
+                    }
                 }
             }
             return AimPosition.CreateDirection(position, direction);
