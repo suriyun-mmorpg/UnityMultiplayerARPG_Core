@@ -480,7 +480,7 @@ namespace MultiplayerARPG
                     // if `tempPredictSqrMagnitude` is greater than `tempSqrMagnitude`,
                     // rigidbody will reaching target and character is moving pass it,
                     // so adjust move speed by distance and time (with physic formula: v=s/t)
-                    if (tempPredictSqrMagnitude >= tempSqrMagnitude)
+                    if (tempPredictSqrMagnitude >= tempSqrMagnitude && tempTargetDistance > 0f)
                         CurrentMoveSpeed *= tempTargetDistance / deltaTime / CurrentMoveSpeed;
                 }
                 tempMoveVelocity = tempHorizontalMoveDirection * CurrentMoveSpeed;
@@ -547,7 +547,7 @@ namespace MultiplayerARPG
                     // if `tempPredictSqrMagnitude` is greater than `tempSqrMagnitude`,
                     // rigidbody will reaching target and character is moving pass it,
                     // so adjust move speed by distance and time (with physic formula: v=s/t)
-                    if (tempPredictSqrMagnitude >= tempSqrMagnitude)
+                    if (tempPredictSqrMagnitude >= tempSqrMagnitude && tempTargetDistance > 0f)
                         CurrentMoveSpeed *= tempTargetDistance / deltaTime / CurrentMoveSpeed;
                     // Swim up to surface
                     if (CurrentMoveSpeed < 0.01f)
