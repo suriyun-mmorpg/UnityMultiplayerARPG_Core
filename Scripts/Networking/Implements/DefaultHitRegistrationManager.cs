@@ -37,8 +37,8 @@ namespace MultiplayerARPG
                     Skill = skill,
                     SkillLevel = skillLevel,
                 });
-                DelayRemoveValidateHits(id);
-                PerformValidation(id, randomSeed);
+                if (!PerformValidation(id, randomSeed))
+                    DelayRemoveValidateHits(id);
             }
         }
 
@@ -54,15 +54,15 @@ namespace MultiplayerARPG
             if (!registerHits.ContainsKey(id))
             {
                 registerHits.Add(id, message.Hits);
-                DelayRemoveRegisterHits(id);
-                PerformValidation(id, message.RandomSeed);
+                if (!PerformValidation(id, message.RandomSeed))
+                    DelayRemoveRegisterHits(id);
             }
         }
 
-        private void PerformValidation(string id, int randomSeed)
+        private bool PerformValidation(string id, int randomSeed)
         {
             if (!registerHits.ContainsKey(id) || !validateHits.ContainsKey(id))
-                return;
+                return false;
 
             while (registerHits[id].Count > 0)
             {
@@ -95,6 +95,7 @@ namespace MultiplayerARPG
 
             registerHits.Remove(id);
             validateHits.Remove(id);
+            return true;
         }
 
         private bool IsHit(HitValidateData validateHitData, HitRegisterData registerData, HitData hitData, DamageableHitBox hitBox)
