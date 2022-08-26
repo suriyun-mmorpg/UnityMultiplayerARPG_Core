@@ -11,7 +11,7 @@ namespace MultiplayerARPG
         private static Dictionary<string, List<HitRegisterData>> registerHits = new Dictionary<string, List<HitRegisterData>>();
         private static Dictionary<string, HitValidateData> validateHits = new Dictionary<string, HitValidateData>();
 
-        public void Validate(DamageInfo damageInfo, int randomSeed, byte fireSpread, BaseCharacterEntity attacker, Dictionary<DamageElement, MinMaxFloat> damageAmounts, CharacterItem weapon, BaseSkill skill, short skillLevel)
+        public void PrepareHitRegValidatation(DamageInfo damageInfo, int randomSeed, byte fireSpread, BaseCharacterEntity attacker, Dictionary<DamageElement, MinMaxFloat> damageAmounts, CharacterItem weapon, BaseSkill skill, short skillLevel)
         {
             if (!BaseGameNetworkManager.Singleton.IsServer)
             {
@@ -26,20 +26,16 @@ namespace MultiplayerARPG
             }
 
             string id = MakeId(attacker.Id, randomSeed);
-            if (!validateHits.ContainsKey(id))
+            validateHits[id] = new HitValidateData()
             {
-                validateHits.Add(id, new HitValidateData()
-                {
-                    FireSpread = fireSpread,
-                    Attacker = attacker,
-                    DamageAmounts = damageAmounts,
-                    Weapon = weapon,
-                    Skill = skill,
-                    SkillLevel = skillLevel,
-                });
-                if (!PerformValidation(id, randomSeed))
-                    DelayRemoveValidateHits(id);
-            }
+                FireSpread = fireSpread,
+                Attacker = attacker,
+                DamageAmounts = damageAmounts,
+                Weapon = weapon,
+                Skill = skill,
+                SkillLevel = skillLevel,
+            };
+            PerformValidation(attacker, id, randomSeed);
         }
 
         public void Register(BaseCharacterEntity attacker, HitRegisterMessage message)
@@ -51,15 +47,11 @@ namespace MultiplayerARPG
             }
 
             string id = MakeId(attacker.Id, message.RandomSeed);
-            if (!registerHits.ContainsKey(id))
-            {
-                registerHits.Add(id, message.Hits);
-                if (!PerformValidation(id, message.RandomSeed))
-                    DelayRemoveRegisterHits(id);
-            }
+            registerHits[id] = message.Hits;
+            PerformValidation(attacker, id, message.RandomSeed);
         }
 
-        private bool PerformValidation(string id, int randomSeed)
+        private bool PerformValidation(BaseCharacterEntity attacker, string id, int randomSeed)
         {
             if (!registerHits.ContainsKey(id) || !validateHits.ContainsKey(id))
                 return false;
@@ -84,7 +76,7 @@ namespace MultiplayerARPG
                     }
                     DamageableHitBox hitBox = damageableEntity.HitBoxes[registerHits[id][0].HitDataCollection[i].HitBoxIndex];
                     // Valiate hitting
-                    if (IsHit(validateHits[id], registerHits[id][0], registerHits[id][0].HitDataCollection[i], hitBox))
+                    if (IsHit(attacker, registerHits[id][0], registerHits[id][0].HitDataCollection[i], hitBox))
                     {
                         // Yes, it is hit
                         hitBox.ReceiveDamage(validateHits[id].Attacker.EntityTransform.position, validateHits[id].Attacker.GetInfo(), validateHits[id].DamageAmounts, validateHits[id].Weapon, validateHits[id].Skill, validateHits[id].SkillLevel, randomSeed);
@@ -98,9 +90,9 @@ namespace MultiplayerARPG
             return true;
         }
 
-        private bool IsHit(HitValidateData validateHitData, HitRegisterData registerData, HitData hitData, DamageableHitBox hitBox)
+        private bool IsHit(BaseCharacterEntity attacker, HitRegisterData hitRegData, HitData hitData, DamageableHitBox hitBox)
         {
-            long halfRtt = validateHitData.Attacker.Player != null ? (validateHitData.Attacker.Player.Rtt / 2) : 0;
+            long halfRtt = attacker.Player != null ? (attacker.Player.Rtt / 2) : 0;
             long serverTime = BaseGameNetworkManager.Singleton.ServerTimestamp;
             long targetTime = serverTime - halfRtt;
             DamageableHitBox.TransformHistory transformHistory = hitBox.GetTransformHistory(serverTime, targetTime);
@@ -108,7 +100,7 @@ namespace MultiplayerARPG
             return isHit;
         }
 
-        public void PrepareToRegister(DamageInfo damageInfo, int randomSeed, BaseCharacterEntity attacker, AimPosition aimPosition, List<HitData> hitDataCollection)
+        public void PrepareToRegister(DamageInfo damageInfo, int randomSeed, BaseCharacterEntity attacker, Vector3 damagePosition, Vector3 damageDirection, List<HitData> hitDataCollection)
         {
             if (!attacker.IsOwnerClient)
             {
@@ -121,19 +113,20 @@ namespace MultiplayerARPG
 
             prepareHits[randomSeed].Add(new HitRegisterData()
             {
-                AimPosition = aimPosition,
+                Position = damagePosition,
+                Direction = damageDirection,
                 HitDataCollection = hitDataCollection,
             });
         }
 
-        private void FixedUpdate()
+        public void SendHitRegToServer()
         {
             if (prepareHits.Count > 0)
             {
                 foreach (KeyValuePair<int, List<HitRegisterData>> kv in prepareHits)
                 {
                     // Send register message to server
-                    BaseGameNetworkManager.Singleton.ClientSendPacket(BaseGameEntity.CLIENT_STATE_DATA_CHANNEL, LiteNetLib.DeliveryMethod.ReliableUnordered, GameNetworkingConsts.HitRegistration, new HitRegisterMessage()
+                    BaseGameNetworkManager.Singleton.ClientSendPacket(BaseGameEntity.CLIENT_STATE_DATA_CHANNEL, LiteNetLib.DeliveryMethod.ReliableOrdered, GameNetworkingConsts.HitRegistration, new HitRegisterMessage()
                     {
                         RandomSeed = kv.Key,
                         Hits = kv.Value,
@@ -141,18 +134,6 @@ namespace MultiplayerARPG
                 }
                 prepareHits.Clear();
             }
-        }
-
-        private static async void DelayRemoveValidateHits(string id)
-        {
-            await UniTask.Delay(200);
-            validateHits.Remove(id);
-        }
-
-        private static async void DelayRemoveRegisterHits(string id)
-        {
-            await UniTask.Delay(200);
-            registerHits.Remove(id);
         }
 
         private static string MakeId(string attackerId, int randomSeed)

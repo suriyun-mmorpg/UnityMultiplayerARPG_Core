@@ -311,7 +311,7 @@ namespace MultiplayerARPG
                             }
                             // Prepare hit registration
                             if (!isHost && isOwnerClient && hitDataCollection.Count > 0)
-                                BaseGameNetworkManager.Singleton.HitRegistrationManager.PrepareToRegister(this, randomSeed, attacker, aimPosition, hitDataCollection);
+                                BaseGameNetworkManager.Singleton.HitRegistrationManager.PrepareToRegister(this, randomSeed, attacker, damagePosition, damageDirection, hitDataCollection);
                         }
                     }
                     break;
@@ -408,7 +408,7 @@ namespace MultiplayerARPG
                             }
                             // Prepare hit registration
                             if (!isHost && isOwnerClient && hitDataCollection.Count > 0)
-                                BaseGameNetworkManager.Singleton.HitRegistrationManager.PrepareToRegister(this, randomSeed, attacker, aimPosition, hitDataCollection);
+                                BaseGameNetworkManager.Singleton.HitRegistrationManager.PrepareToRegister(this, randomSeed, attacker, damagePosition, damageDirection, hitDataCollection);
                         }
                         // Spawn projectile effect, it will move to target but it won't apply damage because it is just effect
                         if (isClient && projectileEffect != null)

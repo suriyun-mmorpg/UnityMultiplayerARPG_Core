@@ -375,6 +375,7 @@ namespace MultiplayerARPG
                 EntityStateMessageWriter.Put(EntityStateDataWriter.Data, 0, EntityStateDataWriter.Length);
                 ClientSendMessage(CLIENT_STATE_DATA_CHANNEL, (shouldSendReliably || (ushort)inputState > 1 << 0) ? DeliveryMethod.ReliableOrdered : DeliveryMethod.Sequenced, EntityStateMessageWriter);
             }
+            CurrentGameManager.HitRegistrationManager.SendHitRegToServer();
         }
 
         public override void SendServerState()

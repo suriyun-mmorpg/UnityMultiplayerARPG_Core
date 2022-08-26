@@ -254,7 +254,7 @@ namespace MultiplayerARPG
             }
 
             if (IsServer && !IsOwnerClient && !IsOwnedByServer)
-                BaseGameNetworkManager.Singleton.HitRegistrationManager.Validate(damageInfo, randomSeed, fireSpread, Entity, damageAmounts, weapon, null, 0);
+                BaseGameNetworkManager.Singleton.HitRegistrationManager.PrepareHitRegValidatation(damageInfo, randomSeed, fireSpread, Entity, damageAmounts, weapon, null, 0);
         }
 
         [AllRpc]

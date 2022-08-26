@@ -116,7 +116,7 @@ namespace MultiplayerARPG
                     out _);
 
                 if (skillUser.IsServer && !skillUser.IsOwnerClient && !skillUser.IsOwnedByServer)
-                    BaseGameNetworkManager.Singleton.HitRegistrationManager.Validate(damageInfo, randomSeed, 0, skillUser, damageAmounts, weapon, this, skillLevel);
+                    BaseGameNetworkManager.Singleton.HitRegistrationManager.PrepareHitRegValidatation(damageInfo, randomSeed, 0, skillUser, damageAmounts, weapon, this, skillLevel);
             }
         }
 
