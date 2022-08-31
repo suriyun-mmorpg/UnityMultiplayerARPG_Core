@@ -19,7 +19,6 @@ namespace MultiplayerARPG
         [Header("Square Area")]
         public float squareSizeX;
         public float squareSizeZ;
-        public float squareGizmosHeight = 5f;
 
         protected GameInstance CurrentGameInstance { get { return GameInstance.Singleton; } }
 
@@ -67,15 +66,13 @@ namespace MultiplayerARPG
 #if UNITY_EDITOR
         private void OnDrawGizmos()
         {
-            Gizmos.color = gizmosColor;
             switch (type)
             {
                 case GameAreaType.Radius:
-                    Gizmos.DrawWireSphere(transform.position, randomRadius);
+                    GenericUtils.DrawCircleGizmos(transform, gizmosColor, randomRadius);
                     break;
                 case GameAreaType.Square:
-                    Gizmos.DrawWireCube(transform.position + Vector3.up * squareGizmosHeight * 0.5f * 0.5f, new Vector3(squareSizeX, squareGizmosHeight * 0.5f, squareSizeZ));
-                    Gizmos.DrawWireCube(transform.position + Vector3.down * squareGizmosHeight * 0.5f * 0.5f, new Vector3(squareSizeX, squareGizmosHeight * 0.5f, squareSizeZ));
+                    GenericUtils.DrawSquareGizmos(transform, gizmosColor, squareSizeX, squareSizeZ);
                     break;
             }
         }

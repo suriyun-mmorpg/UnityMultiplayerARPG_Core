@@ -557,4 +557,58 @@ public static class GenericUtils
         return unityWebRequest.isHttpError || unityWebRequest.isNetworkError;
 #endif
     }
+
+    public static void DrawSquareGizmos(Transform transform, Color color, float squareSizeX, float squareSizeZ)
+    {
+        // Set color
+        Color defaultColor = Gizmos.color;
+        Gizmos.color = color;
+        // 1--2
+        // |  |
+        // 3--4
+        Vector3 p1 = new Vector3(transform.position.x - squareSizeX / 2, transform.position.y, transform.position.z - squareSizeZ / 2);
+        Vector3 p2 = new Vector3(transform.position.x + squareSizeX / 2, transform.position.y, transform.position.z - squareSizeZ / 2);
+        Vector3 p3 = new Vector3(transform.position.x - squareSizeX / 2, transform.position.y, transform.position.z + squareSizeZ / 2);
+        Vector3 p4 = new Vector3(transform.position.x + squareSizeX / 2, transform.position.y, transform.position.z + squareSizeZ / 2);
+        Gizmos.DrawLine(p1, p2);
+        Gizmos.DrawLine(p2, p4);
+        Gizmos.DrawLine(p4, p3);
+        Gizmos.DrawLine(p3, p1);
+        // Restore default colors
+        Gizmos.color = defaultColor;
+    }
+
+    public static void DrawCircleGizmos(Transform transform, Color color, float radius)
+    {
+        // Set matrix
+        Matrix4x4 defaultMatrix = Gizmos.matrix;
+        Gizmos.matrix = transform.localToWorldMatrix;
+        // Set color
+        Color defaultColor = Gizmos.color;
+        Gizmos.color = color;
+        // Draw a ring
+        Vector3 beginPoint = Vector3.zero;
+        Vector3 firstPoint = Vector3.zero;
+        for (float theta = 0; theta < 2 * Mathf.PI; theta += 0.1f)
+        {
+            float x = radius * Mathf.Cos(theta);
+            float z = radius * Mathf.Sin(theta);
+            Vector3 endPoint = new Vector3(x, 0, z);
+            if (theta == 0)
+            {
+                firstPoint = endPoint;
+            }
+            else
+            {
+                Gizmos.DrawLine(beginPoint, endPoint);
+            }
+            beginPoint = endPoint;
+        }
+        // Draw the last segment
+        Gizmos.DrawLine(firstPoint, beginPoint);
+        // Restore default colors
+        Gizmos.color = defaultColor;
+        // Restore default matrix
+        Gizmos.matrix = defaultMatrix;
+    }
 }
