@@ -26,6 +26,7 @@ namespace MultiplayerARPG
         public bool makeByCollider = true;
         public bool makeByCollider2D = true;
         public bool makeByRenderer = false;
+        public bool doNotDestroyCamera = false;
 #if UNITY_EDITOR
         [InspectorButton(nameof(CreateByComponent))]
         public bool create;
@@ -46,7 +47,8 @@ namespace MultiplayerARPG
                 makeByTerrain,
                 makeByCollider,
                 makeByCollider2D,
-                makeByRenderer);
+                makeByRenderer,
+                doNotDestroyCamera);
         }
 
         public static void Create(
@@ -60,7 +62,8 @@ namespace MultiplayerARPG
             bool makeByTerrain,
             bool makeByCollider,
             bool makeByCollider2D,
-            bool makeByRenderer)
+            bool makeByRenderer,
+            bool doNotDestroyCamera = false)
         {
             // Find bounds
             Bounds bounds = default;
@@ -205,7 +208,8 @@ namespace MultiplayerARPG
 
             DestroyImmediate(texture);
             DestroyImmediate(renderTexture);
-            DestroyImmediate(cameraGameObject);
+            if (!doNotDestroyCamera)
+                DestroyImmediate(cameraGameObject);
         }
 #endif
     }
