@@ -7,26 +7,17 @@ namespace MultiplayerARPG
 {
     public class DefaultLagCompensationManager : MonoBehaviour, ILagCompensationManager
     {
-        private readonly Dictionary<uint, DamageableHitBox[]> HitBoxes = new Dictionary<uint, DamageableHitBox[]>();
-        public float snapShotInterval = 0.06f;
-        public int maxHistorySize = 16;
+        [SerializeField]
+        private float snapShotInterval = 0.06f;
+        public float SnapShotInterval { get { return snapShotInterval; } }
+
+        [SerializeField]
+        private int maxHistorySize = 16;
         public int MaxHistorySize { get { return maxHistorySize; } }
 
-        private readonly List<DamageableHitBox> hitBoxes = new List<DamageableHitBox>();
-        private float snapShotCountDown = 0f;
-
-        public bool AddHitBoxes(uint objectId, DamageableHitBox[] hitBoxes)
-        {
-            if (HitBoxes.ContainsKey(objectId))
-                return false;
-            HitBoxes.Add(objectId, hitBoxes);
-            return true;
-        }
-
-        public bool RemoveHitBoxes(uint objectId)
-        {
-            return HitBoxes.Remove(objectId);
-        }
+        private Dictionary<uint, DamageableEntity> damageableEntities = new Dictionary<uint, DamageableEntity>();
+        private List<DamageableEntity> simulatedDamageableEntities = new List<DamageableEntity>();
+        private float lastHistoryStoreTime;
 
         public bool SimulateHitBoxes(long connectionId, long targetTime, Action action)
         {
@@ -65,44 +56,50 @@ namespace MultiplayerARPG
 
         private bool InternalBeginSimlateHitBoxes(LiteNetLibPlayer player, long targetTime)
         {
-            hitBoxes.Clear();
             foreach (uint subscribingObjectId in player.GetSubscribingObjectIds())
             {
-                if (HitBoxes.ContainsKey(subscribingObjectId))
-                    hitBoxes.AddRange(HitBoxes[subscribingObjectId]);
-            }
-            long time = BaseGameNetworkManager.Singleton.ServerTimestamp;
-            for (int i = 0; i < hitBoxes.Count; ++i)
-            {
-                if (hitBoxes[i] != null)
-                    hitBoxes[i].Rewind(time, targetTime);
+                if (damageableEntities.ContainsKey(subscribingObjectId))
+                {
+                    damageableEntities[subscribingObjectId].RewindHitBoxes(targetTime);
+                    if (!simulatedDamageableEntities.Contains(damageableEntities[subscribingObjectId]))
+                        simulatedDamageableEntities.Add(damageableEntities[subscribingObjectId]);
+                }
             }
             return true;
         }
 
         public void EndSimulateHitBoxes()
         {
-            for (int i = 0; i < hitBoxes.Count; ++i)
+            for (int i = 0; i < simulatedDamageableEntities.Count; ++i)
             {
-                if (hitBoxes[i] != null)
-                    hitBoxes[i].Restore();
+                if (simulatedDamageableEntities[i] != null)
+                    simulatedDamageableEntities[i].RestoreHitBoxes();
             }
+        }
+
+        public void AddDamageableEntity(DamageableEntity entity)
+        {
+            damageableEntities[entity.ObjectId] = entity;
+        }
+
+        public void RemoveDamageableEntity(DamageableEntity entity)
+        {
+            damageableEntities.Remove(entity.ObjectId);
         }
 
         private void LateUpdate()
         {
+            float currentTime = Time.unscaledTime;
             if (!BaseGameNetworkManager.Singleton.IsServer)
                 return;
-            snapShotCountDown -= Time.unscaledDeltaTime;
-            if (snapShotCountDown > 0)
-                return;
-            snapShotCountDown = snapShotInterval;
-            long time = BaseGameNetworkManager.Singleton.ServerTimestamp;
-            foreach (DamageableHitBox[] hitBoxesArray in HitBoxes.Values)
+            if (currentTime - lastHistoryStoreTime >= SnapShotInterval)
             {
-                foreach (DamageableHitBox hitBox in hitBoxesArray)
+                lastHistoryStoreTime = currentTime;
+                long serverTimestamp = BaseGameNetworkManager.Singleton.ServerTimestamp;
+                foreach (DamageableEntity entity in damageableEntities.Values)
                 {
-                    hitBox.AddTransformHistory(time);
+                    if (entity.Identity.CountSubscribers() > 0)
+                        entity.AddHitBoxesTransformHistory(serverTimestamp);
                 }
             }
         }

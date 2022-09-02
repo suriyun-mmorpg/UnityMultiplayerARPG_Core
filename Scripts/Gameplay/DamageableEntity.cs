@@ -76,7 +76,13 @@ namespace MultiplayerARPG
             }
             // Add to lag compensation manager
             if (!isStaticHitBoxes)
-                CurrentGameManager.LagCompensationManager.AddHitBoxes(ObjectId, HitBoxes);
+                CurrentGameManager.LagCompensationManager.AddDamageableEntity(this);
+        }
+
+        protected override void EntityOnDestroy()
+        {
+            base.EntityOnDestroy();
+            CurrentGameManager.LagCompensationManager.RemoveDamageableEntity(this);
         }
 
         private DamageableHitBox[] CreateHitBoxes()
@@ -134,16 +140,37 @@ namespace MultiplayerARPG
             }
         }
 
-        protected override void EntityOnDestroy()
-        {
-            base.EntityOnDestroy();
-            CurrentGameManager.LagCompensationManager.RemoveHitBoxes(ObjectId);
-        }
-
         protected override void EntityUpdate()
         {
             base.EntityUpdate();
             SetModelIsDead(this.IsDead());
+        }
+
+        public void AddHitBoxesTransformHistory(long time)
+        {
+            if (isStaticHitBoxes)
+                return;
+            for (int i = 0; i < HitBoxes.Length; ++i)
+            {
+                HitBoxes[i].AddTransformHistory(time);
+            }
+        }
+
+        public void RewindHitBoxes(long targetTime)
+        {
+            long serverTimestamp = Manager.ServerTimestamp;
+            for (int i = 0; i < HitBoxes.Length; ++i)
+            {
+                HitBoxes[i].Rewind(serverTimestamp, targetTime);
+            }
+        }
+
+        public void RestoreHitBoxes()
+        {
+            for (int i = 0; i < HitBoxes.Length; ++i)
+            {
+                HitBoxes[i].Restore();
+            }
         }
 
         /// <summary>
