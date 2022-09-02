@@ -75,6 +75,7 @@ namespace MultiplayerARPG
                 if (simulatedDamageableEntities[i] != null)
                     simulatedDamageableEntities[i].RestoreHitBoxes();
             }
+            simulatedDamageableEntities.Clear();
         }
 
         public void AddDamageableEntity(DamageableEntity entity)
@@ -92,15 +93,14 @@ namespace MultiplayerARPG
             float currentTime = Time.unscaledTime;
             if (!BaseGameNetworkManager.Singleton.IsServer)
                 return;
-            if (currentTime - lastHistoryStoreTime >= SnapShotInterval)
+            if (currentTime - lastHistoryStoreTime < SnapShotInterval)
+                return;
+            lastHistoryStoreTime = currentTime;
+            long serverTimestamp = BaseGameNetworkManager.Singleton.ServerTimestamp;
+            foreach (DamageableEntity entity in damageableEntities.Values)
             {
-                lastHistoryStoreTime = currentTime;
-                long serverTimestamp = BaseGameNetworkManager.Singleton.ServerTimestamp;
-                foreach (DamageableEntity entity in damageableEntities.Values)
-                {
-                    if (entity.Identity.CountSubscribers() > 0)
-                        entity.AddHitBoxesTransformHistory(serverTimestamp);
-                }
+                if (entity.Identity.CountSubscribers() > 0)
+                    entity.AddHitBoxesTransformHistory(serverTimestamp);
             }
         }
     }
