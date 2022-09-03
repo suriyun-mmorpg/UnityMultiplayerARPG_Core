@@ -1,4 +1,7 @@
 using UnityEngine;
+#if UNITY_EDITOR
+using UnityEditor;
+#endif
 
 namespace UtilsComponents
 {
@@ -31,6 +34,24 @@ namespace UtilsComponents
             if (animator == null)
                 animator = GetComponentInParent<Animator>();
             LateUpdate();
+        }
+
+        [ContextMenu("Move Children To Selected Bone")]
+        public void MoveChildrenToSelectedBone()
+        {
+            Transform tempTransform = animator.GetBoneTransform(bone);
+            for (int i = transform.childCount - 1; i >= 0; --i)
+            {
+                Transform childTransform = transform.GetChild(i);
+                Vector3 position = childTransform.position;
+                Quaternion rotation = childTransform.rotation;
+                childTransform.parent = tempTransform;
+                childTransform.position = position;
+                childTransform.rotation = rotation;
+            }
+#if UNITY_EDITOR
+            EditorUtility.SetDirty(transform);
+#endif
         }
     }
 }
