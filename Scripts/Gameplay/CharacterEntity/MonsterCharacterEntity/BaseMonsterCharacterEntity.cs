@@ -197,6 +197,16 @@ namespace MultiplayerARPG
             Profiler.EndSample();
         }
 
+        public override void SendServerState()
+        {
+            if (IsServer && Identity.CountSubscribers() == 0)
+            {
+                // Don't updates while there is no subscrubers
+                return;
+            }
+            base.SendServerState();
+        }
+
         protected void InitStats()
         {
             if (!IsServer)
