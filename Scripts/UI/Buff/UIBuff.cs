@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using Cysharp.Text;
 using UnityEngine;
 
 namespace MultiplayerARPG
@@ -52,7 +53,7 @@ namespace MultiplayerARPG
             {
                 float duration = Buff.GetDuration(Level);
                 uiTextDuration.SetGameObjectActive(duration != 0);
-                uiTextDuration.text = string.Format(
+                uiTextDuration.text = ZString.Format(
                     LanguageManager.GetText(formatKeyDuration),
                     duration.ToString("N0"));
             }
@@ -61,7 +62,7 @@ namespace MultiplayerARPG
             {
                 int recoveryHp = Buff.GetRecoveryHp(Level);
                 uiTextRecoveryHp.SetGameObjectActive(recoveryHp != 0);
-                uiTextRecoveryHp.text = string.Format(
+                uiTextRecoveryHp.text = ZString.Format(
                     LanguageManager.GetText(formatKeyRecoveryHp),
                     recoveryHp.ToString("N0"));
             }
@@ -70,7 +71,7 @@ namespace MultiplayerARPG
             {
                 int recoveryMp = Buff.GetRecoveryMp(Level);
                 uiTextRecoveryMp.SetGameObjectActive(recoveryMp != 0);
-                uiTextRecoveryMp.text = string.Format(
+                uiTextRecoveryMp.text = ZString.Format(
                     LanguageManager.GetText(formatKeyRecoveryMp),
                     recoveryMp.ToString("N0"));
             }
@@ -79,7 +80,7 @@ namespace MultiplayerARPG
             {
                 int recoveryStamina = Buff.GetRecoveryStamina(Level);
                 uiTextRecoveryStamina.SetGameObjectActive(recoveryStamina != 0);
-                uiTextRecoveryStamina.text = string.Format(
+                uiTextRecoveryStamina.text = ZString.Format(
                     LanguageManager.GetText(formatKeyRecoveryStamina),
                     recoveryStamina.ToString("N0"));
             }
@@ -88,7 +89,7 @@ namespace MultiplayerARPG
             {
                 int recoveryFood = Buff.GetRecoveryFood(Level);
                 uiTextRecoveryFood.SetGameObjectActive(recoveryFood != 0);
-                uiTextRecoveryFood.text = string.Format(
+                uiTextRecoveryFood.text = ZString.Format(
                     LanguageManager.GetText(formatKeyRecoveryFood),
                     recoveryFood.ToString("N0"));
             }
@@ -97,7 +98,7 @@ namespace MultiplayerARPG
             {
                 int recoveryWater = Buff.GetRecoveryWater(Level);
                 uiTextRecoveryWater.SetGameObjectActive(recoveryWater != 0);
-                uiTextRecoveryWater.text = string.Format(
+                uiTextRecoveryWater.text = ZString.Format(
                     LanguageManager.GetText(formatKeyRecoveryWater),
                     recoveryWater.ToString("N0"));
             }
