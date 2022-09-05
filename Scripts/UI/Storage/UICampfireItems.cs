@@ -1,5 +1,5 @@
-﻿using UnityEngine;
-using System.Collections;
+﻿using Cysharp.Text;
+using UnityEngine;
 
 namespace MultiplayerARPG
 {
@@ -26,7 +26,7 @@ namespace MultiplayerARPG
             if (uiTextTurnOnElapsed)
             {
                 System.TimeSpan time = System.TimeSpan.FromSeconds(campFireEntity.TurnOnElapsed);
-                uiTextTurnOnElapsed.text = string.Format("{0:D2}:{1:D2}:{2:D2}", time.Hours, time.Minutes, time.Seconds);
+                uiTextTurnOnElapsed.text = ZString.Format("{0:D2}:{1:D2}:{2:D2}", time.Hours, time.Minutes, time.Seconds);
             }
 
             if (turnOnObjects != null && turnOnObjects.Length > 0)

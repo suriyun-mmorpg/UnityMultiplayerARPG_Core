@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
+using Cysharp.Text;
 using UnityEngine;
-using UnityEngine.Serialization;
 
 namespace MultiplayerARPG
 {
@@ -70,7 +70,7 @@ namespace MultiplayerARPG
                 if (WeightLimit <= 0)
                     uiTextWeightLimit.text = LanguageManager.GetText(UITextKeys.UI_LABEL_UNLIMIT_WEIGHT.ToString());
                 else
-                    uiTextWeightLimit.text = string.Format(LanguageManager.GetText(formatKeyWeightLimit), TotalWeight.ToString("N2"), WeightLimit.ToString("N2"));
+                    uiTextWeightLimit.text = ZString.Format(LanguageManager.GetText(formatKeyWeightLimit), TotalWeight.ToString("N2"), WeightLimit.ToString("N2"));
             }
 
             if (uiTextSlotLimit != null)
@@ -78,7 +78,7 @@ namespace MultiplayerARPG
                 if (SlotLimit <= 0)
                     uiTextSlotLimit.text = LanguageManager.GetText(UITextKeys.UI_LABEL_UNLIMIT_SLOT.ToString());
                 else
-                    uiTextSlotLimit.text = string.Format(LanguageManager.GetText(formatKeySlotLimit), UsedSlots.ToString("N0"), SlotLimit.ToString("N0"));
+                    uiTextSlotLimit.text = ZString.Format(LanguageManager.GetText(formatKeySlotLimit), UsedSlots.ToString("N0"), SlotLimit.ToString("N0"));
             }
 
             base.Update();
