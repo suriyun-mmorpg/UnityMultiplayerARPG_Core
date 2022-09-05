@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using Cysharp.Text;
+using UnityEngine;
 using UnityEngine.UI;
 
 namespace MultiplayerARPG
@@ -35,7 +36,7 @@ namespace MultiplayerARPG
 
             if (uiTextLevel != null)
             {
-                uiTextLevel.text = string.Format(
+                uiTextLevel.text = ZString.Format(
                     LanguageManager.GetText(formatKeyLevel),
                     Data == null ? "1" : Data.Level.ToString("N0"));
             }
@@ -59,7 +60,7 @@ namespace MultiplayerARPG
 
             if (uiTextSkillCast != null)
             {
-                uiTextSkillCast.text = string.Format(
+                uiTextSkillCast.text = ZString.Format(
                     LanguageManager.GetText(formatKeySkillCastDuration), castingSkillCountDown.ToString("N2"));
             }
 

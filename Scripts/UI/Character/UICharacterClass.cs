@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using Cysharp.Text;
+using UnityEngine;
 using UnityEngine.UI;
 
 namespace MultiplayerARPG
@@ -24,14 +25,14 @@ namespace MultiplayerARPG
         {
             if (uiTextTitle != null)
             {
-                uiTextTitle.text = string.Format(
+                uiTextTitle.text = ZString.Format(
                     LanguageManager.GetText(formatKeyTitle),
                     Data == null ? LanguageManager.GetUnknowTitle() : Data.Title);
             }
 
             if (uiTextDescription != null)
             {
-                uiTextDescription.text = string.Format(
+                uiTextDescription.text = ZString.Format(
                     LanguageManager.GetText(formatKeyDescription),
                     Data == null ? LanguageManager.GetUnknowDescription() : Data.Description);
             }

@@ -1,6 +1,6 @@
-﻿using LiteNetLibManager;
-using System.Collections.Generic;
-using System.Text;
+﻿using System.Collections.Generic;
+using Cysharp.Text;
+using LiteNetLibManager;
 using UnityEngine;
 using UnityEngine.Profiling;
 
@@ -297,21 +297,21 @@ namespace MultiplayerARPG
 
             if (uiTextId != null)
             {
-                uiTextId.text = string.Format(
+                uiTextId.text = ZString.Format(
                     LanguageManager.GetText(formatKeyId),
                     Data == null ? LanguageManager.GetUnknowTitle() : Data.Id);
             }
 
             if (uiTextName != null)
             {
-                uiTextName.text = string.Format(
+                uiTextName.text = ZString.Format(
                     LanguageManager.GetText(formatKeyName),
                     Data == null ? LanguageManager.GetUnknowTitle() : Data.Title);
             }
 
             if (uiTextLevel != null)
             {
-                uiTextLevel.text = string.Format(
+                uiTextLevel.text = ZString.Format(
                     LanguageManager.GetText(formatKeyLevel),
                     Data == null ? "1" : Data.Level.ToString("N0"));
             }
@@ -337,21 +337,21 @@ namespace MultiplayerARPG
             IPlayerCharacterData playerCharacter = Data as IPlayerCharacterData;
             if (uiTextStatPoint != null)
             {
-                uiTextStatPoint.text = string.Format(
+                uiTextStatPoint.text = ZString.Format(
                     LanguageManager.GetText(formatKeyStatPoint),
                     playerCharacter == null ? "0" : playerCharacter.StatPoint.ToString("N0"));
             }
 
             if (uiTextSkillPoint != null)
             {
-                uiTextSkillPoint.text = string.Format(
+                uiTextSkillPoint.text = ZString.Format(
                     LanguageManager.GetText(formatKeySkillPoint),
                     playerCharacter == null ? "0" : playerCharacter.SkillPoint.ToString("N0"));
             }
 
             if (uiTextGold != null)
             {
-                uiTextGold.text = string.Format(
+                uiTextGold.text = ZString.Format(
                     LanguageManager.GetText(formatKeyGold),
                     playerCharacter == null ? "0" : playerCharacter.Gold.ToString("N0"));
             }
@@ -383,7 +383,7 @@ namespace MultiplayerARPG
 
             if (uiTextWeightLimit != null)
             {
-                uiTextWeightLimit.text = string.Format(
+                uiTextWeightLimit.text = ZString.Format(
                     LanguageManager.GetText(formatKeyWeightLimitStats),
                     Data.GetCaches().TotalItemWeight.ToString("N2"),
                     Data.GetCaches().LimitItemWeight.ToString("N2"));
@@ -391,7 +391,7 @@ namespace MultiplayerARPG
 
             if (uiTextSlotLimit != null)
             {
-                uiTextSlotLimit.text = string.Format(
+                uiTextSlotLimit.text = ZString.Format(
                     LanguageManager.GetText(formatKeySlotLimitStats),
                     Data.GetCaches().TotalItemSlot.ToString("N0"),
                     Data.GetCaches().LimitItemSlot.ToString("N0"));
@@ -416,37 +416,39 @@ namespace MultiplayerARPG
 
             if (uiTextWeaponDamages != null)
             {
-                StringBuilder textDamages = new StringBuilder();
-                if (rightHandWeapon != null)
+                using (Utf16ValueStringBuilder textDamages = ZString.CreateStringBuilder(true))
                 {
-                    MinMaxFloat sumDamages = GameDataHelpers.GetSumDamages(rightHandDamages);
-                    if (textDamages.Length > 0)
-                        textDamages.Append('\n');
-                    textDamages.AppendFormat(
-                        LanguageManager.GetText(formatKeyWeaponDamage),
-                        sumDamages.min.ToString("N0"),
-                        sumDamages.max.ToString("N0"));
+                    if (rightHandWeapon != null)
+                    {
+                        MinMaxFloat sumDamages = GameDataHelpers.GetSumDamages(rightHandDamages);
+                        if (textDamages.Length > 0)
+                            textDamages.Append('\n');
+                        textDamages.AppendFormat(
+                            LanguageManager.GetText(formatKeyWeaponDamage),
+                            sumDamages.min.ToString("N0"),
+                            sumDamages.max.ToString("N0"));
+                    }
+                    if (leftHandWeapon != null)
+                    {
+                        MinMaxFloat sumDamages = GameDataHelpers.GetSumDamages(leftHandDamages);
+                        if (textDamages.Length > 0)
+                            textDamages.Append('\n');
+                        textDamages.AppendFormat(
+                            LanguageManager.GetText(formatKeyWeaponDamage),
+                            sumDamages.min.ToString("N0"),
+                            sumDamages.max.ToString("N0"));
+                    }
+                    if (rightHandWeapon == null && leftHandWeapon == null)
+                    {
+                        IWeaponItem defaultWeaponItem = GameInstance.Singleton.DefaultWeaponItem;
+                        KeyValuePair<DamageElement, MinMaxFloat> damageAmount = defaultWeaponItem.GetDamageAmount(1, 1f, Data);
+                        textDamages.AppendFormat(
+                            LanguageManager.GetText(formatKeyWeaponDamage),
+                            damageAmount.Value.min.ToString("N0"),
+                            damageAmount.Value.max.ToString("N0"));
+                    }
+                    uiTextWeaponDamages.text = textDamages.ToString();
                 }
-                if (leftHandWeapon != null)
-                {
-                    MinMaxFloat sumDamages = GameDataHelpers.GetSumDamages(leftHandDamages);
-                    if (textDamages.Length > 0)
-                        textDamages.Append('\n');
-                    textDamages.AppendFormat(
-                        LanguageManager.GetText(formatKeyWeaponDamage),
-                        sumDamages.min.ToString("N0"),
-                        sumDamages.max.ToString("N0"));
-                }
-                if (rightHandWeapon == null && leftHandWeapon == null)
-                {
-                    IWeaponItem defaultWeaponItem = GameInstance.Singleton.DefaultWeaponItem;
-                    KeyValuePair<DamageElement, MinMaxFloat> damageAmount = defaultWeaponItem.GetDamageAmount(1, 1f, Data);
-                    textDamages.AppendFormat(
-                        LanguageManager.GetText(formatKeyWeaponDamage),
-                        damageAmount.Value.min.ToString("N0"),
-                        damageAmount.Value.max.ToString("N0"));
-                }
-                uiTextWeaponDamages.text = textDamages.ToString();
             }
 
             if (uiRightHandDamages != null)

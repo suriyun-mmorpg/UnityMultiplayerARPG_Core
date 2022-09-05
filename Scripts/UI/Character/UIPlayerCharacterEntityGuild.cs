@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using Cysharp.Text;
+using UnityEngine;
 
 namespace MultiplayerARPG
 {
@@ -62,7 +63,7 @@ namespace MultiplayerARPG
             if (textGuildName != null)
             {
                 textGuildName.SetGameObjectActive(true);
-                textGuildName.text = string.Format(LanguageManager.GetText(formatKeyTitle), guild.GuildName);
+                textGuildName.text = ZString.Format(LanguageManager.GetText(formatKeyTitle), guild.GuildName);
             }
             if (uiGuildIcon != null)
                 uiGuildIcon.SetDataByDataId(options.iconDataId);
