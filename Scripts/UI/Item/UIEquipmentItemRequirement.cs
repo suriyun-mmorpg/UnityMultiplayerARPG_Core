@@ -62,7 +62,7 @@ namespace MultiplayerARPG
                 }
                 else
                 {
-                    using (Utf16ValueStringBuilder str = ZString.CreateStringBuilder(true))
+                    using (Utf16ValueStringBuilder str = ZString.CreateStringBuilder(false))
                     {
                         PlayerCharacter playingCharacterClass = GameInstance.PlayingCharacter.GetDatabase() as PlayerCharacter;
                         bool available = false;

@@ -15,7 +15,7 @@ namespace MultiplayerARPG
         
         protected override void UpdateData()
         {
-            using (Utf16ValueStringBuilder allBonusText = ZString.CreateStringBuilder(true))
+            using (Utf16ValueStringBuilder allBonusText = ZString.CreateStringBuilder(false))
             {
             	int effectCount = 1;
             	string tempText;

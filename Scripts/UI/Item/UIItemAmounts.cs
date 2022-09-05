@@ -67,7 +67,7 @@ namespace MultiplayerARPG
             }
             else
             {
-                using (Utf16ValueStringBuilder tempAllText = ZString.CreateStringBuilder(true))
+                using (Utf16ValueStringBuilder tempAllText = ZString.CreateStringBuilder(false))
                 {
                     BaseItem tempData;
                     int tempCurrentAmount;
