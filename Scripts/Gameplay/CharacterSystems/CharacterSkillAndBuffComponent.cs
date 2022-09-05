@@ -43,6 +43,7 @@ namespace MultiplayerARPG
                         tempDuration = summon.GetDuration();
                         if (summon.ShouldRemove())
                         {
+                            recoveryBuffs.Remove(summon.id);
                             Entity.Summons.RemoveAt(i);
                             summon.UnSummon(Entity);
                         }
