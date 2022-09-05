@@ -1,5 +1,5 @@
 ﻿using System.Collections.Generic;
-using System.Text;
+using Cysharp.Text;
 using UnityEngine;
 using UnityEngine.Serialization;
 #if UNITY_EDITOR
@@ -162,16 +162,18 @@ namespace MultiplayerARPG
             {
                 if (!alreadySetAvailableWeaponsText)
                 {
-                    StringBuilder str = new StringBuilder();
-                    foreach (WeaponType availableWeapon in CacheAvailableWeapons)
+                    using (Utf16ValueStringBuilder str = ZString.CreateStringBuilder(true))
                     {
-                        if (availableWeapon == null)
-                            continue;
-                        if (str.Length > 0)
-                            str.Append('/');
-                        str.Append(availableWeapon.Title);
+                        foreach (WeaponType availableWeapon in CacheAvailableWeapons)
+                        {
+                            if (availableWeapon == null)
+                                continue;
+                            if (str.Length > 0)
+                                str.Append('/');
+                            str.Append(availableWeapon.Title);
+                        }
+                        availableWeaponsText = str.ToString();
                     }
-                    availableWeaponsText = str.ToString();
                     alreadySetAvailableWeaponsText = true;
                 }
                 return availableWeaponsText;
@@ -188,16 +190,18 @@ namespace MultiplayerARPG
             {
                 if (!alreadySetAvailableArmorsText)
                 {
-                    StringBuilder str = new StringBuilder();
-                    foreach (ArmorType requireArmor in availableArmors)
+                    using (Utf16ValueStringBuilder str = ZString.CreateStringBuilder(true))
                     {
-                        if (requireArmor == null)
-                            continue;
-                        if (str.Length > 0)
-                            str.Append('/');
-                        str.Append(requireArmor.Title);
+                        foreach (ArmorType requireArmor in availableArmors)
+                        {
+                            if (requireArmor == null)
+                                continue;
+                            if (str.Length > 0)
+                                str.Append('/');
+                            str.Append(requireArmor.Title);
+                        }
+                        availableArmorsText = str.ToString();
                     }
-                    availableArmorsText = str.ToString();
                     alreadySetAvailableArmorsText = true;
                 }
                 return availableArmorsText;
@@ -214,16 +218,18 @@ namespace MultiplayerARPG
             {
                 if (!alreadySetAvailableVehiclesText)
                 {
-                    StringBuilder str = new StringBuilder();
-                    foreach (VehicleType requireVehicle in availableVehicles)
+                    using (Utf16ValueStringBuilder str = ZString.CreateStringBuilder(true))
                     {
-                        if (requireVehicle == null)
-                            continue;
-                        if (str.Length > 0)
-                            str.Append('/');
-                        str.Append(requireVehicle.Title);
+                        foreach (VehicleType requireVehicle in availableVehicles)
+                        {
+                            if (requireVehicle == null)
+                                continue;
+                            if (str.Length > 0)
+                                str.Append('/');
+                            str.Append(requireVehicle.Title);
+                        }
+                        availableVehiclesText = str.ToString();
                     }
-                    availableVehiclesText = str.ToString();
                     alreadySetAvailableVehiclesText = true;
                 }
                 return availableVehiclesText;
