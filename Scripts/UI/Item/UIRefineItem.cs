@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using Cysharp.Text;
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
@@ -143,14 +144,14 @@ namespace MultiplayerARPG
             {
                 if (!refineLevel.HasValue)
                 {
-                    uiTextRequireGold.text = string.Format(
+                    uiTextRequireGold.text = ZString.Format(
                         LanguageManager.GetText(formatKeyRequireGold),
                         "0",
                         "0");
                 }
                 else
                 {
-                    uiTextRequireGold.text = string.Format(
+                    uiTextRequireGold.text = ZString.Format(
                         GameInstance.PlayingCharacter.Gold >= refineLevel.Value.RequireGold ?
                             LanguageManager.GetText(formatKeyRequireGold) :
                             LanguageManager.GetText(formatKeyRequireGoldNotEnough),
@@ -160,19 +161,19 @@ namespace MultiplayerARPG
             }
 
             if (uiTextSimpleRequireGold != null)
-                uiTextSimpleRequireGold.text = string.Format(LanguageManager.GetText(formatKeySimpleRequireGold), !refineLevel.HasValue ? "0" : refineLevel.Value.RequireGold.ToString("N0"));
+                uiTextSimpleRequireGold.text = ZString.Format(LanguageManager.GetText(formatKeySimpleRequireGold), !refineLevel.HasValue ? "0" : refineLevel.Value.RequireGold.ToString("N0"));
 
             if (uiTextSuccessRate != null)
             {
                 if (!refineLevel.HasValue)
                 {
-                    uiTextSuccessRate.text = string.Format(
+                    uiTextSuccessRate.text = ZString.Format(
                         LanguageManager.GetText(formatKeySuccessRate),
                         0.ToString("N2"));
                 }
                 else
                 {
-                    uiTextSuccessRate.text = string.Format(
+                    uiTextSuccessRate.text = ZString.Format(
                         LanguageManager.GetText(formatKeySuccessRate),
                         (refineLevel.Value.SuccessRate * 100).ToString("N2"));
                 }
@@ -182,13 +183,13 @@ namespace MultiplayerARPG
             {
                 if (!refineLevel.HasValue)
                 {
-                    uiTextRefiningLevel.text = string.Format(
+                    uiTextRefiningLevel.text = ZString.Format(
                         LanguageManager.GetText(formatKeyRefiningLevel),
                         (Level - 1).ToString("N0"));
                 }
                 else
                 {
-                    uiTextRefiningLevel.text = string.Format(
+                    uiTextRefiningLevel.text = ZString.Format(
                         LanguageManager.GetText(formatKeyRefiningLevel),
                         Level.ToString("N0"));
                 }

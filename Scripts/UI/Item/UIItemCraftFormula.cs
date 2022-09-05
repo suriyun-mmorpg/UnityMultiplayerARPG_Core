@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using Cysharp.Text;
+using UnityEngine;
 
 namespace MultiplayerARPG
 {
@@ -19,7 +20,7 @@ namespace MultiplayerARPG
         {
             if (uiTextDuration != null)
             {
-                uiTextDuration.text = string.Format(
+                uiTextDuration.text = ZString.Format(
                     LanguageManager.GetText(formatKeyCraftDuration),
                     Data.CraftDuration.ToString("N0"));
             }

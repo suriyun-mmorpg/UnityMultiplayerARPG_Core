@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using Cysharp.Text;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.UI;
@@ -258,7 +259,7 @@ namespace MultiplayerARPG
             if (uiTextLockRemainsDuration != null)
             {
                 uiTextLockRemainsDuration.SetGameObjectActive(lockRemainsDuration > 0);
-                uiTextLockRemainsDuration.text = string.Format(
+                uiTextLockRemainsDuration.text = ZString.Format(
                     LanguageManager.GetText(formatKeyLockRemainsDuration),
                     lockRemainsDuration.ToString("N0"));
             }
@@ -303,7 +304,7 @@ namespace MultiplayerARPG
             if (uiTextCoolDownDuration != null)
             {
                 uiTextCoolDownDuration.SetGameObjectActive(skill.IsActive && coolDownDuration > 0f);
-                uiTextCoolDownDuration.text = string.Format(
+                uiTextCoolDownDuration.text = ZString.Format(
                     LanguageManager.GetText(formatKeyCoolDownDuration),
                     coolDownDuration.ToString("N0"));
             }
@@ -311,7 +312,7 @@ namespace MultiplayerARPG
             if (uiTextCoolDownRemainsDuration != null)
             {
                 uiTextCoolDownRemainsDuration.SetGameObjectActive(skill.IsActive && coolDownRemainsDuration > 0);
-                uiTextCoolDownRemainsDuration.text = string.Format(
+                uiTextCoolDownRemainsDuration.text = ZString.Format(
                     LanguageManager.GetText(formatKeyCoolDownRemainsDuration),
                     coolDownRemainsDuration.ToString("N0"));
             }
@@ -417,12 +418,12 @@ namespace MultiplayerARPG
 
             if (uiTextTitle != null)
             {
-                string str = string.Format(
+                string str = ZString.Format(
                     LanguageManager.GetText(formatKeyTitle),
                     Item == null ? LanguageManager.GetUnknowTitle() : Item.Title);
                 if (!dontAppendRefineLevelToTitle && EquipmentItem != null && Level > 1)
                 {
-                    str = string.Format(
+                    str = ZString.Format(
                         LanguageManager.GetText(formatKeyTitleWithRefineLevel),
                         Item == null ? LanguageManager.GetUnknowTitle() : Item.Title,
                         (Level - 1).ToString("N0"));
@@ -432,14 +433,14 @@ namespace MultiplayerARPG
 
             if (uiTextDescription != null)
             {
-                uiTextDescription.text = string.Format(
+                uiTextDescription.text = ZString.Format(
                     LanguageManager.GetText(formatKeyDescription),
                     Item == null ? LanguageManager.GetUnknowDescription() : Item.Description);
             }
 
             if (uiTextRarity != null)
             {
-                uiTextRarity.text = string.Format(
+                uiTextRarity.text = ZString.Format(
                     LanguageManager.GetText(formatKeyRarityTitle),
                     Item == null ? LanguageManager.GetUnknowTitle() : Item.RarityTitle);
             }
@@ -451,20 +452,20 @@ namespace MultiplayerARPG
                 {
                     if (showLevelAsDefault)
                     {
-                        uiTextLevel.text = string.Format(
+                        uiTextLevel.text = ZString.Format(
                             LanguageManager.GetText(formatKeyLevel),
                             Level.ToString("N0"));
                     }
                     else
                     {
-                        uiTextLevel.text = string.Format(
+                        uiTextLevel.text = ZString.Format(
                             LanguageManager.GetText(formatKeyRefineLevel),
                             (Level - 1).ToString("N0"));
                     }
                 }
                 else if (PetItem != null)
                 {
-                    uiTextLevel.text = string.Format(
+                    uiTextLevel.text = ZString.Format(
                         LanguageManager.GetText(formatKeyLevel),
                         Level.ToString("N0"));
                 }
@@ -487,14 +488,14 @@ namespace MultiplayerARPG
 
             if (uiTextItemType != null)
             {
-                uiTextItemType.text = string.Format(
+                uiTextItemType.text = ZString.Format(
                     LanguageManager.GetText(formatKeyItemType),
                     Item == null ? LanguageManager.GetUnknowTitle() : Item.TypeTitle);
             }
 
             if (uiTextSellPrice != null)
             {
-                uiTextSellPrice.text = string.Format(
+                uiTextSellPrice.text = ZString.Format(
                     LanguageManager.GetText(formatKeySellPrice),
                     Item == null ? "0" : Item.SellPrice.ToString("N0"));
             }
@@ -504,14 +505,14 @@ namespace MultiplayerARPG
                 string stackString;
                 if (Item == null)
                 {
-                    stackString = string.Format(
+                    stackString = ZString.Format(
                         LanguageManager.GetText(formatKeyStack),
                         "0",
                         "0");
                 }
                 else
                 {
-                    stackString = string.Format(
+                    stackString = ZString.Format(
                         LanguageManager.GetText(formatKeyStack),
                         CharacterItem.amount.ToString("N0"),
                         Item.MaxStack);
@@ -525,7 +526,7 @@ namespace MultiplayerARPG
                 if (uiTextDurability != null)
                 {
                     uiTextDurability.SetGameObjectActive(true);
-                    uiTextDurability.text = string.Format(
+                    uiTextDurability.text = ZString.Format(
                         LanguageManager.GetText(formatKeyDurability),
                         CharacterItem.durability.ToString("N0"),
                         EquipmentItem.MaxDurability.ToString("N0"));
@@ -626,7 +627,7 @@ namespace MultiplayerARPG
 
             if (uiTextWeight != null)
             {
-                uiTextWeight.text = string.Format(
+                uiTextWeight.text = ZString.Format(
                     LanguageManager.GetText(formatKeyWeight),
                     Item == null ? 0f.ToString("N2") : Item.Weight.ToString("N2"));
             }
@@ -936,7 +937,7 @@ namespace MultiplayerARPG
                 if (uiTextExp != null)
                 {
                     uiTextExp.SetGameObjectActive(true);
-                    uiTextExp.text = string.Format(
+                    uiTextExp.text = ZString.Format(
                         LanguageManager.GetText(formatKeyExp),
                         currentExp.ToString("N0"),
                         nextLevelExp.ToString("N0"));
@@ -966,7 +967,7 @@ namespace MultiplayerARPG
                 else
                 {
                     uiTextBuilding.SetGameObjectActive(true);
-                    uiTextBuilding.text = string.Format(
+                    uiTextBuilding.text = ZString.Format(
                         LanguageManager.GetText(formatKeyBuilding),
                         BuildingItem.BuildingEntity.Title);
                 }
@@ -981,7 +982,7 @@ namespace MultiplayerARPG
                 else
                 {
                     uiTextPet.SetGameObjectActive(true);
-                    uiTextPet.text = string.Format(
+                    uiTextPet.text = ZString.Format(
                         LanguageManager.GetText(formatKeyPet),
                         PetItem.PetEntity.Title);
                 }
@@ -996,7 +997,7 @@ namespace MultiplayerARPG
                 else
                 {
                     uiTextMount.SetGameObjectActive(true);
-                    uiTextMount.text = string.Format(
+                    uiTextMount.text = ZString.Format(
                         LanguageManager.GetText(formatKeyMount),
                         MountItem.MountEntity.Title);
                 }
@@ -1024,7 +1025,7 @@ namespace MultiplayerARPG
                 else
                 {
                     uiTextSkill.SetGameObjectActive(true);
-                    uiTextSkill.text = string.Format(
+                    uiTextSkill.text = ZString.Format(
                         LanguageManager.GetText(formatKeySkill),
                         SkillItem.UsingSkill.Title,
                         SkillItem.UsingSkillLevel);

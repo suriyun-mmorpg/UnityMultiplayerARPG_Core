@@ -1,4 +1,4 @@
-﻿using System.Text;
+﻿using Cysharp.Text;
 using UnityEngine;
 
 namespace MultiplayerARPG
@@ -15,33 +15,35 @@ namespace MultiplayerARPG
         
         protected override void UpdateData()
         {
-            StringBuilder allBonusText = new StringBuilder();
-            int effectCount = 1;
-            string tempText;
-            foreach (EquipmentBonus effect in Data.equipmentSet.Effects)
+            using (Utf16ValueStringBuilder allBonusText = ZString.CreateStringBuilder(true))
             {
-                tempText = GetEquipmentBonusText(effect);
-                if (!string.IsNullOrEmpty(tempText))
-                {
-                    if (allBonusText.Length > 0)
-                        allBonusText.Append('\n');
-                    allBonusText.AppendFormat(
-                        effectCount <= Data.equippedCount ?
-                            LanguageManager.GetText(formatKeyAppliedEffect) :
-                            LanguageManager.GetText(formatKeyUnappliedEffect),
-                        (effectCount + 1).ToString("N0"),
-                        tempText);
-                }
-                ++effectCount;
-            }
+            	int effectCount = 1;
+            	string tempText;
+            	foreach (EquipmentBonus effect in Data.equipmentSet.Effects)
+            	{
+                	tempText = GetEquipmentBonusText(effect);
+                	if (!string.IsNullOrEmpty(tempText))
+                	{
+                    	if (allBonusText.Length > 0)
+                        	allBonusText.Append('\n');
+                    	allBonusText.AppendFormat(
+                        	effectCount <= Data.equippedCount ?
+                            	LanguageManager.GetText(formatKeyAppliedEffect) :
+                            	LanguageManager.GetText(formatKeyUnappliedEffect),
+                        	(effectCount + 1).ToString("N0"),
+                        	tempText);
+                	}
+                	++effectCount;
+            	}
 
-            if (uiTextAllBonus != null)
-            {
-                uiTextAllBonus.SetGameObjectActive(allBonusText.Length > 0);
-                uiTextAllBonus.text = string.Format(
-                    LanguageManager.GetText(formatKeySet),
-                    Data.equipmentSet.Title,
-                    allBonusText.ToString());
+                if (uiTextAllBonus != null)
+                {
+                    uiTextAllBonus.SetGameObjectActive(allBonusText.Length > 0);
+                    uiTextAllBonus.text = ZString.Format(
+                        LanguageManager.GetText(formatKeySet),
+                        Data.equipmentSet.Title,
+                        allBonusText.ToString());
+                }
             }
         }
     }

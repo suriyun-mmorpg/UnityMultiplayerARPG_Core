@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Text;
+﻿using Cysharp.Text;
 using UnityEngine;
 
 namespace MultiplayerARPG
@@ -14,36 +13,38 @@ namespace MultiplayerARPG
 
         protected override void UpdateData()
         {
-            StringBuilder allBonusText = new StringBuilder();
-            BaseItem tempItem;
-            string tempText;
-            for (int i = 0; i < Data.maxSocket; ++i)
+            using (Utf16ValueStringBuilder allBonusText = ZString.CreateStringBuilder(true))
             {
-                if (i < Data.sockets.Count && GameInstance.Items.TryGetValue(Data.sockets[i], out tempItem) && tempItem.IsSocketEnhancer())
+                BaseItem tempItem;
+                string tempText;
+                for (int i = 0; i < Data.maxSocket; ++i)
                 {
-                    tempText = GetEquipmentBonusText((tempItem as ISocketEnhancerItem).SocketEnhanceEffect);
-                    if (allBonusText.Length > 0)
-                        allBonusText.Append('\n');
-                    allBonusText.AppendFormat(
-                        LanguageManager.GetText(formatKeySocketFilled),
-                        i + 1,
-                        tempItem.Title,
-                        tempText);
+                    if (i < Data.sockets.Count && GameInstance.Items.TryGetValue(Data.sockets[i], out tempItem) && tempItem.IsSocketEnhancer())
+                    {
+                        tempText = GetEquipmentBonusText((tempItem as ISocketEnhancerItem).SocketEnhanceEffect);
+                        if (allBonusText.Length > 0)
+                            allBonusText.Append('\n');
+                        allBonusText.AppendFormat(
+                            LanguageManager.GetText(formatKeySocketFilled),
+                            i + 1,
+                            tempItem.Title,
+                            tempText);
+                    }
+                    else
+                    {
+                        if (allBonusText.Length > 0)
+                            allBonusText.Append('\n');
+                        allBonusText.AppendFormat(
+                            LanguageManager.GetText(formatKeySocketEmpty),
+                            i + 1);
+                    }
                 }
-                else
-                {
-                    if (allBonusText.Length > 0)
-                        allBonusText.Append('\n');
-                    allBonusText.AppendFormat(
-                        LanguageManager.GetText(formatKeySocketEmpty),
-                        i + 1);
-                }
-            }
 
-            if (uiTextAllBonus != null)
-            {
-                uiTextAllBonus.SetGameObjectActive(allBonusText.Length > 0);
-                uiTextAllBonus.text = allBonusText.ToString();
+                if (uiTextAllBonus != null)
+                {
+                    uiTextAllBonus.SetGameObjectActive(allBonusText.Length > 0);
+                    uiTextAllBonus.text = allBonusText.ToString();
+                }
             }
         }
     }

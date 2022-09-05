@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using Cysharp.Text;
 using UnityEngine;
 
 namespace MultiplayerARPG
@@ -45,7 +46,7 @@ namespace MultiplayerARPG
 
             if (uiTextReturnGold != null)
             {
-                uiTextReturnGold.text = string.Format(
+                uiTextReturnGold.text = ZString.Format(
                         LanguageManager.GetText(formatKeyReturnGold),
                         returnGold.ToString("N0"));
             }

@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using Cysharp.Text;
+using UnityEngine;
 
 namespace MultiplayerARPG
 {
@@ -41,7 +42,7 @@ namespace MultiplayerARPG
 
             if (uiTextRequireGold != null)
             {
-                uiTextRequireGold.text = string.Format(
+                uiTextRequireGold.text = ZString.Format(
                     GameInstance.PlayingCharacter.Gold >= requireGold ?
                         LanguageManager.GetText(formatKeyRequireGold) :
                         LanguageManager.GetText(formatKeyRequireGoldNotEnough),
@@ -50,7 +51,7 @@ namespace MultiplayerARPG
             }
 
             if (uiTextSimpleRequireGold != null)
-                uiTextSimpleRequireGold.text = string.Format(LanguageManager.GetText(formatKeySimpleRequireGold), requireGold.ToString("N0"));
+                uiTextSimpleRequireGold.text = ZString.Format(LanguageManager.GetText(formatKeySimpleRequireGold), requireGold.ToString("N0"));
         }
 
         public void OnClickRepairEquipItems()

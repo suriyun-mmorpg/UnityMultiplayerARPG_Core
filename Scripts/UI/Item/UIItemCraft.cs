@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using Cysharp.Text;
+using UnityEngine;
 
 namespace MultiplayerARPG
 {
@@ -69,14 +70,14 @@ namespace MultiplayerARPG
             {
                 if (CraftingItem == null)
                 {
-                    uiTextRequireGold.text = string.Format(
+                    uiTextRequireGold.text = ZString.Format(
                         LanguageManager.GetText(formatKeyRequireGold),
                         "0",
                         "0");
                 }
                 else
                 {
-                    uiTextRequireGold.text = string.Format(
+                    uiTextRequireGold.text = ZString.Format(
                         GameInstance.PlayingCharacter.Gold >= ItemCraft.RequireGold ?
                             LanguageManager.GetText(formatKeyRequireGold) :
                             LanguageManager.GetText(formatKeyRequireGoldNotEnough),
@@ -86,7 +87,7 @@ namespace MultiplayerARPG
             }
 
             if (uiTextSimpleRequireGold != null)
-                uiTextSimpleRequireGold.text = string.Format(LanguageManager.GetText(formatKeySimpleRequireGold), CraftingItem == null ? "0" : ItemCraft.RequireGold.ToString("N0"));
+                uiTextSimpleRequireGold.text = ZString.Format(LanguageManager.GetText(formatKeySimpleRequireGold), CraftingItem == null ? "0" : ItemCraft.RequireGold.ToString("N0"));
         }
 
         protected override void UpdateData()

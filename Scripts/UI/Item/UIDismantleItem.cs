@@ -1,5 +1,5 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using Cysharp.Text;
 using UnityEngine;
 
 namespace MultiplayerARPG
@@ -29,7 +29,7 @@ namespace MultiplayerARPG
             {
                 dismantleAmount = value;
                 if (uiTextDismantleAmount != null)
-                    uiTextDismantleAmount.text = string.Format(LanguageManager.GetText(formatKeyDismantleAmount), dismantleAmount.ToString("N0"));
+                    uiTextDismantleAmount.text = ZString.Format(LanguageManager.GetText(formatKeyDismantleAmount), dismantleAmount.ToString("N0"));
             }
         }
 
@@ -104,13 +104,13 @@ namespace MultiplayerARPG
             {
                 if (characterItem.IsEmptySlot())
                 {
-                    uiTextReturnGold.text = string.Format(
+                    uiTextReturnGold.text = ZString.Format(
                             LanguageManager.GetText(formatKeyReturnGold),
                             "0");
                 }
                 else
                 {
-                    uiTextReturnGold.text = string.Format(
+                    uiTextReturnGold.text = ZString.Format(
                             LanguageManager.GetText(formatKeyReturnGold),
                             (characterItem.GetItem().DismantleReturnGold * DismantleAmount).ToString("N0"));
                 }

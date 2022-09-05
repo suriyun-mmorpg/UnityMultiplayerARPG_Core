@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using Cysharp.Text;
 using UnityEngine;
 using UnityEngine.Serialization;
 
@@ -90,14 +91,14 @@ namespace MultiplayerARPG
             {
                 if (SelectedEnhancerId == 0)
                 {
-                    uiTextRequireGold.text = string.Format(
+                    uiTextRequireGold.text = ZString.Format(
                         LanguageManager.GetText(formatKeyRequireGold),
                         "0",
                         "0");
                 }
                 else
                 {
-                    uiTextRequireGold.text = string.Format(
+                    uiTextRequireGold.text = ZString.Format(
                         GameInstance.PlayingCharacter.Gold >= GameInstance.Singleton.enhancerRemoval.RequireGold ?
                             LanguageManager.GetText(formatKeyRequireGold) :
                             LanguageManager.GetText(formatKeyRequireGoldNotEnough),

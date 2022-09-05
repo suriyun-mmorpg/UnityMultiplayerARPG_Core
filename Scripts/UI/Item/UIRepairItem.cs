@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using Cysharp.Text;
+using UnityEngine;
 
 namespace MultiplayerARPG
 {
@@ -94,14 +95,14 @@ namespace MultiplayerARPG
             {
                 if (maxDurability <= 0)
                 {
-                    uiTextRequireGold.text = string.Format(
+                    uiTextRequireGold.text = ZString.Format(
                         LanguageManager.GetText(formatKeyRequireGold),
                         "0",
                         "0");
                 }
                 else
                 {
-                    uiTextRequireGold.text = string.Format(
+                    uiTextRequireGold.text = ZString.Format(
                         GameInstance.PlayingCharacter.Gold >= repairPrice.RequireGold ?
                             LanguageManager.GetText(formatKeyRequireGold) :
                             LanguageManager.GetText(formatKeyRequireGoldNotEnough),
@@ -111,20 +112,20 @@ namespace MultiplayerARPG
             }
 
             if (uiTextSimpleRequireGold != null)
-                uiTextSimpleRequireGold.text = string.Format(LanguageManager.GetText(formatKeySimpleRequireGold), maxDurability <= 0 ? "0" : repairPrice.RequireGold.ToString("N0"));
+                uiTextSimpleRequireGold.text = ZString.Format(LanguageManager.GetText(formatKeySimpleRequireGold), maxDurability <= 0 ? "0" : repairPrice.RequireGold.ToString("N0"));
 
             if (uiTextDurability != null)
             {
                 if (maxDurability <= 0)
                 {
-                    uiTextDurability.text = string.Format(
+                    uiTextDurability.text = ZString.Format(
                         LanguageManager.GetText(formatKeyDurability),
                         "0",
                         "0");
                 }
                 else
                 {
-                    uiTextDurability.text = string.Format(
+                    uiTextDurability.text = ZString.Format(
                         LanguageManager.GetText(formatKeyDurability),
                         characterItem.durability.ToString("N0"),
                         maxDurability.ToString("N0"));

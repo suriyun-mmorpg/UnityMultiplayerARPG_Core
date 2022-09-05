@@ -1,4 +1,4 @@
-﻿using System.Text;
+﻿using Cysharp.Text;
 using UnityEngine;
 
 namespace MultiplayerARPG
@@ -120,187 +120,189 @@ namespace MultiplayerARPG
 
         public string GetEquipmentBonusText(EquipmentBonus equipmentBonus)
         {
-            StringBuilder result = new StringBuilder();
-            CharacterStatsTextGenerateData generateTextData;
-            // Dev Extension
-            // How to implement it?:
-            // /*
-            //  * - Add `customStat1` to `CharacterStats` partial class file
-            //  * - Add `customStat1StatsFormat` to `CharacterStatsTextGenerateData`
-            //  * - Add `uiTextCustomStat1` to `CharacterStatsTextGenerateData`
-            //  * - Add `formatKeyCustomStat1Stats` to `UIBaseEquipmentBonus` partial class file
-            //  * - Add `formatKeyCustomStat1RateStats` to `UIBaseEquipmentBonus` partial class file
-            //  * - Add `uiTextCustomStat1` to `UIBaseEquipmentBonus`
-            //  */
-            // [DevExtMethods("SetStatsGenerateTextData")]
-            // public void SetStatsGenerateTextData_Ext(CharacterStatsTextGenerateData generateTextData)
-            // {
-            //   generateTextData.customStat1StatsFormat = formatKeyCustomStat1Stats;
-            //   generateTextData.uiTextCustomStat1 = uiTextCustomStat1;
-            // }
-            // [DevExtMethods("SetRateStatsGenerateTextData")]
-            // public void SetRateStatsGenerateTextData_Ext(CharacterStatsTextGenerateData generateTextData)
-            // {
-            //   generateTextData.customStat1StatsFormat = formatKeyCustomStat1RateStats;
-            //   generateTextData.uiTextCustomStat1 = uiTextCustomStat1;
-            // }
-            // Non-rate stats
-            generateTextData = new CharacterStatsTextGenerateData()
+            using (Utf16ValueStringBuilder result = ZString.CreateStringBuilder(true))
             {
-                data = equipmentBonus.stats,
-                isRate = false,
-                isBonus = true,
-                hpStatsFormat = formatKeyHpStats,
-                hpRecoveryStatsFormat = formatKeyHpRecoveryStats,
-                hpLeechRateStatsFormat = formatKeyHpLeechRateStats,
-                mpStatsFormat = formatKeyMpStats,
-                mpRecoveryStatsFormat = formatKeyMpRecoveryStats,
-                mpLeechRateStatsFormat = formatKeyMpLeechRateStats,
-                staminaStatsFormat = formatKeyStaminaStats,
-                staminaRecoveryStatsFormat = formatKeyStaminaRecoveryStats,
-                staminaLeechRateStatsFormat = formatKeyStaminaLeechRateStats,
-                foodStatsFormat = formatKeyFoodStats,
-                waterStatsFormat = formatKeyWaterStats,
-                accuracyStatsFormat = formatKeyAccuracyStats,
-                evasionStatsFormat = formatKeyEvasionStats,
-                criRateStatsFormat = formatKeyCriRateStats,
-                criDmgRateStatsFormat = formatKeyCriDmgRateStats,
-                blockRateStatsFormat = formatKeyBlockRateStats,
-                blockDmgRateStatsFormat = formatKeyBlockDmgRateStats,
-                moveSpeedStatsFormat = formatKeyMoveSpeedStats,
-                atkSpeedStatsFormat = formatKeyAtkSpeedStats,
-                weightLimitStatsFormat = formatKeyWeightLimitStats,
-                slotLimitStatsFormat = formatKeySlotLimitStats,
-                goldRateStatsFormat = formatKeyGoldRateStats,
-                expRateStatsFormat = formatKeyExpRateStats,
-            };
-            this.InvokeInstanceDevExtMethods("SetStatsGenerateTextData", generateTextData);
-            string statsText = generateTextData.GetText();
-            // Rate stats
-            generateTextData = new CharacterStatsTextGenerateData()
-            {
-                data = equipmentBonus.statsRate,
-                isRate = true,
-                isBonus = true,
-                hpStatsFormat = formatKeyHpRateStats,
-                hpRecoveryStatsFormat = formatKeyHpRecoveryRateStats,
-                hpLeechRateStatsFormat = formatKeyHpLeechRateRateStats,
-                mpStatsFormat = formatKeyMpRateStats,
-                mpRecoveryStatsFormat = formatKeyMpRecoveryRateStats,
-                mpLeechRateStatsFormat = formatKeyMpLeechRateRateStats,
-                staminaStatsFormat = formatKeyStaminaRateStats,
-                staminaRecoveryStatsFormat = formatKeyStaminaRecoveryRateStats,
-                staminaLeechRateStatsFormat = formatKeyStaminaLeechRateRateStats,
-                foodStatsFormat = formatKeyFoodRateStats,
-                waterStatsFormat = formatKeyWaterRateStats,
-                accuracyStatsFormat = formatKeyAccuracyRateStats,
-                evasionStatsFormat = formatKeyEvasionRateStats,
-                criRateStatsFormat = formatKeyCriRateRateStats,
-                criDmgRateStatsFormat = formatKeyCriDmgRateRateStats,
-                blockRateStatsFormat = formatKeyBlockRateRateStats,
-                blockDmgRateStatsFormat = formatKeyBlockDmgRateRateStats,
-                moveSpeedStatsFormat = formatKeyMoveSpeedRateStats,
-                atkSpeedStatsFormat = formatKeyAtkSpeedRateStats,
-                weightLimitStatsFormat = formatKeyWeightLimitRateStats,
-                slotLimitStatsFormat = formatKeySlotLimitRateStats,
-                goldRateStatsFormat = formatKeyGoldRateRateStats,
-                expRateStatsFormat = formatKeyExpRateRateStats,
-            };
-            this.InvokeInstanceDevExtMethods("SetRateStatsGenerateTextData", generateTextData);
-            string rateStatsText = generateTextData.GetText();
+                CharacterStatsTextGenerateData generateTextData;
+                // Dev Extension
+                // How to implement it?:
+                // /*
+                //  * - Add `customStat1` to `CharacterStats` partial class file
+                //  * - Add `customStat1StatsFormat` to `CharacterStatsTextGenerateData`
+                //  * - Add `uiTextCustomStat1` to `CharacterStatsTextGenerateData`
+                //  * - Add `formatKeyCustomStat1Stats` to `UIBaseEquipmentBonus` partial class file
+                //  * - Add `formatKeyCustomStat1RateStats` to `UIBaseEquipmentBonus` partial class file
+                //  * - Add `uiTextCustomStat1` to `UIBaseEquipmentBonus`
+                //  */
+                // [DevExtMethods("SetStatsGenerateTextData")]
+                // public void SetStatsGenerateTextData_Ext(CharacterStatsTextGenerateData generateTextData)
+                // {
+                //   generateTextData.customStat1StatsFormat = formatKeyCustomStat1Stats;
+                //   generateTextData.uiTextCustomStat1 = uiTextCustomStat1;
+                // }
+                // [DevExtMethods("SetRateStatsGenerateTextData")]
+                // public void SetRateStatsGenerateTextData_Ext(CharacterStatsTextGenerateData generateTextData)
+                // {
+                //   generateTextData.customStat1StatsFormat = formatKeyCustomStat1RateStats;
+                //   generateTextData.uiTextCustomStat1 = uiTextCustomStat1;
+                // }
+                // Non-rate stats
+                generateTextData = new CharacterStatsTextGenerateData()
+                {
+                    data = equipmentBonus.stats,
+                    isRate = false,
+                    isBonus = true,
+                    hpStatsFormat = formatKeyHpStats,
+                    hpRecoveryStatsFormat = formatKeyHpRecoveryStats,
+                    hpLeechRateStatsFormat = formatKeyHpLeechRateStats,
+                    mpStatsFormat = formatKeyMpStats,
+                    mpRecoveryStatsFormat = formatKeyMpRecoveryStats,
+                    mpLeechRateStatsFormat = formatKeyMpLeechRateStats,
+                    staminaStatsFormat = formatKeyStaminaStats,
+                    staminaRecoveryStatsFormat = formatKeyStaminaRecoveryStats,
+                    staminaLeechRateStatsFormat = formatKeyStaminaLeechRateStats,
+                    foodStatsFormat = formatKeyFoodStats,
+                    waterStatsFormat = formatKeyWaterStats,
+                    accuracyStatsFormat = formatKeyAccuracyStats,
+                    evasionStatsFormat = formatKeyEvasionStats,
+                    criRateStatsFormat = formatKeyCriRateStats,
+                    criDmgRateStatsFormat = formatKeyCriDmgRateStats,
+                    blockRateStatsFormat = formatKeyBlockRateStats,
+                    blockDmgRateStatsFormat = formatKeyBlockDmgRateStats,
+                    moveSpeedStatsFormat = formatKeyMoveSpeedStats,
+                    atkSpeedStatsFormat = formatKeyAtkSpeedStats,
+                    weightLimitStatsFormat = formatKeyWeightLimitStats,
+                    slotLimitStatsFormat = formatKeySlotLimitStats,
+                    goldRateStatsFormat = formatKeyGoldRateStats,
+                    expRateStatsFormat = formatKeyExpRateStats,
+                };
+                this.InvokeInstanceDevExtMethods("SetStatsGenerateTextData", generateTextData);
+                string statsText = generateTextData.GetText();
+                // Rate stats
+                generateTextData = new CharacterStatsTextGenerateData()
+                {
+                    data = equipmentBonus.statsRate,
+                    isRate = true,
+                    isBonus = true,
+                    hpStatsFormat = formatKeyHpRateStats,
+                    hpRecoveryStatsFormat = formatKeyHpRecoveryRateStats,
+                    hpLeechRateStatsFormat = formatKeyHpLeechRateRateStats,
+                    mpStatsFormat = formatKeyMpRateStats,
+                    mpRecoveryStatsFormat = formatKeyMpRecoveryRateStats,
+                    mpLeechRateStatsFormat = formatKeyMpLeechRateRateStats,
+                    staminaStatsFormat = formatKeyStaminaRateStats,
+                    staminaRecoveryStatsFormat = formatKeyStaminaRecoveryRateStats,
+                    staminaLeechRateStatsFormat = formatKeyStaminaLeechRateRateStats,
+                    foodStatsFormat = formatKeyFoodRateStats,
+                    waterStatsFormat = formatKeyWaterRateStats,
+                    accuracyStatsFormat = formatKeyAccuracyRateStats,
+                    evasionStatsFormat = formatKeyEvasionRateStats,
+                    criRateStatsFormat = formatKeyCriRateRateStats,
+                    criDmgRateStatsFormat = formatKeyCriDmgRateRateStats,
+                    blockRateStatsFormat = formatKeyBlockRateRateStats,
+                    blockDmgRateStatsFormat = formatKeyBlockDmgRateRateStats,
+                    moveSpeedStatsFormat = formatKeyMoveSpeedRateStats,
+                    atkSpeedStatsFormat = formatKeyAtkSpeedRateStats,
+                    weightLimitStatsFormat = formatKeyWeightLimitRateStats,
+                    slotLimitStatsFormat = formatKeySlotLimitRateStats,
+                    goldRateStatsFormat = formatKeyGoldRateRateStats,
+                    expRateStatsFormat = formatKeyExpRateRateStats,
+                };
+                this.InvokeInstanceDevExtMethods("SetRateStatsGenerateTextData", generateTextData);
+                string rateStatsText = generateTextData.GetText();
 
-            if (!string.IsNullOrEmpty(statsText))
-                result.Append(statsText);
+                if (!string.IsNullOrEmpty(statsText))
+                    result.Append(statsText);
 
-            if (!string.IsNullOrEmpty(rateStatsText))
-            {
-                if (result.Length > 0)
-                    result.Append('\n');
-                result.Append(rateStatsText);
+                if (!string.IsNullOrEmpty(rateStatsText))
+                {
+                    if (result.Length > 0)
+                        result.Append('\n');
+                    result.Append(rateStatsText);
+                }
+
+                // Attributes
+                foreach (AttributeAmount entry in equipmentBonus.attributes)
+                {
+                    if (entry.attribute == null || entry.amount == 0)
+                        continue;
+                    if (result.Length > 0)
+                        result.Append('\n');
+                    result.AppendFormat(
+                        LanguageManager.GetText(formatKeyAttributeAmount),
+                        entry.attribute.Title,
+                        entry.amount.ToBonusString("N0"));
+                }
+                foreach (AttributeAmount entry in equipmentBonus.attributesRate)
+                {
+                    if (entry.attribute == null || entry.amount == 0)
+                        continue;
+                    if (result.Length > 0)
+                        result.Append('\n');
+                    result.AppendFormat(
+                        LanguageManager.GetText(formatKeyAttributeAmountRate),
+                        entry.attribute.Title,
+                        (entry.amount * 100).ToBonusString("N2"));
+                }
+
+                DamageElement tempElement;
+                // Resistances
+                foreach (ResistanceAmount entry in equipmentBonus.resistances)
+                {
+                    if (entry.amount == 0)
+                        continue;
+                    if (result.Length > 0)
+                        result.Append('\n');
+                    tempElement = entry.damageElement == null ? GameInstance.Singleton.DefaultDamageElement : entry.damageElement;
+                    result.AppendFormat(
+                        LanguageManager.GetText(formatKeyResistanceAmount),
+                        tempElement.Title,
+                        (entry.amount * 100).ToBonusString("N2"));
+                }
+
+                // Damages
+                foreach (DamageAmount entry in equipmentBonus.damages)
+                {
+                    if (entry.amount.min == 0 && entry.amount.max == 0)
+                        continue;
+                    if (result.Length > 0)
+                        result.Append('\n');
+                    tempElement = entry.damageElement == null ? GameInstance.Singleton.DefaultDamageElement : entry.damageElement;
+                    result.AppendFormat(
+                        LanguageManager.GetText(formatKeyDamageAmount),
+                        tempElement.Title,
+                        entry.amount.min.ToBonusString("N0"),
+                        entry.amount.max.ToString("N0"));
+                }
+
+                // Armors
+                foreach (ArmorAmount entry in equipmentBonus.armors)
+                {
+                    if (entry.amount == 0)
+                        continue;
+                    if (result.Length > 0)
+                        result.Append('\n');
+                    tempElement = entry.damageElement == null ? GameInstance.Singleton.DefaultDamageElement : entry.damageElement;
+                    result.AppendFormat(
+                        LanguageManager.GetText(formatKeyArmorAmount),
+                        tempElement.Title,
+                        entry.amount.ToBonusString("N0"));
+                }
+
+                // Skills
+                foreach (SkillLevel entry in equipmentBonus.skills)
+                {
+                    if (entry.skill == null || entry.level == 0)
+                        continue;
+                    if (result.Length > 0)
+                        result.Append('\n');
+                    result.AppendFormat(
+                        LanguageManager.GetText(formatKeySkillLevel),
+                        entry.skill.Title,
+                        entry.level.ToBonusString("N0"));
+                }
+
+                return result.ToString();
             }
-
-            // Attributes
-            foreach (AttributeAmount entry in equipmentBonus.attributes)
-            {
-                if (entry.attribute == null || entry.amount == 0)
-                    continue;
-                if (result.Length > 0)
-                    result.Append('\n');
-                result.AppendFormat(
-                    LanguageManager.GetText(formatKeyAttributeAmount),
-                    entry.attribute.Title,
-                    entry.amount.ToBonusString("N0"));
-            }
-            foreach (AttributeAmount entry in equipmentBonus.attributesRate)
-            {
-                if (entry.attribute == null || entry.amount == 0)
-                    continue;
-                if (result.Length > 0)
-                    result.Append('\n');
-                result.AppendFormat(
-                    LanguageManager.GetText(formatKeyAttributeAmountRate),
-                    entry.attribute.Title,
-                    (entry.amount * 100).ToBonusString("N2"));
-            }
-
-            DamageElement tempElement;
-            // Resistances
-            foreach (ResistanceAmount entry in equipmentBonus.resistances)
-            {
-                if (entry.amount == 0)
-                    continue;
-                if (result.Length > 0)
-                    result.Append('\n');
-                tempElement = entry.damageElement == null ? GameInstance.Singleton.DefaultDamageElement : entry.damageElement;
-                result.AppendFormat(
-                    LanguageManager.GetText(formatKeyResistanceAmount),
-                    tempElement.Title,
-                    (entry.amount * 100).ToBonusString("N2"));
-            }
-
-            // Damages
-            foreach (DamageAmount entry in equipmentBonus.damages)
-            {
-                if (entry.amount.min == 0 && entry.amount.max == 0)
-                    continue;
-                if (result.Length > 0)
-                    result.Append('\n');
-                tempElement = entry.damageElement == null ? GameInstance.Singleton.DefaultDamageElement : entry.damageElement;
-                result.AppendFormat(
-                    LanguageManager.GetText(formatKeyDamageAmount),
-                    tempElement.Title,
-                    entry.amount.min.ToBonusString("N0"),
-                    entry.amount.max.ToString("N0"));
-            }
-
-            // Armors
-            foreach (ArmorAmount entry in equipmentBonus.armors)
-            {
-                if (entry.amount == 0)
-                    continue;
-                if (result.Length > 0)
-                    result.Append('\n');
-                tempElement = entry.damageElement == null ? GameInstance.Singleton.DefaultDamageElement : entry.damageElement;
-                result.AppendFormat(
-                    LanguageManager.GetText(formatKeyArmorAmount),
-                    tempElement.Title,
-                    entry.amount.ToBonusString("N0"));
-            }
-
-            // Skills
-            foreach (SkillLevel entry in equipmentBonus.skills)
-            {
-                if (entry.skill == null || entry.level == 0)
-                    continue;
-                if (result.Length > 0)
-                    result.Append('\n');
-                result.AppendFormat(
-                    LanguageManager.GetText(formatKeySkillLevel),
-                    entry.skill.Title,
-                    entry.level.ToBonusString("N0"));
-            }
-
-            return result.ToString();
         }
     }
 }

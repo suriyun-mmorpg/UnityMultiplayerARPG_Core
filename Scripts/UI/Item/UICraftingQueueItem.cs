@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using Cysharp.Text;
+using UnityEngine;
 using UnityEngine.UI;
 
 namespace MultiplayerARPG
@@ -59,14 +60,14 @@ namespace MultiplayerARPG
 
             if (uiTextAmount != null)
             {
-                uiTextAmount.text = string.Format(
+                uiTextAmount.text = ZString.Format(
                     LanguageManager.GetText(formatKeyAmount),
                     Data.amount.ToString("N0"));
             }
 
             if (uiTextDuration != null)
             {
-                uiTextDuration.text = string.Format(
+                uiTextDuration.text = ZString.Format(
                     LanguageManager.GetText(formatKeyCraftDuration),
                     craftDuration.ToString("N0"));
             }
@@ -74,7 +75,7 @@ namespace MultiplayerARPG
             if (uiTextRemainsDuration != null)
             {
                 uiTextRemainsDuration.SetGameObjectActive(craftRemainsDuration > 0);
-                uiTextRemainsDuration.text = string.Format(
+                uiTextRemainsDuration.text = ZString.Format(
                     LanguageManager.GetText(formatKeyCraftRemainsDuration),
                     craftRemainsDuration.ToString("N0"));
             }

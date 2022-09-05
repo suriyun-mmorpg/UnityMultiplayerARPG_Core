@@ -1,4 +1,4 @@
-﻿using System.Text;
+﻿using Cysharp.Text;
 using UnityEngine;
 using UnityEngine.Serialization;
 
@@ -39,13 +39,13 @@ namespace MultiplayerARPG
                     short requireCharacterLevel = Data.Requirement.level;
                     if (characterLevel >= requireCharacterLevel)
                     {
-                        uiTextRequireLevel.text = string.Format(
+                        uiTextRequireLevel.text = ZString.Format(
                             LanguageManager.GetText(formatKeyRequireLevel),
                             requireCharacterLevel.ToString("N0"));
                     }
                     else
                     {
-                        uiTextRequireLevel.text = string.Format(
+                        uiTextRequireLevel.text = ZString.Format(
                             LanguageManager.GetText(formatKeyRequireLevelNotEnough),
                             characterLevel,
                             requireCharacterLevel.ToString("N0"));
@@ -62,33 +62,35 @@ namespace MultiplayerARPG
                 }
                 else
                 {
-                    StringBuilder str = new StringBuilder();
-                    PlayerCharacter playingCharacterClass = GameInstance.PlayingCharacter.GetDatabase() as PlayerCharacter;
-                    bool available = false;
-                    if (Data.Requirement.availableClass != null)
+                    using (Utf16ValueStringBuilder str = ZString.CreateStringBuilder(true))
                     {
-                        str.Append(Data.Requirement.availableClass.Title);
-                        if (playingCharacterClass == Data.Requirement.availableClass)
-                            available = true;
-                    }
-                    if (Data.Requirement.availableClasses != null &&
-                        Data.Requirement.availableClasses.Count > 0)
-                    {
-                        foreach (PlayerCharacter characterClass in Data.Requirement.availableClasses)
+                        PlayerCharacter playingCharacterClass = GameInstance.PlayingCharacter.GetDatabase() as PlayerCharacter;
+                        bool available = false;
+                        if (Data.Requirement.availableClass != null)
                         {
-                            if (characterClass == null)
-                                continue;
-                            if (str.Length > 0)
-                                str.Append('/');
-                            str.Append(characterClass.Title);
-                            if (playingCharacterClass == characterClass)
+                            str.Append(Data.Requirement.availableClass.Title);
+                            if (playingCharacterClass == Data.Requirement.availableClass)
                                 available = true;
                         }
+                        if (Data.Requirement.availableClasses != null &&
+                            Data.Requirement.availableClasses.Count > 0)
+                        {
+                            foreach (PlayerCharacter characterClass in Data.Requirement.availableClasses)
+                            {
+                                if (characterClass == null)
+                                    continue;
+                                if (str.Length > 0)
+                                    str.Append('/');
+                                str.Append(characterClass.Title);
+                                if (playingCharacterClass == characterClass)
+                                    available = true;
+                            }
+                        }
+                        uiTextRequireClasses.SetGameObjectActive(true);
+                        uiTextRequireClasses.text = ZString.Format(
+                            LanguageManager.GetText(available ? formatKeyRequireClasses : formatKeyInvalidRequireClasses),
+                            str.ToString());
                     }
-                    uiTextRequireClasses.SetGameObjectActive(true);
-                    uiTextRequireClasses.text = string.Format(
-                        LanguageManager.GetText(available ? formatKeyRequireClasses : formatKeyInvalidRequireClasses),
-                        str.ToString());
                 }
             }
 
