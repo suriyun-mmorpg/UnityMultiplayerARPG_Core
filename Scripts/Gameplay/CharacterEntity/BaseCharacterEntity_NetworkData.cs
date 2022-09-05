@@ -234,7 +234,8 @@ namespace MultiplayerARPG
         public override void OnSetup()
         {
             base.OnSetup();
-            // On data changes events
+            onVehicleEntityChanged += OnVehicleEntityChanged;
+            // On data changed events
             id.onChange += OnIdChange;
             syncTitle.onChange += OnCharacterNameChange;
             level.onChange += OnLevelChange;
@@ -247,7 +248,7 @@ namespace MultiplayerARPG
             equipWeaponSet.onChange += OnEquipWeaponSetChange;
             pitch.onChange += OnPitchChange;
             targetEntityId.onChange += OnTargetEntityIdChange;
-            // On list changes events
+            // On list changed events
             selectableWeaponSets.onOperation += OnSelectableWeaponSetsOperation;
             attributes.onOperation += OnAttributesOperation;
             skills.onOperation += OnSkillsOperation;
@@ -261,7 +262,8 @@ namespace MultiplayerARPG
         protected override void EntityOnDestroy()
         {
             base.EntityOnDestroy();
-            // On data changes events
+            onVehicleEntityChanged -= OnVehicleEntityChanged;
+            // On data changed events
             id.onChange -= OnIdChange;
             syncTitle.onChange -= OnCharacterNameChange;
             level.onChange -= OnLevelChange;
@@ -274,7 +276,7 @@ namespace MultiplayerARPG
             equipWeaponSet.onChange -= OnEquipWeaponSetChange;
             pitch.onChange -= OnPitchChange;
             targetEntityId.onChange -= OnTargetEntityIdChange;
-            // On list changes events
+            // On list changed events
             selectableWeaponSets.onOperation -= OnSelectableWeaponSetsOperation;
             attributes.onOperation -= OnAttributesOperation;
             skills.onOperation -= OnSkillsOperation;
@@ -289,32 +291,44 @@ namespace MultiplayerARPG
         }
         #endregion
 
-        #region Sync data changes callback
         /// <summary>
-        /// Override this to do stuffs when id changes
+        /// This will be called when vehicle entity changed
         /// </summary>
+        /// <param name="vehicleEntity"></param>
+        private void OnVehicleEntityChanged(IVehicleEntity vehicleEntity)
+        {
+            isRecaching = true;
+        }
+
+        #region Sync data changed callback
+        /// <summary>
+        /// This will be called when id changed
+        /// </summary>
+        /// <param name="isInitial"></param>
         /// <param name="id"></param>
-        protected virtual void OnIdChange(bool isInitial, string id)
+        private void OnIdChange(bool isInitial, string id)
         {
             if (onIdChange != null)
                 onIdChange.Invoke(id);
         }
 
         /// <summary>
-        /// Override this to do stuffs when character name changes
+        /// This will be called when character name changed
         /// </summary>
+        /// <param name="isInitial"></param>
         /// <param name="characterName"></param>
-        protected virtual void OnCharacterNameChange(bool isInitial, string characterName)
+        private void OnCharacterNameChange(bool isInitial, string characterName)
         {
             if (onCharacterNameChange != null)
                 onCharacterNameChange.Invoke(characterName);
         }
 
         /// <summary>
-        /// Override this to do stuffs when level changes
+        /// This will be called when level changed
         /// </summary>
+        /// <param name="isInitial"></param>
         /// <param name="level"></param>
-        protected virtual void OnLevelChange(bool isInitial, short level)
+        private void OnLevelChange(bool isInitial, short level)
         {
             isRecaching = true;
 
@@ -323,71 +337,77 @@ namespace MultiplayerARPG
         }
 
         /// <summary>
-        /// Override this to do stuffs when exp changes
+        /// This will be called when exp changed
         /// </summary>
+        /// <param name="isInitial"></param>
         /// <param name="exp"></param>
-        protected virtual void OnExpChange(bool isInitial, int exp)
+        private void OnExpChange(bool isInitial, int exp)
         {
             if (onExpChange != null)
                 onExpChange.Invoke(exp);
         }
 
         /// <summary>
-        /// Override this to do stuffs when is immune changes
+        /// This will be called when is immune changed
         /// </summary>
         /// <param name="isInitial"></param>
         /// <param name="isImmune"></param>
-        protected virtual void OnIsImmuneChange(bool isInitial, bool isImmune)
+        private void OnIsImmuneChange(bool isInitial, bool isImmune)
         {
             if (onIsImmuneChange != null)
                 onIsImmuneChange.Invoke(isImmune);
         }
 
         /// <summary>
-        /// Override this to do stuffs when current hp changes
+        /// This will be called when current hp changed
         /// </summary>
+        /// <param name="isInitial"></param>
         /// <param name="currentHp"></param>
-        protected virtual void OnCurrentHpChange(bool isInitial, int currentHp)
+        private void OnCurrentHpChange(bool isInitial, int currentHp)
         {
             if (onCurrentHpChange != null)
                 onCurrentHpChange.Invoke(currentHp);
         }
 
         /// <summary>
-        /// Override this to do stuffs when current mp changes
+        /// This will be called when current mp changed
         /// </summary>
+        /// <param name="isInitial"></param>
         /// <param name="currentMp"></param>
-        protected virtual void OnCurrentMpChange(bool isInitial, int currentMp)
+        private void OnCurrentMpChange(bool isInitial, int currentMp)
         {
             if (onCurrentMpChange != null)
                 onCurrentMpChange.Invoke(currentMp);
         }
 
         /// <summary>
-        /// Override this to do stuffs when current food changes
+        /// This will be called when current food changed
         /// </summary>
+        /// <param name="isInitial"></param>
         /// <param name="currentFood"></param>
-        protected virtual void OnCurrentFoodChange(bool isInitial, int currentFood)
+        private void OnCurrentFoodChange(bool isInitial, int currentFood)
         {
             if (onCurrentFoodChange != null)
                 onCurrentFoodChange.Invoke(currentFood);
         }
 
         /// <summary>
-        /// Override this to do stuffs when current water changes
+        /// This will be called when current water changed
         /// </summary>
+        /// <param name="isInitial"></param>
         /// <param name="currentWater"></param>
-        protected virtual void OnCurrentWaterChange(bool isInitial, int currentWater)
+        private void OnCurrentWaterChange(bool isInitial, int currentWater)
         {
             if (onCurrentWaterChange != null)
                 onCurrentWaterChange.Invoke(currentWater);
         }
 
         /// <summary>
-        /// Override this to do stuffs when equip weapon set changes
+        /// This will be called when equip weapon set changed
         /// </summary>
+        /// <param name="isInitial"></param>
         /// <param name="equipWeaponSet"></param>
-        protected virtual void OnEquipWeaponSetChange(bool isInitial, byte equipWeaponSet)
+        private void OnEquipWeaponSetChange(bool isInitial, byte equipWeaponSet)
         {
             SetEquipWeaponsModels();
             if (onEquipWeaponSetChange != null)
@@ -395,21 +415,22 @@ namespace MultiplayerARPG
         }
 
         /// <summary>
-        /// Override this to do stuffs when pitch changes
+        /// This will be called when pitch changed
         /// </summary>
+        /// <param name="isInitial"></param>
         /// <param name="pitch"></param>
-        protected virtual void OnPitchChange(bool isInitial, ushort pitch)
+        private void OnPitchChange(bool isInitial, ushort pitch)
         {
             if (onPitchChange != null)
                 onPitchChange.Invoke(pitch);
         }
 
         /// <summary>
-        /// Override this to do stuffs when target entity id changes
+        /// This will be called when target entity id changed
         /// </summary>
         /// <param name="isInitial"></param>
         /// <param name="targetEntityId"></param>
-        protected virtual void OnTargetEntityIdChange(bool isInitial, uint targetEntityId)
+        private void OnTargetEntityIdChange(bool isInitial, uint targetEntityId)
         {
             if (onTargetEntityIdChange != null)
                 onTargetEntityIdChange.Invoke(targetEntityId);
@@ -418,11 +439,11 @@ namespace MultiplayerARPG
 
         #region Net functions operation callback
         /// <summary>
-        /// Override this to do stuffs when equip weapons changes
+        /// This will be called when equip weapons changed
         /// </summary>
         /// <param name="operation"></param>
         /// <param name="index"></param>
-        protected virtual void OnSelectableWeaponSetsOperation(LiteNetLibSyncList.Operation operation, int index)
+        private void OnSelectableWeaponSetsOperation(LiteNetLibSyncList.Operation operation, int index)
         {
             SetEquipWeaponsModels();
             selectableWeaponSetsRecachingState = new SyncListRecachingState()
@@ -434,11 +455,11 @@ namespace MultiplayerARPG
         }
 
         /// <summary>
-        /// Override this to do stuffs when attributes changes
+        /// This will be called when attributes changed
         /// </summary>
         /// <param name="operation"></param>
         /// <param name="index"></param>
-        protected virtual void OnAttributesOperation(LiteNetLibSyncList.Operation operation, int index)
+        private void OnAttributesOperation(LiteNetLibSyncList.Operation operation, int index)
         {
             attributesRecachingState = new SyncListRecachingState()
             {
@@ -449,11 +470,11 @@ namespace MultiplayerARPG
         }
 
         /// <summary>
-        /// Override this to do stuffs when skills changes
+        /// This will be called when skills changed
         /// </summary>
         /// <param name="operation"></param>
         /// <param name="index"></param>
-        protected virtual void OnSkillsOperation(LiteNetLibSyncList.Operation operation, int index)
+        private void OnSkillsOperation(LiteNetLibSyncList.Operation operation, int index)
         {
             skillsRecachingState = new SyncListRecachingState()
             {
@@ -464,11 +485,11 @@ namespace MultiplayerARPG
         }
 
         /// <summary>
-        /// Override this to do stuffs when skill usages changes
+        /// This will be called when skill usages changed
         /// </summary>
         /// <param name="operation"></param>
         /// <param name="index"></param>
-        protected virtual void OnSkillUsagesOperation(LiteNetLibSyncList.Operation operation, int index)
+        private void OnSkillUsagesOperation(LiteNetLibSyncList.Operation operation, int index)
         {
             if (onSkillUsagesOperation != null)
                 onSkillUsagesOperation.Invoke(operation, index);
@@ -496,11 +517,11 @@ namespace MultiplayerARPG
         }
 
         /// <summary>
-        /// Override this to do stuffs when buffs changes
+        /// This will be called when buffs changed
         /// </summary>
         /// <param name="operation"></param>
         /// <param name="index"></param>
-        protected virtual void OnBuffsOperation(LiteNetLibSyncList.Operation operation, int index)
+        private void OnBuffsOperation(LiteNetLibSyncList.Operation operation, int index)
         {
             // Update model's buffs effects
             CharacterModel.SetBuffs(buffs);
@@ -513,7 +534,7 @@ namespace MultiplayerARPG
                 case LiteNetLibSyncList.Operation.AddInitial:
                 case LiteNetLibSyncList.Operation.Insert:
                     // Check last buff to update disallow status
-                    if (buffs.Count > 0 && buffs[buffs.Count - 1].GetBuff().disallowMove)
+                    if (buffs.Count > 0 && buffs[buffs.Count - 1].GetBuff().GetBuff().disallowMove)
                         StopMove();
                     break;
             }
@@ -527,11 +548,11 @@ namespace MultiplayerARPG
         }
 
         /// <summary>
-        /// Override this to do stuffs when equip items changes
+        /// This will be called when equip items changed
         /// </summary>
         /// <param name="operation"></param>
         /// <param name="index"></param>
-        protected virtual void OnEquipItemsOperation(LiteNetLibSyncList.Operation operation, int index)
+        private void OnEquipItemsOperation(LiteNetLibSyncList.Operation operation, int index)
         {
             SetEquipItemsModels();
             equipItemsRecachingState = new SyncListRecachingState()
@@ -543,11 +564,11 @@ namespace MultiplayerARPG
         }
 
         /// <summary>
-        /// Override this to do stuffs when non equip items changes
+        /// This will be called when non equip items changed
         /// </summary>
         /// <param name="operation"></param>
         /// <param name="index"></param>
-        protected virtual void OnNonEquipItemsOperation(LiteNetLibSyncList.Operation operation, int index)
+        private void OnNonEquipItemsOperation(LiteNetLibSyncList.Operation operation, int index)
         {
             nonEquipItemsRecachingState = new SyncListRecachingState()
             {
@@ -558,11 +579,11 @@ namespace MultiplayerARPG
         }
 
         /// <summary>
-        /// Override this to do stuffs when summons changes
+        /// This will be called when summons changed
         /// </summary>
         /// <param name="operation"></param>
         /// <param name="index"></param>
-        protected virtual void OnSummonsOperation(LiteNetLibSyncList.Operation operation, int index)
+        private void OnSummonsOperation(LiteNetLibSyncList.Operation operation, int index)
         {
             summonsRecachingState = new SyncListRecachingState()
             {
