@@ -138,19 +138,28 @@ namespace MultiplayerARPG
         {
             get
             {
-                if (!foundPassengingVehicleEntity && PassengingVehicle.objectId > 0)
+                if (!foundPassengingVehicleEntity)
                 {
-                    passengingVehicleEntity = null;
-                    LiteNetLibIdentity identity;
-                    if (Manager.Assets.TryGetSpawnedObject(PassengingVehicle.objectId, out identity))
+                    if (PassengingVehicle.objectId > 0)
+                    {
+                        passengingVehicleEntity = null;
+                        LiteNetLibIdentity identity;
+                        if (Manager.Assets.TryGetSpawnedObject(PassengingVehicle.objectId, out identity))
+                        {
+                            foundPassengingVehicleEntity = true;
+                            passengingVehicleEntity = identity.GetComponent<IVehicleEntity>();
+                            if (onVehicleEntityChanged != null)
+                                onVehicleEntityChanged.Invoke(passengingVehicleEntity);
+                        }
+                    }
+                    else
                     {
                         foundPassengingVehicleEntity = true;
-                        passengingVehicleEntity = identity.GetComponent<IVehicleEntity>();
+                        passengingVehicleEntity = null;
+                        if (onVehicleEntityChanged != null)
+                            onVehicleEntityChanged.Invoke(passengingVehicleEntity);
                     }
                 }
-                // Clear current vehicle, if not existed
-                if (PassengingVehicle.objectId == 0)
-                    passengingVehicleEntity = null;
                 return passengingVehicleEntity;
             }
         }
@@ -299,6 +308,7 @@ namespace MultiplayerARPG
         public event System.Action onSetup;
         public event System.Action onSetupNetElements;
         public event System.Action onSetOwnerClient;
+        public event System.Action<IVehicleEntity> onVehicleEntityChanged;
         public event NetworkDestroyDelegate onNetworkDestroy;
         #endregion
 
@@ -568,9 +578,9 @@ namespace MultiplayerARPG
             {
                 EntityComponents[i].EntityOnDestroy();
             }
-            // Remove sync field events
-            passengingVehicle.onChange -= OnPassengingVehicleChange;
             EntityOnDestroy();
+            // On data changed events
+            passengingVehicle.onChange -= OnPassengingVehicleChange;
             this.InvokeInstanceDevExtMethods("OnDestroy");
         }
         protected virtual void EntityOnDestroy()
@@ -595,7 +605,7 @@ namespace MultiplayerARPG
                 onSetup.Invoke();
 
             SetupNetElements();
-
+            // On data changed events
             passengingVehicle.onChange += OnPassengingVehicleChange;
         }
 
@@ -612,8 +622,7 @@ namespace MultiplayerARPG
 
         protected void OnPassengingVehicleChange(bool isInitial, PassengingVehicle passengingVehicle)
         {
-            // Set `foundPassengingVehicleEntity` to `True` if `objectId` is `0` so it will not find `PassengingVehicleEntity`
-            foundPassengingVehicleEntity = passengingVehicle.objectId == 0;
+            foundPassengingVehicleEntity = false;
         }
 
         #region Net Functions
