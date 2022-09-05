@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using Cysharp.Text;
+using System.Collections;
 using UnityEngine;
 using UnityEngine.Networking;
 using UnityEngine.Serialization;
@@ -32,14 +33,14 @@ namespace MultiplayerARPG
         {
             if (uiTextTitle != null)
             {
-                uiTextTitle.text = string.Format(
+                uiTextTitle.text = ZString.Format(
                     LanguageManager.GetText(formatKeyTitle),
                     Data == null ? LanguageManager.GetUnknowTitle() : Data.Title);
             }
 
             if (uiTextDescription != null)
             {
-                uiTextDescription.text = string.Format(
+                uiTextDescription.text = ZString.Format(
                     LanguageManager.GetText(formatKeyDescription),
                     Data == null ? LanguageManager.GetUnknowDescription() : Data.Description);
             }
@@ -61,14 +62,14 @@ namespace MultiplayerARPG
 
             if (uiTextSellPrice != null)
             {
-                uiTextSellPrice.text = string.Format(
+                uiTextSellPrice.text = ZString.Format(
                     LanguageManager.GetText(formatKeySellPrice),
                     Data == null ? "0" : Data.GetSellPrice());
             }
 
             if (uiTextCashAmount != null)
             {
-                uiTextCashAmount.text = string.Format(
+                uiTextCashAmount.text = ZString.Format(
                     LanguageManager.GetText(formatKeyCashAmount),
                     Data == null ? "0" : Data.CashAmount.ToString("N0"));
             }

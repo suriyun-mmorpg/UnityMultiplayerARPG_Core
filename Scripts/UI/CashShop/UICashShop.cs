@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
-using UnityEngine;
+using Cysharp.Text;
 using LiteNetLibManager;
+using UnityEngine;
 using UnityEngine.Serialization;
 
 namespace MultiplayerARPG
@@ -122,7 +123,7 @@ namespace MultiplayerARPG
 
             if (uiTextCash != null)
             {
-                uiTextCash.text = string.Format(
+                uiTextCash.text = ZString.Format(
                     LanguageManager.GetText(formatKeyCash),
                     response.cash.ToString("N0"));
             }
