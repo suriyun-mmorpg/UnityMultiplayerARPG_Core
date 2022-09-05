@@ -1,5 +1,5 @@
 ﻿using System.Collections.Generic;
-using System.Text;
+using Cysharp.Text;
 using LiteNetLib.Utils;
 using LiteNetLibManager;
 using UnityEngine;
@@ -72,9 +72,6 @@ namespace MultiplayerARPG
         private IMountItem cacheMountItem;
         [System.NonSerialized]
         private ISkillItem cacheSkillItem;
-
-        [System.NonSerialized]
-        private readonly StringBuilder stringBuilder = new StringBuilder();
 
         public List<int> Sockets
         {
@@ -559,14 +556,15 @@ namespace MultiplayerARPG
 
         public string WriteSockets(char separator = ';')
         {
-            stringBuilder.Clear();
-            foreach (int socket in Sockets)
+            using (Utf16ValueStringBuilder stringBuilder = ZString.CreateStringBuilder(true))
             {
-                stringBuilder
-                    .Append(socket)
-                    .Append(separator);
+                foreach (int socket in Sockets)
+                {
+                    stringBuilder.Append(socket);
+                    stringBuilder.Append(separator);
+                }
+                return stringBuilder.ToString();
             }
-            return stringBuilder.ToString();
         }
 
         public void Serialize(NetDataWriter writer)
