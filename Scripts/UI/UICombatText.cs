@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using Cysharp.Text;
+using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 
@@ -18,7 +19,7 @@ namespace MultiplayerARPG
             set
             {
                 amount = value;
-                textComponent.text = string.Format(format, (showPositiveSign && amount > 0 ? "+" : string.Empty) + amount.ToString("N0"));
+                textComponent.text = ZString.Format(format, (showPositiveSign && amount > 0 ? "+" : string.Empty) + amount.ToString("N0"));
             }
         }
 

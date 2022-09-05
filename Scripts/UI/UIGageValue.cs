@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using Cysharp.Text;
+using UnityEngine;
 using UnityEngine.UI;
 
 namespace MultiplayerARPG
@@ -53,14 +54,14 @@ namespace MultiplayerARPG
             {
                 if (displayType == DisplayType.CurrentByMax)
                 {
-                    textValue.text = string.Format(
+                    textValue.text = ZString.Format(
                         LanguageManager.GetText(formatCurrentByMax),
                         current.ToString(formatCurrentAmount),
                         max.ToString(formatMaxAmount));
                 }
                 else
                 {
-                    textValue.text = string.Format(
+                    textValue.text = ZString.Format(
                         LanguageManager.GetText(formatPercentage),
                         (rate * 100f).ToString(formatPercentageAmount));
                 }
