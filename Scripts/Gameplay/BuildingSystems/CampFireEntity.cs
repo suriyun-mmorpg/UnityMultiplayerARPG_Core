@@ -1,10 +1,10 @@
 ﻿using System.Collections.Generic;
-using UnityEngine;
-using UnityEngine.Events;
+using Cysharp.Text;
+using Cysharp.Threading.Tasks;
 using LiteNetLibManager;
 using LiteNetLib;
-using System.Text;
-using Cysharp.Threading.Tasks;
+using UnityEngine;
+using UnityEngine.Events;
 
 namespace MultiplayerARPG
 {
@@ -47,7 +47,7 @@ namespace MultiplayerARPG
         {
             get
             {
-                return new StringBuilder().Append(IsTurnOn ? byte.MaxValue : byte.MinValue).Append(':').Append(TurnOnElapsed).ToString();
+                return ZString.Concat(IsTurnOn ? byte.MaxValue : byte.MinValue, ':', TurnOnElapsed);
             }
             set
             {
