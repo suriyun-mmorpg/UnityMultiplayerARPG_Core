@@ -79,7 +79,7 @@ namespace MultiplayerARPG
                 if (character != null)
                     currentAttributeAmounts = character.GetAttributes(includeEquipmentsForCurrentAmounts, includeBuffsForCurrentAmounts, includeSkillsForCurrentAmounts ? character.GetSkills(includeEquipmentsForCurrentAmounts) : null);
                 // In-loop temp data
-                using (Utf16ValueStringBuilder tempAllText = ZString.CreateStringBuilder(true))
+                using (Utf16ValueStringBuilder tempAllText = ZString.CreateStringBuilder(false))
                 {
                     Attribute tempData;
                     float tempCurrentAmount;
