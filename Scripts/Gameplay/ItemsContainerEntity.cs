@@ -1,5 +1,6 @@
-﻿using LiteNetLibManager;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using Cysharp.Text;
+using LiteNetLibManager;
 using UnityEngine;
 using UnityEngine.Events;
 
@@ -45,11 +46,11 @@ namespace MultiplayerARPG
             {
                 if (!string.IsNullOrEmpty(dropperTitle.Value))
                 {
-                    return string.Format(LanguageManager.GetText(formatKeyCorpseTitle), DropperTitle.Value);
+                    return ZString.Format(LanguageManager.GetText(formatKeyCorpseTitle), DropperTitle.Value);
                 }
                 if (GameInstance.MonsterCharacterEntities.ContainsKey(dropperEntityId.Value))
                 {
-                    return string.Format(LanguageManager.GetText(formatKeyCorpseTitle), GameInstance.MonsterCharacterEntities[dropperEntityId.Value].EntityTitle);
+                    return ZString.Format(LanguageManager.GetText(formatKeyCorpseTitle), GameInstance.MonsterCharacterEntities[dropperEntityId.Value].EntityTitle);
                 }
                 return base.EntityTitle;
             }
