@@ -416,7 +416,7 @@ namespace MultiplayerARPG
 
             if (uiTextWeaponDamages != null)
             {
-                using (Utf16ValueStringBuilder textDamages = ZString.CreateStringBuilder(true))
+                using (Utf16ValueStringBuilder textDamages = ZString.CreateStringBuilder(false))
                 {
                     if (rightHandWeapon != null)
                     {
