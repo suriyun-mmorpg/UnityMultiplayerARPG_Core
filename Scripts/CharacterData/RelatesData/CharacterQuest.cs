@@ -1,5 +1,5 @@
 ﻿using System.Collections.Generic;
-using System.Text;
+using Cysharp.Text;
 using LiteNetLib.Utils;
 using LiteNetLibManager;
 
@@ -20,9 +20,6 @@ namespace MultiplayerARPG
 
         [System.NonSerialized]
         private Quest cacheQuest;
-
-        [System.NonSerialized]
-        private readonly StringBuilder stringBuilder = new StringBuilder();
 
         public Dictionary<int, int> KilledMonsters
         {
@@ -214,14 +211,17 @@ namespace MultiplayerARPG
 
         public string WriteKilledMonsters()
         {
-            stringBuilder.Clear();
-            foreach (KeyValuePair<int, int> keyValue in KilledMonsters)
+            using (Utf16ValueStringBuilder stringBuilder = ZString.CreateStringBuilder(true))
             {
-                stringBuilder
-                    .Append(keyValue.Key).Append(':')
-                    .Append(keyValue.Value).Append(';');
+                foreach (KeyValuePair<int, int> keyValue in KilledMonsters)
+                {
+                    stringBuilder.Append(keyValue.Key);
+                    stringBuilder.Append(':');
+                    stringBuilder.Append(keyValue.Value);
+                    stringBuilder.Append(';');
+                }
+                return stringBuilder.ToString();
             }
-            return stringBuilder.ToString();
         }
 
         public List<int> ReadCompletedTasks(string completedTasks)
@@ -239,14 +239,15 @@ namespace MultiplayerARPG
 
         public string WriteCompletedTasks()
         {
-            stringBuilder.Clear();
-            foreach (int completedTask in CompletedTasks)
+            using (Utf16ValueStringBuilder stringBuilder = ZString.CreateStringBuilder(true))
             {
-                stringBuilder
-                    .Append(completedTask)
-                    .Append(';');
+                foreach (int completedTask in CompletedTasks)
+                {
+                    stringBuilder.Append(completedTask);
+                    stringBuilder.Append(';');
+                }
+                return stringBuilder.ToString();
             }
-            return stringBuilder.ToString();
         }
 
         public void Serialize(NetDataWriter writer)
