@@ -1,5 +1,5 @@
 ﻿using System.Collections.Generic;
-using System.Text;
+using Cysharp.Text;
 using UnityEngine;
 
 namespace MultiplayerARPG
@@ -48,7 +48,7 @@ namespace MultiplayerARPG
             // Reset number
             if (uiTextSumDamage != null)
             {
-                uiTextSumDamage.text = string.Format(
+                uiTextSumDamage.text = ZString.Format(
                     LanguageManager.GetText(formatKeySumDamage),
                     isBonus ? 0.ToBonusString("N0") : "0",
                     "0");
@@ -65,67 +65,69 @@ namespace MultiplayerARPG
             }
             else
             {
-                StringBuilder tempAllText = new StringBuilder();
-                MinMaxFloat sumDamage = new MinMaxFloat();
-                DamageElement tempElement;
-                MinMaxFloat tempAmount;
-                string tempMinValue;
-                string tempMaxValue;
-                string tempAmountText;
-                UIDamageElementTextPair tempComponentPair;
-                foreach (KeyValuePair<DamageElement, MinMaxFloat> dataEntry in Data)
+                using (Utf16ValueStringBuilder tempAllText = ZString.CreateStringBuilder(true))
                 {
-                    if (dataEntry.Key == null)
-                        continue;
-                    // Set temp data
-                    tempElement = dataEntry.Key;
-                    tempAmount = dataEntry.Value;
-                    // Set current elemental damage text
-                    if (isBonus)
-                        tempMinValue = tempAmount.min.ToBonusString("N0");
-                    else
-                        tempMinValue = tempAmount.min.ToString("N0");
-                    tempMaxValue = tempAmount.max.ToString("N0");
-                    tempAmountText = string.Format(
-                        LanguageManager.GetText(formatKeyDamage),
-                        tempElement.Title,
-                        tempMinValue,
-                        tempMaxValue);
-                    // Append current elemental damage text
-                    if (dataEntry.Value.min != 0 || dataEntry.Value.max != 0)
+                    MinMaxFloat sumDamage = new MinMaxFloat();
+                    DamageElement tempElement;
+                    MinMaxFloat tempAmount;
+                    string tempMinValue;
+                    string tempMaxValue;
+                    string tempAmountText;
+                    UIDamageElementTextPair tempComponentPair;
+                    foreach (KeyValuePair<DamageElement, MinMaxFloat> dataEntry in Data)
                     {
-                        // Add new line if text is not empty
-                        if (tempAllText.Length > 0)
-                            tempAllText.Append('\n');
-                        tempAllText.Append(tempAmountText);
+                        if (dataEntry.Key == null)
+                            continue;
+                        // Set temp data
+                        tempElement = dataEntry.Key;
+                        tempAmount = dataEntry.Value;
+                        // Set current elemental damage text
+                        if (isBonus)
+                            tempMinValue = tempAmount.min.ToBonusString("N0");
+                        else
+                            tempMinValue = tempAmount.min.ToString("N0");
+                        tempMaxValue = tempAmount.max.ToString("N0");
+                        tempAmountText = ZString.Format(
+                            LanguageManager.GetText(formatKeyDamage),
+                            tempElement.Title,
+                            tempMinValue,
+                            tempMaxValue);
+                        // Append current elemental damage text
+                        if (dataEntry.Value.min != 0 || dataEntry.Value.max != 0)
+                        {
+                            // Add new line if text is not empty
+                            if (tempAllText.Length > 0)
+                                tempAllText.Append('\n');
+                            tempAllText.Append(tempAmountText);
+                        }
+                        // Set current elemental damage text to UI
+                        if (CacheTextDamages.TryGetValue(dataEntry.Key, out tempComponentPair))
+                        {
+                            tempComponentPair.uiText.text = tempAmountText;
+                            if (tempComponentPair.root != null)
+                                tempComponentPair.root.SetActive(!inactiveIfAmountZero || (tempAmount.min != 0 && tempAmount.max != 0));
+                        }
+                        sumDamage += tempAmount;
                     }
-                    // Set current elemental damage text to UI
-                    if (CacheTextDamages.TryGetValue(dataEntry.Key, out tempComponentPair))
+
+                    if (uiTextAllDamages != null)
                     {
-                        tempComponentPair.uiText.text = tempAmountText;
-                        if (tempComponentPair.root != null)
-                            tempComponentPair.root.SetActive(!inactiveIfAmountZero || (tempAmount.min != 0 && tempAmount.max != 0));
+                        uiTextAllDamages.SetGameObjectActive(tempAllText.Length > 0);
+                        uiTextAllDamages.text = tempAllText.ToString();
                     }
-                    sumDamage += tempAmount;
-                }
 
-                if (uiTextAllDamages != null)
-                {
-                    uiTextAllDamages.SetGameObjectActive(tempAllText.Length > 0);
-                    uiTextAllDamages.text = tempAllText.ToString();
-                }
-
-                if (uiTextSumDamage != null)
-                {
-                    if (isBonus)
-                        tempMinValue = sumDamage.min.ToBonusString("N0");
-                    else
-                        tempMinValue = sumDamage.min.ToString("N0");
-                    tempMaxValue = sumDamage.max.ToString("N0");
-                    uiTextSumDamage.text = string.Format(
-                        LanguageManager.GetText(formatKeySumDamage),
-                        tempMinValue,
-                        tempMaxValue);
+                    if (uiTextSumDamage != null)
+                    {
+                        if (isBonus)
+                            tempMinValue = sumDamage.min.ToBonusString("N0");
+                        else
+                            tempMinValue = sumDamage.min.ToString("N0");
+                        tempMaxValue = sumDamage.max.ToString("N0");
+                        uiTextSumDamage.text = ZString.Format(
+                            LanguageManager.GetText(formatKeySumDamage),
+                            tempMinValue,
+                            tempMaxValue);
+                    }
                 }
             }
         }
@@ -133,7 +135,7 @@ namespace MultiplayerARPG
         private void SetDefaultValue(UIDamageElementTextPair componentPair)
         {
             DamageElement tempElement = componentPair.damageElement == null ? GameInstance.Singleton.DefaultDamageElement : componentPair.damageElement;
-            componentPair.uiText.text = string.Format(
+            componentPair.uiText.text = ZString.Format(
                 LanguageManager.GetText(formatKeyDamage),
                 tempElement.Title,
                 isBonus ? 0.ToBonusString("N0") : "0",

@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using Cysharp.Text;
+using UnityEngine;
 
 namespace MultiplayerARPG
 {
@@ -15,7 +16,7 @@ namespace MultiplayerARPG
         {
             if (uiTextAmount != null)
             {
-                uiTextAmount.text = string.Format(
+                uiTextAmount.text = ZString.Format(
                     LanguageManager.GetText(formatKeyAmount),
                     Data.damageElement.Title,
                     Data.amount.min.ToString("N0"),

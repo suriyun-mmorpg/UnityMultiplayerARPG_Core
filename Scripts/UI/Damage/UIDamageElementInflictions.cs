@@ -1,5 +1,5 @@
 ﻿using System.Collections.Generic;
-using System.Text;
+using Cysharp.Text;
 using UnityEngine;
 
 namespace MultiplayerARPG
@@ -56,53 +56,55 @@ namespace MultiplayerARPG
             }
             else
             {
-                StringBuilder tempAllText = new StringBuilder();
-                DamageElement tempElement;
-                float tempInfliction;
-                string tempAmountText;
-                UIDamageElementTextPair tempComponentPair;
-                foreach (KeyValuePair<DamageElement, float> dataEntry in Data)
+                using (Utf16ValueStringBuilder tempAllText = ZString.CreateStringBuilder(true))
                 {
-                    if (dataEntry.Key == null)
-                        continue;
-                    // Set temp data
-                    tempElement = dataEntry.Key;
-                    tempInfliction = dataEntry.Value;
-                    // Set current elemental damage infliction text
-                    if (tempElement == null || tempElement == GameInstance.Singleton.DefaultDamageElement)
+                    DamageElement tempElement;
+                    float tempInfliction;
+                    string tempAmountText;
+                    UIDamageElementTextPair tempComponentPair;
+                    foreach (KeyValuePair<DamageElement, float> dataEntry in Data)
                     {
-                        tempAmountText = string.Format(
-                            LanguageManager.GetText(formatKeyInfliction),
-                            (tempInfliction * 100f).ToString("N0"));
+                        if (dataEntry.Key == null)
+                            continue;
+                        // Set temp data
+                        tempElement = dataEntry.Key;
+                        tempInfliction = dataEntry.Value;
+                        // Set current elemental damage infliction text
+                        if (tempElement == null || tempElement == GameInstance.Singleton.DefaultDamageElement)
+                        {
+                            tempAmountText = ZString.Format(
+                                LanguageManager.GetText(formatKeyInfliction),
+                                (tempInfliction * 100f).ToString("N0"));
+                        }
+                        else
+                        {
+                            tempAmountText = ZString.Format(
+                                LanguageManager.GetText(formatKeyInflictionAsElemental),
+                                tempElement.Title,
+                                (tempInfliction * 100f).ToString("N0"));
+                        }
+                        // Append current elemental damage infliction text
+                        if (dataEntry.Value != 0)
+                        {
+                            // Add new line if text is not empty
+                            if (tempAllText.Length > 0)
+                                tempAllText.Append('\n');
+                            tempAllText.Append(tempAmountText);
+                        }
+                        // Set current elemental damage infliction text to UI
+                        if (CacheTextInflictions.TryGetValue(dataEntry.Key, out tempComponentPair))
+                        {
+                            tempComponentPair.uiText.text = tempAmountText;
+                            if (tempComponentPair.root != null)
+                                tempComponentPair.root.SetActive(!inactiveIfAmountZero || tempInfliction != 0);
+                        }
                     }
-                    else
-                    {
-                        tempAmountText = string.Format(
-                            LanguageManager.GetText(formatKeyInflictionAsElemental),
-                            tempElement.Title,
-                            (tempInfliction * 100f).ToString("N0"));
-                    }
-                    // Append current elemental damage infliction text
-                    if (dataEntry.Value != 0)
-                    {
-                        // Add new line if text is not empty
-                        if (tempAllText.Length > 0)
-                            tempAllText.Append('\n');
-                        tempAllText.Append(tempAmountText);
-                    }
-                    // Set current elemental damage infliction text to UI
-                    if (CacheTextInflictions.TryGetValue(dataEntry.Key, out tempComponentPair))
-                    {
-                        tempComponentPair.uiText.text = tempAmountText;
-                        if (tempComponentPair.root != null)
-                            tempComponentPair.root.SetActive(!inactiveIfAmountZero || tempInfliction != 0);
-                    }
-                }
 
-                if (uiTextAllInflictions != null)
-                {
-                    uiTextAllInflictions.SetGameObjectActive(tempAllText.Length > 0);
-                    uiTextAllInflictions.text = tempAllText.ToString();
+                    if (uiTextAllInflictions != null)
+                    {
+                        uiTextAllInflictions.SetGameObjectActive(tempAllText.Length > 0);
+                        uiTextAllInflictions.text = tempAllText.ToString();
+                    }
                 }
             }
         }
@@ -112,13 +114,13 @@ namespace MultiplayerARPG
             DamageElement tempElement = componentPair.damageElement == null ? GameInstance.Singleton.DefaultDamageElement : componentPair.damageElement;
             if (tempElement == null || tempElement == GameInstance.Singleton.DefaultDamageElement)
             {
-                componentPair.uiText.text = string.Format(
+                componentPair.uiText.text = ZString.Format(
                     LanguageManager.GetText(formatKeyInfliction),
                     "0");
             }
             else
             {
-                componentPair.uiText.text = string.Format(
+                componentPair.uiText.text = ZString.Format(
                     LanguageManager.GetText(formatKeyInflictionAsElemental),
                     tempElement.Title,
                     "0");

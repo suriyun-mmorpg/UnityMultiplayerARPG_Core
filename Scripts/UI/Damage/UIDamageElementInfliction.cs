@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using Cysharp.Text;
+using UnityEngine;
 
 namespace MultiplayerARPG
 {
@@ -20,13 +21,13 @@ namespace MultiplayerARPG
                 DamageElement element = Data.damageElement;
                 if (element == null || element == GameInstance.Singleton.DefaultDamageElement)
                 {
-                    uiTextInfliction.text = string.Format(
+                    uiTextInfliction.text = ZString.Format(
                         LanguageManager.GetText(formatKeyInfliction),
                         (Data.infliction * 100f).ToString("N0"));
                 }
                 else
                 {
-                    uiTextInfliction.text = string.Format(
+                    uiTextInfliction.text = ZString.Format(
                         LanguageManager.GetText(formatKeyInflictionAsElemental),
                         element.Title,
                         (Data.infliction * 100f).ToString("N0"));
