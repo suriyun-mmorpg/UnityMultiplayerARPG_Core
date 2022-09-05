@@ -98,7 +98,7 @@ namespace MultiplayerARPG
                 return;
 
             TextWrapper newMessage = AddMessage(rewardCurrencyPrefab);
-            newMessage.text = string.Format(LanguageManager.GetText(formatKeyRewardCurrency.ToString()), currency.Title, amount);
+            newMessage.text = ZString.Format(LanguageManager.GetText(formatKeyRewardCurrency.ToString()), currency.Title, amount);
         }
 
         public TextWrapper AddMessage(TextWrapper prefab)
