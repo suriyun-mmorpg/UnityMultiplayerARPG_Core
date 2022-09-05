@@ -1,5 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using Cysharp.Text;
 using UnityEngine;
 
 namespace MultiplayerARPG
@@ -17,7 +16,7 @@ namespace MultiplayerARPG
         {
             if (uiTextAmount != null)
             {
-                uiTextAmount.text = string.Format(
+                uiTextAmount.text = ZString.Format(
                     LanguageManager.GetText(formatKeyAmount),
                     GetAmount().ToString("N0"));
             }
