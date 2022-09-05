@@ -1,4 +1,5 @@
-﻿using LiteNetLibManager;
+﻿using Cysharp.Text;
+using LiteNetLibManager;
 using UnityEngine;
 using UnityEngine.Events;
 
@@ -134,14 +135,14 @@ namespace MultiplayerARPG
         {
             if (uiTextName != null)
             {
-                uiTextName.text = string.Format(
+                uiTextName.text = ZString.Format(
                     LanguageManager.GetText(formatKeyName),
                     string.IsNullOrEmpty(Data.characterName) ? LanguageManager.GetUnknowTitle() : Data.characterName);
             }
 
             if (uiTextLevel != null)
             {
-                uiTextLevel.text = string.Format(
+                uiTextLevel.text = ZString.Format(
                     LanguageManager.GetText(formatKeyLevel),
                     Data.level.ToString("N0"));
             }
@@ -198,7 +199,7 @@ namespace MultiplayerARPG
 
         public void OnClickAddFriend()
         {
-            UISceneGlobal.Singleton.ShowMessageDialog(LanguageManager.GetText(UITextKeys.UI_FRIEND_ADD.ToString()), string.Format(LanguageManager.GetText(UITextKeys.UI_FRIEND_ADD_DESCRIPTION.ToString()), Data.characterName), false, true, true, false, null, () =>
+            UISceneGlobal.Singleton.ShowMessageDialog(LanguageManager.GetText(UITextKeys.UI_FRIEND_ADD.ToString()), ZString.Format(LanguageManager.GetText(UITextKeys.UI_FRIEND_ADD_DESCRIPTION.ToString()), Data.characterName), false, true, true, false, null, () =>
             {
                 GameInstance.ClientFriendHandlers.RequestAddFriend(new RequestAddFriendMessage()
                 {
@@ -216,7 +217,7 @@ namespace MultiplayerARPG
 
         public void OnClickRemoveFriend()
         {
-            UISceneGlobal.Singleton.ShowMessageDialog(LanguageManager.GetText(UITextKeys.UI_FRIEND_REMOVE.ToString()), string.Format(LanguageManager.GetText(UITextKeys.UI_FRIEND_REMOVE_DESCRIPTION.ToString()), Data.characterName), false, true, true, false, null, () =>
+            UISceneGlobal.Singleton.ShowMessageDialog(LanguageManager.GetText(UITextKeys.UI_FRIEND_REMOVE.ToString()), ZString.Format(LanguageManager.GetText(UITextKeys.UI_FRIEND_REMOVE_DESCRIPTION.ToString()), Data.characterName), false, true, true, false, null, () =>
             {
                 GameInstance.ClientFriendHandlers.RequestRemoveFriend(new RequestRemoveFriendMessage()
                 {
@@ -234,7 +235,7 @@ namespace MultiplayerARPG
 
         public void OnClickSendFriendRequest()
         {
-            UISceneGlobal.Singleton.ShowMessageDialog(LanguageManager.GetText(UITextKeys.UI_FRIEND_REMOVE.ToString()), string.Format(LanguageManager.GetText(UITextKeys.UI_FRIEND_REMOVE_DESCRIPTION.ToString()), Data.characterName), false, true, true, false, null, () =>
+            UISceneGlobal.Singleton.ShowMessageDialog(LanguageManager.GetText(UITextKeys.UI_FRIEND_REMOVE.ToString()), ZString.Format(LanguageManager.GetText(UITextKeys.UI_FRIEND_REMOVE_DESCRIPTION.ToString()), Data.characterName), false, true, true, false, null, () =>
             {
                 GameInstance.ClientFriendHandlers.RequestSendFriendRequest(new RequestSendFriendRequestMessage()
                 {
@@ -342,7 +343,7 @@ namespace MultiplayerARPG
 
         public void OnClickKickFromParty()
         {
-            UISceneGlobal.Singleton.ShowMessageDialog(LanguageManager.GetText(UITextKeys.UI_PARTY_KICK_MEMBER.ToString()), string.Format(LanguageManager.GetText(UITextKeys.UI_PARTY_KICK_MEMBER_DESCRIPTION.ToString()), Data.characterName), false, true, true, false, null, () =>
+            UISceneGlobal.Singleton.ShowMessageDialog(LanguageManager.GetText(UITextKeys.UI_PARTY_KICK_MEMBER.ToString()), ZString.Format(LanguageManager.GetText(UITextKeys.UI_PARTY_KICK_MEMBER_DESCRIPTION.ToString()), Data.characterName), false, true, true, false, null, () =>
             {
                 GameInstance.ClientPartyHandlers.RequestKickMemberFromParty(new RequestKickMemberFromPartyMessage()
                 {
@@ -360,7 +361,7 @@ namespace MultiplayerARPG
 
         public void OnClickKickFromGuild()
         {
-            UISceneGlobal.Singleton.ShowMessageDialog(LanguageManager.GetText(UITextKeys.UI_GUILD_KICK_MEMBER.ToString()), string.Format(LanguageManager.GetText(UITextKeys.UI_GUILD_KICK_MEMBER_DESCRIPTION.ToString()), Data.characterName), false, true, true, false, null, () =>
+            UISceneGlobal.Singleton.ShowMessageDialog(LanguageManager.GetText(UITextKeys.UI_GUILD_KICK_MEMBER.ToString()), ZString.Format(LanguageManager.GetText(UITextKeys.UI_GUILD_KICK_MEMBER_DESCRIPTION.ToString()), Data.characterName), false, true, true, false, null, () =>
             {
                 GameInstance.ClientGuildHandlers.RequestKickMemberFromGuild(new RequestKickMemberFromGuildMessage()
                 {

@@ -1,5 +1,6 @@
-﻿using LiteNetLibManager;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using Cysharp.Text;
+using LiteNetLibManager;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.Serialization;
@@ -112,7 +113,7 @@ namespace MultiplayerARPG
             {
                 if (textSocialId != null)
                 {
-                    textSocialId.text = string.Format(
+                    textSocialId.text = ZString.Format(
                             LanguageManager.GetText(formatKeySocialId),
                             GetSocialId().ToString("N0"));
                 }
@@ -121,14 +122,14 @@ namespace MultiplayerARPG
                 {
                     if (GetMaxMemberAmount() > 0)
                     {
-                        textMemberAmount.text = string.Format(
+                        textMemberAmount.text = ZString.Format(
                             LanguageManager.GetText(formatKeyMemberAmount),
                             memberAmount.ToString("N0"),
                             GetMaxMemberAmount().ToString("N0"));
                     }
                     else
                     {
-                        textMemberAmount.text = string.Format(
+                        textMemberAmount.text = ZString.Format(
                             LanguageManager.GetText(formatKeyMemberAmountNoLimit),
                             memberAmount.ToString("N0"));
                     }
@@ -136,7 +137,7 @@ namespace MultiplayerARPG
 
                 if (textOnlineMemberAmount != null)
                 {
-                    textOnlineMemberAmount.text = string.Format(
+                    textOnlineMemberAmount.text = ZString.Format(
                         LanguageManager.GetText(formatKeyOnlineMemberAmount),
                         onlineMembers.Count.ToString("N0"),
                         memberAmount.ToString("N0"));
@@ -240,7 +241,7 @@ namespace MultiplayerARPG
                 return;
 
             SocialCharacterData friend = MemberSelectionManager.SelectedUI.Data;
-            UISceneGlobal.Singleton.ShowMessageDialog(LanguageManager.GetText(UITextKeys.UI_FRIEND_ADD.ToString()), string.Format(LanguageManager.GetText(UITextKeys.UI_FRIEND_ADD_DESCRIPTION.ToString()), friend.characterName), false, true, true, false, null, () =>
+            UISceneGlobal.Singleton.ShowMessageDialog(LanguageManager.GetText(UITextKeys.UI_FRIEND_ADD.ToString()), ZString.Format(LanguageManager.GetText(UITextKeys.UI_FRIEND_ADD_DESCRIPTION.ToString()), friend.characterName), false, true, true, false, null, () =>
             {
                 GameInstance.ClientFriendHandlers.RequestAddFriend(new RequestAddFriendMessage()
                 {
@@ -262,7 +263,7 @@ namespace MultiplayerARPG
                 return;
 
             SocialCharacterData friend = MemberSelectionManager.SelectedUI.Data;
-            UISceneGlobal.Singleton.ShowMessageDialog(LanguageManager.GetText(UITextKeys.UI_FRIEND_REMOVE.ToString()), string.Format(LanguageManager.GetText(UITextKeys.UI_FRIEND_REMOVE_DESCRIPTION.ToString()), friend.characterName), false, true, true, false, null, () =>
+            UISceneGlobal.Singleton.ShowMessageDialog(LanguageManager.GetText(UITextKeys.UI_FRIEND_REMOVE.ToString()), ZString.Format(LanguageManager.GetText(UITextKeys.UI_FRIEND_REMOVE_DESCRIPTION.ToString()), friend.characterName), false, true, true, false, null, () =>
             {
                 GameInstance.ClientFriendHandlers.RequestRemoveFriend(new RequestRemoveFriendMessage()
                 {
@@ -284,7 +285,7 @@ namespace MultiplayerARPG
                 return;
 
             SocialCharacterData friend = MemberSelectionManager.SelectedUI.Data;
-            UISceneGlobal.Singleton.ShowMessageDialog(LanguageManager.GetText(UITextKeys.UI_FRIEND_REQUEST.ToString()), string.Format(LanguageManager.GetText(UITextKeys.UI_FRIEND_REQUEST_DESCRIPTION.ToString()), friend.characterName), false, true, true, false, null, () =>
+            UISceneGlobal.Singleton.ShowMessageDialog(LanguageManager.GetText(UITextKeys.UI_FRIEND_REQUEST.ToString()), ZString.Format(LanguageManager.GetText(UITextKeys.UI_FRIEND_REQUEST_DESCRIPTION.ToString()), friend.characterName), false, true, true, false, null, () =>
             {
                 GameInstance.ClientFriendHandlers.RequestSendFriendRequest(new RequestSendFriendRequestMessage()
                 {
@@ -420,7 +421,7 @@ namespace MultiplayerARPG
                 return;
 
             SocialCharacterData partyMember = MemberSelectionManager.SelectedUI.Data;
-            UISceneGlobal.Singleton.ShowMessageDialog(LanguageManager.GetText(UITextKeys.UI_PARTY_KICK_MEMBER.ToString()), string.Format(LanguageManager.GetText(UITextKeys.UI_PARTY_KICK_MEMBER_DESCRIPTION.ToString()), partyMember.characterName), false, true, true, false, null, () =>
+            UISceneGlobal.Singleton.ShowMessageDialog(LanguageManager.GetText(UITextKeys.UI_PARTY_KICK_MEMBER.ToString()), ZString.Format(LanguageManager.GetText(UITextKeys.UI_PARTY_KICK_MEMBER_DESCRIPTION.ToString()), partyMember.characterName), false, true, true, false, null, () =>
             {
                 GameInstance.ClientPartyHandlers.RequestKickMemberFromParty(new RequestKickMemberFromPartyMessage()
                 {
@@ -442,7 +443,7 @@ namespace MultiplayerARPG
                 return;
 
             SocialCharacterData guildMember = MemberSelectionManager.SelectedUI.Data;
-            UISceneGlobal.Singleton.ShowMessageDialog(LanguageManager.GetText(UITextKeys.UI_GUILD_KICK_MEMBER.ToString()), string.Format(LanguageManager.GetText(UITextKeys.UI_GUILD_KICK_MEMBER_DESCRIPTION.ToString()), guildMember.characterName), false, true, true, false, null, () =>
+            UISceneGlobal.Singleton.ShowMessageDialog(LanguageManager.GetText(UITextKeys.UI_GUILD_KICK_MEMBER.ToString()), ZString.Format(LanguageManager.GetText(UITextKeys.UI_GUILD_KICK_MEMBER_DESCRIPTION.ToString()), guildMember.characterName), false, true, true, false, null, () =>
             {
                 GameInstance.ClientGuildHandlers.RequestKickMemberFromGuild(new RequestKickMemberFromGuildMessage()
                 {
