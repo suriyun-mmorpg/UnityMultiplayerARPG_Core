@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using Cysharp.Text;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.UI;
@@ -59,7 +60,7 @@ namespace MultiplayerARPG
             if (uiTextRemainsDuration != null)
             {
                 uiTextRemainsDuration.SetGameObjectActive(summonRemainsDuration > 0);
-                uiTextRemainsDuration.text = string.Format(
+                uiTextRemainsDuration.text = ZString.Format(
                     LanguageManager.GetText(formatKeySummonRemainsDuration),
                     summonRemainsDuration.ToString("N0"));
             }
@@ -95,7 +96,7 @@ namespace MultiplayerARPG
 
             if (uiTextTitle != null)
             {
-                uiTextTitle.text = string.Format(
+                uiTextTitle.text = ZString.Format(
                     LanguageManager.GetText(formatKeyTitle),
                     !tempSummonData ? LanguageManager.GetUnknowTitle() : tempSummonData.Title);
             }
@@ -133,7 +134,7 @@ namespace MultiplayerARPG
         {
             if (uiTextStack != null)
             {
-                uiTextStack.text = string.Format(
+                uiTextStack.text = ZString.Format(
                     LanguageManager.GetText(formatKeySummonStack),
                     stackingEntries.Count + 1);
             }
