@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using Cysharp.Text;
+using UnityEngine;
 using UnityEngine.Profiling;
 
 namespace MultiplayerARPG
@@ -53,7 +54,7 @@ namespace MultiplayerARPG
             {
                 tempTitle = Data == null ? string.Empty : Data.Title;
                 uiTextTitle.SetGameObjectActive(!string.IsNullOrEmpty(tempTitle));
-                uiTextTitle.text = string.Format(
+                uiTextTitle.text = ZString.Format(
                     LanguageManager.GetText(formatKeyTitle),
                     tempTitle);
             }
