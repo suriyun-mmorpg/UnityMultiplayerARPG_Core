@@ -12,7 +12,6 @@ namespace MultiplayerARPG
         private short level;
         private byte equipWeaponSet;
         private ObservableCollection<EquipWeapons> selectableEquipWeapons;
-
         private ObservableCollection<CharacterAttribute> attributes;
         private ObservableCollection<CharacterSkill> skills;
         private List<CharacterSkillUsage> skillUsages;
@@ -272,6 +271,9 @@ namespace MultiplayerARPG
                     summons.Add(entry);
             }
         }
+
+        public IVehicleEntity PassengingVehicleEntity { get { return null; } }
+
         private void List_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
             this.MarkToMakeCaches();
