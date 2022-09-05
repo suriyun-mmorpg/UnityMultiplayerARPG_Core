@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using Cysharp.Text;
+using UnityEngine;
 
 namespace MultiplayerARPG
 {
@@ -47,13 +48,13 @@ namespace MultiplayerARPG
                     short requireCharacterLevel = skill.GetRequireCharacterLevel(level);
                     if (characterLevel >= requireCharacterLevel)
                     {
-                        uiTextRequireLevel.text = string.Format(
+                        uiTextRequireLevel.text = ZString.Format(
                             LanguageManager.GetText(formatKeyRequireLevel),
                             requireCharacterLevel.ToString("N0"));
                     }
                     else
                     {
-                        uiTextRequireLevel.text = string.Format(
+                        uiTextRequireLevel.text = ZString.Format(
                             LanguageManager.GetText(formatKeyRequireLevelNotEnough),
                             characterLevel,
                             requireCharacterLevel.ToString("N0"));
@@ -75,13 +76,13 @@ namespace MultiplayerARPG
                     float requireCharacterSkillPoint = skill.GetRequireCharacterSkillPoint(level);
                     if (characterSkillPoint >= requireCharacterSkillPoint)
                     {
-                        uiTextRequireSkillPoint.text = string.Format(
+                        uiTextRequireSkillPoint.text = ZString.Format(
                             LanguageManager.GetText(formatKeyRequireSkillPoint),
                             requireCharacterSkillPoint.ToString("N0"));
                     }
                     else
                     {
-                        uiTextRequireSkillPoint.text = string.Format(
+                        uiTextRequireSkillPoint.text = ZString.Format(
                             LanguageManager.GetText(formatKeyRequireSkillPointNotEnough),
                             characterSkillPoint,
                             requireCharacterSkillPoint.ToString("N0"));
@@ -103,13 +104,13 @@ namespace MultiplayerARPG
                     float requireCharacterGold = skill.GetRequireCharacterGold(level);
                     if (characterGold >= requireCharacterGold)
                     {
-                        uiTextRequireGold.text = string.Format(
+                        uiTextRequireGold.text = ZString.Format(
                             LanguageManager.GetText(formatKeyRequireGold),
                             requireCharacterGold.ToString("N0"));
                     }
                     else
                     {
-                        uiTextRequireGold.text = string.Format(
+                        uiTextRequireGold.text = ZString.Format(
                             LanguageManager.GetText(formatKeyRequireGoldNotEnough),
                             characterGold,
                             requireCharacterGold.ToString("N0"));

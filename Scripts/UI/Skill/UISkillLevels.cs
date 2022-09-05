@@ -1,5 +1,5 @@
 ﻿using System.Collections.Generic;
-using System.Text;
+using Cysharp.Text;
 using UnityEngine;
 
 namespace MultiplayerARPG
@@ -74,73 +74,75 @@ namespace MultiplayerARPG
                 if (character != null)
                     currentSkillLevels = character.GetSkills(includeEquipmentsForCurrentLevels);
                 // In-loop temp data
-                StringBuilder tempAllText = new StringBuilder();
-                BaseSkill tempData;
-                short tempCurrentLevel;
-                short tempTargetLevel;
-                bool tempLevelEnough;
-                string tempCurrentValue;
-                string tempTargetValue;
-                string tempFormat;
-                string tempLevelText;
-                UISkillTextPair tempComponentPair;
-                foreach (KeyValuePair<BaseSkill, short> dataEntry in Data)
+                using (Utf16ValueStringBuilder tempAllText = ZString.CreateStringBuilder(true))
                 {
-                    if (dataEntry.Key == null)
-                        continue;
-                    // Set temp data
-                    tempData = dataEntry.Key;
-                    tempTargetLevel = dataEntry.Value;
-                    tempCurrentLevel = 0;
-                    // Get skill level from character
-                    currentSkillLevels.TryGetValue(tempData, out tempCurrentLevel);
-                    // Use difference format by option
-                    switch (displayType)
+                    BaseSkill tempData;
+                    short tempCurrentLevel;
+                    short tempTargetLevel;
+                    bool tempLevelEnough;
+                    string tempCurrentValue;
+                    string tempTargetValue;
+                    string tempFormat;
+                    string tempLevelText;
+                    UISkillTextPair tempComponentPair;
+                    foreach (KeyValuePair<BaseSkill, short> dataEntry in Data)
                     {
-                        case DisplayType.Requirement:
-                            // This will show both current character skill level and target level
-                            tempLevelEnough = tempCurrentLevel >= tempTargetLevel;
-                            tempFormat = LanguageManager.GetText(tempLevelEnough ? formatKeyLevel : formatKeyLevelNotEnough);
-                            tempCurrentValue = tempCurrentLevel.ToString("N0");
-                            tempTargetValue = tempTargetLevel.ToString("N0");
-                            if (useSimpleFormatIfLevelEnough && tempLevelEnough)
-                                tempLevelText = string.Format(LanguageManager.GetText(formatKeySimpleLevel), tempData.Title, tempTargetValue);
-                            else
-                                tempLevelText = string.Format(tempFormat, tempData.Title, tempCurrentValue, tempTargetValue);
-                            break;
-                        default:
-                            // This will show only target level, so current character skill level will not be shown
-                            if (isBonus)
-                                tempTargetValue = tempTargetLevel.ToBonusString("N0");
-                            else
+                        if (dataEntry.Key == null)
+                            continue;
+                        // Set temp data
+                        tempData = dataEntry.Key;
+                        tempTargetLevel = dataEntry.Value;
+                        tempCurrentLevel = 0;
+                        // Get skill level from character
+                        currentSkillLevels.TryGetValue(tempData, out tempCurrentLevel);
+                        // Use difference format by option
+                        switch (displayType)
+                        {
+                            case DisplayType.Requirement:
+                                // This will show both current character skill level and target level
+                                tempLevelEnough = tempCurrentLevel >= tempTargetLevel;
+                                tempFormat = LanguageManager.GetText(tempLevelEnough ? formatKeyLevel : formatKeyLevelNotEnough);
+                                tempCurrentValue = tempCurrentLevel.ToString("N0");
                                 tempTargetValue = tempTargetLevel.ToString("N0");
-                            tempLevelText = string.Format(
-                                LanguageManager.GetText(formatKeySimpleLevel),
-                                tempData.Title,
-                                tempTargetValue);
-                            break;
+                                if (useSimpleFormatIfLevelEnough && tempLevelEnough)
+                                    tempLevelText = ZString.Format(LanguageManager.GetText(formatKeySimpleLevel), tempData.Title, tempTargetValue);
+                                else
+                                    tempLevelText = ZString.Format(tempFormat, tempData.Title, tempCurrentValue, tempTargetValue);
+                                break;
+                            default:
+                                // This will show only target level, so current character skill level will not be shown
+                                if (isBonus)
+                                    tempTargetValue = tempTargetLevel.ToBonusString("N0");
+                                else
+                                    tempTargetValue = tempTargetLevel.ToString("N0");
+                                tempLevelText = ZString.Format(
+                                    LanguageManager.GetText(formatKeySimpleLevel),
+                                    tempData.Title,
+                                    tempTargetValue);
+                                break;
+                        }
+                        // Append current skill level text
+                        if (dataEntry.Value != 0)
+                        {
+                            // Add new line if text is not empty
+                            if (tempAllText.Length > 0)
+                                tempAllText.Append('\n');
+                            tempAllText.Append(tempLevelText);
+                        }
+                        // Set current skill text to UI
+                        if (CacheTextLevels.TryGetValue(dataEntry.Key, out tempComponentPair))
+                        {
+                            tempComponentPair.uiText.text = tempLevelText;
+                            if (tempComponentPair.root != null)
+                                tempComponentPair.root.SetActive(!inactiveIfLevelZero || tempTargetLevel != 0);
+                        }
                     }
-                    // Append current skill level text
-                    if (dataEntry.Value != 0)
-                    {
-                        // Add new line if text is not empty
-                        if (tempAllText.Length > 0)
-                            tempAllText.Append('\n');
-                        tempAllText.Append(tempLevelText);
-                    }
-                    // Set current skill text to UI
-                    if (CacheTextLevels.TryGetValue(dataEntry.Key, out tempComponentPair))
-                    {
-                        tempComponentPair.uiText.text = tempLevelText;
-                        if (tempComponentPair.root != null)
-                            tempComponentPair.root.SetActive(!inactiveIfLevelZero || tempTargetLevel != 0);
-                    }
-                }
 
-                if (uiTextAllLevels != null)
-                {
-                    uiTextAllLevels.SetGameObjectActive(tempAllText.Length > 0);
-                    uiTextAllLevels.text = tempAllText.ToString();
+                    if (uiTextAllLevels != null)
+                    {
+                        uiTextAllLevels.SetGameObjectActive(tempAllText.Length > 0);
+                        uiTextAllLevels.text = tempAllText.ToString();
+                    }
                 }
             }
         }
@@ -152,21 +154,21 @@ namespace MultiplayerARPG
                 case DisplayType.Requirement:
                     if (useSimpleFormatIfLevelEnough)
                     {
-                        componentPair.uiText.text = string.Format(
+                        componentPair.uiText.text = ZString.Format(
                             LanguageManager.GetText(formatKeySimpleLevel),
                             componentPair.skill.Title,
                             "0");
                     }
                     else
                     {
-                        componentPair.uiText.text = string.Format(
+                        componentPair.uiText.text = ZString.Format(
                             LanguageManager.GetText(formatKeyLevel),
                             componentPair.skill.Title,
                             "0", "0");
                     }
                     break;
                 case DisplayType.Simple:
-                    componentPair.uiText.text = string.Format(
+                    componentPair.uiText.text = ZString.Format(
                         LanguageManager.GetText(formatKeySimpleLevel),
                         componentPair.skill.Title,
                         isBonus ? 0.ToBonusString("N0") : "0");

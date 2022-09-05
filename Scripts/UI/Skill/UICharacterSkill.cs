@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using Cysharp.Text;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.UI;
@@ -113,7 +114,7 @@ namespace MultiplayerARPG
             if (uiTextCoolDownDuration != null)
             {
                 uiTextCoolDownDuration.SetGameObjectActive(Skill.IsActive && coolDownDuration > 0f);
-                uiTextCoolDownDuration.text = string.Format(
+                uiTextCoolDownDuration.text = ZString.Format(
                     LanguageManager.GetText(formatKeyCoolDownDuration),
                     coolDownDuration.ToString("N0"));
             }
@@ -121,7 +122,7 @@ namespace MultiplayerARPG
             if (uiTextCoolDownRemainsDuration != null)
             {
                 uiTextCoolDownRemainsDuration.SetGameObjectActive(Skill.IsActive && coolDownRemainsDuration > 0);
-                uiTextCoolDownRemainsDuration.text = string.Format(
+                uiTextCoolDownRemainsDuration.text = ZString.Format(
                     LanguageManager.GetText(formatKeyCoolDownRemainsDuration),
                     coolDownRemainsDuration.ToString("N0"));
             }
@@ -193,21 +194,21 @@ namespace MultiplayerARPG
 
             if (uiTextTitle != null)
             {
-                uiTextTitle.text = string.Format(
+                uiTextTitle.text = ZString.Format(
                     LanguageManager.GetText(formatKeyTitle),
                     Skill == null ? LanguageManager.GetUnknowTitle() : Skill.Title);
             }
 
             if (uiTextDescription != null)
             {
-                uiTextDescription.text = string.Format(
+                uiTextDescription.text = ZString.Format(
                     LanguageManager.GetText(formatKeyDescription),
                     Skill == null ? LanguageManager.GetUnknowDescription() : Skill.Description);
             }
 
             if (uiTextLevel != null)
             {
-                uiTextLevel.text = string.Format(
+                uiTextLevel.text = ZString.Format(
                     LanguageManager.GetText(formatKeyLevel),
                     Level.ToString("N0"));
             }
@@ -222,7 +223,7 @@ namespace MultiplayerARPG
 
             if (uiTextSkillType != null)
             {
-                uiTextSkillType.text = string.Format(
+                uiTextSkillType.text = ZString.Format(
                     LanguageManager.GetText(formatKeySkillType),
                     Skill == null ? LanguageManager.GetUnknowTitle() : Skill.TypeTitle);
             }
@@ -236,7 +237,7 @@ namespace MultiplayerARPG
                 else
                 {
                     uiTextAvailableWeapons.SetGameObjectActive(true);
-                    uiTextAvailableWeapons.text = string.Format(
+                    uiTextAvailableWeapons.text = ZString.Format(
                         LanguageManager.GetText(formatKeyAvailableWeapons),
                         Skill.AvailableWeaponsText);
                 }
@@ -251,7 +252,7 @@ namespace MultiplayerARPG
                 else
                 {
                     uiTextAvailableArmors.SetGameObjectActive(true);
-                    uiTextAvailableArmors.text = string.Format(
+                    uiTextAvailableArmors.text = ZString.Format(
                         LanguageManager.GetText(formatKeyAvailableArmors),
                         Skill.AvailableArmorsText);
                 }
@@ -266,7 +267,7 @@ namespace MultiplayerARPG
                 else
                 {
                     uiTextAvailableVehicles.SetGameObjectActive(true);
-                    uiTextAvailableVehicles.text = string.Format(
+                    uiTextAvailableVehicles.text = ZString.Format(
                         LanguageManager.GetText(formatKeyAvailableVehicles),
                         Skill.AvailableVehiclesText);
                 }
@@ -279,7 +280,7 @@ namespace MultiplayerARPG
                 tempConsumeAmount = Skill == null || Level <= 0 ? 0 : Skill.GetTotalConsumeHp(Level, Character);
                 if (tempConsumeAmount != 0)
                 {
-                    uiTextConsumeHp.text = string.Format(
+                    uiTextConsumeHp.text = ZString.Format(
                         LanguageManager.GetText(formatKeyConsumeHp),
                         tempConsumeAmount.ToString("N0"));
                     uiTextConsumeHp.SetGameObjectActive(true);
@@ -295,7 +296,7 @@ namespace MultiplayerARPG
                 tempConsumeAmount = Skill == null || Level <= 0 ? 0 : Skill.GetTotalConsumeMp(Level, Character);
                 if (tempConsumeAmount != 0)
                 {
-                    uiTextConsumeMp.text = string.Format(
+                    uiTextConsumeMp.text = ZString.Format(
                         LanguageManager.GetText(formatKeyConsumeMp),
                         tempConsumeAmount.ToString("N0"));
                     uiTextConsumeMp.SetGameObjectActive(true);
@@ -311,7 +312,7 @@ namespace MultiplayerARPG
                 tempConsumeAmount = Skill == null || Level <= 0 ? 0 : Skill.GetTotalConsumeStamina(Level, Character);
                 if (tempConsumeAmount != 0)
                 {
-                    uiTextConsumeStamina.text = string.Format(
+                    uiTextConsumeStamina.text = ZString.Format(
                         LanguageManager.GetText(formatKeyConsumeStamina),
                         tempConsumeAmount.ToString("N0"));
                     uiTextConsumeStamina.SetGameObjectActive(true);
@@ -352,7 +353,7 @@ namespace MultiplayerARPG
                 else
                 {
                     uiTextSummon.SetGameObjectActive(true);
-                    uiTextSummon.text = string.Format(
+                    uiTextSummon.text = ZString.Format(
                         LanguageManager.GetText(formatKeySummon),
                         Skill.Summon.MonsterEntity.Title,
                         Skill.Summon.Level.GetAmount(Level),
@@ -371,7 +372,7 @@ namespace MultiplayerARPG
                 else
                 {
                     uiTextMount.SetGameObjectActive(true);
-                    uiTextMount.text = string.Format(
+                    uiTextMount.text = ZString.Format(
                         LanguageManager.GetText(formatKeyMount),
                         Skill.Mount.MountEntity.Title);
                 }
