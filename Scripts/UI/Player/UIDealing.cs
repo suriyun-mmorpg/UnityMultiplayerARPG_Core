@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using Cysharp.Text;
 using UnityEngine;
 using UnityEngine.Events;
 
@@ -241,7 +242,7 @@ namespace MultiplayerARPG
         {
             if (uiTextDealingGold != null)
             {
-                uiTextDealingGold.text = string.Format(
+                uiTextDealingGold.text = ZString.Format(
                     LanguageManager.GetText(formatKeyDealingGold),
                     gold.ToString("N0"));
             }
@@ -252,7 +253,7 @@ namespace MultiplayerARPG
         {
             if (uiTextAnotherDealingGold != null)
             {
-                uiTextAnotherDealingGold.text = string.Format(
+                uiTextAnotherDealingGold.text = ZString.Format(
                     LanguageManager.GetText(formatKeyAnotherDealingGold),
                     gold.ToString("N0"));
             }
