@@ -1,4 +1,5 @@
-﻿using LiteNetLibManager;
+﻿using Cysharp.Text;
+using LiteNetLibManager;
 using UnityEngine;
 using UnityEngine.Events;
 
@@ -44,23 +45,23 @@ namespace MultiplayerARPG
                 uiGuildIcon.SetDataByDataId(options.iconDataId);
 
             if (textGuildName != null)
-                textGuildName.text = string.Format(LanguageManager.GetText(formatKeyGuildName), Data.GuildName);
+                textGuildName.text = ZString.Format(LanguageManager.GetText(formatKeyGuildName), Data.GuildName);
 
             if (textLevel != null)
-                textLevel.text = string.Format(LanguageManager.GetText(formatKeyLevel), Data.Level.ToString("N0"));
+                textLevel.text = ZString.Format(LanguageManager.GetText(formatKeyLevel), Data.Level.ToString("N0"));
 
             if (textScore != null)
-                textScore.text = string.Format(LanguageManager.GetText(formatKeyScore), Data.Score.ToString("N0"));
+                textScore.text = ZString.Format(LanguageManager.GetText(formatKeyScore), Data.Score.ToString("N0"));
 
             if (textMessage != null)
-                textMessage.text = string.Format(LanguageManager.GetText(formatKeyMessage), Data.GuildMessage);
+                textMessage.text = ZString.Format(LanguageManager.GetText(formatKeyMessage), Data.GuildMessage);
 
             if (textRank != null)
-                textRank.text = string.Format(LanguageManager.GetText(formatKeyRank), Data.Rank.ToString("N0"));
+                textRank.text = ZString.Format(LanguageManager.GetText(formatKeyRank), Data.Rank.ToString("N0"));
 
             if (textMemberAmount != null)
             {
-                textMemberAmount.text = string.Format(
+                textMemberAmount.text = ZString.Format(
                     LanguageManager.GetText(formatKeyMemberAmount),
                     Data.CurrentMembers.ToString("N0"),
                     Data.MaxMembers.ToString("N0"));
@@ -85,7 +86,7 @@ namespace MultiplayerARPG
 
         public void OnClickSendGuildRequest()
         {
-            UISceneGlobal.Singleton.ShowMessageDialog(LanguageManager.GetText(UITextKeys.UI_GUILD_REQUEST.ToString()), string.Format(LanguageManager.GetText(UITextKeys.UI_GUILD_REQUEST_DESCRIPTION.ToString()), Data.GuildName), false, true, true, false, null, () =>
+            UISceneGlobal.Singleton.ShowMessageDialog(LanguageManager.GetText(UITextKeys.UI_GUILD_REQUEST.ToString()), ZString.Format(LanguageManager.GetText(UITextKeys.UI_GUILD_REQUEST_DESCRIPTION.ToString()), Data.GuildName), false, true, true, false, null, () =>
             {
                 GameInstance.ClientGuildHandlers.RequestSendGuildRequest(new RequestSendGuildRequestMessage()
                 {

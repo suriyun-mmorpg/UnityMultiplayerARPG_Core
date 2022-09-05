@@ -1,5 +1,6 @@
-﻿using UnityEngine;
+﻿using Cysharp.Text;
 using LiteNetLibManager;
+using UnityEngine;
 using UnityEngine.UI;
 
 namespace MultiplayerARPG
@@ -169,21 +170,21 @@ namespace MultiplayerARPG
 
             if (textGuildName != null)
             {
-                textGuildName.text = string.Format(
+                textGuildName.text = ZString.Format(
                     LanguageManager.GetText(formatKeyGuildName),
                     Guild == null ? LanguageManager.GetUnknowTitle() : Guild.guildName);
             }
 
             if (textLeaderName != null)
             {
-                textLeaderName.text = string.Format(
+                textLeaderName.text = ZString.Format(
                     LanguageManager.GetText(formatKeyLeaderName),
                     Guild == null ? LanguageManager.GetUnknowTitle() : Guild.GetLeader().characterName);
             }
 
             if (textLevel != null)
             {
-                textLevel.text = string.Format(
+                textLevel.text = ZString.Format(
                     LanguageManager.GetText(formatKeyLevel),
                     Guild == null ? "0" : Guild.level.ToString("N0"));
             }
@@ -207,7 +208,7 @@ namespace MultiplayerARPG
 
             if (textSkillPoint != null)
             {
-                textSkillPoint.text = string.Format(
+                textSkillPoint.text = ZString.Format(
                     LanguageManager.GetText(formatKeySkillPoint),
                     Guild == null ? "0" : Guild.skillPoint.ToString("N0"));
             }
@@ -215,7 +216,7 @@ namespace MultiplayerARPG
             if (Guild == null)
             {
                 if (textMessage != null)
-                    textMessage.text = string.Format(LanguageManager.GetText(formatKeyMessage), string.Empty);
+                    textMessage.text = ZString.Format(LanguageManager.GetText(formatKeyMessage), string.Empty);
 
                 if (inputFieldMessage != null)
                     inputFieldMessage.text = string.Empty;
@@ -226,7 +227,7 @@ namespace MultiplayerARPG
                 guildMessage = Guild.guildMessage;
 
                 if (textMessage != null)
-                    textMessage.text = string.Format(LanguageManager.GetText(formatKeyMessage), guildMessage);
+                    textMessage.text = ZString.Format(LanguageManager.GetText(formatKeyMessage), guildMessage);
 
                 if (inputFieldMessage != null)
                     inputFieldMessage.text = guildMessage;
@@ -235,7 +236,7 @@ namespace MultiplayerARPG
             if (Guild == null)
             {
                 if (textMessage2 != null)
-                    textMessage2.text = string.Format(LanguageManager.GetText(formatKeyMessage2), string.Empty);
+                    textMessage2.text = ZString.Format(LanguageManager.GetText(formatKeyMessage2), string.Empty);
 
                 if (inputFieldMessage2 != null)
                     inputFieldMessage2.text = string.Empty;
@@ -246,7 +247,7 @@ namespace MultiplayerARPG
                 guildMessage2 = Guild.guildMessage2;
 
                 if (textMessage2 != null)
-                    textMessage2.text = string.Format(LanguageManager.GetText(formatKeyMessage2), guildMessage2);
+                    textMessage2.text = ZString.Format(LanguageManager.GetText(formatKeyMessage2), guildMessage2);
 
                 if (inputFieldMessage2 != null)
                     inputFieldMessage2.text = guildMessage2;
@@ -260,14 +261,14 @@ namespace MultiplayerARPG
 
             if (textScore != null)
             {
-                textScore.text = string.Format(
+                textScore.text = ZString.Format(
                     LanguageManager.GetText(formatKeyScore), 
                     Guild == null ? "0" : Guild.score.ToString("N0"));
             }
 
             if (textRank != null)
             {
-                textRank.text = string.Format(
+                textRank.text = ZString.Format(
                     LanguageManager.GetText(formatKeyRank),
                     Guild == null || Guild.rank == 0 ? "N/A" : Guild.rank.ToString("N0"));
             }
@@ -454,7 +455,7 @@ namespace MultiplayerARPG
                 return;
 
             SocialCharacterData guildMember = MemberSelectionManager.SelectedUI.Data;
-            UISceneGlobal.Singleton.ShowMessageDialog(LanguageManager.GetText(UITextKeys.UI_GUILD_CHANGE_LEADER.ToString()), string.Format(LanguageManager.GetText(UITextKeys.UI_GUILD_CHANGE_LEADER_DESCRIPTION.ToString()), guildMember.characterName), false, true, true, false, null, () =>
+            UISceneGlobal.Singleton.ShowMessageDialog(LanguageManager.GetText(UITextKeys.UI_GUILD_CHANGE_LEADER.ToString()), ZString.Format(LanguageManager.GetText(UITextKeys.UI_GUILD_CHANGE_LEADER_DESCRIPTION.ToString()), guildMember.characterName), false, true, true, false, null, () =>
             {
                 GameInstance.ClientGuildHandlers.RequestChangeGuildLeader(new RequestChangeGuildLeaderMessage()
                 {

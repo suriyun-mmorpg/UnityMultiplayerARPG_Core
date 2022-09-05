@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using Cysharp.Text;
+using UnityEngine;
 
 namespace MultiplayerARPG
 {
@@ -19,7 +20,7 @@ namespace MultiplayerARPG
             GuildRole = guildRole;
 
             if (uiGuildRole != null)
-                uiGuildRole.text = string.Format(LanguageManager.GetText(formatKeyGuildRole), guildRoleData.roleName);
+                uiGuildRole.text = ZString.Format(LanguageManager.GetText(formatKeyGuildRole), guildRoleData.roleName);
         }
     }
 }

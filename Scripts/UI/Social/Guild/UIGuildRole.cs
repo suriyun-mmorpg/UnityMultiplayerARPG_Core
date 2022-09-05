@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using Cysharp.Text;
+using UnityEngine;
 
 namespace MultiplayerARPG
 {
@@ -22,7 +23,7 @@ namespace MultiplayerARPG
         {
             if (textRoleName != null)
             {
-                textRoleName.text = string.Format(
+                textRoleName.text = ZString.Format(
                     LanguageManager.GetText(formatKeyRoleName), Data.roleName);
             }
 
@@ -42,7 +43,7 @@ namespace MultiplayerARPG
 
             if (textShareExpPercentage != null)
             {
-                textShareExpPercentage.text = string.Format(
+                textShareExpPercentage.text = ZString.Format(
                     LanguageManager.GetText(formatKeyShareExpPercentage),
                     Data.shareExpPercentage.ToString("N0"));
             }

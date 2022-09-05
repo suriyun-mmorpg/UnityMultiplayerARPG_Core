@@ -1,4 +1,5 @@
-﻿using LiteNetLibManager;
+﻿using Cysharp.Text;
+using LiteNetLibManager;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.Serialization;
@@ -32,7 +33,7 @@ namespace MultiplayerARPG
             if (uiTextRequireGold != null)
             {
                 int gold = owningCharacter.Gold;
-                uiTextRequireGold.text = string.Format(
+                uiTextRequireGold.text = ZString.Format(
                     gold >= systemSetting.CreateGuildRequiredGold ?
                         LanguageManager.GetText(formatKeyRequireGold) :
                         LanguageManager.GetText(formatKeyRequireGoldNotEnough),
@@ -41,7 +42,7 @@ namespace MultiplayerARPG
             }
 
             if (uiTextSimpleRequireGold != null)
-                uiTextSimpleRequireGold.text = string.Format(LanguageManager.GetText(formatKeySimpleRequireGold), systemSetting.CreateGuildRequiredGold.ToString("N0"));
+                uiTextSimpleRequireGold.text = ZString.Format(LanguageManager.GetText(formatKeySimpleRequireGold), systemSetting.CreateGuildRequiredGold.ToString("N0"));
 
             if (uiRequireItemAmounts != null)
             {

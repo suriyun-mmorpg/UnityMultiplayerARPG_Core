@@ -1,5 +1,6 @@
-﻿using LiteNetLibManager;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using Cysharp.Text;
+using LiteNetLibManager;
 using UnityEngine;
 
 namespace MultiplayerARPG
@@ -27,14 +28,14 @@ namespace MultiplayerARPG
 
             if (uiTextName != null)
             {
-                uiTextName.text = string.Format(
+                uiTextName.text = ZString.Format(
                     LanguageManager.GetText(formatKeyName),
                     string.IsNullOrEmpty(member.characterName) ? LanguageManager.GetUnknowTitle() : member.characterName);
             }
 
             if (uiTextLevel != null)
             {
-                uiTextLevel.text = string.Format(
+                uiTextLevel.text = ZString.Format(
                     LanguageManager.GetText(formatKeyLevel),
                     member.level.ToString("N0"));
             }

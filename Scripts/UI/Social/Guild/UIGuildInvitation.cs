@@ -1,5 +1,6 @@
-﻿using UnityEngine;
+﻿using Cysharp.Text;
 using LiteNetLibManager;
+using UnityEngine;
 
 namespace MultiplayerARPG
 {
@@ -24,16 +25,16 @@ namespace MultiplayerARPG
         protected override void UpdateData()
         {
             if (uiTextName != null)
-                uiTextName.text = string.Format(LanguageManager.GetText(formatKeyName), Data.InviterName);
+                uiTextName.text = ZString.Format(LanguageManager.GetText(formatKeyName), Data.InviterName);
 
             if (uiTextLevel != null)
-                uiTextLevel.text = string.Format(LanguageManager.GetText(formatKeyLevel), Data.InviterLevel.ToString("N0"));
+                uiTextLevel.text = ZString.Format(LanguageManager.GetText(formatKeyLevel), Data.InviterLevel.ToString("N0"));
 
             if (uiTextGuildName != null)
-                uiTextGuildName.text = string.Format(LanguageManager.GetText(formatKeyGuildName), Data.GuildName);
+                uiTextGuildName.text = ZString.Format(LanguageManager.GetText(formatKeyGuildName), Data.GuildName);
 
             if (uiTextGuildLevel != null)
-                uiTextGuildLevel.text = string.Format(LanguageManager.GetText(formatKeyGuildLevel), Data.GuildLevel.ToString("N0"));
+                uiTextGuildLevel.text = ZString.Format(LanguageManager.GetText(formatKeyGuildLevel), Data.GuildLevel.ToString("N0"));
         }
 
         public void OnClickAccept()
