@@ -1,6 +1,6 @@
-﻿using LiteNetLib.Utils;
-using System.Collections.Generic;
-using System.Text;
+﻿using System.Collections.Generic;
+using Cysharp.Text;
+using LiteNetLib.Utils;
 
 namespace MultiplayerARPG
 {
@@ -25,9 +25,6 @@ namespace MultiplayerARPG
         public bool IsDelete { get; set; }
         public long DeleteTimestamp { get; set; }
         public long SentTimestamp { get; set; }
-
-        [System.NonSerialized]
-        private readonly StringBuilder stringBuilder = new StringBuilder();
 
         public bool HaveItemsToClaim()
         {
@@ -122,20 +119,32 @@ namespace MultiplayerARPG
 
         public string WriteItems()
         {
-            stringBuilder.Clear();
-            foreach (CharacterItem item in Items)
+            using (Utf16ValueStringBuilder stringBuilder = ZString.CreateStringBuilder(true))
             {
-                stringBuilder.Append(item.dataId).Append(':');
-                stringBuilder.Append(item.amount).Append(':');
-                stringBuilder.Append(item.level).Append(':');
-                stringBuilder.Append(item.durability.ToString("N2")).Append(':');
-                stringBuilder.Append(item.exp).Append(':');
-                stringBuilder.Append(item.lockRemainsDuration.ToString("N2")).Append(':');
-                stringBuilder.Append(item.expireTime).Append(':');
-                stringBuilder.Append(item.randomSeed).Append(':');
-                stringBuilder.Append(item.WriteSockets('|')).Append(';');
+                foreach (CharacterItem item in Items)
+                {
+                    if (item.GetItem() == null) continue;
+                    stringBuilder.Append(item.dataId);
+                    stringBuilder.Append(':');
+                    stringBuilder.Append(item.amount);
+                    stringBuilder.Append(':');
+                    stringBuilder.Append(item.level);
+                    stringBuilder.Append(':');
+                    stringBuilder.Append(item.durability.ToString("N2"));
+                    stringBuilder.Append(':');
+                    stringBuilder.Append(item.exp);
+                    stringBuilder.Append(':');
+                    stringBuilder.Append(item.lockRemainsDuration.ToString("N2"));
+                    stringBuilder.Append(':');
+                    stringBuilder.Append(item.expireTime);
+                    stringBuilder.Append(':');
+                    stringBuilder.Append(item.randomSeed);
+                    stringBuilder.Append(':');
+                    stringBuilder.Append(item.WriteSockets('|'));
+                    stringBuilder.Append(';');
+                }
+                return stringBuilder.ToString();
             }
-            return stringBuilder.ToString();
         }
 
         public void Serialize(NetDataWriter writer)
@@ -147,8 +156,8 @@ namespace MultiplayerARPG
             writer.Put(ReceiverId);
             writer.Put(Title);
             writer.Put(Content);
-            writer.Put(Gold);
-            writer.Put(Cash);
+            writer.PutPackedInt(Gold);
+            writer.PutPackedInt(Cash);
             writer.Put(WriteCurrencies());
             writer.Put(WriteItems());
             writer.Put(IsRead);
@@ -169,8 +178,8 @@ namespace MultiplayerARPG
             ReceiverId = reader.GetString();
             Title = reader.GetString();
             Content = reader.GetString();
-            Gold = reader.GetInt();
-            Cash = reader.GetInt();
+            Gold = reader.GetPackedInt();
+            Cash = reader.GetPackedInt();
             ReadCurrencies(reader.GetString());
             ReadItems(reader.GetString());
             IsRead = reader.GetBool();
