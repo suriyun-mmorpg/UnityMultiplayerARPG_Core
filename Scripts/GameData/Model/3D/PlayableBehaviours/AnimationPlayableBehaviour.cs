@@ -1,5 +1,5 @@
 ﻿using System.Collections.Generic;
-using System.Text;
+using Cysharp.Text;
 using UnityEngine;
 using UnityEngine.Animations;
 using UnityEngine.Playables;
@@ -283,7 +283,6 @@ namespace MultiplayerARPG.GameData.Model.Playables
         private float actionClipLength = 0f;
         private float actionPlayElapsed = 0f;
         private float actionLayerClipSpeed = 0f;
-        private readonly StringBuilder stringBuilder = new StringBuilder();
         private readonly HashSet<string> weaponTypeIds = new HashSet<string>();
         private readonly HashSet<string> leftHandWeaponTypeIds = new HashSet<string>();
         private readonly Dictionary<string, BaseStateInfo> baseStates = new Dictionary<string, BaseStateInfo>();
@@ -341,20 +340,20 @@ namespace MultiplayerARPG.GameData.Model.Playables
 
         private void SetupDefaultAnimations(DefaultAnimations defaultAnimations)
         {
-            SetBaseState(stringBuilder.Clear().Append(CLIP_IDLE).ToString(), defaultAnimations.idleState);
+            SetBaseState(CLIP_IDLE, defaultAnimations.idleState);
             SetMoveStates(string.Empty, string.Empty, defaultAnimations.moveStates);
             SetMoveStates(string.Empty, MOVE_TYPE_SPRINT, defaultAnimations.sprintStates);
             SetMoveStates(string.Empty, MOVE_TYPE_WALK, defaultAnimations.walkStates);
-            SetBaseState(stringBuilder.Clear().Append(CLIP_CROUCH_IDLE).ToString(), defaultAnimations.crouchIdleState);
+            SetBaseState(CLIP_CROUCH_IDLE, defaultAnimations.crouchIdleState);
             SetMoveStates(string.Empty, MOVE_TYPE_CROUCH, defaultAnimations.crouchMoveStates);
-            SetBaseState(stringBuilder.Clear().Append(CLIP_CRAWL_IDLE).ToString(), defaultAnimations.crawlIdleState);
+            SetBaseState(CLIP_CRAWL_IDLE, defaultAnimations.crawlIdleState);
             SetMoveStates(string.Empty, MOVE_TYPE_CRAWL, defaultAnimations.crawlMoveStates);
-            SetBaseState(stringBuilder.Clear().Append(CLIP_SWIM_IDLE).ToString(), defaultAnimations.swimIdleState);
+            SetBaseState(CLIP_SWIM_IDLE, defaultAnimations.swimIdleState);
             SetMoveStates(string.Empty, MOVE_TYPE_SWIM, defaultAnimations.swimMoveStates);
-            SetBaseState(stringBuilder.Clear().Append(CLIP_JUMP).ToString(), defaultAnimations.jumpState);
-            SetBaseState(stringBuilder.Clear().Append(CLIP_FALL).ToString(), defaultAnimations.fallState);
-            SetBaseState(stringBuilder.Clear().Append(CLIP_LANDED).ToString(), defaultAnimations.landedState);
-            SetBaseState(stringBuilder.Clear().Append(CLIP_DEAD).ToString(), defaultAnimations.deadState);
+            SetBaseState(CLIP_JUMP, defaultAnimations.jumpState);
+            SetBaseState(CLIP_FALL, defaultAnimations.fallState);
+            SetBaseState(CLIP_LANDED, defaultAnimations.landedState);
+            SetBaseState(CLIP_DEAD, defaultAnimations.deadState);
         }
 
         private void SetupWeaponAnimations(WeaponAnimations weaponAnimations, string overrideWeaponTypeId = "")
@@ -364,20 +363,20 @@ namespace MultiplayerARPG.GameData.Model.Playables
                 return;
             string weaponTypeId = emptyOverrideId ? weaponAnimations.weaponType.Id : overrideWeaponTypeId;
             weaponTypeIds.Add(weaponTypeId);
-            SetBaseState(stringBuilder.Clear().Append(weaponTypeId).Append(CLIP_IDLE).ToString(), weaponAnimations.idleState);
+            SetBaseState(ZString.Concat(weaponTypeId, CLIP_IDLE), weaponAnimations.idleState);
             SetMoveStates(weaponTypeId, string.Empty, weaponAnimations.moveStates);
             SetMoveStates(weaponTypeId, MOVE_TYPE_SPRINT, weaponAnimations.sprintStates);
             SetMoveStates(weaponTypeId, MOVE_TYPE_WALK, weaponAnimations.walkStates);
-            SetBaseState(stringBuilder.Clear().Append(weaponTypeId).Append(CLIP_CROUCH_IDLE).ToString(), weaponAnimations.crouchIdleState);
+            SetBaseState(ZString.Concat(weaponTypeId, CLIP_CROUCH_IDLE), weaponAnimations.crouchIdleState);
             SetMoveStates(weaponTypeId, MOVE_TYPE_CROUCH, weaponAnimations.crouchMoveStates);
-            SetBaseState(stringBuilder.Clear().Append(weaponTypeId).Append(CLIP_CRAWL_IDLE).ToString(), weaponAnimations.crawlIdleState);
+            SetBaseState(ZString.Concat(weaponTypeId, CLIP_CRAWL_IDLE), weaponAnimations.crawlIdleState);
             SetMoveStates(weaponTypeId, MOVE_TYPE_CRAWL, weaponAnimations.crawlMoveStates);
-            SetBaseState(stringBuilder.Clear().Append(weaponTypeId).Append(CLIP_SWIM_IDLE).ToString(), weaponAnimations.swimIdleState);
+            SetBaseState(ZString.Concat(weaponTypeId, CLIP_SWIM_IDLE), weaponAnimations.swimIdleState);
             SetMoveStates(weaponTypeId, MOVE_TYPE_SWIM, weaponAnimations.swimMoveStates);
-            SetBaseState(stringBuilder.Clear().Append(weaponTypeId).Append(CLIP_JUMP).ToString(), weaponAnimations.jumpState);
-            SetBaseState(stringBuilder.Clear().Append(weaponTypeId).Append(CLIP_FALL).ToString(), weaponAnimations.fallState);
-            SetBaseState(stringBuilder.Clear().Append(weaponTypeId).Append(CLIP_LANDED).ToString(), weaponAnimations.landedState);
-            SetBaseState(stringBuilder.Clear().Append(weaponTypeId).Append(CLIP_DEAD).ToString(), weaponAnimations.deadState);
+            SetBaseState(ZString.Concat(weaponTypeId, CLIP_JUMP), weaponAnimations.jumpState);
+            SetBaseState(ZString.Concat(weaponTypeId, CLIP_FALL), weaponAnimations.fallState);
+            SetBaseState(ZString.Concat(weaponTypeId, CLIP_LANDED), weaponAnimations.landedState);
+            SetBaseState(ZString.Concat(weaponTypeId, CLIP_DEAD), weaponAnimations.deadState);
         }
 
         private void SetupLeftHandWieldingWeaponAnimations(WieldWeaponAnimations weaponAnimations, string overrideWeaponTypeId = "")
@@ -387,32 +386,32 @@ namespace MultiplayerARPG.GameData.Model.Playables
                 return;
             string weaponTypeId = emptyOverrideId ? weaponAnimations.weaponType.Id : overrideWeaponTypeId;
             leftHandWeaponTypeIds.Add(weaponTypeId);
-            SetLeftHandWieldingState(stringBuilder.Clear().Append(weaponTypeId).Append(CLIP_IDLE).ToString(), weaponAnimations.idleState);
+            SetLeftHandWieldingState(ZString.Concat(weaponTypeId, CLIP_IDLE), weaponAnimations.idleState);
             SetLeftHandWieldingMoveStates(weaponTypeId, string.Empty, weaponAnimations.moveStates);
             SetLeftHandWieldingMoveStates(weaponTypeId, MOVE_TYPE_SPRINT, weaponAnimations.sprintStates);
             SetLeftHandWieldingMoveStates(weaponTypeId, MOVE_TYPE_WALK, weaponAnimations.walkStates);
-            SetLeftHandWieldingState(stringBuilder.Clear().Append(weaponTypeId).Append(CLIP_CROUCH_IDLE).ToString(), weaponAnimations.crouchIdleState);
+            SetLeftHandWieldingState(ZString.Concat(weaponTypeId, CLIP_CROUCH_IDLE), weaponAnimations.crouchIdleState);
             SetLeftHandWieldingMoveStates(weaponTypeId, MOVE_TYPE_CROUCH, weaponAnimations.crouchMoveStates);
-            SetLeftHandWieldingState(stringBuilder.Clear().Append(weaponTypeId).Append(CLIP_CRAWL_IDLE).ToString(), weaponAnimations.crawlIdleState);
+            SetLeftHandWieldingState(ZString.Concat(weaponTypeId, CLIP_CRAWL_IDLE), weaponAnimations.crawlIdleState);
             SetLeftHandWieldingMoveStates(weaponTypeId, MOVE_TYPE_CRAWL, weaponAnimations.crawlMoveStates);
-            SetLeftHandWieldingState(stringBuilder.Clear().Append(weaponTypeId).Append(CLIP_SWIM_IDLE).ToString(), weaponAnimations.swimIdleState);
+            SetLeftHandWieldingState(ZString.Concat(weaponTypeId, CLIP_SWIM_IDLE), weaponAnimations.swimIdleState);
             SetLeftHandWieldingMoveStates(weaponTypeId, MOVE_TYPE_SWIM, weaponAnimations.swimMoveStates);
-            SetLeftHandWieldingState(stringBuilder.Clear().Append(weaponTypeId).Append(CLIP_JUMP).ToString(), weaponAnimations.jumpState);
-            SetLeftHandWieldingState(stringBuilder.Clear().Append(weaponTypeId).Append(CLIP_FALL).ToString(), weaponAnimations.fallState);
-            SetLeftHandWieldingState(stringBuilder.Clear().Append(weaponTypeId).Append(CLIP_LANDED).ToString(), weaponAnimations.landedState);
-            SetLeftHandWieldingState(stringBuilder.Clear().Append(weaponTypeId).Append(CLIP_DEAD).ToString(), weaponAnimations.deadState);
+            SetLeftHandWieldingState(ZString.Concat(weaponTypeId, CLIP_JUMP), weaponAnimations.jumpState);
+            SetLeftHandWieldingState(ZString.Concat(weaponTypeId, CLIP_FALL), weaponAnimations.fallState);
+            SetLeftHandWieldingState(ZString.Concat(weaponTypeId, CLIP_LANDED), weaponAnimations.landedState);
+            SetLeftHandWieldingState(ZString.Concat(weaponTypeId, CLIP_DEAD), weaponAnimations.deadState);
         }
 
         private void SetMoveStates(string weaponTypeId, string moveType, MoveStates moveStates)
         {
-            SetBaseState(stringBuilder.Clear().Append(weaponTypeId).Append(DIR_FORWARD).Append(moveType).ToString(), moveStates.forwardState);
-            SetBaseState(stringBuilder.Clear().Append(weaponTypeId).Append(DIR_BACKWARD).Append(moveType).ToString(), moveStates.backwardState);
-            SetBaseState(stringBuilder.Clear().Append(weaponTypeId).Append(DIR_LEFT).Append(moveType).ToString(), moveStates.leftState);
-            SetBaseState(stringBuilder.Clear().Append(weaponTypeId).Append(DIR_RIGHT).Append(moveType).ToString(), moveStates.rightState);
-            SetBaseState(stringBuilder.Clear().Append(weaponTypeId).Append(DIR_FORWARD).Append(DIR_LEFT).Append(moveType).ToString(), moveStates.forwardLeftState);
-            SetBaseState(stringBuilder.Clear().Append(weaponTypeId).Append(DIR_FORWARD).Append(DIR_RIGHT).Append(moveType).ToString(), moveStates.forwardRightState);
-            SetBaseState(stringBuilder.Clear().Append(weaponTypeId).Append(DIR_BACKWARD).Append(DIR_LEFT).Append(moveType).ToString(), moveStates.backwardLeftState);
-            SetBaseState(stringBuilder.Clear().Append(weaponTypeId).Append(DIR_BACKWARD).Append(DIR_RIGHT).Append(moveType).ToString(), moveStates.backwardRightState);
+            SetBaseState(ZString.Concat(weaponTypeId, DIR_FORWARD, moveType), moveStates.forwardState);
+            SetBaseState(ZString.Concat(weaponTypeId, DIR_BACKWARD, moveType), moveStates.backwardState);
+            SetBaseState(ZString.Concat(weaponTypeId, DIR_LEFT, moveType), moveStates.leftState);
+            SetBaseState(ZString.Concat(weaponTypeId, DIR_RIGHT, moveType), moveStates.rightState);
+            SetBaseState(ZString.Concat(weaponTypeId, DIR_FORWARD, DIR_LEFT, moveType), moveStates.forwardLeftState);
+            SetBaseState(ZString.Concat(weaponTypeId, DIR_FORWARD, DIR_RIGHT, moveType), moveStates.forwardRightState);
+            SetBaseState(ZString.Concat(weaponTypeId, DIR_BACKWARD, DIR_LEFT, moveType), moveStates.backwardLeftState);
+            SetBaseState(ZString.Concat(weaponTypeId, DIR_BACKWARD, DIR_RIGHT, moveType), moveStates.backwardRightState);
         }
 
         private void SetBaseState(string id, AnimState state)
@@ -434,14 +433,14 @@ namespace MultiplayerARPG.GameData.Model.Playables
 
         private void SetLeftHandWieldingMoveStates(string weaponTypeId, string moveType, WieldMoveStates moveStates)
         {
-            SetLeftHandWieldingState(stringBuilder.Clear().Append(weaponTypeId).Append(DIR_FORWARD).Append(moveType).ToString(), moveStates.forwardState);
-            SetLeftHandWieldingState(stringBuilder.Clear().Append(weaponTypeId).Append(DIR_BACKWARD).Append(moveType).ToString(), moveStates.backwardState);
-            SetLeftHandWieldingState(stringBuilder.Clear().Append(weaponTypeId).Append(DIR_LEFT).Append(moveType).ToString(), moveStates.leftState);
-            SetLeftHandWieldingState(stringBuilder.Clear().Append(weaponTypeId).Append(DIR_RIGHT).Append(moveType).ToString(), moveStates.rightState);
-            SetLeftHandWieldingState(stringBuilder.Clear().Append(weaponTypeId).Append(DIR_FORWARD).Append(DIR_LEFT).Append(moveType).ToString(), moveStates.forwardLeftState);
-            SetLeftHandWieldingState(stringBuilder.Clear().Append(weaponTypeId).Append(DIR_FORWARD).Append(DIR_RIGHT).Append(moveType).ToString(), moveStates.forwardRightState);
-            SetLeftHandWieldingState(stringBuilder.Clear().Append(weaponTypeId).Append(DIR_BACKWARD).Append(DIR_LEFT).Append(moveType).ToString(), moveStates.backwardLeftState);
-            SetLeftHandWieldingState(stringBuilder.Clear().Append(weaponTypeId).Append(DIR_BACKWARD).Append(DIR_RIGHT).Append(moveType).ToString(), moveStates.backwardRightState);
+            SetLeftHandWieldingState(ZString.Concat(weaponTypeId, DIR_FORWARD, moveType), moveStates.forwardState);
+            SetLeftHandWieldingState(ZString.Concat(weaponTypeId, DIR_BACKWARD, moveType), moveStates.backwardState);
+            SetLeftHandWieldingState(ZString.Concat(weaponTypeId, DIR_LEFT, moveType), moveStates.leftState);
+            SetLeftHandWieldingState(ZString.Concat(weaponTypeId, DIR_RIGHT, moveType), moveStates.rightState);
+            SetLeftHandWieldingState(ZString.Concat(weaponTypeId, DIR_FORWARD, DIR_LEFT, moveType), moveStates.forwardLeftState);
+            SetLeftHandWieldingState(ZString.Concat(weaponTypeId, DIR_FORWARD, DIR_RIGHT, moveType), moveStates.forwardRightState);
+            SetLeftHandWieldingState(ZString.Concat(weaponTypeId, DIR_BACKWARD, DIR_LEFT, moveType), moveStates.backwardLeftState);
+            SetLeftHandWieldingState(ZString.Concat(weaponTypeId, DIR_BACKWARD, DIR_RIGHT, moveType), moveStates.backwardRightState);
         }
 
         private void SetLeftHandWieldingState(string id, ActionState state)
@@ -467,7 +466,7 @@ namespace MultiplayerARPG.GameData.Model.Playables
             {
                 stateUpdateData.PlayingJumpState = PlayingJumpState.None;
                 // Get dead state by weapon type
-                string stateId = stringBuilder.Clear().Append(weaponTypeId).Append(CLIP_DEAD).ToString();
+                string stateId = ZString.Concat(weaponTypeId, CLIP_DEAD);
                 // State not found, use dead state from default animations
                 if (!stateInfos.ContainsKey(stateId))
                     stateId = CLIP_DEAD;
@@ -479,7 +478,7 @@ namespace MultiplayerARPG.GameData.Model.Playables
                 stateUpdateData.IsPreviouslyGrounded = false;
                 stateUpdateData.ForcePlay = true;
                 // Get jump state by weapon type
-                string stateId = stringBuilder.Clear().Append(weaponTypeId).Append(CLIP_JUMP).ToString();
+                string stateId = ZString.Concat(weaponTypeId, CLIP_JUMP);
                 // State not found, use jump state from default animations
                 if (!stateInfos.ContainsKey(stateId))
                     stateId = CLIP_JUMP;
@@ -496,7 +495,7 @@ namespace MultiplayerARPG.GameData.Model.Playables
                 {
                     stateUpdateData.IsPreviouslyGrounded = true;
                     // Get landed state by weapon type
-                    string stateId = stringBuilder.Clear().Append(weaponTypeId).Append(CLIP_LANDED).ToString();
+                    string stateId = ZString.Concat(weaponTypeId, CLIP_LANDED);
                     // State not found, use landed state from default animations
                     if (!stateInfos.ContainsKey(stateId))
                         stateId = CLIP_LANDED;
@@ -508,7 +507,7 @@ namespace MultiplayerARPG.GameData.Model.Playables
                     }
                 }
                 // Get movement state
-                stringBuilder.Clear();
+                Utf16ValueStringBuilder stringBuilder = ZString.CreateStringBuilder(true);
                 bool movingForward = stateUpdateData.MovementState.Has(MovementState.Forward);
                 bool movingBackward = stateUpdateData.MovementState.Has(MovementState.Backward);
                 bool movingLeft = stateUpdateData.MovementState.Has(MovementState.Left);
@@ -570,7 +569,8 @@ namespace MultiplayerARPG.GameData.Model.Playables
                 }
                 // This is state ID without current weapon type ID
                 string stateWithoutWeaponTypeId = stringBuilder.ToString();
-                string stateWithWeaponTypeId = stringBuilder.Clear().Append(weaponTypeId).Append(stateWithoutWeaponTypeId).ToString();
+                stringBuilder.Dispose();
+                string stateWithWeaponTypeId = ZString.Concat(weaponTypeId, stateWithoutWeaponTypeId);
                 // State with weapon type found, use it
                 if (stateInfos.ContainsKey(stateWithWeaponTypeId))
                     return stateWithWeaponTypeId;
@@ -578,7 +578,7 @@ namespace MultiplayerARPG.GameData.Model.Playables
                 if (stateInfos.ContainsKey(stateWithoutWeaponTypeId))
                     return stateWithoutWeaponTypeId;
                 // State with weapon type and state without weapon type not found, try use state with weapon type but without move type
-                stateWithWeaponTypeId = stringBuilder.Clear().Append(weaponTypeId).Append(stateWithoutWeaponIdAndMoveType).ToString();
+                stateWithWeaponTypeId = ZString.Concat(weaponTypeId, stateWithoutWeaponIdAndMoveType);
                 if (stateInfos.ContainsKey(stateWithWeaponTypeId))
                     return stateWithWeaponTypeId;
                 // State still not found, use state without weapon type and move type
@@ -593,7 +593,7 @@ namespace MultiplayerARPG.GameData.Model.Playables
             {
                 stateUpdateData.IsPreviouslyGrounded = false;
                 // Get fall state by weapon type
-                string stateId = stringBuilder.Clear().Append(weaponTypeId).Append(CLIP_FALL).ToString();
+                string stateId = ZString.Concat(weaponTypeId, CLIP_FALL);
                 // State not found, use fall state from default animations
                 if (!stateInfos.ContainsKey(stateId))
                     stateId = CLIP_FALL;
@@ -614,7 +614,7 @@ namespace MultiplayerARPG.GameData.Model.Playables
             string playingStateId = GetPlayingStateId(stateUpdateData.WeaponTypeId, stateInfos, stateUpdateData);
             // State not found, use idle state (with weapon type)
             if (!stateInfos.ContainsKey(playingStateId))
-                playingStateId = stringBuilder.Clear().Append(stateUpdateData.WeaponTypeId).Append(CLIP_IDLE).ToString();
+                playingStateId = ZString.Concat(stateUpdateData.WeaponTypeId, CLIP_IDLE);
             // State still not found, use idle state from default states (without weapon type)
             if (!stateInfos.ContainsKey(playingStateId))
                 playingStateId = CLIP_IDLE;
