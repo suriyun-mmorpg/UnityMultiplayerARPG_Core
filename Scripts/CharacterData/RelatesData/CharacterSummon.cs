@@ -16,6 +16,7 @@ namespace MultiplayerARPG
     public class CharacterSummon : INetSerializable
     {
         public static readonly CharacterSummon Empty = new CharacterSummon();
+        public string id;
         public SummonType type;
         public int dataId;
         public float summonRemainsDuration;
@@ -34,6 +35,8 @@ namespace MultiplayerARPG
         private SummonType dirtyType;
         [System.NonSerialized]
         private int dirtyDataId;
+        [System.NonSerialized]
+        private short dirtyLevel;
 
         [System.NonSerialized]
         private BaseSkill cacheSkill;
@@ -42,7 +45,19 @@ namespace MultiplayerARPG
         [System.NonSerialized]
         private BaseMonsterCharacterEntity cachePrefab;
         [System.NonSerialized]
-        private Buff cacheSummonerBuff;
+        private Buff cacheBuff;
+        [System.NonSerialized]
+        private float cacheDuration;
+        [System.NonSerialized]
+        private int cacheRecoveryHp;
+        [System.NonSerialized]
+        private int cacheRecoveryMp;
+        [System.NonSerialized]
+        private int cacheRecoveryStamina;
+        [System.NonSerialized]
+        private int cacheRecoveryFood;
+        [System.NonSerialized]
+        private int cacheRecoveryWater;
         [System.NonSerialized]
         private CharacterStats cacheIncreaseStats;
         [System.NonSerialized]
@@ -57,6 +72,8 @@ namespace MultiplayerARPG
         private Dictionary<DamageElement, float> cacheIncreaseArmors;
         [System.NonSerialized]
         private Dictionary<DamageElement, MinMaxFloat> cacheIncreaseDamages;
+        [System.NonSerialized]
+        private Dictionary<DamageElement, MinMaxFloat> cacheDamageOverTimes;
 
         [System.NonSerialized]
         private BaseMonsterCharacterEntity cacheEntity;
@@ -72,21 +89,30 @@ namespace MultiplayerARPG
 
         private void MakeCache()
         {
-            if (dirtyType != type || dirtyDataId != dataId)
+            if (dirtyType != type || dirtyDataId != dataId || dirtyLevel != level)
             {
                 dirtyType = type;
                 dirtyDataId = dataId;
+                dirtyType = type;
+                dirtyLevel = level;
                 cacheSkill = null;
                 cachePetItem = null;
                 cachePrefab = null;
-                cacheSummonerBuff = default(Buff);
-                cacheIncreaseStats = new CharacterStats();
-                cacheIncreaseStatsRate = new CharacterStats();
+                cacheBuff = Buff.Empty;
+                cacheDuration = 0;
+                cacheRecoveryHp = 0;
+                cacheRecoveryMp = 0;
+                cacheRecoveryStamina = 0;
+                cacheRecoveryFood = 0;
+                cacheRecoveryWater = 0;
+                cacheIncreaseStats = CharacterStats.Empty;
+                cacheIncreaseStatsRate = CharacterStats.Empty;
                 cacheIncreaseAttributes = null;
                 cacheIncreaseAttributesRate = null;
                 cacheIncreaseResistances = null;
                 cacheIncreaseArmors = null;
                 cacheIncreaseDamages = null;
+                cacheDamageOverTimes = null;
                 switch (type)
                 {
                     case SummonType.Skill:
@@ -104,14 +130,21 @@ namespace MultiplayerARPG
                 if (cachePrefab != null && cachePrefab.CharacterDatabase != null)
                 {
                     MonsterCharacter database = cachePrefab.CharacterDatabase;
-                    cacheSummonerBuff = database.SummonerBuff;
-                    cacheIncreaseStats = cacheSummonerBuff.GetIncreaseStats(level);
-                    cacheIncreaseStatsRate = cacheSummonerBuff.GetIncreaseStatsRate(level);
-                    cacheIncreaseAttributes = cacheSummonerBuff.GetIncreaseAttributes(level);
-                    cacheIncreaseAttributesRate = cacheSummonerBuff.GetIncreaseAttributesRate(level);
-                    cacheIncreaseResistances = cacheSummonerBuff.GetIncreaseResistances(level);
-                    cacheIncreaseArmors = cacheSummonerBuff.GetIncreaseArmors(level);
-                    cacheIncreaseDamages = cacheSummonerBuff.GetIncreaseDamages(level);
+                    cacheBuff = database.SummonerBuff;
+                    cacheDuration = cacheBuff.GetDuration(level);
+                    cacheRecoveryHp = cacheBuff.GetRecoveryHp(level);
+                    cacheRecoveryMp = cacheBuff.GetRecoveryMp(level);
+                    cacheRecoveryStamina = cacheBuff.GetRecoveryStamina(level);
+                    cacheRecoveryFood = cacheBuff.GetRecoveryFood(level);
+                    cacheRecoveryWater = cacheBuff.GetRecoveryWater(level);
+                    cacheIncreaseStats = cacheBuff.GetIncreaseStats(level);
+                    cacheIncreaseStatsRate = cacheBuff.GetIncreaseStatsRate(level);
+                    cacheIncreaseAttributes = cacheBuff.GetIncreaseAttributes(level);
+                    cacheIncreaseAttributesRate = cacheBuff.GetIncreaseAttributesRate(level);
+                    cacheIncreaseResistances = cacheBuff.GetIncreaseResistances(level);
+                    cacheIncreaseArmors = cacheBuff.GetIncreaseArmors(level);
+                    cacheIncreaseDamages = cacheBuff.GetIncreaseDamages(level);
+                    cacheDamageOverTimes = cacheBuff.GetDamageOverTimes(level);
                 }
             }
         }
@@ -186,6 +219,48 @@ namespace MultiplayerARPG
             return cachePrefab;
         }
 
+        public Buff GetBuff()
+        {
+            MakeCache();
+            return cacheBuff;
+        }
+
+        public float GetDuration()
+        {
+            MakeCache();
+            return cacheDuration;
+        }
+
+        public int GetRecoveryHp()
+        {
+            MakeCache();
+            return cacheRecoveryHp;
+        }
+
+        public int GetRecoveryMp()
+        {
+            MakeCache();
+            return cacheRecoveryMp;
+        }
+
+        public int GetRecoveryStamina()
+        {
+            MakeCache();
+            return cacheRecoveryStamina;
+        }
+
+        public int GetRecoveryFood()
+        {
+            MakeCache();
+            return cacheRecoveryFood;
+        }
+
+        public int GetRecoveryWater()
+        {
+            MakeCache();
+            return cacheRecoveryWater;
+        }
+
         public CharacterStats GetIncreaseStats()
         {
             MakeCache();
@@ -228,6 +303,12 @@ namespace MultiplayerARPG
             return cacheIncreaseDamages;
         }
 
+        public Dictionary<DamageElement, MinMaxFloat> GetDamageOverTimes()
+        {
+            MakeCache();
+            return cacheDamageOverTimes;
+        }
+
         public bool ShouldRemove()
         {
             return (CacheEntity && CacheEntity.CurrentHp <= 0) || (type == SummonType.Skill && summonRemainsDuration <= 0f);
@@ -249,10 +330,11 @@ namespace MultiplayerARPG
             currentMp = CurrentMp;
         }
 
-        public CharacterSummon Clone()
+        public CharacterSummon Clone(bool generateNewId = false)
         {
             return new CharacterSummon()
             {
+                id = generateNewId ? GenericUtils.GetUniqueId() : id,
                 type = type,
                 dataId = dataId,
                 summonRemainsDuration = summonRemainsDuration,
@@ -268,6 +350,7 @@ namespace MultiplayerARPG
         {
             return new CharacterSummon()
             {
+                id = GenericUtils.GetUniqueId(),
                 type = type,
                 dataId = dataId,
             };
@@ -275,6 +358,7 @@ namespace MultiplayerARPG
 
         public void Serialize(NetDataWriter writer)
         {
+            writer.Put(id);
             writer.Put((byte)type);
             if (type != SummonType.None)
             {
@@ -295,6 +379,7 @@ namespace MultiplayerARPG
 
         public void Deserialize(NetDataReader reader)
         {
+            id = reader.GetString();
             type = (SummonType)reader.GetByte();
             if (type != SummonType.None)
             {

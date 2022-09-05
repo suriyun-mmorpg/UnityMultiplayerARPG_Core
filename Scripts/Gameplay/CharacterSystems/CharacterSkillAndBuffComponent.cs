@@ -30,72 +30,98 @@ namespace MultiplayerARPG
 
             if (updatingTime >= SKILL_BUFF_UPDATE_DURATION)
             {
+                float tempDuration;
                 // Removing summons if it should
-                int count = Entity.Summons.Count;
-                CharacterSummon summon;
-                for (int i = count - 1; i >= 0; --i)
+                int tempCount;
+                if (!Entity.IsDead())
                 {
-                    summon = Entity.Summons[i];
-                    if (summon.ShouldRemove())
+                    tempCount = Entity.Summons.Count;
+                    CharacterSummon summon;
+                    for (int i = tempCount - 1; i >= 0; --i)
                     {
-                        Entity.Summons.RemoveAt(i);
-                        summon.UnSummon(Entity);
-                    }
-                    else
-                    {
-                        summon.Update(updatingTime);
-                        Entity.Summons[i] = summon;
-                    }
-                }
-                // Removing skill usages if it should
-                count = Entity.SkillUsages.Count;
-                CharacterSkillUsage skillUsage;
-                for (int i = count - 1; i >= 0; --i)
-                {
-                    skillUsage = Entity.SkillUsages[i];
-                    if (skillUsage.ShouldRemove())
-                    {
-                        Entity.SkillUsages.RemoveAt(i);
-                    }
-                    else
-                    {
-                        skillUsage.Update(updatingTime);
-                        Entity.SkillUsages[i] = skillUsage;
+                        summon = Entity.Summons[i];
+                        tempDuration = summon.GetDuration();
+                        if (summon.ShouldRemove())
+                        {
+                            Entity.Summons.RemoveAt(i);
+                            summon.UnSummon(Entity);
+                        }
+                        else
+                        {
+                            summon.Update(updatingTime);
+                            Entity.Summons[i] = summon;
+                        }
+                        // If duration is 0, damages / recoveries will applied immediately, so don't apply it here
+                        if (tempDuration > 0f)
+                        {
+                            CharacterRecoveryData recoveryData;
+                            if (!recoveryBuffs.TryGetValue(summon.id, out recoveryData))
+                            {
+                                recoveryData = new CharacterRecoveryData(Entity);
+                                recoveryData.SetupBySummon(summon);
+                                recoveryBuffs.Add(summon.id, recoveryData);
+                            }
+                            recoveryData.Apply(1 / tempDuration * updatingTime);
+                        }
+                        // Don't update next buffs if character dead
+                        if (Entity.IsDead())
+                            break;
                     }
                 }
                 // Removing buffs if it should
-                count = Entity.Buffs.Count;
-                CharacterBuff buff;
-                float duration;
-                for (int i = count - 1; i >= 0; --i)
+                if (!Entity.IsDead())
                 {
-                    buff = Entity.Buffs[i];
-                    duration = buff.GetDuration();
-                    if (buff.ShouldRemove())
+                    tempCount = Entity.Buffs.Count;
+                    CharacterBuff buff;
+                    for (int i = tempCount - 1; i >= 0; --i)
                     {
-                        recoveryBuffs.Remove(buff.id);
-                        Entity.Buffs.RemoveAt(i);
-                    }
-                    else
-                    {
-                        buff.Update(updatingTime);
-                        Entity.Buffs[i] = buff;
-                    }
-                    // If duration is 0, damages / recoveries will applied immediately, so don't apply it here
-                    if (duration > 0f)
-                    {
-                        CharacterRecoveryData recoveryData;
-                        if (!recoveryBuffs.TryGetValue(buff.id, out recoveryData))
+                        buff = Entity.Buffs[i];
+                        tempDuration = buff.GetDuration();
+                        if (buff.ShouldRemove())
                         {
-                            recoveryData = new CharacterRecoveryData(Entity);
-                            recoveryData.SetupByBuff(buff);
-                            recoveryBuffs.Add(buff.id, recoveryData);
+                            recoveryBuffs.Remove(buff.id);
+                            Entity.Buffs.RemoveAt(i);
                         }
-                        recoveryData.Apply(1 / duration * updatingTime);
+                        else
+                        {
+                            buff.Update(updatingTime);
+                            Entity.Buffs[i] = buff;
+                        }
+                        // If duration is 0, damages / recoveries will applied immediately, so don't apply it here
+                        if (tempDuration > 0f)
+                        {
+                            CharacterRecoveryData recoveryData;
+                            if (!recoveryBuffs.TryGetValue(buff.id, out recoveryData))
+                            {
+                                recoveryData = new CharacterRecoveryData(Entity);
+                                recoveryData.SetupByBuff(buff);
+                                recoveryBuffs.Add(buff.id, recoveryData);
+                            }
+                            recoveryData.Apply(1 / tempDuration * updatingTime);
+                        }
+                        // Don't update next buffs if character dead
+                        if (Entity.IsDead())
+                            break;
                     }
-                    // Don't update next buffs if character dead
-                    if (Entity.IsDead())
-                        break;
+                }
+                // Removing skill usages if it should
+                if (!Entity.IsDead())
+                {
+                    tempCount = Entity.SkillUsages.Count;
+                    CharacterSkillUsage skillUsage;
+                    for (int i = tempCount - 1; i >= 0; --i)
+                    {
+                        skillUsage = Entity.SkillUsages[i];
+                        if (skillUsage.ShouldRemove())
+                        {
+                            Entity.SkillUsages.RemoveAt(i);
+                        }
+                        else
+                        {
+                            skillUsage.Update(updatingTime);
+                            Entity.SkillUsages[i] = skillUsage;
+                        }
+                    }
                 }
                 updatingTime = 0;
             }

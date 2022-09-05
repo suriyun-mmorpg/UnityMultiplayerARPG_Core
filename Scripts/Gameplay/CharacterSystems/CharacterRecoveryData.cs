@@ -81,6 +81,48 @@ namespace MultiplayerARPG
                 DecreasingWater += -tempAmount;
         }
 
+        public void SetupBySummon(CharacterSummon buff)
+        {
+            // Damage over time
+            TotalDamageOverTime = 0f;
+            DamageOverTimes = buff.GetDamageOverTimes();
+            foreach (KeyValuePair<DamageElement, MinMaxFloat> damageOverTime in DamageOverTimes)
+            {
+                TotalDamageOverTime += damageOverTime.Key.GetDamageReducedByResistance(CharacterEntity.GetCaches().Resistances, CharacterEntity.GetCaches().Armors, damageOverTime.Value.Random(Random.Range(0, 255)));
+            }
+            int tempAmount;
+            // Hp recovery
+            tempAmount = buff.GetRecoveryHp();
+            if (tempAmount > 0)
+                RecoveryingHp += tempAmount;
+            else if (tempAmount < 0)
+                DecreasingHp += -tempAmount;
+            // Mp recovery
+            tempAmount = buff.GetRecoveryMp();
+            if (tempAmount > 0)
+                RecoveryingMp += tempAmount;
+            else if (tempAmount < 0)
+                DecreasingMp += -tempAmount;
+            // Stamina recovery
+            tempAmount = buff.GetRecoveryStamina();
+            if (tempAmount > 0)
+                RecoveryingStamina += tempAmount;
+            else if (tempAmount < 0)
+                DecreasingStamina += -tempAmount;
+            // Food recovery
+            tempAmount = buff.GetRecoveryFood();
+            if (tempAmount > 0)
+                RecoveryingFood += tempAmount;
+            else if (tempAmount < 0)
+                DecreasingFood += -tempAmount;
+            // Water recovery
+            tempAmount = buff.GetRecoveryWater();
+            if (tempAmount > 0)
+                RecoveryingWater += tempAmount;
+            else if (tempAmount < 0)
+                DecreasingWater += -tempAmount;
+        }
+
         public void Clear()
         {
             buff = null;
