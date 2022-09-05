@@ -48,7 +48,7 @@ namespace MultiplayerARPG
             }
 
             // Update UIs
-            float buffDuration = CharacterBuff.GetDuration();
+            float buffDuration = CharacterBuff.GetBuff().GetDuration();
 
             if (uiTextDuration != null)
             {
@@ -128,7 +128,7 @@ namespace MultiplayerARPG
                 }
                 else
                 {
-                    Buff buff = Data.GetBuff();
+                    Buff buff = Data.GetBuff().GetBuff();
                     uiBuff.Show();
                     uiBuff.Data = new UIBuffData(buff, Data.level);
                 }
