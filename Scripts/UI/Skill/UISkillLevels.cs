@@ -74,7 +74,7 @@ namespace MultiplayerARPG
                 if (character != null)
                     currentSkillLevels = character.GetSkills(includeEquipmentsForCurrentLevels);
                 // In-loop temp data
-                using (Utf16ValueStringBuilder tempAllText = ZString.CreateStringBuilder(true))
+                using (Utf16ValueStringBuilder tempAllText = ZString.CreateStringBuilder(false))
                 {
                     BaseSkill tempData;
                     short tempCurrentLevel;
