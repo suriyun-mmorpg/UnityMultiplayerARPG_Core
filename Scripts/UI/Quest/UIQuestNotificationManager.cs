@@ -1,5 +1,6 @@
-﻿using LiteNetLibManager;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using Cysharp.Text;
+using LiteNetLibManager;
 using UnityEngine;
 
 namespace MultiplayerARPG
@@ -135,9 +136,9 @@ namespace MultiplayerARPG
                                 {
                                     newMessage = messageHandler.AddMessage(questCompleteMessagePrefab);
                                     if (updatingProgress >= maxProgress)
-                                        newMessage.text = string.Format(LanguageManager.GetText(formatKeyQuestTaskUpdateCollectItemComplete.ToString()), taskTitle, updatingProgress, maxProgress);
+                                        newMessage.text = ZString.Format(LanguageManager.GetText(formatKeyQuestTaskUpdateCollectItemComplete.ToString()), taskTitle, updatingProgress, maxProgress);
                                     else
-                                        newMessage.text = string.Format(LanguageManager.GetText(formatKeyQuestTaskUpdateCollectItem.ToString()), taskTitle, updatingProgress, maxProgress);
+                                        newMessage.text = ZString.Format(LanguageManager.GetText(formatKeyQuestTaskUpdateCollectItem.ToString()), taskTitle, updatingProgress, maxProgress);
                                 }
                                 comparingQuests[i].tasks[j].progress = updatingProgress;
                                 comparingQuests[i].tasks[j].isComplete = updatingIsComplete;
@@ -190,7 +191,7 @@ namespace MultiplayerARPG
                     if (currentTime - awakenTime >= delayBeforeShowingMessages)
                     {
                         newMessage = messageHandler.AddMessage(questAcceptMessagePrefab);
-                        newMessage.text = string.Format(LanguageManager.GetText(formatKeyQuestAccept.ToString()), tempQuestData.Title);
+                        newMessage.text = ZString.Format(LanguageManager.GetText(formatKeyQuestAccept.ToString()), tempQuestData.Title);
                     }
                     comparingQuests.Add(MakeRecord(tempCharacterQuest));
                     break;
@@ -204,7 +205,7 @@ namespace MultiplayerARPG
                         if (currentTime - awakenTime >= delayBeforeShowingMessages)
                         {
                             newMessage = messageHandler.AddMessage(questAcceptMessagePrefab);
-                            newMessage.text = string.Format(LanguageManager.GetText(formatKeyQuestAccept.ToString()), tempQuestData.Title);
+                            newMessage.text = ZString.Format(LanguageManager.GetText(formatKeyQuestAccept.ToString()), tempQuestData.Title);
                         }
                         comparingQuests[index] = MakeRecord(tempCharacterQuest);
                     }
@@ -213,7 +214,7 @@ namespace MultiplayerARPG
                         if (currentTime - awakenTime >= delayBeforeShowingMessages)
                         {
                             newMessage = messageHandler.AddMessage(questCompleteMessagePrefab);
-                            newMessage.text = string.Format(LanguageManager.GetText(formatKeyQuestComplete.ToString()), tempQuestData.Title);
+                            newMessage.text = ZString.Format(LanguageManager.GetText(formatKeyQuestComplete.ToString()), tempQuestData.Title);
                         }
                         comparingQuests[index] = MakeRecord(tempCharacterQuest);
                     }
@@ -239,16 +240,16 @@ namespace MultiplayerARPG
                                         case QuestTaskType.KillMonster:
                                             newMessage = messageHandler.AddMessage(questTaskUpdateMessagePrefab);
                                             if (updatingProgress >= maxProgress)
-                                                newMessage.text = string.Format(LanguageManager.GetText(formatKeyQuestTaskUpdateKillMonsterComplete.ToString()), taskTitle, updatingProgress, maxProgress);
+                                                newMessage.text = ZString.Format(LanguageManager.GetText(formatKeyQuestTaskUpdateKillMonsterComplete.ToString()), taskTitle, updatingProgress, maxProgress);
                                             else
-                                                newMessage.text = string.Format(LanguageManager.GetText(formatKeyQuestTaskUpdateKillMonster.ToString()), taskTitle, updatingProgress, maxProgress);
+                                                newMessage.text = ZString.Format(LanguageManager.GetText(formatKeyQuestTaskUpdateKillMonster.ToString()), taskTitle, updatingProgress, maxProgress);
                                             break;
                                         case QuestTaskType.TalkToNpc:
                                             newMessage = messageHandler.AddMessage(questTaskUpdateMessagePrefab);
                                             if (updatingProgress >= maxProgress)
-                                                newMessage.text = string.Format(LanguageManager.GetText(formatKeyQuestTaskUpdateTalkToNpcComplete.ToString()), taskTitle, updatingProgress, maxProgress);
+                                                newMessage.text = ZString.Format(LanguageManager.GetText(formatKeyQuestTaskUpdateTalkToNpcComplete.ToString()), taskTitle, updatingProgress, maxProgress);
                                             else
-                                                newMessage.text = string.Format(LanguageManager.GetText(formatKeyQuestTaskUpdateTalkToNpc.ToString()), taskTitle, updatingProgress, maxProgress);
+                                                newMessage.text = ZString.Format(LanguageManager.GetText(formatKeyQuestTaskUpdateTalkToNpc.ToString()), taskTitle, updatingProgress, maxProgress);
                                             break;
                                         default:
                                             break;

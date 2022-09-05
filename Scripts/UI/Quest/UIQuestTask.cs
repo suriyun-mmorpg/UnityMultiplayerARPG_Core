@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using Cysharp.Text;
+using UnityEngine;
 
 namespace MultiplayerARPG
 {
@@ -36,7 +37,7 @@ namespace MultiplayerARPG
                     isComplete = Progress >= monsterKillAmount;
                     if (uiTextTaskDescription != null)
                     {
-                        uiTextTaskDescription.text = string.Format(
+                        uiTextTaskDescription.text = ZString.Format(
                             isComplete ?
                                 LanguageManager.GetText(formatKeyTaskKillMonsterComplete) :
                                 LanguageManager.GetText(formatKeyTaskKillMonster), monsterTitle,
@@ -51,7 +52,7 @@ namespace MultiplayerARPG
                     isComplete = Progress >= itemCollectAmount;
                     if (uiTextTaskDescription != null)
                     {
-                        uiTextTaskDescription.text = string.Format(
+                        uiTextTaskDescription.text = ZString.Format(
                             isComplete ?
                                 LanguageManager.GetText(formatKeyTaskCollectItemComplete) :
                                 LanguageManager.GetText(formatKeyTaskCollectItem), itemTitle,
@@ -64,7 +65,7 @@ namespace MultiplayerARPG
                     isComplete = Progress > 0;
                     if (uiTextTaskDescription != null)
                     {
-                        uiTextTaskDescription.text = string.Format(
+                        uiTextTaskDescription.text = ZString.Format(
                             isComplete ?
                                 LanguageManager.GetText(formatKeyTaskTalkToNpcComplete) :
                                 LanguageManager.GetText(formatKeyTaskTalkToNpc), npcTitle);

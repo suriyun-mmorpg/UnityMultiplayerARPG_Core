@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using Cysharp.Text;
 using UnityEngine;
 using UnityEngine.UI;
 #if UNITY_EDITOR
@@ -278,25 +279,25 @@ namespace MultiplayerARPG
                     LanguageManager.GetText(formatKeyTitleOnGoing));
 
             if (uiTextTitle != null)
-                uiTextTitle.text = string.Format(titleFormat, Quest == null ? LanguageManager.GetUnknowTitle() : Quest.Title);
+                uiTextTitle.text = ZString.Format(titleFormat, Quest == null ? LanguageManager.GetUnknowTitle() : Quest.Title);
 
             if (uiTextDescription != null)
             {
-                uiTextDescription.text = string.Format(
+                uiTextDescription.text = ZString.Format(
                     LanguageManager.GetText(formatKeyDescription),
                     Quest == null ? LanguageManager.GetUnknowDescription() : Quest.Description);
             }
 
             if (uiTextRewardExp != null)
             {
-                uiTextRewardExp.text = string.Format(
+                uiTextRewardExp.text = ZString.Format(
                     LanguageManager.GetText(formatKeyRewardExp),
                     Quest == null ? "0" : Quest.rewardExp.ToString("N0"));
             }
 
             if (uiTextRewardGold != null)
             {
-                uiTextRewardGold.text = string.Format(
+                uiTextRewardGold.text = ZString.Format(
                     LanguageManager.GetText(formatKeyRewardGold),
                     Quest == null ? "0" : Quest.rewardGold.ToString("N0"));
             }
