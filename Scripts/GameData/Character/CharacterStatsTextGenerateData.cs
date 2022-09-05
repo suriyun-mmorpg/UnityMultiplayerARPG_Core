@@ -57,7 +57,7 @@ namespace MultiplayerARPG
 
         public string GetText()
         {
-            using (Utf16ValueStringBuilder statsString = ZString.CreateStringBuilder(true))
+            using (Utf16ValueStringBuilder statsString = ZString.CreateStringBuilder(false))
             {
                 string statsStringPart;
                 string tempValue;
