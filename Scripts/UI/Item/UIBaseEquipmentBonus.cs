@@ -120,7 +120,7 @@ namespace MultiplayerARPG
 
         public string GetEquipmentBonusText(EquipmentBonus equipmentBonus)
         {
-            using (Utf16ValueStringBuilder result = ZString.CreateStringBuilder(true))
+            using (Utf16ValueStringBuilder result = ZString.CreateStringBuilder(false))
             {
                 CharacterStatsTextGenerateData generateTextData;
                 // Dev Extension
