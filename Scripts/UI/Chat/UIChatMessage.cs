@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using Cysharp.Text;
+using UnityEngine;
 using UnityEngine.Events;
 
 namespace MultiplayerARPG
@@ -41,7 +42,7 @@ namespace MultiplayerARPG
             {
                 if (Data.channel == ChatChannel.System)
                 {
-                    uiTextMessage.text = string.Format(LanguageManager.GetText(formatSystem), Data.message);
+                    uiTextMessage.text = ZString.Format(LanguageManager.GetText(formatSystem), Data.message);
                     onNotTypeWriter.Invoke();
                 }
                 else
@@ -77,7 +78,7 @@ namespace MultiplayerARPG
                             format = LanguageManager.GetText(formatGuild);
                             break;
                     }
-                    uiTextMessage.text = string.Format(format, Data.sender, Data.message, Data.guildName);
+                    uiTextMessage.text = ZString.Format(format, Data.sender, Data.message, Data.guildName);
                     if (GameInstance.PlayingCharacter != null && GameInstance.PlayingCharacter.CharacterName.Equals(Data.sender))
                         onIsTypeWriter.Invoke();
                     else
