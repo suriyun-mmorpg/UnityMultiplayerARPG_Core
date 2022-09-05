@@ -1,3 +1,4 @@
+using Cysharp.Text;
 using UnityEngine;
 
 namespace MultiplayerARPG
@@ -25,7 +26,7 @@ namespace MultiplayerARPG
 
             if (textRewardExp != null)
             {
-                textRewardExp.text = string.Format(
+                textRewardExp.text = ZString.Format(
                     LanguageManager.GetText(formatKeyRewardExp),
                     Data.rewardExp.ToString("N0"));
                 textRewardExp.SetGameObjectActive(Data.rewardExp != 0);
@@ -36,7 +37,7 @@ namespace MultiplayerARPG
 
             if (textRewardGold != null)
             {
-                textRewardGold.text = string.Format(
+                textRewardGold.text = ZString.Format(
                     LanguageManager.GetText(formatKeyRewardGold),
                     Data.rewardGold.ToString("N0"));
                 textRewardGold.SetGameObjectActive(Data.rewardGold != 0);
@@ -47,7 +48,7 @@ namespace MultiplayerARPG
 
             if (textRewardCash != null)
             {
-                textRewardCash.text = string.Format(
+                textRewardCash.text = ZString.Format(
                     LanguageManager.GetText(formatKeyRewardCash),
                     Data.rewardCash.ToString("N0"));
                 textRewardCash.SetGameObjectActive(Data.rewardCash != 0);
