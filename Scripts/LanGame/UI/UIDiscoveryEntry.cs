@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using Cysharp.Text;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -23,14 +24,14 @@ namespace MultiplayerARPG
         {
             if (uiTextName != null)
             {
-                uiTextName.text = string.Format(
+                uiTextName.text = ZString.Format(
                     LanguageManager.GetText(formatKeyName),
                     Data.characterName);
             }
 
             if (uiTextLevel != null)
             {
-                uiTextLevel.text = string.Format(
+                uiTextLevel.text = ZString.Format(
                     LanguageManager.GetText(formatKeyLevel),
                     Data.level.ToString("N0"));
             }
