@@ -1,5 +1,5 @@
-﻿using UnityEngine;
-using UnityEngine.Events;
+﻿using Cysharp.Text;
+using UnityEngine;
 using UnityEngine.UI;
 
 namespace MultiplayerARPG
@@ -28,21 +28,21 @@ namespace MultiplayerARPG
         {
             if (uiTextTitle != null)
             {
-                uiTextTitle.text = string.Format(
+                uiTextTitle.text = ZString.Format(
                     LanguageManager.GetText(formatKeyTitle),
                     Currency == null ? LanguageManager.GetUnknowTitle() : Currency.Title);
             }
 
             if (uiTextDescription != null)
             {
-                uiTextDescription.text = string.Format(
+                uiTextDescription.text = ZString.Format(
                     LanguageManager.GetText(formatKeyDescription),
                     Currency == null ? LanguageManager.GetUnknowDescription() : Currency.Description);
             }
 
             if (uiTextAmount != null)
             {
-                uiTextAmount.text = string.Format(
+                uiTextAmount.text = ZString.Format(
                     LanguageManager.GetText(formatKeyAmount),
                     Amount.ToString("N0"));
             }
