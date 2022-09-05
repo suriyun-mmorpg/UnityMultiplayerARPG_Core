@@ -1,11 +1,12 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
+using Cysharp.Text;
 using UnityEngine;
-using UnityEngine.UI;
-using UnityEngine.SceneManagement;
-using System.Linq;
 using UnityEngine.Networking;
+using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 using TMPro;
 
 public static class GenericUtils
@@ -520,30 +521,30 @@ public static class GenericUtils
                 return textAMinuteAgo;
             // Less than one hour ago.
             if (secDiff < 3600)
-                return string.Format(formatMinutesAgo, Mathf.FloorToInt((float)secDiff / 60f));
+                return ZString.Format(formatMinutesAgo, Mathf.FloorToInt((float)secDiff / 60f));
             // Less than 2 hours ago.
             if (secDiff < 7200)
                 return textAHourAgo;
             // Less than one day ago.
             if (secDiff < 86400)
-                return string.Format(formatHoursAgo, Mathf.FloorToInt((float)secDiff / 3600f));
+                return ZString.Format(formatHoursAgo, Mathf.FloorToInt((float)secDiff / 3600f));
         }
         // Handle previous days.
         if (dayDiff == 1)
             return textYesterday;
         if (dayDiff < 7)
-            return string.Format(formatDaysAgo, dayDiff);
+            return ZString.Format(formatDaysAgo, dayDiff);
         if (dayDiff < 30)
-            return string.Format(formatWeeksAgo, Mathf.CeilToInt((float)dayDiff / 7f));
+            return ZString.Format(formatWeeksAgo, Mathf.CeilToInt((float)dayDiff / 7f));
         if (monthDiff < 12)
-            return string.Format(formatMonthsAgo, monthDiff);
+            return ZString.Format(formatMonthsAgo, monthDiff);
 
         return textUnknow;
     }
 
     public static System.Uri Append(this System.Uri uri, params string[] paths)
     {
-        return new System.Uri(paths.Aggregate(uri.AbsoluteUri, (current, path) => string.Format("{0}/{1}", current.TrimEnd('/'), path.TrimStart('/'))));
+        return new System.Uri(paths.Aggregate(uri.AbsoluteUri, (current, path) => ZString.Format("{0}/{1}", current.TrimEnd('/'), path.TrimStart('/'))));
     }
 
     public static bool IsError(this UnityWebRequest unityWebRequest)
