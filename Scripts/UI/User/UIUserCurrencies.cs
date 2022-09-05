@@ -1,5 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using Cysharp.Text;
 using UnityEngine;
 
 namespace MultiplayerARPG
@@ -25,7 +24,7 @@ namespace MultiplayerARPG
             if (uiTextUserGold != null)
             {
                 amount = GameInstance.PlayingCharacter == null ? 0 : GameInstance.PlayingCharacter.UserGold;
-                uiTextUserGold.text = string.Format(
+                uiTextUserGold.text = ZString.Format(
                     LanguageManager.GetText(formatKeyUserGold),
                     amount.ToString("N0"));
             }
@@ -33,7 +32,7 @@ namespace MultiplayerARPG
             if (uiTextTotalGold != null)
             {
                 amount = GameInstance.PlayingCharacter == null ? 0 : (GameInstance.PlayingCharacter.UserGold + GameInstance.PlayingCharacter.Gold);
-                uiTextTotalGold.text = string.Format(
+                uiTextTotalGold.text = ZString.Format(
                     LanguageManager.GetText(formatKeyTotalGold),
                     amount.ToString("N0"));
             }
@@ -41,7 +40,7 @@ namespace MultiplayerARPG
             if (uiTextUserCash != null)
             {
                 amount = GameInstance.PlayingCharacter == null ? 0 : GameInstance.PlayingCharacter.UserCash;
-                uiTextUserCash.text = string.Format(
+                uiTextUserCash.text = ZString.Format(
                     LanguageManager.GetText(formatKeyUserCash),
                     amount.ToString("N0"));
             }
