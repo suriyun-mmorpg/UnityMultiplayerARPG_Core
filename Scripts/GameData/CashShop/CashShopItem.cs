@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using Cysharp.Text;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Serialization;
 
@@ -69,19 +70,19 @@ namespace MultiplayerARPG
             List<string> languageKeys = new List<string>(LanguageManager.Languages.Keys);
             List<LanguageData> titleLanguageDataList = new List<LanguageData>();
             List<LanguageData> descriptionLanguageDataList = new List<LanguageData>();
-            defaultTitle = string.Format(LanguageManager.GetText(UIFormatKeys.UI_FORMAT_GENERATE_CAST_SHOP_ITEM_TITLE.ToString()), item.DefaultTitle, generatingData.amount);
-            defaultDescription = string.Format(LanguageManager.GetText(UIFormatKeys.UI_FORMAT_GENERATE_CAST_SHOP_ITEM_DESCRIPTION.ToString()), item.DefaultTitle, generatingData.amount, defaultDescription);
+            defaultTitle = ZString.Format(LanguageManager.GetText(UIFormatKeys.UI_FORMAT_GENERATE_CAST_SHOP_ITEM_TITLE.ToString()), item.DefaultTitle, generatingData.amount);
+            defaultDescription = ZString.Format(LanguageManager.GetText(UIFormatKeys.UI_FORMAT_GENERATE_CAST_SHOP_ITEM_DESCRIPTION.ToString()), item.DefaultTitle, generatingData.amount, defaultDescription);
             foreach (string languageKey in languageKeys)
             {
                 titleLanguageDataList.Add(new LanguageData()
                 {
                     key = languageKey,
-                    value = string.Format(LanguageManager.GetTextByLanguage(languageKey, UIFormatKeys.UI_FORMAT_GENERATE_CAST_SHOP_ITEM_TITLE.ToString()), Language.GetTextByLanguageKey(item.LanguageSpecificTitles, languageKey, item.DefaultTitle), generatingData.amount),
+                    value = ZString.Format(LanguageManager.GetTextByLanguage(languageKey, UIFormatKeys.UI_FORMAT_GENERATE_CAST_SHOP_ITEM_TITLE.ToString()), Language.GetTextByLanguageKey(item.LanguageSpecificTitles, languageKey, item.DefaultTitle), generatingData.amount),
                 });
                 descriptionLanguageDataList.Add(new LanguageData()
                 {
                     key = languageKey,
-                    value = string.Format(LanguageManager.GetTextByLanguage(languageKey, UIFormatKeys.UI_FORMAT_GENERATE_CAST_SHOP_ITEM_DESCRIPTION.ToString()), Language.GetTextByLanguageKey(item.LanguageSpecificTitles, languageKey, item.DefaultTitle), generatingData.amount, Language.GetTextByLanguageKey(item.LanguageSpecificDescriptions, languageKey, item.DefaultDescription)),
+                    value = ZString.Format(LanguageManager.GetTextByLanguage(languageKey, UIFormatKeys.UI_FORMAT_GENERATE_CAST_SHOP_ITEM_DESCRIPTION.ToString()), Language.GetTextByLanguageKey(item.LanguageSpecificTitles, languageKey, item.DefaultTitle), generatingData.amount, Language.GetTextByLanguageKey(item.LanguageSpecificDescriptions, languageKey, item.DefaultDescription)),
                 });
             }
             languageSpecificTitles = titleLanguageDataList.ToArray();
