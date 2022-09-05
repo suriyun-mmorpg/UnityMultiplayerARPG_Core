@@ -15,5 +15,6 @@ namespace MultiplayerARPG
         void RemoveAllPassengers();
         bool IsSeatAvailable(byte seatIndex);
         bool GetAvailableSeat(out byte seatIndex);
+        CalculatedBuff GetBuff();
     }
 }

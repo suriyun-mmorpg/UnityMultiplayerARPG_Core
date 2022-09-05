@@ -175,15 +175,21 @@ namespace MultiplayerARPG
             Dictionary<Attribute, float> result = new Dictionary<Attribute, float>();
             foreach (CharacterBuff buff in data.Buffs)
             {
-                result = GameDataHelpers.CombineAttributes(result, buff.GetIncreaseAttributes());
+                result = GameDataHelpers.CombineAttributes(result, buff.GetBuff().GetIncreaseAttributes());
                 // Increase with rates
-                result = GameDataHelpers.CombineAttributes(result, GameDataHelpers.MultiplyAttributes(new Dictionary<Attribute, float>(baseAttributes), buff.GetIncreaseAttributesRate()));
+                result = GameDataHelpers.CombineAttributes(result, GameDataHelpers.MultiplyAttributes(new Dictionary<Attribute, float>(baseAttributes), buff.GetBuff().GetIncreaseAttributesRate()));
             }
             foreach (CharacterSummon summon in data.Summons)
             {
-                result = GameDataHelpers.CombineAttributes(result, summon.GetIncreaseAttributes());
+                result = GameDataHelpers.CombineAttributes(result, summon.GetBuff().GetIncreaseAttributes());
                 // Increase with rates
-                result = GameDataHelpers.CombineAttributes(result, GameDataHelpers.MultiplyAttributes(new Dictionary<Attribute, float>(baseAttributes), summon.GetIncreaseAttributesRate()));
+                result = GameDataHelpers.CombineAttributes(result, GameDataHelpers.MultiplyAttributes(new Dictionary<Attribute, float>(baseAttributes), summon.GetBuff().GetIncreaseAttributesRate()));
+            }
+            if (data.PassengingVehicleEntity != null)
+            {
+                result = GameDataHelpers.CombineAttributes(result, data.PassengingVehicleEntity.GetBuff().GetIncreaseAttributes());
+                // Increase with rates
+                result = GameDataHelpers.CombineAttributes(result, GameDataHelpers.MultiplyAttributes(new Dictionary<Attribute, float>(baseAttributes), data.PassengingVehicleEntity.GetBuff().GetIncreaseAttributesRate()));
             }
             return result;
         }
@@ -329,11 +335,15 @@ namespace MultiplayerARPG
             Dictionary<DamageElement, float> result = new Dictionary<DamageElement, float>();
             foreach (CharacterBuff buff in data.Buffs)
             {
-                result = GameDataHelpers.CombineResistances(result, buff.GetIncreaseResistances());
+                result = GameDataHelpers.CombineResistances(result, buff.GetBuff().GetIncreaseResistances());
             }
             foreach (CharacterSummon summon in data.Summons)
             {
-                result = GameDataHelpers.CombineResistances(result, summon.GetIncreaseResistances());
+                result = GameDataHelpers.CombineResistances(result, summon.GetBuff().GetIncreaseResistances());
+            }
+            if (data.PassengingVehicleEntity != null)
+            {
+                result = GameDataHelpers.CombineResistances(result, data.PassengingVehicleEntity.GetBuff().GetIncreaseResistances());
             }
             return result;
         }
@@ -420,11 +430,15 @@ namespace MultiplayerARPG
             Dictionary<DamageElement, float> result = new Dictionary<DamageElement, float>();
             foreach (CharacterBuff buff in data.Buffs)
             {
-                result = GameDataHelpers.CombineArmors(result, buff.GetIncreaseArmors());
+                result = GameDataHelpers.CombineArmors(result, buff.GetBuff().GetIncreaseArmors());
             }
             foreach (CharacterSummon summon in data.Summons)
             {
-                result = GameDataHelpers.CombineArmors(result, summon.GetIncreaseArmors());
+                result = GameDataHelpers.CombineArmors(result, summon.GetBuff().GetIncreaseArmors());
+            }
+            if (data.PassengingVehicleEntity != null)
+            {
+                result = GameDataHelpers.CombineArmors(result, data.PassengingVehicleEntity.GetBuff().GetIncreaseArmors());
             }
             return result;
         }
@@ -496,11 +510,15 @@ namespace MultiplayerARPG
             Dictionary<DamageElement, MinMaxFloat> result = new Dictionary<DamageElement, MinMaxFloat>();
             foreach (CharacterBuff buff in data.Buffs)
             {
-                result = GameDataHelpers.CombineDamages(result, buff.GetIncreaseDamages());
+                result = GameDataHelpers.CombineDamages(result, buff.GetBuff().GetIncreaseDamages());
             }
             foreach (CharacterSummon summon in data.Summons)
             {
-                result = GameDataHelpers.CombineDamages(result, summon.GetIncreaseDamages());
+                result = GameDataHelpers.CombineDamages(result, summon.GetBuff().GetIncreaseDamages());
+            }
+            if (data.PassengingVehicleEntity != null)
+            {
+                result = GameDataHelpers.CombineDamages(result, data.PassengingVehicleEntity.GetBuff().GetIncreaseDamages());
             }
             return result;
         }
@@ -604,19 +622,27 @@ namespace MultiplayerARPG
             CharacterStats result = new CharacterStats();
             foreach (CharacterBuff buff in data.Buffs)
             {
-                result += buff.GetIncreaseStats();
-                result += GameDataHelpers.GetStatsFromAttributes(buff.GetIncreaseAttributes());
+                result += buff.GetBuff().GetIncreaseStats();
+                result += GameDataHelpers.GetStatsFromAttributes(buff.GetBuff().GetIncreaseAttributes());
                 // Increase with rates
-                result += baseStats * buff.GetIncreaseStatsRate();
-                result += GameDataHelpers.GetStatsFromAttributes(GameDataHelpers.MultiplyAttributes(new Dictionary<Attribute, float>(baseAttributes), buff.GetIncreaseAttributesRate()));
+                result += baseStats * buff.GetBuff().GetIncreaseStatsRate();
+                result += GameDataHelpers.GetStatsFromAttributes(GameDataHelpers.MultiplyAttributes(new Dictionary<Attribute, float>(baseAttributes), buff.GetBuff().GetIncreaseAttributesRate()));
             }
             foreach (CharacterSummon summon in data.Summons)
             {
-                result += summon.GetIncreaseStats();
-                result += GameDataHelpers.GetStatsFromAttributes(summon.GetIncreaseAttributes());
+                result += summon.GetBuff().GetIncreaseStats();
+                result += GameDataHelpers.GetStatsFromAttributes(summon.GetBuff().GetIncreaseAttributes());
                 // Increase with rates
-                result += baseStats * summon.GetIncreaseStatsRate();
-                result += GameDataHelpers.GetStatsFromAttributes(GameDataHelpers.MultiplyAttributes(new Dictionary<Attribute, float>(baseAttributes), summon.GetIncreaseAttributesRate()));
+                result += baseStats * summon.GetBuff().GetIncreaseStatsRate();
+                result += GameDataHelpers.GetStatsFromAttributes(GameDataHelpers.MultiplyAttributes(new Dictionary<Attribute, float>(baseAttributes), summon.GetBuff().GetIncreaseAttributesRate()));
+            }
+            if (data.PassengingVehicleEntity != null)
+            {
+                result += data.PassengingVehicleEntity.GetBuff().GetIncreaseStats();
+                result += GameDataHelpers.GetStatsFromAttributes(data.PassengingVehicleEntity.GetBuff().GetIncreaseAttributes());
+                // Increase with rates
+                result += baseStats * data.PassengingVehicleEntity.GetBuff().GetIncreaseStatsRate();
+                result += GameDataHelpers.GetStatsFromAttributes(GameDataHelpers.MultiplyAttributes(new Dictionary<Attribute, float>(baseAttributes), data.PassengingVehicleEntity.GetBuff().GetIncreaseAttributesRate()));
             }
             return result;
         }

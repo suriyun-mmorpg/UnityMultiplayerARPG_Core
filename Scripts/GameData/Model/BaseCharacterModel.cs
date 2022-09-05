@@ -618,12 +618,12 @@ namespace MultiplayerARPG
                     if (!tempCachedKeys.Contains(tempKey))
                     {
                         // If old buffs not contains this buff, add this buff effect
-                        InstantiateBuffEffect(tempKey, buff.GetBuff().effects);
+                        InstantiateBuffEffect(tempKey, buff.GetBuff().GetBuff().effects);
                         tempCachedKeys.Add(tempKey);
                     }
                     tempAddingKeys.Add(tempKey);
                     // Ailment effects
-                    switch (buff.GetBuff().ailment)
+                    switch (buff.GetBuff().GetBuff().ailment)
                     {
                         case AilmentPresets.Stun:
                             tempKey = nameof(AilmentPresets.Stun);

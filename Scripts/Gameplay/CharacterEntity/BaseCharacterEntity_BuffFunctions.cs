@@ -58,7 +58,7 @@ namespace MultiplayerARPG
                 {
                     CharacterBuff characterBuff = buffs[buffIndex];
                     characterBuff.level = level;
-                    characterBuff.buffRemainsDuration += buffs[buffIndex].GetDuration();
+                    characterBuff.buffRemainsDuration += buffs[buffIndex].GetBuff().GetDuration();
                     characterBuff.SetApplier(buffApplier, buffApplierWeapon);
                     buffs[buffIndex] = characterBuff;
                     return;
@@ -89,13 +89,13 @@ namespace MultiplayerARPG
             CharacterBuff newBuff = CharacterBuff.Create(type, dataId, level);
             newBuff.Apply(buffApplier, buffApplierWeapon);
             buffs.Add(newBuff);
-            if (newBuff.GetBuff().disallowMove)
+            if (newBuff.GetBuff().GetBuff().disallowMove)
                 StopMove();
 
-            if (newBuff.GetDuration() <= 0f)
+            if (newBuff.GetBuff().GetDuration() <= 0f)
             {
                 CharacterRecoveryData recoveryData = new CharacterRecoveryData(this);
-                recoveryData.SetupByBuff(newBuff);
+                recoveryData.SetupByBuff(newBuff, newBuff.GetBuff());
                 recoveryData.Apply(1f);
             }
 

@@ -48,6 +48,9 @@ namespace MultiplayerARPG
         protected ArmorIncremental[] armors = new ArmorIncremental[0];
 
         [SerializeField]
+        protected Buff buff = Buff.Empty;
+
+        [SerializeField]
         [Tooltip("Delay before the entity destroyed, you may set some delay to play destroyed animation by `onVehicleDestroy` event before it's going to be destroyed from the game.")]
         protected float destroyDelay = 2f;
 
@@ -74,6 +77,8 @@ namespace MultiplayerARPG
         protected readonly Dictionary<byte, BaseGameEntity> passengers = new Dictionary<byte, BaseGameEntity>();
         protected MovementSecure defaultMovementSecure;
         protected bool isDestroyed;
+        protected CalculatedBuff cacheBuff;
+        protected short dirtyLevel = short.MinValue;
 
         protected override sealed void EntityAwake()
         {
@@ -352,6 +357,21 @@ namespace MultiplayerARPG
         public virtual void OnActivate()
         {
             GameInstance.PlayingCharacterEntity.CallServerEnterVehicle(ObjectId);
+        }
+
+        private void MakeCache()
+        {
+            if (dirtyLevel != level)
+            {
+                dirtyLevel = level;
+                cacheBuff = new CalculatedBuff(buff, level);
+            }
+        }
+
+        public CalculatedBuff GetBuff()
+        {
+            MakeCache();
+            return cacheBuff;
         }
     }
 }

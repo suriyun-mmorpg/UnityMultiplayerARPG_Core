@@ -7,6 +7,7 @@ namespace MultiplayerARPG
     public class CharacterSkillAndBuffComponent : BaseGameEntityComponent<BaseCharacterEntity>
     {
         public const float SKILL_BUFF_UPDATE_DURATION = 1f;
+        public const string KEY_VEHICLE_BUFF = "<VEHICLE_BUFF>";
 
         private float updatingTime;
         private float deltaTime;
@@ -31,8 +32,23 @@ namespace MultiplayerARPG
             if (updatingTime >= SKILL_BUFF_UPDATE_DURATION)
             {
                 float tempDuration;
-                // Removing summons if it should
                 int tempCount;
+                if (Entity.PassengingVehicleEntity != null)
+                {
+                    tempDuration = Entity.PassengingVehicleEntity.GetBuff().GetDuration();
+                    if (tempDuration > 0f)
+                    {
+                        CharacterRecoveryData recoveryData;
+                        if (!recoveryBuffs.TryGetValue(KEY_VEHICLE_BUFF, out recoveryData))
+                        {
+                            recoveryData = new CharacterRecoveryData(Entity);
+                            recoveryData.SetupByBuff(null, Entity.PassengingVehicleEntity.GetBuff());
+                            recoveryBuffs.Add(KEY_VEHICLE_BUFF, recoveryData);
+                        }
+                        recoveryData.Apply(1 / tempDuration * updatingTime);
+                    }
+                }
+                // Removing summons if it should
                 if (!Entity.IsDead())
                 {
                     tempCount = Entity.Summons.Count;
@@ -40,7 +56,7 @@ namespace MultiplayerARPG
                     for (int i = tempCount - 1; i >= 0; --i)
                     {
                         summon = Entity.Summons[i];
-                        tempDuration = summon.GetDuration();
+                        tempDuration = summon.GetBuff().GetDuration();
                         if (summon.ShouldRemove())
                         {
                             recoveryBuffs.Remove(summon.id);
@@ -59,7 +75,7 @@ namespace MultiplayerARPG
                             if (!recoveryBuffs.TryGetValue(summon.id, out recoveryData))
                             {
                                 recoveryData = new CharacterRecoveryData(Entity);
-                                recoveryData.SetupBySummon(summon);
+                                recoveryData.SetupByBuff(null, summon.GetBuff());
                                 recoveryBuffs.Add(summon.id, recoveryData);
                             }
                             recoveryData.Apply(1 / tempDuration * updatingTime);
@@ -77,7 +93,7 @@ namespace MultiplayerARPG
                     for (int i = tempCount - 1; i >= 0; --i)
                     {
                         buff = Entity.Buffs[i];
-                        tempDuration = buff.GetDuration();
+                        tempDuration = buff.GetBuff().GetDuration();
                         if (buff.ShouldRemove())
                         {
                             recoveryBuffs.Remove(buff.id);
@@ -95,7 +111,7 @@ namespace MultiplayerARPG
                             if (!recoveryBuffs.TryGetValue(buff.id, out recoveryData))
                             {
                                 recoveryData = new CharacterRecoveryData(Entity);
-                                recoveryData.SetupByBuff(buff);
+                                recoveryData.SetupByBuff(buff, buff.GetBuff());
                                 recoveryBuffs.Add(buff.id, recoveryData);
                             }
                             recoveryData.Apply(1 / tempDuration * updatingTime);

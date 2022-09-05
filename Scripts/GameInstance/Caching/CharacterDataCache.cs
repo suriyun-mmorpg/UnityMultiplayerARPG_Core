@@ -85,21 +85,44 @@ namespace MultiplayerARPG
             IsHide = false;
             MuteFootstepSound = false;
 
-            foreach (CharacterBuff characterBuff in characterData.Buffs)
+            bool allAilmentsWereApplied = false;
+            if (characterData.PassengingVehicleEntity != null)
             {
-                UpdateAppliedAilments(characterBuff.GetBuff());
-                if (AllAilmentsWereApplied())
-                    break;
+                UpdateAppliedAilments(characterData.PassengingVehicleEntity.GetBuff().GetBuff());
+                allAilmentsWereApplied = AllAilmentsWereApplied();
             }
 
-            if (!AllAilmentsWereApplied())
+            if (!allAilmentsWereApplied)
+            {
+                foreach (CharacterBuff characterBuff in characterData.Buffs)
+                {
+                    UpdateAppliedAilments(characterBuff.GetBuff().GetBuff());
+                    allAilmentsWereApplied = AllAilmentsWereApplied();
+                    if (allAilmentsWereApplied)
+                        break;
+                }
+            }
+
+            if (!allAilmentsWereApplied)
+            {
+                foreach (CharacterSummon characterBuff in characterData.Summons)
+                {
+                    UpdateAppliedAilments(characterBuff.GetBuff().GetBuff());
+                    allAilmentsWereApplied = AllAilmentsWereApplied();
+                    if (allAilmentsWereApplied)
+                        break;
+                }
+            }
+
+            if (!allAilmentsWereApplied)
             {
                 foreach (BaseSkill tempSkill in Skills.Keys)
                 {
                     if (tempSkill == null || tempSkill.IsActive || !tempSkill.IsBuff)
                         continue;
                     UpdateAppliedAilments(tempSkill.Buff);
-                    if (AllAilmentsWereApplied())
+                    allAilmentsWereApplied = AllAilmentsWereApplied();
+                    if (allAilmentsWereApplied)
                         break;
                 }
             }

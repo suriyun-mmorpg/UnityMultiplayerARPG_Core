@@ -45,35 +45,7 @@ namespace MultiplayerARPG
         [System.NonSerialized]
         private BaseMonsterCharacterEntity cachePrefab;
         [System.NonSerialized]
-        private Buff cacheBuff;
-        [System.NonSerialized]
-        private float cacheDuration;
-        [System.NonSerialized]
-        private int cacheRecoveryHp;
-        [System.NonSerialized]
-        private int cacheRecoveryMp;
-        [System.NonSerialized]
-        private int cacheRecoveryStamina;
-        [System.NonSerialized]
-        private int cacheRecoveryFood;
-        [System.NonSerialized]
-        private int cacheRecoveryWater;
-        [System.NonSerialized]
-        private CharacterStats cacheIncreaseStats;
-        [System.NonSerialized]
-        private CharacterStats cacheIncreaseStatsRate;
-        [System.NonSerialized]
-        private Dictionary<Attribute, float> cacheIncreaseAttributes;
-        [System.NonSerialized]
-        private Dictionary<Attribute, float> cacheIncreaseAttributesRate;
-        [System.NonSerialized]
-        private Dictionary<DamageElement, float> cacheIncreaseResistances;
-        [System.NonSerialized]
-        private Dictionary<DamageElement, float> cacheIncreaseArmors;
-        [System.NonSerialized]
-        private Dictionary<DamageElement, MinMaxFloat> cacheIncreaseDamages;
-        [System.NonSerialized]
-        private Dictionary<DamageElement, MinMaxFloat> cacheDamageOverTimes;
+        private CalculatedBuff cacheBuff;
 
         [System.NonSerialized]
         private BaseMonsterCharacterEntity cacheEntity;
@@ -98,21 +70,7 @@ namespace MultiplayerARPG
                 cacheSkill = null;
                 cachePetItem = null;
                 cachePrefab = null;
-                cacheBuff = Buff.Empty;
-                cacheDuration = 0;
-                cacheRecoveryHp = 0;
-                cacheRecoveryMp = 0;
-                cacheRecoveryStamina = 0;
-                cacheRecoveryFood = 0;
-                cacheRecoveryWater = 0;
-                cacheIncreaseStats = CharacterStats.Empty;
-                cacheIncreaseStatsRate = CharacterStats.Empty;
-                cacheIncreaseAttributes = null;
-                cacheIncreaseAttributesRate = null;
-                cacheIncreaseResistances = null;
-                cacheIncreaseArmors = null;
-                cacheIncreaseDamages = null;
-                cacheDamageOverTimes = null;
+                Buff tempBuff = Buff.Empty;
                 switch (type)
                 {
                     case SummonType.Skill:
@@ -128,24 +86,8 @@ namespace MultiplayerARPG
                         break;
                 }
                 if (cachePrefab != null && cachePrefab.CharacterDatabase != null)
-                {
-                    MonsterCharacter database = cachePrefab.CharacterDatabase;
-                    cacheBuff = database.SummonerBuff;
-                    cacheDuration = cacheBuff.GetDuration(level);
-                    cacheRecoveryHp = cacheBuff.GetRecoveryHp(level);
-                    cacheRecoveryMp = cacheBuff.GetRecoveryMp(level);
-                    cacheRecoveryStamina = cacheBuff.GetRecoveryStamina(level);
-                    cacheRecoveryFood = cacheBuff.GetRecoveryFood(level);
-                    cacheRecoveryWater = cacheBuff.GetRecoveryWater(level);
-                    cacheIncreaseStats = cacheBuff.GetIncreaseStats(level);
-                    cacheIncreaseStatsRate = cacheBuff.GetIncreaseStatsRate(level);
-                    cacheIncreaseAttributes = cacheBuff.GetIncreaseAttributes(level);
-                    cacheIncreaseAttributesRate = cacheBuff.GetIncreaseAttributesRate(level);
-                    cacheIncreaseResistances = cacheBuff.GetIncreaseResistances(level);
-                    cacheIncreaseArmors = cacheBuff.GetIncreaseArmors(level);
-                    cacheIncreaseDamages = cacheBuff.GetIncreaseDamages(level);
-                    cacheDamageOverTimes = cacheBuff.GetDamageOverTimes(level);
-                }
+                    tempBuff = cachePrefab.CharacterDatabase.SummonerBuff;
+                cacheBuff = new CalculatedBuff(tempBuff, level);
             }
         }
 
@@ -219,94 +161,10 @@ namespace MultiplayerARPG
             return cachePrefab;
         }
 
-        public Buff GetBuff()
+        public CalculatedBuff GetBuff()
         {
             MakeCache();
             return cacheBuff;
-        }
-
-        public float GetDuration()
-        {
-            MakeCache();
-            return cacheDuration;
-        }
-
-        public int GetRecoveryHp()
-        {
-            MakeCache();
-            return cacheRecoveryHp;
-        }
-
-        public int GetRecoveryMp()
-        {
-            MakeCache();
-            return cacheRecoveryMp;
-        }
-
-        public int GetRecoveryStamina()
-        {
-            MakeCache();
-            return cacheRecoveryStamina;
-        }
-
-        public int GetRecoveryFood()
-        {
-            MakeCache();
-            return cacheRecoveryFood;
-        }
-
-        public int GetRecoveryWater()
-        {
-            MakeCache();
-            return cacheRecoveryWater;
-        }
-
-        public CharacterStats GetIncreaseStats()
-        {
-            MakeCache();
-            return cacheIncreaseStats;
-        }
-
-        public CharacterStats GetIncreaseStatsRate()
-        {
-            MakeCache();
-            return cacheIncreaseStatsRate;
-        }
-
-        public Dictionary<Attribute, float> GetIncreaseAttributes()
-        {
-            MakeCache();
-            return cacheIncreaseAttributes;
-        }
-
-        public Dictionary<Attribute, float> GetIncreaseAttributesRate()
-        {
-            MakeCache();
-            return cacheIncreaseAttributesRate;
-        }
-
-        public Dictionary<DamageElement, float> GetIncreaseResistances()
-        {
-            MakeCache();
-            return cacheIncreaseResistances;
-        }
-
-        public Dictionary<DamageElement, float> GetIncreaseArmors()
-        {
-            MakeCache();
-            return cacheIncreaseArmors;
-        }
-
-        public Dictionary<DamageElement, MinMaxFloat> GetIncreaseDamages()
-        {
-            MakeCache();
-            return cacheIncreaseDamages;
-        }
-
-        public Dictionary<DamageElement, MinMaxFloat> GetDamageOverTimes()
-        {
-            MakeCache();
-            return cacheDamageOverTimes;
         }
 
         public bool ShouldRemove()

@@ -583,7 +583,7 @@ namespace MultiplayerARPG
                     for (i = 0; i < attacker.Buffs.Count; ++i)
                     {
                         tempCharacterBuff = attacker.Buffs[i];
-                        tempBuff = tempCharacterBuff.GetBuff();
+                        tempBuff = tempCharacterBuff.GetBuff().GetBuff();
                         tempBuff.ApplySelfStatusEffectsWhenAttacking(tempCharacterBuff.level, attackerInfo, attacker);
                         tempBuff.ApplyEnemyStatusEffectsWhenAttacking(tempCharacterBuff.level, attackerInfo, damageReceiver);
                         if (attacker.IsDead())
@@ -641,7 +641,7 @@ namespace MultiplayerARPG
                     for (i = 0; i < damageReceiver.Buffs.Count; ++i)
                     {
                         tempCharacterBuff = damageReceiver.Buffs[i];
-                        tempBuff = tempCharacterBuff.GetBuff();
+                        tempBuff = tempCharacterBuff.GetBuff().GetBuff();
                         tempBuff.ApplySelfStatusEffectsWhenAttacked(tempCharacterBuff.level, damageReceiverInfo, damageReceiver);
                         tempBuff.ApplyEnemyStatusEffectsWhenAttacked(tempCharacterBuff.level, damageReceiverInfo, attacker);
                         if (damageReceiver.IsDead())
