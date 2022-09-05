@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using Cysharp.Text;
+using UnityEngine;
 
 namespace MultiplayerARPG
 {
@@ -68,7 +69,7 @@ namespace MultiplayerARPG
                 return;
 
             TextWrapper newMessage = AddMessage(rewardExpPrefab);
-            newMessage.text = string.Format(LanguageManager.GetText(formatKeyRewardExp.ToString()), exp);
+            newMessage.text = ZString.Format(LanguageManager.GetText(formatKeyRewardExp.ToString()), exp);
         }
 
         private void OnNotifyRewardGold(int gold)
@@ -77,7 +78,7 @@ namespace MultiplayerARPG
                 return;
 
             TextWrapper newMessage = AddMessage(rewardGoldPrefab);
-            newMessage.text = string.Format(LanguageManager.GetText(formatKeyRewardGold.ToString()), gold);
+            newMessage.text = ZString.Format(LanguageManager.GetText(formatKeyRewardGold.ToString()), gold);
         }
 
         private void OnNotifyRewardItem(int dataId, short amount)
@@ -87,7 +88,7 @@ namespace MultiplayerARPG
                 return;
 
             TextWrapper newMessage = AddMessage(rewardItemPrefab);
-            newMessage.text = string.Format(LanguageManager.GetText(formatKeyRewardItem.ToString()), item.Title, amount);
+            newMessage.text = ZString.Format(LanguageManager.GetText(formatKeyRewardItem.ToString()), item.Title, amount);
         }
 
         private void OnNotifyRewardCurrency(int dataId, int amount)
