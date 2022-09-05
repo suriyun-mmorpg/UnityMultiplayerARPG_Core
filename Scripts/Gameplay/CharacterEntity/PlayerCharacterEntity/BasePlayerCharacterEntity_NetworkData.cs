@@ -201,6 +201,8 @@ namespace MultiplayerARPG
         {
             base.OnSetup();
             // On data changes events
+            id.onChange += OnPlayerIdChange;
+            syncTitle.onChange += OnPlayerCharacterNameChange;
             dataId.onChange += OnDataIdChange;
             factionId.onChange += OnFactionIdChange;
             statPoint.onChange += OnStatPointChange;
@@ -221,6 +223,8 @@ namespace MultiplayerARPG
         {
             base.EntityOnDestroy();
             // On data changes events
+            id.onChange -= OnPlayerIdChange;
+            syncTitle.onChange -= OnPlayerCharacterNameChange;
             dataId.onChange -= OnDataIdChange;
             factionId.onChange -= OnFactionIdChange;
             statPoint.onChange -= OnStatPointChange;
@@ -301,75 +305,73 @@ namespace MultiplayerARPG
         #endregion
 
         #region Sync data changes callback
-        protected override void OnIdChange(bool isInitial, string id)
+        private void OnPlayerIdChange(bool isInitial, string id)
         {
-            base.OnIdChange(isInitial, id);
             if (!string.IsNullOrEmpty(id) && !string.IsNullOrEmpty(CharacterName) && GameInstance.ClientCharacterHandlers != null)
                 GameInstance.ClientCharacterHandlers.SubscribePlayerCharacter(this);
         }
 
-        protected override void OnCharacterNameChange(bool isInitial, string characterName)
+        private void OnPlayerCharacterNameChange(bool isInitial, string characterName)
         {
-            base.OnCharacterNameChange(isInitial, characterName);
             if (!string.IsNullOrEmpty(Id) && !string.IsNullOrEmpty(characterName) && GameInstance.ClientCharacterHandlers != null)
                 GameInstance.ClientCharacterHandlers.SubscribePlayerCharacter(this);
         }
 
-        protected virtual void OnDataIdChange(bool isInitial, int dataId)
+        private void OnDataIdChange(bool isInitial, int dataId)
         {
             if (onDataIdChange != null)
                 onDataIdChange.Invoke(dataId);
         }
 
-        protected virtual void OnFactionIdChange(bool isInitial, int factionId)
+        private void OnFactionIdChange(bool isInitial, int factionId)
         {
             if (onFactionIdChange != null)
                 onFactionIdChange.Invoke(factionId);
         }
 
-        protected virtual void OnStatPointChange(bool isInitial, float statPoint)
+        private void OnStatPointChange(bool isInitial, float statPoint)
         {
             if (onStatPointChange != null)
                 onStatPointChange.Invoke(statPoint);
         }
 
-        protected virtual void OnSkillPointChange(bool isInitial, float skillPoint)
+        private void OnSkillPointChange(bool isInitial, float skillPoint)
         {
             if (onSkillPointChange != null)
                 onSkillPointChange.Invoke(skillPoint);
         }
 
-        protected virtual void OnGoldChange(bool isInitial, int gold)
+        private void OnGoldChange(bool isInitial, int gold)
         {
             if (onGoldChange != null)
                 onGoldChange.Invoke(gold);
         }
 
-        protected virtual void OnUserGoldChange(bool isInitial, int gold)
+        private void OnUserGoldChange(bool isInitial, int gold)
         {
             if (onUserGoldChange != null)
                 onUserGoldChange.Invoke(gold);
         }
 
-        protected virtual void OnUserCashChange(bool isInitial, int gold)
+        private void OnUserCashChange(bool isInitial, int gold)
         {
             if (onUserCashChange != null)
                 onUserCashChange.Invoke(gold);
         }
 
-        protected virtual void OnPartyIdChange(bool isInitial, int partyId)
+        private void OnPartyIdChange(bool isInitial, int partyId)
         {
             if (onPartyIdChange != null)
                 onPartyIdChange.Invoke(partyId);
         }
 
-        protected virtual void OnGuildIdChange(bool isInitial, int guildId)
+        private void OnGuildIdChange(bool isInitial, int guildId)
         {
             if (onGuildIdChange != null)
                 onGuildIdChange.Invoke(guildId);
         }
 
-        protected virtual void OnIsWarpingChange(bool isInitial, bool isWarping)
+        private void OnIsWarpingChange(bool isInitial, bool isWarping)
         {
             if (onIsWarpingChange != null)
                 onIsWarpingChange.Invoke(isWarping);
@@ -377,19 +379,19 @@ namespace MultiplayerARPG
         #endregion
 
         #region Net functions operation callback
-        protected virtual void OnHotkeysOperation(LiteNetLibSyncList.Operation operation, int index)
+        private void OnHotkeysOperation(LiteNetLibSyncList.Operation operation, int index)
         {
             if (onHotkeysOperation != null)
                 onHotkeysOperation.Invoke(operation, index);
         }
 
-        protected virtual void OnQuestsOperation(LiteNetLibSyncList.Operation operation, int index)
+        private void OnQuestsOperation(LiteNetLibSyncList.Operation operation, int index)
         {
             if (onQuestsOperation != null)
                 onQuestsOperation.Invoke(operation, index);
         }
 
-        protected virtual void OnCurrenciesOperation(LiteNetLibSyncList.Operation operation, int index)
+        private void OnCurrenciesOperation(LiteNetLibSyncList.Operation operation, int index)
         {
             if (onCurrenciesOperation != null)
                 onCurrenciesOperation.Invoke(operation, index);
