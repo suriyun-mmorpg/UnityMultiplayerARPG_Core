@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using Cysharp.Text;
+using UnityEngine;
 
 namespace MultiplayerARPG
 {
@@ -23,14 +24,14 @@ namespace MultiplayerARPG
         {
             if (textSenderName != null)
             {
-                textSenderName.text = string.Format(
+                textSenderName.text = ZString.Format(
                     LanguageManager.GetText(formatSenderName),
                     Data == null ? LanguageManager.GetUnknowTitle() : Data.SenderName);
             }
 
             if (textTitle != null)
             {
-                textTitle.text = string.Format(
+                textTitle.text = ZString.Format(
                     LanguageManager.GetText(formatTitle),
                     Data == null ? LanguageManager.GetUnknowTitle() : Data.Title);
             }
@@ -40,7 +41,7 @@ namespace MultiplayerARPG
                 System.DateTime dateTime = new System.DateTime(1970, 1, 1, 0, 0, 0, 0, System.DateTimeKind.Utc);
                 if (Data != null)
                     dateTime = dateTime.AddSeconds(Data.SentTimestamp).ToLocalTime();
-                textSentDate.text = string.Format(
+                textSentDate.text = ZString.Format(
                     LanguageManager.GetText(formatSentDate),
                     dateTime.GetPrettyDate());
             }

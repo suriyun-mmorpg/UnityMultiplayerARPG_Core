@@ -1,4 +1,5 @@
-﻿using LiteNetLibManager;
+﻿using Cysharp.Text;
+using LiteNetLibManager;
 using UnityEngine;
 using UnityEngine.Events;
 
@@ -118,7 +119,7 @@ namespace MultiplayerARPG
         {
             if (textSenderName != null)
             {
-                textSenderName.text = string.Format(
+                textSenderName.text = ZString.Format(
                     LanguageManager.GetText(formatSenderName),
                     mail == null ? LanguageManager.GetUnknowTitle() : mail.SenderName);
                 textSenderName.SetGameObjectActive(mail != null);
@@ -126,7 +127,7 @@ namespace MultiplayerARPG
 
             if (textTitle != null)
             {
-                textTitle.text = string.Format(
+                textTitle.text = ZString.Format(
                     LanguageManager.GetText(formatTitle),
                     mail == null ? LanguageManager.GetUnknowTitle() : mail.Title);
                 textTitle.SetGameObjectActive(mail != null);
@@ -134,7 +135,7 @@ namespace MultiplayerARPG
 
             if (textContent != null)
             {
-                textContent.text = string.Format(
+                textContent.text = ZString.Format(
                     LanguageManager.GetText(formatContent),
                     mail == null ? string.Empty : mail.Content);
                 textContent.SetGameObjectActive(mail != null);
@@ -145,7 +146,7 @@ namespace MultiplayerARPG
 
             if (textGold != null)
             {
-                textGold.text = string.Format(
+                textGold.text = ZString.Format(
                     LanguageManager.GetText(formatGold),
                     mail == null ? "0" : mail.Gold.ToString("N0"));
                 textGold.SetGameObjectActive(mail != null && mail.Gold != 0);
@@ -156,7 +157,7 @@ namespace MultiplayerARPG
 
             if (textCash != null)
             {
-                textCash.text = string.Format(
+                textCash.text = ZString.Format(
                     LanguageManager.GetText(formatCash),
                     mail == null ? "0" : mail.Cash.ToString("N0"));
                 textCash.SetGameObjectActive(mail != null && mail.Cash != 0);
@@ -194,7 +195,7 @@ namespace MultiplayerARPG
                 System.DateTime dateTime = new System.DateTime(1970, 1, 1, 0, 0, 0, 0, System.DateTimeKind.Utc);
                 if (mail != null)
                     dateTime = dateTime.AddSeconds(mail.SentTimestamp).ToLocalTime();
-                textSentDate.text = string.Format(
+                textSentDate.text = ZString.Format(
                     LanguageManager.GetText(formatSentDate),
                     dateTime.GetPrettyDate());
                 textSentDate.SetGameObjectActive(mail != null);
