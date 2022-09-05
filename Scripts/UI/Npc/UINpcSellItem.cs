@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+﻿using Cysharp.Text;
 using UnityEngine;
 
 namespace MultiplayerARPG
@@ -41,7 +41,7 @@ namespace MultiplayerARPG
 
             if (uiTextSellPrice != null)
             {
-                uiTextSellPrice.text = string.Format(
+                uiTextSellPrice.text = ZString.Format(
                     LanguageManager.GetText(formatKeySellPrice),
                     Data.sellPrice.ToString("N0"));
                 uiTextSellPrice.SetGameObjectActive(!inactiveSellPriceIfZero || Data.sellPrice != 0);
