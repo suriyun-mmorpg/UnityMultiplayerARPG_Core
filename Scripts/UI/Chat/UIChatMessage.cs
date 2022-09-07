@@ -8,25 +8,25 @@ namespace MultiplayerARPG
     {
         [Header("String Formats")]
         [Tooltip("Format {0} = Character Name, {1} = Message")]
-        public string formatLocal = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_CHAT_LOCAL);
+        public UILocaleKeySetting formatLocal = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_CHAT_LOCAL);
         [Tooltip("Format {0} = Character Name, {1} = Message")]
-        public string formatGlobal = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_CHAT_GLOBAL);
+        public UILocaleKeySetting formatGlobal = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_CHAT_GLOBAL);
         [Tooltip("Format {0} = Character Name, {1} = Message")]
-        public string formatWhisper = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_CHAT_WHISPER);
+        public UILocaleKeySetting formatWhisper = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_CHAT_WHISPER);
         [Tooltip("Format {0} = Character Name, {1} = Message")]
-        public string formatParty = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_CHAT_PARTY);
+        public UILocaleKeySetting formatParty = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_CHAT_PARTY);
         [Tooltip("Format {0} = Character Name, {1} = Message")]
-        public string formatGuild = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_CHAT_GUILD);
+        public UILocaleKeySetting formatGuild = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_CHAT_GUILD);
         [Tooltip("Format {0} = Message")]
-        public string formatSystem = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_CHAT_SYSTEM);
+        public UILocaleKeySetting formatSystem = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_CHAT_SYSTEM);
         [Tooltip("Format {0} = Character Name, {1} = Message, {2} = Guild Name")]
-        public string formatLocalWithGuildName = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_CHAT_LOCAL_WITH_GUILD_NAME);
+        public UILocaleKeySetting formatLocalWithGuildName = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_CHAT_LOCAL_WITH_GUILD_NAME);
         [Tooltip("Format {0} = Character Name, {1} = Message, {2} = Guild Name")]
-        public string formatGlobalWithGuildName = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_CHAT_GLOBAL_WITH_GUILD_NAME);
+        public UILocaleKeySetting formatGlobalWithGuildName = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_CHAT_GLOBAL_WITH_GUILD_NAME);
         [Tooltip("Format {0} = Character Name, {1} = Message, {2} = Guild Name")]
-        public string formatWhisperWithGuildName = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_CHAT_WHISPER_WITH_GUILD_NAME);
+        public UILocaleKeySetting formatWhisperWithGuildName = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_CHAT_WHISPER_WITH_GUILD_NAME);
         [Tooltip("Format {0} = Character Name, {1} = Message, {2} = Guild Name")]
-        public string formatPartyWithGuildName = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_CHAT_PARTY_WITH_GUILD_NAME);
+        public UILocaleKeySetting formatPartyWithGuildName = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_CHAT_PARTY_WITH_GUILD_NAME);
 
         public TextWrapper uiTextMessage;
         public TextWrapper uiTextSenderOnly;
