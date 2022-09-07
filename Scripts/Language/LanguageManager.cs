@@ -8,6 +8,7 @@ namespace MultiplayerARPG
 {
     public class LanguageManager : MonoBehaviour
     {
+        public const string RETURN_KEY_AS_DEFAULT_VALUE_PREFIX = "K->";
         public static Dictionary<string, Dictionary<string, string>> Languages { get; protected set; } = new Dictionary<string, Dictionary<string, string>>();
         public static Dictionary<string, string> Texts { get; protected set; } = new Dictionary<string, string>();
         public static string CurrentLanguageKey { get; protected set; }
@@ -366,22 +367,27 @@ namespace MultiplayerARPG
 
         public static string GetText(string key, string defaultValue = "")
         {
-            if (!string.IsNullOrEmpty(key))
-            {
-                if (Texts.ContainsKey(key))
-                    return Texts[key];
-                if (DefaultLocale.Texts.ContainsKey(key))
-                    return DefaultLocale.Texts[key];
-            }
+            if (string.IsNullOrWhiteSpace(key))
+                return defaultValue;
+            if (Texts.ContainsKey(key))
+                return Texts[key];
+            if (DefaultLocale.Texts.ContainsKey(key))
+                return DefaultLocale.Texts[key];
+            if (key.StartsWith(RETURN_KEY_AS_DEFAULT_VALUE_PREFIX))
+                return key.Substring(RETURN_KEY_AS_DEFAULT_VALUE_PREFIX.Length);
             return defaultValue;
         }
 
         public static string GetTextByLanguage(string languageKey, string key, string defaultValue = "")
         {
+            if (string.IsNullOrWhiteSpace(languageKey) || string.IsNullOrWhiteSpace(key))
+                return defaultValue;
             if (Languages.ContainsKey(languageKey) && Languages[languageKey].ContainsKey(key))
                 return Languages[languageKey][key];
             if (DefaultLocale.Texts.ContainsKey(key))
                 return DefaultLocale.Texts[key];
+            if (key.StartsWith(RETURN_KEY_AS_DEFAULT_VALUE_PREFIX))
+                return key.Substring(RETURN_KEY_AS_DEFAULT_VALUE_PREFIX.Length);
             return defaultValue;
         }
 
