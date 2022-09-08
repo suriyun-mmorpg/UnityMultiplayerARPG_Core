@@ -808,7 +808,7 @@ namespace MultiplayerARPG
             onSpawnEntitiesProgress.Invoke(sceneName, true, progress);
             // Spawn item drop entities
             if (LogInfo)
-                Logging.Log("Spawning harvestables");
+                Logging.Log("Spawning item drop entities");
             ItemDropSpawnArea[] itemDropSpawnAreas = FindObjectsOfType<ItemDropSpawnArea>();
             for (i = 0; i < itemDropSpawnAreas.Length; ++i)
             {
