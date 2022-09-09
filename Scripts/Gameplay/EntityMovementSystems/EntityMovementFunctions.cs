@@ -1,5 +1,4 @@
-﻿using LiteNetLib;
-using LiteNetLib.Utils;
+﻿using LiteNetLib.Utils;
 using UnityEngine;
 
 namespace MultiplayerARPG
@@ -208,9 +207,9 @@ namespace MultiplayerARPG
             return Mathf.RoundToInt(angle * 1000);
         }
 
-        public static float GetDecompressedAngle(float compressedAngle)
+        public static float GetDecompressedAngle(int compressedAngle)
         {
-            return compressedAngle * 0.001f;
+            return (float)compressedAngle * 0.001f;
         }
         #endregion
     }
