@@ -47,6 +47,8 @@ namespace MultiplayerARPG
         protected Vector2 moveDirection;
         protected float? lagMoveSpeedRate;
         protected bool isTeleporting;
+        protected bool isServerWaitingTeleportConfirm;
+        protected bool isClientConfirmingTeleport;
 
         public override void EntityAwake()
         {
@@ -338,20 +340,32 @@ namespace MultiplayerARPG
             if (Entity.MovementSecure == MovementSecure.NotSecure && IsOwnerClient && !IsServer)
             {
                 // Sync transform from owner client to server (except it's both owner client and server)
+                if (isClientConfirmingTeleport)
+                {
+                    shouldSendReliably = true;
+                    MovementState |= MovementState.IsTeleport;
+                }
                 this.ClientWriteSyncTransform2D(writer);
+                isClientConfirmingTeleport = false;
                 return true;
             }
             if (Entity.MovementSecure == MovementSecure.ServerAuthoritative && IsOwnerClient && !IsServer)
             {
                 EntityMovementInputState inputState;
-                if (this.DifferInputEnoughToSend(oldInput, currentInput, out inputState))
+                if (this.DifferInputEnoughToSend(oldInput, currentInput, out inputState) || isClientConfirmingTeleport)
                 {
                     if (!currentInput.IsKeyMovement)
                     {
                         // Point click should be reliably
                         shouldSendReliably = true;
                     }
+                    if (isClientConfirmingTeleport)
+                    {
+                        shouldSendReliably = true;
+                        MovementState |= MovementState.IsTeleport;
+                    }
                     this.ClientWriteMovementInput2D(writer, inputState, currentInput.MovementState, currentInput.ExtraMovementState, currentInput.Position, currentInput.Direction2D);
+                    isClientConfirmingTeleport = false;
                     oldInput = currentInput;
                     currentInput = null;
                     return true;
@@ -458,6 +472,16 @@ namespace MultiplayerARPG
             DirectionVector2 direction2D;
             long timestamp;
             reader.ReadMovementInputMessage2D(out inputState, out movementState, out extraMovementState, out position, out direction2D, out timestamp);
+            if (movementState.Has(MovementState.IsTeleport))
+            {
+                // Teleport confirming from client
+                isServerWaitingTeleportConfirm = false;
+            }
+            if (isServerWaitingTeleportConfirm)
+            {
+                // Waiting for teleport confirming
+                return;
+            }
             if (Mathf.Abs(timestamp - BaseGameNetworkManager.Singleton.ServerTimestamp) > lagBuffer)
             {
                 // Timestamp is a lot difference to server's timestamp, player might try to hack a game or packet may corrupted occurring, so skip it
@@ -509,6 +533,16 @@ namespace MultiplayerARPG
             DirectionVector2 direction2D;
             long timestamp;
             reader.ReadSyncTransformMessage2D(out movementState, out extraMovementState, out position, out direction2D, out timestamp);
+            if (movementState.Has(MovementState.IsTeleport))
+            {
+                // Teleport confirming from client
+                isServerWaitingTeleportConfirm = false;
+            }
+            if (isServerWaitingTeleportConfirm)
+            {
+                // Waiting for teleport confirming
+                return;
+            }
             if (Mathf.Abs(timestamp - BaseGameNetworkManager.Singleton.ServerTimestamp) > lagBuffer)
             {
                 // Timestamp is a lot difference to server's timestamp, player might try to hack a game or packet may corrupted occurring, so skip it
@@ -563,6 +597,10 @@ namespace MultiplayerARPG
             clientTargetPosition = null;
             NavPaths = null;
             CacheTransform.position = position;
+            if (IsServer && !IsOwnedByServer)
+                isServerWaitingTeleportConfirm = true;
+            if (!IsServer && IsOwnerClient)
+                isClientConfirmingTeleport = true;
         }
     }
 }

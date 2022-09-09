@@ -103,6 +103,8 @@ namespace MultiplayerARPG
         protected bool previouslyAirborne;
         protected ExtraMovementState previouslyExtraMovementState;
         protected bool isTeleporting;
+        protected bool isServerWaitingTeleportConfirm;
+        protected bool isClientConfirmingTeleport;
 
         public override void EntityAwake()
         {
@@ -704,15 +706,21 @@ namespace MultiplayerARPG
                 {
                     MovementState &= ~MovementState.IsJump;
                 }
+                if (isClientConfirmingTeleport)
+                {
+                    shouldSendReliably = true;
+                    MovementState |= MovementState.IsTeleport;
+                }
                 this.ClientWriteSyncTransform3D(writer);
                 sendingJump = false;
+                isClientConfirmingTeleport = false;
                 return true;
             }
             if (Entity.MovementSecure == MovementSecure.ServerAuthoritative && IsOwnerClient && !IsServer)
             {
                 EntityMovementInputState inputState;
                 currentInput = this.SetInputExtraMovementState(currentInput, tempExtraMovementState);
-                if (this.DifferInputEnoughToSend(oldInput, currentInput, out inputState) || sendingJump)
+                if (this.DifferInputEnoughToSend(oldInput, currentInput, out inputState) || sendingJump || isClientConfirmingTeleport)
                 {
                     if (sendingJump)
                     {
@@ -728,8 +736,14 @@ namespace MultiplayerARPG
                         // Point click should be reliably
                         shouldSendReliably = true;
                     }
+                    if (isClientConfirmingTeleport)
+                    {
+                        shouldSendReliably = true;
+                        MovementState |= MovementState.IsTeleport;
+                    }
                     this.ClientWriteMovementInput3D(writer, inputState, currentInput.MovementState, currentInput.ExtraMovementState, currentInput.Position, currentInput.Rotation);
                     sendingJump = false;
+                    isClientConfirmingTeleport = false;
                     oldInput = currentInput;
                     currentInput = null;
                     return true;
@@ -853,6 +867,16 @@ namespace MultiplayerARPG
             float yAngle;
             long timestamp;
             reader.ReadMovementInputMessage3D(out inputState, out movementState, out extraMovementState, out position, out yAngle, out timestamp);
+            if (movementState.Has(MovementState.IsTeleport))
+            {
+                // Teleport confirming from client
+                isServerWaitingTeleportConfirm = false;
+            }
+            if (isServerWaitingTeleportConfirm)
+            {
+                // Waiting for teleport confirming
+                return;
+            }
             if (Mathf.Abs(timestamp - BaseGameNetworkManager.Singleton.ServerTimestamp) > lagBuffer)
             {
                 // Timestamp is a lot difference to server's timestamp, player might try to hack a game or packet may corrupted occurring, so skip it
@@ -920,6 +944,16 @@ namespace MultiplayerARPG
             float yAngle;
             long timestamp;
             reader.ReadSyncTransformMessage3D(out movementState, out extraMovementState, out position, out yAngle, out timestamp);
+            if (movementState.Has(MovementState.IsTeleport))
+            {
+                // Teleport confirming from client
+                isServerWaitingTeleportConfirm = false;
+            }
+            if (isServerWaitingTeleportConfirm)
+            {
+                // Waiting for teleport confirming
+                return;
+            }
             if (Mathf.Abs(timestamp - BaseGameNetworkManager.Singleton.ServerTimestamp) > lagBuffer)
             {
                 // Timestamp is a lot difference to server's timestamp, player might try to hack a game or packet may corrupted occurring, so skip it
@@ -989,6 +1023,10 @@ namespace MultiplayerARPG
             CacheOpenCharacterController.SetPosition(position, false);
             this.yAngle = targetYAngle = yAngle;
             UpdateRotation();
+            if (IsServer && !IsOwnedByServer)
+                isServerWaitingTeleportConfirm = true;
+            if (!IsServer && IsOwnerClient)
+                isClientConfirmingTeleport = true;
         }
 
 #if UNITY_EDITOR
