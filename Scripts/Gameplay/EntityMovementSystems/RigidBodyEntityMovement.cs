@@ -809,6 +809,7 @@ namespace MultiplayerARPG
                     if (Entity.MovementSecure == MovementSecure.ServerAuthoritative || !IsOwnerClient)
                     {
                         this.yAngle = targetYAngle = yAngle;
+                        UpdateRotation();
                         CacheOpenCharacterController.SetPosition(position, false);
                     }
                     MovementState = movementState;
@@ -887,6 +888,7 @@ namespace MultiplayerARPG
                         else
                         {
                             this.yAngle = targetYAngle = yAngle;
+                            UpdateRotation();
                         }
                     }
                     if (movementState.Has(MovementState.IsJump))
@@ -933,6 +935,7 @@ namespace MultiplayerARPG
                 else
                 {
                     this.yAngle = targetYAngle = yAngle;
+                    UpdateRotation();
                 }
                 MovementState = movementState;
                 ExtraMovementState = extraMovementState;
@@ -985,6 +988,7 @@ namespace MultiplayerARPG
             NavPaths = null;
             CacheOpenCharacterController.SetPosition(position, false);
             this.yAngle = targetYAngle = yAngle;
+            UpdateRotation();
         }
 
 #if UNITY_EDITOR

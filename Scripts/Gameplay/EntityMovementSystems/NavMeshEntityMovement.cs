@@ -410,6 +410,7 @@ namespace MultiplayerARPG
                         else
                         {
                             this.yAngle = targetYAngle = yAngle;
+                            UpdateRotation();
                         }
                     }
                 }
@@ -454,6 +455,7 @@ namespace MultiplayerARPG
                 else
                 {
                     this.yAngle = targetYAngle = yAngle;
+                    UpdateRotation();
                 }
                 MovementState = movementState;
                 ExtraMovementState = extraMovementState;
@@ -505,6 +507,7 @@ namespace MultiplayerARPG
             if (CacheNavMeshAgent.isOnNavMesh)
                 CacheNavMeshAgent.isStopped = true;
             this.yAngle = targetYAngle = yAngle;
+            UpdateRotation();
         }
     }
 }
