@@ -261,7 +261,7 @@ namespace MultiplayerARPG
                         CurrentGameplayRule.ApplyFallDamage(this, lastGroundedPosition);
                     }
                 }
-                lastGrounded = MovementState.Has(MovementState.IsGrounded);
+                lastGrounded = MovementState.Has(MovementState.IsGrounded) || MovementState.Has(MovementState.IsUnderWater);
                 if (lastGrounded)
                     lastGroundedPosition = EntityTransform.position;
             }
