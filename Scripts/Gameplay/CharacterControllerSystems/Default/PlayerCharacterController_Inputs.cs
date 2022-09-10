@@ -212,31 +212,34 @@ namespace MultiplayerARPG
                         IActivatableEntity activatable = targetable as IActivatableEntity;
                         IPickupActivatableEntity pickupActivatable = targetable as IPickupActivatableEntity;
                         IDamageableEntity damageable = targetable as IDamageableEntity;
-                        if (activatable != null && activatable.CanActivate())
+                        if (targetable != null && !targetable.NotBeingSelectedOnClick())
                         {
-                            if (activatable.ShouldBeAttackTarget())
-                                SetTarget(activatable, TargetActionType.Attack);
-                            else
-                                SetTarget(activatable, TargetActionType.ClickActivate);
-                            isFollowingTarget = true;
-                            tempHasMapPosition = false;
-                            break;
+                            if (activatable != null && activatable.CanActivate())
+                            {
+                                if (activatable.ShouldBeAttackTarget())
+                                    SetTarget(activatable, TargetActionType.Attack);
+                                else
+                                    SetTarget(activatable, TargetActionType.ClickActivate);
+                                isFollowingTarget = true;
+                                tempHasMapPosition = false;
+                                break;
+                            }
+                            else if (pickupActivatable != null && pickupActivatable.CanPickupActivate())
+                            {
+                                SetTarget(pickupActivatable, TargetActionType.ClickActivate);
+                                isFollowingTarget = true;
+                                tempHasMapPosition = false;
+                                break;
+                            }
+                            else if (damageable != null && !damageable.IsHideOrDead())
+                            {
+                                SetTarget(damageable, TargetActionType.Attack);
+                                isFollowingTarget = true;
+                                tempHasMapPosition = false;
+                                break;
+                            }
                         }
-                        else if (pickupActivatable != null && pickupActivatable.CanPickupActivate())
-                        {
-                            SetTarget(pickupActivatable, TargetActionType.ClickActivate);
-                            isFollowingTarget = true;
-                            tempHasMapPosition = false;
-                            break;
-                        }
-                        else if (damageable != null && !damageable.IsHideOrDead())
-                        {
-                            SetTarget(damageable, TargetActionType.Attack);
-                            isFollowingTarget = true;
-                            tempHasMapPosition = false;
-                            break;
-                        }
-                        else if (!physicFunctions.GetRaycastIsTrigger(tempCounter))
+                        if (!physicFunctions.GetRaycastIsTrigger(tempCounter))
                         {
                             // Set clicked map position, it will be used if no activating entity found
                             tempHasMapPosition = true;
@@ -310,7 +313,7 @@ namespace MultiplayerARPG
             }
             if (pointClickSetTargetImmediately ||
                 (entity != null && SelectedEntity != null && entity.EntityGameObject == SelectedEntity.EntityGameObject) ||
-                (entity != null && entity.ShouldSetAsTargetInOneClick()))
+                (entity != null && entity.SetAsTargetInOneClick()))
             {
                 this.targetActionType = targetActionType;
                 destination = null;

@@ -270,10 +270,17 @@ namespace MultiplayerARPG
             });
         }
 
-        public bool ShouldSetAsTargetInOneClick()
+        public bool SetAsTargetInOneClick()
         {
             if (BaseActivatableEntity != null)
-                return BaseActivatableEntity.ShouldSetAsTargetInOneClick();
+                return BaseActivatableEntity.SetAsTargetInOneClick();
+            return false;
+        }
+
+        public bool NotBeingSelectedOnClick()
+        {
+            if (BaseActivatableEntity != null)
+                return BaseActivatableEntity.NotBeingSelectedOnClick();
             return false;
         }
 

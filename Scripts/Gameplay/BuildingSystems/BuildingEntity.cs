@@ -44,8 +44,12 @@ namespace MultiplayerARPG
         protected float buildDistance = 5f;
 
         [SerializeField]
-        [Tooltip("If this is value `TRUE`, this entity will be destroyed when its parent building entity was destroyed")]
+        [Tooltip("If this is `TRUE`, this entity will be destroyed when its parent building entity was destroyed")]
         protected bool destroyWhenParentDestroyed = false;
+
+        [SerializeField]
+        [Tooltip("If this is `TRUE`, character will move on it when click on it, not select or set it as target")]
+        protected bool notBeingSelectedOnClick = true;
 
         [SerializeField]
         [Tooltip("Building's max HP. If its HP <= 0, it will be destroyed")]
@@ -527,6 +531,11 @@ namespace MultiplayerARPG
         public bool IsCreator(string playerCharacterId)
         {
             return CreatorId.Equals(playerCharacterId);
+        }
+
+        public override bool NotBeingSelectedOnClick()
+        {
+            return notBeingSelectedOnClick;
         }
 
         public virtual float GetActivatableDistance()

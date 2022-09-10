@@ -345,7 +345,7 @@ namespace MultiplayerARPG
             return itemDropEntity;
         }
 
-        public override bool ShouldSetAsTargetInOneClick()
+        public override bool SetAsTargetInOneClick()
         {
             return true;
         }

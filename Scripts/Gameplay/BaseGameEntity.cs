@@ -911,7 +911,12 @@ namespace MultiplayerARPG
             Teleport(exitPosition, exitRotation);
         }
 
-        public virtual bool ShouldSetAsTargetInOneClick()
+        public virtual bool SetAsTargetInOneClick()
+        {
+            return false;
+        }
+
+        public virtual bool NotBeingSelectedOnClick()
         {
             return false;
         }
