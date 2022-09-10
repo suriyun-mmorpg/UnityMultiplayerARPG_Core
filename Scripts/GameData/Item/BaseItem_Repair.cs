@@ -43,7 +43,8 @@ namespace MultiplayerARPG
             float durabilityRate = durability / maxDurability;
             if (durabilityRate >= 0.99f)
                 return repairPrice;
-            for (int i = 0; i < itemRefine.RepairPrices.Length; ++i)
+            System.Array.Sort(itemRefine.RepairPrices);
+            for (int i = itemRefine.RepairPrices.Length - 1; i >= 0; --i)
             {
                 repairPrice = itemRefine.RepairPrices[i];
                 if (durabilityRate < repairPrice.DurabilityRate)

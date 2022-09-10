@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
 namespace MultiplayerARPG
 {
@@ -120,7 +119,7 @@ namespace MultiplayerARPG
     }
 
     [System.Serializable]
-    public partial struct ItemRepairPrice
+    public partial struct ItemRepairPrice : System.IComparable<ItemRepairPrice>
     {
         [Range(0.01f, 1f)]
         [SerializeField]
@@ -178,6 +177,11 @@ namespace MultiplayerARPG
                 }
             }
             return true;
+        }
+
+        public int CompareTo(ItemRepairPrice other)
+        {
+            return durabilityRate.CompareTo(other.durabilityRate);
         }
     }
 }
