@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
 using UtilsComponents;
-using Cysharp.Threading.Tasks;
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
@@ -260,9 +259,8 @@ namespace MultiplayerARPG
             }
         }
 
-        protected async void SetHiddingObjectsAndRenderers(GameObject[] hiddingObjects, Renderer[] hiddingRenderers, bool isHidding)
+        protected void SetHiddingObjectsAndRenderers(GameObject[] hiddingObjects, Renderer[] hiddingRenderers, bool isHidding)
         {
-            await UniTask.NextFrame();
             int i;
             if (hiddingObjects != null && hiddingObjects.Length > 0)
             {
