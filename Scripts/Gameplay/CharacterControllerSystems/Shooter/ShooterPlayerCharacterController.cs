@@ -439,7 +439,7 @@ namespace MultiplayerARPG
             warpPortalEntityDetector.findWarpPortal = true;
         }
 
-        protected override void Setup(BasePlayerCharacterEntity characterEntity)
+        protected override async void Setup(BasePlayerCharacterEntity characterEntity)
         {
             base.Setup(characterEntity);
             CacheGameplayCameraController.Setup(characterEntity);
@@ -456,6 +456,7 @@ namespace MultiplayerARPG
             if (CacheFpsModel != null)
                 Destroy(CacheFpsModel.gameObject);
             CacheFpsModel = characterEntity.ModelManager.InstantiateFpsModel(CacheGameplayCameraController.CameraTransform);
+            await UniTask.NextFrame();
             characterEntity.ModelManager.SetIsFps(ViewMode == ShooterControllerViewMode.Fps);
             UpdateViewMode();
         }
