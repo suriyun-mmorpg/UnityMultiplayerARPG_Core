@@ -408,6 +408,7 @@ namespace MultiplayerARPG
         protected byte pauseFireInputFrames;
         protected bool isAimming;
         protected bool isCharging;
+        protected bool isAlreadyReloaded;
 
         protected override void Awake()
         {
@@ -1182,7 +1183,7 @@ namespace MultiplayerARPG
             {
                 anyKeyPressed = true;
                 // Reload ammo when press the button
-                Reload();
+                Reload(true);
             }
 
             if (exitVehicleInput.IsPress)
@@ -1232,6 +1233,11 @@ namespace MultiplayerARPG
                         }
                         break;
                 }
+            }
+            else
+            {
+                // Ammo filled, set reloaded state to `FALSE` to make it reload auto-reload later again
+                isAlreadyReloaded = false;
             }
 
             // Update look direction
@@ -1571,8 +1577,10 @@ namespace MultiplayerARPG
             PlayingCharacterEntity.StartCharge(isLeftHand);
         }
 
-        public virtual void Reload()
+        public virtual void Reload(bool forceReload = false)
         {
+            if (!forceReload && isAlreadyReloaded)
+                return;
             if (WeaponAbility != null && WeaponAbility.ShouldDeactivateWhenReload)
                 WeaponAbility.ForceDeactivated();
             // Reload ammo at server
@@ -1580,7 +1588,7 @@ namespace MultiplayerARPG
                 PlayingCharacterEntity.Reload(false);
             else if (!PlayingCharacterEntity.EquipWeapons.leftHand.IsAmmoFull() && PlayingCharacterEntity.EquipWeapons.leftHand.HasAmmoToReload(PlayingCharacterEntity))
                 PlayingCharacterEntity.Reload(true);
-            // TODO: do something to improve performance?
+            isAlreadyReloaded = true;
         }
 
         public virtual void ActivateWeaponAbility()
