@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.Serialization;
 
@@ -459,6 +460,8 @@ namespace MultiplayerARPG
             certainDropItems.Shuffle();
             for (i = 0; i < certainDropItems.Count && randomDropCount < maxDropItems; ++i)
             {
+                if (ExcludeItemFromDropping(certainDropItems[i].item))
+                    continue;
                 onRandomItem.Invoke(certainDropItems[i].item, (short)Random.Range(certainDropItems[i].minAmount <= 0 ? 1 : certainDropItems[i].minAmount, certainDropItems[i].maxAmount));
                 ++randomDropCount;
             }
@@ -471,9 +474,46 @@ namespace MultiplayerARPG
             {
                 if (Random.value >= uncertainDropItems[i].dropRate)
                     continue;
+                if (ExcludeItemFromDropping(uncertainDropItems[i].item))
+                    continue;
                 onRandomItem.Invoke(uncertainDropItems[i].item, (short)Random.Range(uncertainDropItems[i].minAmount <= 0 ? 1 : uncertainDropItems[i].minAmount, uncertainDropItems[i].maxAmount));
                 ++randomDropCount;
             }
+        }
+
+        private bool ExcludeItemFromDropping(BaseItem item)
+        {
+            if (BaseGameNetworkManager.CurrentMapInfo.ExcludeItems.Count > 0 && BaseGameNetworkManager.CurrentMapInfo.ExcludeItems.Contains(item))
+                return true;
+            if (BaseGameNetworkManager.CurrentMapInfo.ExcludeAmmoTypes.Count > 0 && item.IsAmmo() && BaseGameNetworkManager.CurrentMapInfo.ExcludeAmmoTypes.Contains((item as IAmmoItem).AmmoType))
+                return true;
+            if (BaseGameNetworkManager.CurrentMapInfo.ExcludeArmorTypes.Count > 0 && item.IsArmor() && BaseGameNetworkManager.CurrentMapInfo.ExcludeArmorTypes.Contains((item as IArmorItem).ArmorType))
+                return true;
+            if (BaseGameNetworkManager.CurrentMapInfo.ExcludeWeaponTypes.Count > 0 && item.IsWeapon() && BaseGameNetworkManager.CurrentMapInfo.ExcludeWeaponTypes.Contains((item as IWeaponItem).WeaponType))
+                return true;
+            if (BaseGameNetworkManager.CurrentMapInfo.ExcludeJunk && item.IsJunk())
+                return true;
+            if (BaseGameNetworkManager.CurrentMapInfo.ExcludeArmor && item.IsArmor())
+                return true;
+            if (BaseGameNetworkManager.CurrentMapInfo.ExcludeShield && item.IsShield())
+                return true;
+            if (BaseGameNetworkManager.CurrentMapInfo.ExcludeWeapon && item.IsWeapon())
+                return true;
+            if (BaseGameNetworkManager.CurrentMapInfo.ExcludePotion && item.IsPotion())
+                return true;
+            if (BaseGameNetworkManager.CurrentMapInfo.ExcludeAmmo && item.IsAmmo())
+                return true;
+            if (BaseGameNetworkManager.CurrentMapInfo.ExcludeBuilding && item.IsBuilding())
+                return true;
+            if (BaseGameNetworkManager.CurrentMapInfo.ExcludePet && item.IsPet())
+                return true;
+            if (BaseGameNetworkManager.CurrentMapInfo.ExcludeSocketEnhancer && item.IsSocketEnhancer())
+                return true;
+            if (BaseGameNetworkManager.CurrentMapInfo.ExcludeMount && item.IsMount())
+                return true;
+            if (BaseGameNetworkManager.CurrentMapInfo.ExcludeSkill && item.IsSkill())
+                return true;
+            return false;
         }
 
         public virtual CurrencyAmount[] RandomCurrencies()
