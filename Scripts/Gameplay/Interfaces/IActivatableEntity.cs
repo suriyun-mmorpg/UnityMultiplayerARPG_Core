@@ -12,7 +12,14 @@ namespace MultiplayerARPG
         /// </summary>
         /// <returns></returns>
         bool ShouldNotActivateAfterFollowed();
+        /// <summary>
+        /// Can activate or not? return `TRUE` if it can.
+        /// </summary>
+        /// <returns></returns>
         bool CanActivate();
+        /// <summary>
+        /// Put anything you want to do when interact the object.
+        /// </summary>
         void OnActivate();
     }
 }

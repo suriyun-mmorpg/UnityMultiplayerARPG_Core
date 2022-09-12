@@ -12,12 +12,12 @@ namespace MultiplayerARPG
         private UnityScene scene = default(UnityScene);
         public virtual UnityScene Scene { get { return scene; } }
 
-        [Tooltip("This will be used when new character has been created, and this map data is the start map")]
+        [Tooltip("This will be used when new character has been created to set its position, and this map data is the start map")]
         [SerializeField]
         private Vector3 startPosition = Vector3.zero;
         public virtual Vector3 StartPosition { get { return startPosition; } }
 
-        [Tooltip("This will be used when new character has been created, and this map data is the start map")]
+        [Tooltip("This will be used when new character has been created to set its rotation, and this map data is the start map")]
         [SerializeField]
         private Vector3 startRotation = Vector3.zero;
         public virtual Vector3 StartRotation { get { return startRotation; } }
@@ -48,62 +48,77 @@ namespace MultiplayerARPG
 
         #region Item Drop Rules
         [Category("Item Drop Rules")]
+        [Tooltip("These items will be excluded when monster dropping items")]
         [SerializeField]
         private List<BaseItem> excludeItems = new List<BaseItem>();
         public List<BaseItem> ExcludeItems { get { return excludeItems; } }
 
+        [Tooltip("Items with these ammo types will be excluded when monster dropping items")]
         [SerializeField]
         private List<AmmoType> excludeAmmoTypes = new List<AmmoType>();
         public List<AmmoType> ExcludeAmmoTypes { get { return excludeAmmoTypes; } }
 
+        [Tooltip("Items with these armor types will be excluded when monster dropping items")]
         [SerializeField]
         private List<ArmorType> excludeArmorTypes = new List<ArmorType>();
         public List<ArmorType> ExcludeArmorTypes { get { return excludeArmorTypes; } }
 
+        [Tooltip("Items with these weapon types will be excluded when monster dropping items")]
         [SerializeField]
         private List<WeaponType> excludeWeaponTypes = new List<WeaponType>();
         public List<WeaponType> ExcludeWeaponTypes { get { return excludeWeaponTypes; } }
 
+        [Tooltip("Junk items will be excluded when monster dropping items or not?")]
         [SerializeField]
         private bool excludeJunk = false;
         public bool ExcludeJunk { get { return excludeJunk; } }
 
+        [Tooltip("Armor items will be excluded when monster dropping items or not?")]
         [SerializeField]
         private bool excludeArmor = false;
         public bool ExcludeArmor { get { return excludeArmor; } }
 
+        [Tooltip("Shield items will be excluded when monster dropping items or not?")]
         [SerializeField]
         private bool excludeShield = false;
         public bool ExcludeShield { get { return excludeShield; } }
 
+        [Tooltip("Weapon items will be excluded when monster dropping items or not?")]
         [SerializeField]
         private bool excludeWeapon = false;
         public bool ExcludeWeapon { get { return excludeWeapon; } }
 
+        [Tooltip("Potion items will be excluded when monster dropping items or not?")]
         [SerializeField]
         private bool excludePotion = false;
         public bool ExcludePotion { get { return excludePotion; } }
 
+        [Tooltip("Ammo items will be excluded when monster dropping items or not?")]
         [SerializeField]
         private bool excludeAmmo = false;
         public bool ExcludeAmmo { get { return excludeAmmo; } }
 
+        [Tooltip("Building items will be excluded when monster dropping items or not?")]
         [SerializeField]
         private bool excludeBuilding = false;
         public bool ExcludeBuilding { get { return excludeBuilding; } }
 
+        [Tooltip("Pet items will be excluded when monster dropping items or not?")]
         [SerializeField]
         private bool excludePet = false;
         public bool ExcludePet { get { return excludePet; } }
 
+        [Tooltip("Socket enhancer items will be excluded when monster dropping items or not?")]
         [SerializeField]
         private bool excludeSocketEnhancer = false;
         public bool ExcludeSocketEnhancer { get { return excludeSocketEnhancer; } }
 
+        [Tooltip("Mount items will be excluded when monster dropping items or not?")]
         [SerializeField]
         private bool excludeMount = false;
         public bool ExcludeMount { get { return excludeMount; } }
 
+        [Tooltip("Skill items will be excluded when monster dropping items or not?")]
         [SerializeField]
         private bool excludeSkill = false;
         public bool ExcludeSkill { get { return excludeSkill; } }
