@@ -9,6 +9,7 @@ namespace MultiplayerARPG
         public CharacterStats statsIncreaseEachLevel;
         [Tooltip("If this value more than 0 it will limit max amount of this attribute by this value")]
         public short maxAmount;
+        public bool cannotReset = false;
 
         public bool CanIncreaseAmount(IPlayerCharacterData character, short amount, out UITextKeys gameMessage, bool checkStatPoint = true)
         {

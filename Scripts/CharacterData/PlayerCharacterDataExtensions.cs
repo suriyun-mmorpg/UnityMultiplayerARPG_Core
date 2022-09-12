@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Runtime.Serialization;
 using System.Runtime.Serialization.Formatters.Binary;
+using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 
 namespace MultiplayerARPG
@@ -809,13 +810,17 @@ namespace MultiplayerARPG
             }
 
             int countStatPoint = 0;
+            Attribute attribute;
             CharacterAttribute characterAttribute;
-            for (int i = 0; i < characterData.Attributes.Count; ++i)
+            for (int i = characterData.Attributes.Count - 1; i >= 0 ; --i)
             {
                 characterAttribute = characterData.Attributes[i];
+                attribute = characterAttribute.GetAttribute();
+                if (attribute.cannotReset)
+                    continue;
                 countStatPoint += characterAttribute.amount;
+                characterData.Attributes.RemoveAt(i);
             }
-            characterData.Attributes.Clear();
             characterData.StatPoint += countStatPoint;
             return true;
         }
@@ -878,16 +883,18 @@ namespace MultiplayerARPG
             short countSkillPoint = 0;
             BaseSkill skill;
             CharacterSkill characterSkill;
-            for (int i = 0; i < characterData.Skills.Count; ++i)
+            for (int i = characterData.Skills.Count - 1; i >= 0 ; --i)
             {
                 characterSkill = characterData.Skills[i];
                 skill = characterSkill.GetSkill();
+                if (skill.cannotReset)
+                    continue;
                 for (short j = 0; j < characterSkill.level; ++j)
                 {
                     countSkillPoint += (short)Mathf.CeilToInt(skill.GetRequireCharacterSkillPoint(j));
                 }
+                characterData.Skills.RemoveAt(i);
             }
-            characterData.Skills.Clear();
             characterData.SkillPoint += countSkillPoint;
             return true;
         }

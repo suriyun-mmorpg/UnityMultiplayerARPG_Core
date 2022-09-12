@@ -13,6 +13,7 @@ namespace MultiplayerARPG
         [Category("Skill Settings")]
         [Range(1, 100)]
         public short maxLevel = 1;
+        public bool cannotReset = false;
 
         [Category(2, "Activation Settings")]
         [Range(0f, 1f)]
