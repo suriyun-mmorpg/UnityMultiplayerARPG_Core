@@ -1,6 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
 namespace MultiplayerARPG
 {
@@ -21,7 +19,19 @@ namespace MultiplayerARPG
 
             if (controller != null)
             {
-                canActivate = controller.ItemDropEntityDetector.itemDrops.Count > 0;
+                if (controller.ItemDropEntityDetector.pickupActivatableEntities.Count > 0)
+                {
+                    IPickupActivatableEntity pickupActivatable;
+                    for (int i = 0; i < controller.ItemDropEntityDetector.pickupActivatableEntities.Count; ++i)
+                    {
+                        pickupActivatable = controller.ItemDropEntityDetector.pickupActivatableEntities[i];
+                        if (pickupActivatable.CanPickupActivate())
+                        {
+                            canActivate = true;
+                            break;
+                        }
+                    }
+                }
             }
 
             if (shooterController != null && shooterController.SelectedGameEntity != null)

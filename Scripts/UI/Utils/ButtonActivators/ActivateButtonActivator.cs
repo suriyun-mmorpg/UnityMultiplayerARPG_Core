@@ -19,11 +19,20 @@ namespace MultiplayerARPG
 
             if (controller != null)
             {
-                canActivate = controller.ActivatableEntityDetector.players.Count > 0 ||
-                    controller.ActivatableEntityDetector.npcs.Count > 0 ||
-                    controller.ActivatableEntityDetector.buildings.Count > 0;
+                if (controller.ActivatableEntityDetector.activatableEntities.Count > 0)
+                {
+                    IActivatableEntity activatable;
+                    for (int i = 0; i < controller.ActivatableEntityDetector.activatableEntities.Count; ++i)
+                    {
+                        activatable = controller.ActivatableEntityDetector.activatableEntities[i];
+                        if (activatable.CanActivate())
+                        {
+                            canActivate = true;
+                            break;
+                        }
+                    }
+                }
             }
-
 
             if (shooterController != null && shooterController.SelectedGameEntity != null)
             {
