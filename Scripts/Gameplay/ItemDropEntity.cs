@@ -99,12 +99,23 @@ namespace MultiplayerARPG
             }
         }
 
-        public Transform CacheModelContainer
+        private bool isModelContainerValidated = false;
+        public Transform ModelContainer
         {
             get
             {
-                if (modelContainer == null)
-                    modelContainer = transform;
+                if (!isModelContainerValidated)
+                {
+                    if (modelContainer == null || modelContainer == transform)
+                    {
+                        modelContainer = new GameObject("_ModelContainer").transform;
+                        modelContainer.transform.SetParent(transform);
+                        modelContainer.transform.localPosition = Vector3.zero;
+                        modelContainer.transform.localRotation = Quaternion.identity;
+                        modelContainer.transform.localScale = Vector3.one;
+                    }
+                    isModelContainerValidated = true;
+                }
                 return modelContainer;
             }
         }
@@ -142,13 +153,13 @@ namespace MultiplayerARPG
             base.EntityAwake();
             gameObject.tag = CurrentGameInstance.itemDropTag;
             gameObject.layer = CurrentGameInstance.itemDropLayer;
-            CacheModelContainer.gameObject.SetActive(false);
+            ModelContainer.gameObject.SetActive(false);
         }
 
         protected override void EntityOnDisable()
         {
             base.EntityOnDisable();
-            CacheModelContainer.gameObject.SetActive(false);
+            ModelContainer.gameObject.SetActive(false);
         }
 
         protected virtual void InitDropItems()
@@ -178,8 +189,7 @@ namespace MultiplayerARPG
                     }
                 }
             }
-            if (DropItems == null || DropItems.Count == 0 ||
-                !GameInstance.Items.ContainsKey(DropItems[0].dataId))
+            if (DropItems == null || DropItems.Count == 0)
             {
                 NetworkDestroy(1f);
                 return;
@@ -244,13 +254,13 @@ namespace MultiplayerARPG
             if (!IsClient)
                 return;
             // Activate container to show item drop model
-            CacheModelContainer.gameObject.SetActive(true);
+            ModelContainer.gameObject.SetActive(true);
             if (dropModel != null)
                 Destroy(dropModel);
             BaseItem item;
             if (itemDropData.putOnPlaceholder && GameInstance.Items.TryGetValue(itemDropData.dataId, out item) && item.DropModel != null)
             {
-                dropModel = Instantiate(item.DropModel, CacheModelContainer);
+                dropModel = Instantiate(item.DropModel, ModelContainer);
                 dropModel.gameObject.SetLayerRecursively(CurrentGameInstance.itemDropLayer, true);
                 dropModel.gameObject.SetActive(true);
                 dropModel.RemoveComponentsInChildren<Collider>(false);
