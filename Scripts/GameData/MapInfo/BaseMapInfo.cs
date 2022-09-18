@@ -30,6 +30,11 @@ namespace MultiplayerARPG
         private float deadY = -100f;
         public virtual float DeadY { get { return deadY; } }
 
+        [Tooltip("If this is `TRUE`, dealing feature will be disabled, all players in this map won't be able to deal items to each other")]
+        [SerializeField]
+        private bool disableDealing = false;
+        public virtual bool DisableDealing { get { return disableDealing; } }
+
         [Tooltip("When character dead, it will drop equipping weapons or not?")]
         [SerializeField]
         private bool playerDeadDropsEquipWeapons = false;

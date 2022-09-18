@@ -82,7 +82,7 @@ namespace MultiplayerARPG
         {
             get
             {
-                return CurrentGameInstance.disableDealing;
+                return CurrentGameInstance.disableDealing || BaseGameNetworkManager.CurrentMapInfo.DisableDealing;
             }
         }
 
