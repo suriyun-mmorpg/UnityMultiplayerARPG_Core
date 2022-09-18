@@ -17,7 +17,7 @@ namespace MultiplayerARPG
         [ServerRpc]
         protected void ServerConstructBuilding(short itemIndex, Vector3 position, Quaternion rotation, uint parentObjectId)
         {
-#if !CLIENT_BUILD
+#if UNITY_SERVER || !MMO_BUILD
             if (!Entity.CanDoActions() ||
                 itemIndex >= Entity.NonEquipItems.Count)
                 return;
@@ -63,7 +63,7 @@ namespace MultiplayerARPG
         [ServerRpc]
         protected void ServerDestroyBuilding(uint objectId)
         {
-#if !CLIENT_BUILD
+#if UNITY_SERVER || !MMO_BUILD
             if (!Entity.CanDoActions())
                 return;
 
@@ -104,7 +104,7 @@ namespace MultiplayerARPG
         [ServerRpc]
         protected void ServerOpenDoor(uint objectId, string password)
         {
-#if !CLIENT_BUILD
+#if UNITY_SERVER || !MMO_BUILD
             if (!Entity.CanDoActions())
                 return;
 
@@ -145,7 +145,7 @@ namespace MultiplayerARPG
         [ServerRpc]
         protected void ServerCloseDoor(uint objectId)
         {
-#if !CLIENT_BUILD
+#if UNITY_SERVER || !MMO_BUILD
             if (!Entity.CanDoActions())
                 return;
 
@@ -180,7 +180,7 @@ namespace MultiplayerARPG
         [ServerRpc]
         protected void ServerTurnOnCampFire(uint objectId)
         {
-#if !CLIENT_BUILD
+#if UNITY_SERVER || !MMO_BUILD
             if (!Entity.CanDoActions())
                 return;
 
@@ -215,7 +215,7 @@ namespace MultiplayerARPG
         [ServerRpc]
         protected void ServerTurnOffCampFire(uint objectId)
         {
-#if !CLIENT_BUILD
+#if UNITY_SERVER || !MMO_BUILD
             if (!Entity.CanDoActions())
                 return;
 
@@ -245,7 +245,7 @@ namespace MultiplayerARPG
         [ServerRpc]
         protected void ServerCraftItemByWorkbench(uint objectId, int dataId)
         {
-#if !CLIENT_BUILD
+#if UNITY_SERVER || !MMO_BUILD
             if (!Entity.CanDoActions())
                 return;
 
@@ -280,7 +280,7 @@ namespace MultiplayerARPG
         [ServerRpc]
         protected void ServerSetBuildingPassword(uint objectId, string password)
         {
-#if !CLIENT_BUILD
+#if UNITY_SERVER || !MMO_BUILD
             if (!Entity.CanDoActions())
                 return;
 
@@ -328,7 +328,7 @@ namespace MultiplayerARPG
         [ServerRpc]
         protected void ServerLockBuilding(uint objectId)
         {
-#if !CLIENT_BUILD
+#if UNITY_SERVER || !MMO_BUILD
             if (!Entity.CanDoActions())
                 return;
 
@@ -375,7 +375,7 @@ namespace MultiplayerARPG
         [ServerRpc]
         protected void ServerUnlockBuilding(uint objectId)
         {
-#if !CLIENT_BUILD
+#if UNITY_SERVER || !MMO_BUILD
             if (!Entity.CanDoActions())
                 return;
 

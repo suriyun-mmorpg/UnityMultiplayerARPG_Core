@@ -11,7 +11,7 @@ namespace MultiplayerARPG
         [ServerRpc]
         protected void ServerUseItem(short itemIndex)
         {
-#if !CLIENT_BUILD
+#if UNITY_SERVER || !MMO_BUILD
             if (!CanUseItem())
                 return;
 

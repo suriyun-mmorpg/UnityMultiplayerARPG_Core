@@ -495,7 +495,7 @@ namespace MultiplayerARPG
 
         protected void ProceedUseSkillStateAtServer(byte simulateSeed, int dataId, bool isLeftHand, uint targetObjectId, AimPosition aimPosition)
         {
-#if !CLIENT_BUILD
+#if UNITY_SERVER || !MMO_BUILD
             // Speed hack avoidance
             if (Time.unscaledTime - LastUseSkillEndTime < -0.05f)
                 return;
@@ -551,7 +551,7 @@ namespace MultiplayerARPG
 
         protected void ProceedUseSkillItemStateAtServer(byte simulateSeed, short itemIndex, bool isLeftHand, uint targetObjectId, AimPosition aimPosition)
         {
-#if !CLIENT_BUILD
+#if UNITY_SERVER || !MMO_BUILD
             // Speed hack avoidance
             if (Time.unscaledTime - LastUseSkillEndTime < -0.05f)
                 return;

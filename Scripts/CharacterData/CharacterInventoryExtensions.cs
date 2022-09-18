@@ -782,7 +782,7 @@ namespace MultiplayerARPG
 
         public static bool DismantleItem(this IPlayerCharacterData character, short index, short amount, out UITextKeys gameMessage)
         {
-#if !CLIENT_BUILD
+#if UNITY_SERVER || !MMO_BUILD
             int returningGold;
             List<ItemAmount> returningItems;
             List<CurrencyAmount> returningCurrencies;
@@ -804,7 +804,7 @@ namespace MultiplayerARPG
 
         public static bool DismantleItems(this IPlayerCharacterData character, short[] selectedIndexes, out UITextKeys gameMessage)
         {
-#if !CLIENT_BUILD
+#if UNITY_SERVER || !MMO_BUILD
             gameMessage = UITextKeys.NONE;
             List<short> indexes = new List<short>(selectedIndexes);
             indexes.Sort();
@@ -853,7 +853,7 @@ namespace MultiplayerARPG
 
         public static bool RefineItem(this IPlayerCharacterData character, InventoryType inventoryType, short index, out UITextKeys gameMessage)
         {
-#if !CLIENT_BUILD
+#if UNITY_SERVER || !MMO_BUILD
             switch (inventoryType)
             {
                 case InventoryType.NonEquipItems:
@@ -875,7 +875,7 @@ namespace MultiplayerARPG
 
         public static bool EnhanceSocketItem(this IPlayerCharacterData character, InventoryType inventoryType, short index, int enhancerId, short socketIndex, out UITextKeys gameMessage)
         {
-#if !CLIENT_BUILD
+#if UNITY_SERVER || !MMO_BUILD
             switch (inventoryType)
             {
                 case InventoryType.NonEquipItems:
@@ -897,7 +897,7 @@ namespace MultiplayerARPG
 
         public static bool RemoveEnhancerFromItem(this IPlayerCharacterData character, InventoryType inventoryType, short index, short socketIndex, out UITextKeys gameMessage)
         {
-#if !CLIENT_BUILD
+#if UNITY_SERVER || !MMO_BUILD
             if (!GameInstance.Singleton.enhancerRemoval.CanRemove(character, out gameMessage))
                 return false;
             bool returnEnhancer = GameInstance.Singleton.enhancerRemoval.ReturnEnhancerItem;
@@ -922,7 +922,7 @@ namespace MultiplayerARPG
 
         public static bool RepairItem(this IPlayerCharacterData character, InventoryType inventoryType, short index, out UITextKeys gameMessage)
         {
-#if !CLIENT_BUILD
+#if UNITY_SERVER || !MMO_BUILD
             switch (inventoryType)
             {
                 case InventoryType.NonEquipItems:
@@ -944,7 +944,7 @@ namespace MultiplayerARPG
 
         public static bool RepairEquipItems(this IPlayerCharacterData character, out UITextKeys gameMessage)
         {
-#if !CLIENT_BUILD
+#if UNITY_SERVER || !MMO_BUILD
             bool success = false;
             BaseItem.RepairRightHandItem(character, out gameMessage);
             success = success || gameMessage == UITextKeys.UI_REPAIR_SUCCESS;
@@ -970,7 +970,7 @@ namespace MultiplayerARPG
 
         public static bool SellItem(this IPlayerCharacterData character, short index, short amount, out UITextKeys gameMessage)
         {
-#if !CLIENT_BUILD
+#if UNITY_SERVER || !MMO_BUILD
             if (index < 0 || index >= character.NonEquipItems.Count)
             {
                 gameMessage = UITextKeys.UI_ERROR_INVALID_ITEM_INDEX;
@@ -1002,7 +1002,7 @@ namespace MultiplayerARPG
 
         public static bool SellItems(this IPlayerCharacterData character, short[] selectedIndexes, out UITextKeys gameMessage)
         {
-#if !CLIENT_BUILD
+#if UNITY_SERVER || !MMO_BUILD
             List<short> indexes = new List<short>(selectedIndexes);
             indexes.Sort();
             short tempIndex;
