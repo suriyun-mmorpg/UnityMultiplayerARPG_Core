@@ -78,6 +78,14 @@ namespace MultiplayerARPG
         public event System.Action<DealingCharacterItems> onUpdateAnotherDealingItems;
         public float dealingCharacterTime { get; private set; }
 
+        public bool DisableDealing
+        {
+            get
+            {
+                return CurrentGameInstance.disableDealing;
+            }
+        }
+
         public bool ExchangingDealingItemsWillOverwhelming()
         {
             if (DealingCharacter == null)
@@ -174,6 +182,11 @@ namespace MultiplayerARPG
         protected void ServerSendDealingRequest(uint objectId)
         {
 #if UNITY_EDITOR || UNITY_SERVER || !MMO_BUILD
+            if (DisableDealing)
+            {
+                // Dealing is disabled
+                return;
+            }
             BasePlayerCharacterEntity targetCharacterEntity;
             if (!Manager.TryGetEntityByObjectId(objectId, out targetCharacterEntity))
             {

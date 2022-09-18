@@ -255,6 +255,8 @@ namespace MultiplayerARPG
         public bool canPickupItemsWhichDropsByPlayersImmediately = false;
         [Tooltip("If dealing request does not accepted within this duration, the request will be cancelled")]
         public float dealingRequestDuration = 5f;
+        [Tooltip("If this is `TRUE`, dealing feature will be disabled, all players won't be able to deal items to each other")]
+        public bool disableDealing = false;
         [Tooltip("This is a distance that allows a player to pick up an item")]
         public float pickUpItemDistance = 1f;
         [Tooltip("This is a distance that random drop item around a player")]
