@@ -59,7 +59,7 @@ namespace MultiplayerARPG
         [ServerRpc]
         protected void ServerNpcActivate(uint objectId)
         {
-#if UNITY_SERVER || !MMO_BUILD
+#if UNITY_EDITOR || UNITY_SERVER || !MMO_BUILD
             if (!Entity.CanDoActions())
                 return;
 
@@ -230,7 +230,7 @@ namespace MultiplayerARPG
         [ServerRpc]
         protected void ServerSelectNpcDialogMenu(byte menuIndex)
         {
-#if UNITY_SERVER || !MMO_BUILD
+#if UNITY_EDITOR || UNITY_SERVER || !MMO_BUILD
             if (CurrentNpcDialog == null)
                 return;
 
@@ -257,7 +257,7 @@ namespace MultiplayerARPG
         [ServerRpc]
         protected void ServerHideNpcDialog()
         {
-#if UNITY_SERVER || !MMO_BUILD
+#if UNITY_EDITOR || UNITY_SERVER || !MMO_BUILD
             ClearNpcDialogData();
             CallOwnerShowNpcDialog(0);
 #endif
@@ -274,7 +274,7 @@ namespace MultiplayerARPG
         [ServerRpc]
         protected void ServerBuyNpcItem(short index, short amount)
         {
-#if UNITY_SERVER || !MMO_BUILD
+#if UNITY_EDITOR || UNITY_SERVER || !MMO_BUILD
             // Dialog must be built-in shop dialog
             NpcDialog dialog;
             if (!AccessingNpcShopDialog(out dialog))
@@ -322,7 +322,7 @@ namespace MultiplayerARPG
         [ServerRpc]
         protected void ServerSelectQuestRewardItem(byte index)
         {
-#if UNITY_SERVER || !MMO_BUILD
+#if UNITY_EDITOR || UNITY_SERVER || !MMO_BUILD
             if (CompletingQuest == null)
                 return;
 

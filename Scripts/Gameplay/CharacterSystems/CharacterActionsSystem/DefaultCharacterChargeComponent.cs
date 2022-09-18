@@ -156,7 +156,7 @@ namespace MultiplayerARPG
 
         protected void ProceedStartChargeStateAtServer(bool isLeftHand)
         {
-#if UNITY_SERVER || !MMO_BUILD
+#if UNITY_EDITOR || UNITY_SERVER || !MMO_BUILD
             // Start charge at server immediately
             PlayChargeAnimation(isLeftHand);
             // Tell clients to start charge later
@@ -183,7 +183,7 @@ namespace MultiplayerARPG
 
         protected void ProceedStopChargeStateAtServer()
         {
-#if UNITY_SERVER || !MMO_BUILD
+#if UNITY_EDITOR || UNITY_SERVER || !MMO_BUILD
             // Stop charge at server immediately
             StopChargeAnimation();
             // Tell clients to stop charge later

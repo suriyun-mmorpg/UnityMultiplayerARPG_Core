@@ -12,7 +12,7 @@ namespace MultiplayerARPG
         [ServerRpc]
         protected virtual void ServerPickupItem(uint objectId)
         {
-#if UNITY_SERVER || !MMO_BUILD
+#if UNITY_EDITOR || UNITY_SERVER || !MMO_BUILD
             if (!CanDoActions())
                 return;
 
@@ -58,7 +58,7 @@ namespace MultiplayerARPG
         [ServerRpc]
         protected virtual void ServerPickupItemFromContainer(uint objectId, int itemsContainerIndex, short amount)
         {
-#if UNITY_SERVER || !MMO_BUILD
+#if UNITY_EDITOR || UNITY_SERVER || !MMO_BUILD
             if (!CanDoActions())
                 return;
 
@@ -111,7 +111,7 @@ namespace MultiplayerARPG
         [ServerRpc]
         protected virtual void ServerPickupAllItemsFromContainer(uint objectId)
         {
-#if UNITY_SERVER || !MMO_BUILD
+#if UNITY_EDITOR || UNITY_SERVER || !MMO_BUILD
             if (!CanDoActions())
                 return;
 
@@ -160,7 +160,7 @@ namespace MultiplayerARPG
         [ServerRpc]
         protected virtual void ServerPickupNearbyItems()
         {
-#if UNITY_SERVER || !MMO_BUILD
+#if UNITY_EDITOR || UNITY_SERVER || !MMO_BUILD
             if (!CanDoActions())
                 return;
             List<ItemDropEntity> itemDropEntities = FindGameEntitiesInDistance<ItemDropEntity>(CurrentGameInstance.pickUpItemDistance, CurrentGameInstance.itemDropLayer.Mask);
@@ -179,7 +179,7 @@ namespace MultiplayerARPG
         [ServerRpc]
         protected virtual void ServerDropItem(short index, short amount)
         {
-#if UNITY_SERVER || !MMO_BUILD
+#if UNITY_EDITOR || UNITY_SERVER || !MMO_BUILD
             if (!CanDoActions() ||
                 index >= nonEquipItems.Count)
                 return;
@@ -242,7 +242,7 @@ namespace MultiplayerARPG
         [ServerRpc]
         protected virtual void ServerUnSummon(uint objectId)
         {
-#if UNITY_SERVER || !MMO_BUILD
+#if UNITY_EDITOR || UNITY_SERVER || !MMO_BUILD
             int index = this.IndexOfSummon(objectId);
             if (index < 0)
                 return;

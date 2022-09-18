@@ -196,7 +196,7 @@ namespace MultiplayerARPG
 
         private void ProceedReloadStateAtServer(bool isLeftHand)
         {
-#if UNITY_SERVER || !MMO_BUILD
+#if UNITY_EDITOR || UNITY_SERVER || !MMO_BUILD
             if (!Entity.CanDoActions())
                 return;
             // Get weapon to reload
