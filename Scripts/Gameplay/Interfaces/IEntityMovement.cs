@@ -1,5 +1,4 @@
-﻿using LiteNetLib.Utils;
-using UnityEngine;
+﻿using UnityEngine;
 
 namespace MultiplayerARPG
 {
@@ -21,25 +20,5 @@ namespace MultiplayerARPG
         float GetSmoothTurnSpeed();
         void Teleport(Vector3 position, Quaternion rotation);
         bool FindGroundedPosition(Vector3 fromPosition, float findDistance, out Vector3 result);
-    }
-
-    public interface IEntityMovementComponent : IEntityMovement, IGameEntityComponent
-    {
-        /// <summary>
-        /// Return `TRUE` if it have something written
-        /// </summary>
-        /// <param name="writer"></param>
-        /// <param name="shouldSendReliably"></param>
-        /// <returns></returns>
-        bool WriteClientState(NetDataWriter writer, out bool shouldSendReliably);
-        /// <summary>
-        /// Return `TRUE` if it have something written
-        /// </summary>
-        /// <param name="writer"></param>
-        /// <param name="shouldSendReliably"></param>
-        /// <returns></returns>
-        bool WriteServerState(NetDataWriter writer, out bool shouldSendReliably);
-        void ReadClientStateAtServer(NetDataReader reader);
-        void ReadServerStateAtClient(NetDataReader reader);
     }
 }
