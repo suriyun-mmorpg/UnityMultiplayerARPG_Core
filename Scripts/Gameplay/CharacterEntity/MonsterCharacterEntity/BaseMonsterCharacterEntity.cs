@@ -75,6 +75,11 @@ namespace MultiplayerARPG
             get { return SummonType != SummonType.None; }
         }
 
+        public bool IsSummonedAndSummonerExisted
+        {
+            get { return IsSummoned && Summoner != null; }
+        }
+
         public GameSpawnArea<BaseMonsterCharacterEntity> SpawnArea { get; protected set; }
 
         public BaseMonsterCharacterEntity SpawnPrefab { get; protected set; }
@@ -302,10 +307,9 @@ namespace MultiplayerARPG
             if (instigator.TryGetEntity(out attackerCharacter))
             {
                 // If summoned by someone, summoner is attacker
-                if (attackerCharacter != null &&
-                    attackerCharacter is BaseMonsterCharacterEntity &&
-                    (attackerCharacter as BaseMonsterCharacterEntity).IsSummoned)
-                    attackerCharacter = (attackerCharacter as BaseMonsterCharacterEntity).Summoner;
+                BaseMonsterCharacterEntity monsterCharacterEntity = attackerCharacter as BaseMonsterCharacterEntity;
+                if (monsterCharacterEntity != null && monsterCharacterEntity.IsSummonedAndSummonerExisted)
+                    attackerCharacter = monsterCharacterEntity.Summoner;
 
                 // Add received damage entry
                 if (attackerCharacter != null)

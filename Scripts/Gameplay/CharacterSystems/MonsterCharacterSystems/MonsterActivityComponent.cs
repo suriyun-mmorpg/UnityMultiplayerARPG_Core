@@ -443,7 +443,7 @@ namespace MultiplayerARPG
 
                 // If no target enenmy or target enemy is dead, Find nearby character by layer mask
                 enemies.Clear();
-                if (Entity.IsSummoned)
+                if (Entity.IsSummonedAndSummonerExisted)
                 {
                     // Find enemy around summoner
                     enemies.AddRange(Entity.FindAliveCharacters<BaseCharacterEntity>(
@@ -451,7 +451,7 @@ namespace MultiplayerARPG
                         CharacterDatabase.SummonedVisualRange,
                         false, /* Don't find an allies */
                         true,  /* Always find an enemies */
-                        Entity.IsSummoned && IsAggressiveWhileSummonerIdle() /* Find enemy while summoned and aggresively */));
+                        IsAggressiveWhileSummonerIdle() /* Find enemy while summoned and aggresively */));
                 }
                 else
                 {
@@ -459,7 +459,7 @@ namespace MultiplayerARPG
                         CharacterDatabase.VisualRange,
                         false, /* Don't find an allies */
                         true,  /* Always find an enemies */
-                        Entity.IsSummoned && IsAggressiveWhileSummonerIdle() /* Find enemy while summoned and aggresively */));
+                        false  /* Don't find an neutral */));
                 }
 
                 for (int i = enemies.Count - 1; i >= 0; --i)
