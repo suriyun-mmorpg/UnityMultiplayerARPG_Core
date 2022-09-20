@@ -5,7 +5,7 @@ namespace MultiplayerARPG
 {
     public class NavMeshEntityMovementFactory : IEntityMovementFactory
     {
-        public string Name => "Nav Mesh Entity Movement Factory";
+        public string Name => "Nav Mesh Entity Movement";
 
         public DimensionType DimensionType => DimensionType.Dimension3D;
 
