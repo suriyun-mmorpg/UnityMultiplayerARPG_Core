@@ -106,7 +106,7 @@ namespace MultiplayerARPG
 
             base.Killed(lastAttacker);
 
-#if UNITY_EDITOR || UNITY_SERVER || !MMO_BUILD
+#if UNITY_EDITOR || UNITY_SERVER
             if (BaseGameNetworkManager.CurrentMapInfo.AutoRespawnWhenDead)
                 GameInstance.ServerCharacterHandlers.Respawn(0, this);
 #endif

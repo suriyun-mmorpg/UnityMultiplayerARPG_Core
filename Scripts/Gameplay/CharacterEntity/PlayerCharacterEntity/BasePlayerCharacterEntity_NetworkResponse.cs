@@ -7,7 +7,7 @@ namespace MultiplayerARPG
         [ServerRpc]
         protected void ServerUseGuildSkill(int dataId)
         {
-#if UNITY_EDITOR || UNITY_SERVER || !MMO_BUILD
+#if UNITY_EDITOR || UNITY_SERVER
             if (this.IsDead())
                 return;
 
@@ -57,7 +57,7 @@ namespace MultiplayerARPG
         [ServerRpc]
         protected void ServerAssignHotkey(string hotkeyId, HotkeyType type, string relateId)
         {
-#if UNITY_EDITOR || UNITY_SERVER || !MMO_BUILD
+#if UNITY_EDITOR || UNITY_SERVER
             CharacterHotkey characterHotkey = new CharacterHotkey();
             characterHotkey.hotkeyId = hotkeyId;
             characterHotkey.type = type;
@@ -73,7 +73,7 @@ namespace MultiplayerARPG
         [ServerRpc]
         protected void ServerEnterWarp(uint objectId)
         {
-#if UNITY_EDITOR || UNITY_SERVER || !MMO_BUILD
+#if UNITY_EDITOR || UNITY_SERVER
             if (!CanDoActions())
                 return;
 
@@ -97,7 +97,7 @@ namespace MultiplayerARPG
         [ServerRpc]
         protected void ServerOpenStorage(uint objectId, string password)
         {
-#if UNITY_EDITOR || UNITY_SERVER || !MMO_BUILD
+#if UNITY_EDITOR || UNITY_SERVER
             if (!CanDoActions())
                 return;
 

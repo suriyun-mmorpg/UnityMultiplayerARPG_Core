@@ -358,7 +358,7 @@ namespace MultiplayerARPG
 
         protected void ProceedAttackStateAtServer(byte simulateSeed, bool isLeftHand)
         {
-#if UNITY_EDITOR || UNITY_SERVER || !MMO_BUILD
+#if UNITY_EDITOR || UNITY_SERVER
             // Speed hack avoidance
             if (Time.unscaledTime - LastAttackEndTime < -0.05f)
                 return;

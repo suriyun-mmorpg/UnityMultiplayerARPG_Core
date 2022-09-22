@@ -629,7 +629,7 @@ namespace MultiplayerARPG
         [ServerRpc]
         protected void ServerEnterVehicle(uint objectId)
         {
-#if UNITY_EDITOR || UNITY_SERVER || !MMO_BUILD
+#if UNITY_EDITOR || UNITY_SERVER
             // Call this function at server
             LiteNetLibIdentity identity;
             if (Manager.Assets.TryGetSpawnedObject(objectId, out identity))
@@ -646,7 +646,7 @@ namespace MultiplayerARPG
         [ServerRpc]
         protected void ServerEnterVehicleToSeat(uint objectId, byte seatIndex)
         {
-#if UNITY_EDITOR || UNITY_SERVER || !MMO_BUILD
+#if UNITY_EDITOR || UNITY_SERVER
             // Call this function at server
             LiteNetLibIdentity identity;
             if (Manager.Assets.TryGetSpawnedObject(objectId, out identity))
@@ -661,7 +661,7 @@ namespace MultiplayerARPG
         [ServerRpc]
         protected void ServerExitVehicle()
         {
-#if UNITY_EDITOR || UNITY_SERVER || !MMO_BUILD
+#if UNITY_EDITOR || UNITY_SERVER
             // Call this function at server
             ExitVehicle();
 #endif
