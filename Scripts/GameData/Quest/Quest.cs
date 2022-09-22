@@ -20,6 +20,9 @@ namespace MultiplayerARPG
         public QuestTask[] tasks = new QuestTask[0];
         [Tooltip("Quests which will be abandoned when accept this quest")]
         public Quest[] abandonQuests = new Quest[0];
+        [Header("Rewarding")]
+        public bool resetAttributes;
+        public bool resetSkills;
         public PlayerCharacter changeCharacterClass;
         public int rewardExp = 0;
         public int rewardGold = 0;

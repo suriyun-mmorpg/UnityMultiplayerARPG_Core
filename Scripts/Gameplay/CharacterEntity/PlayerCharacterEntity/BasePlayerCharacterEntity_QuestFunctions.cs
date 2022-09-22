@@ -132,6 +132,12 @@ namespace MultiplayerARPG
                 }
             }
             this.FillEmptySlots();
+            // Reset attributes
+            if (quest.resetAttributes)
+                this.ResetAttributes();
+            // Reset skills
+            if (quest.resetSkills)
+                this.ResetSkills();
             // Change character class
             if (quest.changeCharacterClass != null)
                 DataId = quest.changeCharacterClass.DataId;
