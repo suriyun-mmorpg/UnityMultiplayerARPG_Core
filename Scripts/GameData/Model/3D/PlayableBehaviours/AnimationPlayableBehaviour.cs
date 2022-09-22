@@ -283,6 +283,7 @@ namespace MultiplayerARPG.GameData.Model.Playables
         private float actionClipLength = 0f;
         private float actionPlayElapsed = 0f;
         private float actionLayerClipSpeed = 0f;
+        private float moveAnimationSpeedMultiplier = 1f;
         private readonly HashSet<string> weaponTypeIds = new HashSet<string>();
         private readonly HashSet<string> leftHandWeaponTypeIds = new HashSet<string>();
         private readonly Dictionary<string, BaseStateInfo> baseStates = new Dictionary<string, BaseStateInfo>();
@@ -512,7 +513,7 @@ namespace MultiplayerARPG.GameData.Model.Playables
                 bool movingBackward = stateUpdateData.MovementState.Has(MovementState.Backward);
                 bool movingLeft = stateUpdateData.MovementState.Has(MovementState.Left);
                 bool movingRight = stateUpdateData.MovementState.Has(MovementState.Right);
-                stateUpdateData.isMoving = (movingForward || movingBackward || movingLeft || movingRight) && CharacterModel.moveAnimationSpeedMultiplier > 0f;
+                stateUpdateData.isMoving = (movingForward || movingBackward || movingLeft || movingRight) && moveAnimationSpeedMultiplier > 0f;
                 if (stateUpdateData.isMoving)
                 {
                     if (movingForward)
@@ -666,7 +667,7 @@ namespace MultiplayerARPG.GameData.Model.Playables
                 LayerMixer.SetLayerMaskFromAvatarMask(layer, avatarMask);
 
                 // Set clip info 
-                stateUpdateData.clipSpeed = stateInfos[playingStateId].GetSpeed(stateUpdateData.isMoving ? CharacterModel.moveAnimationSpeedMultiplier : 1);
+                stateUpdateData.clipSpeed = stateInfos[playingStateId].GetSpeed(stateUpdateData.isMoving ? moveAnimationSpeedMultiplier : 1);
                 // Set transition duration
                 stateUpdateData.transitionDuration = stateInfos[playingStateId].GetTransitionDuration();
                 if (stateUpdateData.transitionDuration <= 0f)
@@ -783,6 +784,13 @@ namespace MultiplayerARPG.GameData.Model.Playables
         {
             if (!readyToPlay)
                 return;
+
+            if (!Mathf.Approximately(moveAnimationSpeedMultiplier, CharacterModel.moveAnimationSpeedMultiplier))
+            {
+                moveAnimationSpeedMultiplier = CharacterModel.moveAnimationSpeedMultiplier;
+                baseStateUpdateData.ForcePlay = true;
+                leftHandWieldingStateUpdateData.ForcePlay = true;
+            }
 
             #region Update base state and left-hand wielding
             if (!IsFreeze)
