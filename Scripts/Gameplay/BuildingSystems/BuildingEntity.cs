@@ -185,10 +185,7 @@ namespace MultiplayerARPG
         public bool IsBuildMode { get; private set; }
         public BasePlayerCharacterEntity Builder { get; private set; }
 
-        protected readonly List<BaseGameEntity> triggerEntities = new List<BaseGameEntity>();
-        protected readonly List<TilemapCollider2D> triggerTilemaps = new List<TilemapCollider2D>();
-        protected readonly List<BuildingMaterial> triggerMaterials = new List<BuildingMaterial>();
-        protected readonly List<NoConstructionArea> triggerNoConstructionAreas = new List<NoConstructionArea>();
+        protected readonly List<GameObject> triggerObjects = new List<GameObject>();
         protected readonly List<BuildingEntity> children = new List<BuildingEntity>();
         protected readonly List<BuildingMaterial> buildingMaterials = new List<BuildingMaterial>();
         protected bool parentFound;
@@ -351,7 +348,7 @@ namespace MultiplayerARPG
                 // Too far from buildiner?
                 return false;
             }
-            if (triggerEntities.Count > 0 || triggerMaterials.Count > 0 || triggerTilemaps.Count > 0 || triggerNoConstructionAreas.Count > 0)
+            if (triggerObjects.Count > 0)
             {
                 // Triggered something?
                 return false;
@@ -452,59 +449,38 @@ namespace MultiplayerARPG
             Builder = builder;
         }
 
-        public void TriggerEnterEntity(BaseGameEntity networkEntity)
+        public bool TriggerEnterEntity(BaseGameEntity entity)
         {
-            if (networkEntity != null &&
-                !triggerEntities.Contains(networkEntity) &&
-                networkEntity.Entity != Entity)
-                triggerEntities.Add(networkEntity);
+            if (entity == null || entity.EntityGameObject == EntityGameObject)
+                return false;
+            if (!triggerObjects.Contains(entity.EntityGameObject))
+                triggerObjects.Add(entity.EntityGameObject);
+            return true;
         }
 
-        public void TriggerExitEntity(BaseGameEntity networkEntity)
+        public bool TriggerExitEntity(BaseGameEntity entity)
         {
-            if (networkEntity != null)
-                triggerEntities.Remove(networkEntity);
+            if (entity == null)
+                return false;
+            triggerObjects.Remove(entity.EntityGameObject);
+            return true;
         }
 
-        public void TriggerEnterBuildingMaterial(BuildingMaterial buildingMaterial)
+        public bool TriggerEnterComponent(Component component)
         {
-            if (buildingMaterial != null &&
-                buildingMaterial.BuildingEntity != this &&
-                !triggerMaterials.Contains(buildingMaterial) &&
-                buildingMaterial.Entity != Entity)
-                triggerMaterials.Add(buildingMaterial);
+            if (component == null)
+                return false;
+            if (!triggerObjects.Contains(component.gameObject))
+                triggerObjects.Add(component.gameObject);
+            return true;
         }
 
-        public void TriggerExitBuildingMaterial(BuildingMaterial buildingMaterial)
+        public bool TriggerExitComponent(Component component)
         {
-            if (buildingMaterial != null)
-                triggerMaterials.Remove(buildingMaterial);
-        }
-
-        public void TriggerEnterTilemap(TilemapCollider2D tilemapCollider)
-        {
-            if (tilemapCollider != null &&
-                !triggerTilemaps.Contains(tilemapCollider))
-                triggerTilemaps.Add(tilemapCollider);
-        }
-
-        public void TriggerExitTilemap(TilemapCollider2D tilemapCollider)
-        {
-            if (tilemapCollider != null)
-                triggerTilemaps.Remove(tilemapCollider);
-        }
-
-        public void TriggerEnterNoConstructionArea(NoConstructionArea noConstructionArea)
-        {
-            if (noConstructionArea != null &&
-                !triggerNoConstructionAreas.Contains(noConstructionArea))
-                triggerNoConstructionAreas.Add(noConstructionArea);
-        }
-
-        public void TriggerExitNoConstructionArea(NoConstructionArea noConstructionArea)
-        {
-            if (noConstructionArea != null)
-                triggerNoConstructionAreas.Remove(noConstructionArea);
+            if (component == null)
+                return false;
+            triggerObjects.Remove(component.gameObject);
+            return true;
         }
 
         public override void OnNetworkDestroy(byte reasons)
