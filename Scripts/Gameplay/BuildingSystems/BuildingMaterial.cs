@@ -186,10 +186,7 @@ namespace MultiplayerARPG
             if (!BuildingEntity.IsBuildMode)
                 return;
 
-            if (BuildingEntity.transform.root == other.transform.root)
-                return;
-
-            if (!ValidateTriggerLayer(other.gameObject))
+            if (!ValidateTriggerLayer(other))
                 return;
 
             if (BuildingEntity.TriggerEnterComponent(other.GetComponent<NoConstructionArea>()))
@@ -201,16 +198,26 @@ namespace MultiplayerARPG
             BuildingMaterial material = other.GetComponent<BuildingMaterial>();
             if (material != null)
             {
-                if (materialInterectFunc())
+                if (!materialInterectFunc())
+                {
                     BuildingEntity.TriggerExitEntity(material.Entity);
+                }
                 else
+                {
+                    if (SameBuildingAreaTransform(other))
+                        return;
                     BuildingEntity.TriggerEnterEntity(material.Entity);
+                }
             }
             else
             {
+                if (SameBuildingAreaTransform(other))
+                    return;
                 IGameEntity gameEntity = other.GetComponent<IGameEntity>();
                 if (gameEntity != null)
+                {
                     BuildingEntity.TriggerEnterEntity(gameEntity.Entity);
+                }
             }
         }
 
@@ -232,6 +239,11 @@ namespace MultiplayerARPG
             IGameEntity gameEntity = other.GetComponent<IGameEntity>();
             if (gameEntity != null)
                 BuildingEntity.TriggerExitEntity(gameEntity.Entity);
+        }
+
+        private bool SameBuildingAreaTransform(GameObject other)
+        {
+            return BuildingEntity.BuildingArea != null && BuildingEntity.BuildingArea.transform.root == other.transform.root;
         }
 
         public bool ValidateTriggerLayer(GameObject gameObject)
