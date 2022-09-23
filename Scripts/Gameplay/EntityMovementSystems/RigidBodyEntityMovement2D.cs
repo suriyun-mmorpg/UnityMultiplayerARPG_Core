@@ -362,7 +362,7 @@ namespace MultiplayerARPG
                     if (isClientConfirmingTeleport)
                     {
                         shouldSendReliably = true;
-                        MovementState |= MovementState.IsTeleport;
+                        currentInput.MovementState |= MovementState.IsTeleport;
                     }
                     this.ClientWriteMovementInput2D(writer, inputState, currentInput.MovementState, currentInput.ExtraMovementState, currentInput.Position, currentInput.Direction2D);
                     isClientConfirmingTeleport = false;
