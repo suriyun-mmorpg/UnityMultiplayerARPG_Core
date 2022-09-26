@@ -21,6 +21,8 @@ namespace UtilsComponents
 
         private void LateUpdate()
         {
+            if (animator == null)
+                return;
             Transform tempTransform = animator.GetBoneTransform(bone);
             if (followPosition)
                 transform.position = tempTransform.position;
