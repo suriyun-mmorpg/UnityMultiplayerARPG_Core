@@ -78,8 +78,8 @@ namespace MultiplayerARPG
                             format = LanguageManager.GetText(formatGuild);
                             break;
                     }
-                    uiTextMessage.text = ZString.Format(format, Data.sender, Data.message, Data.guildName);
-                    if (GameInstance.PlayingCharacter != null && GameInstance.PlayingCharacter.CharacterName.Equals(Data.sender))
+                    uiTextMessage.text = ZString.Format(format, Data.senderName, Data.message, Data.guildName);
+                    if (GameInstance.PlayingCharacter != null && GameInstance.PlayingCharacter.CharacterName.Equals(Data.senderName))
                         onIsTypeWriter.Invoke();
                     else
                         onNotTypeWriter.Invoke();

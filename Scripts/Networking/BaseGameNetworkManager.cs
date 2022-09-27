@@ -517,8 +517,8 @@ namespace MultiplayerARPG
             ChatMessage message = messageHandler.ReadMessage<ChatMessage>().FillChannelId();
             // Get character
             IPlayerCharacterData playerCharacter = null;
-            if (!string.IsNullOrEmpty(message.sender))
-                ServerUserHandlers.TryGetPlayerCharacterByName(message.sender, out playerCharacter);
+            if (!string.IsNullOrEmpty(message.senderName))
+                ServerUserHandlers.TryGetPlayerCharacterByName(message.senderName, out playerCharacter);
             // Set guild data
             if (playerCharacter != null)
             {
@@ -542,7 +542,7 @@ namespace MultiplayerARPG
                 }
                 return;
             }
-            if (message.channel != ChatChannel.System || ServerChatHandlers.CanSendSystemAnnounce(message.sender))
+            if (message.channel != ChatChannel.System || ServerChatHandlers.CanSendSystemAnnounce(message.senderName))
                 ServerChatHandlers.OnChatMessage(message);
         }
 
@@ -993,7 +993,7 @@ namespace MultiplayerARPG
             writer.Put(new ChatMessage()
             {
                 channel = ChatChannel.System,
-                sender = CHAT_SYSTEM_ANNOUNCER_SENDER,
+                senderName = CHAT_SYSTEM_ANNOUNCER_SENDER,
                 message = message,
                 sendByServer = true,
             });
@@ -1008,7 +1008,7 @@ namespace MultiplayerARPG
             writer.Put(new ChatMessage()
             {
                 channel = ChatChannel.Local,
-                sender = sender,
+                senderName = sender,
                 message = message,
                 sendByServer = true,
             });

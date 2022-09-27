@@ -26,8 +26,8 @@ namespace MultiplayerARPG
             IPlayerCharacterData playerCharacter;
             if (message.channel == ChatChannel.Party || message.channel == ChatChannel.Guild)
             {
-                if (!string.IsNullOrEmpty(message.sender) &&
-                    GameInstance.ServerUserHandlers.TryGetPlayerCharacterByName(message.sender, out playerCharacter))
+                if (!string.IsNullOrEmpty(message.senderName) &&
+                    GameInstance.ServerUserHandlers.TryGetPlayerCharacterByName(message.senderName, out playerCharacter))
                 {
                     switch (message.channel)
                     {

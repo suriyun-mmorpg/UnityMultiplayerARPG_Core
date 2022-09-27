@@ -247,8 +247,8 @@ namespace MultiplayerARPG
             {
                 channel = channel,
                 message = message,
-                sender = sender,
-                receiver = receiver,
+                senderName = sender,
+                receiverName = receiver,
             });
             HideEnterChatField();
         }
@@ -327,11 +327,11 @@ namespace MultiplayerARPG
             {
                 case EntryClickResponseMode.SetWhisterAsCommand:
                     ShowEnterChatField();
-                    EnterChatMessage = whisperCommand + " " + uiChatMessage.Data.sender;
+                    EnterChatMessage = whisperCommand + " " + uiChatMessage.Data.senderName;
                     break;
                 case EntryClickResponseMode.SetWhisterReceiverToField:
                     ShowEnterChatField();
-                    EnterChatReceiver = uiChatMessage.Data.sender;
+                    EnterChatReceiver = uiChatMessage.Data.senderName;
                     break;
                 default:
                     onClickChatEntry.Invoke(uiChatMessage);

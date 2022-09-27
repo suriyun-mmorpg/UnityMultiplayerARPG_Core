@@ -6,8 +6,12 @@ namespace MultiplayerARPG
     {
         public ChatChannel channel;
         public string message;
-        public string sender;
-        public string receiver;
+        public string senderUserId;
+        public string senderId;
+        public string senderName;
+        public string receiverUserId;
+        public string receiverId;
+        public string receiverName;
         public int guildId;
         public string guildName;
         public int channelId;
@@ -18,8 +22,12 @@ namespace MultiplayerARPG
         {
             channel = (ChatChannel)reader.GetByte();
             message = reader.GetString();
-            sender = reader.GetString();
-            receiver = reader.GetString();
+            senderUserId = reader.GetString();
+            senderId = reader.GetString();
+            senderName = reader.GetString();
+            receiverUserId = reader.GetString();
+            receiverId = reader.GetString();
+            receiverName = reader.GetString();
             guildId = reader.GetPackedInt();
             if (guildId > 0)
                 guildName = reader.GetString();
@@ -33,8 +41,12 @@ namespace MultiplayerARPG
         {
             writer.Put((byte)channel);
             writer.Put(message);
-            writer.Put(sender);
-            writer.Put(receiver);
+            writer.Put(senderUserId);
+            writer.Put(senderId);
+            writer.Put(senderName);
+            writer.Put(receiverUserId);
+            writer.Put(receiverId);
+            writer.Put(receiverName);
             writer.PutPackedInt(guildId);
             if (guildId > 0)
                 writer.Put(guildName);

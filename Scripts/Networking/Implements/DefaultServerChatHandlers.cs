@@ -21,8 +21,8 @@ namespace MultiplayerARPG
             {
                 case ChatChannel.Local:
                     IPlayerCharacterData playerCharacter = null;
-                    if (!string.IsNullOrEmpty(message.sender))
-                        GameInstance.ServerUserHandlers.TryGetPlayerCharacterByName(message.sender, out playerCharacter);
+                    if (!string.IsNullOrEmpty(message.senderName))
+                        GameInstance.ServerUserHandlers.TryGetPlayerCharacterByName(message.senderName, out playerCharacter);
                     if (message.sendByServer || playerCharacter != null)
                     {
                         BasePlayerCharacterEntity playerCharacterEntity = playerCharacter == null ? null : playerCharacter as BasePlayerCharacterEntity;
@@ -32,7 +32,7 @@ namespace MultiplayerARPG
                             GameInstance.Singleton.GMCommands.CanUseGMCommand(playerCharacterEntity, gmCommand)))
                         {
                             // If it's gm command and sender's user level > 0, handle gm commands
-                            string response = GameInstance.Singleton.GMCommands.HandleGMCommand(message.sender, playerCharacterEntity, message.message);
+                            string response = GameInstance.Singleton.GMCommands.HandleGMCommand(message.senderName, playerCharacterEntity, message.message);
                             if (!string.IsNullOrEmpty(response))
                             {
                                 Manager.ServerSendPacket(playerCharacterEntity.ConnectionId, 0, DeliveryMethod.ReliableOrdered, GameNetworkingConsts.Chat, new ChatMessage()
@@ -65,20 +65,20 @@ namespace MultiplayerARPG
                     }
                     break;
                 case ChatChannel.Global:
-                    if (!string.IsNullOrEmpty(message.sender))
+                    if (!string.IsNullOrEmpty(message.senderName))
                     {
                         // Send message to all clients
                         Manager.ServerSendPacketToAllConnections(0, DeliveryMethod.ReliableOrdered, GameNetworkingConsts.Chat, message);
                     }
                     break;
                 case ChatChannel.Whisper:
-                    if (GameInstance.ServerUserHandlers.TryGetConnectionIdByName(message.sender, out connectionId))
+                    if (GameInstance.ServerUserHandlers.TryGetConnectionIdByName(message.senderName, out connectionId))
                     {
                         // If found sender send whisper message to sender
                         Manager.ServerSendPacket(connectionId, 0, DeliveryMethod.ReliableOrdered, GameNetworkingConsts.Chat, message);
                     }
-                    if (!string.IsNullOrEmpty(message.receiver) && !message.receiver.Equals(message.sender) &&
-                        GameInstance.ServerUserHandlers.TryGetConnectionIdByName(message.receiver, out connectionId))
+                    if (!string.IsNullOrEmpty(message.receiverName) && !message.receiverName.Equals(message.senderName) &&
+                        GameInstance.ServerUserHandlers.TryGetConnectionIdByName(message.receiverName, out connectionId))
                     {
                         // If found receiver send whisper message to receiver
                         Manager.ServerSendPacket(connectionId, 0, DeliveryMethod.ReliableOrdered, GameNetworkingConsts.Chat, message);
