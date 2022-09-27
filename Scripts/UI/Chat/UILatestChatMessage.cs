@@ -2,18 +2,10 @@
 {
     public partial class UILatestChatMessage : UIChatMessage
     {
-        public bool loadOldMessagesToShowOnStart = true;
-
         protected override void Awake()
         {
             base.Awake();
             SetOnClientReceiveChatMessage();
-        }
-
-        private void Start()
-        {
-            if (loadOldMessagesToShowOnStart && UIChatHistory.ChatMessages.Count > 0)
-                OnReceiveChat(UIChatHistory.ChatMessages[UIChatHistory.ChatMessages.Count - 1]);
         }
 
         private void OnDestroy()

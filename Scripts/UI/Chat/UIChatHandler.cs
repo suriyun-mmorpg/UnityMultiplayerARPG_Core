@@ -27,7 +27,6 @@ namespace MultiplayerARPG
         [Range(0, UIChatHistory.MAX_CHAT_HISTORY)]
         public int chatEntrySize = 30;
         public EntryClickResponseMode entryClickResponseMode = EntryClickResponseMode.SetWhisterAsCommand;
-        public bool loadOldMessagesToShowOnStart = true;
 
         [Header("Channel Commands")]
         public string globalCommand = "/a";
@@ -79,12 +78,24 @@ namespace MultiplayerARPG
 
         public event System.Action<UIChatMessage> onClickChatEntry;
 
+        private bool aleradySetupReceiveEvent;
         private bool movingToEnd;
         private ChatChannel dirtyChatChannel;
 
         protected override void Awake()
         {
             base.Awake();
+            if (!aleradySetupReceiveEvent)
+            {
+                int index = UIChatHistory.ChatMessages.Count - chatEntrySize;
+                if (index < 0)
+                    index = 0;
+                while (index < UIChatHistory.ChatMessages.Count)
+                {
+                    OnReceiveChat(UIChatHistory.ChatMessages[index]);
+                    index++;
+                }
+            }
             SetOnClientReceiveChatMessage();
         }
 
@@ -96,17 +107,6 @@ namespace MultiplayerARPG
             {
                 uiMessageField.onValueChanged.RemoveListener(OnMessageFieldValueChange);
                 uiMessageField.onValueChanged.AddListener(OnMessageFieldValueChange);
-            }
-            if (loadOldMessagesToShowOnStart && UIChatHistory.ChatMessages.Count > 0)
-            {
-                int index = UIChatHistory.ChatMessages.Count - chatEntrySize;
-                if (index < 0)
-                    index = 0;
-                while (index < UIChatHistory.ChatMessages.Count)
-                {
-                    OnReceiveChat(UIChatHistory.ChatMessages[index]);
-                    index++;
-                }
             }
         }
 
@@ -124,11 +124,13 @@ namespace MultiplayerARPG
         {
             RemoveOnClientReceiveChatMessage();
             ClientGenericActions.onClientReceiveChatMessage += OnReceiveChat;
+            aleradySetupReceiveEvent = true;
         }
 
         public void RemoveOnClientReceiveChatMessage()
         {
             ClientGenericActions.onClientReceiveChatMessage -= OnReceiveChat;
+            aleradySetupReceiveEvent = false;
         }
 
         private void Update()
