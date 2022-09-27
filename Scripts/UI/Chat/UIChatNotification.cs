@@ -77,6 +77,10 @@ namespace MultiplayerARPG
             {
                 return;
             }
+            System.DateTime chatDateTime = new System.DateTime(1970, 1, 1, 0, 0, 0, 0, System.DateTimeKind.Utc).AddMilliseconds(chatMessage.timestamp).ToLocalTime();
+            System.DateTime currentDataTime = System.DateTime.UtcNow.ToLocalTime();
+            if ((currentDataTime - chatDateTime).TotalSeconds > 5)
+                return;
             if (notifyForAllChannels)
             {
                 notificationCount++;
