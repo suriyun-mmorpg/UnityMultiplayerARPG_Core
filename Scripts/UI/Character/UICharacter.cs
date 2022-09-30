@@ -54,6 +54,9 @@ namespace MultiplayerARPG
         public UICharacterAttributePair[] uiCharacterAttributes;
         public UICharacterCurrencyPair[] uiCharacterCurrencies;
         public UICharacterClass uiCharacterClass;
+        public UIPlayerIcon uiPlayerIcon;
+        public UIPlayerFrame uiPlayerFrame;
+        public UIPlayerTitle uiPlayerTitle;
 
         [Header("Options")]
         [Tooltip("If this is `TRUE` it won't update data when controlling character's data changes")]
@@ -354,6 +357,30 @@ namespace MultiplayerARPG
                 uiTextGold.text = ZString.Format(
                     LanguageManager.GetText(formatKeyGold),
                     playerCharacter == null ? "0" : playerCharacter.Gold.ToString("N0"));
+            }
+
+            // Icon
+            if (uiPlayerIcon != null)
+            {
+                if (playerCharacter != null)
+                    uiPlayerIcon.SetDataByDataId(playerCharacter.IconDataId);
+                uiPlayerIcon.SetVisible(playerCharacter != null);
+            }
+
+            // Frame
+            if (uiPlayerFrame != null)
+            {
+                if (playerCharacter != null)
+                    uiPlayerFrame.SetDataByDataId(playerCharacter.FrameDataId);
+                uiPlayerFrame.SetVisible(playerCharacter != null);
+            }
+
+            // Title
+            if (uiPlayerTitle != null)
+            {
+                if (playerCharacter != null)
+                    uiPlayerTitle.SetDataByDataId(playerCharacter.TitleDataId);
+                uiPlayerTitle.SetVisible(playerCharacter != null);
             }
 
             BaseCharacter character = Data == null ? null : Data.GetDatabase();
