@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace MultiplayerARPG
 {
@@ -11,8 +12,10 @@ namespace MultiplayerARPG
         public UIGuildIcon[] selectedIcons;
 
         [Header("Options")]
-        public bool setSelectedIconByOptions;
-        public bool updateGuildOptionsOnSelectIcon;
+        [FormerlySerializedAs("setSelectedIconByOptions")]
+        public bool setSelectedIconOnEnable = true;
+        [FormerlySerializedAs("updateGuildOptionsOnSelectIcon")]
+        public bool updateGuildOptionsOnSelect = false;
 
         private UIList cacheList;
         public UIList CacheList
@@ -56,7 +59,7 @@ namespace MultiplayerARPG
         {
             CacheSelectionManager.eventOnSelected.RemoveListener(OnSelect);
             CacheSelectionManager.eventOnSelected.AddListener(OnSelect);
-            if (setSelectedIconByOptions && GameInstance.JoinedGuild != null)
+            if (setSelectedIconOnEnable && GameInstance.JoinedGuild != null)
             {
                 // Get current guild options before modify and save
                 GuildOptions options = new GuildOptions();
@@ -73,7 +76,7 @@ namespace MultiplayerARPG
         protected virtual void OnSelect(UIGuildIcon ui)
         {
             UpdateSelectedIcons();
-            if (updateGuildOptionsOnSelectIcon)
+            if (updateGuildOptionsOnSelect)
                 UpdateGuildOptions();
         }
 
