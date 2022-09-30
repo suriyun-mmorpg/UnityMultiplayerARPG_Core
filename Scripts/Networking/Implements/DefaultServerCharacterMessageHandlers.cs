@@ -92,7 +92,7 @@ namespace MultiplayerARPG
             await UniTask.Yield();
         }
 
-        public async UniTaskVoid RequestAvailableIcons(RequestHandlerData requestHandler, EmptyMessage request, RequestProceedResultDelegate<ResponseAvailableIconsMessage> result)
+        public async UniTaskVoid HandleRequestAvailableIcons(RequestHandlerData requestHandler, EmptyMessage request, RequestProceedResultDelegate<ResponseAvailableIconsMessage> result)
         {
             // TODO: Implement data unlocking
             List<int> iconIds = new List<int>();
@@ -108,7 +108,7 @@ namespace MultiplayerARPG
             await UniTask.Yield();
         }
 
-        public async UniTaskVoid RequestAvailableFrames(RequestHandlerData requestHandler, EmptyMessage request, RequestProceedResultDelegate<ResponseAvailableFramesMessage> result)
+        public async UniTaskVoid HandleRequestAvailableFrames(RequestHandlerData requestHandler, EmptyMessage request, RequestProceedResultDelegate<ResponseAvailableFramesMessage> result)
         {
             // TODO: Implement data unlocking
             List<int> frameIds = new List<int>();
@@ -124,7 +124,7 @@ namespace MultiplayerARPG
             await UniTask.Yield();
         }
 
-        public async UniTaskVoid RequestAvailableTitles(RequestHandlerData requestHandler, EmptyMessage request, RequestProceedResultDelegate<ResponseAvailableTitlesMessage> result)
+        public async UniTaskVoid HandleRequestAvailableTitles(RequestHandlerData requestHandler, EmptyMessage request, RequestProceedResultDelegate<ResponseAvailableTitlesMessage> result)
         {
             // TODO: Implement data unlocking
             List<int> titleIds = new List<int>();
@@ -140,7 +140,7 @@ namespace MultiplayerARPG
             await UniTask.Yield();
         }
 
-        public async UniTaskVoid RequestSetIcon(RequestHandlerData requestHandler, RequestSetIconMessage request, RequestProceedResultDelegate<ResponseSetIconMessage> result)
+        public async UniTaskVoid HandleRequestSetIcon(RequestHandlerData requestHandler, RequestSetIconMessage request, RequestProceedResultDelegate<ResponseSetIconMessage> result)
         {
             IPlayerCharacterData playerCharacter;
             if (!GameInstance.ServerUserHandlers.TryGetPlayerCharacter(requestHandler.ConnectionId, out playerCharacter))
@@ -168,7 +168,7 @@ namespace MultiplayerARPG
             await UniTask.Yield();
         }
 
-        public async UniTaskVoid RequestSetFrame(RequestHandlerData requestHandler, RequestSetFrameMessage request, RequestProceedResultDelegate<ResponseSetFrameMessage> result)
+        public async UniTaskVoid HandleRequestSetFrame(RequestHandlerData requestHandler, RequestSetFrameMessage request, RequestProceedResultDelegate<ResponseSetFrameMessage> result)
         {
             IPlayerCharacterData playerCharacter;
             if (!GameInstance.ServerUserHandlers.TryGetPlayerCharacter(requestHandler.ConnectionId, out playerCharacter))
@@ -196,7 +196,7 @@ namespace MultiplayerARPG
             await UniTask.Yield();
         }
 
-        public async UniTaskVoid RequestSetTitle(RequestHandlerData requestHandler, RequestSetTitleMessage request, RequestProceedResultDelegate<ResponseSetTitleMessage> result)
+        public async UniTaskVoid HandleRequestSetTitle(RequestHandlerData requestHandler, RequestSetTitleMessage request, RequestProceedResultDelegate<ResponseSetTitleMessage> result)
         {
             IPlayerCharacterData playerCharacter;
             if (!GameInstance.ServerUserHandlers.TryGetPlayerCharacter(requestHandler.ConnectionId, out playerCharacter))

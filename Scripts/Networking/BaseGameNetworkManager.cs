@@ -206,6 +206,12 @@ namespace MultiplayerARPG
                 RegisterRequestToServer<RequestIncreaseAttributeAmountMessage, ResponseIncreaseAttributeAmountMessage>(GameNetworkingConsts.IncreaseAttributeAmount, ServerCharacterMessageHandlers.HandleRequestIncreaseAttributeAmount);
                 RegisterRequestToServer<RequestIncreaseSkillLevelMessage, ResponseIncreaseSkillLevelMessage>(GameNetworkingConsts.IncreaseSkillLevel, ServerCharacterMessageHandlers.HandleRequestIncreaseSkillLevel);
                 RegisterRequestToServer<RequestRespawnMessage, ResponseRespawnMessage>(GameNetworkingConsts.Respawn, ServerCharacterMessageHandlers.HandleRequestRespawn);
+                RegisterRequestToServer<EmptyMessage, ResponseAvailableIconsMessage>(GameNetworkingConsts.AvailableIcons, ServerCharacterMessageHandlers.HandleRequestAvailableIcons);
+                RegisterRequestToServer<EmptyMessage, ResponseAvailableFramesMessage>(GameNetworkingConsts.AvailableFrames, ServerCharacterMessageHandlers.HandleRequestAvailableFrames);
+                RegisterRequestToServer<EmptyMessage, ResponseAvailableTitlesMessage>(GameNetworkingConsts.AvailableTitles, ServerCharacterMessageHandlers.HandleRequestAvailableTitles);
+                RegisterRequestToServer<RequestSetIconMessage, ResponseSetIconMessage>(GameNetworkingConsts.SetIcon, ServerCharacterMessageHandlers.HandleRequestSetIcon);
+                RegisterRequestToServer<RequestSetFrameMessage, ResponseSetFrameMessage>(GameNetworkingConsts.SetFrame, ServerCharacterMessageHandlers.HandleRequestSetFrame);
+                RegisterRequestToServer<RequestSetTitleMessage, ResponseSetTitleMessage>(GameNetworkingConsts.SetTitle, ServerCharacterMessageHandlers.HandleRequestSetTitle);
             }
             // Inventory
             if (ServerInventoryMessageHandlers != null)
