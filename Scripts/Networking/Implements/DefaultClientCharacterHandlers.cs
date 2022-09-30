@@ -62,5 +62,35 @@ namespace MultiplayerARPG
             SubscribedPlayerCharactersById.Clear();
             SubscribedPlayerCharactersByName.Clear();
         }
+
+        public bool RequestAvailableIcons(ResponseDelegate<ResponseAvailableIconsMessage> callback)
+        {
+            return Manager.ClientSendRequest(GameNetworkingConsts.AvailableIcons, EmptyMessage.Value, responseDelegate: callback);
+        }
+
+        public bool RequestAvailableFrames(ResponseDelegate<ResponseAvailableFramesMessage> callback)
+        {
+            return Manager.ClientSendRequest(GameNetworkingConsts.AvailableFrames, EmptyMessage.Value, responseDelegate: callback);
+        }
+
+        public bool RequestAvailableTitles(ResponseDelegate<ResponseAvailableTitlesMessage> callback)
+        {
+            return Manager.ClientSendRequest(GameNetworkingConsts.AvailableTitles, EmptyMessage.Value, responseDelegate: callback);
+        }
+
+        public bool RequestSetIcon(RequestSetIconMessage data, ResponseDelegate<ResponseSetIconMessage> callback)
+        {
+            return Manager.ClientSendRequest(GameNetworkingConsts.SetIcon, data, responseDelegate: callback);
+        }
+
+        public bool RequestSetFrame(RequestSetFrameMessage data, ResponseDelegate<ResponseSetFrameMessage> callback)
+        {
+            return Manager.ClientSendRequest(GameNetworkingConsts.SetFrame, data, responseDelegate: callback);
+        }
+
+        public bool RequestSetTitle(RequestSetTitleMessage data, ResponseDelegate<ResponseSetTitleMessage> callback)
+        {
+            return Manager.ClientSendRequest(GameNetworkingConsts.SetTitle, data, responseDelegate: callback);
+        }
     }
 }
