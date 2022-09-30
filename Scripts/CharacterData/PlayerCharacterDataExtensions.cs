@@ -47,6 +47,9 @@ namespace MultiplayerARPG
             to.RespawnMapName = from.RespawnMapName;
             to.RespawnPosition = from.RespawnPosition;
             to.MountDataId = from.MountDataId;
+            to.IconDataId = from.IconDataId;
+            to.FrameDataId = from.FrameDataId;
+            to.TitleDataId = from.TitleDataId;
             to.LastDeadTime = from.LastDeadTime;
             to.UnmuteTime = from.UnmuteTime;
             to.LastUpdate = from.LastUpdate;
@@ -430,6 +433,9 @@ namespace MultiplayerARPG
                 writer.Put(characterData.RespawnPosition.z);
             }
             writer.PutPackedInt(characterData.MountDataId);
+            writer.PutPackedInt(characterData.IconDataId);
+            writer.PutPackedInt(characterData.FrameDataId);
+            writer.PutPackedInt(characterData.TitleDataId);
             writer.PutPackedLong(characterData.LastDeadTime);
             writer.PutPackedLong(characterData.UnmuteTime);
             writer.PutPackedLong(characterData.LastUpdate);
@@ -595,6 +601,9 @@ namespace MultiplayerARPG
                 characterData.RespawnPosition = new Vector3(reader.GetFloat(), reader.GetFloat(), reader.GetFloat());
             }
             characterData.MountDataId = reader.GetPackedInt();
+            characterData.IconDataId = reader.GetPackedInt();
+            characterData.FrameDataId = reader.GetPackedInt();
+            characterData.TitleDataId = reader.GetPackedInt();
             characterData.LastDeadTime = reader.GetPackedLong();
             characterData.UnmuteTime = reader.GetPackedLong();
             characterData.LastUpdate = reader.GetPackedLong();

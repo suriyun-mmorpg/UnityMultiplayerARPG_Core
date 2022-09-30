@@ -32,6 +32,12 @@ namespace MultiplayerARPG
         [SerializeField]
         protected SyncFieldVector3 respawnPosition = new SyncFieldVector3();
         [SerializeField]
+        protected SyncFieldInt iconDataId = new SyncFieldInt();
+        [SerializeField]
+        protected SyncFieldInt frameDataId = new SyncFieldInt();
+        [SerializeField]
+        protected SyncFieldInt titleDataId = new SyncFieldInt();
+        [SerializeField]
         protected SyncFieldLong lastDeadTime = new SyncFieldLong();
         [SerializeField]
         protected SyncFieldLong unmuteTime = new SyncFieldLong();
@@ -95,11 +101,6 @@ namespace MultiplayerARPG
             get { return respawnPosition.Value; }
             set { respawnPosition.Value = value; }
         }
-        public bool IsWarping
-        {
-            get { return isWarping.Value; }
-            set { isWarping.Value = value; }
-        }
         public int MountDataId
         {
             get
@@ -114,6 +115,21 @@ namespace MultiplayerARPG
             }
             set { }
         }
+        public int IconDataId
+        {
+            get { return iconDataId.Value; }
+            set { iconDataId.Value = value; }
+        }
+        public int FrameDataId
+        {
+            get { return frameDataId.Value; }
+            set { frameDataId.Value = value; }
+        }
+        public int TitleDataId
+        {
+            get { return titleDataId.Value; }
+            set { titleDataId.Value = value; }
+        }
         public long LastDeadTime
         {
             get { return lastDeadTime.Value; }
@@ -125,6 +141,11 @@ namespace MultiplayerARPG
             set { unmuteTime.Value = value; }
         }
         public long LastUpdate { get; set; }
+        public bool IsWarping
+        {
+            get { return isWarping.Value; }
+            set { isWarping.Value = value; }
+        }
 
         public IList<CharacterHotkey> Hotkeys
         {
@@ -184,10 +205,16 @@ namespace MultiplayerARPG
             respawnMapName.syncMode = LiteNetLibSyncField.SyncMode.ServerToOwnerClient;
             respawnPosition.deliveryMethod = DeliveryMethod.ReliableOrdered;
             respawnPosition.syncMode = LiteNetLibSyncField.SyncMode.ServerToOwnerClient;
-            isWarping.deliveryMethod = DeliveryMethod.Unreliable;
-            isWarping.syncMode = LiteNetLibSyncField.SyncMode.ServerToOwnerClient;
+            iconDataId.deliveryMethod = DeliveryMethod.ReliableOrdered;
+            iconDataId.syncMode = LiteNetLibSyncField.SyncMode.ServerToOwnerClient;
+            frameDataId.deliveryMethod = DeliveryMethod.ReliableOrdered;
+            frameDataId.syncMode = LiteNetLibSyncField.SyncMode.ServerToOwnerClient;
+            titleDataId.deliveryMethod = DeliveryMethod.ReliableOrdered;
+            titleDataId.syncMode = LiteNetLibSyncField.SyncMode.ServerToOwnerClient;
             lastDeadTime.deliveryMethod = DeliveryMethod.Sequenced;
             lastDeadTime.syncMode = LiteNetLibSyncField.SyncMode.ServerToOwnerClient;
+            isWarping.deliveryMethod = DeliveryMethod.ReliableOrdered;
+            isWarping.syncMode = LiteNetLibSyncField.SyncMode.ServerToOwnerClient;
             pitch.deliveryMethod = DeliveryMethod.Sequenced;
             pitch.syncMode = LiteNetLibSyncField.SyncMode.ClientMulticast;
             targetEntityId.clientDataChannel = CLIENT_STATE_DATA_CHANNEL;

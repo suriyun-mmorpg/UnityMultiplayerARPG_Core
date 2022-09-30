@@ -18,6 +18,9 @@ namespace MultiplayerARPG
         public int maxHp;
         public int currentMp;
         public int maxMp;
+        public int iconDataId;
+        public int frameDataId;
+        public int titleDataId;
 
         public void Deserialize(NetDataReader reader)
         {
@@ -48,6 +51,9 @@ namespace MultiplayerARPG
             partyId = reader.GetPackedInt();
             guildId = reader.GetPackedInt();
             guildRole = reader.GetByte();
+            iconDataId = reader.GetPackedInt();
+            frameDataId = reader.GetPackedInt();
+            titleDataId = reader.GetPackedInt();
         }
 
         public void SerializeWithoutHpMp(NetDataWriter writer)
@@ -61,6 +67,9 @@ namespace MultiplayerARPG
             writer.PutPackedInt(partyId);
             writer.PutPackedInt(guildId);
             writer.Put(guildRole);
+            writer.PutPackedInt(iconDataId);
+            writer.PutPackedInt(frameDataId);
+            writer.PutPackedInt(titleDataId);
         }
 
         public static SocialCharacterData Create(IPlayerCharacterData character)
@@ -77,6 +86,9 @@ namespace MultiplayerARPG
                 guildRole = character.GuildRole,
                 currentHp = character.CurrentHp,
                 currentMp = character.CurrentMp,
+                iconDataId = character.IconDataId,
+                frameDataId = character.FrameDataId,
+                titleDataId = character.TitleDataId,
             };
         }
 
@@ -96,6 +108,9 @@ namespace MultiplayerARPG
                 maxHp = character.MaxHp,
                 currentMp = character.CurrentMp,
                 maxMp = character.MaxMp,
+                iconDataId = character.IconDataId,
+                frameDataId = character.FrameDataId,
+                titleDataId = character.TitleDataId,
             };
         }
     }

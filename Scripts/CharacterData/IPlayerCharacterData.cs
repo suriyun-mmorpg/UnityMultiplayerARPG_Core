@@ -63,6 +63,9 @@ namespace MultiplayerARPG
         string RespawnMapName { get; set; }
         Vector3 RespawnPosition { get; set; }
         int MountDataId { get; set; }
+        int IconDataId { get; set; }
+        int FrameDataId { get; set; }
+        int TitleDataId { get; set; }
         long LastDeadTime { get; set; }
         long UnmuteTime { get; set; }
         long LastUpdate { get; set; }

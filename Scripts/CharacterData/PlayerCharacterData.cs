@@ -28,6 +28,9 @@ namespace MultiplayerARPG
         public string RespawnMapName { get; set; }
         public Vector3 RespawnPosition { get; set; }
         public int MountDataId { get; set; }
+        public int IconDataId { get; set; }
+        public int FrameDataId { get; set; }
+        public int TitleDataId { get; set; }
         public long LastDeadTime { get; set; }
         public long UnmuteTime { get; set; }
         public long LastUpdate { get; set; }
