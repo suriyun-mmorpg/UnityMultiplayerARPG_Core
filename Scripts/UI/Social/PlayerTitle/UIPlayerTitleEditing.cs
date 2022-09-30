@@ -144,7 +144,6 @@ namespace MultiplayerARPG
         protected virtual void ResponseSelectedTitle(ResponseHandlerData requestHandler, AckResponseCode responseCode, ResponseSetTitleMessage response)
         {
             if (responseCode.ShowUnhandledResponseMessageDialog(response.message)) return;
-            GameInstance.PlayingCharacter.TitleDataId = response.dataId;
         }
     }
 }
