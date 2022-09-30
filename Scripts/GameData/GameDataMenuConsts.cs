@@ -197,13 +197,25 @@ namespace MultiplayerARPG
         public const string FACTION_MENU = "Create GameData/Faction";
         public const int FACTION_ORDER = -5297;
 
+        public const string PLAYER_ICON_FILE = "Player Icon";
+        public const string PLAYER_ICON_MENU = "Create GameData/Player Icon";
+        public const int PLAYER_ICON_ORDER = -5199;
+
+        public const string PLAYER_FRAME_FILE = "Player Frame";
+        public const string PLAYER_FRAME_MENU = "Create GameData/Player Frame";
+        public const int PLAYER_FRAME_ORDER = -5198;
+
+        public const string PLAYER_TITLE_FILE = "Player Title";
+        public const string PLAYER_TITLE_MENU = "Create GameData/Player Title";
+        public const int PLAYER_TITLE_ORDER = -5197;
+
         public const string GUILD_SKILL_FILE = "Guild Skill";
         public const string GUILD_SKILL_MENU = "Create GameData/Guild Skill";
-        public const int GUILD_SKILL_ORDER = -5199;
+        public const int GUILD_SKILL_ORDER = -5196;
 
         public const string GUILD_ICON_FILE = "Guild Icon";
         public const string GUILD_ICON_MENU = "Create GameData/Guild Icon";
-        public const int GUILD_ICON_ORDER = -5198;
+        public const int GUILD_ICON_ORDER = -5195;
 
         public const string SOCIAL_SYSTEM_SETTING_FILE = "Social System Setting";
         public const string SOCIAL_SYSTEM_SETTING_MENU = "Create GameData/Social System Setting";
