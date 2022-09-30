@@ -115,7 +115,7 @@ namespace MultiplayerARPG
                 tempUI.SetIsLocked(availableIconIds.Contains(data.DataId));
                 tempUI.Show();
                 CacheSelectionManager.Add(tempUI);
-                if (availableIconIds.Contains(data.DataId) || selectedDataId == data.DataId)
+                if ((selectedDataId == 0 && availableIconIds.Contains(data.DataId)) || selectedDataId == data.DataId)
                     tempUI.OnClickSelect();
             });
         }
@@ -144,6 +144,7 @@ namespace MultiplayerARPG
         protected virtual void ResponseSelectedIcon(ResponseHandlerData requestHandler, AckResponseCode responseCode, ResponseSetIconMessage response)
         {
             if (responseCode.ShowUnhandledResponseMessageDialog(response.message)) return;
+            GameInstance.PlayingCharacter.IconDataId = response.dataId;
         }
     }
 }

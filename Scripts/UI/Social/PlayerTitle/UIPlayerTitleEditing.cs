@@ -115,7 +115,7 @@ namespace MultiplayerARPG
                 tempUI.SetIsLocked(availableTitleIds.Contains(data.DataId));
                 tempUI.Show();
                 CacheSelectionManager.Add(tempUI);
-                if (availableTitleIds.Contains(data.DataId) || selectedDataId == data.DataId)
+                if ((selectedDataId == 0 && availableTitleIds.Contains(data.DataId)) || selectedDataId == data.DataId)
                     tempUI.OnClickSelect();
             });
         }
@@ -144,6 +144,7 @@ namespace MultiplayerARPG
         protected virtual void ResponseSelectedTitle(ResponseHandlerData requestHandler, AckResponseCode responseCode, ResponseSetTitleMessage response)
         {
             if (responseCode.ShowUnhandledResponseMessageDialog(response.message)) return;
+            GameInstance.PlayingCharacter.TitleDataId = response.dataId;
         }
     }
 }
