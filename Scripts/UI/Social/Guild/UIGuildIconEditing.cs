@@ -12,8 +12,6 @@ namespace MultiplayerARPG
         public UIGuildIcon[] selectedIcons;
 
         [Header("Options")]
-        [FormerlySerializedAs("setSelectedIconByOptions")]
-        public bool setSelectedIconOnEnable = true;
         [FormerlySerializedAs("updateGuildOptionsOnSelectIcon")]
         public bool updateGuildOptionsOnSelect = false;
 
@@ -59,7 +57,7 @@ namespace MultiplayerARPG
         {
             CacheSelectionManager.eventOnSelected.RemoveListener(OnSelect);
             CacheSelectionManager.eventOnSelected.AddListener(OnSelect);
-            if (setSelectedIconOnEnable && GameInstance.JoinedGuild != null)
+            if (GameInstance.JoinedGuild != null)
             {
                 // Get current guild options before modify and save
                 GuildOptions options = new GuildOptions();
