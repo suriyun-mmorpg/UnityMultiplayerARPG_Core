@@ -19,12 +19,12 @@ namespace MultiplayerARPG
 
         protected override void UpdateData()
         {
-            PlayerTitle icon = Data;
-            if (icon == null)
-                icon = GameInstance.PlayerTitles.Values.FirstOrDefault();
+            PlayerTitle title = Data;
+            if (title == null)
+                title = GameInstance.PlayerTitles.Values.FirstOrDefault();
             if (imageIcon != null)
             {
-                Sprite iconSprite = icon == null ? null : icon.Icon;
+                Sprite iconSprite = title == null ? null : title.Icon;
                 imageIcon.gameObject.SetActive(iconSprite != null);
                 imageIcon.sprite = iconSprite;
                 imageIcon.preserveAspect = true;
@@ -33,9 +33,9 @@ namespace MultiplayerARPG
 
         public void SetDataByDataId(int dataId)
         {
-            PlayerTitle guildIcon;
-            if (GameInstance.PlayerTitles.TryGetValue(dataId, out guildIcon))
-                Data = guildIcon;
+            PlayerTitle title;
+            if (GameInstance.PlayerTitles.TryGetValue(dataId, out title))
+                Data = title;
             else
                 Data = null;
         }

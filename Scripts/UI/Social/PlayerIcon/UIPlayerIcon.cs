@@ -33,9 +33,9 @@ namespace MultiplayerARPG
 
         public void SetDataByDataId(int dataId)
         {
-            PlayerIcon guildIcon;
-            if (GameInstance.PlayerIcons.TryGetValue(dataId, out guildIcon))
-                Data = guildIcon;
+            PlayerIcon icon;
+            if (GameInstance.PlayerIcons.TryGetValue(dataId, out icon))
+                Data = icon;
             else
                 Data = null;
         }
