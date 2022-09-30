@@ -69,7 +69,7 @@ namespace MultiplayerARPG
         {
             if (settings.applyToTransform)
             {
-                Apply(settings);
+                targetTransform.localPosition = settings.localPosition;
                 settings.applyToTransform = false;
             }
         }
@@ -87,7 +87,7 @@ namespace MultiplayerARPG
             if (!settings.drawGizmos)
                 return;
             Gizmos.color = settings.gizmosColor;
-            Gizmos.DrawWireSphere(targetTransform.parent.position + settings.localPosition, 0.1f);
+            Gizmos.DrawWireSphere(targetTransform.parent.position + new Vector3(settings.localPosition.x * targetTransform.parent.lossyScale.x, settings.localPosition.y * targetTransform.parent.lossyScale.y, settings.localPosition.z * targetTransform.parent.lossyScale.z), 0.1f);
         }
 #endif
 
