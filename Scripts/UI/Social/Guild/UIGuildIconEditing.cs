@@ -1,4 +1,6 @@
-﻿using UnityEngine;
+﻿using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
 using UnityEngine.Serialization;
 
 namespace MultiplayerARPG
@@ -89,8 +91,20 @@ namespace MultiplayerARPG
             CacheSelectionManager.DeselectSelectedUI();
             CacheSelectionManager.Clear();
 
+            List<GuildIcon> list = new List<GuildIcon>(GameInstance.GuildIcons.Values);
+            if (list.Count == 0)
+            {
+                CacheList.HideAll();
+                if (listEmptyObject != null)
+                    listEmptyObject.SetActive(true);
+                return;
+            }
+
+            if (listEmptyObject != null)
+                listEmptyObject.SetActive(false);
+
             UIGuildIcon tempUI;
-            CacheList.Generate(GameInstance.GuildIcons.Values, (index, data, ui) =>
+            CacheList.Generate(list, (index, data, ui) =>
             {
                 tempUI = ui.GetComponent<UIGuildIcon>();
                 tempUI.Data = data;
