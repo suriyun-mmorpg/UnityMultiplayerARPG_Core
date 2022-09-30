@@ -34,7 +34,7 @@ namespace MultiplayerARPG
             if (GameInstance.GuildIcons.TryGetValue(dataId, out guildIcon))
                 Data = guildIcon;
             else
-                Data = null;
+                Data = GameInstance.GuildIcons.Values.FirstOrDefault();
         }
     }
 }

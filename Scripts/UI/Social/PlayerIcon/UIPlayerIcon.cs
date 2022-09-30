@@ -37,7 +37,7 @@ namespace MultiplayerARPG
             if (GameInstance.PlayerIcons.TryGetValue(dataId, out icon))
                 Data = icon;
             else
-                Data = null;
+                Data = GameInstance.PlayerIcons.Values.FirstOrDefault();
         }
 
         public void SetIsLocked(bool isLocked)

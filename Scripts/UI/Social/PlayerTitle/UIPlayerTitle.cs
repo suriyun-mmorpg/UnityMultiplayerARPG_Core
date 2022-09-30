@@ -37,7 +37,7 @@ namespace MultiplayerARPG
             if (GameInstance.PlayerTitles.TryGetValue(dataId, out title))
                 Data = title;
             else
-                Data = null;
+                Data = GameInstance.PlayerTitles.Values.FirstOrDefault();
         }
 
         public void SetIsLocked(bool isLocked)
