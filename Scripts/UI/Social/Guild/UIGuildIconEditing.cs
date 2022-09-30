@@ -12,7 +12,6 @@ namespace MultiplayerARPG
 
         [Header("Options")]
         public bool setSelectedIconByOptions;
-        public bool updateSelectedIconsOnSelectIcon;
         public bool updateGuildOptionsOnSelectIcon;
 
         private UIList cacheList;
@@ -73,8 +72,7 @@ namespace MultiplayerARPG
 
         protected virtual void OnSelect(UIGuildIcon ui)
         {
-            if (updateSelectedIconsOnSelectIcon)
-                UpdateSelectedIcons();
+            UpdateSelectedIcons();
             if (updateGuildOptionsOnSelectIcon)
                 UpdateGuildOptions();
         }
