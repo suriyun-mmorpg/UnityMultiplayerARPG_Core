@@ -17,6 +17,9 @@ namespace MultiplayerARPG
             BaseSkill[] skills = Resources.LoadAll<BaseSkill>("");
             BaseNpcDialog[] npcDialogs = Resources.LoadAll<BaseNpcDialog>("");
             Quest[] quests = Resources.LoadAll<Quest>("");
+            PlayerIcon[] playerIcons = Resources.LoadAll<PlayerIcon>("");
+            PlayerFrame[] playerFrames = Resources.LoadAll<PlayerFrame>("");
+            PlayerTitle[] playerTitles = Resources.LoadAll<PlayerTitle>("");
             GuildSkill[] guildSkills = Resources.LoadAll<GuildSkill>("");
             GuildIcon[] guildIcons = Resources.LoadAll<GuildIcon>("");
             StatusEffect[] statusEffects = Resources.LoadAll<StatusEffect>("");
@@ -33,6 +36,9 @@ namespace MultiplayerARPG
             GameInstance.AddSkills(skills);
             GameInstance.AddNpcDialogs(npcDialogs);
             GameInstance.AddQuests(quests);
+            GameInstance.AddPlayerIcons(playerIcons);
+            GameInstance.AddPlayerFrames(playerFrames);
+            GameInstance.AddPlayerTitles(playerTitles);
             GameInstance.AddGuildSkills(guildSkills);
             GameInstance.AddGuildIcons(guildIcons);
             GameInstance.AddStatusEffects(statusEffects);

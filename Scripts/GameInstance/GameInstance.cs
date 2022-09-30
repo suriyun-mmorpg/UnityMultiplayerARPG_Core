@@ -99,6 +99,9 @@ namespace MultiplayerARPG
         public static readonly Dictionary<int, BaseSkill> Skills = new Dictionary<int, BaseSkill>();
         public static readonly Dictionary<int, BaseNpcDialog> NpcDialogs = new Dictionary<int, BaseNpcDialog>();
         public static readonly Dictionary<int, Quest> Quests = new Dictionary<int, Quest>();
+        public static readonly Dictionary<int, PlayerIcon> PlayerIcons = new Dictionary<int, PlayerIcon>();
+        public static readonly Dictionary<int, PlayerFrame> PlayerFrames = new Dictionary<int, PlayerFrame>();
+        public static readonly Dictionary<int, PlayerTitle> PlayerTitles = new Dictionary<int, PlayerTitle>();
         public static readonly Dictionary<int, GuildSkill> GuildSkills = new Dictionary<int, GuildSkill>();
         public static readonly Dictionary<int, GuildIcon> GuildIcons = new Dictionary<int, GuildIcon>();
         public static readonly Dictionary<int, Gacha> Gachas = new Dictionary<int, Gacha>();
@@ -666,6 +669,9 @@ namespace MultiplayerARPG
             Skills.Clear();
             NpcDialogs.Clear();
             Quests.Clear();
+            PlayerIcons.Clear();
+            PlayerFrames.Clear();
+            PlayerTitles.Clear();
             GuildSkills.Clear();
             GuildIcons.Clear();
             Gachas.Clear();
@@ -1216,6 +1222,36 @@ namespace MultiplayerARPG
         public static void AddQuests(IEnumerable<Quest> quests)
         {
             AddManyGameData(Quests, quests);
+        }
+
+        public static void AddPlayerIcons(params PlayerIcon[] playerIcons)
+        {
+            AddPlayerIcons((IEnumerable<PlayerIcon>)playerIcons);
+        }
+
+        public static void AddPlayerIcons(IEnumerable<PlayerIcon> playerIcons)
+        {
+            AddManyGameData(PlayerIcons, playerIcons);
+        }
+
+        public static void AddPlayerFrames(params PlayerFrame[] playerFrames)
+        {
+            AddPlayerFrames((IEnumerable<PlayerFrame>)playerFrames);
+        }
+
+        public static void AddPlayerFrames(IEnumerable<PlayerFrame> playerFrames)
+        {
+            AddManyGameData(PlayerFrames, playerFrames);
+        }
+
+        public static void AddPlayerTitles(params PlayerTitle[] playerTitles)
+        {
+            AddPlayerTitles((IEnumerable<PlayerTitle>)playerTitles);
+        }
+
+        public static void AddPlayerTitles(IEnumerable<PlayerTitle> playerTitles)
+        {
+            AddManyGameData(PlayerTitles, playerTitles);
         }
 
         public static void AddGuildSkills(params GuildSkill[] guildSkills)

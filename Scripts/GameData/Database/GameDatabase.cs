@@ -33,6 +33,9 @@ namespace MultiplayerARPG
         public WeaponType[] weaponTypes;
         public AmmoType[] ammoTypes;
         public BaseSkill[] skills;
+        public PlayerIcon[] playerIcons;
+        public PlayerFrame[] playerFrames;
+        public PlayerTitle[] playerTitles;
         public GuildSkill[] guildSkills;
         public GuildIcon[] guildIcons;
         public StatusEffect[] statusEffects;
@@ -53,6 +56,9 @@ namespace MultiplayerARPG
         public string mapInfoBundleName = "map";
         public string sceneBundleName = "scene";
         public string skillBundleName = "skill";
+        public string playerIconBundleName = "playerIcon";
+        public string playerFrameBundleName = "playerFrame";
+        public string playerTitleBundleName = "playerTitle";
         public string guildSkillBundleName = "guildSkill";
         public string guildIconBundleName = "guildIcon";
         public string questBundleName = "quest";
@@ -75,6 +81,9 @@ namespace MultiplayerARPG
             GameInstance.AddWeaponTypes(weaponTypes);
             GameInstance.AddAmmoTypes(ammoTypes);
             GameInstance.AddSkills(skills);
+            GameInstance.AddPlayerIcons(playerIcons);
+            GameInstance.AddPlayerFrames(playerFrames);
+            GameInstance.AddPlayerTitles(playerTitles);
             GameInstance.AddGuildSkills(guildSkills);
             GameInstance.AddGuildIcons(guildIcons);
             GameInstance.AddStatusEffects(statusEffects);
@@ -175,6 +184,27 @@ namespace MultiplayerARPG
                 if (string.IsNullOrEmpty(assetImporter.assetBundleName))
                     assetImporter.SetAssetBundleNameAndVariant(skillBundleName, "");
             }
+            foreach (PlayerIcon asset in GameInstance.PlayerIcons.Values)
+            {
+                assetPath = AssetDatabase.GetAssetPath(asset.GetInstanceID());
+                assetImporter = AssetImporter.GetAtPath(assetPath);
+                if (string.IsNullOrEmpty(assetImporter.assetBundleName))
+                    assetImporter.SetAssetBundleNameAndVariant(playerIconBundleName, "");
+            }
+            foreach (PlayerFrame asset in GameInstance.PlayerFrames.Values)
+            {
+                assetPath = AssetDatabase.GetAssetPath(asset.GetInstanceID());
+                assetImporter = AssetImporter.GetAtPath(assetPath);
+                if (string.IsNullOrEmpty(assetImporter.assetBundleName))
+                    assetImporter.SetAssetBundleNameAndVariant(playerFrameBundleName, "");
+            }
+            foreach (PlayerTitle asset in GameInstance.PlayerTitles.Values)
+            {
+                assetPath = AssetDatabase.GetAssetPath(asset.GetInstanceID());
+                assetImporter = AssetImporter.GetAtPath(assetPath);
+                if (string.IsNullOrEmpty(assetImporter.assetBundleName))
+                    assetImporter.SetAssetBundleNameAndVariant(playerTitleBundleName, "");
+            }
             foreach (GuildSkill asset in GameInstance.GuildSkills.Values)
             {
                 assetPath = AssetDatabase.GetAssetPath(asset.GetInstanceID());
@@ -225,6 +255,9 @@ namespace MultiplayerARPG
             GameInstance.AddWeaponTypes(weaponTypes);
             GameInstance.AddAmmoTypes(ammoTypes);
             GameInstance.AddSkills(skills);
+            GameInstance.AddPlayerIcons(playerIcons);
+            GameInstance.AddPlayerFrames(playerFrames);
+            GameInstance.AddPlayerTitles(playerTitles);
             GameInstance.AddGuildSkills(guildSkills);
             GameInstance.AddGuildIcons(guildIcons);
             GameInstance.AddStatusEffects(statusEffects);
@@ -274,6 +307,18 @@ namespace MultiplayerARPG
             List<BaseSkill> tempSkills = new List<BaseSkill>(GameInstance.Skills.Values);
             tempSkills.Sort();
             skills = tempSkills.ToArray();
+
+            List<PlayerIcon> tempPlayerIcons = new List<PlayerIcon>(GameInstance.PlayerIcons.Values);
+            tempPlayerIcons.Sort();
+            playerIcons = tempPlayerIcons.ToArray();
+
+            List<PlayerFrame> tempPlayerFrames = new List<PlayerFrame>(GameInstance.PlayerFrames.Values);
+            tempPlayerFrames.Sort();
+            playerFrames = tempPlayerFrames.ToArray();
+
+            List<PlayerTitle> tempPlayerTitles = new List<PlayerTitle>(GameInstance.PlayerTitles.Values);
+            tempPlayerTitles.Sort();
+            playerTitles = tempPlayerTitles.ToArray();
 
             List<GuildSkill> tempGuildSkills = new List<GuildSkill>(GameInstance.GuildSkills.Values);
             tempGuildSkills.Sort();
