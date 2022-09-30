@@ -7,7 +7,6 @@ namespace MultiplayerARPG
     public partial class UIPlayerFrameEditing : UIBase
     {
         [Header("UI Elements")]
-        public Sprite defaultFrame;
         public GameObject listEmptyObject;
         public UIPlayerFrame uiPrefab;
         public Transform uiContainer;

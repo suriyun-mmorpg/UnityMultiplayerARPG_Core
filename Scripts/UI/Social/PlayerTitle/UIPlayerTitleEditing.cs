@@ -7,7 +7,6 @@ namespace MultiplayerARPG
     public partial class UIPlayerTitleEditing : UIBase
     {
         [Header("UI Elements")]
-        public Sprite defaultTitle;
         public GameObject listEmptyObject;
         public UIPlayerTitle uiPrefab;
         public Transform uiContainer;

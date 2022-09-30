@@ -7,7 +7,6 @@ namespace MultiplayerARPG
     public partial class UIPlayerIconEditing : UIBase
     {
         [Header("UI Elements")]
-        public Sprite defaultIcon;
         public GameObject listEmptyObject;
         public UIPlayerIcon uiPrefab;
         public Transform uiContainer;
