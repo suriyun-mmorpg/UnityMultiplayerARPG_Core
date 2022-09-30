@@ -19,6 +19,9 @@ namespace MultiplayerARPG
         public TextWrapper uiTextLevel;
         public UIGageValue uiGageHp;
         public UIGageValue uiGageMp;
+        public UIPlayerIcon uiPlayerIcon;
+        public UIPlayerFrame uiPlayerFrame;
+        public UIPlayerTitle uiPlayerTitle;
         public TextWrapper uiTextOnlineStatus;
         public UICharacterBuffs uiCharacterBuffs;
         [Header("Member states objects")]
@@ -107,6 +110,18 @@ namespace MultiplayerARPG
                 if (uiGageMp.textValue != null)
                     uiGageMp.textValue.SetGameObjectActive(maxValue > 0);
             }
+
+            // Icon
+            if (uiPlayerIcon != null)
+                uiPlayerIcon.SetDataByDataId(Data.iconDataId);
+
+            // Frame
+            if (uiPlayerFrame != null)
+                uiPlayerFrame.SetDataByDataId(Data.frameDataId);
+
+            // Title
+            if (uiPlayerTitle != null)
+                uiPlayerTitle.SetDataByDataId(Data.titleDataId);
 
             if (dirtyCharacterId != Data.id)
             {
