@@ -1,5 +1,4 @@
 ﻿using LiteNetLib;
-using LiteNetLib.Utils;
 using System.Collections.Generic;
 
 namespace MultiplayerARPG
@@ -8,39 +7,33 @@ namespace MultiplayerARPG
     {
         public const byte SOCIAL_MSG_DATA_CHANNEL = 5;
 
-        public static UpdateSocialMemberMessage MakeAddSocialMember(int id, string characterId, string characterName, int dataId, short level)
+        public static UpdateSocialMemberMessage MakeAddSocialMember(int id, SocialCharacterData character)
         {
             return new UpdateSocialMemberMessage()
             {
                 type = UpdateSocialMemberMessage.UpdateType.Add,
                 socialId = id,
-                character = new SocialCharacterData()
-                {
-                    id = characterId,
-                    characterName = characterName,
-                    dataId = dataId,
-                    level = level,
-                },
+                character = character,
             };
         }
 
-        public static void SendAddSocialMember(this LiteNetLibManager.LiteNetLibServer server, long connectionId, ushort msgType, int id, string characterId, string characterName, int dataId, short level)
+        public static void SendAddSocialMember(this LiteNetLibManager.LiteNetLibServer server, long connectionId, ushort msgType, int id, SocialCharacterData character)
         {
-            server.SendPacket(connectionId, SOCIAL_MSG_DATA_CHANNEL, DeliveryMethod.ReliableOrdered, msgType, (writer) => writer.Put(MakeAddSocialMember(id, characterId, characterName, dataId, level)));
+            server.SendPacket(connectionId, SOCIAL_MSG_DATA_CHANNEL, DeliveryMethod.ReliableOrdered, msgType, (writer) => writer.Put(MakeAddSocialMember(id, character)));
         }
 
-        public static void SendAddSocialMember(this LiteNetLibManager.LiteNetLibClient client, ushort msgType, int id, string characterId, string characterName, int dataId, short level)
+        public static void SendAddSocialMember(this LiteNetLibManager.LiteNetLibClient client, ushort msgType, int id, SocialCharacterData character)
         {
-            client.SendPacket(SOCIAL_MSG_DATA_CHANNEL, DeliveryMethod.ReliableOrdered, msgType, (writer) => writer.Put(MakeAddSocialMember(id, characterId, characterName, dataId, level)));
+            client.SendPacket(SOCIAL_MSG_DATA_CHANNEL, DeliveryMethod.ReliableOrdered, msgType, (writer) => writer.Put(MakeAddSocialMember(id, character)));
         }
 
-        public static UpdateSocialMemberMessage MakeUpdateSocialMember(int id, SocialCharacterData member)
+        public static UpdateSocialMemberMessage MakeUpdateSocialMember(int id, SocialCharacterData character)
         {
             return new UpdateSocialMemberMessage()
             {
                 type = UpdateSocialMemberMessage.UpdateType.Update,
                 socialId = id,
-                character = member,
+                character = character,
             };
         }
 

@@ -56,19 +56,19 @@ namespace MultiplayerARPG
                 return;
             foreach (SocialCharacterData member in party.GetMembers())
             {
-                handlers.SendAddPartyMember(connectionId, party.id, member.id, member.characterName, member.dataId, member.level);
+                handlers.SendAddPartyMember(connectionId, party.id, member);
             }
         }
 
-        public static void SendAddPartyMemberToMembers(this IServerGameMessageHandlers handlers, PartyData party, string characterId, string characterName, int dataId, short level)
+        public static void SendAddPartyMemberToMembers(this IServerGameMessageHandlers handlers, PartyData party, SocialCharacterData newMember)
         {
             if (party == null)
                 return;
             long connectionId;
             foreach (SocialCharacterData member in party.GetMembers())
             {
-                if (!member.id.Equals(characterId) && GameInstance.ServerUserHandlers.TryGetConnectionId(member.id, out connectionId))
-                    handlers.SendAddPartyMember(connectionId, party.id, characterId, characterName, dataId, level);
+                if (!member.id.Equals(newMember.id) && GameInstance.ServerUserHandlers.TryGetConnectionId(member.id, out connectionId))
+                    handlers.SendAddPartyMember(connectionId, party.id, newMember);
             }
         }
 
@@ -300,19 +300,19 @@ namespace MultiplayerARPG
                 return;
             foreach (SocialCharacterData member in guild.GetMembers())
             {
-                handlers.SendAddGuildMember(connectionId, guild.id, member.id, member.characterName, member.dataId, member.level);
+                handlers.SendAddGuildMember(connectionId, guild.id, member);
             }
         }
 
-        public static void SendAddGuildMemberToMembers(this IServerGameMessageHandlers handlers, GuildData guild, string characterId, string characterName, int dataId, short level)
+        public static void SendAddGuildMemberToMembers(this IServerGameMessageHandlers handlers, GuildData guild, SocialCharacterData newMember)
         {
             if (guild == null)
                 return;
             long connectionId;
             foreach (SocialCharacterData member in guild.GetMembers())
             {
-                if (!member.id.Equals(characterId) && GameInstance.ServerUserHandlers.TryGetConnectionId(member.id, out connectionId))
-                    handlers.SendAddGuildMember(connectionId, guild.id, characterId, characterName, dataId, level);
+                if (!member.id.Equals(newMember.id) && GameInstance.ServerUserHandlers.TryGetConnectionId(member.id, out connectionId))
+                    handlers.SendAddGuildMember(connectionId, guild.id, newMember);
             }
         }
 

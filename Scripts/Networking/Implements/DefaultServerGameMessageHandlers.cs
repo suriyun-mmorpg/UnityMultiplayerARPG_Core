@@ -110,9 +110,9 @@ namespace MultiplayerARPG
             Manager.Server.SendPartyTerminate(connectionId, GameNetworkingConsts.UpdateParty, id);
         }
 
-        public void SendAddPartyMember(long connectionId, int id, string characterId, string characterName, int dataId, short level)
+        public void SendAddPartyMember(long connectionId, int id, SocialCharacterData member)
         {
-            Manager.Server.SendAddSocialMember(connectionId, GameNetworkingConsts.UpdatePartyMember, id, characterId, characterName, dataId, level);
+            Manager.Server.SendAddSocialMember(connectionId, GameNetworkingConsts.UpdatePartyMember, id, member);
         }
 
         public void SendUpdatePartyMember(long connectionId, int id, SocialCharacterData member)
@@ -166,9 +166,9 @@ namespace MultiplayerARPG
             Manager.Server.SendGuildTerminate(connectionId, GameNetworkingConsts.UpdateGuild, id);
         }
 
-        public void SendAddGuildMember(long connectionId, int id, string characterId, string characterName, int dataId, short level)
+        public void SendAddGuildMember(long connectionId, int id, SocialCharacterData member)
         {
-            Manager.Server.SendAddSocialMember(connectionId, GameNetworkingConsts.UpdateGuildMember, id, characterId, characterName, dataId, level);
+            Manager.Server.SendAddSocialMember(connectionId, GameNetworkingConsts.UpdateGuildMember, id, member);
         }
 
         public void SendUpdateGuildMember(long connectionId, int id, SocialCharacterData member)
