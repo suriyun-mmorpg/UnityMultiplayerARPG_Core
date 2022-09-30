@@ -30,13 +30,13 @@ namespace MultiplayerARPG
             }
         }
 
-        private UIGuildIconEditingSelectionManager cacheSelectionManager;
-        public UIGuildIconEditingSelectionManager CacheSelectionManager
+        private UIGuildIconSelectionManager cacheSelectionManager;
+        public UIGuildIconSelectionManager CacheSelectionManager
         {
             get
             {
                 if (cacheSelectionManager == null)
-                    cacheSelectionManager = gameObject.GetOrAddComponent<UIGuildIconEditingSelectionManager>();
+                    cacheSelectionManager = gameObject.GetOrAddComponent<UIGuildIconSelectionManager>();
                 cacheSelectionManager.selectionMode = UISelectionMode.SelectSingle;
                 return cacheSelectionManager;
             }
