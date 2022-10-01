@@ -67,7 +67,7 @@ namespace MultiplayerARPG
             {
                 nonOwnerObject.SetActive(false);
             }
-            result.gameObject.layer = GameInstance.Singleton.playerLayer;
+            result.gameObject.SetLayerRecursively(GameInstance.Singleton.playerLayer, true);
             result.gameObject.SetActive(true);
             result.transform.localPosition = Vector3.zero;
             return result.CharacterModel;
