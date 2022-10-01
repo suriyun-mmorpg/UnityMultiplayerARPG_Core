@@ -351,7 +351,7 @@ namespace MultiplayerARPG
 
         public virtual bool CanActivate()
         {
-            return !this.IsDead();
+            return !this.IsDead() && GameInstance.PlayingCharacterEntity.PassengingVehicleEntity == null;
         }
 
         public virtual void OnActivate()
