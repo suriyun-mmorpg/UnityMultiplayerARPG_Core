@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Cysharp.Threading.Tasks;
+using System;
 using UnityEngine;
 using UnityEngine.AI;
 using UnityEngine.Rendering;
@@ -111,7 +112,8 @@ namespace MultiplayerARPG
 
         public BuildingEntity BuildingEntity { get; private set; }
         public NavMeshObstacle CacheNavMeshObstacle { get; private set; }
-        private bool dirtyIsBuildMode;
+
+        private BuildingMaterialBuildModeHandler buildModeHandler;
 
         public override void Setup(byte index)
         {
@@ -145,110 +147,18 @@ namespace MultiplayerARPG
 
             CurrentState = State.Unknow;
             CurrentState = State.Default;
-        }
 
-        private void Update()
-        {
-            if (BuildingEntity.IsBuildMode != dirtyIsBuildMode)
+            if (BuildingEntity.IsBuildMode)
             {
-                dirtyIsBuildMode = BuildingEntity.IsBuildMode;
                 if (CacheNavMeshObstacle != null)
-                    CacheNavMeshObstacle.enabled = !BuildingEntity.IsBuildMode;
-            }
-        }
+                    CacheNavMeshObstacle.enabled = false;
 
-        private void OnTriggerStay(Collider other)
-        {
-            TriggerEnter(other.gameObject, () => CacheCollider.ColliderIntersect(other, boundsSizeRateWhilePlacing));
-        }
-
-        private void OnTriggerExit(Collider other)
-        {
-            TriggerExit(other.gameObject);
-        }
-
-        private void OnTriggerStay2D(Collider2D other)
-        {
-            TriggerEnter(other.gameObject, () => CacheCollider2D.ColliderIntersect(other, boundsSizeRateWhilePlacing));
-        }
-
-        private void OnTriggerExit2D(Collider2D other)
-        {
-            TriggerExit(other.gameObject);
-        }
-
-        private void TriggerEnter(GameObject other, Func<bool> materialInterectFunc)
-        {
-
-            if (!isSetup)
-                return;
-
-            if (!BuildingEntity.IsBuildMode)
-                return;
-
-            if (!ValidateTriggerLayer(other))
-                return;
-
-            if (BuildingEntity.TriggerEnterComponent(other.GetComponent<NoConstructionArea>()))
-                return;
-
-            if (BuildingEntity.TriggerEnterComponent(other.GetComponent<TilemapCollider2D>()))
-                return;
-
-            BuildingMaterial material = other.GetComponent<BuildingMaterial>();
-            if (material != null)
-            {
-                if (!materialInterectFunc())
+                if (buildModeHandler == null)
                 {
-                    BuildingEntity.TriggerExitEntity(material.Entity);
-                }
-                else
-                {
-                    if (SameBuildingAreaTransform(other))
-                        return;
-                    BuildingEntity.TriggerEnterEntity(material.Entity);
+                    buildModeHandler = gameObject.AddComponent<BuildingMaterialBuildModeHandler>();
+                    buildModeHandler.Setup(this);
                 }
             }
-            else
-            {
-                if (SameBuildingAreaTransform(other))
-                    return;
-                IGameEntity gameEntity = other.GetComponent<IGameEntity>();
-                if (gameEntity != null)
-                {
-                    BuildingEntity.TriggerEnterEntity(gameEntity.Entity);
-                }
-            }
-        }
-
-        private void TriggerExit(GameObject other)
-        {
-            if (!isSetup)
-                return;
-
-            if (!BuildingEntity.IsBuildMode)
-                return;
-
-            if (BuildingEntity.TriggerExitComponent(other.GetComponent<NoConstructionArea>()))
-                return;
-
-            if (BuildingEntity.TriggerExitComponent(other.GetComponent<TilemapCollider2D>()))
-                return;
-
-            // Material is derived from `IGameEntity`, so just find for `IGameEntity` is fine
-            IGameEntity gameEntity = other.GetComponent<IGameEntity>();
-            if (gameEntity != null)
-                BuildingEntity.TriggerExitEntity(gameEntity.Entity);
-        }
-
-        private bool SameBuildingAreaTransform(GameObject other)
-        {
-            return BuildingEntity.BuildingArea != null && BuildingEntity.BuildingArea.transform.root == other.transform.root;
-        }
-
-        public bool ValidateTriggerLayer(GameObject gameObject)
-        {
-            return gameObject.layer != PhysicLayers.TransparentFX;
         }
     }
 }
