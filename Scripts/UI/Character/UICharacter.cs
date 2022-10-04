@@ -383,16 +383,11 @@ namespace MultiplayerARPG
                 uiPlayerTitle.SetVisible(playerCharacter != null);
             }
 
-            BaseCharacter character = Data == null ? null : Data.GetDatabase();
-            if (uiCharacterClass != null)
-                uiCharacterClass.Data = character;
-
             Profiler.EndSample();
         }
 
         protected override void UpdateData()
         {
-            IPlayerCharacterData playerCharacter = Data as IPlayerCharacterData;
             cacheStats = new CharacterStats();
             cacheAttributes = new Dictionary<Attribute, float>();
             cacheResistances = new Dictionary<DamageElement, float>();
@@ -563,6 +558,10 @@ namespace MultiplayerARPG
 
             if (uiCharacterBuffs != null)
                 uiCharacterBuffs.UpdateData(Data);
+
+            BaseCharacter character = Data == null ? null : Data.GetDatabase();
+            if (uiCharacterClass != null)
+                uiCharacterClass.Data = character;
         }
     }
 }
