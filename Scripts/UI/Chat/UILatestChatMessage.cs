@@ -16,6 +16,7 @@
         public void SetOnClientReceiveChatMessage()
         {
             RemoveOnClientReceiveChatMessage();
+            OnReceiveChat(UIChatHistory.ChatMessages[UIChatHistory.ChatMessages.Count - 1]);
             ClientGenericActions.onClientReceiveChatMessage += OnReceiveChat;
         }
 
