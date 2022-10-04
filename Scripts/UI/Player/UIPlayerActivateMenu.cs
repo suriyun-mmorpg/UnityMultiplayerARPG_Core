@@ -15,16 +15,21 @@ namespace MultiplayerARPG
 
         protected override void UpdateUI()
         {
+            if (Data == null)
+            {
+                Hide();
+                return;
+            }
             base.UpdateUI();
             foreach (GameObject obj in partyInviteObjects)
             {
                 if (obj != null)
-                    obj.SetActive(GameInstance.JoinedParty != null && GameInstance.JoinedParty.CanInvite(GameInstance.PlayingCharacter.Id));
+                    obj.SetActive(Data.PartyId <= 0 && GameInstance.JoinedParty != null && GameInstance.JoinedParty.CanInvite(GameInstance.PlayingCharacter.Id));
             }
             foreach (GameObject obj in guildInviteObjects)
             {
                 if (obj != null)
-                    obj.SetActive(GameInstance.JoinedGuild != null && GameInstance.JoinedGuild.CanInvite(GameInstance.PlayingCharacter.Id));
+                    obj.SetActive(Data.GuildId <= 0 && GameInstance.JoinedGuild != null && GameInstance.JoinedGuild.CanInvite(GameInstance.PlayingCharacter.Id));
             }
         }
 
