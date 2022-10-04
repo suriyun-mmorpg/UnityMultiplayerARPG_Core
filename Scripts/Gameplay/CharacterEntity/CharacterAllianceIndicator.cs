@@ -65,16 +65,20 @@ namespace MultiplayerARPG
                 BasePlayerCharacterEntity playerCharacterEntity = characterEntity as BasePlayerCharacterEntity;
                 if (playerCharacterEntity != null)
                 {
-                    if (playerCharacterEntity.PartyId > 0 && playerCharacterEntity.PartyId == GameInstance.PlayingCharacter.PartyId && partyMemberIndicator != null)
-                    {
-                        if (partyMemberIndicator.activeSelf != isShowing)
-                            partyMemberIndicator.SetActive(isShowing);
-                    }
-                    if (playerCharacterEntity.GuildId > 0 && playerCharacterEntity.GuildId == GameInstance.PlayingCharacter.GuildId && guildMemberIndicator != null)
-                    {
-                        if (guildMemberIndicator != null && guildMemberIndicator.activeSelf != isShowing)
-                            guildMemberIndicator.SetActive(isShowing);
-                    }
+                    isShowing = playerCharacterEntity.PartyId > 0 && playerCharacterEntity.PartyId == GameInstance.PlayingCharacter.PartyId;
+                    if (partyMemberIndicator != null && partyMemberIndicator.activeSelf != isShowing)
+                        partyMemberIndicator.SetActive(isShowing);
+                    isShowing = playerCharacterEntity.GuildId > 0 && playerCharacterEntity.GuildId == GameInstance.PlayingCharacter.GuildId;
+                    if (guildMemberIndicator != null && guildMemberIndicator.activeSelf != isShowing)
+                        guildMemberIndicator.SetActive(isShowing);
+                }
+                else
+                {
+                    isShowing = false;
+                    if (partyMemberIndicator != null && partyMemberIndicator.activeSelf != isShowing)
+                        partyMemberIndicator.SetActive(isShowing);
+                    if (guildMemberIndicator != null && guildMemberIndicator.activeSelf != isShowing)
+                        guildMemberIndicator.SetActive(isShowing);
                 }
 
                 isShowing = characterEntity.IsEnemy(GameInstance.PlayingCharacterEntity.GetInfo());
