@@ -21,8 +21,6 @@ namespace MultiplayerARPG
         private BaseCharacterEntity characterEntity;
         private float lastUpdateTime;
 
-        private bool tempVisibleResult;
-
         private void Awake()
         {
             characterEntity = GetComponentInParent<BaseCharacterEntity>();
@@ -54,50 +52,38 @@ namespace MultiplayerARPG
             {
                 lastUpdateTime = Time.unscaledTime;
 
-                tempVisibleResult = GameInstance.PlayingCharacterEntity == characterEntity;
-                if (owningIndicator != null && owningIndicator.activeSelf != tempVisibleResult)
-                    owningIndicator.SetActive(tempVisibleResult);
+                bool isShowing;
 
-                if (tempVisibleResult)
-                    return;
+                isShowing = GameInstance.PlayingCharacterEntity == characterEntity;
+                if (owningIndicator != null && owningIndicator.activeSelf != isShowing)
+                    owningIndicator.SetActive(isShowing);
 
-                tempVisibleResult = characterEntity.IsAlly(GameInstance.PlayingCharacterEntity.GetInfo());
-                if (allyIndicator != null && allyIndicator.activeSelf != tempVisibleResult)
-                    allyIndicator.SetActive(tempVisibleResult);
+                isShowing = characterEntity.IsAlly(GameInstance.PlayingCharacterEntity.GetInfo());
+                if (allyIndicator != null && allyIndicator.activeSelf != isShowing)
+                    allyIndicator.SetActive(isShowing);
 
-                if (tempVisibleResult)
+                BasePlayerCharacterEntity playerCharacterEntity = characterEntity as BasePlayerCharacterEntity;
+                if (playerCharacterEntity != null)
                 {
-                    // Is ally, so it can be in the same party or same guild
-                    BasePlayerCharacterEntity playerCharacterEntity = characterEntity as BasePlayerCharacterEntity;
-                    if (playerCharacterEntity != null)
+                    if (playerCharacterEntity.PartyId > 0 && playerCharacterEntity.PartyId == GameInstance.PlayingCharacter.PartyId && partyMemberIndicator != null)
                     {
-                        if (playerCharacterEntity.PartyId > 0 && playerCharacterEntity.PartyId == GameInstance.PlayingCharacter.PartyId && partyMemberIndicator != null)
-                        {
-                            if (partyMemberIndicator.activeSelf != tempVisibleResult)
-                                partyMemberIndicator.SetActive(tempVisibleResult);
-                        }
-                        else if (playerCharacterEntity.GuildId > 0 && playerCharacterEntity.GuildId == GameInstance.PlayingCharacter.GuildId && guildMemberIndicator != null)
-                        {
-                            if (guildMemberIndicator != null && guildMemberIndicator.activeSelf != tempVisibleResult)
-                                guildMemberIndicator.SetActive(tempVisibleResult);
-                        }
+                        if (partyMemberIndicator.activeSelf != isShowing)
+                            partyMemberIndicator.SetActive(isShowing);
                     }
-                    return;
+                    if (playerCharacterEntity.GuildId > 0 && playerCharacterEntity.GuildId == GameInstance.PlayingCharacter.GuildId && guildMemberIndicator != null)
+                    {
+                        if (guildMemberIndicator != null && guildMemberIndicator.activeSelf != isShowing)
+                            guildMemberIndicator.SetActive(isShowing);
+                    }
                 }
 
-                if (tempVisibleResult)
-                    return;
+                isShowing = characterEntity.IsEnemy(GameInstance.PlayingCharacterEntity.GetInfo());
+                if (enemyIndicator != null && enemyIndicator.activeSelf != isShowing)
+                    enemyIndicator.SetActive(isShowing);
 
-                tempVisibleResult = characterEntity.IsEnemy(GameInstance.PlayingCharacterEntity.GetInfo());
-                if (enemyIndicator != null && enemyIndicator.activeSelf != tempVisibleResult)
-                    enemyIndicator.SetActive(tempVisibleResult);
-
-                if (tempVisibleResult)
-                    return;
-
-                tempVisibleResult = characterEntity.IsNeutral(GameInstance.PlayingCharacterEntity.GetInfo());
-                if (neutralIndicator != null && neutralIndicator.activeSelf != tempVisibleResult)
-                    neutralIndicator.SetActive(tempVisibleResult);
+                isShowing = characterEntity.IsNeutral(GameInstance.PlayingCharacterEntity.GetInfo());
+                if (neutralIndicator != null && neutralIndicator.activeSelf != isShowing)
+                    neutralIndicator.SetActive(isShowing);
             }
         }
     }
