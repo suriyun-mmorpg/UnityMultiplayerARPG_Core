@@ -21,6 +21,7 @@ namespace MultiplayerARPG
         {
             base.InitialCameraControls();
             CameraControls.AimAssistAvoidanceListener = this;
+            CameraControls.aimAssistLayerMask = GetAimAssistLayerMask();
         }
 
         public void Recoil(float x, float y)
