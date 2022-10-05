@@ -345,20 +345,16 @@ namespace MultiplayerARPG
             float yAngle;
             long timestamp;
             reader.ReadSyncTransformMessage3D(out movementState, out extraMovementState, out position, out yAngle, out timestamp);
-            if (Mathf.Abs(timestamp - BaseGameNetworkManager.Singleton.ServerTimestamp) > lagBuffer)
+            if (acceptedPositionTimestamp <= timestamp)
             {
-                // Timestamp is a lot difference to server's timestamp, player might try to hack a game or packet may corrupted occurring, so skip it
-                return;
-            }
-            if (acceptedPositionTimestamp < timestamp)
-            {
-                // Snap character to the position if character is too far from the position
                 if (movementState.Has(MovementState.IsTeleport))
                 {
+                    // Server requested to teleport
                     OnTeleport(position, yAngle);
                 }
                 else if (Vector3.Distance(position, CacheTransform.position) >= snapThreshold)
                 {
+                    // Snap character to the position if character is too far from the position
                     if (Entity.MovementSecure == MovementSecure.ServerAuthoritative || !IsOwnerClient)
                     {
                         CacheTransform.eulerAngles = new Vector3(0, yAngle, 0);
@@ -415,7 +411,7 @@ namespace MultiplayerARPG
                 // Timestamp is a lot difference to server's timestamp, player might try to hack a game or packet may corrupted occurring, so skip it
                 return;
             }
-            if (acceptedPositionTimestamp < timestamp)
+            if (acceptedPositionTimestamp <= timestamp)
             {
                 if (!inputState.Has(EntityMovementInputState.IsStopped))
                 {
@@ -479,7 +475,7 @@ namespace MultiplayerARPG
                 // Timestamp is a lot difference to server's timestamp, player might try to hack a game or packet may corrupted occurring, so skip it
                 return;
             }
-            if (acceptedPositionTimestamp < timestamp)
+            if (acceptedPositionTimestamp <= timestamp)
             {
                 if (IsClient)
                 {
