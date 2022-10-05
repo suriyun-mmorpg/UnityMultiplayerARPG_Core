@@ -373,7 +373,6 @@ namespace MultiplayerARPG
         protected IActivatableEntity activatableEntity;
         protected IHoldActivatableEntity holdActivatableEntity;
         // Temp data
-        protected IGameEntity tempGameEntity;
         protected Ray centerRay;
         protected float centerOriginToCharacterDistance;
         protected Vector3 moveDirection;
@@ -836,6 +835,7 @@ namespace MultiplayerARPG
                 }
             }
             // Temporary variables
+            DamageableHitBox tempHitBox;
             RaycastHit tempHitInfo;
             float tempDistance;
             // Default aim position (aim to sky/space)
@@ -862,12 +862,12 @@ namespace MultiplayerARPG
                 }
 
                 // Get damageable hit box component from hit target
-                tempGameEntity = tempHitInfo.collider.GetComponent<DamageableHitBox>();
+                tempHitBox = tempHitInfo.collider.GetComponent<DamageableHitBox>();
 
-                if (tempGameEntity == null || !tempGameEntity.Entity || tempGameEntity.IsHide() ||
-                    tempGameEntity.GetObjectId() == PlayingCharacterEntity.ObjectId)
+                if (tempHitBox == null || !tempHitBox.Entity || tempHitBox.IsHide() ||
+                    tempHitBox.GetObjectId() == PlayingCharacterEntity.ObjectId)
                 {
-                    // Skip empty game entity / hiddeing entity / controlling player's entity
+                    // Skip empty game entity / hidding entity / controlling player's entity
                     continue;
                 }
 
@@ -876,18 +876,22 @@ namespace MultiplayerARPG
                     continue;
 
                 // Skip dead entity while attacking (to allow to use resurrect skills)
-                if (attacking && (tempGameEntity as DamageableHitBox).IsDead())
+                if (attacking && tempHitBox.IsDead())
                     continue;
 
                 // Entity is in front of character, so this is target
-                aimTargetPosition = tempHitInfo.point;
-                SelectedEntity = tempGameEntity.Entity;
+                if (tempHitBox.CanReceiveDamageFrom(PlayingCharacterEntity.GetInfo()))
+                    aimTargetPosition = tempHitInfo.point;
+                SelectedEntity = tempHitBox.Entity;
                 break;
             }
 
             // Aim to activateable entities if it can't find attacking target
-            if (SelectedGameEntity == null)
+            if (SelectedGameEntity == null && !attacking)
             {
+                SelectedEntity = null;
+                IGameEntity tempGameEntity;
+                IBaseActivatableEntity tempActivatableEntity;
                 // Default aim position (aim to sky/space)
                 aimTargetPosition = centerRay.origin + centerRay.direction * (centerOriginToCharacterDistance + findTargetRaycastDistance);
                 // Raycast from camera position to center of screen
@@ -912,18 +916,8 @@ namespace MultiplayerARPG
                         continue;
                     }
 
-                    // Find item drop entity
-                    if (tempGameEntity.Entity is ItemDropEntity &&
-                        tempDistance <= CurrentGameInstance.pickUpItemDistance)
-                    {
-                        // Entity is in front of character, so this is target
-                        if (!turnForwardWhileDoingAction || IsInFront(tempHitInfo.point))
-                            aimTargetPosition = tempHitInfo.point;
-                        SelectedEntity = tempGameEntity.Entity;
-                        break;
-                    }
-                    // Find activatable entity (NPC/Building/Mount/Etc)
-                    if (tempDistance <= CurrentGameInstance.conversationDistance)
+                    tempActivatableEntity = tempGameEntity as IBaseActivatableEntity;
+                    if (tempActivatableEntity != null && tempDistance <= tempActivatableEntity.GetActivatableDistance())
                     {
                         // Entity is in front of character, so this is target
                         if (!turnForwardWhileDoingAction || IsInFront(tempHitInfo.point))
