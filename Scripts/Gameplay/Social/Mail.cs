@@ -119,7 +119,7 @@ namespace MultiplayerARPG
 
         public string WriteItems()
         {
-            using (Utf16ValueStringBuilder stringBuilder = ZString.CreateStringBuilder(true))
+            using (Utf16ValueStringBuilder stringBuilder = ZString.CreateStringBuilder(false))
             {
                 foreach (CharacterItem item in Items)
                 {
