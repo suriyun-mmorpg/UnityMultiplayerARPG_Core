@@ -892,8 +892,6 @@ namespace MultiplayerARPG
                 SelectedEntity = null;
                 IGameEntity tempGameEntity;
                 IBaseActivatableEntity tempActivatableEntity;
-                // Default aim position (aim to sky/space)
-                aimTargetPosition = centerRay.origin + centerRay.direction * (centerOriginToCharacterDistance + findTargetRaycastDistance);
                 // Raycast from camera position to center of screen
                 tempCount = PhysicUtils.SortedRaycastNonAlloc3D(centerRay.origin, centerRay.direction, raycasts, centerOriginToCharacterDistance + findTargetRaycastDistance, CurrentGameInstance.GetTargetLayerMask());
                 for (int tempCounter = 0; tempCounter < tempCount; ++tempCounter)
@@ -920,8 +918,6 @@ namespace MultiplayerARPG
                     if (tempActivatableEntity != null && tempDistance <= tempActivatableEntity.GetActivatableDistance())
                     {
                         // Entity is in front of character, so this is target
-                        if (!turnForwardWhileDoingAction || IsInFront(tempHitInfo.point))
-                            aimTargetPosition = tempHitInfo.point;
                         SelectedEntity = tempGameEntity.Entity;
                         break;
                     }
