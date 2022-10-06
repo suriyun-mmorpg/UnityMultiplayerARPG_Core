@@ -137,7 +137,7 @@ namespace MultiplayerARPG
 
         public void SetLookRotation(Quaternion rotation)
         {
-            if (!Entity.CanMove())
+            if (!Entity.CanMove() || !Entity.CanTurn())
                 return;
             if (this.CanPredictMovement())
             {
@@ -195,19 +195,20 @@ namespace MultiplayerARPG
             {
                 if (inputDirection.HasValue)
                 {
+                    // Moving by WASD keys
                     CacheNavMeshAgent.Move(inputDirection.Value * CacheNavMeshAgent.speed * deltaTime);
                     //CacheNavMeshAgent.SetDestination(CacheTransform.position);
                     MovementState = MovementState.Forward | MovementState.IsGrounded;
                     // Turn character to destination
-                    if (lookRotationApplied)
+                    if (lookRotationApplied && Entity.CanTurn())
                         targetYAngle = Quaternion.LookRotation(inputDirection.Value).eulerAngles.y;
                 }
                 else
                 {
-                    // Update movement state
+                    // Moving by clicked position
                     MovementState = (CacheNavMeshAgent.velocity.sqrMagnitude > 0f ? MovementState.Forward : MovementState.None) | MovementState.IsGrounded;
                     // Turn character to destination
-                    if (lookRotationApplied && CacheNavMeshAgent.velocity.sqrMagnitude > 0f)
+                    if (lookRotationApplied && Entity.CanTurn() && CacheNavMeshAgent.velocity.sqrMagnitude > 0f)
                         targetYAngle = Quaternion.LookRotation(CacheNavMeshAgent.velocity.normalized).eulerAngles.y;
                 }
                 // Update extra movement state

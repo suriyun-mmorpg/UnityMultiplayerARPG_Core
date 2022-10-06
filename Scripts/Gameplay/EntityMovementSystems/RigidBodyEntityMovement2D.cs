@@ -137,6 +137,8 @@ namespace MultiplayerARPG
 
         public virtual void SetLookRotation(Quaternion rotation)
         {
+            if (!Entity.CanMove() || !Entity.CanTurn())
+                return;
             if (this.CanPredictMovement())
             {
                 // Always apply movement to owner client (it's client prediction for server auth movement)

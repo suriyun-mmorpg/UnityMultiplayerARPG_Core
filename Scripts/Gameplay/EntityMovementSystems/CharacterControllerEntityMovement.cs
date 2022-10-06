@@ -228,7 +228,7 @@ namespace MultiplayerARPG
 
         public void SetLookRotation(Quaternion rotation)
         {
-            if (!Entity.CanMove())
+            if (!Entity.CanMove() || !Entity.CanTurn())
                 return;
             if (this.CanPredictMovement())
             {
@@ -375,7 +375,8 @@ namespace MultiplayerARPG
             if (IsOwnerClientOrOwnedByServer && lookRotationApplied && moveDirection.sqrMagnitude > 0f)
             {
                 // Turn character by move direction
-                targetYAngle = Quaternion.LookRotation(moveDirection).eulerAngles.y;
+                if (Entity.CanTurn())
+                    targetYAngle = Quaternion.LookRotation(moveDirection).eulerAngles.y;
             }
 
             if (!Entity.CanMove())
@@ -384,6 +385,9 @@ namespace MultiplayerARPG
                 isJumping = false;
                 applyingJumpForce = false;
             }
+
+            if (!Entity.CanJump())
+                isJumping = false;
 
             // Prepare movement speed
             tempEntityMoveSpeed = applyingJumpForce ? 0f : Entity.GetMoveSpeed();
