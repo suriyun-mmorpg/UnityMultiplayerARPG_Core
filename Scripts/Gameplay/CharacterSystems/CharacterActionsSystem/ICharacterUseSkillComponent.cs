@@ -13,6 +13,7 @@ namespace MultiplayerARPG
         bool IsUsingSkill { get; }
         float LastUseSkillEndTime { get; }
         float MoveSpeedRateWhileUsingSkill { get; }
+        MovementRestriction MovementRestrictionWhileUsingSkill { get; }
 
         void InterruptCastingSkill();
         void CancelSkill();

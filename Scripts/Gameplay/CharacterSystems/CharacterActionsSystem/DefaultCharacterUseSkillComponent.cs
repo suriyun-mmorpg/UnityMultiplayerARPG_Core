@@ -20,6 +20,7 @@ namespace MultiplayerARPG
         public float CastingSkillDuration { get; protected set; }
         public float CastingSkillCountDown { get; protected set; }
         public float MoveSpeedRateWhileUsingSkill { get; protected set; }
+        public MovementRestriction MovementRestrictionWhileUsingSkill { get; protected set; }
         public AnimActionType AnimActionType { get; protected set; }
         public int AnimActionDataId { get; protected set; }
 
@@ -135,6 +136,7 @@ namespace MultiplayerARPG
 
             // Calculate move speed rate while doing action at clients and server
             MoveSpeedRateWhileUsingSkill = skill.moveSpeedRateWhileUsingSkill;
+            MovementRestrictionWhileUsingSkill = skill.movementRestrictionWhileUsingSkill;
 
             // Get play speed multiplier will use it to play animation faster or slower based on attack speed stats
             animSpeedRate *= Entity.GetAnimSpeedRate(AnimActionType);

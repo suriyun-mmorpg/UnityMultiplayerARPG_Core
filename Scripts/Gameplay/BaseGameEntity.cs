@@ -737,12 +737,27 @@ namespace MultiplayerARPG
             return false;
         }
 
+        public virtual bool CanWalk()
+        {
+            return false;
+        }
+
         public virtual bool CanCrouch()
         {
             return false;
         }
 
         public virtual bool CanCrawl()
+        {
+            return false;
+        }
+
+        public virtual bool CanJump()
+        {
+            return false;
+        }
+
+        public virtual bool CanTurn()
         {
             return false;
         }

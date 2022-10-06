@@ -7,6 +7,7 @@ namespace MultiplayerARPG
         bool IsAttacking { get; }
         float LastAttackEndTime { get; }
         float MoveSpeedRateWhileAttacking { get; }
+        MovementRestriction MovementRestrictionWhileAttacking { get; }
 
         void CancelAttack();
         void ClearAttackStates();

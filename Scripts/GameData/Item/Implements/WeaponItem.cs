@@ -56,6 +56,13 @@ namespace MultiplayerARPG
         }
 
         [SerializeField]
+        private MovementRestriction movementRestrictionWhileReloading = default(MovementRestriction);
+        public MovementRestriction MovementRestrictionWhileReloading
+        {
+            get { return movementRestrictionWhileReloading; }
+        }
+
+        [SerializeField]
         private float moveSpeedRateWhileCharging = 1f;
         public float MoveSpeedRateWhileCharging
         {
@@ -63,10 +70,24 @@ namespace MultiplayerARPG
         }
 
         [SerializeField]
+        private MovementRestriction movementRestrictionWhileCharging = default(MovementRestriction);
+        public MovementRestriction MovementRestrictionWhileCharging
+        {
+            get { return movementRestrictionWhileCharging; }
+        }
+
+        [SerializeField]
         private float moveSpeedRateWhileAttacking = 0f;
         public float MoveSpeedRateWhileAttacking
         {
             get { return moveSpeedRateWhileAttacking; }
+        }
+
+        [SerializeField]
+        private MovementRestriction movementRestrictionWhileAttacking = default(MovementRestriction);
+        public MovementRestriction MovementRestrictionWhileAttacking
+        {
+            get { return movementRestrictionWhileAttacking; }
         }
 
         [SerializeField]

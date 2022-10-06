@@ -7,6 +7,7 @@ namespace MultiplayerARPG
         short ReloadingAmmoAmount { get; }
         bool IsReloading { get; }
         float MoveSpeedRateWhileReloading { get; }
+        MovementRestriction MovementRestrictionWhileReloading { get; }
 
         void CancelReload();
         void ClearReloadStates();

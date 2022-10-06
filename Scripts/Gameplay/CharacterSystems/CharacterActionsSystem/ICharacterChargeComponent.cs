@@ -6,6 +6,7 @@ namespace MultiplayerARPG
     {
         bool IsCharging { get; }
         float MoveSpeedRateWhileCharging { get; }
+        MovementRestriction MovementRestrictionWhileCharging { get; }
 
         void ClearChargeStates();
         void StartCharge(bool isLeftHand);

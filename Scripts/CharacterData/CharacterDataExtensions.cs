@@ -1523,6 +1523,13 @@ namespace MultiplayerARPG
             return weaponItem.MoveSpeedRateWhileReloading;
         }
 
+        public static MovementRestriction GetMovementRestrictionWhileReloading(this ICharacterData data, IWeaponItem weaponItem)
+        {
+            if (data is BaseMonsterCharacterEntity)
+                return MovementRestriction.None;
+            return weaponItem.MovementRestrictionWhileReloading;
+        }
+
         public static float GetMoveSpeedRateWhileCharging(this ICharacterData data, IWeaponItem weaponItem)
         {
             if (data is BaseMonsterCharacterEntity)
@@ -1530,11 +1537,25 @@ namespace MultiplayerARPG
             return weaponItem.MoveSpeedRateWhileCharging;
         }
 
+        public static MovementRestriction GetMovementRestrictionWhileCharging(this ICharacterData data, IWeaponItem weaponItem)
+        {
+            if (data is BaseMonsterCharacterEntity)
+                return MovementRestriction.None;
+            return weaponItem.MovementRestrictionWhileCharging;
+        }
+
         public static float GetMoveSpeedRateWhileAttacking(this ICharacterData data, IWeaponItem weaponItem)
         {
             if (data is BaseMonsterCharacterEntity)
                 return (data as BaseMonsterCharacterEntity).CharacterDatabase.MoveSpeedRateWhileAttacking;
             return weaponItem.MoveSpeedRateWhileAttacking;
+        }
+
+        public static MovementRestriction GetMovementRestrictionWhileAttacking(this ICharacterData data, IWeaponItem weaponItem)
+        {
+            if (data is BaseMonsterCharacterEntity)
+                return MovementRestriction.None;
+            return weaponItem.MovementRestrictionWhileAttacking;
         }
 
         public static int IndexOfAttribute(this ICharacterData data, int dataId)

@@ -106,9 +106,11 @@ namespace MultiplayerARPG
         public bool IsAttacking { get { return AttackComponent.IsAttacking; } }
         public float LastAttackEndTime { get { return AttackComponent.LastAttackEndTime; } }
         public float MoveSpeedRateWhileAttacking { get { return AttackComponent.MoveSpeedRateWhileAttacking; } }
+        public MovementRestriction MovementRestrictionWhileAttacking { get { return AttackComponent.MovementRestrictionWhileAttacking; } }
         public bool IsUsingSkill { get { return UseSkillComponent.IsUsingSkill; } }
         public float LastUseSkillEndTime { get { return UseSkillComponent.LastUseSkillEndTime; } }
         public float MoveSpeedRateWhileUsingSkill { get { return UseSkillComponent.MoveSpeedRateWhileUsingSkill; } }
+        public MovementRestriction MovementRestrictionWhileUsingSkill { get { return UseSkillComponent.MovementRestrictionWhileUsingSkill; } }
         public BaseSkill UsingSkill { get { return UseSkillComponent.UsingSkill; } }
         public short UsingSkillLevel { get { return UseSkillComponent.UsingSkillLevel; } }
         public bool IsCastingSkillCanBeInterrupted { get { return UseSkillComponent.IsCastingSkillCanBeInterrupted; } }
@@ -118,8 +120,10 @@ namespace MultiplayerARPG
         public short ReloadingAmmoAmount { get { return ReloadComponent.ReloadingAmmoAmount; } }
         public bool IsReloading { get { return ReloadComponent.IsReloading; } }
         public float MoveSpeedRateWhileReloading { get { return ReloadComponent.MoveSpeedRateWhileReloading; } }
+        public MovementRestriction MovementRestrictionWhileReloading { get { return ReloadComponent.MovementRestrictionWhileReloading; } }
         public bool IsCharging { get { return ChargeComponent.IsCharging; } }
         public float MoveSpeedRateWhileCharging { get { return ChargeComponent.MoveSpeedRateWhileCharging; } }
+        public MovementRestriction MovementRestrictionWhileCharging { get { return ChargeComponent.MovementRestrictionWhileCharging; } }
         public float RespawnGroundedCheckCountDown { get; protected set; }
         public float RespawnInvincibleCountDown { get; protected set; }
 
@@ -1105,6 +1109,13 @@ namespace MultiplayerARPG
             return CurrentStamina > 0;
         }
 
+        public sealed override bool CanWalk()
+        {
+            if (!MovementState.Has(MovementState.IsGrounded) || MovementState.Has(MovementState.IsUnderWater))
+                return false;
+            return true;
+        }
+
         public override sealed bool CanCrouch()
         {
             if (!MovementState.Has(MovementState.IsGrounded) || MovementState.Has(MovementState.IsUnderWater))
@@ -1116,6 +1127,48 @@ namespace MultiplayerARPG
         {
             if (!MovementState.Has(MovementState.IsGrounded) || MovementState.Has(MovementState.IsUnderWater))
                 return false;
+            return true;
+        }
+
+        public override bool CanJump()
+        {
+            if (IsAttacking && MovementRestrictionWhileAttacking.jumpRestricted)
+            {
+                return false;
+            }
+            else if (IsUsingSkill && MovementRestrictionWhileUsingSkill.jumpRestricted)
+            {
+                return false;
+            }
+            else if (IsReloading && MovementRestrictionWhileReloading.jumpRestricted)
+            {
+                return false;
+            }
+            else if (IsCharging && MovementRestrictionWhileCharging.jumpRestricted)
+            {
+                return false;
+            }
+            return true;
+        }
+
+        public override bool CanTurn()
+        {
+            if (IsAttacking && MovementRestrictionWhileAttacking.turnRestricted)
+            {
+                return false;
+            }
+            else if (IsUsingSkill && MovementRestrictionWhileUsingSkill.turnRestricted)
+            {
+                return false;
+            }
+            else if (IsReloading && MovementRestrictionWhileReloading.turnRestricted)
+            {
+                return false;
+            }
+            else if (IsCharging && MovementRestrictionWhileCharging.turnRestricted)
+            {
+                return false;
+            }
             return true;
         }
 

@@ -168,6 +168,16 @@ namespace MultiplayerARPG
             return false;
         }
 
+        public override bool CanJump()
+        {
+            return true;
+        }
+
+        public override bool CanTurn()
+        {
+            return true;
+        }
+
         public bool IsAttackable(byte seatIndex)
         {
             return Seats[seatIndex].canAttack;

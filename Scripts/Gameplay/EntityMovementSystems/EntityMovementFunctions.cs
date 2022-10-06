@@ -41,6 +41,8 @@ namespace MultiplayerARPG
                     case ExtraMovementState.IsWalking:
                         if (!movementState.HasDirectionMovement())
                             extraMovementState = ExtraMovementState.None;
+                        else if (!movement.Entity.CanWalk())
+                            extraMovementState = ExtraMovementState.None;
                         break;
                     case ExtraMovementState.IsCrouching:
                         if (!movement.Entity.CanCrouch())

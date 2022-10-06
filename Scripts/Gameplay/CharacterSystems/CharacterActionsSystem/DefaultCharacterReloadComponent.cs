@@ -12,6 +12,7 @@ namespace MultiplayerARPG
         public short ReloadingAmmoAmount { get; protected set; }
         public bool IsReloading { get; protected set; }
         public float MoveSpeedRateWhileReloading { get; protected set; }
+        public MovementRestriction MovementRestrictionWhileReloading { get; protected set; }
         public AnimActionType AnimActionType { get; protected set; }
 
         protected bool sendingClientReload;
@@ -69,6 +70,7 @@ namespace MultiplayerARPG
 
             // Calculate move speed rate while doing action at clients and server
             MoveSpeedRateWhileReloading = Entity.GetMoveSpeedRateWhileReloading(weaponItem);
+            MovementRestrictionWhileReloading = Entity.GetMovementRestrictionWhileReloading(weaponItem);
             try
             {
                 // Play animation

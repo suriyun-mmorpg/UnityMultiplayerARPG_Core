@@ -14,6 +14,7 @@ namespace MultiplayerARPG
         public bool IsAttacking { get; protected set; }
         public float LastAttackEndTime { get; protected set; }
         public float MoveSpeedRateWhileAttacking { get; protected set; }
+        public MovementRestriction MovementRestrictionWhileAttacking { get; protected set; }
         public AnimActionType AnimActionType { get; protected set; }
         public int AnimActionDataId { get; protected set; }
 
@@ -77,6 +78,7 @@ namespace MultiplayerARPG
 
             // Calculate move speed rate while doing action at clients and server
             MoveSpeedRateWhileAttacking = Entity.GetMoveSpeedRateWhileAttacking(weaponItem);
+            MovementRestrictionWhileAttacking = Entity.GetMovementRestrictionWhileAttacking(weaponItem);
 
             // Get play speed multiplier will use it to play animation faster or slower based on attack speed stats
             animSpeedRate *= Entity.GetAnimSpeedRate(AnimActionType);

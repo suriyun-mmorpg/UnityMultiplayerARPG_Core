@@ -6,6 +6,7 @@ namespace MultiplayerARPG
     {
         public bool IsCharging { get; protected set; }
         public float MoveSpeedRateWhileCharging { get; protected set; }
+        public MovementRestriction MovementRestrictionWhileCharging { get; protected set; }
 
         protected bool sendingClientStartCharge;
         protected bool sendingClientStopCharge;
@@ -47,6 +48,7 @@ namespace MultiplayerARPG
             }
             // Set weapon charging state
             MoveSpeedRateWhileCharging = Entity.GetMoveSpeedRateWhileCharging(weaponItem);
+            MovementRestrictionWhileCharging = Entity.GetMovementRestrictionWhileCharging(weaponItem);
             IsCharging = true;
         }
 
