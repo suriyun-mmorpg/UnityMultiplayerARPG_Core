@@ -20,8 +20,7 @@ namespace MultiplayerARPG
         [Tooltip("This is move speed rate while using this skill")]
         public float moveSpeedRateWhileUsingSkill = 0f;
         public MovementRestriction movementRestrictionWhileUsingSkill;
-        public bool restrictedWhileCrouching;
-        public bool restrictedWhileCrawling;
+        public ActionRestriction useSkillRestriction;
         public IncrementalInt consumeHp;
         public IncrementalInt consumeMp;
         public IncrementalInt consumeStamina;

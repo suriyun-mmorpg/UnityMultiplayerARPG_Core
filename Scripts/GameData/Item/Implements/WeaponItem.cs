@@ -91,17 +91,17 @@ namespace MultiplayerARPG
         }
 
         [SerializeField]
-        private ActionRestriction restrictionWhileCrouching = default(ActionRestriction);
-        public ActionRestriction RestrictionWhileCrouching
+        private ActionRestriction attackRestriction = default(ActionRestriction);
+        public ActionRestriction AttackRestriction
         {
-            get { return restrictionWhileCrouching; }
+            get { return attackRestriction; }
         }
 
         [SerializeField]
-        private ActionRestriction restrictionWhileCrawling = default(ActionRestriction);
-        public ActionRestriction RestrictionWhileCrawling
+        private ActionRestriction reloadRestriction = default(ActionRestriction);
+        public ActionRestriction ReloadRestriction
         {
-            get { return restrictionWhileCrawling; }
+            get { return reloadRestriction; }
         }
 
         [SerializeField]

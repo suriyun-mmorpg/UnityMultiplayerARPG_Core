@@ -35,8 +35,8 @@ namespace MultiplayerARPG
         /// </summary>
         float MoveSpeedRateWhileAttacking { get; }
         MovementRestriction MovementRestrictionWhileAttacking { get; }
-        ActionRestriction RestrictionWhileCrouching { get; }
-        ActionRestriction RestrictionWhileCrawling { get; }
+        ActionRestriction AttackRestriction { get; }
+        ActionRestriction ReloadRestriction { get; }
         /// <summary>
         /// How many bullets can store in the gun
         /// </summary>

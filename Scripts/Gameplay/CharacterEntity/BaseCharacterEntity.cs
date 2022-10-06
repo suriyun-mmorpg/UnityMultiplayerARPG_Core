@@ -580,10 +580,10 @@ namespace MultiplayerARPG
                 return false;
             }
 
-            if (Entity.ExtraMovementState == ExtraMovementState.IsCrouching && weaponItem.RestrictionWhileCrouching.attackRestricted)
+            if (Entity.ExtraMovementState == ExtraMovementState.IsCrouching && weaponItem.AttackRestriction.restrictedWhileCrouching)
                 return false;
 
-            if (Entity.ExtraMovementState == ExtraMovementState.IsCrawling && weaponItem.RestrictionWhileCrawling.attackRestricted)
+            if (Entity.ExtraMovementState == ExtraMovementState.IsCrawling && weaponItem.AttackRestriction.restrictedWhileCrawling)
                 return false;
 
             return true;
@@ -606,10 +606,10 @@ namespace MultiplayerARPG
                 return false;
             }
 
-            if (Entity.ExtraMovementState == ExtraMovementState.IsCrouching && skill.restrictedWhileCrouching)
+            if (Entity.ExtraMovementState == ExtraMovementState.IsCrouching && skill.useSkillRestriction.restrictedWhileCrouching)
                 return false;
 
-            if (Entity.ExtraMovementState == ExtraMovementState.IsCrawling && skill.restrictedWhileCrawling)
+            if (Entity.ExtraMovementState == ExtraMovementState.IsCrawling && skill.useSkillRestriction.restrictedWhileCrawling)
                 return false;
 
             return true;
@@ -632,10 +632,10 @@ namespace MultiplayerARPG
                 return false;
             }
 
-            if (Entity.ExtraMovementState == ExtraMovementState.IsCrouching && skill.restrictedWhileCrouching)
+            if (Entity.ExtraMovementState == ExtraMovementState.IsCrouching && skill.useSkillRestriction.restrictedWhileCrouching)
                 return false;
 
-            if (Entity.ExtraMovementState == ExtraMovementState.IsCrawling && skill.restrictedWhileCrawling)
+            if (Entity.ExtraMovementState == ExtraMovementState.IsCrawling && skill.useSkillRestriction.restrictedWhileCrawling)
                 return false;
 
             return true;
@@ -654,10 +654,10 @@ namespace MultiplayerARPG
             if (characterItem.IsAmmoFull() || !characterItem.HasAmmoToReload(this))
                 return false;
 
-            if (Entity.ExtraMovementState == ExtraMovementState.IsCrouching && weaponItem.RestrictionWhileCrouching.reloadRestricted)
+            if (Entity.ExtraMovementState == ExtraMovementState.IsCrouching && weaponItem.ReloadRestriction.restrictedWhileCrouching)
                 return false;
 
-            if (Entity.ExtraMovementState == ExtraMovementState.IsCrawling && weaponItem.RestrictionWhileCrawling.reloadRestricted)
+            if (Entity.ExtraMovementState == ExtraMovementState.IsCrawling && weaponItem.ReloadRestriction.restrictedWhileCrawling)
                 return false;
 
             return true;
