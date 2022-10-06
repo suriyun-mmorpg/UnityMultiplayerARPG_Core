@@ -675,7 +675,7 @@ namespace MultiplayerARPG
             return true;
         }
 
-        public bool Attack(bool isLeftHand)
+        public bool Attack(ref bool isLeftHand)
         {
             if (!IsOwnerClientOrOwnedByServer)
                 return false;
@@ -719,7 +719,7 @@ namespace MultiplayerARPG
             UseSkillComponent.InterruptCastingSkill();
         }
 
-        public bool StartCharge(bool isLeftHand)
+        public bool StartCharge(ref bool isLeftHand)
         {
             if (!IsOwnerClientOrOwnedByServer)
                 return false;

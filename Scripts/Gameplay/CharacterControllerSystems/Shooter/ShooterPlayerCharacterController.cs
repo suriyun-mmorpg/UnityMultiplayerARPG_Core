@@ -1023,7 +1023,7 @@ namespace MultiplayerARPG
                     await Aimming();
                     // Button released, start attacking while fire type is fire on release
                     if (rightHandFireType == FireType.FireOnRelease)
-                        Attack(isLeftHandAttacking);
+                        Attack(ref isLeftHandAttacking);
                     isCharging = false;
                 }
                 // If release fire key while charging, attack
@@ -1034,7 +1034,7 @@ namespace MultiplayerARPG
                     await Aimming();
                     // Button released, start attacking while fire type is fire on release
                     if (leftHandFireType == FireType.FireOnRelease)
-                        Attack(isLeftHandAttacking);
+                        Attack(ref isLeftHandAttacking);
                     isCharging = false;
                 }
             }
@@ -1099,12 +1099,12 @@ namespace MultiplayerARPG
                         if (rightHandFireType == FireType.FireOnRelease)
                         {
                             isCharging = true;
-                            WeaponCharge(isLeftHandAttacking);
+                            WeaponCharge(ref isLeftHandAttacking);
                         }
                         else
                         {
                             isCharging = false;
-                            Attack(isLeftHandAttacking);
+                            Attack(ref isLeftHandAttacking);
                         }
                     }
                     else
@@ -1113,12 +1113,12 @@ namespace MultiplayerARPG
                         if (leftHandFireType == FireType.FireOnRelease)
                         {
                             isCharging = true;
-                            WeaponCharge(isLeftHandAttacking);
+                            WeaponCharge(ref isLeftHandAttacking);
                         }
                         else
                         {
                             isCharging = false;
-                            Attack(isLeftHandAttacking);
+                            Attack(ref isLeftHandAttacking);
                         }
                     }
                 }
@@ -1551,20 +1551,20 @@ namespace MultiplayerARPG
             }
         }
 
-        public virtual void Attack(bool isLeftHand)
+        public virtual void Attack(ref bool isLeftHand)
         {
             if (pauseFireInputFrames > 0)
                 return;
             // Set this to `TRUE` to update crosshair
-            if (PlayingCharacterEntity.Attack(isLeftHand))
+            if (PlayingCharacterEntity.Attack(ref isLeftHand))
                 updateAttackingCrosshair = true;
         }
 
-        public virtual void WeaponCharge(bool isLeftHand)
+        public virtual void WeaponCharge(ref bool isLeftHand)
         {
             if (pauseFireInputFrames > 0)
                 return;
-            PlayingCharacterEntity.StartCharge(isLeftHand);
+            PlayingCharacterEntity.StartCharge(ref isLeftHand);
         }
 
         public virtual void Reload(bool forceReload = false)

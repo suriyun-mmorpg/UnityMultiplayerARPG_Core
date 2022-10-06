@@ -366,7 +366,8 @@ namespace MultiplayerARPG
 
         public void RequestAttack()
         {
-            if (PlayingCharacterEntity.Attack(isLeftHandAttacking))
+            // Switching right/left/right/left...
+            if (PlayingCharacterEntity.Attack(ref isLeftHandAttacking))
                 isLeftHandAttacking = !isLeftHandAttacking;
         }
 
