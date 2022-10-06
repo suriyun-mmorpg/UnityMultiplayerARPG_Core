@@ -58,6 +58,10 @@ namespace MultiplayerARPG
         /// </summary>
         AudioClip ReloadClip { get; }
         /// <summary>
+        /// Audio clip which will plays when reloaded an ammo
+        /// </summary>
+        AudioClip ReloadedClip { get; }
+        /// <summary>
         /// Audio clip which will plays when there is no ammo
         /// </summary>
         AudioClip EmptyClip { get; }

@@ -85,6 +85,7 @@ namespace MultiplayerARPG
         };
         public AudioClip launchClip;
         public AudioClip reloadClip;
+        public AudioClip reloadedClip;
         public AudioClip emptyClip;
 
         [Header("Fire Configs")]
@@ -454,6 +455,11 @@ namespace MultiplayerARPG
         public AudioClip ReloadClip
         {
             get { return reloadClip; }
+        }
+
+        public AudioClip ReloadedClip
+        {
+            get { return reloadedClip; }
         }
 
         public AudioClip EmptyClip

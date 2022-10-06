@@ -155,6 +155,20 @@ namespace MultiplayerARPG
             }
         }
 
+        [SerializeField]
+        private AudioClip reloadedClip = null;
+        [SerializeField]
+        private AudioClip[] reloadedClips = new AudioClip[0];
+        public AudioClip ReloadedClip
+        {
+            get
+            {
+                if (reloadedClips != null && reloadedClips.Length > 0)
+                    return reloadedClips[Random.Range(0, reloadedClips.Length - 1)];
+                return null;
+            }
+        }
+
         [HideInInspector]
         [SerializeField]
         private AudioClip emptyClip = null;
@@ -221,6 +235,17 @@ namespace MultiplayerARPG
                     reloadClips = clips.ToArray();
                 }
                 reloadClip = null;
+                hasChanges = true;
+            }
+            if (reloadedClip != null)
+            {
+                List<AudioClip> clips = new List<AudioClip>(reloadedClips);
+                if (!clips.Contains(reloadedClip))
+                {
+                    clips.Add(reloadedClip);
+                    reloadedClips = clips.ToArray();
+                }
+                reloadedClip = null;
                 hasChanges = true;
             }
             if (emptyClip != null)
