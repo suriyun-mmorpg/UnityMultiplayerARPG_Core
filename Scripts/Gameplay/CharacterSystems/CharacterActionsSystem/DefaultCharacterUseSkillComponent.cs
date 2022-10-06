@@ -272,9 +272,8 @@ namespace MultiplayerARPG
                         if (Entity.FpsModel && Entity.FpsModel.gameObject.activeSelf)
                             Entity.FpsModel.PlayEquippedWeaponLaunch(isLeftHand);
                         // Play launch sfx
-                        if (weaponItem != null &&
-                            (AnimActionType == AnimActionType.AttackRightHand ||
-                            AnimActionType == AnimActionType.AttackLeftHand))
+                        if (AnimActionType == AnimActionType.AttackRightHand ||
+                            AnimActionType == AnimActionType.AttackLeftHand)
                         {
                             AudioManager.PlaySfxClipAtAudioSource(weaponItem.LaunchClip.audioClip, Entity.CharacterModel.GenericAudioSource, weaponItem.LaunchClip.GetRandomedVolume());
                         }
