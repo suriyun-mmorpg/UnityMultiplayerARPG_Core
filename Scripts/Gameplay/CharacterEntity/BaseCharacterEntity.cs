@@ -561,7 +561,7 @@ namespace MultiplayerARPG
         #endregion
 
         #region Attack / Skill / Weapon / Damage
-        public bool ValidateAttack(bool isLeftHand)
+        public bool ValidateAttack(ref bool isLeftHand)
         {
             if (!CanAttack())
                 return false;
@@ -569,10 +569,10 @@ namespace MultiplayerARPG
             if (!UpdateLastActionTime())
                 return false;
 
-            CharacterItem weapon = this.GetAvailableWeapon(ref isLeftHand);
-            IWeaponItem weaponItem = weapon.GetWeaponItem();
+            CharacterItem characterItem = this.GetAvailableWeapon(ref isLeftHand);
+            IWeaponItem weaponItem = characterItem.GetWeaponItem();
 
-            if (!ValidateAmmo(weapon, 1))
+            if (!ValidateAmmo(characterItem, 1))
             {
                 QueueGameMessage(UITextKeys.UI_ERROR_NO_AMMO);
                 if (weaponItem != null)
@@ -679,7 +679,7 @@ namespace MultiplayerARPG
         {
             if (!IsOwnerClientOrOwnedByServer)
                 return false;
-            if (ValidateAttack(isLeftHand))
+            if (ValidateAttack(ref isLeftHand))
             {
                 StopCharge();
                 AttackComponent.Attack(isLeftHand);
@@ -723,7 +723,7 @@ namespace MultiplayerARPG
         {
             if (!IsOwnerClientOrOwnedByServer)
                 return false;
-            if (ValidateAttack(isLeftHand))
+            if (ValidateAttack(ref isLeftHand))
             {
                 ChargeComponent.StartCharge(isLeftHand);
                 return true;
