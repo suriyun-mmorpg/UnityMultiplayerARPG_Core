@@ -10,6 +10,9 @@ namespace MultiplayerARPG
 {
     public class DefaultCharacterUseSkillComponent : BaseNetworkedGameEntityComponent<BaseCharacterEntity>, ICharacterUseSkillComponent
     {
+        public const float DEFAULT_TOTAL_DURATION = 2f;
+        public const float DEFAULT_TRIGGER_DURATION = 1f;
+        public const float DEFAULT_STATE_SETUP_DELAY = 1f;
         protected List<CancellationTokenSource> skillCancellationTokenSources = new List<CancellationTokenSource>();
         public BaseSkill UsingSkill { get; protected set; }
         public short UsingSkillLevel { get; protected set; }
@@ -21,6 +24,10 @@ namespace MultiplayerARPG
         public float CastingSkillCountDown { get; protected set; }
         public float MoveSpeedRateWhileUsingSkill { get; protected set; }
         public MovementRestriction MovementRestrictionWhileUsingSkill { get; protected set; }
+        protected float totalDuration;
+        public float UseSkillTotalDuration { get { return totalDuration; } set { totalDuration = value; } }
+        protected float[] triggerDurations;
+        public float[] UseSkillTriggerDurations { get { return triggerDurations; } set { triggerDurations = value; } }
         public AnimActionType AnimActionType { get; protected set; }
         public int AnimActionDataId { get; protected set; }
 
@@ -97,8 +104,6 @@ namespace MultiplayerARPG
             // Prepare required data and get animation data
             int animationIndex;
             float animSpeedRate;
-            float[] triggerDurations;
-            float totalDuration;
             Entity.GetRandomAnimationData(
                 animActionType,
                 animActionDataId,
@@ -149,7 +154,13 @@ namespace MultiplayerARPG
             CastingSkillDuration = CastingSkillCountDown = skill.GetCastDuration(skillLevel);
 
             // Last use skill end time
-            LastUseSkillEndTime = Time.unscaledTime + (totalDuration / animSpeedRate);
+            float remainsDuration = DEFAULT_TOTAL_DURATION;
+            LastUseSkillEndTime = Time.unscaledTime + DEFAULT_TOTAL_DURATION;
+            if (totalDuration >= 0f)
+            {
+                remainsDuration = totalDuration;
+                LastUseSkillEndTime = Time.unscaledTime + (totalDuration / animSpeedRate);
+            }
 
             try
             {
@@ -207,8 +218,33 @@ namespace MultiplayerARPG
                     }
                 }
 
-                float remainsDuration = totalDuration;
-                float tempTriggerDuration;
+                // Try setup state data (maybe by animation clip events or state machine behaviours), if it was not set up
+                if (triggerDurations == null || triggerDurations.Length == 0 || totalDuration < 0f)
+                {
+                    // Wait some components to setup proper `useSkillTriggerDurations` and `useSkillTotalDuration` within `DEFAULT_STATE_SETUP_DELAY`
+                    float setupDelayCountDown = DEFAULT_STATE_SETUP_DELAY;
+                    do
+                    {
+                        await UniTask.Yield();
+                        setupDelayCountDown -= Time.unscaledDeltaTime;
+                    } while (setupDelayCountDown > 0 && (triggerDurations == null || triggerDurations.Length == 0 || totalDuration < 0f));
+                    if (setupDelayCountDown <= 0f)
+                    {
+                        // Can't setup properly, so try to setup manually to make it still workable
+                        remainsDuration = DEFAULT_TOTAL_DURATION - DEFAULT_STATE_SETUP_DELAY;
+                        triggerDurations = new float[1]
+                        {
+                        DEFAULT_TRIGGER_DURATION,
+                        };
+                    }
+                    else
+                    {
+                        // Can setup, so set proper `remainsDuration` and `LastUseSkillEndTime` value
+                        remainsDuration = totalDuration;
+                        LastUseSkillEndTime = Time.unscaledTime + (totalDuration / animSpeedRate);
+                    }
+                }
+
                 SimulatingActionTriggerHistories[simulateSeed] = new SimulatingActionTriggerHistory(triggerDurations.Length);
                 if (SimlatingActionTriggerDataList.ContainsKey(simulateSeed))
                 {
@@ -218,6 +254,8 @@ namespace MultiplayerARPG
                     }
                 }
                 SimlatingActionTriggerDataList.Clear();
+
+                float tempTriggerDuration;
                 for (int hitIndex = 0; hitIndex < triggerDurations.Length; ++hitIndex)
                 {
                     // Play special effects after trigger duration

@@ -8,6 +8,8 @@ namespace MultiplayerARPG
         float LastAttackEndTime { get; }
         float MoveSpeedRateWhileAttacking { get; }
         MovementRestriction MovementRestrictionWhileAttacking { get; }
+        float AttackTotalDuration { get; set; }
+        float[] AttackTriggerDurations { get; set; }
 
         void CancelAttack();
         void ClearAttackStates();

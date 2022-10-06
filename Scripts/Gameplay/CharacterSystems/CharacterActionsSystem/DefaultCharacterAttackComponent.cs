@@ -10,11 +10,18 @@ namespace MultiplayerARPG
 {
     public class DefaultCharacterAttackComponent : BaseNetworkedGameEntityComponent<BaseCharacterEntity>, ICharacterAttackComponent
     {
+        public const float DEFAULT_TOTAL_DURATION = 2f;
+        public const float DEFAULT_TRIGGER_DURATION = 1f;
+        public const float DEFAULT_STATE_SETUP_DELAY = 1f;
         protected List<CancellationTokenSource> attackCancellationTokenSources = new List<CancellationTokenSource>();
         public bool IsAttacking { get; protected set; }
         public float LastAttackEndTime { get; protected set; }
         public float MoveSpeedRateWhileAttacking { get; protected set; }
         public MovementRestriction MovementRestrictionWhileAttacking { get; protected set; }
+        protected float totalDuration;
+        public float AttackTotalDuration { get { return totalDuration; } set { totalDuration = value; } }
+        protected float[] triggerDurations;
+        public float[] AttackTriggerDurations { get { return triggerDurations; } set { triggerDurations = value; } }
         public AnimActionType AnimActionType { get; protected set; }
         public int AnimActionDataId { get; protected set; }
 
@@ -57,8 +64,6 @@ namespace MultiplayerARPG
             // Prepare required data and get animation data
             int animationIndex;
             float animSpeedRate;
-            float[] triggerDurations;
-            float totalDuration;
             Entity.GetRandomAnimationData(
                 animActionType,
                 animActionDataId,
@@ -84,7 +89,13 @@ namespace MultiplayerARPG
             animSpeedRate *= Entity.GetAnimSpeedRate(AnimActionType);
 
             // Last attack end time
-            LastAttackEndTime = Time.unscaledTime + (totalDuration / animSpeedRate);
+            float remainsDuration = DEFAULT_TOTAL_DURATION;
+            LastAttackEndTime = Time.unscaledTime + DEFAULT_TOTAL_DURATION;
+            if (totalDuration >= 0f)
+            {
+                remainsDuration = totalDuration;
+                LastAttackEndTime = Time.unscaledTime + (totalDuration / animSpeedRate);
+            }
 
             try
             {
@@ -108,8 +119,33 @@ namespace MultiplayerARPG
                     }
                 }
 
-                float remainsDuration = totalDuration;
-                float tempTriggerDuration;
+                // Try setup state data (maybe by animation clip events or state machine behaviours), if it was not set up
+                if (triggerDurations == null || triggerDurations.Length == 0 || totalDuration < 0f)
+                {
+                    // Wait some components to setup proper `attackTriggerDurations` and `attackTotalDuration` within `DEFAULT_STATE_SETUP_DELAY`
+                    float setupDelayCountDown = DEFAULT_STATE_SETUP_DELAY;
+                    do
+                    {
+                        await UniTask.Yield();
+                        setupDelayCountDown -= Time.unscaledDeltaTime;
+                    } while (setupDelayCountDown > 0 && (triggerDurations == null || triggerDurations.Length == 0 || totalDuration < 0f));
+                    if (setupDelayCountDown <= 0f)
+                    {
+                        // Can't setup properly, so try to setup manually to make it still workable
+                        remainsDuration = DEFAULT_TOTAL_DURATION - DEFAULT_STATE_SETUP_DELAY;
+                        triggerDurations = new float[1]
+                        {
+                        DEFAULT_TRIGGER_DURATION,
+                        };
+                    }
+                    else
+                    {
+                        // Can setup, so set proper `remainsDuration` and `LastAttackEndTime` value
+                        remainsDuration = totalDuration;
+                        LastAttackEndTime = Time.unscaledTime + (totalDuration / animSpeedRate);
+                    }
+                }
+
                 SimulatingActionTriggerHistories[simulateSeed] = new SimulatingActionTriggerHistory(triggerDurations.Length);
                 if (SimlatingActionTriggerDataList.ContainsKey(simulateSeed))
                 {
@@ -119,9 +155,11 @@ namespace MultiplayerARPG
                     }
                 }
                 SimlatingActionTriggerDataList.Clear();
+
+                float tempTriggerDuration;
                 for (int hitIndex = 0; hitIndex < triggerDurations.Length; ++hitIndex)
                 {
-                    // Play special effects after trigger duration
+                    // Wait until triggger before play special effects
                     tempTriggerDuration = triggerDurations[hitIndex];
                     remainsDuration -= tempTriggerDuration;
                     await UniTask.Delay((int)(tempTriggerDuration / animSpeedRate * 1000f), true, PlayerLoopTiming.Update, attackCancellationTokenSource.Token);
@@ -135,11 +173,7 @@ namespace MultiplayerARPG
                         if (Entity.FpsModel && Entity.FpsModel.gameObject.activeSelf)
                             Entity.FpsModel.PlayEquippedWeaponLaunch(isLeftHand);
                         // Play launch sfx
-                        if (AnimActionType == AnimActionType.AttackRightHand ||
-                            AnimActionType == AnimActionType.AttackLeftHand)
-                        {
-                            AudioManager.PlaySfxClipAtAudioSource(weaponItem.LaunchClip, Entity.CharacterModel.GenericAudioSource);
-                        }
+                        AudioManager.PlaySfxClipAtAudioSource(weaponItem.LaunchClip, Entity.CharacterModel.GenericAudioSource);
                     }
 
                     // Call on attack to extend attack functionality while attacking

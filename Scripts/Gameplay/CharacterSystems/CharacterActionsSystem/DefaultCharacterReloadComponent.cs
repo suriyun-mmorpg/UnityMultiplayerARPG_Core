@@ -1,18 +1,27 @@
 ﻿using Cysharp.Threading.Tasks;
 using LiteNetLib.Utils;
+using LiteNetLibManager;
 using System.Collections.Generic;
 using System.Threading;
+using UnityEngine;
 
 namespace MultiplayerARPG
 {
     public class DefaultCharacterReloadComponent : BaseNetworkedGameEntityComponent<BaseCharacterEntity>, ICharacterReloadComponent
     {
-
+        public const float DEFAULT_TOTAL_DURATION = 2f;
+        public const float DEFAULT_TRIGGER_DURATION = 1f;
+        public const float DEFAULT_STATE_SETUP_DELAY = 1f;
         protected List<CancellationTokenSource> reloadCancellationTokenSources = new List<CancellationTokenSource>();
         public short ReloadingAmmoAmount { get; protected set; }
         public bool IsReloading { get; protected set; }
+        public float LastReloadEndTime { get; protected set; }
         public float MoveSpeedRateWhileReloading { get; protected set; }
         public MovementRestriction MovementRestrictionWhileReloading { get; protected set; }
+        protected float totalDuration;
+        public float ReloadTotalDuration { get { return totalDuration; } set { totalDuration = value; } }
+        protected float[] triggerDurations;
+        public float[] ReloadTriggerDurations { get { return triggerDurations; } set { triggerDurations = value; } }
         public AnimActionType AnimActionType { get; protected set; }
 
         protected bool sendingClientReload;
@@ -52,8 +61,6 @@ namespace MultiplayerARPG
 
             // Prepare requires data and get animation data
             float animSpeedRate;
-            float[] triggerDurations;
-            float totalDuration;
             Entity.GetAnimationData(
                 animActionType,
                 animActionDataId,
@@ -71,6 +78,16 @@ namespace MultiplayerARPG
             // Calculate move speed rate while doing action at clients and server
             MoveSpeedRateWhileReloading = Entity.GetMoveSpeedRateWhileReloading(weaponItem);
             MovementRestrictionWhileReloading = Entity.GetMovementRestrictionWhileReloading(weaponItem);
+
+            // Last attack end time
+            float remainsDuration = DEFAULT_TOTAL_DURATION;
+            LastReloadEndTime = Time.unscaledTime + DEFAULT_TOTAL_DURATION;
+            if (totalDuration >= 0f)
+            {
+                remainsDuration = totalDuration;
+                LastReloadEndTime = Time.unscaledTime + (totalDuration / animSpeedRate);
+            }
+
             try
             {
                 // Play animation
@@ -93,7 +110,7 @@ namespace MultiplayerARPG
                     }
                 }
 
-                // Animations will plays on clients only
+                // Special effects will plays on clients only
                 if (IsClient)
                 {
                     // Play weapon reload special effects
@@ -102,19 +119,57 @@ namespace MultiplayerARPG
                     if (Entity.FpsModel && Entity.FpsModel.gameObject.activeSelf)
                         Entity.FpsModel.PlayEquippedWeaponReload(isLeftHand);
                     // Play reload sfx
-                    if (AnimActionType == AnimActionType.ReloadRightHand ||
-                        AnimActionType == AnimActionType.ReloadLeftHand)
+                    AudioManager.PlaySfxClipAtAudioSource(weaponItem.ReloadClip, Entity.CharacterModel.GenericAudioSource);
+                }
+
+                // Try setup state data (maybe by animation clip events or state machine behaviours), if it was not set up
+                if (triggerDurations == null || triggerDurations.Length == 0 || totalDuration < 0f)
+                {
+                    // Wait some components to setup proper `attackTriggerDurations` and `attackTotalDuration` within `DEFAULT_STATE_SETUP_DELAY`
+                    float setupDelayCountDown = DEFAULT_STATE_SETUP_DELAY;
+                    do
                     {
-                        AudioManager.PlaySfxClipAtAudioSource(weaponItem.ReloadClip, Entity.CharacterModel.GenericAudioSource);
+                        await UniTask.Yield();
+                        setupDelayCountDown -= Time.unscaledDeltaTime;
+                    } while (setupDelayCountDown > 0 && (triggerDurations == null || triggerDurations.Length == 0 || totalDuration < 0f));
+                    if (setupDelayCountDown <= 0f)
+                    {
+                        // Can't setup properly, so try to setup manually to make it still workable
+                        remainsDuration = DEFAULT_TOTAL_DURATION - DEFAULT_STATE_SETUP_DELAY;
+                        triggerDurations = new float[1]
+                        {
+                        DEFAULT_TRIGGER_DURATION,
+                        };
+                    }
+                    else
+                    {
+                        // Can setup, so set proper `remainsDuration` and `LastAttackEndTime` value
+                        remainsDuration = totalDuration;
+                        LastReloadEndTime = Time.unscaledTime + (totalDuration / animSpeedRate);
                     }
                 }
 
+                float tempTriggerDuration;
                 for (int i = 0; i < triggerDurations.Length; ++i)
                 {
                     // Wait until triggger before reload ammo
-                    await UniTask.Delay((int)(triggerDurations[i] / animSpeedRate * 1000f), true, PlayerLoopTiming.Update, reloadCancellationTokenSource.Token);
+                    tempTriggerDuration = triggerDurations[i];
+                    remainsDuration -= tempTriggerDuration;
+                    await UniTask.Delay((int)(tempTriggerDuration / animSpeedRate * 1000f), true, PlayerLoopTiming.Update, reloadCancellationTokenSource.Token);
 
-                    // Prepare data
+                    // Special effects will plays on clients only
+                    if (IsClient)
+                    {
+                        // Play weapon reload special effects
+                        if (Entity.CharacterModel && Entity.CharacterModel.gameObject.activeSelf)
+                            Entity.CharacterModel.PlayEquippedWeaponReloaded(isLeftHand);
+                        if (Entity.FpsModel && Entity.FpsModel.gameObject.activeSelf)
+                            Entity.FpsModel.PlayEquippedWeaponReloaded(isLeftHand);
+                        // Play reload sfx
+                        AudioManager.PlaySfxClipAtAudioSource(weaponItem.ReloadedClip, Entity.CharacterModel.GenericAudioSource);
+                    }
+
+                    // Reload / Fill ammo
                     short triggerReloadAmmoAmount = (short)(ReloadingAmmoAmount / triggerDurations.Length);
                     EquipWeapons equipWeapons = Entity.EquipWeapons;
                     if (IsServer && Entity.DecreaseAmmos(weaponItem.WeaponType.RequireAmmoType, triggerReloadAmmoAmount, out _))
@@ -127,12 +182,29 @@ namespace MultiplayerARPG
                             equipWeapons.rightHand = weapon;
                         Entity.EquipWeapons = equipWeapons;
                     }
-                    await UniTask.Delay((int)((totalDuration - triggerDurations[i]) / animSpeedRate * 1000f), true, PlayerLoopTiming.Update, reloadCancellationTokenSource.Token);
+
+                    if (remainsDuration <= 0f)
+                    {
+                        // Stop trigger animations loop
+                        break;
+                    }
+                }
+
+                if (remainsDuration > 0f)
+                {
+                    // Wait until animation ends to stop actions
+                    await UniTask.Delay((int)(remainsDuration / animSpeedRate * 1000f), true, PlayerLoopTiming.Update, reloadCancellationTokenSource.Token);
                 }
             }
-            catch
+            catch (System.OperationCanceledException)
             {
                 // Catch the cancellation
+                LastReloadEndTime = Time.unscaledTime;
+            }
+            catch (System.Exception ex)
+            {
+                // Other errors
+                Logging.LogException(LogTag, ex);
             }
             finally
             {
@@ -199,7 +271,8 @@ namespace MultiplayerARPG
         private void ProceedReloadStateAtServer(bool isLeftHand)
         {
 #if UNITY_EDITOR || UNITY_SERVER
-            if (!Entity.CanDoActions())
+            // Speed hack avoidance
+            if (Time.unscaledTime - LastReloadEndTime < -0.05f)
                 return;
             // Get weapon to reload
             CharacterItem reloadingWeapon = isLeftHand ? Entity.EquipWeapons.leftHand : Entity.EquipWeapons.rightHand;

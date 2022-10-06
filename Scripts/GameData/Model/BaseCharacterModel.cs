@@ -775,6 +775,14 @@ namespace MultiplayerARPG
                 CacheLeftHandEquipmentEntity.PlayReload();
         }
 
+        public void PlayEquippedWeaponReloaded(bool isLeftHand)
+        {
+            if (!isLeftHand && CacheRightHandEquipmentEntity != null)
+                CacheRightHandEquipmentEntity.PlayReloaded();
+            if (isLeftHand && CacheLeftHandEquipmentEntity != null)
+                CacheLeftHandEquipmentEntity.PlayReloaded();
+        }
+
         public void PlayEquippedWeaponCharge(bool isLeftHand)
         {
             if (!isLeftHand && CacheRightHandEquipmentEntity != null)
@@ -844,12 +852,74 @@ namespace MultiplayerARPG
         public abstract void StopActionAnimation();
         public abstract void StopSkillCastAnimation();
         public abstract void StopWeaponChargeAnimation();
+        /// <summary>
+        /// Get random right-hand attack animation, if `triggerDurations`'s length is 0/`totalDuration` <= 0, it will wait other methods to use as `triggerDurations`/`totalDuration` (such as animtion clip event, state machine behaviour).
+        /// </summary>
+        /// <param name="dataId"></param>
+        /// <param name="randomSeed"></param>
+        /// <param name="animationIndex"></param>
+        /// <param name="animSpeedRate"></param>
+        /// <param name="triggerDurations"></param>
+        /// <param name="totalDuration"></param>
+        /// <returns></returns>
         public abstract bool GetRandomRightHandAttackAnimation(int dataId, int randomSeed, out int animationIndex, out float animSpeedRate, out float[] triggerDurations, out float totalDuration);
+        /// <summary>
+        /// Get random left-hand attack animation, if `triggerDurations`'s length is 0/`totalDuration` <= 0, it will wait other methods to use as `triggerDurations`/`totalDuration` (such as animtion clip event, state machine behaviour).
+        /// </summary>
+        /// <param name="dataId"></param>
+        /// <param name="randomSeed"></param>
+        /// <param name="animationIndex"></param>
+        /// <param name="animSpeedRate"></param>
+        /// <param name="triggerDurations"></param>
+        /// <param name="totalDuration"></param>
+        /// <returns></returns>
         public abstract bool GetRandomLeftHandAttackAnimation(int dataId, int randomSeed, out int animationIndex, out float animSpeedRate, out float[] triggerDurations, out float totalDuration);
+        /// <summary>
+        /// Get right-hand attack animation, if `triggerDurations`'s length is 0/`totalDuration` <= 0, it will wait other methods to use as `triggerDurations`/`totalDuration` (such as animtion clip event, state machine behaviour).
+        /// </summary>
+        /// <param name="dataId"></param>
+        /// <param name="animationIndex"></param>
+        /// <param name="animSpeedRate"></param>
+        /// <param name="triggerDurations"></param>
+        /// <param name="totalDuration"></param>
+        /// <returns></returns>
         public abstract bool GetRightHandAttackAnimation(int dataId, int animationIndex, out float animSpeedRate, out float[] triggerDurations, out float totalDuration);
+        /// <summary>
+        /// Get left-hand attack animation, if `triggerDurations`'s length is 0/`totalDuration` <= 0, it will wait other methods to use as `triggerDurations`/`totalDuration` (such as animtion clip event, state machine behaviour).
+        /// </summary>
+        /// <param name="dataId"></param>
+        /// <param name="animationIndex"></param>
+        /// <param name="animSpeedRate"></param>
+        /// <param name="triggerDurations"></param>
+        /// <param name="totalDuration"></param>
+        /// <returns></returns>
         public abstract bool GetLeftHandAttackAnimation(int dataId, int animationIndex, out float animSpeedRate, out float[] triggerDurations, out float totalDuration);
+        /// <summary>
+        /// Get skill activate animation, if `triggerDurations`'s length is 0/`totalDuration` <= 0, it will wait other methods to use as `triggerDurations`/`totalDuration` (such as animtion clip event, state machine behaviour).
+        /// </summary>
+        /// <param name="dataId"></param>
+        /// <param name="animSpeedRate"></param>
+        /// <param name="triggerDurations"></param>
+        /// <param name="totalDuration"></param>
+        /// <returns></returns>
         public abstract bool GetSkillActivateAnimation(int dataId, out float animSpeedRate, out float[] triggerDurations, out float totalDuration);
+        /// <summary>
+        /// Get right-hand reload animation, if `triggerDurations`'s length is 0/`totalDuration` <= 0, it will wait other methods to use as `triggerDurations`/`totalDuration` (such as animtion clip event, state machine behaviour).
+        /// </summary>
+        /// <param name="dataId"></param>
+        /// <param name="animSpeedRate"></param>
+        /// <param name="triggerDurations"></param>
+        /// <param name="totalDuration"></param>
+        /// <returns></returns>
         public abstract bool GetRightHandReloadAnimation(int dataId, out float animSpeedRate, out float[] triggerDurations, out float totalDuration);
+        /// <summary>
+        /// Get left-hand reload animation, if `triggerDurations`'s length is 0/`totalDuration` <= 0, it will wait other methods to use as `triggerDurations`/`totalDuration` (such as animtion clip event, state machine behaviour).
+        /// </summary>
+        /// <param name="dataId"></param>
+        /// <param name="animSpeedRate"></param>
+        /// <param name="triggerDurations"></param>
+        /// <param name="totalDuration"></param>
+        /// <returns></returns>
         public abstract bool GetLeftHandReloadAnimation(int dataId, out float animSpeedRate, out float[] triggerDurations, out float totalDuration);
         public abstract SkillActivateAnimationType GetSkillActivateAnimationType(int dataId);
     }

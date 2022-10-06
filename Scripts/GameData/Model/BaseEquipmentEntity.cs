@@ -37,6 +37,7 @@ namespace MultiplayerARPG
         public UnityEvent onDisable = new UnityEvent();
         public UnityEvent onPlayLaunch = new UnityEvent();
         public UnityEvent onPlayReload = new UnityEvent();
+        public UnityEvent onPlayReloaded = new UnityEvent();
         public UnityEvent onPlayCharge = new UnityEvent();
 
         public IEnumerable<IPoolDescriptor> PoolDescriptors
@@ -98,6 +99,11 @@ namespace MultiplayerARPG
         public virtual void PlayReload()
         {
             onPlayReload.Invoke();
+        }
+
+        public virtual void PlayReloaded()
+        {
+            onPlayReloaded.Invoke();
         }
 
         public virtual void PlayCharge()
