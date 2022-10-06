@@ -52,19 +52,19 @@ namespace MultiplayerARPG
         /// <summary>
         /// Audio clip which will plays when fire and bullet launched
         /// </summary>
-        AudioClip LaunchClip { get; }
+        AudioClipWithVolumeSettings LaunchClip { get; }
         /// <summary>
         /// Audio clip which will plays when reload an ammo
         /// </summary>
-        AudioClip ReloadClip { get; }
+        AudioClipWithVolumeSettings ReloadClip { get; }
         /// <summary>
         /// Audio clip which will plays when reloaded an ammo
         /// </summary>
-        AudioClip ReloadedClip { get; }
+        AudioClipWithVolumeSettings ReloadedClip { get; }
         /// <summary>
         /// Audio clip which will plays when there is no ammo
         /// </summary>
-        AudioClip EmptyClip { get; }
+        AudioClipWithVolumeSettings EmptyClip { get; }
         /// <summary>
         /// How to fire
         /// </summary>

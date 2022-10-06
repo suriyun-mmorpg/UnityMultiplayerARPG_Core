@@ -173,7 +173,7 @@ namespace MultiplayerARPG
                         if (Entity.FpsModel && Entity.FpsModel.gameObject.activeSelf)
                             Entity.FpsModel.PlayEquippedWeaponLaunch(isLeftHand);
                         // Play launch sfx
-                        AudioManager.PlaySfxClipAtAudioSource(weaponItem.LaunchClip, Entity.CharacterModel.GenericAudioSource);
+                        AudioManager.PlaySfxClipAtAudioSource(weaponItem.LaunchClip.audioClip, Entity.CharacterModel.GenericAudioSource, weaponItem.LaunchClip.GetRandomedVolume());
                     }
 
                     // Call on attack to extend attack functionality while attacking

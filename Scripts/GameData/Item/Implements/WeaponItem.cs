@@ -128,14 +128,20 @@ namespace MultiplayerARPG
         [HideInInspector]
         [SerializeField]
         private AudioClip launchClip = null;
+
+        [HideInInspector]
         [SerializeField]
         private AudioClip[] launchClips = new AudioClip[0];
-        public AudioClip LaunchClip
+
+        [SerializeField]
+        private AudioClipWithVolumeSettings[] launchClipSettings = new AudioClipWithVolumeSettings[0];
+
+        public AudioClipWithVolumeSettings LaunchClip
         {
             get
             {
-                if (launchClips != null && launchClips.Length > 0)
-                    return launchClips[Random.Range(0, launchClips.Length - 1)];
+                if (launchClipSettings != null && launchClipSettings.Length > 0)
+                    return launchClipSettings[Random.Range(0, launchClipSettings.Length - 1)];
                 return null;
             }
         }
@@ -143,28 +149,41 @@ namespace MultiplayerARPG
         [HideInInspector]
         [SerializeField]
         private AudioClip reloadClip = null;
+
+        [HideInInspector]
         [SerializeField]
         private AudioClip[] reloadClips = new AudioClip[0];
-        public AudioClip ReloadClip
+
+        [SerializeField]
+        private AudioClipWithVolumeSettings[] reloadClipSettings = new AudioClipWithVolumeSettings[0];
+
+        public AudioClipWithVolumeSettings ReloadClip
         {
             get
             {
-                if (reloadClips != null && reloadClips.Length > 0)
-                    return reloadClips[Random.Range(0, reloadClips.Length - 1)];
+                if (reloadClipSettings != null && reloadClipSettings.Length > 0)
+                    return reloadClipSettings[Random.Range(0, reloadClipSettings.Length - 1)];
                 return null;
             }
         }
 
+        [HideInInspector]
         [SerializeField]
         private AudioClip reloadedClip = null;
+
+        [HideInInspector]
         [SerializeField]
         private AudioClip[] reloadedClips = new AudioClip[0];
-        public AudioClip ReloadedClip
+
+        [SerializeField]
+        private AudioClipWithVolumeSettings[] reloadedClipSettings = new AudioClipWithVolumeSettings[0];
+
+        public AudioClipWithVolumeSettings ReloadedClip
         {
             get
             {
-                if (reloadedClips != null && reloadedClips.Length > 0)
-                    return reloadedClips[Random.Range(0, reloadedClips.Length - 1)];
+                if (reloadedClipSettings != null && reloadedClipSettings.Length > 0)
+                    return reloadedClipSettings[Random.Range(0, reloadedClipSettings.Length - 1)];
                 return null;
             }
         }
@@ -172,14 +191,20 @@ namespace MultiplayerARPG
         [HideInInspector]
         [SerializeField]
         private AudioClip emptyClip = null;
+
+        [HideInInspector]
         [SerializeField]
         private AudioClip[] emptyClips = new AudioClip[0];
-        public AudioClip EmptyClip
+
+        [SerializeField]
+        private AudioClipWithVolumeSettings[] emptyClipSettings = new AudioClipWithVolumeSettings[0];
+
+        public AudioClipWithVolumeSettings EmptyClip
         {
             get
             {
-                if (emptyClips != null && emptyClips.Length > 0)
-                    return emptyClips[Random.Range(0, emptyClips.Length - 1)];
+                if (emptyClipSettings != null && emptyClipSettings.Length > 0)
+                    return emptyClipSettings[Random.Range(0, emptyClipSettings.Length - 1)];
                 return null;
             }
         }
@@ -215,51 +240,54 @@ namespace MultiplayerARPG
         public override bool Validate()
         {
             bool hasChanges = false;
-            if (launchClip != null)
-            {
-                List<AudioClip> clips = new List<AudioClip>(launchClips);
-                if (!clips.Contains(launchClip))
-                {
-                    clips.Add(launchClip);
-                    launchClips = clips.ToArray();
-                }
-                launchClip = null;
+            if (MigrateAudioClips(ref launchClip, ref launchClips, ref launchClipSettings))
                 hasChanges = true;
-            }
-            if (reloadClip != null)
-            {
-                List<AudioClip> clips = new List<AudioClip>(reloadClips);
-                if (!clips.Contains(reloadClip))
-                {
-                    clips.Add(reloadClip);
-                    reloadClips = clips.ToArray();
-                }
-                reloadClip = null;
+            if (MigrateAudioClips(ref reloadClip, ref reloadClips, ref reloadClipSettings))
                 hasChanges = true;
-            }
-            if (reloadedClip != null)
-            {
-                List<AudioClip> clips = new List<AudioClip>(reloadedClips);
-                if (!clips.Contains(reloadedClip))
-                {
-                    clips.Add(reloadedClip);
-                    reloadedClips = clips.ToArray();
-                }
-                reloadedClip = null;
+            if (MigrateAudioClips(ref reloadedClip, ref reloadedClips, ref reloadedClipSettings))
                 hasChanges = true;
-            }
-            if (emptyClip != null)
-            {
-                List<AudioClip> clips = new List<AudioClip>(emptyClips);
-                if (!clips.Contains(emptyClip))
-                {
-                    clips.Add(emptyClip);
-                    emptyClips = clips.ToArray();
-                }
-                emptyClip = null;
+            if (MigrateAudioClips(ref emptyClip, ref emptyClips, ref emptyClipSettings))
                 hasChanges = true;
-            }
             return hasChanges || base.Validate();
+        }
+
+        private bool MigrateAudioClips(ref AudioClip singleClip, ref AudioClip[] multipleClips, ref AudioClipWithVolumeSettings[] destinationSettings)
+        {
+            if (singleClip == null && (multipleClips == null || multipleClips.Length == 0))
+                return false;
+
+            bool hasChanges = false;
+
+            List<AudioClip> clips = new List<AudioClip>();
+            if (multipleClips != null && multipleClips.Length > 0)
+            {
+                clips.AddRange(multipleClips);
+                multipleClips = null;
+                hasChanges = true;
+            }
+            if (singleClip != null && !clips.Contains(singleClip))
+            {
+                clips.Add(singleClip);
+                singleClip = null;
+                hasChanges = true;
+            }
+            if (!hasChanges)
+                return false;
+
+            List<AudioClipWithVolumeSettings> clipSettings = new List<AudioClipWithVolumeSettings>();
+            if (destinationSettings != null && destinationSettings.Length > 0)
+                clipSettings.AddRange(destinationSettings);
+            for (int i = 0; i < clips.Count; ++i)
+            {
+                clipSettings.Add(new AudioClipWithVolumeSettings()
+                {
+                    audioClip = clips[i],
+                    minRandomVolume = 1f,
+                    maxRandomVolume = 1f,
+                });
+            }
+            destinationSettings = clipSettings.ToArray();
+            return true;
         }
 
         public override void PrepareRelatesData()

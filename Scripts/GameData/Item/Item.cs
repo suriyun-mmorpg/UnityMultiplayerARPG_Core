@@ -83,10 +83,22 @@ namespace MultiplayerARPG
             minSpread = 10f,
             maxSpread = 50f
         };
+
+        [HideInInspector]
         public AudioClip launchClip;
+        public AudioClipWithVolumeSettings[] launchClipSettings = new AudioClipWithVolumeSettings[0];
+
+        [HideInInspector]
         public AudioClip reloadClip;
+        public AudioClipWithVolumeSettings[] reloadClipSettings = new AudioClipWithVolumeSettings[0];
+
+        [HideInInspector]
         public AudioClip reloadedClip;
+        public AudioClipWithVolumeSettings[] reloadedClipSettings = new AudioClipWithVolumeSettings[0];
+
+        [HideInInspector]
         public AudioClip emptyClip;
+        public AudioClipWithVolumeSettings[] emptyClipSettings = new AudioClipWithVolumeSettings[0];
 
         [Header("Fire Configs")]
         public FireType fireType;
@@ -447,24 +459,44 @@ namespace MultiplayerARPG
             get { return crosshairSetting; }
         }
 
-        public AudioClip LaunchClip
+        public AudioClipWithVolumeSettings LaunchClip
         {
-            get { return launchClip; }
+            get
+            {
+                if (launchClipSettings != null && launchClipSettings.Length > 0)
+                    return launchClipSettings[Random.Range(0, launchClipSettings.Length - 1)];
+                return null;
+            }
         }
 
-        public AudioClip ReloadClip
+        public AudioClipWithVolumeSettings ReloadClip
         {
-            get { return reloadClip; }
+            get
+            {
+                if (reloadClipSettings != null && reloadClipSettings.Length > 0)
+                    return reloadClipSettings[Random.Range(0, reloadClipSettings.Length - 1)];
+                return null;
+            }
         }
 
-        public AudioClip ReloadedClip
+        public AudioClipWithVolumeSettings ReloadedClip
         {
-            get { return reloadedClip; }
+            get
+            {
+                if (reloadedClipSettings != null && reloadedClipSettings.Length > 0)
+                    return reloadedClipSettings[Random.Range(0, reloadedClipSettings.Length - 1)];
+                return null;
+            }
         }
 
-        public AudioClip EmptyClip
+        public AudioClipWithVolumeSettings EmptyClip
         {
-            get { return emptyClip; }
+            get
+            {
+                if (emptyClipSettings != null && emptyClipSettings.Length > 0)
+                    return emptyClipSettings[Random.Range(0, emptyClipSettings.Length - 1)];
+                return null;
+            }
         }
 
         public FireType FireType
@@ -526,6 +558,53 @@ namespace MultiplayerARPG
             get { return socketEnhanceEffect; }
         }
         #endregion
+
+        public override bool Validate()
+        {
+            bool hasChanges = false;
+            if (MigrateAudioClips(ref launchClip, ref launchClipSettings))
+                hasChanges = true;
+            if (MigrateAudioClips(ref reloadClip, ref reloadClipSettings))
+                hasChanges = true;
+            if (MigrateAudioClips(ref reloadedClip, ref reloadedClipSettings))
+                hasChanges = true;
+            if (MigrateAudioClips(ref emptyClip, ref emptyClipSettings))
+                hasChanges = true;
+            return hasChanges || base.Validate();
+        }
+
+        private bool MigrateAudioClips(ref AudioClip singleClip, ref AudioClipWithVolumeSettings[] destinationSettings)
+        {
+            if (singleClip == null)
+                return false;
+
+            bool hasChanges = false;
+
+            List<AudioClip> clips = new List<AudioClip>();
+            if (singleClip != null && !clips.Contains(singleClip))
+            {
+                clips.Add(singleClip);
+                singleClip = null;
+                hasChanges = true;
+            }
+            if (!hasChanges)
+                return false;
+
+            List<AudioClipWithVolumeSettings> clipSettings = new List<AudioClipWithVolumeSettings>();
+            if (destinationSettings != null && destinationSettings.Length > 0)
+                clipSettings.AddRange(destinationSettings);
+            for (int i = 0; i < clips.Count; ++i)
+            {
+                clipSettings.Add(new AudioClipWithVolumeSettings()
+                {
+                    audioClip = clips[i],
+                    minRandomVolume = 1f,
+                    maxRandomVolume = 1f,
+                });
+            }
+            destinationSettings = clipSettings.ToArray();
+            return true;
+        }
 
         public override void PrepareRelatesData()
         {

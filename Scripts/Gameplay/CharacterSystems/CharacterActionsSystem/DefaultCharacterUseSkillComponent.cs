@@ -276,7 +276,7 @@ namespace MultiplayerARPG
                             (AnimActionType == AnimActionType.AttackRightHand ||
                             AnimActionType == AnimActionType.AttackLeftHand))
                         {
-                            AudioManager.PlaySfxClipAtAudioSource(weaponItem.LaunchClip, Entity.CharacterModel.GenericAudioSource);
+                            AudioManager.PlaySfxClipAtAudioSource(weaponItem.LaunchClip.audioClip, Entity.CharacterModel.GenericAudioSource, weaponItem.LaunchClip.GetRandomedVolume());
                         }
                     }
 
