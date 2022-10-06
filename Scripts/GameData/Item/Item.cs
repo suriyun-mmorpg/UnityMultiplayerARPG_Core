@@ -70,6 +70,8 @@ namespace MultiplayerARPG
         [Tooltip("This is move speed rate while attacking with this weapon")]
         public float moveSpeedRateWhileAttacking = 0f;
         public MovementRestriction movementRestrictionWhileAttacking = default(MovementRestriction);
+        public ActionRestriction restrictionWhileCrouching = default(ActionRestriction);
+        public ActionRestriction restrictionWhileCrawling = default(ActionRestriction);
         [Tooltip("For macine gun may set this to 30 as magazine capacity, if this is 0 it will not need to have ammo loaded to shoot but still need ammo in inventory")]
         public short ammoCapacity;
         public BaseWeaponAbility weaponAbility;
@@ -417,6 +419,16 @@ namespace MultiplayerARPG
         public MovementRestriction MovementRestrictionWhileAttacking
         {
             get { return movementRestrictionWhileAttacking; }
+        }
+
+        public ActionRestriction RestrictionWhileCrouching
+        {
+            get { return restrictionWhileCrouching; }
+        }
+
+        public ActionRestriction RestrictionWhileCrawling
+        {
+            get { return restrictionWhileCrawling; }
         }
 
         public short AmmoCapacity

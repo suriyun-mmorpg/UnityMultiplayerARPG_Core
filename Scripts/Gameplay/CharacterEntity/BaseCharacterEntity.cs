@@ -571,6 +571,7 @@ namespace MultiplayerARPG
 
             CharacterItem weapon = this.GetAvailableWeapon(ref isLeftHand);
             IWeaponItem weaponItem = weapon.GetWeaponItem();
+
             if (!ValidateAmmo(weapon, 1))
             {
                 QueueGameMessage(UITextKeys.UI_ERROR_NO_AMMO);
@@ -578,6 +579,13 @@ namespace MultiplayerARPG
                     AudioManager.PlaySfxClipAtAudioSource(weaponItem.EmptyClip, CharacterModel.GenericAudioSource);
                 return false;
             }
+
+            if (Entity.ExtraMovementState == ExtraMovementState.IsCrouching && weaponItem.RestrictionWhileCrouching.attackRestricted)
+                return false;
+
+            if (Entity.ExtraMovementState == ExtraMovementState.IsCrawling && weaponItem.RestrictionWhileCrawling.attackRestricted)
+                return false;
+
             return true;
         }
 
@@ -589,13 +597,20 @@ namespace MultiplayerARPG
             if (!UpdateLastActionTime())
                 return false;
 
+            BaseSkill skill;
             UITextKeys gameMessage;
-            if (!this.ValidateSkillToUse(dataId, isLeftHand, targetObjectId, out _, out _, out gameMessage))
+            if (!this.ValidateSkillToUse(dataId, isLeftHand, targetObjectId, out skill, out _, out gameMessage))
             {
                 if (gameMessage != UITextKeys.NONE)
                     QueueGameMessage(gameMessage);
                 return false;
             }
+
+            if (Entity.ExtraMovementState == ExtraMovementState.IsCrouching && skill.restrictedWhileCrouching)
+                return false;
+
+            if (Entity.ExtraMovementState == ExtraMovementState.IsCrawling && skill.restrictedWhileCrawling)
+                return false;
 
             return true;
         }
@@ -608,13 +623,20 @@ namespace MultiplayerARPG
             if (!UpdateLastActionTime())
                 return false;
 
+            BaseSkill skill;
             UITextKeys gameMessage;
-            if (!this.ValidateSkillItemToUse(index, isLeftHand, targetObjectId, out _, out _, out gameMessage))
+            if (!this.ValidateSkillItemToUse(index, isLeftHand, targetObjectId, out skill, out _, out gameMessage))
             {
                 if (gameMessage != UITextKeys.NONE)
                     QueueGameMessage(gameMessage);
                 return false;
             }
+
+            if (Entity.ExtraMovementState == ExtraMovementState.IsCrouching && skill.restrictedWhileCrouching)
+                return false;
+
+            if (Entity.ExtraMovementState == ExtraMovementState.IsCrawling && skill.restrictedWhileCrawling)
+                return false;
 
             return true;
         }
@@ -623,10 +645,21 @@ namespace MultiplayerARPG
         {
             if (!CanDoActions())
                 return false;
-            if (!isLeftHand && (EquipWeapons.rightHand.IsAmmoFull() || !EquipWeapons.rightHand.HasAmmoToReload(this)))
+
+            CharacterItem characterItem = isLeftHand ? EquipWeapons.leftHand : EquipWeapons.rightHand;
+            if (characterItem.IsEmptySlot())
                 return false;
-            if (isLeftHand && (EquipWeapons.leftHand.IsAmmoFull() || !EquipWeapons.leftHand.HasAmmoToReload(this)))
+
+            IWeaponItem weaponItem = characterItem.GetWeaponItem();
+            if (characterItem.IsAmmoFull() || !characterItem.HasAmmoToReload(this))
                 return false;
+
+            if (Entity.ExtraMovementState == ExtraMovementState.IsCrouching && weaponItem.RestrictionWhileCrouching.reloadRestricted)
+                return false;
+
+            if (Entity.ExtraMovementState == ExtraMovementState.IsCrawling && weaponItem.RestrictionWhileCrawling.reloadRestricted)
+                return false;
+
             return true;
         }
 

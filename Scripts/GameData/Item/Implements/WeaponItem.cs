@@ -91,6 +91,20 @@ namespace MultiplayerARPG
         }
 
         [SerializeField]
+        private ActionRestriction restrictionWhileCrouching = default(ActionRestriction);
+        public ActionRestriction RestrictionWhileCrouching
+        {
+            get { return restrictionWhileCrouching; }
+        }
+
+        [SerializeField]
+        private ActionRestriction restrictionWhileCrawling = default(ActionRestriction);
+        public ActionRestriction RestrictionWhileCrawling
+        {
+            get { return restrictionWhileCrawling; }
+        }
+
+        [SerializeField]
         private short ammoCapacity = 0;
         public short AmmoCapacity
         {
