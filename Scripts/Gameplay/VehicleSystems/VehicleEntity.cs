@@ -111,18 +111,7 @@ namespace MultiplayerARPG
             base.OnSetup();
             InitStats();
             SpawnPosition = EntityTransform.position;
-            syncPassengerIds.onOperation = (op, index) =>
-            {
-                LiteNetLibIdentity identity;
-                if (index < syncPassengerIds.Count)
-                {
-                    // Add passenger entity to dictionary if the id > 0
-                    if (syncPassengerIds[index] == 0)
-                        passengers.Remove((byte)index);
-                    else if (Manager.Assets.TryGetSpawnedObject(syncPassengerIds[index], out identity))
-                        passengers[(byte)index] = identity.GetComponent<BaseGameEntity>();
-                }
-            };
+            syncPassengerIds.onOperation += OnPassengerIdsOperation;
             if (IsServer)
             {
                 // Prepare passengers data, add data at server then it wil be synced to clients
@@ -133,6 +122,30 @@ namespace MultiplayerARPG
             }
             // Vehicle must not being destroyed when owner player is disconnect to avoid vehicle exiting issues
             Identity.DoNotDestroyWhenDisconnect = true;
+        }
+
+        protected override void EntityOnDestroy()
+        {
+            base.EntityOnDestroy();
+            syncPassengerIds.onOperation -= OnPassengerIdsOperation;
+        }
+
+        private void OnPassengerIdsOperation(LiteNetLibSyncList.Operation operation, int index)
+        {
+            if (index < syncPassengerIds.Count)
+            {
+                // Set passenger entity to dictionary if the id > 0
+                if (syncPassengerIds[index] == 0)
+                {
+                    passengers.Remove((byte)index);
+                }
+                else if (Manager.Assets.TryGetSpawnedObject(syncPassengerIds[index], out LiteNetLibIdentity identity))
+                {
+                    BaseGameEntity passenger = identity.GetComponent<BaseGameEntity>();
+                    passenger.SetPassengingVehicle((byte)index, this);
+                    passengers[(byte)index] = passenger;
+                }
+            }
         }
 
         protected override void EntityUpdate()
@@ -212,8 +225,12 @@ namespace MultiplayerARPG
                 return false;
             if (seatIndex < syncPassengerIds.Count)
             {
-                BaseGameEntity passenger;
-                if (Manager.TryGetEntityByObjectId(syncPassengerIds[seatIndex], out passenger))
+                // Store exiting object ID
+                uint passengerId = syncPassengerIds[seatIndex];
+                // Set passenger ID to `0` to tell clients that the passenger is exiting
+                syncPassengerIds[seatIndex] = 0;
+                // Move passenger to exit transform
+                if (Manager.TryGetEntityByObjectId(passengerId, out BaseGameEntity passenger))
                 {
                     if (Seats[seatIndex].exitTransform != null) {
                         passenger.ExitedVehicle(
@@ -227,7 +244,6 @@ namespace MultiplayerARPG
                             MovementTransform.rotation);
                     }
                 }
-                syncPassengerIds[seatIndex] = 0;
                 return true;
             }
             return false;

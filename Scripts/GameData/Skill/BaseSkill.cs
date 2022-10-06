@@ -701,7 +701,7 @@ namespace MultiplayerARPG
                         if (CacheAvailableVehicles.Count > 0)
                         {
                             if (character.PassengingVehicleType == null ||
-                                !character.PassengingVehicleEntity.IsDriver(character.PassengingVehicle.seatIndex) ||
+                                !character.PassengingVehicleEntity.IsDriver(character.PassengingVehicleSeatIndex) ||
                                 !CacheAvailableVehicles.Contains(character.PassengingVehicleType))
                             {
                                 gameMessage = UITextKeys.UI_ERROR_CANNOT_USE_SKILL_BY_CURRENT_VEHICLE;

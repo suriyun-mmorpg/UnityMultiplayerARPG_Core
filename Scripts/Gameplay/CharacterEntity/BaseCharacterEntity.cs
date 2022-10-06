@@ -313,7 +313,7 @@ namespace MultiplayerARPG
             }
 
             // Update character model handler based on passenging vehicle
-            ModelManager.UpdatePassengingVehicle(PassengingVehicleType, PassengingVehicle.seatIndex);
+            ModelManager.UpdatePassengingVehicle(PassengingVehicleType, PassengingVehicleSeatIndex);
             // Set character model hide state
             ModelManager.SetIsHide(CharacterModelManager.HIDE_SETTER_ENTITY, IsHide());
             // Update model animations
