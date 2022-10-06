@@ -580,6 +580,9 @@ namespace MultiplayerARPG
                 return false;
             }
 
+            if (!Entity.MovementState.Has(MovementState.IsGrounded) && weaponItem.AttackRestriction.restrictedWhileAirborne)
+                return false;
+
             if (Entity.ExtraMovementState == ExtraMovementState.IsCrouching && weaponItem.AttackRestriction.restrictedWhileCrouching)
                 return false;
 
@@ -605,6 +608,9 @@ namespace MultiplayerARPG
                     QueueGameMessage(gameMessage);
                 return false;
             }
+
+            if (!Entity.MovementState.Has(MovementState.IsGrounded) && skill.useSkillRestriction.restrictedWhileAirborne)
+                return false;
 
             if (Entity.ExtraMovementState == ExtraMovementState.IsCrouching && skill.useSkillRestriction.restrictedWhileCrouching)
                 return false;
@@ -632,6 +638,9 @@ namespace MultiplayerARPG
                 return false;
             }
 
+            if (!Entity.MovementState.Has(MovementState.IsGrounded) && skill.useSkillRestriction.restrictedWhileAirborne)
+                return false;
+
             if (Entity.ExtraMovementState == ExtraMovementState.IsCrouching && skill.useSkillRestriction.restrictedWhileCrouching)
                 return false;
 
@@ -652,6 +661,9 @@ namespace MultiplayerARPG
 
             IWeaponItem weaponItem = characterItem.GetWeaponItem();
             if (characterItem.IsAmmoFull() || !characterItem.HasAmmoToReload(this))
+                return false;
+
+            if (!Entity.MovementState.Has(MovementState.IsGrounded) && weaponItem.ReloadRestriction.restrictedWhileAirborne)
                 return false;
 
             if (Entity.ExtraMovementState == ExtraMovementState.IsCrouching && weaponItem.ReloadRestriction.restrictedWhileCrouching)
