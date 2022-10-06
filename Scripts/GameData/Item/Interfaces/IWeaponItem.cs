@@ -24,16 +24,16 @@ namespace MultiplayerARPG
         /// This will be multiplied with character's movement speed while reloading this weapon
         /// </summary>
         float MoveSpeedRateWhileReloading { get; }
-        MovementRestriction MovementRestrictionWhileReloading { get; }
         /// <summary>
         /// This will be multiplied with character's movement speed while charging this weapon
         /// </summary>
         float MoveSpeedRateWhileCharging { get; }
-        MovementRestriction MovementRestrictionWhileCharging { get; }
         /// <summary>
         /// This will be multiplied with character's movement speed while attacking with this weapon
         /// </summary>
         float MoveSpeedRateWhileAttacking { get; }
+        MovementRestriction MovementRestrictionWhileReloading { get; }
+        MovementRestriction MovementRestrictionWhileCharging { get; }
         MovementRestriction MovementRestrictionWhileAttacking { get; }
         ActionRestriction AttackRestriction { get; }
         ActionRestriction ReloadRestriction { get; }

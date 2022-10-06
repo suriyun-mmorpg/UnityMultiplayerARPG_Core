@@ -61,14 +61,14 @@ namespace MultiplayerARPG
         [Range(0f, 1f)]
         [Tooltip("This is move speed rate while reloading this weapon")]
         public float moveSpeedRateWhileReloading = 1f;
-        public MovementRestriction movementRestrictionWhileReloading = default(MovementRestriction);
         [Range(0f, 1f)]
         [Tooltip("This is move speed rate while charging this weapon")]
         public float moveSpeedRateWhileCharging = 1f;
-        public MovementRestriction movementRestrictionWhileCharging = default(MovementRestriction);
         [Range(0f, 1f)]
         [Tooltip("This is move speed rate while attacking with this weapon")]
         public float moveSpeedRateWhileAttacking = 0f;
+        public MovementRestriction movementRestrictionWhileReloading = default(MovementRestriction);
+        public MovementRestriction movementRestrictionWhileCharging = default(MovementRestriction);
         public MovementRestriction movementRestrictionWhileAttacking = default(MovementRestriction);
         public ActionRestriction attackRestriction = default(ActionRestriction);
         public ActionRestriction reloadRestriction = default(ActionRestriction);
@@ -396,24 +396,24 @@ namespace MultiplayerARPG
             get { return moveSpeedRateWhileReloading; }
         }
 
-        public MovementRestriction MovementRestrictionWhileReloading
-        {
-            get { return movementRestrictionWhileReloading; }
-        }
-
         public float MoveSpeedRateWhileCharging
         {
             get { return moveSpeedRateWhileCharging; }
         }
 
-        public MovementRestriction MovementRestrictionWhileCharging
-        {
-            get { return movementRestrictionWhileCharging; }
-        }
-
         public float MoveSpeedRateWhileAttacking
         {
             get { return moveSpeedRateWhileAttacking; }
+        }
+
+        public MovementRestriction MovementRestrictionWhileReloading
+        {
+            get { return movementRestrictionWhileReloading; }
+        }
+
+        public MovementRestriction MovementRestrictionWhileCharging
+        {
+            get { return movementRestrictionWhileCharging; }
         }
 
         public MovementRestriction MovementRestrictionWhileAttacking
