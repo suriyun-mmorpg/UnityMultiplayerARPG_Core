@@ -264,7 +264,7 @@ namespace MultiplayerARPG
                     await UniTask.Delay((int)(tempTriggerDuration / animSpeedRate * 1000f), true, PlayerLoopTiming.Update, skillCancellationTokenSource.Token);
 
                     // Special effects will plays on clients only
-                    if (IsClient)
+                    if (IsClient && (AnimActionType == AnimActionType.AttackRightHand || AnimActionType == AnimActionType.AttackLeftHand))
                     {
                         // Play weapon launch special effects
                         if (Entity.CharacterModel && Entity.CharacterModel.gameObject.activeSelf)
@@ -272,11 +272,7 @@ namespace MultiplayerARPG
                         if (Entity.FpsModel && Entity.FpsModel.gameObject.activeSelf)
                             Entity.FpsModel.PlayEquippedWeaponLaunch(isLeftHand);
                         // Play launch sfx
-                        if (AnimActionType == AnimActionType.AttackRightHand ||
-                            AnimActionType == AnimActionType.AttackLeftHand)
-                        {
-                            AudioManager.PlaySfxClipAtAudioSource(weaponItem.LaunchClip.audioClip, Entity.CharacterModel.GenericAudioSource, weaponItem.LaunchClip.GetRandomedVolume());
-                        }
+                        AudioManager.PlaySfxClipAtAudioSource(weaponItem.LaunchClip.audioClip, Entity.CharacterModel.GenericAudioSource, weaponItem.LaunchClip.GetRandomedVolume());
                     }
 
                     // Get aim position by character's forward
