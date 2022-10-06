@@ -247,9 +247,6 @@ namespace MultiplayerARPG
 
         public override void OnSetup()
         {
-            // Force set `MovementSecure` to `ServerAuthoritative` for all monsters
-            MovementSecure = MovementSecure.ServerAuthoritative;
-
             base.OnSetup();
 
             if (IsClient)

@@ -16,6 +16,7 @@ namespace MultiplayerARPG
         [Header("Movement AI")]
         [Range(0.01f, 1f)]
         public float stoppingDistance = 0.1f;
+        public MovementSecure movementSecure = MovementSecure.NotSecure;
 
         [Header("Movement Settings")]
         public float jumpHeight = 2f;
@@ -174,7 +175,7 @@ namespace MultiplayerARPG
 
         public void StopMove()
         {
-            if (Entity.MovementSecure == MovementSecure.ServerAuthoritative)
+            if (movementSecure == MovementSecure.ServerAuthoritative)
             {
                 // Send movement input to server, then server will apply movement and sync transform to clients
                 this.SetInputStop(currentInput);
@@ -192,7 +193,7 @@ namespace MultiplayerARPG
         {
             if (!Entity.CanMove())
                 return;
-            if (this.CanPredictMovement())
+            if (CanPredictMovement())
             {
                 // Always apply movement to owner client (it's client prediction for server auth movement)
                 inputDirection = moveDirection;
@@ -208,7 +209,7 @@ namespace MultiplayerARPG
         {
             if (!Entity.CanMove())
                 return;
-            if (this.CanPredictMovement())
+            if (CanPredictMovement())
             {
                 // Always apply movement to owner client (it's client prediction for server auth movement)
                 SetMovePaths(position, true);
@@ -219,7 +220,7 @@ namespace MultiplayerARPG
         {
             if (!Entity.CanMove())
                 return;
-            if (this.CanPredictMovement())
+            if (CanPredictMovement())
             {
                 // Always apply movement to owner client (it's client prediction for server auth movement)
                 tempExtraMovementState = extraMovementState;
@@ -230,7 +231,7 @@ namespace MultiplayerARPG
         {
             if (!Entity.CanMove() || !Entity.CanTurn())
                 return;
-            if (this.CanPredictMovement())
+            if (CanPredictMovement())
             {
                 // Always apply movement to owner client (it's client prediction for server auth movement)
                 targetYAngle = rotation.eulerAngles.y;
@@ -272,7 +273,7 @@ namespace MultiplayerARPG
         public override void EntityUpdate()
         {
             UpdateMovement(Time.deltaTime);
-            if (IsOwnerClient || (IsServer && Entity.MovementSecure == MovementSecure.ServerAuthoritative))
+            if (CanPredictMovement())
             {
                 tempMovementState = moveDirection.sqrMagnitude > 0f ? tempMovementState : MovementState.None;
                 if (isUnderWater)
@@ -591,7 +592,7 @@ namespace MultiplayerARPG
         private float CalculateCurrentMoveSpeed(float maxMoveSpeed, float deltaTime)
         {
             // Adjust speed by rtt
-            if (!IsServer && IsOwnerClient && Entity.MovementSecure == MovementSecure.ServerAuthoritative)
+            if (!IsServer && IsOwnerClient && movementSecure == MovementSecure.ServerAuthoritative)
             {
                 float rtt = 0.001f * Entity.Manager.Rtt;
                 float acc = 1f / rtt * deltaTime * 0.5f;
@@ -680,7 +681,7 @@ namespace MultiplayerARPG
         public bool WriteClientState(NetDataWriter writer, out bool shouldSendReliably)
         {
             shouldSendReliably = false;
-            if (Entity.MovementSecure == MovementSecure.NotSecure && IsOwnerClient && !IsServer)
+            if (movementSecure == MovementSecure.NotSecure && IsOwnerClient && !IsServer)
             {
                 // Sync transform from owner client to server (except it's both owner client and server)
                 if (sendingJump)
@@ -702,7 +703,7 @@ namespace MultiplayerARPG
                 isClientConfirmingTeleport = false;
                 return true;
             }
-            if (Entity.MovementSecure == MovementSecure.ServerAuthoritative && IsOwnerClient && !IsServer)
+            if (movementSecure == MovementSecure.ServerAuthoritative && IsOwnerClient && !IsServer)
             {
                 EntityMovementInputState inputState;
                 currentInput = this.SetInputExtraMovementState(currentInput, tempExtraMovementState);
@@ -768,7 +769,7 @@ namespace MultiplayerARPG
 
         public void ReadClientStateAtServer(NetDataReader reader)
         {
-            switch (Entity.MovementSecure)
+            switch (movementSecure)
             {
                 case MovementSecure.NotSecure:
                     ReadSyncTransformAtServer(reader);
@@ -802,7 +803,7 @@ namespace MultiplayerARPG
                 else if (Vector3.Distance(position, CacheTransform.position) >= snapThreshold)
                 {
                     // Snap character to the position if character is too far from the position
-                    if (Entity.MovementSecure == MovementSecure.ServerAuthoritative || !IsOwnerClient)
+                    if (movementSecure == MovementSecure.ServerAuthoritative || !IsOwnerClient)
                     {
                         this.yAngle = targetYAngle = yAngle;
                         UpdateRotation();
@@ -835,7 +836,7 @@ namespace MultiplayerARPG
                 // Don't read and apply inputs, because it was done (this is both owner client and server)
                 return;
             }
-            if (Entity.MovementSecure == MovementSecure.NotSecure)
+            if (movementSecure == MovementSecure.NotSecure)
             {
                 // Movement handling at client, so don't read movement inputs from client (but have to read transform)
                 return;
@@ -914,7 +915,7 @@ namespace MultiplayerARPG
                 // Don't read and apply transform, because it was done (this is both owner client and server)
                 return;
             }
-            if (Entity.MovementSecure == MovementSecure.ServerAuthoritative)
+            if (movementSecure == MovementSecure.ServerAuthoritative)
             {
                 // Movement handling at server, so don't read sync transform from client
                 return;
@@ -1008,6 +1009,11 @@ namespace MultiplayerARPG
                 isServerWaitingTeleportConfirm = true;
             if (!IsServer && IsOwnerClient)
                 isClientConfirmingTeleport = true;
+        }
+
+        public bool CanPredictMovement()
+        {
+            return Entity.IsOwnerClient || (Entity.IsOwnerClientOrOwnedByServer && movementSecure == MovementSecure.NotSecure) || (Entity.IsServer && movementSecure == MovementSecure.ServerAuthoritative);
         }
     }
 }

@@ -6,11 +6,6 @@ namespace MultiplayerARPG
     public static class EntityMovementFunctions
     {
         #region Generic Functions
-        public static bool CanPredictMovement(this IEntityMovement movement)
-        {
-            return movement.Entity.IsOwnerClient || (movement.Entity.IsServer && movement.Entity.MovementSecure == MovementSecure.ServerAuthoritative);
-        }
-
         public static ExtraMovementState ValidateExtraMovementState(this IEntityMovement movement, MovementState movementState, ExtraMovementState extraMovementState)
         {
             // Movement state can affect extra movement state

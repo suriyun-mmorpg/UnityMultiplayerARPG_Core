@@ -75,7 +75,6 @@ namespace MultiplayerARPG
         public float DestroyRespawnDelay { get { return destroyRespawnDelay; } }
 
         protected readonly Dictionary<byte, BaseGameEntity> passengers = new Dictionary<byte, BaseGameEntity>();
-        protected MovementSecure defaultMovementSecure;
         protected bool isDestroyed;
         protected CalculatedBuff cacheBuff;
         protected short dirtyLevel = short.MinValue;
@@ -86,7 +85,6 @@ namespace MultiplayerARPG
             gameObject.tag = CurrentGameInstance.vehicleTag;
             gameObject.layer = CurrentGameInstance.vehicleLayer;
             isDestroyed = false;
-            defaultMovementSecure = MovementSecure;
         }
 
         protected virtual void InitStats()
@@ -145,21 +143,6 @@ namespace MultiplayerARPG
                     passenger.SetPassengingVehicle((byte)index, this);
                     passengers[(byte)index] = passenger;
                 }
-            }
-        }
-
-        protected override void EntityUpdate()
-        {
-            base.EntityUpdate();
-            if (HasDriver)
-            {
-                // Client will control movement
-                MovementSecure = defaultMovementSecure;
-            }
-            else
-            {
-                // Server will control movement
-                MovementSecure = MovementSecure.ServerAuthoritative;
             }
         }
 

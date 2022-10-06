@@ -106,10 +106,6 @@ namespace MultiplayerARPG
 
         [Category(3, "Entity Movement")]
         [SerializeField]
-        private MovementSecure movementSecure = MovementSecure.NotSecure;
-        public MovementSecure MovementSecure { get { return movementSecure; } set { movementSecure = value; } }
-
-        [SerializeField]
         protected bool canSideSprint = false;
         public bool CanSideSprint { get { return canSideSprint; } }
 
