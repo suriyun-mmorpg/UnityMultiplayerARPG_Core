@@ -388,6 +388,8 @@ namespace MultiplayerARPG
 
         protected override void UpdateData()
         {
+            IPlayerCharacterData playerCharacter = Data as IPlayerCharacterData;
+
             cacheStats = new CharacterStats();
             cacheAttributes = new Dictionary<Attribute, float>();
             cacheResistances = new Dictionary<DamageElement, float>();
