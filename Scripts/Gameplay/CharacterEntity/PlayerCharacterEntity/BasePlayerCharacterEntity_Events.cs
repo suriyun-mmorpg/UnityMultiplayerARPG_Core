@@ -6,6 +6,7 @@ namespace MultiplayerARPG
     {
         // Note: You may use `Awake` dev extension to setup an events and `OnDestroy` to desetup an events
         // Sync variables
+        public event System.Action<int> onDataIdChange;
         public event System.Action<int> onFactionIdChange;
         public event System.Action<float> onStatPointChange;
         public event System.Action<float> onSkillPointChange;
