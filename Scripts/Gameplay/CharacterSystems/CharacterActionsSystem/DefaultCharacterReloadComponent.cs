@@ -119,7 +119,9 @@ namespace MultiplayerARPG
                     if (Entity.FpsModel && Entity.FpsModel.gameObject.activeSelf)
                         Entity.FpsModel.PlayEquippedWeaponReload(isLeftHand);
                     // Play reload sfx
-                    AudioManager.PlaySfxClipAtAudioSource(weaponItem.ReloadClip.audioClip, Entity.CharacterModel.GenericAudioSource, weaponItem.ReloadClip.GetRandomedVolume());
+                    AudioClipWithVolumeSettings audioClip = weaponItem.ReloadClip;
+                    if (audioClip != null)
+                        AudioManager.PlaySfxClipAtAudioSource(audioClip.audioClip, Entity.CharacterModel.GenericAudioSource, audioClip.GetRandomedVolume());
                 }
 
                 // Try setup state data (maybe by animation clip events or state machine behaviours), if it was not set up
@@ -166,7 +168,9 @@ namespace MultiplayerARPG
                         if (Entity.FpsModel && Entity.FpsModel.gameObject.activeSelf)
                             Entity.FpsModel.PlayEquippedWeaponReloaded(isLeftHand);
                         // Play reload sfx
-                        AudioManager.PlaySfxClipAtAudioSource(weaponItem.ReloadedClip.audioClip, Entity.CharacterModel.GenericAudioSource, weaponItem.ReloadedClip.GetRandomedVolume());
+                        AudioClipWithVolumeSettings audioClip = weaponItem.ReloadedClip;
+                        if (audioClip != null)
+                            AudioManager.PlaySfxClipAtAudioSource(audioClip.audioClip, Entity.CharacterModel.GenericAudioSource, audioClip.GetRandomedVolume());
                     }
 
                     // Reload / Fill ammo

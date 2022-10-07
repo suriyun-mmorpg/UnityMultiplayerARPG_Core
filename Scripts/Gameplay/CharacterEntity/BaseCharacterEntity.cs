@@ -582,8 +582,9 @@ namespace MultiplayerARPG
             if (!ValidateAmmo(characterItem, 1))
             {
                 QueueGameMessage(UITextKeys.UI_ERROR_NO_AMMO);
-                if (weaponItem != null)
-                    AudioManager.PlaySfxClipAtAudioSource(weaponItem.EmptyClip.audioClip, CharacterModel.GenericAudioSource, weaponItem.EmptyClip.GetRandomedVolume());
+                AudioClipWithVolumeSettings audioClip = weaponItem.EmptyClip;
+                if (audioClip != null)
+                    AudioManager.PlaySfxClipAtAudioSource(audioClip.audioClip, CharacterModel.GenericAudioSource, audioClip.GetRandomedVolume());
                 return false;
             }
 

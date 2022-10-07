@@ -272,7 +272,9 @@ namespace MultiplayerARPG
                         if (Entity.FpsModel && Entity.FpsModel.gameObject.activeSelf)
                             Entity.FpsModel.PlayEquippedWeaponLaunch(isLeftHand);
                         // Play launch sfx
-                        AudioManager.PlaySfxClipAtAudioSource(weaponItem.LaunchClip.audioClip, Entity.CharacterModel.GenericAudioSource, weaponItem.LaunchClip.GetRandomedVolume());
+                        AudioClipWithVolumeSettings audioClip = weaponItem.LaunchClip;
+                        if (audioClip != null)
+                            AudioManager.PlaySfxClipAtAudioSource(audioClip.audioClip, Entity.CharacterModel.GenericAudioSource, audioClip.GetRandomedVolume());
                     }
 
                     // Get aim position by character's forward
