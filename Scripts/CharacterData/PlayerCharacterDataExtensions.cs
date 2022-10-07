@@ -16,7 +16,18 @@ namespace MultiplayerARPG
             ClassType = typeof(PlayerCharacterDataExtensions);
         }
 
-        public static T CloneTo<T>(this IPlayerCharacterData from, T to) where T : IPlayerCharacterData
+        public static T CloneTo<T>(this IPlayerCharacterData from, T to,
+            bool withEquipWeapons = true,
+            bool withAttributes = true,
+            bool withSkills = true,
+            bool withSkillUsages = true,
+            bool withBuffs = true,
+            bool withEquipItems = true,
+            bool withNonEquipItems = true,
+            bool withSummons = true,
+            bool withHotkeys = true,
+            bool withQuests = true,
+            bool withCurrencies = true) where T : IPlayerCharacterData
         {
             to.Id = from.Id;
             to.DataId = from.DataId;
@@ -53,17 +64,28 @@ namespace MultiplayerARPG
             to.LastDeadTime = from.LastDeadTime;
             to.UnmuteTime = from.UnmuteTime;
             to.LastUpdate = from.LastUpdate;
-            to.SelectableWeaponSets = from.SelectableWeaponSets.Clone();
-            to.Attributes = from.Attributes.Clone();
-            to.Buffs = from.Buffs.Clone();
-            to.Hotkeys = from.Hotkeys.Clone();
-            to.Quests = from.Quests.Clone();
-            to.Currencies = from.Currencies.Clone();
-            to.EquipItems = from.EquipItems.Clone();
-            to.NonEquipItems = from.NonEquipItems.Clone();
-            to.Skills = from.Skills.Clone();
-            to.SkillUsages = from.SkillUsages.Clone();
-            to.Summons = from.Summons.Clone();
+            if (withEquipWeapons)
+                to.SelectableWeaponSets = from.SelectableWeaponSets.Clone();
+            if (withAttributes)
+                to.Attributes = from.Attributes.Clone();
+            if (withSkills)
+                to.Skills = from.Skills.Clone();
+            if (withSkillUsages)
+                to.SkillUsages = from.SkillUsages.Clone();
+            if (withBuffs)
+                to.Buffs = from.Buffs.Clone();
+            if (withEquipItems)
+                to.EquipItems = from.EquipItems.Clone();
+            if (withNonEquipItems)
+                to.NonEquipItems = from.NonEquipItems.Clone();
+            if (withSummons)
+                to.Summons = from.Summons.Clone();
+            if (withHotkeys)
+                to.Hotkeys = from.Hotkeys.Clone();
+            if (withQuests)
+                to.Quests = from.Quests.Clone();
+            if (withCurrencies)
+                to.Currencies = from.Currencies.Clone();
             DevExtUtils.InvokeStaticDevExtMethods(ClassType, "CloneTo", from, to);
             return to;
         }
