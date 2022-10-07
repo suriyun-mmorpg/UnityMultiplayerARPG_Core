@@ -41,6 +41,7 @@ namespace MultiplayerARPG
         protected IServerGachaMessageHandlers ServerGachaMessageHandlers { get; set; }
         protected IServerFriendMessageHandlers ServerFriendMessageHandlers { get; set; }
         protected IServerBankMessageHandlers ServerBankMessageHandlers { get; set; }
+        protected IServerOnlineCharacterMessageHandlers ServerOnlineCharacterMessageHandlers { get; set; }
         // Client handlers
         protected IClientCashShopHandlers ClientCashShopHandlers { get; set; }
         protected IClientMailHandlers ClientMailHandlers { get; set; }
@@ -295,6 +296,11 @@ namespace MultiplayerARPG
                 RegisterRequestToServer<RequestWithdrawUserGoldMessage, ResponseWithdrawUserGoldMessage>(GameNetworkingConsts.WithdrawUserGold, ServerBankMessageHandlers.HandleRequestWithdrawUserGold);
                 RegisterRequestToServer<RequestDepositGuildGoldMessage, ResponseDepositGuildGoldMessage>(GameNetworkingConsts.DepositGuildGold, ServerBankMessageHandlers.HandleRequestDepositGuildGold);
                 RegisterRequestToServer<RequestWithdrawGuildGoldMessage, ResponseWithdrawGuildGoldMessage>(GameNetworkingConsts.WithdrawGuildGold, ServerBankMessageHandlers.HandleRequestWithdrawGuildGold);
+            }
+            // Online Character
+            if (ServerOnlineCharacterMessageHandlers != null)
+            {
+                RegisterRequestToServer<RequestGetOnlineCharacterDataMessage, ResponseGetOnlineCharacterDataMessage>(GameNetworkingConsts.GetOnlineCharacterData, ServerOnlineCharacterMessageHandlers.HandleRequestGetOnlineCharacterData);
             }
             // Keeping `RegisterClientMessages` and `RegisterServerMessages` for backward compatibility, can use any of below dev extension methods
             this.InvokeInstanceDevExtMethods("RegisterClientMessages");

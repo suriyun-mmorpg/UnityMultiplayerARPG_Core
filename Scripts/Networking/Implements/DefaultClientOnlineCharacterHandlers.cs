@@ -78,5 +78,10 @@ namespace MultiplayerARPG
             OnlineRequestTimes.Clear();
             OnlineCharacterIds.Clear();
         }
+
+        public bool RequestGetOnlineCharacterData(RequestGetOnlineCharacterDataMessage data, ResponseDelegate<ResponseGetOnlineCharacterDataMessage> callback)
+        {
+            return Manager.ClientSendRequest(GameNetworkingConsts.GetOnlineCharacterData, data, responseDelegate: callback);
+        }
     }
 }
