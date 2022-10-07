@@ -1,5 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 namespace MultiplayerARPG
@@ -60,10 +58,10 @@ namespace MultiplayerARPG
         {
             if (prefab == null)
                 return;
-            if (string.IsNullOrEmpty(chatMessage.sender) || string.IsNullOrEmpty(chatMessage.message))
+            if (string.IsNullOrEmpty(chatMessage.senderName) || string.IsNullOrEmpty(chatMessage.message))
                 return;
             IPlayerCharacterData senderCharacter;
-            if (!GameInstance.ClientCharacterHandlers.TryGetSubscribedPlayerCharacterByName(chatMessage.sender, out senderCharacter) && !(senderCharacter is BasePlayerCharacterEntity))
+            if (!GameInstance.ClientCharacterHandlers.TryGetSubscribedPlayerCharacterByName(chatMessage.senderName, out senderCharacter) && !(senderCharacter is BasePlayerCharacterEntity))
                 return;
             (senderCharacter as BasePlayerCharacterEntity).InstantiateChatBubble(prefab, chatMessage, visibleDuration);
         }

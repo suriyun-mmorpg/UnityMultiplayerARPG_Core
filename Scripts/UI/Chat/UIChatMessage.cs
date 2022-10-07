@@ -86,7 +86,7 @@ namespace MultiplayerARPG
                 }
             }
             if (uiTextSenderOnly != null)
-                uiTextSenderOnly.text = Data.sender;
+                uiTextSenderOnly.text = Data.senderName;
             if (uiTextMessageOnly != null)
                 uiTextMessageOnly.text = Data.message;
             InvokeRepeating(nameof(UpdateTimestamp), 0f, 5f);
