@@ -589,9 +589,9 @@ namespace MultiplayerARPG
                 // Control camera by touch-screen
                 Cursor.lockState = CursorLockMode.None;
                 Cursor.visible = true;
-                CacheGameplayCameraController.UpdateRotationX = false;
-                CacheGameplayCameraController.UpdateRotationY = false;
-                CacheGameplayCameraController.UpdateRotation = InputManager.GetButton("CameraRotate");
+                CacheGameplayCameraController.UpdateRotationX = InputManager.GetButton("CameraRotate");
+                CacheGameplayCameraController.UpdateRotationY = InputManager.GetButton("CameraRotate") && PlayingCharacterEntity.CanTurn();
+                CacheGameplayCameraController.UpdateRotation = false;
                 CacheGameplayCameraController.UpdateZoom = !isBlockController;
             }
             else
@@ -599,7 +599,9 @@ namespace MultiplayerARPG
                 // Control camera by mouse-move
                 Cursor.lockState = !isBlockController ? CursorLockMode.Locked : CursorLockMode.None;
                 Cursor.visible = isBlockController;
-                CacheGameplayCameraController.UpdateRotation = !isBlockController;
+                CacheGameplayCameraController.UpdateRotationX = !isBlockController;
+                CacheGameplayCameraController.UpdateRotationY = !isBlockController && PlayingCharacterEntity.CanTurn();
+                CacheGameplayCameraController.UpdateRotation = false;
                 CacheGameplayCameraController.UpdateZoom = !isBlockController;
             }
             isBlockController |= GenericUtils.IsFocusInputField();
