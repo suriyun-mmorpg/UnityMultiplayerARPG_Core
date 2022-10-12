@@ -173,7 +173,7 @@ namespace MultiplayerARPG.GameData.Model.Playables
                 base.SetEquipWeapons(newEquipWeapons);
                 return;
             }
-            StartedActionCoroutine(StartCoroutine(PlayEquipWeaponsAnimationRoutine(newEquipWeapons, rightIsDiffer, leftIsDiffer)));
+            StartActionCoroutine(PlayEquipWeaponsAnimationRoutine(newEquipWeapons, rightIsDiffer, leftIsDiffer));
         }
 
         private IEnumerator PlayEquipWeaponsAnimationRoutine(EquipWeapons newEquipWeapons, bool rightIsDiffer, bool leftIsDiffer)
@@ -372,7 +372,7 @@ namespace MultiplayerARPG.GameData.Model.Playables
 
         public override void PlaySkillCastClip(int dataId, float duration)
         {
-            StartedActionCoroutine(StartCoroutine(PlaySkillCastClipRoutine(GetSkillCastState(dataId), duration)));
+            StartActionCoroutine(PlaySkillCastClipRoutine(GetSkillCastState(dataId), duration));
         }
 
         private IEnumerator PlaySkillCastClipRoutine(ActionState castState, float duration)
@@ -399,7 +399,7 @@ namespace MultiplayerARPG.GameData.Model.Playables
         #region Action animations
         public override void PlayActionAnimation(AnimActionType animActionType, int dataId, int index, float playSpeedMultiplier = 1)
         {
-            StartedActionCoroutine(StartCoroutine(PlayActionAnimationRoutine(GetActionAnimation(animActionType, dataId, index), playSpeedMultiplier)));
+            StartActionCoroutine(PlayActionAnimationRoutine(GetActionAnimation(animActionType, dataId, index), playSpeedMultiplier));
         }
 
         private IEnumerator PlayActionAnimationRoutine(ActionAnimation actionAnimation, float playSpeedMultiplier)
@@ -508,10 +508,10 @@ namespace MultiplayerARPG.GameData.Model.Playables
         }
         #endregion
 
-        protected Coroutine StartedActionCoroutine(Coroutine coroutine)
+        protected Coroutine StartActionCoroutine(IEnumerator routine)
         {
             StopActionCoroutine();
-            actionCoroutine = coroutine;
+            actionCoroutine = StartCoroutine(routine);
             isDoingAction = true;
             return actionCoroutine;
         }
