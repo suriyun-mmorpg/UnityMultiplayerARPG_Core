@@ -315,11 +315,4 @@ namespace MultiplayerARPG
 
         public virtual void AddingNewEffect(GameEffect newEffect) { }
     }
-
-    [System.Serializable]
-    public struct EffectContainer
-    {
-        public string effectSocket;
-        public Transform transform;
-    }
 }
