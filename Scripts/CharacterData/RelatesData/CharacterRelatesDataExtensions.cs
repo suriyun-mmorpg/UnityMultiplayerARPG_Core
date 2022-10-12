@@ -57,6 +57,32 @@
             return data == null || data.Equals(CharacterSummon.Empty);
         }
 
+        public static bool IsDiffer(this CharacterItem data, CharacterItem anotherData)
+        {
+            if (data == null && anotherData == null)
+                return false;
+            if ((data != null && anotherData == null) || (data == null && anotherData != null))
+                return true;
+            return data.id != anotherData.id;
+        }
+
+        public static bool IsDiffer(this EquipWeapons data, EquipWeapons anotherData, out bool rightIsDiffer, out bool leftIsDiffer)
+        {
+            rightIsDiffer = false;
+            leftIsDiffer = false;
+            if (data == null && anotherData == null)
+                return false;
+            if ((data != null && anotherData == null) || (data == null && anotherData != null))
+            {
+                rightIsDiffer = true;
+                leftIsDiffer = true;
+                return true;
+            }
+            rightIsDiffer = data.rightHand.IsDiffer(anotherData.rightHand);
+            leftIsDiffer = data.leftHand.IsDiffer(anotherData.leftHand);
+            return rightIsDiffer || leftIsDiffer;
+        }
+
         public static IWeaponItem GetRightHandWeaponItem(this EquipWeapons equipWeapons)
         {
             if (equipWeapons.IsEmptyRightHandSlot())

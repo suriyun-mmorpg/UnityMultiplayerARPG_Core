@@ -154,12 +154,11 @@ namespace MultiplayerARPG.GameData.Model.Playables
             return tempActionAnimation;
         }
 
-        public override void SetEquipWeapons(EquipWeapons equipWeapons)
+        public override void SetEquipWeapons(EquipWeapons newEquipWeapons)
         {
-            base.SetEquipWeapons(equipWeapons);
             // Get one equipped weapon from right-hand or left-hand
-            IWeaponItem rightWeaponItem = equipWeapons.GetRightHandWeaponItem();
-            IWeaponItem leftWeaponItem = equipWeapons.GetLeftHandWeaponItem();
+            IWeaponItem rightWeaponItem = newEquipWeapons.GetRightHandWeaponItem();
+            IWeaponItem leftWeaponItem = newEquipWeapons.GetLeftHandWeaponItem();
             if (rightWeaponItem == null)
                 rightWeaponItem = leftWeaponItem;
             // Set equipped weapon type, it will be used to get animations by id
@@ -167,8 +166,83 @@ namespace MultiplayerARPG.GameData.Model.Playables
             if (rightWeaponItem != null)
                 equippedWeaponType = rightWeaponItem.WeaponType;
             if (Behaviour != null)
-                Behaviour.SetPlayingWeaponTypeId(rightWeaponItem, leftWeaponItem, equipWeapons.GetLeftHandShieldItem());
+                Behaviour.SetEquipWeapons(rightWeaponItem, leftWeaponItem, newEquipWeapons.GetLeftHandShieldItem());
+            // Player draw/holster animation
+            if (!newEquipWeapons.IsDiffer(equipWeapons, out bool rightIsDiffer, out bool leftIsDiffer))
+            {
+                base.SetEquipWeapons(newEquipWeapons);
+                return;
+            }
+            StartedActionCoroutine(StartCoroutine(PlayEquipWeaponsAnimationRoutine(newEquipWeapons, rightIsDiffer, leftIsDiffer)));
         }
+
+        private IEnumerator PlayEquipWeaponsAnimationRoutine(EquipWeapons newEquipWeapons, bool rightIsDiffer, bool leftIsDiffer)
+        {
+            isDoingAction = true;
+
+            // Prepare states
+            ActionState holsterState = new ActionState();
+            if (rightIsDiffer && !equipWeapons.rightHand.IsEmptySlot())
+            {
+                if (TryGetWeaponAnimations(equipWeapons.rightHand.dataId, out WeaponAnimations anims))
+                    holsterState = anims.rightHandHolsterState;
+                else
+                    holsterState = defaultAnimations.rightHandHolsterState;
+            }
+            else if (leftIsDiffer && !equipWeapons.leftHand.IsEmptySlot())
+            {
+                if (TryGetWeaponAnimations(equipWeapons.leftHand.dataId, out WeaponAnimations anims))
+                    holsterState = anims.leftHandHolsterState;
+                else
+                    holsterState = defaultAnimations.leftHandHolsterState;
+            }
+
+            ActionState drawState = new ActionState();
+            if (rightIsDiffer && !newEquipWeapons.rightHand.IsEmptySlot())
+            {
+                if (TryGetWeaponAnimations(newEquipWeapons.rightHand.dataId, out WeaponAnimations anims))
+                    drawState = anims.rightHandDrawState;
+                else
+                    drawState = defaultAnimations.rightHandDrawState;
+            }
+            else if (leftIsDiffer && !newEquipWeapons.leftHand.IsEmptySlot())
+            {
+                if (TryGetWeaponAnimations(newEquipWeapons.leftHand.dataId, out WeaponAnimations anims))
+                    drawState = anims.leftHandDrawState;
+                else
+                    drawState = defaultAnimations.leftHandDrawState;
+            }
+
+            // Play holster state
+            bool hasClip;
+            hasClip = holsterState.clip != null;
+            if (hasClip)
+            {
+                Behaviour.PlayAction(holsterState, 1f);
+                // Wait by animation playing duration
+                yield return new WaitForSecondsRealtime(holsterState.clip.length);
+                // Stop doing action animation
+                Behaviour.StopAction();
+            }
+
+            // Switch weapon items
+            base.SetEquipWeapons(newEquipWeapons);
+
+            // Play draw state
+            hasClip = drawState.clip != null;
+            if (hasClip)
+            {
+                Behaviour.PlayAction(drawState, 1f);
+                // Wait by animation playing duration
+                yield return new WaitForSecondsRealtime(drawState.clip.length);
+                // Stop doing action animation
+                Behaviour.StopAction();
+            }
+
+            isDoingAction = false;
+        }
+
+
 
         #region Right-hand animations
         public ActionAnimation[] GetRightHandAttackAnimations(int dataId)
@@ -298,13 +372,12 @@ namespace MultiplayerARPG.GameData.Model.Playables
 
         public override void PlaySkillCastClip(int dataId, float duration)
         {
-            StartedActionCoroutine(StartCoroutine(PlaySkillCastClipRoutine(dataId, duration)));
+            StartedActionCoroutine(StartCoroutine(PlaySkillCastClipRoutine(GetSkillCastState(dataId), duration)));
         }
 
-        private IEnumerator PlaySkillCastClipRoutine(int dataId, float duration)
+        private IEnumerator PlaySkillCastClipRoutine(ActionState castState, float duration)
         {
             isDoingAction = true;
-            ActionState castState = GetSkillCastState(dataId);
             bool hasClip = castState.clip != null;
             if (hasClip)
                 Behaviour.PlayAction(castState, 1f, duration);
@@ -326,24 +399,23 @@ namespace MultiplayerARPG.GameData.Model.Playables
         #region Action animations
         public override void PlayActionAnimation(AnimActionType animActionType, int dataId, int index, float playSpeedMultiplier = 1)
         {
-            StartedActionCoroutine(StartCoroutine(PlayActionAnimationRoutine(animActionType, dataId, index, playSpeedMultiplier)));
+            StartedActionCoroutine(StartCoroutine(PlayActionAnimationRoutine(GetActionAnimation(animActionType, dataId, index), playSpeedMultiplier)));
         }
 
-        private IEnumerator PlayActionAnimationRoutine(AnimActionType animActionType, int dataId, int index, float playSpeedMultiplier)
+        private IEnumerator PlayActionAnimationRoutine(ActionAnimation actionAnimation, float playSpeedMultiplier)
         {
             isDoingAction = true;
-            ActionAnimation tempActionAnimation = GetActionAnimation(animActionType, dataId, index);
-            AudioManager.PlaySfxClipAtAudioSource(tempActionAnimation.GetRandomAudioClip(), GenericAudioSource);
-            bool hasClip = tempActionAnimation.state.clip != null;
+            AudioManager.PlaySfxClipAtAudioSource(actionAnimation.GetRandomAudioClip(), GenericAudioSource);
+            bool hasClip = actionAnimation.state.clip != null;
             if (hasClip)
-                Behaviour.PlayAction(tempActionAnimation.state, playSpeedMultiplier);
-            // Waits by current transition + clip duration before end animation
-            yield return new WaitForSecondsRealtime(tempActionAnimation.GetClipLength() / playSpeedMultiplier);
+                Behaviour.PlayAction(actionAnimation.state, playSpeedMultiplier);
+            // Wait by animation playing duration
+            yield return new WaitForSecondsRealtime(actionAnimation.GetClipLength() / playSpeedMultiplier);
             // Stop doing action animation
             if (hasClip)
                 Behaviour.StopAction();
             // Waits by current transition + extra duration before end playing animation state
-            yield return new WaitForSecondsRealtime(tempActionAnimation.GetExtendDuration() / playSpeedMultiplier);
+            yield return new WaitForSecondsRealtime(actionAnimation.GetExtendDuration() / playSpeedMultiplier);
             isDoingAction = false;
         }
 
@@ -439,8 +511,6 @@ namespace MultiplayerARPG.GameData.Model.Playables
         protected Coroutine StartedActionCoroutine(Coroutine coroutine)
         {
             StopActionCoroutine();
-            if (actionCoroutine != null)
-                StopCoroutine(actionCoroutine);
             actionCoroutine = coroutine;
             isDoingAction = true;
             return actionCoroutine;

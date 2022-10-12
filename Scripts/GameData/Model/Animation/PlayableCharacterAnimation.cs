@@ -178,6 +178,12 @@ namespace MultiplayerARPG.GameData.Model.Playables
         public ActionAnimation rightHandReloadAnimation;
         public ActionAnimation leftHandReloadAnimation;
 
+        [Header("Draw/Holster Animations")]
+        public ActionState rightHandDrawState;
+        public ActionState leftHandDrawState;
+        public ActionState rightHandHolsterState;
+        public ActionState leftHandHolsterState;
+
         public WeaponType Data { get { return weaponType; } }
     }
 
@@ -290,5 +296,11 @@ namespace MultiplayerARPG.GameData.Model.Playables
         [Header("Skill animations")]
         public ActionState skillCastState;
         public ActionAnimation skillActivateAnimation;
+
+        [Header("Draw/Holster Animations")]
+        public ActionState rightHandDrawState;
+        public ActionState leftHandDrawState;
+        public ActionState rightHandHolsterState;
+        public ActionState leftHandHolsterState;
     }
 }

@@ -855,7 +855,7 @@ namespace MultiplayerARPG.GameData.Model.Playables
             #endregion
         }
 
-        public void SetPlayingWeaponTypeId(IWeaponItem rightHand, IWeaponItem leftHand, IShieldItem leftHandShield)
+        public void SetEquipWeapons(IWeaponItem rightHand, IWeaponItem leftHand, IShieldItem leftHandShield)
         {
             baseStateUpdateData.WeaponTypeId = string.Empty;
             if (rightHand != null && weaponTypeIds.Contains(rightHand.WeaponType.Id))
