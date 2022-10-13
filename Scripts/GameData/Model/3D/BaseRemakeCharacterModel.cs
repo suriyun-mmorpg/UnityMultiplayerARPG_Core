@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using System.Collections;
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
@@ -110,10 +111,10 @@ namespace MultiplayerARPG
             return CacheAnimationsManager.SetAndTryGetCacheSkillAnimations(Id, weaponAnimations, skillAnimations, dataId, out anims);
         }
 
-        protected Coroutine StartedActionCoroutine(Coroutine coroutine)
+        protected Coroutine StartActionCoroutine(IEnumerator routine)
         {
             StopActionCoroutine();
-            actionCoroutine = coroutine;
+            actionCoroutine = StartCoroutine(routine);
             return actionCoroutine;
         }
 

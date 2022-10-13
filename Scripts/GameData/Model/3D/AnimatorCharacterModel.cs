@@ -730,7 +730,7 @@ namespace MultiplayerARPG
             StopActionAnimation();
             StopSkillCastAnimation();
             StopWeaponChargeAnimation();
-            StartedActionCoroutine(StartCoroutine(PlayActionAnimation_Animator(animActionType, dataId, index, playSpeedMultiplier)));
+            StartActionCoroutine(PlayActionAnimation_Animator(animActionType, dataId, index, playSpeedMultiplier));
         }
 
         private IEnumerator PlayActionAnimation_Animator(AnimActionType animActionType, int dataId, int index, float playSpeedMultiplier)
@@ -775,7 +775,7 @@ namespace MultiplayerARPG
             StopActionAnimation();
             StopSkillCastAnimation();
             StopWeaponChargeAnimation();
-            StartedActionCoroutine(StartCoroutine(PlaySkillCastClip_Animator(dataId, duration)));
+            StartActionCoroutine(PlaySkillCastClip_Animator(dataId, duration));
         }
 
         private IEnumerator PlaySkillCastClip_Animator(int dataId, float duration)
