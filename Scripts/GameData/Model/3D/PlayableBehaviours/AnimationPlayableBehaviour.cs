@@ -875,10 +875,10 @@ namespace MultiplayerARPG.GameData.Model.Playables
             leftHandWieldingStateUpdateData.PlayingJumpState = PlayingJumpState.Starting;
         }
 
-        public void PlayAction(ActionState actionState, float speedRate, float duration = 0f, bool loop = false)
+        public float PlayAction(ActionState actionState, float speedRate, float duration = 0f, bool loop = false)
         {
             if (IsFreeze || CharacterModel.isDead)
-                return;
+                return 0f;
 
             // Destroy playing state
             if (ActionLayerMixer.IsValid())
@@ -922,6 +922,8 @@ namespace MultiplayerARPG.GameData.Model.Playables
                 playingActionState = PlayingActionState.Looping;
             else
                 playingActionState = PlayingActionState.Playing;
+
+            return actionClipLength;
         }
 
         public void StopAction()
