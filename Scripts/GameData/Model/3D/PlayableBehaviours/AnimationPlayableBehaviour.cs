@@ -875,6 +875,14 @@ namespace MultiplayerARPG.GameData.Model.Playables
             leftHandWieldingStateUpdateData.PlayingJumpState = PlayingJumpState.Starting;
         }
 
+        /// <summary>
+        /// Order it to play action animation by action state, return calculated animation length
+        /// </summary>
+        /// <param name="actionState"></param>
+        /// <param name="speedRate"></param>
+        /// <param name="duration"></param>
+        /// <param name="loop"></param>
+        /// <returns></returns>
         public float PlayAction(ActionState actionState, float speedRate, float duration = 0f, bool loop = false)
         {
             if (IsFreeze || CharacterModel.isDead)
