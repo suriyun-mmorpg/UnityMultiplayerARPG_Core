@@ -182,35 +182,41 @@ namespace MultiplayerARPG.GameData.Model.Playables
 
             // Prepare states
             ActionState holsterState = new ActionState();
-            if (rightIsDiffer && !equipWeapons.rightHand.IsEmptySlot())
+            if (equipWeapons != null)
             {
-                if (TryGetWeaponAnimations(equipWeapons.rightHand.dataId, out WeaponAnimations anims))
-                    holsterState = anims.rightHandHolsterState;
-                else
-                    holsterState = defaultAnimations.rightHandHolsterState;
-            }
-            else if (leftIsDiffer && !equipWeapons.leftHand.IsEmptySlot())
-            {
-                if (TryGetWeaponAnimations(equipWeapons.leftHand.dataId, out WeaponAnimations anims))
-                    holsterState = anims.leftHandHolsterState;
-                else
-                    holsterState = defaultAnimations.leftHandHolsterState;
+                if (rightIsDiffer && !equipWeapons.rightHand.IsEmptySlot())
+                {
+                    if (TryGetWeaponAnimations(equipWeapons.rightHand.dataId, out WeaponAnimations anims))
+                        holsterState = anims.rightHandHolsterState;
+                    else
+                        holsterState = defaultAnimations.rightHandHolsterState;
+                }
+                else if (leftIsDiffer && !equipWeapons.leftHand.IsEmptySlot())
+                {
+                    if (TryGetWeaponAnimations(equipWeapons.leftHand.dataId, out WeaponAnimations anims))
+                        holsterState = anims.leftHandHolsterState;
+                    else
+                        holsterState = defaultAnimations.leftHandHolsterState;
+                }
             }
 
             ActionState drawState = new ActionState();
-            if (rightIsDiffer && !newEquipWeapons.rightHand.IsEmptySlot())
+            if (newEquipWeapons != null)
             {
-                if (TryGetWeaponAnimations(newEquipWeapons.rightHand.dataId, out WeaponAnimations anims))
-                    drawState = anims.rightHandDrawState;
-                else
-                    drawState = defaultAnimations.rightHandDrawState;
-            }
-            else if (leftIsDiffer && !newEquipWeapons.leftHand.IsEmptySlot())
-            {
-                if (TryGetWeaponAnimations(newEquipWeapons.leftHand.dataId, out WeaponAnimations anims))
-                    drawState = anims.leftHandDrawState;
-                else
-                    drawState = defaultAnimations.leftHandDrawState;
+                if (rightIsDiffer && !newEquipWeapons.rightHand.IsEmptySlot())
+                {
+                    if (TryGetWeaponAnimations(newEquipWeapons.rightHand.dataId, out WeaponAnimations anims))
+                        drawState = anims.rightHandDrawState;
+                    else
+                        drawState = defaultAnimations.rightHandDrawState;
+                }
+                else if (leftIsDiffer && !newEquipWeapons.leftHand.IsEmptySlot())
+                {
+                    if (TryGetWeaponAnimations(newEquipWeapons.leftHand.dataId, out WeaponAnimations anims))
+                        drawState = anims.leftHandDrawState;
+                    else
+                        drawState = defaultAnimations.leftHandDrawState;
+                }
             }
 
             // Play holster state
@@ -218,11 +224,8 @@ namespace MultiplayerARPG.GameData.Model.Playables
             hasClip = holsterState.clip != null;
             if (hasClip)
             {
-                Behaviour.PlayAction(holsterState, 1f);
                 // Wait by animation playing duration
-                yield return new WaitForSecondsRealtime(holsterState.clip.length);
-                // Stop doing action animation
-                Behaviour.StopAction();
+                yield return new WaitForSecondsRealtime(Behaviour.PlayAction(holsterState, 1f));
             }
 
             // Switch weapon items
@@ -232,11 +235,8 @@ namespace MultiplayerARPG.GameData.Model.Playables
             hasClip = drawState.clip != null;
             if (hasClip)
             {
-                Behaviour.PlayAction(drawState, 1f);
                 // Wait by animation playing duration
-                yield return new WaitForSecondsRealtime(drawState.clip.length);
-                // Stop doing action animation
-                Behaviour.StopAction();
+                yield return new WaitForSecondsRealtime(Behaviour.PlayAction(drawState, 1f));
             }
 
             isDoingAction = false;
@@ -378,14 +378,8 @@ namespace MultiplayerARPG.GameData.Model.Playables
         private IEnumerator PlaySkillCastClipRoutine(ActionState castState, float duration)
         {
             isDoingAction = true;
-            bool hasClip = castState.clip != null;
-            if (hasClip)
-                Behaviour.PlayAction(castState, 1f, duration);
             // Waits by skill cast duration
-            yield return new WaitForSecondsRealtime(duration);
-            // Stop casting skill animation
-            if (hasClip)
-                Behaviour.StopAction();
+            yield return new WaitForSecondsRealtime(Behaviour.PlayAction(castState, 1f, duration));
             isDoingAction = false;
         }
 
@@ -406,14 +400,8 @@ namespace MultiplayerARPG.GameData.Model.Playables
         {
             isDoingAction = true;
             AudioManager.PlaySfxClipAtAudioSource(actionAnimation.GetRandomAudioClip(), GenericAudioSource);
-            bool hasClip = actionAnimation.state.clip != null;
-            if (hasClip)
-                Behaviour.PlayAction(actionAnimation.state, playSpeedMultiplier);
             // Wait by animation playing duration
-            yield return new WaitForSecondsRealtime(actionAnimation.GetClipLength() / playSpeedMultiplier);
-            // Stop doing action animation
-            if (hasClip)
-                Behaviour.StopAction();
+            yield return new WaitForSecondsRealtime(Behaviour.PlayAction(actionAnimation.state, playSpeedMultiplier));
             // Waits by current transition + extra duration before end playing animation state
             yield return new WaitForSecondsRealtime(actionAnimation.GetExtendDuration() / playSpeedMultiplier);
             isDoingAction = false;
