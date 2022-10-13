@@ -6,35 +6,61 @@ using UnityEditor.SceneManagement;
 using UnityEngine.AI;
 using StandardAssets.Characters.Physics;
 using LiteNetLibManager;
-using MultiplayerARPG.GameData.Model.Playables;
+using System.Reflection;
 
 namespace MultiplayerARPG
 {
     public class VehicleEntityCreatorEditor : EditorWindow
     {
-        public enum CharacterModelType
-        {
-            PlayableCharacterModel,
-            AnimatorCharacterModel,
-            AnimationCharacterModel,
-        }
-
-        public enum EntityMovementType
-        {
-            CharacterController,
-            NavMesh,
-            Rigidbody,
-        }
-
         private string fileName;
-        private CharacterModelType characterModelType;
-        private EntityMovementType entityMovementType;
         private GameDatabase gameDatabase;
         private GameObject fbx;
+
+        private static readonly List<ICharacterModelFactory> modelFactories = new List<ICharacterModelFactory>();
+        private static readonly List<string> modelNames = new List<string>();
+        private static int selectedModelIndex = 0;
+
+        private static readonly List<IEntityMovementFactory> movementFactories = new List<IEntityMovementFactory>();
+        private static readonly List<string> movementNames = new List<string>();
+        private static int selectedMovementIndex = 0;
 
         [MenuItem(EditorMenuConsts.VEHICLE_ENTITY_CREATOR_MENU, false, EditorMenuConsts.VEHICLE_ENTITY_CREATOR_ORDER)]
         public static void CreateNewVehicleEntity()
         {
+            // Init classes
+            selectedModelIndex = 0;
+            modelFactories.Clear();
+            modelNames.Clear();
+            movementFactories.Clear();
+            movementNames.Clear();
+            System.Type modelFactoryType = typeof(ICharacterModelFactory);
+            System.Type movementFactoryType = typeof(IEntityMovementFactory);
+            Assembly[] assemblies = System.AppDomain.CurrentDomain.GetAssemblies();
+            foreach (Assembly assembly in assemblies)
+            {
+                foreach (System.Type type in assembly.GetTypes())
+                {
+                    if (type != modelFactoryType && modelFactoryType.IsAssignableFrom(type))
+                    {
+                        ICharacterModelFactory modelFactory = System.Activator.CreateInstance(type) as ICharacterModelFactory;
+                        if (modelFactory.DimensionType == DimensionType.Dimension3D)
+                        {
+                            modelFactories.Add(modelFactory);
+                            modelNames.Add(modelFactory.Name);
+                        }
+                    }
+                    if (type != movementFactoryType && movementFactoryType.IsAssignableFrom(type))
+                    {
+                        IEntityMovementFactory movementFactory = System.Activator.CreateInstance(type) as IEntityMovementFactory;
+                        if (movementFactory.DimensionType == DimensionType.Dimension3D)
+                        {
+                            movementFactories.Add(movementFactory);
+                            movementNames.Add(movementFactory.Name);
+                        }
+                    }
+                }
+            }
+
             bool gettingWindow;
             if (EditorGlobalData.EditorScene.HasValue)
             {
@@ -64,8 +90,8 @@ namespace MultiplayerARPG
                 GUILayout.BeginVertical("box");
                 {
                     fileName = EditorGUILayout.TextField("Filename", fileName);
-                    characterModelType = (CharacterModelType)EditorGUILayout.EnumPopup("Character model type", characterModelType);
-                    entityMovementType = (EntityMovementType)EditorGUILayout.EnumPopup("Entity movement type", entityMovementType);
+                    selectedModelIndex = EditorGUILayout.Popup("Character model type", selectedModelIndex, modelNames.ToArray());
+                    selectedMovementIndex = EditorGUILayout.Popup("Entity movement type", selectedMovementIndex, movementNames.ToArray());
                     if (gameDatabase == null)
                         EditorGUILayout.HelpBox("Select your game database which you want to add new vehicle entity, leave it `None` if you don't want to add vehicle entity to game database", MessageType.Info);
                     gameDatabase = EditorGUILayout.ObjectField("Game database", gameDatabase, typeof(GameDatabase), false, GUILayout.ExpandWidth(true)) as GameDatabase;
@@ -94,90 +120,17 @@ namespace MultiplayerARPG
             var newObject = Instantiate(fbx, Vector3.zero, Quaternion.identity);
             newObject.AddComponent<LiteNetLibIdentity>();
 
-            Animator animator;
-            BaseCharacterModel characterModel = null;
-            switch (characterModelType)
+            ICharacterModelFactory modelFactory = modelFactories[selectedModelIndex];
+            IEntityMovementFactory movementFactory = movementFactories[selectedMovementIndex];
+            if (!modelFactory.ValidateSourceObject(newObject) ||
+                !movementFactory.ValidateSourceObject(newObject))
             {
-                case CharacterModelType.PlayableCharacterModel:
-                    characterModel = newObject.AddComponent<PlayableCharacterModel>();
-                    animator = newObject.GetComponentInChildren<Animator>();
-                    if (animator == null)
-                    {
-                        Debug.LogError("Cannot create new entity with `PlayableCharacterModel`, can't find `Animator` component");
-                        DestroyImmediate(newObject);
-                        return;
-                    }
-                    (characterModel as PlayableCharacterModel).animator = animator;
-                    break;
-                case CharacterModelType.AnimatorCharacterModel:
-                    characterModel = newObject.AddComponent<AnimatorCharacterModel>();
-                    animator = newObject.GetComponentInChildren<Animator>();
-                    if (animator == null)
-                    {
-                        Debug.LogError("Cannot create new entity with `AnimatorCharacterModel`, can't find `Animator` component");
-                        DestroyImmediate(newObject);
-                        return;
-                    }
-                    (characterModel as AnimatorCharacterModel).animator = animator;
-                    break;
-                case CharacterModelType.AnimationCharacterModel:
-                    characterModel = newObject.AddComponent<AnimationCharacterModel>();
-                    var animation = newObject.GetComponentInChildren<Animation>();
-                    if (animation == null)
-                    {
-                        Debug.LogError("Cannot create new entity with `AnimationCharacterModel`, can't find `Animation` component");
-                        DestroyImmediate(newObject);
-                        return;
-                    }
-                    (characterModel as AnimationCharacterModel).legacyAnimation = animation;
-                    break;
+                DestroyImmediate(newObject);
+                return;
             }
-            
+
             Bounds bounds = default;
-            var meshes = newObject.GetComponentsInChildren<MeshRenderer>();
-            for (int i = 0; i < meshes.Length; ++i)
-            {
-                if (i > 0)
-                    bounds.Encapsulate(meshes[i].bounds);
-                else
-                    bounds = meshes[i].bounds;
-            }
-
-            var skinnedMeshes = newObject.GetComponentsInChildren<SkinnedMeshRenderer>();
-            for (int i = 0; i < skinnedMeshes.Length; ++i)
-            {
-                if (i > 0)
-                    bounds.Encapsulate(skinnedMeshes[i].bounds);
-                else
-                    bounds = skinnedMeshes[i].bounds;
-            }
-
-            switch (entityMovementType)
-            {
-                case EntityMovementType.CharacterController:
-                    var characterController = newObject.AddComponent<CharacterController>();
-                    characterController.height = bounds.size.y;
-                    characterController.radius = Mathf.Min(bounds.extents.x, bounds.extents.z);
-                    characterController.center = Vector3.zero + (Vector3.up * characterController.height * 0.5f);
-                    newObject.AddComponent<CharacterControllerEntityMovement>();
-                    break;
-                case EntityMovementType.NavMesh:
-                    var navMeshAgent = newObject.AddComponent<NavMeshAgent>();
-                    navMeshAgent.height = bounds.size.y;
-                    navMeshAgent.radius = Mathf.Min(bounds.extents.x, bounds.extents.z);
-                    newObject.AddComponent<NavMeshEntityMovement>();
-                    break;
-                case EntityMovementType.Rigidbody:
-                    newObject.AddComponent<Rigidbody>();
-                    var capsuleCollider = newObject.AddComponent<CapsuleCollider>();
-                    capsuleCollider.height = bounds.size.y;
-                    capsuleCollider.radius = Mathf.Min(bounds.extents.x, bounds.extents.z);
-                    capsuleCollider.center = Vector3.zero + (Vector3.up * capsuleCollider.height * 0.5f);
-                    var openCharacterController = newObject.AddComponent<OpenCharacterController>();
-                    openCharacterController.SetRadiusHeightAndCenter(capsuleCollider.radius, capsuleCollider.height, capsuleCollider.center, false, false);
-                    newObject.AddComponent<RigidBodyEntityMovement>();
-                    break;
-            }
+            movementFactory.Setup(newObject, ref bounds);
 
             VehicleEntity baseVehicleEntity = newObject.AddComponent<VehicleEntity>();
             if (baseVehicleEntity != null)

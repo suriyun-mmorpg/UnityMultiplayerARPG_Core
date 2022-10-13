@@ -4,30 +4,48 @@ using UnityEngine;
 using UnityEditor;
 using UnityEditor.SceneManagement;
 using LiteNetLibManager;
-using MultiplayerARPG.GameData.Model.Playables;
+using System.Reflection;
 
 namespace MultiplayerARPG
 {
     public class NpcEntityCreatorEditor : EditorWindow
     {
-        public enum CharacterModelType
-        {
-            PlayableCharacterModel,
-            AnimatorCharacterModel,
-            AnimationCharacterModel,
-        }
-
         private string fileName;
-        private CharacterModelType characterModelType;
         private NpcDatabase npcDatabase;
         private BaseMapInfo mapInfo;
         private Vector3 entityPosition;
         private Vector3 entityRotation;
         private GameObject fbx;
 
+        private static readonly List<ICharacterModelFactory> modelFactories = new List<ICharacterModelFactory>();
+        private static readonly List<string> modelNames = new List<string>();
+        private static int selectedModelIndex = 0;
+
         [MenuItem(EditorMenuConsts.NPC_ENTITY_CREATOR_MENU, false, EditorMenuConsts.NPC_ENTITY_CREATOR_ORDER)]
         public static void CreateNewNpcEntity()
         {
+            // Init classes
+            selectedModelIndex = 0;
+            modelFactories.Clear();
+            modelNames.Clear();
+            System.Type modelFactoryType = typeof(ICharacterModelFactory);
+            Assembly[] assemblies = System.AppDomain.CurrentDomain.GetAssemblies();
+            foreach (Assembly assembly in assemblies)
+            {
+                foreach (System.Type type in assembly.GetTypes())
+                {
+                    if (type != modelFactoryType && modelFactoryType.IsAssignableFrom(type))
+                    {
+                        ICharacterModelFactory modelFactory = System.Activator.CreateInstance(type) as ICharacterModelFactory;
+                        if (modelFactory.DimensionType == DimensionType.Dimension3D)
+                        {
+                            modelFactories.Add(modelFactory);
+                            modelNames.Add(modelFactory.Name);
+                        }
+                    }
+                }
+            }
+
             bool gettingWindow;
             if (EditorGlobalData.EditorScene.HasValue)
             {
@@ -57,7 +75,7 @@ namespace MultiplayerARPG
                 GUILayout.BeginVertical("box");
                 {
                     fileName = EditorGUILayout.TextField("Filename", fileName);
-                    characterModelType = (CharacterModelType)EditorGUILayout.EnumPopup("Character model type", characterModelType);
+                    selectedModelIndex = EditorGUILayout.Popup("Character model type", selectedModelIndex, modelNames.ToArray());
                     if (npcDatabase == null)
                         EditorGUILayout.HelpBox("Select your NPC database which you want to add new NPC entity, leave it `None` if you don't want to add NPC entity to NPC database", MessageType.Info);
                     npcDatabase = EditorGUILayout.ObjectField("NPC database", npcDatabase, typeof(NpcDatabase), false, GUILayout.ExpandWidth(true)) as NpcDatabase;
@@ -94,62 +112,11 @@ namespace MultiplayerARPG
             var newObject = Instantiate(fbx, Vector3.zero, Quaternion.identity);
             newObject.AddComponent<LiteNetLibIdentity>();
 
-            Animator animator;
-            BaseCharacterModel characterModel = null;
-            switch (characterModelType)
+            ICharacterModelFactory modelFactory = modelFactories[selectedModelIndex];
+            if (!modelFactory.ValidateSourceObject(newObject))
             {
-                case CharacterModelType.PlayableCharacterModel:
-                    characterModel = newObject.AddComponent<PlayableCharacterModel>();
-                    animator = newObject.GetComponentInChildren<Animator>();
-                    if (animator == null)
-                    {
-                        Debug.LogError("Cannot create new entity with `PlayableCharacterModel`, can't find `Animator` component");
-                        DestroyImmediate(newObject);
-                        return;
-                    }
-                    (characterModel as PlayableCharacterModel).animator = animator;
-                    break;
-                case CharacterModelType.AnimatorCharacterModel:
-                    characterModel = newObject.AddComponent<AnimatorCharacterModel>();
-                    animator = newObject.GetComponentInChildren<Animator>();
-                    if (animator == null)
-                    {
-                        Debug.LogError("Cannot create new entity with `AnimatorCharacterModel`, can't find `Animator` component");
-                        DestroyImmediate(newObject);
-                        return;
-                    }
-                    (characterModel as AnimatorCharacterModel).animator = animator;
-                    break;
-                case CharacterModelType.AnimationCharacterModel:
-                    characterModel = newObject.AddComponent<AnimationCharacterModel>();
-                    var animation = newObject.GetComponentInChildren<Animation>();
-                    if (animation == null)
-                    {
-                        Debug.LogError("Cannot create new entity with `AnimationCharacterModel`, can't find `Animation` component");
-                        DestroyImmediate(newObject);
-                        return;
-                    }
-                    (characterModel as AnimationCharacterModel).legacyAnimation = animation;
-                    break;
-            }
-
-            Bounds bounds = default;
-            var meshes = newObject.GetComponentsInChildren<MeshRenderer>();
-            for (int i = 0; i < meshes.Length; ++i)
-            {
-                if (i > 0)
-                    bounds.Encapsulate(meshes[i].bounds);
-                else
-                    bounds = meshes[i].bounds;
-            }
-
-            var skinnedMeshes = newObject.GetComponentsInChildren<SkinnedMeshRenderer>();
-            for (int i = 0; i < skinnedMeshes.Length; ++i)
-            {
-                if (i > 0)
-                    bounds.Encapsulate(skinnedMeshes[i].bounds);
-                else
-                    bounds = skinnedMeshes[i].bounds;
+                DestroyImmediate(newObject);
+                return;
             }
 
             NpcEntity npcEntity = newObject.AddComponent<NpcEntity>();
