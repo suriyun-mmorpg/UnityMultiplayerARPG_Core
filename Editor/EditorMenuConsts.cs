@@ -17,17 +17,14 @@ namespace MultiplayerARPG
         #endregion
 
         #region Entity (3D)
-        public const string CHARACTER_MODEL_CLONER_MENU = "MMORPG KIT/Character Model Cloner (3D)";
-        public const int CHARACTER_MODEL_CLONER_ORDER = 200;
-
         public const string CHARACTER_ENTITY_CREATOR_MENU = "MMORPG KIT/Character Entity Creator (3D)";
-        public const int CHARACTER_ENTITY_CREATOR_ORDER = 201;
+        public const int CHARACTER_ENTITY_CREATOR_ORDER = 200;
 
         public const string NPC_ENTITY_CREATOR_MENU = "MMORPG KIT/Npc Entity Creator (3D)";
-        public const int NPC_ENTITY_CREATOR_ORDER = 202;
+        public const int NPC_ENTITY_CREATOR_ORDER = 201;
 
         public const string VEHICLE_ENTITY_CREATOR_MENU = "MMORPG KIT/Vehicle Entity Creator (3D)";
-        public const int VEHICLE_ENTITY_CREATOR_ORDER = 203;
+        public const int VEHICLE_ENTITY_CREATOR_ORDER = 202;
         #endregion
 
         #region Other
