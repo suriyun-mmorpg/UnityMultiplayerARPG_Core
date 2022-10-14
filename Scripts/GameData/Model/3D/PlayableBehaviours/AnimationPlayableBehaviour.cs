@@ -667,7 +667,7 @@ namespace MultiplayerARPG.GameData.Model.Playables
                 LayerMixer.SetLayerMaskFromAvatarMask(layer, avatarMask);
 
                 // Set clip info 
-                stateUpdateData.clipSpeed = stateInfos[playingStateId].GetSpeed(stateUpdateData.isMoving ? moveAnimationSpeedMultiplier : 1);
+                stateUpdateData.clipSpeed = stateInfos[playingStateId].GetSpeed(moveAnimationSpeedMultiplier > 0f ? moveAnimationSpeedMultiplier : 1f);
                 // Set transition duration
                 stateUpdateData.transitionDuration = stateInfos[playingStateId].GetTransitionDuration();
                 if (stateUpdateData.transitionDuration <= 0f)
