@@ -179,7 +179,6 @@ namespace MultiplayerARPG.GameData.Model.Playables
         private IEnumerator PlayEquipWeaponsAnimationRoutine(EquipWeapons newEquipWeapons, bool rightIsDiffer, bool leftIsDiffer)
         {
             isDoingAction = true;
-
             // Prepare states
             ActionState holsterState = new ActionState();
             if (equipWeapons != null)
@@ -499,8 +498,8 @@ namespace MultiplayerARPG.GameData.Model.Playables
         protected Coroutine StartActionCoroutine(IEnumerator routine)
         {
             StopActionCoroutine();
-            actionCoroutine = StartCoroutine(routine);
             isDoingAction = true;
+            actionCoroutine = StartCoroutine(routine);
             return actionCoroutine;
         }
 
