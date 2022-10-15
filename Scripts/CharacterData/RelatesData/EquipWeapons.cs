@@ -46,6 +46,15 @@ namespace MultiplayerARPG
         {
             Deserialize(reader);
         }
+
+        public EquipWeapons Clone(bool generateNewId = false)
+        {
+            return new EquipWeapons()
+            {
+                rightHand = rightHand.Clone(generateNewId),
+                leftHand = leftHand.Clone(generateNewId),
+            };
+        }
     }
 
     [System.Serializable]
