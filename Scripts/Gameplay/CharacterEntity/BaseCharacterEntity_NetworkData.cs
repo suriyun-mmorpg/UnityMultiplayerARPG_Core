@@ -409,7 +409,7 @@ namespace MultiplayerARPG
         /// <param name="equipWeaponSet"></param>
         private void OnEquipWeaponSetChange(bool isInitial, byte equipWeaponSet)
         {
-            SetEquipWeaponsModels();
+            PrepareToSetEquipWeaponsModels();
             if (onEquipWeaponSetChange != null)
                 onEquipWeaponSetChange.Invoke(equipWeaponSet);
         }
@@ -445,7 +445,7 @@ namespace MultiplayerARPG
         /// <param name="index"></param>
         private void OnSelectableWeaponSetsOperation(LiteNetLibSyncList.Operation operation, int index)
         {
-            SetEquipWeaponsModels();
+            PrepareToSetEquipWeaponsModels();
             selectableWeaponSetsRecachingState = new SyncListRecachingState()
             {
                 isRecaching = true,
@@ -554,7 +554,7 @@ namespace MultiplayerARPG
         /// <param name="index"></param>
         private void OnEquipItemsOperation(LiteNetLibSyncList.Operation operation, int index)
         {
-            SetEquipItemsModels();
+            PrepareToSetEquipItemsModels();
             equipItemsRecachingState = new SyncListRecachingState()
             {
                 isRecaching = true,
@@ -591,22 +591,6 @@ namespace MultiplayerARPG
                 operation = operation,
                 index = index
             };
-        }
-        #endregion
-
-        #region Other functions
-        protected void SetEquipWeaponsModels()
-        {
-            CharacterModel.SetEquipWeapons(EquipWeapons);
-            if (FpsModel)
-                FpsModel.SetEquipWeapons(EquipWeapons);
-        }
-
-        protected void SetEquipItemsModels()
-        {
-            CharacterModel.SetEquipItems(EquipItems);
-            if (FpsModel)
-                FpsModel.SetEquipItems(EquipItems);
         }
         #endregion
     }

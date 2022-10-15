@@ -20,6 +20,7 @@ namespace MultiplayerARPG
         public const float RESPAWN_GROUNDED_CHECK_DURATION = 1f;
         public const float RESPAWN_INVINCIBLE_DURATION = 1f;
         public const float FIND_ENTITY_DISTANCE_BUFFER = 1f;
+        public const int FRAMES_BEFORE_SET_EQUIP_MODEL = 1;
 
         protected struct SyncListRecachingState
         {
@@ -134,6 +135,8 @@ namespace MultiplayerARPG
         public float RespawnGroundedCheckCountDown { get; protected set; }
         public float RespawnInvincibleCountDown { get; protected set; }
 
+        protected int countDownToSetEquipWeaponsModels = FRAMES_BEFORE_SET_EQUIP_MODEL;
+        protected int countDownToSetEquipItemsModels = FRAMES_BEFORE_SET_EQUIP_MODEL;
         protected float lastMountTime;
         protected float lastUseItemTime;
         protected float lastActionTime;
@@ -351,6 +354,20 @@ namespace MultiplayerARPG
                     pushGameMessageCountDown = COMBATANT_MESSAGE_DELAY;
                     ClientGenericActions.ClientReceiveGameMessage(pushingGameMessages.Dequeue());
                 }
+            }
+
+            if (countDownToSetEquipWeaponsModels > 0)
+            {
+                --countDownToSetEquipWeaponsModels;
+                if (countDownToSetEquipWeaponsModels <= 0)
+                    SetEquipWeaponsModels();
+            }
+
+            if (countDownToSetEquipItemsModels > 0)
+            {
+                --countDownToSetEquipItemsModels;
+                if (countDownToSetEquipItemsModels <= 0)
+                    SetEquipItemsModels();
             }
         }
 
@@ -1519,6 +1536,32 @@ namespace MultiplayerARPG
                 animActionType == AnimActionType.AttackLeftHand)
                 return GetAttackSpeed();
             return 1f;
+        }
+        #endregion
+
+        #region Equip items models setting
+        protected void PrepareToSetEquipWeaponsModels()
+        {
+            countDownToSetEquipWeaponsModels = FRAMES_BEFORE_SET_EQUIP_MODEL;
+        }
+
+        protected void PrepareToSetEquipItemsModels()
+        {
+            countDownToSetEquipItemsModels = FRAMES_BEFORE_SET_EQUIP_MODEL;
+        }
+
+        protected void SetEquipWeaponsModels()
+        {
+            CharacterModel.SetEquipWeapons(EquipWeapons);
+            if (FpsModel)
+                FpsModel.SetEquipWeapons(EquipWeapons);
+        }
+
+        protected void SetEquipItemsModels()
+        {
+            CharacterModel.SetEquipItems(EquipItems);
+            if (FpsModel)
+                FpsModel.SetEquipItems(EquipItems);
         }
         #endregion
 
