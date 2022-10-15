@@ -1,6 +1,6 @@
 namespace MultiplayerARPG
 {
-    public interface ICustomAnimationPlayableModel
+    public interface ICustomAnimationModel
     {
         void PlayCustomAnimation(int id);
     }
