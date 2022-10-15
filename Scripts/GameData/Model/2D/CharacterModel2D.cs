@@ -15,6 +15,7 @@ namespace MultiplayerARPG
             Idle,
             Move,
             Sprint,
+            Walk,
             Dead,
             DefaultAttack,
             DefaultSkillCast,
@@ -25,6 +26,7 @@ namespace MultiplayerARPG
         public CharacterAnimation2D idleAnimation2D;
         public CharacterAnimation2D moveAnimation2D;
         public CharacterAnimation2D sprintAnimation2D;
+        public CharacterAnimation2D walkAnimation2D;
         public CharacterAnimation2D deadAnimation2D;
         public ActionAnimation2D defaultAttackAnimation2D;
         [FormerlySerializedAs("defaultSkillCastClip2D")]
@@ -136,6 +138,9 @@ namespace MultiplayerARPG
                 case SampleAnimation.Move:
                     Play(moveAnimation2D, sampleDirection);
                     break;
+                case SampleAnimation.Walk:
+                    Play(walkAnimation2D, sampleDirection);
+                    break;
                 case SampleAnimation.Sprint:
                     Play(sprintAnimation2D, sampleDirection);
                     break;
@@ -205,10 +210,18 @@ namespace MultiplayerARPG
                 movementState.Has(MovementState.Right) ||
                 movementState.Has(MovementState.Left))
             {
-                if (extraMovementState == ExtraMovementState.IsSprinting)
-                    Play(sprintAnimation2D, DirectionType2D);
-                else
-                    Play(moveAnimation2D, DirectionType2D);
+                switch (extraMovementState)
+                {
+                    case ExtraMovementState.IsSprinting:
+                        Play(sprintAnimation2D, DirectionType2D);
+                        break;
+                    case ExtraMovementState.IsWalking:
+                        Play(walkAnimation2D, DirectionType2D);
+                        break;
+                    default:
+                        Play(moveAnimation2D, DirectionType2D);
+                        break;
+                }
             }
             else
             {
