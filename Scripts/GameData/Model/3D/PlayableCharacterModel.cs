@@ -40,6 +40,7 @@ namespace MultiplayerARPG.GameData.Model.Playables
         protected WeaponType equippedWeaponType = null;
         protected Coroutine actionCoroutine = null;
         protected bool isDoingAction = false;
+        protected EquipWeapons oldEquipWeapons = null;
 
         protected override void Awake()
         {
@@ -168,8 +169,12 @@ namespace MultiplayerARPG.GameData.Model.Playables
             if (Behaviour != null)
                 Behaviour.SetEquipWeapons(rightWeaponItem, leftWeaponItem, newEquipWeapons.GetLeftHandShieldItem());
             // Player draw/holster animation
-            if (!newEquipWeapons.IsDiffer(equipWeapons, out bool rightIsDiffer, out bool leftIsDiffer))
+            if (oldEquipWeapons == null)
+                oldEquipWeapons = newEquipWeapons;
+            if (isDoingAction || !newEquipWeapons.IsDiffer(oldEquipWeapons, out bool rightIsDiffer, out bool leftIsDiffer))
             {
+                if (newEquipWeapons != null)
+                    oldEquipWeapons = newEquipWeapons.Clone();
                 base.SetEquipWeapons(newEquipWeapons);
                 return;
             }
@@ -180,22 +185,35 @@ namespace MultiplayerARPG.GameData.Model.Playables
         {
             isDoingAction = true;
             // Prepare states
+            float holsteredDurationRate = 0f;
             ActionState holsterState = new ActionState();
-            if (equipWeapons != null)
+            if (oldEquipWeapons != null)
             {
-                if (rightIsDiffer && !equipWeapons.rightHand.IsEmptySlot())
+                if (rightIsDiffer)
                 {
-                    if (TryGetWeaponAnimations(equipWeapons.rightHand.dataId, out WeaponAnimations anims))
-                        holsterState = anims.rightHandHolsterState;
+                    if (!oldEquipWeapons.IsEmptyRightHandSlot() && TryGetWeaponAnimations(oldEquipWeapons.rightHand.dataId, out WeaponAnimations anims))
+                    {
+                        holsterState = anims.rightHandHolsterAnimation.holsterState;
+                        holsteredDurationRate = anims.rightHandHolsterAnimation.holsteredDurationRate;
+                    }
                     else
-                        holsterState = defaultAnimations.rightHandHolsterState;
+                    {
+                        holsterState = defaultAnimations.rightHandHolsterAnimation.holsterState;
+                        holsteredDurationRate = defaultAnimations.rightHandHolsterAnimation.holsteredDurationRate;
+                    }
                 }
-                else if (leftIsDiffer && !equipWeapons.leftHand.IsEmptySlot())
+                else if (leftIsDiffer)
                 {
-                    if (TryGetWeaponAnimations(equipWeapons.leftHand.dataId, out WeaponAnimations anims))
-                        holsterState = anims.leftHandHolsterState;
+                    if (!oldEquipWeapons.IsEmptyRightHandSlot() && TryGetWeaponAnimations(oldEquipWeapons.leftHand.dataId, out WeaponAnimations anims))
+                    {
+                        holsterState = anims.leftHandHolsterAnimation.holsterState;
+                        holsteredDurationRate = anims.leftHandHolsterAnimation.holsteredDurationRate;
+                    }
                     else
-                        holsterState = defaultAnimations.leftHandHolsterState;
+                    {
+                        holsterState = defaultAnimations.leftHandHolsterAnimation.holsterState;
+                        holsteredDurationRate = defaultAnimations.leftHandHolsterAnimation.holsteredDurationRate;
+                    }
                 }
             }
 
@@ -205,37 +223,64 @@ namespace MultiplayerARPG.GameData.Model.Playables
                 if (rightIsDiffer && !newEquipWeapons.rightHand.IsEmptySlot())
                 {
                     if (TryGetWeaponAnimations(newEquipWeapons.rightHand.dataId, out WeaponAnimations anims))
-                        drawState = anims.rightHandDrawState;
+                        drawState = anims.rightHandHolsterAnimation.drawState;
                     else
-                        drawState = defaultAnimations.rightHandDrawState;
+                        drawState = defaultAnimations.rightHandHolsterAnimation.drawState;
                 }
                 else if (leftIsDiffer && !newEquipWeapons.leftHand.IsEmptySlot())
                 {
                     if (TryGetWeaponAnimations(newEquipWeapons.leftHand.dataId, out WeaponAnimations anims))
-                        drawState = anims.leftHandDrawState;
+                        drawState = anims.leftHandHolsterAnimation.drawState;
                     else
-                        drawState = defaultAnimations.leftHandDrawState;
+                        drawState = defaultAnimations.leftHandHolsterAnimation.drawState;
                 }
             }
 
-            // Play holster state
+            float holsteredDelay;
+            float animationDelay;
             bool hasClip;
+
+            // Play holster state
+            holsteredDelay = 0f;
+            animationDelay = 0f;
             hasClip = holsterState.clip != null;
             if (hasClip)
             {
-                // Wait by animation playing duration
-                yield return new WaitForSecondsRealtime(Behaviour.PlayAction(holsterState, 1f));
+                // Setup animation playing duration
+                animationDelay = Behaviour.PlayAction(holsterState, 1f);
+                holsteredDelay = animationDelay * holsteredDurationRate;
+            }
+
+            if (holsteredDelay > 0f)
+            {
+                // Wait by holstering duration
+                yield return new WaitForSecondsRealtime(holsteredDelay);
             }
 
             // Switch weapon items
+            if (newEquipWeapons != null)
+                oldEquipWeapons = newEquipWeapons.Clone();
             base.SetEquipWeapons(newEquipWeapons);
 
+            if (animationDelay - holsteredDelay > 0f)
+            {
+                // Wait by animation playing duration
+                yield return new WaitForSecondsRealtime(animationDelay);
+            }
+
             // Play draw state
+            animationDelay = 0f;
             hasClip = drawState.clip != null;
             if (hasClip)
             {
+                // Setup animation playing duration
+                animationDelay = Behaviour.PlayAction(drawState, 1f);
+            }
+
+            if (animationDelay > 0f)
+            {
                 // Wait by animation playing duration
-                yield return new WaitForSecondsRealtime(Behaviour.PlayAction(drawState, 1f));
+                yield return new WaitForSecondsRealtime(animationDelay);
             }
 
             isDoingAction = false;

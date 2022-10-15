@@ -31,6 +31,15 @@ namespace MultiplayerARPG.GameData.Model.Playables
     }
 
     [System.Serializable]
+    public struct HolsterAnimation
+    {
+        public ActionState holsterState;
+        [Range(0f, 1f)]
+        public float holsteredDurationRate;
+        public ActionState drawState;
+    }
+
+    [System.Serializable]
     public struct MoveStates
     {
         public AnimState forwardState;
@@ -179,10 +188,8 @@ namespace MultiplayerARPG.GameData.Model.Playables
         public ActionAnimation leftHandReloadAnimation;
 
         [Header("Draw/Holster Animations")]
-        public ActionState rightHandDrawState;
-        public ActionState leftHandDrawState;
-        public ActionState rightHandHolsterState;
-        public ActionState leftHandHolsterState;
+        public HolsterAnimation rightHandHolsterAnimation;
+        public HolsterAnimation leftHandHolsterAnimation;
 
         public WeaponType Data { get { return weaponType; } }
     }
@@ -298,9 +305,7 @@ namespace MultiplayerARPG.GameData.Model.Playables
         public ActionAnimation skillActivateAnimation;
 
         [Header("Draw/Holster Animations")]
-        public ActionState rightHandDrawState;
-        public ActionState leftHandDrawState;
-        public ActionState rightHandHolsterState;
-        public ActionState leftHandHolsterState;
+        public HolsterAnimation rightHandHolsterAnimation;
+        public HolsterAnimation leftHandHolsterAnimation;
     }
 }
