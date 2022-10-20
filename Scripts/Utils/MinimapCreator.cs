@@ -27,6 +27,7 @@ namespace MultiplayerARPG
         public bool makeByCollider2D = true;
         public bool makeByRenderer = false;
         public bool doNotDestroyCamera = false;
+        public Camera customCamera;
 #if UNITY_EDITOR
         [InspectorButton(nameof(CreateByComponent))]
         public bool create;
@@ -48,7 +49,8 @@ namespace MultiplayerARPG
                 makeByCollider,
                 makeByCollider2D,
                 makeByRenderer,
-                doNotDestroyCamera);
+                doNotDestroyCamera,
+                customCamera);
         }
 
         public static void Create(
@@ -63,7 +65,8 @@ namespace MultiplayerARPG
             bool makeByCollider,
             bool makeByCollider2D,
             bool makeByRenderer,
-            bool doNotDestroyCamera = false)
+            bool doNotDestroyCamera = false,
+            Camera customCamera = null)
         {
             // Find bounds
             Bounds bounds = default;
@@ -120,8 +123,8 @@ namespace MultiplayerARPG
             }
 
             // Create camera
-            GameObject cameraGameObject = new GameObject("_MinimapMakerCamera");
-            Camera camera = cameraGameObject.AddComponent<Camera>();
+            GameObject cameraGameObject = customCamera != null ? customCamera.gameObject : new GameObject("_MinimapMakerCamera");
+            Camera camera = customCamera != null ? customCamera : cameraGameObject.AddComponent<Camera>();
             switch (dimensionType)
             {
                 case DimensionType.Dimension2D:
@@ -208,7 +211,7 @@ namespace MultiplayerARPG
 
             DestroyImmediate(texture);
             DestroyImmediate(renderTexture);
-            if (!doNotDestroyCamera)
+            if (!doNotDestroyCamera && customCamera == null)
                 DestroyImmediate(cameraGameObject);
         }
 #endif
