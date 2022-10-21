@@ -93,7 +93,8 @@ namespace MultiplayerARPG
                     (password) =>
                     {
                         GameInstance.PlayingCharacterEntity.Building.CallServerOpenDoor(ObjectId, password);
-                    }, string.Empty, PasswordContentType, PasswordLength);
+                    }, string.Empty, PasswordContentType, PasswordLength, 
+                    LanguageManager.GetText(UITextKeys.UI_ENTER_BUILDING_PASSWORD.ToString()));
             }
         }
     }

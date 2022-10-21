@@ -310,6 +310,9 @@ namespace MultiplayerARPG
         // Error - Map Spawn Server
         UI_ERROR_EMPTY_SCENE_NAME,
         UI_ERROR_CANNOT_EXCUTE_MAP_SERVER,
+        // Enter Amount
+        UI_ENTER_ITEM_AMOUNT,
+        UI_ENTER_ITEM_AMOUNT_DESCRIPTION,
     }
 
     public enum UIItemTypeKeys : byte
@@ -1525,6 +1528,9 @@ namespace MultiplayerARPG
             Texts.Add(UITextKeys.UI_MAIL_CLAIMED.ToString(), "Claimed an items");
             Texts.Add(UITextKeys.UI_ERROR_MAIL_DELETE_NOT_ALLOWED.ToString(), "You're not allowed to delete the mail");
             Texts.Add(UITextKeys.UI_MAIL_DELETED.ToString(), "Mail deleted");
+            // Enter Amount
+            Texts.Add(UITextKeys.UI_ENTER_ITEM_AMOUNT.ToString(), "Enter Amount");
+            Texts.Add(UITextKeys.UI_ENTER_ITEM_AMOUNT_DESCRIPTION.ToString(), "Enter amount of item");
             // Error - IAP
             Texts.Add(UITextKeys.UI_ERROR_IAP_NOT_INITIALIZED.ToString(), "In-App Purchasing system not initialized yet");
             Texts.Add(UITextKeys.UI_ERROR_IAP_PURCHASING_UNAVAILABLE.ToString(), "Purchasing is unavailable");

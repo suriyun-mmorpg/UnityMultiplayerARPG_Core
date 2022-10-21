@@ -16,6 +16,7 @@ public class UIInputDialog : UIBase
     private float floatDefaultAmount;
     private float? floatMinAmount;
     private float? floatMaxAmount;
+    private string defaultPlaceHolderText;
 
     public string Title
     {
@@ -50,6 +51,40 @@ public class UIInputDialog : UIBase
         set
         {
             if (uiInputField != null) uiInputField.text = value;
+        }
+    }
+
+    public string PlaceHolderText
+    {
+        get
+        {
+
+            if (uiInputField != null)
+            {
+                if (uiInputField.placeholder is Text)
+                    return (uiInputField.placeholder as Text).text;
+                if (uiInputField.placeholder is TMPro.TMP_Text)
+                    return (uiInputField.placeholder as TMPro.TMP_Text).text;
+            }
+            return string.Empty;
+        }
+        set
+        {
+            if (uiInputField != null)
+            {
+                if (uiInputField.placeholder is Text)
+                {
+                    if (string.IsNullOrEmpty(defaultPlaceHolderText))
+                        defaultPlaceHolderText = (uiInputField.placeholder as Text).text;
+                    (uiInputField.placeholder as Text).text = !string.IsNullOrEmpty(value) ? value : defaultPlaceHolderText;
+                }
+                if (uiInputField.placeholder is TMPro.TMP_Text)
+                {
+                    if (string.IsNullOrEmpty(defaultPlaceHolderText))
+                        defaultPlaceHolderText = (uiInputField.placeholder as TMPro.TMP_Text).text;
+                    (uiInputField.placeholder as TMPro.TMP_Text).text = !string.IsNullOrEmpty(value) ? value : defaultPlaceHolderText;
+                }
+            }
         }
     }
 
@@ -91,13 +126,15 @@ public class UIInputDialog : UIBase
         System.Action<string> onConfirmText,
         string defaultText = "",
         InputField.ContentType contentType = InputField.ContentType.Standard,
-        int characterLimit = 0)
+        int characterLimit = 0,
+        string placeHolder = "")
     {
         Title = title;
         Description = description;
         InputFieldText = defaultText;
         ContentType = contentType;
         CharacterLimit = characterLimit;
+        PlaceHolderText = placeHolder;
         this.onConfirmText = onConfirmText;
         Show();
     }
@@ -107,7 +144,8 @@ public class UIInputDialog : UIBase
         System.Action<int> onConfirmInteger,
         int? minAmount = null,
         int? maxAmount = null,
-        int defaultAmount = 0)
+        int defaultAmount = 0,
+        string placeHolder = "")
     {
         if (!minAmount.HasValue)
             minAmount = int.MinValue;
@@ -121,6 +159,7 @@ public class UIInputDialog : UIBase
         Title = title;
         Description = description;
         InputFieldText = defaultAmount.ToString();
+        PlaceHolderText = placeHolder;
         if (uiInputField != null)
         {
             if (minAmount.Value > maxAmount.Value)
@@ -156,7 +195,8 @@ public class UIInputDialog : UIBase
         System.Action<float> onConfirmDecimal,
         float? minAmount = null,
         float? maxAmount = null,
-        float defaultAmount = 0f)
+        float defaultAmount = 0f,
+        string placeHolder = "")
     {
         if (!minAmount.HasValue)
             minAmount = float.MinValue;
@@ -169,6 +209,7 @@ public class UIInputDialog : UIBase
         Title = title;
         Description = description;
         InputFieldText = defaultAmount.ToString();
+        PlaceHolderText = placeHolder;
         if (uiInputField != null)
         {
             if (minAmount.Value > maxAmount.Value)

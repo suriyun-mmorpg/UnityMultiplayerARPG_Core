@@ -73,7 +73,8 @@ namespace MultiplayerARPG
             System.Action<int> onConfirmInteger,
             int? minAmount = null,
             int? maxAmount = null,
-            int defaultAmount = 0)
+            int defaultAmount = 0,
+            string placeHolder = "")
         {
 #if DEBUG_UI
             Debug.Log($"Showing input dialog (integer) {title} {description}");
@@ -83,7 +84,8 @@ namespace MultiplayerARPG
                 onConfirmInteger,
                 minAmount,
                 maxAmount,
-                defaultAmount);
+                defaultAmount,
+                placeHolder);
         }
 
         public void ShowInputDialog(string title,
@@ -91,7 +93,8 @@ namespace MultiplayerARPG
             System.Action<float> onConfirmDecimal,
             float? minAmount = null,
             float? maxAmount = null,
-            float defaultAmount = 0f)
+            float defaultAmount = 0f,
+            string placeHolder = "")
         {
 #if DEBUG_UI
             Debug.Log($"Showing input dialog (float) {title} {description}");
@@ -101,7 +104,8 @@ namespace MultiplayerARPG
                 onConfirmDecimal,
                 minAmount,
                 maxAmount,
-                defaultAmount);
+                defaultAmount,
+                placeHolder);
         }
 
         public void ShowPasswordDialog(string title,
@@ -109,14 +113,16 @@ namespace MultiplayerARPG
             System.Action<string> onConfirmText,
             string defaultText = "",
             InputField.ContentType contentType = InputField.ContentType.Standard,
-            int characterLimit = 0)
+            int characterLimit = 0,
+            string placeHolder = "")
         {
             uiPasswordDialog.Show(title,
                 description,
                 onConfirmText,
                 defaultText,
                 contentType,
-                characterLimit);
+                characterLimit,
+                placeHolder);
         }
 
         public void ShowDisconnectDialog(DisconnectInfo disconnectInfo)

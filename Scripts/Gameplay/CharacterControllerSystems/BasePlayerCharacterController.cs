@@ -199,7 +199,8 @@ namespace MultiplayerARPG
                 (password) =>
                 {
                     PlayingCharacterEntity.Building.CallServerSetBuildingPassword(objectId, password);
-                }, string.Empty, TargetBuildingEntity.PasswordContentType, TargetBuildingEntity.PasswordLength);
+                }, string.Empty, TargetBuildingEntity.PasswordContentType, TargetBuildingEntity.PasswordLength,
+                LanguageManager.GetText(UITextKeys.UI_SET_BUILDING_PASSWORD.ToString()));
             DeselectBuilding();
         }
 

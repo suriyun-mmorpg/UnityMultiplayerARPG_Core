@@ -251,6 +251,18 @@ public class InputFieldWrapper : MonoBehaviour
         }
     }
 
+    public Graphic placeholder
+    {
+        get
+        {
+            if (unityInputField != null)
+                return unityInputField.placeholder;
+            if (textMeshInputField != null)
+                return textMeshInputField.placeholder;
+            return null;
+        }
+    }
+
     void Awake()
     {
         if (unityInputField == null) unityInputField = GetComponent<InputField>();
