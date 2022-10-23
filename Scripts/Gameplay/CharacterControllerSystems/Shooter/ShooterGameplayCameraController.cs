@@ -32,7 +32,7 @@ namespace MultiplayerARPG
         public virtual bool AvoidAimAssist(RaycastHit hitInfo)
         {
             IGameEntity entity = hitInfo.collider.GetComponent<IGameEntity>();
-            if (entity != null && entity.Entity != null && entity.Entity != PlayerCharacterEntity)
+            if (!entity.IsNull() && entity.Entity != PlayerCharacterEntity)
             {
                 DamageableEntity damageableEntity = entity.Entity as DamageableEntity;
                 return damageableEntity == null || damageableEntity.IsDead() || !damageableEntity.CanReceiveDamageFrom(PlayerCharacterEntity.GetInfo());

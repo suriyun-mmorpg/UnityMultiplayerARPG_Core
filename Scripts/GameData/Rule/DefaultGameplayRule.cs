@@ -879,7 +879,7 @@ namespace MultiplayerARPG
             for (int i = 0; i < count; ++i)
             {
                 gameEntity = character.FindPhysicFunctions.GetRaycastObject(i).GetComponent<IGameEntity>();
-                if (gameEntity == null) continue;
+                if (gameEntity.IsNull()) continue;
                 if (gameEntity.GetObjectId() == objectId)
                 {
                     // It's target entity, so interact it

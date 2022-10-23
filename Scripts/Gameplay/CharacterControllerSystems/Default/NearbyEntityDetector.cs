@@ -292,7 +292,7 @@ namespace MultiplayerARPG
             pickupActivatableEntity = null;
 
             IGameEntity gameEntity = other.GetComponent<IGameEntity>();
-            if (gameEntity != null)
+            if (!gameEntity.IsNull())
             {
                 if (findPlayer)
                 {
@@ -351,14 +351,14 @@ namespace MultiplayerARPG
             if (findActivatableEntity)
             {
                 activatableEntity = other.GetComponent<IActivatableEntity>();
-                if (activatableEntity != null && activatableEntity.EntityGameObject == GameInstance.PlayingCharacterEntity.EntityGameObject)
+                if (!activatableEntity.IsNull() && activatableEntity.EntityGameObject == GameInstance.PlayingCharacterEntity.EntityGameObject)
                     activatableEntity = null;
             }
 
             if (findPickupActivatableEntity)
             {
                 pickupActivatableEntity = other.GetComponent<IPickupActivatableEntity>();
-                if (pickupActivatableEntity != null && pickupActivatableEntity.EntityGameObject == GameInstance.PlayingCharacterEntity.EntityGameObject)
+                if (!pickupActivatableEntity.IsNull() && pickupActivatableEntity.EntityGameObject == GameInstance.PlayingCharacterEntity.EntityGameObject)
                     pickupActivatableEntity = null;
             }
         }

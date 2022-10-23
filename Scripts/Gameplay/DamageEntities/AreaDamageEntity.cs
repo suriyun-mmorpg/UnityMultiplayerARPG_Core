@@ -138,7 +138,7 @@ namespace MultiplayerARPG
         protected virtual void TriggerExit(GameObject other)
         {
             IDamageableEntity target = other.GetComponent<IDamageableEntity>();
-            if (target == null)
+            if (target.IsNull())
                 return;
 
             if (!receivingDamageHitBoxes.ContainsKey(target.GetObjectId()))

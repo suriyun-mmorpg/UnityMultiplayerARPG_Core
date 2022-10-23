@@ -22,7 +22,7 @@ namespace MultiplayerARPG
         private void TriggerEnter(GameObject other)
         {
             IDamageableEntity gameEntity = other.GetComponent<IDamageableEntity>();
-            if (gameEntity == null)
+            if (gameEntity.IsNull())
                 return;
             gameEntity.IsInSafeArea = true;
         }
@@ -40,7 +40,7 @@ namespace MultiplayerARPG
         private void TriggerExit(GameObject other)
         {
             IDamageableEntity gameEntity = other.GetComponent<IDamageableEntity>();
-            if (gameEntity == null)
+            if (gameEntity.IsNull())
                 return;
             gameEntity.IsInSafeArea = false;
         }

@@ -108,7 +108,7 @@ namespace MultiplayerARPG
                 if (SameBuildingAreaTransform(other))
                     return;
                 IGameEntity gameEntity = other.GetComponent<IGameEntity>();
-                if (gameEntity != null)
+                if (!gameEntity.IsNull())
                     buildingMaterial.BuildingEntity.TriggerEnterEntity(gameEntity.Entity);
             }
         }
@@ -128,7 +128,7 @@ namespace MultiplayerARPG
 
             // Material is derived from `IGameEntity`, so just find for `IGameEntity` is fine
             IGameEntity gameEntity = other.GetComponent<IGameEntity>();
-            if (gameEntity != null)
+            if (!gameEntity.IsNull())
                 buildingMaterial.BuildingEntity.TriggerExitEntity(gameEntity.Entity);
         }
 

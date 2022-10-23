@@ -198,7 +198,7 @@ namespace MultiplayerARPG
                     if (isMouseHoldAndNotDrag)
                     {
                         IHoldActivatableEntity activatable = tempTransform.GetComponent<IHoldActivatableEntity>();
-                        if (activatable != null && activatable.CanHoldActivate())
+                        if (!activatable.IsNull() && activatable.CanHoldActivate())
                         {
                             SetTarget(activatable, TargetActionType.HoldClickActivate);
                             isFollowingTarget = true;
@@ -212,9 +212,9 @@ namespace MultiplayerARPG
                         IActivatableEntity activatable = targetable as IActivatableEntity;
                         IPickupActivatableEntity pickupActivatable = targetable as IPickupActivatableEntity;
                         IDamageableEntity damageable = targetable as IDamageableEntity;
-                        if (targetable != null && !targetable.NotBeingSelectedOnClick())
+                        if (!targetable.IsNull() && !targetable.NotBeingSelectedOnClick())
                         {
-                            if (activatable != null && activatable.CanActivate())
+                            if (!activatable.IsNull() && activatable.CanActivate())
                             {
                                 if (activatable.ShouldBeAttackTarget())
                                     SetTarget(activatable, TargetActionType.Attack);
@@ -224,7 +224,7 @@ namespace MultiplayerARPG
                                 tempHasMapPosition = false;
                                 break;
                             }
-                            else if (pickupActivatable != null && pickupActivatable.CanPickupActivate())
+                            else if (!pickupActivatable.IsNull() && pickupActivatable.CanPickupActivate())
                             {
                                 SetTarget(pickupActivatable, TargetActionType.ClickActivate);
                                 isFollowingTarget = true;

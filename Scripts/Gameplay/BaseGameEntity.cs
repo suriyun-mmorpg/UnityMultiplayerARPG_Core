@@ -591,13 +591,10 @@ namespace MultiplayerARPG
         {
 #if UNITY_EDITOR || UNITY_SERVER
             // Call this function at server
-            LiteNetLibIdentity identity;
-            if (Manager.Assets.TryGetSpawnedObject(objectId, out identity))
+            if (Manager.Assets.TryGetSpawnedObject(objectId, out LiteNetLibIdentity identity))
             {
                 IVehicleEntity vehicleEntity = identity.GetComponent<IVehicleEntity>();
-                byte seatIndex;
-                if (vehicleEntity != null &&
-                    vehicleEntity.GetAvailableSeat(out seatIndex))
+                if (!vehicleEntity.IsNull() && vehicleEntity.GetAvailableSeat(out byte seatIndex))
                     EnterVehicle(vehicleEntity, seatIndex);
             }
 #endif
@@ -608,11 +605,10 @@ namespace MultiplayerARPG
         {
 #if UNITY_EDITOR || UNITY_SERVER
             // Call this function at server
-            LiteNetLibIdentity identity;
-            if (Manager.Assets.TryGetSpawnedObject(objectId, out identity))
+            if (Manager.Assets.TryGetSpawnedObject(objectId, out LiteNetLibIdentity identity))
             {
                 IVehicleEntity vehicleEntity = identity.GetComponent<IVehicleEntity>();
-                if (vehicleEntity != null)
+                if (!vehicleEntity.IsNull())
                     EnterVehicle(vehicleEntity, seatIndex);
             }
 #endif

@@ -223,7 +223,7 @@ namespace MultiplayerARPG
             if (destroying)
                 return;
 
-            if (other.GetComponent<IUnHittable>() != null)
+            if (!other.GetComponent<IUnHittable>().IsNull())
                 return;
 
             DamageableHitBox target;
@@ -264,7 +264,7 @@ namespace MultiplayerARPG
         {
             target = null;
 
-            if (other.GetComponent<IUnHittable>() != null)
+            if (!other.GetComponent<IUnHittable>().IsNull())
                 return false;
 
             target = other.GetComponent<DamageableHitBox>();

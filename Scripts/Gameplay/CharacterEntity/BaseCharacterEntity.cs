@@ -1348,7 +1348,7 @@ namespace MultiplayerARPG
             for (int tempLoopCounter = 0; tempLoopCounter < tempOverlapSize; ++tempLoopCounter)
             {
                 tempBaseEntity = FindPhysicFunctions.GetOverlapObject(tempLoopCounter).GetComponent<IDamageableEntity>();
-                if (tempBaseEntity == null)
+                if (tempBaseEntity.IsNull())
                     continue;
                 tempEntity = tempBaseEntity.Entity as T;
                 if (tempEntity == null)
@@ -1382,7 +1382,7 @@ namespace MultiplayerARPG
             for (int tempLoopCounter = 0; tempLoopCounter < tempOverlapSize; ++tempLoopCounter)
             {
                 tempBaseEntity = FindPhysicFunctions.GetOverlapObject(tempLoopCounter).GetComponent<IDamageableEntity>();
-                if (tempBaseEntity == null)
+                if (tempBaseEntity.IsNull())
                     continue;
                 tempEntity = tempBaseEntity.Entity as T;
                 if (!IsCharacterWhichLookingFor(tempEntity, findForAlive, findForAlly, findForEnemy, findForNeutral, findInFov, fov))
@@ -1426,7 +1426,7 @@ namespace MultiplayerARPG
             for (int tempLoopCounter = 0; tempLoopCounter < tempOverlapSize; ++tempLoopCounter)
             {
                 tempBaseEntity = FindPhysicFunctions.GetOverlapObject(tempLoopCounter).GetComponent<IDamageableEntity>();
-                if (tempBaseEntity == null)
+                if (tempBaseEntity.IsNull())
                     continue;
                 tempEntity = tempBaseEntity.Entity as T;
                 if (!IsCharacterWhichLookingFor(tempEntity, findForAliveOnly, findForAlly, findForEnemy, findForNeutral, findInFov, fov))

@@ -857,7 +857,7 @@ namespace MultiplayerARPG
                     continue;
                 }
 
-                if (tempHitInfo.collider.GetComponent<IUnHittable>() != null)
+                if (!tempHitInfo.collider.GetComponent<IUnHittable>().IsNull())
                 {
                     // Don't aim to unhittable objects
                     continue;
@@ -899,7 +899,7 @@ namespace MultiplayerARPG
                 for (int tempCounter = 0; tempCounter < tempCount; ++tempCounter)
                 {
                     tempHitInfo = raycasts[tempCounter];
-                    if (tempHitInfo.collider.GetComponent<IUnHittable>() != null)
+                    if (!tempHitInfo.collider.GetComponent<IUnHittable>().IsNull())
                     {
                         // Don't aim to unhittable objects
                         continue;
@@ -909,7 +909,7 @@ namespace MultiplayerARPG
                     tempDistance = Vector3.Distance(EntityTransform.position, tempHitInfo.point);
                     tempGameEntity = tempHitInfo.collider.GetComponent<IGameEntity>();
 
-                    if (tempGameEntity == null || !tempGameEntity.Entity || tempGameEntity.IsHide() ||
+                    if (tempGameEntity.IsNull() || tempGameEntity.IsHide() ||
                         tempGameEntity.GetObjectId() == PlayingCharacterEntity.ObjectId)
                     {
                         // Skip empty game entity / hiddeing entity / controlling player's entity

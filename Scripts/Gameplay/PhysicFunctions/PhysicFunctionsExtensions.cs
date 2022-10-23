@@ -14,10 +14,10 @@ namespace MultiplayerARPG
             ITargetableEntity tempTargetableEntity;
             for (int tempLoopCounter = 0; tempLoopCounter < tempOverlapSize; ++tempLoopCounter)
             {
-                if (!includeUnHittable && functions.GetOverlapObject(tempLoopCounter).GetComponent<IUnHittable>() != null)
+                if (!includeUnHittable && !functions.GetOverlapObject(tempLoopCounter).GetComponent<IUnHittable>().IsNull())
                     continue;
                 tempTargetableEntity = functions.GetOverlapObject(tempLoopCounter).GetComponent<ITargetableEntity>();
-                if (tempTargetableEntity != null && tempTargetableEntity.EntityGameObject == targetEntity.EntityGameObject)
+                if (!tempTargetableEntity.IsNull() && tempTargetableEntity.EntityGameObject == targetEntity.EntityGameObject)
                     return true;
             }
             return false;
@@ -32,7 +32,7 @@ namespace MultiplayerARPG
             DamageableHitBox tempBaseEntity;
             for (int tempLoopCounter = 0; tempLoopCounter < tempOverlapSize; ++tempLoopCounter)
             {
-                if (!includeUnHittable && functions.GetOverlapObject(tempLoopCounter).GetComponent<IUnHittable>() != null)
+                if (!includeUnHittable && !functions.GetOverlapObject(tempLoopCounter).GetComponent<IUnHittable>().IsNull())
                     continue;
                 tempBaseEntity = functions.GetOverlapObject(tempLoopCounter).GetComponent<DamageableHitBox>();
                 if (tempBaseEntity != null && tempBaseEntity.Entity == targetEntity.Entity)
@@ -53,7 +53,7 @@ namespace MultiplayerARPG
             for (int tempLoopCounter = 0; tempLoopCounter < tempOverlapSize; ++tempLoopCounter)
             {
                 tempBaseEntity = functions.GetOverlapObject(tempLoopCounter).GetComponent<IGameEntity>();
-                if (tempBaseEntity == null)
+                if (tempBaseEntity.IsNull())
                     continue;
                 tempEntity = tempBaseEntity.Entity as T;
                 if (tempEntity == null)

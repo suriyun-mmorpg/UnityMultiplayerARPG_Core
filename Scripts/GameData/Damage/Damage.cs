@@ -222,7 +222,7 @@ namespace MultiplayerARPG
                             {
                                 tempGameObject = attacker.AttackPhysicFunctions.GetOverlapObject(tempLoopCounter);
 
-                                if (tempGameObject.GetComponent<IUnHittable>() != null)
+                                if (!tempGameObject.GetComponent<IUnHittable>().IsNull())
                                     continue;
 
                                 tempDamageableHitBox = tempGameObject.GetComponent<DamageableHitBox>();
@@ -351,7 +351,7 @@ namespace MultiplayerARPG
                                 distance = attacker.AttackPhysicFunctions.GetRaycastDistance(tempLoopCounter);
                                 tempGameObject = attacker.AttackPhysicFunctions.GetRaycastObject(tempLoopCounter);
 
-                                if (tempGameObject.GetComponent<IUnHittable>() != null)
+                                if (!tempGameObject.GetComponent<IUnHittable>().IsNull())
                                     continue;
 
                                 if (distance < minDistance)
