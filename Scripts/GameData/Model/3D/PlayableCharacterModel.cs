@@ -185,13 +185,15 @@ namespace MultiplayerARPG.GameData.Model.Playables
         {
             isDoingAction = true;
             // Prepare states
+            IWeaponItem tempWeaponItem;
             float holsteredDurationRate = 0f;
             ActionState holsterState = new ActionState();
             if (oldEquipWeapons != null)
             {
                 if (rightIsDiffer)
                 {
-                    if (!oldEquipWeapons.IsEmptyRightHandSlot() && TryGetWeaponAnimations(oldEquipWeapons.rightHand.dataId, out WeaponAnimations anims))
+                    tempWeaponItem = oldEquipWeapons.GetRightHandWeaponItem();
+                    if (tempWeaponItem != null && TryGetWeaponAnimations(tempWeaponItem.WeaponType.DataId, out WeaponAnimations anims))
                     {
                         holsterState = anims.rightHandHolsterAnimation.holsterState;
                         holsteredDurationRate = anims.rightHandHolsterAnimation.holsteredDurationRate;
@@ -204,7 +206,8 @@ namespace MultiplayerARPG.GameData.Model.Playables
                 }
                 else if (leftIsDiffer)
                 {
-                    if (!oldEquipWeapons.IsEmptyRightHandSlot() && TryGetWeaponAnimations(oldEquipWeapons.leftHand.dataId, out WeaponAnimations anims))
+                    tempWeaponItem = oldEquipWeapons.GetLeftHandWeaponItem();
+                    if (tempWeaponItem != null && TryGetWeaponAnimations(tempWeaponItem.WeaponType.DataId, out WeaponAnimations anims))
                     {
                         holsterState = anims.leftHandHolsterAnimation.holsterState;
                         holsteredDurationRate = anims.leftHandHolsterAnimation.holsteredDurationRate;
@@ -220,16 +223,18 @@ namespace MultiplayerARPG.GameData.Model.Playables
             ActionState drawState = new ActionState();
             if (newEquipWeapons != null)
             {
-                if (rightIsDiffer && !newEquipWeapons.rightHand.IsEmptySlot())
+                if (rightIsDiffer && !newEquipWeapons.IsEmptyRightHandSlot())
                 {
-                    if (TryGetWeaponAnimations(newEquipWeapons.rightHand.dataId, out WeaponAnimations anims))
+                    tempWeaponItem = newEquipWeapons.GetRightHandWeaponItem();
+                    if (tempWeaponItem != null && TryGetWeaponAnimations(tempWeaponItem.DataId, out WeaponAnimations anims))
                         drawState = anims.rightHandHolsterAnimation.drawState;
                     else
                         drawState = defaultAnimations.rightHandHolsterAnimation.drawState;
                 }
-                else if (leftIsDiffer && !newEquipWeapons.leftHand.IsEmptySlot())
+                else if (leftIsDiffer && !newEquipWeapons.IsEmptyLeftHandSlot())
                 {
-                    if (TryGetWeaponAnimations(newEquipWeapons.leftHand.dataId, out WeaponAnimations anims))
+                    tempWeaponItem = newEquipWeapons.GetLeftHandWeaponItem();
+                    if (tempWeaponItem != null && TryGetWeaponAnimations(tempWeaponItem.WeaponType.DataId, out WeaponAnimations anims))
                         drawState = anims.leftHandHolsterAnimation.drawState;
                     else
                         drawState = defaultAnimations.leftHandHolsterAnimation.drawState;
