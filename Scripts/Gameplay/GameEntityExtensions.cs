@@ -35,71 +35,71 @@ namespace MultiplayerARPG
         public static bool IsNull(this IGameEntity obj)
         {
             if (obj is Object unityObj)
-                return unityObj != null;
-            return obj != null;
+                return unityObj == null;
+            return obj == null;
         }
 
         public static bool IsNull(this IGameEntityComponent obj)
         {
             if (obj is Object unityObj)
-                return unityObj != null;
-            return obj != null;
+                return unityObj == null;
+            return obj == null;
         }
 
         public static bool IsNull(this IDamageableEntity obj)
         {
             if (obj is Object unityObj)
-                return unityObj != null;
-            return obj != null;
+                return unityObj == null;
+            return obj == null;
         }
 
         public static bool IsNull(this ITargetableEntity obj)
         {
             if (obj is Object unityObj)
-                return unityObj != null;
-            return obj != null;
+                return unityObj == null;
+            return obj == null;
         }
 
         public static bool IsNull(this IEntityMovement obj)
         {
             if (obj is Object unityObj)
-                return unityObj != null;
-            return obj != null;
+                return unityObj == null;
+            return obj == null;
         }
 
         public static bool IsNull(this IEntityMovementComponent obj)
         {
             if (obj is Object unityObj)
-                return unityObj != null;
-            return obj != null;
+                return unityObj == null;
+            return obj == null;
         }
 
         public static bool IsNull(this IBaseActivatableEntity obj)
         {
             if (obj is Object unityObj)
-                return unityObj != null;
-            return obj != null;
+                return unityObj == null;
+            return obj == null;
         }
 
         public static bool IsNull(this IActivatableEntity obj)
         {
             if (obj is Object unityObj)
-                return unityObj != null;
-            return obj != null;
+                return unityObj == null;
+            return obj == null;
         }
 
         public static bool IsNull(this IHoldActivatableEntity obj)
         {
             if (obj is Object unityObj)
-                return unityObj != null;
-            return obj != null;
+                return unityObj == null;
+            return obj == null;
         }
 
         public static bool IsNull(this IPickupActivatableEntity obj)
         {
             if (obj is Object unityObj)
-                return unityObj != null;
-            return obj != null;
+                return unityObj == null;
+            return obj == null;
         }
 
         public static bool IsNull(this IUnHittable obj)
