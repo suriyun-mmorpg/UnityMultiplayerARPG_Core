@@ -139,6 +139,7 @@ namespace MultiplayerARPG
         protected int countDownToSetEquipItemsModels = FRAMES_BEFORE_SET_EQUIP_MODEL;
         protected float lastMountTime;
         protected float lastUseItemTime;
+        protected readonly Dictionary<int, float> lastUseItemTimes = new Dictionary<int, float>();
         protected float lastActionTime;
         protected float pushGameMessageCountDown;
         protected bool canCheckGrounded;

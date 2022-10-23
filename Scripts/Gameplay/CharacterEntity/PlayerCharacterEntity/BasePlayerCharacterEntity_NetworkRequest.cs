@@ -21,11 +21,18 @@ namespace MultiplayerARPG
             if (nonEquipItems[index].IsLock())
                 return false;
 
-            IUsableItem item = nonEquipItems[index].GetUsableItem();
-            if (item == null)
+
+            IUsableItem usableItem = nonEquipItems[index].GetUsableItem();
+            if (usableItem == null)
                 return false;
 
-            lastUseItemTime = Time.unscaledTime;
+            float time = Time.unscaledTime;
+            if (usableItem.UseItemCooldown > 0f && lastUseItemTimes.ContainsKey(index) && time - lastUseItemTimes[nonEquipItems[index].dataId] < usableItem.UseItemCooldown)
+                return false;
+
+            lastUseItemTime = time;
+            if (!IsServer)
+                lastUseItemTimes[nonEquipItems[index].dataId] = time;
             return true;
         }
 

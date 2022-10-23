@@ -1,4 +1,6 @@
 ﻿using LiteNetLibManager;
+using System.Reflection;
+using UnityEngine;
 
 namespace MultiplayerARPG
 {
@@ -26,20 +28,12 @@ namespace MultiplayerARPG
             if (usableItem == null)
                 return;
 
-            usableItem.UseItem(this, itemIndex, tempCharacterItem);
+            float time = Time.unscaledTime;
+            if (usableItem.UseItemCooldown > 0f && lastUseItemTimes.ContainsKey(itemIndex) && time - lastUseItemTimes[nonEquipItems[itemIndex].dataId] < usableItem.UseItemCooldown)
+                return;
 
-            if (usableItem.UseItemCooldown > 0f)
-            {
-                for (int i = 0; i < nonEquipItems.Count; ++i)
-                {
-                    if (nonEquipItems[i].dataId == usableItem.DataId)
-                    {
-                        tempCharacterItem = nonEquipItems[i];
-                        tempCharacterItem.Lock(usableItem.UseItemCooldown);
-                        nonEquipItems[i] = tempCharacterItem;
-                    }
-                }
-            }
+            usableItem.UseItem(this, itemIndex, tempCharacterItem);
+            lastUseItemTimes[nonEquipItems[itemIndex].dataId] = time;
 #endif
         }
     }
