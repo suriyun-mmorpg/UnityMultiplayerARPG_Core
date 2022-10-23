@@ -171,6 +171,7 @@ namespace MultiplayerARPG
             tempDeltaTime = Time.unscaledDeltaTime;
             TurnOnElapsed += tempDeltaTime;
 
+            HashSet<int> convertedItem = new HashSet<int>();
             ConvertItem convertData;
             List<CharacterItem> items = new List<CharacterItem>(GameInstance.ServerStorageHandlers.GetStorageEntityItems(this));
             CharacterItem tempItem;
@@ -179,6 +180,11 @@ namespace MultiplayerARPG
                 tempItem = items[i];
                 if (!CacheConvertItems.ContainsKey(tempItem.dataId))
                     continue;
+
+                if (convertedItem.Contains(tempItem.dataId))
+                    continue;
+
+                convertedItem.Add(tempItem.dataId);
 
                 convertData = CacheConvertItems[tempItem.dataId];
 
