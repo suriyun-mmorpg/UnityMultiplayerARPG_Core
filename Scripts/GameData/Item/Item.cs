@@ -690,7 +690,7 @@ namespace MultiplayerARPG
 
         protected void UseItemPotion(BaseCharacterEntity character, short itemIndex, short level)
         {
-            if (!character.CanUseItem() || level <= 0 || !character.DecreaseItemsByIndex(itemIndex, 1))
+            if (!character.CanUseItem() || level <= 0 || !character.DecreaseItemsByIndex(itemIndex, 1, false))
                 return;
             character.FillEmptySlots();
             character.ApplyBuff(DataId, BuffType.PotionBuff, level, character.GetInfo(), null);
@@ -698,7 +698,7 @@ namespace MultiplayerARPG
 
         protected void UseItemPet(BaseCharacterEntity character, short itemIndex, short level, int exp)
         {
-            if (!character.CanUseItem() || level <= 0 || !character.DecreaseItemsByIndex(itemIndex, 1))
+            if (!character.CanUseItem() || level <= 0 || !character.DecreaseItemsByIndex(itemIndex, 1, false))
                 return;
             character.FillEmptySlots();
             // Clear all summoned pets

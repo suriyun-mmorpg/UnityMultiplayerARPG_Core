@@ -98,7 +98,7 @@ namespace MultiplayerARPG
             {
                 GameInstance.ServerGameMessageHandlers.NotifyRewardItem(ConnectionId, characterItem.dataId, characterItem.amount);
             });
-            itemsContainerEntity.Items.DecreaseItemsByIndex(itemsContainerIndex, amount, false);
+            itemsContainerEntity.Items.DecreaseItemsByIndex(itemsContainerIndex, amount, false, true);
             itemsContainerEntity.PickedUp();
             this.FillEmptySlots();
 #endif
@@ -188,7 +188,7 @@ namespace MultiplayerARPG
             if (nonEquipItem.IsEmptySlot() || amount > nonEquipItem.amount)
                 return;
 
-            if (!this.DecreaseItemsByIndex(index, amount))
+            if (!this.DecreaseItemsByIndex(index, amount, false))
                 return;
 
             this.FillEmptySlots();

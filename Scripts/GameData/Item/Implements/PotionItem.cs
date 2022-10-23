@@ -39,7 +39,7 @@ namespace MultiplayerARPG
 
         public void UseItem(BaseCharacterEntity characterEntity, short itemIndex, CharacterItem characterItem)
         {
-            if (!characterEntity.CanUseItem() || characterItem.level <= 0 || !characterEntity.DecreaseItemsByIndex(itemIndex, 1))
+            if (!characterEntity.CanUseItem() || characterItem.level <= 0 || !characterEntity.DecreaseItemsByIndex(itemIndex, 1, false))
                 return;
             characterEntity.FillEmptySlots();
             characterEntity.ApplyBuff(DataId, BuffType.PotionBuff, characterItem.level, characterEntity.GetInfo(), null);

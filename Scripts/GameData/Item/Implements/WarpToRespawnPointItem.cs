@@ -44,7 +44,7 @@ namespace MultiplayerARPG
         public void UseItem(BaseCharacterEntity characterEntity, short itemIndex, CharacterItem characterItem)
         {
             BasePlayerCharacterEntity playerCharacterEntity = characterEntity as BasePlayerCharacterEntity;
-            if (playerCharacterEntity == null || !characterEntity.CanUseItem() || characterItem.level <= 0 || !characterEntity.DecreaseItemsByIndex(itemIndex, 1))
+            if (playerCharacterEntity == null || !characterEntity.CanUseItem() || characterItem.level <= 0 || !characterEntity.DecreaseItemsByIndex(itemIndex, 1, false))
                 return;
             GameInstance.ServerCharacterHandlers.Respawn(0, playerCharacterEntity);
         }

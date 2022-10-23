@@ -803,7 +803,7 @@ namespace MultiplayerARPG
                     return false;
                 if (itemIndex >= 0)
                 {
-                    if (characterData.DecreaseItemsByIndex(itemIndex, 1))
+                    if (characterData.DecreaseItemsByIndex(itemIndex, 1, false))
                         characterData.FillEmptySlots();
                     else
                         return false;
@@ -818,7 +818,7 @@ namespace MultiplayerARPG
                     return false;
                 if (itemIndex >= 0)
                 {
-                    if (characterData.DecreaseItemsByIndex(itemIndex, 1))
+                    if (characterData.DecreaseItemsByIndex(itemIndex, 1, false))
                         characterData.FillEmptySlots();
                     else
                         return false;
@@ -833,7 +833,7 @@ namespace MultiplayerARPG
         {
             if (itemIndex >= 0)
             {
-                if (characterData.DecreaseItemsByIndex(itemIndex, 1))
+                if (characterData.DecreaseItemsByIndex(itemIndex, 1, false))
                     characterData.FillEmptySlots();
                 else
                     return false;
@@ -874,7 +874,7 @@ namespace MultiplayerARPG
                     return false;
                 if (itemIndex >= 0)
                 {
-                    if (characterData.DecreaseItemsByIndex(itemIndex, 1))
+                    if (characterData.DecreaseItemsByIndex(itemIndex, 1, false))
                         characterData.FillEmptySlots();
                     else
                         return false;
@@ -889,7 +889,7 @@ namespace MultiplayerARPG
                     return false;
                 if (itemIndex >= 0)
                 {
-                    if (characterData.DecreaseItemsByIndex(itemIndex, 1))
+                    if (characterData.DecreaseItemsByIndex(itemIndex, 1, false))
                         characterData.FillEmptySlots();
                     else
                         return false;
@@ -904,7 +904,7 @@ namespace MultiplayerARPG
         {
             if (itemIndex >= 0)
             {
-                if (characterData.DecreaseItemsByIndex(itemIndex, 1))
+                if (characterData.DecreaseItemsByIndex(itemIndex, 1, false))
                     characterData.FillEmptySlots();
                 else
                     return false;

@@ -1177,7 +1177,7 @@ namespace MultiplayerARPG
             foreach (KeyValuePair<int, short> decreasingItem in decreasingItemIndexes)
             {
                 decreaseItems.Add(decreasingItem.Key, decreasingItem.Value);
-                itemList.DecreaseItemsByIndex(decreasingItem.Key, decreasingItem.Value, isLimitInventorySlot);
+                itemList.DecreaseItemsByIndex(decreasingItem.Key, decreasingItem.Value, isLimitInventorySlot, true);
             }
             return true;
         }
@@ -1257,7 +1257,7 @@ namespace MultiplayerARPG
             foreach (KeyValuePair<int, short> decreasingItem in decreasingItemIndexes)
             {
                 decreaseItems.Add(data.NonEquipItems[decreasingItem.Key], decreasingItem.Value);
-                DecreaseItemsByIndex(data, decreasingItem.Key, decreasingItem.Value);
+                DecreaseItemsByIndex(data, decreasingItem.Key, decreasingItem.Value, true);
             }
             return true;
         }
@@ -1269,13 +1269,19 @@ namespace MultiplayerARPG
         #endregion
 
         #region Decrease Items By Index
-        public static bool DecreaseItemsByIndex(this IList<CharacterItem> itemList, int index, short amount, bool isLimitInventorySlot)
+        public static bool DecreaseItemsByIndex(this IList<CharacterItem> itemList, int index, short amount, bool isLimitInventorySlot, bool adjustMaxAmount)
         {
             if (index < 0 || index >= itemList.Count)
                 return false;
             CharacterItem item = itemList[index];
-            if (item.IsEmptySlot() || amount > item.amount)
+            if (item.IsEmptySlot())
                 return false;
+            if (amount > item.amount)
+            {
+                if (!adjustMaxAmount)
+                    return false;
+                amount = item.amount;
+            }
             if (item.amount - amount == 0)
             {
                 if (isLimitInventorySlot)
@@ -1291,9 +1297,9 @@ namespace MultiplayerARPG
             return true;
         }
 
-        public static bool DecreaseItemsByIndex(this ICharacterData data, int index, short amount)
+        public static bool DecreaseItemsByIndex(this ICharacterData data, int index, short amount, bool adjustMaxAmount)
         {
-            if (data.NonEquipItems.DecreaseItemsByIndex(index, amount, GameInstance.Singleton.IsLimitInventorySlot))
+            if (data.NonEquipItems.DecreaseItemsByIndex(index, amount, GameInstance.Singleton.IsLimitInventorySlot, adjustMaxAmount))
                 return true;
             return false;
         }

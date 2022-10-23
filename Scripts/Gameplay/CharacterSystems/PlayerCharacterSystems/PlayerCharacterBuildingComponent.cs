@@ -18,18 +18,19 @@ namespace MultiplayerARPG
         protected void ServerConstructBuilding(short itemIndex, Vector3 position, Quaternion rotation, uint parentObjectId)
         {
 #if UNITY_EDITOR || UNITY_SERVER
-            if (!Entity.CanDoActions() ||
-                itemIndex >= Entity.NonEquipItems.Count)
+            if (!Entity.CanDoActions() || itemIndex >= Entity.NonEquipItems.Count)
+            {
                 return;
+            }
 
             BuildingEntity buildingEntity;
             CharacterItem nonEquipItem = Entity.NonEquipItems[itemIndex];
-            if (nonEquipItem.IsEmptySlot() ||
-                nonEquipItem.GetBuildingItem() == null ||
-                nonEquipItem.GetBuildingItem().BuildingEntity == null ||
+            if (nonEquipItem.IsEmptySlot() || nonEquipItem.GetBuildingItem() == null || nonEquipItem.GetBuildingItem().BuildingEntity == null ||
                 !GameInstance.BuildingEntities.TryGetValue(nonEquipItem.GetBuildingItem().BuildingEntity.EntityId, out buildingEntity) ||
-                !Entity.DecreaseItemsByIndex(itemIndex, 1))
+                !Entity.DecreaseItemsByIndex(itemIndex, 1, false))
+            {
                 return;
+            }
 
             Entity.FillEmptySlots();
             BuildingSaveData buildingSaveData = new BuildingSaveData();

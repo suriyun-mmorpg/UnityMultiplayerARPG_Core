@@ -597,7 +597,7 @@ namespace MultiplayerARPG
             short skillLevel;
             if (!Entity.ValidateSkillItemToUse(itemIndex, isLeftHand, targetObjectId, out skill, out skillLevel, out _))
                 return;
-            if (!Entity.DecreaseItemsByIndex(itemIndex, 1))
+            if (!Entity.DecreaseItemsByIndex(itemIndex, 1, false))
                 return;
             Entity.FillEmptySlots();
             // Set use skill state

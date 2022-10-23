@@ -45,7 +45,7 @@ namespace MultiplayerARPG
                             return false;
                         }
                         // Remove from storage
-                        storageItems.DecreaseItemsByIndex(storageItemIndex, storageItemAmount, storageIsLimitSlot);
+                        storageItems.DecreaseItemsByIndex(storageItemIndex, storageItemAmount, storageIsLimitSlot, true);
                     }
                     else
                     {
@@ -54,7 +54,7 @@ namespace MultiplayerARPG
                             // Replace empty slot
                             playerCharacter.NonEquipItems[inventoryItemIndex] = movingItem;
                             // Remove from storage
-                            storageItems.DecreaseItemsByIndex(storageItemIndex, storageItemAmount, storageIsLimitSlot);
+                            storageItems.DecreaseItemsByIndex(storageItemIndex, storageItemAmount, storageIsLimitSlot, true);
                         }
                         else
                         {
@@ -173,7 +173,7 @@ namespace MultiplayerARPG
                             return false;
                         }
                         // Remove from inventory
-                        playerCharacter.DecreaseItemsByIndex(inventoryItemIndex, inventoryItemAmount);
+                        playerCharacter.DecreaseItemsByIndex(inventoryItemIndex, inventoryItemAmount, true);
                     }
                     else
                     {
@@ -182,7 +182,7 @@ namespace MultiplayerARPG
                             // Replace empty slot
                             storageItems[storageItemIndex] = movingItem;
                             // Remove from inventory
-                            playerCharacter.DecreaseItemsByIndex(inventoryItemIndex, inventoryItemAmount);
+                            playerCharacter.DecreaseItemsByIndex(inventoryItemIndex, inventoryItemAmount, true);
                         }
                         else
                         {
@@ -244,7 +244,7 @@ namespace MultiplayerARPG
                         equipWeapons.leftHand = movingItem;
                         playerCharacter.SelectableWeaponSets[equipSlotIndexOrWeaponSet] = equipWeapons;
                         // Remove from storage
-                        storageItems.DecreaseItemsByIndex(storageItemIndex, movingItem.amount, storageIsLimitSlot);
+                        storageItems.DecreaseItemsByIndex(storageItemIndex, movingItem.amount, storageIsLimitSlot, true);
                     }
                     else
                     {
@@ -272,7 +272,7 @@ namespace MultiplayerARPG
                         equipWeapons.rightHand = movingItem;
                         playerCharacter.SelectableWeaponSets[equipSlotIndexOrWeaponSet] = equipWeapons;
                         // Remove from storage
-                        storageItems.DecreaseItemsByIndex(storageItemIndex, movingItem.amount, storageIsLimitSlot);
+                        storageItems.DecreaseItemsByIndex(storageItemIndex, movingItem.amount, storageIsLimitSlot, true);
                     }
                     else
                     {
@@ -294,7 +294,7 @@ namespace MultiplayerARPG
                         movingItem.equipSlotIndex = equipSlotIndexOrWeaponSet;
                         playerCharacter.EquipItems.Add(movingItem);
                         // Remove from storage
-                        storageItems.DecreaseItemsByIndex(storageItemIndex, movingItem.amount, storageIsLimitSlot);
+                        storageItems.DecreaseItemsByIndex(storageItemIndex, movingItem.amount, storageIsLimitSlot, true);
                     }
                     else
                     {
@@ -754,7 +754,7 @@ namespace MultiplayerARPG
             }
 
             // Simulate data before applies
-            if (!simulatingNonEquipItems.DecreaseItemsByIndex(index, amount, GameInstance.Singleton.IsLimitInventorySlot))
+            if (!simulatingNonEquipItems.DecreaseItemsByIndex(index, amount, GameInstance.Singleton.IsLimitInventorySlot, false))
             {
                 gameMessage = UITextKeys.UI_ERROR_NOT_ENOUGH_ITEMS;
                 return false;
@@ -791,7 +791,7 @@ namespace MultiplayerARPG
                 return false;
 
             character.Gold = character.Gold.Increase(returningGold);
-            character.DecreaseItemsByIndex(index, amount);
+            character.DecreaseItemsByIndex(index, amount, true);
             character.IncreaseItems(returningItems);
             character.IncreaseCurrencies(returningCurrencies);
             character.FillEmptySlots();
@@ -839,7 +839,7 @@ namespace MultiplayerARPG
             indexes.Sort();
             for (int i = indexes.Count - 1; i >= 0; --i)
             {
-                character.DecreaseItemsByIndex(indexes[i], indexAmountPairs[indexes[i]]);
+                character.DecreaseItemsByIndex(indexes[i], indexAmountPairs[indexes[i]], true);
             }
             character.IncreaseItems(returningItems);
             character.IncreaseCurrencies(returningCurrencies);
@@ -986,7 +986,7 @@ namespace MultiplayerARPG
             }
 
             // Remove item from inventory
-            character.DecreaseItemsByIndex(index, amount);
+            character.DecreaseItemsByIndex(index, amount, true);
             character.FillEmptySlots();
 
             // Increase currencies
