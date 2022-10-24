@@ -127,6 +127,9 @@ namespace MultiplayerARPG
 
         public virtual void EnterWarp(BasePlayerCharacterEntity playerCharacterEntity)
         {
+            if (playerCharacterEntity.IsDead())
+                return;
+
             WarpPortalType portalType = warpPortalType;
             string mapName = warpToMapInfo == null ? string.Empty : warpToMapInfo.Id;
             Vector3 position = warpToPosition;
