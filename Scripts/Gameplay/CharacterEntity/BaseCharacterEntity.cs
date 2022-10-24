@@ -315,7 +315,7 @@ namespace MultiplayerARPG
                 ExitVehicle();
 
             // Enable movement or not
-            if (Movement.Enabled != tempEnableMovement)
+            if (!Movement.IsNull() && Movement.Enabled != tempEnableMovement)
             {
                 if (!tempEnableMovement)
                     Movement.StopMove();
@@ -393,7 +393,7 @@ namespace MultiplayerARPG
             else if (ChargeComponent.WriteClientStartChargeState(EntityStateDataWriter))
                 inputState |= CharacterInputState.IsChargeStarting;
             // Movement
-            if (Movement != null && Movement.Enabled && Movement.WriteClientState(EntityStateDataWriter, out shouldSendReliably))
+            if (!Movement.IsNull() && Movement.Enabled && Movement.WriteClientState(EntityStateDataWriter, out shouldSendReliably))
                 inputState |= CharacterInputState.IsMoving;
             // Set input state and send to clients
             if (inputState != CharacterInputState.None)
@@ -428,7 +428,7 @@ namespace MultiplayerARPG
             else if (ChargeComponent.WriteServerStartChargeState(EntityStateDataWriter))
                 inputState |= CharacterInputState.IsChargeStarting;
             // Movement
-            if (Movement != null && Movement.Enabled && Movement.WriteServerState(EntityStateDataWriter, out shouldSendReliably))
+            if (!Movement.IsNull() && Movement.Enabled && Movement.WriteServerState(EntityStateDataWriter, out shouldSendReliably))
                 inputState |= CharacterInputState.IsMoving;
             // Set input state and send to clients
             if (inputState != CharacterInputState.None)
