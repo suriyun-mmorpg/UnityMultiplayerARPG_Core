@@ -473,7 +473,7 @@ namespace MultiplayerARPG
                             if (shareGuildExpRate > 0)
                             {
                                 // Increase guild exp
-                                GameInstance.ServerGuildHandlers.IncreaseGuildExp(tempPlayerCharacterEntity, (int)(reward.exp * shareGuildExpRate * rewardRate));
+                                GameInstance.ServerGuildHandlers.IncreaseGuildExp(tempPlayerCharacterEntity, Mathf.CeilToInt(reward.exp * shareGuildExpRate * rewardRate));
                             }
                         }
                         // Try find party data from player character
