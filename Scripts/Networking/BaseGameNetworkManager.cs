@@ -436,6 +436,7 @@ namespace MultiplayerARPG
 
         public override void OnPeerConnected(long connectionId)
         {
+            this.InvokeInstanceDevExtMethods("OnPeerConnected", connectionId);
             SendMapInfo(connectionId);
             SendTimeOfDay(connectionId);
             base.OnPeerConnected(connectionId);
