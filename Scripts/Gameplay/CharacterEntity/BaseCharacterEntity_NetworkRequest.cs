@@ -40,8 +40,7 @@
 
         public bool CallServerDropItem(short nonEquipIndex, short amount)
         {
-            if (!CanDoActions() ||
-                nonEquipIndex >= NonEquipItems.Count)
+            if (!CanDoActions() || nonEquipIndex >= NonEquipItems.Count)
                 return false;
             RPC(ServerDropItem, nonEquipIndex, amount);
             return true;
