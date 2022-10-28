@@ -134,12 +134,12 @@ namespace MultiplayerARPG
         public MovementRestriction MovementRestrictionWhileCharging { get { return ChargeComponent.MovementRestrictionWhileCharging; } }
         public float RespawnGroundedCheckCountDown { get; protected set; }
         public float RespawnInvincibleCountDown { get; protected set; }
+        public float LastUseItemTime { get; set; }
+        public Dictionary<int, float> LastUseItemTimes { get; private set; } = new Dictionary<int, float>();
 
         protected int countDownToSetEquipWeaponsModels = FRAMES_BEFORE_SET_EQUIP_MODEL;
         protected int countDownToSetEquipItemsModels = FRAMES_BEFORE_SET_EQUIP_MODEL;
         protected float lastMountTime;
-        protected float lastUseItemTime;
-        protected readonly Dictionary<int, float> lastUseItemTimes = new Dictionary<int, float>();
         protected float lastActionTime;
         protected float pushGameMessageCountDown;
         protected bool canCheckGrounded;
@@ -655,9 +655,7 @@ namespace MultiplayerARPG
             if (!UpdateLastActionTime())
                 return false;
 
-            BaseSkill skill;
-            UITextKeys gameMessage;
-            if (!this.ValidateSkillItemToUse(index, isLeftHand, targetObjectId, out skill, out _, out gameMessage))
+            if (!this.ValidateSkillItemToUse(index, isLeftHand, targetObjectId, out _, out BaseSkill skill, out _, out UITextKeys gameMessage))
             {
                 if (gameMessage != UITextKeys.NONE)
                     QueueGameMessage(gameMessage);

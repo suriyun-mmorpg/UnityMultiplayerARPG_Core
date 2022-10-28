@@ -4,7 +4,7 @@ namespace MultiplayerARPG
 {
     public partial class BasePlayerCharacterEntity
     {
-        public bool ValidateRequestUseItem(short index)
+        public bool ValidateRequestUseItem(short itemIndex)
         {
             if (!CanUseItem())
                 return false;
@@ -12,27 +12,28 @@ namespace MultiplayerARPG
             if (!UpdateLastActionTime())
                 return false;
 
-            if (Time.unscaledTime - lastUseItemTime < CurrentGameInstance.useItemDelay)
+            if (Time.unscaledTime - LastUseItemTime < CurrentGameInstance.useItemDelay)
                 return false;
 
-            if (index >= nonEquipItems.Count)
+            if (itemIndex >= nonEquipItems.Count)
                 return false;
 
-            if (nonEquipItems[index].IsLock())
+            if (nonEquipItems[itemIndex].IsLock())
                 return false;
 
 
-            IUsableItem usableItem = nonEquipItems[index].GetUsableItem();
+            IUsableItem usableItem = nonEquipItems[itemIndex].GetUsableItem();
             if (usableItem == null)
                 return false;
 
             float time = Time.unscaledTime;
-            if (usableItem.UseItemCooldown > 0f && lastUseItemTimes.ContainsKey(index) && time - lastUseItemTimes[nonEquipItems[index].dataId] < usableItem.UseItemCooldown)
+            int itemDataId = nonEquipItems[itemIndex].dataId;
+            if (usableItem.UseItemCooldown > 0f && LastUseItemTimes.ContainsKey(itemDataId) && time - LastUseItemTimes[itemDataId] < usableItem.UseItemCooldown)
                 return false;
 
-            lastUseItemTime = time;
+            LastUseItemTime = time;
             if (!IsServer)
-                lastUseItemTimes[nonEquipItems[index].dataId] = time;
+                LastUseItemTimes[itemDataId] = time;
             return true;
         }
 

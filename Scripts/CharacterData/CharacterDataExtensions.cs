@@ -2128,8 +2128,9 @@ namespace MultiplayerARPG
             return true;
         }
 
-        public static bool ValidateSkillItemToUse(this BaseCharacterEntity character, short itemIndex, bool isLeftHand, uint targetObjectId, out BaseSkill skill, out short skillLevel, out UITextKeys gameMessage)
+        public static bool ValidateSkillItemToUse(this BaseCharacterEntity character, short itemIndex, bool isLeftHand, uint targetObjectId, out ISkillItem skillItem, out BaseSkill skill, out short skillLevel, out UITextKeys gameMessage)
         {
+            skillItem = null;
             skill = null;
             skillLevel = 0;
             gameMessage = UITextKeys.NONE;
@@ -2140,14 +2141,14 @@ namespace MultiplayerARPG
                 return false;
             }
 
-            ISkillItem item = character.NonEquipItems[itemIndex].GetSkillItem();
-            if (item == null || item.UsingSkill == null ||
-                !item.UsingSkill.CanUse(character, item.UsingSkillLevel, isLeftHand, targetObjectId, out gameMessage, true))
+            skillItem = character.NonEquipItems[itemIndex].GetSkillItem();
+            if (skillItem == null || skillItem.UsingSkill == null ||
+                !skillItem.UsingSkill.CanUse(character, skillItem.UsingSkillLevel, isLeftHand, targetObjectId, out gameMessage, true))
             {
                 return false;
             }
-            skill = item.UsingSkill;
-            skillLevel = item.UsingSkillLevel;
+            skill = skillItem.UsingSkill;
+            skillLevel = skillItem.UsingSkillLevel;
 
             return true;
         }

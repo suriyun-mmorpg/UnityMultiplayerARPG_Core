@@ -420,10 +420,17 @@ namespace MultiplayerARPG
             if (!IsServer && IsOwnerClient)
             {
                 // Validate skill
-                BaseSkill skill;
-                short skillLevel;
-                if (!Entity.ValidateSkillItemToUse(itemIndex, isLeftHand, targetObjectId, out skill, out skillLevel, out _))
+                if (!Entity.ValidateSkillItemToUse(itemIndex, isLeftHand, targetObjectId, out ISkillItem skillItem, out BaseSkill skill, out short skillLevel, out _))
                     return;
+                // Validate using time
+                float time = Time.unscaledTime;
+                int itemDataId = Entity.NonEquipItems[itemIndex].dataId;
+                if (skillItem.UseItemCooldown > 0f && Entity.LastUseItemTimes.ContainsKey(itemDataId) && time - Entity.LastUseItemTimes[itemDataId] < skillItem.UseItemCooldown)
+                    return;
+                // Update using time
+                Entity.LastUseItemTime = time;
+                if (!IsServer)
+                    Entity.LastUseItemTimes[itemDataId] = time;
                 // Get simulate seed for simulation validating
                 byte simulateSeed = (byte)Random.Range(byte.MinValue, byte.MaxValue);
                 // Set use skill state
@@ -593,10 +600,14 @@ namespace MultiplayerARPG
             if (Time.unscaledTime - LastUseSkillEndTime < -0.05f)
                 return;
             // Validate skill item
-            BaseSkill skill;
-            short skillLevel;
-            if (!Entity.ValidateSkillItemToUse(itemIndex, isLeftHand, targetObjectId, out skill, out skillLevel, out _))
+            if (!Entity.ValidateSkillItemToUse(itemIndex, isLeftHand, targetObjectId, out ISkillItem skillItem, out BaseSkill skill, out short skillLevel, out _))
                 return;
+            // Validate using time
+            float time = Time.unscaledTime;
+            int itemDataId = Entity.NonEquipItems[itemIndex].dataId;
+            if (skillItem.UseItemCooldown > 0f && Entity.LastUseItemTimes.ContainsKey(itemDataId) && time - Entity.LastUseItemTimes[itemDataId] < skillItem.UseItemCooldown)
+                return;
+            // Decrease items
             if (!Entity.DecreaseItemsByIndex(itemIndex, 1, false))
                 return;
             Entity.FillEmptySlots();
@@ -612,6 +623,8 @@ namespace MultiplayerARPG
             sendingIsLeftHand = isLeftHand;
             sendingTargetObjectId = targetObjectId;
             sendingAimPosition = aimPosition;
+            // Update using time
+            Entity.LastUseItemTimes[itemDataId] = time;
 #endif
         }
 
