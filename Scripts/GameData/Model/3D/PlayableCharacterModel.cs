@@ -36,6 +36,7 @@ namespace MultiplayerARPG.GameData.Model.Playables
         public PlayableGraph Graph { get; protected set; }
         public AnimationPlayableBehaviour Template { get; protected set; }
         public AnimationPlayableBehaviour Behaviour { get; protected set; }
+        public float AwakenTime { get; protected set; }
 
         protected WeaponType equippedWeaponType = null;
         protected Coroutine actionCoroutine = null;
@@ -45,6 +46,7 @@ namespace MultiplayerARPG.GameData.Model.Playables
         protected override void Awake()
         {
             base.Awake();
+            AwakenTime = Time.unscaledTime;
             if (animator == null)
                 animator = GetComponentInChildren<Animator>();
             Template = new AnimationPlayableBehaviour();
@@ -171,7 +173,7 @@ namespace MultiplayerARPG.GameData.Model.Playables
             // Player draw/holster animation
             if (oldEquipWeapons == null)
                 oldEquipWeapons = newEquipWeapons;
-            if (isDoingAction || !newEquipWeapons.IsDiffer(oldEquipWeapons, out bool rightIsDiffer, out bool leftIsDiffer))
+            if (Time.unscaledTime - AwakenTime < 1f ||  isDoingAction || !newEquipWeapons.IsDiffer(oldEquipWeapons, out bool rightIsDiffer, out bool leftIsDiffer))
             {
                 if (newEquipWeapons != null)
                     oldEquipWeapons = newEquipWeapons.Clone();

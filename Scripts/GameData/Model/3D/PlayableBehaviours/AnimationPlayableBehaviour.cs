@@ -289,12 +289,10 @@ namespace MultiplayerARPG.GameData.Model.Playables
         private readonly Dictionary<string, BaseStateInfo> baseStates = new Dictionary<string, BaseStateInfo>();
         private readonly Dictionary<string, LeftHandWieldingStateInfo> leftHandWieldingStates = new Dictionary<string, LeftHandWieldingStateInfo>();
         private bool readyToPlay = false;
-        private float awakenTime;
 
         public void Setup(PlayableCharacterModel characterModel)
         {
             CharacterModel = characterModel;
-            awakenTime = Time.unscaledTime;
             // Setup clips by settings in character model
             // Default
             SetupDefaultAnimations(characterModel.defaultAnimations);
@@ -693,7 +691,7 @@ namespace MultiplayerARPG.GameData.Model.Playables
             float weight;
             float weightUpdate;
             bool transitionEnded = false;
-            if (CharacterModel.isDead && Time.unscaledTime - awakenTime < 1f)
+            if (CharacterModel.isDead && Time.unscaledTime - CharacterModel.AwakenTime < 1f)
             {
                 // Play dead animation at end frame immediately
                 mixer.GetInput(stateUpdateData.inputPort).SetTime(baseStates[stateUpdateData.playingStateId].State.clip.length);
