@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System.Collections.Generic;
+using UnityEngine;
 
 namespace MultiplayerARPG
 {
@@ -28,67 +29,66 @@ namespace MultiplayerARPG
 
         private void Update()
         {
-            if (characterEntity == null || !characterEntity.IsClient ||
-                GameInstance.PlayingCharacterEntity == null ||
-                (characterEntity.IsServer && characterEntity.Identity.CountSubscribers() == 0) ||
-                Vector3.Distance(characterEntity.EntityTransform.position, GameInstance.PlayingCharacterEntity.EntityTransform.position) > updateWithinRange)
+            if (characterEntity == null || !characterEntity.IsClient || (characterEntity.IsServer && characterEntity.Identity.CountSubscribers() == 0) ||
+                GameInstance.PlayingCharacterEntity == null || Vector3.Distance(characterEntity.EntityTransform.position, GameInstance.PlayingCharacterEntity.EntityTransform.position) > updateWithinRange)
             {
-                if (owningIndicator != null && owningIndicator.activeSelf)
-                    owningIndicator.SetActive(false);
-                if (allyIndicator != null && allyIndicator.activeSelf)
-                    allyIndicator.SetActive(false);
-                if (partyMemberIndicator != null && partyMemberIndicator.activeSelf)
-                    partyMemberIndicator.SetActive(false);
-                if (guildMemberIndicator != null && guildMemberIndicator.activeSelf)
-                    guildMemberIndicator.SetActive(false);
-                if (enemyIndicator != null && enemyIndicator.activeSelf)
-                    enemyIndicator.SetActive(false);
-                if (neutralIndicator != null && neutralIndicator.activeSelf)
-                    neutralIndicator.SetActive(false);
+                HideAll();
                 return;
             }
 
             if (Time.unscaledTime - lastUpdateTime >= updateRepeatRate)
             {
                 lastUpdateTime = Time.unscaledTime;
-
+                HideAll();
+                EntityInfo entityInfo = characterEntity.GetInfo();
+                List<GameObject> showingObjects = new List<GameObject>();
                 bool isShowing;
 
                 isShowing = GameInstance.PlayingCharacterEntity == characterEntity;
-                if (owningIndicator != null && owningIndicator.activeSelf != isShowing)
-                    owningIndicator.SetActive(isShowing);
+                if (owningIndicator != null && isShowing && !showingObjects.Contains(owningIndicator))
+                    showingObjects.Add(owningIndicator);
 
                 isShowing = characterEntity.IsAlly(GameInstance.PlayingCharacterEntity.GetInfo());
-                if (allyIndicator != null && allyIndicator.activeSelf != isShowing)
-                    allyIndicator.SetActive(isShowing);
+                if (allyIndicator != null && isShowing && !showingObjects.Contains(allyIndicator))
+                    showingObjects.Add(allyIndicator);
 
-                BasePlayerCharacterEntity playerCharacterEntity = characterEntity as BasePlayerCharacterEntity;
-                if (playerCharacterEntity != null)
-                {
-                    isShowing = playerCharacterEntity.PartyId > 0 && playerCharacterEntity.PartyId == GameInstance.PlayingCharacter.PartyId;
-                    if (partyMemberIndicator != null && partyMemberIndicator.activeSelf != isShowing)
-                        partyMemberIndicator.SetActive(isShowing);
-                    isShowing = playerCharacterEntity.GuildId > 0 && playerCharacterEntity.GuildId == GameInstance.PlayingCharacter.GuildId;
-                    if (guildMemberIndicator != null && guildMemberIndicator.activeSelf != isShowing)
-                        guildMemberIndicator.SetActive(isShowing);
-                }
-                else
-                {
-                    isShowing = false;
-                    if (partyMemberIndicator != null && partyMemberIndicator.activeSelf != isShowing)
-                        partyMemberIndicator.SetActive(isShowing);
-                    if (guildMemberIndicator != null && guildMemberIndicator.activeSelf != isShowing)
-                        guildMemberIndicator.SetActive(isShowing);
-                }
+                isShowing = entityInfo.PartyId > 0 && entityInfo.PartyId == GameInstance.PlayingCharacter.PartyId;
+                if (partyMemberIndicator != null && isShowing && !showingObjects.Contains(partyMemberIndicator))
+                    showingObjects.Add(partyMemberIndicator);
+
+                isShowing = entityInfo.GuildId > 0 && entityInfo.GuildId == GameInstance.PlayingCharacter.GuildId;
+                if (guildMemberIndicator != null && isShowing && !showingObjects.Contains(guildMemberIndicator))
+                    showingObjects.Add(guildMemberIndicator);
 
                 isShowing = characterEntity.IsEnemy(GameInstance.PlayingCharacterEntity.GetInfo());
-                if (enemyIndicator != null && enemyIndicator.activeSelf != isShowing)
-                    enemyIndicator.SetActive(isShowing);
+                if (enemyIndicator != null && isShowing && !showingObjects.Contains(enemyIndicator))
+                    showingObjects.Add(enemyIndicator);
 
                 isShowing = characterEntity.IsNeutral(GameInstance.PlayingCharacterEntity.GetInfo());
-                if (neutralIndicator != null && neutralIndicator.activeSelf != isShowing)
-                    neutralIndicator.SetActive(isShowing);
+                if (neutralIndicator != null && isShowing && !showingObjects.Contains(neutralIndicator))
+                    showingObjects.Add(neutralIndicator);
+
+                for (int i = 0; i < showingObjects.Count; ++i)
+                {
+                    showingObjects[i].SetActive(true);
+                }
             }
+        }
+
+        public void HideAll()
+        {
+            if (owningIndicator != null && owningIndicator.activeSelf)
+                owningIndicator.SetActive(false);
+            if (allyIndicator != null && allyIndicator.activeSelf)
+                allyIndicator.SetActive(false);
+            if (partyMemberIndicator != null && partyMemberIndicator.activeSelf)
+                partyMemberIndicator.SetActive(false);
+            if (guildMemberIndicator != null && guildMemberIndicator.activeSelf)
+                guildMemberIndicator.SetActive(false);
+            if (enemyIndicator != null && enemyIndicator.activeSelf)
+                enemyIndicator.SetActive(false);
+            if (neutralIndicator != null && neutralIndicator.activeSelf)
+                neutralIndicator.SetActive(false);
         }
     }
 }
