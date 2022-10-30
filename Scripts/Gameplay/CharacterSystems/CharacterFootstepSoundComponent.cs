@@ -165,6 +165,9 @@ namespace MultiplayerARPG
 
         public void PlaySound()
         {
+            if (Application.isBatchMode || AudioListener.pause)
+                return;
+
             // Don't play sound while muting footstep sound
             if (Entity.MuteFootstepSound)
                 return;

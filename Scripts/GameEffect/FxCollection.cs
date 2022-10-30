@@ -98,6 +98,8 @@ namespace MultiplayerARPG
 
         public void Play()
         {
+            if (Application.isBatchMode)
+                return;
             int i;
             // Play particles
             ParticleSystem.MainModule mainEmitter;
@@ -120,6 +122,7 @@ namespace MultiplayerARPG
                 audioSources[i].volume = volume;
                 audioSources[i].Play();
             }
+            // Play audio source setters
             for (i = 0; i < audioSourceSetters.Length; ++i)
             {
                 audioSourceSetters[i].Play();
@@ -128,15 +131,23 @@ namespace MultiplayerARPG
 
         public void Stop()
         {
+            if (Application.isBatchMode)
+                return;
+            int i;
             // Stop particles
-            foreach (ParticleSystem particle in particles)
+            for (i = 0; i < particles.Length; ++i)
             {
-                particle.Stop();
+                particles[i].Stop();
             }
             // Stop audio sources
-            foreach (AudioSource audioSource in audioSources)
+            for (i = 0; i < audioSources.Length; ++i)
             {
-                audioSource.Stop();
+                audioSources[i].Stop();
+            }
+            // Stop audio source setters
+            for (i = 0; i < audioSourceSetters.Length; ++i)
+            {
+                audioSourceSetters[i].Stop();
             }
         }
     }

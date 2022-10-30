@@ -123,9 +123,12 @@ namespace MultiplayerARPG
                 gameObject.SetActive(true);
             // Prepare destroy time
             destroyTime = isLoop ? -1 : Time.time + lifeTime;
-            // Play random audio
-            if (randomSoundEffects.Length > 0)
-                AudioSource.PlayClipAtPoint(randomSoundEffects[Random.Range(0, randomSoundEffects.Length)], CacheTransform.position, AudioManager.Singleton.GetVolumeLevel(SettingId));
+            if (!Application.isBatchMode && !AudioListener.pause)
+            {
+                // Play random audio
+                if (randomSoundEffects.Length > 0)
+                    AudioSource.PlayClipAtPoint(randomSoundEffects[Random.Range(0, randomSoundEffects.Length)], CacheTransform.position, AudioManager.Singleton.GetVolumeLevel(SettingId));
+            }
             FxCollection.Play();
         }
     }
