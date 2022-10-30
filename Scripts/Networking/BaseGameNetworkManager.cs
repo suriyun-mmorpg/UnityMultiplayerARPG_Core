@@ -333,6 +333,7 @@ namespace MultiplayerARPG
             if (ClientOnlineCharacterHandlers != null)
                 ClientOnlineCharacterHandlers.ClearOnlineCharacters();
             CurrentMapInfo = null;
+            isReadyToInstantiatePlayers = false;
             // Extensions
             this.InvokeInstanceDevExtMethods("Clean");
             foreach (BaseGameNetworkManagerComponent component in ManagerComponents)
