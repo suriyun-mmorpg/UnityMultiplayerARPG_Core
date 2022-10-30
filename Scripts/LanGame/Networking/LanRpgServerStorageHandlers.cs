@@ -51,56 +51,37 @@ namespace MultiplayerARPG
             return usingStorageIds.TryGetValue(connectionId, out storageId);
         }
 
-        public async UniTask<bool> IncreaseStorageItems(StorageId storageId, CharacterItem addingItem)
+        public async UniTask<CharacterItem> ConvertStorageItems(StorageId storageId, int dataId, short amount, int convertedDataId, short convertedAmount)
         {
-            await UniTask.Yield();
-            if (addingItem.IsEmptySlot())
-                return false;
-            List<CharacterItem> storageItems = GetStorageItems(storageId);
             // Prepare storage data
             Storage storage = GetStorage(storageId, out _);
             bool isLimitWeight = storage.weightLimit > 0;
             bool isLimitSlot = storage.slotLimit > 0;
             short weightLimit = storage.weightLimit;
             short slotLimit = storage.slotLimit;
-            // Increase item to storage
-            bool isOverwhelming = storageItems.IncreasingItemsWillOverwhelming(
-                addingItem.dataId, addingItem.amount, isLimitWeight, weightLimit,
-                storageItems.GetTotalItemWeight(), isLimitSlot, slotLimit);
-            if (!isOverwhelming && storageItems.IncreaseItems(addingItem))
-            {
-                // Update slots
-                storageItems.FillEmptySlots(isLimitSlot, slotLimit);
-                SetStorageItems(storageId, storageItems);
-                NotifyStorageItemsUpdated(storageId.storageType, storageId.storageOwnerId);
-                return true;
-            }
-            return false;
-        }
-
-        public async UniTask<DecreaseStorageItemsResult> DecreaseStorageItems(StorageId storageId, int dataId, short amount)
-        {
-            await UniTask.Yield();
-            List<CharacterItem> storageItems = GetStorageItems(storageId);
-            // Prepare storage data
-            Storage storage = GetStorage(storageId, out _);
-            bool isLimitSlot = storage.slotLimit > 0;
-            short slotLimit = storage.slotLimit;
+            // Prepare storage items
+            List<CharacterItem> storageItems = new List<CharacterItem>(GetStorageItems(storageId));
             // Decrease item from storage
-            Dictionary<int, short> decreasedItems;
-            if (storageItems.DecreaseItems(dataId, amount, isLimitSlot, out decreasedItems))
+            if (!storageItems.DecreaseItems(dataId, amount, isLimitSlot, out _))
+                return null;
+            // Increase item to storage
+            CharacterItem droppingItem = null;
+            if (GameInstance.Items.ContainsKey(convertedDataId) && convertedAmount > 0)
             {
-                // Update slots
-                storageItems.FillEmptySlots(isLimitSlot, slotLimit);
-                SetStorageItems(storageId, storageItems);
-                NotifyStorageItemsUpdated(storageId.storageType, storageId.storageOwnerId);
-                return new DecreaseStorageItemsResult()
+                // Increase item to storage
+                droppingItem = CharacterItem.Create(convertedDataId, convertedAmount);
+                if (!storageItems.IncreasingItemsWillOverwhelming(convertedDataId, convertedAmount, isLimitWeight, weightLimit, storageItems.GetTotalItemWeight(), isLimitSlot, slotLimit))
                 {
-                    IsSuccess = true,
-                    DecreasedItems = decreasedItems,
-                };
+                    storageItems.IncreaseItems(droppingItem);
+                    droppingItem = null;
+                }
             }
-            return new DecreaseStorageItemsResult();
+            // Update slots
+            storageItems.FillEmptySlots(isLimitSlot, slotLimit);
+            SetStorageItems(storageId, storageItems);
+            NotifyStorageItemsUpdated(storageId.storageType, storageId.storageOwnerId);
+            await UniTask.Yield();
+            return droppingItem;
         }
 
         public List<CharacterItem> GetStorageItems(StorageId storageId)

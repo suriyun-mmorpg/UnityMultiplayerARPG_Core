@@ -36,19 +36,15 @@ namespace MultiplayerARPG
         bool TryGetOpenedStorageId(long connectionId, out StorageId storageId);
 
         /// <summary>
-        /// Increase items to storage
-        /// </summary>
-        /// <param name="storageId"></param>
-        /// <param name="addingItem"></param>
-        UniTask<bool> IncreaseStorageItems(StorageId storageId, CharacterItem addingItem);
-
-        /// <summary>
-        /// Decrease items from storage
+        /// Decrease items from storage, return item which going to drop on ground
         /// </summary>
         /// <param name="storageId"></param>
         /// <param name="dataId"></param>
         /// <param name="amount"></param>
-        UniTask<DecreaseStorageItemsResult> DecreaseStorageItems(StorageId storageId, int dataId, short amount);
+        /// <param name="convertedDataId"></param>
+        /// <param name="convertedAmount"></param>
+        /// <returns></returns>
+        UniTask<CharacterItem> ConvertStorageItems(StorageId storageId, int dataId, short amount, int convertedDataId, short convertedAmount);
 
         /// <summary>
         /// Get storage items by storage Id

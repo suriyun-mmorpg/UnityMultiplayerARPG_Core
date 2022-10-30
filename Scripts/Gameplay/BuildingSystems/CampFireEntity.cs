@@ -204,17 +204,15 @@ namespace MultiplayerARPG
         protected async UniTaskVoid ConvertItem(ConvertItem convertData)
         {
             StorageId storageId = new StorageId(StorageType.Building, Id);
-            ItemAmount tempItemAmount = convertData.item;
-            await GameInstance.ServerStorageHandlers.DecreaseStorageItems(storageId, tempItemAmount.item.DataId, tempItemAmount.amount);
-            if (convertData.convertedItem.item != null)
+            int dataId = convertData.item.item != null ? convertData.item.item.DataId : 0;
+            short amount = convertData.item.amount;
+            int convertedDataId = convertData.convertedItem.item != null ? convertData.convertedItem.item.DataId : 0;
+            short convertedAmount = convertData.convertedItem.amount;
+            CharacterItem droppingItem = await GameInstance.ServerStorageHandlers.ConvertStorageItems(storageId, dataId, amount, convertedDataId, convertedAmount);
+            if (droppingItem != null)
             {
-                tempItemAmount = convertData.convertedItem;
-                CharacterItem convertedItem = CharacterItem.Create(tempItemAmount.item.DataId, 1, tempItemAmount.amount);
-                if (!await GameInstance.ServerStorageHandlers.IncreaseStorageItems(storageId, convertedItem))
-                {
-                    // Cannot add item to storage, so drop to ground
-                    ItemDropEntity.DropItem(this, convertedItem, new string[0]);
-                }
+                // Drop item on ground
+                ItemDropEntity.DropItem(this, droppingItem, new string[0]);
             }
         }
 
