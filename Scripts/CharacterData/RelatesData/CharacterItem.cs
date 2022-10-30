@@ -572,6 +572,7 @@ namespace MultiplayerARPG
             if (this.IsEmptySlot())
             {
                 writer.Put((byte)CharacterItemSyncState.IsEmpty);
+                writer.Put(id);
                 return;
             }
             bool isEquipment = GetEquipmentItem() != null;
@@ -634,7 +635,7 @@ namespace MultiplayerARPG
             CharacterItemSyncState syncState = (CharacterItemSyncState)reader.GetByte();
             if (syncState == CharacterItemSyncState.IsEmpty)
             {
-                id = string.Empty;
+                id = reader.GetString();
                 dataId = 0;
                 level = 0;
                 amount = 0;
