@@ -661,11 +661,17 @@ namespace MultiplayerARPG
             System.GC.Collect();
         }
 
-        protected override void HandleEnterGameResponse(ResponseHandlerData responseHandler, AckResponseCode responseCode, EnterGameResponseMessage response)
+        protected override void HandleClientReadyResponse(ResponseHandlerData responseHandler, AckResponseCode responseCode, EmptyMessage response)
         {
-            base.HandleEnterGameResponse(responseHandler, responseCode, response);
+            base.HandleClientReadyResponse(responseHandler, responseCode, response);
             if (responseCode != AckResponseCode.Success)
-                UISceneGlobal.Singleton.ShowDisconnectDialog(DisconnectReason.ConnectionRejected);
+                OnClientConnectionRefused();
+        }
+
+        public override void OnClientConnectionRefused()
+        {
+            base.OnClientConnectionRefused();
+            UISceneGlobal.Singleton.ShowDisconnectDialog(DisconnectReason.ConnectionRejected);
         }
 
         public override void OnClientOnlineSceneLoaded()
