@@ -244,7 +244,7 @@ namespace MultiplayerARPG
                     pendingSpawnPlayerCharacters.Add(connectionId, playerCharacterData);
                 if (!pendingSpawnPlayerCharacterSummonBuffs.ContainsKey(connectionId))
                     pendingSpawnPlayerCharacterSummonBuffs.Add(connectionId, playerSummonBuffs);
-                return false;
+                return IsServer && ClientConnectionId == connectionId;
             }
             if (LogDev) Logging.Log("[LanRpgNetworkManager] Deserializing client ready extra");
             SpawnPlayerCharacter(connectionId, playerCharacterData, playerSummonBuffs);
