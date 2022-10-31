@@ -108,6 +108,9 @@ namespace MultiplayerARPG
             }
         }
 
+        protected List<StorageConvertItemsEntry> preparedConvertItems = new List<StorageConvertItemsEntry>();
+        protected float convertCountDown = 1f;
+
         public override void OnSetup()
         {
             base.OnSetup();
@@ -196,23 +199,57 @@ namespace MultiplayerARPG
                 if (convertRemainsDuration[tempItem.dataId] <= 0f)
                 {
                     convertRemainsDuration[tempItem.dataId] = convertData.convertInterval;
-                    ConvertItem(convertData).Forget();
+                    PrepareConvertItems(convertData);
+                }
+            }
+
+            if (convertCountDown > 0f)
+            {
+                convertCountDown -= tempDeltaTime;
+                if (convertCountDown <= 0f)
+                {
+                    convertCountDown = 1f;
+                    ProceedConvertItems();
                 }
             }
         }
 
-        protected async UniTaskVoid ConvertItem(ConvertItem convertData)
+        protected void PrepareConvertItems(ConvertItem convertData)
         {
-            StorageId storageId = new StorageId(StorageType.Building, Id);
-            int dataId = convertData.item.item != null ? convertData.item.item.DataId : 0;
-            short amount = convertData.item.amount;
-            int convertedDataId = convertData.convertedItem.item != null ? convertData.convertedItem.item.DataId : 0;
-            short convertedAmount = convertData.convertedItem.amount;
-            CharacterItem droppingItem = await GameInstance.ServerStorageHandlers.ConvertStorageItems(storageId, dataId, amount, convertedDataId, convertedAmount);
-            if (droppingItem != null)
+            StorageConvertItemsEntry convertItemsEntry = new StorageConvertItemsEntry();
+            if (convertData.item.item != null && convertData.item.amount > 0)
             {
-                // Drop item on ground
-                ItemDropEntity.DropItem(this, droppingItem, new string[0]);
+                int dataId = convertData.item.item.DataId;
+                short amount = convertData.item.amount;
+                convertItemsEntry.dataId = dataId;
+                convertItemsEntry.amount = amount;
+            }
+
+            if (convertData.convertedItem.item != null && convertData.convertedItem.amount > 0)
+            {
+                int convertedDataId = convertData.convertedItem.item.DataId;
+                short convertedAmount = convertData.convertedItem.amount;
+                convertItemsEntry.convertedDataId = convertedDataId;
+                convertItemsEntry.convertedAmount = convertedAmount;
+            }
+
+            if (convertItemsEntry.amount + convertItemsEntry.convertedAmount > 0)
+                preparedConvertItems.Add(convertItemsEntry);
+        }
+
+        protected async void ProceedConvertItems()
+        {
+            if (preparedConvertItems.Count <= 0)
+                return;
+            StorageId storageId = new StorageId(StorageType.Building, Id);
+            List<CharacterItem> droppingItems = await GameInstance.ServerStorageHandlers.ConvertStorageItems(storageId, preparedConvertItems);
+            if (droppingItems != null && droppingItems.Count > 0)
+            {
+                for (int i = 0; i < droppingItems.Count; ++i)
+                {
+                    // Drop item on ground
+                    ItemDropEntity.DropItem(this, droppingItems[i], new string[0]);
+                }
             }
         }
 

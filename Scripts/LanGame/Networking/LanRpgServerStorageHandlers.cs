@@ -51,7 +51,7 @@ namespace MultiplayerARPG
             return usingStorageIds.TryGetValue(connectionId, out storageId);
         }
 
-        public async UniTask<CharacterItem> ConvertStorageItems(StorageId storageId, int dataId, short amount, int convertedDataId, short convertedAmount)
+        public async UniTask<List<CharacterItem>> ConvertStorageItems(StorageId storageId, List<StorageConvertItemsEntry> convertItems)
         {
             // Prepare storage data
             Storage storage = GetStorage(storageId, out _);
@@ -61,19 +61,29 @@ namespace MultiplayerARPG
             short slotLimit = storage.slotLimit;
             // Prepare storage items
             List<CharacterItem> storageItems = new List<CharacterItem>(GetStorageItems(storageId));
-            // Decrease item from storage
-            if (!storageItems.DecreaseItems(dataId, amount, isLimitSlot, out _))
-                return null;
-            // Increase item to storage
-            CharacterItem droppingItem = null;
-            if (GameInstance.Items.ContainsKey(convertedDataId) && convertedAmount > 0)
+            List<CharacterItem> droppingItems = new List<CharacterItem>();
+            for (int i = 0; i < convertItems.Count; ++i)
             {
+                int dataId = convertItems[i].dataId;
+                short amount = convertItems[i].amount;
+                int convertedDataId = convertItems[i].convertedDataId;
+                short convertedAmount = convertItems[i].convertedAmount;
+                // Decrease item from storage
+                if (!storageItems.DecreaseItems(dataId, amount, isLimitSlot, out _))
+                    continue;
                 // Increase item to storage
-                droppingItem = CharacterItem.Create(convertedDataId, convertedAmount);
-                if (!storageItems.IncreasingItemsWillOverwhelming(convertedDataId, convertedAmount, isLimitWeight, weightLimit, storageItems.GetTotalItemWeight(), isLimitSlot, slotLimit))
+                if (GameInstance.Items.ContainsKey(convertedDataId) && convertedAmount > 0)
                 {
-                    storageItems.IncreaseItems(droppingItem);
-                    droppingItem = null;
+                    // Increase item to storage
+                    CharacterItem droppingItem = CharacterItem.Create(convertedDataId, convertedAmount);
+                    if (!storageItems.IncreasingItemsWillOverwhelming(convertedDataId, convertedAmount, isLimitWeight, weightLimit, storageItems.GetTotalItemWeight(), isLimitSlot, slotLimit))
+                    {
+                        storageItems.IncreaseItems(droppingItem);
+                    }
+                    else
+                    {
+                        droppingItems.Add(droppingItem);
+                    }
                 }
             }
             // Update slots
@@ -81,7 +91,7 @@ namespace MultiplayerARPG
             SetStorageItems(storageId, storageItems);
             NotifyStorageItemsUpdated(storageId.storageType, storageId.storageOwnerId);
             await UniTask.Yield();
-            return droppingItem;
+            return droppingItems;
         }
 
         public List<CharacterItem> GetStorageItems(StorageId storageId)
