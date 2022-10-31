@@ -1530,7 +1530,7 @@ namespace MultiplayerARPG
         {
             if (selectionManager != null)
                 selectionManager.DeselectSelectedUI();
-            GameInstance.PlayingCharacterEntity.Dealing.CallServerSetDealingItem((short)IndexOfData, (short)amount);
+            GameInstance.PlayingCharacterEntity.Dealing.CallServerSetDealingItem(CharacterItem.id, (short)amount);
         }
         #endregion
 

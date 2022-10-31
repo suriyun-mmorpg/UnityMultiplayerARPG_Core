@@ -93,11 +93,11 @@ namespace MultiplayerARPG
             List<ItemAmount> itemAmounts = new List<ItemAmount>();
             for (int i = 0; i < DealingItems.Count; ++i)
             {
-                if (DealingItems[i].characterItem.IsEmptySlot()) continue;
+                if (DealingItems[i].IsEmptySlot()) continue;
                 itemAmounts.Add(new ItemAmount()
                 {
-                    item = DealingItems[i].characterItem.GetItem(),
-                    amount = DealingItems[i].characterItem.amount,
+                    item = DealingItems[i].GetItem(),
+                    amount = DealingItems[i].amount,
                 });
             }
             return DealingCharacter.IncreasingItemsWillOverwhelming(itemAmounts);
@@ -107,9 +107,9 @@ namespace MultiplayerARPG
         {
             if (DealingCharacter == null)
                 return;
-            List<DealingCharacterItem> tempDealingItems = new List<DealingCharacterItem>(DealingItems);
+            List<CharacterItem> tempDealingItems = new List<CharacterItem>(DealingItems);
             CharacterItem nonEquipItem;
-            DealingCharacterItem dealingItem;
+            CharacterItem dealingItem;
             int i, j;
             for (i = Entity.NonEquipItems.Count - 1; i >= 0; --i)
             {
@@ -117,13 +117,13 @@ namespace MultiplayerARPG
                 for (j = tempDealingItems.Count - 1; j >= 0; --j)
                 {
                     dealingItem = tempDealingItems[j];
-                    if (dealingItem.nonEquipIndex == i && nonEquipItem.amount >= dealingItem.characterItem.amount)
+                    if (nonEquipItem.id == dealingItem.id && nonEquipItem.amount >= dealingItem.amount)
                     {
-                        if (DealingCharacter.IncreaseItems(dealingItem.characterItem))
+                        if (DealingCharacter.IncreaseItems(dealingItem))
                         {
-                            GameInstance.ServerGameMessageHandlers.NotifyRewardItem(DealingCharacter.ConnectionId, dealingItem.characterItem.dataId, dealingItem.characterItem.amount);
+                            GameInstance.ServerGameMessageHandlers.NotifyRewardItem(DealingCharacter.ConnectionId, dealingItem.dataId, dealingItem.amount);
                             // Reduce item amount when able to increase item to co character
-                            nonEquipItem.amount -= dealingItem.characterItem.amount;
+                            nonEquipItem.amount -= dealingItem.amount;
                             if (nonEquipItem.amount == 0)
                             {
                                 // Amount is 0, remove it from inventory
@@ -292,14 +292,14 @@ namespace MultiplayerARPG
                 onShowDealingDialog.Invoke(playerCharacterEntity);
         }
 
-        public bool CallServerSetDealingItem(short itemIndex, short amount)
+        public bool CallServerSetDealingItem(string id, short amount)
         {
-            RPC(ServerSetDealingItem, itemIndex, amount);
+            RPC(ServerSetDealingItem, id, amount);
             return true;
         }
 
         [ServerRpc]
-        protected void ServerSetDealingItem(short itemIndex, short amount)
+        protected void ServerSetDealingItem(string id, short amount)
         {
 #if UNITY_EDITOR || UNITY_SERVER
             if (DealingState != DealingState.Dealing)
@@ -308,23 +308,21 @@ namespace MultiplayerARPG
                 return;
             }
 
-            if (itemIndex >= Entity.NonEquipItems.Count)
+            int indexOfNonEquipItem = Entity.IndexOfNonEquipItem(id);
+            if (indexOfNonEquipItem <= 0)
                 return;
 
             DealingCharacterItems dealingItems = DealingItems;
             for (int i = dealingItems.Count - 1; i >= 0; --i)
             {
-                if (itemIndex == dealingItems[i].nonEquipIndex)
+                if (id == dealingItems[i].id)
                 {
                     dealingItems.RemoveAt(i);
                     break;
                 }
             }
-            CharacterItem characterItem = Entity.NonEquipItems[itemIndex].Clone();
-            characterItem.amount = amount;
-            DealingCharacterItem dealingItem = new DealingCharacterItem();
-            dealingItem.nonEquipIndex = itemIndex;
-            dealingItem.characterItem = characterItem;
+            CharacterItem dealingItem = Entity.NonEquipItems[indexOfNonEquipItem].Clone();
+            dealingItem.amount = amount;
             dealingItems.Add(dealingItem);
             // Update to clients
             DealingItems = dealingItems;

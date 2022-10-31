@@ -279,9 +279,9 @@ namespace MultiplayerARPG
             list.Generate(dealingItems, (index, dealingItem, ui) =>
             {
                 tempUiCharacterItem = ui.GetComponent<UICharacterItem>();
-                if (dealingItem.characterItem.NotEmptySlot())
+                if (dealingItem.NotEmptySlot())
                 {
-                    tempUiCharacterItem.Setup(new UICharacterItemData(dealingItem.characterItem, InventoryType.NonEquipItems), GameInstance.PlayingCharacterEntity, -1);
+                    tempUiCharacterItem.Setup(new UICharacterItemData(dealingItem, InventoryType.NonEquipItems), GameInstance.PlayingCharacterEntity, -1);
                     tempUiCharacterItem.Show();
                     uiList.Add(tempUiCharacterItem);
                 }
