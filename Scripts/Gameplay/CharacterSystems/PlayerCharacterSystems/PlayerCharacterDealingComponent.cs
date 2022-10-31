@@ -309,7 +309,7 @@ namespace MultiplayerARPG
             }
 
             int indexOfNonEquipItem = Entity.IndexOfNonEquipItem(id);
-            if (indexOfNonEquipItem <= 0)
+            if (indexOfNonEquipItem < 0)
                 return;
 
             DealingCharacterItems dealingItems = DealingItems;
@@ -419,9 +419,10 @@ namespace MultiplayerARPG
         protected void ServerCancelDealing()
         {
 #if UNITY_EDITOR || UNITY_SERVER
-            if (DealingCharacter != null)
+            if (DealingCharacter != null && DealingCharacter.Dealing.DealingState != DealingState.None)
                 GameInstance.ServerGameMessageHandlers.SendGameMessage(DealingCharacter.ConnectionId, UITextKeys.UI_ERROR_DEALING_CANCELED);
-            GameInstance.ServerGameMessageHandlers.SendGameMessage(ConnectionId, UITextKeys.UI_ERROR_DEALING_CANCELED);
+            if (DealingState != DealingState.None)
+                GameInstance.ServerGameMessageHandlers.SendGameMessage(ConnectionId, UITextKeys.UI_ERROR_DEALING_CANCELED);
             StopDealing();
 #endif
         }
