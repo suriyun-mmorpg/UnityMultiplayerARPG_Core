@@ -55,6 +55,41 @@ namespace MultiplayerARPG
 
         public DirectionType2D DirectionType2D { get { return GameplayUtils.GetDirectionTypeByVector2(direction2D); } }
 
+        protected override void Awake()
+        {
+            base.Awake();
+            if (sprintAnimation2D == null)
+            {
+                sprintAnimation2D = moveAnimation2D;
+            }
+            else
+            {
+                if (sprintAnimation2D.down == null)
+                    sprintAnimation2D.down = moveAnimation2D.down;
+                if (sprintAnimation2D.up == null)
+                    sprintAnimation2D.up = moveAnimation2D.up;
+                if (sprintAnimation2D.left == null)
+                    sprintAnimation2D.left = moveAnimation2D.left;
+                if (sprintAnimation2D.right == null)
+                    sprintAnimation2D.right = moveAnimation2D.right;
+            }
+            if (walkAnimation2D == null)
+            {
+                walkAnimation2D = moveAnimation2D;
+            }
+            else
+            {
+                if (walkAnimation2D.down == null)
+                    walkAnimation2D.down = moveAnimation2D.down;
+                if (walkAnimation2D.up == null)
+                    walkAnimation2D.up = moveAnimation2D.up;
+                if (walkAnimation2D.left == null)
+                    walkAnimation2D.left = moveAnimation2D.left;
+                if (walkAnimation2D.right == null)
+                    walkAnimation2D.right = moveAnimation2D.right;
+            }
+        }
+
         private void OnEnable()
         {
 #if UNITY_EDITOR
