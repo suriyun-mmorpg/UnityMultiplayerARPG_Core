@@ -243,6 +243,7 @@ namespace MultiplayerARPG
                 return;
             StorageId storageId = new StorageId(StorageType.Building, Id);
             List<CharacterItem> droppingItems = await GameInstance.ServerStorageHandlers.ConvertStorageItems(storageId, preparedConvertItems);
+            preparedConvertItems.Clear();
             if (droppingItems != null && droppingItems.Count > 0)
             {
                 for (int i = 0; i < droppingItems.Count; ++i)
