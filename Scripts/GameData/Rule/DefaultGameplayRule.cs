@@ -513,29 +513,32 @@ namespace MultiplayerARPG
                 DecreaseEquipWeaponsDurability(attacker, decreaseWeaponDurability);
                 CharacterStats stats = attacker.GetCaches().Stats;
                 // Hp Leeching, don't decrease damage receiver's Hp again
-                int leechAmount = Mathf.CeilToInt(damage * stats.hpLeechRate);
-                if (leechAmount != 0)
+                if (!attacker.IsDead())
                 {
-                    attacker.CurrentHp += leechAmount;
-                    attacker.CurrentHp = Mathf.Clamp(attacker.CurrentHp, 0, attacker.MaxHp);
-                }
-                // Mp Leeching
-                leechAmount = Mathf.CeilToInt(damage * stats.mpLeechRate);
-                if (leechAmount != 0)
-                {
-                    attacker.CurrentMp += leechAmount;
-                    attacker.CurrentMp = Mathf.Clamp(attacker.CurrentMp, 0, attacker.MaxMp);
-                    damageReceiver.CurrentMp -= leechAmount;
-                    damageReceiver.CurrentMp = Mathf.Clamp(damageReceiver.CurrentMp, 0, damageReceiver.MaxMp);
-                }
-                // Stamina Leeching
-                leechAmount = Mathf.CeilToInt(damage * stats.staminaLeechRate);
-                if (leechAmount != 0)
-                {
-                    attacker.CurrentStamina += leechAmount;
-                    attacker.CurrentStamina = Mathf.Clamp(attacker.CurrentStamina, 0, attacker.MaxStamina);
-                    damageReceiver.CurrentStamina -= leechAmount;
-                    damageReceiver.CurrentStamina = Mathf.Clamp(damageReceiver.CurrentStamina, 0, damageReceiver.MaxStamina);
+                    int leechAmount = Mathf.CeilToInt(damage * stats.hpLeechRate);
+                    if (leechAmount != 0)
+                    {
+                        attacker.CurrentHp += leechAmount;
+                        attacker.CurrentHp = Mathf.Clamp(attacker.CurrentHp, 0, attacker.MaxHp);
+                    }
+                    // Mp Leeching
+                    leechAmount = Mathf.CeilToInt(damage * stats.mpLeechRate);
+                    if (leechAmount != 0)
+                    {
+                        attacker.CurrentMp += leechAmount;
+                        attacker.CurrentMp = Mathf.Clamp(attacker.CurrentMp, 0, attacker.MaxMp);
+                        damageReceiver.CurrentMp -= leechAmount;
+                        damageReceiver.CurrentMp = Mathf.Clamp(damageReceiver.CurrentMp, 0, damageReceiver.MaxMp);
+                    }
+                    // Stamina Leeching
+                    leechAmount = Mathf.CeilToInt(damage * stats.staminaLeechRate);
+                    if (leechAmount != 0)
+                    {
+                        attacker.CurrentStamina += leechAmount;
+                        attacker.CurrentStamina = Mathf.Clamp(attacker.CurrentStamina, 0, attacker.MaxStamina);
+                        damageReceiver.CurrentStamina -= leechAmount;
+                        damageReceiver.CurrentStamina = Mathf.Clamp(damageReceiver.CurrentStamina, 0, damageReceiver.MaxStamina);
+                    }
                 }
                 // Applies status effects
                 int i;
