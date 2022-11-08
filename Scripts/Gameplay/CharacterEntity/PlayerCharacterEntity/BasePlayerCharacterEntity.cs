@@ -115,11 +115,6 @@ namespace MultiplayerARPG
             Profiler.EndSample();
         }
 
-        public override bool CanDoActions()
-        {
-            return base.CanDoActions() && Dealing.DealingState == DealingState.None;
-        }
-
         public virtual float GetActivatableDistance()
         {
             return GameInstance.Singleton.conversationDistance;

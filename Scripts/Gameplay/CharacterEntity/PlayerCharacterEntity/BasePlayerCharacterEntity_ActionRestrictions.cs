@@ -9,158 +9,137 @@ namespace MultiplayerARPG
             get { return Dealing?.DealingState != DealingState.None; }
         }
 
-        public override bool CanEquipItem
+        public override bool CanDoActions()
         {
-            get
-            {
-                if (IsUpdatingStorage)
-                    return false;
-                if (IsDealing)
-                    return false;
-                if (!CanDoActions())
-                    return false;
-                return true;
-            }
+            return base.CanDoActions() && Dealing.DealingState == DealingState.None;
         }
 
-        public override bool CanUnEquipItem
+        public override bool CanEquipItem()
         {
-            get
-            {
-                if (IsUpdatingStorage)
-                    return false;
-                if (IsDealing)
-                    return false;
-                if (!CanDoActions())
-                    return false;
-                return true;
-            }
+            if (IsUpdatingStorage)
+                return false;
+            if (IsDealing)
+                return false;
+            if (!CanDoActions())
+                return false;
+            return true;
         }
 
-        public override bool CanPickUpItem
+        public override bool CanUnEquipItem()
         {
-            get
-            {
-                if (IsUpdatingStorage)
-                    return false;
-                if (IsDealing)
-                    return false;
-                if (!CanDoActions())
-                    return false;
-                return true;
-            }
+            if (IsUpdatingStorage)
+                return false;
+            if (IsDealing)
+                return false;
+            if (!CanDoActions())
+                return false;
+            return true;
         }
 
-        public override bool CanDropItem
+        public override bool CanPickUpItem()
         {
-            get
-            {
-                if (IsUpdatingStorage)
-                    return false;
-                if (IsDealing)
-                    return false;
-                if (!CanDoActions())
-                    return false;
-                return true;
-            }
+            if (IsUpdatingStorage)
+                return false;
+            if (IsDealing)
+                return false;
+            if (!CanDoActions())
+                return false;
+            return true;
         }
 
-        public override bool CanRepairItem
+        public override bool CanDropItem()
         {
-            get
-            {
-                if (IsUpdatingStorage)
-                    return false;
-                if (IsDealing)
-                    return false;
-                if (!CanDoActions())
-                    return false;
-                return true;
-            }
+            if (IsUpdatingStorage)
+                return false;
+            if (IsDealing)
+                return false;
+            if (!CanDoActions())
+                return false;
+            return true;
         }
 
-        public override bool CanRefineItem
+        public override bool CanRepairItem()
         {
-            get
-            {
-                if (IsUpdatingStorage)
-                    return false;
-                if (IsDealing)
-                    return false;
-                if (!CanDoActions())
-                    return false;
-                return true;
-            }
+            if (IsUpdatingStorage)
+                return false;
+            if (IsDealing)
+                return false;
+            if (!CanDoActions())
+                return false;
+            return true;
         }
 
-        public override bool CanEnhanceSocketItem
+        public override bool CanRefineItem()
         {
-            get
-            {
-                if (IsUpdatingStorage)
-                    return false;
-                if (IsDealing)
-                    return false;
-                if (!CanDoActions())
-                    return false;
-                return true;
-            }
+            if (IsUpdatingStorage)
+                return false;
+            if (IsDealing)
+                return false;
+            if (!CanDoActions())
+                return false;
+            return true;
         }
 
-        public override bool CanRemoveEnhancerFromItem
+        public override bool CanEnhanceSocketItem()
         {
-            get
-            {
-                if (IsUpdatingStorage)
-                    return false;
-                if (IsDealing)
-                    return false;
-                if (!CanDoActions())
-                    return false;
-                return true;
-            }
+            if (IsUpdatingStorage)
+                return false;
+            if (IsDealing)
+                return false;
+            if (!CanDoActions())
+                return false;
+            return true;
         }
 
-        public override bool CanDismentleItem
+        public override bool CanRemoveEnhancerFromItem()
         {
-            get
-            {
-                if (IsUpdatingStorage)
-                    return false;
-                if (IsDealing)
-                    return false;
-                if (!CanDoActions())
-                    return false;
-                return true;
-            }
+            if (IsUpdatingStorage)
+                return false;
+            if (IsDealing)
+                return false;
+            if (!CanDoActions())
+                return false;
+            return true;
         }
 
-        public override bool CanSellItem
+        public override bool CanDismentleItem()
         {
-            get
-            {
-                if (IsUpdatingStorage)
-                    return false;
-                if (IsDealing)
-                    return false;
-                if (!CanDoActions())
-                    return false;
-                return true;
-            }
+            if (IsUpdatingStorage)
+                return false;
+            if (IsDealing)
+                return false;
+            if (!CanDoActions())
+                return false;
+            return true;
         }
 
-        public override bool CanMoveItem
+        public override bool CanSellItem()
         {
-            get
-            {
-                if (IsUpdatingStorage)
-                    return false;
-                if (IsDealing)
-                    return false;
-                if (!CanDoActions())
-                    return false;
-                return true;
-            }
+            if (IsUpdatingStorage)
+                return false;
+            if (IsDealing)
+                return false;
+            if (!CanDoActions())
+                return false;
+            return true;
+        }
+
+        public override bool CanMoveItem()
+        {
+            if (IsUpdatingStorage)
+                return false;
+            if (IsDealing)
+                return false;
+            if (!CanDoActions())
+                return false;
+            return true;
+        }
+
+        public override bool CanUseItem()
+        {
+            if (IsDealing)
+                return false;
+            return base.CanUseItem();
         }
     }
 }

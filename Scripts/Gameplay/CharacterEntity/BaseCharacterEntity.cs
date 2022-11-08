@@ -1094,11 +1094,6 @@ namespace MultiplayerARPG
                 IsPlayingReloadAnimation();
         }
 
-        public virtual bool CanDoActions()
-        {
-            return !this.IsDead() && !IsAttacking && !IsUsingSkill && !IsReloading && !IsPlayingActionAnimation();
-        }
-
         public float GetAttackSpeed()
         {
             float atkSpeed = this.GetCaches().AtkSpeed;
@@ -1244,39 +1239,6 @@ namespace MultiplayerARPG
         public override sealed bool IsHide()
         {
             return this.GetCaches().IsHide;
-        }
-
-        public virtual bool CanAttack()
-        {
-            if (!CanDoActions())
-                return false;
-            if (this.GetCaches().DisallowAttack)
-                return false;
-            if (PassengingVehicleEntity != null &&
-                !PassengingVehicleSeat.canAttack)
-                return false;
-            return true;
-        }
-
-        public virtual bool CanUseSkill()
-        {
-            if (!CanDoActions())
-                return false;
-            if (this.GetCaches().DisallowUseSkill)
-                return false;
-            if (PassengingVehicleEntity != null &&
-                !PassengingVehicleSeat.canUseSkill)
-                return false;
-            return true;
-        }
-
-        public virtual bool CanUseItem()
-        {
-            if (this.IsDead())
-                return false;
-            if (this.GetCaches().DisallowUseItem)
-                return false;
-            return true;
         }
         #endregion
 

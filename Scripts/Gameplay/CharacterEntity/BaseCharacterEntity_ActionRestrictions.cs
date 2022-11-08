@@ -2,59 +2,97 @@ namespace MultiplayerARPG
 {
     public partial class BaseCharacterEntity
     {
-        public virtual bool CanEquipItem
+        public virtual bool CanDoActions()
         {
-            get { return true; }
+            return !this.IsDead() && !IsAttacking && !IsUsingSkill && !IsReloading && !IsPlayingActionAnimation();
         }
 
-        public virtual bool CanUnEquipItem
+        public virtual bool CanEquipItem()
         {
-            get { return true; }
+            return true;
         }
 
-        public virtual bool CanPickUpItem
+        public virtual bool CanUnEquipItem()
         {
-            get { return true; }
+            return true;
         }
 
-        public virtual bool CanDropItem
+        public virtual bool CanPickUpItem()
         {
-            get { return true; }
+            return true;
         }
 
-        public virtual bool CanRepairItem
+        public virtual bool CanDropItem()
         {
-            get { return true; }
+            return true;
         }
 
-        public virtual bool CanRefineItem
+        public virtual bool CanRepairItem()
         {
-            get { return true; }
+            return true;
         }
 
-        public virtual bool CanEnhanceSocketItem
+        public virtual bool CanRefineItem()
         {
-            get { return true; }
+            return true;
         }
 
-        public virtual bool CanRemoveEnhancerFromItem
+        public virtual bool CanEnhanceSocketItem()
         {
-            get { return true; }
+            return true;
         }
 
-        public virtual bool CanDismentleItem
+        public virtual bool CanRemoveEnhancerFromItem()
         {
-            get { return true; }
+            return true;
         }
 
-        public virtual bool CanSellItem
+        public virtual bool CanDismentleItem()
         {
-            get { return true; }
+            return true;
         }
 
-        public virtual bool CanMoveItem
+        public virtual bool CanSellItem()
         {
-            get { return true; }
+            return true;
+        }
+
+        public virtual bool CanMoveItem()
+        {
+            return true;
+        }
+
+        public virtual bool CanAttack()
+        {
+            if (!CanDoActions())
+                return false;
+            if (this.GetCaches().DisallowAttack)
+                return false;
+            if (PassengingVehicleEntity != null &&
+                !PassengingVehicleSeat.canAttack)
+                return false;
+            return true;
+        }
+
+        public virtual bool CanUseSkill()
+        {
+            if (!CanDoActions())
+                return false;
+            if (this.GetCaches().DisallowUseSkill)
+                return false;
+            if (PassengingVehicleEntity != null &&
+                !PassengingVehicleSeat.canUseSkill)
+                return false;
+            return true;
+        }
+
+        public virtual bool CanUseItem()
+        {
+            if (this.IsDead())
+                return false;
+            if (this.GetCaches().DisallowUseItem)
+                return false;
+            return true;
         }
     }
 }

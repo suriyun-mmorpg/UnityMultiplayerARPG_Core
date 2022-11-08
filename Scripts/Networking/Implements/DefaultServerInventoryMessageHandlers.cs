@@ -20,7 +20,7 @@ namespace MultiplayerARPG
             }
 
             BasePlayerCharacterEntity playerCharacterEntity = playerCharacter as BasePlayerCharacterEntity;
-            if (playerCharacterEntity != null && !playerCharacterEntity.CanMoveItem)
+            if (playerCharacterEntity != null && !playerCharacterEntity.CanMoveItem())
             {
                 result.Invoke(AckResponseCode.Error, new ResponseSwapOrMergeItemMessage());
                 return;
@@ -52,7 +52,7 @@ namespace MultiplayerARPG
             }
 
             BasePlayerCharacterEntity playerCharacterEntity = playerCharacter as BasePlayerCharacterEntity;
-            if (playerCharacterEntity != null && !playerCharacterEntity.CanEquipItem)
+            if (playerCharacterEntity != null && !playerCharacterEntity.CanEquipItem())
             {
                 result.Invoke(AckResponseCode.Error, new ResponseEquipArmorMessage());
                 return;
@@ -84,7 +84,7 @@ namespace MultiplayerARPG
             }
 
             BasePlayerCharacterEntity playerCharacterEntity = playerCharacter as BasePlayerCharacterEntity;
-            if (playerCharacterEntity != null && !playerCharacterEntity.CanEquipItem)
+            if (playerCharacterEntity != null && !playerCharacterEntity.CanEquipItem())
             {
                 result.Invoke(AckResponseCode.Error, new ResponseEquipWeaponMessage());
                 return;
@@ -116,7 +116,7 @@ namespace MultiplayerARPG
             }
 
             BasePlayerCharacterEntity playerCharacterEntity = playerCharacter as BasePlayerCharacterEntity;
-            if (playerCharacterEntity != null && !playerCharacterEntity.CanUnEquipItem)
+            if (playerCharacterEntity != null && !playerCharacterEntity.CanUnEquipItem())
             {
                 result.Invoke(AckResponseCode.Error, new ResponseUnEquipArmorMessage());
                 return;
@@ -148,7 +148,7 @@ namespace MultiplayerARPG
             }
 
             BasePlayerCharacterEntity playerCharacterEntity = playerCharacter as BasePlayerCharacterEntity;
-            if (playerCharacterEntity != null && !playerCharacterEntity.CanUnEquipItem)
+            if (playerCharacterEntity != null && !playerCharacterEntity.CanUnEquipItem())
             {
                 result.Invoke(AckResponseCode.Error, new ResponseUnEquipWeaponMessage());
                 return;
@@ -180,7 +180,7 @@ namespace MultiplayerARPG
             }
 
             BasePlayerCharacterEntity playerCharacterEntity = playerCharacter as BasePlayerCharacterEntity;
-            if (playerCharacterEntity != null && !playerCharacterEntity.CanEquipItem)
+            if (playerCharacterEntity != null && !playerCharacterEntity.CanEquipItem())
             {
                 result.Invoke(AckResponseCode.Error, new ResponseSwitchEquipWeaponSetMessage());
                 return;
@@ -209,7 +209,7 @@ namespace MultiplayerARPG
             }
 
             BasePlayerCharacterEntity playerCharacterEntity = playerCharacter as BasePlayerCharacterEntity;
-            if (playerCharacterEntity != null && !playerCharacterEntity.CanDismentleItem)
+            if (playerCharacterEntity != null && !playerCharacterEntity.CanDismentleItem())
             {
                 result.Invoke(AckResponseCode.Error, new ResponseDismantleItemMessage());
                 return;
@@ -245,7 +245,7 @@ namespace MultiplayerARPG
             }
 
             BasePlayerCharacterEntity playerCharacterEntity = playerCharacter as BasePlayerCharacterEntity;
-            if (playerCharacterEntity != null && !playerCharacterEntity.CanDismentleItem)
+            if (playerCharacterEntity != null && !playerCharacterEntity.CanDismentleItem())
             {
                 result.Invoke(AckResponseCode.Error, new ResponseDismantleItemsMessage());
                 return;
@@ -281,7 +281,7 @@ namespace MultiplayerARPG
             }
 
             BasePlayerCharacterEntity playerCharacterEntity = playerCharacter as BasePlayerCharacterEntity;
-            if (playerCharacterEntity != null && !playerCharacterEntity.CanEnhanceSocketItem)
+            if (playerCharacterEntity != null && !playerCharacterEntity.CanEnhanceSocketItem())
             {
                 result.Invoke(AckResponseCode.Error, new ResponseEnhanceSocketItemMessage());
                 return;
@@ -316,7 +316,7 @@ namespace MultiplayerARPG
             }
 
             BasePlayerCharacterEntity playerCharacterEntity = playerCharacter as BasePlayerCharacterEntity;
-            if (playerCharacterEntity != null && !playerCharacterEntity.CanRefineItem)
+            if (playerCharacterEntity != null && !playerCharacterEntity.CanRefineItem())
             {
                 result.Invoke(AckResponseCode.Error, new ResponseRefineItemMessage());
                 return;
@@ -352,7 +352,7 @@ namespace MultiplayerARPG
             }
 
             BasePlayerCharacterEntity playerCharacterEntity = playerCharacter as BasePlayerCharacterEntity;
-            if (playerCharacterEntity != null && !playerCharacterEntity.CanRemoveEnhancerFromItem)
+            if (playerCharacterEntity != null && !playerCharacterEntity.CanRemoveEnhancerFromItem())
             {
                 result.Invoke(AckResponseCode.Error, new ResponseRemoveEnhancerFromItemMessage());
                 return;
@@ -388,7 +388,7 @@ namespace MultiplayerARPG
             }
 
             BasePlayerCharacterEntity playerCharacterEntity = playerCharacter as BasePlayerCharacterEntity;
-            if (playerCharacterEntity != null && !playerCharacterEntity.CanRepairItem)
+            if (playerCharacterEntity != null && !playerCharacterEntity.CanRepairItem())
             {
                 result.Invoke(AckResponseCode.Error, new ResponseRepairItemMessage());
                 return;
@@ -424,7 +424,7 @@ namespace MultiplayerARPG
             }
 
             BasePlayerCharacterEntity playerCharacterEntity = playerCharacter as BasePlayerCharacterEntity;
-            if (playerCharacterEntity != null && !playerCharacterEntity.CanRepairItem)
+            if (playerCharacterEntity != null && !playerCharacterEntity.CanRepairItem())
             {
                 result.Invoke(AckResponseCode.Error, new ResponseRepairEquipItemsMessage());
                 return;
@@ -459,7 +459,7 @@ namespace MultiplayerARPG
                 return;
             }
 
-            if (!playerCharacterEntity.CanSellItem)
+            if (!playerCharacterEntity.CanSellItem())
             {
                 result.Invoke(AckResponseCode.Error, new ResponseSellItemMessage());
                 return;
@@ -500,7 +500,7 @@ namespace MultiplayerARPG
                 return;
             }
 
-            if (!playerCharacterEntity.CanSellItem)
+            if (!playerCharacterEntity.CanSellItem())
             {
                 result.Invoke(AckResponseCode.Error, new ResponseSellItemsMessage());
                 return;

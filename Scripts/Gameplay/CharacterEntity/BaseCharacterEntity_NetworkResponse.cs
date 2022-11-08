@@ -13,7 +13,7 @@ namespace MultiplayerARPG
         protected virtual void ServerPickupItem(uint objectId)
         {
 #if UNITY_EDITOR || UNITY_SERVER
-            if (!CanPickUpItem)
+            if (!CanPickUpItem())
                 return;
 
             ItemDropEntity itemDropEntity;
@@ -59,7 +59,7 @@ namespace MultiplayerARPG
         protected virtual void ServerPickupItemFromContainer(uint objectId, int itemsContainerIndex, short amount)
         {
 #if UNITY_EDITOR || UNITY_SERVER
-            if (!CanPickUpItem)
+            if (!CanPickUpItem())
                 return;
 
             ItemsContainerEntity itemsContainerEntity;
@@ -112,7 +112,7 @@ namespace MultiplayerARPG
         protected virtual void ServerPickupAllItemsFromContainer(uint objectId)
         {
 #if UNITY_EDITOR || UNITY_SERVER
-            if (!CanPickUpItem)
+            if (!CanPickUpItem())
                 return;
 
             ItemsContainerEntity itemsContainerEntity;
@@ -161,7 +161,7 @@ namespace MultiplayerARPG
         protected virtual void ServerPickupNearbyItems()
         {
 #if UNITY_EDITOR || UNITY_SERVER
-            if (!CanPickUpItem)
+            if (!CanPickUpItem())
                 return;
             List<ItemDropEntity> itemDropEntities = FindGameEntitiesInDistance<ItemDropEntity>(CurrentGameInstance.pickUpItemDistance, CurrentGameInstance.itemDropLayer.Mask);
             foreach (ItemDropEntity itemDropEntity in itemDropEntities)
@@ -180,7 +180,7 @@ namespace MultiplayerARPG
         protected virtual void ServerDropItem(short index, short amount)
         {
 #if UNITY_EDITOR || UNITY_SERVER
-            if (!CanDropItem || index >= nonEquipItems.Count)
+            if (!CanDropItem() || index >= nonEquipItems.Count)
                 return;
 
             CharacterItem nonEquipItem = nonEquipItems[index];
