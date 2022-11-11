@@ -66,7 +66,7 @@ namespace MultiplayerARPG
             if (buttonUnlock != null)
                 buttonUnlock.interactable = buildingEntity.Lockable && buildingEntity.IsCreator(Controller.PlayingCharacterEntity);
             if (buttonActivate != null)
-                buttonActivate.interactable = buildingEntity.Activatable;
+                buttonActivate.interactable = buildingEntity.CanActivate();
         }
 
         private void Update()

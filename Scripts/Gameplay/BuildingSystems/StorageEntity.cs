@@ -35,7 +35,6 @@ namespace MultiplayerARPG
         protected SyncFieldBool isOpen = new SyncFieldBool();
 
         private bool dirtyIsOpen;
-        public override bool Activatable { get { return true; } }
 
         public override void OnSetup()
         {
@@ -86,6 +85,11 @@ namespace MultiplayerARPG
                     isOpen.Value = updatingIsOpen;
                 }
             }
+        }
+
+        public override bool CanActivate()
+        {
+            return !this.IsDead();
         }
 
         public override void OnActivate()

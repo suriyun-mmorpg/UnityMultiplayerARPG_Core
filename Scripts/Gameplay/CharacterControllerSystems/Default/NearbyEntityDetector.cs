@@ -346,7 +346,7 @@ namespace MultiplayerARPG
                     {
                         if (findOnlyAliveBuildings && building != null && building.IsDead())
                             building = null;
-                        if (findOnlyActivatableBuildings && building != null && !building.Activatable)
+                        if (findOnlyActivatableBuildings && building != null && !building.CanActivate())
                             building = null;
                     }
                 }

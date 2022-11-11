@@ -179,7 +179,6 @@ namespace MultiplayerARPG
             set { }
         }
 
-        public virtual bool Activatable { get { return false; } }
         public virtual bool Lockable { get { return false; } }
         public bool IsBuildMode { get; private set; }
         public BasePlayerCharacterEntity Builder { get; private set; }
@@ -535,7 +534,7 @@ namespace MultiplayerARPG
 
         public virtual bool CanActivate()
         {
-            return !this.IsDead() && Activatable;
+            return false;
         }
 
         public virtual void OnActivate()

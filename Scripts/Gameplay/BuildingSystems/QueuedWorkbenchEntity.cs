@@ -21,7 +21,6 @@ namespace MultiplayerARPG
         [SerializeField]
         protected SyncListCraftingQueueItem queueItems = new SyncListCraftingQueueItem();
 
-        public override bool Activatable { get { return true; } }
 
         private Dictionary<int, ItemCraftFormula> cacheItemCraftFormulas;
         public Dictionary<int, ItemCraftFormula> CacheItemCraftFormulas
@@ -77,6 +76,11 @@ namespace MultiplayerARPG
             base.PrepareRelatesData();
             if (CacheItemCraftFormulas.Count > 0)
                 GameInstance.AddItemCraftFormulas(SourceId, CacheItemCraftFormulas.Values);
+        }
+
+        public override bool CanActivate()
+        {
+            return !this.IsDead();
         }
 
         public override void OnActivate()

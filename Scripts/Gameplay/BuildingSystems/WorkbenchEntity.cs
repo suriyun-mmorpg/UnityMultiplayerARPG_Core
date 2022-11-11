@@ -10,7 +10,6 @@ namespace MultiplayerARPG
         protected ItemCraft[] itemCrafts = new ItemCraft[0];
         public ItemCraft[] ItemCrafts { get { return itemCrafts; } }
 
-        public override bool Activatable { get { return true; } }
 
         private Dictionary<int, ItemCraft> cacheItemCrafts;
         public Dictionary<int, ItemCraft> CacheItemCrafts
@@ -58,6 +57,11 @@ namespace MultiplayerARPG
                 }
                 GameInstance.AddItems(items);
             }
+        }
+
+        public override bool CanActivate()
+        {
+            return !this.IsDead();
         }
 
         public override void OnActivate()

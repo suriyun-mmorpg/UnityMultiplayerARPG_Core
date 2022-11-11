@@ -26,8 +26,6 @@ namespace MultiplayerARPG
         [SerializeField]
         protected SyncFieldBool isOpen = new SyncFieldBool();
 
-        public override bool Activatable { get { return true; } }
-
         public bool IsOpen
         {
             get { return isOpen.Value; }
@@ -69,6 +67,11 @@ namespace MultiplayerARPG
                 else
                     onClose.Invoke();
             }
+        }
+
+        public override bool CanActivate()
+        {
+            return !this.IsDead();
         }
 
         public override void OnActivate()

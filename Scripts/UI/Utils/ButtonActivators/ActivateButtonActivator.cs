@@ -45,7 +45,7 @@ namespace MultiplayerARPG
                 if (!canActivate)
                 {
                     BuildingEntity buildingEntity = shooterController.SelectedGameEntity as BuildingEntity;
-                    if (buildingEntity != null && !buildingEntity.IsBuildMode && buildingEntity.Activatable)
+                    if (buildingEntity != null && !buildingEntity.IsBuildMode && buildingEntity.CanActivate())
                     {
                         canActivate = true;
                     }
