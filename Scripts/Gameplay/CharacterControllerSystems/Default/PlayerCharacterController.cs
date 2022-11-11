@@ -253,10 +253,28 @@ namespace MultiplayerARPG
                     destination = null;
             }
 
+            float deltaTime = Time.deltaTime;
+            activateInput.OnUpdate(deltaTime);
+            pickupItemInput.OnUpdate(deltaTime);
+            reloadInput.OnUpdate(deltaTime);
+            findEnemyInput.OnUpdate(deltaTime);
+            exitVehicleInput.OnUpdate(deltaTime);
+            switchEquipWeaponSetInput.OnUpdate(deltaTime);
+
             UpdateInput();
             UpdateFollowTarget();
             PlayingCharacterEntity.AimPosition = PlayingCharacterEntity.GetAttackAimPosition(ref isLeftHandAttacking);
             PlayingCharacterEntity.SetSmoothTurnSpeed(turnSmoothSpeed);
+        }
+
+        private void LateUpdate()
+        {
+            activateInput.OnLateUpdate();
+            pickupItemInput.OnLateUpdate();
+            reloadInput.OnLateUpdate();
+            findEnemyInput.OnLateUpdate();
+            exitVehicleInput.OnLateUpdate();
+            switchEquipWeaponSetInput.OnLateUpdate();
         }
 
         private Vector3 GetBuildingPlacePosition(Vector3 position)
