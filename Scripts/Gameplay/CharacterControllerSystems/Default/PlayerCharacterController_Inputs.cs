@@ -28,7 +28,23 @@ namespace MultiplayerARPG
             if (ConstructingBuildingEntity == null)
             {
                 // Activate nearby npcs / players / activable buildings
-                if (activateInput.IsPress)
+                if (activateInput.IsHold)
+                {
+                    if (ActivatableEntityDetector.holdActivatableEntities.Count > 0)
+                    {
+                        IHoldActivatableEntity holdActivatable;
+                        for (int i = 0; i < ActivatableEntityDetector.holdActivatableEntities.Count; ++i)
+                        {
+                            holdActivatable = ActivatableEntityDetector.holdActivatableEntities[i];
+                            if (holdActivatable.CanHoldActivate())
+                            {
+                                holdActivatable.OnHoldActivate();
+                                break;
+                            }
+                        }
+                    }
+                }
+                else if (activateInput.IsRelease)
                 {
                     if (ActivatableEntityDetector.activatableEntities.Count > 0)
                     {
@@ -39,21 +55,6 @@ namespace MultiplayerARPG
                             if (activatable.CanActivate())
                             {
                                 activatable.OnActivate();
-                                break;
-                            }
-                        }
-                    }
-                } else if (activateInput.IsHold)
-                {
-                    if (ActivatableEntityDetector.activatableEntities.Count > 0)
-                    {
-                        IHoldActivatableEntity activatable;
-                        for (int i = 0; i < ActivatableEntityDetector.holdActivatableEntities.Count; ++i)
-                        {
-                            activatable = ActivatableEntityDetector.holdActivatableEntities[i];
-                            if (activatable.CanHoldActivate())
-                            {
-                                activatable.OnHoldActivate();
                                 break;
                             }
                         }
@@ -333,8 +334,8 @@ namespace MultiplayerARPG
                 this.targetActionType = targetActionType;
                 destination = null;
                 TargetEntity = entity;
-                if (entity is IGameEntity)
-                    PlayingCharacterEntity.SetTargetEntity((entity as IGameEntity).Entity);
+                if (entity is IGameEntity gameEntity)
+                    PlayingCharacterEntity.SetTargetEntity(gameEntity.Entity);
             }
             SelectedEntity = entity;
         }
