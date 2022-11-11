@@ -89,17 +89,6 @@ namespace MultiplayerARPG
             return true;
         }
 
-        public bool CallServerOpenStorage(uint objectId, string password)
-        {
-            if (!CurrentGameplayRule.CanInteractEntity(this, objectId))
-            {
-                ClientGenericActions.ClientReceiveGameMessage(UITextKeys.UI_ERROR_CHARACTER_IS_TOO_FAR);
-                return false;
-            }
-            RPC(ServerOpenStorage, objectId, password);
-            return true;
-        }
-
         public bool CallServerAppendCraftingQueueItem(uint sourceObjectId, int dataId, short amount)
         {
             if (!CurrentGameplayRule.CanInteractEntity(this, sourceObjectId))

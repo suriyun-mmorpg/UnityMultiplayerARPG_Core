@@ -92,7 +92,7 @@ namespace MultiplayerARPG
         {
             if (!Lockable || !IsLocked)
             {
-                GameInstance.PlayingCharacterEntity.CallServerOpenStorage(ObjectId, string.Empty);
+                GameInstance.PlayingCharacterEntity.Building.CallServerOpenStorage(ObjectId, string.Empty);
             }
             else
             {
@@ -101,7 +101,7 @@ namespace MultiplayerARPG
                     LanguageManager.GetText(UITextKeys.UI_ENTER_BUILDING_PASSWORD_DESCRIPTION.ToString()),
                     (password) =>
                     {
-                        GameInstance.PlayingCharacterEntity.CallServerOpenStorage(ObjectId, password);
+                        GameInstance.PlayingCharacterEntity.Building.CallServerOpenStorage(ObjectId, password);
                     }, string.Empty, PasswordContentType, PasswordLength);
             }
         }

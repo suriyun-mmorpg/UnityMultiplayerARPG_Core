@@ -91,6 +91,54 @@ namespace MultiplayerARPG
 #endif
         }
 
+        public bool CallServerOpenStorage(uint objectId, string password)
+        {
+            if (!CurrentGameplayRule.CanInteractEntity(Entity, objectId))
+            {
+                ClientGenericActions.ClientReceiveGameMessage(UITextKeys.UI_ERROR_CHARACTER_IS_TOO_FAR);
+                return false;
+            }
+            RPC(ServerOpenStorage, objectId, password);
+            return true;
+        }
+
+        [ServerRpc]
+        protected void ServerOpenStorage(uint objectId, string password)
+        {
+#if UNITY_EDITOR || UNITY_SERVER
+            if (!Entity.CanDoActions())
+                return;
+
+            StorageEntity storageEntity;
+            if (!Manager.TryGetEntityByObjectId(objectId, out storageEntity))
+            {
+                // Can't find the entity
+                return;
+            }
+
+            if (!Entity.IsGameEntityInDistance(storageEntity, CurrentGameInstance.conversationDistance))
+            {
+                GameInstance.ServerGameMessageHandlers.SendGameMessage(ConnectionId, UITextKeys.UI_ERROR_CHARACTER_IS_TOO_FAR);
+                return;
+            }
+
+            if (storageEntity.Lockable && storageEntity.IsLocked && !storageEntity.LockPassword.Equals(password))
+            {
+                GameInstance.ServerGameMessageHandlers.SendGameMessage(ConnectionId, UITextKeys.UI_ERROR_WRONG_BUILDING_PASSWORD);
+                return;
+            }
+
+            StorageId storageId;
+            if (!Entity.GetStorageId(StorageType.Building, objectId, out storageId))
+            {
+                // Wrong storage type or relative data
+                return;
+            }
+
+            GameInstance.ServerStorageHandlers.OpenStorage(ConnectionId, Entity, storageId);
+#endif
+        }
+
         public bool CallServerOpenDoor(uint objectId, string password)
         {
             if (!CurrentGameplayRule.CanInteractEntity(Entity, objectId))
@@ -124,7 +172,7 @@ namespace MultiplayerARPG
 
             if (doorEntity.Lockable && doorEntity.IsLocked && !doorEntity.LockPassword.Equals(password))
             {
-                // Wrong password
+                GameInstance.ServerGameMessageHandlers.SendGameMessage(ConnectionId, UITextKeys.UI_ERROR_WRONG_BUILDING_PASSWORD);
                 return;
             }
 

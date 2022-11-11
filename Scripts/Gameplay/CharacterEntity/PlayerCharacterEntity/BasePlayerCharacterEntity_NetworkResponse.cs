@@ -95,43 +95,6 @@ namespace MultiplayerARPG
         }
 
         [ServerRpc]
-        protected void ServerOpenStorage(uint objectId, string password)
-        {
-#if UNITY_EDITOR || UNITY_SERVER
-            if (!CanDoActions())
-                return;
-
-            StorageEntity storageEntity;
-            if (!Manager.TryGetEntityByObjectId(objectId, out storageEntity))
-            {
-                // Can't find the entity
-                return;
-            }
-
-            if (!IsGameEntityInDistance(storageEntity, CurrentGameInstance.conversationDistance))
-            {
-                GameInstance.ServerGameMessageHandlers.SendGameMessage(ConnectionId, UITextKeys.UI_ERROR_CHARACTER_IS_TOO_FAR);
-                return;
-            }
-
-            if (storageEntity.Lockable && storageEntity.IsLocked && !storageEntity.LockPassword.Equals(password))
-            {
-                // Wrong password
-                return;
-            }
-
-            StorageId storageId;
-            if (!this.GetStorageId(StorageType.Building, objectId, out storageId))
-            {
-                // Wrong storage type or relative data
-                return;
-            }
-
-            GameInstance.ServerStorageHandlers.OpenStorage(ConnectionId, this, storageId);
-#endif
-        }
-
-        [ServerRpc]
         protected void ServerAppendCraftingQueueItem(uint sourceObjectId, int dataId, short amount)
         {
             UITextKeys errorMessage;

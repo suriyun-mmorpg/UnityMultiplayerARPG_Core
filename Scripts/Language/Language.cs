@@ -279,6 +279,8 @@ namespace MultiplayerARPG
         // Enter Building Password
         UI_SET_BUILDING_PASSWORD,
         UI_SET_BUILDING_PASSWORD_DESCRIPTION,
+        // Building Error
+        UI_ERROR_WRONG_BUILDING_PASSWORD,
         // IAP Error
         UI_ERROR_IAP_NOT_INITIALIZED,
         UI_ERROR_IAP_PURCHASING_UNAVAILABLE,
@@ -1511,6 +1513,7 @@ namespace MultiplayerARPG
             Texts.Add(UITextKeys.UI_ENTER_BUILDING_PASSWORD_DESCRIPTION.ToString(), "Enter 6 digits number");
             Texts.Add(UITextKeys.UI_SET_BUILDING_PASSWORD.ToString(), "Set password");
             Texts.Add(UITextKeys.UI_SET_BUILDING_PASSWORD_DESCRIPTION.ToString(), "Enter 6 digits number");
+            Texts.Add(UITextKeys.UI_ERROR_WRONG_BUILDING_PASSWORD.ToString(), "Wrong password");
             // UI Mail
             Texts.Add(UITextKeys.UI_ERROR_MAIL_SEND_NOT_ALLOWED.ToString(), "You're not allowed to send mail");
             Texts.Add(UITextKeys.UI_ERROR_MAIL_SEND_NO_RECEIVER.ToString(), "No receiver, you may entered wrong name");
