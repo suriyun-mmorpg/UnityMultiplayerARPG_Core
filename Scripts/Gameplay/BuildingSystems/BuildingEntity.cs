@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Profiling;
-using UnityEngine.Tilemaps;
 using LiteNetLibManager;
 using UnityEngine.Events;
 using UnityEngine.UI;
