@@ -535,27 +535,27 @@ namespace MultiplayerARPG
             if (buildingEntity is DoorEntity)
             {
                 if (!uiCurrentDoor.IsVisible())
-                    uiCurrentDoor.Show();
+                    uiCurrentDoor.Show(buildingEntity);
             }
             else if (buildingEntity is StorageEntity)
             {
                 if (!uiCurrentStorage.IsVisible())
-                    uiCurrentStorage.Show();
+                    uiCurrentStorage.Show(buildingEntity);
             }
             else if (buildingEntity is WorkbenchEntity)
             {
                 if (!uiCurrentWorkbench.IsVisible())
-                    uiCurrentWorkbench.Show();
+                    uiCurrentWorkbench.Show(buildingEntity);
             }
             else if (buildingEntity is QueuedWorkbenchEntity)
             {
                 if (!uiCurrentQueuedWorkbench.IsVisible())
-                    uiCurrentQueuedWorkbench.Show();
+                    uiCurrentQueuedWorkbench.Show(buildingEntity);
             }
             else
             {
                 if (!uiCurrentBuilding.IsVisible())
-                    uiCurrentBuilding.Show();
+                    uiCurrentBuilding.Show(buildingEntity);
             }
             if (onShowCurrentBuildingDialog != null)
                 onShowCurrentBuildingDialog.Invoke(buildingEntity);
