@@ -17,6 +17,7 @@ namespace MultiplayerARPG
         public UICharacterItem uiCharacterItem;
         public GameObject[] placeHolders;
         public KeyCode key;
+        public string buttonName;
 
         [Header("Options")]
         public bool autoAssignItem;
@@ -83,12 +84,13 @@ namespace MultiplayerARPG
 
             if (IsChanneledAbility())
             {
-                if (Input.GetKey(key) && !channeledActionStarted)
+                bool pressing = InputManager.GetKey(key) || InputManager.GetButton(buttonName);
+                if (pressing && !channeledActionStarted)
                 {
                     channeledActionStarted = true;
                     UICharacterHotkeys.SetUsingHotkey(this);
                 }
-                else if (!Input.GetKey(key) && channeledActionStarted)
+                else if (!pressing && channeledActionStarted)
                 {
                     channeledActionStarted = false;
                     UICharacterHotkeys.FinishHotkeyAimControls(false);
@@ -96,7 +98,8 @@ namespace MultiplayerARPG
             }
             else
             {
-                if (Input.GetKeyDown(key))
+                bool pressing = InputManager.GetKeyDown(key) || InputManager.GetButtonDown(buttonName);
+                if (pressing)
                     OnClickUse();
             }
         }
