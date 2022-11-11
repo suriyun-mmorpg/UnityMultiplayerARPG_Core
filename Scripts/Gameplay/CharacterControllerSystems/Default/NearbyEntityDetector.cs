@@ -121,8 +121,6 @@ namespace MultiplayerARPG
 
         private void OnTriggerExit(Collider other)
         {
-            if (excludeColliders.Contains(other))
-                return;
             if (!RemoveEntity(other.gameObject))
                 return;
             if (onUpdateList != null)
@@ -144,8 +142,6 @@ namespace MultiplayerARPG
 
         private void OnTriggerExit2D(Collider2D other)
         {
-            if (excludeCollider2Ds.Contains(other))
-                return;
             if (!RemoveEntity(other.gameObject))
                 return;
             if (onUpdateList != null)
@@ -165,15 +161,16 @@ namespace MultiplayerARPG
             IActivatableEntity activatableEntity;
             IHoldActivatableEntity holdActivatableEntity;
             IPickupActivatableEntity pickupActivatableEntity;
-            FindEntity(other, out player, out monster, out npc, out itemDrop, out building, out vehicle, out warpPortal, out itemsContainer, out activatableEntity, out holdActivatableEntity, out pickupActivatableEntity);
+            FindEntity(other, out player, out monster, out npc, out itemDrop, out building, out vehicle, out warpPortal, out itemsContainer, out activatableEntity, out holdActivatableEntity, out pickupActivatableEntity, true);
 
+            bool foundSomething = false;
             if (player != null)
             {
                 if (!characters.Contains(player))
                     characters.Add(player);
                 if (!players.Contains(player))
                     players.Add(player);
-                return true;
+                foundSomething = true;
             }
             if (monster != null)
             {
@@ -181,63 +178,63 @@ namespace MultiplayerARPG
                     characters.Add(monster);
                 if (!monsters.Contains(monster))
                     monsters.Add(monster);
-                return true;
+                foundSomething = true;
             }
             if (npc != null)
             {
                 if (!npcs.Contains(npc))
                     npcs.Add(npc);
-                return true;
+                foundSomething = true;
             }
             if (itemDrop != null)
             {
                 if (!itemDrops.Contains(itemDrop))
                     itemDrops.Add(itemDrop);
-                return true;
+                foundSomething = true;
             }
             if (building != null)
             {
                 if (!buildings.Contains(building))
                     buildings.Add(building);
-                return true;
+                foundSomething = true;
             }
             if (vehicle != null)
             {
                 if (!vehicles.Contains(vehicle))
                     vehicles.Add(vehicle);
-                return true;
+                foundSomething = true;
             }
             if (warpPortal != null)
             {
                 if (!warpPortals.Contains(warpPortal))
                     warpPortals.Add(warpPortal);
-                return true;
+                foundSomething = true;
             }
             if (itemsContainer != null)
             {
                 if (!itemsContainers.Contains(itemsContainer))
                     itemsContainers.Add(itemsContainer);
-                return true;
+                foundSomething = true;
             }
             if (!activatableEntity.IsNull())
             {
                 if (!activatableEntities.Contains(activatableEntity))
                     activatableEntities.Add(activatableEntity);
-                return true;
+                foundSomething = true;
             }
             if (!holdActivatableEntity.IsNull())
             {
                 if (!holdActivatableEntities.Contains(holdActivatableEntity))
                     holdActivatableEntities.Add(holdActivatableEntity);
-                return true;
+                foundSomething = true;
             }
             if (!pickupActivatableEntity.IsNull())
             {
                 if (!pickupActivatableEntities.Contains(pickupActivatableEntity))
                     pickupActivatableEntities.Add(pickupActivatableEntity);
-                return true;
+                foundSomething = true;
             }
-            return false;
+            return foundSomething;
         }
 
         private bool RemoveEntity(GameObject other)
@@ -255,29 +252,30 @@ namespace MultiplayerARPG
             IPickupActivatableEntity pickupActivatableEntity;
             FindEntity(other, out player, out monster, out npc, out itemDrop, out building, out vehicle, out warpPortal, out itemsContainer, out activatableEntity, out holdActivatableEntity, out pickupActivatableEntity, false);
 
+            bool removeSomething = false;
             if (player != null)
-                return characters.Remove(player) && players.Remove(player);
+                removeSomething = removeSomething || characters.Remove(player) && players.Remove(player);
             if (monster != null)
-                return characters.Remove(monster) && monsters.Remove(monster);
+                removeSomething = removeSomething || characters.Remove(monster) && monsters.Remove(monster);
             if (npc != null)
-                return npcs.Remove(npc);
+                removeSomething = removeSomething || npcs.Remove(npc);
             if (itemDrop != null)
-                return itemDrops.Remove(itemDrop);
+                removeSomething = removeSomething || itemDrops.Remove(itemDrop);
             if (building != null)
-                return buildings.Remove(building);
+                removeSomething = removeSomething || buildings.Remove(building);
             if (vehicle != null)
-                return vehicles.Remove(vehicle);
+                removeSomething = removeSomething || vehicles.Remove(vehicle);
             if (warpPortal != null)
-                return warpPortals.Remove(warpPortal);
+                removeSomething = removeSomething || warpPortals.Remove(warpPortal);
             if (itemsContainer != null)
-                return itemsContainers.Remove(itemsContainer);
-            if (activatableEntity != null)
-                return activatableEntities.Remove(activatableEntity);
-            if (holdActivatableEntity != null)
-                return holdActivatableEntities.Remove(holdActivatableEntity);
-            if (pickupActivatableEntity != null)
-                return pickupActivatableEntities.Remove(pickupActivatableEntity);
-            return false;
+                removeSomething = removeSomething || itemsContainers.Remove(itemsContainer);
+            if (!activatableEntity.IsNull())
+                removeSomething = removeSomething || activatableEntities.Remove(activatableEntity);
+            if (!holdActivatableEntity.IsNull())
+                removeSomething = removeSomething || holdActivatableEntities.Remove(holdActivatableEntity);
+            if (!pickupActivatableEntity.IsNull())
+                removeSomething = removeSomething || pickupActivatableEntities.Remove(pickupActivatableEntity);
+            return removeSomething;
         }
 
         private void FindEntity(GameObject other,
@@ -292,7 +290,7 @@ namespace MultiplayerARPG
             out IActivatableEntity activatableEntity,
             out IHoldActivatableEntity holdActivatableEntity,
             out IPickupActivatableEntity pickupActivatableEntity,
-            bool findWithAdvanceOptions = true)
+            bool findWithAdvanceOptions)
         {
             player = null;
             monster = null;
