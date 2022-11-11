@@ -14,10 +14,10 @@ namespace MultiplayerARPG
         /// <summary>
         /// Return `TRUE` if character can use command
         /// </summary>
-        /// <param name="characterEntity"></param>
+        /// <param name="userLevel"></param>
         /// <param name="command"></param>
         /// <returns></returns>
-        public abstract bool CanUseGMCommand(BasePlayerCharacterEntity characterEntity, string command);
+        public abstract bool CanUseGMCommand(int userLevel, string command);
         /// <summary>
         /// Return response message, it's a message which send to command user.
         /// </summary>

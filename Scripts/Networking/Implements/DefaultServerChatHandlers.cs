@@ -26,10 +26,9 @@ namespace MultiplayerARPG
                     if (message.sendByServer || playerCharacter != null)
                     {
                         BasePlayerCharacterEntity playerCharacterEntity = playerCharacter == null ? null : playerCharacter as BasePlayerCharacterEntity;
-                        string gmCommand;
                         if (message.sendByServer || (playerCharacterEntity != null &&
-                            GameInstance.Singleton.GMCommands.IsGMCommand(message.message, out gmCommand) &&
-                            GameInstance.Singleton.GMCommands.CanUseGMCommand(playerCharacterEntity, gmCommand)))
+                            GameInstance.Singleton.GMCommands.IsGMCommand(message.message, out string gmCommand) &&
+                            GameInstance.Singleton.GMCommands.CanUseGMCommand(playerCharacterEntity.UserLevel, gmCommand)))
                         {
                             // If it's gm command and sender's user level > 0, handle gm commands
                             string response = GameInstance.Singleton.GMCommands.HandleGMCommand(message.senderName, playerCharacterEntity, message.message);
@@ -85,8 +84,7 @@ namespace MultiplayerARPG
                     }
                     break;
                 case ChatChannel.Party:
-                    PartyData party;
-                    if (GameInstance.ServerPartyHandlers.TryGetParty(message.channelId, out party))
+                    if (GameInstance.ServerPartyHandlers.TryGetParty(message.channelId, out PartyData party))
                     {
                         foreach (string memberId in party.GetMemberIds())
                         {
@@ -99,8 +97,7 @@ namespace MultiplayerARPG
                     }
                     break;
                 case ChatChannel.Guild:
-                    GuildData guild;
-                    if (GameInstance.ServerGuildHandlers.TryGetGuild(message.channelId, out guild))
+                    if (GameInstance.ServerGuildHandlers.TryGetGuild(message.channelId, out GuildData guild))
                     {
                         foreach (string memberId in guild.GetMemberIds())
                         {

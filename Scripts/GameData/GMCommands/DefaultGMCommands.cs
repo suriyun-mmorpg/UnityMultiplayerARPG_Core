@@ -206,10 +206,10 @@ namespace MultiplayerARPG
             return false;
         }
 
-        public override bool CanUseGMCommand(BasePlayerCharacterEntity characterEntity, string command)
+        public override bool CanUseGMCommand(int userLevel, string command)
         {
             // TODO: May allow user to use some GM commands by their user level.
-            return characterEntity != null && characterEntity.UserLevel > 0;
+            return userLevel > 0;
         }
 
         public override string HandleGMCommand(string sender, BasePlayerCharacterEntity characterEntity, string chatMessage)
