@@ -28,7 +28,7 @@ namespace MultiplayerARPG
             if (ConstructingBuildingEntity == null)
             {
                 // Activate nearby npcs / players / activable buildings
-                if (InputManager.GetButtonDown("Activate"))
+                if (activateInput.IsPress)
                 {
                     if (ActivatableEntityDetector.activatableEntities.Count > 0)
                     {
@@ -43,9 +43,24 @@ namespace MultiplayerARPG
                             }
                         }
                     }
+                } else if (activateInput.IsHold)
+                {
+                    if (ActivatableEntityDetector.activatableEntities.Count > 0)
+                    {
+                        IHoldActivatableEntity activatable;
+                        for (int i = 0; i < ActivatableEntityDetector.holdActivatableEntities.Count; ++i)
+                        {
+                            activatable = ActivatableEntityDetector.holdActivatableEntities[i];
+                            if (activatable.CanHoldActivate())
+                            {
+                                activatable.OnHoldActivate();
+                                break;
+                            }
+                        }
+                    }
                 }
                 // Pick up nearby items
-                if (InputManager.GetButtonDown("PickUpItem"))
+                if (pickupItemInput.IsPress)
                 {
                     if (ItemDropEntityDetector.pickupActivatableEntities.Count > 0)
                     {
@@ -62,13 +77,13 @@ namespace MultiplayerARPG
                     }
                 }
                 // Reload
-                if (InputManager.GetButtonDown("Reload"))
+                if (reloadInput.IsPress)
                 {
                     // Reload ammo when press the button
                     ReloadAmmo();
                 }
                 // Find target to attack
-                if (InputManager.GetButtonDown("FindEnemy"))
+                if (findEnemyInput.IsPress)
                 {
                     ++findingEnemyIndex;
                     if (findingEnemyIndex < 0 || findingEnemyIndex >= EnemyEntityDetector.characters.Count)
@@ -87,12 +102,12 @@ namespace MultiplayerARPG
                         }
                     }
                 }
-                if (InputManager.GetButtonDown("ExitVehicle"))
+                if (exitVehicleInput.IsPress)
                 {
                     // Exit vehicle
                     PlayingCharacterEntity.CallServerExitVehicle();
                 }
-                if (InputManager.GetButtonDown("SwitchEquipWeaponSet"))
+                if (switchEquipWeaponSetInput.IsPress)
                 {
                     // Switch equip weapon set
                     GameInstance.ClientInventoryHandlers.RequestSwitchEquipWeaponSet(new RequestSwitchEquipWeaponSetMessage()

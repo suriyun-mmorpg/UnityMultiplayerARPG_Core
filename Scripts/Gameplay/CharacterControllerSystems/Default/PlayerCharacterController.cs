@@ -124,6 +124,12 @@ namespace MultiplayerARPG
         protected bool isFollowingTarget;
         protected bool didActionOnTarget;
         protected float buildYRotate;
+        protected InputStateManager activateInput;
+        protected InputStateManager pickupItemInput;
+        protected InputStateManager reloadInput;
+        protected InputStateManager findEnemyInput;
+        protected InputStateManager exitVehicleInput;
+        protected InputStateManager switchEquipWeaponSetInput;
 
         protected override void Awake()
         {
@@ -143,6 +149,12 @@ namespace MultiplayerARPG
             findingEnemyIndex = -1;
             isLeftHandAttacking = false;
             ConstructingBuildingEntity = null;
+            activateInput = new InputStateManager("Activate");
+            pickupItemInput = new InputStateManager("PickUpItem");
+            reloadInput = new InputStateManager("Reload");
+            findEnemyInput = new InputStateManager("FindEnemy");
+            exitVehicleInput = new InputStateManager("ExitVehicle");
+            switchEquipWeaponSetInput = new InputStateManager("SwitchEquipWeaponSet");
 
             if (targetObjectPrefab != null)
             {
@@ -161,6 +173,7 @@ namespace MultiplayerARPG
             ActivatableEntityDetector = tempGameObject.AddComponent<NearbyEntityDetector>();
             ActivatableEntityDetector.detectingRadius = distanceToActivateByActivateKey;
             ActivatableEntityDetector.findActivatableEntity = true;
+            ActivatableEntityDetector.findHoldActivatableEntity = true;
             // This entity detector will find for an item drop entities to activate when pressed pickup key
             tempGameObject = new GameObject("_ItemDropEntityDetector");
             ItemDropEntityDetector = tempGameObject.AddComponent<NearbyEntityDetector>();
