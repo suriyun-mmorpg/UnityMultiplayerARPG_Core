@@ -10,8 +10,6 @@ public class UIInputDialog : UIBase
     private System.Action<string> onConfirmText;
     private System.Action<int> onConfirmInteger;
     private System.Action<float> onConfirmDecimal;
-    private InputField.ContentType contentType;
-    private int characterLimit;
     private int intDefaultAmount;
     private int? intMinAmount;
     private int? intMaxAmount;
@@ -23,7 +21,7 @@ public class UIInputDialog : UIBase
     {
         get
         {
-            return uiTextTitle == null ? "" : uiTextTitle.text;
+            return uiTextTitle == null ? string.Empty : uiTextTitle.text;
         }
         set
         {
@@ -35,7 +33,7 @@ public class UIInputDialog : UIBase
     {
         get
         {
-            return uiTextDescription == null ? "" : uiTextDescription.text;
+            return uiTextDescription == null ? string.Empty : uiTextDescription.text;
         }
         set
         {
@@ -47,7 +45,7 @@ public class UIInputDialog : UIBase
     {
         get
         {
-            return uiInputField == null ? "" : uiInputField.text;
+            return uiInputField == null ? string.Empty : uiInputField.text;
         }
         set
         {
@@ -55,13 +53,32 @@ public class UIInputDialog : UIBase
         }
     }
 
+    public InputField.ContentType ContentType
+    {
+        get
+        {
+            return uiInputField == null ? InputField.ContentType.Standard : uiInputField.contentType;
+        }
+        set
+        {
+            if (uiInputField != null) uiInputField.contentType = value;
+        }
+    }
+
+    public int CharacterLimit
+    {
+        get
+        {
+            return uiInputField == null ? 0 : uiInputField.characterLimit;
+        }
+        set
+        {
+            if (uiInputField != null) uiInputField.characterLimit = value;
+        }
+    }
+
     protected virtual void OnEnable()
     {
-        if (uiInputField != null)
-        {
-            uiInputField.contentType = contentType;
-            uiInputField.characterLimit = characterLimit;
-        }
         if (buttonConfirm != null)
         {
             buttonConfirm.onClick.RemoveListener(OnClickConfirm);
@@ -79,8 +96,8 @@ public class UIInputDialog : UIBase
         Title = title;
         Description = description;
         InputFieldText = defaultText;
-        this.contentType = contentType;
-        this.characterLimit = characterLimit;
+        ContentType = contentType;
+        CharacterLimit = characterLimit;
         this.onConfirmText = onConfirmText;
         Show();
     }
@@ -114,8 +131,8 @@ public class UIInputDialog : UIBase
             uiInputField.onValueChanged.RemoveAllListeners();
             uiInputField.onValueChanged.AddListener(ValidateIntAmount);
         }
-        contentType = InputField.ContentType.IntegerNumber;
-        characterLimit = 0;
+        ContentType = InputField.ContentType.IntegerNumber;
+        CharacterLimit = 0;
         this.onConfirmInteger = onConfirmInteger;
         Show();
     }
@@ -162,8 +179,8 @@ public class UIInputDialog : UIBase
             uiInputField.onValueChanged.RemoveAllListeners();
             uiInputField.onValueChanged.AddListener(ValidateFloatAmount);
         }
-        contentType = InputField.ContentType.DecimalNumber;
-        characterLimit = 0;
+        ContentType = InputField.ContentType.DecimalNumber;
+        CharacterLimit = 0;
         this.onConfirmDecimal = onConfirmDecimal;
         Show();
     }
@@ -184,7 +201,7 @@ public class UIInputDialog : UIBase
 
     public void OnClickConfirm()
     {
-        switch (contentType)
+        switch (ContentType)
         {
             case InputField.ContentType.IntegerNumber:
                 int intAmount = int.Parse(InputFieldText);
