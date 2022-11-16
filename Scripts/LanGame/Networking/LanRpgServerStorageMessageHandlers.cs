@@ -171,9 +171,9 @@ namespace MultiplayerARPG
                 });
                 return;
             }
-            List<CharacterItem> storageItemList = GameInstance.ServerStorageHandlers.GetStorageItems(storageId);
-            if (fromIndex >= storageItemList.Count ||
-                toIndex >= storageItemList.Count)
+            List<CharacterItem> storageItems = GameInstance.ServerStorageHandlers.GetStorageItems(storageId);
+            if (fromIndex >= storageItems.Count ||
+                toIndex >= storageItems.Count)
             {
                 result.Invoke(AckResponseCode.Error, new ResponseSwapOrMergeStorageItemMessage()
                 {
@@ -186,8 +186,8 @@ namespace MultiplayerARPG
             bool isLimitSlot = storage.slotLimit > 0;
             short slotLimit = storage.slotLimit;
             // Prepare item data
-            CharacterItem fromItem = storageItemList[fromIndex];
-            CharacterItem toItem = storageItemList[toIndex];
+            CharacterItem fromItem = storageItems[fromIndex];
+            CharacterItem toItem = storageItems[toIndex];
 
             if (fromItem.dataId.Equals(toItem.dataId) && !fromItem.IsFull() && !toItem.IsFull())
             {
@@ -196,26 +196,26 @@ namespace MultiplayerARPG
                 if (toItem.amount + fromItem.amount <= maxStack)
                 {
                     toItem.amount += fromItem.amount;
-                    storageItemList[fromIndex] = CharacterItem.Empty;
-                    storageItemList[toIndex] = toItem;
+                    storageItems[fromIndex] = CharacterItem.Empty;
+                    storageItems[toIndex] = toItem;
                 }
                 else
                 {
                     short remains = (short)(toItem.amount + fromItem.amount - maxStack);
                     toItem.amount = maxStack;
                     fromItem.amount = remains;
-                    storageItemList[fromIndex] = fromItem;
-                    storageItemList[toIndex] = toItem;
+                    storageItems[fromIndex] = fromItem;
+                    storageItems[toIndex] = toItem;
                 }
             }
             else
             {
                 // Swap
-                storageItemList[fromIndex] = toItem;
-                storageItemList[toIndex] = fromItem;
+                storageItems[fromIndex] = toItem;
+                storageItems[toIndex] = fromItem;
             }
-            storageItemList.FillEmptySlots(isLimitSlot, slotLimit);
-            GameInstance.ServerStorageHandlers.SetStorageItems(storageId, storageItemList);
+            storageItems.FillEmptySlots(isLimitSlot, slotLimit);
+            GameInstance.ServerStorageHandlers.SetStorageItems(storageId, storageItems);
             GameInstance.ServerStorageHandlers.NotifyStorageItemsUpdated(request.storageType, request.storageOwnerId);
             // Success
             result.Invoke(AckResponseCode.Success, new ResponseSwapOrMergeStorageItemMessage());
