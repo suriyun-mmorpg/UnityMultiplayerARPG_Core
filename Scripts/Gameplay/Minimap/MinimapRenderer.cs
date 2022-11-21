@@ -10,6 +10,7 @@ namespace MultiplayerARPG
         public float spriteOffsets2D = 1f;
         public Sprite noMinimapSprite = null;
         public UnityLayer layer;
+        public SpriteRenderer minimapRendererPrefab;
 
         [Header("Testing")]
         public bool isTestMode;
@@ -21,7 +22,10 @@ namespace MultiplayerARPG
 
         private void Start()
         {
-            spriteRenderer = new GameObject("__MinimapRenderer").AddComponent<SpriteRenderer>();
+            if (minimapRendererPrefab == null)
+                spriteRenderer = new GameObject("__MinimapRenderer").AddComponent<SpriteRenderer>();
+            else
+                spriteRenderer = Instantiate(minimapRendererPrefab);
             spriteRenderer.gameObject.layer = layer.LayerIndex;
         }
 

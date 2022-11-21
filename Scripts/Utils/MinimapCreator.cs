@@ -8,13 +8,14 @@ namespace MultiplayerARPG
 {
     public class MinimapCreator : MonoBehaviour
     {
-        public const int TEXTURE_WIDTH = 1024;
-        public const int TEXTURE_HEIGHT = 1024;
+        public const int TEXTURE_WIDTH_AND_HEIGHT = 2048;
         public const int TEXTURE_DEPTH = 24;
         public const float SPRITE_PIXELS_PER_UNIT = 100f;
 
         public BaseMapInfo targetMapInfo;
         public DimensionType dimensionType;
+        public int widthAndHeight = 2048;
+        public int depth = 24;
         public LayerMask cullingMask = ~0;
         public Color clearFlagsBackgroundColor = Color.black;
         public string minimapSuffix = "_minimap";
@@ -50,7 +51,9 @@ namespace MultiplayerARPG
                 makeByCollider2D,
                 makeByRenderer,
                 doNotDestroyCamera,
-                customCamera);
+                customCamera,
+                widthAndHeight,
+                depth);
         }
 
         public static void Create(
@@ -66,7 +69,9 @@ namespace MultiplayerARPG
             bool makeByCollider2D,
             bool makeByRenderer,
             bool doNotDestroyCamera = false,
-            Camera customCamera = null)
+            Camera customCamera = null,
+            int? widthAndHeight = null,
+            int? depth = null)
         {
             // Find bounds
             Bounds bounds = default;
@@ -144,9 +149,11 @@ namespace MultiplayerARPG
             camera.cullingMask = cullingMask.value;
 
             // Make texture
-            RenderTexture renderTexture = new RenderTexture(TEXTURE_WIDTH, TEXTURE_HEIGHT, TEXTURE_DEPTH);
-            Rect rect = new Rect(0, 0, TEXTURE_WIDTH, TEXTURE_HEIGHT);
-            Texture2D texture = new Texture2D(TEXTURE_WIDTH, TEXTURE_HEIGHT, TextureFormat.RGBA32, false);
+            int tempWidthAndHeight = widthAndHeight.HasValue ? widthAndHeight.Value : TEXTURE_WIDTH_AND_HEIGHT;
+            int tempDepth = depth.HasValue ? depth.Value : TEXTURE_DEPTH;
+            RenderTexture renderTexture = new RenderTexture(tempWidthAndHeight, tempWidthAndHeight, TEXTURE_DEPTH);
+            Rect rect = new Rect(0, 0, tempWidthAndHeight, tempWidthAndHeight);
+            Texture2D texture = new Texture2D(tempWidthAndHeight, tempWidthAndHeight, TextureFormat.RGBA32, false);
 
             camera.targetTexture = renderTexture;
             camera.Render();
