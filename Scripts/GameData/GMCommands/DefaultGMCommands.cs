@@ -5,6 +5,7 @@ namespace MultiplayerARPG
 {
     public class DefaultGMCommands : BaseGMCommands
     {
+#if UNITY_EDITOR || UNITY_SERVER
         /// <summary>
         /// Get list of all GM commands
         /// </summary>
@@ -115,12 +116,13 @@ namespace MultiplayerARPG
             "/ban {name} {duration} = Ban character's account which its name is {name} for {duration} days.\n" +
             "/unban {name} = Unban character's account which its name is {name}.\n" +
             "/kick {name} = Kick character which its name is {name}.\n";
+#endif
 
         public virtual bool IsDataLengthValid(string command, int dataLength)
         {
             if (string.IsNullOrEmpty(command))
                 return false;
-
+#if UNITY_EDITOR || UNITY_SERVER
             if (command.ToLower().Equals(Help.ToLower()))
                 return true;
             if (command.ToLower().Equals(Level.ToLower()) && dataLength == 2)
@@ -165,7 +167,7 @@ namespace MultiplayerARPG
                 return true;
             if (command.ToLower().Equals(Kick.ToLower()) && dataLength == 2)
                 return true;
-
+#endif
             return false;
         }
 
@@ -174,7 +176,7 @@ namespace MultiplayerARPG
             command = string.Empty;
             if (string.IsNullOrEmpty(chatMessage))
                 return false;
-
+#if UNITY_EDITOR || UNITY_SERVER
             string[] splited = chatMessage.Split(' ');
             command = splited[0];
             if (command.ToLower().Equals(Help.ToLower()) ||
@@ -202,6 +204,7 @@ namespace MultiplayerARPG
             {
                 return true;
             }
+#endif
             command = string.Empty;
             return false;
         }
@@ -216,8 +219,8 @@ namespace MultiplayerARPG
         {
             if (string.IsNullOrEmpty(chatMessage))
                 return string.Empty;
-
             string response = string.Empty;
+#if UNITY_EDITOR || UNITY_SERVER
             string[] data = chatMessage.Split(' ');
             string commandKey = data[0];
             string receiver;
@@ -579,6 +582,7 @@ namespace MultiplayerARPG
                     }
                 }
             }
+#endif
             return response;
         }
     }
