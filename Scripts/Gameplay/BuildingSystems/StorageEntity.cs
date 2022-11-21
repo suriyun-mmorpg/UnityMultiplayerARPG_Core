@@ -105,9 +105,10 @@ namespace MultiplayerARPG
                     LanguageManager.GetText(UITextKeys.UI_ENTER_BUILDING_PASSWORD_DESCRIPTION.ToString()),
                     (password) =>
                     {
-                        GameInstance.PlayingCharacterEntity.CallServerOpenStorage(ObjectId, password);
+                        GameInstance.PlayingCharacterEntity.Building.CallServerOpenStorage(ObjectId, password);
                     }, string.Empty, PasswordContentType, PasswordLength,
                     LanguageManager.GetText(UITextKeys.UI_ENTER_BUILDING_PASSWORD.ToString()));
+            }
         }
     }
 }
