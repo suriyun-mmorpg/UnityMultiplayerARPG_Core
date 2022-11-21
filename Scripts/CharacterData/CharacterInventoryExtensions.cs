@@ -26,15 +26,19 @@ namespace MultiplayerARPG
                         return false;
                     break;
                 default:
-                    CharacterItem movingItem = storageItems[storageItemIndex].Clone(true);
-                    if (movingItem.IsEmptySlot())
+                    if (storageItems[storageItemIndex].IsEmptySlot())
                     {
                         gameMessage = UITextKeys.UI_ERROR_INVALID_ITEM_INDEX;
                         return false;
                     }
+                    if (storageItems[storageItemIndex].amount < storageItemAmount)
+                    {
+                        gameMessage = UITextKeys.UI_ERROR_NOT_ENOUGH_ITEMS;
+                        return false;
+                    }
+                    CharacterItem movingItem = storageItems[storageItemIndex].Clone(true);
                     movingItem.amount = storageItemAmount;
-                    if (inventoryItemIndex < 0 ||
-                        inventoryItemIndex >= playerCharacter.NonEquipItems.Count ||
+                    if (inventoryItemIndex < 0 || inventoryItemIndex >= playerCharacter.NonEquipItems.Count ||
                         playerCharacter.NonEquipItems[inventoryItemIndex].dataId == movingItem.dataId)
                     {
                         // Add to inventory or merge
@@ -88,8 +92,7 @@ namespace MultiplayerARPG
             out UITextKeys gameMessage)
         {
             // Get and validate inventory item
-            if (equipSlotIndexOrWeaponSet < 0 ||
-                equipSlotIndexOrWeaponSet >= GameInstance.Singleton.maxEquipWeaponSet)
+            if (equipSlotIndexOrWeaponSet < 0 || equipSlotIndexOrWeaponSet >= GameInstance.Singleton.maxEquipWeaponSet)
                 equipSlotIndexOrWeaponSet = playerCharacter.EquipWeaponSet;
             playerCharacter.FillWeaponSetsIfNeeded(equipSlotIndexOrWeaponSet);
             EquipWeapons equipWeapons = playerCharacter.SelectableWeaponSets[equipSlotIndexOrWeaponSet];
@@ -97,24 +100,43 @@ namespace MultiplayerARPG
             switch (inventoryType)
             {
                 case InventoryType.EquipWeaponLeft:
+                    if (equipWeapons.leftHand.IsEmptySlot())
+                    {
+                        gameMessage = UITextKeys.UI_ERROR_INVALID_ITEM_INDEX;
+                        return false;
+                    }
                     movingItem = equipWeapons.leftHand.Clone(true);
                     break;
                 case InventoryType.EquipWeaponRight:
+                    if (equipWeapons.rightHand.IsEmptySlot())
+                    {
+                        gameMessage = UITextKeys.UI_ERROR_INVALID_ITEM_INDEX;
+                        return false;
+                    }
                     movingItem = equipWeapons.rightHand.Clone(true);
                     break;
                 case InventoryType.EquipItems:
+                    if (playerCharacter.EquipItems[inventoryItemIndex].IsEmptySlot())
+                    {
+                        gameMessage = UITextKeys.UI_ERROR_INVALID_ITEM_INDEX;
+                        return false;
+                    }
                     movingItem = playerCharacter.EquipItems[inventoryItemIndex].Clone(true);
                     break;
                 default:
+                    if (playerCharacter.NonEquipItems[inventoryItemIndex].IsEmptySlot())
+                    {
+                        gameMessage = UITextKeys.UI_ERROR_INVALID_ITEM_INDEX;
+                        return false;
+                    }
+                    if (playerCharacter.NonEquipItems[inventoryItemIndex].amount < inventoryItemAmount)
+                    {
+                        gameMessage = UITextKeys.UI_ERROR_NOT_ENOUGH_ITEMS;
+                        return false;
+                    }
                     movingItem = playerCharacter.NonEquipItems[inventoryItemIndex].Clone(true);
                     movingItem.amount = inventoryItemAmount;
                     break;
-            }
-
-            if (movingItem.IsEmptySlot())
-            {
-                gameMessage = UITextKeys.UI_ERROR_INVALID_ITEM_INDEX;
-                return false;
             }
 
             switch (inventoryType)
@@ -122,8 +144,7 @@ namespace MultiplayerARPG
                 case InventoryType.EquipWeaponLeft:
                 case InventoryType.EquipWeaponRight:
                 case InventoryType.EquipItems:
-                    if (storageItemIndex < 0 ||
-                        storageItemIndex >= storageItems.Count ||
+                    if (storageItemIndex < 0 || storageItemIndex >= storageItems.Count ||
                         storageItems[storageItemIndex].IsEmptySlot())
                     {
                         // Add to storage
@@ -159,8 +180,7 @@ namespace MultiplayerARPG
                     }
                     break;
                 default:
-                    if (storageItemIndex < 0 ||
-                        storageItemIndex >= storageItems.Count ||
+                    if (storageItemIndex < 0 || storageItemIndex >= storageItems.Count ||
                         storageItems[storageItemIndex].dataId == movingItem.dataId)
                     {
                         // Add to storage or merge
