@@ -1057,6 +1057,7 @@ namespace MultiplayerARPG
                 {
                     if (activateInput.IsHold)
                     {
+                        holdActivatableEntity = null;
                         if (SelectedEntity is IHoldActivatableEntity)
                         {
                             holdActivatableEntity = SelectedEntity as IHoldActivatableEntity;
@@ -1064,6 +1065,7 @@ namespace MultiplayerARPG
                     }
                     else if (activateInput.IsRelease)
                     {
+                        activatableEntity = null;
                         if (SelectedEntity == null)
                         {
                             if (warpPortalEntityDetector?.warpPortals.Count > 0)
