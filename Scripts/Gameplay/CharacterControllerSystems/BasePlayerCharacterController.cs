@@ -180,43 +180,51 @@ namespace MultiplayerARPG
             TargetEntity = null;
         }
 
-        public virtual void DestroyBuilding()
+        public virtual void DestroyBuilding(BuildingEntity targetBuildingEntity)
         {
-            if (TargetBuildingEntity == null)
+            if (targetBuildingEntity == null)
                 return;
-            PlayingCharacterEntity.Building.CallServerDestroyBuilding(TargetBuildingEntity.ObjectId);
+            PlayingCharacterEntity.Building.CallServerDestroyBuilding(targetBuildingEntity.ObjectId);
             DeselectBuilding();
         }
 
-        public virtual void SetBuildingPassword()
+        public virtual void SetBuildingPassword(BuildingEntity targetBuildingEntity)
         {
-            if (TargetBuildingEntity == null)
+            if (targetBuildingEntity == null)
                 return;
-            uint objectId = TargetBuildingEntity.ObjectId;
+            uint objectId = targetBuildingEntity.ObjectId;
             UISceneGlobal.Singleton.ShowPasswordDialog(
                 LanguageManager.GetText(UITextKeys.UI_SET_BUILDING_PASSWORD.ToString()),
                 LanguageManager.GetText(UITextKeys.UI_SET_BUILDING_PASSWORD_DESCRIPTION.ToString()),
                 (password) =>
                 {
                     PlayingCharacterEntity.Building.CallServerSetBuildingPassword(objectId, password);
-                }, string.Empty, TargetBuildingEntity.PasswordContentType, TargetBuildingEntity.PasswordLength,
+                }, string.Empty, targetBuildingEntity.PasswordContentType, targetBuildingEntity.PasswordLength,
                 LanguageManager.GetText(UITextKeys.UI_SET_BUILDING_PASSWORD.ToString()));
             DeselectBuilding();
         }
 
-        public virtual void LockBuilding()
+        public virtual void LockBuilding(BuildingEntity targetBuildingEntity)
         {
-            if (TargetBuildingEntity == null)
+            if (targetBuildingEntity == null)
                 return;
-            PlayingCharacterEntity.Building.CallServerLockBuilding(TargetBuildingEntity.ObjectId);
+            PlayingCharacterEntity.Building.CallServerLockBuilding(targetBuildingEntity.ObjectId);
             DeselectBuilding();
         }
 
-        public virtual void UnlockBuilding()
+        public virtual void UnlockBuilding(BuildingEntity targetBuildingEntity)
         {
-            if (TargetBuildingEntity == null)
+            if (targetBuildingEntity == null)
                 return;
-            PlayingCharacterEntity.Building.CallServerUnlockBuilding(TargetBuildingEntity.ObjectId);
+            PlayingCharacterEntity.Building.CallServerUnlockBuilding(targetBuildingEntity.ObjectId);
+            DeselectBuilding();
+        }
+
+        public virtual void ActivateBuilding(BuildingEntity targetBuildingEntity)
+        {
+            if (targetBuildingEntity == null)
+                return;
+            targetBuildingEntity.OnActivate();
             DeselectBuilding();
         }
 
@@ -259,14 +267,6 @@ namespace MultiplayerARPG
         protected void HideNpcDialog()
         {
             CacheUISceneGameplay.HideNpcDialog();
-        }
-
-        public void ActivateBuilding()
-        {
-            if (TargetBuildingEntity == null)
-                return;
-            TargetBuildingEntity.OnActivate();
-            DeselectBuilding();
         }
 
         public void SetQueueUsingSkill(AimPosition aimPosition, BaseSkill skill, short level)

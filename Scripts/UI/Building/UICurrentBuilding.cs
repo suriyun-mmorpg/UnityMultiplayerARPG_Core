@@ -83,31 +83,31 @@ namespace MultiplayerARPG
 
         public void OnClickDestroy()
         {
-            Controller.DestroyBuilding();
+            Controller.DestroyBuilding(buildingEntity);
             Hide();
         }
 
         public void OnClickSetPassword()
         {
-            Controller.SetBuildingPassword();
+            Controller.SetBuildingPassword(buildingEntity);
             Hide();
         }
 
         public void OnClickLock()
         {
-            Controller.LockBuilding();
+            Controller.LockBuilding(buildingEntity);
             Hide();
         }
 
         public void OnClickUnlock()
         {
-            Controller.UnlockBuilding();
+            Controller.UnlockBuilding(buildingEntity);
             Hide();
         }
 
         public void OnClickActivate()
         {
-            Controller.ActivateBuilding();
+            Controller.ActivateBuilding(buildingEntity);
             Hide();
         }
     }
