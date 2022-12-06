@@ -265,7 +265,7 @@ namespace MultiplayerARPG
                     if ("TooLongGuildName".Equals(data.key))
                         data.key = UITextKeys.UI_ERROR_GUILD_NAME_TOO_LONG.ToString();
                     if ("ExistedGuildName".Equals(data.key))
-                        data.key = UITextKeys.UI_ERROR_CHARACTER_NAME_EXISTED.ToString();
+                        data.key = UITextKeys.UI_ERROR_GUILD_NAME_EXISTED.ToString();
                     if ("TooShortGuildRoleName".Equals(data.key))
                         data.key = UITextKeys.UI_ERROR_GUILD_ROLE_NAME_TOO_SHORT.ToString();
                     if ("TooLongGuildRoleName".Equals(data.key))
