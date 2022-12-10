@@ -105,20 +105,24 @@ namespace MultiplayerARPG
             CacheEntity.Summon(summoner, type, summonLevel);
             objectId = CacheEntity.ObjectId;
             summonRemainsDuration = duration;
+            level = summonLevel;
         }
 
         public void Summon(BaseCharacterEntity summoner, short summonLevel, float duration, int summonExp)
         {
             Summon(summoner, summonLevel, duration);
             CacheEntity.Exp = summonExp;
+            exp = summonExp;
         }
 
         public void Summon(BaseCharacterEntity summoner, short summonLevel, float duration, int summonExp, int summonCurrentHp, int summonCurrentMp)
         {
-            Summon(summoner, summonLevel, duration);
-            CacheEntity.Exp = summonExp;
+            Summon(summoner, summonLevel, duration, summonExp);
             CacheEntity.CurrentHp = summonCurrentHp;
             CacheEntity.CurrentMp = summonCurrentMp;
+            currentHp = summonCurrentHp;
+            currentMp = summonCurrentMp;
+
         }
 
         public void UnSummon(BaseCharacterEntity summoner)
