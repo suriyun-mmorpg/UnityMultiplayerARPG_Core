@@ -169,7 +169,7 @@ namespace MultiplayerARPG
         {
             if (skillUser.IsDead() || !skillUser.IsServer || skillLevel <= 0)
                 return;
-            int i = 0;
+            int i;
             int amountEachTime = summon.AmountEachTime.GetAmount(skillLevel);
             for (i = 0; i < amountEachTime; ++i)
             {
