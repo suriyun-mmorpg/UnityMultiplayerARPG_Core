@@ -40,7 +40,8 @@ namespace MultiplayerARPG
         Standalone,
         Mobile,
         MobileWithKeyInputs,
-    } // TODO: Add console mode
+        Console,
+    }
 
     [DefaultExecutionOrder(-999)]
 #if ENABLE_PURCHASING && UNITY_PURCHASING && (UNITY_IOS || UNITY_ANDROID)
@@ -146,6 +147,8 @@ namespace MultiplayerARPG
         public BaseUISceneGameplay uiSceneGameplayPrefab = null;
         [Tooltip("If this is empty, it will use `UI Scene Gameplay Prefab` as gameplay UI prefab")]
         public BaseUISceneGameplay uiSceneGameplayMobilePrefab = null;
+        [Tooltip("If this is empty, it will use `UI Scene Gameplay Prefab` as gameplay UI prefab")]
+        public BaseUISceneGameplay uiSceneGameplayConsolePrefab = null;
         [Tooltip("Default controller prefab will be used when controller prefab at player character entity is null")]
         public BasePlayerCharacterController defaultControllerPrefab = null;
         [Tooltip("This is camera controller when start game as server (not start with client as host)")]
@@ -354,8 +357,10 @@ namespace MultiplayerARPG
 
         [Header("Scene/Maps")]
         public UnityScene homeScene = default(UnityScene);
-        [Tooltip("If this is empty, it will use `Home Mobile Scene` as home scene")]
+        [Tooltip("If this is empty, it will use `Home Scene` as home scene")]
         public UnityScene homeMobileScene = default(UnityScene);
+        [Tooltip("If this is empty, it will use `Home Scene` as home scene")]
+        public UnityScene homeConsoleScene = default(UnityScene);
 
         [Header("Player Configs")]
         public int minCharacterNameLength = 2;
@@ -371,6 +376,9 @@ namespace MultiplayerARPG
         [Tooltip("This will be applied if this value is 1,2,3 or 4. target framerate will be applied if this value is 0.")]
         public int mobileVSyncCount = 0;
         public int mobileTargetFrameRate = 30;
+        [Tooltip("This will be applied if this value is 1,2,3 or 4. target framerate will be applied if this value is 0.")]
+        public int consoleVSyncCount = 0;
+        public int consoleTargetFrameRate = 60;
 
         [Header("Playing In Editor")]
         public TestInEditorMode testInEditorMode = TestInEditorMode.Standalone;
@@ -435,6 +443,8 @@ namespace MultiplayerARPG
             {
                 if ((Application.isMobilePlatform || IsMobileTestInEditor()) && uiSceneGameplayMobilePrefab != null)
                     return uiSceneGameplayMobilePrefab;
+                if ((Application.isConsolePlatform || IsConsoleTestInEditor()) && uiSceneGameplayConsolePrefab != null)
+                    return uiSceneGameplayConsolePrefab;
                 return uiSceneGameplayPrefab;
             }
         }
@@ -445,6 +455,8 @@ namespace MultiplayerARPG
             {
                 if ((Application.isMobilePlatform || IsMobileTestInEditor()) && homeMobileScene.IsSet())
                     return homeMobileScene;
+                if ((Application.isConsolePlatform || IsConsoleTestInEditor()) && homeConsoleScene.IsSet())
+                    return homeConsoleScene;
                 return homeScene;
             }
         }
@@ -551,6 +563,11 @@ namespace MultiplayerARPG
                 {
                     QualitySettings.vSyncCount = mobileVSyncCount;
                     Application.targetFrameRate = mobileTargetFrameRate;
+                }
+                else if (Application.isConsolePlatform)
+                {
+                    QualitySettings.vSyncCount = consoleVSyncCount;
+                    Application.targetFrameRate = consoleTargetFrameRate;
                 }
                 else
                 {
@@ -699,6 +716,11 @@ namespace MultiplayerARPG
         public bool IsMobileTestInEditor()
         {
             return (testInEditorMode == TestInEditorMode.Mobile || testInEditorMode == TestInEditorMode.MobileWithKeyInputs) && Application.isEditor;
+        }
+
+        public bool IsConsoleTestInEditor()
+        {
+            return testInEditorMode == TestInEditorMode.Console && Application.isEditor;
         }
 
         public void LoadedGameData()
