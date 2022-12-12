@@ -234,7 +234,6 @@ namespace MultiplayerARPG
         public override void OnSetup()
         {
             base.OnSetup();
-            onVehicleEntityChanged += OnVehicleEntityChanged;
             // On data changed events
             id.onChange += OnIdChange;
             syncTitle.onChange += OnCharacterNameChange;
@@ -262,7 +261,6 @@ namespace MultiplayerARPG
         protected override void EntityOnDestroy()
         {
             base.EntityOnDestroy();
-            onVehicleEntityChanged -= OnVehicleEntityChanged;
             // On data changed events
             id.onChange -= OnIdChange;
             syncTitle.onChange -= OnCharacterNameChange;

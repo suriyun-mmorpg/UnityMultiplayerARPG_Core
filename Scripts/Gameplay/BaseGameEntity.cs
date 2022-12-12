@@ -280,7 +280,6 @@ namespace MultiplayerARPG
         public event System.Action onSetup;
         public event System.Action onSetupNetElements;
         public event System.Action onSetOwnerClient;
-        public event System.Action<IVehicleEntity> onVehicleEntityChanged;
         public event NetworkDestroyDelegate onNetworkDestroy;
         #endregion
 
