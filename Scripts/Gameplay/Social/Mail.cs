@@ -95,8 +95,8 @@ namespace MultiplayerARPG
                 if (splitData.Length < 7 || !long.TryParse(splitData[6], out expireTime))
                     expireTime = 0;
 
-                byte randomSeed;
-                if (splitData.Length < 8 || !byte.TryParse(splitData[7], out randomSeed))
+                short randomSeed;
+                if (splitData.Length < 8 || !short.TryParse(splitData[7], out randomSeed))
                     randomSeed = 0;
 
                 string sockets;
