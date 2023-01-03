@@ -1,5 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using LiteNetLibManager;
 using UnityEngine;
 #if UNITY_EDITOR
