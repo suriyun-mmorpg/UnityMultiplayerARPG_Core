@@ -81,11 +81,6 @@ namespace MultiplayerARPG
         public System.Action<long, string> onRegisterUser;
         public System.Action<long> onUnregisterUser;
 
-        public override uint PacketVersion()
-        {
-            return 43;
-        }
-
         protected override void Awake()
         {
             Singleton = this;
