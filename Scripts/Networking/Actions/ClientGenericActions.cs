@@ -1,11 +1,12 @@
 ﻿using LiteNetLib;
+using System.Net.Sockets;
 
 namespace MultiplayerARPG
 {
     public static class ClientGenericActions
     {
         public static System.Action onClientConnected;
-        public static System.Action<DisconnectInfo> onClientDisconnected;
+        public static System.Action<DisconnectReason, SocketError, UITextKeys> onClientDisconnected;
         public static System.Action onClientStopped;
         public static System.Action onClientWarp;
         public static System.Action<ChatMessage> onClientReceiveChatMessage;
@@ -21,10 +22,10 @@ namespace MultiplayerARPG
                 onClientConnected.Invoke();
         }
 
-        public static void ClientDisconnected(DisconnectInfo disconnectInfo)
+        public static void ClientDisconnected(DisconnectReason reason, SocketError socketError, UITextKeys message)
         {
             if (onClientDisconnected != null)
-                onClientDisconnected.Invoke(disconnectInfo);
+                onClientDisconnected.Invoke(reason, socketError, message);
         }
 
         public static void ClientStopped()

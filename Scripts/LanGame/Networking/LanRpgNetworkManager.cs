@@ -1,10 +1,11 @@
-﻿using System.Collections.Generic;
-using UnityEngine;
-using LiteNetLibManager;
+﻿using UnityEngine;
 using LiteNetLib;
 using LiteNetLib.Utils;
+using LiteNetLibManager;
 using UnityEngine.Profiling;
 using Cysharp.Threading.Tasks;
+using System.Collections.Generic;
+using System.Net.Sockets;
 
 namespace MultiplayerARPG
 {
@@ -212,10 +213,10 @@ namespace MultiplayerARPG
             }
         }
 
-        public override void OnPeerDisconnected(long connectionId, DisconnectInfo disconnectInfo)
+        public override void OnPeerDisconnected(long connectionId, DisconnectReason reason, SocketError socketError)
         {
+            base.OnPeerDisconnected(connectionId, reason, socketError);
             UnregisterPlayerCharacter(connectionId);
-            base.OnPeerDisconnected(connectionId, disconnectInfo);
         }
 
         public override void SerializeClientReadyData(NetDataWriter writer)

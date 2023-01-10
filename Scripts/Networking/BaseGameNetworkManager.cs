@@ -1,12 +1,13 @@
-﻿using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 using LiteNetLib;
+using LiteNetLib.Utils;
 using LiteNetLibManager;
 using LiteNetLibManager.SuperGrid2D;
 using UnityEngine.Rendering;
 using UnityEngine.SceneManagement;
 using Cysharp.Threading.Tasks;
-using LiteNetLib.Utils;
+using System.Collections.Generic;
+using System.Net.Sockets;
 
 namespace MultiplayerARPG
 {
@@ -423,11 +424,16 @@ namespace MultiplayerARPG
             base.OnClientConnected();
         }
 
-        public override void OnClientDisconnected(DisconnectInfo disconnectInfo)
+        public override void OnClientDisconnected(DisconnectReason reason, SocketError socketError, byte[] data)
         {
-            UISceneGlobal.Singleton.ShowDisconnectDialog(disconnectInfo);
-            ClientGenericActions.ClientDisconnected(disconnectInfo);
-            base.OnClientDisconnected(disconnectInfo);
+            UITextKeys message = UITextKeys.NONE;
+            if (data != null && data.Length > 0)
+            {
+                NetDataReader reader = new NetDataReader(data);
+                message = (UITextKeys)reader.GetPackedUShort();
+            }
+            UISceneGlobal.Singleton.ShowDisconnectDialog(reason, socketError, message);
+            ClientGenericActions.ClientDisconnected(reason, socketError, message);
         }
 
         public override void OnPeerConnected(long connectionId)
@@ -667,7 +673,7 @@ namespace MultiplayerARPG
         public override void OnClientConnectionRefused()
         {
             base.OnClientConnectionRefused();
-            UISceneGlobal.Singleton.ShowDisconnectDialog(DisconnectReason.ConnectionRejected);
+            UISceneGlobal.Singleton.ShowDisconnectDialog(DisconnectReason.ConnectionRejected, SocketError.Success, UITextKeys.NONE);
         }
 
         public override void OnClientOnlineSceneLoaded()
@@ -1012,7 +1018,7 @@ namespace MultiplayerARPG
                 message = message,
                 sendByServer = true,
             });
-            HandleChatAtServer(new MessageHandlerData(GameNetworkingConsts.Chat, Server, -1, new NetDataReader(writer.CopyData())));
+            HandleChatAtServer(new MessageHandlerData(GameNetworkingConsts.Chat, Server, -1, new NetDataReader(writer.Data)));
         }
 
         public void ServerSendLocalMessage(string sender, string message)
@@ -1027,7 +1033,16 @@ namespace MultiplayerARPG
                 message = message,
                 sendByServer = true,
             });
-            HandleChatAtServer(new MessageHandlerData(GameNetworkingConsts.Chat, Server, -1, new NetDataReader(writer.CopyData())));
+            HandleChatAtServer(new MessageHandlerData(GameNetworkingConsts.Chat, Server, -1, new NetDataReader(writer.Data)));
+        }
+
+        public void KickClient(long connectionId, UITextKeys message)
+        {
+            if (!IsServer)
+                return;
+            NetDataWriter writer = new NetDataWriter();
+            writer.PutPackedUShort((ushort)message);
+            KickClient(connectionId, writer.Data);
         }
     }
 }

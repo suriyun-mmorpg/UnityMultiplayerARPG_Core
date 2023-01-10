@@ -1,4 +1,5 @@
 ﻿using LiteNetLib;
+using System.Net.Sockets;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -125,37 +126,39 @@ namespace MultiplayerARPG
                 placeHolder);
         }
 
-        public void ShowDisconnectDialog(DisconnectInfo disconnectInfo)
-        {
-            ShowDisconnectDialog(disconnectInfo.Reason);
-        }
-
-        public void ShowDisconnectDialog(DisconnectReason reason)
+        public void ShowDisconnectDialog(DisconnectReason reason, SocketError socketError, UITextKeys message)
         {
             string errorMessage = LanguageManager.GetUnknowTitle();
-            switch (reason)
+            if (message != UITextKeys.NONE)
             {
-                case DisconnectReason.DisconnectPeerCalled:
-                    errorMessage = LanguageManager.GetText(UITextKeys.UI_ERROR_KICKED_FROM_SERVER.ToString());
-                    break;
-                case DisconnectReason.ConnectionFailed:
-                    errorMessage = LanguageManager.GetText(UITextKeys.UI_ERROR_CONNECTION_FAILED.ToString());
-                    break;
-                case DisconnectReason.ConnectionRejected:
-                    errorMessage = LanguageManager.GetText(UITextKeys.UI_ERROR_CONNECTION_REJECTED.ToString());
-                    break;
-                case DisconnectReason.RemoteConnectionClose:
-                    errorMessage = LanguageManager.GetText(UITextKeys.UI_ERROR_REMOTE_CONNECTION_CLOSE.ToString());
-                    break;
-                case DisconnectReason.InvalidProtocol:
-                    errorMessage = LanguageManager.GetText(UITextKeys.UI_ERROR_INVALID_PROTOCOL.ToString());
-                    break;
-                case DisconnectReason.HostUnreachable:
-                    errorMessage = LanguageManager.GetText(UITextKeys.UI_ERROR_HOST_UNREACHABLE.ToString());
-                    break;
-                case DisconnectReason.Timeout:
-                    errorMessage = LanguageManager.GetText(UITextKeys.UI_ERROR_CONNECTION_TIMEOUT.ToString());
-                    break;
+                errorMessage = LanguageManager.GetText(message.ToString());
+            }
+            else
+            {
+                switch (reason)
+                {
+                    case DisconnectReason.DisconnectPeerCalled:
+                        errorMessage = LanguageManager.GetText(UITextKeys.UI_ERROR_KICKED_FROM_SERVER.ToString());
+                        break;
+                    case DisconnectReason.ConnectionFailed:
+                        errorMessage = LanguageManager.GetText(UITextKeys.UI_ERROR_CONNECTION_FAILED.ToString());
+                        break;
+                    case DisconnectReason.ConnectionRejected:
+                        errorMessage = LanguageManager.GetText(UITextKeys.UI_ERROR_CONNECTION_REJECTED.ToString());
+                        break;
+                    case DisconnectReason.RemoteConnectionClose:
+                        errorMessage = LanguageManager.GetText(UITextKeys.UI_ERROR_REMOTE_CONNECTION_CLOSE.ToString());
+                        break;
+                    case DisconnectReason.InvalidProtocol:
+                        errorMessage = LanguageManager.GetText(UITextKeys.UI_ERROR_INVALID_PROTOCOL.ToString());
+                        break;
+                    case DisconnectReason.HostUnreachable:
+                        errorMessage = LanguageManager.GetText(UITextKeys.UI_ERROR_HOST_UNREACHABLE.ToString());
+                        break;
+                    case DisconnectReason.Timeout:
+                        errorMessage = LanguageManager.GetText(UITextKeys.UI_ERROR_CONNECTION_TIMEOUT.ToString());
+                        break;
+                }
             }
             Singleton.ShowMessageDialog(LanguageManager.GetText(UITextKeys.UI_LABEL_DISCONNECTED.ToString()), errorMessage, true, false, false, false);
         }
