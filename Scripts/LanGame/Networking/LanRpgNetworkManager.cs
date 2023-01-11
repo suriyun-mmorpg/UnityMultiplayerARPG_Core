@@ -379,12 +379,8 @@ namespace MultiplayerARPG
                 return;
             }
 
-            BaseMapInfo mapInfo;
-            if (!string.IsNullOrEmpty(mapName) &&
-                playerCharacterEntity.IsServer &&
-                playerCharacterEntity.IsOwnerClient &&
-                GameInstance.MapInfos.TryGetValue(mapName, out mapInfo) &&
-                mapInfo.IsSceneSet())
+            if (!string.IsNullOrEmpty(mapName) && playerCharacterEntity.IsServer && playerCharacterEntity.IsOwnerClient &&
+                GameInstance.MapInfos.TryGetValue(mapName, out BaseMapInfo mapInfo) && mapInfo.IsSceneSet())
             {
                 // Save data before warp
                 BasePlayerCharacterEntity owningCharacter = GameInstance.PlayingCharacterEntity;
