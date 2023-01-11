@@ -11,33 +11,31 @@ namespace MultiplayerARPG
             RequestHandlerData requestHandler, EmptyMessage request,
             RequestProceedResultDelegate<ResponseCashShopInfoMessage> result)
         {
-            IPlayerCharacterData playerCharacter;
-            if (!GameInstance.ServerUserHandlers.TryGetPlayerCharacter(requestHandler.ConnectionId, out playerCharacter))
+            await UniTask.Yield();
+            if (!GameInstance.ServerUserHandlers.TryGetPlayerCharacter(requestHandler.ConnectionId, out IPlayerCharacterData playerCharacter))
             {
-                result.Invoke(AckResponseCode.Error, new ResponseCashShopInfoMessage()
+                result.InvokeError(new ResponseCashShopInfoMessage()
                 {
                     message = UITextKeys.UI_ERROR_NOT_LOGGED_IN,
                 });
                 return;
             }
-
-            result.Invoke(AckResponseCode.Success, new ResponseCashShopInfoMessage()
+            result.InvokeSuccess(new ResponseCashShopInfoMessage()
             {
                 cash = playerCharacter.UserCash,
                 cashShopItemIds = new List<int>(GameInstance.CashShopItems.Keys),
             });
-
-            await UniTask.Yield();
         }
 
         public async UniTaskVoid HandleRequestCashShopBuy(
             RequestHandlerData requestHandler, RequestCashShopBuyMessage request,
             RequestProceedResultDelegate<ResponseCashShopBuyMessage> result)
         {
-            IPlayerCharacterData playerCharacter;
-            if (!GameInstance.ServerUserHandlers.TryGetPlayerCharacter(requestHandler.ConnectionId, out playerCharacter))
+            await UniTask.Yield();
+
+            if (!GameInstance.ServerUserHandlers.TryGetPlayerCharacter(requestHandler.ConnectionId, out IPlayerCharacterData playerCharacter))
             {
-                result.Invoke(AckResponseCode.Error, new ResponseCashShopBuyMessage()
+                result.InvokeError(new ResponseCashShopBuyMessage()
                 {
                     message = UITextKeys.UI_ERROR_NOT_LOGGED_IN,
                 });
@@ -46,17 +44,16 @@ namespace MultiplayerARPG
 
             if (request.amount <= 0)
             {
-                result.Invoke(AckResponseCode.Error, new ResponseCashShopBuyMessage()
+                result.InvokeError(new ResponseCashShopBuyMessage()
                 {
                     message = UITextKeys.UI_ERROR_INVALID_DATA,
                 });
                 return;
             }
 
-            CashShopItem cashShopItem;
-            if (!GameInstance.CashShopItems.TryGetValue(request.dataId, out cashShopItem))
+            if (!GameInstance.CashShopItems.TryGetValue(request.dataId, out CashShopItem cashShopItem))
             {
-                result.Invoke(AckResponseCode.Error, new ResponseCashShopBuyMessage()
+                result.InvokeError(new ResponseCashShopBuyMessage()
                 {
                     message = UITextKeys.UI_ERROR_ITEM_NOT_FOUND,
                 });
@@ -66,7 +63,7 @@ namespace MultiplayerARPG
             if ((request.currencyType == CashShopItemCurrencyType.CASH && cashShopItem.SellPriceCash <= 0) ||
                 (request.currencyType == CashShopItemCurrencyType.GOLD && cashShopItem.SellPriceGold <= 0))
             {
-                result.Invoke(AckResponseCode.Error, new ResponseCashShopBuyMessage()
+                result.InvokeError(new ResponseCashShopBuyMessage()
                 {
                     message = UITextKeys.UI_ERROR_INVALID_ITEM_DATA,
                 });
@@ -86,7 +83,7 @@ namespace MultiplayerARPG
                 priceCash = cashShopItem.SellPriceCash * request.amount;
                 if (userCash < priceCash)
                 {
-                    result.Invoke(AckResponseCode.Error, new ResponseCashShopBuyMessage()
+                    result.InvokeError(new ResponseCashShopBuyMessage()
                     {
                         message = UITextKeys.UI_ERROR_NOT_ENOUGH_CASH,
                     });
@@ -101,7 +98,7 @@ namespace MultiplayerARPG
                 priceGold = cashShopItem.SellPriceGold * request.amount;
                 if (characterGold < priceGold)
                 {
-                    result.Invoke(AckResponseCode.Error, new ResponseCashShopBuyMessage()
+                    result.InvokeError(new ResponseCashShopBuyMessage()
                     {
                         message = UITextKeys.UI_ERROR_NOT_ENOUGH_GOLD,
                     });
@@ -134,7 +131,7 @@ namespace MultiplayerARPG
                 }
                 if (playerCharacter.IncreasingItemsWillOverwhelming(rewardItems))
                 {
-                    result.Invoke(AckResponseCode.Error, new ResponseCashShopBuyMessage()
+                    result.InvokeError(new ResponseCashShopBuyMessage()
                     {
                         message = UITextKeys.UI_ERROR_WILL_OVERWHELMING,
                     });
@@ -166,57 +163,50 @@ namespace MultiplayerARPG
             playerCharacter.FillEmptySlots();
 
             // Response to client
-            result.Invoke(AckResponseCode.Success, new ResponseCashShopBuyMessage()
+            result.InvokeSuccess(new ResponseCashShopBuyMessage()
             {
                 dataId = request.dataId,
                 rewardGold = cashShopItem.ReceiveGold,
                 rewardItems = rewardItems,
             });
-
-            await UniTask.Yield();
         }
 
         public async UniTaskVoid HandleRequestCashPackageInfo(
             RequestHandlerData requestHandler, EmptyMessage request,
             RequestProceedResultDelegate<ResponseCashPackageInfoMessage> result)
         {
-            IPlayerCharacterData playerCharacter;
-            if (!GameInstance.ServerUserHandlers.TryGetPlayerCharacter(requestHandler.ConnectionId, out playerCharacter))
+            await UniTask.Yield();
+            if (!GameInstance.ServerUserHandlers.TryGetPlayerCharacter(requestHandler.ConnectionId, out IPlayerCharacterData playerCharacter))
             {
-                result.Invoke(AckResponseCode.Error, new ResponseCashPackageInfoMessage()
+                result.InvokeError(new ResponseCashPackageInfoMessage()
                 {
                     message = UITextKeys.UI_ERROR_NOT_LOGGED_IN,
                 });
                 return;
             }
-
-            result.Invoke(AckResponseCode.Success, new ResponseCashPackageInfoMessage()
+            result.InvokeSuccess(new ResponseCashPackageInfoMessage()
             {
                 cash = playerCharacter.UserCash,
                 cashPackageIds = new List<int>(GameInstance.CashPackages.Keys),
             });
-
-            await UniTask.Yield();
         }
 
         public async UniTaskVoid HandleRequestCashPackageBuyValidation(
             RequestHandlerData requestHandler, RequestCashPackageBuyValidationMessage request,
             RequestProceedResultDelegate<ResponseCashPackageBuyValidationMessage> result)
         {
-            IPlayerCharacterData playerCharacter;
-            if (!GameInstance.ServerUserHandlers.TryGetPlayerCharacter(requestHandler.ConnectionId, out playerCharacter))
+            await UniTask.Yield();
+            if (!GameInstance.ServerUserHandlers.TryGetPlayerCharacter(requestHandler.ConnectionId, out IPlayerCharacterData playerCharacter))
             {
-                result.Invoke(AckResponseCode.Error, new ResponseCashPackageBuyValidationMessage()
+                result.InvokeError(new ResponseCashPackageBuyValidationMessage()
                 {
                     message = UITextKeys.UI_ERROR_NOT_LOGGED_IN,
                 });
                 return;
             }
-
-            CashPackage cashPackage;
-            if (!GameInstance.CashPackages.TryGetValue(request.dataId, out cashPackage))
+            if (!GameInstance.CashPackages.TryGetValue(request.dataId, out CashPackage cashPackage))
             {
-                result.Invoke(AckResponseCode.Error, new ResponseCashPackageBuyValidationMessage()
+                result.InvokeError(new ResponseCashPackageBuyValidationMessage()
                 {
                     message = UITextKeys.UI_ERROR_CASH_PACKAGE_NOT_FOUND,
                 });
@@ -224,13 +214,11 @@ namespace MultiplayerARPG
             }
             playerCharacter.UserCash = playerCharacter.UserCash.Increase(cashPackage.CashAmount);
 
-            result.Invoke(AckResponseCode.Success, new ResponseCashPackageBuyValidationMessage()
+            result.InvokeSuccess(new ResponseCashPackageBuyValidationMessage()
             {
                 dataId = request.dataId,
                 cash = playerCharacter.UserCash,
             });
-
-            await UniTask.Yield();
         }
     }
 }
