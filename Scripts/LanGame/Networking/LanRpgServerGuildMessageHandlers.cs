@@ -11,10 +11,9 @@ namespace MultiplayerARPG
         public async UniTaskVoid HandleRequestAcceptGuildInvitation(RequestHandlerData requestHandler, RequestAcceptGuildInvitationMessage request, RequestProceedResultDelegate<ResponseAcceptGuildInvitationMessage> result)
         {
             await UniTask.Yield();
-            BasePlayerCharacterEntity playerCharacter;
-            if (!GameInstance.ServerUserHandlers.TryGetPlayerCharacter(requestHandler.ConnectionId, out playerCharacter))
+            if (!GameInstance.ServerUserHandlers.TryGetPlayerCharacter(requestHandler.ConnectionId, out BasePlayerCharacterEntity playerCharacter))
             {
-                result.Invoke(AckResponseCode.Error, new ResponseAcceptGuildInvitationMessage()
+                result.InvokeError(new ResponseAcceptGuildInvitationMessage()
                 {
                     message = UITextKeys.UI_ERROR_NOT_LOGGED_IN,
                 });
@@ -23,7 +22,7 @@ namespace MultiplayerARPG
             ValidateGuildRequestResult validateResult = GameInstance.ServerGuildHandlers.CanAcceptGuildInvitation(request.guildId, playerCharacter);
             if (!validateResult.IsSuccess)
             {
-                result.Invoke(AckResponseCode.Error, new ResponseAcceptGuildInvitationMessage()
+                result.InvokeError(new ResponseAcceptGuildInvitationMessage()
                 {
                     message = validateResult.GameMessage,
                 });
@@ -38,7 +37,7 @@ namespace MultiplayerARPG
             // Send message to inviter
             GameInstance.ServerGameMessageHandlers.SendGameMessageByCharacterId(request.inviterId, UITextKeys.UI_GUILD_INVITATION_ACCEPTED);
             // Response to invitee
-            result.Invoke(AckResponseCode.Success, new ResponseAcceptGuildInvitationMessage()
+            result.InvokeSuccess(new ResponseAcceptGuildInvitationMessage()
             {
                 message = UITextKeys.UI_GUILD_INVITATION_ACCEPTED,
             });
@@ -47,10 +46,9 @@ namespace MultiplayerARPG
         public async UniTaskVoid HandleRequestDeclineGuildInvitation(RequestHandlerData requestHandler, RequestDeclineGuildInvitationMessage request, RequestProceedResultDelegate<ResponseDeclineGuildInvitationMessage> result)
         {
             await UniTask.Yield();
-            BasePlayerCharacterEntity playerCharacter;
-            if (!GameInstance.ServerUserHandlers.TryGetPlayerCharacter(requestHandler.ConnectionId, out playerCharacter))
+            if (!GameInstance.ServerUserHandlers.TryGetPlayerCharacter(requestHandler.ConnectionId, out BasePlayerCharacterEntity playerCharacter))
             {
-                result.Invoke(AckResponseCode.Error, new ResponseDeclineGuildInvitationMessage()
+                result.InvokeError(new ResponseDeclineGuildInvitationMessage()
                 {
                     message = UITextKeys.UI_ERROR_NOT_LOGGED_IN,
                 });
@@ -59,7 +57,7 @@ namespace MultiplayerARPG
             ValidateGuildRequestResult validateResult = GameInstance.ServerGuildHandlers.CanDeclineGuildInvitation(request.guildId, playerCharacter);
             if (!validateResult.IsSuccess)
             {
-                result.Invoke(AckResponseCode.Error, new ResponseDeclineGuildInvitationMessage()
+                result.InvokeError(new ResponseDeclineGuildInvitationMessage()
                 {
                     message = validateResult.GameMessage,
                 });
@@ -69,7 +67,7 @@ namespace MultiplayerARPG
             // Send message to inviter
             GameInstance.ServerGameMessageHandlers.SendGameMessageByCharacterId(request.inviterId, UITextKeys.UI_GUILD_INVITATION_DECLINED);
             // Response to invitee
-            result.Invoke(AckResponseCode.Success, new ResponseDeclineGuildInvitationMessage()
+            result.InvokeSuccess(new ResponseDeclineGuildInvitationMessage()
             {
                 message = UITextKeys.UI_GUILD_INVITATION_DECLINED,
             });
@@ -78,19 +76,17 @@ namespace MultiplayerARPG
         public async UniTaskVoid HandleRequestSendGuildInvitation(RequestHandlerData requestHandler, RequestSendGuildInvitationMessage request, RequestProceedResultDelegate<ResponseSendGuildInvitationMessage> result)
         {
             await UniTask.Yield();
-            BasePlayerCharacterEntity playerCharacter;
-            if (!GameInstance.ServerUserHandlers.TryGetPlayerCharacter(requestHandler.ConnectionId, out playerCharacter))
+            if (!GameInstance.ServerUserHandlers.TryGetPlayerCharacter(requestHandler.ConnectionId, out BasePlayerCharacterEntity playerCharacter))
             {
-                result.Invoke(AckResponseCode.Error, new ResponseSendGuildInvitationMessage()
+                result.InvokeError(new ResponseSendGuildInvitationMessage()
                 {
                     message = UITextKeys.UI_ERROR_NOT_LOGGED_IN,
                 });
                 return;
             }
-            BasePlayerCharacterEntity inviteeCharacter;
-            if (!GameInstance.ServerUserHandlers.TryGetPlayerCharacterById(request.inviteeId, out inviteeCharacter))
+            if (!GameInstance.ServerUserHandlers.TryGetPlayerCharacterById(request.inviteeId, out BasePlayerCharacterEntity inviteeCharacter))
             {
-                result.Invoke(AckResponseCode.Error, new ResponseSendGuildInvitationMessage()
+                result.InvokeError(new ResponseSendGuildInvitationMessage()
                 {
                     message = UITextKeys.UI_ERROR_CHARACTER_NOT_FOUND,
                 });
@@ -99,7 +95,7 @@ namespace MultiplayerARPG
             ValidateGuildRequestResult validateResult = GameInstance.ServerGuildHandlers.CanSendGuildInvitation(playerCharacter, inviteeCharacter);
             if (!validateResult.IsSuccess)
             {
-                result.Invoke(AckResponseCode.Error, new ResponseSendGuildInvitationMessage()
+                result.InvokeError(new ResponseSendGuildInvitationMessage()
                 {
                     message = validateResult.GameMessage,
                 });
@@ -115,16 +111,15 @@ namespace MultiplayerARPG
                 GuildName = validateResult.Guild.guildName,
                 GuildLevel = validateResult.Guild.level,
             });
-            result.Invoke(AckResponseCode.Success, new ResponseSendGuildInvitationMessage());
+            result.InvokeSuccess(new ResponseSendGuildInvitationMessage());
         }
 
         public async UniTaskVoid HandleRequestCreateGuild(RequestHandlerData requestHandler, RequestCreateGuildMessage request, RequestProceedResultDelegate<ResponseCreateGuildMessage> result)
         {
             await UniTask.Yield();
-            IPlayerCharacterData playerCharacter;
-            if (!GameInstance.ServerUserHandlers.TryGetPlayerCharacter(requestHandler.ConnectionId, out playerCharacter))
+            if (!GameInstance.ServerUserHandlers.TryGetPlayerCharacter(requestHandler.ConnectionId, out IPlayerCharacterData playerCharacter))
             {
-                result.Invoke(AckResponseCode.Error, new ResponseCreateGuildMessage()
+                result.InvokeError(new ResponseCreateGuildMessage()
                 {
                     message = UITextKeys.UI_ERROR_NOT_LOGGED_IN,
                 });
@@ -133,7 +128,7 @@ namespace MultiplayerARPG
             ValidateGuildRequestResult validateResult = playerCharacter.CanCreateGuild(request.guildName);
             if (!validateResult.IsSuccess)
             {
-                result.Invoke(AckResponseCode.Error, new ResponseCreateGuildMessage()
+                result.InvokeError(new ResponseCreateGuildMessage()
                 {
                     message = validateResult.GameMessage,
                 });
@@ -146,16 +141,15 @@ namespace MultiplayerARPG
             playerCharacter.GuildRole = guild.GetMemberRole(playerCharacter.Id);
             playerCharacter.SharedGuildExp = 0;
             GameInstance.ServerGameMessageHandlers.SendSetFullGuildData(requestHandler.ConnectionId, guild);
-            result.Invoke(AckResponseCode.Success, new ResponseCreateGuildMessage());
+            result.InvokeSuccess(new ResponseCreateGuildMessage());
         }
 
         public async UniTaskVoid HandleRequestChangeGuildLeader(RequestHandlerData requestHandler, RequestChangeGuildLeaderMessage request, RequestProceedResultDelegate<ResponseChangeGuildLeaderMessage> result)
         {
             await UniTask.Yield();
-            IPlayerCharacterData playerCharacter;
-            if (!GameInstance.ServerUserHandlers.TryGetPlayerCharacter(requestHandler.ConnectionId, out playerCharacter))
+            if (!GameInstance.ServerUserHandlers.TryGetPlayerCharacter(requestHandler.ConnectionId, out IPlayerCharacterData playerCharacter))
             {
-                result.Invoke(AckResponseCode.Error, new ResponseChangeGuildLeaderMessage()
+                result.InvokeError(new ResponseChangeGuildLeaderMessage()
                 {
                     message = UITextKeys.UI_ERROR_NOT_LOGGED_IN,
                 });
@@ -164,7 +158,7 @@ namespace MultiplayerARPG
             ValidateGuildRequestResult validateResult = GameInstance.ServerGuildHandlers.CanChangeGuildLeader(playerCharacter, request.memberId);
             if (!validateResult.IsSuccess)
             {
-                result.Invoke(AckResponseCode.Error, new ResponseChangeGuildLeaderMessage()
+                result.InvokeError(new ResponseChangeGuildLeaderMessage()
                 {
                     message = validateResult.GameMessage,
                 });
@@ -174,16 +168,15 @@ namespace MultiplayerARPG
             GameInstance.ServerGuildHandlers.SetGuild(validateResult.GuildId, validateResult.Guild);
             GameInstance.ServerGameMessageHandlers.SendSetGuildLeaderToMembers(validateResult.Guild);
             GameInstance.ServerGameMessageHandlers.SendSetGuildMemberRoleToMembers(validateResult.Guild, request.memberId, 0);
-            result.Invoke(AckResponseCode.Success, new ResponseChangeGuildLeaderMessage());
+            result.InvokeSuccess(new ResponseChangeGuildLeaderMessage());
         }
 
         public async UniTaskVoid HandleRequestKickMemberFromGuild(RequestHandlerData requestHandler, RequestKickMemberFromGuildMessage request, RequestProceedResultDelegate<ResponseKickMemberFromGuildMessage> result)
         {
             await UniTask.Yield();
-            IPlayerCharacterData playerCharacter;
-            if (!GameInstance.ServerUserHandlers.TryGetPlayerCharacter(requestHandler.ConnectionId, out playerCharacter))
+            if (!GameInstance.ServerUserHandlers.TryGetPlayerCharacter(requestHandler.ConnectionId, out IPlayerCharacterData playerCharacter))
             {
-                result.Invoke(AckResponseCode.Error, new ResponseKickMemberFromGuildMessage()
+                result.InvokeError(new ResponseKickMemberFromGuildMessage()
                 {
                     message = UITextKeys.UI_ERROR_NOT_LOGGED_IN,
                 });
@@ -192,16 +185,14 @@ namespace MultiplayerARPG
             ValidateGuildRequestResult validateResult = GameInstance.ServerGuildHandlers.CanKickMemberFromGuild(playerCharacter, request.memberId);
             if (!validateResult.IsSuccess)
             {
-                result.Invoke(AckResponseCode.Error, new ResponseKickMemberFromGuildMessage()
+                result.InvokeError(new ResponseKickMemberFromGuildMessage()
                 {
                     message = validateResult.GameMessage,
                 });
                 return;
             }
-            IPlayerCharacterData memberCharacter;
-            long memberConnectionId;
-            if (GameInstance.ServerUserHandlers.TryGetPlayerCharacterById(request.memberId, out memberCharacter) &&
-                GameInstance.ServerUserHandlers.TryGetConnectionId(request.memberId, out memberConnectionId))
+            if (GameInstance.ServerUserHandlers.TryGetPlayerCharacterById(request.memberId, out IPlayerCharacterData memberCharacter) &&
+                GameInstance.ServerUserHandlers.TryGetConnectionId(request.memberId, out long memberConnectionId))
             {
                 memberCharacter.ClearGuild();
                 GameInstance.ServerGameMessageHandlers.SendClearGuildData(memberConnectionId, validateResult.GuildId);
@@ -209,16 +200,15 @@ namespace MultiplayerARPG
             validateResult.Guild.RemoveMember(request.memberId);
             GameInstance.ServerGuildHandlers.SetGuild(validateResult.GuildId, validateResult.Guild);
             GameInstance.ServerGameMessageHandlers.SendRemoveGuildMemberToMembers(validateResult.Guild, request.memberId);
-            result.Invoke(AckResponseCode.Success, new ResponseKickMemberFromGuildMessage());
+            result.InvokeSuccess(new ResponseKickMemberFromGuildMessage());
         }
 
         public async UniTaskVoid HandleRequestLeaveGuild(RequestHandlerData requestHandler, EmptyMessage request, RequestProceedResultDelegate<ResponseLeaveGuildMessage> result)
         {
             await UniTask.Yield();
-            IPlayerCharacterData playerCharacter;
-            if (!GameInstance.ServerUserHandlers.TryGetPlayerCharacter(requestHandler.ConnectionId, out playerCharacter))
+            if (!GameInstance.ServerUserHandlers.TryGetPlayerCharacter(requestHandler.ConnectionId, out IPlayerCharacterData playerCharacter))
             {
-                result.Invoke(AckResponseCode.Error, new ResponseLeaveGuildMessage()
+                result.InvokeError(new ResponseLeaveGuildMessage()
                 {
                     message = UITextKeys.UI_ERROR_NOT_LOGGED_IN,
                 });
@@ -227,7 +217,7 @@ namespace MultiplayerARPG
             ValidateGuildRequestResult validateResult = GameInstance.ServerGuildHandlers.CanLeaveGuild(playerCharacter);
             if (!validateResult.IsSuccess)
             {
-                result.Invoke(AckResponseCode.Error, new ResponseLeaveGuildMessage()
+                result.InvokeError(new ResponseLeaveGuildMessage()
                 {
                     message = validateResult.GameMessage,
                 });
@@ -256,16 +246,15 @@ namespace MultiplayerARPG
                 GameInstance.ServerGameMessageHandlers.SendRemoveGuildMemberToMembers(validateResult.Guild, playerCharacter.Id);
                 GameInstance.ServerGameMessageHandlers.SendClearGuildData(requestHandler.ConnectionId, validateResult.GuildId);
             }
-            result.Invoke(AckResponseCode.Success, new ResponseLeaveGuildMessage());
+            result.InvokeSuccess(new ResponseLeaveGuildMessage());
         }
 
         public async UniTaskVoid HandleRequestChangeGuildMessage(RequestHandlerData requestHandler, RequestChangeGuildMessageMessage request, RequestProceedResultDelegate<ResponseChangeGuildMessageMessage> result)
         {
             await UniTask.Yield();
-            IPlayerCharacterData playerCharacter;
-            if (!GameInstance.ServerUserHandlers.TryGetPlayerCharacter(requestHandler.ConnectionId, out playerCharacter))
+            if (!GameInstance.ServerUserHandlers.TryGetPlayerCharacter(requestHandler.ConnectionId, out IPlayerCharacterData playerCharacter))
             {
-                result.Invoke(AckResponseCode.Error, new ResponseChangeGuildMessageMessage()
+                result.InvokeError(new ResponseChangeGuildMessageMessage()
                 {
                     message = UITextKeys.UI_ERROR_NOT_LOGGED_IN,
                 });
@@ -274,7 +263,7 @@ namespace MultiplayerARPG
             ValidateGuildRequestResult validateResult = GameInstance.ServerGuildHandlers.CanChangeGuildMessage(playerCharacter, request.message);
             if (!validateResult.IsSuccess)
             {
-                result.Invoke(AckResponseCode.Error, new ResponseChangeGuildMessageMessage()
+                result.InvokeError(new ResponseChangeGuildMessageMessage()
                 {
                     message = validateResult.GameMessage,
                 });
@@ -283,16 +272,15 @@ namespace MultiplayerARPG
             validateResult.Guild.guildMessage = request.message;
             GameInstance.ServerGuildHandlers.SetGuild(validateResult.GuildId, validateResult.Guild);
             GameInstance.ServerGameMessageHandlers.SendSetGuildMessageToMembers(validateResult.Guild);
-            result.Invoke(AckResponseCode.Success, new ResponseChangeGuildMessageMessage());
+            result.InvokeSuccess(new ResponseChangeGuildMessageMessage());
         }
 
         public async UniTaskVoid HandleRequestChangeGuildMessage2(RequestHandlerData requestHandler, RequestChangeGuildMessageMessage request, RequestProceedResultDelegate<ResponseChangeGuildMessageMessage> result)
         {
             await UniTask.Yield();
-            IPlayerCharacterData playerCharacter;
-            if (!GameInstance.ServerUserHandlers.TryGetPlayerCharacter(requestHandler.ConnectionId, out playerCharacter))
+            if (!GameInstance.ServerUserHandlers.TryGetPlayerCharacter(requestHandler.ConnectionId, out IPlayerCharacterData playerCharacter))
             {
-                result.Invoke(AckResponseCode.Error, new ResponseChangeGuildMessageMessage()
+                result.InvokeError(new ResponseChangeGuildMessageMessage()
                 {
                     message = UITextKeys.UI_ERROR_NOT_LOGGED_IN,
                 });
@@ -301,7 +289,7 @@ namespace MultiplayerARPG
             ValidateGuildRequestResult validateResult = GameInstance.ServerGuildHandlers.CanChangeGuildMessage2(playerCharacter, request.message);
             if (!validateResult.IsSuccess)
             {
-                result.Invoke(AckResponseCode.Error, new ResponseChangeGuildMessageMessage()
+                result.InvokeError(new ResponseChangeGuildMessageMessage()
                 {
                     message = validateResult.GameMessage,
                 });
@@ -310,16 +298,15 @@ namespace MultiplayerARPG
             validateResult.Guild.guildMessage2 = request.message;
             GameInstance.ServerGuildHandlers.SetGuild(validateResult.GuildId, validateResult.Guild);
             GameInstance.ServerGameMessageHandlers.SendSetGuildMessageToMembers(validateResult.Guild);
-            result.Invoke(AckResponseCode.Success, new ResponseChangeGuildMessageMessage());
+            result.InvokeSuccess(new ResponseChangeGuildMessageMessage());
         }
 
         public async UniTaskVoid HandleRequestChangeGuildOptions(RequestHandlerData requestHandler, RequestChangeGuildOptionsMessage request, RequestProceedResultDelegate<ResponseChangeGuildOptionsMessage> result)
         {
             await UniTask.Yield();
-            IPlayerCharacterData playerCharacter;
-            if (!GameInstance.ServerUserHandlers.TryGetPlayerCharacter(requestHandler.ConnectionId, out playerCharacter))
+            if (!GameInstance.ServerUserHandlers.TryGetPlayerCharacter(requestHandler.ConnectionId, out IPlayerCharacterData playerCharacter))
             {
-                result.Invoke(AckResponseCode.Error, new ResponseChangeGuildOptionsMessage()
+                result.InvokeError(new ResponseChangeGuildOptionsMessage()
                 {
                     message = UITextKeys.UI_ERROR_NOT_LOGGED_IN,
                 });
@@ -328,7 +315,7 @@ namespace MultiplayerARPG
             ValidateGuildRequestResult validateResult = GameInstance.ServerGuildHandlers.CanChangeGuildOptions(playerCharacter);
             if (!validateResult.IsSuccess)
             {
-                result.Invoke(AckResponseCode.Error, new ResponseChangeGuildOptionsMessage()
+                result.InvokeError(new ResponseChangeGuildOptionsMessage()
                 {
                     message = validateResult.GameMessage,
                 });
@@ -337,16 +324,15 @@ namespace MultiplayerARPG
             validateResult.Guild.options = request.options;
             GameInstance.ServerGuildHandlers.SetGuild(validateResult.GuildId, validateResult.Guild);
             GameInstance.ServerGameMessageHandlers.SendSetGuildOptionsToMembers(validateResult.Guild);
-            result.Invoke(AckResponseCode.Success, new ResponseChangeGuildOptionsMessage());
+            result.InvokeSuccess(new ResponseChangeGuildOptionsMessage());
         }
 
         public async UniTaskVoid HandleRequestChangeGuildAutoAcceptRequests(RequestHandlerData requestHandler, RequestChangeGuildAutoAcceptRequestsMessage request, RequestProceedResultDelegate<ResponseChangeGuildAutoAcceptRequestsMessage> result)
         {
             await UniTask.Yield();
-            IPlayerCharacterData playerCharacter;
-            if (!GameInstance.ServerUserHandlers.TryGetPlayerCharacter(requestHandler.ConnectionId, out playerCharacter))
+            if (!GameInstance.ServerUserHandlers.TryGetPlayerCharacter(requestHandler.ConnectionId, out IPlayerCharacterData playerCharacter))
             {
-                result.Invoke(AckResponseCode.Error, new ResponseChangeGuildAutoAcceptRequestsMessage()
+                result.InvokeError(new ResponseChangeGuildAutoAcceptRequestsMessage()
                 {
                     message = UITextKeys.UI_ERROR_NOT_LOGGED_IN,
                 });
@@ -355,7 +341,7 @@ namespace MultiplayerARPG
             ValidateGuildRequestResult validateResult = GameInstance.ServerGuildHandlers.CanChangeGuildOptions(playerCharacter);
             if (!validateResult.IsSuccess)
             {
-                result.Invoke(AckResponseCode.Error, new ResponseChangeGuildAutoAcceptRequestsMessage()
+                result.InvokeError(new ResponseChangeGuildAutoAcceptRequestsMessage()
                 {
                     message = validateResult.GameMessage,
                 });
@@ -364,16 +350,15 @@ namespace MultiplayerARPG
             validateResult.Guild.autoAcceptRequests = request.autoAcceptRequests;
             GameInstance.ServerGuildHandlers.SetGuild(validateResult.GuildId, validateResult.Guild);
             GameInstance.ServerGameMessageHandlers.SendSetGuildAutoAcceptRequestsToMembers(validateResult.Guild);
-            result.Invoke(AckResponseCode.Success, new ResponseChangeGuildAutoAcceptRequestsMessage());
+            result.InvokeSuccess(new ResponseChangeGuildAutoAcceptRequestsMessage());
         }
 
         public async UniTaskVoid HandleRequestChangeGuildRole(RequestHandlerData requestHandler, RequestChangeGuildRoleMessage request, RequestProceedResultDelegate<ResponseChangeGuildRoleMessage> result)
         {
             await UniTask.Yield();
-            IPlayerCharacterData playerCharacter;
-            if (!GameInstance.ServerUserHandlers.TryGetPlayerCharacter(requestHandler.ConnectionId, out playerCharacter))
+            if (!GameInstance.ServerUserHandlers.TryGetPlayerCharacter(requestHandler.ConnectionId, out IPlayerCharacterData playerCharacter))
             {
-                result.Invoke(AckResponseCode.Error, new ResponseChangeGuildRoleMessage()
+                result.InvokeError(new ResponseChangeGuildRoleMessage()
                 {
                     message = UITextKeys.UI_ERROR_NOT_LOGGED_IN,
                 });
@@ -382,7 +367,7 @@ namespace MultiplayerARPG
             ValidateGuildRequestResult validateResult = GameInstance.ServerGuildHandlers.CanChangeGuildRole(playerCharacter, request.guildRole, request.name);
             if (!validateResult.IsSuccess)
             {
-                result.Invoke(AckResponseCode.Error, new ResponseChangeGuildRoleMessage()
+                result.InvokeError(new ResponseChangeGuildRoleMessage()
                 {
                     message = validateResult.GameMessage,
                 });
@@ -398,16 +383,15 @@ namespace MultiplayerARPG
                     memberCharacter.GuildRole = validateResult.Guild.GetMemberRole(memberCharacter.Id);
             }
             GameInstance.ServerGameMessageHandlers.SendSetGuildRoleToMembers(validateResult.Guild, request.guildRole, request.name, request.canInvite, request.canKick, request.shareExpPercentage);
-            result.Invoke(AckResponseCode.Success, new ResponseChangeGuildRoleMessage());
+            result.InvokeSuccess(new ResponseChangeGuildRoleMessage());
         }
 
         public async UniTaskVoid HandleRequestChangeMemberGuildRole(RequestHandlerData requestHandler, RequestChangeMemberGuildRoleMessage request, RequestProceedResultDelegate<ResponseChangeMemberGuildRoleMessage> result)
         {
             await UniTask.Yield();
-            IPlayerCharacterData playerCharacter;
-            if (!GameInstance.ServerUserHandlers.TryGetPlayerCharacter(requestHandler.ConnectionId, out playerCharacter))
+            if (!GameInstance.ServerUserHandlers.TryGetPlayerCharacter(requestHandler.ConnectionId, out IPlayerCharacterData playerCharacter))
             {
-                result.Invoke(AckResponseCode.Error, new ResponseChangeMemberGuildRoleMessage()
+                result.InvokeError(new ResponseChangeMemberGuildRoleMessage()
                 {
                     message = UITextKeys.UI_ERROR_NOT_LOGGED_IN,
                 });
@@ -416,7 +400,7 @@ namespace MultiplayerARPG
             ValidateGuildRequestResult validateResult = GameInstance.ServerGuildHandlers.CanChangeGuildMemberRole(playerCharacter, request.memberId);
             if (!validateResult.IsSuccess)
             {
-                result.Invoke(AckResponseCode.Error, new ResponseChangeMemberGuildRoleMessage()
+                result.InvokeError(new ResponseChangeMemberGuildRoleMessage()
                 {
                     message = validateResult.GameMessage,
                 });
@@ -424,20 +408,18 @@ namespace MultiplayerARPG
             }
             validateResult.Guild.SetMemberRole(request.memberId, request.guildRole);
             GameInstance.ServerGuildHandlers.SetGuild(validateResult.GuildId, validateResult.Guild);
-            IPlayerCharacterData memberCharacter;
-            if (GameInstance.ServerUserHandlers.TryGetPlayerCharacterById(request.memberId, out memberCharacter))
+            if (GameInstance.ServerUserHandlers.TryGetPlayerCharacterById(request.memberId, out IPlayerCharacterData memberCharacter))
                 memberCharacter.GuildRole = validateResult.Guild.GetMemberRole(memberCharacter.Id);
             GameInstance.ServerGameMessageHandlers.SendSetGuildMemberRoleToMembers(validateResult.Guild, request.memberId, request.guildRole);
-            result.Invoke(AckResponseCode.Success, new ResponseChangeMemberGuildRoleMessage());
+            result.InvokeSuccess(new ResponseChangeMemberGuildRoleMessage());
         }
 
         public async UniTaskVoid HandleRequestIncreaseGuildSkillLevel(RequestHandlerData requestHandler, RequestIncreaseGuildSkillLevelMessage request, RequestProceedResultDelegate<ResponseIncreaseGuildSkillLevelMessage> result)
         {
             await UniTask.Yield();
-            IPlayerCharacterData playerCharacter;
-            if (!GameInstance.ServerUserHandlers.TryGetPlayerCharacter(requestHandler.ConnectionId, out playerCharacter))
+            if (!GameInstance.ServerUserHandlers.TryGetPlayerCharacter(requestHandler.ConnectionId, out IPlayerCharacterData playerCharacter))
             {
-                result.Invoke(AckResponseCode.Error, new ResponseIncreaseGuildSkillLevelMessage()
+                result.InvokeError(new ResponseIncreaseGuildSkillLevelMessage()
                 {
                     message = UITextKeys.UI_ERROR_NOT_LOGGED_IN,
                 });
@@ -446,7 +428,7 @@ namespace MultiplayerARPG
             ValidateGuildRequestResult validateResult = GameInstance.ServerGuildHandlers.CanIncreaseGuildSkillLevel(playerCharacter, request.dataId);
             if (!validateResult.IsSuccess)
             {
-                result.Invoke(AckResponseCode.Error, new ResponseIncreaseGuildSkillLevelMessage()
+                result.InvokeError(new ResponseIncreaseGuildSkillLevelMessage()
                 {
                     message = validateResult.GameMessage,
                 });
@@ -456,7 +438,7 @@ namespace MultiplayerARPG
             GameInstance.ServerGuildHandlers.SetGuild(validateResult.GuildId, validateResult.Guild);
             GameInstance.ServerGameMessageHandlers.SendSetGuildSkillLevelToMembers(validateResult.Guild, request.dataId);
             GameInstance.ServerGameMessageHandlers.SendSetGuildLevelExpSkillPointToMembers(validateResult.Guild);
-            result.Invoke(AckResponseCode.Success, new ResponseIncreaseGuildSkillLevelMessage());
+            result.InvokeSuccess(new ResponseIncreaseGuildSkillLevelMessage());
         }
 
         public async UniTaskVoid HandleRequestSendGuildRequest(RequestHandlerData requestHandler, RequestSendGuildRequestMessage request, RequestProceedResultDelegate<ResponseSendGuildRequestMessage> result)
@@ -491,27 +473,25 @@ namespace MultiplayerARPG
 
         public async UniTaskVoid HandleRequestGetGuildInfo(RequestHandlerData requestHandler, RequestGetGuildInfoMessage request, RequestProceedResultDelegate<ResponseGetGuildInfoMessage> result)
         {
-            IPlayerCharacterData playerCharacter;
-            if (!GameInstance.ServerUserHandlers.TryGetPlayerCharacter(requestHandler.ConnectionId, out playerCharacter))
+            if (!GameInstance.ServerUserHandlers.TryGetPlayerCharacter(requestHandler.ConnectionId, out IPlayerCharacterData playerCharacter))
             {
-                result.Invoke(AckResponseCode.Error, new ResponseGetGuildInfoMessage()
+                result.InvokeError(new ResponseGetGuildInfoMessage()
                 {
                     message = UITextKeys.UI_ERROR_NOT_LOGGED_IN,
                 });
                 return;
             }
 
-            GuildData guild;
-            if (!GameInstance.ServerGuildHandlers.TryGetGuild(request.guildId, out guild))
+            if (!GameInstance.ServerGuildHandlers.TryGetGuild(request.guildId, out GuildData guild))
             {
-                result.Invoke(AckResponseCode.Error, new ResponseGetGuildInfoMessage()
+                result.InvokeError(new ResponseGetGuildInfoMessage()
                 {
                     message = UITextKeys.UI_ERROR_GUILD_NOT_FOUND,
                 });
                 return;
             }
 
-            result.Invoke(AckResponseCode.Success, new ResponseGetGuildInfoMessage()
+            result.InvokeSuccess(new ResponseGetGuildInfoMessage()
             {
                 guild = new GuildListEntry()
                 {
