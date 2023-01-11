@@ -22,8 +22,7 @@ namespace MultiplayerARPG
             string characterId = messageHandler.Reader.GetString();
             if (string.IsNullOrEmpty(characterId))
                 return;
-            float lastOnlineTime;
-            if (OnlineCharacterIds.TryGetValue(characterId, out lastOnlineTime))
+            if (OnlineCharacterIds.TryGetValue(characterId, out float lastOnlineTime))
             {
                 // Notify back online character
                 Manager.ServerSendPacket(messageHandler.ConnectionId, 0, DeliveryMethod.ReliableOrdered, GameNetworkingConsts.NotifyOnlineCharacter, (writer) =>
