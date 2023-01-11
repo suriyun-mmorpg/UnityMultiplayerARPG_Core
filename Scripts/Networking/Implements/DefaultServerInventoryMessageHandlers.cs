@@ -9,10 +9,9 @@ namespace MultiplayerARPG
         public async UniTaskVoid HandleRequestSwapOrMergeItem(RequestHandlerData requestHandler, RequestSwapOrMergeItemMessage request, RequestProceedResultDelegate<ResponseSwapOrMergeItemMessage> result)
         {
             await UniTask.Yield();
-            IPlayerCharacterData playerCharacter;
-            if (!GameInstance.ServerUserHandlers.TryGetPlayerCharacter(requestHandler.ConnectionId, out playerCharacter))
+            if (!GameInstance.ServerUserHandlers.TryGetPlayerCharacter(requestHandler.ConnectionId, out IPlayerCharacterData playerCharacter))
             {
-                result.Invoke(AckResponseCode.Error, new ResponseSwapOrMergeItemMessage()
+                result.InvokeError(new ResponseSwapOrMergeItemMessage()
                 {
                     message = UITextKeys.UI_ERROR_NOT_LOGGED_IN,
                 });
@@ -22,29 +21,27 @@ namespace MultiplayerARPG
             BasePlayerCharacterEntity playerCharacterEntity = playerCharacter as BasePlayerCharacterEntity;
             if (playerCharacterEntity != null && !playerCharacterEntity.CanMoveItem())
             {
-                result.Invoke(AckResponseCode.Error, new ResponseSwapOrMergeItemMessage());
+                result.InvokeError(new ResponseSwapOrMergeItemMessage());
                 return;
             }
 
-            UITextKeys gameMessage;
-            if (!playerCharacter.SwapOrMergeItem(request.fromIndex, request.toIndex, out gameMessage))
+            if (!playerCharacter.SwapOrMergeItem(request.fromIndex, request.toIndex, out UITextKeys gameMessage))
             {
-                result.Invoke(AckResponseCode.Error, new ResponseSwapOrMergeItemMessage()
+                result.InvokeError(new ResponseSwapOrMergeItemMessage()
                 {
                     message = gameMessage,
                 });
                 return;
             }
-            result.Invoke(AckResponseCode.Success, new ResponseSwapOrMergeItemMessage());
+            result.InvokeSuccess(new ResponseSwapOrMergeItemMessage());
         }
 
         public async UniTaskVoid HandleRequestEquipArmor(RequestHandlerData requestHandler, RequestEquipArmorMessage request, RequestProceedResultDelegate<ResponseEquipArmorMessage> result)
         {
             await UniTask.Yield();
-            IPlayerCharacterData playerCharacter;
-            if (!GameInstance.ServerUserHandlers.TryGetPlayerCharacter(requestHandler.ConnectionId, out playerCharacter))
+            if (!GameInstance.ServerUserHandlers.TryGetPlayerCharacter(requestHandler.ConnectionId, out IPlayerCharacterData playerCharacter))
             {
-                result.Invoke(AckResponseCode.Error, new ResponseEquipArmorMessage()
+                result.InvokeError(new ResponseEquipArmorMessage()
                 {
                     message = UITextKeys.UI_ERROR_NOT_LOGGED_IN,
                 });
@@ -54,29 +51,27 @@ namespace MultiplayerARPG
             BasePlayerCharacterEntity playerCharacterEntity = playerCharacter as BasePlayerCharacterEntity;
             if (playerCharacterEntity != null && !playerCharacterEntity.CanEquipItem())
             {
-                result.Invoke(AckResponseCode.Error, new ResponseEquipArmorMessage());
+                result.InvokeError(new ResponseEquipArmorMessage());
                 return;
             }
 
-            UITextKeys gameMessage;
-            if (!playerCharacter.EquipArmor(request.nonEquipIndex, request.equipSlotIndex, out gameMessage))
+            if (!playerCharacter.EquipArmor(request.nonEquipIndex, request.equipSlotIndex, out UITextKeys gameMessage))
             {
-                result.Invoke(AckResponseCode.Error, new ResponseEquipArmorMessage()
+                result.InvokeError(new ResponseEquipArmorMessage()
                 {
                     message = gameMessage,
                 });
                 return;
             }
-            result.Invoke(AckResponseCode.Success, new ResponseEquipArmorMessage());
+            result.InvokeSuccess(new ResponseEquipArmorMessage());
         }
 
         public async UniTaskVoid HandleRequestEquipWeapon(RequestHandlerData requestHandler, RequestEquipWeaponMessage request, RequestProceedResultDelegate<ResponseEquipWeaponMessage> result)
         {
             await UniTask.Yield();
-            IPlayerCharacterData playerCharacter;
-            if (!GameInstance.ServerUserHandlers.TryGetPlayerCharacter(requestHandler.ConnectionId, out playerCharacter))
+            if (!GameInstance.ServerUserHandlers.TryGetPlayerCharacter(requestHandler.ConnectionId, out IPlayerCharacterData playerCharacter))
             {
-                result.Invoke(AckResponseCode.Error, new ResponseEquipWeaponMessage()
+                result.InvokeError(new ResponseEquipWeaponMessage()
                 {
                     message = UITextKeys.UI_ERROR_NOT_LOGGED_IN,
                 });
@@ -86,29 +81,27 @@ namespace MultiplayerARPG
             BasePlayerCharacterEntity playerCharacterEntity = playerCharacter as BasePlayerCharacterEntity;
             if (playerCharacterEntity != null && !playerCharacterEntity.CanEquipItem())
             {
-                result.Invoke(AckResponseCode.Error, new ResponseEquipWeaponMessage());
+                result.InvokeError(new ResponseEquipWeaponMessage());
                 return;
             }
 
-            UITextKeys gameMessage;
-            if (!playerCharacter.EquipWeapon(request.nonEquipIndex, request.equipWeaponSet, request.isLeftHand, out gameMessage))
+            if (!playerCharacter.EquipWeapon(request.nonEquipIndex, request.equipWeaponSet, request.isLeftHand, out UITextKeys gameMessage))
             {
-                result.Invoke(AckResponseCode.Error, new ResponseEquipWeaponMessage()
+                result.InvokeError(new ResponseEquipWeaponMessage()
                 {
                     message = gameMessage,
                 });
                 return;
             }
-            result.Invoke(AckResponseCode.Success, new ResponseEquipWeaponMessage());
+            result.InvokeSuccess(new ResponseEquipWeaponMessage());
         }
 
         public async UniTaskVoid HandleRequestUnEquipArmor(RequestHandlerData requestHandler, RequestUnEquipArmorMessage request, RequestProceedResultDelegate<ResponseUnEquipArmorMessage> result)
         {
             await UniTask.Yield();
-            IPlayerCharacterData playerCharacter;
-            if (!GameInstance.ServerUserHandlers.TryGetPlayerCharacter(requestHandler.ConnectionId, out playerCharacter))
+            if (!GameInstance.ServerUserHandlers.TryGetPlayerCharacter(requestHandler.ConnectionId, out IPlayerCharacterData playerCharacter))
             {
-                result.Invoke(AckResponseCode.Error, new ResponseUnEquipArmorMessage()
+                result.InvokeError(new ResponseUnEquipArmorMessage()
                 {
                     message = UITextKeys.UI_ERROR_NOT_LOGGED_IN,
                 });
@@ -118,29 +111,27 @@ namespace MultiplayerARPG
             BasePlayerCharacterEntity playerCharacterEntity = playerCharacter as BasePlayerCharacterEntity;
             if (playerCharacterEntity != null && !playerCharacterEntity.CanUnEquipItem())
             {
-                result.Invoke(AckResponseCode.Error, new ResponseUnEquipArmorMessage());
+                result.InvokeError(new ResponseUnEquipArmorMessage());
                 return;
             }
 
-            UITextKeys gameMessage;
-            if (!playerCharacter.UnEquipArmor(request.equipIndex, false, out gameMessage, out _, request.nonEquipIndex))
+            if (!playerCharacter.UnEquipArmor(request.equipIndex, false, out UITextKeys gameMessage, out _, request.nonEquipIndex))
             {
-                result.Invoke(AckResponseCode.Error, new ResponseUnEquipArmorMessage()
+                result.InvokeError(new ResponseUnEquipArmorMessage()
                 {
                     message = gameMessage,
                 });
                 return;
             }
-            result.Invoke(AckResponseCode.Success, new ResponseUnEquipArmorMessage());
+            result.InvokeSuccess(new ResponseUnEquipArmorMessage());
         }
 
         public async UniTaskVoid HandleRequestUnEquipWeapon(RequestHandlerData requestHandler, RequestUnEquipWeaponMessage request, RequestProceedResultDelegate<ResponseUnEquipWeaponMessage> result)
         {
             await UniTask.Yield();
-            IPlayerCharacterData playerCharacter;
-            if (!GameInstance.ServerUserHandlers.TryGetPlayerCharacter(requestHandler.ConnectionId, out playerCharacter))
+            if (!GameInstance.ServerUserHandlers.TryGetPlayerCharacter(requestHandler.ConnectionId, out IPlayerCharacterData playerCharacter))
             {
-                result.Invoke(AckResponseCode.Error, new ResponseUnEquipWeaponMessage()
+                result.InvokeError(new ResponseUnEquipWeaponMessage()
                 {
                     message = UITextKeys.UI_ERROR_NOT_LOGGED_IN,
                 });
@@ -150,29 +141,27 @@ namespace MultiplayerARPG
             BasePlayerCharacterEntity playerCharacterEntity = playerCharacter as BasePlayerCharacterEntity;
             if (playerCharacterEntity != null && !playerCharacterEntity.CanUnEquipItem())
             {
-                result.Invoke(AckResponseCode.Error, new ResponseUnEquipWeaponMessage());
+                result.InvokeError(new ResponseUnEquipWeaponMessage());
                 return;
             }
 
-            UITextKeys gameMessage;
-            if (!playerCharacter.UnEquipWeapon(request.equipWeaponSet, request.isLeftHand, false, out gameMessage, out _, request.nonEquipIndex))
+            if (!playerCharacter.UnEquipWeapon(request.equipWeaponSet, request.isLeftHand, false, out UITextKeys gameMessage, out _, request.nonEquipIndex))
             {
-                result.Invoke(AckResponseCode.Error, new ResponseUnEquipWeaponMessage()
+                result.InvokeError(new ResponseUnEquipWeaponMessage()
                 {
                     message = gameMessage,
                 });
                 return;
             }
-            result.Invoke(AckResponseCode.Success, new ResponseUnEquipWeaponMessage());
+            result.InvokeSuccess(new ResponseUnEquipWeaponMessage());
         }
 
         public async UniTaskVoid HandleRequestSwitchEquipWeaponSet(RequestHandlerData requestHandler, RequestSwitchEquipWeaponSetMessage request, RequestProceedResultDelegate<ResponseSwitchEquipWeaponSetMessage> result)
         {
             await UniTask.Yield();
-            IPlayerCharacterData playerCharacter;
-            if (!GameInstance.ServerUserHandlers.TryGetPlayerCharacter(requestHandler.ConnectionId, out playerCharacter))
+            if (!GameInstance.ServerUserHandlers.TryGetPlayerCharacter(requestHandler.ConnectionId, out IPlayerCharacterData playerCharacter))
             {
-                result.Invoke(AckResponseCode.Error, new ResponseSwitchEquipWeaponSetMessage()
+                result.InvokeError(new ResponseSwitchEquipWeaponSetMessage()
                 {
                     message = UITextKeys.UI_ERROR_NOT_LOGGED_IN,
                 });
@@ -182,7 +171,7 @@ namespace MultiplayerARPG
             BasePlayerCharacterEntity playerCharacterEntity = playerCharacter as BasePlayerCharacterEntity;
             if (playerCharacterEntity != null && !playerCharacterEntity.CanEquipItem())
             {
-                result.Invoke(AckResponseCode.Error, new ResponseSwitchEquipWeaponSetMessage());
+                result.InvokeError(new ResponseSwitchEquipWeaponSetMessage());
                 return;
             }
 
@@ -192,16 +181,15 @@ namespace MultiplayerARPG
             playerCharacter.FillWeaponSetsIfNeeded(equipWeaponSet);
             playerCharacter.EquipWeaponSet = equipWeaponSet;
 
-            result.Invoke(AckResponseCode.Success, new ResponseSwitchEquipWeaponSetMessage());
+            result.InvokeSuccess(new ResponseSwitchEquipWeaponSetMessage());
         }
 
         public async UniTaskVoid HandleRequestDismantleItem(RequestHandlerData requestHandler, RequestDismantleItemMessage request, RequestProceedResultDelegate<ResponseDismantleItemMessage> result)
         {
             await UniTask.Yield();
-            IPlayerCharacterData playerCharacter;
-            if (!GameInstance.ServerUserHandlers.TryGetPlayerCharacter(requestHandler.ConnectionId, out playerCharacter))
+            if (!GameInstance.ServerUserHandlers.TryGetPlayerCharacter(requestHandler.ConnectionId, out IPlayerCharacterData playerCharacter))
             {
-                result.Invoke(AckResponseCode.Error, new ResponseDismantleItemMessage()
+                result.InvokeError(new ResponseDismantleItemMessage()
                 {
                     message = UITextKeys.UI_ERROR_NOT_LOGGED_IN,
                 });
@@ -211,21 +199,20 @@ namespace MultiplayerARPG
             BasePlayerCharacterEntity playerCharacterEntity = playerCharacter as BasePlayerCharacterEntity;
             if (playerCharacterEntity != null && !playerCharacterEntity.CanDismentleItem())
             {
-                result.Invoke(AckResponseCode.Error, new ResponseDismantleItemMessage());
+                result.InvokeError(new ResponseDismantleItemMessage());
                 return;
             }
 
-            UITextKeys gameMessage;
-            if (!playerCharacter.DismantleItem(request.index, request.amount, out gameMessage))
+            if (!playerCharacter.DismantleItem(request.index, request.amount, out UITextKeys gameMessage))
             {
-                result.Invoke(AckResponseCode.Error, new ResponseDismantleItemMessage()
+                result.InvokeError(new ResponseDismantleItemMessage()
                 {
                     message = gameMessage,
                 });
                 return;
             }
 
-            result.Invoke(AckResponseCode.Success, new ResponseDismantleItemMessage()
+            result.InvokeSuccess(new ResponseDismantleItemMessage()
             {
                 message = gameMessage,
             });
@@ -234,10 +221,9 @@ namespace MultiplayerARPG
         public async UniTaskVoid HandleRequestDismantleItems(RequestHandlerData requestHandler, RequestDismantleItemsMessage request, RequestProceedResultDelegate<ResponseDismantleItemsMessage> result)
         {
             await UniTask.Yield();
-            IPlayerCharacterData playerCharacter;
-            if (!GameInstance.ServerUserHandlers.TryGetPlayerCharacter(requestHandler.ConnectionId, out playerCharacter))
+            if (!GameInstance.ServerUserHandlers.TryGetPlayerCharacter(requestHandler.ConnectionId, out IPlayerCharacterData playerCharacter))
             {
-                result.Invoke(AckResponseCode.Error, new ResponseDismantleItemsMessage()
+                result.InvokeError(new ResponseDismantleItemsMessage()
                 {
                     message = UITextKeys.UI_ERROR_NOT_LOGGED_IN,
                 });
@@ -247,21 +233,20 @@ namespace MultiplayerARPG
             BasePlayerCharacterEntity playerCharacterEntity = playerCharacter as BasePlayerCharacterEntity;
             if (playerCharacterEntity != null && !playerCharacterEntity.CanDismentleItem())
             {
-                result.Invoke(AckResponseCode.Error, new ResponseDismantleItemsMessage());
+                result.InvokeError(new ResponseDismantleItemsMessage());
                 return;
             }
 
-            UITextKeys gameMessage;
-            if (!playerCharacter.DismantleItems(request.selectedIndexes, out gameMessage))
+            if (!playerCharacter.DismantleItems(request.selectedIndexes, out UITextKeys gameMessage))
             {
-                result.Invoke(AckResponseCode.Error, new ResponseDismantleItemsMessage()
+                result.InvokeError(new ResponseDismantleItemsMessage()
                 {
                     message = gameMessage,
                 });
                 return;
             }
 
-            result.Invoke(AckResponseCode.Success, new ResponseDismantleItemsMessage()
+            result.InvokeSuccess(new ResponseDismantleItemsMessage()
             {
                 message = gameMessage,
             });
@@ -270,10 +255,9 @@ namespace MultiplayerARPG
         public async UniTaskVoid HandleRequestEnhanceSocketItem(RequestHandlerData requestHandler, RequestEnhanceSocketItemMessage request, RequestProceedResultDelegate<ResponseEnhanceSocketItemMessage> result)
         {
             await UniTask.Yield();
-            IPlayerCharacterData playerCharacter;
-            if (!GameInstance.ServerUserHandlers.TryGetPlayerCharacter(requestHandler.ConnectionId, out playerCharacter))
+            if (!GameInstance.ServerUserHandlers.TryGetPlayerCharacter(requestHandler.ConnectionId, out IPlayerCharacterData playerCharacter))
             {
-                result.Invoke(AckResponseCode.Error, new ResponseEnhanceSocketItemMessage()
+                result.InvokeError(new ResponseEnhanceSocketItemMessage()
                 {
                     message = UITextKeys.UI_ERROR_NOT_LOGGED_IN,
                 });
@@ -283,20 +267,19 @@ namespace MultiplayerARPG
             BasePlayerCharacterEntity playerCharacterEntity = playerCharacter as BasePlayerCharacterEntity;
             if (playerCharacterEntity != null && !playerCharacterEntity.CanEnhanceSocketItem())
             {
-                result.Invoke(AckResponseCode.Error, new ResponseEnhanceSocketItemMessage());
+                result.InvokeError(new ResponseEnhanceSocketItemMessage());
                 return;
             }
 
-            UITextKeys gameMessage;
-            if (!playerCharacter.EnhanceSocketItem(request.inventoryType, request.index, request.enhancerId, request.socketIndex, out gameMessage))
+            if (!playerCharacter.EnhanceSocketItem(request.inventoryType, request.index, request.enhancerId, request.socketIndex, out UITextKeys gameMessage))
             {
-                result.Invoke(AckResponseCode.Error, new ResponseEnhanceSocketItemMessage()
+                result.InvokeError(new ResponseEnhanceSocketItemMessage()
                 {
                     message = gameMessage,
                 });
                 return;
             }
-            result.Invoke(AckResponseCode.Success, new ResponseEnhanceSocketItemMessage()
+            result.InvokeSuccess(new ResponseEnhanceSocketItemMessage()
             {
                 message = gameMessage,
             });
@@ -305,10 +288,9 @@ namespace MultiplayerARPG
         public async UniTaskVoid HandleRequestRefineItem(RequestHandlerData requestHandler, RequestRefineItemMessage request, RequestProceedResultDelegate<ResponseRefineItemMessage> result)
         {
             await UniTask.Yield();
-            IPlayerCharacterData playerCharacter;
-            if (!GameInstance.ServerUserHandlers.TryGetPlayerCharacter(requestHandler.ConnectionId, out playerCharacter))
+            if (!GameInstance.ServerUserHandlers.TryGetPlayerCharacter(requestHandler.ConnectionId, out IPlayerCharacterData playerCharacter))
             {
-                result.Invoke(AckResponseCode.Error, new ResponseRefineItemMessage()
+                result.InvokeError(new ResponseRefineItemMessage()
                 {
                     message = UITextKeys.UI_ERROR_NOT_LOGGED_IN,
                 });
@@ -318,21 +300,20 @@ namespace MultiplayerARPG
             BasePlayerCharacterEntity playerCharacterEntity = playerCharacter as BasePlayerCharacterEntity;
             if (playerCharacterEntity != null && !playerCharacterEntity.CanRefineItem())
             {
-                result.Invoke(AckResponseCode.Error, new ResponseRefineItemMessage());
+                result.InvokeError(new ResponseRefineItemMessage());
                 return;
             }
 
-            UITextKeys gameMessage;
-            if (!playerCharacter.RefineItem(request.inventoryType, request.index, out gameMessage))
+            if (!playerCharacter.RefineItem(request.inventoryType, request.index, out UITextKeys gameMessage))
             {
-                result.Invoke(AckResponseCode.Error, new ResponseRefineItemMessage()
+                result.InvokeError(new ResponseRefineItemMessage()
                 {
                     message = gameMessage,
                 });
                 return;
             }
 
-            result.Invoke(AckResponseCode.Success, new ResponseRefineItemMessage()
+            result.InvokeSuccess(new ResponseRefineItemMessage()
             {
                 message = gameMessage,
             });
@@ -341,10 +322,9 @@ namespace MultiplayerARPG
         public async UniTaskVoid HandleRequestRemoveEnhancerFromItem(RequestHandlerData requestHandler, RequestRemoveEnhancerFromItemMessage request, RequestProceedResultDelegate<ResponseRemoveEnhancerFromItemMessage> result)
         {
             await UniTask.Yield();
-            IPlayerCharacterData playerCharacter;
-            if (!GameInstance.ServerUserHandlers.TryGetPlayerCharacter(requestHandler.ConnectionId, out playerCharacter))
+            if (!GameInstance.ServerUserHandlers.TryGetPlayerCharacter(requestHandler.ConnectionId, out IPlayerCharacterData playerCharacter))
             {
-                result.Invoke(AckResponseCode.Error, new ResponseRemoveEnhancerFromItemMessage()
+                result.InvokeError(new ResponseRemoveEnhancerFromItemMessage()
                 {
                     message = UITextKeys.UI_ERROR_NOT_LOGGED_IN,
                 });
@@ -354,21 +334,20 @@ namespace MultiplayerARPG
             BasePlayerCharacterEntity playerCharacterEntity = playerCharacter as BasePlayerCharacterEntity;
             if (playerCharacterEntity != null && !playerCharacterEntity.CanRemoveEnhancerFromItem())
             {
-                result.Invoke(AckResponseCode.Error, new ResponseRemoveEnhancerFromItemMessage());
+                result.InvokeError(new ResponseRemoveEnhancerFromItemMessage());
                 return;
             }
 
-            UITextKeys gameMessage;
-            if (!playerCharacter.RemoveEnhancerFromItem(request.inventoryType, request.index, request.socketIndex, out gameMessage))
+            if (!playerCharacter.RemoveEnhancerFromItem(request.inventoryType, request.index, request.socketIndex, out UITextKeys gameMessage))
             {
-                result.Invoke(AckResponseCode.Error, new ResponseRemoveEnhancerFromItemMessage()
+                result.InvokeError(new ResponseRemoveEnhancerFromItemMessage()
                 {
                     message = gameMessage,
                 });
                 return;
             }
 
-            result.Invoke(AckResponseCode.Success, new ResponseRemoveEnhancerFromItemMessage()
+            result.InvokeSuccess(new ResponseRemoveEnhancerFromItemMessage()
             {
                 message = gameMessage,
             });
@@ -377,10 +356,9 @@ namespace MultiplayerARPG
         public async UniTaskVoid HandleRequestRepairItem(RequestHandlerData requestHandler, RequestRepairItemMessage request, RequestProceedResultDelegate<ResponseRepairItemMessage> result)
         {
             await UniTask.Yield();
-            IPlayerCharacterData playerCharacter;
-            if (!GameInstance.ServerUserHandlers.TryGetPlayerCharacter(requestHandler.ConnectionId, out playerCharacter))
+            if (!GameInstance.ServerUserHandlers.TryGetPlayerCharacter(requestHandler.ConnectionId, out IPlayerCharacterData playerCharacter))
             {
-                result.Invoke(AckResponseCode.Error, new ResponseRepairItemMessage()
+                result.InvokeError(new ResponseRepairItemMessage()
                 {
                     message = UITextKeys.UI_ERROR_NOT_LOGGED_IN,
                 });
@@ -390,21 +368,20 @@ namespace MultiplayerARPG
             BasePlayerCharacterEntity playerCharacterEntity = playerCharacter as BasePlayerCharacterEntity;
             if (playerCharacterEntity != null && !playerCharacterEntity.CanRepairItem())
             {
-                result.Invoke(AckResponseCode.Error, new ResponseRepairItemMessage());
+                result.InvokeError(new ResponseRepairItemMessage());
                 return;
             }
 
-            UITextKeys gameMessage;
-            if (!playerCharacter.RepairItem(request.inventoryType, request.index, out gameMessage))
+            if (!playerCharacter.RepairItem(request.inventoryType, request.index, out UITextKeys gameMessage))
             {
-                result.Invoke(AckResponseCode.Error, new ResponseRepairItemMessage()
+                result.InvokeError(new ResponseRepairItemMessage()
                 {
                     message = gameMessage,
                 });
                 return;
             }
 
-            result.Invoke(AckResponseCode.Success, new ResponseRepairItemMessage()
+            result.InvokeSuccess(new ResponseRepairItemMessage()
             {
                 message = gameMessage,
             });
@@ -413,10 +390,9 @@ namespace MultiplayerARPG
         public async UniTaskVoid HandleRequestRepairEquipItems(RequestHandlerData requestHandler, EmptyMessage request, RequestProceedResultDelegate<ResponseRepairEquipItemsMessage> result)
         {
             await UniTask.Yield();
-            IPlayerCharacterData playerCharacter;
-            if (!GameInstance.ServerUserHandlers.TryGetPlayerCharacter(requestHandler.ConnectionId, out playerCharacter))
+            if (!GameInstance.ServerUserHandlers.TryGetPlayerCharacter(requestHandler.ConnectionId, out IPlayerCharacterData playerCharacter))
             {
-                result.Invoke(AckResponseCode.Error, new ResponseRepairEquipItemsMessage()
+                result.InvokeError(new ResponseRepairEquipItemsMessage()
                 {
                     message = UITextKeys.UI_ERROR_NOT_LOGGED_IN,
                 });
@@ -426,21 +402,20 @@ namespace MultiplayerARPG
             BasePlayerCharacterEntity playerCharacterEntity = playerCharacter as BasePlayerCharacterEntity;
             if (playerCharacterEntity != null && !playerCharacterEntity.CanRepairItem())
             {
-                result.Invoke(AckResponseCode.Error, new ResponseRepairEquipItemsMessage());
+                result.InvokeError(new ResponseRepairEquipItemsMessage());
                 return;
             }
 
-            UITextKeys gameMessage;
-            if (!playerCharacter.RepairEquipItems(out gameMessage))
+            if (!playerCharacter.RepairEquipItems(out UITextKeys gameMessage))
             {
-                result.Invoke(AckResponseCode.Error, new ResponseRepairEquipItemsMessage()
+                result.InvokeError(new ResponseRepairEquipItemsMessage()
                 {
                     message = gameMessage,
                 });
                 return;
             }
 
-            result.Invoke(AckResponseCode.Success, new ResponseRepairEquipItemsMessage()
+            result.InvokeSuccess(new ResponseRepairEquipItemsMessage()
             {
                 message = gameMessage,
             });
@@ -449,39 +424,40 @@ namespace MultiplayerARPG
         public async UniTaskVoid HandleRequestSellItem(RequestHandlerData requestHandler, RequestSellItemMessage request, RequestProceedResultDelegate<ResponseSellItemMessage> result)
         {
             await UniTask.Yield();
-            BasePlayerCharacterEntity playerCharacterEntity;
-            if (!GameInstance.ServerUserHandlers.TryGetPlayerCharacter(requestHandler.ConnectionId, out playerCharacterEntity))
+            if (!GameInstance.ServerUserHandlers.TryGetPlayerCharacter(requestHandler.ConnectionId, out IPlayerCharacterData playerCharacter))
             {
-                result.Invoke(AckResponseCode.Error, new ResponseSellItemMessage()
+                result.InvokeError(new ResponseSellItemMessage()
                 {
                     message = UITextKeys.UI_ERROR_NOT_LOGGED_IN,
                 });
                 return;
             }
 
-            if (!playerCharacterEntity.CanSellItem())
+            BasePlayerCharacterEntity playerCharacterEntity = playerCharacter as BasePlayerCharacterEntity;
+            if (playerCharacterEntity != null)
             {
-                result.Invoke(AckResponseCode.Error, new ResponseSellItemMessage());
-                return;
+                if (!playerCharacterEntity.CanSellItem())
+                {
+                    result.InvokeError(new ResponseSellItemMessage());
+                    return;
+                }
+                if (!playerCharacterEntity.NpcAction.AccessingNpcShopDialog(out _))
+                {
+                    result.InvokeError(new ResponseSellItemMessage());
+                    return;
+                }
             }
 
-            if (!playerCharacterEntity.NpcAction.AccessingNpcShopDialog(out _))
+            if (!playerCharacter.SellItem(request.index, request.amount, out UITextKeys gameMessage))
             {
-                result.Invoke(AckResponseCode.Error, new ResponseSellItemMessage());
-                return;
-            }
-
-            UITextKeys gameMessage;
-            if (!playerCharacterEntity.SellItem(request.index, request.amount, out gameMessage))
-            {
-                result.Invoke(AckResponseCode.Error, new ResponseSellItemMessage()
+                result.InvokeError(new ResponseSellItemMessage()
                 {
                     message = gameMessage,
                 });
                 return;
             }
 
-            result.Invoke(AckResponseCode.Success, new ResponseSellItemMessage()
+            result.InvokeSuccess(new ResponseSellItemMessage()
             {
                 message = gameMessage,
             });
@@ -490,39 +466,40 @@ namespace MultiplayerARPG
         public async UniTaskVoid HandleRequestSellItems(RequestHandlerData requestHandler, RequestSellItemsMessage request, RequestProceedResultDelegate<ResponseSellItemsMessage> result)
         {
             await UniTask.Yield();
-            BasePlayerCharacterEntity playerCharacterEntity;
-            if (!GameInstance.ServerUserHandlers.TryGetPlayerCharacter(requestHandler.ConnectionId, out playerCharacterEntity))
+            if (!GameInstance.ServerUserHandlers.TryGetPlayerCharacter(requestHandler.ConnectionId, out IPlayerCharacterData playerCharacter))
             {
-                result.Invoke(AckResponseCode.Error, new ResponseSellItemsMessage()
+                result.InvokeError(new ResponseSellItemsMessage()
                 {
                     message = UITextKeys.UI_ERROR_NOT_LOGGED_IN,
                 });
                 return;
             }
 
-            if (!playerCharacterEntity.CanSellItem())
+            BasePlayerCharacterEntity playerCharacterEntity = playerCharacter as BasePlayerCharacterEntity;
+            if (playerCharacterEntity != null)
             {
-                result.Invoke(AckResponseCode.Error, new ResponseSellItemsMessage());
-                return;
+                if (!playerCharacterEntity.CanSellItem())
+                {
+                    result.InvokeError(new ResponseSellItemsMessage());
+                    return;
+                }
+                if (!playerCharacterEntity.NpcAction.AccessingNpcShopDialog(out _))
+                {
+                    result.InvokeError(new ResponseSellItemsMessage());
+                    return;
+                }
             }
 
-            if (!playerCharacterEntity.NpcAction.AccessingNpcShopDialog(out _))
+            if (!playerCharacter.SellItems(request.selectedIndexes, out UITextKeys gameMessage))
             {
-                result.Invoke(AckResponseCode.Error, new ResponseSellItemsMessage());
-                return;
-            }
-
-            UITextKeys gameMessage;
-            if (!playerCharacterEntity.SellItems(request.selectedIndexes, out gameMessage))
-            {
-                result.Invoke(AckResponseCode.Error, new ResponseSellItemsMessage()
+                result.InvokeError(new ResponseSellItemsMessage()
                 {
                     message = gameMessage,
                 });
                 return;
             }
 
-            result.Invoke(AckResponseCode.Success, new ResponseSellItemsMessage()
+            result.InvokeSuccess(new ResponseSellItemsMessage()
             {
                 message = gameMessage,
             });
