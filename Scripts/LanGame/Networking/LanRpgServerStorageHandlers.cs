@@ -14,6 +14,7 @@ namespace MultiplayerARPG
 
         public async UniTaskVoid OpenStorage(long connectionId, IPlayerCharacterData playerCharacter, StorageId storageId)
         {
+            await UniTask.Yield();
             if (!CanAccessStorage(playerCharacter, storageId))
             {
                 GameInstance.ServerGameMessageHandlers.SendGameMessage(connectionId, UITextKeys.UI_ERROR_CANNOT_ACCESS_STORAGE);
@@ -26,25 +27,22 @@ namespace MultiplayerARPG
             usingStorageIds.TryRemove(connectionId, out _);
             usingStorageIds.TryAdd(connectionId, storageId);
             // Notify storage items to client
-            uint storageObjectId;
-            Storage storage = GetStorage(storageId, out storageObjectId);
+            Storage storage = GetStorage(storageId, out uint storageObjectId);
             GameInstance.ServerGameMessageHandlers.NotifyStorageOpened(connectionId, storageId.storageType, storageId.storageOwnerId, storageObjectId, storage.weightLimit, storage.slotLimit);
             List<CharacterItem> storageItems = GetStorageItems(storageId);
             storageItems.FillEmptySlots(storage.slotLimit > 0, storage.slotLimit);
             GameInstance.ServerGameMessageHandlers.NotifyStorageItems(connectionId, storageItems);
-            await UniTask.Yield();
         }
 
         public async UniTaskVoid CloseStorage(long connectionId)
         {
-            StorageId storageId;
-            if (usingStorageIds.TryGetValue(connectionId, out storageId) && usingStorageClients.ContainsKey(storageId))
+            await UniTask.Yield();
+            if (usingStorageIds.TryGetValue(connectionId, out StorageId storageId) && usingStorageClients.ContainsKey(storageId))
             {
                 usingStorageClients[storageId].Remove(connectionId);
                 usingStorageIds.TryRemove(connectionId, out _);
                 GameInstance.ServerGameMessageHandlers.NotifyStorageClosed(connectionId);
             }
-            await UniTask.Yield();
         }
 
         public bool TryGetOpenedStorageId(long connectionId, out StorageId storageId)
@@ -54,6 +52,7 @@ namespace MultiplayerARPG
 
         public async UniTask<List<CharacterItem>> ConvertStorageItems(StorageId storageId, List<StorageConvertItemsEntry> convertItems)
         {
+            await UniTask.Yield();
             // Prepare storage data
             Storage storage = GetStorage(storageId, out _);
             bool isLimitWeight = storage.weightLimit > 0;
@@ -91,7 +90,6 @@ namespace MultiplayerARPG
             storageItems.FillEmptySlots(isLimitSlot, slotLimit);
             SetStorageItems(storageId, storageItems);
             NotifyStorageItemsUpdated(storageId.storageType, storageId.storageOwnerId);
-            await UniTask.Yield();
             return droppingItems;
         }
 
@@ -122,8 +120,7 @@ namespace MultiplayerARPG
                     storage = GameInstance.Singleton.guildStorage;
                     break;
                 case StorageType.Building:
-                    StorageEntity buildingEntity;
-                    if (GameInstance.ServerBuildingHandlers.TryGetBuilding(storageId.storageOwnerId, out buildingEntity))
+                    if (GameInstance.ServerBuildingHandlers.TryGetBuilding(storageId.storageOwnerId, out StorageEntity buildingEntity))
                     {
                         objectId = buildingEntity.ObjectId;
                         storage = buildingEntity.Storage;
@@ -147,8 +144,7 @@ namespace MultiplayerARPG
                         return false;
                     break;
                 case StorageType.Building:
-                    StorageEntity buildingEntity;
-                    if (!GameInstance.ServerBuildingHandlers.TryGetBuilding(storageId.storageOwnerId, out buildingEntity) ||
+                    if (!GameInstance.ServerBuildingHandlers.TryGetBuilding(storageId.storageOwnerId, out StorageEntity buildingEntity) ||
                         !(buildingEntity.IsCreator(playerCharacter.Id) || buildingEntity.CanUseByEveryone))
                         return false;
                     break;
