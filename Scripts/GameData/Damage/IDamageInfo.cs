@@ -24,7 +24,7 @@ namespace MultiplayerARPG
             CharacterItem weapon,
             Dictionary<DamageElement, MinMaxFloat> damageAmounts,
             BaseSkill skill,
-            short skillLevel,
+            int skillLevel,
             int randomSeed,
             AimPosition aimPosition,
             Vector3 stagger,

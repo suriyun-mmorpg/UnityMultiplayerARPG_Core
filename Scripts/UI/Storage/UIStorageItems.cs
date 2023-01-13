@@ -19,10 +19,10 @@ namespace MultiplayerARPG
         public StorageType StorageType { get; private set; }
         public string StorageOwnerId { get; private set; }
         public BaseGameEntity TargetEntity { get; private set; }
-        public short WeightLimit { get; private set; }
-        public short SlotLimit { get; private set; }
+        public int WeightLimit { get; private set; }
+        public int SlotLimit { get; private set; }
         public float TotalWeight { get; private set; }
-        public short UsedSlots { get; private set; }
+        public int UsedSlots { get; private set; }
 
         private bool doNotCloseStorageOnDisable;
 
@@ -84,7 +84,7 @@ namespace MultiplayerARPG
             base.Update();
         }
 
-        public void Show(StorageType storageType, string storageOwnerId, BaseGameEntity targetEntity, short weightLimit, short slotLimit)
+        public void Show(StorageType storageType, string storageOwnerId, BaseGameEntity targetEntity, int weightLimit, int slotLimit)
         {
             StorageType = storageType;
             StorageOwnerId = storageOwnerId;

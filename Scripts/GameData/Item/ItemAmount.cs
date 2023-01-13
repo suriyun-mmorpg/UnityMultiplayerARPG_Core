@@ -4,6 +4,6 @@
     public struct ItemAmount
     {
         public BaseItem item;
-        public short amount;
+        public int amount;
     }
 }

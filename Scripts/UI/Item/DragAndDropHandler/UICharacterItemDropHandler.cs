@@ -81,9 +81,9 @@ namespace MultiplayerARPG
                     // Unequip item
                     GameInstance.ClientInventoryHandlers.RequestUnEquipItem(
                         draggedItemUI.uiCharacterItem.InventoryType,
-                        (short)draggedItemUI.uiCharacterItem.IndexOfData,
+                        draggedItemUI.uiCharacterItem.IndexOfData,
                         draggedItemUI.uiCharacterItem.EquipSlotIndex,
-                        (short)uiCharacterItem.IndexOfData,
+                        uiCharacterItem.IndexOfData,
                         ClientInventoryActions.ResponseUnEquipArmor,
                         ClientInventoryActions.ResponseUnEquipWeapon);
                     break;
@@ -97,7 +97,7 @@ namespace MultiplayerARPG
                     }
                     else
                     {
-                        draggedItemUI.uiCharacterItem.OnClickMoveToStorage((short)uiCharacterItem.IndexOfData);
+                        draggedItemUI.uiCharacterItem.OnClickMoveToStorage(uiCharacterItem.IndexOfData);
                     }
                     break;
             }
@@ -117,8 +117,8 @@ namespace MultiplayerARPG
                     // Drop non equip item to non equip item
                     GameInstance.ClientInventoryHandlers.RequestSwapOrMergeItem(new RequestSwapOrMergeItemMessage()
                     {
-                        fromIndex = (short)draggedItemUI.uiCharacterItem.IndexOfData,
-                        toIndex = (short)uiCharacterItem.IndexOfData,
+                        fromIndex = draggedItemUI.uiCharacterItem.IndexOfData,
+                        toIndex = uiCharacterItem.IndexOfData,
                     }, ClientInventoryActions.ResponseSwapOrMergeItem);
                     break;
                 case InventoryType.EquipItems:
@@ -139,7 +139,7 @@ namespace MultiplayerARPG
                     }
                     else
                     {
-                        draggedItemUI.uiCharacterItem.OnClickMoveToStorage((short)uiCharacterItem.IndexOfData);
+                        draggedItemUI.uiCharacterItem.OnClickMoveToStorage(uiCharacterItem.IndexOfData);
                     }
                     break;
             }
@@ -166,7 +166,7 @@ namespace MultiplayerARPG
                     }
                     else
                     {
-                        draggedItemUI.uiCharacterItem.OnClickMoveFromStorage(uiCharacterItem.InventoryType, uiCharacterItem.EquipSlotIndex, (short)uiCharacterItem.IndexOfData);
+                        draggedItemUI.uiCharacterItem.OnClickMoveFromStorage(uiCharacterItem.InventoryType, uiCharacterItem.EquipSlotIndex, uiCharacterItem.IndexOfData);
                     }
                     break;
                 case InventoryType.StorageItems:
@@ -177,8 +177,8 @@ namespace MultiplayerARPG
                     {
                         storageType = storageType,
                         storageOwnerId = storageOwnerId,
-                        fromIndex = (short)draggedItemUI.uiCharacterItem.IndexOfData,
-                        toIndex = (short)uiCharacterItem.IndexOfData
+                        fromIndex = draggedItemUI.uiCharacterItem.IndexOfData,
+                        toIndex = uiCharacterItem.IndexOfData
                     }, ClientStorageActions.ResponseSwapOrMergeStorageItem);
                     break;
             }
@@ -219,7 +219,7 @@ namespace MultiplayerARPG
             // Can equip the item
             // so tell the server that this client want to equip the item
             GameInstance.ClientInventoryHandlers.RequestEquipItem(
-                (short)draggedItemUI.uiCharacterItem.IndexOfData,
+                draggedItemUI.uiCharacterItem.IndexOfData,
                 uiCharacterItem.InventoryType,
                 uiCharacterItem.EquipSlotIndex,
                 ClientInventoryActions.ResponseEquipArmor,

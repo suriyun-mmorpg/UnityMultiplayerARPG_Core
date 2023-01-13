@@ -153,10 +153,10 @@ namespace MultiplayerARPG
         /// <param name="resultDictionary"></param>
         /// <param name="newEntry"></param>
         /// <returns></returns>
-        public static Dictionary<BaseSkill, short> CombineSkills(Dictionary<BaseSkill, short> resultDictionary, KeyValuePair<BaseSkill, short> newEntry)
+        public static Dictionary<BaseSkill, int> CombineSkills(Dictionary<BaseSkill, int> resultDictionary, KeyValuePair<BaseSkill, int> newEntry)
         {
             if (resultDictionary == null)
-                resultDictionary = new Dictionary<BaseSkill, short>();
+                resultDictionary = new Dictionary<BaseSkill, int>();
             if (newEntry.Key != null)
             {
                 if (!resultDictionary.ContainsKey(newEntry.Key))
@@ -173,10 +173,10 @@ namespace MultiplayerARPG
         /// <param name="resultDictionary"></param>
         /// <param name="newEntry"></param>
         /// <returns></returns>
-        public static Dictionary<BaseItem, short> CombineItems(Dictionary<BaseItem, short> resultDictionary, KeyValuePair<BaseItem, short> newEntry)
+        public static Dictionary<BaseItem, int> CombineItems(Dictionary<BaseItem, int> resultDictionary, KeyValuePair<BaseItem, int> newEntry)
         {
             if (resultDictionary == null)
-                resultDictionary = new Dictionary<BaseItem, short>();
+                resultDictionary = new Dictionary<BaseItem, int>();
             if (newEntry.Key != null)
             {
                 if (!resultDictionary.ContainsKey(newEntry.Key))
@@ -193,10 +193,10 @@ namespace MultiplayerARPG
         /// <param name="resultDictionary"></param>
         /// <param name="newEntry"></param>
         /// <returns></returns>
-        public static Dictionary<AmmoType, short> CombineAmmoTypes(Dictionary<AmmoType, short> resultDictionary, KeyValuePair<AmmoType, short> newEntry)
+        public static Dictionary<AmmoType, int> CombineAmmoTypes(Dictionary<AmmoType, int> resultDictionary, KeyValuePair<AmmoType, int> newEntry)
         {
             if (resultDictionary == null)
-                resultDictionary = new Dictionary<AmmoType, short>();
+                resultDictionary = new Dictionary<AmmoType, int>();
             if (newEntry.Key != null)
             {
                 if (!resultDictionary.ContainsKey(newEntry.Key))
@@ -346,13 +346,13 @@ namespace MultiplayerARPG
         /// <param name="resultDictionary"></param>
         /// <param name="combineDictionary"></param>
         /// <returns></returns>
-        public static Dictionary<BaseSkill, short> CombineSkills(Dictionary<BaseSkill, short> resultDictionary, Dictionary<BaseSkill, short> combineDictionary)
+        public static Dictionary<BaseSkill, int> CombineSkills(Dictionary<BaseSkill, int> resultDictionary, Dictionary<BaseSkill, int> combineDictionary)
         {
             if (resultDictionary == null)
-                resultDictionary = new Dictionary<BaseSkill, short>();
+                resultDictionary = new Dictionary<BaseSkill, int>();
             if (combineDictionary != null && combineDictionary.Count > 0)
             {
-                foreach (KeyValuePair<BaseSkill, short> entry in combineDictionary)
+                foreach (KeyValuePair<BaseSkill, int> entry in combineDictionary)
                 {
                     CombineSkills(resultDictionary, entry);
                 }
@@ -366,13 +366,13 @@ namespace MultiplayerARPG
         /// <param name="resultDictionary"></param>
         /// <param name="newEntry"></param>
         /// <returns></returns>
-        public static Dictionary<BaseItem, short> CombineItems(Dictionary<BaseItem, short> resultDictionary, Dictionary<BaseItem, short> combineDictionary)
+        public static Dictionary<BaseItem, int> CombineItems(Dictionary<BaseItem, int> resultDictionary, Dictionary<BaseItem, int> combineDictionary)
         {
             if (resultDictionary == null)
-                resultDictionary = new Dictionary<BaseItem, short>();
+                resultDictionary = new Dictionary<BaseItem, int>();
             if (combineDictionary != null && combineDictionary.Count > 0)
             {
-                foreach (KeyValuePair<BaseItem, short> entry in combineDictionary)
+                foreach (KeyValuePair<BaseItem, int> entry in combineDictionary)
                 {
                     CombineItems(resultDictionary, entry);
                 }
@@ -405,7 +405,7 @@ namespace MultiplayerARPG
         /// <param name="rate"></param>
         /// <param name="effectiveness"></param>
         /// <returns></returns>
-        public static KeyValuePair<DamageElement, MinMaxFloat> ToKeyValuePair(this DamageIncremental source, short level, float rate, float effectiveness)
+        public static KeyValuePair<DamageElement, MinMaxFloat> ToKeyValuePair(this DamageIncremental source, int level, float rate, float effectiveness)
         {
             DamageElement damageElement = source.damageElement;
             if (damageElement == null)
@@ -432,7 +432,7 @@ namespace MultiplayerARPG
         /// <param name="source"></param>
         /// <param name="level"></param>
         /// <returns></returns>
-        public static KeyValuePair<DamageElement, float> ToKeyValuePair(this DamageInflictionIncremental source, short level)
+        public static KeyValuePair<DamageElement, float> ToKeyValuePair(this DamageInflictionIncremental source, int level)
         {
             DamageElement damageElement = source.damageElement;
             if (damageElement == null)
@@ -460,7 +460,7 @@ namespace MultiplayerARPG
         /// <param name="level"></param>
         /// <param name="rate"></param>
         /// <returns></returns>
-        public static KeyValuePair<Attribute, float> ToKeyValuePair(this AttributeIncremental source, short level, float rate)
+        public static KeyValuePair<Attribute, float> ToKeyValuePair(this AttributeIncremental source, int level, float rate)
         {
             if (source.attribute == null)
                 return new KeyValuePair<Attribute, float>();
@@ -498,7 +498,7 @@ namespace MultiplayerARPG
         /// <param name="level"></param>
         /// <param name="rate"></param>
         /// <returns></returns>
-        public static KeyValuePair<DamageElement, float> ToKeyValuePair(this ResistanceIncremental source, short level, float rate)
+        public static KeyValuePair<DamageElement, float> ToKeyValuePair(this ResistanceIncremental source, int level, float rate)
         {
             DamageElement damageElement = source.damageElement;
             if (damageElement == null)
@@ -527,7 +527,7 @@ namespace MultiplayerARPG
         /// <param name="level"></param>
         /// <param name="rate"></param>
         /// <returns></returns>
-        public static KeyValuePair<DamageElement, float> ToKeyValuePair(this ArmorIncremental source, short level, float rate)
+        public static KeyValuePair<DamageElement, float> ToKeyValuePair(this ArmorIncremental source, int level, float rate)
         {
             DamageElement damageElement = source.damageElement;
             if (damageElement == null)
@@ -540,11 +540,11 @@ namespace MultiplayerARPG
         /// </summary>
         /// <param name="source"></param>
         /// <returns></returns>
-        public static KeyValuePair<BaseSkill, short> ToKeyValuePair(this SkillLevel source)
+        public static KeyValuePair<BaseSkill, int> ToKeyValuePair(this SkillLevel source)
         {
             if (source.skill == null)
-                return new KeyValuePair<BaseSkill, short>();
-            return new KeyValuePair<BaseSkill, short>(source.skill, source.level);
+                return new KeyValuePair<BaseSkill, int>();
+            return new KeyValuePair<BaseSkill, int>(source.skill, source.level);
         }
 
         /// <summary>
@@ -552,11 +552,11 @@ namespace MultiplayerARPG
         /// </summary>
         /// <param name="source"></param>
         /// <returns></returns>
-        public static KeyValuePair<BaseSkill, short> ToKeyValuePair(this MonsterSkill source)
+        public static KeyValuePair<BaseSkill, int> ToKeyValuePair(this MonsterSkill source)
         {
             if (source.skill == null)
-                return new KeyValuePair<BaseSkill, short>();
-            return new KeyValuePair<BaseSkill, short>(source.skill, source.level);
+                return new KeyValuePair<BaseSkill, int>();
+            return new KeyValuePair<BaseSkill, int>(source.skill, source.level);
         }
 
         /// <summary>
@@ -564,11 +564,11 @@ namespace MultiplayerARPG
         /// </summary>
         /// <param name="source"></param>
         /// <returns></returns>
-        public static KeyValuePair<BaseItem, short> ToKeyValuePair(this ItemAmount source)
+        public static KeyValuePair<BaseItem, int> ToKeyValuePair(this ItemAmount source)
         {
             if (source.item == null)
-                return new KeyValuePair<BaseItem, short>();
-            return new KeyValuePair<BaseItem, short>(source.item, source.amount);
+                return new KeyValuePair<BaseItem, int>();
+            return new KeyValuePair<BaseItem, int>(source.item, source.amount);
         }
 
         /// <summary>
@@ -576,11 +576,11 @@ namespace MultiplayerARPG
         /// </summary>
         /// <param name="source"></param>
         /// <returns></returns>
-        public static KeyValuePair<AmmoType, short> ToKeyValuePair(this AmmoTypeAmount source)
+        public static KeyValuePair<AmmoType, int> ToKeyValuePair(this AmmoTypeAmount source)
         {
             if (source.ammoType == null)
-                return new KeyValuePair<AmmoType, short>();
-            return new KeyValuePair<AmmoType, short>(source.ammoType, source.amount);
+                return new KeyValuePair<AmmoType, int>();
+            return new KeyValuePair<AmmoType, int>(source.ammoType, source.amount);
         }
         #endregion
 
@@ -641,7 +641,7 @@ namespace MultiplayerARPG
         /// <param name="level"></param>
         /// <param name="rate"></param>
         /// <returns></returns>
-        public static Dictionary<DamageElement, MinMaxFloat> CombineDamages(IEnumerable<DamageIncremental> sourceIncrementals, Dictionary<DamageElement, MinMaxFloat> resultDictionary, short level, float rate)
+        public static Dictionary<DamageElement, MinMaxFloat> CombineDamages(IEnumerable<DamageIncremental> sourceIncrementals, Dictionary<DamageElement, MinMaxFloat> resultDictionary, int level, float rate)
         {
             if (resultDictionary == null)
                 resultDictionary = new Dictionary<DamageElement, MinMaxFloat>();
@@ -664,7 +664,7 @@ namespace MultiplayerARPG
         /// <param name="resultDictionary"></param>
         /// <param name="level"></param>
         /// <returns></returns>
-        public static Dictionary<DamageElement, float> CombineDamageInflictions(IEnumerable<DamageInflictionIncremental> sourceIncrementals, Dictionary<DamageElement, float> resultDictionary, short level)
+        public static Dictionary<DamageElement, float> CombineDamageInflictions(IEnumerable<DamageInflictionIncremental> sourceIncrementals, Dictionary<DamageElement, float> resultDictionary, int level)
         {
             if (resultDictionary == null)
                 resultDictionary = new Dictionary<DamageElement, float>();
@@ -711,7 +711,7 @@ namespace MultiplayerARPG
         /// <param name="level"></param>
         /// <param name="rate"></param>
         /// <returns></returns>
-        public static Dictionary<Attribute, float> CombineAttributes(IEnumerable<AttributeIncremental> sourceIncrementals, Dictionary<Attribute, float> resultDictionary, short level, float rate)
+        public static Dictionary<Attribute, float> CombineAttributes(IEnumerable<AttributeIncremental> sourceIncrementals, Dictionary<Attribute, float> resultDictionary, int level, float rate)
         {
             if (resultDictionary == null)
                 resultDictionary = new Dictionary<Attribute, float>();
@@ -781,7 +781,7 @@ namespace MultiplayerARPG
         /// <param name="level"></param>
         /// <param name="rate"></param>
         /// <returns></returns>
-        public static Dictionary<DamageElement, float> CombineResistances(IEnumerable<ResistanceIncremental> sourceIncrementals, Dictionary<DamageElement, float> resultDictionary, short level, float rate)
+        public static Dictionary<DamageElement, float> CombineResistances(IEnumerable<ResistanceIncremental> sourceIncrementals, Dictionary<DamageElement, float> resultDictionary, int level, float rate)
         {
             if (resultDictionary == null)
                 resultDictionary = new Dictionary<DamageElement, float>();
@@ -829,7 +829,7 @@ namespace MultiplayerARPG
         /// <param name="level"></param>
         /// <param name="rate"></param>
         /// <returns></returns>
-        public static Dictionary<DamageElement, float> CombineArmors(IEnumerable<ArmorIncremental> sourceIncrementals, Dictionary<DamageElement, float> resultDictionary, short level, float rate)
+        public static Dictionary<DamageElement, float> CombineArmors(IEnumerable<ArmorIncremental> sourceIncrementals, Dictionary<DamageElement, float> resultDictionary, int level, float rate)
         {
             if (resultDictionary == null)
                 resultDictionary = new Dictionary<DamageElement, float>();
@@ -851,13 +851,13 @@ namespace MultiplayerARPG
         /// <param name="sourceLevels"></param>
         /// <param name="resultDictionary"></param>
         /// <returns></returns>
-        public static Dictionary<BaseSkill, short> CombineSkills(IEnumerable<SkillLevel> sourceLevels, Dictionary<BaseSkill, short> resultDictionary)
+        public static Dictionary<BaseSkill, int> CombineSkills(IEnumerable<SkillLevel> sourceLevels, Dictionary<BaseSkill, int> resultDictionary)
         {
             if (resultDictionary == null)
-                resultDictionary = new Dictionary<BaseSkill, short>();
+                resultDictionary = new Dictionary<BaseSkill, int>();
             if (sourceLevels != null)
             {
-                KeyValuePair<BaseSkill, short> pair;
+                KeyValuePair<BaseSkill, int> pair;
                 foreach (SkillLevel sourceLevel in sourceLevels)
                 {
                     pair = ToKeyValuePair(sourceLevel);
@@ -873,13 +873,13 @@ namespace MultiplayerARPG
         /// <param name="sourceMonsterSkills"></param>
         /// <param name="resultDictionary"></param>
         /// <returns></returns>
-        public static Dictionary<BaseSkill, short> CombineSkills(IEnumerable<MonsterSkill> sourceMonsterSkills, Dictionary<BaseSkill, short> resultDictionary)
+        public static Dictionary<BaseSkill, int> CombineSkills(IEnumerable<MonsterSkill> sourceMonsterSkills, Dictionary<BaseSkill, int> resultDictionary)
         {
             if (resultDictionary == null)
-                resultDictionary = new Dictionary<BaseSkill, short>();
+                resultDictionary = new Dictionary<BaseSkill, int>();
             if (sourceMonsterSkills != null)
             {
-                KeyValuePair<BaseSkill, short> pair;
+                KeyValuePair<BaseSkill, int> pair;
                 foreach (MonsterSkill sourceMonsterSkill in sourceMonsterSkills)
                 {
                     pair = ToKeyValuePair(sourceMonsterSkill);
@@ -895,13 +895,13 @@ namespace MultiplayerARPG
         /// <param name="sourceAmounts"></param>
         /// <param name="resultDictionary"></param>
         /// <returns></returns>
-        public static Dictionary<BaseItem, short> CombineItems(IEnumerable<ItemAmount> sourceAmounts, Dictionary<BaseItem, short> resultDictionary)
+        public static Dictionary<BaseItem, int> CombineItems(IEnumerable<ItemAmount> sourceAmounts, Dictionary<BaseItem, int> resultDictionary)
         {
             if (resultDictionary == null)
-                resultDictionary = new Dictionary<BaseItem, short>();
+                resultDictionary = new Dictionary<BaseItem, int>();
             if (sourceAmounts != null)
             {
-                KeyValuePair<BaseItem, short> pair;
+                KeyValuePair<BaseItem, int> pair;
                 foreach (ItemAmount sourceAmount in sourceAmounts)
                 {
                     pair = ToKeyValuePair(sourceAmount);
@@ -917,13 +917,13 @@ namespace MultiplayerARPG
         /// <param name="sourceAmounts"></param>
         /// <param name="resultDictionary"></param>
         /// <returns></returns>
-        public static Dictionary<AmmoType, short> CombineAmmoTypes(IEnumerable<AmmoTypeAmount> sourceAmounts, Dictionary<AmmoType, short> resultDictionary)
+        public static Dictionary<AmmoType, int> CombineAmmoTypes(IEnumerable<AmmoTypeAmount> sourceAmounts, Dictionary<AmmoType, int> resultDictionary)
         {
             if (resultDictionary == null)
-                resultDictionary = new Dictionary<AmmoType, short>();
+                resultDictionary = new Dictionary<AmmoType, int>();
             if (sourceAmounts != null)
             {
-                KeyValuePair<AmmoType, short> pair;
+                KeyValuePair<AmmoType, int> pair;
                 foreach (AmmoTypeAmount sourceAmount in sourceAmounts)
                 {
                     pair = ToKeyValuePair(sourceAmount);

@@ -26,7 +26,7 @@ namespace MultiplayerARPG
         {
             ClientGenericActions.NotifyRewardItem(
                 messageHandler.Reader.GetPackedInt(),
-                messageHandler.Reader.GetPackedShort());
+                messageHandler.Reader.GetPackedInt());
         }
 
         public void HandleNotifyRewardCurrency(MessageHandlerData messageHandler)
@@ -42,8 +42,8 @@ namespace MultiplayerARPG
                 (StorageType)messageHandler.Reader.GetByte(),
                 messageHandler.Reader.GetString(),
                 messageHandler.Reader.GetPackedUInt(),
-                messageHandler.Reader.GetPackedShort(),
-                messageHandler.Reader.GetPackedShort());
+                messageHandler.Reader.GetPackedInt(),
+                messageHandler.Reader.GetPackedInt());
         }
 
         public void HandleNotifyStorageClosed(MessageHandlerData messageHandler)

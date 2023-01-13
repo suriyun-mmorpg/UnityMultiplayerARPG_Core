@@ -73,7 +73,7 @@ namespace MultiplayerARPG
         public bool showDamageWithBuffs;
 
         // Improve garbage collector
-        private Dictionary<BaseSkill, short> cacheSkills;
+        private Dictionary<BaseSkill, int> cacheSkills;
         private CharacterStats cacheStats;
         private Dictionary<Attribute, float> cacheAttributes;
         private Dictionary<DamageElement, float> cacheResistances;
@@ -395,7 +395,7 @@ namespace MultiplayerARPG
             cacheResistances = new Dictionary<DamageElement, float>();
             cacheArmors = new Dictionary<DamageElement, float>();
             cacheDamages = new Dictionary<DamageElement, MinMaxFloat>();
-            cacheSkills = new Dictionary<BaseSkill, short>();
+            cacheSkills = new Dictionary<BaseSkill, int>();
             cacheEquipmentSets = new Dictionary<EquipmentSet, int>();
             cacheSkills = GameDataHelpers.CombineSkills(cacheSkills, Data.GetSkills(true));
             cacheAttributes = GameDataHelpers.CombineAttributes(cacheAttributes, showAttributeWithBuffs ? Data.GetAttributes(true, true, cacheSkills) : Data.GetAttributes(true, false, null));

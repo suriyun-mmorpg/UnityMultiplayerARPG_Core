@@ -82,7 +82,7 @@ namespace MultiplayerARPG
 
         private void OnClickPickUpItemsContainerConfirmed(int selectedIndex, int amount)
         {
-            GameInstance.PlayingCharacterEntity.CallServerPickupItemFromContainer(TargetEntity.ObjectId, selectedIndex, (short)amount);
+            GameInstance.PlayingCharacterEntity.CallServerPickupItemFromContainer(TargetEntity.ObjectId, selectedIndex, amount);
         }
 
         public void UpdateData(ItemsContainerEntity targetEntity)

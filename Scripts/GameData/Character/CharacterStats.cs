@@ -129,7 +129,7 @@ namespace MultiplayerARPG
         public CharacterStats baseStats;
         public CharacterStats statsIncreaseEachLevel;
 
-        public CharacterStats GetCharacterStats(short level)
+        public CharacterStats GetCharacterStats(int level)
         {
             CharacterStats result = new CharacterStats();
             result += baseStats;

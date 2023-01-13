@@ -79,7 +79,7 @@ namespace MultiplayerARPG
             }
         }
 
-        public static bool AppendCraftingQueueItem(this ICraftingQueueSource source, IPlayerCharacterData crafter, uint crafterId, int dataId, short amount, out UITextKeys errorMessage)
+        public static bool AppendCraftingQueueItem(this ICraftingQueueSource source, IPlayerCharacterData crafter, uint crafterId, int dataId, int amount, out UITextKeys errorMessage)
         {
             errorMessage = UITextKeys.NONE;
             if (!source.CanCraft)
@@ -101,7 +101,7 @@ namespace MultiplayerARPG
             return true;
         }
 
-        public static void ChangeCraftingQueueItem(this ICraftingQueueSource source, uint crafterId, int index, short amount)
+        public static void ChangeCraftingQueueItem(this ICraftingQueueSource source, uint crafterId, int index, int amount)
         {
             if (!source.CanCraft)
                 return;

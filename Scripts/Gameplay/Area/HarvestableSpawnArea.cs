@@ -52,7 +52,7 @@ namespace MultiplayerARPG
             GameInstance.AddHarvestableEntities(prefab);
         }
 
-        protected override HarvestableEntity SpawnInternal(HarvestableEntity prefab, short level)
+        protected override HarvestableEntity SpawnInternal(HarvestableEntity prefab, int level)
         {
             Vector3 spawnPosition;
             if (GetRandomPosition(out spawnPosition))

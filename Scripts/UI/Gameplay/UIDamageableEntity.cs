@@ -75,7 +75,7 @@ namespace MultiplayerARPG
             int totalDamage,
             CharacterItem weapon,
             BaseSkill skill,
-            short skillLevel,
+            int skillLevel,
             CharacterBuff buff,
             bool isDamageOverTime)
         {

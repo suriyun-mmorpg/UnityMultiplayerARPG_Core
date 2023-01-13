@@ -22,7 +22,7 @@ namespace MultiplayerARPG
         {
             CharacterSkill data = (CharacterSkill)obj;
             data.dataId = info.GetInt32("dataId");
-            data.level = info.GetInt16("level");
+            data.level = info.GetInt32("level");
             obj = data;
             return obj;
         }

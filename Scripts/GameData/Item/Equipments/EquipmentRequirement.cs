@@ -13,7 +13,7 @@ namespace MultiplayerARPG
         [Tooltip("Which character classes can equip item.")]
         public List<PlayerCharacter> availableClasses;
         [Tooltip("Character must have level equals or more than this setting to equip item.")]
-        public short level;
+        public int level;
         [Tooltip("Character must have attribute amounts equals or more than this setting to equip item.")]
         [ArrayElementTitle("attribute")]
         public AttributeAmount[] attributeAmounts;

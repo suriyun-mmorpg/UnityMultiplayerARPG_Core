@@ -4,7 +4,7 @@
     public struct QuestRequirement
     {
         public PlayerCharacter character;
-        public short level;
+        public int level;
         public Quest[] completedQuests;
     }
 }

@@ -4,7 +4,7 @@ namespace MultiplayerARPG
 {
     public partial class BaseItem
     {
-        public static void GetDismantleReturnItems(CharacterItem dismantlingItem, short amount, out List<ItemAmount> items, out List<CurrencyAmount> currencies)
+        public static void GetDismantleReturnItems(CharacterItem dismantlingItem, int amount, out List<ItemAmount> items, out List<CurrencyAmount> currencies)
         {
             items = new List<ItemAmount>();
             currencies = new List<CurrencyAmount>();
@@ -21,7 +21,7 @@ namespace MultiplayerARPG
                 items.Add(new ItemAmount()
                 {
                     item = dismantleReturnItems[i].item,
-                    amount = (short)(dismantleReturnItems[i].amount * amount)
+                    amount = dismantleReturnItems[i].amount * amount,
                 });
             }
             if (dismantlingItem.Sockets.Count > 0)
@@ -46,7 +46,7 @@ namespace MultiplayerARPG
                 currencies.Add(new CurrencyAmount()
                 {
                     currency = dismantleReturnCurrencies[i].currency,
-                    amount = (short)(dismantleReturnCurrencies[i].amount * amount)
+                    amount = dismantleReturnCurrencies[i].amount * amount,
                 });
             }
         }

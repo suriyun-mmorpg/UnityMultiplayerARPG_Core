@@ -189,7 +189,7 @@ namespace MultiplayerARPG
             GameInstance.ClientInventoryHandlers.RequestEnhanceSocketItem(new RequestEnhanceSocketItemMessage()
             {
                 inventoryType = InventoryType,
-                index = (short)IndexOfData,
+                index = IndexOfData,
                 enhancerId = SelectedEnhancerId,
                 socketIndex = -1,
             }, ClientInventoryActions.ResponseEnhanceSocketItem);
@@ -204,8 +204,8 @@ namespace MultiplayerARPG
             GameInstance.ClientInventoryHandlers.RequestRemoveEnhancerFromItem(new RequestRemoveEnhancerFromItemMessage()
             {
                 inventoryType = InventoryType,
-                index = (short)IndexOfData,
-                socketIndex = (short)SelectedSocketIndex,
+                index = IndexOfData,
+                socketIndex = SelectedSocketIndex,
             }, ClientInventoryActions.ResponseRemoveEnhancerFromItem);
         }
     }

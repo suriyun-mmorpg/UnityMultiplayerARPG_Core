@@ -259,10 +259,10 @@ namespace MultiplayerARPG
             {
                 if (startItem.item == null || startItem.amount <= 0)
                     continue;
-                short amount = startItem.amount;
+                int amount = startItem.amount;
                 while (amount > 0)
                 {
-                    short addAmount = amount;
+                    int addAmount = amount;
                     if (addAmount > startItem.item.MaxStack)
                         addAmount = startItem.item.MaxStack;
                     if (!character.IncreasingItemsWillOverwhelming(startItem.item.DataId, addAmount))
@@ -421,7 +421,7 @@ namespace MultiplayerARPG
             writer.Put(characterData.UserId);
             writer.PutPackedInt(characterData.FactionId);
             writer.Put(characterData.CharacterName);
-            writer.PutPackedShort(characterData.Level);
+            writer.PutPackedInt(characterData.Level);
             writer.PutPackedInt(characterData.Exp);
             writer.PutPackedInt(characterData.CurrentHp);
             writer.PutPackedInt(characterData.CurrentMp);
@@ -464,7 +464,7 @@ namespace MultiplayerARPG
             // Attributes
             if (withAttributes)
             {
-                writer.Put((byte)characterData.Attributes.Count);
+                writer.PutPackedInt(characterData.Attributes.Count);
                 foreach (CharacterAttribute entry in characterData.Attributes)
                 {
                     writer.Put(entry);
@@ -473,7 +473,7 @@ namespace MultiplayerARPG
             // Buffs
             if (withBuffs)
             {
-                writer.Put((byte)characterData.Buffs.Count);
+                writer.PutPackedInt(characterData.Buffs.Count);
                 foreach (CharacterBuff entry in characterData.Buffs)
                 {
                     writer.Put(entry);
@@ -482,7 +482,7 @@ namespace MultiplayerARPG
             // Skills
             if (withSkills)
             {
-                writer.Put((short)characterData.Skills.Count);
+                writer.PutPackedInt(characterData.Skills.Count);
                 foreach (CharacterSkill entry in characterData.Skills)
                 {
                     writer.Put(entry);
@@ -491,7 +491,7 @@ namespace MultiplayerARPG
             // Skill Usages
             if (withSkillUsages)
             {
-                writer.Put((byte)characterData.SkillUsages.Count);
+                writer.PutPackedInt(characterData.SkillUsages.Count);
                 foreach (CharacterSkillUsage entry in characterData.SkillUsages)
                 {
                     writer.Put(entry);
@@ -500,7 +500,7 @@ namespace MultiplayerARPG
             // Summons
             if (withSummons)
             {
-                writer.Put((byte)characterData.Summons.Count);
+                writer.PutPackedInt(characterData.Summons.Count);
                 foreach (CharacterSummon entry in characterData.Summons)
                 {
                     writer.Put(entry);
@@ -509,7 +509,7 @@ namespace MultiplayerARPG
             // Equip Items
             if (withEquipItems)
             {
-                writer.Put((byte)characterData.EquipItems.Count);
+                writer.PutPackedInt(characterData.EquipItems.Count);
                 foreach (CharacterItem entry in characterData.EquipItems)
                 {
                     writer.Put(entry);
@@ -518,7 +518,7 @@ namespace MultiplayerARPG
             // Non Equip Items
             if (withNonEquipItems)
             {
-                writer.Put((short)characterData.NonEquipItems.Count);
+                writer.PutPackedInt(characterData.NonEquipItems.Count);
                 foreach (CharacterItem entry in characterData.NonEquipItems)
                 {
                     writer.Put(entry);
@@ -527,7 +527,7 @@ namespace MultiplayerARPG
             // Hotkeys
             if (withHotkeys)
             {
-                writer.Put((byte)characterData.Hotkeys.Count);
+                writer.PutPackedInt(characterData.Hotkeys.Count);
                 foreach (CharacterHotkey entry in characterData.Hotkeys)
                 {
                     writer.Put(entry);
@@ -536,7 +536,7 @@ namespace MultiplayerARPG
             // Quests
             if (withQuests)
             {
-                writer.Put((short)characterData.Quests.Count);
+                writer.PutPackedInt(characterData.Quests.Count);
                 foreach (CharacterQuest entry in characterData.Quests)
                 {
                     writer.Put(entry);
@@ -545,7 +545,7 @@ namespace MultiplayerARPG
             // Currencies
             if (withCurrencies)
             {
-                writer.Put((byte)characterData.Currencies.Count);
+                writer.PutPackedInt(characterData.Currencies.Count);
                 foreach (CharacterCurrency entry in characterData.Currencies)
                 {
                     writer.Put(entry);
@@ -556,7 +556,7 @@ namespace MultiplayerARPG
             // Selectable weapon sets
             if (withEquipWeapons)
             {
-                writer.Put((byte)characterData.SelectableWeaponSets.Count);
+                writer.PutPackedInt(characterData.SelectableWeaponSets.Count);
                 foreach (EquipWeapons entry in characterData.SelectableWeaponSets)
                 {
                     writer.Put(entry);
@@ -595,7 +595,7 @@ namespace MultiplayerARPG
             characterData.UserId = reader.GetString();
             characterData.FactionId = reader.GetPackedInt();
             characterData.CharacterName = reader.GetString();
-            characterData.Level = reader.GetPackedShort();
+            characterData.Level = reader.GetPackedInt();
             characterData.Exp = reader.GetPackedInt();
             characterData.CurrentHp = reader.GetPackedInt();
             characterData.CurrentMp = reader.GetPackedInt();
@@ -633,7 +633,7 @@ namespace MultiplayerARPG
             // Attributes
             if (withAttributes)
             {
-                count = reader.GetByte();
+                count = reader.GetPackedInt();
                 for (int i = 0; i < count; ++i)
                 {
                     characterData.Attributes.Add(reader.Get<CharacterAttribute>());
@@ -642,7 +642,7 @@ namespace MultiplayerARPG
             // Buffs
             if (withBuffs)
             {
-                count = reader.GetByte();
+                count = reader.GetPackedInt();
                 for (int i = 0; i < count; ++i)
                 {
                     characterData.Buffs.Add(reader.Get<CharacterBuff>());
@@ -651,7 +651,7 @@ namespace MultiplayerARPG
             // Skills
             if (withSkills)
             {
-                count = reader.GetShort();
+                count = reader.GetPackedInt();
                 for (int i = 0; i < count; ++i)
                 {
                     characterData.Skills.Add(reader.Get<CharacterSkill>());
@@ -660,7 +660,7 @@ namespace MultiplayerARPG
             // Skill Usages
             if (withSkillUsages)
             {
-                count = reader.GetByte();
+                count = reader.GetPackedInt();
                 for (int i = 0; i < count; ++i)
                 {
                     characterData.SkillUsages.Add(reader.Get<CharacterSkillUsage>());
@@ -669,7 +669,7 @@ namespace MultiplayerARPG
             // Summons
             if (withSummons)
             {
-                count = reader.GetByte();
+                count = reader.GetPackedInt();
                 for (int i = 0; i < count; ++i)
                 {
                     characterData.Summons.Add(reader.Get<CharacterSummon>());
@@ -678,7 +678,7 @@ namespace MultiplayerARPG
             // Equip Items
             if (withEquipItems)
             {
-                count = reader.GetByte();
+                count = reader.GetPackedInt();
                 for (int i = 0; i < count; ++i)
                 {
                     characterData.EquipItems.Add(reader.Get<CharacterItem>());
@@ -687,7 +687,7 @@ namespace MultiplayerARPG
             // Non Equip Items
             if (withNonEquipItems)
             {
-                count = reader.GetShort();
+                count = reader.GetPackedInt();
                 for (int i = 0; i < count; ++i)
                 {
                     characterData.NonEquipItems.Add(reader.Get<CharacterItem>());
@@ -696,7 +696,7 @@ namespace MultiplayerARPG
             // Hotkeys
             if (withHotkeys)
             {
-                count = reader.GetByte();
+                count = reader.GetPackedInt();
                 for (int i = 0; i < count; ++i)
                 {
                     characterData.Hotkeys.Add(reader.Get<CharacterHotkey>());
@@ -705,7 +705,7 @@ namespace MultiplayerARPG
             // Quests
             if (withQuests)
             {
-                count = reader.GetShort();
+                count = reader.GetPackedInt();
                 for (int i = 0; i < count; ++i)
                 {
                     characterData.Quests.Add(reader.Get<CharacterQuest>());
@@ -714,7 +714,7 @@ namespace MultiplayerARPG
             // Currencies
             if (withCurrencies)
             {
-                count = reader.GetByte();
+                count = reader.GetPackedInt();
                 for (int i = 0; i < count; ++i)
                 {
                     characterData.Currencies.Add(reader.Get<CharacterCurrency>());
@@ -725,7 +725,7 @@ namespace MultiplayerARPG
             // Selectable weapon sets
             if (withEquipWeapons)
             {
-                count = reader.GetByte();
+                count = reader.GetPackedInt();
                 for (int i = 0; i < count; ++i)
                 {
                     characterData.SelectableWeaponSets.Add(reader.Get<EquipWeapons>());
@@ -787,7 +787,7 @@ namespace MultiplayerARPG
             return index;
         }
 
-        public static bool AddAttribute(this IPlayerCharacterData characterData, out UITextKeys gameMessage, int dataId, short amount = 1, short itemIndex = -1)
+        public static bool AddAttribute(this IPlayerCharacterData characterData, out UITextKeys gameMessage, int dataId, int amount = 1, int itemIndex = -1)
         {
             gameMessage = UITextKeys.NONE;
             Attribute attribute;
@@ -799,7 +799,7 @@ namespace MultiplayerARPG
             if (index < 0)
             {
                 characterAtttribute = CharacterAttribute.Create(attribute, 0);
-                if (!attribute.CanIncreaseAmount(characterData, (short)(characterAtttribute.amount + amount - 1), out gameMessage, itemIndex < 0))
+                if (!attribute.CanIncreaseAmount(characterData, characterAtttribute.amount + amount - 1, out gameMessage, itemIndex < 0))
                     return false;
                 if (itemIndex >= 0)
                 {
@@ -814,7 +814,7 @@ namespace MultiplayerARPG
             else
             {
                 characterAtttribute = characterData.Attributes[index];
-                if (!attribute.CanIncreaseAmount(characterData, (short)(characterAtttribute.amount + amount - 1), out gameMessage, itemIndex < 0))
+                if (!attribute.CanIncreaseAmount(characterData, characterAtttribute.amount + amount - 1, out gameMessage, itemIndex < 0))
                     return false;
                 if (itemIndex >= 0)
                 {
@@ -829,7 +829,7 @@ namespace MultiplayerARPG
             return true;
         }
 
-        public static bool ResetAttributes(this IPlayerCharacterData characterData, short itemIndex = -1)
+        public static bool ResetAttributes(this IPlayerCharacterData characterData, int itemIndex = -1)
         {
             if (itemIndex >= 0)
             {
@@ -855,7 +855,7 @@ namespace MultiplayerARPG
             return true;
         }
 
-        public static bool AddSkill(this IPlayerCharacterData characterData, out UITextKeys gameMessageType, int dataId, short level = 1, short itemIndex = -1)
+        public static bool AddSkill(this IPlayerCharacterData characterData, out UITextKeys gameMessageType, int dataId, int level = 1, int itemIndex = -1)
         {
             gameMessageType = UITextKeys.NONE;
             BaseSkill skill;
@@ -870,7 +870,7 @@ namespace MultiplayerARPG
             if (index < 0)
             {
                 characterSkill = CharacterSkill.Create(skill, 0);
-                if (!skill.CanLevelUp(characterData, (short)(characterSkill.level + level - 1), out gameMessageType, itemIndex < 0, itemIndex < 0))
+                if (!skill.CanLevelUp(characterData, (characterSkill.level + level - 1), out gameMessageType, itemIndex < 0, itemIndex < 0))
                     return false;
                 if (itemIndex >= 0)
                 {
@@ -885,7 +885,7 @@ namespace MultiplayerARPG
             else
             {
                 characterSkill = characterData.Skills[index];
-                if (!skill.CanLevelUp(characterData, (short)(characterSkill.level + level - 1), out gameMessageType, itemIndex < 0, itemIndex < 0))
+                if (!skill.CanLevelUp(characterData, (characterSkill.level + level - 1), out gameMessageType, itemIndex < 0, itemIndex < 0))
                     return false;
                 if (itemIndex >= 0)
                 {
@@ -900,7 +900,7 @@ namespace MultiplayerARPG
             return true;
         }
 
-        public static bool ResetSkills(this IPlayerCharacterData characterData, short itemIndex = -1)
+        public static bool ResetSkills(this IPlayerCharacterData characterData, int itemIndex = -1)
         {
             if (itemIndex >= 0)
             {
@@ -910,7 +910,7 @@ namespace MultiplayerARPG
                     return false;
             }
 
-            short countSkillPoint = 0;
+            int countSkillPoint = 0;
             BaseSkill skill;
             CharacterSkill characterSkill;
             for (int i = characterData.Skills.Count - 1; i >= 0 ; --i)
@@ -919,9 +919,9 @@ namespace MultiplayerARPG
                 skill = characterSkill.GetSkill();
                 if (skill.cannotReset)
                     continue;
-                for (short j = 0; j < characterSkill.level; ++j)
+                for (int j = 0; j < characterSkill.level; ++j)
                 {
-                    countSkillPoint += (short)Mathf.CeilToInt(skill.GetRequireCharacterSkillPoint(j));
+                    countSkillPoint += Mathf.CeilToInt(skill.GetRequireCharacterSkillPoint(j));
                 }
                 characterData.Skills.RemoveAt(i);
             }

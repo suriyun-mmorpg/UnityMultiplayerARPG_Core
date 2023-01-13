@@ -75,7 +75,7 @@ namespace MultiplayerARPG
 
         public static int GetNextLevelExp(this ICharacterData data)
         {
-            short level = data.Level;
+            int level = data.Level;
             if (level <= 0)
                 return 0;
             int[] expTree = GameInstance.Singleton.ExpTree;
@@ -96,9 +96,9 @@ namespace MultiplayerARPG
             return result;
         }
 
-        public static short GetTotalItemSlot(this IList<CharacterItem> itemList)
+        public static int GetTotalItemSlot(this IList<CharacterItem> itemList)
         {
-            short result = 0;
+            int result = 0;
             foreach (CharacterItem item in itemList)
             {
                 if (item.IsEmptySlot()) continue;
@@ -120,7 +120,7 @@ namespace MultiplayerARPG
             foreach (CharacterAttribute characterAttribute in data.Attributes)
             {
                 Attribute key = characterAttribute.GetAttribute();
-                short value = characterAttribute.amount;
+                int value = characterAttribute.amount;
                 if (key == null)
                     continue;
                 if (!result.ContainsKey(key))
@@ -201,12 +201,12 @@ namespace MultiplayerARPG
             return data.GetSkills(true).GetPassiveSkillAttributes(baseAttributes);
         }
 
-        public static Dictionary<Attribute, float> GetPassiveSkillAttributes(this Dictionary<BaseSkill, short> skills, Dictionary<Attribute, float> baseAttributes)
+        public static Dictionary<Attribute, float> GetPassiveSkillAttributes(this Dictionary<BaseSkill, int> skills, Dictionary<Attribute, float> baseAttributes)
         {
             if (skills == null)
                 return new Dictionary<Attribute, float>();
             Dictionary<Attribute, float> result = new Dictionary<Attribute, float>();
-            foreach (KeyValuePair<BaseSkill, short> skill in skills)
+            foreach (KeyValuePair<BaseSkill, int> skill in skills)
             {
                 if (skill.Key == null || !skill.Key.IsPassive || skill.Value <= 0)
                     continue;
@@ -217,7 +217,7 @@ namespace MultiplayerARPG
             return result;
         }
 
-        public static Dictionary<Attribute, float> GetAttributes(this ICharacterData data, bool sumWithEquipments, bool sumWithBuffs, Dictionary<BaseSkill, short> skills)
+        public static Dictionary<Attribute, float> GetAttributes(this ICharacterData data, bool sumWithEquipments, bool sumWithBuffs, Dictionary<BaseSkill, int> skills)
         {
             Dictionary<Attribute, float> result = data.GetCharacterAttributes();
             if (sumWithEquipments || sumWithBuffs)
@@ -233,15 +233,15 @@ namespace MultiplayerARPG
             return result;
         }
 
-        public static Dictionary<BaseSkill, short> GetCharacterSkills(this ICharacterData data)
+        public static Dictionary<BaseSkill, int> GetCharacterSkills(this ICharacterData data)
         {
             if (data == null || data.GetDatabase() == null)
-                return new Dictionary<BaseSkill, short>();
+                return new Dictionary<BaseSkill, int>();
             // Make dictionary of skills which set in `PlayerCharacter` or `MonsterCharacter`
-            Dictionary<BaseSkill, short> result = new Dictionary<BaseSkill, short>(data.GetDatabase().CacheSkillLevels);
+            Dictionary<BaseSkill, int> result = new Dictionary<BaseSkill, int>(data.GetDatabase().CacheSkillLevels);
             // Combine with skills that character learnt
             BaseSkill learnedSkill;
-            short learnedSkillLevel;
+            int learnedSkillLevel;
             foreach (CharacterSkill characterSkill in data.Skills)
             {
                 learnedSkill = characterSkill.GetSkill();
@@ -256,11 +256,11 @@ namespace MultiplayerARPG
             return result;
         }
 
-        public static Dictionary<BaseSkill, short> GetEquipmentSkills(this ICharacterData data)
+        public static Dictionary<BaseSkill, int> GetEquipmentSkills(this ICharacterData data)
         {
             if (data == null)
-                return new Dictionary<BaseSkill, short>();
-            Dictionary<BaseSkill, short> result = new Dictionary<BaseSkill, short>();
+                return new Dictionary<BaseSkill, int>();
+            Dictionary<BaseSkill, int> result = new Dictionary<BaseSkill, int>();
             // Armors
             foreach (CharacterItem equipItem in data.EquipItems)
             {
@@ -283,9 +283,9 @@ namespace MultiplayerARPG
             return result;
         }
 
-        public static Dictionary<BaseSkill, short> GetSkills(this ICharacterData data, bool sumWithEquipments)
+        public static Dictionary<BaseSkill, int> GetSkills(this ICharacterData data, bool sumWithEquipments)
         {
-            Dictionary<BaseSkill, short> result = data.GetCharacterSkills();
+            Dictionary<BaseSkill, int> result = data.GetCharacterSkills();
             if (sumWithEquipments)
                 result = GameDataHelpers.CombineSkills(result, data.GetEquipmentSkills());
             return result;
@@ -355,12 +355,12 @@ namespace MultiplayerARPG
             return data.GetSkills(true).GetPassiveSkillResistances();
         }
 
-        public static Dictionary<DamageElement, float> GetPassiveSkillResistances(this Dictionary<BaseSkill, short> skills)
+        public static Dictionary<DamageElement, float> GetPassiveSkillResistances(this Dictionary<BaseSkill, int> skills)
         {
             if (skills == null)
                 return new Dictionary<DamageElement, float>();
             Dictionary<DamageElement, float> result = new Dictionary<DamageElement, float>();
-            foreach (KeyValuePair<BaseSkill, short> skill in skills)
+            foreach (KeyValuePair<BaseSkill, int> skill in skills)
             {
                 if (skill.Key == null || !skill.Key.IsPassive || skill.Value <= 0)
                     continue;
@@ -369,7 +369,7 @@ namespace MultiplayerARPG
             return result;
         }
 
-        public static Dictionary<DamageElement, float> GetResistances(this ICharacterData data, bool sumWithEquipments, bool sumWithBuffs, Dictionary<BaseSkill, short> skills)
+        public static Dictionary<DamageElement, float> GetResistances(this ICharacterData data, bool sumWithEquipments, bool sumWithBuffs, Dictionary<BaseSkill, int> skills)
         {
             Dictionary<DamageElement, float> result = data.GetCharacterResistances();
             if (sumWithEquipments)
@@ -450,12 +450,12 @@ namespace MultiplayerARPG
             return data.GetPassiveSkillArmors();
         }
 
-        public static Dictionary<DamageElement, float> GetPassiveSkillArmors(this Dictionary<BaseSkill, short> skills)
+        public static Dictionary<DamageElement, float> GetPassiveSkillArmors(this Dictionary<BaseSkill, int> skills)
         {
             if (skills == null)
                 return new Dictionary<DamageElement, float>();
             Dictionary<DamageElement, float> result = new Dictionary<DamageElement, float>();
-            foreach (KeyValuePair<BaseSkill, short> skill in skills)
+            foreach (KeyValuePair<BaseSkill, int> skill in skills)
             {
                 if (skill.Key == null || !skill.Key.IsPassive || skill.Value <= 0)
                     continue;
@@ -464,7 +464,7 @@ namespace MultiplayerARPG
             return result;
         }
 
-        public static Dictionary<DamageElement, float> GetArmors(this ICharacterData data, bool sumWithEquipments, bool sumWithBuffs, Dictionary<BaseSkill, short> skills)
+        public static Dictionary<DamageElement, float> GetArmors(this ICharacterData data, bool sumWithEquipments, bool sumWithBuffs, Dictionary<BaseSkill, int> skills)
         {
             Dictionary<DamageElement, float> result = data.GetCharacterArmors();
             if (sumWithEquipments)
@@ -530,12 +530,12 @@ namespace MultiplayerARPG
             return data.GetSkills(true).GetPassiveSkillIncreaseDamages();
         }
 
-        public static Dictionary<DamageElement, MinMaxFloat> GetPassiveSkillIncreaseDamages(this Dictionary<BaseSkill, short> skills)
+        public static Dictionary<DamageElement, MinMaxFloat> GetPassiveSkillIncreaseDamages(this Dictionary<BaseSkill, int> skills)
         {
             if (skills == null)
                 return new Dictionary<DamageElement, MinMaxFloat>();
             Dictionary<DamageElement, MinMaxFloat> result = new Dictionary<DamageElement, MinMaxFloat>();
-            foreach (KeyValuePair<BaseSkill, short> skill in skills)
+            foreach (KeyValuePair<BaseSkill, int> skill in skills)
             {
                 if (skill.Key == null || !skill.Key.IsPassive || skill.Value <= 0)
                     continue;
@@ -544,7 +544,7 @@ namespace MultiplayerARPG
             return result;
         }
 
-        public static Dictionary<DamageElement, MinMaxFloat> GetIncreaseDamages(this ICharacterData data, bool sumWithEquipments, bool sumWithBuffs, Dictionary<BaseSkill, short> skills)
+        public static Dictionary<DamageElement, MinMaxFloat> GetIncreaseDamages(this ICharacterData data, bool sumWithEquipments, bool sumWithBuffs, Dictionary<BaseSkill, int> skills)
         {
             Dictionary<DamageElement, MinMaxFloat> result = new Dictionary<DamageElement, MinMaxFloat>();
             if (sumWithEquipments)
@@ -653,12 +653,12 @@ namespace MultiplayerARPG
             return data.GetSkills(true).GetPassiveSkillStats(baseStats, baseAttributes);
         }
 
-        public static CharacterStats GetPassiveSkillStats(this Dictionary<BaseSkill, short> skills, CharacterStats baseStats, Dictionary<Attribute, float> baseAttributes)
+        public static CharacterStats GetPassiveSkillStats(this Dictionary<BaseSkill, int> skills, CharacterStats baseStats, Dictionary<Attribute, float> baseAttributes)
         {
             if (skills == null)
                 return new CharacterStats();
             CharacterStats result = new CharacterStats();
-            foreach (KeyValuePair<BaseSkill, short> skill in skills)
+            foreach (KeyValuePair<BaseSkill, int> skill in skills)
             {
                 if (skill.Key == null || !skill.Key.IsPassive || skill.Value <= 0)
                     continue;
@@ -671,7 +671,7 @@ namespace MultiplayerARPG
             return result;
         }
 
-        public static CharacterStats GetStats(this ICharacterData data, bool sumWithEquipments, bool sumWithBuffs, Dictionary<BaseSkill, short> skills)
+        public static CharacterStats GetStats(this ICharacterData data, bool sumWithEquipments, bool sumWithBuffs, Dictionary<BaseSkill, int> skills)
         {
             CharacterStats result = new CharacterStats();
             result += data.GetCharacterStats();
@@ -696,7 +696,7 @@ namespace MultiplayerARPG
         #endregion
 
         #region Fill Empty Slots
-        public static void FillEmptySlots(this IList<CharacterItem> itemList, bool isLimitSlot, short slotLimit)
+        public static void FillEmptySlots(this IList<CharacterItem> itemList, bool isLimitSlot, int slotLimit)
         {
             int i;
             if (!isLimitSlot || GameInstance.Singleton.doNotFillEmptySlots)
@@ -760,7 +760,7 @@ namespace MultiplayerARPG
             return data.GetCaches().TotalItemSlot + unEquipCount > data.GetCaches().LimitItemSlot;
         }
 
-        public static bool IncreasingItemsWillOverwhelming(this IList<CharacterItem> itemList, int dataId, short amount, bool isLimitWeight, float weightLimit, float totalItemWeight, bool isLimitSlot, short slotLimit)
+        public static bool IncreasingItemsWillOverwhelming(this IList<CharacterItem> itemList, int dataId, int amount, bool isLimitWeight, float weightLimit, float totalItemWeight, bool isLimitSlot, int slotLimit)
         {
             BaseItem itemData;
             if (amount <= 0 || !GameInstance.Items.TryGetValue(dataId, out itemData))
@@ -781,7 +781,7 @@ namespace MultiplayerARPG
                 return false;
             }
 
-            short maxStack = itemData.MaxStack;
+            int maxStack = itemData.MaxStack;
             // Loop to all slots to add amount to any slots that item amount not max in stack
             CharacterItem tempItem;
             for (int i = 0; i < itemList.Count; ++i)
@@ -807,7 +807,7 @@ namespace MultiplayerARPG
                         return false;
                     }
                     else if (maxStack - tempItem.amount >= 0)
-                        amount -= (short)(maxStack - tempItem.amount);
+                        amount -= maxStack - tempItem.amount;
                 }
             }
 
@@ -833,7 +833,7 @@ namespace MultiplayerARPG
             return true;
         }
 
-        public static bool IncreasingItemsWillOverwhelming(this IList<CharacterItem> itemList, IEnumerable<ItemAmount> increasingItems, bool isLimitWeight, float weightLimit, float totalItemWeight, bool isLimitSlot, short slotLimit)
+        public static bool IncreasingItemsWillOverwhelming(this IList<CharacterItem> itemList, IEnumerable<ItemAmount> increasingItems, bool isLimitWeight, float weightLimit, float totalItemWeight, bool isLimitSlot, int slotLimit)
         {
             if (itemList == null || increasingItems == null)
                 return false;
@@ -862,7 +862,7 @@ namespace MultiplayerARPG
             return false;
         }
 
-        public static bool IncreasingItemsWillOverwhelming(this IList<CharacterItem> itemList, IEnumerable<RewardedItem> increasingItems, bool isLimitWeight, float weightLimit, float totalItemWeight, bool isLimitSlot, short slotLimit)
+        public static bool IncreasingItemsWillOverwhelming(this IList<CharacterItem> itemList, IEnumerable<RewardedItem> increasingItems, bool isLimitWeight, float weightLimit, float totalItemWeight, bool isLimitSlot, int slotLimit)
         {
             if (itemList == null || increasingItems == null)
                 return false;
@@ -891,7 +891,7 @@ namespace MultiplayerARPG
             return false;
         }
 
-        public static bool IncreasingItemsWillOverwhelming(this IList<CharacterItem> itemList, IEnumerable<CharacterItem> increasingItems, bool isLimitWeight, float weightLimit, float totalItemWeight, bool isLimitSlot, short slotLimit)
+        public static bool IncreasingItemsWillOverwhelming(this IList<CharacterItem> itemList, IEnumerable<CharacterItem> increasingItems, bool isLimitWeight, float weightLimit, float totalItemWeight, bool isLimitSlot, int slotLimit)
         {
             if (itemList == null || increasingItems == null)
                 return false;
@@ -920,7 +920,7 @@ namespace MultiplayerARPG
             return false;
         }
 
-        public static bool IncreasingItemsWillOverwhelming(this ICharacterData data, int dataId, short amount)
+        public static bool IncreasingItemsWillOverwhelming(this ICharacterData data, int dataId, int amount)
         {
             return data.NonEquipItems.IncreasingItemsWillOverwhelming(
                 dataId,
@@ -973,9 +973,9 @@ namespace MultiplayerARPG
             if (increasingItem.IsEmptySlot()) return false;
 
             BaseItem itemData = increasingItem.GetItem();
-            short amount = increasingItem.amount;
+            int amount = increasingItem.amount;
 
-            short maxStack = itemData.MaxStack;
+            int maxStack = itemData.MaxStack;
             Dictionary<int, CharacterItem> emptySlots = new Dictionary<int, CharacterItem>();
             Dictionary<int, CharacterItem> changes = new Dictionary<int, CharacterItem>();
             // Loop to all slots to add amount to any slots that item amount not max in stack
@@ -1000,7 +1000,7 @@ namespace MultiplayerARPG
                     }
                     else if (maxStack - item.amount >= 0)
                     {
-                        amount -= (short)(maxStack - item.amount);
+                        amount -= maxStack - item.amount;
                         item.amount = maxStack;
                         changes[i] = item;
                     }
@@ -1015,7 +1015,7 @@ namespace MultiplayerARPG
                 foreach (int emptySlotIndex in emptySlots.Keys)
                 {
                     tempNewItem = increasingItem.Clone(true);
-                    short addAmount = 0;
+                    int addAmount = 0;
                     if (amount - maxStack >= 0)
                     {
                         addAmount = maxStack;
@@ -1043,7 +1043,7 @@ namespace MultiplayerARPG
             while (amount > 0)
             {
                 tempNewItem = increasingItem.Clone(true);
-                short addAmount;
+                int addAmount;
                 if (amount - maxStack >= 0)
                 {
                     addAmount = maxStack;
@@ -1151,11 +1151,11 @@ namespace MultiplayerARPG
         #endregion
 
         #region Decrease Items
-        public static bool DecreaseItems(this IList<CharacterItem> itemList, int dataId, short amount, bool isLimitInventorySlot, out Dictionary<int, short> decreaseItems)
+        public static bool DecreaseItems(this IList<CharacterItem> itemList, int dataId, int amount, bool isLimitInventorySlot, out Dictionary<int, int> decreaseItems)
         {
-            decreaseItems = new Dictionary<int, short>();
-            Dictionary<int, short> decreasingItemIndexes = new Dictionary<int, short>();
-            short tempDecresingAmount;
+            decreaseItems = new Dictionary<int, int>();
+            Dictionary<int, int> decreasingItemIndexes = new Dictionary<int, int>();
+            int tempDecresingAmount;
             CharacterItem tempItem;
             for (int i = itemList.Count - 1; i >= 0; --i)
             {
@@ -1174,7 +1174,7 @@ namespace MultiplayerARPG
             }
             if (amount > 0)
                 return false;
-            foreach (KeyValuePair<int, short> decreasingItem in decreasingItemIndexes)
+            foreach (KeyValuePair<int, int> decreasingItem in decreasingItemIndexes)
             {
                 decreaseItems.Add(decreasingItem.Key, decreasingItem.Value);
                 itemList.DecreaseItemsByIndex(decreasingItem.Key, decreasingItem.Value, isLimitInventorySlot, true);
@@ -1182,25 +1182,25 @@ namespace MultiplayerARPG
             return true;
         }
 
-        public static bool DecreaseItems(this ICharacterData data, int dataId, short amount, out Dictionary<int, short> decreaseItems)
+        public static bool DecreaseItems(this ICharacterData data, int dataId, int amount, out Dictionary<int, int> decreaseItems)
         {
             if (data.NonEquipItems.DecreaseItems(dataId, amount, GameInstance.Singleton.IsLimitInventorySlot, out decreaseItems))
                 return true;
             return false;
         }
 
-        public static bool DecreaseItems(this ICharacterData data, int dataId, short amount)
+        public static bool DecreaseItems(this ICharacterData data, int dataId, int amount)
         {
             return DecreaseItems(data, dataId, amount, out _);
         }
 
-        public static void DecreaseItems(this ICharacterData character, Dictionary<BaseItem, short> itemAmounts, float multiplier = 1)
+        public static void DecreaseItems(this ICharacterData character, Dictionary<BaseItem, int> itemAmounts, float multiplier = 1)
         {
             if (itemAmounts == null)
                 return;
-            foreach (KeyValuePair<BaseItem, short> itemAmount in itemAmounts)
+            foreach (KeyValuePair<BaseItem, int> itemAmount in itemAmounts)
             {
-                character.DecreaseItems(itemAmount.Key.DataId, (short)Mathf.CeilToInt(itemAmount.Value * multiplier), out _);
+                character.DecreaseItems(itemAmount.Key.DataId, Mathf.CeilToInt(itemAmount.Value * multiplier), out _);
             }
         }
 
@@ -1210,7 +1210,7 @@ namespace MultiplayerARPG
                 return;
             foreach (ItemAmount itemAmount in itemAmounts)
             {
-                character.DecreaseItems(itemAmount.item.DataId, (short)Mathf.CeilToInt(itemAmount.amount * multiplier), out _);
+                character.DecreaseItems(itemAmount.item.DataId, Mathf.CeilToInt(itemAmount.amount * multiplier), out _);
             }
         }
 
@@ -1220,21 +1220,21 @@ namespace MultiplayerARPG
                 return;
             foreach (CharacterItem characterItem in characterItems)
             {
-                character.DecreaseItems(characterItem.dataId, (short)Mathf.CeilToInt(characterItem.amount * multiplier), out _);
+                character.DecreaseItems(characterItem.dataId, Mathf.CeilToInt(characterItem.amount * multiplier), out _);
             }
         }
         #endregion
 
         #region Ammo Functions
-        public static bool DecreaseAmmos(this ICharacterData data, AmmoType ammoType, short amount, out Dictionary<DamageElement, MinMaxFloat> increaseDamages, out Dictionary<CharacterItem, short> decreaseItems)
+        public static bool DecreaseAmmos(this ICharacterData data, AmmoType ammoType, int amount, out Dictionary<DamageElement, MinMaxFloat> increaseDamages, out Dictionary<CharacterItem, int> decreaseItems)
         {
             increaseDamages = null;
-            decreaseItems = new Dictionary<CharacterItem, short>();
+            decreaseItems = new Dictionary<CharacterItem, int>();
             if (ammoType == null || amount <= 0)
                 return false;
-            Dictionary<int, short> decreasingItemIndexes = new Dictionary<int, short>();
+            Dictionary<int, int> decreasingItemIndexes = new Dictionary<int, int>();
             CharacterItem nonEquipItem;
-            short tempDecresingAmount;
+            int tempDecresingAmount;
             for (int i = data.NonEquipItems.Count - 1; i >= 0; --i)
             {
                 nonEquipItem = data.NonEquipItems[i];
@@ -1254,7 +1254,7 @@ namespace MultiplayerARPG
             }
             if (amount > 0)
                 return false;
-            foreach (KeyValuePair<int, short> decreasingItem in decreasingItemIndexes)
+            foreach (KeyValuePair<int, int> decreasingItem in decreasingItemIndexes)
             {
                 decreaseItems.Add(data.NonEquipItems[decreasingItem.Key], decreasingItem.Value);
                 DecreaseItemsByIndex(data, decreasingItem.Key, decreasingItem.Value, true);
@@ -1262,14 +1262,14 @@ namespace MultiplayerARPG
             return true;
         }
 
-        public static bool DecreaseAmmos(this ICharacterData data, AmmoType ammoType, short amount, out Dictionary<DamageElement, MinMaxFloat> increaseDamages)
+        public static bool DecreaseAmmos(this ICharacterData data, AmmoType ammoType, int amount, out Dictionary<DamageElement, MinMaxFloat> increaseDamages)
         {
             return DecreaseAmmos(data, ammoType, amount, out increaseDamages, out _);
         }
         #endregion
 
         #region Decrease Items By Index
-        public static bool DecreaseItemsByIndex(this IList<CharacterItem> itemList, int index, short amount, bool isLimitInventorySlot, bool adjustMaxAmount)
+        public static bool DecreaseItemsByIndex(this IList<CharacterItem> itemList, int index, int amount, bool isLimitInventorySlot, bool adjustMaxAmount)
         {
             if (index < 0 || index >= itemList.Count)
                 return false;
@@ -1297,7 +1297,7 @@ namespace MultiplayerARPG
             return true;
         }
 
-        public static bool DecreaseItemsByIndex(this ICharacterData data, int index, short amount, bool adjustMaxAmount)
+        public static bool DecreaseItemsByIndex(this ICharacterData data, int index, int amount, bool adjustMaxAmount)
         {
             if (data.NonEquipItems.DecreaseItemsByIndex(index, amount, GameInstance.Singleton.IsLimitInventorySlot, adjustMaxAmount))
                 return true;
@@ -1654,11 +1654,11 @@ namespace MultiplayerARPG
 
         public static bool HasEnoughAttributeAmounts(this ICharacterData data, Dictionary<Attribute, float> requiredAttributeAmounts, bool sumWithEquipments, bool sumWithBuffs, bool sumWithSkills, out UITextKeys gameMessage, out Dictionary<Attribute, float> currentAttributeAmounts, float multiplier = 1)
         {
-            Dictionary<BaseSkill, short> currentSkillLevels = sumWithSkills ? data.GetSkills(sumWithEquipments) : new Dictionary<BaseSkill, short>();
+            Dictionary<BaseSkill, int> currentSkillLevels = sumWithSkills ? data.GetSkills(sumWithEquipments) : new Dictionary<BaseSkill, int>();
             return data.HasEnoughAttributeAmounts(requiredAttributeAmounts, sumWithEquipments, sumWithBuffs, currentSkillLevels, out gameMessage, out currentAttributeAmounts, multiplier);
         }
 
-        public static bool HasEnoughAttributeAmounts(this ICharacterData data, Dictionary<Attribute, float> requiredAttributeAmounts, bool sumWithEquipments, bool sumWithBuffs, Dictionary<BaseSkill, short> currentSkillLevels, out UITextKeys gameMessage, out Dictionary<Attribute, float> currentAttributeAmounts, float multiplier = 1)
+        public static bool HasEnoughAttributeAmounts(this ICharacterData data, Dictionary<Attribute, float> requiredAttributeAmounts, bool sumWithEquipments, bool sumWithBuffs, Dictionary<BaseSkill, int> currentSkillLevels, out UITextKeys gameMessage, out Dictionary<Attribute, float> currentAttributeAmounts, float multiplier = 1)
         {
             gameMessage = UITextKeys.NONE;
             currentAttributeAmounts = data.GetAttributes(sumWithEquipments, sumWithBuffs, currentSkillLevels);
@@ -1674,7 +1674,7 @@ namespace MultiplayerARPG
             return true;
         }
 
-        public static bool HasEnoughSkillLevels(this ICharacterData data, Dictionary<BaseSkill, short> requiredSkillLevels, bool sumWithEquipments, out UITextKeys gameMessage, out Dictionary<BaseSkill, short> currentSkillLevels, float multiplier = 1)
+        public static bool HasEnoughSkillLevels(this ICharacterData data, Dictionary<BaseSkill, int> requiredSkillLevels, bool sumWithEquipments, out UITextKeys gameMessage, out Dictionary<BaseSkill, int> currentSkillLevels, float multiplier = 1)
         {
             gameMessage = UITextKeys.NONE;
             currentSkillLevels = data.GetSkills(sumWithEquipments);
@@ -1690,15 +1690,15 @@ namespace MultiplayerARPG
             return true;
         }
 
-        public static Dictionary<BaseItem, short> GetNonEquipItems(this ICharacterData data)
+        public static Dictionary<BaseItem, int> GetNonEquipItems(this ICharacterData data)
         {
             if (data == null)
-                return new Dictionary<BaseItem, short>();
-            Dictionary<BaseItem, short> result = new Dictionary<BaseItem, short>();
+                return new Dictionary<BaseItem, int>();
+            Dictionary<BaseItem, int> result = new Dictionary<BaseItem, int>();
             foreach (CharacterItem characterItem in data.NonEquipItems)
             {
                 BaseItem key = characterItem.GetItem();
-                short value = characterItem.amount;
+                int value = characterItem.amount;
                 if (key == null)
                     continue;
                 if (!result.ContainsKey(key))
@@ -1710,7 +1710,7 @@ namespace MultiplayerARPG
             return result;
         }
 
-        public static bool HasEnoughNonEquipItemAmounts(this ICharacterData data, Dictionary<BaseItem, short> requiredItemAmounts, out UITextKeys gameMessage, out Dictionary<BaseItem, short> currentItemAmounts, float multiplier = 1)
+        public static bool HasEnoughNonEquipItemAmounts(this ICharacterData data, Dictionary<BaseItem, int> requiredItemAmounts, out UITextKeys gameMessage, out Dictionary<BaseItem, int> currentItemAmounts, float multiplier = 1)
         {
             gameMessage = UITextKeys.NONE;
             currentItemAmounts = data.GetNonEquipItems();
@@ -1919,7 +1919,7 @@ namespace MultiplayerARPG
             Dictionary<DamageElement, float> bonusResistances,
             Dictionary<DamageElement, float> bonusArmors,
             Dictionary<DamageElement, MinMaxFloat> bonusDamages,
-            Dictionary<BaseSkill, short> bonusSkills,
+            Dictionary<BaseSkill, int> bonusSkills,
             Dictionary<EquipmentSet, int> equipmentSets,
             bool combine)
         {
@@ -1978,7 +1978,7 @@ namespace MultiplayerARPG
             Dictionary<DamageElement, float> tempResistances;
             Dictionary<DamageElement, float> tempArmors;
             Dictionary<DamageElement, MinMaxFloat> tempDamages;
-            Dictionary<BaseSkill, short> tempSkillLevels;
+            Dictionary<BaseSkill, int> tempSkillLevels;
             CharacterStats tempIncreaseStats;
             foreach (KeyValuePair<EquipmentSet, int> cacheEquipmentSet in equipmentSets)
             {
@@ -2027,7 +2027,7 @@ namespace MultiplayerARPG
             Dictionary<DamageElement, float> resultResistances,
             Dictionary<DamageElement, float> resultArmors,
             Dictionary<DamageElement, MinMaxFloat> resultIncreaseDamages,
-            Dictionary<BaseSkill, short> resultSkills,
+            Dictionary<BaseSkill, int> resultSkills,
             Dictionary<EquipmentSet, int> resultEquipmentSets,
             bool combine)
         {
@@ -2058,7 +2058,7 @@ namespace MultiplayerARPG
             }
         }
 
-        public static void ApplyStatusEffect(this IEnumerable<StatusEffectApplying> statusEffects, short level, EntityInfo applier, CharacterItem weapon, BaseCharacterEntity target)
+        public static void ApplyStatusEffect(this IEnumerable<StatusEffectApplying> statusEffects, int level, EntityInfo applier, CharacterItem weapon, BaseCharacterEntity target)
         {
             if (level <= 0 || target == null || statusEffects == null)
                 return;
@@ -2073,9 +2073,9 @@ namespace MultiplayerARPG
             }
         }
 
-        public static Dictionary<int, short> ToAttributeAmountDictionary(this IEnumerable<CharacterAttribute> list)
+        public static Dictionary<int, int> ToAttributeAmountDictionary(this IEnumerable<CharacterAttribute> list)
         {
-            Dictionary<int, short> result = new Dictionary<int, short>();
+            Dictionary<int, int> result = new Dictionary<int, int>();
             foreach (CharacterAttribute entry in list)
             {
                 result[entry.dataId] = entry.amount;
@@ -2083,19 +2083,19 @@ namespace MultiplayerARPG
             return result;
         }
 
-        public static List<CharacterAttribute> ToCharacterAttributes(this Dictionary<int, short> dict)
+        public static List<CharacterAttribute> ToCharacterAttributes(this Dictionary<int, int> dict)
         {
             List<CharacterAttribute> result = new List<CharacterAttribute>();
-            foreach (KeyValuePair<int, short> entry in dict)
+            foreach (KeyValuePair<int, int> entry in dict)
             {
                 result.Add(CharacterAttribute.Create(entry.Key, entry.Value));
             }
             return result;
         }
 
-        public static Dictionary<int, short> ToSkillLevelDictionary(this IEnumerable<CharacterSkill> list)
+        public static Dictionary<int, int> ToSkillLevelDictionary(this IEnumerable<CharacterSkill> list)
         {
-            Dictionary<int, short> result = new Dictionary<int, short>();
+            Dictionary<int, int> result = new Dictionary<int, int>();
             foreach (CharacterSkill entry in list)
             {
                 result[entry.dataId] = entry.level;
@@ -2103,17 +2103,17 @@ namespace MultiplayerARPG
             return result;
         }
 
-        public static List<CharacterSkill> ToCharacterSkills(this Dictionary<int, short> dict)
+        public static List<CharacterSkill> ToCharacterSkills(this Dictionary<int, int> dict)
         {
             List<CharacterSkill> result = new List<CharacterSkill>();
-            foreach (KeyValuePair<int, short> entry in dict)
+            foreach (KeyValuePair<int, int> entry in dict)
             {
                 result.Add(CharacterSkill.Create(entry.Key, entry.Value));
             }
             return result;
         }
 
-        public static bool ValidateSkillToUse(this BaseCharacterEntity character, int dataId, bool isLeftHand, uint targetObjectId, out BaseSkill skill, out short skillLevel, out UITextKeys gameMessage)
+        public static bool ValidateSkillToUse(this BaseCharacterEntity character, int dataId, bool isLeftHand, uint targetObjectId, out BaseSkill skill, out int skillLevel, out UITextKeys gameMessage)
         {
             skillLevel = 0;
             gameMessage = UITextKeys.NONE;
@@ -2128,7 +2128,7 @@ namespace MultiplayerARPG
             return true;
         }
 
-        public static bool ValidateSkillItemToUse(this BaseCharacterEntity character, short itemIndex, bool isLeftHand, uint targetObjectId, out ISkillItem skillItem, out BaseSkill skill, out short skillLevel, out UITextKeys gameMessage)
+        public static bool ValidateSkillItemToUse(this BaseCharacterEntity character, int itemIndex, bool isLeftHand, uint targetObjectId, out ISkillItem skillItem, out BaseSkill skill, out int skillLevel, out UITextKeys gameMessage)
         {
             skillItem = null;
             skill = null;

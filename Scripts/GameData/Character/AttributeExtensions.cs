@@ -17,7 +17,7 @@
             return attribute.GetStats(attributeAmount.amount);
         }
 
-        public static CharacterStats GetStats(this AttributeIncremental attributeIncremental, short level)
+        public static CharacterStats GetStats(this AttributeIncremental attributeIncremental, int level)
         {
             if (attributeIncremental.attribute == null)
                 return new CharacterStats();

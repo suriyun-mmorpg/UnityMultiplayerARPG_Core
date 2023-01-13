@@ -4,7 +4,7 @@
     public struct ItemRandomByWeight
     {
         public BaseItem item;
-        public short amount;
+        public int amount;
         public int randomWeight;
     }
 }

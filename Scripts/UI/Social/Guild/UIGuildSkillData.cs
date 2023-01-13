@@ -3,8 +3,8 @@
     public struct UIGuildSkillData
     {
         public GuildSkill guildSkill;
-        public short targetLevel;
-        public UIGuildSkillData(GuildSkill guildSkill, short targetLevel)
+        public int targetLevel;
+        public UIGuildSkillData(GuildSkill guildSkill, int targetLevel)
         {
             this.guildSkill = guildSkill;
             this.targetLevel = targetLevel;

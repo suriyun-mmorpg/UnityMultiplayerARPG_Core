@@ -16,7 +16,7 @@ namespace MultiplayerARPG
         // Sync variables
         public event System.Action<string> onIdChange;
         public event System.Action<string> onCharacterNameChange;
-        public event System.Action<short> onLevelChange;
+        public event System.Action<int> onLevelChange;
         public event System.Action<int> onExpChange;
         public event System.Action<bool> onIsImmuneChange;
         public event System.Action<int> onCurrentHpChange;
@@ -69,7 +69,7 @@ namespace MultiplayerARPG
 
         public void OnUseSkillRoutine(
             BaseSkill skill,
-            short level,
+            int level,
             bool isLeftHand,
             CharacterItem weapon,
             int hitIndex,
@@ -86,7 +86,7 @@ namespace MultiplayerARPG
             CharacterItem weapon,
             Dictionary<DamageElement, MinMaxFloat> damageAmounts,
             BaseSkill skill,
-            short skillLevel,
+            int skillLevel,
             int randomSeed,
             AimPosition aimPosition,
             Vector3 stagger,

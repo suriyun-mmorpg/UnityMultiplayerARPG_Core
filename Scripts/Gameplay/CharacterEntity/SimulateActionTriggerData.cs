@@ -8,7 +8,7 @@ namespace MultiplayerARPG
         public int randomSeed;
         public uint targetObjectId;
         public int skillDataId;
-        public short skillLevel;
+        public int skillLevel;
         public AimPosition aimPosition;
 
         public void Serialize(NetDataWriter writer)
@@ -19,7 +19,7 @@ namespace MultiplayerARPG
             {
                 writer.PutPackedUInt(targetObjectId);
                 writer.PutPackedInt(skillDataId);
-                writer.PutPackedShort(skillLevel);
+                writer.PutPackedInt(skillLevel);
             }
             writer.Put(aimPosition);
         }
@@ -32,7 +32,7 @@ namespace MultiplayerARPG
             {
                 targetObjectId = reader.GetPackedUInt();
                 skillDataId = reader.GetPackedInt();
-                skillLevel = reader.GetPackedShort();
+                skillLevel = reader.GetPackedInt();
             }
             aimPosition = reader.Get<AimPosition>();
         }

@@ -81,7 +81,7 @@ namespace MultiplayerARPG
             // Prepare storage data
             Storage storage = GameInstance.ServerStorageHandlers.GetStorage(storageId, out _);
             bool isLimitSlot = storage.slotLimit > 0;
-            short slotLimit = storage.slotLimit;
+            int slotLimit = storage.slotLimit;
             UITextKeys gameMessage;
             if (!playerCharacter.MoveItemFromStorage(isLimitSlot, slotLimit, storageItems, request.storageItemIndex, request.storageItemAmount, request.inventoryType, request.inventoryItemIndex, request.equipSlotIndexOrWeaponSet, out gameMessage))
             {
@@ -126,8 +126,8 @@ namespace MultiplayerARPG
             Storage storage = GameInstance.ServerStorageHandlers.GetStorage(storageId, out _);
             bool isLimitWeight = storage.weightLimit > 0;
             bool isLimitSlot = storage.slotLimit > 0;
-            short weightLimit = storage.weightLimit;
-            short slotLimit = storage.slotLimit;
+            int weightLimit = storage.weightLimit;
+            int slotLimit = storage.slotLimit;
             UITextKeys gameMessage;
             if (!playerCharacter.MoveItemToStorage(isLimitWeight, weightLimit, isLimitSlot, slotLimit, storageItems, request.storageItemIndex, request.inventoryType, request.inventoryItemIndex, request.inventoryItemAmount, request.equipSlotIndexOrWeaponSet, out gameMessage))
             {
@@ -148,8 +148,8 @@ namespace MultiplayerARPG
         {
             await UniTask.Yield();
             StorageId storageId = new StorageId(request.storageType, request.storageOwnerId);
-            short fromIndex = request.fromIndex;
-            short toIndex = request.toIndex;
+            int fromIndex = request.fromIndex;
+            int toIndex = request.toIndex;
             if (!GameInstance.ServerUserHandlers.TryGetPlayerCharacter(requestHandler.ConnectionId, out IPlayerCharacterData playerCharacter))
             {
                 result.InvokeError(new ResponseSwapOrMergeStorageItemMessage()
@@ -179,7 +179,7 @@ namespace MultiplayerARPG
             // Prepare storage data
             Storage storage = GameInstance.ServerStorageHandlers.GetStorage(storageId, out _);
             bool isLimitSlot = storage.slotLimit > 0;
-            short slotLimit = storage.slotLimit;
+            int slotLimit = storage.slotLimit;
             // Prepare item data
             CharacterItem fromItem = storageItems[fromIndex];
             CharacterItem toItem = storageItems[toIndex];
@@ -187,7 +187,7 @@ namespace MultiplayerARPG
             if (fromItem.dataId.Equals(toItem.dataId) && !fromItem.IsFull() && !toItem.IsFull())
             {
                 // Merge if same id and not full
-                short maxStack = toItem.GetMaxStack();
+                int maxStack = toItem.GetMaxStack();
                 if (toItem.amount + fromItem.amount <= maxStack)
                 {
                     toItem.amount += fromItem.amount;
@@ -196,7 +196,7 @@ namespace MultiplayerARPG
                 }
                 else
                 {
-                    short remains = (short)(toItem.amount + fromItem.amount - maxStack);
+                    int remains = toItem.amount + fromItem.amount - maxStack;
                     toItem.amount = maxStack;
                     fromItem.amount = remains;
                     storageItems[fromIndex] = fromItem;

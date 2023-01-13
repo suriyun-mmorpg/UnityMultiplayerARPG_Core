@@ -7,10 +7,10 @@ namespace MultiplayerARPG
         public static bool MoveItemFromStorage(
             this IPlayerCharacterData playerCharacter,
             bool storageIsLimitSlot,
-            short storageSlotLimit,
+            int storageSlotLimit,
             IList<CharacterItem> storageItems,
             int storageItemIndex,
-            short storageItemAmount,
+            int storageItemAmount,
             InventoryType inventoryType,
             int inventoryItemIndex,
             byte equipSlotIndexOrWeaponSet,
@@ -82,12 +82,12 @@ namespace MultiplayerARPG
             bool storageIsLimitWeight,
             float storageWeightLimit,
             bool storageIsLimitSlot,
-            short storageSlotLimit,
+            int storageSlotLimit,
             IList<CharacterItem> storageItems,
             int storageItemIndex,
             InventoryType inventoryType,
             int inventoryItemIndex,
-            short inventoryItemAmount,
+            int inventoryItemAmount,
             byte equipSlotIndexOrWeaponSet,
             out UITextKeys gameMessage)
         {
@@ -224,7 +224,7 @@ namespace MultiplayerARPG
         public static bool SwapStorageItemWithEquipmentItem(
             this IPlayerCharacterData playerCharacter,
             bool storageIsLimitSlot,
-            short storageSlotLimit,
+            int storageSlotLimit,
             IList<CharacterItem> storageItems,
             int storageItemIndex,
             InventoryType inventoryType,
@@ -701,7 +701,7 @@ namespace MultiplayerARPG
             return true;
         }
 
-        public static bool SwapOrMergeItem(this ICharacterData character, short fromIndex, short toIndex, out UITextKeys gameMessage)
+        public static bool SwapOrMergeItem(this ICharacterData character, int fromIndex, int toIndex, out UITextKeys gameMessage)
         {
             if (fromIndex < 0 || fromIndex >= character.NonEquipItems.Count ||
                 toIndex < 0 || toIndex >= character.NonEquipItems.Count ||
@@ -716,7 +716,7 @@ namespace MultiplayerARPG
             if (fromItem.dataId.Equals(toItem.dataId) && !fromItem.IsFull() && !toItem.IsFull())
             {
                 // Merge if same id and not full
-                short maxStack = toItem.GetMaxStack();
+                int maxStack = toItem.GetMaxStack();
                 if (toItem.amount + fromItem.amount <= maxStack)
                 {
                     toItem.amount += fromItem.amount;
@@ -729,7 +729,7 @@ namespace MultiplayerARPG
                 }
                 else
                 {
-                    short remains = (short)(toItem.amount + fromItem.amount - maxStack);
+                    int remains = toItem.amount + fromItem.amount - maxStack;
                     toItem.amount = maxStack;
                     fromItem.amount = remains;
                     character.NonEquipItems[fromIndex] = fromItem;
@@ -746,7 +746,7 @@ namespace MultiplayerARPG
             return true;
         }
 
-        public static bool VerifyDismantleItem(this IPlayerCharacterData character, short index, short amount, List<CharacterItem> simulatingNonEquipItems, out UITextKeys gameMessage, out int returningGold, out List<ItemAmount> returningItems, out List<CurrencyAmount> returningCurrencies)
+        public static bool VerifyDismantleItem(this IPlayerCharacterData character, int index, int amount, List<CharacterItem> simulatingNonEquipItems, out UITextKeys gameMessage, out int returningGold, out List<ItemAmount> returningItems, out List<CurrencyAmount> returningCurrencies)
         {
             gameMessage = UITextKeys.NONE;
             returningGold = 0;
@@ -800,7 +800,7 @@ namespace MultiplayerARPG
             return true;
         }
 
-        public static bool DismantleItem(this IPlayerCharacterData character, short index, short amount, out UITextKeys gameMessage)
+        public static bool DismantleItem(this IPlayerCharacterData character, int index, int amount, out UITextKeys gameMessage)
         {
 #if UNITY_EDITOR || UNITY_SERVER
             int returningGold;
@@ -822,19 +822,19 @@ namespace MultiplayerARPG
 #endif
         }
 
-        public static bool DismantleItems(this IPlayerCharacterData character, short[] selectedIndexes, out UITextKeys gameMessage)
+        public static bool DismantleItems(this IPlayerCharacterData character, int[] selectedIndexes, out UITextKeys gameMessage)
         {
 #if UNITY_EDITOR || UNITY_SERVER
             gameMessage = UITextKeys.NONE;
-            List<short> indexes = new List<short>(selectedIndexes);
+            List<int> indexes = new List<int>(selectedIndexes);
             indexes.Sort();
-            Dictionary<short, short> indexAmountPairs = new Dictionary<short, short>();
+            Dictionary<int, int> indexAmountPairs = new Dictionary<int, int>();
             List<CharacterItem> simulatingNonEquipItems = character.NonEquipItems.Clone();
             int returningGold = 0;
             List<ItemAmount> returningItems = new List<ItemAmount>();
             List<CurrencyAmount> returningCurrencies = new List<CurrencyAmount>();
-            short tempIndex;
-            short tempAmount;
+            int tempIndex;
+            int tempAmount;
             int tempReturningGold;
             List<ItemAmount> tempReturningItems;
             List<CurrencyAmount> tempReturningCurrencies;
@@ -871,7 +871,7 @@ namespace MultiplayerARPG
 #endif
         }
 
-        public static bool RefineItem(this IPlayerCharacterData character, InventoryType inventoryType, short index, out UITextKeys gameMessage)
+        public static bool RefineItem(this IPlayerCharacterData character, InventoryType inventoryType, int index, out UITextKeys gameMessage)
         {
 #if UNITY_EDITOR || UNITY_SERVER
             switch (inventoryType)
@@ -893,7 +893,7 @@ namespace MultiplayerARPG
 #endif
         }
 
-        public static bool EnhanceSocketItem(this IPlayerCharacterData character, InventoryType inventoryType, short index, int enhancerId, short socketIndex, out UITextKeys gameMessage)
+        public static bool EnhanceSocketItem(this IPlayerCharacterData character, InventoryType inventoryType, int index, int enhancerId, int socketIndex, out UITextKeys gameMessage)
         {
 #if UNITY_EDITOR || UNITY_SERVER
             switch (inventoryType)
@@ -915,7 +915,7 @@ namespace MultiplayerARPG
 #endif
         }
 
-        public static bool RemoveEnhancerFromItem(this IPlayerCharacterData character, InventoryType inventoryType, short index, short socketIndex, out UITextKeys gameMessage)
+        public static bool RemoveEnhancerFromItem(this IPlayerCharacterData character, InventoryType inventoryType, int index, int socketIndex, out UITextKeys gameMessage)
         {
 #if UNITY_EDITOR || UNITY_SERVER
             if (!GameInstance.Singleton.enhancerRemoval.CanRemove(character, out gameMessage))
@@ -940,7 +940,7 @@ namespace MultiplayerARPG
 #endif
         }
 
-        public static bool RepairItem(this IPlayerCharacterData character, InventoryType inventoryType, short index, out UITextKeys gameMessage)
+        public static bool RepairItem(this IPlayerCharacterData character, InventoryType inventoryType, int index, out UITextKeys gameMessage)
         {
 #if UNITY_EDITOR || UNITY_SERVER
             switch (inventoryType)
@@ -988,7 +988,7 @@ namespace MultiplayerARPG
 #endif
         }
 
-        public static bool SellItem(this IPlayerCharacterData character, short index, short amount, out UITextKeys gameMessage)
+        public static bool SellItem(this IPlayerCharacterData character, int index, int amount, out UITextKeys gameMessage)
         {
 #if UNITY_EDITOR || UNITY_SERVER
             if (index < 0 || index >= character.NonEquipItems.Count)
@@ -1020,12 +1020,12 @@ namespace MultiplayerARPG
 #endif
         }
 
-        public static bool SellItems(this IPlayerCharacterData character, short[] selectedIndexes, out UITextKeys gameMessage)
+        public static bool SellItems(this IPlayerCharacterData character, int[] selectedIndexes, out UITextKeys gameMessage)
         {
 #if UNITY_EDITOR || UNITY_SERVER
-            List<short> indexes = new List<short>(selectedIndexes);
+            List<int> indexes = new List<int>(selectedIndexes);
             indexes.Sort();
-            short tempIndex;
+            int tempIndex;
             for (int i = indexes.Count - 1; i >= 0; --i)
             {
                 tempIndex = indexes[i];

@@ -54,7 +54,7 @@ namespace MultiplayerARPG
                     potionItem = GameInstance.PlayingCharacterEntity.NonEquipItems[i].GetPotionItem();
                     if (potionItem == null || !key.Equals(potionItem.AutoUseKey))
                         continue;
-                    if (GameInstance.PlayingCharacterEntity.CallServerUseItem((short)i))
+                    if (GameInstance.PlayingCharacterEntity.CallServerUseItem(i))
                     {
                         useCooldown = potionItem.UseItemCooldown;
                         return;

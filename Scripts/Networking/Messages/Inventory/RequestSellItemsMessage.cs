@@ -4,11 +4,11 @@ namespace MultiplayerARPG
 {
     public struct RequestSellItemsMessage : INetSerializable
     {
-        public short[] selectedIndexes;
+        public int[] selectedIndexes;
 
         public void Deserialize(NetDataReader reader)
         {
-            selectedIndexes = reader.GetShortArray();
+            selectedIndexes = reader.GetIntArray();
         }
 
         public void Serialize(NetDataWriter writer)

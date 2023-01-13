@@ -30,15 +30,15 @@ namespace MultiplayerARPG
         public static readonly CharacterItem Empty = new CharacterItem();
         public string id;
         public int dataId;
-        public short level;
-        public short amount;
+        public int level;
+        public int amount;
         public byte equipSlotIndex;
         public float durability;
         public int exp;
         public float lockRemainsDuration;
         public long expireTime;
-        public short randomSeed;
-        public short ammo;
+        public int randomSeed;
+        public int ammo;
         public List<int> sockets = new List<int>();
 
         [System.NonSerialized]
@@ -219,9 +219,9 @@ namespace MultiplayerARPG
             return cacheSkillItem;
         }
 
-        public short GetMaxStack()
+        public int GetMaxStack()
         {
-            return GetItem() == null ? (short)0 : GetItem().MaxStack;
+            return GetItem() == null ? 0 : GetItem().MaxStack;
         }
 
         public float GetMaxDurability()
@@ -367,7 +367,7 @@ namespace MultiplayerARPG
             return GetEquipmentItem().GetIncreaseDamages(level, randomSeed);
         }
 
-        public Dictionary<BaseSkill, short> GetIncreaseSkills()
+        public Dictionary<BaseSkill, int> GetIncreaseSkills()
         {
             if (GetEquipmentItem() == null)
                 return null;
@@ -472,11 +472,11 @@ namespace MultiplayerARPG
             return result;
         }
 
-        public Dictionary<BaseSkill, short> GetSocketsIncreaseSkills()
+        public Dictionary<BaseSkill, int> GetSocketsIncreaseSkills()
         {
             if (GetEquipmentItem() == null || Sockets.Count == 0)
                 return null;
-            Dictionary<BaseSkill, short> result = new Dictionary<BaseSkill, short>();
+            Dictionary<BaseSkill, int> result = new Dictionary<BaseSkill, int>();
             BaseItem tempEnhancer;
             foreach (int socketId in Sockets)
             {
@@ -505,12 +505,12 @@ namespace MultiplayerARPG
             };
         }
 
-        public static CharacterItem Create(BaseItem item, short level = 1, short amount = 1, short? randomSeed = null)
+        public static CharacterItem Create(BaseItem item, int level = 1, int amount = 1, int? randomSeed = null)
         {
             return Create(item.DataId, level, amount, randomSeed);
         }
 
-        public static CharacterItem Create(int dataId, short level = 1, short amount = 1, short? randomSeed = null)
+        public static CharacterItem Create(int dataId, int level = 1, int amount = 1, int? randomSeed = null)
         {
             CharacterItem newItem = new CharacterItem();
             newItem.id = GenericUtils.GetUniqueId();
@@ -531,7 +531,7 @@ namespace MultiplayerARPG
                 if (randomSeed.HasValue)
                     newItem.randomSeed = randomSeed.Value;
                 else
-                    newItem.randomSeed = (short)Random.Range(short.MinValue, short.MaxValue);
+                    newItem.randomSeed = Random.Range(int.MinValue, int.MaxValue);
             }
             return newItem;
         }
@@ -596,8 +596,8 @@ namespace MultiplayerARPG
             writer.Put(id);
             writer.PutPackedLong(expireTime);
             writer.PutPackedInt(dataId);
-            writer.PutPackedShort(level);
-            writer.PutPackedShort(amount);
+            writer.PutPackedInt(level);
+            writer.PutPackedInt(amount);
             writer.Put(equipSlotIndex);
             writer.Put(lockRemainsDuration);
 
@@ -616,12 +616,12 @@ namespace MultiplayerARPG
                     }
                 }
 
-                writer.PutPackedShort(randomSeed);
+                writer.PutPackedInt(randomSeed);
             }
 
             if (isWeapon)
             {
-                writer.PutPackedShort(ammo);
+                writer.PutPackedInt(ammo);
             }
 
             if (isPet)
@@ -653,8 +653,8 @@ namespace MultiplayerARPG
             id = reader.GetString();
             expireTime = reader.GetPackedLong();
             dataId = reader.GetPackedInt();
-            level = reader.GetPackedShort();
-            amount = reader.GetPackedShort();
+            level = reader.GetPackedInt();
+            amount = reader.GetPackedInt();
             equipSlotIndex = reader.GetByte();
             lockRemainsDuration = reader.GetFloat();
 
@@ -670,12 +670,12 @@ namespace MultiplayerARPG
                     Sockets.Add(reader.GetPackedInt());
                 }
 
-                randomSeed = reader.GetPackedShort();
+                randomSeed = reader.GetPackedInt();
             }
 
             if (syncState.Has(CharacterItemSyncState.IsWeapon))
             {
-                ammo = reader.GetPackedShort();
+                ammo = reader.GetPackedInt();
             }
 
             if (syncState.Has(CharacterItemSyncState.IsPet))

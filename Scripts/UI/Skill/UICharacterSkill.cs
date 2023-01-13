@@ -9,7 +9,7 @@ namespace MultiplayerARPG
     public partial class UICharacterSkill : UIDataForCharacter<UICharacterSkillData>
     {
         public CharacterSkill CharacterSkill { get { return Data.characterSkill; } }
-        public short Level { get { return Data.targetLevel; } }
+        public int Level { get { return Data.targetLevel; } }
         public BaseSkill Skill { get { return CharacterSkill != null ? CharacterSkill.GetSkill() : null; } }
 
         [Header("String Formats")]
@@ -478,7 +478,7 @@ namespace MultiplayerARPG
                 }
                 else
                 {
-                    uiNextLevelSkill.Setup(new UICharacterSkillData(CharacterSkill, (short)(Level + 1)), Character, IndexOfData);
+                    uiNextLevelSkill.Setup(new UICharacterSkillData(CharacterSkill, (Level + 1)), Character, IndexOfData);
                     uiNextLevelSkill.Show();
                 }
             }

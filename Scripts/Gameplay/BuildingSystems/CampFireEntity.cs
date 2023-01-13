@@ -220,7 +220,7 @@ namespace MultiplayerARPG
             if (convertData.item.item != null && convertData.item.amount > 0)
             {
                 int dataId = convertData.item.item.DataId;
-                short amount = convertData.item.amount;
+                int amount = convertData.item.amount;
                 convertItemsEntry.dataId = dataId;
                 convertItemsEntry.amount = amount;
             }
@@ -228,7 +228,7 @@ namespace MultiplayerARPG
             if (convertData.convertedItem.item != null && convertData.convertedItem.amount > 0)
             {
                 int convertedDataId = convertData.convertedItem.item.DataId;
-                short convertedAmount = convertData.convertedItem.amount;
+                int convertedAmount = convertData.convertedItem.amount;
                 convertItemsEntry.convertedDataId = convertedDataId;
                 convertItemsEntry.convertedAmount = convertedAmount;
             }
@@ -278,7 +278,7 @@ namespace MultiplayerARPG
                 return true;
             }
             List<CharacterItem> items = GameInstance.ServerStorageHandlers.GetStorageEntityItems(this);
-            Dictionary<int, short> countItems = new Dictionary<int, short>();
+            Dictionary<int, int> countItems = new Dictionary<int, int>();
             foreach (CharacterItem item in items)
             {
                 if (CacheFuelItems.ContainsKey(item.dataId))

@@ -31,12 +31,12 @@ namespace MultiplayerARPG
             get { return SkillType.Active; }
         }
 
-        public override float GetCastDistance(BaseCharacterEntity skillUser, short skillLevel, bool isLeftHand)
+        public override float GetCastDistance(BaseCharacterEntity skillUser, int skillLevel, bool isLeftHand)
         {
             return castDistance.GetAmount(skillLevel);
         }
 
-        public override float GetCastFov(BaseCharacterEntity skillUser, short skillLevel, bool isLeftHand)
+        public override float GetCastFov(BaseCharacterEntity skillUser, int skillLevel, bool isLeftHand)
         {
             return 360f;
         }
@@ -48,7 +48,7 @@ namespace MultiplayerARPG
 
         public override AimPosition UpdateAimControls(Vector2 aimAxes, params object[] data)
         {
-            short skillLevel = (short)data[0];
+            int skillLevel = (int)data[0];
             if (BasePlayerCharacterController.Singleton is ShooterPlayerCharacterController)
                 return AreaSkillControls.UpdateAimControls_Shooter(aimAxes, this, skillLevel, CacheTargetObject);
             return AreaSkillControls.UpdateAimControls(aimAxes, this, skillLevel, CacheTargetObject);

@@ -6,7 +6,7 @@ namespace MultiplayerARPG
     [DisallowMultipleComponent]
     public partial class PlayerCharacterBuildingComponent : BaseNetworkedGameEntityComponent<BasePlayerCharacterEntity>
     {
-        public bool CallServerConstructBuilding(short itemIndex, Vector3 position, Quaternion rotation, uint parentObjectId)
+        public bool CallServerConstructBuilding(int itemIndex, Vector3 position, Quaternion rotation, uint parentObjectId)
         {
             if (!Entity.CanDoActions())
                 return false;
@@ -15,7 +15,7 @@ namespace MultiplayerARPG
         }
 
         [ServerRpc]
-        protected void ServerConstructBuilding(short itemIndex, Vector3 position, Quaternion rotation, uint parentObjectId)
+        protected void ServerConstructBuilding(int itemIndex, Vector3 position, Quaternion rotation, uint parentObjectId)
         {
 #if UNITY_EDITOR || UNITY_SERVER
             if (!Entity.CanDoActions() || itemIndex >= Entity.NonEquipItems.Count)

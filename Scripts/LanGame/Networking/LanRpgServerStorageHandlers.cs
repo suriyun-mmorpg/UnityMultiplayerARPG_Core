@@ -57,17 +57,17 @@ namespace MultiplayerARPG
             Storage storage = GetStorage(storageId, out _);
             bool isLimitWeight = storage.weightLimit > 0;
             bool isLimitSlot = storage.slotLimit > 0;
-            short weightLimit = storage.weightLimit;
-            short slotLimit = storage.slotLimit;
+            int weightLimit = storage.weightLimit;
+            int slotLimit = storage.slotLimit;
             // Prepare storage items
             List<CharacterItem> storageItems = new List<CharacterItem>(GetStorageItems(storageId));
             List<CharacterItem> droppingItems = new List<CharacterItem>();
             for (int i = 0; i < convertItems.Count; ++i)
             {
                 int dataId = convertItems[i].dataId;
-                short amount = convertItems[i].amount;
+                int amount = convertItems[i].amount;
                 int convertedDataId = convertItems[i].convertedDataId;
-                short convertedAmount = convertItems[i].convertedAmount;
+                int convertedAmount = convertItems[i].convertedAmount;
                 // Decrease item from storage
                 if (!storageItems.DecreaseItems(dataId, amount, isLimitSlot, out _))
                     continue;

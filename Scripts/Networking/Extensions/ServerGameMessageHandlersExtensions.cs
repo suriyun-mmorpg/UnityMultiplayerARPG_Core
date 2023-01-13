@@ -342,7 +342,7 @@ namespace MultiplayerARPG
         {
             if (guild == null)
                 return;
-            foreach (KeyValuePair<int, short> guildSkillLevel in guild.GetSkillLevels())
+            foreach (KeyValuePair<int, int> guildSkillLevel in guild.GetSkillLevels())
             {
                 handlers.SendSetGuildSkillLevel(connectionId, guild.id, guildSkillLevel.Key, guildSkillLevel.Value);
             }
@@ -352,7 +352,7 @@ namespace MultiplayerARPG
         {
             if (guild == null)
                 return;
-            short skillLevel = guild.GetSkillLevel(dataId);
+            int skillLevel = guild.GetSkillLevel(dataId);
             long connectionId;
             foreach (SocialCharacterData member in guild.GetMembers())
             {

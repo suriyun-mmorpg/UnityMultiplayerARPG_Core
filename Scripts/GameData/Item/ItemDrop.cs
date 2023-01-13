@@ -7,9 +7,9 @@ namespace MultiplayerARPG
     public struct ItemDrop
     {
         public BaseItem item;
-        public short minAmount;
+        public int minAmount;
         [FormerlySerializedAs("amount")]
-        public short maxAmount;
+        public int maxAmount;
         [Range(0f, 1f)]
         public float dropRate;
     }

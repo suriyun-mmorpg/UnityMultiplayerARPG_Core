@@ -12,7 +12,7 @@
         void ShowDismantleItemDialog(InventoryType inventoryType, int indexOfData);
         void ShowRepairItemDialog(InventoryType inventoryType, int indexOfData);
         void ShowEnhanceSocketItemDialog(InventoryType inventoryType, int indexOfData);
-        void ShowStorageDialog(StorageType storageType, string storageOwnerId, uint objectId, short weightLimit, short slotLimit);
+        void ShowStorageDialog(StorageType storageType, string storageOwnerId, uint objectId, int weightLimit, int slotLimit);
         void HideStorageDialog();
     }
 }

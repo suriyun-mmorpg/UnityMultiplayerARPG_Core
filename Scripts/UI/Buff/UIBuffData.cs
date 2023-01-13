@@ -3,8 +3,8 @@
     public struct UIBuffData
     {
         public Buff buff;
-        public short targetLevel;
-        public UIBuffData(Buff buff, short targetLevel)
+        public int targetLevel;
+        public UIBuffData(Buff buff, int targetLevel)
         {
             this.buff = buff;
             this.targetLevel = targetLevel;

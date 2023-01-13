@@ -218,7 +218,7 @@ namespace MultiplayerARPG
             GameInstance.ClientInventoryHandlers.RequestRefineItem(new RequestRefineItemMessage()
             {
                 inventoryType = InventoryType,
-                index = (short)IndexOfData,
+                index = IndexOfData,
             }, ClientInventoryActions.ResponseRefineItem);
         }
     }

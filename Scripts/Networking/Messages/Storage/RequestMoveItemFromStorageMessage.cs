@@ -6,9 +6,9 @@ namespace MultiplayerARPG
     {
         public StorageType storageType;
         public string storageOwnerId;
-        public short storageItemIndex;
-        public short storageItemAmount;
-        public short inventoryItemIndex;
+        public int storageItemIndex;
+        public int storageItemAmount;
+        public int inventoryItemIndex;
         public InventoryType inventoryType;
         public byte equipSlotIndexOrWeaponSet;
 
@@ -16,9 +16,9 @@ namespace MultiplayerARPG
         {
             storageType = (StorageType)reader.GetByte();
             storageOwnerId = reader.GetString();
-            storageItemIndex = reader.GetPackedShort();
-            storageItemAmount = reader.GetPackedShort();
-            inventoryItemIndex = reader.GetPackedShort();
+            storageItemIndex = reader.GetPackedInt();
+            storageItemAmount = reader.GetPackedInt();
+            inventoryItemIndex = reader.GetPackedInt();
             inventoryType = (InventoryType)reader.GetByte();
             equipSlotIndexOrWeaponSet = reader.GetByte();
         }
@@ -27,9 +27,9 @@ namespace MultiplayerARPG
         {
             writer.Put((byte)storageType);
             writer.Put(storageOwnerId);
-            writer.PutPackedShort(storageItemIndex);
-            writer.PutPackedShort(storageItemAmount);
-            writer.PutPackedShort(inventoryItemIndex);
+            writer.PutPackedInt(storageItemIndex);
+            writer.PutPackedInt(storageItemAmount);
+            writer.PutPackedInt(inventoryItemIndex);
             writer.Put((byte)inventoryType);
             writer.Put(equipSlotIndexOrWeaponSet);
         }

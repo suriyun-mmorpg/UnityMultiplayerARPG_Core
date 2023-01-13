@@ -71,12 +71,12 @@ namespace MultiplayerARPG
                 if (splitData.Length < 1 || !int.TryParse(splitData[0], out dataId))
                     continue;
 
-                short amount;
-                if (splitData.Length < 2 || !short.TryParse(splitData[1], out amount))
+                int amount;
+                if (splitData.Length < 2 || !int.TryParse(splitData[1], out amount))
                     amount = 1;
 
-                short level;
-                if (splitData.Length < 3 || !short.TryParse(splitData[2], out level))
+                int level;
+                if (splitData.Length < 3 || !int.TryParse(splitData[2], out level))
                     level = 1;
 
                 float durability;
@@ -95,8 +95,8 @@ namespace MultiplayerARPG
                 if (splitData.Length < 7 || !long.TryParse(splitData[6], out expireTime))
                     expireTime = 0;
 
-                short randomSeed;
-                if (splitData.Length < 8 || !short.TryParse(splitData[7], out randomSeed))
+                int randomSeed;
+                if (splitData.Length < 8 || !int.TryParse(splitData[7], out randomSeed))
                     randomSeed = 0;
 
                 string sockets;

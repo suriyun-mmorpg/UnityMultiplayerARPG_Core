@@ -24,8 +24,8 @@ namespace MultiplayerARPG
         }
 
         [SerializeField]
-        private short usingSkillLevel = 0;
-        public short UsingSkillLevel
+        private int usingSkillLevel = 0;
+        public int UsingSkillLevel
         {
             get { return usingSkillLevel; }
         }
@@ -37,7 +37,7 @@ namespace MultiplayerARPG
             get { return useItemCooldown; }
         }
 
-        public void UseItem(BaseCharacterEntity characterEntity, short itemIndex, CharacterItem characterItem)
+        public void UseItem(BaseCharacterEntity characterEntity, int itemIndex, CharacterItem characterItem)
         {
             // TODO: May changes this function later.
         }

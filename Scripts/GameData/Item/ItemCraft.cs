@@ -13,8 +13,8 @@ namespace MultiplayerARPG
         public BaseItem CraftingItem { get { return craftingItem; } }
 
         [SerializeField]
-        private short amount;
-        public short Amount { get { return (short)(amount > 0 ? amount : 1); } }
+        private int amount;
+        public int Amount { get { return (amount > 0 ? amount : 1); } }
 
         [SerializeField]
         private int requireGold;
@@ -33,7 +33,7 @@ namespace MultiplayerARPG
 
         public ItemCraft(
             BaseItem craftingItem,
-            short amount,
+            int amount,
             int requireGold,
             ItemAmount[] requireItems,
             CurrencyAmount[] requireCurrencies)

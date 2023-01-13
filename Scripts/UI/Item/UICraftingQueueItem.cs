@@ -121,8 +121,8 @@ namespace MultiplayerARPG
 
         public void OnClickChange()
         {
-            short amount;
-            if (inputAmount == null || !short.TryParse(inputAmount.text, out amount))
+            int amount;
+            if (inputAmount == null || !int.TryParse(inputAmount.text, out amount))
                 amount = 1;
             GameInstance.PlayingCharacterEntity.CallServerChangeCraftingQueueItem(CraftingQueueManager.Source.ObjectId, IndexOfData, amount);
         }

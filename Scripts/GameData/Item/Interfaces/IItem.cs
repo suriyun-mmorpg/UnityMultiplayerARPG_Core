@@ -27,7 +27,7 @@ namespace MultiplayerARPG
         /// <summary>
         /// Max stack
         /// </summary>
-        short MaxStack { get; }
+        int MaxStack { get; }
         /// <summary>
         /// Item refine data
         /// </summary>

@@ -155,7 +155,7 @@ namespace MultiplayerARPG
             GameInstance.ClientInventoryHandlers.RequestRepairItem(new RequestRepairItemMessage()
             {
                 inventoryType = InventoryType,
-                index = (short)IndexOfData,
+                index = IndexOfData,
             }, ClientInventoryActions.ResponseRepairItem);
         }
     }

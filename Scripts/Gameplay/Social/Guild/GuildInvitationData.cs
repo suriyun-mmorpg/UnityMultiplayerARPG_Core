@@ -7,29 +7,29 @@ namespace MultiplayerARPG
     {
         public string InviterId { get; set; }
         public string InviterName { get; set; }
-        public short InviterLevel { get; set; }
+        public int InviterLevel { get; set; }
         public int GuildId { get; set; }
         public string GuildName { get; set; }
-        public short GuildLevel { get; set; }
+        public int GuildLevel { get; set; }
 
         public void Deserialize(NetDataReader reader)
         {
             InviterId = reader.GetString();
             InviterName = reader.GetString();
-            InviterLevel = reader.GetPackedShort();
+            InviterLevel = reader.GetPackedInt();
             GuildId = reader.GetPackedInt();
             GuildName = reader.GetString();
-            GuildLevel = reader.GetPackedShort();
+            GuildLevel = reader.GetPackedInt();
         }
 
         public void Serialize(NetDataWriter writer)
         {
             writer.Put(InviterId);
             writer.Put(InviterName);
-            writer.PutPackedShort(InviterLevel);
+            writer.PutPackedInt(InviterLevel);
             writer.PutPackedInt(GuildId);
             writer.Put(GuildName);
-            writer.PutPackedShort(GuildLevel);
+            writer.PutPackedInt(GuildLevel);
         }
     }
 }

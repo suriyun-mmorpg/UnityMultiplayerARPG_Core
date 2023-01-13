@@ -661,7 +661,7 @@ namespace MultiplayerARPG
             uiEnhanceSocketItem.Show();
         }
 
-        public override void ShowStorageDialog(StorageType storageType, string storageOwnerId, uint objectId, short weightLimit, short slotLimit)
+        public override void ShowStorageDialog(StorageType storageType, string storageOwnerId, uint objectId, int weightLimit, int slotLimit)
         {
             // Hide all of storage UIs
             if (uiPlayerStorageItems != null)

@@ -15,7 +15,7 @@ namespace MultiplayerARPG
         public const float DEFAULT_STATE_SETUP_DELAY = 1f;
         protected List<CancellationTokenSource> skillCancellationTokenSources = new List<CancellationTokenSource>();
         public BaseSkill UsingSkill { get; protected set; }
-        public short UsingSkillLevel { get; protected set; }
+        public int UsingSkillLevel { get; protected set; }
         public bool IsUsingSkill { get; protected set; }
         public float LastUseSkillEndTime { get; protected set; }
         public bool IsCastingSkillCanBeInterrupted { get; protected set; }
@@ -40,8 +40,8 @@ namespace MultiplayerARPG
         protected bool sendingServerUseSkillInterrupted;
         protected byte sendingSeed;
         protected int sendingSkillDataId;
-        protected short sendingSkillLevel;
-        protected short sendingItemIndex;
+        protected int sendingSkillLevel;
+        protected int sendingItemIndex;
         protected bool sendingIsLeftHand;
         protected uint sendingTargetObjectId;
         protected AimPosition sendingAimPosition;
@@ -53,7 +53,7 @@ namespace MultiplayerARPG
                 CastingSkillCountDown -= Time.unscaledDeltaTime;
         }
 
-        protected virtual void SetUseSkillActionStates(AnimActionType animActionType, int animActionDataId, BaseSkill usingSkill, short usingSkillLevel)
+        protected virtual void SetUseSkillActionStates(AnimActionType animActionType, int animActionDataId, BaseSkill usingSkill, int usingSkillLevel)
         {
             ClearUseSkillStates();
             AnimActionType = animActionType;
@@ -84,7 +84,7 @@ namespace MultiplayerARPG
             }
         }
 
-        protected async UniTaskVoid UseSkillRoutine(byte simulateSeed, bool isLeftHand, BaseSkill skill, short skillLevel, uint targetObjectId, AimPosition skillAimPosition)
+        protected async UniTaskVoid UseSkillRoutine(byte simulateSeed, bool isLeftHand, BaseSkill skill, int skillLevel, uint targetObjectId, AimPosition skillAimPosition)
         {
             // Prepare cancellation
             CancellationTokenSource skillCancellationTokenSource = new CancellationTokenSource();
@@ -389,7 +389,7 @@ namespace MultiplayerARPG
             {
                 // Validate skill
                 BaseSkill skill;
-                short skillLevel;
+                int skillLevel;
                 if (!Entity.ValidateSkillToUse(dataId, isLeftHand, targetObjectId, out skill, out skillLevel, out _))
                     return;
                 // Get simulate seed for simulation validating
@@ -415,12 +415,12 @@ namespace MultiplayerARPG
             }
         }
 
-        public void UseSkillItem(short itemIndex, bool isLeftHand, uint targetObjectId, AimPosition aimPosition)
+        public void UseSkillItem(int itemIndex, bool isLeftHand, uint targetObjectId, AimPosition aimPosition)
         {
             if (!IsServer && IsOwnerClient)
             {
                 // Validate skill
-                if (!Entity.ValidateSkillItemToUse(itemIndex, isLeftHand, targetObjectId, out ISkillItem skillItem, out BaseSkill skill, out short skillLevel, out _))
+                if (!Entity.ValidateSkillItemToUse(itemIndex, isLeftHand, targetObjectId, out ISkillItem skillItem, out BaseSkill skill, out int skillLevel, out _))
                     return;
                 // Validate using time
                 float time = Time.unscaledTime;
@@ -475,7 +475,7 @@ namespace MultiplayerARPG
             {
                 writer.Put(sendingSeed);
                 writer.PutPackedInt(sendingSkillDataId);
-                writer.PutPackedShort(sendingSkillLevel);
+                writer.PutPackedInt(sendingSkillLevel);
                 writer.Put(sendingIsLeftHand);
                 writer.PutPackedUInt(sendingTargetObjectId);
                 writer.Put(sendingAimPosition);
@@ -490,7 +490,7 @@ namespace MultiplayerARPG
             if (sendingClientUseSkillItem)
             {
                 writer.Put(sendingSeed);
-                writer.PutPackedShort(sendingItemIndex);
+                writer.PutPackedInt(sendingItemIndex);
                 writer.Put(sendingIsLeftHand);
                 writer.PutPackedUInt(sendingTargetObjectId);
                 writer.Put(sendingAimPosition);
@@ -545,7 +545,7 @@ namespace MultiplayerARPG
                 return;
             // Validate skill
             BaseSkill skill;
-            short skillLevel;
+            int skillLevel;
             if (!Entity.ValidateSkillToUse(dataId, isLeftHand, targetObjectId, out skill, out skillLevel, out _))
                 return;
             // Set use skill state
@@ -567,7 +567,7 @@ namespace MultiplayerARPG
         {
             byte simulateSeed = reader.GetByte();
             int skillDataId = reader.GetPackedInt();
-            short skillLevel = reader.GetPackedShort();
+            int skillLevel = reader.GetPackedInt();
             bool isLeftHand = reader.GetBool();
             uint targetObjectId = reader.GetPackedUInt();
             AimPosition aimPosition = reader.Get<AimPosition>();
@@ -586,21 +586,21 @@ namespace MultiplayerARPG
         public void ReadClientUseSkillItemStateAtServer(NetDataReader reader)
         {
             byte simulateSeed = reader.GetByte();
-            short itemIndex = reader.GetPackedShort();
+            int itemIndex = reader.GetPackedInt();
             bool isLeftHand = reader.GetBool();
             uint targetObjectId = reader.GetPackedUInt();
             AimPosition aimPosition = reader.Get<AimPosition>();
             ProceedUseSkillItemStateAtServer(simulateSeed, itemIndex, isLeftHand, targetObjectId, aimPosition);
         }
 
-        protected void ProceedUseSkillItemStateAtServer(byte simulateSeed, short itemIndex, bool isLeftHand, uint targetObjectId, AimPosition aimPosition)
+        protected void ProceedUseSkillItemStateAtServer(byte simulateSeed, int itemIndex, bool isLeftHand, uint targetObjectId, AimPosition aimPosition)
         {
 #if UNITY_EDITOR || UNITY_SERVER
             // Speed hack avoidance
             if (Time.unscaledTime - LastUseSkillEndTime < -0.05f)
                 return;
             // Validate skill item
-            if (!Entity.ValidateSkillItemToUse(itemIndex, isLeftHand, targetObjectId, out ISkillItem skillItem, out BaseSkill skill, out short skillLevel, out _))
+            if (!Entity.ValidateSkillItemToUse(itemIndex, isLeftHand, targetObjectId, out ISkillItem skillItem, out BaseSkill skill, out int skillLevel, out _))
                 return;
             // Validate using time
             float time = Time.unscaledTime;

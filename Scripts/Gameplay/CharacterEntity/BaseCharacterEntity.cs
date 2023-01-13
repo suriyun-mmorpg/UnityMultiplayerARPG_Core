@@ -117,12 +117,12 @@ namespace MultiplayerARPG
         public float UseSkillTotalDuration { get { return UseSkillComponent.UseSkillTotalDuration; } set { UseSkillComponent.UseSkillTotalDuration = value; } }
         public float[] UseSkillTriggerDurations { get { return UseSkillComponent.UseSkillTriggerDurations; } set { UseSkillComponent.UseSkillTriggerDurations = value; } }
         public BaseSkill UsingSkill { get { return UseSkillComponent.UsingSkill; } }
-        public short UsingSkillLevel { get { return UseSkillComponent.UsingSkillLevel; } }
+        public int UsingSkillLevel { get { return UseSkillComponent.UsingSkillLevel; } }
         public bool IsCastingSkillCanBeInterrupted { get { return UseSkillComponent.IsCastingSkillCanBeInterrupted; } }
         public bool IsCastingSkillInterrupted { get { return UseSkillComponent.IsCastingSkillInterrupted; } }
         public float CastingSkillDuration { get { return UseSkillComponent.CastingSkillDuration; } }
         public float CastingSkillCountDown { get { return UseSkillComponent.CastingSkillCountDown; } }
-        public short ReloadingAmmoAmount { get { return ReloadComponent.ReloadingAmmoAmount; } }
+        public int ReloadingAmmoAmount { get { return ReloadComponent.ReloadingAmmoAmount; } }
         public bool IsReloading { get { return ReloadComponent.IsReloading; } }
         public float LastReloadEndTime { get { return ReloadComponent.LastReloadEndTime; } }
         public float MoveSpeedRateWhileReloading { get { return ReloadComponent.MoveSpeedRateWhileReloading; } }
@@ -647,7 +647,7 @@ namespace MultiplayerARPG
             return true;
         }
 
-        public bool ValidateUseSkillItem(short index, bool isLeftHand, uint targetObjectId)
+        public bool ValidateUseSkillItem(int index, bool isLeftHand, uint targetObjectId)
         {
             if (!CanUseItem())
                 return false;
@@ -725,7 +725,7 @@ namespace MultiplayerARPG
             return false;
         }
 
-        public bool UseSkillItem(short itemIndex, bool isLeftHand, uint targetObjectId, AimPosition aimPosition)
+        public bool UseSkillItem(int itemIndex, bool isLeftHand, uint targetObjectId, AimPosition aimPosition)
         {
             if (!IsOwnerClientOrOwnedByServer)
                 return false;
@@ -895,7 +895,7 @@ namespace MultiplayerARPG
             return damageAmounts;
         }
 
-        public bool ValidateAmmo(CharacterItem weapon, short amount, bool validIfNoRequireAmmoType = true)
+        public bool ValidateAmmo(CharacterItem weapon, int amount, bool validIfNoRequireAmmoType = true)
         {
             // Avoid null data
             if (weapon == null)
@@ -922,7 +922,7 @@ namespace MultiplayerARPG
             return validIfNoRequireAmmoType;
         }
 
-        public bool DecreaseAmmos(CharacterItem weapon, bool isLeftHand, short amount, out Dictionary<DamageElement, MinMaxFloat> increaseDamages, bool validIfNoRequireAmmoType = true)
+        public bool DecreaseAmmos(CharacterItem weapon, bool isLeftHand, int amount, out Dictionary<DamageElement, MinMaxFloat> increaseDamages, bool validIfNoRequireAmmoType = true)
         {
             increaseDamages = null;
 

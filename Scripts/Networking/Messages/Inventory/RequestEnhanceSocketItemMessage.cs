@@ -5,24 +5,24 @@ namespace MultiplayerARPG
     public struct RequestEnhanceSocketItemMessage : INetSerializable
     {
         public InventoryType inventoryType;
-        public short index;
+        public int index;
         public int enhancerId;
-        public short socketIndex;
+        public int socketIndex;
 
         public void Deserialize(NetDataReader reader)
         {
             inventoryType = (InventoryType)reader.GetByte();
-            index = reader.GetPackedShort();
+            index = reader.GetPackedInt();
             enhancerId = reader.GetPackedInt();
-            socketIndex = reader.GetPackedShort();
+            socketIndex = reader.GetPackedInt();
         }
 
         public void Serialize(NetDataWriter writer)
         {
             writer.Put((byte)inventoryType);
-            writer.PutPackedShort(index);
+            writer.PutPackedInt(index);
             writer.PutPackedInt(enhancerId);
-            writer.PutPackedShort(socketIndex);
+            writer.PutPackedInt(socketIndex);
         }
     }
 }

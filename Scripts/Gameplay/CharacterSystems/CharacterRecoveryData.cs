@@ -264,7 +264,7 @@ namespace MultiplayerARPG
                 {
                     CharacterItem weapon = null;
                     BaseSkill skill = null;
-                    short skillLevel = 0;
+                    int skillLevel = 0;
                     if (buff != null)
                     {
                         weapon = buff.BuffApplierWeapon;

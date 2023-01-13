@@ -12,9 +12,9 @@ namespace MultiplayerARPG
         {
             public TPrefab prefab;
             [Min(1)]
-            public short level;
+            public int level;
             [Min(1)]
-            public short amount;
+            public int amount;
         }
 
         [Header("Spawning Data")]
@@ -22,11 +22,11 @@ namespace MultiplayerARPG
         public T prefab;
         [FormerlySerializedAs("level")]
         [Min(1)]
-        public short minLevel = 1;
+        public int minLevel = 1;
         [Min(1)]
-        public short maxLevel = 1;
+        public int maxLevel = 1;
         [Min(1)]
-        public short amount = 1;
+        public int amount = 1;
         public float respawnPendingEntitiesDelay = 5f;
 
         public abstract SpawnPrefabData<T>[] SpawningPrefabs { get; }
@@ -75,7 +75,7 @@ namespace MultiplayerARPG
         {
             for (int i = 0; i < amount; ++i)
             {
-                Spawn(prefab, (short)Random.Range(minLevel, maxLevel + 1), 0);
+                Spawn(prefab, Random.Range(minLevel, maxLevel + 1), 0);
             }
             foreach (SpawnPrefabData<T> spawningPrefab in SpawningPrefabs)
             {
@@ -83,7 +83,7 @@ namespace MultiplayerARPG
             }
         }
 
-        public virtual void SpawnByAmount(T prefab, short level, int amount)
+        public virtual void SpawnByAmount(T prefab, int level, int amount)
         {
             for (int i = 0; i < amount; ++i)
             {
@@ -91,17 +91,17 @@ namespace MultiplayerARPG
             }
         }
 
-        public virtual Coroutine Spawn(T prefab, short level, float delay)
+        public virtual Coroutine Spawn(T prefab, int level, float delay)
         {
             return StartCoroutine(SpawnRoutine(prefab, level, delay));
         }
 
-        IEnumerator SpawnRoutine(T prefab, short level, float delay)
+        IEnumerator SpawnRoutine(T prefab, int level, float delay)
         {
             yield return new WaitForSecondsRealtime(delay);
             SpawnInternal(prefab, level);
         }
 
-        protected abstract T SpawnInternal(T prefab, short level);
+        protected abstract T SpawnInternal(T prefab, int level);
     }
 }

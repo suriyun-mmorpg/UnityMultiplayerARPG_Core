@@ -7,7 +7,7 @@ namespace MultiplayerARPG
     public partial class UIBuff : UISelectionEntry<UIBuffData>
     {
         public Buff Buff { get { return Data.buff; } }
-        public short Level { get { return Data.targetLevel; } }
+        public int Level { get { return Data.targetLevel; } }
 
         [Header("String Formats")]
         [Tooltip("Format => {0} = {Buff Duration}")]

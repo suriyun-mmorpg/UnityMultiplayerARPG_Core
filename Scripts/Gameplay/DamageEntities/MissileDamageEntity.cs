@@ -59,7 +59,7 @@ namespace MultiplayerARPG
             CharacterItem weapon,
             Dictionary<DamageElement, MinMaxFloat> damageAmounts,
             BaseSkill skill,
-            short skillLevel,
+            int skillLevel,
             float missileDistance,
             float missileSpeed,
             IDamageableEntity lockingTarget)

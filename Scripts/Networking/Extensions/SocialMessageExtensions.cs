@@ -331,7 +331,7 @@ namespace MultiplayerARPG
             client.SendPacket(SOCIAL_MSG_DATA_CHANNEL, DeliveryMethod.ReliableOrdered, msgType, (writer) => writer.Put(MakeGuildTerminate(id)));
         }
 
-        public static UpdateGuildMessage MakeSetGuildLevelExpSkillPoint(int id, short level, int exp, short skillPoint)
+        public static UpdateGuildMessage MakeSetGuildLevelExpSkillPoint(int id, int level, int exp, int skillPoint)
         {
             return new UpdateGuildMessage()
             {
@@ -343,17 +343,17 @@ namespace MultiplayerARPG
             };
         }
 
-        public static void SendSetGuildLevelExpSkillPoint(this LiteNetLibManager.LiteNetLibServer server, long connectionId, ushort msgType, int id, short level, int exp, short skillPoint)
+        public static void SendSetGuildLevelExpSkillPoint(this LiteNetLibManager.LiteNetLibServer server, long connectionId, ushort msgType, int id, int level, int exp, int skillPoint)
         {
             server.SendPacket(connectionId, SOCIAL_MSG_DATA_CHANNEL, DeliveryMethod.ReliableOrdered, msgType, (writer) => writer.Put(MakeSetGuildLevelExpSkillPoint(id, level, exp, skillPoint)));
         }
 
-        public static void SendSetGuildLevelExpSkillPoint(this LiteNetLibManager.LiteNetLibClient client, ushort msgType, int id, short level, int exp, short skillPoint)
+        public static void SendSetGuildLevelExpSkillPoint(this LiteNetLibManager.LiteNetLibClient client, ushort msgType, int id, int level, int exp, int skillPoint)
         {
             client.SendPacket(SOCIAL_MSG_DATA_CHANNEL, DeliveryMethod.ReliableOrdered, msgType, (writer) => writer.Put(MakeSetGuildLevelExpSkillPoint(id, level, exp, skillPoint)));
         }
 
-        public static UpdateGuildMessage MakeSetGuildSkillLevel(int id, int dataId, short level)
+        public static UpdateGuildMessage MakeSetGuildSkillLevel(int id, int dataId, int level)
         {
             return new UpdateGuildMessage()
             {
@@ -364,12 +364,12 @@ namespace MultiplayerARPG
             };
         }
 
-        public static void SendSetGuildSkillLevel(this LiteNetLibManager.LiteNetLibServer server, long connectionId, ushort msgType, int id, int dataId, short level)
+        public static void SendSetGuildSkillLevel(this LiteNetLibManager.LiteNetLibServer server, long connectionId, ushort msgType, int id, int dataId, int level)
         {
             server.SendPacket(connectionId, SOCIAL_MSG_DATA_CHANNEL, DeliveryMethod.ReliableOrdered, msgType, (writer) => writer.Put(MakeSetGuildSkillLevel(id, dataId, level)));
         }
 
-        public static void SendSetGuildSkillLevel(this LiteNetLibManager.LiteNetLibClient client, ushort msgType, int id, int dataId, short level)
+        public static void SendSetGuildSkillLevel(this LiteNetLibManager.LiteNetLibClient client, ushort msgType, int id, int dataId, int level)
         {
             client.SendPacket(SOCIAL_MSG_DATA_CHANNEL, DeliveryMethod.ReliableOrdered, msgType, (writer) => writer.Put(MakeSetGuildSkillLevel(id, dataId, level)));
         }

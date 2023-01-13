@@ -8,7 +8,7 @@ namespace MultiplayerARPG
         private CharacterStats stats;
         public CharacterStats Stats => stats;
         public Dictionary<Attribute, float> Attributes { get; }
-        public Dictionary<BaseSkill, short> Skills { get; }
+        public Dictionary<BaseSkill, int> Skills { get; }
         public Dictionary<DamageElement, float> Resistances { get; }
         public Dictionary<DamageElement, float> Armors { get; }
         public Dictionary<DamageElement, MinMaxFloat> IncreaseDamages { get; }
@@ -22,9 +22,9 @@ namespace MultiplayerARPG
         public float MoveSpeed => stats.moveSpeed;
         public float BaseMoveSpeed { get; private set; }
         public float TotalItemWeight { get; private set; }
-        public short TotalItemSlot { get; private set; }
+        public int TotalItemSlot { get; private set; }
         public float LimitItemWeight { get; private set; }
-        public short LimitItemSlot { get; private set; }
+        public int LimitItemSlot { get; private set; }
         public bool DisallowMove { get; private set; }
         public bool DisallowAttack { get; private set; }
         public bool DisallowUseSkill { get; private set; }
@@ -40,7 +40,7 @@ namespace MultiplayerARPG
             Resistances = new Dictionary<DamageElement, float>();
             Armors = new Dictionary<DamageElement, float>();
             IncreaseDamages = new Dictionary<DamageElement, MinMaxFloat>();
-            Skills = new Dictionary<BaseSkill, short>();
+            Skills = new Dictionary<BaseSkill, int>();
             EquipmentSets = new Dictionary<EquipmentSet, int>();
         }
 
@@ -146,15 +146,15 @@ namespace MultiplayerARPG
             return 0f;
         }
 
-        public short GetSkill(string nameId)
+        public int GetSkill(string nameId)
         {
             return GetSkill(nameId.GenerateHashId());
         }
 
-        public short GetSkill(int dataId)
+        public int GetSkill(int dataId)
         {
             BaseSkill data;
-            short result;
+            int result;
             if (GameInstance.Skills.TryGetValue(dataId, out data) &&
                 Skills.TryGetValue(data, out result))
                 return result;

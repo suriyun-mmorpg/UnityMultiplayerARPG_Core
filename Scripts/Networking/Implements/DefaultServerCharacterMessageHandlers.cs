@@ -52,11 +52,11 @@ namespace MultiplayerARPG
             int indexOfSkill = playerCharacter.IndexOfSkill(request.dataId);
             CharacterSkill characterSkill = playerCharacter.Skills[indexOfSkill];
             BaseSkill skill = characterSkill.GetSkill();
-            short learnLevel = (short)(characterSkill.level - 1);
+            int learnLevel = characterSkill.level - 1;
             float requireSkillPoint = skill.GetRequireCharacterSkillPoint(learnLevel);
             int requireGold = skill.GetRequireCharacterGold(learnLevel);
             Dictionary<Currency, int> requireCurrencies = skill.GetRequireCurrencyAmounts(learnLevel);
-            Dictionary<BaseItem, short> requireItems = skill.GetRequireItemAmounts(learnLevel);
+            Dictionary<BaseItem, int> requireItems = skill.GetRequireItemAmounts(learnLevel);
             playerCharacter.SkillPoint -= requireSkillPoint;
             playerCharacter.Gold -= requireGold;
             playerCharacter.DecreaseCurrencies(requireCurrencies);

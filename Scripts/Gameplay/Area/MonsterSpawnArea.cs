@@ -52,7 +52,7 @@ namespace MultiplayerARPG
             GameInstance.AddCharacterEntities(prefab);
         }
 
-        protected override BaseMonsterCharacterEntity SpawnInternal(BaseMonsterCharacterEntity prefab, short level)
+        protected override BaseMonsterCharacterEntity SpawnInternal(BaseMonsterCharacterEntity prefab, int level)
         {
             Vector3 spawnPosition;
             if (GetRandomPosition(out spawnPosition))

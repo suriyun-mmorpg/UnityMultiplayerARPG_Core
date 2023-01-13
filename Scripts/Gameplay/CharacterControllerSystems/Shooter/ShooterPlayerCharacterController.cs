@@ -1360,7 +1360,7 @@ namespace MultiplayerARPG
             CharacterItem weapon,
             Dictionary<DamageElement, MinMaxFloat> damageAmounts,
             BaseSkill skill,
-            short skillLevel,
+            int skillLevel,
             int randomSeed,
             AimPosition aimPosition,
             Vector3 stagger,
@@ -1474,7 +1474,7 @@ namespace MultiplayerARPG
         protected virtual void UseSkill(string id, AimPosition aimPosition)
         {
             BaseSkill skill;
-            short skillLevel;
+            int skillLevel;
             if (!GameInstance.Skills.TryGetValue(BaseGameData.MakeDataId(id), out skill) || skill == null ||
                 !PlayingCharacterEntity.GetCaches().Skills.TryGetValue(skill, out skillLevel))
                 return;
@@ -1505,7 +1505,7 @@ namespace MultiplayerARPG
                 {
                     GameInstance.ClientInventoryHandlers.RequestUnEquipItem(
                         inventoryType,
-                        (short)itemIndex,
+                        itemIndex,
                         equipWeaponSet,
                         -1,
                         ClientInventoryActions.ResponseUnEquipArmor,
@@ -1525,14 +1525,14 @@ namespace MultiplayerARPG
             {
                 GameInstance.ClientInventoryHandlers.RequestEquipItem(
                         PlayingCharacterEntity,
-                        (short)itemIndex,
+                        itemIndex,
                         HotkeyEquipWeaponSet,
                         ClientInventoryActions.ResponseEquipArmor,
                         ClientInventoryActions.ResponseEquipWeapon);
             }
             else if (item.IsSkill())
             {
-                SetQueueUsingSkill(aimPosition, (item as ISkillItem).UsingSkill, (item as ISkillItem).UsingSkillLevel, (short)itemIndex);
+                SetQueueUsingSkill(aimPosition, (item as ISkillItem).UsingSkill, (item as ISkillItem).UsingSkillLevel, itemIndex);
             }
             else if (item.IsBuilding())
             {
@@ -1551,7 +1551,7 @@ namespace MultiplayerARPG
             }
             else if (item.IsUsable())
             {
-                PlayingCharacterEntity.CallServerUseItem((short)itemIndex);
+                PlayingCharacterEntity.CallServerUseItem(itemIndex);
             }
         }
 

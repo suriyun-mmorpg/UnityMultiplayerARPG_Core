@@ -4,19 +4,19 @@ namespace MultiplayerARPG
 {
     public struct RequestSwapOrMergeItemMessage : INetSerializable
     {
-        public short fromIndex;
-        public short toIndex;
+        public int fromIndex;
+        public int toIndex;
 
         public void Deserialize(NetDataReader reader)
         {
-            fromIndex = reader.GetPackedShort();
-            toIndex = reader.GetPackedShort();
+            fromIndex = reader.GetPackedInt();
+            toIndex = reader.GetPackedInt();
         }
 
         public void Serialize(NetDataWriter writer)
         {
-            writer.PutPackedShort(fromIndex);
-            writer.PutPackedShort(toIndex);
+            writer.PutPackedInt(fromIndex);
+            writer.PutPackedInt(toIndex);
         }
     }
 }

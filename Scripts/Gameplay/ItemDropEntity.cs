@@ -82,7 +82,7 @@ namespace MultiplayerARPG
         public HashSet<string> Looters { get; protected set; }
         public GameSpawnArea<ItemDropEntity> SpawnArea { get; protected set; }
         public ItemDropEntity SpawnPrefab { get; protected set; }
-        public short SpawnLevel { get; protected set; }
+        public int SpawnLevel { get; protected set; }
         public Vector3 SpawnPosition { get; protected set; }
         public float DestroyDelay { get { return destroyDelay; } }
         public float DestroyRespawnDelay { get { return destroyRespawnDelay; } }
@@ -180,12 +180,12 @@ namespace MultiplayerARPG
                         randomItem = CacheRandomItems[Random.Range(0, CacheRandomItems.Count)];
                         if (Random.value > randomItem.dropRate)
                             continue;
-                        DropItems.Add(CharacterItem.Create(randomItem.item.DataId, 1, (short)Random.Range(randomItem.minAmount <= 0 ? 1 : randomItem.minAmount, randomItem.maxAmount)));
+                        DropItems.Add(CharacterItem.Create(randomItem.item.DataId, 1, Random.Range(randomItem.minAmount <= 0 ? 1 : randomItem.minAmount, randomItem.maxAmount)));
                     }
                     if (DropItems.Count == 0)
                     {
                         randomItem = CacheRandomItems[Random.Range(0, CacheRandomItems.Count)];
-                        DropItems.Add(CharacterItem.Create(randomItem.item.DataId, 1, (short)Random.Range(randomItem.minAmount <= 0 ? 1 : randomItem.minAmount, randomItem.maxAmount)));
+                        DropItems.Add(CharacterItem.Create(randomItem.item.DataId, 1, Random.Range(randomItem.minAmount <= 0 ? 1 : randomItem.minAmount, randomItem.maxAmount)));
                     }
                 }
             }
@@ -215,7 +215,7 @@ namespace MultiplayerARPG
             itemDropData.syncMode = LiteNetLibSyncField.SyncMode.ServerToClients;
         }
 
-        public virtual void SetSpawnArea(GameSpawnArea<ItemDropEntity> spawnArea, ItemDropEntity spawnPrefab, short spawnLevel, Vector3 spawnPosition)
+        public virtual void SetSpawnArea(GameSpawnArea<ItemDropEntity> spawnArea, ItemDropEntity spawnPrefab, int spawnLevel, Vector3 spawnPosition)
         {
             SpawnArea = spawnArea;
             SpawnPrefab = spawnPrefab;

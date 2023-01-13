@@ -7,11 +7,11 @@ namespace MultiplayerARPG
         void SendGameMessage(long connectionId, UITextKeys message);
         void NotifyRewardExp(long connectionId, int exp);
         void NotifyRewardGold(long connectionId, int gold);
-        void NotifyRewardItem(long connectionId, int dataId, short amount);
+        void NotifyRewardItem(long connectionId, int dataId, int amount);
         void NotifyRewardCurrency(long connectionId, int dataId, int amount);
         // Storage
         void NotifyStorageItems(long connectionId, List<CharacterItem> storageItems);
-        void NotifyStorageOpened(long connectionId, StorageType storageType, string storageOwnerId, uint objectId, short weightLimit, short slotLimit);
+        void NotifyStorageOpened(long connectionId, StorageType storageType, string storageOwnerId, uint objectId, int weightLimit, int slotLimit);
         void NotifyStorageClosed(long connectionId);
         // Party
         void SendSetPartyData(long connectionId, int id, bool shareExp, bool shareItem, string leaderId);
@@ -37,9 +37,9 @@ namespace MultiplayerARPG
         void SendAddGuildMember(long connectionId, int id, SocialCharacterData member);
         void SendUpdateGuildMember(long connectionId, int id, SocialCharacterData member);
         void SendRemoveGuildMember(long connectionId, int id, string characterId);
-        void SendSetGuildSkillLevel(long connectionId, int id, int dataId, short level);
+        void SendSetGuildSkillLevel(long connectionId, int id, int dataId, int level);
         void SendSetGuildGold(long connectionId, int id, int gold);
-        void SendSetGuildLevelExpSkillPoint(long connectionId, int id, short level, int exp, short skillPoint);
+        void SendSetGuildLevelExpSkillPoint(long connectionId, int id, int level, int exp, int skillPoint);
         void SendNotifyGuildInvitation(long connectionId, GuildInvitationData invitation);
     }
 }

@@ -53,7 +53,7 @@ namespace MultiplayerARPG
                         EquipItem(draggedItemUI);
                         break;
                     case UICharacterItemDragHandler.SourceLocation.StorageItems:
-                        draggedItemUI.uiCharacterItem.OnClickMoveFromStorage(uiCharacterItem.InventoryType, uiCharacterItem.EquipSlotIndex, (short)uiCharacterItem.IndexOfData);
+                        draggedItemUI.uiCharacterItem.OnClickMoveFromStorage(uiCharacterItem.InventoryType, uiCharacterItem.EquipSlotIndex, uiCharacterItem.IndexOfData);
                         break;
                 }
             }
@@ -94,7 +94,7 @@ namespace MultiplayerARPG
             // Can equip the item
             // so tell the server that this client want to equip the item
             GameInstance.ClientInventoryHandlers.RequestEquipItem(
-                (short)draggedItemUI.uiCharacterItem.IndexOfData,
+                draggedItemUI.uiCharacterItem.IndexOfData,
                 uiCharacterItem.InventoryType,
                 uiCharacterItem.EquipSlotIndex,
                 ClientInventoryActions.ResponseEquipArmor,

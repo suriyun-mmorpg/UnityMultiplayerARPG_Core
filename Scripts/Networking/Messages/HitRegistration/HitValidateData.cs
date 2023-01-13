@@ -9,6 +9,6 @@ namespace MultiplayerARPG
         public Dictionary<DamageElement, MinMaxFloat> DamageAmounts { get; set; }
         public CharacterItem Weapon { get; set; }
         public BaseSkill Skill { get; set; }
-        public short SkillLevel { get; set; }
+        public int SkillLevel { get; set; }
     }
 }

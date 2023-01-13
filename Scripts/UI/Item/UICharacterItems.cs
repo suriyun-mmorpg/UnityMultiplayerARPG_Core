@@ -103,23 +103,23 @@ namespace MultiplayerARPG
             }
         }
 
-        public void UpdateData(ICharacterData character, IDictionary<BaseItem, short> items)
+        public void UpdateData(ICharacterData character, IDictionary<BaseItem, int> items)
         {
             Character = character;
             LoadedList.Clear();
-            foreach (KeyValuePair<BaseItem, short> item in items)
+            foreach (KeyValuePair<BaseItem, int> item in items)
             {
                 LoadedList.Add(CharacterItem.Create(item.Key, 1, item.Value));
             }
             GenerateList();
         }
 
-        public void UpdateData(ICharacterData character, IDictionary<int, short> items)
+        public void UpdateData(ICharacterData character, IDictionary<int, int> items)
         {
             Character = character;
             LoadedList.Clear();
             BaseItem tempItem;
-            foreach (KeyValuePair<int, short> item in items)
+            foreach (KeyValuePair<int, int> item in items)
             {
                 if (GameInstance.Items.TryGetValue(item.Key, out tempItem))
                     LoadedList.Add(CharacterItem.Create(tempItem, 1, item.Value));

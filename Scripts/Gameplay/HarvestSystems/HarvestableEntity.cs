@@ -47,7 +47,7 @@ namespace MultiplayerARPG
         public float ColliderDetectionRadius { get { return colliderDetectionRadius; } }
         public GameSpawnArea<HarvestableEntity> SpawnArea { get; protected set; }
         public HarvestableEntity SpawnPrefab { get; protected set; }
-        public short SpawnLevel { get; protected set; }
+        public int SpawnLevel { get; protected set; }
         public Vector3 SpawnPosition { get; protected set; }
         public float DestroyDelay { get { return destroyDelay; } }
         public float DestroyRespawnDelay { get { return destroyRespawnDelay; } }
@@ -77,7 +77,7 @@ namespace MultiplayerARPG
             CurrentHp = MaxHp;
         }
 
-        public virtual void SetSpawnArea(GameSpawnArea<HarvestableEntity> spawnArea, HarvestableEntity spawnPrefab, short spawnLevel, Vector3 spawnPosition)
+        public virtual void SetSpawnArea(GameSpawnArea<HarvestableEntity> spawnArea, HarvestableEntity spawnPrefab, int spawnLevel, Vector3 spawnPosition)
         {
             SpawnArea = spawnArea;
             SpawnPrefab = spawnPrefab;
@@ -106,7 +106,7 @@ namespace MultiplayerARPG
             RPC(AllOnHarvestableDestroy);
         }
 
-        protected override void ApplyReceiveDamage(HitBoxPosition position, Vector3 fromPosition, EntityInfo instigator, Dictionary<DamageElement, MinMaxFloat> damageAmounts, CharacterItem weapon, BaseSkill skill, short skillLevel, int randomSeed, out CombatAmountType combatAmountType, out int totalDamage)
+        protected override void ApplyReceiveDamage(HitBoxPosition position, Vector3 fromPosition, EntityInfo instigator, Dictionary<DamageElement, MinMaxFloat> damageAmounts, CharacterItem weapon, BaseSkill skill, int skillLevel, int randomSeed, out CombatAmountType combatAmountType, out int totalDamage)
         {
             BaseCharacterEntity attackerCharacter;
             instigator.TryGetEntity(out attackerCharacter);
@@ -149,7 +149,7 @@ namespace MultiplayerARPG
             {
                 ItemDropByWeight receivingItem = itemRandomizer.TakeOne();
                 int itemDataId = receivingItem.item.DataId;
-                short itemAmount = (short)(receivingItem.amountPerDamage * calculatingTotalDamage);
+                int itemAmount = (int)(receivingItem.amountPerDamage * calculatingTotalDamage);
                 bool droppingToGround = collectType == HarvestableCollectType.DropToGround;
 
                 if (attackerCharacter != null)
@@ -181,7 +181,7 @@ namespace MultiplayerARPG
             CurrentHp -= totalDamage;
         }
 
-        public override void ReceivedDamage(HitBoxPosition position, Vector3 fromPosition, EntityInfo instigator, Dictionary<DamageElement, MinMaxFloat> damageAmounts, CombatAmountType combatAmountType, int totalDamage, CharacterItem weapon, BaseSkill skill, short skillLevel, CharacterBuff buff, bool isDamageOverTime = false)
+        public override void ReceivedDamage(HitBoxPosition position, Vector3 fromPosition, EntityInfo instigator, Dictionary<DamageElement, MinMaxFloat> damageAmounts, CombatAmountType combatAmountType, int totalDamage, CharacterItem weapon, BaseSkill skill, int skillLevel, CharacterBuff buff, bool isDamageOverTime = false)
         {
             base.ReceivedDamage(position, fromPosition, instigator, damageAmounts, combatAmountType, totalDamage, weapon, skill, skillLevel, buff, isDamageOverTime);
             BaseCharacterEntity attackerCharacter;

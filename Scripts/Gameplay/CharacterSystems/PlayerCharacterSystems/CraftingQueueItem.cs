@@ -8,14 +8,14 @@ namespace MultiplayerARPG
     {
         public uint crafterId;
         public int dataId;
-        public short amount;
+        public int amount;
         public float craftRemainsDuration;
 
         public void Serialize(NetDataWriter writer)
         {
             writer.PutPackedUInt(crafterId);
             writer.PutPackedInt(dataId);
-            writer.PutPackedShort(amount);
+            writer.PutPackedInt(amount);
             writer.Put(craftRemainsDuration);
         }
 
@@ -23,7 +23,7 @@ namespace MultiplayerARPG
         {
             crafterId = reader.GetPackedUInt();
             dataId = reader.GetPackedInt();
-            amount = reader.GetPackedShort();
+            amount = reader.GetPackedInt();
             craftRemainsDuration = reader.GetFloat();
         }
     }

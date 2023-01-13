@@ -233,8 +233,8 @@ namespace MultiplayerARPG
                 }
                 if (commandKey.ToLower().Equals(Level.ToLower()))
                 {
-                    short amount;
-                    if (!short.TryParse(data[1], out amount) || amount <= 0)
+                    int amount;
+                    if (!int.TryParse(data[1], out amount) || amount <= 0)
                     {
                         response = "Wrong input data";
                     }
@@ -272,8 +272,8 @@ namespace MultiplayerARPG
                 }
                 if (commandKey.ToLower().Equals(Gold.ToLower()))
                 {
-                    short amount;
-                    if (!short.TryParse(data[1], out amount) || amount <= 0)
+                    int amount;
+                    if (!int.TryParse(data[1], out amount) || amount <= 0)
                     {
                         response = "Wrong input data";
                     }
@@ -297,8 +297,8 @@ namespace MultiplayerARPG
                             break;
                         }
                     }
-                    short amount;
-                    if (!short.TryParse(data[2], out amount) || amount <= 0)
+                    int amount;
+                    if (!int.TryParse(data[2], out amount) || amount <= 0)
                     {
                         response = "Wrong input data";
                     }
@@ -324,8 +324,8 @@ namespace MultiplayerARPG
                 if (commandKey.ToLower().Equals(GiveGold.ToLower()))
                 {
                     receiver = data[1];
-                    short amount;
-                    if (!short.TryParse(data[2], out amount) || amount <= 0)
+                    int amount;
+                    if (!int.TryParse(data[2], out amount) || amount <= 0)
                     {
                         response = "Wrong input data";
                     }
@@ -350,8 +350,8 @@ namespace MultiplayerARPG
                             break;
                         }
                     }
-                    short amount;
-                    if (!short.TryParse(data[3], out amount) || amount <= 0)
+                    int amount;
+                    if (!int.TryParse(data[3], out amount) || amount <= 0)
                     {
                         response = "Wrong input data";
                     }
@@ -484,13 +484,13 @@ namespace MultiplayerARPG
                             break;
                         }
                     }
-                    short level;
+                    int level;
                     int amount;
                     if (targetMonster == null)
                     {
                         response = "Cannot find the monster";
                     }
-                    else if (!short.TryParse(data[2], out level) || !int.TryParse(data[3], out amount))
+                    else if (!int.TryParse(data[2], out level) || !int.TryParse(data[3], out amount))
                     {
                         response = "Wrong input data";
                     }

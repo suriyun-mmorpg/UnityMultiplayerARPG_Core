@@ -4,19 +4,19 @@ namespace MultiplayerARPG
 {
     public struct RequestDismantleItemMessage : INetSerializable
     {
-        public short index;
-        public short amount;
+        public int index;
+        public int amount;
 
         public void Deserialize(NetDataReader reader)
         {
-            index = reader.GetPackedShort();
-            amount = reader.GetPackedShort();
+            index = reader.GetPackedInt();
+            amount = reader.GetPackedInt();
         }
 
         public void Serialize(NetDataWriter writer)
         {
-            writer.PutPackedShort(index);
-            writer.PutPackedShort(amount);
+            writer.PutPackedInt(index);
+            writer.PutPackedInt(amount);
         }
     }
 }

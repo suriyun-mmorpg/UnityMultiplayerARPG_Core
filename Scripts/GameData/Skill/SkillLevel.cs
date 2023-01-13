@@ -6,15 +6,15 @@ namespace MultiplayerARPG
     public struct SkillLevel
     {
         public BaseSkill skill;
-        public short level;
+        public int level;
     }
 
     [System.Serializable]
     public struct SkillRandomLevel
     {
         public BaseSkill skill;
-        public short minLevel;
-        public short maxLevel;
+        public int minLevel;
+        public int maxLevel;
         [Range(0, 1f)]
         public float applyRate;
 
@@ -28,7 +28,7 @@ namespace MultiplayerARPG
             return new SkillLevel()
             {
                 skill = skill,
-                level = (short)random.RandomInt(minLevel, maxLevel),
+                level = random.RandomInt(minLevel, maxLevel),
             };
         }
     }

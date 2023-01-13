@@ -12,7 +12,7 @@ namespace MultiplayerARPG
     {
         [Category("Skill Settings")]
         [Range(1, 100)]
-        public short maxLevel = 1;
+        public int maxLevel = 1;
         public bool cannotReset = false;
 
         [Category(2, "Activation Settings")]
@@ -70,7 +70,7 @@ namespace MultiplayerARPG
         public RequireAmmoType requireAmmoType;
         [FormerlySerializedAs("useAmmoAmount")]
         [Tooltip("It will be used while `Require Ammo Type` is `Based On Weapon` to decrease ammo")]
-        public short requireAmmoAmount;
+        public int requireAmmoAmount;
         [Tooltip("If this list is empty it won't decrease ammo items from inventory. It will decrease one kind of item in this list when using skill, not all items in this list")]
         public AmmoTypeAmount[] requireAmmos;
 
@@ -257,7 +257,7 @@ namespace MultiplayerARPG
             get { return skillCastEffects; }
         }
 
-        public float GetCastDuration(short skillLevel)
+        public float GetCastDuration(int skillLevel)
         {
             return castDuration.GetAmount(skillLevel);
         }
@@ -267,52 +267,52 @@ namespace MultiplayerARPG
             get { return damageHitEffects; }
         }
 
-        public int GetConsumeHp(short level)
+        public int GetConsumeHp(int level)
         {
             return consumeHp.GetAmount(level);
         }
 
-        public int GetConsumeMp(short level)
+        public int GetConsumeMp(int level)
         {
             return consumeMp.GetAmount(level);
         }
 
-        public int GetConsumeStamina(short level)
+        public int GetConsumeStamina(int level)
         {
             return consumeStamina.GetAmount(level);
         }
 
-        public float GetConsumeHpRate(short level)
+        public float GetConsumeHpRate(int level)
         {
             return consumeHpRate.GetAmount(level);
         }
 
-        public float GetConsumeMpRate(short level)
+        public float GetConsumeMpRate(int level)
         {
             return consumeMpRate.GetAmount(level);
         }
 
-        public float GetConsumeStaminaRate(short level)
+        public float GetConsumeStaminaRate(int level)
         {
             return consumeStaminaRate.GetAmount(level);
         }
 
-        public int GetTotalConsumeHp(short level, ICharacterData character)
+        public int GetTotalConsumeHp(int level, ICharacterData character)
         {
             return (int)(character.GetCaches().MaxHp * GetConsumeHpRate(level)) + GetConsumeHp(level);
         }
 
-        public int GetTotalConsumeMp(short level, ICharacterData character)
+        public int GetTotalConsumeMp(int level, ICharacterData character)
         {
             return (int)(character.GetCaches().MaxMp * GetConsumeMpRate(level)) + GetConsumeMp(level);
         }
 
-        public int GetTotalConsumeStamina(short level, ICharacterData character)
+        public int GetTotalConsumeStamina(int level, ICharacterData character)
         {
             return (int)(character.GetCaches().MaxStamina * GetConsumeStaminaRate(level)) + GetConsumeStamina(level);
         }
 
-        public float GetCoolDownDuration(short level)
+        public float GetCoolDownDuration(int level)
         {
             float duration = coolDownDuration.GetAmount(level);
             if (duration < 0f)
@@ -320,56 +320,56 @@ namespace MultiplayerARPG
             return duration;
         }
 
-        public bool IsDisallowToLevelUp(short level)
+        public bool IsDisallowToLevelUp(int level)
         {
             if (level >= requirementEachLevels.Count)
                 return requirementEachLevels[requirementEachLevels.Count - 1].disallow;
             return requirementEachLevels[level].disallow;
         }
 
-        public short GetRequireCharacterLevel(short level)
+        public int GetRequireCharacterLevel(int level)
         {
             if (level >= requirementEachLevels.Count)
                 return requirementEachLevels[requirementEachLevels.Count - 1].characterLevel;
             return requirementEachLevels[level].characterLevel;
         }
 
-        public float GetRequireCharacterSkillPoint(short level)
+        public float GetRequireCharacterSkillPoint(int level)
         {
             if (level >= requirementEachLevels.Count)
                 return requirementEachLevels[requirementEachLevels.Count - 1].skillPoint;
             return requirementEachLevels[level].skillPoint;
         }
 
-        public int GetRequireCharacterGold(short level)
+        public int GetRequireCharacterGold(int level)
         {
             if (level >= requirementEachLevels.Count)
                 return requirementEachLevels[requirementEachLevels.Count - 1].gold;
             return requirementEachLevels[level].gold;
         }
 
-        public Dictionary<Attribute, float> GetRequireAttributeAmounts(short level)
+        public Dictionary<Attribute, float> GetRequireAttributeAmounts(int level)
         {
             if (level >= requirementEachLevels.Count)
                 return GameDataHelpers.CombineAttributes(requirementEachLevels[requirementEachLevels.Count - 1].attributeAmounts, null, 1f);
             return GameDataHelpers.CombineAttributes(requirementEachLevels[level].attributeAmounts, null, 1f);
         }
 
-        public Dictionary<BaseSkill, short> GetRequireSkillLevels(short level)
+        public Dictionary<BaseSkill, int> GetRequireSkillLevels(int level)
         {
             if (level >= requirementEachLevels.Count)
                 return GameDataHelpers.CombineSkills(requirementEachLevels[requirementEachLevels.Count - 1].skillLevels, null);
             return GameDataHelpers.CombineSkills(requirementEachLevels[level].skillLevels, null);
         }
 
-        public Dictionary<Currency, int> GetRequireCurrencyAmounts(short level)
+        public Dictionary<Currency, int> GetRequireCurrencyAmounts(int level)
         {
             if (level >= requirementEachLevels.Count)
                 return GameDataHelpers.CombineCurrencies(requirementEachLevels[requirementEachLevels.Count - 1].currencyAmounts, null);
             return GameDataHelpers.CombineCurrencies(requirementEachLevels[level].currencyAmounts, null);
         }
 
-        public Dictionary<BaseItem, short> GetRequireItemAmounts(short level)
+        public Dictionary<BaseItem, int> GetRequireItemAmounts(int level)
         {
             if (level >= requirementEachLevels.Count)
                 return GameDataHelpers.CombineItems(requirementEachLevels[requirementEachLevels.Count - 1].itemAmounts, null);
@@ -378,7 +378,7 @@ namespace MultiplayerARPG
 
         public bool IsAvailable(ICharacterData character)
         {
-            short skillLevel;
+            int skillLevel;
             return character.GetCaches().Skills.TryGetValue(this, out skillLevel) && skillLevel > 0;
         }
 
@@ -386,13 +386,13 @@ namespace MultiplayerARPG
         public virtual bool IsAttack { get { return false; } }
         public virtual bool IsBuff { get { return false; } }
         public virtual bool IsDebuff { get { return false; } }
-        public abstract float GetCastDistance(BaseCharacterEntity skillUser, short skillLevel, bool isLeftHand);
-        public abstract float GetCastFov(BaseCharacterEntity skillUser, short skillLevel, bool isLeftHand);
-        public abstract KeyValuePair<DamageElement, MinMaxFloat> GetBaseAttackDamageAmount(ICharacterData skillUser, short skillLevel, bool isLeftHand);
-        public abstract Dictionary<DamageElement, float> GetAttackWeaponDamageInflictions(ICharacterData skillUser, short skillLevel);
-        public abstract Dictionary<DamageElement, MinMaxFloat> GetAttackAdditionalDamageAmounts(ICharacterData skillUser, short skillLevel);
+        public abstract float GetCastDistance(BaseCharacterEntity skillUser, int skillLevel, bool isLeftHand);
+        public abstract float GetCastFov(BaseCharacterEntity skillUser, int skillLevel, bool isLeftHand);
+        public abstract KeyValuePair<DamageElement, MinMaxFloat> GetBaseAttackDamageAmount(ICharacterData skillUser, int skillLevel, bool isLeftHand);
+        public abstract Dictionary<DamageElement, float> GetAttackWeaponDamageInflictions(ICharacterData skillUser, int skillLevel);
+        public abstract Dictionary<DamageElement, MinMaxFloat> GetAttackAdditionalDamageAmounts(ICharacterData skillUser, int skillLevel);
         public virtual bool RequiredTarget { get { return false; } }
-        public virtual bool IsIncreaseAttackDamageAmountsWithBuffs(ICharacterData skillUser, short skillLevel) { return false; }
+        public virtual bool IsIncreaseAttackDamageAmountsWithBuffs(ICharacterData skillUser, int skillLevel) { return false; }
         public virtual HarvestType GetHarvestType() { return HarvestType.None; }
         public virtual IncrementalMinMaxFloat GetHarvestDamageAmount() { return new IncrementalMinMaxFloat(); }
         public virtual bool HasCustomAimControls() { return false; }
@@ -420,7 +420,7 @@ namespace MultiplayerARPG
             get { return SkillType == SkillType.CraftItem; }
         }
 
-        public Dictionary<DamageElement, MinMaxFloat> GetAttackDamages(ICharacterData skillUser, short skillLevel, bool isLeftHand)
+        public Dictionary<DamageElement, MinMaxFloat> GetAttackDamages(ICharacterData skillUser, int skillLevel, bool isLeftHand)
         {
             Dictionary<DamageElement, MinMaxFloat> damageAmounts = new Dictionary<DamageElement, MinMaxFloat>();
 
@@ -478,7 +478,7 @@ namespace MultiplayerARPG
         /// <returns></returns>
         public void ApplySkill(
             BaseCharacterEntity skillUser,
-            short skillLevel,
+            int skillLevel,
             bool isLeftHand,
             CharacterItem weapon,
             int hitIndex,
@@ -529,7 +529,7 @@ namespace MultiplayerARPG
         /// <returns></returns>
         protected abstract void ApplySkillImplement(
             BaseCharacterEntity skillUser,
-            short skillLevel,
+            int skillLevel,
             bool isLeftHand,
             CharacterItem weapon,
             int hitIndex,
@@ -551,7 +551,7 @@ namespace MultiplayerARPG
         /// <returns></returns>
         public virtual bool OnAttack(
             BaseCharacterEntity skillUser,
-            short skillLevel,
+            int skillLevel,
             bool isLeftHand,
             CharacterItem weapon,
             int hitIndex,
@@ -561,7 +561,7 @@ namespace MultiplayerARPG
             return false;
         }
 
-        public virtual bool CanLevelUp(IPlayerCharacterData character, short level, out UITextKeys gameMessage, bool checkSkillPoint = true, bool checkGold = true)
+        public virtual bool CanLevelUp(IPlayerCharacterData character, int level, out UITextKeys gameMessage, bool checkSkillPoint = true, bool checkGold = true)
         {
             gameMessage = UITextKeys.NONE;
             if (character == null || !character.GetDatabase().CacheSkillLevels.ContainsKey(this))
@@ -601,7 +601,7 @@ namespace MultiplayerARPG
             }
 
             // Check is it pass skill level requirement or not
-            Dictionary<BaseSkill, short> currentSkillLevels;
+            Dictionary<BaseSkill, int> currentSkillLevels;
             if (!character.HasEnoughSkillLevels(GetRequireSkillLevels(level), false, out gameMessage, out currentSkillLevels))
                 return false;
 
@@ -620,7 +620,7 @@ namespace MultiplayerARPG
             return true;
         }
 
-        public virtual bool CanUse(BaseCharacterEntity character, short level, bool isLeftHand, uint targetObjectId, out UITextKeys gameMessage, bool isItem = false)
+        public virtual bool CanUse(BaseCharacterEntity character, int level, bool isLeftHand, uint targetObjectId, out UITextKeys gameMessage, bool isItem = false)
         {
             gameMessage = UITextKeys.NONE;
             if (character == null)
@@ -778,8 +778,9 @@ namespace MultiplayerARPG
         /// </summary>
         /// <param name="character"></param>
         /// <param name="itemDataId"></param>
+        /// <param name="amount"></param>
         /// <returns></returns>
-        protected bool HasEnoughItems(BaseCharacterEntity character, out int itemDataId, out short amount)
+        protected bool HasEnoughItems(BaseCharacterEntity character, out int itemDataId, out int amount)
         {
             itemDataId = 0;
             amount = 0;
@@ -805,7 +806,7 @@ namespace MultiplayerARPG
         /// <param name="ammoType"></param>
         /// <param name="amount"></param>
         /// <returns></returns>
-        protected bool HasEnoughAmmos(BaseCharacterEntity character, bool isLeftHand, out AmmoType ammoType, out short amount)
+        protected bool HasEnoughAmmos(BaseCharacterEntity character, bool isLeftHand, out AmmoType ammoType, out int amount)
         {
             ammoType = null;
             amount = 0;
@@ -833,7 +834,7 @@ namespace MultiplayerARPG
         protected bool DecreaseItems(BaseCharacterEntity character)
         {
             int itemDataId;
-            short amount;
+            int amount;
             if (HasEnoughItems(character, out itemDataId, out amount))
             {
                 if (itemDataId == 0 || amount == 0)
@@ -854,7 +855,7 @@ namespace MultiplayerARPG
         {
             increaseDamages = null;
             AmmoType ammoType;
-            short amount;
+            int amount;
             switch (requireAmmoType)
             {
                 case RequireAmmoType.BasedOnWeapon:
@@ -886,7 +887,7 @@ namespace MultiplayerARPG
         public void MakeRequirementEachLevels()
         {
             requirementEachLevels.Clear();
-            for (short i = 1; i <= maxLevel; ++i)
+            for (int i = 1; i <= maxLevel; ++i)
             {
                 requirementEachLevels.Add(new SkillRequirementEntry()
                 {

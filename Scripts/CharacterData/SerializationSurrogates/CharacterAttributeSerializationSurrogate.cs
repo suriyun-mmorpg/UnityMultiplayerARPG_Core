@@ -22,7 +22,7 @@ namespace MultiplayerARPG
         {
             CharacterAttribute data = (CharacterAttribute)obj;
             data.dataId = info.GetInt32("dataId");
-            data.amount = info.GetInt16("amount");
+            data.amount = info.GetInt32("amount");
             obj = data;
             return obj;
         }

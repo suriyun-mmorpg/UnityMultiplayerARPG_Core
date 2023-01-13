@@ -8,9 +8,9 @@ namespace MultiplayerARPG
         public const byte LeaderRole = 0;
 
         public string guildName;
-        public short level;
+        public int level;
         public int exp;
-        public short skillPoint;
+        public int skillPoint;
         public string guildMessage;
         public string guildMessage2;
         public int gold;
@@ -20,7 +20,7 @@ namespace MultiplayerARPG
         public int rank;
         private List<GuildRoleData> roles;
         private Dictionary<string, byte> memberRoles;
-        private Dictionary<int, short> skillLevels;
+        private Dictionary<int, int> skillLevels;
         private bool isCached;
 
         private int increaseMaxMember;
@@ -107,7 +107,7 @@ namespace MultiplayerARPG
             autoAcceptRequests = false;
             rank = 0;
             memberRoles = new Dictionary<string, byte>();
-            skillLevels = new Dictionary<int, short>();
+            skillLevels = new Dictionary<int, int>();
         }
 
         public GuildData(int id)
@@ -294,12 +294,12 @@ namespace MultiplayerARPG
             return result;
         }
 
-        public IEnumerable<KeyValuePair<int, short>> GetSkillLevels()
+        public IEnumerable<KeyValuePair<int, int>> GetSkillLevels()
         {
             return skillLevels;
         }
 
-        public short GetSkillLevel(int dataId)
+        public int GetSkillLevel(int dataId)
         {
             if (GameInstance.GuildSkills.ContainsKey(dataId) && skillLevels.ContainsKey(dataId))
                 return skillLevels[dataId];
@@ -317,7 +317,7 @@ namespace MultiplayerARPG
         {
             if (GameInstance.GuildSkills.ContainsKey(dataId))
             {
-                short level = (short)(skillLevels.ContainsKey(dataId) ? skillLevels[dataId] : 0);
+                int level = (skillLevels.ContainsKey(dataId) ? skillLevels[dataId] : 0);
                 level += 1;
                 skillPoint -= 1;
                 skillLevels[dataId] = level;
@@ -325,7 +325,7 @@ namespace MultiplayerARPG
             }
         }
 
-        public void SetSkillLevel(int dataId, short level)
+        public void SetSkillLevel(int dataId, int level)
         {
             if (GameInstance.GuildSkills.ContainsKey(dataId))
             {
@@ -347,8 +347,8 @@ namespace MultiplayerARPG
             decreaseExpLostPercentage = 0;
 
             GuildSkill tempGuildSkill;
-            short tempLevel;
-            foreach (KeyValuePair<int, short> skill in skillLevels)
+            int tempLevel;
+            foreach (KeyValuePair<int, int> skill in skillLevels)
             {
                 tempLevel = skill.Value;
                 if (!GameInstance.GuildSkills.TryGetValue(skill.Key, out tempGuildSkill) || tempLevel <= 0)
@@ -392,9 +392,9 @@ namespace MultiplayerARPG
         {
             base.Serialize(writer);
             writer.Put(guildName);
-            writer.PutPackedShort(level);
+            writer.PutPackedInt(level);
             writer.PutPackedInt(exp);
-            writer.PutPackedShort(skillPoint);
+            writer.PutPackedInt(skillPoint);
             writer.Put(guildMessage);
             writer.Put(guildMessage2);
             writer.PutPackedInt(score);
@@ -411,9 +411,9 @@ namespace MultiplayerARPG
         {
             base.Deserialize(reader);
             guildName = reader.GetString();
-            level = reader.GetPackedShort();
+            level = reader.GetPackedInt();
             exp = reader.GetPackedInt();
-            skillPoint = reader.GetPackedShort();
+            skillPoint = reader.GetPackedInt();
             guildMessage = reader.GetString();
             guildMessage2 = reader.GetString();
             score = reader.GetPackedInt();
@@ -423,7 +423,7 @@ namespace MultiplayerARPG
             rank = reader.GetPackedInt();
             roles = reader.GetList<GuildRoleData>();
             memberRoles = reader.GetDictionary<string, byte>();
-            skillLevels = reader.GetDictionary<int, short>();
+            skillLevels = reader.GetDictionary<int, int>();
         }
     }
 }

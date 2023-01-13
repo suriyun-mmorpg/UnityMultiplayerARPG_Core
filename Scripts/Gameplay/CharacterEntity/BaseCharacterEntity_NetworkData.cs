@@ -12,7 +12,7 @@ namespace MultiplayerARPG
         [SerializeField]
         protected SyncFieldString id = new SyncFieldString();
         [SerializeField]
-        protected SyncFieldShort level = new SyncFieldShort();
+        protected SyncFieldInt level = new SyncFieldInt();
         [SerializeField]
         protected SyncFieldInt exp = new SyncFieldInt();
         [SerializeField]
@@ -52,7 +52,7 @@ namespace MultiplayerARPG
         #region Fields/Interface implementation
         public string Id { get { return id.Value; } set { id.Value = value; } }
         public string CharacterName { get { return syncTitle.Value; } set { syncTitle.Value = value; } }
-        public short Level { get { return level.Value; } set { level.Value = value; } }
+        public int Level { get { return level.Value; } set { level.Value = value; } }
         public int Exp { get { return exp.Value; } set { exp.Value = value; } }
         public int CurrentMp { get { return currentMp.Value; } set { currentMp.Value = value; } }
         public int CurrentStamina { get { return currentStamina.Value; } set { currentStamina.Value = value; } }
@@ -326,7 +326,7 @@ namespace MultiplayerARPG
         /// </summary>
         /// <param name="isInitial"></param>
         /// <param name="level"></param>
-        private void OnLevelChange(bool isInitial, short level)
+        private void OnLevelChange(bool isInitial, int level)
         {
             isRecaching = true;
 

@@ -4,7 +4,7 @@ namespace MultiplayerARPG
 {
     public partial class BasePlayerCharacterEntity
     {
-        public bool ValidateRequestUseItem(short itemIndex)
+        public bool ValidateRequestUseItem(int itemIndex)
         {
             if (!CanUseItem())
                 return false;
@@ -37,7 +37,7 @@ namespace MultiplayerARPG
             return true;
         }
 
-        public bool CallServerUseItem(short index)
+        public bool CallServerUseItem(int index)
         {
             if (!ValidateRequestUseItem(index))
                 return false;
@@ -89,7 +89,7 @@ namespace MultiplayerARPG
             return true;
         }
 
-        public bool CallServerAppendCraftingQueueItem(uint sourceObjectId, int dataId, short amount)
+        public bool CallServerAppendCraftingQueueItem(uint sourceObjectId, int dataId, int amount)
         {
             if (!CurrentGameplayRule.CanInteractEntity(this, sourceObjectId))
                 return false;
@@ -97,7 +97,7 @@ namespace MultiplayerARPG
             return true;
         }
 
-        public bool CallServerChangeCraftingQueueItem(uint sourceObjectId, int indexOfData, short amount)
+        public bool CallServerChangeCraftingQueueItem(uint sourceObjectId, int indexOfData, int amount)
         {
             if (!CurrentGameplayRule.CanInteractEntity(this, sourceObjectId))
                 return false;

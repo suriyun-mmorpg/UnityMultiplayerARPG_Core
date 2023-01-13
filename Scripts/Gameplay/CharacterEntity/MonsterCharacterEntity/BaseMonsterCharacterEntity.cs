@@ -84,7 +84,7 @@ namespace MultiplayerARPG
 
         public BaseMonsterCharacterEntity SpawnPrefab { get; protected set; }
 
-        public short SpawnLevel { get; protected set; }
+        public int SpawnLevel { get; protected set; }
 
         public Vector3 SpawnPosition { get; protected set; }
 
@@ -228,7 +228,7 @@ namespace MultiplayerARPG
             CurrentWater = (int)stats.water;
         }
 
-        public void SetSpawnArea(GameSpawnArea<BaseMonsterCharacterEntity> spawnArea, BaseMonsterCharacterEntity spawnPrefab, short spawnLevel, Vector3 spawnPosition)
+        public void SetSpawnArea(GameSpawnArea<BaseMonsterCharacterEntity> spawnArea, BaseMonsterCharacterEntity spawnPrefab, int spawnLevel, Vector3 spawnPosition)
         {
             SpawnArea = spawnArea;
             SpawnPrefab = spawnPrefab;
@@ -286,7 +286,7 @@ namespace MultiplayerARPG
             return base.GetMoveSpeed();
         }
 
-        public override void ReceivedDamage(HitBoxPosition position, Vector3 fromPosition, EntityInfo instigator, Dictionary<DamageElement, MinMaxFloat> damageAmounts, CombatAmountType damageAmountType, int totalDamage, CharacterItem weapon, BaseSkill skill, short skillLevel, CharacterBuff buff, bool isDamageOverTime = false)
+        public override void ReceivedDamage(HitBoxPosition position, Vector3 fromPosition, EntityInfo instigator, Dictionary<DamageElement, MinMaxFloat> damageAmounts, CombatAmountType damageAmountType, int totalDamage, CharacterItem weapon, BaseSkill skill, int skillLevel, CharacterBuff buff, bool isDamageOverTime = false)
         {
             RecordRecivingDamage(instigator, totalDamage);
             base.ReceivedDamage(position, fromPosition, instigator, damageAmounts, damageAmountType, totalDamage, weapon, skill, skillLevel, buff, isDamageOverTime);
@@ -603,7 +603,7 @@ namespace MultiplayerARPG
             looters.Clear();
         }
 
-        private void OnRandomDropItem(BaseItem item, short amount)
+        private void OnRandomDropItem(BaseItem item, int amount)
         {
             // Drop item to the ground
             if (amount > item.MaxStack)
@@ -641,7 +641,7 @@ namespace MultiplayerARPG
             OnRespawn();
         }
 
-        public void Summon(BaseCharacterEntity summoner, SummonType summonType, short level)
+        public void Summon(BaseCharacterEntity summoner, SummonType summonType, int level)
         {
             Summoner = summoner;
             SummonType = summonType;

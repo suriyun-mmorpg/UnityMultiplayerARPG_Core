@@ -5,21 +5,21 @@ namespace MultiplayerARPG
     public struct RequestRemoveEnhancerFromItemMessage : INetSerializable
     {
         public InventoryType inventoryType;
-        public short index;
-        public short socketIndex;
+        public int index;
+        public int socketIndex;
 
         public void Deserialize(NetDataReader reader)
         {
             inventoryType = (InventoryType)reader.GetByte();
-            index = reader.GetPackedShort();
-            socketIndex = reader.GetPackedShort();
+            index = reader.GetPackedInt();
+            socketIndex = reader.GetPackedInt();
         }
 
         public void Serialize(NetDataWriter writer)
         {
             writer.Put((byte)inventoryType);
-            writer.PutPackedShort(index);
-            writer.PutPackedShort(socketIndex);
+            writer.PutPackedInt(index);
+            writer.PutPackedInt(socketIndex);
         }
     }
 }

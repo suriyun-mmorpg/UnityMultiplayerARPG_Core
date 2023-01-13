@@ -81,7 +81,7 @@ namespace MultiplayerARPG
             newMessage.text = ZString.Format(LanguageManager.GetText(formatKeyRewardGold.ToString()), gold);
         }
 
-        private void OnNotifyRewardItem(int dataId, short amount)
+        private void OnNotifyRewardItem(int dataId, int amount)
         {
             BaseItem item;
             if (rewardItemPrefab == null || !GameInstance.Items.TryGetValue(dataId, out item))

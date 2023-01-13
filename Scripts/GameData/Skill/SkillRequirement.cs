@@ -4,7 +4,7 @@
     public class SkillRequirement
     {
         public bool disallow;
-        public IncrementalShort characterLevel = new IncrementalShort() { baseAmount = 0, amountIncreaseEachLevel = 0 };
+        public IncrementalInt characterLevel = new IncrementalInt() { baseAmount = 0, amountIncreaseEachLevel = 0 };
         public IncrementalFloat skillPoint = new IncrementalFloat() { baseAmount = 1, amountIncreaseEachLevel = 0 };
         public IncrementalInt gold = new IncrementalInt() { baseAmount = 0, amountIncreaseEachLevel = 0 };
         [ArrayElementTitle("attribute")]

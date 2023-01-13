@@ -7,7 +7,7 @@ namespace MultiplayerARPG
     {
         public int Id { get; set; }
         public string GuildName { get; set; }
-        public short Level { get; set; }
+        public int Level { get; set; }
         public GuildListFieldOptions FieldOptions { get; set; }
         public string GuildMessage { get; set; }
         public string GuildMessage2 { get; set; }
@@ -22,7 +22,7 @@ namespace MultiplayerARPG
         {
             writer.PutPackedInt(Id);
             writer.Put(GuildName);
-            writer.PutPackedShort(Level);
+            writer.PutPackedInt(Level);
             writer.PutPackedInt((int)FieldOptions);
             if (FieldOptions.Has(GuildListFieldOptions.GuildMessage))
                 writer.Put(GuildMessage);
@@ -46,7 +46,7 @@ namespace MultiplayerARPG
         {
             Id = reader.GetPackedInt();
             GuildName = reader.GetString();
-            Level = reader.GetPackedShort();
+            Level = reader.GetPackedInt();
             FieldOptions = (GuildListFieldOptions)reader.GetPackedInt();
             if (FieldOptions.Has(GuildListFieldOptions.GuildMessage))
                 GuildMessage = reader.GetString();

@@ -5,7 +5,7 @@ namespace MultiplayerARPG
     public interface ICharacterUseSkillComponent
     {
         BaseSkill UsingSkill { get; }
-        short UsingSkillLevel { get; }
+        int UsingSkillLevel { get; }
         bool IsCastingSkillCanBeInterrupted { get; }
         bool IsCastingSkillInterrupted { get; }
         float CastingSkillDuration { get; }
@@ -21,7 +21,7 @@ namespace MultiplayerARPG
         void CancelSkill();
         void ClearUseSkillStates();
         void UseSkill(int dataId, bool isLeftHand, uint targetObjectId, AimPosition aimPosition);
-        void UseSkillItem(short itemIndex, bool isLeftHand, uint targetObjectId, AimPosition aimPosition);
+        void UseSkillItem(int itemIndex, bool isLeftHand, uint targetObjectId, AimPosition aimPosition);
         /// <summary>
         /// Return `TRUE` if it have something written
         /// </summary>

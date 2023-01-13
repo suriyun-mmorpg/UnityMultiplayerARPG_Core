@@ -33,9 +33,9 @@ namespace MultiplayerARPG
         public bool canInvite;
         public bool canKick;
         public byte shareExpPercentage;
-        public short level;
+        public int level;
         public int exp;
-        public short skillPoint;
+        public int skillPoint;
         public int gold;
         public int score;
         public string options;
@@ -46,7 +46,7 @@ namespace MultiplayerARPG
         public void Deserialize(NetDataReader reader)
         {
             type = (UpdateType)reader.GetByte();
-            id = reader.GetInt();
+            id = reader.GetPackedInt();
             switch (type)
             {
                 case UpdateType.Create:
@@ -72,14 +72,14 @@ namespace MultiplayerARPG
                     guildRole = reader.GetByte();
                     break;
                 case UpdateType.SetSkillLevel:
-                    dataId = reader.GetInt();
-                    level = reader.GetShort();
+                    dataId = reader.GetPackedInt();
+                    level = reader.GetPackedInt();
                     break;
                 case UpdateType.SetGold:
-                    gold = reader.GetInt();
+                    gold = reader.GetPackedInt();
                     break;
                 case UpdateType.SetScore:
-                    score = reader.GetInt();
+                    score = reader.GetPackedInt();
                     break;
                 case UpdateType.SetOptions:
                     options = reader.GetString();
@@ -88,12 +88,12 @@ namespace MultiplayerARPG
                     autoAcceptRequests = reader.GetBool();
                     break;
                 case UpdateType.SetRank:
-                    rank = reader.GetInt();
+                    rank = reader.GetPackedInt();
                     break;
                 case UpdateType.LevelExpSkillPoint:
-                    level = reader.GetShort();
-                    exp = reader.GetInt();
-                    skillPoint = reader.GetShort();
+                    level = reader.GetPackedInt();
+                    exp = reader.GetPackedInt();
+                    skillPoint = reader.GetPackedInt();
                     break;
             }
         }
@@ -101,7 +101,7 @@ namespace MultiplayerARPG
         public void Serialize(NetDataWriter writer)
         {
             writer.Put((byte)type);
-            writer.Put(id);
+            writer.PutPackedInt(id);
             switch (type)
             {
                 case UpdateType.Create:
@@ -127,14 +127,14 @@ namespace MultiplayerARPG
                     writer.Put(guildRole);
                     break;
                 case UpdateType.SetSkillLevel:
-                    writer.Put(dataId);
-                    writer.Put(level);
+                    writer.PutPackedInt(dataId);
+                    writer.PutPackedInt(level);
                     break;
                 case UpdateType.SetGold:
-                    writer.Put(gold);
+                    writer.PutPackedInt(gold);
                     break;
                 case UpdateType.SetScore:
-                    writer.Put(score);
+                    writer.PutPackedInt(score);
                     break;
                 case UpdateType.SetOptions:
                     writer.Put(options);
@@ -143,12 +143,12 @@ namespace MultiplayerARPG
                     writer.Put(autoAcceptRequests);
                     break;
                 case UpdateType.SetRank:
-                    writer.Put(rank);
+                    writer.PutPackedInt(rank);
                     break;
                 case UpdateType.LevelExpSkillPoint:
-                    writer.Put(level);
-                    writer.Put(exp);
-                    writer.Put(skillPoint);
+                    writer.PutPackedInt(level);
+                    writer.PutPackedInt(exp);
+                    writer.PutPackedInt(skillPoint);
                     break;
             }
         }

@@ -17,7 +17,7 @@ namespace MultiplayerARPG
     public struct MonsterCharacterAmount
     {
         public MonsterCharacter monster;
-        public short amount;
+        public int amount;
     }
 
     [CreateAssetMenu(fileName = GameDataMenuConsts.MONSTER_CHARACTER_FILE, menuName = GameDataMenuConsts.MONSTER_CHARACTER_MENU, order = GameDataMenuConsts.MONSTER_CHARACTER_ORDER)]
@@ -27,8 +27,8 @@ namespace MultiplayerARPG
         [Header("Monster Data")]
         [SerializeField]
         [Tooltip("This will be used to adjust stats. If this value is 100, it means current stats which set to this character data is stats for character level 100, it will be used to adjust stats for character level 1.")]
-        private short defaultLevel = 1;
-        public short DefaultLevel { get { return defaultLevel; } }
+        private int defaultLevel = 1;
+        public int DefaultLevel { get { return defaultLevel; } }
         [SerializeField]
         [Tooltip("`Normal` will attack when being attacked, `Aggressive` will attack when enemy nearby, `Assist` will attack when other with same `Ally Id` being attacked, `NoHarm` won't attack.")]
         private MonsterCharacteristic characteristic = MonsterCharacteristic.Normal;
@@ -333,7 +333,7 @@ namespace MultiplayerARPG
                                 damageElement = tempValue.damageElement,
                                 amount = new IncrementalFloat()
                                 {
-                                    baseAmount = (short)(tempValue.amount.baseAmount + (tempValue.amount.amountIncreaseEachLevel * -(defaultLevel - 1))),
+                                    baseAmount = tempValue.amount.baseAmount + (tempValue.amount.amountIncreaseEachLevel * -(defaultLevel - 1)),
                                     amountIncreaseEachLevel = tempValue.amount.amountIncreaseEachLevel,
                                 }
                             };
@@ -367,7 +367,7 @@ namespace MultiplayerARPG
                                 damageElement = tempValue.damageElement,
                                 amount = new IncrementalFloat()
                                 {
-                                    baseAmount = (short)(tempValue.amount.baseAmount + (tempValue.amount.amountIncreaseEachLevel * -(defaultLevel - 1))),
+                                    baseAmount = tempValue.amount.baseAmount + (tempValue.amount.amountIncreaseEachLevel * -(defaultLevel - 1)),
                                     amountIncreaseEachLevel = tempValue.amount.amountIncreaseEachLevel,
                                 }
                             };
@@ -379,13 +379,13 @@ namespace MultiplayerARPG
         }
 
         [System.NonSerialized]
-        private Dictionary<BaseSkill, short> cacheSkillLevels = null;
-        public override Dictionary<BaseSkill, short> CacheSkillLevels
+        private Dictionary<BaseSkill, int> cacheSkillLevels = null;
+        public override Dictionary<BaseSkill, int> CacheSkillLevels
         {
             get
             {
                 if (cacheSkillLevels == null)
-                    cacheSkillLevels = GameDataHelpers.CombineSkills(skills, new Dictionary<BaseSkill, short>());
+                    cacheSkillLevels = GameDataHelpers.CombineSkills(skills, new Dictionary<BaseSkill, int>());
                 return cacheSkillLevels;
             }
         }
@@ -440,17 +440,17 @@ namespace MultiplayerARPG
 
         private readonly List<MonsterSkill> tempRandomSkills = new List<MonsterSkill>();
 
-        public virtual int RandomExp(short level)
+        public virtual int RandomExp(int level)
         {
             return AdjustedRandomExp.GetAmount(level).Random();
         }
 
-        public virtual int RandomGold(short level)
+        public virtual int RandomGold(int level)
         {
             return AdjustedRandomGold.GetAmount(level).Random();
         }
 
-        public virtual void RandomItems(System.Action<BaseItem, short> onRandomItem)
+        public virtual void RandomItems(System.Action<BaseItem, int> onRandomItem)
         {
             if (CacheRandomItems.Count == 0)
                 return;
@@ -462,7 +462,7 @@ namespace MultiplayerARPG
             {
                 if (ExcludeItemFromDropping(certainDropItems[i].item))
                     continue;
-                onRandomItem.Invoke(certainDropItems[i].item, (short)Random.Range(certainDropItems[i].minAmount <= 0 ? 1 : certainDropItems[i].minAmount, certainDropItems[i].maxAmount));
+                onRandomItem.Invoke(certainDropItems[i].item, Random.Range(certainDropItems[i].minAmount <= 0 ? 1 : certainDropItems[i].minAmount, certainDropItems[i].maxAmount));
                 ++randomDropCount;
             }
             // Reached max drop items?
@@ -476,7 +476,7 @@ namespace MultiplayerARPG
                     continue;
                 if (ExcludeItemFromDropping(uncertainDropItems[i].item))
                     continue;
-                onRandomItem.Invoke(uncertainDropItems[i].item, (short)Random.Range(uncertainDropItems[i].minAmount <= 0 ? 1 : uncertainDropItems[i].minAmount, uncertainDropItems[i].maxAmount));
+                onRandomItem.Invoke(uncertainDropItems[i].item, Random.Range(uncertainDropItems[i].minAmount <= 0 ? 1 : uncertainDropItems[i].minAmount, uncertainDropItems[i].maxAmount));
                 ++randomDropCount;
             }
         }
@@ -534,7 +534,7 @@ namespace MultiplayerARPG
             return currencies.ToArray();
         }
 
-        public virtual bool RandomSkill(BaseMonsterCharacterEntity entity, out BaseSkill skill, out short level)
+        public virtual bool RandomSkill(BaseMonsterCharacterEntity entity, out BaseSkill skill, out int level)
         {
             skill = null;
             level = 1;

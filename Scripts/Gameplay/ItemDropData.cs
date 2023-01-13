@@ -10,23 +10,23 @@ namespace MultiplayerARPG
     {
         public bool putOnPlaceholder;
         public int dataId;
-        public short level;
-        public short amount;
+        public int level;
+        public int amount;
 
         public void Deserialize(NetDataReader reader)
         {
             putOnPlaceholder = reader.GetBool();
             dataId = reader.GetPackedInt();
-            level = reader.GetPackedShort();
-            amount = reader.GetPackedShort();
+            level = reader.GetPackedInt();
+            amount = reader.GetPackedInt();
         }
 
         public void Serialize(NetDataWriter writer)
         {
             writer.Put(putOnPlaceholder);
             writer.PutPackedInt(dataId);
-            writer.PutPackedShort(level);
-            writer.PutPackedShort(amount);
+            writer.PutPackedInt(level);
+            writer.PutPackedInt(amount);
         }
     }
 

@@ -25,15 +25,15 @@ namespace MultiplayerARPG
         public IncrementalInt MaxStack { get { return maxStack; } }
 
         [SerializeField]
-        private IncrementalShort level;
-        public IncrementalShort Level { get { return level; } }
+        private IncrementalInt level;
+        public IncrementalInt Level { get { return level; } }
 
         public SkillSummon(
             BaseMonsterCharacterEntity monsterEntity,
             IncrementalFloat duration,
             IncrementalInt amountEachTime,
             IncrementalInt maxStack,
-            IncrementalShort level)
+            IncrementalInt level)
         {
             this.monsterEntity = monsterEntity;
             this.duration = duration;

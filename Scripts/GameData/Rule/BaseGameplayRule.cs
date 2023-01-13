@@ -7,15 +7,15 @@ namespace MultiplayerARPG
     {
         public float GoldRate { get; set; } = 1f;
         public float ExpRate { get; set; } = 1f;
-        public abstract bool RandomAttackHitOccurs(Vector3 fromPosition, BaseCharacterEntity attacker, BaseCharacterEntity damageReceiver, Dictionary<DamageElement, MinMaxFloat> damageAmounts, CharacterItem weapon, BaseSkill skill, short skillLevel, int randomSeed, out bool isCritical, out bool isBlocked);
-        public abstract float RandomAttackDamage(Vector3 fromPosition, BaseCharacterEntity attacker, BaseCharacterEntity damageReceiver, DamageElement damageElement, MinMaxFloat damageAmount, CharacterItem weapon, BaseSkill skill, short skillLevel, int randomSeed);
+        public abstract bool RandomAttackHitOccurs(Vector3 fromPosition, BaseCharacterEntity attacker, BaseCharacterEntity damageReceiver, Dictionary<DamageElement, MinMaxFloat> damageAmounts, CharacterItem weapon, BaseSkill skill, int skillLevel, int randomSeed, out bool isCritical, out bool isBlocked);
+        public abstract float RandomAttackDamage(Vector3 fromPosition, BaseCharacterEntity attacker, BaseCharacterEntity damageReceiver, DamageElement damageElement, MinMaxFloat damageAmount, CharacterItem weapon, BaseSkill skill, int skillLevel, int randomSeed);
         public abstract float GetHitChance(BaseCharacterEntity attacker, BaseCharacterEntity damageReceiver);
         public abstract float GetCriticalChance(BaseCharacterEntity attacker, BaseCharacterEntity damageReceiver);
         public abstract float GetCriticalDamage(BaseCharacterEntity attacker, BaseCharacterEntity damageReceiver, float damage);
         public abstract float GetBlockChance(BaseCharacterEntity attacker, BaseCharacterEntity damageReceiver);
         public abstract float GetBlockDamage(BaseCharacterEntity attacker, BaseCharacterEntity damageReceiver, float damage);
         public abstract float GetDamageReducedByResistance(Dictionary<DamageElement, float> damageReceiverResistances, Dictionary<DamageElement, float> damageReceiverArmors, float damageAmount, DamageElement damageElement);
-        public abstract int GetTotalDamage(Vector3 fromPosition, EntityInfo instigator, DamageableEntity damageReceiver, float totalDamage, CharacterItem weapon, BaseSkill skill, short skillLevel);
+        public abstract int GetTotalDamage(Vector3 fromPosition, EntityInfo instigator, DamageableEntity damageReceiver, float totalDamage, CharacterItem weapon, BaseSkill skill, int skillLevel);
         public abstract float GetRecoveryHpPerSeconds(BaseCharacterEntity character);
         public abstract float GetRecoveryMpPerSeconds(BaseCharacterEntity character);
         public abstract float GetRecoveryStaminaPerSeconds(BaseCharacterEntity character);
@@ -33,23 +33,23 @@ namespace MultiplayerARPG
         public abstract float GetSwimMoveSpeedRate(BaseGameEntity gameEntity);
         public abstract float GetTotalWeight(ICharacterData character, CharacterStats stats);
         public abstract float GetLimitWeight(ICharacterData character, CharacterStats stats);
-        public abstract short GetTotalSlot(ICharacterData character, CharacterStats stats);
-        public abstract short GetLimitSlot(ICharacterData character, CharacterStats stats);
+        public abstract int GetTotalSlot(ICharacterData character, CharacterStats stats);
+        public abstract int GetLimitSlot(ICharacterData character, CharacterStats stats);
         public abstract bool IsHungry(BaseCharacterEntity character);
         public abstract bool IsThirsty(BaseCharacterEntity character);
         public abstract bool RewardExp(BaseCharacterEntity character, Reward reward, float multiplier, RewardGivenType rewardGivenType, out int rewardedExp);
         public abstract void RewardCurrencies(BaseCharacterEntity character, Reward reward, float multiplier, RewardGivenType rewardGivenType, out int rewardedGold);
         public abstract float GetEquipmentStatsRate(CharacterItem characterItem);
         public abstract void OnCharacterRespawn(ICharacterData character);
-        public abstract void OnCharacterReceivedDamage(BaseCharacterEntity attacker, BaseCharacterEntity damageReceiver, CombatAmountType combatAmountType, int damage, CharacterItem weapon, BaseSkill skill, short skillLevel);
-        public abstract void OnHarvestableReceivedDamage(BaseCharacterEntity attacker, HarvestableEntity damageReceiver, CombatAmountType combatAmountType, int damage, CharacterItem weapon, BaseSkill skill, short skillLevel);
+        public abstract void OnCharacterReceivedDamage(BaseCharacterEntity attacker, BaseCharacterEntity damageReceiver, CombatAmountType combatAmountType, int damage, CharacterItem weapon, BaseSkill skill, int skillLevel);
+        public abstract void OnHarvestableReceivedDamage(BaseCharacterEntity attacker, HarvestableEntity damageReceiver, CombatAmountType combatAmountType, int damage, CharacterItem weapon, BaseSkill skill, int skillLevel);
         public abstract float GetRecoveryUpdateDuration();
         public abstract void ApplyFallDamage(BaseCharacterEntity character, Vector3 lastGroundedPosition);
         public abstract bool CanInteractEntity(BaseCharacterEntity character, uint objectId);
         public abstract Vector3 GetSummonPosition(BaseCharacterEntity character);
         public abstract Quaternion GetSummonRotation(BaseCharacterEntity character);
 
-        public virtual bool CurrenciesEnoughToBuyItem(IPlayerCharacterData character, NpcSellItem sellItem, short amount)
+        public virtual bool CurrenciesEnoughToBuyItem(IPlayerCharacterData character, NpcSellItem sellItem, int amount)
         {
             if (character.Gold < sellItem.sellPrice * amount)
                 return false;
@@ -58,7 +58,7 @@ namespace MultiplayerARPG
             return character.HasEnoughCurrencyAmounts(GameDataHelpers.CombineCurrencies(sellItem.sellPrices, null), out _, out _, amount);
         }
 
-        public virtual void DecreaseCurrenciesWhenBuyItem(IPlayerCharacterData character, NpcSellItem sellItem, short amount)
+        public virtual void DecreaseCurrenciesWhenBuyItem(IPlayerCharacterData character, NpcSellItem sellItem, int amount)
         {
             character.Gold -= sellItem.sellPrice * amount;
             if (sellItem.sellPrices == null || sellItem.sellPrices.Length == 0)
@@ -66,7 +66,7 @@ namespace MultiplayerARPG
             character.DecreaseCurrencies(sellItem.sellPrices, amount);
         }
 
-        public virtual void IncreaseCurrenciesWhenSellItem(IPlayerCharacterData character, BaseItem item, short amount)
+        public virtual void IncreaseCurrenciesWhenSellItem(IPlayerCharacterData character, BaseItem item, int amount)
         {
             character.Gold = character.Gold.Increase(item.SellPrice * amount);
         }
@@ -156,7 +156,7 @@ namespace MultiplayerARPG
             character.DecreaseCurrencies(setting.CacheCreateGuildRequireCurrencies);
         }
 
-        public virtual Reward MakeMonsterReward(MonsterCharacter monster, short level)
+        public virtual Reward MakeMonsterReward(MonsterCharacter monster, int level)
         {
             Reward result = new Reward();
             result.exp = monster.RandomExp(level);

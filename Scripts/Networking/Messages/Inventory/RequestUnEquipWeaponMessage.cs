@@ -6,20 +6,20 @@ namespace MultiplayerARPG
     {
         public byte equipWeaponSet;
         public bool isLeftHand;
-        public short nonEquipIndex;
+        public int nonEquipIndex;
 
         public void Deserialize(NetDataReader reader)
         {
             equipWeaponSet = reader.GetByte();
             isLeftHand = reader.GetBool();
-            nonEquipIndex = reader.GetPackedShort();
+            nonEquipIndex = reader.GetPackedInt();
         }
 
         public void Serialize(NetDataWriter writer)
         {
             writer.Put(equipWeaponSet);
             writer.Put(isLeftHand);
-            writer.PutPackedShort(nonEquipIndex);
+            writer.PutPackedInt(nonEquipIndex);
         }
     }
 }

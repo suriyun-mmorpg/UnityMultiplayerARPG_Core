@@ -4,19 +4,19 @@ namespace MultiplayerARPG
 {
     public struct RequestUnEquipArmorMessage : INetSerializable
     {
-        public short equipIndex;
-        public short nonEquipIndex;
+        public int equipIndex;
+        public int nonEquipIndex;
 
         public void Deserialize(NetDataReader reader)
         {
-            equipIndex = reader.GetPackedShort();
-            nonEquipIndex = reader.GetPackedShort();
+            equipIndex = reader.GetPackedInt();
+            nonEquipIndex = reader.GetPackedInt();
         }
 
         public void Serialize(NetDataWriter writer)
         {
-            writer.PutPackedShort(equipIndex);
-            writer.PutPackedShort(nonEquipIndex);
+            writer.PutPackedInt(equipIndex);
+            writer.PutPackedInt(nonEquipIndex);
         }
     }
 }

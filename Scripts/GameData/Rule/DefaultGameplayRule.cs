@@ -11,9 +11,9 @@ namespace MultiplayerARPG
         public float increaseStatPointEachLevel = 5;
         public float increaseSkillPointEachLevel = 1;
         [Tooltip("If this > `0`, it will increase stat point until character reached max level. If it's `20`, it will increase stat point until character reached level `20`")]
-        public short increaseStatPointsUntilReachedLevel = 0;
+        public int increaseStatPointsUntilReachedLevel = 0;
         [Tooltip("If this > `0`, it will increase skill point until character reached max level. If it's `20`, it will increase skill point until character reached level `20`")]
-        public short increaseSkillPointsUntilReachedLevel = 0;
+        public int increaseSkillPointsUntilReachedLevel = 0;
         [Range(0f, 100f)]
         public float expLostPercentageWhenDeath = 2f;
         [Header("Stamina/Sprint")]
@@ -74,7 +74,7 @@ namespace MultiplayerARPG
         public bool recoverWaterWhenLevelUp;
         public bool recoverStaminaWhenLevelUp;
 
-        public override bool RandomAttackHitOccurs(Vector3 fromPosition, BaseCharacterEntity attacker, BaseCharacterEntity damageReceiver, Dictionary<DamageElement, MinMaxFloat> damageAmounts, CharacterItem weapon, BaseSkill skill, short skillLevel, int randomSeed, out bool isCritical, out bool isBlocked)
+        public override bool RandomAttackHitOccurs(Vector3 fromPosition, BaseCharacterEntity attacker, BaseCharacterEntity damageReceiver, Dictionary<DamageElement, MinMaxFloat> damageAmounts, CharacterItem weapon, BaseSkill skill, int skillLevel, int randomSeed, out bool isCritical, out bool isBlocked)
         {
             isCritical = false;
             isBlocked = false;
@@ -88,7 +88,7 @@ namespace MultiplayerARPG
             return isHit;
         }
 
-        public override float RandomAttackDamage(Vector3 fromPosition, BaseCharacterEntity attacker, BaseCharacterEntity damageReceiver, DamageElement damageElement, MinMaxFloat damageAmount, CharacterItem weapon, BaseSkill skill, short skillLevel, int randomSeed)
+        public override float RandomAttackDamage(Vector3 fromPosition, BaseCharacterEntity attacker, BaseCharacterEntity damageReceiver, DamageElement damageElement, MinMaxFloat damageAmount, CharacterItem weapon, BaseSkill skill, int skillLevel, int randomSeed)
         {
             return damageAmount.Random(randomSeed);
         }
@@ -102,8 +102,8 @@ namespace MultiplayerARPG
             // Calculate chance to hit
             float attackerAcc = attackerStats.accuracy;
             float dmgReceiverEva = dmgReceiverStats.evasion;
-            short attackerLvl = attacker.Level;
-            short dmgReceiverLvl = damageReceiver.Level;
+            int attackerLvl = attacker.Level;
+            int dmgReceiverLvl = damageReceiver.Level;
             float hitChance = 2f;
 
             if (attackerAcc != 0 && dmgReceiverEva != 0)
@@ -184,7 +184,7 @@ namespace MultiplayerARPG
             return damageAmount;
         }
 
-        public override int GetTotalDamage(Vector3 fromPosition, EntityInfo instigator, DamageableEntity damageReceiver, float totalDamage, CharacterItem weapon, BaseSkill skill, short skillLevel)
+        public override int GetTotalDamage(Vector3 fromPosition, EntityInfo instigator, DamageableEntity damageReceiver, float totalDamage, CharacterItem weapon, BaseSkill skill, int skillLevel)
         {
             return (int)totalDamage;
         }
@@ -318,12 +318,12 @@ namespace MultiplayerARPG
             return result;
         }
 
-        public override short GetLimitSlot(ICharacterData character, CharacterStats stats)
+        public override int GetLimitSlot(ICharacterData character, CharacterStats stats)
         {
-            return (short)(stats.slotLimit + GameInstance.Singleton.baseSlotLimit);
+            return (int)(stats.slotLimit + GameInstance.Singleton.baseSlotLimit);
         }
 
-        public override short GetTotalSlot(ICharacterData character, CharacterStats stats)
+        public override int GetTotalSlot(ICharacterData character, CharacterStats stats)
         {
             return character.NonEquipItems.GetTotalItemSlot();
         }
@@ -501,7 +501,7 @@ namespace MultiplayerARPG
             character.CurrentWater = character.GetCaches().MaxWater;
         }
 
-        public override void OnCharacterReceivedDamage(BaseCharacterEntity attacker, BaseCharacterEntity damageReceiver, CombatAmountType combatAmountType, int damage, CharacterItem weapon, BaseSkill skill, short skillLevel)
+        public override void OnCharacterReceivedDamage(BaseCharacterEntity attacker, BaseCharacterEntity damageReceiver, CombatAmountType combatAmountType, int damage, CharacterItem weapon, BaseSkill skill, int skillLevel)
         {
             float decreaseWeaponDurability;
             float decreaseShieldDurability;
@@ -596,7 +596,7 @@ namespace MultiplayerARPG
                 if (!attacker.IsDead())
                 {
                     // Passive skills
-                    foreach (KeyValuePair<BaseSkill, short> characterSkill in attacker.GetCaches().Skills)
+                    foreach (KeyValuePair<BaseSkill, int> characterSkill in attacker.GetCaches().Skills)
                     {
                         tempSkill = characterSkill.Key;
                         if (!tempSkill.IsPassive)
@@ -654,7 +654,7 @@ namespace MultiplayerARPG
                 if (!damageReceiver.IsDead())
                 {
                     // Passive skills
-                    foreach (KeyValuePair<BaseSkill, short> characterSkill in damageReceiver.GetCaches().Skills)
+                    foreach (KeyValuePair<BaseSkill, int> characterSkill in damageReceiver.GetCaches().Skills)
                     {
                         tempSkill = characterSkill.Key;
                         if (!tempSkill.IsPassive)
@@ -717,7 +717,7 @@ namespace MultiplayerARPG
             tempSocketEnhancerItem.ApplyEnemyStatusEffectsWhenAttacked(damageReceiverInfo, attacker);
         }
 
-        public override void OnHarvestableReceivedDamage(BaseCharacterEntity attacker, HarvestableEntity damageReceiver, CombatAmountType combatAmountType, int damage, CharacterItem weapon, BaseSkill skill, short skillLevel)
+        public override void OnHarvestableReceivedDamage(BaseCharacterEntity attacker, HarvestableEntity damageReceiver, CombatAmountType combatAmountType, int damage, CharacterItem weapon, BaseSkill skill, int skillLevel)
         {
             float decreaseWeaponDurability;
             float decreaseShieldDurability;

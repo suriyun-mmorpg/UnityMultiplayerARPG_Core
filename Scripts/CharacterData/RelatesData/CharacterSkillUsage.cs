@@ -55,7 +55,7 @@ namespace MultiplayerARPG
             return cacheGuildSkill;
         }
 
-        public void Use(ICharacterData character, short level)
+        public void Use(ICharacterData character, int level)
         {
             coolDownRemainsDuration = 0f;
             switch (type)

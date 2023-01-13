@@ -5,12 +5,12 @@ namespace MultiplayerARPG
 {
     public partial class BaseItem
     {
-        public bool CanRefine(IPlayerCharacterData character, short level)
+        public bool CanRefine(IPlayerCharacterData character, int level)
         {
             return CanRefine(character, level, out _);
         }
 
-        public bool CanRefine(IPlayerCharacterData character, short level, out UITextKeys gameMessage)
+        public bool CanRefine(IPlayerCharacterData character, int level, out UITextKeys gameMessage)
         {
             if (!this.IsEquipment())
             {

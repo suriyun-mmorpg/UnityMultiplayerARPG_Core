@@ -12,7 +12,7 @@
         public UICharacterAttributeData(CharacterAttribute characterAttribute) : this(characterAttribute, characterAttribute.amount)
         {
         }
-        public UICharacterAttributeData(Attribute attribute, short targetLevel) : this(CharacterAttribute.Create(attribute, targetLevel), targetLevel)
+        public UICharacterAttributeData(Attribute attribute, int targetLevel) : this(CharacterAttribute.Create(attribute, targetLevel), targetLevel)
         {
         }
     }

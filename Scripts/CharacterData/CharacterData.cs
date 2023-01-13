@@ -9,7 +9,7 @@ namespace MultiplayerARPG
     {
         private int dataId;
         private int entityId;
-        private short level;
+        private int level;
         private byte equipWeaponSet;
         private ObservableCollection<EquipWeapons> selectableEquipWeapons;
         private ObservableCollection<CharacterAttribute> attributes;
@@ -45,7 +45,7 @@ namespace MultiplayerARPG
             get { return CharacterName; }
             set { CharacterName = value; }
         }
-        public short Level
+        public int Level
         {
             get { return level; }
             set

@@ -21,7 +21,7 @@ namespace MultiplayerARPG
             GameInstance.AddItemDropEntities(prefab);
         }
 
-        protected override ItemDropEntity SpawnInternal(ItemDropEntity prefab, short level)
+        protected override ItemDropEntity SpawnInternal(ItemDropEntity prefab, int level)
         {
             Vector3 spawnPosition;
             if (GetRandomPosition(out spawnPosition))

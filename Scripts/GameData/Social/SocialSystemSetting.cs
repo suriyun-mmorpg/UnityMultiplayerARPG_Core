@@ -62,7 +62,7 @@ namespace MultiplayerARPG
         private int[] guildExpTree;
 
         [Header("Exp calculator")]
-        public short guildMaxLevel;
+        public int guildMaxLevel;
         public Int32GraphCalculator guildExpCalculator;
         public bool guildCalculateExp;
 
@@ -77,13 +77,13 @@ namespace MultiplayerARPG
         public byte MaxShareExpPercentage { get { return maxShareExpPercentage; } }
 
         [System.NonSerialized]
-        private Dictionary<BaseItem, short> cacheCreateGuildRequireItems;
-        public Dictionary<BaseItem, short> CacheCreateGuildRequireItems
+        private Dictionary<BaseItem, int> cacheCreateGuildRequireItems;
+        public Dictionary<BaseItem, int> CacheCreateGuildRequireItems
         {
             get
             {
                 if (cacheCreateGuildRequireItems == null)
-                    cacheCreateGuildRequireItems = GameDataHelpers.CombineItems(createGuildRequireItems, new Dictionary<BaseItem, short>());
+                    cacheCreateGuildRequireItems = GameDataHelpers.CombineItems(createGuildRequireItems, new Dictionary<BaseItem, int>());
                 return cacheCreateGuildRequireItems;
             }
         }
@@ -161,7 +161,7 @@ namespace MultiplayerARPG
             GameInstance.Singleton.GameplayRule.DecreaseCurrenciesWhenCreateGuild(character, this);
         }
 
-        public int GetNextLevelExp(short level)
+        public int GetNextLevelExp(int level)
         {
             return GetNextLevelExp(GuildExpTree, level);
         }
@@ -179,7 +179,7 @@ namespace MultiplayerARPG
             return guild;
         }
 
-        public static int GetNextLevelExp(int[] expTree, short level)
+        public static int GetNextLevelExp(int[] expTree, int level)
         {
             if (level <= 0)
                 return 0;
@@ -190,12 +190,12 @@ namespace MultiplayerARPG
 
         public static bool CalculateIncreasedGuildExp(
             int[] expTree,
-            short level, 
+            int level, 
             int exp, 
-            short skillPoint, 
-            out short resultLevel, 
+            int skillPoint, 
+            out int resultLevel, 
             out int resultExp, 
-            out short resultSkillPoint)
+            out int resultSkillPoint)
         {
             bool isLevelUp = false;
             int nextLevelExp = GetNextLevelExp(expTree, level);
@@ -239,7 +239,7 @@ namespace MultiplayerARPG
             {
                 guildCalculateExp = false;
                 int[] guildExpTree = new int[guildMaxLevel];
-                for (short i = 1; i <= guildMaxLevel; ++i)
+                for (int i = 1; i <= guildMaxLevel; ++i)
                 {
                     guildExpTree[i - 1] = guildExpCalculator.Calculate(i, guildMaxLevel);
                 }

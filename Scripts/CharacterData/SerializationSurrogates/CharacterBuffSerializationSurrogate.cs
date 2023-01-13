@@ -34,7 +34,7 @@ namespace MultiplayerARPG
             }
             data.type = (BuffType)info.GetByte("type");
             data.dataId = info.GetInt32("dataId");
-            data.level = info.GetInt16("level");
+            data.level = info.GetInt32("level");
             data.buffRemainsDuration = info.GetSingle("buffRemainsDuration");
             obj = data;
             return obj;

@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace MultiplayerARPG
 {
-    public partial class UISkillLevels : UISelectionEntry<Dictionary<BaseSkill, short>>
+    public partial class UISkillLevels : UISelectionEntry<Dictionary<BaseSkill, int>>
     {
         public enum DisplayType
         {
@@ -70,22 +70,22 @@ namespace MultiplayerARPG
             {
                 // Prepare attribute data
                 IPlayerCharacterData character = GameInstance.PlayingCharacter;
-                Dictionary<BaseSkill, short> currentSkillLevels = new Dictionary<BaseSkill, short>();
+                Dictionary<BaseSkill, int> currentSkillLevels = new Dictionary<BaseSkill, int>();
                 if (character != null)
                     currentSkillLevels = character.GetSkills(includeEquipmentsForCurrentLevels);
                 // In-loop temp data
                 using (Utf16ValueStringBuilder tempAllText = ZString.CreateStringBuilder(false))
                 {
                     BaseSkill tempData;
-                    short tempCurrentLevel;
-                    short tempTargetLevel;
+                    int tempCurrentLevel;
+                    int tempTargetLevel;
                     bool tempLevelEnough;
                     string tempCurrentValue;
                     string tempTargetValue;
                     string tempFormat;
                     string tempLevelText;
                     UISkillTextPair tempComponentPair;
-                    foreach (KeyValuePair<BaseSkill, short> dataEntry in Data)
+                    foreach (KeyValuePair<BaseSkill, int> dataEntry in Data)
                     {
                         if (dataEntry.Key == null)
                             continue;

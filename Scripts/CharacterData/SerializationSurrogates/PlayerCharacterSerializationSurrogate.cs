@@ -67,7 +67,7 @@ namespace MultiplayerARPG
             data.DataId = info.GetInt32("dataId");
             data.EntityId = info.GetInt32("entityId");
             data.CharacterName = info.GetString("characterName");
-            data.Level = info.GetInt16("level");
+            data.Level = info.GetInt32("level");
             data.Exp = info.GetInt32("exp");
             data.CurrentHp = info.GetInt32("currentHp");
             data.CurrentMp = info.GetInt32("currentMp");

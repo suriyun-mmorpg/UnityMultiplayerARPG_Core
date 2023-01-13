@@ -66,8 +66,8 @@ namespace MultiplayerARPG
 
         [Tooltip("How many levels it will be decreased if refining failed")]
         [SerializeField]
-        private short refineFailDecreaseLevels;
-        public short RefineFailDecreaseLevels { get { return refineFailDecreaseLevels; } }
+        private int refineFailDecreaseLevels;
+        public int RefineFailDecreaseLevels { get { return refineFailDecreaseLevels; } }
 
         [Tooltip("It will be destroyed if this value is TRUE and refining failed")]
         [SerializeField]
@@ -79,7 +79,7 @@ namespace MultiplayerARPG
             ItemAmount[] requireItems,
             CurrencyAmount[] requireCurrencies,
             int requireGold,
-            short refineFailDecreaseLevels,
+            int refineFailDecreaseLevels,
             bool refineFailDestroyItem)
         {
             this.successRate = successRate;

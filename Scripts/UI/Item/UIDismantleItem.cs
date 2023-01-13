@@ -21,8 +21,8 @@ namespace MultiplayerARPG
         protected bool activated;
         protected string activeItemId;
 
-        private short dismantleAmount;
-        public short DismantleAmount
+        private int dismantleAmount;
+        public int DismantleAmount
         {
             get { return dismantleAmount; }
             private set
@@ -138,7 +138,7 @@ namespace MultiplayerARPG
             activeItemId = CharacterItem.id;
             GameInstance.ClientInventoryHandlers.RequestDismantleItem(new RequestDismantleItemMessage()
             {
-                index = (short)IndexOfData,
+                index = IndexOfData,
                 amount = DismantleAmount,
             }, ClientInventoryActions.ResponseDismantleItem);
         }
@@ -153,7 +153,7 @@ namespace MultiplayerARPG
 
         private void OnDismantleItemAmountConfirmed(int amount)
         {
-            DismantleAmount = (short)amount;
+            DismantleAmount = amount;
         }
     }
 }

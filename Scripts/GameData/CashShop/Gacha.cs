@@ -58,7 +58,7 @@ namespace MultiplayerARPG
                     item = randomedItem.item,
                     level = 1,
                     amount = randomedItem.amount,
-                    randomSeed = (short)Random.Range(short.MinValue, short.MaxValue),
+                    randomSeed = Random.Range(int.MinValue, int.MaxValue),
                 });
             }
             return rewardItems;

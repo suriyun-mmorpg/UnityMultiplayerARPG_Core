@@ -24,7 +24,7 @@ namespace MultiplayerARPG
 
         private IUsableItem usingItem;
         private BaseSkill usingSkill;
-        private short usingSkillLevel;
+        private int usingSkillLevel;
         private bool channeledActionStarted;
 
         protected override void OnEnable()
@@ -104,14 +104,14 @@ namespace MultiplayerARPG
             }
         }
 
-        public bool GetAssignedSkill(out BaseSkill skill, out short skillLevel)
+        public bool GetAssignedSkill(out BaseSkill skill, out int skillLevel)
         {
             skill = null;
             skillLevel = 0;
             if (Data.type == HotkeyType.Skill)
             {
                 // Get all skills included equipment skills
-                Dictionary<BaseSkill, short> skills = GameInstance.PlayingCharacter.GetCaches().Skills;
+                Dictionary<BaseSkill, int> skills = GameInstance.PlayingCharacter.GetCaches().Skills;
                 int dataId = BaseGameData.MakeDataId(Data.relateId);
                 return GameInstance.Skills.TryGetValue(dataId, out skill) &&
                     skill != null && skills.TryGetValue(skill, out skillLevel);

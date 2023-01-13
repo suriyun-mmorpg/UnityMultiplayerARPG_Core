@@ -10,7 +10,7 @@ namespace MultiplayerARPG
         public static System.Action<ResponseHandlerData, AckResponseCode, ResponseMoveItemFromStorageMessage> onResponseMoveItemFromStorage;
         public static System.Action<ResponseHandlerData, AckResponseCode, ResponseMoveItemToStorageMessage> onResponseMoveItemToStorage;
         public static System.Action<ResponseHandlerData, AckResponseCode, ResponseSwapOrMergeStorageItemMessage> onResponseSwapOrMergeStorageItem;
-        public static System.Action<StorageType, string, uint, short, short> onNotifyStorageOpened;
+        public static System.Action<StorageType, string, uint, int, int> onNotifyStorageOpened;
         public static System.Action onNotifyStorageClosed;
         public static System.Action<List<CharacterItem>> onNotifyStorageItemsUpdated;
 
@@ -49,7 +49,7 @@ namespace MultiplayerARPG
                 onResponseSwapOrMergeStorageItem.Invoke(requestHandler, responseCode, response);
         }
 
-        public static void NotifyStorageOpened(StorageType storageType, string storageOwnerId, uint objectId, short weightLimit, short slotLimit)
+        public static void NotifyStorageOpened(StorageType storageType, string storageOwnerId, uint objectId, int weightLimit, int slotLimit)
         {
             GameInstance.OpenedStorageType = storageType;
             GameInstance.OpenedStorageOwnerId = storageOwnerId;

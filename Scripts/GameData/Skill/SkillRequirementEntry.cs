@@ -4,7 +4,7 @@
     public struct SkillRequirementEntry
     {
         public bool disallow;
-        public short characterLevel;
+        public int characterLevel;
         public float skillPoint;
         public int gold;
         [ArrayElementTitle("attribute")]

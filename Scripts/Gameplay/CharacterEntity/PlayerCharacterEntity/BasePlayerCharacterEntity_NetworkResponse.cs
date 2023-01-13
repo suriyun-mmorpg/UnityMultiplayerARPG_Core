@@ -25,7 +25,7 @@ namespace MultiplayerARPG
                 return;
             }
 
-            short level = guild.GetSkillLevel(dataId);
+            int level = guild.GetSkillLevel(dataId);
             if (level <= 0)
             {
                 GameInstance.ServerGameMessageHandlers.SendGameMessage(ConnectionId, UITextKeys.UI_ERROR_SKILL_LEVEL_IS_ZERO);
@@ -95,7 +95,7 @@ namespace MultiplayerARPG
         }
 
         [ServerRpc]
-        protected void ServerAppendCraftingQueueItem(uint sourceObjectId, int dataId, short amount)
+        protected void ServerAppendCraftingQueueItem(uint sourceObjectId, int dataId, int amount)
         {
             UITextKeys errorMessage;
             if (sourceObjectId == ObjectId)
@@ -111,7 +111,7 @@ namespace MultiplayerARPG
         }
 
         [ServerRpc]
-        protected void ServerChangeCraftingQueueItem(uint sourceObjectId, int indexOfData, short amount)
+        protected void ServerChangeCraftingQueueItem(uint sourceObjectId, int indexOfData, int amount)
         {
             if (sourceObjectId == ObjectId)
             {

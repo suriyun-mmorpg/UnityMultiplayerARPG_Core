@@ -460,7 +460,7 @@ namespace MultiplayerARPG
                 return;
             destination = null;
             BaseSkill skill = queueUsingSkill.skill;
-            short skillLevel = queueUsingSkill.level;
+            int skillLevel = queueUsingSkill.level;
             BaseCharacterEntity targetEntity;
             // Point click mode always lock on target
             bool wasdLockAttackTarget = this.wasdLockAttackTarget || controllerMode == PlayerCharacterControllerMode.PointClick;
@@ -828,7 +828,7 @@ namespace MultiplayerARPG
         protected void UseSkill(string id, AimPosition aimPosition)
         {
             BaseSkill skill;
-            short skillLevel;
+            int skillLevel;
             if (!GameInstance.Skills.TryGetValue(BaseGameData.MakeDataId(id), out skill) || skill == null ||
                 !PlayingCharacterEntity.GetCaches().Skills.TryGetValue(skill, out skillLevel))
                 return;
@@ -859,7 +859,7 @@ namespace MultiplayerARPG
                 {
                     GameInstance.ClientInventoryHandlers.RequestUnEquipItem(
                         inventoryType,
-                        (short)itemIndex,
+                        itemIndex,
                         equipWeaponSet,
                         -1,
                         ClientInventoryActions.ResponseUnEquipArmor,
@@ -879,14 +879,14 @@ namespace MultiplayerARPG
             {
                 GameInstance.ClientInventoryHandlers.RequestEquipItem(
                         PlayingCharacterEntity,
-                        (short)itemIndex,
+                        itemIndex,
                         HotkeyEquipWeaponSet,
                         ClientInventoryActions.ResponseEquipArmor,
                         ClientInventoryActions.ResponseEquipWeapon);
             }
             else if (item.IsSkill())
             {
-                SetQueueUsingSkill(aimPosition, (item as ISkillItem).UsingSkill, (item as ISkillItem).UsingSkillLevel, (short)itemIndex);
+                SetQueueUsingSkill(aimPosition, (item as ISkillItem).UsingSkill, (item as ISkillItem).UsingSkillLevel, itemIndex);
             }
             else if (item.IsBuilding())
             {
@@ -897,7 +897,7 @@ namespace MultiplayerARPG
             }
             else if (item.IsUsable())
             {
-                PlayingCharacterEntity.CallServerUseItem((short)itemIndex);
+                PlayingCharacterEntity.CallServerUseItem(itemIndex);
             }
         }
 

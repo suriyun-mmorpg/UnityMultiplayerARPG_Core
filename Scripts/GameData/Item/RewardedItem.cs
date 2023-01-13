@@ -6,9 +6,9 @@ namespace MultiplayerARPG
     public struct RewardedItem : INetSerializable
     {
         public BaseItem item;
-        public short level;
-        public short amount;
-        public short randomSeed;
+        public int level;
+        public int amount;
+        public int randomSeed;
 
         public void SetItemByDataId(int dataId)
         {
@@ -18,17 +18,17 @@ namespace MultiplayerARPG
         public void Deserialize(NetDataReader reader)
         {
             SetItemByDataId(reader.GetPackedInt());
-            level = reader.GetPackedShort();
-            amount = reader.GetPackedShort();
-            randomSeed = reader.GetPackedShort();
+            level = reader.GetPackedInt();
+            amount = reader.GetPackedInt();
+            randomSeed = reader.GetPackedInt();
         }
 
         public void Serialize(NetDataWriter writer)
         {
             writer.PutPackedInt(item != null ? item.DataId : 0);
-            writer.PutPackedShort(level);
-            writer.PutPackedShort(amount);
-            writer.PutPackedShort(randomSeed);
+            writer.PutPackedInt(level);
+            writer.PutPackedInt(amount);
+            writer.PutPackedInt(randomSeed);
         }
     }
 }

@@ -9,9 +9,9 @@ namespace MultiplayerARPG
         {
             public AimPosition aimPosition;
             public BaseSkill skill;
-            public short level;
-            public short itemIndex;
-            public UsingSkillData(AimPosition aimPosition, BaseSkill skill, short level, short itemIndex)
+            public int level;
+            public int itemIndex;
+            public UsingSkillData(AimPosition aimPosition, BaseSkill skill, int level, int itemIndex)
             {
                 this.aimPosition = aimPosition;
                 this.skill = skill;
@@ -19,7 +19,7 @@ namespace MultiplayerARPG
                 this.itemIndex = itemIndex;
             }
 
-            public UsingSkillData(AimPosition aimPosition, BaseSkill skill, short level)
+            public UsingSkillData(AimPosition aimPosition, BaseSkill skill, int level)
             {
                 this.aimPosition = aimPosition;
                 this.skill = skill;
@@ -149,7 +149,7 @@ namespace MultiplayerARPG
                 uint parentObjectId = 0;
                 if (ConstructingBuildingEntity.BuildingArea != null)
                     parentObjectId = ConstructingBuildingEntity.BuildingArea.GetEntityObjectId();
-                PlayingCharacterEntity.Building.CallServerConstructBuilding((short)buildingItemIndex, ConstructingBuildingEntity.EntityTransform.position, ConstructingBuildingEntity.EntityTransform.rotation, parentObjectId);
+                PlayingCharacterEntity.Building.CallServerConstructBuilding(buildingItemIndex, ConstructingBuildingEntity.EntityTransform.position, ConstructingBuildingEntity.EntityTransform.rotation, parentObjectId);
             }
             DestroyConstructingBuilding();
         }
@@ -269,12 +269,12 @@ namespace MultiplayerARPG
             CacheUISceneGameplay.HideNpcDialog();
         }
 
-        public void SetQueueUsingSkill(AimPosition aimPosition, BaseSkill skill, short level)
+        public void SetQueueUsingSkill(AimPosition aimPosition, BaseSkill skill, int level)
         {
             queueUsingSkill = new UsingSkillData(aimPosition, skill, level);
         }
 
-        public void SetQueueUsingSkill(AimPosition aimPosition, BaseSkill skill, short level, short itemIndex)
+        public void SetQueueUsingSkill(AimPosition aimPosition, BaseSkill skill, int level, int itemIndex)
         {
             queueUsingSkill = new UsingSkillData(aimPosition, skill, level, itemIndex);
         }

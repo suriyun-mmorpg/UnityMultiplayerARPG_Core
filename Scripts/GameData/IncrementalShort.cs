@@ -4,8 +4,8 @@ public struct IncrementalShort
     public short baseAmount;
     public float amountIncreaseEachLevel;
 
-    public short GetAmount(short level)
+    public short GetAmount(int level)
     {
-        return (short)(baseAmount + (short)(amountIncreaseEachLevel * (level - 1)));
+        return (short)(baseAmount + (amountIncreaseEachLevel * (level - 1)));
     }
 }

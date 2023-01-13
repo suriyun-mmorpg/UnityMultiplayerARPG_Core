@@ -54,7 +54,7 @@ namespace MultiplayerARPG
 
         public void OnClickSellItems()
         {
-            List<short> indexes = new List<short>();
+            List<int> indexes = new List<int>();
             CharacterItem tempCharacterItem;
             List<UICharacterItem> selectedUIs = uiNonEquipItems.CacheSelectionManager.GetSelectedUIs();
             foreach (UICharacterItem selectedUI in selectedUIs)
@@ -62,7 +62,7 @@ namespace MultiplayerARPG
                 tempCharacterItem = selectedUI.Data.characterItem;
                 if (tempCharacterItem.IsEmptySlot() || selectedUI.InventoryType != InventoryType.NonEquipItems)
                     continue;
-                indexes.Add((short)selectedUI.IndexOfData);
+                indexes.Add(selectedUI.IndexOfData);
             }
             GameInstance.ClientInventoryHandlers.RequestSellItems(new RequestSellItemsMessage()
             {

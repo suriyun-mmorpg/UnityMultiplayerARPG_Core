@@ -22,24 +22,24 @@ namespace MultiplayerARPG
         private ArmorIncremental[] armors;
         public virtual ArmorIncremental[] Armors { get { return armors; } set { armors = value; } }
 
-        public abstract Dictionary<BaseSkill, short> CacheSkillLevels { get; }
+        public abstract Dictionary<BaseSkill, int> CacheSkillLevels { get; }
 
-        public CharacterStats GetCharacterStats(short level)
+        public CharacterStats GetCharacterStats(int level)
         {
             return Stats.GetCharacterStats(level);
         }
 
-        public Dictionary<Attribute, float> GetCharacterAttributes(short level)
+        public Dictionary<Attribute, float> GetCharacterAttributes(int level)
         {
             return GameDataHelpers.CombineAttributes(Attributes, new Dictionary<Attribute, float>(), level, 1f);
         }
 
-        public Dictionary<DamageElement, float> GetCharacterResistances(short level)
+        public Dictionary<DamageElement, float> GetCharacterResistances(int level)
         {
             return GameDataHelpers.CombineResistances(Resistances, new Dictionary<DamageElement, float>(), level, 1f);
         }
 
-        public Dictionary<DamageElement, float> GetCharacterArmors(short level)
+        public Dictionary<DamageElement, float> GetCharacterArmors(int level)
         {
             return GameDataHelpers.CombineArmors(Armors, new Dictionary<DamageElement, float>(), level, 1f);
         }

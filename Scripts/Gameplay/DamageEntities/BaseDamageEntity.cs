@@ -9,7 +9,7 @@ namespace MultiplayerARPG
         protected CharacterItem weapon;
         protected Dictionary<DamageElement, MinMaxFloat> damageAmounts;
         protected BaseSkill skill;
-        protected short skillLevel;
+        protected int skillLevel;
 
         public GameInstance CurrentGameInstance
         {
@@ -73,7 +73,7 @@ namespace MultiplayerARPG
             CharacterItem weapon,
             Dictionary<DamageElement, MinMaxFloat> damageAmounts,
             BaseSkill skill,
-            short skillLevel)
+            int skillLevel)
         {
             this.instigator = instigator;
             this.weapon = weapon;

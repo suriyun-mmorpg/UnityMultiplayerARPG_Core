@@ -35,8 +35,8 @@ namespace MultiplayerARPG
                 else
                 {
                     uiTextRequireLevel.SetGameObjectActive(true);
-                    short characterLevel = (short)(GameInstance.PlayingCharacter != null ? GameInstance.PlayingCharacter.Level : 1);
-                    short requireCharacterLevel = Data.Requirement.level;
+                    int characterLevel = GameInstance.PlayingCharacter != null ? GameInstance.PlayingCharacter.Level : 1;
+                    int requireCharacterLevel = Data.Requirement.level;
                     if (characterLevel >= requireCharacterLevel)
                     {
                         uiTextRequireLevel.text = ZString.Format(

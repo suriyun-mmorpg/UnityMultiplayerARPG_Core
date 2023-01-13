@@ -12,7 +12,7 @@ namespace MultiplayerARPG
     public class GameInstanceTools : MonoBehaviour
     {
         [Header("Exp calculator")]
-        public short maxLevel;
+        public int maxLevel;
         public Int32GraphCalculator expCalculator;
         public bool calculateExp;
 
@@ -34,9 +34,9 @@ namespace MultiplayerARPG
             {
                 calculateExp = false;
                 int[] expTree = new int[maxLevel - 1];
-                for (short i = 1; i < maxLevel; ++i)
+                for (int i = 1; i < maxLevel; ++i)
                 {
-                    expTree[i - 1] = expCalculator.Calculate(i, (short)(maxLevel - 1));
+                    expTree[i - 1] = expCalculator.Calculate(i, (maxLevel - 1));
                 }
                 CacheGameInstance.ExpTree = expTree;
                 EditorUtility.SetDirty(CacheGameInstance);

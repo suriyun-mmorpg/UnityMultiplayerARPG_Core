@@ -40,7 +40,7 @@ namespace MultiplayerARPG
         /// <summary>
         /// How many bullets can store in the gun
         /// </summary>
-        short AmmoCapacity { get; }
+        int AmmoCapacity { get; }
         /// <summary>
         /// Weapon ability such as zoom, change how to fire, change launch clip. (For now, it has only zoom)
         /// </summary>

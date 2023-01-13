@@ -13,7 +13,7 @@ namespace MultiplayerARPG
         protected float weight = 0f;
         [SerializeField]
         [Min(1)]
-        protected short maxStack = 1;
+        protected int maxStack = 1;
         [SerializeField]
         protected ItemRefine itemRefine = null;
         [SerializeField]
@@ -66,7 +66,7 @@ namespace MultiplayerARPG
 
         public float Weight { get { return weight; } }
 
-        public short MaxStack { get { return maxStack; } }
+        public int MaxStack { get { return maxStack; } }
 
         public ItemRefine ItemRefine { get { return itemRefine; } }
 

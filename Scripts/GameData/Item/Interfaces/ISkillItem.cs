@@ -9,6 +9,6 @@
         /// <summary>
         /// Activating skill's level
         /// </summary>
-        short UsingSkillLevel { get; }
+        int UsingSkillLevel { get; }
     }
 }

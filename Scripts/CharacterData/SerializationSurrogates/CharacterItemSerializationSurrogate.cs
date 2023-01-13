@@ -33,13 +33,13 @@ namespace MultiplayerARPG
         {
             CharacterItem data = (CharacterItem)obj;
             data.dataId = info.GetInt32("dataId");
-            data.level = info.GetInt16("level");
-            data.amount = info.GetInt16("amount");
+            data.level = info.GetInt32("level");
+            data.amount = info.GetInt32("amount");
             data.equipSlotIndex = info.GetByte("equipSlotIndex");
             data.durability = info.GetSingle("durability");
             data.exp = info.GetInt32("exp");
             data.lockRemainsDuration = info.GetSingle("lockRemainsDuration");
-            data.ammo = info.GetInt16("ammo");
+            data.ammo = info.GetInt32("ammo");
             data.sockets = (List<int>)info.GetValue("sockets", typeof(List<int>));
             // TODO: Backward compatible, this will be removed in future version
             try
@@ -57,7 +57,7 @@ namespace MultiplayerARPG
             catch { }
             try
             {
-                data.randomSeed = info.GetInt16("randomSeed");
+                data.randomSeed = info.GetInt32("randomSeed");
             }
             catch { }
             if (string.IsNullOrEmpty(data.id))

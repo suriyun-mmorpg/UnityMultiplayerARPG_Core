@@ -101,13 +101,13 @@ namespace MultiplayerARPG
         }
 
         [System.NonSerialized]
-        private Dictionary<BaseSkill, short> cacheSkillLevels = null;
-        public override Dictionary<BaseSkill, short> CacheSkillLevels
+        private Dictionary<BaseSkill, int> cacheSkillLevels = null;
+        public override Dictionary<BaseSkill, int> CacheSkillLevels
         {
             get
             {
                 if (cacheSkillLevels == null)
-                    cacheSkillLevels = GameDataHelpers.CombineSkills(skillLevels, new Dictionary<BaseSkill, short>());
+                    cacheSkillLevels = GameDataHelpers.CombineSkills(skillLevels, new Dictionary<BaseSkill, int>());
                 return cacheSkillLevels;
             }
         }

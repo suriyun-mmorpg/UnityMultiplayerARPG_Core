@@ -292,14 +292,14 @@ namespace MultiplayerARPG
                 onShowDealingDialog.Invoke(playerCharacterEntity);
         }
 
-        public bool CallServerSetDealingItem(string id, short amount)
+        public bool CallServerSetDealingItem(string id, int amount)
         {
             RPC(ServerSetDealingItem, id, amount);
             return true;
         }
 
         [ServerRpc]
-        protected void ServerSetDealingItem(string id, short amount)
+        protected void ServerSetDealingItem(string id, int amount)
         {
 #if UNITY_EDITOR || UNITY_SERVER
             if (DealingState != DealingState.Dealing)

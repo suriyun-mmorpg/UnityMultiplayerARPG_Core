@@ -4,7 +4,7 @@ namespace MultiplayerARPG
 {
     public static partial class ClientInventoryHandlersExtensions
     {
-        public static void RequestEquipItem(this IClientInventoryHandlers handlers, IPlayerCharacterData playerCharacter, short nonEquipIndex, byte equipWeaponSet, ResponseDelegate<ResponseEquipArmorMessage> responseEquipArmor, ResponseDelegate<ResponseEquipWeaponMessage> responseEquipWeapon)
+        public static void RequestEquipItem(this IClientInventoryHandlers handlers, IPlayerCharacterData playerCharacter, int nonEquipIndex, byte equipWeaponSet, ResponseDelegate<ResponseEquipArmorMessage> responseEquipArmor, ResponseDelegate<ResponseEquipWeaponMessage> responseEquipWeapon)
         {
             if (nonEquipIndex < 0 || nonEquipIndex >= playerCharacter.NonEquipItems.Count)
                 return;
@@ -79,7 +79,7 @@ namespace MultiplayerARPG
                 byte equippingSlotIndex = (byte)(equippingArmorItem.ArmorType.EquippableSlots - 1);
                 bool[] equippedSlots = new bool[equippingArmorItem.ArmorType.EquippableSlots];
                 CharacterItem equippedItem;
-                for (short i = 0; i < playerCharacter.EquipItems.Count; ++i)
+                for (int i = 0; i < playerCharacter.EquipItems.Count; ++i)
                 {
                     equippedItem = playerCharacter.EquipItems[i];
                     // If equipped item is same armor type, find which slot it is equipped
@@ -103,7 +103,7 @@ namespace MultiplayerARPG
             }
         }
 
-        public static void RequestEquipItem(this IClientInventoryHandlers handlers, short nonEquipIndex, InventoryType inventoryType, byte equipSlotIndex, ResponseDelegate<ResponseEquipArmorMessage> responseEquipArmor, ResponseDelegate<ResponseEquipWeaponMessage> responseEquipWeapon)
+        public static void RequestEquipItem(this IClientInventoryHandlers handlers, int nonEquipIndex, InventoryType inventoryType, byte equipSlotIndex, ResponseDelegate<ResponseEquipArmorMessage> responseEquipArmor, ResponseDelegate<ResponseEquipWeaponMessage> responseEquipWeapon)
         {
             switch (inventoryType)
             {
@@ -133,7 +133,7 @@ namespace MultiplayerARPG
             }
         }
 
-        public static void RequestUnEquipItem(this IClientInventoryHandlers handlers, InventoryType inventoryType, short equipItemIndex, byte equipWeaponSet, short nonEquipIndex, ResponseDelegate<ResponseUnEquipArmorMessage> responseUnEquipArmor, ResponseDelegate<ResponseUnEquipWeaponMessage> responseUnEquipWeapon)
+        public static void RequestUnEquipItem(this IClientInventoryHandlers handlers, InventoryType inventoryType, int equipItemIndex, byte equipWeaponSet, int nonEquipIndex, ResponseDelegate<ResponseUnEquipArmorMessage> responseUnEquipArmor, ResponseDelegate<ResponseUnEquipWeaponMessage> responseUnEquipWeapon)
         {
             switch (inventoryType)
             {

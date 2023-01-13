@@ -62,7 +62,7 @@ namespace MultiplayerARPG
         }
 
         public ICharacterData Character { get; protected set; }
-        public Dictionary<BaseSkill, short> LoadedList { get; private set; } = new Dictionary<BaseSkill, short>();
+        public Dictionary<BaseSkill, int> LoadedList { get; private set; } = new Dictionary<BaseSkill, int>();
 
         protected virtual void OnEnable()
         {
@@ -170,23 +170,23 @@ namespace MultiplayerARPG
             GenerateList();
         }
 
-        public void UpdateData(ICharacterData character, IDictionary<BaseSkill, short> skills)
+        public void UpdateData(ICharacterData character, IDictionary<BaseSkill, int> skills)
         {
             Character = character;
             LoadedList.Clear();
-            foreach (KeyValuePair<BaseSkill, short> skill in skills)
+            foreach (KeyValuePair<BaseSkill, int> skill in skills)
             {
                 LoadedList[skill.Key] = skill.Value;
             }
             GenerateList();
         }
 
-        public void UpdateData(ICharacterData character, IDictionary<int, short> skills)
+        public void UpdateData(ICharacterData character, IDictionary<int, int> skills)
         {
             Character = character;
             LoadedList.Clear();
             BaseSkill tempSkill;
-            foreach (KeyValuePair<int, short> skill in skills)
+            foreach (KeyValuePair<int, int> skill in skills)
             {
                 if (GameInstance.Skills.TryGetValue(skill.Key, out tempSkill))
                     LoadedList[tempSkill] = skill.Value;
@@ -211,7 +211,7 @@ namespace MultiplayerARPG
             CacheSelectionManager.DeselectSelectedUI();
             CacheSelectionManager.Clear();
 
-            Dictionary<BaseSkill, short> filteredList = UICharacterSkillsUtils.GetFilteredList(LoadedList, filterCategories, filterSkillTypes);
+            Dictionary<BaseSkill, int> filteredList = UICharacterSkillsUtils.GetFilteredList(LoadedList, filterCategories, filterSkillTypes);
             if (Character == null || filteredList.Count == 0)
             {
                 if (uiDialog != null)
@@ -227,13 +227,13 @@ namespace MultiplayerARPG
 
             UICharacterSkill tempUI;
             int tempIndexOfLearnedSkill;
-            short tempLearnedSkillLevel;
+            int tempLearnedSkillLevel;
             // Combine skills from database (skill that can level up) with learned skill and equipment skill
             CacheList.Generate(filteredList, (index, data, ui) =>
             {
                 tempUI = ui.GetComponent<UICharacterSkill>();
                 tempIndexOfLearnedSkill = Character.IndexOfSkill(data.Key.DataId);
-                tempLearnedSkillLevel = (short)(tempIndexOfLearnedSkill >= 0 ? Character.Skills[tempIndexOfLearnedSkill].level : 0);
+                tempLearnedSkillLevel = tempIndexOfLearnedSkill >= 0 ? Character.Skills[tempIndexOfLearnedSkill].level : 0;
                 // Set UI data, Create new character skill data based on learned skill, target level is sum of learned skill and equipment skill
                 tempUI.Setup(new UICharacterSkillData(CharacterSkill.Create(data.Key, tempLearnedSkillLevel), data.Value), Character, tempIndexOfLearnedSkill);
                 tempUI.Show();

@@ -3,5 +3,5 @@ public struct DiscoveryData
 {
     public string id;
     public string characterName;
-    public short level;
+    public int level;
 }

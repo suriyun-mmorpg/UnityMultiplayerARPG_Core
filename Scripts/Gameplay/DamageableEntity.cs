@@ -255,7 +255,7 @@ namespace MultiplayerARPG
         /// <param name="skill"></param>
         /// <param name="skillLevel"></param>
         /// <param name="randomSeed"></param>
-        internal void ApplyDamage(HitBoxPosition position, Vector3 fromPosition, EntityInfo instigator, Dictionary<DamageElement, MinMaxFloat> damageAmounts, CharacterItem weapon, BaseSkill skill, short skillLevel, int randomSeed)
+        internal void ApplyDamage(HitBoxPosition position, Vector3 fromPosition, EntityInfo instigator, Dictionary<DamageElement, MinMaxFloat> damageAmounts, CharacterItem weapon, BaseSkill skill, int skillLevel, int randomSeed)
         {
             ReceivingDamage(position, fromPosition, instigator, damageAmounts, weapon, skill, skillLevel);
             CombatAmountType combatAmountType;
@@ -274,7 +274,7 @@ namespace MultiplayerARPG
         /// <param name="weapon">Weapon which used to attack</param>
         /// <param name="skill">Skill which used to attack</param>
         /// <param name="skillLevel">Skill level which used to attack</param>
-        public virtual void ReceivingDamage(HitBoxPosition position, Vector3 fromPosition, EntityInfo instigator, Dictionary<DamageElement, MinMaxFloat> damageAmounts, CharacterItem weapon, BaseSkill skill, short skillLevel)
+        public virtual void ReceivingDamage(HitBoxPosition position, Vector3 fromPosition, EntityInfo instigator, Dictionary<DamageElement, MinMaxFloat> damageAmounts, CharacterItem weapon, BaseSkill skill, int skillLevel)
         {
             IGameEntity attacker;
             instigator.TryGetEntity(out attacker);
@@ -295,7 +295,7 @@ namespace MultiplayerARPG
         /// <param name="randomSeed">Random seed for damage randoming</param>
         /// <param name="combatAmountType">Result damage type</param>
         /// <param name="totalDamage">Result damage</param>
-        protected abstract void ApplyReceiveDamage(HitBoxPosition position, Vector3 fromPosition, EntityInfo instigator, Dictionary<DamageElement, MinMaxFloat> damageAmounts, CharacterItem weapon, BaseSkill skill, short skillLevel, int randomSeed, out CombatAmountType combatAmountType, out int totalDamage);
+        protected abstract void ApplyReceiveDamage(HitBoxPosition position, Vector3 fromPosition, EntityInfo instigator, Dictionary<DamageElement, MinMaxFloat> damageAmounts, CharacterItem weapon, BaseSkill skill, int skillLevel, int randomSeed, out CombatAmountType combatAmountType, out int totalDamage);
 
         /// <summary>
         /// This function will be called after applied receive damage
@@ -311,7 +311,7 @@ namespace MultiplayerARPG
         /// <param name="skillLevel">Level of the skill</param>
         /// <param name="buff">Which buff is the source of damages</param>
         /// <param name="isDamageOverTime">Received from damage over time debuff</param>
-        public virtual void ReceivedDamage(HitBoxPosition position, Vector3 fromPosition, EntityInfo instigator, Dictionary<DamageElement, MinMaxFloat> damageAmounts, CombatAmountType combatAmountType, int totalDamage, CharacterItem weapon, BaseSkill skill, short skillLevel, CharacterBuff buff, bool isDamageOverTime = false)
+        public virtual void ReceivedDamage(HitBoxPosition position, Vector3 fromPosition, EntityInfo instigator, Dictionary<DamageElement, MinMaxFloat> damageAmounts, CombatAmountType combatAmountType, int totalDamage, CharacterItem weapon, BaseSkill skill, int skillLevel, CharacterBuff buff, bool isDamageOverTime = false)
         {
             HitEffectsSourceType hitEffectsSourceType = HitEffectsSourceType.None;
             int hitEffectsSourceDataId = 0;

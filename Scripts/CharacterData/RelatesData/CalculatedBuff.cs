@@ -5,7 +5,7 @@ namespace MultiplayerARPG
     public class CalculatedBuff
     {
         private Buff buff;
-        private short level;
+        private int level;
         private float cacheDuration;
         private int cacheRecoveryHp;
         private int cacheRecoveryMp;
@@ -22,7 +22,7 @@ namespace MultiplayerARPG
         private Dictionary<DamageElement, MinMaxFloat> cacheDamageOverTimes;
         private int cacheMaxStack;
 
-        public CalculatedBuff(Buff buff, short level)
+        public CalculatedBuff(Buff buff, int level)
         {
             this.buff = buff;
             this.level = level;
@@ -48,7 +48,7 @@ namespace MultiplayerARPG
             return buff;
         }
 
-        public short GetLevel()
+        public int GetLevel()
         {
             return level;
         }

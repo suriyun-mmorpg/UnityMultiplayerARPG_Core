@@ -20,12 +20,12 @@ namespace MultiplayerARPG
         public int dataId;
         public float summonRemainsDuration;
         public uint objectId;
-        public short level;
+        public int level;
         public int exp;
         public int currentHp;
         public int currentMp;
         // Properties for save / load
-        public short Level { get { return CacheEntity != null ? CacheEntity.Level : level; } }
+        public int Level { get { return CacheEntity != null ? CacheEntity.Level : level; } }
         public int Exp { get { return CacheEntity != null ? CacheEntity.Exp : exp; } }
         public int CurrentHp { get { return CacheEntity != null ? CacheEntity.CurrentHp : currentHp; } }
         public int CurrentMp { get { return CacheEntity != null ? CacheEntity.CurrentMp : currentMp; } }
@@ -35,7 +35,7 @@ namespace MultiplayerARPG
         [System.NonSerialized]
         private int dirtyDataId;
         [System.NonSerialized]
-        private short dirtyLevel;
+        private int dirtyLevel;
 
         [System.NonSerialized]
         private BaseSkill cacheSkill;
@@ -90,7 +90,7 @@ namespace MultiplayerARPG
             }
         }
 
-        public void Summon(BaseCharacterEntity summoner, short summonLevel, float duration)
+        public void Summon(BaseCharacterEntity summoner, int summonLevel, float duration)
         {
             if (GetPrefab() == null)
                 return;
@@ -107,14 +107,14 @@ namespace MultiplayerARPG
             level = summonLevel;
         }
 
-        public void Summon(BaseCharacterEntity summoner, short summonLevel, float duration, int summonExp)
+        public void Summon(BaseCharacterEntity summoner, int summonLevel, float duration, int summonExp)
         {
             Summon(summoner, summonLevel, duration);
             CacheEntity.Exp = summonExp;
             exp = summonExp;
         }
 
-        public void Summon(BaseCharacterEntity summoner, short summonLevel, float duration, int summonExp, int summonCurrentHp, int summonCurrentMp)
+        public void Summon(BaseCharacterEntity summoner, int summonLevel, float duration, int summonExp, int summonCurrentHp, int summonCurrentMp)
         {
             Summon(summoner, summonLevel, duration, summonExp);
             CacheEntity.CurrentHp = summonCurrentHp;
@@ -231,7 +231,7 @@ namespace MultiplayerARPG
                         break;
                 }
                 writer.PutPackedUInt(objectId);
-                writer.PutPackedShort(level);
+                writer.PutPackedInt(level);
                 writer.PutPackedInt(exp);
                 writer.PutPackedInt(currentHp);
                 writer.PutPackedInt(currentMp);
@@ -252,7 +252,7 @@ namespace MultiplayerARPG
                         break;
                 }
                 objectId = reader.GetPackedUInt();
-                level = reader.GetPackedShort();
+                level = reader.GetPackedInt();
                 exp = reader.GetPackedInt();
                 currentHp = reader.GetPackedInt();
                 currentMp = reader.GetPackedInt();

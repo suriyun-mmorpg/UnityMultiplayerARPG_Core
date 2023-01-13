@@ -29,7 +29,7 @@ namespace MultiplayerARPG
             data.type = (SummonType)info.GetByte("type");
             data.dataId = info.GetInt32("dataId");
             data.summonRemainsDuration = info.GetSingle("summonRemainsDuration");
-            data.level = info.GetInt16("level");
+            data.level = info.GetInt32("level");
             data.exp = info.GetInt32("exp");
             data.currentHp = info.GetInt32("currentHp");
             data.currentMp = info.GetInt32("currentMp");

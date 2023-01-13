@@ -9,7 +9,7 @@ namespace MultiplayerARPG
         int EntityId { get; set; }
         string CharacterName { get; set; }
         string Title { get; set; }
-        short Level { get; set; }
+        int Level { get; set; }
         int Exp { get; set; }
         int CurrentHp { get; set; }
         int CurrentMp { get; set; }

@@ -20,7 +20,7 @@ namespace MultiplayerARPG
         public string id;
         public BuffType type;
         public int dataId;
-        public short level;
+        public int level;
         public float buffRemainsDuration;
 
         [System.NonSerialized]
@@ -28,7 +28,7 @@ namespace MultiplayerARPG
         [System.NonSerialized]
         private int dirtyDataId;
         [System.NonSerialized]
-        private short dirtyLevel;
+        private int dirtyLevel;
 
         [System.NonSerialized]
         private BaseSkill cacheSkill;
@@ -152,7 +152,7 @@ namespace MultiplayerARPG
             };
         }
 
-        public static CharacterBuff Create(BuffType type, int dataId, short level = 1)
+        public static CharacterBuff Create(BuffType type, int dataId, int level = 1)
         {
             return new CharacterBuff()
             {
@@ -169,7 +169,7 @@ namespace MultiplayerARPG
             writer.Put(id);
             writer.Put((byte)type);
             writer.PutPackedInt(dataId);
-            writer.PutPackedShort(level);
+            writer.PutPackedInt(level);
             writer.Put(buffRemainsDuration);
         }
 
@@ -178,7 +178,7 @@ namespace MultiplayerARPG
             id = reader.GetString();
             type = (BuffType)reader.GetByte();
             dataId = reader.GetPackedInt();
-            level = reader.GetPackedShort();
+            level = reader.GetPackedInt();
             buffRemainsDuration = reader.GetFloat();
         }
     }

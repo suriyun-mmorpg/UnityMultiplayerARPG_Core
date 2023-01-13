@@ -5,7 +5,7 @@ public abstract class GraphCalculator<T>
     public T minValue;
     public T maxValue;
     public float growth;
-    public abstract T Calculate(short currentLevel, short maxLevel);
+    public abstract T Calculate(int currentLevel, int maxLevel);
 
 }
 
@@ -21,7 +21,7 @@ public class Int32GraphCalculator : GraphCalculator<int>
         return result;
     }
 
-    public override int Calculate(short currentLevel, short maxLevel)
+    public override int Calculate(int currentLevel, int maxLevel)
     {
         if (currentLevel <= 0)
             currentLevel = 1;
@@ -55,7 +55,7 @@ public class SingleGraphCalculator : GraphCalculator<float>
         return result;
     }
 
-    public override float Calculate(short currentLevel, short maxLevel)
+    public override float Calculate(int currentLevel, int maxLevel)
     {
         if (currentLevel <= 0)
             currentLevel = 1;

@@ -41,14 +41,14 @@ namespace MultiplayerARPG
             });
         }
 
-        public void NotifyRewardItem(long connectionId, int dataId, short amount)
+        public void NotifyRewardItem(long connectionId, int dataId, int amount)
         {
             if (amount <= 0)
                 return;
             Manager.ServerSendPacket(connectionId, 0, DeliveryMethod.ReliableOrdered, GameNetworkingConsts.NotifyRewardItem, (writer) =>
             {
                 writer.PutPackedInt(dataId);
-                writer.PutPackedShort(amount);
+                writer.PutPackedInt(amount);
             });
         }
 
@@ -72,15 +72,15 @@ namespace MultiplayerARPG
             });
         }
 
-        public void NotifyStorageOpened(long connectionId, StorageType storageType, string storageOwnerId, uint objectId, short weightLimit, short slotLimit)
+        public void NotifyStorageOpened(long connectionId, StorageType storageType, string storageOwnerId, uint objectId, int weightLimit, int slotLimit)
         {
             Manager.ServerSendPacket(connectionId, 0, DeliveryMethod.ReliableOrdered, GameNetworkingConsts.NotifyStorageOpened, (writer) =>
             {
                 writer.Put((byte)storageType);
                 writer.Put(storageOwnerId);
                 writer.PutPackedUInt(objectId);
-                writer.PutPackedShort(weightLimit);
-                writer.PutPackedShort(slotLimit);
+                writer.PutPackedInt(weightLimit);
+                writer.PutPackedInt(slotLimit);
             });
         }
 
@@ -181,7 +181,7 @@ namespace MultiplayerARPG
             Manager.Server.SendRemoveSocialMember(connectionId, GameNetworkingConsts.UpdateGuildMember, id, characterId);
         }
 
-        public void SendSetGuildSkillLevel(long connectionId, int id, int dataId, short level)
+        public void SendSetGuildSkillLevel(long connectionId, int id, int dataId, int level)
         {
             Manager.Server.SendSetGuildSkillLevel(connectionId, GameNetworkingConsts.UpdateGuild, id, dataId, level);
         }
@@ -211,7 +211,7 @@ namespace MultiplayerARPG
             Manager.Server.SendSetGuildRank(connectionId, GameNetworkingConsts.UpdateGuild, id, rank);
         }
 
-        public void SendSetGuildLevelExpSkillPoint(long connectionId, int id, short level, int exp, short skillPoint)
+        public void SendSetGuildLevelExpSkillPoint(long connectionId, int id, int level, int exp, int skillPoint)
         {
             Manager.Server.SendSetGuildLevelExpSkillPoint(connectionId, GameNetworkingConsts.UpdateGuild, id, level, exp, skillPoint);
         }

@@ -4,7 +4,7 @@ namespace MultiplayerARPG
 {
     public interface ICharacterReloadComponent
     {
-        short ReloadingAmmoAmount { get; }
+        int ReloadingAmmoAmount { get; }
         bool IsReloading { get; }
         float LastReloadEndTime { get; }
         float MoveSpeedRateWhileReloading { get; }

@@ -73,7 +73,7 @@ namespace MultiplayerARPG
         public ActionRestriction attackRestriction = default(ActionRestriction);
         public ActionRestriction reloadRestriction = default(ActionRestriction);
         [Tooltip("For macine gun may set this to 30 as magazine capacity, if this is 0 it will not need to have ammo loaded to shoot but still need ammo in inventory")]
-        public short ammoCapacity;
+        public int ammoCapacity;
         public BaseWeaponAbility weaponAbility;
         public CrosshairSetting crosshairSetting = new CrosshairSetting()
         {
@@ -444,7 +444,7 @@ namespace MultiplayerARPG
             get { return reloadRestriction; }
         }
 
-        public short AmmoCapacity
+        public int AmmoCapacity
         {
             get { return ammoCapacity; }
         }
@@ -546,7 +546,7 @@ namespace MultiplayerARPG
             get { return skillLevel.skill; }
         }
 
-        public short UsingSkillLevel
+        public int UsingSkillLevel
         {
             get { return skillLevel.level; }
         }
@@ -660,7 +660,7 @@ namespace MultiplayerARPG
             return this;
         }
 
-        public void UseItem(BaseCharacterEntity character, short itemIndex, CharacterItem characterItem)
+        public void UseItem(BaseCharacterEntity character, int itemIndex, CharacterItem characterItem)
         {
             switch (itemType)
             {
@@ -688,7 +688,7 @@ namespace MultiplayerARPG
             }
         }
 
-        protected void UseItemPotion(BaseCharacterEntity character, short itemIndex, short level)
+        protected void UseItemPotion(BaseCharacterEntity character, int itemIndex, int level)
         {
             if (!character.CanUseItem() || level <= 0 || !character.DecreaseItemsByIndex(itemIndex, 1, false))
                 return;
@@ -696,7 +696,7 @@ namespace MultiplayerARPG
             character.ApplyBuff(DataId, BuffType.PotionBuff, level, character.GetInfo(), null);
         }
 
-        protected void UseItemPet(BaseCharacterEntity character, short itemIndex, short level, int exp)
+        protected void UseItemPet(BaseCharacterEntity character, int itemIndex, int level, int exp)
         {
             if (!character.CanUseItem() || level <= 0 || !character.DecreaseItemsByIndex(itemIndex, 1, false))
                 return;
@@ -717,7 +717,7 @@ namespace MultiplayerARPG
             character.Summons.Add(newSummon);
         }
 
-        protected void UseItemMount(BaseCharacterEntity character, short itemIndex, short level)
+        protected void UseItemMount(BaseCharacterEntity character, int itemIndex, int level)
         {
             if (!character.CanUseItem() || level <= 0)
                 return;
@@ -725,17 +725,17 @@ namespace MultiplayerARPG
             character.Mount(MountEntity);
         }
 
-        protected void UseItemAttributeIncrease(BasePlayerCharacterEntity character, short itemIndex)
+        protected void UseItemAttributeIncrease(BasePlayerCharacterEntity character, int itemIndex)
         {
             if (!character.CanUseItem() || attributeAmount.attribute == null)
                 return;
 
             UITextKeys gameMessage;
-            if (!character.AddAttribute(out gameMessage, attributeAmount.attribute.DataId, (short)attributeAmount.amount, itemIndex))
+            if (!character.AddAttribute(out gameMessage, attributeAmount.attribute.DataId, (int)attributeAmount.amount, itemIndex))
                 GameInstance.ServerGameMessageHandlers.SendGameMessage(character.ConnectionId, gameMessage);
         }
 
-        protected void UseItemAttributeReset(BasePlayerCharacterEntity character, short itemIndex)
+        protected void UseItemAttributeReset(BasePlayerCharacterEntity character, int itemIndex)
         {
             if (!character.CanUseItem())
                 return;
@@ -743,7 +743,7 @@ namespace MultiplayerARPG
             character.ResetAttributes(itemIndex);
         }
 
-        protected void UseItemSkillLearn(BasePlayerCharacterEntity character, short itemIndex)
+        protected void UseItemSkillLearn(BasePlayerCharacterEntity character, int itemIndex)
         {
             if (!character.CanUseItem() || UsingSkill == null)
                 return;
@@ -753,7 +753,7 @@ namespace MultiplayerARPG
                 GameInstance.ServerGameMessageHandlers.SendGameMessage(character.ConnectionId, gameMessage);
         }
 
-        protected void UseItemSkillReset(BasePlayerCharacterEntity character, short itemIndex)
+        protected void UseItemSkillReset(BasePlayerCharacterEntity character, int itemIndex)
         {
             if (!character.CanUseItem())
                 return;

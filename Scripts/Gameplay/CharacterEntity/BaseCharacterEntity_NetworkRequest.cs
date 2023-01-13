@@ -11,7 +11,7 @@
             return true;
         }
 
-        public bool CallServerPickupItemFromContainer(uint objectId, int itemsContainerIndex, short amount)
+        public bool CallServerPickupItemFromContainer(uint objectId, int itemsContainerIndex, int amount)
         {
             if (!CanDoActions())
                 return false;
@@ -38,7 +38,7 @@
             return true;
         }
 
-        public bool CallServerDropItem(short nonEquipIndex, short amount)
+        public bool CallServerDropItem(int nonEquipIndex, int amount)
         {
             if (!CanDoActions() || nonEquipIndex >= NonEquipItems.Count)
                 return false;

@@ -321,7 +321,7 @@ namespace MultiplayerARPG
         [Tooltip("If this is `TRUE` it won't fill empty slots")]
         public bool doNotFillEmptySlots = false;
         [Tooltip("Base slot limit for all characters, it will be used when `InventorySystem` is `LimitSlots`")]
-        public short baseSlotLimit = 0;
+        public int baseSlotLimit = 0;
         public Storage playerStorage = default(Storage);
         public Storage guildStorage = default(Storage);
         public EnhancerRemoval enhancerRemoval = default(EnhancerRemoval);

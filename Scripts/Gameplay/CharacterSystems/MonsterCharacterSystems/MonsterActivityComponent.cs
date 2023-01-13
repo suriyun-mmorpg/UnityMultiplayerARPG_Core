@@ -40,7 +40,7 @@ namespace MultiplayerARPG
         protected Vector3 lastPosition;
         protected IDamageableEntity tempTargetEnemy;
         protected BaseSkill queueSkill;
-        protected short queueSkillLevel;
+        protected int queueSkillLevel;
         protected bool alreadySetActionState;
         protected bool isLeftHandAttacking;
         protected float lastSetDestinationTime;
@@ -90,7 +90,7 @@ namespace MultiplayerARPG
                 Entity.SetAttackTarget(enemy);
         }
 
-        private void Entity_onReceivedDamage(HitBoxPosition position, Vector3 fromPosition, IGameEntity attacker, CombatAmountType combatAmountType, int totalDamage, CharacterItem weapon, BaseSkill skill, short skillLevel, CharacterBuff buff, bool isDamageOverTime)
+        private void Entity_onReceivedDamage(HitBoxPosition position, Vector3 fromPosition, IGameEntity attacker, CombatAmountType combatAmountType, int totalDamage, CharacterItem weapon, BaseSkill skill, int skillLevel, CharacterBuff buff, bool isDamageOverTime)
         {
             BaseCharacterEntity attackerCharacter = attacker as BaseCharacterEntity;
             if (attackerCharacter == null)

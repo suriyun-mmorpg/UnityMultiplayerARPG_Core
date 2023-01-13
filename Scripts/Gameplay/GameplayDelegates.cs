@@ -13,7 +13,7 @@ namespace MultiplayerARPG
         Dictionary<DamageElement, MinMaxFloat> damageAmounts,
         CharacterItem weapon,
         BaseSkill skill,
-        short skillLevel);
+        int skillLevel);
 
     public delegate void ReceivedDamageDelegate(
         HitBoxPosition position,
@@ -23,7 +23,7 @@ namespace MultiplayerARPG
         int totalDamage,
         CharacterItem weapon,
         BaseSkill skill,
-        short skillLevel,
+        int skillLevel,
         CharacterBuff buff,
         bool isDamageOverTime);
 
@@ -48,7 +48,7 @@ namespace MultiplayerARPG
 
     public delegate void UseSkillRoutineDelegate(
         BaseSkill skill,
-        short level,
+        int level,
         bool isLeftHand,
         CharacterItem weapon,
         int hitIndex,
@@ -61,7 +61,7 @@ namespace MultiplayerARPG
         CharacterItem weapon,
         Dictionary<DamageElement, MinMaxFloat> damageAmounts,
         BaseSkill skill,
-        short skillLevel,
+        int skillLevel,
         int randomSeed,
         AimPosition aimPosition,
         Vector3 stagger,
@@ -70,7 +70,7 @@ namespace MultiplayerARPG
     public delegate void ApplyBuffDelegate(
         int dataId,
         BuffType type,
-        short level,
+        int level,
         EntityInfo buffApplier);
 
     public delegate void CharacterStatsDelegate(

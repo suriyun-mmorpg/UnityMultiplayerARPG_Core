@@ -8,7 +8,7 @@ namespace MultiplayerARPG
     public class UIGuildSkill : UISelectionEntry<UIGuildSkillData>
     {
         public GuildSkill GuildSkill { get { return Data.guildSkill; } }
-        public short Level { get { return Data.targetLevel; } }
+        public int Level { get { return Data.targetLevel; } }
 
         [Header("String Formats")]
         [Tooltip("Format => {0} = {Title}")]
@@ -300,7 +300,7 @@ namespace MultiplayerARPG
                 }
                 else
                 {
-                    uiNextLevelSkill.Data = new UIGuildSkillData(GuildSkill, (short)(Level + 1));
+                    uiNextLevelSkill.Data = new UIGuildSkillData(GuildSkill, Level + 1);
                     uiNextLevelSkill.Show();
                 }
             }

@@ -13,7 +13,7 @@ namespace MultiplayerARPG
         public static System.Action<UITextKeys> onClientReceiveGameMessage;
         public static System.Action<int> onNotifyRewardExp;
         public static System.Action<int> onNotifyRewardGold;
-        public static System.Action<int, short> onNotifyRewardItem;
+        public static System.Action<int, int> onNotifyRewardItem;
         public static System.Action<int, int> onNotifyRewardCurrency;
 
         public static void ClientConnected()
@@ -66,7 +66,7 @@ namespace MultiplayerARPG
                 onNotifyRewardGold.Invoke(gold);
         }
 
-        public static void NotifyRewardItem(int dataId, short amount)
+        public static void NotifyRewardItem(int dataId, int amount)
         {
             if (onNotifyRewardItem != null)
                 onNotifyRewardItem.Invoke(dataId, amount);

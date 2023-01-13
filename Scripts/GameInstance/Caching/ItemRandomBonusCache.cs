@@ -13,7 +13,7 @@ namespace MultiplayerARPG
         public Dictionary<DamageElement, float> ResistanceAmounts { get; private set; }
         public Dictionary<DamageElement, float> ArmorAmounts { get; private set; }
         public Dictionary<DamageElement, MinMaxFloat> DamageAmounts { get; private set; }
-        public Dictionary<BaseSkill, short> SkillLevels { get; private set; }
+        public Dictionary<BaseSkill, int> SkillLevels { get; private set; }
         public int DataId { get; private set; }
         public int RandomSeed { get; private set; }
 
@@ -28,7 +28,7 @@ namespace MultiplayerARPG
             ResistanceAmounts = new Dictionary<DamageElement, float>();
             ArmorAmounts = new Dictionary<DamageElement, float>();
             DamageAmounts = new Dictionary<DamageElement, MinMaxFloat>();
-            SkillLevels = new Dictionary<BaseSkill, short>();
+            SkillLevels = new Dictionary<BaseSkill, int>();
             System.Random random = new System.Random(randomSeed);
             int appliedAmount = 0;
             ItemRandomBonus randomBonus = equipmentItem.RandomBonus;

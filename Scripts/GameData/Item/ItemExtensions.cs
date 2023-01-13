@@ -92,7 +92,7 @@ namespace MultiplayerARPG
         #endregion
 
         #region Ammo Extension
-        public static Dictionary<DamageElement, MinMaxFloat> GetIncreaseDamages(this IAmmoItem ammoItem, short level)
+        public static Dictionary<DamageElement, MinMaxFloat> GetIncreaseDamages(this IAmmoItem ammoItem, int level)
         {
             Dictionary<DamageElement, MinMaxFloat> result = new Dictionary<DamageElement, MinMaxFloat>();
             if (ammoItem != null && ammoItem.IsAmmo())
@@ -102,7 +102,7 @@ namespace MultiplayerARPG
         #endregion
 
         #region Equipment Extension
-        public static CharacterStats GetIncreaseStats<T>(this T equipmentItem, short level, int randomSeed)
+        public static CharacterStats GetIncreaseStats<T>(this T equipmentItem, int level, int randomSeed)
             where T : IEquipmentItem
         {
             if (equipmentItem == null || !equipmentItem.IsEquipment())
@@ -110,7 +110,7 @@ namespace MultiplayerARPG
             return equipmentItem.IncreaseStats.GetCharacterStats(level) + ItemRandomBonusCacheManager.GetCaches(equipmentItem, randomSeed).CharacterStats;
         }
 
-        public static CharacterStats GetIncreaseStatsRate<T>(this T equipmentItem, short level, int randomSeed)
+        public static CharacterStats GetIncreaseStatsRate<T>(this T equipmentItem, int level, int randomSeed)
             where T : IEquipmentItem
         {
             if (equipmentItem == null || !equipmentItem.IsEquipment())
@@ -118,7 +118,7 @@ namespace MultiplayerARPG
             return equipmentItem.IncreaseStatsRate.GetCharacterStats(level) + ItemRandomBonusCacheManager.GetCaches(equipmentItem, randomSeed).CharacterStatsRate;
         }
 
-        public static Dictionary<Attribute, float> GetIncreaseAttributes<T>(this T equipmentItem, short level, int randomSeed)
+        public static Dictionary<Attribute, float> GetIncreaseAttributes<T>(this T equipmentItem, int level, int randomSeed)
             where T : IEquipmentItem
         {
             Dictionary<Attribute, float> result = new Dictionary<Attribute, float>();
@@ -132,7 +132,7 @@ namespace MultiplayerARPG
             return result;
         }
 
-        public static Dictionary<Attribute, float> GetIncreaseAttributesRate<T>(this T equipmentItem, short level, int randomSeed)
+        public static Dictionary<Attribute, float> GetIncreaseAttributesRate<T>(this T equipmentItem, int level, int randomSeed)
             where T : IEquipmentItem
         {
             Dictionary<Attribute, float> result = new Dictionary<Attribute, float>();
@@ -146,7 +146,7 @@ namespace MultiplayerARPG
             return result;
         }
 
-        public static Dictionary<DamageElement, float> GetIncreaseResistances<T>(this T equipmentItem, short level, int randomSeed)
+        public static Dictionary<DamageElement, float> GetIncreaseResistances<T>(this T equipmentItem, int level, int randomSeed)
             where T : IEquipmentItem
         {
             Dictionary<DamageElement, float> result = new Dictionary<DamageElement, float>();
@@ -160,7 +160,7 @@ namespace MultiplayerARPG
             return result;
         }
 
-        public static Dictionary<DamageElement, float> GetIncreaseArmors<T>(this T equipmentItem, short level, int randomSeed)
+        public static Dictionary<DamageElement, float> GetIncreaseArmors<T>(this T equipmentItem, int level, int randomSeed)
             where T : IEquipmentItem
         {
             Dictionary<DamageElement, float> result = new Dictionary<DamageElement, float>();
@@ -174,7 +174,7 @@ namespace MultiplayerARPG
             return result;
         }
 
-        public static Dictionary<DamageElement, MinMaxFloat> GetIncreaseDamages<T>(this T equipmentItem, short level, int randomSeed)
+        public static Dictionary<DamageElement, MinMaxFloat> GetIncreaseDamages<T>(this T equipmentItem, int level, int randomSeed)
             where T : IEquipmentItem
         {
             Dictionary<DamageElement, MinMaxFloat> result = new Dictionary<DamageElement, MinMaxFloat>();
@@ -188,10 +188,10 @@ namespace MultiplayerARPG
             return result;
         }
 
-        public static Dictionary<BaseSkill, short> GetIncreaseSkills<T>(this T equipmentItem, int randomSeed)
+        public static Dictionary<BaseSkill, int> GetIncreaseSkills<T>(this T equipmentItem, int randomSeed)
             where T : IEquipmentItem
         {
-            Dictionary<BaseSkill, short> result = new Dictionary<BaseSkill, short>();
+            Dictionary<BaseSkill, int> result = new Dictionary<BaseSkill, int>();
             if (equipmentItem != null && equipmentItem.IsEquipment())
             {
                 result = GameDataHelpers.CombineSkills(equipmentItem.IncreaseSkillLevels, result);
@@ -202,7 +202,7 @@ namespace MultiplayerARPG
             return result;
         }
 
-        public static void ApplySelfStatusEffectsWhenAttacking<T>(this T equipmentItem, short level, EntityInfo applier, CharacterItem weapon, BaseCharacterEntity target)
+        public static void ApplySelfStatusEffectsWhenAttacking<T>(this T equipmentItem, int level, EntityInfo applier, CharacterItem weapon, BaseCharacterEntity target)
             where T : IEquipmentItem
         {
             if (level <= 0 || target == null || equipmentItem == null || !equipmentItem.IsEquipment())
@@ -210,7 +210,7 @@ namespace MultiplayerARPG
             equipmentItem.SelfStatusEffectsWhenAttacking.ApplyStatusEffect(level, applier, weapon, target);
         }
 
-        public static void ApplyEnemyStatusEffectsWhenAttacking<T>(this T equipmentItem, short level, EntityInfo applier, CharacterItem weapon, BaseCharacterEntity target)
+        public static void ApplyEnemyStatusEffectsWhenAttacking<T>(this T equipmentItem, int level, EntityInfo applier, CharacterItem weapon, BaseCharacterEntity target)
             where T : IEquipmentItem
         {
             if (level <= 0 || target == null || equipmentItem == null || !equipmentItem.IsEquipment())
@@ -218,7 +218,7 @@ namespace MultiplayerARPG
             equipmentItem.EnemyStatusEffectsWhenAttacking.ApplyStatusEffect(level, applier, weapon, target);
         }
 
-        public static void ApplySelfStatusEffectsWhenAttacked<T>(this T equipmentItem, short level, EntityInfo applier, BaseCharacterEntity target)
+        public static void ApplySelfStatusEffectsWhenAttacked<T>(this T equipmentItem, int level, EntityInfo applier, BaseCharacterEntity target)
             where T : IEquipmentItem
         {
             if (level <= 0 || target == null || equipmentItem == null || !equipmentItem.IsEquipment())
@@ -226,7 +226,7 @@ namespace MultiplayerARPG
             equipmentItem.SelfStatusEffectsWhenAttacked.ApplyStatusEffect(level, applier, null, target);
         }
 
-        public static void ApplyEnemyStatusEffectsWhenAttacked<T>(this T equipmentItem, short level, EntityInfo applier, BaseCharacterEntity target)
+        public static void ApplyEnemyStatusEffectsWhenAttacked<T>(this T equipmentItem, int level, EntityInfo applier, BaseCharacterEntity target)
             where T : IEquipmentItem
         {
             if (level <= 0 || target == null || equipmentItem == null || !equipmentItem.IsEquipment())
@@ -236,7 +236,7 @@ namespace MultiplayerARPG
         #endregion
 
         #region Armor/Shield Extension
-        public static KeyValuePair<DamageElement, float> GetArmorAmount<T>(this T defendItem, short level, float rate)
+        public static KeyValuePair<DamageElement, float> GetArmorAmount<T>(this T defendItem, int level, float rate)
             where T : IDefendEquipmentItem
         {
             if (defendItem == null || !defendItem.IsDefendEquipment())
@@ -270,7 +270,7 @@ namespace MultiplayerARPG
             return weaponItem.WeaponType.DualWieldRestriction;
         }
 
-        public static KeyValuePair<DamageElement, MinMaxFloat> GetDamageAmount<T>(this T weaponItem, short itemLevel, float statsRate, ICharacterData character)
+        public static KeyValuePair<DamageElement, MinMaxFloat> GetDamageAmount<T>(this T weaponItem, int itemLevel, float statsRate, ICharacterData character)
             where T : IWeaponItem
         {
             if (weaponItem == null || !weaponItem.IsWeapon())
@@ -349,7 +349,7 @@ namespace MultiplayerARPG
         }
         #endregion
 
-        public static bool CanEquip<T>(this T item, ICharacterData character, short level, out UITextKeys gameMessage)
+        public static bool CanEquip<T>(this T item, ICharacterData character, int level, out UITextKeys gameMessage)
              where T : IEquipmentItem
         {
             gameMessage = UITextKeys.NONE;

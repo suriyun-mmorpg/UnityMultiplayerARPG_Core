@@ -8,12 +8,12 @@ namespace MultiplayerARPG
     {
         public static readonly CharacterSkill Empty = new CharacterSkill();
         public int dataId;
-        public short level;
+        public int level;
 
         [System.NonSerialized]
         private int dirtyDataId;
         [System.NonSerialized]
-        private short dirtyLevel;
+        private int dirtyLevel;
 
         [System.NonSerialized]
         private BaseSkill cacheSkill;
@@ -44,12 +44,12 @@ namespace MultiplayerARPG
             };
         }
 
-        public static CharacterSkill Create(BaseSkill skill, short level = 1)
+        public static CharacterSkill Create(BaseSkill skill, int level = 1)
         {
             return Create(skill.DataId, level);
         }
 
-        public static CharacterSkill Create(int dataId, short level = 1)
+        public static CharacterSkill Create(int dataId, int level = 1)
         {
             return new CharacterSkill()
             {
@@ -61,13 +61,13 @@ namespace MultiplayerARPG
         public void Serialize(NetDataWriter writer)
         {
             writer.PutPackedInt(dataId);
-            writer.PutPackedShort(level);
+            writer.PutPackedInt(level);
         }
 
         public void Deserialize(NetDataReader reader)
         {
             dataId = reader.GetPackedInt();
-            level = reader.GetPackedShort();
+            level = reader.GetPackedInt();
         }
     }
 

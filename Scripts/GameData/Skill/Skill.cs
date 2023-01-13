@@ -66,7 +66,7 @@ namespace MultiplayerARPG
             }
         }
 
-        protected override void ApplySkillImplement(BaseCharacterEntity skillUser, short skillLevel, bool isLeftHand, CharacterItem weapon, int hitIndex, Dictionary<DamageElement, MinMaxFloat> damageAmounts, uint targetObjectId, AimPosition aimPosition, int randomSeed)
+        protected override void ApplySkillImplement(BaseCharacterEntity skillUser, int skillLevel, bool isLeftHand, CharacterItem weapon, int hitIndex, Dictionary<DamageElement, MinMaxFloat> damageAmounts, uint targetObjectId, AimPosition aimPosition, int randomSeed)
         {
             // Craft item
             if (skillType == SkillType.CraftItem &&
@@ -120,7 +120,7 @@ namespace MultiplayerARPG
             }
         }
 
-        protected void ApplySkillBuff(BaseCharacterEntity skillUser, short skillLevel, CharacterItem weapon, uint targetObjectId)
+        protected void ApplySkillBuff(BaseCharacterEntity skillUser, int skillLevel, CharacterItem weapon, uint targetObjectId)
         {
             if (skillUser.IsDead() || !skillUser.IsServer || skillLevel <= 0)
                 return;
@@ -165,7 +165,7 @@ namespace MultiplayerARPG
             }
         }
 
-        protected void ApplySkillSummon(BaseCharacterEntity skillUser, short skillLevel)
+        protected void ApplySkillSummon(BaseCharacterEntity skillUser, int skillLevel)
         {
             if (skillUser.IsDead() || !skillUser.IsServer || skillLevel <= 0)
                 return;
@@ -198,7 +198,7 @@ namespace MultiplayerARPG
             }
         }
 
-        protected void ApplySkillMount(BaseCharacterEntity skillUser, short skillLevel)
+        protected void ApplySkillMount(BaseCharacterEntity skillUser, int skillLevel)
         {
             if (skillUser.IsDead() || !skillUser.IsServer || skillLevel <= 0)
                 return;
@@ -238,7 +238,7 @@ namespace MultiplayerARPG
             get { return IsAttack && isDebuff; }
         }
 
-        public override float GetCastDistance(BaseCharacterEntity skillUser, short skillLevel, bool isLeftHand)
+        public override float GetCastDistance(BaseCharacterEntity skillUser, int skillLevel, bool isLeftHand)
         {
             if (!IsAttack)
                 return buffDistance.GetAmount(skillLevel);
@@ -247,7 +247,7 @@ namespace MultiplayerARPG
             return skillUser.GetAttackDistance(isLeftHand);
         }
 
-        public override float GetCastFov(BaseCharacterEntity skillUser, short skillLevel, bool isLeftHand)
+        public override float GetCastFov(BaseCharacterEntity skillUser, int skillLevel, bool isLeftHand)
         {
             if (!IsAttack)
                 return 360f;
@@ -256,7 +256,7 @@ namespace MultiplayerARPG
             return skillUser.GetAttackFov(isLeftHand);
         }
 
-        public override KeyValuePair<DamageElement, MinMaxFloat> GetBaseAttackDamageAmount(ICharacterData skillUser, short skillLevel, bool isLeftHand)
+        public override KeyValuePair<DamageElement, MinMaxFloat> GetBaseAttackDamageAmount(ICharacterData skillUser, int skillLevel, bool isLeftHand)
         {
             switch (skillAttackType)
             {
@@ -268,21 +268,21 @@ namespace MultiplayerARPG
             return new KeyValuePair<DamageElement, MinMaxFloat>();
         }
 
-        public override Dictionary<DamageElement, float> GetAttackWeaponDamageInflictions(ICharacterData skillUser, short skillLevel)
+        public override Dictionary<DamageElement, float> GetAttackWeaponDamageInflictions(ICharacterData skillUser, int skillLevel)
         {
             if (!IsAttack)
                 return new Dictionary<DamageElement, float>();
             return GameDataHelpers.CombineDamageInflictions(weaponDamageInflictions, new Dictionary<DamageElement, float>(), skillLevel);
         }
 
-        public override Dictionary<DamageElement, MinMaxFloat> GetAttackAdditionalDamageAmounts(ICharacterData skillUser, short skillLevel)
+        public override Dictionary<DamageElement, MinMaxFloat> GetAttackAdditionalDamageAmounts(ICharacterData skillUser, int skillLevel)
         {
             if (!IsAttack)
                 return new Dictionary<DamageElement, MinMaxFloat>();
             return GameDataHelpers.CombineDamages(additionalDamageAmounts, new Dictionary<DamageElement, MinMaxFloat>(), skillLevel, 1f);
         }
 
-        public override bool IsIncreaseAttackDamageAmountsWithBuffs(ICharacterData skillUser, short skillLevel)
+        public override bool IsIncreaseAttackDamageAmountsWithBuffs(ICharacterData skillUser, int skillLevel)
         {
             return increaseDamageAmountsWithBuffs;
         }
@@ -360,7 +360,7 @@ namespace MultiplayerARPG
             return base.GetApplyTransform(skillUser, isLeftHand);
         }
 
-        public override bool CanUse(BaseCharacterEntity character, short level, bool isLeftHand, uint targetObjectId, out UITextKeys gameMessage, bool isItem = false)
+        public override bool CanUse(BaseCharacterEntity character, int level, bool isLeftHand, uint targetObjectId, out UITextKeys gameMessage, bool isItem = false)
         {
             BaseCharacterEntity targetEntity;
             if (RequiredTarget && !canBuffEnemy && character.CurrentGameManager.TryGetEntityByObjectId(targetObjectId, out targetEntity) && targetEntity.IsEnemy(character.GetInfo()))

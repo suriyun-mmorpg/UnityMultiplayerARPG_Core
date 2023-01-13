@@ -32,7 +32,7 @@ namespace MultiplayerARPG
         protected override void UpdateData()
         {
             BaseSkill skill = Data.characterSkill.GetSkill();
-            short level = (short)(Data.targetLevel - 1);
+            int level = Data.targetLevel - 1;
 
             if (uiTextRequireLevel != null)
             {
@@ -44,8 +44,8 @@ namespace MultiplayerARPG
                 else
                 {
                     uiTextRequireLevel.SetGameObjectActive(true);
-                    short characterLevel = (short)(GameInstance.PlayingCharacter != null ? GameInstance.PlayingCharacter.Level : 1);
-                    short requireCharacterLevel = skill.GetRequireCharacterLevel(level);
+                    int characterLevel = GameInstance.PlayingCharacter != null ? GameInstance.PlayingCharacter.Level : 1;
+                    int requireCharacterLevel = skill.GetRequireCharacterLevel(level);
                     if (characterLevel >= requireCharacterLevel)
                     {
                         uiTextRequireLevel.text = ZString.Format(

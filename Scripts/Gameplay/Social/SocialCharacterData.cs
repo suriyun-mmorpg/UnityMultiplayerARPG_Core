@@ -9,7 +9,7 @@ namespace MultiplayerARPG
         public string userId;
         public string characterName;
         public int dataId;
-        public short level;
+        public int level;
         public int factionId;
         public int partyId;
         public int guildId;
@@ -46,7 +46,7 @@ namespace MultiplayerARPG
             userId = reader.GetString();
             characterName = reader.GetString();
             dataId = reader.GetPackedInt();
-            level = reader.GetPackedShort();
+            level = reader.GetPackedInt();
             factionId = reader.GetPackedInt();
             partyId = reader.GetPackedInt();
             guildId = reader.GetPackedInt();
@@ -62,7 +62,7 @@ namespace MultiplayerARPG
             writer.Put(userId);
             writer.Put(characterName);
             writer.PutPackedInt(dataId);
-            writer.PutPackedShort(level);
+            writer.PutPackedInt(level);
             writer.PutPackedInt(factionId);
             writer.PutPackedInt(partyId);
             writer.PutPackedInt(guildId);

@@ -49,7 +49,7 @@ namespace MultiplayerARPG
         public virtual void Setup(
             EntityInfo buffApplier,
             BaseSkill skill,
-            short skillLevel,
+            int skillLevel,
             bool applyBuffToEveryone,
             float areaDuration,
             float applyDuration)

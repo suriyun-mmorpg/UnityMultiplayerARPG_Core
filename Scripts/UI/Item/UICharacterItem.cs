@@ -10,7 +10,7 @@ namespace MultiplayerARPG
     public partial class UICharacterItem : UIDataForCharacter<UICharacterItemData>
     {
         public CharacterItem CharacterItem { get { return Data.characterItem; } }
-        public short Level { get { return Data.targetLevel; } }
+        public int Level { get { return Data.targetLevel; } }
         public InventoryType InventoryType { get { return Data.inventoryType; } }
         public BaseItem Item { get { return CharacterItem != null && CharacterItem.NotEmptySlot() ? CharacterItem.GetItem() : null; } }
         public IUsableItem UsableItem { get { return CharacterItem != null && CharacterItem.NotEmptySlot() ? CharacterItem.GetUsableItem() : null; } }
@@ -801,7 +801,7 @@ namespace MultiplayerARPG
 
             if (uiIncreaseSkillLevels != null)
             {
-                Dictionary<BaseSkill, short> skillLevels = null;
+                Dictionary<BaseSkill, int> skillLevels = null;
                 if (EquipmentItem != null)
                     skillLevels = EquipmentItem.GetIncreaseSkills(CharacterItem.randomSeed);
                 else if (SocketEnhancerItem != null)
@@ -1049,7 +1049,7 @@ namespace MultiplayerARPG
                 }
                 else
                 {
-                    uiNextLevelItem.Setup(new UICharacterItemData(CharacterItem, (short)(Level + 1), InventoryType), Character, IndexOfData);
+                    uiNextLevelItem.Setup(new UICharacterItemData(CharacterItem, Level + 1, InventoryType), Character, IndexOfData);
                     uiNextLevelItem.Show();
                 }
             }
@@ -1392,7 +1392,7 @@ namespace MultiplayerARPG
 
             GameInstance.ClientInventoryHandlers.RequestEquipItem(
                 GameInstance.PlayingCharacter,
-                (short)IndexOfData,
+                IndexOfData,
                 GameInstance.PlayingCharacter.EquipWeaponSet,
                 ClientInventoryActions.ResponseEquipArmor,
                 ClientInventoryActions.ResponseEquipWeapon);
@@ -1409,7 +1409,7 @@ namespace MultiplayerARPG
 
             GameInstance.ClientInventoryHandlers.RequestUnEquipItem(
                 InventoryType,
-                (short)IndexOfData,
+                IndexOfData,
                 CharacterItem.equipSlotIndex,
                 -1,
                 ClientInventoryActions.ResponseUnEquipArmor,
@@ -1476,7 +1476,7 @@ namespace MultiplayerARPG
         {
             if (selectionManager != null)
                 selectionManager.DeselectSelectedUI();
-            GameInstance.PlayingCharacterEntity.CallServerDropItem((short)IndexOfData, (short)amount);
+            GameInstance.PlayingCharacterEntity.CallServerDropItem(IndexOfData, amount);
         }
         #endregion
 
@@ -1503,8 +1503,8 @@ namespace MultiplayerARPG
                 selectionManager.DeselectSelectedUI();
             GameInstance.ClientInventoryHandlers.RequestSellItem(new RequestSellItemMessage()
             {
-                index = (short)IndexOfData,
-                amount = (short)amount,
+                index = IndexOfData,
+                amount = amount,
             }, ClientInventoryActions.ResponseSellItem);
         }
         #endregion
@@ -1530,7 +1530,7 @@ namespace MultiplayerARPG
         {
             if (selectionManager != null)
                 selectionManager.DeselectSelectedUI();
-            GameInstance.PlayingCharacterEntity.Dealing.CallServerSetDealingItem(CharacterItem.id, (short)amount);
+            GameInstance.PlayingCharacterEntity.Dealing.CallServerSetDealingItem(CharacterItem.id, amount);
         }
         #endregion
 
@@ -1540,7 +1540,7 @@ namespace MultiplayerARPG
             OnClickMoveToStorage(-1);
         }
 
-        public void OnClickMoveToStorage(short storageItemIndex)
+        public void OnClickMoveToStorage(int storageItemIndex)
         {
             // Only unequipped equipment can be moved to storage
             if (!IsOwningCharacter() || (InventoryType != InventoryType.NonEquipItems && InventoryType != InventoryType.EquipItems && InventoryType != InventoryType.EquipWeaponRight && InventoryType != InventoryType.EquipWeaponLeft))
@@ -1559,7 +1559,7 @@ namespace MultiplayerARPG
             }
         }
 
-        private void OnClickMoveToStorageConfirmed(short storageItemIndex, int amount)
+        private void OnClickMoveToStorageConfirmed(int storageItemIndex, int amount)
         {
             if (selectionManager != null)
                 selectionManager.DeselectSelectedUI();
@@ -1569,8 +1569,8 @@ namespace MultiplayerARPG
             {
                 storageType = storageType,
                 storageOwnerId = storageOwnerId,
-                inventoryItemIndex = (short)IndexOfData,
-                inventoryItemAmount = (short)amount,
+                inventoryItemIndex = IndexOfData,
+                inventoryItemAmount = amount,
                 storageItemIndex = storageItemIndex,
                 inventoryType = InventoryType,
                 equipSlotIndexOrWeaponSet = EquipSlotIndex,
@@ -1584,7 +1584,7 @@ namespace MultiplayerARPG
             OnClickMoveFromStorage(InventoryType.NonEquipItems, Character.EquipWeaponSet, -1);
         }
 
-        public void OnClickMoveFromStorage(InventoryType inventoryType, byte equipSlotIndex, short inventoryItemIndex)
+        public void OnClickMoveFromStorage(InventoryType inventoryType, byte equipSlotIndex, int inventoryItemIndex)
         {
             // Only storage items can be moved from storage
             if (!IsOwningCharacter() || InventoryType != InventoryType.StorageItems)
@@ -1603,7 +1603,7 @@ namespace MultiplayerARPG
             }
         }
 
-        private void OnClickMoveFromStorageConfirmed(InventoryType inventoryType, byte equipSlotIndex, short inventoryItemIndex, int amount)
+        private void OnClickMoveFromStorageConfirmed(InventoryType inventoryType, byte equipSlotIndex, int inventoryItemIndex, int amount)
         {
             if (selectionManager != null)
                 selectionManager.DeselectSelectedUI();
@@ -1613,8 +1613,8 @@ namespace MultiplayerARPG
             {
                 storageType = storageType,
                 storageOwnerId = storageOwnerId,
-                storageItemIndex = (short)IndexOfData,
-                storageItemAmount = (short)amount,
+                storageItemIndex = IndexOfData,
+                storageItemAmount = amount,
                 inventoryItemIndex = inventoryItemIndex,
                 inventoryType = inventoryType,
                 equipSlotIndexOrWeaponSet = equipSlotIndex,
@@ -1646,7 +1646,7 @@ namespace MultiplayerARPG
         {
             if (selectionManager != null)
                 selectionManager.DeselectSelectedUI();
-            GameInstance.PlayingCharacterEntity.CallServerPickupItemFromContainer(GameInstance.ItemsContainerUIVisibilityManager.ItemsContainerEntity.ObjectId, IndexOfData, (short)amount);
+            GameInstance.PlayingCharacterEntity.CallServerPickupItemFromContainer(GameInstance.ItemsContainerUIVisibilityManager.ItemsContainerEntity.ObjectId, IndexOfData, amount);
         }
         #endregion
 
@@ -1685,7 +1685,7 @@ namespace MultiplayerARPG
                 GameInstance.ClientInventoryHandlers.RequestRefineItem(new RequestRefineItemMessage()
                 {
                     inventoryType = InventoryType,
-                    index = (short)IndexOfData,
+                    index = IndexOfData,
                 }, ClientInventoryActions.ResponseRefineItem);
             }
         }
@@ -1740,8 +1740,8 @@ namespace MultiplayerARPG
                 selectionManager.DeselectSelectedUI();
             GameInstance.ClientInventoryHandlers.RequestDismantleItem(new RequestDismantleItemMessage()
             {
-                index = (short)IndexOfData,
-                amount = (short)amount,
+                index = IndexOfData,
+                amount = amount,
             }, ClientInventoryActions.ResponseDismantleItem);
         }
         #endregion
@@ -1781,7 +1781,7 @@ namespace MultiplayerARPG
                 GameInstance.ClientInventoryHandlers.RequestRepairItem(new RequestRepairItemMessage()
                 {
                     inventoryType = InventoryType,
-                    index = (short)IndexOfData,
+                    index = IndexOfData,
                 }, ClientInventoryActions.ResponseRepairItem);
             }
         }

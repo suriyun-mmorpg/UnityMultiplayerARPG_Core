@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace MultiplayerARPG
 {
-    public partial class UIItemAmounts : UISelectionEntry<Dictionary<BaseItem, short>>
+    public partial class UIItemAmounts : UISelectionEntry<Dictionary<BaseItem, int>>
     {
         public enum DisplayType
         {
@@ -78,7 +78,7 @@ namespace MultiplayerARPG
                     string tempFormat;
                     string tempAmountText;
                     UIItemTextPair tempComponentPair;
-                    foreach (KeyValuePair<BaseItem, short> dataEntry in Data)
+                    foreach (KeyValuePair<BaseItem, int> dataEntry in Data)
                     {
                         if (dataEntry.Key == null)
                             continue;

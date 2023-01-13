@@ -263,7 +263,7 @@ namespace MultiplayerARPG
 #endif
         }
 
-        public bool CallServerBuyNpcItem(short itemIndex, short amount)
+        public bool CallServerBuyNpcItem(int itemIndex, int amount)
         {
             if (Entity.IsDead())
                 return false;
@@ -272,7 +272,7 @@ namespace MultiplayerARPG
         }
 
         [ServerRpc]
-        protected void ServerBuyNpcItem(short index, short amount)
+        protected void ServerBuyNpcItem(int index, int amount)
         {
 #if UNITY_EDITOR || UNITY_SERVER
             // Dialog must be built-in shop dialog

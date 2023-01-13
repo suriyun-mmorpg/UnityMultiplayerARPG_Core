@@ -3,9 +3,9 @@
     public struct UICharacterItemData
     {
         public CharacterItem characterItem;
-        public short targetLevel;
+        public int targetLevel;
         public InventoryType inventoryType;
-        public UICharacterItemData(CharacterItem characterItem, short targetLevel, InventoryType inventoryType)
+        public UICharacterItemData(CharacterItem characterItem, int targetLevel, InventoryType inventoryType)
         {
             this.characterItem = characterItem;
             this.targetLevel = targetLevel;
@@ -14,7 +14,7 @@
         public UICharacterItemData(CharacterItem characterItem, InventoryType inventoryType) : this(characterItem, characterItem.level, inventoryType)
         {
         }
-        public UICharacterItemData(BaseItem item, short targetLevel, InventoryType inventoryType) : this(CharacterItem.Create(item, targetLevel), targetLevel, inventoryType)
+        public UICharacterItemData(BaseItem item, int targetLevel, InventoryType inventoryType) : this(CharacterItem.Create(item, targetLevel), targetLevel, inventoryType)
         {
         }
     }

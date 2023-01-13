@@ -56,7 +56,7 @@ namespace MultiplayerARPG
         /// <param name="objectId"></param>
         /// <param name="itemsContainerIndex"></param>
         [ServerRpc]
-        protected virtual void ServerPickupItemFromContainer(uint objectId, int itemsContainerIndex, short amount)
+        protected virtual void ServerPickupItemFromContainer(uint objectId, int itemsContainerIndex, int amount)
         {
 #if UNITY_EDITOR || UNITY_SERVER
             if (!CanPickUpItem())
@@ -177,7 +177,7 @@ namespace MultiplayerARPG
         /// <param name="index"></param>
         /// <param name="amount"></param>
         [ServerRpc]
-        protected virtual void ServerDropItem(short index, short amount)
+        protected virtual void ServerDropItem(int index, int amount)
         {
 #if UNITY_EDITOR || UNITY_SERVER
             if (!CanDropItem() || index >= nonEquipItems.Count)

@@ -5,18 +5,18 @@ namespace MultiplayerARPG
     public struct RequestRepairItemMessage : INetSerializable
     {
         public InventoryType inventoryType;
-        public short index;
+        public int index;
 
         public void Deserialize(NetDataReader reader)
         {
             inventoryType = (InventoryType)reader.GetByte();
-            index = reader.GetPackedShort();
+            index = reader.GetPackedInt();
         }
 
         public void Serialize(NetDataWriter writer)
         {
             writer.Put((byte)inventoryType);
-            writer.PutPackedShort(index);
+            writer.PutPackedInt(index);
         }
     }
 }

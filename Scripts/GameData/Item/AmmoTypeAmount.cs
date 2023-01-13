@@ -4,6 +4,6 @@
     public struct AmmoTypeAmount
     {
         public AmmoType ammoType;
-        public short amount;
+        public int amount;
     }
 }

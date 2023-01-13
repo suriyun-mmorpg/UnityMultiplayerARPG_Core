@@ -8,7 +8,7 @@ namespace MultiplayerARPG
     {
         public static readonly CharacterAttribute Empty = new CharacterAttribute();
         public int dataId;
-        public short amount;
+        public int amount;
 
         [System.NonSerialized]
         private int dirtyDataId;
@@ -40,12 +40,12 @@ namespace MultiplayerARPG
             };
         }
 
-        public static CharacterAttribute Create(Attribute attribute, short amount = 0)
+        public static CharacterAttribute Create(Attribute attribute, int amount = 0)
         {
             return Create(attribute.DataId, amount);
         }
 
-        public static CharacterAttribute Create(int dataId, short amount = 0)
+        public static CharacterAttribute Create(int dataId, int amount = 0)
         {
             return new CharacterAttribute()
             {
@@ -57,13 +57,13 @@ namespace MultiplayerARPG
         public void Serialize(NetDataWriter writer)
         {
             writer.PutPackedInt(dataId);
-            writer.PutPackedShort(amount);
+            writer.PutPackedInt(amount);
         }
 
         public void Deserialize(NetDataReader reader)
         {
             dataId = reader.GetPackedInt();
-            amount = reader.GetPackedShort();
+            amount = reader.GetPackedInt();
         }
     }
 

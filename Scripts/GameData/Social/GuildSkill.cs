@@ -13,7 +13,7 @@ namespace MultiplayerARPG
     {
         [Category("Skill Settings")]
         [Range(1, 100)]
-        public short maxLevel = 1;
+        public int maxLevel = 1;
         public GuildSkillType skillType;
 
         [Category(2, "Activation Settings")]
@@ -33,32 +33,32 @@ namespace MultiplayerARPG
             return skillType;
         }
 
-        public int GetIncreaseMaxMember(short level)
+        public int GetIncreaseMaxMember(int level)
         {
             return increaseMaxMember.GetAmount(level);
         }
 
-        public float GetIncreaseExpGainPercentage(short level)
+        public float GetIncreaseExpGainPercentage(int level)
         {
             return increaseExpGainPercentage.GetAmount(level);
         }
 
-        public float GetIncreaseGoldGainPercentage(short level)
+        public float GetIncreaseGoldGainPercentage(int level)
         {
             return increaseGoldGainPercentage.GetAmount(level);
         }
 
-        public float GetIncreaseShareExpGainPercentage(short level)
+        public float GetIncreaseShareExpGainPercentage(int level)
         {
             return increaseShareExpGainPercentage.GetAmount(level);
         }
 
-        public float GetIncreaseShareGoldGainPercentage(short level)
+        public float GetIncreaseShareGoldGainPercentage(int level)
         {
             return increaseShareGoldGainPercentage.GetAmount(level);
         }
 
-        public float GetDecreaseExpLostPercentage(short level)
+        public float GetDecreaseExpLostPercentage(int level)
         {
             return decreaseExpLostPercentage.GetAmount(level);
         }
@@ -73,7 +73,7 @@ namespace MultiplayerARPG
             get { return buff; }
         }
 
-        public bool CanLevelUp(IPlayerCharacterData character, short level)
+        public bool CanLevelUp(IPlayerCharacterData character, int level)
         {
             if (character == null)
                 return false;
@@ -85,7 +85,7 @@ namespace MultiplayerARPG
             return guildData.skillPoint > 0 && level < maxLevel;
         }
 
-        public bool CanUse(ICharacterData character, short level)
+        public bool CanUse(ICharacterData character, int level)
         {
             if (character == null)
                 return false;
@@ -97,7 +97,7 @@ namespace MultiplayerARPG
             return true;
         }
 
-        public float GetCoolDownDuration(short level)
+        public float GetCoolDownDuration(int level)
         {
             float duration = coolDownDuration.GetAmount(level);
             if (duration < 0f)

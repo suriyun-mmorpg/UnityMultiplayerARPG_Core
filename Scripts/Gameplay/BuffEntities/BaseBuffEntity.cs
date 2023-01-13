@@ -10,7 +10,7 @@ namespace MultiplayerARPG
         protected bool applyBuffToEveryone;
         protected EntityInfo buffApplier;
         protected BaseSkill skill;
-        protected short skillLevel;
+        protected int skillLevel;
 
         public GameInstance CurrentGameInstance
         {
@@ -64,7 +64,7 @@ namespace MultiplayerARPG
         public virtual void Setup(
             EntityInfo buffApplier,
             BaseSkill skill,
-            short skillLevel,
+            int skillLevel,
             bool applyBuffToEveryone)
         {
             this.buffApplier = buffApplier;

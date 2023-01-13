@@ -7,7 +7,7 @@ namespace MultiplayerARPG
     {
         public ItemCraft ItemCraft { get { return Data; } }
         public BaseItem CraftingItem { get { return ItemCraft.CraftingItem; } }
-        public short Amount { get { return ItemCraft.Amount; } }
+        public int Amount { get { return ItemCraft.Amount; } }
 
         [Header("String Formats")]
         [Tooltip("Format => {0} = {Current Gold Amount}, {1} = {Target Amount}")]

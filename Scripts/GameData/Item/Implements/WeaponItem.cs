@@ -105,8 +105,8 @@ namespace MultiplayerARPG
         }
 
         [SerializeField]
-        private short ammoCapacity = 0;
-        public short AmmoCapacity
+        private int ammoCapacity = 0;
+        public int AmmoCapacity
         {
             get { return ammoCapacity; }
         }
