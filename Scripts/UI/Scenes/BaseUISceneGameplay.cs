@@ -4,7 +4,7 @@ using System.Collections.Generic;
 namespace MultiplayerARPG
 {
     [DisallowMultipleComponent]
-    public abstract class BaseUISceneGameplay : MonoBehaviour, IItemUIVisibilityManager, IItemsContainerUIVisibilityManager
+    public abstract partial class BaseUISceneGameplay : MonoBehaviour, IItemUIVisibilityManager, IItemsContainerUIVisibilityManager
     {
         public static BaseUISceneGameplay Singleton { get; private set; }
 
