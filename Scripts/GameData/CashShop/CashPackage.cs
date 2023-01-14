@@ -7,7 +7,7 @@ using UnityEngine.Purchasing;
 namespace MultiplayerARPG
 {
     [CreateAssetMenu(fileName = GameDataMenuConsts.CASH_PACKAGE_FILE, menuName = GameDataMenuConsts.CASH_PACKAGE_MENU, order = GameDataMenuConsts.CASH_PACKAGE_ORDER)]
-    public class CashPackage : BaseGameData
+    public partial class CashPackage : BaseGameData
     {
         [Category("Cash Package Settings")]
         [SerializeField]

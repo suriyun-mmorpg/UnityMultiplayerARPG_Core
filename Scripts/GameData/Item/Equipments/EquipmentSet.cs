@@ -3,7 +3,7 @@
 namespace MultiplayerARPG
 {
     [CreateAssetMenu(fileName = GameDataMenuConsts.EQUIPMENT_SET_FILE, menuName = GameDataMenuConsts.EQUIPMENT_SET_MENU, order = GameDataMenuConsts.EQUIPMENT_SET_ORDER)]
-    public class EquipmentSet : BaseGameData
+    public partial class EquipmentSet : BaseGameData
     {
         [Category("Equipment Set Settings")]
         [SerializeField]

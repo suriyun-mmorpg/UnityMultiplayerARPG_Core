@@ -3,7 +3,7 @@
 namespace MultiplayerARPG
 {
     [CreateAssetMenu(fileName = GameDataMenuConsts.CURRENCY_FILE, menuName = GameDataMenuConsts.CURRENCY_MENU, order = GameDataMenuConsts.CURRENCY_ORDER)]
-    public class Currency : BaseGameData
+    public partial class Currency : BaseGameData
     {
     }
 

@@ -4,7 +4,7 @@ using UnityEngine;
 namespace MultiplayerARPG
 {
     [CreateAssetMenu(fileName = GameDataMenuConsts.GACHA_FILE, menuName = GameDataMenuConsts.GACHA_MENU, order = GameDataMenuConsts.GACHA_ORDER)]
-    public class Gacha : BaseGameData
+    public partial class Gacha : BaseGameData
     {
         [Category("Gacha Settings")]
         [SerializeField]

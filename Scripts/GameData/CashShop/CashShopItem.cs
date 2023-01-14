@@ -6,7 +6,7 @@ using UnityEngine.Serialization;
 namespace MultiplayerARPG
 {
     [CreateAssetMenu(fileName = GameDataMenuConsts.CASH_SHOP_ITEM_FILE, menuName = GameDataMenuConsts.CASH_SHOP_ITEM_MENU, order = GameDataMenuConsts.CASH_SHOP_ITEM_ORDER)]
-    public class CashShopItem : BaseGameData
+    public partial class CashShopItem : BaseGameData
     {
         [Category("Cash Shop Item Settings")]
         [SerializeField]

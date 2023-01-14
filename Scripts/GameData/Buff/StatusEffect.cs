@@ -3,7 +3,7 @@
 namespace MultiplayerARPG
 {
     [CreateAssetMenu(fileName = GameDataMenuConsts.STATUS_EFFECT_FILE, menuName = GameDataMenuConsts.STATUS_EFFECT_MENU, order = GameDataMenuConsts.STATUS_EFFECT_ORDER)]
-    public class StatusEffect : BaseGameData
+    public partial class StatusEffect : BaseGameData
     {
         [Category("Status Effect Settings")]
         [SerializeField]
