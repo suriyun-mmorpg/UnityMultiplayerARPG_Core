@@ -7,6 +7,10 @@ namespace MultiplayerARPG
     {
         public static readonly Buff Empty = new Buff();
 
+        [Header("Generic Settings")]
+        public string tag;
+        public string[] restrictTags;
+
         [Header("Settings for Passive and Active Skills")]
         [Tooltip("Increase character's stats.")]
         public CharacterStatsIncremental increaseStats;
