@@ -1,19 +1,19 @@
 ﻿namespace MultiplayerARPG
 {
     [System.Serializable]
-    public class SkillRequirement
+    public struct SkillRequirement
     {
         public bool disallow;
-        public IncrementalInt characterLevel = new IncrementalInt() { baseAmount = 0, amountIncreaseEachLevel = 0 };
-        public IncrementalFloat skillPoint = new IncrementalFloat() { baseAmount = 1, amountIncreaseEachLevel = 0 };
-        public IncrementalInt gold = new IncrementalInt() { baseAmount = 0, amountIncreaseEachLevel = 0 };
+        public IncrementalInt characterLevel;
+        public IncrementalFloat skillPoint;
+        public IncrementalInt gold;
         [ArrayElementTitle("attribute")]
-        public AttributeAmount[] attributeAmounts = new AttributeAmount[0];
+        public AttributeAmount[] attributeAmounts;
         [ArrayElementTitle("skill")]
-        public SkillLevel[] skillLevels = new SkillLevel[0];
+        public SkillLevel[] skillLevels;
         [ArrayElementTitle("currency")]
-        public CurrencyAmount[] currencyAmounts = new CurrencyAmount[0];
+        public CurrencyAmount[] currencyAmounts;
         [ArrayElementTitle("item")]
-        public ItemAmount[] itemAmounts = new ItemAmount[0];
+        public ItemAmount[] itemAmounts;
     }
 }

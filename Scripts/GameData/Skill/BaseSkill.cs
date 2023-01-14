@@ -40,7 +40,13 @@ namespace MultiplayerARPG
 
         [Category(11, "Requirement")]
         [Header("Requirements to Levelup (Tools)")]
-        public SkillRequirement requirement = new SkillRequirement();
+        public SkillRequirement requirement = new SkillRequirement()
+        {
+            skillPoint = new IncrementalFloat()
+            {
+                baseAmount = 1,
+            },
+        };
 #if UNITY_EDITOR
         [InspectorButton(nameof(MakeRequirementEachLevels))]
         public bool makeRequirementEachLevels;
