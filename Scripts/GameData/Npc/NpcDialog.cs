@@ -229,6 +229,11 @@ namespace MultiplayerARPG
                 case NpcDialogType.SaveRespawnPoint:
                     if (uiNpcDialog.onSwitchToSaveRespawnPointDialog != null)
                         uiNpcDialog.onSwitchToSaveRespawnPointDialog.Invoke();
+                    if (uiNpcDialog.uiConfirmRequirement != null && confirmRequirement.HasConfirmConditions())
+                    {
+                        uiNpcDialog.uiConfirmRequirement.Data = confirmRequirement;
+                        uiNpcDialog.uiConfirmRequirement.Show();
+                    }
                     confirmMenuAction = new UINpcDialogMenuAction();
                     cancelMenuAction = new UINpcDialogMenuAction();
                     confirmMenuAction.title = uiNpcDialog.MessageSaveRespawnPointConfirm;
@@ -241,6 +246,11 @@ namespace MultiplayerARPG
                 case NpcDialogType.Warp:
                     if (uiNpcDialog.onSwitchToWarpDialog != null)
                         uiNpcDialog.onSwitchToWarpDialog.Invoke();
+                    if (uiNpcDialog.uiConfirmRequirement != null && confirmRequirement.HasConfirmConditions())
+                    {
+                        uiNpcDialog.uiConfirmRequirement.Data = confirmRequirement;
+                        uiNpcDialog.uiConfirmRequirement.Show();
+                    }
                     confirmMenuAction = new UINpcDialogMenuAction();
                     cancelMenuAction = new UINpcDialogMenuAction();
                     confirmMenuAction.title = uiNpcDialog.MessageWarpConfirm;
@@ -341,6 +351,9 @@ namespace MultiplayerARPG
 
             if (uiNpcDialog.uiCraftItem != null)
                 uiNpcDialog.uiCraftItem.Hide();
+
+            if (uiNpcDialog.uiConfirmRequirement != null)
+                uiNpcDialog.uiConfirmRequirement.Hide();
         }
 
         public override bool ValidateDialog(BasePlayerCharacterEntity characterEntity)

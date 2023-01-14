@@ -23,6 +23,9 @@ namespace MultiplayerARPG
         [Header("Craft Item Dialog")]
         public UIItemCraft uiCraftItem;
 
+        [Tooltip("Requirement for `SaveRespawnPoint` and `Warp` dialog confirmation")]
+        public UINpcDialogConfirmRequirement uiConfirmRequirement;
+
         [Header("Quest Accept Menu Title")]
         public string messageQuestAccept = "Accept";
         public LanguageData[] messageQuestAcceptTitles;
