@@ -18,6 +18,8 @@ namespace MultiplayerARPG
         public NpcDialogType type;
         [Output(dynamicPortList = true, connectionType = ConnectionType.Override)]
         public NpcDialogMenu[] menus;
+        [Tooltip("Requirement for `SaveRespawnPoint` and `Warp` dialog confirmation")]
+        public NpcDialogConfirmRequirement confirmRequirement;
         // Quest
         public Quest quest;
         [Output(backingValue = ShowBackingValue.Always, connectionType = ConnectionType.Override)]
@@ -260,18 +262,6 @@ namespace MultiplayerARPG
                     menuActions.Add(confirmMenuAction);
                     menuActions.Add(cancelMenuAction);
                     break;
-                case NpcDialogType.DismantleItem:
-                    if (uiNpcDialog.onSwitchToDismantleItemDialog != null)
-                        uiNpcDialog.onSwitchToDismantleItemDialog.Invoke();
-                    confirmMenuAction = new UINpcDialogMenuAction();
-                    cancelMenuAction = new UINpcDialogMenuAction();
-                    confirmMenuAction.title = uiNpcDialog.MessageDismantleItemConfirm;
-                    confirmMenuAction.menuIndex = CONFIRM_MENU_INDEX;
-                    cancelMenuAction.title = uiNpcDialog.MessageDismantleItemCancel;
-                    cancelMenuAction.menuIndex = CANCEL_MENU_INDEX;
-                    menuActions.Add(confirmMenuAction);
-                    menuActions.Add(cancelMenuAction);
-                    break;
                 case NpcDialogType.PlayerStorage:
                     if (uiNpcDialog.onSwitchToPlayerStorageDialog != null)
                         uiNpcDialog.onSwitchToPlayerStorageDialog.Invoke();
@@ -295,6 +285,18 @@ namespace MultiplayerARPG
                     guildStorageCancelAction.menuIndex = CANCEL_MENU_INDEX;
                     menuActions.Add(guildStorageConfirmAction);
                     menuActions.Add(guildStorageCancelAction);
+                    break;
+                case NpcDialogType.DismantleItem:
+                    if (uiNpcDialog.onSwitchToDismantleItemDialog != null)
+                        uiNpcDialog.onSwitchToDismantleItemDialog.Invoke();
+                    confirmMenuAction = new UINpcDialogMenuAction();
+                    cancelMenuAction = new UINpcDialogMenuAction();
+                    confirmMenuAction.title = uiNpcDialog.MessageDismantleItemConfirm;
+                    confirmMenuAction.menuIndex = CONFIRM_MENU_INDEX;
+                    cancelMenuAction.title = uiNpcDialog.MessageDismantleItemCancel;
+                    cancelMenuAction.menuIndex = CANCEL_MENU_INDEX;
+                    menuActions.Add(confirmMenuAction);
+                    menuActions.Add(cancelMenuAction);
                     break;
                 case NpcDialogType.RepairItem:
                     if (uiNpcDialog.onSwitchToRepairItemDialog != null)
@@ -465,9 +467,16 @@ namespace MultiplayerARPG
                     switch (menuIndex)
                     {
                         case CONFIRM_MENU_INDEX:
-                            characterEntity.RespawnMapName = saveRespawnMap.Id;
-                            characterEntity.RespawnPosition = saveRespawnPosition;
-                            characterEntity.NpcAction.CurrentNpcDialog = GetValidatedDialogOrNull(saveRespawnConfirmDialog, characterEntity);
+                            if (PassConfirmConditions(characterEntity, out UITextKeys errorMessage))
+                            {
+                                characterEntity.RespawnMapName = saveRespawnMap.Id;
+                                characterEntity.RespawnPosition = saveRespawnPosition;
+                                characterEntity.NpcAction.CurrentNpcDialog = GetValidatedDialogOrNull(saveRespawnConfirmDialog, characterEntity);
+                            }
+                            else
+                            {
+                                GameInstance.ServerGameMessageHandlers.SendGameMessage(characterEntity.ConnectionId, errorMessage);
+                            }
                             return;
                         case CANCEL_MENU_INDEX:
                             characterEntity.NpcAction.CurrentNpcDialog = GetValidatedDialogOrNull(saveRespawnCancelDialog, characterEntity);
@@ -478,7 +487,14 @@ namespace MultiplayerARPG
                     switch (menuIndex)
                     {
                         case CONFIRM_MENU_INDEX:
-                            BaseGameNetworkManager.Singleton.WarpCharacter(warpPortalType, characterEntity, warpMap.Id, warpPosition, warpOverrideRotation, warpRotation);
+                            if (PassConfirmConditions(characterEntity, out UITextKeys errorMessage))
+                            {
+                                BaseGameNetworkManager.Singleton.WarpCharacter(warpPortalType, characterEntity, warpMap.Id, warpPosition, warpOverrideRotation, warpRotation);
+                            }
+                            else
+                            {
+                                GameInstance.ServerGameMessageHandlers.SendGameMessage(characterEntity.ConnectionId, errorMessage);
+                            }
                             return;
                         case CANCEL_MENU_INDEX:
                             characterEntity.NpcAction.CurrentNpcDialog = GetValidatedDialogOrNull(warpCancelDialog, characterEntity);
@@ -496,23 +512,11 @@ namespace MultiplayerARPG
                             return;
                     }
                     return;
-                case NpcDialogType.DismantleItem:
-                    switch (menuIndex)
-                    {
-                        case CONFIRM_MENU_INDEX:
-                            characterEntity.NpcAction.CallOwnerShowNpcDismantleItem();
-                            return;
-                        case CANCEL_MENU_INDEX:
-                            characterEntity.NpcAction.CurrentNpcDialog = GetValidatedDialogOrNull(dismantleItemCancelDialog, characterEntity);
-                            return;
-                    }
-                    return;
                 case NpcDialogType.PlayerStorage:
                     switch (menuIndex)
                     {
                         case CONFIRM_MENU_INDEX:
-                            StorageId storageId;
-                            if (characterEntity.GetStorageId(StorageType.Player, 0, out storageId))
+                            if (characterEntity.GetStorageId(StorageType.Player, 0, out StorageId storageId))
                                 GameInstance.ServerStorageHandlers.OpenStorage(characterEntity.ConnectionId, characterEntity, storageId);
                             return;
                         case CANCEL_MENU_INDEX:
@@ -524,12 +528,22 @@ namespace MultiplayerARPG
                     switch (menuIndex)
                     {
                         case CONFIRM_MENU_INDEX:
-                            StorageId storageId;
-                            if (characterEntity.GetStorageId(StorageType.Guild, 0, out storageId))
+                            if (characterEntity.GetStorageId(StorageType.Guild, 0, out StorageId storageId))
                                 GameInstance.ServerStorageHandlers.OpenStorage(characterEntity.ConnectionId, characterEntity, storageId);
                             return;
                         case CANCEL_MENU_INDEX:
                             characterEntity.NpcAction.CurrentNpcDialog = GetValidatedDialogOrNull(storageCancelDialog, characterEntity);
+                            return;
+                    }
+                    return;
+                case NpcDialogType.DismantleItem:
+                    switch (menuIndex)
+                    {
+                        case CONFIRM_MENU_INDEX:
+                            characterEntity.NpcAction.CallOwnerShowNpcDismantleItem();
+                            return;
+                        case CANCEL_MENU_INDEX:
+                            characterEntity.NpcAction.CurrentNpcDialog = GetValidatedDialogOrNull(dismantleItemCancelDialog, characterEntity);
                             return;
                     }
                     return;
@@ -606,6 +620,24 @@ namespace MultiplayerARPG
         public override bool IsShop
         {
             get { return type == NpcDialogType.Shop; }
+        }
+
+        public bool PassConfirmConditions(IPlayerCharacterData character, out UITextKeys gameMessage)
+        {
+            if (character.Gold < confirmRequirement.gold)
+            {
+                gameMessage = UITextKeys.UI_ERROR_NOT_ENOUGH_GOLD;
+                return false;
+            }
+            if (!character.HasEnoughCurrencyAmounts(GameDataHelpers.CombineCurrencies(confirmRequirement.currencyAmounts, null), out gameMessage, out _))
+                return false;
+            if (!character.HasEnoughNonEquipItemAmounts(GameDataHelpers.CombineItems(confirmRequirement.itemAmounts, null), out gameMessage, out _))
+                return false;
+            gameMessage = UITextKeys.NONE;
+            character.Gold -= confirmRequirement.gold;
+            character.DecreaseCurrencies(confirmRequirement.currencyAmounts);
+            character.DecreaseItems(confirmRequirement.itemAmounts);
+            return true;
         }
     }
 }

@@ -39,6 +39,7 @@ namespace MultiplayerARPG
             ShowOnEnum(nameof(npcDialog.type), nameof(NpcDialogType.SaveRespawnPoint), nameof(npcDialog.saveRespawnPosition));
             ShowOnEnum(nameof(npcDialog.type), nameof(NpcDialogType.SaveRespawnPoint), nameof(npcDialog.saveRespawnConfirmDialog));
             ShowOnEnum(nameof(npcDialog.type), nameof(NpcDialogType.SaveRespawnPoint), nameof(npcDialog.saveRespawnCancelDialog));
+            ShowOnEnum(nameof(npcDialog.type), nameof(NpcDialogType.SaveRespawnPoint), nameof(npcDialog.confirmRequirement));
             // Warp
             ShowOnEnum(nameof(npcDialog.type), nameof(NpcDialogType.Warp), nameof(npcDialog.warpPortalType));
             ShowOnEnum(nameof(npcDialog.type), nameof(NpcDialogType.Warp), nameof(npcDialog.warpMap));
@@ -46,6 +47,7 @@ namespace MultiplayerARPG
             ShowOnEnum(nameof(npcDialog.type), nameof(NpcDialogType.Warp), nameof(npcDialog.warpOverrideRotation));
             ShowOnEnum(nameof(npcDialog.type), nameof(NpcDialogType.Warp), nameof(npcDialog.warpRotation));
             ShowOnEnum(nameof(npcDialog.type), nameof(NpcDialogType.Warp), nameof(npcDialog.warpCancelDialog));
+            ShowOnEnum(nameof(npcDialog.type), nameof(NpcDialogType.Warp), nameof(npcDialog.confirmRequirement));
             // Refine Item
             ShowOnEnum(nameof(npcDialog.type), nameof(NpcDialogType.RefineItem), nameof(npcDialog.refineItemCancelDialog));
             // Dismantle Item
