@@ -1,4 +1,5 @@
 ﻿using System.Text;
+using UnityEngine;
 
 namespace MultiplayerARPG
 {
@@ -128,13 +129,35 @@ namespace MultiplayerARPG
     {
         public CharacterStats baseStats;
         public CharacterStats statsIncreaseEachLevel;
+        [Tooltip("It won't automatically sort by `minLevel`, you have to sort it from low to high to make it calculate properly")]
+        public CharacterStatsIncrementalByLevel[] statsIncreaseEachLevelByLevels;
 
         public CharacterStats GetCharacterStats(int level)
         {
-            CharacterStats result = new CharacterStats();
-            result += baseStats;
-            result += (statsIncreaseEachLevel * (level - 1));
+            if (statsIncreaseEachLevelByLevels == null || statsIncreaseEachLevelByLevels.Length == 0)
+                return baseStats + (statsIncreaseEachLevel * (level - 1));
+            CharacterStats result = baseStats;
+            int countLevel = 2;
+            int indexOfIncremental = 0;
+            int firstMinLevel = statsIncreaseEachLevelByLevels[indexOfIncremental].minLevel;
+            while (countLevel <= level)
+            {
+                if (countLevel < firstMinLevel)
+                    result += statsIncreaseEachLevel;
+                else
+                    result += statsIncreaseEachLevelByLevels[indexOfIncremental].statsIncreaseEachLevel;
+                countLevel++;
+                if (indexOfIncremental + 1 < statsIncreaseEachLevelByLevels.Length && countLevel >= statsIncreaseEachLevelByLevels[indexOfIncremental + 1].minLevel)
+                    indexOfIncremental++;
+            }
             return result;
         }
+    }
+
+    [System.Serializable]
+    public struct CharacterStatsIncrementalByLevel
+    {
+        public int minLevel;
+        public CharacterStats statsIncreaseEachLevel;
     }
 }
