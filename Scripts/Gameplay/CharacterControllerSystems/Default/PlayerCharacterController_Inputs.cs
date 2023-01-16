@@ -681,6 +681,8 @@ namespace MultiplayerARPG
 
         protected virtual void DoActionOrMoveToEntity(ITargetableEntity entity, float distance, System.Action action)
         {
+            if (entity.IsNull())
+                return;
             Vector3 sourcePosition = EntityTransform.position;
             Vector3 targetPosition = entity.EntityTransform.position;
             if (OverlappedEntity(entity, sourcePosition, targetPosition, distance))
