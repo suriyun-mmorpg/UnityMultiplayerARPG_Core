@@ -4,7 +4,7 @@
 public struct IncrementalShort
 {
     public short baseAmount;
-    public short amountIncreaseEachLevel;
+    public float amountIncreaseEachLevel;
     [Tooltip("It won't automatically sort by `minLevel`, you have to sort it from low to high to make it calculate properly")]
     public IncrementalShortByLevel[] amountIncreaseEachLevelByLevels;
 
@@ -12,7 +12,7 @@ public struct IncrementalShort
     {
         if (amountIncreaseEachLevelByLevels == null || amountIncreaseEachLevelByLevels.Length == 0)
             return (short)(baseAmount + (amountIncreaseEachLevel * (level - 1)));
-        short result = baseAmount;
+        float result = baseAmount;
         int countLevel = 2;
         int indexOfIncremental = 0;
         int firstMinLevel = amountIncreaseEachLevelByLevels[indexOfIncremental].minLevel;
@@ -26,7 +26,7 @@ public struct IncrementalShort
             if (indexOfIncremental + 1 < amountIncreaseEachLevelByLevels.Length && countLevel >= amountIncreaseEachLevelByLevels[indexOfIncremental + 1].minLevel)
                 indexOfIncremental++;
         }
-        return result;
+        return (short)result;
     }
 }
 
@@ -34,5 +34,5 @@ public struct IncrementalShort
 public struct IncrementalShortByLevel
 {
     public int minLevel;
-    public short amountIncreaseEachLevel;
+    public float amountIncreaseEachLevel;
 }

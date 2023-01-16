@@ -403,9 +403,19 @@ namespace MultiplayerARPG
                 {
                     if (!adjustRandomExp.HasValue)
                     {
+                        MinMaxFloat adjustBaseAmount = new MinMaxFloat()
+                        {
+                            min = randomExp.baseAmount.min,
+                            max = randomExp.baseAmount.max,
+                        };
+                        adjustBaseAmount += randomExp.amountIncreaseEachLevel * -(defaultLevel - 1);
                         adjustRandomExp = new IncrementalMinMaxInt()
                         {
-                            baseAmount = randomExp.baseAmount + (randomExp.amountIncreaseEachLevel * -(defaultLevel - 1)),
+                            baseAmount = new MinMaxInt()
+                            {
+                                min = (int)adjustBaseAmount.min,
+                                max = (int)adjustBaseAmount.max,
+                            },
                             amountIncreaseEachLevel = randomExp.amountIncreaseEachLevel,
                         };
                     }
@@ -427,9 +437,19 @@ namespace MultiplayerARPG
                 {
                     if (!adjustRandomGold.HasValue)
                     {
+                        MinMaxFloat adjustBaseAmount = new MinMaxFloat()
+                        {
+                            min = randomExp.baseAmount.min,
+                            max = randomExp.baseAmount.max,
+                        };
+                        adjustBaseAmount += randomGold.amountIncreaseEachLevel * -(defaultLevel - 1);
                         adjustRandomGold = new IncrementalMinMaxInt()
                         {
-                            baseAmount = randomGold.baseAmount + (randomGold.amountIncreaseEachLevel * -(defaultLevel - 1)),
+                            baseAmount = new MinMaxInt()
+                            {
+                                min = (int)adjustBaseAmount.min,
+                                max = (int)adjustBaseAmount.max,
+                            },
                             amountIncreaseEachLevel = randomGold.amountIncreaseEachLevel,
                         };
                     }

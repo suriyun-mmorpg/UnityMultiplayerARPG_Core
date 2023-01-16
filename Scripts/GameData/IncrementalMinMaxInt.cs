@@ -4,15 +4,26 @@
 public struct IncrementalMinMaxInt
 {
     public MinMaxInt baseAmount;
-    public MinMaxInt amountIncreaseEachLevel;
+    public MinMaxFloat amountIncreaseEachLevel;
     [Tooltip("It won't automatically sort by `minLevel`, you have to sort it from low to high to make it calculate properly")]
     public IncrementalMinMaxIntByLevel[] amountIncreaseEachLevelByLevels;
 
     public MinMaxInt GetAmount(int level)
     {
+        MinMaxFloat result = new MinMaxFloat()
+        {
+            min = baseAmount.min,
+            max = baseAmount.max,
+        };
         if (amountIncreaseEachLevelByLevels == null || amountIncreaseEachLevelByLevels.Length == 0)
-            return baseAmount + (amountIncreaseEachLevel * (level - 1));
-        MinMaxInt result = baseAmount;
+        {
+            result += amountIncreaseEachLevel * (level - 1);
+            return new MinMaxInt()
+            {
+                min = (int)result.min,
+                max = (int)result.max,
+            };
+        }
         int countLevel = 2;
         int indexOfIncremental = 0;
         int firstMinLevel = amountIncreaseEachLevelByLevels[indexOfIncremental].minLevel;
@@ -26,7 +37,11 @@ public struct IncrementalMinMaxInt
             if (indexOfIncremental + 1 < amountIncreaseEachLevelByLevels.Length && countLevel >= amountIncreaseEachLevelByLevels[indexOfIncremental + 1].minLevel)
                 indexOfIncremental++;
         }
-        return result;
+        return new MinMaxInt()
+        {
+            min = (int)result.min,
+            max = (int)result.max,
+        };
     }
 }
 
@@ -34,5 +49,5 @@ public struct IncrementalMinMaxInt
 public struct IncrementalMinMaxIntByLevel
 {
     public int minLevel;
-    public MinMaxInt amountIncreaseEachLevel;
+    public MinMaxFloat amountIncreaseEachLevel;
 }

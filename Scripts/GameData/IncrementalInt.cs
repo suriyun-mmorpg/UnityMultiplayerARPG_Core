@@ -4,15 +4,15 @@
 public struct IncrementalInt
 {
     public int baseAmount;
-    public int amountIncreaseEachLevel;
+    public float amountIncreaseEachLevel;
     [Tooltip("It won't automatically sort by `minLevel`, you have to sort it from low to high to make it calculate properly")]
     public IncrementalIntByLevel[] amountIncreaseEachLevelByLevels;
 
     public int GetAmount(int level)
     {
         if (amountIncreaseEachLevelByLevels == null || amountIncreaseEachLevelByLevels.Length == 0)
-            return baseAmount + (amountIncreaseEachLevel * (level - 1));
-        int result = baseAmount;
+            return (int)(baseAmount + (amountIncreaseEachLevel * (level - 1)));
+        float result = baseAmount;
         int countLevel = 2;
         int indexOfIncremental = 0;
         int firstMinLevel = amountIncreaseEachLevelByLevels[indexOfIncremental].minLevel;
@@ -26,7 +26,7 @@ public struct IncrementalInt
             if (indexOfIncremental + 1 < amountIncreaseEachLevelByLevels.Length && countLevel >= amountIncreaseEachLevelByLevels[indexOfIncremental + 1].minLevel)
                 indexOfIncremental++;
         }
-        return result;
+        return (int)result;
     }
 }
 
@@ -34,5 +34,5 @@ public struct IncrementalInt
 public struct IncrementalIntByLevel
 {
     public int minLevel;
-    public int amountIncreaseEachLevel;
+    public float amountIncreaseEachLevel;
 }
