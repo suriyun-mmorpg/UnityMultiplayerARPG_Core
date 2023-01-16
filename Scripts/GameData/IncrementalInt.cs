@@ -11,7 +11,7 @@ public struct IncrementalInt
     public int GetAmount(int level)
     {
         if (amountIncreaseEachLevelByLevels == null || amountIncreaseEachLevelByLevels.Length == 0)
-            return (int)(baseAmount + (amountIncreaseEachLevel * (level - 1)));
+            return baseAmount + (amountIncreaseEachLevel * (level - 1));
         int result = baseAmount;
         int countLevel = 2;
         int indexOfIncremental = 0;
