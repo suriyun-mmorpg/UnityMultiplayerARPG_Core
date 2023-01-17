@@ -498,7 +498,7 @@ namespace MultiplayerARPG
                                     }
                                 }
                             }
-                            int countNearbyPartyMembers;
+                            float countNearbyPartyMembers;
                             // Share EXP to party members
                             countNearbyPartyMembers = sharingExpMembers.Count;
                             for (int i = 0; i < sharingExpMembers.Count; ++i)
@@ -506,7 +506,23 @@ namespace MultiplayerARPG
                                 nearbyPartyMember = sharingExpMembers[i];
                                 // If share exp, every party member will receive devided exp
                                 // If not share exp, character who make damage will receive non-devided exp
-                                nearbyPartyMember.RewardExp(reward, (1f - shareGuildExpRate) / (float)countNearbyPartyMembers * rewardRate, RewardGivenType.PartyShare);
+                                int petIndex = nearbyPartyMember.IndexOfSummon(SummonType.PetItem);
+                                if (petIndex >= 0)
+                                {
+                                    tempMonsterCharacterEntity = nearbyPartyMember.Summons[petIndex].CacheEntity;
+                                    if (tempMonsterCharacterEntity != null)
+                                    {
+                                        // Share exp to pet, set multiplier to 0.5, because it will be shared to player
+                                        tempMonsterCharacterEntity.RewardExp(reward, (1f - shareGuildExpRate) / countNearbyPartyMembers * 0.5f * rewardRate, RewardGivenType.PartyShare);
+                                    }
+                                    // Set multiplier to 0.5, because it was shared to monster
+                                    nearbyPartyMember.RewardExp(reward, (1f - shareGuildExpRate) / countNearbyPartyMembers * 0.5f * rewardRate, RewardGivenType.PartyShare);
+                                }
+                                else
+                                {
+                                    // No pet, no share, so rate is 1f
+                                    nearbyPartyMember.RewardExp(reward, (1f - shareGuildExpRate) / countNearbyPartyMembers * rewardRate, RewardGivenType.PartyShare);
+                                }
                             }
                             // Share Items to party members
                             countNearbyPartyMembers = sharingItemMembers.Count;
@@ -520,7 +536,7 @@ namespace MultiplayerARPG
                                     // Make other member in party able to pickup items
                                     looters.Add(nearbyPartyMember.Id);
                                 }
-                                nearbyPartyMember.RewardCurrencies(reward, 1f / (float)countNearbyPartyMembers * rewardRate, RewardGivenType.PartyShare);
+                                nearbyPartyMember.RewardCurrencies(reward, 1f / countNearbyPartyMembers * rewardRate, RewardGivenType.PartyShare);
                             }
                             // Shared exp has been given, so do not give it to character again
                             if (tempPartyData.shareExp)
