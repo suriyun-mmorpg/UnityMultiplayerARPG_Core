@@ -7,10 +7,13 @@ namespace MultiplayerARPG
         public const float GROUND_DETECTION_DISTANCE = 30f;
         private static readonly RaycastHit[] findGroundRaycastHits = new RaycastHit[1000];
 
+        private static int lastUpdateFrame;
+        public static bool IsAiming { get { return Time.frameCount - lastUpdateFrame <= 1; } }
         public static bool IsMobile { get { return InputManager.useMobileInputOnNonMobile || Application.isMobilePlatform; } }
 
         public static AimPosition UpdateAimControls(Vector2 aimAxes, BaseAreaSkill skill, int skillLevel, GameObject targetObject)
         {
+            lastUpdateFrame = Time.frameCount;
             if (IsMobile)
                 return UpdateAimControls_Mobile(aimAxes, skill, skillLevel, targetObject);
             return UpdateAimControls_PC(Input.mousePosition, skill, skillLevel, targetObject);
@@ -18,6 +21,7 @@ namespace MultiplayerARPG
 
         public static AimPosition UpdateAimControls_Shooter(Vector2 aimAxes, BaseAreaSkill skill, int skillLevel, GameObject targetObject)
         {
+            lastUpdateFrame = Time.frameCount;
             if (IsMobile)
                 return UpdateAimControls_Mobile(aimAxes, skill, skillLevel, targetObject);
             return UpdateAimControls_PC(new Vector3(Screen.width * 0.5f, Screen.height * 0.5f), skill, skillLevel, targetObject);
