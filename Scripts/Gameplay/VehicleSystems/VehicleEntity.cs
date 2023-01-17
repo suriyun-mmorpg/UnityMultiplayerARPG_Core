@@ -150,16 +150,14 @@ namespace MultiplayerARPG
         {
             if (moveSpeedType == VehicleMoveSpeedType.FixedMovedSpeed)
                 return moveSpeed;
-            BaseGameEntity driver;
-            if (passengers.TryGetValue(0, out driver))
+            if (passengers.TryGetValue(0, out BaseGameEntity driver))
                 return driver.GetMoveSpeed() * driverMoveSpeedRate;
             return 0f;
         }
 
         public override bool CanMove()
         {
-            BaseGameEntity driver;
-            if (passengers.TryGetValue(0, out driver))
+            if (passengers.TryGetValue(0, out BaseGameEntity driver))
                 return driver.CanMove();
             return false;
         }
