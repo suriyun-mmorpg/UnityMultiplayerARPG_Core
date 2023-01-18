@@ -130,6 +130,7 @@ namespace MultiplayerARPG
         public float ReloadTotalDuration { get { return ReloadComponent.ReloadTotalDuration; } set { ReloadComponent.ReloadTotalDuration = value; } }
         public float[] ReloadTriggerDurations { get { return ReloadComponent.ReloadTriggerDurations; } set { ReloadComponent.ReloadTriggerDurations = value; } }
         public bool IsCharging { get { return ChargeComponent.IsCharging; } }
+        public bool WillDoActionWhenStopCharging { get { return ChargeComponent.WillDoActionWhenStopCharging; } }
         public float MoveSpeedRateWhileCharging { get { return ChargeComponent.MoveSpeedRateWhileCharging; } }
         public MovementRestriction MovementRestrictionWhileCharging { get { return ChargeComponent.MovementRestrictionWhileCharging; } }
         public float RespawnGroundedCheckCountDown { get; protected set; }
@@ -586,15 +587,17 @@ namespace MultiplayerARPG
         #endregion
 
         #region Attack / Skill / Weapon / Damage
-        public bool ValidateAttack(ref bool isLeftHand)
+        public bool ValidateAttack(ref bool isLeftHand, out CharacterItem characterItem)
         {
+            characterItem = null;
+
             if (!CanAttack())
                 return false;
 
             if (!UpdateLastActionTime())
                 return false;
 
-            CharacterItem characterItem = this.GetAvailableWeapon(ref isLeftHand);
+            characterItem = this.GetAvailableWeapon(ref isLeftHand);
             IWeaponItem weaponItem = characterItem.GetWeaponItem();
 
             if (!ValidateAmmo(characterItem, 1))
@@ -626,9 +629,7 @@ namespace MultiplayerARPG
             if (!UpdateLastActionTime())
                 return false;
 
-            BaseSkill skill;
-            UITextKeys gameMessage;
-            if (!this.ValidateSkillToUse(dataId, isLeftHand, targetObjectId, out skill, out _, out gameMessage))
+            if (!this.ValidateSkillToUse(dataId, isLeftHand, targetObjectId, out BaseSkill skill, out _, out UITextKeys gameMessage))
             {
                 if (gameMessage != UITextKeys.NONE)
                     QueueGameMessage(gameMessage);
@@ -703,8 +704,13 @@ namespace MultiplayerARPG
         {
             if (!IsOwnerClientOrOwnedByServer)
                 return false;
-            if (ValidateAttack(ref isLeftHand))
+            if (ValidateAttack(ref isLeftHand, out CharacterItem characterItem))
             {
+                if (characterItem.GetWeaponItem().FireType == FireType.FireOnRelease && !WillDoActionWhenStopCharging)
+                {
+                    StopCharge();
+                    return false;
+                }
                 StopCharge();
                 AttackComponent.Attack(isLeftHand);
                 return true;
@@ -747,7 +753,7 @@ namespace MultiplayerARPG
         {
             if (!IsOwnerClientOrOwnedByServer)
                 return false;
-            if (ValidateAttack(ref isLeftHand))
+            if (ValidateAttack(ref isLeftHand, out CharacterItem item) && item.GetWeaponItem().FireType == FireType.FireOnRelease)
             {
                 ChargeComponent.StartCharge(isLeftHand);
                 return true;

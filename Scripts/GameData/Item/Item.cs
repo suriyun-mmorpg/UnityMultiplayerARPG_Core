@@ -104,6 +104,7 @@ namespace MultiplayerARPG
         public FireType fireType;
         public Vector2 fireStagger;
         public byte fireSpread;
+        public float chargeDuration;
         public bool destroyImmediatelyAfterFired;
 
         [Category(3, "Buff/Bonus Settings")]
@@ -512,6 +513,11 @@ namespace MultiplayerARPG
         public byte FireSpread
         {
             get { return fireSpread; }
+        }
+
+        public float ChargeDuration
+        {
+            get { return chargeDuration; }
         }
 
         public bool DestroyImmediatelyAfterFired

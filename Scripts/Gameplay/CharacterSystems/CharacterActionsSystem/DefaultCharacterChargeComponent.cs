@@ -1,13 +1,23 @@
 ﻿using LiteNetLib.Utils;
+using UnityEngine;
 
 namespace MultiplayerARPG
 {
     public class DefaultCharacterChargeComponent : BaseNetworkedGameEntityComponent<BaseCharacterEntity>, ICharacterChargeComponent
     {
         public bool IsCharging { get; protected set; }
+        public bool WillDoActionWhenStopCharging
+        {
+            get
+            {
+                return IsCharging && (Time.unscaledTime - chargeStartTime >= chargeDuration);
+            }
+        }
         public float MoveSpeedRateWhileCharging { get; protected set; }
         public MovementRestriction MovementRestrictionWhileCharging { get; protected set; }
 
+        protected float chargeStartTime;
+        protected float chargeDuration;
         protected bool sendingClientStartCharge;
         protected bool sendingClientStopCharge;
         protected bool sendingServerStartCharge;
@@ -50,6 +60,8 @@ namespace MultiplayerARPG
             MoveSpeedRateWhileCharging = Entity.GetMoveSpeedRateWhileCharging(weaponItem);
             MovementRestrictionWhileCharging = Entity.GetMovementRestrictionWhileCharging(weaponItem);
             IsCharging = true;
+            chargeStartTime = Time.unscaledTime;
+            chargeDuration = weaponItem.ChargeDuration;
         }
 
         protected void StopChargeAnimation()

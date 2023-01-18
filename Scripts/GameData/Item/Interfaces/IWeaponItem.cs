@@ -78,6 +78,10 @@ namespace MultiplayerARPG
         /// </summary>
         byte FireSpread { get; }
         /// <summary>
+        /// Minimum charge duration to attack
+        /// </summary>
+        float ChargeDuration { get; }
+        /// <summary>
         /// If this is `TRUE`, character's item will be destroyed after fired, will be used for grenade items
         /// </summary>
         bool DestroyImmediatelyAfterFired { get; }

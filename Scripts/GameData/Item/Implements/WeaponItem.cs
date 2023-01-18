@@ -231,6 +231,13 @@ namespace MultiplayerARPG
         }
 
         [SerializeField]
+        private float chargeDuration = 0;
+        public float ChargeDuration
+        {
+            get { return chargeDuration; }
+        }
+
+        [SerializeField]
         private bool destroyImmediatelyAfterFired = false;
         public bool DestroyImmediatelyAfterFired
         {
