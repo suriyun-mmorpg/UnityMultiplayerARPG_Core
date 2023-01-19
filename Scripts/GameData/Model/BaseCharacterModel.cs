@@ -76,6 +76,26 @@ namespace MultiplayerARPG
 
         public CharacterModelManager Manager { get; protected set; }
 
+        protected Dictionary<string, EquipmentModel> equippedModels = new Dictionary<string, EquipmentModel>();
+        /// <summary>
+        /// { equipPosition(String), model(EquipmentModel) }
+        /// </summary>
+        public Dictionary<string, EquipmentModel> EquippedModels
+        {
+            get { return IsMainModel ? equippedModels : MainModel.equippedModels; }
+            set { MainModel.equippedModels = value; }
+        }
+
+        protected Dictionary<string, GameObject> equippedModelObjects = new Dictionary<string, GameObject>();
+        /// <summary>
+        /// { equipSocket(String), modelObject(GameObject) }
+        /// </summary>
+        public Dictionary<string, GameObject> EquippedModelObjects
+        {
+            get { return IsMainModel ? equippedModelObjects : MainModel.equippedModelObjects; }
+            set { MainModel.equippedModelObjects = value; }
+        }
+
         public override Dictionary<string, EffectContainer> CacheEffectContainers
         {
             get { return IsMainModel ? base.CacheEffectContainers : MainModel.CacheEffectContainers; }
@@ -99,15 +119,6 @@ namespace MultiplayerARPG
             get { return IsMainModel ? cacheEquipmentModelContainers : MainModel.cacheEquipmentModelContainers; }
         }
 
-        protected Dictionary<string, Dictionary<string, GameObject>> cacheModels;
-        /// <summary>
-        /// { equipPosition(String), { equipSocket(String), model(GameObject) } }
-        /// </summary>
-        public Dictionary<string, Dictionary<string, GameObject>> CacheModels
-        {
-            get { return IsMainModel ? cacheModels : MainModel.cacheModels; }
-        }
-
         protected Dictionary<string, List<GameEffect>> cacheEffects = new Dictionary<string, List<GameEffect>>();
         /// <summary>
         /// { equipPosition(String), [ effect(GameEffect) ] }
@@ -129,24 +140,6 @@ namespace MultiplayerARPG
         {
             get { return IsMainModel ? cacheLeftHandEquipmentEntity : MainModel.cacheLeftHandEquipmentEntity; }
             set { MainModel.cacheLeftHandEquipmentEntity = value; }
-        }
-
-        protected Dictionary<string, List<BaseEquipmentEntity>> cacheEquipmentEntities;
-        /// <summary>
-        /// { equipPosition(String), [ equipmentEntity(BaseEquipmentEntity) ] }
-        /// </summary>
-        public Dictionary<string, List<BaseEquipmentEntity>> CacheEquipmentEntities
-        {
-            get { return IsMainModel ? cacheEquipmentEntities : MainModel.cacheEquipmentEntities; }
-        }
-
-        /// <summary>
-        /// { equipPosition(String), itemDataId(Int32) }
-        /// </summary>
-        protected Dictionary<string, int> cacheItemIds;
-        public Dictionary<string, int> CacheItemIds
-        {
-            get { return IsMainModel ? cacheItemIds : MainModel.cacheItemIds; }
         }
 
         protected bool isCacheDataInitialized = false;
@@ -219,10 +212,7 @@ namespace MultiplayerARPG
                 }
             }
 
-            cacheModels = new Dictionary<string, Dictionary<string, GameObject>>();
             cacheEffects = new Dictionary<string, List<GameEffect>>();
-            cacheEquipmentEntities = new Dictionary<string, List<BaseEquipmentEntity>>();
-            cacheItemIds = new Dictionary<string, int>();
         }
 
         protected void UpdateObjectsWhenSwitch()
@@ -366,164 +356,80 @@ namespace MultiplayerARPG
         }
 #endif
 
-        protected void DestroyCacheModel(string equipPosition)
-        {
-            if (string.IsNullOrEmpty(equipPosition))
-                return;
-
-            Dictionary<string, GameObject> oldModels;
-            if (CacheModels.TryGetValue(equipPosition, out oldModels) &&
-                oldModels != null)
-            {
-                EquipmentContainer tempContainer;
-                foreach (string equipSocket in oldModels.Keys)
-                {
-                    if (oldModels[equipSocket] != null)
-                        Destroy(oldModels[equipSocket]);
-                    if (!CacheEquipmentModelContainers.TryGetValue(equipSocket, out tempContainer))
-                        continue;
-                    tempContainer.DeactivateInstantiatedObjects();
-                    tempContainer.SetActiveDefaultModel(true);
-                }
-                CacheModels.Remove(equipPosition);
-            }
-            if (CacheItemIds.ContainsKey(equipPosition))
-                CacheItemIds.Remove(equipPosition);
-            if (onEquipmentModelsDestroyed != null)
-                onEquipmentModelsDestroyed.Invoke(equipPosition);
-        }
-
-        protected void DestroyCacheModels()
-        {
-            foreach (string equipPosition in CacheModels.Keys)
-            {
-                DestroyCacheModel(equipPosition);
-            }
-        }
-
         public virtual void SetEquipWeapons(EquipWeapons equipWeapons)
         {
             this.equipWeapons = equipWeapons;
-
-            IEquipmentItem rightHandItem = equipWeapons.GetRightHandEquipmentItem();
-            IEquipmentItem leftHandItem = equipWeapons.GetLeftHandEquipmentItem();
-
-            // Clear equipped item models
-            tempAddingKeys.Clear();
-            if (rightHandItem != null)
-                tempAddingKeys.Add(GameDataConst.EQUIP_POSITION_RIGHT_HAND);
-            if (leftHandItem != null)
-                tempAddingKeys.Add(GameDataConst.EQUIP_POSITION_LEFT_HAND);
-
-            tempCachedKeys.Clear();
-            tempCachedKeys.AddRange(CacheModels.Keys);
-            foreach (string equipPosition in tempCachedKeys)
-            {
-                // Destroy cache model by the position which not existed in new equipment position (unequipped items)
-                if (!tempAddingKeys.Contains(equipPosition) &&
-                    (equipPosition.Equals(GameDataConst.EQUIP_POSITION_RIGHT_HAND) ||
-                    equipPosition.Equals(GameDataConst.EQUIP_POSITION_LEFT_HAND)))
-                    DestroyCacheModel(equipPosition);
-            }
-
-            BaseEquipmentEntity baseEquipmentEntity;
-            if (rightHandItem != null && rightHandItem.IsWeapon())
-            {
-                InstantiateEquipModel(GameDataConst.EQUIP_POSITION_RIGHT_HAND, rightHandItem.DataId, equipWeapons.rightHand.level, rightHandItem.EquipmentModels, out baseEquipmentEntity);
-                CacheRightHandEquipmentEntity = baseEquipmentEntity;
-            }
-            if (leftHandItem != null && leftHandItem.IsWeapon())
-            {
-                InstantiateEquipModel(GameDataConst.EQUIP_POSITION_LEFT_HAND, leftHandItem.DataId, equipWeapons.leftHand.level, (leftHandItem as IWeaponItem).OffHandEquipmentModels, out baseEquipmentEntity);
-                CacheLeftHandEquipmentEntity = baseEquipmentEntity;
-            }
-            if (leftHandItem != null && leftHandItem.IsShield())
-            {
-                InstantiateEquipModel(GameDataConst.EQUIP_POSITION_LEFT_HAND, leftHandItem.DataId, equipWeapons.leftHand.level, leftHandItem.EquipmentModels, out baseEquipmentEntity);
-                CacheLeftHandEquipmentEntity = baseEquipmentEntity;
-            }
+            UpdateEquipmentModels();
         }
 
         public virtual void SetEquipItems(IList<CharacterItem> equipItems)
         {
             this.equipItems = equipItems;
-            IArmorItem armorItem;
-            tempAddingKeys.Clear();
+            UpdateEquipmentModels();
+        }
+
+        private void UpdateEquipmentModels()
+        {
+            // Prepared data
+            EquipmentContainer tempContainer;
+            EquipmentModel tempEquipmentModel;
+            GameObject tempEquipmentObject;
+            Dictionary<string, EquipmentModel> equippingModels = new Dictionary<string, EquipmentModel>();
+            HashSet<string> unequippingSockets = new HashSet<string>(EquippedModels.Keys);
+
+            // Setup equipping models from equip items
             if (equipItems != null && equipItems.Count > 0)
             {
                 foreach (CharacterItem equipItem in equipItems)
                 {
-                    armorItem = equipItem.GetArmorItem();
-                    if (armorItem == null) continue;
-                    tempAddingKeys.Add(armorItem.GetEquipPosition());
+                    IArmorItem armorItem = equipItem.GetArmorItem();
+                    if (armorItem == null)
+                        continue;
+                    SetupEquippingModels(equippingModels, unequippingSockets, armorItem.EquipmentModels, equipItem.dataId, equipItem.level, armorItem.GetEquipPosition());
                 }
             }
 
-            tempCachedKeys.Clear();
-            tempCachedKeys.AddRange(CacheModels.Keys);
-            foreach (string equipPosition in tempCachedKeys)
-            {
-                // Destroy cache model by the position which not existed in new equipment position (unequipped items)
-                if (!tempAddingKeys.Contains(equipPosition) &&
-                    !equipPosition.Equals(GameDataConst.EQUIP_POSITION_RIGHT_HAND) &&
-                    !equipPosition.Equals(GameDataConst.EQUIP_POSITION_LEFT_HAND))
-                    DestroyCacheModel(equipPosition);
-            }
+            // Setup equipping models from equip weapons
+            IEquipmentItem rightHandItem = equipWeapons.GetRightHandEquipmentItem();
+            IEquipmentItem leftHandItem = equipWeapons.GetLeftHandEquipmentItem();
+            if (rightHandItem != null && rightHandItem.IsWeapon())
+                SetupEquippingModels(equippingModels, unequippingSockets, (rightHandItem as IWeaponItem).EquipmentModels, equipWeapons.rightHand.dataId, equipWeapons.rightHand.level, GameDataConst.EQUIP_POSITION_RIGHT_HAND);
+            if (leftHandItem != null && leftHandItem.IsWeapon())
+                SetupEquippingModels(equippingModels, unequippingSockets, (leftHandItem as IWeaponItem).OffHandEquipmentModels, equipWeapons.leftHand.dataId, equipWeapons.leftHand.level, GameDataConst.EQUIP_POSITION_LEFT_HAND);
+            if (leftHandItem != null && leftHandItem.IsShield())
+                SetupEquippingModels(equippingModels, unequippingSockets, (leftHandItem as IShieldItem).EquipmentModels, equipWeapons.leftHand.dataId, equipWeapons.leftHand.level, GameDataConst.EQUIP_POSITION_LEFT_HAND);
 
-            if (equipItems != null)
+            // Destroy unequipped item models, and show default models
+            foreach (string unequippingSocket in unequippingSockets)
             {
-                foreach (CharacterItem equipItem in equipItems)
+                if (EquippedModelObjects.TryGetValue(unequippingSocket, out tempEquipmentObject))
                 {
-                    armorItem = equipItem.GetArmorItem();
-                    if (armorItem == null) continue;
-                    if (tempAddingKeys.Contains(armorItem.GetEquipPosition()))
-                        InstantiateEquipModel(armorItem.GetEquipPosition(), armorItem.DataId, equipItem.level, armorItem.EquipmentModels, out _);
+                    Destroy(tempEquipmentObject);
+                    EquippedModelObjects.Remove(unequippingSocket);
                 }
+
+                if (!CacheEquipmentModelContainers.TryGetValue(unequippingSocket, out tempContainer))
+                    continue;
+
+                tempContainer.SetActiveDefaultModel(true);
             }
-        }
 
-        public void InstantiateEquipModel(string equipPosition, int itemDataId, int itemLevel, EquipmentModel[] equipmentModels, out BaseEquipmentEntity foundEquipmentEntity)
-        {
-            foundEquipmentEntity = null;
+            // Instantiate equipping models
+            CacheRightHandEquipmentEntity = null;
+            CacheLeftHandEquipmentEntity = null;
 
-            if (!CacheEquipmentEntities.ContainsKey(equipPosition))
-                CacheEquipmentEntities.Add(equipPosition, new List<BaseEquipmentEntity>());
-
-            // Temp variables
-            int i;
-            GameObject tempEquipmentObject;
-            BaseEquipmentEntity tempEquipmentEntity;
-
-            // Same item Id, just change equipment level don't destroy and re-create
-            if (CacheItemIds.ContainsKey(equipPosition) && CacheItemIds[equipPosition] == itemDataId)
+            foreach (string equipSocket in equippingModels.Keys)
             {
-                for (i = 0; i < CacheEquipmentEntities[equipPosition].Count; ++i)
+                if (EquippedModelObjects.TryGetValue(equipSocket, out tempEquipmentObject))
                 {
-                    tempEquipmentEntity = CacheEquipmentEntities[equipPosition][i];
-                    tempEquipmentEntity.Setup(this, equipPosition, itemLevel);
-                    if (foundEquipmentEntity == null)
-                        foundEquipmentEntity = tempEquipmentEntity;
+                    Destroy(tempEquipmentObject);
+                    EquippedModelObjects.Remove(equipSocket);
                 }
-                return;
-            }
 
-            DestroyCacheModel(equipPosition);
-            CacheItemIds[equipPosition] = itemDataId;
-            CacheEquipmentEntities[equipPosition].Clear();
-
-            if (equipmentModels == null || equipmentModels.Length == 0)
-                return;
-
-            Dictionary<string, GameObject> tempInstantiatingModels = new Dictionary<string, GameObject>();
-            EquipmentContainer tempContainer;
-            EquipmentModel tempEquipmentModel;
-            for (i = 0; i < equipmentModels.Length; ++i)
-            {
-                tempEquipmentModel = equipmentModels[i];
-                if (string.IsNullOrEmpty(tempEquipmentModel.equipSocket))
+                if (!CacheEquipmentModelContainers.TryGetValue(equipSocket, out tempContainer))
                     continue;
-                if (!CacheEquipmentModelContainers.TryGetValue(tempEquipmentModel.equipSocket, out tempContainer))
-                    continue;
+
+                tempEquipmentModel = equippingModels[equipSocket];
                 if (tempEquipmentModel.useInstantiatedObject)
                 {
                     // Activate the instantiated object
@@ -531,13 +437,9 @@ namespace MultiplayerARPG
                         continue;
                     tempContainer.SetActiveDefaultModel(false);
                     tempEquipmentObject = tempContainer.instantiatedObjects[tempEquipmentModel.instantiatedObjectIndex];
-                    tempEquipmentEntity = tempEquipmentObject.GetComponent<BaseEquipmentEntity>();
-                    tempInstantiatingModels.Add(tempEquipmentModel.equipSocket, null);
                 }
                 else
                 {
-                    if (tempEquipmentModel.model == null)
-                        continue;
                     // Instantiate model, setup transform and activate game object
                     tempContainer.DeactivateInstantiatedObjects();
                     tempContainer.SetActiveDefaultModel(false);
@@ -551,23 +453,51 @@ namespace MultiplayerARPG
                     else
                         tempEquipmentObject.gameObject.SetLayerRecursively(EquipmentLayer, true);
                     tempEquipmentObject.RemoveComponentsInChildren<Collider>(false);
-                    tempEquipmentEntity = tempEquipmentObject.GetComponent<BaseEquipmentEntity>();
-                    AddingNewModel(tempEquipmentObject, tempContainer);
-                    tempInstantiatingModels.Add(tempEquipmentModel.equipSocket, tempEquipmentObject);
+                    EquippedModelObjects[equipSocket] = tempEquipmentObject;
                 }
-                // Setup equipment entity (if exists)
-                if (tempEquipmentEntity != null)
+
+                // Setup equipment entity
+                if (CacheRightHandEquipmentEntity == null && GameDataConst.EQUIP_POSITION_RIGHT_HAND.Equals(tempEquipmentModel.equipPosition))
+                    CacheRightHandEquipmentEntity = tempEquipmentObject.GetComponent<BaseEquipmentEntity>();
+                if (CacheLeftHandEquipmentEntity == null && GameDataConst.EQUIP_POSITION_LEFT_HAND.Equals(tempEquipmentModel.equipPosition))
+                    CacheLeftHandEquipmentEntity = tempEquipmentObject.GetComponent<BaseEquipmentEntity>();
+            }
+
+            EquippedModels = equippingModels;
+        }
+
+        private void SetupEquippingModels(Dictionary<string, EquipmentModel> equippingModels, HashSet<string> unequippingSockets, EquipmentModel[] equipmentModels, int itemDataId, int itemLevel, string equipPosition)
+        {
+            if (equipmentModels == null || equipmentModels.Length == 0 || string.IsNullOrWhiteSpace(equipPosition))
+                return;
+
+            foreach (EquipmentModel model in equipmentModels)
+            {
+                if (string.IsNullOrEmpty(model.equipSocket) || (!model.useInstantiatedObject && !model.model))
                 {
-                    tempEquipmentEntity.Setup(this, equipPosition, itemLevel);
-                    CacheEquipmentEntities[equipPosition].Add(tempEquipmentEntity);
-                    if (foundEquipmentEntity == null)
-                        foundEquipmentEntity = tempEquipmentEntity;
+                    // Required data are empty, skip it
+                    continue;
+                }
+
+                if (!equippingModels.TryGetValue(model.equipSocket, out EquipmentModel storedModel) || storedModel.priority < model.priority || storedModel.itemLevel < itemLevel)
+                {
+                    if (equippedModels.TryGetValue(model.equipSocket, out EquipmentModel equippedModel)
+                        && equippedModel.itemDataId == itemDataId
+                        && equippedModel.itemLevel == itemLevel)
+                    {
+                        // Same view data, so don't destroy and don't instantiates this model object
+                        unequippingSockets.Remove(model.equipSocket);
+                        continue;
+                    }
+
+                    EquipmentModel clonedModel = model.Clone();
+                    clonedModel.itemDataId = itemDataId;
+                    clonedModel.itemLevel = itemLevel;
+                    clonedModel.equipPosition = equipPosition;
+                    equippingModels[clonedModel.equipSocket] = clonedModel;
+                    unequippingSockets.Remove(model.equipSocket);
                 }
             }
-            // Cache Models
-            CacheModels[equipPosition] = tempInstantiatingModels;
-            if (onEquipmentModelsInstantiated != null)
-                onEquipmentModelsInstantiated.Invoke(equipPosition);
         }
 
         protected void CreateCacheEffect(string buffId, List<GameEffect> effects)
@@ -580,7 +510,7 @@ namespace MultiplayerARPG
         protected void DestroyCacheEffect(string buffId)
         {
             List<GameEffect> oldEffects;
-            if (!string.IsNullOrEmpty(buffId) && CacheEffects.TryGetValue(buffId, out oldEffects) && oldEffects != null)
+            if (!string.IsNullOrEmpty(buffId) && CacheEffects.TryGetValue(buffId, out List<GameEffect> oldEffects) && oldEffects != null)
             {
                 foreach (GameEffect effect in oldEffects)
                 {
@@ -726,13 +656,6 @@ namespace MultiplayerARPG
         public SkillActivateAnimationType UseSkillActivateAnimationType(BaseSkill skill)
         {
             return GetSkillActivateAnimationType(skill.DataId);
-        }
-
-        public List<BaseEquipmentEntity> GetEquipmentEntities(string equipPosition)
-        {
-            if (!CacheEquipmentEntities.ContainsKey(equipPosition))
-                CacheEquipmentEntities.Add(equipPosition, new List<BaseEquipmentEntity>());
-            return CacheEquipmentEntities[equipPosition];
         }
 
         public BaseEquipmentEntity GetRightHandEquipmentEntity()
