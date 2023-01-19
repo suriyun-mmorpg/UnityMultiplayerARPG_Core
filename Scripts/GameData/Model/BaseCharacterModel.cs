@@ -509,7 +509,6 @@ namespace MultiplayerARPG
 
         protected void DestroyCacheEffect(string buffId)
         {
-            List<GameEffect> oldEffects;
             if (!string.IsNullOrEmpty(buffId) && CacheEffects.TryGetValue(buffId, out List<GameEffect> oldEffects) && oldEffects != null)
             {
                 foreach (GameEffect effect in oldEffects)
