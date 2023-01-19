@@ -21,8 +21,6 @@ namespace MultiplayerARPG
         [HideInInspector]
         public int itemLevel;
         [HideInInspector]
-        public byte equipSlotIndex;
-        [HideInInspector]
         public string equipPosition;
         #endregion
 
@@ -41,7 +39,6 @@ namespace MultiplayerARPG
                 // Runtime only data
                 itemDataId = itemDataId,
                 itemLevel = itemLevel,
-                equipSlotIndex = equipSlotIndex,
                 equipPosition = equipPosition,
             };
         }
