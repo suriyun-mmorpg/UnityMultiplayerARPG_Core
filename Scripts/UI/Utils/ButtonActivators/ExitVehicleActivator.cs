@@ -1,6 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
 namespace MultiplayerARPG
 {
@@ -8,13 +6,9 @@ namespace MultiplayerARPG
     {
         public GameObject[] activateObjects;
 
-        private bool canExitVehicle;
-
         private void LateUpdate()
         {
-            canExitVehicle = GameInstance.PlayingCharacterEntity != null &&
-                GameInstance.PlayingCharacterEntity.PassengingVehicleEntity != null;
-
+            bool canExitVehicle = GameInstance.PlayingCharacterEntity != null && GameInstance.PlayingCharacterEntity.PassengingVehicleEntity != null;
             foreach (GameObject obj in activateObjects)
             {
                 obj.SetActive(canExitVehicle);

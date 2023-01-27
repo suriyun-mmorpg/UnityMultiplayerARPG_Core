@@ -6,13 +6,9 @@ namespace MultiplayerARPG
     {
         public GameObject[] activateObjects;
 
-        private bool canReload;
-
         private void LateUpdate()
         {
-            canReload = IsReloadable(GameInstance.PlayingCharacter.EquipWeapons.rightHand) ||
-                IsReloadable(GameInstance.PlayingCharacter.EquipWeapons.leftHand);
-
+            bool canReload = IsReloadable(GameInstance.PlayingCharacter.EquipWeapons.rightHand) || IsReloadable(GameInstance.PlayingCharacter.EquipWeapons.leftHand);
             foreach (GameObject obj in activateObjects)
             {
                 obj.SetActive(canReload);
