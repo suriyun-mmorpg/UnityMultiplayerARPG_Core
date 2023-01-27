@@ -82,17 +82,19 @@ namespace MultiplayerARPG
         public UIBase uiIsWarping;
 
         [Header("Other Settings")]
-        public UIToggleUI[] toggleUis;
-        [Tooltip("These GameObject (s) will ignore click / touch detection when click or touch on screen")]
+        public List<UIToggleUI> toggleUis = new List<UIToggleUI>();
+        [Tooltip("These Tags will ignore pointer over UIs detection when click or touch on screen")]
+        public List<UnityTag> ignorePointerOverUITags = new List<UnityTag>();
+        [Tooltip("These GameObjects will ignore pointer over UIs detection when click or touch on screen")]
         [FormerlySerializedAs("ignorePointerDetectionUis")]
-        public List<GameObject> ignorePointerOverUIObjects;
-        [Tooltip("These UI (s) will block character controller inputs while visible")]
+        public List<GameObject> ignorePointerOverUIObjects = new List<GameObject>();
+        [Tooltip("These UIs will blocks character controller inputs while visible")]
         [FormerlySerializedAs("blockControllerUIs")]
-        public List<UIBase> blockControllerUis;
+        public List<UIBase> blockControllerUis = new List<UIBase>();
 
         [Header("Events")]
-        public UnityEvent onCharacterDead;
-        public UnityEvent onCharacterRespawn;
+        public UnityEvent onCharacterDead = new UnityEvent();
+        public UnityEvent onCharacterRespawn = new UnityEvent();
 
         public System.Action<BuildingEntity> onShowConstructBuildingDialog;
         public System.Action onHideConstructBuildingDialog;
@@ -101,10 +103,8 @@ namespace MultiplayerARPG
 
         public override ItemsContainerEntity ItemsContainerEntity { get { return uiItemsContainer.TargetEntity; } }
 
-        /// <summary>
-        /// List of dialogs which open by activate on NPCs or Building Entites
-        /// </summary>
-        private readonly List<UIBase> npcDialogs = new List<UIBase>();
+        private readonly List<UIBase> openedNpcDialogs = new List<UIBase>();
+        private readonly List<RaycastResult> pointerOverUIResults = new List<RaycastResult>();
 
         protected override void Awake()
         {
@@ -403,11 +403,11 @@ namespace MultiplayerARPG
 
         public override void HideNpcDialog()
         {
-            for (int i = npcDialogs.Count - 1; i >= 0; --i)
+            for (int i = openedNpcDialogs.Count - 1; i >= 0; --i)
             {
-                if (npcDialogs[i].IsVisible())
-                    npcDialogs[i].Hide();
-                npcDialogs.RemoveAt(i);
+                if (openedNpcDialogs[i].IsVisible())
+                    openedNpcDialogs[i].Hide();
+                openedNpcDialogs.RemoveAt(i);
             }
             GameInstance.PlayingCharacterEntity.NpcAction.CallServerHideNpcDialog();
         }
@@ -490,20 +490,38 @@ namespace MultiplayerARPG
             if (UIDragHandler.DraggingObjects.Count > 0)
                 return true;
             eventDataCurrentPosition.position = new Vector2(Input.mousePosition.x, Input.mousePosition.y);
-            List<RaycastResult> results = new List<RaycastResult>();
-            EventSystem.current.RaycastAll(eventDataCurrentPosition, results);
+            EventSystem.current.RaycastAll(eventDataCurrentPosition, pointerOverUIResults);
             // If it's not mobile ui, assume that it's over UI
-            if (ignorePointerOverUIObjects != null && ignorePointerOverUIObjects.Count > 0)
+            if (ignorePointerOverUITags.Count > 0 || ignorePointerOverUIObjects.Count > 0)
             {
-                foreach (RaycastResult result in results)
+                int i;
+                int j;
+                bool containsTag = false;
+                RaycastResult result;
+                for (i = 0; i < pointerOverUIResults.Count; ++i)
                 {
-                    if (!ignorePointerOverUIObjects.Contains(result.gameObject))
+                    result = pointerOverUIResults[i];
+                    // Find containing tags
+                    for (j = 0; j < ignorePointerOverUITags.Count; ++j)
+                    {
+                        if (result.gameObject.CompareTag(ignorePointerOverUITags[j].Tag))
+                        {
+                            containsTag = true;
+                            break;
+                        }
+                    }
+                    // Not ignored, so determining that the pointer is pointing over UIs
+                    if (!containsTag && !ignorePointerOverUIObjects.Contains(result.gameObject))
+                    {
+                        Debug.LogError(result.gameObject);
                         return true;
+                    }
                 }
             }
             else
             {
-                return results.Count > 0;
+                // Pointer over UI if it hit something, so if count > 0, then determining that the pointer is pointing over UIs
+                return pointerOverUIResults.Count > 0;
             }
             return false;
         }
@@ -762,8 +780,8 @@ namespace MultiplayerARPG
 
         protected void AddNpcDialog(UIBase npcDialog)
         {
-            if (!npcDialogs.Contains(npcDialog))
-                npcDialogs.Add(npcDialog);
+            if (!openedNpcDialogs.Contains(npcDialog))
+                openedNpcDialogs.Add(npcDialog);
         }
 
         public override void OnControllerSetup(BasePlayerCharacterEntity characterEntity)
