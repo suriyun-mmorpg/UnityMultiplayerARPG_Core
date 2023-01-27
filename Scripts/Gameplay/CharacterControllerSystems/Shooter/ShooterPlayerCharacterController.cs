@@ -1862,5 +1862,20 @@ namespace MultiplayerARPG
             base.ConfirmBuild();
             pauseFireInputFrames = PAUSE_FIRE_INPUT_FRAMES_AFTER_CONFIRM_BUILD;
         }
+
+        public override bool ShouldShowActivateButtons()
+        {
+            return SelectedGameEntity is IActivatableEntity castedEntity && castedEntity.CanActivate();
+        }
+
+        public override bool ShouldShowHoldActivateButtons()
+        {
+            return SelectedGameEntity is IHoldActivatableEntity castedEntity && castedEntity.CanHoldActivate();
+        }
+
+        public override bool ShouldShowPickUpButtons()
+        {
+            return SelectedGameEntity is IPickupActivatableEntity castedEntity && castedEntity.CanPickupActivate();
+        }
     }
 }

@@ -433,5 +433,50 @@ namespace MultiplayerARPG
                 ClearQueueUsingSkill();
             }
         }
+
+        public override bool ShouldShowActivateButtons()
+        {
+            if (ActivatableEntityDetector.activatableEntities.Count > 0)
+            {
+                IActivatableEntity activatable;
+                for (int i = 0; i < ActivatableEntityDetector.activatableEntities.Count; ++i)
+                {
+                    activatable = ActivatableEntityDetector.activatableEntities[i];
+                    if (activatable.CanActivate())
+                        return true;
+                }
+            }
+            return false;
+        }
+
+        public override bool ShouldShowHoldActivateButtons()
+        {
+            if (ActivatableEntityDetector.holdActivatableEntities.Count > 0)
+            {
+                IHoldActivatableEntity activatable;
+                for (int i = 0; i < ActivatableEntityDetector.holdActivatableEntities.Count; ++i)
+                {
+                    activatable = ActivatableEntityDetector.holdActivatableEntities[i];
+                    if (activatable.CanHoldActivate())
+                        return true;
+                }
+            }
+            return false;
+        }
+
+        public override bool ShouldShowPickUpButtons()
+        {
+            if (ItemDropEntityDetector.pickupActivatableEntities.Count > 0)
+            {
+                IPickupActivatableEntity activatable;
+                for (int i = 0; i < ItemDropEntityDetector.pickupActivatableEntities.Count; ++i)
+                {
+                    activatable = ItemDropEntityDetector.pickupActivatableEntities[i];
+                    if (activatable.CanPickupActivate())
+                        return true;
+                }
+            }
+            return false;
+        }
     }
 }

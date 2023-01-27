@@ -291,5 +291,8 @@ namespace MultiplayerARPG
         public abstract void UseHotkey(HotkeyType type, string relateId, AimPosition aimPosition);
         public abstract AimPosition UpdateBuildAimControls(Vector2 aimAxes, BuildingEntity prefab);
         public abstract void FinishBuildAimControls(bool isCancel);
+        public abstract bool ShouldShowActivateButtons();
+        public abstract bool ShouldShowHoldActivateButtons();
+        public abstract bool ShouldShowPickUpButtons();
     }
 }
