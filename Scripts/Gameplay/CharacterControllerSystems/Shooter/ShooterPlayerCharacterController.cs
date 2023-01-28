@@ -433,6 +433,8 @@ namespace MultiplayerARPG
                 castedObj.SetData(buildRotationSnap, buildRotateAngle, buildRotateSpeed);
             });
             BuildAimController.Init();
+            // Initial area skill aim controller
+            AreaSkillAimController = gameObject.GetOrAddComponent<IAreaSkillAimController, ShooterAreaSkillAimController>();
 
             buildingItemIndex = -1;
             isLeftHandAttacking = false;

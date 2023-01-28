@@ -159,6 +159,8 @@ namespace MultiplayerARPG
                 castedObj.SetData(buildGridSnap, buildGridOffsets, buildGridSize, buildRotationSnap, buildRotateAngle, buildRotateSpeed);
             });
             BuildAimController.Init();
+            // Initial area skill aim controller
+            AreaSkillAimController = gameObject.GetOrAddComponent<IAreaSkillAimController, DefaultAreaSkillAimController>();
 
             buildingItemIndex = -1;
             findingEnemyIndex = -1;

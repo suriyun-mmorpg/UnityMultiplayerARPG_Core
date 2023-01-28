@@ -108,7 +108,7 @@ namespace MultiplayerARPG
             get { return TargetGameEntity as BuildingEntity; }
         }
         public IBuildAimController BuildAimController { get; protected set; }
-        public ISkillAimController SkillAimController { get; protected set; }
+        public IAreaSkillAimController AreaSkillAimController { get; protected set; }
 
         protected int buildingItemIndex;
         protected UsingSkillData queueUsingSkill;

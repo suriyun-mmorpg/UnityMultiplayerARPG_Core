@@ -12,20 +12,6 @@ namespace MultiplayerARPG
         public IncrementalFloat applyDuration;
         public GameObject targetObjectPrefab;
 
-        private GameObject cacheTargetObject;
-        public GameObject CacheTargetObject
-        {
-            get
-            {
-                if (cacheTargetObject == null)
-                {
-                    cacheTargetObject = Instantiate(targetObjectPrefab);
-                    cacheTargetObject.SetActive(false);
-                }
-                return cacheTargetObject;
-            }
-        }
-
         public override SkillType SkillType
         {
             get { return SkillType.Active; }
@@ -48,16 +34,12 @@ namespace MultiplayerARPG
 
         public override AimPosition UpdateAimControls(Vector2 aimAxes, params object[] data)
         {
-            int skillLevel = (int)data[0];
-            if (BasePlayerCharacterController.Singleton is ShooterPlayerCharacterController)
-                return AreaSkillControls.UpdateAimControls_Shooter(aimAxes, this, skillLevel, CacheTargetObject);
-            return AreaSkillControls.UpdateAimControls(aimAxes, this, skillLevel, CacheTargetObject);
+            return BasePlayerCharacterController.Singleton.AreaSkillAimController.UpdateAimControls(aimAxes, this, (int)data[0]);
         }
 
         public override void FinishAimControls(bool isCancel)
         {
-            if (CacheTargetObject != null)
-                CacheTargetObject.SetActive(false);
+            BasePlayerCharacterController.Singleton.AreaSkillAimController.FinishAimControls(isCancel);
         }
     }
 }
