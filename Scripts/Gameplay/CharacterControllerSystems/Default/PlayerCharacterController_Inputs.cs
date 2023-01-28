@@ -6,10 +6,15 @@ namespace MultiplayerARPG
     {
         public const float MIN_START_MOVE_DISTANCE = 0.01f;
 
+        public int FindClickObjects(out Vector3 worldPosition2D)
+        {
+            return physicFunctions.RaycastPickObjects(CacheGameplayCameraController.Camera, InputManager.MousePosition(), CurrentGameInstance.GetTargetLayerMask(), 100f, out worldPosition2D);
+        }
+
         public virtual void UpdateInput()
         {
             bool isFocusInputField = GenericUtils.IsFocusInputField();
-            bool isPointerOverUIObject = CacheUISceneGameplay.IsPointerOverUIObject();
+            bool isPointerOverUIObject = UISceneGameplay.IsPointerOverUIObject();
             CacheGameplayCameraController.UpdateRotationX = false;
             CacheGameplayCameraController.UpdateRotationY = false;
             if (Application.isConsolePlatform)
@@ -184,7 +189,7 @@ namespace MultiplayerARPG
                 mouseDownPosition = Input.mousePosition;
             }
             // Read inputs
-            isPointerOverUI = CacheUISceneGameplay.IsPointerOverUIObject();
+            isPointerOverUI = UISceneGameplay.IsPointerOverUIObject();
             isMouseDragDetected = (Input.mousePosition - mouseDownPosition).sqrMagnitude > DETECT_MOUSE_DRAG_DISTANCE_SQUARED;
             isMouseHoldDetected = Time.unscaledTime - mouseDownTime > DETECT_MOUSE_HOLD_DURATION;
             isMouseHoldAndNotDrag = !isMouseDragDetected && isMouseHoldDetected;
@@ -901,54 +906,6 @@ namespace MultiplayerARPG
             {
                 PlayingCharacterEntity.CallServerUseItem(itemIndex);
             }
-        }
-
-        public override AimPosition UpdateBuildAimControls(Vector2 aimAxes, BuildingEntity prefab)
-        {
-            // Instantiate constructing building
-            if (ConstructingBuildingEntity == null)
-            {
-                InstantiateConstructingBuilding(prefab);
-                buildYRotate = 0;
-            }
-            // Rotate by keys
-            Vector3 buildingAngles = Vector3.zero;
-            if (CurrentGameInstance.DimensionType == DimensionType.Dimension3D)
-            {
-                if (buildRotationSnap)
-                {
-                    if (InputManager.GetButtonDown("RotateLeft"))
-                        buildYRotate -= buildRotateAngle;
-                    if (InputManager.GetButtonDown("RotateRight"))
-                        buildYRotate += buildRotateAngle;
-                    // Make Y rotation set to 0, 90, 180
-                    buildingAngles.y = buildYRotate = Mathf.Round(buildYRotate / buildRotateAngle) * buildRotateAngle;
-                }
-                else
-                {
-                    float deltaTime = Time.deltaTime;
-                    if (InputManager.GetButton("RotateLeft"))
-                        buildYRotate -= buildRotateSpeed * deltaTime;
-                    if (InputManager.GetButton("RotateRight"))
-                        buildYRotate += buildRotateSpeed * deltaTime;
-                    // Rotate by set angles
-                    buildingAngles.y = buildYRotate;
-                }
-                ConstructingBuildingEntity.BuildYRotation = buildYRotate;
-            }
-            ConstructingBuildingEntity.Rotation = Quaternion.Euler(buildingAngles);
-            // Find position to place building
-            if (InputManager.useMobileInputOnNonMobile || Application.isMobilePlatform)
-                FindAndSetBuildingAreaByAxes(aimAxes);
-            else
-                FindAndSetBuildingAreaByMousePosition();
-            return AimPosition.CreatePosition(ConstructingBuildingEntity.Position);
-        }
-
-        public override void FinishBuildAimControls(bool isCancel)
-        {
-            if (isCancel)
-                CancelBuild();
         }
     }
 }

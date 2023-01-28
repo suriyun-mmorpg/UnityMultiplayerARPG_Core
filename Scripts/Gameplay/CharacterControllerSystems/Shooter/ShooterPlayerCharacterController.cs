@@ -403,7 +403,6 @@ namespace MultiplayerARPG
         protected bool updateAttackingCrosshair;
         protected bool updateAttackedCrosshair;
         protected bool mustReleaseFireKey;
-        protected float buildYRotate;
         protected byte pauseFireInputFrames;
         protected bool isAimming;
         protected bool isCharging;
@@ -412,18 +411,29 @@ namespace MultiplayerARPG
         protected override void Awake()
         {
             base.Awake();
+            // Initial gameplay camera controller
             CacheGameplayCameraController = gameObject.GetOrAddComponent<IShooterGameplayCameraController, ShooterGameplayCameraController>((obj) =>
             {
                 ShooterGameplayCameraController castedObj = obj as ShooterGameplayCameraController;
-                castedObj.gameplayCameraPrefab = gameplayCameraPrefab;
-                castedObj.InitialCameraControls();
+                castedObj.SetData(gameplayCameraPrefab);
             });
+            CacheGameplayCameraController.Init();
             CameraRotationSpeedScale = DefaultCameraRotationSpeedScale;
+            // Initial minimap camera controller
             CacheMinimapCameraController = gameObject.GetOrAddComponent<IMinimapCameraController, DefaultMinimapCameraController>((obj) =>
             {
                 DefaultMinimapCameraController castedObj = obj as DefaultMinimapCameraController;
-                castedObj.minimapCameraPrefab = minimapCameraPrefab;
+                castedObj.SetData(minimapCameraPrefab);
             });
+            CacheMinimapCameraController.Init();
+            // Initial build aim controller
+            BuildAimController = gameObject.GetOrAddComponent<IShooterBuildAimController, ShooterBuildAimController>((obj) =>
+            {
+                ShooterBuildAimController castedObj = obj as ShooterBuildAimController;
+                castedObj.SetData(buildRotationSnap, buildRotateAngle, buildRotateSpeed);
+            });
+            BuildAimController.Init();
+
             buildingItemIndex = -1;
             isLeftHandAttacking = false;
             ConstructingBuildingEntity = null;
@@ -432,6 +442,7 @@ namespace MultiplayerARPG
             reloadInput = new InputStateManager("Reload");
             exitVehicleInput = new InputStateManager("ExitVehicle");
             switchEquipWeaponSetInput = new InputStateManager("SwitchEquipWeaponSet");
+
             // Initialize warp portal entity detector
             GameObject tempGameObject = new GameObject("_WarpPortalEntityDetector");
             warpPortalEntityDetector = tempGameObject.AddComponent<NearbyEntityDetector>();
@@ -478,8 +489,6 @@ namespace MultiplayerARPG
         protected override void OnDestroy()
         {
             base.OnDestroy();
-            Destroy(CacheGameplayCameraController.gameObject);
-            Destroy(CacheMinimapCameraController.gameObject);
             if (warpPortalEntityDetector != null)
                 Destroy(warpPortalEntityDetector.gameObject);
             Cursor.lockState = CursorLockMode.None;
@@ -581,7 +590,7 @@ namespace MultiplayerARPG
             switchEquipWeaponSetInput.OnUpdate(tempDeltaTime);
 
             // Check is any UIs block controller or not?
-            bool isBlockController = CacheUISceneGameplay.IsBlockController();
+            bool isBlockController = UISceneGameplay.IsBlockController();
 
             // Lock cursor when not show UIs
             if (InputManager.useMobileInputOnNonMobile || Application.isMobilePlatform)
@@ -931,7 +940,7 @@ namespace MultiplayerARPG
             turnDirection.y = 0f;
             turnDirection.Normalize();
             // Show target hp/mp
-            CacheUISceneGameplay.SetTargetEntity(SelectedGameEntity);
+            UISceneGameplay.SetTargetEntity(SelectedGameEntity);
             PlayingCharacterEntity.SetTargetEntity(SelectedGameEntity);
             // Update aim assist
             CacheGameplayCameraController.EnableAimAssist = enableAimAssist && (tempPressAttackRight || tempPressAttackLeft || !aimAssistOnFireOnly) && !(SelectedGameEntity is IDamageableEntity);
@@ -950,6 +959,8 @@ namespace MultiplayerARPG
         {
             // Disable aim assist while constucting the building
             CacheGameplayCameraController.EnableAimAssist = false;
+            // Update build aim controller
+            (BuildAimController as IShooterBuildAimController)?.UpdateCameraLookData(centerRay, centerOriginToCharacterDistance, cameraForward, cameraRight);
         }
 
         protected virtual void UpdateMovementInputs()
@@ -1722,139 +1733,6 @@ namespace MultiplayerARPG
         public virtual bool IsInFront(Vector3 position)
         {
             return Vector3.Angle(cameraForward, position - EntityTransform.position) < 115f;
-        }
-
-        public override AimPosition UpdateBuildAimControls(Vector2 aimAxes, BuildingEntity prefab)
-        {
-            if (PlayingCharacterEntity == null)
-            {
-                // Character destroyed, can't controls
-                return AimPosition.CreatePosition(Vector3.zero);
-            }
-            // Instantiate constructing building
-            if (ConstructingBuildingEntity == null)
-            {
-                InstantiateConstructingBuilding(prefab);
-                buildYRotate = 0f;
-            }
-            // Rotate by keys
-            Vector3 buildingAngles = Vector3.zero;
-            if (CurrentGameInstance.DimensionType == DimensionType.Dimension3D)
-            {
-                if (buildRotationSnap)
-                {
-                    if (InputManager.GetButtonDown("RotateLeft"))
-                        buildYRotate -= buildRotateAngle;
-                    if (InputManager.GetButtonDown("RotateRight"))
-                        buildYRotate += buildRotateAngle;
-                    // Make Y rotation set to 0, 90, 180
-                    buildingAngles.y = buildYRotate = Mathf.Round(buildYRotate / buildRotateAngle) * buildRotateAngle;
-                }
-                else
-                {
-                    float deltaTime = Time.deltaTime;
-                    if (InputManager.GetButton("RotateLeft"))
-                        buildYRotate -= buildRotateSpeed * deltaTime;
-                    if (InputManager.GetButton("RotateRight"))
-                        buildYRotate += buildRotateSpeed * deltaTime;
-                    // Rotate by set angles
-                    buildingAngles.y = buildYRotate;
-                }
-                ConstructingBuildingEntity.BuildYRotation = buildYRotate;
-            }
-            // Clear area before next find
-            ConstructingBuildingEntity.BuildingArea = null;
-            // Default aim position (aim to sky/space)
-            aimTargetPosition = centerRay.origin + centerRay.direction * (centerOriginToCharacterDistance + ConstructingBuildingEntity.BuildDistance - BuildingEntity.BUILD_DISTANCE_BUFFER);
-            aimTargetPosition = GameplayUtils.ClampPosition(EntityTransform.position, aimTargetPosition, ConstructingBuildingEntity.BuildDistance - BuildingEntity.BUILD_DISTANCE_BUFFER);
-            // Raycast from camera position to center of screen
-            FindConstructingBuildingArea(new Ray(centerRay.origin, (aimTargetPosition - centerRay.origin).normalized), Vector3.Distance(centerRay.origin, aimTargetPosition));
-            // Not hit ground
-            if (!ConstructingBuildingEntity.HitSurface)
-            {
-                // Find nearest grounded position
-                FindConstructingBuildingArea(new Ray(aimTargetPosition, Vector3.down), 8f);
-            }
-            // Place constructing building
-            if ((ConstructingBuildingEntity.BuildingArea && !ConstructingBuildingEntity.BuildingArea.snapBuildingObject) ||
-                !ConstructingBuildingEntity.BuildingArea)
-            {
-                // Place the building on the ground when the building area is not snapping
-                // Or place it anywhere if there is no building area
-                // It's also no snapping build area, so set building rotation by camera look direction
-                ConstructingBuildingEntity.Position = aimTargetPosition;
-                // Rotate to camera
-                Vector3 direction = aimTargetPosition - CacheGameplayCameraController.CameraTransform.position;
-                direction.y = 0f;
-                direction.Normalize();
-                ConstructingBuildingEntity.EntityTransform.eulerAngles = Quaternion.LookRotation(direction).eulerAngles + (Vector3.up * buildYRotate);
-            }
-            return AimPosition.CreatePosition(ConstructingBuildingEntity.Position);
-        }
-
-        protected int FindConstructingBuildingArea(Ray ray, float distance)
-        {
-            ConstructingBuildingEntity.BuildingArea = null;
-            ConstructingBuildingEntity.HitSurface = false;
-            ConstructingBuildingEntity.HitSurfaceNormal = Vector3.down;
-            int tempCount = PhysicUtils.SortedRaycastNonAlloc3D(ray.origin, ray.direction, raycasts, distance, CurrentGameInstance.GetBuildLayerMask());
-            RaycastHit tempHitInfo;
-            BuildingEntity buildingEntity;
-            BuildingArea buildingArea;
-            for (int tempCounter = 0; tempCounter < tempCount; ++tempCounter)
-            {
-                tempHitInfo = raycasts[tempCounter];
-                if (ConstructingBuildingEntity.EntityTransform.root == tempHitInfo.transform.root)
-                {
-                    // Hit collider which is part of constructing building entity, skip it
-                    continue;
-                }
-
-                aimTargetPosition = tempHitInfo.point;
-
-                if (!IsInFront(tempHitInfo.point))
-                {
-                    // Skip because this position is not allowed to build the building
-                    continue;
-                }
-
-                buildingEntity = tempHitInfo.transform.root.GetComponent<BuildingEntity>();
-                buildingArea = tempHitInfo.transform.GetComponent<BuildingArea>();
-                if (buildingArea == null && tempHitInfo.collider.isTrigger)
-                {
-                    // Skip because it is trigger collider without building area
-                    continue;
-                }
-
-                if ((buildingArea == null || !ConstructingBuildingEntity.BuildingTypes.Contains(buildingArea.buildingType))
-                    && buildingEntity == null)
-                {
-                    // Hit surface which is not building area or building entity
-                    ConstructingBuildingEntity.BuildingArea = null;
-                    ConstructingBuildingEntity.HitSurface = true;
-                    ConstructingBuildingEntity.HitSurfaceNormal = tempHitInfo.normal;
-                    break;
-                }
-
-                if (buildingArea == null || !ConstructingBuildingEntity.BuildingTypes.Contains(buildingArea.buildingType))
-                {
-                    // Skip because this area is not allowed to build the building that you are going to build
-                    continue;
-                }
-
-                // Found building area which can construct the building
-                ConstructingBuildingEntity.BuildingArea = buildingArea;
-                ConstructingBuildingEntity.HitSurface = true;
-                ConstructingBuildingEntity.HitSurfaceNormal = tempHitInfo.normal;
-                break;
-            }
-            return tempCount;
-        }
-
-        public override void FinishBuildAimControls(bool isCancel)
-        {
-            if (isCancel)
-                CancelBuild();
         }
 
         public override void ConfirmBuild()

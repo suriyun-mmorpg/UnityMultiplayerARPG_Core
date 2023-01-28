@@ -17,9 +17,9 @@ namespace MultiplayerARPG
         public float AimAssistMaxAngleFromFollowingTarget { get { return CameraControls.aimAssistMaxAngleFromFollowingTarget; } set { CameraControls.aimAssistMaxAngleFromFollowingTarget = value; } }
         public float CameraRotationSpeedScale { get { return CameraControls.rotationSpeedScale; } set { CameraControls.rotationSpeedScale = value; } }
 
-        public override void InitialCameraControls()
+        public override void Init()
         {
-            base.InitialCameraControls();
+            base.Init();
             CameraControls.AimAssistAvoidanceListener = this;
             CameraControls.aimAssistLayerMask = GetAimAssistLayerMask();
         }

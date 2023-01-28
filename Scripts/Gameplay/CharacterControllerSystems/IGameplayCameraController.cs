@@ -20,6 +20,7 @@ namespace MultiplayerARPG
         bool UpdateRotationX { get; set; }
         bool UpdateRotationY { get; set; }
         bool UpdateZoom { get; set; }
+        void Init();
         void Setup(BasePlayerCharacterEntity characterEntity);
         void Desetup(BasePlayerCharacterEntity characterEntity);
     }

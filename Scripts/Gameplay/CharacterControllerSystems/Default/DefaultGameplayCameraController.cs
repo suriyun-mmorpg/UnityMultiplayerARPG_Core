@@ -4,11 +4,16 @@ namespace MultiplayerARPG
 {
     public class DefaultGameplayCameraController : MonoBehaviour, IGameplayCameraController
     {
-        public FollowCameraControls gameplayCameraPrefab = null;
-        public bool aimAssistPlayer = true;
-        public bool aimAssistMonster = true;
-        public bool aimAssistBuilding = false;
-        public bool aimAssistHarvestable = false;
+        [SerializeField]
+        protected FollowCameraControls gameplayCameraPrefab;
+        [SerializeField]
+        protected bool aimAssistPlayer = true;
+        [SerializeField]
+        protected bool aimAssistMonster = true;
+        [SerializeField]
+        protected bool aimAssistBuilding = false;
+        [SerializeField]
+        protected bool aimAssistHarvestable = false;
         public BasePlayerCharacterEntity PlayerCharacterEntity { get; protected set; }
         public FollowCameraControls CameraControls { get; protected set; }
         public Camera Camera { get { return CameraControls.CacheCamera; } }
@@ -29,22 +34,27 @@ namespace MultiplayerARPG
 
         protected bool cameraControlsInitialized = false;
 
-        protected virtual void Start()
+        public virtual void Init()
         {
-            InitialCameraControls();
-        }
-
-        public virtual void InitialCameraControls()
-        {
-            if (cameraControlsInitialized)
-                return;
-            cameraControlsInitialized = true;
             if (gameplayCameraPrefab == null)
             {
                 Debug.LogWarning("`gameplayCameraPrefab` is empty, `DefaultGameplayCameraController` component is disabling.");
                 enabled = false;
             }
             CameraControls = Instantiate(gameplayCameraPrefab);
+        }
+
+        public virtual void SetData(FollowCameraControls gameplayCameraPrefab,
+            bool aimAssistPlayer = true,
+            bool aimAssistMonster = true,
+            bool aimAssistBuilding = true,
+            bool aimAssistHarvestable = true)
+        {
+            this.gameplayCameraPrefab = gameplayCameraPrefab;
+            this.aimAssistPlayer = aimAssistPlayer;
+            this.aimAssistMonster = aimAssistMonster;
+            this.aimAssistBuilding = aimAssistBuilding;
+            this.aimAssistHarvestable = aimAssistHarvestable;
         }
 
         protected virtual void OnDestroy()

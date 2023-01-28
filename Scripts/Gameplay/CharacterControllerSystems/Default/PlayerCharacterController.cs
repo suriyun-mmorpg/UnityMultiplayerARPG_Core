@@ -123,7 +123,6 @@ namespace MultiplayerARPG
         protected bool isLeftHandAttacking;
         protected bool isFollowingTarget;
         protected bool didActionOnTarget;
-        protected float buildYRotate;
         protected InputStateManager activateInput;
         protected InputStateManager pickupItemInput;
         protected InputStateManager reloadInput;
@@ -134,17 +133,33 @@ namespace MultiplayerARPG
         protected override void Awake()
         {
             base.Awake();
+            // Initial physic functions
+            if (CurrentGameInstance.DimensionType == DimensionType.Dimension3D)
+                physicFunctions = new PhysicFunctions(512);
+            else
+                physicFunctions = new PhysicFunctions2D(512);
+            // Initial gameplay camera controller
             CacheGameplayCameraController = gameObject.GetOrAddComponent<IGameplayCameraController, DefaultGameplayCameraController>((obj) =>
             {
                 DefaultGameplayCameraController castedObj = obj as DefaultGameplayCameraController;
-                castedObj.gameplayCameraPrefab = gameplayCameraPrefab;
-                castedObj.InitialCameraControls();
+                castedObj.SetData(gameplayCameraPrefab);
             });
+            CacheGameplayCameraController.Init();
+            // Initial minimap camera controller
             CacheMinimapCameraController = gameObject.GetOrAddComponent<IMinimapCameraController, DefaultMinimapCameraController>((obj) =>
             {
                 DefaultMinimapCameraController castedObj = obj as DefaultMinimapCameraController;
-                castedObj.minimapCameraPrefab = minimapCameraPrefab;
+                castedObj.SetData(minimapCameraPrefab);
             });
+            CacheMinimapCameraController.Init();
+            // Initial build aim controller
+            BuildAimController = gameObject.GetOrAddComponent<IBuildAimController, DefaultBuildAimController>((obj) =>
+            {
+                DefaultBuildAimController castedObj = obj as DefaultBuildAimController;
+                castedObj.SetData(buildGridSnap, buildGridOffsets, buildGridSize, buildRotationSnap, buildRotateAngle, buildRotateSpeed);
+            });
+            BuildAimController.Init();
+
             buildingItemIndex = -1;
             findingEnemyIndex = -1;
             isLeftHandAttacking = false;
@@ -188,11 +203,6 @@ namespace MultiplayerARPG
             EnemyEntityDetector.findMonster = true;
             EnemyEntityDetector.findOnlyAliveMonsters = true;
             EnemyEntityDetector.findMonsterToAttack = true;
-            // Initial physic functions
-            if (CurrentGameInstance.DimensionType == DimensionType.Dimension3D)
-                physicFunctions = new PhysicFunctions(512);
-            else
-                physicFunctions = new PhysicFunctions2D(512);
         }
 
         protected override void Setup(BasePlayerCharacterEntity characterEntity)
@@ -212,10 +222,12 @@ namespace MultiplayerARPG
         protected override void OnDestroy()
         {
             base.OnDestroy();
-            Destroy(CacheGameplayCameraController.gameObject);
-            Destroy(CacheMinimapCameraController.gameObject);
             if (CacheTargetObject != null)
                 Destroy(CacheTargetObject.gameObject);
+            if (ActivatableEntityDetector != null)
+                Destroy(ActivatableEntityDetector.gameObject);
+            if (ItemDropEntityDetector != null)
+                Destroy(ItemDropEntityDetector.gameObject);
             if (EnemyEntityDetector != null)
                 Destroy(EnemyEntityDetector.gameObject);
         }
@@ -238,11 +250,11 @@ namespace MultiplayerARPG
                 destination = null;
                 isFollowingTarget = false;
                 CancelBuild();
-                CacheUISceneGameplay.SetTargetEntity(null);
+                UISceneGameplay.SetTargetEntity(null);
             }
             else
             {
-                CacheUISceneGameplay.SetTargetEntity(SelectedGameEntity);
+                UISceneGameplay.SetTargetEntity(SelectedGameEntity);
             }
 
             if (destination.HasValue)
@@ -275,21 +287,6 @@ namespace MultiplayerARPG
             findEnemyInput.OnLateUpdate();
             exitVehicleInput.OnLateUpdate();
             switchEquipWeaponSetInput.OnLateUpdate();
-        }
-
-        private Vector3 GetBuildingPlacePosition(Vector3 position)
-        {
-            if (CurrentGameInstance.DimensionType == DimensionType.Dimension3D)
-            {
-                if (buildGridSnap)
-                    position = new Vector3(Mathf.Round(position.x / buildGridSize) * buildGridSize, position.y, Mathf.Round(position.z / buildGridSize) * buildGridSize) + buildGridOffsets;
-            }
-            else
-            {
-                if (buildGridSnap)
-                    position = new Vector3(Mathf.Round(position.x / buildGridSize) * buildGridSize, Mathf.Round(position.y / buildGridSize) * buildGridSize) + buildGridOffsets;
-            }
-            return position;
         }
 
         public bool TryGetSelectedTargetAsAttackingEntity(out BaseCharacterEntity character)

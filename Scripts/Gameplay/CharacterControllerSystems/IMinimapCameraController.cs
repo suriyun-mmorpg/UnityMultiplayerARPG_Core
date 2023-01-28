@@ -9,6 +9,7 @@ namespace MultiplayerARPG
         Transform CameraTransform { get; }
         Transform FollowingEntityTransform { get; set; }
         Transform FollowingGameplayCameraTransform { get; set; }
+        void Init();
         void Setup(BasePlayerCharacterEntity characterEntity);
         void Desetup(BasePlayerCharacterEntity characterEntity);
     }

@@ -4,14 +4,15 @@ namespace MultiplayerARPG
 {
     public class DefaultMinimapCameraController : MonoBehaviour, IMinimapCameraController
     {
-        public FollowCameraControls minimapCameraPrefab = null;
+        [SerializeField]
+        protected FollowCameraControls minimapCameraPrefab;
         public FollowCameraControls CameraControls { get; protected set; }
         public Camera Camera { get { return CameraControls.CacheCamera; } }
         public Transform CameraTransform { get { return CameraControls.CacheCameraTransform; } }
         public Transform FollowingEntityTransform { get; set; }
         public Transform FollowingGameplayCameraTransform { get; set; }
 
-        protected virtual void Start()
+        public virtual void Init()
         {
             if (minimapCameraPrefab == null)
             {
@@ -19,6 +20,11 @@ namespace MultiplayerARPG
                 enabled = false;
             }
             CameraControls = Instantiate(minimapCameraPrefab);
+        }
+
+        public virtual void SetData(FollowCameraControls minimapCameraPrefab)
+        {
+            this.minimapCameraPrefab = minimapCameraPrefab;
         }
 
         protected virtual void OnDestroy()

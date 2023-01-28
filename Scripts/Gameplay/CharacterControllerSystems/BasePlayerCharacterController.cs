@@ -35,6 +35,7 @@ namespace MultiplayerARPG
         public static BasePlayerCharacterEntity OwningCharacter { get { return Singleton == null ? null : Singleton.PlayingCharacterEntity; } }
         public System.Action<BasePlayerCharacterController> onSetup;
         public System.Action<BasePlayerCharacterController> onDesetup;
+        public GameInstance CurrentGameInstance { get { return GameInstance.Singleton; } }
 
         public BasePlayerCharacterEntity PlayingCharacterEntity
         {
@@ -72,32 +73,43 @@ namespace MultiplayerARPG
             get { return PlayingCharacterEntity.StoppingDistance; }
         }
 
-        public BaseUISceneGameplay CacheUISceneGameplay { get; protected set; }
-        public GameInstance CurrentGameInstance { get { return GameInstance.Singleton; } }
+        public BaseUISceneGameplay UISceneGameplay { get; protected set; }
         public ITargetableEntity SelectedEntity { get; protected set; }
         public BaseGameEntity SelectedGameEntity
         {
             get
             {
-                if (SelectedEntity is IGameEntity)
-                    return (SelectedEntity as IGameEntity).Entity;
+                if (SelectedEntity is IGameEntity castedEntity)
+                    return castedEntity.Entity;
                 return null;
             }
         }
-        public uint SelectedGameEntityObjectId { get { return SelectedGameEntity != null ? SelectedGameEntity.ObjectId : 0; } }
+        public uint SelectedGameEntityObjectId
+        {
+            get { return SelectedGameEntity != null ? SelectedGameEntity.ObjectId : 0; }
+        }
         public ITargetableEntity TargetEntity { get; protected set; }
         public BaseGameEntity TargetGameEntity
         {
             get
             {
-                if (TargetEntity is IGameEntity)
-                    return (TargetEntity as IGameEntity).Entity;
+                if (TargetEntity is IGameEntity castedEntity)
+                    return castedEntity.Entity;
                 return null;
             }
         }
-        public uint TargetGameEntityObjectId { get { return TargetGameEntity != null ? TargetGameEntity.ObjectId : 0; } }
+        public uint TargetGameEntityObjectId
+        {
+            get { return TargetGameEntity != null ? TargetGameEntity.ObjectId : 0; }
+        }
         public BuildingEntity ConstructingBuildingEntity { get; protected set; }
-        public BuildingEntity TargetBuildingEntity { get { return TargetGameEntity as BuildingEntity; } }
+        public BuildingEntity TargetBuildingEntity
+        {
+            get { return TargetGameEntity as BuildingEntity; }
+        }
+        public IBuildAimController BuildAimController { get; protected set; }
+        public ISkillAimController SkillAimController { get; protected set; }
+
         protected int buildingItemIndex;
         protected UsingSkillData queueUsingSkill;
 
@@ -115,9 +127,9 @@ namespace MultiplayerARPG
         {
             // Initial UI Scene gameplay
             if (CurrentGameInstance.UISceneGameplayPrefab != null)
-                CacheUISceneGameplay = Instantiate(CurrentGameInstance.UISceneGameplayPrefab);
-            if (CacheUISceneGameplay != null)
-                CacheUISceneGameplay.OnControllerSetup(characterEntity);
+                UISceneGameplay = Instantiate(CurrentGameInstance.UISceneGameplayPrefab);
+            if (UISceneGameplay != null)
+                UISceneGameplay.OnControllerSetup(characterEntity);
             // Don't send navigation events
             EventSystem eventSystem = FindObjectOfType<EventSystem>();
             if (eventSystem != null)
@@ -128,8 +140,8 @@ namespace MultiplayerARPG
 
         protected virtual void Desetup(BasePlayerCharacterEntity characterEntity)
         {
-            if (CacheUISceneGameplay != null)
-                Destroy(CacheUISceneGameplay.gameObject);
+            if (UISceneGameplay != null)
+                Destroy(UISceneGameplay.gameObject);
             if (onDesetup != null)
                 onDesetup.Invoke(this);
         }
@@ -233,40 +245,40 @@ namespace MultiplayerARPG
             if (!ConstructingBuildingEntity.CanBuild())
             {
                 DestroyConstructingBuilding();
-                CacheUISceneGameplay.HideConstructBuildingDialog();
+                UISceneGameplay.HideConstructBuildingDialog();
                 return;
             }
-            CacheUISceneGameplay.ShowConstructBuildingDialog(ConstructingBuildingEntity);
+            UISceneGameplay.ShowConstructBuildingDialog(ConstructingBuildingEntity);
         }
 
         protected void HideConstructBuildingDialog()
         {
-            CacheUISceneGameplay.HideConstructBuildingDialog();
+            UISceneGameplay.HideConstructBuildingDialog();
         }
 
         protected void ShowCurrentBuildingDialog()
         {
-            CacheUISceneGameplay.ShowCurrentBuildingDialog(TargetBuildingEntity);
+            UISceneGameplay.ShowCurrentBuildingDialog(TargetBuildingEntity);
         }
 
         protected void HideCurrentBuildingDialog()
         {
-            CacheUISceneGameplay.HideCurrentBuildingDialog();
+            UISceneGameplay.HideCurrentBuildingDialog();
         }
 
         protected void ShowItemsContainerDialog(ItemsContainerEntity itemsContainerEntity)
         {
-            CacheUISceneGameplay.ShowItemsContainerDialog(itemsContainerEntity);
+            UISceneGameplay.ShowItemsContainerDialog(itemsContainerEntity);
         }
 
         protected void HideItemsContainerDialog()
         {
-            CacheUISceneGameplay.HideItemsContainerDialog();
+            UISceneGameplay.HideItemsContainerDialog();
         }
 
         protected void HideNpcDialog()
         {
-            CacheUISceneGameplay.HideNpcDialog();
+            UISceneGameplay.HideNpcDialog();
         }
 
         public void SetQueueUsingSkill(AimPosition aimPosition, BaseSkill skill, int level)
@@ -289,8 +301,6 @@ namespace MultiplayerARPG
         }
 
         public abstract void UseHotkey(HotkeyType type, string relateId, AimPosition aimPosition);
-        public abstract AimPosition UpdateBuildAimControls(Vector2 aimAxes, BuildingEntity prefab);
-        public abstract void FinishBuildAimControls(bool isCancel);
         public abstract bool ShouldShowActivateButtons();
         public abstract bool ShouldShowHoldActivateButtons();
         public abstract bool ShouldShowPickUpButtons();

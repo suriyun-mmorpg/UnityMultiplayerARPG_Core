@@ -42,12 +42,12 @@ namespace MultiplayerARPG
 
         public AimPosition UpdateAimControls(Vector2 aimAxes, params object[] data)
         {
-            return BasePlayerCharacterController.Singleton.UpdateBuildAimControls(aimAxes, BuildingEntity);
+            return BasePlayerCharacterController.Singleton.BuildAimController.UpdateAimControls(aimAxes, BuildingEntity);
         }
 
         public void FinishAimControls(bool isCancel)
         {
-            BasePlayerCharacterController.Singleton.FinishBuildAimControls(isCancel);
+            BasePlayerCharacterController.Singleton.BuildAimController.FinishAimControls(isCancel);
         }
 
         public bool IsChanneledAbility()

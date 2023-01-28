@@ -792,7 +792,7 @@ namespace MultiplayerARPG
                 case LegacyItemType.Potion:
                     return default;
                 case LegacyItemType.Building:
-                    return BasePlayerCharacterController.Singleton.UpdateBuildAimControls(aimAxes, BuildingEntity);
+                    return BasePlayerCharacterController.Singleton.BuildAimController.UpdateAimControls(aimAxes, BuildingEntity);
                 case LegacyItemType.Pet:
                     return default;
                 case LegacyItemType.Mount:
@@ -810,7 +810,7 @@ namespace MultiplayerARPG
                 case LegacyItemType.Potion:
                     break;
                 case LegacyItemType.Building:
-                    BasePlayerCharacterController.Singleton.FinishBuildAimControls(isCancel);
+                    BasePlayerCharacterController.Singleton.BuildAimController.FinishAimControls(isCancel);
                     break;
                 case LegacyItemType.Pet:
                     break;
