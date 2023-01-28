@@ -63,13 +63,17 @@ namespace MultiplayerARPG
             return port.node;
         }
 
-        public override void OnCreateConnection(NodePort from, NodePort to)
+        public override void OnCreateConnection(NodePort from, NodePort to, bool swapping)
         {
+            if (swapping)
+                return;
             SetDialogByPort(from, to);
         }
 
-        public override void OnRemoveConnection(NodePort port)
+        public override void OnRemoveConnection(NodePort port, bool swapping)
         {
+            if (swapping)
+                return;
             SetDialogByPort(port, null);
         }
 
