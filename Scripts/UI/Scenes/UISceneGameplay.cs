@@ -513,7 +513,6 @@ namespace MultiplayerARPG
                     // Not ignored, so determining that the pointer is pointing over UIs
                     if (!containsTag && !ignorePointerOverUIObjects.Contains(result.gameObject))
                     {
-                        Debug.LogError(result.gameObject);
                         return true;
                     }
                 }
