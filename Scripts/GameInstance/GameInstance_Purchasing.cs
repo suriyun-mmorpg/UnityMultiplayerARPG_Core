@@ -76,7 +76,7 @@ namespace MultiplayerARPG
                     if (productCatalogItem == null)
                         continue;
 
-                    Logging.Log(ToString(), "[" + TAG_INIT + "]: Adding product " + productCatalogItem.id + " type " + productCatalogItem.type.ToString());
+                    Logging.Log(LogTag, "[" + TAG_INIT + "]: Adding product " + productCatalogItem.id + " type " + productCatalogItem.type.ToString());
                     if (productCatalogItem.allStoreIDs.Count > 0)
                     {
                         var ids = new IDs();
@@ -96,7 +96,7 @@ namespace MultiplayerARPG
             }
 
 #if ENABLE_PURCHASING && UNITY_PURCHASING && (UNITY_ANDROID || UNITY_IOS)
-            Logging.Log(ToString(), "[" + TAG_INIT + "]: Initializing Purchasing...");
+            Logging.Log(LogTag, "[" + TAG_INIT + "]: Initializing Purchasing...");
             // Kick off the remainder of the set-up with an asynchrounous call, passing the configuration 
             // and this class' instance. Expect a response either in OnInitialized or OnInitializeFailed.
             try
@@ -106,11 +106,11 @@ namespace MultiplayerARPG
             catch (System.InvalidOperationException ex)
             {
                 var errorMessage = "[" + TAG_INIT + "]: Cannot initialize purchasing, the platform may not supports.";
-                Logging.LogError(ToString(), errorMessage);
-                Logging.LogException(ToString(), ex);
+                Logging.LogError(LogTag, errorMessage);
+                Logging.LogException(LogTag, ex);
             }
 #else
-            Logging.Log(ToString(), "[" + TAG_INIT + "]: Initialized without purchasing");
+            Logging.Log(LogTag, "[" + TAG_INIT + "]: Initialized without purchasing");
 #endif
         }
 
@@ -135,14 +135,14 @@ namespace MultiplayerARPG
             StoreExtensionProvider = extensions;
             var productCount = StoreController.products.all.Length;
             var logMessage = "[" + TAG_INIT + "]: OnInitialized with " + productCount + " products";
-            Logging.Log(ToString(), logMessage);
+            Logging.Log(LogTag, logMessage);
         }
 
         public void OnInitializeFailed(InitializationFailureReason error)
         {
             // Purchasing set-up has not succeeded. Check error for reason. Consider sharing this reason with the user.
             var errorMessage = "[" + TAG_INIT + "]: Fail. InitializationFailureReason: " + error;
-            Logging.LogError(ToString(), errorMessage);
+            Logging.LogError(LogTag, errorMessage);
         }
 
         public PurchaseProcessingResult ProcessPurchase(PurchaseEventArgs args)
@@ -211,7 +211,7 @@ namespace MultiplayerARPG
         {
             // A product purchase attempt did not succeed. Check failureReason for more detail. Consider sharing 
             // this reason with the user to guide their troubleshooting actions.
-            Logging.LogError(ToString(), "[" + TAG_PURCHASE + "]: FAIL. Product: " + product.definition.storeSpecificId + ", PurchaseFailureReason: " + failureReason);
+            Logging.LogError(LogTag, "[" + TAG_PURCHASE + "]: FAIL. Product: " + product.definition.storeSpecificId + ", PurchaseFailureReason: " + failureReason);
             string errorMessage = string.Empty;
             switch (failureReason)
             {
@@ -253,7 +253,7 @@ namespace MultiplayerARPG
             if (!IsPurchasingInitialized())
             {
                 // ... report the situation and stop restoring. Consider either waiting longer, or retrying initialization.
-                Logging.LogError(ToString(), "[" + TAG_PURCHASE + "]: FAIL. Not initialized.");
+                Logging.LogError(LogTag, "[" + TAG_PURCHASE + "]: FAIL. Not initialized.");
                 PurchaseResult(false, LanguageManager.GetText(UITextKeys.UI_ERROR_IAP_NOT_INITIALIZED.ToString()));
                 return;
             }
@@ -261,16 +261,16 @@ namespace MultiplayerARPG
             var product = StoreController.products.WithID(productId);
             if (product != null && product.availableToPurchase)
             {
-                Logging.Log(ToString(), string.Format("[" + TAG_PURCHASE + "] Purchasing product asychronously: '{0}'", product.definition.id));
+                Logging.Log(LogTag, string.Format("[" + TAG_PURCHASE + "] Purchasing product asychronously: '{0}'", product.definition.id));
                 StoreController.InitiatePurchase(product);
             }
             else
             {
-                Logging.LogError(ToString(), "[" + TAG_PURCHASE + "]: FAIL. Not purchasing product, either is not found or is not available for purchase.");
+                Logging.LogError(LogTag, "[" + TAG_PURCHASE + "]: FAIL. Not purchasing product, either is not found or is not available for purchase.");
                 PurchaseResult(false, LanguageManager.GetText(UITextKeys.UI_ERROR_IAP_PRODUCT_UNAVAILABLE.ToString()));
             }
 #else
-            Logging.LogWarning(ToString(), "Cannot purchase product, Unity Purchasing is not enabled.");
+            Logging.LogWarning(LogTag, "Cannot purchase product, Unity Purchasing is not enabled.");
 #endif
         }
         #endregion

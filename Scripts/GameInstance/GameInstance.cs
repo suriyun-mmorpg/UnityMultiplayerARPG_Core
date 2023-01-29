@@ -50,6 +50,7 @@ namespace MultiplayerARPG
     public partial class GameInstance : MonoBehaviour
 #endif
     {
+        public static readonly string LogTag = nameof(GameInstance);
         public static GameInstance Singleton { get; protected set; }
         public static IClientCashShopHandlers ClientCashShopHandlers { get; set; }
         public static IClientMailHandlers ClientMailHandlers { get; set; }
