@@ -690,44 +690,47 @@ namespace MultiplayerARPG
                 HideNpcDialog();
 
             // If jumping add jump state
-            if (InputManager.GetButtonDown("Jump"))
+            if (!isBlockController)
             {
-                if (unToggleCrouchWhenJump && PlayingCharacterEntity.ExtraMovementState == ExtraMovementState.IsCrouching)
-                    toggleCrouchOn = false;
-                else if (unToggleCrawlWhenJump && PlayingCharacterEntity.ExtraMovementState == ExtraMovementState.IsCrawling)
-                    toggleCrawlOn = false;
-                else
-                    movementState |= MovementState.IsJump;
-            }
-            else if (PlayingCharacterEntity.MovementState.Has(MovementState.IsGrounded))
-            {
-                if (DetectExtraActive("Sprint", sprintActiveMode, ref toggleSprintOn))
+                if (InputManager.GetButtonDown("Jump"))
                 {
-                    extraMovementState = ExtraMovementState.IsSprinting;
-                    toggleWalkOn = false;
-                    toggleCrouchOn = false;
-                    toggleCrawlOn = false;
+                    if (unToggleCrouchWhenJump && PlayingCharacterEntity.ExtraMovementState == ExtraMovementState.IsCrouching)
+                        toggleCrouchOn = false;
+                    else if (unToggleCrawlWhenJump && PlayingCharacterEntity.ExtraMovementState == ExtraMovementState.IsCrawling)
+                        toggleCrawlOn = false;
+                    else
+                        movementState |= MovementState.IsJump;
                 }
-                if (DetectExtraActive("Walk", walkActiveMode, ref toggleWalkOn))
+                else if (PlayingCharacterEntity.MovementState.Has(MovementState.IsGrounded))
                 {
-                    extraMovementState = ExtraMovementState.IsWalking;
-                    toggleSprintOn = false;
-                    toggleCrouchOn = false;
-                    toggleCrawlOn = false;
-                }
-                if (DetectExtraActive("Crouch", crouchActiveMode, ref toggleCrouchOn))
-                {
-                    extraMovementState = ExtraMovementState.IsCrouching;
-                    toggleSprintOn = false;
-                    toggleWalkOn = false;
-                    toggleCrawlOn = false;
-                }
-                if (DetectExtraActive("Crawl", crawlActiveMode, ref toggleCrawlOn))
-                {
-                    extraMovementState = ExtraMovementState.IsCrawling;
-                    toggleSprintOn = false;
-                    toggleWalkOn = false;
-                    toggleCrouchOn = false;
+                    if (DetectExtraActive("Sprint", sprintActiveMode, ref toggleSprintOn))
+                    {
+                        extraMovementState = ExtraMovementState.IsSprinting;
+                        toggleWalkOn = false;
+                        toggleCrouchOn = false;
+                        toggleCrawlOn = false;
+                    }
+                    if (DetectExtraActive("Walk", walkActiveMode, ref toggleWalkOn))
+                    {
+                        extraMovementState = ExtraMovementState.IsWalking;
+                        toggleSprintOn = false;
+                        toggleCrouchOn = false;
+                        toggleCrawlOn = false;
+                    }
+                    if (DetectExtraActive("Crouch", crouchActiveMode, ref toggleCrouchOn))
+                    {
+                        extraMovementState = ExtraMovementState.IsCrouching;
+                        toggleSprintOn = false;
+                        toggleWalkOn = false;
+                        toggleCrawlOn = false;
+                    }
+                    if (DetectExtraActive("Crawl", crawlActiveMode, ref toggleCrawlOn))
+                    {
+                        extraMovementState = ExtraMovementState.IsCrawling;
+                        toggleSprintOn = false;
+                        toggleWalkOn = false;
+                        toggleCrouchOn = false;
+                    }
                 }
             }
             if (moveDirection.magnitude > 0f)
