@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using UnityEngine;
+﻿using UnityEngine;
 
 namespace MultiplayerARPG
 {
@@ -16,6 +11,6 @@ namespace MultiplayerARPG
         /// <param name="progress"></param>
         /// <returns></returns>
         public abstract string GetTaskDescription(IPlayerCharacterData playerCharacter, int progress);
-        public abstract int GetTaskProgress(IPlayerCharacterData playerCharacter, out string targetTitle, out int maxProgress, out bool isComplete);
+        public abstract int GetTaskProgress(IPlayerCharacterData playerCharacter, Quest quest, int taskIndex, out string targetTitle, out int maxProgress, out bool isComplete);
     }
 }

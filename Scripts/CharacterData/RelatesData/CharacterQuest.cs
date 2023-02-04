@@ -135,7 +135,7 @@ namespace MultiplayerARPG
                     isComplete = progress >= targetProgress;
                     return progress;
                 case QuestTaskType.Custom:
-                    return task.customQuestTask.GetTaskProgress(character, out targetTitle, out targetProgress, out isComplete);
+                    return task.customQuestTask.GetTaskProgress(character, quest, taskIndex, out targetTitle, out targetProgress, out isComplete);
             }
             targetTitle = string.Empty;
             targetProgress = 0;
