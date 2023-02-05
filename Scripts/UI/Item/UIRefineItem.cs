@@ -213,7 +213,7 @@ namespace MultiplayerARPG
                             LanguageManager.GetText(formatKeyRequireGold) :
                             LanguageManager.GetText(formatKeyRequireGoldNotEnough),
                         GameInstance.PlayingCharacter.Gold.ToString("N0"),
-                        GameInstance.Singleton.GameplayRule.DecreaseCurrenciesWhenRefineItem(GameInstance.PlayingCharacter, refineLevel.Value, decreaseRequireGoldRate).ToString("N0"));
+                        GameInstance.Singleton.GameplayRule.GetRefineItemRequireGold(GameInstance.PlayingCharacter, refineLevel.Value, decreaseRequireGoldRate).ToString("N0"));
                 }
             }
 
