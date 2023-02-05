@@ -16,8 +16,29 @@ namespace MultiplayerARPG
         public TextWrapper uiTextTitle;
         public TextWrapper uiTextDescription;
         public Image imageIcon;
+        public AudioSource voiceSource;
 
         protected BaseNpcDialog lastData;
+
+        protected override void OnEnable()
+        {
+            base.OnEnable();
+            if (voiceSource != null)
+            {
+                if (voiceSource.clip != null)
+                    voiceSource.Play();
+            }
+        }
+
+        protected override void OnDisable()
+        {
+            base.OnDisable();
+            if (voiceSource != null)
+            {
+                voiceSource.Stop();
+                voiceSource.clip = null;
+            }
+        }
 
         protected override void UpdateData()
         {
@@ -44,6 +65,15 @@ namespace MultiplayerARPG
                 imageIcon.gameObject.SetActive(iconSprite != null);
                 imageIcon.sprite = iconSprite;
                 imageIcon.preserveAspect = true;
+            }
+
+            if (voiceSource != null)
+            {
+                voiceSource.Stop();
+                AudioClip clip = Data == null ? null : Data.voice;
+                voiceSource.clip = clip;
+                if (clip != null && enabled)
+                    voiceSource.Play();
             }
 
             Data.RenderUI(this);

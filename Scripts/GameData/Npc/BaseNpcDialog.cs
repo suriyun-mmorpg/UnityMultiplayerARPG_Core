@@ -21,6 +21,7 @@ namespace MultiplayerARPG
         [Tooltip("Descriptions by language keys")]
         public LanguageData[] descriptions;
         public Sprite icon;
+        public AudioClip voice;
 
         #region Generic Data
         public string Id { get { return name; } }
