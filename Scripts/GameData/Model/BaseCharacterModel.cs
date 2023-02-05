@@ -411,6 +411,7 @@ namespace MultiplayerARPG
                 if (!CacheEquipmentModelContainers.TryGetValue(unequippingSocket, out tempContainer))
                     continue;
 
+                tempContainer.DeactivateInstantiatedObjects();
                 tempContainer.SetActiveDefaultModel(true);
             }
 
@@ -461,10 +462,6 @@ namespace MultiplayerARPG
                     CacheRightHandEquipmentEntity = tempEquipmentObject.GetComponent<BaseEquipmentEntity>();
                 if (CacheLeftHandEquipmentEntity == null && GameDataConst.EQUIP_POSITION_LEFT_HAND.Equals(tempEquipmentModel.equipPosition))
                     CacheLeftHandEquipmentEntity = tempEquipmentObject.GetComponent<BaseEquipmentEntity>();
-            }
-            foreach (var key in equippingModels.Keys)
-            {
-                Debug.LogError(key);
             }
             EquippedModels = equippingModels;
         }
