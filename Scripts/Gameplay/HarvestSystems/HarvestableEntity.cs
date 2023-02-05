@@ -186,7 +186,7 @@ namespace MultiplayerARPG
             base.ReceivedDamage(position, fromPosition, instigator, damageAmounts, combatAmountType, totalDamage, weapon, skill, skillLevel, buff, isDamageOverTime);
             BaseCharacterEntity attackerCharacter;
             instigator.TryGetEntity(out attackerCharacter);
-            CurrentGameInstance.GameplayRule.OnHarvestableReceivedDamage(attackerCharacter, this, combatAmountType, totalDamage, weapon, skill, skillLevel);
+            CurrentGameInstance.GameplayRule.OnHarvestableReceivedDamage(attackerCharacter, this, combatAmountType, totalDamage, weapon, skill, skillLevel, buff, isDamageOverTime);
 
             if (combatAmountType == CombatAmountType.Miss)
                 return;

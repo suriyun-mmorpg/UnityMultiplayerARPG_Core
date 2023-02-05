@@ -501,12 +501,11 @@ namespace MultiplayerARPG
             character.CurrentWater = character.GetCaches().MaxWater;
         }
 
-        public override void OnCharacterReceivedDamage(BaseCharacterEntity attacker, BaseCharacterEntity damageReceiver, CombatAmountType combatAmountType, int damage, CharacterItem weapon, BaseSkill skill, int skillLevel)
+        public override void OnCharacterReceivedDamage(BaseCharacterEntity attacker, BaseCharacterEntity damageReceiver, CombatAmountType combatAmountType, int damage, CharacterItem weapon, BaseSkill skill, int skillLevel, CharacterBuff buff, bool isDamageOverTime)
         {
-            float decreaseWeaponDurability;
-            float decreaseShieldDurability;
-            float decreaseArmorDurability;
-            GetDecreaseDurabilityAmount(combatAmountType, out decreaseWeaponDurability, out decreaseShieldDurability, out decreaseArmorDurability);
+            if (isDamageOverTime)
+                return;
+            GetDecreaseDurabilityAmount(combatAmountType, out float decreaseWeaponDurability, out float decreaseShieldDurability, out float decreaseArmorDurability);
             if (attacker != null)
             {
                 // Decrease Weapon Durability
@@ -717,12 +716,11 @@ namespace MultiplayerARPG
             tempSocketEnhancerItem.ApplyEnemyStatusEffectsWhenAttacked(damageReceiverInfo, attacker);
         }
 
-        public override void OnHarvestableReceivedDamage(BaseCharacterEntity attacker, HarvestableEntity damageReceiver, CombatAmountType combatAmountType, int damage, CharacterItem weapon, BaseSkill skill, int skillLevel)
+        public override void OnHarvestableReceivedDamage(BaseCharacterEntity attacker, HarvestableEntity damageReceiver, CombatAmountType combatAmountType, int damage, CharacterItem weapon, BaseSkill skill, int skillLevel, CharacterBuff buff, bool isDamageOverTime)
         {
-            float decreaseWeaponDurability;
-            float decreaseShieldDurability;
-            float decreaseArmorDurability;
-            GetDecreaseDurabilityAmount(combatAmountType, out decreaseWeaponDurability, out decreaseShieldDurability, out decreaseArmorDurability);
+            if (isDamageOverTime)
+                return;
+            GetDecreaseDurabilityAmount(combatAmountType, out float decreaseWeaponDurability, out float decreaseShieldDurability, out float decreaseArmorDurability);
             if (attacker != null)
             {
                 // Decrease Weapon Durability
