@@ -444,17 +444,20 @@ namespace MultiplayerARPG
                     // Instantiate model, setup transform and activate game object
                     tempContainer.DeactivateInstantiatedObjects();
                     tempContainer.SetActiveDefaultModel(false);
-                    tempEquipmentObject = Instantiate(tempEquipmentModel.model, tempContainer.transform);
-                    tempEquipmentObject.transform.localPosition = tempEquipmentModel.localPosition;
-                    tempEquipmentObject.transform.localEulerAngles = tempEquipmentModel.localEulerAngles;
-                    tempEquipmentObject.transform.localScale = tempEquipmentModel.localScale.Equals(Vector3.zero) ? Vector3.one : tempEquipmentModel.localScale;
-                    tempEquipmentObject.gameObject.SetActive(true);
-                    if (SetEquipmentLayerFollowEntity)
-                        tempEquipmentObject.gameObject.GetOrAddComponent<SetLayerFollowGameObject>((comp) => comp.source = CacheEntity.gameObject);
-                    else
-                        tempEquipmentObject.gameObject.SetLayerRecursively(EquipmentLayer, true);
-                    tempEquipmentObject.RemoveComponentsInChildren<Collider>(false);
-                    EquippedModelObjects[equipSocket] = tempEquipmentObject;
+                    if (tempContainer.transform != null)
+                    {
+                        tempEquipmentObject = Instantiate(tempEquipmentModel.model, tempContainer.transform);
+                        tempEquipmentObject.transform.localPosition = tempEquipmentModel.localPosition;
+                        tempEquipmentObject.transform.localEulerAngles = tempEquipmentModel.localEulerAngles;
+                        tempEquipmentObject.transform.localScale = tempEquipmentModel.localScale.Equals(Vector3.zero) ? Vector3.one : tempEquipmentModel.localScale;
+                        tempEquipmentObject.gameObject.SetActive(true);
+                        if (SetEquipmentLayerFollowEntity)
+                            tempEquipmentObject.gameObject.GetOrAddComponent<SetLayerFollowGameObject>((comp) => comp.source = CacheEntity.gameObject);
+                        else
+                            tempEquipmentObject.gameObject.SetLayerRecursively(EquipmentLayer, true);
+                        tempEquipmentObject.RemoveComponentsInChildren<Collider>(false);
+                        EquippedModelObjects[equipSocket] = tempEquipmentObject;
+                    }
                 }
 
                 // Setup equipment entity
