@@ -462,7 +462,10 @@ namespace MultiplayerARPG
                 if (CacheLeftHandEquipmentEntity == null && GameDataConst.EQUIP_POSITION_LEFT_HAND.Equals(tempEquipmentModel.equipPosition))
                     CacheLeftHandEquipmentEntity = tempEquipmentObject.GetComponent<BaseEquipmentEntity>();
             }
-
+            foreach (var key in equippingModels.Keys)
+            {
+                Debug.LogError(key);
+            }
             EquippedModels = equippingModels;
         }
 
@@ -481,7 +484,7 @@ namespace MultiplayerARPG
 
                 if (!equippingModels.TryGetValue(model.equipSocket, out EquipmentModel storedModel) || storedModel.priority < model.priority || storedModel.itemLevel < itemLevel)
                 {
-                    if (equippedModels.TryGetValue(model.equipSocket, out EquipmentModel equippedModel)
+                    if (EquippedModels.TryGetValue(model.equipSocket, out EquipmentModel equippedModel)
                         && equippedModel.itemDataId == itemDataId
                         && equippedModel.itemLevel == itemLevel)
                     {

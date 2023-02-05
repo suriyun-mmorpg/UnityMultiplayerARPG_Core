@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using Cysharp.Text;
 using System.Collections.Generic;
+using LiteNetLibManager;
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
@@ -40,7 +41,7 @@ namespace MultiplayerARPG
 
         protected bool activated;
         protected string activeItemId;
-        protected List<int> materialDataIds = new List<int>();
+        protected List<int> enhancerDataIds = new List<int>();
 
         protected override void Awake()
         {
@@ -79,10 +80,14 @@ namespace MultiplayerARPG
             CanRefine = false;
             ReachedMaxLevel = false;
             ItemRefineLevel? refineLevel = null;
+            float increaseSuccessRate = 0f;
+            float decreaseRequireGoldRate = 0f;
+            float chanceToNotDecreaseLevels = 0f;
+            float chanceToNotDestroyItem = 0f;
             if (!characterItem.IsEmptySlot())
             {
                 UITextKeys gameMessage = UITextKeys.UI_ERROR_CANNOT_REFINE;
-                CanRefine = EquipmentItem != null && characterItem.GetItem().CanRefine(GameInstance.PlayingCharacter, Level, materialDataIds.ToArray(), out gameMessage);
+                CanRefine = EquipmentItem != null && characterItem.GetItem().CanRefine(GameInstance.PlayingCharacter, Level, enhancerDataIds.ToArray(), out gameMessage);
                 if (CanRefine)
                 {
                     refineLevel = EquipmentItem.ItemRefine.Levels[Level - 1];
@@ -101,6 +106,54 @@ namespace MultiplayerARPG
                             break;
                     }
                 }
+            }
+
+            if (uiRefineEnhancerItems != null)
+            {
+                uiRefineEnhancerItems.inventoryType = InventoryType.Unknow;
+                uiRefineEnhancerItems.CacheSelectionManager.selectionMode = UISelectionMode.SelectSingle;
+                List<CharacterItem> characterItems = new List<CharacterItem>();
+                if (refineLevel.HasValue)
+                {
+                    for (int i = 0; i < GameInstance.PlayingCharacter.NonEquipItems.Count; ++i)
+                    {
+                        for (int j = 0; j < refineLevel.Value.AvailableEnhancers.Length; ++j)
+                        {
+                            if (refineLevel.Value.AvailableEnhancers[j].item == GameInstance.PlayingCharacter.NonEquipItems[i].GetItem())
+                                characterItems.Add(GameInstance.PlayingCharacter.NonEquipItems[i].Clone());
+                        }
+                    }
+                    for (int i = 0; i < enhancerDataIds.Count; ++i)
+                    {
+                        characterItems.DecreaseItems(enhancerDataIds[i], 1, false, out _);
+                    }
+                }
+                uiRefineEnhancerItems.UpdateData(GameInstance.PlayingCharacter, characterItems);
+            }
+
+            if (uiAppliedRefineEnhancerItems != null)
+            {
+                uiAppliedRefineEnhancerItems.inventoryType = InventoryType.Unknow;
+                uiAppliedRefineEnhancerItems.CacheSelectionManager.selectionMode = UISelectionMode.SelectSingle;
+                List<CharacterItem> characterItems = new List<CharacterItem>();
+                if (refineLevel.HasValue)
+                {
+                    for (int i = 0; i < enhancerDataIds.Count; ++i)
+                    {
+                        characterItems.Add(CharacterItem.Create(enhancerDataIds[i]));
+                        for (int j = 0; j < refineLevel.Value.AvailableEnhancers.Length; ++j)
+                        {
+                            if (refineLevel.Value.AvailableEnhancers[j].item.DataId == enhancerDataIds[i])
+                            {
+                                increaseSuccessRate += refineLevel.Value.AvailableEnhancers[j].increaseSuccessRate;
+                                decreaseRequireGoldRate += refineLevel.Value.AvailableEnhancers[j].decreaseRequireGoldRate;
+                                chanceToNotDecreaseLevels += refineLevel.Value.AvailableEnhancers[j].chanceToNotDecreaseLevels;
+                                chanceToNotDestroyItem += refineLevel.Value.AvailableEnhancers[j].chanceToNotDestroyItem;
+                            }
+                        }
+                    }
+                }
+                uiAppliedRefineEnhancerItems.UpdateData(GameInstance.PlayingCharacter, characterItems);
             }
 
             if (uiCharacterItem != null)
@@ -160,7 +213,7 @@ namespace MultiplayerARPG
                             LanguageManager.GetText(formatKeyRequireGold) :
                             LanguageManager.GetText(formatKeyRequireGoldNotEnough),
                         GameInstance.PlayingCharacter.Gold.ToString("N0"),
-                        refineLevel.Value.RequireGold.ToString("N0"));
+                        GameInstance.Singleton.GameplayRule.DecreaseCurrenciesWhenRefineItem(GameInstance.PlayingCharacter, refineLevel.Value, decreaseRequireGoldRate).ToString("N0"));
                 }
             }
 
@@ -179,7 +232,7 @@ namespace MultiplayerARPG
                 {
                     uiTextSuccessRate.text = ZString.Format(
                         LanguageManager.GetText(formatKeySuccessRate),
-                        (refineLevel.Value.SuccessRate * 100).ToString("N2"));
+                        ((refineLevel.Value.SuccessRate + increaseSuccessRate) * 100).ToString("N2"));
                 }
             }
 
@@ -198,48 +251,13 @@ namespace MultiplayerARPG
                         Level.ToString("N0"));
                 }
             }
-
-            if (uiRefineEnhancerItems != null)
-            {
-                uiRefineEnhancerItems.inventoryType = InventoryType.Unknow;
-                List<CharacterItem> characterItems = new List<CharacterItem>();
-                if (refineLevel.HasValue)
-                {
-                    for (int i = 0; i < GameInstance.PlayingCharacter.NonEquipItems.Count; ++i)
-                    {
-                        for (int j = 0; j < refineLevel.Value.AvailableEnhancers.Length; ++j)
-                        {
-                            if (refineLevel.Value.AvailableEnhancers[j].item == GameInstance.PlayingCharacter.NonEquipItems[i].GetItem())
-                                characterItems.Add(GameInstance.PlayingCharacter.NonEquipItems[i].Clone());
-                        }
-                    }
-                    for (int i = 0; i < materialDataIds.Count; ++i)
-                    {
-                        characterItems.DecreaseItems(materialDataIds[i], 1, false, out _);
-                    }
-                }
-                uiRefineEnhancerItems.UpdateData(GameInstance.PlayingCharacter, characterItems);
-            }
-
-            if (uiAppliedRefineEnhancerItems != null)
-            {
-                uiAppliedRefineEnhancerItems.inventoryType = InventoryType.Unknow;
-                List<CharacterItem> characterItems = new List<CharacterItem>();
-                if (refineLevel.HasValue)
-                {
-                    for (int i = 0; i < materialDataIds.Count; ++i)
-                    {
-                        characterItems.Add(CharacterItem.Create(materialDataIds[i]));
-                    }
-                }
-                uiAppliedRefineEnhancerItems.UpdateData(GameInstance.PlayingCharacter, characterItems);
-            }
         }
 
         public override void Show()
         {
             base.Show();
             activated = false;
+            enhancerDataIds.Clear();
             OnUpdateCharacterItems();
         }
 
@@ -259,17 +277,39 @@ namespace MultiplayerARPG
             {
                 inventoryType = InventoryType,
                 index = IndexOfData,
-            }, ClientInventoryActions.ResponseRefineItem);
+                enhancerDataIds = enhancerDataIds.ToArray(),
+            }, ResponseRefineItem);
+        }
+
+        protected void ResponseRefineItem(ResponseHandlerData requestHandler, AckResponseCode responseCode, ResponseRefineItemMessage response)
+        {
+            ClientInventoryActions.ResponseRefineItem(requestHandler, responseCode, response);
+            enhancerDataIds.Clear();
+            OnUpdateCharacterItems();
         }
 
         public void OnClickAddRefineEnhancer()
         {
-
+            List<UICharacterItem> selectedUIs = uiRefineEnhancerItems.CacheSelectionManager.GetSelectedUIs();
+            if (selectedUIs.Count == 0)
+                return;
+            foreach (UICharacterItem selectedUI in selectedUIs)
+            {
+                enhancerDataIds.Add(selectedUI.CharacterItem.dataId);
+            }
+            OnUpdateCharacterItems();
         }
 
         public void OnClickRemoveRefineEnhancer()
         {
-
+            List<UICharacterItem> selectedUIs = uiAppliedRefineEnhancerItems.CacheSelectionManager.GetSelectedUIs();
+            if (selectedUIs.Count == 0)
+                return;
+            foreach (UICharacterItem selectedUI in selectedUIs)
+            {
+                enhancerDataIds.Remove(selectedUI.CharacterItem.dataId);
+            }
+            OnUpdateCharacterItems();
         }
     }
 }

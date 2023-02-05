@@ -10,7 +10,7 @@ namespace MultiplayerARPG
             refineLevel = default;
             if (ItemRefine == null)
                 return false;
-            if (level >= ItemRefine.Levels.Length)
+            if (level - 1 >= ItemRefine.Levels.Length)
                 return false;
             refineLevel = ItemRefine.Levels[level - 1];
             return true;
@@ -35,7 +35,7 @@ namespace MultiplayerARPG
                 gameMessage = UITextKeys.UI_ERROR_CANNOT_REFINE;
                 return false;
             }
-            if (level >= ItemRefine.Levels.Length)
+            if (level - 1 >= ItemRefine.Levels.Length)
             {
                 // Cannot refine because item reached max level
                 gameMessage = UITextKeys.UI_ERROR_REFINE_ITEM_REACHED_MAX_LEVEL;
@@ -145,6 +145,7 @@ namespace MultiplayerARPG
                     inventoryChanged = true;
                 }
             }
+            Debug.LogError(refineLevel.SuccessRate + increaseSuccessRate);
             if (Random.value <= refineLevel.SuccessRate + increaseSuccessRate)
             {
                 // If success, increase item level

@@ -73,7 +73,10 @@ namespace MultiplayerARPG
 
         public virtual bool CurrenciesEnoughToRefineItem(IPlayerCharacterData character, ItemRefineLevel refineLevel, float decreaseRate)
         {
-            if (character.Gold < refineLevel.RequireGold)
+            int price = Mathf.CeilToInt(refineLevel.RequireGold - (refineLevel.RequireGold * decreaseRate));
+            if (price < 0)
+                price = 0;
+            if (character.Gold < price)
                 return false;
             if (refineLevel.RequireCurrencies == null || refineLevel.RequireCurrencies.Length == 0)
                 return true;
@@ -82,7 +85,10 @@ namespace MultiplayerARPG
 
         public virtual void DecreaseCurrenciesWhenRefineItem(IPlayerCharacterData character, ItemRefineLevel refineLevel, float decreaseRate)
         {
-            character.Gold -= Mathf.CeilToInt(refineLevel.RequireGold - (refineLevel.RequireGold * decreaseRate));
+            int price = Mathf.CeilToInt(refineLevel.RequireGold - (refineLevel.RequireGold * decreaseRate));
+            if (price < 0)
+                price = 0;
+            character.Gold -= price;
             if (refineLevel.RequireCurrencies == null || refineLevel.RequireCurrencies.Length == 0)
                 return;
             character.DecreaseCurrencies(refineLevel.RequireCurrencies);

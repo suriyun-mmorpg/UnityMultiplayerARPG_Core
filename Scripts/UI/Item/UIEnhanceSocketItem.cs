@@ -14,8 +14,7 @@ namespace MultiplayerARPG
         {
             get
             {
-                if (uiSocketEnhancerItems.CacheSelectionManager != null &&
-                    uiSocketEnhancerItems.CacheSelectionManager.SelectedUI != null &&
+                if (uiSocketEnhancerItems.CacheSelectionManager.SelectedUI != null &&
                     uiSocketEnhancerItems.CacheSelectionManager.SelectedUI.SocketEnhancerItem != null)
                     return uiSocketEnhancerItems.CacheSelectionManager.SelectedUI.SocketEnhancerItem.DataId;
                 return 0;
@@ -26,8 +25,7 @@ namespace MultiplayerARPG
         {
             get
             {
-                if (uiAppliedSocketEnhancerItems.CacheSelectionManager != null &&
-                    uiAppliedSocketEnhancerItems.CacheSelectionManager.SelectedUI != null)
+                if (uiAppliedSocketEnhancerItems.CacheSelectionManager.SelectedUI != null)
                     return uiAppliedSocketEnhancerItems.CacheSelectionManager.SelectedUI.IndexOfData;
                 return -1;
             }
@@ -143,12 +141,14 @@ namespace MultiplayerARPG
             if (uiSocketEnhancerItems != null)
             {
                 uiSocketEnhancerItems.filterItemTypes = new List<ItemType>() { ItemType.SocketEnhancer };
+                uiSocketEnhancerItems.CacheSelectionManager.selectionMode = UISelectionMode.SelectSingle;
                 uiSocketEnhancerItems.UpdateData(GameInstance.PlayingCharacter);
             }
 
             if (uiAppliedSocketEnhancerItems != null)
             {
                 uiAppliedSocketEnhancerItems.inventoryType = InventoryType.Unknow;
+                uiAppliedSocketEnhancerItems.CacheSelectionManager.selectionMode = UISelectionMode.SelectSingle;
                 uiAppliedSocketEnhancerItems.filterItemTypes = new List<ItemType>() { ItemType.SocketEnhancer };
                 List<CharacterItem> characterItems = new List<CharacterItem>();
                 if (EquipmentItem != null)

@@ -6,20 +6,20 @@ namespace MultiplayerARPG
     {
         public InventoryType inventoryType;
         public int index;
-        public int[] materialDataIds;
+        public int[] enhancerDataIds;
 
         public void Deserialize(NetDataReader reader)
         {
             inventoryType = (InventoryType)reader.GetByte();
             index = reader.GetPackedInt();
-            materialDataIds = reader.GetIntArray();
+            enhancerDataIds = reader.GetIntArray();
         }
 
         public void Serialize(NetDataWriter writer)
         {
             writer.Put((byte)inventoryType);
             writer.PutPackedInt(index);
-            writer.PutArray(materialDataIds);
+            writer.PutArray(enhancerDataIds);
         }
     }
 }

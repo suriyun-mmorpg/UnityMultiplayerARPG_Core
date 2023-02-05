@@ -89,6 +89,7 @@ namespace MultiplayerARPG
         public bool RefineFailDestroyItem { get { return refineFailDestroyItem; } }
 
         [Tooltip("Materials for item refinement enhancing")]
+        [SerializeField]
         private ItemRefineEnhancer[] availableEnhancers;
         public ItemRefineEnhancer[] AvailableEnhancers { get { return availableEnhancers; } }
 
