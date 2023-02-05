@@ -207,7 +207,7 @@ namespace MultiplayerARPG
             {
                 foreach (EquipmentContainer equipmentContainer in equipmentContainers)
                 {
-                    if (equipmentContainer.transform != null && !cacheEquipmentModelContainers.ContainsKey(equipmentContainer.equipSocket))
+                    if (!cacheEquipmentModelContainers.ContainsKey(equipmentContainer.equipSocket))
                         cacheEquipmentModelContainers[equipmentContainer.equipSocket] = equipmentContainer;
                 }
             }
