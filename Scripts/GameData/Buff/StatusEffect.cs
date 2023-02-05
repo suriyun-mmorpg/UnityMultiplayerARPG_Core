@@ -21,8 +21,6 @@ namespace MultiplayerARPG
         public StatusEffect statusEffect;
         [Tooltip("Buff stats will be decreased by level")]
         public IncrementalInt buffLevel;
-        [Tooltip("1 = 100% chance to apply the status effect")]
-        public IncrementalFloat chance;
 
     }
 }

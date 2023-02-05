@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using UnityEngine;
 
 namespace MultiplayerARPG
 {
@@ -10,15 +11,6 @@ namespace MultiplayerARPG
         {
             if (!IsServer || this.IsDead())
                 return;
-
-            restrictBuffTags.Clear();
-            string[] tempRestrictTags;
-            for (int i = 0; i < Buffs.Count; ++i)
-            {
-                tempRestrictTags = Buffs[i].GetBuff().GetBuff().restrictTags;
-                if (tempRestrictTags != null && tempRestrictTags.Length > 0)
-                    restrictBuffTags.AddRange(tempRestrictTags);
-            }
 
             Buff tempBuff = default;
             bool isExtendDuration = false;
@@ -60,6 +52,21 @@ namespace MultiplayerARPG
                     isExtendDuration = tempBuff.isExtendDuration;
                     maxStack = tempBuff.GetMaxStack(level);
                     break;
+            }
+
+            if (Random.value <= tempBuff.failChance.GetAmount(Level))
+            {
+                // Failed, so buff won't be applied
+                return;
+            }
+
+            restrictBuffTags.Clear();
+            string[] tempRestrictTags;
+            for (int i = 0; i < Buffs.Count; ++i)
+            {
+                tempRestrictTags = Buffs[i].GetBuff().GetBuff().restrictTags;
+                if (tempRestrictTags != null && tempRestrictTags.Length > 0)
+                    restrictBuffTags.AddRange(tempRestrictTags);
             }
 
             if (!string.IsNullOrEmpty(tempBuff.tag) && restrictBuffTags.Contains(tempBuff.tag))

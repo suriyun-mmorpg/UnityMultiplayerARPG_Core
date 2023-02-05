@@ -263,9 +263,9 @@ namespace MultiplayerARPG
             get { return skillCastEffects; }
         }
 
-        public float GetCastDuration(int skillLevel)
+        public float GetCastDuration(int level)
         {
-            return castDuration.GetAmount(skillLevel);
+            return castDuration.GetAmount(level);
         }
 
         public GameEffect[] DamageHitEffects

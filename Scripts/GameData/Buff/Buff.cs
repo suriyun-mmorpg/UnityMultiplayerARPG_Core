@@ -10,6 +10,8 @@ namespace MultiplayerARPG
         [Header("Generic Settings")]
         public string tag;
         public string[] restrictTags;
+        [Tooltip("1 = 100% chance to not apply the buff")]
+        public IncrementalFloat failChance;
 
         [Header("Settings for Passive and Active Skills")]
         [Tooltip("Increase character's stats.")]
