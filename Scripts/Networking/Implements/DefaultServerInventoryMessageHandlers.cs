@@ -304,7 +304,7 @@ namespace MultiplayerARPG
                 return;
             }
 
-            if (!playerCharacter.RefineItem(request.inventoryType, request.index, out UITextKeys gameMessage))
+            if (!playerCharacter.RefineItem(request.inventoryType, request.index, request.materialDataIds, out UITextKeys gameMessage))
             {
                 result.InvokeError(new ResponseRefineItemMessage()
                 {

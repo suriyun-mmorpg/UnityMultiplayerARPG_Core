@@ -871,19 +871,19 @@ namespace MultiplayerARPG
 #endif
         }
 
-        public static bool RefineItem(this IPlayerCharacterData character, InventoryType inventoryType, int index, out UITextKeys gameMessage)
+        public static bool RefineItem(this IPlayerCharacterData character, InventoryType inventoryType, int index, int[] enhancerDataIds, out UITextKeys gameMessage)
         {
 #if UNITY_EDITOR || UNITY_SERVER
             switch (inventoryType)
             {
                 case InventoryType.NonEquipItems:
-                    return BaseItem.RefineNonEquipItem(character, index, out gameMessage);
+                    return BaseItem.RefineNonEquipItem(character, index, enhancerDataIds, out gameMessage);
                 case InventoryType.EquipItems:
-                    return BaseItem.RefineEquipItem(character, index, out gameMessage);
+                    return BaseItem.RefineEquipItem(character, index, enhancerDataIds, out gameMessage);
                 case InventoryType.EquipWeaponRight:
-                    return BaseItem.RefineRightHandItem(character, out gameMessage);
+                    return BaseItem.RefineRightHandItem(character, enhancerDataIds, out gameMessage);
                 case InventoryType.EquipWeaponLeft:
-                    return BaseItem.RefineLeftHandItem(character, out gameMessage);
+                    return BaseItem.RefineLeftHandItem(character, enhancerDataIds, out gameMessage);
             }
             gameMessage = UITextKeys.UI_ERROR_INVALID_ITEM_DATA;
             return false;

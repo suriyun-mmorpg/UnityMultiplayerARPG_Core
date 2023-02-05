@@ -71,7 +71,7 @@ namespace MultiplayerARPG
             character.Gold = character.Gold.Increase(item.SellPrice * amount);
         }
 
-        public virtual bool CurrenciesEnoughToRefineItem(IPlayerCharacterData character, ItemRefineLevel refineLevel)
+        public virtual bool CurrenciesEnoughToRefineItem(IPlayerCharacterData character, ItemRefineLevel refineLevel, float decreaseRate)
         {
             if (character.Gold < refineLevel.RequireGold)
                 return false;
@@ -80,9 +80,9 @@ namespace MultiplayerARPG
             return character.HasEnoughCurrencyAmounts(GameDataHelpers.CombineCurrencies(refineLevel.RequireCurrencies, null), out _, out _);
         }
 
-        public virtual void DecreaseCurrenciesWhenRefineItem(IPlayerCharacterData character, ItemRefineLevel refineLevel)
+        public virtual void DecreaseCurrenciesWhenRefineItem(IPlayerCharacterData character, ItemRefineLevel refineLevel, float decreaseRate)
         {
-            character.Gold -= refineLevel.RequireGold;
+            character.Gold -= Mathf.CeilToInt(refineLevel.RequireGold - (refineLevel.RequireGold * decreaseRate));
             if (refineLevel.RequireCurrencies == null || refineLevel.RequireCurrencies.Length == 0)
                 return;
             character.DecreaseCurrencies(refineLevel.RequireCurrencies);

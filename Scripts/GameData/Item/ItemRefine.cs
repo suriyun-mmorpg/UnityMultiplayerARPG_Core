@@ -43,6 +43,20 @@ namespace MultiplayerARPG
     }
 
     [System.Serializable]
+    public partial struct ItemRefineEnhancer
+    {
+        public BaseItem item;
+        [Range(0f, 1f)]
+        public float increaseSuccessRate;
+        [Range(0f, 1f)]
+        public float decreaseRequireGoldRate;
+        [Range(0f, 1f)]
+        public float chanceToNotDecreaseLevels;
+        [Range(0f, 1f)]
+        public float chanceToNotDestroyItem;
+    }
+
+    [System.Serializable]
     public partial struct ItemRefineLevel
     {
         [Range(0.01f, 1f)]
@@ -74,13 +88,18 @@ namespace MultiplayerARPG
         private bool refineFailDestroyItem;
         public bool RefineFailDestroyItem { get { return refineFailDestroyItem; } }
 
+        [Tooltip("Materials for item refinement enhancing")]
+        private ItemRefineEnhancer[] availableEnhancers;
+        public ItemRefineEnhancer[] AvailableEnhancers { get { return availableEnhancers; } }
+
         public ItemRefineLevel(
             float successRate,
             ItemAmount[] requireItems,
             CurrencyAmount[] requireCurrencies,
             int requireGold,
             int refineFailDecreaseLevels,
-            bool refineFailDestroyItem)
+            bool refineFailDestroyItem,
+            ItemRefineEnhancer[] availableMaterials)
         {
             this.successRate = successRate;
             this.requireItems = requireItems;
@@ -88,17 +107,35 @@ namespace MultiplayerARPG
             this.requireGold = requireGold;
             this.refineFailDecreaseLevels = refineFailDecreaseLevels;
             this.refineFailDestroyItem = refineFailDestroyItem;
+            this.availableEnhancers = availableMaterials;
         }
 
-        public bool CanRefine(IPlayerCharacterData character)
+        public bool CanRefine(IPlayerCharacterData character, int[] materialDataIds)
         {
-            return CanRefine(character, out _);
+            return CanRefine(character, materialDataIds, out _);
         }
 
-        public bool CanRefine(IPlayerCharacterData character, out UITextKeys gameMessage)
+        public bool CanRefine(IPlayerCharacterData character, int[] materialDataIds, out UITextKeys gameMessage)
         {
             gameMessage = UITextKeys.NONE;
-            if (!GameInstance.Singleton.GameplayRule.CurrenciesEnoughToRefineItem(character, this))
+            float decreaseRequireGoldRate = 0f;
+            for (int i = 0; i < materialDataIds.Length; ++i)
+            {
+                int materialDataId = materialDataIds[i];
+                int indexOfMaterial = character.IndexOfNonEquipItem(materialDataId);
+                if (indexOfMaterial >= 0 && character.NonEquipItems[indexOfMaterial].NotEmptySlot())
+                {
+                    for (int j = 0; j < AvailableEnhancers.Length; ++j)
+                    {
+                        if (AvailableEnhancers[j].item != null && AvailableEnhancers[j].item.DataId == materialDataId)
+                        {
+                            decreaseRequireGoldRate += AvailableEnhancers[j].decreaseRequireGoldRate;
+                            break;
+                        }
+                    }
+                }
+            }
+            if (!GameInstance.Singleton.GameplayRule.CurrenciesEnoughToRefineItem(character, this, decreaseRequireGoldRate))
             {
                 gameMessage = UITextKeys.UI_ERROR_NOT_ENOUGH_CURRENCY_AMOUNTS;
                 return false;

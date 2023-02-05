@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using Cysharp.Text;
+using System.Collections.Generic;
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
@@ -34,9 +35,12 @@ namespace MultiplayerARPG
         public TextWrapper uiTextSimpleRequireGold;
         public TextWrapper uiTextSuccessRate;
         public TextWrapper uiTextRefiningLevel;
+        public UICharacterItems uiRefineEnhancerItems;
+        public UICharacterItems uiAppliedRefineEnhancerItems;
 
         protected bool activated;
         protected string activeItemId;
+        protected List<int> materialDataIds = new List<int>();
 
         protected override void Awake()
         {
@@ -78,7 +82,7 @@ namespace MultiplayerARPG
             if (!characterItem.IsEmptySlot())
             {
                 UITextKeys gameMessage = UITextKeys.UI_ERROR_CANNOT_REFINE;
-                CanRefine = EquipmentItem != null && characterItem.GetItem().CanRefine(GameInstance.PlayingCharacter, Level, out gameMessage);
+                CanRefine = EquipmentItem != null && characterItem.GetItem().CanRefine(GameInstance.PlayingCharacter, Level, materialDataIds.ToArray(), out gameMessage);
                 if (CanRefine)
                 {
                     refineLevel = EquipmentItem.ItemRefine.Levels[Level - 1];
@@ -194,6 +198,42 @@ namespace MultiplayerARPG
                         Level.ToString("N0"));
                 }
             }
+
+            if (uiRefineEnhancerItems != null)
+            {
+                uiRefineEnhancerItems.inventoryType = InventoryType.Unknow;
+                List<CharacterItem> characterItems = new List<CharacterItem>();
+                if (refineLevel.HasValue)
+                {
+                    for (int i = 0; i < GameInstance.PlayingCharacter.NonEquipItems.Count; ++i)
+                    {
+                        for (int j = 0; j < refineLevel.Value.AvailableEnhancers.Length; ++j)
+                        {
+                            if (refineLevel.Value.AvailableEnhancers[j].item == GameInstance.PlayingCharacter.NonEquipItems[i].GetItem())
+                                characterItems.Add(GameInstance.PlayingCharacter.NonEquipItems[i].Clone());
+                        }
+                    }
+                    for (int i = 0; i < materialDataIds.Count; ++i)
+                    {
+                        characterItems.DecreaseItems(materialDataIds[i], 1, false, out _);
+                    }
+                }
+                uiRefineEnhancerItems.UpdateData(GameInstance.PlayingCharacter, characterItems);
+            }
+
+            if (uiAppliedRefineEnhancerItems != null)
+            {
+                uiAppliedRefineEnhancerItems.inventoryType = InventoryType.Unknow;
+                List<CharacterItem> characterItems = new List<CharacterItem>();
+                if (refineLevel.HasValue)
+                {
+                    for (int i = 0; i < materialDataIds.Count; ++i)
+                    {
+                        characterItems.Add(CharacterItem.Create(materialDataIds[i]));
+                    }
+                }
+                uiAppliedRefineEnhancerItems.UpdateData(GameInstance.PlayingCharacter, characterItems);
+            }
         }
 
         public override void Show()
@@ -220,6 +260,16 @@ namespace MultiplayerARPG
                 inventoryType = InventoryType,
                 index = IndexOfData,
             }, ClientInventoryActions.ResponseRefineItem);
+        }
+
+        public void OnClickAddRefineEnhancer()
+        {
+
+        }
+
+        public void OnClickRemoveRefineEnhancer()
+        {
+
         }
     }
 }

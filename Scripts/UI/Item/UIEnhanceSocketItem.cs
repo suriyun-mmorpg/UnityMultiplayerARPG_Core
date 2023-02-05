@@ -143,7 +143,6 @@ namespace MultiplayerARPG
             if (uiSocketEnhancerItems != null)
             {
                 uiSocketEnhancerItems.filterItemTypes = new List<ItemType>() { ItemType.SocketEnhancer };
-                uiSocketEnhancerItems.filterCategories = new List<string>();
                 uiSocketEnhancerItems.UpdateData(GameInstance.PlayingCharacter);
             }
 
@@ -151,7 +150,6 @@ namespace MultiplayerARPG
             {
                 uiAppliedSocketEnhancerItems.inventoryType = InventoryType.Unknow;
                 uiAppliedSocketEnhancerItems.filterItemTypes = new List<ItemType>() { ItemType.SocketEnhancer };
-                uiAppliedSocketEnhancerItems.filterCategories = new List<string>();
                 List<CharacterItem> characterItems = new List<CharacterItem>();
                 if (EquipmentItem != null)
                 {
