@@ -84,7 +84,7 @@ namespace MultiplayerARPG
 
         private bool MigrateVehicleModels()
         {
-            if (vehicleModels != null && vehicleModels.Length > 0)
+            if (MainTpsModel != null && vehicleModels != null && vehicleModels.Length > 0)
             {
                 MainTpsModel.VehicleModels = vehicleModels;
                 vehicleModels = new VehicleCharacterModel[0];
