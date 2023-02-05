@@ -145,6 +145,7 @@ namespace MultiplayerARPG
                         {
                             UINpcDialogMenuAction menuAction = new UINpcDialogMenuAction();
                             menuAction.title = menu.Title;
+                            menuAction.icon = menu.icon;
                             menuAction.menuIndex = i;
                             menuActions.Add(menuAction);
                         }
@@ -161,13 +162,21 @@ namespace MultiplayerARPG
                             UINpcDialogMenuAction declineMenuAction = new UINpcDialogMenuAction();
                             UINpcDialogMenuAction abandonMenuAction = new UINpcDialogMenuAction();
                             UINpcDialogMenuAction completeMenuAction = new UINpcDialogMenuAction();
+
                             acceptMenuAction.title = uiNpcDialog.MessageQuestAccept;
+                            acceptMenuAction.icon = uiNpcDialog.questAcceptIcon;
                             acceptMenuAction.menuIndex = QUEST_ACCEPT_MENU_INDEX;
+
                             declineMenuAction.title = uiNpcDialog.MessageQuestDecline;
+                            declineMenuAction.icon = uiNpcDialog.questDeclineIcon;
                             declineMenuAction.menuIndex = QUEST_DECLINE_MENU_INDEX;
+
                             abandonMenuAction.title = uiNpcDialog.MessageQuestAbandon;
+                            abandonMenuAction.icon = uiNpcDialog.questAbandonIcon;
                             abandonMenuAction.menuIndex = QUEST_ABANDON_MENU_INDEX;
+
                             completeMenuAction.title = uiNpcDialog.MessageQuestComplete;
+                            completeMenuAction.icon = uiNpcDialog.questCompleteIcon;
                             completeMenuAction.menuIndex = QUEST_COMPLETE_MENU_INDEX;
 
                             CharacterQuest characterQuest;
@@ -215,10 +224,15 @@ namespace MultiplayerARPG
                         {
                             confirmMenuAction = new UINpcDialogMenuAction();
                             cancelMenuAction = new UINpcDialogMenuAction();
+
                             confirmMenuAction.title = uiNpcDialog.MessageCraftItemConfirm;
+                            confirmMenuAction.icon = uiNpcDialog.craftConfirmIcon;
                             confirmMenuAction.menuIndex = CONFIRM_MENU_INDEX;
+
                             cancelMenuAction.title = uiNpcDialog.MessageCraftItemCancel;
+                            cancelMenuAction.icon = uiNpcDialog.craftCancelIcon;
                             cancelMenuAction.menuIndex = CANCEL_MENU_INDEX;
+
                             uiNpcDialog.uiCraftItem.Setup(CrafterType.Npc, null, itemCraft);
                             menuActions.Add(confirmMenuAction);
                             menuActions.Add(cancelMenuAction);
@@ -236,10 +250,15 @@ namespace MultiplayerARPG
                     }
                     confirmMenuAction = new UINpcDialogMenuAction();
                     cancelMenuAction = new UINpcDialogMenuAction();
+
                     confirmMenuAction.title = uiNpcDialog.MessageSaveRespawnPointConfirm;
+                    confirmMenuAction.icon = uiNpcDialog.saveRespawnPointConfirmIcon;
                     confirmMenuAction.menuIndex = CONFIRM_MENU_INDEX;
+
                     cancelMenuAction.title = uiNpcDialog.MessageSaveRespawnPointCancel;
+                    cancelMenuAction.icon = uiNpcDialog.saveRespawnPointCancelIcon;
                     cancelMenuAction.menuIndex = CANCEL_MENU_INDEX;
+
                     menuActions.Add(confirmMenuAction);
                     menuActions.Add(cancelMenuAction);
                     break;
@@ -253,10 +272,15 @@ namespace MultiplayerARPG
                     }
                     confirmMenuAction = new UINpcDialogMenuAction();
                     cancelMenuAction = new UINpcDialogMenuAction();
+
                     confirmMenuAction.title = uiNpcDialog.MessageWarpConfirm;
+                    confirmMenuAction.icon = uiNpcDialog.warpConfirmIcon;
                     confirmMenuAction.menuIndex = CONFIRM_MENU_INDEX;
+
                     cancelMenuAction.title = uiNpcDialog.MessageWarpCancel;
+                    cancelMenuAction.icon = uiNpcDialog.warpCancelIcon;
                     cancelMenuAction.menuIndex = CANCEL_MENU_INDEX;
+
                     menuActions.Add(confirmMenuAction);
                     menuActions.Add(cancelMenuAction);
                     break;
@@ -265,46 +289,66 @@ namespace MultiplayerARPG
                         uiNpcDialog.onSwitchToRefineItemDialog.Invoke();
                     confirmMenuAction = new UINpcDialogMenuAction();
                     cancelMenuAction = new UINpcDialogMenuAction();
+
                     confirmMenuAction.title = uiNpcDialog.MessageRefineItemConfirm;
+                    confirmMenuAction.icon = uiNpcDialog.refineItemConfirmIcon;
                     confirmMenuAction.menuIndex = CONFIRM_MENU_INDEX;
+
                     cancelMenuAction.title = uiNpcDialog.MessageRefineItemCancel;
+                    cancelMenuAction.icon = uiNpcDialog.refineItemCancelIcon;
                     cancelMenuAction.menuIndex = CANCEL_MENU_INDEX;
+
                     menuActions.Add(confirmMenuAction);
                     menuActions.Add(cancelMenuAction);
                     break;
                 case NpcDialogType.PlayerStorage:
                     if (uiNpcDialog.onSwitchToPlayerStorageDialog != null)
                         uiNpcDialog.onSwitchToPlayerStorageDialog.Invoke();
-                    UINpcDialogMenuAction playerStorageConfirmAction = new UINpcDialogMenuAction();
-                    UINpcDialogMenuAction playerStorageCancelAction = new UINpcDialogMenuAction();
-                    playerStorageConfirmAction.title = uiNpcDialog.MessagePlayerStorageConfirm;
-                    playerStorageConfirmAction.menuIndex = CONFIRM_MENU_INDEX;
-                    playerStorageCancelAction.title = uiNpcDialog.MessagePlayerStorageCancel;
-                    playerStorageCancelAction.menuIndex = CANCEL_MENU_INDEX;
-                    menuActions.Add(playerStorageConfirmAction);
-                    menuActions.Add(playerStorageCancelAction);
+                    confirmMenuAction = new UINpcDialogMenuAction();
+                    cancelMenuAction = new UINpcDialogMenuAction();
+
+                    confirmMenuAction.title = uiNpcDialog.MessagePlayerStorageConfirm;
+                    confirmMenuAction.icon = uiNpcDialog.playerStorageConfirmIcon;
+                    confirmMenuAction.menuIndex = CONFIRM_MENU_INDEX;
+
+                    cancelMenuAction.title = uiNpcDialog.MessagePlayerStorageCancel;
+                    cancelMenuAction.icon = uiNpcDialog.playerStorageCancelIcon;
+                    cancelMenuAction.menuIndex = CANCEL_MENU_INDEX;
+
+                    menuActions.Add(confirmMenuAction);
+                    menuActions.Add(cancelMenuAction);
                     break;
                 case NpcDialogType.GuildStorage:
                     if (uiNpcDialog.onSwitchToGuildStorageDialog != null)
                         uiNpcDialog.onSwitchToGuildStorageDialog.Invoke();
-                    UINpcDialogMenuAction guildStorageConfirmAction = new UINpcDialogMenuAction();
-                    UINpcDialogMenuAction guildStorageCancelAction = new UINpcDialogMenuAction();
-                    guildStorageConfirmAction.title = uiNpcDialog.MessageGuildStorageConfirm;
-                    guildStorageConfirmAction.menuIndex = CONFIRM_MENU_INDEX;
-                    guildStorageCancelAction.title = uiNpcDialog.MessageGuildStorageCancel;
-                    guildStorageCancelAction.menuIndex = CANCEL_MENU_INDEX;
-                    menuActions.Add(guildStorageConfirmAction);
-                    menuActions.Add(guildStorageCancelAction);
+                    confirmMenuAction = new UINpcDialogMenuAction();
+                    cancelMenuAction = new UINpcDialogMenuAction();
+
+                    confirmMenuAction.title = uiNpcDialog.MessageGuildStorageConfirm;
+                    confirmMenuAction.icon = uiNpcDialog.guildStorageConfirmIcon;
+                    confirmMenuAction.menuIndex = CONFIRM_MENU_INDEX;
+
+                    cancelMenuAction.title = uiNpcDialog.MessageGuildStorageCancel;
+                    cancelMenuAction.icon = uiNpcDialog.guildStorageCancelIcon;
+                    cancelMenuAction.menuIndex = CANCEL_MENU_INDEX;
+
+                    menuActions.Add(confirmMenuAction);
+                    menuActions.Add(cancelMenuAction);
                     break;
                 case NpcDialogType.DismantleItem:
                     if (uiNpcDialog.onSwitchToDismantleItemDialog != null)
                         uiNpcDialog.onSwitchToDismantleItemDialog.Invoke();
                     confirmMenuAction = new UINpcDialogMenuAction();
                     cancelMenuAction = new UINpcDialogMenuAction();
+
                     confirmMenuAction.title = uiNpcDialog.MessageDismantleItemConfirm;
+                    confirmMenuAction.icon = uiNpcDialog.dismantleItemConfirmIcon;
                     confirmMenuAction.menuIndex = CONFIRM_MENU_INDEX;
+
                     cancelMenuAction.title = uiNpcDialog.MessageDismantleItemCancel;
+                    cancelMenuAction.icon = uiNpcDialog.dismantleItemCancelIcon;
                     cancelMenuAction.menuIndex = CANCEL_MENU_INDEX;
+
                     menuActions.Add(confirmMenuAction);
                     menuActions.Add(cancelMenuAction);
                     break;
@@ -313,10 +357,15 @@ namespace MultiplayerARPG
                         uiNpcDialog.onSwitchToRepairItemDialog.Invoke();
                     confirmMenuAction = new UINpcDialogMenuAction();
                     cancelMenuAction = new UINpcDialogMenuAction();
+
                     confirmMenuAction.title = uiNpcDialog.MessageRepairItemConfirm;
+                    confirmMenuAction.icon = uiNpcDialog.repairItemConfirmIcon;
                     confirmMenuAction.menuIndex = CONFIRM_MENU_INDEX;
+
                     cancelMenuAction.title = uiNpcDialog.MessageRepairItemCancel;
+                    cancelMenuAction.icon = uiNpcDialog.repairItemCancelIcon;
                     cancelMenuAction.menuIndex = CANCEL_MENU_INDEX;
+
                     menuActions.Add(confirmMenuAction);
                     menuActions.Add(cancelMenuAction);
                     break;

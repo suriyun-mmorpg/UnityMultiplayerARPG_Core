@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using UnityEngine.UI;
 
 namespace MultiplayerARPG
 {
@@ -6,6 +7,7 @@ namespace MultiplayerARPG
     public struct UINpcDialogMenuAction
     {
         public string title;
+        public Sprite icon;
         public int menuIndex;
     }
 
@@ -14,11 +16,20 @@ namespace MultiplayerARPG
         [Header("UI Elements")]
         public TextWrapper uiTextTitle;
         public UINpcDialog uiNpcDialog;
+        public Image imageIcon;
 
         protected override void UpdateData()
         {
             if (uiTextTitle != null)
                 uiTextTitle.text = Data.title;
+
+            if (imageIcon != null)
+            {
+                Sprite iconSprite = Data.icon;
+                imageIcon.gameObject.SetActive(iconSprite != null);
+                imageIcon.sprite = iconSprite;
+                imageIcon.preserveAspect = true;
+            }
         }
 
         public void OnClickMenu()

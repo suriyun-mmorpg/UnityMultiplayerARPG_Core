@@ -9,6 +9,7 @@ namespace MultiplayerARPG
         public string title;
         [Tooltip("Titles by language keys")]
         public LanguageData[] titles;
+        public Sprite icon;
         public NpcDialogCondition[] showConditions;
         public bool isCloseMenu;
         [BoolShowConditional(nameof(isCloseMenu), false)]

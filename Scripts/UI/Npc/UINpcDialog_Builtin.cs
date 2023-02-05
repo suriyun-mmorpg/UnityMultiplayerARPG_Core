@@ -33,6 +33,7 @@ namespace MultiplayerARPG
         {
             get { return Language.GetText(messageQuestAcceptTitles, messageQuestAccept); }
         }
+        public Sprite questAcceptIcon;
 
         [Header("Quest Decline Menu Title")]
         public string messageQuestDecline = "Decline";
@@ -41,6 +42,7 @@ namespace MultiplayerARPG
         {
             get { return Language.GetText(messageQuestDeclineTitles, messageQuestDecline); }
         }
+        public Sprite questDeclineIcon;
 
         [Header("Quest Abandon Menu Title")]
         public string messageQuestAbandon = "Abandon";
@@ -49,6 +51,7 @@ namespace MultiplayerARPG
         {
             get { return Language.GetText(messageQuestAbandonTitles, messageQuestAbandon); }
         }
+        public Sprite questAbandonIcon;
 
         [Header("Quest Complete Menu Title")]
         public string messageQuestComplete = "Complete";
@@ -57,6 +60,7 @@ namespace MultiplayerARPG
         {
             get { return Language.GetText(messageQuestCompleteTitles, messageQuestComplete); }
         }
+        public Sprite questCompleteIcon;
 
         [Header("Craft Item Confirm Menu Title")]
         public string messageCraftItemConfirm = "Craft";
@@ -65,6 +69,7 @@ namespace MultiplayerARPG
         {
             get { return Language.GetText(messageCraftItemConfirmTitles, messageCraftItemConfirm); }
         }
+        public Sprite craftConfirmIcon;
 
         [Header("Craft Item Cancel Menu Title")]
         public string messageCraftItemCancel = "Cancel";
@@ -73,6 +78,7 @@ namespace MultiplayerARPG
         {
             get { return Language.GetText(messageCraftItemCancelTitles, messageCraftItemCancel); }
         }
+        public Sprite craftCancelIcon;
 
         [Header("Save Respawn Point Confirm Menu Title")]
         public string messageSaveRespawnPointConfirm = "Confirm";
@@ -81,6 +87,7 @@ namespace MultiplayerARPG
         {
             get { return Language.GetText(messageSaveRespawnPointConfirmTitles, messageSaveRespawnPointConfirm); }
         }
+        public Sprite saveRespawnPointConfirmIcon;
 
         [Header("Save Respawn Point Cancel Menu Title")]
         public string messageSaveRespawnPointCancel = "Cancel";
@@ -89,6 +96,7 @@ namespace MultiplayerARPG
         {
             get { return Language.GetText(messageSaveRespawnPointCancelTitles, messageSaveRespawnPointCancel); }
         }
+        public Sprite saveRespawnPointCancelIcon;
 
         [Header("Warp Confirm Menu Title")]
         public string messageWarpConfirm = "Confirm";
@@ -97,6 +105,7 @@ namespace MultiplayerARPG
         {
             get { return Language.GetText(messageWarpConfirmTitles, messageWarpConfirm); }
         }
+        public Sprite warpConfirmIcon;
 
         [Header("Warp Cancel Menu Title")]
         public string messageWarpCancel = "Cancel";
@@ -105,6 +114,7 @@ namespace MultiplayerARPG
         {
             get { return Language.GetText(messageWarpCancelTitles, messageWarpCancel); }
         }
+        public Sprite warpCancelIcon;
 
         [Header("Refine Item Confirm Menu Title")]
         public string messageRefineItemConfirm = "Refine Item";
@@ -113,6 +123,7 @@ namespace MultiplayerARPG
         {
             get { return Language.GetText(messageRefineItemConfirmTitles, messageRefineItemConfirm); }
         }
+        public Sprite refineItemConfirmIcon;
 
         [Header("Refine Item Cancel Menu Title")]
         public string messageRefineItemCancel = "Cancel";
@@ -121,6 +132,7 @@ namespace MultiplayerARPG
         {
             get { return Language.GetText(messageRefineItemCancelTitles, messageRefineItemCancel); }
         }
+        public Sprite refineItemCancelIcon;
 
         [Header("Dismantle Item Confirm Menu Title")]
         public string messageDismantleItemConfirm = "Dismantle Item";
@@ -129,6 +141,7 @@ namespace MultiplayerARPG
         {
             get { return Language.GetText(messageDismantleItemConfirmTitles, messageDismantleItemConfirm); }
         }
+        public Sprite dismantleItemConfirmIcon;
 
         [Header("Dismantle Item Cancel Menu Title")]
         public string messageDismantleItemCancel = "Cancel";
@@ -137,6 +150,7 @@ namespace MultiplayerARPG
         {
             get { return Language.GetText(messageDismantleItemCancelTitles, messageDismantleItemCancel); }
         }
+        public Sprite dismantleItemCancelIcon;
 
         [Header("Open Player Storage Confirm Menu Title")]
         public string messagePlayerStorageConfirm = "Open Storage";
@@ -145,6 +159,7 @@ namespace MultiplayerARPG
         {
             get { return Language.GetText(messagePlayerStorageConfirmTitles, messagePlayerStorageConfirm); }
         }
+        public Sprite playerStorageConfirmIcon;
 
         [Header("Open Player Storage Cancel Menu Title")]
         public string messagePlayerStorageCancel = "Cancel";
@@ -153,6 +168,7 @@ namespace MultiplayerARPG
         {
             get { return Language.GetText(messagePlayerStorageCancelTitles, messagePlayerStorageCancel); }
         }
+        public Sprite playerStorageCancelIcon;
 
         [Header("Open Guild Storage Confirm Menu Title")]
         public string messageGuildStorageConfirm = "Open Storage";
@@ -161,6 +177,7 @@ namespace MultiplayerARPG
         {
             get { return Language.GetText(messageGuildStorageConfirmTitles, messageGuildStorageConfirm); }
         }
+        public Sprite guildStorageConfirmIcon;
 
         [Header("Open Guild Storage Cancel Menu Title")]
         public string messageGuildStorageCancel = "Cancel";
@@ -169,6 +186,7 @@ namespace MultiplayerARPG
         {
             get { return Language.GetText(messageGuildStorageCancelTitles, messageGuildStorageCancel); }
         }
+        public Sprite guildStorageCancelIcon;
 
         [Header("Repair Item Confirm Menu Title")]
         public string messageRepairItemConfirm = "Repair Item";
@@ -177,6 +195,7 @@ namespace MultiplayerARPG
         {
             get { return Language.GetText(messageRepairItemConfirmTitles, messageRepairItemConfirm); }
         }
+        public Sprite repairItemConfirmIcon;
 
         [Header("Repair Item Cancel Menu Title")]
         public string messageRepairItemCancel = "Cancel";
@@ -185,6 +204,7 @@ namespace MultiplayerARPG
         {
             get { return Language.GetText(messageRepairItemCancelTitles, messageRepairItemCancel); }
         }
+        public Sprite repairItemCancelIcon;
 
         [Header("Event")]
         public UnityEvent onSwitchToNormalDialog;
