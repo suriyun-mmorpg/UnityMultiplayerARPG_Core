@@ -238,8 +238,7 @@ namespace MultiplayerARPG
                 return false;
             }
             // Prepare variables that being used in switch scope
-            if (equipSlotIndexOrWeaponSet < 0 ||
-                equipSlotIndexOrWeaponSet >= GameInstance.Singleton.maxEquipWeaponSet)
+            if (equipSlotIndexOrWeaponSet < 0 || equipSlotIndexOrWeaponSet >= GameInstance.Singleton.maxEquipWeaponSet)
                 equipSlotIndexOrWeaponSet = playerCharacter.EquipWeaponSet;
             playerCharacter.FillWeaponSetsIfNeeded(equipSlotIndexOrWeaponSet);
             EquipWeapons equipWeapons = playerCharacter.SelectableWeaponSets[equipSlotIndexOrWeaponSet];
@@ -321,6 +320,8 @@ namespace MultiplayerARPG
                         // Swapping
                         CharacterItem storageItem = storageItems[storageItemIndex].Clone(true);
                         CharacterItem equipItem = playerCharacter.EquipItems[unequippingIndex].Clone(true);
+                        storageItem.equipSlotIndex = equipSlotIndexOrWeaponSet;
+                        equipItem.equipSlotIndex = 0;
                         storageItems[storageItemIndex] = equipItem;
                         playerCharacter.EquipItems[unequippingIndex] = storageItem;
                     }
