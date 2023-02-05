@@ -5,32 +5,32 @@ using UnityEngine;
 
 namespace MultiplayerARPG
 {
-	public abstract class UIBaseOwningCharacterItem : UISelectionEntry<UIOwningCharacterItemData>
-	{
-		public InventoryType InventoryType { get { return Data.inventoryType; } }
-		public int IndexOfData { get { return Data.indexOfData; } }
-		public CharacterItem CharacterItem
-		{
-			get
-			{
-				switch (InventoryType)
-				{
-					case InventoryType.NonEquipItems:
-						if (IndexOfData >= 0 && IndexOfData < GameInstance.PlayingCharacter.NonEquipItems.Count)
-							return GameInstance.PlayingCharacter.NonEquipItems[IndexOfData];
-						break;
-					case InventoryType.EquipItems:
-						if (IndexOfData >= 0 && IndexOfData < GameInstance.PlayingCharacter.EquipItems.Count)
-							return GameInstance.PlayingCharacter.EquipItems[IndexOfData];
-						break;
-					case InventoryType.EquipWeaponRight:
-						return GameInstance.PlayingCharacter.EquipWeapons.rightHand;
-					case InventoryType.EquipWeaponLeft:
-						return GameInstance.PlayingCharacter.EquipWeapons.leftHand;
-				}
-				return null;
-			}
-		}
+    public abstract class UIBaseOwningCharacterItem : UISelectionEntry<UIOwningCharacterItemData>
+    {
+        public InventoryType InventoryType { get { return Data.inventoryType; } }
+        public int IndexOfData { get { return Data.indexOfData; } }
+        public CharacterItem CharacterItem
+        {
+            get
+            {
+                switch (InventoryType)
+                {
+                    case InventoryType.NonEquipItems:
+                        if (IndexOfData >= 0 && IndexOfData < GameInstance.PlayingCharacter.NonEquipItems.Count)
+                            return GameInstance.PlayingCharacter.NonEquipItems[IndexOfData];
+                        break;
+                    case InventoryType.EquipItems:
+                        if (IndexOfData >= 0 && IndexOfData < GameInstance.PlayingCharacter.EquipItems.Count)
+                            return GameInstance.PlayingCharacter.EquipItems[IndexOfData];
+                        break;
+                    case InventoryType.EquipWeaponRight:
+                        return GameInstance.PlayingCharacter.EquipWeapons.rightHand;
+                    case InventoryType.EquipWeaponLeft:
+                        return GameInstance.PlayingCharacter.EquipWeapons.leftHand;
+                }
+                return null;
+            }
+        }
         public int Level { get { return (CharacterItem != null ? CharacterItem.level : 1); } }
         public int Amount { get { return (CharacterItem != null ? CharacterItem.amount : 0); } }
 
