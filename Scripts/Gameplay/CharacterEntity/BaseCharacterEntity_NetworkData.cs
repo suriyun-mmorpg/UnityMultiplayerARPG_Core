@@ -58,6 +58,10 @@ namespace MultiplayerARPG
         public int CurrentStamina { get { return currentStamina.Value; } set { currentStamina.Value = value; } }
         public int CurrentFood { get { return currentFood.Value; } set { currentFood.Value = value; } }
         public int CurrentWater { get { return currentWater.Value; } set { currentWater.Value = value; } }
+        public virtual int IconDataId { get; set; }
+        public virtual int FrameDataId { get; set; }
+        public virtual int TitleDataId { get; set; }
+        public byte EquipWeaponSet { get { return equipWeaponSet.Value; } set { equipWeaponSet.Value = value; } }
         public EquipWeapons EquipWeapons
         {
             get
@@ -72,7 +76,6 @@ namespace MultiplayerARPG
                 SelectableWeaponSets[EquipWeaponSet] = value;
             }
         }
-        public byte EquipWeaponSet { get { return equipWeaponSet.Value; } set { equipWeaponSet.Value = value; } }
         public float Pitch
         {
             get

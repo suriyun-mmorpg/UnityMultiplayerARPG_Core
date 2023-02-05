@@ -115,17 +115,17 @@ namespace MultiplayerARPG
             }
             set { }
         }
-        public int IconDataId
+        public override int IconDataId
         {
             get { return iconDataId.Value; }
             set { iconDataId.Value = value; }
         }
-        public int FrameDataId
+        public override int FrameDataId
         {
             get { return frameDataId.Value; }
             set { frameDataId.Value = value; }
         }
-        public int TitleDataId
+        public override int TitleDataId
         {
             get { return titleDataId.Value; }
             set { titleDataId.Value = value; }

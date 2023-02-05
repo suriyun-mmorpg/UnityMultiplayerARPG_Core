@@ -191,6 +191,12 @@ namespace MultiplayerARPG
                 // Increase with rates
                 result = GameDataHelpers.CombineAttributes(result, GameDataHelpers.MultiplyAttributes(new Dictionary<Attribute, float>(baseAttributes), data.PassengingVehicleEntity.GetBuff().GetIncreaseAttributesRate()));
             }
+            if (GameInstance.PlayerTitles.TryGetValue(data.TitleDataId, out PlayerTitle title))
+            {
+                result = GameDataHelpers.CombineAttributes(result, title.buff.GetIncreaseAttributes(1));
+                // Increase with rates
+                result = GameDataHelpers.CombineAttributes(result, GameDataHelpers.MultiplyAttributes(new Dictionary<Attribute, float>(baseAttributes), title.buff.GetIncreaseAttributesRate(1)));
+            }
             return result;
         }
 
@@ -345,6 +351,10 @@ namespace MultiplayerARPG
             {
                 result = GameDataHelpers.CombineResistances(result, data.PassengingVehicleEntity.GetBuff().GetIncreaseResistances());
             }
+            if (GameInstance.PlayerTitles.TryGetValue(data.TitleDataId, out PlayerTitle title))
+            {
+                result = GameDataHelpers.CombineResistances(result, title.buff.GetIncreaseResistances(1));
+            }
             return result;
         }
 
@@ -440,6 +450,10 @@ namespace MultiplayerARPG
             {
                 result = GameDataHelpers.CombineArmors(result, data.PassengingVehicleEntity.GetBuff().GetIncreaseArmors());
             }
+            if (GameInstance.PlayerTitles.TryGetValue(data.TitleDataId, out PlayerTitle title))
+            {
+                result = GameDataHelpers.CombineArmors(result, title.buff.GetIncreaseArmors(1));
+            }
             return result;
         }
 
@@ -519,6 +533,10 @@ namespace MultiplayerARPG
             if (data.PassengingVehicleEntity != null)
             {
                 result = GameDataHelpers.CombineDamages(result, data.PassengingVehicleEntity.GetBuff().GetIncreaseDamages());
+            }
+            if (GameInstance.PlayerTitles.TryGetValue(data.TitleDataId, out PlayerTitle title))
+            {
+                result = GameDataHelpers.CombineDamages(result, title.buff.GetIncreaseDamages(1));
             }
             return result;
         }
@@ -643,6 +661,14 @@ namespace MultiplayerARPG
                 // Increase with rates
                 result += baseStats * data.PassengingVehicleEntity.GetBuff().GetIncreaseStatsRate();
                 result += GameDataHelpers.GetStatsFromAttributes(GameDataHelpers.MultiplyAttributes(new Dictionary<Attribute, float>(baseAttributes), data.PassengingVehicleEntity.GetBuff().GetIncreaseAttributesRate()));
+            }
+            if (GameInstance.PlayerTitles.TryGetValue(data.TitleDataId, out PlayerTitle title))
+            {
+                result += title.buff.GetIncreaseStats(1);
+                result += GameDataHelpers.GetStatsFromAttributes(title.buff.GetIncreaseAttributes(1));
+                // Increase with rates
+                result += baseStats * title.buff.GetIncreaseStatsRate(1);
+                result += GameDataHelpers.GetStatsFromAttributes(GameDataHelpers.MultiplyAttributes(new Dictionary<Attribute, float>(baseAttributes), title.buff.GetIncreaseAttributesRate(1)));
             }
             return result;
         }

@@ -60,6 +60,9 @@ namespace MultiplayerARPG
         public int CurrentStamina { get; set; }
         public int CurrentFood { get; set; }
         public int CurrentWater { get; set; }
+        public int IconDataId { get; set; }
+        public int FrameDataId { get; set; }
+        public int TitleDataId { get; set; }
 
         public EquipWeapons EquipWeapons
         {

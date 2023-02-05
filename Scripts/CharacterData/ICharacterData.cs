@@ -16,6 +16,9 @@ namespace MultiplayerARPG
         int CurrentStamina { get; set; }
         int CurrentFood { get; set; }
         int CurrentWater { get; set; }
+        int IconDataId { get; set; }
+        int FrameDataId { get; set; }
+        int TitleDataId { get; set; }
         byte EquipWeaponSet { get; set; }
         IList<EquipWeapons> SelectableWeaponSets { get; set; }
         EquipWeapons EquipWeapons { get; set; }
