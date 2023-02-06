@@ -75,6 +75,31 @@ namespace MultiplayerARPG
             return GameDataHelpers.CombineDamages(buff.damageOverTimes, new Dictionary<DamageElement, MinMaxFloat>(), level, 1f);
         }
 
+        public static float GetRemoveBuffWhenAttackChance(this Buff buff, int level)
+        {
+            return buff.removeBuffWhenAttackChance.GetAmount(level);
+        }
+
+        public static float GetRemoveBuffWhenAttackedChance(this Buff buff, int level)
+        {
+            return buff.removeBuffWhenAttackedChance.GetAmount(level);
+        }
+
+        public static float GetRemoveBuffWhenUseSkillChance(this Buff buff, int level)
+        {
+            return buff.removeBuffWhenUseSkillChance.GetAmount(level);
+        }
+
+        public static float GetRemoveBuffWhenUseItemChance(this Buff buff, int level)
+        {
+            return buff.removeBuffWhenUseItemChance.GetAmount(level);
+        }
+
+        public static float GetRemoveBuffWhenPickupItemChance(this Buff buff, int level)
+        {
+            return buff.removeBuffWhenPickupItemChance.GetAmount(level);
+        }
+
         public static int GetMaxStack(this Buff buff, int level)
         {
             return buff.maxStack.GetAmount(level);

@@ -47,6 +47,8 @@ namespace MultiplayerARPG
             });
             this.FillEmptySlots();
             itemDropEntity.PickedUp();
+            // Do something with buffs when use item
+            SkillAndBuffComponent.OnPickupItem();
 #endif
         }
 

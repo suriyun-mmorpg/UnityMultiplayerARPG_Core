@@ -104,6 +104,8 @@ namespace MultiplayerARPG
         public ICharacterUseSkillComponent UseSkillComponent { get; protected set; }
         public ICharacterReloadComponent ReloadComponent { get; protected set; }
         public ICharacterChargeComponent ChargeComponent { get; protected set; }
+        public CharacterRecoveryComponent RecoveryComponent { get; protected set; }
+        public CharacterSkillAndBuffComponent SkillAndBuffComponent { get; protected set; }
         public bool IsAttacking { get { return AttackComponent.IsAttacking; } }
         public float LastAttackEndTime { get { return AttackComponent.LastAttackEndTime; } }
         public float MoveSpeedRateWhileAttacking { get { return AttackComponent.MoveSpeedRateWhileAttacking; } }
@@ -198,8 +200,8 @@ namespace MultiplayerARPG
             UseSkillComponent = gameObject.GetOrAddComponent<ICharacterUseSkillComponent, DefaultCharacterUseSkillComponent>();
             ReloadComponent = gameObject.GetOrAddComponent<ICharacterReloadComponent, DefaultCharacterReloadComponent>();
             ChargeComponent = gameObject.GetOrAddComponent<ICharacterChargeComponent, DefaultCharacterChargeComponent>();
-            gameObject.GetOrAddComponent<CharacterRecoveryComponent>();
-            gameObject.GetOrAddComponent<CharacterSkillAndBuffComponent>();
+            RecoveryComponent = gameObject.GetOrAddComponent<CharacterRecoveryComponent>();
+            SkillAndBuffComponent = gameObject.GetOrAddComponent<CharacterSkillAndBuffComponent>();
         }
 
         protected override void EntityAwake()

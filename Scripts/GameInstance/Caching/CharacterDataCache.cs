@@ -33,6 +33,11 @@ namespace MultiplayerARPG
         public bool IsHide { get; private set; }
         public bool MuteFootstepSound { get; private set; }
         public bool IsOverweight { get; private set; }
+        public bool HavingChanceToRemoveBuffWhenAttack { get; private set; }
+        public bool HavingChanceToRemoveBuffWhenAttacked { get; private set; }
+        public bool HavingChanceToRemoveBuffWhenUseSkill { get; private set; }
+        public bool HavingChanceToRemoveBuffWhenUseItem { get; private set; }
+        public bool HavingChanceToRemoveBuffWhenPickupItem { get; private set; }
 
         public CharacterDataCache()
         {
@@ -84,11 +89,16 @@ namespace MultiplayerARPG
             FreezeAnimation = false;
             IsHide = false;
             MuteFootstepSound = false;
+            HavingChanceToRemoveBuffWhenAttack = false;
+            HavingChanceToRemoveBuffWhenAttacked = false;
+            HavingChanceToRemoveBuffWhenUseSkill = false;
+            HavingChanceToRemoveBuffWhenUseItem = false;
+            HavingChanceToRemoveBuffWhenPickupItem = false;
 
             bool allAilmentsWereApplied = false;
             if (characterData.PassengingVehicleEntity != null)
             {
-                UpdateAppliedAilments(characterData.PassengingVehicleEntity.GetBuff().GetBuff());
+                UpdateAppliedAilments(characterData.PassengingVehicleEntity.GetBuff());
                 allAilmentsWereApplied = AllAilmentsWereApplied();
             }
 
@@ -96,7 +106,7 @@ namespace MultiplayerARPG
             {
                 foreach (CharacterBuff characterBuff in characterData.Buffs)
                 {
-                    UpdateAppliedAilments(characterBuff.GetBuff().GetBuff());
+                    UpdateAppliedAilments(characterBuff.GetBuff());
                     allAilmentsWereApplied = AllAilmentsWereApplied();
                     if (allAilmentsWereApplied)
                         break;
@@ -107,7 +117,7 @@ namespace MultiplayerARPG
             {
                 foreach (CharacterSummon characterBuff in characterData.Summons)
                 {
-                    UpdateAppliedAilments(characterBuff.GetBuff().GetBuff());
+                    UpdateAppliedAilments(characterBuff.GetBuff());
                     allAilmentsWereApplied = AllAilmentsWereApplied();
                     if (allAilmentsWereApplied)
                         break;
@@ -120,7 +130,7 @@ namespace MultiplayerARPG
                 {
                     if (tempSkill == null || tempSkill.IsActive || !tempSkill.IsBuff)
                         continue;
-                    UpdateAppliedAilments(tempSkill.Buff);
+                    UpdateAppliedAilments(new CalculatedBuff(tempSkill.Buff, Skills[tempSkill]));
                     allAilmentsWereApplied = AllAilmentsWereApplied();
                     if (allAilmentsWereApplied)
                         break;
@@ -128,6 +138,31 @@ namespace MultiplayerARPG
             }
 
             return this;
+        }
+
+        public void ClearChanceToRemoveBuffWhenAttack()
+        {
+            HavingChanceToRemoveBuffWhenAttack = false;
+        }
+
+        public void ClearChanceToRemoveBuffWhenAttacked()
+        {
+            HavingChanceToRemoveBuffWhenAttacked = false;
+        }
+
+        public void ClearChanceToRemoveBuffWhenUseSkill()
+        {
+            HavingChanceToRemoveBuffWhenUseSkill = false;
+        }
+
+        public void ClearChanceToRemoveBuffWhenUseItem()
+        {
+            HavingChanceToRemoveBuffWhenUseItem = false;
+        }
+
+        public void ClearChanceToRemoveBuffWhenPickupItem()
+        {
+            HavingChanceToRemoveBuffWhenPickupItem = false;
         }
 
         #region Helper functions to get stats amount
@@ -221,8 +256,9 @@ namespace MultiplayerARPG
             return 0;
         }
 
-        public void UpdateAppliedAilments(Buff tempBuff)
+        public void UpdateAppliedAilments(CalculatedBuff buff)
         {
+            Buff tempBuff = buff.GetBuff();
             switch (tempBuff.ailment)
             {
                 case AilmentPresets.Stun:
@@ -258,6 +294,16 @@ namespace MultiplayerARPG
                 IsHide = true;
             if (tempBuff.muteFootstepSound)
                 MuteFootstepSound = true;
+            if (buff.GetRemoveBuffWhenAttackChance() > 0f)
+                HavingChanceToRemoveBuffWhenAttack = true;
+            if (buff.GetRemoveBuffWhenAttackedChance() > 0f)
+                HavingChanceToRemoveBuffWhenAttacked = true;
+            if (buff.GetRemoveBuffWhenUseSkillChance() > 0f)
+                HavingChanceToRemoveBuffWhenUseSkill = true;
+            if (buff.GetRemoveBuffWhenUseItemChance() > 0f)
+                HavingChanceToRemoveBuffWhenUseItem = true;
+            if (buff.GetRemoveBuffWhenPickupItemChance() > 0f)
+                HavingChanceToRemoveBuffWhenPickupItem = true;
         }
 
         public bool AllAilmentsWereApplied()
@@ -268,7 +314,12 @@ namespace MultiplayerARPG
                 DisallowUseItem &&
                 FreezeAnimation &&
                 IsHide &&
-                MuteFootstepSound;
+                MuteFootstepSound &&
+                HavingChanceToRemoveBuffWhenAttack &&
+                HavingChanceToRemoveBuffWhenAttacked &&
+                HavingChanceToRemoveBuffWhenUseSkill &&
+                HavingChanceToRemoveBuffWhenUseItem &&
+                HavingChanceToRemoveBuffWhenPickupItem;
         }
         #endregion
     }

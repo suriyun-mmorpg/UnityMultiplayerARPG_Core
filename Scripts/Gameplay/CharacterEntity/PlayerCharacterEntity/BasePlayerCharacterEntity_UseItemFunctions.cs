@@ -34,6 +34,8 @@ namespace MultiplayerARPG
 
             usableItem.UseItem(this, itemIndex, tempCharacterItem);
             LastUseItemTimes[itemDataId] = time;
+            // Do something with buffs when use item
+            SkillAndBuffComponent.OnUseItem();
 #endif
         }
     }

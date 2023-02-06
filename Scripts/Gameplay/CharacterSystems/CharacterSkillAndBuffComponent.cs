@@ -143,5 +143,135 @@ namespace MultiplayerARPG
                 updatingTime = 0;
             }
         }
+
+        public void OnAttack()
+        {
+            CharacterDataCache cache = Entity.GetCaches();
+            if (!cache.HavingChanceToRemoveBuffWhenAttack)
+                return;
+            bool stillHavingChance = false;
+            CharacterBuff buff;
+            float chance;
+            for (int i = Entity.Buffs.Count - 1; i >= 0; --i)
+            {
+                buff = Entity.Buffs[i];
+                chance = buff.GetBuff().GetRemoveBuffWhenAttackChance();
+                if (chance > 0)
+                {
+                    if (Random.value > chance)
+                    {
+                        stillHavingChance = true;
+                        continue;
+                    }
+                    Entity.Buffs.RemoveAt(i);
+                }
+            }
+            if (!stillHavingChance)
+                cache.ClearChanceToRemoveBuffWhenAttack();
+        }
+
+        public void OnAttacked()
+        {
+            CharacterDataCache cache = Entity.GetCaches();
+            if (!cache.HavingChanceToRemoveBuffWhenAttacked)
+                return;
+            bool stillHavingChance = false;
+            CharacterBuff buff;
+            float chance;
+            for (int i = Entity.Buffs.Count - 1; i >= 0; --i)
+            {
+                buff = Entity.Buffs[i];
+                chance = buff.GetBuff().GetRemoveBuffWhenAttackedChance();
+                if (chance > 0)
+                {
+                    if (Random.value > chance)
+                    {
+                        stillHavingChance = true;
+                        continue;
+                    }
+                    Entity.Buffs.RemoveAt(i);
+                }
+            }
+            if (!stillHavingChance)
+                cache.ClearChanceToRemoveBuffWhenAttacked();
+        }
+
+        public void OnUseSkill()
+        {
+            CharacterDataCache cache = Entity.GetCaches();
+            if (!cache.HavingChanceToRemoveBuffWhenUseSkill)
+                return;
+            bool stillHavingChance = false;
+            CharacterBuff buff;
+            float chance;
+            for (int i = Entity.Buffs.Count - 1; i >= 0; --i)
+            {
+                buff = Entity.Buffs[i];
+                chance = buff.GetBuff().GetRemoveBuffWhenUseSkillChance();
+                if (chance > 0)
+                {
+                    if (Random.value > chance)
+                    {
+                        stillHavingChance = true;
+                        continue;
+                    }
+                    Entity.Buffs.RemoveAt(i);
+                }
+            }
+            if (!stillHavingChance)
+                cache.ClearChanceToRemoveBuffWhenUseSkill();
+        }
+
+        public void OnUseItem()
+        {
+            CharacterDataCache cache = Entity.GetCaches();
+            if (!cache.HavingChanceToRemoveBuffWhenUseItem)
+                return;
+            bool stillHavingChance = false;
+            CharacterBuff buff;
+            float chance;
+            for (int i = Entity.Buffs.Count - 1; i >= 0; --i)
+            {
+                buff = Entity.Buffs[i];
+                chance = buff.GetBuff().GetRemoveBuffWhenUseItemChance();
+                if (chance > 0)
+                {
+                    if (Random.value > chance)
+                    {
+                        stillHavingChance = true;
+                        continue;
+                    }
+                    Entity.Buffs.RemoveAt(i);
+                }
+            }
+            if (!stillHavingChance)
+                cache.ClearChanceToRemoveBuffWhenUseItem();
+        }
+
+        public void OnPickupItem()
+        {
+            CharacterDataCache cache = Entity.GetCaches();
+            if (!cache.HavingChanceToRemoveBuffWhenPickupItem)
+                return;
+            bool stillHavingChance = false;
+            CharacterBuff buff;
+            float chance;
+            for (int i = Entity.Buffs.Count - 1; i >= 0; --i)
+            {
+                buff = Entity.Buffs[i];
+                chance = buff.GetBuff().GetRemoveBuffWhenPickupItemChance();
+                if (chance > 0)
+                {
+                    if (Random.value > chance)
+                    {
+                        stillHavingChance = true;
+                        continue;
+                    }
+                    Entity.Buffs.RemoveAt(i);
+                }
+            }
+            if (!stillHavingChance)
+                cache.ClearChanceToRemoveBuffWhenPickupItem();
+        }
     }
 }

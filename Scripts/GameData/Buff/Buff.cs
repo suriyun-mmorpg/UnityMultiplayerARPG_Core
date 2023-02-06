@@ -10,8 +10,10 @@ namespace MultiplayerARPG
         [Header("Generic Settings")]
         public string tag;
         public string[] restrictTags;
-        [Tooltip("1 = 100% chance to not apply the buff")]
-        public IncrementalFloat failChance;
+        [Tooltip("If it is not enable, it will have 100% chance to apply the buff")]
+        public bool enableApplyChance;
+        [Tooltip("1 = 100% chance to apply the buff")]
+        public IncrementalFloat applyChance;
 
         [Header("Settings for Passive and Active Skills")]
         [Tooltip("Increase character's stats.")]
@@ -33,7 +35,6 @@ namespace MultiplayerARPG
         [Tooltip("Increase character's damages.")]
         [ArrayElementTitle("damageElement")]
         public DamageIncremental[] increaseDamages;
-
         [Header("Settings for Active Skills only")]
         [Tooltip("If duration less than or equals to 0, buff stats won't applied only recovery will be applied. This won't be applied to monster's summoner.")]
         public IncrementalFloat duration;
@@ -62,6 +63,16 @@ namespace MultiplayerARPG
         public bool disallowUseItem;
         [Tooltip("Freeze animation while the buff is applied")]
         public bool freezeAnimation;
+        [Tooltip("1 = 100% chance to remove the buff when attacking")]
+        public IncrementalFloat removeBuffWhenAttackChance;
+        [Tooltip("1 = 100% chance to remove the buff when attacked")]
+        public IncrementalFloat removeBuffWhenAttackedChance;
+        [Tooltip("1 = 100% chance to remove the buff when using skill")]
+        public IncrementalFloat removeBuffWhenUseSkillChance;
+        [Tooltip("1 = 100% chance to remove the buff when using item")]
+        public IncrementalFloat removeBuffWhenUseItemChance;
+        [Tooltip("1 = 100% chance to remove the buff when picking item up")]
+        public IncrementalFloat removeBuffWhenPickupItemChance;
         [Tooltip("Hide character. This won't be applied to monster's summoner.")]
         public bool isHide;
         [Tooltip("Mute character movement sound while applied. This won't be applied to monster's summoner.")]

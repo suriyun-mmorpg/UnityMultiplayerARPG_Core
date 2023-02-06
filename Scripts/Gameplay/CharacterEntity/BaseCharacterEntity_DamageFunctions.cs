@@ -182,6 +182,8 @@ namespace MultiplayerARPG
             }
             else
             {
+                // Do something with buffs when attacked
+                SkillAndBuffComponent.OnAttacked();
                 // Apply debuff if character is not dead
                 if (buff == null && skill != null && skill.IsDebuff)
                     ApplyBuff(skill.DataId, BuffType.SkillDebuff, skillLevel, instigator, weapon);

@@ -97,6 +97,12 @@ namespace MultiplayerARPG
                 LastAttackEndTime = Time.unscaledTime + (totalDuration / animSpeedRate);
             }
 
+            if (IsServer)
+            {
+                // Do something with buffs when attack
+                Entity.SkillAndBuffComponent.OnAttack();
+            }
+
             try
             {
                 // Play action animation

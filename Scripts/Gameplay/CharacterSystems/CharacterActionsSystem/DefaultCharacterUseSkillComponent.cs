@@ -116,9 +116,9 @@ namespace MultiplayerARPG
             // Set doing action state at clients and server
             SetUseSkillActionStates(animActionType, animActionDataId, skill, skillLevel);
 
-            // Update skill usage states at server only
             if (IsServer)
             {
+                // Update skill usage states at server only
                 CharacterSkillUsage newSkillUsage;
                 int skillUsageIndex = Entity.IndexOfSkillUsage(skill.DataId, SkillUsageType.Skill);
                 if (skillUsageIndex >= 0)
@@ -133,6 +133,8 @@ namespace MultiplayerARPG
                     newSkillUsage.Use(Entity, skillLevel);
                     Entity.SkillUsages.Add(newSkillUsage);
                 }
+                // Do something with buffs when use skill
+                Entity.SkillAndBuffComponent.OnUseSkill();
             }
 
             // Prepare required data and get damages data

@@ -54,7 +54,7 @@ namespace MultiplayerARPG
                     break;
             }
 
-            if (Random.value <= tempBuff.failChance.GetAmount(Level))
+            if (tempBuff.enableApplyChance && Random.value > tempBuff.applyChance.GetAmount(Level))
             {
                 // Failed, so buff won't be applied
                 return;

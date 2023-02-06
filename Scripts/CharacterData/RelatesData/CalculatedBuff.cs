@@ -20,6 +20,11 @@ namespace MultiplayerARPG
         private Dictionary<DamageElement, float> cacheIncreaseArmors;
         private Dictionary<DamageElement, MinMaxFloat> cacheIncreaseDamages;
         private Dictionary<DamageElement, MinMaxFloat> cacheDamageOverTimes;
+        private float cacheRemoveBuffWhenAttackChance;
+        private float cacheRemoveBuffWhenAttackedChance;
+        private float cacheRemoveBuffWhenUseSkillChance;
+        private float cacheRemoveBuffWhenUseItemChance;
+        private float cacheRemoveBuffWhenPickupItemChance;
         private int cacheMaxStack;
 
         public CalculatedBuff(Buff buff, int level)
@@ -40,6 +45,11 @@ namespace MultiplayerARPG
             cacheIncreaseArmors = buff.GetIncreaseArmors(level);
             cacheIncreaseDamages = buff.GetIncreaseDamages(level);
             cacheDamageOverTimes = buff.GetDamageOverTimes(level);
+            cacheRemoveBuffWhenAttackChance = buff.GetRemoveBuffWhenAttackChance(level);
+            cacheRemoveBuffWhenAttackedChance = buff.GetRemoveBuffWhenAttackedChance(level);
+            cacheRemoveBuffWhenUseSkillChance = buff.GetRemoveBuffWhenUseSkillChance(level);
+            cacheRemoveBuffWhenUseItemChance = buff.GetRemoveBuffWhenUseItemChance(level);
+            cacheRemoveBuffWhenPickupItemChance = buff.GetRemoveBuffWhenPickupItemChance(level);
             cacheMaxStack = buff.GetMaxStack(level);
         }
 
@@ -121,6 +131,31 @@ namespace MultiplayerARPG
         public Dictionary<DamageElement, MinMaxFloat> GetDamageOverTimes()
         {
             return cacheDamageOverTimes;
+        }
+
+        public float GetRemoveBuffWhenAttackChance()
+        {
+            return cacheRemoveBuffWhenAttackChance;
+        }
+
+        public float GetRemoveBuffWhenAttackedChance()
+        {
+            return cacheRemoveBuffWhenAttackedChance;
+        }
+
+        public float GetRemoveBuffWhenUseSkillChance()
+        {
+            return cacheRemoveBuffWhenUseSkillChance;
+        }
+
+        public float GetRemoveBuffWhenUseItemChance()
+        {
+            return cacheRemoveBuffWhenUseItemChance;
+        }
+
+        public float GetRemoveBuffWhenPickupItemChance()
+        {
+            return cacheRemoveBuffWhenPickupItemChance;
         }
 
         public int MaxStack()
