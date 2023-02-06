@@ -241,6 +241,9 @@ namespace MultiplayerARPG
             userCash.onChange += OnUserCashChange;
             partyId.onChange += OnPartyIdChange;
             guildId.onChange += OnGuildIdChange;
+            iconDataId.onChange += OnIconDataIdChange;
+            frameDataId.onChange += OnFrameDataIdChange;
+            titleDataId.onChange += OnTitleDataIdChange;
             isWarping.onChange += OnIsWarpingChange;
             // On list changes events
             hotkeys.onOperation += OnHotkeysOperation;
@@ -263,6 +266,9 @@ namespace MultiplayerARPG
             userCash.onChange -= OnUserCashChange;
             partyId.onChange -= OnPartyIdChange;
             guildId.onChange -= OnGuildIdChange;
+            iconDataId.onChange -= OnIconDataIdChange;
+            frameDataId.onChange -= OnFrameDataIdChange;
+            titleDataId.onChange -= OnTitleDataIdChange;
             isWarping.onChange -= OnIsWarpingChange;
             // On list changes events
             hotkeys.onOperation -= OnHotkeysOperation;
@@ -398,6 +404,25 @@ namespace MultiplayerARPG
         {
             if (onGuildIdChange != null)
                 onGuildIdChange.Invoke(guildId);
+        }
+
+        private void OnIconDataIdChange(bool isInitial, int guildId)
+        {
+            if (onIconDataIdChange != null)
+                onIconDataIdChange.Invoke(guildId);
+        }
+
+        private void OnFrameDataIdChange(bool isInitial, int guildId)
+        {
+            if (onFrameDataIdChange != null)
+                onFrameDataIdChange.Invoke(guildId);
+        }
+
+        private void OnTitleDataIdChange(bool isInitial, int guildId)
+        {
+            if (onTitleDataIdChange != null)
+                onTitleDataIdChange.Invoke(guildId);
+            isRecaching = true;
         }
 
         private void OnIsWarpingChange(bool isInitial, bool isWarping)

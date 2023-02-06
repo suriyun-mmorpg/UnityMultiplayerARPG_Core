@@ -15,6 +15,9 @@ namespace MultiplayerARPG
         public event System.Action<int> onUserCashChange;
         public event System.Action<int> onPartyIdChange;
         public event System.Action<int> onGuildIdChange;
+        public event System.Action<int> onIconDataIdChange;
+        public event System.Action<int> onFrameDataIdChange;
+        public event System.Action<int> onTitleDataIdChange;
         public event System.Action<bool> onIsWarpingChange;
         // Sync lists
         public event System.Action<LiteNetLibSyncList.Operation, int> onHotkeysOperation;
