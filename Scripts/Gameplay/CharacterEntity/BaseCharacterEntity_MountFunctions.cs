@@ -29,5 +29,11 @@ namespace MultiplayerARPG
             // Seat index for mount entity always 0
             EnterVehicle(vehicle, 0);
         }
+
+        public override void SetPassengingVehicle(byte seatIndex, IVehicleEntity vehicleEntity)
+        {
+            base.SetPassengingVehicle(seatIndex, vehicleEntity);
+            isRecaching = true;
+        }
     }
 }

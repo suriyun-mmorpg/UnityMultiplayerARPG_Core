@@ -877,12 +877,12 @@ namespace MultiplayerARPG
             Teleport(exitPosition, exitRotation);
         }
 
-        public void ClearPassengingVehicle()
+        public virtual void ClearPassengingVehicle()
         {
             SetPassengingVehicle(0, null);
         }
 
-        public void SetPassengingVehicle(byte seatIndex, IVehicleEntity vehicleEntity)
+        public virtual void SetPassengingVehicle(byte seatIndex, IVehicleEntity vehicleEntity)
         {
             PassengingVehicleSeatIndex = seatIndex;
             PassengingVehicleEntity = vehicleEntity;

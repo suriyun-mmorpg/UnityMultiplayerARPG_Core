@@ -292,15 +292,6 @@ namespace MultiplayerARPG
         }
         #endregion
 
-        /// <summary>
-        /// This will be called when vehicle entity changed
-        /// </summary>
-        /// <param name="vehicleEntity"></param>
-        private void OnVehicleEntityChanged(IVehicleEntity vehicleEntity)
-        {
-            isRecaching = true;
-        }
-
         #region Sync data changed callback
         /// <summary>
         /// This will be called when id changed
