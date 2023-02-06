@@ -42,6 +42,7 @@ namespace MultiplayerARPG.GameData.Model.Playables
         protected Coroutine actionCoroutine = null;
         protected bool isDoingAction = false;
         protected EquipWeapons oldEquipWeapons = null;
+        protected System.Action onStopAction = null;
 
         protected override void Awake()
         {
@@ -175,12 +176,17 @@ namespace MultiplayerARPG.GameData.Model.Playables
                 oldEquipWeapons = newEquipWeapons;
             if (Time.unscaledTime - AwakenTime < 1f || isDoingAction || !newEquipWeapons.IsDiffer(oldEquipWeapons, out bool rightIsDiffer, out bool leftIsDiffer))
             {
-                if (newEquipWeapons != null)
-                    oldEquipWeapons = newEquipWeapons.Clone();
-                base.SetEquipWeapons(newEquipWeapons);
+                SetNewEquipWeapons(newEquipWeapons);
                 return;
             }
-            StartActionCoroutine(PlayEquipWeaponsAnimationRoutine(newEquipWeapons, rightIsDiffer, leftIsDiffer));
+            StartActionCoroutine(PlayEquipWeaponsAnimationRoutine(newEquipWeapons, rightIsDiffer, leftIsDiffer), () => SetNewEquipWeapons(newEquipWeapons));
+        }
+
+        private void SetNewEquipWeapons(EquipWeapons newEquipWeapons)
+        {
+            if (newEquipWeapons != null)
+                oldEquipWeapons = newEquipWeapons.Clone();
+            base.SetEquipWeapons(newEquipWeapons);
         }
 
         private IEnumerator PlayEquipWeaponsAnimationRoutine(EquipWeapons newEquipWeapons, bool rightIsDiffer, bool leftIsDiffer)
@@ -265,9 +271,8 @@ namespace MultiplayerARPG.GameData.Model.Playables
             }
 
             // Switch weapon items
-            if (newEquipWeapons != null)
-                oldEquipWeapons = newEquipWeapons.Clone();
-            base.SetEquipWeapons(newEquipWeapons);
+            SetNewEquipWeapons(newEquipWeapons);
+            onStopAction = null;
 
             if (animationDelay - holsteredDelay > 0f)
             {
@@ -547,20 +552,27 @@ namespace MultiplayerARPG.GameData.Model.Playables
         }
         #endregion
 
-        protected Coroutine StartActionCoroutine(IEnumerator routine)
+        protected Coroutine StartActionCoroutine(IEnumerator routine, System.Action onStopAction = null)
         {
             StopActionCoroutine();
             isDoingAction = true;
             actionCoroutine = StartCoroutine(routine);
+            this.onStopAction = onStopAction;
             return actionCoroutine;
         }
 
         protected void StopActionCoroutine()
         {
+            if (isDoingAction)
+            {
+                if (onStopAction != null)
+                    onStopAction.Invoke();
+            }
             if (actionCoroutine != null)
                 StopCoroutine(actionCoroutine);
             actionCoroutine = null;
             isDoingAction = false;
+            onStopAction = null;
         }
     }
 }
