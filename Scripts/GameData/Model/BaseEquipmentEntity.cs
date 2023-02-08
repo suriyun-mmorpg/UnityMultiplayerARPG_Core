@@ -7,6 +7,7 @@ using UnityEditor;
 
 namespace MultiplayerARPG
 {
+    [DisallowMultipleComponent]
     public abstract partial class BaseEquipmentEntity : MonoBehaviour, IPoolDescriptorCollection
     {
         public BaseCharacterModel CharacterModel { get; set; }
