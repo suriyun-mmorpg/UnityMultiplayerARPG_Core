@@ -120,10 +120,7 @@ namespace MultiplayerARPG
                 // This attribute is valid, so not have to add it
                 if (validAttributeIds.Contains(attribute.DataId))
                     continue;
-                CharacterAttribute characterAttribute = new CharacterAttribute();
-                characterAttribute.dataId = attribute.DataId;
-                characterAttribute.amount = 0;
-                character.Attributes.Add(characterAttribute);
+                character.Attributes.Add(CharacterAttribute.Create(attribute.DataId, 0));
             }
             // Validating character skills
             int returningSkillPoint = 0;
@@ -151,10 +148,7 @@ namespace MultiplayerARPG
                 // This skill is valid, so not have to add it
                 if (validSkillIds.Contains(skill.DataId))
                     continue;
-                CharacterSkill characterSkill = new CharacterSkill();
-                characterSkill.dataId = skill.DataId;
-                characterSkill.level = 0;
-                character.Skills.Add(characterSkill);
+                character.Skills.Add(CharacterSkill.Create(skill.DataId, 0));
             }
             // Validating character equip weapons
             List<CharacterItem> returningItems = new List<CharacterItem>();
@@ -211,17 +205,11 @@ namespace MultiplayerARPG
             // Attributes
             foreach (Attribute attribute in GameInstance.Attributes.Values)
             {
-                CharacterAttribute characterAttribute = new CharacterAttribute();
-                characterAttribute.dataId = attribute.DataId;
-                characterAttribute.amount = 0;
-                character.Attributes.Add(characterAttribute);
+                character.Attributes.Add(CharacterAttribute.Create(attribute.DataId, 0));
             }
             foreach (BaseSkill skill in playerCharacter.CacheSkillLevels.Keys)
             {
-                CharacterSkill characterSkill = new CharacterSkill();
-                characterSkill.dataId = skill.DataId;
-                characterSkill.level = 0;
-                character.Skills.Add(characterSkill);
+                character.Skills.Add(CharacterSkill.Create(skill.DataId, 0));
             }
             // Prepare weapon sets
             character.FillWeaponSetsIfNeeded(character.EquipWeaponSet);
@@ -789,10 +777,11 @@ namespace MultiplayerARPG
 
         public static bool AddAttribute(this IPlayerCharacterData characterData, out UITextKeys gameMessage, int dataId, int amount = 1, int itemIndex = -1)
         {
-            gameMessage = UITextKeys.NONE;
-            Attribute attribute;
-            if (!GameInstance.Attributes.TryGetValue(dataId, out attribute))
+            if (!GameInstance.Attributes.TryGetValue(dataId, out Attribute attribute))
+            {
+                gameMessage = UITextKeys.UI_ERROR_INVALID_ATTRIBUTE_DATA;
                 return false;
+            }
 
             CharacterAttribute characterAtttribute;
             int index = characterData.IndexOfAttribute(dataId);
@@ -857,9 +846,7 @@ namespace MultiplayerARPG
 
         public static bool AddSkill(this IPlayerCharacterData characterData, out UITextKeys gameMessageType, int dataId, int level = 1, int itemIndex = -1)
         {
-            gameMessageType = UITextKeys.NONE;
-            BaseSkill skill;
-            if (!GameInstance.Skills.TryGetValue(dataId, out skill))
+            if (!GameInstance.Skills.TryGetValue(dataId, out BaseSkill skill))
             {
                 gameMessageType = UITextKeys.UI_ERROR_INVALID_SKILL_DATA;
                 return false;
