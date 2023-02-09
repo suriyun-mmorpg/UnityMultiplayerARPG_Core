@@ -53,6 +53,7 @@ namespace MultiplayerARPG
                     }
                     else
                     {
+                        // Already check for the storage index, so don't do it again
                         if (playerCharacter.NonEquipItems[inventoryItemIndex].IsEmptySlot())
                         {
                             // Replace empty slot
@@ -97,6 +98,8 @@ namespace MultiplayerARPG
             playerCharacter.FillWeaponSetsIfNeeded(equipSlotIndexOrWeaponSet);
             EquipWeapons equipWeapons = playerCharacter.SelectableWeaponSets[equipSlotIndexOrWeaponSet];
             CharacterItem movingItem;
+
+            // Validate item index
             switch (inventoryType)
             {
                 case InventoryType.EquipWeaponLeft:
@@ -116,6 +119,11 @@ namespace MultiplayerARPG
                     movingItem = equipWeapons.rightHand.Clone(true);
                     break;
                 case InventoryType.EquipItems:
+                    if (inventoryItemIndex < 0 || inventoryItemIndex >= playerCharacter.EquipItems.Count)
+                    {
+                        gameMessage = UITextKeys.UI_ERROR_INVALID_ITEM_INDEX;
+                        return false;
+                    }
                     if (playerCharacter.EquipItems[inventoryItemIndex].IsEmptySlot())
                     {
                         gameMessage = UITextKeys.UI_ERROR_INVALID_ITEM_INDEX;
@@ -124,6 +132,11 @@ namespace MultiplayerARPG
                     movingItem = playerCharacter.EquipItems[inventoryItemIndex].Clone(true);
                     break;
                 default:
+                    if (inventoryItemIndex < 0 || inventoryItemIndex >= playerCharacter.NonEquipItems.Count)
+                    {
+                        gameMessage = UITextKeys.UI_ERROR_INVALID_ITEM_INDEX;
+                        return false;
+                    }
                     if (playerCharacter.NonEquipItems[inventoryItemIndex].IsEmptySlot())
                     {
                         gameMessage = UITextKeys.UI_ERROR_INVALID_ITEM_INDEX;
@@ -197,6 +210,7 @@ namespace MultiplayerARPG
                     }
                     else
                     {
+                        // Already check for the storage index, so don't do it again
                         if (storageItems[storageItemIndex].IsEmptySlot())
                         {
                             // Replace empty slot
@@ -231,6 +245,11 @@ namespace MultiplayerARPG
             byte equipSlotIndexOrWeaponSet,
             out UITextKeys gameMessage)
         {
+            if (storageItemIndex >= storageItems.Count)
+            {
+                gameMessage = UITextKeys.UI_ERROR_INVALID_ITEM_INDEX;
+                return false;
+            }
             CharacterItem movingItem = storageItems[storageItemIndex].Clone(true);
             if (movingItem.IsEmptySlot())
             {
