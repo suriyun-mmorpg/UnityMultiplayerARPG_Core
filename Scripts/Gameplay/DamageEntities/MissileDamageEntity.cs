@@ -32,6 +32,7 @@ namespace MultiplayerARPG
         protected float launchTime;
         protected float missileDuration;
         protected bool destroying;
+        protected float? lagMoveSpeedRate;
         protected Vector3? previousPosition;
         protected RaycastHit2D[] hits2D = new RaycastHit2D[8];
         protected RaycastHit[] hits3D = new RaycastHit[8];
@@ -188,16 +189,36 @@ namespace MultiplayerARPG
                 return;
             }
 
+            float currentMissileSpeed = CalculateCurrentMoveSpeed(missileSpeed, Time.fixedDeltaTime);
             if (CurrentGameInstance.DimensionType == DimensionType.Dimension2D)
             {
                 if (CacheRigidbody2D != null)
-                    CacheRigidbody2D.velocity = -CacheTransform.up * missileSpeed;
+                    CacheRigidbody2D.velocity = -CacheTransform.up * currentMissileSpeed;
             }
             else
             {
                 if (CacheRigidbody != null)
-                    CacheRigidbody.velocity = CacheTransform.forward * missileSpeed;
+                    CacheRigidbody.velocity = CacheTransform.forward * currentMissileSpeed;
             }
+        }
+
+        protected float CalculateCurrentMoveSpeed(float maxMoveSpeed, float deltaTime)
+        {
+            // Adjust speed by rtt
+            if (!IsServer && instigator.TryGetEntity(out BaseGameEntity entity) && entity.IsOwnerClient)
+            {
+                float rtt = 0.001f * CurrentGameManager.Rtt;
+                float acc = 1f / rtt * deltaTime * 0.5f;
+                if (!lagMoveSpeedRate.HasValue)
+                    lagMoveSpeedRate = 0f;
+                if (lagMoveSpeedRate < 1f)
+                    lagMoveSpeedRate += acc;
+                if (lagMoveSpeedRate > 1f)
+                    lagMoveSpeedRate = 1f;
+                return maxMoveSpeed * lagMoveSpeedRate.Value;
+            }
+            // TODO: Adjust other's client move speed by rtt
+            return maxMoveSpeed;
         }
 
         protected override void OnPushBack()
