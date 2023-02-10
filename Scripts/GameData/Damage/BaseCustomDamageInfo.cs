@@ -19,6 +19,7 @@ namespace MultiplayerARPG
         public abstract Transform GetDamageTransform(BaseCharacterEntity attacker, bool isLeftHand);
         public abstract float GetDistance();
         public abstract float GetFov();
+        public abstract bool IsHitReachedMax(int alreadyHitCount);
 
         public virtual void PrepareRelatesData()
         {

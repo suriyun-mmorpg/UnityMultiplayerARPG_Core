@@ -276,6 +276,10 @@ namespace MultiplayerARPG
                 fireStagger = weapon.GetWeaponItem().FireStagger;
             }
 
+            // Prepare hit reg validatation, hit reg will be made from client later
+            if (IsServer && !IsOwnerClient && !IsOwnedByServer)
+                BaseGameNetworkManager.Singleton.HitRegistrationManager.PrepareHitRegValidatation(damageInfo, randomSeed, fireSpread, Entity, damageAmounts, weapon, null, 0);
+
             // Fire
             System.Random random = new System.Random(randomSeed);
             Vector3 stagger;
@@ -296,9 +300,6 @@ namespace MultiplayerARPG
                     stagger,
                     out _);
             }
-
-            if (IsServer && !IsOwnerClient && !IsOwnedByServer)
-                BaseGameNetworkManager.Singleton.HitRegistrationManager.PrepareHitRegValidatation(damageInfo, randomSeed, fireSpread, Entity, damageAmounts, weapon, null, 0);
         }
 
         [AllRpc]

@@ -102,6 +102,9 @@ namespace MultiplayerARPG
             if (IsAttack)
             {
                 DamageInfo damageInfo = GetDamageInfo(skillUser, isLeftHand);
+                // Prepare hit reg validatation, hit reg will be made from client later
+                if (skillUser.IsServer && !skillUser.IsOwnerClient && !skillUser.IsOwnedByServer)
+                    BaseGameNetworkManager.Singleton.HitRegistrationManager.PrepareHitRegValidatation(damageInfo, randomSeed, 0, skillUser, damageAmounts, weapon, this, skillLevel);
                 // Launch damage entity to apply damage to other characters
                 damageInfo.LaunchDamageEntity(
                     skillUser,
@@ -114,9 +117,6 @@ namespace MultiplayerARPG
                     aimPosition,
                     Vector3.zero,
                     out _);
-
-                if (skillUser.IsServer && !skillUser.IsOwnerClient && !skillUser.IsOwnedByServer)
-                    BaseGameNetworkManager.Singleton.HitRegistrationManager.PrepareHitRegValidatation(damageInfo, randomSeed, 0, skillUser, damageAmounts, weapon, this, skillLevel);
             }
         }
 

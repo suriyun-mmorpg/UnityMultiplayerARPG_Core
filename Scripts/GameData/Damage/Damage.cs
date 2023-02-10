@@ -454,6 +454,22 @@ namespace MultiplayerARPG
             if (impactEffects != null)
                 impactEffects.PrepareRelatesData();
         }
+
+        public bool IsHitReachedMax(int alreadyHitCount)
+        {
+            switch (damageType)
+            {
+                case DamageType.Melee:
+                case DamageType.Missile:
+                case DamageType.Throwable:
+                    return alreadyHitCount < 0;
+                case DamageType.Raycast:
+                    return alreadyHitCount <= 0 || alreadyHitCount < pierceThroughEntities;
+                case DamageType.Custom:
+                    return customDamageInfo.IsHitReachedMax(alreadyHitCount);
+            }
+            return false;
+        }
     }
 
     [System.Serializable]

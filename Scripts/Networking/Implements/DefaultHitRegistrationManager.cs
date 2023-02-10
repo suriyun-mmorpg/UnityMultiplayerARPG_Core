@@ -1,4 +1,4 @@
-using Cysharp.Threading.Tasks;
+using Cysharp.Text;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -31,6 +31,7 @@ namespace MultiplayerARPG
                 FireSpread = fireSpread,
                 Attacker = attacker,
                 DamageAmounts = damageAmounts,
+                DamageInfo = damageInfo,
                 Weapon = weapon,
                 Skill = skill,
                 SkillLevel = skillLevel,
@@ -56,6 +57,7 @@ namespace MultiplayerARPG
             if (!registerHits.ContainsKey(id) || !validateHits.ContainsKey(id))
                 return false;
 
+            HashSet<string> hitHitboxes = new HashSet<string>();
             while (registerHits[id].Count > 0)
             {
                 if (registerHits[id].Count > validateHits[id].FireSpread + 1)
@@ -64,16 +66,27 @@ namespace MultiplayerARPG
                     registerHits[id].RemoveAt(0);
                     continue;
                 }
-                DamageableEntity damageableEntity;
+                hitHitboxes.Clear();
                 for (int i = 0; i < registerHits[id][0].HitDataCollection.Count; ++i)
                 {
-                    if (!BaseGameNetworkManager.Singleton.TryGetEntityByObjectId(registerHits[id][0].HitDataCollection[i].HitObjectId, out damageableEntity) ||
-                        registerHits[id][0].HitDataCollection[i].HitBoxIndex >= damageableEntity.HitBoxes.Length)
+                    if (!BaseGameNetworkManager.Singleton.TryGetEntityByObjectId(registerHits[id][0].HitDataCollection[i].HitObjectId, out DamageableEntity damageableEntity) ||
+                        registerHits[id][0].HitDataCollection[i].HitBoxIndex < 0 || registerHits[id][0].HitDataCollection[i].HitBoxIndex >= damageableEntity.HitBoxes.Length)
                     {
                         // Can't find target or invalid hitbox
-                        registerHits[id].RemoveAt(0);
                         continue;
                     }
+                    if (!validateHits[id].DamageInfo.IsHitReachedMax(hitHitboxes.Count))
+                    {
+                        // Can't hit because it is reaching max amount of objects that can be hit
+                        continue;
+                    }
+                    string hitId = ZString.Concat(registerHits[id][0].HitDataCollection[i].HitObjectId, "_", registerHits[id][0].HitDataCollection[i].HitBoxIndex);
+                    if (hitHitboxes.Contains(hitId))
+                    {
+                        // Already hit to the hitbox, shouldn't be hit again
+                        continue;
+                    }
+                    hitHitboxes.Add(hitId);
                     DamageableHitBox hitBox = damageableEntity.HitBoxes[registerHits[id][0].HitDataCollection[i].HitBoxIndex];
                     // Valiate hitting
                     if (IsHit(attacker, registerHits[id][0], registerHits[id][0].HitDataCollection[i], hitBox))
@@ -102,12 +115,6 @@ namespace MultiplayerARPG
 
         public void PrepareToRegister(DamageInfo damageInfo, int randomSeed, BaseCharacterEntity attacker, Vector3 damagePosition, Vector3 damageDirection, List<HitData> hitDataCollection)
         {
-            if (!attacker.IsOwnerClient)
-            {
-                // Only owner client can prepare to register
-                return;
-            }
-
             if (!prepareHits.ContainsKey(randomSeed))
                 prepareHits.Add(randomSeed, new List<HitRegisterData>());
 
@@ -138,7 +145,7 @@ namespace MultiplayerARPG
 
         private static string MakeId(string attackerId, int randomSeed)
         {
-            return attackerId + "_" + randomSeed;
+            return ZString.Concat(attackerId, "_", randomSeed);
         }
     }
 }

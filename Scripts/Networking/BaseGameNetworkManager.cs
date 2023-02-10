@@ -564,15 +564,13 @@ namespace MultiplayerARPG
         protected void HandleClientEntityStateAtServer(MessageHandlerData messageHandler)
         {
             uint objectId = messageHandler.Reader.GetPackedUInt();
-            BaseGameEntity gameEntity;
-            if (Assets.TryGetSpawnedObject(objectId, out gameEntity) && gameEntity.Identity.ConnectionId == messageHandler.ConnectionId)
+            if (Assets.TryGetSpawnedObject(objectId, out BaseGameEntity gameEntity) && gameEntity.Identity.ConnectionId == messageHandler.ConnectionId)
                 gameEntity.ReadClientStateAtServer(messageHandler.Reader);
         }
 
         protected void HandleHitRegistrationAtServer(MessageHandlerData messageHandler)
         {
-            BasePlayerCharacterEntity gameEntity;
-            if (ServerUserHandlers.TryGetPlayerCharacter(messageHandler.ConnectionId, out gameEntity))
+            if (ServerUserHandlers.TryGetPlayerCharacter(messageHandler.ConnectionId, out BasePlayerCharacterEntity gameEntity))
                 HitRegistrationManager.Register(gameEntity, messageHandler.Reader.Get<HitRegisterMessage>());
         }
 
@@ -731,8 +729,7 @@ namespace MultiplayerARPG
                 Logging.Log("Spawning warp portals");
             if (GameInstance.MapWarpPortals.Count > 0)
             {
-                List<WarpPortal> mapWarpPortals;
-                if (GameInstance.MapWarpPortals.TryGetValue(CurrentMapInfo.Id, out mapWarpPortals))
+                if (GameInstance.MapWarpPortals.TryGetValue(CurrentMapInfo.Id, out List<WarpPortal> mapWarpPortals))
                 {
                     WarpPortal warpPortal;
                     WarpPortalEntity warpPortalPrefab;
@@ -769,8 +766,7 @@ namespace MultiplayerARPG
                 Logging.Log("Spawning NPCs");
             if (GameInstance.MapNpcs.Count > 0)
             {
-                List<Npc> mapNpcs;
-                if (GameInstance.MapNpcs.TryGetValue(CurrentMapInfo.Id, out mapNpcs))
+                if (GameInstance.MapNpcs.TryGetValue(CurrentMapInfo.Id, out List<Npc> mapNpcs))
                 {
                     Npc npc;
                     NpcEntity npcPrefab;
