@@ -98,6 +98,12 @@ namespace MultiplayerARPG
             {
                 onlyNewMails = onlyNewMails,
             }, MailListCallback);
+            // Update notification count
+            UIMailNotification[] notifications = FindObjectsOfType<UIMailNotification>();
+            for (int i = 0; i < notifications.Length; ++i)
+            {
+                notifications[i].Refresh();
+            }
         }
 
         protected virtual void MailListCallback(ResponseHandlerData requestHandler, AckResponseCode responseCode, ResponseMailListMessage response)

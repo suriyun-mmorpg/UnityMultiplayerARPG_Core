@@ -18,6 +18,12 @@ namespace MultiplayerARPG
         public void Refresh()
         {
             GameInstance.ClientFriendHandlers.RequestGetFriendRequests(GetFriendRequestsCallback);
+            // Update notification count
+            UIFriendRequestNotification[] notifications = FindObjectsOfType<UIFriendRequestNotification>();
+            for (int i = 0; i < notifications.Length; ++i)
+            {
+                notifications[i].Refresh();
+            }
         }
 
         private void GetFriendRequestsCallback(ResponseHandlerData responseHandler, AckResponseCode responseCode, ResponseGetFriendRequestsMessage response)
