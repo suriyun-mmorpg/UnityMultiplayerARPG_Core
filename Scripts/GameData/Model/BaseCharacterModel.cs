@@ -454,9 +454,17 @@ namespace MultiplayerARPG
                 if (tempEquipmentObject != null)
                 {
                     if (CacheRightHandEquipmentEntity == null && GameDataConst.EQUIP_POSITION_RIGHT_HAND.Equals(tempEquipmentModel.equipPosition))
+                    {
                         CacheRightHandEquipmentEntity = tempEquipmentObject.GetComponent<BaseEquipmentEntity>();
+                        if (CacheRightHandEquipmentEntity != null)
+                            CacheRightHandEquipmentEntity.Setup(this, tempEquipmentModel.equipPosition, tempEquipmentModel.itemLevel);
+                    }
                     if (CacheLeftHandEquipmentEntity == null && GameDataConst.EQUIP_POSITION_LEFT_HAND.Equals(tempEquipmentModel.equipPosition))
+                    {
                         CacheLeftHandEquipmentEntity = tempEquipmentObject.GetComponent<BaseEquipmentEntity>();
+                        if (CacheLeftHandEquipmentEntity != null)
+                            CacheLeftHandEquipmentEntity.Setup(this, tempEquipmentModel.equipPosition, tempEquipmentModel.itemLevel);
+                    }
                 }
             }
             EquippedModels = storingModels;
