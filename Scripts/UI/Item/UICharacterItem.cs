@@ -1501,6 +1501,8 @@ namespace MultiplayerARPG
         {
             if (selectionManager != null)
                 selectionManager.DeselectSelectedUI();
+            if (amount <= 0)
+                return;
             GameInstance.ClientInventoryHandlers.RequestSellItem(new RequestSellItemMessage()
             {
                 index = IndexOfData,
