@@ -182,7 +182,7 @@ namespace MultiplayerARPG
         protected virtual void ServerDropItem(int index, int amount)
         {
 #if UNITY_EDITOR || UNITY_SERVER
-            if (!CanDropItem() || index >= nonEquipItems.Count)
+            if (amount <= 0 || !CanDoActions() || index >= NonEquipItems.Count)
                 return;
 
             CharacterItem nonEquipItem = nonEquipItems[index];
