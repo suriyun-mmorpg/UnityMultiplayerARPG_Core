@@ -275,6 +275,9 @@ namespace MultiplayerARPG
         protected void ServerBuyNpcItem(int index, int amount)
         {
 #if UNITY_EDITOR || UNITY_SERVER
+            if (amount <= 0)
+                return;
+
             // Dialog must be built-in shop dialog
             NpcDialog dialog;
             if (!AccessingNpcShopDialog(out dialog))
