@@ -8,61 +8,16 @@ namespace MultiplayerARPG
 {
     public class BuildingMaterialBuildModeHandler : MonoBehaviour
     {
-        private class BuilingMaterialInteractData
-        {
-            internal BuildingMaterial Material { get; set; }
-            internal Func<bool> IntersectFunc { get; set; }
-        }
-        public const float BUILDING_MATERIAL_INTERSECT_DELAY = 0.25f;
         private BuildingMaterial buildingMaterial;
-        private Dictionary<int, BuilingMaterialInteractData> interactingMaterials = new Dictionary<int, BuilingMaterialInteractData>();
-        private float intersectCountDown = 0f;
 
-        public async void Setup(BuildingMaterial buildingMaterial)
+        public void Setup(BuildingMaterial buildingMaterial)
         {
             this.buildingMaterial = buildingMaterial;
-            gameObject.SetActive(false);
-            // Wait for next frame to make a Unity physics works properly
-            await UniTask.NextFrame();
-            gameObject.SetActive(true);
         }
 
-        private void Update()
+        private void OnTriggerStay(Collider other)
         {
-            if (interactingMaterials.Count == 0)
-            {
-                intersectCountDown = 0;
-                return;
-            }
-
-            if (intersectCountDown <= 0)
-            {
-                foreach (BuilingMaterialInteractData interactData in interactingMaterials.Values)
-                {
-                    HandleBuildingMaterialInteraction(interactData);
-                }
-                intersectCountDown = BUILDING_MATERIAL_INTERSECT_DELAY;
-            }
-            else
-            {
-                intersectCountDown -= Time.unscaledDeltaTime;
-            }
-        }
-
-        private bool HandleBuildingMaterialInteraction(BuilingMaterialInteractData interactData)
-        {
-            if (SameBuildingAreaTransform(interactData.Material.gameObject) || !interactData.IntersectFunc())
-            {
-                buildingMaterial.BuildingEntity.TriggerExitEntity(interactData.Material.Entity);
-                return false;
-            }
-            buildingMaterial.BuildingEntity.TriggerEnterEntity(interactData.Material.Entity);
-            return true;
-        }
-
-        private void OnTriggerEnter(Collider other)
-        {
-            TriggerEnter(other.gameObject, () => buildingMaterial.CacheCollider.ColliderIntersect(other, buildingMaterial.boundsSizeRateWhilePlacing));
+            TriggerEnter(other.gameObject, other, null);
         }
 
         private void OnTriggerExit(Collider other)
@@ -72,7 +27,7 @@ namespace MultiplayerARPG
 
         private void OnTriggerEnter2D(Collider2D other)
         {
-            TriggerEnter(other.gameObject, () => buildingMaterial.CacheCollider2D.ColliderIntersect(other, buildingMaterial.boundsSizeRateWhilePlacing));
+            TriggerEnter(other.gameObject, null, other);
         }
 
         private void OnTriggerExit2D(Collider2D other)
@@ -80,10 +35,13 @@ namespace MultiplayerARPG
             TriggerExit(other.gameObject);
         }
 
-        private void TriggerEnter(GameObject other, Func<bool> materialIntersectFunc)
+        private void TriggerEnter(GameObject other, Collider collider, Collider2D collider2D)
         {
-            if (!ValidateTriggerLayer(other))
+            if (!ValidateTriggerLayer(other) || SameBuildingAreaTransform(other))
+            {
+                buildingMaterial.BuildingEntity.TriggerExitGameObject(other);
                 return;
+            }
 
             if (buildingMaterial.BuildingEntity.TriggerEnterComponent(other.GetComponent<NoConstructionArea>()))
                 return;
@@ -91,50 +49,39 @@ namespace MultiplayerARPG
             if (buildingMaterial.BuildingEntity.TriggerEnterComponent(other.GetComponent<TilemapCollider2D>()))
                 return;
 
-            BuildingMaterial material = other.GetComponent<BuildingMaterial>();
-            if (material != null)
+            BuildingArea buildingArea = other.GetComponent<BuildingArea>();
+            if (buildingArea != null)
+                return;
+
+            bool foundMaterial = other.GetComponent<BuildingMaterial>() != null;
+            IGameEntity gameEntity = other.GetComponent<IGameEntity>();
+            if (!foundMaterial && !gameEntity.IsNull())
             {
-                if (!interactingMaterials.ContainsKey(material.GetInstanceID()))
-                {
-                    interactingMaterials.Add(material.GetInstanceID(), new BuilingMaterialInteractData()
-                    {
-                        Material = material,
-                        IntersectFunc = materialIntersectFunc,
-                    });
-                }
+                buildingMaterial.BuildingEntity.TriggerEnterEntity(gameEntity.Entity);
+                return;
             }
+
+            bool isMaterialOrNonTrigger = false;
+            if (!isMaterialOrNonTrigger && collider != null && !collider.isTrigger && buildingMaterial.CacheCollider.ColliderIntersect(collider, buildingMaterial.boundsSizeRateWhilePlacing))
+                isMaterialOrNonTrigger = true;
+            if (!isMaterialOrNonTrigger && collider2D != null && !collider2D.isTrigger && buildingMaterial.CacheCollider2D.ColliderIntersect(collider2D, buildingMaterial.boundsSizeRateWhilePlacing))
+                isMaterialOrNonTrigger = true;
+
+            if (isMaterialOrNonTrigger)
+                buildingMaterial.BuildingEntity.TriggerEnterGameObject(other);
             else
-            {
-                if (SameBuildingAreaTransform(other))
-                    return;
-                IGameEntity gameEntity = other.GetComponent<IGameEntity>();
-                if (!gameEntity.IsNull())
-                    buildingMaterial.BuildingEntity.TriggerEnterEntity(gameEntity.Entity);
-            }
+                buildingMaterial.BuildingEntity.TriggerExitGameObject(other);
+
         }
 
         private void TriggerExit(GameObject other)
         {
-            if (buildingMaterial.BuildingEntity.TriggerExitComponent(other.GetComponent<NoConstructionArea>()))
-                return;
-
-            if (buildingMaterial.BuildingEntity.TriggerExitComponent(other.GetComponent<TilemapCollider2D>()))
-                return;
-
-            // Removing the material from the intersect checking list
-            BuildingMaterial material = other.GetComponent<BuildingMaterial>();
-            if (material != null)
-                interactingMaterials.Remove(material.GetInstanceID());
-
-            // Material is derived from `IGameEntity`, so just find for `IGameEntity` is fine
-            IGameEntity gameEntity = other.GetComponent<IGameEntity>();
-            if (!gameEntity.IsNull())
-                buildingMaterial.BuildingEntity.TriggerExitEntity(gameEntity.Entity);
+            buildingMaterial.BuildingEntity.TriggerExitGameObject(other);
         }
 
         private bool SameBuildingAreaTransform(GameObject other)
         {
-            return buildingMaterial.BuildingEntity.BuildingArea != null && buildingMaterial.BuildingEntity.BuildingArea.transform.root == other.transform.root;
+            return buildingMaterial.BuildingEntity.BuildingArea != null && buildingMaterial.BuildingEntity.BuildingArea.transform == other.transform;
         }
 
         public bool ValidateTriggerLayer(GameObject gameObject)

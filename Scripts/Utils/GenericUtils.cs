@@ -288,12 +288,10 @@ public static class GenericUtils
 
     public static bool ColliderIntersect(this Collider source, Collider dest, float sourceSizeRate = 1f)
     {
-        Vector3 sourceSize;
-        Vector3[] sourcePoints;
-        source.GetActualSizeBoundsPoints(out sourceSize, out sourcePoints);
-        Vector3 sourceCenter = (sourcePoints[0] + sourcePoints[7]) * 0.5f;
-        Vector3 sourceHalf = sourceSize * sourceSizeRate * 0.5f;
-        Collider[] results = Physics.OverlapBox(sourceCenter, sourceHalf, source.transform.rotation, LayerMask.GetMask(LayerMask.LayerToName(dest.gameObject.layer)), QueryTriggerInteraction.Collide);
+        source.GetActualSizeBoundsPoints(out Vector3 sourceSize, out Vector3[] sourcePoints);
+        Vector3 center = (sourcePoints[0] + sourcePoints[7]) * 0.5f;
+        Vector3 size = sourceSize * sourceSizeRate;
+        Collider[] results = Physics.OverlapBox(center, size * 0.5f, Quaternion.identity, LayerMask.GetMask(LayerMask.LayerToName(dest.gameObject.layer)), QueryTriggerInteraction.Collide);
         for (int i = 0; i < results.Length; ++i)
         {
             if (results[i] == dest)
@@ -304,12 +302,10 @@ public static class GenericUtils
 
     public static bool ColliderIntersect(this Collider2D source, Collider2D dest, float sourceSizeRate = 1f)
     {
-        Vector3 sourceSize;
-        Vector3[] sourcePoints;
-        source.GetActualSizeBoundsPoints(out sourceSize, out sourcePoints);
-        Vector3 sourceCenter = (sourcePoints[0] + sourcePoints[7]) * 0.5f;
-        Vector3 sourceHalf = sourceSize * sourceSizeRate * 0.5f;
-        Collider2D[] results = Physics2D.OverlapBoxAll(sourceCenter, sourceHalf, source.transform.eulerAngles.z, LayerMask.GetMask(LayerMask.LayerToName(dest.gameObject.layer)));
+        source.GetActualSizeBoundsPoints(out Vector3 sourceSize, out Vector3[] sourcePoints);
+        Vector3 center = (sourcePoints[0] + sourcePoints[7]) * 0.5f;
+        Vector3 size = sourceSize * sourceSizeRate;
+        Collider2D[] results = Physics2D.OverlapBoxAll(center, size, source.transform.eulerAngles.z, LayerMask.GetMask(LayerMask.LayerToName(dest.gameObject.layer)));
         for (int i = 0; i < results.Length; ++i)
         {
             if (results[i] == dest)

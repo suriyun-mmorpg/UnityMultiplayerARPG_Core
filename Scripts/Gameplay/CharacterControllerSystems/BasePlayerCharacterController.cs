@@ -174,6 +174,7 @@ namespace MultiplayerARPG
         public virtual BuildingEntity InstantiateConstructingBuilding(BuildingEntity prefab)
         {
             ConstructingBuildingEntity = Instantiate(prefab);
+            ConstructingBuildingEntity.name += "(Constructing)";
             ConstructingBuildingEntity.SetupAsBuildMode(PlayingCharacterEntity);
             ConstructingBuildingEntity.EntityTransform.parent = null;
             return ConstructingBuildingEntity;

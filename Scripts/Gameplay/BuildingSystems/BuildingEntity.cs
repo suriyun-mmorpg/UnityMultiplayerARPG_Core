@@ -219,24 +219,29 @@ namespace MultiplayerARPG
             return false;
         }
 
+        public void UpdateBuildingAreaSnapping()
+        {
+            if (BuildingArea != null && BuildingArea.snapBuildingObject)
+            {
+                EntityTransform.position = BuildingArea.transform.position;
+                EntityTransform.rotation = BuildingArea.transform.rotation;
+                if (BuildingArea.allowRotateInSocket)
+                {
+                    EntityTransform.localEulerAngles = new Vector3(
+                        EntityTransform.localEulerAngles.x,
+                        EntityTransform.localEulerAngles.y + BuildYRotation,
+                        EntityTransform.localEulerAngles.z);
+                }
+            }
+        }
+
         protected override void EntityUpdate()
         {
             base.EntityUpdate();
             Profiler.BeginSample("BuildingEntity - Update");
             if (IsBuildMode)
             {
-                if (BuildingArea != null && BuildingArea.snapBuildingObject)
-                {
-                    EntityTransform.position = BuildingArea.transform.position;
-                    EntityTransform.rotation = BuildingArea.transform.rotation;
-                    if (BuildingArea.allowRotateInSocket)
-                    {
-                        EntityTransform.localEulerAngles = new Vector3(
-                            EntityTransform.localEulerAngles.x,
-                            EntityTransform.localEulerAngles.y + BuildYRotation,
-                            EntityTransform.localEulerAngles.z);
-                    }
-                }
+                UpdateBuildingAreaSnapping();
                 bool canBuild = CanBuild();
                 foreach (BuildingMaterial buildingMaterial in buildingMaterials)
                 {
@@ -478,6 +483,23 @@ namespace MultiplayerARPG
             if (component == null)
                 return false;
             triggerObjects.Remove(component.gameObject);
+            return true;
+        }
+
+        public bool TriggerEnterGameObject(GameObject other)
+        {
+            if (other == null)
+                return false;
+            if (!triggerObjects.Contains(other))
+                triggerObjects.Add(other);
+            return true;
+        }
+
+        public bool TriggerExitGameObject(GameObject other)
+        {
+            if (other == null)
+                return false;
+            triggerObjects.Remove(other);
             return true;
         }
 
