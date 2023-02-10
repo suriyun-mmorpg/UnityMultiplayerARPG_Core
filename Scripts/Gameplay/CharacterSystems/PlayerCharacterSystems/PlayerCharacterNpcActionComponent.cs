@@ -265,7 +265,7 @@ namespace MultiplayerARPG
 
         public bool CallServerBuyNpcItem(int itemIndex, int amount)
         {
-            if (Entity.IsDead())
+            if (amount <= 0 || Entity.IsDead())
                 return false;
             RPC(ServerBuyNpcItem, itemIndex, amount);
             return true;
@@ -275,7 +275,7 @@ namespace MultiplayerARPG
         protected void ServerBuyNpcItem(int index, int amount)
         {
 #if UNITY_EDITOR || UNITY_SERVER
-            if (amount <= 0)
+            if (amount <= 0 || Entity.IsDead())
                 return;
 
             // Dialog must be built-in shop dialog
