@@ -433,6 +433,12 @@ namespace MultiplayerARPG
                 return;
             }
 
+            if (request.amount <= 0)
+            {
+                result.InvokeError(new ResponseSellItemMessage());
+                return;
+            }
+
             BasePlayerCharacterEntity playerCharacterEntity = playerCharacter as BasePlayerCharacterEntity;
             if (playerCharacterEntity != null)
             {
