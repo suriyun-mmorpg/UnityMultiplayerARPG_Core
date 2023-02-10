@@ -462,7 +462,7 @@ namespace MultiplayerARPG
                 case DamageType.Melee:
                 case DamageType.Missile:
                 case DamageType.Throwable:
-                    return alreadyHitCount < 0;
+                    return alreadyHitCount <= 0;
                 case DamageType.Raycast:
                     return alreadyHitCount <= 0 || alreadyHitCount < pierceThroughEntities;
                 case DamageType.Custom:
