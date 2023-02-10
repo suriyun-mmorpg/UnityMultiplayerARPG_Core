@@ -145,7 +145,6 @@ namespace MultiplayerARPG
                     inventoryChanged = true;
                 }
             }
-            Debug.LogError(refineLevel.SuccessRate + increaseSuccessRate);
             if (Random.value <= refineLevel.SuccessRate + increaseSuccessRate)
             {
                 // If success, increase item level
