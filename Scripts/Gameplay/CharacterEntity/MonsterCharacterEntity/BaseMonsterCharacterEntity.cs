@@ -300,8 +300,7 @@ namespace MultiplayerARPG
 
         public void RecordRecivingDamage(EntityInfo instigator, int damage)
         {
-            BaseCharacterEntity attackerCharacter;
-            if (instigator.TryGetEntity(out attackerCharacter))
+            if (instigator.TryGetEntity(out BaseCharacterEntity attackerCharacter))
             {
                 // If summoned by someone, summoner is attacker
                 BaseMonsterCharacterEntity monsterCharacterEntity = attackerCharacter as BaseMonsterCharacterEntity;
