@@ -32,7 +32,7 @@ namespace MultiplayerARPG
                     cacheItemCraftFormulas = new Dictionary<int, ItemCraftFormula>();
                     foreach (ItemCraftFormula itemCraftFormula in itemCraftFormulas)
                     {
-                        if (itemCraftFormula.ItemCraft.CraftingItem == null)
+                        if (itemCraftFormula == null || itemCraftFormula.ItemCraft.CraftingItem == null)
                             continue;
                         cacheItemCraftFormulas[itemCraftFormula.DataId] = itemCraftFormula;
                     }
