@@ -14,5 +14,14 @@ namespace MultiplayerARPG
         {
             get { return ItemType.Shield; }
         }
+
+        [Category("In-Scene Objects/Appearance")]
+        [SerializeField]
+        private EquipmentModel[] sheathModels = new EquipmentModel[0];
+        public EquipmentModel[] SheathModels
+        {
+            get { return sheathModels; }
+            set { sheathModels = value; }
+        }
     }
 }

@@ -648,7 +648,8 @@ namespace MultiplayerARPG
             // Update movement inputs
             if (isBlockController)
             {
-                PlayingCharacterEntity.KeyMovement(Vector3.zero, MovementState.None);
+                // Clear movement inputs
+                moveDirection = Vector3.zero;
                 DeactivateWeaponAbility();
             }
             else
@@ -1056,6 +1057,13 @@ namespace MultiplayerARPG
                     isCharging = false;
                 }
             }
+            // Controller blocked, so don't do anything
+            if (isBlockController)
+            {
+                updatingInputs = false;
+                return;
+            }
+
             bool anyKeyPressed = false;
             if (isCharging ||
                 queueUsingSkill.skill != null ||

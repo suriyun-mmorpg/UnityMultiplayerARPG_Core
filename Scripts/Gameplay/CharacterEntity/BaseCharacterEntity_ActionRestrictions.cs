@@ -64,6 +64,8 @@ namespace MultiplayerARPG
 
         public virtual bool CanAttack()
         {
+            if (IsWeaponsSheathed)
+                return false;
             if (!CanDoActions())
                 return false;
             if (this.GetCaches().DisallowAttack)
@@ -76,6 +78,8 @@ namespace MultiplayerARPG
 
         public virtual bool CanUseSkill()
         {
+            if (IsWeaponsSheathed)
+                return false;
             if (!CanDoActions())
                 return false;
             if (this.GetCaches().DisallowUseSkill)

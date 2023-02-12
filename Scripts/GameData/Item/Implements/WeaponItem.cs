@@ -25,6 +25,22 @@ namespace MultiplayerARPG
             set { offHandEquipmentModels = value; }
         }
 
+        [SerializeField]
+        private EquipmentModel[] sheathModels = new EquipmentModel[0];
+        public EquipmentModel[] SheathModels
+        {
+            get { return sheathModels; }
+            set { sheathModels = value; }
+        }
+
+        [SerializeField]
+        private EquipmentModel[] offHandSheathModels = new EquipmentModel[0];
+        public EquipmentModel[] OffHandSheathModels
+        {
+            get { return offHandSheathModels; }
+            set { offHandSheathModels = value; }
+        }
+
         [Category("Equipment Settings")]
         [Header("Weapon Settings")]
         [SerializeField]

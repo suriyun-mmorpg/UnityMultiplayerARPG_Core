@@ -13,6 +13,14 @@ namespace MultiplayerARPG
         /// </summary>
         EquipmentModel[] OffHandEquipmentModels { get; }
         /// <summary>
+        /// These models will be instantiated when this item not being equipped or sheathed
+        /// </summary>
+        EquipmentModel[] SheathModels { get; }
+        /// <summary>
+        /// These models will be instantiated when this item not being equipped or sheathed
+        /// </summary>
+        EquipmentModel[] OffHandSheathModels { get; }
+        /// <summary>
         /// Damange amount which will be used when attacking characters, buildings and so on
         /// </summary>
         DamageIncremental DamageAmount { get; }

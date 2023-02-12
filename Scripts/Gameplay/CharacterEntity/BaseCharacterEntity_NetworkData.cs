@@ -26,6 +26,8 @@ namespace MultiplayerARPG
         [SerializeField]
         protected SyncFieldByte equipWeaponSet = new SyncFieldByte();
         [SerializeField]
+        protected SyncFieldBool isWeaponsSheathed = new SyncFieldBool();
+        [SerializeField]
         protected SyncFieldUShort pitch = new SyncFieldUShort();
         [SerializeField]
         protected SyncFieldUInt targetEntityId = new SyncFieldUInt();
@@ -62,6 +64,7 @@ namespace MultiplayerARPG
         public virtual int FrameDataId { get; set; }
         public virtual int TitleDataId { get; set; }
         public byte EquipWeaponSet { get { return equipWeaponSet.Value; } set { equipWeaponSet.Value = value; } }
+        public bool IsWeaponsSheathed { get { return isWeaponsSheathed.Value; } set { isWeaponsSheathed.Value = value; } }
         public EquipWeapons EquipWeapons
         {
             get
@@ -219,6 +222,8 @@ namespace MultiplayerARPG
             currentWater.syncMode = LiteNetLibSyncField.SyncMode.ServerToClients;
             equipWeaponSet.deliveryMethod = DeliveryMethod.ReliableOrdered;
             equipWeaponSet.syncMode = LiteNetLibSyncField.SyncMode.ServerToClients;
+            isWeaponsSheathed.deliveryMethod = DeliveryMethod.ReliableOrdered;
+            isWeaponsSheathed.syncMode = LiteNetLibSyncField.SyncMode.ClientMulticast;
             pitch.deliveryMethod = DeliveryMethod.Sequenced;
             pitch.syncMode = LiteNetLibSyncField.SyncMode.ServerToClients;
             targetEntityId.deliveryMethod = DeliveryMethod.ReliableOrdered;
@@ -248,6 +253,7 @@ namespace MultiplayerARPG
             currentFood.onChange += OnCurrentFoodChange;
             currentWater.onChange += OnCurrentWaterChange;
             equipWeaponSet.onChange += OnEquipWeaponSetChange;
+            isWeaponsSheathed.onChange += OnIsWeaponsSheathedChange;
             pitch.onChange += OnPitchChange;
             targetEntityId.onChange += OnTargetEntityIdChange;
             // On list changed events
@@ -275,6 +281,7 @@ namespace MultiplayerARPG
             currentFood.onChange -= OnCurrentFoodChange;
             currentWater.onChange -= OnCurrentWaterChange;
             equipWeaponSet.onChange -= OnEquipWeaponSetChange;
+            isWeaponsSheathed.onChange -= OnIsWeaponsSheathedChange;
             pitch.onChange -= OnPitchChange;
             targetEntityId.onChange -= OnTargetEntityIdChange;
             // On list changed events
@@ -399,11 +406,23 @@ namespace MultiplayerARPG
         /// </summary>
         /// <param name="isInitial"></param>
         /// <param name="equipWeaponSet"></param>
-        private void OnEquipWeaponSetChange(bool isInitial, byte equipWeaponSet)
+        protected virtual void OnEquipWeaponSetChange(bool isInitial, byte equipWeaponSet)
         {
             PrepareToSetEquipWeaponsModels();
             if (onEquipWeaponSetChange != null)
                 onEquipWeaponSetChange.Invoke(equipWeaponSet);
+        }
+
+        /// <summary>
+        /// This will be called when is weapons sheathed changed
+        /// </summary>
+        /// <param name="isInitial"></param>
+        /// <param name="isWeaponsSheathed"></param>
+        protected virtual void OnIsWeaponsSheathedChange(bool isInitial, bool isWeaponsSheathed)
+        {
+            PrepareToSetEquipWeaponsModels();
+            if (onIsWeaponsSheathedChange != null)
+                onIsWeaponsSheathedChange.Invoke(isWeaponsSheathed);
         }
 
         /// <summary>

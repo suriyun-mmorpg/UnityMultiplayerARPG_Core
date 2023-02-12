@@ -1,4 +1,5 @@
 ﻿using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Animations;
 using UnityEngine.Playables;
@@ -158,8 +159,13 @@ namespace MultiplayerARPG.GameData.Model.Playables
             return tempActionAnimation;
         }
 
-        public override void SetEquipWeapons(EquipWeapons newEquipWeapons)
+        public override void SetEquipWeapons(IList<EquipWeapons> selectableWeaponSets, byte equipWeaponSet, bool isWeaponsSheathed)
         {
+            EquipWeapons newEquipWeapons;
+            if (isWeaponsSheathed || selectableWeaponSets == null || selectableWeaponSets.Count == 0)
+                newEquipWeapons = new EquipWeapons();
+            else
+                newEquipWeapons = selectableWeaponSets[equipWeaponSet];
             // Get one equipped weapon from right-hand or left-hand
             IWeaponItem rightWeaponItem = newEquipWeapons.GetRightHandWeaponItem();
             IWeaponItem leftWeaponItem = newEquipWeapons.GetLeftHandWeaponItem();
@@ -176,20 +182,20 @@ namespace MultiplayerARPG.GameData.Model.Playables
                 oldEquipWeapons = newEquipWeapons;
             if (Time.unscaledTime - AwakenTime < 1f || isDoingAction || !newEquipWeapons.IsDiffer(oldEquipWeapons, out bool rightIsDiffer, out bool leftIsDiffer))
             {
-                SetNewEquipWeapons(newEquipWeapons);
+                SetNewEquipWeapons(newEquipWeapons, selectableWeaponSets, equipWeaponSet, isWeaponsSheathed);
                 return;
             }
-            StartActionCoroutine(PlayEquipWeaponsAnimationRoutine(newEquipWeapons, rightIsDiffer, leftIsDiffer), () => SetNewEquipWeapons(newEquipWeapons));
+            StartActionCoroutine(PlayEquipWeaponsAnimationRoutine(newEquipWeapons, rightIsDiffer, leftIsDiffer, selectableWeaponSets, equipWeaponSet, isWeaponsSheathed), () => SetNewEquipWeapons(newEquipWeapons, selectableWeaponSets, equipWeaponSet, isWeaponsSheathed));
         }
 
-        private void SetNewEquipWeapons(EquipWeapons newEquipWeapons)
+        private void SetNewEquipWeapons(EquipWeapons newEquipWeapons, IList<EquipWeapons> selectableWeaponSets, byte equipWeaponSet, bool isWeaponsSheathed)
         {
             if (newEquipWeapons != null)
                 oldEquipWeapons = newEquipWeapons.Clone();
-            base.SetEquipWeapons(newEquipWeapons);
+            base.SetEquipWeapons(selectableWeaponSets, equipWeaponSet, isWeaponsSheathed);
         }
 
-        private IEnumerator PlayEquipWeaponsAnimationRoutine(EquipWeapons newEquipWeapons, bool rightIsDiffer, bool leftIsDiffer)
+        private IEnumerator PlayEquipWeaponsAnimationRoutine(EquipWeapons newEquipWeapons, bool rightIsDiffer, bool leftIsDiffer, IList<EquipWeapons> selectableWeaponSets, byte equipWeaponSet, bool isWeaponsSheathed)
         {
             isDoingAction = true;
             // Prepare states
@@ -271,7 +277,7 @@ namespace MultiplayerARPG.GameData.Model.Playables
             }
 
             // Switch weapon items
-            SetNewEquipWeapons(newEquipWeapons);
+            SetNewEquipWeapons(newEquipWeapons, selectableWeaponSets, equipWeaponSet, isWeaponsSheathed);
             onStopAction = null;
 
             if (animationDelay - holsteredDelay > 0f)

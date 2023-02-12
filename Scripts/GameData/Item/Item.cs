@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace MultiplayerARPG
 {
@@ -36,7 +37,10 @@ namespace MultiplayerARPG
         [Category("In-Scene Objects/Appearance")]
         public EquipmentModel[] equipmentModels;
         [Tooltip("This will be available with `Weapon` item, set it in case that it will be equipped at left hand")]
-        public EquipmentModel[] subEquipmentModels;
+        [FormerlySerializedAs("subEquipmentModels")]
+        public EquipmentModel[] offHandEquipmentModels;
+        public EquipmentModel[] sheathModels;
+        public EquipmentModel[] offHandSheathModels;
 
         [Category(2, "Equipment Settings")]
         [Header("Generic Equipment Settings")]
@@ -392,7 +396,19 @@ namespace MultiplayerARPG
 
         public EquipmentModel[] OffHandEquipmentModels
         {
-            get { return subEquipmentModels; }
+            get { return offHandEquipmentModels; }
+        }
+
+        public EquipmentModel[] SheathModels
+        {
+            get { return sheathModels; }
+            set { sheathModels = value; }
+        }
+
+        public EquipmentModel[] OffHandSheathModels
+        {
+            get { return offHandSheathModels; }
+            set { offHandSheathModels = value; }
         }
 
         public DamageIncremental DamageAmount
@@ -632,7 +648,7 @@ namespace MultiplayerARPG
             GameInstance.AddStatusEffects(enemyStatusEffectsWhenAttacked);
             GameInstance.AddEquipmentSets(equipmentSet);
             GameInstance.AddPoolingWeaponLaunchEffects(equipmentModels);
-            GameInstance.AddPoolingWeaponLaunchEffects(subEquipmentModels);
+            GameInstance.AddPoolingWeaponLaunchEffects(offHandEquipmentModels);
             GameInstance.AddArmorTypes(armorType);
             GameInstance.AddWeaponTypes(weaponType);
             GameInstance.AddAmmoTypes(ammoType);
@@ -640,7 +656,7 @@ namespace MultiplayerARPG
             buff.PrepareRelatesData();
             // Data migration
             GameInstance.MigrateEquipmentEntities(equipmentModels);
-            GameInstance.MigrateEquipmentEntities(subEquipmentModels);
+            GameInstance.MigrateEquipmentEntities(offHandEquipmentModels);
         }
 
         public Item GenerateDefaultItem(WeaponType type)

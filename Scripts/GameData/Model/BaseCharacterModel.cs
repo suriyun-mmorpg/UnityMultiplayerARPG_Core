@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
 using UtilsComponents;
+using Cysharp.Text;
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
@@ -145,7 +146,9 @@ namespace MultiplayerARPG
         protected bool isCacheDataInitialized = false;
 
         // Protected fields
-        public EquipWeapons equipWeapons { get; protected set; }
+        public IList<EquipWeapons> selectableWeaponSets { get; protected set; }
+        public byte equipWeaponSet { get; protected set; }
+        public bool isWeaponsSheathed { get; protected set; }
         public IList<CharacterItem> equipItems { get; protected set; }
         public IList<CharacterBuff> buffs { get; protected set; }
         public bool isDead { get; protected set; }
@@ -267,7 +270,7 @@ namespace MultiplayerARPG
                 previousModel.RevertObjectsWhenSwitch();
                 SetIsDead(previousModel.isDead);
                 SetDefaultAnimations();
-                SetEquipWeapons(previousModel.equipWeapons);
+                SetEquipWeapons(previousModel.selectableWeaponSets, previousModel.equipWeaponSet, previousModel.isWeaponsSheathed);
                 SetEquipItems(previousModel.equipItems);
                 SetBuffs(previousModel.buffs);
                 SetMoveAnimationSpeedMultiplier(previousModel.moveAnimationSpeedMultiplier);
@@ -276,7 +279,7 @@ namespace MultiplayerARPG
             else
             {
                 SetDefaultAnimations();
-                SetEquipWeapons(equipWeapons);
+                SetEquipWeapons(selectableWeaponSets, equipWeaponSet, isWeaponsSheathed);
                 SetEquipItems(equipItems);
                 SetBuffs(buffs);
             }
@@ -356,9 +359,11 @@ namespace MultiplayerARPG
         }
 #endif
 
-        public virtual void SetEquipWeapons(EquipWeapons equipWeapons)
+        public virtual void SetEquipWeapons(IList<EquipWeapons> selectableWeaponSets, byte equipWeaponSet, bool isWeaponsSheathed)
         {
-            this.equipWeapons = equipWeapons;
+            this.selectableWeaponSets = selectableWeaponSets;
+            this.equipWeaponSet = equipWeaponSet;
+            this.isWeaponsSheathed = isWeaponsSheathed;
             UpdateEquipmentModels();
         }
 
@@ -391,6 +396,11 @@ namespace MultiplayerARPG
             }
 
             // Setup equipping models from equip weapons
+            EquipWeapons equipWeapons;
+            if (isWeaponsSheathed || selectableWeaponSets == null || selectableWeaponSets.Count == 0)
+                equipWeapons = new EquipWeapons();
+            else
+                equipWeapons = selectableWeaponSets[equipWeaponSet];
             IEquipmentItem rightHandItem = equipWeapons.GetRightHandEquipmentItem();
             IEquipmentItem leftHandItem = equipWeapons.GetLeftHandEquipmentItem();
             if (rightHandItem != null && rightHandItem.IsWeapon())
@@ -399,6 +409,25 @@ namespace MultiplayerARPG
                 SetupEquippingModels(showingModels, storingModels, unequippingSockets, (leftHandItem as IWeaponItem).OffHandEquipmentModels, equipWeapons.leftHand.dataId, equipWeapons.leftHand.level, GameDataConst.EQUIP_POSITION_LEFT_HAND);
             if (leftHandItem != null && leftHandItem.IsShield())
                 SetupEquippingModels(showingModels, storingModels, unequippingSockets, (leftHandItem as IShieldItem).EquipmentModels, equipWeapons.leftHand.dataId, equipWeapons.leftHand.level, GameDataConst.EQUIP_POSITION_LEFT_HAND);
+
+            if (selectableWeaponSets != null && selectableWeaponSets.Count > 0)
+            {
+                for (byte i = 0; i < selectableWeaponSets.Count; ++i)
+                {
+                    if (isWeaponsSheathed || i != equipWeaponSet)
+                    {
+                        equipWeapons = selectableWeaponSets[i];
+                        rightHandItem = equipWeapons.GetRightHandEquipmentItem();
+                        leftHandItem = equipWeapons.GetLeftHandEquipmentItem();
+                        if (rightHandItem != null && rightHandItem.IsWeapon())
+                            SetupEquippingModels(showingModels, storingModels, unequippingSockets, (rightHandItem as IWeaponItem).SheathModels, equipWeapons.rightHand.dataId, equipWeapons.rightHand.level, ZString.Concat(GameDataConst.EQUIP_POSITION_RIGHT_HAND, "_", i), true, i);
+                        if (leftHandItem != null && leftHandItem.IsWeapon())
+                            SetupEquippingModels(showingModels, storingModels, unequippingSockets, (leftHandItem as IWeaponItem).OffHandSheathModels, equipWeapons.leftHand.dataId, equipWeapons.leftHand.level, ZString.Concat(GameDataConst.EQUIP_POSITION_LEFT_HAND, "_", i), true, i);
+                        if (leftHandItem != null && leftHandItem.IsShield())
+                            SetupEquippingModels(showingModels, storingModels, unequippingSockets, (leftHandItem as IShieldItem).SheathModels, equipWeapons.leftHand.dataId, equipWeapons.leftHand.level, ZString.Concat(GameDataConst.EQUIP_POSITION_LEFT_HAND, "_", i), true, i);
+                    }
+                }
+            }
 
             // Destroy unequipped item models, and show default models
             foreach (string unequippingSocket in unequippingSockets)
@@ -487,7 +516,7 @@ namespace MultiplayerARPG
             }
         }
 
-        private void SetupEquippingModels(Dictionary<string, EquipmentModel> showingModels, Dictionary<string, EquipmentModel> storingModels, HashSet<string> unequippingSockets, EquipmentModel[] equipmentModels, int itemDataId, int itemLevel, string equipPosition)
+        private void SetupEquippingModels(Dictionary<string, EquipmentModel> showingModels, Dictionary<string, EquipmentModel> storingModels, HashSet<string> unequippingSockets, EquipmentModel[] equipmentModels, int itemDataId, int itemLevel, string equipPosition, bool isSheathModels = false, byte equipWeaponSet = 0)
         {
             if (equipmentModels == null || equipmentModels.Length == 0 || string.IsNullOrWhiteSpace(equipPosition))
                 return;
@@ -500,15 +529,31 @@ namespace MultiplayerARPG
                     continue;
                 }
 
-                if (!showingModels.TryGetValue(model.equipSocket, out EquipmentModel storedModel) || storedModel.priority < model.priority || storedModel.itemLevel < itemLevel)
+                string equipSocket = model.equipSocket;
+                if (isSheathModels)
                 {
-                    if (EquippedModels.TryGetValue(model.equipSocket, out EquipmentModel equippedModel)
+                    // Can instantiates multiple sheath models into 1 socket, so create new collection name
+                    equipSocket = ZString.Concat(equipSocket, "_SHEATH_", equipWeaponSet, "_", equipPosition);
+                    // Create a new container for this sheath weapons
+                    if (!CacheEquipmentModelContainers.ContainsKey(equipSocket) && CacheEquipmentModelContainers.ContainsKey(model.equipSocket))
+                        CacheEquipmentModelContainers[equipSocket] = CacheEquipmentModelContainers[model.equipSocket];
+                }
+
+                if (!showingModels.TryGetValue(equipSocket, out EquipmentModel storedModel) || storedModel.priority < model.priority || storedModel.itemLevel < itemLevel)
+                {
+                    if (isSheathModels && model.useSpecificSheathEquipWeaponSet && model.specificSheathEquipWeaponSet != equipWeaponSet)
+                    {
+                        // Don't show it because `specificSheathEquipWeaponSet` is not equals to `equipWeaponSet`
+                        continue;
+                    }
+
+                    if (EquippedModels.TryGetValue(equipSocket, out EquipmentModel equippedModel)
                         && equippedModel.itemDataId == itemDataId
                         && equippedModel.itemLevel == itemLevel)
                     {
                         // Same view data, so don't destroy and don't instantiates this model object
-                        storingModels[model.equipSocket] = equippedModel;
-                        unequippingSockets.Remove(model.equipSocket);
+                        storingModels[equipSocket] = equippedModel;
+                        unequippingSockets.Remove(equipSocket);
                         continue;
                     }
 
@@ -516,9 +561,9 @@ namespace MultiplayerARPG
                     clonedModel.itemDataId = itemDataId;
                     clonedModel.itemLevel = itemLevel;
                     clonedModel.equipPosition = equipPosition;
-                    showingModels[model.equipSocket] = clonedModel;
-                    storingModels[model.equipSocket] = clonedModel;
-                    unequippingSockets.Remove(model.equipSocket);
+                    showingModels[equipSocket] = clonedModel;
+                    storingModels[equipSocket] = clonedModel;
+                    unequippingSockets.Remove(equipSocket);
                 }
             }
         }

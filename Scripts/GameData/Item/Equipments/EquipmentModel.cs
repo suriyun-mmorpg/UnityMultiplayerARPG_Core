@@ -5,16 +5,24 @@ namespace MultiplayerARPG
     [System.Serializable]
     public struct EquipmentModel
     {
+        [Header("Generic Settings")]
         public string equipSocket;
         public bool useInstantiatedObject;
         [BoolShowConditional(nameof(useInstantiatedObject), false)]
         public GameObject model;
         [BoolShowConditional(nameof(useInstantiatedObject), true)]
         public int instantiatedObjectIndex;
+        public byte priority;
+
+        [Header("Transform Settings")]
         public Vector3 localPosition;
         public Vector3 localEulerAngles;
         public Vector3 localScale;
-        public byte priority;
+
+        [Header("Weapon Sheath Settings")]
+        public bool useSpecificSheathEquipWeaponSet;
+        public byte specificSheathEquipWeaponSet;
+
         #region These variables will be used at runtime, do not make changes in editor
         [HideInInspector]
         public int itemDataId;

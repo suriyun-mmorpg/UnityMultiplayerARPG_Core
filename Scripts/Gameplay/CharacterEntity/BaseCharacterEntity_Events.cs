@@ -24,6 +24,7 @@ namespace MultiplayerARPG
         public event System.Action<int> onCurrentFoodChange;
         public event System.Action<int> onCurrentWaterChange;
         public event System.Action<byte> onEquipWeaponSetChange;
+        public event System.Action<bool> onIsWeaponsSheathedChange;
         public event System.Action<ushort> onPitchChange;
         public event System.Action<uint> onTargetEntityIdChange;
         // Sync lists

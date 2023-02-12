@@ -1521,9 +1521,9 @@ namespace MultiplayerARPG
 
         protected void SetEquipWeaponsModels()
         {
-            CharacterModel.SetEquipWeapons(EquipWeapons);
+            CharacterModel.SetEquipWeapons(SelectableWeaponSets, EquipWeaponSet, IsWeaponsSheathed);
             if (FpsModel)
-                FpsModel.SetEquipWeapons(EquipWeapons);
+                FpsModel.SetEquipWeapons(SelectableWeaponSets, EquipWeaponSet, IsWeaponsSheathed);
         }
 
         protected void SetEquipItemsModels()

@@ -384,7 +384,9 @@ namespace MultiplayerARPG
                 if (SelectedPlayerCharacter.LeftHandEquipItem != null)
                     equipWeapons.leftHand = CharacterItem.Create(SelectedPlayerCharacter.LeftHandEquipItem);
                 // Set model equip weapons
-                SelectedModel.SetEquipWeapons(equipWeapons);
+                IList<EquipWeapons> selectableWeaponSets = new List<EquipWeapons>();
+                selectableWeaponSets.Add(equipWeapons);
+                SelectedModel.SetEquipWeapons(selectableWeaponSets, 0, false);
             }
         }
 

@@ -289,7 +289,7 @@ namespace MultiplayerARPG
                 };
                 if (newItemData is Item)
                 {
-                    (newItemData as Item).subEquipmentModels = equipmentModels;
+                    (newItemData as Item).offHandEquipmentModels = equipmentModels;
                 }
                 else
                 {

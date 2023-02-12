@@ -205,7 +205,7 @@ namespace MultiplayerARPG
             MainFpsModel.transform.localPosition = fpsModelPositionOffsets;
             MainFpsModel.transform.localRotation = Quaternion.Euler(fpsModelRotationOffsets);
             MainFpsModel.SetEquipItems(MainTpsModel.equipItems);
-            MainFpsModel.SetEquipWeapons(MainTpsModel.equipWeapons);
+            MainFpsModel.SetEquipWeapons(MainTpsModel.selectableWeaponSets, MainTpsModel.equipWeaponSet, MainTpsModel.isWeaponsSheathed);
             ActiveFpsModel = MainFpsModel;
             return MainFpsModel;
         }
