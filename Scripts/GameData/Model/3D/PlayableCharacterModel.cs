@@ -180,7 +180,7 @@ namespace MultiplayerARPG.GameData.Model.Playables
             // Player draw/holster animation
             if (oldEquipWeapons == null)
                 oldEquipWeapons = newEquipWeapons;
-            if (Time.unscaledTime - AwakenTime < 1f || isDoingAction || !newEquipWeapons.IsDiffer(oldEquipWeapons, out bool rightIsDiffer, out bool leftIsDiffer))
+            if (Time.unscaledTime - AwakenTime < 1f || !newEquipWeapons.IsDiffer(oldEquipWeapons, out bool rightIsDiffer, out bool leftIsDiffer))
             {
                 SetNewEquipWeapons(newEquipWeapons, selectableWeaponSets, equipWeaponSet, isWeaponsSheathed);
                 return;
@@ -234,6 +234,7 @@ namespace MultiplayerARPG.GameData.Model.Playables
                 }
             }
 
+            float drawnDurationRate = 0f;
             ActionState drawState = new ActionState();
             if (newEquipWeapons != null)
             {
@@ -241,29 +242,41 @@ namespace MultiplayerARPG.GameData.Model.Playables
                 {
                     tempWeaponItem = newEquipWeapons.GetRightHandWeaponItem();
                     if (tempWeaponItem != null && TryGetWeaponAnimations(tempWeaponItem.WeaponType.DataId, out WeaponAnimations anims) && anims.rightHandHolsterAnimation.drawState.clip != null)
+                    {
                         drawState = anims.rightHandHolsterAnimation.drawState;
+                        drawnDurationRate = anims.rightHandHolsterAnimation.drawnDurationRate;
+                    }
                     else
+                    {
                         drawState = defaultAnimations.rightHandHolsterAnimation.drawState;
+                        drawnDurationRate = defaultAnimations.rightHandHolsterAnimation.drawnDurationRate;
+                    }
                 }
                 else if (leftIsDiffer && !newEquipWeapons.IsEmptyLeftHandSlot())
                 {
                     tempWeaponItem = newEquipWeapons.GetLeftHandWeaponItem();
                     if (tempWeaponItem != null && TryGetWeaponAnimations(tempWeaponItem.WeaponType.DataId, out WeaponAnimations anims) && anims.leftHandHolsterAnimation.drawState.clip != null)
+                    {
                         drawState = anims.leftHandHolsterAnimation.drawState;
+                        drawnDurationRate = anims.leftHandHolsterAnimation.drawnDurationRate;
+                    }
                     else
+                    {
                         drawState = defaultAnimations.leftHandHolsterAnimation.drawState;
+                        drawnDurationRate = defaultAnimations.leftHandHolsterAnimation.drawnDurationRate;
+                    }
                 }
             }
 
             float holsteredDelay;
+            float drawnDelay;
             float animationDelay;
-            bool hasClip;
+            bool alreadySetNewEquipWeapons = false;
 
             // Play holster state
             holsteredDelay = 0f;
             animationDelay = 0f;
-            hasClip = holsterState.clip != null;
-            if (hasClip)
+            if (holsterState.clip != null)
             {
                 // Setup animation playing duration
                 animationDelay = Behaviour.PlayAction(holsterState, 1f);
@@ -276,34 +289,56 @@ namespace MultiplayerARPG.GameData.Model.Playables
                 yield return new WaitForSecondsRealtime(holsteredDelay);
             }
 
-            // Switch weapon items
-            SetNewEquipWeapons(newEquipWeapons, selectableWeaponSets, equipWeaponSet, isWeaponsSheathed);
-            onStopAction = null;
+            // Holstered, so hide the weapon
+            if (holsterState.clip != null && drawState.clip != null)
+            {
+                base.SetEquipWeapons(selectableWeaponSets, equipWeaponSet, true);
+            }
+            else if (holsterState.clip != null)
+            {
+                // Set new equip weapons immediately after pass holstered delay, because it has no draw state
+                alreadySetNewEquipWeapons = true;
+                SetNewEquipWeapons(newEquipWeapons, selectableWeaponSets, equipWeaponSet, isWeaponsSheathed);
+                onStopAction = null;
+            }
 
             if (animationDelay - holsteredDelay > 0f)
             {
-                // Wait by animation playing duration
-                yield return new WaitForSecondsRealtime(animationDelay);
+                // Wait by remaining animation playing duration
+                yield return new WaitForSecondsRealtime(animationDelay - holsteredDelay);
             }
 
             // Play draw state
+            drawnDelay = 0f;
             animationDelay = 0f;
-            hasClip = drawState.clip != null;
-            if (hasClip)
+            if (drawState.clip != null)
             {
                 // Setup animation playing duration
                 animationDelay = Behaviour.PlayAction(drawState, 1f);
+                drawnDelay = animationDelay * drawnDurationRate;
             }
 
-            if (animationDelay > 0f)
+            if (drawnDelay > 0f)
             {
-                // Wait by animation playing duration
-                yield return new WaitForSecondsRealtime(animationDelay);
+                // Wait by drawing duration
+                yield return new WaitForSecondsRealtime(drawnDelay);
+            }
+
+            // Drawn, so show the weapon
+            if (!alreadySetNewEquipWeapons)
+            {
+                SetNewEquipWeapons(newEquipWeapons, selectableWeaponSets, equipWeaponSet, isWeaponsSheathed);
+                onStopAction = null;
+            }
+
+            if (animationDelay - drawnDurationRate > 0f)
+            {
+                // Wait by remaining animation playing duration
+                yield return new WaitForSecondsRealtime(animationDelay - drawnDurationRate);
             }
 
             isDoingAction = false;
         }
-
 
 
         #region Right-hand animations

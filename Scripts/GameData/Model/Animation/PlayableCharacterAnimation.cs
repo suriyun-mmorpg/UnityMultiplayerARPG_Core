@@ -37,6 +37,8 @@ namespace MultiplayerARPG.GameData.Model.Playables
         [Range(0f, 1f)]
         public float holsteredDurationRate;
         public ActionState drawState;
+        [Range(0f, 1f)]
+        public float drawnDurationRate;
     }
 
     [System.Serializable]
