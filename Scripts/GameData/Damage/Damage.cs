@@ -460,9 +460,14 @@ namespace MultiplayerARPG
             switch (damageType)
             {
                 case DamageType.Melee:
+                    if (hitOnlySelectedTarget)
+                        return alreadyHitCount <= 0;
+                    else
+                        return true;
                 case DamageType.Missile:
                 case DamageType.Throwable:
-                    return alreadyHitCount <= 0;
+                    // Can hit unlimited objects within attack/explode range
+                    return true;
                 case DamageType.Raycast:
                     return alreadyHitCount <= 0 || alreadyHitCount < pierceThroughEntities;
                 case DamageType.Custom:

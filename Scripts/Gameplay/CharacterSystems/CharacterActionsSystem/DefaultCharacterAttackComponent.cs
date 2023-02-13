@@ -203,12 +203,13 @@ namespace MultiplayerARPG
                         // Apply attack damages
                         if (IsOwnerClientOrOwnedByServer)
                         {
-                            int applySeed = unchecked(simulateSeed + (hitIndex * 16));
+                            int applySeed = GetApplySeed(simulateSeed, hitIndex);
                             ApplyAttack(isLeftHand, weapon, damageInfo, damageAmounts, Entity.AimPosition, applySeed);
+                            // Simulate action at non-owner clients
                             SimulateActionTriggerData simulateData = new SimulateActionTriggerData();
                             if (isLeftHand)
                                 simulateData.state |= SimulateActionTriggerState.IsLeftHand;
-                            simulateData.randomSeed = simulateSeed;
+                            simulateData.simulateSeed = simulateSeed;
                             simulateData.aimPosition = Entity.AimPosition;
                             RPC(AllSimulateActionTrigger, BaseGameEntity.SERVER_STATE_DATA_CHANNEL, DeliveryMethod.ReliableOrdered, simulateData);
                         }
@@ -309,22 +310,22 @@ namespace MultiplayerARPG
                 return;
             if (!ProceedSimulateActionTrigger(data))
             {
-                if (!SimlatingActionTriggerDataList.ContainsKey(data.randomSeed))
-                    SimlatingActionTriggerDataList[data.randomSeed] = new List<SimulateActionTriggerData>();
-                SimlatingActionTriggerDataList[data.randomSeed].Add(data);
+                if (!SimlatingActionTriggerDataList.ContainsKey(data.simulateSeed))
+                    SimlatingActionTriggerDataList[data.simulateSeed] = new List<SimulateActionTriggerData>();
+                SimlatingActionTriggerDataList[data.simulateSeed].Add(data);
             }
         }
 
         protected bool ProceedSimulateActionTrigger(SimulateActionTriggerData data)
         {
             SimulatingActionTriggerHistory history;
-            if (!SimulatingActionTriggerHistories.TryGetValue(data.randomSeed, out history) || history.TriggeredIndex >= history.TriggerLength)
+            if (!SimulatingActionTriggerHistories.TryGetValue(data.simulateSeed, out history) || history.TriggeredIndex >= history.TriggerLength)
                 return false;
-            int hitIndex = SimulatingActionTriggerHistories[data.randomSeed].TriggeredIndex;
-            int applySeed = unchecked(data.randomSeed + (hitIndex * 16));
+            int hitIndex = SimulatingActionTriggerHistories[data.simulateSeed].TriggeredIndex;
+            int applySeed = GetApplySeed(data.simulateSeed, hitIndex);
             hitIndex++;
             history.TriggeredIndex = hitIndex;
-            SimulatingActionTriggerHistories[data.randomSeed] = history;
+            SimulatingActionTriggerHistories[data.simulateSeed] = history;
             bool isLeftHand = data.state.HasFlag(SimulateActionTriggerState.IsLeftHand);
             if (!data.state.HasFlag(SimulateActionTriggerState.IsSkill))
             {
@@ -334,6 +335,11 @@ namespace MultiplayerARPG
                 ApplyAttack(isLeftHand, weapon, damageInfo, damageAmounts, data.aimPosition, applySeed);
             }
             return true;
+        }
+
+        protected int GetApplySeed(int simulateSeed, int hitIndex)
+        {
+            return unchecked(simulateSeed + (hitIndex * 16));
         }
 
         public void CancelAttack()

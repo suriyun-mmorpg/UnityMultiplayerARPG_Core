@@ -57,7 +57,7 @@ namespace MultiplayerARPG
             if (!registerHits.ContainsKey(id) || !validateHits.ContainsKey(id))
                 return false;
 
-            HashSet<string> hitHitboxes = new HashSet<string>();
+            HashSet<uint> hitObjectIds = new HashSet<uint>();
             while (registerHits[id].Count > 0)
             {
                 if (registerHits[id].Count > validateHits[id].FireSpread + 1)
@@ -66,28 +66,29 @@ namespace MultiplayerARPG
                     registerHits[id].RemoveAt(0);
                     continue;
                 }
-                hitHitboxes.Clear();
+                hitObjectIds.Clear();
                 for (int i = 0; i < registerHits[id][0].HitDataCollection.Count; ++i)
                 {
-                    if (!BaseGameNetworkManager.Singleton.TryGetEntityByObjectId(registerHits[id][0].HitDataCollection[i].HitObjectId, out DamageableEntity damageableEntity) ||
-                        registerHits[id][0].HitDataCollection[i].HitBoxIndex < 0 || registerHits[id][0].HitDataCollection[i].HitBoxIndex >= damageableEntity.HitBoxes.Length)
+                    uint objectId = registerHits[id][0].HitDataCollection[i].HitObjectId;
+                    int hitBoxIndex = registerHits[id][0].HitDataCollection[i].HitBoxIndex;
+                    if (!BaseGameNetworkManager.Singleton.TryGetEntityByObjectId(objectId, out DamageableEntity damageableEntity) ||
+                        hitBoxIndex < 0 || hitBoxIndex >= damageableEntity.HitBoxes.Length)
                     {
                         // Can't find target or invalid hitbox
                         continue;
                     }
-                    if (!validateHits[id].DamageInfo.IsHitReachedMax(hitHitboxes.Count))
+                    if (!validateHits[id].DamageInfo.IsHitReachedMax(hitObjectIds.Count))
                     {
                         // Can't hit because it is reaching max amount of objects that can be hit
                         continue;
                     }
-                    string hitId = ZString.Concat(registerHits[id][0].HitDataCollection[i].HitObjectId, "_", registerHits[id][0].HitDataCollection[i].HitBoxIndex);
-                    if (hitHitboxes.Contains(hitId))
+                    if (hitObjectIds.Contains(objectId))
                     {
-                        // Already hit to the hitbox, shouldn't be hit again
+                        // Already hit this object, cannot be hit again
                         continue;
                     }
-                    hitHitboxes.Add(hitId);
-                    DamageableHitBox hitBox = damageableEntity.HitBoxes[registerHits[id][0].HitDataCollection[i].HitBoxIndex];
+                    hitObjectIds.Add(objectId);
+                    DamageableHitBox hitBox = damageableEntity.HitBoxes[hitBoxIndex];
                     // Valiate hitting
                     if (IsHit(attacker, registerHits[id][0], registerHits[id][0].HitDataCollection[i], hitBox))
                     {

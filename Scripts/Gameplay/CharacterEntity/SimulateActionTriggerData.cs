@@ -5,7 +5,7 @@ namespace MultiplayerARPG
     public struct SimulateActionTriggerData : INetSerializable
     {
         public SimulateActionTriggerState state;
-        public int randomSeed;
+        public int simulateSeed;
         public uint targetObjectId;
         public int skillDataId;
         public int skillLevel;
@@ -14,7 +14,7 @@ namespace MultiplayerARPG
         public void Serialize(NetDataWriter writer)
         {
             writer.Put((byte)state);
-            writer.PutPackedInt(randomSeed);
+            writer.PutPackedInt(simulateSeed);
             if (state.HasFlag(SimulateActionTriggerState.IsSkill))
             {
                 writer.PutPackedUInt(targetObjectId);
@@ -27,7 +27,7 @@ namespace MultiplayerARPG
         public void Deserialize(NetDataReader reader)
         {
             state = (SimulateActionTriggerState)reader.GetByte();
-            randomSeed = reader.GetPackedInt();
+            simulateSeed = reader.GetPackedInt();
             if (state.HasFlag(SimulateActionTriggerState.IsSkill))
             {
                 targetObjectId = reader.GetPackedUInt();
@@ -39,12 +39,8 @@ namespace MultiplayerARPG
 
         public BaseSkill GetSkill()
         {
-            if (state.HasFlag(SimulateActionTriggerState.IsSkill))
-            {
-                BaseSkill skill;
-                if (GameInstance.Skills.TryGetValue(skillDataId, out skill))
-                    return skill;
-            }
+            if (state.HasFlag(SimulateActionTriggerState.IsSkill) && GameInstance.Skills.TryGetValue(skillDataId, out BaseSkill skill))
+                return skill;
             return null;
         }
     }
