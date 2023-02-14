@@ -3,25 +3,9 @@ using LiteNetLibManager;
 
 namespace MultiplayerARPG
 {
-    public enum BuffType : byte
-    {
-        SkillBuff,
-        SkillDebuff,
-        PotionBuff,
-        GuildSkillBuff,
-        StatusEffect,
-    }
-
     [System.Serializable]
     public partial class CharacterBuff : INetSerializable
     {
-        public static readonly CharacterBuff Empty = new CharacterBuff();
-        public string id;
-        public BuffType type;
-        public int dataId;
-        public int level;
-        public float buffRemainsDuration;
-
         [System.NonSerialized]
         private BuffType dirtyType;
         [System.NonSerialized]

@@ -6,10 +6,6 @@ namespace MultiplayerARPG
     [System.Serializable]
     public partial class CharacterSkill : INetSerializable
     {
-        public static readonly CharacterSkill Empty = new CharacterSkill();
-        public int dataId;
-        public int level;
-
         [System.NonSerialized]
         private int dirtyDataId;
         [System.NonSerialized]
