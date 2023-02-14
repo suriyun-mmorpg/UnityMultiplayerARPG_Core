@@ -4,7 +4,7 @@ using LiteNetLibManager;
 namespace MultiplayerARPG
 {
     [System.Serializable]
-    public class CharacterCurrency : INetSerializable
+    public partial class CharacterCurrency : INetSerializable
     {
         public static readonly CharacterCurrency Empty = new CharacterCurrency();
         public int dataId;

@@ -6,7 +6,7 @@ using LiteNetLibManager;
 namespace MultiplayerARPG
 {
     [System.Serializable]
-    public class CharacterQuest : INetSerializable
+    public partial class CharacterQuest : INetSerializable
     {
         public static readonly CharacterQuest Empty = new CharacterQuest();
         public int dataId;

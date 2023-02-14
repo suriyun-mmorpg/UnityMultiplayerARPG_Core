@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using LiteNetLib.Utils;
+﻿using LiteNetLib.Utils;
 using LiteNetLibManager;
 
 namespace MultiplayerARPG
@@ -14,7 +13,7 @@ namespace MultiplayerARPG
     }
 
     [System.Serializable]
-    public class CharacterBuff : INetSerializable
+    public partial class CharacterBuff : INetSerializable
     {
         public static readonly CharacterBuff Empty = new CharacterBuff();
         public string id;

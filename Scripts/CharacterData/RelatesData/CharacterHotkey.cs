@@ -11,7 +11,7 @@ namespace MultiplayerARPG
     }
 
     [System.Serializable]
-    public class CharacterHotkey : INetSerializable
+    public partial class CharacterHotkey : INetSerializable
     {
         public static readonly CharacterHotkey Empty = new CharacterHotkey();
         public string hotkeyId;

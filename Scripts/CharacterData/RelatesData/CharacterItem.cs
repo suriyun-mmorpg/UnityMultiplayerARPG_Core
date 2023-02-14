@@ -25,7 +25,7 @@ namespace MultiplayerARPG
     }
 
     [System.Serializable]
-    public class CharacterItem : INetSerializable
+    public partial class CharacterItem : INetSerializable
     {
         public static readonly CharacterItem Empty = new CharacterItem();
         public string id;
