@@ -198,143 +198,98 @@ namespace MultiplayerARPG.GameData.Model.Playables
         private IEnumerator PlayEquipWeaponsAnimationRoutine(EquipWeapons newEquipWeapons, bool rightIsDiffer, bool leftIsDiffer, IList<EquipWeapons> selectableWeaponSets, byte equipWeaponSet, bool isWeaponsSheathed)
         {
             isDoingAction = true;
-            // Prepare states
+
             IWeaponItem tempWeaponItem;
-            float holsteredDurationRate = 0f;
-            ActionState holsterState = new ActionState();
-            if (oldEquipWeapons != null)
+            float triggeredDurationRate = 0f;
+            ActionState actionState = new ActionState();
+            if (isWeaponsSheathed)
             {
-                if (rightIsDiffer)
+                if (oldEquipWeapons != null)
                 {
-                    tempWeaponItem = oldEquipWeapons.GetRightHandWeaponItem();
-                    if (tempWeaponItem != null && TryGetWeaponAnimations(tempWeaponItem.WeaponType.DataId, out WeaponAnimations anims) && anims.rightHandHolsterAnimation.holsterState.clip != null)
+                    if (rightIsDiffer)
                     {
-                        holsterState = anims.rightHandHolsterAnimation.holsterState;
-                        holsteredDurationRate = anims.rightHandHolsterAnimation.holsteredDurationRate;
+                        tempWeaponItem = oldEquipWeapons.GetRightHandWeaponItem();
+                        if (tempWeaponItem != null && TryGetWeaponAnimations(tempWeaponItem.WeaponType.DataId, out WeaponAnimations anims) && anims.rightHandHolsterAnimation.holsterState.clip != null)
+                        {
+                            actionState = anims.rightHandHolsterAnimation.holsterState;
+                            triggeredDurationRate = anims.rightHandHolsterAnimation.holsteredDurationRate;
+                        }
+                        else
+                        {
+                            actionState = defaultAnimations.rightHandHolsterAnimation.holsterState;
+                            triggeredDurationRate = defaultAnimations.rightHandHolsterAnimation.holsteredDurationRate;
+                        }
                     }
-                    else
+                    else if (leftIsDiffer)
                     {
-                        holsterState = defaultAnimations.rightHandHolsterAnimation.holsterState;
-                        holsteredDurationRate = defaultAnimations.rightHandHolsterAnimation.holsteredDurationRate;
+                        tempWeaponItem = oldEquipWeapons.GetLeftHandWeaponItem();
+                        if (tempWeaponItem != null && TryGetWeaponAnimations(tempWeaponItem.WeaponType.DataId, out WeaponAnimations anims) && anims.leftHandHolsterAnimation.holsterState.clip != null)
+                        {
+                            actionState = anims.leftHandHolsterAnimation.holsterState;
+                            triggeredDurationRate = anims.leftHandHolsterAnimation.holsteredDurationRate;
+                        }
+                        else
+                        {
+                            actionState = defaultAnimations.leftHandHolsterAnimation.holsterState;
+                            triggeredDurationRate = defaultAnimations.leftHandHolsterAnimation.holsteredDurationRate;
+                        }
                     }
                 }
-                else if (leftIsDiffer)
+            }
+            else
+            {
+                if (newEquipWeapons != null)
                 {
-                    tempWeaponItem = oldEquipWeapons.GetLeftHandWeaponItem();
-                    if (tempWeaponItem != null && TryGetWeaponAnimations(tempWeaponItem.WeaponType.DataId, out WeaponAnimations anims) && anims.leftHandHolsterAnimation.holsterState.clip != null)
+                    if (rightIsDiffer)
                     {
-                        holsterState = anims.leftHandHolsterAnimation.holsterState;
-                        holsteredDurationRate = anims.leftHandHolsterAnimation.holsteredDurationRate;
+                        tempWeaponItem = newEquipWeapons.GetRightHandWeaponItem();
+                        if (tempWeaponItem != null && TryGetWeaponAnimations(tempWeaponItem.WeaponType.DataId, out WeaponAnimations anims) && anims.rightHandHolsterAnimation.drawState.clip != null)
+                        {
+                            actionState = anims.rightHandHolsterAnimation.drawState;
+                            triggeredDurationRate = anims.rightHandHolsterAnimation.drawnDurationRate;
+                        }
+                        else
+                        {
+                            actionState = defaultAnimations.rightHandHolsterAnimation.drawState;
+                            triggeredDurationRate = defaultAnimations.rightHandHolsterAnimation.drawnDurationRate;
+                        }
                     }
-                    else
+                    else if (leftIsDiffer)
                     {
-                        holsterState = defaultAnimations.leftHandHolsterAnimation.holsterState;
-                        holsteredDurationRate = defaultAnimations.leftHandHolsterAnimation.holsteredDurationRate;
+                        tempWeaponItem = newEquipWeapons.GetLeftHandWeaponItem();
+                        if (tempWeaponItem != null && TryGetWeaponAnimations(tempWeaponItem.WeaponType.DataId, out WeaponAnimations anims) && anims.leftHandHolsterAnimation.drawState.clip != null)
+                        {
+                            actionState = anims.leftHandHolsterAnimation.drawState;
+                            triggeredDurationRate = anims.leftHandHolsterAnimation.drawnDurationRate;
+                        }
+                        else
+                        {
+                            actionState = defaultAnimations.leftHandHolsterAnimation.drawState;
+                            triggeredDurationRate = defaultAnimations.leftHandHolsterAnimation.drawnDurationRate;
+                        }
                     }
                 }
             }
 
-            float drawnDurationRate = 0f;
-            ActionState drawState = new ActionState();
-            if (newEquipWeapons != null)
-            {
-                if (rightIsDiffer && !newEquipWeapons.IsEmptyRightHandSlot())
-                {
-                    tempWeaponItem = newEquipWeapons.GetRightHandWeaponItem();
-                    if (tempWeaponItem != null && TryGetWeaponAnimations(tempWeaponItem.WeaponType.DataId, out WeaponAnimations anims) && anims.rightHandHolsterAnimation.drawState.clip != null)
-                    {
-                        drawState = anims.rightHandHolsterAnimation.drawState;
-                        drawnDurationRate = anims.rightHandHolsterAnimation.drawnDurationRate;
-                    }
-                    else
-                    {
-                        drawState = defaultAnimations.rightHandHolsterAnimation.drawState;
-                        drawnDurationRate = defaultAnimations.rightHandHolsterAnimation.drawnDurationRate;
-                    }
-                }
-                else if (leftIsDiffer && !newEquipWeapons.IsEmptyLeftHandSlot())
-                {
-                    tempWeaponItem = newEquipWeapons.GetLeftHandWeaponItem();
-                    if (tempWeaponItem != null && TryGetWeaponAnimations(tempWeaponItem.WeaponType.DataId, out WeaponAnimations anims) && anims.leftHandHolsterAnimation.drawState.clip != null)
-                    {
-                        drawState = anims.leftHandHolsterAnimation.drawState;
-                        drawnDurationRate = anims.leftHandHolsterAnimation.drawnDurationRate;
-                    }
-                    else
-                    {
-                        drawState = defaultAnimations.leftHandHolsterAnimation.drawState;
-                        drawnDurationRate = defaultAnimations.leftHandHolsterAnimation.drawnDurationRate;
-                    }
-                }
-            }
-
-            float holsteredDelay;
-            float drawnDelay;
-            float animationDelay;
-            bool alreadySetNewEquipWeapons = false;
-
-            // Play holster state
-            holsteredDelay = 0f;
-            animationDelay = 0f;
-            if (holsterState.clip != null)
+            float animationDelay = 0f;
+            float triggeredDelay = 0f;
+            if (actionState.clip != null)
             {
                 // Setup animation playing duration
-                animationDelay = Behaviour.PlayAction(holsterState, 1f);
-                holsteredDelay = animationDelay * holsteredDurationRate;
+                animationDelay = Behaviour.PlayAction(actionState, 1f);
+                triggeredDelay = animationDelay * triggeredDurationRate;
             }
 
-            if (holsteredDelay > 0f)
-            {
-                // Wait by holstering duration
-                yield return new WaitForSecondsRealtime(holsteredDelay);
-            }
+            if (triggeredDelay > 0f)
+                yield return new WaitForSecondsRealtime(triggeredDelay);
 
-            // Holstered, so hide the weapon
-            if (holsterState.clip != null && drawState.clip != null)
-            {
-                base.SetEquipWeapons(selectableWeaponSets, equipWeaponSet, true);
-            }
-            else if (holsterState.clip != null)
-            {
-                // Set new equip weapons immediately after pass holstered delay, because it has no draw state
-                alreadySetNewEquipWeapons = true;
-                SetNewEquipWeapons(newEquipWeapons, selectableWeaponSets, equipWeaponSet, isWeaponsSheathed);
-                onStopAction = null;
-            }
+            SetNewEquipWeapons(newEquipWeapons, selectableWeaponSets, equipWeaponSet, isWeaponsSheathed);
+            onStopAction = null;
 
-            if (animationDelay - holsteredDelay > 0f)
+            if (animationDelay - triggeredDelay > 0f)
             {
                 // Wait by remaining animation playing duration
-                yield return new WaitForSecondsRealtime(animationDelay - holsteredDelay);
-            }
-
-            // Play draw state
-            drawnDelay = 0f;
-            animationDelay = 0f;
-            if (drawState.clip != null)
-            {
-                // Setup animation playing duration
-                animationDelay = Behaviour.PlayAction(drawState, 1f);
-                drawnDelay = animationDelay * drawnDurationRate;
-            }
-
-            if (drawnDelay > 0f)
-            {
-                // Wait by drawing duration
-                yield return new WaitForSecondsRealtime(drawnDelay);
-            }
-
-            // Drawn, so show the weapon
-            if (!alreadySetNewEquipWeapons)
-            {
-                SetNewEquipWeapons(newEquipWeapons, selectableWeaponSets, equipWeaponSet, isWeaponsSheathed);
-                onStopAction = null;
-            }
-
-            if (animationDelay - drawnDurationRate > 0f)
-            {
-                // Wait by remaining animation playing duration
-                yield return new WaitForSecondsRealtime(animationDelay - drawnDurationRate);
+                yield return new WaitForSecondsRealtime(animationDelay - triggeredDelay);
             }
 
             isDoingAction = false;
