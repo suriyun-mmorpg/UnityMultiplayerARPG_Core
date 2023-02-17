@@ -2,16 +2,8 @@
 
 namespace MultiplayerARPG
 {
-    [System.Serializable]
-    public class MailListEntry : INetSerializable
+    public partial class MailListEntry
     {
-        public string Id { get; set; }
-        public string SenderName { get; set; }
-        public string Title { get; set; }
-        public bool IsRead { get; set; }
-        public bool IsClaim { get; set; }
-        public long SentTimestamp { get; set; }
-
         public void Serialize(NetDataWriter writer)
         {
             writer.Put(Id);
