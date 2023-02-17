@@ -2,14 +2,8 @@
 
 namespace MultiplayerARPG
 {
-    [System.Serializable]
-    public struct GuildRoleData : INetSerializable
+    public partial struct GuildRoleData : INetSerializable
     {
-        public string roleName;
-        public bool canInvite;
-        public bool canKick;
-        public byte shareExpPercentage;
-
         public void Deserialize(NetDataReader reader)
         {
             roleName = reader.GetString();
