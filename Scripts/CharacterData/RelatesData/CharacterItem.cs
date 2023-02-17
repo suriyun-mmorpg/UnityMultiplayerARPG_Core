@@ -24,7 +24,6 @@ namespace MultiplayerARPG
         }
     }
 
-    [System.Serializable]
     public partial class CharacterItem : INetSerializable
     {
         [System.NonSerialized]

@@ -2,7 +2,6 @@
 
 namespace MultiplayerARPG
 {
-    [System.Serializable]
     public partial struct BuildingSaveData : INetSerializable
     {
         public void Deserialize(NetDataReader reader)

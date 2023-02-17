@@ -2,7 +2,6 @@
 
 namespace MultiplayerARPG
 {
-    [System.Serializable]
     public partial class StorageCharacterItem : INetSerializable
     {
         public void Serialize(NetDataWriter writer)

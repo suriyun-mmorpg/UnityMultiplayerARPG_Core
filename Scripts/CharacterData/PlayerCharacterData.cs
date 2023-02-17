@@ -2,8 +2,7 @@
 
 namespace MultiplayerARPG
 {
-    [System.Serializable]
-    public partial class PlayerCharacterData : CharacterData, IPlayerCharacterData, INetSerializable
+    public partial class PlayerCharacterData : INetSerializable
     {
         public void Deserialize(NetDataReader reader)
         {

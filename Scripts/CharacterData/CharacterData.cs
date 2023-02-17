@@ -1,7 +1,6 @@
 ﻿namespace MultiplayerARPG
 {
-    [System.Serializable]
-    public partial class CharacterData : ICharacterData
+    public partial class CharacterData
     {
         public IVehicleEntity PassengingVehicleEntity { get { return null; } }
     }

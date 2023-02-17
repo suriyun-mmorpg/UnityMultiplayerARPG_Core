@@ -3,15 +3,8 @@ using LiteNetLib.Utils;
 
 namespace MultiplayerARPG
 {
-    [System.Serializable]
     public partial class PartyData : INetSerializable
     {
-        public PartyData(int id, bool shareExp, bool shareItem, SocialCharacterData leaderCharacter)
-            : this(id, shareExp, shareItem, leaderCharacter.id)
-        {
-            AddMember(leaderCharacter);
-        }
-
         public void Setting(bool shareExp, bool shareItem)
         {
             this.shareExp = shareExp;

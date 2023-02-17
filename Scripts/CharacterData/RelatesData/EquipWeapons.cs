@@ -3,7 +3,6 @@ using LiteNetLibManager;
 
 namespace MultiplayerARPG
 {
-    [System.Serializable]
     public partial class EquipWeapons : INetSerializable
     {
         private void Validate()

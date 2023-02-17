@@ -3,10 +3,8 @@ using LiteNetLibManager;
 
 namespace MultiplayerARPG
 {
-    [System.Serializable]
     public partial class CharacterSummon : INetSerializable
     {
-        // Properties for save / load
         public int Level { get { return CacheEntity != null ? CacheEntity.Level : level; } }
         public int Exp { get { return CacheEntity != null ? CacheEntity.Exp : exp; } }
         public int CurrentHp { get { return CacheEntity != null ? CacheEntity.CurrentHp : currentHp; } }
