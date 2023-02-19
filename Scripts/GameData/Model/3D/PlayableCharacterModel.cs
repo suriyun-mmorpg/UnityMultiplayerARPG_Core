@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Animations;
 using UnityEngine.Playables;
+using UnityEngine.Serialization;
 
 namespace MultiplayerARPG.GameData.Model.Playables
 {
@@ -26,8 +27,9 @@ namespace MultiplayerARPG.GameData.Model.Playables
         [ArrayElementTitle("weaponType")]
         public WeaponAnimations[] weaponAnimations = new WeaponAnimations[0];
         [Tooltip("Weapon animations will be overrided by these animations while wielding weapon with the same type at left-hand")]
+        [FormerlySerializedAs("leftHandWieldingWeaponAnimations")]
         [ArrayElementTitle("weaponType")]
-        public WieldWeaponAnimations[] leftHandWieldingWeaponAnimations = new WieldWeaponAnimations[0];
+        public WieldWeaponAnimations[] leftHandWeaponAnimations = new WieldWeaponAnimations[0];
         [Tooltip("Don't have to set `weaponType` data, this is for shield")]
         public WieldWeaponAnimations leftHandShieldAnimations = new WieldWeaponAnimations();
         [ArrayElementTitle("skill")]
@@ -119,12 +121,32 @@ namespace MultiplayerARPG.GameData.Model.Playables
 
         public bool TryGetWeaponAnimations(int dataId, out WeaponAnimations anims)
         {
-            return CacheAnimationsManager.SetAndTryGetCacheWeaponAnimations(Id, weaponAnimations, skillAnimations, dataId, out anims);
+            if (CacheAnimationsManager.SetAndTryGetCacheWeaponAnimations(Id, weaponAnimations, skillAnimations, dataId, out anims))
+            {
+                return true;
+            }
+            if (GameInstance.WeaponTypes.TryGetValue(dataId, out WeaponType weaponType) && weaponType.PlayableCharacterModelSettings.applyWeaponAnimations)
+            {
+                anims = weaponType.PlayableCharacterModelSettings.weaponAnimations;
+                anims.weaponType = weaponType;
+                return true;
+            }
+            return false;
         }
 
         public bool TryGetSkillAnimations(int dataId, out SkillAnimations anims)
         {
-            return CacheAnimationsManager.SetAndTryGetCacheSkillAnimations(Id, weaponAnimations, skillAnimations, dataId, out anims);
+            if (CacheAnimationsManager.SetAndTryGetCacheSkillAnimations(Id, weaponAnimations, skillAnimations, dataId, out anims))
+            {
+                return true;
+            }
+            if (GameInstance.Skills.TryGetValue(dataId, out BaseSkill skill) && skill.PlayableCharacterModelSettings.applySkillAnimations)
+            {
+                anims = skill.PlayableCharacterModelSettings.skillAnimations;
+                anims.skill = skill;
+                return true;
+            }
+            return false;
         }
 
         public ActionAnimation GetActionAnimation(AnimActionType animActionType, int dataId, int index)
