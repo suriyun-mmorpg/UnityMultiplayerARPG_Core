@@ -430,20 +430,6 @@ namespace MultiplayerARPG
             if (!Entity.TryGetTargetEntity(out targetEntity) || targetEntity.Entity == Entity.Entity ||
                  targetEntity.IsDead() || !targetEntity.CanReceiveDamageFrom(Entity.GetInfo()))
             {
-                BaseCharacterEntity enemy;
-                for (int i = enemies.Count - 1; i >= 0; --i)
-                {
-                    enemy = enemies[i];
-                    enemies.RemoveAt(i);
-                    if (enemy != null && enemy.Entity != Entity.Entity && !enemy.IsDead() &&
-                        enemy.CanReceiveDamageFrom(Entity.GetInfo()))
-                    {
-                        // Found target, attack it
-                        Entity.SetAttackTarget(enemy);
-                        return true;
-                    }
-                }
-
                 // If no target enenmy or target enemy is dead, Find nearby character by layer mask
                 enemies.Clear();
                 if (Entity.IsSummonedAndSummonerExisted)
@@ -465,15 +451,16 @@ namespace MultiplayerARPG
                         false  /* Don't find an neutral */));
                 }
 
+                BaseCharacterEntity tempEnemy;
                 for (int i = enemies.Count - 1; i >= 0; --i)
                 {
-                    enemy = enemies[i];
+                    tempEnemy = enemies[i];
                     enemies.RemoveAt(i);
-                    if (enemy != null && enemy.Entity != Entity.Entity && !enemy.IsDead() &&
-                        enemy.CanReceiveDamageFrom(Entity.GetInfo()))
+                    if (tempEnemy != null && tempEnemy.Entity != Entity.Entity && !tempEnemy.IsDead() &&
+                        tempEnemy.CanReceiveDamageFrom(Entity.GetInfo()))
                     {
                         // Found target, attack it
-                        Entity.SetAttackTarget(enemy);
+                        Entity.SetAttackTarget(tempEnemy);
                         return true;
                     }
                 }
