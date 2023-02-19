@@ -19,18 +19,29 @@ namespace MultiplayerARPG
 
         internal static int GeneratingId { get; set; } = 0;
 
-        protected int? id;
+        [SerializeField]
+        [HideInInspector]
+        protected bool isIdAssigned;
+
+        [SerializeField]
+        [HideInInspector]
+        protected int id;
+
         public int Id
         {
             get
             {
-                if (!id.HasValue)
-                    id = ++GeneratingId;
-                return id.Value;
+                if (!isIdAssigned)
+                {
+                    id = gameObject.GetInstanceID();
+                    isIdAssigned = true;
+                }
+                return id;
             }
             protected set
             {
                 id = value;
+                isIdAssigned = true;
             }
         }
 
@@ -158,7 +169,8 @@ namespace MultiplayerARPG
 
         internal void UnassignId()
         {
-            id = null;
+            isIdAssigned = false;
+            id = 0;
         }
 
         protected virtual void Awake()
