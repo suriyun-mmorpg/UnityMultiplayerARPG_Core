@@ -21,7 +21,7 @@ namespace MultiplayerARPG
             get
             {
                 if (!string.IsNullOrEmpty(localeKeySetting) && LanguageManager.Texts.ContainsKey(localeKeySetting))
-                    LanguageManager.GetText(localeKeySetting, defaultText);
+                    return LanguageManager.GetText(localeKeySetting, defaultText);
                 return Language.GetText(textByLanguageKeys, defaultText);
             }
         }
