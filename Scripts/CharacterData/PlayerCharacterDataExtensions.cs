@@ -191,7 +191,7 @@ namespace MultiplayerARPG
             return character;
         }
 
-        public static T SetNewPlayerCharacterData<T>(this T character, string characterName, int dataId, int entityId) where T : IPlayerCharacterData
+        public static T SetNewPlayerCharacterData<T>(this T character, string characterName, int dataId, int entityId, int factionId) where T : IPlayerCharacterData
         {
             GameInstance gameInstance = GameInstance.Singleton;
             PlayerCharacter playerCharacter;
@@ -267,6 +267,7 @@ namespace MultiplayerARPG
             character.CurrentFood = (int)stats.food;
             character.CurrentWater = (int)stats.water;
             character.Gold = gameInstance.newCharacterSetting != null ? gameInstance.newCharacterSetting.startGold : gameInstance.startGold;
+            character.FactionId = factionId;
             // Start Map
             BaseMapInfo startMap;
             Vector3 startPosition;
