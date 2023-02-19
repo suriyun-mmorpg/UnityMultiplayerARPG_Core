@@ -28,6 +28,7 @@ namespace MultiplayerARPG.GameData.Model.Playables
         [Tooltip("Weapon animations will be overrided by these animations while wielding weapon with the same type at left-hand")]
         [ArrayElementTitle("weaponType")]
         public WieldWeaponAnimations[] leftHandWieldingWeaponAnimations = new WieldWeaponAnimations[0];
+        [Tooltip("Don't have to set `weaponType` data, this is for shield")]
         public WieldWeaponAnimations leftHandShieldAnimations = new WieldWeaponAnimations();
         [ArrayElementTitle("skill")]
         public SkillAnimations[] skillAnimations = new SkillAnimations[0];
