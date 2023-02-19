@@ -368,6 +368,9 @@ namespace MultiplayerARPG
 
         public virtual void RandomWanderDestination()
         {
+            randomedWanderDelay = Random.Range(randomWanderDelayMin, randomWanderDelayMax);
+            if (Entity.IsPlayingActionAnimation())
+                return;
             Vector3 randomPosition;
             // Random position around summoner or around spawn point
             if (Entity.Summoner != null)
@@ -385,9 +388,8 @@ namespace MultiplayerARPG
                     randomPosition = Entity.SpawnPosition + new Vector3(randomCircle.x, 0f, randomCircle.y);
             }
 
-            Entity.SetTargetEntity(null);
             SetWanderDestination(randomPosition);
-            randomedWanderDelay = Random.Range(randomWanderDelayMin, randomWanderDelayMax);
+            Entity.SetTargetEntity(null);
         }
 
         public virtual void FollowSummoner()
