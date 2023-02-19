@@ -45,6 +45,14 @@ namespace MultiplayerARPG
         /// <summary>
         /// Get character from server's collection
         /// </summary>
+        /// <param name="id"></param>
+        /// <param name="playerCharacter"></param>
+        /// <returns></returns>
+        bool TryGetPlayerCharacterByUserId(string userId, out IPlayerCharacterData playerCharacter);
+
+        /// <summary>
+        /// Get character from server's collection
+        /// </summary>
         /// <param name="name"></param>
         /// <param name="playerCharacter"></param>
         /// <returns></returns>
