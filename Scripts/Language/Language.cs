@@ -1093,6 +1093,16 @@ namespace MultiplayerARPG
         /// Format => {0} = {Character Name}, {1} = {Message}, {2} = {Guild Name}
         /// </summary>
         UI_FORMAT_CHAT_PARTY_WITH_GUILD_NAME,
+
+        // 1.80 New Formats
+        /// <summary>
+        /// Format => {0} = {Stat Points}
+        /// </summary>
+        UI_FORMAT_REWARD_STAT_POINTS,
+        /// <summary>
+        /// Format => {0} = {Skill Points}
+        /// </summary>
+        UI_FORMAT_REWARD_SKILL_POINTS,
     }
 
     public static class DefaultLocale
@@ -1619,6 +1629,9 @@ namespace MultiplayerARPG
             Texts.Add(UIFormatKeys.UI_FORMAT_CHAT_GLOBAL_WITH_GUILD_NAME.ToString(), "<color=white>(GLOBAL) {0}[{2}]: {1}</color>");
             Texts.Add(UIFormatKeys.UI_FORMAT_CHAT_WHISPER_WITH_GUILD_NAME.ToString(), "<color=green>(WHISPER) {0}[{2}]: {1}</color>");
             Texts.Add(UIFormatKeys.UI_FORMAT_CHAT_PARTY_WITH_GUILD_NAME.ToString(), "<color=cyan>(PARTY) {0}[{2}]: {1}</color>");
+            // 1.80 New Formats
+            Texts.Add(UIFormatKeys.UI_FORMAT_REWARD_STAT_POINTS.ToString(), "Reward Stat Points: {0}");
+            Texts.Add(UIFormatKeys.UI_FORMAT_REWARD_SKILL_POINTS.ToString(), "Reward Skill Points: {0}");
         }
     }
 

@@ -26,12 +26,18 @@ namespace MultiplayerARPG
         public UILocaleKeySetting formatKeyRewardExp = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_REWARD_EXP);
         [Tooltip("Format => {0} = {Gold Amount}")]
         public UILocaleKeySetting formatKeyRewardGold = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_REWARD_GOLD);
+        [Tooltip("Format => {0} = {Stat Points}")]
+        public UILocaleKeySetting formatKeyRewardStatPoints = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_REWARD_STAT_POINTS);
+        [Tooltip("Format => {0} = {Skill Points}")]
+        public UILocaleKeySetting formatKeyRewardSkillPoints = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_REWARD_SKILL_POINTS);
 
         [Header("UI Elements")]
         public TextWrapper uiTextTitle;
         public TextWrapper uiTextDescription;
         public TextWrapper uiTextRewardExp;
         public TextWrapper uiTextRewardGold;
+        public TextWrapper uiTextRewardStatPoints;
+        public TextWrapper uiTextRewardSkillPoints;
         [Header("Items")]
         public UICharacterItem uiRewardItemDialog;
         public UICharacterItem uiRewardItemPrefab;
@@ -300,6 +306,20 @@ namespace MultiplayerARPG
                 uiTextRewardGold.text = ZString.Format(
                     LanguageManager.GetText(formatKeyRewardGold),
                     Quest == null ? "0" : Quest.rewardGold.ToString("N0"));
+            }
+
+            if (uiTextRewardStatPoints != null)
+            {
+                uiTextRewardStatPoints.text = ZString.Format(
+                    LanguageManager.GetText(formatKeyRewardStatPoints),
+                    Quest == null ? "0" : Quest.rewardStatPoints.ToString("N0"));
+            }
+
+            if (uiTextRewardSkillPoints != null)
+            {
+                uiTextRewardSkillPoints.text = ZString.Format(
+                    LanguageManager.GetText(formatKeyRewardSkillPoints),
+                    Quest == null ? "0" : Quest.rewardSkillPoints.ToString("N0"));
             }
 
             // Prepare reward items

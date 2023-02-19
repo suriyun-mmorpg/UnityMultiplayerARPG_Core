@@ -145,6 +145,16 @@ namespace MultiplayerARPG
             RewardExp(reward, 1f, RewardGivenType.Quest);
             // Add currency
             RewardCurrencies(reward, 1f, RewardGivenType.Quest);
+            // Add stat points
+            checked
+            {
+                StatPoint += quest.rewardStatPoints;
+            }
+            // Add skill points
+            checked
+            {
+                SkillPoint += quest.rewardSkillPoints;
+            }
             // Set quest state
             characterQuest.isComplete = true;
             if (!quest.canRepeat)

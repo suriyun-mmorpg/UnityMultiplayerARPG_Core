@@ -26,6 +26,8 @@ namespace MultiplayerARPG
         public PlayerCharacter changeCharacterClass;
         public int rewardExp = 0;
         public int rewardGold = 0;
+        public int rewardStatPoints = 0;
+        public int rewardSkillPoints = 0;
         [ArrayElementTitle("currency")]
         public CurrencyAmount[] rewardCurrencies = new CurrencyAmount[0];
         [ArrayElementTitle("item")]
