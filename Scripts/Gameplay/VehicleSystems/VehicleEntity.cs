@@ -75,6 +75,7 @@ namespace MultiplayerARPG
         public float DestroyRespawnDelay { get { return destroyRespawnDelay; } }
 
         protected readonly Dictionary<byte, BaseGameEntity> passengers = new Dictionary<byte, BaseGameEntity>();
+        protected readonly Dictionary<uint, UnityAction<LiteNetLibIdentity>> spawnEvents = new Dictionary<uint, UnityAction<LiteNetLibIdentity>>();
         protected bool isDestroyed;
         protected CalculatedBuff cacheBuff;
         protected int dirtyLevel = int.MinValue;
@@ -130,19 +131,38 @@ namespace MultiplayerARPG
 
         private void OnPassengerIdsOperation(LiteNetLibSyncList.Operation operation, int index)
         {
-            if (index < syncPassengerIds.Count)
+            if (index >= syncPassengerIds.Count)
+                return;
+            // Set passenger entity to dictionary if the id > 0
+            uint passengerId = syncPassengerIds[index];
+            if (passengerId == 0)
             {
-                // Set passenger entity to dictionary if the id > 0
-                if (syncPassengerIds[index] == 0)
+                passengers.Remove((byte)index);
+                return;
+            }
+            if (Manager.Assets.TryGetSpawnedObject(passengerId, out LiteNetLibIdentity identity))
+            {
+                // Set the passenger
+                BaseGameEntity passenger = identity.GetComponent<BaseGameEntity>();
+                passenger.SetPassengingVehicle((byte)index, this);
+                passengers[(byte)index] = passenger;
+            }
+            else
+            {
+                // Create a new event to set passenger when passenger object spawn
+                spawnEvents[passengerId] = (identity) =>
                 {
-                    passengers.Remove((byte)index);
-                }
-                else if (Manager.Assets.TryGetSpawnedObject(syncPassengerIds[index], out LiteNetLibIdentity identity))
-                {
+                    if (identity.ObjectId != passengerId)
+                        return;
                     BaseGameEntity passenger = identity.GetComponent<BaseGameEntity>();
                     passenger.SetPassengingVehicle((byte)index, this);
                     passengers[(byte)index] = passenger;
-                }
+                    // Remove the event after passenger was set
+                    Manager.Assets.onObjectSpawn.RemoveListener(spawnEvents[passengerId]);
+                    spawnEvents.Remove(passengerId);
+                };
+                // Set the event
+                Manager.Assets.onObjectSpawn.AddListener(spawnEvents[passengerId]);
             }
         }
 
@@ -204,30 +224,29 @@ namespace MultiplayerARPG
         {
             if (!IsServer)
                 return false;
-            if (seatIndex < syncPassengerIds.Count)
+            if (seatIndex >= syncPassengerIds.Count)
+                return false;
+            // Store exiting object ID
+            uint passengerId = syncPassengerIds[seatIndex];
+            // Set passenger ID to `0` to tell clients that the passenger is exiting
+            syncPassengerIds[seatIndex] = 0;
+            // Move passenger to exit transform
+            if (Manager.TryGetEntityByObjectId(passengerId, out BaseGameEntity passenger))
             {
-                // Store exiting object ID
-                uint passengerId = syncPassengerIds[seatIndex];
-                // Set passenger ID to `0` to tell clients that the passenger is exiting
-                syncPassengerIds[seatIndex] = 0;
-                // Move passenger to exit transform
-                if (Manager.TryGetEntityByObjectId(passengerId, out BaseGameEntity passenger))
+                if (Seats[seatIndex].exitTransform != null)
                 {
-                    if (Seats[seatIndex].exitTransform != null) {
-                        passenger.ExitedVehicle(
-                            Seats[seatIndex].exitTransform.position,
-                            Seats[seatIndex].exitTransform.rotation);
-                    }
-                    else
-                    {
-                        passenger.ExitedVehicle(
-                            MovementTransform.position,
-                            MovementTransform.rotation);
-                    }
+                    passenger.ExitedVehicle(
+                        Seats[seatIndex].exitTransform.position,
+                        Seats[seatIndex].exitTransform.rotation);
                 }
-                return true;
+                else
+                {
+                    passenger.ExitedVehicle(
+                        MovementTransform.position,
+                        MovementTransform.rotation);
+                }
             }
-            return false;
+            return true;
         }
 
         public void RemoveAllPassengers()
