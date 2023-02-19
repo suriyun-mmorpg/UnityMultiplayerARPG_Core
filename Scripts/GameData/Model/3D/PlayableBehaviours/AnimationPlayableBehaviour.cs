@@ -253,18 +253,36 @@ namespace MultiplayerARPG.GameData.Model.Playables
                 // Setup clips by settings in character model
                 // Default
                 SetupDefaultAnimations(characterModel.defaultAnimations);
+                int i;
                 // Clips based on equipped weapons
-                for (int i = 0; i < characterModel.weaponAnimations.Length; ++i)
+                for (i = 0; i < characterModel.weaponAnimations.Length; ++i)
                 {
                     SetupWeaponAnimations(characterModel.weaponAnimations[i]);
                 }
                 // Clips based on equipped weapons in left-hand
-                for (int i = 0; i < characterModel.leftHandWeaponAnimations.Length; ++i)
+                for (i = 0; i < characterModel.leftHandWeaponAnimations.Length; ++i)
                 {
                     SetupLeftHandWieldingWeaponAnimations(characterModel.leftHandWeaponAnimations[i]);
                 }
                 // Clips based on equipped shield in left-hand
                 SetupLeftHandWieldingWeaponAnimations(characterModel.leftHandShieldAnimations, SHILED_WEAPON_TYPE_ID);
+                // Setup from weapon data
+                List<WeaponType> weaponTypes = new List<WeaponType>(GameInstance.WeaponTypes.Values);
+                for (i = 0; i < weaponTypes.Count; ++i)
+                {
+                    if (weaponTypes[i].PlayableCharacterModelSettings.applyWeaponAnimations)
+                    {
+                        WeaponAnimations weaponAnimations = weaponTypes[i].PlayableCharacterModelSettings.weaponAnimations;
+                        weaponAnimations.weaponType = weaponTypes[i];
+                        SetupWeaponAnimations(weaponAnimations);
+                    }
+                    if (weaponTypes[i].PlayableCharacterModelSettings.applyLeftHandWeaponAnimations)
+                    {
+                        WieldWeaponAnimations weaponAnimations = weaponTypes[i].PlayableCharacterModelSettings.leftHandWeaponAnimations;
+                        weaponAnimations.weaponType = weaponTypes[i];
+                        SetupLeftHandWieldingWeaponAnimations(weaponAnimations);
+                    }
+                }
             }
 
             private void SetupDefaultAnimations(DefaultAnimations defaultAnimations)
@@ -291,6 +309,8 @@ namespace MultiplayerARPG.GameData.Model.Playables
                 if (emptyOverrideId && weaponAnimations.weaponType == null)
                     return;
                 string weaponTypeId = emptyOverrideId ? weaponAnimations.weaponType.Id : overrideWeaponTypeId;
+                if (WeaponTypeIds.Contains(weaponTypeId))
+                    return;
                 WeaponTypeIds.Add(weaponTypeId);
                 SetBaseState(ZString.Concat(weaponTypeId, CLIP_IDLE), weaponAnimations.idleState);
                 SetMoveStates(weaponTypeId, string.Empty, weaponAnimations.moveStates);
@@ -314,6 +334,8 @@ namespace MultiplayerARPG.GameData.Model.Playables
                 if (emptyOverrideId && weaponAnimations.weaponType == null)
                     return;
                 string weaponTypeId = emptyOverrideId ? weaponAnimations.weaponType.Id : overrideWeaponTypeId;
+                if (LeftHandWeaponTypeIds.Contains(weaponTypeId))
+                    return;
                 LeftHandWeaponTypeIds.Add(weaponTypeId);
                 SetLeftHandWieldingState(ZString.Concat(weaponTypeId, CLIP_IDLE), weaponAnimations.idleState);
                 SetLeftHandWieldingMoveStates(weaponTypeId, string.Empty, weaponAnimations.moveStates);
