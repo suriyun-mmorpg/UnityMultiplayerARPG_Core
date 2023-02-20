@@ -61,9 +61,9 @@ namespace MultiplayerARPG
         /// </summary>
         DamageIncremental[] IncreaseDamages { get; }
         /// <summary>
-        /// Increasing skill levels while equipping this item
+        /// Increasing skills while equipping this item
         /// </summary>
-        SkillLevel[] IncreaseSkillLevels { get; }
+        SkillIncremental[] IncreaseSkills { get; }
         /// <summary>
         /// Status effects that can be applied to the attacker when attacking
         /// </summary>

@@ -1202,6 +1202,21 @@ namespace MultiplayerARPG
             }
         }
 
+        public static void AddSkills(params SkillIncremental[] skillLevels)
+        {
+            AddSkills((IEnumerable<SkillIncremental>)skillLevels);
+        }
+
+        public static void AddSkills(IEnumerable<SkillIncremental> skillLevels)
+        {
+            if (skillLevels == null)
+                return;
+            foreach (SkillIncremental skillLevel in skillLevels)
+            {
+                AddGameData(Skills, skillLevel.skill);
+            }
+        }
+
         public static void AddSkills(params SkillRandomLevel[] skillLevels)
         {
             AddSkills((IEnumerable<SkillRandomLevel>)skillLevels);

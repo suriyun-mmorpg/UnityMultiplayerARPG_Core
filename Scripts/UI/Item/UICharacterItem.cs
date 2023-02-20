@@ -803,9 +803,9 @@ namespace MultiplayerARPG
             {
                 Dictionary<BaseSkill, int> skillLevels = null;
                 if (EquipmentItem != null)
-                    skillLevels = EquipmentItem.GetIncreaseSkills(CharacterItem.randomSeed);
+                    skillLevels = EquipmentItem.GetIncreaseSkills(Level, CharacterItem.randomSeed);
                 else if (SocketEnhancerItem != null)
-                    skillLevels = GameDataHelpers.CombineSkills(SocketEnhancerItem.SocketEnhanceEffect.skills, skillLevels);
+                    skillLevels = GameDataHelpers.CombineSkills(SocketEnhancerItem.SocketEnhanceEffect.skills, skillLevels, 1f);
 
                 if (skillLevels == null || skillLevels.Count == 0)
                 {

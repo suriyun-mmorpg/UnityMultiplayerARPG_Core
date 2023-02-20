@@ -371,7 +371,7 @@ namespace MultiplayerARPG
         {
             if (GetEquipmentItem() == null)
                 return null;
-            return GetEquipmentItem().GetIncreaseSkills(randomSeed);
+            return GetEquipmentItem().GetIncreaseSkills(level, randomSeed);
         }
 
         public CharacterStats GetSocketsIncreaseStats()
@@ -481,7 +481,7 @@ namespace MultiplayerARPG
             foreach (int socketId in Sockets)
             {
                 if (GameInstance.Items.TryGetValue(socketId, out tempEnhancer))
-                    result = GameDataHelpers.CombineSkills((tempEnhancer as ISocketEnhancerItem).SocketEnhanceEffect.skills, result);
+                    result = GameDataHelpers.CombineSkills((tempEnhancer as ISocketEnhancerItem).SocketEnhanceEffect.skills, result, 1f);
             }
             return result;
         }

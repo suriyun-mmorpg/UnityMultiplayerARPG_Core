@@ -146,7 +146,7 @@ namespace MultiplayerARPG
                 for (int i = 0; i < randomBonus.randomSkillLevels.Length; ++i)
                 {
                     if (!randomBonus.randomSkillLevels[i].Apply(random)) continue;
-                    SkillLevels = GameDataHelpers.CombineSkills(SkillLevels, randomBonus.randomSkillLevels[i].GetRandomedAmount(random).ToKeyValuePair());
+                    SkillLevels = GameDataHelpers.CombineSkills(SkillLevels, randomBonus.randomSkillLevels[i].GetRandomedAmount(random).ToKeyValuePair(1f));
                     appliedAmount++;
                     if (randomBonus.maxRandomStatsAmount > 0 && appliedAmount >= randomBonus.maxRandomStatsAmount)
                         return;

@@ -188,13 +188,13 @@ namespace MultiplayerARPG
             return result;
         }
 
-        public static Dictionary<BaseSkill, int> GetIncreaseSkills<T>(this T equipmentItem, int randomSeed)
+        public static Dictionary<BaseSkill, int> GetIncreaseSkills<T>(this T equipmentItem, int level, int randomSeed)
             where T : IEquipmentItem
         {
             Dictionary<BaseSkill, int> result = new Dictionary<BaseSkill, int>();
             if (equipmentItem != null && equipmentItem.IsEquipment())
             {
-                result = GameDataHelpers.CombineSkills(equipmentItem.IncreaseSkillLevels, result);
+                result = GameDataHelpers.CombineSkills(equipmentItem.IncreaseSkills, result, level, 1f);
                 if (equipmentItem.RandomBonus.randomSkillLevels != null &&
                     equipmentItem.RandomBonus.randomSkillLevels.Length > 0)
                     result = GameDataHelpers.CombineSkills(result, ItemRandomBonusCacheManager.GetCaches(equipmentItem, randomSeed).SkillLevels);

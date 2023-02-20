@@ -113,11 +113,14 @@ namespace MultiplayerARPG
             get { return increaseDamages; }
         }
 
+        [HideInInspector]
         [SerializeField]
         private SkillLevel[] increaseSkillLevels = new SkillLevel[0];
-        public SkillLevel[] IncreaseSkillLevels
+        [SerializeField]
+        private SkillIncremental[] increaseSkills = new SkillIncremental[0];
+        public SkillIncremental[] IncreaseSkills
         {
-            get { return increaseSkillLevels; }
+            get { return increaseSkills; }
         }
 
         [SerializeField]
@@ -155,6 +158,32 @@ namespace MultiplayerARPG
             get { return randomBonus; }
         }
 
+        public override bool Validate()
+        {
+            bool hasChanges = false;
+            if (increaseSkillLevels != null && increaseSkillLevels.Length > 0)
+            {
+                List<SkillIncremental> skills = new List<SkillIncremental>();
+                foreach (SkillLevel increaseSkillLevel in increaseSkillLevels)
+                {
+                    if (increaseSkillLevel.skill == null)
+                        continue;
+                    skills.Add(new SkillIncremental()
+                    {
+                        skill = increaseSkillLevel.skill,
+                        level = new IncrementalInt()
+                        {
+                            baseAmount = increaseSkillLevel.level
+                        },
+                    });
+                }
+                increaseSkills = skills.ToArray();
+                increaseSkillLevels = null;
+                hasChanges = true;
+            }
+            return hasChanges || base.Validate();
+        }
+
         public override void PrepareRelatesData()
         {
             base.PrepareRelatesData();
@@ -163,7 +192,7 @@ namespace MultiplayerARPG
             GameInstance.AddDamageElements(IncreaseResistances);
             GameInstance.AddDamageElements(IncreaseArmors);
             GameInstance.AddDamageElements(IncreaseDamages);
-            GameInstance.AddSkills(IncreaseSkillLevels);
+            GameInstance.AddSkills(IncreaseSkills);
             GameInstance.AddStatusEffects(SelfStatusEffectsWhenAttacking);
             GameInstance.AddStatusEffects(EnemyStatusEffectsWhenAttacking);
             GameInstance.AddStatusEffects(SelfStatusEffectsWhenAttacked);

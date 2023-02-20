@@ -32,4 +32,11 @@ namespace MultiplayerARPG
             };
         }
     }
+
+    [System.Serializable]
+    public struct SkillIncremental
+    {
+        public BaseSkill skill;
+        public IncrementalInt level;
+    }
 }

@@ -107,7 +107,7 @@ namespace MultiplayerARPG
             get
             {
                 if (cacheSkillLevels == null)
-                    cacheSkillLevels = GameDataHelpers.CombineSkills(skillLevels, new Dictionary<BaseSkill, int>());
+                    cacheSkillLevels = GameDataHelpers.CombineSkills(skillLevels, new Dictionary<BaseSkill, int>(), 1f);
                 return cacheSkillLevels;
             }
         }

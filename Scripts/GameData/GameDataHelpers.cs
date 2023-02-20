@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using UnityEngine;
 
 namespace MultiplayerARPG
 {
@@ -540,11 +541,23 @@ namespace MultiplayerARPG
         /// </summary>
         /// <param name="source"></param>
         /// <returns></returns>
-        public static KeyValuePair<BaseSkill, int> ToKeyValuePair(this SkillLevel source)
+        public static KeyValuePair<BaseSkill, int> ToKeyValuePair(this SkillLevel source, float rate)
         {
             if (source.skill == null)
                 return new KeyValuePair<BaseSkill, int>();
-            return new KeyValuePair<BaseSkill, int>(source.skill, source.level);
+            return new KeyValuePair<BaseSkill, int>(source.skill, Mathf.CeilToInt(source.level * rate));
+        }
+
+        /// <summary>
+        /// Make skill - level key-value pair
+        /// </summary>
+        /// <param name="source"></param>
+        /// <returns></returns>
+        public static KeyValuePair<BaseSkill, int> ToKeyValuePair(this SkillIncremental source, int level, float rate)
+        {
+            if (source.skill == null)
+                return new KeyValuePair<BaseSkill, int>();
+            return new KeyValuePair<BaseSkill, int>(source.skill, Mathf.CeilToInt(source.level.GetAmount(level) * rate));
         }
 
         /// <summary>
@@ -850,8 +863,9 @@ namespace MultiplayerARPG
         /// </summary>
         /// <param name="sourceLevels"></param>
         /// <param name="resultDictionary"></param>
+        /// <param name="rate"></param>
         /// <returns></returns>
-        public static Dictionary<BaseSkill, int> CombineSkills(IEnumerable<SkillLevel> sourceLevels, Dictionary<BaseSkill, int> resultDictionary)
+        public static Dictionary<BaseSkill, int> CombineSkills(IEnumerable<SkillLevel> sourceLevels, Dictionary<BaseSkill, int> resultDictionary, float rate)
         {
             if (resultDictionary == null)
                 resultDictionary = new Dictionary<BaseSkill, int>();
@@ -860,7 +874,31 @@ namespace MultiplayerARPG
                 KeyValuePair<BaseSkill, int> pair;
                 foreach (SkillLevel sourceLevel in sourceLevels)
                 {
-                    pair = ToKeyValuePair(sourceLevel);
+                    pair = ToKeyValuePair(sourceLevel, rate);
+                    resultDictionary = CombineSkills(resultDictionary, pair);
+                }
+            }
+            return resultDictionary;
+        }
+
+        /// <summary>
+        /// Combine skill level incrementals dictionary
+        /// </summary>
+        /// <param name="sourceIncrementals"></param>
+        /// <param name="resultDictionary"></param>
+        /// <param name="level"></param>
+        /// <param name="rate"></param>
+        /// <returns></returns>
+        public static Dictionary<BaseSkill, int> CombineSkills(IEnumerable<SkillIncremental> sourceIncrementals, Dictionary<BaseSkill, int> resultDictionary, int level, float rate)
+        {
+            if (resultDictionary == null)
+                resultDictionary = new Dictionary<BaseSkill, int>();
+            if (sourceIncrementals != null)
+            {
+                KeyValuePair<BaseSkill, int> pair;
+                foreach (SkillIncremental sourceIncremental in sourceIncrementals)
+                {
+                    pair = ToKeyValuePair(sourceIncremental, level, rate);
                     resultDictionary = CombineSkills(resultDictionary, pair);
                 }
             }
@@ -958,7 +996,7 @@ namespace MultiplayerARPG
                 foreach (Attribute attribute in attributeAmounts.Keys)
                 {
                     if (attribute == null) continue;
-                    stats += attribute.statsIncreaseEachLevel * attributeAmounts[attribute];
+                    stats += attribute.StatsIncreaseEachLevel * attributeAmounts[attribute];
                 }
             }
             return stats;

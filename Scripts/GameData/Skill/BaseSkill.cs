@@ -364,8 +364,8 @@ namespace MultiplayerARPG
         public Dictionary<BaseSkill, int> GetRequireSkillLevels(int level)
         {
             if (level >= requirementEachLevels.Count)
-                return GameDataHelpers.CombineSkills(requirementEachLevels[requirementEachLevels.Count - 1].skillLevels, null);
-            return GameDataHelpers.CombineSkills(requirementEachLevels[level].skillLevels, null);
+                return GameDataHelpers.CombineSkills(requirementEachLevels[requirementEachLevels.Count - 1].skillLevels, null, 1f);
+            return GameDataHelpers.CombineSkills(requirementEachLevels[level].skillLevels, null, 1f);
         }
 
         public Dictionary<Currency, int> GetRequireCurrencyAmounts(int level)
