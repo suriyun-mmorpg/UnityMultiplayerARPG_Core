@@ -6,7 +6,34 @@ namespace MultiplayerARPG
     public partial class Attribute : BaseGameData
     {
         [Category("Attribute Settings")]
-        public CharacterStats statsIncreaseEachLevel;
+        [SerializeField]
+        private CharacterStats statsIncreaseEachLevel;
+        public CharacterStats StatsIncreaseEachLevel
+        {
+            get { return statsIncreaseEachLevel; }
+        }
+
+        [SerializeField]
+        private ResistanceIncremental[] increaseResistances = new ResistanceIncremental[0];
+        public ResistanceIncremental[] IncreaseResistances
+        {
+            get { return increaseResistances; }
+        }
+
+        [SerializeField]
+        private ArmorIncremental[] increaseArmors = new ArmorIncremental[0];
+        public ArmorIncremental[] IncreaseArmors
+        {
+            get { return increaseArmors; }
+        }
+
+        [SerializeField]
+        private DamageIncremental[] increaseDamages = new DamageIncremental[0];
+        public DamageIncremental[] IncreaseDamages
+        {
+            get { return increaseDamages; }
+        }
+
         [Tooltip("If this value more than 0 it will limit max amount of this attribute by this value")]
         public int maxAmount;
         public bool cannotReset = false;

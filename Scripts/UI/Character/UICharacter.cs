@@ -399,9 +399,9 @@ namespace MultiplayerARPG
             cacheEquipmentSets = new Dictionary<EquipmentSet, int>();
             cacheSkills = GameDataHelpers.CombineSkills(cacheSkills, Data.GetSkills(true));
             cacheAttributes = GameDataHelpers.CombineAttributes(cacheAttributes, showAttributeWithBuffs ? Data.GetAttributes(true, true, cacheSkills) : Data.GetAttributes(true, false, null));
-            cacheResistances = GameDataHelpers.CombineResistances(cacheResistances, showResistanceWithBuffs ? Data.GetResistances(true, true, cacheSkills) : Data.GetResistances(true, false, null));
-            cacheArmors = GameDataHelpers.CombineArmors(cacheArmors, showArmorWithBuffs ? Data.GetArmors(true, true, cacheSkills) : Data.GetArmors(true, false, null));
-            cacheDamages = GameDataHelpers.CombineDamages(cacheDamages, showDamageWithBuffs ? Data.GetIncreaseDamages(true, true, cacheSkills) : Data.GetIncreaseDamages(true, false, null));
+            cacheResistances = GameDataHelpers.CombineResistances(cacheResistances, showResistanceWithBuffs ? Data.GetResistances(true, true, cacheAttributes, cacheSkills) : Data.GetResistances(true, false, null, null));
+            cacheArmors = GameDataHelpers.CombineArmors(cacheArmors, showArmorWithBuffs ? Data.GetArmors(true, true, cacheAttributes, cacheSkills) : Data.GetArmors(true, false, null, null));
+            cacheDamages = GameDataHelpers.CombineDamages(cacheDamages, showDamageWithBuffs ? Data.GetIncreaseDamages(true, true, cacheAttributes, cacheSkills) : Data.GetIncreaseDamages(true, false, null, null));
             cacheStats = cacheStats + (showStatsWithBuffs ? Data.GetStats(true, true, cacheSkills) : Data.GetStats(true, false, null));
             Data.GetEquipmentSetBonus(ref cacheStats, cacheAttributes, cacheResistances, cacheArmors, cacheDamages, cacheSkills, cacheEquipmentSets, true);
 
