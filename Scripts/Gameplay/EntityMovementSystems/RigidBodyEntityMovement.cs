@@ -77,8 +77,7 @@ namespace MultiplayerARPG
         protected float applyJumpForceCountDown;
         protected Collider waterCollider;
         protected Transform groundedTransform;
-        protected Vector3 groundedLocalPosition;
-        protected Vector3 oldGroundedPosition;
+        protected Vector3 previousPlatformPosition;
         protected long acceptedPositionTimestamp;
         protected Vector3? clientTargetPosition;
         protected float yAngle;
@@ -580,18 +579,15 @@ namespace MultiplayerARPG
             }
 
             Vector3 platformMotion = Vector3.zero;
-            if (isGrounded && !isUnderWater)
+            if (!isUnderWater)
             {
                 // Apply platform motion
-                if (groundedTransform != null && deltaTime > 0.0f)
+                if (groundedTransform != null)
                 {
-                    Vector3 newGroundedPosition = groundedTransform.TransformPoint(groundedLocalPosition);
-                    platformMotion = (newGroundedPosition - oldGroundedPosition) / deltaTime;
-                    platformMotion.y = 0;
-                    oldGroundedPosition = newGroundedPosition;
+                    platformMotion = (groundedTransform.position - previousPlatformPosition) / deltaTime;
+                    previousPlatformPosition = groundedTransform.position;
                 }
             }
-
             collisionFlags = CacheOpenCharacterController.Move((tempMoveVelocity + platformMotion) * deltaTime);
 
             if (yTurnSpeed <= 0f)
@@ -679,21 +675,18 @@ namespace MultiplayerARPG
             }
         }
 
-        private void OnCharacterControllerCollision(OpenCharacterController.CollisionInfo info)
+        private void OnCharacterControllerCollision(OpenCharacterController.CollisionInfo hit)
         {
             if (CacheOpenCharacterController.isGrounded)
             {
-                if (platformLayerMask == (platformLayerMask | (1 << info.gameObject.layer)) && info.point.y < CacheTransform.position.y + 0.1f)
+                if (CacheTransform.position.y >= hit.point.y)
                 {
-                    groundedTransform = info.collider.transform;
-                    oldGroundedPosition = info.point;
-                    groundedLocalPosition = groundedTransform.InverseTransformPoint(oldGroundedPosition);
-                }
-                else
-                {
-                    groundedTransform = null;
+                    groundedTransform = hit.collider.transform;
+                    previousPlatformPosition = groundedTransform.position;
+                    return;
                 }
             }
+            groundedTransform = null;
         }
 
         public bool WriteClientState(NetDataWriter writer, out bool shouldSendReliably)
