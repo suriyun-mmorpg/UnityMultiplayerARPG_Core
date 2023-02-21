@@ -691,14 +691,14 @@ namespace MultiplayerARPG
         {
             if (grounded)
             {
-                groundedTransform = hit.collider.transform;
-                previousPlatformPosition = groundedTransform.position;
+                if (CacheTransform.position.y >= hit.point.y)
+                {
+                    groundedTransform = hit.collider.transform;
+                    previousPlatformPosition = groundedTransform.position;
+                    return;
+                }
             }
-            else
-            {
-                groundedTransform = null;
-                previousPlatformPosition = Vector3.zero;
-            }
+            groundedTransform = null;
         }
 
         public bool WriteClientState(NetDataWriter writer, out bool shouldSendReliably)
