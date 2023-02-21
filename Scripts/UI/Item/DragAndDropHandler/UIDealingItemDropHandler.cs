@@ -19,7 +19,7 @@ namespace MultiplayerARPG
         public virtual void OnDrop(PointerEventData eventData)
         {
             // Validate drop position
-            if (!RectTransformUtility.RectangleContainsScreenPoint(DropRect, Input.mousePosition))
+            if (!RectTransformUtility.RectangleContainsScreenPoint(DropRect, InputManager.MousePosition()))
                 return;
             // Validate dragging UI
             UIDragHandler dragHandler = eventData.pointerDrag.GetComponent<UIDragHandler>();

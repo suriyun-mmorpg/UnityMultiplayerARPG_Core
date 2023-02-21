@@ -120,7 +120,7 @@ public partial class UIDragHandler : MonoBehaviour, IBeginDragHandler, IDragHand
         }
         if (!CanDrag)
             return;
-        rootTransform.position = Input.mousePosition;
+        rootTransform.position = InputManager.MousePosition();
     }
 
     public virtual void OnEndDrag(PointerEventData eventData)

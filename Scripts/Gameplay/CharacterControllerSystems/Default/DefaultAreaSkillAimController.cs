@@ -26,7 +26,7 @@ namespace MultiplayerARPG
             }
             if (IsMobile)
                 return UpdateAimControls_Mobile(aimAxes, skill, skillLevel);
-            return UpdateAimControls_PC(Input.mousePosition, skill, skillLevel);
+            return UpdateAimControls_PC(InputManager.MousePosition(), skill, skillLevel);
         }
 
         public void FinishAimControls(bool isCancel)

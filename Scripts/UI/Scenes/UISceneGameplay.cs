@@ -193,7 +193,7 @@ namespace MultiplayerARPG
 
             foreach (UIToggleUI toggleUi in toggleUis)
             {
-                if (Input.GetKeyDown(toggleUi.keyCode) || InputManager.GetButtonDown(toggleUi.buttonName))
+                if (InputManager.GetKeyDown(toggleUi.keyCode) || InputManager.GetButtonDown(toggleUi.buttonName))
                     toggleUi.ui.Toggle();
             }
         }
@@ -489,7 +489,7 @@ namespace MultiplayerARPG
             PointerEventData eventDataCurrentPosition = new PointerEventData(EventSystem.current);
             if (UIDragHandler.DraggingObjects.Count > 0)
                 return true;
-            eventDataCurrentPosition.position = new Vector2(Input.mousePosition.x, Input.mousePosition.y);
+            eventDataCurrentPosition.position = new Vector2(InputManager.MousePosition().x, InputManager.MousePosition().y);
             EventSystem.current.RaycastAll(eventDataCurrentPosition, pointerOverUIResults);
             // If it's not mobile ui, assume that it's over UI
             if (ignorePointerOverUITags.Count > 0 || ignorePointerOverUIObjects.Count > 0)

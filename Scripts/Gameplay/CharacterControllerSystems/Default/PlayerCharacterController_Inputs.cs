@@ -178,19 +178,19 @@ namespace MultiplayerARPG
             if (UICharacterHotkeys.UsingHotkey != null)
                 return;
 
-            getMouseDown = Input.GetMouseButtonDown(0);
-            getMouseUp = Input.GetMouseButtonUp(0);
-            getMouse = Input.GetMouseButton(0);
+            getMouseDown = InputManager.GetMouseButtonDown(0);
+            getMouseUp = InputManager.GetMouseButtonUp(0);
+            getMouse = InputManager.GetMouseButton(0);
 
             if (getMouseDown)
             {
                 isMouseDragOrHoldOrOverUI = false;
                 mouseDownTime = Time.unscaledTime;
-                mouseDownPosition = Input.mousePosition;
+                mouseDownPosition = InputManager.MousePosition();
             }
             // Read inputs
             isPointerOverUI = UISceneGameplay.IsPointerOverUIObject();
-            isMouseDragDetected = (Input.mousePosition - mouseDownPosition).sqrMagnitude > DETECT_MOUSE_DRAG_DISTANCE_SQUARED;
+            isMouseDragDetected = (InputManager.MousePosition() - mouseDownPosition).sqrMagnitude > DETECT_MOUSE_DRAG_DISTANCE_SQUARED;
             isMouseHoldDetected = Time.unscaledTime - mouseDownTime > DETECT_MOUSE_HOLD_DURATION;
             isMouseHoldAndNotDrag = !isMouseDragDetected && isMouseHoldDetected;
             if (!isMouseDragOrHoldOrOverUI && (isMouseDragDetected || isMouseHoldDetected || isPointerOverUI))

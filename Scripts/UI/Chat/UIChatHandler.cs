@@ -147,7 +147,7 @@ namespace MultiplayerARPG
                 movingToEnd = false;
                 uiMessageField.MoveTextEnd(false);
             }
-            if (Input.GetKeyUp(enterChatKey))
+            if (InputManager.GetKeyUp(enterChatKey))
             {
                 if (!EnterChatFieldVisible)
                     ShowEnterChatField();
