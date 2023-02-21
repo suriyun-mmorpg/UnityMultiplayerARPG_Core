@@ -26,7 +26,6 @@ namespace MultiplayerARPG
         public float gravity = 9.81f;
         public float maxFallVelocity = 40f;
         public float stickGroundForce = 9.6f;
-        public LayerMask platformLayerMask = 1;
         [Tooltip("Delay before character change from grounded state to airborne")]
         public float airborneDelay = 0.01f;
         public bool doNotChangeVelocityWhileAirborne;
@@ -36,6 +35,10 @@ namespace MultiplayerARPG
         [Range(0.1f, 1f)]
         public float underWaterThreshold = 0.75f;
         public bool autoSwimToSurface;
+
+        [Header("Player Grounded")]
+        [Tooltip("If the character is grounded or not. Not part of the CharacterController built in grounded check")]
+        public bool grounded = true;
 
         [Header("Root Motion Settings")]
         public bool useRootMotionForMovement;
@@ -74,8 +77,7 @@ namespace MultiplayerARPG
         protected float applyJumpForceCountDown;
         protected Collider waterCollider;
         protected Transform groundedTransform;
-        protected Vector3 groundedLocalPosition;
-        protected Vector3 oldGroundedPosition;
+        protected Vector3 previousPlatformPosition;
         protected long acceptedPositionTimestamp;
         protected long acceptedJumpTimestamp;
         protected Vector3? clientTargetPosition;
@@ -148,6 +150,20 @@ namespace MultiplayerARPG
             NavPaths = null;
         }
 
+        private void OnDrawGizmos()
+        {
+            Color transparentGreen = new Color(0.0f, 1.0f, 0.0f, 0.35f);
+            Color transparentRed = new Color(1.0f, 0.0f, 0.0f, 0.35f);
+
+            if (grounded) 
+                Gizmos.color = transparentGreen;
+            else 
+                Gizmos.color = transparentRed;
+
+            // when selected, draw a gizmo in the position of, and matching radius of, the grounded collider
+            Gizmos.DrawSphere(new Vector3(CacheTransform.position.x, CacheTransform.position.y + (CacheCharacterController.radius * CacheTransform.localScale.y), CacheTransform.position.z), CacheCharacterController.radius * Mathf.Max(CacheTransform.localScale.x, CacheTransform.localScale.z));
+        }
+
         private void OnAnimatorMove()
         {
             if (!CacheAnimator)
@@ -201,7 +217,7 @@ namespace MultiplayerARPG
                 if (inputDirection.sqrMagnitude > 0)
                     NavPaths = null;
                 if (!isJumping && !applyingJumpForce)
-                    isJumping = CacheCharacterController.isGrounded && tempMovementState.Has(MovementState.IsJump);
+                    isJumping = grounded && tempMovementState.Has(MovementState.IsJump);
             }
         }
 
@@ -278,7 +294,7 @@ namespace MultiplayerARPG
                 tempMovementState = moveDirection.sqrMagnitude > 0f ? tempMovementState : MovementState.None;
                 if (isUnderWater)
                     tempMovementState |= MovementState.IsUnderWater;
-                if (CacheCharacterController.isGrounded || airborneElapsed < airborneDelay)
+                if (grounded || airborneElapsed < airborneDelay)
                     tempMovementState |= MovementState.IsGrounded;
                 // Update movement state
                 MovementState = tempMovementState;
@@ -306,6 +322,18 @@ namespace MultiplayerARPG
             isUnderWater = currentThreshold >= underWaterThreshold;
         }
 
+        private void GroundedCheck()
+        {
+            if (CacheCharacterController.isGrounded)
+            {
+                grounded = true;
+                return;
+            }
+            // set sphere position, with offset
+            Vector3 spherePosition = new Vector3(CacheTransform.position.x, CacheTransform.position.y + (CacheCharacterController.radius * CacheTransform.localScale.y), CacheTransform.position.z);
+            grounded = Physics.CheckSphere(spherePosition, CacheCharacterController.radius * Mathf.Max(CacheTransform.localScale.x, CacheTransform.localScale.z), GameInstance.Singleton.GetGameEntityGroundDetectionLayerMask(), QueryTriggerInteraction.Ignore);
+        }
+
         private void UpdateMovement(float deltaTime)
         {
             float tempSqrMagnitude;
@@ -324,8 +352,9 @@ namespace MultiplayerARPG
             moveDirection = Vector3.zero;
             tempTargetDistance = 0f;
             WaterCheck();
+            GroundedCheck();
 
-            bool isGrounded = CacheCharacterController.isGrounded;
+            bool isGrounded = grounded;
             bool isAirborne = !isGrounded && !isUnderWater && airborneElapsed >= airborneDelay;
 
             // Update airborne elasped
@@ -561,19 +590,17 @@ namespace MultiplayerARPG
             }
 
             Vector3 platformMotion = Vector3.zero;
-            if (isGrounded && !isUnderWater)
+            if (!isUnderWater)
             {
                 // Apply platform motion
-                if (groundedTransform != null && deltaTime > 0.0f)
+                if (groundedTransform != null)
                 {
-                    Vector3 newGroundedPosition = groundedTransform.TransformPoint(groundedLocalPosition);
-                    platformMotion = (newGroundedPosition - oldGroundedPosition) / deltaTime;
-                    oldGroundedPosition = newGroundedPosition;
+                    platformMotion = (groundedTransform.position - previousPlatformPosition) / deltaTime;
+                    previousPlatformPosition = groundedTransform.position;
                 }
             }
-
-            Vector3 stickGroundMove = isGrounded && !isUnderWater ? (Vector3.down * stickGroundForce * deltaTime) : Vector3.zero;
-            collisionFlags = CacheCharacterController.Move((tempMoveVelocity + platformMotion) * deltaTime + stickGroundMove);
+            Vector3 stickGroundMotion = isGrounded && !isUnderWater && platformMotion.y <= 0f ? (Vector3.down * stickGroundForce) : Vector3.zero;
+            collisionFlags = CacheCharacterController.Move((tempMoveVelocity + platformMotion + stickGroundMotion) * deltaTime);
 
             if (yTurnSpeed <= 0f)
                 yAngle = targetYAngle;
@@ -662,19 +689,15 @@ namespace MultiplayerARPG
 
         private void OnControllerColliderHit(ControllerColliderHit hit)
         {
-            if (CacheCharacterController.isGrounded)
+            if (grounded)
             {
-                RaycastHit raycastHit;
-                if (Physics.SphereCast(CacheTransform.position + Vector3.up * 0.8f, 0.8f, Vector3.down, out raycastHit, 0.1f, platformLayerMask, QueryTriggerInteraction.Ignore) && raycastHit.point.y < CacheTransform.position.y + 0.1f)
-                {
-                    groundedTransform = raycastHit.collider.transform;
-                    oldGroundedPosition = raycastHit.point;
-                    groundedLocalPosition = groundedTransform.InverseTransformPoint(oldGroundedPosition);
-                }
-                else
-                {
-                    groundedTransform = null;
-                }
+                groundedTransform = hit.collider.transform;
+                previousPlatformPosition = groundedTransform.position;
+            }
+            else
+            {
+                groundedTransform = null;
+                previousPlatformPosition = Vector3.zero;
             }
         }
 
