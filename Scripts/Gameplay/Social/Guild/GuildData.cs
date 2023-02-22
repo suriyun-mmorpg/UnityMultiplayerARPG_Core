@@ -65,6 +65,12 @@ namespace MultiplayerARPG
             }
         }
 
+        public GuildData(int id, string guildName, string leaderId)
+            : this(id, guildName, leaderId, SystemSetting.GuildMemberRoles)
+        {
+
+        }
+
         public void AddMember(BasePlayerCharacterEntity playerCharacterEntity, byte guildRole)
         {
             AddMember(CreateMemberData(playerCharacterEntity), guildRole);
