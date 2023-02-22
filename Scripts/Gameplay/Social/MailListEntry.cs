@@ -2,7 +2,7 @@
 
 namespace MultiplayerARPG
 {
-    public partial class MailListEntry
+    public partial class MailListEntry : INetSerializable
     {
         public void Serialize(NetDataWriter writer)
         {
