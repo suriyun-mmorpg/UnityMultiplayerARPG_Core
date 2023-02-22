@@ -65,16 +65,6 @@ namespace MultiplayerARPG
             }
         }
 
-        public byte LowestMemberRole
-        {
-            get
-            {
-                if (roles == null || roles.Count < 2)
-                    return 1;
-                return (byte)(roles.Count - 1);
-            }
-        }
-
         public void AddMember(BasePlayerCharacterEntity playerCharacterEntity, byte guildRole)
         {
             AddMember(CreateMemberData(playerCharacterEntity), guildRole);
