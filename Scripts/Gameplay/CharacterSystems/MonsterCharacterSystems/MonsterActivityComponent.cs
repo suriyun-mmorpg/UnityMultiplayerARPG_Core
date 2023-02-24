@@ -31,21 +31,19 @@ namespace MultiplayerARPG
         public float switchTargetDelay = 3;
 
         protected readonly List<BaseCharacterEntity> enemies = new List<BaseCharacterEntity>();
-        protected bool startedAggressive;
-        protected float aggressiveElasped;
-        protected float randomedWanderElasped;
+        protected float aggressiveCountDown;
+        protected float randomedWanderCountDown;
         protected float randomedWanderDelay;
         protected bool startedFollowEnemy;
         protected float startFollowEnemyElasped;
         protected Vector3 lastPosition;
-        protected IDamageableEntity tempTargetEnemy;
         protected BaseSkill queueSkill;
         protected int queueSkillLevel;
         protected bool alreadySetActionState;
         protected bool isLeftHandAttacking;
         protected float lastSetDestinationTime;
-        protected bool previouslyExitFromSafeArea;
-        protected bool previouslyMoveBackToSpawnPoint;
+        protected bool reachedSpawnPoint;
+        protected bool enemyExisted;
         protected float pauseCountdown;
         protected float lastSwitchTargetTime;
 
@@ -109,6 +107,7 @@ namespace MultiplayerARPG
                     lastSwitchTargetTime = Time.unscaledTime;
                     Entity.SetAttackTarget(attackerCharacter);
                 }
+                pauseCountdown = miniStunDuration;
             }
         }
 
@@ -144,38 +143,39 @@ namespace MultiplayerARPG
                     UpdateEnemyFindingActivity(deltaTime);
 
                     if (Vector3.Distance(currentPosition, Entity.Summoner.EntityTransform.position) > CurrentGameInstance.minFollowSummonerDistance)
-                    {
-                        // Follow summoner
                         FollowSummoner();
-                        startedAggressive = IsAggressiveWhileSummonerIdle();
-                    }
                     else
-                    {
                         UpdateWanderDestinationRandomingActivity(deltaTime);
-                    }
                     startedFollowEnemy = false;
                 }
             }
             else
             {
-                if (Entity.IsInSafeArea)
+                float distFromSpawnPoint = Vector3.Distance(Entity.SpawnPosition, currentPosition);
+                if (!reachedSpawnPoint)
                 {
-                    UpdateExitFromSafeAreaActivity(deltaTime);
-                    startedFollowEnemy = false;
+                    if (distFromSpawnPoint <= Mathf.Max(1f, randomWanderDistance))
+                        reachedSpawnPoint = true;
                     return;
                 }
-                previouslyExitFromSafeArea = false;
 
-                if (maxDistanceFromSpawnPoint > 0f && Vector3.Distance(Entity.SpawnPosition, currentPosition) >= maxDistanceFromSpawnPoint)
+                if (Entity.IsInSafeArea)
                 {
                     UpdateMoveBackToSpawnPointActivity(deltaTime);
                     startedFollowEnemy = false;
                     return;
                 }
-                previouslyMoveBackToSpawnPoint = false;
+
+                if (maxDistanceFromSpawnPoint > 0f && distFromSpawnPoint >= maxDistanceFromSpawnPoint)
+                {
+                    UpdateMoveBackToSpawnPointActivity(deltaTime);
+                    startedFollowEnemy = false;
+                    return;
+                }
 
                 if (!UpdateAttackEnemy(deltaTime, currentPosition))
                 {
+                    enemyExisted = false;
                     UpdateEnemyFindingActivity(deltaTime);
                     UpdateWanderDestinationRandomingActivity(deltaTime);
                     startedFollowEnemy = false;
@@ -185,52 +185,36 @@ namespace MultiplayerARPG
 
         protected virtual void UpdateEnemyFindingActivity(float deltaTime)
         {
-            if (!startedAggressive)
+            aggressiveCountDown -= deltaTime;
+            if (enemies.Count <= 0 && aggressiveCountDown > 0f)
                 return;
-            aggressiveElasped += deltaTime;
-            // Find target when it's time
-            if ((enemies.Count > 0 || aggressiveElasped >= findEnemyDelay) &&
-                FindEnemy())
-            {
-                aggressiveElasped = 0f;
-                startedAggressive = false;
-            }
-        }
-
-        protected virtual void UpdateExitFromSafeAreaActivity(float deltaTime)
-        {
-            randomedWanderElasped += deltaTime;
-            if (!previouslyExitFromSafeArea || randomedWanderElasped >= randomedWanderDelay)
-            {
-                randomedWanderElasped = 0f;
-                lastSetDestinationTime = 0f;
-                RandomWanderDestination();
-                previouslyExitFromSafeArea = true;
-            }
+            if (!FindEnemy())
+                return;
+            aggressiveCountDown = findEnemyDelay;
+            enemyExisted = true;
         }
 
         protected virtual void UpdateMoveBackToSpawnPointActivity(float deltaTime)
         {
-            randomedWanderElasped += deltaTime;
-            if (!previouslyMoveBackToSpawnPoint || randomedWanderElasped >= randomedWanderDelay)
-            {
-                randomedWanderElasped = 0f;
-                lastSetDestinationTime = 0f;
-                RandomWanderDestination();
-                previouslyMoveBackToSpawnPoint = true;
-            }
+            randomedWanderCountDown -= deltaTime;
+            if (randomedWanderCountDown > 0f)
+                return;
+            if (!RandomWanderDestination())
+                return;
+            randomedWanderCountDown = randomedWanderDelay;
+            reachedSpawnPoint = false;
         }
 
         protected virtual void UpdateWanderDestinationRandomingActivity(float deltaTime)
         {
-            randomedWanderElasped += deltaTime;
-            // Wandering when it's time
-            if (randomedWanderElasped >= randomedWanderDelay)
-            {
-                randomedWanderElasped = 0f;
-                RandomWanderDestination();
-                startedAggressive = true;
-            }
+            if (enemyExisted)
+                return;
+            randomedWanderCountDown -= deltaTime;
+            if (randomedWanderCountDown > 0f)
+                return;
+            if (!RandomWanderDestination())
+                return;
+            randomedWanderCountDown = randomedWanderDelay;
         }
 
         /// <summary>
@@ -241,14 +225,14 @@ namespace MultiplayerARPG
         /// <returns></returns>
         private bool UpdateAttackEnemy(float deltaTime, Vector3 currentPosition)
         {
-            if (!Entity.TryGetTargetEntity(out tempTargetEnemy) || Entity.Characteristic == MonsterCharacteristic.NoHarm)
+            if (Entity.Characteristic == MonsterCharacteristic.NoHarm || !Entity.TryGetTargetEntity(out IDamageableEntity targetEnemy))
             {
                 // No target, stop attacking
                 ClearActionState();
                 return false;
             }
 
-            if (tempTargetEnemy.Entity == Entity.Entity || tempTargetEnemy.IsHideOrDead() || !tempTargetEnemy.CanReceiveDamageFrom(Entity.GetInfo()))
+            if (targetEnemy.Entity == Entity.Entity || targetEnemy.IsHideOrDead() || !targetEnemy.CanReceiveDamageFrom(Entity.GetInfo()))
             {
                 // If target is dead or in safe area stop attacking
                 Entity.SetTargetEntity(null);
@@ -257,7 +241,7 @@ namespace MultiplayerARPG
             }
 
             // If it has target then go to target
-            if (tempTargetEnemy != null && !Entity.IsPlayingActionAnimation() && !alreadySetActionState)
+            if (targetEnemy != null && !Entity.IsPlayingActionAnimation() && !alreadySetActionState)
             {
                 // Random action state to do next time
                 if (CharacterDatabase.RandomSkill(Entity, out queueSkill, out queueSkillLevel) && queueSkill != null)
@@ -274,9 +258,9 @@ namespace MultiplayerARPG
                 return true;
             }
 
-            Vector3 targetPosition = tempTargetEnemy.GetTransform().position;
+            Vector3 targetPosition = targetEnemy.GetTransform().position;
             float attackDistance = GetAttackDistance();
-            if (OverlappedEntity(tempTargetEnemy.Entity, GetDamageTransform().position, targetPosition, attackDistance))
+            if (OverlappedEntity(targetEnemy.Entity, GetDamageTransform().position, targetPosition, attackDistance))
             {
                 startedFollowEnemy = false;
                 SetWanderDestination(CacheTransform.position);
@@ -310,7 +294,7 @@ namespace MultiplayerARPG
                     Entity.UseSkill(queueSkill.DataId, false, 0, new AimPosition()
                     {
                         type = AimPositionType.Position,
-                        position = tempTargetEnemy.OpponentAimTransform.position,
+                        position = targetEnemy.OpponentAimTransform.position,
                     });
                 }
                 else
@@ -356,21 +340,22 @@ namespace MultiplayerARPG
             Entity.PointClickMovement(position);
         }
 
-        public void SetWanderDestination(Vector3 destination)
+        public bool SetWanderDestination(Vector3 destination)
         {
             float time = Time.unscaledTime;
             if (time - lastSetDestinationTime <= 0.1f)
-                return;
+                return false;
             lastSetDestinationTime = time;
             Entity.SetExtraMovementState(ExtraMovementState.IsWalking);
             Entity.PointClickMovement(destination);
+            return true;
         }
 
-        public virtual void RandomWanderDestination()
+        public virtual bool RandomWanderDestination()
         {
+            if (!Entity.CanMove() || Entity.IsPlayingActionAnimation())
+                return false;
             randomedWanderDelay = Random.Range(randomWanderDelayMin, randomWanderDelayMax);
-            if (Entity.IsPlayingActionAnimation())
-                return;
             Vector3 randomPosition;
             // Random position around summoner or around spawn point
             if (Entity.Summoner != null)
@@ -388,8 +373,11 @@ namespace MultiplayerARPG
                     randomPosition = Entity.SpawnPosition + new Vector3(randomCircle.x, 0f, randomCircle.y);
             }
 
-            SetWanderDestination(randomPosition);
+            if (!SetWanderDestination(randomPosition))
+                return false;
+
             Entity.SetTargetEntity(null);
+            return true;
         }
 
         public virtual void FollowSummoner()
@@ -426,8 +414,7 @@ namespace MultiplayerARPG
                 Entity.Summoner == null)
                 return false;
 
-            IDamageableEntity targetEntity;
-            if (!Entity.TryGetTargetEntity(out targetEntity) || targetEntity.Entity == Entity.Entity ||
+            if (!Entity.TryGetTargetEntity(out IDamageableEntity targetEntity) || targetEntity.Entity == Entity.Entity ||
                  targetEntity.IsDead() || !targetEntity.CanReceiveDamageFrom(Entity.GetInfo()))
             {
                 // If no target enenmy or target enemy is dead, Find nearby character by layer mask
