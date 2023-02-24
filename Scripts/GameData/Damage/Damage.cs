@@ -320,14 +320,15 @@ namespace MultiplayerARPG
                     // Instantiates on both client and server (damage applies at server)
                     if (missileDamageEntity != null)
                     {
+                        DamageableEntity selectedTarget = null;
                         if (hitOnlySelectedTarget)
                         {
-                            if (!attacker.TryGetTargetEntity(out tempDamageableHitBox))
-                                tempDamageableHitBox = null;
+                            if (!attacker.TryGetTargetEntity(out selectedTarget))
+                                selectedTarget = null;
                         }
-                        // TODO: May predict and move missile ahead of time based on client's RTT
+
                         PoolSystem.GetInstance(missileDamageEntity, damagePosition, damageRotation)
-                            .Setup(instigator, weapon, damageAmounts, skill, skillLevel, missileDistance, missileSpeed, tempDamageableHitBox);
+                            .Setup(instigator, weapon, damageAmounts, skill, skillLevel, missileDistance, missileSpeed, selectedTarget);
                     }
                     break;
                 case DamageType.Raycast:
