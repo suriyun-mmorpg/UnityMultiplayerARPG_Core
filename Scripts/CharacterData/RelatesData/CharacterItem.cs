@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using Cysharp.Text;
 using LiteNetLib.Utils;
 using LiteNetLibManager;
 using UnityEngine;
@@ -57,16 +56,6 @@ namespace MultiplayerARPG
         private IMountItem cacheMountItem;
         [System.NonSerialized]
         private ISkillItem cacheSkillItem;
-
-        public List<int> Sockets
-        {
-            get
-            {
-                if (sockets == null)
-                    sockets = new List<int>();
-                return sockets;
-            }
-        }
 
         private void MakeCache()
         {
@@ -524,32 +513,6 @@ namespace MultiplayerARPG
         public static CharacterItem CreateEmptySlot()
         {
             return Create(0, 1, 0);
-        }
-
-        public List<int> ReadSockets(string sockets, char separator = ';')
-        {
-            Sockets.Clear();
-            string[] splitTexts = sockets.Split(separator);
-            foreach (string text in splitTexts)
-            {
-                if (string.IsNullOrEmpty(text))
-                    continue;
-                Sockets.Add(int.Parse(text));
-            }
-            return Sockets;
-        }
-
-        public string WriteSockets(char separator = ';')
-        {
-            using (Utf16ValueStringBuilder stringBuilder = ZString.CreateStringBuilder(true))
-            {
-                foreach (int socket in Sockets)
-                {
-                    stringBuilder.Append(socket);
-                    stringBuilder.Append(separator);
-                }
-                return stringBuilder.ToString();
-            }
         }
 
         public void Serialize(NetDataWriter writer)
