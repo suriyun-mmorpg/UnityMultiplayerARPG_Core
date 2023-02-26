@@ -367,7 +367,7 @@ namespace MultiplayerARPG
                 return;
 
             // If mobile platforms, don't receive input raw to make it smooth
-            bool raw = !InputManager.useMobileInputOnNonMobile && !Application.isMobilePlatform;
+            bool raw = !GameInstance.Singleton.IsMobileTestInEditor() && !Application.isMobilePlatform && !GameInstance.Singleton.IsConsoleTestInEditor() && !Application.isConsolePlatform;
             Vector3 moveDirection = GetMoveDirection(InputManager.GetAxis("Horizontal", raw), InputManager.GetAxis("Vertical", raw));
             moveDirection.Normalize();
 

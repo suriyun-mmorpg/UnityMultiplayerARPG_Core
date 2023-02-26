@@ -130,10 +130,6 @@ namespace MultiplayerARPG
                 UISceneGameplay = Instantiate(CurrentGameInstance.UISceneGameplayPrefab);
             if (UISceneGameplay != null)
                 UISceneGameplay.OnControllerSetup(characterEntity);
-            // Don't send navigation events
-            EventSystem eventSystem = FindObjectOfType<EventSystem>();
-            if (eventSystem != null)
-                eventSystem.sendNavigationEvents = false;
             if (onSetup != null)
                 onSetup.Invoke(this);
         }
