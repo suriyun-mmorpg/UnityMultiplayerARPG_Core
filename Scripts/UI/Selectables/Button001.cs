@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -12,6 +13,10 @@ namespace MultiplayerARPG
         public float selectedScaling = 0.05f;
         public bool selectDisabledSelectable = false;
         public Transform scalingTransform;
+        public List<Selectable> upSelectables = new List<Selectable>();
+        public List<Selectable> downSelectables = new List<Selectable>();
+        public List<Selectable> leftSelectables = new List<Selectable>();
+        public List<Selectable> rightSelectables = new List<Selectable>();
         private SelectionState _currentSelectionState;
         private Vector3 _defaultLocalScale = Vector3.one;
 
@@ -21,6 +26,67 @@ namespace MultiplayerARPG
             if (scalingTransform == null)
                 scalingTransform = transform;
             _defaultLocalScale = scalingTransform.localScale;
+        }
+
+        protected Selectable GetFirstSelectable(List<Selectable> list, Selectable defaultExplicit)
+        {
+            if (list == null)
+                return null;
+
+            for (int i = 0; i < list.Count; i++)
+            {
+                if (list[i] != null && list[i].IsInteractable() && list[i].gameObject.activeInHierarchy)
+                {
+                    return list[i];
+                }
+            }
+
+            return defaultExplicit;
+        }
+
+        public void AddUpSelectable(Selectable selectable, bool prioritize = false)
+        {
+            AddSelectable(upSelectables, selectable, prioritize);
+        }
+
+        public void AddDownSelectable(Selectable selectable, bool prioritize = false)
+        {
+            AddSelectable(downSelectables, selectable, prioritize);
+        }
+
+        public void AddLeftSelectable(Selectable selectable, bool prioritize = false)
+        {
+            AddSelectable(leftSelectables, selectable, prioritize);
+        }
+
+        public void AddRightSelectable(Selectable selectable, bool prioritize = false)
+        {
+            AddSelectable(rightSelectables, selectable, prioritize);
+        }
+
+        protected void AddSelectable(List<Selectable> list, Selectable selectable, bool prioritize)
+        {
+            if (list == null)
+            {
+                list = new List<Selectable>();
+            }
+
+            if (prioritize)
+            {
+                list.Insert(0, selectable);
+            }
+            else
+            {
+                list.Add(selectable);
+            }
+        }
+
+        public void Clear()
+        {
+            upSelectables.Clear();
+            downSelectables.Clear();
+            leftSelectables.Clear();
+            rightSelectables.Clear();
         }
 
         protected override void DoStateTransition(SelectionState state, bool instant)
@@ -39,7 +105,7 @@ namespace MultiplayerARPG
 
         public override Selectable FindSelectableOnLeft()
         {
-            Selectable selectable = base.FindSelectableOnLeft();
+            Selectable selectable = GetFirstSelectable(leftSelectables, base.FindSelectableOnLeft());
             if (selectable != null && !selectable.interactable && !selectDisabledSelectable)
                 selectable = null;
             return selectable;
@@ -47,7 +113,7 @@ namespace MultiplayerARPG
 
         public override Selectable FindSelectableOnRight()
         {
-            Selectable selectable = base.FindSelectableOnRight();
+            Selectable selectable = GetFirstSelectable(rightSelectables, base.FindSelectableOnRight());
             if (selectable != null && !selectable.interactable && !selectDisabledSelectable)
                 selectable = null;
             return selectable;
@@ -55,7 +121,7 @@ namespace MultiplayerARPG
 
         public override Selectable FindSelectableOnUp()
         {
-            Selectable selectable = base.FindSelectableOnUp();
+            Selectable selectable = GetFirstSelectable(upSelectables, base.FindSelectableOnUp());
             if (selectable != null && !selectable.interactable && !selectDisabledSelectable)
                 selectable = null;
             return selectable;
@@ -63,7 +129,7 @@ namespace MultiplayerARPG
 
         public override Selectable FindSelectableOnDown()
         {
-            Selectable selectable = base.FindSelectableOnDown();
+            Selectable selectable = GetFirstSelectable(downSelectables, base.FindSelectableOnDown());
             if (selectable != null && !selectable.interactable && !selectDisabledSelectable)
                 selectable = null;
             return selectable;
