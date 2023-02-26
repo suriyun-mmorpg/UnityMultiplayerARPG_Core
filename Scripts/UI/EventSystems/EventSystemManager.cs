@@ -48,6 +48,8 @@ namespace MultiplayerARPG
                 DestroyImmediate(oldInputModule);
             CurrentEventSystem.gameObject.GetOrAddComponent<InputSystemUIInputModule>();
 #endif
+            CurrentEventSystem.sendNavigationEvents = false;
+
             if (onEventSystemReady != null)
                 onEventSystemReady.Invoke();
         }
