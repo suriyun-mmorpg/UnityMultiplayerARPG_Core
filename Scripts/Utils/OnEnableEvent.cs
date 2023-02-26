@@ -7,7 +7,7 @@ namespace UtilsComponents
     {
         public UnityEvent onEnable;
 
-        private void OnEnable()
+        protected virtual void OnEnable()
         {
             onEnable.Invoke();
         }

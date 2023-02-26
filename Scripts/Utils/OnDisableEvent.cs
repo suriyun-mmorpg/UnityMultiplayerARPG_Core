@@ -7,7 +7,7 @@ namespace UtilsComponents
     {
         public UnityEvent onDisable;
 
-        private void OnDisable()
+        protected virtual void OnDisable()
         {
             onDisable.Invoke();
         }
