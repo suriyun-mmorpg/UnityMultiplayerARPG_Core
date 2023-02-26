@@ -15,15 +15,13 @@ namespace MultiplayerARPG
         {
             bool isFocusInputField = GenericUtils.IsFocusInputField();
             bool isPointerOverUIObject = UISceneGameplay.IsPointerOverUIObject();
+            bool isBlockController = UISceneGameplay.IsBlockController();
             CacheGameplayCameraController.UpdateRotationX = false;
             CacheGameplayCameraController.UpdateRotationY = false;
-            if (Application.isConsolePlatform)
-                CacheGameplayCameraController.UpdateRotation = !isFocusInputField && !isPointerOverUIObject;
-            else
-                CacheGameplayCameraController.UpdateRotation = !isFocusInputField && !isPointerOverUIObject && InputManager.GetButton("CameraRotate");
-            CacheGameplayCameraController.UpdateZoom = !isFocusInputField && !isPointerOverUIObject;
+            CacheGameplayCameraController.UpdateRotation = !isFocusInputField && !isBlockController && !isPointerOverUIObject && InputManager.GetButton("CameraRotate");
+            CacheGameplayCameraController.UpdateZoom = !isFocusInputField && !isBlockController && !isPointerOverUIObject;
 
-            if (isFocusInputField || PlayingCharacterEntity.IsDead())
+            if (isFocusInputField || isBlockController || PlayingCharacterEntity.IsDead())
             {
                 PlayingCharacterEntity.KeyMovement(Vector3.zero, MovementState.None);
                 return;
