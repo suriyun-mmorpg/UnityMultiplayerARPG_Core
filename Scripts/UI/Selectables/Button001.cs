@@ -11,13 +11,16 @@ namespace MultiplayerARPG
         public float selectedScaleDuration = 1f;
         public float selectedScaling = 0.05f;
         public bool selectDisabledSelectable = false;
+        public Transform scalingTransform;
         private SelectionState _currentSelectionState;
         private Vector3 _defaultLocalScale = Vector3.one;
 
         protected override void Awake()
         {
             base.Awake();
-            _defaultLocalScale = transform.localScale;
+            if (scalingTransform == null)
+                scalingTransform = transform;
+            _defaultLocalScale = scalingTransform.localScale;
         }
 
         protected override void DoStateTransition(SelectionState state, bool instant)
@@ -29,9 +32,9 @@ namespace MultiplayerARPG
         void Update()
         {
             if (_currentSelectionState == SelectionState.Selected)
-                transform.localScale = new Vector3(_defaultLocalScale.x + Mathf.PingPong(Time.time, selectedScaleDuration) * selectedScaling, _defaultLocalScale.y + Mathf.PingPong(Time.time, selectedScaleDuration) * selectedScaling, transform.localScale.z);
+                scalingTransform.localScale = new Vector3(_defaultLocalScale.x + Mathf.PingPong(Time.time, selectedScaleDuration) * selectedScaling, _defaultLocalScale.y + Mathf.PingPong(Time.time, selectedScaleDuration) * selectedScaling, scalingTransform.localScale.z);
             else
-                transform.localScale = _defaultLocalScale;
+                scalingTransform.localScale = _defaultLocalScale;
         }
 
         public override Selectable FindSelectableOnLeft()
