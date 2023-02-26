@@ -8,13 +8,15 @@ namespace MultiplayerARPG
         private void OnEnable()
         {
             EventSystem system = FindObjectOfType<EventSystem>();
-            system.sendNavigationEvents = true;
+            if (system != null)
+                system.sendNavigationEvents = true;
         }
 
         private void OnDisable()
         {
             EventSystem system = FindObjectOfType<EventSystem>();
-            system.sendNavigationEvents = false;
+            if (system != null)
+                system.sendNavigationEvents = false;
         }
     }
 }
