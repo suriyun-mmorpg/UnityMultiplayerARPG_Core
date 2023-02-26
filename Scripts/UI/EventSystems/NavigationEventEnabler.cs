@@ -5,18 +5,26 @@ namespace MultiplayerARPG
 {
     public class NavigationEventEnabler : MonoBehaviour
     {
+        public bool setupOnEnable;
+        public bool setupOnDisable;
+
         private void OnEnable()
         {
-            EventSystem system = FindObjectOfType<EventSystem>();
-            if (system != null)
-                system.sendNavigationEvents = true;
+            if (setupOnEnable)
+                SetSendNavigationEvents(true);
         }
 
         private void OnDisable()
         {
+            if (setupOnDisable)
+                SetSendNavigationEvents(false);
+        }
+
+        public void SetSendNavigationEvents(bool enable)
+        {
             EventSystem system = FindObjectOfType<EventSystem>();
             if (system != null)
-                system.sendNavigationEvents = false;
+                system.sendNavigationEvents = enable;
         }
     }
 }
