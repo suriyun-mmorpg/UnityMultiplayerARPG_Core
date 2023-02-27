@@ -1,4 +1,7 @@
 using System.Collections.Generic;
+#if UNITY_EDITOR
+using UnityEditor;
+#endif
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -9,9 +12,9 @@ namespace MultiplayerARPG
     /// </summary>
     public class InputField001 : InputField
     {
+        public bool selectDisabledSelectable = false;
         public float selectedScaleDuration = 1f;
         public float selectedScaling = 0.05f;
-        public bool selectDisabledSelectable = false;
         public Transform scalingTransform;
         public List<Selectable> upSelectables = new List<Selectable>();
         public List<Selectable> downSelectables = new List<Selectable>();
@@ -31,7 +34,7 @@ namespace MultiplayerARPG
         protected Selectable GetFirstSelectable(List<Selectable> list, Selectable defaultExplicit)
         {
             if (list == null)
-                return null;
+                return defaultExplicit;
 
             for (int i = 0; i < list.Count; i++)
             {
@@ -97,10 +100,13 @@ namespace MultiplayerARPG
 
         void Update()
         {
-            if (_currentSelectionState == SelectionState.Selected)
-                scalingTransform.localScale = new Vector3(_defaultLocalScale.x + Mathf.PingPong(Time.time, selectedScaleDuration) * selectedScaling, _defaultLocalScale.y + Mathf.PingPong(Time.time, selectedScaleDuration) * selectedScaling, scalingTransform.localScale.z);
-            else
-                scalingTransform.localScale = _defaultLocalScale;
+            if (Application.isPlaying)
+            {
+                if (_currentSelectionState == SelectionState.Selected)
+                    scalingTransform.localScale = new Vector3(_defaultLocalScale.x + Mathf.PingPong(Time.time, selectedScaleDuration) * selectedScaling, _defaultLocalScale.y + Mathf.PingPong(Time.time, selectedScaleDuration) * selectedScaling, scalingTransform.localScale.z);
+                else
+                    scalingTransform.localScale = _defaultLocalScale;
+            }
         }
 
         public override Selectable FindSelectableOnLeft()
@@ -135,4 +141,89 @@ namespace MultiplayerARPG
             return selectable;
         }
     }
+
+#if UNITY_EDITOR
+    [CustomEditor(typeof(InputField001), true)]
+    [CanEditMultipleObjects]
+    public class InputField001Editor : UnityEditor.UI.InputFieldEditor
+    {
+        protected SerializedProperty selectedScaleDuration;
+        protected SerializedProperty selectedScaling;
+        protected SerializedProperty selectDisabledSelectable;
+        protected SerializedProperty scalingTransform;
+        protected SerializedProperty upSelectables;
+        protected SerializedProperty downSelectables;
+        protected SerializedProperty leftSelectables;
+        protected SerializedProperty rightSelectables;
+
+        public override void OnInspectorGUI()
+        {
+            base.OnInspectorGUI();
+
+            InputField001 target = this.target as InputField001;
+
+            if (selectedScaleDuration == null)
+                selectedScaleDuration = serializedObject.FindProperty(nameof(target.selectedScaleDuration));
+            if (selectedScaling == null)
+                selectedScaling = serializedObject.FindProperty(nameof(target.selectedScaling));
+            if (selectDisabledSelectable == null)
+                selectDisabledSelectable = serializedObject.FindProperty(nameof(target.selectDisabledSelectable));
+            if (scalingTransform == null)
+                scalingTransform = serializedObject.FindProperty(nameof(target.scalingTransform));
+            if (upSelectables == null)
+                upSelectables = serializedObject.FindProperty(nameof(target.upSelectables));
+            if (downSelectables == null)
+                downSelectables = serializedObject.FindProperty(nameof(target.downSelectables));
+            if (leftSelectables == null)
+                leftSelectables = serializedObject.FindProperty(nameof(target.leftSelectables));
+            if (rightSelectables == null)
+                rightSelectables = serializedObject.FindProperty(nameof(target.rightSelectables));
+
+            EditorGUILayout.LabelField("Smart Navigation", EditorStyles.boldLabel);
+
+            GUILayout.BeginHorizontal();
+            if (GUILayout.Button("Up"))
+            {
+                target.upSelectables.Clear();
+                target.AddUpSelectable(target.FindSelectableOnUp());
+                EditorUtility.SetDirty(target);
+            }
+            if (GUILayout.Button("Down"))
+            {
+                target.downSelectables.Clear();
+                target.AddDownSelectable(target.FindSelectableOnDown());
+                EditorUtility.SetDirty(target);
+            }
+            if (GUILayout.Button("Left"))
+            {
+                target.leftSelectables.Clear();
+                target.AddLeftSelectable(target.FindSelectableOnLeft());
+                EditorUtility.SetDirty(target);
+            }
+            if (GUILayout.Button("Right"))
+            {
+                target.rightSelectables.Clear();
+                target.AddRightSelectable(target.FindSelectableOnRight());
+                EditorUtility.SetDirty(target);
+            }
+            if (GUILayout.Button("Clear"))
+            {
+                target.Clear();
+                EditorUtility.SetDirty(target);
+            }
+            GUILayout.EndHorizontal();
+
+            serializedObject.Update();
+            EditorGUILayout.PropertyField(upSelectables, new GUIContent("Up Selectables"));
+            EditorGUILayout.PropertyField(downSelectables, new GUIContent("Down Selectables"));
+            EditorGUILayout.PropertyField(leftSelectables, new GUIContent("Left Selectables"));
+            EditorGUILayout.PropertyField(rightSelectables, new GUIContent("Right Selectables"));
+            EditorGUILayout.PropertyField(selectDisabledSelectable, new GUIContent("Select Disabled Selectable"));
+            EditorGUILayout.PropertyField(selectedScaleDuration, new GUIContent("Selected Scale Duration"));
+            EditorGUILayout.PropertyField(selectedScaling, new GUIContent("Selected Scaling"));
+            EditorGUILayout.PropertyField(scalingTransform, new GUIContent("Scaling Transform"));
+            serializedObject.ApplyModifiedProperties();
+        }
+    }
+#endif
 }
