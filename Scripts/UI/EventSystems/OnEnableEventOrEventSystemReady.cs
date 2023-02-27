@@ -17,7 +17,7 @@ namespace MultiplayerARPG
 
         private void Instance_onEventSystemReady()
         {
-            onEnable.Invoke();
+            Trigger();
         }
     }
 }
