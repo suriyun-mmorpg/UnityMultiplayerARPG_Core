@@ -231,14 +231,13 @@ namespace MultiplayerARPG
             HashSet<int> questIds = new HashSet<int>();
             FindQuestFromDialog(playerCharacter, questIds, StartDialog);
             Quest quest;
-            int talkToNpcTaskIndex;
             List<int> inProgressQuests = new List<int>();
             foreach (CharacterQuest characterQuest in playerCharacter.Quests)
             {
                 quest = characterQuest.GetQuest();
                 if (quest == null || characterQuest.isComplete)
                     continue;
-                if (quest.HaveToTalkToNpc(playerCharacter, this, out talkToNpcTaskIndex, out _, out _) && !characterQuest.CompletedTasks.Contains(talkToNpcTaskIndex))
+                if (quest.HaveToTalkToNpc(playerCharacter, this, out int talkToNpcTaskIndex, out _, out bool completeAfterTalked) && !completeAfterTalked && !characterQuest.CompletedTasks.Contains(talkToNpcTaskIndex))
                     return true;
                 inProgressQuests.Add(quest.DataId);
             }
@@ -263,6 +262,8 @@ namespace MultiplayerARPG
                 quest = characterQuest.GetQuest();
                 if (quest == null || characterQuest.isComplete || !characterQuest.IsAllTasksDoneAndIsCompletingTarget(playerCharacter, this))
                     continue;
+                if (quest.HaveToTalkToNpc(playerCharacter, this, out _, out _, out bool completeAfterTalked) && completeAfterTalked)
+                    return true;
                 tasksDoneQuests.Add(quest.DataId);
             }
             foreach (int questId in questIds)

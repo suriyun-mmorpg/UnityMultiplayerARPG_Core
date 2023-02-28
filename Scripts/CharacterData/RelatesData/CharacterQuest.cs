@@ -89,9 +89,8 @@ namespace MultiplayerARPG
                 GetProgress(character, i, out isComplete);
                 if (!isComplete)
                     return false;
-                if (tasks[i].taskType == QuestTaskType.TalkToNpc &&
-                    tasks[i].completeAfterTalked &&
-                    tasks[i].npcEntity != npcEntity)
+                if (tasks[i].taskType == QuestTaskType.TalkToNpc && tasks[i].completeAfterTalked &&
+                    (npcEntity == null || tasks[i].npcEntity.EntityId != npcEntity.EntityId))
                     return false;
             }
             return true;
@@ -130,7 +129,10 @@ namespace MultiplayerARPG
                     return progress;
                 case QuestTaskType.TalkToNpc:
                     targetTitle = task.npcEntity == null ? null : task.npcEntity.Title;
-                    progress = CompletedTasks.Contains(taskIndex) ? 1 : 0;
+                    if (task.completeAfterTalked)
+                        progress = 1;
+                    else
+                        progress = CompletedTasks.Contains(taskIndex) ? 1 : 0;
                     targetProgress = 1;
                     isComplete = progress >= targetProgress;
                     return progress;
