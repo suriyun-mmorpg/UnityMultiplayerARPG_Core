@@ -97,6 +97,13 @@
             return equipWeapons.rightHand.GetEquipmentItem();
         }
 
+        public static BaseItem GetRightHandItem(this EquipWeapons equipWeapons)
+        {
+            if (equipWeapons.IsEmptyRightHandSlot())
+                return null;
+            return equipWeapons.rightHand.GetItem();
+        }
+
         public static IWeaponItem GetLeftHandWeaponItem(this EquipWeapons equipWeapons)
         {
             if (equipWeapons.IsEmptyLeftHandSlot())
@@ -116,6 +123,13 @@
             if (equipWeapons.IsEmptyLeftHandSlot())
                 return null;
             return equipWeapons.leftHand.GetEquipmentItem();
+        }
+
+        public static BaseItem GetLeftHandItem(this EquipWeapons equipWeapons)
+        {
+            if (equipWeapons.IsEmptyLeftHandSlot())
+                return null;
+            return equipWeapons.leftHand.GetItem();
         }
 
         public static bool NotEmptyRightHandSlot(this EquipWeapons equipWeapons)

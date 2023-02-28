@@ -58,22 +58,43 @@ namespace MultiplayerARPG
             {
                 for (int i = 0; i < SelectableWeaponSets.Count; ++i)
                 {
-                    droppingItems.Add(SelectableWeaponSets[i].rightHand);
-                    droppingItems.Add(SelectableWeaponSets[i].leftHand);
-                    SelectableWeaponSets[i] = new EquipWeapons();
+                    EquipWeapons updatingEquipWeapons = SelectableWeaponSets[i].Clone();
+                    if (!CurrentMapInfo.ExcludeItemFromDropping(SelectableWeaponSets[i].GetRightHandItem()))
+                    {
+                        droppingItems.Add(SelectableWeaponSets[i].rightHand);
+                        updatingEquipWeapons.rightHand = CharacterItem.Empty;
+                    }
+                    if (!CurrentMapInfo.ExcludeItemFromDropping(SelectableWeaponSets[i].GetLeftHandItem()))
+                    {
+                        droppingItems.Add(SelectableWeaponSets[i].leftHand);
+                        updatingEquipWeapons.leftHand = CharacterItem.Empty;
+                    }
+                    SelectableWeaponSets[i] = updatingEquipWeapons;
                 }
             }
 
             if (CurrentMapInfo.PlayerDeadDropsEquipItems)
             {
-                droppingItems.AddRange(EquipItems);
-                EquipItems.Clear();
+                for (int i = EquipItems.Count - 1; i >= 0; --i)
+                {
+                    if (!EquipItems[i].IsEmptySlot() && !CurrentMapInfo.ExcludeItemFromDropping(EquipItems[i].GetItem()))
+                    {
+                        droppingItems.Add(EquipItems[i]);
+                        EquipItems.RemoveAt(i);
+                    }
+                }
             }
 
             if (CurrentMapInfo.PlayerDeadDropsNonEquipItems)
             {
-                droppingItems.AddRange(NonEquipItems);
-                NonEquipItems.Clear();
+                for (int i = NonEquipItems.Count - 1; i >= 0; --i)
+                {
+                    if (!NonEquipItems[i].IsEmptySlot() && !CurrentMapInfo.ExcludeItemFromDropping(NonEquipItems[i].GetItem()))
+                    {
+                        droppingItems.Add(NonEquipItems[i]);
+                        NonEquipItems.RemoveAt(i);
+                    }
+                }
             }
 
             int dropCount = 0;

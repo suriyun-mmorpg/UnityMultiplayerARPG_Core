@@ -192,5 +192,42 @@ namespace MultiplayerARPG
         protected abstract bool IsMonsterAlly(BaseMonsterCharacterEntity monsterCharacter, EntityInfo targetEntityInfo);
         protected abstract bool IsPlayerEnemy(BasePlayerCharacterEntity playerCharacter, EntityInfo targetEntityInfo);
         protected abstract bool IsMonsterEnemy(BaseMonsterCharacterEntity monsterCharacter, EntityInfo targetEntityInfo);
+
+        public bool ExcludeItemFromDropping(BaseItem item)
+        {
+            if (item == null)
+                return false;
+            if (ExcludeItems.Count > 0 && ExcludeItems.Contains(item))
+                return true;
+            if (ExcludeAmmoTypes.Count > 0 && item.IsAmmo() && ExcludeAmmoTypes.Contains((item as IAmmoItem).AmmoType))
+                return true;
+            if (ExcludeArmorTypes.Count > 0 && item.IsArmor() && ExcludeArmorTypes.Contains((item as IArmorItem).ArmorType))
+                return true;
+            if (ExcludeWeaponTypes.Count > 0 && item.IsWeapon() && ExcludeWeaponTypes.Contains((item as IWeaponItem).WeaponType))
+                return true;
+            if (ExcludeJunk && item.IsJunk())
+                return true;
+            if (ExcludeArmor && item.IsArmor())
+                return true;
+            if (ExcludeShield && item.IsShield())
+                return true;
+            if (ExcludeWeapon && item.IsWeapon())
+                return true;
+            if (ExcludePotion && item.IsPotion())
+                return true;
+            if (ExcludeAmmo && item.IsAmmo())
+                return true;
+            if (ExcludeBuilding && item.IsBuilding())
+                return true;
+            if (ExcludePet && item.IsPet())
+                return true;
+            if (ExcludeSocketEnhancer && item.IsSocketEnhancer())
+                return true;
+            if (ExcludeMount && item.IsMount())
+                return true;
+            if (ExcludeSkill && item.IsSkill())
+                return true;
+            return false;
+        }
     }
 }
