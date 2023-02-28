@@ -49,7 +49,7 @@ namespace MultiplayerARPG
 
         public bool IsAggressiveWhileSummonerIdle()
         {
-            return (isAggressiveWhileSummonerIdle || Entity.Characteristic == MonsterCharacteristic.Aggressive) && Entity.Characteristic != MonsterCharacteristic.NoHarm;
+            return isAggressiveWhileSummonerIdle && Entity.Characteristic == MonsterCharacteristic.Aggressive && Entity.Characteristic != MonsterCharacteristic.NoHarm;
         }
 
         public override void EntityAwake()
@@ -426,8 +426,8 @@ namespace MultiplayerARPG
                         Entity.Summoner.EntityTransform.position,
                         CharacterDatabase.SummonedVisualRange,
                         false, /* Don't find an allies */
-                        true,  /* Always find an enemies */
-                        IsAggressiveWhileSummonerIdle() /* Find enemy while summoned and aggresively */));
+                        IsAggressiveWhileSummonerIdle(), /* Find enemy while summoned and aggresively */
+                        IsAggressiveWhileSummonerIdle()  /* Find enemy while summoned and aggresively */));
                 }
                 else
                 {
