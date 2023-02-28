@@ -54,6 +54,24 @@ public static class GenericUtils
         textMeshInputFields = null;
     }
 
+    public static Rect GetWorldRect(this RectTransform transform)
+    {
+        Vector3[] corners = new Vector3[4];
+        transform.GetWorldCorners(corners);
+        // Get the bottom left corner.
+        Vector3 position = corners[0];
+        Vector2 size = new Vector2(transform.lossyScale.x * transform.rect.size.x, transform.lossyScale.y * transform.rect.size.y);
+        return new Rect(position, size);
+    }
+
+    public static bool ContainsRect(this Rect rect1, Rect rect2, float rect2Scale = 1f)
+    {
+        return rect1.Contains(rect2.center + (new Vector2(-rect2.size.x, -rect2.size.y) * 0.5f * rect2Scale)) &&
+            rect1.Contains(rect2.center + (new Vector2(rect2.size.x, -rect2.size.y) * 0.5f * rect2Scale)) &&
+            rect1.Contains(rect2.center + (new Vector2(-rect2.size.x, rect2.size.y) * 0.5f * rect2Scale)) &&
+            rect1.Contains(rect2.center + (new Vector2(rect2.size.x, rect2.size.y) * 0.5f * rect2Scale));
+    }
+
     public static void SetLayerRecursively(this GameObject gameObject, int layerIndex, bool includeInactive)
     {
         if (gameObject == null)

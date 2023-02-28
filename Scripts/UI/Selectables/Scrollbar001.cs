@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEditor;
 #endif
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
 namespace MultiplayerARPG
@@ -20,6 +21,7 @@ namespace MultiplayerARPG
         public List<Selectable> downSelectables = new List<Selectable>();
         public List<Selectable> leftSelectables = new List<Selectable>();
         public List<Selectable> rightSelectables = new List<Selectable>();
+        public ScrollRect scrollRect;
         private SelectionState _currentSelectionState;
         private Vector3 _defaultLocalScale = Vector3.one;
 
@@ -29,6 +31,13 @@ namespace MultiplayerARPG
             if (scalingTransform == null)
                 scalingTransform = transform;
             _defaultLocalScale = scalingTransform.localScale;
+        }
+
+        protected override void Start()
+        {
+            base.Start();
+            if (scrollRect == null)
+                scrollRect = GetComponentInParent<ScrollRect>();
         }
 
         protected Selectable GetFirstSelectable(List<Selectable> list, Selectable defaultExplicit)
@@ -96,6 +105,12 @@ namespace MultiplayerARPG
         {
             base.DoStateTransition(state, instant);
             _currentSelectionState = state;
+        }
+
+        public override void OnSelect(BaseEventData eventData)
+        {
+            base.OnSelect(eventData);
+            this.ScrollSnap(scrollRect);
         }
 
         protected override void Update()
