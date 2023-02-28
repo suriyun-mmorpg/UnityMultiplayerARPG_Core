@@ -296,7 +296,11 @@ namespace MultiplayerARPG
             // Notify clients that this character is spawn or dead
             if (!playerCharacterEntity.IsDead())
             {
-                // Summon saved summons
+                playerCharacterEntity.CallAllOnRespawn();
+                // Summon saved mount entity
+                if (GameInstance.VehicleEntities.ContainsKey(playerCharacterData.MountDataId))
+                    playerCharacterEntity.Mount(GameInstance.VehicleEntities[playerCharacterData.MountDataId]);
+                // Summon monsters
                 for (int i = 0; i < playerCharacterEntity.Summons.Count; ++i)
                 {
                     CharacterSummon summon = playerCharacterEntity.Summons[i];
@@ -312,11 +316,6 @@ namespace MultiplayerARPG
                     }
                     playerCharacterEntity.Summons[i] = summon;
                 }
-
-                // Summon saved mount entity
-                if (GameInstance.VehicleEntities.ContainsKey(playerCharacterData.MountDataId))
-                    playerCharacterEntity.Mount(GameInstance.VehicleEntities[playerCharacterData.MountDataId]);
-                playerCharacterEntity.CallAllOnRespawn();
             }
             else
             {
