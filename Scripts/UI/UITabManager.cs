@@ -42,17 +42,25 @@ public class UITabManager : UIBase
     {
         SetupToggles();
         base.OnShow();
-        ShowTab(0);
+        ShowTab(0, true);
     }
 
-    public void ShowTab(int index)
+    public void ShowTab(int index, bool force = false)
     {
         if (index < 0)
             index = tabs.Length - 1;
         if (index >= tabs.Length)
             index = 0;
         currentTabIndex = index;
-        tabs[index].toggle.isOn = true;
+        if (force)
+        {
+            tabs[index].toggle.SetIsOnWithoutNotify(true);
+            tabs[index].uiContent.SetVisible(true);
+        }
+        else
+        {
+            tabs[index].toggle.isOn = true;
+        }
     }
 
     protected virtual void Update()
