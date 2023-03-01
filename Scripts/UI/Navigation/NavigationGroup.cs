@@ -16,8 +16,8 @@ namespace MultiplayerARPG
         public List<Selectable> downSelectables = new List<Selectable>();
         public List<Selectable> leftSelectables = new List<Selectable>();
         public List<Selectable> rightSelectables = new List<Selectable>();
-        public List<Selectable> noChildSelectables = new List<Selectable>();
         public List<NavigationChild> childs = new List<NavigationChild>();
+        protected bool selectedOnNoChild;
 
         protected override void Awake()
         {
@@ -61,11 +61,6 @@ namespace MultiplayerARPG
             AddSelectable(rightSelectables, selectable, prioritize);
         }
 
-        public void AddNoChildSelectable(Selectable selectable, bool prioritize = false)
-        {
-            AddSelectable(noChildSelectables, selectable, prioritize);
-        }
-
         protected void AddSelectable(List<Selectable> list, Selectable selectable, bool prioritize)
         {
             if (list == null)
@@ -89,7 +84,6 @@ namespace MultiplayerARPG
             downSelectables.Clear();
             leftSelectables.Clear();
             rightSelectables.Clear();
-            noChildSelectables.Clear();
         }
 
         public override void OnSelect(BaseEventData eventData)
@@ -97,13 +91,12 @@ namespace MultiplayerARPG
             base.OnSelect(eventData);
             if (childs.Count > 0)
             {
+                selectedOnNoChild = false;
                 StartCoroutine(DelaySelect(childs[0].Selectable));
             }
             else
             {
-                Selectable selectable = FindSelectableOnNoChild();
-                if (selectable != null)
-                    StartCoroutine(DelaySelect(selectable));
+                selectedOnNoChild = true;
             }
         }
 
@@ -145,23 +138,36 @@ namespace MultiplayerARPG
             return selectable;
         }
 
-        public Selectable FindSelectableOnNoChild()
-        {
-            Selectable selectable = GetFirstSelectable(noChildSelectables, base.FindSelectableOnDown());
-            if (selectable != null && !selectable.interactable && !selectDisabledSelectable)
-                selectable = null;
-            return selectable;
-        }
-
         public void AddChild(NavigationChild child)
         {
-            if (!childs.Contains(child))
-                childs.Add(child);
+            if (childs.Contains(child))
+                return;
+            childs.Add(child);
+            if (selectedOnNoChild)
+            {
+                selectedOnNoChild = false;
+                StartCoroutine(DelaySelect(childs[0].Selectable));
+            }
         }
 
         public void RemoveChild(NavigationChild child)
         {
+            bool selected = child.Selectable.gameObject == EventSystem.current.currentSelectedGameObject;
+            int index = childs.IndexOf(child);
             childs.Remove(child);
+            if (!selected)
+                return;
+            if (childs.Count <= 0)
+            {
+                Select();
+            }
+            else
+            {
+                if (index < childs.Count)
+                    childs[index].Selectable.Select();
+                else
+                    childs[childs.Count - 1].Selectable.Select();
+            }
         }
 
         private void LateUpdate()
@@ -286,7 +292,6 @@ namespace MultiplayerARPG
         protected SerializedProperty downSelectables;
         protected SerializedProperty leftSelectables;
         protected SerializedProperty rightSelectables;
-        protected SerializedProperty noChildSelectables;
 
         public override void OnInspectorGUI()
         {
@@ -304,8 +309,6 @@ namespace MultiplayerARPG
                 leftSelectables = serializedObject.FindProperty(nameof(target.leftSelectables));
             if (rightSelectables == null)
                 rightSelectables = serializedObject.FindProperty(nameof(target.rightSelectables));
-            if (noChildSelectables == null)
-                noChildSelectables = serializedObject.FindProperty(nameof(target.noChildSelectables));
 
             EditorGUILayout.LabelField("Smart Navigation", EditorStyles.boldLabel);
 
@@ -346,7 +349,6 @@ namespace MultiplayerARPG
             EditorGUILayout.PropertyField(downSelectables, new GUIContent("Down Selectables"));
             EditorGUILayout.PropertyField(leftSelectables, new GUIContent("Left Selectables"));
             EditorGUILayout.PropertyField(rightSelectables, new GUIContent("Right Selectables"));
-            EditorGUILayout.PropertyField(noChildSelectables, new GUIContent("No Child Selectables"));
             EditorGUILayout.PropertyField(selectDisabledSelectable, new GUIContent("Select Disabled Selectable"));
             serializedObject.ApplyModifiedProperties();
         }
