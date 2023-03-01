@@ -19,12 +19,20 @@ namespace MultiplayerARPG
         public List<Selectable> rightSelectables = new List<Selectable>();
         public List<NavigationChild> childs = new List<NavigationChild>();
         protected bool selectedOnNoChild;
+        protected NavigationChild lastSelectedChild;
         protected static NavigationGroup lastSelectedGroupWhileDisabled;
 
         protected override void Awake()
         {
             base.Awake();
             childs.Clear();
+        }
+
+        public void SetLastSelectedChild(NavigationChild child)
+        {
+            if (!childs.Contains(child))
+                return;
+            lastSelectedChild = child;
         }
 
         protected Selectable GetFirstSelectable(List<Selectable> list, Selectable defaultExplicit)
@@ -114,7 +122,10 @@ namespace MultiplayerARPG
             if (childs.Count > 0)
             {
                 selectedOnNoChild = false;
-                DelaySelect(childs[0].Selectable);
+                if (lastSelectedChild != null)
+                    DelaySelect(lastSelectedChild.Selectable);
+                else
+                    DelaySelect(childs[0].Selectable);
             }
             else
             {
@@ -168,7 +179,10 @@ namespace MultiplayerARPG
         {
             if (childs.Contains(child))
                 return;
-            childs.Add(child);
+            if (child.shouldBeFirstSelected)
+                childs.Insert(0, child);
+            else
+                childs.Add(child);
             if (selectedOnNoChild)
             {
                 selectedOnNoChild = false;

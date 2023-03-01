@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
 namespace MultiplayerARPG
@@ -7,6 +8,7 @@ namespace MultiplayerARPG
     public class NavigationChild : MonoBehaviour
     {
         public NavigationGroup group;
+        public bool shouldBeFirstSelected;
         public bool vertical = true;
         public bool horizontal = true;
 
@@ -23,6 +25,12 @@ namespace MultiplayerARPG
                 group = GetComponentInParent<NavigationGroup>();
             if (group != null)
                 group.AddChild(this);
+        }
+
+        private void Update()
+        {
+            if (group != null && EventSystem.current.currentSelectedGameObject == gameObject)
+                group.SetLastSelectedChild(this);
         }
 
         private void OnDestroy()
