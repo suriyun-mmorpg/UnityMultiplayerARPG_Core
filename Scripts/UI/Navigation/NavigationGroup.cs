@@ -1,3 +1,4 @@
+using Cysharp.Threading.Tasks;
 using System.Collections;
 using System.Collections.Generic;
 #if UNITY_EDITOR
@@ -18,6 +19,7 @@ namespace MultiplayerARPG
         public List<Selectable> rightSelectables = new List<Selectable>();
         public List<NavigationChild> childs = new List<NavigationChild>();
         protected bool selectedOnNoChild;
+        protected static NavigationGroup lastSelectedGroupWhileDisabled;
 
         protected override void Awake()
         {
@@ -86,13 +88,33 @@ namespace MultiplayerARPG
             rightSelectables.Clear();
         }
 
+        public override void Select()
+        {
+            if (!isActiveAndEnabled)
+            {
+                lastSelectedGroupWhileDisabled = this;
+                return;
+            }
+            base.Select();
+        }
+
+        protected override void OnEnable()
+        {
+            base.OnEnable();
+            if (lastSelectedGroupWhileDisabled == this)
+            {
+                lastSelectedGroupWhileDisabled = null;
+                Select();
+            }
+        }
+
         public override void OnSelect(BaseEventData eventData)
         {
             base.OnSelect(eventData);
             if (childs.Count > 0)
             {
                 selectedOnNoChild = false;
-                StartCoroutine(DelaySelect(childs[0].Selectable));
+                DelaySelect(childs[0].Selectable);
             }
             else
             {
@@ -100,9 +122,13 @@ namespace MultiplayerARPG
             }
         }
 
-        IEnumerator DelaySelect(Selectable selectable, float delay = 0.1f)
+        private async void DelaySelect(Selectable selectable, float delay = 0.1f)
         {
-            yield return new WaitForSeconds(delay);
+            while (delay > 0)
+            {
+                delay -= Time.deltaTime;
+                await UniTask.Yield();
+            }
             selectable.Select();
         }
 
@@ -146,13 +172,13 @@ namespace MultiplayerARPG
             if (selectedOnNoChild)
             {
                 selectedOnNoChild = false;
-                StartCoroutine(DelaySelect(childs[0].Selectable));
+                DelaySelect(childs[0].Selectable);
             }
         }
 
         public void RemoveChild(NavigationChild child)
         {
-            bool selected = child.Selectable.gameObject == EventSystem.current.currentSelectedGameObject;
+            bool selected = EventSystem.current != null && child.Selectable.gameObject == EventSystem.current.currentSelectedGameObject;
             int index = childs.IndexOf(child);
             childs.Remove(child);
             if (!selected)
