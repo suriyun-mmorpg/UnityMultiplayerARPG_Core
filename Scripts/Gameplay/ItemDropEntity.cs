@@ -350,8 +350,8 @@ namespace MultiplayerARPG
             itemDropEntity.isPickedUp = false;
             itemDropEntity.dropTime = Time.unscaledTime;
             itemDropEntity.appearDuration = appearDuration;
-            BaseGameNetworkManager.Singleton.Assets.NetworkSpawn(spawnObj);
             itemDropEntity.InitDropItems();
+            BaseGameNetworkManager.Singleton.Assets.NetworkSpawn(spawnObj);
             return itemDropEntity;
         }
 
