@@ -7,12 +7,13 @@ namespace MultiplayerARPG
         protected override void OnEnable()
         {
             base.OnEnable();
-            EventSystemManager.Instance.onEventSystemReady += Instance_onEventSystemReady;
+            EventSystemManager.onEventSystemReady += Instance_onEventSystemReady;
         }
 
-        private void OnDisable()
+        protected override void OnDisable()
         {
-            EventSystemManager.Instance.onEventSystemReady -= Instance_onEventSystemReady;
+            base.OnDisable();
+            EventSystemManager.onEventSystemReady -= Instance_onEventSystemReady;
         }
 
         private void Instance_onEventSystemReady()
