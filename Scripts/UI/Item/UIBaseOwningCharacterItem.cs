@@ -35,6 +35,8 @@ namespace MultiplayerARPG
         public int Amount { get { return (CharacterItem != null ? CharacterItem.amount : 0); } }
 
         public UICharacterItem uiCharacterItem;
+        [Tooltip("These objects will be activated while item is set")]
+        public GameObject[] hasItemObjects;
         [Tooltip("These objects will be activated while item is not set")]
         public GameObject[] noItemObjects;
 
@@ -81,6 +83,15 @@ namespace MultiplayerARPG
         protected override void Update()
         {
             base.Update();
+            if (hasItemObjects != null && hasItemObjects.Length > 0)
+            {
+                foreach (GameObject hasItemObject in hasItemObjects)
+                {
+                    if (hasItemObject == null)
+                        continue;
+                    hasItemObject.SetActive(!CharacterItem.IsEmptySlot());
+                }
+            }
             if (noItemObjects != null && noItemObjects.Length > 0)
             {
                 foreach (GameObject noItemObject in noItemObjects)
