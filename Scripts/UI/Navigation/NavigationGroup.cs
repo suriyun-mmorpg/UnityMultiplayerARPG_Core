@@ -122,10 +122,21 @@ namespace MultiplayerARPG
             if (childs.Count > 0)
             {
                 selectedOnNoChild = false;
-                if (lastSelectedChild != null)
+                if (lastSelectedChild != null && lastSelectedChild.isActiveAndEnabled)
+                {
                     DelaySelect(lastSelectedChild.Selectable);
+                }
                 else
-                    DelaySelect(childs[0].Selectable);
+                {
+                    for (int i = 0; i < childs.Count; ++i)
+                    {
+                        if (childs[i].isActiveAndEnabled)
+                        {
+                            DelaySelect(childs[i].Selectable);
+                            break;
+                        }
+                    }
+                }
             }
             else
             {
@@ -186,7 +197,14 @@ namespace MultiplayerARPG
             if (selectedOnNoChild)
             {
                 selectedOnNoChild = false;
-                DelaySelect(childs[0].Selectable);
+                for (int i = 0; i < childs.Count; ++i)
+                {
+                    if (childs[i].isActiveAndEnabled)
+                    {
+                        DelaySelect(childs[i].Selectable);
+                        break;
+                    }
+                }
             }
         }
 
@@ -204,9 +222,27 @@ namespace MultiplayerARPG
             else
             {
                 if (index < childs.Count)
-                    childs[index].Selectable.Select();
+                {
+                    for (int i = index; i >= 0; --i)
+                    {
+                        if (childs[i].isActiveAndEnabled)
+                        {
+                            DelaySelect(childs[i].Selectable);
+                            break;
+                        }
+                    }
+                }
                 else
-                    childs[childs.Count - 1].Selectable.Select();
+                {
+                    for (int i = childs.Count - 1; i >= 0; --i)
+                    {
+                        if (childs[i].isActiveAndEnabled)
+                        {
+                            DelaySelect(childs[i].Selectable);
+                            break;
+                        }
+                    }
+                }
             }
         }
 
