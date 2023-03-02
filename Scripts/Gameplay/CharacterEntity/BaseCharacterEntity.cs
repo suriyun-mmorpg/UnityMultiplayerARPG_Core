@@ -138,7 +138,6 @@ namespace MultiplayerARPG
         public float RespawnGroundedCheckCountDown { get; protected set; }
         public float RespawnInvincibleCountDown { get; protected set; }
         public float LastUseItemTime { get; set; }
-        public Dictionary<int, float> LastUseItemTimes { get; private set; } = new Dictionary<int, float>();
 
         protected int countDownToSetEquipWeaponsModels = FRAMES_BEFORE_SET_EQUIP_MODEL;
         protected int countDownToSetEquipItemsModels = FRAMES_BEFORE_SET_EQUIP_MODEL;

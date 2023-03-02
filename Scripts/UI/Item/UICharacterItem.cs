@@ -225,10 +225,10 @@ namespace MultiplayerARPG
             float deltaTime = Time.deltaTime;
             UpdateLockRemainsDuration(deltaTime);
 
-            ISkillItem skillItem = SkillItem;
-            if (skillItem != null)
+            IUsableItem usableItem = UsableItem;
+            if (usableItem != null)
             {
-                UpdateSkillCoolDownRemainsDuration(skillItem.UsingSkill, deltaTime);
+                UpdateUIUsableItemCoolDownRemainsDuration(usableItem, deltaTime);
             }
             else
             {
@@ -285,7 +285,13 @@ namespace MultiplayerARPG
             }
         }
 
-        private void UpdateSkillCoolDownRemainsDuration(BaseSkill skill, float deltaTime)
+        private void UpdateUIUsableItemCoolDownRemainsDuration(IUsableItem item, float deltaTime)
+        {
+            float coolDownDuration = item != null ? item.UseItemCooldown : 0f;
+            UpdateUICoolDownRemainsDuration(coolDownDuration, deltaTime);
+        }
+
+        private void UpdateUICoolDownRemainsDuration(float coolDownDuration, float deltaTime)
         {
             if (coolDownRemainsDuration > 0f)
             {
@@ -298,12 +304,9 @@ namespace MultiplayerARPG
                 coolDownRemainsDuration = 0f;
             }
 
-            // Update UIs
-            float coolDownDuration = skill.GetCoolDownDuration(Level);
-
             if (uiTextCoolDownDuration != null)
             {
-                uiTextCoolDownDuration.SetGameObjectActive(skill.IsActive && coolDownDuration > 0f);
+                uiTextCoolDownDuration.SetGameObjectActive(coolDownDuration > 0f);
                 uiTextCoolDownDuration.text = ZString.Format(
                     LanguageManager.GetText(formatKeyCoolDownDuration),
                     coolDownDuration.ToString("N0"));
@@ -311,7 +314,7 @@ namespace MultiplayerARPG
 
             if (uiTextCoolDownRemainsDuration != null)
             {
-                uiTextCoolDownRemainsDuration.SetGameObjectActive(skill.IsActive && coolDownRemainsDuration > 0);
+                uiTextCoolDownRemainsDuration.SetGameObjectActive(coolDownRemainsDuration > 0);
                 uiTextCoolDownRemainsDuration.text = ZString.Format(
                     LanguageManager.GetText(formatKeyCoolDownRemainsDuration),
                     coolDownRemainsDuration.ToString("N0"));
@@ -343,16 +346,19 @@ namespace MultiplayerARPG
                 }
             }
         }
-
-        protected override void UpdateUI()
+        protected void UpdateUsableItemCoolDownRemainsDuration()
         {
-            // Update remains duration
-            if (coolDownRemainsDuration <= 0f && Character != null && SkillItem != null && SkillItem.UsingSkill != null)
+            if (coolDownRemainsDuration <= 0f && Character != null && UsableItem != null)
             {
-                int indexOfSkillUsage = Character.IndexOfSkillUsage(SkillItem.UsingSkill.DataId, SkillUsageType.Skill);
+                int indexOfSkillUsage = Character.IndexOfSkillUsage(UsableItem.DataId, SkillUsageType.UsableItem);
                 if (indexOfSkillUsage >= 0)
                     coolDownRemainsDuration = Character.SkillUsages[indexOfSkillUsage].coolDownRemainsDuration;
             }
+        }
+
+        protected override void UpdateUI()
+        {
+            UpdateUsableItemCoolDownRemainsDuration();
 
             if (!IsOwningCharacter() || !IsVisible())
                 return;
@@ -368,13 +374,7 @@ namespace MultiplayerARPG
 
         protected override void UpdateData()
         {
-            // Update remains duration
-            if (Character != null && SkillItem != null && SkillItem.UsingSkill != null)
-            {
-                int indexOfSkillUsage = Character.IndexOfSkillUsage(SkillItem.UsingSkill.DataId, SkillUsageType.Skill);
-                if (indexOfSkillUsage >= 0 && Mathf.Abs(Character.SkillUsages[indexOfSkillUsage].coolDownRemainsDuration - coolDownRemainsDuration) > 1)
-                    coolDownRemainsDuration = Character.SkillUsages[indexOfSkillUsage].coolDownRemainsDuration;
-            }
+            UpdateUsableItemCoolDownRemainsDuration();
 
             if (Level <= 0)
             {

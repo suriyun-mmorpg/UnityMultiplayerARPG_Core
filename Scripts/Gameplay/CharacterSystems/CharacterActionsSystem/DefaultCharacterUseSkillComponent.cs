@@ -84,7 +84,24 @@ namespace MultiplayerARPG
             }
         }
 
-        protected async UniTaskVoid UseSkillRoutine(byte simulateSeed, bool isLeftHand, BaseSkill skill, int skillLevel, uint targetObjectId, AimPosition skillAimPosition)
+        protected void AddOrUpdateSkillUsage(SkillUsageType type, int dataId, int skillLevel)
+        {
+            int index = Entity.IndexOfSkillUsage(dataId, type);
+            if (index >= 0)
+            {
+                CharacterSkillUsage newSkillUsage = Entity.SkillUsages[index];
+                newSkillUsage.Use(Entity, skillLevel);
+                Entity.SkillUsages[index] = newSkillUsage;
+            }
+            else
+            {
+                CharacterSkillUsage newSkillUsage = CharacterSkillUsage.Create(type, dataId);
+                newSkillUsage.Use(Entity, skillLevel);
+                Entity.SkillUsages.Add(newSkillUsage);
+            }
+        }
+
+        protected async UniTaskVoid UseSkillRoutine(byte simulateSeed, bool isLeftHand, BaseSkill skill, int skillLevel, uint targetObjectId, AimPosition skillAimPosition, int? itemDataId)
         {
             // Prepare cancellation
             CancellationTokenSource skillCancellationTokenSource = new CancellationTokenSource();
@@ -119,19 +136,13 @@ namespace MultiplayerARPG
             if (IsServer)
             {
                 // Update skill usage states at server only
-                CharacterSkillUsage newSkillUsage;
-                int skillUsageIndex = Entity.IndexOfSkillUsage(skill.DataId, SkillUsageType.Skill);
-                if (skillUsageIndex >= 0)
+                if (itemDataId.HasValue)
                 {
-                    newSkillUsage = Entity.SkillUsages[skillUsageIndex];
-                    newSkillUsage.Use(Entity, skillLevel);
-                    Entity.SkillUsages[skillUsageIndex] = newSkillUsage;
+                    AddOrUpdateSkillUsage(SkillUsageType.UsableItem, itemDataId.Value, skillLevel);
                 }
                 else
                 {
-                    newSkillUsage = CharacterSkillUsage.Create(SkillUsageType.Skill, skill.DataId);
-                    newSkillUsage.Use(Entity, skillLevel);
-                    Entity.SkillUsages.Add(newSkillUsage);
+                    AddOrUpdateSkillUsage(SkillUsageType.Skill, skill.DataId, skillLevel);
                 }
                 // Do something with buffs when use skill
                 Entity.SkillAndBuffComponent.OnUseSkill();
@@ -404,7 +415,7 @@ namespace MultiplayerARPG
                 // Set use skill state
                 IsUsingSkill = true;
                 // Simulate skill using at client immediately
-                UseSkillRoutine(simulateSeed, isLeftHand, skill, skillLevel, targetObjectId, aimPosition).Forget();
+                UseSkillRoutine(simulateSeed, isLeftHand, skill, skillLevel, targetObjectId, aimPosition, null).Forget();
                 // Tell server that this client use skill
                 sendingClientUseSkill = true;
                 sendingSeed = simulateSeed;
@@ -429,21 +440,14 @@ namespace MultiplayerARPG
                 // Validate skill
                 if (!Entity.ValidateSkillItemToUse(itemIndex, isLeftHand, targetObjectId, out ISkillItem skillItem, out BaseSkill skill, out int skillLevel, out _))
                     return;
-                // Validate using time
-                float time = Time.unscaledTime;
-                int itemDataId = Entity.NonEquipItems[itemIndex].dataId;
-                if (skillItem.UseItemCooldown > 0f && Entity.LastUseItemTimes.ContainsKey(itemDataId) && time - Entity.LastUseItemTimes[itemDataId] < skillItem.UseItemCooldown)
-                    return;
                 // Update using time
-                Entity.LastUseItemTime = time;
-                if (!IsServer)
-                    Entity.LastUseItemTimes[itemDataId] = time;
+                Entity.LastUseItemTime = Time.unscaledTime;
                 // Get simulate seed for simulation validating
                 byte simulateSeed = (byte)Random.Range(byte.MinValue, byte.MaxValue);
                 // Set use skill state
                 IsUsingSkill = true;
                 // Simulate skill using at client immediately
-                UseSkillRoutine(simulateSeed, isLeftHand, skill, skillLevel, targetObjectId, aimPosition).Forget();
+                UseSkillRoutine(simulateSeed, isLeftHand, skill, skillLevel, targetObjectId, aimPosition, Entity.NonEquipItems[itemIndex].dataId).Forget();
                 // Tell server that this client use skill
                 sendingClientUseSkillItem = true;
                 sendingSeed = simulateSeed;
@@ -558,7 +562,7 @@ namespace MultiplayerARPG
             // Set use skill state
             IsUsingSkill = true;
             // Play animation at server immediately
-            UseSkillRoutine(simulateSeed, isLeftHand, skill, skillLevel, targetObjectId, aimPosition).Forget();
+            UseSkillRoutine(simulateSeed, isLeftHand, skill, skillLevel, targetObjectId, aimPosition, null).Forget();
             // Tell clients to play animation later
             sendingServerUseSkill = true;
             sendingSeed = simulateSeed;
@@ -587,7 +591,7 @@ namespace MultiplayerARPG
             if (!GameInstance.Skills.TryGetValue(skillDataId, out skill) && skillLevel > 0)
                 ClearUseSkillStates();
             Entity.AttackComponent.CancelAttack();
-            UseSkillRoutine(simulateSeed, isLeftHand, skill, skillLevel, targetObjectId, aimPosition).Forget();
+            UseSkillRoutine(simulateSeed, isLeftHand, skill, skillLevel, targetObjectId, aimPosition, null).Forget();
         }
 
         public void ReadClientUseSkillItemStateAtServer(NetDataReader reader)
@@ -609,11 +613,6 @@ namespace MultiplayerARPG
             // Validate skill item
             if (!Entity.ValidateSkillItemToUse(itemIndex, isLeftHand, targetObjectId, out ISkillItem skillItem, out BaseSkill skill, out int skillLevel, out _))
                 return;
-            // Validate using time
-            float time = Time.unscaledTime;
-            int itemDataId = Entity.NonEquipItems[itemIndex].dataId;
-            if (skillItem.UseItemCooldown > 0f && Entity.LastUseItemTimes.ContainsKey(itemDataId) && time - Entity.LastUseItemTimes[itemDataId] < skillItem.UseItemCooldown)
-                return;
             // Decrease items
             if (!Entity.DecreaseItemsByIndex(itemIndex, 1, false))
                 return;
@@ -621,7 +620,7 @@ namespace MultiplayerARPG
             // Set use skill state
             IsUsingSkill = true;
             // Play animation at server immediately
-            UseSkillRoutine(simulateSeed, isLeftHand, skill, skillLevel, targetObjectId, aimPosition).Forget();
+            UseSkillRoutine(simulateSeed, isLeftHand, skill, skillLevel, targetObjectId, aimPosition, Entity.NonEquipItems[itemIndex].dataId).Forget();
             // Tell clients to play animation later
             sendingServerUseSkill = true;
             sendingSeed = simulateSeed;
@@ -630,8 +629,6 @@ namespace MultiplayerARPG
             sendingIsLeftHand = isLeftHand;
             sendingTargetObjectId = targetObjectId;
             sendingAimPosition = aimPosition;
-            // Update using time
-            Entity.LastUseItemTimes[itemDataId] = time;
 #endif
         }
 

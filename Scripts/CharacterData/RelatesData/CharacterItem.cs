@@ -239,7 +239,7 @@ namespace MultiplayerARPG
             return GetMaxDurability() > 0 && durability <= 0;
         }
 
-        public bool IsLock()
+        public bool IsLocked()
         {
             return lockRemainsDuration > 0;
         }

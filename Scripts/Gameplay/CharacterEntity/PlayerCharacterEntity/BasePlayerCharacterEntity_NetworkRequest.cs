@@ -12,28 +12,23 @@ namespace MultiplayerARPG
             if (!UpdateLastActionTime())
                 return false;
 
-            if (Time.unscaledTime - LastUseItemTime < CurrentGameInstance.useItemDelay)
-                return false;
-
-            if (itemIndex >= nonEquipItems.Count)
-                return false;
-
-            if (nonEquipItems[itemIndex].IsLock())
-                return false;
-
-
-            IUsableItem usableItem = nonEquipItems[itemIndex].GetUsableItem();
-            if (usableItem == null)
-                return false;
-
             float time = Time.unscaledTime;
-            int itemDataId = nonEquipItems[itemIndex].dataId;
-            if (usableItem.UseItemCooldown > 0f && LastUseItemTimes.ContainsKey(itemDataId) && time - LastUseItemTimes[itemDataId] < usableItem.UseItemCooldown)
+            if (time - LastUseItemTime < CurrentGameInstance.useItemDelay)
+                return false;
+
+            if (itemIndex < 0 || itemIndex >= nonEquipItems.Count)
+                return false;
+
+            if (this.IndexOfSkillUsage(nonEquipItems[itemIndex].dataId, SkillUsageType.UsableItem) >= 0)
+                return false;
+
+            if (nonEquipItems[itemIndex].IsLocked())
+                return false;
+
+            if (nonEquipItems[itemIndex].GetUsableItem() == null)
                 return false;
 
             LastUseItemTime = time;
-            if (!IsServer)
-                LastUseItemTimes[itemDataId] = time;
             return true;
         }
 

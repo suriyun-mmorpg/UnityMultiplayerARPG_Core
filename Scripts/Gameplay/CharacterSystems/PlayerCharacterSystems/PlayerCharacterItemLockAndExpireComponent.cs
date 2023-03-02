@@ -40,7 +40,7 @@ namespace MultiplayerARPG
                     }
                     else
                     {
-                        if (nonEquipItem.IsLock())
+                        if (nonEquipItem.IsLocked())
                         {
                             nonEquipItem.Update(updatingTime);
                             Entity.NonEquipItems[i] = nonEquipItem;

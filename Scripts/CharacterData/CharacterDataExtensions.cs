@@ -2205,9 +2205,21 @@ namespace MultiplayerARPG
             skillLevel = 0;
             gameMessage = UITextKeys.NONE;
 
-            if (itemIndex >= character.NonEquipItems.Count ||
-                character.NonEquipItems[itemIndex].IsLock())
+            if (itemIndex < 0 || itemIndex >= character.NonEquipItems.Count)
             {
+                gameMessage = UITextKeys.UI_ERROR_INVALID_ITEM_INDEX;
+                return false;
+            }
+
+            if (character.IndexOfSkillUsage(character.NonEquipItems[itemIndex].dataId, SkillUsageType.UsableItem) >= 0)
+            {
+                gameMessage = UITextKeys.UI_ERROR_ITEM_IS_COOLING_DOWN;
+                return false;
+            }
+
+            if (character.NonEquipItems[itemIndex].IsLocked())
+            {
+                gameMessage = UITextKeys.UI_ERROR_ITEM_IS_LOCKED;
                 return false;
             }
 
