@@ -193,6 +193,9 @@ namespace MultiplayerARPG
         UI_ERROR_SKILL_IS_COOLING_DOWN,
         UI_ERROR_SKILL_IS_NOT_LEARNED,
         UI_ERROR_NO_SKILL_TARGET,
+        // Items
+        UI_ERROR_ITEM_IS_COOLING_DOWN,
+        UI_ERROR_ITEM_IS_LOCKED,
         // Requirement
         UI_ERROR_NOT_ENOUGH_LEVEL,
         UI_ERROR_NOT_MATCH_CHARACTER_CLASS,
@@ -1444,6 +1447,9 @@ namespace MultiplayerARPG
             Texts.Add(UITextKeys.UI_ERROR_SKILL_IS_COOLING_DOWN.ToString(), "Skill is cooling down");
             Texts.Add(UITextKeys.UI_ERROR_SKILL_IS_NOT_LEARNED.ToString(), "Skill is not learned");
             Texts.Add(UITextKeys.UI_ERROR_NO_SKILL_TARGET.ToString(), "No target");
+            // Error - Item
+            Texts.Add(UITextKeys.UI_ERROR_ITEM_IS_COOLING_DOWN.ToString(), "Item is cooling down");
+            Texts.Add(UITextKeys.UI_ERROR_ITEM_IS_LOCKED.ToString(), "Item is locked");
             // Error - Requirement
             Texts.Add(UITextKeys.UI_ERROR_NOT_ENOUGH_LEVEL.ToString(), "Not enough level");
             Texts.Add(UITextKeys.UI_ERROR_NOT_MATCH_CHARACTER_CLASS.ToString(), "Not match character class");
