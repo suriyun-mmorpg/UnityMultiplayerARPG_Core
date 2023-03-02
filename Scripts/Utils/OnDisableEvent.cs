@@ -4,6 +4,7 @@ using UnityEngine.Events;
 
 namespace UtilsComponents
 {
+    [DefaultExecutionOrder(1001)]
     public class OnDisableEvent : MonoBehaviour
     {
         public UnityEvent onDisable = new UnityEvent();
