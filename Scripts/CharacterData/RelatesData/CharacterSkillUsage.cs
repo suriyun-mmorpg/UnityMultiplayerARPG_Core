@@ -7,6 +7,7 @@ namespace MultiplayerARPG
     {
         Skill,
         GuildSkill,
+        UsableItem,
     }
 
     [System.Serializable]
@@ -23,6 +24,8 @@ namespace MultiplayerARPG
         private BaseSkill cacheSkill;
         [System.NonSerialized]
         private GuildSkill cacheGuildSkill;
+        [System.NonSerialized]
+        private IUsableItem cacheUsableItem;
 
         private void MakeCache()
         {
@@ -31,6 +34,7 @@ namespace MultiplayerARPG
                 dirtyDataId = dataId;
                 cacheSkill = null;
                 cacheGuildSkill = null;
+                cacheUsableItem = null;
                 switch (type)
                 {
                     case SkillUsageType.Skill:
@@ -38,6 +42,10 @@ namespace MultiplayerARPG
                         break;
                     case SkillUsageType.GuildSkill:
                         GameInstance.GuildSkills.TryGetValue(dataId, out cacheGuildSkill);
+                        break;
+                    case SkillUsageType.UsableItem:
+                        if (GameInstance.Items.TryGetValue(dataId, out BaseItem item))
+                            cacheUsableItem = item as IUsableItem;
                         break;
                 }
             }
@@ -55,11 +63,29 @@ namespace MultiplayerARPG
             return cacheGuildSkill;
         }
 
+        public IUsableItem GetUsableItem()
+        {
+            MakeCache();
+            return cacheUsableItem;
+        }
+
         public void Use(ICharacterData character, int level)
         {
             coolDownRemainsDuration = 0f;
             switch (type)
             {
+                case SkillUsageType.UsableItem:
+                    if (GetUsableItem() != null)
+                    {
+                        coolDownRemainsDuration = GetUsableItem().UseItemCooldown;
+                    }
+                    break;
+                case SkillUsageType.GuildSkill:
+                    if (GetGuildSkill() != null)
+                    {
+                        coolDownRemainsDuration = GetGuildSkill().GetCoolDownDuration(level);
+                    }
+                    break;
                 case SkillUsageType.Skill:
                     if (GetSkill() != null)
                     {
@@ -80,12 +106,6 @@ namespace MultiplayerARPG
                         if (tempAmount < 0)
                             tempAmount = 0;
                         character.CurrentStamina -= tempAmount;
-                    }
-                    break;
-                case SkillUsageType.GuildSkill:
-                    if (GetGuildSkill() != null)
-                    {
-                        coolDownRemainsDuration = GetGuildSkill().GetCoolDownDuration(level);
                     }
                     break;
             }
