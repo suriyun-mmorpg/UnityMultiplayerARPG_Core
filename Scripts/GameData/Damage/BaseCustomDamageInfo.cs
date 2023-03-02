@@ -25,5 +25,10 @@ namespace MultiplayerARPG
         {
 
         }
+
+        public virtual bool ValidatedByHitRegistrationManager()
+        {
+            return false;
+        }
     }
 }

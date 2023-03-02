@@ -5,7 +5,6 @@ namespace MultiplayerARPG
     public struct HitValidateData
     {
         public byte FireSpread { get; set; }
-        public BaseCharacterEntity Attacker { get; set; }
         public Dictionary<DamageElement, MinMaxFloat> DamageAmounts { get; set; }
         public DamageInfo DamageInfo { get; set; }
         public CharacterItem Weapon { get; set; }

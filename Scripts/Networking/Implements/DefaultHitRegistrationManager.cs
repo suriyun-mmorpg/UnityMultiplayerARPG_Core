@@ -13,23 +13,22 @@ namespace MultiplayerARPG
 
         public void PrepareHitRegValidatation(DamageInfo damageInfo, int randomSeed, byte fireSpread, BaseCharacterEntity attacker, Dictionary<DamageElement, MinMaxFloat> damageAmounts, CharacterItem weapon, BaseSkill skill, int skillLevel)
         {
-            if (!BaseGameNetworkManager.Singleton.IsServer)
-            {
-                // Only server can prepare hit registration
+            // Only server can prepare hit registration
+            if (attacker == null || !BaseGameNetworkManager.Singleton.IsServer)
                 return;
-            }
 
+            // Don't validate damage entity based damage types
             if (damageInfo.damageType == DamageType.Missile || damageInfo.damageType == DamageType.Throwable)
-            {
-                // Don't validate damage entity based damage types
                 return;
-            }
+
+            // Validating or not?
+            if (damageInfo.damageType == DamageType.Custom && (damageInfo.customDamageInfo == null || !damageInfo.customDamageInfo.ValidatedByHitRegistrationManager()))
+                return;
 
             string id = MakeId(attacker.Id, randomSeed);
             validateHits[id] = new HitValidateData()
             {
                 FireSpread = fireSpread,
-                Attacker = attacker,
                 DamageAmounts = damageAmounts,
                 DamageInfo = damageInfo,
                 Weapon = weapon,
@@ -41,11 +40,9 @@ namespace MultiplayerARPG
 
         public void Register(BaseCharacterEntity attacker, HitRegisterMessage message)
         {
-            if (!BaseGameNetworkManager.Singleton.IsServer)
-            {
-                // Only server can perform hit registration
+            // Only server can perform hit registration
+            if (attacker == null || !BaseGameNetworkManager.Singleton.IsServer)
                 return;
-            }
 
             string id = MakeId(attacker.Id, message.RandomSeed);
             registerHits[id] = message.Hits;
@@ -54,7 +51,7 @@ namespace MultiplayerARPG
 
         private bool PerformValidation(BaseCharacterEntity attacker, string id, int randomSeed)
         {
-            if (!registerHits.ContainsKey(id) || !validateHits.ContainsKey(id))
+            if (attacker == null || !registerHits.ContainsKey(id) || !validateHits.ContainsKey(id))
                 return false;
 
             HashSet<uint> hitObjectIds = new HashSet<uint>();
@@ -93,7 +90,7 @@ namespace MultiplayerARPG
                     if (IsHit(attacker, registerHits[id][0], registerHits[id][0].HitDataCollection[i], hitBox))
                     {
                         // Yes, it is hit
-                        hitBox.ReceiveDamage(validateHits[id].Attacker.EntityTransform.position, validateHits[id].Attacker.GetInfo(), validateHits[id].DamageAmounts, validateHits[id].Weapon, validateHits[id].Skill, validateHits[id].SkillLevel, randomSeed);
+                        hitBox.ReceiveDamage(attacker.EntityTransform.position, attacker.GetInfo(), validateHits[id].DamageAmounts, validateHits[id].Weapon, validateHits[id].Skill, validateHits[id].SkillLevel, randomSeed);
                     }
                 }
                 registerHits[id].RemoveAt(0);
