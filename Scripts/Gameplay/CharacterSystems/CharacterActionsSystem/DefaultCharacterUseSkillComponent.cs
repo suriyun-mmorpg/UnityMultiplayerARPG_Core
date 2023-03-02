@@ -438,8 +438,11 @@ namespace MultiplayerARPG
             if (!IsServer && IsOwnerClient)
             {
                 // Validate skill
-                if (!Entity.ValidateSkillItemToUse(itemIndex, isLeftHand, targetObjectId, out ISkillItem skillItem, out BaseSkill skill, out int skillLevel, out _))
+                if (!Entity.ValidateSkillItemToUse(itemIndex, isLeftHand, targetObjectId, out ISkillItem _, out BaseSkill skill, out int skillLevel, out UITextKeys gameMessage))
+                {
+                    ClientGenericActions.ClientReceiveGameMessage(gameMessage);
                     return;
+                }
                 // Update using time
                 Entity.LastUseItemTime = Time.unscaledTime;
                 // Get simulate seed for simulation validating

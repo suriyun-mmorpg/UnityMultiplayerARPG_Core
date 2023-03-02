@@ -16,28 +16,9 @@ namespace MultiplayerARPG
             if (!CanUseItem())
                 return;
 
-            if (itemIndex < 0 || itemIndex >= nonEquipItems.Count)
+            if (!this.ValidateUsableItemToUse(itemIndex, out IUsableItem usableItem, out UITextKeys gameMessage))
             {
-                GameInstance.ServerGameMessageHandlers.SendGameMessage(Entity.ConnectionId, UITextKeys.UI_ERROR_INVALID_ITEM_INDEX);
-                return;
-            }
-
-            if (this.IndexOfSkillUsage(nonEquipItems[itemIndex].dataId, SkillUsageType.UsableItem) >= 0)
-            {
-                GameInstance.ServerGameMessageHandlers.SendGameMessage(Entity.ConnectionId, UITextKeys.UI_ERROR_ITEM_IS_COOLING_DOWN);
-                return;
-            }
-
-            if (nonEquipItems[itemIndex].IsLocked())
-            {
-                GameInstance.ServerGameMessageHandlers.SendGameMessage(Entity.ConnectionId, UITextKeys.UI_ERROR_ITEM_IS_LOCKED);
-                return;
-            }
-
-            IUsableItem usableItem = nonEquipItems[itemIndex].GetUsableItem();
-            if (usableItem == null)
-            {
-                GameInstance.ServerGameMessageHandlers.SendGameMessage(Entity.ConnectionId, UITextKeys.UI_ERROR_INVALID_ITEM_DATA);
+                GameInstance.ServerGameMessageHandlers.SendGameMessage(ConnectionId, gameMessage);
                 return;
             }
 

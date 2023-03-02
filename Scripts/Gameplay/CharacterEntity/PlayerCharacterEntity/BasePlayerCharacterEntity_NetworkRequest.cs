@@ -16,17 +16,11 @@ namespace MultiplayerARPG
             if (time - LastUseItemTime < CurrentGameInstance.useItemDelay)
                 return false;
 
-            if (itemIndex < 0 || itemIndex >= nonEquipItems.Count)
+            if (!this.ValidateUsableItemToUse(itemIndex, out _, out UITextKeys gameMessage))
+            {
+                ClientGenericActions.ClientReceiveGameMessage(gameMessage);
                 return false;
-
-            if (this.IndexOfSkillUsage(nonEquipItems[itemIndex].dataId, SkillUsageType.UsableItem) >= 0)
-                return false;
-
-            if (nonEquipItems[itemIndex].IsLocked())
-                return false;
-
-            if (nonEquipItems[itemIndex].GetUsableItem() == null)
-                return false;
+            }
 
             LastUseItemTime = time;
             return true;

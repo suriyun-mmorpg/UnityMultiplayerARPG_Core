@@ -2203,17 +2203,32 @@ namespace MultiplayerARPG
             skillItem = null;
             skill = null;
             skillLevel = 0;
+
+            if (!ValidateUsableItemToUse(character, itemIndex, out IUsableItem usableItem, out gameMessage))
+            {
+                return false;
+            }
+
+            skillItem = usableItem as ISkillItem;
+            if (skillItem == null || skillItem.UsingSkill == null ||
+                !skillItem.UsingSkill.CanUse(character, skillItem.UsingSkillLevel, isLeftHand, targetObjectId, out gameMessage, true))
+            {
+                return false;
+            }
+            skill = skillItem.UsingSkill;
+            skillLevel = skillItem.UsingSkillLevel;
+
+            return true;
+        }
+
+        public static bool ValidateUsableItemToUse(this BaseCharacterEntity character, int itemIndex, out IUsableItem usableItem, out UITextKeys gameMessage)
+        {
+            usableItem = null;
             gameMessage = UITextKeys.NONE;
 
             if (itemIndex < 0 || itemIndex >= character.NonEquipItems.Count)
             {
                 gameMessage = UITextKeys.UI_ERROR_INVALID_ITEM_INDEX;
-                return false;
-            }
-
-            if (character.IndexOfSkillUsage(character.NonEquipItems[itemIndex].dataId, SkillUsageType.UsableItem) >= 0)
-            {
-                gameMessage = UITextKeys.UI_ERROR_ITEM_IS_COOLING_DOWN;
                 return false;
             }
 
@@ -2223,14 +2238,18 @@ namespace MultiplayerARPG
                 return false;
             }
 
-            skillItem = character.NonEquipItems[itemIndex].GetSkillItem();
-            if (skillItem == null || skillItem.UsingSkill == null ||
-                !skillItem.UsingSkill.CanUse(character, skillItem.UsingSkillLevel, isLeftHand, targetObjectId, out gameMessage, true))
+            usableItem = character.NonEquipItems[itemIndex].GetUsableItem();
+            if (usableItem == null)
             {
+                gameMessage = UITextKeys.UI_ERROR_INVALID_ITEM_DATA;
                 return false;
             }
-            skill = skillItem.UsingSkill;
-            skillLevel = skillItem.UsingSkillLevel;
+
+            if (character.IndexOfSkillUsage(character.NonEquipItems[itemIndex].dataId, SkillUsageType.UsableItem) >= 0)
+            {
+                gameMessage = UITextKeys.UI_ERROR_ITEM_IS_COOLING_DOWN;
+                return false;
+            }
 
             return true;
         }
