@@ -110,7 +110,7 @@ namespace MultiplayerARPG
         public IBuildAimController BuildAimController { get; protected set; }
         public IAreaSkillAimController AreaSkillAimController { get; protected set; }
 
-        protected int buildingItemIndex;
+        protected int buildingItemIndex = -1;
         protected UsingSkillData queueUsingSkill;
 
         protected virtual void Awake()

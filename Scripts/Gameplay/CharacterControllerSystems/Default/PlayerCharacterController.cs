@@ -102,27 +102,11 @@ namespace MultiplayerARPG
         public GameObject CacheTargetObject { get; protected set; }
 
         // Input & control states variables
-        protected bool getMouseUp;
-        protected bool getMouseDown;
-        protected bool getMouse;
-        protected bool isPointerOverUI;
-        protected bool isMouseDragDetected;
-        protected bool isMouseHoldDetected;
-        protected bool isMouseHoldAndNotDrag;
-        protected bool isSprinting;
-        protected bool isWalking;
         protected Vector3? destination;
-        protected Vector3 mouseDownPosition;
-        protected float mouseDownTime;
-        protected bool isMouseDragOrHoldOrOverUI;
-        protected Vector3? targetPosition;
         protected TargetActionType targetActionType;
         protected IPhysicFunctions physicFunctions;
-        protected Vector3 previousPointClickPosition = Vector3.positiveInfinity;
-        protected int findingEnemyIndex;
         protected bool isLeftHandAttacking;
         protected bool isFollowingTarget;
-        protected bool didActionOnTarget;
         protected InputStateManager activateInput;
         protected InputStateManager pickupItemInput;
         protected InputStateManager reloadInput;
@@ -162,8 +146,6 @@ namespace MultiplayerARPG
             // Initial area skill aim controller
             AreaSkillAimController = gameObject.GetOrAddComponent<IAreaSkillAimController, DefaultAreaSkillAimController>();
 
-            buildingItemIndex = -1;
-            findingEnemyIndex = -1;
             isLeftHandAttacking = false;
             ConstructingBuildingEntity = null;
             activateInput = new InputStateManager("Activate");

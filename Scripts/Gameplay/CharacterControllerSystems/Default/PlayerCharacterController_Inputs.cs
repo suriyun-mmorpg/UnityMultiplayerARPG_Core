@@ -6,6 +6,25 @@ namespace MultiplayerARPG
     {
         public const float MIN_START_MOVE_DISTANCE = 0.01f;
 
+        // Input & control states variables
+        protected int findingEnemyIndex = -1;
+        protected bool getMouseUp;
+        protected bool getMouseDown;
+        protected bool getMouse;
+        protected bool isPointerOverUI;
+        protected bool isMouseDragDetected;
+        protected bool isMouseHoldDetected;
+        protected bool isMouseHoldAndNotDrag;
+        protected bool isSprinting;
+        protected bool isWalking;
+        protected Vector3 mouseDownPosition;
+        protected float mouseDownTime;
+        protected bool isMouseDragOrHoldOrOverUI;
+        protected Vector3? targetPosition;
+        protected Vector3 previousPointClickPosition = Vector3.positiveInfinity;
+        protected bool didActionOnTarget;
+        protected bool isBlockControllerLastFrame = false;
+
         public int FindClickObjects(out Vector3 worldPosition2D)
         {
             return physicFunctions.RaycastPickObjects(CacheGameplayCameraController.Camera, InputManager.MousePosition(), CurrentGameInstance.GetTargetLayerMask(), 100f, out worldPosition2D);
@@ -18,14 +37,17 @@ namespace MultiplayerARPG
             bool isBlockController = UISceneGameplay.IsBlockController();
             CacheGameplayCameraController.UpdateRotationX = false;
             CacheGameplayCameraController.UpdateRotationY = false;
-            CacheGameplayCameraController.UpdateRotation = !isFocusInputField && !isBlockController && !isPointerOverUIObject && InputManager.GetButton("CameraRotate");
-            CacheGameplayCameraController.UpdateZoom = !isFocusInputField && !isBlockController && !isPointerOverUIObject;
+            CacheGameplayCameraController.UpdateRotation = !isFocusInputField && !isBlockController && !isBlockControllerLastFrame && !isPointerOverUIObject && InputManager.GetButton("CameraRotate");
+            CacheGameplayCameraController.UpdateZoom = !isFocusInputField && !isBlockController && !isBlockControllerLastFrame && !isPointerOverUIObject;
 
-            if (isFocusInputField || isBlockController || PlayingCharacterEntity.IsDead())
+            if (isFocusInputField || isBlockController || isBlockControllerLastFrame || PlayingCharacterEntity.IsDead())
             {
+                isBlockControllerLastFrame = isBlockController;
                 PlayingCharacterEntity.KeyMovement(Vector3.zero, MovementState.None);
                 return;
             }
+
+            isBlockControllerLastFrame = isBlockController;
 
             // If it's building something, don't allow to activate NPC/Warp/Pickup Item
             if (ConstructingBuildingEntity == null)
