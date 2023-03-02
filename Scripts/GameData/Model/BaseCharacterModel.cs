@@ -482,18 +482,13 @@ namespace MultiplayerARPG
                 // Setup equipment entity
                 if (tempEquipmentObject != null)
                 {
+                    BaseEquipmentEntity tempEquipmentEntity = tempEquipmentObject.GetComponent<BaseEquipmentEntity>();
+                    if (tempEquipmentEntity != null)
+                        tempEquipmentEntity.Setup(this, tempEquipmentModel.equipPosition, tempEquipmentModel.itemLevel);
                     if (CacheRightHandEquipmentEntity == null && GameDataConst.EQUIP_POSITION_RIGHT_HAND.Equals(tempEquipmentModel.equipPosition))
-                    {
-                        CacheRightHandEquipmentEntity = tempEquipmentObject.GetComponent<BaseEquipmentEntity>();
-                        if (CacheRightHandEquipmentEntity != null)
-                            CacheRightHandEquipmentEntity.Setup(this, tempEquipmentModel.equipPosition, tempEquipmentModel.itemLevel);
-                    }
+                        CacheRightHandEquipmentEntity = tempEquipmentEntity;
                     if (CacheLeftHandEquipmentEntity == null && GameDataConst.EQUIP_POSITION_LEFT_HAND.Equals(tempEquipmentModel.equipPosition))
-                    {
-                        CacheLeftHandEquipmentEntity = tempEquipmentObject.GetComponent<BaseEquipmentEntity>();
-                        if (CacheLeftHandEquipmentEntity != null)
-                            CacheLeftHandEquipmentEntity.Setup(this, tempEquipmentModel.equipPosition, tempEquipmentModel.itemLevel);
-                    }
+                        CacheLeftHandEquipmentEntity = tempEquipmentEntity;
                 }
             }
             EquippedModels = storingModels;
