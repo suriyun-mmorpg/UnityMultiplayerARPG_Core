@@ -12,7 +12,7 @@ namespace MultiplayerARPG
     /// <summary>
     /// Made this component for navigation demo, because built-in Unity's components not good enough
     /// </summary>
-    public class TMP_InputField001 : InputField
+    public class TMP_InputField001 : TMPro.TMP_InputField
     {
         public bool selectDisabledSelectable = false;
         public float selectedScaleDuration = 1f;
