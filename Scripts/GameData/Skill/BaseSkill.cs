@@ -754,11 +754,13 @@ namespace MultiplayerARPG
                 return false;
             }
 
-            int skillUsageIndex = character.IndexOfSkillUsage(DataId, SkillUsageType.Skill);
-            if (skillUsageIndex >= 0 && character.SkillUsages[skillUsageIndex].coolDownRemainsDuration > 0f)
+            if (!isItem)
             {
-                gameMessage = UITextKeys.UI_ERROR_SKILL_IS_COOLING_DOWN;
-                return false;
+                if (character.IndexOfSkillUsage(DataId, SkillUsageType.Skill) >= 0)
+                {
+                    gameMessage = UITextKeys.UI_ERROR_SKILL_IS_COOLING_DOWN;
+                    return false;
+                }
             }
 
             if (RequiredTarget)
