@@ -161,7 +161,7 @@ namespace MultiplayerARPG
 
         private void Update()
         {
-            if (InputManager.useMobileInputOnNonMobile || Application.isMobilePlatform)
+            if (InputManager.UseMobileInput())
                 UpdateHotkeyMobileInputs();
             else
                 UpdateHotkeyInputs();

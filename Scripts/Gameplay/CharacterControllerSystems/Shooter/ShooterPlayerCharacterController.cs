@@ -1692,7 +1692,7 @@ namespace MultiplayerARPG
         public bool IsUsingHotkey()
         {
             // Check using hotkey for PC only
-            return !InputManager.useMobileInputOnNonMobile && !Application.isMobilePlatform && UICharacterHotkeys.UsingHotkey != null;
+            return !InputManager.UseMobileInput() && UICharacterHotkeys.UsingHotkey != null;
         }
 
         public virtual bool GetPrimaryAttackButton()

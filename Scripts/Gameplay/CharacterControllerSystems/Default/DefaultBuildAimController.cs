@@ -100,7 +100,7 @@ namespace MultiplayerARPG
             }
             ConstructingBuildingEntity.Rotation = Quaternion.Euler(buildingAngles);
             // Find position to place building
-            if (InputManager.useMobileInputOnNonMobile || Application.isMobilePlatform)
+            if (InputManager.UseMobileInput())
                 FindAndSetBuildingAreaByAxes(aimAxes);
             else
                 FindAndSetBuildingAreaByMousePosition();
