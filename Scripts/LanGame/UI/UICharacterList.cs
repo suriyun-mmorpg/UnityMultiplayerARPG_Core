@@ -191,8 +191,12 @@ namespace MultiplayerARPG
                 Vector3 startRotation;
                 database.GetStartMapAndTransform(SelectedPlayerCharacterData, out startMap, out startPosition, out startRotation);
                 SelectedPlayerCharacterData.CurrentMapName = startMap.Id;
-                SelectedPlayerCharacterData.CurrentPosition = startPosition;
-                SelectedPlayerCharacterData.CurrentRotation = startRotation;
+                SelectedPlayerCharacterData.CurrentPositionX = startPosition.x;
+                SelectedPlayerCharacterData.CurrentPositionY = startPosition.y;
+                SelectedPlayerCharacterData.CurrentPositionZ = startPosition.z;
+                SelectedPlayerCharacterData.CurrentRotationX = startRotation.x;
+                SelectedPlayerCharacterData.CurrentRotationY = startRotation.y;
+                SelectedPlayerCharacterData.CurrentRotationZ = startRotation.z;
             }
             // Set selected character to network manager
             (BaseGameNetworkManager.Singleton as LanRpgNetworkManager).selectedCharacter = SelectedPlayerCharacterData;
