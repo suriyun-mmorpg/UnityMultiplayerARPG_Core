@@ -68,27 +68,88 @@ namespace MultiplayerARPG
         public string UserId { get; set; }
         public byte UserLevel { get; set; }
         public string CurrentMapName { get { return CurrentGameManager.GetCurrentMapId(this); } set { } }
-        public Vector3 CurrentPosition
+        public float CurrentPositionX
         {
-            get { return CurrentGameManager.GetCurrentPosition(this); }
-            set { CurrentGameManager.SetCurrentPosition(this, value); }
+            get { return CurrentGameManager.GetCurrentPosition(this).x; }
+            set
+            {
+                Vector3 position = CurrentGameManager.GetCurrentPosition(this);
+                CurrentGameManager.SetCurrentPosition(this, new Vector3(value, position.y, position.z));
+            }
         }
-        public Vector3 CurrentRotation
+        public float CurrentPositionY
+        {
+            get { return CurrentGameManager.GetCurrentPosition(this).y; }
+            set
+            {
+                Vector3 position = CurrentGameManager.GetCurrentPosition(this);
+                CurrentGameManager.SetCurrentPosition(this, new Vector3(position.x, value, position.z));
+            }
+        }
+        public float CurrentPositionZ
+        {
+            get { return CurrentGameManager.GetCurrentPosition(this).z; }
+            set
+            {
+                Vector3 position = CurrentGameManager.GetCurrentPosition(this);
+                CurrentGameManager.SetCurrentPosition(this, new Vector3(position.x, position.y, value));
+            }
+        }
+        public float CurrentRotationX
         {
             get
             {
                 if (CurrentGameInstance.DimensionType == DimensionType.Dimension3D)
-                    return EntityTransform.eulerAngles;
-                return Quaternion.LookRotation(Direction2D).eulerAngles;
+                    return EntityTransform.eulerAngles.x;
+                return Quaternion.LookRotation(Direction2D).eulerAngles.x;
             }
             set
             {
+                Vector3 eulerAngles = new Vector3(value, EntityTransform.eulerAngles.y, EntityTransform.eulerAngles.z);
                 if (CurrentGameInstance.DimensionType == DimensionType.Dimension3D)
                 {
-                    EntityTransform.eulerAngles = value;
+                    EntityTransform.eulerAngles = eulerAngles;
                     return;
                 }
-                Direction2D = Quaternion.Euler(value) * Vector3.forward;
+                Direction2D = Quaternion.Euler(eulerAngles) * Vector3.forward;
+            }
+        }
+        public float CurrentRotationY
+        {
+            get
+            {
+                if (CurrentGameInstance.DimensionType == DimensionType.Dimension3D)
+                    return EntityTransform.eulerAngles.y;
+                return Quaternion.LookRotation(Direction2D).eulerAngles.y;
+            }
+            set
+            {
+                Vector3 eulerAngles = new Vector3(EntityTransform.eulerAngles.x, value, EntityTransform.eulerAngles.z);
+                if (CurrentGameInstance.DimensionType == DimensionType.Dimension3D)
+                {
+                    EntityTransform.eulerAngles = eulerAngles;
+                    return;
+                }
+                Direction2D = Quaternion.Euler(eulerAngles) * Vector3.forward;
+            }
+        }
+        public float CurrentRotationZ
+        {
+            get
+            {
+                if (CurrentGameInstance.DimensionType == DimensionType.Dimension3D)
+                    return EntityTransform.eulerAngles.z;
+                return Quaternion.LookRotation(Direction2D).eulerAngles.z;
+            }
+            set
+            {
+                Vector3 eulerAngles = new Vector3(EntityTransform.eulerAngles.x, EntityTransform.eulerAngles.y, value);
+                if (CurrentGameInstance.DimensionType == DimensionType.Dimension3D)
+                {
+                    EntityTransform.eulerAngles = eulerAngles;
+                    return;
+                }
+                Direction2D = Quaternion.Euler(eulerAngles) * Vector3.forward;
             }
         }
         public string RespawnMapName
@@ -96,10 +157,32 @@ namespace MultiplayerARPG
             get { return respawnMapName.Value; }
             set { respawnMapName.Value = value; }
         }
-        public Vector3 RespawnPosition
+        public float RespawnPositionX
         {
-            get { return respawnPosition.Value; }
-            set { respawnPosition.Value = value; }
+            get { return respawnPosition.Value.x; }
+            set
+            {
+                Vector3 position = respawnPosition.Value;
+                respawnPosition.Value = new Vector3(value, position.y, position.z);
+            }
+        }
+        public float RespawnPositionY
+        {
+            get { return respawnPosition.Value.y; }
+            set
+            {
+                Vector3 position = respawnPosition.Value;
+                respawnPosition.Value = new Vector3(position.x, value, position.z);
+            }
+        }
+        public float RespawnPositionZ
+        {
+            get { return respawnPosition.Value.z; }
+            set
+            {
+                Vector3 position = respawnPosition.Value;
+                respawnPosition.Value = new Vector3(position.x, position.y, value);
+            }
         }
         public int MountDataId
         {
