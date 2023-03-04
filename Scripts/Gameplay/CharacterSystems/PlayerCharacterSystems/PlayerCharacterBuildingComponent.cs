@@ -6,7 +6,7 @@ namespace MultiplayerARPG
     [DisallowMultipleComponent]
     public partial class PlayerCharacterBuildingComponent : BaseNetworkedGameEntityComponent<BasePlayerCharacterEntity>
     {
-        public bool CallServerConstructBuilding(int itemIndex, Vector3 position, Quaternion rotation, uint parentObjectId)
+        public bool CallServerConstructBuilding(int itemIndex, Vector3 position, Vector3 rotation, uint parentObjectId)
         {
             if (!Entity.CanDoActions())
                 return false;
@@ -15,7 +15,7 @@ namespace MultiplayerARPG
         }
 
         [ServerRpc]
-        protected void ServerConstructBuilding(int itemIndex, Vector3 position, Quaternion rotation, uint parentObjectId)
+        protected void ServerConstructBuilding(int itemIndex, Vector3 position, Vector3 rotation, uint parentObjectId)
         {
 #if UNITY_EDITOR || UNITY_SERVER
             if (!Entity.CanDoActions() || itemIndex >= Entity.NonEquipItems.Count)
@@ -42,8 +42,12 @@ namespace MultiplayerARPG
             buildingSaveData.EntityId = buildingEntity.EntityId;
             buildingSaveData.CurrentHp = buildingEntity.MaxHp;
             buildingSaveData.RemainsLifeTime = buildingEntity.LifeTime;
-            buildingSaveData.Position = position;
-            buildingSaveData.Rotation = rotation;
+            buildingSaveData.PositionX = position.x;
+            buildingSaveData.PositionY = position.y;
+            buildingSaveData.PositionZ = position.z;
+            buildingSaveData.RotationX = rotation.x;
+            buildingSaveData.RotationY = rotation.y;
+            buildingSaveData.RotationZ = rotation.z;
             buildingSaveData.CreatorId = Entity.Id;
             buildingSaveData.CreatorName = Entity.CharacterName;
             CurrentGameManager.CreateBuildingEntity(buildingSaveData, false);

@@ -111,14 +111,16 @@ namespace MultiplayerARPG
                 // Place the building on the ground when the building area is not snapping
                 // Or place it anywhere if there is no building area
                 // It's also no snapping build area, so set building rotation by camera look direction
-                ConstructingBuildingEntity.Position = _aimTargetPosition;
+                ConstructingBuildingEntity.PositionX = _aimTargetPosition.x;
+                ConstructingBuildingEntity.PositionY = _aimTargetPosition.y;
+                ConstructingBuildingEntity.PositionZ = _aimTargetPosition.z;
                 // Rotate to camera
                 Vector3 direction = _aimTargetPosition - _gameplayCameraController.CameraTransform.position;
                 direction.y = 0f;
                 direction.Normalize();
                 ConstructingBuildingEntity.EntityTransform.eulerAngles = Quaternion.LookRotation(direction).eulerAngles + (Vector3.up * _buildYRotate);
             }
-            return AimPosition.CreatePosition(ConstructingBuildingEntity.Position);
+            return AimPosition.CreatePosition(new Vector3(ConstructingBuildingEntity.PositionX, ConstructingBuildingEntity.PositionY, ConstructingBuildingEntity.PositionZ));
         }
 
         protected int FindConstructingBuildingArea(Ray ray, float distance)

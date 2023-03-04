@@ -59,7 +59,7 @@ namespace MultiplayerARPG
             base.Setup(characterEntity);
             if (characterEntity == null || CameraControls == null)
                 return;
-            CameraControls.startYRotation = characterEntity.CurrentRotation.y;
+            CameraControls.startYRotation = characterEntity.CurrentRotationY;
         }
 
         public override void Desetup(BasePlayerCharacterEntity characterEntity)

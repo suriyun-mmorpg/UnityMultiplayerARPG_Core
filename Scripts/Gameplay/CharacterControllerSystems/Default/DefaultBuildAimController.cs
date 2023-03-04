@@ -98,13 +98,15 @@ namespace MultiplayerARPG
                 }
                 ConstructingBuildingEntity.BuildYRotation = _buildYRotate;
             }
-            ConstructingBuildingEntity.Rotation = Quaternion.Euler(buildingAngles);
+            ConstructingBuildingEntity.RotationX = buildingAngles.x;
+            ConstructingBuildingEntity.RotationY = buildingAngles.y;
+            ConstructingBuildingEntity.RotationZ = buildingAngles.z;
             // Find position to place building
             if (InputManager.UseMobileInput())
                 FindAndSetBuildingAreaByAxes(aimAxes);
             else
                 FindAndSetBuildingAreaByMousePosition();
-            return AimPosition.CreatePosition(ConstructingBuildingEntity.Position);
+            return AimPosition.CreatePosition(new Vector3(ConstructingBuildingEntity.PositionX, ConstructingBuildingEntity.PositionY, ConstructingBuildingEntity.PositionZ));
         }
 
         public virtual void FinishAimControls(bool isCancel)
@@ -140,7 +142,7 @@ namespace MultiplayerARPG
             BuildingArea buildingArea;
             Transform tempTransform;
             Vector3 tempRaycastPoint;
-            Vector3 snappedPosition = GetBuildingPlacePosition(ConstructingBuildingEntity.Position);
+            Vector3 snappedPosition = GetBuildingPlacePosition(new Vector3(ConstructingBuildingEntity.PositionX, ConstructingBuildingEntity.PositionY, ConstructingBuildingEntity.PositionZ));
             for (int tempCounter = 0; tempCounter < count; ++tempCounter)
             {
                 tempTransform = _physicFunctions.GetRaycastTransform(tempCounter);
@@ -165,7 +167,9 @@ namespace MultiplayerARPG
                         {
                             tempRaycastPoint = groundHits[j].point;
                             snappedPosition = GetBuildingPlacePosition(tempRaycastPoint);
-                            ConstructingBuildingEntity.Position = snappedPosition;
+                            ConstructingBuildingEntity.PositionX = snappedPosition.x;
+                            ConstructingBuildingEntity.PositionY = snappedPosition.y;
+                            ConstructingBuildingEntity.PositionZ = snappedPosition.z;
                             hitAimmingObject = true;
                             break;
                         }
@@ -175,7 +179,9 @@ namespace MultiplayerARPG
                 }
                 else
                 {
-                    ConstructingBuildingEntity.Position = snappedPosition;
+                    ConstructingBuildingEntity.PositionX = snappedPosition.x;
+                    ConstructingBuildingEntity.PositionY = snappedPosition.y;
+                    ConstructingBuildingEntity.PositionZ = snappedPosition.z;
                 }
 
                 buildingEntity = tempTransform.root.GetComponent<BuildingEntity>();
@@ -201,7 +207,9 @@ namespace MultiplayerARPG
                 ConstructingBuildingEntity.HitSurfaceNormal = _physicFunctions.GetRaycastNormal(tempCounter);
                 return true;
             }
-            ConstructingBuildingEntity.Position = snappedPosition;
+            ConstructingBuildingEntity.PositionX = snappedPosition.x;
+            ConstructingBuildingEntity.PositionY = snappedPosition.y;
+            ConstructingBuildingEntity.PositionZ = snappedPosition.z;
             return false;
         }
 
