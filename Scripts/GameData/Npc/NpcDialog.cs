@@ -532,7 +532,9 @@ namespace MultiplayerARPG
                             if (PassConfirmConditions(characterEntity, out UITextKeys errorMessage))
                             {
                                 characterEntity.RespawnMapName = saveRespawnMap.Id;
-                                characterEntity.RespawnPosition = saveRespawnPosition;
+                                characterEntity.RespawnPositionX = saveRespawnPosition.x;
+                                characterEntity.RespawnPositionY = saveRespawnPosition.y;
+                                characterEntity.RespawnPositionZ = saveRespawnPosition.z;
                                 characterEntity.NpcAction.CurrentNpcDialog = GetValidatedDialogOrNull(saveRespawnConfirmDialog, characterEntity);
                             }
                             else
