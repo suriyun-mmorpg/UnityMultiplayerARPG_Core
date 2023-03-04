@@ -53,10 +53,16 @@ namespace MultiplayerARPG
             to.SharedGuildExp = from.SharedGuildExp;
             to.EquipWeaponSet = from.EquipWeaponSet;
             to.CurrentMapName = from.CurrentMapName;
-            to.CurrentPosition = from.CurrentPosition;
-            to.CurrentRotation = from.CurrentRotation;
+            to.CurrentPositionX = from.CurrentPositionX;
+            to.CurrentPositionY = from.CurrentPositionY;
+            to.CurrentPositionZ = from.CurrentPositionZ;
+            to.CurrentRotationX = from.CurrentRotationX;
+            to.CurrentRotationY = from.CurrentRotationY;
+            to.CurrentRotationZ = from.CurrentRotationZ;
             to.RespawnMapName = from.RespawnMapName;
-            to.RespawnPosition = from.RespawnPosition;
+            to.RespawnPositionX = from.RespawnPositionX;
+            to.RespawnPositionY = from.RespawnPositionY;
+            to.RespawnPositionZ = from.RespawnPositionZ;
             to.MountDataId = from.MountDataId;
             to.IconDataId = from.IconDataId;
             to.FrameDataId = from.FrameDataId;
@@ -274,10 +280,16 @@ namespace MultiplayerARPG
             Vector3 startRotation;
             playerCharacter.GetStartMapAndTransform(character, out startMap, out startPosition, out startRotation);
             character.CurrentMapName = startMap.Id;
-            character.CurrentPosition = startPosition;
-            character.CurrentRotation = startRotation;
+            character.CurrentPositionX = startPosition.x;
+            character.CurrentPositionY = startPosition.y;
+            character.CurrentPositionZ = startPosition.z;
+            character.CurrentRotationX = startRotation.x;
+            character.CurrentRotationY = startRotation.y;
+            character.CurrentRotationZ = startRotation.z;
             character.RespawnMapName = startMap.Id;
-            character.RespawnPosition = startPosition;
+            character.RespawnPositionX = startPosition.x;
+            character.RespawnPositionY = startPosition.y;
+            character.RespawnPositionZ = startPosition.z;
             DevExtUtils.InvokeStaticDevExtMethods(ClassType, "SetNewCharacterData", character, characterName, dataId, entityId);
             return character;
         }
@@ -429,19 +441,19 @@ namespace MultiplayerARPG
             writer.Put(characterData.CurrentMapName);
             if (withTransforms)
             {
-                writer.Put(characterData.CurrentPosition.x);
-                writer.Put(characterData.CurrentPosition.y);
-                writer.Put(characterData.CurrentPosition.z);
-                writer.Put(characterData.CurrentRotation.x);
-                writer.Put(characterData.CurrentRotation.y);
-                writer.Put(characterData.CurrentRotation.z);
+                writer.Put(characterData.CurrentPositionX);
+                writer.Put(characterData.CurrentPositionY);
+                writer.Put(characterData.CurrentPositionZ);
+                writer.Put(characterData.CurrentRotationX);
+                writer.Put(characterData.CurrentRotationY);
+                writer.Put(characterData.CurrentRotationZ);
             }
             writer.Put(characterData.RespawnMapName);
             if (withTransforms)
             {
-                writer.Put(characterData.RespawnPosition.x);
-                writer.Put(characterData.RespawnPosition.y);
-                writer.Put(characterData.RespawnPosition.z);
+                writer.Put(characterData.RespawnPositionX);
+                writer.Put(characterData.RespawnPositionY);
+                writer.Put(characterData.RespawnPositionZ);
             }
             writer.PutPackedInt(characterData.MountDataId);
             writer.PutPackedInt(characterData.IconDataId);
@@ -603,13 +615,19 @@ namespace MultiplayerARPG
             characterData.CurrentMapName = reader.GetString();
             if (withTransforms)
             {
-                characterData.CurrentPosition = new Vector3(reader.GetFloat(), reader.GetFloat(), reader.GetFloat());
-                characterData.CurrentRotation = new Vector3(reader.GetFloat(), reader.GetFloat(), reader.GetFloat());
+                characterData.CurrentPositionX = reader.GetFloat();
+                characterData.CurrentPositionY = reader.GetFloat();
+                characterData.CurrentPositionZ = reader.GetFloat();
+                characterData.CurrentRotationX = reader.GetFloat();
+                characterData.CurrentRotationY = reader.GetFloat();
+                characterData.CurrentRotationZ = reader.GetFloat();
             }
             characterData.RespawnMapName = reader.GetString();
             if (withTransforms)
             {
-                characterData.RespawnPosition = new Vector3(reader.GetFloat(), reader.GetFloat(), reader.GetFloat());
+                characterData.RespawnPositionX = reader.GetFloat();
+                characterData.RespawnPositionY = reader.GetFloat();
+                characterData.RespawnPositionZ = reader.GetFloat();
             }
             characterData.MountDataId = reader.GetPackedInt();
             characterData.IconDataId = reader.GetPackedInt();
