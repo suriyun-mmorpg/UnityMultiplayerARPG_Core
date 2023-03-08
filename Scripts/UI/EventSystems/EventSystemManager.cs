@@ -8,14 +8,19 @@ using UnityEngine.SceneManagement;
 
 namespace MultiplayerARPG
 {
-    public static class EventSystemManager
+    public class EventSystemManager : MonoBehaviour
     {
         public static EventSystem CurrentEventSystem;
         public static event System.Action onEventSystemReady;
 
-        static EventSystemManager()
+        private void OnEnable()
         {
             SceneManager.sceneLoaded += SceneManager_sceneLoaded;
+        }
+
+        private void OnDisable()
+        {
+            SceneManager.sceneLoaded -= SceneManager_sceneLoaded;
         }
 
         private static async void SceneManager_sceneLoaded(Scene scene, LoadSceneMode loadMode)

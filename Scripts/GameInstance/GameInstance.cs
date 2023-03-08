@@ -44,6 +44,7 @@ namespace MultiplayerARPG
     }
 
     [DefaultExecutionOrder(-999)]
+    [RequireComponent(typeof(EventSystemManager))]
 #if ENABLE_PURCHASING && UNITY_PURCHASING && (UNITY_IOS || UNITY_ANDROID)
     public partial class GameInstance : MonoBehaviour, IStoreListener
 #else
@@ -388,6 +389,8 @@ namespace MultiplayerARPG
         public System.Action onGameDataLoaded;
 
         #region Cache Data
+        public EventSystemManager EventSystemManager { get; private set; }
+
         public DimensionType DimensionType
         {
             get { return dimensionType; }
@@ -584,7 +587,7 @@ namespace MultiplayerARPG
             }
             DontDestroyOnLoad(gameObject);
             Singleton = this;
-
+            EventSystemManager = gameObject.GetOrAddComponent<EventSystemManager>();
             InputManager.useMobileInputOnNonMobile = IsMobileTestInEditor();
             InputManager.useNonMobileInput = testInEditorMode == TestInEditorMode.MobileWithKeyInputs && Application.isEditor;
 
