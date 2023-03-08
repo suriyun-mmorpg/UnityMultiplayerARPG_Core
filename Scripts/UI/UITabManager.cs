@@ -54,8 +54,11 @@ public class UITabManager : UIBase
         currentTabIndex = index;
         if (force)
         {
-            tabs[index].toggle.SetIsOnWithoutNotify(true);
-            tabs[index].uiContent.SetVisible(true);
+            for (int i = 0; i < tabs.Length; ++i)
+            {
+                tabs[i].toggle.SetIsOnWithoutNotify(i == index);
+                tabs[i].uiContent.SetVisible(i == index);
+            }
         }
         else
         {
