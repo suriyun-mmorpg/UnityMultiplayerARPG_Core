@@ -74,6 +74,14 @@ namespace MultiplayerARPG
         [Tooltip("If this value is `0`, this value will be set as `GameInstance` -> `pickUpItemDistance`")]
         protected float distanceToActivateByPickupKey = 0f;
 
+        [Header("UI Blocking Settings")]
+        [SerializeField]
+        protected bool uiNotBlockForStandalone = true;
+        [SerializeField]
+        protected bool uiNotBlockForMobile = true;
+        [SerializeField]
+        protected bool uiNotBlockForConsole = false;
+
         #region Events
         /// <summary>
         /// RelateId (string), AimPosition (AimPosition)
