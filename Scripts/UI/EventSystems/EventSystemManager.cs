@@ -1,3 +1,4 @@
+using Cysharp.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.EventSystems;
 #if ENABLE_INPUT_SYSTEM
@@ -17,8 +18,10 @@ namespace MultiplayerARPG
             SceneManager.sceneLoaded += SceneManager_sceneLoaded;
         }
 
-        private static void SceneManager_sceneLoaded(Scene scene, LoadSceneMode loadMode)
+        private static async void SceneManager_sceneLoaded(Scene scene, LoadSceneMode loadMode)
         {
+            await UniTask.Delay(100);
+            await UniTask.SwitchToMainThread();
             CurrentEventSystem = Object.FindObjectOfType<EventSystem>();
             // Create a new event system
             if (CurrentEventSystem == null)
