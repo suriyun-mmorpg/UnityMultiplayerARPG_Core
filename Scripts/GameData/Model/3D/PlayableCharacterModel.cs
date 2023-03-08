@@ -186,9 +186,15 @@ namespace MultiplayerARPG.GameData.Model.Playables
         {
             EquipWeapons newEquipWeapons;
             if (isWeaponsSheathed || selectableWeaponSets == null || selectableWeaponSets.Count == 0)
+            {
                 newEquipWeapons = new EquipWeapons();
+            }
             else
+            {
+                if (equipWeaponSet >= selectableWeaponSets.Count)
+                    equipWeaponSet = (byte)(selectableWeaponSets.Count - 1);
                 newEquipWeapons = selectableWeaponSets[equipWeaponSet];
+            }
             // Get one equipped weapon from right-hand or left-hand
             IWeaponItem rightWeaponItem = newEquipWeapons.GetRightHandWeaponItem();
             IWeaponItem leftWeaponItem = newEquipWeapons.GetLeftHandWeaponItem();
