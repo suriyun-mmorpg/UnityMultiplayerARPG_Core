@@ -161,7 +161,7 @@ namespace MultiplayerARPG
                 Gizmos.color = transparentRed;
 
             // when selected, draw a gizmo in the position of, and matching radius of, the grounded collider
-            Gizmos.DrawSphere(new Vector3(CacheTransform.position.x, CacheTransform.position.y + (CacheCharacterController.radius * CacheTransform.localScale.y), CacheTransform.position.z), CacheCharacterController.radius * Mathf.Max(CacheTransform.localScale.x, CacheTransform.localScale.z));
+            Gizmos.DrawSphere(new Vector3(transform.position.x, transform.position.y + (CacheCharacterController.radius * transform.localScale.y), transform.position.z), CacheCharacterController.radius * Mathf.Max(transform.localScale.x, transform.localScale.z));
         }
 
         private void OnAnimatorMove()
