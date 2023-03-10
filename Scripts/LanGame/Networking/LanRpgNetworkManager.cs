@@ -262,13 +262,18 @@ namespace MultiplayerARPG
                 return;
             }
             if (!CurrentMapInfo.Id.Equals(playerCharacterData.CurrentMapName))
-                playerCharacterData.CurrentPosition = teleportPosition.HasValue ? teleportPosition.Value : CurrentMapInfo.StartPosition;
+            {
+                Vector3 currentPosition = teleportPosition.HasValue ? teleportPosition.Value : CurrentMapInfo.StartPosition;
+                playerCharacterData.CurrentPositionX = currentPosition.x;
+                playerCharacterData.CurrentPositionY = currentPosition.y;
+                playerCharacterData.CurrentPositionZ = currentPosition.z;
+            }
             Quaternion characterRotation = Quaternion.identity;
             if (CurrentGameInstance.DimensionType == DimensionType.Dimension3D)
-                characterRotation = Quaternion.Euler(playerCharacterData.CurrentRotation);
+                characterRotation = Quaternion.Euler(playerCharacterData.CurrentRotationX, playerCharacterData.CurrentRotationY, playerCharacterData.CurrentRotationZ);
             LiteNetLibIdentity spawnObj = Assets.GetObjectInstance(
                 entityPrefab.Identity.HashAssetId,
-                playerCharacterData.CurrentPosition,
+                new Vector3(playerCharacterData.CurrentPositionX, playerCharacterData.CurrentPositionY, playerCharacterData.CurrentPositionZ),
                 characterRotation);
             BasePlayerCharacterEntity playerCharacterEntity = spawnObj.GetComponent<BasePlayerCharacterEntity>();
             playerCharacterData.CloneTo(playerCharacterEntity);
@@ -373,8 +378,12 @@ namespace MultiplayerARPG
             if (string.IsNullOrEmpty(mapName) || (mapName.Equals(CurrentMapInfo.Id) && !IsInstanceMap()))
             {
                 if (overrideRotation)
-                    playerCharacterEntity.CurrentRotation = rotation;
-                playerCharacterEntity.Teleport(position, Quaternion.Euler(playerCharacterEntity.CurrentRotation));
+                {
+                    playerCharacterEntity.CurrentRotationX = rotation.x;
+                    playerCharacterEntity.CurrentRotationY = rotation.y;
+                    playerCharacterEntity.CurrentRotationZ = rotation.z;
+                }
+                playerCharacterEntity.Teleport(position, Quaternion.Euler(playerCharacterEntity.CurrentRotationX, playerCharacterEntity.CurrentRotationY, playerCharacterEntity.CurrentRotationZ));
                 return;
             }
 
@@ -393,9 +402,15 @@ namespace MultiplayerARPG
                 {
                     selectedCharacter = owningCharacter.CloneTo(selectedCharacter);
                     selectedCharacter.CurrentMapName = mapInfo.Id;
-                    selectedCharacter.CurrentPosition = position;
+                    selectedCharacter.CurrentPositionX = position.x;
+                    selectedCharacter.CurrentPositionY = position.y;
+                    selectedCharacter.CurrentPositionZ = position.z;
                     if (overrideRotation)
-                        selectedCharacter.CurrentRotation = rotation;
+                    {
+                        selectedCharacter.CurrentRotationX = rotation.x;
+                        selectedCharacter.CurrentRotationY = rotation.y;
+                        selectedCharacter.CurrentRotationZ = rotation.z;
+                    }
                     SaveSystem.SaveCharacter(selectedCharacter);
                     SaveSystem.SaveSummonBuffs(selectedCharacter, new List<CharacterSummon>(owningCharacter.Summons));
                 }

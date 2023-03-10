@@ -3,28 +3,8 @@ using LiteNetLibManager;
 
 namespace MultiplayerARPG
 {
-    public enum SummonType : byte
+    public partial class CharacterSummon : INetSerializable
     {
-        None,
-        Skill,
-        PetItem,
-        Custom = byte.MaxValue
-    }
-
-    [System.Serializable]
-    public class CharacterSummon : INetSerializable
-    {
-        public static readonly CharacterSummon Empty = new CharacterSummon();
-        public string id;
-        public SummonType type;
-        public int dataId;
-        public float summonRemainsDuration;
-        public uint objectId;
-        public int level;
-        public int exp;
-        public int currentHp;
-        public int currentMp;
-        // Properties for save / load
         public int Level { get { return CacheEntity != null ? CacheEntity.Level : level; } }
         public int Exp { get { return CacheEntity != null ? CacheEntity.Exp : exp; } }
         public int CurrentHp { get { return CacheEntity != null ? CacheEntity.CurrentHp : currentHp; } }

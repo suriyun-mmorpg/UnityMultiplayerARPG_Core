@@ -31,3 +31,6 @@
 [submodule "GraphicSettings"]
 	path = GraphicSettings
 	url = https://github.com/insthync/unity-graphic-settings.git
+[submodule "SharedData"]
+	path = SharedData
+	url = https://github.com/insthync/UnityMultiplayerARPG_SharedData.git

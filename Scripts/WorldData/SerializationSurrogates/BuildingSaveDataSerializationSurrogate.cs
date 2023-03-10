@@ -16,8 +16,8 @@ namespace MultiplayerARPG
             info.AddValue("entityId", data.EntityId);
             info.AddValue("currentHp", data.CurrentHp);
             info.AddValue("remainsLifeTime", data.RemainsLifeTime);
-            info.AddValue("position", data.Position);
-            info.AddValue("rotation", data.Rotation);
+            info.AddValue("position", new Vector3(data.PositionX, data.PositionY, data.PositionZ));
+            info.AddValue("rotation", Quaternion.Euler(data.RotationX, data.RotationY, data.RotationZ));
             info.AddValue("isLocked", data.IsLocked);
             info.AddValue("lockPassword", data.LockPassword);
             info.AddValue("creatorId", data.CreatorId);
@@ -37,8 +37,14 @@ namespace MultiplayerARPG
             data.EntityId = info.GetInt32("entityId");
             data.CurrentHp = info.GetInt32("currentHp");
             data.RemainsLifeTime = info.GetSingle("remainsLifeTime");
-            data.Position = (Vector3)info.GetValue("position", typeof(Vector3));
-            data.Rotation = (Quaternion)info.GetValue("rotation", typeof(Quaternion));
+            Vector3 position = (Vector3)info.GetValue("position", typeof(Vector3));
+            data.PositionX = position.x;
+            data.PositionY = position.y;
+            data.PositionZ = position.z;
+            Quaternion rotation = (Quaternion)info.GetValue("rotation", typeof(Quaternion));
+            data.RotationX = rotation.eulerAngles.x;
+            data.RotationY = rotation.eulerAngles.y;
+            data.RotationZ = rotation.eulerAngles.z;
             data.IsLocked = info.GetBoolean("isLocked");
             data.LockPassword = info.GetString("lockPassword");
             data.CreatorId = info.GetString("creatorId");

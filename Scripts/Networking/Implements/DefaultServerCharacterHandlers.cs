@@ -52,7 +52,7 @@ namespace MultiplayerARPG
             GameInstance.Singleton.GameplayRule.OnCharacterRespawn(playerCharacter);
             WarpPortalType respawnPortalType = WarpPortalType.Default;
             string respawnMapName = playerCharacter.RespawnMapName;
-            Vector3 respawnPosition = playerCharacter.RespawnPosition;
+            Vector3 respawnPosition = new Vector3(playerCharacter.RespawnPositionX, playerCharacter.RespawnPositionY, playerCharacter.RespawnPositionZ);
             bool respawnOverrideRotation = false;
             Vector3 respawnRotation = Vector3.zero;
             if (BaseGameNetworkManager.CurrentMapInfo != null)
@@ -74,7 +74,9 @@ namespace MultiplayerARPG
             else
             {
                 playerCharacter.CurrentMapName = respawnMapName;
-                playerCharacter.CurrentPosition = respawnPosition;
+                playerCharacter.CurrentPositionX = respawnPosition.x;
+                playerCharacter.CurrentPositionY = respawnPosition.y;
+                playerCharacter.CurrentPositionZ = respawnPosition.z;
             }
         }
     }

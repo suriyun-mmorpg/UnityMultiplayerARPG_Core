@@ -2,26 +2,8 @@
 
 namespace MultiplayerARPG
 {
-    [System.Serializable]
-    public struct SocialCharacterData : INetSerializable
+    public partial struct SocialCharacterData : INetSerializable
     {
-        public string id;
-        public string userId;
-        public string characterName;
-        public int dataId;
-        public int level;
-        public int factionId;
-        public int partyId;
-        public int guildId;
-        public byte guildRole;
-        public int currentHp;
-        public int maxHp;
-        public int currentMp;
-        public int maxMp;
-        public int iconDataId;
-        public int frameDataId;
-        public int titleDataId;
-
         public void Deserialize(NetDataReader reader)
         {
             DeserializeWithoutHpMp(reader);
@@ -70,26 +52,6 @@ namespace MultiplayerARPG
             writer.PutPackedInt(iconDataId);
             writer.PutPackedInt(frameDataId);
             writer.PutPackedInt(titleDataId);
-        }
-
-        public static SocialCharacterData Create(IPlayerCharacterData character)
-        {
-            return new SocialCharacterData()
-            {
-                id = character.Id,
-                characterName = character.CharacterName,
-                dataId = character.DataId,
-                level = character.Level,
-                factionId = character.FactionId,
-                partyId = character.PartyId,
-                guildId = character.GuildId,
-                guildRole = character.GuildRole,
-                currentHp = character.CurrentHp,
-                currentMp = character.CurrentMp,
-                iconDataId = character.IconDataId,
-                frameDataId = character.FrameDataId,
-                titleDataId = character.TitleDataId,
-            };
         }
 
         public static SocialCharacterData Create(BasePlayerCharacterEntity character)

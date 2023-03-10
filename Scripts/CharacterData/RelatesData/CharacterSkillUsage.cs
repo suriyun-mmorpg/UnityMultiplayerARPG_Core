@@ -3,21 +3,8 @@ using LiteNetLibManager;
 
 namespace MultiplayerARPG
 {
-    public enum SkillUsageType : byte
+    public partial class CharacterSkillUsage : INetSerializable
     {
-        Skill,
-        GuildSkill,
-        UsableItem,
-    }
-
-    [System.Serializable]
-    public class CharacterSkillUsage : INetSerializable
-    {
-        public static readonly CharacterSkillUsage Empty = new CharacterSkillUsage();
-        public SkillUsageType type;
-        public int dataId;
-        public float coolDownRemainsDuration;
-
         [System.NonSerialized]
         private int dirtyDataId;
         [System.NonSerialized]
