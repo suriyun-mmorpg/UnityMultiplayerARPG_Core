@@ -740,11 +740,11 @@ namespace MultiplayerARPG
                 if (toItem.amount + fromItem.amount <= maxStack)
                 {
                     toItem.amount += fromItem.amount;
+                    character.NonEquipItems[toIndex] = toItem;
                     if (GameInstance.Singleton.IsLimitInventorySlot)
                         character.NonEquipItems[fromIndex] = CharacterItem.Empty;
                     else
                         character.NonEquipItems.RemoveAt(fromIndex);
-                    character.NonEquipItems[toIndex] = toItem;
                     character.FillEmptySlots();
                 }
                 else
