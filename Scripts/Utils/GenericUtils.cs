@@ -503,22 +503,60 @@ public static class GenericUtils
         return new System.Random(seed).RandomInt(min, max);
     }
 
-    public static string GetPrettyDate(this System.DateTime dateTime,
-        string textNow = "a few seconds ago",
-        string textAMinuteAgo = "1 Minute ago",
-        string textAHourAgo = "1 Hour ago",
-        string textYesterday = "Yesterday",
-        string formatMinutesAgo = "{0} Minutes ago",
-        string formatHoursAgo = "{0} Hours ago",
-        string formatDaysAgo = "{0} Days ago",
-        string formatWeeksAgo = "{0} Weeks ago",
-        string formatMonthsAgo = "{0} Months ago",
-        string textUnknow = "Unknow")
+    public static string GetPrettyDate(this System.TimeSpan dateTimeDiff, bool future = false)
     {
-        System.TimeSpan dateTimeDiff = System.DateTime.Now.Subtract(dateTime);
+        // TODO: Will get format string from language settings
+        string textAFewSecondsAgo = "a few seconds ago";
+        string textAMinuteAgo = "1 Minute ago";
+        string textAHourAgo = "1 Hour ago";
+        string textYesterday = "Yesterday";
+        string formatMinutesAgo = "{0} Minutes ago";
+        string formatHoursAgo = "{0} Hours ago";
+        string formatDaysAgo = "{0} Days ago";
+        string formatWeeksAgo = "{0} Weeks ago";
+        string formatMonthsAgo = "{0} Months ago";
+        string textUnknow = "Unknow";
+
+        // Future text
+        string textAFewSeconds = "a few seconds";
+        string textAMinute = "1 Minute";
+        string textAHour = "1 Hour";
+        string textTomorrow = "Tomorrow";
+        string formatMinutes = "{0} Minutes";
+        string formatHours = "{0} Hours";
+        string formatDays = "{0} Days";
+        string formatWeeks = "{0} Weeks";
+        string formatMonths = "{0} Months";
+
         int monthDiff = (int)(dateTimeDiff.TotalDays / 30);
         int dayDiff = (int)dateTimeDiff.TotalDays;
         int secDiff = (int)dateTimeDiff.TotalSeconds;
+
+        if (future)
+        {
+            return GetPrettyDate(monthDiff, dayDiff, secDiff, textAFewSeconds, textAMinute, textAHour, textTomorrow, formatMinutes, formatHours, formatDays, formatWeeks, formatMonths, textUnknow);
+        }
+        else
+        {
+            return GetPrettyDate(monthDiff, dayDiff, secDiff, textAFewSecondsAgo, textAMinuteAgo, textAHourAgo, textYesterday, formatMinutesAgo, formatHoursAgo, formatDaysAgo, formatWeeksAgo, formatMonthsAgo, textUnknow);
+        }
+    }
+
+    public static string GetPrettyDate(
+        int monthDiff, 
+        int dayDiff, 
+        int secDiff,
+        string textNow,
+        string textAMinute,
+        string textAHour,
+        string textADay,
+        string formatMinutes,
+        string formatHours,
+        string formatDays,
+        string formatWeeks,
+        string formatMonths,
+        string textUnknow)
+    {
 
         // Don't allow out of range values.
         if (dayDiff < 0)
@@ -527,31 +565,31 @@ public static class GenericUtils
         // Handle same-day times.
         if (dayDiff == 0)
         {
-            // Less than one minute ago.
+            // Less than one minute.
             if (secDiff < 60)
                 return textNow;
-            // Less than 2 minutes ago.
+            // Less than 2 minutes.
             if (secDiff < 120)
-                return textAMinuteAgo;
-            // Less than one hour ago.
+                return textAMinute;
+            // Less than one hour.
             if (secDiff < 3600)
-                return ZString.Format(formatMinutesAgo, Mathf.FloorToInt((float)secDiff / 60f));
-            // Less than 2 hours ago.
+                return ZString.Format(formatMinutes, Mathf.FloorToInt((float)secDiff / 60f));
+            // Less than 2 hours.
             if (secDiff < 7200)
-                return textAHourAgo;
-            // Less than one day ago.
+                return textAHour;
+            // Less than one day.
             if (secDiff < 86400)
-                return ZString.Format(formatHoursAgo, Mathf.FloorToInt((float)secDiff / 3600f));
+                return ZString.Format(formatHours, Mathf.FloorToInt((float)secDiff / 3600f));
         }
         // Handle previous days.
         if (dayDiff == 1)
-            return textYesterday;
+            return textADay;
         if (dayDiff < 7)
-            return ZString.Format(formatDaysAgo, dayDiff);
+            return ZString.Format(formatDays, dayDiff);
         if (dayDiff < 30)
-            return ZString.Format(formatWeeksAgo, Mathf.CeilToInt((float)dayDiff / 7f));
+            return ZString.Format(formatWeeks, Mathf.CeilToInt((float)dayDiff / 7f));
         if (monthDiff < 12)
-            return ZString.Format(formatMonthsAgo, monthDiff);
+            return ZString.Format(formatMonths, monthDiff);
 
         return textUnknow;
     }
