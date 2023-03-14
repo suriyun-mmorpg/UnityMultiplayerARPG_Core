@@ -573,13 +573,13 @@ public static class GenericUtils
                 return textAMinute;
             // Less than one hour.
             if (secDiff < 3600)
-                return ZString.Format(formatMinutes, Mathf.FloorToInt((float)secDiff / 60f));
+                return ZString.Format(formatMinutes, Mathf.CeilToInt((float)secDiff / 60f));
             // Less than 2 hours.
             if (secDiff < 7200)
                 return textAHour;
             // Less than one day.
             if (secDiff < 86400)
-                return ZString.Format(formatHours, Mathf.FloorToInt((float)secDiff / 3600f));
+                return ZString.Format(formatHours, Mathf.CeilToInt((float)secDiff / 3600f));
         }
         // Handle previous days.
         if (dayDiff == 1)
