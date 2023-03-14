@@ -16,20 +16,26 @@ namespace MultiplayerARPG
         public int increaseSkillPointsUntilReachedLevel = 0;
         [Range(0f, 100f)]
         public float expLostPercentageWhenDeath = 2f;
+
         [Header("Stamina/Sprint")]
         public float staminaRecoveryPerSeconds = 5;
         public float staminaDecreasePerSeconds = 5;
         public float moveSpeedRateWhileOverweight = 0.05f;
         [FormerlySerializedAs("moveSpeedRateWhileSprint")]
         public float moveSpeedRateWhileSprinting = 1.5f;
+
         [Header("Walk")]
         public float moveSpeedRateWhileWalking = 0.5f;
+
         [Header("Crouch")]
         public float moveSpeedRateWhileCrouching = 0.35f;
+
         [Header("Crawl")]
         public float moveSpeedRateWhileCrawling = 0.15f;
+
         [Header("Swim")]
         public float moveSpeedRateWhileSwimming = 0.5f;
+
         [Header("Hp/Mp/Food/Water")]
         public int hungryWhenFoodLowerThan = 40;
         public int thirstyWhenWaterLowerThan = 40;
@@ -47,6 +53,7 @@ namespace MultiplayerARPG
         public float hpDecreaseRatePerSecondsWhenThirsty = 0.05f;
         [Range(0f, 1f)]
         public float mpDecreaseRatePerSecondsWhenThirsty = 0.05f;
+
         [Header("Durability")]
         public float normalDecreaseWeaponDurability = 0.5f;
         public float normalDecreaseShieldDurability = 0.5f;
@@ -60,19 +67,43 @@ namespace MultiplayerARPG
         public float missDecreaseWeaponDurability = 0f;
         public float missDecreaseShieldDurability = 0;
         public float missDecreaseArmorDurability = 0f;
+
         [Header("Damage Occurs")]
         public bool alwaysHitWhenCriticalOccurs = true;
+
         [Header("Fall Damage")]
         [Tooltip("Character will receive damage 1% of Max Hp, when fall distance = min distance")]
         public float fallDamageMinDistance = 5;
         [Tooltip("Character will receive damage 100% of Max Hp, when fall distance >= max distance")]
         public float fallDamageMaxDistance = 20;
+
         [Header("Level Up")]
         public bool recoverHpWhenLevelUp;
         public bool recoverMpWhenLevelUp;
         public bool recoverFoodWhenLevelUp;
         public bool recoverWaterWhenLevelUp;
         public bool recoverStaminaWhenLevelUp;
+
+        [Header("Battle Points Score")]
+        public float hpBattlePointScore = 5;
+        public float hpRecoveryBattlePointScore = 2;
+        public float hpLeechRateBattlePointScore = 3;
+        public float mpBattlePointScore = 5;
+        public float mpRecoveryBattlePointScore = 2;
+        public float mpLeechRateBattlePointScore = 3;
+        public float staminaBattlePointScore = 2;
+        public float staminaRecoveryBattlePointScore = 2;
+        public float staminaLeechRateBattlePointScore = 3;
+        public float foodBattlePointScore = 2;
+        public float waterBattlePointScore = 2;
+        public float accuracyBattlePointScore = 10;
+        public float evasionBattlePointScore = 10;
+        public float criRateBattlePointScore = 5;
+        public float criDmgRateBattlePointScore = 5;
+        public float blockRateBattlePointScore = 5;
+        public float blockDmgRateBattlePointScore = 5;
+        public float moveSpeedBattlePointScore = 10;
+        public float atkSpeedBattlePointScore = 10;
 
         public override bool RandomAttackHitOccurs(Vector3 fromPosition, BaseCharacterEntity attacker, BaseCharacterEntity damageReceiver, Dictionary<DamageElement, MinMaxFloat> damageAmounts, CharacterItem weapon, BaseSkill skill, int skillLevel, int randomSeed, out bool isCritical, out bool isBlocked)
         {
@@ -920,6 +951,31 @@ namespace MultiplayerARPG
             if (GameInstance.Singleton.DimensionType == DimensionType.Dimension2D)
                 return Quaternion.identity;
             return character.EntityTransform.rotation;
+        }
+
+        public override float GetBattlePointFromCharacterStats(CharacterStats stats)
+        {
+            float battlePoint = 0f;
+            battlePoint += stats.hp * hpBattlePointScore;
+            battlePoint += stats.hpRecovery * hpRecoveryBattlePointScore;
+            battlePoint += stats.hpLeechRate * hpLeechRateBattlePointScore;
+            battlePoint += stats.mp * mpBattlePointScore;
+            battlePoint += stats.mpRecovery * mpRecoveryBattlePointScore;
+            battlePoint += stats.mpLeechRate * mpLeechRateBattlePointScore;
+            battlePoint += stats.stamina * staminaBattlePointScore;
+            battlePoint += stats.staminaRecovery * staminaRecoveryBattlePointScore;
+            battlePoint += stats.staminaLeechRate * staminaLeechRateBattlePointScore;
+            battlePoint += stats.food * foodBattlePointScore;
+            battlePoint += stats.water * waterBattlePointScore;
+            battlePoint += stats.accuracy * accuracyBattlePointScore;
+            battlePoint += stats.evasion * evasionBattlePointScore;
+            battlePoint += stats.criRate * criRateBattlePointScore;
+            battlePoint += stats.criDmgRate * criDmgRateBattlePointScore;
+            battlePoint += stats.blockRate * blockRateBattlePointScore;
+            battlePoint += stats.blockDmgRate * blockDmgRateBattlePointScore;
+            battlePoint += stats.moveSpeed * moveSpeedBattlePointScore;
+            battlePoint += stats.atkSpeed * atkSpeedBattlePointScore;
+            return battlePoint;
         }
     }
 }

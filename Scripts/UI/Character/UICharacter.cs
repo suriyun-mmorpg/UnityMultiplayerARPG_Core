@@ -19,6 +19,8 @@ namespace MultiplayerARPG
         public UILocaleKeySetting formatKeyStatPoint = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_STAT_POINTS);
         [Tooltip("Format => {0} = {Skill Points}")]
         public UILocaleKeySetting formatKeySkillPoint = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_SKILL_POINTS);
+        [Tooltip("Format => {0} = {Battle Points}")]
+        public UILocaleKeySetting formatKeyBattlePoint = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_BATTLE_POINTS);
         [Tooltip("Format => {0} = {Gold Amount}")]
         public UILocaleKeySetting formatKeyGold = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_GOLD);
         [Tooltip("Format => {0} = {Current Total Weights}, {1} = {Weight Limit}")]
@@ -40,6 +42,7 @@ namespace MultiplayerARPG
         public UIGageValue uiGageWater;
         public TextWrapper uiTextStatPoint;
         public TextWrapper uiTextSkillPoint;
+        public TextWrapper uiTextBattlePoint;
         public TextWrapper uiTextGold;
         public TextWrapper uiTextWeightLimit;
         public TextWrapper uiTextSlotLimit;
@@ -350,6 +353,13 @@ namespace MultiplayerARPG
                 uiTextSkillPoint.text = ZString.Format(
                     LanguageManager.GetText(formatKeySkillPoint),
                     playerCharacter == null ? "0" : playerCharacter.SkillPoint.ToString("N0"));
+            }
+
+            if (uiTextBattlePoint != null)
+            {
+                uiTextBattlePoint.text = ZString.Format(
+                    LanguageManager.GetText(formatKeyBattlePoint),
+                    playerCharacter == null ? "0" : playerCharacter.GetCaches().BattlePoints.ToString("N0"));
             }
 
             if (uiTextGold != null)

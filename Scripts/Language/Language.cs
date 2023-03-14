@@ -1116,6 +1116,10 @@ namespace MultiplayerARPG
         /// Format => {0} = {When it will be expired}
         /// </summary>
         UI_FORMAT_ITEM_EXPIRE_TIME,
+        /// <summary>
+        /// Format => {0} = {Battle Points}
+        /// </summary>
+        UI_FORMAT_BATTLE_POINTS,
     }
 
     public static class DefaultLocale
@@ -1651,6 +1655,7 @@ namespace MultiplayerARPG
             // 1.81c New Formats
             Texts.Add(UIFormatKeys.UI_FORMAT_ITEM_EXPIRE_DURATION.ToString(), "Duration: {0}");
             Texts.Add(UIFormatKeys.UI_FORMAT_ITEM_EXPIRE_TIME.ToString(), "Expires In: {0}");
+            Texts.Add(UIFormatKeys.UI_FORMAT_BATTLE_POINTS.ToString(), "Battle Points: {0}");
         }
     }
 

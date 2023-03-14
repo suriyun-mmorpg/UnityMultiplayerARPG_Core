@@ -8,6 +8,27 @@ namespace MultiplayerARPG
     {
         [Category("Damage Element Settings")]
         [SerializeField]
+        private float resistanceBattlePointScore = 5;
+        public float ResistanceBattlePointScore
+        {
+            get { return resistanceBattlePointScore; }
+        }
+
+        [SerializeField]
+        private float armorBattlePointScore = 5;
+        public float ArmorBattlePointScore
+        {
+            get { return armorBattlePointScore; }
+        }
+
+        [SerializeField]
+        private float damageBattlePointScore = 10;
+        public float DamageBattlePointScore
+        {
+            get { return damageBattlePointScore; }
+        }
+
+        [SerializeField]
         [Range(0f, 1f)]
         private float maxResistanceAmount = 1f;
         public float MaxResistanceAmount { get { return maxResistanceAmount; } }

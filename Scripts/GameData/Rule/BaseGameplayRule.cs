@@ -48,6 +48,7 @@ namespace MultiplayerARPG
         public abstract bool CanInteractEntity(BaseCharacterEntity character, uint objectId);
         public abstract Vector3 GetSummonPosition(BaseCharacterEntity character);
         public abstract Quaternion GetSummonRotation(BaseCharacterEntity character);
+        public abstract float GetBattlePointFromCharacterStats(CharacterStats stats);
 
         public virtual bool CurrenciesEnoughToBuyItem(IPlayerCharacterData character, NpcSellItem sellItem, int amount)
         {

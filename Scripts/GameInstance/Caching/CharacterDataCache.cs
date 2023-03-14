@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using UnityEngine;
 
 namespace MultiplayerARPG
 {
@@ -38,6 +39,7 @@ namespace MultiplayerARPG
         public bool HavingChanceToRemoveBuffWhenUseSkill { get; private set; }
         public bool HavingChanceToRemoveBuffWhenUseItem { get; private set; }
         public bool HavingChanceToRemoveBuffWhenPickupItem { get; private set; }
+        public int BattlePoints { get; private set; }
 
         public CharacterDataCache()
         {
@@ -62,6 +64,7 @@ namespace MultiplayerARPG
                 return this;
 
             IsRecaching = false;
+            int oldBattlePoints = BattlePoints;
 
             characterData.GetAllStats(
                 ref stats,
@@ -124,17 +127,62 @@ namespace MultiplayerARPG
                 }
             }
 
-            if (!allAilmentsWereApplied)
+            float tempTotalBattlePoint = 0f;
+
+            foreach (Attribute tempAttribute in Attributes.Keys)
             {
-                foreach (BaseSkill tempSkill in Skills.Keys)
+                if (tempAttribute == null)
+                    continue;
+                float amount = Attributes[tempAttribute];
+                tempTotalBattlePoint += tempAttribute.BattlePointScore * amount;
+            }
+
+            foreach (BaseSkill tempSkill in Skills.Keys)
+            {
+                if (tempSkill == null)
+                    continue;
+                int skillLevel = Skills[tempSkill];
+                tempTotalBattlePoint += tempSkill.battlePointScore * skillLevel;
+                // Apply ailments by passive buff only
+                if (!allAilmentsWereApplied && !tempSkill.IsActive && tempSkill.IsBuff)
                 {
-                    if (tempSkill == null || tempSkill.IsActive || !tempSkill.IsBuff)
-                        continue;
-                    UpdateAppliedAilments(new CalculatedBuff(tempSkill.Buff, Skills[tempSkill]));
+                    UpdateAppliedAilments(new CalculatedBuff(tempSkill.Buff, skillLevel));
                     allAilmentsWereApplied = AllAilmentsWereApplied();
-                    if (allAilmentsWereApplied)
-                        break;
                 }
+            }
+
+            foreach (DamageElement tempDamageElement in Resistances.Keys)
+            {
+                if (tempDamageElement == null)
+                    continue;
+                float amount = Resistances[tempDamageElement];
+                tempTotalBattlePoint += tempDamageElement.ResistanceBattlePointScore * amount;
+            }
+
+            foreach (DamageElement tempDamageElement in Armors.Keys)
+            {
+                if (tempDamageElement == null)
+                    continue;
+                float amount = Armors[tempDamageElement];
+                tempTotalBattlePoint += tempDamageElement.ArmorBattlePointScore * amount;
+            }
+
+            foreach (DamageElement tempDamageElement in IncreaseDamages.Keys)
+            {
+                if (tempDamageElement == null)
+                    continue;
+                MinMaxFloat amount = IncreaseDamages[tempDamageElement];
+                tempTotalBattlePoint += tempDamageElement.ArmorBattlePointScore * (amount.min + amount.max) * 0.5f;
+            }
+
+            tempTotalBattlePoint += GameInstance.Singleton.GameplayRule.GetBattlePointFromCharacterStats(Stats);
+            BattlePoints = Mathf.CeilToInt(tempTotalBattlePoint);
+
+            if (characterData == GameInstance.PlayingCharacter)
+            {
+                int battlePointChange = BattlePoints - oldBattlePoints;
+                if (battlePointChange != 0)
+                    ClientGenericActions.NotifyBattlePointsChanged(battlePointChange);
             }
 
             return this;

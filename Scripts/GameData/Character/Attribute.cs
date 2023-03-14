@@ -5,7 +5,15 @@ namespace MultiplayerARPG
     [CreateAssetMenu(fileName = GameDataMenuConsts.ATTRIBUTE_FILE, menuName = GameDataMenuConsts.ATTRIBUTE_MENU, order = GameDataMenuConsts.ATTRIBUTE_ORDER)]
     public partial class Attribute : BaseGameData
     {
+
         [Category("Attribute Settings")]
+        [SerializeField]
+        private float battlePointScore = 10;
+        public float BattlePointScore
+        {
+            get { return battlePointScore; }
+        }
+
         [SerializeField]
         private CharacterStats statsIncreaseEachLevel;
         public CharacterStats StatsIncreaseEachLevel

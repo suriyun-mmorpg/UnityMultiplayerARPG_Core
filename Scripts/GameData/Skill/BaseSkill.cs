@@ -13,6 +13,7 @@ namespace MultiplayerARPG
         [Category("Skill Settings")]
         [Range(1, 100)]
         public int maxLevel = 1;
+        public float battlePointScore = 0;
         public bool cannotReset = false;
 
         [Category(2, "Activation Settings")]
