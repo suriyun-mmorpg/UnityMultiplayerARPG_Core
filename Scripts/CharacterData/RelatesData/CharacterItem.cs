@@ -497,15 +497,21 @@ namespace MultiplayerARPG
             newItem.exp = 0;
             newItem.lockRemainsDuration = 0f;
             newItem.ammo = 0;
-            BaseItem tempItem;
-            if (GameInstance.Items.TryGetValue(dataId, out tempItem) && tempItem is IEquipmentItem)
+            if (GameInstance.Items.TryGetValue(dataId, out BaseItem tempItem))
             {
-                newItem.durability = (tempItem as IEquipmentItem).MaxDurability;
-                newItem.lockRemainsDuration = tempItem.LockDuration;
-                if (randomSeed.HasValue)
-                    newItem.randomSeed = randomSeed.Value;
-                else
-                    newItem.randomSeed = Random.Range(int.MinValue, int.MaxValue);
+                if (tempItem is IEquipmentItem)
+                {
+                    newItem.durability = (tempItem as IEquipmentItem).MaxDurability;
+                    newItem.lockRemainsDuration = tempItem.LockDuration;
+                    if (randomSeed.HasValue)
+                        newItem.randomSeed = randomSeed.Value;
+                    else
+                        newItem.randomSeed = Random.Range(int.MinValue, int.MaxValue);
+                }
+                if (tempItem.ExpireDuration > 0)
+                {
+                    newItem.expireTime = System.DateTimeOffset.UtcNow.ToUnixTimeSeconds() + (tempItem.ExpireDuration * 60 * 60);
+                }
             }
             return newItem;
         }
