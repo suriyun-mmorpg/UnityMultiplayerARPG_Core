@@ -66,6 +66,10 @@ namespace MultiplayerARPG
         public UILocaleKeySetting formatKeyCoolDownRemainsDuration = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_SIMPLE);
         [Tooltip("Format => {0} = {Item Type Title}")]
         public UILocaleKeySetting formatKeyItemType = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_ITEM_TYPE);
+        [Tooltip("Format => {0} = {Duration to be expired}")]
+        public UILocaleKeySetting formatKeyExpireDuration = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_ITEM_EXPIRE_DURATION);
+        [Tooltip("Format => {0} = {When it will be expired}")]
+        public UILocaleKeySetting formatKeyExpireTime = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_ITEM_EXPIRE_TIME);
 
         [Header("UI Elements")]
         public TextWrapper uiTextTitle;
@@ -82,6 +86,10 @@ namespace MultiplayerARPG
         public TextWrapper uiTextWeight;
         public TextWrapper uiTextExp;
         public UIGageValue uiGageExp;
+
+        [Header("Item Expiring")]
+        public TextWrapper uiTextExpireDuration;
+        public TextWrapper uiTextExpireTime;
 
         [Header("Item Locking")]
         public TextWrapper uiTextLockRemainsDuration;
@@ -241,6 +249,26 @@ namespace MultiplayerARPG
             }
         }
 
+        private void UpdateExpireTime()
+        {
+
+            if (uiTextExpireTime != null)
+            {
+                if (CharacterItem != null && CharacterItem.expireTime > 0)
+                {
+                    System.DateTime dateTime = new System.DateTime(1970, 1, 1, 0, 0, 0, 0, System.DateTimeKind.Utc).AddSeconds(CharacterItem.expireTime).ToLocalTime();
+                    uiTextExpireTime.SetGameObjectActive(true);
+                    uiTextExpireTime.text = ZString.Format(
+                        LanguageManager.GetText(formatKeyExpireTime),
+                        (new System.DateTime(dateTime.Ticks) - System.DateTime.Now).GetPrettyDate(true));
+                }
+                else
+                {
+                    uiTextExpireTime.SetGameObjectActive(false);
+                }
+            }
+        }
+
         private void UpdateLockRemainsDuration(float deltaTime)
         {
             lockRemainsDuration = CharacterItem != null ? CharacterItem.lockRemainsDuration : 0f;
@@ -359,6 +387,7 @@ namespace MultiplayerARPG
         protected override void UpdateUI()
         {
             UpdateUsableItemCoolDownRemainsDuration();
+            UpdateExpireTime();
 
             if (!IsOwningCharacter() || !IsVisible())
                 return;
@@ -491,6 +520,21 @@ namespace MultiplayerARPG
                 uiTextItemType.text = ZString.Format(
                     LanguageManager.GetText(formatKeyItemType),
                     Item == null ? LanguageManager.GetUnknowTitle() : Item.TypeTitle);
+            }
+
+            if (uiTextExpireDuration != null)
+            {
+                if (Item != null && Item.ExpireDuration > 0)
+                {
+                    uiTextExpireDuration.SetGameObjectActive(true);
+                    uiTextExpireDuration.text = ZString.Format(
+                        LanguageManager.GetText(formatKeyExpireDuration),
+                        System.TimeSpan.FromHours(Item.ExpireDuration).GetPrettyDate(true));
+                }
+                else
+                {
+                    uiTextExpireDuration.SetGameObjectActive(false);
+                }
             }
 
             if (uiTextSellPrice != null)
