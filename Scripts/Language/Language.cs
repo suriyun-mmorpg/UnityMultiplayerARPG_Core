@@ -1106,6 +1106,16 @@ namespace MultiplayerARPG
         /// Format => {0} = {Skill Points}
         /// </summary>
         UI_FORMAT_REWARD_SKILL_POINTS,
+
+        // 1.81c New Formats
+        /// <summary>
+        /// Format => {0} = {Duration to be expired}
+        /// </summary>
+        UI_FORMAT_ITEM_EXPIRE_DURATION,
+        /// <summary>
+        /// Format => {0} = {When it will be expired}
+        /// </summary>
+        UI_FORMAT_ITEM_EXPIRE_TIME,
     }
 
     public static class DefaultLocale
@@ -1638,6 +1648,9 @@ namespace MultiplayerARPG
             // 1.80 New Formats
             Texts.Add(UIFormatKeys.UI_FORMAT_REWARD_STAT_POINTS.ToString(), "Reward Stat Points: {0}");
             Texts.Add(UIFormatKeys.UI_FORMAT_REWARD_SKILL_POINTS.ToString(), "Reward Skill Points: {0}");
+            // 1.81c New Formats
+            Texts.Add(UIFormatKeys.UI_FORMAT_ITEM_EXPIRE_DURATION.ToString(), "Duration: {0}");
+            Texts.Add(UIFormatKeys.UI_FORMAT_ITEM_EXPIRE_TIME.ToString(), "Expires In: {0}");
         }
     }
 
