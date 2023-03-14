@@ -209,7 +209,7 @@ namespace MultiplayerARPG
         {
             if (isOnline) 
                 return "Online";
-            return System.DateTime.Now.AddSeconds(-offlineOffsets).GetPrettyDate();
+            return (System.DateTime.Now - System.DateTime.Now.AddSeconds(-offlineOffsets)).GetPrettyDate();
         }
 
         public void OnClickAddFriend()

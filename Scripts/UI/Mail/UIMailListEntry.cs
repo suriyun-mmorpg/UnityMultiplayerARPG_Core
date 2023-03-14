@@ -43,7 +43,7 @@ namespace MultiplayerARPG
                     dateTime = dateTime.AddSeconds(Data.SentTimestamp).ToLocalTime();
                 textSentDate.text = ZString.Format(
                     LanguageManager.GetText(formatSentDate),
-                    dateTime.GetPrettyDate());
+                    (System.DateTime.Now - new System.DateTime(dateTime.Ticks)).GetPrettyDate());
             }
 
             if (readObjects != null && readObjects.Length > 0)

@@ -197,7 +197,7 @@ namespace MultiplayerARPG
                     dateTime = dateTime.AddSeconds(mail.SentTimestamp).ToLocalTime();
                 textSentDate.text = ZString.Format(
                     LanguageManager.GetText(formatSentDate),
-                    dateTime.GetPrettyDate());
+                    (System.DateTime.Now - new System.DateTime(dateTime.Ticks)).GetPrettyDate());
                 textSentDate.SetGameObjectActive(mail != null);
             }
 

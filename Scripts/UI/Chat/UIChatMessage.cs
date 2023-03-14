@@ -97,7 +97,7 @@ namespace MultiplayerARPG
             if (uiTextTimestamp != null)
             {
                 System.DateTime dateTime = new System.DateTime(1970, 1, 1, 0, 0, 0, 0, System.DateTimeKind.Utc).AddMilliseconds(Data.timestamp).ToLocalTime();
-                uiTextTimestamp.text = new System.DateTime(dateTime.Ticks).GetPrettyDate();
+                uiTextTimestamp.text = (System.DateTime.Now - new System.DateTime(dateTime.Ticks)).GetPrettyDate();
             }
         }
 
