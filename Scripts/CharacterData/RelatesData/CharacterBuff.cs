@@ -1,4 +1,5 @@
-﻿using LiteNetLib.Utils;
+﻿using Cysharp.Text;
+using LiteNetLib.Utils;
 using LiteNetLibManager;
 
 namespace MultiplayerARPG
@@ -21,7 +22,7 @@ namespace MultiplayerARPG
         [System.NonSerialized]
         private StatusEffect cacheStatusEffect;
         [System.NonSerialized]
-        private CalculatedBuff cacheBuff;
+        private CalculatedBuff cacheBuff = new CalculatedBuff();
         [System.NonSerialized]
         private string cacheKey;
 
@@ -32,7 +33,7 @@ namespace MultiplayerARPG
         {
             if (dirtyDataId != dataId || dirtyType != type || dirtyLevel != level)
             {
-                cacheKey = type + "_" + dataId;
+                cacheKey = ZString.Concat(type, "_", dataId);
                 dirtyDataId = dataId;
                 dirtyType = type;
                 dirtyLevel = level;
@@ -60,7 +61,7 @@ namespace MultiplayerARPG
                             tempBuff = cacheStatusEffect.Buff;
                         break;
                 }
-                cacheBuff = new CalculatedBuff(tempBuff, level);
+                cacheBuff.Build(tempBuff, level);
             }
         }
 

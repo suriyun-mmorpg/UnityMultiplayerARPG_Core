@@ -141,28 +141,28 @@ namespace MultiplayerARPG
             foreach (CharacterItem equipItem in data.EquipItems)
             {
                 if (equipItem.IsEmptySlot()) continue;
-                result = GameDataHelpers.CombineAttributes(result, equipItem.GetIncreaseAttributes());
+                result = GameDataHelpers.CombineAttributes(result, equipItem.GetBuff().GetIncreaseAttributes());
                 result = GameDataHelpers.CombineAttributes(result, equipItem.GetSocketsIncreaseAttributes());
                 // Increase by rate
-                result = GameDataHelpers.CombineAttributes(result, GameDataHelpers.MultiplyAttributes(new Dictionary<Attribute, float>(baseAttributes), equipItem.GetIncreaseAttributesRate()));
+                result = GameDataHelpers.CombineAttributes(result, GameDataHelpers.MultiplyAttributes(new Dictionary<Attribute, float>(baseAttributes), equipItem.GetBuff().GetIncreaseAttributesRate()));
                 result = GameDataHelpers.CombineAttributes(result, GameDataHelpers.MultiplyAttributes(new Dictionary<Attribute, float>(baseAttributes), equipItem.GetSocketsIncreaseAttributesRate()));
             }
             // Increase attributes from right hand equipment
             if (data.EquipWeapons.NotEmptyRightHandSlot())
             {
-                result = GameDataHelpers.CombineAttributes(result, data.EquipWeapons.rightHand.GetIncreaseAttributes());
+                result = GameDataHelpers.CombineAttributes(result, data.EquipWeapons.rightHand.GetBuff().GetIncreaseAttributes());
                 result = GameDataHelpers.CombineAttributes(result, data.EquipWeapons.rightHand.GetSocketsIncreaseAttributes());
                 // Increase by rate
-                result = GameDataHelpers.CombineAttributes(result, GameDataHelpers.MultiplyAttributes(new Dictionary<Attribute, float>(baseAttributes), data.EquipWeapons.rightHand.GetIncreaseAttributesRate()));
+                result = GameDataHelpers.CombineAttributes(result, GameDataHelpers.MultiplyAttributes(new Dictionary<Attribute, float>(baseAttributes), data.EquipWeapons.rightHand.GetBuff().GetIncreaseAttributesRate()));
                 result = GameDataHelpers.CombineAttributes(result, GameDataHelpers.MultiplyAttributes(new Dictionary<Attribute, float>(baseAttributes), data.EquipWeapons.rightHand.GetSocketsIncreaseAttributesRate()));
             }
             // Increase attributes from left hand equipment
             if (data.EquipWeapons.NotEmptyLeftHandSlot())
             {
-                result = GameDataHelpers.CombineAttributes(result, data.EquipWeapons.leftHand.GetIncreaseAttributes());
+                result = GameDataHelpers.CombineAttributes(result, data.EquipWeapons.leftHand.GetBuff().GetIncreaseAttributes());
                 result = GameDataHelpers.CombineAttributes(result, data.EquipWeapons.leftHand.GetSocketsIncreaseAttributes());
                 // Increase by rate
-                result = GameDataHelpers.CombineAttributes(result, GameDataHelpers.MultiplyAttributes(new Dictionary<Attribute, float>(baseAttributes), data.EquipWeapons.leftHand.GetIncreaseAttributesRate()));
+                result = GameDataHelpers.CombineAttributes(result, GameDataHelpers.MultiplyAttributes(new Dictionary<Attribute, float>(baseAttributes), data.EquipWeapons.leftHand.GetBuff().GetIncreaseAttributesRate()));
                 result = GameDataHelpers.CombineAttributes(result, GameDataHelpers.MultiplyAttributes(new Dictionary<Attribute, float>(baseAttributes), data.EquipWeapons.leftHand.GetSocketsIncreaseAttributesRate()));
             }
             return result;
@@ -271,19 +271,19 @@ namespace MultiplayerARPG
             foreach (CharacterItem equipItem in data.EquipItems)
             {
                 if (equipItem.IsEmptySlot()) continue;
-                result = GameDataHelpers.CombineSkills(result, equipItem.GetIncreaseSkills());
+                result = GameDataHelpers.CombineSkills(result, equipItem.GetBuff().GetIncreaseSkills());
                 result = GameDataHelpers.CombineSkills(result, equipItem.GetSocketsIncreaseSkills());
             }
             // Right hand equipment
             if (data.EquipWeapons.NotEmptyRightHandSlot())
             {
-                result = GameDataHelpers.CombineSkills(result, data.EquipWeapons.rightHand.GetIncreaseSkills());
+                result = GameDataHelpers.CombineSkills(result, data.EquipWeapons.rightHand.GetBuff().GetIncreaseSkills());
                 result = GameDataHelpers.CombineSkills(result, data.EquipWeapons.rightHand.GetSocketsIncreaseSkills());
             }
             // Left hand equipment
             if (data.EquipWeapons.NotEmptyLeftHandSlot())
             {
-                result = GameDataHelpers.CombineSkills(result, data.EquipWeapons.leftHand.GetIncreaseSkills());
+                result = GameDataHelpers.CombineSkills(result, data.EquipWeapons.leftHand.GetBuff().GetIncreaseSkills());
                 result = GameDataHelpers.CombineSkills(result, data.EquipWeapons.leftHand.GetSocketsIncreaseSkills());
             }
             return result;
@@ -316,19 +316,19 @@ namespace MultiplayerARPG
             foreach (CharacterItem equipItem in data.EquipItems)
             {
                 if (equipItem.IsEmptySlot()) continue;
-                result = GameDataHelpers.CombineResistances(result, equipItem.GetIncreaseResistances());
+                result = GameDataHelpers.CombineResistances(result, equipItem.GetBuff().GetIncreaseResistances());
                 result = GameDataHelpers.CombineResistances(result, equipItem.GetSocketsIncreaseResistances());
             }
             // Right hand equipment
             if (data.EquipWeapons.NotEmptyRightHandSlot())
             {
-                result = GameDataHelpers.CombineResistances(result, data.EquipWeapons.rightHand.GetIncreaseResistances());
+                result = GameDataHelpers.CombineResistances(result, data.EquipWeapons.rightHand.GetBuff().GetIncreaseResistances());
                 result = GameDataHelpers.CombineResistances(result, data.EquipWeapons.rightHand.GetSocketsIncreaseResistances());
             }
             // Left hand equipment
             if (data.EquipWeapons.NotEmptyLeftHandSlot())
             {
-                result = GameDataHelpers.CombineResistances(result, data.EquipWeapons.leftHand.GetIncreaseResistances());
+                result = GameDataHelpers.CombineResistances(result, data.EquipWeapons.leftHand.GetBuff().GetIncreaseResistances());
                 result = GameDataHelpers.CombineResistances(result, data.EquipWeapons.leftHand.GetSocketsIncreaseResistances());
             }
             return result;
@@ -427,7 +427,7 @@ namespace MultiplayerARPG
             {
                 if (equipItem.IsEmptySlot() || equipItem.GetDefendItem() == null) continue;
                 result = GameDataHelpers.CombineArmors(result, equipItem.GetArmorAmount());
-                result = GameDataHelpers.CombineArmors(result, equipItem.GetIncreaseArmors());
+                result = GameDataHelpers.CombineArmors(result, equipItem.GetBuff().GetIncreaseArmors());
                 result = GameDataHelpers.CombineArmors(result, equipItem.GetSocketsIncreaseArmors());
             }
             // Right hand equipment
@@ -435,7 +435,7 @@ namespace MultiplayerARPG
             {
                 if (data.EquipWeapons.rightHand.GetDefendItem() != null)
                     result = GameDataHelpers.CombineArmors(result, data.EquipWeapons.rightHand.GetArmorAmount());
-                result = GameDataHelpers.CombineArmors(result, data.EquipWeapons.rightHand.GetIncreaseArmors());
+                result = GameDataHelpers.CombineArmors(result, data.EquipWeapons.rightHand.GetBuff().GetIncreaseArmors());
                 result = GameDataHelpers.CombineArmors(result, data.EquipWeapons.rightHand.GetSocketsIncreaseArmors());
             }
             // Left hand equipment
@@ -443,7 +443,7 @@ namespace MultiplayerARPG
             {
                 if (data.EquipWeapons.leftHand.GetDefendItem() != null)
                     result = GameDataHelpers.CombineArmors(result, data.EquipWeapons.leftHand.GetArmorAmount());
-                result = GameDataHelpers.CombineArmors(result, data.EquipWeapons.leftHand.GetIncreaseArmors());
+                result = GameDataHelpers.CombineArmors(result, data.EquipWeapons.leftHand.GetBuff().GetIncreaseArmors());
                 result = GameDataHelpers.CombineArmors(result, data.EquipWeapons.leftHand.GetSocketsIncreaseArmors());
             }
             return result;
@@ -531,19 +531,19 @@ namespace MultiplayerARPG
             foreach (CharacterItem equipItem in data.EquipItems)
             {
                 if (equipItem.IsEmptySlot()) continue;
-                result = GameDataHelpers.CombineDamages(result, equipItem.GetIncreaseDamages());
+                result = GameDataHelpers.CombineDamages(result, equipItem.GetBuff().GetIncreaseDamages());
                 result = GameDataHelpers.CombineDamages(result, equipItem.GetSocketsIncreaseDamages());
             }
             // Right hand equipment
             if (data.EquipWeapons.NotEmptyRightHandSlot())
             {
-                result = GameDataHelpers.CombineDamages(result, data.EquipWeapons.rightHand.GetIncreaseDamages());
+                result = GameDataHelpers.CombineDamages(result, data.EquipWeapons.rightHand.GetBuff().GetIncreaseDamages());
                 result = GameDataHelpers.CombineDamages(result, data.EquipWeapons.rightHand.GetSocketsIncreaseDamages());
             }
             // Left hand equipment
             if (data.EquipWeapons.NotEmptyLeftHandSlot())
             {
-                result = GameDataHelpers.CombineDamages(result, data.EquipWeapons.leftHand.GetIncreaseDamages());
+                result = GameDataHelpers.CombineDamages(result, data.EquipWeapons.leftHand.GetBuff().GetIncreaseDamages());
                 result = GameDataHelpers.CombineDamages(result, data.EquipWeapons.leftHand.GetSocketsIncreaseDamages());
             }
             return result;
@@ -642,40 +642,40 @@ namespace MultiplayerARPG
             foreach (CharacterItem equipItem in data.EquipItems)
             {
                 if (equipItem.IsEmptySlot()) continue;
-                result += equipItem.GetIncreaseStats();
+                result += equipItem.GetBuff().GetIncreaseStats();
                 result += equipItem.GetSocketsIncreaseStats();
-                result += GameDataHelpers.GetStatsFromAttributes(equipItem.GetIncreaseAttributes());
+                result += GameDataHelpers.GetStatsFromAttributes(equipItem.GetBuff().GetIncreaseAttributes());
                 result += GameDataHelpers.GetStatsFromAttributes(equipItem.GetSocketsIncreaseAttributes());
                 // Increase with rates
-                result += baseStats * equipItem.GetIncreaseStatsRate();
+                result += baseStats * equipItem.GetBuff().GetIncreaseStatsRate();
                 result += baseStats * equipItem.GetSocketsIncreaseStatsRate();
-                result += GameDataHelpers.GetStatsFromAttributes(GameDataHelpers.MultiplyAttributes(new Dictionary<Attribute, float>(baseAttributes), equipItem.GetIncreaseAttributesRate()));
+                result += GameDataHelpers.GetStatsFromAttributes(GameDataHelpers.MultiplyAttributes(new Dictionary<Attribute, float>(baseAttributes), equipItem.GetBuff().GetIncreaseAttributesRate()));
                 result += GameDataHelpers.GetStatsFromAttributes(GameDataHelpers.MultiplyAttributes(new Dictionary<Attribute, float>(baseAttributes), equipItem.GetSocketsIncreaseAttributesRate()));
             }
             // Increase stats from right hand equipment
             if (data.EquipWeapons.NotEmptyRightHandSlot())
             {
-                result += data.EquipWeapons.rightHand.GetIncreaseStats();
+                result += data.EquipWeapons.rightHand.GetBuff().GetIncreaseStats();
                 result += data.EquipWeapons.rightHand.GetSocketsIncreaseStats();
-                result += GameDataHelpers.GetStatsFromAttributes(data.EquipWeapons.rightHand.GetIncreaseAttributes());
+                result += GameDataHelpers.GetStatsFromAttributes(data.EquipWeapons.rightHand.GetBuff().GetIncreaseAttributes());
                 result += GameDataHelpers.GetStatsFromAttributes(data.EquipWeapons.rightHand.GetSocketsIncreaseAttributes());
                 // Increase with rates
-                result += baseStats * data.EquipWeapons.rightHand.GetIncreaseStatsRate();
+                result += baseStats * data.EquipWeapons.rightHand.GetBuff().GetIncreaseStatsRate();
                 result += baseStats * data.EquipWeapons.rightHand.GetSocketsIncreaseStatsRate();
-                result += GameDataHelpers.GetStatsFromAttributes(GameDataHelpers.MultiplyAttributes(new Dictionary<Attribute, float>(baseAttributes), data.EquipWeapons.rightHand.GetIncreaseAttributesRate()));
+                result += GameDataHelpers.GetStatsFromAttributes(GameDataHelpers.MultiplyAttributes(new Dictionary<Attribute, float>(baseAttributes), data.EquipWeapons.rightHand.GetBuff().GetIncreaseAttributesRate()));
                 result += GameDataHelpers.GetStatsFromAttributes(GameDataHelpers.MultiplyAttributes(new Dictionary<Attribute, float>(baseAttributes), data.EquipWeapons.rightHand.GetSocketsIncreaseAttributesRate()));
             }
             // Increase stats from left hand equipment
             if (data.EquipWeapons.NotEmptyLeftHandSlot())
             {
-                result += data.EquipWeapons.leftHand.GetIncreaseStats();
+                result += data.EquipWeapons.leftHand.GetBuff().GetIncreaseStats();
                 result += data.EquipWeapons.leftHand.GetSocketsIncreaseStats();
-                result += GameDataHelpers.GetStatsFromAttributes(data.EquipWeapons.leftHand.GetIncreaseAttributes());
+                result += GameDataHelpers.GetStatsFromAttributes(data.EquipWeapons.leftHand.GetBuff().GetIncreaseAttributes());
                 result += GameDataHelpers.GetStatsFromAttributes(data.EquipWeapons.leftHand.GetSocketsIncreaseAttributes());
                 // Increase with rates
-                result += baseStats * data.EquipWeapons.leftHand.GetIncreaseStatsRate();
+                result += baseStats * data.EquipWeapons.leftHand.GetBuff().GetIncreaseStatsRate();
                 result += baseStats * data.EquipWeapons.leftHand.GetSocketsIncreaseStatsRate();
-                result += GameDataHelpers.GetStatsFromAttributes(GameDataHelpers.MultiplyAttributes(new Dictionary<Attribute, float>(baseAttributes), data.EquipWeapons.leftHand.GetIncreaseAttributesRate()));
+                result += GameDataHelpers.GetStatsFromAttributes(GameDataHelpers.MultiplyAttributes(new Dictionary<Attribute, float>(baseAttributes), data.EquipWeapons.leftHand.GetBuff().GetIncreaseAttributesRate()));
                 result += GameDataHelpers.GetStatsFromAttributes(GameDataHelpers.MultiplyAttributes(new Dictionary<Attribute, float>(baseAttributes), data.EquipWeapons.leftHand.GetSocketsIncreaseAttributesRate()));
             }
             return result;

@@ -27,6 +27,10 @@ namespace MultiplayerARPG
     {
         [System.NonSerialized]
         private int dirtyDataId;
+        [System.NonSerialized]
+        private int dirtyLevel;
+        [System.NonSerialized]
+        private int dirtyRandomSeed;
 
         [System.NonSerialized]
         private BaseItem cacheItem;
@@ -56,12 +60,16 @@ namespace MultiplayerARPG
         private IMountItem cacheMountItem;
         [System.NonSerialized]
         private ISkillItem cacheSkillItem;
+        [System.NonSerialized]
+        private CalculatedItemBuff cacheBuff = new CalculatedItemBuff();
 
         private void MakeCache()
         {
-            if (dirtyDataId != dataId)
+            if (dirtyDataId != dataId || dirtyLevel != level || dirtyRandomSeed != randomSeed)
             {
                 dirtyDataId = dataId;
+                dirtyLevel = level;
+                dirtyRandomSeed = randomSeed;
                 cacheItem = null;
                 cacheUsableItem = null;
                 cacheEquipmentItem = null;
@@ -106,6 +114,8 @@ namespace MultiplayerARPG
                     if (cacheItem.IsSkill())
                         cacheSkillItem = cacheItem as ISkillItem;
                 }
+
+                cacheBuff.Build(cacheEquipmentItem, level, randomSeed);
             }
         }
 
@@ -292,60 +302,10 @@ namespace MultiplayerARPG
             return GetWeaponItem().GetDamageAmount(level, GetEquipmentStatsRate(), characterData);
         }
 
-        public CharacterStats GetIncreaseStats()
+        public CalculatedItemBuff GetBuff()
         {
-            if (GetEquipmentItem() == null)
-                return CharacterStats.Empty;
-            return GetEquipmentItem().GetIncreaseStats(level, randomSeed);
-        }
-
-        public CharacterStats GetIncreaseStatsRate()
-        {
-            if (GetEquipmentItem() == null)
-                return CharacterStats.Empty;
-            return GetEquipmentItem().GetIncreaseStatsRate(level, randomSeed);
-        }
-
-        public Dictionary<Attribute, float> GetIncreaseAttributes()
-        {
-            if (GetEquipmentItem() == null)
-                return null;
-            return GetEquipmentItem().GetIncreaseAttributes(level, randomSeed);
-        }
-
-        public Dictionary<Attribute, float> GetIncreaseAttributesRate()
-        {
-            if (GetEquipmentItem() == null)
-                return null;
-            return GetEquipmentItem().GetIncreaseAttributesRate(level, randomSeed);
-        }
-
-        public Dictionary<DamageElement, float> GetIncreaseResistances()
-        {
-            if (GetEquipmentItem() == null)
-                return null;
-            return GetEquipmentItem().GetIncreaseResistances(level, randomSeed);
-        }
-
-        public Dictionary<DamageElement, float> GetIncreaseArmors()
-        {
-            if (GetEquipmentItem() == null)
-                return null;
-            return GetEquipmentItem().GetIncreaseArmors(level, randomSeed);
-        }
-
-        public Dictionary<DamageElement, MinMaxFloat> GetIncreaseDamages()
-        {
-            if (GetEquipmentItem() == null)
-                return null;
-            return GetEquipmentItem().GetIncreaseDamages(level, randomSeed);
-        }
-
-        public Dictionary<BaseSkill, int> GetIncreaseSkills()
-        {
-            if (GetEquipmentItem() == null)
-                return null;
-            return GetEquipmentItem().GetIncreaseSkills(level, randomSeed);
+            MakeCache();
+            return cacheBuff;
         }
 
         public CharacterStats GetSocketsIncreaseStats()

@@ -14,12 +14,12 @@ namespace MultiplayerARPG
         private int cacheRecoveryWater;
         private CharacterStats cacheIncreaseStats;
         private CharacterStats cacheIncreaseStatsRate;
-        private Dictionary<Attribute, float> cacheIncreaseAttributes;
-        private Dictionary<Attribute, float> cacheIncreaseAttributesRate;
-        private Dictionary<DamageElement, float> cacheIncreaseResistances;
-        private Dictionary<DamageElement, float> cacheIncreaseArmors;
-        private Dictionary<DamageElement, MinMaxFloat> cacheIncreaseDamages;
-        private Dictionary<DamageElement, MinMaxFloat> cacheDamageOverTimes;
+        private Dictionary<Attribute, float> cacheIncreaseAttributes = new Dictionary<Attribute, float>();
+        private Dictionary<Attribute, float> cacheIncreaseAttributesRate = new Dictionary<Attribute, float>();
+        private Dictionary<DamageElement, float> cacheIncreaseResistances = new Dictionary<DamageElement, float>();
+        private Dictionary<DamageElement, float> cacheIncreaseArmors = new Dictionary<DamageElement, float>();
+        private Dictionary<DamageElement, MinMaxFloat> cacheIncreaseDamages = new Dictionary<DamageElement, MinMaxFloat>();
+        private Dictionary<DamageElement, MinMaxFloat> cacheDamageOverTimes = new Dictionary<DamageElement, MinMaxFloat>();
         private float cacheRemoveBuffWhenAttackChance;
         private float cacheRemoveBuffWhenAttackedChance;
         private float cacheRemoveBuffWhenUseSkillChance;
@@ -27,10 +27,18 @@ namespace MultiplayerARPG
         private float cacheRemoveBuffWhenPickupItemChance;
         private int cacheMaxStack;
 
-        public CalculatedBuff(Buff buff, int level)
+        public void Build(Buff buff, int level)
         {
             this.buff = buff;
             this.level = level;
+
+            cacheIncreaseAttributes.Clear();
+            cacheIncreaseAttributesRate.Clear();
+            cacheIncreaseResistances.Clear();
+            cacheIncreaseArmors.Clear();
+            cacheIncreaseDamages.Clear();
+            cacheDamageOverTimes.Clear();
+
             cacheDuration = buff.GetDuration(level);
             cacheRecoveryHp = buff.GetRecoveryHp(level);
             cacheRecoveryMp = buff.GetRecoveryMp(level);
@@ -39,12 +47,12 @@ namespace MultiplayerARPG
             cacheRecoveryWater = buff.GetRecoveryWater(level);
             cacheIncreaseStats = buff.GetIncreaseStats(level);
             cacheIncreaseStatsRate = buff.GetIncreaseStatsRate(level);
-            cacheIncreaseAttributes = buff.GetIncreaseAttributes(level);
-            cacheIncreaseAttributesRate = buff.GetIncreaseAttributesRate(level);
-            cacheIncreaseResistances = buff.GetIncreaseResistances(level);
-            cacheIncreaseArmors = buff.GetIncreaseArmors(level);
-            cacheIncreaseDamages = buff.GetIncreaseDamages(level);
-            cacheDamageOverTimes = buff.GetDamageOverTimes(level);
+            buff.GetIncreaseAttributes(level, cacheIncreaseAttributes);
+            buff.GetIncreaseAttributesRate(level, cacheIncreaseAttributesRate);
+            buff.GetIncreaseResistances(level, cacheIncreaseResistances);
+            buff.GetIncreaseArmors(level, cacheIncreaseArmors);
+            buff.GetIncreaseDamages(level, cacheIncreaseDamages);
+            buff.GetDamageOverTimes(level, cacheDamageOverTimes);
             cacheRemoveBuffWhenAttackChance = buff.GetRemoveBuffWhenAttackChance(level);
             cacheRemoveBuffWhenAttackedChance = buff.GetRemoveBuffWhenAttackedChance(level);
             cacheRemoveBuffWhenUseSkillChance = buff.GetRemoveBuffWhenUseSkillChance(level);

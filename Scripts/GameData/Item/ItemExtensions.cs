@@ -118,10 +118,11 @@ namespace MultiplayerARPG
             return equipmentItem.IncreaseStatsRate.GetCharacterStats(level) + ItemRandomBonusCacheManager.GetCaches(equipmentItem, randomSeed).CharacterStatsRate;
         }
 
-        public static Dictionary<Attribute, float> GetIncreaseAttributes<T>(this T equipmentItem, int level, int randomSeed)
+        public static Dictionary<Attribute, float> GetIncreaseAttributes<T>(this T equipmentItem, int level, int randomSeed, Dictionary<Attribute, float> result = null)
             where T : IEquipmentItem
         {
-            Dictionary<Attribute, float> result = new Dictionary<Attribute, float>();
+            if (result == null)
+                result = new Dictionary<Attribute, float>();
             if (equipmentItem != null && equipmentItem.IsEquipment())
             {
                 result = GameDataHelpers.CombineAttributes(equipmentItem.IncreaseAttributes, result, level, 1f);
@@ -132,10 +133,11 @@ namespace MultiplayerARPG
             return result;
         }
 
-        public static Dictionary<Attribute, float> GetIncreaseAttributesRate<T>(this T equipmentItem, int level, int randomSeed)
+        public static Dictionary<Attribute, float> GetIncreaseAttributesRate<T>(this T equipmentItem, int level, int randomSeed, Dictionary<Attribute, float> result = null)
             where T : IEquipmentItem
         {
-            Dictionary<Attribute, float> result = new Dictionary<Attribute, float>();
+            if (result == null)
+                result = new Dictionary<Attribute, float>();
             if (equipmentItem != null && equipmentItem.IsEquipment())
             {
                 result = GameDataHelpers.CombineAttributes(equipmentItem.IncreaseAttributesRate, result, level, 1f);
@@ -146,10 +148,11 @@ namespace MultiplayerARPG
             return result;
         }
 
-        public static Dictionary<DamageElement, float> GetIncreaseResistances<T>(this T equipmentItem, int level, int randomSeed)
+        public static Dictionary<DamageElement, float> GetIncreaseResistances<T>(this T equipmentItem, int level, int randomSeed, Dictionary<DamageElement, float> result = null)
             where T : IEquipmentItem
         {
-            Dictionary<DamageElement, float> result = new Dictionary<DamageElement, float>();
+            if (result == null)
+                result = new Dictionary<DamageElement, float>();
             if (equipmentItem != null && equipmentItem.IsEquipment())
             {
                 result = GameDataHelpers.CombineResistances(equipmentItem.IncreaseResistances, result, level, 1f);
@@ -160,10 +163,11 @@ namespace MultiplayerARPG
             return result;
         }
 
-        public static Dictionary<DamageElement, float> GetIncreaseArmors<T>(this T equipmentItem, int level, int randomSeed)
+        public static Dictionary<DamageElement, float> GetIncreaseArmors<T>(this T equipmentItem, int level, int randomSeed, Dictionary<DamageElement, float> result = null)
             where T : IEquipmentItem
         {
-            Dictionary<DamageElement, float> result = new Dictionary<DamageElement, float>();
+            if (result == null)
+                result = new Dictionary<DamageElement, float>();
             if (equipmentItem != null && equipmentItem.IsEquipment())
             {
                 result = GameDataHelpers.CombineArmors(equipmentItem.IncreaseArmors, result, level, 1f);
@@ -174,10 +178,11 @@ namespace MultiplayerARPG
             return result;
         }
 
-        public static Dictionary<DamageElement, MinMaxFloat> GetIncreaseDamages<T>(this T equipmentItem, int level, int randomSeed)
+        public static Dictionary<DamageElement, MinMaxFloat> GetIncreaseDamages<T>(this T equipmentItem, int level, int randomSeed, Dictionary<DamageElement, MinMaxFloat> result = null)
             where T : IEquipmentItem
         {
-            Dictionary<DamageElement, MinMaxFloat> result = new Dictionary<DamageElement, MinMaxFloat>();
+            if (result == null)
+                result = new Dictionary<DamageElement, MinMaxFloat>();
             if (equipmentItem != null && equipmentItem.IsEquipment())
             {
                 result = GameDataHelpers.CombineDamages(equipmentItem.IncreaseDamages, result, level, 1f);
@@ -188,10 +193,11 @@ namespace MultiplayerARPG
             return result;
         }
 
-        public static Dictionary<BaseSkill, int> GetIncreaseSkills<T>(this T equipmentItem, int level, int randomSeed)
+        public static Dictionary<BaseSkill, int> GetIncreaseSkills<T>(this T equipmentItem, int level, int randomSeed, Dictionary<BaseSkill, int> result = null)
             where T : IEquipmentItem
         {
-            Dictionary<BaseSkill, int> result = new Dictionary<BaseSkill, int>();
+            if (result == null)
+                result = new Dictionary<BaseSkill, int>();
             if (equipmentItem != null && equipmentItem.IsEquipment())
             {
                 result = GameDataHelpers.CombineSkills(equipmentItem.IncreaseSkills, result, level, 1f);
