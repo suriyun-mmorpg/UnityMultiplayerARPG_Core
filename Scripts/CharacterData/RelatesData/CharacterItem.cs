@@ -231,22 +231,16 @@ namespace MultiplayerARPG
         public bool IsAmmoEmpty()
         {
             IWeaponItem item = GetWeaponItem();
-            if (item != null)
-            {
-                if (item.AmmoCapacity > 0)
-                    return ammo == 0;
-            }
+            if (item != null && item.AmmoCapacity > 0)
+                return ammo == 0;
             return false;
         }
 
         public bool IsAmmoFull()
         {
             IWeaponItem item = GetWeaponItem();
-            if (item != null)
-            {
-                if (item.AmmoCapacity > 0)
-                    return ammo >= item.AmmoCapacity;
-            }
+            if (item != null && item.AmmoCapacity > 0)
+                return ammo >= item.AmmoCapacity;
             return true;
         }
 
@@ -290,23 +284,26 @@ namespace MultiplayerARPG
 
         public KeyValuePair<DamageElement, float> GetArmorAmount()
         {
-            if (GetDefendItem() == null)
+            IDefendEquipmentItem item = GetDefendItem();
+            if (item == null)
                 return new KeyValuePair<DamageElement, float>();
-            return GetDefendItem().GetArmorAmount(level, GetEquipmentStatsRate());
+            return item.GetArmorAmount(level, GetEquipmentStatsRate());
         }
 
         public KeyValuePair<DamageElement, MinMaxFloat> GetDamageAmount(ICharacterData characterData)
         {
-            if (GetWeaponItem() == null)
+            IWeaponItem item = GetWeaponItem();
+            if (item == null)
                 return new KeyValuePair<DamageElement, MinMaxFloat>();
-            return GetWeaponItem().GetDamageAmount(level, GetEquipmentStatsRate(), characterData);
+            return item.GetDamageAmount(level, GetEquipmentStatsRate(), characterData);
         }
 
         public KeyValuePair<DamageElement, MinMaxFloat> GetPureDamageAmount()
         {
-            if (GetWeaponItem() == null)
+            IWeaponItem item = GetWeaponItem();
+            if (item == null)
                 return new KeyValuePair<DamageElement, MinMaxFloat>();
-            return GetWeaponItem().GetDamageAmount(level, GetEquipmentStatsRate(), 1f);
+            return item.GetDamageAmount(level, GetEquipmentStatsRate(), 1f);
         }
 
         public float GetWeaponDamageBattlePoints()
@@ -508,8 +505,9 @@ namespace MultiplayerARPG
                 writer.Put(id);
                 return;
             }
-            bool isEquipment = GetEquipmentItem() != null;
-            bool isWeapon = isEquipment && GetWeaponItem() != null;
+            MakeCache();
+            bool isEquipment = cacheEquipmentItem != null;
+            bool isWeapon = isEquipment && cacheWeaponItem != null;
             bool isPet = GetPetItem() != null;
             CharacterItemSyncState syncState = CharacterItemSyncState.None;
             if (isEquipment)
