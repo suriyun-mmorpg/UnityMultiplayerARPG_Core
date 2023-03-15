@@ -7,8 +7,6 @@ namespace MultiplayerARPG
         private IEquipmentItem item;
         private int level;
         private int randomSeed;
-        private KeyValuePair<DamageElement, float> armorAmount = new KeyValuePair<DamageElement, float>();
-        private KeyValuePair<DamageElement, MinMaxFloat> damageAmount = new KeyValuePair<DamageElement, MinMaxFloat>();
         private CharacterStats increaseStats = CharacterStats.Empty;
         private CharacterStats increaseStatsRate = CharacterStats.Empty;
         private Dictionary<Attribute, float> increaseAttributes = new Dictionary<Attribute, float>();
