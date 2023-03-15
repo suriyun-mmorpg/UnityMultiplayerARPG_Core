@@ -18,6 +18,16 @@ namespace MultiplayerARPG
         private Dictionary<DamageElement, MinMaxFloat> increaseDamages = new Dictionary<DamageElement, MinMaxFloat>();
         private Dictionary<BaseSkill, int> increaseSkills = new Dictionary<BaseSkill, int>();
 
+        public CalculatedItemBuff()
+        {
+
+        }
+
+        public CalculatedItemBuff(IEquipmentItem item, int level, int randomSeed)
+        {
+            Build(item, level, randomSeed);
+        }
+
         public void Build(IEquipmentItem item, int level, int randomSeed)
         {
             this.item = item;

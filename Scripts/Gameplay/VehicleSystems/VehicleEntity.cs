@@ -77,7 +77,7 @@ namespace MultiplayerARPG
         protected readonly Dictionary<byte, BaseGameEntity> passengers = new Dictionary<byte, BaseGameEntity>();
         protected readonly Dictionary<uint, UnityAction<LiteNetLibIdentity>> spawnEvents = new Dictionary<uint, UnityAction<LiteNetLibIdentity>>();
         protected bool isDestroyed;
-        protected CalculatedBuff cacheBuff;
+        protected CalculatedBuff cacheBuff = new CalculatedBuff();
         protected int dirtyLevel = int.MinValue;
 
         protected override sealed void EntityAwake()
@@ -390,7 +390,7 @@ namespace MultiplayerARPG
             if (dirtyLevel != level)
             {
                 dirtyLevel = level;
-                cacheBuff = new CalculatedBuff(buff, level);
+                cacheBuff.Build(buff, level);
             }
         }
 

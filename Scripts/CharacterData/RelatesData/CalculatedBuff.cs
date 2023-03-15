@@ -27,6 +27,16 @@ namespace MultiplayerARPG
         private float cacheRemoveBuffWhenPickupItemChance;
         private int cacheMaxStack;
 
+        public CalculatedBuff()
+        {
+
+        }
+
+        public CalculatedBuff(Buff buff, int level)
+        {
+            Build(buff, level);
+        }
+
         public void Build(Buff buff, int level)
         {
             this.buff = buff;

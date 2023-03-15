@@ -24,7 +24,7 @@ namespace MultiplayerARPG
         [System.NonSerialized]
         private BaseMonsterCharacterEntity cachePrefab;
         [System.NonSerialized]
-        private CalculatedBuff cacheBuff;
+        private CalculatedBuff cacheBuff = new CalculatedBuff();
 
         [System.NonSerialized]
         private BaseMonsterCharacterEntity cacheEntity;
@@ -66,7 +66,7 @@ namespace MultiplayerARPG
                 }
                 if (cachePrefab != null && cachePrefab.CharacterDatabase != null)
                     tempBuff = cachePrefab.CharacterDatabase.SummonerBuff;
-                cacheBuff = new CalculatedBuff(tempBuff, level);
+                cacheBuff.Build(tempBuff, level);
             }
         }
 
