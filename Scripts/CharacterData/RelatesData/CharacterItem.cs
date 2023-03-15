@@ -302,6 +302,25 @@ namespace MultiplayerARPG
             return GetWeaponItem().GetDamageAmount(level, GetEquipmentStatsRate(), characterData);
         }
 
+        public KeyValuePair<DamageElement, MinMaxFloat> GetPureDamageAmount()
+        {
+            if (GetWeaponItem() == null)
+                return new KeyValuePair<DamageElement, MinMaxFloat>();
+            return GetWeaponItem().GetDamageAmount(level, GetEquipmentStatsRate(), 1f);
+        }
+
+        public float GetWeaponDamageBattlePoints()
+        {
+            if (GetWeaponItem() == null)
+                return 0f;
+            KeyValuePair<DamageElement, MinMaxFloat> kv = GetPureDamageAmount();
+            DamageElement tempDamageElement = kv.Key;
+            if (tempDamageElement == null)
+                tempDamageElement = GameInstance.Singleton.DefaultDamageElement;
+            MinMaxFloat amount = kv.Value;
+            return tempDamageElement.DamageBattlePointScore * (amount.min + amount.max) * 0.5f;
+        }
+
         public CalculatedItemBuff GetBuff()
         {
             MakeCache();

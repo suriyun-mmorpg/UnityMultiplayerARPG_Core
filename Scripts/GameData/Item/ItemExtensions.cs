@@ -279,9 +279,15 @@ namespace MultiplayerARPG
         public static KeyValuePair<DamageElement, MinMaxFloat> GetDamageAmount<T>(this T weaponItem, int itemLevel, float statsRate, ICharacterData character)
             where T : IWeaponItem
         {
+            return weaponItem.GetDamageAmount(itemLevel, statsRate, weaponItem.GetEffectivenessDamage(character));
+        }
+
+        public static KeyValuePair<DamageElement, MinMaxFloat> GetDamageAmount<T>(this T weaponItem, int itemLevel, float statsRate, float effectiveness)
+            where T : IWeaponItem
+        {
             if (weaponItem == null || !weaponItem.IsWeapon())
                 return new KeyValuePair<DamageElement, MinMaxFloat>();
-            return GameDataHelpers.ToKeyValuePair(weaponItem.DamageAmount, itemLevel, statsRate, weaponItem.GetEffectivenessDamage(character));
+            return GameDataHelpers.ToKeyValuePair(weaponItem.DamageAmount, itemLevel, statsRate, effectiveness);
         }
 
         public static float GetEffectivenessDamage<T>(this T weaponItem, ICharacterData character)
