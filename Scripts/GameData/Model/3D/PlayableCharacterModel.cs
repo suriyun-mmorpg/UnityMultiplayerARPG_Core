@@ -40,7 +40,7 @@ namespace MultiplayerARPG.GameData.Model.Playables
         public PlayableGraph Graph { get; protected set; }
         public AnimationPlayableBehaviour Template { get; protected set; }
         public AnimationPlayableBehaviour Behaviour { get; protected set; }
-        public float AwakenTime { get; protected set; }
+        public int AwakenFrame { get; protected set; }
 
         protected WeaponType equippedWeaponType = null;
         protected Coroutine actionCoroutine = null;
@@ -51,7 +51,7 @@ namespace MultiplayerARPG.GameData.Model.Playables
         protected override void Awake()
         {
             base.Awake();
-            AwakenTime = Time.unscaledTime;
+            AwakenFrame = Time.frameCount;
             if (animator == null)
                 animator = GetComponentInChildren<Animator>();
             Template = new AnimationPlayableBehaviour();
@@ -207,13 +207,15 @@ namespace MultiplayerARPG.GameData.Model.Playables
             if (Behaviour != null)
                 Behaviour.SetEquipWeapons(rightWeaponItem, leftWeaponItem, newEquipWeapons.GetLeftHandShieldItem());
             // Player draw/holster animation
-            if (oldEquipWeapons == null)
-                oldEquipWeapons = newEquipWeapons;
-            if (Time.unscaledTime - AwakenTime < 1f || !newEquipWeapons.IsDiffer(oldEquipWeapons, out bool rightIsDiffer, out bool leftIsDiffer))
+            if (Time.frameCount - AwakenFrame < 2 || !newEquipWeapons.IsDiffer(oldEquipWeapons, out bool rightIsDiffer, out bool leftIsDiffer))
             {
+                if (oldEquipWeapons == null)
+                    oldEquipWeapons = newEquipWeapons;
                 SetNewEquipWeapons(newEquipWeapons, selectableWeaponSets, equipWeaponSet, isWeaponsSheathed);
                 return;
             }
+            if (oldEquipWeapons == null)
+                oldEquipWeapons = newEquipWeapons;
             StartActionCoroutine(PlayEquipWeaponsAnimationRoutine(newEquipWeapons, rightIsDiffer, leftIsDiffer, selectableWeaponSets, equipWeaponSet, isWeaponsSheathed), () => SetNewEquipWeapons(newEquipWeapons, selectableWeaponSets, equipWeaponSet, isWeaponsSheathed));
         }
 
