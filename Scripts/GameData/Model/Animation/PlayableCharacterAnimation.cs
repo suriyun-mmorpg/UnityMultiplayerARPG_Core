@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace MultiplayerARPG.GameData.Model.Playables
 {
@@ -33,12 +34,19 @@ namespace MultiplayerARPG.GameData.Model.Playables
     [System.Serializable]
     public struct HolsterAnimation
     {
-        public ActionState holsterState;
+        [Header("Sheath")]
+        [FormerlySerializedAs("holsterState")]
+        public ActionState sheathState;
         [Range(0f, 1f)]
-        public float holsteredDurationRate;
-        public ActionState drawState;
+        [FormerlySerializedAs("holsteredDurationRate")]
+        public float sheatedDurationRate;
+
+        [Header("Unsheath")]
+        [FormerlySerializedAs("drawState")]
+        public ActionState unsheathState;
         [Range(0f, 1f)]
-        public float drawnDurationRate;
+        [FormerlySerializedAs("drawnDurationRate")]
+        public float unsheathedDurationRate;
     }
 
     [System.Serializable]
@@ -189,9 +197,11 @@ namespace MultiplayerARPG.GameData.Model.Playables
         public ActionAnimation rightHandReloadAnimation;
         public ActionAnimation leftHandReloadAnimation;
 
-        [Header("Draw/Holster Animations")]
-        public HolsterAnimation rightHandHolsterAnimation;
-        public HolsterAnimation leftHandHolsterAnimation;
+        [Header("Sheath/Unsheath Animations")]
+        [FormerlySerializedAs("rightHandHolsterAnimation")]
+        public HolsterAnimation rightHandSheathingAnimation;
+        [FormerlySerializedAs("leftHandHolsterAnimation")]
+        public HolsterAnimation leftHandSheathingAnimation;
 
         public WeaponType Data { get { return weaponType; } }
     }
