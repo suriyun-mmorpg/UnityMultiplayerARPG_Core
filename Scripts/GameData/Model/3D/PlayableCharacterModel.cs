@@ -224,44 +224,95 @@ namespace MultiplayerARPG.GameData.Model.Playables
             base.SetEquipWeapons(selectableWeaponSets, equipWeaponSet, isWeaponsSheathed);
         }
 
+        public void GetRightHandSheathActionState(EquipWeapons oldEquipWeapons, out ActionState actionState, out float triggeredDurationRate)
+        {
+            IWeaponItem tempWeaponItem = oldEquipWeapons.GetRightHandWeaponItem();
+            if (tempWeaponItem != null && TryGetWeaponAnimations(tempWeaponItem.WeaponType.DataId, out WeaponAnimations anims) && anims.rightHandWeaponSheathingAnimation.sheathState.clip != null)
+            {
+                actionState = anims.rightHandWeaponSheathingAnimation.sheathState;
+                triggeredDurationRate = anims.rightHandWeaponSheathingAnimation.sheathedDurationRate;
+            }
+            else
+            {
+                actionState = defaultAnimations.rightHandWeaponSheathingAnimation.sheathState;
+                triggeredDurationRate = defaultAnimations.rightHandWeaponSheathingAnimation.sheathedDurationRate;
+            }
+        }
+
+        public void GetLeftHandSheathActionState(EquipWeapons oldEquipWeapons, out ActionState actionState, out float triggeredDurationRate)
+        {
+            IWeaponItem tempWeaponItem = oldEquipWeapons.GetLeftHandWeaponItem();
+            IShieldItem tempShieldItem = oldEquipWeapons.GetLeftHandShieldItem();
+            if (tempWeaponItem != null && TryGetWeaponAnimations(tempWeaponItem.WeaponType.DataId, out WeaponAnimations anims) && anims.leftHandWeaponSheathingAnimation.sheathState.clip != null)
+            {
+                actionState = anims.leftHandWeaponSheathingAnimation.sheathState;
+                triggeredDurationRate = anims.leftHandWeaponSheathingAnimation.sheathedDurationRate;
+            }
+            else if (tempShieldItem != null)
+            {
+                actionState = defaultAnimations.leftHandShieldSheathingAnimation.sheathState;
+                triggeredDurationRate = defaultAnimations.leftHandShieldSheathingAnimation.sheathedDurationRate;
+            }
+            else
+            {
+                actionState = defaultAnimations.leftHandWeaponSheathingAnimation.sheathState;
+                triggeredDurationRate = defaultAnimations.leftHandWeaponSheathingAnimation.sheathedDurationRate;
+            }
+        }
+
+        public void GetRightHandUnsheathActionState(EquipWeapons newEquipWeapons, out ActionState actionState, out float triggeredDurationRate)
+        {
+            IWeaponItem tempWeaponItem = newEquipWeapons.GetRightHandWeaponItem();
+            if (tempWeaponItem != null && TryGetWeaponAnimations(tempWeaponItem.WeaponType.DataId, out WeaponAnimations anims) && anims.rightHandWeaponSheathingAnimation.unsheathState.clip != null)
+            {
+                actionState = anims.rightHandWeaponSheathingAnimation.unsheathState;
+                triggeredDurationRate = anims.rightHandWeaponSheathingAnimation.unsheathedDurationRate;
+            }
+            else
+            {
+                actionState = defaultAnimations.rightHandWeaponSheathingAnimation.unsheathState;
+                triggeredDurationRate = defaultAnimations.rightHandWeaponSheathingAnimation.unsheathedDurationRate;
+            }
+        }
+
+        public void GetLeftHandUnsheathActionState(EquipWeapons newEquipWeapons, out ActionState actionState, out float triggeredDurationRate)
+        {
+            IWeaponItem tempWeaponItem = oldEquipWeapons.GetLeftHandWeaponItem();
+            IShieldItem tempShieldItem = oldEquipWeapons.GetLeftHandShieldItem();
+            if (tempWeaponItem != null && TryGetWeaponAnimations(tempWeaponItem.WeaponType.DataId, out WeaponAnimations anims) && anims.leftHandWeaponSheathingAnimation.sheathState.clip != null)
+            {
+                actionState = anims.leftHandWeaponSheathingAnimation.unsheathState;
+                triggeredDurationRate = anims.leftHandWeaponSheathingAnimation.unsheathedDurationRate;
+            }
+            else if (tempShieldItem != null)
+            {
+                actionState = defaultAnimations.leftHandShieldSheathingAnimation.unsheathState;
+                triggeredDurationRate = defaultAnimations.leftHandShieldSheathingAnimation.unsheathedDurationRate;
+            }
+            else
+            {
+                actionState = defaultAnimations.leftHandWeaponSheathingAnimation.unsheathState;
+                triggeredDurationRate = defaultAnimations.leftHandWeaponSheathingAnimation.unsheathedDurationRate;
+            }
+        }
+
         private IEnumerator PlayEquipWeaponsAnimationRoutine(EquipWeapons newEquipWeapons, bool rightIsDiffer, bool leftIsDiffer, IList<EquipWeapons> selectableWeaponSets, byte equipWeaponSet, bool isWeaponsSheathed)
         {
             isDoingAction = true;
 
-            IWeaponItem tempWeaponItem;
-            float triggeredDurationRate = 0f;
             ActionState actionState = new ActionState();
+            float triggeredDurationRate = 0f;
             if (isWeaponsSheathed)
             {
                 if (oldEquipWeapons != null)
                 {
                     if (rightIsDiffer)
                     {
-                        tempWeaponItem = oldEquipWeapons.GetRightHandWeaponItem();
-                        if (tempWeaponItem != null && TryGetWeaponAnimations(tempWeaponItem.WeaponType.DataId, out WeaponAnimations anims) && anims.rightHandSheathingAnimation.sheathState.clip != null)
-                        {
-                            actionState = anims.rightHandSheathingAnimation.sheathState;
-                            triggeredDurationRate = anims.rightHandSheathingAnimation.sheatedDurationRate;
-                        }
-                        else
-                        {
-                            actionState = defaultAnimations.rightHandHolsterAnimation.sheathState;
-                            triggeredDurationRate = defaultAnimations.rightHandHolsterAnimation.sheatedDurationRate;
-                        }
+                        GetRightHandSheathActionState(oldEquipWeapons, out actionState, out triggeredDurationRate);
                     }
                     else if (leftIsDiffer)
                     {
-                        tempWeaponItem = oldEquipWeapons.GetLeftHandWeaponItem();
-                        if (tempWeaponItem != null && TryGetWeaponAnimations(tempWeaponItem.WeaponType.DataId, out WeaponAnimations anims) && anims.leftHandSheathingAnimation.sheathState.clip != null)
-                        {
-                            actionState = anims.leftHandSheathingAnimation.sheathState;
-                            triggeredDurationRate = anims.leftHandSheathingAnimation.sheatedDurationRate;
-                        }
-                        else
-                        {
-                            actionState = defaultAnimations.leftHandHolsterAnimation.sheathState;
-                            triggeredDurationRate = defaultAnimations.leftHandHolsterAnimation.sheatedDurationRate;
-                        }
+                        GetLeftHandSheathActionState(oldEquipWeapons, out actionState, out triggeredDurationRate);
                     }
                 }
             }
@@ -271,31 +322,17 @@ namespace MultiplayerARPG.GameData.Model.Playables
                 {
                     if (rightIsDiffer)
                     {
-                        tempWeaponItem = newEquipWeapons.GetRightHandWeaponItem();
-                        if (tempWeaponItem != null && TryGetWeaponAnimations(tempWeaponItem.WeaponType.DataId, out WeaponAnimations anims) && anims.rightHandSheathingAnimation.unsheathState.clip != null)
-                        {
-                            actionState = anims.rightHandSheathingAnimation.unsheathState;
-                            triggeredDurationRate = anims.rightHandSheathingAnimation.unsheathedDurationRate;
-                        }
+                        if (newEquipWeapons.IsEmptyRightHandSlot())
+                            GetRightHandSheathActionState(oldEquipWeapons, out actionState, out triggeredDurationRate);
                         else
-                        {
-                            actionState = defaultAnimations.rightHandHolsterAnimation.unsheathState;
-                            triggeredDurationRate = defaultAnimations.rightHandHolsterAnimation.unsheathedDurationRate;
-                        }
+                            GetRightHandUnsheathActionState(newEquipWeapons, out actionState, out triggeredDurationRate);
                     }
                     else if (leftIsDiffer)
                     {
-                        tempWeaponItem = newEquipWeapons.GetLeftHandWeaponItem();
-                        if (tempWeaponItem != null && TryGetWeaponAnimations(tempWeaponItem.WeaponType.DataId, out WeaponAnimations anims) && anims.leftHandSheathingAnimation.unsheathState.clip != null)
-                        {
-                            actionState = anims.leftHandSheathingAnimation.unsheathState;
-                            triggeredDurationRate = anims.leftHandSheathingAnimation.unsheathedDurationRate;
-                        }
+                        if (newEquipWeapons.IsEmptyLeftHandSlot())
+                            GetLeftHandSheathActionState(oldEquipWeapons, out actionState, out triggeredDurationRate);
                         else
-                        {
-                            actionState = defaultAnimations.leftHandHolsterAnimation.unsheathState;
-                            triggeredDurationRate = defaultAnimations.leftHandHolsterAnimation.unsheathedDurationRate;
-                        }
+                            GetLeftHandUnsheathActionState(newEquipWeapons, out actionState, out triggeredDurationRate);
                     }
                 }
             }

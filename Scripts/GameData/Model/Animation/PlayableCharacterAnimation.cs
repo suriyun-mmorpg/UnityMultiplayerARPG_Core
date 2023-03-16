@@ -39,7 +39,7 @@ namespace MultiplayerARPG.GameData.Model.Playables
         public ActionState sheathState;
         [Range(0f, 1f)]
         [FormerlySerializedAs("holsteredDurationRate")]
-        public float sheatedDurationRate;
+        public float sheathedDurationRate;
 
         [Header("Unsheath")]
         [FormerlySerializedAs("drawState")]
@@ -199,9 +199,9 @@ namespace MultiplayerARPG.GameData.Model.Playables
 
         [Header("Sheath/Unsheath Animations")]
         [FormerlySerializedAs("rightHandHolsterAnimation")]
-        public HolsterAnimation rightHandSheathingAnimation;
+        public HolsterAnimation rightHandWeaponSheathingAnimation;
         [FormerlySerializedAs("leftHandHolsterAnimation")]
-        public HolsterAnimation leftHandSheathingAnimation;
+        public HolsterAnimation leftHandWeaponSheathingAnimation;
 
         public WeaponType Data { get { return weaponType; } }
     }
@@ -316,8 +316,11 @@ namespace MultiplayerARPG.GameData.Model.Playables
         public ActionState skillCastState;
         public ActionAnimation skillActivateAnimation;
 
-        [Header("Draw/Holster Animations")]
-        public HolsterAnimation rightHandHolsterAnimation;
-        public HolsterAnimation leftHandHolsterAnimation;
+        [Header("Sheath/Unsheath Animations")]
+        [FormerlySerializedAs("rightHandHolsterAnimation")]
+        public HolsterAnimation rightHandWeaponSheathingAnimation;
+        [FormerlySerializedAs("leftHandHolsterAnimation")]
+        public HolsterAnimation leftHandWeaponSheathingAnimation;
+        public HolsterAnimation leftHandShieldSheathingAnimation;
     }
 }
