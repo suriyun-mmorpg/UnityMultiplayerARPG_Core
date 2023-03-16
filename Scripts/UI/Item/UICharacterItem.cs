@@ -110,6 +110,7 @@ namespace MultiplayerARPG
         public UISkillLevels uiIncreaseSkillLevels;
         public UIEquipmentSet uiEquipmentSet;
         public UIEquipmentSockets uiEquipmentSockets;
+        public UIItemRandomBonus uiItemRandomBonus;
         [Tooltip("Use this component to show refine info, if you are going to refine when click button, use `OnClickRefineItem` function")]
         public UIRefineItem uiRefineItem;
         [Tooltip("Use this component to show dismantle info, if you are going to dismantle when click button, use `OnClickDismantleItem` function")]
@@ -891,6 +892,19 @@ namespace MultiplayerARPG
                 {
                     uiEquipmentSockets.Show();
                     uiEquipmentSockets.Data = new UIEquipmentSocketsData(CharacterItem.Sockets, EquipmentItem.MaxSocket);
+                }
+            }
+
+            if (uiItemRandomBonus != null)
+            {
+                if (EquipmentItem == null)
+                {
+                    uiItemRandomBonus.Hide();
+                }
+                else
+                {
+                    uiItemRandomBonus.Show();
+                    uiItemRandomBonus.Data = EquipmentItem.RandomBonus;
                 }
             }
 
