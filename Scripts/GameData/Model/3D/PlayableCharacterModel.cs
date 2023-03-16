@@ -207,15 +207,13 @@ namespace MultiplayerARPG.GameData.Model.Playables
             if (Behaviour != null)
                 Behaviour.SetEquipWeapons(rightWeaponItem, leftWeaponItem, newEquipWeapons.GetLeftHandShieldItem());
             // Player draw/holster animation
+            if (oldEquipWeapons == null)
+                oldEquipWeapons = newEquipWeapons;
             if (Time.frameCount - AwakenFrame < 2 || !newEquipWeapons.IsDiffer(oldEquipWeapons, out bool rightIsDiffer, out bool leftIsDiffer))
             {
-                if (oldEquipWeapons == null)
-                    oldEquipWeapons = newEquipWeapons;
                 SetNewEquipWeapons(newEquipWeapons, selectableWeaponSets, equipWeaponSet, isWeaponsSheathed);
                 return;
             }
-            if (oldEquipWeapons == null)
-                oldEquipWeapons = newEquipWeapons;
             StartActionCoroutine(PlayEquipWeaponsAnimationRoutine(newEquipWeapons, rightIsDiffer, leftIsDiffer, selectableWeaponSets, equipWeaponSet, isWeaponsSheathed), () => SetNewEquipWeapons(newEquipWeapons, selectableWeaponSets, equipWeaponSet, isWeaponsSheathed));
         }
 
