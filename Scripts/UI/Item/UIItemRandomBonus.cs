@@ -38,89 +38,89 @@ namespace MultiplayerARPG
         private void WriteCharacterStats(StringBuilder builder)
         {
             // Hp
-            WriteEntry(builder, LanguageManager.GetText(UIFormatKeys.UI_FORMAT_HP.ToString()), Data.randomCharacterStats.hpApplyRate, Data.randomCharacterStats.minHp, Data.randomCharacterStats.maxHp);
-            WriteEntry(builder, LanguageManager.GetText(UIFormatKeys.UI_FORMAT_HP_RECOVERY.ToString()), Data.randomCharacterStats.hpRecoveryApplyRate, Data.randomCharacterStats.minHpRecovery, Data.randomCharacterStats.maxHpRecovery);
-            WriteEntry(builder, LanguageManager.GetText(UIFormatKeys.UI_FORMAT_HP_LEECH_RATE.ToString()), Data.randomCharacterStats.hpLeechRateApplyRate, Data.randomCharacterStats.minHpLeechRate, Data.randomCharacterStats.maxHpLeechRate);
+            WriteEntry(builder, LanguageManager.GetText(UIFormatKeys.UI_FORMAT_HP.ToString()), Data.randomCharacterStats.hpApplyRate, Data.randomCharacterStats.minHp, Data.randomCharacterStats.maxHp, numberFormat: "N0");
+            WriteEntry(builder, LanguageManager.GetText(UIFormatKeys.UI_FORMAT_HP_RECOVERY.ToString()), Data.randomCharacterStats.hpRecoveryApplyRate, Data.randomCharacterStats.minHpRecovery, Data.randomCharacterStats.maxHpRecovery, numberFormat: "N0");
+            WriteEntry(builder, LanguageManager.GetText(UIFormatKeys.UI_FORMAT_HP_LEECH_RATE.ToString()), Data.randomCharacterStats.hpLeechRateApplyRate, Data.randomCharacterStats.minHpLeechRate, Data.randomCharacterStats.maxHpLeechRate, 100f);
             // Mp
-            WriteEntry(builder, LanguageManager.GetText(UIFormatKeys.UI_FORMAT_MP.ToString()), Data.randomCharacterStats.mpApplyRate, Data.randomCharacterStats.minMp, Data.randomCharacterStats.maxMp);
-            WriteEntry(builder, LanguageManager.GetText(UIFormatKeys.UI_FORMAT_MP_RECOVERY.ToString()), Data.randomCharacterStats.mpRecoveryApplyRate, Data.randomCharacterStats.minMpRecovery, Data.randomCharacterStats.maxMpRecovery);
-            WriteEntry(builder, LanguageManager.GetText(UIFormatKeys.UI_FORMAT_MP_LEECH_RATE.ToString()), Data.randomCharacterStats.mpLeechRateApplyRate, Data.randomCharacterStats.minMpLeechRate, Data.randomCharacterStats.maxMpLeechRate);
+            WriteEntry(builder, LanguageManager.GetText(UIFormatKeys.UI_FORMAT_MP.ToString()), Data.randomCharacterStats.mpApplyRate, Data.randomCharacterStats.minMp, Data.randomCharacterStats.maxMp, numberFormat: "N0");
+            WriteEntry(builder, LanguageManager.GetText(UIFormatKeys.UI_FORMAT_MP_RECOVERY.ToString()), Data.randomCharacterStats.mpRecoveryApplyRate, Data.randomCharacterStats.minMpRecovery, Data.randomCharacterStats.maxMpRecovery, numberFormat: "N0");
+            WriteEntry(builder, LanguageManager.GetText(UIFormatKeys.UI_FORMAT_MP_LEECH_RATE.ToString()), Data.randomCharacterStats.mpLeechRateApplyRate, Data.randomCharacterStats.minMpLeechRate, Data.randomCharacterStats.maxMpLeechRate, 100f);
             // Stamina
-            WriteEntry(builder, LanguageManager.GetText(UIFormatKeys.UI_FORMAT_STAMINA.ToString()), Data.randomCharacterStats.staminaApplyRate, Data.randomCharacterStats.minStamina, Data.randomCharacterStats.maxStamina);
-            WriteEntry(builder, LanguageManager.GetText(UIFormatKeys.UI_FORMAT_STAMINA_RECOVERY.ToString()), Data.randomCharacterStats.staminaRecoveryApplyRate, Data.randomCharacterStats.minStaminaRecovery, Data.randomCharacterStats.maxStaminaRecovery);
-            WriteEntry(builder, LanguageManager.GetText(UIFormatKeys.UI_FORMAT_STAMINA_LEECH_RATE.ToString()), Data.randomCharacterStats.staminaLeechRateApplyRate, Data.randomCharacterStats.minStaminaLeechRate, Data.randomCharacterStats.maxStaminaLeechRate);
+            WriteEntry(builder, LanguageManager.GetText(UIFormatKeys.UI_FORMAT_STAMINA.ToString()), Data.randomCharacterStats.staminaApplyRate, Data.randomCharacterStats.minStamina, Data.randomCharacterStats.maxStamina, numberFormat: "N0");
+            WriteEntry(builder, LanguageManager.GetText(UIFormatKeys.UI_FORMAT_STAMINA_RECOVERY.ToString()), Data.randomCharacterStats.staminaRecoveryApplyRate, Data.randomCharacterStats.minStaminaRecovery, Data.randomCharacterStats.maxStaminaRecovery, numberFormat: "N0");
+            WriteEntry(builder, LanguageManager.GetText(UIFormatKeys.UI_FORMAT_STAMINA_LEECH_RATE.ToString()), Data.randomCharacterStats.staminaLeechRateApplyRate, Data.randomCharacterStats.minStaminaLeechRate, Data.randomCharacterStats.maxStaminaLeechRate, 100f);
             // Food
-            WriteEntry(builder, LanguageManager.GetText(UIFormatKeys.UI_FORMAT_FOOD.ToString()), Data.randomCharacterStats.foodApplyRate, Data.randomCharacterStats.minFood, Data.randomCharacterStats.maxFood);
+            WriteEntry(builder, LanguageManager.GetText(UIFormatKeys.UI_FORMAT_FOOD.ToString()), Data.randomCharacterStats.foodApplyRate, Data.randomCharacterStats.minFood, Data.randomCharacterStats.maxFood, numberFormat: "N0");
             // Water
-            WriteEntry(builder, LanguageManager.GetText(UIFormatKeys.UI_FORMAT_WATER.ToString()), Data.randomCharacterStats.waterApplyRate, Data.randomCharacterStats.minWater, Data.randomCharacterStats.maxWater);
+            WriteEntry(builder, LanguageManager.GetText(UIFormatKeys.UI_FORMAT_WATER.ToString()), Data.randomCharacterStats.waterApplyRate, Data.randomCharacterStats.minWater, Data.randomCharacterStats.maxWater, numberFormat: "N0");
             // Accuracy
-            WriteEntry(builder, LanguageManager.GetText(UIFormatKeys.UI_FORMAT_ACCURACY.ToString()), Data.randomCharacterStats.accuracyApplyRate, Data.randomCharacterStats.minAccuracy, Data.randomCharacterStats.maxAccuracy);
+            WriteEntry(builder, LanguageManager.GetText(UIFormatKeys.UI_FORMAT_ACCURACY.ToString()), Data.randomCharacterStats.accuracyApplyRate, Data.randomCharacterStats.minAccuracy, Data.randomCharacterStats.maxAccuracy, numberFormat: "N0");
             // Evasion
-            WriteEntry(builder, LanguageManager.GetText(UIFormatKeys.UI_FORMAT_EVASION.ToString()), Data.randomCharacterStats.evasionApplyRate, Data.randomCharacterStats.minEvasion, Data.randomCharacterStats.maxEvasion);
+            WriteEntry(builder, LanguageManager.GetText(UIFormatKeys.UI_FORMAT_EVASION.ToString()), Data.randomCharacterStats.evasionApplyRate, Data.randomCharacterStats.minEvasion, Data.randomCharacterStats.maxEvasion, numberFormat: "N0");
             // CriRate
-            WriteEntry(builder, LanguageManager.GetText(UIFormatKeys.UI_FORMAT_CRITICAL_RATE.ToString()), Data.randomCharacterStats.criRateApplyRate, Data.randomCharacterStats.minCriRate, Data.randomCharacterStats.maxCriRate);
+            WriteEntry(builder, LanguageManager.GetText(UIFormatKeys.UI_FORMAT_CRITICAL_RATE.ToString()), Data.randomCharacterStats.criRateApplyRate, Data.randomCharacterStats.minCriRate, Data.randomCharacterStats.maxCriRate, 100f);
             // CriDmgRate
-            WriteEntry(builder, LanguageManager.GetText(UIFormatKeys.UI_FORMAT_CRITICAL_DAMAGE_RATE.ToString()), Data.randomCharacterStats.criDmgRateApplyRate, Data.randomCharacterStats.minCriDmgRate, Data.randomCharacterStats.maxCriDmgRate);
+            WriteEntry(builder, LanguageManager.GetText(UIFormatKeys.UI_FORMAT_CRITICAL_DAMAGE_RATE.ToString()), Data.randomCharacterStats.criDmgRateApplyRate, Data.randomCharacterStats.minCriDmgRate, Data.randomCharacterStats.maxCriDmgRate, 100f);
             // BlockRate
-            WriteEntry(builder, LanguageManager.GetText(UIFormatKeys.UI_FORMAT_BLOCK_RATE.ToString()), Data.randomCharacterStats.blockRateApplyRate, Data.randomCharacterStats.minBlockRate, Data.randomCharacterStats.maxBlockRate);
+            WriteEntry(builder, LanguageManager.GetText(UIFormatKeys.UI_FORMAT_BLOCK_RATE.ToString()), Data.randomCharacterStats.blockRateApplyRate, Data.randomCharacterStats.minBlockRate, Data.randomCharacterStats.maxBlockRate, 100f);
             // BlockDmgRate
-            WriteEntry(builder, LanguageManager.GetText(UIFormatKeys.UI_FORMAT_BLOCK_DAMAGE_RATE.ToString()), Data.randomCharacterStats.blockDmgRateApplyRate, Data.randomCharacterStats.minBlockDmgRate, Data.randomCharacterStats.maxBlockDmgRate);
+            WriteEntry(builder, LanguageManager.GetText(UIFormatKeys.UI_FORMAT_BLOCK_DAMAGE_RATE.ToString()), Data.randomCharacterStats.blockDmgRateApplyRate, Data.randomCharacterStats.minBlockDmgRate, Data.randomCharacterStats.maxBlockDmgRate, 100f);
             // MoveSpeed
-            WriteEntry(builder, LanguageManager.GetText(UIFormatKeys.UI_FORMAT_MOVE_SPEED.ToString()), Data.randomCharacterStats.moveSpeedApplyRate, Data.randomCharacterStats.minMoveSpeed, Data.randomCharacterStats.maxMoveSpeed);
+            WriteEntry(builder, LanguageManager.GetText(UIFormatKeys.UI_FORMAT_MOVE_SPEED.ToString()), Data.randomCharacterStats.moveSpeedApplyRate, Data.randomCharacterStats.minMoveSpeed, Data.randomCharacterStats.maxMoveSpeed, numberFormat: "N0");
             // AtkSpeed
-            WriteEntry(builder, LanguageManager.GetText(UIFormatKeys.UI_FORMAT_ATTACK_SPEED.ToString()), Data.randomCharacterStats.atkSpeedApplyRate, Data.randomCharacterStats.minAtkSpeed, Data.randomCharacterStats.maxAtkSpeed);
+            WriteEntry(builder, LanguageManager.GetText(UIFormatKeys.UI_FORMAT_ATTACK_SPEED.ToString()), Data.randomCharacterStats.atkSpeedApplyRate, Data.randomCharacterStats.minAtkSpeed, Data.randomCharacterStats.maxAtkSpeed, numberFormat: "N0");
             // WeightLimit
-            WriteEntry(builder, LanguageManager.GetText(UIFormatKeys.UI_FORMAT_WEIGHT.ToString()), Data.randomCharacterStats.weightLimitApplyRate, Data.randomCharacterStats.minWeightLimit, Data.randomCharacterStats.maxWeightLimit);
+            WriteEntry(builder, LanguageManager.GetText(UIFormatKeys.UI_FORMAT_WEIGHT.ToString()), Data.randomCharacterStats.weightLimitApplyRate, Data.randomCharacterStats.minWeightLimit, Data.randomCharacterStats.maxWeightLimit, numberFormat: "N0");
             // SlotLimit
-            WriteEntry(builder, LanguageManager.GetText(UIFormatKeys.UI_FORMAT_SLOT.ToString()), Data.randomCharacterStats.slotLimitApplyRate, Data.randomCharacterStats.minSlotLimit, Data.randomCharacterStats.maxSlotLimit);
+            WriteEntry(builder, LanguageManager.GetText(UIFormatKeys.UI_FORMAT_SLOT.ToString()), Data.randomCharacterStats.slotLimitApplyRate, Data.randomCharacterStats.minSlotLimit, Data.randomCharacterStats.maxSlotLimit, numberFormat: "N0");
             // GoldRate
-            WriteEntry(builder, LanguageManager.GetText(UIFormatKeys.UI_FORMAT_GOLD_RATE.ToString()), Data.randomCharacterStats.goldRateApplyRate, Data.randomCharacterStats.minGoldRate, Data.randomCharacterStats.maxGoldRate);
+            WriteEntry(builder, LanguageManager.GetText(UIFormatKeys.UI_FORMAT_GOLD_RATE.ToString()), Data.randomCharacterStats.goldRateApplyRate, Data.randomCharacterStats.minGoldRate, Data.randomCharacterStats.maxGoldRate, 100f);
             // ExpRate
-            WriteEntry(builder, LanguageManager.GetText(UIFormatKeys.UI_FORMAT_EXP_RATE.ToString()), Data.randomCharacterStats.expRateApplyRate, Data.randomCharacterStats.minExpRate, Data.randomCharacterStats.maxExpRate);
+            WriteEntry(builder, LanguageManager.GetText(UIFormatKeys.UI_FORMAT_EXP_RATE.ToString()), Data.randomCharacterStats.expRateApplyRate, Data.randomCharacterStats.minExpRate, Data.randomCharacterStats.maxExpRate, 100f);
         }
 
         private void WriteCharacterStatsRate(StringBuilder builder)
         {
             // Hp
-            WriteEntry(builder, LanguageManager.GetText(UIFormatKeys.UI_FORMAT_HP_RATE.ToString()), Data.randomCharacterStats.hpApplyRate, Data.randomCharacterStats.minHp, Data.randomCharacterStats.maxHp, 100f);
-            WriteEntry(builder, LanguageManager.GetText(UIFormatKeys.UI_FORMAT_HP_RECOVERY_RATE.ToString()), Data.randomCharacterStats.hpRecoveryApplyRate, Data.randomCharacterStats.minHpRecovery, Data.randomCharacterStats.maxHpRecovery, 100f);
-            WriteEntry(builder, LanguageManager.GetText(UIFormatKeys.UI_FORMAT_HP_LEECH_RATE_RATE.ToString()), Data.randomCharacterStats.hpLeechRateApplyRate, Data.randomCharacterStats.minHpLeechRate, Data.randomCharacterStats.maxHpLeechRate, 100f);
+            WriteEntry(builder, LanguageManager.GetText(UIFormatKeys.UI_FORMAT_HP_RATE.ToString()), Data.randomCharacterStatsRate.hpApplyRate, Data.randomCharacterStatsRate.minHp, Data.randomCharacterStatsRate.maxHp, 100f);
+            WriteEntry(builder, LanguageManager.GetText(UIFormatKeys.UI_FORMAT_HP_RECOVERY_RATE.ToString()), Data.randomCharacterStatsRate.hpRecoveryApplyRate, Data.randomCharacterStatsRate.minHpRecovery, Data.randomCharacterStatsRate.maxHpRecovery, 100f);
+            WriteEntry(builder, LanguageManager.GetText(UIFormatKeys.UI_FORMAT_HP_LEECH_RATE_RATE.ToString()), Data.randomCharacterStatsRate.hpLeechRateApplyRate, Data.randomCharacterStatsRate.minHpLeechRate, Data.randomCharacterStatsRate.maxHpLeechRate, 100f);
             // Mp
-            WriteEntry(builder, LanguageManager.GetText(UIFormatKeys.UI_FORMAT_MP_RATE.ToString()), Data.randomCharacterStats.mpApplyRate, Data.randomCharacterStats.minMp, Data.randomCharacterStats.maxMp, 100f);
-            WriteEntry(builder, LanguageManager.GetText(UIFormatKeys.UI_FORMAT_MP_RECOVERY_RATE.ToString()), Data.randomCharacterStats.mpRecoveryApplyRate, Data.randomCharacterStats.minMpRecovery, Data.randomCharacterStats.maxMpRecovery, 100f);
-            WriteEntry(builder, LanguageManager.GetText(UIFormatKeys.UI_FORMAT_MP_LEECH_RATE_RATE.ToString()), Data.randomCharacterStats.mpLeechRateApplyRate, Data.randomCharacterStats.minMpLeechRate, Data.randomCharacterStats.maxMpLeechRate, 100f);
+            WriteEntry(builder, LanguageManager.GetText(UIFormatKeys.UI_FORMAT_MP_RATE.ToString()), Data.randomCharacterStatsRate.mpApplyRate, Data.randomCharacterStatsRate.minMp, Data.randomCharacterStatsRate.maxMp, 100f);
+            WriteEntry(builder, LanguageManager.GetText(UIFormatKeys.UI_FORMAT_MP_RECOVERY_RATE.ToString()), Data.randomCharacterStatsRate.mpRecoveryApplyRate, Data.randomCharacterStatsRate.minMpRecovery, Data.randomCharacterStatsRate.maxMpRecovery, 100f);
+            WriteEntry(builder, LanguageManager.GetText(UIFormatKeys.UI_FORMAT_MP_LEECH_RATE_RATE.ToString()), Data.randomCharacterStatsRate.mpLeechRateApplyRate, Data.randomCharacterStatsRate.minMpLeechRate, Data.randomCharacterStatsRate.maxMpLeechRate, 100f);
             // Stamina
-            WriteEntry(builder, LanguageManager.GetText(UIFormatKeys.UI_FORMAT_STAMINA_RATE.ToString()), Data.randomCharacterStats.staminaApplyRate, Data.randomCharacterStats.minStamina, Data.randomCharacterStats.maxStamina, 100f);
-            WriteEntry(builder, LanguageManager.GetText(UIFormatKeys.UI_FORMAT_STAMINA_RECOVERY_RATE.ToString()), Data.randomCharacterStats.staminaRecoveryApplyRate, Data.randomCharacterStats.minStaminaRecovery, Data.randomCharacterStats.maxStaminaRecovery, 100f);
-            WriteEntry(builder, LanguageManager.GetText(UIFormatKeys.UI_FORMAT_STAMINA_LEECH_RATE_RATE.ToString()), Data.randomCharacterStats.staminaLeechRateApplyRate, Data.randomCharacterStats.minStaminaLeechRate, Data.randomCharacterStats.maxStaminaLeechRate, 100f);
+            WriteEntry(builder, LanguageManager.GetText(UIFormatKeys.UI_FORMAT_STAMINA_RATE.ToString()), Data.randomCharacterStatsRate.staminaApplyRate, Data.randomCharacterStatsRate.minStamina, Data.randomCharacterStatsRate.maxStamina, 100f);
+            WriteEntry(builder, LanguageManager.GetText(UIFormatKeys.UI_FORMAT_STAMINA_RECOVERY_RATE.ToString()), Data.randomCharacterStatsRate.staminaRecoveryApplyRate, Data.randomCharacterStatsRate.minStaminaRecovery, Data.randomCharacterStatsRate.maxStaminaRecovery, 100f);
+            WriteEntry(builder, LanguageManager.GetText(UIFormatKeys.UI_FORMAT_STAMINA_LEECH_RATE_RATE.ToString()), Data.randomCharacterStatsRate.staminaLeechRateApplyRate, Data.randomCharacterStatsRate.minStaminaLeechRate, Data.randomCharacterStatsRate.maxStaminaLeechRate, 100f);
             // Food
-            WriteEntry(builder, LanguageManager.GetText(UIFormatKeys.UI_FORMAT_FOOD_RATE.ToString()), Data.randomCharacterStats.foodApplyRate, Data.randomCharacterStats.minFood, Data.randomCharacterStats.maxFood, 100f);
+            WriteEntry(builder, LanguageManager.GetText(UIFormatKeys.UI_FORMAT_FOOD_RATE.ToString()), Data.randomCharacterStatsRate.foodApplyRate, Data.randomCharacterStatsRate.minFood, Data.randomCharacterStatsRate.maxFood, 100f);
             // Water
-            WriteEntry(builder, LanguageManager.GetText(UIFormatKeys.UI_FORMAT_WATER_RATE.ToString()), Data.randomCharacterStats.waterApplyRate, Data.randomCharacterStats.minWater, Data.randomCharacterStats.maxWater, 100f);
+            WriteEntry(builder, LanguageManager.GetText(UIFormatKeys.UI_FORMAT_WATER_RATE.ToString()), Data.randomCharacterStatsRate.waterApplyRate, Data.randomCharacterStatsRate.minWater, Data.randomCharacterStatsRate.maxWater, 100f);
             // Accuracy
-            WriteEntry(builder, LanguageManager.GetText(UIFormatKeys.UI_FORMAT_ACCURACY_RATE.ToString()), Data.randomCharacterStats.accuracyApplyRate, Data.randomCharacterStats.minAccuracy, Data.randomCharacterStats.maxAccuracy, 100f);
+            WriteEntry(builder, LanguageManager.GetText(UIFormatKeys.UI_FORMAT_ACCURACY_RATE.ToString()), Data.randomCharacterStatsRate.accuracyApplyRate, Data.randomCharacterStatsRate.minAccuracy, Data.randomCharacterStatsRate.maxAccuracy, 100f);
             // Evasion
-            WriteEntry(builder, LanguageManager.GetText(UIFormatKeys.UI_FORMAT_EVASION_RATE.ToString()), Data.randomCharacterStats.evasionApplyRate, Data.randomCharacterStats.minEvasion, Data.randomCharacterStats.maxEvasion, 100f);
+            WriteEntry(builder, LanguageManager.GetText(UIFormatKeys.UI_FORMAT_EVASION_RATE.ToString()), Data.randomCharacterStatsRate.evasionApplyRate, Data.randomCharacterStatsRate.minEvasion, Data.randomCharacterStatsRate.maxEvasion, 100f);
             // CriRate
-            WriteEntry(builder, LanguageManager.GetText(UIFormatKeys.UI_FORMAT_CRITICAL_RATE_RATE.ToString()), Data.randomCharacterStats.criRateApplyRate, Data.randomCharacterStats.minCriRate, Data.randomCharacterStats.maxCriRate, 100f);
+            WriteEntry(builder, LanguageManager.GetText(UIFormatKeys.UI_FORMAT_CRITICAL_RATE_RATE.ToString()), Data.randomCharacterStatsRate.criRateApplyRate, Data.randomCharacterStatsRate.minCriRate, Data.randomCharacterStatsRate.maxCriRate, 100f);
             // CriDmgRate
-            WriteEntry(builder, LanguageManager.GetText(UIFormatKeys.UI_FORMAT_CRITICAL_DAMAGE_RATE_RATE.ToString()), Data.randomCharacterStats.criDmgRateApplyRate, Data.randomCharacterStats.minCriDmgRate, Data.randomCharacterStats.maxCriDmgRate, 100f);
+            WriteEntry(builder, LanguageManager.GetText(UIFormatKeys.UI_FORMAT_CRITICAL_DAMAGE_RATE_RATE.ToString()), Data.randomCharacterStatsRate.criDmgRateApplyRate, Data.randomCharacterStatsRate.minCriDmgRate, Data.randomCharacterStatsRate.maxCriDmgRate, 100f);
             // BlockRate
-            WriteEntry(builder, LanguageManager.GetText(UIFormatKeys.UI_FORMAT_BLOCK_RATE_RATE.ToString()), Data.randomCharacterStats.blockRateApplyRate, Data.randomCharacterStats.minBlockRate, Data.randomCharacterStats.maxBlockRate, 100f);
+            WriteEntry(builder, LanguageManager.GetText(UIFormatKeys.UI_FORMAT_BLOCK_RATE_RATE.ToString()), Data.randomCharacterStatsRate.blockRateApplyRate, Data.randomCharacterStatsRate.minBlockRate, Data.randomCharacterStatsRate.maxBlockRate, 100f);
             // BlockDmgRate
-            WriteEntry(builder, LanguageManager.GetText(UIFormatKeys.UI_FORMAT_BLOCK_DAMAGE_RATE_RATE.ToString()), Data.randomCharacterStats.blockDmgRateApplyRate, Data.randomCharacterStats.minBlockDmgRate, Data.randomCharacterStats.maxBlockDmgRate, 100f);
+            WriteEntry(builder, LanguageManager.GetText(UIFormatKeys.UI_FORMAT_BLOCK_DAMAGE_RATE_RATE.ToString()), Data.randomCharacterStatsRate.blockDmgRateApplyRate, Data.randomCharacterStatsRate.minBlockDmgRate, Data.randomCharacterStatsRate.maxBlockDmgRate, 100f);
             // MoveSpeed
-            WriteEntry(builder, LanguageManager.GetText(UIFormatKeys.UI_FORMAT_MOVE_SPEED_RATE.ToString()), Data.randomCharacterStats.moveSpeedApplyRate, Data.randomCharacterStats.minMoveSpeed, Data.randomCharacterStats.maxMoveSpeed, 100f);
+            WriteEntry(builder, LanguageManager.GetText(UIFormatKeys.UI_FORMAT_MOVE_SPEED_RATE.ToString()), Data.randomCharacterStatsRate.moveSpeedApplyRate, Data.randomCharacterStatsRate.minMoveSpeed, Data.randomCharacterStatsRate.maxMoveSpeed, 100f);
             // AtkSpeed
-            WriteEntry(builder, LanguageManager.GetText(UIFormatKeys.UI_FORMAT_ATTACK_SPEED_RATE.ToString()), Data.randomCharacterStats.atkSpeedApplyRate, Data.randomCharacterStats.minAtkSpeed, Data.randomCharacterStats.maxAtkSpeed, 100f);
+            WriteEntry(builder, LanguageManager.GetText(UIFormatKeys.UI_FORMAT_ATTACK_SPEED_RATE.ToString()), Data.randomCharacterStatsRate.atkSpeedApplyRate, Data.randomCharacterStatsRate.minAtkSpeed, Data.randomCharacterStatsRate.maxAtkSpeed, 100f);
             // WeightLimit
-            WriteEntry(builder, LanguageManager.GetText(UIFormatKeys.UI_FORMAT_WEIGHT_RATE.ToString()), Data.randomCharacterStats.weightLimitApplyRate, Data.randomCharacterStats.minWeightLimit, Data.randomCharacterStats.maxWeightLimit, 100f);
+            WriteEntry(builder, LanguageManager.GetText(UIFormatKeys.UI_FORMAT_WEIGHT_RATE.ToString()), Data.randomCharacterStatsRate.weightLimitApplyRate, Data.randomCharacterStatsRate.minWeightLimit, Data.randomCharacterStatsRate.maxWeightLimit, 100f);
             // SlotLimit
-            WriteEntry(builder, LanguageManager.GetText(UIFormatKeys.UI_FORMAT_SLOT_RATE.ToString()), Data.randomCharacterStats.slotLimitApplyRate, Data.randomCharacterStats.minSlotLimit, Data.randomCharacterStats.maxSlotLimit, 100f);
+            WriteEntry(builder, LanguageManager.GetText(UIFormatKeys.UI_FORMAT_SLOT_RATE.ToString()), Data.randomCharacterStatsRate.slotLimitApplyRate, Data.randomCharacterStatsRate.minSlotLimit, Data.randomCharacterStatsRate.maxSlotLimit, 100f);
             // GoldRate
-            WriteEntry(builder, LanguageManager.GetText(UIFormatKeys.UI_FORMAT_GOLD_RATE_RATE.ToString()), Data.randomCharacterStats.goldRateApplyRate, Data.randomCharacterStats.minGoldRate, Data.randomCharacterStats.maxGoldRate, 100f);
+            WriteEntry(builder, LanguageManager.GetText(UIFormatKeys.UI_FORMAT_GOLD_RATE_RATE.ToString()), Data.randomCharacterStatsRate.goldRateApplyRate, Data.randomCharacterStatsRate.minGoldRate, Data.randomCharacterStatsRate.maxGoldRate, 100f);
             // ExpRate
-            WriteEntry(builder, LanguageManager.GetText(UIFormatKeys.UI_FORMAT_EXP_RATE_RATE.ToString()), Data.randomCharacterStats.expRateApplyRate, Data.randomCharacterStats.minExpRate, Data.randomCharacterStats.maxExpRate, 100f);
+            WriteEntry(builder, LanguageManager.GetText(UIFormatKeys.UI_FORMAT_EXP_RATE_RATE.ToString()), Data.randomCharacterStatsRate.expRateApplyRate, Data.randomCharacterStatsRate.minExpRate, Data.randomCharacterStatsRate.maxExpRate, 100f);
         }
 
         private void WriteAttributes(StringBuilder builder)
@@ -131,7 +131,7 @@ namespace MultiplayerARPG
             {
                 if (entry.attribute == null)
                     continue;
-                WriteEntry(builder, LanguageManager.GetText(formatAttributeAmount), entry.attribute.Title, entry.applyRate, entry.minAmount, entry.maxAmount);
+                WriteEntry(builder, LanguageManager.GetText(formatAttributeAmount), entry.attribute.Title, entry.applyRate, entry.minAmount, entry.maxAmount, numberFormat: "N0");
             }
         }
 
@@ -157,7 +157,7 @@ namespace MultiplayerARPG
                 tempDamageElement = entry.damageElement;
                 if (tempDamageElement == null)
                     tempDamageElement = GameInstance.Singleton.DefaultDamageElement;
-                WriteEntry(builder, LanguageManager.GetText(formatResistanceAmount), entry.damageElement.Title, entry.applyRate, entry.minAmount, entry.maxAmount);
+                WriteEntry(builder, LanguageManager.GetText(formatResistanceAmount), entry.damageElement.Title, entry.applyRate, entry.minAmount, entry.maxAmount, 100f);
             }
         }
 
@@ -171,7 +171,7 @@ namespace MultiplayerARPG
                 tempDamageElement = entry.damageElement;
                 if (tempDamageElement == null)
                     tempDamageElement = GameInstance.Singleton.DefaultDamageElement;
-                WriteEntry(builder, LanguageManager.GetText(formatArmorAmount), entry.damageElement.Title, entry.applyRate, entry.minAmount, entry.maxAmount);
+                WriteEntry(builder, LanguageManager.GetText(formatArmorAmount), entry.damageElement.Title, entry.applyRate, entry.minAmount, entry.maxAmount, numberFormat: "N0");
             }
         }
 
@@ -185,7 +185,7 @@ namespace MultiplayerARPG
                 tempDamageElement = entry.damageElement;
                 if (tempDamageElement == null)
                     tempDamageElement = GameInstance.Singleton.DefaultDamageElement;
-                WriteEntry(builder, LanguageManager.GetText(formatDamageAmount), entry.damageElement.Title, entry.applyRate, entry.minAmount, entry.maxAmount);
+                WriteEntry(builder, LanguageManager.GetText(formatDamageAmount), entry.damageElement.Title, entry.applyRate, entry.minAmount, entry.maxAmount, numberFormat: "N0");
             }
         }
 
@@ -197,39 +197,39 @@ namespace MultiplayerARPG
             {
                 if (entry.skill == null)
                     continue;
-                WriteEntry(builder, LanguageManager.GetText(formatSkillLevel), entry.skill.Title, entry.applyRate, entry.minLevel, entry.maxLevel);
+                WriteEntry(builder, LanguageManager.GetText(formatSkillLevel), entry.skill.Title, entry.applyRate, entry.minLevel, entry.maxLevel, numberFormat: "N0");
             }
         }
 
-        private void WriteEntry(StringBuilder builder, string format, float applyRate, float minValue, float maxValue, float multiplier = 1f)
+        private void WriteEntry(StringBuilder builder, string format, float applyRate, float minValue, float maxValue, float multiplier = 1f, string numberFormat = "N2")
         {
             if (applyRate <= 0f && minValue == 0 && maxValue == 0)
                 return;
             if (builder.Length > 0)
                 builder.Append('\n');
             builder.Append(ZString.Format(format,
-                ZString.Concat((minValue * multiplier).ToString("N2"), randomAmountSeparator, (maxValue * multiplier).ToString("N2"))));
+                ZString.Concat((minValue * multiplier).ToString(numberFormat), randomAmountSeparator, (maxValue * multiplier).ToString(numberFormat))));
         }
 
-        private void WriteEntry(StringBuilder builder, string format, string title, float applyRate, float minValue, float maxValue, float multiplier = 1f)
+        private void WriteEntry(StringBuilder builder, string format, string title, float applyRate, float minValue, float maxValue, float multiplier = 1f, string numberFormat = "N2")
         {
             if (applyRate <= 0f && minValue == 0 && maxValue == 0)
                 return;
             if (builder.Length > 0)
                 builder.Append('\n');
             builder.Append(ZString.Format(format, title,
-                ZString.Concat((minValue * multiplier).ToString("N2"), randomAmountSeparator, (maxValue * multiplier).ToString("N2"))));
+                ZString.Concat((minValue * multiplier).ToString(numberFormat), randomAmountSeparator, (maxValue * multiplier).ToString(numberFormat))));
         }
 
-        private void WriteEntry(StringBuilder builder, string format, string title, float applyRate, MinMaxFloat minValue, MinMaxFloat maxValue, float multiplier = 1f)
+        private void WriteEntry(StringBuilder builder, string format, string title, float applyRate, MinMaxFloat minValue, MinMaxFloat maxValue, float multiplier = 1f, string numberFormat = "N2")
         {
             if (applyRate <= 0f && minValue.min == 0 && minValue.max == 0 && maxValue.min == 0 && maxValue.max == 0)
                 return;
             if (builder.Length > 0)
                 builder.Append('\n');
             builder.Append(ZString.Format(format, title,
-                ZString.Concat((minValue.min * multiplier).ToString("N2"), randomMinMaxAmountSeparator, (minValue.max * multiplier).ToString("N2")),
-                ZString.Concat((maxValue.min * multiplier).ToString("N2"), randomMinMaxAmountSeparator, (maxValue.max * multiplier).ToString("N2"))));
+                ZString.Concat((minValue.min * multiplier).ToString(numberFormat), randomMinMaxAmountSeparator, (minValue.max * multiplier).ToString(numberFormat)),
+                ZString.Concat((maxValue.min * multiplier).ToString(numberFormat), randomMinMaxAmountSeparator, (maxValue.max * multiplier).ToString(numberFormat))));
         }
     }
 }
