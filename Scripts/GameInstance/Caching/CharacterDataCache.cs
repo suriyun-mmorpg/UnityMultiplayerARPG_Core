@@ -40,6 +40,10 @@ namespace MultiplayerARPG
         public bool HavingChanceToRemoveBuffWhenUseItem { get; private set; }
         public bool HavingChanceToRemoveBuffWhenPickupItem { get; private set; }
         public int BattlePoints { get; private set; }
+        public CharacterItem RightHandItem { get; private set; }
+        public CharacterItem LeftHandItem { get; private set; }
+        public bool IsRightHandItemAvailable { get; private set; }
+        public bool IsLeftHandItemAvailable { get; private set; }
 
         public CharacterDataCache()
         {
@@ -195,7 +199,35 @@ namespace MultiplayerARPG
                     ClientGenericActions.NotifyBattlePointsChanged(battlePointChange);
             }
 
+            IsRightHandItemAvailable = false;
+            IsRightHandItemAvailable = false;
+
+            IWeaponItem rightWeaponItem = characterData.EquipWeapons.GetRightHandWeaponItem();
+            if (rightWeaponItem != null)
+            {
+                IsRightHandItemAvailable = true;
+                RightHandItem = characterData.EquipWeapons.rightHand;
+            }
+            IWeaponItem leftWeaponItem = characterData.EquipWeapons.GetLeftHandWeaponItem();
+            if (leftWeaponItem != null)
+            {
+                IsLeftHandItemAvailable = true;
+                LeftHandItem = characterData.EquipWeapons.leftHand;
+            }
+            if (!IsRightHandItemAvailable && !IsRightHandItemAvailable)
+            {
+                IsRightHandItemAvailable = true;
+                RightHandItem = CharacterItem.Create(GameInstance.Singleton.DefaultWeaponItem.DataId);
+            }
+
             return this;
+        }
+
+        public CharacterItem GetAvailableWeapon(ref bool isLeftHand)
+        {
+            if (isLeftHand && !IsLeftHandItemAvailable)
+                isLeftHand = false;
+            return isLeftHand ? LeftHandItem : RightHandItem;
         }
 
         public void ClearChanceToRemoveBuffWhenAttack()
