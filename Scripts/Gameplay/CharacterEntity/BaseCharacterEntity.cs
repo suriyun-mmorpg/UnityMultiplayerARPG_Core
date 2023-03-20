@@ -875,7 +875,7 @@ namespace MultiplayerARPG
             // Assign data id
             animationDataId = weapon.GetWeaponItem().WeaponType.DataId;
             // Assign animation action type
-            animActionType = !isLeftHand ? AnimActionType.ReloadRightHand : AnimActionType.ReloadLeftHand;
+            animActionType = isLeftHand ? AnimActionType.ReloadLeftHand : AnimActionType.ReloadRightHand;
         }
 
         public virtual void GetAttackingData(
@@ -888,7 +888,7 @@ namespace MultiplayerARPG
             // Assign data id
             animationDataId = weapon.GetWeaponItem().WeaponType.DataId;
             // Assign animation action type
-            animActionType = !isLeftHand ? AnimActionType.AttackRightHand : AnimActionType.AttackLeftHand;
+            animActionType = isLeftHand ? AnimActionType.AttackLeftHand : AnimActionType.AttackRightHand;
         }
 
         public Dictionary<DamageElement, MinMaxFloat> GetWeaponDamagesWithBuffs(CharacterItem weapon)
