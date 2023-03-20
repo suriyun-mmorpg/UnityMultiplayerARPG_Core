@@ -475,6 +475,7 @@ namespace MultiplayerARPG
                         else
                             tempEquipmentObject.gameObject.SetLayerRecursively(EquipmentLayer, true);
                         tempEquipmentObject.RemoveComponentsInChildren<Collider>(false);
+                        AddingNewModel(tempEquipmentObject, tempContainer);
                         EquippedModelObjects[equipSocket] = tempEquipmentObject;
                     }
                 }
