@@ -380,6 +380,16 @@ namespace MultiplayerARPG
             // TODO: May implement pulling animation for 2D models
         }
 
+        public override int GetRightHandAttackRandomMax(int dataId)
+        {
+            return 1;
+        }
+
+        public override int GetLeftHandAttackRandomMax(int dataId)
+        {
+            return 1;
+        }
+
         public override bool GetRandomRightHandAttackAnimation(int dataId, int randomSeed, out int animationIndex, out float animSpeedRate, out float[] triggerDurations, out float totalDuration)
         {
             animationIndex = 0;

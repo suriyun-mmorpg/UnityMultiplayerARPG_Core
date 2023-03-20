@@ -406,6 +406,11 @@ namespace MultiplayerARPG.GameData.Model.Playables
             animationIndex = GenericUtils.RandomInt(randomSeed, 0, GetRightHandAttackAnimations(dataId).Length);
             return GetRightHandAttackAnimation(dataId, animationIndex, out animSpeedRate, out triggerDurations, out totalDuration);
         }
+
+        public override int GetRightHandAttackRandomMax(int dataId)
+        {
+            return GetRightHandAttackAnimations(dataId).Length;
+        }
         #endregion
 
         #region Left-hand animations
@@ -451,6 +456,11 @@ namespace MultiplayerARPG.GameData.Model.Playables
         {
             animationIndex = GenericUtils.RandomInt(randomSeed, 0, GetLeftHandAttackAnimations(dataId).Length);
             return GetLeftHandAttackAnimation(dataId, animationIndex, out animSpeedRate, out triggerDurations, out totalDuration);
+        }
+
+        public override int GetLeftHandAttackRandomMax(int dataId)
+        {
+            return GetLeftHandAttackAnimations(dataId).Length;
         }
         #endregion
 

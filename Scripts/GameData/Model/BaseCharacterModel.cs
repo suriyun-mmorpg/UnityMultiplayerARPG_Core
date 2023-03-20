@@ -838,6 +838,8 @@ namespace MultiplayerARPG
         public abstract void StopActionAnimation();
         public abstract void StopSkillCastAnimation();
         public abstract void StopWeaponChargeAnimation();
+        public abstract int GetRightHandAttackRandomMax(int dataId);
+        public abstract int GetLeftHandAttackRandomMax(int dataId);
         /// <summary>
         /// Get random right-hand attack animation, if `triggerDurations`'s length is 0/`totalDuration` <= 0, it will wait other methods to use as `triggerDurations`/`totalDuration` (such as animtion clip event, state machine behaviour).
         /// </summary>
