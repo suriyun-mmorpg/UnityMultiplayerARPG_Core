@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
 using UnityEngine.Serialization;
 
@@ -492,7 +491,7 @@ namespace MultiplayerARPG
             uncertainDropItems.Shuffle();
             for (i = 0; i < uncertainDropItems.Count && randomDropCount < maxDropItems; ++i)
             {
-                if (Random.value >= uncertainDropItems[i].dropRate)
+                if (Random.value > uncertainDropItems[i].dropRate)
                     continue;
                 if (BaseGameNetworkManager.CurrentMapInfo.ExcludeItemFromDropping(uncertainDropItems[i].item))
                     continue;
@@ -601,7 +600,8 @@ namespace MultiplayerARPG
             if (itemDropTable != null)
             {
                 hasChanges = true;
-                List<ItemDropTable> tempItemDropTables = new List<ItemDropTable>(itemDropTables);
+                List<ItemDropTable> tempItemDropTables = new List<ItemDropTable>();
+                tempItemDropTables.AddRange(itemDropTables);
                 tempItemDropTables.Add(itemDropTable);
                 itemDropTables = tempItemDropTables.ToArray();
                 itemDropTable = null;
