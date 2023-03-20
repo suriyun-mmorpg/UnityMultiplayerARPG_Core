@@ -25,8 +25,14 @@ namespace MultiplayerARPG
         public AnimActionType AnimActionType { get; protected set; }
         public int AnimActionDataId { get; protected set; }
 
+        public bool doNotRandomAnimation;
+        public float animationResetDelay = 2f;
+
         protected readonly Dictionary<int, SimulatingActionTriggerHistory> SimulatingActionTriggerHistories = new Dictionary<int, SimulatingActionTriggerHistory>();
         protected readonly Dictionary<int, List<SimulateActionTriggerData>> SimlatingActionTriggerDataList = new Dictionary<int, List<SimulateActionTriggerData>>();
+        protected int lastAttackAnimationIndex = 0;
+        protected int lastAttackDataId = 0;
+        // Network data sending
         protected bool sendingClientAttack;
         protected bool sendingServerAttack;
         protected byte sendingSeed;
@@ -47,6 +53,10 @@ namespace MultiplayerARPG
 
         protected async UniTaskVoid AttackRoutine(byte simulateSeed, bool isLeftHand)
         {
+            // Prepare time
+            float time = Time.unscaledTime;
+            float deltaTime = Time.unscaledDeltaTime;
+
             // Prepare cancellation
             CancellationTokenSource attackCancellationTokenSource = new CancellationTokenSource();
             attackCancellationTokenSources.Add(attackCancellationTokenSource);
@@ -61,14 +71,30 @@ namespace MultiplayerARPG
                 out animActionDataId,
                 out weapon);
 
+            // Get playing animation index
+            int randomMax = 1;
+            switch (animActionType)
+            {
+                case AnimActionType.AttackLeftHand:
+                    randomMax = Entity.CharacterModel.GetLeftHandAttackRandomMax(animActionDataId);
+                    break;
+                case AnimActionType.AttackRightHand:
+                    randomMax = Entity.CharacterModel.GetRightHandAttackRandomMax(animActionDataId);
+                    break;
+            }
+            if (time - LastAttackEndTime > animationResetDelay || lastAttackAnimationIndex >= randomMax || lastAttackDataId != animActionDataId)
+                lastAttackAnimationIndex = 0;
+            int animationIndex = lastAttackAnimationIndex++;
+            if (!doNotRandomAnimation)
+                animationIndex = Random.Range(0, randomMax);
+            lastAttackDataId = animActionDataId;
+
             // Prepare required data and get animation data
-            int animationIndex;
             float animSpeedRate;
-            Entity.GetRandomAnimationData(
+            Entity.GetAnimationData(
                 animActionType,
                 animActionDataId,
-                simulateSeed,
-                out animationIndex,
+                animationIndex,
                 out animSpeedRate,
                 out triggerDurations,
                 out totalDuration);
@@ -90,11 +116,11 @@ namespace MultiplayerARPG
 
             // Last attack end time
             float remainsDuration = DEFAULT_TOTAL_DURATION;
-            LastAttackEndTime = Time.unscaledTime + DEFAULT_TOTAL_DURATION;
+            LastAttackEndTime = time + DEFAULT_TOTAL_DURATION;
             if (totalDuration >= 0f)
             {
                 remainsDuration = totalDuration;
-                LastAttackEndTime = Time.unscaledTime + (totalDuration / animSpeedRate);
+                LastAttackEndTime = time + (totalDuration / animSpeedRate);
             }
 
             if (IsServer)
@@ -133,7 +159,7 @@ namespace MultiplayerARPG
                     do
                     {
                         await UniTask.Yield();
-                        setupDelayCountDown -= Time.unscaledDeltaTime;
+                        setupDelayCountDown -= deltaTime;
                     } while (setupDelayCountDown > 0 && (triggerDurations == null || triggerDurations.Length == 0 || totalDuration < 0f));
                     if (setupDelayCountDown <= 0f)
                     {
@@ -148,7 +174,7 @@ namespace MultiplayerARPG
                     {
                         // Can setup, so set proper `remainsDuration` and `LastAttackEndTime` value
                         remainsDuration = totalDuration;
-                        LastAttackEndTime = Time.unscaledTime + (totalDuration / animSpeedRate);
+                        LastAttackEndTime = time + (totalDuration / animSpeedRate);
                     }
                 }
 
@@ -241,7 +267,7 @@ namespace MultiplayerARPG
             catch (System.OperationCanceledException)
             {
                 // Catch the cancellation
-                LastAttackEndTime = Time.unscaledTime;
+                LastAttackEndTime = time;
             }
             catch (System.Exception ex)
             {
