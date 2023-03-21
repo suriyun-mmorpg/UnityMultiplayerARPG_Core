@@ -1177,12 +1177,16 @@ namespace MultiplayerARPG
         {
             if (!MovementState.Has(MovementState.IsGrounded) || MovementState.Has(MovementState.IsUnderWater))
                 return false;
+            if (this.GetCaches().DisallowSprint)
+                return false;
             return CurrentStamina > 0;
         }
 
         public sealed override bool CanWalk()
         {
             if (!MovementState.Has(MovementState.IsGrounded) || MovementState.Has(MovementState.IsUnderWater))
+                return false;
+            if (this.GetCaches().DisallowWalk)
                 return false;
             return true;
         }
@@ -1191,6 +1195,8 @@ namespace MultiplayerARPG
         {
             if (!MovementState.Has(MovementState.IsGrounded) || MovementState.Has(MovementState.IsUnderWater))
                 return false;
+            if (this.GetCaches().DisallowCrouch)
+                return false;
             return true;
         }
 
@@ -1198,11 +1204,17 @@ namespace MultiplayerARPG
         {
             if (!MovementState.Has(MovementState.IsGrounded) || MovementState.Has(MovementState.IsUnderWater))
                 return false;
+            if (this.GetCaches().DisallowCrawl)
+                return false;
             return true;
         }
 
         public override bool CanJump()
         {
+            if (this.GetCaches().DisallowJump)
+            {
+                return false;
+            }
             if (IsAttacking && MovementRestrictionWhileAttacking.jumpRestricted)
             {
                 return false;

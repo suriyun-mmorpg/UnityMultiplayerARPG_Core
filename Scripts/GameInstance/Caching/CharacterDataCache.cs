@@ -27,6 +27,11 @@ namespace MultiplayerARPG
         public float LimitItemWeight { get; private set; }
         public int LimitItemSlot { get; private set; }
         public bool DisallowMove { get; private set; }
+        public bool DisallowSprint { get; private set; }
+        public bool DisallowWalk { get; private set; }
+        public bool DisallowJump { get; private set; }
+        public bool DisallowCrouch { get; private set; }
+        public bool DisallowCrawl { get; private set; }
         public bool DisallowAttack { get; private set; }
         public bool DisallowUseSkill { get; private set; }
         public bool DisallowUseItem { get; private set; }
@@ -90,6 +95,11 @@ namespace MultiplayerARPG
 
             IsOverweight = (GameInstance.Singleton.IsLimitInventorySlot && TotalItemSlot > LimitItemSlot) || (GameInstance.Singleton.IsLimitInventoryWeight && TotalItemWeight > LimitItemWeight);
             DisallowMove = false;
+            DisallowSprint = false;
+            DisallowWalk = false;
+            DisallowJump = false;
+            DisallowCrouch = false;
+            DisallowCrawl = false;
             DisallowAttack = false;
             DisallowUseSkill = false;
             DisallowUseItem = false;
@@ -353,6 +363,11 @@ namespace MultiplayerARPG
             {
                 case AilmentPresets.Stun:
                     DisallowMove = true;
+                    DisallowSprint = true;
+                    DisallowWalk = true;
+                    DisallowJump = true;
+                    DisallowCrouch = true;
+                    DisallowCrawl = true;
                     DisallowAttack = true;
                     DisallowUseSkill = true;
                     DisallowUseItem = true;
@@ -362,6 +377,11 @@ namespace MultiplayerARPG
                     break;
                 case AilmentPresets.Freeze:
                     DisallowMove = true;
+                    DisallowSprint = true;
+                    DisallowWalk = true;
+                    DisallowJump = true;
+                    DisallowCrouch = true;
+                    DisallowCrawl = true;
                     DisallowAttack = true;
                     DisallowUseSkill = true;
                     DisallowUseItem = true;
@@ -370,6 +390,16 @@ namespace MultiplayerARPG
                 default:
                     if (tempBuff.disallowMove)
                         DisallowMove = true;
+                    if (tempBuff.disallowSprint)
+                        DisallowSprint = true;
+                    if (tempBuff.disallowWalk)
+                        DisallowWalk = true;
+                    if (tempBuff.disallowJump)
+                        DisallowJump = true;
+                    if (tempBuff.disallowCrouch)
+                        DisallowCrouch = true;
+                    if (tempBuff.disallowCrawl)
+                        DisallowCrawl = true;
                     if (tempBuff.disallowAttack)
                         DisallowAttack = true;
                     if (tempBuff.disallowUseSkill)
@@ -399,6 +429,11 @@ namespace MultiplayerARPG
         public bool AllAilmentsWereApplied()
         {
             return DisallowMove &&
+                DisallowSprint &&
+                DisallowWalk &&
+                DisallowJump &&
+                DisallowCrouch &&
+                DisallowCrawl &&
                 DisallowAttack &&
                 DisallowUseSkill &&
                 DisallowUseItem &&

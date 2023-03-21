@@ -40,6 +40,16 @@ namespace MultiplayerARPG
         public UIDamageElementAmounts uiDamageOverTimes;
         [Tooltip("This will activate if buff's disallow move is `TRUE`, developer may set text or icon here")]
         public GameObject disallowMoveObject;
+        [Tooltip("This will activate if buff's disallow sprint is `TRUE`, developer may set text or icon here")]
+        public GameObject disallowSprintObject;
+        [Tooltip("This will activate if buff's disallow walk is `TRUE`, developer may set text or icon here")]
+        public GameObject disallowWalkObject;
+        [Tooltip("This will activate if buff's disallow jump is `TRUE`, developer may set text or icon here")]
+        public GameObject disallowJumpObject;
+        [Tooltip("This will activate if buff's disallow crouch is `TRUE`, developer may set text or icon here")]
+        public GameObject disallowCrouchObject;
+        [Tooltip("This will activate if buff's disallow prone is `TRUE`, developer may set text or icon here")]
+        public GameObject disallowCrawlObject;
         [Tooltip("This will activate if buff's disallow attack is `TRUE`, developer may set text or icon here")]
         public GameObject disallowAttackObject;
         [Tooltip("This will activate if buff's disallow use skill is `TRUE`, developer may set text or icon here")]
@@ -223,6 +233,21 @@ namespace MultiplayerARPG
 
             if (disallowMoveObject != null)
                 disallowMoveObject.SetActive(Data.buff.disallowMove);
+
+            if (disallowSprintObject != null)
+                disallowSprintObject.SetActive(Data.buff.disallowSprint);
+
+            if (disallowWalkObject != null)
+                disallowWalkObject.SetActive(Data.buff.disallowWalk);
+
+            if (disallowJumpObject != null)
+                disallowJumpObject.SetActive(Data.buff.disallowJump);
+
+            if (disallowCrouchObject != null)
+                disallowCrouchObject.SetActive(Data.buff.disallowCrouch);
+
+            if (disallowCrawlObject != null)
+                disallowCrawlObject.SetActive(Data.buff.disallowCrawl);
 
             if (disallowAttackObject != null)
                 disallowAttackObject.SetActive(Data.buff.disallowAttack);

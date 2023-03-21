@@ -55,6 +55,11 @@ namespace MultiplayerARPG
         public AilmentPresets ailment;
         [Tooltip("Disallow character to move while applied. This won't be applied to monster's summoner.")]
         public bool disallowMove;
+        public bool disallowSprint;
+        public bool disallowWalk;
+        public bool disallowJump;
+        public bool disallowCrouch;
+        public bool disallowCrawl;
         [Tooltip("Disallow character to attack while applied. This won't be applied to monster's summoner.")]
         public bool disallowAttack;
         [Tooltip("Disallow character to use skill while applied. This won't be applied to monster's summoner.")]
