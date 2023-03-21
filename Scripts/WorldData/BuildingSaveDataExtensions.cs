@@ -27,12 +27,8 @@ namespace MultiplayerARPG
             to.CreatorId = from.CreatorId;
             to.CreatorName = from.CreatorName;
             to.ExtraData = from.ExtraData;
-            to.PositionX = from.PositionX;
-            to.PositionY = from.PositionY;
-            to.PositionZ = from.PositionZ;
-            to.RotationX = from.RotationX;
-            to.RotationY = from.RotationY;
-            to.RotationZ = from.RotationZ;
+            to.Position = from.Position;
+            to.Rotation = from.Rotation;
             DevExtUtils.InvokeStaticDevExtMethods(ClassType, "CloneTo", from, to);
             return to;
         }
@@ -46,12 +42,8 @@ namespace MultiplayerARPG
             writer.Put(buildingSaveData.RemainsLifeTime);
             writer.Put(buildingSaveData.IsLocked);
             writer.Put(buildingSaveData.LockPassword);
-            writer.Put(buildingSaveData.PositionX);
-            writer.Put(buildingSaveData.PositionY);
-            writer.Put(buildingSaveData.PositionZ);
-            writer.Put(buildingSaveData.RotationX);
-            writer.Put(buildingSaveData.RotationY);
-            writer.Put(buildingSaveData.RotationZ);
+            writer.PutVector3(buildingSaveData.Position);
+            writer.PutQuaternion(buildingSaveData.Rotation);
             writer.Put(buildingSaveData.CreatorId);
             writer.Put(buildingSaveData.CreatorName);
             writer.Put(buildingSaveData.ExtraData);
@@ -77,12 +69,8 @@ namespace MultiplayerARPG
             buildingSaveData.RemainsLifeTime = reader.GetFloat();
             buildingSaveData.IsLocked = reader.GetBool();
             buildingSaveData.LockPassword = reader.GetString();
-            buildingSaveData.PositionX = reader.GetFloat();
-            buildingSaveData.PositionY = reader.GetFloat();
-            buildingSaveData.PositionZ = reader.GetFloat();
-            buildingSaveData.RotationX = reader.GetFloat();
-            buildingSaveData.RotationY = reader.GetFloat();
-            buildingSaveData.RotationZ = reader.GetFloat();
+            buildingSaveData.Position = reader.GetVector3();
+            buildingSaveData.Rotation = reader.GetQuaternion();
             buildingSaveData.CreatorId = reader.GetString();
             buildingSaveData.CreatorName = reader.GetString();
             buildingSaveData.ExtraData = reader.GetString();
