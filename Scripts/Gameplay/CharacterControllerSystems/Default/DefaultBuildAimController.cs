@@ -98,7 +98,7 @@ namespace MultiplayerARPG
                 }
                 ConstructingBuildingEntity.BuildYRotation = _buildYRotate;
             }
-            ConstructingBuildingEntity.Rotation = Quaternion.Euler(buildingAngles);
+            ConstructingBuildingEntity.Rotation = buildingAngles;
             // Find position to place building
             if (InputManager.UseMobileInput())
                 FindAndSetBuildingAreaByAxes(aimAxes);

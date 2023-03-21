@@ -16,8 +16,8 @@ namespace MultiplayerARPG
             info.AddValue("entityId", data.EntityId);
             info.AddValue("currentHp", data.CurrentHp);
             info.AddValue("remainsLifeTime", data.RemainsLifeTime);
-            info.AddValue("position", data.Position);
-            info.AddValue("rotation", data.Rotation);
+            info.AddValue("position", (Vector3)data.Position);
+            info.AddValue("rotation", Quaternion.Euler(data.Rotation));
             info.AddValue("isLocked", data.IsLocked);
             info.AddValue("lockPassword", data.LockPassword);
             info.AddValue("creatorId", data.CreatorId);
@@ -38,7 +38,7 @@ namespace MultiplayerARPG
             data.CurrentHp = info.GetInt32("currentHp");
             data.RemainsLifeTime = info.GetSingle("remainsLifeTime");
             data.Position = (Vector3)info.GetValue("position", typeof(Vector3));
-            data.Rotation = (Quaternion)info.GetValue("rotation", typeof(Quaternion));
+            data.Rotation = ((Quaternion)info.GetValue("rotation", typeof(Quaternion))).eulerAngles;
             data.IsLocked = info.GetBoolean("isLocked");
             data.LockPassword = info.GetString("lockPassword");
             data.CreatorId = info.GetString("creatorId");

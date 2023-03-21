@@ -68,12 +68,12 @@ namespace MultiplayerARPG
         public string UserId { get; set; }
         public byte UserLevel { get; set; }
         public string CurrentMapName { get { return CurrentGameManager.GetCurrentMapId(this); } set { } }
-        public Vector3 CurrentPosition
+        public Vec3 CurrentPosition
         {
             get { return CurrentGameManager.GetCurrentPosition(this); }
             set { CurrentGameManager.SetCurrentPosition(this, value); }
         }
-        public Vector3 CurrentRotation
+        public Vec3 CurrentRotation
         {
             get
             {
@@ -96,7 +96,7 @@ namespace MultiplayerARPG
             get { return respawnMapName.Value; }
             set { respawnMapName.Value = value; }
         }
-        public Vector3 RespawnPosition
+        public Vec3 RespawnPosition
         {
             get { return respawnPosition.Value; }
             set { respawnPosition.Value = value; }

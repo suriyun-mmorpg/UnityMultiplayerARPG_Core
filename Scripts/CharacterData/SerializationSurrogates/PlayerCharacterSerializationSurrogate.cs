@@ -39,10 +39,10 @@ namespace MultiplayerARPG
             info.AddValue("userGold", data.UserGold);
             info.AddValue("userCash", data.UserCash);
             info.AddValue("currentMapName", data.CurrentMapName);
-            info.AddValue("currentPosition", data.CurrentPosition);
-            info.AddValue("currentRotation", data.CurrentRotation);
+            info.AddValue("currentPosition", (Vector3)data.CurrentPosition);
+            info.AddValue("currentRotation", (Vector3)data.CurrentRotation);
             info.AddValue("respawnMapName", data.RespawnMapName);
-            info.AddValue("respawnPosition", data.RespawnPosition);
+            info.AddValue("respawnPosition", (Vector3)data.RespawnPosition);
             info.AddValue("mountDataId", data.MountDataId);
             info.AddValue("iconDataId", data.IconDataId);
             info.AddValue("frameDataId", data.FrameDataId);

@@ -43,7 +43,7 @@ namespace MultiplayerARPG
             writer.Put(buildingSaveData.IsLocked);
             writer.Put(buildingSaveData.LockPassword);
             writer.PutVector3(buildingSaveData.Position);
-            writer.PutQuaternion(buildingSaveData.Rotation);
+            writer.PutVector3(buildingSaveData.Rotation);
             writer.Put(buildingSaveData.CreatorId);
             writer.Put(buildingSaveData.CreatorName);
             writer.Put(buildingSaveData.ExtraData);
@@ -70,7 +70,7 @@ namespace MultiplayerARPG
             buildingSaveData.IsLocked = reader.GetBool();
             buildingSaveData.LockPassword = reader.GetString();
             buildingSaveData.Position = reader.GetVector3();
-            buildingSaveData.Rotation = reader.GetQuaternion();
+            buildingSaveData.Rotation = reader.GetVector3();
             buildingSaveData.CreatorId = reader.GetString();
             buildingSaveData.CreatorName = reader.GetString();
             buildingSaveData.ExtraData = reader.GetString();

@@ -149,16 +149,16 @@ namespace MultiplayerARPG
             set;
         }
 
-        public Vector3 Position
+        public Vec3 Position
         {
             get { return EntityTransform.position; }
             set { EntityTransform.position = value; }
         }
 
-        public Quaternion Rotation
+        public Vec3 Rotation
         {
-            get { return EntityTransform.rotation; }
-            set { EntityTransform.rotation = value; }
+            get { return EntityTransform.eulerAngles; }
+            set { EntityTransform.eulerAngles = value; }
         }
 
         public string CreatorId

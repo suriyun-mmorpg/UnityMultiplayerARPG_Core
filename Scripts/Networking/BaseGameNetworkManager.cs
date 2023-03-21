@@ -897,7 +897,7 @@ namespace MultiplayerARPG
             {
                 LiteNetLibIdentity spawnObj = Assets.GetObjectInstance(
                     GameInstance.BuildingEntities[saveData.EntityId].Identity.HashAssetId,
-                    saveData.Position, saveData.Rotation);
+                    saveData.Position, Quaternion.Euler(saveData.Rotation));
                 BuildingEntity buildingEntity = spawnObj.GetComponent<BuildingEntity>();
                 buildingEntity.Id = saveData.Id;
                 buildingEntity.ParentId = saveData.ParentId;
