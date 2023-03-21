@@ -25,8 +25,8 @@ namespace MultiplayerARPG
         }
 
         [System.NonSerialized]
-        private Dictionary<WeaponType, WeightedRandomizer<ItemDropByWeight>> cacheHarvestItems;
-        public Dictionary<WeaponType, WeightedRandomizer<ItemDropByWeight>> CacheHarvestItems
+        private Dictionary<WeaponType, WeightedRandomizer<ItemDropForHarvestable>> cacheHarvestItems;
+        public Dictionary<WeaponType, WeightedRandomizer<ItemDropForHarvestable>> CacheHarvestItems
         {
             get
             {
@@ -47,8 +47,8 @@ namespace MultiplayerARPG
         }
 
         [System.NonSerialized]
-        private Dictionary<BaseSkill, WeightedRandomizer<ItemDropByWeight>> cacheSkillHarvestItems;
-        public Dictionary<BaseSkill, WeightedRandomizer<ItemDropByWeight>> CacheSkillHarvestItems
+        private Dictionary<BaseSkill, WeightedRandomizer<ItemDropForHarvestable>> cacheSkillHarvestItems;
+        public Dictionary<BaseSkill, WeightedRandomizer<ItemDropForHarvestable>> CacheSkillHarvestItems
         {
             get
             {
@@ -62,14 +62,14 @@ namespace MultiplayerARPG
             if (cacheHarvestEffectivenesses == null || cacheHarvestItems == null)
             {
                 cacheHarvestEffectivenesses = new Dictionary<WeaponType, HarvestEffectiveness>();
-                cacheHarvestItems = new Dictionary<WeaponType, WeightedRandomizer<ItemDropByWeight>>();
+                cacheHarvestItems = new Dictionary<WeaponType, WeightedRandomizer<ItemDropForHarvestable>>();
                 foreach (HarvestEffectiveness harvestEffectiveness in harvestEffectivenesses)
                 {
                     if (harvestEffectiveness.weaponType != null && harvestEffectiveness.damageEffectiveness > 0)
                     {
                         cacheHarvestEffectivenesses[harvestEffectiveness.weaponType] = harvestEffectiveness;
-                        Dictionary<ItemDropByWeight, int> harvestItems = new Dictionary<ItemDropByWeight, int>();
-                        foreach (ItemDropByWeight item in harvestEffectiveness.items)
+                        Dictionary<ItemDropForHarvestable, int> harvestItems = new Dictionary<ItemDropForHarvestable, int>();
+                        foreach (ItemDropForHarvestable item in harvestEffectiveness.items)
                         {
                             if (item.item == null || item.amountPerDamage <= 0 || item.randomWeight <= 0)
                                 continue;
@@ -82,14 +82,14 @@ namespace MultiplayerARPG
             if (cacheSkillHarvestEffectivenesses == null || cacheSkillHarvestItems == null)
             {
                 cacheSkillHarvestEffectivenesses = new Dictionary<BaseSkill, SkillHarvestEffectiveness>();
-                cacheSkillHarvestItems = new Dictionary<BaseSkill, WeightedRandomizer<ItemDropByWeight>>();
+                cacheSkillHarvestItems = new Dictionary<BaseSkill, WeightedRandomizer<ItemDropForHarvestable>>();
                 foreach (SkillHarvestEffectiveness skillHarvestEffectiveness in skillHarvestEffectivenesses)
                 {
                     if (skillHarvestEffectiveness.skill != null && skillHarvestEffectiveness.damageEffectiveness > 0)
                     {
                         cacheSkillHarvestEffectivenesses[skillHarvestEffectiveness.skill] = skillHarvestEffectiveness;
-                        Dictionary<ItemDropByWeight, int> harvestItems = new Dictionary<ItemDropByWeight, int>();
-                        foreach (ItemDropByWeight item in skillHarvestEffectiveness.items)
+                        Dictionary<ItemDropForHarvestable, int> harvestItems = new Dictionary<ItemDropForHarvestable, int>();
+                        foreach (ItemDropForHarvestable item in skillHarvestEffectiveness.items)
                         {
                             if (item.item == null || item.amountPerDamage <= 0 || item.randomWeight <= 0)
                                 continue;
@@ -129,7 +129,7 @@ namespace MultiplayerARPG
         [Range(0.1f, 5f)]
         public float damageEffectiveness;
         [ArrayElementTitle("item")]
-        public ItemDropByWeight[] items;
+        public ItemDropForHarvestable[] items;
     }
 
     [System.Serializable]
@@ -140,6 +140,6 @@ namespace MultiplayerARPG
         [Range(0.1f, 5f)]
         public float damageEffectiveness;
         [ArrayElementTitle("item")]
-        public ItemDropByWeight[] items;
+        public ItemDropForHarvestable[] items;
     }
 }

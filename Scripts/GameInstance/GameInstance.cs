@@ -1096,16 +1096,16 @@ namespace MultiplayerARPG
             }
         }
 
-        public static void AddItems(params ItemDropByWeight[] itemDrops)
+        public static void AddItems(params ItemDropForHarvestable[] itemDrops)
         {
-            AddItems((IEnumerable<ItemDropByWeight>)itemDrops);
+            AddItems((IEnumerable<ItemDropForHarvestable>)itemDrops);
         }
 
-        public static void AddItems(IEnumerable<ItemDropByWeight> itemDrops)
+        public static void AddItems(IEnumerable<ItemDropForHarvestable> itemDrops)
         {
             if (itemDrops == null)
                 return;
-            foreach (ItemDropByWeight itemDrop in itemDrops)
+            foreach (ItemDropForHarvestable itemDrop in itemDrops)
             {
                 AddItems(itemDrop.item);
             }

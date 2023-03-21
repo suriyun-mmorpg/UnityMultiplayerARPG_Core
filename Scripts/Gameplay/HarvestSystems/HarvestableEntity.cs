@@ -119,7 +119,7 @@ namespace MultiplayerARPG
                 skillHarvestType = skill.GetHarvestType();
             }
             // Get randomizer and random damage
-            WeightedRandomizer<ItemDropByWeight> itemRandomizer = null;
+            WeightedRandomizer<ItemDropForHarvestable> itemRandomizer = null;
             switch (skillHarvestType)
             {
                 case HarvestType.BasedOnWeapon:
@@ -147,7 +147,7 @@ namespace MultiplayerARPG
             // If found randomizer, random dropping items
             if (skillHarvestType != HarvestType.None && itemRandomizer != null)
             {
-                ItemDropByWeight receivingItem = itemRandomizer.TakeOne();
+                ItemDropForHarvestable receivingItem = itemRandomizer.TakeOne();
                 int itemDataId = receivingItem.item.DataId;
                 int itemAmount = (int)(receivingItem.amountPerDamage * calculatingTotalDamage);
                 bool droppingToGround = collectType == HarvestableCollectType.DropToGround;

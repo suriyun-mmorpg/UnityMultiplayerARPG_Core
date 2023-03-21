@@ -1,7 +1,7 @@
 ﻿namespace MultiplayerARPG
 {
     [System.Serializable]
-    public struct ItemDropByWeight
+    public struct ItemDropForHarvestable
     {
         public BaseItem item;
         public float amountPerDamage;
