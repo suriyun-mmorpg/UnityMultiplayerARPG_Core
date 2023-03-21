@@ -108,6 +108,8 @@ namespace MultiplayerARPG
         [SerializeField]
         private ItemDropTable[] itemDropTables = new ItemDropTable[0];
         [SerializeField]
+        private ItemRandomByWeightTable[] itemRandomByWeightTables = new ItemRandomByWeightTable[0];
+        [SerializeField]
         [Tooltip("Max kind of items that will be dropped in ground")]
         private byte maxDropItems = 5;
 
@@ -143,6 +145,22 @@ namespace MultiplayerARPG
         private IncrementalMinMaxInt? adjustRandomExp = null;
         [System.NonSerialized]
         private IncrementalMinMaxInt? adjustRandomGold = null;
+
+        [System.NonSerialized]
+        private List<ItemRandomByWeightTable> cacheItemRandomByWeightTables = null;
+        public List<ItemRandomByWeightTable> CacheItemRandomByWeightTables
+        {
+            get
+            {
+                if (cacheItemRandomByWeightTables == null)
+                {
+                    cacheItemRandomByWeightTables = new List<ItemRandomByWeightTable>();
+                    if (itemRandomByWeightTables != null)
+                        cacheItemRandomByWeightTables.AddRange(itemRandomByWeightTables);
+                }
+                return cacheItemRandomByWeightTables;
+            }
+        }
 
         [System.NonSerialized]
         private List<ItemDrop> certainDropItems = new List<ItemDrop>();
@@ -471,7 +489,7 @@ namespace MultiplayerARPG
 
         public virtual void RandomItems(System.Action<BaseItem, int> onRandomItem)
         {
-            if (CacheRandomItems.Count == 0)
+            if (CacheRandomItems.Count == 0 && CacheItemRandomByWeightTables.Count <= 0)
                 return;
             int randomDropCount = 0;
             int i;
@@ -481,7 +499,10 @@ namespace MultiplayerARPG
             {
                 if (BaseGameNetworkManager.CurrentMapInfo.ExcludeItemFromDropping(certainDropItems[i].item))
                     continue;
-                onRandomItem.Invoke(certainDropItems[i].item, Random.Range(certainDropItems[i].minAmount <= 0 ? 1 : certainDropItems[i].minAmount, certainDropItems[i].maxAmount));
+                if (certainDropItems[i].minAmount <= 0)
+                    onRandomItem.Invoke(certainDropItems[i].item, certainDropItems[i].maxAmount);
+                else
+                    onRandomItem.Invoke(certainDropItems[i].item, Random.Range(certainDropItems[i].minAmount, certainDropItems[i].maxAmount));
                 ++randomDropCount;
             }
             // Reached max drop items?
@@ -495,8 +516,20 @@ namespace MultiplayerARPG
                     continue;
                 if (BaseGameNetworkManager.CurrentMapInfo.ExcludeItemFromDropping(uncertainDropItems[i].item))
                     continue;
-                onRandomItem.Invoke(uncertainDropItems[i].item, Random.Range(uncertainDropItems[i].minAmount <= 0 ? 1 : uncertainDropItems[i].minAmount, uncertainDropItems[i].maxAmount));
+                if (uncertainDropItems[i].minAmount <= 0)
+                    onRandomItem.Invoke(uncertainDropItems[i].item, uncertainDropItems[i].maxAmount);
+                else
+                    onRandomItem.Invoke(uncertainDropItems[i].item, Random.Range(uncertainDropItems[i].minAmount, uncertainDropItems[i].maxAmount));
                 ++randomDropCount;
+            }
+            // Reached max drop items?
+            if (randomDropCount >= maxDropItems)
+                return;
+            // Drop items by weighted tables
+            CacheItemRandomByWeightTables.Shuffle();
+            for (i = 0; i < CacheItemRandomByWeightTables.Count && randomDropCount < maxDropItems; ++i)
+            {
+                CacheItemRandomByWeightTables[i].RandomItem(onRandomItem);
             }
         }
 
@@ -558,6 +591,13 @@ namespace MultiplayerARPG
             base.PrepareRelatesData();
             DamageInfo.PrepareRelatesData();
             GameInstance.AddItems(CacheRandomItems);
+            if (itemRandomByWeightTables != null)
+            {
+                foreach (ItemRandomByWeightTable entry in itemRandomByWeightTables)
+                {
+                    GameInstance.AddItems(entry.randomItems);
+                }
+            }
         }
 
         public override bool Validate()
