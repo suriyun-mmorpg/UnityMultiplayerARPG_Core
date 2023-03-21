@@ -34,3 +34,6 @@
 [submodule "SharedData"]
 	path = SharedData
 	url = https://github.com/insthync/UnityMultiplayerARPG_SharedData.git
+[submodule "UnityRestClient"]
+	path = UnityRestClient
+	url = https://github.com/insthync/unity-rest-client.git
