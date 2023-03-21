@@ -33,8 +33,9 @@ namespace MultiplayerARPG
         /// <returns></returns>
         public virtual Vector3 GetCurrentPosition(BasePlayerCharacterEntity playerCharacterEntity)
         {
-            if (CurrentGameInstance.currentPositionSaveMode == CurrentPositionSaveMode.UseRespawnPosition || !CurrentMapInfo.SaveCurrentMapPosition)
-                return new Vector3(playerCharacterEntity.RespawnPositionX, playerCharacterEntity.RespawnPositionY, playerCharacterEntity.RespawnPositionZ);
+            if (CurrentGameInstance.currentPositionSaveMode == CurrentPositionSaveMode.UseRespawnPosition ||
+                !CurrentMapInfo.SaveCurrentMapPosition)
+                return playerCharacterEntity.RespawnPosition;
             return playerCharacterEntity.EntityTransform.position;
         }
 
