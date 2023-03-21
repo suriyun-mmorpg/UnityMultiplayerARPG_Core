@@ -39,10 +39,10 @@ namespace MultiplayerARPG
             info.AddValue("userGold", data.UserGold);
             info.AddValue("userCash", data.UserCash);
             info.AddValue("currentMapName", data.CurrentMapName);
-            info.AddValue("currentPosition", new Vector3(data.CurrentPositionX, data.CurrentPositionY, data.CurrentPositionZ));
-            info.AddValue("currentRotation", new Vector3(data.CurrentRotationX, data.CurrentRotationY, data.CurrentRotationZ));
+            info.AddValue("currentPosition", data.CurrentPosition);
+            info.AddValue("currentRotation", data.CurrentRotation);
             info.AddValue("respawnMapName", data.RespawnMapName);
-            info.AddValue("respawnPosition", new Vector3(data.RespawnPositionX, data.RespawnPositionY, data.RespawnPositionZ));
+            info.AddValue("respawnPosition", data.RespawnPosition);
             info.AddValue("mountDataId", data.MountDataId);
             info.AddValue("iconDataId", data.IconDataId);
             info.AddValue("frameDataId", data.FrameDataId);
@@ -106,24 +106,15 @@ namespace MultiplayerARPG
             }
             catch { }
             data.CurrentMapName = info.GetString("currentMapName");
-            Vector3 currentPosition = (Vector3)info.GetValue("currentPosition", typeof(Vector3));
-            data.CurrentPositionX = currentPosition.x;
-            data.CurrentPositionY = currentPosition.y;
-            data.CurrentPositionZ = currentPosition.z;
+            data.CurrentPosition = (Vector3)info.GetValue("currentPosition", typeof(Vector3));
             // TODO: Backward compatible, this will be removed in future version
             try
             {
-                Vector3 currentRotation = (Vector3)info.GetValue("currentRotation", typeof(Vector3));
-                data.CurrentRotationX = currentRotation.x;
-                data.CurrentRotationY = currentRotation.y;
-                data.CurrentRotationZ = currentRotation.z;
+                data.CurrentRotation = (Vector3)info.GetValue("currentRotation", typeof(Vector3));
             }
             catch { }
             data.RespawnMapName = info.GetString("respawnMapName");
-            Vector3 respawnPosition = (Vector3)info.GetValue("respawnPosition", typeof(Vector3));
-            data.RespawnPositionX = respawnPosition.x;
-            data.RespawnPositionY = respawnPosition.y;
-            data.RespawnPositionZ = respawnPosition.z;
+            data.RespawnPosition = (Vector3)info.GetValue("respawnPosition", typeof(Vector3));
             // TODO: Backward compatible, this will be removed in future version
             try
             {
