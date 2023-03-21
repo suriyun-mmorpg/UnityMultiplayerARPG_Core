@@ -57,6 +57,10 @@ namespace MultiplayerARPG
         public const string ITEM_DROP_TABLE_MENU = "Create GameData/Item Drop Table";
         public const int ITEM_DROP_TABLE_ORDER = -5893;
 
+        public const string ITEM_RANDOM_BY_WEIGHT_TABLE_FILE = "Item Random By Weight Table";
+        public const string ITEM_RANDOM_BY_WEIGHT_TABLE_MENU = "Create GameData/Item Random By Weight Table";
+        public const int ITEM_RANDOM_BY_WEIGHT_TABLE_ORDER = -5892;
+
         public const string SKILL_FILE = "Skill";
         public const string SKILL_MENU = "Create GameData/Skill/Skill";
         public const int SKILL_ORDER = -5799;
