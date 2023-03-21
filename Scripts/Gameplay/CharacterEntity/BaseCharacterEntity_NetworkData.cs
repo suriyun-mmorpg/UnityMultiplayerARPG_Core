@@ -330,7 +330,6 @@ namespace MultiplayerARPG
         private void OnLevelChange(bool isInitial, int level)
         {
             isRecaching = true;
-
             if (onLevelChange != null)
                 onLevelChange.Invoke(level);
         }
@@ -409,6 +408,7 @@ namespace MultiplayerARPG
         protected virtual void OnEquipWeaponSetChange(bool isInitial, byte equipWeaponSet)
         {
             PrepareToSetEquipWeaponsModels();
+            isRecaching = true;
             if (onEquipWeaponSetChange != null)
                 onEquipWeaponSetChange.Invoke(equipWeaponSet);
         }
@@ -421,6 +421,7 @@ namespace MultiplayerARPG
         protected virtual void OnIsWeaponsSheathedChange(bool isInitial, bool isWeaponsSheathed)
         {
             PrepareToSetEquipWeaponsModels();
+            isRecaching = true;
             if (onIsWeaponsSheathedChange != null)
                 onIsWeaponsSheathedChange.Invoke(isWeaponsSheathed);
         }

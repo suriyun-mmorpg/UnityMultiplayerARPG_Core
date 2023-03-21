@@ -420,9 +420,9 @@ namespace MultiplayerARPG
 
         private void OnTitleDataIdChange(bool isInitial, int guildId)
         {
+            isRecaching = true;
             if (onTitleDataIdChange != null)
                 onTitleDataIdChange.Invoke(guildId);
-            isRecaching = true;
         }
 
         private void OnIsWarpingChange(bool isInitial, bool isWarping)
