@@ -32,6 +32,7 @@ namespace MultiplayerARPG
             get { return multipleModeOpenCount; }
         }
 
+        [Tooltip("An empty items won't be used for item randoming")]
         [ArrayElementTitle("item")]
         [SerializeField]
         private ItemRandomByWeight[] randomItems = new ItemRandomByWeight[0];
@@ -40,26 +41,52 @@ namespace MultiplayerARPG
             get { return randomItems; }
         }
 
+        [System.NonSerialized]
+        private Dictionary<ItemRandomByWeight, int> cacheRandomItems;
+        public Dictionary<ItemRandomByWeight, int> CacheRandomItems
+        {
+            get
+            {
+                if (cacheRandomItems == null)
+                {
+                    cacheRandomItems = new Dictionary<ItemRandomByWeight, int>();
+                    foreach (ItemRandomByWeight item in randomItems)
+                    {
+                        if (item.item == null || item.maxAmount <= 0 || item.randomWeight <= 0)
+                            continue;
+                        cacheRandomItems[item] = item.randomWeight;
+                    }
+                }
+                return cacheRandomItems;
+            }
+        }
+
         public List<RewardedItem> GetRandomedItems(int count)
         {
             List<RewardedItem> rewardItems = new List<RewardedItem>();
-            Dictionary<ItemRandomByWeight, int> randomItems = new Dictionary<ItemRandomByWeight, int>();
-            foreach (ItemRandomByWeight item in RandomItems)
-            {
-                if (item.item == null || item.randomWeight <= 0)
-                    continue;
-                randomItems[item] = item.randomWeight;
-            }
             for (int i = 0; i < count; ++i)
             {
-                ItemRandomByWeight randomedItem = WeightedRandomizer.From(randomItems).TakeOne();
-                rewardItems.Add(new RewardedItem()
+                ItemRandomByWeight randomedItem = WeightedRandomizer.From(CacheRandomItems).TakeOne();
+                if (randomedItem.minAmount <= 0)
                 {
-                    item = randomedItem.item,
-                    level = 1,
-                    amount = randomedItem.amount,
-                    randomSeed = Random.Range(int.MinValue, int.MaxValue),
-                });
+                    rewardItems.Add(new RewardedItem()
+                    {
+                        item = randomedItem.item,
+                        level = 1,
+                        amount = randomedItem.maxAmount,
+                        randomSeed = Random.Range(int.MinValue, int.MaxValue),
+                    });
+                }
+                else
+                {
+                    rewardItems.Add(new RewardedItem()
+                    {
+                        item = randomedItem.item,
+                        level = 1,
+                        amount = Random.Range(randomedItem.minAmount, randomedItem.maxAmount),
+                        randomSeed = Random.Range(int.MinValue, int.MaxValue),
+                    });
+                }
             }
             return rewardItems;
         }
