@@ -728,7 +728,7 @@ namespace MultiplayerARPG.GameData.Model.Playables
             float weight;
             float weightUpdate;
             bool transitionEnded = false;
-            if (CharacterModel.isDead && Time.frameCount - CharacterModel.AwakenFrame < 2)
+            if (CharacterModel.isDead && Time.unscaledTime - CharacterModel.AwakenTime < 1f)
             {
                 // Play dead animation at end frame immediately
                 mixer.GetInput(stateUpdateData.inputPort).SetTime(Cache.BaseStates[stateUpdateData.playingStateId].State.clip.length);
