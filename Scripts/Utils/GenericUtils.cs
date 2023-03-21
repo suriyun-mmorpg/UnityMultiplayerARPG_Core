@@ -8,50 +8,24 @@ using UnityEngine.Networking;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 using TMPro;
+using UnityEngine.EventSystems;
 
 public static class GenericUtils
 {
-    private static List<InputField> inputFields;
-    private static List<TMP_InputField> textMeshInputFields;
-    private static bool isSetOnActiveSceneChanged_ResetInputField;
     private static System.Random randomizer = new System.Random();
 
     public static bool IsFocusInputField()
     {
-        GameObject[] rootObjects;
-        if (inputFields == null || textMeshInputFields == null)
+        if (EventSystem.current != null && EventSystem.current.currentSelectedGameObject != null)
         {
-            inputFields = new List<InputField>();
-            textMeshInputFields = new List<TMP_InputField>();
-            rootObjects = SceneManager.GetActiveScene().GetRootGameObjects();
-            foreach (GameObject rootObject in rootObjects)
-            {
-                inputFields.AddRange(rootObject.GetComponentsInChildren<InputField>(true));
-                textMeshInputFields.AddRange(rootObject.GetComponentsInChildren<TMP_InputField>(true));
-            }
-        }
-        foreach (InputField inputField in inputFields)
-        {
-            if (inputField.isFocused)
+            InputField inputField = EventSystem.current.currentSelectedGameObject.GetComponent<InputField>();
+            if (inputField != null && inputField.isFocused)
                 return true;
-        }
-        foreach (TMP_InputField inputField in textMeshInputFields)
-        {
-            if (inputField.isFocused)
+            TMP_InputField tmpInputField = EventSystem.current.currentSelectedGameObject.GetComponent<TMP_InputField>();
+            if (tmpInputField != null && tmpInputField.isFocused)
                 return true;
-        }
-        if (!isSetOnActiveSceneChanged_ResetInputField)
-        {
-            SceneManager.activeSceneChanged += OnActiveSceneChanged_ResetInputField;
-            isSetOnActiveSceneChanged_ResetInputField = true;
         }
         return false;
-    }
-
-    public static void OnActiveSceneChanged_ResetInputField(Scene scene1, Scene scene2)
-    {
-        inputFields = null;
-        textMeshInputFields = null;
     }
 
     public static Rect GetWorldRect(this RectTransform transform)
