@@ -7,7 +7,7 @@ namespace MultiplayerARPG
     public struct ItemDrop
     {
         public BaseItem item;
-        [Min(1)]
+        [Tooltip("Set `minAmount` to <= `0` to not random amount, it will use `maxAmount` as a dropped amount")]
         public int minAmount;
         [FormerlySerializedAs("amount")]
         [Min(1)]
