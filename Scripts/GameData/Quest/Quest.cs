@@ -110,12 +110,12 @@ namespace MultiplayerARPG
             }
             for (int i = 0; i < randomRewardItems.Length; ++i)
             {
-                if (randomRewardItems[i].amount <= 0)
+                if (randomRewardItems[i].maxAmount <= 0)
                 {
-                    Debug.LogWarning("[Quest] Random Reward Items [" + i + "], amount is " + randomRewardItems[i].amount + " will be changed to 1 (Minimum Value)");
+                    Debug.LogWarning("[Quest] Random Reward Items [" + i + "], max amount is " + randomRewardItems[i].maxAmount + " will be changed to 1 (Minimum Value)");
                     hasChanges = true;
                     ItemRandomByWeight reward = randomRewardItems[i];
-                    reward.amount = 1;
+                    reward.maxAmount = 1;
                     randomRewardItems[i] = reward;
                 }
             }

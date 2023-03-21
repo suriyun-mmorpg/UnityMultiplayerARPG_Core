@@ -361,7 +361,7 @@ namespace MultiplayerARPG
                 CacheRandomRewardItemList.Generate(Quest.randomRewardItems, (index, RandomrewardItem, ui) =>
                 {
                     UICharacterItem uiCharacterItem = ui.GetComponent<UICharacterItem>();
-                    uiCharacterItem.Setup(new UICharacterItemData(CharacterItem.Create(RandomrewardItem.item, 1, RandomrewardItem.amount), InventoryType.NonEquipItems), GameInstance.PlayingCharacter, -1);
+                    uiCharacterItem.Setup(new UICharacterItemData(CharacterItem.Create(RandomrewardItem.item, 1, RandomrewardItem.maxAmount), InventoryType.NonEquipItems), GameInstance.PlayingCharacter, -1);
                     uiCharacterItem.Show();
                     CacheRewardItemSelectionManager.Add(uiCharacterItem);
                 });
