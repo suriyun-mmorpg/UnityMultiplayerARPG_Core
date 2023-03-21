@@ -141,6 +141,7 @@ namespace MultiplayerARPG
         protected readonly HashSet<string> looters = new HashSet<string>();
         protected readonly List<CharacterItem> droppingItems = new List<CharacterItem>();
         protected float lastTeleportToSummonerTime = 0f;
+        protected int beforeDamageReceivedHp;
 
         public override void PrepareRelatesData()
         {
@@ -286,6 +287,12 @@ namespace MultiplayerARPG
             return base.GetMoveSpeed();
         }
 
+        public override void ReceivingDamage(HitBoxPosition position, Vector3 fromPosition, EntityInfo instigator, Dictionary<DamageElement, MinMaxFloat> damageAmounts, CharacterItem weapon, BaseSkill skill, int skillLevel)
+        {
+            beforeDamageReceivedHp = CurrentHp;
+            base.ReceivingDamage(position, fromPosition, instigator, damageAmounts, weapon, skill, skillLevel);
+        }
+
         public override void ReceivedDamage(HitBoxPosition position, Vector3 fromPosition, EntityInfo instigator, Dictionary<DamageElement, MinMaxFloat> damageAmounts, CombatAmountType damageAmountType, int totalDamage, CharacterItem weapon, BaseSkill skill, int skillLevel, CharacterBuff buff, bool isDamageOverTime = false)
         {
             RecordRecivingDamage(instigator, totalDamage);
@@ -294,8 +301,9 @@ namespace MultiplayerARPG
 
         public override void OnBuffHpDecrease(EntityInfo causer, int amount)
         {
-            RecordRecivingDamage(causer, amount);
+            beforeDamageReceivedHp = CurrentHp;
             base.OnBuffHpDecrease(causer, amount);
+            RecordRecivingDamage(causer, amount);
         }
 
         public void RecordRecivingDamage(EntityInfo instigator, int damage)
@@ -310,8 +318,8 @@ namespace MultiplayerARPG
                 // Add received damage entry
                 if (attackerCharacter != null)
                 {
-                    if (damage > CurrentHp)
-                        damage = CurrentHp;
+                    if (damage > beforeDamageReceivedHp)
+                        damage = beforeDamageReceivedHp;
                     ReceivedDamageRecord receivedDamageRecord = new ReceivedDamageRecord();
                     receivedDamageRecord.totalReceivedDamage = damage;
                     if (receivedDamageRecords.ContainsKey(attackerCharacter))
