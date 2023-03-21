@@ -161,7 +161,7 @@ namespace MultiplayerARPG
         {
             portalType = WarpPortalType.Default;
             mapName = playerCharacterData.RespawnMapName;
-            position = new Vector3(playerCharacterData.RespawnPositionX, playerCharacterData.RespawnPositionY, playerCharacterData.RespawnPositionZ);
+            position = playerCharacterData.RespawnPosition;
             overrideRotation = false;
             rotation = Vector3.zero;
         }
