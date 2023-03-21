@@ -149,40 +149,16 @@ namespace MultiplayerARPG
             set;
         }
 
-        public float PositionX
+        public Vector3 Position
         {
-            get { return EntityTransform.position.x; }
-            set { EntityTransform.position = new Vector3(value, EntityTransform.position.y, EntityTransform.position.z); }
+            get { return EntityTransform.position; }
+            set { EntityTransform.position = value; }
         }
 
-        public float PositionY
+        public Quaternion Rotation
         {
-            get { return EntityTransform.position.y; }
-            set { EntityTransform.position = new Vector3(EntityTransform.position.x, value, EntityTransform.position.z); }
-        }
-
-        public float PositionZ
-        {
-            get { return EntityTransform.position.z; }
-            set { EntityTransform.position = new Vector3(EntityTransform.position.x, EntityTransform.position.y, value); }
-        }
-
-        public float RotationX
-        {
-            get { return EntityTransform.eulerAngles.x; }
-            set { EntityTransform.eulerAngles = new Vector3(value, EntityTransform.eulerAngles.y, EntityTransform.eulerAngles.z); }
-        }
-
-        public float RotationY
-        {
-            get { return EntityTransform.eulerAngles.y; }
-            set { EntityTransform.eulerAngles = new Vector3(EntityTransform.eulerAngles.x, value, EntityTransform.eulerAngles.z); }
-        }
-
-        public float RotationZ
-        {
-            get { return EntityTransform.eulerAngles.z; }
-            set { EntityTransform.eulerAngles = new Vector3(EntityTransform.eulerAngles.x, EntityTransform.eulerAngles.y, value); }
+            get { return EntityTransform.rotation; }
+            set { EntityTransform.rotation = value; }
         }
 
         public string CreatorId
