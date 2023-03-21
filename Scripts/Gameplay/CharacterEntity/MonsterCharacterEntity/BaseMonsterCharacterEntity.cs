@@ -310,6 +310,8 @@ namespace MultiplayerARPG
                 // Add received damage entry
                 if (attackerCharacter != null)
                 {
+                    if (damage > CurrentHp)
+                        damage = CurrentHp;
                     ReceivedDamageRecord receivedDamageRecord = new ReceivedDamageRecord();
                     receivedDamageRecord.totalReceivedDamage = damage;
                     if (receivedDamageRecords.ContainsKey(attackerCharacter))
