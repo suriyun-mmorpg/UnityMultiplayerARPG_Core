@@ -150,19 +150,23 @@ namespace MultiplayerARPG
             NavPaths = null;
         }
 
+#if UNITY_EDITOR
         private void OnDrawGizmos()
         {
             Color transparentGreen = new Color(0.0f, 1.0f, 0.0f, 0.35f);
             Color transparentRed = new Color(1.0f, 0.0f, 0.0f, 0.35f);
 
-            if (grounded) 
+            if (grounded)
                 Gizmos.color = transparentGreen;
-            else 
+            else
                 Gizmos.color = transparentRed;
 
-            // when selected, draw a gizmo in the position of, and matching radius of, the grounded collider
+            if (CacheCharacterController == null)
+                CacheCharacterController = GetComponent<CharacterController>();
+            // when selected, draw a gizmos in the position of, and matching radius of, the grounded collider
             Gizmos.DrawSphere(new Vector3(transform.position.x, transform.position.y + (CacheCharacterController.radius * transform.localScale.y), transform.position.z), CacheCharacterController.radius * Mathf.Max(transform.localScale.x, transform.localScale.z));
         }
+#endif
 
         private void OnAnimatorMove()
         {
