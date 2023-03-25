@@ -210,7 +210,7 @@ namespace MultiplayerARPG
             }
 
             IsRightHandItemAvailable = false;
-            IsRightHandItemAvailable = false;
+            IsLeftHandItemAvailable = false;
 
             IWeaponItem rightWeaponItem = characterData.EquipWeapons.GetRightHandWeaponItem();
             if (rightWeaponItem != null)
