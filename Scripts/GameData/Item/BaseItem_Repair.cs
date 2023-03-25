@@ -12,7 +12,7 @@ namespace MultiplayerARPG
         public bool CanRepair(IPlayerCharacterData character, float durability, out float maxDurability, out ItemRepairPrice repairPrice, out UITextKeys gameMessageType)
         {
             maxDurability = 0f;
-            repairPrice = default(ItemRepairPrice);
+            repairPrice = default;
             if (!this.IsEquipment())
             {
                 // Cannot repair because it's not equipment item
@@ -26,6 +26,11 @@ namespace MultiplayerARPG
                 return false;
             }
             repairPrice = GetRepairPrice(durability, out maxDurability);
+            if (durability >= maxDurability)
+            {
+                gameMessageType = UITextKeys.UI_ERROR_CANNOT_REPAIR;
+                return false;
+            }
             return repairPrice.CanRepair(character, out gameMessageType);
         }
 
@@ -36,12 +41,12 @@ namespace MultiplayerARPG
 
         public ItemRepairPrice GetRepairPrice(float durability, out float maxDurability)
         {
-            ItemRepairPrice repairPrice = default(ItemRepairPrice);
+            ItemRepairPrice repairPrice = default;
             maxDurability = (this as IEquipmentItem).MaxDurability;
             if (maxDurability <= 0f)
                 return repairPrice;
             float durabilityRate = durability / maxDurability;
-            if (durabilityRate >= 0.99f)
+            if (durabilityRate >= 1f)
                 return repairPrice;
             System.Array.Sort(itemRefine.RepairPrices);
             for (int i = itemRefine.RepairPrices.Length - 1; i >= 0; --i)
@@ -99,16 +104,8 @@ namespace MultiplayerARPG
                 gameMessageType = UITextKeys.UI_ERROR_ITEM_NOT_FOUND;
                 return false;
             }
-            BaseItem equipmentItem = repairingItem.GetEquipmentItem() as BaseItem;
-            if (equipmentItem == null)
-            {
-                // Cannot refine because it's not equipment item
-                gameMessageType = UITextKeys.UI_ERROR_ITEM_NOT_EQUIPMENT;
-                return false;
-            }
-            float maxDurability;
-            ItemRepairPrice repairPrice;
-            if (!equipmentItem.CanRepair(character, repairingItem.durability, out maxDurability, out repairPrice, out gameMessageType))
+            BaseItem equipmentItem = repairingItem.GetItem();
+            if (!equipmentItem.CanRepair(character, repairingItem.durability, out float maxDurability, out ItemRepairPrice repairPrice, out gameMessageType))
                 return false;
             gameMessageType = UITextKeys.UI_REPAIR_SUCCESS;
             // Repair item
