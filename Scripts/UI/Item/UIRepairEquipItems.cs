@@ -1,4 +1,5 @@
 ﻿using Cysharp.Text;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace MultiplayerARPG
@@ -15,22 +16,34 @@ namespace MultiplayerARPG
 
         [Header("UI Elements")]
         public TextWrapper uiTextRequireGold;
+        public UIItemAmounts uiRequireItemAmounts;
+        public UICurrencyAmounts uiRequireCurrencyAmounts;
         public TextWrapper uiTextSimpleRequireGold;
 
         private void LateUpdate()
         {
             int requireGold = 0;
+            List<ItemAmount> requireItems = new List<ItemAmount>();
+            List<CurrencyAmount> requireCurrencies = new List<CurrencyAmount>();
             ItemRepairPrice tempRepairPrice;
             EquipWeapons equipWeapons = GameInstance.PlayingCharacterEntity.EquipWeapons;
             if (!equipWeapons.IsEmptyRightHandSlot())
             {
                 tempRepairPrice = equipWeapons.rightHand.GetItem().GetRepairPrice(equipWeapons.rightHand.durability);
                 requireGold += tempRepairPrice.RequireGold;
+                if (tempRepairPrice.RequireItems != null && tempRepairPrice.RequireItems.Length > 0)
+                    requireItems.AddRange(tempRepairPrice.RequireItems);
+                if (tempRepairPrice.RequireCurrencies != null && tempRepairPrice.RequireCurrencies.Length > 0)
+                    requireCurrencies.AddRange(tempRepairPrice.RequireCurrencies);
             }
             if (!equipWeapons.IsEmptyLeftHandSlot())
             {
                 tempRepairPrice = equipWeapons.leftHand.GetItem().GetRepairPrice(equipWeapons.leftHand.durability);
                 requireGold += tempRepairPrice.RequireGold;
+                if (tempRepairPrice.RequireItems != null && tempRepairPrice.RequireItems.Length > 0)
+                    requireItems.AddRange(tempRepairPrice.RequireItems);
+                if (tempRepairPrice.RequireCurrencies != null && tempRepairPrice.RequireCurrencies.Length > 0)
+                    requireCurrencies.AddRange(tempRepairPrice.RequireCurrencies);
             }
             foreach (CharacterItem equipItem in GameInstance.PlayingCharacterEntity.EquipItems)
             {
@@ -38,6 +51,38 @@ namespace MultiplayerARPG
                     continue;
                 tempRepairPrice = equipItem.GetItem().GetRepairPrice(equipItem.durability);
                 requireGold += tempRepairPrice.RequireGold;
+                if (tempRepairPrice.RequireItems != null && tempRepairPrice.RequireItems.Length > 0)
+                    requireItems.AddRange(tempRepairPrice.RequireItems);
+                if (tempRepairPrice.RequireCurrencies != null && tempRepairPrice.RequireCurrencies.Length > 0)
+                    requireCurrencies.AddRange(tempRepairPrice.RequireCurrencies);
+            }
+
+            if (uiRequireItemAmounts != null)
+            {
+                if (requireItems.Count == 0)
+                {
+                    uiRequireItemAmounts.Hide();
+                }
+                else
+                {
+                    uiRequireItemAmounts.displayType = UIItemAmounts.DisplayType.Requirement;
+                    uiRequireItemAmounts.Show();
+                    uiRequireItemAmounts.Data = GameDataHelpers.CombineItems(requireItems, null);
+                }
+            }
+
+            if (uiRequireCurrencyAmounts != null)
+            {
+                if (requireCurrencies.Count == 0)
+                {
+                    uiRequireCurrencyAmounts.Hide();
+                }
+                else
+                {
+                    uiRequireCurrencyAmounts.displayType = UICurrencyAmounts.DisplayType.Requirement;
+                    uiRequireCurrencyAmounts.Show();
+                    uiRequireCurrencyAmounts.Data = GameDataHelpers.CombineCurrencies(requireCurrencies, null);
+                }
             }
 
             if (uiTextRequireGold != null)
