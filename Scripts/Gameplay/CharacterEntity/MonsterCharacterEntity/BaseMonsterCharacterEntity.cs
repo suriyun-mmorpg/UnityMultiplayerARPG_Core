@@ -433,6 +433,7 @@ namespace MultiplayerARPG
             bool givenRewardExp;
             bool givenRewardCurrency;
             float shareGuildExpRate;
+            float itemDropRate = 1f;
             if (receivedDamageRecords.Count > 0)
             {
                 float tempHighRewardRate = 0f;
@@ -588,6 +589,7 @@ namespace MultiplayerARPG
                         {
                             // Make current character able to pick up item because it made most damage
                             looters.Add(tempPlayerCharacterEntity.Id);
+                            itemDropRate = 1f + tempPlayerCharacterEntity.GetCaches().Stats.itemDropRate;
                         }
                     }   // End is `BasePlayerCharacterEntity` condition
                 }   // End for-loop
@@ -596,7 +598,7 @@ namespace MultiplayerARPG
             // Clear dropping items, it will fills in `OnRandomDropItem` function
             droppingItems.Clear();
             // Drop items
-            CharacterDatabase.RandomItems(OnRandomDropItem);
+            CharacterDatabase.RandomItems(OnRandomDropItem, itemDropRate);
 
             switch (CurrentGameInstance.monsterDeadDropItemMode)
             {

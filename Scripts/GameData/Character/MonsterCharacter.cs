@@ -487,7 +487,7 @@ namespace MultiplayerARPG
             return AdjustedRandomGold.GetAmount(level).Random();
         }
 
-        public virtual void RandomItems(System.Action<BaseItem, int> onRandomItem)
+        public virtual void RandomItems(System.Action<BaseItem, int> onRandomItem, float rate = 1f)
         {
             if (CacheRandomItems.Count == 0 && CacheItemRandomByWeightTables.Count <= 0)
                 return;
@@ -512,7 +512,7 @@ namespace MultiplayerARPG
             uncertainDropItems.Shuffle();
             for (i = 0; i < uncertainDropItems.Count && randomDropCount < maxDropItems; ++i)
             {
-                if (Random.value > uncertainDropItems[i].dropRate)
+                if (Random.value > uncertainDropItems[i].dropRate * rate)
                     continue;
                 if (BaseGameNetworkManager.CurrentMapInfo.ExcludeItemFromDropping(uncertainDropItems[i].item))
                     continue;
