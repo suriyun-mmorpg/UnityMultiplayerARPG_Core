@@ -475,7 +475,7 @@ namespace MultiplayerARPG
             newItem.ammo = 0;
             if (GameInstance.Items.TryGetValue(dataId, out BaseItem tempItem))
             {
-                if (tempItem is IEquipmentItem)
+                if (tempItem.IsEquipment())
                 {
                     newItem.durability = (tempItem as IEquipmentItem).MaxDurability;
                     newItem.lockRemainsDuration = tempItem.LockDuration;
