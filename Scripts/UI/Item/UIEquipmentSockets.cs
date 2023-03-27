@@ -27,7 +27,7 @@ namespace MultiplayerARPG
                 {
                     if (i < Data.sockets.Count && GameInstance.Items.TryGetValue(Data.sockets[i], out tempItem) && tempItem.IsSocketEnhancer())
                     {
-                        appliedSocketEnhancerItems.Add(CharacterItem.Create(Data.sockets[i], randomSeed: 0));
+                        appliedSocketEnhancerItems.Add(CharacterItem.Create(Data.sockets[i]));
                         tempText = GetEquipmentBonusText((tempItem as ISocketEnhancerItem).SocketEnhanceEffect);
                         if (allBonusText.Length > 0)
                             allBonusText.Append('\n');
@@ -59,7 +59,6 @@ namespace MultiplayerARPG
             {
                 uiAppliedSocketEnhancerItems.inventoryType = InventoryType.Unknow;
                 uiAppliedSocketEnhancerItems.CacheSelectionManager.selectionMode = UISelectionMode.SelectSingle;
-                uiAppliedSocketEnhancerItems.filterItemTypes = new List<ItemType>() { ItemType.SocketEnhancer };
                 uiAppliedSocketEnhancerItems.UpdateData(GameInstance.PlayingCharacter, appliedSocketEnhancerItems);
             }
         }
