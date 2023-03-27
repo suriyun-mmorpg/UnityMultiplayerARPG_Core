@@ -77,6 +77,8 @@ namespace MultiplayerARPG
             WriteEntry(builder, LanguageManager.GetText(UIFormatKeys.UI_FORMAT_GOLD_RATE.ToString()), Data.randomCharacterStats.goldRateApplyRate, Data.randomCharacterStats.minGoldRate, Data.randomCharacterStats.maxGoldRate, 100f);
             // ExpRate
             WriteEntry(builder, LanguageManager.GetText(UIFormatKeys.UI_FORMAT_EXP_RATE.ToString()), Data.randomCharacterStats.expRateApplyRate, Data.randomCharacterStats.minExpRate, Data.randomCharacterStats.maxExpRate, 100f);
+            // ItemDropRate
+            WriteEntry(builder, LanguageManager.GetText(UIFormatKeys.UI_FORMAT_ITEM_DROP_RATE.ToString()), Data.randomCharacterStats.itemDropRateApplyRate, Data.randomCharacterStats.minItemDropRate, Data.randomCharacterStats.maxItemDropRate, 100f);
         }
 
         private void WriteCharacterStatsRate(StringBuilder builder)
@@ -121,6 +123,8 @@ namespace MultiplayerARPG
             WriteEntry(builder, LanguageManager.GetText(UIFormatKeys.UI_FORMAT_GOLD_RATE_RATE.ToString()), Data.randomCharacterStatsRate.goldRateApplyRate, Data.randomCharacterStatsRate.minGoldRate, Data.randomCharacterStatsRate.maxGoldRate, 100f);
             // ExpRate
             WriteEntry(builder, LanguageManager.GetText(UIFormatKeys.UI_FORMAT_EXP_RATE_RATE.ToString()), Data.randomCharacterStatsRate.expRateApplyRate, Data.randomCharacterStatsRate.minExpRate, Data.randomCharacterStatsRate.maxExpRate, 100f);
+            // ItemDropRate
+            WriteEntry(builder, LanguageManager.GetText(UIFormatKeys.UI_FORMAT_ITEM_DROP_RATE_RATE.ToString()), Data.randomCharacterStats.itemDropRateApplyRate, Data.randomCharacterStats.minItemDropRate, Data.randomCharacterStats.maxItemDropRate, 100f);
         }
 
         private void WriteAttributes(StringBuilder builder)

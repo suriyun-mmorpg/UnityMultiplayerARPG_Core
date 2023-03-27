@@ -57,6 +57,8 @@ namespace MultiplayerARPG
         public UILocaleKeySetting formatKeyGoldRateStats = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_GOLD_RATE);
         [Tooltip("Format => {0} = {Amount * 100}")]
         public UILocaleKeySetting formatKeyExpRateStats = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_EXP_RATE);
+        [Tooltip("Format => {0} = {Amount * 100}")]
+        public UILocaleKeySetting formatKeyItemDropRateStats = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_ITEM_DROP_RATE);
 
         [Header("String Formats (Stats Rate)")]
         [Tooltip("Format => {0} = {Amount * 100}")]
@@ -105,6 +107,8 @@ namespace MultiplayerARPG
         public UILocaleKeySetting formatKeyGoldRateRateStats = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_GOLD_RATE_RATE);
         [Tooltip("Format => {0} = {Amount * 100}")]
         public UILocaleKeySetting formatKeyExpRateRateStats = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_EXP_RATE_RATE);
+        [Tooltip("Format => {0} = {Amount * 100}")]
+        public UILocaleKeySetting formatKeyItemDropRateRateStats = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_ITEM_DROP_RATE_RATE);
 
         [Header("UI Elements")]
         public TextWrapper uiTextStats;
@@ -131,6 +135,7 @@ namespace MultiplayerARPG
         public TextWrapper uiTextSlotLimit;
         public TextWrapper uiTextGoldRate;
         public TextWrapper uiTextExpRate;
+        public TextWrapper uiTextItemDropRate;
         public DisplayType displayType;
         public bool isBonus;
 
@@ -192,6 +197,7 @@ namespace MultiplayerARPG
                         slotLimitStatsFormat = formatKeySlotLimitRateStats,
                         goldRateStatsFormat = formatKeyGoldRateRateStats,
                         expRateStatsFormat = formatKeyExpRateRateStats,
+                        itemDropRateStatsFormat = formatKeyItemDropRateRateStats,
                         uiTextHp = uiTextHp,
                         uiTextHpRecovery = uiTextHpRecovery,
                         uiTextHpLeechRate = uiTextHpLeechRate,
@@ -215,6 +221,7 @@ namespace MultiplayerARPG
                         uiTextSlotLimit = uiTextSlotLimit,
                         uiTextGoldRate = uiTextGoldRate,
                         uiTextExpRate = uiTextExpRate,
+                        uiTextItemDropRate = uiTextItemDropRate,
                     };
                     this.InvokeInstanceDevExtMethods("SetRateStatsGenerateTextData", generateTextData);
                     statsString = generateTextData.GetText();
@@ -248,6 +255,7 @@ namespace MultiplayerARPG
                         slotLimitStatsFormat = formatKeySlotLimitStats,
                         goldRateStatsFormat = formatKeyGoldRateStats,
                         expRateStatsFormat = formatKeyExpRateStats,
+                        itemDropRateStatsFormat = formatKeyItemDropRateStats,
                         uiTextHp = uiTextHp,
                         uiTextHpRecovery = uiTextHpRecovery,
                         uiTextHpLeechRate = uiTextHpLeechRate,
@@ -271,6 +279,7 @@ namespace MultiplayerARPG
                         uiTextSlotLimit = uiTextSlotLimit,
                         uiTextGoldRate = uiTextGoldRate,
                         uiTextExpRate = uiTextExpRate,
+                        uiTextItemDropRate = uiTextItemDropRate,
                     };
                     this.InvokeInstanceDevExtMethods("SetStatsGenerateTextData", generateTextData);
                     statsString = generateTextData.GetText();

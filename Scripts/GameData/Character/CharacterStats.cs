@@ -32,6 +32,7 @@ namespace MultiplayerARPG
         public float slotLimit;
         public float goldRate;
         public float expRate;
+        public float itemDropRate;
 
         public static CharacterStats operator +(CharacterStats a, CharacterStats b)
         {
@@ -58,6 +59,7 @@ namespace MultiplayerARPG
             a.slotLimit = a.slotLimit + b.slotLimit;
             a.goldRate = a.goldRate + b.goldRate;
             a.expRate = a.expRate + b.expRate;
+            a.itemDropRate = a.itemDropRate + b.itemDropRate;
             if (GameExtensionInstance.onAddCharacterStats != null)
                 GameExtensionInstance.onAddCharacterStats(ref a, b);
             return a;
@@ -88,6 +90,7 @@ namespace MultiplayerARPG
             a.slotLimit = a.slotLimit * multiplier;
             a.goldRate = a.goldRate * multiplier;
             a.expRate = a.expRate * multiplier;
+            a.itemDropRate = a.itemDropRate * multiplier;
             if (GameExtensionInstance.onMultiplyCharacterStatsWithNumber != null)
                 GameExtensionInstance.onMultiplyCharacterStatsWithNumber(ref a, multiplier);
             return a;
@@ -118,6 +121,7 @@ namespace MultiplayerARPG
             a.slotLimit = a.slotLimit * b.slotLimit;
             a.goldRate = a.goldRate * b.goldRate;
             a.expRate = a.expRate * b.expRate;
+            a.itemDropRate = a.itemDropRate * b.itemDropRate;
             if (GameExtensionInstance.onMultiplyCharacterStats != null)
                 GameExtensionInstance.onMultiplyCharacterStats(ref a, b);
             return a;

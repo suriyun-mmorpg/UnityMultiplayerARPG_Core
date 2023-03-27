@@ -145,6 +145,12 @@ namespace MultiplayerARPG
         [Range(0, 1f)]
         public float expRateApplyRate;
 
+        [Header("Item Drop Rate")]
+        public float minItemDropRate;
+        public float maxItemDropRate;
+        [Range(0, 1f)]
+        public float itemDropRateApplyRate;
+
         public float GetRandomedHp(System.Random random)
         {
             return random.RandomFloat(minHp, maxHp);
@@ -260,6 +266,11 @@ namespace MultiplayerARPG
             return random.RandomFloat(minExpRate, maxExpRate);
         }
 
+        public float GetRandomedItemDropRate(System.Random random)
+        {
+            return random.RandomFloat(minItemDropRate, maxItemDropRate);
+        }
+
         public bool ApplyHp(System.Random random)
         {
             return random.NextDouble() <= hpApplyRate;
@@ -373,6 +384,11 @@ namespace MultiplayerARPG
         public bool ApplyExpRate(System.Random random)
         {
             return random.NextDouble() <= expRateApplyRate;
+        }
+
+        public bool ApplyItemDropRate(System.Random random)
+        {
+            return random.NextDouble() <= itemDropRateApplyRate;
         }
     }
 }

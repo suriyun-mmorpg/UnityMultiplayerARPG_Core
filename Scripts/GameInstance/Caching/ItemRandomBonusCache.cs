@@ -343,6 +343,14 @@ namespace MultiplayerARPG
                     return;
             }
 
+            if (randomStats.ApplyItemDropRate(random))
+            {
+                stats.itemDropRate = randomStats.GetRandomedItemDropRate(random);
+                appliedAmount++;
+                if (randomBonus.maxRandomStatsAmount > 0 && appliedAmount >= randomBonus.maxRandomStatsAmount)
+                    return;
+            }
+
             if (GameExtensionInstance.onRandomCharacterStats != null)
                 GameExtensionInstance.onRandomCharacterStats(random, randomBonus, randomStats, ref stats, ref appliedAmount);
         }

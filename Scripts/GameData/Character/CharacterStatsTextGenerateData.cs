@@ -31,6 +31,7 @@ namespace MultiplayerARPG
         public string slotLimitStatsFormat;
         public string goldRateStatsFormat;
         public string expRateStatsFormat;
+        public string itemDropRateStatsFormat;
         public TextWrapper uiTextHp;
         public TextWrapper uiTextHpRecovery;
         public TextWrapper uiTextHpLeechRate;
@@ -54,6 +55,7 @@ namespace MultiplayerARPG
         public TextWrapper uiTextSlotLimit;
         public TextWrapper uiTextGoldRate;
         public TextWrapper uiTextExpRate;
+        public TextWrapper uiTextItemDropRate;
 
         public string GetText()
         {
@@ -452,6 +454,23 @@ namespace MultiplayerARPG
                 }
                 if (uiTextExpRate != null)
                     uiTextExpRate.text = statsStringPart;
+
+                // EtemDrop Rate
+                if (isBonus)
+                    tempValue = isRate ? (data.itemDropRate * 100).ToBonusString("N2") : (data.itemDropRate * 100).ToBonusString("N0");
+                else
+                    tempValue = isRate ? (data.itemDropRate * 100).ToString("N2") : (data.itemDropRate * 100).ToString("N0");
+                statsStringPart = ZString.Format(
+                    LanguageManager.GetText(itemDropRateStatsFormat),
+                    tempValue);
+                if (data.itemDropRate != 0)
+                {
+                    if (statsString.Length > 0)
+                        statsString.Append('\n');
+                    statsString.Append(statsStringPart);
+                }
+                if (uiTextItemDropRate != null)
+                    uiTextItemDropRate.text = statsStringPart;
 
                 // Dev Extension
                 // How to implement it?:

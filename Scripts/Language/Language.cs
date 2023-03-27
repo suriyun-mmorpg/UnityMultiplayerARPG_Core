@@ -1120,6 +1120,16 @@ namespace MultiplayerARPG
         /// Format => {0} = {Battle Points}
         /// </summary>
         UI_FORMAT_BATTLE_POINTS,
+
+        // 1.81h New Formats
+        /// <summary>
+        /// Format => {0} = {Amount * 100}
+        /// </summary>
+        UI_FORMAT_ITEM_DROP_RATE,
+        /// <summary>
+        /// Format => {0} = {Amount * 100}
+        /// </summary>
+        UI_FORMAT_ITEM_DROP_RATE_RATE,
     }
 
     public static class DefaultLocale
@@ -1656,6 +1666,9 @@ namespace MultiplayerARPG
             Texts.Add(UIFormatKeys.UI_FORMAT_ITEM_EXPIRE_DURATION.ToString(), "Duration: {0}");
             Texts.Add(UIFormatKeys.UI_FORMAT_ITEM_EXPIRE_TIME.ToString(), "Expires In: {0}");
             Texts.Add(UIFormatKeys.UI_FORMAT_BATTLE_POINTS.ToString(), "Battle Points: {0}");
+            // 1.81h New Formats
+            Texts.Add(UIFormatKeys.UI_FORMAT_ITEM_DROP_RATE.ToString(), "Item Drop Rate: {0}%");
+            Texts.Add(UIFormatKeys.UI_FORMAT_ITEM_DROP_RATE_RATE.ToString(), "% of Item Drop Rate: {0}%");
         }
     }
 
