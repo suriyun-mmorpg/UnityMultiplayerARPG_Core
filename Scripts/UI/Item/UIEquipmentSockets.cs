@@ -12,6 +12,7 @@ namespace MultiplayerARPG
         [Tooltip("Format => {0} = {Socket Index}")]
         public UILocaleKeySetting formatKeySocketEmpty = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_EQUIPMENT_SOCKET_EMPTY);
 
+        [Header("UI Elements")]
         public UICharacterItems uiAppliedSocketEnhancerItems;
 
         protected override void UpdateData()
