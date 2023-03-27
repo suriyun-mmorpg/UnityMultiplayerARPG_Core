@@ -1,4 +1,5 @@
 ﻿using Cysharp.Text;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace MultiplayerARPG
@@ -11,8 +12,12 @@ namespace MultiplayerARPG
         [Tooltip("Format => {0} = {Socket Index}")]
         public UILocaleKeySetting formatKeySocketEmpty = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_EQUIPMENT_SOCKET_EMPTY);
 
+        public UICharacterItems uiAppliedSocketEnhancerItems;
+
         protected override void UpdateData()
         {
+            List<CharacterItem> appliedSocketEnhancerItems = new List<CharacterItem>();
+
             using (Utf16ValueStringBuilder allBonusText = ZString.CreateStringBuilder(false))
             {
                 BaseItem tempItem;
@@ -21,6 +26,7 @@ namespace MultiplayerARPG
                 {
                     if (i < Data.sockets.Count && GameInstance.Items.TryGetValue(Data.sockets[i], out tempItem) && tempItem.IsSocketEnhancer())
                     {
+                        appliedSocketEnhancerItems.Add(CharacterItem.Create(Data.sockets[i], randomSeed: 0));
                         tempText = GetEquipmentBonusText((tempItem as ISocketEnhancerItem).SocketEnhanceEffect);
                         if (allBonusText.Length > 0)
                             allBonusText.Append('\n');
@@ -32,6 +38,7 @@ namespace MultiplayerARPG
                     }
                     else
                     {
+                        appliedSocketEnhancerItems.Add(CharacterItem.CreateEmptySlot());
                         if (allBonusText.Length > 0)
                             allBonusText.Append('\n');
                         allBonusText.AppendFormat(
@@ -45,6 +52,14 @@ namespace MultiplayerARPG
                     uiTextAllBonus.SetGameObjectActive(allBonusText.Length > 0);
                     uiTextAllBonus.text = allBonusText.ToString();
                 }
+            }
+
+            if (uiAppliedSocketEnhancerItems != null)
+            {
+                uiAppliedSocketEnhancerItems.inventoryType = InventoryType.Unknow;
+                uiAppliedSocketEnhancerItems.CacheSelectionManager.selectionMode = UISelectionMode.SelectSingle;
+                uiAppliedSocketEnhancerItems.filterItemTypes = new List<ItemType>() { ItemType.SocketEnhancer };
+                uiAppliedSocketEnhancerItems.UpdateData(GameInstance.PlayingCharacter, appliedSocketEnhancerItems);
             }
         }
     }
