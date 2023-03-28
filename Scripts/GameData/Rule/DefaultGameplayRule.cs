@@ -372,8 +372,7 @@ namespace MultiplayerARPG
         public override bool RewardExp(BaseCharacterEntity character, Reward reward, float multiplier, RewardGivenType rewardGivenType, out int rewardedExp)
         {
             rewardedExp = 0;
-            if ((character is BaseMonsterCharacterEntity) &&
-                (character as BaseMonsterCharacterEntity).SummonType != SummonType.PetItem)
+            if (character is BaseMonsterCharacterEntity monsterCharacterEntity && monsterCharacterEntity.SummonType != SummonType.PetItem)
             {
                 // If it's monster and not pet, do not increase exp
                 return false;
@@ -900,9 +899,9 @@ namespace MultiplayerARPG
             // This function will sort: near to far, so loop from 0
             float dist = Vector3.Distance(character.EntityTransform.position, interactingEntity.EntityTransform.position);
             Vector3 dir = (interactingEntity.EntityTransform.position - character.EntityTransform.position).normalized;
-            if (interactingEntity is ICraftingQueueSource)
+            if (interactingEntity is ICraftingQueueSource craftingQueueSource)
             {
-                if (!(interactingEntity as ICraftingQueueSource).IsInCraftDistance(character.EntityTransform.position))
+                if (!craftingQueueSource.IsInCraftDistance(character.EntityTransform.position))
                     return false;
             }
             // Find that the entity is behind the wall or not
