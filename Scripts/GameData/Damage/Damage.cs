@@ -193,10 +193,7 @@ namespace MultiplayerARPG
             DamageableHitBox tempDamageableHitBox = null;
 
             // Damage transform data
-            Vector3 damagePosition;
-            Vector3 damageDirection;
-            Quaternion damageRotation;
-            this.GetDamagePositionAndRotation(attacker, isLeftHand, aimPosition, stagger, out damagePosition, out damageDirection, out damageRotation);
+            this.GetDamagePositionAndRotation(attacker, isLeftHand, aimPosition, stagger, out Vector3 damagePosition, out Vector3 damageDirection, out Quaternion damageRotation);
 #if UNITY_EDITOR
             attacker.SetDebugDamage(damagePosition, damageDirection, damageRotation, isLeftHand);
 #endif
