@@ -836,10 +836,10 @@ namespace MultiplayerARPG
                 BaseGameEntity targetEntity = GetTargetEntity();
                 if (targetEntity != null && targetEntity != Entity)
                 {
-                    if (targetEntity is DamageableEntity)
+                    if (targetEntity is DamageableEntity damageableEntity)
                     {
-                        if (!(targetEntity as DamageableEntity).IsHideOrDead())
-                            return GetAttackAimPosition(position, (targetEntity as DamageableEntity).OpponentAimTransform.position);
+                        if (!damageableEntity.IsHideOrDead())
+                            return GetAttackAimPosition(position, damageableEntity.OpponentAimTransform.position);
                     }
                     else
                     {
