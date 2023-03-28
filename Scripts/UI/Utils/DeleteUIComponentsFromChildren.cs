@@ -17,8 +17,8 @@ namespace MultiplayerARPG
             }
             for (int i = mobileInputs.Length - 1; i >= 0; --i)
             {
-                if (mobileInputs[i] is Component)
-                    DestroyImmediate(mobileInputs[i] as Component);
+                if (mobileInputs[i] is Component comp)
+                    DestroyImmediate(comp);
             }
         }
     }

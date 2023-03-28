@@ -24,9 +24,9 @@ namespace UtilsComponents
 
             public int CompareTo(object obj)
             {
-                if (!(obj is Setting))
-                    return 0;
-                return Aspect().CompareTo(((Setting)obj).Aspect());
+                if (obj is Setting setting)
+                    return Aspect().CompareTo(setting.Aspect());
+                return 0;
             }
         }
         public float defaultMatchWidthOrHeight = 1f;

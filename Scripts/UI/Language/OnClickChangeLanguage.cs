@@ -13,8 +13,8 @@ namespace MultiplayerARPG
             {
                 if (!uis[i].IsVisible())
                     continue;
-                if (uis[i] is IUISelectionEntry)
-                    (uis[i] as IUISelectionEntry).ForceUpdate();
+                if (uis[i] is IUISelectionEntry selectionEntry)
+                    selectionEntry.ForceUpdate();
 
             }
         }

@@ -31,7 +31,7 @@ namespace MultiplayerARPG
 
         protected override void UpdateUI()
         {
-            if (Character is IPlayerCharacterData && Attribute.CanIncreaseAmount(Character as IPlayerCharacterData, CharacterAttribute.amount, out _))
+            if (Character is IPlayerCharacterData playerCharacter && Attribute.CanIncreaseAmount(playerCharacter, CharacterAttribute.amount, out _))
                 onAbleToIncrease.Invoke();
             else
                 onUnableToIncrease.Invoke();

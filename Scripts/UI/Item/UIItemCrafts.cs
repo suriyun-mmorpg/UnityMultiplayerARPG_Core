@@ -57,17 +57,15 @@ namespace MultiplayerARPG
                     List<ItemCraft> itemCrafts = new List<ItemCraft>();
                     foreach (CharacterSkill characterSkill in owningCharacter.Skills)
                     {
-                        if (characterSkill == null ||
-                            characterSkill.GetSkill() == null ||
-                            !characterSkill.GetSkill().IsCraftItem)
+                        if (characterSkill == null || characterSkill.GetSkill() == null || !characterSkill.GetSkill().IsCraftItem)
                             continue;
                         itemCrafts.Add(characterSkill.GetSkill().ItemCraft);
                     }
                     UpdateData(itemCrafts);
                     break;
                 case CrafterType.Workbench:
-                    if (targetEntity && targetEntity is WorkbenchEntity)
-                        UpdateData((targetEntity as WorkbenchEntity).ItemCrafts);
+                    if (targetEntity && targetEntity is WorkbenchEntity workbenchEntity)
+                        UpdateData(workbenchEntity.ItemCrafts);
                     break;
             }
             Show();
