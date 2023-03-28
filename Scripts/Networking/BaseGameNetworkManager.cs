@@ -721,7 +721,7 @@ namespace MultiplayerARPG
             onSpawnEntitiesStart.Invoke(sceneName, true, progress);
             await PreSpawnEntities();
             RegisterEntities();
-            await UniTask.SwitchToMainThread();
+            await UniTask.NextFrame();
             int i;
             LiteNetLibIdentity spawnObj;
             // Spawn Warp Portals
