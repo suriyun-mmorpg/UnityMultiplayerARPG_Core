@@ -50,22 +50,18 @@ namespace MultiplayerARPG
             reloadCancellationTokenSources.Add(reloadCancellationTokenSource);
 
             // Prepare requires data and get weapon data
-            AnimActionType animActionType;
-            int animActionDataId;
-            CharacterItem weapon;
             Entity.GetReloadingData(
                 ref isLeftHand,
-                out animActionType,
-                out animActionDataId,
-                out weapon);
+                out AnimActionType animActionType,
+                out int animActionDataId,
+                out CharacterItem weapon);
 
             // Prepare requires data and get animation data
-            float animSpeedRate;
             Entity.GetAnimationData(
                 animActionType,
                 animActionDataId,
                 0,
-                out animSpeedRate,
+                out float animSpeedRate,
                 out triggerDurations,
                 out totalDuration);
 
@@ -90,33 +86,26 @@ namespace MultiplayerARPG
 
             try
             {
+                bool tpsModelAvailable = Entity.CharacterModel != null && Entity.CharacterModel.gameObject.activeSelf;
+                BaseCharacterModel vehicleModel = Entity.PassengingVehicleModel as BaseCharacterModel;
+                bool vehicleModelAvailable = vehicleModel != null;
+                bool fpsModelAvailable = IsClient && Entity.FpsModel != null && Entity.FpsModel.gameObject.activeSelf;
+
                 // Play animation
-                if (Entity.CharacterModel && Entity.CharacterModel.gameObject.activeSelf)
-                {
-                    // TPS model
+                if (tpsModelAvailable)
                     Entity.CharacterModel.PlayActionAnimation(AnimActionType, animActionDataId, 0);
-                }
-                if (Entity.PassengingVehicleModel && Entity.PassengingVehicleModel is BaseCharacterModel characterModel)
-                {
-                    // Vehicle model
-                    characterModel.PlayActionAnimation(AnimActionType, animActionDataId, 0);
-                }
-                if (IsClient)
-                {
-                    if (Entity.FpsModel && Entity.FpsModel.gameObject.activeSelf)
-                    {
-                        // FPS model
-                        Entity.FpsModel.PlayActionAnimation(AnimActionType, animActionDataId, 0);
-                    }
-                }
+                if (vehicleModelAvailable)
+                    vehicleModel.PlayActionAnimation(AnimActionType, animActionDataId, 0);
+                if (fpsModelAvailable)
+                    Entity.FpsModel.PlayActionAnimation(AnimActionType, animActionDataId, 0);
 
                 // Special effects will plays on clients only
                 if (IsClient)
                 {
                     // Play weapon reload special effects
-                    if (Entity.CharacterModel && Entity.CharacterModel.gameObject.activeSelf)
+                    if (tpsModelAvailable)
                         Entity.CharacterModel.PlayEquippedWeaponReload(isLeftHand);
-                    if (Entity.FpsModel && Entity.FpsModel.gameObject.activeSelf)
+                    if (fpsModelAvailable)
                         Entity.FpsModel.PlayEquippedWeaponReload(isLeftHand);
                     // Play reload sfx
                     AudioClipWithVolumeSettings audioClip = weaponItem.ReloadClip;
@@ -163,9 +152,9 @@ namespace MultiplayerARPG
                     if (IsClient)
                     {
                         // Play weapon reload special effects
-                        if (Entity.CharacterModel && Entity.CharacterModel.gameObject.activeSelf)
+                        if (tpsModelAvailable)
                             Entity.CharacterModel.PlayEquippedWeaponReloaded(isLeftHand);
-                        if (Entity.FpsModel && Entity.FpsModel.gameObject.activeSelf)
+                        if (fpsModelAvailable)
                             Entity.FpsModel.PlayEquippedWeaponReloaded(isLeftHand);
                         // Play reload sfx
                         AudioClipWithVolumeSettings audioClip = weaponItem.ReloadedClip;

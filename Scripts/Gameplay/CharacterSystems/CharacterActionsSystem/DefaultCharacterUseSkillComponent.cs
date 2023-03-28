@@ -108,25 +108,20 @@ namespace MultiplayerARPG
             skillCancellationTokenSources.Add(skillCancellationTokenSource);
 
             // Prepare required data and get skill data
-            AnimActionType animActionType;
-            int animActionDataId;
-            CharacterItem weapon;
             Entity.GetUsingSkillData(
                 skill,
                 ref isLeftHand,
-                out animActionType,
-                out animActionDataId,
-                out weapon);
+                out AnimActionType animActionType,
+                out int animActionDataId,
+                out CharacterItem weapon);
 
             // Prepare required data and get animation data
-            int animationIndex;
-            float animSpeedRate;
             Entity.GetRandomAnimationData(
                 animActionType,
                 animActionDataId,
                 simulateSeed,
-                out animationIndex,
-                out animSpeedRate,
+                out int animationIndex,
+                out float animSpeedRate,
                 out triggerDurations,
                 out totalDuration);
 
@@ -174,62 +169,42 @@ namespace MultiplayerARPG
                 remainsDuration = totalDuration;
                 LastUseSkillEndTime = Time.unscaledTime + (totalDuration / animSpeedRate);
             }
-
             try
             {
+                bool tpsModelAvailable = Entity.CharacterModel != null && Entity.CharacterModel.gameObject.activeSelf;
+                BaseCharacterModel vehicleModel = Entity.PassengingVehicleModel as BaseCharacterModel;
+                bool vehicleModelAvailable = vehicleModel != null;
+                bool fpsModelAvailable = IsClient && Entity.FpsModel != null && Entity.FpsModel.gameObject.activeSelf;
+
                 // Play special effect
                 if (IsClient)
                 {
-                    if (Entity.CharacterModel && Entity.CharacterModel.gameObject.activeSelf)
+                    if (tpsModelAvailable)
                         Entity.CharacterModel.InstantiateEffect(skill.SkillCastEffect);
-                    if (Entity.FpsModel && Entity.FpsModel.gameObject.activeSelf)
+                    if (fpsModelAvailable)
                         Entity.FpsModel.InstantiateEffect(skill.SkillCastEffect);
                 }
 
                 if (CastingSkillDuration > 0f)
                 {
                     // Play cast animation
-                    if (Entity.CharacterModel && Entity.CharacterModel.gameObject.activeSelf)
-                    {
-                        // TPS model
+                    if (tpsModelAvailable)
                         Entity.CharacterModel.PlaySkillCastClip(skill.DataId, CastingSkillDuration);
-                    }
-                    if (Entity.PassengingVehicleModel && Entity.PassengingVehicleModel is BaseCharacterModel characterModel)
-                    {
-                        // Vehicle model
-                        characterModel.PlaySkillCastClip(skill.DataId, CastingSkillDuration);
-                    }
-                    if (IsClient)
-                    {
-                        if (Entity.FpsModel && Entity.FpsModel.gameObject.activeSelf)
-                        {
-                            // FPS model
-                            Entity.FpsModel.PlaySkillCastClip(skill.DataId, CastingSkillDuration);
-                        }
-                    }
+                    if (vehicleModelAvailable)
+                        vehicleModel.PlaySkillCastClip(skill.DataId, CastingSkillDuration);
+                    if (fpsModelAvailable)
+                        Entity.FpsModel.PlaySkillCastClip(skill.DataId, CastingSkillDuration);
                     // Wait until end of cast duration
                     await UniTask.Delay((int)(CastingSkillDuration * 1000f), true, PlayerLoopTiming.Update, skillCancellationTokenSource.Token);
                 }
 
                 // Play action animation
-                if (Entity.CharacterModel && Entity.CharacterModel.gameObject.activeSelf)
-                {
-                    // TPS model
+                if (tpsModelAvailable)
                     Entity.CharacterModel.PlayActionAnimation(AnimActionType, AnimActionDataId, animationIndex, animSpeedRate);
-                }
-                if (Entity.PassengingVehicleModel && Entity.PassengingVehicleModel is BaseCharacterModel characterModel)
-                {
-                    // Vehicle model
-                    characterModel.PlayActionAnimation(AnimActionType, AnimActionDataId, animationIndex, animSpeedRate);
-                }
-                if (IsClient)
-                {
-                    if (Entity.FpsModel && Entity.FpsModel.gameObject.activeSelf)
-                    {
-                        // FPS model
-                        Entity.FpsModel.PlayActionAnimation(AnimActionType, AnimActionDataId, animationIndex, animSpeedRate);
-                    }
-                }
+                if (vehicleModelAvailable)
+                    vehicleModel.PlayActionAnimation(AnimActionType, AnimActionDataId, animationIndex, animSpeedRate);
+                if (fpsModelAvailable)
+                    Entity.FpsModel.PlayActionAnimation(AnimActionType, AnimActionDataId, animationIndex, animSpeedRate);
 
                 // Try setup state data (maybe by animation clip events or state machine behaviours), if it was not set up
                 if (triggerDurations == null || triggerDurations.Length == 0 || totalDuration < 0f)
@@ -280,9 +255,9 @@ namespace MultiplayerARPG
                     if (IsClient && (AnimActionType == AnimActionType.AttackRightHand || AnimActionType == AnimActionType.AttackLeftHand))
                     {
                         // Play weapon launch special effects
-                        if (Entity.CharacterModel && Entity.CharacterModel.gameObject.activeSelf)
+                        if (tpsModelAvailable)
                             Entity.CharacterModel.PlayEquippedWeaponLaunch(isLeftHand);
-                        if (Entity.FpsModel && Entity.FpsModel.gameObject.activeSelf)
+                        if (fpsModelAvailable)
                             Entity.FpsModel.PlayEquippedWeaponLaunch(isLeftHand);
                         // Play launch sfx
                         AudioClipWithVolumeSettings audioClip = weaponItem.LaunchClip;
@@ -374,8 +349,7 @@ namespace MultiplayerARPG
 
         protected bool ProceedSimulateActionTrigger(SimulateActionTriggerData data)
         {
-            SimulatingActionTriggerHistory simulatingHit;
-            if (!SimulatingActionTriggerHistories.TryGetValue(data.simulateSeed, out simulatingHit) || simulatingHit.TriggeredIndex >= simulatingHit.TriggerLength)
+            if (!SimulatingActionTriggerHistories.TryGetValue(data.simulateSeed, out SimulatingActionTriggerHistory simulatingHit) || simulatingHit.TriggeredIndex >= simulatingHit.TriggerLength)
                 return false;
             int hitIndex = SimulatingActionTriggerHistories[data.simulateSeed].TriggeredIndex;
             int applySeed = GetApplySeed(data.simulateSeed, hitIndex);
@@ -406,9 +380,7 @@ namespace MultiplayerARPG
             if (!IsServer && IsOwnerClient)
             {
                 // Validate skill
-                BaseSkill skill;
-                int skillLevel;
-                if (!Entity.ValidateSkillToUse(dataId, isLeftHand, targetObjectId, out skill, out skillLevel, out _))
+                if (!Entity.ValidateSkillToUse(dataId, isLeftHand, targetObjectId, out BaseSkill skill, out int skillLevel, out _))
                     return;
                 // Get simulate seed for simulation validating
                 byte simulateSeed = (byte)Random.Range(byte.MinValue, byte.MaxValue);
@@ -558,9 +530,7 @@ namespace MultiplayerARPG
             if (Time.unscaledTime - LastUseSkillEndTime < -0.05f)
                 return;
             // Validate skill
-            BaseSkill skill;
-            int skillLevel;
-            if (!Entity.ValidateSkillToUse(dataId, isLeftHand, targetObjectId, out skill, out skillLevel, out _))
+            if (!Entity.ValidateSkillToUse(dataId, isLeftHand, targetObjectId, out BaseSkill skill, out int skillLevel, out _))
                 return;
             // Set use skill state
             IsUsingSkill = true;
@@ -590,8 +560,7 @@ namespace MultiplayerARPG
                 // Don't play use skill animation again (it already played in `UseSkill` and `UseSkillItem` function)
                 return;
             }
-            BaseSkill skill;
-            if (!GameInstance.Skills.TryGetValue(skillDataId, out skill) && skillLevel > 0)
+            if (!GameInstance.Skills.TryGetValue(skillDataId, out BaseSkill skill) && skillLevel > 0)
                 ClearUseSkillStates();
             Entity.AttackComponent.CancelAttack();
             UseSkillRoutine(simulateSeed, isLeftHand, skill, skillLevel, targetObjectId, aimPosition, null).Forget();
@@ -663,22 +632,19 @@ namespace MultiplayerARPG
                 Entity.CharacterModel.StopSkillCastAnimation();
                 Entity.CharacterModel.StopWeaponChargeAnimation();
             }
-            if (Entity.PassengingVehicleModel && Entity.PassengingVehicleModel is BaseCharacterModel characterModel)
+            if (Entity.PassengingVehicleModel && Entity.PassengingVehicleModel is BaseCharacterModel vehicleModel)
             {
                 // Vehicle model
-                characterModel.StopActionAnimation();
-                characterModel.StopSkillCastAnimation();
-                characterModel.StopWeaponChargeAnimation();
+                vehicleModel.StopActionAnimation();
+                vehicleModel.StopSkillCastAnimation();
+                vehicleModel.StopWeaponChargeAnimation();
             }
-            if (IsClient)
+            if (IsClient && Entity.FpsModel && Entity.FpsModel.gameObject.activeSelf)
             {
-                if (Entity.FpsModel && Entity.FpsModel.gameObject.activeSelf)
-                {
-                    // FPS model
-                    Entity.FpsModel.StopActionAnimation();
-                    Entity.FpsModel.StopSkillCastAnimation();
-                    Entity.FpsModel.StopWeaponChargeAnimation();
-                }
+                // FPS model
+                Entity.FpsModel.StopActionAnimation();
+                Entity.FpsModel.StopSkillCastAnimation();
+                Entity.FpsModel.StopWeaponChargeAnimation();
             }
         }
     }

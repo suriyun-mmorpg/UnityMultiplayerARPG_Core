@@ -62,14 +62,11 @@ namespace MultiplayerARPG
             attackCancellationTokenSources.Add(attackCancellationTokenSource);
 
             // Prepare required data and get weapon data
-            AnimActionType animActionType;
-            int animActionDataId;
-            CharacterItem weapon;
             Entity.GetAttackingData(
                 ref isLeftHand,
-                out animActionType,
-                out animActionDataId,
-                out weapon);
+                out AnimActionType animActionType,
+                out int animActionDataId,
+                out CharacterItem weapon);
 
             // Get playing animation index
             int randomMax = 1;
@@ -90,12 +87,11 @@ namespace MultiplayerARPG
             lastAttackDataId = animActionDataId;
 
             // Prepare required data and get animation data
-            float animSpeedRate;
             Entity.GetAnimationData(
                 animActionType,
                 animActionDataId,
                 animationIndex,
-                out animSpeedRate,
+                out float animSpeedRate,
                 out triggerDurations,
                 out totalDuration);
 
@@ -131,25 +127,18 @@ namespace MultiplayerARPG
 
             try
             {
+                bool tpsModelAvailable = Entity.CharacterModel != null && Entity.CharacterModel.gameObject.activeSelf;
+                BaseCharacterModel vehicleModel = Entity.PassengingVehicleModel as BaseCharacterModel;
+                bool vehicleModelAvailable = vehicleModel != null;
+                bool fpsModelAvailable = IsClient && Entity.FpsModel != null && Entity.FpsModel.gameObject.activeSelf;
+
                 // Play action animation
-                if (Entity.CharacterModel && Entity.CharacterModel.gameObject.activeSelf)
-                {
-                    // TPS model
+                if (tpsModelAvailable)
                     Entity.CharacterModel.PlayActionAnimation(AnimActionType, AnimActionDataId, animationIndex, animSpeedRate);
-                }
-                if (Entity.PassengingVehicleModel && Entity.PassengingVehicleModel is BaseCharacterModel characterModel)
-                {
-                    // Vehicle model
-                    characterModel.PlayActionAnimation(AnimActionType, AnimActionDataId, animationIndex, animSpeedRate);
-                }
-                if (IsClient)
-                {
-                    if (Entity.FpsModel && Entity.FpsModel.gameObject.activeSelf)
-                    {
-                        // FPS model
-                        Entity.FpsModel.PlayActionAnimation(AnimActionType, AnimActionDataId, animationIndex, animSpeedRate);
-                    }
-                }
+                if (vehicleModelAvailable)
+                    vehicleModel.PlayActionAnimation(AnimActionType, AnimActionDataId, animationIndex, animSpeedRate);
+                if (fpsModelAvailable)
+                    Entity.FpsModel.PlayActionAnimation(AnimActionType, AnimActionDataId, animationIndex, animSpeedRate);
 
                 // Try setup state data (maybe by animation clip events or state machine behaviours), if it was not set up
                 if (triggerDurations == null || triggerDurations.Length == 0 || totalDuration < 0f)
@@ -200,9 +189,9 @@ namespace MultiplayerARPG
                     if (IsClient)
                     {
                         // Play weapon launch special effects
-                        if (Entity.CharacterModel && Entity.CharacterModel.gameObject.activeSelf)
+                        if (tpsModelAvailable)
                             Entity.CharacterModel.PlayEquippedWeaponLaunch(isLeftHand);
-                        if (Entity.FpsModel && Entity.FpsModel.gameObject.activeSelf)
+                        if (fpsModelAvailable)
                             Entity.FpsModel.PlayEquippedWeaponLaunch(isLeftHand);
                         // Play launch sfx
                         AudioClipWithVolumeSettings audioClip = weaponItem.LaunchClip;
@@ -288,8 +277,7 @@ namespace MultiplayerARPG
             if (IsServer)
             {
                 // Increase damage with ammo damage
-                Dictionary<DamageElement, MinMaxFloat> increaseDamages;
-                Entity.DecreaseAmmos(weapon, isLeftHand, 1, out increaseDamages);
+                Entity.DecreaseAmmos(weapon, isLeftHand, 1, out Dictionary<DamageElement, MinMaxFloat>  increaseDamages);
                 if (increaseDamages != null)
                     damageAmounts = GameDataHelpers.CombineDamages(damageAmounts, increaseDamages);
             }
@@ -344,8 +332,7 @@ namespace MultiplayerARPG
 
         protected bool ProceedSimulateActionTrigger(SimulateActionTriggerData data)
         {
-            SimulatingActionTriggerHistory history;
-            if (!SimulatingActionTriggerHistories.TryGetValue(data.simulateSeed, out history) || history.TriggeredIndex >= history.TriggerLength)
+            if (!SimulatingActionTriggerHistories.TryGetValue(data.simulateSeed, out SimulatingActionTriggerHistory history) || history.TriggeredIndex >= history.TriggerLength)
                 return false;
             int hitIndex = SimulatingActionTriggerHistories[data.simulateSeed].TriggeredIndex;
             int applySeed = GetApplySeed(data.simulateSeed, hitIndex);
