@@ -429,11 +429,11 @@ namespace MultiplayerARPG
                 }
             }
 
-            if (Model is IMoveableModel)
+            if (Model is IMoveableModel moveableModel)
             {
                 // Update movement animation
-                (Model as IMoveableModel).SetMoveAnimationSpeedMultiplier(MoveAnimationSpeedMultiplier);
-                (Model as IMoveableModel).SetMovementState(MovementState, ExtraMovementState, Direction2D, false);
+                moveableModel.SetMoveAnimationSpeedMultiplier(MoveAnimationSpeedMultiplier);
+                moveableModel.SetMovementState(MovementState, ExtraMovementState, Direction2D, false);
             }
         }
 
@@ -813,14 +813,14 @@ namespace MultiplayerARPG
 
         public virtual void PlayJumpAnimation()
         {
-            if (Model is IJumppableModel)
-                (Model as IJumppableModel).PlayJumpAnimation();
+            if (Model is IJumppableModel jumppableModel)
+                jumppableModel.PlayJumpAnimation();
         }
 
         public virtual void PlayPickupAnimation()
         {
-            if (Model is IPickupableModel)
-                (Model as IPickupableModel).PlayPickupAnimation();
+            if (Model is IPickupableModel pickupableModel)
+                pickupableModel.PlayPickupAnimation();
         }
 
         protected bool EnterVehicle(IVehicleEntity vehicle, byte seatIndex)
