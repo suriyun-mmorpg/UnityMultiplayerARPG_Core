@@ -418,7 +418,7 @@ namespace MultiplayerARPG
             bool hasUpdate = false;
             for (int i = entities.Count - 1; i >= 0; --i)
             {
-                if (entities[i] == null || (entities[i] is Object && (entities[i] as Object) == null) ||
+                if (entities[i] == null || (entities[i] is Object unityObj && unityObj == null) ||
                     !entities[i].EntityGameObject.activeInHierarchy)
                 {
                     entities.RemoveAt(i);
