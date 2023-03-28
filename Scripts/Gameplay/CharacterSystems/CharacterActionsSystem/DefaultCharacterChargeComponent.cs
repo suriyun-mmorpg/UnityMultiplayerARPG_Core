@@ -41,11 +41,11 @@ namespace MultiplayerARPG
                 Entity.CharacterModel.PlayWeaponChargeClip(weaponTypeDataId, isLeftHand);
                 Entity.CharacterModel.PlayEquippedWeaponCharge(isLeftHand);
             }
-            if (Entity.PassengingVehicleModel && Entity.PassengingVehicleModel is BaseCharacterModel)
+            if (Entity.PassengingVehicleModel && Entity.PassengingVehicleModel is BaseCharacterModel characterModel)
             {
                 // Vehicle model
-                (Entity.PassengingVehicleModel as BaseCharacterModel).PlayWeaponChargeClip(weaponTypeDataId, isLeftHand);
-                (Entity.PassengingVehicleModel as BaseCharacterModel).PlayEquippedWeaponCharge(isLeftHand);
+                characterModel.PlayWeaponChargeClip(weaponTypeDataId, isLeftHand);
+                characterModel.PlayEquippedWeaponCharge(isLeftHand);
             }
             if (IsClient)
             {
@@ -72,10 +72,10 @@ namespace MultiplayerARPG
                 // TPS model
                 Entity.CharacterModel.StopWeaponChargeAnimation();
             }
-            if (Entity.PassengingVehicleModel && Entity.PassengingVehicleModel is BaseCharacterModel)
+            if (Entity.PassengingVehicleModel && Entity.PassengingVehicleModel is BaseCharacterModel characterModel)
             {
                 // Vehicle model
-                (Entity.PassengingVehicleModel as BaseCharacterModel).StopWeaponChargeAnimation();
+                characterModel.StopWeaponChargeAnimation();
             }
             if (IsClient)
             {

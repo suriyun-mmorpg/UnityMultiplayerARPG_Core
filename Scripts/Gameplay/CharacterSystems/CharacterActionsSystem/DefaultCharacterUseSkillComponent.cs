@@ -194,10 +194,10 @@ namespace MultiplayerARPG
                         // TPS model
                         Entity.CharacterModel.PlaySkillCastClip(skill.DataId, CastingSkillDuration);
                     }
-                    if (Entity.PassengingVehicleModel && Entity.PassengingVehicleModel is BaseCharacterModel)
+                    if (Entity.PassengingVehicleModel && Entity.PassengingVehicleModel is BaseCharacterModel characterModel)
                     {
                         // Vehicle model
-                        (Entity.PassengingVehicleModel as BaseCharacterModel).PlaySkillCastClip(skill.DataId, CastingSkillDuration);
+                        characterModel.PlaySkillCastClip(skill.DataId, CastingSkillDuration);
                     }
                     if (IsClient)
                     {
@@ -217,10 +217,10 @@ namespace MultiplayerARPG
                     // TPS model
                     Entity.CharacterModel.PlayActionAnimation(AnimActionType, AnimActionDataId, animationIndex, animSpeedRate);
                 }
-                if (Entity.PassengingVehicleModel && Entity.PassengingVehicleModel is BaseCharacterModel)
+                if (Entity.PassengingVehicleModel && Entity.PassengingVehicleModel is BaseCharacterModel characterModel)
                 {
                     // Vehicle model
-                    (Entity.PassengingVehicleModel as BaseCharacterModel).PlayActionAnimation(AnimActionType, AnimActionDataId, animationIndex, animSpeedRate);
+                    characterModel.PlayActionAnimation(AnimActionType, AnimActionDataId, animationIndex, animSpeedRate);
                 }
                 if (IsClient)
                 {
@@ -663,12 +663,12 @@ namespace MultiplayerARPG
                 Entity.CharacterModel.StopSkillCastAnimation();
                 Entity.CharacterModel.StopWeaponChargeAnimation();
             }
-            if (Entity.PassengingVehicleModel && Entity.PassengingVehicleModel is BaseCharacterModel)
+            if (Entity.PassengingVehicleModel && Entity.PassengingVehicleModel is BaseCharacterModel characterModel)
             {
                 // Vehicle model
-                (Entity.PassengingVehicleModel as BaseCharacterModel).StopActionAnimation();
-                (Entity.PassengingVehicleModel as BaseCharacterModel).StopSkillCastAnimation();
-                (Entity.PassengingVehicleModel as BaseCharacterModel).StopWeaponChargeAnimation();
+                characterModel.StopActionAnimation();
+                characterModel.StopSkillCastAnimation();
+                characterModel.StopWeaponChargeAnimation();
             }
             if (IsClient)
             {
