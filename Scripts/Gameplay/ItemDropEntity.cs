@@ -78,6 +78,7 @@ namespace MultiplayerARPG
             }
         }
         public bool PutOnPlaceholder { get; protected set; }
+        public RewardGivenType GivenType { get; protected set; }
         public List<CharacterItem> DropItems { get; protected set; }
         public HashSet<string> Looters { get; protected set; }
         public GameSpawnArea<ItemDropEntity> SpawnArea { get; protected set; }
@@ -305,12 +306,12 @@ namespace MultiplayerARPG
             InitDropItems();
         }
 
-        public static ItemDropEntity DropItem(BaseGameEntity dropper, CharacterItem dropData, IEnumerable<string> looters)
+        public static ItemDropEntity DropItem(BaseGameEntity dropper, RewardGivenType givenType, CharacterItem dropData, IEnumerable<string> looters)
         {
-            return DropItem(GameInstance.Singleton.itemDropEntityPrefab, dropper, dropData, looters, GameInstance.Singleton.itemAppearDuration);
+            return DropItem(GameInstance.Singleton.itemDropEntityPrefab, dropper, givenType, dropData, looters, GameInstance.Singleton.itemAppearDuration);
         }
 
-        public static ItemDropEntity DropItem(ItemDropEntity prefab, BaseGameEntity dropper, CharacterItem dropData, IEnumerable<string> looters, float appearDuration)
+        public static ItemDropEntity DropItem(ItemDropEntity prefab, BaseGameEntity dropper, RewardGivenType givenType, CharacterItem dropData, IEnumerable<string> looters, float appearDuration)
         {
             Vector3 dropPosition = dropper.EntityTransform.position;
             Quaternion dropRotation = Quaternion.identity;
@@ -327,10 +328,10 @@ namespace MultiplayerARPG
                     dropPosition += new Vector3(Random.Range(-1f, 1f) * GameInstance.Singleton.dropDistance, Random.Range(-1f, 1f) * GameInstance.Singleton.dropDistance);
                     break;
             }
-            return DropItem(prefab, dropPosition, dropRotation, dropData, looters, appearDuration);
+            return DropItem(prefab, dropPosition, dropRotation, givenType, dropData, looters, appearDuration);
         }
 
-        public static ItemDropEntity DropItem(ItemDropEntity prefab, Vector3 dropPosition, Quaternion dropRotation, CharacterItem dropItem, IEnumerable<string> looters, float appearDuration)
+        public static ItemDropEntity DropItem(ItemDropEntity prefab, Vector3 dropPosition, Quaternion dropRotation, RewardGivenType givenType, CharacterItem dropItem, IEnumerable<string> looters, float appearDuration)
         {
             if (prefab == null)
                 return null;
@@ -345,6 +346,7 @@ namespace MultiplayerARPG
                 dropPosition, dropRotation);
             ItemDropEntity itemDropEntity = spawnObj.GetComponent<ItemDropEntity>();
             itemDropEntity.PutOnPlaceholder = true;
+            itemDropEntity.GivenType = givenType;
             itemDropEntity.DropItems = new List<CharacterItem> { dropItem };
             itemDropEntity.Looters = new HashSet<string>(looters);
             itemDropEntity.isPickedUp = false;

@@ -158,7 +158,7 @@ namespace MultiplayerARPG
                         droppingToGround = true;
                     if (!droppingToGround)
                     {
-                        GameInstance.ServerGameMessageHandlers.NotifyRewardItem(attackerCharacter.ConnectionId, itemDataId, itemAmount);
+                        GameInstance.ServerGameMessageHandlers.NotifyRewardItem(attackerCharacter.ConnectionId, RewardGivenType.Harvestable, itemDataId, itemAmount);
                         attackerCharacter.IncreaseItems(CharacterItem.Create(itemDataId, 1, itemAmount));
                         attackerCharacter.FillEmptySlots();
                     }
@@ -171,7 +171,7 @@ namespace MultiplayerARPG
                 }
 
                 if (droppingToGround)
-                    ItemDropEntity.DropItem(this, CharacterItem.Create(itemDataId, 1, itemAmount), new string[0]);
+                    ItemDropEntity.DropItem(this, RewardGivenType.Harvestable, CharacterItem.Create(itemDataId, 1, itemAmount), new string[0]);
             }
             // Apply damages
             combatAmountType = CombatAmountType.NormalDamage;

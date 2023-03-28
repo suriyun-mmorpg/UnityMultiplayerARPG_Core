@@ -39,6 +39,7 @@ namespace MultiplayerARPG
         {
             get { return items; }
         }
+        public RewardGivenType GivenType { get; protected set; }
         public HashSet<string> Looters { get; protected set; }
         public override string EntityTitle
         {
@@ -114,7 +115,7 @@ namespace MultiplayerARPG
             NetworkDestroy(destroyDelay);
         }
 
-        public static ItemsContainerEntity DropItems(ItemsContainerEntity prefab, BaseGameEntity dropper, IEnumerable<CharacterItem> dropItems, IEnumerable<string> looters, float appearDuration, bool randomPosition = false, bool randomRotation = false)
+        public static ItemsContainerEntity DropItems(ItemsContainerEntity prefab, BaseGameEntity dropper, RewardGivenType givenType, IEnumerable<CharacterItem> dropItems, IEnumerable<string> looters, float appearDuration, bool randomPosition = false, bool randomRotation = false)
         {
             Vector3 dropPosition = dropper.EntityTransform.position;
             Quaternion dropRotation = dropper.EntityTransform.rotation;
@@ -140,10 +141,10 @@ namespace MultiplayerARPG
                     }
                     break;
             }
-            return DropItems(prefab, dropper, dropPosition, dropRotation, dropItems, looters, appearDuration);
+            return DropItems(prefab, dropper, dropPosition, dropRotation, givenType, dropItems, looters, appearDuration);
         }
 
-        public static ItemsContainerEntity DropItems(ItemsContainerEntity prefab, BaseGameEntity dropper, Vector3 dropPosition, Quaternion dropRotation, IEnumerable<CharacterItem> dropItems, IEnumerable<string> looters, float appearDuration)
+        public static ItemsContainerEntity DropItems(ItemsContainerEntity prefab, BaseGameEntity dropper, Vector3 dropPosition, Quaternion dropRotation, RewardGivenType givenType, IEnumerable<CharacterItem> dropItems, IEnumerable<string> looters, float appearDuration)
         {
             if (prefab == null)
                 return null;
@@ -158,6 +159,7 @@ namespace MultiplayerARPG
                 dropPosition, dropRotation);
             ItemsContainerEntity itemsContainerEntity = spawnObj.GetComponent<ItemsContainerEntity>();
             itemsContainerEntity.Items.AddRange(dropItems);
+            itemsContainerEntity.GivenType = givenType;
             itemsContainerEntity.Looters = new HashSet<string>(looters);
             itemsContainerEntity.isDestroyed = false;
             itemsContainerEntity.dropTime = Time.unscaledTime;

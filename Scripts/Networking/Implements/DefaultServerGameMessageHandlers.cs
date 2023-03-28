@@ -21,43 +21,47 @@ namespace MultiplayerARPG
             Manager.ServerSendPacket(connectionId, 0, DeliveryMethod.ReliableOrdered, GameNetworkingConsts.GameMessage, message);
         }
 
-        public void NotifyRewardExp(long connectionId, int exp)
+        public void NotifyRewardExp(long connectionId, RewardGivenType givenType, int exp)
         {
             if (exp <= 0)
                 return;
             Manager.ServerSendPacket(connectionId, 0, DeliveryMethod.ReliableOrdered, GameNetworkingConsts.NotifyRewardExp, (writer) =>
             {
+                writer.Put((byte)givenType);
                 writer.PutPackedInt(exp);
             });
         }
 
-        public void NotifyRewardGold(long connectionId, int gold)
+        public void NotifyRewardGold(long connectionId, RewardGivenType givenType, int gold)
         {
             if (gold <= 0)
                 return;
             Manager.ServerSendPacket(connectionId, 0, DeliveryMethod.ReliableOrdered, GameNetworkingConsts.NotifyRewardGold, (writer) =>
             {
+                writer.Put((byte)givenType);
                 writer.PutPackedInt(gold);
             });
         }
 
-        public void NotifyRewardItem(long connectionId, int dataId, int amount)
+        public void NotifyRewardItem(long connectionId, RewardGivenType givenType, int dataId, int amount)
         {
             if (amount <= 0)
                 return;
             Manager.ServerSendPacket(connectionId, 0, DeliveryMethod.ReliableOrdered, GameNetworkingConsts.NotifyRewardItem, (writer) =>
             {
+                writer.Put((byte)givenType);
                 writer.PutPackedInt(dataId);
                 writer.PutPackedInt(amount);
             });
         }
 
-        public void NotifyRewardCurrency(long connectionId, int dataId, int amount)
+        public void NotifyRewardCurrency(long connectionId, RewardGivenType givenType, int dataId, int amount)
         {
             if (amount <= 0)
                 return;
             Manager.ServerSendPacket(connectionId, 0, DeliveryMethod.ReliableOrdered, GameNetworkingConsts.NotifyRewardCurrency, (writer) =>
             {
+                writer.Put((byte)givenType);
                 writer.PutPackedInt(dataId);
                 writer.PutPackedInt(amount);
             });

@@ -14,17 +14,22 @@ namespace MultiplayerARPG
 
         public void HandleNotifyRewardExp(MessageHandlerData messageHandler)
         {
-            ClientGenericActions.NotifyRewardExp(messageHandler.Reader.GetPackedInt());
+            ClientGenericActions.NotifyRewardExp(
+                (RewardGivenType)messageHandler.Reader.GetByte(),
+                messageHandler.Reader.GetPackedInt());
         }
 
         public void HandleNotifyRewardGold(MessageHandlerData messageHandler)
         {
-            ClientGenericActions.NotifyRewardGold(messageHandler.Reader.GetPackedInt());
+            ClientGenericActions.NotifyRewardGold(
+                (RewardGivenType)messageHandler.Reader.GetByte(),
+                messageHandler.Reader.GetPackedInt());
         }
 
         public void HandleNotifyRewardItem(MessageHandlerData messageHandler)
         {
             ClientGenericActions.NotifyRewardItem(
+                (RewardGivenType)messageHandler.Reader.GetByte(),
                 messageHandler.Reader.GetPackedInt(),
                 messageHandler.Reader.GetPackedInt());
         }
@@ -32,6 +37,7 @@ namespace MultiplayerARPG
         public void HandleNotifyRewardCurrency(MessageHandlerData messageHandler)
         {
             ClientGenericActions.NotifyRewardCurrency(
+                (RewardGivenType)messageHandler.Reader.GetByte(),
                 messageHandler.Reader.GetPackedInt(),
                 messageHandler.Reader.GetPackedInt());
         }

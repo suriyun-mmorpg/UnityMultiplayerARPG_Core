@@ -310,7 +310,7 @@ namespace MultiplayerARPG
             // Add item to inventory
             Entity.IncreaseItems(CharacterItem.Create(dataId, 1, amount));
             Entity.FillEmptySlots();
-            GameInstance.ServerGameMessageHandlers.NotifyRewardItem(ConnectionId, dataId, amount);
+            GameInstance.ServerGameMessageHandlers.NotifyRewardItem(ConnectionId, RewardGivenType.NpcShop, dataId, amount);
 #endif
         }
 

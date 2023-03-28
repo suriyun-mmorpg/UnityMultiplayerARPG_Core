@@ -11,10 +11,10 @@ namespace MultiplayerARPG
         public static System.Action onClientWarp;
         public static System.Action<ChatMessage> onClientReceiveChatMessage;
         public static System.Action<UITextKeys> onClientReceiveGameMessage;
-        public static System.Action<int> onNotifyRewardExp;
-        public static System.Action<int> onNotifyRewardGold;
-        public static System.Action<int, int> onNotifyRewardItem;
-        public static System.Action<int, int> onNotifyRewardCurrency;
+        public static System.Action<RewardGivenType, int> onNotifyRewardExp;
+        public static System.Action<RewardGivenType, int> onNotifyRewardGold;
+        public static System.Action<RewardGivenType, int, int> onNotifyRewardItem;
+        public static System.Action<RewardGivenType, int, int> onNotifyRewardCurrency;
         public static System.Action<int> onNotifyBattlePointsChanged;
 
         public static void ClientConnected()
@@ -55,28 +55,28 @@ namespace MultiplayerARPG
                 onClientReceiveGameMessage.Invoke(message);
         }
 
-        public static void NotifyRewardExp(int exp)
+        public static void NotifyRewardExp(RewardGivenType givenType, int exp)
         {
             if (onNotifyRewardExp != null)
-                onNotifyRewardExp.Invoke(exp);
+                onNotifyRewardExp.Invoke(givenType, exp);
         }
 
-        public static void NotifyRewardGold(int gold)
+        public static void NotifyRewardGold(RewardGivenType givenType, int gold)
         {
             if (onNotifyRewardGold != null)
-                onNotifyRewardGold.Invoke(gold);
+                onNotifyRewardGold.Invoke(givenType, gold);
         }
 
-        public static void NotifyRewardItem(int dataId, int amount)
+        public static void NotifyRewardItem(RewardGivenType givenType, int dataId, int amount)
         {
             if (onNotifyRewardItem != null)
-                onNotifyRewardItem.Invoke(dataId, amount);
+                onNotifyRewardItem.Invoke(givenType, dataId, amount);
         }
 
-        public static void NotifyRewardCurrency(int dataId, int amount)
+        public static void NotifyRewardCurrency(RewardGivenType givenType, int dataId, int amount)
         {
             if (onNotifyRewardCurrency != null)
-                onNotifyRewardCurrency.Invoke(dataId, amount);
+                onNotifyRewardCurrency.Invoke(givenType, dataId, amount);
         }
 
         public static void NotifyBattlePointsChanged(int amount)

@@ -115,12 +115,12 @@ namespace MultiplayerARPG
                     case DeadDropItemMode.DropOnGround:
                         for (int i = 0; i < droppingItems.Count; ++i)
                         {
-                            ItemDropEntity.DropItem(this, droppingItems[i], looters);
+                            ItemDropEntity.DropItem(this, RewardGivenType.PlayerDead, droppingItems[i], looters);
                         }
                         break;
                     case DeadDropItemMode.CorpseLooting:
                         if (droppingItems.Count > 0)
-                            ItemsContainerEntity.DropItems(CurrentGameInstance.monsterCorpsePrefab, this, droppingItems, looters, CurrentGameInstance.playerCorpseAppearDuration);
+                            ItemsContainerEntity.DropItems(CurrentGameInstance.monsterCorpsePrefab, this, RewardGivenType.PlayerDead, droppingItems, looters, CurrentGameInstance.playerCorpseAppearDuration);
                         break;
                 }
             }

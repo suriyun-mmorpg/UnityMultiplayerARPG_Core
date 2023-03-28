@@ -419,7 +419,7 @@ namespace MultiplayerARPG
                 {
                     if (droppingItem.item == null || droppingItem.amount == 0)
                         continue;
-                    ItemDropEntity.DropItem(this, CharacterItem.Create(droppingItem.item, 1, droppingItem.amount), new string[0]);
+                    ItemDropEntity.DropItem(this, RewardGivenType.BuildingDestroyed, CharacterItem.Create(droppingItem.item, 1, droppingItem.amount), new string[0]);
                 }
             }
             // Destroy this entity

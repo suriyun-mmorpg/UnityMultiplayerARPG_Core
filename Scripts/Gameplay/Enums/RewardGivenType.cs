@@ -6,6 +6,13 @@
         KillMonster,
         PartyShare,
         Quest,
-        Harvestable
+        Harvestable,
+        Crafting,
+        Dealing,
+        NpcShop,
+        PlayerDrop,
+        PlayerDead,
+        BuildingDrop,
+        BuildingDestroyed,
     }
 }

@@ -43,7 +43,7 @@ namespace MultiplayerARPG
 
             this.IncreaseItems(itemDropEntity.DropItems, (characterItem) =>
             {
-                GameInstance.ServerGameMessageHandlers.NotifyRewardItem(ConnectionId, characterItem.dataId, characterItem.amount);
+                GameInstance.ServerGameMessageHandlers.NotifyRewardItem(ConnectionId, itemDropEntity.GivenType, characterItem.dataId, characterItem.amount);
             });
             this.FillEmptySlots();
             itemDropEntity.PickedUp();
@@ -98,7 +98,7 @@ namespace MultiplayerARPG
 
             this.IncreaseItems(pickingItem, (characterItem) =>
             {
-                GameInstance.ServerGameMessageHandlers.NotifyRewardItem(ConnectionId, characterItem.dataId, characterItem.amount);
+                GameInstance.ServerGameMessageHandlers.NotifyRewardItem(ConnectionId, itemsContainerEntity.GivenType, characterItem.dataId, characterItem.amount);
             });
             itemsContainerEntity.Items.DecreaseItemsByIndex(itemsContainerIndex, amount, false, true);
             itemsContainerEntity.PickedUp();
@@ -147,7 +147,7 @@ namespace MultiplayerARPG
 
                 this.IncreaseItems(pickingItem, (characterItem) =>
                 {
-                    GameInstance.ServerGameMessageHandlers.NotifyRewardItem(ConnectionId, characterItem.dataId, characterItem.amount);
+                    GameInstance.ServerGameMessageHandlers.NotifyRewardItem(ConnectionId, itemsContainerEntity.GivenType, characterItem.dataId, characterItem.amount);
                 });
                 itemsContainerEntity.Items.RemoveAt(0);
             }
@@ -201,9 +201,9 @@ namespace MultiplayerARPG
                     CharacterItem dropData = nonEquipItem.Clone();
                     dropData.amount = amount;
                     if (CurrentGameInstance.canPickupItemsWhichDropsByPlayersImmediately)
-                        ItemDropEntity.DropItem(this, dropData, new string[0]);
+                        ItemDropEntity.DropItem(this, RewardGivenType.PlayerDrop, dropData, new string[0]);
                     else
-                        ItemDropEntity.DropItem(this, dropData, new string[] { Id });
+                        ItemDropEntity.DropItem(this, RewardGivenType.PlayerDrop, dropData, new string[] { Id });
                     break;
             }
 #endif

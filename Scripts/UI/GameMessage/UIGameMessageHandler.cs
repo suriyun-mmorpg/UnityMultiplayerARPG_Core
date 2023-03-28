@@ -63,7 +63,7 @@ namespace MultiplayerARPG
             newMessage.text = LanguageManager.GetText(message.ToString());
         }
 
-        private void OnNotifyRewardExp(int exp)
+        private void OnNotifyRewardExp(RewardGivenType givenType, int exp)
         {
             if (rewardExpPrefab == null)
                 return;
@@ -72,7 +72,7 @@ namespace MultiplayerARPG
             newMessage.text = ZString.Format(LanguageManager.GetText(formatKeyRewardExp.ToString()), exp);
         }
 
-        private void OnNotifyRewardGold(int gold)
+        private void OnNotifyRewardGold(RewardGivenType givenType, int gold)
         {
             if (rewardGoldPrefab == null)
                 return;
@@ -81,7 +81,7 @@ namespace MultiplayerARPG
             newMessage.text = ZString.Format(LanguageManager.GetText(formatKeyRewardGold.ToString()), gold);
         }
 
-        private void OnNotifyRewardItem(int dataId, int amount)
+        private void OnNotifyRewardItem(RewardGivenType givenType, int dataId, int amount)
         {
             BaseItem item;
             if (rewardItemPrefab == null || !GameInstance.Items.TryGetValue(dataId, out item))
@@ -91,7 +91,7 @@ namespace MultiplayerARPG
             newMessage.text = ZString.Format(LanguageManager.GetText(formatKeyRewardItem.ToString()), item.Title, amount);
         }
 
-        private void OnNotifyRewardCurrency(int dataId, int amount)
+        private void OnNotifyRewardCurrency(RewardGivenType givenType, int dataId, int amount)
         {
             Currency currency;
             if (rewardCurrencyPrefab == null || !GameInstance.Currencies.TryGetValue(dataId, out currency))

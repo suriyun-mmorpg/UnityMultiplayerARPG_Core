@@ -78,10 +78,10 @@ namespace MultiplayerARPG
             int rewardedExp;
             if (!CurrentGameplayRule.RewardExp(this, reward, multiplier, rewardGivenType, out rewardedExp))
             {
-                GameInstance.ServerGameMessageHandlers.NotifyRewardExp(ConnectionId, rewardedExp);
+                GameInstance.ServerGameMessageHandlers.NotifyRewardExp(ConnectionId, rewardGivenType, rewardedExp);
                 return;
             }
-            GameInstance.ServerGameMessageHandlers.NotifyRewardExp(ConnectionId, rewardedExp);
+            GameInstance.ServerGameMessageHandlers.NotifyRewardExp(ConnectionId, rewardGivenType, rewardedExp);
             CallAllOnLevelUp();
         }
 
@@ -91,14 +91,14 @@ namespace MultiplayerARPG
                 return;
             int rewardedGold;
             CurrentGameplayRule.RewardCurrencies(this, reward, multiplier, rewardGivenType, out rewardedGold);
-            GameInstance.ServerGameMessageHandlers.NotifyRewardGold(ConnectionId, rewardedGold);
+            GameInstance.ServerGameMessageHandlers.NotifyRewardGold(ConnectionId, rewardGivenType, rewardedGold);
             if (reward.currencies != null && reward.currencies.Length > 0)
             {
                 foreach (CurrencyAmount currency in reward.currencies)
                 {
                     if (currency.currency == null || currency.amount == 0)
                         continue;
-                    GameInstance.ServerGameMessageHandlers.NotifyRewardCurrency(ConnectionId, currency.currency.DataId, currency.amount);
+                    GameInstance.ServerGameMessageHandlers.NotifyRewardCurrency(ConnectionId, rewardGivenType, currency.currency.DataId, currency.amount);
                 }
             }
         }
