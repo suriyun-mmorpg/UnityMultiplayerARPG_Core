@@ -1363,10 +1363,10 @@ namespace MultiplayerARPG
             {
                 if (AddGameData(Characters, character))
                 {
-                    if (character is PlayerCharacter)
-                        AddGameData(PlayerCharacters, character as PlayerCharacter);
-                    else if (character is MonsterCharacter)
-                        AddGameData(MonsterCharacters, character as MonsterCharacter);
+                    if (character is PlayerCharacter playerCharacter)
+                        AddGameData(PlayerCharacters, playerCharacter);
+                    else if (character is MonsterCharacter monsterCharacter)
+                        AddGameData(MonsterCharacters, monsterCharacter);
                 }
             }
         }
@@ -1624,10 +1624,10 @@ namespace MultiplayerARPG
                     continue;
                 if (!characterEntity.Identity.IsSceneObject && !CharacterEntities.ContainsKey(characterEntity.Identity.HashAssetId))
                     CharacterEntities[characterEntity.Identity.HashAssetId] = characterEntity;
-                if (characterEntity is BasePlayerCharacterEntity)
-                    AddGameEntity(PlayerCharacterEntities, characterEntity as BasePlayerCharacterEntity);
-                else if (characterEntity is BaseMonsterCharacterEntity)
-                    AddGameEntity(MonsterCharacterEntities, characterEntity as BaseMonsterCharacterEntity);
+                if (characterEntity is BasePlayerCharacterEntity playerCharacterEntity)
+                    AddGameEntity(PlayerCharacterEntities, playerCharacterEntity);
+                else if (characterEntity is BaseMonsterCharacterEntity monsterCharacterEntity)
+                    AddGameEntity(MonsterCharacterEntities, monsterCharacterEntity);
             }
         }
 
