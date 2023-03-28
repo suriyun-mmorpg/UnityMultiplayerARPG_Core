@@ -437,8 +437,8 @@ namespace MultiplayerARPG
                         applyJumpForceCountDown = applyJumpForceFixedDuration;
                         break;
                     case ApplyJumpForceMode.ApplyAfterJumpDuration:
-                        if (Entity.Model is IJumppableModel)
-                            applyJumpForceCountDown = (Entity.Model as IJumppableModel).GetJumpAnimationDuration();
+                        if (Entity.Model is IJumppableModel jumppableModel)
+                            applyJumpForceCountDown = jumppableModel.GetJumpAnimationDuration();
                         break;
                 }
             }
