@@ -535,7 +535,7 @@ namespace MultiplayerARPG
                         CacheEquipmentModelContainers[equipSocket] = CacheEquipmentModelContainers[model.equipSocket];
                 }
 
-                if (!showingModels.TryGetValue(equipSocket, out EquipmentModel storedModel) || storedModel.priority < model.priority || storedModel.itemLevel < itemLevel)
+                if (!storingModels.TryGetValue(equipSocket, out EquipmentModel storedModel) || storedModel.priority < model.priority || (storedModel.equipPosition == equipPosition && storedModel.itemLevel < itemLevel))
                 {
                     if (isSheathModels && model.useSpecificSheathEquipWeaponSet && model.specificSheathEquipWeaponSet != equipWeaponSet)
                     {
