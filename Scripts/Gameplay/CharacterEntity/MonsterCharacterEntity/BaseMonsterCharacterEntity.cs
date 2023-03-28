@@ -407,22 +407,19 @@ namespace MultiplayerARPG
             Reward reward = CurrentGameplayRule.MakeMonsterReward(CharacterDatabase, Level);
             // Temp data which will be in-use in loop
             BaseCharacterEntity tempCharacterEntity;
-            BasePlayerCharacterEntity tempPlayerCharacterEntity;
-            BaseMonsterCharacterEntity tempMonsterCharacterEntity;
             // Last player is last player who kill the monster
             // Whom will have permission to pickup an items before other
             BasePlayerCharacterEntity lastPlayer = null;
             BaseCharacterEntity attackerCharacter;
             if (lastAttacker.TryGetEntity(out attackerCharacter))
             {
-                if (attackerCharacter is BaseMonsterCharacterEntity)
+                if (attackerCharacter is BaseMonsterCharacterEntity monsterCharacterEntity)
                 {
-                    tempMonsterCharacterEntity = attackerCharacter as BaseMonsterCharacterEntity;
-                    if (tempMonsterCharacterEntity.Summoner != null &&
-                        tempMonsterCharacterEntity.Summoner is BasePlayerCharacterEntity)
+                    if (monsterCharacterEntity.Summoner != null &&
+                        monsterCharacterEntity.Summoner is BasePlayerCharacterEntity)
                     {
                         // Set its summoner as main enemy
-                        lastAttacker = tempMonsterCharacterEntity.Summoner.GetInfo();
+                        lastAttacker = monsterCharacterEntity.Summoner.GetInfo();
                         lastAttacker.TryGetEntity(out attackerCharacter);
                     }
                 }
@@ -452,21 +449,20 @@ namespace MultiplayerARPG
                     if (rewardRate > 1f)
                         rewardRate = 1f;
 
-                    if (tempCharacterEntity is BaseMonsterCharacterEntity)
+                    if (tempCharacterEntity is BaseMonsterCharacterEntity monsterCharacterEntity)
                     {
-                        tempMonsterCharacterEntity = tempCharacterEntity as BaseMonsterCharacterEntity;
-                        if (tempMonsterCharacterEntity.Summoner != null &&
-                            tempMonsterCharacterEntity.Summoner is BasePlayerCharacterEntity)
+                        if (monsterCharacterEntity.Summoner != null &&
+                            monsterCharacterEntity.Summoner is BasePlayerCharacterEntity)
                         {
                             // Set its summoner as main enemy
-                            tempCharacterEntity = tempMonsterCharacterEntity.Summoner;
+                            tempCharacterEntity = monsterCharacterEntity.Summoner;
                         }
                     }
 
-                    if (tempCharacterEntity is BasePlayerCharacterEntity)
+                    if (tempCharacterEntity is BasePlayerCharacterEntity playerCharacterEntity)
                     {
                         bool makeMostDamage = false;
-                        tempPlayerCharacterEntity = tempCharacterEntity as BasePlayerCharacterEntity;
+                        playerCharacterEntity = tempCharacterEntity as BasePlayerCharacterEntity;
                         // Clear looters list when it is found new player character who make most damages
                         if (rewardRate > tempHighRewardRate)
                         {
@@ -475,19 +471,19 @@ namespace MultiplayerARPG
                             makeMostDamage = true;
                         }
                         // Try find guild data from player character
-                        if (tempPlayerCharacterEntity.GuildId > 0 && GameInstance.ServerGuildHandlers.TryGetGuild(tempPlayerCharacterEntity.GuildId, out tempGuildData))
+                        if (playerCharacterEntity.GuildId > 0 && GameInstance.ServerGuildHandlers.TryGetGuild(playerCharacterEntity.GuildId, out tempGuildData))
                         {
                             // Calculation amount of Exp which will be shared to guild
-                            shareGuildExpRate = (float)tempGuildData.ShareExpPercentage(tempPlayerCharacterEntity.Id) * 0.01f;
+                            shareGuildExpRate = (float)tempGuildData.ShareExpPercentage(playerCharacterEntity.Id) * 0.01f;
                             // Will share Exp to guild when sharing amount more than 0
                             if (shareGuildExpRate > 0)
                             {
                                 // Increase guild exp
-                                GameInstance.ServerGuildHandlers.IncreaseGuildExp(tempPlayerCharacterEntity, Mathf.CeilToInt(reward.exp * shareGuildExpRate * rewardRate));
+                                GameInstance.ServerGuildHandlers.IncreaseGuildExp(playerCharacterEntity, Mathf.CeilToInt(reward.exp * shareGuildExpRate * rewardRate));
                             }
                         }
                         // Try find party data from player character
-                        if (tempPlayerCharacterEntity.PartyId > 0 && GameInstance.ServerPartyHandlers.TryGetParty(tempPlayerCharacterEntity.PartyId, out tempPartyData))
+                        if (playerCharacterEntity.PartyId > 0 && GameInstance.ServerPartyHandlers.TryGetParty(playerCharacterEntity.PartyId, out tempPartyData))
                         {
                             List<BasePlayerCharacterEntity> sharingExpMembers = new List<BasePlayerCharacterEntity>();
                             List<BasePlayerCharacterEntity> sharingItemMembers = new List<BasePlayerCharacterEntity>();
@@ -498,12 +494,12 @@ namespace MultiplayerARPG
                                 {
                                     if (tempPartyData.shareExp)
                                     {
-                                        if (GameInstance.Singleton.partyShareExpDistance <= 0f || Vector3.Distance(tempPlayerCharacterEntity.EntityTransform.position, nearbyPartyMember.EntityTransform.position) <= GameInstance.Singleton.partyShareExpDistance)
+                                        if (GameInstance.Singleton.partyShareExpDistance <= 0f || Vector3.Distance(playerCharacterEntity.EntityTransform.position, nearbyPartyMember.EntityTransform.position) <= GameInstance.Singleton.partyShareExpDistance)
                                             sharingExpMembers.Add(nearbyPartyMember);
                                     }
                                     if (tempPartyData.shareItem)
                                     {
-                                        if (GameInstance.Singleton.partyShareItemDistance <= 0f || Vector3.Distance(tempPlayerCharacterEntity.EntityTransform.position, nearbyPartyMember.EntityTransform.position) <= GameInstance.Singleton.partyShareItemDistance)
+                                        if (GameInstance.Singleton.partyShareItemDistance <= 0f || Vector3.Distance(playerCharacterEntity.EntityTransform.position, nearbyPartyMember.EntityTransform.position) <= GameInstance.Singleton.partyShareItemDistance)
                                             sharingItemMembers.Add(nearbyPartyMember);
                                     }
                                 }
@@ -519,11 +515,11 @@ namespace MultiplayerARPG
                                 int petIndex = nearbyPartyMember.IndexOfSummon(SummonType.PetItem);
                                 if (petIndex >= 0)
                                 {
-                                    tempMonsterCharacterEntity = nearbyPartyMember.Summons[petIndex].CacheEntity;
-                                    if (tempMonsterCharacterEntity != null)
+                                    monsterCharacterEntity = nearbyPartyMember.Summons[petIndex].CacheEntity;
+                                    if (monsterCharacterEntity != null)
                                     {
                                         // Share exp to pet, set multiplier to 0.5, because it will be shared to player
-                                        tempMonsterCharacterEntity.RewardExp(reward, (1f - shareGuildExpRate) / countNearbyPartyMembers * 0.5f * rewardRate, RewardGivenType.PartyShare);
+                                        monsterCharacterEntity.RewardExp(reward, (1f - shareGuildExpRate) / countNearbyPartyMembers * 0.5f * rewardRate, RewardGivenType.PartyShare);
                                     }
                                     // Set multiplier to 0.5, because it was shared to monster
                                     nearbyPartyMember.RewardExp(reward, (1f - shareGuildExpRate) / countNearbyPartyMembers * 0.5f * rewardRate, RewardGivenType.PartyShare);
@@ -560,36 +556,36 @@ namespace MultiplayerARPG
                         if (!givenRewardExp)
                         {
                             // Will give reward when it was not given
-                            int petIndex = tempPlayerCharacterEntity.IndexOfSummon(SummonType.PetItem);
+                            int petIndex = playerCharacterEntity.IndexOfSummon(SummonType.PetItem);
                             if (petIndex >= 0)
                             {
-                                tempMonsterCharacterEntity = tempPlayerCharacterEntity.Summons[petIndex].CacheEntity;
-                                if (tempMonsterCharacterEntity != null)
+                                monsterCharacterEntity = playerCharacterEntity.Summons[petIndex].CacheEntity;
+                                if (monsterCharacterEntity != null)
                                 {
                                     // Share exp to pet, set multiplier to 0.5, because it will be shared to player
-                                    tempMonsterCharacterEntity.RewardExp(reward, (1f - shareGuildExpRate) * 0.5f * rewardRate, RewardGivenType.KillMonster);
+                                    monsterCharacterEntity.RewardExp(reward, (1f - shareGuildExpRate) * 0.5f * rewardRate, RewardGivenType.KillMonster);
                                 }
                                 // Set multiplier to 0.5, because it was shared to monster
-                                tempPlayerCharacterEntity.RewardExp(reward, (1f - shareGuildExpRate) * 0.5f * rewardRate, RewardGivenType.KillMonster);
+                                playerCharacterEntity.RewardExp(reward, (1f - shareGuildExpRate) * 0.5f * rewardRate, RewardGivenType.KillMonster);
                             }
                             else
                             {
                                 // No pet, no share, so rate is 1f
-                                tempPlayerCharacterEntity.RewardExp(reward, (1f - shareGuildExpRate) * rewardRate, RewardGivenType.KillMonster);
+                                playerCharacterEntity.RewardExp(reward, (1f - shareGuildExpRate) * rewardRate, RewardGivenType.KillMonster);
                             }
                         }
 
                         if (!givenRewardCurrency)
                         {
                             // Will give reward when it was not given
-                            tempPlayerCharacterEntity.RewardCurrencies(reward, rewardRate, RewardGivenType.KillMonster);
+                            playerCharacterEntity.RewardCurrencies(reward, rewardRate, RewardGivenType.KillMonster);
                         }
 
                         if (makeMostDamage)
                         {
                             // Make current character able to pick up item because it made most damage
-                            looters.Add(tempPlayerCharacterEntity.Id);
-                            itemDropRate = 1f + tempPlayerCharacterEntity.GetCaches().Stats.itemDropRate;
+                            looters.Add(playerCharacterEntity.Id);
+                            itemDropRate = 1f + playerCharacterEntity.GetCaches().Stats.itemDropRate;
                         }
                     }   // End is `BasePlayerCharacterEntity` condition
                 }   // End for-loop
