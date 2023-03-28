@@ -371,14 +371,14 @@ namespace MultiplayerARPG
 
         public virtual void PlayHitAnimation()
         {
-            if (Model is IHittableModel)
-                (Model as IHittableModel).PlayHitAnimation();
+            if (Model is IHittableModel hittableModel)
+                hittableModel.PlayHitAnimation();
         }
 
         public virtual void SetModelIsDead(bool isDead)
         {
-            if (Model is IDeadableModel)
-                (Model as IDeadableModel).SetIsDead(isDead);
+            if (Model is IDeadableModel deadableModel)
+                deadableModel.SetIsDead(isDead);
         }
     }
 }
