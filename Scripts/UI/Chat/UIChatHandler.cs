@@ -190,7 +190,8 @@ namespace MultiplayerARPG
             if (uiMessageField != null)
             {
                 uiMessageField.DeactivateInputField();
-                EventSystem.current.SetSelectedGameObject(null);
+                if (EventSystem.current != null)
+                    EventSystem.current.SetSelectedGameObject(null);
             }
             EnterChatFieldVisible = false;
         }

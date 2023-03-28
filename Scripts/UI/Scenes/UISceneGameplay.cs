@@ -490,7 +490,8 @@ namespace MultiplayerARPG
             if (UIDragHandler.DraggingObjects.Count > 0)
                 return true;
             eventDataCurrentPosition.position = new Vector2(InputManager.MousePosition().x, InputManager.MousePosition().y);
-            EventSystem.current.RaycastAll(eventDataCurrentPosition, pointerOverUIResults);
+            if (EventSystem.current != null)
+                EventSystem.current.RaycastAll(eventDataCurrentPosition, pointerOverUIResults);
             // If it's not mobile ui, assume that it's over UI
             if (ignorePointerOverUITags.Count > 0 || ignorePointerOverUIObjects.Count > 0)
             {
