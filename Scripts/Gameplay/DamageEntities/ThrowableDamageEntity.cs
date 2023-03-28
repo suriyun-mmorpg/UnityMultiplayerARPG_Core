@@ -120,7 +120,7 @@ namespace MultiplayerARPG
                 return false;
             }
 
-            if (!canApplyDamageToAllies && target.DamageableEntity is BaseCharacterEntity && (target.DamageableEntity as BaseCharacterEntity).IsAlly(instigator))
+            if (!canApplyDamageToAllies && target.DamageableEntity is BaseCharacterEntity characterEntity && characterEntity.IsAlly(instigator))
             {
                 target = null;
                 return false;

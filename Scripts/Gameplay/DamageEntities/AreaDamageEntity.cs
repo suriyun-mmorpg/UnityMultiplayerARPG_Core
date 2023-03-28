@@ -90,7 +90,7 @@ namespace MultiplayerARPG
             if (!canApplyDamageToUser && target.GetObjectId() == instigator.ObjectId)
                 return;
 
-            if (!canApplyDamageToAllies && target.DamageableEntity is BaseCharacterEntity && (target.DamageableEntity as BaseCharacterEntity).IsAlly(instigator))
+            if (!canApplyDamageToAllies && target.DamageableEntity is BaseCharacterEntity characterEntity && characterEntity.IsAlly(instigator))
                 return;
 
             target.ReceiveDamageWithoutConditionCheck(CacheTransform.position, instigator, damageAmounts, weapon, skill, skillLevel, Random.Range(0, 255));
