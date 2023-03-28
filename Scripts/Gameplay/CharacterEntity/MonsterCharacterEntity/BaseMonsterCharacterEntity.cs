@@ -462,7 +462,12 @@ namespace MultiplayerARPG
                     if (tempCharacterEntity is BasePlayerCharacterEntity playerCharacterEntity)
                     {
                         bool makeMostDamage = false;
-                        playerCharacterEntity = tempCharacterEntity as BasePlayerCharacterEntity;
+                        bool isLastAttacker = lastPlayer != null && lastPlayer.ObjectId == playerCharacterEntity.ObjectId;
+                        if (isLastAttacker)
+                        {
+                            // Increase kill progress
+                            playerCharacterEntity.OnKillMonster(this);
+                        }
                         // Clear looters list when it is found new player character who make most damages
                         if (rewardRate > tempHighRewardRate)
                         {
@@ -501,6 +506,11 @@ namespace MultiplayerARPG
                                     {
                                         if (GameInstance.Singleton.partyShareItemDistance <= 0f || Vector3.Distance(playerCharacterEntity.EntityTransform.position, nearbyPartyMember.EntityTransform.position) <= GameInstance.Singleton.partyShareItemDistance)
                                             sharingItemMembers.Add(nearbyPartyMember);
+                                    }
+                                    if (isLastAttacker)
+                                    {
+                                        // Increase kill progress
+                                        nearbyPartyMember.OnKillMonster(this);
                                     }
                                 }
                             }
@@ -608,12 +618,6 @@ namespace MultiplayerARPG
                     if (droppingItems.Count > 0)
                         ItemsContainerEntity.DropItems(CurrentGameInstance.monsterCorpsePrefab, this, RewardGivenType.KillMonster, droppingItems, looters, CurrentGameInstance.monsterCorpseAppearDuration);
                     break;
-            }
-
-            if (lastPlayer != null)
-            {
-                // Increase kill progress
-                lastPlayer.OnKillMonster(this);
             }
 
             if (!IsSummoned)
