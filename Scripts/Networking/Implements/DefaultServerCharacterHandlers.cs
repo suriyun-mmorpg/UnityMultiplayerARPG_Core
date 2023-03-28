@@ -57,9 +57,8 @@ namespace MultiplayerARPG
             Vector3 respawnRotation = Vector3.zero;
             if (BaseGameNetworkManager.CurrentMapInfo != null)
                 BaseGameNetworkManager.CurrentMapInfo.GetRespawnPoint(playerCharacter, out respawnPortalType, out respawnMapName, out respawnPosition, out respawnOverrideRotation, out respawnRotation);
-            if (playerCharacter is BasePlayerCharacterEntity)
+            if (playerCharacter is BasePlayerCharacterEntity entity)
             {
-                BasePlayerCharacterEntity entity = playerCharacter as BasePlayerCharacterEntity;
                 switch (respawnPortalType)
                 {
                     case WarpPortalType.Default:
