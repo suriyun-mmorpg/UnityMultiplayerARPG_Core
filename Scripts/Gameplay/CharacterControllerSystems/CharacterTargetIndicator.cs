@@ -38,7 +38,7 @@ namespace MultiplayerARPG
 
             if (currentTarget != null)
             {
-                if ((currentTarget is DamageableEntity) && (currentTarget as DamageableEntity).IsDead())
+                if (currentTarget is DamageableEntity damageableEntity && damageableEntity.IsDead())
                 {
                     indicatorObject.gameObject.SetActive(false);
                     return;
