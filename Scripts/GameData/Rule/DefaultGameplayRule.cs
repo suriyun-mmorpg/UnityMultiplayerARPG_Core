@@ -210,7 +210,7 @@ namespace MultiplayerARPG
             if (damageReceiverArmors.TryGetValue(damageElement, out armorAmount))
             {
                 // Formula: Attack * 100 / (100 + Defend)
-                damageAmount *= 100f / (100f + armorAmount);
+                damageAmount *= 100f / (100f + Mathf.Max(0f, armorAmount));
             }
             return damageAmount;
         }
