@@ -25,7 +25,7 @@ namespace MultiplayerARPG
             TriggerExit(other.gameObject);
         }
 
-        private void OnTriggerEnter2D(Collider2D other)
+        private void OnTriggerStay2D(Collider2D other)
         {
             TriggerEnter(other.gameObject, null, other);
         }
@@ -76,6 +76,12 @@ namespace MultiplayerARPG
 
         private void TriggerExit(GameObject other)
         {
+            IGameEntity gameEntity = other.GetComponent<IGameEntity>();
+            if (!gameEntity.IsNull())
+            {
+                buildingMaterial.BuildingEntity.TriggerExitEntity(gameEntity.Entity);
+                return;
+            }
             buildingMaterial.BuildingEntity.TriggerExitGameObject(other);
         }
 
