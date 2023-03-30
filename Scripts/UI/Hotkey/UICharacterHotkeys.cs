@@ -218,7 +218,7 @@ namespace MultiplayerARPG
                 return;
             HotkeyAimPosition = UsingHotkey.UpdateAimControls(Vector2.zero);
             // Click anywhere (on the map) to use skill
-            if (Input.GetMouseButtonDown(0) && !UsingHotkey.IsChanneledAbility())
+            if (InputManager.GetMouseButtonDown(0) && !UsingHotkey.IsChanneledAbility() && !UIBlockController.IsBlockController())
                 FinishHotkeyAimControls(false);
         }
 
