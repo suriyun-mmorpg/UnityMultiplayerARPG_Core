@@ -183,9 +183,9 @@ namespace MultiplayerARPG
         public bool IsBuildMode { get; private set; }
         public BasePlayerCharacterEntity Builder { get; private set; }
 
-        protected readonly List<GameObject> triggerObjects = new List<GameObject>();
-        protected readonly List<BuildingEntity> children = new List<BuildingEntity>();
-        protected readonly List<BuildingMaterial> buildingMaterials = new List<BuildingMaterial>();
+        protected readonly HashSet<GameObject> triggerObjects = new HashSet<GameObject>();
+        protected readonly HashSet<BuildingEntity> children = new HashSet<BuildingEntity>();
+        protected readonly HashSet<BuildingMaterial> buildingMaterials = new HashSet<BuildingMaterial>();
         protected bool parentFound;
         protected bool isDestroyed;
 
@@ -283,8 +283,7 @@ namespace MultiplayerARPG
 
         public void RegisterMaterial(BuildingMaterial material)
         {
-            if (!buildingMaterials.Contains(material))
-                buildingMaterials.Add(material);
+            buildingMaterials.Add(material);
         }
 
         public override void OnSetup()
@@ -330,8 +329,7 @@ namespace MultiplayerARPG
 
         public void AddChildren(BuildingEntity buildingEntity)
         {
-            if (!children.Contains(buildingEntity))
-                children.Add(buildingEntity);
+            children.Add(buildingEntity);
         }
 
         public bool IsPositionInBuildDistance(Vector3 builderPosition, Vector3 placePosition)
@@ -348,7 +346,7 @@ namespace MultiplayerARPG
             }
             if (!IsPositionInBuildDistance(Builder.EntityTransform.position, EntityTransform.position))
             {
-                // Too far from buildiner?
+                // Too far from builder?
                 return false;
             }
             if (triggerObjects.Count > 0)
@@ -452,12 +450,21 @@ namespace MultiplayerARPG
             Builder = builder;
         }
 
+        public void AddTriggerObject(GameObject obj)
+        {
+            triggerObjects.Add(obj);
+        }
+
+        public bool RemoveTriggerObject(GameObject obj)
+        {
+            return triggerObjects.Remove(obj);
+        }
+
         public bool TriggerEnterEntity(BaseGameEntity entity)
         {
             if (entity == null || entity.EntityGameObject == EntityGameObject)
                 return false;
-            if (!triggerObjects.Contains(entity.EntityGameObject))
-                triggerObjects.Add(entity.EntityGameObject);
+            AddTriggerObject(entity.EntityGameObject);
             return true;
         }
 
@@ -465,7 +472,7 @@ namespace MultiplayerARPG
         {
             if (entity == null)
                 return false;
-            triggerObjects.Remove(entity.EntityGameObject);
+            RemoveTriggerObject(entity.EntityGameObject);
             return true;
         }
 
@@ -473,8 +480,7 @@ namespace MultiplayerARPG
         {
             if (component == null)
                 return false;
-            if (!triggerObjects.Contains(component.gameObject))
-                triggerObjects.Add(component.gameObject);
+            AddTriggerObject(component.gameObject);
             return true;
         }
 
@@ -482,7 +488,7 @@ namespace MultiplayerARPG
         {
             if (component == null)
                 return false;
-            triggerObjects.Remove(component.gameObject);
+            RemoveTriggerObject(component.gameObject);
             return true;
         }
 
@@ -490,8 +496,7 @@ namespace MultiplayerARPG
         {
             if (other == null)
                 return false;
-            if (!triggerObjects.Contains(other))
-                triggerObjects.Add(other);
+            AddTriggerObject(other);
             return true;
         }
 
@@ -499,7 +504,7 @@ namespace MultiplayerARPG
         {
             if (other == null)
                 return false;
-            triggerObjects.Remove(other);
+            RemoveTriggerObject(other);
             return true;
         }
 
