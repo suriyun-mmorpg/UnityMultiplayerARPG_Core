@@ -486,43 +486,38 @@ namespace MultiplayerARPG
 
         public override bool IsPointerOverUIObject()
         {
-            if (EventSystem.current == null)
+            if (InputManager.IsDraggingMobileInput)
                 return false;
-            PointerEventData eventDataCurrentPosition = new PointerEventData(EventSystem.current);
             if (UIDragHandler.DraggingObjects.Count > 0)
                 return true;
-            eventDataCurrentPosition.position = new Vector2(InputManager.MousePosition().x, InputManager.MousePosition().y);
-            EventSystem.current.RaycastAll(eventDataCurrentPosition, pointerOverUIResults);
-            // If it's not mobile ui, assume that it's over UI
-            if (ignorePointerOverUITags.Count > 0 || ignorePointerOverUIObjects.Count > 0)
+            if (EventSystem.current == null)
+                return false;
+            PointerEventData pointer = new PointerEventData(EventSystem.current);
+            pointer.position = new Vector2(InputManager.MousePosition().x, InputManager.MousePosition().y);
+            EventSystem.current.RaycastAll(pointer, pointerOverUIResults);
+
+            int i;
+            int j;
+            bool containsTag = false;
+            RaycastResult result;
+            for (i = 0; i < pointerOverUIResults.Count; ++i)
             {
-                int i;
-                int j;
-                bool containsTag = false;
-                RaycastResult result;
-                for (i = 0; i < pointerOverUIResults.Count; ++i)
+                result = pointerOverUIResults[i];
+                // Find containing tags
+                for (j = 0; j < ignorePointerOverUITags.Count; ++j)
                 {
-                    result = pointerOverUIResults[i];
-                    // Find containing tags
-                    for (j = 0; j < ignorePointerOverUITags.Count; ++j)
+                    if (result.gameObject.CompareTag(ignorePointerOverUITags[j].Tag))
                     {
-                        if (result.gameObject.CompareTag(ignorePointerOverUITags[j].Tag))
-                        {
-                            containsTag = true;
-                            break;
-                        }
-                    }
-                    // Not ignored, so determining that the pointer is pointing over UIs
-                    if (!containsTag && !ignorePointerOverUIObjects.Contains(result.gameObject))
-                    {
-                        return true;
+                        // Ignoring this one
+                        containsTag = true;
+                        break;
                     }
                 }
-            }
-            else
-            {
-                // Pointer over UI if it hit something, so if count > 0, then determining that the pointer is pointing over UIs
-                return pointerOverUIResults.Count > 0;
+                // Not ignored, so determining that the pointer is pointing over UIs
+                if (!containsTag && !ignorePointerOverUIObjects.Contains(result.gameObject))
+                {
+                    return true;
+                }
             }
             return false;
         }
