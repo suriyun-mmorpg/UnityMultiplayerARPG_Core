@@ -398,9 +398,23 @@ namespace MultiplayerARPG
             // Setup equipping models from equip weapons
             EquipWeapons equipWeapons;
             if (isWeaponsSheathed || selectableWeaponSets == null || selectableWeaponSets.Count == 0)
+            {
                 equipWeapons = new EquipWeapons();
+            }
             else
+            {
+                if (equipWeaponSet >= selectableWeaponSets.Count)
+                {
+                    // Issues occuring, so try to simulate data
+                    // Create a new list to make sure that changes won't be applied to the source list (the source list must be readonly)
+                    selectableWeaponSets = new List<EquipWeapons>(selectableWeaponSets);
+                    while (equipWeaponSet >= selectableWeaponSets.Count)
+                    {
+                        selectableWeaponSets.Add(new EquipWeapons());
+                    }
+                }
                 equipWeapons = selectableWeaponSets[equipWeaponSet];
+            }
             IEquipmentItem rightHandItem = equipWeapons.GetRightHandEquipmentItem();
             IEquipmentItem leftHandItem = equipWeapons.GetLeftHandEquipmentItem();
             if (rightHandItem != null && rightHandItem.IsWeapon())
