@@ -11,7 +11,7 @@ namespace MultiplayerARPG
         {
             message = (UITextKeys)reader.GetPackedUShort();
             if (message == UITextKeys.NONE)
-                character = reader.Get<PlayerCharacterData>();
+                character = reader.Get(() => new PlayerCharacterData());
         }
 
         public void Serialize(NetDataWriter writer)

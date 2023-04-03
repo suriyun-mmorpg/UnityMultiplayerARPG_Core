@@ -27,9 +27,9 @@ namespace MultiplayerARPG
         {
             Validate();
             // Right hand
-            rightHand = reader.Get<CharacterItem>();
+            rightHand = reader.Get(() => new CharacterItem());
             // Left hand
-            leftHand = reader.Get<CharacterItem>();
+            leftHand = reader.Get(() => new CharacterItem());
         }
 
         public void Deserialize(NetDataReader reader, LiteNetLibElement element)

@@ -625,7 +625,7 @@ namespace MultiplayerARPG
                 count = reader.GetPackedInt();
                 for (int i = 0; i < count; ++i)
                 {
-                    characterData.Attributes.Add(reader.Get<CharacterAttribute>());
+                    characterData.Attributes.Add(reader.Get(() => new CharacterAttribute()));
                 }
             }
             // Buffs
@@ -634,7 +634,7 @@ namespace MultiplayerARPG
                 count = reader.GetPackedInt();
                 for (int i = 0; i < count; ++i)
                 {
-                    characterData.Buffs.Add(reader.Get<CharacterBuff>());
+                    characterData.Buffs.Add(reader.Get(() => new CharacterBuff()));
                 }
             }
             // Skills
@@ -643,7 +643,7 @@ namespace MultiplayerARPG
                 count = reader.GetPackedInt();
                 for (int i = 0; i < count; ++i)
                 {
-                    characterData.Skills.Add(reader.Get<CharacterSkill>());
+                    characterData.Skills.Add(reader.Get(() => new CharacterSkill()));
                 }
             }
             // Skill Usages
@@ -652,7 +652,7 @@ namespace MultiplayerARPG
                 count = reader.GetPackedInt();
                 for (int i = 0; i < count; ++i)
                 {
-                    characterData.SkillUsages.Add(reader.Get<CharacterSkillUsage>());
+                    characterData.SkillUsages.Add(reader.Get(() => new CharacterSkillUsage()));
                 }
             }
             // Summons
@@ -661,7 +661,7 @@ namespace MultiplayerARPG
                 count = reader.GetPackedInt();
                 for (int i = 0; i < count; ++i)
                 {
-                    characterData.Summons.Add(reader.Get<CharacterSummon>());
+                    characterData.Summons.Add(reader.Get(() => new CharacterSummon()));
                 }
             }
             // Equip Items
@@ -670,7 +670,7 @@ namespace MultiplayerARPG
                 count = reader.GetPackedInt();
                 for (int i = 0; i < count; ++i)
                 {
-                    characterData.EquipItems.Add(reader.Get<CharacterItem>());
+                    characterData.EquipItems.Add(reader.Get(() => new CharacterItem()));
                 }
             }
             // Non Equip Items
@@ -679,7 +679,7 @@ namespace MultiplayerARPG
                 count = reader.GetPackedInt();
                 for (int i = 0; i < count; ++i)
                 {
-                    characterData.NonEquipItems.Add(reader.Get<CharacterItem>());
+                    characterData.NonEquipItems.Add(reader.Get(() => new CharacterItem()));
                 }
             }
             // Hotkeys
@@ -688,7 +688,7 @@ namespace MultiplayerARPG
                 count = reader.GetPackedInt();
                 for (int i = 0; i < count; ++i)
                 {
-                    characterData.Hotkeys.Add(reader.Get<CharacterHotkey>());
+                    characterData.Hotkeys.Add(reader.Get(() => new CharacterHotkey()));
                 }
             }
             // Quests
@@ -697,7 +697,7 @@ namespace MultiplayerARPG
                 count = reader.GetPackedInt();
                 for (int i = 0; i < count; ++i)
                 {
-                    characterData.Quests.Add(reader.Get<CharacterQuest>());
+                    characterData.Quests.Add(reader.Get(() => new CharacterQuest()));
                 }
             }
             // Currencies
@@ -706,7 +706,7 @@ namespace MultiplayerARPG
                 count = reader.GetPackedInt();
                 for (int i = 0; i < count; ++i)
                 {
-                    characterData.Currencies.Add(reader.Get<CharacterCurrency>());
+                    characterData.Currencies.Add(reader.Get(() => new CharacterCurrency()));
                 }
             }
             // Equip weapon set
@@ -717,7 +717,7 @@ namespace MultiplayerARPG
                 count = reader.GetPackedInt();
                 for (int i = 0; i < count; ++i)
                 {
-                    characterData.SelectableWeaponSets.Add(reader.Get<EquipWeapons>());
+                    characterData.SelectableWeaponSets.Add(reader.Get(() => new EquipWeapons()));
                 }
             }
             DevExtUtils.InvokeStaticDevExtMethods(ClassType, "DeserializeCharacterData", characterData, reader);

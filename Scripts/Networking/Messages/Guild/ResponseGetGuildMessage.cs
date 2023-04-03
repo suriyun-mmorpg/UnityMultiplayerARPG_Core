@@ -10,7 +10,7 @@ namespace MultiplayerARPG
         {
             bool notNull = reader.GetBool();
             if (notNull)
-                guild = reader.Get<GuildData>();
+                guild = reader.Get(() => new GuildData());
         }
 
         public void Serialize(NetDataWriter writer)

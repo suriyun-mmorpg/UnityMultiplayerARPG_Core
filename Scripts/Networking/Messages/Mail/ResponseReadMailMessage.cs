@@ -11,7 +11,7 @@ namespace MultiplayerARPG
         {
             message = (UITextKeys)reader.GetPackedUShort();
             if (message == UITextKeys.NONE)
-                mail = reader.Get<Mail>();
+                mail = reader.Get(() => new Mail());
         }
 
         public void Serialize(NetDataWriter writer)
