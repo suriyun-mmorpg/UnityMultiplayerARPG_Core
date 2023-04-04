@@ -222,7 +222,7 @@ namespace MultiplayerARPG
                     inputFieldMessage.text = string.Empty;
             }
 
-            if (Guild != null && !Guild.guildMessage.Equals(guildMessage))
+            if (Guild != null && Guild.guildMessage != null && !Guild.guildMessage.Equals(guildMessage))
             {
                 guildMessage = Guild.guildMessage;
 
@@ -242,7 +242,7 @@ namespace MultiplayerARPG
                     inputFieldMessage2.text = string.Empty;
             }
 
-            if (Guild != null && !Guild.guildMessage2.Equals(guildMessage2))
+            if (Guild != null && Guild.guildMessage2 != null && !Guild.guildMessage2.Equals(guildMessage2))
             {
                 guildMessage2 = Guild.guildMessage2;
 
