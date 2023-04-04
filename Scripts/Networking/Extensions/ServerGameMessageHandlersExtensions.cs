@@ -245,7 +245,7 @@ namespace MultiplayerARPG
             }
         }
 
-        public static void SendSetGuildRoleToMembers(this IServerGameMessageHandlers handlers, GuildData guild, byte guildRole, string roleName, bool canInvite, bool canKick, byte shareExpPercentage)
+        public static void SendSetGuildRoleToMembers(this IServerGameMessageHandlers handlers, GuildData guild, byte guildRole, GuildRoleData guildRoleData)
         {
             if (guild == null)
                 return;
@@ -253,7 +253,7 @@ namespace MultiplayerARPG
             foreach (SocialCharacterData member in guild.GetMembers())
             {
                 if (GameInstance.ServerUserHandlers.TryGetConnectionId(member.id, out connectionId))
-                    handlers.SendSetGuildRole(connectionId, guild.id, guildRole, roleName, canInvite, canKick, shareExpPercentage);
+                    handlers.SendSetGuildRole(connectionId, guild.id, guildRole, guildRoleData);
             }
         }
 
@@ -266,7 +266,7 @@ namespace MultiplayerARPG
             for (byte role = 0; role < roles.Count; ++role)
             {
                 guildRoleData = roles[role];
-                handlers.SendSetGuildRole(connectionId, guild.id, role, guildRoleData.roleName, guildRoleData.canInvite, guildRoleData.canKick, guildRoleData.shareExpPercentage);
+                handlers.SendSetGuildRole(connectionId, guild.id, role, guildRoleData);
             }
         }
 

@@ -480,7 +480,7 @@ namespace MultiplayerARPG
             {
                 byte guildRole = (byte)RoleSelectionManager.IndexOf(RoleSelectionManager.SelectedUI);
                 GuildRoleData role = Guild.GetRole(guildRole);
-                uiGuildRoleSetting.Show(guildRole, role.roleName, role.canInvite, role.canKick, role.shareExpPercentage);
+                uiGuildRoleSetting.Show(guildRole, role);
             }
         }
 

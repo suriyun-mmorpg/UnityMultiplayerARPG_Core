@@ -364,7 +364,9 @@ namespace MultiplayerARPG
                 });
                 return;
             }
-            ValidateGuildRequestResult validateResult = GameInstance.ServerGuildHandlers.CanChangeGuildRole(playerCharacter, request.guildRole, request.name);
+            if (request.guildRoleData.shareExpPercentage > GameInstance.Singleton.SocialSystemSetting.MaxShareExpPercentage)
+                request.guildRoleData.shareExpPercentage = GameInstance.Singleton.SocialSystemSetting.MaxShareExpPercentage;
+            ValidateGuildRequestResult validateResult = GameInstance.ServerGuildHandlers.CanChangeGuildRole(playerCharacter, request.guildRole, request.guildRoleData.roleName);
             if (!validateResult.IsSuccess)
             {
                 result.InvokeError(new ResponseChangeGuildRoleMessage()
@@ -373,7 +375,7 @@ namespace MultiplayerARPG
                 });
                 return;
             }
-            validateResult.Guild.SetRole(request.guildRole, request.name, request.canInvite, request.canKick, request.shareExpPercentage);
+            validateResult.Guild.SetRole(request.guildRole, request.guildRoleData);
             GameInstance.ServerGuildHandlers.SetGuild(validateResult.GuildId, validateResult.Guild);
             // Change characters guild role
             IPlayerCharacterData memberCharacter;
@@ -382,7 +384,7 @@ namespace MultiplayerARPG
                 if (GameInstance.ServerUserHandlers.TryGetPlayerCharacterById(memberId, out memberCharacter))
                     memberCharacter.GuildRole = validateResult.Guild.GetMemberRole(memberCharacter.Id);
             }
-            GameInstance.ServerGameMessageHandlers.SendSetGuildRoleToMembers(validateResult.Guild, request.guildRole, request.name, request.canInvite, request.canKick, request.shareExpPercentage);
+            GameInstance.ServerGameMessageHandlers.SendSetGuildRoleToMembers(validateResult.Guild, request.guildRole, request.guildRoleData);
             result.InvokeSuccess(new ResponseChangeGuildRoleMessage());
         }
 

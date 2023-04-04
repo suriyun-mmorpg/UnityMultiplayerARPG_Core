@@ -29,10 +29,7 @@ namespace MultiplayerARPG
         public string guildMessage;
         public string characterId;
         public byte guildRole;
-        public string roleName;
-        public bool canInvite;
-        public bool canKick;
-        public byte shareExpPercentage;
+        public GuildRoleData guildRoleData;
         public int level;
         public int exp;
         public int skillPoint;
@@ -62,10 +59,7 @@ namespace MultiplayerARPG
                     break;
                 case UpdateType.SetGuildRole:
                     guildRole = reader.GetByte();
-                    roleName = reader.GetString();
-                    canInvite = reader.GetBool();
-                    canKick = reader.GetBool();
-                    shareExpPercentage = reader.GetByte();
+                    guildRoleData = reader.Get<GuildRoleData>();
                     break;
                 case UpdateType.SetGuildMemberRole:
                     characterId = reader.GetString();
@@ -117,10 +111,7 @@ namespace MultiplayerARPG
                     break;
                 case UpdateType.SetGuildRole:
                     writer.Put(guildRole);
-                    writer.Put(roleName);
-                    writer.Put(canInvite);
-                    writer.Put(canKick);
-                    writer.Put(shareExpPercentage);
+                    writer.Put(guildRoleData);
                     break;
                 case UpdateType.SetGuildMemberRole:
                     writer.Put(characterId);

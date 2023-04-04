@@ -155,9 +155,9 @@ namespace MultiplayerARPG
             Manager.Server.SendSetGuildMessage2(connectionId, GameNetworkingConsts.UpdateGuild, id, message);
         }
 
-        public void SendSetGuildRole(long connectionId, int id, byte guildRole, string roleName, bool canInvite, bool canKick, byte shareExpPercentage)
+        public void SendSetGuildRole(long connectionId, int id, byte guildRole, GuildRoleData guildRoleData)
         {
-            Manager.Server.SendSetGuildRole(connectionId, GameNetworkingConsts.UpdateGuild, id, guildRole, roleName, canInvite, canKick, shareExpPercentage);
+            Manager.Server.SendSetGuildRole(connectionId, GameNetworkingConsts.UpdateGuild, id, guildRole, guildRoleData);
         }
 
         public void SendSetGuildMemberRole(long connectionId, int id, string characterId, byte guildRole)

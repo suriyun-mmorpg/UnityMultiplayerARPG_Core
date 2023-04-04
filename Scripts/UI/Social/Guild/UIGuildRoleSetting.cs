@@ -10,11 +10,12 @@ namespace MultiplayerARPG
         public InputFieldWrapper inputFieldRoleName;
         public Toggle toggleCanInvite;
         public Toggle toggleCanKick;
+        public Toggle toggleCanUseStorage;
         public InputFieldWrapper inputFieldShareExpPercentage;
 
         private byte guildRole;
 
-        public void Show(byte guildRole, string roleName, bool canInvite, bool canKick, byte shareExpPercentage)
+        public void Show(byte guildRole, GuildRoleData guildRoleData)
         {
             base.Show();
 
@@ -22,16 +23,22 @@ namespace MultiplayerARPG
             if (inputFieldRoleName != null)
             {
                 inputFieldRoleName.unityInputField.contentType = InputField.ContentType.Standard;
-                inputFieldRoleName.text = roleName;
+                inputFieldRoleName.text = guildRoleData.roleName;
             }
+
             if (toggleCanInvite != null)
-                toggleCanInvite.isOn = canInvite;
+                toggleCanInvite.isOn = guildRoleData.canInvite;
+
             if (toggleCanKick != null)
-                toggleCanKick.isOn = canKick;
+                toggleCanKick.isOn = guildRoleData.canKick;
+
+            if (toggleCanUseStorage != null)
+                toggleCanUseStorage.isOn = guildRoleData.canUseStorage;
+
             if (inputFieldShareExpPercentage != null)
             {
                 inputFieldShareExpPercentage.unityInputField.contentType = InputField.ContentType.IntegerNumber;
-                inputFieldShareExpPercentage.text = shareExpPercentage.ToString("N0");
+                inputFieldShareExpPercentage.text = guildRoleData.shareExpPercentage.ToString("N0");
             }
         }
 
@@ -51,13 +58,20 @@ namespace MultiplayerARPG
                 return;
             }
 
+            if (shareExpPercentage > GameInstance.Singleton.SocialSystemSetting.MaxShareExpPercentage)
+                shareExpPercentage = GameInstance.Singleton.SocialSystemSetting.MaxShareExpPercentage;
+
             GameInstance.ClientGuildHandlers.RequestChangeGuildRole(new RequestChangeGuildRoleMessage()
             {
                 guildRole = guildRole,
-                name = inputFieldRoleName.text,
-                canInvite = toggleCanInvite != null && toggleCanInvite.isOn,
-                canKick = toggleCanKick != null && toggleCanKick.isOn,
-                shareExpPercentage = shareExpPercentage,
+                guildRoleData = new GuildRoleData()
+                {
+                    roleName = inputFieldRoleName.text,
+                    canInvite = toggleCanInvite != null && toggleCanInvite.isOn,
+                    canKick = toggleCanKick != null && toggleCanKick.isOn,
+                    canUseStorage = toggleCanUseStorage != null && toggleCanUseStorage.isOn,
+                    shareExpPercentage = shareExpPercentage,
+                },
             }, ChangeGuildRoleCallback);
         }
 

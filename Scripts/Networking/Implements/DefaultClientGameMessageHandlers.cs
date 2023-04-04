@@ -136,7 +136,7 @@ namespace MultiplayerARPG
                         GameInstance.JoinedGuild.guildMessage2 = message.guildMessage;
                         break;
                     case UpdateGuildMessage.UpdateType.SetGuildRole:
-                        GameInstance.JoinedGuild.SetRole(message.guildRole, message.roleName, message.canInvite, message.canKick, message.shareExpPercentage);
+                        GameInstance.JoinedGuild.SetRole(message.guildRole, message.guildRoleData);
                         break;
                     case UpdateGuildMessage.UpdateType.SetGuildMemberRole:
                         GameInstance.JoinedGuild.SetMemberRole(message.characterId, message.guildRole);

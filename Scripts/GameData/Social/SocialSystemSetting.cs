@@ -40,12 +40,12 @@ namespace MultiplayerARPG
         [Tooltip("Member roles from high to low priority")]
         [SerializeField]
         private GuildRoleData[] guildMemberRoles = new GuildRoleData[] {
-            new GuildRoleData() { roleName = "Master", canInvite = true, canKick = true },
-            new GuildRoleData() { roleName = "Member 1", canInvite = false, canKick = false },
-            new GuildRoleData() { roleName = "Member 2", canInvite = false, canKick = false },
-            new GuildRoleData() { roleName = "Member 3", canInvite = false, canKick = false },
-            new GuildRoleData() { roleName = "Member 4", canInvite = false, canKick = false },
-            new GuildRoleData() { roleName = "Member 5", canInvite = false, canKick = false },
+            new GuildRoleData() { roleName = "Master", canInvite = true, canKick = true, canUseStorage = true },
+            new GuildRoleData() { roleName = "Member 1", canInvite = false, canKick = false, canUseStorage = false },
+            new GuildRoleData() { roleName = "Member 2", canInvite = false, canKick = false, canUseStorage = false },
+            new GuildRoleData() { roleName = "Member 3", canInvite = false, canKick = false, canUseStorage = false },
+            new GuildRoleData() { roleName = "Member 4", canInvite = false, canKick = false, canUseStorage = false },
+            new GuildRoleData() { roleName = "Member 5", canInvite = false, canKick = false, canUseStorage = false },
         };
         [Range(0, 100)]
         [SerializeField]
@@ -221,7 +221,7 @@ namespace MultiplayerARPG
                 Logging.LogWarning(ToString(), "`Guild Member Roles` must more or equals to 2");
                 guildMemberRoles = new GuildRoleData[] {
                     guildMemberRoles[0],
-                    new GuildRoleData() { roleName = "Member 1", canInvite = false, canKick = false },
+                    new GuildRoleData() { roleName = "Member 1", canInvite = false, canKick = false, canUseStorage = false },
                 };
                 EditorUtility.SetDirty(this);
             }
@@ -229,8 +229,8 @@ namespace MultiplayerARPG
             {
                 Logging.LogWarning(ToString(), "`Guild Member Roles` must more or equals to 2");
                 guildMemberRoles = new GuildRoleData[] {
-                    new GuildRoleData() { roleName = "Master", canInvite = true, canKick = true },
-                    new GuildRoleData() { roleName = "Member 1", canInvite = false, canKick = false },
+                    new GuildRoleData() { roleName = "Master", canInvite = true, canKick = true, canUseStorage = true },
+                    new GuildRoleData() { roleName = "Member 1", canInvite = false, canKick = false, canUseStorage = false },
                 };
                 EditorUtility.SetDirty(this);
             }

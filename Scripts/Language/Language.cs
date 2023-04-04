@@ -261,6 +261,8 @@ namespace MultiplayerARPG
         UI_GUILD_ROLE_CANNOT_INVITE,
         UI_GUILD_ROLE_CAN_KICK,
         UI_GUILD_ROLE_CANNOT_KICK,
+        UI_GUILD_ROLE_CAN_USE_STORAGE,
+        UI_GUILD_ROLE_CANNOT_USE_STORAGE,
         // Friend
         UI_FRIEND_ADD,
         UI_FRIEND_ADD_DESCRIPTION,
@@ -1539,6 +1541,8 @@ namespace MultiplayerARPG
             Texts.Add(UITextKeys.UI_GUILD_ROLE_CANNOT_INVITE.ToString(), "Cannot invite");
             Texts.Add(UITextKeys.UI_GUILD_ROLE_CAN_KICK.ToString(), "Can kick");
             Texts.Add(UITextKeys.UI_GUILD_ROLE_CANNOT_KICK.ToString(), "Cannot kick");
+            Texts.Add(UITextKeys.UI_GUILD_ROLE_CAN_USE_STORAGE.ToString(), "Can use storage");
+            Texts.Add(UITextKeys.UI_GUILD_ROLE_CANNOT_USE_STORAGE.ToString(), "Cannot use storage");
             // UI Friend
             Texts.Add(UITextKeys.UI_FRIEND_ADD.ToString(), "Add Friend");
             Texts.Add(UITextKeys.UI_FRIEND_ADD_DESCRIPTION.ToString(), "You want to add {0} to friend list?");

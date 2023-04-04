@@ -267,28 +267,25 @@ namespace MultiplayerARPG
             client.SendPacket(SOCIAL_MSG_DATA_CHANNEL, DeliveryMethod.ReliableOrdered, msgType, (writer) => writer.Put(MakeSetGuildMessage2(id, message)));
         }
 
-        public static UpdateGuildMessage MakeSetGuildRole(int id, byte guildRole, string roleName, bool canInvite, bool canKick, byte shareExpPercentage)
+        public static UpdateGuildMessage MakeSetGuildRole(int id, byte guildRole, GuildRoleData guildRoleData)
         {
             return new UpdateGuildMessage()
             {
                 type = UpdateGuildMessage.UpdateType.SetGuildRole,
                 id = id,
                 guildRole = guildRole,
-                roleName = roleName,
-                canInvite = canInvite,
-                canKick = canKick,
-                shareExpPercentage = shareExpPercentage,
+                guildRoleData = guildRoleData,
             };
         }
 
-        public static void SendSetGuildRole(this LiteNetLibManager.LiteNetLibServer server, long connectionId, ushort msgType, int id, byte guildRole, string roleName, bool canInvite, bool canKick, byte shareExpPercentage)
+        public static void SendSetGuildRole(this LiteNetLibManager.LiteNetLibServer server, long connectionId, ushort msgType, int id, byte guildRole, GuildRoleData guildRoleData)
         {
-            server.SendPacket(connectionId, SOCIAL_MSG_DATA_CHANNEL, DeliveryMethod.ReliableOrdered, msgType, (writer) => writer.Put(MakeSetGuildRole(id, guildRole, roleName, canInvite, canKick, shareExpPercentage)));
+            server.SendPacket(connectionId, SOCIAL_MSG_DATA_CHANNEL, DeliveryMethod.ReliableOrdered, msgType, (writer) => writer.Put(MakeSetGuildRole(id, guildRole, guildRoleData)));
         }
 
-        public static void SendSetGuildRole(this LiteNetLibManager.LiteNetLibClient client, ushort msgType, int id, byte guildRole, string roleName, bool canInvite, bool canKick, byte shareExpPercentage)
+        public static void SendSetGuildRole(this LiteNetLibManager.LiteNetLibClient client, ushort msgType, int id, byte guildRole, GuildRoleData guildRoleData)
         {
-            client.SendPacket(SOCIAL_MSG_DATA_CHANNEL, DeliveryMethod.ReliableOrdered, msgType, (writer) => writer.Put(MakeSetGuildRole(id, guildRole, roleName, canInvite, canKick, shareExpPercentage)));
+            client.SendPacket(SOCIAL_MSG_DATA_CHANNEL, DeliveryMethod.ReliableOrdered, msgType, (writer) => writer.Put(MakeSetGuildRole(id, guildRole, guildRoleData)));
         }
 
         public static UpdateGuildMessage MakeSetGuildMemberRole(int id, string characterId, byte guildRole)

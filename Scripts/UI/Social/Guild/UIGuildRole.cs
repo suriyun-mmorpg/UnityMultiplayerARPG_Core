@@ -15,9 +15,11 @@ namespace MultiplayerARPG
         public TextWrapper textRoleName;
         public TextWrapper textCanInvite;
         public TextWrapper textCanKick;
+        public TextWrapper textCanUseStorage;
         public TextWrapper textShareExpPercentage;
         public GameObject[] canInviteObjects;
         public GameObject[] canKickObjects;
+        public GameObject[] canUseStorageObjects;
 
         protected override void UpdateData()
         {
@@ -41,6 +43,13 @@ namespace MultiplayerARPG
                     LanguageManager.GetText(UITextKeys.UI_GUILD_ROLE_CANNOT_KICK.ToString());
             }
 
+            if (textCanUseStorage != null)
+            {
+                textCanUseStorage.text = Data.canUseStorage ?
+                    LanguageManager.GetText(UITextKeys.UI_GUILD_ROLE_CAN_USE_STORAGE.ToString()) :
+                    LanguageManager.GetText(UITextKeys.UI_GUILD_ROLE_CANNOT_USE_STORAGE.ToString());
+            }
+
             if (textShareExpPercentage != null)
             {
                 textShareExpPercentage.text = ZString.Format(
@@ -61,6 +70,14 @@ namespace MultiplayerARPG
                 foreach (GameObject canKickObject in canKickObjects)
                 {
                     canKickObject.SetActive(Data.canKick);
+                }
+            }
+
+            if (canUseStorageObjects != null)
+            {
+                foreach (GameObject canUseStorageObject in canUseStorageObjects)
+                {
+                    canUseStorageObject.SetActive(Data.canUseStorage);
                 }
             }
         }

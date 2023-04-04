@@ -31,7 +31,7 @@ namespace MultiplayerARPG
         void SendSetGuildAutoAcceptRequests(long connectionId, int id, bool autoAcceptRequests);
         void SendSetGuildScore(long connectionId, int id, int score);
         void SendSetGuildRank(long connectionId, int id, int rank);
-        void SendSetGuildRole(long connectionId, int id, byte guildRole, string roleName, bool canInvite, bool canKick, byte shareExpPercentage);
+        void SendSetGuildRole(long connectionId, int id, byte guildRole, GuildRoleData guildRoleData);
         void SendSetGuildMemberRole(long connectionId, int id, string characterId, byte guildRole);
         void SendClearGuildData(long connectionId, int id);
         void SendAddGuildMember(long connectionId, int id, SocialCharacterData member);
