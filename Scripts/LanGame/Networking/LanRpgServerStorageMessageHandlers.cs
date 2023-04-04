@@ -10,8 +10,8 @@ namespace MultiplayerARPG
         public async UniTaskVoid HandleRequestOpenStorage(RequestHandlerData requestHandler, RequestOpenStorageMessage request, RequestProceedResultDelegate<ResponseOpenStorageMessage> result)
         {
             await UniTask.Yield();
-            if (request.storageType != StorageType.Player &&
-                request.storageType != StorageType.Guild)
+            if (request.storageType == StorageType.None ||
+                request.storageType == StorageType.Building)
             {
                 result.InvokeError(new ResponseOpenStorageMessage()
                 {
@@ -26,6 +26,17 @@ namespace MultiplayerARPG
                     message = UITextKeys.UI_ERROR_NOT_LOGGED_IN,
                 });
                 return;
+            }
+            if (request.storageType == StorageType.Guild)
+            {
+                if (!GameInstance.ServerGuildHandlers.TryGetGuild(playerCharacter.GuildId, out GuildData guildData) || guildData.CanUseStorage(playerCharacter.Id))
+                {
+                    result.InvokeError(new ResponseOpenStorageMessage()
+                    {
+                        message = UITextKeys.UI_ERROR_CANNOT_ACCESS_STORAGE,
+                    });
+                    return;
+                }
             }
             if (!playerCharacter.GetStorageId(request.storageType, 0, out StorageId storageId))
             {
