@@ -654,6 +654,17 @@ namespace MultiplayerARPG
         {
             PlayPickupAnimation();
         }
+
+        public void CallAllPlayCustomAnimation(int id)
+        {
+            RPC(AllPlayCustomAnimation, id);
+        }
+
+        [AllRpc]
+        protected virtual void AllPlayCustomAnimation(int id)
+        {
+            PlayCustomAnimation(id);
+        }
         #endregion
 
         #region RPC Calls
@@ -821,6 +832,12 @@ namespace MultiplayerARPG
         {
             if (Model is IPickupableModel pickupableModel)
                 pickupableModel.PlayPickupAnimation();
+        }
+
+        public virtual void PlayCustomAnimation(int id)
+        {
+            if (Model is ICustomAnimationModel customAnimationModel)
+                customAnimationModel.PlayCustomAnimation(id);
         }
 
         protected bool EnterVehicle(IVehicleEntity vehicle, byte seatIndex)

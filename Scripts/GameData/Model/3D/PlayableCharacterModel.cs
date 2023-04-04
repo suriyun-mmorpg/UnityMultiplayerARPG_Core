@@ -628,7 +628,17 @@ namespace MultiplayerARPG.GameData.Model.Playables
                 return;
             if (isDoingAction)
                 return;
-            Behaviour.PlayAction(customAnimations[id], 1f);
+            if (customAnimations[id].clip != null)
+                Behaviour.PlayAction(customAnimations[id], 1f);
+        }
+
+        public AnimationClip GetCustomAnimationClip(int id)
+        {
+            if (id < 0 || id >= customAnimations.Length)
+                return null;
+            if (customAnimations[id].clip == null)
+                return null;
+            return customAnimations[id].clip;
         }
         #endregion
 
