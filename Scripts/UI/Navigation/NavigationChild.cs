@@ -29,7 +29,7 @@ namespace MultiplayerARPG
 
         private void Update()
         {
-            if (group != null && EventSystem.current.currentSelectedGameObject == gameObject)
+            if (group != null && EventSystem.current != null && EventSystem.current.currentSelectedGameObject == gameObject)
                 group.SetLastSelectedChild(this);
         }
 
