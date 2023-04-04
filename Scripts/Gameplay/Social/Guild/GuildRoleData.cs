@@ -9,6 +9,7 @@ namespace MultiplayerARPG
             roleName = reader.GetString();
             canInvite = reader.GetBool();
             canKick = reader.GetBool();
+            canUseStorage = reader.GetBool();
             shareExpPercentage = reader.GetByte();
         }
 
@@ -17,6 +18,7 @@ namespace MultiplayerARPG
             writer.Put(roleName);
             writer.Put(canInvite);
             writer.Put(canKick);
+            writer.Put(canUseStorage);
             writer.Put(shareExpPercentage);
         }
     }
