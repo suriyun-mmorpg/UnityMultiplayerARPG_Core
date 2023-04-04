@@ -29,7 +29,7 @@ namespace MultiplayerARPG
             }
             if (request.storageType == StorageType.Guild)
             {
-                if (!GameInstance.ServerGuildHandlers.TryGetGuild(playerCharacter.GuildId, out GuildData guildData) || guildData.CanUseStorage(playerCharacter.Id))
+                if (!GameInstance.ServerGuildHandlers.TryGetGuild(playerCharacter.GuildId, out GuildData guildData) || !guildData.CanUseStorage(playerCharacter.Id))
                 {
                     result.InvokeError(new ResponseOpenStorageMessage()
                     {
