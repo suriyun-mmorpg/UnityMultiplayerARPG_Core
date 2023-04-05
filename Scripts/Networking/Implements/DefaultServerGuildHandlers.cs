@@ -67,7 +67,7 @@ namespace MultiplayerARPG
             ValidateGuildRequestResult validateResult = this.CanIncreaseGuildExp(playerCharacter, exp);
             if (!validateResult.IsSuccess)
                 return;
-            validateResult.Guild = GameInstance.Singleton.SocialSystemSetting.IncreaseGuildExp(validateResult.Guild, exp);
+            validateResult.Guild.IncreaseGuildExp(GameInstance.Singleton.SocialSystemSetting.GuildExpTree, exp);
             SetGuild(validateResult.GuildId, validateResult.Guild);
             GameInstance.ServerGameMessageHandlers.SendSetGuildLevelExpSkillPointToMembers(validateResult.Guild);
         }
