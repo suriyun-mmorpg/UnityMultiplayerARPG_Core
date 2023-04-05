@@ -110,7 +110,7 @@ namespace MultiplayerARPG
         public Storage GetStorage(StorageId storageId, out uint objectId)
         {
             objectId = 0;
-            Storage storage = default(Storage);
+            Storage storage = default;
             switch (storageId.storageType)
             {
                 case StorageType.Player:
@@ -139,8 +139,8 @@ namespace MultiplayerARPG
                         return false;
                     break;
                 case StorageType.Guild:
-                    if (!GameInstance.ServerGuildHandlers.ContainsGuild(playerCharacter.GuildId) ||
-                        !playerCharacter.GuildId.ToString().Equals(storageId.storageOwnerId))
+                    if (!GameInstance.ServerGuildHandlers.TryGetGuild(playerCharacter.GuildId, out GuildData guild) ||
+                        !playerCharacter.GuildId.ToString().Equals(storageId.storageOwnerId) || !guild.CanUseStorage(playerCharacter.Id))
                         return false;
                     break;
                 case StorageType.Building:
