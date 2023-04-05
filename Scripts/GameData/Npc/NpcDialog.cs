@@ -580,6 +580,8 @@ namespace MultiplayerARPG
                         case CONFIRM_MENU_INDEX:
                             if (characterEntity.GetStorageId(StorageType.Player, 0, out StorageId storageId))
                                 GameInstance.ServerStorageHandlers.OpenStorage(characterEntity.ConnectionId, characterEntity, storageId);
+                            else
+                                ClientGenericActions.ClientReceiveGameMessage(UITextKeys.UI_ERROR_CANNOT_ACCESS_STORAGE);
                             return;
                         case CANCEL_MENU_INDEX:
                             characterEntity.NpcAction.CurrentNpcDialog = GetValidatedDialogOrNull(storageCancelDialog, characterEntity);
@@ -592,6 +594,8 @@ namespace MultiplayerARPG
                         case CONFIRM_MENU_INDEX:
                             if (characterEntity.GetStorageId(StorageType.Guild, 0, out StorageId storageId))
                                 GameInstance.ServerStorageHandlers.OpenStorage(characterEntity.ConnectionId, characterEntity, storageId);
+                            else
+                                ClientGenericActions.ClientReceiveGameMessage(UITextKeys.UI_ERROR_CANNOT_ACCESS_STORAGE);
                             return;
                         case CANCEL_MENU_INDEX:
                             characterEntity.NpcAction.CurrentNpcDialog = GetValidatedDialogOrNull(storageCancelDialog, characterEntity);
