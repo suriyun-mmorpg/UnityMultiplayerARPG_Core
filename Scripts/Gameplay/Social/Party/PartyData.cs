@@ -5,12 +5,6 @@ namespace MultiplayerARPG
 {
     public partial class PartyData : INetSerializable
     {
-        public void Setting(bool shareExp, bool shareItem)
-        {
-            this.shareExp = shareExp;
-            this.shareItem = shareItem;
-        }
-
         public void GetSortedMembers(out SocialCharacterData[] sortedMembers)
         {
             int i = 0;
