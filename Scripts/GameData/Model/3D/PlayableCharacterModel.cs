@@ -47,6 +47,8 @@ namespace MultiplayerARPG.GameData.Model.Playables
         protected bool isDoingAction = false;
         protected EquipWeapons oldEquipWeapons = null;
         protected System.Action onStopAction = null;
+        protected bool started = false;
+        protected bool willPlayOnStarted = true;
 
         protected override void Awake()
         {
@@ -61,8 +63,9 @@ namespace MultiplayerARPG.GameData.Model.Playables
 
         protected virtual void Start()
         {
-            if (!IsMainModel)
-                Graph.Stop();
+            started = true;
+            if (willPlayOnStarted)
+                Graph.Play();
         }
 
         public override void AddingNewModel(GameObject newModel, EquipmentContainer equipmentContainer)
@@ -93,7 +96,6 @@ namespace MultiplayerARPG.GameData.Model.Playables
             Behaviour = playable.GetBehaviour();
             AnimationPlayableOutput output = AnimationPlayableOutput.Create(Graph, "Output", animator);
             output.SetSourcePlayable(playable);
-            Graph.Play();
         }
 
         protected void DestroyGraph()
@@ -104,12 +106,22 @@ namespace MultiplayerARPG.GameData.Model.Playables
 
         internal override void OnSwitchingToAnotherModel()
         {
+            if (!started)
+            {
+                willPlayOnStarted = false;
+                return;
+            }
             if (Graph.IsValid())
                 Graph.Stop();
         }
 
         internal override void OnSwitchedToThisModel()
         {
+            if (!started)
+            {
+                willPlayOnStarted = true;
+                return;
+            }
             if (Graph.IsValid())
                 Graph.Play();
         }
