@@ -161,58 +161,6 @@ namespace MultiplayerARPG
             GameInstance.Singleton.GameplayRule.DecreaseCurrenciesWhenCreateGuild(character, this);
         }
 
-        public int GetNextLevelExp(int level)
-        {
-            return GetNextLevelExp(GuildExpTree, level);
-        }
-
-        public GuildData IncreaseGuildExp(GuildData guild, int exp)
-        {
-            CalculateIncreasedGuildExp(
-                GuildExpTree,
-                guild.level,
-                guild.exp + exp,
-                guild.skillPoint,
-                out guild.level,
-                out guild.exp,
-                out guild.skillPoint);
-            return guild;
-        }
-
-        public static int GetNextLevelExp(int[] expTree, int level)
-        {
-            if (level <= 0)
-                return 0;
-            if (level > expTree.Length)
-                return 0;
-            return expTree[level - 1];
-        }
-
-        public static bool CalculateIncreasedGuildExp(
-            int[] expTree,
-            int level, 
-            int exp, 
-            int skillPoint, 
-            out int resultLevel, 
-            out int resultExp, 
-            out int resultSkillPoint)
-        {
-            bool isLevelUp = false;
-            int nextLevelExp = GetNextLevelExp(expTree, level);
-            while (nextLevelExp > 0 && exp >= nextLevelExp)
-            {
-                exp = exp - nextLevelExp;
-                ++level;
-                nextLevelExp = GetNextLevelExp(expTree, level);
-                skillPoint += 1;
-                isLevelUp = true;
-            }
-            resultLevel = level;
-            resultExp = exp;
-            resultSkillPoint = skillPoint;
-            return isLevelUp;
-        }
-
 #if UNITY_EDITOR
         void OnValidate()
         {
