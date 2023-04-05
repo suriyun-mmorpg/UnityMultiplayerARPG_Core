@@ -174,7 +174,7 @@ namespace MultiplayerARPG
 
         public int GetNextLevelExp()
         {
-            return SystemSetting.GetNextLevelExp(level);
+            return GetNextLevelExp(SystemSetting.GuildExpTree, level);
         }
 
         public override void Serialize(NetDataWriter writer)
