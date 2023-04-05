@@ -2,11 +2,11 @@
 
 namespace MultiplayerARPG
 {
-    public partial struct BuildingSaveData : INetSerializable
+    public partial class BuildingSaveData : INetSerializable
     {
         public void Deserialize(NetDataReader reader)
         {
-            reader.DeserializeBuildingSaveData(ref this);
+            this.DeserializeBuildingSaveData(reader);
         }
 
         public void Serialize(NetDataWriter writer)
