@@ -10,7 +10,7 @@ namespace MultiplayerARPG
 {
     public abstract partial class BaseCharacterModel : GameEntityModel, IMoveableModel, IHittableModel, IJumppableModel, IPickupableModel, IDeadableModel
     {
-        public BaseCharacterModel MainModel { get; internal set; }
+        public BaseCharacterModel MainModel { get; set; }
         public bool IsMainModel { get { return MainModel == this; } }
         public bool IsActiveModel { get; protected set; } = false;
         public bool IsTpsModel { get; internal set; }
