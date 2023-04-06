@@ -26,8 +26,8 @@ namespace MultiplayerARPG
         public UICombatText uiCombatTextFoodDecrease;
         public UICombatText uiCombatTextWaterDecrease;
 
-        private readonly Dictionary<DamageableEntity, Queue<KeyValuePair<CombatAmountType, int>>> spawningCombatTexts = new Dictionary<DamageableEntity, Queue<KeyValuePair<CombatAmountType, int>>>();
-        private readonly Dictionary<DamageableEntity, float> spawningCombatTextTimes = new Dictionary<DamageableEntity, float>();
+        private readonly Dictionary<DamageableEntity, Queue<KeyValuePair<CombatAmountType, int>>> _spawningCombatTexts = new Dictionary<DamageableEntity, Queue<KeyValuePair<CombatAmountType, int>>>();
+        private readonly Dictionary<DamageableEntity, float> _spawningCombatTextTimes = new Dictionary<DamageableEntity, float>();
 
         protected virtual void Awake()
         {
@@ -50,18 +50,18 @@ namespace MultiplayerARPG
         {
             float currentTime = Time.unscaledTime;
             KeyValuePair<CombatAmountType, int> combatTextData;
-            foreach (DamageableEntity damageableEntity in spawningCombatTexts.Keys)
+            foreach (DamageableEntity damageableEntity in _spawningCombatTexts.Keys)
             {
-                if (damageableEntity == null || spawningCombatTexts[damageableEntity].Count == 0)
+                if (damageableEntity == null || _spawningCombatTexts[damageableEntity].Count == 0)
                     continue;
 
-                if (!spawningCombatTextTimes.ContainsKey(damageableEntity))
-                    spawningCombatTextTimes[damageableEntity] = currentTime;
+                if (!_spawningCombatTextTimes.ContainsKey(damageableEntity))
+                    _spawningCombatTextTimes[damageableEntity] = currentTime;
 
-                if (currentTime - spawningCombatTextTimes[damageableEntity] >= 0.1f)
+                if (currentTime - _spawningCombatTextTimes[damageableEntity] >= 0.1f)
                 {
-                    spawningCombatTextTimes[damageableEntity] = currentTime;
-                    combatTextData = spawningCombatTexts[damageableEntity].Dequeue();
+                    _spawningCombatTextTimes[damageableEntity] = currentTime;
+                    combatTextData = _spawningCombatTexts[damageableEntity].Dequeue();
                     SpawnCombatText(damageableEntity.CombatTextTransform, combatTextData.Key, combatTextData.Value);
                 }
             }
@@ -72,9 +72,9 @@ namespace MultiplayerARPG
             if (Vector3.Distance(GameInstance.PlayingCharacterEntity.EntityTransform.position, damageableEntity.EntityTransform.position) > GameInstance.Singleton.combatTextDistance)
                 return;
 
-            if (!spawningCombatTexts.ContainsKey(damageableEntity))
-                spawningCombatTexts[damageableEntity] = new Queue<KeyValuePair<CombatAmountType, int>>();
-            spawningCombatTexts[damageableEntity].Enqueue(new KeyValuePair<CombatAmountType, int>(combatAmountType, amount));
+            if (!_spawningCombatTexts.ContainsKey(damageableEntity))
+                _spawningCombatTexts[damageableEntity] = new Queue<KeyValuePair<CombatAmountType, int>>();
+            _spawningCombatTexts[damageableEntity].Enqueue(new KeyValuePair<CombatAmountType, int>(combatAmountType, amount));
         }
 
         public void SpawnCombatText(Transform followingTransform, CombatAmountType combatAmountType, int amount)
