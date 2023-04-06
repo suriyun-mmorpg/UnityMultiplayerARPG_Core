@@ -22,6 +22,9 @@ namespace MultiplayerARPG
         public Transform messageContainer;
         public float visibleDuration;
 
+        private UITextKeys _lastMessage;
+        private float _lastMessagedTime;
+
         private void Awake()
         {
             if (!rewardExpPrefab)
@@ -56,7 +59,11 @@ namespace MultiplayerARPG
         {
             if (messagePrefab == null)
                 return;
-
+            float time = Time.unscaledTime;
+            if (_lastMessage == message && time - _lastMessagedTime > visibleDuration)
+                return;
+            _lastMessage = message;
+            _lastMessagedTime = time;
             TextWrapper newMessage = AddMessage(messagePrefab);
             if (message.ToString().ToUpper().StartsWith("UI_ERROR"))
                 newMessage.color = errorMessageColor;

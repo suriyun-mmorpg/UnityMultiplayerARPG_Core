@@ -16,7 +16,6 @@ namespace MultiplayerARPG
     public abstract partial class BaseCharacterEntity : DamageableEntity, ICharacterData
     {
         public const float ACTION_DELAY = 0.1f;
-        public const float COMBATANT_MESSAGE_DELAY = 1f;
         public const float RESPAWN_GROUNDED_CHECK_DURATION = 1f;
         public const float RESPAWN_INVINCIBLE_DURATION = 1f;
         public const float FIND_ENTITY_DISTANCE_BUFFER = 1f;
@@ -143,11 +142,8 @@ namespace MultiplayerARPG
         protected int countDownToSetEquipItemsModels = FRAMES_BEFORE_SET_EQUIP_MODEL;
         protected float lastMountTime;
         protected float lastActionTime;
-        protected float pushGameMessageCountDown;
-        protected bool canCheckGrounded;
         protected bool lastGrounded;
         protected Vector3 lastGroundedPosition;
-        protected readonly Queue<UITextKeys> pushingGameMessages = new Queue<UITextKeys>();
         #endregion
 
         public IPhysicFunctions AttackPhysicFunctions { get; protected set; }
@@ -217,6 +213,8 @@ namespace MultiplayerARPG
                 FindPhysicFunctions = new PhysicFunctions2D(512);
             }
             isRecaching = true;
+            lastGrounded = false;
+            lastGroundedPosition = EntityTransform.position;
         }
 
 #if UNITY_EDITOR
@@ -265,22 +263,20 @@ namespace MultiplayerARPG
 
             if (IsServer && CurrentGameInstance.DimensionType == DimensionType.Dimension3D)
             {
-                // Ground check / ground damage will be calculated at server while dimension type is 3d only
-                if (!canCheckGrounded)
+                bool isGrounded = MovementState.Has(MovementState.IsGrounded);
+                // Ground check, ground damage will be calculated at server while dimension type is 3d only
+                if (!lastGrounded && isGrounded)
                 {
-                    canCheckGrounded = true;
+                    // Apply fall damage when falling last frame and grounded this frame
+                    CurrentGameplayRule.ApplyFallDamage(this, lastGroundedPosition);
                 }
-                else
-                {
-                    if (!lastGrounded && MovementState.Has(MovementState.IsGrounded))
-                    {
-                        // Apply fall damage when not passenging vehicle
-                        CurrentGameplayRule.ApplyFallDamage(this, lastGroundedPosition);
-                    }
-                }
-                lastGrounded = MovementState.Has(MovementState.IsGrounded) || MovementState.Has(MovementState.IsUnderWater);
+                // Set last grounded state, it will be used next frame to find
+                lastGrounded = isGrounded;
                 if (lastGrounded)
+                {
+                    // Set last grounded position, it will be used to calculate fall damage
                     lastGroundedPosition = EntityTransform.position;
+                }
             }
 
             bool tempEnableMovement = PassengingVehicleEntity == null;
@@ -345,18 +341,6 @@ namespace MultiplayerARPG
                 FpsModel.SetMoveAnimationSpeedMultiplier(MoveAnimationSpeedMultiplier);
                 // Update movement animation
                 FpsModel.SetMovementState(MovementState, ExtraMovementState, Direction2D, this.GetCaches().FreezeAnimation);
-            }
-
-            if (IsOwnerClient)
-            {
-                // Pushing combatatnt errors on screen
-                if (pushGameMessageCountDown > 0)
-                    pushGameMessageCountDown -= deltaTime;
-                if (pushGameMessageCountDown <= 0 && pushingGameMessages.Count > 0)
-                {
-                    pushGameMessageCountDown = COMBATANT_MESSAGE_DELAY;
-                    ClientGenericActions.ClientReceiveGameMessage(pushingGameMessages.Dequeue());
-                }
             }
 
             if (countDownToSetEquipWeaponsModels > 0)
@@ -495,7 +479,6 @@ namespace MultiplayerARPG
             // Clear target entity when teleport
             SetTargetEntity(null);
             // Setup ground check data
-            canCheckGrounded = true;
             lastGrounded = true;
             lastGroundedPosition = position;
         }
@@ -603,7 +586,8 @@ namespace MultiplayerARPG
 
             if (!ValidateAmmo(characterItem, 1))
             {
-                QueueGameMessage(UITextKeys.UI_ERROR_NO_AMMO);
+                if (IsOwnerClient)
+                    ClientGenericActions.ClientReceiveGameMessage(UITextKeys.UI_ERROR_NO_AMMO);
                 AudioClipWithVolumeSettings audioClip = weaponItem.EmptyClip;
                 if (audioClip != null)
                     AudioManager.PlaySfxClipAtAudioSource(audioClip.audioClip, CharacterModel.GenericAudioSource, audioClip.GetRandomedVolume());
@@ -632,8 +616,8 @@ namespace MultiplayerARPG
 
             if (!this.ValidateSkillToUse(dataId, isLeftHand, targetObjectId, out BaseSkill skill, out _, out UITextKeys gameMessage))
             {
-                if (gameMessage != UITextKeys.NONE)
-                    QueueGameMessage(gameMessage);
+                if (IsOwnerClient)
+                    ClientGenericActions.ClientReceiveGameMessage(gameMessage);
                 return false;
             }
 
@@ -659,8 +643,8 @@ namespace MultiplayerARPG
 
             if (!this.ValidateSkillItemToUse(index, isLeftHand, targetObjectId, out _, out BaseSkill skill, out _, out UITextKeys gameMessage))
             {
-                if (gameMessage != UITextKeys.NONE)
-                    QueueGameMessage(gameMessage);
+                if (IsOwnerClient)
+                    ClientGenericActions.ClientReceiveGameMessage(gameMessage);
                 return false;
             }
 
@@ -1588,18 +1572,6 @@ namespace MultiplayerARPG
             if (CurrentMapInfo == null)
                 return false;
             return CurrentMapInfo.IsEnemy(this, entityInfo);
-        }
-
-        public void QueueGameMessage(UITextKeys error)
-        {
-            if (!IsOwnerClient)
-                return;
-            // Last error must be different
-            if (pushingGameMessages.Count > 0 &&
-                pushingGameMessages.Peek() == error)
-                return;
-            // Enqueue error, it will be pushing on screen in Update()
-            pushingGameMessages.Enqueue(error);
         }
     }
 }
