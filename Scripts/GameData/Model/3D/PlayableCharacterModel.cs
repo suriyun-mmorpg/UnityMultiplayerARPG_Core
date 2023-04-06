@@ -40,20 +40,18 @@ namespace MultiplayerARPG.GameData.Model.Playables
         public PlayableGraph Graph { get; protected set; }
         public AnimationPlayableBehaviour Template { get; protected set; }
         public AnimationPlayableBehaviour Behaviour { get; protected set; }
-        public float AwakenTime { get; protected set; }
+        public float SwitchedTime { get; protected set; }
 
         protected WeaponType equippedWeaponType = null;
         protected Coroutine actionCoroutine = null;
         protected bool isDoingAction = false;
         protected EquipWeapons oldEquipWeapons = null;
         protected System.Action onStopAction = null;
-        protected bool started = false;
-        protected bool willPlayOnStarted = true;
 
         protected override void Awake()
         {
             base.Awake();
-            AwakenTime = Time.unscaledTime;
+            SwitchedTime = Time.unscaledTime;
             if (animator == null)
                 animator = GetComponentInChildren<Animator>();
             Template = new AnimationPlayableBehaviour();
@@ -63,8 +61,7 @@ namespace MultiplayerARPG.GameData.Model.Playables
 
         protected virtual void Start()
         {
-            started = true;
-            if (willPlayOnStarted)
+            if (IsActiveModel)
                 Graph.Play();
         }
 
@@ -106,22 +103,17 @@ namespace MultiplayerARPG.GameData.Model.Playables
 
         internal override void OnSwitchingToAnotherModel()
         {
-            if (!started)
-            {
-                willPlayOnStarted = false;
-                return;
-            }
             if (Graph.IsValid())
                 Graph.Stop();
         }
 
+        internal override void OnSwitchingToThisModel()
+        {
+            SwitchedTime = Time.unscaledTime;
+        }
+
         internal override void OnSwitchedToThisModel()
         {
-            if (!started)
-            {
-                willPlayOnStarted = true;
-                return;
-            }
             if (Graph.IsValid())
                 Graph.Play();
         }
@@ -229,7 +221,7 @@ namespace MultiplayerARPG.GameData.Model.Playables
             // Player draw/holster animation
             if (oldEquipWeapons == null)
                 oldEquipWeapons = newEquipWeapons;
-            if (Time.unscaledTime - AwakenTime < 1f || !newEquipWeapons.IsDiffer(oldEquipWeapons, out bool rightIsDiffer, out bool leftIsDiffer))
+            if (Time.unscaledTime - SwitchedTime < 1f || !newEquipWeapons.IsDiffer(oldEquipWeapons, out bool rightIsDiffer, out bool leftIsDiffer))
             {
                 SetNewEquipWeapons(newEquipWeapons, selectableWeaponSets, equipWeaponSet, isWeaponsSheathed);
                 return;

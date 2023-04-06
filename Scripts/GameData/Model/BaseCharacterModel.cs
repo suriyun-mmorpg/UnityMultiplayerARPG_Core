@@ -12,6 +12,7 @@ namespace MultiplayerARPG
     {
         public BaseCharacterModel MainModel { get; set; }
         public bool IsMainModel { get { return MainModel == this; } }
+        public bool IsActiveModel { get; set; } = false;
         public bool IsTpsModel { get; set; }
         public bool IsFpsModel { get; set; }
 
@@ -172,18 +173,23 @@ namespace MultiplayerARPG
 
             Manager = GetComponent<CharacterModelManager>();
             if (Manager == null)
-                Manager = GetComponentInParent<CharacterModelManager>();
-            // Can't find manager, this component may attached to non-character entities, so assume that this character model is main model
-            if (Manager == null)
-                MainModel = this;
-            else
-                CacheEntity = Manager.Entity;
+                Manager = GetComponentInParent<CharacterModelManager>(true);
 
-            if (IsMainModel)
+            // Can't find manager, this component may attached to non-character entities, so assume that this character model is main model
+            if (Manager != null)
+            {
+                CacheEntity = Manager.Entity;
+                Manager.InitTpsModel(this);
+            }
+            else
+            {
+                MainModel = this;
                 InitCacheData();
+                SwitchModel(null);
+            }
         }
 
-        public void InitCacheData()
+        internal void InitCacheData()
         {
             if (isCacheDataInitialized)
                 return;
@@ -264,8 +270,10 @@ namespace MultiplayerARPG
 
         internal virtual void SwitchModel(BaseCharacterModel previousModel)
         {
+            OnSwitchingToThisModel();
             if (previousModel != null)
             {
+                previousModel.IsActiveModel = false;
                 previousModel.OnSwitchingToAnotherModel();
                 previousModel.RevertObjectsWhenSwitch();
                 SetIsDead(previousModel.isDead);
@@ -283,12 +291,24 @@ namespace MultiplayerARPG
                 SetEquipItems(equipItems);
                 SetBuffs(buffs);
             }
-
+            IsActiveModel = true;
             UpdateObjectsWhenSwitch();
+            if (previousModel != null)
+                previousModel.OnSwitchedToAnotherModel();
             OnSwitchedToThisModel();
         }
 
         internal virtual void OnSwitchingToAnotherModel()
+        {
+
+        }
+
+        internal virtual void OnSwitchedToAnotherModel()
+        {
+
+        }
+
+        internal virtual void OnSwitchingToThisModel()
         {
 
         }

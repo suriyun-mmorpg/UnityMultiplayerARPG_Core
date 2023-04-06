@@ -60,11 +60,42 @@ namespace MultiplayerARPG
         {
             ValidateMainTpsModel();
             MigrateVehicleModels();
-            MainTpsModel.MainModel = MainTpsModel;
-            MainTpsModel.IsTpsModel = true;
-            MainTpsModel.IsFpsModel = false;
-            MainTpsModel.InitCacheData();
-            SwitchTpsModel(MainTpsModel);
+        }
+
+        internal void InitTpsModel(BaseCharacterModel model)
+        {
+            model.MainModel = MainTpsModel;
+            model.IsTpsModel = true;
+            model.IsFpsModel = false;
+            if (model == MainTpsModel)
+            {
+                MainTpsModel.InitCacheData();
+                SwitchTpsModel(MainTpsModel);
+            }
+        }
+
+        internal void InitFpsModel(BaseCharacterModel model)
+        {
+            model.MainModel = model;
+            model.IsTpsModel = false;
+            model.IsFpsModel = true;
+            if (model == MainFpsModel)
+            {
+                MainFpsModel.InitCacheData();
+                SwitchFpsModel(MainFpsModel);
+            }
+        }
+
+        public BaseCharacterModel InstantiateFpsModel(Transform container)
+        {
+            if (fpsModelPrefab == null)
+                return null;
+            MainFpsModel = Instantiate(fpsModelPrefab, container);
+            MainFpsModel.transform.localPosition = fpsModelPositionOffsets;
+            MainFpsModel.transform.localRotation = Quaternion.Euler(fpsModelRotationOffsets);
+            MainFpsModel.SetEquipItems(MainTpsModel.equipItems);
+            MainFpsModel.SetEquipWeapons(MainTpsModel.selectableWeaponSets, MainTpsModel.equipWeaponSet, MainTpsModel.isWeaponsSheathed);
+            return MainFpsModel;
         }
 
         public bool ValidateMainTpsModel()
@@ -186,23 +217,6 @@ namespace MultiplayerARPG
             // FPS model will be hidden when it's not FPS mode
             if (MainFpsModel != null)
                 MainFpsModel.gameObject.SetActive(IsFps);
-        }
-
-        public BaseCharacterModel InstantiateFpsModel(Transform container)
-        {
-            if (fpsModelPrefab == null)
-                return null;
-            MainFpsModel = Instantiate(fpsModelPrefab, container);
-            MainFpsModel.MainModel = MainFpsModel;
-            MainFpsModel.IsFpsModel = true;
-            MainFpsModel.IsTpsModel = false;
-            MainFpsModel.InitCacheData();
-            MainFpsModel.transform.localPosition = fpsModelPositionOffsets;
-            MainFpsModel.transform.localRotation = Quaternion.Euler(fpsModelRotationOffsets);
-            MainFpsModel.SetEquipItems(MainTpsModel.equipItems);
-            MainFpsModel.SetEquipWeapons(MainTpsModel.selectableWeaponSets, MainTpsModel.equipWeaponSet, MainTpsModel.isWeaponsSheathed);
-            ActiveFpsModel = MainFpsModel;
-            return MainFpsModel;
         }
     }
 }
