@@ -11,6 +11,7 @@ namespace MultiplayerARPG
         public bool shouldBeFirstSelected;
         public bool vertical = true;
         public bool horizontal = true;
+        protected int _dirtySiblingIndex;
 
         public Selectable Selectable { get; private set; }
 
@@ -29,8 +30,16 @@ namespace MultiplayerARPG
 
         private void Update()
         {
-            if (group != null && EventSystem.current != null && EventSystem.current.currentSelectedGameObject == gameObject)
-                group.SetLastSelectedChild(this);
+            if (group != null)
+            {
+                if (EventSystem.current != null && EventSystem.current.currentSelectedGameObject == gameObject)
+                    group.SetLastSelectedChild(this);
+                if (_dirtySiblingIndex != transform.GetSiblingIndex())
+                {
+                    _dirtySiblingIndex = transform.GetSiblingIndex();
+                    group.forceUpdateChildNavigation = true;
+                }
+            }
         }
 
         private void OnDestroy()

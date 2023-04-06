@@ -1,5 +1,4 @@
 using Cysharp.Threading.Tasks;
-using System.Collections;
 using System.Collections.Generic;
 #if UNITY_EDITOR
 using UnityEditor;
@@ -18,9 +17,11 @@ namespace MultiplayerARPG
         public List<Selectable> leftSelectables = new List<Selectable>();
         public List<Selectable> rightSelectables = new List<Selectable>();
         public List<NavigationChild> childs = new List<NavigationChild>();
-        protected bool selectedOnNoChild;
-        protected NavigationChild lastSelectedChild;
-        protected static NavigationGroup lastSelectedGroupWhileDisabled;
+        public bool forceUpdateChildNavigation = false;
+        protected bool _selectedOnNoChild;
+        protected NavigationChild _lastSelectedChild;
+        protected int _dirtyChildCount = -1;
+        protected static NavigationGroup s_lastSelectedGroupWhileDisabled;
 
         protected override void Awake()
         {
@@ -32,7 +33,7 @@ namespace MultiplayerARPG
         {
             if (!childs.Contains(child))
                 return;
-            lastSelectedChild = child;
+            _lastSelectedChild = child;
         }
 
         protected Selectable GetFirstSelectable(List<Selectable> list, Selectable defaultExplicit)
@@ -100,7 +101,7 @@ namespace MultiplayerARPG
         {
             if (!isActiveAndEnabled)
             {
-                lastSelectedGroupWhileDisabled = this;
+                s_lastSelectedGroupWhileDisabled = this;
                 return;
             }
             base.Select();
@@ -109,9 +110,9 @@ namespace MultiplayerARPG
         protected override void OnEnable()
         {
             base.OnEnable();
-            if (lastSelectedGroupWhileDisabled == this)
+            if (s_lastSelectedGroupWhileDisabled == this)
             {
-                lastSelectedGroupWhileDisabled = null;
+                s_lastSelectedGroupWhileDisabled = null;
                 Select();
             }
         }
@@ -121,10 +122,10 @@ namespace MultiplayerARPG
             base.OnSelect(eventData);
             if (childs.Count > 0)
             {
-                selectedOnNoChild = false;
-                if (lastSelectedChild != null && lastSelectedChild.isActiveAndEnabled)
+                _selectedOnNoChild = false;
+                if (_lastSelectedChild != null && _lastSelectedChild.isActiveAndEnabled)
                 {
-                    DelaySelect(lastSelectedChild.Selectable);
+                    DelaySelect(_lastSelectedChild.Selectable);
                 }
                 else
                 {
@@ -140,7 +141,7 @@ namespace MultiplayerARPG
             }
             else
             {
-                selectedOnNoChild = true;
+                _selectedOnNoChild = true;
             }
         }
 
@@ -194,9 +195,9 @@ namespace MultiplayerARPG
                 childs.Insert(0, child);
             else
                 childs.Add(child);
-            if (selectedOnNoChild)
+            if (_selectedOnNoChild)
             {
-                selectedOnNoChild = false;
+                _selectedOnNoChild = false;
                 for (int i = 0; i < childs.Count; ++i)
                 {
                     if (childs[i].isActiveAndEnabled)
@@ -253,6 +254,10 @@ namespace MultiplayerARPG
 
         public void UpdateChildNavigation()
         {
+            if (_dirtyChildCount == childs.Count && !forceUpdateChildNavigation)
+                return;
+            forceUpdateChildNavigation = false;
+            _dirtyChildCount = childs.Count;
             for (int i = 0; i < childs.Count; ++i)
             {
                 Navigation nav = new Navigation();
