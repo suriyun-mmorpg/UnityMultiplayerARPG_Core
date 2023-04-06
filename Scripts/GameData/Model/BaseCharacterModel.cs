@@ -10,11 +10,11 @@ namespace MultiplayerARPG
 {
     public abstract partial class BaseCharacterModel : GameEntityModel, IMoveableModel, IHittableModel, IJumppableModel, IPickupableModel, IDeadableModel
     {
-        public BaseCharacterModel MainModel { get; set; }
+        public BaseCharacterModel MainModel { get; internal set; }
         public bool IsMainModel { get { return MainModel == this; } }
-        public bool IsActiveModel { get; set; } = false;
-        public bool IsTpsModel { get; set; }
-        public bool IsFpsModel { get; set; }
+        public bool IsActiveModel { get; protected set; } = false;
+        public bool IsTpsModel { get; internal set; }
+        public bool IsFpsModel { get; internal set; }
 
         [Header("Model Switching Settings")]
         [SerializeField]
@@ -270,32 +270,35 @@ namespace MultiplayerARPG
 
         internal virtual void SwitchModel(BaseCharacterModel previousModel)
         {
-            OnSwitchingToThisModel();
             if (previousModel != null)
             {
                 previousModel.IsActiveModel = false;
                 previousModel.OnSwitchingToAnotherModel();
                 previousModel.RevertObjectsWhenSwitch();
-                SetIsDead(previousModel.isDead);
+                OnSwitchingToThisModel();
                 SetDefaultAnimations();
+                SetIsDead(previousModel.isDead);
+                SetMoveAnimationSpeedMultiplier(previousModel.moveAnimationSpeedMultiplier);
+                SetMovementState(previousModel.movementState, previousModel.extraMovementState, previousModel.direction2D, previousModel.isFreezeAnimation);
                 SetEquipWeapons(previousModel.selectableWeaponSets, previousModel.equipWeaponSet, previousModel.isWeaponsSheathed);
                 SetEquipItems(previousModel.equipItems);
                 SetBuffs(previousModel.buffs);
-                SetMoveAnimationSpeedMultiplier(previousModel.moveAnimationSpeedMultiplier);
-                SetMovementState(previousModel.movementState, previousModel.extraMovementState, previousModel.direction2D, previousModel.isFreezeAnimation);
+                IsActiveModel = true;
+                UpdateObjectsWhenSwitch();
+                OnSwitchedToThisModel();
+                previousModel.OnSwitchedToAnotherModel();
             }
             else
             {
+                OnSwitchingToThisModel();
                 SetDefaultAnimations();
                 SetEquipWeapons(selectableWeaponSets, equipWeaponSet, isWeaponsSheathed);
                 SetEquipItems(equipItems);
                 SetBuffs(buffs);
+                IsActiveModel = true;
+                UpdateObjectsWhenSwitch();
+                OnSwitchedToThisModel();
             }
-            IsActiveModel = true;
-            UpdateObjectsWhenSwitch();
-            if (previousModel != null)
-                previousModel.OnSwitchedToAnotherModel();
-            OnSwitchedToThisModel();
         }
 
         internal virtual void OnSwitchingToAnotherModel()
