@@ -582,9 +582,11 @@ namespace MultiplayerARPG
 
                     if (EquippedModels.TryGetValue(equipSocket, out EquipmentModel equippedModel)
                         && equippedModel.itemDataId == itemDataId
-                        && equippedModel.itemLevel == itemLevel)
+                        && equippedModel.itemLevel == itemLevel
+                        && equippedModel.priority == model.priority)
                     {
                         // Same view data, so don't destroy and don't instantiates this model object
+                        showingModels.Remove(equipSocket);
                         storingModels[equipSocket] = equippedModel;
                         unequippingSockets.Remove(equipSocket);
                         continue;
