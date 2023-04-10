@@ -60,7 +60,7 @@ namespace MultiplayerARPG
             if (messagePrefab == null)
                 return;
             float time = Time.unscaledTime;
-            if (_lastMessage == message && time - _lastMessagedTime > visibleDuration)
+            if (_lastMessage == message && time - _lastMessagedTime < visibleDuration)
                 return;
             _lastMessage = message;
             _lastMessagedTime = time;
