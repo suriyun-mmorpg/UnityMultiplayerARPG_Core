@@ -137,11 +137,11 @@ namespace MultiplayerARPG
             }
         }
 
-        protected bool isDestroyed;
-        protected readonly HashSet<string> looters = new HashSet<string>();
-        protected readonly List<CharacterItem> droppingItems = new List<CharacterItem>();
-        protected float lastTeleportToSummonerTime = 0f;
-        protected int beforeDamageReceivedHp;
+        protected bool _isDestroyed;
+        protected readonly HashSet<string> _looters = new HashSet<string>();
+        protected readonly List<CharacterItem> _droppingItems = new List<CharacterItem>();
+        protected float _lastTeleportToSummonerTime = 0f;
+        protected int _beforeDamageReceivedHp;
 
         public override void PrepareRelatesData()
         {
@@ -166,7 +166,7 @@ namespace MultiplayerARPG
             base.EntityAwake();
             gameObject.tag = CurrentGameInstance.monsterTag;
             gameObject.layer = CurrentGameInstance.monsterLayer;
-            isDestroyed = false;
+            _isDestroyed = false;
         }
 
         protected override void EntityUpdate()
@@ -191,11 +191,11 @@ namespace MultiplayerARPG
                     {
                         float currentTime = Time.unscaledTime;
                         if (Vector3.Distance(EntityTransform.position, Summoner.EntityTransform.position) > CurrentGameInstance.maxFollowSummonerDistance &&
-                            currentTime - lastTeleportToSummonerTime > TELEPORT_TO_SUMMONER_DELAY)
+                            currentTime - _lastTeleportToSummonerTime > TELEPORT_TO_SUMMONER_DELAY)
                         {
                             // Teleport to summoner if too far from summoner
                             Teleport(GameInstance.Singleton.GameplayRule.GetSummonPosition(Summoner), GameInstance.Singleton.GameplayRule.GetSummonRotation(Summoner));
-                            lastTeleportToSummonerTime = currentTime;
+                            _lastTeleportToSummonerTime = currentTime;
                         }
                     }
                 }
@@ -217,7 +217,7 @@ namespace MultiplayerARPG
         {
             if (!IsServer)
                 return;
-            isDestroyed = false;
+            _isDestroyed = false;
             if (Level <= 0)
                 Level = CharacterDatabase.DefaultLevel;
             ForceMakeCaches();
@@ -289,7 +289,7 @@ namespace MultiplayerARPG
 
         public override void ReceivingDamage(HitBoxPosition position, Vector3 fromPosition, EntityInfo instigator, Dictionary<DamageElement, MinMaxFloat> damageAmounts, CharacterItem weapon, BaseSkill skill, int skillLevel)
         {
-            beforeDamageReceivedHp = CurrentHp;
+            _beforeDamageReceivedHp = CurrentHp;
             base.ReceivingDamage(position, fromPosition, instigator, damageAmounts, weapon, skill, skillLevel);
         }
 
@@ -301,7 +301,7 @@ namespace MultiplayerARPG
 
         public override void OnBuffHpDecrease(EntityInfo causer, int amount)
         {
-            beforeDamageReceivedHp = CurrentHp;
+            _beforeDamageReceivedHp = CurrentHp;
             base.OnBuffHpDecrease(causer, amount);
             RecordRecivingDamage(causer, amount);
         }
@@ -318,8 +318,8 @@ namespace MultiplayerARPG
                 // Add received damage entry
                 if (attackerCharacter != null)
                 {
-                    if (damage > beforeDamageReceivedHp)
-                        damage = beforeDamageReceivedHp;
+                    if (damage > _beforeDamageReceivedHp)
+                        damage = _beforeDamageReceivedHp;
                     ReceivedDamageRecord receivedDamageRecord = new ReceivedDamageRecord();
                     receivedDamageRecord.totalReceivedDamage = damage;
                     if (receivedDamageRecords.ContainsKey(attackerCharacter))
@@ -407,21 +407,21 @@ namespace MultiplayerARPG
             GivingRewardToKillers(FindLastAttackerPlayer(lastAttacker), out float itemDropRate);
             receivedDamageRecords.Clear();
             // Clear dropping items, it will fills in `OnRandomDropItem` function
-            droppingItems.Clear();
+            _droppingItems.Clear();
             // Drop items
             CharacterDatabase.RandomItems(OnRandomDropItem, itemDropRate);
 
             switch (CurrentGameInstance.monsterDeadDropItemMode)
             {
                 case DeadDropItemMode.DropOnGround:
-                    for (int i = 0; i < droppingItems.Count; ++i)
+                    for (int i = 0; i < _droppingItems.Count; ++i)
                     {
-                        ItemDropEntity.DropItem(this, RewardGivenType.KillMonster, droppingItems[i], looters);
+                        ItemDropEntity.DropItem(this, RewardGivenType.KillMonster, _droppingItems[i], _looters);
                     }
                     break;
                 case DeadDropItemMode.CorpseLooting:
-                    if (droppingItems.Count > 0)
-                        ItemsContainerEntity.DropItems(CurrentGameInstance.monsterCorpsePrefab, this, RewardGivenType.KillMonster, droppingItems, looters, CurrentGameInstance.monsterCorpseAppearDuration);
+                    if (_droppingItems.Count > 0)
+                        ItemsContainerEntity.DropItems(CurrentGameInstance.monsterCorpsePrefab, this, RewardGivenType.KillMonster, _droppingItems, _looters, CurrentGameInstance.monsterCorpseAppearDuration);
                     break;
             }
 
@@ -432,7 +432,7 @@ namespace MultiplayerARPG
             }
 
             // Clear looters because they are already set to dropped items
-            looters.Clear();
+            _looters.Clear();
         }
 
         /// <summary>
@@ -499,10 +499,10 @@ namespace MultiplayerARPG
                     if (rewardRate > tempHighRewardRate)
                     {
                         tempHighRewardRate = rewardRate;
-                        looters.Clear();
+                        _looters.Clear();
                         makeMostDamage = true;
                         // Make this player character to be able to pick up item because it made most damage
-                        looters.Add(tempPlayerCharacterEntity.Id);
+                        _looters.Add(tempPlayerCharacterEntity.Id);
                         // And also change item drop rate
                         itemDropRate = 1f + tempPlayerCharacterEntity.GetCaches().Stats.itemDropRate;
                     }
@@ -624,7 +624,7 @@ namespace MultiplayerARPG
                 if (makeMostDamage)
                 {
                     // Make other member in party able to pickup items
-                    looters.Add(nearbyPartyMember.Id);
+                    _looters.Add(nearbyPartyMember.Id);
                 }
                 nearbyPartyMember.RewardCurrencies(reward, 1f / countNearbyPartyMembers * rewardRate, playerCharacterEntity.ObjectId == nearbyPartyMember.ObjectId ? RewardGivenType.KillMonster : RewardGivenType.PartyShare);
             }
@@ -653,7 +653,7 @@ namespace MultiplayerARPG
             // Drop item to the ground
             if (amount > item.MaxStack)
                 amount = item.MaxStack;
-            droppingItems.Add(CharacterItem.Create(item, 1, amount));
+            _droppingItems.Add(CharacterItem.Create(item, 1, amount));
         }
 
         public virtual void DestroyAndRespawn()
@@ -661,10 +661,10 @@ namespace MultiplayerARPG
             if (!IsServer)
                 return;
             CurrentHp = 0;
-            if (isDestroyed)
+            if (_isDestroyed)
                 return;
             // Mark as destroyed
-            isDestroyed = true;
+            _isDestroyed = true;
             // Respawning later
             if (SpawnArea != null)
                 SpawnArea.Spawn(SpawnPrefab, SpawnLevel, DestroyDelay + DestroyRespawnDelay);

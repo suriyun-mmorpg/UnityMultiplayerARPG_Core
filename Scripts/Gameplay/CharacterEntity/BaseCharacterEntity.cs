@@ -138,12 +138,12 @@ namespace MultiplayerARPG
         public float RespawnInvincibleCountDown { get; protected set; }
         public float LastUseItemTime { get; set; }
 
-        protected int countDownToSetEquipWeaponsModels = FRAMES_BEFORE_SET_EQUIP_MODEL;
-        protected int countDownToSetEquipItemsModels = FRAMES_BEFORE_SET_EQUIP_MODEL;
-        protected float lastMountTime;
-        protected float lastActionTime;
-        protected bool lastGrounded;
-        protected Vector3 lastGroundedPosition;
+        protected int _countDownToSetEquipWeaponsModels = FRAMES_BEFORE_SET_EQUIP_MODEL;
+        protected int _countDownToSetEquipItemsModels = FRAMES_BEFORE_SET_EQUIP_MODEL;
+        protected float _lastMountTime;
+        protected float _lastActionTime;
+        protected bool _lastGrounded;
+        protected Vector3 _lastGroundedPosition;
         #endregion
 
         public IPhysicFunctions AttackPhysicFunctions { get; protected set; }
@@ -213,8 +213,8 @@ namespace MultiplayerARPG
                 FindPhysicFunctions = new PhysicFunctions2D(512);
             }
             isRecaching = true;
-            lastGrounded = false;
-            lastGroundedPosition = EntityTransform.position;
+            _lastGrounded = false;
+            _lastGroundedPosition = EntityTransform.position;
         }
 
 #if UNITY_EDITOR
@@ -265,17 +265,17 @@ namespace MultiplayerARPG
             {
                 bool isGrounded = MovementState.Has(MovementState.IsGrounded);
                 // Ground check, ground damage will be calculated at server while dimension type is 3d only
-                if (!lastGrounded && isGrounded)
+                if (!_lastGrounded && isGrounded)
                 {
                     // Apply fall damage when falling last frame and grounded this frame
-                    CurrentGameplayRule.ApplyFallDamage(this, lastGroundedPosition);
+                    CurrentGameplayRule.ApplyFallDamage(this, _lastGroundedPosition);
                 }
                 // Set last grounded state, it will be used next frame to find
-                lastGrounded = isGrounded;
-                if (lastGrounded)
+                _lastGrounded = isGrounded;
+                if (_lastGrounded)
                 {
                     // Set last grounded position, it will be used to calculate fall damage
-                    lastGroundedPosition = EntityTransform.position;
+                    _lastGroundedPosition = EntityTransform.position;
                 }
             }
 
@@ -343,17 +343,17 @@ namespace MultiplayerARPG
                 FpsModel.SetMovementState(MovementState, ExtraMovementState, Direction2D, this.GetCaches().FreezeAnimation);
             }
 
-            if (countDownToSetEquipWeaponsModels > 0)
+            if (_countDownToSetEquipWeaponsModels > 0)
             {
-                --countDownToSetEquipWeaponsModels;
-                if (countDownToSetEquipWeaponsModels <= 0)
+                --_countDownToSetEquipWeaponsModels;
+                if (_countDownToSetEquipWeaponsModels <= 0)
                     SetEquipWeaponsModels();
             }
 
-            if (countDownToSetEquipItemsModels > 0)
+            if (_countDownToSetEquipItemsModels > 0)
             {
-                --countDownToSetEquipItemsModels;
-                if (countDownToSetEquipItemsModels <= 0)
+                --_countDownToSetEquipItemsModels;
+                if (_countDownToSetEquipItemsModels <= 0)
                     SetEquipItemsModels();
             }
         }
@@ -479,8 +479,8 @@ namespace MultiplayerARPG
             // Clear target entity when teleport
             SetTargetEntity(null);
             // Setup ground check data
-            lastGrounded = true;
-            lastGroundedPosition = position;
+            _lastGrounded = true;
+            _lastGroundedPosition = position;
         }
 
         public override void PlayJumpAnimation()
@@ -773,15 +773,15 @@ namespace MultiplayerARPG
         public bool UpdateLastActionTime()
         {
             float time = Time.unscaledTime;
-            if (time - lastActionTime < ACTION_DELAY)
+            if (time - _lastActionTime < ACTION_DELAY)
                 return false;
-            lastActionTime = time;
+            _lastActionTime = time;
             return true;
         }
 
         public bool CanDoNextAction()
         {
-            return Time.unscaledTime - lastActionTime >= ACTION_DELAY;
+            return Time.unscaledTime - _lastActionTime >= ACTION_DELAY;
         }
 
         public void ClearActionStates()
@@ -1506,12 +1506,12 @@ namespace MultiplayerARPG
         #region Equip items models setting
         protected void PrepareToSetEquipWeaponsModels()
         {
-            countDownToSetEquipWeaponsModels = FRAMES_BEFORE_SET_EQUIP_MODEL;
+            _countDownToSetEquipWeaponsModels = FRAMES_BEFORE_SET_EQUIP_MODEL;
         }
 
         protected void PrepareToSetEquipItemsModels()
         {
-            countDownToSetEquipItemsModels = FRAMES_BEFORE_SET_EQUIP_MODEL;
+            _countDownToSetEquipItemsModels = FRAMES_BEFORE_SET_EQUIP_MODEL;
         }
 
         protected void SetEquipWeaponsModels()

@@ -64,8 +64,8 @@ namespace MultiplayerARPG
         {
             if (!IsServer)
                 return;
-            lastGrounded = true;
-            lastGroundedPosition = EntityTransform.position;
+            _lastGrounded = true;
+            _lastGroundedPosition = EntityTransform.position;
             RespawnGroundedCheckCountDown = RESPAWN_GROUNDED_CHECK_DURATION;
             RespawnInvincibleCountDown = RESPAWN_INVINCIBLE_DURATION;
             CallAllOnRespawn();

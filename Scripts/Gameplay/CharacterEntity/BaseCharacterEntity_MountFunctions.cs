@@ -7,10 +7,10 @@ namespace MultiplayerARPG
     {
         public virtual void Mount(VehicleEntity mountEntityPrefab)
         {
-            if (!IsServer || mountEntityPrefab == null || Time.unscaledTime - lastMountTime < CurrentGameInstance.mountDelay)
+            if (!IsServer || mountEntityPrefab == null || Time.unscaledTime - _lastMountTime < CurrentGameInstance.mountDelay)
                 return;
 
-            lastMountTime = Time.unscaledTime;
+            _lastMountTime = Time.unscaledTime;
 
             Vector3 enterPosition = EntityTransform.position;
             if (PassengingVehicleEntity != null)
