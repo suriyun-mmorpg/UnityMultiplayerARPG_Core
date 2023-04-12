@@ -109,8 +109,8 @@ namespace MultiplayerARPG
         public IBuildAimController BuildAimController { get; protected set; }
         public IAreaSkillAimController AreaSkillAimController { get; protected set; }
 
-        protected int buildingItemIndex = -1;
-        protected UsingSkillData queueUsingSkill;
+        protected int _buildingItemIndex = -1;
+        protected UsingSkillData _queueUsingSkill;
 
         protected virtual void Awake()
         {
@@ -156,7 +156,7 @@ namespace MultiplayerARPG
                 uint parentObjectId = 0;
                 if (ConstructingBuildingEntity.BuildingArea != null)
                     parentObjectId = ConstructingBuildingEntity.BuildingArea.GetEntityObjectId();
-                PlayingCharacterEntity.Building.CallServerConstructBuilding(buildingItemIndex, ConstructingBuildingEntity.EntityTransform.position, ConstructingBuildingEntity.EntityTransform.eulerAngles, parentObjectId);
+                PlayingCharacterEntity.Building.CallServerConstructBuilding(_buildingItemIndex, ConstructingBuildingEntity.EntityTransform.position, ConstructingBuildingEntity.EntityTransform.eulerAngles, parentObjectId);
             }
             DestroyConstructingBuilding();
         }
@@ -279,21 +279,21 @@ namespace MultiplayerARPG
 
         public void SetQueueUsingSkill(AimPosition aimPosition, BaseSkill skill, int level)
         {
-            queueUsingSkill = new UsingSkillData(aimPosition, skill, level);
+            _queueUsingSkill = new UsingSkillData(aimPosition, skill, level);
         }
 
         public void SetQueueUsingSkill(AimPosition aimPosition, BaseSkill skill, int level, int itemIndex)
         {
-            queueUsingSkill = new UsingSkillData(aimPosition, skill, level, itemIndex);
+            _queueUsingSkill = new UsingSkillData(aimPosition, skill, level, itemIndex);
         }
 
         public void ClearQueueUsingSkill()
         {
-            queueUsingSkill = new UsingSkillData();
-            queueUsingSkill.aimPosition = default;
-            queueUsingSkill.skill = null;
-            queueUsingSkill.level = 0;
-            queueUsingSkill.itemIndex = -1;
+            _queueUsingSkill = new UsingSkillData();
+            _queueUsingSkill.aimPosition = default;
+            _queueUsingSkill.skill = null;
+            _queueUsingSkill.level = 0;
+            _queueUsingSkill.itemIndex = -1;
         }
 
         public abstract void UseHotkey(HotkeyType type, string relateId, AimPosition aimPosition);

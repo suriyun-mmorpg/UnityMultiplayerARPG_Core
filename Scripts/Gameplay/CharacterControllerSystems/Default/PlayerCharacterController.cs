@@ -110,26 +110,26 @@ namespace MultiplayerARPG
         public GameObject CacheTargetObject { get; protected set; }
 
         // Input & control states variables
-        protected Vector3? destination;
-        protected TargetActionType targetActionType;
-        protected IPhysicFunctions physicFunctions;
-        protected bool isLeftHandAttacking;
-        protected bool isFollowingTarget;
-        protected InputStateManager activateInput;
-        protected InputStateManager pickupItemInput;
-        protected InputStateManager reloadInput;
-        protected InputStateManager findEnemyInput;
-        protected InputStateManager exitVehicleInput;
-        protected InputStateManager switchEquipWeaponSetInput;
+        protected Vector3? _destination;
+        protected TargetActionType _targetActionType;
+        protected IPhysicFunctions _physicFunctions;
+        protected bool _isLeftHandAttacking;
+        protected bool _isFollowingTarget;
+        protected InputStateManager _activateInput;
+        protected InputStateManager _pickupItemInput;
+        protected InputStateManager _reloadInput;
+        protected InputStateManager _findEnemyInput;
+        protected InputStateManager _exitVehicleInput;
+        protected InputStateManager _switchEquipWeaponSetInput;
 
         protected override void Awake()
         {
             base.Awake();
             // Initial physic functions
             if (CurrentGameInstance.DimensionType == DimensionType.Dimension3D)
-                physicFunctions = new PhysicFunctions(512);
+                _physicFunctions = new PhysicFunctions(512);
             else
-                physicFunctions = new PhysicFunctions2D(512);
+                _physicFunctions = new PhysicFunctions2D(512);
             // Initial gameplay camera controller
             CacheGameplayCameraController = gameObject.GetOrAddComponent<IGameplayCameraController, DefaultGameplayCameraController>((obj) =>
             {
@@ -154,14 +154,14 @@ namespace MultiplayerARPG
             // Initial area skill aim controller
             AreaSkillAimController = gameObject.GetOrAddComponent<IAreaSkillAimController, DefaultAreaSkillAimController>();
 
-            isLeftHandAttacking = false;
+            _isLeftHandAttacking = false;
             ConstructingBuildingEntity = null;
-            activateInput = new InputStateManager("Activate");
-            pickupItemInput = new InputStateManager("PickUpItem");
-            reloadInput = new InputStateManager("Reload");
-            findEnemyInput = new InputStateManager("FindEnemy");
-            exitVehicleInput = new InputStateManager("ExitVehicle");
-            switchEquipWeaponSetInput = new InputStateManager("SwitchEquipWeaponSet");
+            _activateInput = new InputStateManager("Activate");
+            _pickupItemInput = new InputStateManager("PickUpItem");
+            _reloadInput = new InputStateManager("Reload");
+            _findEnemyInput = new InputStateManager("FindEnemy");
+            _exitVehicleInput = new InputStateManager("ExitVehicle");
+            _switchEquipWeaponSetInput = new InputStateManager("SwitchEquipWeaponSet");
 
             if (targetObjectPrefab != null)
             {
@@ -234,13 +234,13 @@ namespace MultiplayerARPG
             CacheMinimapCameraController.FollowingGameplayCameraTransform = CacheGameplayCameraController.CameraTransform;
 
             if (CacheTargetObject != null)
-                CacheTargetObject.gameObject.SetActive(destination.HasValue);
+                CacheTargetObject.gameObject.SetActive(_destination.HasValue);
 
             if (PlayingCharacterEntity.IsDead())
             {
                 ClearQueueUsingSkill();
-                destination = null;
-                isFollowingTarget = false;
+                _destination = null;
+                _isFollowingTarget = false;
                 CancelBuild();
                 UISceneGameplay.SetTargetEntity(null);
             }
@@ -249,36 +249,36 @@ namespace MultiplayerARPG
                 UISceneGameplay.SetTargetEntity(SelectedGameEntity);
             }
 
-            if (destination.HasValue)
+            if (_destination.HasValue)
             {
                 if (CacheTargetObject != null)
-                    CacheTargetObject.transform.position = destination.Value;
-                if (Vector3.Distance(destination.Value, MovementTransform.position) < StoppingDistance + 0.5f)
-                    destination = null;
+                    CacheTargetObject.transform.position = _destination.Value;
+                if (Vector3.Distance(_destination.Value, MovementTransform.position) < StoppingDistance + 0.5f)
+                    _destination = null;
             }
 
             float deltaTime = Time.deltaTime;
-            activateInput.OnUpdate(deltaTime);
-            pickupItemInput.OnUpdate(deltaTime);
-            reloadInput.OnUpdate(deltaTime);
-            findEnemyInput.OnUpdate(deltaTime);
-            exitVehicleInput.OnUpdate(deltaTime);
-            switchEquipWeaponSetInput.OnUpdate(deltaTime);
+            _activateInput.OnUpdate(deltaTime);
+            _pickupItemInput.OnUpdate(deltaTime);
+            _reloadInput.OnUpdate(deltaTime);
+            _findEnemyInput.OnUpdate(deltaTime);
+            _exitVehicleInput.OnUpdate(deltaTime);
+            _switchEquipWeaponSetInput.OnUpdate(deltaTime);
 
             UpdateInput();
             UpdateFollowTarget();
-            PlayingCharacterEntity.AimPosition = PlayingCharacterEntity.GetAttackAimPosition(ref isLeftHandAttacking);
+            PlayingCharacterEntity.AimPosition = PlayingCharacterEntity.GetAttackAimPosition(ref _isLeftHandAttacking);
             PlayingCharacterEntity.SetSmoothTurnSpeed(turnSmoothSpeed);
         }
 
         private void LateUpdate()
         {
-            activateInput.OnLateUpdate();
-            pickupItemInput.OnLateUpdate();
-            reloadInput.OnLateUpdate();
-            findEnemyInput.OnLateUpdate();
-            exitVehicleInput.OnLateUpdate();
-            switchEquipWeaponSetInput.OnLateUpdate();
+            _activateInput.OnLateUpdate();
+            _pickupItemInput.OnLateUpdate();
+            _reloadInput.OnLateUpdate();
+            _findEnemyInput.OnLateUpdate();
+            _exitVehicleInput.OnLateUpdate();
+            _switchEquipWeaponSetInput.OnLateUpdate();
         }
 
         public bool TryGetSelectedTargetAsAttackingEntity(out BaseCharacterEntity character)
@@ -317,7 +317,7 @@ namespace MultiplayerARPG
         {
             if (!TryGetDoActionEntity(out entity, TargetActionType.UseSkill))
                 return false;
-            if (queueUsingSkill.skill == null)
+            if (_queueUsingSkill.skill == null)
             {
                 entity = null;
                 return false;
@@ -329,7 +329,7 @@ namespace MultiplayerARPG
             where T : class, ITargetableEntity
         {
             entity = default;
-            if (targetActionType != actionType)
+            if (_targetActionType != actionType)
                 return false;
             if (TargetEntity == null)
                 return false;
@@ -350,11 +350,11 @@ namespace MultiplayerARPG
         {
             castDistance = CurrentGameInstance.conversationDistance;
             castFov = 360f;
-            if (queueUsingSkill.skill != null)
+            if (_queueUsingSkill.skill != null)
             {
                 // If skill is attack skill, set distance and fov by skill
-                castDistance = queueUsingSkill.skill.GetCastDistance(PlayingCharacterEntity, queueUsingSkill.level, isLeftHand);
-                castFov = queueUsingSkill.skill.GetCastFov(PlayingCharacterEntity, queueUsingSkill.level, isLeftHand);
+                castDistance = _queueUsingSkill.skill.GetCastDistance(PlayingCharacterEntity, _queueUsingSkill.level, isLeftHand);
+                castFov = _queueUsingSkill.skill.GetCastFov(PlayingCharacterEntity, _queueUsingSkill.level, isLeftHand);
             }
             castDistance -= PlayingCharacterEntity.StoppingDistance;
         }
@@ -387,8 +387,8 @@ namespace MultiplayerARPG
         public void RequestAttack()
         {
             // Switching right/left/right/left...
-            if (PlayingCharacterEntity.Attack(ref isLeftHandAttacking))
-                isLeftHandAttacking = !isLeftHandAttacking;
+            if (PlayingCharacterEntity.Attack(ref _isLeftHandAttacking))
+                _isLeftHandAttacking = !_isLeftHandAttacking;
         }
 
         public void RequestUsePendingSkill()
@@ -400,23 +400,23 @@ namespace MultiplayerARPG
                 return;
             }
 
-            if (queueUsingSkill.skill != null &&
+            if (_queueUsingSkill.skill != null &&
                 !PlayingCharacterEntity.IsPlayingActionAnimation() &&
                 !PlayingCharacterEntity.IsAttacking &&
                 !PlayingCharacterEntity.IsUsingSkill)
             {
-                if (queueUsingSkill.itemIndex >= 0)
+                if (_queueUsingSkill.itemIndex >= 0)
                 {
-                    if (PlayingCharacterEntity.UseSkillItem(queueUsingSkill.itemIndex, isLeftHandAttacking, SelectedGameEntityObjectId, queueUsingSkill.aimPosition))
+                    if (PlayingCharacterEntity.UseSkillItem(_queueUsingSkill.itemIndex, _isLeftHandAttacking, SelectedGameEntityObjectId, _queueUsingSkill.aimPosition))
                     {
-                        isLeftHandAttacking = !isLeftHandAttacking;
+                        _isLeftHandAttacking = !_isLeftHandAttacking;
                     }
                 }
                 else
                 {
-                    if (PlayingCharacterEntity.UseSkill(queueUsingSkill.skill.DataId, isLeftHandAttacking, SelectedGameEntityObjectId, queueUsingSkill.aimPosition))
+                    if (PlayingCharacterEntity.UseSkill(_queueUsingSkill.skill.DataId, _isLeftHandAttacking, SelectedGameEntityObjectId, _queueUsingSkill.aimPosition))
                     {
-                        isLeftHandAttacking = !isLeftHandAttacking;
+                        _isLeftHandAttacking = !_isLeftHandAttacking;
                     }
                 }
                 ClearQueueUsingSkill();
