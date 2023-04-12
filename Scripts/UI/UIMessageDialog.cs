@@ -58,10 +58,10 @@ public class UIMessageDialog : UIBase
         set { if (buttonCancel != null) buttonCancel.gameObject.SetActive(value); }
     }
 
-    private System.Action onClickOkay;
-    private System.Action onClickYes;
-    private System.Action onClickNo;
-    private System.Action onClickCancel;
+    private System.Action _onClickOkay;
+    private System.Action _onClickYes;
+    private System.Action _onClickNo;
+    private System.Action _onClickCancel;
 
     protected virtual void OnEnable()
     {
@@ -105,38 +105,38 @@ public class UIMessageDialog : UIBase
         ShowButtonYes = showButtonYes;
         ShowButtonNo = showButtonNo;
         ShowButtonCancel = showButtonCancel;
-        this.onClickOkay = onClickOkay;
-        this.onClickYes = onClickYes;
-        this.onClickNo = onClickNo;
-        this.onClickCancel = onClickCancel;
+        _onClickOkay = onClickOkay;
+        _onClickYes = onClickYes;
+        _onClickNo = onClickNo;
+        _onClickCancel = onClickCancel;
         Show();
     }
 
     public void OnClickOkay()
     {
-        if (onClickOkay != null)
-            onClickOkay.Invoke();
+        if (_onClickOkay != null)
+            _onClickOkay.Invoke();
         Hide();
     }
 
     public void OnClickYes()
     {
-        if (onClickYes != null)
-            onClickYes.Invoke();
+        if (_onClickYes != null)
+            _onClickYes.Invoke();
         Hide();
     }
 
     public void OnClickNo()
     {
-        if (onClickNo != null)
-            onClickNo.Invoke();
+        if (_onClickNo != null)
+            _onClickNo.Invoke();
         Hide();
     }
 
     public void OnClickCancel()
     {
-        if (onClickCancel != null)
-            onClickCancel.Invoke();
+        if (_onClickCancel != null)
+            _onClickCancel.Invoke();
         Hide();
     }
 }

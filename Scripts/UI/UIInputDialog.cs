@@ -7,16 +7,16 @@ public class UIInputDialog : UIBase
     public TextWrapper uiTextDescription;
     public InputFieldWrapper uiInputField;
     public Button buttonConfirm;
-    private System.Action<string> onConfirmText;
-    private System.Action<int> onConfirmInteger;
-    private System.Action<float> onConfirmDecimal;
-    private int intDefaultAmount;
-    private int? intMinAmount;
-    private int? intMaxAmount;
-    private float floatDefaultAmount;
-    private float? floatMinAmount;
-    private float? floatMaxAmount;
-    private string defaultPlaceHolderText;
+    private System.Action<string> _onConfirmText;
+    private System.Action<int> _onConfirmInteger;
+    private System.Action<float> _onConfirmDecimal;
+    private int _intDefaultAmount;
+    private int? _intMinAmount;
+    private int? _intMaxAmount;
+    private float _floatDefaultAmount;
+    private float? _floatMinAmount;
+    private float? _floatMaxAmount;
+    private string _defaultPlaceHolderText;
 
     public string Title
     {
@@ -74,15 +74,15 @@ public class UIInputDialog : UIBase
             {
                 if (uiInputField.placeholder is Text)
                 {
-                    if (string.IsNullOrEmpty(defaultPlaceHolderText))
-                        defaultPlaceHolderText = (uiInputField.placeholder as Text).text;
-                    (uiInputField.placeholder as Text).text = !string.IsNullOrEmpty(value) ? value : defaultPlaceHolderText;
+                    if (string.IsNullOrEmpty(_defaultPlaceHolderText))
+                        _defaultPlaceHolderText = (uiInputField.placeholder as Text).text;
+                    (uiInputField.placeholder as Text).text = !string.IsNullOrEmpty(value) ? value : _defaultPlaceHolderText;
                 }
                 if (uiInputField.placeholder is TMPro.TMP_Text)
                 {
-                    if (string.IsNullOrEmpty(defaultPlaceHolderText))
-                        defaultPlaceHolderText = (uiInputField.placeholder as TMPro.TMP_Text).text;
-                    (uiInputField.placeholder as TMPro.TMP_Text).text = !string.IsNullOrEmpty(value) ? value : defaultPlaceHolderText;
+                    if (string.IsNullOrEmpty(_defaultPlaceHolderText))
+                        _defaultPlaceHolderText = (uiInputField.placeholder as TMPro.TMP_Text).text;
+                    (uiInputField.placeholder as TMPro.TMP_Text).text = !string.IsNullOrEmpty(value) ? value : _defaultPlaceHolderText;
                 }
             }
         }
@@ -135,7 +135,7 @@ public class UIInputDialog : UIBase
         ContentType = contentType;
         CharacterLimit = characterLimit;
         PlaceHolderText = placeHolder;
-        this.onConfirmText = onConfirmText;
+        _onConfirmText = onConfirmText;
         Show();
     }
 
@@ -152,9 +152,9 @@ public class UIInputDialog : UIBase
         if (!maxAmount.HasValue)
             maxAmount = int.MaxValue;
 
-        intDefaultAmount = defaultAmount;
-        intMinAmount = minAmount;
-        intMaxAmount = maxAmount;
+        _intDefaultAmount = defaultAmount;
+        _intMinAmount = minAmount;
+        _intMaxAmount = maxAmount;
 
         Title = title;
         Description = description;
@@ -172,20 +172,20 @@ public class UIInputDialog : UIBase
         }
         ContentType = InputField.ContentType.IntegerNumber;
         CharacterLimit = 0;
-        this.onConfirmInteger = onConfirmInteger;
+        _onConfirmInteger = onConfirmInteger;
         Show();
     }
 
     protected void ValidateIntAmount(string result)
     {
-        int amount = intDefaultAmount;
+        int amount = _intDefaultAmount;
         if (int.TryParse(result, out amount))
         {
             uiInputField.onValueChanged.RemoveAllListeners();
-            if (intMinAmount.HasValue && amount < intMinAmount.Value)
-                InputFieldText = intMinAmount.Value.ToString();
-            if (intMaxAmount.HasValue && amount > intMaxAmount.Value)
-                InputFieldText = intMaxAmount.Value.ToString();
+            if (_intMinAmount.HasValue && amount < _intMinAmount.Value)
+                InputFieldText = _intMinAmount.Value.ToString();
+            if (_intMaxAmount.HasValue && amount > _intMaxAmount.Value)
+                InputFieldText = _intMaxAmount.Value.ToString();
             uiInputField.onValueChanged.AddListener(ValidateIntAmount);
         }
     }
@@ -203,9 +203,9 @@ public class UIInputDialog : UIBase
         if (!maxAmount.HasValue)
             maxAmount = float.MaxValue;
 
-        floatDefaultAmount = defaultAmount;
-        floatMinAmount = minAmount;
-        floatMaxAmount = maxAmount;
+        _floatDefaultAmount = defaultAmount;
+        _floatMinAmount = minAmount;
+        _floatMaxAmount = maxAmount;
         Title = title;
         Description = description;
         InputFieldText = defaultAmount.ToString();
@@ -222,20 +222,20 @@ public class UIInputDialog : UIBase
         }
         ContentType = InputField.ContentType.DecimalNumber;
         CharacterLimit = 0;
-        this.onConfirmDecimal = onConfirmDecimal;
+        _onConfirmDecimal = onConfirmDecimal;
         Show();
     }
 
     protected void ValidateFloatAmount(string result)
     {
-        float amount = floatDefaultAmount;
+        float amount = _floatDefaultAmount;
         if (float.TryParse(result, out amount))
         {
             uiInputField.onValueChanged.RemoveAllListeners();
-            if (floatMinAmount.HasValue && amount < floatMinAmount.Value)
-                InputFieldText = floatMinAmount.Value.ToString();
-            if (floatMaxAmount.HasValue && amount > floatMaxAmount.Value)
-                InputFieldText = floatMaxAmount.Value.ToString();
+            if (_floatMinAmount.HasValue && amount < _floatMinAmount.Value)
+                InputFieldText = _floatMinAmount.Value.ToString();
+            if (_floatMaxAmount.HasValue && amount > _floatMaxAmount.Value)
+                InputFieldText = _floatMaxAmount.Value.ToString();
             uiInputField.onValueChanged.AddListener(ValidateFloatAmount);
         }
     }
@@ -246,18 +246,18 @@ public class UIInputDialog : UIBase
         {
             case InputField.ContentType.IntegerNumber:
                 int intAmount = int.Parse(InputFieldText);
-                if (onConfirmInteger != null)
-                    onConfirmInteger.Invoke(intAmount);
+                if (_onConfirmInteger != null)
+                    _onConfirmInteger.Invoke(intAmount);
                 break;
             case InputField.ContentType.DecimalNumber:
                 float floatAmount = float.Parse(InputFieldText);
-                if (onConfirmDecimal != null)
-                    onConfirmDecimal.Invoke(floatAmount);
+                if (_onConfirmDecimal != null)
+                    _onConfirmDecimal.Invoke(floatAmount);
                 break;
             default:
                 string text = InputFieldText;
-                if (onConfirmText != null)
-                    onConfirmText.Invoke(text);
+                if (_onConfirmText != null)
+                    _onConfirmText.Invoke(text);
                 break;
         }
         Hide();
