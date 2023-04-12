@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System.Collections.Generic;
+using UnityEngine;
 
 namespace MultiplayerARPG
 {
@@ -6,7 +7,6 @@ namespace MultiplayerARPG
     {
         public float speed;
         public float lifeTime = 1;
-        public Transform CacheTransform { get; private set; }
         private FxCollection fxCollection;
         public FxCollection FxCollection
         {
@@ -17,12 +17,7 @@ namespace MultiplayerARPG
                 return fxCollection;
             }
         }
-        private bool playFxOnEnable;
-
-        protected virtual void Awake()
-        {
-            CacheTransform = transform;
-        }
+        private bool _playFxOnEnable;
 
         protected virtual void Update()
         {
@@ -31,11 +26,11 @@ namespace MultiplayerARPG
 
         protected virtual void OnEnable()
         {
-            if (playFxOnEnable)
+            if (_playFxOnEnable)
                 PlayFx();
         }
 
-        public virtual void Setup(float distance, float speed)
+        public virtual void Setup(float distance, float speed, ImpactEffects impactEffects, List<ImpactEffectPlayingData> impacts)
         {
             this.speed = speed;
             lifeTime = distance / speed;
@@ -69,11 +64,11 @@ namespace MultiplayerARPG
         {
             if (!gameObject.activeInHierarchy)
             {
-                playFxOnEnable = true;
+                _playFxOnEnable = true;
                 return;
             }
             FxCollection.Play();
-            playFxOnEnable = false;
+            _playFxOnEnable = false;
         }
 
         public virtual void StopFx()

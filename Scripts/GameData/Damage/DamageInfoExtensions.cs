@@ -12,6 +12,9 @@ namespace MultiplayerARPG
                 position = damageTransform.position;
                 GetDamageRotation2D(attacker.Direction2D, out rotation);
                 direction = attacker.Direction2D;
+#if UNITY_EDITOR
+                attacker.SetDebugDamage(position, direction, rotation, isLeftHand);
+#endif
                 return;
             }
             if (aimPosition.type == AimPositionType.Direction)
@@ -28,6 +31,9 @@ namespace MultiplayerARPG
                 GetDamageRotation3D(position, aimPosition.position, stagger, out rotation);
                 direction = rotation * Vector3.forward;
             }
+#if UNITY_EDITOR
+            attacker.SetDebugDamage(position, direction, rotation, isLeftHand);
+#endif
         }
 
         public static void GetDamageRotation2D(Vector2 aimDirection, out Quaternion rotation)
