@@ -53,7 +53,7 @@ namespace MultiplayerARPG
         private SampleAnimation? dirtySampleAnimation;
         private DirectionType2D? dirtySampleType;
 
-        public DirectionType2D DirectionType2D { get { return GameplayUtils.GetDirectionTypeByVector2(direction2D); } }
+        public DirectionType2D DirectionType2D { get { return GameplayUtils.GetDirectionTypeByVector2(Direction2D); } }
 
         protected override void Awake()
         {
@@ -224,7 +224,7 @@ namespace MultiplayerARPG
 
         public override void PlayMoveAnimation()
         {
-            if (isDead)
+            if (IsDead)
             {
                 Play(deadAnimation2D, DirectionType2D);
                 playingAction = false;
@@ -240,12 +240,12 @@ namespace MultiplayerARPG
                 return;
             }
 
-            if (movementState.Has(MovementState.Forward) ||
-                movementState.Has(MovementState.Backward) ||
-                movementState.Has(MovementState.Right) ||
-                movementState.Has(MovementState.Left))
+            if (MovementState.Has(MovementState.Forward) ||
+                MovementState.Has(MovementState.Backward) ||
+                MovementState.Has(MovementState.Right) ||
+                MovementState.Has(MovementState.Left))
             {
-                switch (extraMovementState)
+                switch (ExtraMovementState)
                 {
                     case ExtraMovementState.IsSprinting:
                         Play(sprintAnimation2D, DirectionType2D);

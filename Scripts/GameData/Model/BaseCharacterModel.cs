@@ -144,28 +144,26 @@ namespace MultiplayerARPG
             set { MainModel.cacheLeftHandEquipmentEntity = value; }
         }
 
-        protected bool isCacheDataInitialized = false;
-
-        // Protected fields
-        public IList<EquipWeapons> selectableWeaponSets { get; protected set; }
-        public byte equipWeaponSet { get; protected set; }
-        public bool isWeaponsSheathed { get; protected set; }
-        public IList<CharacterItem> equipItems { get; protected set; }
-        public IList<CharacterBuff> buffs { get; protected set; }
-        public bool isDead { get; protected set; }
-        public float moveAnimationSpeedMultiplier { get; protected set; }
-        public MovementState movementState { get; protected set; }
-        public ExtraMovementState extraMovementState { get; protected set; }
-        public Vector2 direction2D { get; protected set; }
-        public bool isFreezeAnimation { get; protected set; }
+        public IList<EquipWeapons> SelectableWeaponSets { get; protected set; }
+        public byte EquipWeaponSet { get; protected set; }
+        public bool IsWeaponsSheathed { get; protected set; }
+        public IList<CharacterItem> EquipItems { get; protected set; }
+        public IList<CharacterBuff> Buffs { get; protected set; }
+        public bool IsDead { get; protected set; }
+        public float MoveAnimationSpeedMultiplier { get; protected set; }
+        public MovementState MovementState { get; protected set; }
+        public ExtraMovementState ExtraMovementState { get; protected set; }
+        public Vector2 Direction2D { get; protected set; }
+        public bool IsFreezeAnimation { get; protected set; }
 
         // Public events
         public System.Action<string> onEquipmentModelsInstantiated;
         public System.Action<string> onEquipmentModelsDestroyed;
 
         // Optimize garbage collector
-        protected readonly List<string> tempAddingKeys = new List<string>();
-        protected readonly List<string> tempCachedKeys = new List<string>();
+        protected bool _isCacheDataInitialized = false;
+        protected readonly List<string> _tempAddingKeys = new List<string>();
+        protected readonly List<string> _tempCachedKeys = new List<string>();
 
         protected override void Awake()
         {
@@ -191,9 +189,9 @@ namespace MultiplayerARPG
 
         internal void InitCacheData()
         {
-            if (isCacheDataInitialized)
+            if (_isCacheDataInitialized)
                 return;
-            isCacheDataInitialized = true;
+            _isCacheDataInitialized = true;
 
             cacheVehicleModels = new Dictionary<int, VehicleCharacterModel>();
             if (vehicleModels != null && vehicleModels.Length > 0)
@@ -277,12 +275,12 @@ namespace MultiplayerARPG
                 previousModel.RevertObjectsWhenSwitch();
                 OnSwitchingToThisModel();
                 SetDefaultAnimations();
-                SetIsDead(previousModel.isDead);
-                SetMoveAnimationSpeedMultiplier(previousModel.moveAnimationSpeedMultiplier);
-                SetMovementState(previousModel.movementState, previousModel.extraMovementState, previousModel.direction2D, previousModel.isFreezeAnimation);
-                SetEquipWeapons(previousModel.selectableWeaponSets, previousModel.equipWeaponSet, previousModel.isWeaponsSheathed);
-                SetEquipItems(previousModel.equipItems);
-                SetBuffs(previousModel.buffs);
+                SetIsDead(previousModel.IsDead);
+                SetMoveAnimationSpeedMultiplier(previousModel.MoveAnimationSpeedMultiplier);
+                SetMovementState(previousModel.MovementState, previousModel.ExtraMovementState, previousModel.Direction2D, previousModel.IsFreezeAnimation);
+                SetEquipWeapons(previousModel.SelectableWeaponSets, previousModel.EquipWeaponSet, previousModel.IsWeaponsSheathed);
+                SetEquipItems(previousModel.EquipItems);
+                SetBuffs(previousModel.Buffs);
                 IsActiveModel = true;
                 UpdateObjectsWhenSwitch();
                 OnSwitchedToThisModel();
@@ -292,9 +290,9 @@ namespace MultiplayerARPG
             {
                 OnSwitchingToThisModel();
                 SetDefaultAnimations();
-                SetEquipWeapons(selectableWeaponSets, equipWeaponSet, isWeaponsSheathed);
-                SetEquipItems(equipItems);
-                SetBuffs(buffs);
+                SetEquipWeapons(SelectableWeaponSets, EquipWeaponSet, IsWeaponsSheathed);
+                SetEquipItems(EquipItems);
+                SetBuffs(Buffs);
                 IsActiveModel = true;
                 UpdateObjectsWhenSwitch();
                 OnSwitchedToThisModel();
@@ -384,15 +382,15 @@ namespace MultiplayerARPG
 
         public virtual void SetEquipWeapons(IList<EquipWeapons> selectableWeaponSets, byte equipWeaponSet, bool isWeaponsSheathed)
         {
-            this.selectableWeaponSets = selectableWeaponSets;
-            this.equipWeaponSet = equipWeaponSet;
-            this.isWeaponsSheathed = isWeaponsSheathed;
+            this.SelectableWeaponSets = selectableWeaponSets;
+            this.EquipWeaponSet = equipWeaponSet;
+            this.IsWeaponsSheathed = isWeaponsSheathed;
             UpdateEquipmentModels();
         }
 
         public virtual void SetEquipItems(IList<CharacterItem> equipItems)
         {
-            this.equipItems = equipItems;
+            this.EquipItems = equipItems;
             UpdateEquipmentModels();
         }
 
@@ -407,9 +405,9 @@ namespace MultiplayerARPG
             HashSet<string> unequippingSockets = new HashSet<string>(EquippedModels.Keys);
 
             // Setup equipping models from equip items
-            if (equipItems != null && equipItems.Count > 0)
+            if (EquipItems != null && EquipItems.Count > 0)
             {
-                foreach (CharacterItem equipItem in equipItems)
+                foreach (CharacterItem equipItem in EquipItems)
                 {
                     IArmorItem armorItem = equipItem.GetArmorItem();
                     if (armorItem == null)
@@ -420,23 +418,23 @@ namespace MultiplayerARPG
 
             // Setup equipping models from equip weapons
             EquipWeapons equipWeapons;
-            if (isWeaponsSheathed || selectableWeaponSets == null || selectableWeaponSets.Count == 0)
+            if (IsWeaponsSheathed || SelectableWeaponSets == null || SelectableWeaponSets.Count == 0)
             {
                 equipWeapons = new EquipWeapons();
             }
             else
             {
-                if (equipWeaponSet >= selectableWeaponSets.Count)
+                if (EquipWeaponSet >= SelectableWeaponSets.Count)
                 {
                     // Issues occuring, so try to simulate data
                     // Create a new list to make sure that changes won't be applied to the source list (the source list must be readonly)
-                    selectableWeaponSets = new List<EquipWeapons>(selectableWeaponSets);
-                    while (equipWeaponSet >= selectableWeaponSets.Count)
+                    SelectableWeaponSets = new List<EquipWeapons>(SelectableWeaponSets);
+                    while (EquipWeaponSet >= SelectableWeaponSets.Count)
                     {
-                        selectableWeaponSets.Add(new EquipWeapons());
+                        SelectableWeaponSets.Add(new EquipWeapons());
                     }
                 }
-                equipWeapons = selectableWeaponSets[equipWeaponSet];
+                equipWeapons = SelectableWeaponSets[EquipWeaponSet];
             }
             IEquipmentItem rightHandItem = equipWeapons.GetRightHandEquipmentItem();
             IEquipmentItem leftHandItem = equipWeapons.GetLeftHandEquipmentItem();
@@ -447,13 +445,13 @@ namespace MultiplayerARPG
             if (leftHandItem != null && leftHandItem.IsShield())
                 SetupEquippingModels(showingModels, storingModels, unequippingSockets, (leftHandItem as IShieldItem).EquipmentModels, equipWeapons.leftHand.dataId, equipWeapons.leftHand.level, GameDataConst.EQUIP_POSITION_LEFT_HAND);
 
-            if (selectableWeaponSets != null && selectableWeaponSets.Count > 0)
+            if (SelectableWeaponSets != null && SelectableWeaponSets.Count > 0)
             {
-                for (byte i = 0; i < selectableWeaponSets.Count; ++i)
+                for (byte i = 0; i < SelectableWeaponSets.Count; ++i)
                 {
-                    if (isWeaponsSheathed || i != equipWeaponSet)
+                    if (IsWeaponsSheathed || i != EquipWeaponSet)
                     {
-                        equipWeapons = selectableWeaponSets[i];
+                        equipWeapons = SelectableWeaponSets[i];
                         rightHandItem = equipWeapons.GetRightHandEquipmentItem();
                         leftHandItem = equipWeapons.GetLeftHandEquipmentItem();
                         if (rightHandItem != null && rightHandItem.IsWeapon())
@@ -633,12 +631,12 @@ namespace MultiplayerARPG
 
         public virtual void SetBuffs(IList<CharacterBuff> buffs)
         {
-            this.buffs = buffs;
+            this.Buffs = buffs;
             // Temp old keys
-            tempCachedKeys.Clear();
-            tempCachedKeys.AddRange(CacheEffects.Keys);
+            _tempCachedKeys.Clear();
+            _tempCachedKeys.AddRange(CacheEffects.Keys);
             // Prepare data
-            tempAddingKeys.Clear();
+            _tempAddingKeys.Clear();
             // Loop new buffs to prepare adding keys
             if (buffs != null && buffs.Count > 0)
             {
@@ -647,51 +645,51 @@ namespace MultiplayerARPG
                 {
                     // Buff effects
                     tempKey = buff.GetKey();
-                    if (!tempCachedKeys.Contains(tempKey))
+                    if (!_tempCachedKeys.Contains(tempKey))
                     {
                         // If old buffs not contains this buff, add this buff effect
                         InstantiateBuffEffect(tempKey, buff.GetBuff().GetBuff().effects);
-                        tempCachedKeys.Add(tempKey);
+                        _tempCachedKeys.Add(tempKey);
                     }
-                    tempAddingKeys.Add(tempKey);
+                    _tempAddingKeys.Add(tempKey);
                     // Ailment effects
                     switch (buff.GetBuff().GetBuff().ailment)
                     {
                         case AilmentPresets.Stun:
                             tempKey = nameof(AilmentPresets.Stun);
-                            if (!tempCachedKeys.Contains(tempKey))
+                            if (!_tempCachedKeys.Contains(tempKey))
                             {
                                 InstantiateBuffEffect(tempKey, GameInstance.Singleton.StunEffects);
-                                tempCachedKeys.Add(tempKey);
+                                _tempCachedKeys.Add(tempKey);
                             }
-                            tempAddingKeys.Add(tempKey);
+                            _tempAddingKeys.Add(tempKey);
                             break;
                         case AilmentPresets.Mute:
                             tempKey = nameof(AilmentPresets.Mute);
-                            if (!tempCachedKeys.Contains(tempKey))
+                            if (!_tempCachedKeys.Contains(tempKey))
                             {
                                 InstantiateBuffEffect(tempKey, GameInstance.Singleton.MuteEffects);
-                                tempCachedKeys.Add(tempKey);
+                                _tempCachedKeys.Add(tempKey);
                             }
-                            tempAddingKeys.Add(tempKey);
+                            _tempAddingKeys.Add(tempKey);
                             break;
                         case AilmentPresets.Freeze:
                             tempKey = nameof(AilmentPresets.Freeze);
-                            if (!tempCachedKeys.Contains(tempKey))
+                            if (!_tempCachedKeys.Contains(tempKey))
                             {
                                 InstantiateBuffEffect(tempKey, GameInstance.Singleton.FreezeEffects);
-                                tempCachedKeys.Add(tempKey);
+                                _tempCachedKeys.Add(tempKey);
                             }
-                            tempAddingKeys.Add(tempKey);
+                            _tempAddingKeys.Add(tempKey);
                             break;
                     }
                 }
             }
             // Remove effects which removed from new buffs list
             // Loop old keys to destroy removed buffs
-            foreach (string key in tempCachedKeys)
+            foreach (string key in _tempCachedKeys)
             {
-                if (!tempAddingKeys.Contains(key))
+                if (!_tempAddingKeys.Contains(key))
                 {
                     // New buffs not contains old buff, remove effect
                     DestroyCacheEffect(key);
@@ -820,22 +818,22 @@ namespace MultiplayerARPG
 
         public void SetIsDead(bool isDead)
         {
-            this.isDead = isDead;
+            this.IsDead = isDead;
         }
 
         public void SetMoveAnimationSpeedMultiplier(float moveAnimationSpeedMultiplier)
         {
-            this.moveAnimationSpeedMultiplier = moveAnimationSpeedMultiplier;
+            this.MoveAnimationSpeedMultiplier = moveAnimationSpeedMultiplier;
         }
 
         public void SetMovementState(MovementState movementState, ExtraMovementState extraMovementState, Vector2 direction2D, bool isFreezeAnimation)
         {
             if (!Application.isPlaying)
                 return;
-            this.movementState = movementState;
-            this.extraMovementState = extraMovementState;
-            this.direction2D = direction2D;
-            this.isFreezeAnimation = isFreezeAnimation;
+            this.MovementState = movementState;
+            this.ExtraMovementState = extraMovementState;
+            this.Direction2D = direction2D;
+            this.IsFreezeAnimation = isFreezeAnimation;
             PlayMoveAnimation();
         }
 

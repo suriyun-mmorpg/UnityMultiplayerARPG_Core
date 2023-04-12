@@ -491,9 +491,9 @@ namespace MultiplayerARPG.GameData.Model.Playables
 
         private string GetPlayingStateId<T>(string weaponTypeId, Dictionary<string, T> stateInfos, StateUpdateData stateUpdateData) where T : IStateInfo
         {
-            stateUpdateData.IsDead = CharacterModel.isDead;
-            stateUpdateData.MovementState = CharacterModel.movementState;
-            stateUpdateData.ExtraMovementState = CharacterModel.extraMovementState;
+            stateUpdateData.IsDead = CharacterModel.IsDead;
+            stateUpdateData.MovementState = CharacterModel.MovementState;
+            stateUpdateData.ExtraMovementState = CharacterModel.ExtraMovementState;
 
             if (!stateUpdateData.HasChanges)
                 return stateUpdateData.playingStateId;
@@ -728,7 +728,7 @@ namespace MultiplayerARPG.GameData.Model.Playables
             float weight;
             float weightUpdate;
             bool transitionEnded = false;
-            if (CharacterModel.isDead && Time.unscaledTime - CharacterModel.SwitchedTime < 1f)
+            if (CharacterModel.IsDead && Time.unscaledTime - CharacterModel.SwitchedTime < 1f)
             {
                 // Play dead animation at end frame immediately
                 mixer.GetInput(stateUpdateData.inputPort).SetTime(Cache.BaseStates[stateUpdateData.playingStateId].State.clip.length);
@@ -820,9 +820,9 @@ namespace MultiplayerARPG.GameData.Model.Playables
             if (!readyToPlay)
                 return;
 
-            if (!Mathf.Approximately(moveAnimationSpeedMultiplier, CharacterModel.moveAnimationSpeedMultiplier))
+            if (!Mathf.Approximately(moveAnimationSpeedMultiplier, CharacterModel.MoveAnimationSpeedMultiplier))
             {
-                moveAnimationSpeedMultiplier = CharacterModel.moveAnimationSpeedMultiplier;
+                moveAnimationSpeedMultiplier = CharacterModel.MoveAnimationSpeedMultiplier;
                 baseStateUpdateData.ForcePlay = true;
                 leftHandWieldingStateUpdateData.ForcePlay = true;
             }
@@ -842,7 +842,7 @@ namespace MultiplayerARPG.GameData.Model.Playables
             if (playingActionState == PlayingActionState.None)
                 return;
 
-            if (CharacterModel.isDead && playingActionState != PlayingActionState.Stopping)
+            if (CharacterModel.IsDead && playingActionState != PlayingActionState.Stopping)
             {
                 // Character dead, stop action animation
                 playingActionState = PlayingActionState.Stopping;
@@ -920,7 +920,7 @@ namespace MultiplayerARPG.GameData.Model.Playables
         /// <returns></returns>
         public float PlayAction(ActionState actionState, float speedRate, float duration = 0f, bool loop = false)
         {
-            if (IsFreeze || CharacterModel.isDead)
+            if (IsFreeze || CharacterModel.IsDead)
                 return 0f;
 
             // Destroy playing state
