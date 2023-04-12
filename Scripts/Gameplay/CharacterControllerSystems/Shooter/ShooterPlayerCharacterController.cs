@@ -1497,10 +1497,8 @@ namespace MultiplayerARPG
 
         protected virtual void UseSkill(string id, AimPosition aimPosition)
         {
-            BaseSkill skill;
-            int skillLevel;
-            if (!GameInstance.Skills.TryGetValue(BaseGameData.MakeDataId(id), out skill) || skill == null ||
-                !PlayingCharacterEntity.GetCaches().Skills.TryGetValue(skill, out skillLevel))
+            if (!GameInstance.Skills.TryGetValue(BaseGameData.MakeDataId(id), out BaseSkill skill) || skill == null ||
+                !PlayingCharacterEntity.GetCaches().Skills.TryGetValue(skill, out int skillLevel))
                 return;
             SetQueueUsingSkill(aimPosition, skill, skillLevel);
         }
@@ -1508,24 +1506,19 @@ namespace MultiplayerARPG
         protected virtual void UseItem(string id, AimPosition aimPosition)
         {
             int itemIndex;
-            BaseItem item;
             int dataId = BaseGameData.MakeDataId(id);
-            if (GameInstance.Items.ContainsKey(dataId))
+            if (GameInstance.Items.TryGetValue(dataId, out BaseItem item))
             {
-                item = GameInstance.Items[dataId];
-                itemIndex = OwningCharacter.IndexOfNonEquipItem(dataId);
+                itemIndex = GameInstance.PlayingCharacterEntity.IndexOfNonEquipItem(dataId);
             }
             else
             {
-                InventoryType inventoryType;
-                byte equipWeaponSet;
-                CharacterItem characterItem;
                 if (PlayingCharacterEntity.IsEquipped(
                     id,
-                    out inventoryType,
+                    out InventoryType inventoryType,
                     out itemIndex,
-                    out equipWeaponSet,
-                    out characterItem))
+                    out byte equipWeaponSet,
+                    out CharacterItem characterItem))
                 {
                     GameInstance.ClientInventoryHandlers.RequestUnEquipItem(
                         inventoryType,

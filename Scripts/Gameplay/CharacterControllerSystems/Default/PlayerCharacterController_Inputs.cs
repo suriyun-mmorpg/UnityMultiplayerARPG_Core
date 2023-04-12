@@ -241,12 +241,11 @@ namespace MultiplayerARPG
                 didActionOnTarget = false;
                 // Prepare temp variables
                 Transform tempTransform;
-                Vector3 tempVector3;
                 bool tempHasMapPosition = false;
                 Vector3 tempMapPosition = Vector3.zero;
                 // If mouse up while cursor point to target (character, item, npc and so on)
                 bool mouseUpOnTarget = getMouseUp && !isMouseDragOrHoldOrOverUI;
-                int tempCount = FindClickObjects(out tempVector3);
+                int tempCount = FindClickObjects(out Vector3 tempVector3);
                 for (int tempCounter = 0; tempCounter < tempCount; ++tempCounter)
                 {
                     tempTransform = physicFunctions.GetRaycastTransform(tempCounter);
@@ -869,10 +868,8 @@ namespace MultiplayerARPG
 
         protected void UseSkill(string id, AimPosition aimPosition)
         {
-            BaseSkill skill;
-            int skillLevel;
-            if (!GameInstance.Skills.TryGetValue(BaseGameData.MakeDataId(id), out skill) || skill == null ||
-                !PlayingCharacterEntity.GetCaches().Skills.TryGetValue(skill, out skillLevel))
+            if (!GameInstance.Skills.TryGetValue(BaseGameData.MakeDataId(id), out BaseSkill skill) || skill == null ||
+                !PlayingCharacterEntity.GetCaches().Skills.TryGetValue(skill, out int skillLevel))
                 return;
             SetQueueUsingSkill(aimPosition, skill, skillLevel);
         }
@@ -880,24 +877,19 @@ namespace MultiplayerARPG
         protected void UseItem(string id, AimPosition aimPosition)
         {
             int itemIndex;
-            BaseItem item;
             int dataId = BaseGameData.MakeDataId(id);
-            if (GameInstance.Items.ContainsKey(dataId))
+            if (GameInstance.Items.TryGetValue(dataId, out BaseItem item))
             {
-                item = GameInstance.Items[dataId];
-                itemIndex = OwningCharacter.IndexOfNonEquipItem(dataId);
+                itemIndex = GameInstance.PlayingCharacterEntity.IndexOfNonEquipItem(dataId);
             }
             else
             {
-                InventoryType inventoryType;
-                byte equipWeaponSet;
-                CharacterItem characterItem;
                 if (PlayingCharacterEntity.IsEquipped(
                     id,
-                    out inventoryType,
+                    out InventoryType inventoryType,
                     out itemIndex,
-                    out equipWeaponSet,
-                    out characterItem))
+                    out byte equipWeaponSet,
+                    out CharacterItem characterItem))
                 {
                     GameInstance.ClientInventoryHandlers.RequestUnEquipItem(
                         inventoryType,
