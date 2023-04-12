@@ -227,10 +227,11 @@ namespace MultiplayerARPG
         }
         public virtual float MoveAnimationSpeedMultiplier { get { return 1f; } }
         public virtual bool MuteFootstepSound { get { return false; } }
-        protected bool dirtyIsHide;
-        protected bool isTeleporting;
-        protected Vector3 teleportingPosition;
-        protected Quaternion teleportingRotation;
+
+        protected bool _dirtyIsHide;
+        protected bool _isTeleporting;
+        protected Vector3 _teleportingPosition;
+        protected Quaternion _teleportingRotation;
 
         public GameInstance CurrentGameInstance
         {
@@ -454,10 +455,10 @@ namespace MultiplayerARPG
                 onLateUpdate.Invoke();
             // Update identity's hide status
             bool isHide = IsHide();
-            if (dirtyIsHide != isHide)
+            if (_dirtyIsHide != isHide)
             {
-                dirtyIsHide = isHide;
-                Identity.IsHide = dirtyIsHide;
+                _dirtyIsHide = isHide;
+                Identity.IsHide = _dirtyIsHide;
             }
         }
 
@@ -470,10 +471,10 @@ namespace MultiplayerARPG
                 EntityTransform.rotation = PassengingVehicleSeat.passengingTransform.rotation;
             }
 
-            if (isTeleporting && ActiveMovement != null)
+            if (_isTeleporting && ActiveMovement != null)
             {
-                Teleport(teleportingPosition, teleportingRotation);
-                isTeleporting = false;
+                Teleport(_teleportingPosition, _teleportingRotation);
+                _isTeleporting = false;
             }
         }
 
@@ -791,9 +792,9 @@ namespace MultiplayerARPG
             if (ActiveMovement == null)
             {
                 // Can't teleport properly yet, try to teleport later
-                teleportingPosition = position;
-                teleportingRotation = rotation;
-                isTeleporting = true;
+                _teleportingPosition = position;
+                _teleportingRotation = rotation;
+                _isTeleporting = true;
                 return;
             }
             if (FindGroundedPosition(position, GROUND_DETECTION_DISTANCE, out Vector3 groundedPosition))
