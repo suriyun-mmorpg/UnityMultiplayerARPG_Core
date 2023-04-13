@@ -14,21 +14,22 @@ namespace MultiplayerARPG
         public UnityEvent onDestroy;
         public float explodeDistance;
 
-        protected float throwForce;
-        protected float lifetime;
-        protected bool isExploded;
-
         public Rigidbody CacheRigidbody { get; private set; }
         public Rigidbody2D CacheRigidbody2D { get; private set; }
 
-        protected float throwedTime;
-        protected bool destroying;
+        protected float _throwForce;
+        protected float _lifetime;
+        protected bool _isExploded;
+        protected float _throwedTime;
+        protected bool _destroying;
+        protected IgnoreColliderManager _ignoreColliderManager;
 
         protected override void Awake()
         {
             base.Awake();
             CacheRigidbody = GetComponent<Rigidbody>();
             CacheRigidbody2D = GetComponent<Rigidbody2D>();
+            _ignoreColliderManager = new IgnoreColliderManager(GetComponentsInChildren<Collider>(), GetComponentsInChildren<Collider2D>());
         }
 
         /// <summary>
@@ -51,44 +52,46 @@ namespace MultiplayerARPG
             float lifetime)
         {
             Setup(instigator, weapon, damageAmounts, skill, skillLevel);
-            this.throwForce = throwForce;
-            this.lifetime = lifetime;
+            _throwForce = throwForce;
+            _lifetime = lifetime;
 
             if (lifetime <= 0)
             {
                 // Explode immediately when lifetime is 0
                 Explode();
                 PushBack(destroyDelay);
-                destroying = true;
+                _destroying = true;
                 return;
             }
-            isExploded = false;
-            destroying = false;
-            throwedTime = Time.unscaledTime;
+            _isExploded = false;
+            _destroying = false;
+            _throwedTime = Time.unscaledTime;
             if (CurrentGameInstance.DimensionType == DimensionType.Dimension2D)
             {
                 CacheRigidbody2D.velocity = Vector2.zero;
                 CacheRigidbody2D.angularVelocity = 0f;
                 CacheRigidbody2D.AddForce(CacheTransform.forward * throwForce, ForceMode2D.Impulse);
+                _ignoreColliderManager.ResetAndSetIgnoreColliders(instigator);
             }
             else
             {
                 CacheRigidbody.velocity = Vector3.zero;
                 CacheRigidbody.angularVelocity = Vector3.zero;
                 CacheRigidbody.AddForce(CacheTransform.forward * throwForce, ForceMode.Impulse);
+                _ignoreColliderManager.ResetAndSetIgnoreCollider2Ds(instigator);
             }
         }
 
         protected virtual void Update()
         {
-            if (destroying)
+            if (_destroying)
                 return;
 
-            if (Time.unscaledTime - throwedTime >= lifetime)
+            if (Time.unscaledTime - _throwedTime >= _lifetime)
             {
                 Explode();
                 PushBack(destroyDelay);
-                destroying = true;
+                _destroying = true;
             }
         }
 
@@ -143,10 +146,10 @@ namespace MultiplayerARPG
 
         protected virtual void Explode()
         {
-            if (isExploded)
+            if (_isExploded)
                 return;
 
-            isExploded = true;
+            _isExploded = true;
 
             if (onExploded != null)
                 onExploded.Invoke();

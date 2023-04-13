@@ -46,11 +46,11 @@ namespace MultiplayerARPG
         public bool instantiateDisappear = false;
         public GameObject disappearEffect;
 
-        private Vector3 initialPosition;
-        private bool impacted;
-        private Vector3 normal;
-        private Vector3 hitPos;
-        private Vector3 defaultImpactEffectPosition;
+        private Vector3 _initialPosition;
+        private bool _impacted;
+        private Vector3 _normal;
+        private Vector3 _hitPos;
+        private Vector3 _defaultImpactEffectPosition;
 
         public override void Setup(
             EntityInfo instigator,
@@ -65,24 +65,24 @@ namespace MultiplayerARPG
             base.Setup(instigator, weapon, damageAmounts, skill, skillLevel, missileDistance, missileSpeed, lockingTarget);
 
             // Initial configuration
-            initialPosition = CacheTransform.position;
-            impacted = false;
+            _initialPosition = CacheTransform.position;
+            _impacted = false;
 
             // Configuration bullet and effects
             if (projectileObject) projectileObject.SetActive(true);
             if (impactEffect && !instantiateImpact)
             {
                 impactEffect.SetActive(false);
-                defaultImpactEffectPosition = impactEffect.transform.localPosition;
+                _defaultImpactEffectPosition = impactEffect.transform.localPosition;
             }
             if (disappearEffect && !instantiateDisappear) disappearEffect.SetActive(false);
 
             // Movement
-            Vector3 targetPos = initialPosition + (CacheTransform.forward * missileDistance);
+            Vector3 targetPos = _initialPosition + (CacheTransform.forward * missileDistance);
 
             if (lockingTarget != null && lockingTarget.CurrentHp > 0) targetPos = lockingTarget.GetTransform().position;
 
-            float dist = Vector3.Distance(initialPosition, targetPos);
+            float dist = Vector3.Distance(_initialPosition, targetPos);
             float yOffset = -transform.forward.y;
 
             if (recalculateSpeed) missileSpeed = LaunchSpeed(dist, yOffset, Physics.gravity.magnitude, angle * Mathf.Deg2Rad);
@@ -106,7 +106,7 @@ namespace MultiplayerARPG
         protected override void FixedUpdate()
         {
             // Don't move if exploded or collided
-            if (isExploded || impacted) return;
+            if (_isExploded || _impacted) return;
 
             Vector3 point1 = CacheTransform.position;
             float stepSize = 1.0f / predictionStepPerFrame;
@@ -130,22 +130,22 @@ namespace MultiplayerARPG
                 switch (hitDetectionMode)
                 {
                     case HitDetectionMode.Raycast:
-                        hitCount = Physics.RaycastNonAlloc(origin, dir, hits3D, dist, hitLayers);
+                        hitCount = Physics.RaycastNonAlloc(origin, dir, _hits3D, dist, hitLayers);
                         break;
                     case HitDetectionMode.SphereCast:
-                        hitCount = Physics.SphereCastNonAlloc(origin, sphereCastRadius, dir, hits3D, dist, hitLayers);
+                        hitCount = Physics.SphereCastNonAlloc(origin, sphereCastRadius, dir, _hits3D, dist, hitLayers);
                         break;
                     case HitDetectionMode.BoxCast:
-                        hitCount = Physics.BoxCastNonAlloc(origin, boxCastSize * 0.5f, dir, hits3D, CacheTransform.rotation, dist, hitLayers);
+                        hitCount = Physics.BoxCastNonAlloc(origin, boxCastSize * 0.5f, dir, _hits3D, CacheTransform.rotation, dist, hitLayers);
                         break;
                 }
 
                 for (int i = 0; i < hitCount; ++i)
                 {
-                    hit = hits3D[i];
+                    hit = _hits3D[i];
                     if (useNormal)
-                        normal = hit.normal;
-                    hitPos = hit.point;
+                        _normal = hit.normal;
+                    _hitPos = hit.point;
 
                     // Hit itself, no impact
                     BaseGameEntity instigatorEntity;
@@ -153,7 +153,7 @@ namespace MultiplayerARPG
                         continue;
 
                     Impact(hit.collider.transform.gameObject);
-                    if (destroying)
+                    if (_destroying)
                     {
                         // Already hit something
                         return;
@@ -161,7 +161,7 @@ namespace MultiplayerARPG
                 }
 
                 // Moved too far from `initialPosition`
-                if (Vector3.Distance(initialPosition, point2) > missileDistance)
+                if (Vector3.Distance(_initialPosition, point2) > _missileDistance)
                 {
                     NoImpact();
                     return;
@@ -175,7 +175,7 @@ namespace MultiplayerARPG
 
         protected void NoImpact()
         {
-            if (destroying)
+            if (_destroying)
                 return;
 
             if (disappearEffect && IsClient)
@@ -192,11 +192,11 @@ namespace MultiplayerARPG
                     disappearEffect.SetActive(true);
 
                 PushBack(destroyDelay);
-                destroying = true;
+                _destroying = true;
                 return;
             }
             PushBack();
-            destroying = true;
+            _destroying = true;
         }
 
         protected void Impact(GameObject hitted)
@@ -235,8 +235,8 @@ namespace MultiplayerARPG
                 {
                     Quaternion hitRot = Quaternion.identity;
                     if (useNormal)
-                        hitRot = Quaternion.FromToRotation(Vector3.forward, normal);
-                    GameObject newImpactEffect = Instantiate(impactEffect, hitPos, hitRot);
+                        hitRot = Quaternion.FromToRotation(Vector3.forward, _normal);
+                    GameObject newImpactEffect = Instantiate(impactEffect, _hitPos, hitRot);
                     if (stickTo)
                         newImpactEffect.transform.parent = hitted.transform;
                     newImpactEffect.SetActive(true);
@@ -244,8 +244,8 @@ namespace MultiplayerARPG
                 else
                 {
                     if (useNormal)
-                        impactEffect.transform.rotation = Quaternion.FromToRotation(Vector3.forward, normal);
-                    impactEffect.transform.position = hitPos;
+                        impactEffect.transform.rotation = Quaternion.FromToRotation(Vector3.forward, _normal);
+                    impactEffect.transform.position = _hitPos;
                     if (stickTo)
                         impactEffect.transform.parent = hitted.transform;
                     impactEffect.SetActive(true);
@@ -259,9 +259,9 @@ namespace MultiplayerARPG
                 Explode();
             }
 
-            impacted = true;
+            _impacted = true;
             PushBack(destroyDelay);
-            destroying = true;
+            _destroying = true;
         }
 
         protected override void OnPushBack()
@@ -269,7 +269,7 @@ namespace MultiplayerARPG
             if (impactEffect && stickTo && !instantiateImpact)
             {
                 impactEffect.transform.parent = CacheTransform;
-                impactEffect.transform.localPosition = defaultImpactEffectPosition;
+                impactEffect.transform.localPosition = _defaultImpactEffectPosition;
             }
             base.OnPushBack();
         }

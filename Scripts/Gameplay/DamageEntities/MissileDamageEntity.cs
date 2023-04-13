@@ -21,27 +21,28 @@ namespace MultiplayerARPG
         [Tooltip("If this value more than 0, when it hit anything or it is out of life, it will explode and apply damage to characters in this distance")]
         public float explodeDistance;
 
-        protected float missileDistance;
-        protected float missileSpeed;
-        protected bool isExploded;
-        protected IDamageableEntity lockingTarget;
-
         public Rigidbody CacheRigidbody { get; private set; }
         public Rigidbody2D CacheRigidbody2D { get; private set; }
 
-        protected float launchTime;
-        protected float missileDuration;
-        protected bool destroying;
-        protected float? lagMoveSpeedRate;
-        protected Vector3? previousPosition;
-        protected RaycastHit2D[] hits2D = new RaycastHit2D[8];
-        protected RaycastHit[] hits3D = new RaycastHit[8];
+        protected float _missileDistance;
+        protected float _missileSpeed;
+        protected bool _isExploded;
+        protected IDamageableEntity _lockingTarget;
+        protected float _launchTime;
+        protected float _missileDuration;
+        protected bool _destroying;
+        protected float? _lagMoveSpeedRate;
+        protected Vector3? _previousPosition;
+        protected RaycastHit2D[] _hits2D = new RaycastHit2D[8];
+        protected RaycastHit[] _hits3D = new RaycastHit[8];
+        protected IgnoreColliderManager _ignoreColliderManager;
 
         protected override void Awake()
         {
             base.Awake();
             CacheRigidbody = GetComponent<Rigidbody>();
             CacheRigidbody2D = GetComponent<Rigidbody2D>();
+            _ignoreColliderManager = new IgnoreColliderManager(GetComponentsInChildren<Collider>(), GetComponentsInChildren<Collider2D>());
         }
 
         /// <summary>
@@ -66,28 +67,36 @@ namespace MultiplayerARPG
             IDamageableEntity lockingTarget)
         {
             Setup(instigator, weapon, damageAmounts, skill, skillLevel);
-            this.missileDistance = missileDistance;
-            this.missileSpeed = missileSpeed;
+            _missileDistance = missileDistance;
+            _missileSpeed = missileSpeed;
 
             if (missileDistance <= 0 && missileSpeed <= 0)
             {
                 // Explode immediately when distance and speed is 0
                 Explode();
                 PushBack(destroyDelay);
-                destroying = true;
+                _destroying = true;
                 return;
             }
-            this.lockingTarget = lockingTarget;
-            isExploded = false;
-            destroying = false;
-            launchTime = Time.unscaledTime;
-            missileDuration = (missileDistance / missileSpeed) + 0.1f;
+            _lockingTarget = lockingTarget;
+            _isExploded = false;
+            _destroying = false;
+            _launchTime = Time.unscaledTime;
+            _missileDuration = (missileDistance / missileSpeed) + 0.1f;
+            if (CurrentGameInstance.DimensionType == DimensionType.Dimension2D)
+            {
+                _ignoreColliderManager.ResetAndSetIgnoreColliders(instigator);
+            }
+            else
+            {
+                _ignoreColliderManager.ResetAndSetIgnoreCollider2Ds(instigator);
+            }
         }
 
         protected override void OnEnable()
         {
             base.OnEnable();
-            previousPosition = CacheTransform.position;
+            _previousPosition = CacheTransform.position;
         }
 
 #if UNITY_EDITOR
@@ -110,14 +119,14 @@ namespace MultiplayerARPG
 
         protected virtual void Update()
         {
-            if (destroying)
+            if (_destroying)
                 return;
 
-            if (Time.unscaledTime - launchTime >= missileDuration)
+            if (Time.unscaledTime - _launchTime >= _missileDuration)
             {
                 Explode();
                 PushBack(destroyDelay);
-                destroying = true;
+                _destroying = true;
             }
 
             HitDetect();
@@ -128,53 +137,53 @@ namespace MultiplayerARPG
         /// </summary>
         public virtual void HitDetect()
         {
-            if (!destroying)
+            if (!_destroying)
             {
-                if (previousPosition.HasValue)
+                if (_previousPosition.HasValue)
                 {
                     int hitCount = 0;
                     int layerMask = GameInstance.Singleton.GetDamageEntityHitLayerMask();
-                    Vector3 dir = (CacheTransform.position - previousPosition.Value).normalized;
-                    float dist = Vector3.Distance(CacheTransform.position, previousPosition.Value);
+                    Vector3 dir = (CacheTransform.position - _previousPosition.Value).normalized;
+                    float dist = Vector3.Distance(CacheTransform.position, _previousPosition.Value);
                     // Raycast to previous position to check is it hitting something or not
                     // If hit, explode
                     switch (hitDetectionMode)
                     {
                         case HitDetectionMode.Raycast:
                             if (CurrentGameInstance.DimensionType == DimensionType.Dimension2D)
-                                hitCount = Physics2D.RaycastNonAlloc(previousPosition.Value, dir, hits2D, dist, layerMask);
+                                hitCount = Physics2D.RaycastNonAlloc(_previousPosition.Value, dir, _hits2D, dist, layerMask);
                             else
-                                hitCount = Physics.RaycastNonAlloc(previousPosition.Value, dir, hits3D, dist, layerMask);
+                                hitCount = Physics.RaycastNonAlloc(_previousPosition.Value, dir, _hits3D, dist, layerMask);
                             break;
                         case HitDetectionMode.SphereCast:
                             if (CurrentGameInstance.DimensionType == DimensionType.Dimension2D)
-                                hitCount = Physics2D.CircleCastNonAlloc(previousPosition.Value, sphereCastRadius, dir, hits2D, dist, layerMask);
+                                hitCount = Physics2D.CircleCastNonAlloc(_previousPosition.Value, sphereCastRadius, dir, _hits2D, dist, layerMask);
                             else
-                                hitCount = Physics.SphereCastNonAlloc(previousPosition.Value, sphereCastRadius, dir, hits3D, dist, layerMask);
+                                hitCount = Physics.SphereCastNonAlloc(_previousPosition.Value, sphereCastRadius, dir, _hits3D, dist, layerMask);
                             break;
                         case HitDetectionMode.BoxCast:
                             if (CurrentGameInstance.DimensionType == DimensionType.Dimension2D)
-                                hitCount = Physics2D.BoxCastNonAlloc(previousPosition.Value, new Vector2(boxCastSize.x, boxCastSize.y), Vector2.SignedAngle(Vector2.zero, dir), dir, hits2D, dist, layerMask);
+                                hitCount = Physics2D.BoxCastNonAlloc(_previousPosition.Value, new Vector2(boxCastSize.x, boxCastSize.y), Vector2.SignedAngle(Vector2.zero, dir), dir, _hits2D, dist, layerMask);
                             else
-                                hitCount = Physics.BoxCastNonAlloc(previousPosition.Value, boxCastSize * 0.5f, dir, hits3D, CacheTransform.rotation, dist, layerMask);
+                                hitCount = Physics.BoxCastNonAlloc(_previousPosition.Value, boxCastSize * 0.5f, dir, _hits3D, CacheTransform.rotation, dist, layerMask);
                             break;
                     }
                     for (int i = 0; i < hitCount; ++i)
                     {
-                        if (CurrentGameInstance.DimensionType == DimensionType.Dimension2D && hits2D[i].transform != null)
-                            TriggerEnter(hits2D[i].transform.gameObject);
-                        if (CurrentGameInstance.DimensionType == DimensionType.Dimension3D && hits3D[i].transform != null)
-                            TriggerEnter(hits3D[i].transform.gameObject);
+                        if (CurrentGameInstance.DimensionType == DimensionType.Dimension2D && _hits2D[i].transform != null)
+                            TriggerEnter(_hits2D[i].transform.gameObject);
+                        if (CurrentGameInstance.DimensionType == DimensionType.Dimension3D && _hits3D[i].transform != null)
+                            TriggerEnter(_hits3D[i].transform.gameObject);
                     }
                 }
-                previousPosition = CacheTransform.position;
+                _previousPosition = CacheTransform.position;
             }
         }
 
         protected virtual void FixedUpdate()
         {
             // Don't move if exploded
-            if (isExploded)
+            if (_isExploded)
             {
                 if (CurrentGameInstance.DimensionType == DimensionType.Dimension2D)
                 {
@@ -189,7 +198,7 @@ namespace MultiplayerARPG
                 return;
             }
 
-            float currentMissileSpeed = CalculateCurrentMoveSpeed(missileSpeed, Time.fixedDeltaTime);
+            float currentMissileSpeed = CalculateCurrentMoveSpeed(_missileSpeed, Time.fixedDeltaTime);
             if (CurrentGameInstance.DimensionType == DimensionType.Dimension2D)
             {
                 if (CacheRigidbody2D != null)
@@ -209,13 +218,13 @@ namespace MultiplayerARPG
             {
                 float rtt = 0.001f * CurrentGameManager.Rtt;
                 float acc = 1f / rtt * deltaTime * 0.5f;
-                if (!lagMoveSpeedRate.HasValue)
-                    lagMoveSpeedRate = 0f;
-                if (lagMoveSpeedRate < 1f)
-                    lagMoveSpeedRate += acc;
-                if (lagMoveSpeedRate > 1f)
-                    lagMoveSpeedRate = 1f;
-                return maxMoveSpeed * lagMoveSpeedRate.Value;
+                if (!_lagMoveSpeedRate.HasValue)
+                    _lagMoveSpeedRate = 0f;
+                if (_lagMoveSpeedRate < 1f)
+                    _lagMoveSpeedRate += acc;
+                if (_lagMoveSpeedRate > 1f)
+                    _lagMoveSpeedRate = 1f;
+                return maxMoveSpeed * _lagMoveSpeedRate.Value;
             }
             // TODO: Adjust other's client move speed by rtt
             return maxMoveSpeed;
@@ -233,7 +242,7 @@ namespace MultiplayerARPG
                 if (CacheRigidbody != null)
                     CacheRigidbody.velocity = Vector3.zero;
             }
-            previousPosition = null;
+            _previousPosition = null;
             if (onDestroy != null)
                 onDestroy.Invoke();
             base.OnPushBack();
@@ -241,7 +250,7 @@ namespace MultiplayerARPG
 
         protected virtual void TriggerEnter(GameObject other)
         {
-            if (destroying)
+            if (_destroying)
                 return;
 
             if (!other.GetComponent<IUnHittable>().IsNull())
@@ -260,7 +269,7 @@ namespace MultiplayerARPG
                     ApplyDamageTo(target);
                 }
                 PushBack(destroyDelay);
-                destroying = true;
+                _destroying = true;
                 return;
             }
 
@@ -275,7 +284,7 @@ namespace MultiplayerARPG
                     Explode();
                 }
                 PushBack(destroyDelay);
-                destroying = true;
+                _destroying = true;
                 return;
             }
         }
@@ -295,7 +304,7 @@ namespace MultiplayerARPG
             if (instigator.TryGetEntity(out BaseGameEntity instigatorEntity) && instigatorEntity == target.Entity)
                 return false;
 
-            if (lockingTarget != null && lockingTarget.GetObjectId() != target.GetObjectId())
+            if (_lockingTarget != null && _lockingTarget.GetObjectId() != target.GetObjectId())
                 return false;
 
             return true;
@@ -313,10 +322,10 @@ namespace MultiplayerARPG
 
         protected virtual void Explode()
         {
-            if (isExploded)
+            if (_isExploded)
                 return;
 
-            isExploded = true;
+            _isExploded = true;
 
             // Explode when distance > 0
             if (explodeDistance <= 0f)
