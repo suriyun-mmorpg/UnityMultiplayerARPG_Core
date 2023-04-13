@@ -20,14 +20,14 @@ namespace MultiplayerARPG
         {
             ResetIgnoreColliders();
             if (_colliders != null && _colliders.Length > 0 && instigator.TryGetEntity(out BaseGameEntity entity))
-                SetIgnoreColliders(entity.GetComponentsInChildren<Collider>());
+                SetIgnoreColliders(entity.EntityGameObject.GetComponentsInChildren<Collider>());
         }
 
         public void ResetAndSetIgnoreCollider2Ds(EntityInfo instigator)
         {
             ResetIgnoreCollider2Ds();
             if (_collider2Ds != null && _collider2Ds.Length > 0 && instigator.TryGetEntity(out BaseGameEntity entity))
-                SetIgnoreColliders2D(entity.GetComponentsInChildren<Collider2D>());
+                SetIgnoreColliders2D(entity.EntityGameObject.GetComponentsInChildren<Collider2D>());
         }
 
         public void SetIgnoreColliders(Collider[] colliders)
