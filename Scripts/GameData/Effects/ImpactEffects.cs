@@ -10,39 +10,46 @@ namespace MultiplayerARPG
         public ImpactEffect[] effects;
 
         [System.NonSerialized]
-        private Dictionary<string, GameEffect> cacheEffects;
+        private Dictionary<string, GameEffect> _cacheEffects;
         public Dictionary<string, GameEffect> Effects
         {
             get
             {
-                if (cacheEffects == null)
+                if (_cacheEffects == null)
                 {
-                    cacheEffects = new Dictionary<string, GameEffect>();
+                    _cacheEffects = new Dictionary<string, GameEffect>();
                     if (effects != null && effects.Length > 0)
                     {
                         foreach (ImpactEffect effect in effects)
                         {
                             if (effect.effect == null)
                                 continue;
-                            cacheEffects[effect.tag.Tag] = effect.effect;
+                            _cacheEffects[effect.tag.Tag] = effect.effect;
                         }
                     }
                 }
-                return cacheEffects;
+                return _cacheEffects;
             }
         }
 
-        public GameEffect TryGetEffect(string tag)
+        public bool TryGetEffect(string tag, out GameEffect effect)
         {
-            if (Effects.ContainsKey(tag))
-                return Effects[tag];
-            return defaultEffect;
+            if (Effects.TryGetValue(tag, out effect))
+                return true;
+            if (defaultEffect != null)
+            {
+                effect = defaultEffect;
+                return true;
+            }
+            return false;
         }
 
         public void PrepareRelatesData()
         {
-            List<GameEffect> effects = new List<GameEffect>(Effects.Values);
-            effects.Add(defaultEffect);
+            List<GameEffect> effects = new List<GameEffect>(Effects.Values)
+            {
+                defaultEffect
+            };
             GameInstance.AddPoolingObjects(effects);
         }
     }

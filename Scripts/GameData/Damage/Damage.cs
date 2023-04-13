@@ -469,7 +469,7 @@ namespace MultiplayerARPG
                 if (isClient)
                 {
                     PoolSystem.GetInstance(projectileEffect, damagePosition, damageRotation)
-                        .Setup(projectileDistance, missileSpeed, impactEffects, impactEffectsData);
+                        .Setup(projectileDistance, missileSpeed, impactEffects, damagePosition, impactEffectsData);
                 }
                 return;
             }
@@ -513,7 +513,6 @@ namespace MultiplayerARPG
                             tag = tempTag,
                             point = tempHitPoint,
                             normal = tempHitNormal,
-                            distance = tempHitDistance,
                         });
                     }
 
@@ -566,7 +565,6 @@ namespace MultiplayerARPG
                         tag = tempTag,
                         point = tempHitPoint,
                         normal = tempHitNormal,
-                        distance = tempHitDistance,
                     });
                 }
 
@@ -588,7 +586,7 @@ namespace MultiplayerARPG
             if (isClient)
             {
                 PoolSystem.GetInstance(projectileEffect, damagePosition, damageRotation)
-                    .Setup(projectileDistance, missileSpeed, impactEffects, impactEffectsData);
+                    .Setup(projectileDistance, missileSpeed, impactEffects, damagePosition, impactEffectsData);
             }
         }
 

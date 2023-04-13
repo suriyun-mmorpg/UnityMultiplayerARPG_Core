@@ -8,6 +8,5 @@ namespace MultiplayerARPG
         public string tag;
         public Vector3 point;
         public Vector3 normal;
-        public float distance;
     }
 }
