@@ -149,25 +149,14 @@ namespace MultiplayerARPG
             Vector3 stagger,
             out Dictionary<uint, int> hitBoxes)
         {
-            hitBoxes = new Dictionary<uint, int>();
             if (attacker == null)
+            {
+                hitBoxes = new Dictionary<uint, int>();
                 return;
+            }
 
             switch (damageType)
             {
-                case DamageType.Melee:
-                    LaunchMeleeDamage(
-                        attacker,
-                        isLeftHand,
-                        weapon,
-                        damageAmounts,
-                        skill,
-                        skillLevel,
-                        randomSeed,
-                        aimPosition,
-                        stagger,
-                        hitBoxes);
-                    break;
                 case DamageType.Missile:
                     LaunchMissileDamage(
                         attacker,
@@ -179,7 +168,7 @@ namespace MultiplayerARPG
                         randomSeed,
                         aimPosition,
                         stagger,
-                        hitBoxes);
+                        out hitBoxes);
                     break;
                 case DamageType.Raycast:
                     LaunchRaycastDamage(
@@ -192,7 +181,7 @@ namespace MultiplayerARPG
                         randomSeed,
                         aimPosition,
                         stagger,
-                        hitBoxes);
+                        out hitBoxes);
                     break;
                 case DamageType.Throwable:
                     LaunchThrowableDamage(
@@ -205,10 +194,23 @@ namespace MultiplayerARPG
                         randomSeed,
                         aimPosition,
                         stagger,
-                        hitBoxes);
+                        out hitBoxes);
                     break;
                 case DamageType.Custom:
                     customDamageInfo.LaunchDamageEntity(
+                        attacker,
+                        isLeftHand,
+                        weapon,
+                        damageAmounts,
+                        skill,
+                        skillLevel,
+                        randomSeed,
+                        aimPosition,
+                        stagger,
+                        out hitBoxes);
+                    break;
+                default:
+                    LaunchMeleeDamage(
                         attacker,
                         isLeftHand,
                         weapon,
@@ -245,8 +247,9 @@ namespace MultiplayerARPG
             int randomSeed,
             AimPosition aimPosition,
             Vector3 stagger,
-            Dictionary<uint, int> hitBoxes)
+            out Dictionary<uint, int> hitBoxes)
         {
+            hitBoxes = new Dictionary<uint, int>();
             bool isClient = attacker.IsClient;
             bool isHost = attacker.IsHost;
             bool isOwnerClient = attacker.IsOwnerClient;
@@ -272,6 +275,7 @@ namespace MultiplayerARPG
             List<HitData> hitDataCollection = new List<HitData>();
             DamageableHitBox tempDamageableHitBox;
             GameObject tempGameObject;
+            string tempTag;
             int tempDamageTakenTargetIndex = 0;
             DamageableHitBox tempDamageTakenTarget = null;
             DamageableEntity tempSelectedTarget = null;
@@ -296,9 +300,13 @@ namespace MultiplayerARPG
                     // Hit wall... so play impact effects
                     if (isPlayImpactEffects)
                     {
+                        tempTag = tempGameObject.tag;
                         // Prepare data to instantiate impact effects
-                        Vector3 closestPoint = attacker.AttackPhysicFunctions.GetOverlapColliderClosestPoint(i, damagePosition);
-                        PoolSystem.GetInstance(impactEffects.TryGetEffect(tempGameObject.tag), closestPoint, Quaternion.LookRotation((closestPoint - damagePosition).normalized));
+                        if (impactEffects.TryGetEffect(tempTag, out GameEffect gameEffect))
+                        {
+                            Vector3 closestPoint = attacker.AttackPhysicFunctions.GetOverlapColliderClosestPoint(i, damagePosition);
+                            PoolSystem.GetInstance(gameEffect, closestPoint, Quaternion.LookRotation((closestPoint - damagePosition).normalized));
+                        }
                     }
                     continue;
                 }
@@ -321,17 +329,12 @@ namespace MultiplayerARPG
                 if (hitOnlySelectedTarget)
                 {
                     // Check with selected target
-                    if (hasSelectedTarget && tempSelectedTarget.GetObjectId() == tempDamageableHitBox.GetObjectId())
-                    {
-                        // This is selected target, so this is character which must receives damages
-                        tempDamageTakenTargetIndex = i;
-                        tempDamageTakenTarget = tempDamageableHitBox;
-                        break;
-                    }
                     // Set damage taken target, it will be used in-case it can't find selected target
                     tempDamageTakenTargetIndex = i;
                     tempDamageTakenTarget = tempDamageableHitBox;
-                    // Hit only selected target, will apply damage later (outside this loop)
+                    // The hitting entity is the selected target so break the loop to apply damage later (outside this loop)
+                    if (hasSelectedTarget && tempSelectedTarget.GetObjectId() == tempDamageableHitBox.GetObjectId())
+                        break;
                     continue;
                 }
 
@@ -353,8 +356,12 @@ namespace MultiplayerARPG
                 // Instantiate impact effects
                 if (isPlayImpactEffects)
                 {
-                    Vector3 closestPoint = attacker.AttackPhysicFunctions.GetOverlapColliderClosestPoint(i, damagePosition);
-                    PoolSystem.GetInstance(impactEffects.TryGetEffect(tempDamageableHitBox.EntityGameObject.tag), closestPoint, Quaternion.LookRotation((closestPoint - damagePosition).normalized));
+                    tempTag = tempDamageableHitBox.EntityGameObject.tag;
+                    if (impactEffects.TryGetEffect(tempTag, out GameEffect gameEffect))
+                    {
+                        Vector3 closestPoint = attacker.AttackPhysicFunctions.GetOverlapColliderClosestPoint(i, damagePosition);
+                        PoolSystem.GetInstance(gameEffect, closestPoint, Quaternion.LookRotation((closestPoint - damagePosition).normalized));
+                    }
                 }
             }
 
@@ -379,8 +386,12 @@ namespace MultiplayerARPG
                 // Instantiate impact effects
                 if (isPlayImpactEffects)
                 {
-                    Vector3 closestPoint = attacker.AttackPhysicFunctions.GetOverlapColliderClosestPoint(tempDamageTakenTargetIndex, damagePosition);
-                    PoolSystem.GetInstance(impactEffects.TryGetEffect(tempDamageTakenTarget.EntityGameObject.tag), closestPoint, Quaternion.LookRotation((closestPoint - damagePosition).normalized));
+                    tempTag = tempDamageTakenTarget.EntityGameObject.tag;
+                    if (impactEffects.TryGetEffect(tempTag, out GameEffect gameEffect))
+                    {
+                        Vector3 closestPoint = attacker.AttackPhysicFunctions.GetOverlapColliderClosestPoint(tempDamageTakenTargetIndex, damagePosition);
+                        PoolSystem.GetInstance(gameEffect, closestPoint, Quaternion.LookRotation((closestPoint - damagePosition).normalized));
+                    }
                 }
             }
 
@@ -399,8 +410,9 @@ namespace MultiplayerARPG
             int randomSeed,
             AimPosition aimPosition,
             Vector3 stagger,
-            Dictionary<uint, int> hitBoxes)
+            out Dictionary<uint, int> hitBoxes)
         {
+            hitBoxes = new Dictionary<uint, int>();
             // Spawn missile damage entity, it will move to target then apply damage when hit
             // Instantiates on both client and server (damage applies at server)
             if (missileDamageEntity == null)
@@ -428,8 +440,9 @@ namespace MultiplayerARPG
             int randomSeed,
             AimPosition aimPosition,
             Vector3 stagger,
-            Dictionary<uint, int> hitBoxes)
+            out Dictionary<uint, int> hitBoxes)
         {
+            hitBoxes = new Dictionary<uint, int>();
             bool isClient = attacker.IsClient;
             bool isHost = attacker.IsHost;
             bool isOwnerClient = attacker.IsOwnerClient;
@@ -460,6 +473,7 @@ namespace MultiplayerARPG
                 }
                 return;
             }
+
             projectileDistance = float.MinValue;
             byte pierceThroughEntities = this.pierceThroughEntities;
             List<HitData> hitDataCollection = new List<HitData>();
@@ -467,6 +481,7 @@ namespace MultiplayerARPG
             Vector3 tempHitNormal;
             float tempHitDistance;
             GameObject tempGameObject;
+            string tempTag;
             DamageableHitBox tempDamageableHitBox;
             // Find characters that receiving damages
             for (int tempLoopCounter = 0; tempLoopCounter < tempHitCount; ++tempLoopCounter)
@@ -492,9 +507,10 @@ namespace MultiplayerARPG
                     // Prepare data to instantiate impact effects
                     if (isPlayImpactEffects)
                     {
+                        tempTag = tempGameObject.tag;
                         impactEffectsData.Add(new ImpactEffectPlayingData()
                         {
-                            tag = tempGameObject.tag,
+                            tag = tempTag,
                             point = tempHitPoint,
                             normal = tempHitNormal,
                             distance = tempHitDistance,
@@ -544,9 +560,10 @@ namespace MultiplayerARPG
                 // Prepare data to instantiate impact effects
                 if (isPlayImpactEffects)
                 {
+                    tempTag = tempDamageableHitBox.EntityGameObject.tag;
                     impactEffectsData.Add(new ImpactEffectPlayingData()
                     {
-                        tag = tempDamageableHitBox.EntityGameObject.tag,
+                        tag = tempTag,
                         point = tempHitPoint,
                         normal = tempHitNormal,
                         distance = tempHitDistance,
@@ -585,8 +602,9 @@ namespace MultiplayerARPG
             int randomSeed,
             AimPosition aimPosition,
             Vector3 stagger,
-            Dictionary<uint, int> hitBoxes)
+            out Dictionary<uint, int> hitBoxes)
         {
+            hitBoxes = new Dictionary<uint, int>();
             if (throwableDamageEntity == null)
                 return;
 
