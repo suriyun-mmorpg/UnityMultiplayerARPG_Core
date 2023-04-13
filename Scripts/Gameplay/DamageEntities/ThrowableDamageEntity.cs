@@ -68,17 +68,17 @@ namespace MultiplayerARPG
             _throwedTime = Time.unscaledTime;
             if (CurrentGameInstance.DimensionType == DimensionType.Dimension2D)
             {
+                _ignoreColliderManager.ResetAndSetIgnoreColliders(instigator);
                 CacheRigidbody2D.velocity = Vector2.zero;
                 CacheRigidbody2D.angularVelocity = 0f;
                 CacheRigidbody2D.AddForce(CacheTransform.forward * throwForce, ForceMode2D.Impulse);
-                _ignoreColliderManager.ResetAndSetIgnoreColliders(instigator);
             }
             else
             {
+                _ignoreColliderManager.ResetAndSetIgnoreCollider2Ds(instigator);
                 CacheRigidbody.velocity = Vector3.zero;
                 CacheRigidbody.angularVelocity = Vector3.zero;
                 CacheRigidbody.AddForce(CacheTransform.forward * throwForce, ForceMode.Impulse);
-                _ignoreColliderManager.ResetAndSetIgnoreCollider2Ds(instigator);
             }
         }
 
