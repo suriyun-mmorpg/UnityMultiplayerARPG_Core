@@ -69,16 +69,16 @@ namespace MultiplayerARPG
             pooledObjects[prefab] = queue;
         }
 
-        public static T GetInstance<T>(T prefab)
+        public static T GetInstance<T>(T prefab, System.Action<T> onBeforeActivated = null)
             where T : Object, IPoolDescriptor
         {
             if (prefab == null)
                 return null;
-            T instance = GetInstance(prefab, Vector3.zero, Quaternion.identity);
+            T instance = GetInstance(prefab, Vector3.zero, Quaternion.identity, onBeforeActivated);
             return instance;
         }
 
-        public static T GetInstance<T>(T prefab, Vector3 position, Quaternion rotation)
+        public static T GetInstance<T>(T prefab, Vector3 position, Quaternion rotation, System.Action<T> onBeforeActivated = null)
             where T : Object, IPoolDescriptor
         {
             if (prefab == null)
@@ -99,6 +99,8 @@ namespace MultiplayerARPG
                     obj.transform.SetParent(PoolingTransform);
 #endif
                 }
+                if (onBeforeActivated != null)
+                    onBeforeActivated.Invoke(obj as T);
                 obj.ObjectPrefab = prefab;
                 obj.transform.position = position;
                 obj.transform.rotation = rotation;
@@ -109,7 +111,7 @@ namespace MultiplayerARPG
             }
 
             InitPool(prefab);
-            return GetInstance(prefab, position, rotation);
+            return GetInstance(prefab, position, rotation, onBeforeActivated);
         }
 
         public static void PushBack<T>(T instance)
