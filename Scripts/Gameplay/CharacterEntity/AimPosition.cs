@@ -1,4 +1,5 @@
 ﻿using LiteNetLib.Utils;
+using LiteNetLibManager;
 using UnityEngine;
 
 namespace MultiplayerARPG
@@ -45,5 +46,10 @@ namespace MultiplayerARPG
                 direction = direction,
             };
         }
+    }
+
+    [System.Serializable]
+    public class SyncFieldAimPosition : LiteNetLibSyncField<AimPosition>
+    {
     }
 }

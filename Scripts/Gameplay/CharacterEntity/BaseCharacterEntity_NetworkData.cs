@@ -30,6 +30,8 @@ namespace MultiplayerARPG
         [SerializeField]
         protected SyncFieldUShort pitch = new SyncFieldUShort();
         [SerializeField]
+        protected SyncFieldAimPosition aimPosition = new SyncFieldAimPosition();
+        [SerializeField]
         protected SyncFieldUInt targetEntityId = new SyncFieldUInt();
 
         [Category(101, "Sync Lists", false)]
@@ -90,7 +92,17 @@ namespace MultiplayerARPG
                 pitch.Value = (ushort)(value / 360f * 10000);
             }
         }
-        public AimPosition AimPosition { get; set; }
+        public AimPosition AimPosition
+        {
+            get
+            {
+                return aimPosition.Value;
+            }
+            set
+            {
+                aimPosition.Value = value;
+            }
+        }
 
         public IList<EquipWeapons> SelectableWeaponSets
         {
@@ -226,6 +238,8 @@ namespace MultiplayerARPG
             isWeaponsSheathed.syncMode = LiteNetLibSyncField.SyncMode.ClientMulticast;
             pitch.deliveryMethod = DeliveryMethod.Sequenced;
             pitch.syncMode = LiteNetLibSyncField.SyncMode.ServerToClients;
+            aimPosition.deliveryMethod = DeliveryMethod.Sequenced;
+            aimPosition.syncMode = LiteNetLibSyncField.SyncMode.ClientMulticast;
             targetEntityId.deliveryMethod = DeliveryMethod.ReliableOrdered;
             targetEntityId.syncMode = LiteNetLibSyncField.SyncMode.ServerToClients;
 
@@ -255,6 +269,7 @@ namespace MultiplayerARPG
             equipWeaponSet.onChange += OnEquipWeaponSetChange;
             isWeaponsSheathed.onChange += OnIsWeaponsSheathedChange;
             pitch.onChange += OnPitchChange;
+            aimPosition.onChange += OnAimPositionChange;
             targetEntityId.onChange += OnTargetEntityIdChange;
             // On list changed events
             selectableWeaponSets.onOperation += OnSelectableWeaponSetsOperation;
@@ -283,6 +298,7 @@ namespace MultiplayerARPG
             equipWeaponSet.onChange -= OnEquipWeaponSetChange;
             isWeaponsSheathed.onChange -= OnIsWeaponsSheathedChange;
             pitch.onChange -= OnPitchChange;
+            aimPosition.onChange -= OnAimPositionChange;
             targetEntityId.onChange -= OnTargetEntityIdChange;
             // On list changed events
             selectableWeaponSets.onOperation -= OnSelectableWeaponSetsOperation;
@@ -435,6 +451,17 @@ namespace MultiplayerARPG
         {
             if (onPitchChange != null)
                 onPitchChange.Invoke(pitch);
+        }
+
+        /// <summary>
+        /// This will be called when aim position changed
+        /// </summary>
+        /// <param name="isInitial"></param>
+        /// <param name="aimPosition"></param>
+        private void OnAimPositionChange(bool isInitial, AimPosition aimPosition)
+        {
+            if (onAimPositionChange != null)
+                onAimPositionChange.Invoke(aimPosition);
         }
 
         /// <summary>

@@ -26,6 +26,7 @@ namespace MultiplayerARPG
         public event System.Action<byte> onEquipWeaponSetChange;
         public event System.Action<bool> onIsWeaponsSheathedChange;
         public event System.Action<ushort> onPitchChange;
+        public event System.Action<AimPosition> onAimPositionChange;
         public event System.Action<uint> onTargetEntityIdChange;
         // Sync lists
         public event System.Action<LiteNetLibSyncList.Operation, int> onSelectableWeaponSetsOperation;
