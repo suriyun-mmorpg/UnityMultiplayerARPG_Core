@@ -4,54 +4,54 @@ namespace MultiplayerARPG
 {
     public class FxCollection
     {
-        private ParticleSystem[] particles;
-        private LineRenderer[] lineRenderers;
-        private AudioSource[] audioSources;
-        private AudioSourceSetter[] audioSourceSetters;
-        private bool[] particleDefaultLoops;
-        private bool[] lineRendererDefaultLoops;
-        private bool[] audioSourceDefaultLoops;
+        private ParticleSystem[] _particles;
+        private LineRenderer[] _lineRenderers;
+        private AudioSource[] _audioSources;
+        private AudioSourceSetter[] _audioSourceSetters;
+        private bool[] _particleDefaultLoops;
+        private bool[] _lineRendererDefaultLoops;
+        private bool[] _audioSourceDefaultLoops;
 
         public FxCollection(GameObject gameObject)
         {
             int i;
-            particles = gameObject.GetComponentsInChildren<ParticleSystem>(true);
-            particleDefaultLoops = new bool[particles.Length];
-            for (i = 0; i < particles.Length; ++i)
+            _particles = gameObject.GetComponentsInChildren<ParticleSystem>(true);
+            _particleDefaultLoops = new bool[_particles.Length];
+            for (i = 0; i < _particles.Length; ++i)
             {
-                particleDefaultLoops[i] = particles[i].main.loop;
+                _particleDefaultLoops[i] = _particles[i].main.loop;
             }
-            lineRenderers = gameObject.GetComponentsInChildren<LineRenderer>(true);
-            lineRendererDefaultLoops = new bool[lineRenderers.Length];
-            for (i = 0; i < lineRenderers.Length; ++i)
+            _lineRenderers = gameObject.GetComponentsInChildren<LineRenderer>(true);
+            _lineRendererDefaultLoops = new bool[_lineRenderers.Length];
+            for (i = 0; i < _lineRenderers.Length; ++i)
             {
-                lineRendererDefaultLoops[i] = lineRenderers[i].loop;
+                _lineRendererDefaultLoops[i] = _lineRenderers[i].loop;
             }
-            audioSources = gameObject.GetComponentsInChildren<AudioSource>(true);
-            audioSourceDefaultLoops = new bool[audioSources.Length];
-            for (i = 0; i < audioSources.Length; ++i)
+            _audioSources = gameObject.GetComponentsInChildren<AudioSource>(true);
+            _audioSourceDefaultLoops = new bool[_audioSources.Length];
+            for (i = 0; i < _audioSources.Length; ++i)
             {
-                audioSourceDefaultLoops[i] = audioSources[i].loop;
+                _audioSourceDefaultLoops[i] = _audioSources[i].loop;
             }
-            audioSourceSetters = gameObject.GetComponentsInChildren<AudioSourceSetter>(true);
+            _audioSourceSetters = gameObject.GetComponentsInChildren<AudioSourceSetter>(true);
         }
 
         public void RevertLoop()
         {
             int i;
             ParticleSystem.MainModule mainEmitter;
-            for (i = 0; i < particles.Length; ++i)
+            for (i = 0; i < _particles.Length; ++i)
             {
-                mainEmitter = particles[i].main;
-                mainEmitter.loop = particleDefaultLoops[i];
+                mainEmitter = _particles[i].main;
+                mainEmitter.loop = _particleDefaultLoops[i];
             }
-            for (i = 0; i < lineRenderers.Length; ++i)
+            for (i = 0; i < _lineRenderers.Length; ++i)
             {
-                lineRenderers[i].loop = lineRendererDefaultLoops[i];
+                _lineRenderers[i].loop = _lineRendererDefaultLoops[i];
             }
-            for (i = 0; i < audioSources.Length; ++i)
+            for (i = 0; i < _audioSources.Length; ++i)
             {
-                audioSources[i].loop = audioSourceDefaultLoops[i];
+                _audioSources[i].loop = _audioSourceDefaultLoops[i];
             }
         }
 
@@ -59,18 +59,18 @@ namespace MultiplayerARPG
         {
             int i;
             ParticleSystem.MainModule mainEmitter;
-            for (i = 0; i < particles.Length; ++i)
+            for (i = 0; i < _particles.Length; ++i)
             {
-                mainEmitter = particles[i].main;
+                mainEmitter = _particles[i].main;
                 mainEmitter.loop = loop;
             }
-            for (i = 0; i < lineRenderers.Length; ++i)
+            for (i = 0; i < _lineRenderers.Length; ++i)
             {
-                lineRenderers[i].loop = loop;
+                _lineRenderers[i].loop = loop;
             }
-            for (i = 0; i < audioSources.Length; ++i)
+            for (i = 0; i < _audioSources.Length; ++i)
             {
-                audioSources[i].loop = loop;
+                _audioSources[i].loop = loop;
             }
         }
 
@@ -78,18 +78,18 @@ namespace MultiplayerARPG
         {
             // Prepare particles
             ParticleSystem.MainModule mainEmitter;
-            foreach (ParticleSystem particle in particles)
+            foreach (ParticleSystem particle in _particles)
             {
                 mainEmitter = particle.main;
                 mainEmitter.playOnAwake = false;
             }
             // Prepare audio sources
-            foreach (AudioSource audioSource in audioSources)
+            foreach (AudioSource audioSource in _audioSources)
             {
                 audioSource.playOnAwake = false;
             }
             // Prepare audio source setters
-            foreach (AudioSourceSetter audioSourceSetter in audioSourceSetters)
+            foreach (AudioSourceSetter audioSourceSetter in _audioSourceSetters)
             {
                 audioSourceSetter.playOnAwake = false;
                 audioSourceSetter.playOnEnable = false;
@@ -103,29 +103,29 @@ namespace MultiplayerARPG
             int i;
             // Play particles
             ParticleSystem.MainModule mainEmitter;
-            for (i = 0; i < particles.Length; ++i)
+            for (i = 0; i < _particles.Length; ++i)
             {
-                mainEmitter = particles[i].main;
-                mainEmitter.loop = particleDefaultLoops[i];
-                particles[i].Play();
+                mainEmitter = _particles[i].main;
+                mainEmitter.loop = _particleDefaultLoops[i];
+                _particles[i].Play();
             }
             // Revert line renderers loop
-            for (i = 0; i < lineRenderers.Length; ++i)
+            for (i = 0; i < _lineRenderers.Length; ++i)
             {
-                lineRenderers[i].loop = lineRendererDefaultLoops[i];
+                _lineRenderers[i].loop = _lineRendererDefaultLoops[i];
             }
             // Play audio sources
             float volume = AudioManager.Singleton == null ? 1f : AudioManager.Singleton.sfxVolumeSetting.Level;
-            for (i = 0; i < audioSources.Length; ++i)
+            for (i = 0; i < _audioSources.Length; ++i)
             {
-                audioSources[i].loop = audioSourceDefaultLoops[i];
-                audioSources[i].volume = volume;
-                audioSources[i].Play();
+                _audioSources[i].loop = _audioSourceDefaultLoops[i];
+                _audioSources[i].volume = volume;
+                _audioSources[i].Play();
             }
             // Play audio source setters
-            for (i = 0; i < audioSourceSetters.Length; ++i)
+            for (i = 0; i < _audioSourceSetters.Length; ++i)
             {
-                audioSourceSetters[i].Play();
+                _audioSourceSetters[i].Play();
             }
         }
 
@@ -135,19 +135,19 @@ namespace MultiplayerARPG
                 return;
             int i;
             // Stop particles
-            for (i = 0; i < particles.Length; ++i)
+            for (i = 0; i < _particles.Length; ++i)
             {
-                particles[i].Stop();
+                _particles[i].Stop();
             }
             // Stop audio sources
-            for (i = 0; i < audioSources.Length; ++i)
+            for (i = 0; i < _audioSources.Length; ++i)
             {
-                audioSources[i].Stop();
+                _audioSources[i].Stop();
             }
             // Stop audio source setters
-            for (i = 0; i < audioSourceSetters.Length; ++i)
+            for (i = 0; i < _audioSourceSetters.Length; ++i)
             {
-                audioSourceSetters[i].Stop();
+                _audioSourceSetters[i].Stop();
             }
         }
     }

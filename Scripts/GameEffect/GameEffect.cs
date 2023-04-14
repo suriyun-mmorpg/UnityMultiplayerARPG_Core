@@ -28,34 +28,36 @@ namespace MultiplayerARPG
         public string effectSocket;
         public bool isLoop;
         public float lifeTime;
-        private bool intendToFollowingTarget;
-        private Transform followingTarget;
+        public AudioClip[] randomSoundEffects = new AudioClip[0];
+
+        private bool _intendToFollowTarget;
+        private Transform _followingTarget;
         public Transform FollowingTarget
         {
-            get { return followingTarget; }
+            get { return _followingTarget; }
             set
             {
                 if (value == null)
                     return;
-                followingTarget = value;
-                intendToFollowingTarget = true;
+                _followingTarget = value;
+                _intendToFollowTarget = true;
             }
         }
 
         public Transform CacheTransform { get; private set; }
-        private FxCollection fxCollection;
+
+        private FxCollection _fxCollection;
         public FxCollection FxCollection
         {
             get
             {
-                if (fxCollection == null)
-                    fxCollection = new FxCollection(gameObject);
-                return fxCollection;
+                if (_fxCollection == null)
+                    _fxCollection = new FxCollection(gameObject);
+                return _fxCollection;
             }
         }
 
-        public AudioClip[] randomSoundEffects = new AudioClip[0];
-        private float destroyTime;
+        private float _destroyTime;
 
         private void Awake()
         {
@@ -73,7 +75,7 @@ namespace MultiplayerARPG
 
         private void Update()
         {
-            if (destroyTime >= 0 && destroyTime - Time.time <= 0)
+            if (_destroyTime >= 0 && _destroyTime - Time.time <= 0)
             {
                 PushBack();
                 return;
@@ -84,7 +86,7 @@ namespace MultiplayerARPG
                 CacheTransform.position = FollowingTarget.position;
                 CacheTransform.rotation = FollowingTarget.rotation;
             }
-            else if (intendToFollowingTarget)
+            else if (_intendToFollowTarget)
             {
                 // Following target destroyed, don't push back immediately, destroy it after some delay
                 DestroyEffect();
@@ -94,7 +96,7 @@ namespace MultiplayerARPG
         public void DestroyEffect()
         {
             FxCollection.SetLoop(false);
-            destroyTime = Time.time + lifeTime;
+            _destroyTime = Time.time + lifeTime;
         }
 
         public override void InitPrefab()
@@ -122,7 +124,7 @@ namespace MultiplayerARPG
             if (!gameObject.activeSelf)
                 gameObject.SetActive(true);
             // Prepare destroy time
-            destroyTime = isLoop ? -1 : Time.time + lifeTime;
+            _destroyTime = isLoop ? -1 : Time.time + lifeTime;
             if (!Application.isBatchMode && !AudioListener.pause)
             {
                 // Play random audio
