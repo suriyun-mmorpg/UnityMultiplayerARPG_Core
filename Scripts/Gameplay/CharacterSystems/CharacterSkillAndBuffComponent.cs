@@ -9,13 +9,13 @@ namespace MultiplayerARPG
         public const float SKILL_BUFF_UPDATE_DURATION = 1f;
         public const string KEY_VEHICLE_BUFF = "<VEHICLE_BUFF>";
 
-        private float updatingTime;
-        private float deltaTime;
-        private Dictionary<string, CharacterRecoveryData> recoveryBuffs;
+        private float _updatingTime;
+        private float _deltaTime;
+        private Dictionary<string, CharacterRecoveryData> _recoveryBuffs;
 
         public override void EntityStart()
         {
-            recoveryBuffs = new Dictionary<string, CharacterRecoveryData>();
+            _recoveryBuffs = new Dictionary<string, CharacterRecoveryData>();
         }
 
         public override sealed void EntityUpdate()
@@ -23,13 +23,13 @@ namespace MultiplayerARPG
             if (!Entity.IsServer)
                 return;
 
-            deltaTime = Time.unscaledDeltaTime;
-            updatingTime += deltaTime;
+            _deltaTime = Time.unscaledDeltaTime;
+            _updatingTime += _deltaTime;
 
             if (Entity.IsRecaching || Entity.IsDead())
                 return;
 
-            if (updatingTime >= SKILL_BUFF_UPDATE_DURATION)
+            if (_updatingTime >= SKILL_BUFF_UPDATE_DURATION)
             {
                 float tempDuration;
                 int tempCount;
@@ -39,13 +39,13 @@ namespace MultiplayerARPG
                     if (tempDuration > 0f)
                     {
                         CharacterRecoveryData recoveryData;
-                        if (!recoveryBuffs.TryGetValue(KEY_VEHICLE_BUFF, out recoveryData))
+                        if (!_recoveryBuffs.TryGetValue(KEY_VEHICLE_BUFF, out recoveryData))
                         {
                             recoveryData = new CharacterRecoveryData(Entity);
                             recoveryData.SetupByBuff(null, Entity.PassengingVehicleEntity.GetBuff());
-                            recoveryBuffs.Add(KEY_VEHICLE_BUFF, recoveryData);
+                            _recoveryBuffs.Add(KEY_VEHICLE_BUFF, recoveryData);
                         }
-                        recoveryData.Apply(1 / tempDuration * updatingTime);
+                        recoveryData.Apply(1 / tempDuration * _updatingTime);
                     }
                 }
                 // Removing summons if it should
@@ -59,26 +59,26 @@ namespace MultiplayerARPG
                         tempDuration = summon.GetBuff().GetDuration();
                         if (summon.ShouldRemove())
                         {
-                            recoveryBuffs.Remove(summon.id);
+                            _recoveryBuffs.Remove(summon.id);
                             Entity.Summons.RemoveAt(i);
                             summon.UnSummon(Entity);
                         }
                         else
                         {
-                            summon.Update(updatingTime);
+                            summon.Update(_updatingTime);
                             Entity.Summons[i] = summon;
                         }
                         // If duration is 0, damages / recoveries will applied immediately, so don't apply it here
                         if (tempDuration > 0f)
                         {
                             CharacterRecoveryData recoveryData;
-                            if (!recoveryBuffs.TryGetValue(summon.id, out recoveryData))
+                            if (!_recoveryBuffs.TryGetValue(summon.id, out recoveryData))
                             {
                                 recoveryData = new CharacterRecoveryData(Entity);
                                 recoveryData.SetupByBuff(null, summon.GetBuff());
-                                recoveryBuffs.Add(summon.id, recoveryData);
+                                _recoveryBuffs.Add(summon.id, recoveryData);
                             }
-                            recoveryData.Apply(1 / tempDuration * updatingTime);
+                            recoveryData.Apply(1 / tempDuration * _updatingTime);
                         }
                         // Don't update next buffs if character dead
                         if (Entity.IsDead())
@@ -96,25 +96,25 @@ namespace MultiplayerARPG
                         tempDuration = buff.GetBuff().GetDuration();
                         if (buff.ShouldRemove())
                         {
-                            recoveryBuffs.Remove(buff.id);
+                            _recoveryBuffs.Remove(buff.id);
                             Entity.Buffs.RemoveAt(i);
                         }
                         else
                         {
-                            buff.Update(updatingTime);
+                            buff.Update(_updatingTime);
                             Entity.Buffs[i] = buff;
                         }
                         // If duration is 0, damages / recoveries will applied immediately, so don't apply it here
                         if (tempDuration > 0f)
                         {
                             CharacterRecoveryData recoveryData;
-                            if (!recoveryBuffs.TryGetValue(buff.id, out recoveryData))
+                            if (!_recoveryBuffs.TryGetValue(buff.id, out recoveryData))
                             {
                                 recoveryData = new CharacterRecoveryData(Entity);
                                 recoveryData.SetupByBuff(buff, buff.GetBuff());
-                                recoveryBuffs.Add(buff.id, recoveryData);
+                                _recoveryBuffs.Add(buff.id, recoveryData);
                             }
-                            recoveryData.Apply(1 / tempDuration * updatingTime);
+                            recoveryData.Apply(1 / tempDuration * _updatingTime);
                         }
                         // Don't update next buffs if character dead
                         if (Entity.IsDead())
@@ -135,12 +135,12 @@ namespace MultiplayerARPG
                         }
                         else
                         {
-                            skillUsage.Update(updatingTime);
+                            skillUsage.Update(_updatingTime);
                             Entity.SkillUsages[i] = skillUsage;
                         }
                     }
                 }
-                updatingTime = 0;
+                _updatingTime = 0;
             }
         }
 

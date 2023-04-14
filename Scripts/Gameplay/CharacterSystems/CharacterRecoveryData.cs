@@ -19,18 +19,18 @@ namespace MultiplayerARPG
         public float TotalDamageOverTime { get; set; } = 0f;
         public Dictionary<DamageElement, MinMaxFloat> DamageOverTimes { get; set; } = new Dictionary<DamageElement, MinMaxFloat>();
 
-        private float calculatingRecoveryingHp = 0f;
-        private float calculatingRecoveryingMp = 0f;
-        private float calculatingRecoveryingStamina = 0f;
-        private float calculatingRecoveryingFood = 0f;
-        private float calculatingRecoveryingWater = 0f;
-        private float calculatingDecreasingHp = 0f;
-        private float calculatingDecreasingMp = 0f;
-        private float calculatingDecreasingStamina = 0f;
-        private float calculatingDecreasingFood = 0f;
-        private float calculatingDecreasingWater = 0f;
-        private float calculatingTotalDamageOverTime = 0f;
-        private CharacterBuff buff;
+        private float _calculatingRecoveryingHp = 0f;
+        private float _calculatingRecoveryingMp = 0f;
+        private float _calculatingRecoveryingStamina = 0f;
+        private float _calculatingRecoveryingFood = 0f;
+        private float _calculatingRecoveryingWater = 0f;
+        private float _calculatingDecreasingHp = 0f;
+        private float _calculatingDecreasingMp = 0f;
+        private float _calculatingDecreasingStamina = 0f;
+        private float _calculatingDecreasingFood = 0f;
+        private float _calculatingDecreasingWater = 0f;
+        private float _calculatingTotalDamageOverTime = 0f;
+        private CharacterBuff _buff;
 
         public CharacterRecoveryData(BaseCharacterEntity characterEntity)
         {
@@ -39,7 +39,7 @@ namespace MultiplayerARPG
 
         public void SetupByBuff(CharacterBuff buff, CalculatedBuff calculatedBuff)
         {
-            this.buff = buff;
+            _buff = buff;
             // Damage over time
             TotalDamageOverTime = 0f;
             DamageOverTimes = calculatedBuff.GetDamageOverTimes();
@@ -82,7 +82,7 @@ namespace MultiplayerARPG
 
         public void Clear()
         {
-            buff = null;
+            _buff = null;
             RecoveryingHp = 0f;
             RecoveryingMp = 0f;
             RecoveryingStamina = 0f;
@@ -95,161 +95,161 @@ namespace MultiplayerARPG
             DecreasingWater = 0f;
             TotalDamageOverTime = 0f;
             DamageOverTimes.Clear();
-            calculatingRecoveryingHp = 0f;
-            calculatingRecoveryingMp = 0f;
-            calculatingRecoveryingStamina = 0f;
-            calculatingRecoveryingFood = 0f;
-            calculatingRecoveryingWater = 0f;
-            calculatingDecreasingHp = 0f;
-            calculatingDecreasingMp = 0f;
-            calculatingDecreasingStamina = 0f;
-            calculatingDecreasingFood = 0f;
-            calculatingDecreasingWater = 0f;
-            calculatingTotalDamageOverTime = 0f;
+            _calculatingRecoveryingHp = 0f;
+            _calculatingRecoveryingMp = 0f;
+            _calculatingRecoveryingStamina = 0f;
+            _calculatingRecoveryingFood = 0f;
+            _calculatingRecoveryingWater = 0f;
+            _calculatingDecreasingHp = 0f;
+            _calculatingDecreasingMp = 0f;
+            _calculatingDecreasingStamina = 0f;
+            _calculatingDecreasingFood = 0f;
+            _calculatingDecreasingWater = 0f;
+            _calculatingTotalDamageOverTime = 0f;
         }
 
         public void Apply(float rate)
         {
-            EntityInfo instigator = buff != null ? buff.BuffApplier : EntityInfo.Empty;
+            EntityInfo instigator = _buff != null ? _buff.BuffApplier : EntityInfo.Empty;
 
             int tempAmount;
             // Hp
             if (CharacterEntity.CurrentHp < CharacterEntity.MaxHp)
             {
-                calculatingRecoveryingHp += RecoveryingHp * rate;
-                if (calculatingRecoveryingHp >= 1)
+                _calculatingRecoveryingHp += RecoveryingHp * rate;
+                if (_calculatingRecoveryingHp >= 1)
                 {
-                    tempAmount = (int)calculatingRecoveryingHp;
+                    tempAmount = (int)_calculatingRecoveryingHp;
                     if (tempAmount < 0)
                         tempAmount = 0;
                     CharacterEntity.OnBuffHpRecovery(instigator, tempAmount);
-                    calculatingRecoveryingHp -= tempAmount;
+                    _calculatingRecoveryingHp -= tempAmount;
                 }
             }
 
             // Decrease Hp
             if (CharacterEntity.CurrentHp > 0)
             {
-                calculatingDecreasingHp += DecreasingHp * rate;
-                if (calculatingDecreasingHp >= 1)
+                _calculatingDecreasingHp += DecreasingHp * rate;
+                if (_calculatingDecreasingHp >= 1)
                 {
-                    tempAmount = (int)calculatingDecreasingHp;
+                    tempAmount = (int)_calculatingDecreasingHp;
                     if (tempAmount < 0)
                         tempAmount = 0;
                     CharacterEntity.OnBuffHpDecrease(instigator, tempAmount);
-                    calculatingDecreasingHp -= tempAmount;
+                    _calculatingDecreasingHp -= tempAmount;
                 }
             }
 
             // Mp
             if (CharacterEntity.CurrentMp < CharacterEntity.MaxMp)
             {
-                calculatingRecoveryingMp += RecoveryingMp * rate;
-                if (calculatingRecoveryingMp >= 1)
+                _calculatingRecoveryingMp += RecoveryingMp * rate;
+                if (_calculatingRecoveryingMp >= 1)
                 {
-                    tempAmount = (int)calculatingRecoveryingMp;
+                    tempAmount = (int)_calculatingRecoveryingMp;
                     if (tempAmount < 0)
                         tempAmount = 0;
                     CharacterEntity.OnBuffMpRecovery(instigator, tempAmount);
-                    calculatingRecoveryingMp -= tempAmount;
+                    _calculatingRecoveryingMp -= tempAmount;
                 }
             }
 
             // Decrease Mp
             if (CharacterEntity.CurrentMp > 0)
             {
-                calculatingDecreasingMp += DecreasingMp * rate;
-                if (calculatingDecreasingMp >= 1)
+                _calculatingDecreasingMp += DecreasingMp * rate;
+                if (_calculatingDecreasingMp >= 1)
                 {
-                    tempAmount = (int)calculatingDecreasingMp;
+                    tempAmount = (int)_calculatingDecreasingMp;
                     if (tempAmount < 0)
                         tempAmount = 0;
                     CharacterEntity.OnBuffMpDecrease(instigator, tempAmount);
-                    calculatingDecreasingMp -= tempAmount;
+                    _calculatingDecreasingMp -= tempAmount;
                 }
             }
 
             // Stamina
             if (CharacterEntity.CurrentStamina < CharacterEntity.MaxStamina)
             {
-                calculatingRecoveryingStamina += RecoveryingStamina * rate;
-                if (calculatingRecoveryingStamina >= 1)
+                _calculatingRecoveryingStamina += RecoveryingStamina * rate;
+                if (_calculatingRecoveryingStamina >= 1)
                 {
-                    tempAmount = (int)calculatingRecoveryingStamina;
+                    tempAmount = (int)_calculatingRecoveryingStamina;
                     if (tempAmount < 0)
                         tempAmount = 0;
                     CharacterEntity.OnBuffStaminaRecovery(instigator, tempAmount);
-                    calculatingRecoveryingStamina -= tempAmount;
+                    _calculatingRecoveryingStamina -= tempAmount;
                 }
             }
 
             // Decrease Stamina
             if (CharacterEntity.CurrentStamina > 0)
             {
-                calculatingDecreasingStamina += DecreasingStamina * rate;
-                if (calculatingDecreasingStamina >= 1)
+                _calculatingDecreasingStamina += DecreasingStamina * rate;
+                if (_calculatingDecreasingStamina >= 1)
                 {
-                    tempAmount = (int)calculatingDecreasingStamina;
+                    tempAmount = (int)_calculatingDecreasingStamina;
                     if (tempAmount < 0)
                         tempAmount = 0;
                     CharacterEntity.OnBuffStaminaDecrease(instigator, tempAmount);
-                    calculatingDecreasingStamina -= tempAmount;
+                    _calculatingDecreasingStamina -= tempAmount;
                 }
             }
 
             // Food
             if (CharacterEntity.CurrentFood < CharacterEntity.MaxFood)
             {
-                calculatingRecoveryingFood += RecoveryingFood * rate;
-                if (calculatingRecoveryingFood >= 1)
+                _calculatingRecoveryingFood += RecoveryingFood * rate;
+                if (_calculatingRecoveryingFood >= 1)
                 {
-                    tempAmount = (int)calculatingRecoveryingFood;
+                    tempAmount = (int)_calculatingRecoveryingFood;
                     if (tempAmount < 0)
                         tempAmount = 0;
                     CharacterEntity.OnBuffFoodRecovery(instigator, tempAmount);
-                    calculatingRecoveryingFood -= tempAmount;
+                    _calculatingRecoveryingFood -= tempAmount;
                 }
             }
 
             // Decrease Food
             if (CharacterEntity.CurrentFood > 0)
             {
-                calculatingDecreasingFood += DecreasingFood * rate;
-                if (calculatingDecreasingFood >= 1)
+                _calculatingDecreasingFood += DecreasingFood * rate;
+                if (_calculatingDecreasingFood >= 1)
                 {
-                    tempAmount = (int)calculatingDecreasingFood;
+                    tempAmount = (int)_calculatingDecreasingFood;
                     if (tempAmount < 0)
                         tempAmount = 0;
                     CharacterEntity.OnBuffFoodDecrease(instigator, tempAmount);
-                    calculatingDecreasingFood -= tempAmount;
+                    _calculatingDecreasingFood -= tempAmount;
                 }
             }
 
             // Water
             if (CharacterEntity.CurrentWater < CharacterEntity.MaxWater)
             {
-                calculatingRecoveryingWater += RecoveryingWater * rate;
-                if (calculatingRecoveryingWater >= 1)
+                _calculatingRecoveryingWater += RecoveryingWater * rate;
+                if (_calculatingRecoveryingWater >= 1)
                 {
-                    tempAmount = (int)calculatingRecoveryingWater;
+                    tempAmount = (int)_calculatingRecoveryingWater;
                     if (tempAmount < 0)
                         tempAmount = 0;
                     CharacterEntity.OnBuffWaterRecovery(instigator, tempAmount);
-                    calculatingRecoveryingWater -= tempAmount;
+                    _calculatingRecoveryingWater -= tempAmount;
                 }
             }
 
             // Decrease Water
             if (CharacterEntity.CurrentWater > 0)
             {
-                calculatingDecreasingWater += DecreasingWater * rate;
-                if (calculatingDecreasingWater >= 1)
+                _calculatingDecreasingWater += DecreasingWater * rate;
+                if (_calculatingDecreasingWater >= 1)
                 {
-                    tempAmount = (int)calculatingDecreasingWater;
+                    tempAmount = (int)_calculatingDecreasingWater;
                     if (tempAmount < 0)
                         tempAmount = 0;
                     CharacterEntity.OnBuffWaterDecrease(instigator, tempAmount);
-                    calculatingDecreasingWater -= tempAmount;
+                    _calculatingDecreasingWater -= tempAmount;
                 }
             }
 
@@ -259,24 +259,24 @@ namespace MultiplayerARPG
             // Apply damage overtime
             if (CharacterEntity.CurrentHp > 0)
             {
-                calculatingTotalDamageOverTime += TotalDamageOverTime * rate;
-                if (calculatingTotalDamageOverTime >= 1)
+                _calculatingTotalDamageOverTime += TotalDamageOverTime * rate;
+                if (_calculatingTotalDamageOverTime >= 1)
                 {
                     CharacterItem weapon = null;
                     BaseSkill skill = null;
                     int skillLevel = 0;
-                    if (buff != null)
+                    if (_buff != null)
                     {
-                        weapon = buff.BuffApplierWeapon;
-                        skill = buff.GetSkill();
-                        skillLevel = buff.level;
+                        weapon = _buff.BuffApplierWeapon;
+                        skill = _buff.GetSkill();
+                        skillLevel = _buff.level;
                     }
-                    tempAmount = (int)calculatingTotalDamageOverTime;
+                    tempAmount = (int)_calculatingTotalDamageOverTime;
                     if (tempAmount < 0)
                         tempAmount = 0;
                     CharacterEntity.CurrentHp -= tempAmount;
-                    CharacterEntity.ReceivedDamage(HitBoxPosition.None, CharacterEntity.EntityTransform.position, instigator, DamageOverTimes, CombatAmountType.NormalDamage, tempAmount, weapon, skill, skillLevel, buff, true);
-                    calculatingTotalDamageOverTime -= tempAmount;
+                    CharacterEntity.ReceivedDamage(HitBoxPosition.None, CharacterEntity.EntityTransform.position, instigator, DamageOverTimes, CombatAmountType.NormalDamage, tempAmount, weapon, skill, skillLevel, _buff, true);
+                    _calculatingTotalDamageOverTime -= tempAmount;
                 }
             }
         }

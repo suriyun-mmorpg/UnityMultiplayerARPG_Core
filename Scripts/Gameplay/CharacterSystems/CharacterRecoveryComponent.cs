@@ -4,14 +4,14 @@ namespace MultiplayerARPG
 {
     public class CharacterRecoveryComponent : BaseGameEntityComponent<BaseCharacterEntity>
     {
-        private float updatingTime;
-        private float deltaTime;
-        private CharacterRecoveryData recoveryData;
-        private bool isClearRecoveryData;
+        private float _updatingTime;
+        private float _deltaTime;
+        private CharacterRecoveryData _recoveryData;
+        private bool _isClearRecoveryData;
 
         public override void EntityStart()
         {
-            recoveryData = new CharacterRecoveryData(Entity);
+            _recoveryData = new CharacterRecoveryData(Entity);
         }
 
         public override sealed void EntityUpdate()
@@ -19,35 +19,35 @@ namespace MultiplayerARPG
             if (!Entity.IsServer)
                 return;
 
-            deltaTime = Time.unscaledDeltaTime;
+            _deltaTime = Time.unscaledDeltaTime;
 
             if (Entity.IsRecaching)
                 return;
 
             if (Entity.IsDead())
             {
-                if (!isClearRecoveryData)
+                if (!_isClearRecoveryData)
                 {
-                    isClearRecoveryData = true;
-                    recoveryData.Clear();
+                    _isClearRecoveryData = true;
+                    _recoveryData.Clear();
                 }
                 return;
             }
-            isClearRecoveryData = false;
+            _isClearRecoveryData = false;
 
-            updatingTime += deltaTime;
-            if (updatingTime >= CurrentGameplayRule.GetRecoveryUpdateDuration())
+            _updatingTime += _deltaTime;
+            if (_updatingTime >= CurrentGameplayRule.GetRecoveryUpdateDuration())
             {
-                recoveryData.RecoveryingHp = CurrentGameplayRule.GetRecoveryHpPerSeconds(Entity);
-                recoveryData.DecreasingHp = CurrentGameplayRule.GetDecreasingHpPerSeconds(Entity);
-                recoveryData.RecoveryingMp = CurrentGameplayRule.GetRecoveryMpPerSeconds(Entity);
-                recoveryData.DecreasingMp = CurrentGameplayRule.GetDecreasingMpPerSeconds(Entity);
-                recoveryData.RecoveryingStamina = CurrentGameplayRule.GetRecoveryStaminaPerSeconds(Entity);
-                recoveryData.DecreasingStamina = CurrentGameplayRule.GetDecreasingStaminaPerSeconds(Entity);
-                recoveryData.DecreasingFood = CurrentGameplayRule.GetDecreasingFoodPerSeconds(Entity);
-                recoveryData.DecreasingWater = CurrentGameplayRule.GetDecreasingWaterPerSeconds(Entity);
-                recoveryData.Apply(updatingTime);
-                updatingTime = 0;
+                _recoveryData.RecoveryingHp = CurrentGameplayRule.GetRecoveryHpPerSeconds(Entity);
+                _recoveryData.DecreasingHp = CurrentGameplayRule.GetDecreasingHpPerSeconds(Entity);
+                _recoveryData.RecoveryingMp = CurrentGameplayRule.GetRecoveryMpPerSeconds(Entity);
+                _recoveryData.DecreasingMp = CurrentGameplayRule.GetDecreasingMpPerSeconds(Entity);
+                _recoveryData.RecoveryingStamina = CurrentGameplayRule.GetRecoveryStaminaPerSeconds(Entity);
+                _recoveryData.DecreasingStamina = CurrentGameplayRule.GetDecreasingStaminaPerSeconds(Entity);
+                _recoveryData.DecreasingFood = CurrentGameplayRule.GetDecreasingFoodPerSeconds(Entity);
+                _recoveryData.DecreasingWater = CurrentGameplayRule.GetDecreasingWaterPerSeconds(Entity);
+                _recoveryData.Apply(_updatingTime);
+                _updatingTime = 0;
             }
         }
     }
