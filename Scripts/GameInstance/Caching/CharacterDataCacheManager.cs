@@ -4,29 +4,29 @@ namespace MultiplayerARPG
 {
     public static class CharacterDataCacheManager
     {
-        private static readonly Dictionary<ICharacterData, CharacterDataCache> caches = new Dictionary<ICharacterData, CharacterDataCache>();
+        private static readonly Dictionary<ICharacterData, CharacterDataCache> s_caches = new Dictionary<ICharacterData, CharacterDataCache>();
 
         public static CharacterDataCache GetCaches(this ICharacterData characterData)
         {
             if (characterData == null)
                 return null;
-            if (!caches.ContainsKey(characterData))
-                caches[characterData] = new CharacterDataCache().MarkToMakeCaches().MakeCache(characterData);
-            return caches[characterData].MakeCache(characterData);
+            if (!s_caches.ContainsKey(characterData))
+                s_caches[characterData] = new CharacterDataCache().MarkToMakeCaches().MakeCache(characterData);
+            return s_caches[characterData].MakeCache(characterData);
         }
 
         public static CharacterDataCache MarkToMakeCaches(this ICharacterData characterData)
         {
             if (characterData == null)
                 return null;
-            if (!caches.ContainsKey(characterData))
+            if (!s_caches.ContainsKey(characterData))
                 return new CharacterDataCache().MarkToMakeCaches();
-            return caches[characterData].MarkToMakeCaches();
+            return s_caches[characterData].MarkToMakeCaches();
         }
 
         public static void Clear()
         {
-            caches.Clear();
+            s_caches.Clear();
         }
     }
 }

@@ -4,10 +4,10 @@ namespace MultiplayerARPG
 {
     public class ItemRandomBonusCache
     {
-        private CharacterStats characterStats;
-        public CharacterStats CharacterStats { get { return characterStats; } }
-        private CharacterStats characterStatsRate;
-        public CharacterStats CharacterStatsRate { get { return characterStatsRate; } }
+        private CharacterStats _characterStats;
+        public CharacterStats CharacterStats { get { return _characterStats; } }
+        private CharacterStats _characterStatsRate;
+        public CharacterStats CharacterStatsRate { get { return _characterStatsRate; } }
         public Dictionary<Attribute, float> AttributeAmounts { get; private set; }
         public Dictionary<Attribute, float> AttributeAmountRates { get; private set; }
         public Dictionary<DamageElement, float> ResistanceAmounts { get; private set; }
@@ -21,8 +21,8 @@ namespace MultiplayerARPG
         {
             DataId = equipmentItem.DataId;
             RandomSeed = randomSeed;
-            characterStats = new CharacterStats();
-            characterStatsRate = new CharacterStats();
+            _characterStats = new CharacterStats();
+            _characterStatsRate = new CharacterStats();
             AttributeAmounts = new Dictionary<Attribute, float>();
             AttributeAmountRates = new Dictionary<Attribute, float>();
             ResistanceAmounts = new Dictionary<DamageElement, float>();
@@ -39,8 +39,8 @@ namespace MultiplayerARPG
             actions[3] = () => RandomArmorAmounts(random, randomBonus, ref appliedAmount);
             actions[4] = () => RandomDamageAmounts(random, randomBonus, ref appliedAmount);
             actions[5] = () => RandomSkillLevels(random, randomBonus, ref appliedAmount);
-            actions[6] = () => RandomCharacterStats(random, randomBonus, randomBonus.randomCharacterStats, ref characterStats, ref appliedAmount);
-            actions[7] = () => RandomCharacterStats(random, randomBonus, randomBonus.randomCharacterStatsRate, ref characterStatsRate, ref appliedAmount);
+            actions[6] = () => RandomCharacterStats(random, randomBonus, randomBonus.randomCharacterStats, ref _characterStats, ref appliedAmount);
+            actions[7] = () => RandomCharacterStats(random, randomBonus, randomBonus.randomCharacterStatsRate, ref _characterStatsRate, ref appliedAmount);
             actions.Shuffle(random);
             actions[0].Invoke();
             actions[1].Invoke();

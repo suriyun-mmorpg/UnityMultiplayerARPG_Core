@@ -6,21 +6,21 @@ namespace MultiplayerARPG
     public sealed class CharacterDataCache
     {
         public bool IsRecaching { get; private set; }
-        private CharacterStats stats;
-        public CharacterStats Stats => stats;
+        private CharacterStats _stats;
+        public CharacterStats Stats => _stats;
         public Dictionary<Attribute, float> Attributes { get; }
         public Dictionary<BaseSkill, int> Skills { get; }
         public Dictionary<DamageElement, float> Resistances { get; }
         public Dictionary<DamageElement, float> Armors { get; }
         public Dictionary<DamageElement, MinMaxFloat> IncreaseDamages { get; }
         public Dictionary<EquipmentSet, int> EquipmentSets { get; }
-        public int MaxHp => (int)stats.hp;
-        public int MaxMp => (int)stats.mp;
-        public int MaxStamina => (int)stats.stamina;
-        public int MaxFood => (int)stats.food;
-        public int MaxWater => (int)stats.water;
-        public float AtkSpeed => stats.atkSpeed;
-        public float MoveSpeed => stats.moveSpeed;
+        public int MaxHp => (int)_stats.hp;
+        public int MaxMp => (int)_stats.mp;
+        public int MaxStamina => (int)_stats.stamina;
+        public int MaxFood => (int)_stats.food;
+        public int MaxWater => (int)_stats.water;
+        public float AtkSpeed => _stats.atkSpeed;
+        public float MoveSpeed => _stats.moveSpeed;
         public float BaseMoveSpeed { get; private set; }
         public float TotalItemWeight { get; private set; }
         public int TotalItemSlot { get; private set; }
@@ -76,7 +76,7 @@ namespace MultiplayerARPG
             int oldBattlePoints = BattlePoints;
 
             characterData.GetAllStats(
-                ref stats,
+                ref _stats,
                 Attributes,
                 Resistances,
                 Armors,
@@ -88,10 +88,10 @@ namespace MultiplayerARPG
             if (characterData.GetDatabase() != null)
                 BaseMoveSpeed = characterData.GetDatabase().Stats.baseStats.moveSpeed;
 
-            TotalItemWeight = GameInstance.Singleton.GameplayRule.GetTotalWeight(characterData, stats);
-            TotalItemSlot = GameInstance.Singleton.GameplayRule.GetTotalSlot(characterData, stats);
-            LimitItemWeight = GameInstance.Singleton.GameplayRule.GetLimitWeight(characterData, stats);
-            LimitItemSlot = GameInstance.Singleton.GameplayRule.GetLimitSlot(characterData, stats);
+            TotalItemWeight = GameInstance.Singleton.GameplayRule.GetTotalWeight(characterData, _stats);
+            TotalItemSlot = GameInstance.Singleton.GameplayRule.GetTotalSlot(characterData, _stats);
+            LimitItemWeight = GameInstance.Singleton.GameplayRule.GetLimitWeight(characterData, _stats);
+            LimitItemSlot = GameInstance.Singleton.GameplayRule.GetLimitSlot(characterData, _stats);
 
             IsOverweight = (GameInstance.Singleton.IsLimitInventorySlot && TotalItemSlot > LimitItemSlot) || (GameInstance.Singleton.IsLimitInventoryWeight && TotalItemWeight > LimitItemWeight);
             DisallowMove = false;
