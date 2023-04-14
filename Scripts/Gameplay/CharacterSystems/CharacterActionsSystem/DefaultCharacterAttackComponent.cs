@@ -13,30 +13,30 @@ namespace MultiplayerARPG
         public const float DEFAULT_TOTAL_DURATION = 2f;
         public const float DEFAULT_TRIGGER_DURATION = 1f;
         public const float DEFAULT_STATE_SETUP_DELAY = 1f;
-        protected List<CancellationTokenSource> attackCancellationTokenSources = new List<CancellationTokenSource>();
+        protected readonly List<CancellationTokenSource> _attackCancellationTokenSources = new List<CancellationTokenSource>();
         public bool IsAttacking { get; protected set; }
         public float LastAttackEndTime { get; protected set; }
         public float MoveSpeedRateWhileAttacking { get; protected set; }
         public MovementRestriction MovementRestrictionWhileAttacking { get; protected set; }
-        protected float totalDuration;
-        public float AttackTotalDuration { get { return totalDuration; } set { totalDuration = value; } }
-        protected float[] triggerDurations;
-        public float[] AttackTriggerDurations { get { return triggerDurations; } set { triggerDurations = value; } }
+        protected float _totalDuration;
+        public float AttackTotalDuration { get { return _totalDuration; } set { _totalDuration = value; } }
+        protected float[] _triggerDurations;
+        public float[] AttackTriggerDurations { get { return _triggerDurations; } set { _triggerDurations = value; } }
         public AnimActionType AnimActionType { get; protected set; }
         public int AnimActionDataId { get; protected set; }
 
         public bool doNotRandomAnimation;
         public float animationResetDelay = 2f;
 
-        protected readonly Dictionary<int, SimulatingActionTriggerHistory> SimulatingActionTriggerHistories = new Dictionary<int, SimulatingActionTriggerHistory>();
-        protected readonly Dictionary<int, List<SimulateActionTriggerData>> SimlatingActionTriggerDataList = new Dictionary<int, List<SimulateActionTriggerData>>();
-        protected int lastAttackAnimationIndex = 0;
-        protected int lastAttackDataId = 0;
+        protected readonly Dictionary<int, SimulatingActionTriggerHistory> _simulatingActionTriggerHistories = new Dictionary<int, SimulatingActionTriggerHistory>();
+        protected readonly Dictionary<int, List<SimulateActionTriggerData>> _simlatingActionTriggerDataList = new Dictionary<int, List<SimulateActionTriggerData>>();
+        protected int _lastAttackAnimationIndex = 0;
+        protected int _lastAttackDataId = 0;
         // Network data sending
-        protected bool sendingClientAttack;
-        protected bool sendingServerAttack;
-        protected byte sendingSeed;
-        protected bool sendingIsLeftHand;
+        protected bool _sendingClientAttack;
+        protected bool _sendingServerAttack;
+        protected byte _sendingSeed;
+        protected bool _sendingIsLeftHand;
 
         protected virtual void SetAttackActionStates(AnimActionType animActionType, int animActionDataId)
         {
@@ -59,7 +59,7 @@ namespace MultiplayerARPG
 
             // Prepare cancellation
             CancellationTokenSource attackCancellationTokenSource = new CancellationTokenSource();
-            attackCancellationTokenSources.Add(attackCancellationTokenSource);
+            _attackCancellationTokenSources.Add(attackCancellationTokenSource);
 
             // Prepare required data and get weapon data
             Entity.GetAttackingData(
@@ -79,12 +79,12 @@ namespace MultiplayerARPG
                     randomMax = Entity.CharacterModel.GetRightHandAttackRandomMax(animActionDataId);
                     break;
             }
-            if (time - LastAttackEndTime > animationResetDelay || lastAttackAnimationIndex >= randomMax || lastAttackDataId != animActionDataId)
-                lastAttackAnimationIndex = 0;
-            int animationIndex = lastAttackAnimationIndex++;
+            if (time - LastAttackEndTime > animationResetDelay || _lastAttackAnimationIndex >= randomMax || _lastAttackDataId != animActionDataId)
+                _lastAttackAnimationIndex = 0;
+            int animationIndex = _lastAttackAnimationIndex++;
             if (!doNotRandomAnimation)
                 animationIndex = Random.Range(0, randomMax);
-            lastAttackDataId = animActionDataId;
+            _lastAttackDataId = animActionDataId;
 
             // Prepare required data and get animation data
             Entity.GetAnimationData(
@@ -92,8 +92,8 @@ namespace MultiplayerARPG
                 animActionDataId,
                 animationIndex,
                 out float animSpeedRate,
-                out triggerDurations,
-                out totalDuration);
+                out _triggerDurations,
+                out _totalDuration);
 
             // Set doing action state at clients and server
             SetAttackActionStates(animActionType, animActionDataId);
@@ -113,10 +113,10 @@ namespace MultiplayerARPG
             // Last attack end time
             float remainsDuration = DEFAULT_TOTAL_DURATION;
             LastAttackEndTime = time + DEFAULT_TOTAL_DURATION;
-            if (totalDuration >= 0f)
+            if (_totalDuration >= 0f)
             {
-                remainsDuration = totalDuration;
-                LastAttackEndTime = time + (totalDuration / animSpeedRate);
+                remainsDuration = _totalDuration;
+                LastAttackEndTime = time + (_totalDuration / animSpeedRate);
             }
 
             if (IsServer)
@@ -141,7 +141,7 @@ namespace MultiplayerARPG
                     Entity.FpsModel.PlayActionAnimation(AnimActionType, AnimActionDataId, animationIndex, animSpeedRate);
 
                 // Try setup state data (maybe by animation clip events or state machine behaviours), if it was not set up
-                if (triggerDurations == null || triggerDurations.Length == 0 || totalDuration < 0f)
+                if (_triggerDurations == null || _triggerDurations.Length == 0 || _totalDuration < 0f)
                 {
                     // Wait some components to setup proper `attackTriggerDurations` and `attackTotalDuration` within `DEFAULT_STATE_SETUP_DELAY`
                     float setupDelayCountDown = DEFAULT_STATE_SETUP_DELAY;
@@ -149,12 +149,12 @@ namespace MultiplayerARPG
                     {
                         await UniTask.Yield();
                         setupDelayCountDown -= deltaTime;
-                    } while (setupDelayCountDown > 0 && (triggerDurations == null || triggerDurations.Length == 0 || totalDuration < 0f));
+                    } while (setupDelayCountDown > 0 && (_triggerDurations == null || _triggerDurations.Length == 0 || _totalDuration < 0f));
                     if (setupDelayCountDown <= 0f)
                     {
                         // Can't setup properly, so try to setup manually to make it still workable
                         remainsDuration = DEFAULT_TOTAL_DURATION - DEFAULT_STATE_SETUP_DELAY;
-                        triggerDurations = new float[1]
+                        _triggerDurations = new float[1]
                         {
                         DEFAULT_TRIGGER_DURATION,
                         };
@@ -162,26 +162,26 @@ namespace MultiplayerARPG
                     else
                     {
                         // Can setup, so set proper `remainsDuration` and `LastAttackEndTime` value
-                        remainsDuration = totalDuration;
-                        LastAttackEndTime = time + (totalDuration / animSpeedRate);
+                        remainsDuration = _totalDuration;
+                        LastAttackEndTime = time + (_totalDuration / animSpeedRate);
                     }
                 }
 
-                SimulatingActionTriggerHistories[simulateSeed] = new SimulatingActionTriggerHistory(triggerDurations.Length);
-                if (SimlatingActionTriggerDataList.ContainsKey(simulateSeed))
+                _simulatingActionTriggerHistories[simulateSeed] = new SimulatingActionTriggerHistory(_triggerDurations.Length);
+                if (_simlatingActionTriggerDataList.ContainsKey(simulateSeed))
                 {
-                    foreach (SimulateActionTriggerData data in SimlatingActionTriggerDataList[simulateSeed])
+                    foreach (SimulateActionTriggerData data in _simlatingActionTriggerDataList[simulateSeed])
                     {
                         ProceedSimulateActionTrigger(data);
                     }
                 }
-                SimlatingActionTriggerDataList.Clear();
+                _simlatingActionTriggerDataList.Clear();
 
                 float tempTriggerDuration;
-                for (int hitIndex = 0; hitIndex < triggerDurations.Length; ++hitIndex)
+                for (int hitIndex = 0; hitIndex < _triggerDurations.Length; ++hitIndex)
                 {
                     // Wait until triggger before play special effects
-                    tempTriggerDuration = triggerDurations[hitIndex];
+                    tempTriggerDuration = _triggerDurations[hitIndex];
                     remainsDuration -= tempTriggerDuration;
                     await UniTask.Delay((int)(tempTriggerDuration / animSpeedRate * 1000f), true, PlayerLoopTiming.Update, attackCancellationTokenSource.Token);
 
@@ -266,7 +266,7 @@ namespace MultiplayerARPG
             finally
             {
                 attackCancellationTokenSource.Dispose();
-                attackCancellationTokenSources.Remove(attackCancellationTokenSource);
+                _attackCancellationTokenSources.Remove(attackCancellationTokenSource);
             }
             // Clear action states at clients and server
             ClearAttackStates();
@@ -324,21 +324,21 @@ namespace MultiplayerARPG
                 return;
             if (!ProceedSimulateActionTrigger(data))
             {
-                if (!SimlatingActionTriggerDataList.ContainsKey(data.simulateSeed))
-                    SimlatingActionTriggerDataList[data.simulateSeed] = new List<SimulateActionTriggerData>();
-                SimlatingActionTriggerDataList[data.simulateSeed].Add(data);
+                if (!_simlatingActionTriggerDataList.ContainsKey(data.simulateSeed))
+                    _simlatingActionTriggerDataList[data.simulateSeed] = new List<SimulateActionTriggerData>();
+                _simlatingActionTriggerDataList[data.simulateSeed].Add(data);
             }
         }
 
         protected bool ProceedSimulateActionTrigger(SimulateActionTriggerData data)
         {
-            if (!SimulatingActionTriggerHistories.TryGetValue(data.simulateSeed, out SimulatingActionTriggerHistory history) || history.TriggeredIndex >= history.TriggerLength)
+            if (!_simulatingActionTriggerHistories.TryGetValue(data.simulateSeed, out SimulatingActionTriggerHistory history) || history.TriggeredIndex >= history.TriggerLength)
                 return false;
-            int hitIndex = SimulatingActionTriggerHistories[data.simulateSeed].TriggeredIndex;
+            int hitIndex = _simulatingActionTriggerHistories[data.simulateSeed].TriggeredIndex;
             int applySeed = GetApplySeed(data.simulateSeed, hitIndex);
             hitIndex++;
             history.TriggeredIndex = hitIndex;
-            SimulatingActionTriggerHistories[data.simulateSeed] = history;
+            _simulatingActionTriggerHistories[data.simulateSeed] = history;
             bool isLeftHand = data.state.HasFlag(SimulateActionTriggerState.IsLeftHand);
             if (!data.state.HasFlag(SimulateActionTriggerState.IsSkill))
             {
@@ -357,11 +357,11 @@ namespace MultiplayerARPG
 
         public void CancelAttack()
         {
-            for (int i = attackCancellationTokenSources.Count - 1; i >= 0; --i)
+            for (int i = _attackCancellationTokenSources.Count - 1; i >= 0; --i)
             {
-                if (!attackCancellationTokenSources[i].IsCancellationRequested)
-                    attackCancellationTokenSources[i].Cancel();
-                attackCancellationTokenSources.RemoveAt(i);
+                if (!_attackCancellationTokenSources[i].IsCancellationRequested)
+                    _attackCancellationTokenSources[i].Cancel();
+                _attackCancellationTokenSources.RemoveAt(i);
             }
         }
 
@@ -376,9 +376,9 @@ namespace MultiplayerARPG
                 // Simulate attacking at client immediately
                 AttackRoutine(simulateSeed, isLeftHand).Forget();
                 // Tell server that this client attack
-                sendingClientAttack = true;
-                sendingSeed = simulateSeed;
-                sendingIsLeftHand = isLeftHand;
+                _sendingClientAttack = true;
+                _sendingSeed = simulateSeed;
+                _sendingIsLeftHand = isLeftHand;
             }
             else if (IsOwnerClientOrOwnedByServer)
             {
@@ -391,11 +391,11 @@ namespace MultiplayerARPG
 
         public bool WriteClientAttackState(NetDataWriter writer)
         {
-            if (sendingClientAttack)
+            if (_sendingClientAttack)
             {
-                writer.Put(sendingSeed);
-                writer.Put(sendingIsLeftHand);
-                sendingClientAttack = false;
+                writer.Put(_sendingSeed);
+                writer.Put(_sendingIsLeftHand);
+                _sendingClientAttack = false;
                 return true;
             }
             return false;
@@ -403,11 +403,11 @@ namespace MultiplayerARPG
 
         public bool WriteServerAttackState(NetDataWriter writer)
         {
-            if (sendingServerAttack)
+            if (_sendingServerAttack)
             {
-                writer.Put(sendingSeed);
-                writer.Put(sendingIsLeftHand);
-                sendingServerAttack = false;
+                writer.Put(_sendingSeed);
+                writer.Put(_sendingIsLeftHand);
+                _sendingServerAttack = false;
                 return true;
             }
             return false;
@@ -431,9 +431,9 @@ namespace MultiplayerARPG
             // Play attack animation at server immediately
             AttackRoutine(simulateSeed, isLeftHand).Forget();
             // Tell clients to play animation later
-            sendingServerAttack = true;
-            sendingSeed = simulateSeed;
-            sendingIsLeftHand = isLeftHand;
+            _sendingServerAttack = true;
+            _sendingSeed = simulateSeed;
+            _sendingIsLeftHand = isLeftHand;
 #endif
         }
 

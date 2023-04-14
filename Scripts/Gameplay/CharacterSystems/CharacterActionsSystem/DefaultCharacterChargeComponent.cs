@@ -10,19 +10,19 @@ namespace MultiplayerARPG
         {
             get
             {
-                return IsCharging && (Time.unscaledTime - chargeStartTime >= chargeDuration);
+                return IsCharging && (Time.unscaledTime - _chargeStartTime >= _chargeDuration);
             }
         }
         public float MoveSpeedRateWhileCharging { get; protected set; }
         public MovementRestriction MovementRestrictionWhileCharging { get; protected set; }
 
-        protected float chargeStartTime;
-        protected float chargeDuration;
-        protected bool sendingClientStartCharge;
-        protected bool sendingClientStopCharge;
-        protected bool sendingServerStartCharge;
-        protected bool sendingServerStopCharge;
-        protected bool sendingIsLeftHand;
+        protected float _chargeStartTime;
+        protected float _chargeDuration;
+        protected bool _sendingClientStartCharge;
+        protected bool _sendingClientStopCharge;
+        protected bool _sendingServerStartCharge;
+        protected bool _sendingServerStopCharge;
+        protected bool _sendingIsLeftHand;
 
         public virtual void ClearChargeStates()
         {
@@ -57,8 +57,8 @@ namespace MultiplayerARPG
             MoveSpeedRateWhileCharging = Entity.GetMoveSpeedRateWhileCharging(weaponItem);
             MovementRestrictionWhileCharging = Entity.GetMovementRestrictionWhileCharging(weaponItem);
             IsCharging = true;
-            chargeStartTime = Time.unscaledTime;
-            chargeDuration = weaponItem.ChargeDuration;
+            _chargeStartTime = Time.unscaledTime;
+            _chargeDuration = weaponItem.ChargeDuration;
         }
 
         protected void StopChargeAnimation()
@@ -90,8 +90,8 @@ namespace MultiplayerARPG
                 // Simulate start charge at client immediately
                 PlayChargeAnimation(isLeftHand);
                 // Tell the server to start charge
-                sendingClientStartCharge = true;
-                sendingIsLeftHand = isLeftHand;
+                _sendingClientStartCharge = true;
+                _sendingIsLeftHand = isLeftHand;
             }
             else if (IsOwnerClientOrOwnedByServer)
             {
@@ -106,7 +106,7 @@ namespace MultiplayerARPG
                 // Simulate stop charge at client immediately
                 StopChargeAnimation();
                 // Tell the server to stop charge
-                sendingClientStopCharge = true;
+                _sendingClientStopCharge = true;
             }
             else if (IsOwnerClientOrOwnedByServer)
             {
@@ -116,10 +116,10 @@ namespace MultiplayerARPG
 
         public bool WriteClientStartChargeState(NetDataWriter writer)
         {
-            if (sendingClientStartCharge)
+            if (_sendingClientStartCharge)
             {
-                writer.Put(sendingIsLeftHand);
-                sendingClientStartCharge = false;
+                writer.Put(_sendingIsLeftHand);
+                _sendingClientStartCharge = false;
                 return true;
             }
             return false;
@@ -127,10 +127,10 @@ namespace MultiplayerARPG
 
         public bool WriteServerStartChargeState(NetDataWriter writer)
         {
-            if (sendingServerStartCharge)
+            if (_sendingServerStartCharge)
             {
-                writer.Put(sendingIsLeftHand);
-                sendingServerStartCharge = false;
+                writer.Put(_sendingIsLeftHand);
+                _sendingServerStartCharge = false;
                 return true;
             }
             return false;
@@ -138,9 +138,9 @@ namespace MultiplayerARPG
 
         public bool WriteClientStopChargeState(NetDataWriter writer)
         {
-            if (sendingClientStopCharge)
+            if (_sendingClientStopCharge)
             {
-                sendingClientStopCharge = false;
+                _sendingClientStopCharge = false;
                 return true;
             }
             return false;
@@ -148,9 +148,9 @@ namespace MultiplayerARPG
 
         public bool WriteServerStopChargeState(NetDataWriter writer)
         {
-            if (sendingServerStopCharge)
+            if (_sendingServerStopCharge)
             {
-                sendingServerStopCharge = false;
+                _sendingServerStopCharge = false;
                 return true;
             }
             return false;
@@ -168,8 +168,8 @@ namespace MultiplayerARPG
             // Start charge at server immediately
             PlayChargeAnimation(isLeftHand);
             // Tell clients to start charge later
-            sendingServerStartCharge = true;
-            sendingIsLeftHand = isLeftHand;
+            _sendingServerStartCharge = true;
+            _sendingIsLeftHand = isLeftHand;
 #endif
         }
 
@@ -195,7 +195,7 @@ namespace MultiplayerARPG
             // Stop charge at server immediately
             StopChargeAnimation();
             // Tell clients to stop charge later
-            sendingServerStopCharge = true;
+            _sendingServerStopCharge = true;
 #endif
         }
 

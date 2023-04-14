@@ -12,22 +12,22 @@ namespace MultiplayerARPG
         public const float DEFAULT_TOTAL_DURATION = 2f;
         public const float DEFAULT_TRIGGER_DURATION = 1f;
         public const float DEFAULT_STATE_SETUP_DELAY = 1f;
-        protected List<CancellationTokenSource> reloadCancellationTokenSources = new List<CancellationTokenSource>();
+        protected readonly List<CancellationTokenSource> _reloadCancellationTokenSources = new List<CancellationTokenSource>();
         public int ReloadingAmmoAmount { get; protected set; }
         public bool IsReloading { get; protected set; }
         public float LastReloadEndTime { get; protected set; }
         public float MoveSpeedRateWhileReloading { get; protected set; }
         public MovementRestriction MovementRestrictionWhileReloading { get; protected set; }
-        protected float totalDuration;
-        public float ReloadTotalDuration { get { return totalDuration; } set { totalDuration = value; } }
-        protected float[] triggerDurations;
-        public float[] ReloadTriggerDurations { get { return triggerDurations; } set { triggerDurations = value; } }
+        protected float _totalDuration;
+        public float ReloadTotalDuration { get { return _totalDuration; } set { _totalDuration = value; } }
+        protected float[] _triggerDurations;
+        public float[] ReloadTriggerDurations { get { return _triggerDurations; } set { _triggerDurations = value; } }
         public AnimActionType AnimActionType { get; protected set; }
 
-        protected bool sendingClientReload;
-        protected bool sendingServerReload;
-        protected bool sendingIsLeftHand;
-        protected int sendingReloadingAmmoAmount;
+        protected bool _sendingClientReload;
+        protected bool _sendingServerReload;
+        protected bool _sendingIsLeftHand;
+        protected int _sendingReloadingAmmoAmount;
 
         protected virtual void SetReloadActionStates(AnimActionType animActionType, int reloadingAmmoAmount)
         {
@@ -47,7 +47,7 @@ namespace MultiplayerARPG
         {
             // Prepare cancellation
             CancellationTokenSource reloadCancellationTokenSource = new CancellationTokenSource();
-            reloadCancellationTokenSources.Add(reloadCancellationTokenSource);
+            _reloadCancellationTokenSources.Add(reloadCancellationTokenSource);
 
             // Prepare requires data and get weapon data
             Entity.GetReloadingData(
@@ -62,8 +62,8 @@ namespace MultiplayerARPG
                 animActionDataId,
                 0,
                 out float animSpeedRate,
-                out triggerDurations,
-                out totalDuration);
+                out _triggerDurations,
+                out _totalDuration);
 
             // Set doing action state at clients and server
             SetReloadActionStates(animActionType, reloadingAmmoAmount);
@@ -78,10 +78,10 @@ namespace MultiplayerARPG
             // Last attack end time
             float remainsDuration = DEFAULT_TOTAL_DURATION;
             LastReloadEndTime = Time.unscaledTime + DEFAULT_TOTAL_DURATION;
-            if (totalDuration >= 0f)
+            if (_totalDuration >= 0f)
             {
-                remainsDuration = totalDuration;
-                LastReloadEndTime = Time.unscaledTime + (totalDuration / animSpeedRate);
+                remainsDuration = _totalDuration;
+                LastReloadEndTime = Time.unscaledTime + (_totalDuration / animSpeedRate);
             }
 
             try
@@ -114,7 +114,7 @@ namespace MultiplayerARPG
                 }
 
                 // Try setup state data (maybe by animation clip events or state machine behaviours), if it was not set up
-                if (triggerDurations == null || triggerDurations.Length == 0 || totalDuration < 0f)
+                if (_triggerDurations == null || _triggerDurations.Length == 0 || _totalDuration < 0f)
                 {
                     // Wait some components to setup proper `attackTriggerDurations` and `attackTotalDuration` within `DEFAULT_STATE_SETUP_DELAY`
                     float setupDelayCountDown = DEFAULT_STATE_SETUP_DELAY;
@@ -122,12 +122,12 @@ namespace MultiplayerARPG
                     {
                         await UniTask.Yield();
                         setupDelayCountDown -= Time.unscaledDeltaTime;
-                    } while (setupDelayCountDown > 0 && (triggerDurations == null || triggerDurations.Length == 0 || totalDuration < 0f));
+                    } while (setupDelayCountDown > 0 && (_triggerDurations == null || _triggerDurations.Length == 0 || _totalDuration < 0f));
                     if (setupDelayCountDown <= 0f)
                     {
                         // Can't setup properly, so try to setup manually to make it still workable
                         remainsDuration = DEFAULT_TOTAL_DURATION - DEFAULT_STATE_SETUP_DELAY;
-                        triggerDurations = new float[1]
+                        _triggerDurations = new float[1]
                         {
                         DEFAULT_TRIGGER_DURATION,
                         };
@@ -135,16 +135,16 @@ namespace MultiplayerARPG
                     else
                     {
                         // Can setup, so set proper `remainsDuration` and `LastAttackEndTime` value
-                        remainsDuration = totalDuration;
-                        LastReloadEndTime = Time.unscaledTime + (totalDuration / animSpeedRate);
+                        remainsDuration = _totalDuration;
+                        LastReloadEndTime = Time.unscaledTime + (_totalDuration / animSpeedRate);
                     }
                 }
 
                 float tempTriggerDuration;
-                for (int i = 0; i < triggerDurations.Length; ++i)
+                for (int i = 0; i < _triggerDurations.Length; ++i)
                 {
                     // Wait until triggger before reload ammo
-                    tempTriggerDuration = triggerDurations[i];
+                    tempTriggerDuration = _triggerDurations[i];
                     remainsDuration -= tempTriggerDuration;
                     await UniTask.Delay((int)(tempTriggerDuration / animSpeedRate * 1000f), true, PlayerLoopTiming.Update, reloadCancellationTokenSource.Token);
 
@@ -163,7 +163,7 @@ namespace MultiplayerARPG
                     }
 
                     // Reload / Fill ammo
-                    int triggerReloadAmmoAmount = (ReloadingAmmoAmount / triggerDurations.Length);
+                    int triggerReloadAmmoAmount = (ReloadingAmmoAmount / _triggerDurations.Length);
                     EquipWeapons equipWeapons = Entity.EquipWeapons;
                     if (IsServer && Entity.DecreaseAmmos(weaponItem.WeaponType.RequireAmmoType, triggerReloadAmmoAmount, out _))
                     {
@@ -202,7 +202,7 @@ namespace MultiplayerARPG
             finally
             {
                 reloadCancellationTokenSource.Dispose();
-                reloadCancellationTokenSources.Remove(reloadCancellationTokenSource);
+                _reloadCancellationTokenSources.Remove(reloadCancellationTokenSource);
             }
             // Clear action states at clients and server
             ClearReloadStates();
@@ -210,11 +210,11 @@ namespace MultiplayerARPG
 
         public void CancelReload()
         {
-            for (int i = reloadCancellationTokenSources.Count - 1; i >= 0; --i)
+            for (int i = _reloadCancellationTokenSources.Count - 1; i >= 0; --i)
             {
-                if (!reloadCancellationTokenSources[i].IsCancellationRequested)
-                    reloadCancellationTokenSources[i].Cancel();
-                reloadCancellationTokenSources.RemoveAt(i);
+                if (!_reloadCancellationTokenSources[i].IsCancellationRequested)
+                    _reloadCancellationTokenSources[i].Cancel();
+                _reloadCancellationTokenSources.RemoveAt(i);
             }
         }
 
@@ -222,8 +222,8 @@ namespace MultiplayerARPG
         {
             if (!IsServer && IsOwnerClient)
             {
-                sendingClientReload = true;
-                sendingIsLeftHand = isLeftHand;
+                _sendingClientReload = true;
+                _sendingIsLeftHand = isLeftHand;
                 ReloadRoutine(isLeftHand, 0).Forget();
             }
             else if (IsOwnerClientOrOwnedByServer)
@@ -234,10 +234,10 @@ namespace MultiplayerARPG
 
         public bool WriteClientReloadState(NetDataWriter writer)
         {
-            if (sendingClientReload)
+            if (_sendingClientReload)
             {
-                writer.Put(sendingIsLeftHand);
-                sendingClientReload = false;
+                writer.Put(_sendingIsLeftHand);
+                _sendingClientReload = false;
                 return true;
             }
             return false;
@@ -245,11 +245,11 @@ namespace MultiplayerARPG
 
         public bool WriteServerReloadState(NetDataWriter writer)
         {
-            if (sendingServerReload)
+            if (_sendingServerReload)
             {
-                writer.Put(sendingIsLeftHand);
-                writer.PutPackedInt(sendingReloadingAmmoAmount);
-                sendingServerReload = false;
+                writer.Put(_sendingIsLeftHand);
+                writer.PutPackedInt(_sendingReloadingAmmoAmount);
+                _sendingServerReload = false;
                 return true;
             }
             return false;
@@ -290,9 +290,9 @@ namespace MultiplayerARPG
             // Play animation at server immediately
             ReloadRoutine(isLeftHand, reloadingAmmoAmount).Forget();
             // Tell clients to play animation later
-            sendingServerReload = true;
-            sendingIsLeftHand = isLeftHand;
-            sendingReloadingAmmoAmount = reloadingAmmoAmount;
+            _sendingServerReload = true;
+            _sendingIsLeftHand = isLeftHand;
+            _sendingReloadingAmmoAmount = reloadingAmmoAmount;
 #endif
         }
 

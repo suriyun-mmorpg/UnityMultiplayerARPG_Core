@@ -13,7 +13,7 @@ namespace MultiplayerARPG
         public const float DEFAULT_TOTAL_DURATION = 2f;
         public const float DEFAULT_TRIGGER_DURATION = 1f;
         public const float DEFAULT_STATE_SETUP_DELAY = 1f;
-        protected List<CancellationTokenSource> skillCancellationTokenSources = new List<CancellationTokenSource>();
+        protected readonly List<CancellationTokenSource> _skillCancellationTokenSources = new List<CancellationTokenSource>();
         public BaseSkill UsingSkill { get; protected set; }
         public int UsingSkillLevel { get; protected set; }
         public bool IsUsingSkill { get; protected set; }
@@ -31,20 +31,20 @@ namespace MultiplayerARPG
         public AnimActionType AnimActionType { get; protected set; }
         public int AnimActionDataId { get; protected set; }
 
-        protected readonly Dictionary<int, SimulatingActionTriggerHistory> SimulatingActionTriggerHistories = new Dictionary<int, SimulatingActionTriggerHistory>();
-        protected readonly Dictionary<int, List<SimulateActionTriggerData>> SimlatingActionTriggerDataList = new Dictionary<int, List<SimulateActionTriggerData>>();
-        protected bool sendingClientUseSkill;
-        protected bool sendingClientUseSkillItem;
-        protected bool sendingClientUseSkillInterrupted;
-        protected bool sendingServerUseSkill;
-        protected bool sendingServerUseSkillInterrupted;
-        protected byte sendingSeed;
-        protected int sendingSkillDataId;
-        protected int sendingSkillLevel;
-        protected int sendingItemIndex;
-        protected bool sendingIsLeftHand;
-        protected uint sendingTargetObjectId;
-        protected AimPosition sendingAimPosition;
+        protected readonly Dictionary<int, SimulatingActionTriggerHistory> _simulatingActionTriggerHistories = new Dictionary<int, SimulatingActionTriggerHistory>();
+        protected readonly Dictionary<int, List<SimulateActionTriggerData>> _simlatingActionTriggerDataList = new Dictionary<int, List<SimulateActionTriggerData>>();
+        protected bool _sendingClientUseSkill;
+        protected bool _sendingClientUseSkillItem;
+        protected bool _sendingClientUseSkillInterrupted;
+        protected bool _sendingServerUseSkill;
+        protected bool _sendingServerUseSkillInterrupted;
+        protected byte _sendingSeed;
+        protected int _sendingSkillDataId;
+        protected int _sendingSkillLevel;
+        protected int _sendingItemIndex;
+        protected bool _sendingIsLeftHand;
+        protected uint _sendingTargetObjectId;
+        protected AimPosition _sendingAimPosition;
 
         public override void EntityUpdate()
         {
@@ -74,13 +74,13 @@ namespace MultiplayerARPG
         {
             if (!IsServer)
             {
-                sendingClientUseSkillInterrupted = true;
+                _sendingClientUseSkillInterrupted = true;
                 return;
             }
             if (IsCastingSkillCanBeInterrupted && !IsCastingSkillInterrupted)
             {
                 IsCastingSkillInterrupted = true;
-                sendingServerUseSkillInterrupted = true;
+                _sendingServerUseSkillInterrupted = true;
             }
         }
 
@@ -105,7 +105,7 @@ namespace MultiplayerARPG
         {
             // Prepare cancellation
             CancellationTokenSource skillCancellationTokenSource = new CancellationTokenSource();
-            skillCancellationTokenSources.Add(skillCancellationTokenSource);
+            _skillCancellationTokenSources.Add(skillCancellationTokenSource);
 
             // Prepare required data and get skill data
             Entity.GetUsingSkillData(
@@ -233,15 +233,15 @@ namespace MultiplayerARPG
                     }
                 }
 
-                SimulatingActionTriggerHistories[simulateSeed] = new SimulatingActionTriggerHistory(triggerDurations.Length);
-                if (SimlatingActionTriggerDataList.ContainsKey(simulateSeed))
+                _simulatingActionTriggerHistories[simulateSeed] = new SimulatingActionTriggerHistory(triggerDurations.Length);
+                if (_simlatingActionTriggerDataList.ContainsKey(simulateSeed))
                 {
-                    foreach (SimulateActionTriggerData data in SimlatingActionTriggerDataList[simulateSeed])
+                    foreach (SimulateActionTriggerData data in _simlatingActionTriggerDataList[simulateSeed])
                     {
                         ProceedSimulateActionTrigger(data);
                     }
                 }
-                SimlatingActionTriggerDataList.Clear();
+                _simlatingActionTriggerDataList.Clear();
 
                 float tempTriggerDuration;
                 for (int hitIndex = 0; hitIndex < triggerDurations.Length; ++hitIndex)
@@ -318,7 +318,7 @@ namespace MultiplayerARPG
             finally
             {
                 skillCancellationTokenSource.Dispose();
-                skillCancellationTokenSources.Remove(skillCancellationTokenSource);
+                _skillCancellationTokenSources.Remove(skillCancellationTokenSource);
             }
             // Clear action states at clients and server
             ClearUseSkillStates();
@@ -326,11 +326,11 @@ namespace MultiplayerARPG
 
         public void CancelSkill()
         {
-            for (int i = skillCancellationTokenSources.Count - 1; i >= 0; --i)
+            for (int i = _skillCancellationTokenSources.Count - 1; i >= 0; --i)
             {
-                if (!skillCancellationTokenSources[i].IsCancellationRequested)
-                    skillCancellationTokenSources[i].Cancel();
-                skillCancellationTokenSources.RemoveAt(i);
+                if (!_skillCancellationTokenSources[i].IsCancellationRequested)
+                    _skillCancellationTokenSources[i].Cancel();
+                _skillCancellationTokenSources.RemoveAt(i);
             }
         }
 
@@ -341,21 +341,21 @@ namespace MultiplayerARPG
                 return;
             if (!ProceedSimulateActionTrigger(data))
             {
-                if (!SimlatingActionTriggerDataList.ContainsKey(data.simulateSeed))
-                    SimlatingActionTriggerDataList[data.simulateSeed] = new List<SimulateActionTriggerData>();
-                SimlatingActionTriggerDataList[data.simulateSeed].Add(data);
+                if (!_simlatingActionTriggerDataList.ContainsKey(data.simulateSeed))
+                    _simlatingActionTriggerDataList[data.simulateSeed] = new List<SimulateActionTriggerData>();
+                _simlatingActionTriggerDataList[data.simulateSeed].Add(data);
             }
         }
 
         protected bool ProceedSimulateActionTrigger(SimulateActionTriggerData data)
         {
-            if (!SimulatingActionTriggerHistories.TryGetValue(data.simulateSeed, out SimulatingActionTriggerHistory simulatingHit) || simulatingHit.TriggeredIndex >= simulatingHit.TriggerLength)
+            if (!_simulatingActionTriggerHistories.TryGetValue(data.simulateSeed, out SimulatingActionTriggerHistory simulatingHit) || simulatingHit.TriggeredIndex >= simulatingHit.TriggerLength)
                 return false;
-            int hitIndex = SimulatingActionTriggerHistories[data.simulateSeed].TriggeredIndex;
+            int hitIndex = _simulatingActionTriggerHistories[data.simulateSeed].TriggeredIndex;
             int applySeed = GetApplySeed(data.simulateSeed, hitIndex);
             hitIndex++;
             simulatingHit.TriggeredIndex = hitIndex;
-            SimulatingActionTriggerHistories[data.simulateSeed] = simulatingHit;
+            _simulatingActionTriggerHistories[data.simulateSeed] = simulatingHit;
             bool isLeftHand = data.state.HasFlag(SimulateActionTriggerState.IsLeftHand);
             if (data.state.HasFlag(SimulateActionTriggerState.IsSkill))
             {
@@ -389,12 +389,12 @@ namespace MultiplayerARPG
                 // Simulate skill using at client immediately
                 UseSkillRoutine(simulateSeed, isLeftHand, skill, skillLevel, targetObjectId, aimPosition, null).Forget();
                 // Tell server that this client use skill
-                sendingClientUseSkill = true;
-                sendingSeed = simulateSeed;
-                sendingSkillDataId = dataId;
-                sendingIsLeftHand = isLeftHand;
-                sendingTargetObjectId = targetObjectId;
-                sendingAimPosition = aimPosition;
+                _sendingClientUseSkill = true;
+                _sendingSeed = simulateSeed;
+                _sendingSkillDataId = dataId;
+                _sendingIsLeftHand = isLeftHand;
+                _sendingTargetObjectId = targetObjectId;
+                _sendingAimPosition = aimPosition;
             }
             else if (IsOwnerClientOrOwnedByServer)
             {
@@ -424,12 +424,12 @@ namespace MultiplayerARPG
                 // Simulate skill using at client immediately
                 UseSkillRoutine(simulateSeed, isLeftHand, skill, skillLevel, targetObjectId, aimPosition, Entity.NonEquipItems[itemIndex].dataId).Forget();
                 // Tell server that this client use skill
-                sendingClientUseSkillItem = true;
-                sendingSeed = simulateSeed;
-                sendingItemIndex = itemIndex;
-                sendingIsLeftHand = isLeftHand;
-                sendingTargetObjectId = targetObjectId;
-                sendingAimPosition = aimPosition;
+                _sendingClientUseSkillItem = true;
+                _sendingSeed = simulateSeed;
+                _sendingItemIndex = itemIndex;
+                _sendingIsLeftHand = isLeftHand;
+                _sendingTargetObjectId = targetObjectId;
+                _sendingAimPosition = aimPosition;
             }
             else if (IsOwnerClientOrOwnedByServer)
             {
@@ -442,14 +442,14 @@ namespace MultiplayerARPG
 
         public bool WriteClientUseSkillState(NetDataWriter writer)
         {
-            if (sendingClientUseSkill)
+            if (_sendingClientUseSkill)
             {
-                writer.Put(sendingSeed);
-                writer.PutPackedInt(sendingSkillDataId);
-                writer.Put(sendingIsLeftHand);
-                writer.PutPackedUInt(sendingTargetObjectId);
-                writer.Put(sendingAimPosition);
-                sendingClientUseSkill = false;
+                writer.Put(_sendingSeed);
+                writer.PutPackedInt(_sendingSkillDataId);
+                writer.Put(_sendingIsLeftHand);
+                writer.PutPackedUInt(_sendingTargetObjectId);
+                writer.Put(_sendingAimPosition);
+                _sendingClientUseSkill = false;
                 return true;
             }
             return false;
@@ -457,15 +457,15 @@ namespace MultiplayerARPG
 
         public bool WriteServerUseSkillState(NetDataWriter writer)
         {
-            if (sendingServerUseSkill)
+            if (_sendingServerUseSkill)
             {
-                writer.Put(sendingSeed);
-                writer.PutPackedInt(sendingSkillDataId);
-                writer.PutPackedInt(sendingSkillLevel);
-                writer.Put(sendingIsLeftHand);
-                writer.PutPackedUInt(sendingTargetObjectId);
-                writer.Put(sendingAimPosition);
-                sendingServerUseSkill = false;
+                writer.Put(_sendingSeed);
+                writer.PutPackedInt(_sendingSkillDataId);
+                writer.PutPackedInt(_sendingSkillLevel);
+                writer.Put(_sendingIsLeftHand);
+                writer.PutPackedUInt(_sendingTargetObjectId);
+                writer.Put(_sendingAimPosition);
+                _sendingServerUseSkill = false;
                 return true;
             }
             return false;
@@ -473,14 +473,14 @@ namespace MultiplayerARPG
 
         public bool WriteClientUseSkillItemState(NetDataWriter writer)
         {
-            if (sendingClientUseSkillItem)
+            if (_sendingClientUseSkillItem)
             {
-                writer.Put(sendingSeed);
-                writer.PutPackedInt(sendingItemIndex);
-                writer.Put(sendingIsLeftHand);
-                writer.PutPackedUInt(sendingTargetObjectId);
-                writer.Put(sendingAimPosition);
-                sendingClientUseSkillItem = false;
+                writer.Put(_sendingSeed);
+                writer.PutPackedInt(_sendingItemIndex);
+                writer.Put(_sendingIsLeftHand);
+                writer.PutPackedUInt(_sendingTargetObjectId);
+                writer.Put(_sendingAimPosition);
+                _sendingClientUseSkillItem = false;
                 return true;
             }
             return false;
@@ -495,9 +495,9 @@ namespace MultiplayerARPG
 
         public bool WriteClientUseSkillInterruptedState(NetDataWriter writer)
         {
-            if (sendingClientUseSkillInterrupted)
+            if (_sendingClientUseSkillInterrupted)
             {
-                sendingClientUseSkillInterrupted = false;
+                _sendingClientUseSkillInterrupted = false;
                 return true;
             }
             return false;
@@ -505,9 +505,9 @@ namespace MultiplayerARPG
 
         public bool WriteServerUseSkillInterruptedState(NetDataWriter writer)
         {
-            if (sendingServerUseSkillInterrupted)
+            if (_sendingServerUseSkillInterrupted)
             {
-                sendingServerUseSkillInterrupted = false;
+                _sendingServerUseSkillInterrupted = false;
                 return true;
             }
             return false;
@@ -537,13 +537,13 @@ namespace MultiplayerARPG
             // Play animation at server immediately
             UseSkillRoutine(simulateSeed, isLeftHand, skill, skillLevel, targetObjectId, aimPosition, null).Forget();
             // Tell clients to play animation later
-            sendingServerUseSkill = true;
-            sendingSeed = simulateSeed;
-            sendingSkillDataId = dataId;
-            sendingSkillLevel = skillLevel;
-            sendingIsLeftHand = isLeftHand;
-            sendingTargetObjectId = targetObjectId;
-            sendingAimPosition = aimPosition;
+            _sendingServerUseSkill = true;
+            _sendingSeed = simulateSeed;
+            _sendingSkillDataId = dataId;
+            _sendingSkillLevel = skillLevel;
+            _sendingIsLeftHand = isLeftHand;
+            _sendingTargetObjectId = targetObjectId;
+            _sendingAimPosition = aimPosition;
 #endif
         }
 
@@ -594,13 +594,13 @@ namespace MultiplayerARPG
             // Play animation at server immediately
             UseSkillRoutine(simulateSeed, isLeftHand, skill, skillLevel, targetObjectId, aimPosition, Entity.NonEquipItems[itemIndex].dataId).Forget();
             // Tell clients to play animation later
-            sendingServerUseSkill = true;
-            sendingSeed = simulateSeed;
-            sendingSkillDataId = skill.DataId;
-            sendingSkillLevel = skillLevel;
-            sendingIsLeftHand = isLeftHand;
-            sendingTargetObjectId = targetObjectId;
-            sendingAimPosition = aimPosition;
+            _sendingServerUseSkill = true;
+            _sendingSeed = simulateSeed;
+            _sendingSkillDataId = skill.DataId;
+            _sendingSkillLevel = skillLevel;
+            _sendingIsLeftHand = isLeftHand;
+            _sendingTargetObjectId = targetObjectId;
+            _sendingAimPosition = aimPosition;
 #endif
         }
 
