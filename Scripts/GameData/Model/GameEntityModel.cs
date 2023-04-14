@@ -145,13 +145,13 @@ namespace MultiplayerARPG
         public Transform CacheTransform { get; protected set; }
         public BaseGameEntity CacheEntity { get; protected set; }
 
-        protected Dictionary<string, EffectContainer> cacheEffectContainers = null;
+        protected Dictionary<string, EffectContainer> _cacheEffectContainers = null;
         /// <summary>
         /// Dictionary[effectSocket(String), container(CharacterModelContainer)]
         /// </summary>
         public virtual Dictionary<string, EffectContainer> CacheEffectContainers
         {
-            get { return cacheEffectContainers; }
+            get { return _cacheEffectContainers; }
         }
 
         internal void AssignId()
@@ -175,13 +175,13 @@ namespace MultiplayerARPG
                     obj.spatialBlend = 1f;
                 });
             }
-            cacheEffectContainers = new Dictionary<string, EffectContainer>();
+            _cacheEffectContainers = new Dictionary<string, EffectContainer>();
             if (effectContainers != null && effectContainers.Length > 0)
             {
                 foreach (EffectContainer effectContainer in effectContainers)
                 {
-                    if (effectContainer.transform != null && !cacheEffectContainers.ContainsKey(effectContainer.effectSocket))
-                        cacheEffectContainers[effectContainer.effectSocket] = effectContainer;
+                    if (effectContainer.transform != null && !_cacheEffectContainers.ContainsKey(effectContainer.effectSocket))
+                        _cacheEffectContainers[effectContainer.effectSocket] = effectContainer;
                 }
             }
         }
