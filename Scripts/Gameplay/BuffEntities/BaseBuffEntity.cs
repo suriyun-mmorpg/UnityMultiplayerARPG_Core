@@ -7,10 +7,10 @@ namespace MultiplayerARPG
         /// <summary>
         /// If this is `TRUE` buffs will applies to everyone including with an enemies
         /// </summary>
-        protected bool applyBuffToEveryone;
-        protected EntityInfo buffApplier;
-        protected BaseSkill skill;
-        protected int skillLevel;
+        protected bool _applyBuffToEveryone;
+        protected EntityInfo _buffApplier;
+        protected BaseSkill _skill;
+        protected int _skillLevel;
 
         public GameInstance CurrentGameInstance
         {
@@ -67,17 +67,17 @@ namespace MultiplayerARPG
             int skillLevel,
             bool applyBuffToEveryone)
         {
-            this.buffApplier = buffApplier;
-            this.skill = skill;
-            this.skillLevel = skillLevel;
-            this.applyBuffToEveryone = applyBuffToEveryone;
+            this._buffApplier = buffApplier;
+            this._skill = skill;
+            this._skillLevel = skillLevel;
+            this._applyBuffToEveryone = applyBuffToEveryone;
         }
 
         public virtual void ApplyBuffTo(BaseCharacterEntity target)
         {
-            if (!IsServer || target == null || target.IsDead() || (!applyBuffToEveryone && !target.IsAlly(buffApplier)))
+            if (!IsServer || target == null || target.IsDead() || (!_applyBuffToEveryone && !target.IsAlly(_buffApplier)))
                 return;
-            target.ApplyBuff(skill.DataId, BuffType.SkillBuff, skillLevel, buffApplier, null);
+            target.ApplyBuff(_skill.DataId, BuffType.SkillBuff, _skillLevel, _buffApplier, null);
         }
 
         public override void InitPrefab()

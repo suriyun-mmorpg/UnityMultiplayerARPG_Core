@@ -22,9 +22,9 @@ namespace MultiplayerARPG
             }
         }
 
-        protected float applyDuration;
-        protected float lastAppliedTime;
-        protected readonly Dictionary<uint, BaseCharacterEntity> receivingBuffCharacters = new Dictionary<uint, BaseCharacterEntity>();
+        protected float _applyDuration;
+        protected float _lastAppliedTime;
+        protected readonly Dictionary<uint, BaseCharacterEntity> _receivingBuffCharacters = new Dictionary<uint, BaseCharacterEntity>();
 
         protected override void Awake()
         {
@@ -56,16 +56,16 @@ namespace MultiplayerARPG
         {
             base.Setup(buffApplier, skill, skillLevel, applyBuffToEveryone);
             PushBack(areaDuration);
-            this.applyDuration = applyDuration;
-            lastAppliedTime = Time.unscaledTime;
+            this._applyDuration = applyDuration;
+            _lastAppliedTime = Time.unscaledTime;
         }
 
         protected virtual void Update()
         {
-            if (Time.unscaledTime - lastAppliedTime >= applyDuration)
+            if (Time.unscaledTime - _lastAppliedTime >= _applyDuration)
             {
-                lastAppliedTime = Time.unscaledTime;
-                foreach (BaseCharacterEntity entity in receivingBuffCharacters.Values)
+                _lastAppliedTime = Time.unscaledTime;
+                foreach (BaseCharacterEntity entity in _receivingBuffCharacters.Values)
                 {
                     if (entity == null)
                         continue;
@@ -77,7 +77,7 @@ namespace MultiplayerARPG
 
         protected override void OnPushBack()
         {
-            receivingBuffCharacters.Clear();
+            _receivingBuffCharacters.Clear();
             if (onDestroy != null)
                 onDestroy.Invoke();
         }
@@ -98,10 +98,10 @@ namespace MultiplayerARPG
             if (target == null)
                 return;
 
-            if (receivingBuffCharacters.ContainsKey(target.ObjectId))
+            if (_receivingBuffCharacters.ContainsKey(target.ObjectId))
                 return;
 
-            receivingBuffCharacters.Add(target.ObjectId, target);
+            _receivingBuffCharacters.Add(target.ObjectId, target);
         }
 
         protected virtual void OnTriggerExit(Collider other)
@@ -120,10 +120,10 @@ namespace MultiplayerARPG
             if (target == null)
                 return;
 
-            if (!receivingBuffCharacters.ContainsKey(target.ObjectId))
+            if (!_receivingBuffCharacters.ContainsKey(target.ObjectId))
                 return;
 
-            receivingBuffCharacters.Remove(target.ObjectId);
+            _receivingBuffCharacters.Remove(target.ObjectId);
         }
 
         public override void InitPrefab()
