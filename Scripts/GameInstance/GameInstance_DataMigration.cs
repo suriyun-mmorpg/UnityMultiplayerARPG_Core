@@ -12,9 +12,9 @@ namespace MultiplayerARPG
             List<GameObject> modelObjects = new List<GameObject>();
             foreach (EquipmentModel equipmentModel in equipmentModels)
             {
-                if (equipmentModel.model == null)
+                if (equipmentModel.meshPrefab == null)
                     continue;
-                modelObjects.Add(equipmentModel.model);
+                modelObjects.Add(equipmentModel.meshPrefab);
             }
             List<EquipmentEntity> equipmentEntities = modelObjects.GetComponents<EquipmentEntity>();
             foreach (EquipmentEntity equipmentEntity in equipmentEntities)

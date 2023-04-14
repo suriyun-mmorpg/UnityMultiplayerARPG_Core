@@ -500,17 +500,18 @@ namespace MultiplayerARPG
                     tempContainer.SetActiveDefaultModel(false);
                     if (tempContainer.transform != null)
                     {
-                        tempEquipmentObject = Instantiate(tempEquipmentModel.model, tempContainer.transform);
+                        tempEquipmentObject = Instantiate(tempEquipmentModel.meshPrefab, tempContainer.transform);
                         tempEquipmentObject.transform.localPosition = tempEquipmentModel.localPosition;
                         tempEquipmentObject.transform.localEulerAngles = tempEquipmentModel.localEulerAngles;
-                        tempEquipmentObject.transform.localScale = tempEquipmentModel.localScale.Equals(Vector3.zero) ? Vector3.one : tempEquipmentModel.localScale;
+                        if (!tempEquipmentModel.doNotChangeScale)
+                            tempEquipmentObject.transform.localScale = tempEquipmentModel.localScale.Equals(Vector3.zero) ? Vector3.one : tempEquipmentModel.localScale;
                         tempEquipmentObject.gameObject.SetActive(true);
                         if (SetEquipmentLayerFollowEntity)
                             tempEquipmentObject.gameObject.GetOrAddComponent<SetLayerFollowGameObject>((comp) => comp.source = CacheEntity.gameObject);
                         else
                             tempEquipmentObject.gameObject.SetLayerRecursively(EquipmentLayer, true);
                         tempEquipmentObject.RemoveComponentsInChildren<Collider>(false);
-                        AddingNewModel(tempEquipmentObject, tempContainer);
+                        AddingNewModel(tempEquipmentModel, tempEquipmentObject, tempContainer);
                         EquippedModelObjects[equipSocket] = tempEquipmentObject;
                     }
                 }
@@ -554,7 +555,7 @@ namespace MultiplayerARPG
 
             foreach (EquipmentModel model in equipmentModels)
             {
-                if (string.IsNullOrEmpty(model.equipSocket) || (!model.useInstantiatedObject && !model.model))
+                if (string.IsNullOrEmpty(model.equipSocket) || (!model.useInstantiatedObject && !model.meshPrefab))
                 {
                     // Required data are empty, skip it
                     continue;
@@ -814,7 +815,7 @@ namespace MultiplayerARPG
                 CacheLeftHandEquipmentEntity.PlayCharge();
         }
 
-        public virtual void AddingNewModel(GameObject newModel, EquipmentContainer equipmentContainer) { }
+        public virtual void AddingNewModel(EquipmentModel data, GameObject newModel, EquipmentContainer equipmentContainer) { }
 
         public void SetIsDead(bool isDead)
         {

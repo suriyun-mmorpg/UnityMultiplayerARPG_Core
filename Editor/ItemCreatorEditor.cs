@@ -260,7 +260,7 @@ namespace MultiplayerARPG
                     {
                         equipSocket = equipSocketR,
                         useInstantiatedObject = false,
-                        model = savedEquipModelR,
+                        meshPrefab = savedEquipModelR,
                     }
                 };
                 if (newItemData is Item)
@@ -284,7 +284,7 @@ namespace MultiplayerARPG
                     {
                         equipSocket = equipSocketL,
                         useInstantiatedObject = false,
-                        model = savedEquipModelL,
+                        meshPrefab = savedEquipModelL,
                     }
                 };
                 if (newItemData is Item)

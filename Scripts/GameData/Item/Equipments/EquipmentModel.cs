@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace MultiplayerARPG
 {
@@ -7,16 +8,28 @@ namespace MultiplayerARPG
     {
         [Header("Generic Settings")]
         public string equipSocket;
+
+        [Header("Prefab Settings")]
+        [Tooltip("Turn it on to use instantiated object which is a child of character model")]
+        [FormerlySerializedAs("useInstantiatedObject")]
         public bool useInstantiatedObject;
         [BoolShowConditional(nameof(useInstantiatedObject), false)]
-        public GameObject model;
+        [FormerlySerializedAs("model")]
+        public GameObject meshPrefab;
         [BoolShowConditional(nameof(useInstantiatedObject), true)]
         public int instantiatedObjectIndex;
         public byte priority;
 
+        [Header("Skinned Mesh Settings")]
+        [Tooltip("Turn it on to not use bones from entities if this mesh is skinned mesh")]
+        public bool doNotUseEntityBones;
+
         [Header("Transform Settings")]
         public Vector3 localPosition;
         public Vector3 localEulerAngles;
+        [Tooltip("Turn it on to not change object scale when it is instantiated to character's hands (or other part of body)")]
+        public bool doNotChangeScale;
+        [BoolShowConditional(nameof(doNotChangeScale), false)]
         public Vector3 localScale;
 
         [Header("Weapon Sheath Settings")]
@@ -38,7 +51,7 @@ namespace MultiplayerARPG
             {
                 equipSocket = equipSocket,
                 useInstantiatedObject = useInstantiatedObject,
-                model = model,
+                meshPrefab = meshPrefab,
                 instantiatedObjectIndex = instantiatedObjectIndex,
                 localPosition = localPosition,
                 localEulerAngles = localEulerAngles,

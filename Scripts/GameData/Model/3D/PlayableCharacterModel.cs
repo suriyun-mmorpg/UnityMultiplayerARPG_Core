@@ -65,9 +65,11 @@ namespace MultiplayerARPG.GameData.Model.Playables
                 Graph.Play();
         }
 
-        public override void AddingNewModel(GameObject newModel, EquipmentContainer equipmentContainer)
+        public override void AddingNewModel(EquipmentModel data, GameObject newModel, EquipmentContainer equipmentContainer)
         {
-            base.AddingNewModel(newModel, equipmentContainer);
+            base.AddingNewModel(data, newModel, equipmentContainer);
+            if (data.doNotUseEntityBones)
+                return;
             SkinnedMeshRenderer skinnedMesh = newModel.GetComponentInChildren<SkinnedMeshRenderer>();
             if (skinnedMesh != null && skinnedMeshRenderer != null)
             {
