@@ -31,8 +31,8 @@ namespace MultiplayerARPG
 
         public abstract SpawnPrefabData<T>[] SpawningPrefabs { get; }
 
-        protected float respawnPendingEntitiesTimer = 0f;
-        protected readonly List<SpawnPrefabData<T>> pending = new List<SpawnPrefabData<T>>();
+        protected float _respawnPendingEntitiesTimer = 0f;
+        protected readonly List<SpawnPrefabData<T>> _pending = new List<SpawnPrefabData<T>>();
 
         protected virtual void Awake()
         {
@@ -41,13 +41,13 @@ namespace MultiplayerARPG
 
         protected virtual void LateUpdate()
         {
-            if (pending.Count > 0)
+            if (_pending.Count > 0)
             {
-                respawnPendingEntitiesTimer += Time.deltaTime;
-                if (respawnPendingEntitiesTimer >= respawnPendingEntitiesDelay)
+                _respawnPendingEntitiesTimer += Time.deltaTime;
+                if (_respawnPendingEntitiesTimer >= respawnPendingEntitiesDelay)
                 {
-                    respawnPendingEntitiesTimer = 0f;
-                    foreach (SpawnPrefabData<T> pendingEntry in pending)
+                    _respawnPendingEntitiesTimer = 0f;
+                    foreach (SpawnPrefabData<T> pendingEntry in _pending)
                     {
                         Logging.LogWarning(ToString(), $"Spawning pending entities, Prefab: {pendingEntry.prefab.name}, Amount: {pendingEntry.amount}.");
                         for (int i = 0; i < pendingEntry.amount; ++i)
@@ -55,7 +55,7 @@ namespace MultiplayerARPG
                             Spawn(pendingEntry.prefab, pendingEntry.level, 0);
                         }
                     }
-                    pending.Clear();
+                    _pending.Clear();
                 }
             }
         }

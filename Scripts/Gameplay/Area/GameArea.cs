@@ -22,7 +22,7 @@ namespace MultiplayerARPG
 
         protected GameInstance CurrentGameInstance { get { return GameInstance.Singleton; } }
 
-        protected IPhysicFunctions physicFunctions;
+        protected IPhysicFunctions _physicFunctions;
 
         public bool GetRandomPosition(out Vector3 randomedPosition)
         {

@@ -72,13 +72,13 @@ namespace MultiplayerARPG
                             overlap.gameObject.layer == CurrentGameInstance.harvestableLayer)
                         {
                             // Don't spawn because it will hitting other entities
-                            pending.Add(new HarvestableSpawnPrefabData()
+                            _pending.Add(new HarvestableSpawnPrefabData()
                             {
                                 prefab = prefab,
                                 level = level,
                                 amount = 1
                             });
-                            Logging.LogWarning(ToString(), $"Cannot spawn harvestable, it is collided to another entities, pending harvestable amount {pending.Count}");
+                            Logging.LogWarning(ToString(), $"Cannot spawn harvestable, it is collided to another entities, pending harvestable amount {_pending.Count}");
                             return null;
                         }
                     }
@@ -98,13 +98,13 @@ namespace MultiplayerARPG
                             overlap.gameObject.layer == CurrentGameInstance.harvestableLayer)
                         {
                             // Don't spawn because it will hitting other entities
-                            pending.Add(new HarvestableSpawnPrefabData()
+                            _pending.Add(new HarvestableSpawnPrefabData()
                             {
                                 prefab = prefab,
                                 level = level,
                                 amount = 1
                             });
-                            Logging.LogWarning(ToString(), $"Cannot spawn harvestable, it is collided to another entities, pending harvestable amount {pending.Count}");
+                            Logging.LogWarning(ToString(), $"Cannot spawn harvestable, it is collided to another entities, pending harvestable amount {_pending.Count}");
                             return null;
                         }
                     }
@@ -119,13 +119,13 @@ namespace MultiplayerARPG
                 BaseGameNetworkManager.Singleton.Assets.NetworkSpawn(spawnObj);
                 return entity;
             }
-            pending.Add(new HarvestableSpawnPrefabData()
+            _pending.Add(new HarvestableSpawnPrefabData()
             {
                 prefab = prefab,
                 level = level,
                 amount = 1
             });
-            Logging.LogWarning(ToString(), $"Cannot spawn harvestable, it cannot find grounded position, pending harvestable amount {pending.Count}");
+            Logging.LogWarning(ToString(), $"Cannot spawn harvestable, it cannot find grounded position, pending harvestable amount {_pending.Count}");
             return null;
         }
 

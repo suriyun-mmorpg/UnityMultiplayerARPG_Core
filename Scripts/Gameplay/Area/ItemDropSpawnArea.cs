@@ -35,13 +35,13 @@ namespace MultiplayerARPG
                 BaseGameNetworkManager.Singleton.Assets.NetworkSpawn(spawnObj);
                 return entity;
             }
-            pending.Add(new ItemDropSpawnPrefabData()
+            _pending.Add(new ItemDropSpawnPrefabData()
             {
                 prefab = prefab,
                 level = level,
                 amount = 1
             });
-            Logging.LogWarning(ToString(), $"Cannot spawn item drop, it cannot find grounded position, pending item drop amount {pending.Count}");
+            Logging.LogWarning(ToString(), $"Cannot spawn item drop, it cannot find grounded position, pending item drop amount {_pending.Count}");
             return null;
         }
 

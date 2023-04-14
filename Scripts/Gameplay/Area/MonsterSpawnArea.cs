@@ -66,13 +66,13 @@ namespace MultiplayerARPG
                 {
                     // Destroy the entity (because it can't find ground position)
                     Destroy(entity.gameObject);
-                    pending.Add(new MonsterSpawnPrefabData()
+                    _pending.Add(new MonsterSpawnPrefabData()
                     {
                         prefab = prefab,
                         level = level,
                         amount = 1
                     });
-                    Logging.LogWarning(ToString(), $"Cannot spawn monster, it cannot find grounded position, pending monster amount {pending.Count}");
+                    Logging.LogWarning(ToString(), $"Cannot spawn monster, it cannot find grounded position, pending monster amount {_pending.Count}");
                     return null;
                 }
                 entity.Level = level;
@@ -81,13 +81,13 @@ namespace MultiplayerARPG
                 BaseGameNetworkManager.Singleton.Assets.NetworkSpawn(spawnObj);
                 return entity;
             }
-            pending.Add(new MonsterSpawnPrefabData()
+            _pending.Add(new MonsterSpawnPrefabData()
             {
                 prefab = prefab,
                 level = level,
                 amount = 1
             });
-            Logging.LogWarning(ToString(), $"Cannot spawn monster, it cannot find grounded position, pending monster amount {pending.Count}");
+            Logging.LogWarning(ToString(), $"Cannot spawn monster, it cannot find grounded position, pending monster amount {_pending.Count}");
             return null;
         }
 
