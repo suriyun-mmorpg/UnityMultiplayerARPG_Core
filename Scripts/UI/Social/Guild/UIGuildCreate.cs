@@ -48,14 +48,14 @@ namespace MultiplayerARPG
             {
                 uiRequireItemAmounts.displayType = UIItemAmounts.DisplayType.Requirement;
                 uiRequireItemAmounts.Show();
-                uiRequireItemAmounts.Data = systemSetting.CacheCreateGuildRequireItems;
+                uiRequireItemAmounts.Data = systemSetting.CreateGuildRequireItems;
             }
 
             if (uiRequireCurrencyAmounts != null)
             {
                 uiRequireCurrencyAmounts.displayType = UICurrencyAmounts.DisplayType.Requirement;
                 uiRequireCurrencyAmounts.Show();
-                uiRequireCurrencyAmounts.Data = systemSetting.CacheCreateGuildRequireCurrencies;
+                uiRequireCurrencyAmounts.Data = systemSetting.CreateGuildRequireCurrencies;
             }
         }
 

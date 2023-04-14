@@ -152,17 +152,17 @@ namespace MultiplayerARPG
         {
             if (character.Gold < setting.CreateGuildRequiredGold)
                 return false;
-            if (setting.CacheCreateGuildRequireCurrencies.Count == 0)
+            if (setting.CreateGuildRequireCurrencies.Count == 0)
                 return true;
-            return character.HasEnoughCurrencyAmounts(setting.CacheCreateGuildRequireCurrencies, out _, out _);
+            return character.HasEnoughCurrencyAmounts(setting.CreateGuildRequireCurrencies, out _, out _);
         }
 
         public virtual void DecreaseCurrenciesWhenCreateGuild(IPlayerCharacterData character, SocialSystemSetting setting)
         {
             character.Gold -= setting.CreateGuildRequiredGold;
-            if (setting.CacheCreateGuildRequireCurrencies.Count == 0)
+            if (setting.CreateGuildRequireCurrencies.Count == 0)
                 return;
-            character.DecreaseCurrencies(setting.CacheCreateGuildRequireCurrencies);
+            character.DecreaseCurrencies(setting.CreateGuildRequireCurrencies);
         }
 
         public virtual Reward MakeMonsterReward(MonsterCharacter monster, int level)

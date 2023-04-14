@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using LiteNetLibManager;
 using UnityEngine;
+using Newtonsoft.Json;
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
@@ -12,10 +13,13 @@ namespace MultiplayerARPG
     {
         [Header("Party Configs")]
         [SerializeField]
+        [JsonIgnore]
         private int maxPartyMember = 8;
         [SerializeField]
+        [JsonIgnore]
         private bool partyMemberCanInvite = false;
         [SerializeField]
+        [JsonIgnore]
         private bool partyMemberCanKick = false;
 
         public int MaxPartyMember { get { return maxPartyMember; } }
@@ -24,21 +28,29 @@ namespace MultiplayerARPG
 
         [Header("Guild Configs")]
         [SerializeField]
+        [JsonIgnore]
         private int maxGuildMember = 50;
         [SerializeField]
+        [JsonIgnore]
         private int minGuildNameLength = 2;
         [SerializeField]
+        [JsonIgnore]
         private int maxGuildNameLength = 16;
         [SerializeField]
+        [JsonIgnore]
         private int minGuildRoleNameLength = 2;
         [SerializeField]
+        [JsonIgnore]
         private int maxGuildRoleNameLength = 16;
         [SerializeField]
+        [JsonIgnore]
         private int maxGuildMessageLength = 140;
         [SerializeField]
+        [JsonIgnore]
         private int maxGuildMessage2Length = 140;
         [Tooltip("Member roles from high to low priority")]
         [SerializeField]
+        [JsonIgnore]
         private GuildRoleData[] guildMemberRoles = new GuildRoleData[] {
             new GuildRoleData() { roleName = "Master", canInvite = true, canKick = true, canUseStorage = true },
             new GuildRoleData() { roleName = "Member 1", canInvite = false, canKick = false, canUseStorage = false },
@@ -49,22 +61,33 @@ namespace MultiplayerARPG
         };
         [Range(0, 100)]
         [SerializeField]
+        [JsonIgnore]
         private byte maxShareExpPercentage = 20;
         [SerializeField]
+        [JsonIgnore]
         [ArrayElementTitle("item")]
         private ItemAmount[] createGuildRequireItems = new ItemAmount[0];
         [SerializeField]
+        [JsonIgnore]
         [ArrayElementTitle("currency")]
         private CurrencyAmount[] createGuildRequireCurrencies = new CurrencyAmount[0];
         [SerializeField]
+        [JsonIgnore]
         private int createGuildRequiredGold = 1000;
         [SerializeField]
+        [JsonIgnore]
         private int[] guildExpTree;
 
         [Header("Exp calculator")]
-        public int guildMaxLevel;
-        public Int32GraphCalculator guildExpCalculator;
-        public bool guildCalculateExp;
+        [SerializeField]
+        [JsonIgnore]
+        private int guildMaxLevel;
+        [SerializeField]
+        [JsonIgnore]
+        private Int32GraphCalculator guildExpCalculator;
+        [SerializeField]
+        [JsonIgnore]
+        private bool guildCalculateExp;
 
         public int MaxGuildMember { get { return maxGuildMember; } }
         public int MinGuildNameLength { get { return minGuildNameLength; } }
@@ -77,26 +100,26 @@ namespace MultiplayerARPG
         public byte MaxShareExpPercentage { get { return maxShareExpPercentage; } }
 
         [System.NonSerialized]
-        private Dictionary<BaseItem, int> cacheCreateGuildRequireItems;
-        public Dictionary<BaseItem, int> CacheCreateGuildRequireItems
+        private Dictionary<BaseItem, int> _createGuildRequireItems;
+        public Dictionary<BaseItem, int> CreateGuildRequireItems
         {
             get
             {
-                if (cacheCreateGuildRequireItems == null)
-                    cacheCreateGuildRequireItems = GameDataHelpers.CombineItems(createGuildRequireItems, new Dictionary<BaseItem, int>());
-                return cacheCreateGuildRequireItems;
+                if (_createGuildRequireItems == null)
+                    _createGuildRequireItems = GameDataHelpers.CombineItems(createGuildRequireItems, new Dictionary<BaseItem, int>());
+                return _createGuildRequireItems;
             }
         }
 
         [System.NonSerialized]
-        private Dictionary<Currency, int> cacheCreateGuildRequireCurrencies;
-        public Dictionary<Currency, int> CacheCreateGuildRequireCurrencies
+        private Dictionary<Currency, int> _createGuildRequireCurrencies;
+        public Dictionary<Currency, int> CreateGuildRequireCurrencies
         {
             get
             {
-                if (cacheCreateGuildRequireCurrencies == null)
-                    cacheCreateGuildRequireCurrencies = GameDataHelpers.CombineCurrencies(createGuildRequireCurrencies, new Dictionary<Currency, int>());
-                return cacheCreateGuildRequireCurrencies;
+                if (_createGuildRequireCurrencies == null)
+                    _createGuildRequireCurrencies = GameDataHelpers.CombineCurrencies(createGuildRequireCurrencies, new Dictionary<Currency, int>());
+                return _createGuildRequireCurrencies;
             }
         }
 
