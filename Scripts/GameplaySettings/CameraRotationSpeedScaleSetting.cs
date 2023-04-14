@@ -12,7 +12,7 @@ namespace MultiplayerARPG
         public float maxValue = 1f;
         public float defaultValue = 1f;
         public string cameraRotationSpeedScaleSaveKey = "DEFAULT_CAMERA_ROTATION_SPEED_SCALE";
-        private readonly static Dictionary<string, float> CameraRotationSpeedScales = new Dictionary<string, float>();
+        private readonly static Dictionary<string, float> s_cameraRotationSpeedScales = new Dictionary<string, float>();
         public float CameraRotationSpeedScale
         {
             get
@@ -23,7 +23,7 @@ namespace MultiplayerARPG
             {
                 if (!string.IsNullOrEmpty(cameraRotationSpeedScaleSaveKey))
                 {
-                    CameraRotationSpeedScales[cameraRotationSpeedScaleSaveKey] = value;
+                    s_cameraRotationSpeedScales[cameraRotationSpeedScaleSaveKey] = value;
                     PlayerPrefs.SetFloat(cameraRotationSpeedScaleSaveKey, value);
                 }
             }
@@ -33,9 +33,9 @@ namespace MultiplayerARPG
         {
             if (string.IsNullOrEmpty(key))
                 return defaultValue;
-            if (!CameraRotationSpeedScales.ContainsKey(key))
-                CameraRotationSpeedScales[key] = PlayerPrefs.GetFloat(key, defaultValue);
-            return CameraRotationSpeedScales[key];
+            if (!s_cameraRotationSpeedScales.ContainsKey(key))
+                s_cameraRotationSpeedScales[key] = PlayerPrefs.GetFloat(key, defaultValue);
+            return s_cameraRotationSpeedScales[key];
         }
 
         private void Start()
