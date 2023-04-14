@@ -345,7 +345,7 @@ namespace MultiplayerARPG
         /// <param name="level"></param>
         private void OnLevelChange(bool isInitial, int level)
         {
-            isRecaching = true;
+            _isRecaching = true;
             if (onLevelChange != null)
                 onLevelChange.Invoke(level);
         }
@@ -424,7 +424,7 @@ namespace MultiplayerARPG
         protected virtual void OnEquipWeaponSetChange(bool isInitial, byte equipWeaponSet)
         {
             PrepareToSetEquipWeaponsModels();
-            isRecaching = true;
+            _isRecaching = true;
             if (onEquipWeaponSetChange != null)
                 onEquipWeaponSetChange.Invoke(equipWeaponSet);
         }
@@ -437,7 +437,7 @@ namespace MultiplayerARPG
         protected virtual void OnIsWeaponsSheathedChange(bool isInitial, bool isWeaponsSheathed)
         {
             PrepareToSetEquipWeaponsModels();
-            isRecaching = true;
+            _isRecaching = true;
             if (onIsWeaponsSheathedChange != null)
                 onIsWeaponsSheathedChange.Invoke(isWeaponsSheathed);
         }
@@ -485,7 +485,7 @@ namespace MultiplayerARPG
         private void OnSelectableWeaponSetsOperation(LiteNetLibSyncList.Operation operation, int index)
         {
             PrepareToSetEquipWeaponsModels();
-            selectableWeaponSetsRecachingState = new SyncListRecachingState()
+            _selectableWeaponSetsRecachingState = new SyncListRecachingState()
             {
                 isRecaching = true,
                 operation = operation,
@@ -500,7 +500,7 @@ namespace MultiplayerARPG
         /// <param name="index"></param>
         private void OnAttributesOperation(LiteNetLibSyncList.Operation operation, int index)
         {
-            attributesRecachingState = new SyncListRecachingState()
+            _attributesRecachingState = new SyncListRecachingState()
             {
                 isRecaching = true,
                 operation = operation,
@@ -515,7 +515,7 @@ namespace MultiplayerARPG
         /// <param name="index"></param>
         private void OnSkillsOperation(LiteNetLibSyncList.Operation operation, int index)
         {
-            skillsRecachingState = new SyncListRecachingState()
+            _skillsRecachingState = new SyncListRecachingState()
             {
                 isRecaching = true,
                 operation = operation,
@@ -544,7 +544,7 @@ namespace MultiplayerARPG
                     int skillIndex = this.IndexOfSkill(SkillUsages[index].dataId);
                     if (skillIndex >= 0)
                     {
-                        skillsRecachingState = new SyncListRecachingState()
+                        _skillsRecachingState = new SyncListRecachingState()
                         {
                             isRecaching = true,
                             operation = operation,
@@ -578,7 +578,7 @@ namespace MultiplayerARPG
                     break;
             }
 
-            buffsRecachingState = new SyncListRecachingState()
+            _buffsRecachingState = new SyncListRecachingState()
             {
                 isRecaching = true,
                 operation = operation,
@@ -594,7 +594,7 @@ namespace MultiplayerARPG
         private void OnEquipItemsOperation(LiteNetLibSyncList.Operation operation, int index)
         {
             PrepareToSetEquipItemsModels();
-            equipItemsRecachingState = new SyncListRecachingState()
+            _equipItemsRecachingState = new SyncListRecachingState()
             {
                 isRecaching = true,
                 operation = operation,
@@ -609,7 +609,7 @@ namespace MultiplayerARPG
         /// <param name="index"></param>
         private void OnNonEquipItemsOperation(LiteNetLibSyncList.Operation operation, int index)
         {
-            nonEquipItemsRecachingState = new SyncListRecachingState()
+            _nonEquipItemsRecachingState = new SyncListRecachingState()
             {
                 isRecaching = true,
                 operation = operation,
@@ -624,7 +624,7 @@ namespace MultiplayerARPG
         /// <param name="index"></param>
         private void OnSummonsOperation(LiteNetLibSyncList.Operation operation, int index)
         {
-            summonsRecachingState = new SyncListRecachingState()
+            _summonsRecachingState = new SyncListRecachingState()
             {
                 isRecaching = true,
                 operation = operation,

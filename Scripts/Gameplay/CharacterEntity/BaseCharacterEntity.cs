@@ -212,7 +212,7 @@ namespace MultiplayerARPG
                 AttackPhysicFunctions = new PhysicFunctions2D(512);
                 FindPhysicFunctions = new PhysicFunctions2D(512);
             }
-            isRecaching = true;
+            _isRecaching = true;
             _lastGrounded = false;
             _lastGroundedPosition = EntityTransform.position;
         }

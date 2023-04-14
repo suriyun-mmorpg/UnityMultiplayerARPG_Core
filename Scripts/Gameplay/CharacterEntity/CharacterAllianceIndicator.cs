@@ -19,36 +19,37 @@ namespace MultiplayerARPG
         public GameObject neutralIndicator;
         public float updateWithinRange = 30f;
         public float updateRepeatRate = 0.5f;
-        private BaseCharacterEntity characterEntity;
-        private float lastUpdateTime;
+
+        private BaseCharacterEntity _characterEntity;
+        private float _lastUpdateTime;
 
         private void Awake()
         {
-            characterEntity = GetComponentInParent<BaseCharacterEntity>();
+            _characterEntity = GetComponentInParent<BaseCharacterEntity>();
         }
 
         private void Update()
         {
-            if (characterEntity == null || !characterEntity.IsClient || (characterEntity.IsServer && characterEntity.Identity.CountSubscribers() == 0) ||
-                GameInstance.PlayingCharacterEntity == null || Vector3.Distance(characterEntity.EntityTransform.position, GameInstance.PlayingCharacterEntity.EntityTransform.position) > updateWithinRange)
+            if (_characterEntity == null || !_characterEntity.IsClient || (_characterEntity.IsServer && _characterEntity.Identity.CountSubscribers() == 0) ||
+                GameInstance.PlayingCharacterEntity == null || Vector3.Distance(_characterEntity.EntityTransform.position, GameInstance.PlayingCharacterEntity.EntityTransform.position) > updateWithinRange)
             {
                 HideAll();
                 return;
             }
 
-            if (Time.unscaledTime - lastUpdateTime >= updateRepeatRate)
+            if (Time.unscaledTime - _lastUpdateTime >= updateRepeatRate)
             {
-                lastUpdateTime = Time.unscaledTime;
+                _lastUpdateTime = Time.unscaledTime;
                 HideAll();
-                EntityInfo entityInfo = characterEntity.GetInfo();
+                EntityInfo entityInfo = _characterEntity.GetInfo();
                 List<GameObject> showingObjects = new List<GameObject>();
                 bool isShowing;
 
-                isShowing = GameInstance.PlayingCharacterEntity == characterEntity;
+                isShowing = GameInstance.PlayingCharacterEntity == _characterEntity;
                 if (owningIndicator != null && isShowing && !showingObjects.Contains(owningIndicator))
                     showingObjects.Add(owningIndicator);
 
-                isShowing = characterEntity.IsAlly(GameInstance.PlayingCharacterEntity.GetInfo());
+                isShowing = _characterEntity.IsAlly(GameInstance.PlayingCharacterEntity.GetInfo());
                 if (allyIndicator != null && isShowing && !showingObjects.Contains(allyIndicator))
                     showingObjects.Add(allyIndicator);
 
@@ -60,11 +61,11 @@ namespace MultiplayerARPG
                 if (guildMemberIndicator != null && isShowing && !showingObjects.Contains(guildMemberIndicator))
                     showingObjects.Add(guildMemberIndicator);
 
-                isShowing = characterEntity.IsEnemy(GameInstance.PlayingCharacterEntity.GetInfo());
+                isShowing = _characterEntity.IsEnemy(GameInstance.PlayingCharacterEntity.GetInfo());
                 if (enemyIndicator != null && isShowing && !showingObjects.Contains(enemyIndicator))
                     showingObjects.Add(enemyIndicator);
 
-                isShowing = characterEntity.IsNeutral(GameInstance.PlayingCharacterEntity.GetInfo());
+                isShowing = _characterEntity.IsNeutral(GameInstance.PlayingCharacterEntity.GetInfo());
                 if (neutralIndicator != null && isShowing && !showingObjects.Contains(neutralIndicator))
                     showingObjects.Add(neutralIndicator);
 

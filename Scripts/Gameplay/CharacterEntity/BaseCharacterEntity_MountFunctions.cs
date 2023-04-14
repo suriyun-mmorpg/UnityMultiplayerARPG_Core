@@ -33,7 +33,7 @@ namespace MultiplayerARPG
         public override void SetPassengingVehicle(byte seatIndex, IVehicleEntity vehicleEntity)
         {
             base.SetPassengingVehicle(seatIndex, vehicleEntity);
-            isRecaching = true;
+            _isRecaching = true;
         }
     }
 }

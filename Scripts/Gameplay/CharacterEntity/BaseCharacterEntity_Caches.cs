@@ -10,31 +10,31 @@
         {
             get
             {
-                return isRecaching ||
-                    selectableWeaponSetsRecachingState.isRecaching ||
-                    attributesRecachingState.isRecaching ||
-                    skillsRecachingState.isRecaching ||
-                    buffsRecachingState.isRecaching ||
-                    equipItemsRecachingState.isRecaching ||
-                    nonEquipItemsRecachingState.isRecaching ||
-                    summonsRecachingState.isRecaching;
+                return _isRecaching ||
+                    _selectableWeaponSetsRecachingState.isRecaching ||
+                    _attributesRecachingState.isRecaching ||
+                    _skillsRecachingState.isRecaching ||
+                    _buffsRecachingState.isRecaching ||
+                    _equipItemsRecachingState.isRecaching ||
+                    _nonEquipItemsRecachingState.isRecaching ||
+                    _summonsRecachingState.isRecaching;
             }
         }
-        protected bool isRecaching;
-        protected SyncListRecachingState selectableWeaponSetsRecachingState;
-        protected SyncListRecachingState attributesRecachingState;
-        protected SyncListRecachingState skillsRecachingState;
-        protected SyncListRecachingState buffsRecachingState;
-        protected SyncListRecachingState equipItemsRecachingState;
-        protected SyncListRecachingState nonEquipItemsRecachingState;
-        protected SyncListRecachingState summonsRecachingState;
+        protected bool _isRecaching;
+        protected SyncListRecachingState _selectableWeaponSetsRecachingState;
+        protected SyncListRecachingState _attributesRecachingState;
+        protected SyncListRecachingState _skillsRecachingState;
+        protected SyncListRecachingState _buffsRecachingState;
+        protected SyncListRecachingState _equipItemsRecachingState;
+        protected SyncListRecachingState _nonEquipItemsRecachingState;
+        protected SyncListRecachingState _summonsRecachingState;
 
         /// <summary>
         /// Make caches for character stats / attributes / skills / resistances / increase damages and so on immdediately
         /// </summary>
         public void ForceMakeCaches()
         {
-            isRecaching = true;
+            _isRecaching = true;
             MakeCaches();
         }
 
@@ -49,56 +49,56 @@
             // Make caches with cache manager
             this.MarkToMakeCaches();
 
-            if (selectableWeaponSetsRecachingState.isRecaching)
+            if (_selectableWeaponSetsRecachingState.isRecaching)
             {
                 if (onSelectableWeaponSetsOperation != null)
-                    onSelectableWeaponSetsOperation.Invoke(selectableWeaponSetsRecachingState.operation, selectableWeaponSetsRecachingState.index);
-                selectableWeaponSetsRecachingState = SyncListRecachingState.Empty;
+                    onSelectableWeaponSetsOperation.Invoke(_selectableWeaponSetsRecachingState.operation, _selectableWeaponSetsRecachingState.index);
+                _selectableWeaponSetsRecachingState = SyncListRecachingState.Empty;
             }
 
-            if (attributesRecachingState.isRecaching)
+            if (_attributesRecachingState.isRecaching)
             {
                 if (onAttributesOperation != null)
-                    onAttributesOperation.Invoke(attributesRecachingState.operation, attributesRecachingState.index);
-                attributesRecachingState = SyncListRecachingState.Empty;
+                    onAttributesOperation.Invoke(_attributesRecachingState.operation, _attributesRecachingState.index);
+                _attributesRecachingState = SyncListRecachingState.Empty;
             }
 
-            if (skillsRecachingState.isRecaching)
+            if (_skillsRecachingState.isRecaching)
             {
                 if (onSkillsOperation != null)
-                    onSkillsOperation.Invoke(skillsRecachingState.operation, skillsRecachingState.index);
-                skillsRecachingState = SyncListRecachingState.Empty;
+                    onSkillsOperation.Invoke(_skillsRecachingState.operation, _skillsRecachingState.index);
+                _skillsRecachingState = SyncListRecachingState.Empty;
             }
 
-            if (buffsRecachingState.isRecaching)
+            if (_buffsRecachingState.isRecaching)
             {
                 if (onBuffsOperation != null)
-                    onBuffsOperation.Invoke(buffsRecachingState.operation, buffsRecachingState.index);
-                buffsRecachingState = SyncListRecachingState.Empty;
+                    onBuffsOperation.Invoke(_buffsRecachingState.operation, _buffsRecachingState.index);
+                _buffsRecachingState = SyncListRecachingState.Empty;
             }
 
-            if (equipItemsRecachingState.isRecaching)
+            if (_equipItemsRecachingState.isRecaching)
             {
                 if (onEquipItemsOperation != null)
-                    onEquipItemsOperation.Invoke(equipItemsRecachingState.operation, equipItemsRecachingState.index);
-                equipItemsRecachingState = SyncListRecachingState.Empty;
+                    onEquipItemsOperation.Invoke(_equipItemsRecachingState.operation, _equipItemsRecachingState.index);
+                _equipItemsRecachingState = SyncListRecachingState.Empty;
             }
 
-            if (nonEquipItemsRecachingState.isRecaching)
+            if (_nonEquipItemsRecachingState.isRecaching)
             {
                 if (onNonEquipItemsOperation != null)
-                    onNonEquipItemsOperation.Invoke(nonEquipItemsRecachingState.operation, nonEquipItemsRecachingState.index);
-                nonEquipItemsRecachingState = SyncListRecachingState.Empty;
+                    onNonEquipItemsOperation.Invoke(_nonEquipItemsRecachingState.operation, _nonEquipItemsRecachingState.index);
+                _nonEquipItemsRecachingState = SyncListRecachingState.Empty;
             }
 
-            if (summonsRecachingState.isRecaching)
+            if (_summonsRecachingState.isRecaching)
             {
                 if (onSummonsOperation != null)
-                    onSummonsOperation.Invoke(summonsRecachingState.operation, summonsRecachingState.index);
-                summonsRecachingState = SyncListRecachingState.Empty;
+                    onSummonsOperation.Invoke(_summonsRecachingState.operation, _summonsRecachingState.index);
+                _summonsRecachingState = SyncListRecachingState.Empty;
             }
 
-            isRecaching = false;
+            _isRecaching = false;
         }
     }
 }
