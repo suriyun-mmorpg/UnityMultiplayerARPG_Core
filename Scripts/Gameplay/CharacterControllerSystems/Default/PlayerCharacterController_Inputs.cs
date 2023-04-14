@@ -7,23 +7,23 @@ namespace MultiplayerARPG
         public const float MIN_START_MOVE_DISTANCE = 0.01f;
 
         // Input & control states variables
-        protected int findingEnemyIndex = -1;
-        protected bool getMouseUp;
-        protected bool getMouseDown;
-        protected bool getMouse;
-        protected bool isPointerOverUI;
-        protected bool isMouseDragDetected;
-        protected bool isMouseHoldDetected;
-        protected bool isMouseHoldAndNotDrag;
-        protected bool isSprinting;
-        protected bool isWalking;
-        protected Vector3 mouseDownPosition;
-        protected float mouseDownTime;
-        protected bool isMouseDragOrHoldOrOverUI;
-        protected Vector3? targetPosition;
-        protected Vector3 previousPointClickPosition = Vector3.positiveInfinity;
-        protected bool didActionOnTarget;
-        protected bool isBlockControllerLastFrame = false;
+        protected int _findingEnemyIndex = -1;
+        protected bool _getMouseUp;
+        protected bool _getMouseDown;
+        protected bool _getMouse;
+        protected bool _isPointerOverUI;
+        protected bool _isMouseDragDetected;
+        protected bool _isMouseHoldDetected;
+        protected bool _isMouseHoldAndNotDrag;
+        protected bool _isSprinting;
+        protected bool _isWalking;
+        protected Vector3 _mouseDownPosition;
+        protected float _mouseDownTime;
+        protected bool _isMouseDragOrHoldOrOverUI;
+        protected Vector3? _targetPosition;
+        protected Vector3 _previousPointClickPosition = Vector3.positiveInfinity;
+        protected bool _didActionOnTarget;
+        protected bool _isBlockControllerLastFrame = false;
 
         public int FindClickObjects(out Vector3 worldPosition2D)
         {
@@ -52,17 +52,17 @@ namespace MultiplayerARPG
             }
             CacheGameplayCameraController.UpdateRotationX = false;
             CacheGameplayCameraController.UpdateRotationY = false;
-            CacheGameplayCameraController.UpdateRotation = !isFocusInputField && !isBlockController && !isBlockControllerLastFrame && !isPointerOverUIObject && InputManager.GetButton("CameraRotate");
-            CacheGameplayCameraController.UpdateZoom = !isFocusInputField && !isBlockController && !isBlockControllerLastFrame && !isPointerOverUIObject;
+            CacheGameplayCameraController.UpdateRotation = !isFocusInputField && !isBlockController && !_isBlockControllerLastFrame && !isPointerOverUIObject && InputManager.GetButton("CameraRotate");
+            CacheGameplayCameraController.UpdateZoom = !isFocusInputField && !isBlockController && !_isBlockControllerLastFrame && !isPointerOverUIObject;
 
-            if (isFocusInputField || isBlockController || isBlockControllerLastFrame || PlayingCharacterEntity.IsDead())
+            if (isFocusInputField || isBlockController || _isBlockControllerLastFrame || PlayingCharacterEntity.IsDead())
             {
-                isBlockControllerLastFrame = isBlockController;
+                _isBlockControllerLastFrame = isBlockController;
                 PlayingCharacterEntity.KeyMovement(Vector3.zero, MovementState.None);
                 return;
             }
 
-            isBlockControllerLastFrame = isBlockController;
+            _isBlockControllerLastFrame = isBlockController;
 
             // If it's building something, don't allow to activate NPC/Warp/Pickup Item
             if (ConstructingBuildingEntity == null)
@@ -126,15 +126,15 @@ namespace MultiplayerARPG
                 // Find target to attack
                 if (_findEnemyInput.IsPress)
                 {
-                    ++findingEnemyIndex;
-                    if (findingEnemyIndex < 0 || findingEnemyIndex >= EnemyEntityDetector.characters.Count)
-                        findingEnemyIndex = 0;
+                    ++_findingEnemyIndex;
+                    if (_findingEnemyIndex < 0 || _findingEnemyIndex >= EnemyEntityDetector.characters.Count)
+                        _findingEnemyIndex = 0;
                     if (EnemyEntityDetector.characters.Count > 0)
                     {
                         SetTarget(null, TargetActionType.Attack);
-                        if (!EnemyEntityDetector.characters[findingEnemyIndex].IsHideOrDead())
+                        if (!EnemyEntityDetector.characters[_findingEnemyIndex].IsHideOrDead())
                         {
-                            SetTarget(EnemyEntityDetector.characters[findingEnemyIndex], TargetActionType.Attack);
+                            SetTarget(EnemyEntityDetector.characters[_findingEnemyIndex], TargetActionType.Attack);
                             if (SelectedGameEntity != null)
                             {
                                 // Turn character to enemy but does not move or attack yet.
@@ -159,14 +159,14 @@ namespace MultiplayerARPG
                 if (InputManager.GetButtonDown("Sprint"))
                 {
                     // Toggles sprint state
-                    isSprinting = !isSprinting;
-                    isWalking = false;
+                    _isSprinting = !_isSprinting;
+                    _isWalking = false;
                 }
                 else if (InputManager.GetButtonDown("Walk"))
                 {
                     // Toggles sprint state
-                    isWalking = !isWalking;
-                    isSprinting = false;
+                    _isWalking = !_isWalking;
+                    _isSprinting = false;
                 }
                 // Auto reload
                 if (PlayingCharacterEntity.EquipWeapons.rightHand.IsAmmoEmpty() ||
@@ -183,9 +183,9 @@ namespace MultiplayerARPG
             UpdatePointClickInput();
             UpdateWASDInput();
             // Set extra movement state
-            if (isSprinting)
+            if (_isSprinting)
                 PlayingCharacterEntity.SetExtraMovementState(ExtraMovementState.IsSprinting);
-            else if (isWalking)
+            else if (_isWalking)
                 PlayingCharacterEntity.SetExtraMovementState(ExtraMovementState.IsWalking);
             else
                 PlayingCharacterEntity.SetExtraMovementState(ExtraMovementState.None);
@@ -213,44 +213,44 @@ namespace MultiplayerARPG
             if (UICharacterHotkeys.UsingHotkey != null)
                 return;
 
-            getMouseDown = InputManager.GetMouseButtonDown(0);
-            getMouseUp = InputManager.GetMouseButtonUp(0);
-            getMouse = InputManager.GetMouseButton(0);
+            _getMouseDown = InputManager.GetMouseButtonDown(0);
+            _getMouseUp = InputManager.GetMouseButtonUp(0);
+            _getMouse = InputManager.GetMouseButton(0);
 
-            if (getMouseDown)
+            if (_getMouseDown)
             {
-                isMouseDragOrHoldOrOverUI = false;
-                mouseDownTime = Time.unscaledTime;
-                mouseDownPosition = InputManager.MousePosition();
+                _isMouseDragOrHoldOrOverUI = false;
+                _mouseDownTime = Time.unscaledTime;
+                _mouseDownPosition = InputManager.MousePosition();
             }
             // Read inputs
-            isPointerOverUI = UISceneGameplay.IsPointerOverUIObject();
-            isMouseDragDetected = (InputManager.MousePosition() - mouseDownPosition).sqrMagnitude > DETECT_MOUSE_DRAG_DISTANCE_SQUARED;
-            isMouseHoldDetected = Time.unscaledTime - mouseDownTime > DETECT_MOUSE_HOLD_DURATION;
-            isMouseHoldAndNotDrag = !isMouseDragDetected && isMouseHoldDetected;
-            if (!isMouseDragOrHoldOrOverUI && (isMouseDragDetected || isMouseHoldDetected || isPointerOverUI))
+            _isPointerOverUI = UISceneGameplay.IsPointerOverUIObject();
+            _isMouseDragDetected = (InputManager.MousePosition() - _mouseDownPosition).sqrMagnitude > DETECT_MOUSE_DRAG_DISTANCE_SQUARED;
+            _isMouseHoldDetected = Time.unscaledTime - _mouseDownTime > DETECT_MOUSE_HOLD_DURATION;
+            _isMouseHoldAndNotDrag = !_isMouseDragDetected && _isMouseHoldDetected;
+            if (!_isMouseDragOrHoldOrOverUI && (_isMouseDragDetected || _isMouseHoldDetected || _isPointerOverUI))
             {
                 // Detected mouse dragging or hold on an UIs
-                isMouseDragOrHoldOrOverUI = true;
+                _isMouseDragOrHoldOrOverUI = true;
             }
             // Will set move target when pointer isn't point on an UIs 
-            if (!isPointerOverUI && (getMouse || getMouseUp))
+            if (!_isPointerOverUI && (_getMouse || _getMouseUp))
             {
                 // Clear target
                 ClearTarget(true);
-                didActionOnTarget = false;
+                _didActionOnTarget = false;
                 // Prepare temp variables
                 Transform tempTransform;
                 bool tempHasMapPosition = false;
                 Vector3 tempMapPosition = Vector3.zero;
                 // If mouse up while cursor point to target (character, item, npc and so on)
-                bool mouseUpOnTarget = getMouseUp && !isMouseDragOrHoldOrOverUI;
+                bool mouseUpOnTarget = _getMouseUp && !_isMouseDragOrHoldOrOverUI;
                 int tempCount = FindClickObjects(out Vector3 tempVector3);
                 for (int tempCounter = 0; tempCounter < tempCount; ++tempCounter)
                 {
                     tempTransform = _physicFunctions.GetRaycastTransform(tempCounter);
                     // When holding on target, or already enter edit building mode
-                    if (isMouseHoldAndNotDrag)
+                    if (_isMouseHoldAndNotDrag)
                     {
                         IHoldActivatableEntity activatable = tempTransform.GetComponent<IHoldActivatableEntity>();
                         if (!activatable.IsNull() && activatable.CanHoldActivate())
@@ -309,7 +309,7 @@ namespace MultiplayerARPG
                 if (tempHasMapPosition)
                 {
                     SelectedEntity = null;
-                    targetPosition = tempMapPosition;
+                    _targetPosition = tempMapPosition;
                 }
                 // When clicked on map (any non-collider position)
                 // tempVector3 is come from FindClickObjects()
@@ -320,11 +320,11 @@ namespace MultiplayerARPG
                 {
                     ClearTarget();
                     tempVector3.z = 0;
-                    targetPosition = tempVector3;
+                    _targetPosition = tempVector3;
                 }
 
                 // Found ground position
-                if (targetPosition.HasValue)
+                if (_targetPosition.HasValue)
                 {
                     // Close NPC dialog, when target changes
                     HideNpcDialog();
@@ -337,7 +337,7 @@ namespace MultiplayerARPG
                     }
                     else
                     {
-                        OnPointClickOnGround(targetPosition.Value);
+                        OnPointClickOnGround(_targetPosition.Value);
                     }
                 }
             }
@@ -358,7 +358,7 @@ namespace MultiplayerARPG
 
         protected virtual void SetTarget(ITargetableEntity entity, TargetActionType targetActionType, bool checkControllerMode = true)
         {
-            targetPosition = null;
+            _targetPosition = null;
             if (checkControllerMode && controllerMode == PlayerCharacterControllerMode.WASD)
             {
                 this._targetActionType = targetActionType;
@@ -385,7 +385,7 @@ namespace MultiplayerARPG
                 SelectedEntity = null;
             TargetEntity = null;
             PlayingCharacterEntity.SetTargetEntity(null);
-            targetPosition = null;
+            _targetPosition = null;
             _targetActionType = TargetActionType.ClickActivate;
         }
 
@@ -657,9 +657,9 @@ namespace MultiplayerARPG
                 {
                     if (activatableEntity.ShouldNotActivateAfterFollowed())
                         return;
-                    if (!didActionOnTarget)
+                    if (!_didActionOnTarget)
                     {
-                        didActionOnTarget = true;
+                        _didActionOnTarget = true;
                         if (activatableEntity.CanActivate())
                             activatableEntity.OnActivate();
                         if (activatableEntity.ShouldClearTargetAfterActivated())
@@ -671,9 +671,9 @@ namespace MultiplayerARPG
             {
                 DoActionOrMoveToEntity(holdActivatableEntity, holdActivatableEntity.GetActivatableDistance(), () =>
                 {
-                    if (!didActionOnTarget)
+                    if (!_didActionOnTarget)
                     {
-                        didActionOnTarget = true;
+                        _didActionOnTarget = true;
                         if (holdActivatableEntity.CanHoldActivate())
                             holdActivatableEntity.OnHoldActivate();
                         if (holdActivatableEntity.ShouldClearTargetAfterActivated())
@@ -685,9 +685,9 @@ namespace MultiplayerARPG
             {
                 DoActionOrMoveToEntity(pickupActivatableEntity, pickupActivatableEntity.GetActivatableDistance(), () =>
                 {
-                    if (!didActionOnTarget)
+                    if (!_didActionOnTarget)
                     {
-                        didActionOnTarget = true;
+                        _didActionOnTarget = true;
                         if (pickupActivatableEntity.CanPickupActivate())
                             pickupActivatableEntity.OnPickupActivate();
                         if (pickupActivatableEntity.ShouldClearTargetAfterActivated())
@@ -822,10 +822,10 @@ namespace MultiplayerARPG
             Vector3 direction = (targetPosition - sourcePosition).normalized;
             Vector3 position = targetPosition - (direction * (distance - StoppingDistance));
             if (Vector3.Distance(MovementTransform.position, position) > MIN_START_MOVE_DISTANCE &&
-                Vector3.Distance(previousPointClickPosition, position) > MIN_START_MOVE_DISTANCE)
+                Vector3.Distance(_previousPointClickPosition, position) > MIN_START_MOVE_DISTANCE)
             {
                 PlayingCharacterEntity.PointClickMovement(position);
-                previousPointClickPosition = position;
+                _previousPointClickPosition = position;
             }
         }
 

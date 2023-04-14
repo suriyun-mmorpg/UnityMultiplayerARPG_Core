@@ -1,5 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 
 namespace MultiplayerARPG
@@ -38,10 +37,10 @@ namespace MultiplayerARPG
         public readonly List<IActivatableEntity> activatableEntities = new List<IActivatableEntity>();
         public readonly List<IHoldActivatableEntity> holdActivatableEntities = new List<IHoldActivatableEntity>();
         public readonly List<IPickupActivatableEntity> pickupActivatableEntities = new List<IPickupActivatableEntity>();
-        private readonly HashSet<Collider> excludeColliders = new HashSet<Collider>();
-        private readonly HashSet<Collider2D> excludeCollider2Ds = new HashSet<Collider2D>();
-        private SphereCollider cacheCollider;
-        private CircleCollider2D cacheCollider2D;
+        private readonly HashSet<Collider> _excludeColliders = new HashSet<Collider>();
+        private readonly HashSet<Collider2D> _excludeCollider2Ds = new HashSet<Collider2D>();
+        private SphereCollider _cacheCollider;
+        private CircleCollider2D _cacheCollider2D;
 
         public System.Action onUpdateList;
 
@@ -55,9 +54,9 @@ namespace MultiplayerARPG
         {
             if (GameInstance.Singleton.DimensionType == DimensionType.Dimension3D)
             {
-                cacheCollider = gameObject.AddComponent<SphereCollider>();
-                cacheCollider.radius = detectingRadius;
-                cacheCollider.isTrigger = true;
+                _cacheCollider = gameObject.AddComponent<SphereCollider>();
+                _cacheCollider.radius = detectingRadius;
+                _cacheCollider.isTrigger = true;
                 Rigidbody rigidbody = gameObject.AddComponent<Rigidbody>();
                 rigidbody.useGravity = false;
                 rigidbody.isKinematic = true;
@@ -65,9 +64,9 @@ namespace MultiplayerARPG
             }
             else
             {
-                cacheCollider2D = gameObject.AddComponent<CircleCollider2D>();
-                cacheCollider2D.radius = detectingRadius;
-                cacheCollider2D.isTrigger = true;
+                _cacheCollider2D = gameObject.AddComponent<CircleCollider2D>();
+                _cacheCollider2D.radius = detectingRadius;
+                _cacheCollider2D.isTrigger = true;
                 Rigidbody2D rigidbody2D = gameObject.AddComponent<Rigidbody2D>();
                 rigidbody2D.isKinematic = true;
                 rigidbody2D.constraints = RigidbodyConstraints2D.FreezeAll;
@@ -80,9 +79,9 @@ namespace MultiplayerARPG
                 return;
 
             if (GameInstance.Singleton.DimensionType == DimensionType.Dimension3D)
-                cacheCollider.radius = detectingRadius;
+                _cacheCollider.radius = detectingRadius;
             else
-                cacheCollider2D.radius = detectingRadius;
+                _cacheCollider2D.radius = detectingRadius;
 
             CacheTransform.position = GameInstance.PlayingCharacterEntity.EntityTransform.position;
             // Find nearby entities
@@ -102,17 +101,17 @@ namespace MultiplayerARPG
 
         public void ClearExcludeColliders()
         {
-            excludeColliders.Clear();
-            excludeCollider2Ds.Clear();
+            _excludeColliders.Clear();
+            _excludeCollider2Ds.Clear();
         }
 
         private void OnTriggerEnter(Collider other)
         {
-            if (excludeColliders.Contains(other))
+            if (_excludeColliders.Contains(other))
                 return;
             if (!AddEntity(other.gameObject))
             {
-                excludeColliders.Add(other);
+                _excludeColliders.Add(other);
                 return;
             }
             if (onUpdateList != null)
@@ -129,11 +128,11 @@ namespace MultiplayerARPG
 
         private void OnTriggerEnter2D(Collider2D other)
         {
-            if (excludeCollider2Ds.Contains(other))
+            if (_excludeCollider2Ds.Contains(other))
                 return;
             if (!AddEntity(other.gameObject))
             {
-                excludeCollider2Ds.Add(other);
+                _excludeCollider2Ds.Add(other);
                 return;
             }
             if (onUpdateList != null)

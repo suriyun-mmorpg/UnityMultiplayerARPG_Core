@@ -32,7 +32,7 @@ namespace MultiplayerARPG
         public bool UpdateRotationY { get { return CameraControls.updateRotationY; } set { CameraControls.updateRotationY = value; } }
         public bool UpdateZoom { get { return CameraControls.updateZoom; } set { CameraControls.updateZoom = value; } }
 
-        protected bool cameraControlsInitialized = false;
+        protected bool _cameraControlsInitialized = false;
 
         public virtual void Init()
         {
