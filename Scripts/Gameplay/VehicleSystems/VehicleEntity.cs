@@ -37,7 +37,7 @@ namespace MultiplayerARPG
         protected int level = 0;
 
         [SerializeField]
-        protected IncrementalInt hp = default(IncrementalInt);
+        protected IncrementalInt hp = default;
 
         [SerializeField]
         [ArrayElementTitle("damageElement")]
@@ -65,7 +65,7 @@ namespace MultiplayerARPG
         protected SyncListUInt syncPassengerIds = new SyncListUInt();
 
         public virtual bool IsDestroyWhenDriverExit { get { return false; } }
-        public virtual bool HasDriver { get { return passengers.ContainsKey(0); } }
+        public virtual bool HasDriver { get { return _passengers.ContainsKey(0); } }
         public Dictionary<DamageElement, float> Resistances { get; private set; }
         public Dictionary<DamageElement, float> Armors { get; private set; }
         public override bool IsImmune { get { return base.IsImmune || !canBeAttacked; } set { base.IsImmune = value; } }
@@ -74,18 +74,18 @@ namespace MultiplayerARPG
         public float DestroyDelay { get { return destroyDelay; } }
         public float DestroyRespawnDelay { get { return destroyRespawnDelay; } }
 
-        protected readonly Dictionary<byte, BaseGameEntity> passengers = new Dictionary<byte, BaseGameEntity>();
-        protected readonly Dictionary<uint, UnityAction<LiteNetLibIdentity>> spawnEvents = new Dictionary<uint, UnityAction<LiteNetLibIdentity>>();
-        protected bool isDestroyed;
-        protected CalculatedBuff cacheBuff = new CalculatedBuff();
-        protected int dirtyLevel = int.MinValue;
+        protected readonly Dictionary<byte, BaseGameEntity> _passengers = new Dictionary<byte, BaseGameEntity>();
+        protected readonly Dictionary<uint, UnityAction<LiteNetLibIdentity>> _spawnEvents = new Dictionary<uint, UnityAction<LiteNetLibIdentity>>();
+        protected bool _isDestroyed;
+        protected CalculatedBuff _cacheBuff = new CalculatedBuff();
+        protected int _dirtyLevel = int.MinValue;
 
         protected override sealed void EntityAwake()
         {
             base.EntityAwake();
             gameObject.tag = CurrentGameInstance.vehicleTag;
             gameObject.layer = CurrentGameInstance.vehicleLayer;
-            isDestroyed = false;
+            _isDestroyed = false;
         }
 
         protected virtual void InitStats()
@@ -137,7 +137,7 @@ namespace MultiplayerARPG
             uint passengerId = syncPassengerIds[index];
             if (passengerId == 0)
             {
-                passengers.Remove((byte)index);
+                _passengers.Remove((byte)index);
                 return;
             }
             if (Manager.Assets.TryGetSpawnedObject(passengerId, out LiteNetLibIdentity identity))
@@ -145,24 +145,24 @@ namespace MultiplayerARPG
                 // Set the passenger
                 BaseGameEntity passenger = identity.GetComponent<BaseGameEntity>();
                 passenger.SetPassengingVehicle((byte)index, this);
-                passengers[(byte)index] = passenger;
+                _passengers[(byte)index] = passenger;
             }
             else
             {
                 // Create a new event to set passenger when passenger object spawn
-                spawnEvents[passengerId] = (identity) =>
+                _spawnEvents[passengerId] = (identity) =>
                 {
                     if (identity.ObjectId != passengerId)
                         return;
                     BaseGameEntity passenger = identity.GetComponent<BaseGameEntity>();
                     passenger.SetPassengingVehicle((byte)index, this);
-                    passengers[(byte)index] = passenger;
+                    _passengers[(byte)index] = passenger;
                     // Remove the event after passenger was set
-                    Manager.Assets.onObjectSpawn.RemoveListener(spawnEvents[passengerId]);
-                    spawnEvents.Remove(passengerId);
+                    Manager.Assets.onObjectSpawn.RemoveListener(_spawnEvents[passengerId]);
+                    _spawnEvents.Remove(passengerId);
                 };
                 // Set the event
-                Manager.Assets.onObjectSpawn.AddListener(spawnEvents[passengerId]);
+                Manager.Assets.onObjectSpawn.AddListener(_spawnEvents[passengerId]);
             }
         }
 
@@ -170,14 +170,14 @@ namespace MultiplayerARPG
         {
             if (moveSpeedType == VehicleMoveSpeedType.FixedMovedSpeed)
                 return moveSpeed;
-            if (passengers.TryGetValue(0, out BaseGameEntity driver))
+            if (_passengers.TryGetValue(0, out BaseGameEntity driver))
                 return driver.GetMoveSpeed() * driverMoveSpeedRate;
             return 0f;
         }
 
         public override bool CanMove()
         {
-            if (passengers.TryGetValue(0, out BaseGameEntity driver))
+            if (_passengers.TryGetValue(0, out BaseGameEntity driver))
                 return driver.CanMove();
             return false;
         }
@@ -200,7 +200,7 @@ namespace MultiplayerARPG
         public List<BaseGameEntity> GetAllPassengers()
         {
             List<BaseGameEntity> result = new List<BaseGameEntity>();
-            foreach (BaseGameEntity passenger in passengers.Values)
+            foreach (BaseGameEntity passenger in _passengers.Values)
             {
                 if (passenger)
                     result.Add(passenger);
@@ -210,7 +210,7 @@ namespace MultiplayerARPG
 
         public BaseGameEntity GetPassenger(byte seatIndex)
         {
-            return passengers[seatIndex];
+            return _passengers[seatIndex];
         }
 
         public void SetPassenger(byte seatIndex, BaseGameEntity gameEntity)
@@ -261,7 +261,7 @@ namespace MultiplayerARPG
 
         public bool IsSeatAvailable(byte seatIndex)
         {
-            return !isDestroyed && seatIndex < syncPassengerIds.Count && syncPassengerIds[seatIndex] == 0;
+            return !_isDestroyed && seatIndex < syncPassengerIds.Count && syncPassengerIds[seatIndex] == 0;
         }
 
         public bool GetAvailableSeat(out byte seatIndex)
@@ -330,9 +330,9 @@ namespace MultiplayerARPG
             if (!IsServer)
                 return;
             CurrentHp = 0;
-            if (isDestroyed)
+            if (_isDestroyed)
                 return;
-            isDestroyed = true;
+            _isDestroyed = true;
             // Kick passengers
             RemoveAllPassengers();
             // Tell clients that the vehicle destroy to play animation at client
@@ -347,7 +347,7 @@ namespace MultiplayerARPG
         protected IEnumerator RespawnRoutine()
         {
             yield return new WaitForSecondsRealtime(destroyDelay + destroyRespawnDelay);
-            isDestroyed = false;
+            _isDestroyed = false;
             InitStats();
             Manager.Assets.NetworkSpawnScene(
                 Identity.ObjectId,
@@ -387,17 +387,17 @@ namespace MultiplayerARPG
 
         private void MakeCache()
         {
-            if (dirtyLevel != level)
+            if (_dirtyLevel != level)
             {
-                dirtyLevel = level;
-                cacheBuff.Build(buff, level);
+                _dirtyLevel = level;
+                _cacheBuff.Build(buff, level);
             }
         }
 
         public CalculatedBuff GetBuff()
         {
             MakeCache();
-            return cacheBuff;
+            return _cacheBuff;
         }
     }
 }
