@@ -52,7 +52,7 @@ namespace MultiplayerARPG
         public float DestroyDelay { get { return destroyDelay; } }
         public float DestroyRespawnDelay { get { return destroyRespawnDelay; } }
 
-        protected bool isDestroyed;
+        protected bool _isDestroyed;
 
         public override void PrepareRelatesData()
         {
@@ -66,14 +66,14 @@ namespace MultiplayerARPG
             gameObject.tag = CurrentGameInstance.harvestableTag;
             gameObject.layer = CurrentGameInstance.harvestableLayer;
             isStaticHitBoxes = true;
-            isDestroyed = false;
+            _isDestroyed = false;
         }
 
         protected virtual void InitStats()
         {
             if (!IsServer)
                 return;
-            isDestroyed = false;
+            _isDestroyed = false;
             CurrentHp = MaxHp;
         }
 
@@ -201,10 +201,10 @@ namespace MultiplayerARPG
             if (!IsServer)
                 return;
             CurrentHp = 0;
-            if (isDestroyed)
+            if (_isDestroyed)
                 return;
             // Mark as destroyed
-            isDestroyed = true;
+            _isDestroyed = true;
             // Tell clients that the harvestable destroy to play animation at client
             CallAllOnHarvestableDestroy();
             // Respawning later
