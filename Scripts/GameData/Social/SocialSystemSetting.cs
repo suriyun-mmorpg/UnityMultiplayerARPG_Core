@@ -78,7 +78,7 @@ namespace MultiplayerARPG
         [JsonIgnore]
         private int[] guildExpTree;
 
-        [Header("Exp calculator")]
+        [Header("Exp Calculator Tool")]
         [SerializeField]
         [JsonIgnore]
         private int guildMaxLevel;
