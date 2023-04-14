@@ -24,9 +24,9 @@ namespace MultiplayerARPG
             }
         }
 
-        protected float applyDuration;
-        protected float lastAppliedTime;
-        protected readonly Dictionary<uint, DamageableHitBox> receivingDamageHitBoxes = new Dictionary<uint, DamageableHitBox>();
+        protected float _applyDuration;
+        protected float _lastAppliedTime;
+        protected readonly Dictionary<uint, DamageableHitBox> _receivingDamageHitBoxes = new Dictionary<uint, DamageableHitBox>();
 
         protected override void Awake()
         {
@@ -60,8 +60,8 @@ namespace MultiplayerARPG
         {
             base.Setup(instigator, weapon, damageAmounts, skill, skillLevel);
             PushBack(areaDuration);
-            this.applyDuration = applyDuration;
-            lastAppliedTime = Time.unscaledTime;
+            this._applyDuration = applyDuration;
+            _lastAppliedTime = Time.unscaledTime;
         }
 
         protected virtual void Update()
@@ -69,10 +69,10 @@ namespace MultiplayerARPG
             if (!IsServer)
                 return;
 
-            if (Time.unscaledTime - lastAppliedTime >= applyDuration)
+            if (Time.unscaledTime - _lastAppliedTime >= _applyDuration)
             {
-                lastAppliedTime = Time.unscaledTime;
-                foreach (DamageableHitBox hitBox in receivingDamageHitBoxes.Values)
+                _lastAppliedTime = Time.unscaledTime;
+                foreach (DamageableHitBox hitBox in _receivingDamageHitBoxes.Values)
                 {
                     if (hitBox == null)
                         continue;
@@ -87,18 +87,18 @@ namespace MultiplayerARPG
             if (target == null || target.IsDead() || target.IsImmune || target.IsInSafeArea)
                 return;
 
-            if (!canApplyDamageToUser && target.GetObjectId() == instigator.ObjectId)
+            if (!canApplyDamageToUser && target.GetObjectId() == _instigator.ObjectId)
                 return;
 
-            if (!canApplyDamageToAllies && target.DamageableEntity is BaseCharacterEntity characterEntity && characterEntity.IsAlly(instigator))
+            if (!canApplyDamageToAllies && target.DamageableEntity is BaseCharacterEntity characterEntity && characterEntity.IsAlly(_instigator))
                 return;
 
-            target.ReceiveDamageWithoutConditionCheck(CacheTransform.position, instigator, damageAmounts, weapon, skill, skillLevel, Random.Range(0, 255));
+            target.ReceiveDamageWithoutConditionCheck(CacheTransform.position, _instigator, _damageAmounts, _weapon, _skill, _skillLevel, Random.Range(0, 255));
         }
 
         protected override void OnPushBack()
         {
-            receivingDamageHitBoxes.Clear();
+            _receivingDamageHitBoxes.Clear();
             if (onDestroy != null)
                 onDestroy.Invoke();
         }
@@ -119,10 +119,10 @@ namespace MultiplayerARPG
             if (target == null)
                 return;
 
-            if (receivingDamageHitBoxes.ContainsKey(target.GetObjectId()))
+            if (_receivingDamageHitBoxes.ContainsKey(target.GetObjectId()))
                 return;
 
-            receivingDamageHitBoxes.Add(target.GetObjectId(), target);
+            _receivingDamageHitBoxes.Add(target.GetObjectId(), target);
         }
 
         protected virtual void OnTriggerExit(Collider other)
@@ -141,10 +141,10 @@ namespace MultiplayerARPG
             if (target.IsNull())
                 return;
 
-            if (!receivingDamageHitBoxes.ContainsKey(target.GetObjectId()))
+            if (!_receivingDamageHitBoxes.ContainsKey(target.GetObjectId()))
                 return;
 
-            receivingDamageHitBoxes.Remove(target.GetObjectId());
+            _receivingDamageHitBoxes.Remove(target.GetObjectId());
         }
 
         public override void InitPrefab()

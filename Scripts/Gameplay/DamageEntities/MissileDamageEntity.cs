@@ -214,7 +214,7 @@ namespace MultiplayerARPG
         protected float CalculateCurrentMoveSpeed(float maxMoveSpeed, float deltaTime)
         {
             // Adjust speed by rtt
-            if (!IsServer && instigator.TryGetEntity(out BaseGameEntity entity) && entity.IsOwnerClient)
+            if (!IsServer && _instigator.TryGetEntity(out BaseGameEntity entity) && entity.IsOwnerClient)
             {
                 float rtt = 0.001f * CurrentGameManager.Rtt;
                 float acc = 1f / rtt * deltaTime * 0.5f;
@@ -298,10 +298,10 @@ namespace MultiplayerARPG
 
             target = other.GetComponent<DamageableHitBox>();
 
-            if (target == null || target.IsDead() || !target.CanReceiveDamageFrom(instigator))
+            if (target == null || target.IsDead() || !target.CanReceiveDamageFrom(_instigator))
                 return false;
 
-            if (instigator.TryGetEntity(out BaseGameEntity instigatorEntity) && instigatorEntity == target.Entity)
+            if (_instigator.TryGetEntity(out BaseGameEntity instigatorEntity) && instigatorEntity == target.Entity)
                 return false;
 
             if (_lockingTarget != null && _lockingTarget.GetObjectId() != target.GetObjectId())

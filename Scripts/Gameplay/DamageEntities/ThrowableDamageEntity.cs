@@ -130,13 +130,13 @@ namespace MultiplayerARPG
                 return false;
             }
 
-            if (!canApplyDamageToUser && target.GetObjectId() == instigator.ObjectId)
+            if (!canApplyDamageToUser && target.GetObjectId() == _instigator.ObjectId)
             {
                 target = null;
                 return false;
             }
 
-            if (!canApplyDamageToAllies && target.DamageableEntity is BaseCharacterEntity characterEntity && characterEntity.IsAlly(instigator))
+            if (!canApplyDamageToAllies && target.DamageableEntity is BaseCharacterEntity characterEntity && characterEntity.IsAlly(_instigator))
             {
                 target = null;
                 return false;
@@ -150,7 +150,7 @@ namespace MultiplayerARPG
             DamageableHitBox target;
             if (FindTargetHitBox(other, out target) && !alreadyHitObjects.Contains(target.GetObjectId()))
             {
-                target.ReceiveDamageWithoutConditionCheck(CacheTransform.position, instigator, damageAmounts, weapon, skill, skillLevel, Random.Range(0, 255));
+                target.ReceiveDamageWithoutConditionCheck(CacheTransform.position, _instigator, _damageAmounts, _weapon, _skill, _skillLevel, Random.Range(0, 255));
                 alreadyHitObjects.Add(target.GetObjectId());
                 return true;
             }

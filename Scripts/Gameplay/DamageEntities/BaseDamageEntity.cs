@@ -5,11 +5,11 @@ namespace MultiplayerARPG
 {
     public abstract partial class BaseDamageEntity : PoolDescriptor
     {
-        protected EntityInfo instigator;
-        protected CharacterItem weapon;
-        protected Dictionary<DamageElement, MinMaxFloat> damageAmounts;
-        protected BaseSkill skill;
-        protected int skillLevel;
+        protected EntityInfo _instigator;
+        protected CharacterItem _weapon;
+        protected Dictionary<DamageElement, MinMaxFloat> _damageAmounts;
+        protected BaseSkill _skill;
+        protected int _skillLevel;
 
         public GameInstance CurrentGameInstance
         {
@@ -75,18 +75,18 @@ namespace MultiplayerARPG
             BaseSkill skill,
             int skillLevel)
         {
-            this.instigator = instigator;
-            this.weapon = weapon;
-            this.damageAmounts = damageAmounts;
-            this.skill = skill;
-            this.skillLevel = skillLevel;
+            _instigator = instigator;
+            _weapon = weapon;
+            _damageAmounts = damageAmounts;
+            _skill = skill;
+            _skillLevel = skillLevel;
         }
 
         public virtual void ApplyDamageTo(DamageableHitBox target)
         {
-            if (!IsServer || target == null || target.IsDead() || !target.CanReceiveDamageFrom(instigator))
+            if (!IsServer || target == null || target.IsDead() || !target.CanReceiveDamageFrom(_instigator))
                 return;
-            target.ReceiveDamage(CacheTransform.position, instigator, damageAmounts, weapon, skill, skillLevel, Random.Range(0, 255));
+            target.ReceiveDamage(CacheTransform.position, _instigator, _damageAmounts, _weapon, _skill, _skillLevel, Random.Range(0, 255));
         }
 
         public override void InitPrefab()

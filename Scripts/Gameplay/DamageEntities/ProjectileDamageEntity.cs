@@ -149,7 +149,7 @@ namespace MultiplayerARPG
 
                     // Hit itself, no impact
                     BaseGameEntity instigatorEntity;
-                    if (instigator.Id != null && instigator.TryGetEntity(out instigatorEntity) && instigatorEntity.transform.root == hit.transform.root)
+                    if (_instigator.Id != null && _instigator.TryGetEntity(out instigatorEntity) && instigatorEntity.transform.root == hit.transform.root)
                         continue;
 
                     Impact(hit.collider.transform.gameObject);
