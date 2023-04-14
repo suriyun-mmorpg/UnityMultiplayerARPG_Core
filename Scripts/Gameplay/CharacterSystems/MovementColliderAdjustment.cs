@@ -56,23 +56,23 @@ namespace MultiplayerARPG
 #endif
         };
 
-        private OpenCharacterController openCharacterController;
-        private CapsuleCollider capsuleCollider;
-        private bool previousIsUnderWater;
-        private ExtraMovementState previousExtraMovementState;
+        private OpenCharacterController _openCharacterController;
+        private CapsuleCollider _capsuleCollider;
+        private bool _previousIsUnderWater;
+        private ExtraMovementState _previousExtraMovementState;
 
         public override void EntityAwake()
         {
-            openCharacterController = GetComponent<OpenCharacterController>();
-            capsuleCollider = GetComponent<CapsuleCollider>();
+            _openCharacterController = GetComponent<OpenCharacterController>();
+            _capsuleCollider = GetComponent<CapsuleCollider>();
         }
 
 #if UNITY_EDITOR
         private void OnValidate()
         {
-            openCharacterController = GetComponent<OpenCharacterController>();
-            capsuleCollider = GetComponent<CapsuleCollider>();
-            if (openCharacterController != null)
+            _openCharacterController = GetComponent<OpenCharacterController>();
+            _capsuleCollider = GetComponent<CapsuleCollider>();
+            if (_openCharacterController != null)
             {
                 Settings tempSettings;
                 bool anyDirectionNotY = false;
@@ -185,15 +185,15 @@ namespace MultiplayerARPG
 
         public override void EntityLateUpdate()
         {
-            if (openCharacterController == null && capsuleCollider == null)
+            if (_openCharacterController == null && _capsuleCollider == null)
                 return;
 
             bool isUnderWater = Entity.MovementState.Has(MovementState.IsUnderWater);
-            if (isUnderWater && isUnderWater != previousIsUnderWater)
+            if (isUnderWater && isUnderWater != _previousIsUnderWater)
             {
                 Apply(swimSettings);
             }
-            else if (Entity.ExtraMovementState != previousExtraMovementState)
+            else if (Entity.ExtraMovementState != _previousExtraMovementState)
             {
                 switch (Entity.ExtraMovementState)
                 {
@@ -208,22 +208,22 @@ namespace MultiplayerARPG
                         break;
                 }
             }
-            previousIsUnderWater = isUnderWater;
-            previousExtraMovementState = Entity.ExtraMovementState;
+            _previousIsUnderWater = isUnderWater;
+            _previousExtraMovementState = Entity.ExtraMovementState;
         }
 
         private void Apply(Settings settings)
         {
-            if (openCharacterController != null)
+            if (_openCharacterController != null)
             {
-                openCharacterController.SetRadiusHeightAndCenter(settings.radius, settings.height, settings.center, true, true);
+                _openCharacterController.SetRadiusHeightAndCenter(settings.radius, settings.height, settings.center, true, true);
             }
-            else if (capsuleCollider != null)
+            else if (_capsuleCollider != null)
             {
-                capsuleCollider.center = settings.center;
-                capsuleCollider.radius = settings.radius;
-                capsuleCollider.height = settings.height;
-                capsuleCollider.direction = (int)settings.direction;
+                _capsuleCollider.center = settings.center;
+                _capsuleCollider.radius = settings.radius;
+                _capsuleCollider.height = settings.height;
+                _capsuleCollider.direction = (int)settings.direction;
             }
         }
     }

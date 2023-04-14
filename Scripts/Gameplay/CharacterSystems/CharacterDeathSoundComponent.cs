@@ -21,7 +21,7 @@ namespace MultiplayerARPG
         public AudioComponentSettingType settingType = AudioComponentSettingType.Sfx;
         public string otherSettingId;
         public DeathSoundData soundData;
-        private bool dirtyIsDead;
+        private bool _dirtyIsDead;
 
         public string SettingId
         {
@@ -63,10 +63,10 @@ namespace MultiplayerARPG
 
         public override void EntityUpdate()
         {
-            if (dirtyIsDead != Entity.IsDead())
+            if (_dirtyIsDead != Entity.IsDead())
             {
-                dirtyIsDead = Entity.IsDead();
-                if (dirtyIsDead)
+                _dirtyIsDead = Entity.IsDead();
+                if (_dirtyIsDead)
                     PlaySound();
             }
         }

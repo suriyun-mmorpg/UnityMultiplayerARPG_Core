@@ -49,7 +49,7 @@ namespace MultiplayerARPG
 #endif
         };
 
-        private Vector3 targetPosition;
+        private Vector3 _targetPosition;
 
 #if UNITY_EDITOR
         private void OnValidate()
@@ -95,7 +95,7 @@ namespace MultiplayerARPG
         {
             base.EntityUpdate();
 
-            targetTransform.localPosition = Vector3.MoveTowards(targetTransform.localPosition, targetPosition, translateSpeed * Time.deltaTime);
+            targetTransform.localPosition = Vector3.MoveTowards(targetTransform.localPosition, _targetPosition, translateSpeed * Time.deltaTime);
         }
 
         public override void EntityLateUpdate()
@@ -126,7 +126,7 @@ namespace MultiplayerARPG
 
         private void Apply(Settings settings)
         {
-            targetPosition = settings.localPosition;
+            _targetPosition = settings.localPosition;
         }
     }
 }
