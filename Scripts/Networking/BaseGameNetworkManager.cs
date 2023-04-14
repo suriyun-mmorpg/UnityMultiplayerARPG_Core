@@ -65,13 +65,13 @@ namespace MultiplayerARPG
         public static BaseMapInfo CurrentMapInfo { get; protected set; }
 
         // Events
-        protected float updateOnlineCharactersCountDown;
-        protected float updateTimeOfDayCountDown;
-        protected float serverSceneLoadedTime;
+        protected float _updateOnlineCharactersCountDown;
+        protected float _updateTimeOfDayCountDown;
+        protected float _serverSceneLoadedTime;
         // Instantiate object allowing status
-        protected Dictionary<string, bool> readyToInstantiateObjectsStates = new Dictionary<string, bool>();
-        protected bool isReadyToInstantiateObjects;
-        protected bool isReadyToInstantiatePlayers;
+        protected Dictionary<string, bool> _readyToInstantiateObjectsStates = new Dictionary<string, bool>();
+        protected bool _isReadyToInstantiateObjects;
+        protected bool _isReadyToInstantiatePlayers;
         // Spawn entities events
         public LiteNetLibLoadSceneEvent onSpawnEntitiesStart;
         public LiteNetLibLoadSceneEvent onSpawnEntitiesProgress;
@@ -109,16 +109,16 @@ namespace MultiplayerARPG
             float tempDeltaTime = Time.unscaledDeltaTime;
             if (IsServer)
             {
-                updateOnlineCharactersCountDown -= tempDeltaTime;
-                if (updateOnlineCharactersCountDown <= 0f)
+                _updateOnlineCharactersCountDown -= tempDeltaTime;
+                if (_updateOnlineCharactersCountDown <= 0f)
                 {
-                    updateOnlineCharactersCountDown = UPDATE_ONLINE_CHARACTER_DURATION;
+                    _updateOnlineCharactersCountDown = UPDATE_ONLINE_CHARACTER_DURATION;
                     UpdateOnlineCharacters();
                 }
-                updateTimeOfDayCountDown -= tempDeltaTime;
-                if (updateTimeOfDayCountDown <= 0f)
+                _updateTimeOfDayCountDown -= tempDeltaTime;
+                if (_updateTimeOfDayCountDown <= 0f)
                 {
-                    updateTimeOfDayCountDown = UPDATE_TIME_OF_DAY_DURATION;
+                    _updateTimeOfDayCountDown = UPDATE_TIME_OF_DAY_DURATION;
                     SendTimeOfDay();
                 }
             }
@@ -329,7 +329,7 @@ namespace MultiplayerARPG
             if (ClientOnlineCharacterHandlers != null)
                 ClientOnlineCharacterHandlers.ClearOnlineCharacters();
             CurrentMapInfo = null;
-            isReadyToInstantiatePlayers = false;
+            _isReadyToInstantiatePlayers = false;
             // Extensions
             this.InvokeInstanceDevExtMethods("Clean");
             foreach (BaseGameNetworkManagerComponent component in ManagerComponents)
@@ -693,10 +693,10 @@ namespace MultiplayerARPG
             {
                 component.OnServerOnlineSceneLoaded(this);
             }
-            readyToInstantiateObjectsStates.Clear();
-            isReadyToInstantiateObjects = false;
-            isReadyToInstantiatePlayers = false;
-            serverSceneLoadedTime = Time.unscaledTime;
+            _readyToInstantiateObjectsStates.Clear();
+            _isReadyToInstantiateObjects = false;
+            _isReadyToInstantiatePlayers = false;
+            _serverSceneLoadedTime = Time.unscaledTime;
             SpawnEntities().Forget();
         }
 
@@ -704,9 +704,9 @@ namespace MultiplayerARPG
         {
             if (!IsServer)
                 return;
-            readyToInstantiateObjectsStates.Clear();
-            isReadyToInstantiateObjects = false;
-            isReadyToInstantiatePlayers = false;
+            _readyToInstantiateObjectsStates.Clear();
+            _isReadyToInstantiateObjects = false;
+            _isReadyToInstantiatePlayers = false;
             base.ServerSceneChange(sceneName);
         }
 
@@ -849,7 +849,7 @@ namespace MultiplayerARPG
             progress = 1f;
             onSpawnEntitiesFinish.Invoke(sceneName, true, progress);
             await PostSpawnEntities();
-            isReadyToInstantiatePlayers = true;
+            _isReadyToInstantiatePlayers = true;
         }
 
         protected virtual async UniTask PreSpawnEntities()
@@ -984,20 +984,20 @@ namespace MultiplayerARPG
 
         public bool IsReadyToInstantiateObjects()
         {
-            if (!isReadyToInstantiateObjects)
+            if (!_isReadyToInstantiateObjects)
             {
-                readyToInstantiateObjectsStates[INSTANTIATES_OBJECTS_DELAY_STATE_KEY] = Time.unscaledTime - serverSceneLoadedTime >= INSTANTIATES_OBJECTS_DELAY;
-                this.InvokeInstanceDevExtMethods("UpdateReadyToInstantiateObjectsStates", readyToInstantiateObjectsStates);
+                _readyToInstantiateObjectsStates[INSTANTIATES_OBJECTS_DELAY_STATE_KEY] = Time.unscaledTime - _serverSceneLoadedTime >= INSTANTIATES_OBJECTS_DELAY;
+                this.InvokeInstanceDevExtMethods("UpdateReadyToInstantiateObjectsStates", _readyToInstantiateObjectsStates);
                 foreach (BaseGameNetworkManagerComponent component in ManagerComponents)
                 {
-                    component.UpdateReadyToInstantiateObjectsStates(this, readyToInstantiateObjectsStates);
+                    component.UpdateReadyToInstantiateObjectsStates(this, _readyToInstantiateObjectsStates);
                 }
-                foreach (bool value in readyToInstantiateObjectsStates.Values)
+                foreach (bool value in _readyToInstantiateObjectsStates.Values)
                 {
                     if (!value)
                         return false;
                 }
-                isReadyToInstantiateObjects = true;
+                _isReadyToInstantiateObjects = true;
             }
             return true;
         }
