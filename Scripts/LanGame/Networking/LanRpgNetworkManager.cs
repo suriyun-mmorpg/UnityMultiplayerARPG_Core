@@ -31,10 +31,10 @@ namespace MultiplayerARPG
         public List<CharacterBuff> selectedCharacterSummonBuffs;
         public List<CharacterItem> selectedCharacterStorageItems;
         public EnableGmCommandType enableGmCommands;
-        private float lastSaveTime;
-        private Vector3? teleportPosition;
-        private readonly Dictionary<long, PlayerCharacterData> pendingSpawnPlayerCharacters = new Dictionary<long, PlayerCharacterData>();
-        private readonly Dictionary<long, List<CharacterBuff>> pendingSpawnPlayerCharacterSummonBuffs = new Dictionary<long, List<CharacterBuff>>();
+        private float _lastSaveTime;
+        private Vector3? _teleportPosition;
+        private readonly Dictionary<long, PlayerCharacterData> _pendingSpawnPlayerCharacters = new Dictionary<long, PlayerCharacterData>();
+        private readonly Dictionary<long, List<CharacterBuff>> _pendingSpawnPlayerCharacterSummonBuffs = new Dictionary<long, List<CharacterBuff>>();
 
         public LiteNetLibDiscovery CacheDiscovery { get; private set; }
         public BaseGameSaveSystem SaveSystem { get { return GameInstance.Singleton.SaveSystem; } }
@@ -151,11 +151,9 @@ namespace MultiplayerARPG
 
         protected override void HandleServerSceneChange(MessageHandlerData messageHandler)
         {
-            BasePlayerCharacterEntity owningCharacter = GameInstance.PlayingCharacterEntity;
-            if (!IsServer && IsClientConnected && owningCharacter != null)
+            if (!IsServer)
             {
-                SaveSystem.SaveCharacter(owningCharacter);
-                SaveSystem.SaveSummonBuffs(owningCharacter, new List<CharacterSummon>(owningCharacter.Summons));
+                Save();
                 SaveSystem.OnSceneChanging();
             }
             base.HandleServerSceneChange(messageHandler);
@@ -166,22 +164,28 @@ namespace MultiplayerARPG
             await SaveSystem.PreSpawnEntities(selectedCharacter, ServerStorageHandlers.GetAllStorageItems());
         }
 
-        public void Save()
+        public void Save(System.Action<IPlayerCharacterData> onBeforeSaveCharacter = null, bool saveWorld = true, bool saveStorage = true)
         {
             Profiler.BeginSample("LanRpgNetworkManager - Save Data");
-            BasePlayerCharacterEntity owningCharacter = GameInstance.PlayingCharacterEntity;
-            if (owningCharacter != null)
+            BasePlayerCharacterEntity playingCharacter = GameInstance.PlayingCharacterEntity;
+            if (playingCharacter != null)
             {
-                SaveSystem.SaveCharacter(owningCharacter);
-                SaveSystem.SaveSummonBuffs(owningCharacter, new List<CharacterSummon>(owningCharacter.Summons));
+                selectedCharacter = playingCharacter.CloneTo(selectedCharacter);
+                if (onBeforeSaveCharacter != null)
+                    onBeforeSaveCharacter.Invoke(selectedCharacter);
+                SaveSystem.SaveCharacter(selectedCharacter);
+                SaveSystem.SaveSummonBuffs(selectedCharacter, new List<CharacterSummon>(selectedCharacter.Summons));
                 if (IsServer)
                 {
-                    SaveSystem.SaveWorld(owningCharacter, ServerBuildingHandlers.GetBuildings());
-                    SaveSystem.SaveStorage(owningCharacter, ServerStorageHandlers.GetAllStorageItems());
+                    if (saveWorld)
+                        SaveSystem.SaveWorld(selectedCharacter, ServerBuildingHandlers.GetBuildings());
+                    if (saveStorage)
+                        SaveSystem.SaveStorage(selectedCharacter, ServerStorageHandlers.GetAllStorageItems());
                 }
                 else
                 {
-                    SaveSystem.SavePlayerStorage(owningCharacter, selectedCharacterStorageItems);
+                    if (saveStorage)
+                        SaveSystem.SavePlayerStorage(selectedCharacter, selectedCharacterStorageItems);
                 }
             }
             Profiler.EndSample();
@@ -191,25 +195,25 @@ namespace MultiplayerARPG
         {
             base.FixedUpdate();
             float tempTime = Time.fixedTime;
-            if (tempTime - lastSaveTime > autoSaveDuration)
+            if (tempTime - _lastSaveTime > autoSaveDuration)
             {
                 Save();
-                lastSaveTime = tempTime;
+                _lastSaveTime = tempTime;
             }
 
-            if (IsServer && pendingSpawnPlayerCharacters.Count > 0 && isReadyToInstantiatePlayers)
+            if (IsServer && _pendingSpawnPlayerCharacters.Count > 0 && isReadyToInstantiatePlayers)
             {
                 // Spawn pending player characters
                 LiteNetLibPlayer player;
-                foreach (KeyValuePair<long, PlayerCharacterData> spawnPlayerCharacter in pendingSpawnPlayerCharacters)
+                foreach (KeyValuePair<long, PlayerCharacterData> spawnPlayerCharacter in _pendingSpawnPlayerCharacters)
                 {
                     if (!Players.TryGetValue(spawnPlayerCharacter.Key, out player))
                         continue;
                     player.IsReady = true;
-                    SpawnPlayerCharacter(spawnPlayerCharacter.Key, spawnPlayerCharacter.Value, pendingSpawnPlayerCharacterSummonBuffs[spawnPlayerCharacter.Key]);
+                    SpawnPlayerCharacter(spawnPlayerCharacter.Key, spawnPlayerCharacter.Value, _pendingSpawnPlayerCharacterSummonBuffs[spawnPlayerCharacter.Key]);
                 }
-                pendingSpawnPlayerCharacters.Clear();
-                pendingSpawnPlayerCharacterSummonBuffs.Clear();
+                _pendingSpawnPlayerCharacters.Clear();
+                _pendingSpawnPlayerCharacterSummonBuffs.Clear();
             }
         }
 
@@ -241,10 +245,10 @@ namespace MultiplayerARPG
             {
                 // Not ready to instantiate objects, add spawning player character to pending dictionary
                 if (LogDev) Logging.Log("[LanRpgNetworkManager] Not ready to deserializing client ready extra");
-                if (!pendingSpawnPlayerCharacters.ContainsKey(connectionId))
-                    pendingSpawnPlayerCharacters.Add(connectionId, playerCharacterData);
-                if (!pendingSpawnPlayerCharacterSummonBuffs.ContainsKey(connectionId))
-                    pendingSpawnPlayerCharacterSummonBuffs.Add(connectionId, playerSummonBuffs);
+                if (!_pendingSpawnPlayerCharacters.ContainsKey(connectionId))
+                    _pendingSpawnPlayerCharacters.Add(connectionId, playerCharacterData);
+                if (!_pendingSpawnPlayerCharacterSummonBuffs.ContainsKey(connectionId))
+                    _pendingSpawnPlayerCharacterSummonBuffs.Add(connectionId, playerSummonBuffs);
                 return true;
             }
             if (LogDev) Logging.Log("[LanRpgNetworkManager] Deserializing client ready extra");
@@ -262,7 +266,7 @@ namespace MultiplayerARPG
                 return;
             }
             if (!CurrentMapInfo.Id.Equals(playerCharacterData.CurrentMapName))
-                playerCharacterData.CurrentPosition = teleportPosition.HasValue ? teleportPosition.Value : CurrentMapInfo.StartPosition;
+                playerCharacterData.CurrentPosition = _teleportPosition.HasValue ? _teleportPosition.Value : CurrentMapInfo.StartPosition;
             Quaternion characterRotation = Quaternion.identity;
             if (CurrentGameInstance.DimensionType == DimensionType.Dimension3D)
                 characterRotation = Quaternion.Euler(playerCharacterData.CurrentRotation);
@@ -388,17 +392,14 @@ namespace MultiplayerARPG
                 ServerBuildingHandlers.ClearBuildings();
                 ServerStorageHandlers.ClearStorage();
                 SetMapInfo(mapInfo);
-                teleportPosition = position;
-                if (owningCharacter != null)
+                _teleportPosition = position;
+                Save((savingCharacter) =>
                 {
-                    selectedCharacter = owningCharacter.CloneTo(selectedCharacter);
-                    selectedCharacter.CurrentMapName = mapInfo.Id;
-                    selectedCharacter.CurrentPosition = position;
+                    savingCharacter.CurrentMapName = mapInfo.Id;
+                    savingCharacter.CurrentPosition = position;
                     if (overrideRotation)
-                        selectedCharacter.CurrentRotation = rotation;
-                    SaveSystem.SaveCharacter(selectedCharacter);
-                    SaveSystem.SaveSummonBuffs(selectedCharacter, new List<CharacterSummon>(owningCharacter.Summons));
-                }
+                        savingCharacter.CurrentRotation = rotation;
+                }, false, false);
                 SaveSystem.OnSceneChanging();
                 // Unregister all players characters to register later after map changed
                 foreach (LiteNetLibPlayer player in GetPlayers())
