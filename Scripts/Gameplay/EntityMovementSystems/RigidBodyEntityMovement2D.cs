@@ -8,8 +8,8 @@ namespace MultiplayerARPG
     [RequireComponent(typeof(Rigidbody2D))]
     public class RigidBodyEntityMovement2D : BaseNetworkedGameEntityComponent<BaseGameEntity>, IEntityMovementComponent
     {
-        protected static readonly long lagBuffer = System.TimeSpan.TicksPerMillisecond * 200;
-        protected static readonly float lagBufferUnityTime = 0.2f;
+        protected static readonly long s_lagBuffer = System.TimeSpan.TicksPerMillisecond * 200;
+        protected static readonly float s_lagBufferUnityTime = 0.2f;
 
         [Header("Movement Settings")]
         [Range(0.01f, 1f)]
@@ -36,20 +36,20 @@ namespace MultiplayerARPG
             get { return NavPaths != null && NavPaths.Count > 0; }
         }
 
-        protected float lastServerValidateTransformTime;
-        protected float lastServerValidateTransformMoveSpeed;
-        protected long acceptedPositionTimestamp;
-        protected Vector2? clientTargetPosition;
-        protected EntityMovementInput oldInput;
-        protected EntityMovementInput currentInput;
-        protected MovementState tempMovementState;
-        protected ExtraMovementState tempExtraMovementState;
-        protected Vector2 inputDirection;
-        protected Vector2 moveDirection;
-        protected float? lagMoveSpeedRate;
-        protected bool isTeleporting;
-        protected bool isServerWaitingTeleportConfirm;
-        protected bool isClientConfirmingTeleport;
+        protected float _lastServerValidateTransformTime;
+        protected float _lastServerValidateTransformMoveSpeed;
+        protected long _acceptedPositionTimestamp;
+        protected Vector2? _clientTargetPosition;
+        protected EntityMovementInput _oldInput;
+        protected EntityMovementInput _currentInput;
+        protected MovementState _tempMovementState;
+        protected ExtraMovementState _tempExtraMovementState;
+        protected Vector2 _inputDirection;
+        protected Vector2 _moveDirection;
+        protected float? _lagMoveSpeedRate;
+        protected bool _isTeleporting;
+        protected bool _isServerWaitingTeleportConfirm;
+        protected bool _isClientConfirmingTeleport;
 
         public override void EntityAwake()
         {
@@ -80,7 +80,7 @@ namespace MultiplayerARPG
         public override void OnSetOwnerClient(bool isOwnerClient)
         {
             base.OnSetOwnerClient(isOwnerClient);
-            clientTargetPosition = null;
+            _clientTargetPosition = null;
             NavPaths = null;
         }
 
@@ -89,7 +89,7 @@ namespace MultiplayerARPG
             if (movementSecure == MovementSecure.ServerAuthoritative)
             {
                 // Send movement input to server, then server will apply movement and sync transform to clients
-                this.SetInputStop(currentInput);
+                this.SetInputStop(_currentInput);
             }
             StopMoveFunction();
         }
@@ -97,7 +97,7 @@ namespace MultiplayerARPG
         private void StopMoveFunction()
         {
             NavPaths = null;
-            lagMoveSpeedRate = null;
+            _lagMoveSpeedRate = null;
         }
 
         public virtual void KeyMovement(Vector3 moveDirection, MovementState movementState)
@@ -107,9 +107,9 @@ namespace MultiplayerARPG
             if (CanPredictMovement())
             {
                 // Always apply movement to owner client (it's client prediction for server auth movement)
-                inputDirection = moveDirection;
-                tempMovementState = movementState;
-                if (inputDirection.sqrMagnitude > 0)
+                _inputDirection = moveDirection;
+                _tempMovementState = movementState;
+                if (_inputDirection.sqrMagnitude > 0)
                     NavPaths = null;
             }
         }
@@ -132,7 +132,7 @@ namespace MultiplayerARPG
             if (CanPredictMovement())
             {
                 // Always apply movement to owner client (it's client prediction for server auth movement)
-                tempExtraMovementState = extraMovementState;
+                _tempExtraMovementState = extraMovementState;
             }
         }
 
@@ -171,7 +171,7 @@ namespace MultiplayerARPG
                 Logging.LogWarning("RigidBodyEntityMovement2D", "Teleport function shouldn't be called at client [" + name + "]");
                 return;
             }
-            isTeleporting = true;
+            _isTeleporting = true;
             OnTeleport(position);
         }
 
@@ -186,15 +186,15 @@ namespace MultiplayerARPG
             UpdateMovement(Time.deltaTime);
             if (CanPredictMovement())
             {
-                tempMovementState = moveDirection.sqrMagnitude > 0f ? tempMovementState : MovementState.None;
-                tempMovementState |= MovementState.IsGrounded;
+                _tempMovementState = _moveDirection.sqrMagnitude > 0f ? _tempMovementState : MovementState.None;
+                _tempMovementState |= MovementState.IsGrounded;
                 // Update movement state
-                MovementState = tempMovementState;
+                MovementState = _tempMovementState;
                 // Update extra movement state
-                ExtraMovementState = this.ValidateExtraMovementState(MovementState, tempExtraMovementState);
+                ExtraMovementState = this.ValidateExtraMovementState(MovementState, _tempExtraMovementState);
                 // Set current input
-                currentInput = this.SetInputMovementState(currentInput, MovementState);
-                currentInput = this.SetInputExtraMovementState(currentInput, ExtraMovementState);
+                _currentInput = this.SetInputMovementState(_currentInput, MovementState);
+                _currentInput = this.SetInputExtraMovementState(_currentInput, ExtraMovementState);
             }
             else
             {
@@ -218,48 +218,48 @@ namespace MultiplayerARPG
 
             tempCurrentPosition = CacheTransform.position;
             tempMoveVelocity = Vector3.zero;
-            moveDirection = Vector2.zero;
+            _moveDirection = Vector2.zero;
             tempTargetDistance = 0f;
 
             if (HasNavPaths)
             {
                 // Set `tempTargetPosition` and `tempCurrentPosition`
                 tempTargetPosition = NavPaths.Peek();
-                moveDirection = (tempTargetPosition - tempCurrentPosition).normalized;
+                _moveDirection = (tempTargetPosition - tempCurrentPosition).normalized;
                 tempTargetDistance = Vector2.Distance(tempTargetPosition, tempCurrentPosition);
-                if (!tempMovementState.Has(MovementState.Forward))
-                    tempMovementState |= MovementState.Forward;
+                if (!_tempMovementState.Has(MovementState.Forward))
+                    _tempMovementState |= MovementState.Forward;
                 if (tempTargetDistance < StoppingDistance)
                 {
                     NavPaths.Dequeue();
                     if (!HasNavPaths)
                     {
                         StopMoveFunction();
-                        moveDirection = Vector2.zero;
+                        _moveDirection = Vector2.zero;
                     }
                 }
                 else
                 {
                     // Turn character to destination
-                    Direction2D = moveDirection;
+                    Direction2D = _moveDirection;
                 }
             }
-            else if (clientTargetPosition.HasValue)
+            else if (_clientTargetPosition.HasValue)
             {
-                tempTargetPosition = clientTargetPosition.Value;
-                moveDirection = (tempTargetPosition - tempCurrentPosition).normalized;
+                tempTargetPosition = _clientTargetPosition.Value;
+                _moveDirection = (tempTargetPosition - tempCurrentPosition).normalized;
                 tempTargetDistance = Vector2.Distance(tempTargetPosition, tempCurrentPosition);
                 if (tempTargetDistance < 0.001f)
                 {
-                    clientTargetPosition = null;
+                    _clientTargetPosition = null;
                     StopMoveFunction();
-                    moveDirection = Vector2.zero;
+                    _moveDirection = Vector2.zero;
                 }
             }
-            else if (inputDirection.sqrMagnitude > 0f)
+            else if (_inputDirection.sqrMagnitude > 0f)
             {
-                moveDirection = inputDirection.normalized;
-                tempTargetPosition = tempCurrentPosition + moveDirection;
+                _moveDirection = _inputDirection.normalized;
+                tempTargetPosition = tempCurrentPosition + _moveDirection;
             }
             else
             {
@@ -268,7 +268,7 @@ namespace MultiplayerARPG
 
             if (!Entity.CanMove())
             {
-                moveDirection = Vector2.zero;
+                _moveDirection = Vector2.zero;
             }
 
             // Prepare movement speed
@@ -276,16 +276,16 @@ namespace MultiplayerARPG
             tempMaxMoveSpeed = tempEntityMoveSpeed;
 
             // Updating horizontal movement (WASD inputs)
-            if (moveDirection.sqrMagnitude > 0f)
+            if (_moveDirection.sqrMagnitude > 0f)
             {
                 // If character move backward
                 CurrentMoveSpeed = CalculateCurrentMoveSpeed(tempMaxMoveSpeed, deltaTime);
 
                 // NOTE: `tempTargetPosition` and `tempCurrentPosition` were set above
                 tempSqrMagnitude = (tempTargetPosition - tempCurrentPosition).sqrMagnitude;
-                tempPredictPosition = tempCurrentPosition + (moveDirection * CurrentMoveSpeed * deltaTime);
+                tempPredictPosition = tempCurrentPosition + (_moveDirection * CurrentMoveSpeed * deltaTime);
                 tempPredictSqrMagnitude = (tempPredictPosition - tempCurrentPosition).sqrMagnitude;
-                if (HasNavPaths || clientTargetPosition.HasValue)
+                if (HasNavPaths || _clientTargetPosition.HasValue)
                 {
                     // Check `tempSqrMagnitude` against the `tempPredictSqrMagnitude`
                     // if `tempPredictSqrMagnitude` is greater than `tempSqrMagnitude`,
@@ -294,20 +294,20 @@ namespace MultiplayerARPG
                     if (tempPredictSqrMagnitude >= tempSqrMagnitude && tempTargetDistance > 0f)
                         CurrentMoveSpeed *= tempTargetDistance / deltaTime / CurrentMoveSpeed;
                 }
-                tempMoveVelocity = moveDirection * CurrentMoveSpeed;
+                tempMoveVelocity = _moveDirection * CurrentMoveSpeed;
                 // Set inputs
                 if (HasNavPaths)
                 {
-                    currentInput = this.SetInputPosition(currentInput, tempTargetPosition);
-                    currentInput = this.SetInputIsKeyMovement(currentInput, false);
+                    _currentInput = this.SetInputPosition(_currentInput, tempTargetPosition);
+                    _currentInput = this.SetInputIsKeyMovement(_currentInput, false);
                 }
                 else
                 {
-                    currentInput = this.SetInputPosition(currentInput, tempPredictPosition);
-                    currentInput = this.SetInputIsKeyMovement(currentInput, true);
+                    _currentInput = this.SetInputPosition(_currentInput, tempPredictPosition);
+                    _currentInput = this.SetInputIsKeyMovement(_currentInput, true);
                 }
             }
-            currentInput = this.SetInputDirection2D(currentInput, Direction2D);
+            _currentInput = this.SetInputDirection2D(_currentInput, Direction2D);
             CacheRigidbody2D.velocity = tempMoveVelocity;
         }
 
@@ -318,13 +318,13 @@ namespace MultiplayerARPG
             {
                 float rtt = 0.001f * Entity.Manager.Rtt;
                 float acc = 1f / rtt * deltaTime * 0.5f;
-                if (!lagMoveSpeedRate.HasValue)
-                    lagMoveSpeedRate = 0f;
-                if (lagMoveSpeedRate < 1f)
-                    lagMoveSpeedRate += acc;
-                if (lagMoveSpeedRate > 1f)
-                    lagMoveSpeedRate = 1f;
-                return maxMoveSpeed * lagMoveSpeedRate.Value;
+                if (!_lagMoveSpeedRate.HasValue)
+                    _lagMoveSpeedRate = 0f;
+                if (_lagMoveSpeedRate < 1f)
+                    _lagMoveSpeedRate += acc;
+                if (_lagMoveSpeedRate > 1f)
+                    _lagMoveSpeedRate = 1f;
+                return maxMoveSpeed * _lagMoveSpeedRate.Value;
             }
             // TODO: Adjust other's client move speed by rtt
             return maxMoveSpeed;
@@ -343,34 +343,34 @@ namespace MultiplayerARPG
             if (movementSecure == MovementSecure.NotSecure && IsOwnerClient && !IsServer)
             {
                 // Sync transform from owner client to server (except it's both owner client and server)
-                if (isClientConfirmingTeleport)
+                if (_isClientConfirmingTeleport)
                 {
                     shouldSendReliably = true;
                     MovementState |= MovementState.IsTeleport;
                 }
                 this.ClientWriteSyncTransform2D(writer);
-                isClientConfirmingTeleport = false;
+                _isClientConfirmingTeleport = false;
                 return true;
             }
             if (movementSecure == MovementSecure.ServerAuthoritative && IsOwnerClient && !IsServer)
             {
                 EntityMovementInputState inputState;
-                if (this.DifferInputEnoughToSend(oldInput, currentInput, out inputState) || isClientConfirmingTeleport)
+                if (this.DifferInputEnoughToSend(_oldInput, _currentInput, out inputState) || _isClientConfirmingTeleport)
                 {
-                    if (!currentInput.IsKeyMovement)
+                    if (!_currentInput.IsKeyMovement)
                     {
                         // Point click should be reliably
                         shouldSendReliably = true;
                     }
-                    if (isClientConfirmingTeleport)
+                    if (_isClientConfirmingTeleport)
                     {
                         shouldSendReliably = true;
-                        currentInput.MovementState |= MovementState.IsTeleport;
+                        _currentInput.MovementState |= MovementState.IsTeleport;
                     }
-                    this.ClientWriteMovementInput2D(writer, inputState, currentInput.MovementState, currentInput.ExtraMovementState, currentInput.Position, currentInput.Direction2D);
-                    isClientConfirmingTeleport = false;
-                    oldInput = currentInput;
-                    currentInput = null;
+                    this.ClientWriteMovementInput2D(writer, inputState, _currentInput.MovementState, _currentInput.ExtraMovementState, _currentInput.Position, _currentInput.Direction2D);
+                    _isClientConfirmingTeleport = false;
+                    _oldInput = _currentInput;
+                    _currentInput = null;
                     return true;
                 }
             }
@@ -380,7 +380,7 @@ namespace MultiplayerARPG
         public bool WriteServerState(NetDataWriter writer, out bool shouldSendReliably)
         {
             shouldSendReliably = false;
-            if (isTeleporting)
+            if (_isTeleporting)
             {
                 shouldSendReliably = true;
                 MovementState |= MovementState.IsTeleport;
@@ -391,7 +391,7 @@ namespace MultiplayerARPG
             }
             // Sync transform from server to all clients (include owner client)
             this.ServerWriteSyncTransform2D(writer);
-            isTeleporting = false;
+            _isTeleporting = false;
             return true;
         }
 
@@ -426,7 +426,7 @@ namespace MultiplayerARPG
                 // Server requested to teleport
                 OnTeleport(position);
             }
-            else if (acceptedPositionTimestamp <= timestamp)
+            else if (_acceptedPositionTimestamp <= timestamp)
             {
                 if (Vector2.Distance(position, CacheTransform.position) >= snapThreshold)
                 {
@@ -442,11 +442,11 @@ namespace MultiplayerARPG
                 else if (!IsOwnerClient)
                 {
                     Direction2D = direction2D;
-                    clientTargetPosition = position;
+                    _clientTargetPosition = position;
                     MovementState = movementState;
                     ExtraMovementState = extraMovementState;
                 }
-                acceptedPositionTimestamp = timestamp;
+                _acceptedPositionTimestamp = timestamp;
             }
         }
 
@@ -474,30 +474,30 @@ namespace MultiplayerARPG
             if (movementState.Has(MovementState.IsTeleport))
             {
                 // Teleport confirming from client
-                isServerWaitingTeleportConfirm = false;
+                _isServerWaitingTeleportConfirm = false;
             }
-            if (isServerWaitingTeleportConfirm)
+            if (_isServerWaitingTeleportConfirm)
             {
                 // Waiting for teleport confirming
                 return;
             }
-            if (Mathf.Abs(timestamp - BaseGameNetworkManager.Singleton.ServerTimestamp) > lagBuffer)
+            if (Mathf.Abs(timestamp - BaseGameNetworkManager.Singleton.ServerTimestamp) > s_lagBuffer)
             {
                 // Timestamp is a lot difference to server's timestamp, player might try to hack a game or packet may corrupted occurring, so skip it
                 return;
             }
-            if (acceptedPositionTimestamp <= timestamp)
+            if (_acceptedPositionTimestamp <= timestamp)
             {
                 if (!inputState.Has(EntityMovementInputState.IsStopped))
                 {
                     NavPaths = null;
-                    tempMovementState = movementState;
-                    tempExtraMovementState = extraMovementState;
+                    _tempMovementState = movementState;
+                    _tempExtraMovementState = extraMovementState;
                     if (inputState.Has(EntityMovementInputState.PositionChanged))
                     {
                         if (inputState.Has(EntityMovementInputState.IsKeyMovement))
                         {
-                            clientTargetPosition = position;
+                            _clientTargetPosition = position;
                         }
                         else
                         {
@@ -510,7 +510,7 @@ namespace MultiplayerARPG
                 {
                     StopMoveFunction();
                 }
-                acceptedPositionTimestamp = timestamp;
+                _acceptedPositionTimestamp = timestamp;
             }
         }
 
@@ -535,19 +535,19 @@ namespace MultiplayerARPG
             if (movementState.Has(MovementState.IsTeleport))
             {
                 // Teleport confirming from client
-                isServerWaitingTeleportConfirm = false;
+                _isServerWaitingTeleportConfirm = false;
             }
-            if (isServerWaitingTeleportConfirm)
+            if (_isServerWaitingTeleportConfirm)
             {
                 // Waiting for teleport confirming
                 return;
             }
-            if (Mathf.Abs(timestamp - BaseGameNetworkManager.Singleton.ServerTimestamp) > lagBuffer)
+            if (Mathf.Abs(timestamp - BaseGameNetworkManager.Singleton.ServerTimestamp) > s_lagBuffer)
             {
                 // Timestamp is a lot difference to server's timestamp, player might try to hack a game or packet may corrupted occurring, so skip it
                 return;
             }
-            if (acceptedPositionTimestamp <= timestamp)
+            if (_acceptedPositionTimestamp <= timestamp)
             {
                 Direction2D = direction2D;
                 MovementState = movementState;
@@ -556,9 +556,9 @@ namespace MultiplayerARPG
                 {
                     // If it's server only (not a host), set position follows the client immediately
                     float currentTime = Time.unscaledTime;
-                    float t = currentTime - lastServerValidateTransformTime;
+                    float t = currentTime - _lastServerValidateTransformTime;
                     float v = Entity.GetMoveSpeed();
-                    float s = (lastServerValidateTransformMoveSpeed * (t + lagBufferUnityTime)) + (v * t); // +`lagBufferUnityTime` as high ping buffer
+                    float s = (_lastServerValidateTransformMoveSpeed * (t + s_lagBufferUnityTime)) + (v * t); // +`lagBufferUnityTime` as high ping buffer
                     if (s < 0.001f)
                         s = 0.001f;
                     Vector2 oldPos = CacheTransform.position.GetXY();
@@ -578,8 +578,8 @@ namespace MultiplayerARPG
                         // And also adjust client's position
                         Teleport(newPos, Quaternion.identity);
                     }
-                    lastServerValidateTransformTime = currentTime;
-                    lastServerValidateTransformMoveSpeed = v;
+                    _lastServerValidateTransformTime = currentTime;
+                    _lastServerValidateTransformMoveSpeed = v;
                 }
                 else
                 {
@@ -587,19 +587,19 @@ namespace MultiplayerARPG
                     if (Vector3.Distance(position, CacheTransform.position) > 0.01f)
                         SetMovePaths(position, false);
                 }
-                acceptedPositionTimestamp = timestamp;
+                _acceptedPositionTimestamp = timestamp;
             }
         }
 
         protected virtual void OnTeleport(Vector2 position)
         {
-            clientTargetPosition = null;
+            _clientTargetPosition = null;
             NavPaths = null;
             CacheTransform.position = position;
             if (IsServer && !IsOwnedByServer)
-                isServerWaitingTeleportConfirm = true;
+                _isServerWaitingTeleportConfirm = true;
             if (!IsServer && IsOwnerClient)
-                isClientConfirmingTeleport = true;
+                _isClientConfirmingTeleport = true;
         }
 
         public bool CanPredictMovement()
