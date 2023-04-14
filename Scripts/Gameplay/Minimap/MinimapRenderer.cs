@@ -17,49 +17,49 @@ namespace MultiplayerARPG
         public BaseMapInfo testingMapInfo;
         public DimensionType testingDimensionType;
 
-        private BaseMapInfo currentMapInfo;
-        private SpriteRenderer spriteRenderer;
+        private BaseMapInfo _currentMapInfo;
+        private SpriteRenderer _spriteRenderer;
 
         private void Start()
         {
             if (minimapRendererPrefab == null)
-                spriteRenderer = new GameObject("__MinimapRenderer").AddComponent<SpriteRenderer>();
+                _spriteRenderer = new GameObject("__MinimapRenderer").AddComponent<SpriteRenderer>();
             else
-                spriteRenderer = Instantiate(minimapRendererPrefab);
-            spriteRenderer.gameObject.layer = layer.LayerIndex;
+                _spriteRenderer = Instantiate(minimapRendererPrefab);
+            _spriteRenderer.gameObject.layer = layer.LayerIndex;
         }
 
         private void Update()
         {
             BaseMapInfo mapInfo = isTestMode ? testingMapInfo : BaseGameNetworkManager.CurrentMapInfo;
-            if (mapInfo == null || mapInfo == currentMapInfo)
+            if (mapInfo == null || mapInfo == _currentMapInfo)
                 return;
-            currentMapInfo = mapInfo;
+            _currentMapInfo = mapInfo;
 
             // Use bounds size to calculate transforms
-            float boundsWidth = currentMapInfo.MinimapBoundsWidth;
-            float boundsLength = currentMapInfo.MinimapBoundsLength;
+            float boundsWidth = _currentMapInfo.MinimapBoundsWidth;
+            float boundsLength = _currentMapInfo.MinimapBoundsLength;
             float maxBoundsSize = Mathf.Max(boundsWidth, boundsLength);
 
             // Set dimention type
             DimensionType dimensionType = GameInstance.Singleton == null || isTestMode ? testingDimensionType : GameInstance.Singleton.DimensionType;
 
-            if (spriteRenderer != null)
+            if (_spriteRenderer != null)
             {
                 switch (dimensionType)
                 {
                     case DimensionType.Dimension2D:
-                        spriteRenderer.transform.position = currentMapInfo.MinimapPosition + (Vector3.forward * spriteOffsets2D);
-                        spriteRenderer.transform.eulerAngles = Vector3.zero;
+                        _spriteRenderer.transform.position = _currentMapInfo.MinimapPosition + (Vector3.forward * spriteOffsets2D);
+                        _spriteRenderer.transform.eulerAngles = Vector3.zero;
                         break;
                     default:
-                        spriteRenderer.transform.position = currentMapInfo.MinimapPosition + (Vector3.up * spriteOffsets3D);
-                        spriteRenderer.transform.eulerAngles = new Vector3(90f, 0f, 0f);
+                        _spriteRenderer.transform.position = _currentMapInfo.MinimapPosition + (Vector3.up * spriteOffsets3D);
+                        _spriteRenderer.transform.eulerAngles = new Vector3(90f, 0f, 0f);
                         break;
                 }
-                spriteRenderer.sprite = currentMapInfo.MinimapSprite != null ? currentMapInfo.MinimapSprite : noMinimapSprite;
-                if (spriteRenderer.sprite != null)
-                    spriteRenderer.transform.localScale = new Vector3(1f, 1f) * maxBoundsSize * spriteRenderer.sprite.pixelsPerUnit / Mathf.Max(spriteRenderer.sprite.texture.width, spriteRenderer.sprite.texture.height);
+                _spriteRenderer.sprite = _currentMapInfo.MinimapSprite != null ? _currentMapInfo.MinimapSprite : noMinimapSprite;
+                if (_spriteRenderer.sprite != null)
+                    _spriteRenderer.transform.localScale = new Vector3(1f, 1f) * maxBoundsSize * _spriteRenderer.sprite.pixelsPerUnit / Mathf.Max(_spriteRenderer.sprite.texture.width, _spriteRenderer.sprite.texture.height);
             }
         }
     }
