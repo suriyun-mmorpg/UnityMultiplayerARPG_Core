@@ -17,7 +17,7 @@ namespace MultiplayerARPG
         public float updateRepeatRate = 0.5f;
         [HideInInspector, System.NonSerialized]
         public NpcEntity npcEntity;
-        private float lastUpdateTime;
+        private float _lastUpdateTime;
 
         private void Awake()
         {
@@ -40,9 +40,9 @@ namespace MultiplayerARPG
                 return;
             }
 
-            if (Time.unscaledTime - lastUpdateTime >= updateRepeatRate)
+            if (Time.unscaledTime - _lastUpdateTime >= updateRepeatRate)
             {
-                lastUpdateTime = Time.unscaledTime;
+                _lastUpdateTime = Time.unscaledTime;
                 // Indicator priority haveTasksDoneQuests > haveInProgressQuests > haveNewQuests
                 bool isIndicatorShown = false;
                 bool tempVisibleState;

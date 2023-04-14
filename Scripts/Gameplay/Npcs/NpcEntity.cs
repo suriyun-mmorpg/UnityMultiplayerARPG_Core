@@ -24,8 +24,8 @@ namespace MultiplayerARPG
         [SerializeField]
         private Transform questIndicatorContainer = null;
 
-        private UINpcEntity uiNpcEntity;
-        private NpcQuestIndicator questIndicator;
+        private UINpcEntity _uiNpcEntity;
+        private NpcQuestIndicator _questIndicator;
 
         public BaseNpcDialog StartDialog
         {
@@ -136,21 +136,21 @@ namespace MultiplayerARPG
         {
             if (prefab == null)
                 return;
-            if (uiNpcEntity != null)
-                Destroy(uiNpcEntity.gameObject);
-            uiNpcEntity = Instantiate(prefab, CharacterUiTransform);
-            uiNpcEntity.transform.localPosition = Vector3.zero;
-            uiNpcEntity.Data = this;
+            if (_uiNpcEntity != null)
+                Destroy(_uiNpcEntity.gameObject);
+            _uiNpcEntity = Instantiate(prefab, CharacterUiTransform);
+            _uiNpcEntity.transform.localPosition = Vector3.zero;
+            _uiNpcEntity.Data = this;
         }
 
         public void InstantiateQuestIndicator(NpcQuestIndicator prefab)
         {
             if (prefab == null)
                 return;
-            if (questIndicator != null)
-                Destroy(questIndicator.gameObject);
-            questIndicator = Instantiate(prefab, QuestIndicatorContainer);
-            questIndicator.npcEntity = this;
+            if (_questIndicator != null)
+                Destroy(_questIndicator.gameObject);
+            _questIndicator = Instantiate(prefab, QuestIndicatorContainer);
+            _questIndicator.npcEntity = this;
         }
 
         private void FindQuestFromDialog(IPlayerCharacterData playerCharacter, HashSet<int> questIds, BaseNpcDialog baseDialog, List<BaseNpcDialog> foundDialogs = null)
