@@ -266,7 +266,7 @@ namespace MultiplayerARPG
                 SetWanderDestination(CacheTransform.position);
                 // Lookat target then do something when it's in range
                 Vector3 lookAtDirection = (targetPosition - currentPosition).normalized;
-                bool readyToAttack = false;
+                bool turnedToEnemy = false;
                 if (lookAtDirection.sqrMagnitude > 0)
                 {
                     if (CurrentGameInstance.DimensionType == DimensionType.Dimension3D)
@@ -277,18 +277,21 @@ namespace MultiplayerARPG
                         lookRotationEuler.z = 0;
                         currentLookAtRotation = Quaternion.RotateTowards(currentLookAtRotation, Quaternion.Euler(lookRotationEuler), turnToEnemySpeed * Time.deltaTime);
                         Entity.SetLookRotation(currentLookAtRotation);
-                        readyToAttack = Mathf.Abs(currentLookAtRotation.eulerAngles.y - lookRotationEuler.y) < 15f;
+                        turnedToEnemy = Mathf.Abs(currentLookAtRotation.eulerAngles.y - lookRotationEuler.y) < 15f;
                     }
                     else
                     {
                         // Update 2D direction
                         Entity.SetLookRotation(Quaternion.LookRotation(lookAtDirection));
-                        readyToAttack = true;
+                        turnedToEnemy = true;
                     }
                 }
 
+                if (!turnedToEnemy)
+                    return true;
+
                 Entity.AimPosition = Entity.GetAttackAimPosition(ref _isLeftHandAttacking);
-                if (!readyToAttack || Entity.IsPlayingActionAnimation())
+                if (Entity.IsPlayingActionAnimation())
                     return true;
 
                 if (_queueSkill != null && Entity.IndexOfSkillUsage(_queueSkill.DataId, SkillUsageType.Skill) < 0)
