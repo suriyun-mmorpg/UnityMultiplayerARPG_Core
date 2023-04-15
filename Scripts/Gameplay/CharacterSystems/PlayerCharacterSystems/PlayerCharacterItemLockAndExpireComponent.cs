@@ -7,21 +7,21 @@ namespace MultiplayerARPG
     {
         public const float ITEM_UPDATE_DURATION = 1f;
 
-        private float updatingTime;
-        private float deltaTime;
+        private float _updatingTime;
+        private float _deltaTime;
 
         public override sealed void EntityUpdate()
         {
             if (!Entity.IsServer)
                 return;
 
-            deltaTime = Time.unscaledDeltaTime;
-            updatingTime += deltaTime;
+            _deltaTime = Time.unscaledDeltaTime;
+            _updatingTime += _deltaTime;
 
             if (Entity.IsRecaching || Entity.IsDead())
                 return;
 
-            if (updatingTime >= ITEM_UPDATE_DURATION)
+            if (_updatingTime >= ITEM_UPDATE_DURATION)
             {
                 // Removing non-equip items if it should
                 long currentTime = System.DateTimeOffset.UtcNow.ToUnixTimeSeconds();
@@ -45,7 +45,7 @@ namespace MultiplayerARPG
                     }
                     else if (tempItem.IsLocked())
                     {
-                        tempItem.Update(updatingTime);
+                        tempItem.Update(_updatingTime);
                         Entity.NonEquipItems[i] = tempItem;
                     }
                 }
@@ -82,7 +82,7 @@ namespace MultiplayerARPG
                         Entity.SelectableWeaponSets[i] = tempEquipWeapons;
                     }
                 }
-                updatingTime = 0;
+                _updatingTime = 0;
             }
         }
     }
