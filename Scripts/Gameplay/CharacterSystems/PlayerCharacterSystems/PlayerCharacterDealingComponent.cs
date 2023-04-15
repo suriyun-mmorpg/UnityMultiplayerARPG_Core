@@ -7,58 +7,58 @@ namespace MultiplayerARPG
     [DisallowMultipleComponent]
     public partial class PlayerCharacterDealingComponent : BaseNetworkedGameEntityComponent<BasePlayerCharacterEntity>
     {
-        protected DealingState dealingState = DealingState.None;
-        protected int dealingGold = 0;
-        protected DealingCharacterItems dealingItems = new DealingCharacterItems();
+        protected DealingState _dealingState = DealingState.None;
         public DealingState DealingState
         {
-            get { return dealingState; }
+            get { return _dealingState; }
             set
             {
-                dealingState = value;
+                _dealingState = value;
                 CallOwnerUpdateDealingState(value);
                 if (DealingCharacter != null)
                     DealingCharacter.Dealing.CallOwnerUpdateAnotherDealingState(value);
             }
         }
 
+        protected int _dealingGold = 0;
         public int DealingGold
         {
-            get { return dealingGold; }
+            get { return _dealingGold; }
             set
             {
-                dealingGold = value;
+                _dealingGold = value;
                 CallOwnerUpdateDealingGold(value);
                 if (DealingCharacter != null)
                     DealingCharacter.Dealing.CallOwnerUpdateAnotherDealingGold(value);
             }
         }
 
+        protected DealingCharacterItems _dealingItems = new DealingCharacterItems();
         public DealingCharacterItems DealingItems
         {
-            get { return dealingItems; }
+            get { return _dealingItems; }
             set
             {
-                dealingItems = value;
+                _dealingItems = value;
                 CallOwnerUpdateDealingItems(value);
                 if (DealingCharacter != null)
                     DealingCharacter.Dealing.CallOwnerUpdateAnotherDealingItems(value);
             }
         }
 
-        private BasePlayerCharacterEntity dealingCharacter;
+        private BasePlayerCharacterEntity _dealingCharacter;
         public BasePlayerCharacterEntity DealingCharacter
         {
             get
             {
-                if (DealingState == DealingState.None && Time.unscaledTime - dealingCharacterTime >= CurrentGameInstance.dealingRequestDuration)
-                    dealingCharacter = null;
-                return dealingCharacter;
+                if (DealingState == DealingState.None && Time.unscaledTime - DealingCharacterTime >= CurrentGameInstance.dealingRequestDuration)
+                    _dealingCharacter = null;
+                return _dealingCharacter;
             }
             set
             {
-                dealingCharacter = value;
-                dealingCharacterTime = Time.unscaledTime;
+                _dealingCharacter = value;
+                DealingCharacterTime = Time.unscaledTime;
             }
         }
 
@@ -76,7 +76,7 @@ namespace MultiplayerARPG
         public event System.Action<int> onUpdateAnotherDealingGold;
         public event System.Action<DealingCharacterItems> onUpdateDealingItems;
         public event System.Action<DealingCharacterItems> onUpdateAnotherDealingItems;
-        public float dealingCharacterTime { get; private set; }
+        public float DealingCharacterTime { get; private set; }
 
         public bool DisableDealing
         {
