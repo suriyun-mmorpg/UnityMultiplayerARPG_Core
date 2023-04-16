@@ -507,7 +507,7 @@ namespace MultiplayerARPG
                         itemDropRate = 1f + tempPlayerCharacterEntity.GetCaches().Stats.itemDropRate;
                     }
                     GivingRewardToGuild(tempPlayerCharacterEntity, reward, rewardRate, out float shareGuildExpRate);
-                    GivingRewardToParty(tempPlayerCharacterEntity, isLastAttacker, reward, shareGuildExpRate, rewardRate, makeMostDamage, out givenRewardExp, out givenRewardCurrency);
+                    GivingRewardToParty(tempPlayerCharacterEntity, isLastAttacker, reward, rewardRate, shareGuildExpRate, makeMostDamage, out givenRewardExp, out givenRewardCurrency);
 
                     // Add reward to current character in damage record list
                     if (!givenRewardExp)
@@ -582,7 +582,7 @@ namespace MultiplayerARPG
                     // Add party member to sharing item list, to share item to this party member later
                     sharingItemMembers.Add(nearbyPartyMember);
                 }
-                if (isLastAttacker)
+                if (isLastAttacker && playerCharacterEntity.ObjectId != nearbyPartyMember.ObjectId)
                 {
                     // Increase kill progress
                     nearbyPartyMember.OnKillMonster(this);
