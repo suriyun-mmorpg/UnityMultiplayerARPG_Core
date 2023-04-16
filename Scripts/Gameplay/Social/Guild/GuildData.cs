@@ -85,11 +85,13 @@ namespace MultiplayerARPG
         public void GetSortedMembers(out SocialCharacterData[] sortedMembers, out byte[] sortedMemberRoles)
         {
             int i = 0;
-            List<SocialCharacterData> offlineMembers = new List<SocialCharacterData>();
             sortedMembers = new SocialCharacterData[members.Count];
             sortedMemberRoles = new byte[members.Count];
+            if (members.Count <= 0)
+                return;
             sortedMembers[i] = members[leaderId];
             sortedMemberRoles[i++] = LeaderRole;
+            List<SocialCharacterData> offlineMembers = new List<SocialCharacterData>();
             SocialCharacterData tempMember;
             foreach (string memberId in members.Keys)
             {
