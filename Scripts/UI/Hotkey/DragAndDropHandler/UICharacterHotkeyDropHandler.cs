@@ -32,7 +32,7 @@ namespace MultiplayerARPG
                 return;
             }
             // Validate drop position
-            if (!RectTransformUtility.RectangleContainsScreenPoint(DropRect, InputManager.MousePosition()))
+            if (!RectTransformUtility.RectangleContainsScreenPoint(DropRect, eventData.position))
                 return;
             // Validate dragging UI
             UIDragHandler dragHandler = eventData.pointerDrag.GetComponent<UIDragHandler>();
