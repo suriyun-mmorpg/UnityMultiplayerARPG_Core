@@ -1,5 +1,4 @@
 ﻿using UnityEngine;
-using UnityEngine.UI;
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
@@ -14,17 +13,17 @@ public class UISelectionEntryActiveObject : MonoBehaviour
     }
 
     public Setting[] settings;
-    private IUISelectionEntry entry;
-    private bool dirtySelected;
+    private IUISelectionEntry _entry;
+    private bool _dirtySelected;
 
     private void Awake()
     {
-        entry = GetComponent<IUISelectionEntry>();
+        _entry = GetComponent<IUISelectionEntry>();
     }
 
     private void OnEnable()
     {
-        dirtySelected = false;
+        _dirtySelected = false;
         foreach (Setting setting in settings)
         {
             setting.defaultObject.SetActive(true);
@@ -34,16 +33,16 @@ public class UISelectionEntryActiveObject : MonoBehaviour
 
     private void Update()
     {
-        if (entry == null)
+        if (_entry == null)
             return;
 
-        if (dirtySelected != entry.IsSelected)
+        if (_dirtySelected != _entry.IsSelected)
         {
-            dirtySelected = entry.IsSelected;
+            _dirtySelected = _entry.IsSelected;
             foreach (Setting setting in settings)
             {
-                setting.defaultObject.SetActive(!dirtySelected);
-                setting.selectedObject.SetActive(dirtySelected);
+                setting.defaultObject.SetActive(!_dirtySelected);
+                setting.selectedObject.SetActive(_dirtySelected);
             }
         }
     }

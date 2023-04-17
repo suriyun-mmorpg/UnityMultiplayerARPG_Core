@@ -15,8 +15,8 @@ public class UITabManager : UIBase
     public string prevTabButtonName = "TabLeft";
     public string nextTabButtonName = "TabRight";
     public int currentTabIndex = 0;
-    protected ToggleGroup toggleGroup;
-    protected bool alreadySetup;
+    protected ToggleGroup _toggleGroup;
+    protected bool _alreadySetup;
 
     protected override void Awake()
     {
@@ -26,15 +26,15 @@ public class UITabManager : UIBase
 
     protected void SetupToggles()
     {
-        if (alreadySetup)
+        if (_alreadySetup)
             return;
-        alreadySetup = true;
-        toggleGroup = GetComponent<ToggleGroup>();
+        _alreadySetup = true;
+        _toggleGroup = GetComponent<ToggleGroup>();
         for (int i = 0; i < tabs.Length; ++i)
         {
             int index = i;
             tabs[index].toggle.onValueChanged.AddListener(tabs[index].uiContent.SetVisible);
-            tabs[index].toggle.group = toggleGroup;
+            tabs[index].toggle.group = _toggleGroup;
         }
     }
 

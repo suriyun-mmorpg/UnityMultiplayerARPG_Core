@@ -11,10 +11,10 @@ public class UIFollowWorldPosition : MonoBehaviour
     public float damping = 5f;
     public float snapDistance = 100f;
 
-    private Vector3? wantedPosition;
-    private TransformAccessArray followJobTransforms;
-    private UIFollowWorldPositionJob followJob;
-    private JobHandle followJobHandle;
+    private Vector3? _wantedPosition;
+    private TransformAccessArray _followJobTransforms;
+    private UIFollowWorldPositionJob _followJob;
+    private JobHandle _followJobHandle;
 
     public RectTransform CacheTransform { get; private set; }
     public Transform CacheCameraTransform { get; private set; }
@@ -35,35 +35,35 @@ public class UIFollowWorldPosition : MonoBehaviour
     private void OnEnable()
     {
         CacheTransform = GetComponent<RectTransform>();
-        followJobTransforms = new TransformAccessArray(new Transform[] { CacheTransform });
+        _followJobTransforms = new TransformAccessArray(new Transform[] { CacheTransform });
     }
 
     private void OnDisable()
     {
-        followJobTransforms.Dispose();
-        followJobHandle.Complete();
+        _followJobTransforms.Dispose();
+        _followJobHandle.Complete();
     }
 
     private void Update()
     {
         if (TargetCamera == null)
             return;
-        wantedPosition = RectTransformUtility.WorldToScreenPoint(targetCamera, targetPosition);
+        _wantedPosition = RectTransformUtility.WorldToScreenPoint(targetCamera, targetPosition);
     }
 
     private void LateUpdate()
     {
-        if (!wantedPosition.HasValue)
+        if (!_wantedPosition.HasValue)
             return;
-        followJobHandle.Complete();
-        followJob = new UIFollowWorldPositionJob()
+        _followJobHandle.Complete();
+        _followJob = new UIFollowWorldPositionJob()
         {
-            wantedPosition = wantedPosition.Value,
+            wantedPosition = _wantedPosition.Value,
             damping = damping,
             snapDistance = snapDistance,
             deltaTime = Time.deltaTime,
         };
-        followJobHandle = followJob.Schedule(followJobTransforms);
+        _followJobHandle = _followJob.Schedule(_followJobTransforms);
         JobHandle.ScheduleBatchedJobs();
     }
 
@@ -72,8 +72,8 @@ public class UIFollowWorldPosition : MonoBehaviour
         this.targetPosition = targetPosition;
         if (TargetCamera == null)
             return;
-        wantedPosition = RectTransformUtility.WorldToScreenPoint(targetCamera, targetPosition);
-        CacheTransform.position = wantedPosition.Value;
+        _wantedPosition = RectTransformUtility.WorldToScreenPoint(targetCamera, targetPosition);
+        CacheTransform.position = _wantedPosition.Value;
     }
 }
 

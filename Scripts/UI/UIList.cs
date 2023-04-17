@@ -11,7 +11,7 @@ public class UIList : MonoBehaviour
     public int ListCount { get; protected set; } = 0;
     public System.Action<int, object, GameObject> onGenerateEntry = null;
     public int? ChildPrefabsCount { get; protected set; }
-    protected readonly List<GameObject> uis = new List<GameObject>();
+    protected readonly List<GameObject> _uis = new List<GameObject>();
 
     public void RemoveContainerChildren()
     {
@@ -35,9 +35,9 @@ public class UIList : MonoBehaviour
         {
             // NOTE: `ui` can be NULL
             GameObject ui = null;
-            if (i < uis.Count)
+            if (i < _uis.Count)
             {
-                ui = uis[i];
+                ui = _uis[i];
                 ui.transform.SetSiblingIndex(ChildPrefabsCount.Value + i);
                 ui.SetActive(true);
             }
@@ -51,7 +51,7 @@ public class UIList : MonoBehaviour
                     ui.transform.localRotation = Quaternion.identity;
                     ui.transform.localScale = Vector3.one;
                     ui.transform.SetSiblingIndex(ChildPrefabsCount.Value + i);
-                    uis.Add(ui);
+                    _uis.Add(ui);
                     ui.SetActive(true);
                 }
             }
@@ -62,9 +62,9 @@ public class UIList : MonoBehaviour
             ++i;
         }
         ListCount = i;
-        for (; i < uis.Count; ++i)
+        for (; i < _uis.Count; ++i)
         {
-            GameObject ui = uis[i];
+            GameObject ui = _uis[i];
             ui.SetActive(false);
         }
     }
@@ -73,9 +73,9 @@ public class UIList : MonoBehaviour
     {
         RemoveContainerChildren();
 
-        for (int i = 0; i < uis.Count; ++i)
+        for (int i = 0; i < _uis.Count; ++i)
         {
-            GameObject ui = uis[i];
+            GameObject ui = _uis[i];
             ui.SetActive(false);
         }
     }

@@ -4,7 +4,7 @@ using UnityEngine;
 public class UIStackManager : MonoBehaviour
 {
     public string closeButtonName = "CloseUI";
-    private static Stack<UIStackEntry> entries = new Stack<UIStackEntry>();
+    private static Stack<UIStackEntry> s_entries = new Stack<UIStackEntry>();
 
     private void Awake()
     {
@@ -16,9 +16,9 @@ public class UIStackManager : MonoBehaviour
         if (InputManager.GetButtonDown(closeButtonName))
         {
             UIStackEntry entry;
-            while (entries.Count > 0)
+            while (s_entries.Count > 0)
             {
-                entry = entries.Pop();
+                entry = s_entries.Pop();
                 if (entry != null)
                 {
                     entry.Hide();
@@ -30,11 +30,11 @@ public class UIStackManager : MonoBehaviour
 
     public void Clear()
     {
-        entries.Clear();
+        s_entries.Clear();
     }
 
     public static void Add(UIStackEntry entry)
     {
-        entries.Push(entry);
+        s_entries.Push(entry);
     }
 }

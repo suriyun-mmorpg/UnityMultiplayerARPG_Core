@@ -2,18 +2,18 @@
 {
     public abstract class UIDataForCharacter<T> : UISelectionEntry<T>
     {
-        private ICharacterData character;
+        private ICharacterData _character;
         public ICharacterData Character
         {
             get
             {
-                if (character != null)
-                    return character;
+                if (_character != null)
+                    return _character;
                 return GameInstance.PlayingCharacter;
             }
             protected set
             {
-                character = value;
+                _character = value;
             }
         }
         public int IndexOfData { get; protected set; }

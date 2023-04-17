@@ -12,14 +12,14 @@ namespace MultiplayerARPG
         public bool showPositiveSign;
         public TextWrapper textComponent;
 
-        private int amount;
+        private int _amount;
         public int Amount
         {
-            get { return amount; }
+            get { return _amount; }
             set
             {
-                amount = value;
-                textComponent.text = ZString.Format(format, (showPositiveSign && amount > 0 ? "+" : string.Empty) + amount.ToString("N0"));
+                _amount = value;
+                textComponent.text = ZString.Format(format, (showPositiveSign && _amount > 0 ? "+" : string.Empty) + _amount.ToString("N0"));
             }
         }
 

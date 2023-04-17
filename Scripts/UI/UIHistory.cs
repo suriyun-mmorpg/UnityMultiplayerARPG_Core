@@ -4,7 +4,7 @@ using UnityEngine;
 public class UIHistory : MonoBehaviour
 {
     public UIBase firstUI;
-    protected readonly Stack<UIBase> uiStack = new Stack<UIBase>();
+    protected readonly Stack<UIBase> _uiStack = new Stack<UIBase>();
 
     private void Awake()
     {
@@ -17,38 +17,38 @@ public class UIHistory : MonoBehaviour
         if (ui == null)
             return;
         // Hide latest ui
-        if (uiStack.Count > 0)
-            uiStack.Peek().Hide();
+        if (_uiStack.Count > 0)
+            _uiStack.Peek().Hide();
         else if (firstUI != null)
             firstUI.Hide();
 
-        uiStack.Push(ui);
+        _uiStack.Push(ui);
         ui.Show();
     }
 
     public void Back()
     {
         // Remove current ui from stack
-        if (uiStack.Count > 0)
+        if (_uiStack.Count > 0)
         {
-            UIBase ui = uiStack.Pop();
+            UIBase ui = _uiStack.Pop();
             ui.Hide();
         }
         // Show recent ui
-        if (uiStack.Count > 0)
-            uiStack.Peek().Show();
+        if (_uiStack.Count > 0)
+            _uiStack.Peek().Show();
         else if (firstUI != null)
             firstUI.Show();
     }
 
     public void ClearHistory()
     {
-        while (uiStack.Count > 0)
+        while (_uiStack.Count > 0)
         {
-            UIBase ui = uiStack.Pop();
+            UIBase ui = _uiStack.Pop();
             ui.Hide();
         }
-        uiStack.Clear();
+        _uiStack.Clear();
         if (firstUI != null)
             firstUI.Show();
     }

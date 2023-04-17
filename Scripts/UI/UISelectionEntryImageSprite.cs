@@ -15,17 +15,17 @@ public class UISelectionEntryImageSprite : MonoBehaviour
     }
 
     public Setting[] settings;
-    private IUISelectionEntry entry;
-    private bool dirtySelected;
+    private IUISelectionEntry _entry;
+    private bool _dirtySelected;
 
     private void Awake()
     {
-        entry = GetComponent<IUISelectionEntry>();
+        _entry = GetComponent<IUISelectionEntry>();
     }
 
     private void OnEnable()
     {
-        dirtySelected = false;
+        _dirtySelected = false;
         foreach (Setting setting in settings)
         {
             setting.image.sprite = setting.defaultSprite;
@@ -34,15 +34,15 @@ public class UISelectionEntryImageSprite : MonoBehaviour
 
     private void Update()
     {
-        if (entry == null)
+        if (_entry == null)
             return;
 
-        if (dirtySelected != entry.IsSelected)
+        if (_dirtySelected != _entry.IsSelected)
         {
-            dirtySelected = entry.IsSelected;
+            _dirtySelected = _entry.IsSelected;
             foreach (Setting setting in settings)
             {
-                setting.image.sprite = dirtySelected ? setting.selectedSprite : setting.defaultSprite;
+                setting.image.sprite = _dirtySelected ? setting.selectedSprite : setting.defaultSprite;
             }
         }
     }

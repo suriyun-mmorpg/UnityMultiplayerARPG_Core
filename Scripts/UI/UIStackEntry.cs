@@ -3,11 +3,11 @@ using UnityEngine;
 [RequireComponent(typeof(UIBase))]
 public class UIStackEntry : MonoBehaviour
 {
-    private UIBase ui;
+    private UIBase _ui;
 
     private void Awake()
     {
-        ui = GetComponent<UIBase>();
+        _ui = GetComponent<UIBase>();
     }
 
     private void OnEnable()
@@ -17,6 +17,6 @@ public class UIStackEntry : MonoBehaviour
 
     public void Hide()
     {
-        ui.Hide();
+        _ui.Hide();
     }
 }
