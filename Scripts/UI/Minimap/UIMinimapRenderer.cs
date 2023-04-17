@@ -48,25 +48,25 @@ namespace MultiplayerARPG
         public BaseMapInfo testingMapInfo;
         public Transform testingPlayingCharacterTransform;
 
-        private float updateMarkerCountdown;
-        private BaseMapInfo currentMapInfo;
-        private List<MarkerData> markers = new List<MarkerData>();
+        private float _updateMarkerCountdown;
+        private BaseMapInfo _currentMapInfo;
+        private List<MarkerData> _markers = new List<MarkerData>();
 
         private void Update()
         {
             BaseMapInfo mapInfo = isTestMode ? testingMapInfo : BaseGameNetworkManager.CurrentMapInfo;
             if (mapInfo == null)
             {
-                updateMarkerCountdown = 0f;
+                _updateMarkerCountdown = 0f;
                 if (imageMinimap.gameObject.activeSelf)
                     imageMinimap.gameObject.SetActive(false);
                 return;
             }
-            currentMapInfo = mapInfo;
+            _currentMapInfo = mapInfo;
 
             // Use bounds size to calculate transforms
-            float boundsWidth = currentMapInfo.MinimapBoundsWidth;
-            float boundsLength = currentMapInfo.MinimapBoundsLength;
+            float boundsWidth = _currentMapInfo.MinimapBoundsWidth;
+            float boundsLength = _currentMapInfo.MinimapBoundsLength;
             float maxBoundsSize = Mathf.Max(boundsWidth, boundsLength);
 
             // Prepare target transform to follow
@@ -74,7 +74,7 @@ namespace MultiplayerARPG
 
             if (imageMinimap != null)
             {
-                imageMinimap.sprite = currentMapInfo.MinimapSprite;
+                imageMinimap.sprite = _currentMapInfo.MinimapSprite;
                 imageMinimap.preserveAspect = true;
                 if (!imageMinimap.gameObject.activeSelf)
                     imageMinimap.gameObject.SetActive(true);
@@ -85,10 +85,10 @@ namespace MultiplayerARPG
 
                 float sizeRate = -(minImageSize / maxBoundsSize);
 
-                updateMarkerCountdown -= Time.deltaTime;
-                if (updateMarkerCountdown <= 0f)
+                _updateMarkerCountdown -= Time.deltaTime;
+                if (_updateMarkerCountdown <= 0f)
                 {
-                    updateMarkerCountdown = updateMarkerDuration;
+                    _updateMarkerCountdown = updateMarkerDuration;
                     InstantiateEntitiesMarkers(sizeRate);
                 }
                 UpdateEntitiesMarkersPosition(sizeRate);
@@ -104,33 +104,33 @@ namespace MultiplayerARPG
                 }
                 else
                 {
-                    imageMinimap.transform.localPosition = -new Vector2((currentMapInfo.MinimapPosition.x - playingCharacterTransform.position.x) * sizeRate, (currentMapInfo.MinimapPosition.z - playingCharacterTransform.position.z) * sizeRate);
+                    imageMinimap.transform.localPosition = -new Vector2((_currentMapInfo.MinimapPosition.x - playingCharacterTransform.position.x) * sizeRate, (_currentMapInfo.MinimapPosition.z - playingCharacterTransform.position.z) * sizeRate);
                 }
             }
         }
 
         private void UpdateEntitiesMarkersPosition(float sizeRate)
         {
-            for (int i = markers.Count - 1; i >= 0; --i)
+            for (int i = _markers.Count - 1; i >= 0; --i)
             {
-                if (markers[i].Character == null)
+                if (_markers[i].Character == null)
                 {
-                    Destroy(markers[i].Marker.gameObject);
-                    markers.RemoveAt(i);
+                    Destroy(_markers[i].Marker.gameObject);
+                    _markers.RemoveAt(i);
                     continue;
                 }
 
-                SetMarkerPositionAndRotation(markers[i].Marker, markers[i].Character.EntityTransform, sizeRate, markers[i].MarkerRotateOffsets);
+                SetMarkerPositionAndRotation(_markers[i].Marker, _markers[i].Character.EntityTransform, sizeRate, _markers[i].MarkerRotateOffsets);
             }
         }
 
         private void InstantiateEntitiesMarkers(float sizeRate)
         {
-            for (int i = markers.Count - 1; i >= 0; --i)
+            for (int i = _markers.Count - 1; i >= 0; --i)
             {
-                Destroy(markers[i].Marker.gameObject);
+                Destroy(_markers[i].Marker.gameObject);
             }
-            markers.Clear();
+            _markers.Clear();
 
             if (GameInstance.PlayingCharacterEntity != null)
             {
@@ -193,7 +193,7 @@ namespace MultiplayerARPG
             newMarker.SetParent(nonPlayingCharacterMarkerContainer);
             newMarker.transform.localScale = Vector3.one;
             SetMarkerPositionAndRotation(newMarker, character.EntityTransform, sizeRate, markerRotateOffsets);
-            markers.Add(new MarkerData()
+            _markers.Add(new MarkerData()
             {
                 Character = character,
                 Marker = newMarker,
@@ -207,14 +207,14 @@ namespace MultiplayerARPG
             {
                 case DimensionType.Dimension2D:
                     makerTransform.localPosition = new Vector2(
-                                                (currentMapInfo.MinimapPosition.x - entityTransform.position.x) * sizeRate,
-                                                (currentMapInfo.MinimapPosition.y - entityTransform.position.y) * sizeRate);
+                                                (_currentMapInfo.MinimapPosition.x - entityTransform.position.x) * sizeRate,
+                                                (_currentMapInfo.MinimapPosition.y - entityTransform.position.y) * sizeRate);
                     makerTransform.localEulerAngles = Vector3.zero;
                     break;
                 default:
                     makerTransform.localPosition = new Vector2(
-                                                (currentMapInfo.MinimapPosition.x - entityTransform.position.x) * sizeRate,
-                                                (currentMapInfo.MinimapPosition.z - entityTransform.position.z) * sizeRate);
+                                                (_currentMapInfo.MinimapPosition.x - entityTransform.position.x) * sizeRate,
+                                                (_currentMapInfo.MinimapPosition.z - entityTransform.position.z) * sizeRate);
                     makerTransform.localEulerAngles = markerRotateOffsets + (Vector3.back * entityTransform.eulerAngles.y);
                     break;
             }
