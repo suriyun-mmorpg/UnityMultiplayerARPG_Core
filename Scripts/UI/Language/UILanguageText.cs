@@ -11,8 +11,7 @@ namespace MultiplayerARPG
         public string defaultText;
         public Text unityText;
         public TextMeshProUGUI textMeshText;
-
-        private string languageKey;
+        private string _currentLanguageKey;
 
         private void Awake()
         {
@@ -24,10 +23,9 @@ namespace MultiplayerARPG
 
         private void Update()
         {
-            if (languageKey != LanguageManager.CurrentLanguageKey)
+            if (_currentLanguageKey != LanguageManager.CurrentLanguageKey)
             {
-                string text = "";
-                if (LanguageManager.Texts.TryGetValue(dataKey, out text))
+                if (LanguageManager.Texts.TryGetValue(dataKey, out string text))
                 {
                     if (unityText != null)
                         unityText.text = text;
@@ -41,7 +39,7 @@ namespace MultiplayerARPG
                     if (textMeshText != null)
                         textMeshText.text = defaultText;
                 }
-                languageKey = LanguageManager.CurrentLanguageKey;
+                _currentLanguageKey = LanguageManager.CurrentLanguageKey;
             }
         }
 
