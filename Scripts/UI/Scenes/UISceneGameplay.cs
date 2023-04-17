@@ -103,8 +103,8 @@ namespace MultiplayerARPG
 
         public override ItemsContainerEntity ItemsContainerEntity { get { return uiItemsContainer.TargetEntity; } }
 
-        private readonly List<UIBase> openedNpcDialogs = new List<UIBase>();
-        private readonly List<RaycastResult> pointerOverUIResults = new List<RaycastResult>();
+        private readonly List<UIBase> _openedNpcDialogs = new List<UIBase>();
+        private readonly List<RaycastResult> _pointerOverUIResults = new List<RaycastResult>();
 
         protected override void Awake()
         {
@@ -403,11 +403,11 @@ namespace MultiplayerARPG
 
         public override void HideNpcDialog()
         {
-            for (int i = openedNpcDialogs.Count - 1; i >= 0; --i)
+            for (int i = _openedNpcDialogs.Count - 1; i >= 0; --i)
             {
-                if (openedNpcDialogs[i].IsVisible())
-                    openedNpcDialogs[i].Hide();
-                openedNpcDialogs.RemoveAt(i);
+                if (_openedNpcDialogs[i].IsVisible())
+                    _openedNpcDialogs[i].Hide();
+                _openedNpcDialogs.RemoveAt(i);
             }
             GameInstance.PlayingCharacterEntity.NpcAction.CallServerHideNpcDialog();
         }
@@ -494,15 +494,15 @@ namespace MultiplayerARPG
                 return false;
             PointerEventData pointer = new PointerEventData(EventSystem.current);
             pointer.position = new Vector2(InputManager.MousePosition().x, InputManager.MousePosition().y);
-            EventSystem.current.RaycastAll(pointer, pointerOverUIResults);
+            EventSystem.current.RaycastAll(pointer, _pointerOverUIResults);
 
             int i;
             int j;
             bool containsTag = false;
             RaycastResult result;
-            for (i = 0; i < pointerOverUIResults.Count; ++i)
+            for (i = 0; i < _pointerOverUIResults.Count; ++i)
             {
-                result = pointerOverUIResults[i];
+                result = _pointerOverUIResults[i];
                 // Find containing tags
                 for (j = 0; j < ignorePointerOverUITags.Count; ++j)
                 {
@@ -776,8 +776,8 @@ namespace MultiplayerARPG
 
         protected void AddNpcDialog(UIBase npcDialog)
         {
-            if (!openedNpcDialogs.Contains(npcDialog))
-                openedNpcDialogs.Add(npcDialog);
+            if (!_openedNpcDialogs.Contains(npcDialog))
+                _openedNpcDialogs.Add(npcDialog);
         }
 
         public override void OnControllerSetup(BasePlayerCharacterEntity characterEntity)
