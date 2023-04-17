@@ -5,7 +5,7 @@ namespace MultiplayerARPG
 {
     public partial class UICharacterSkillDragHandler : UIDragHandler
     {
-        public enum SourceLocation
+        public enum SourceLocation : byte
         {
             Skills,
             Hotkey,
@@ -15,20 +15,18 @@ namespace MultiplayerARPG
         public bool requireDropArea = false;
         public bool enableUnassignHotkeyAction = true;
 
-        public SourceLocation sourceLocation { get; protected set; }
-        // Skills data
-        public UICharacterSkill uiCharacterSkill { get; protected set; }
-        // Hotkey data
-        public UICharacterHotkey uiCharacterHotkey { get; protected set; }
+        public SourceLocation Location { get; protected set; }
+        public UICharacterSkill UISkill { get; protected set; }
+        public UICharacterHotkey UIHotkey { get; protected set; }
 
-        protected UICharacterSkill cacheUI;
+        protected UICharacterSkill _cacheUI;
         public UICharacterSkill CacheUI
         {
             get
             {
-                if (cacheUI == null)
-                    cacheUI = GetComponent<UICharacterSkill>();
-                return cacheUI;
+                if (_cacheUI == null)
+                    _cacheUI = GetComponent<UICharacterSkill>();
+                return _cacheUI;
             }
         }
 
@@ -36,12 +34,12 @@ namespace MultiplayerARPG
         {
             get
             {
-                switch (sourceLocation)
+                switch (Location)
                 {
                     case SourceLocation.Skills:
-                        return uiCharacterSkill != null;
+                        return UISkill != null;
                     case SourceLocation.Hotkey:
-                        return uiCharacterHotkey != null;
+                        return UIHotkey != null;
                 }
                 return false;
             }
@@ -55,14 +53,14 @@ namespace MultiplayerARPG
 
         public void SetupForSkills(UICharacterSkill uiCharacterSkill)
         {
-            sourceLocation = SourceLocation.Skills;
-            this.uiCharacterSkill = uiCharacterSkill;
+            Location = SourceLocation.Skills;
+            UISkill = uiCharacterSkill;
         }
 
         public void SetupForHotkey(UICharacterHotkey uiCharacterHotkey)
         {
-            sourceLocation = SourceLocation.Hotkey;
-            this.uiCharacterHotkey = uiCharacterHotkey;
+            Location = SourceLocation.Hotkey;
+            UIHotkey = uiCharacterHotkey;
         }
 
         public override void OnEndDrag(PointerEventData eventData)
@@ -77,8 +75,8 @@ namespace MultiplayerARPG
                 return;
             if (requireDropArea)
                 return;
-            if (enableUnassignHotkeyAction && sourceLocation == SourceLocation.Hotkey)
-                GameInstance.PlayingCharacterEntity.UnAssignHotkey(uiCharacterHotkey.hotkeyId);
+            if (enableUnassignHotkeyAction && Location == SourceLocation.Hotkey)
+                GameInstance.PlayingCharacterEntity.UnAssignHotkey(UIHotkey.hotkeyId);
         }
     }
 }

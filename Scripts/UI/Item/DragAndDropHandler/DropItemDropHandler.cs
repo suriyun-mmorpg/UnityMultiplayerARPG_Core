@@ -3,16 +3,16 @@ using UnityEngine.EventSystems;
 
 namespace MultiplayerARPG
 {
-    public class DropItemDropHandler : MonoBehaviour, IDropHandler
+    public partial class DropItemDropHandler : MonoBehaviour, IDropHandler
     {
-        private RectTransform dropRect;
+        protected RectTransform _dropRect;
         public RectTransform DropRect
         {
             get
             {
-                if (dropRect == null)
-                    dropRect = transform as RectTransform;
-                return dropRect;
+                if (_dropRect == null)
+                    _dropRect = transform as RectTransform;
+                return _dropRect;
             }
         }
 
@@ -31,12 +31,12 @@ namespace MultiplayerARPG
             UICharacterItemDragHandler draggedItemUI = dragHandler as UICharacterItemDragHandler;
             if (draggedItemUI != null)
             {
-                switch (draggedItemUI.sourceLocation)
+                switch (draggedItemUI.Location)
                 {
                     case UICharacterItemDragHandler.SourceLocation.EquipItems:
                         break;
                     case UICharacterItemDragHandler.SourceLocation.NonEquipItems:
-                        draggedItemUI.uiCharacterItem.OnClickDrop();
+                        draggedItemUI.UIItem.OnClickDrop();
                         break;
                     case UICharacterItemDragHandler.SourceLocation.StorageItems:
                         break;

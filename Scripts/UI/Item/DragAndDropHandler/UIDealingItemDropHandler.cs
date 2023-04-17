@@ -5,14 +5,14 @@ namespace MultiplayerARPG
 {
     public partial class UIDealingItemDropHandler : MonoBehaviour, IDropHandler
     {
-        protected RectTransform dropRect;
+        protected RectTransform _dropRect;
         public RectTransform DropRect
         {
             get
             {
-                if (dropRect == null)
-                    dropRect = transform as RectTransform;
-                return dropRect;
+                if (_dropRect == null)
+                    _dropRect = transform as RectTransform;
+                return _dropRect;
             }
         }
 
@@ -31,11 +31,11 @@ namespace MultiplayerARPG
             UICharacterItemDragHandler draggedItemUI = dragHandler as UICharacterItemDragHandler;
             if (draggedItemUI != null)
             {
-                switch (draggedItemUI.sourceLocation)
+                switch (draggedItemUI.Location)
                 {
                     case UICharacterItemDragHandler.SourceLocation.NonEquipItems:
                     case UICharacterItemDragHandler.SourceLocation.EquipItems:
-                        draggedItemUI.uiCharacterItem.OnClickSetDealingItem();
+                        draggedItemUI.UIItem.OnClickSetDealingItem();
                         break;
                 }
             }

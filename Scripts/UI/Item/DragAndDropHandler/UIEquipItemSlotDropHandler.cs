@@ -7,14 +7,14 @@ namespace MultiplayerARPG
     {
         public UICharacterItem uiCharacterItem;
 
-        protected RectTransform dropRect;
+        protected RectTransform _dropRect;
         public RectTransform DropRect
         {
             get
             {
-                if (dropRect == null)
-                    dropRect = transform as RectTransform;
-                return dropRect;
+                if (_dropRect == null)
+                    _dropRect = transform as RectTransform;
+                return _dropRect;
             }
         }
 
@@ -44,7 +44,7 @@ namespace MultiplayerARPG
             UICharacterItemDragHandler draggedItemUI = dragHandler as UICharacterItemDragHandler;
             if (draggedItemUI != null)
             {
-                switch (draggedItemUI.sourceLocation)
+                switch (draggedItemUI.Location)
                 {
                     case UICharacterItemDragHandler.SourceLocation.EquipItems:
                         break;
@@ -53,7 +53,7 @@ namespace MultiplayerARPG
                         EquipItem(draggedItemUI);
                         break;
                     case UICharacterItemDragHandler.SourceLocation.StorageItems:
-                        draggedItemUI.uiCharacterItem.OnClickMoveFromStorage(uiCharacterItem.InventoryType, uiCharacterItem.EquipSlotIndex, uiCharacterItem.IndexOfData);
+                        draggedItemUI.UIItem.OnClickMoveFromStorage(uiCharacterItem.InventoryType, uiCharacterItem.EquipSlotIndex, uiCharacterItem.IndexOfData);
                         break;
                 }
             }
@@ -66,9 +66,9 @@ namespace MultiplayerARPG
                 return;
 
             // Detect type of equipping slot and validate
-            IArmorItem armorItem = draggedItemUI.uiCharacterItem.CharacterItem.GetArmorItem();
-            IWeaponItem weaponItem = draggedItemUI.uiCharacterItem.CharacterItem.GetWeaponItem();
-            IShieldItem shieldItem = draggedItemUI.uiCharacterItem.CharacterItem.GetShieldItem();
+            IArmorItem armorItem = draggedItemUI.UIItem.CharacterItem.GetArmorItem();
+            IWeaponItem weaponItem = draggedItemUI.UIItem.CharacterItem.GetWeaponItem();
+            IShieldItem shieldItem = draggedItemUI.UIItem.CharacterItem.GetShieldItem();
             switch (uiCharacterItem.InventoryType)
             {
                 case InventoryType.EquipItems:
@@ -94,7 +94,7 @@ namespace MultiplayerARPG
             // Can equip the item
             // so tell the server that this client want to equip the item
             GameInstance.ClientInventoryHandlers.RequestEquipItem(
-                draggedItemUI.uiCharacterItem.IndexOfData,
+                draggedItemUI.UIItem.IndexOfData,
                 uiCharacterItem.InventoryType,
                 uiCharacterItem.EquipSlotIndex,
                 ClientInventoryActions.ResponseEquipArmor,

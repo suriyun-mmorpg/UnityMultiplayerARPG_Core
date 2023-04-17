@@ -23,20 +23,18 @@ namespace MultiplayerARPG
         public bool enablePickupFromContainerAction = true;
         public bool enableUnassignHotkeyAction = true;
 
-        public SourceLocation sourceLocation { get; protected set; }
-        // Non Equip / Equip items data
-        public UICharacterItem uiCharacterItem { get; protected set; }
-        // Hotkey data
-        public UICharacterHotkey uiCharacterHotkey { get; protected set; }
+        public SourceLocation Location { get; protected set; }
+        public UICharacterItem UIItem { get; protected set; }
+        public UICharacterHotkey UIHotkey { get; protected set; }
 
-        protected UICharacterItem cacheUI;
+        protected UICharacterItem _cacheUI;
         public UICharacterItem CacheUI
         {
             get
             {
-                if (cacheUI == null)
-                    cacheUI = GetComponent<UICharacterItem>();
-                return cacheUI;
+                if (_cacheUI == null)
+                    _cacheUI = GetComponent<UICharacterItem>();
+                return _cacheUI;
             }
         }
 
@@ -44,15 +42,15 @@ namespace MultiplayerARPG
         {
             get
             {
-                switch (sourceLocation)
+                switch (Location)
                 {
                     case SourceLocation.NonEquipItems:
                     case SourceLocation.EquipItems:
                     case SourceLocation.StorageItems:
                     case SourceLocation.ItemsContainer:
-                        return uiCharacterItem != null && uiCharacterItem.IndexOfData >= 0 && uiCharacterItem.CharacterItem.NotEmptySlot();
+                        return UIItem != null && UIItem.IndexOfData >= 0 && UIItem.CharacterItem.NotEmptySlot();
                     case SourceLocation.Hotkey:
-                        return uiCharacterHotkey != null;
+                        return UIHotkey != null;
                 }
                 return false;
             }
@@ -66,38 +64,38 @@ namespace MultiplayerARPG
 
         public void SetupForEquipItems(UICharacterItem uiCharacterItem)
         {
-            sourceLocation = SourceLocation.EquipItems;
-            this.uiCharacterItem = uiCharacterItem;
+            Location = SourceLocation.EquipItems;
+            UIItem = uiCharacterItem;
         }
 
         public void SetupForNonEquipItems(UICharacterItem uiCharacterItem)
         {
-            sourceLocation = SourceLocation.NonEquipItems;
-            this.uiCharacterItem = uiCharacterItem;
+            Location = SourceLocation.NonEquipItems;
+            UIItem = uiCharacterItem;
         }
 
         public void SetupForStorageItems(UICharacterItem uiCharacterItem)
         {
-            sourceLocation = SourceLocation.StorageItems;
-            this.uiCharacterItem = uiCharacterItem;
+            Location = SourceLocation.StorageItems;
+            UIItem = uiCharacterItem;
         }
 
         public void SetupForItemsContainer(UICharacterItem uiCharacterItem)
         {
-            sourceLocation = SourceLocation.ItemsContainer;
-            this.uiCharacterItem = uiCharacterItem;
+            Location = SourceLocation.ItemsContainer;
+            UIItem = uiCharacterItem;
         }
 
         public void SetupForHotkey(UICharacterHotkey uiCharacterHotkey)
         {
-            sourceLocation = SourceLocation.Hotkey;
-            this.uiCharacterHotkey = uiCharacterHotkey;
+            Location = SourceLocation.Hotkey;
+            UIHotkey = uiCharacterHotkey;
         }
 
         public void SetupForUnknow(UICharacterItem uiCharacterItem)
         {
-            sourceLocation = SourceLocation.Unknow;
-            this.uiCharacterItem = uiCharacterItem;
+            Location = SourceLocation.Unknow;
+            UIItem = uiCharacterItem;
         }
 
         public override void OnEndDrag(PointerEventData eventData)
@@ -112,16 +110,16 @@ namespace MultiplayerARPG
                 return;
             if (requireDropArea)
                 return;
-            if (enableDropItemAction && sourceLocation == SourceLocation.NonEquipItems && (!EventSystem.current.IsPointerOverGameObject() || EventSystem.current.currentSelectedGameObject.GetComponent<IMobileInputArea>() != null))
-                uiCharacterItem.OnClickDrop();
-            if (enableUnequipItemAction && sourceLocation == SourceLocation.EquipItems && EventSystem.current.IsPointerOverGameObject())
-                uiCharacterItem.OnClickUnEquip();
-            if (enableMoveFromStorageAction && sourceLocation == SourceLocation.StorageItems)
-                uiCharacterItem.OnClickMoveFromStorage();
-            if (enablePickupFromContainerAction && sourceLocation == SourceLocation.ItemsContainer)
-                uiCharacterItem.OnClickPickUpFromContainer();
-            if (enableUnassignHotkeyAction && sourceLocation == SourceLocation.Hotkey)
-                GameInstance.PlayingCharacterEntity.UnAssignHotkey(uiCharacterHotkey.hotkeyId);
+            if (enableDropItemAction && Location == SourceLocation.NonEquipItems && (!EventSystem.current.IsPointerOverGameObject() || EventSystem.current.currentSelectedGameObject.GetComponent<IMobileInputArea>() != null))
+                UIItem.OnClickDrop();
+            if (enableUnequipItemAction && Location == SourceLocation.EquipItems && EventSystem.current.IsPointerOverGameObject())
+                UIItem.OnClickUnEquip();
+            if (enableMoveFromStorageAction && Location == SourceLocation.StorageItems)
+                UIItem.OnClickMoveFromStorage();
+            if (enablePickupFromContainerAction && Location == SourceLocation.ItemsContainer)
+                UIItem.OnClickPickUpFromContainer();
+            if (enableUnassignHotkeyAction && Location == SourceLocation.Hotkey)
+                GameInstance.PlayingCharacterEntity.UnAssignHotkey(UIHotkey.hotkeyId);
         }
     }
 }

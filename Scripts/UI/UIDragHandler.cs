@@ -33,11 +33,11 @@ public partial class UIDragHandler : MonoBehaviour, IBeginDragHandler, IDragHand
 
     public bool IsDropped { get; set; }
 
-    private int defaultSiblingIndex;
-    private Transform defaultParent;
-    private Vector3 defaultLocalPosition;
-    private Vector3 defaultLocalScale;
-    private Button attachedButton;
+    private int _defaultSiblingIndex;
+    private Transform _defaultParent;
+    private Vector3 _defaultLocalPosition;
+    private Vector3 _defaultLocalScale;
+    private Button _attachedButton;
 
     protected virtual void Start()
     {
@@ -84,10 +84,10 @@ public partial class UIDragHandler : MonoBehaviour, IBeginDragHandler, IDragHand
             }
         }
 
-        defaultSiblingIndex = rootTransform.GetSiblingIndex();
-        defaultParent = rootTransform.parent;
-        defaultLocalPosition = rootTransform.localPosition;
-        defaultLocalScale = rootTransform.localScale;
+        _defaultSiblingIndex = rootTransform.GetSiblingIndex();
+        _defaultParent = rootTransform.parent;
+        _defaultLocalPosition = rootTransform.localPosition;
+        _defaultLocalScale = rootTransform.localScale;
 
         if (!CanDrag)
             return;
@@ -98,9 +98,9 @@ public partial class UIDragHandler : MonoBehaviour, IBeginDragHandler, IDragHand
         rootTransform.SetAsLastSibling();
 
         // Disable button to not trigger on click event after drag
-        attachedButton = rootTransform.GetComponent<Button>();
-        if (attachedButton != null)
-            attachedButton.enabled = false;
+        _attachedButton = rootTransform.GetComponent<Button>();
+        if (_attachedButton != null)
+            _attachedButton.enabled = false;
 
         // Don't raycast while dragging to avoid it going to obstruct drop area
         foreach (Graphic graphic in CacheGraphics)
@@ -132,14 +132,14 @@ public partial class UIDragHandler : MonoBehaviour, IBeginDragHandler, IDragHand
             return;
         }
         DraggingObjects.Remove(gameObject);
-        rootTransform.SetParent(defaultParent);
-        rootTransform.SetSiblingIndex(defaultSiblingIndex);
-        rootTransform.localPosition = defaultLocalPosition;
-        rootTransform.localScale = defaultLocalScale;
+        rootTransform.SetParent(_defaultParent);
+        rootTransform.SetSiblingIndex(_defaultSiblingIndex);
+        rootTransform.localPosition = _defaultLocalPosition;
+        rootTransform.localScale = _defaultLocalScale;
 
         // Enable button to allow on click event after drag
-        if (attachedButton != null)
-            attachedButton.enabled = true;
+        if (_attachedButton != null)
+            _attachedButton.enabled = true;
 
         // Enable raycast graphics
         foreach (Graphic graphic in CacheGraphics)

@@ -7,14 +7,14 @@ namespace MultiplayerARPG
     {
         public UICharacterHotkey uiCharacterHotkey;
 
-        protected RectTransform dropRect;
+        protected RectTransform _dropRect;
         public RectTransform DropRect
         {
             get
             {
-                if (dropRect == null)
-                    dropRect = transform as RectTransform;
-                return dropRect;
+                if (_dropRect == null)
+                    _dropRect = transform as RectTransform;
+                return _dropRect;
             }
         }
 
@@ -47,9 +47,9 @@ namespace MultiplayerARPG
             UICharacterItemDragHandler draggedItemUI = dragHandler as UICharacterItemDragHandler;
             if (draggedItemUI != null)
             {
-                if (draggedItemUI.sourceLocation == UICharacterItemDragHandler.SourceLocation.Hotkey)
+                if (draggedItemUI.Location == UICharacterItemDragHandler.SourceLocation.Hotkey)
                 {
-                    swappingHotkeyId = draggedItemUI.uiCharacterHotkey.Data.hotkeyId;
+                    swappingHotkeyId = draggedItemUI.UIHotkey.Data.hotkeyId;
                     swappingType = uiCharacterHotkey.Data.type;
                     swappingDataId = uiCharacterHotkey.Data.relateId;
                 }
@@ -60,7 +60,7 @@ namespace MultiplayerARPG
                     GameInstance.PlayingCharacterEntity.AssignItemHotkey(uiCharacterHotkey.Data.hotkeyId, draggedItemUI.CacheUI.Data.characterItem);
                 }
 
-                if (draggedItemUI.sourceLocation == UICharacterItemDragHandler.SourceLocation.Hotkey)
+                if (draggedItemUI.Location == UICharacterItemDragHandler.SourceLocation.Hotkey)
                 {
                     // Swap key
                     GameInstance.PlayingCharacterEntity.CallServerAssignHotkey(swappingHotkeyId, swappingType, swappingDataId);
@@ -70,9 +70,9 @@ namespace MultiplayerARPG
             UICharacterSkillDragHandler draggedSkillUI = dragHandler as UICharacterSkillDragHandler;
             if (draggedSkillUI != null)
             {
-                if (draggedSkillUI.sourceLocation == UICharacterSkillDragHandler.SourceLocation.Hotkey)
+                if (draggedSkillUI.Location == UICharacterSkillDragHandler.SourceLocation.Hotkey)
                 {
-                    swappingHotkeyId = draggedSkillUI.uiCharacterHotkey.Data.hotkeyId;
+                    swappingHotkeyId = draggedSkillUI.UIHotkey.Data.hotkeyId;
                     swappingType = uiCharacterHotkey.Data.type;
                     swappingDataId = uiCharacterHotkey.Data.relateId;
                 }
@@ -83,7 +83,7 @@ namespace MultiplayerARPG
                     GameInstance.PlayingCharacterEntity.AssignSkillHotkey(uiCharacterHotkey.Data.hotkeyId, draggedSkillUI.CacheUI.Skill);
                 }
 
-                if (draggedSkillUI.sourceLocation == UICharacterSkillDragHandler.SourceLocation.Hotkey)
+                if (draggedSkillUI.Location == UICharacterSkillDragHandler.SourceLocation.Hotkey)
                 {
                     // Swap key
                     GameInstance.PlayingCharacterEntity.CallServerAssignHotkey(swappingHotkeyId, swappingType, swappingDataId);
