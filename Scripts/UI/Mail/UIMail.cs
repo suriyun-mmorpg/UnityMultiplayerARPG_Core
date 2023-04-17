@@ -45,13 +45,13 @@ namespace MultiplayerARPG
         public UnityEvent onClaimMailItems = new UnityEvent();
         public UnityEvent onDeleteMail = new UnityEvent();
 
-        private string mailId;
+        private string _mailId;
         public string MailId
         {
-            get { return mailId; }
+            get { return _mailId; }
             set
             {
-                mailId = value;
+                _mailId = value;
                 ReadMail();
             }
         }
