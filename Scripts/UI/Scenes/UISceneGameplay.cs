@@ -640,7 +640,7 @@ namespace MultiplayerARPG
         public override bool IsDealingDialogVisibleWithDealingState()
         {
             return uiDealing != null && uiDealing.IsVisible() &&
-                uiDealing.dealingState == DealingState.Dealing;
+                uiDealing.DealingState == DealingState.Dealing;
         }
 
         public override void ShowRefineItemDialog(InventoryType inventoryType, int indexOfData)

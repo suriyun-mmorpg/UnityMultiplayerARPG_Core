@@ -33,54 +33,55 @@ namespace MultiplayerARPG
         public UnityEvent onAnotherStateChangeToConfirm;
         public UnityEvent onBothStateChangeToLock;
 
-        public DealingState dealingState { get; private set; }
-        public DealingState anotherDealingState { get; private set; }
-        public int dealingGold { get; private set; }
-        public int anotherDealingGold { get; private set; }
-        private readonly List<UICharacterItem> tempDealingItemUIs = new List<UICharacterItem>();
-        private readonly List<UICharacterItem> tempAnotherDealingItemUIs = new List<UICharacterItem>();
+        public DealingState DealingState { get; private set; }
+        public DealingState AnotherDealingState { get; private set; }
+        public int DealingGold { get; private set; }
+        public int AnotherDealingGold { get; private set; }
 
-        private UIList cacheDealingItemsList;
+        private UIList _cacheDealingItemsList;
         public UIList CacheDealingItemsList
         {
             get
             {
-                if (cacheDealingItemsList == null)
+                if (_cacheDealingItemsList == null)
                 {
-                    cacheDealingItemsList = gameObject.AddComponent<UIList>();
-                    cacheDealingItemsList.uiPrefab = uiDealingItemPrefab.gameObject;
-                    cacheDealingItemsList.uiContainer = uiDealingItemsContainer;
+                    _cacheDealingItemsList = gameObject.AddComponent<UIList>();
+                    _cacheDealingItemsList.uiPrefab = uiDealingItemPrefab.gameObject;
+                    _cacheDealingItemsList.uiContainer = uiDealingItemsContainer;
                 }
-                return cacheDealingItemsList;
+                return _cacheDealingItemsList;
             }
         }
 
-        private UIList cacheAnotherDealingItemsList;
+        private UIList _cacheAnotherDealingItemsList;
         public UIList CacheAnotherDealingItemsList
         {
             get
             {
-                if (cacheAnotherDealingItemsList == null)
+                if (_cacheAnotherDealingItemsList == null)
                 {
-                    cacheAnotherDealingItemsList = gameObject.AddComponent<UIList>();
-                    cacheAnotherDealingItemsList.uiPrefab = uiDealingItemPrefab.gameObject;
-                    cacheAnotherDealingItemsList.uiContainer = uiAnotherDealingItemsContainer;
+                    _cacheAnotherDealingItemsList = gameObject.AddComponent<UIList>();
+                    _cacheAnotherDealingItemsList.uiPrefab = uiDealingItemPrefab.gameObject;
+                    _cacheAnotherDealingItemsList.uiContainer = uiAnotherDealingItemsContainer;
                 }
-                return cacheAnotherDealingItemsList;
+                return _cacheAnotherDealingItemsList;
             }
         }
 
-        private UICharacterItemSelectionManager cacheItemSelectionManager;
+        private UICharacterItemSelectionManager _cacheItemSelectionManager;
         public UICharacterItemSelectionManager CacheItemSelectionManager
         {
             get
             {
-                if (cacheItemSelectionManager == null)
-                    cacheItemSelectionManager = gameObject.GetOrAddComponent<UICharacterItemSelectionManager>();
-                cacheItemSelectionManager.selectionMode = UISelectionMode.SelectSingle;
-                return cacheItemSelectionManager;
+                if (_cacheItemSelectionManager == null)
+                    _cacheItemSelectionManager = gameObject.GetOrAddComponent<UICharacterItemSelectionManager>();
+                _cacheItemSelectionManager.selectionMode = UISelectionMode.SelectSingle;
+                return _cacheItemSelectionManager;
             }
         }
+
+        private readonly List<UICharacterItem> _tempDealingItemUIs = new List<UICharacterItem>();
+        private readonly List<UICharacterItem> _tempAnotherDealingItemUIs = new List<UICharacterItem>();
 
         protected override void OnEnable()
         {
@@ -167,8 +168,8 @@ namespace MultiplayerARPG
                 uiAnotherCharacter.Data = anotherCharacter;
             }
 
-            dealingState = DealingState.None;
-            anotherDealingState = DealingState.None;
+            DealingState = DealingState.None;
+            AnotherDealingState = DealingState.None;
             UpdateDealingState(DealingState.Dealing);
             UpdateAnotherDealingState(DealingState.Dealing);
             UpdateDealingGold(0);
@@ -181,10 +182,10 @@ namespace MultiplayerARPG
 
         public void UpdateDealingState(DealingState state)
         {
-            if (dealingState != state)
+            if (DealingState != state)
             {
-                dealingState = state;
-                switch (dealingState)
+                DealingState = state;
+                switch (DealingState)
                 {
                     case DealingState.None:
                         Hide();
@@ -202,7 +203,7 @@ namespace MultiplayerARPG
                             onStateChangeToConfirm.Invoke();
                         break;
                 }
-                if (dealingState == DealingState.LockDealing && anotherDealingState == DealingState.LockDealing)
+                if (DealingState == DealingState.LockDealing && AnotherDealingState == DealingState.LockDealing)
                 {
                     if (onBothStateChangeToLock != null)
                         onBothStateChangeToLock.Invoke();
@@ -212,10 +213,10 @@ namespace MultiplayerARPG
 
         public void UpdateAnotherDealingState(DealingState state)
         {
-            if (anotherDealingState != state)
+            if (AnotherDealingState != state)
             {
-                anotherDealingState = state;
-                switch (anotherDealingState)
+                AnotherDealingState = state;
+                switch (AnotherDealingState)
                 {
                     case DealingState.Dealing:
                         if (onAnotherStateChangeToDealing != null)
@@ -230,7 +231,7 @@ namespace MultiplayerARPG
                             onAnotherStateChangeToConfirm.Invoke();
                         break;
                 }
-                if (dealingState == DealingState.LockDealing && anotherDealingState == DealingState.LockDealing)
+                if (DealingState == DealingState.LockDealing && AnotherDealingState == DealingState.LockDealing)
                 {
                     if (onBothStateChangeToLock != null)
                         onBothStateChangeToLock.Invoke();
@@ -246,7 +247,7 @@ namespace MultiplayerARPG
                     LanguageManager.GetText(formatKeyDealingGold),
                     gold.ToString("N0"));
             }
-            dealingGold = gold;
+            DealingGold = gold;
         }
 
         public void UpdateAnotherDealingGold(int gold)
@@ -257,17 +258,17 @@ namespace MultiplayerARPG
                     LanguageManager.GetText(formatKeyAnotherDealingGold),
                     gold.ToString("N0"));
             }
-            anotherDealingGold = gold;
+            AnotherDealingGold = gold;
         }
 
         public void UpdateDealingItems(DealingCharacterItems dealingItems)
         {
-            SetupList(CacheDealingItemsList, dealingItems, tempDealingItemUIs);
+            SetupList(CacheDealingItemsList, dealingItems, _tempDealingItemUIs);
         }
 
         public void UpdateAnotherDealingItems(DealingCharacterItems dealingItems)
         {
-            SetupList(CacheAnotherDealingItemsList, dealingItems, tempAnotherDealingItemUIs);
+            SetupList(CacheAnotherDealingItemsList, dealingItems, _tempAnotherDealingItemUIs);
         }
 
         private void SetupList(UIList list, DealingCharacterItems dealingItems, List<UICharacterItem> uiList)
@@ -292,11 +293,11 @@ namespace MultiplayerARPG
             });
 
             CacheItemSelectionManager.Clear();
-            foreach (UICharacterItem tempDealingItemUI in tempDealingItemUIs)
+            foreach (UICharacterItem tempDealingItemUI in _tempDealingItemUIs)
             {
                 CacheItemSelectionManager.Add(tempDealingItemUI);
             }
-            foreach (UICharacterItem tempAnotherDealingItemUI in tempAnotherDealingItemUIs)
+            foreach (UICharacterItem tempAnotherDealingItemUI in _tempAnotherDealingItemUIs)
             {
                 CacheItemSelectionManager.Add(tempAnotherDealingItemUI);
             }
