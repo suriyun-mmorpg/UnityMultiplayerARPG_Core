@@ -65,18 +65,6 @@ namespace MultiplayerARPG
             }
         }
 
-        public GuildData(int id, string guildName, SocialCharacterData leaderCharacterEntity)
-            : this(id, guildName, leaderCharacterEntity.id)
-        {
-            AddMember(leaderCharacterEntity);
-        }
-
-        public GuildData(int id, string guildName, string leaderId)
-            : this(id, guildName, leaderId, SystemSetting.GuildMemberRoles)
-        {
-
-        }
-
         public void AddMember(BasePlayerCharacterEntity playerCharacterEntity, byte guildRole)
         {
             AddMember(CreateMemberData(playerCharacterEntity), guildRole);
@@ -122,9 +110,9 @@ namespace MultiplayerARPG
 
         private void MakeCaches()
         {
-            if (isCached)
+            if (_isCached)
                 return;
-            isCached = true;
+            _isCached = true;
             increaseMaxMember = 0;
             increaseExpGainPercentage = 0;
             increaseGoldGainPercentage = 0;

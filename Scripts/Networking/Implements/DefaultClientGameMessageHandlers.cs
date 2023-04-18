@@ -120,7 +120,7 @@ namespace MultiplayerARPG
             UpdateGuildMessage message = messageHandler.ReadMessage<UpdateGuildMessage>();
             if (message.type == UpdateGuildMessage.UpdateType.Create)
             {
-                GameInstance.JoinedGuild = new GuildData(message.id, message.guildName, message.characterId);
+                GameInstance.JoinedGuild = new GuildData(message.id, message.guildName, message.characterId, GameInstance.Singleton.SocialSystemSetting.GuildMemberRoles);
             }
             else if (GameInstance.JoinedGuild != null && GameInstance.JoinedGuild.id == message.id)
             {

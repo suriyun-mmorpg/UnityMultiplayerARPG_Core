@@ -134,7 +134,7 @@ namespace MultiplayerARPG
                 });
                 return;
             }
-            GuildData guild = new GuildData(++Id, request.guildName, SocialCharacterData.Create(playerCharacter));
+            GuildData guild = new GuildData(++Id, request.guildName, SocialCharacterData.Create(playerCharacter), GameInstance.Singleton.SocialSystemSetting.GuildMemberRoles);
             GameInstance.Singleton.SocialSystemSetting.DecreaseCreateGuildResource(playerCharacter);
             GameInstance.ServerGuildHandlers.SetGuild(guild.id, guild);
             playerCharacter.GuildId = guild.id;
