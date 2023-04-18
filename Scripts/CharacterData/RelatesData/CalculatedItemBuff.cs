@@ -4,17 +4,17 @@ namespace MultiplayerARPG
 {
     public class CalculatedItemBuff
     {
-        private IEquipmentItem item;
-        private int level;
-        private int randomSeed;
-        private CharacterStats increaseStats = CharacterStats.Empty;
-        private CharacterStats increaseStatsRate = CharacterStats.Empty;
-        private Dictionary<Attribute, float> increaseAttributes = new Dictionary<Attribute, float>();
-        private Dictionary<Attribute, float> increaseAttributesRate = new Dictionary<Attribute, float>();
-        private Dictionary<DamageElement, float> increaseResistances = new Dictionary<DamageElement, float>();
-        private Dictionary<DamageElement, float> increaseArmors = new Dictionary<DamageElement, float>();
-        private Dictionary<DamageElement, MinMaxFloat> increaseDamages = new Dictionary<DamageElement, MinMaxFloat>();
-        private Dictionary<BaseSkill, int> increaseSkills = new Dictionary<BaseSkill, int>();
+        private IEquipmentItem _item;
+        private int _level;
+        private int _randomSeed;
+        private CharacterStats _increaseStats = CharacterStats.Empty;
+        private CharacterStats _increaseStatsRate = CharacterStats.Empty;
+        private Dictionary<Attribute, float> _increaseAttributes = new Dictionary<Attribute, float>();
+        private Dictionary<Attribute, float> _increaseAttributesRate = new Dictionary<Attribute, float>();
+        private Dictionary<DamageElement, float> _increaseResistances = new Dictionary<DamageElement, float>();
+        private Dictionary<DamageElement, float> _increaseArmors = new Dictionary<DamageElement, float>();
+        private Dictionary<DamageElement, MinMaxFloat> _increaseDamages = new Dictionary<DamageElement, MinMaxFloat>();
+        private Dictionary<BaseSkill, int> _increaseSkills = new Dictionary<BaseSkill, int>();
 
         public CalculatedItemBuff()
         {
@@ -28,85 +28,85 @@ namespace MultiplayerARPG
 
         public void Build(IEquipmentItem item, int level, int randomSeed)
         {
-            this.item = item;
-            this.level = level;
-            this.randomSeed = randomSeed;
+            this._item = item;
+            this._level = level;
+            this._randomSeed = randomSeed;
 
-            increaseStats = CharacterStats.Empty;
-            increaseStatsRate = CharacterStats.Empty;
-            increaseAttributes.Clear();
-            increaseAttributesRate.Clear();
-            increaseResistances.Clear();
-            increaseArmors.Clear();
-            increaseDamages.Clear();
-            increaseSkills.Clear();
+            _increaseStats = CharacterStats.Empty;
+            _increaseStatsRate = CharacterStats.Empty;
+            _increaseAttributes.Clear();
+            _increaseAttributesRate.Clear();
+            _increaseResistances.Clear();
+            _increaseArmors.Clear();
+            _increaseDamages.Clear();
+            _increaseSkills.Clear();
 
             if (item == null || !item.IsEquipment())
                 return;
 
-            increaseStats = item.GetIncreaseStats(level, randomSeed);
-            increaseStatsRate = item.GetIncreaseStatsRate(level, randomSeed);
-            item.GetIncreaseAttributes(level, randomSeed, increaseAttributes);
-            item.GetIncreaseAttributesRate(level, randomSeed, increaseAttributesRate);
-            item.GetIncreaseResistances(level, randomSeed, increaseResistances);
-            item.GetIncreaseArmors(level, randomSeed, increaseArmors);
-            item.GetIncreaseDamages(level, randomSeed, increaseDamages);
-            item.GetIncreaseSkills(level, randomSeed, increaseSkills);
+            _increaseStats = item.GetIncreaseStats(level, randomSeed);
+            _increaseStatsRate = item.GetIncreaseStatsRate(level, randomSeed);
+            item.GetIncreaseAttributes(level, randomSeed, _increaseAttributes);
+            item.GetIncreaseAttributesRate(level, randomSeed, _increaseAttributesRate);
+            item.GetIncreaseResistances(level, randomSeed, _increaseResistances);
+            item.GetIncreaseArmors(level, randomSeed, _increaseArmors);
+            item.GetIncreaseDamages(level, randomSeed, _increaseDamages);
+            item.GetIncreaseSkills(level, randomSeed, _increaseSkills);
         }
 
         public IEquipmentItem GetItem()
         {
-            return item;
+            return _item;
         }
 
         public int GetLevel()
         {
-            return level;
+            return _level;
         }
 
         public int GetRandomSeed()
         {
-            return randomSeed;
+            return _randomSeed;
         }
 
         public CharacterStats GetIncreaseStats()
         {
-            return increaseStats;
+            return _increaseStats;
         }
 
         public CharacterStats GetIncreaseStatsRate()
         {
-            return increaseStatsRate;
+            return _increaseStatsRate;
         }
 
         public Dictionary<Attribute, float> GetIncreaseAttributes()
         {
-            return increaseAttributes;
+            return _increaseAttributes;
         }
 
         public Dictionary<Attribute, float> GetIncreaseAttributesRate()
         {
-            return increaseAttributesRate;
+            return _increaseAttributesRate;
         }
 
         public Dictionary<DamageElement, float> GetIncreaseResistances()
         {
-            return increaseResistances;
+            return _increaseResistances;
         }
 
         public Dictionary<DamageElement, float> GetIncreaseArmors()
         {
-            return increaseArmors;
+            return _increaseArmors;
         }
 
         public Dictionary<DamageElement, MinMaxFloat> GetIncreaseDamages()
         {
-            return increaseDamages;
+            return _increaseDamages;
         }
 
         public Dictionary<BaseSkill, int> GetIncreaseSkills()
         {
-            return increaseSkills;
+            return _increaseSkills;
         }
     }
 }

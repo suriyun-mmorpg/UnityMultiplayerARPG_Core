@@ -4,28 +4,28 @@ namespace MultiplayerARPG
 {
     public class CalculatedBuff
     {
-        private Buff buff;
-        private int level;
-        private float cacheDuration;
-        private int cacheRecoveryHp;
-        private int cacheRecoveryMp;
-        private int cacheRecoveryStamina;
-        private int cacheRecoveryFood;
-        private int cacheRecoveryWater;
-        private CharacterStats cacheIncreaseStats;
-        private CharacterStats cacheIncreaseStatsRate;
-        private Dictionary<Attribute, float> cacheIncreaseAttributes = new Dictionary<Attribute, float>();
-        private Dictionary<Attribute, float> cacheIncreaseAttributesRate = new Dictionary<Attribute, float>();
-        private Dictionary<DamageElement, float> cacheIncreaseResistances = new Dictionary<DamageElement, float>();
-        private Dictionary<DamageElement, float> cacheIncreaseArmors = new Dictionary<DamageElement, float>();
-        private Dictionary<DamageElement, MinMaxFloat> cacheIncreaseDamages = new Dictionary<DamageElement, MinMaxFloat>();
-        private Dictionary<DamageElement, MinMaxFloat> cacheDamageOverTimes = new Dictionary<DamageElement, MinMaxFloat>();
-        private float cacheRemoveBuffWhenAttackChance;
-        private float cacheRemoveBuffWhenAttackedChance;
-        private float cacheRemoveBuffWhenUseSkillChance;
-        private float cacheRemoveBuffWhenUseItemChance;
-        private float cacheRemoveBuffWhenPickupItemChance;
-        private int cacheMaxStack;
+        private Buff _buff;
+        private int _level;
+        private float _cacheDuration;
+        private int _cacheRecoveryHp;
+        private int _cacheRecoveryMp;
+        private int _cacheRecoveryStamina;
+        private int _cacheRecoveryFood;
+        private int _cacheRecoveryWater;
+        private CharacterStats _cacheIncreaseStats;
+        private CharacterStats _cacheIncreaseStatsRate;
+        private Dictionary<Attribute, float> _cacheIncreaseAttributes = new Dictionary<Attribute, float>();
+        private Dictionary<Attribute, float> _cacheIncreaseAttributesRate = new Dictionary<Attribute, float>();
+        private Dictionary<DamageElement, float> _cacheIncreaseResistances = new Dictionary<DamageElement, float>();
+        private Dictionary<DamageElement, float> _cacheIncreaseArmors = new Dictionary<DamageElement, float>();
+        private Dictionary<DamageElement, MinMaxFloat> _cacheIncreaseDamages = new Dictionary<DamageElement, MinMaxFloat>();
+        private Dictionary<DamageElement, MinMaxFloat> _cacheDamageOverTimes = new Dictionary<DamageElement, MinMaxFloat>();
+        private float _cacheRemoveBuffWhenAttackChance;
+        private float _cacheRemoveBuffWhenAttackedChance;
+        private float _cacheRemoveBuffWhenUseSkillChance;
+        private float _cacheRemoveBuffWhenUseItemChance;
+        private float _cacheRemoveBuffWhenPickupItemChance;
+        private int _cacheMaxStack;
 
         public CalculatedBuff()
         {
@@ -39,146 +39,146 @@ namespace MultiplayerARPG
 
         public void Build(Buff buff, int level)
         {
-            this.buff = buff;
-            this.level = level;
+            _buff = buff;
+            _level = level;
 
-            cacheIncreaseAttributes.Clear();
-            cacheIncreaseAttributesRate.Clear();
-            cacheIncreaseResistances.Clear();
-            cacheIncreaseArmors.Clear();
-            cacheIncreaseDamages.Clear();
-            cacheDamageOverTimes.Clear();
+            _cacheIncreaseAttributes.Clear();
+            _cacheIncreaseAttributesRate.Clear();
+            _cacheIncreaseResistances.Clear();
+            _cacheIncreaseArmors.Clear();
+            _cacheIncreaseDamages.Clear();
+            _cacheDamageOverTimes.Clear();
 
-            cacheDuration = buff.GetDuration(level);
-            cacheRecoveryHp = buff.GetRecoveryHp(level);
-            cacheRecoveryMp = buff.GetRecoveryMp(level);
-            cacheRecoveryStamina = buff.GetRecoveryStamina(level);
-            cacheRecoveryFood = buff.GetRecoveryFood(level);
-            cacheRecoveryWater = buff.GetRecoveryWater(level);
-            cacheIncreaseStats = buff.GetIncreaseStats(level);
-            cacheIncreaseStatsRate = buff.GetIncreaseStatsRate(level);
-            buff.GetIncreaseAttributes(level, cacheIncreaseAttributes);
-            buff.GetIncreaseAttributesRate(level, cacheIncreaseAttributesRate);
-            buff.GetIncreaseResistances(level, cacheIncreaseResistances);
-            buff.GetIncreaseArmors(level, cacheIncreaseArmors);
-            buff.GetIncreaseDamages(level, cacheIncreaseDamages);
-            buff.GetDamageOverTimes(level, cacheDamageOverTimes);
-            cacheRemoveBuffWhenAttackChance = buff.GetRemoveBuffWhenAttackChance(level);
-            cacheRemoveBuffWhenAttackedChance = buff.GetRemoveBuffWhenAttackedChance(level);
-            cacheRemoveBuffWhenUseSkillChance = buff.GetRemoveBuffWhenUseSkillChance(level);
-            cacheRemoveBuffWhenUseItemChance = buff.GetRemoveBuffWhenUseItemChance(level);
-            cacheRemoveBuffWhenPickupItemChance = buff.GetRemoveBuffWhenPickupItemChance(level);
-            cacheMaxStack = buff.GetMaxStack(level);
+            _cacheDuration = buff.GetDuration(level);
+            _cacheRecoveryHp = buff.GetRecoveryHp(level);
+            _cacheRecoveryMp = buff.GetRecoveryMp(level);
+            _cacheRecoveryStamina = buff.GetRecoveryStamina(level);
+            _cacheRecoveryFood = buff.GetRecoveryFood(level);
+            _cacheRecoveryWater = buff.GetRecoveryWater(level);
+            _cacheIncreaseStats = buff.GetIncreaseStats(level);
+            _cacheIncreaseStatsRate = buff.GetIncreaseStatsRate(level);
+            buff.GetIncreaseAttributes(level, _cacheIncreaseAttributes);
+            buff.GetIncreaseAttributesRate(level, _cacheIncreaseAttributesRate);
+            buff.GetIncreaseResistances(level, _cacheIncreaseResistances);
+            buff.GetIncreaseArmors(level, _cacheIncreaseArmors);
+            buff.GetIncreaseDamages(level, _cacheIncreaseDamages);
+            buff.GetDamageOverTimes(level, _cacheDamageOverTimes);
+            _cacheRemoveBuffWhenAttackChance = buff.GetRemoveBuffWhenAttackChance(level);
+            _cacheRemoveBuffWhenAttackedChance = buff.GetRemoveBuffWhenAttackedChance(level);
+            _cacheRemoveBuffWhenUseSkillChance = buff.GetRemoveBuffWhenUseSkillChance(level);
+            _cacheRemoveBuffWhenUseItemChance = buff.GetRemoveBuffWhenUseItemChance(level);
+            _cacheRemoveBuffWhenPickupItemChance = buff.GetRemoveBuffWhenPickupItemChance(level);
+            _cacheMaxStack = buff.GetMaxStack(level);
         }
 
         public Buff GetBuff()
         {
-            return buff;
+            return _buff;
         }
 
         public int GetLevel()
         {
-            return level;
+            return _level;
         }
 
         public float GetDuration()
         {
-            return cacheDuration;
+            return _cacheDuration;
         }
 
         public int GetRecoveryHp()
         {
-            return cacheRecoveryHp;
+            return _cacheRecoveryHp;
         }
 
         public int GetRecoveryMp()
         {
-            return cacheRecoveryMp;
+            return _cacheRecoveryMp;
         }
 
         public int GetRecoveryStamina()
         {
-            return cacheRecoveryStamina;
+            return _cacheRecoveryStamina;
         }
 
         public int GetRecoveryFood()
         {
-            return cacheRecoveryFood;
+            return _cacheRecoveryFood;
         }
 
         public int GetRecoveryWater()
         {
-            return cacheRecoveryWater;
+            return _cacheRecoveryWater;
         }
 
         public CharacterStats GetIncreaseStats()
         {
-            return cacheIncreaseStats;
+            return _cacheIncreaseStats;
         }
 
         public CharacterStats GetIncreaseStatsRate()
         {
-            return cacheIncreaseStatsRate;
+            return _cacheIncreaseStatsRate;
         }
 
         public Dictionary<Attribute, float> GetIncreaseAttributes()
         {
-            return cacheIncreaseAttributes;
+            return _cacheIncreaseAttributes;
         }
 
         public Dictionary<Attribute, float> GetIncreaseAttributesRate()
         {
-            return cacheIncreaseAttributesRate;
+            return _cacheIncreaseAttributesRate;
         }
 
         public Dictionary<DamageElement, float> GetIncreaseResistances()
         {
-            return cacheIncreaseResistances;
+            return _cacheIncreaseResistances;
         }
 
         public Dictionary<DamageElement, float> GetIncreaseArmors()
         {
-            return cacheIncreaseArmors;
+            return _cacheIncreaseArmors;
         }
 
         public Dictionary<DamageElement, MinMaxFloat> GetIncreaseDamages()
         {
-            return cacheIncreaseDamages;
+            return _cacheIncreaseDamages;
         }
 
         public Dictionary<DamageElement, MinMaxFloat> GetDamageOverTimes()
         {
-            return cacheDamageOverTimes;
+            return _cacheDamageOverTimes;
         }
 
         public float GetRemoveBuffWhenAttackChance()
         {
-            return cacheRemoveBuffWhenAttackChance;
+            return _cacheRemoveBuffWhenAttackChance;
         }
 
         public float GetRemoveBuffWhenAttackedChance()
         {
-            return cacheRemoveBuffWhenAttackedChance;
+            return _cacheRemoveBuffWhenAttackedChance;
         }
 
         public float GetRemoveBuffWhenUseSkillChance()
         {
-            return cacheRemoveBuffWhenUseSkillChance;
+            return _cacheRemoveBuffWhenUseSkillChance;
         }
 
         public float GetRemoveBuffWhenUseItemChance()
         {
-            return cacheRemoveBuffWhenUseItemChance;
+            return _cacheRemoveBuffWhenUseItemChance;
         }
 
         public float GetRemoveBuffWhenPickupItemChance()
         {
-            return cacheRemoveBuffWhenPickupItemChance;
+            return _cacheRemoveBuffWhenPickupItemChance;
         }
 
         public int MaxStack()
         {
-            return cacheMaxStack;
+            return _cacheMaxStack;
         }
     }
 }

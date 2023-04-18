@@ -6,24 +6,23 @@ namespace MultiplayerARPG
     public partial class CharacterCurrency : INetSerializable
     {
         [System.NonSerialized]
-        private int dirtyDataId;
+        private int _dirtyDataId;
         [System.NonSerialized]
-        private Currency cacheCurrency;
+        private Currency _cacheCurrency;
 
         private void MakeCache()
         {
-            if (dirtyDataId != dataId)
-            {
-                dirtyDataId = dataId;
-                cacheCurrency = null;
-                GameInstance.Currencies.TryGetValue(dataId, out cacheCurrency);
-            }
+            if (_dirtyDataId == dataId)
+                return;
+            _dirtyDataId = dataId;
+            if (!GameInstance.Currencies.TryGetValue(dataId, out _cacheCurrency))
+                _cacheCurrency = null;
         }
 
         public Currency GetCurrency()
         {
             MakeCache();
-            return cacheCurrency;
+            return _cacheCurrency;
         }
 
         public CharacterCurrency Clone()

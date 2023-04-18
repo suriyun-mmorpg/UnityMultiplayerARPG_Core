@@ -6,24 +6,23 @@ namespace MultiplayerARPG
     public partial class CharacterAttribute : INetSerializable
     {
         [System.NonSerialized]
-        private int dirtyDataId;
+        private int _dirtyDataId;
         [System.NonSerialized]
-        private Attribute cacheAttribute;
+        private Attribute _cacheAttribute;
 
         private void MakeCache()
         {
-            if (dirtyDataId != dataId)
-            {
-                dirtyDataId = dataId;
-                cacheAttribute = null;
-                GameInstance.Attributes.TryGetValue(dataId, out cacheAttribute);
-            }
+            if (_dirtyDataId == dataId)
+                return;
+            _dirtyDataId = dataId;
+            if (!GameInstance.Attributes.TryGetValue(dataId, out _cacheAttribute))
+                _cacheAttribute = null;
         }
 
         public Attribute GetAttribute()
         {
             MakeCache();
-            return cacheAttribute;
+            return _cacheAttribute;
         }
 
         public CharacterAttribute Clone()

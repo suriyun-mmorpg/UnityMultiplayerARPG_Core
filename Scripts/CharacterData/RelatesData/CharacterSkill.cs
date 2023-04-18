@@ -6,28 +6,27 @@ namespace MultiplayerARPG
     public partial class CharacterSkill : INetSerializable
     {
         [System.NonSerialized]
-        private int dirtyDataId;
+        private int _dirtyDataId;
         [System.NonSerialized]
-        private int dirtyLevel;
+        private int _dirtyLevel;
 
         [System.NonSerialized]
-        private BaseSkill cacheSkill;
+        private BaseSkill _cacheSkill;
 
         private void MakeCache()
         {
-            if (dirtyDataId != dataId || dirtyLevel != level)
-            {
-                dirtyDataId = dataId;
-                dirtyLevel = level;
-                cacheSkill = null;
-                GameInstance.Skills.TryGetValue(dataId, out cacheSkill);
-            }
+            if (_dirtyDataId == dataId && _dirtyLevel == level)
+                return;
+            _dirtyDataId = dataId;
+            _dirtyLevel = level;
+            if (!GameInstance.Skills.TryGetValue(dataId, out _cacheSkill))
+                _cacheSkill = null;
         }
 
         public BaseSkill GetSkill()
         {
             MakeCache();
-            return cacheSkill;
+            return _cacheSkill;
         }
 
         public CharacterSkill Clone()

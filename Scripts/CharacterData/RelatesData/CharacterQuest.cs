@@ -7,29 +7,24 @@ namespace MultiplayerARPG
     public partial class CharacterQuest : INetSerializable
     {
         [System.NonSerialized]
-        private int dirtyDataId;
+        private int _dirtyDataId;
 
         [System.NonSerialized]
-        private Quest cacheQuest;
+        private Quest _cacheQuest;
 
         private void MakeCache()
         {
-            if (!GameInstance.Quests.ContainsKey(dataId))
-            {
-                cacheQuest = null;
+            if (_dirtyDataId == dataId)
                 return;
-            }
-            if (dirtyDataId != dataId)
-            {
-                dirtyDataId = dataId;
-                cacheQuest = GameInstance.Quests.TryGetValue(dataId, out cacheQuest) ? cacheQuest : null;
-            }
+            _dirtyDataId = dataId;
+            if (!GameInstance.Quests.TryGetValue(dataId, out _cacheQuest))
+                _cacheQuest = null;
         }
 
         public Quest GetQuest()
         {
             MakeCache();
-            return cacheQuest;
+            return _cacheQuest;
         }
 
         public bool IsAllTasksDone(IPlayerCharacterData character)
