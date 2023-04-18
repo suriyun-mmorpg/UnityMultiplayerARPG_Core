@@ -1928,7 +1928,7 @@ namespace MultiplayerARPG
         {
             for (int i = 0; i < data.Summons.Count; ++i)
             {
-                if (data.Summons[i].objectId == objectId)
+                if (data.Summons[i].ObjectId == objectId)
                     return i;
             }
             return -1;

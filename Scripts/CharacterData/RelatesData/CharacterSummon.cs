@@ -5,6 +5,7 @@ namespace MultiplayerARPG
 {
     public partial class CharacterSummon : INetSerializable
     {
+        public uint ObjectId { get; internal set; }
         public int Level { get { return CacheEntity != null ? CacheEntity.Level : level; } }
         public int Exp { get { return CacheEntity != null ? CacheEntity.Exp : exp; } }
         public int CurrentHp { get { return CacheEntity != null ? CacheEntity.CurrentHp : currentHp; } }
@@ -32,8 +33,8 @@ namespace MultiplayerARPG
         {
             get
             {
-                if (_cacheEntity == null && objectId > 0)
-                    BaseGameNetworkManager.Singleton.Assets.TryGetSpawnedObject(objectId, out _cacheEntity);
+                if (_cacheEntity == null && ObjectId > 0)
+                    BaseGameNetworkManager.Singleton.Assets.TryGetSpawnedObject(ObjectId, out _cacheEntity);
                 return _cacheEntity;
             }
         }
@@ -80,7 +81,7 @@ namespace MultiplayerARPG
             _cacheEntity = spawnObj.GetComponent<BaseMonsterCharacterEntity>();
             BaseGameNetworkManager.Singleton.Assets.NetworkSpawn(spawnObj);
             CacheEntity.Summon(summoner, type, summonLevel);
-            objectId = CacheEntity.ObjectId;
+            ObjectId = CacheEntity.ObjectId;
             summonRemainsDuration = duration;
             level = summonLevel;
         }
@@ -177,7 +178,7 @@ namespace MultiplayerARPG
                 type = type,
                 dataId = dataId,
                 summonRemainsDuration = summonRemainsDuration,
-                objectId = objectId,
+                ObjectId = ObjectId,
                 level = level,
                 exp = exp,
                 currentHp = currentHp,
@@ -208,7 +209,7 @@ namespace MultiplayerARPG
                         writer.Put(summonRemainsDuration);
                         break;
                 }
-                writer.PutPackedUInt(objectId);
+                writer.PutPackedUInt(ObjectId);
                 writer.PutPackedInt(level);
                 writer.PutPackedInt(exp);
                 writer.PutPackedInt(currentHp);
@@ -229,7 +230,7 @@ namespace MultiplayerARPG
                         summonRemainsDuration = reader.GetFloat();
                         break;
                 }
-                objectId = reader.GetPackedUInt();
+                ObjectId = reader.GetPackedUInt();
                 level = reader.GetPackedInt();
                 exp = reader.GetPackedInt();
                 currentHp = reader.GetPackedInt();
@@ -245,14 +246,14 @@ namespace MultiplayerARPG
         {
             CharacterSummon result = this[index];
             result.summonRemainsDuration = reader.GetFloat();
-            result.objectId = reader.GetPackedUInt();
+            result.ObjectId = reader.GetPackedUInt();
             return result;
         }
 
         protected override void SerializeValueForSetOrDirty(int index, NetDataWriter writer, CharacterSummon value)
         {
             writer.Put(value.summonRemainsDuration);
-            writer.PutPackedUInt(value.objectId);
+            writer.PutPackedUInt(value.ObjectId);
         }
     }
 }
