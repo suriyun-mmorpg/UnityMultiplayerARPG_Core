@@ -6,54 +6,54 @@ namespace MultiplayerARPG
     public partial class CharacterSkillUsage : INetSerializable
     {
         [System.NonSerialized]
-        private int dirtyDataId;
+        private int _dirtyDataId;
+
         [System.NonSerialized]
-        private BaseSkill cacheSkill;
+        private BaseSkill _cacheSkill;
         [System.NonSerialized]
-        private GuildSkill cacheGuildSkill;
+        private GuildSkill _cacheGuildSkill;
         [System.NonSerialized]
-        private IUsableItem cacheUsableItem;
+        private IUsableItem _cacheUsableItem;
 
         private void MakeCache()
         {
-            if (dirtyDataId != dataId)
+            if (_dirtyDataId == dataId)
+                return;
+            _dirtyDataId = dataId;
+            _cacheSkill = null;
+            _cacheGuildSkill = null;
+            _cacheUsableItem = null;
+            switch (type)
             {
-                dirtyDataId = dataId;
-                cacheSkill = null;
-                cacheGuildSkill = null;
-                cacheUsableItem = null;
-                switch (type)
-                {
-                    case SkillUsageType.Skill:
-                        GameInstance.Skills.TryGetValue(dataId, out cacheSkill);
-                        break;
-                    case SkillUsageType.GuildSkill:
-                        GameInstance.GuildSkills.TryGetValue(dataId, out cacheGuildSkill);
-                        break;
-                    case SkillUsageType.UsableItem:
-                        if (GameInstance.Items.TryGetValue(dataId, out BaseItem item))
-                            cacheUsableItem = item as IUsableItem;
-                        break;
-                }
+                case SkillUsageType.Skill:
+                    GameInstance.Skills.TryGetValue(dataId, out _cacheSkill);
+                    break;
+                case SkillUsageType.GuildSkill:
+                    GameInstance.GuildSkills.TryGetValue(dataId, out _cacheGuildSkill);
+                    break;
+                case SkillUsageType.UsableItem:
+                    if (GameInstance.Items.TryGetValue(dataId, out BaseItem item))
+                        _cacheUsableItem = item as IUsableItem;
+                    break;
             }
         }
 
         public BaseSkill GetSkill()
         {
             MakeCache();
-            return cacheSkill;
+            return _cacheSkill;
         }
 
         public GuildSkill GetGuildSkill()
         {
             MakeCache();
-            return cacheGuildSkill;
+            return _cacheGuildSkill;
         }
 
         public IUsableItem GetUsableItem()
         {
             MakeCache();
-            return cacheUsableItem;
+            return _cacheUsableItem;
         }
 
         public void Use(ICharacterData character, int level)
