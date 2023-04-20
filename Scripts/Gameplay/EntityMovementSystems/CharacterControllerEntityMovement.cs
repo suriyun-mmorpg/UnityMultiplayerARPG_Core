@@ -631,8 +631,7 @@ namespace MultiplayerARPG
             if (useNavMesh)
             {
                 NavMeshPath navPath = new NavMeshPath();
-                NavMeshHit navHit;
-                if (NavMesh.SamplePosition(position, out navHit, 5f, NavMesh.AllAreas) &&
+                if (NavMesh.SamplePosition(position, out NavMeshHit navHit, 5f, NavMesh.AllAreas) &&
                     NavMesh.CalculatePath(CacheTransform.position, navHit.position, NavMesh.AllAreas, navPath))
                 {
                     NavPaths = new Queue<Vector3>(navPath.corners);
@@ -714,9 +713,8 @@ namespace MultiplayerARPG
             }
             if (movementSecure == MovementSecure.ServerAuthoritative && IsOwnerClient && !IsServer)
             {
-                EntityMovementInputState inputState;
                 _currentInput = this.SetInputExtraMovementState(_currentInput, _tempExtraMovementState);
-                if (this.DifferInputEnoughToSend(_oldInput, _currentInput, out inputState) || _sendingJump || _isClientConfirmingTeleport)
+                if (this.DifferInputEnoughToSend(_oldInput, _currentInput, out EntityMovementInputState inputState) || _sendingJump || _isClientConfirmingTeleport)
                 {
                     if (_sendingJump)
                     {
@@ -796,12 +794,7 @@ namespace MultiplayerARPG
                 // Don't read and apply transform, because it was done at server
                 return;
             }
-            MovementState movementState;
-            ExtraMovementState extraMovementState;
-            Vector3 position;
-            float yAngle;
-            long timestamp;
-            reader.ReadSyncTransformMessage3D(out movementState, out extraMovementState, out position, out yAngle, out timestamp);
+            reader.ReadSyncTransformMessage3D(out MovementState movementState, out ExtraMovementState extraMovementState, out Vector3 position, out float yAngle, out long timestamp);
             if (movementState.Has(MovementState.IsTeleport))
             {
                 // Server requested to teleport
@@ -814,7 +807,7 @@ namespace MultiplayerARPG
                     // Snap character to the position if character is too far from the position
                     if (movementSecure == MovementSecure.ServerAuthoritative || !IsOwnerClient)
                     {
-                        this._yAngle = _targetYAngle = yAngle;
+                        _yAngle = _targetYAngle = yAngle;
                         UpdateRotation();
                         CacheTransform.position = position;
                     }
@@ -852,13 +845,7 @@ namespace MultiplayerARPG
             }
             if (!Entity.CanMove())
                 return;
-            EntityMovementInputState inputState;
-            MovementState movementState;
-            ExtraMovementState extraMovementState;
-            Vector3 position;
-            float yAngle;
-            long timestamp;
-            reader.ReadMovementInputMessage3D(out inputState, out movementState, out extraMovementState, out position, out yAngle, out timestamp);
+            reader.ReadMovementInputMessage3D(out EntityMovementInputState inputState, out MovementState movementState, out ExtraMovementState extraMovementState, out Vector3 position, out float yAngle, out long timestamp);
             if (movementState.Has(MovementState.IsTeleport))
             {
                 // Teleport confirming from client
@@ -902,7 +889,7 @@ namespace MultiplayerARPG
                         }
                         else
                         {
-                            this._yAngle = _targetYAngle = yAngle;
+                            _yAngle = _targetYAngle = yAngle;
                             UpdateRotation();
                         }
                     }
@@ -929,12 +916,7 @@ namespace MultiplayerARPG
                 // Movement handling at server, so don't read sync transform from client
                 return;
             }
-            MovementState movementState;
-            ExtraMovementState extraMovementState;
-            Vector3 position;
-            float yAngle;
-            long timestamp;
-            reader.ReadSyncTransformMessage3D(out movementState, out extraMovementState, out position, out yAngle, out timestamp);
+            reader.ReadSyncTransformMessage3D(out MovementState movementState, out ExtraMovementState extraMovementState, out Vector3 position, out float yAngle, out long timestamp);
             if (movementState.Has(MovementState.IsTeleport))
             {
                 // Teleport confirming from client
@@ -959,7 +941,7 @@ namespace MultiplayerARPG
                 }
                 else
                 {
-                    this._yAngle = _targetYAngle = yAngle;
+                    _yAngle = _targetYAngle = yAngle;
                     UpdateRotation();
                 }
                 MovementState = movementState;
@@ -988,7 +970,7 @@ namespace MultiplayerARPG
                         newPos = oldPos + (dir * s);
                         CacheTransform.position = newPos;
                         // And also adjust client's position
-                        Teleport(newPos, Quaternion.Euler(0f, this._yAngle, 0f));
+                        Teleport(newPos, Quaternion.Euler(0f, _yAngle, 0f));
                     }
                     _lastServerValidateTransformTime = currentTime;
                     _lastServerValidateTransformMoveSpeed = v;
@@ -1012,7 +994,7 @@ namespace MultiplayerARPG
             _clientTargetPosition = null;
             NavPaths = null;
             CacheTransform.position = position;
-            this._yAngle = _targetYAngle = yAngle;
+            _yAngle = _targetYAngle = yAngle;
             UpdateRotation();
             if (IsServer && !IsOwnedByServer)
                 _isServerWaitingTeleportConfirm = true;

@@ -354,8 +354,7 @@ namespace MultiplayerARPG
             }
             if (movementSecure == MovementSecure.ServerAuthoritative && IsOwnerClient && !IsServer)
             {
-                EntityMovementInputState inputState;
-                if (this.DifferInputEnoughToSend(_oldInput, _currentInput, out inputState) || _isClientConfirmingTeleport)
+                if (this.DifferInputEnoughToSend(_oldInput, _currentInput, out EntityMovementInputState inputState) || _isClientConfirmingTeleport)
                 {
                     if (!_currentInput.IsKeyMovement)
                     {
@@ -415,12 +414,7 @@ namespace MultiplayerARPG
                 // Don't read and apply transform, because it was done at server
                 return;
             }
-            MovementState movementState;
-            ExtraMovementState extraMovementState;
-            Vector2 position;
-            DirectionVector2 direction2D;
-            long timestamp;
-            reader.ReadSyncTransformMessage2D(out movementState, out extraMovementState, out position, out direction2D, out timestamp);
+            reader.ReadSyncTransformMessage2D(out MovementState movementState, out ExtraMovementState extraMovementState, out Vector2 position, out DirectionVector2 direction2D, out long timestamp);
             if (movementState.Has(MovementState.IsTeleport))
             {
                 // Server requested to teleport
@@ -464,13 +458,7 @@ namespace MultiplayerARPG
             }
             if (!Entity.CanMove())
                 return;
-            EntityMovementInputState inputState;
-            MovementState movementState;
-            ExtraMovementState extraMovementState;
-            Vector2 position;
-            DirectionVector2 direction2D;
-            long timestamp;
-            reader.ReadMovementInputMessage2D(out inputState, out movementState, out extraMovementState, out position, out direction2D, out timestamp);
+            reader.ReadMovementInputMessage2D(out EntityMovementInputState inputState, out MovementState movementState, out ExtraMovementState extraMovementState, out Vector2 position, out DirectionVector2 direction2D, out long timestamp);
             if (movementState.Has(MovementState.IsTeleport))
             {
                 // Teleport confirming from client
@@ -526,12 +514,7 @@ namespace MultiplayerARPG
                 // Movement handling at server, so don't read sync transform from client
                 return;
             }
-            MovementState movementState;
-            ExtraMovementState extraMovementState;
-            Vector2 position;
-            DirectionVector2 direction2D;
-            long timestamp;
-            reader.ReadSyncTransformMessage2D(out movementState, out extraMovementState, out position, out direction2D, out timestamp);
+            reader.ReadSyncTransformMessage2D(out MovementState movementState, out ExtraMovementState extraMovementState, out Vector2 position, out DirectionVector2 direction2D, out long timestamp);
             if (movementState.Has(MovementState.IsTeleport))
             {
                 // Teleport confirming from client
