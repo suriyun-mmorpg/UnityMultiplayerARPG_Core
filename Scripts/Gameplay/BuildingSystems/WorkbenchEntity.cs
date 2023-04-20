@@ -11,22 +11,22 @@ namespace MultiplayerARPG
         public ItemCraft[] ItemCrafts { get { return itemCrafts; } }
 
 
-        private Dictionary<int, ItemCraft> cacheItemCrafts;
+        private Dictionary<int, ItemCraft> _cacheItemCrafts;
         public Dictionary<int, ItemCraft> CacheItemCrafts
         {
             get
             {
-                if (cacheItemCrafts == null)
+                if (_cacheItemCrafts == null)
                 {
-                    cacheItemCrafts = new Dictionary<int, ItemCraft>();
+                    _cacheItemCrafts = new Dictionary<int, ItemCraft>();
                     foreach (ItemCraft itemCraft in itemCrafts)
                     {
                         if (itemCraft.CraftingItem == null)
                             continue;
-                        cacheItemCrafts[itemCraft.CraftingItem.DataId] = itemCraft;
+                        _cacheItemCrafts[itemCraft.CraftingItem.DataId] = itemCraft;
                     }
                 }
-                return cacheItemCrafts;
+                return _cacheItemCrafts;
             }
         }
 

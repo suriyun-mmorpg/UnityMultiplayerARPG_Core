@@ -22,22 +22,22 @@ namespace MultiplayerARPG
         protected SyncListCraftingQueueItem queueItems = new SyncListCraftingQueueItem();
 
 
-        private Dictionary<int, ItemCraftFormula> cacheItemCraftFormulas;
+        private Dictionary<int, ItemCraftFormula> _cacheItemCraftFormulas;
         public Dictionary<int, ItemCraftFormula> CacheItemCraftFormulas
         {
             get
             {
-                if (cacheItemCraftFormulas == null)
+                if (_cacheItemCraftFormulas == null)
                 {
-                    cacheItemCraftFormulas = new Dictionary<int, ItemCraftFormula>();
+                    _cacheItemCraftFormulas = new Dictionary<int, ItemCraftFormula>();
                     foreach (ItemCraftFormula itemCraftFormula in itemCraftFormulas)
                     {
                         if (itemCraftFormula == null || itemCraftFormula.ItemCraft.CraftingItem == null)
                             continue;
-                        cacheItemCraftFormulas[itemCraftFormula.DataId] = itemCraftFormula;
+                        _cacheItemCraftFormulas[itemCraftFormula.DataId] = itemCraftFormula;
                     }
                 }
-                return cacheItemCraftFormulas;
+                return _cacheItemCraftFormulas;
             }
         }
 

@@ -63,53 +63,52 @@ namespace MultiplayerARPG
             }
         }
 
-        private float tempDeltaTime;
-        protected readonly Dictionary<int, float> convertRemainsDuration = new Dictionary<int, float>();
+        protected readonly Dictionary<int, float> _convertRemainsDuration = new Dictionary<int, float>();
 
-        protected Dictionary<int, ConvertItem> cacheFuelItems;
+        protected Dictionary<int, ConvertItem> _cacheFuelItems;
         public Dictionary<int, ConvertItem> CacheFuelItems
         {
             get
             {
-                if (cacheFuelItems == null)
+                if (_cacheFuelItems == null)
                 {
-                    cacheFuelItems = new Dictionary<int, ConvertItem>();
+                    _cacheFuelItems = new Dictionary<int, ConvertItem>();
                     if (convertItems != null && convertItems.Length > 0)
                     {
                         foreach (ConvertItem convertItem in convertItems)
                         {
                             if (convertItem.item.item == null || !convertItem.isFuel) continue;
-                            cacheFuelItems[convertItem.item.item.DataId] = convertItem;
+                            _cacheFuelItems[convertItem.item.item.DataId] = convertItem;
                         }
                     }
                 }
-                return cacheFuelItems;
+                return _cacheFuelItems;
             }
         }
 
-        protected Dictionary<int, ConvertItem> cacheConvertItems;
+        protected Dictionary<int, ConvertItem> _cacheConvertItems;
         public Dictionary<int, ConvertItem> CacheConvertItems
         {
             get
             {
-                if (cacheConvertItems == null)
+                if (_cacheConvertItems == null)
                 {
-                    cacheConvertItems = new Dictionary<int, ConvertItem>();
+                    _cacheConvertItems = new Dictionary<int, ConvertItem>();
                     if (convertItems != null && convertItems.Length > 0)
                     {
                         foreach (ConvertItem convertItem in convertItems)
                         {
                             if (convertItem.item.item == null) continue;
-                            cacheConvertItems[convertItem.item.item.DataId] = convertItem;
+                            _cacheConvertItems[convertItem.item.item.DataId] = convertItem;
                         }
                     }
                 }
-                return cacheConvertItems;
+                return _cacheConvertItems;
             }
         }
 
-        protected List<StorageConvertItemsEntry> preparedConvertItems = new List<StorageConvertItemsEntry>();
-        protected float convertCountDown = 1f;
+        protected List<StorageConvertItemsEntry> _preparedConvertItems = new List<StorageConvertItemsEntry>();
+        protected float _convertCountDown = 1f;
 
         public override void OnSetup()
         {
@@ -158,8 +157,8 @@ namespace MultiplayerARPG
 
             if (!IsTurnOn)
             {
-                if (convertRemainsDuration.Count > 0)
-                    convertRemainsDuration.Clear();
+                if (_convertRemainsDuration.Count > 0)
+                    _convertRemainsDuration.Clear();
                 return;
             }
 
@@ -171,7 +170,7 @@ namespace MultiplayerARPG
             }
 
             // Consume fuel and convert item
-            tempDeltaTime = Time.unscaledDeltaTime;
+            float tempDeltaTime = Time.unscaledDeltaTime;
             TurnOnElapsed += tempDeltaTime;
 
             HashSet<int> convertedItem = new HashSet<int>();
@@ -191,24 +190,24 @@ namespace MultiplayerARPG
 
                 convertData = CacheConvertItems[tempItem.dataId];
 
-                if (!convertRemainsDuration.ContainsKey(tempItem.dataId))
-                    convertRemainsDuration.Add(tempItem.dataId, convertData.convertInterval);
+                if (!_convertRemainsDuration.ContainsKey(tempItem.dataId))
+                    _convertRemainsDuration.Add(tempItem.dataId, convertData.convertInterval);
 
-                convertRemainsDuration[tempItem.dataId] -= tempDeltaTime;
+                _convertRemainsDuration[tempItem.dataId] -= tempDeltaTime;
 
-                if (convertRemainsDuration[tempItem.dataId] <= 0f)
+                if (_convertRemainsDuration[tempItem.dataId] <= 0f)
                 {
-                    convertRemainsDuration[tempItem.dataId] = convertData.convertInterval;
+                    _convertRemainsDuration[tempItem.dataId] = convertData.convertInterval;
                     PrepareConvertItems(convertData);
                 }
             }
 
-            if (convertCountDown > 0f)
+            if (_convertCountDown > 0f)
             {
-                convertCountDown -= tempDeltaTime;
-                if (convertCountDown <= 0f)
+                _convertCountDown -= tempDeltaTime;
+                if (_convertCountDown <= 0f)
                 {
-                    convertCountDown = 1f;
+                    _convertCountDown = 1f;
                     ProceedConvertItems();
                 }
             }
@@ -234,18 +233,18 @@ namespace MultiplayerARPG
             }
 
             if (convertItemsEntry.amount + convertItemsEntry.convertedAmount > 0)
-                preparedConvertItems.Add(convertItemsEntry);
+                _preparedConvertItems.Add(convertItemsEntry);
         }
 
         protected async void ProceedConvertItems()
         {
-            if (preparedConvertItems.Count <= 0)
+            if (_preparedConvertItems.Count <= 0)
                 return;
             StorageId storageId = new StorageId(StorageType.Building, Id);
             if (GameInstance.ServerStorageHandlers.IsStorageBusy(storageId))
                 return;
-            List<CharacterItem> droppingItems = await GameInstance.ServerStorageHandlers.ConvertStorageItems(storageId, preparedConvertItems);
-            preparedConvertItems.Clear();
+            List<CharacterItem> droppingItems = await GameInstance.ServerStorageHandlers.ConvertStorageItems(storageId, _preparedConvertItems);
+            _preparedConvertItems.Clear();
             if (droppingItems != null && droppingItems.Count > 0)
             {
                 for (int i = 0; i < droppingItems.Count; ++i)

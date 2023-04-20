@@ -34,7 +34,7 @@ namespace MultiplayerARPG
         [SerializeField]
         protected SyncFieldBool isOpen = new SyncFieldBool();
 
-        private bool dirtyIsOpen;
+        private bool _dirtyIsOpen;
 
         public override void OnSetup()
         {
@@ -79,9 +79,9 @@ namespace MultiplayerARPG
             if (IsServer)
             {
                 bool updatingIsOpen = GameInstance.ServerStorageHandlers.IsStorageEntityOpen(this);
-                if (updatingIsOpen != dirtyIsOpen)
+                if (updatingIsOpen != _dirtyIsOpen)
                 {
-                    dirtyIsOpen = updatingIsOpen;
+                    _dirtyIsOpen = updatingIsOpen;
                     isOpen.Value = updatingIsOpen;
                 }
             }
