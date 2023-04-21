@@ -2,22 +2,8 @@
 
 namespace MultiplayerARPG
 {
-    public struct ChatMessage : INetSerializable
+    public partial struct ChatMessage : INetSerializable
     {
-        public ChatChannel channel;
-        public string message;
-        public string senderUserId;
-        public string senderId;
-        public string senderName;
-        public string receiverUserId;
-        public string receiverId;
-        public string receiverName;
-        public int guildId;
-        public string guildName;
-        public int channelId;
-        public bool sendByServer;
-        public long timestamp;
-
         public void Deserialize(NetDataReader reader)
         {
             channel = (ChatChannel)reader.GetByte();

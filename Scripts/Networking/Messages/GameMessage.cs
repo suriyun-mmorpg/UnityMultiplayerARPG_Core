@@ -2,10 +2,8 @@
 
 namespace MultiplayerARPG
 {
-    public struct GameMessage : INetSerializable
+    public partial struct GameMessage : INetSerializable
     {
-        public UITextKeys message;
-
         public void Deserialize(NetDataReader reader)
         {
             message = (UITextKeys)reader.GetPackedUShort();

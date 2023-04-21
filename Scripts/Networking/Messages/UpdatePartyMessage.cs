@@ -2,22 +2,8 @@
 
 namespace MultiplayerARPG
 {
-    public struct UpdatePartyMessage : INetSerializable
+    public partial struct UpdatePartyMessage : INetSerializable
     {
-        public enum UpdateType : byte
-        {
-            Create,
-            ChangeLeader,
-            Setting,
-            Terminate,
-            Member,
-        }
-        public UpdateType type;
-        public int id;
-        public bool shareExp;
-        public bool shareItem;
-        public string characterId;
-
         public void Deserialize(NetDataReader reader)
         {
             type = (UpdateType)reader.GetByte();

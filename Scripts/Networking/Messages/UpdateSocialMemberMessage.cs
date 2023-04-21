@@ -2,19 +2,8 @@
 
 namespace MultiplayerARPG
 {
-    public struct UpdateSocialMemberMessage : INetSerializable
+    public partial struct UpdateSocialMemberMessage : INetSerializable
     {
-        public enum UpdateType : byte
-        {
-            Add,
-            Update,
-            Remove,
-            Clear,
-        }
-        public UpdateType type;
-        public int socialId;
-        public SocialCharacterData character;
-
         public void Deserialize(NetDataReader reader)
         {
             type = (UpdateType)reader.GetByte();
