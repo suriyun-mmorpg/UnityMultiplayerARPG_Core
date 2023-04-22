@@ -18,7 +18,7 @@ namespace MultiplayerARPG
         public Image imageIcon;
         public AudioSource voiceSource;
 
-        protected BaseNpcDialog lastData;
+        protected BaseNpcDialog _lastData;
 
         protected override void OnEnable()
         {
@@ -42,8 +42,8 @@ namespace MultiplayerARPG
 
         protected override void UpdateData()
         {
-            if (lastData != null)
-                lastData.UnrenderUI(this);
+            if (_lastData != null)
+                _lastData.UnrenderUI(this);
 
             if (uiTextTitle != null)
             {
@@ -77,7 +77,7 @@ namespace MultiplayerARPG
             }
 
             Data.RenderUI(this);
-            lastData = Data;
+            _lastData = Data;
         }
     }
 }

@@ -219,45 +219,45 @@ namespace MultiplayerARPG
         public UnityEvent onSwitchToGuildStorageDialog;
         public UnityEvent onSwitchToRepairItemDialog;
 
-        private UIList cacheMenuList;
+        private UIList _cacheMenuList;
         public UIList CacheMenuList
         {
             get
             {
-                if (cacheMenuList == null)
+                if (_cacheMenuList == null)
                 {
-                    cacheMenuList = gameObject.AddComponent<UIList>();
-                    cacheMenuList.uiPrefab = uiMenuPrefab.gameObject;
-                    cacheMenuList.uiContainer = uiMenuContainer;
+                    _cacheMenuList = gameObject.AddComponent<UIList>();
+                    _cacheMenuList.uiPrefab = uiMenuPrefab.gameObject;
+                    _cacheMenuList.uiContainer = uiMenuContainer;
                 }
-                return cacheMenuList;
+                return _cacheMenuList;
             }
         }
 
-        private UIList cacheSellItemList;
+        private UIList _cacheSellItemList;
         public UIList CacheSellItemList
         {
             get
             {
-                if (cacheSellItemList == null)
+                if (_cacheSellItemList == null)
                 {
-                    cacheSellItemList = gameObject.AddComponent<UIList>();
-                    cacheSellItemList.uiPrefab = uiSellItemPrefab.gameObject;
-                    cacheSellItemList.uiContainer = uiSellItemContainer;
+                    _cacheSellItemList = gameObject.AddComponent<UIList>();
+                    _cacheSellItemList.uiPrefab = uiSellItemPrefab.gameObject;
+                    _cacheSellItemList.uiContainer = uiSellItemContainer;
                 }
-                return cacheSellItemList;
+                return _cacheSellItemList;
             }
         }
 
-        private UINpcSellItemSelectionManager cacheSellItemSelectionManager;
+        private UINpcSellItemSelectionManager _cacheSellItemSelectionManager;
         public UINpcSellItemSelectionManager CacheSellItemSelectionManager
         {
             get
             {
-                if (cacheSellItemSelectionManager == null)
-                    cacheSellItemSelectionManager = gameObject.GetOrAddComponent<UINpcSellItemSelectionManager>();
-                cacheSellItemSelectionManager.selectionMode = UISelectionMode.SelectSingle;
-                return cacheSellItemSelectionManager;
+                if (_cacheSellItemSelectionManager == null)
+                    _cacheSellItemSelectionManager = gameObject.GetOrAddComponent<UINpcSellItemSelectionManager>();
+                _cacheSellItemSelectionManager.selectionMode = UISelectionMode.SelectSingle;
+                return _cacheSellItemSelectionManager;
             }
         }
 
