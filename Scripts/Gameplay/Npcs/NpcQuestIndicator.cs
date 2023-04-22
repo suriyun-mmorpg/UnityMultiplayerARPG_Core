@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using Cysharp.Threading.Tasks;
+using UnityEngine;
 using UnityEngine.Serialization;
 
 namespace MultiplayerARPG
@@ -43,24 +44,29 @@ namespace MultiplayerARPG
             if (Time.unscaledTime - _lastUpdateTime >= updateRepeatRate)
             {
                 _lastUpdateTime = Time.unscaledTime;
-                // Indicator priority haveTasksDoneQuests > haveInProgressQuests > haveNewQuests
-                bool isIndicatorShown = false;
-                bool tempVisibleState;
-                tempVisibleState = !isIndicatorShown && npcEntity.HaveTasksDoneQuests(GameInstance.PlayingCharacterEntity);
-                isIndicatorShown = isIndicatorShown || tempVisibleState;
-                if (haveTasksDoneQuestsIndicator != null && haveTasksDoneQuestsIndicator.activeSelf != tempVisibleState)
-                    haveTasksDoneQuestsIndicator.SetActive(tempVisibleState);
-
-                tempVisibleState = !isIndicatorShown && npcEntity.HaveInProgressQuests(GameInstance.PlayingCharacterEntity);
-                isIndicatorShown = isIndicatorShown || tempVisibleState;
-                if (haveInProgressQuestsIndicator != null && haveInProgressQuestsIndicator.activeSelf != tempVisibleState)
-                    haveInProgressQuestsIndicator.SetActive(tempVisibleState);
-
-                tempVisibleState = !isIndicatorShown && npcEntity.HaveNewQuests(GameInstance.PlayingCharacterEntity);
-                isIndicatorShown = isIndicatorShown || tempVisibleState;
-                if (haveNewQuestsIndicator != null && haveNewQuestsIndicator.activeSelf != tempVisibleState)
-                    haveNewQuestsIndicator.SetActive(tempVisibleState);
+                UpdateStatus().Forget();
             }
+        }
+
+        private async UniTaskVoid UpdateStatus()
+        {
+            // Indicator priority haveTasksDoneQuests > haveInProgressQuests > haveNewQuests
+            bool isIndicatorShown = false;
+            bool tempVisibleState;
+            tempVisibleState = !isIndicatorShown && await npcEntity.HaveTasksDoneQuests(GameInstance.PlayingCharacterEntity);
+            isIndicatorShown = isIndicatorShown || tempVisibleState;
+            if (haveTasksDoneQuestsIndicator != null && haveTasksDoneQuestsIndicator.activeSelf != tempVisibleState)
+                haveTasksDoneQuestsIndicator.SetActive(tempVisibleState);
+
+            tempVisibleState = !isIndicatorShown && await npcEntity.HaveInProgressQuests(GameInstance.PlayingCharacterEntity);
+            isIndicatorShown = isIndicatorShown || tempVisibleState;
+            if (haveInProgressQuestsIndicator != null && haveInProgressQuestsIndicator.activeSelf != tempVisibleState)
+                haveInProgressQuestsIndicator.SetActive(tempVisibleState);
+
+            tempVisibleState = !isIndicatorShown && await npcEntity.HaveNewQuests(GameInstance.PlayingCharacterEntity);
+            isIndicatorShown = isIndicatorShown || tempVisibleState;
+            if (haveNewQuestsIndicator != null && haveNewQuestsIndicator.activeSelf != tempVisibleState)
+                haveNewQuestsIndicator.SetActive(tempVisibleState);
         }
     }
 }

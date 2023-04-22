@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections.Generic;
 using UnityEngine.Serialization;
+using Cysharp.Threading.Tasks;
 
 namespace MultiplayerARPG
 {
@@ -153,7 +154,7 @@ namespace MultiplayerARPG
             _questIndicator.npcEntity = this;
         }
 
-        private void FindQuestFromDialog(IPlayerCharacterData playerCharacter, HashSet<int> questIds, BaseNpcDialog baseDialog, List<BaseNpcDialog> foundDialogs = null)
+        private async UniTask FindQuestFromDialog(IPlayerCharacterData playerCharacter, HashSet<int> questIds, BaseNpcDialog baseDialog, List<BaseNpcDialog> foundDialogs = null)
         {
             if (foundDialogs == null)
                 foundDialogs = new List<BaseNpcDialog>();
@@ -172,39 +173,42 @@ namespace MultiplayerARPG
                 case NpcDialogType.Normal:
                     foreach (NpcDialogMenu menu in dialog.menus)
                     {
-                        if (menu.isCloseMenu || !menu.IsPassConditions(playerCharacter)) continue;
-                        FindQuestFromDialog(playerCharacter, questIds, menu.dialog, foundDialogs);
+                        if (menu.isCloseMenu || !await menu.IsPassConditions(playerCharacter)) continue;
+                        await FindQuestFromDialog(playerCharacter, questIds, menu.dialog, foundDialogs);
                     }
                     break;
                 case NpcDialogType.Quest:
                     if (dialog.quest != null)
                         questIds.Add(dialog.quest.DataId);
-                    FindQuestFromDialog(playerCharacter, questIds, dialog.questAcceptedDialog, foundDialogs);
-                    FindQuestFromDialog(playerCharacter, questIds, dialog.questDeclinedDialog, foundDialogs);
-                    FindQuestFromDialog(playerCharacter, questIds, dialog.questAbandonedDialog, foundDialogs);
-                    FindQuestFromDialog(playerCharacter, questIds, dialog.questCompletedDialog, foundDialogs);
+                    await UniTask.WhenAll(
+                        FindQuestFromDialog(playerCharacter, questIds, dialog.questAcceptedDialog, foundDialogs),
+                        FindQuestFromDialog(playerCharacter, questIds, dialog.questDeclinedDialog, foundDialogs),
+                        FindQuestFromDialog(playerCharacter, questIds, dialog.questAbandonedDialog, foundDialogs),
+                        FindQuestFromDialog(playerCharacter, questIds, dialog.questCompletedDialog, foundDialogs));
                     break;
                 case NpcDialogType.CraftItem:
-                    FindQuestFromDialog(playerCharacter, questIds, dialog.craftNotMeetRequirementsDialog, foundDialogs);
-                    FindQuestFromDialog(playerCharacter, questIds, dialog.craftDoneDialog, foundDialogs);
-                    FindQuestFromDialog(playerCharacter, questIds, dialog.craftCancelDialog, foundDialogs);
+                    await UniTask.WhenAll(
+                        FindQuestFromDialog(playerCharacter, questIds, dialog.craftNotMeetRequirementsDialog, foundDialogs),
+                        FindQuestFromDialog(playerCharacter, questIds, dialog.craftDoneDialog, foundDialogs),
+                        FindQuestFromDialog(playerCharacter, questIds, dialog.craftCancelDialog, foundDialogs));
                     break;
                 case NpcDialogType.SaveRespawnPoint:
-                    FindQuestFromDialog(playerCharacter, questIds, dialog.saveRespawnConfirmDialog, foundDialogs);
-                    FindQuestFromDialog(playerCharacter, questIds, dialog.saveRespawnCancelDialog, foundDialogs);
+                    await UniTask.WhenAll(
+                        FindQuestFromDialog(playerCharacter, questIds, dialog.saveRespawnConfirmDialog, foundDialogs),
+                        FindQuestFromDialog(playerCharacter, questIds, dialog.saveRespawnCancelDialog, foundDialogs));
                     break;
                 case NpcDialogType.Warp:
-                    FindQuestFromDialog(playerCharacter, questIds, dialog.warpCancelDialog, foundDialogs);
+                    await FindQuestFromDialog(playerCharacter, questIds, dialog.warpCancelDialog, foundDialogs);
                     break;
             }
         }
 
-        public bool HaveNewQuests(IPlayerCharacterData playerCharacter)
+        public async UniTask<bool> HaveNewQuests(IPlayerCharacterData playerCharacter)
         {
             if (playerCharacter == null)
                 return false;
             HashSet<int> questIds = new HashSet<int>();
-            FindQuestFromDialog(playerCharacter, questIds, StartDialog);
+            await FindQuestFromDialog(playerCharacter, questIds, StartDialog);
             Quest quest;
             List<int> clearedQuests = new List<int>();
             foreach (CharacterQuest characterQuest in playerCharacter.Quests)
@@ -224,12 +228,12 @@ namespace MultiplayerARPG
             return false;
         }
 
-        public bool HaveInProgressQuests(IPlayerCharacterData playerCharacter)
+        public async UniTask<bool> HaveInProgressQuests(IPlayerCharacterData playerCharacter)
         {
             if (playerCharacter == null)
                 return false;
             HashSet<int> questIds = new HashSet<int>();
-            FindQuestFromDialog(playerCharacter, questIds, StartDialog);
+            await FindQuestFromDialog(playerCharacter, questIds, StartDialog);
             Quest quest;
             List<int> inProgressQuests = new List<int>();
             foreach (CharacterQuest characterQuest in playerCharacter.Quests)
@@ -249,12 +253,12 @@ namespace MultiplayerARPG
             return false;
         }
 
-        public bool HaveTasksDoneQuests(IPlayerCharacterData playerCharacter)
+        public async UniTask<bool> HaveTasksDoneQuests(IPlayerCharacterData playerCharacter)
         {
             if (playerCharacter == null)
                 return false;
             HashSet<int> questIds = new HashSet<int>();
-            FindQuestFromDialog(playerCharacter, questIds, StartDialog);
+            await FindQuestFromDialog(playerCharacter, questIds, StartDialog);
             Quest quest;
             List<int> tasksDoneQuests = new List<int>();
             foreach (CharacterQuest characterQuest in playerCharacter.Quests)

@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using Cysharp.Threading.Tasks;
+using UnityEngine;
 
 namespace MultiplayerARPG
 {
@@ -20,13 +21,13 @@ namespace MultiplayerARPG
             get { return Language.GetText(titles, title); }
         }
 
-        public bool IsPassConditions(IPlayerCharacterData character)
+        public async UniTask<bool> IsPassConditions(IPlayerCharacterData character)
         {
             if (dialog != null && !dialog.IsPassMenuCondition(character))
                 return false;
             foreach (NpcDialogCondition showCondition in showConditions)
             {
-                if (!showCondition.IsPass(character))
+                if (!await showCondition.IsPass(character))
                     return false;
             }
             return true;

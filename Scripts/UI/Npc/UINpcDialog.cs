@@ -76,7 +76,7 @@ namespace MultiplayerARPG
                     voiceSource.Play();
             }
 
-            Data.RenderUI(this);
+            Data.RenderUI(this).Forget();
             _lastData = Data;
         }
     }

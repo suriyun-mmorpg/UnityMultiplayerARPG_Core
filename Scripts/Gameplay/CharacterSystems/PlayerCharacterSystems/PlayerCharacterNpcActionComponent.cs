@@ -228,13 +228,13 @@ namespace MultiplayerARPG
         }
 
         [ServerRpc]
-        protected void ServerSelectNpcDialogMenu(byte menuIndex)
+        protected async void ServerSelectNpcDialogMenu(byte menuIndex)
         {
 #if UNITY_EDITOR || UNITY_SERVER
             if (CurrentNpcDialog == null)
                 return;
 
-            CurrentNpcDialog.GoToNextDialog(Entity, menuIndex);
+            await CurrentNpcDialog.GoToNextDialog(Entity, menuIndex);
             if (CurrentNpcDialog != null)
             {
                 // Show Npc dialog on client

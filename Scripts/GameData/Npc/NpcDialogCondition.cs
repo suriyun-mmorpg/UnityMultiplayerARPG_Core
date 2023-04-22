@@ -1,4 +1,5 @@
-﻿using UnityEngine.Serialization;
+﻿using Cysharp.Threading.Tasks;
+using UnityEngine.Serialization;
 
 namespace MultiplayerARPG
 {
@@ -15,10 +16,10 @@ namespace MultiplayerARPG
         [StringShowConditional(nameof(conditionType), new string[] { nameof(NpcDialogConditionType.LevelMoreThanOrEqual), nameof(NpcDialogConditionType.LevelLessThanOrEqual) })]
         [FormerlySerializedAs("conditionalLevel")]
         public int level;
-        [NpcDialogConditionData]
-        public NpcDialogConditionData conditionData;
+        [StringShowConditional(nameof(conditionType), new string[] { nameof(NpcDialogConditionType.Custom) })]
+        public BaseCustomNpcDialogCondition customCondition;
 
-        public bool IsPass(IPlayerCharacterData character)
+        public async UniTask<bool> IsPass(IPlayerCharacterData character)
         {
             int indexOfQuest = -1;
             bool questTasksCompleted = false;
@@ -52,7 +53,7 @@ namespace MultiplayerARPG
                 case NpcDialogConditionType.PlayerCharacterIs:
                     return character.DataId == playerCharacter.DataId;
                 case NpcDialogConditionType.Custom:
-                    return conditionData.Invoke(character.Id);
+                    return await customCondition.IsPass(character);
             }
             return true;
         }

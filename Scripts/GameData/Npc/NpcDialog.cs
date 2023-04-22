@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using Cysharp.Threading.Tasks;
 using LiteNetLibManager;
 using UnityEngine;
 using XNode;
@@ -113,7 +114,7 @@ namespace MultiplayerARPG
             return true;
         }
 
-        public override void RenderUI(UINpcDialog uiNpcDialog)
+        public override async UniTaskVoid RenderUI(UINpcDialog uiNpcDialog)
         {
             BasePlayerCharacterEntity owningCharacter = GameInstance.PlayingCharacterEntity;
             BaseItem craftingItem = null;
@@ -141,7 +142,7 @@ namespace MultiplayerARPG
                     for (int i = 0; i < menus.Length; ++i)
                     {
                         NpcDialogMenu menu = menus[i];
-                        if (menu.IsPassConditions(owningCharacter))
+                        if (await menu.IsPassConditions(owningCharacter))
                         {
                             UINpcDialogMenuAction menuAction = new UINpcDialogMenuAction();
                             menuAction.title = menu.Title;
@@ -445,7 +446,7 @@ namespace MultiplayerARPG
             return true;
         }
 
-        public override void GoToNextDialog(BasePlayerCharacterEntity characterEntity, byte menuIndex)
+        public override async UniTask GoToNextDialog(BasePlayerCharacterEntity characterEntity, byte menuIndex)
         {
             characterEntity.NpcAction.ClearNpcDialogData();
             // This dialog is current NPC dialog
@@ -460,7 +461,7 @@ namespace MultiplayerARPG
                     }
                     // Changing current npc dialog
                     NpcDialogMenu selectedMenu = menus[menuIndex];
-                    if (!selectedMenu.IsPassConditions(characterEntity) || selectedMenu.dialog == null || selectedMenu.isCloseMenu)
+                    if (!await selectedMenu.IsPassConditions(characterEntity) || selectedMenu.dialog == null || selectedMenu.isCloseMenu)
                     {
                         // Close dialog, so return null
                         return;

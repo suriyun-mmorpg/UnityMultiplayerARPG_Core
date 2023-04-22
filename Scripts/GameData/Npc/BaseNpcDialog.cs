@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using XNode;
+using Cysharp.Threading.Tasks;
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
@@ -94,7 +95,7 @@ namespace MultiplayerARPG
         /// This will be called to render current dialog
         /// </summary>
         /// <param name="uiNpcDialog"></param>
-        public abstract void RenderUI(UINpcDialog uiNpcDialog);
+        public abstract UniTaskVoid RenderUI(UINpcDialog uiNpcDialog);
         /// <summary>
         /// This will be called to un-render previous dialog
         /// </summary>
@@ -112,7 +113,7 @@ namespace MultiplayerARPG
         /// <param name="characterEntity"></param>
         /// <param name="menuIndex"></param>
         /// <returns></returns>
-        public abstract void GoToNextDialog(BasePlayerCharacterEntity characterEntity, byte menuIndex);
+        public abstract UniTask GoToNextDialog(BasePlayerCharacterEntity characterEntity, byte menuIndex);
         protected abstract void SetDialogByPort(NodePort from, NodePort to);
         public abstract bool IsShop { get; }
     }
