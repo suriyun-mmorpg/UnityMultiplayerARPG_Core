@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using Newtonsoft.Json;
+using UnityEngine;
 
 namespace MultiplayerARPG
 {
@@ -22,11 +23,11 @@ namespace MultiplayerARPG
             // Get current guild options before modify and save
             GuildOptions options = new GuildOptions();
             if (!string.IsNullOrEmpty(GameInstance.JoinedGuild.options))
-                options = JsonUtility.FromJson<GuildOptions>(GameInstance.JoinedGuild.options);
+                options = JsonConvert.DeserializeObject<GuildOptions>(GameInstance.JoinedGuild.options);
             options.iconDataId = data.DataId;
             GameInstance.ClientGuildHandlers.RequestChangeGuildOptions(new RequestChangeGuildOptionsMessage()
             {
-                options = JsonUtility.ToJson(options),
+                options = JsonConvert.SerializeObject(options),
             }, ClientGuildActions.ResponseChangeGuildOptions);
         }
     }

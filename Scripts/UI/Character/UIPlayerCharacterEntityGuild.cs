@@ -1,4 +1,5 @@
 ﻿using Cysharp.Text;
+using Newtonsoft.Json;
 using UnityEngine;
 
 namespace MultiplayerARPG
@@ -58,7 +59,7 @@ namespace MultiplayerARPG
 
             GuildOptions options = new GuildOptions();
             if (!string.IsNullOrEmpty(guild.Options))
-                options = JsonUtility.FromJson<GuildOptions>(guild.Options);
+                options = JsonConvert.DeserializeObject<GuildOptions>(guild.Options);
 
             if (textGuildName != null)
             {

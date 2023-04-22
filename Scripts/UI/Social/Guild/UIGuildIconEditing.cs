@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using Newtonsoft.Json;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Serialization;
@@ -64,7 +65,7 @@ namespace MultiplayerARPG
                 // Get current guild options before modify and save
                 GuildOptions options = new GuildOptions();
                 if (!string.IsNullOrEmpty(GameInstance.JoinedGuild.options))
-                    options = JsonUtility.FromJson<GuildOptions>(GameInstance.JoinedGuild.options);
+                    options = JsonConvert.DeserializeObject<GuildOptions>(GameInstance.JoinedGuild.options);
                 UpdateData(options.iconDataId);
             }
             else

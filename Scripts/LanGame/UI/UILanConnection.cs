@@ -1,9 +1,9 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Net;
 using UnityEngine;
 using UnityEngine.UI;
 using LiteNetLibManager;
+using Newtonsoft.Json;
 
 namespace MultiplayerARPG
 {
@@ -103,7 +103,7 @@ namespace MultiplayerARPG
 
         private void OnReceivedBroadcast(IPEndPoint remoteEndPoint, string data)
         {
-            DiscoveryData characterData = JsonUtility.FromJson<DiscoveryData>(data);
+            DiscoveryData characterData = JsonConvert.DeserializeObject<DiscoveryData>(data);
             discoveries[characterData.id] = characterData;
             remoteEndPoints[characterData.id] = remoteEndPoint;
             UpdateList();

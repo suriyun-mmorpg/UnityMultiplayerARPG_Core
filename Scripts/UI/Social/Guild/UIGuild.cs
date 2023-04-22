@@ -1,5 +1,6 @@
 ﻿using Cysharp.Text;
 using LiteNetLibManager;
+using Newtonsoft.Json;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -163,7 +164,7 @@ namespace MultiplayerARPG
         {
             GuildOptions options = new GuildOptions();
             if (Guild != null && !string.IsNullOrEmpty(Guild.options))
-                options = JsonUtility.FromJson<GuildOptions>(Guild.options);
+                options = JsonConvert.DeserializeObject<GuildOptions>(Guild.options);
 
             if (uiGuildIcon != null)
                 uiGuildIcon.SetDataByDataId(options.iconDataId);

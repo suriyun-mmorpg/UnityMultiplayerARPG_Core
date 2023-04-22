@@ -6,6 +6,7 @@ using UnityEngine.Profiling;
 using Cysharp.Threading.Tasks;
 using System.Collections.Generic;
 using System.Net.Sockets;
+using Newtonsoft.Json;
 
 namespace MultiplayerARPG
 {
@@ -90,7 +91,7 @@ namespace MultiplayerARPG
                     maxConnections = gameServiceConnection.maxConnections;
                     StartHost(false);
                     // Set discovery data by selected character
-                    CacheDiscovery.data = JsonUtility.ToJson(new DiscoveryData()
+                    CacheDiscovery.data = JsonConvert.SerializeObject(new DiscoveryData()
                     {
                         id = selectedCharacter.Id,
                         characterName = selectedCharacter.CharacterName,
