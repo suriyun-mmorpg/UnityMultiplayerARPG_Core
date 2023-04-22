@@ -79,8 +79,9 @@ namespace MultiplayerARPG
             SetDialogByPort(port, null);
         }
 
-        public virtual bool IsPassMenuCondition(IPlayerCharacterData character)
+        public virtual async UniTask<bool> IsPassMenuCondition(IPlayerCharacterData character)
         {
+            await UniTask.Yield();
             return true;
         }
 

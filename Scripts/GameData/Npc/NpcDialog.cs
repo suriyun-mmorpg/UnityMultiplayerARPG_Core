@@ -104,8 +104,9 @@ namespace MultiplayerARPG
             GameInstance.AddQuests(quest);
         }
 
-        public override bool IsPassMenuCondition(IPlayerCharacterData character)
+        public override async UniTask<bool> IsPassMenuCondition(IPlayerCharacterData character)
         {
+            await UniTask.Yield();
             if (type == NpcDialogType.Quest)
             {
                 if (quest == null || !quest.CanReceiveQuest(character))

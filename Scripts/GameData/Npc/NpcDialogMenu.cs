@@ -23,7 +23,7 @@ namespace MultiplayerARPG
 
         public async UniTask<bool> IsPassConditions(IPlayerCharacterData character)
         {
-            if (dialog != null && !dialog.IsPassMenuCondition(character))
+            if (dialog != null && !await dialog.IsPassMenuCondition(character))
                 return false;
             foreach (NpcDialogCondition showCondition in showConditions)
             {
