@@ -22,15 +22,12 @@ namespace MultiplayerARPG
         protected bool _isExploded;
         protected float _throwedTime;
         protected bool _destroying;
-        protected bool _updatedOnce;
-        protected IgnoreColliderManager _ignoreColliderManager;
 
         protected override void Awake()
         {
             base.Awake();
             CacheRigidbody = GetComponent<Rigidbody>();
             CacheRigidbody2D = GetComponent<Rigidbody2D>();
-            _ignoreColliderManager = new IgnoreColliderManager(GetComponentsInChildren<Collider>(), GetComponentsInChildren<Collider2D>());
         }
 
         /// <summary>
@@ -66,15 +63,18 @@ namespace MultiplayerARPG
             }
             _isExploded = false;
             _destroying = false;
-            _updatedOnce = false;
             _throwedTime = Time.unscaledTime;
             if (CurrentGameInstance.DimensionType == DimensionType.Dimension2D)
             {
-                _ignoreColliderManager.ResetAndSetIgnoreColliders(instigator);
+                CacheRigidbody2D.velocity = Vector2.zero;
+                CacheRigidbody2D.angularVelocity = 0f;
+                CacheRigidbody2D.AddForce(CacheTransform.forward * _throwForce, ForceMode2D.Impulse);
             }
             else
             {
-                _ignoreColliderManager.ResetAndSetIgnoreCollider2Ds(instigator);
+                CacheRigidbody.velocity = Vector3.zero;
+                CacheRigidbody.angularVelocity = Vector3.zero;
+                CacheRigidbody.AddForce(CacheTransform.forward * _throwForce, ForceMode.Impulse);
             }
         }
 
@@ -82,23 +82,6 @@ namespace MultiplayerARPG
         {
             if (_destroying)
                 return;
-
-            if (!_updatedOnce)
-            {
-                _updatedOnce = true;
-                if (CurrentGameInstance.DimensionType == DimensionType.Dimension2D)
-                {
-                    CacheRigidbody2D.velocity = Vector2.zero;
-                    CacheRigidbody2D.angularVelocity = 0f;
-                    CacheRigidbody2D.AddForce(CacheTransform.forward * _throwForce, ForceMode2D.Impulse);
-                }
-                else
-                {
-                    CacheRigidbody.velocity = Vector3.zero;
-                    CacheRigidbody.angularVelocity = Vector3.zero;
-                    CacheRigidbody.AddForce(CacheTransform.forward * _throwForce, ForceMode.Impulse);
-                }
-            }
 
             if (Time.unscaledTime - _throwedTime >= _lifetime)
             {

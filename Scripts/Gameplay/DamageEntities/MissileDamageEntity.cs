@@ -35,14 +35,12 @@ namespace MultiplayerARPG
         protected Vector3? _previousPosition;
         protected RaycastHit2D[] _hits2D = new RaycastHit2D[8];
         protected RaycastHit[] _hits3D = new RaycastHit[8];
-        protected IgnoreColliderManager _ignoreColliderManager;
 
         protected override void Awake()
         {
             base.Awake();
             CacheRigidbody = GetComponent<Rigidbody>();
             CacheRigidbody2D = GetComponent<Rigidbody2D>();
-            _ignoreColliderManager = new IgnoreColliderManager(GetComponentsInChildren<Collider>(), GetComponentsInChildren<Collider2D>());
         }
 
         /// <summary>
@@ -83,14 +81,6 @@ namespace MultiplayerARPG
             _destroying = false;
             _launchTime = Time.unscaledTime;
             _missileDuration = (missileDistance / missileSpeed) + 0.1f;
-            if (CurrentGameInstance.DimensionType == DimensionType.Dimension2D)
-            {
-                _ignoreColliderManager.ResetAndSetIgnoreColliders(instigator);
-            }
-            else
-            {
-                _ignoreColliderManager.ResetAndSetIgnoreCollider2Ds(instigator);
-            }
         }
 
         protected override void OnEnable()
