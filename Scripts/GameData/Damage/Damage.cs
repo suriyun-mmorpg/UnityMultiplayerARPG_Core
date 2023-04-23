@@ -411,7 +411,7 @@ namespace MultiplayerARPG
             // Instantiate missile damage entity
             float missileDistance = this.missileDistance;
             float missileSpeed = this.missileSpeed;
-            PoolSystem.GetInstance(missileDamageEntity, damagePosition, damageRotation, instance => instance.Setup(instigator, weapon, damageAmounts, skill, skillLevel, missileDistance, missileSpeed, lockingTarget));
+            PoolSystem.GetInstance(missileDamageEntity, damagePosition, damageRotation).Setup(instigator, weapon, damageAmounts, skill, skillLevel, missileDistance, missileSpeed, lockingTarget);
         }
 
         private void LaunchRaycastDamage(
@@ -598,7 +598,7 @@ namespace MultiplayerARPG
             // TODO: May predict and move missile ahead of time based on client's RTT
             float throwForce = this.throwForce;
             float throwableLifeTime = this.throwableLifeTime;
-            PoolSystem.GetInstance(throwableDamageEntity, damagePosition, damageRotation, instance => instance.Setup(instigator, weapon, damageAmounts, skill, skillLevel, throwForce, throwableLifeTime));
+            PoolSystem.GetInstance(throwableDamageEntity, damagePosition, damageRotation).Setup(instigator, weapon, damageAmounts, skill, skillLevel, throwForce, throwableLifeTime);
         }
 
         public void PrepareRelatesData()
