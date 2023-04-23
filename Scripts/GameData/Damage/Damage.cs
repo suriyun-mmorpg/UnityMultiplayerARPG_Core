@@ -290,26 +290,7 @@ namespace MultiplayerARPG
 
                 tempDamageableHitBox = tempGameObject.GetComponent<DamageableHitBox>();
                 if (tempDamageableHitBox == null)
-                {
-                    if (GameInstance.Singleton.IsDamageableLayer(tempGameObject.layer))
-                    {
-                        // Hit something which is part of damageable entities
-                        continue;
-                    }
-
-                    // Hit wall... so play impact effects
-                    if (isPlayImpactEffects)
-                    {
-                        tempTag = tempGameObject.tag;
-                        // Prepare data to instantiate impact effects
-                        if (impactEffects.TryGetEffect(tempTag, out GameEffect gameEffect))
-                        {
-                            Vector3 closestPoint = attacker.AttackPhysicFunctions.GetOverlapColliderClosestPoint(i, damagePosition);
-                            PoolSystem.GetInstance(gameEffect, closestPoint, Quaternion.LookRotation((closestPoint - damagePosition).normalized));
-                        }
-                    }
                     continue;
-                }
 
                 if (tempDamageableHitBox.GetObjectId() == attacker.ObjectId)
                     continue;
@@ -357,11 +338,7 @@ namespace MultiplayerARPG
                 if (isPlayImpactEffects)
                 {
                     tempTag = tempDamageableHitBox.EntityGameObject.tag;
-                    if (impactEffects.TryGetEffect(tempTag, out GameEffect gameEffect))
-                    {
-                        Vector3 closestPoint = attacker.AttackPhysicFunctions.GetOverlapColliderClosestPoint(i, damagePosition);
-                        PoolSystem.GetInstance(gameEffect, closestPoint, Quaternion.LookRotation((closestPoint - damagePosition).normalized));
-                    }
+                    PlayMeleeImpactEffect(attacker, tempTag, i, tempGameObject.transform, damagePosition);
                 }
             }
 
@@ -387,17 +364,23 @@ namespace MultiplayerARPG
                 if (isPlayImpactEffects)
                 {
                     tempTag = tempDamageTakenTarget.EntityGameObject.tag;
-                    if (impactEffects.TryGetEffect(tempTag, out GameEffect gameEffect))
-                    {
-                        Vector3 closestPoint = attacker.AttackPhysicFunctions.GetOverlapColliderClosestPoint(tempDamageTakenTargetIndex, damagePosition);
-                        PoolSystem.GetInstance(gameEffect, closestPoint, Quaternion.LookRotation((closestPoint - damagePosition).normalized));
-                    }
+                    PlayMeleeImpactEffect(attacker, tempTag, tempDamageTakenTargetIndex, tempDamageTakenTarget.transform, damagePosition);
                 }
             }
 
             // Prepare hit registration
             if (!isHost && isOwnerClient && hitDataCollection.Count > 0)
                 BaseGameNetworkManager.Singleton.HitRegistrationManager.PrepareToRegister(this, randomSeed, attacker, damagePosition, damageDirection, hitDataCollection);
+        }
+
+        private void PlayMeleeImpactEffect(BaseCharacterEntity attacker, string tag, int overlapIndex, Transform overlapTransform, Vector3 damagePosition)
+        {
+            if (!impactEffects.TryGetEffect(tag, out GameEffect gameEffect))
+                return;
+            Vector3 targetPosition = overlapTransform.position;
+            targetPosition.y = damagePosition.y;
+            Vector3 dir = (targetPosition - damagePosition).normalized;
+            PoolSystem.GetInstance(gameEffect, overlapTransform.position, Quaternion.LookRotation(Vector3.up, dir));
         }
 
         private void LaunchMissileDamage(
