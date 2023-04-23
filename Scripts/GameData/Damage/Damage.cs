@@ -338,7 +338,7 @@ namespace MultiplayerARPG
                 if (isPlayImpactEffects)
                 {
                     tempTag = tempDamageableHitBox.EntityGameObject.tag;
-                    PlayMeleeImpactEffect(attacker, tempTag, i, tempGameObject.transform, damagePosition);
+                    PlayMeleeImpactEffect(attacker, tempTag, tempDamageableHitBox, damagePosition);
                 }
             }
 
@@ -364,7 +364,7 @@ namespace MultiplayerARPG
                 if (isPlayImpactEffects)
                 {
                     tempTag = tempDamageTakenTarget.EntityGameObject.tag;
-                    PlayMeleeImpactEffect(attacker, tempTag, tempDamageTakenTargetIndex, tempDamageTakenTarget.transform, damagePosition);
+                    PlayMeleeImpactEffect(attacker, tempTag, tempDamageTakenTarget, damagePosition);
                 }
             }
 
@@ -373,14 +373,14 @@ namespace MultiplayerARPG
                 BaseGameNetworkManager.Singleton.HitRegistrationManager.PrepareToRegister(this, randomSeed, attacker, damagePosition, damageDirection, hitDataCollection);
         }
 
-        private void PlayMeleeImpactEffect(BaseCharacterEntity attacker, string tag, int overlapIndex, Transform overlapTransform, Vector3 damagePosition)
+        private void PlayMeleeImpactEffect(BaseCharacterEntity attacker, string tag, DamageableHitBox hitBox, Vector3 damagePosition)
         {
             if (!impactEffects.TryGetEffect(tag, out GameEffect gameEffect))
                 return;
-            Vector3 targetPosition = overlapTransform.position;
+            Vector3 targetPosition = hitBox.Bounds.center;
             targetPosition.y = damagePosition.y;
             Vector3 dir = (targetPosition - damagePosition).normalized;
-            PoolSystem.GetInstance(gameEffect, overlapTransform.position, Quaternion.LookRotation(Vector3.up, dir));
+            PoolSystem.GetInstance(gameEffect, hitBox.Bounds.center, Quaternion.LookRotation(Vector3.up, dir));
         }
 
         private void LaunchMissileDamage(
