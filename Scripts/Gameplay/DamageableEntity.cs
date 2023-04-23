@@ -214,8 +214,7 @@ namespace MultiplayerARPG
                     switch (hitEffectsSourceType)
                     {
                         case HitEffectsSourceType.DamageElement:
-                            DamageElement damageElement;
-                            if (GameInstance.DamageElements.TryGetValue(hitEffectsSourceDataId, out damageElement) &&
+                            if (GameInstance.DamageElements.TryGetValue(hitEffectsSourceDataId, out DamageElement damageElement) &&
                                 damageElement.DamageHitEffects != null &&
                                 damageElement.DamageHitEffects.Length > 0)
                             {
@@ -223,8 +222,7 @@ namespace MultiplayerARPG
                             }
                             break;
                         case HitEffectsSourceType.Skill:
-                            BaseSkill skill;
-                            if (GameInstance.Skills.TryGetValue(hitEffectsSourceDataId, out skill) &&
+                            if (GameInstance.Skills.TryGetValue(hitEffectsSourceDataId, out BaseSkill skill) &&
                                 skill.DamageHitEffects != null &&
                                 skill.DamageHitEffects.Length > 0)
                             {
@@ -258,9 +256,7 @@ namespace MultiplayerARPG
         internal void ApplyDamage(HitBoxPosition position, Vector3 fromPosition, EntityInfo instigator, Dictionary<DamageElement, MinMaxFloat> damageAmounts, CharacterItem weapon, BaseSkill skill, int skillLevel, int randomSeed)
         {
             ReceivingDamage(position, fromPosition, instigator, damageAmounts, weapon, skill, skillLevel);
-            CombatAmountType combatAmountType;
-            int totalDamage;
-            ApplyReceiveDamage(position, fromPosition, instigator, damageAmounts, weapon, skill, skillLevel, randomSeed, out combatAmountType, out totalDamage);
+            ApplyReceiveDamage(position, fromPosition, instigator, damageAmounts, weapon, skill, skillLevel, randomSeed, out CombatAmountType combatAmountType, out int totalDamage);
             ReceivedDamage(position, fromPosition, instigator, damageAmounts, combatAmountType, totalDamage, weapon, skill, skillLevel, null);
         }
 
@@ -276,8 +272,7 @@ namespace MultiplayerARPG
         /// <param name="skillLevel">Skill level which used to attack</param>
         public virtual void ReceivingDamage(HitBoxPosition position, Vector3 fromPosition, EntityInfo instigator, Dictionary<DamageElement, MinMaxFloat> damageAmounts, CharacterItem weapon, BaseSkill skill, int skillLevel)
         {
-            IGameEntity attacker;
-            instigator.TryGetEntity(out attacker);
+            instigator.TryGetEntity(out IGameEntity attacker);
             if (onReceiveDamage != null)
                 onReceiveDamage.Invoke(position, fromPosition, attacker, damageAmounts, weapon, skill, skillLevel);
         }
@@ -340,8 +335,7 @@ namespace MultiplayerARPG
                 }
             }
             CallAllAppendCombatText(combatAmountType, hitEffectsSourceType, hitEffectsSourceDataId, totalDamage);
-            IGameEntity attacker;
-            instigator.TryGetEntity(out attacker);
+            instigator.TryGetEntity(out IGameEntity attacker);
             if (onReceivedDamage != null)
                 onReceivedDamage.Invoke(position, fromPosition, attacker, combatAmountType, totalDamage, weapon, skill, skillLevel, buff, isDamageOverTime);
         }
