@@ -120,5 +120,24 @@ namespace MultiplayerARPG
         {
             return _overlapColliders2D[index].ClosestPoint(position);
         }
+
+        public bool GetOverlapColliderRaycast(int index, Vector3 origin, Vector3 direction, out Vector3 point, out Vector3 normal, out float distance, out Transform transform, float maxDistance)
+        {
+            RaycastHit2D[] hits = new RaycastHit2D[1];
+            int hitCount = _overlapColliders2D[index].Raycast(direction, hits, maxDistance);
+            if (hitCount > 0)
+            {
+                point = hits[0].point;
+                normal = hits[0].normal;
+                distance = hits[0].distance;
+                transform = hits[0].transform;
+                return true;
+            }
+            point = origin + direction * maxDistance;
+            normal = -direction;
+            distance = maxDistance;
+            transform = null;
+            return false;
+        }
     }
 }

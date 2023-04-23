@@ -39,5 +39,7 @@ namespace MultiplayerARPG
         GameObject GetOverlapObject(int index);
 
         Vector3 GetOverlapColliderClosestPoint(int index, Vector3 position);
+
+        bool GetOverlapColliderRaycast(int index, Vector3 origin, Vector3 direction, out Vector3 point, out Vector3 normal, out float distance, out Transform transform, float maxDistance);
     }
 }
