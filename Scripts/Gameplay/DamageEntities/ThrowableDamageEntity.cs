@@ -1,5 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
 
@@ -22,6 +21,7 @@ namespace MultiplayerARPG
         protected bool _isExploded;
         protected float _throwedTime;
         protected bool _destroying;
+        protected readonly HashSet<uint> _alreadyHitObjects = new HashSet<uint>();
 
         protected override void Awake()
         {
@@ -130,8 +130,7 @@ namespace MultiplayerARPG
 
         protected virtual bool FindAndApplyDamage(GameObject other, HashSet<uint> alreadyHitObjects)
         {
-            DamageableHitBox target;
-            if (FindTargetHitBox(other, out target) && !alreadyHitObjects.Contains(target.GetObjectId()))
+            if (FindTargetHitBox(other, out DamageableHitBox target) && !alreadyHitObjects.Contains(target.GetObjectId()))
             {
                 target.ReceiveDamageWithoutConditionCheck(CacheTransform.position, _instigator, _damageAmounts, _weapon, _skill, _skillLevel, Random.Range(0, 255));
                 alreadyHitObjects.Add(target.GetObjectId());
@@ -160,20 +159,20 @@ namespace MultiplayerARPG
         {
             if (CurrentGameInstance.DimensionType == DimensionType.Dimension2D)
             {
-                HashSet<uint> alreadyHitObjects = new HashSet<uint>();
+                _alreadyHitObjects.Clear();
                 Collider2D[] colliders2D = Physics2D.OverlapCircleAll(CacheTransform.position, explodeDistance);
                 foreach (Collider2D collider in colliders2D)
                 {
-                    FindAndApplyDamage(collider.gameObject, alreadyHitObjects);
+                    FindAndApplyDamage(collider.gameObject, _alreadyHitObjects);
                 }
             }
             else
             {
-                HashSet<uint> alreadyHitObjects = new HashSet<uint>();
+                _alreadyHitObjects.Clear();
                 Collider[] colliders = Physics.OverlapSphere(CacheTransform.position, explodeDistance);
                 foreach (Collider collider in colliders)
                 {
-                    FindAndApplyDamage(collider.gameObject, alreadyHitObjects);
+                    FindAndApplyDamage(collider.gameObject, _alreadyHitObjects);
                 }
             }
         }
