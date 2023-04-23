@@ -10,6 +10,7 @@
         QuestCompleted,
         FactionIs,
         PlayerCharacterIs,
-        Custom = 254
+        CustomByScriptableObject = 253,
+        CustomByCallback = 254,
     }
 }

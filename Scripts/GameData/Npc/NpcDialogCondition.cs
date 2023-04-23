@@ -16,8 +16,11 @@ namespace MultiplayerARPG
         [StringShowConditional(nameof(conditionType), new string[] { nameof(NpcDialogConditionType.LevelMoreThanOrEqual), nameof(NpcDialogConditionType.LevelLessThanOrEqual) })]
         [FormerlySerializedAs("conditionalLevel")]
         public int level;
-        [StringShowConditional(nameof(conditionType), new string[] { nameof(NpcDialogConditionType.Custom) })]
-        public BaseCustomNpcDialogCondition customCondition;
+        [StringShowConditional(nameof(conditionType), new string[] { nameof(NpcDialogConditionType.CustomByScriptableObject) })]
+        public BaseCustomNpcDialogCondition customConditionScriptableObject;
+        [NpcDialogConditionData]
+        [FormerlySerializedAs("conditionData")]
+        public NpcDialogConditionData customConditionCallback;
 
         public async UniTask<bool> IsPass(IPlayerCharacterData character)
         {
@@ -52,8 +55,10 @@ namespace MultiplayerARPG
                     return character.FactionId == faction.DataId;
                 case NpcDialogConditionType.PlayerCharacterIs:
                     return character.DataId == playerCharacter.DataId;
-                case NpcDialogConditionType.Custom:
-                    return await customCondition.IsPass(character);
+                case NpcDialogConditionType.CustomByScriptableObject:
+                    return await customConditionScriptableObject.IsPass(character);
+                case NpcDialogConditionType.CustomByCallback:
+                    return customConditionCallback.Invoke(character.Id);
             }
             return true;
         }
