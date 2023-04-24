@@ -60,7 +60,7 @@ namespace MultiplayerARPG
         {
             base.Setup(instigator, weapon, damageAmounts, skill, skillLevel);
             PushBack(areaDuration);
-            this._applyDuration = applyDuration;
+            _applyDuration = applyDuration;
             _lastAppliedTime = Time.unscaledTime;
         }
 
