@@ -572,6 +572,7 @@ namespace MultiplayerARPG
             // Don't applies velocity while using root motion
             if ((isGrounded && useRootMotionForMovement) ||
                 (isAirborne && useRootMotionForAirMovement) ||
+                (!isGrounded && !isAirborne && useRootMotionForMovement) ||
                 (_isUnderWater && useRootMotionUnderWater))
             {
                 tempMoveVelocity.x = 0;
