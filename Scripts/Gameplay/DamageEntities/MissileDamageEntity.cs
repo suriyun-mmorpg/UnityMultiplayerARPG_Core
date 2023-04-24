@@ -35,6 +35,7 @@ namespace MultiplayerARPG
         protected Vector3? _previousPosition;
         protected RaycastHit2D[] _hits2D = new RaycastHit2D[8];
         protected RaycastHit[] _hits3D = new RaycastHit[8];
+        protected readonly HashSet<uint> _alreadyHitObjects = new HashSet<uint>();
 
         protected override void Awake()
         {
@@ -288,19 +289,22 @@ namespace MultiplayerARPG
 
             target = other.GetComponent<DamageableHitBox>();
 
-            if (target == null || target.IsDead() || !target.CanReceiveDamageFrom(_instigator))
+            if (target == null || target.IsDead() || target.GetObjectId() == _instigator.ObjectId || !target.CanReceiveDamageFrom(_instigator))
+            {
+                target = null;
                 return false;
-
-            if (_instigator.TryGetEntity(out BaseGameEntity instigatorEntity) && instigatorEntity == target.Entity)
-                return false;
+            }
 
             if (_lockingTarget != null && _lockingTarget.GetObjectId() != target.GetObjectId())
+            {
+                target = null;
                 return false;
+            }
 
             return true;
         }
 
-        protected virtual bool FindAndApplyDamage(GameObject other)
+        protected virtual bool FindAndApplyDamage(GameObject other, HashSet<uint> alreadyHitObjects)
         {
             if (FindTargetHitBox(other, out DamageableHitBox target))
             {
@@ -334,18 +338,20 @@ namespace MultiplayerARPG
         {
             if (CurrentGameInstance.DimensionType == DimensionType.Dimension2D)
             {
+                _alreadyHitObjects.Clear();
                 Collider2D[] colliders2D = Physics2D.OverlapCircleAll(CacheTransform.position, explodeDistance);
                 foreach (Collider2D collider in colliders2D)
                 {
-                    FindAndApplyDamage(collider.gameObject);
+                    FindAndApplyDamage(collider.gameObject, _alreadyHitObjects);
                 }
             }
             else
             {
+                _alreadyHitObjects.Clear();
                 Collider[] colliders = Physics.OverlapSphere(CacheTransform.position, explodeDistance);
                 foreach (Collider collider in colliders)
                 {
-                    FindAndApplyDamage(collider.gameObject);
+                    FindAndApplyDamage(collider.gameObject, _alreadyHitObjects);
                 }
             }
         }
