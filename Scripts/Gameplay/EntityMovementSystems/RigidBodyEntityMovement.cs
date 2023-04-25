@@ -11,10 +11,6 @@ namespace MultiplayerARPG
     [RequireComponent(typeof(OpenCharacterController))]
     public class RigidBodyEntityMovement : BaseNetworkedGameEntityComponent<BaseGameEntity>, IEntityMovementComponent, IBuiltInEntityMovement3D
     {
-        protected static readonly RaycastHit[] s_findGroundRaycastHits = new RaycastHit[4];
-        protected static readonly long s_lagBuffer = System.TimeSpan.TicksPerMillisecond * 200;
-        protected static readonly float s_lagBufferUnityTime = 0.2f;
-
         [Header("Movement AI")]
         [Range(0.01f, 1f)]
         public float stoppingDistance = 0.1f;
@@ -169,7 +165,10 @@ namespace MultiplayerARPG
 
         public override void EntityUpdate()
         {
-            Functions.EntityUpdate();
+            float deltaTime = Time.deltaTime;
+            Functions.UpdateMovement(deltaTime);
+            Functions.UpdateRotation(deltaTime);
+            Functions.AfterMovementUpdate(deltaTime);
         }
 
         public bool GroundCheck()
@@ -185,6 +184,16 @@ namespace MultiplayerARPG
         public void Move(Vector3 motion)
         {
             CacheOpenCharacterController.Move(motion);
+        }
+
+        public void RotateY(float yAngle)
+        {
+            CacheTransform.eulerAngles = new Vector3(0f, yAngle, 0f);
+        }
+
+        public void OnJumpForceApplied()
+        {
+
         }
 
         public bool WriteClientState(NetDataWriter writer, out bool shouldSendReliably)

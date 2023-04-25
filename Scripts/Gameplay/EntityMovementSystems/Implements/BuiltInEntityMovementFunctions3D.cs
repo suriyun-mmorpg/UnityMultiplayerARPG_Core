@@ -261,29 +261,6 @@ namespace MultiplayerARPG
             return PhysicUtils.FindGroundedPosition(fromPosition, s_findGroundRaycastHits, findDistance, GameInstance.Singleton.GetGameEntityGroundDetectionLayerMask(), out result, CacheTransform);
         }
 
-        public void EntityUpdate()
-        {
-            UpdateMovement(Time.deltaTime);
-            if (CanPredictMovement())
-            {
-                _tempMovementState = _moveDirection.sqrMagnitude > 0f ? _tempMovementState : MovementState.None;
-                if (_isUnderWater)
-                    _tempMovementState |= MovementState.IsUnderWater;
-                if (_isGrounded || _airborneElapsed < airborneDelay)
-                    _tempMovementState |= MovementState.IsGrounded;
-                // Update movement state
-                MovementState = _tempMovementState;
-                // Update extra movement state
-                ExtraMovementState = Entity.ValidateExtraMovementState(MovementState, _tempExtraMovementState);
-            }
-            else
-            {
-                // Update movement state
-                if (HasNavPaths && !MovementState.Has(MovementState.Forward))
-                    MovementState |= MovementState.Forward;
-            }
-        }
-
         public bool WaterCheck(Collider waterCollider)
         {
             if (waterCollider == null)
@@ -296,7 +273,7 @@ namespace MultiplayerARPG
             return currentThreshold >= underWaterThreshold;
         }
 
-        private void UpdateMovement(float deltaTime)
+        public void UpdateMovement(float deltaTime)
         {
             float tempSqrMagnitude;
             float tempPredictSqrMagnitude;
@@ -429,6 +406,7 @@ namespace MultiplayerARPG
                     {
                         _verticalVelocity = CalculateJumpVerticalSpeed();
                     }
+                    EntityMovement.OnJumpForceApplied();
                 }
             }
             // Updating horizontal movement (WASD inputs)
@@ -564,18 +542,44 @@ namespace MultiplayerARPG
             Vector3 stickGroundMotion = _isGrounded && !_isUnderWater && platformMotion.y <= 0f ? (Vector3.down * stickGroundForce) : Vector3.zero;
             EntityMovement.Move((tempMoveVelocity + platformMotion + stickGroundMotion) * deltaTime);
 
-            if (_yTurnSpeed <= 0f)
-                _yAngle = _targetYAngle;
-            else if (Mathf.Abs(_yAngle - _targetYAngle) > 1f)
-                _yAngle = Mathf.LerpAngle(_yAngle, _targetYAngle, _yTurnSpeed * deltaTime);
-            UpdateRotation();
-            _lookRotationApplied = true;
             _currentInput = Entity.SetInputRotation(_currentInput, CacheTransform.rotation);
             _isJumping = false;
             _acceptedJump = false;
             _previouslyGrounded = _isGrounded;
             _previouslyAirborne = isAirborne;
             _previouslyExtraMovementState = _tempExtraMovementState;
+        }
+
+        public void UpdateRotation(float deltaTime)
+        {
+            if (_yTurnSpeed <= 0f)
+                _yAngle = _targetYAngle;
+            else if (Mathf.Abs(_yAngle - _targetYAngle) > 1f)
+                _yAngle = Mathf.LerpAngle(_yAngle, _targetYAngle, _yTurnSpeed * deltaTime);
+            _lookRotationApplied = true;
+            RotateY();
+        }
+
+        public void AfterMovementUpdate(float deltaTime)
+        {
+            if (CanPredictMovement())
+            {
+                _tempMovementState = _moveDirection.sqrMagnitude > 0f ? _tempMovementState : MovementState.None;
+                if (_isUnderWater)
+                    _tempMovementState |= MovementState.IsUnderWater;
+                if (_isGrounded || _airborneElapsed < airborneDelay)
+                    _tempMovementState |= MovementState.IsGrounded;
+                // Update movement state
+                MovementState = _tempMovementState;
+                // Update extra movement state
+                ExtraMovementState = Entity.ValidateExtraMovementState(MovementState, _tempExtraMovementState);
+            }
+            else
+            {
+                // Update movement state
+                if (HasNavPaths && !MovementState.Has(MovementState.Forward))
+                    MovementState |= MovementState.Forward;
+            }
         }
 
         private float CalculateCurrentMoveSpeed(float maxMoveSpeed, float deltaTime)
@@ -597,9 +601,9 @@ namespace MultiplayerARPG
             return maxMoveSpeed;
         }
 
-        private void UpdateRotation()
+        private void RotateY()
         {
-            CacheTransform.eulerAngles = new Vector3(0f, _yAngle, 0f);
+            EntityMovement.RotateY(_yAngle);
         }
 
         private void SetMovePaths(Vector3 position, bool useNavMesh)
@@ -784,7 +788,7 @@ namespace MultiplayerARPG
                     if (movementSecure == MovementSecure.ServerAuthoritative || !IsOwnerClient)
                     {
                         _yAngle = _targetYAngle = yAngle;
-                        UpdateRotation();
+                        RotateY();
                         CacheTransform.position = position;
                     }
                     MovementState = movementState;
@@ -868,7 +872,7 @@ namespace MultiplayerARPG
                     else
                     {
                         _yAngle = _targetYAngle = yAngle;
-                        UpdateRotation();
+                        RotateY();
                     }
                 }
                 if (movementState.Has(MovementState.IsJump))
@@ -917,7 +921,7 @@ namespace MultiplayerARPG
                 else
                 {
                     _yAngle = _targetYAngle = yAngle;
-                    UpdateRotation();
+                    RotateY();
                 }
                 MovementState = movementState;
                 ExtraMovementState = extraMovementState;
@@ -970,7 +974,7 @@ namespace MultiplayerARPG
             NavPaths = null;
             CacheTransform.position = position;
             _yAngle = _targetYAngle = yAngle;
-            UpdateRotation();
+            RotateY();
             if (IsServer && !IsOwnedByServer)
                 _isServerWaitingTeleportConfirm = true;
             if (!IsServer && IsOwnerClient)
