@@ -19,7 +19,7 @@ namespace MultiplayerARPG
                 socialSystemSetting = ScriptableObject.CreateInstance<SocialSystemSetting>();
             string path = EditorUtility.SaveFilePanel("Export Social System Setting", Application.dataPath, "socialSystemSetting", "json");
             if (path.Length > 0)
-                File.WriteAllText(path, JsonConvert.SerializeObject(socialSystemSetting));
+                File.WriteAllText(path, JsonConvert.SerializeObject(socialSystemSetting, Formatting.Indented));
         }
     }
 }
