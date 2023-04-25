@@ -11,7 +11,7 @@ namespace MultiplayerARPG
     [DefaultExecutionOrder(0)]
     public abstract class BaseGameEntity : LiteNetLibBehaviour, IGameEntity, IEntityMovement
     {
-        public const float GROUND_DETECTION_DISTANCE = 30f;
+        public const float GROUND_DETECTION_DISTANCE = 10f;
         public const byte CLIENT_STATE_DATA_CHANNEL = 3;
         public const byte SERVER_STATE_DATA_CHANNEL = 3;
 
