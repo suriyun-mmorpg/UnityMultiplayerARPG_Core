@@ -15,70 +15,70 @@ namespace MultiplayerARPG
 
     public static class EntityMovementInputExtension
     {
-        public static EntityMovementInput InitInput(this IEntityMovementComponent entityMovement)
+        public static EntityMovementInput InitInput(this BaseGameEntity entity)
         {
             return new EntityMovementInput()
             {
-                Position = entityMovement.Entity.EntityTransform.position,
-                Rotation = entityMovement.Entity.EntityTransform.rotation,
+                Position = entity.EntityTransform.position,
+                Rotation = entity.EntityTransform.rotation,
             };
         }
 
-        public static EntityMovementInput SetInputIsKeyMovement(this IEntityMovementComponent entityMovement, EntityMovementInput input, bool isKeyMovement)
+        public static EntityMovementInput SetInputIsKeyMovement(this BaseGameEntity entity, EntityMovementInput input, bool isKeyMovement)
         {
             if (input == null)
-                input = entityMovement.InitInput();
+                input = entity.InitInput();
             input.IsKeyMovement = isKeyMovement;
             return input;
         }
 
-        public static EntityMovementInput SetInputMovementState(this IEntityMovementComponent entityMovement, EntityMovementInput input, MovementState movementState)
+        public static EntityMovementInput SetInputMovementState(this BaseGameEntity entity, EntityMovementInput input, MovementState movementState)
         {
             if (input == null)
-                input = entityMovement.InitInput();
+                input = entity.InitInput();
             input.IsStopped = false;
             bool isJump = input.MovementState.Has(MovementState.IsJump);
             input.MovementState = movementState;
             if (isJump)
-                input = entityMovement.SetInputJump(input);
+                input = entity.SetInputJump(input);
             // Update extra movement state because some movement state can affect extra movement state
-            input = SetInputExtraMovementState(entityMovement, input, input.ExtraMovementState);
+            input = SetInputExtraMovementState(entity, input, input.ExtraMovementState);
             return input;
         }
 
-        public static EntityMovementInput SetInputMovementState2D(this IEntityMovementComponent entityMovement, EntityMovementInput input, MovementState movementState)
+        public static EntityMovementInput SetInputMovementState2D(this BaseGameEntity entity, EntityMovementInput input, MovementState movementState)
         {
             if (input == null)
-                input = entityMovement.InitInput();
+                input = entity.InitInput();
             input.IsStopped = false;
             input.MovementState = movementState;
             // Update extra movement state because some movement state can affect extra movement state
-            input = SetInputExtraMovementState(entityMovement, input, input.ExtraMovementState);
+            input = SetInputExtraMovementState(entity, input, input.ExtraMovementState);
             return input;
         }
 
-        public static EntityMovementInput SetInputExtraMovementState(this IEntityMovementComponent entityMovement, EntityMovementInput input, ExtraMovementState extraMovementState)
+        public static EntityMovementInput SetInputExtraMovementState(this BaseGameEntity entity, EntityMovementInput input, ExtraMovementState extraMovementState)
         {
             if (input == null)
-                input = entityMovement.InitInput();
+                input = entity.InitInput();
             input.IsStopped = false;
-            input.ExtraMovementState = entityMovement.ValidateExtraMovementState(input.MovementState, extraMovementState);
+            input.ExtraMovementState = entity.ValidateExtraMovementState(input.MovementState, extraMovementState);
             return input;
         }
 
-        public static EntityMovementInput SetInputPosition(this IEntityMovementComponent entityMovement, EntityMovementInput input, Vector3 position)
+        public static EntityMovementInput SetInputPosition(this BaseGameEntity entity, EntityMovementInput input, Vector3 position)
         {
             if (input == null)
-                input = entityMovement.InitInput();
+                input = entity.InitInput();
             input.IsStopped = false;
             input.Position = position;
             return input;
         }
 
-        public static EntityMovementInput SetInputYPosition(this IEntityMovementComponent entityMovement, EntityMovementInput input, float yPosition)
+        public static EntityMovementInput SetInputYPosition(this BaseGameEntity entity, EntityMovementInput input, float yPosition)
         {
             if (input == null)
-                input = entityMovement.InitInput();
+                input = entity.InitInput();
             input.IsStopped = false;
             Vector3 position = input.Position;
             position.y = yPosition;
@@ -86,51 +86,51 @@ namespace MultiplayerARPG
             return input;
         }
 
-        public static EntityMovementInput SetInputRotation(this IEntityMovementComponent entityMovement, EntityMovementInput input, Quaternion rotation)
+        public static EntityMovementInput SetInputRotation(this BaseGameEntity entity, EntityMovementInput input, Quaternion rotation)
         {
             if (input == null)
-                input = entityMovement.InitInput();
+                input = entity.InitInput();
             input.IsStopped = false;
             input.Rotation = rotation;
             return input;
         }
 
-        public static EntityMovementInput SetInputDirection2D(this IEntityMovementComponent entityMovement, EntityMovementInput input, Vector2 direction2D)
+        public static EntityMovementInput SetInputDirection2D(this BaseGameEntity entity, EntityMovementInput input, Vector2 direction2D)
         {
             if (input == null)
-                input = entityMovement.InitInput();
+                input = entity.InitInput();
             input.IsStopped = false;
             input.Direction2D = direction2D;
             return input;
         }
 
-        public static EntityMovementInput SetInputJump(this IEntityMovementComponent entityMovement, EntityMovementInput input)
+        public static EntityMovementInput SetInputJump(this BaseGameEntity entity, EntityMovementInput input)
         {
             if (input == null)
-                input = entityMovement.InitInput();
+                input = entity.InitInput();
             input.IsStopped = false;
             input.MovementState |= MovementState.IsJump;
             return input;
         }
 
-        public static EntityMovementInput ClearInputJump(this IEntityMovementComponent entityMovement, EntityMovementInput input)
+        public static EntityMovementInput ClearInputJump(this BaseGameEntity entity, EntityMovementInput input)
         {
             if (input == null)
-                input = entityMovement.InitInput();
+                input = entity.InitInput();
             input.IsStopped = false;
             input.MovementState &= ~MovementState.IsJump;
             return input;
         }
 
-        public static EntityMovementInput SetInputStop(this IEntityMovementComponent entityMovement, EntityMovementInput input)
+        public static EntityMovementInput SetInputStop(this BaseGameEntity entity, EntityMovementInput input)
         {
             if (input == null)
-                input = entityMovement.InitInput();
+                input = entity.InitInput();
             input.IsStopped = true;
             return input;
         }
 
-        public static bool DifferInputEnoughToSend(this IEntityMovementComponent entityMovement, EntityMovementInput oldInput, EntityMovementInput newInput, out EntityMovementInputState state)
+        public static bool DifferInputEnoughToSend(this BaseGameEntity entity, EntityMovementInput oldInput, EntityMovementInput newInput, out EntityMovementInputState state)
         {
             state = EntityMovementInputState.None;
             if (newInput == null)

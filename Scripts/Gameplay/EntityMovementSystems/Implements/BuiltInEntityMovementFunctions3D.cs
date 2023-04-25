@@ -1,20 +1,17 @@
-﻿using LiteNetLib.Utils;
+
+using LiteNetLib.Utils;
 using LiteNetLibManager;
-using StandardAssets.Characters.Physics;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
 
 namespace MultiplayerARPG
 {
-    [RequireComponent(typeof(Rigidbody))]
-    [RequireComponent(typeof(CapsuleCollider))]
-    [RequireComponent(typeof(OpenCharacterController))]
-    public class RigidBodyEntityMovement : BaseNetworkedGameEntityComponent<BaseGameEntity>, IEntityMovementComponent
+    public class BuiltInEntityMovementFunctions3D
     {
-        protected static readonly RaycastHit[] s_findGroundRaycastHits = new RaycastHit[4];
-        protected static readonly long s_lagBuffer = System.TimeSpan.TicksPerMillisecond * 200;
-        protected static readonly float s_lagBufferUnityTime = 0.2f;
+        private static readonly RaycastHit[] s_findGroundRaycastHits = new RaycastHit[4];
+        private static readonly long s_lagBuffer = System.TimeSpan.TicksPerMillisecond * 200;
+        private static readonly float s_lagBufferUnityTime = 0.2f;
 
         [Header("Movement AI")]
         [Range(0.01f, 1f)]
@@ -28,7 +25,7 @@ namespace MultiplayerARPG
         public float backwardMoveSpeedRate = 0.75f;
         public float gravity = 9.81f;
         public float maxFallVelocity = 40f;
-        public LayerMask platformLayerMask = 1;
+        public float stickGroundForce = 9.6f;
         [Tooltip("Delay before character change from grounded state to airborne")]
         public float airborneDelay = 0.01f;
         public bool doNotChangeVelocityWhileAirborne;
@@ -50,16 +47,25 @@ namespace MultiplayerARPG
         [Header("Networking Settings")]
         public float snapThreshold = 5.0f;
 
-        public Animator CacheAnimator { get; private set; }
-        public Rigidbody CacheRigidbody { get; private set; }
-        public CapsuleCollider CacheCapsuleCollider { get; private set; }
-        public OpenCharacterController CacheOpenCharacterController { get; private set; }
+        public BaseGameEntity Entity { get; private set; }
+        public bool IsServer { get { return Entity.IsServer; } }
+        public bool IsClient { get { return Entity.IsClient; } }
+        public bool IsOwnerClient { get { return Entity.IsOwnerClient; } }
+        public bool IsOwnedByServer { get { return Entity.IsOwnedByServer; } }
+        public bool IsOwnerClientOrOwnedByServer { get { return Entity.IsOwnerClientOrOwnedByServer; } }
+        public GameInstance CurrentGameInstance { get { return Entity.CurrentGameInstance; } }
+        public BaseGameplayRule CurrentGameplayRule { get { return Entity.CurrentGameplayRule; } }
+        public BaseGameNetworkManager CurrentGameManager { get { return Entity.CurrentGameManager; } }
+        public Transform CacheTransform { get { return Entity.EntityTransform; } }
+        public Animator Animator { get; private set; }
+        public IBuiltInEntityMovement3D EntityMovement { get; private set; }
+
         public float StoppingDistance
         {
             get { return stoppingDistance; }
         }
-        public MovementState MovementState { get; protected set; }
-        public ExtraMovementState ExtraMovementState { get; protected set; }
+        public MovementState MovementState { get; private set; }
+        public ExtraMovementState ExtraMovementState { get; private set; }
         public DirectionVector2 Direction2D { get { return Vector2.down; } set { } }
         public float CurrentMoveSpeed { get; private set; }
 
@@ -70,107 +76,72 @@ namespace MultiplayerARPG
         }
 
         // Movement codes
-        protected float _airborneElapsed;
-        protected bool _isUnderWater;
-        protected bool _isJumping;
-        protected bool _applyingJumpForce;
-        protected float _applyJumpForceCountDown;
-        protected Collider _waterCollider;
-        protected Transform _groundedTransform;
-        protected Vector3 _previousPlatformPosition;
-        protected long _acceptedPositionTimestamp;
-        protected Vector3? _clientTargetPosition;
-        protected float _yAngle;
-        protected float _targetYAngle;
-        protected float _yTurnSpeed;
-        protected bool _lookRotationApplied;
-        protected bool _acceptedJump;
-        protected bool _sendingJump;
-        protected float _lastServerValidateTransformTime;
-        protected float _lastServerValidateTransformMoveSpeed;
-        protected EntityMovementInput _oldInput;
-        protected EntityMovementInput _currentInput;
-        protected MovementState _tempMovementState;
-        protected ExtraMovementState _tempExtraMovementState;
-        protected Vector3 _inputDirection;
-        protected Vector3 _moveDirection;
-        protected float _verticalVelocity;
-        protected float? _lagMoveSpeedRate;
-        protected Vector3 _velocityBeforeAirborne;
-        protected CollisionFlags _collisionFlags;
-        protected float _pauseMovementCountDown;
-        protected bool _previouslyGrounded;
-        protected bool _previouslyAirborne;
-        protected ExtraMovementState _previouslyExtraMovementState;
-        protected bool _isTeleporting;
-        protected bool _isServerWaitingTeleportConfirm;
-        protected bool _isClientConfirmingTeleport;
+        private bool _isGrounded = true;
+        private bool _isUnderWater = false;
+        private float _airborneElapsed;
+        private bool _isJumping;
+        private bool _applyingJumpForce;
+        private float _applyJumpForceCountDown;
+        private Collider _waterCollider;
+        private Transform _groundedTransform;
+        private Vector3 _previousPlatformPosition;
+        private long _acceptedPositionTimestamp;
+        private long _acceptedJumpTimestamp;
+        private Vector3? _clientTargetPosition;
+        private float _yAngle;
+        private float _targetYAngle;
+        private float _yTurnSpeed;
+        private bool _lookRotationApplied;
+        private bool _acceptedJump;
+        private bool _sendingJump;
+        private float _lastServerValidateTransformTime;
+        private float _lastServerValidateTransformMoveSpeed;
+        private EntityMovementInput _oldInput;
+        private EntityMovementInput _currentInput;
+        private MovementState _tempMovementState;
+        private ExtraMovementState _tempExtraMovementState;
+        private Vector3 _inputDirection;
+        private Vector3 _moveDirection;
+        private float _verticalVelocity;
+        private float? _lagMoveSpeedRate;
+        private Vector3 _velocityBeforeAirborne;
+        private float _pauseMovementCountDown;
+        private bool _previouslyGrounded;
+        private bool _previouslyAirborne;
+        private ExtraMovementState _previouslyExtraMovementState;
+        private bool _isTeleporting;
+        private bool _isServerWaitingTeleportConfirm;
+        private bool _isClientConfirmingTeleport;
 
-        public override void EntityAwake()
+        public BuiltInEntityMovementFunctions3D(BaseGameEntity entity, Animator animator, IBuiltInEntityMovement3D entityMovement)
         {
-            // Prepare animator component
-            CacheAnimator = GetComponent<Animator>();
-            // Prepare rigidbody component
-            CacheRigidbody = gameObject.GetOrAddComponent<Rigidbody>();
-            // Prepare collider component
-            CacheCapsuleCollider = gameObject.GetOrAddComponent<CapsuleCollider>();
-            // Prepare open character controller
-            float radius = CacheCapsuleCollider.radius;
-            float height = CacheCapsuleCollider.height;
-            Vector3 center = CacheCapsuleCollider.center;
-            CacheOpenCharacterController = gameObject.GetOrAddComponent<OpenCharacterController>((comp) =>
-            {
-                comp.SetRadiusHeightAndCenter(radius, height, center, true, true);
-            });
-            CacheOpenCharacterController.collision += OnCharacterControllerCollision;
-            // Disable unused component
-            LiteNetLibTransform disablingComp = gameObject.GetComponent<LiteNetLibTransform>();
-            if (disablingComp != null)
-            {
-                Logging.LogWarning("RigidBodyEntityMovement", "You can remove `LiteNetLibTransform` component from game entity, it's not being used anymore [" + name + "]");
-                disablingComp.enabled = false;
-            }
-            // Setup
+            Entity = entity;
+            Animator = animator;
+            EntityMovement = entityMovement;
             _yAngle = _targetYAngle = CacheTransform.eulerAngles.y;
             _lookRotationApplied = true;
-            StopMoveFunction();
         }
 
-        public override void EntityStart()
+        public void EntityStart()
         {
             _yAngle = CacheTransform.eulerAngles.y;
-            CacheOpenCharacterController.SetPosition(CacheTransform.position, true);
             _verticalVelocity = 0;
         }
 
-        public override void ComponentOnEnable()
+        public void ComponentEnabled()
         {
-            CacheOpenCharacterController.enabled = true;
-            CacheOpenCharacterController.SetPosition(CacheTransform.position, true);
             _verticalVelocity = 0;
         }
 
-        public override void ComponentOnDisable()
+        public void OnSetOwnerClient(bool isOwnerClient)
         {
-            CacheOpenCharacterController.enabled = false;
-        }
-
-        public override void EntityOnDestroy()
-        {
-            base.EntityOnDestroy();
-            CacheOpenCharacterController.collision -= OnCharacterControllerCollision;
-        }
-
-        public override void OnSetOwnerClient(bool isOwnerClient)
-        {
-            base.OnSetOwnerClient(isOwnerClient);
             _clientTargetPosition = null;
             NavPaths = null;
         }
 
-        private void OnAnimatorMove()
+        public void OnAnimatorMove()
         {
-            if (!CacheAnimator)
+            if (!Animator)
                 return;
 
             if (useRootMotionWhileNotMoving &&
@@ -181,16 +152,16 @@ namespace MultiplayerARPG
                 !MovementState.Has(MovementState.IsJump))
             {
                 // No movement, apply root motion position / rotation
-                CacheAnimator.ApplyBuiltinRootMotion();
+                Animator.ApplyBuiltinRootMotion();
                 return;
             }
 
             if (MovementState.Has(MovementState.IsGrounded) && useRootMotionForMovement)
-                CacheAnimator.ApplyBuiltinRootMotion();
+                Animator.ApplyBuiltinRootMotion();
             if (!MovementState.Has(MovementState.IsGrounded) && useRootMotionForAirMovement)
-                CacheAnimator.ApplyBuiltinRootMotion();
+                Animator.ApplyBuiltinRootMotion();
             if (MovementState.Has(MovementState.IsUnderWater) && useRootMotionUnderWater)
-                CacheAnimator.ApplyBuiltinRootMotion();
+                Animator.ApplyBuiltinRootMotion();
         }
 
         public void StopMove()
@@ -203,9 +174,10 @@ namespace MultiplayerARPG
             StopMoveFunction();
         }
 
-        private void StopMoveFunction()
+        public void StopMoveFunction()
         {
             NavPaths = null;
+            _lagMoveSpeedRate = null;
         }
 
         public void KeyMovement(Vector3 moveDirection, MovementState movementState)
@@ -220,7 +192,7 @@ namespace MultiplayerARPG
                 if (_inputDirection.sqrMagnitude > 0)
                     NavPaths = null;
                 if (!_isJumping && !_applyingJumpForce)
-                    _isJumping = CacheOpenCharacterController.isGrounded && _tempMovementState.Has(MovementState.IsJump);
+                    _isJumping = _isGrounded && _tempMovementState.Has(MovementState.IsJump);
             }
         }
 
@@ -277,7 +249,7 @@ namespace MultiplayerARPG
         {
             if (!IsServer)
             {
-                Logging.LogWarning("RigidBodyEntityMovement", "Teleport function shouldn't be called at client [" + name + "]");
+                Logging.LogWarning("CharacterControllerEntityMovementFunctions", $"Teleport function shouldn't be called at client [{Entity.name}]");
                 return;
             }
             _isTeleporting = true;
@@ -289,21 +261,20 @@ namespace MultiplayerARPG
             return PhysicUtils.FindGroundedPosition(fromPosition, s_findGroundRaycastHits, findDistance, GameInstance.Singleton.GetGameEntityGroundDetectionLayerMask(), out result, CacheTransform);
         }
 
-        public override void EntityUpdate()
+        public void EntityUpdate()
         {
             UpdateMovement(Time.deltaTime);
             if (CanPredictMovement())
             {
-                // Update movement state
                 _tempMovementState = _moveDirection.sqrMagnitude > 0f ? _tempMovementState : MovementState.None;
                 if (_isUnderWater)
                     _tempMovementState |= MovementState.IsUnderWater;
-                if (CacheOpenCharacterController.isGrounded || _airborneElapsed < airborneDelay)
+                if (_isGrounded || _airborneElapsed < airborneDelay)
                     _tempMovementState |= MovementState.IsGrounded;
                 // Update movement state
                 MovementState = _tempMovementState;
                 // Update extra movement state
-                ExtraMovementState = this.ValidateExtraMovementState(MovementState, _tempExtraMovementState);
+                ExtraMovementState = Entity.ValidateExtraMovementState(MovementState, _tempExtraMovementState);
             }
             else
             {
@@ -311,19 +282,6 @@ namespace MultiplayerARPG
                 if (HasNavPaths && !MovementState.Has(MovementState.Forward))
                     MovementState |= MovementState.Forward;
             }
-        }
-
-        private void WaterCheck()
-        {
-            if (_waterCollider == null)
-            {
-                // Not in water
-                _isUnderWater = false;
-                return;
-            }
-            float footToSurfaceDist = _waterCollider.bounds.max.y - CacheCapsuleCollider.bounds.min.y;
-            float currentThreshold = footToSurfaceDist / (CacheCapsuleCollider.bounds.max.y - CacheCapsuleCollider.bounds.min.y);
-            _isUnderWater = currentThreshold >= underWaterThreshold;
         }
 
         private void UpdateMovement(float deltaTime)
@@ -339,17 +297,17 @@ namespace MultiplayerARPG
             Vector3 tempTargetPosition;
             Vector3 tempPredictPosition;
 
+            tempTargetDistance = 0f;
             tempCurrentPosition = CacheTransform.position;
             tempMoveVelocity = Vector3.zero;
             _moveDirection = Vector3.zero;
-            tempTargetDistance = 0f;
-            WaterCheck();
-
-            bool isGrounded = CacheOpenCharacterController.isGrounded;
-            bool isAirborne = !isGrounded && !_isUnderWater && _airborneElapsed >= airborneDelay;
+            _isUnderWater = EntityMovement.WaterCheck(_waterCollider);
+            _isGrounded = EntityMovement.GroundCheck();
+            
+            bool isAirborne = !_isGrounded && !_isUnderWater && _airborneElapsed >= airborneDelay;
 
             // Update airborne elasped
-            if (CacheOpenCharacterController.isGrounded)
+            if (_isGrounded)
                 _airborneElapsed = 0f;
             else
                 _airborneElapsed += deltaTime;
@@ -415,7 +373,7 @@ namespace MultiplayerARPG
             tempMaxMoveSpeed = tempEntityMoveSpeed;
 
             // Calculate vertical velocity by gravity
-            if (!isGrounded && !_isUnderWater)
+            if (!_isGrounded && !_isUnderWater)
             {
                 if (!useRootMotionForFall)
                     _verticalVelocity = Mathf.MoveTowards(_verticalVelocity, -maxFallVelocity, gravity * deltaTime);
@@ -429,7 +387,7 @@ namespace MultiplayerARPG
             }
 
             // Jumping 
-            if (_acceptedJump || (_pauseMovementCountDown <= 0f && isGrounded && _isJumping && !CacheOpenCharacterController.startedSlide))
+            if (_acceptedJump || (_pauseMovementCountDown <= 0f && _isGrounded && _isJumping))
             {
                 _sendingJump = true;
                 _airborneElapsed = airborneDelay;
@@ -453,12 +411,14 @@ namespace MultiplayerARPG
                 _applyJumpForceCountDown -= Time.deltaTime;
                 if (_applyJumpForceCountDown <= 0f)
                 {
+                    _isGrounded = false;
                     _applyingJumpForce = false;
                     if (!useRootMotionForJump)
+                    {
                         _verticalVelocity = CalculateJumpVerticalSpeed();
+                    }
                 }
             }
-
             // Updating horizontal movement (WASD inputs)
             if (!isAirborne)
             {
@@ -506,15 +466,15 @@ namespace MultiplayerARPG
             }
             if (IsOwnerClientOrOwnedByServer)
             {
-                if (isGrounded && _previouslyAirborne)
+                if (_isGrounded && _previouslyAirborne)
                 {
                     _pauseMovementCountDown = landedPauseMovementDuration;
                 }
-                else if (isGrounded && _previouslyExtraMovementState != ExtraMovementState.IsCrawling && _tempExtraMovementState == ExtraMovementState.IsCrawling)
+                else if (_isGrounded && _previouslyExtraMovementState != ExtraMovementState.IsCrawling && _tempExtraMovementState == ExtraMovementState.IsCrawling)
                 {
                     _pauseMovementCountDown = beforeCrawlingPauseMovementDuration;
                 }
-                else if (isGrounded && _previouslyExtraMovementState == ExtraMovementState.IsCrawling && _tempExtraMovementState != ExtraMovementState.IsCrawling)
+                else if (_isGrounded && _previouslyExtraMovementState == ExtraMovementState.IsCrawling && _tempExtraMovementState != ExtraMovementState.IsCrawling)
                 {
                     _pauseMovementCountDown = afterCrawlingPauseMovementDuration;
                 }
@@ -543,7 +503,7 @@ namespace MultiplayerARPG
                 {
                     if (autoSwimToSurface)
                         _moveDirection.y = 1f;
-                    tempTargetPosition = Vector3.up * (_waterCollider.bounds.max.y - (CacheCapsuleCollider.bounds.size.y * underWaterThreshold));
+                    tempTargetPosition = Vector3.up * (_waterCollider.bounds.max.y - (EntityMovement.GetBounds().size.y * underWaterThreshold));
                     tempCurrentPosition = Vector3.up * CacheTransform.position.y;
                     tempTargetDistance = Vector3.Distance(tempTargetPosition, tempCurrentPosition);
                     tempSqrMagnitude = (tempTargetPosition - tempCurrentPosition).sqrMagnitude;
@@ -570,9 +530,9 @@ namespace MultiplayerARPG
             }
 
             // Don't applies velocity while using root motion
-            if ((isGrounded && useRootMotionForMovement) ||
+            if ((_isGrounded && useRootMotionForMovement) ||
                 (isAirborne && useRootMotionForAirMovement) ||
-                (!isGrounded && !isAirborne && useRootMotionForMovement) ||
+                (!_isGrounded && !isAirborne && useRootMotionForMovement) ||
                 (_isUnderWater && useRootMotionUnderWater))
             {
                 tempMoveVelocity.x = 0;
@@ -589,7 +549,8 @@ namespace MultiplayerARPG
                     _previousPlatformPosition = _groundedTransform.position;
                 }
             }
-            _collisionFlags = CacheOpenCharacterController.Move((tempMoveVelocity + platformMotion) * deltaTime);
+            Vector3 stickGroundMotion = _isGrounded && !_isUnderWater && platformMotion.y <= 0f ? (Vector3.down * stickGroundForce) : Vector3.zero;
+            EntityMovement.Move((tempMoveVelocity + platformMotion + stickGroundMotion) * deltaTime);
 
             if (_yTurnSpeed <= 0f)
                 _yAngle = _targetYAngle;
@@ -600,7 +561,7 @@ namespace MultiplayerARPG
             _currentInput = Entity.SetInputRotation(_currentInput, CacheTransform.rotation);
             _isJumping = false;
             _acceptedJump = false;
-            _previouslyGrounded = isGrounded;
+            _previouslyGrounded = _isGrounded;
             _previouslyAirborne = isAirborne;
             _previouslyExtraMovementState = _tempExtraMovementState;
         }
@@ -657,7 +618,7 @@ namespace MultiplayerARPG
             return Mathf.Sqrt(2f * jumpHeight * gravity);
         }
 
-        private void OnTriggerEnter(Collider other)
+        public void OnTriggerEnter(Collider other)
         {
             if (other.gameObject.layer == PhysicLayers.Water)
             {
@@ -666,7 +627,7 @@ namespace MultiplayerARPG
             }
         }
 
-        private void OnTriggerExit(Collider other)
+        public void OnTriggerExit(Collider other)
         {
             if (other.gameObject.layer == PhysicLayers.Water)
             {
@@ -675,13 +636,13 @@ namespace MultiplayerARPG
             }
         }
 
-        private void OnCharacterControllerCollision(OpenCharacterController.CollisionInfo hit)
+        public void OnControllerColliderHit(Vector3 hitPoint, Transform hitTransform)
         {
-            if (CacheOpenCharacterController.isGrounded)
+            if (_isGrounded)
             {
-                if (CacheTransform.position.y >= hit.point.y)
+                if (CacheTransform.position.y >= hitPoint.y)
                 {
-                    _groundedTransform = hit.collider.transform;
+                    _groundedTransform = hitTransform;
                     _previousPlatformPosition = _groundedTransform.position;
                     return;
                 }
@@ -709,7 +670,7 @@ namespace MultiplayerARPG
                     shouldSendReliably = true;
                     MovementState |= MovementState.IsTeleport;
                 }
-                this.ClientWriteSyncTransform3D(writer);
+                Entity.ClientWriteSyncTransform3D(writer);
                 _sendingJump = false;
                 _isClientConfirmingTeleport = false;
                 return true;
@@ -738,7 +699,7 @@ namespace MultiplayerARPG
                         // Point click should be reliably
                         shouldSendReliably = true;
                     }
-                    this.ClientWriteMovementInput3D(writer, inputState, _currentInput.MovementState, _currentInput.ExtraMovementState, _currentInput.Position, _currentInput.Rotation);
+                    Entity.ClientWriteMovementInput3D(writer, inputState, _currentInput.MovementState, _currentInput.ExtraMovementState, _currentInput.Position, _currentInput.Rotation);
                     _sendingJump = false;
                     _isClientConfirmingTeleport = false;
                     _oldInput = _currentInput;
@@ -771,7 +732,7 @@ namespace MultiplayerARPG
             {
                 MovementState &= ~MovementState.IsTeleport;
             }
-            this.ServerWriteSyncTransform3D(writer);
+            Entity.ServerWriteSyncTransform3D(writer);
             _sendingJump = false;
             _isTeleporting = false;
             return true;
@@ -812,7 +773,7 @@ namespace MultiplayerARPG
                     {
                         _yAngle = _targetYAngle = yAngle;
                         UpdateRotation();
-                        CacheOpenCharacterController.SetPosition(position, false);
+                        CacheTransform.position = position;
                     }
                     MovementState = movementState;
                     ExtraMovementState = extraMovementState;
@@ -989,13 +950,13 @@ namespace MultiplayerARPG
                 _acceptedJump = true;
         }
 
-        protected virtual void OnTeleport(Vector3 position, float yAngle)
+        private void OnTeleport(Vector3 position, float yAngle)
         {
             _airborneElapsed = 0;
             _verticalVelocity = 0;
             _clientTargetPosition = null;
             NavPaths = null;
-            CacheOpenCharacterController.SetPosition(position, false);
+            CacheTransform.position = position;
             _yAngle = _targetYAngle = yAngle;
             UpdateRotation();
             if (IsServer && !IsOwnedByServer)
@@ -1008,19 +969,5 @@ namespace MultiplayerARPG
         {
             return Entity.IsOwnerClient || (Entity.IsOwnerClientOrOwnedByServer && movementSecure == MovementSecure.NotSecure) || (Entity.IsServer && movementSecure == MovementSecure.ServerAuthoritative);
         }
-
-#if UNITY_EDITOR
-        [ContextMenu("Applies Collider Settings To Controller")]
-        public void AppliesColliderSettingsToController()
-        {
-            CapsuleCollider collider = gameObject.GetOrAddComponent<CapsuleCollider>();
-            float radius = collider.radius;
-            float height = collider.height;
-            Vector3 center = collider.center;
-            // Prepare open character controller
-            OpenCharacterController controller = gameObject.GetOrAddComponent<OpenCharacterController>();
-            controller.SetRadiusHeightAndCenter(radius, height, center, true, true);
-        }
-#endif
     }
 }

@@ -127,7 +127,7 @@ namespace MultiplayerARPG
             if (movementSecure == MovementSecure.ServerAuthoritative)
             {
                 // Send movement input to server, then server will apply movement and sync transform to clients
-                this.SetInputStop(_currentInput);
+                Entity.SetInputStop(_currentInput);
             }
             StopMoveFunction();
         }
@@ -219,23 +219,18 @@ namespace MultiplayerARPG
                 // Update extra movement state
                 ExtraMovementState = this.ValidateExtraMovementState(MovementState, _tempExtraMovementState);
                 // Set current input
-                _currentInput = this.SetInputMovementState(_currentInput, MovementState);
-                _currentInput = this.SetInputExtraMovementState(_currentInput, ExtraMovementState);
+                _currentInput = Entity.SetInputMovementState(_currentInput, MovementState);
+                _currentInput = Entity.SetInputExtraMovementState(_currentInput, ExtraMovementState);
                 if (_inputDirection.HasValue)
                 {
-                    _currentInput = this.SetInputIsKeyMovement(_currentInput, true);
-                    _currentInput = this.SetInputPosition(_currentInput, CacheTransform.position);
+                    _currentInput = Entity.SetInputIsKeyMovement(_currentInput, true);
+                    _currentInput = Entity.SetInputPosition(_currentInput, CacheTransform.position);
                 }
                 else if (_moveByDestination)
                 {
-                    _currentInput = this.SetInputIsKeyMovement(_currentInput, false);
-                    _currentInput = this.SetInputPosition(_currentInput, CacheNavMeshAgent.destination);
+                    _currentInput = Entity.SetInputIsKeyMovement(_currentInput, false);
+                    _currentInput = Entity.SetInputPosition(_currentInput, CacheNavMeshAgent.destination);
                 }
-            }
-            else
-            {
-                // Update movement state
-                MovementState = (CacheNavMeshAgent.velocity.sqrMagnitude > 0 ? MovementState.Forward : MovementState.None) | MovementState.IsGrounded;
             }
             // Update rotating
             if (_yTurnSpeed <= 0f)
@@ -244,7 +239,7 @@ namespace MultiplayerARPG
                 _yAngle = Mathf.LerpAngle(_yAngle, _targetYAngle, _yTurnSpeed * deltaTime);
             UpdateRotation();
             _lookRotationApplied = true;
-            _currentInput = this.SetInputRotation(_currentInput, CacheTransform.rotation);
+            _currentInput = Entity.SetInputRotation(_currentInput, CacheTransform.rotation);
         }
 
         private void UpdateRotation()
@@ -289,7 +284,7 @@ namespace MultiplayerARPG
                     shouldSendReliably = true;
                     _currentInput.MovementState |= MovementState.IsTeleport;
                 }
-                if (this.DifferInputEnoughToSend(_oldInput, _currentInput, out EntityMovementInputState inputState))
+                if (Entity.DifferInputEnoughToSend(_oldInput, _currentInput, out EntityMovementInputState inputState))
                 {
                     if (!_currentInput.IsKeyMovement)
                     {
@@ -360,6 +355,7 @@ namespace MultiplayerARPG
                         CacheTransform.eulerAngles = new Vector3(0, yAngle, 0);
                         CacheNavMeshAgent.Warp(position);
                     }
+                    MovementState = movementState;
                     ExtraMovementState = extraMovementState;
                 }
                 else if (!IsOwnerClient)
@@ -367,6 +363,7 @@ namespace MultiplayerARPG
                     _targetYAngle = yAngle;
                     _yTurnSpeed = 1f / Time.fixedDeltaTime;
                     SetMovePaths(position);
+                    MovementState = movementState;
                     ExtraMovementState = extraMovementState;
                 }
                 _acceptedPositionTimestamp = timestamp;
@@ -472,6 +469,7 @@ namespace MultiplayerARPG
                     _yAngle = _targetYAngle = yAngle;
                     UpdateRotation();
                 }
+                MovementState = movementState;
                 ExtraMovementState = extraMovementState;
                 if (Vector3.Distance(position.GetXZ(), CacheTransform.position.GetXZ()) > 0.01f)
                 {

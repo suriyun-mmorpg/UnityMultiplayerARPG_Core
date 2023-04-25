@@ -89,7 +89,7 @@ namespace MultiplayerARPG
             if (movementSecure == MovementSecure.ServerAuthoritative)
             {
                 // Send movement input to server, then server will apply movement and sync transform to clients
-                this.SetInputStop(_currentInput);
+                Entity.SetInputStop(_currentInput);
             }
             StopMoveFunction();
         }
@@ -193,8 +193,8 @@ namespace MultiplayerARPG
                 // Update extra movement state
                 ExtraMovementState = this.ValidateExtraMovementState(MovementState, _tempExtraMovementState);
                 // Set current input
-                _currentInput = this.SetInputMovementState(_currentInput, MovementState);
-                _currentInput = this.SetInputExtraMovementState(_currentInput, ExtraMovementState);
+                _currentInput = Entity.SetInputMovementState(_currentInput, MovementState);
+                _currentInput = Entity.SetInputExtraMovementState(_currentInput, ExtraMovementState);
             }
             else
             {
@@ -298,16 +298,16 @@ namespace MultiplayerARPG
                 // Set inputs
                 if (HasNavPaths)
                 {
-                    _currentInput = this.SetInputPosition(_currentInput, tempTargetPosition);
-                    _currentInput = this.SetInputIsKeyMovement(_currentInput, false);
+                    _currentInput = Entity.SetInputPosition(_currentInput, tempTargetPosition);
+                    _currentInput = Entity.SetInputIsKeyMovement(_currentInput, false);
                 }
                 else
                 {
-                    _currentInput = this.SetInputPosition(_currentInput, tempPredictPosition);
-                    _currentInput = this.SetInputIsKeyMovement(_currentInput, true);
+                    _currentInput = Entity.SetInputPosition(_currentInput, tempPredictPosition);
+                    _currentInput = Entity.SetInputIsKeyMovement(_currentInput, true);
                 }
             }
-            _currentInput = this.SetInputDirection2D(_currentInput, Direction2D);
+            _currentInput = Entity.SetInputDirection2D(_currentInput, Direction2D);
             CacheRigidbody2D.velocity = tempMoveVelocity;
         }
 
@@ -359,7 +359,7 @@ namespace MultiplayerARPG
                     shouldSendReliably = true;
                     _currentInput.MovementState |= MovementState.IsTeleport;
                 }
-                if (this.DifferInputEnoughToSend(_oldInput, _currentInput, out EntityMovementInputState inputState))
+                if (Entity.DifferInputEnoughToSend(_oldInput, _currentInput, out EntityMovementInputState inputState))
                 {
                     if (!_currentInput.IsKeyMovement)
                     {
