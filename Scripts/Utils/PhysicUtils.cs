@@ -187,8 +187,7 @@ public static class PhysicUtils
 
     public static Vector3 FindGroundedPosition(Vector3 origin, RaycastHit[] allocHits, float distance, int layerMask, Transform exceptionObject = null)
     {
-        Vector3 result;
-        FindGroundedPosition(origin, allocHits, distance, layerMask, out result, exceptionObject);
+        FindGroundedPosition(origin, allocHits, distance, layerMask, out Vector3 result, exceptionObject);
         return result;
     }
 
