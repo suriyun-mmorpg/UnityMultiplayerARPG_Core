@@ -270,6 +270,7 @@ namespace MultiplayerARPG
         protected virtual bool UpdateEntityComponents { get { return true; } }
         protected NetDataWriter EntityStateMessageWriter { get; private set; } = new NetDataWriter();
         protected NetDataWriter EntityStateDataWriter { get; private set; } = new NetDataWriter();
+        private bool? _wasUpdateEntityComponents;
 
         #region Events
         public event System.Action onStart;
@@ -281,6 +282,7 @@ namespace MultiplayerARPG
         public event System.Action onSetup;
         public event System.Action onSetupNetElements;
         public event System.Action onSetOwnerClient;
+        public event System.Action<bool> onUpdateEntityComponentsChanged;
         public event NetworkDestroyDelegate onNetworkDestroy;
         #endregion
 
@@ -441,13 +443,20 @@ namespace MultiplayerARPG
         private void LateUpdate()
         {
             Profiler.BeginSample("Entity Components - LateUpdate");
-            if (UpdateEntityComponents)
+            bool updateEntityComponents = UpdateEntityComponents;
+            if (updateEntityComponents)
             {
                 for (int i = 0; i < EntityComponents.Length; ++i)
                 {
                     if (EntityComponents[i].Enabled)
                         EntityComponents[i].EntityLateUpdate();
                 }
+            }
+            if (!_wasUpdateEntityComponents.HasValue || _wasUpdateEntityComponents.Value != updateEntityComponents)
+            {
+                _wasUpdateEntityComponents = updateEntityComponents;
+                if (onUpdateEntityComponentsChanged != null)
+                    onUpdateEntityComponentsChanged.Invoke(updateEntityComponents);
             }
             Profiler.EndSample();
             EntityLateUpdate();
