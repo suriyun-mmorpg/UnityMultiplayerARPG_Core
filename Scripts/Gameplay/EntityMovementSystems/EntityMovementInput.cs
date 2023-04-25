@@ -145,7 +145,7 @@ namespace MultiplayerARPG
                 return true;
             }
             // TODO: Send delta changes
-            if (newInput.IsStopped)
+            if (newInput.IsStopped && !oldInput.IsStopped)
                 state |= EntityMovementInputState.IsStopped;
             if (newInput.IsKeyMovement)
                 state |= EntityMovementInputState.IsKeyMovement;
@@ -153,7 +153,7 @@ namespace MultiplayerARPG
                 state |= EntityMovementInputState.PositionChanged;
             if (Quaternion.Angle(newInput.Rotation, oldInput.Rotation) > 0.01f)
                 state |= EntityMovementInputState.RotationChanged;
-            if (newInput.MovementState.Has(MovementState.IsJump))
+            if (newInput.MovementState.Has(MovementState.IsJump) || newInput.MovementState.Has(MovementState.IsTeleport))
                 state |= EntityMovementInputState.Other;
             if (newInput.ExtraMovementState != oldInput.ExtraMovementState)
                 state |= EntityMovementInputState.Other;

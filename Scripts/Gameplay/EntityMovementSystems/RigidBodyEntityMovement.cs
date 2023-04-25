@@ -717,26 +717,26 @@ namespace MultiplayerARPG
             if (movementSecure == MovementSecure.ServerAuthoritative && IsOwnerClient && !IsServer)
             {
                 _currentInput = this.SetInputExtraMovementState(_currentInput, _tempExtraMovementState);
-                if (this.DifferInputEnoughToSend(_oldInput, _currentInput, out EntityMovementInputState inputState) || _sendingJump || _isClientConfirmingTeleport)
+                if (_sendingJump)
                 {
-                    if (_sendingJump)
-                    {
-                        shouldSendReliably = true;
-                        _currentInput = this.SetInputJump(_currentInput);
-                    }
-                    else
-                    {
-                        _currentInput = this.ClearInputJump(_currentInput);
-                    }
+                    shouldSendReliably = true;
+                    _currentInput = this.SetInputJump(_currentInput);
+                }
+                else
+                {
+                    _currentInput = this.ClearInputJump(_currentInput);
+                }
+                if (_isClientConfirmingTeleport)
+                {
+                    shouldSendReliably = true;
+                    _currentInput.MovementState |= MovementState.IsTeleport;
+                }
+                if (this.DifferInputEnoughToSend(_oldInput, _currentInput, out EntityMovementInputState inputState))
+                {
                     if (!_currentInput.IsKeyMovement)
                     {
                         // Point click should be reliably
                         shouldSendReliably = true;
-                    }
-                    if (_isClientConfirmingTeleport)
-                    {
-                        shouldSendReliably = true;
-                        _currentInput.MovementState |= MovementState.IsTeleport;
                     }
                     this.ClientWriteMovementInput3D(writer, inputState, _currentInput.MovementState, _currentInput.ExtraMovementState, _currentInput.Position, _currentInput.Rotation);
                     _sendingJump = false;
@@ -846,8 +846,6 @@ namespace MultiplayerARPG
                 // Movement handling at client, so don't read movement inputs from client (but have to read transform)
                 return;
             }
-            if (!Entity.CanMove())
-                return;
             reader.ReadMovementInputMessage3D(out EntityMovementInputState inputState, out MovementState movementState, out ExtraMovementState extraMovementState, out Vector3 position, out float yAngle, out long timestamp);
             if (movementState.Has(MovementState.IsTeleport))
             {
@@ -864,46 +862,46 @@ namespace MultiplayerARPG
                 // Timestamp is a lot difference to server's timestamp, player might try to hack a game or packet may corrupted occurring, so skip it
                 return;
             }
+            if (!Entity.CanMove())
+            {
+                // It can't move, so don't move
+                return;
+            }
             if (_acceptedPositionTimestamp <= timestamp)
             {
-                if (!inputState.Has(EntityMovementInputState.IsStopped))
+                _tempMovementState = movementState;
+                _tempExtraMovementState = extraMovementState;
+                _clientTargetPosition = null;
+                if (inputState.Has(EntityMovementInputState.PositionChanged))
                 {
-                    _tempMovementState = movementState;
-                    _tempExtraMovementState = extraMovementState;
-                    _clientTargetPosition = null;
-                    if (inputState.Has(EntityMovementInputState.PositionChanged))
+                    if (inputState.Has(EntityMovementInputState.IsKeyMovement))
                     {
-                        if (inputState.Has(EntityMovementInputState.IsKeyMovement))
-                        {
-                            NavPaths = null;
-                            _clientTargetPosition = position;
-                        }
-                        else
-                        {
-                            _clientTargetPosition = null;
-                            SetMovePaths(position, true);
-                        }
+                        NavPaths = null;
+                        _clientTargetPosition = position;
                     }
-                    if (inputState.Has(EntityMovementInputState.RotationChanged))
+                    else
                     {
-                        if (IsClient)
-                        {
-                            _targetYAngle = yAngle;
-                            _yTurnSpeed = 1f / Time.fixedDeltaTime;
-                        }
-                        else
-                        {
-                            _yAngle = _targetYAngle = yAngle;
-                            UpdateRotation();
-                        }
+                        _clientTargetPosition = null;
+                        SetMovePaths(position, true);
                     }
-                    if (movementState.Has(MovementState.IsJump))
-                        _acceptedJump = true;
                 }
-                else
+                if (inputState.Has(EntityMovementInputState.RotationChanged))
                 {
+                    if (IsClient)
+                    {
+                        _targetYAngle = yAngle;
+                        _yTurnSpeed = 1f / Time.fixedDeltaTime;
+                    }
+                    else
+                    {
+                        _yAngle = _targetYAngle = yAngle;
+                        UpdateRotation();
+                    }
+                }
+                if (movementState.Has(MovementState.IsJump))
+                    _acceptedJump = true;
+                if (inputState.Has(EntityMovementInputState.IsStopped))
                     StopMoveFunction();
-                }
                 _acceptedPositionTimestamp = timestamp;
             }
         }

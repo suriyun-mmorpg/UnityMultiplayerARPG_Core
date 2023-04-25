@@ -354,17 +354,17 @@ namespace MultiplayerARPG
             }
             if (movementSecure == MovementSecure.ServerAuthoritative && IsOwnerClient && !IsServer)
             {
-                if (this.DifferInputEnoughToSend(_oldInput, _currentInput, out EntityMovementInputState inputState) || _isClientConfirmingTeleport)
+                if (_isClientConfirmingTeleport)
+                {
+                    shouldSendReliably = true;
+                    _currentInput.MovementState |= MovementState.IsTeleport;
+                }
+                if (this.DifferInputEnoughToSend(_oldInput, _currentInput, out EntityMovementInputState inputState))
                 {
                     if (!_currentInput.IsKeyMovement)
                     {
                         // Point click should be reliably
                         shouldSendReliably = true;
-                    }
-                    if (_isClientConfirmingTeleport)
-                    {
-                        shouldSendReliably = true;
-                        _currentInput.MovementState |= MovementState.IsTeleport;
                     }
                     this.ClientWriteMovementInput2D(writer, inputState, _currentInput.MovementState, _currentInput.ExtraMovementState, _currentInput.Position, _currentInput.Direction2D);
                     _isClientConfirmingTeleport = false;
@@ -456,8 +456,6 @@ namespace MultiplayerARPG
                 // Movement handling at client, so don't read movement inputs from client (but have to read transform)
                 return;
             }
-            if (!Entity.CanMove())
-                return;
             reader.ReadMovementInputMessage2D(out EntityMovementInputState inputState, out MovementState movementState, out ExtraMovementState extraMovementState, out Vector2 position, out DirectionVector2 direction2D, out long timestamp);
             if (movementState.Has(MovementState.IsTeleport))
             {
@@ -474,30 +472,30 @@ namespace MultiplayerARPG
                 // Timestamp is a lot difference to server's timestamp, player might try to hack a game or packet may corrupted occurring, so skip it
                 return;
             }
+            if (!Entity.CanMove())
+            {
+                // It can't move, so don't move
+                return;
+            }
             if (_acceptedPositionTimestamp <= timestamp)
             {
-                if (!inputState.Has(EntityMovementInputState.IsStopped))
+                NavPaths = null;
+                _tempMovementState = movementState;
+                _tempExtraMovementState = extraMovementState;
+                if (inputState.Has(EntityMovementInputState.PositionChanged))
                 {
-                    NavPaths = null;
-                    _tempMovementState = movementState;
-                    _tempExtraMovementState = extraMovementState;
-                    if (inputState.Has(EntityMovementInputState.PositionChanged))
+                    if (inputState.Has(EntityMovementInputState.IsKeyMovement))
                     {
-                        if (inputState.Has(EntityMovementInputState.IsKeyMovement))
-                        {
-                            _clientTargetPosition = position;
-                        }
-                        else
-                        {
-                            SetMovePaths(position, true);
-                        }
+                        _clientTargetPosition = position;
                     }
-                    Direction2D = direction2D;
+                    else
+                    {
+                        SetMovePaths(position, true);
+                    }
                 }
-                else
-                {
+                Direction2D = direction2D;
+                if (inputState.Has(EntityMovementInputState.IsStopped))
                     StopMoveFunction();
-                }
                 _acceptedPositionTimestamp = timestamp;
             }
         }
