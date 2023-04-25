@@ -2,7 +2,6 @@
 using LiteNetLibManager;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.AI;
 
 namespace MultiplayerARPG
 {
@@ -78,12 +77,14 @@ namespace MultiplayerARPG
                 rigidBody.useGravity = false;
                 rigidBody.isKinematic = true;
             }
+            // Setup
             Functions = new BuiltInEntityMovementFunctions3D(Entity, CacheAnimator, this)
             {
                 stoppingDistance = stoppingDistance,
                 movementSecure = movementSecure,
                 jumpHeight = jumpHeight,
                 applyJumpForceMode = applyJumpForceMode,
+                applyJumpForceFixedDuration = applyJumpForceFixedDuration,
                 backwardMoveSpeedRate = backwardMoveSpeedRate,
                 gravity = gravity,
                 maxFallVelocity = maxFallVelocity,
@@ -113,8 +114,8 @@ namespace MultiplayerARPG
 
         public override void ComponentOnEnable()
         {
-            CacheCharacterController.enabled = true;
             Functions.ComponentEnabled();
+            CacheCharacterController.enabled = true;
         }
 
         public override void ComponentOnDisable()
@@ -151,18 +152,6 @@ namespace MultiplayerARPG
         public override void EntityUpdate()
         {
             Functions.EntityUpdate();
-        }
-
-        public bool WaterCheck(Collider waterCollider)
-        {
-            if (waterCollider == null)
-            {
-                // Not in water
-                return false;
-            }
-            float footToSurfaceDist = waterCollider.bounds.max.y - CacheCharacterController.bounds.min.y;
-            float currentThreshold = footToSurfaceDist / (CacheCharacterController.bounds.max.y - CacheCharacterController.bounds.min.y);
-            return currentThreshold >= underWaterThreshold;
         }
 
         public bool GroundCheck()

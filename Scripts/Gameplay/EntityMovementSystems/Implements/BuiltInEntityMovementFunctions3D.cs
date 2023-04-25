@@ -249,7 +249,7 @@ namespace MultiplayerARPG
         {
             if (!IsServer)
             {
-                Logging.LogWarning("CharacterControllerEntityMovementFunctions", $"Teleport function shouldn't be called at client [{Entity.name}]");
+                Logging.LogWarning("BuiltInEntityMovementFunctions3D", $"Teleport function shouldn't be called at client [{Entity.name}]");
                 return;
             }
             _isTeleporting = true;
@@ -284,6 +284,18 @@ namespace MultiplayerARPG
             }
         }
 
+        public bool WaterCheck(Collider waterCollider)
+        {
+            if (waterCollider == null)
+            {
+                // Not in water
+                return false;
+            }
+            float footToSurfaceDist = waterCollider.bounds.max.y - EntityMovement.GetBounds().min.y;
+            float currentThreshold = footToSurfaceDist / (EntityMovement.GetBounds().max.y - EntityMovement.GetBounds().min.y);
+            return currentThreshold >= underWaterThreshold;
+        }
+
         private void UpdateMovement(float deltaTime)
         {
             float tempSqrMagnitude;
@@ -301,7 +313,7 @@ namespace MultiplayerARPG
             tempCurrentPosition = CacheTransform.position;
             tempMoveVelocity = Vector3.zero;
             _moveDirection = Vector3.zero;
-            _isUnderWater = EntityMovement.WaterCheck(_waterCollider);
+            _isUnderWater = WaterCheck(_waterCollider);
             _isGrounded = EntityMovement.GroundCheck();
             
             bool isAirborne = !_isGrounded && !_isUnderWater && _airborneElapsed >= airborneDelay;
