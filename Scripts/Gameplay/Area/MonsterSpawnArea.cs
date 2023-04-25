@@ -54,8 +54,7 @@ namespace MultiplayerARPG
 
         protected override BaseMonsterCharacterEntity SpawnInternal(BaseMonsterCharacterEntity prefab, int level)
         {
-            Vector3 spawnPosition;
-            if (GetRandomPosition(out spawnPosition))
+            if (GetRandomPosition(out Vector3 spawnPosition))
             {
                 Quaternion spawnRotation = GetRandomRotation();
                 LiteNetLibIdentity spawnObj = BaseGameNetworkManager.Singleton.Assets.GetObjectInstance(
