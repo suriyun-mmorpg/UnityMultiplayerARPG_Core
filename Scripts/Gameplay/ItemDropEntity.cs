@@ -10,7 +10,7 @@ namespace MultiplayerARPG
     public class ItemDropEntity : BaseGameEntity, IPickupActivatableEntity
     {
         public const float GROUND_DETECTION_Y_OFFSETS = 3f;
-        private static readonly RaycastHit[] findGroundRaycastHits = new RaycastHit[1000];
+        private static readonly RaycastHit[] s_findGroundRaycastHits = new RaycastHit[4];
 
         [Category("Relative GameObjects/Transforms")]
         [Tooltip("Item's `dropModel` will be instantiated to this transform for items which drops from characters")]
@@ -39,15 +39,15 @@ namespace MultiplayerARPG
         protected ItemDropTable itemDropTable;
 
         [System.NonSerialized]
-        private List<ItemDrop> cacheRandomItems;
+        private List<ItemDrop> _cacheRandomItems;
         public List<ItemDrop> CacheRandomItems
         {
             get
             {
-                if (cacheRandomItems == null)
+                if (_cacheRandomItems == null)
                 {
                     int i = 0;
-                    cacheRandomItems = new List<ItemDrop>();
+                    _cacheRandomItems = new List<ItemDrop>();
                     if (randomItems != null &&
                         randomItems.Length > 0)
                     {
@@ -57,7 +57,7 @@ namespace MultiplayerARPG
                                 randomItems[i].maxAmount <= 0 ||
                                 randomItems[i].dropRate <= 0)
                                 continue;
-                            cacheRandomItems.Add(randomItems[i]);
+                            _cacheRandomItems.Add(randomItems[i]);
                         }
                     }
                     if (itemDropTable != null &&
@@ -70,11 +70,11 @@ namespace MultiplayerARPG
                                 itemDropTable.randomItems[i].maxAmount <= 0 ||
                                 itemDropTable.randomItems[i].dropRate <= 0)
                                 continue;
-                            cacheRandomItems.Add(itemDropTable.randomItems[i]);
+                            _cacheRandomItems.Add(itemDropTable.randomItems[i]);
                         }
                     }
                 }
-                return cacheRandomItems;
+                return _cacheRandomItems;
             }
         }
         public bool PutOnPlaceholder { get; protected set; }
@@ -87,7 +87,8 @@ namespace MultiplayerARPG
         public Vector3 SpawnPosition { get; protected set; }
         public float DestroyDelay { get { return destroyDelay; } }
         public float DestroyRespawnDelay { get { return destroyRespawnDelay; } }
-        private GameObject dropModel;
+
+        private GameObject _dropModel;
 
         public override string EntityTitle
         {
@@ -256,16 +257,16 @@ namespace MultiplayerARPG
                 return;
             // Activate container to show item drop model
             ModelContainer.gameObject.SetActive(true);
-            if (dropModel != null)
-                Destroy(dropModel);
+            if (_dropModel != null)
+                Destroy(_dropModel);
             BaseItem item;
             if (itemDropData.putOnPlaceholder && GameInstance.Items.TryGetValue(itemDropData.dataId, out item) && item.DropModel != null)
             {
-                dropModel = Instantiate(item.DropModel, ModelContainer);
-                dropModel.gameObject.SetLayerRecursively(CurrentGameInstance.itemDropLayer, true);
-                dropModel.gameObject.SetActive(true);
-                dropModel.RemoveComponentsInChildren<Collider>(false);
-                dropModel.transform.localPosition = Vector3.zero;
+                _dropModel = Instantiate(item.DropModel, ModelContainer);
+                _dropModel.gameObject.SetLayerRecursively(CurrentGameInstance.itemDropLayer, true);
+                _dropModel.gameObject.SetActive(true);
+                _dropModel.RemoveComponentsInChildren<Collider>(false);
+                _dropModel.transform.localPosition = Vector3.zero;
             }
         }
 
@@ -339,7 +340,7 @@ namespace MultiplayerARPG
             if (GameInstance.Singleton.DimensionType == DimensionType.Dimension3D)
             {
                 // Find drop position on ground
-                dropPosition = PhysicUtils.FindGroundedPosition(dropPosition, findGroundRaycastHits, GROUND_DETECTION_DISTANCE, GameInstance.Singleton.GetItemDropGroundDetectionLayerMask());
+                dropPosition = PhysicUtils.FindGroundedPosition(dropPosition, s_findGroundRaycastHits, GROUND_DETECTION_DISTANCE, GameInstance.Singleton.GetItemDropGroundDetectionLayerMask());
             }
             LiteNetLibIdentity spawnObj = BaseGameNetworkManager.Singleton.Assets.GetObjectInstance(
                 prefab.Identity.HashAssetId,

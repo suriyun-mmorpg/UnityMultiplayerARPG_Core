@@ -9,6 +9,7 @@ namespace MultiplayerARPG
     public class ItemsContainerEntity : BaseGameEntity, IActivatableEntity
     {
         public const float GROUND_DETECTION_Y_OFFSETS = 3f;
+        private static readonly RaycastHit[] s_findGroundRaycastHits = new RaycastHit[4];
 
         [Category(5, "Items Container Settings")]
         [Tooltip("Delay before the entity destroyed, you may set some delay to play destroyed animation by `onItemDropDestroy` event before it's going to be destroyed from the game.")]
@@ -22,22 +23,20 @@ namespace MultiplayerARPG
         [SerializeField]
         protected UnityEvent onItemsContainerDestroy;
 
-        private static readonly RaycastHit[] findGroundRaycastHits = new RaycastHit[1000];
-
-        protected SyncFieldString dropperTitle = new SyncFieldString();
+        protected SyncFieldString _dropperTitle = new SyncFieldString();
         public SyncFieldString DropperTitle
         {
-            get { return dropperTitle; }
+            get { return _dropperTitle; }
         }
-        protected SyncFieldInt dropperEntityId = new SyncFieldInt();
+        protected SyncFieldInt _dropperEntityId = new SyncFieldInt();
         public SyncFieldInt DropperEntityId
         {
-            get { return dropperEntityId; }
+            get { return _dropperEntityId; }
         }
-        protected SyncListCharacterItem items = new SyncListCharacterItem();
+        protected SyncListCharacterItem _items = new SyncListCharacterItem();
         public SyncListCharacterItem Items
         {
-            get { return items; }
+            get { return _items; }
         }
         public RewardGivenType GivenType { get; protected set; }
         public HashSet<string> Looters { get; protected set; }
@@ -45,35 +44,35 @@ namespace MultiplayerARPG
         {
             get
             {
-                if (!string.IsNullOrEmpty(dropperTitle.Value))
+                if (!string.IsNullOrEmpty(_dropperTitle.Value))
                 {
                     return ZString.Format(LanguageManager.GetText(formatKeyCorpseTitle), DropperTitle.Value);
                 }
-                if (GameInstance.MonsterCharacterEntities.ContainsKey(dropperEntityId.Value))
+                if (GameInstance.MonsterCharacterEntities.ContainsKey(_dropperEntityId.Value))
                 {
-                    return ZString.Format(LanguageManager.GetText(formatKeyCorpseTitle), GameInstance.MonsterCharacterEntities[dropperEntityId.Value].EntityTitle);
+                    return ZString.Format(LanguageManager.GetText(formatKeyCorpseTitle), GameInstance.MonsterCharacterEntities[_dropperEntityId.Value].EntityTitle);
                 }
                 return base.EntityTitle;
             }
         }
 
         // Private variables
-        protected bool isDestroyed;
-        protected float dropTime;
-        protected float appearDuration;
+        protected bool _isDestroyed;
+        protected float _dropTime;
+        protected float _appearDuration;
 
         protected override void SetupNetElements()
         {
             base.SetupNetElements();
-            dropperTitle.syncMode = LiteNetLibSyncField.SyncMode.ServerToClients;
-            dropperEntityId.syncMode = LiteNetLibSyncField.SyncMode.ServerToClients;
-            items.forOwnerOnly = false;
+            _dropperTitle.syncMode = LiteNetLibSyncField.SyncMode.ServerToClients;
+            _dropperEntityId.syncMode = LiteNetLibSyncField.SyncMode.ServerToClients;
+            _items.forOwnerOnly = false;
         }
 
         public override void OnSetup()
         {
             base.OnSetup();
-            NetworkDestroy(appearDuration);
+            NetworkDestroy(_appearDuration);
         }
 
         [AllRpc]
@@ -91,7 +90,7 @@ namespace MultiplayerARPG
         public virtual bool IsAbleToLoot(BaseCharacterEntity baseCharacterEntity)
         {
             if ((Looters == null || Looters.Count == 0 || Looters.Contains(baseCharacterEntity.Id) ||
-                Time.unscaledTime - dropTime > CurrentGameInstance.itemLootLockDuration) && !isDestroyed)
+                Time.unscaledTime - _dropTime > CurrentGameInstance.itemLootLockDuration) && !_isDestroyed)
                 return true;
             return false;
         }
@@ -105,10 +104,10 @@ namespace MultiplayerARPG
                 return;
             if (Items.Count > 0)
                 return;
-            if (isDestroyed)
+            if (_isDestroyed)
                 return;
             // Mark as destroyed
-            isDestroyed = true;
+            _isDestroyed = true;
             // Tell clients that the item drop destroy to play animation at client
             CallAllOnItemDropDestroy();
             // Destroy this entity
@@ -152,7 +151,7 @@ namespace MultiplayerARPG
             if (GameInstance.Singleton.DimensionType == DimensionType.Dimension3D)
             {
                 // Find drop position on ground
-                dropPosition = PhysicUtils.FindGroundedPosition(dropPosition, findGroundRaycastHits, GROUND_DETECTION_DISTANCE, GameInstance.Singleton.GetItemDropGroundDetectionLayerMask());
+                dropPosition = PhysicUtils.FindGroundedPosition(dropPosition, s_findGroundRaycastHits, GROUND_DETECTION_DISTANCE, GameInstance.Singleton.GetItemDropGroundDetectionLayerMask());
             }
             LiteNetLibIdentity spawnObj = BaseGameNetworkManager.Singleton.Assets.GetObjectInstance(
                 prefab.Identity.HashAssetId,
@@ -161,9 +160,9 @@ namespace MultiplayerARPG
             itemsContainerEntity.Items.AddRange(dropItems);
             itemsContainerEntity.GivenType = givenType;
             itemsContainerEntity.Looters = new HashSet<string>(looters);
-            itemsContainerEntity.isDestroyed = false;
-            itemsContainerEntity.dropTime = Time.unscaledTime;
-            itemsContainerEntity.appearDuration = appearDuration;
+            itemsContainerEntity._isDestroyed = false;
+            itemsContainerEntity._dropTime = Time.unscaledTime;
+            itemsContainerEntity._appearDuration = appearDuration;
             if (dropper != null)
             {
                 if (!string.IsNullOrEmpty(dropper.SyncTitle))
