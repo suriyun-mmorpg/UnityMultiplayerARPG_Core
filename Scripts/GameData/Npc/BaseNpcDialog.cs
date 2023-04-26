@@ -79,10 +79,9 @@ namespace MultiplayerARPG
             SetDialogByPort(port, null);
         }
 
-        public virtual async UniTask<bool> IsPassMenuCondition(IPlayerCharacterData character)
+        public virtual UniTask<bool> IsPassMenuCondition(IPlayerCharacterData character)
         {
-            await UniTask.Yield();
-            return true;
+            return UniTask.FromResult(true);
         }
 
         public static BaseNpcDialog GetValidatedDialogOrNull(BaseNpcDialog dialog, BasePlayerCharacterEntity characterEntity)
