@@ -127,16 +127,6 @@ namespace MultiplayerARPG
             get { return destroyRespawnDelay; }
         }
 
-        protected override bool UpdateEntityComponents
-        {
-            get
-            {
-                if (IsServer && Identity.CountSubscribers() == 0)
-                    return false;
-                return true;
-            }
-        }
-
         protected bool _isDestroyed;
         protected readonly HashSet<string> _looters = new HashSet<string>();
         protected readonly List<CharacterItem> _droppingItems = new List<CharacterItem>();

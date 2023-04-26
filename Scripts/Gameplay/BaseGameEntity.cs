@@ -267,7 +267,15 @@ namespace MultiplayerARPG
         }
 
         protected IGameEntityComponent[] EntityComponents { get; private set; }
-        protected virtual bool UpdateEntityComponents { get { return true; } }
+        protected virtual bool UpdateEntityComponents
+        {
+            get
+            {
+                if (IsServer && IsOwnedByServer && Identity.CountSubscribers() == 0)
+                    return false;
+                return true;
+            }
+        }
         protected NetDataWriter EntityStateMessageWriter { get; private set; } = new NetDataWriter();
         protected NetDataWriter EntityStateDataWriter { get; private set; } = new NetDataWriter();
         private bool? _wasUpdateEntityComponents;
@@ -442,8 +450,8 @@ namespace MultiplayerARPG
 
         private void LateUpdate()
         {
-            Profiler.BeginSample("Entity Components - LateUpdate");
             bool updateEntityComponents = UpdateEntityComponents;
+            Profiler.BeginSample("Entity Components - LateUpdate");
             if (updateEntityComponents)
             {
                 for (int i = 0; i < EntityComponents.Length; ++i)
@@ -452,13 +460,13 @@ namespace MultiplayerARPG
                         EntityComponents[i].EntityLateUpdate();
                 }
             }
+            Profiler.EndSample();
             if (!_wasUpdateEntityComponents.HasValue || _wasUpdateEntityComponents.Value != updateEntityComponents)
             {
                 _wasUpdateEntityComponents = updateEntityComponents;
                 if (onUpdateEntityComponentsChanged != null)
                     onUpdateEntityComponentsChanged.Invoke(updateEntityComponents);
             }
-            Profiler.EndSample();
             EntityLateUpdate();
             if (onLateUpdate != null)
                 onLateUpdate.Invoke();

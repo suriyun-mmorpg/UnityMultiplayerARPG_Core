@@ -63,6 +63,22 @@ namespace MultiplayerARPG.GameData.Model.Playables
         {
             if (IsActiveModel)
                 Graph.Play();
+            CacheEntity.onUpdateEntityComponentsChanged += CacheEntity_onUpdateEntityComponentsChanged;
+        }
+
+        private void CacheEntity_onUpdateEntityComponentsChanged(bool updating)
+        {
+            Debug.LogError(updating);
+            if (!updating || !IsActiveModel)
+            {
+                if (Graph.IsPlaying())
+                    Graph.Stop();
+            }
+            else
+            {
+                if (!Graph.IsPlaying())
+                    Graph.Play();
+            }
         }
 
         public override void AddingNewModel(EquipmentModel data, GameObject newModel, EquipmentContainer equipmentContainer)
@@ -122,6 +138,7 @@ namespace MultiplayerARPG.GameData.Model.Playables
 
         private void OnDestroy()
         {
+            CacheEntity.onUpdateEntityComponentsChanged -= CacheEntity_onUpdateEntityComponentsChanged;
             DestroyGraph();
         }
 
