@@ -68,7 +68,6 @@ namespace MultiplayerARPG.GameData.Model.Playables
 
         private void CacheEntity_onUpdateEntityComponentsChanged(bool updating)
         {
-            Debug.LogError(updating);
             if (!updating || !IsActiveModel)
             {
                 if (Graph.IsPlaying())
