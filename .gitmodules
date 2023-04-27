@@ -37,6 +37,3 @@
 [submodule "UnityRestClient"]
 	path = UnityRestClient
 	url = https://github.com/insthync/unity-rest-client.git
-[submodule "SharedNetworkMessages"]
-	path = SharedNetworkMessages
-	url = https://github.com/insthync/UnityMultiplayerARPG_SharedNetworkMessages.git
