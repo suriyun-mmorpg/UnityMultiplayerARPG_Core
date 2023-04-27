@@ -1,5 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 
 namespace MultiplayerARPG
@@ -14,60 +13,60 @@ namespace MultiplayerARPG
         public int expPerDamage;
 
         [System.NonSerialized]
-        private Dictionary<WeaponType, HarvestEffectiveness> cacheHarvestEffectivenesses;
+        private Dictionary<WeaponType, HarvestEffectiveness> _cacheHarvestEffectivenesses;
         public Dictionary<WeaponType, HarvestEffectiveness> CacheHarvestEffectivenesses
         {
             get
             {
                 InitCaches();
-                return cacheHarvestEffectivenesses;
+                return _cacheHarvestEffectivenesses;
             }
         }
 
         [System.NonSerialized]
-        private Dictionary<WeaponType, WeightedRandomizer<ItemDropForHarvestable>> cacheHarvestItems;
+        private Dictionary<WeaponType, WeightedRandomizer<ItemDropForHarvestable>> _cacheHarvestItems;
         public Dictionary<WeaponType, WeightedRandomizer<ItemDropForHarvestable>> CacheHarvestItems
         {
             get
             {
                 InitCaches();
-                return cacheHarvestItems;
+                return _cacheHarvestItems;
             }
         }
 
         [System.NonSerialized]
-        private Dictionary<BaseSkill, SkillHarvestEffectiveness> cacheSkillHarvestEffectivenesses;
+        private Dictionary<BaseSkill, SkillHarvestEffectiveness> _cacheSkillHarvestEffectivenesses;
         public Dictionary<BaseSkill, SkillHarvestEffectiveness> CacheSkillHarvestEffectivenesses
         {
             get
             {
                 InitCaches();
-                return cacheSkillHarvestEffectivenesses;
+                return _cacheSkillHarvestEffectivenesses;
             }
         }
 
         [System.NonSerialized]
-        private Dictionary<BaseSkill, WeightedRandomizer<ItemDropForHarvestable>> cacheSkillHarvestItems;
+        private Dictionary<BaseSkill, WeightedRandomizer<ItemDropForHarvestable>> _cacheSkillHarvestItems;
         public Dictionary<BaseSkill, WeightedRandomizer<ItemDropForHarvestable>> CacheSkillHarvestItems
         {
             get
             {
                 InitCaches();
-                return cacheSkillHarvestItems;
+                return _cacheSkillHarvestItems;
             }
         }
 
         private void InitCaches()
         {
-            if (cacheHarvestEffectivenesses == null || cacheHarvestItems == null)
+            if (_cacheHarvestEffectivenesses == null || _cacheHarvestItems == null)
             {
-                cacheHarvestEffectivenesses = new Dictionary<WeaponType, HarvestEffectiveness>();
-                cacheHarvestItems = new Dictionary<WeaponType, WeightedRandomizer<ItemDropForHarvestable>>();
+                _cacheHarvestEffectivenesses = new Dictionary<WeaponType, HarvestEffectiveness>();
+                _cacheHarvestItems = new Dictionary<WeaponType, WeightedRandomizer<ItemDropForHarvestable>>();
                 foreach (HarvestEffectiveness harvestEffectiveness in harvestEffectivenesses)
                 {
                     if (harvestEffectiveness.weaponType != null && harvestEffectiveness.damageEffectiveness > 0)
                     {
-                        cacheHarvestEffectivenesses[harvestEffectiveness.weaponType] = harvestEffectiveness;
+                        _cacheHarvestEffectivenesses[harvestEffectiveness.weaponType] = harvestEffectiveness;
                         Dictionary<ItemDropForHarvestable, int> harvestItems = new Dictionary<ItemDropForHarvestable, int>();
                         foreach (ItemDropForHarvestable item in harvestEffectiveness.items)
                         {
@@ -75,19 +74,19 @@ namespace MultiplayerARPG
                                 continue;
                             harvestItems[item] = item.randomWeight;
                         }
-                        cacheHarvestItems[harvestEffectiveness.weaponType] = WeightedRandomizer.From(harvestItems);
+                        _cacheHarvestItems[harvestEffectiveness.weaponType] = WeightedRandomizer.From(harvestItems);
                     }
                 }
             }
-            if (cacheSkillHarvestEffectivenesses == null || cacheSkillHarvestItems == null)
+            if (_cacheSkillHarvestEffectivenesses == null || _cacheSkillHarvestItems == null)
             {
-                cacheSkillHarvestEffectivenesses = new Dictionary<BaseSkill, SkillHarvestEffectiveness>();
-                cacheSkillHarvestItems = new Dictionary<BaseSkill, WeightedRandomizer<ItemDropForHarvestable>>();
+                _cacheSkillHarvestEffectivenesses = new Dictionary<BaseSkill, SkillHarvestEffectiveness>();
+                _cacheSkillHarvestItems = new Dictionary<BaseSkill, WeightedRandomizer<ItemDropForHarvestable>>();
                 foreach (SkillHarvestEffectiveness skillHarvestEffectiveness in skillHarvestEffectivenesses)
                 {
                     if (skillHarvestEffectiveness.skill != null && skillHarvestEffectiveness.damageEffectiveness > 0)
                     {
-                        cacheSkillHarvestEffectivenesses[skillHarvestEffectiveness.skill] = skillHarvestEffectiveness;
+                        _cacheSkillHarvestEffectivenesses[skillHarvestEffectiveness.skill] = skillHarvestEffectiveness;
                         Dictionary<ItemDropForHarvestable, int> harvestItems = new Dictionary<ItemDropForHarvestable, int>();
                         foreach (ItemDropForHarvestable item in skillHarvestEffectiveness.items)
                         {
@@ -95,7 +94,7 @@ namespace MultiplayerARPG
                                 continue;
                             harvestItems[item] = item.randomWeight;
                         }
-                        cacheSkillHarvestItems[skillHarvestEffectiveness.skill] = WeightedRandomizer.From(harvestItems);
+                        _cacheSkillHarvestItems[skillHarvestEffectiveness.skill] = WeightedRandomizer.From(harvestItems);
                     }
                 }
             }
