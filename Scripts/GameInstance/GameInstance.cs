@@ -753,10 +753,16 @@ namespace MultiplayerARPG
             AddPoolingObjects(FreezeEffects);
             AddPoolingObjects(DefaultDamageHitEffects);
 
-            if (warpPortalDatabase != null)
+            if (newCharacterSetting != null && newCharacterSetting.startItems != null)
+                AddItems(newCharacterSetting.startItems);
+
+            if (startItems != null)
+                AddItems(startItems);
+
+            if (warpPortalDatabase != null && warpPortalDatabase.maps != null)
                 AddMapWarpPortals(warpPortalDatabase.maps);
 
-            if (npcDatabase != null)
+            if (npcDatabase != null && npcDatabase.maps != null)
                 AddMapNpcs(npcDatabase.maps);
 
             InitializePurchasing();
