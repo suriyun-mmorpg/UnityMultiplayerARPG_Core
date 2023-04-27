@@ -35,31 +35,32 @@ namespace MultiplayerARPG
         private void OnGameDataLoadedToExportMinimalItemsAsJson()
         {
             onGameDataLoaded -= OnGameDataLoadedToExportMinimalItemsAsJson;
-            Dictionary<int, Dictionary<string, object>> exportingItems = new Dictionary<int, Dictionary<string, object>>();
+            Dictionary<int, MinimalItem> exportingItems = new Dictionary<int, MinimalItem>();
             foreach (var kv in Items)
             {
-                exportingItems[kv.Key] = new Dictionary<string, object>()
+                MinimalItem item = new MinimalItem()
                 {
-                    { "Id", kv.Value.Id },
-                    { "DataId", kv.Value.DataId },
-                    { "ItemType", (byte)kv.Value.ItemType },
-                    { "SellPrice", kv.Value.SellPrice },
-                    { "Weight", kv.Value.Weight },
-                    { "MaxStack", kv.Value.MaxStack },
-                    { "MaxLevel", kv.Value.MaxLevel },
-                    { "LockDuration", kv.Value.LockDuration },
-                    { "ExpireDuration", kv.Value.ExpireDuration },
+                    Id = kv.Value.Id,
+                    DataId = kv.Value.DataId,
+                    ItemType = (int)kv.Value.ItemType,
+                    SellPrice = kv.Value.SellPrice,
+                    Weight = kv.Value.Weight,
+                    MaxStack = kv.Value.MaxStack,
+                    MaxLevel = kv.Value.MaxLevel,
+                    LockDuration = kv.Value.LockDuration,
+                    ExpireDuration = kv.Value.ExpireDuration,
                 };
                 if (kv.Value.IsEquipment())
                 {
-                    exportingItems[kv.Key]["MaxDurability"] = (kv.Value as IEquipmentItem).MaxDurability;
-                    exportingItems[kv.Key]["DestroyIfBroken"] = (kv.Value as IEquipmentItem).DestroyIfBroken;
-                    exportingItems[kv.Key]["MaxSocket"] = (kv.Value as IEquipmentItem).MaxSocket;
+                    item.MaxDurability = (kv.Value as IEquipmentItem).MaxDurability;
+                    item.DestroyIfBroken = (kv.Value as IEquipmentItem).DestroyIfBroken;
+                    item.MaxSocket = (kv.Value as IEquipmentItem).MaxSocket;
                 }
                 if (kv.Value.IsWeapon())
                 {
-                    exportingItems[kv.Key]["AmmoCapacity"] = (kv.Value as IWeaponItem).AmmoCapacity;
+                    item.AmmoCapacity = (kv.Value as IWeaponItem).AmmoCapacity;
                 }
+                exportingItems[kv.Key] = item;
             }
             string path = EditorUtility.SaveFilePanel("Export Minimal Items", Application.dataPath, "items", "json");
             if (path.Length > 0)
