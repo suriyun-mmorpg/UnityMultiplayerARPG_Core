@@ -24,14 +24,14 @@ namespace MultiplayerARPG
         }
 
         [System.NonSerialized]
-        private Dictionary<Attribute, float> cacheRequireAttributeAmounts = null;
+        private Dictionary<Attribute, float> _cacheRequireAttributeAmounts = null;
         public Dictionary<Attribute, float> RequireAttributeAmounts
         {
             get
             {
-                if (cacheRequireAttributeAmounts == null)
-                    cacheRequireAttributeAmounts = GameDataHelpers.CombineAttributes(requirement.attributeAmounts, new Dictionary<Attribute, float>(), 1f);
-                return cacheRequireAttributeAmounts;
+                if (_cacheRequireAttributeAmounts == null)
+                    _cacheRequireAttributeAmounts = GameDataHelpers.CombineAttributes(requirement.attributeAmounts, new Dictionary<Attribute, float>(), 1f);
+                return _cacheRequireAttributeAmounts;
             }
         }
 
