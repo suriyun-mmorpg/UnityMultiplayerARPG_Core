@@ -417,6 +417,38 @@ namespace MultiplayerARPG
         {
             return Create(item.DataId, level, amount, randomSeed);
         }
+
+        public static CharacterItem Create(int dataId, int level = 1, int amount = 1, int? randomSeed = null)
+        {
+            CharacterItem newItem = new CharacterItem();
+            newItem.id = GenericUtils.GetUniqueId();
+            newItem.dataId = dataId;
+            if (level <= 0)
+                level = 1;
+            newItem.level = level;
+            newItem.amount = amount;
+            newItem.durability = 0f;
+            newItem.exp = 0;
+            newItem.lockRemainsDuration = 0f;
+            newItem.ammo = 0;
+            if (GameInstance.Items.TryGetValue(dataId, out BaseItem tempItem))
+            {
+                if (tempItem.IsEquipment())
+                {
+                    newItem.durability = (tempItem as IEquipmentItem).MaxDurability;
+                    newItem.lockRemainsDuration = tempItem.LockDuration;
+                    if (randomSeed.HasValue)
+                        newItem.randomSeed = randomSeed.Value;
+                    else
+                        newItem.randomSeed = GenericUtils.RandomInt(int.MinValue, int.MaxValue);
+                }
+                if (tempItem.ExpireDuration > 0)
+                {
+                    newItem.expireTime = System.DateTimeOffset.Now.ToUnixTimeSeconds() + (tempItem.ExpireDuration * 60 * 60);
+                }
+            }
+            return newItem;
+        }
     }
 
     [System.Serializable]
