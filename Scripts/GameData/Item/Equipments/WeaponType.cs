@@ -30,7 +30,7 @@ namespace MultiplayerARPG
         private DualWieldRestriction dualWieldRestriction = DualWieldRestriction.None;
         public DualWieldRestriction DualWieldRestriction { get { return dualWieldRestriction; } }
         [SerializeField]
-        private DamageInfo damageInfo = default(DamageInfo);
+        private DamageInfo damageInfo = default;
         public DamageInfo DamageInfo { get { return damageInfo; } }
         [SerializeField]
         private DamageEffectivenessAttribute[] effectivenessAttributes = new DamageEffectivenessAttribute[0];
