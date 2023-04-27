@@ -59,10 +59,10 @@ namespace MultiplayerARPG
 
         [Category(4, "Attacking")]
         [SerializeField]
-        private DamageInfo damageInfo = default(DamageInfo);
+        private DamageInfo damageInfo = default;
         public DamageInfo DamageInfo { get { return damageInfo; } }
         [SerializeField]
-        private DamageIncremental damageAmount = default(DamageIncremental);
+        private DamageIncremental damageAmount = default;
         public DamageIncremental DamageAmount
         {
             get
@@ -74,9 +74,9 @@ namespace MultiplayerARPG
                 }
                 else
                 {
-                    if (!adjustDamageAmount.HasValue)
+                    if (!_adjustDamageAmount.HasValue)
                     {
-                        adjustDamageAmount = new DamageIncremental()
+                        _adjustDamageAmount = new DamageIncremental()
                         {
                             damageElement = damageAmount.damageElement,
                             amount = new IncrementalMinMaxFloat()
@@ -86,7 +86,7 @@ namespace MultiplayerARPG
                             }
                         };
                     }
-                    return adjustDamageAmount.Value;
+                    return _adjustDamageAmount.Value;
                 }
             }
         }
@@ -96,9 +96,9 @@ namespace MultiplayerARPG
 
         [Category(5, "Killing Rewards")]
         [SerializeField]
-        private IncrementalMinMaxInt randomExp = default(IncrementalMinMaxInt);
+        private IncrementalMinMaxInt randomExp = default;
         [SerializeField]
-        private IncrementalMinMaxInt randomGold = default(IncrementalMinMaxInt);
+        private IncrementalMinMaxInt randomGold = default;
         [SerializeField]
         [ArrayElementTitle("currency")]
         public CurrencyRandomAmount[] randomCurrencies = new CurrencyRandomAmount[0];
@@ -132,51 +132,51 @@ namespace MultiplayerARPG
         #endregion
 
         [System.NonSerialized]
-        private CharacterStatsIncremental? adjustStats = null;
+        private CharacterStatsIncremental? _adjustStats = null;
         [System.NonSerialized]
-        private AttributeIncremental[] adjustAttributes = null;
+        private AttributeIncremental[] _adjustAttributes = null;
         [System.NonSerialized]
-        private ResistanceIncremental[] adjustResistances = null;
+        private ResistanceIncremental[] _adjustResistances = null;
         [System.NonSerialized]
-        private ArmorIncremental[] adjustArmors = null;
+        private ArmorIncremental[] _adjustArmors = null;
         [System.NonSerialized]
-        private DamageIncremental? adjustDamageAmount = null;
+        private DamageIncremental? _adjustDamageAmount = null;
         [System.NonSerialized]
-        private IncrementalMinMaxInt? adjustRandomExp = null;
+        private IncrementalMinMaxInt? _adjustRandomExp = null;
         [System.NonSerialized]
-        private IncrementalMinMaxInt? adjustRandomGold = null;
+        private IncrementalMinMaxInt? _adjustRandomGold = null;
 
         [System.NonSerialized]
-        private List<ItemRandomByWeightTable> cacheItemRandomByWeightTables = null;
+        private List<ItemRandomByWeightTable> _cacheItemRandomByWeightTables = null;
         public List<ItemRandomByWeightTable> CacheItemRandomByWeightTables
         {
             get
             {
-                if (cacheItemRandomByWeightTables == null)
+                if (_cacheItemRandomByWeightTables == null)
                 {
-                    cacheItemRandomByWeightTables = new List<ItemRandomByWeightTable>();
+                    _cacheItemRandomByWeightTables = new List<ItemRandomByWeightTable>();
                     if (itemRandomByWeightTables != null)
-                        cacheItemRandomByWeightTables.AddRange(itemRandomByWeightTables);
+                        _cacheItemRandomByWeightTables.AddRange(itemRandomByWeightTables);
                 }
-                return cacheItemRandomByWeightTables;
+                return _cacheItemRandomByWeightTables;
             }
         }
 
         [System.NonSerialized]
-        private List<ItemDrop> certainDropItems = new List<ItemDrop>();
+        private List<ItemDrop> _certainDropItems = new List<ItemDrop>();
         [System.NonSerialized]
-        private List<ItemDrop> uncertainDropItems = new List<ItemDrop>();
+        private List<ItemDrop> _uncertainDropItems = new List<ItemDrop>();
 
         [System.NonSerialized]
-        private List<ItemDrop> cacheRandomItems = null;
+        private List<ItemDrop> _cacheRandomItems = null;
         public List<ItemDrop> CacheRandomItems
         {
             get
             {
-                if (cacheRandomItems == null)
+                if (_cacheRandomItems == null)
                 {
                     int i;
-                    cacheRandomItems = new List<ItemDrop>();
+                    _cacheRandomItems = new List<ItemDrop>();
                     if (randomItems != null &&
                         randomItems.Length > 0)
                     {
@@ -186,7 +186,7 @@ namespace MultiplayerARPG
                                 randomItems[i].maxAmount <= 0 ||
                                 randomItems[i].dropRate <= 0)
                                 continue;
-                            cacheRandomItems.Add(randomItems[i]);
+                            _cacheRandomItems.Add(randomItems[i]);
                         }
                     }
                     if (itemDropTables != null &&
@@ -204,36 +204,36 @@ namespace MultiplayerARPG
                                         itemDropTable.randomItems[i].maxAmount <= 0 ||
                                         itemDropTable.randomItems[i].dropRate <= 0)
                                         continue;
-                                    cacheRandomItems.Add(itemDropTable.randomItems[i]);
+                                    _cacheRandomItems.Add(itemDropTable.randomItems[i]);
                                 }
                             }
                         }
                     }
-                    cacheRandomItems.Sort((a, b) => b.dropRate.CompareTo(a.dropRate));
-                    certainDropItems.Clear();
-                    uncertainDropItems.Clear();
-                    for (i = 0; i < cacheRandomItems.Count; ++i)
+                    _cacheRandomItems.Sort((a, b) => b.dropRate.CompareTo(a.dropRate));
+                    _certainDropItems.Clear();
+                    _uncertainDropItems.Clear();
+                    for (i = 0; i < _cacheRandomItems.Count; ++i)
                     {
-                        if (cacheRandomItems[i].dropRate >= 1f)
-                            certainDropItems.Add(cacheRandomItems[i]);
+                        if (_cacheRandomItems[i].dropRate >= 1f)
+                            _certainDropItems.Add(_cacheRandomItems[i]);
                         else
-                            uncertainDropItems.Add(cacheRandomItems[i]);
+                            _uncertainDropItems.Add(_cacheRandomItems[i]);
                     }
                 }
-                return cacheRandomItems;
+                return _cacheRandomItems;
             }
         }
 
         [System.NonSerialized]
-        private List<CurrencyRandomAmount> cacheRandomCurrencies = null;
+        private List<CurrencyRandomAmount> _cacheRandomCurrencies = null;
         public List<CurrencyRandomAmount> CacheRandomCurrencies
         {
             get
             {
-                if (cacheRandomCurrencies == null)
+                if (_cacheRandomCurrencies == null)
                 {
                     int i;
-                    cacheRandomCurrencies = new List<CurrencyRandomAmount>();
+                    _cacheRandomCurrencies = new List<CurrencyRandomAmount>();
                     if (randomCurrencies != null &&
                         randomCurrencies.Length > 0)
                     {
@@ -242,7 +242,7 @@ namespace MultiplayerARPG
                             if (randomCurrencies[i].currency == null ||
                                 randomCurrencies[i].maxAmount <= 0)
                                 continue;
-                            cacheRandomCurrencies.Add(randomCurrencies[i]);
+                            _cacheRandomCurrencies.Add(randomCurrencies[i]);
                         }
                     }
                     if (itemDropTables != null &&
@@ -259,13 +259,13 @@ namespace MultiplayerARPG
                                     if (itemDropTable.randomCurrencies[i].currency == null ||
                                         itemDropTable.randomCurrencies[i].maxAmount <= 0)
                                         continue;
-                                    cacheRandomCurrencies.Add(itemDropTable.randomCurrencies[i]);
+                                    _cacheRandomCurrencies.Add(itemDropTable.randomCurrencies[i]);
                                 }
                             }
                         }
                     }
                 }
-                return cacheRandomCurrencies;
+                return _cacheRandomCurrencies;
             }
         }
 
@@ -280,15 +280,15 @@ namespace MultiplayerARPG
                 }
                 else
                 {
-                    if (!adjustStats.HasValue)
+                    if (!_adjustStats.HasValue)
                     {
-                        adjustStats = new CharacterStatsIncremental()
+                        _adjustStats = new CharacterStatsIncremental()
                         {
                             baseStats = base.Stats.baseStats + (base.Stats.statsIncreaseEachLevel * -(defaultLevel - 1)),
                             statsIncreaseEachLevel = base.Stats.statsIncreaseEachLevel,
                         };
                     }
-                    return adjustStats.Value;
+                    return _adjustStats.Value;
                 }
             }
         }
@@ -304,14 +304,14 @@ namespace MultiplayerARPG
                 }
                 else
                 {
-                    if (adjustAttributes == null)
+                    if (_adjustAttributes == null)
                     {
-                        adjustAttributes = new AttributeIncremental[base.Attributes.Length];
+                        _adjustAttributes = new AttributeIncremental[base.Attributes.Length];
                         AttributeIncremental tempValue;
                         for (int i = 0; i < base.Attributes.Length; ++i)
                         {
                             tempValue = base.Attributes[i];
-                            adjustAttributes[i] = new AttributeIncremental()
+                            _adjustAttributes[i] = new AttributeIncremental()
                             {
                                 attribute = tempValue.attribute,
                                 amount = new IncrementalFloat()
@@ -322,7 +322,7 @@ namespace MultiplayerARPG
                             };
                         }
                     }
-                    return adjustAttributes;
+                    return _adjustAttributes;
                 }
             }
         }
@@ -338,14 +338,14 @@ namespace MultiplayerARPG
                 }
                 else
                 {
-                    if (adjustResistances == null)
+                    if (_adjustResistances == null)
                     {
-                        adjustResistances = new ResistanceIncremental[base.Resistances.Length];
+                        _adjustResistances = new ResistanceIncremental[base.Resistances.Length];
                         ResistanceIncremental tempValue;
                         for (int i = 0; i < base.Resistances.Length; ++i)
                         {
                             tempValue = base.Resistances[i];
-                            adjustResistances[i] = new ResistanceIncremental()
+                            _adjustResistances[i] = new ResistanceIncremental()
                             {
                                 damageElement = tempValue.damageElement,
                                 amount = new IncrementalFloat()
@@ -356,7 +356,7 @@ namespace MultiplayerARPG
                             };
                         }
                     }
-                    return adjustResistances;
+                    return _adjustResistances;
                 }
             }
         }
@@ -372,14 +372,14 @@ namespace MultiplayerARPG
                 }
                 else
                 {
-                    if (adjustArmors == null)
+                    if (_adjustArmors == null)
                     {
-                        adjustArmors = new ArmorIncremental[base.Armors.Length];
+                        _adjustArmors = new ArmorIncremental[base.Armors.Length];
                         ArmorIncremental tempValue;
                         for (int i = 0; i < base.Armors.Length; ++i)
                         {
                             tempValue = base.Armors[i];
-                            adjustArmors[i] = new ArmorIncremental()
+                            _adjustArmors[i] = new ArmorIncremental()
                             {
                                 damageElement = tempValue.damageElement,
                                 amount = new IncrementalFloat()
@@ -390,20 +390,20 @@ namespace MultiplayerARPG
                             };
                         }
                     }
-                    return adjustArmors;
+                    return _adjustArmors;
                 }
             }
         }
 
         [System.NonSerialized]
-        private Dictionary<BaseSkill, int> cacheSkillLevels = null;
+        private Dictionary<BaseSkill, int> _cacheSkillLevels = null;
         public override Dictionary<BaseSkill, int> CacheSkillLevels
         {
             get
             {
-                if (cacheSkillLevels == null)
-                    cacheSkillLevels = GameDataHelpers.CombineSkills(skills, new Dictionary<BaseSkill, int>());
-                return cacheSkillLevels;
+                if (_cacheSkillLevels == null)
+                    _cacheSkillLevels = GameDataHelpers.CombineSkills(skills, new Dictionary<BaseSkill, int>());
+                return _cacheSkillLevels;
             }
         }
 
@@ -418,7 +418,7 @@ namespace MultiplayerARPG
                 }
                 else
                 {
-                    if (!adjustRandomExp.HasValue)
+                    if (!_adjustRandomExp.HasValue)
                     {
                         MinMaxFloat adjustBaseAmount = new MinMaxFloat()
                         {
@@ -426,7 +426,7 @@ namespace MultiplayerARPG
                             max = randomExp.baseAmount.max,
                         };
                         adjustBaseAmount += randomExp.amountIncreaseEachLevel * -(defaultLevel - 1);
-                        adjustRandomExp = new IncrementalMinMaxInt()
+                        _adjustRandomExp = new IncrementalMinMaxInt()
                         {
                             baseAmount = new MinMaxInt()
                             {
@@ -436,7 +436,7 @@ namespace MultiplayerARPG
                             amountIncreaseEachLevel = randomExp.amountIncreaseEachLevel,
                         };
                     }
-                    return adjustRandomExp.Value;
+                    return _adjustRandomExp.Value;
                 }
             }
         }
@@ -452,7 +452,7 @@ namespace MultiplayerARPG
                 }
                 else
                 {
-                    if (!adjustRandomGold.HasValue)
+                    if (!_adjustRandomGold.HasValue)
                     {
                         MinMaxFloat adjustBaseAmount = new MinMaxFloat()
                         {
@@ -460,7 +460,7 @@ namespace MultiplayerARPG
                             max = randomExp.baseAmount.max,
                         };
                         adjustBaseAmount += randomGold.amountIncreaseEachLevel * -(defaultLevel - 1);
-                        adjustRandomGold = new IncrementalMinMaxInt()
+                        _adjustRandomGold = new IncrementalMinMaxInt()
                         {
                             baseAmount = new MinMaxInt()
                             {
@@ -470,7 +470,7 @@ namespace MultiplayerARPG
                             amountIncreaseEachLevel = randomGold.amountIncreaseEachLevel,
                         };
                     }
-                    return adjustRandomGold.Value;
+                    return _adjustRandomGold.Value;
                 }
             }
         }
@@ -494,32 +494,32 @@ namespace MultiplayerARPG
             int randomDropCount = 0;
             int i;
             // Drop certain drop rate items
-            certainDropItems.Shuffle();
-            for (i = 0; i < certainDropItems.Count && randomDropCount < maxDropItems; ++i)
+            _certainDropItems.Shuffle();
+            for (i = 0; i < _certainDropItems.Count && randomDropCount < maxDropItems; ++i)
             {
-                if (BaseGameNetworkManager.CurrentMapInfo.ExcludeItemFromDropping(certainDropItems[i].item))
+                if (BaseGameNetworkManager.CurrentMapInfo.ExcludeItemFromDropping(_certainDropItems[i].item))
                     continue;
-                if (certainDropItems[i].minAmount <= 0)
-                    onRandomItem.Invoke(certainDropItems[i].item, certainDropItems[i].maxAmount);
+                if (_certainDropItems[i].minAmount <= 0)
+                    onRandomItem.Invoke(_certainDropItems[i].item, _certainDropItems[i].maxAmount);
                 else
-                    onRandomItem.Invoke(certainDropItems[i].item, Random.Range(certainDropItems[i].minAmount, certainDropItems[i].maxAmount));
+                    onRandomItem.Invoke(_certainDropItems[i].item, Random.Range(_certainDropItems[i].minAmount, _certainDropItems[i].maxAmount));
                 ++randomDropCount;
             }
             // Reached max drop items?
             if (randomDropCount >= maxDropItems)
                 return;
             // Drop uncertain drop rate items
-            uncertainDropItems.Shuffle();
-            for (i = 0; i < uncertainDropItems.Count && randomDropCount < maxDropItems; ++i)
+            _uncertainDropItems.Shuffle();
+            for (i = 0; i < _uncertainDropItems.Count && randomDropCount < maxDropItems; ++i)
             {
-                if (Random.value > uncertainDropItems[i].dropRate * rate)
+                if (Random.value > _uncertainDropItems[i].dropRate * rate)
                     continue;
-                if (BaseGameNetworkManager.CurrentMapInfo.ExcludeItemFromDropping(uncertainDropItems[i].item))
+                if (BaseGameNetworkManager.CurrentMapInfo.ExcludeItemFromDropping(_uncertainDropItems[i].item))
                     continue;
-                if (uncertainDropItems[i].minAmount <= 0)
-                    onRandomItem.Invoke(uncertainDropItems[i].item, uncertainDropItems[i].maxAmount);
+                if (_uncertainDropItems[i].minAmount <= 0)
+                    onRandomItem.Invoke(_uncertainDropItems[i].item, _uncertainDropItems[i].maxAmount);
                 else
-                    onRandomItem.Invoke(uncertainDropItems[i].item, Random.Range(uncertainDropItems[i].minAmount, uncertainDropItems[i].maxAmount));
+                    onRandomItem.Invoke(_uncertainDropItems[i].item, Random.Range(_uncertainDropItems[i].minAmount, _uncertainDropItems[i].maxAmount));
                 ++randomDropCount;
             }
             // Reached max drop items?
