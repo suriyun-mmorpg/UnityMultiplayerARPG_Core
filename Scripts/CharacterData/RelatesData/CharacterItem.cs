@@ -449,6 +449,11 @@ namespace MultiplayerARPG
             }
             return newItem;
         }
+
+        public static CharacterItem CreateEmptySlot()
+        {
+            return Create(0, 1, 0);
+        }
     }
 
     [System.Serializable]
