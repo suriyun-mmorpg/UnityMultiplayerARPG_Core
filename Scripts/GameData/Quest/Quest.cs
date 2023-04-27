@@ -40,35 +40,35 @@ namespace MultiplayerARPG
         public bool canRepeat;
 
         [System.NonSerialized]
-        private HashSet<int> cacheKillMonsterIds;
+        private HashSet<int> _cacheKillMonsterIds;
         public HashSet<int> CacheKillMonsterIds
         {
             get
             {
-                if (cacheKillMonsterIds == null)
+                if (_cacheKillMonsterIds == null)
                 {
-                    cacheKillMonsterIds = new HashSet<int>();
+                    _cacheKillMonsterIds = new HashSet<int>();
                     foreach (QuestTask task in tasks)
                     {
                         if (task.taskType == QuestTaskType.KillMonster &&
                             task.monsterCharacterAmount.monster != null &&
                             task.monsterCharacterAmount.amount > 0)
-                            cacheKillMonsterIds.Add(task.monsterCharacterAmount.monster.DataId);
+                            _cacheKillMonsterIds.Add(task.monsterCharacterAmount.monster.DataId);
                     }
                 }
-                return cacheKillMonsterIds;
+                return _cacheKillMonsterIds;
             }
         }
 
         [System.NonSerialized]
-        private Dictionary<Currency, int> cacheRewardCurrencies;
+        private Dictionary<Currency, int> _cacheRewardCurrencies;
         public Dictionary<Currency, int> CacheRewardCurrencies
         {
             get
             {
-                if (cacheRewardCurrencies == null)
-                    cacheRewardCurrencies = GameDataHelpers.CombineCurrencies(rewardCurrencies, null);
-                return cacheRewardCurrencies;
+                if (_cacheRewardCurrencies == null)
+                    _cacheRewardCurrencies = GameDataHelpers.CombineCurrencies(rewardCurrencies, null);
+                return _cacheRewardCurrencies;
             }
         }
 
