@@ -25,26 +25,26 @@ namespace MultiplayerARPG
         public WarpPointByCondition[] respawnPointsByCondition;
 
         [System.NonSerialized]
-        private Dictionary<int, List<WarpPointByCondition>> cacheRespawnPointsByCondition;
+        private Dictionary<int, List<WarpPointByCondition>> _cacheRespawnPointsByCondition;
         public Dictionary<int, List<WarpPointByCondition>> CacheRespawnPointsByCondition
         {
             get
             {
-                if (cacheRespawnPointsByCondition == null)
+                if (_cacheRespawnPointsByCondition == null)
                 {
-                    cacheRespawnPointsByCondition = new Dictionary<int, List<WarpPointByCondition>>();
+                    _cacheRespawnPointsByCondition = new Dictionary<int, List<WarpPointByCondition>>();
                     int factionDataId;
                     foreach (WarpPointByCondition overrideRespawnPoint in respawnPointsByCondition)
                     {
                         factionDataId = 0;
                         if (overrideRespawnPoint.forFaction != null)
                             factionDataId = overrideRespawnPoint.forFaction.DataId;
-                        if (!cacheRespawnPointsByCondition.ContainsKey(factionDataId))
-                            cacheRespawnPointsByCondition.Add(factionDataId, new List<WarpPointByCondition>());
-                        cacheRespawnPointsByCondition[factionDataId].Add(overrideRespawnPoint);
+                        if (!_cacheRespawnPointsByCondition.ContainsKey(factionDataId))
+                            _cacheRespawnPointsByCondition.Add(factionDataId, new List<WarpPointByCondition>());
+                        _cacheRespawnPointsByCondition[factionDataId].Add(overrideRespawnPoint);
                     }
                 }
-                return cacheRespawnPointsByCondition;
+                return _cacheRespawnPointsByCondition;
             }
         }
 
