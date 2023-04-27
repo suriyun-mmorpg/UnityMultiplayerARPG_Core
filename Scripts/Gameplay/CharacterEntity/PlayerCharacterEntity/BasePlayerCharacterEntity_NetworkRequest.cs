@@ -54,15 +54,15 @@ namespace MultiplayerARPG
             string relateId = characterItem.GetItem().Id;
             // For an equipments, it will use item unique id
             if (characterItem.GetEquipmentItem() != null)
-            {
                 relateId = characterItem.id;
-            }
             return CallServerAssignHotkey(hotkeyId, HotkeyType.Item, relateId);
         }
 
-        public bool AssignSkillHotkey(string hotkeyId, BaseSkill skill)
+        public bool AssignSkillHotkey(string hotkeyId, CharacterSkill characterSkill)
         {
-            return CallServerAssignHotkey(hotkeyId, HotkeyType.Skill, skill.Id);
+            // Use skil data id
+            string relateId = characterSkill.GetSkill().Id;
+            return CallServerAssignHotkey(hotkeyId, HotkeyType.Skill, relateId);
         }
 
         public bool UnAssignHotkey(string hotkeyId)
