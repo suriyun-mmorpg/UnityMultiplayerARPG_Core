@@ -324,9 +324,9 @@ namespace MultiplayerARPG
         public bool doNotFillEmptySlots = false;
         [Tooltip("Base slot limit for all characters, it will be used when `InventorySystem` is `LimitSlots`")]
         public int baseSlotLimit = 0;
-        public Storage playerStorage = default(Storage);
-        public Storage guildStorage = default(Storage);
-        public EnhancerRemoval enhancerRemoval = default(EnhancerRemoval);
+        public Storage playerStorage = default;
+        public Storage guildStorage = default;
+        public EnhancerRemoval enhancerRemoval = default;
 
         [Header("Gameplay Configs - Summon Monster")]
         [Tooltip("This is a distance that random summon around a character")]
@@ -358,11 +358,11 @@ namespace MultiplayerARPG
         public ItemAmount[] startItems = new ItemAmount[0];
 
         [Header("Scene/Maps")]
-        public UnityScene homeScene = default(UnityScene);
+        public UnityScene homeScene = default;
         [Tooltip("If this is empty, it will use `Home Scene` as home scene")]
-        public UnityScene homeMobileScene = default(UnityScene);
+        public UnityScene homeMobileScene = default;
         [Tooltip("If this is empty, it will use `Home Scene` as home scene")]
-        public UnityScene homeConsoleScene = default(UnityScene);
+        public UnityScene homeConsoleScene = default;
 
         [Header("Player Configs")]
         public int minCharacterNameLength = 2;
@@ -587,6 +587,7 @@ namespace MultiplayerARPG
             }
             DontDestroyOnLoad(gameObject);
             Singleton = this;
+            LoadHomeScenePreventions.Clear();
             EventSystemManager = gameObject.GetOrAddComponent<EventSystemManager>();
             InputManager.useMobileInputOnNonMobile = IsMobileTestInEditor();
             InputManager.useNonMobileInput = testInEditorMode == TestInEditorMode.MobileWithKeyInputs && Application.isEditor;
