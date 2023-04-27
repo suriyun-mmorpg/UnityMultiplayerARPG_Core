@@ -807,7 +807,7 @@ namespace MultiplayerARPG
 
         public static void FillWeaponSetsIfNeeded(this ICharacterData data, byte equipWeaponSet)
         {
-            if (data is IGameEntity && !(data as IGameEntity).Entity.IsServer)
+            if (data is IGameEntity gameEntity && !gameEntity.Entity.IsServer)
             {
                 Logging.LogWarning("Client can't fill weapon sets");
                 return;
@@ -1426,27 +1426,26 @@ namespace MultiplayerARPG
 
         public static DamageInfo GetWeaponDamageInfo(this ICharacterData data, ref bool isLeftHand)
         {
-            if (data is BaseMonsterCharacterEntity)
+            if (data is BaseMonsterCharacterEntity monsterCharacterEntity)
             {
                 isLeftHand = false;
-                return (data as BaseMonsterCharacterEntity).CharacterDatabase.DamageInfo;
+                return monsterCharacterEntity.CharacterDatabase.DamageInfo;
             }
             return data.GetAvailableWeapon(ref isLeftHand).GetWeaponItem().WeaponType.DamageInfo;
         }
 
         public static DamageInfo GetWeaponDamageInfo(this ICharacterData data, IWeaponItem weaponItem)
         {
-            if (data is BaseMonsterCharacterEntity)
-                return (data as BaseMonsterCharacterEntity).CharacterDatabase.DamageInfo;
+            if (data is BaseMonsterCharacterEntity monsterCharacterEntity)
+                return monsterCharacterEntity.CharacterDatabase.DamageInfo;
             return weaponItem.WeaponType.DamageInfo;
         }
 
         public static KeyValuePair<DamageElement, MinMaxFloat> GetWeaponDamages(this ICharacterData data, ref bool isLeftHand)
         {
-            if (data is BaseMonsterCharacterEntity)
+            if (data is BaseMonsterCharacterEntity monsterCharacterEntity)
             {
                 isLeftHand = false;
-                BaseMonsterCharacterEntity monsterCharacterEntity = data as BaseMonsterCharacterEntity;
                 return monsterCharacterEntity.CharacterDatabase.DamageAmount.ToKeyValuePair(monsterCharacterEntity.Level, 1f, 0f);
             }
             return data.GetAvailableWeapon(ref isLeftHand).GetDamageAmount(data);
@@ -1454,11 +1453,8 @@ namespace MultiplayerARPG
 
         public static KeyValuePair<DamageElement, MinMaxFloat> GetWeaponDamages(this ICharacterData data, CharacterItem weapon)
         {
-            if (data is BaseMonsterCharacterEntity)
-            {
-                BaseMonsterCharacterEntity monsterCharacterEntity = data as BaseMonsterCharacterEntity;
+            if (data is BaseMonsterCharacterEntity monsterCharacterEntity)
                 return monsterCharacterEntity.CharacterDatabase.DamageAmount.ToKeyValuePair(monsterCharacterEntity.Level, 1f, 0f);
-            }
             return weapon.GetDamageAmount(data);
         }
 
@@ -1492,8 +1488,8 @@ namespace MultiplayerARPG
 
         public static float GetMoveSpeedRateWhileAttacking(this ICharacterData data, IWeaponItem weaponItem)
         {
-            if (data is BaseMonsterCharacterEntity)
-                return (data as BaseMonsterCharacterEntity).CharacterDatabase.MoveSpeedRateWhileAttacking;
+            if (data is BaseMonsterCharacterEntity monsterCharacterEntity)
+                return monsterCharacterEntity.CharacterDatabase.MoveSpeedRateWhileAttacking;
             return weaponItem.MoveSpeedRateWhileAttacking;
         }
 
