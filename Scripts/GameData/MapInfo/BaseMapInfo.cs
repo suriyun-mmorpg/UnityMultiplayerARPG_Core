@@ -9,7 +9,7 @@ namespace MultiplayerARPG
         #region Map Info Settings
         [Category("Map Info Settings")]
         [SerializeField]
-        private UnityScene scene = default(UnityScene);
+        private UnityScene scene = default;
         public virtual UnityScene Scene { get { return scene; } }
 
         [Tooltip("This will be used when new character has been created to set its position, and this map data is the start map")]
