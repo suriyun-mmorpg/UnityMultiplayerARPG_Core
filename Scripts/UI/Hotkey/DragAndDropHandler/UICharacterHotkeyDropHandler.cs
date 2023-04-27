@@ -57,7 +57,7 @@ namespace MultiplayerARPG
                 if (uiCharacterHotkey.CanAssignCharacterItem(draggedItemUI.CacheUI.Data.characterItem))
                 {
                     // Assign item to hotkey
-                    GameInstance.PlayingCharacterEntity.AssignItemHotkey(uiCharacterHotkey.Data.hotkeyId, draggedItemUI.CacheUI.Data.characterItem);
+                    GameInstance.PlayingCharacterEntity.AssignItemHotkey(uiCharacterHotkey.Data.hotkeyId, draggedItemUI.CacheUI.CharacterItem);
                 }
 
                 if (draggedItemUI.Location == UICharacterItemDragHandler.SourceLocation.Hotkey)
@@ -80,7 +80,7 @@ namespace MultiplayerARPG
                 if (uiCharacterHotkey.CanAssignCharacterSkill(draggedSkillUI.CacheUI.Data.characterSkill))
                 {
                     // Assign item to hotkey
-                    GameInstance.PlayingCharacterEntity.AssignSkillHotkey(uiCharacterHotkey.Data.hotkeyId, draggedSkillUI.CacheUI.Skill);
+                    GameInstance.PlayingCharacterEntity.AssignSkillHotkey(uiCharacterHotkey.Data.hotkeyId, draggedSkillUI.CacheUI.CharacterSkill);
                 }
 
                 if (draggedSkillUI.Location == UICharacterSkillDragHandler.SourceLocation.Hotkey)
