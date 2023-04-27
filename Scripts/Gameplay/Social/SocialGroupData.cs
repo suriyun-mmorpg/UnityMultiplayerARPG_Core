@@ -1,8 +1,6 @@
-﻿using LiteNetLib.Utils;
-
-namespace MultiplayerARPG
+﻿namespace MultiplayerARPG
 {
-    public partial class SocialGroupData : INetSerializable
+    public partial class SocialGroupData
     {
         public static SocialSystemSetting SystemSetting { get { return GameInstance.Singleton.SocialSystemSetting; } }
 
@@ -19,20 +17,6 @@ namespace MultiplayerARPG
         public void UpdateMember(BasePlayerCharacterEntity playerCharacter)
         {
             UpdateMember(CreateMemberData(playerCharacter));
-        }
-
-        public virtual void Serialize(NetDataWriter writer)
-        {
-            writer.Put(id);
-            writer.Put(leaderId);
-            writer.PutDictionary(members);
-        }
-
-        public virtual void Deserialize(NetDataReader reader)
-        {
-            id = reader.GetInt();
-            leaderId = reader.GetString();
-            members = reader.GetDictionary<string, SocialCharacterData>();
         }
 
         public bool UpdateSocialGroupMember(UpdateSocialMemberMessage message)

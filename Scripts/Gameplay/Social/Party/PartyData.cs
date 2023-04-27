@@ -1,9 +1,8 @@
 ﻿using System.Collections.Generic;
-using LiteNetLib.Utils;
 
 namespace MultiplayerARPG
 {
-    public partial class PartyData : INetSerializable
+    public partial class PartyData
     {
         public void GetSortedMembers(out SocialCharacterData[] sortedMembers)
         {
@@ -51,20 +50,6 @@ namespace MultiplayerARPG
                 return true;
             else
                 return SystemSetting.PartyMemberCanKick;
-        }
-
-        public override void Serialize(NetDataWriter writer)
-        {
-            base.Serialize(writer);
-            writer.Put(shareExp);
-            writer.Put(shareItem);
-        }
-
-        public override void Deserialize(NetDataReader reader)
-        {
-            base.Deserialize(reader);
-            shareExp = reader.GetBool();
-            shareItem = reader.GetBool();
         }
     }
 }

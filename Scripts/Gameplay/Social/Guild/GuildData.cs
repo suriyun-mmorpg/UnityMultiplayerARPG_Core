@@ -1,9 +1,8 @@
 ﻿using System.Collections.Generic;
-using LiteNetLib.Utils;
 
 namespace MultiplayerARPG
 {
-    public partial class GuildData : INetSerializable
+    public partial class GuildData
     {
         private int _increaseMaxMember;
         public int IncreaseMaxMember
@@ -165,44 +164,6 @@ namespace MultiplayerARPG
         public int GetNextLevelExp()
         {
             return GetNextLevelExp(SystemSetting.GuildExpTree, level);
-        }
-
-        public override void Serialize(NetDataWriter writer)
-        {
-            base.Serialize(writer);
-            writer.Put(guildName);
-            writer.PutPackedInt(level);
-            writer.PutPackedInt(exp);
-            writer.PutPackedInt(skillPoint);
-            writer.Put(guildMessage);
-            writer.Put(guildMessage2);
-            writer.PutPackedInt(score);
-            writer.PutPackedInt(gold);
-            writer.Put(options);
-            writer.Put(autoAcceptRequests);
-            writer.PutPackedInt(rank);
-            writer.PutList(roles);
-            writer.PutDictionary(memberRoles);
-            writer.PutDictionary(skillLevels);
-        }
-
-        public override void Deserialize(NetDataReader reader)
-        {
-            base.Deserialize(reader);
-            guildName = reader.GetString();
-            level = reader.GetPackedInt();
-            exp = reader.GetPackedInt();
-            skillPoint = reader.GetPackedInt();
-            guildMessage = reader.GetString();
-            guildMessage2 = reader.GetString();
-            score = reader.GetPackedInt();
-            gold = reader.GetPackedInt();
-            options = reader.GetString();
-            autoAcceptRequests = reader.GetBool();
-            rank = reader.GetPackedInt();
-            roles = reader.GetList<GuildRoleData>();
-            memberRoles = reader.GetDictionary<string, byte>();
-            skillLevels = reader.GetDictionary<int, int>();
         }
     }
 }
