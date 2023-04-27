@@ -42,22 +42,22 @@ namespace MultiplayerARPG
         }
 
         [System.NonSerialized]
-        private Dictionary<ItemRandomByWeight, int> cacheRandomItems;
+        private Dictionary<ItemRandomByWeight, int> _cacheRandomItems;
         public Dictionary<ItemRandomByWeight, int> CacheRandomItems
         {
             get
             {
-                if (cacheRandomItems == null)
+                if (_cacheRandomItems == null)
                 {
-                    cacheRandomItems = new Dictionary<ItemRandomByWeight, int>();
+                    _cacheRandomItems = new Dictionary<ItemRandomByWeight, int>();
                     foreach (ItemRandomByWeight item in randomItems)
                     {
                         if (item.item == null || item.maxAmount <= 0 || item.randomWeight <= 0)
                             continue;
-                        cacheRandomItems[item] = item.randomWeight;
+                        _cacheRandomItems[item] = item.randomWeight;
                     }
                 }
-                return cacheRandomItems;
+                return _cacheRandomItems;
             }
         }
 
