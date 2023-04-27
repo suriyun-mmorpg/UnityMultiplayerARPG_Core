@@ -6,7 +6,7 @@ namespace MultiplayerARPG
     {
         [Category("Buff/Bonus Settings")]
         [SerializeField]
-        private ArmorIncremental armorAmount = default(ArmorIncremental);
+        private ArmorIncremental armorAmount = default;
         public ArmorIncremental ArmorAmount
         {
             get { return armorAmount; }
