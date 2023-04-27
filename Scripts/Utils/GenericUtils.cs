@@ -7,7 +7,7 @@ using UnityEngine.UI;
 using TMPro;
 using UnityEngine.EventSystems;
 
-public static class GenericUtils
+public static partial class GenericUtils
 {
     private static System.Random randomizer = new System.Random();
 
