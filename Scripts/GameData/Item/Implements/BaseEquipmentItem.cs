@@ -17,7 +17,7 @@ namespace MultiplayerARPG
         [Category(2, "Equipment Settings")]
         [Header("Generic Equipment Settings")]
         [SerializeField]
-        private EquipmentRequirement requirement = default(EquipmentRequirement);
+        private EquipmentRequirement requirement = default;
         public EquipmentRequirement Requirement
         {
             get { return requirement; }
@@ -65,14 +65,14 @@ namespace MultiplayerARPG
 
         [Category(3, "Buff/Bonus Settings")]
         [SerializeField]
-        private CharacterStatsIncremental increaseStats = default(CharacterStatsIncremental);
+        private CharacterStatsIncremental increaseStats = default;
         public CharacterStatsIncremental IncreaseStats
         {
             get { return increaseStats; }
         }
 
         [SerializeField]
-        private CharacterStatsIncremental increaseStatsRate = default(CharacterStatsIncremental);
+        private CharacterStatsIncremental increaseStatsRate = default;
         public CharacterStatsIncremental IncreaseStatsRate
         {
             get { return increaseStatsRate; }
