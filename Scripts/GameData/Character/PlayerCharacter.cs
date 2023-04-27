@@ -51,26 +51,26 @@ namespace MultiplayerARPG
         [SerializeField]
         private StartMapByCondition[] startPointsByCondition = new StartMapByCondition[0];
         [System.NonSerialized]
-        private Dictionary<int, List<StartMapByCondition>> cacheStartMapsByCondition;
+        private Dictionary<int, List<StartMapByCondition>> _cacheStartMapsByCondition;
         public Dictionary<int, List<StartMapByCondition>> CacheStartMapsByCondition
         {
             get
             {
-                if (cacheStartMapsByCondition == null)
+                if (_cacheStartMapsByCondition == null)
                 {
-                    cacheStartMapsByCondition = new Dictionary<int, List<StartMapByCondition>>();
+                    _cacheStartMapsByCondition = new Dictionary<int, List<StartMapByCondition>>();
                     int factionDataId;
                     foreach (StartMapByCondition startPointByCondition in startPointsByCondition)
                     {
                         factionDataId = 0;
                         if (startPointByCondition.forFaction != null)
                             factionDataId = startPointByCondition.forFaction.DataId;
-                        if (!cacheStartMapsByCondition.ContainsKey(factionDataId))
-                            cacheStartMapsByCondition.Add(factionDataId, new List<StartMapByCondition>());
-                        cacheStartMapsByCondition[factionDataId].Add(startPointByCondition);
+                        if (!_cacheStartMapsByCondition.ContainsKey(factionDataId))
+                            _cacheStartMapsByCondition.Add(factionDataId, new List<StartMapByCondition>());
+                        _cacheStartMapsByCondition[factionDataId].Add(startPointByCondition);
                     }
                 }
-                return cacheStartMapsByCondition;
+                return _cacheStartMapsByCondition;
             }
         }
 
@@ -101,14 +101,14 @@ namespace MultiplayerARPG
         }
 
         [System.NonSerialized]
-        private Dictionary<BaseSkill, int> cacheSkillLevels = null;
+        private Dictionary<BaseSkill, int> _cacheSkillLevels = null;
         public override Dictionary<BaseSkill, int> CacheSkillLevels
         {
             get
             {
-                if (cacheSkillLevels == null)
-                    cacheSkillLevels = GameDataHelpers.CombineSkills(skillLevels, new Dictionary<BaseSkill, int>(), 1f);
-                return cacheSkillLevels;
+                if (_cacheSkillLevels == null)
+                    _cacheSkillLevels = GameDataHelpers.CombineSkills(skillLevels, new Dictionary<BaseSkill, int>(), 1f);
+                return _cacheSkillLevels;
             }
         }
 
