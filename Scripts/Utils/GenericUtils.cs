@@ -1,16 +1,14 @@
 ﻿using System.Collections.Generic;
-using System.Linq;
-using Cysharp.Text;
 using UnityEngine;
 using UnityEngine.Networking;
 using UnityEngine.UI;
 using TMPro;
 using UnityEngine.EventSystems;
+using Cysharp.Text;
+using System.Linq;
 
 public static partial class GenericUtils
 {
-    private static System.Random randomizer = new System.Random();
-
     public static bool IsFocusInputField()
     {
         if (EventSystem.current != null && EventSystem.current.currentSelectedGameObject != null)
@@ -364,173 +362,6 @@ public static partial class GenericUtils
         }
     }
 
-    public static string ToBonusString(this short value, string format = "N0")
-    {
-        return value >= 0 ? "+" + value.ToString(format) : value.ToString(format);
-    }
-
-    public static string ToBonusString(this int value, string format = "N0")
-    {
-        return value >= 0 ? "+" + value.ToString(format) : value.ToString(format);
-    }
-
-    public static string ToBonusString(this float value, string format = "N0")
-    {
-        return value >= 0 ? "+" + value.ToString(format) : value.ToString(format);
-    }
-
-    public static void Shuffle<T>(this IList<T> list, System.Random random)
-    {
-        if (list == null || list.Count <= 1)
-            return;
-        int tempRandomIndex;
-        T tempEntry;
-        for (int i = 0; i < list.Count - 1; ++i)
-        {
-            tempRandomIndex = random.Next(i, list.Count);
-            tempEntry = list[i];
-            list[i] = list[tempRandomIndex];
-            list[tempRandomIndex] = tempEntry;
-        }
-    }
-
-    public static void Shuffle<T>(this IList<T> list)
-    {
-        randomizer.Next();
-        Shuffle(list, randomizer);
-    }
-
-    public static int Increase(this int a, int b)
-    {
-        try
-        {
-            checked
-            {
-                return a + b;
-            }
-        }
-        catch (System.OverflowException)
-        {
-            return int.MaxValue;
-        }
-    }
-
-    public static float RandomFloat(this System.Random random, float min, float max)
-    {
-        return (float)random.NextDouble() * (max - min) + min;
-    }
-
-    public static float RandomFloat(int seed, float min, float max)
-    {
-        return new System.Random(seed).RandomFloat(min, max);
-    }
-
-    public static int RandomInt(this System.Random random, int min, int max)
-    {
-        return random.Next(min, max);
-    }
-
-    public static int RandomInt(int seed, int min, int max)
-    {
-        return new System.Random(seed).RandomInt(min, max);
-    }
-
-    public static string GetPrettyDate(this System.TimeSpan dateTimeDiff, bool future = false)
-    {
-        // TODO: Will get format string from language settings
-        string textAFewSecondsAgo = "a few seconds ago";
-        string textAMinuteAgo = "1 Minute ago";
-        string textAHourAgo = "1 Hour ago";
-        string textYesterday = "Yesterday";
-        string formatMinutesAgo = "{0} Minutes ago";
-        string formatHoursAgo = "{0} Hours ago";
-        string formatDaysAgo = "{0} Days ago";
-        string formatWeeksAgo = "{0} Weeks ago";
-        string formatMonthsAgo = "{0} Months ago";
-        string textUnknow = "Unknow";
-
-        // Future text
-        string textAFewSeconds = "a few seconds";
-        string textAMinute = "1 Minute";
-        string textAHour = "1 Hour";
-        string textTomorrow = "Tomorrow";
-        string formatMinutes = "{0} Minutes";
-        string formatHours = "{0} Hours";
-        string formatDays = "{0} Days";
-        string formatWeeks = "{0} Weeks";
-        string formatMonths = "{0} Months";
-
-        int monthDiff = (int)(dateTimeDiff.TotalDays / 30);
-        int dayDiff = (int)dateTimeDiff.TotalDays;
-        int secDiff = (int)dateTimeDiff.TotalSeconds;
-
-        if (future)
-        {
-            return GetPrettyDate(monthDiff, dayDiff, secDiff, textAFewSeconds, textAMinute, textAHour, textTomorrow, formatMinutes, formatHours, formatDays, formatWeeks, formatMonths, textUnknow);
-        }
-        else
-        {
-            return GetPrettyDate(monthDiff, dayDiff, secDiff, textAFewSecondsAgo, textAMinuteAgo, textAHourAgo, textYesterday, formatMinutesAgo, formatHoursAgo, formatDaysAgo, formatWeeksAgo, formatMonthsAgo, textUnknow);
-        }
-    }
-
-    public static string GetPrettyDate(
-        int monthDiff, 
-        int dayDiff, 
-        int secDiff,
-        string textNow,
-        string textAMinute,
-        string textAHour,
-        string textADay,
-        string formatMinutes,
-        string formatHours,
-        string formatDays,
-        string formatWeeks,
-        string formatMonths,
-        string textUnknow)
-    {
-
-        // Don't allow out of range values.
-        if (dayDiff < 0)
-            return textUnknow;
-
-        // Handle same-day times.
-        if (dayDiff == 0)
-        {
-            // Less than one minute.
-            if (secDiff < 60)
-                return textNow;
-            // Less than 2 minutes.
-            if (secDiff < 120)
-                return textAMinute;
-            // Less than one hour.
-            if (secDiff < 3600)
-                return ZString.Format(formatMinutes, Mathf.CeilToInt((float)secDiff / 60f));
-            // Less than 2 hours.
-            if (secDiff < 7200)
-                return textAHour;
-            // Less than one day.
-            if (secDiff < 86400)
-                return ZString.Format(formatHours, Mathf.CeilToInt((float)secDiff / 3600f));
-        }
-        // Handle previous days.
-        if (dayDiff == 1)
-            return textADay;
-        if (dayDiff < 7)
-            return ZString.Format(formatDays, dayDiff);
-        if (dayDiff < 30)
-            return ZString.Format(formatWeeks, Mathf.CeilToInt((float)dayDiff / 7f));
-        if (monthDiff < 12)
-            return ZString.Format(formatMonths, monthDiff);
-
-        return textUnknow;
-    }
-
-    public static System.Uri Append(this System.Uri uri, params string[] paths)
-    {
-        return new System.Uri(paths.Aggregate(uri.AbsoluteUri, (current, path) => ZString.Format("{0}/{1}", current.TrimEnd('/'), path.TrimStart('/'))));
-    }
-
     public static bool IsError(this UnityWebRequest unityWebRequest)
     {
 #if UNITY_2020_2_OR_NEWER
@@ -595,5 +426,116 @@ public static partial class GenericUtils
         Gizmos.color = defaultColor;
         // Restore default matrix
         Gizmos.matrix = defaultMatrix;
+    }
+
+    public static string ToBonusString(this short value, string format = "N0")
+    {
+        return value >= 0 ? "+" + value.ToString(format) : value.ToString(format);
+    }
+
+    public static string ToBonusString(this int value, string format = "N0")
+    {
+        return value >= 0 ? "+" + value.ToString(format) : value.ToString(format);
+    }
+
+    public static string ToBonusString(this float value, string format = "N0")
+    {
+        return value >= 0 ? "+" + value.ToString(format) : value.ToString(format);
+    }
+
+    public static string GetPrettyDate(this System.TimeSpan dateTimeDiff, bool future = false)
+    {
+        // TODO: Will get format string from language settings
+        string textAFewSecondsAgo = "a few seconds ago";
+        string textAMinuteAgo = "1 Minute ago";
+        string textAHourAgo = "1 Hour ago";
+        string textYesterday = "Yesterday";
+        string formatMinutesAgo = "{0} Minutes ago";
+        string formatHoursAgo = "{0} Hours ago";
+        string formatDaysAgo = "{0} Days ago";
+        string formatWeeksAgo = "{0} Weeks ago";
+        string formatMonthsAgo = "{0} Months ago";
+        string textUnknow = "Unknow";
+
+        // Future text
+        string textAFewSeconds = "a few seconds";
+        string textAMinute = "1 Minute";
+        string textAHour = "1 Hour";
+        string textTomorrow = "Tomorrow";
+        string formatMinutes = "{0} Minutes";
+        string formatHours = "{0} Hours";
+        string formatDays = "{0} Days";
+        string formatWeeks = "{0} Weeks";
+        string formatMonths = "{0} Months";
+
+        int monthDiff = (int)(dateTimeDiff.TotalDays / 30);
+        int dayDiff = (int)dateTimeDiff.TotalDays;
+        int secDiff = (int)dateTimeDiff.TotalSeconds;
+
+        if (future)
+        {
+            return GetPrettyDate(monthDiff, dayDiff, secDiff, textAFewSeconds, textAMinute, textAHour, textTomorrow, formatMinutes, formatHours, formatDays, formatWeeks, formatMonths, textUnknow);
+        }
+        else
+        {
+            return GetPrettyDate(monthDiff, dayDiff, secDiff, textAFewSecondsAgo, textAMinuteAgo, textAHourAgo, textYesterday, formatMinutesAgo, formatHoursAgo, formatDaysAgo, formatWeeksAgo, formatMonthsAgo, textUnknow);
+        }
+    }
+
+    public static string GetPrettyDate(
+        int monthDiff,
+        int dayDiff,
+        int secDiff,
+        string textNow,
+        string textAMinute,
+        string textAHour,
+        string textADay,
+        string formatMinutes,
+        string formatHours,
+        string formatDays,
+        string formatWeeks,
+        string formatMonths,
+        string textUnknow)
+    {
+
+        // Don't allow out of range values.
+        if (dayDiff < 0)
+            return textUnknow;
+
+        // Handle same-day times.
+        if (dayDiff == 0)
+        {
+            // Less than one minute.
+            if (secDiff < 60)
+                return textNow;
+            // Less than 2 minutes.
+            if (secDiff < 120)
+                return textAMinute;
+            // Less than one hour.
+            if (secDiff < 3600)
+                return ZString.Format(formatMinutes, Mathf.CeilToInt((float)secDiff / 60f));
+            // Less than 2 hours.
+            if (secDiff < 7200)
+                return textAHour;
+            // Less than one day.
+            if (secDiff < 86400)
+                return ZString.Format(formatHours, Mathf.CeilToInt((float)secDiff / 3600f));
+        }
+        // Handle previous days.
+        if (dayDiff == 1)
+            return textADay;
+        if (dayDiff < 7)
+            return ZString.Format(formatDays, dayDiff);
+        if (dayDiff < 30)
+            return ZString.Format(formatWeeks, Mathf.CeilToInt((float)dayDiff / 7f));
+        if (monthDiff < 12)
+            return ZString.Format(formatMonths, monthDiff);
+
+        return textUnknow;
+    }
+
+    public static System.Uri Append(this System.Uri uri, params string[] paths)
+    {
+        return new System.Uri(paths.Aggregate(uri.AbsoluteUri, (current, path) => ZString.Format("{0}/{1}", current.TrimEnd('/'), path.TrimStart('/'))));
     }
 }
