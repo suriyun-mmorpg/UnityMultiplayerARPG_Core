@@ -215,7 +215,7 @@ namespace MultiplayerARPG
                 case SkillAttackType.BasedOnWeapon:
                     return skillUser.GetWeaponDamageInfo(ref isLeftHand);
             }
-            return default(DamageInfo);
+            return default;
         }
 
         public override SkillType SkillType
