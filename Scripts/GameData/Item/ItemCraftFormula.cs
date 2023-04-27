@@ -8,7 +8,7 @@ namespace MultiplayerARPG
     {
         [Category("Item Craft Formula Settings")]
         [SerializeField]
-        private ItemCraft itemCraft = default(ItemCraft);
+        private ItemCraft itemCraft = default;
         public ItemCraft ItemCraft
         {
             get { return itemCraft; }
