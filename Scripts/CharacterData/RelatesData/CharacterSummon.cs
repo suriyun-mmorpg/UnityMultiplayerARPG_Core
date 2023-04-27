@@ -3,9 +3,8 @@ using LiteNetLibManager;
 
 namespace MultiplayerARPG
 {
-    public partial class CharacterSummon : INetSerializable
+    public partial class CharacterSummon
     {
-        public uint ObjectId { get; internal set; }
         public int Level { get { return CacheEntity != null ? CacheEntity.Level : level; } }
         public int Exp { get { return CacheEntity != null ? CacheEntity.Exp : exp; } }
         public int CurrentHp { get { return CacheEntity != null ? CacheEntity.CurrentHp : currentHp; } }
@@ -33,8 +32,8 @@ namespace MultiplayerARPG
         {
             get
             {
-                if (_cacheEntity == null && ObjectId > 0)
-                    BaseGameNetworkManager.Singleton.Assets.TryGetSpawnedObject(ObjectId, out _cacheEntity);
+                if (_cacheEntity == null && objectId > 0)
+                    BaseGameNetworkManager.Singleton.Assets.TryGetSpawnedObject(objectId, out _cacheEntity);
                 return _cacheEntity;
             }
         }
@@ -81,7 +80,7 @@ namespace MultiplayerARPG
             _cacheEntity = spawnObj.GetComponent<BaseMonsterCharacterEntity>();
             BaseGameNetworkManager.Singleton.Assets.NetworkSpawn(spawnObj);
             CacheEntity.Summon(summoner, type, summonLevel);
-            ObjectId = CacheEntity.ObjectId;
+            objectId = CacheEntity.ObjectId;
             summonRemainsDuration = duration;
             level = summonLevel;
         }
@@ -169,74 +168,6 @@ namespace MultiplayerARPG
             currentHp = CurrentHp;
             currentMp = CurrentMp;
         }
-
-        public CharacterSummon Clone(bool generateNewId = false)
-        {
-            return new CharacterSummon()
-            {
-                id = generateNewId ? GenericUtils.GetUniqueId() : id,
-                type = type,
-                dataId = dataId,
-                summonRemainsDuration = summonRemainsDuration,
-                ObjectId = ObjectId,
-                level = level,
-                exp = exp,
-                currentHp = currentHp,
-                currentMp = currentMp,
-            };
-        }
-
-        public static CharacterSummon Create(SummonType type, int dataId)
-        {
-            return new CharacterSummon()
-            {
-                id = GenericUtils.GetUniqueId(),
-                type = type,
-                dataId = dataId,
-            };
-        }
-
-        public void Serialize(NetDataWriter writer)
-        {
-            writer.Put(id);
-            writer.Put((byte)type);
-            if (type != SummonType.None)
-            {
-                writer.PutPackedInt(dataId);
-                switch (type)
-                {
-                    case SummonType.Skill:
-                        writer.Put(summonRemainsDuration);
-                        break;
-                }
-                writer.PutPackedUInt(ObjectId);
-                writer.PutPackedInt(level);
-                writer.PutPackedInt(exp);
-                writer.PutPackedInt(currentHp);
-                writer.PutPackedInt(currentMp);
-            }
-        }
-
-        public void Deserialize(NetDataReader reader)
-        {
-            id = reader.GetString();
-            type = (SummonType)reader.GetByte();
-            if (type != SummonType.None)
-            {
-                dataId = reader.GetPackedInt();
-                switch (type)
-                {
-                    case SummonType.Skill:
-                        summonRemainsDuration = reader.GetFloat();
-                        break;
-                }
-                ObjectId = reader.GetPackedUInt();
-                level = reader.GetPackedInt();
-                exp = reader.GetPackedInt();
-                currentHp = reader.GetPackedInt();
-                currentMp = reader.GetPackedInt();
-            }
-        }
     }
 
     [System.Serializable]
@@ -246,14 +177,14 @@ namespace MultiplayerARPG
         {
             CharacterSummon result = this[index];
             result.summonRemainsDuration = reader.GetFloat();
-            result.ObjectId = reader.GetPackedUInt();
+            result.objectId = reader.GetPackedUInt();
             return result;
         }
 
         protected override void SerializeValueForSetOrDirty(int index, NetDataWriter writer, CharacterSummon value)
         {
             writer.Put(value.summonRemainsDuration);
-            writer.PutPackedUInt(value.ObjectId);
+            writer.PutPackedUInt(value.objectId);
         }
     }
 }

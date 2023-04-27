@@ -1,30 +1,32 @@
-﻿using LiteNetLib.Utils;
-using LiteNetLibManager;
+﻿using LiteNetLibManager;
 
 namespace MultiplayerARPG
 {
-    public partial class CharacterHotkey : INetSerializable
+    public partial class CharacterHotkey
     {
-        public void Serialize(NetDataWriter writer)
+        public static CharacterHotkey Create(string hotkeyId, CharacterItem characterItem)
         {
-            writer.Put(hotkeyId);
-            writer.Put((byte)type);
-            writer.Put(relateId);
-        }
-
-        public void Deserialize(NetDataReader reader)
-        {
-            hotkeyId = reader.GetString();
-            type = (HotkeyType)reader.GetByte();
-            relateId = reader.GetString();
-        }
-
-        public CharacterHotkey Clone()
-        {
+            // Usable items will use item data id
+            string relateId = characterItem.GetItem().Id;
+            // For an equipments, it will use item unique id
+            if (characterItem.GetEquipmentItem() != null)
+                relateId = characterItem.id;
             return new CharacterHotkey()
             {
                 hotkeyId = hotkeyId,
-                type = type,
+                type = HotkeyType.Item,
+                relateId = relateId,
+            };
+        }
+
+        public static CharacterHotkey Create(string hotkeyId, CharacterSkill characterSkill)
+        {
+            // Use skil data id
+            string relateId = characterSkill.GetSkill().Id;
+            return new CharacterHotkey()
+            {
+                hotkeyId = hotkeyId,
+                type = HotkeyType.Skill,
                 relateId = relateId,
             };
         }

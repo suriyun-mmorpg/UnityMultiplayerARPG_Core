@@ -1,9 +1,8 @@
-﻿using LiteNetLib.Utils;
-using LiteNetLibManager;
+﻿using LiteNetLibManager;
 
 namespace MultiplayerARPG
 {
-    public partial class CharacterCurrency : INetSerializable
+    public partial class CharacterCurrency
     {
         [System.NonSerialized]
         private int _dirtyDataId;
@@ -25,39 +24,9 @@ namespace MultiplayerARPG
             return _cacheCurrency;
         }
 
-        public CharacterCurrency Clone()
-        {
-            return new CharacterCurrency()
-            {
-                dataId = dataId,
-                amount = amount,
-            };
-        }
-
         public static CharacterCurrency Create(Currency currency, int amount = 0)
         {
             return Create(currency.DataId, amount);
-        }
-
-        public static CharacterCurrency Create(int dataId, int amount = 0)
-        {
-            return new CharacterCurrency()
-            {
-                dataId = dataId,
-                amount = amount,
-            };
-        }
-
-        public void Serialize(NetDataWriter writer)
-        {
-            writer.PutPackedInt(dataId);
-            writer.PutPackedInt(amount);
-        }
-
-        public void Deserialize(NetDataReader reader)
-        {
-            dataId = reader.GetPackedInt();
-            amount = reader.GetPackedInt();
         }
     }
 

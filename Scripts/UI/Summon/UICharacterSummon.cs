@@ -147,7 +147,7 @@ namespace MultiplayerARPG
 
         public void AddStackingEntry(CharacterSummon summon)
         {
-            stackingEntries[summon.ObjectId] = summon;
+            stackingEntries[summon.objectId] = summon;
             OnStackingEntriesUpdate();
         }
 
@@ -167,7 +167,7 @@ namespace MultiplayerARPG
         {
             if (CharacterSummon.type == SummonType.PetItem ||
                 CharacterSummon.type == SummonType.Custom)
-                GameInstance.PlayingCharacterEntity.CallServerUnSummon(CharacterSummon.ObjectId);
+                GameInstance.PlayingCharacterEntity.CallServerUnSummon(CharacterSummon.objectId);
         }
     }
 }

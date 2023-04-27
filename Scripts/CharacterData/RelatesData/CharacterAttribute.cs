@@ -1,9 +1,8 @@
-﻿using LiteNetLib.Utils;
-using LiteNetLibManager;
+﻿using LiteNetLibManager;
 
 namespace MultiplayerARPG
 {
-    public partial class CharacterAttribute : INetSerializable
+    public partial class CharacterAttribute
     {
         [System.NonSerialized]
         private int _dirtyDataId;
@@ -25,39 +24,9 @@ namespace MultiplayerARPG
             return _cacheAttribute;
         }
 
-        public CharacterAttribute Clone()
-        {
-            return new CharacterAttribute()
-            {
-                dataId = dataId,
-                amount = amount,
-            };
-        }
-
         public static CharacterAttribute Create(Attribute attribute, int amount = 0)
         {
             return Create(attribute.DataId, amount);
-        }
-
-        public static CharacterAttribute Create(int dataId, int amount = 0)
-        {
-            return new CharacterAttribute()
-            {
-                dataId = dataId,
-                amount = amount,
-            };
-        }
-
-        public void Serialize(NetDataWriter writer)
-        {
-            writer.PutPackedInt(dataId);
-            writer.PutPackedInt(amount);
-        }
-
-        public void Deserialize(NetDataReader reader)
-        {
-            dataId = reader.GetPackedInt();
-            amount = reader.GetPackedInt();
         }
     }
 

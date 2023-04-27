@@ -1,50 +1,10 @@
-﻿using LiteNetLib.Utils;
-using LiteNetLibManager;
+﻿using LiteNetLibManager;
 
 namespace MultiplayerARPG
 {
-    public partial class EquipWeapons : INetSerializable
+    public partial class EquipWeapons
     {
-        private void Validate()
-        {
-            if (rightHand == null)
-                rightHand = new CharacterItem();
-
-            if (leftHand == null)
-                leftHand = new CharacterItem();
-        }
-
-        public void Serialize(NetDataWriter writer)
-        {
-            Validate();
-            // Right hand
-            writer.Put(rightHand);
-            // Left hand
-            writer.Put(leftHand);
-        }
-
-        public void Deserialize(NetDataReader reader)
-        {
-            Validate();
-            // Right hand
-            rightHand = reader.Get(() => new CharacterItem());
-            // Left hand
-            leftHand = reader.Get(() => new CharacterItem());
-        }
-
-        public void Deserialize(NetDataReader reader, LiteNetLibElement element)
-        {
-            Deserialize(reader);
-        }
-
-        public EquipWeapons Clone(bool generateNewId = false)
-        {
-            return new EquipWeapons()
-            {
-                rightHand = rightHand.Clone(generateNewId),
-                leftHand = leftHand.Clone(generateNewId),
-            };
-        }
+        // NOTE: May add some functions later
     }
 
     [System.Serializable]

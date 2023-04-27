@@ -104,7 +104,7 @@ namespace MultiplayerARPG
         public virtual void UpdateData(ICharacterData character)
         {
             Character = character;
-            uint selectedSummonObjectId = CacheSelectionManager.SelectedUI != null ? CacheSelectionManager.SelectedUI.CharacterSummon.ObjectId : 0;
+            uint selectedSummonObjectId = CacheSelectionManager.SelectedUI != null ? CacheSelectionManager.SelectedUI.CharacterSummon.objectId : 0;
             CacheSelectionManager.DeselectSelectedUI();
             CacheSelectionManager.Clear();
 
@@ -132,7 +132,7 @@ namespace MultiplayerARPG
                             break;
                     }
                     CacheSelectionManager.Add(tempUI);
-                    if (selectedSummonObjectId == data.ObjectId)
+                    if (selectedSummonObjectId == data.objectId)
                         tempUI.OnClickSelect();
                 }
             });

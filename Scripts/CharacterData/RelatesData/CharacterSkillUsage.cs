@@ -3,7 +3,7 @@ using LiteNetLibManager;
 
 namespace MultiplayerARPG
 {
-    public partial class CharacterSkillUsage : INetSerializable
+    public partial class CharacterSkillUsage
     {
         [System.NonSerialized]
         private int _dirtyDataId;
@@ -106,40 +106,6 @@ namespace MultiplayerARPG
         public void Update(float deltaTime)
         {
             coolDownRemainsDuration -= deltaTime;
-        }
-
-        public CharacterSkillUsage Clone()
-        {
-            return new CharacterSkillUsage()
-            {
-                type = type,
-                dataId = dataId,
-                coolDownRemainsDuration = coolDownRemainsDuration,
-            };
-        }
-
-        public static CharacterSkillUsage Create(SkillUsageType type, int dataId)
-        {
-            return new CharacterSkillUsage()
-            {
-                type = type,
-                dataId = dataId,
-                coolDownRemainsDuration = 0f,
-            };
-        }
-
-        public void Serialize(NetDataWriter writer)
-        {
-            writer.Put((byte)type);
-            writer.PutPackedInt(dataId);
-            writer.Put(coolDownRemainsDuration);
-        }
-
-        public void Deserialize(NetDataReader reader)
-        {
-            type = (SkillUsageType)reader.GetByte();
-            dataId = reader.GetPackedInt();
-            coolDownRemainsDuration = reader.GetFloat();
         }
     }
 

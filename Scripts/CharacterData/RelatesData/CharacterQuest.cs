@@ -1,10 +1,8 @@
-﻿using System.Collections.Generic;
-using LiteNetLib.Utils;
-using LiteNetLibManager;
+﻿using LiteNetLibManager;
 
 namespace MultiplayerARPG
 {
-    public partial class CharacterQuest : INetSerializable
+    public partial class CharacterQuest
     {
         [System.NonSerialized]
         private int _dirtyDataId;
@@ -134,76 +132,9 @@ namespace MultiplayerARPG
             return KilledMonsters[monsterDataId];
         }
 
-        public CharacterQuest Clone()
-        {
-            CharacterQuest clone = new CharacterQuest();
-            clone.dataId = dataId;
-            clone.isComplete = isComplete;
-            clone.isTracking = isTracking;
-            // Clone killed monsters
-            Dictionary<int, int> killedMonsters = new Dictionary<int, int>();
-            foreach (KeyValuePair<int, int> cloneEntry in this.killedMonsters)
-            {
-                killedMonsters[cloneEntry.Key] = cloneEntry.Value;
-            }
-            clone.killedMonsters = killedMonsters;
-            // Clone complete tasks
-            clone.completedTasks = new List<int>(completedTasks);
-            return clone;
-        }
-
         public static CharacterQuest Create(Quest quest)
         {
-            return new CharacterQuest()
-            {
-                dataId = quest.DataId,
-                isComplete = false,
-            };
-        }
-
-        public void Serialize(NetDataWriter writer)
-        {
-            writer.PutPackedInt(dataId);
-            writer.Put(isComplete);
-            writer.Put(isTracking);
-            byte killMonstersCount = (byte)KilledMonsters.Count;
-            writer.Put(killMonstersCount);
-            if (killMonstersCount > 0)
-            {
-                foreach (KeyValuePair<int, int> killedMonster in KilledMonsters)
-                {
-                    writer.PutPackedInt(killedMonster.Key);
-                    writer.PutPackedInt(killedMonster.Value);
-                }
-            }
-            byte completedTasksCount = (byte)CompletedTasks.Count;
-            writer.Put(completedTasksCount);
-            if (completedTasksCount > 0)
-            {
-                foreach (int talkedNpc in CompletedTasks)
-                {
-                    writer.PutPackedInt(talkedNpc);
-                }
-            }
-        }
-
-        public void Deserialize(NetDataReader reader)
-        {
-            dataId = reader.GetPackedInt();
-            isComplete = reader.GetBool();
-            isTracking = reader.GetBool();
-            int killMonstersCount = reader.GetByte();
-            KilledMonsters.Clear();
-            for (int i = 0; i < killMonstersCount; ++i)
-            {
-                KilledMonsters.Add(reader.GetPackedInt(), reader.GetPackedInt());
-            }
-            int completedTasksCount = reader.GetByte();
-            CompletedTasks.Clear();
-            for (int i = 0; i < completedTasksCount; ++i)
-            {
-                CompletedTasks.Add(reader.GetPackedInt());
-            }
+            return Create(quest.DataId);
         }
     }
 

@@ -1,9 +1,8 @@
-﻿using LiteNetLib.Utils;
-using LiteNetLibManager;
+﻿using LiteNetLibManager;
 
 namespace MultiplayerARPG
 {
-    public partial class CharacterSkill : INetSerializable
+    public partial class CharacterSkill
     {
         [System.NonSerialized]
         private int _dirtyDataId;
@@ -29,39 +28,9 @@ namespace MultiplayerARPG
             return _cacheSkill;
         }
 
-        public CharacterSkill Clone()
-        {
-            return new CharacterSkill()
-            {
-                dataId = dataId,
-                level = level,
-            };
-        }
-
         public static CharacterSkill Create(BaseSkill skill, int level = 1)
         {
             return Create(skill.DataId, level);
-        }
-
-        public static CharacterSkill Create(int dataId, int level = 1)
-        {
-            return new CharacterSkill()
-            {
-                dataId = dataId,
-                level = level,
-            };
-        }
-
-        public void Serialize(NetDataWriter writer)
-        {
-            writer.PutPackedInt(dataId);
-            writer.PutPackedInt(level);
-        }
-
-        public void Deserialize(NetDataReader reader)
-        {
-            dataId = reader.GetPackedInt();
-            level = reader.GetPackedInt();
         }
     }
 
