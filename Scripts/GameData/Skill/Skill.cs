@@ -55,14 +55,14 @@ namespace MultiplayerARPG
         public ItemCraft itemCraft;
 
         [System.NonSerialized]
-        private Dictionary<Attribute, float> cacheEffectivenessAttributes;
+        private Dictionary<Attribute, float> _cacheEffectivenessAttributes;
         public Dictionary<Attribute, float> CacheEffectivenessAttributes
         {
             get
             {
-                if (cacheEffectivenessAttributes == null)
-                    cacheEffectivenessAttributes = GameDataHelpers.CombineDamageEffectivenessAttributes(effectivenessAttributes, new Dictionary<Attribute, float>());
-                return cacheEffectivenessAttributes;
+                if (_cacheEffectivenessAttributes == null)
+                    _cacheEffectivenessAttributes = GameDataHelpers.CombineDamageEffectivenessAttributes(effectivenessAttributes, new Dictionary<Attribute, float>());
+                return _cacheEffectivenessAttributes;
             }
         }
 
