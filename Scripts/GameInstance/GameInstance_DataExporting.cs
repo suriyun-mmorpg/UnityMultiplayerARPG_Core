@@ -41,6 +41,7 @@ namespace MultiplayerARPG
                 exportingItems[kv.Key] = new Dictionary<string, object>()
                 {
                     { "Id", kv.Value.Id },
+                    { "DataId", kv.Value.DataId },
                     { "ItemType", (byte)kv.Value.ItemType },
                     { "SellPrice", kv.Value.SellPrice },
                     { "Weight", kv.Value.Weight },
