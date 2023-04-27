@@ -1,5 +1,4 @@
-﻿using LiteNetLib.Utils;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.IO;
 using System.Runtime.Serialization;
 using System.Runtime.Serialization.Formatters.Binary;
@@ -11,8 +10,7 @@ namespace MultiplayerARPG
     {
         public static T ValidateCharacterData<T>(this T character) where T : IPlayerCharacterData
         {
-            PlayerCharacter database;
-            if (!GameInstance.PlayerCharacters.TryGetValue(character.DataId, out database))
+            if (!GameInstance.PlayerCharacters.TryGetValue(character.DataId, out PlayerCharacter database))
                 return character;
             // Validating character attributes
             int returningStatPoint = 0;
@@ -112,17 +110,23 @@ namespace MultiplayerARPG
 
         public static T SetNewPlayerCharacterData<T>(this T character, string characterName, int dataId, int entityId, int factionId) where T : IPlayerCharacterData
         {
-            GameInstance gameInstance = GameInstance.Singleton;
-            PlayerCharacter playerCharacter;
-            if (!GameInstance.PlayerCharacters.TryGetValue(dataId, out playerCharacter))
+            int startGold = GameInstance.Singleton.newCharacterSetting != null ? GameInstance.Singleton.newCharacterSetting.startGold : GameInstance.Singleton.startGold;
+            ItemAmount[] startItems = GameInstance.Singleton.newCharacterSetting != null ? GameInstance.Singleton.newCharacterSetting.startItems : GameInstance.Singleton.startItems;
+            return character.SetNewPlayerCharacterData(GameInstance.PlayerCharacters, GameInstance.Attributes, startGold, startItems, characterName, dataId, entityId, factionId);
+        }
+
+        public static T SetNewPlayerCharacterData<T>(this T character, Dictionary<int, PlayerCharacter> playerCharacters, Dictionary<int, Attribute> attributes, int startGold, ItemAmount[] startItems, string characterName, int dataId, int entityId, int factionId) where T : IPlayerCharacterData
+        {
+            if (!playerCharacters.TryGetValue(dataId, out PlayerCharacter playerCharacter))
                 return character;
+
             // General data
             character.DataId = dataId;
             character.EntityId = entityId;
             character.CharacterName = characterName;
             character.Level = 1;
             // Attributes
-            foreach (Attribute attribute in GameInstance.Attributes.Values)
+            foreach (Attribute attribute in attributes.Values)
             {
                 character.Attributes.Add(CharacterAttribute.Create(attribute.DataId, 0));
             }
@@ -159,10 +163,10 @@ namespace MultiplayerARPG
                 character.EquipItems.Add(newItem);
             }
             // Start items
-            List<ItemAmount> startItems = new List<ItemAmount>();
-            startItems.AddRange(gameInstance.newCharacterSetting != null ? gameInstance.newCharacterSetting.startItems : gameInstance.startItems);
-            startItems.AddRange(playerCharacter.StartItems);
-            foreach (ItemAmount startItem in startItems)
+            List<ItemAmount> allStartItems = new List<ItemAmount>();
+            allStartItems.AddRange(startItems);
+            allStartItems.AddRange(playerCharacter.StartItems);
+            foreach (ItemAmount startItem in allStartItems)
             {
                 if (startItem.item == null || startItem.amount <= 0)
                     continue;
@@ -185,13 +189,10 @@ namespace MultiplayerARPG
             character.CurrentStamina = (int)stats.stamina;
             character.CurrentFood = (int)stats.food;
             character.CurrentWater = (int)stats.water;
-            character.Gold = gameInstance.newCharacterSetting != null ? gameInstance.newCharacterSetting.startGold : gameInstance.startGold;
+            character.Gold = startGold;
             character.FactionId = factionId;
             // Start Map
-            BaseMapInfo startMap;
-            Vector3 startPosition;
-            Vector3 startRotation;
-            playerCharacter.GetStartMapAndTransform(character, out startMap, out startPosition, out startRotation);
+            playerCharacter.GetStartMapAndTransform(character, out BaseMapInfo startMap, out Vector3 startPosition, out Vector3 startRotation);
             character.CurrentMapName = startMap.Id;
             character.CurrentPosition = startPosition;
             character.CurrentRotation = startRotation;
@@ -417,7 +418,7 @@ namespace MultiplayerARPG
             int countStatPoint = 0;
             Attribute attribute;
             CharacterAttribute characterAttribute;
-            for (int i = characterData.Attributes.Count - 1; i >= 0 ; --i)
+            for (int i = characterData.Attributes.Count - 1; i >= 0; --i)
             {
                 characterAttribute = characterData.Attributes[i];
                 attribute = characterAttribute.GetAttribute();
@@ -486,7 +487,7 @@ namespace MultiplayerARPG
             int countSkillPoint = 0;
             BaseSkill skill;
             CharacterSkill characterSkill;
-            for (int i = characterData.Skills.Count - 1; i >= 0 ; --i)
+            for (int i = characterData.Skills.Count - 1; i >= 0; --i)
             {
                 characterSkill = characterData.Skills[i];
                 skill = characterSkill.GetSkill();
