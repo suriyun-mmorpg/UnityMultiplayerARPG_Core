@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using UnityEngine.Serialization;
 using System;
+using Newtonsoft.Json;
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
@@ -33,6 +34,7 @@ namespace MultiplayerARPG
         {
             get { return languageSpecificTitles; }
         }
+        [JsonIgnore]
         public virtual string Title
         {
             get { return Language.GetText(languageSpecificTitles, defaultTitle); }
@@ -53,6 +55,7 @@ namespace MultiplayerARPG
         {
             get { return languageSpecificDescriptions; }
         }
+        [JsonIgnore]
         public virtual string Description
         {
             get { return Language.GetText(languageSpecificDescriptions, defaultDescription); }

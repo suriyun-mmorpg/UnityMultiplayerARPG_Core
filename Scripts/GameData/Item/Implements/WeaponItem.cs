@@ -51,14 +51,14 @@ namespace MultiplayerARPG
         }
 
         [SerializeField]
-        private DamageIncremental damageAmount = default(DamageIncremental);
+        private DamageIncremental damageAmount = default;
         public DamageIncremental DamageAmount
         {
             get { return damageAmount; }
         }
 
         [SerializeField]
-        private IncrementalMinMaxFloat harvestDamageAmount = default(IncrementalMinMaxFloat);
+        private IncrementalMinMaxFloat harvestDamageAmount = default;
         public IncrementalMinMaxFloat HarvestDamageAmount
         {
             get { return harvestDamageAmount; }
@@ -86,35 +86,35 @@ namespace MultiplayerARPG
         }
 
         [SerializeField]
-        private MovementRestriction movementRestrictionWhileReloading = default(MovementRestriction);
+        private MovementRestriction movementRestrictionWhileReloading = default;
         public MovementRestriction MovementRestrictionWhileReloading
         {
             get { return movementRestrictionWhileReloading; }
         }
 
         [SerializeField]
-        private MovementRestriction movementRestrictionWhileCharging = default(MovementRestriction);
+        private MovementRestriction movementRestrictionWhileCharging = default;
         public MovementRestriction MovementRestrictionWhileCharging
         {
             get { return movementRestrictionWhileCharging; }
         }
 
         [SerializeField]
-        private MovementRestriction movementRestrictionWhileAttacking = default(MovementRestriction);
+        private MovementRestriction movementRestrictionWhileAttacking = default;
         public MovementRestriction MovementRestrictionWhileAttacking
         {
             get { return movementRestrictionWhileAttacking; }
         }
 
         [SerializeField]
-        private ActionRestriction attackRestriction = default(ActionRestriction);
+        private ActionRestriction attackRestriction = default;
         public ActionRestriction AttackRestriction
         {
             get { return attackRestriction; }
         }
 
         [SerializeField]
-        private ActionRestriction reloadRestriction = default(ActionRestriction);
+        private ActionRestriction reloadRestriction = default;
         public ActionRestriction ReloadRestriction
         {
             get { return reloadRestriction; }
@@ -135,7 +135,7 @@ namespace MultiplayerARPG
         }
 
         [SerializeField]
-        private CrosshairSetting crosshairSetting = default(CrosshairSetting);
+        private CrosshairSetting crosshairSetting = default;
         public CrosshairSetting CrosshairSetting
         {
             get { return crosshairSetting; }

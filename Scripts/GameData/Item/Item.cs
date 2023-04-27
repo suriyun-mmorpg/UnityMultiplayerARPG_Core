@@ -71,11 +71,11 @@ namespace MultiplayerARPG
         [Range(0f, 1f)]
         [Tooltip("This is move speed rate while attacking with this weapon")]
         public float moveSpeedRateWhileAttacking = 0f;
-        public MovementRestriction movementRestrictionWhileReloading = default(MovementRestriction);
-        public MovementRestriction movementRestrictionWhileCharging = default(MovementRestriction);
-        public MovementRestriction movementRestrictionWhileAttacking = default(MovementRestriction);
-        public ActionRestriction attackRestriction = default(ActionRestriction);
-        public ActionRestriction reloadRestriction = default(ActionRestriction);
+        public MovementRestriction movementRestrictionWhileReloading = default;
+        public MovementRestriction movementRestrictionWhileCharging = default;
+        public MovementRestriction movementRestrictionWhileAttacking = default;
+        public ActionRestriction attackRestriction = default;
+        public ActionRestriction reloadRestriction = default;
         [Tooltip("For macine gun may set this to 30 as magazine capacity, if this is 0 it will not need to have ammo loaded to shoot but still need ammo in inventory")]
         public int ammoCapacity;
         public BaseWeaponAbility weaponAbility;

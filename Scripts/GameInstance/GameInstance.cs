@@ -765,7 +765,8 @@ namespace MultiplayerARPG
             if (npcDatabase != null && npcDatabase.maps != null)
                 AddMapNpcs(npcDatabase.maps);
 
-            InitializePurchasing();
+            if (Application.isPlaying)
+                InitializePurchasing();
 
             OnGameDataLoaded();
 
@@ -776,7 +777,7 @@ namespace MultiplayerARPG
         {
             if (onGameDataLoaded != null)
                 onGameDataLoaded.Invoke();
-            if (!DoNotLoadHomeScene)
+            if (Application.isPlaying && !DoNotLoadHomeScene)
                 LoadHomeScene();
         }
 
