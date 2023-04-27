@@ -68,29 +68,29 @@ namespace MultiplayerARPG
             {
                 if (_cacheItem.IsUsable())
                     _cacheUsableItem = _cacheItem as IUsableItem;
-                else if (_cacheItem.IsEquipment())
+                if (_cacheItem.IsEquipment())
                     _cacheEquipmentItem = _cacheItem as IEquipmentItem;
-                else if (_cacheItem.IsDefendEquipment())
+                if (_cacheItem.IsDefendEquipment())
                     _cacheDefendItem = _cacheItem as IDefendEquipmentItem;
-                else if (_cacheItem.IsArmor())
+                if (_cacheItem.IsArmor())
                     _cacheArmorItem = _cacheItem as IArmorItem;
-                else if (_cacheItem.IsWeapon())
+                if (_cacheItem.IsWeapon())
                     _cacheWeaponItem = _cacheItem as IWeaponItem;
-                else if (_cacheItem.IsShield())
+                if (_cacheItem.IsShield())
                     _cacheShieldItem = _cacheItem as IShieldItem;
-                else if (_cacheItem.IsPotion())
+                if (_cacheItem.IsPotion())
                     _cachePotionItem = _cacheItem as IPotionItem;
-                else if (_cacheItem.IsAmmo())
+                if (_cacheItem.IsAmmo())
                     _cacheAmmoItem = _cacheItem as IAmmoItem;
-                else if (_cacheItem.IsBuilding())
+                if (_cacheItem.IsBuilding())
                     _cacheBuildingItem = _cacheItem as IBuildingItem;
-                else if (_cacheItem.IsPet())
+                if (_cacheItem.IsPet())
                     _cachePetItem = _cacheItem as IPetItem;
-                else if (_cacheItem.IsSocketEnhancer())
+                if (_cacheItem.IsSocketEnhancer())
                     _cacheSocketEnhancerItem = _cacheItem as ISocketEnhancerItem;
-                else if (_cacheItem.IsMount())
+                if (_cacheItem.IsMount())
                     _cacheMountItem = _cacheItem as IMountItem;
-                else if (_cacheItem.IsSkill())
+                if (_cacheItem.IsSkill())
                     _cacheSkillItem = _cacheItem as ISkillItem;
             }
             _cacheBuff.Build(_cacheEquipmentItem, level, randomSeed);
