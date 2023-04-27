@@ -100,77 +100,77 @@ namespace MultiplayerARPG
         }
 
         [System.NonSerialized]
-        private HashSet<WeaponType> cacheAvailableWeapons;
+        private HashSet<WeaponType> _cacheAvailableWeapons;
         public HashSet<WeaponType> CacheAvailableWeapons
         {
             get
             {
-                if (cacheAvailableWeapons == null)
+                if (_cacheAvailableWeapons == null)
                 {
-                    cacheAvailableWeapons = new HashSet<WeaponType>();
+                    _cacheAvailableWeapons = new HashSet<WeaponType>();
                     if (availableWeapons == null || availableWeapons.Length == 0)
-                        return cacheAvailableWeapons;
+                        return _cacheAvailableWeapons;
                     foreach (WeaponType availableWeapon in availableWeapons)
                     {
                         if (availableWeapon == null) continue;
-                        cacheAvailableWeapons.Add(availableWeapon);
+                        _cacheAvailableWeapons.Add(availableWeapon);
                     }
                 }
-                return cacheAvailableWeapons;
+                return _cacheAvailableWeapons;
             }
         }
 
         [System.NonSerialized]
-        private HashSet<ArmorType> cacheAvailableArmors;
+        private HashSet<ArmorType> _cacheAvailableArmors;
         public HashSet<ArmorType> CacheAvailableArmors
         {
             get
             {
-                if (cacheAvailableArmors == null)
+                if (_cacheAvailableArmors == null)
                 {
-                    cacheAvailableArmors = new HashSet<ArmorType>();
+                    _cacheAvailableArmors = new HashSet<ArmorType>();
                     if (availableArmors == null || availableArmors.Length == 0)
-                        return cacheAvailableArmors;
+                        return _cacheAvailableArmors;
                     foreach (ArmorType requireArmor in availableArmors)
                     {
                         if (requireArmor == null) continue;
-                        cacheAvailableArmors.Add(requireArmor);
+                        _cacheAvailableArmors.Add(requireArmor);
                     }
                 }
-                return cacheAvailableArmors;
+                return _cacheAvailableArmors;
             }
         }
 
         [System.NonSerialized]
-        private HashSet<VehicleType> cacheAvailableVehicles;
+        private HashSet<VehicleType> _cacheAvailableVehicles;
         public HashSet<VehicleType> CacheAvailableVehicles
         {
             get
             {
-                if (cacheAvailableVehicles == null)
+                if (_cacheAvailableVehicles == null)
                 {
-                    cacheAvailableVehicles = new HashSet<VehicleType>();
+                    _cacheAvailableVehicles = new HashSet<VehicleType>();
                     if (availableVehicles == null || availableVehicles.Length == 0)
-                        return cacheAvailableVehicles;
+                        return _cacheAvailableVehicles;
                     foreach (VehicleType requireVehicle in availableVehicles)
                     {
                         if (requireVehicle == null) continue;
-                        cacheAvailableVehicles.Add(requireVehicle);
+                        _cacheAvailableVehicles.Add(requireVehicle);
                     }
                 }
-                return cacheAvailableVehicles;
+                return _cacheAvailableVehicles;
             }
         }
 
         [System.NonSerialized]
-        private bool alreadySetAvailableWeaponsText;
+        private bool _alreadySetAvailableWeaponsText;
         [System.NonSerialized]
-        private string availableWeaponsText;
+        private string _availableWeaponsText;
         public string AvailableWeaponsText
         {
             get
             {
-                if (!alreadySetAvailableWeaponsText)
+                if (!_alreadySetAvailableWeaponsText)
                 {
                     using (Utf16ValueStringBuilder str = ZString.CreateStringBuilder(true))
                     {
@@ -182,23 +182,23 @@ namespace MultiplayerARPG
                                 str.Append('/');
                             str.Append(availableWeapon.Title);
                         }
-                        availableWeaponsText = str.ToString();
+                        _availableWeaponsText = str.ToString();
                     }
-                    alreadySetAvailableWeaponsText = true;
+                    _alreadySetAvailableWeaponsText = true;
                 }
-                return availableWeaponsText;
+                return _availableWeaponsText;
             }
         }
 
         [System.NonSerialized]
-        private bool alreadySetAvailableArmorsText;
+        private bool _alreadySetAvailableArmorsText;
         [System.NonSerialized]
-        private string availableArmorsText;
+        private string _availableArmorsText;
         public string AvailableArmorsText
         {
             get
             {
-                if (!alreadySetAvailableArmorsText)
+                if (!_alreadySetAvailableArmorsText)
                 {
                     using (Utf16ValueStringBuilder str = ZString.CreateStringBuilder(true))
                     {
@@ -210,23 +210,23 @@ namespace MultiplayerARPG
                                 str.Append('/');
                             str.Append(requireArmor.Title);
                         }
-                        availableArmorsText = str.ToString();
+                        _availableArmorsText = str.ToString();
                     }
-                    alreadySetAvailableArmorsText = true;
+                    _alreadySetAvailableArmorsText = true;
                 }
-                return availableArmorsText;
+                return _availableArmorsText;
             }
         }
 
         [System.NonSerialized]
-        private bool alreadySetAvailableVehiclesText;
+        private bool _alreadySetAvailableVehiclesText;
         [System.NonSerialized]
         private string availableVehiclesText;
         public string AvailableVehiclesText
         {
             get
             {
-                if (!alreadySetAvailableVehiclesText)
+                if (!_alreadySetAvailableVehiclesText)
                 {
                     using (Utf16ValueStringBuilder str = ZString.CreateStringBuilder(true))
                     {
@@ -240,7 +240,7 @@ namespace MultiplayerARPG
                         }
                         availableVehiclesText = str.ToString();
                     }
-                    alreadySetAvailableVehiclesText = true;
+                    _alreadySetAvailableVehiclesText = true;
                 }
                 return availableVehiclesText;
             }
