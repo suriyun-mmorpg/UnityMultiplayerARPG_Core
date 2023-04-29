@@ -82,6 +82,7 @@ namespace MultiplayerARPG
             _destroying = false;
             _launchTime = Time.unscaledTime;
             _missileDuration = (missileDistance / missileSpeed) + 0.1f;
+            _alreadyHitObjects.Clear();
         }
 
         protected override void OnEnable()
@@ -244,20 +245,19 @@ namespace MultiplayerARPG
             if (_destroying)
                 return;
 
-            if (!other.GetComponent<IUnHittable>().IsNull())
-                return;
-
             if (FindTargetHitBox(other, out DamageableHitBox target))
             {
-                if (explodeDistance > 0f)
+                // Hit a hitbox
+                if (explodeDistance <= 0f && _alreadyHitObjects.Contains(target.GetObjectId()))
                 {
-                    // Explode immediately when hit something
-                    Explode();
+                    // If this is not going to explode, just apply damage to target
+                    _alreadyHitObjects.Add(target.GetObjectId());
+                    ApplyDamageTo(target);
                 }
                 else
                 {
-                    // If this is not going to explode, just apply damage to target
-                    ApplyDamageTo(target);
+                    // Explode immediately when hit something
+                    Explode();
                 }
                 PushBack(destroyDelay);
                 _destroying = true;
@@ -306,8 +306,9 @@ namespace MultiplayerARPG
 
         protected virtual bool FindAndApplyDamage(GameObject other, HashSet<uint> alreadyHitObjects)
         {
-            if (FindTargetHitBox(other, out DamageableHitBox target))
+            if (FindTargetHitBox(other, out DamageableHitBox target) && !_alreadyHitObjects.Contains(target.GetObjectId()))
             {
+                _alreadyHitObjects.Add(target.GetObjectId());
                 ApplyDamageTo(target);
                 return true;
             }
@@ -338,7 +339,6 @@ namespace MultiplayerARPG
         {
             if (CurrentGameInstance.DimensionType == DimensionType.Dimension2D)
             {
-                _alreadyHitObjects.Clear();
                 Collider2D[] colliders2D = Physics2D.OverlapCircleAll(CacheTransform.position, explodeDistance);
                 foreach (Collider2D collider in colliders2D)
                 {
@@ -347,7 +347,6 @@ namespace MultiplayerARPG
             }
             else
             {
-                _alreadyHitObjects.Clear();
                 Collider[] colliders = Physics.OverlapSphere(CacheTransform.position, explodeDistance);
                 foreach (Collider collider in colliders)
                 {

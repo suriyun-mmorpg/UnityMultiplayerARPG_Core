@@ -212,9 +212,10 @@ namespace MultiplayerARPG
             if (FindTargetHitBox(hitted, out DamageableHitBox target))
             {
                 // Hit a hitbox
-                if (explodeDistance <= 0f)
+                if (explodeDistance <= 0f && _alreadyHitObjects.Contains(target.GetObjectId()))
                 {
                     // If this is not going to explode, just apply damage to target
+                    _alreadyHitObjects.Add(target.GetObjectId());
                     ApplyDamageTo(target);
                 }
                 OnHit(hitted);
