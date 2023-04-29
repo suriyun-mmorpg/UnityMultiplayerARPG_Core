@@ -204,7 +204,13 @@ namespace MultiplayerARPG
                     break;
             }
 
-            await UniTask.WhenAll(tasks);
+            try
+            {
+                await UniTask.WhenAll(tasks);
+            }
+            catch
+            {
+            }
         }
 
         public async UniTask<bool> HaveNewQuests(IPlayerCharacterData playerCharacter)
