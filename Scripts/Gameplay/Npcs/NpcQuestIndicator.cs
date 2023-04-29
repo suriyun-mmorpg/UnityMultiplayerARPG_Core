@@ -14,42 +14,39 @@ namespace MultiplayerARPG
         [Tooltip("This will activate when there are new quests")]
         [FormerlySerializedAs("haveNewQuestIndicator")]
         public GameObject haveNewQuestsIndicator;
-        public float updateWithinRange = 30f;
-        public float updateRepeatRate = 0.5f;
         [HideInInspector, System.NonSerialized]
         public NpcEntity npcEntity;
-        private float _lastUpdateTime;
+        protected bool _isUpdating = true;
 
         private void Awake()
         {
             if (npcEntity == null)
                 npcEntity = GetComponentInParent<NpcEntity>();
+
+            GameInstance.PlayingCharacterEntity.onNonEquipItemsOperation += PlayingCharacterEntity_onNonEquipItemsOperation;
+            GameInstance.PlayingCharacterEntity.onQuestsOperation += PlayingCharacterEntity_onQuestsOperation;
         }
 
-        private void Update()
+        private void OnDestroy()
         {
-            if (npcEntity == null ||
-                GameInstance.PlayingCharacterEntity == null ||
-                Vector3.Distance(npcEntity.EntityTransform.position, GameInstance.PlayingCharacterEntity.EntityTransform.position) > updateWithinRange)
-            {
-                if (haveTasksDoneQuestsIndicator != null && haveTasksDoneQuestsIndicator.activeSelf)
-                    haveTasksDoneQuestsIndicator.SetActive(false);
-                if (haveInProgressQuestsIndicator != null && haveInProgressQuestsIndicator.activeSelf)
-                    haveInProgressQuestsIndicator.SetActive(false);
-                if (haveNewQuestsIndicator != null && haveNewQuestsIndicator.activeSelf)
-                    haveNewQuestsIndicator.SetActive(false);
-                return;
-            }
+            GameInstance.PlayingCharacterEntity.onNonEquipItemsOperation -= PlayingCharacterEntity_onNonEquipItemsOperation;
+            GameInstance.PlayingCharacterEntity.onQuestsOperation -= PlayingCharacterEntity_onQuestsOperation;
+        }
 
-            if (Time.unscaledTime - _lastUpdateTime >= updateRepeatRate)
-            {
-                _lastUpdateTime = Time.unscaledTime;
-                UpdateStatus().Forget();
-            }
+        private void PlayingCharacterEntity_onNonEquipItemsOperation(LiteNetLibManager.LiteNetLibSyncList.Operation op, int index)
+        {
+            UpdateStatus().Forget();
+        }
+
+        private void PlayingCharacterEntity_onQuestsOperation(LiteNetLibManager.LiteNetLibSyncList.Operation op, int index)
+        {
+            UpdateStatus().Forget();
         }
 
         private async UniTaskVoid UpdateStatus()
         {
+            if (_isUpdating)
+                return;
             // Indicator priority haveTasksDoneQuests > haveInProgressQuests > haveNewQuests
             bool isIndicatorShown = false;
             bool tempVisibleState;
@@ -67,6 +64,7 @@ namespace MultiplayerARPG
             isIndicatorShown = isIndicatorShown || tempVisibleState;
             if (haveNewQuestsIndicator != null && haveNewQuestsIndicator.activeSelf != tempVisibleState)
                 haveNewQuestsIndicator.SetActive(tempVisibleState);
+            _isUpdating = false;
         }
     }
 }
