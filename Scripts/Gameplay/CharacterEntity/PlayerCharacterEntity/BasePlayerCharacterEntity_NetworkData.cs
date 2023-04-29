@@ -289,20 +289,29 @@ namespace MultiplayerARPG
             // Setup relates elements
             if (IsOwnerClient)
             {
-                if (BasePlayerCharacterController.Singleton == null)
+                BasePlayerCharacterController prefab;
+                if (ControllerPrefab != null)
                 {
-                    if (ControllerPrefab != null)
-                    {
-                        BasePlayerCharacterController controller = Instantiate(ControllerPrefab);
-                        controller.PlayingCharacterEntity = this;
-                    }
-                    else if (CurrentGameInstance.defaultControllerPrefab != null)
-                    {
-                        BasePlayerCharacterController controller = Instantiate(CurrentGameInstance.defaultControllerPrefab);
-                        controller.PlayingCharacterEntity = this;
-                    }
-                    else
-                        Logging.LogWarning(ToString(), "`Controller Prefab` is empty so it cannot be instantiated");
+                    prefab = ControllerPrefab;
+                }
+                else if (CurrentGameInstance.defaultControllerPrefab != null)
+                {
+                    prefab = CurrentGameInstance.defaultControllerPrefab;
+                }
+                else if (BasePlayerCharacterController.Singleton != null)
+                {
+                    prefab = BasePlayerCharacterController.LastPrefab;
+                }
+                else
+                {
+                    Logging.LogWarning(ToString(), "`Controller Prefab` is empty so it cannot be instantiated");
+                    prefab = null;
+                }
+                if (prefab != null)
+                {
+                    BasePlayerCharacterController.LastPrefab = prefab;
+                    BasePlayerCharacterController controller = Instantiate(prefab);
+                    controller.PlayingCharacterEntity = this;
                 }
                 if (CurrentGameInstance.owningCharacterObjects != null && CurrentGameInstance.owningCharacterObjects.Length > 0)
                 {
@@ -321,7 +330,9 @@ namespace MultiplayerARPG
                     }
                 }
                 if (CurrentGameInstance.owningCharacterUI != null)
+                {
                     InstantiateUI(CurrentGameInstance.owningCharacterUI);
+                }
             }
             else if (IsClient)
             {
@@ -334,7 +345,9 @@ namespace MultiplayerARPG
                     }
                 }
                 if (CurrentGameInstance.nonOwningCharacterUI != null)
+                {
                     InstantiateUI(CurrentGameInstance.nonOwningCharacterUI);
+                }
             }
         }
         #endregion

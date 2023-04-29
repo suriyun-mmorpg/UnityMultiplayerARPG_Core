@@ -1,5 +1,4 @@
 ﻿using UnityEngine;
-using UnityEngine.EventSystems;
 
 namespace MultiplayerARPG
 {
@@ -29,6 +28,7 @@ namespace MultiplayerARPG
         }
 
         public static BasePlayerCharacterController Singleton { get; protected set; }
+        public static BasePlayerCharacterController LastPrefab { get; set; }
         /// <summary>
         /// Controlled character, can use `GameInstance.PlayingCharacter` or `GameInstance.PlayingCharacterEntity` instead.
         /// </summary>
