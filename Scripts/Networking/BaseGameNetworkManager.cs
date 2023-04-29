@@ -726,7 +726,7 @@ namespace MultiplayerARPG
             LiteNetLibIdentity spawnObj;
             // Spawn Warp Portals
             if (LogInfo)
-                Logging.Log("Spawning warp portals");
+                Logging.Log(LogTag, "Spawning warp portals");
             if (GameInstance.MapWarpPortals.Count > 0)
             {
                 if (GameInstance.MapWarpPortals.TryGetValue(CurrentMapInfo.Id, out List<WarpPortal> mapWarpPortals))
@@ -763,7 +763,7 @@ namespace MultiplayerARPG
             onSpawnEntitiesProgress.Invoke(sceneName, true, progress);
             // Spawn Npcs
             if (LogInfo)
-                Logging.Log("Spawning NPCs");
+                Logging.Log(LogTag, "Spawning NPCs");
             if (GameInstance.MapNpcs.Count > 0)
             {
                 if (GameInstance.MapNpcs.TryGetValue(CurrentMapInfo.Id, out List<Npc> mapNpcs))
@@ -797,7 +797,7 @@ namespace MultiplayerARPG
             onSpawnEntitiesProgress.Invoke(sceneName, true, progress);
             // Spawn monsters
             if (LogInfo)
-                Logging.Log("Spawning monsters");
+                Logging.Log(LogTag, "Spawning monsters");
             MonsterSpawnArea[] monsterSpawnAreas = FindObjectsOfType<MonsterSpawnArea>();
             for (i = 0; i < monsterSpawnAreas.Length; ++i)
             {
@@ -811,7 +811,7 @@ namespace MultiplayerARPG
             onSpawnEntitiesProgress.Invoke(sceneName, true, progress);
             // Spawn harvestables
             if (LogInfo)
-                Logging.Log("Spawning harvestables");
+                Logging.Log(LogTag, "Spawning harvestables");
             HarvestableSpawnArea[] harvestableSpawnAreas = FindObjectsOfType<HarvestableSpawnArea>();
             for (i = 0; i < harvestableSpawnAreas.Length; ++i)
             {
@@ -825,7 +825,7 @@ namespace MultiplayerARPG
             onSpawnEntitiesProgress.Invoke(sceneName, true, progress);
             // Spawn item drop entities
             if (LogInfo)
-                Logging.Log("Spawning item drop entities");
+                Logging.Log(LogTag, "Spawning item drop entities");
             ItemDropSpawnArea[] itemDropSpawnAreas = FindObjectsOfType<ItemDropSpawnArea>();
             for (i = 0; i < itemDropSpawnAreas.Length; ++i)
             {
@@ -842,7 +842,7 @@ namespace MultiplayerARPG
                 SystemInfo.graphicsDeviceType != GraphicsDeviceType.Null)
             {
                 if (LogInfo)
-                    Logging.Log("Spawning server character");
+                    Logging.Log(LogTag, "Spawning server character");
                 Instantiate(GameInstance.Singleton.serverCharacterPrefab, CurrentMapInfo.StartPosition, Quaternion.identity);
             }
             await UniTask.Yield();
