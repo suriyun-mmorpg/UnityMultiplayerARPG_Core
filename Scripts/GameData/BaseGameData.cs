@@ -124,5 +124,10 @@ namespace MultiplayerARPG
             else
                 throw new ArgumentException("Object is not a BaseGameData");
         }
+
+        public override string ToString()
+        {
+            return Id;
+        }
     }
 }
