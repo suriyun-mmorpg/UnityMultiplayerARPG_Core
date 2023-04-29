@@ -16,21 +16,44 @@ namespace MultiplayerARPG
         public GameObject haveNewQuestsIndicator;
         [HideInInspector, System.NonSerialized]
         public NpcEntity npcEntity;
-        protected bool _isUpdating = true;
+        protected BasePlayerCharacterEntity _previousEntity;
+        protected bool _isUpdating = false;
 
         private void Awake()
         {
             if (npcEntity == null)
                 npcEntity = GetComponentInParent<NpcEntity>();
-
-            GameInstance.PlayingCharacterEntity.onNonEquipItemsOperation += PlayingCharacterEntity_onNonEquipItemsOperation;
-            GameInstance.PlayingCharacterEntity.onQuestsOperation += PlayingCharacterEntity_onQuestsOperation;
+            GameInstance.onSetPlayingCharacter += GameInstance_onSetPlayingCharacter;
+            if (GameInstance.PlayingCharacterEntity != null)
+                GameInstance_onSetPlayingCharacter(GameInstance.PlayingCharacterEntity);
         }
 
         private void OnDestroy()
         {
-            GameInstance.PlayingCharacterEntity.onNonEquipItemsOperation -= PlayingCharacterEntity_onNonEquipItemsOperation;
-            GameInstance.PlayingCharacterEntity.onQuestsOperation -= PlayingCharacterEntity_onQuestsOperation;
+            GameInstance.onSetPlayingCharacter -= GameInstance_onSetPlayingCharacter;
+            if (_previousEntity != null)
+            {
+                _previousEntity.onNonEquipItemsOperation -= PlayingCharacterEntity_onNonEquipItemsOperation;
+                _previousEntity.onQuestsOperation -= PlayingCharacterEntity_onQuestsOperation;
+            }
+        }
+
+        private void GameInstance_onSetPlayingCharacter(IPlayerCharacterData playingCharacterData)
+        {
+            if (_previousEntity != null)
+            {
+                _previousEntity.onNonEquipItemsOperation -= PlayingCharacterEntity_onNonEquipItemsOperation;
+                _previousEntity.onQuestsOperation -= PlayingCharacterEntity_onQuestsOperation;
+            }
+
+            BasePlayerCharacterEntity playerCharacterEntity = playingCharacterData as BasePlayerCharacterEntity;
+            _previousEntity = playerCharacterEntity;
+
+            if (_previousEntity != null)
+            {
+                _previousEntity.onNonEquipItemsOperation += PlayingCharacterEntity_onNonEquipItemsOperation;
+                _previousEntity.onQuestsOperation += PlayingCharacterEntity_onQuestsOperation;
+            }
         }
 
         private void PlayingCharacterEntity_onNonEquipItemsOperation(LiteNetLibManager.LiteNetLibSyncList.Operation op, int index)
@@ -47,6 +70,7 @@ namespace MultiplayerARPG
         {
             if (_isUpdating)
                 return;
+            _isUpdating = true;
             // Indicator priority haveTasksDoneQuests > haveInProgressQuests > haveNewQuests
             bool isIndicatorShown = false;
             bool tempVisibleState;
