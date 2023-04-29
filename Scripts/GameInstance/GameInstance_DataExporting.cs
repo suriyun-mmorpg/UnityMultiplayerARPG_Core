@@ -2,7 +2,6 @@
 using Newtonsoft.Json;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using UnityEditor;
 using UnityEngine;
 
@@ -20,7 +19,17 @@ namespace MultiplayerARPG
                 socialSystemSetting = ScriptableObject.CreateInstance<SocialSystemSetting>();
             string path = EditorUtility.SaveFilePanel("Export Social System Setting", Application.dataPath, "socialSystemSetting", "json");
             if (path.Length > 0)
-                File.WriteAllText(path, JsonConvert.SerializeObject(socialSystemSetting, Formatting.Indented));
+            {
+                File.WriteAllText(path, JsonConvert.SerializeObject(socialSystemSetting, Formatting.Indented, new JsonSerializerSettings()
+                {
+                    ContractResolver = new SocialSystemSettingContractResolver(),
+                    Converters = new List<JsonConverter>
+                    {
+                        new GameDataIntDictJsonConverter<BaseItem>(Items),
+                        new GameDataIntDictJsonConverter<Currency>(Currencies),
+                    },
+                }));
+            }
         }
 
         [InspectorButton(nameof(ExportMinimalItemsAsJson))]

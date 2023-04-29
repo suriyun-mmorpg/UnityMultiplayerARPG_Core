@@ -130,7 +130,7 @@ namespace MultiplayerARPG
         {
             if (Application.isPlaying)
                 return base.ToString();
-            return DataId.ToString();
+            return Id;
         }
 #endif
     }
