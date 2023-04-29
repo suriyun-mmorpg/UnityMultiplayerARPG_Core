@@ -80,7 +80,20 @@ namespace MultiplayerARPG
         public static string UserId { get; set; }
         public static string UserToken { get; set; }
         public static string SelectedCharacterId { get; set; }
-        public static IPlayerCharacterData PlayingCharacter { get; set; }
+        private static IPlayerCharacterData s_playingCharacter;
+        public static IPlayerCharacterData PlayingCharacter
+        {
+            get { return s_playingCharacter; }
+            set
+            {
+                if (value != s_playingCharacter)
+                {
+                    s_playingCharacter = value;
+                    if (onSetPlayingCharacter != null)
+                        onSetPlayingCharacter.Invoke(value);
+                }
+            }
+        }
         public static BasePlayerCharacterEntity PlayingCharacterEntity { get { return PlayingCharacter as BasePlayerCharacterEntity; } }
         public static PartyData JoinedParty { get; set; }
         public static GuildData JoinedGuild { get; set; }
@@ -385,6 +398,8 @@ namespace MultiplayerARPG
         [Header("Playing In Editor")]
         public TestInEditorMode testInEditorMode = TestInEditorMode.Standalone;
 
+        // Static events
+        public static event System.Action<IPlayerCharacterData> onSetPlayingCharacter;
         // Events
         public System.Action onGameDataLoaded;
 
