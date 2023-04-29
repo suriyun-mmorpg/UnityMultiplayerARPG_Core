@@ -124,14 +124,5 @@ namespace MultiplayerARPG
             else
                 throw new ArgumentException("Object is not a BaseGameData");
         }
-
-#if UNITY_EDITOR
-        public override string ToString()
-        {
-            if (Application.isPlaying)
-                return base.ToString();
-            return Id;
-        }
-#endif
     }
 }
