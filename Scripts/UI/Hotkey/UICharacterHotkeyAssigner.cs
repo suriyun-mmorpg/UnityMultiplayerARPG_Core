@@ -11,59 +11,59 @@ namespace MultiplayerARPG
         public Transform uiCharacterItemContainer;
         public bool autoHideIfNothingToAssign;
 
-        private UIList cacheSkillList;
+        private UIList _cacheSkillList;
         public UIList CacheSkillList
         {
             get
             {
-                if (cacheSkillList == null)
+                if (_cacheSkillList == null)
                 {
-                    cacheSkillList = gameObject.AddComponent<UIList>();
+                    _cacheSkillList = gameObject.AddComponent<UIList>();
                     if (uiCharacterSkillPrefab != null)
-                        cacheSkillList.uiPrefab = uiCharacterSkillPrefab.gameObject;
-                    cacheSkillList.uiContainer = uiCharacterSkillContainer;
+                        _cacheSkillList.uiPrefab = uiCharacterSkillPrefab.gameObject;
+                    _cacheSkillList.uiContainer = uiCharacterSkillContainer;
                 }
-                return cacheSkillList;
+                return _cacheSkillList;
             }
         }
 
-        private UIList cacheItemList;
+        private UIList _cacheItemList;
         public UIList CacheItemList
         {
             get
             {
-                if (cacheItemList == null)
+                if (_cacheItemList == null)
                 {
-                    cacheItemList = gameObject.AddComponent<UIList>();
+                    _cacheItemList = gameObject.AddComponent<UIList>();
                     if (uiCharacterItemPrefab != null)
-                        cacheItemList.uiPrefab = uiCharacterItemPrefab.gameObject;
-                    cacheItemList.uiContainer = uiCharacterItemContainer;
+                        _cacheItemList.uiPrefab = uiCharacterItemPrefab.gameObject;
+                    _cacheItemList.uiContainer = uiCharacterItemContainer;
                 }
-                return cacheItemList;
+                return _cacheItemList;
             }
         }
 
-        private UICharacterSkillSelectionManager cacheSkillSelectionManager;
+        private UICharacterSkillSelectionManager _cacheSkillSelectionManager;
         public UICharacterSkillSelectionManager CacheSkillSelectionManager
         {
             get
             {
-                if (cacheSkillSelectionManager == null)
-                    cacheSkillSelectionManager = gameObject.GetOrAddComponent<UICharacterSkillSelectionManager>();
-                cacheSkillSelectionManager.selectionMode = UISelectionMode.SelectSingle;
-                return cacheSkillSelectionManager;
+                if (_cacheSkillSelectionManager == null)
+                    _cacheSkillSelectionManager = gameObject.GetOrAddComponent<UICharacterSkillSelectionManager>();
+                _cacheSkillSelectionManager.selectionMode = UISelectionMode.SelectSingle;
+                return _cacheSkillSelectionManager;
             }
         }
 
-        private UICharacterItemSelectionManager cacheItemSelectionManager;
+        private UICharacterItemSelectionManager _cacheItemSelectionManager;
         public UICharacterItemSelectionManager CacheItemSelectionManager
         {
             get
             {
-                if (cacheItemSelectionManager == null)
-                    cacheItemSelectionManager = gameObject.GetOrAddComponent<UICharacterItemSelectionManager>();
-                cacheItemSelectionManager.selectionMode = UISelectionMode.SelectSingle;
-                return cacheItemSelectionManager;
+                if (_cacheItemSelectionManager == null)
+                    _cacheItemSelectionManager = gameObject.GetOrAddComponent<UICharacterItemSelectionManager>();
+                _cacheItemSelectionManager.selectionMode = UISelectionMode.SelectSingle;
+                return _cacheItemSelectionManager;
             }
         }
 

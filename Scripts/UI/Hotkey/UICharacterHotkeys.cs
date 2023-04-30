@@ -24,7 +24,7 @@ namespace MultiplayerARPG
         public RectTransform hotkeyCancelArea;
         public static UICharacterHotkey UsingHotkey { get; private set; }
         public static AimPosition HotkeyAimPosition { get; private set; }
-        private static UICharacterHotkey otherHotkey;
+        private static UICharacterHotkey s_otherHotkey;
         /// <summary>
         /// The hotkey which will be used by other components
         /// </summary>
@@ -32,46 +32,46 @@ namespace MultiplayerARPG
         {
             get
             {
-                if (otherHotkey == null)
+                if (s_otherHotkey == null)
                 {
-                    otherHotkey = new GameObject("_OtherHotkey").AddComponent<UICharacterHotkey>();
-                    otherHotkey.transform.localScale = Vector3.zero;
+                    s_otherHotkey = new GameObject("_OtherHotkey").AddComponent<UICharacterHotkey>();
+                    s_otherHotkey.transform.localScale = Vector3.zero;
                 }
-                return otherHotkey;
+                return s_otherHotkey;
             }
         }
         private static readonly List<IHotkeyJoystickEventHandler> hotkeyJoysticks = new List<IHotkeyJoystickEventHandler>();
 
-        private Dictionary<string, List<UICharacterHotkey>> cacheUICharacterHotkeys;
+        private Dictionary<string, List<UICharacterHotkey>> _cacheUICharacterHotkeys;
         public Dictionary<string, List<UICharacterHotkey>> CacheUICharacterHotkeys
         {
             get
             {
                 InitCaches();
-                return cacheUICharacterHotkeys;
+                return _cacheUICharacterHotkeys;
             }
         }
 
-        private UICharacterHotkeySelectionManager cacheCharacterHotkeySelectionManager;
-        public UICharacterHotkeySelectionManager CacheCharacterHotkeySelectionManager
+        private UICharacterHotkeySelectionManager _cacheSelectionManager;
+        public UICharacterHotkeySelectionManager CacheSelectionManager
         {
             get
             {
-                if (cacheCharacterHotkeySelectionManager == null)
-                    cacheCharacterHotkeySelectionManager = gameObject.GetOrAddComponent<UICharacterHotkeySelectionManager>();
-                cacheCharacterHotkeySelectionManager.selectionMode = UISelectionMode.SelectSingle;
-                return cacheCharacterHotkeySelectionManager;
+                if (_cacheSelectionManager == null)
+                    _cacheSelectionManager = gameObject.GetOrAddComponent<UICharacterHotkeySelectionManager>();
+                _cacheSelectionManager.selectionMode = UISelectionMode.SelectSingle;
+                return _cacheSelectionManager;
             }
         }
 
         private void InitCaches()
         {
-            if (cacheUICharacterHotkeys == null)
+            if (_cacheUICharacterHotkeys == null)
             {
-                CacheCharacterHotkeySelectionManager.DeselectSelectedUI();
-                CacheCharacterHotkeySelectionManager.Clear();
+                CacheSelectionManager.DeselectSelectedUI();
+                CacheSelectionManager.Clear();
                 int j = 0;
-                cacheUICharacterHotkeys = new Dictionary<string, List<UICharacterHotkey>>();
+                _cacheUICharacterHotkeys = new Dictionary<string, List<UICharacterHotkey>>();
                 for (int i = 0; i < uiCharacterHotkeys.Length; ++i)
                 {
                     UICharacterHotkeyPair uiCharacterHotkey = uiCharacterHotkeys[i];
@@ -84,10 +84,10 @@ namespace MultiplayerARPG
                         characterHotkey.type = HotkeyType.None;
                         characterHotkey.relateId = string.Empty;
                         ui.Setup(this, uiCharacterHotkeyAssigner, characterHotkey, -1);
-                        if (!cacheUICharacterHotkeys.ContainsKey(id))
-                            cacheUICharacterHotkeys.Add(id, new List<UICharacterHotkey>());
-                        cacheUICharacterHotkeys[id].Add(ui);
-                        CacheCharacterHotkeySelectionManager.Add(ui);
+                        if (!_cacheUICharacterHotkeys.ContainsKey(id))
+                            _cacheUICharacterHotkeys.Add(id, new List<UICharacterHotkey>());
+                        _cacheUICharacterHotkeys[id].Add(ui);
+                        CacheSelectionManager.Add(ui);
                         // Select first UI
                         if (j == 0)
                             ui.OnClickSelect();
@@ -169,7 +169,7 @@ namespace MultiplayerARPG
 
         public override void Hide()
         {
-            CacheCharacterHotkeySelectionManager.DeselectSelectedUI();
+            CacheSelectionManager.DeselectSelectedUI();
             base.Hide();
         }
 

@@ -22,10 +22,10 @@ namespace MultiplayerARPG
         [Header("Options")]
         public bool autoAssignItem;
 
-        private IUsableItem usingItem;
-        private BaseSkill usingSkill;
-        private int usingSkillLevel;
-        private bool channeledActionStarted;
+        private IUsableItem _usingItem;
+        private BaseSkill _usingSkill;
+        private int _usingSkillLevel;
+        private bool _channeledActionStarted;
 
         protected override void OnEnable()
         {
@@ -85,14 +85,14 @@ namespace MultiplayerARPG
             if (IsChanneledAbility())
             {
                 bool pressing = InputManager.GetKey(key) || InputManager.GetButton(buttonName);
-                if (pressing && !channeledActionStarted)
+                if (pressing && !_channeledActionStarted)
                 {
-                    channeledActionStarted = true;
+                    _channeledActionStarted = true;
                     UICharacterHotkeys.SetUsingHotkey(this);
                 }
-                else if (!pressing && channeledActionStarted)
+                else if (!pressing && _channeledActionStarted)
                 {
-                    channeledActionStarted = false;
+                    _channeledActionStarted = false;
                     UICharacterHotkeys.FinishHotkeyAimControls(false);
                 }
             }
@@ -160,9 +160,9 @@ namespace MultiplayerARPG
         private void UpdateSkillUI()
         {
             // Find skill by relate Id
-            usingSkill = null;
-            usingSkillLevel = 0;
-            bool foundUsingSkill = GetAssignedSkill(out usingSkill, out usingSkillLevel);
+            _usingSkill = null;
+            _usingSkillLevel = 0;
+            bool foundUsingSkill = GetAssignedSkill(out _usingSkill, out _usingSkillLevel);
 
             if (uiCharacterSkill == null && UICharacterHotkeys != null && UICharacterHotkeys.uiCharacterSkillPrefab != null)
             {
@@ -180,7 +180,7 @@ namespace MultiplayerARPG
                 else
                 {
                     // Found skill, so create new skill entry if it's not existed in learn skill list
-                    uiCharacterSkill.Setup(new UICharacterSkillData(usingSkill, usingSkillLevel), GameInstance.PlayingCharacter, GameInstance.PlayingCharacter.IndexOfSkill(usingSkill.DataId));
+                    uiCharacterSkill.Setup(new UICharacterSkillData(_usingSkill, _usingSkillLevel), GameInstance.PlayingCharacter, GameInstance.PlayingCharacter.IndexOfSkill(_usingSkill.DataId));
                     uiCharacterSkill.Show();
                     UICharacterSkillDragHandler dragHandler = uiCharacterSkill.GetComponentInChildren<UICharacterSkillDragHandler>();
                     if (dragHandler != null)
@@ -192,13 +192,13 @@ namespace MultiplayerARPG
         private void UpdateItemUI()
         {
             // Find item by relate Id
-            usingItem = null;
+            _usingItem = null;
             InventoryType inventoryType;
             int itemIndex;
             CharacterItem characterItem;
             bool foundUsingItem = GetAssignedItem(out inventoryType, out itemIndex, out characterItem);
             if (foundUsingItem)
-                usingItem = characterItem.GetUsableItem();
+                _usingItem = characterItem.GetUsableItem();
 
             if (uiCharacterItem == null && UICharacterHotkeys != null && UICharacterHotkeys.uiCharacterItemPrefab != null)
             {
@@ -227,14 +227,14 @@ namespace MultiplayerARPG
 
         public bool HasCustomAimControls()
         {
-            if (usingItem != null &&
-                usingItem.HasCustomAimControls())
+            if (_usingItem != null &&
+                _usingItem.HasCustomAimControls())
             {
                 return true;
             }
-            else if (usingSkill != null && usingSkillLevel > 0 &&
-                usingSkill.IsActive &&
-                usingSkill.HasCustomAimControls())
+            else if (_usingSkill != null && _usingSkillLevel > 0 &&
+                _usingSkill.IsActive &&
+                _usingSkill.HasCustomAimControls())
             {
                 return true;
             }
@@ -243,16 +243,16 @@ namespace MultiplayerARPG
 
         public AimPosition UpdateAimControls(Vector2 axes)
         {
-            if (usingItem != null &&
-                usingItem.HasCustomAimControls())
+            if (_usingItem != null &&
+                _usingItem.HasCustomAimControls())
             {
-                return usingItem.UpdateAimControls(axes);
+                return _usingItem.UpdateAimControls(axes);
             }
-            if (usingSkill != null && usingSkillLevel > 0 &&
-                usingSkill.IsActive &&
-                usingSkill.HasCustomAimControls())
+            if (_usingSkill != null && _usingSkillLevel > 0 &&
+                _usingSkill.IsActive &&
+                _usingSkill.HasCustomAimControls())
             {
-                return usingSkill.UpdateAimControls(axes, usingSkillLevel);
+                return _usingSkill.UpdateAimControls(axes, _usingSkillLevel);
             }
             return default;
         }
@@ -260,10 +260,10 @@ namespace MultiplayerARPG
         public void FinishAimControls(bool isCancel, AimPosition aimPosition)
         {
             ICustomAimController ability = null;
-            if (usingItem != null)
-                ability = usingItem;
-            if (usingSkill != null)
-                ability = usingSkill;
+            if (_usingItem != null)
+                ability = _usingItem;
+            if (_usingSkill != null)
+                ability = _usingSkill;
             if (ability != null)
             {
                 ability.FinishAimControls(isCancel);
@@ -279,14 +279,14 @@ namespace MultiplayerARPG
 
         public bool IsChanneledAbility()
         {
-            if (usingItem != null &&
-                usingItem.IsChanneledAbility())
+            if (_usingItem != null &&
+                _usingItem.IsChanneledAbility())
             {
                 return true;
             }
-            if (usingSkill != null && usingSkillLevel > 0 &&
-                usingSkill.IsActive &&
-                usingSkill.IsChanneledAbility())
+            if (_usingSkill != null && _usingSkillLevel > 0 &&
+                _usingSkill.IsActive &&
+                _usingSkill.IsChanneledAbility())
             {
                 return true;
             }
@@ -323,7 +323,7 @@ namespace MultiplayerARPG
                 UICharacterHotkeys.SetUsingHotkey(null);
             }
 
-            if (usingSkill != null && GameInstance.PlayingCharacter.IndexOfSkillUsage(usingSkill.DataId, SkillUsageType.Skill) >= 0)
+            if (_usingSkill != null && GameInstance.PlayingCharacter.IndexOfSkillUsage(_usingSkill.DataId, SkillUsageType.Skill) >= 0)
             {
                 // Skill this cooling down, can't use it
                 return;
