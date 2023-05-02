@@ -127,7 +127,12 @@ namespace MultiplayerARPG
                     data.AvailableCharacters[kv.Key][database.DataId] = new PlayerCharacterData().SetNewPlayerCharacterData(string.Empty, database.DataId, kv.Key, 0);
                 }
             }
-            data.AvailableFactionIds.AddRange(Factions.Keys);
+
+            foreach (var kv in Factions)
+            {
+                if (!kv.Value.IsLocked)
+                    data.AvailableFactionIds.Add(kv.Key);
+            }
 
             DestroyImmediate(DefaultArmorType);
             DefaultArmorType = null;

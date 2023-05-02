@@ -200,12 +200,12 @@ namespace MultiplayerARPG
             if (CacheRaceToggles.Count == 0)
                 return GameInstance.PlayerCharacterEntities.Values.ToList();
             else
-                return GameInstance.PlayerCharacterEntities.Values.Where((a) => SelectedRaces.Contains(a.Race)).ToList();
+                return GameInstance.PlayerCharacterEntities.Values.Where((o) => SelectedRaces.Contains(o.Race)).ToList();
         }
 
         protected virtual List<Faction> GetSelectableFactions()
         {
-            return GameInstance.Factions.Values.ToList();
+            return GameInstance.Factions.Values.Where(o => !o.IsLocked).ToList();
         }
 
         protected virtual void LoadCharacters()
@@ -311,7 +311,7 @@ namespace MultiplayerARPG
         protected virtual void OnDisable()
         {
             characterModelContainer.RemoveChildren();
-            uiInputCharacterName.text = "";
+            uiInputCharacterName.text = string.Empty;
         }
 
         protected void OnSelectCharacter(UICharacter uiCharacter)
