@@ -45,6 +45,21 @@ namespace MultiplayerARPG
             }
         }
 
+        [SerializeField]
+        private bool showAllWhenNoTrackedQuests;
+        public bool ShowAllWhenNoTrackedQuests
+        {
+            get { return showAllWhenNoTrackedQuests; }
+            set
+            {
+                if (showAllWhenNoTrackedQuests != value)
+                {
+                    showAllWhenNoTrackedQuests = value;
+                    UpdateData();
+                }
+            }
+        }
+
         private UIList cacheList;
         public UIList CacheList
         {
@@ -117,7 +132,7 @@ namespace MultiplayerARPG
             CacheSelectionManager.DeselectSelectedUI();
             CacheSelectionManager.Clear();
 
-            List<CharacterQuest> filteredList = UICharacterQuestsUtils.GetFilteredList(GameInstance.PlayingCharacter.Quests, ShowOnlyTrackingQuests, HideCompleteQuest);
+            List<CharacterQuest> filteredList = UICharacterQuestsUtils.GetFilteredList(GameInstance.PlayingCharacter.Quests, ShowOnlyTrackingQuests, ShowAllWhenNoTrackedQuests, HideCompleteQuest);
             if (filteredList.Count == 0)
             {
                 if (uiDialog != null)

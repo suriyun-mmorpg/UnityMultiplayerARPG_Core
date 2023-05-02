@@ -4,7 +4,7 @@ namespace MultiplayerARPG
 {
     public class UICharacterQuestsUtils
     {
-        public static List<CharacterQuest> GetFilteredList(IList<CharacterQuest> list, bool showOnlyTrackingQuests, bool hideCompleteQuest)
+        public static List<CharacterQuest> GetFilteredList(IList<CharacterQuest> list, bool showOnlyTrackingQuests, bool showAllWhenNoTrackedQuests, bool hideCompleteQuest)
         {
             // Prepare result
             List<CharacterQuest> result = new List<CharacterQuest>();
@@ -29,7 +29,7 @@ namespace MultiplayerARPG
                 entry = list[i];
                 if (!GameInstance.Quests.ContainsKey(entry.dataId))
                     continue;
-                if (showOnlyTrackingQuests && hasTrackingQuests && !entry.isTracking)
+                if (showOnlyTrackingQuests && !entry.isTracking && (!showAllWhenNoTrackedQuests || hasTrackingQuests))
                     continue;
                 if (hideCompleteQuest && entry.isComplete)
                     continue;
