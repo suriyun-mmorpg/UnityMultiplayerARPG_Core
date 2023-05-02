@@ -154,8 +154,11 @@ namespace MultiplayerARPG
             _questIndicator.npcEntity = this;
         }
 
-        private async UniTask FindQuestFromDialog(IPlayerCharacterData playerCharacter, HashSet<int> questIds, BaseNpcDialog baseDialog, NpcDialogMenu? prevMenu, List<BaseNpcDialog> foundDialogs = null)
+        private async UniTask FindQuestFromDialog(IPlayerCharacterData playerCharacter, HashSet<int> questIds, BaseNpcDialog baseDialog, List<NpcDialogMenu> foundMenus = null, List<BaseNpcDialog> foundDialogs = null)
         {
+            if (foundMenus == null)
+                foundMenus = new List<NpcDialogMenu>();
+
             if (foundDialogs == null)
                 foundDialogs = new List<BaseNpcDialog>();
 
@@ -169,6 +172,7 @@ namespace MultiplayerARPG
             foundDialogs.Add(dialog);
 
             List<UniTask> tasks = new List<UniTask>();
+            List<UniTask<bool>> menuConditionTasks = new List<UniTask<bool>>();
             switch (dialog.type)
             {
                 case NpcDialogType.Normal:
@@ -176,31 +180,50 @@ namespace MultiplayerARPG
                     {
                         if (menu.isCloseMenu)
                             continue;
-                        tasks.Add(FindQuestFromDialog(playerCharacter, questIds, menu.dialog, menu, foundDialogs));
+                        foundMenus.Add(menu);
+                        tasks.Add(FindQuestFromDialog(playerCharacter, questIds, menu.dialog, foundMenus, foundDialogs));
                     }
                     break;
                 case NpcDialogType.Quest:
                     if (dialog.quest != null)
                     {
-                        if (!prevMenu.HasValue || await prevMenu.Value.IsPassConditions(playerCharacter))
+
+                        if (foundMenus.Count > 0)
+                        {
+                            foreach (NpcDialogMenu menu in foundMenus)
+                            {
+                                menuConditionTasks.Add(menu.IsPassConditions(playerCharacter));
+                            }
+                        }
+                        bool[] menuConditionResults = await UniTask.WhenAll(menuConditionTasks);
+                        bool isPass = true;
+                        foreach (bool menuConditionResult in menuConditionResults)
+                        {
+                            if (!menuConditionResult)
+                            {
+                                isPass = false;
+                                break;
+                            }
+                        }
+                        if (isPass)
                             questIds.Add(dialog.quest.DataId);
                     }
-                    tasks.Add(FindQuestFromDialog(playerCharacter, questIds, dialog.questAcceptedDialog, null, foundDialogs));
-                    tasks.Add(FindQuestFromDialog(playerCharacter, questIds, dialog.questDeclinedDialog, null, foundDialogs));
-                    tasks.Add(FindQuestFromDialog(playerCharacter, questIds, dialog.questAbandonedDialog, null, foundDialogs));
-                    tasks.Add(FindQuestFromDialog(playerCharacter, questIds, dialog.questCompletedDialog, null, foundDialogs));
+                    tasks.Add(FindQuestFromDialog(playerCharacter, questIds, dialog.questAcceptedDialog, foundMenus, foundDialogs));
+                    tasks.Add(FindQuestFromDialog(playerCharacter, questIds, dialog.questDeclinedDialog, foundMenus, foundDialogs));
+                    tasks.Add(FindQuestFromDialog(playerCharacter, questIds, dialog.questAbandonedDialog, foundMenus, foundDialogs));
+                    tasks.Add(FindQuestFromDialog(playerCharacter, questIds, dialog.questCompletedDialog, foundMenus, foundDialogs));
                     break;
                 case NpcDialogType.CraftItem:
-                    tasks.Add(FindQuestFromDialog(playerCharacter, questIds, dialog.craftNotMeetRequirementsDialog, null, foundDialogs));
-                    tasks.Add(FindQuestFromDialog(playerCharacter, questIds, dialog.craftDoneDialog, null, foundDialogs));
-                    tasks.Add(FindQuestFromDialog(playerCharacter, questIds, dialog.craftCancelDialog, null, foundDialogs));
+                    tasks.Add(FindQuestFromDialog(playerCharacter, questIds, dialog.craftNotMeetRequirementsDialog, foundMenus, foundDialogs));
+                    tasks.Add(FindQuestFromDialog(playerCharacter, questIds, dialog.craftDoneDialog, foundMenus, foundDialogs));
+                    tasks.Add(FindQuestFromDialog(playerCharacter, questIds, dialog.craftCancelDialog, foundMenus, foundDialogs));
                     break;
                 case NpcDialogType.SaveRespawnPoint:
-                    tasks.Add(FindQuestFromDialog(playerCharacter, questIds, dialog.saveRespawnConfirmDialog, null, foundDialogs));
-                    tasks.Add(FindQuestFromDialog(playerCharacter, questIds, dialog.saveRespawnCancelDialog, null, foundDialogs));
+                    tasks.Add(FindQuestFromDialog(playerCharacter, questIds, dialog.saveRespawnConfirmDialog, foundMenus, foundDialogs));
+                    tasks.Add(FindQuestFromDialog(playerCharacter, questIds, dialog.saveRespawnCancelDialog, foundMenus, foundDialogs));
                     break;
                 case NpcDialogType.Warp:
-                    tasks.Add(FindQuestFromDialog(playerCharacter, questIds, dialog.warpCancelDialog, null, foundDialogs));
+                    tasks.Add(FindQuestFromDialog(playerCharacter, questIds, dialog.warpCancelDialog, foundMenus, foundDialogs));
                     break;
             }
 
@@ -218,7 +241,7 @@ namespace MultiplayerARPG
             if (playerCharacter == null)
                 return false;
             HashSet<int> questIds = new HashSet<int>();
-            await FindQuestFromDialog(playerCharacter, questIds, StartDialog, null);
+            await FindQuestFromDialog(playerCharacter, questIds, StartDialog);
             Quest quest;
             List<int> clearedQuests = new List<int>();
             foreach (CharacterQuest characterQuest in playerCharacter.Quests)
@@ -243,7 +266,7 @@ namespace MultiplayerARPG
             if (playerCharacter == null)
                 return false;
             HashSet<int> questIds = new HashSet<int>();
-            await FindQuestFromDialog(playerCharacter, questIds, StartDialog, null);
+            await FindQuestFromDialog(playerCharacter, questIds, StartDialog);
             Quest quest;
             List<int> inProgressQuests = new List<int>();
             foreach (CharacterQuest characterQuest in playerCharacter.Quests)
@@ -268,7 +291,7 @@ namespace MultiplayerARPG
             if (playerCharacter == null)
                 return false;
             HashSet<int> questIds = new HashSet<int>();
-            await FindQuestFromDialog(playerCharacter, questIds, StartDialog, null);
+            await FindQuestFromDialog(playerCharacter, questIds, StartDialog);
             Quest quest;
             List<int> tasksDoneQuests = new List<int>();
             foreach (CharacterQuest characterQuest in playerCharacter.Quests)
