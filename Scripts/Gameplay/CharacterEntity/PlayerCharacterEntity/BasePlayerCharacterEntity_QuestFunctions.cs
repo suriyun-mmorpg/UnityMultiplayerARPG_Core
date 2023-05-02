@@ -153,6 +153,9 @@ namespace MultiplayerARPG
             // Change character class
             if (quest.changeCharacterClass != null)
                 DataId = quest.changeCharacterClass.DataId;
+            // Change character faction
+            if (quest.changeCharacterFaction != null)
+                FactionId = quest.changeCharacterFaction.DataId;
             // Add exp
             RewardExp(reward, 1f, RewardGivenType.Quest);
             // Add currency

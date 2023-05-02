@@ -24,6 +24,7 @@ namespace MultiplayerARPG
         public bool resetAttributes;
         public bool resetSkills;
         public PlayerCharacter changeCharacterClass;
+        public Faction changeCharacterFaction;
         public int rewardExp = 0;
         public int rewardGold = 0;
         public int rewardStatPoints = 0;
@@ -136,6 +137,7 @@ namespace MultiplayerARPG
             }
             GameInstance.AddQuests(abandonQuests);
             GameInstance.AddCharacters(changeCharacterClass);
+            GameInstance.AddFactions(changeCharacterFaction);
             GameInstance.AddCurrencies(rewardCurrencies);
             GameInstance.AddItems(rewardItems);
             GameInstance.AddItems(selectableRewardItems);
