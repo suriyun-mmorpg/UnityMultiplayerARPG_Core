@@ -94,7 +94,7 @@ namespace MultiplayerARPG
             List<int> iconIds = new List<int>();
             foreach (PlayerIcon icon in GameInstance.PlayerIcons.Values)
             {
-                if (!icon.isLocked)
+                if (!icon.IsLocked)
                     iconIds.Add(icon.DataId);
             }
             result.InvokeSuccess(new ResponseAvailableIconsMessage()
@@ -110,7 +110,7 @@ namespace MultiplayerARPG
             List<int> frameIds = new List<int>();
             foreach (PlayerFrame frame in GameInstance.PlayerFrames.Values)
             {
-                if (!frame.isLocked)
+                if (!frame.IsLocked)
                     frameIds.Add(frame.DataId);
             }
             result.InvokeSuccess(new ResponseAvailableFramesMessage()
@@ -126,7 +126,7 @@ namespace MultiplayerARPG
             List<int> titleIds = new List<int>();
             foreach (PlayerTitle title in GameInstance.PlayerTitles.Values)
             {
-                if (!title.isLocked)
+                if (!title.IsLocked)
                     titleIds.Add(title.DataId);
             }
             result.InvokeSuccess(new ResponseAvailableTitlesMessage()
@@ -147,7 +147,7 @@ namespace MultiplayerARPG
                 return;
             }
             // TODO: Implement data unlocking
-            if (!GameInstance.PlayerIcons.TryGetValue(request.dataId, out PlayerIcon data) || data.isLocked)
+            if (!GameInstance.PlayerIcons.TryGetValue(request.dataId, out PlayerIcon data) || data.IsLocked)
             {
                 result.InvokeError(new ResponseSetIconMessage()
                 {
@@ -174,7 +174,7 @@ namespace MultiplayerARPG
                 return;
             }
             // TODO: Implement data unlocking
-            if (!GameInstance.PlayerFrames.TryGetValue(request.dataId, out PlayerFrame data) || data.isLocked)
+            if (!GameInstance.PlayerFrames.TryGetValue(request.dataId, out PlayerFrame data) || data.IsLocked)
             {
                 result.InvokeError(new ResponseSetFrameMessage()
                 {
@@ -201,7 +201,7 @@ namespace MultiplayerARPG
                 return;
             }
             // TODO: Implement data unlocking
-            if (!GameInstance.PlayerTitles.TryGetValue(request.dataId, out PlayerTitle data) || data.isLocked)
+            if (!GameInstance.PlayerTitles.TryGetValue(request.dataId, out PlayerTitle data) || data.IsLocked)
             {
                 result.InvokeError(new ResponseSetTitleMessage()
                 {
