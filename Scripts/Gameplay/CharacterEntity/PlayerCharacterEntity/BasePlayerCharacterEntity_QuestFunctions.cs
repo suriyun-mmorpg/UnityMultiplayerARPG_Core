@@ -15,8 +15,7 @@ namespace MultiplayerARPG
         public virtual void ChangeQuestTracking(int questDataId, bool isTracking)
         {
             int indexOfQuest = this.IndexOfQuest(questDataId);
-            Quest quest;
-            if (indexOfQuest < 0 || !GameInstance.Quests.TryGetValue(questDataId, out quest))
+            if (indexOfQuest < 0 || !GameInstance.Quests.TryGetValue(questDataId, out Quest quest))
                 return;
             CharacterQuest characterQuest = quests[indexOfQuest];
             characterQuest.isTracking = isTracking;
@@ -26,8 +25,7 @@ namespace MultiplayerARPG
         public virtual void AcceptQuest(int questDataId)
         {
             int indexOfQuest = this.IndexOfQuest(questDataId);
-            Quest quest;
-            if (indexOfQuest >= 0 || !GameInstance.Quests.TryGetValue(questDataId, out quest))
+            if (indexOfQuest >= 0 || !GameInstance.Quests.TryGetValue(questDataId, out Quest quest))
                 return;
             if (quest.abandonQuests != null && quest.abandonQuests.Length > 0)
             {
@@ -43,8 +41,7 @@ namespace MultiplayerARPG
         public virtual void AbandonQuest(int questDataId)
         {
             int indexOfQuest = this.IndexOfQuest(questDataId);
-            Quest quest;
-            if (indexOfQuest < 0 || !GameInstance.Quests.TryGetValue(questDataId, out quest))
+            if (indexOfQuest < 0 || !GameInstance.Quests.TryGetValue(questDataId, out Quest quest))
                 return;
             CharacterQuest characterQuest = quests[indexOfQuest];
             if (characterQuest.isComplete)
@@ -55,8 +52,7 @@ namespace MultiplayerARPG
         public virtual bool CompleteQuest(int questDataId, byte selectedRewardIndex)
         {
             int indexOfQuest = this.IndexOfQuest(questDataId);
-            Quest quest;
-            if (indexOfQuest < 0 || !GameInstance.Quests.TryGetValue(questDataId, out quest))
+            if (indexOfQuest < 0 || !GameInstance.Quests.TryGetValue(questDataId, out Quest quest))
                 return false;
 
             CharacterQuest characterQuest = quests[indexOfQuest];
