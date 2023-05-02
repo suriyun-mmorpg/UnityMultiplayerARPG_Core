@@ -40,6 +40,7 @@ namespace MultiplayerARPG
             if (prefab == null && monsterCharacterEntity != null)
             {
                 prefab = monsterCharacterEntity;
+                monsterCharacterEntity = null;
 #if UNITY_EDITOR
                 EditorUtility.SetDirty(this);
 #endif
@@ -94,5 +95,13 @@ namespace MultiplayerARPG
         {
             get { return CurrentGameInstance.GetGameEntityGroundDetectionLayerMask(); }
         }
+
+#if UNITY_EDITOR
+        [ContextMenu("Count Spawning Objects")]
+        public override void CountSpawningObjects()
+        {
+            base.CountSpawningObjects();
+        }
+#endif
     }
 }

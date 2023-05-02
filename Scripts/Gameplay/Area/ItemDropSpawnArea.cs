@@ -49,5 +49,13 @@ namespace MultiplayerARPG
         {
             get { return CurrentGameInstance.GetItemDropGroundDetectionLayerMask(); }
         }
+
+#if UNITY_EDITOR
+        [ContextMenu("Count Spawning Objects")]
+        public override void CountSpawningObjects()
+        {
+            base.CountSpawningObjects();
+        }
+#endif
     }
 }

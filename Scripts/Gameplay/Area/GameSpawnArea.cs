@@ -103,5 +103,21 @@ namespace MultiplayerARPG
         }
 
         protected abstract T SpawnInternal(T prefab, int level);
+
+        public virtual void CountSpawningObjects()
+        {
+            int count = 0;
+            GameSpawnArea<T>[] areas = FindObjectsOfType<GameSpawnArea<T>>();
+            foreach (GameSpawnArea<T> area in areas)
+            {
+                count += area.amount;
+                List<SpawnPrefabData<T>> spawningPrefabs = new List<SpawnPrefabData<T>>(area.SpawningPrefabs);
+                foreach (SpawnPrefabData<T> spawningPrefab in spawningPrefabs)
+                {
+                    count += spawningPrefab.amount;
+                }
+            }
+            Debug.Log($"Spawning {typeof(T).Name} Amount: {count}");
+        }
     }
 }

@@ -40,6 +40,7 @@ namespace MultiplayerARPG
             if (prefab == null && harvestableEntity != null)
             {
                 prefab = harvestableEntity;
+                harvestableEntity = null;
 #if UNITY_EDITOR
                 EditorUtility.SetDirty(this);
 #endif
@@ -133,5 +134,13 @@ namespace MultiplayerARPG
         {
             get { return CurrentGameInstance.GetHarvestableSpawnGroundDetectionLayerMask(); }
         }
+
+#if UNITY_EDITOR
+        [ContextMenu("Count Spawning Objects")]
+        public override void CountSpawningObjects()
+        {
+            base.CountSpawningObjects();
+        }
+#endif
     }
 }
