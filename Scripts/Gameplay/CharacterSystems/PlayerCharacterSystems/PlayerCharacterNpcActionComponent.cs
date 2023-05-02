@@ -6,18 +6,28 @@ namespace MultiplayerARPG
     [DisallowMultipleComponent]
     public partial class PlayerCharacterNpcActionComponent : BaseNetworkedGameEntityComponent<BasePlayerCharacterEntity>
     {
-        public BaseNpcDialog CurrentNpcDialog { get; set; }
+        protected BaseNpcDialog _currentNpcDialog;
+        public BaseNpcDialog CurrentNpcDialog
+        {
+            get { return _currentNpcDialog; }
+            set
+            {
+                if (IsServer && value != null && value.EnterDialogActionOnServer != null)
+                    value.EnterDialogActionOnServer.DoAction(Entity);
+                _currentNpcDialog = value;
+            }
+        }
         public Quest CompletingQuest { get; set; }
         public BaseNpcDialog NpcDialogAfterSelectRewardItem { get; set; }
 
         /// <summary>
         /// Action: int questDataId
         /// </summary>
-        public event System.Action<int> onShowQuestRewardItemSelection;
+        public event System.Action<Quest> onShowQuestRewardItemSelection;
         /// <summary>
         /// Action: int npcDialogDataId
         /// </summary>
-        public event System.Action<int> onShowNpcDialog;
+        public event System.Action<BaseNpcDialog> onShowNpcDialog;
         public event System.Action onShowNpcRefineItem;
         public event System.Action onShowNpcDismantleItem;
         public event System.Action onShowNpcRepairItem;
@@ -63,8 +73,7 @@ namespace MultiplayerARPG
             if (!Entity.CanDoActions())
                 return;
 
-            NpcEntity npcEntity;
-            if (!Manager.TryGetEntityByObjectId(objectId, out npcEntity))
+            if (!Manager.TryGetEntityByObjectId(objectId, out NpcEntity npcEntity))
             {
                 // Can't find the entity
                 return;
@@ -80,38 +89,38 @@ namespace MultiplayerARPG
             CurrentNpcDialog = npcEntity.StartDialog;
 
             // Update task
-            Quest quest;
-            int taskIndex;
-            BaseNpcDialog talkToNpcTaskDialog;
-            bool completeAfterTalked;
-            CharacterQuest characterQuest;
+            CharacterQuest tempCharacterQuest;
+            Quest tempQuest;
+            int tempTaskIndex;
+            BaseNpcDialog tempTalkToNpcTaskDialog;
+            bool tempCompleteAfterTalked;
             for (int i = 0; i < Entity.Quests.Count; ++i)
             {
-                characterQuest = Entity.Quests[i];
-                if (characterQuest.isComplete)
+                tempCharacterQuest = Entity.Quests[i];
+                if (tempCharacterQuest.isComplete)
                     continue;
-                quest = characterQuest.GetQuest();
-                if (quest == null || !quest.HaveToTalkToNpc(Entity, npcEntity, out taskIndex, out talkToNpcTaskDialog, out completeAfterTalked))
+                tempQuest = tempCharacterQuest.GetQuest();
+                if (tempQuest == null || !tempQuest.HaveToTalkToNpc(Entity, npcEntity, out tempTaskIndex, out tempTalkToNpcTaskDialog, out tempCompleteAfterTalked))
                     continue;
-                CurrentNpcDialog = talkToNpcTaskDialog;
-                if (!characterQuest.CompletedTasks.Contains(taskIndex))
-                    characterQuest.CompletedTasks.Add(taskIndex);
-                Entity.Quests[i] = characterQuest;
-                if (completeAfterTalked && characterQuest.IsAllTasksDone(Entity))
+                CurrentNpcDialog = tempTalkToNpcTaskDialog;
+                if (!tempCharacterQuest.CompletedTasks.Contains(tempTaskIndex))
+                    tempCharacterQuest.CompletedTasks.Add(tempTaskIndex);
+                Entity.Quests[i] = tempCharacterQuest;
+                if (tempCompleteAfterTalked && tempCharacterQuest.IsAllTasksDone(Entity))
                 {
-                    if (quest.selectableRewardItems != null &&
-                        quest.selectableRewardItems.Length > 0)
+                    if (tempQuest.selectableRewardItems != null &&
+                        tempQuest.selectableRewardItems.Length > 0)
                     {
                         // Show quest reward dialog at client
-                        CallOwnerShowQuestRewardItemSelection(quest.DataId);
-                        CompletingQuest = quest;
-                        NpcDialogAfterSelectRewardItem = talkToNpcTaskDialog;
+                        CallOwnerShowQuestRewardItemSelection(tempQuest.DataId);
+                        CompletingQuest = tempQuest;
+                        NpcDialogAfterSelectRewardItem = tempTalkToNpcTaskDialog;
                         CurrentNpcDialog = null;
                     }
                     else
                     {
                         // No selectable reward items, complete the quest immediately
-                        if (!Entity.CompleteQuest(quest.DataId, 0))
+                        if (!Entity.CompleteQuest(tempQuest.DataId, 0))
                             CurrentNpcDialog = null;
                     }
                     break;
@@ -136,11 +145,14 @@ namespace MultiplayerARPG
         {
             // Hide npc dialog
             if (onShowNpcDialog != null)
-                onShowNpcDialog.Invoke(0);
+                onShowNpcDialog.Invoke(null);
+
+            if (!GameInstance.Quests.TryGetValue(questDataId, out Quest quest))
+                quest = null;
 
             // Show quest reward dialog
             if (onShowQuestRewardItemSelection != null)
-                onShowQuestRewardItemSelection.Invoke(questDataId);
+                onShowQuestRewardItemSelection.Invoke(quest);
         }
 
         public bool CallOwnerShowNpcDialog(int npcDialogDataId)
@@ -154,9 +166,15 @@ namespace MultiplayerARPG
         [TargetRpc]
         protected void TargetShowNpcDialog(int npcDialogDataId)
         {
-            // Show npc dialog by dataId, if dataId = 0 it will hide
+            // Show npc dialog by dataId, if it can't find dialog, it will hide
+            if (!GameInstance.NpcDialogs.TryGetValue(npcDialogDataId, out BaseNpcDialog npcDialog))
+                npcDialog = null;
+
+            if (npcDialog != null && npcDialog.EnterDialogActionOnClient != null)
+                npcDialog.EnterDialogActionOnClient.DoAction(GameInstance.PlayingCharacter);
+
             if (onShowNpcDialog != null)
-                onShowNpcDialog.Invoke(npcDialogDataId);
+                onShowNpcDialog.Invoke(npcDialog);
         }
 
         public bool CallOwnerShowNpcRefineItem()
@@ -172,7 +190,7 @@ namespace MultiplayerARPG
         {
             // Hide npc dialog
             if (onShowNpcDialog != null)
-                onShowNpcDialog.Invoke(0);
+                onShowNpcDialog.Invoke(null);
 
             // Show refine dialog
             if (onShowNpcRefineItem != null)
@@ -192,7 +210,7 @@ namespace MultiplayerARPG
         {
             // Hide npc dialog
             if (onShowNpcDialog != null)
-                onShowNpcDialog.Invoke(0);
+                onShowNpcDialog.Invoke(null);
 
             // Show dismantle dialog
             if (onShowNpcDismantleItem != null)
@@ -212,7 +230,7 @@ namespace MultiplayerARPG
         {
             // Hide npc dialog
             if (onShowNpcDialog != null)
-                onShowNpcDialog.Invoke(0);
+                onShowNpcDialog.Invoke(null);
 
             // Show repair dialog
             if (onShowNpcRepairItem != null)
@@ -279,8 +297,7 @@ namespace MultiplayerARPG
                 return;
 
             // Dialog must be built-in shop dialog
-            NpcDialog dialog;
-            if (!AccessingNpcShopDialog(out dialog))
+            if (!AccessingNpcShopDialog(out NpcDialog dialog))
                 return;
 
             // Found buying item or not?

@@ -23,18 +23,43 @@ namespace MultiplayerARPG
         public LanguageData[] descriptions;
         public Sprite icon;
         public AudioClip voice;
+        public BaseNpcDialogAction enterDialogActionOnClient;
+        public BaseNpcDialogAction enterDialogActionOnServer;
 
         #region Generic Data
         public string Id { get { return name; } }
+
+        public int DataId { get { return MakeDataId(Id); } }
+
         public string Title
         {
             get { return Language.GetText(titles, title); }
         }
+
         public string Description
         {
             get { return Language.GetText(descriptions, description); }
         }
-        public int DataId { get { return MakeDataId(Id); } }
+
+        public Sprite Icon
+        {
+            get { return icon; }
+        }
+
+        public AudioClip Voice
+        {
+            get { return voice; }
+        }
+
+        public BaseNpcDialogAction EnterDialogActionOnClient
+        {
+            get { return enterDialogActionOnClient; }
+        }
+
+        public BaseNpcDialogAction EnterDialogActionOnServer
+        {
+            get { return enterDialogActionOnServer; }
+        }
 
         public static int MakeDataId(string id)
         {

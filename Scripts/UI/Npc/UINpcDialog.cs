@@ -61,7 +61,7 @@ namespace MultiplayerARPG
 
             if (imageIcon != null)
             {
-                Sprite iconSprite = Data == null ? null : Data.icon;
+                Sprite iconSprite = Data == null ? null : Data.Icon;
                 imageIcon.gameObject.SetActive(iconSprite != null);
                 imageIcon.sprite = iconSprite;
                 imageIcon.preserveAspect = true;
@@ -70,7 +70,7 @@ namespace MultiplayerARPG
             if (voiceSource != null)
             {
                 voiceSource.Stop();
-                AudioClip clip = Data == null ? null : Data.voice;
+                AudioClip clip = Data == null ? null : Data.Voice;
                 voiceSource.clip = clip;
                 if (clip != null && enabled)
                     voiceSource.Play();

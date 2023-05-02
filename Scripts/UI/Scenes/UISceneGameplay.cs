@@ -371,11 +371,18 @@ namespace MultiplayerARPG
             onCharacterRespawn.Invoke();
         }
 
-        public override void ShowQuestRewardItemSelection(int questDataId)
+        public void ShowQuestRewardItemSelection(Quest quest)
         {
             if (uiQuestRewardItemSelection == null)
                 return;
-            uiQuestRewardItemSelection.UpdateData(questDataId);
+
+            if (quest == null)
+            {
+                uiQuestRewardItemSelection.Hide();
+                return;
+            }
+
+            uiQuestRewardItemSelection.UpdateData(quest);
             uiQuestRewardItemSelection.Show();
             AddNpcDialog(uiQuestRewardItemSelection);
         }
@@ -386,16 +393,17 @@ namespace MultiplayerARPG
                 uiQuestRewardItemSelection.Hide();
         }
 
-        public override void ShowNpcDialog(int npcDialogDataId)
+        public void ShowNpcDialog(BaseNpcDialog npcDialog)
         {
             if (uiNpcDialog == null)
                 return;
-            BaseNpcDialog npcDialog;
-            if (!GameInstance.NpcDialogs.TryGetValue(npcDialogDataId, out npcDialog))
+
+            if (npcDialog == null)
             {
                 uiNpcDialog.Hide();
                 return;
             }
+
             uiNpcDialog.Data = npcDialog;
             uiNpcDialog.Show();
             AddNpcDialog(uiNpcDialog);
