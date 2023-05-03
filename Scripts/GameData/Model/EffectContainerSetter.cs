@@ -1,5 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using LiteNetLibManager;
 using UnityEngine;
 
@@ -13,7 +12,9 @@ namespace MultiplayerARPG
         {
             if (gameEntityModel == null)
             {
-                Logging.LogWarning(ToString(), "Cannot find game entity model");
+#if UNITY_EDITOR || DEVELOPMENT_BUILD
+                Logging.LogWarning("Cannot find game entity model");
+#endif
                 return;
             }
             bool hasChanges = false;

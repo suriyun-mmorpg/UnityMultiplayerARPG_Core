@@ -1,5 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using LiteNetLibManager;
 using UnityEngine;
 #if UNITY_EDITOR
@@ -25,7 +24,9 @@ namespace MultiplayerARPG
         {
             if (characterModel == null)
             {
+#if UNITY_EDITOR || DEVELOPMENT_BUILD
                 Logging.LogWarning(ToString(), "Cannot find character model");
+#endif
                 return;
             }
             bool hasChanges = false;
@@ -70,7 +71,7 @@ namespace MultiplayerARPG
         {
             if (childIndex < 0 || childIndex >= transform.childCount)
             {
-                Logging.LogError(ToString(), "Can't set default model, invalid wrong child index.");
+                Debug.LogError("Can't set default model, invalid wrong child index.");
                 return;
             }
             defaultModel = transform.GetChild(childIndex).gameObject;
