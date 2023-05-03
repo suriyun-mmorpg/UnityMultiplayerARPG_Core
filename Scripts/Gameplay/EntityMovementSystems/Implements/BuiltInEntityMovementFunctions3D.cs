@@ -249,7 +249,7 @@ namespace MultiplayerARPG
         {
             if (!IsServer)
             {
-                Logging.LogWarning("BuiltInEntityMovementFunctions3D", $"Teleport function shouldn't be called at client [{Entity.name}]");
+                Logging.LogWarning(nameof(BuiltInEntityMovementFunctions3D), $"Teleport function shouldn't be called at client [{Entity.name}]");
                 return;
             }
             _isTeleporting = true;

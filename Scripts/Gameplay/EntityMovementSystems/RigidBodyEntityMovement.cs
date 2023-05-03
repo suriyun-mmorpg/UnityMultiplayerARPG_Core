@@ -80,7 +80,7 @@ namespace MultiplayerARPG
             LiteNetLibTransform disablingComp = gameObject.GetComponent<LiteNetLibTransform>();
             if (disablingComp != null)
             {
-                Logging.LogWarning("RigidBodyEntityMovement", "You can remove `LiteNetLibTransform` component from game entity, it's not being used anymore [" + name + "]");
+                Logging.LogWarning(nameof(RigidBodyEntityMovement), "You can remove `LiteNetLibTransform` component from game entity, it's not being used anymore [" + name + "]");
                 disablingComp.enabled = false;
             }
             // Setup

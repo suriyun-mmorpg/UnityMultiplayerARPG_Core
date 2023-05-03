@@ -59,7 +59,7 @@ namespace MultiplayerARPG
             LiteNetLibTransform disablingComp = gameObject.GetComponent<LiteNetLibTransform>();
             if (disablingComp != null)
             {
-                Logging.LogWarning("NavMeshEntityMovement", "You can remove `LiteNetLibTransform` component from game entity, it's not being used anymore [" + name + "]");
+                Logging.LogWarning(nameof(RigidBodyEntityMovement2D), "You can remove `LiteNetLibTransform` component from game entity, it's not being used anymore [" + name + "]");
                 disablingComp.enabled = false;
             }
             // Setup
@@ -168,7 +168,7 @@ namespace MultiplayerARPG
         {
             if (!IsServer)
             {
-                Logging.LogWarning("RigidBodyEntityMovement2D", "Teleport function shouldn't be called at client [" + name + "]");
+                Logging.LogWarning(nameof(RigidBodyEntityMovement2D), "Teleport function shouldn't be called at client [" + name + "]");
                 return;
             }
             _isTeleporting = true;
