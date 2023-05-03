@@ -25,7 +25,10 @@ namespace MultiplayerARPG
                 npcEntity = GetComponentInParent<NpcEntity>();
             GameInstance.onSetPlayingCharacter += GameInstance_onSetPlayingCharacter;
             if (GameInstance.PlayingCharacterEntity != null)
+            {
                 GameInstance_onSetPlayingCharacter(GameInstance.PlayingCharacterEntity);
+                UpdateStatus().Forget();
+            }
         }
 
         private void OnDestroy()
