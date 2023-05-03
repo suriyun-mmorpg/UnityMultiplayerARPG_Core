@@ -108,19 +108,25 @@ namespace MultiplayerARPG
 
         protected virtual void Update()
         {
-            for (int i = 0; i < _arrayGameEntityLength; ++i)
+            if (IsNetworkActive)
             {
-                if (_arrayGameEntity[i].enabled)
-                    _arrayGameEntity[i].DoUpdate();
+                for (int i = 0; i < _arrayGameEntityLength; ++i)
+                {
+                    if (_arrayGameEntity[i].enabled)
+                        _arrayGameEntity[i].DoUpdate();
+                }
             }
         }
 
         protected virtual void LateUpdate()
         {
-            for (int i = 0; i < _arrayGameEntityLength; ++i)
+            if (IsNetworkActive)
             {
-                if (_arrayGameEntity[i].enabled)
-                    _arrayGameEntity[i].DoLateUpdate();
+                for (int i = 0; i < _arrayGameEntityLength; ++i)
+                {
+                    if (_arrayGameEntity[i].enabled)
+                        _arrayGameEntity[i].DoLateUpdate();
+                }
             }
         }
 
@@ -147,11 +153,11 @@ namespace MultiplayerARPG
             {
                 // Update day-night time on both client and server. It will sync from server some time to make sure that clients time of day won't very difference
                 CurrentGameInstance.DayNightTimeUpdater.UpdateTimeOfDay(tempDeltaTime);
-            }
-            for (int i = 0; i < _arrayGameEntityLength; ++i)
-            {
-                if (_arrayGameEntity[i].enabled)
-                    _arrayGameEntity[i].DoFixedUpdate();
+                for (int i = 0; i < _arrayGameEntityLength; ++i)
+                {
+                    if (_arrayGameEntity[i].enabled)
+                        _arrayGameEntity[i].DoFixedUpdate();
+                }
             }
         }
 
@@ -168,8 +174,6 @@ namespace MultiplayerARPG
         {
             _hashedGameEntity.Remove(gameEntity);
             _arrayGameEntityLength = _hashedGameEntity.Count;
-            if (_hashedGameEntity.Count > _arrayGameEntity.Length)
-                System.Array.Resize(ref _arrayGameEntity, _hashedGameEntity.Count);
             _hashedGameEntity.CopyTo(_arrayGameEntity, 0, _arrayGameEntityLength);
         }
 
@@ -374,6 +378,8 @@ namespace MultiplayerARPG
                 ClientOnlineCharacterHandlers.ClearOnlineCharacters();
             CurrentMapInfo = null;
             _isReadyToInstantiatePlayers = false;
+            _hashedGameEntity.Clear();
+            _arrayGameEntityLength = 0;
             // Extensions
             this.InvokeInstanceDevExtMethods("Clean");
             foreach (BaseGameNetworkManagerComponent component in ManagerComponents)
