@@ -169,7 +169,7 @@ namespace MultiplayerARPG
         {
             if (guildMemberRoles.Length < 2)
             {
-                Logging.LogWarning(ToString(), "`Guild Member Roles` must more or equals to 2");
+                Debug.LogWarning($"[{nameof(SocialSystemSetting)}] `Guild Member Roles` must more or equals to 2");
                 guildMemberRoles = new GuildRoleData[] {
                     guildMemberRoles[0],
                     new GuildRoleData() { roleName = "Member 1", canInvite = false, canKick = false, canUseStorage = false },
@@ -178,7 +178,7 @@ namespace MultiplayerARPG
             }
             else if (guildMemberRoles.Length < 1)
             {
-                Logging.LogWarning(ToString(), "`Guild Member Roles` must more or equals to 2");
+                Debug.LogWarning($"[{nameof(SocialSystemSetting)}] `Guild Member Roles` must more or equals to 2");
                 guildMemberRoles = new GuildRoleData[] {
                     new GuildRoleData() { roleName = "Master", canInvite = true, canKick = true, canUseStorage = true },
                     new GuildRoleData() { roleName = "Member 1", canInvite = false, canKick = false, canUseStorage = false },
