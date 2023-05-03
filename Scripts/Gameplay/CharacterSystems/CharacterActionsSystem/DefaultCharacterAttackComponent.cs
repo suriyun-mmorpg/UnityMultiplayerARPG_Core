@@ -340,13 +340,10 @@ namespace MultiplayerARPG
             history.TriggeredIndex = hitIndex;
             _simulatingActionTriggerHistories[data.simulateSeed] = history;
             bool isLeftHand = data.state.HasFlag(SimulateActionTriggerState.IsLeftHand);
-            if (!data.state.HasFlag(SimulateActionTriggerState.IsSkill))
-            {
-                CharacterItem weapon = Entity.GetAvailableWeapon(ref isLeftHand);
-                DamageInfo damageInfo = Entity.GetWeaponDamageInfo(weapon.GetWeaponItem());
-                Dictionary<DamageElement, MinMaxFloat> damageAmounts = Entity.GetWeaponDamagesWithBuffs(weapon);
-                ApplyAttack(isLeftHand, weapon, damageInfo, damageAmounts, data.aimPosition, applySeed);
-            }
+            CharacterItem weapon = Entity.GetAvailableWeapon(ref isLeftHand);
+            DamageInfo damageInfo = Entity.GetWeaponDamageInfo(weapon.GetWeaponItem());
+            Dictionary<DamageElement, MinMaxFloat> damageAmounts = Entity.GetWeaponDamagesWithBuffs(weapon);
+            ApplyAttack(isLeftHand, weapon, damageInfo, damageAmounts, data.aimPosition, applySeed);
             return true;
         }
 
