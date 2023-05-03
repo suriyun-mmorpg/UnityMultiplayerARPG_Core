@@ -294,19 +294,6 @@ namespace MultiplayerARPG
         public event NetworkDestroyDelegate onNetworkDestroy;
         #endregion
 
-        private void Awake()
-        {
-            InitialRequiredComponents();
-            EntityComponents = GetComponents<IGameEntityComponent>();
-            for (int i = 0; i < EntityComponents.Length; ++i)
-            {
-                EntityComponents[i].EntityAwake();
-                EntityComponents[i].Enabled = true;
-            }
-            EntityAwake();
-            this.InvokeInstanceDevExtMethods("Awake");
-        }
-
         /// <summary>
         /// Override this function to initial required components
         /// This function will be called by this entity when awake
@@ -347,17 +334,19 @@ namespace MultiplayerARPG
             return GameplayUtils.MakeLocalBoundsByCollider(EntityTransform);
         }
 
+        private void Awake()
+        {
+            InitialRequiredComponents();
+            EntityComponents = GetComponents<IGameEntityComponent>();
+            for (int i = 0; i < EntityComponents.Length; ++i)
+            {
+                EntityComponents[i].EntityAwake();
+                EntityComponents[i].Enabled = true;
+            }
+            EntityAwake();
+            this.InvokeInstanceDevExtMethods("Awake");
+        }
         protected virtual void EntityAwake() { }
-
-#if UNITY_EDITOR
-        protected virtual void OnDrawGizmos()
-        {
-        }
-
-        protected virtual void OnDrawGizmosSelected()
-        {
-        }
-#endif
 
         private void Start()
         {
@@ -369,8 +358,52 @@ namespace MultiplayerARPG
             EntityStart();
             if (onStart != null)
                 onStart.Invoke();
+            BaseGameNetworkManager.Singleton.RegisterGameEntity(this);
         }
         protected virtual void EntityStart() { }
+
+        private void OnDestroy()
+        {
+            for (int i = 0; i < EntityComponents.Length; ++i)
+            {
+                EntityComponents[i].EntityOnDestroy();
+            }
+            EntityOnDestroy();
+            this.InvokeInstanceDevExtMethods("OnDestroy");
+            BaseGameNetworkManager.Singleton.UnregisterGameEntity(this);
+        }
+        protected virtual void EntityOnDestroy()
+        {
+            // Exit vehicle when destroy
+            if (IsServer)
+                ExitVehicle();
+        }
+
+        private void OnEnable()
+        {
+            EntityOnEnable();
+            if (onEnable != null)
+                onEnable.Invoke();
+        }
+        protected virtual void EntityOnEnable() { }
+
+        private void OnDisable()
+        {
+            EntityOnDisable();
+            if (onDisable != null)
+                onDisable.Invoke();
+        }
+        protected virtual void EntityOnDisable() { }
+
+#if UNITY_EDITOR
+        protected virtual void OnDrawGizmos()
+        {
+        }
+
+        protected virtual void OnDrawGizmosSelected()
+        {
+        }
+#endif
 
         public override void OnSetOwnerClient(bool isOwnerClient)
         {
@@ -392,23 +425,7 @@ namespace MultiplayerARPG
             }
         }
 
-        private void OnEnable()
-        {
-            EntityOnEnable();
-            if (onEnable != null)
-                onEnable.Invoke();
-        }
-        protected virtual void EntityOnEnable() { }
-
-        private void OnDisable()
-        {
-            EntityOnDisable();
-            if (onDisable != null)
-                onDisable.Invoke();
-        }
-        protected virtual void EntityOnDisable() { }
-
-        private void Update()
+        internal void DoUpdate()
         {
             Profiler.BeginSample("Entity Components - Update");
             if (UpdateEntityComponents)
@@ -448,7 +465,7 @@ namespace MultiplayerARPG
             }
         }
 
-        private void LateUpdate()
+        internal void DoLateUpdate()
         {
             bool updateEntityComponents = UpdateEntityComponents;
             Profiler.BeginSample("Entity Components - LateUpdate");
@@ -495,7 +512,7 @@ namespace MultiplayerARPG
             }
         }
 
-        private void FixedUpdate()
+        internal void DoFixedUpdate()
         {
             Profiler.BeginSample("Entity Components - FixedUpdate");
             if (UpdateEntityComponents)
@@ -559,22 +576,6 @@ namespace MultiplayerARPG
         {
             if (Movement != null)
                 Movement.ReadServerStateAtClient(reader);
-        }
-
-        private void OnDestroy()
-        {
-            for (int i = 0; i < EntityComponents.Length; ++i)
-            {
-                EntityComponents[i].EntityOnDestroy();
-            }
-            EntityOnDestroy();
-            this.InvokeInstanceDevExtMethods("OnDestroy");
-        }
-        protected virtual void EntityOnDestroy()
-        {
-            // Exit vehicle when destroy
-            if (IsServer)
-                ExitVehicle();
         }
 
         protected virtual void OnValidate()

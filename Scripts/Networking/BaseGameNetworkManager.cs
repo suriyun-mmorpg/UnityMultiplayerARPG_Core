@@ -64,14 +64,6 @@ namespace MultiplayerARPG
 
         public static BaseMapInfo CurrentMapInfo { get; protected set; }
 
-        // Events
-        protected float _updateOnlineCharactersCountDown;
-        protected float _updateTimeOfDayCountDown;
-        protected float _serverSceneLoadedTime;
-        // Instantiate object allowing status
-        protected Dictionary<string, bool> _readyToInstantiateObjectsStates = new Dictionary<string, bool>();
-        protected bool _isReadyToInstantiateObjects;
-        protected bool _isReadyToInstantiatePlayers;
         // Spawn entities events
         public LiteNetLibLoadSceneEvent onSpawnEntitiesStart;
         public LiteNetLibLoadSceneEvent onSpawnEntitiesProgress;
@@ -81,6 +73,17 @@ namespace MultiplayerARPG
         public System.Action<long> onUnregisterCharacter;
         public System.Action<long, string> onRegisterUser;
         public System.Action<long> onUnregisterUser;
+        // Private variables
+        protected float _updateOnlineCharactersCountDown;
+        protected float _updateTimeOfDayCountDown;
+        protected float _serverSceneLoadedTime;
+        protected HashSet<BaseGameEntity> _hashedGameEntity = new HashSet<BaseGameEntity>();
+        protected BaseGameEntity[] _arrayGameEntity = new BaseGameEntity[2048];
+        protected int _arrayGameEntityLength = 0;
+        // Instantiate object allowing status
+        protected Dictionary<string, bool> _readyToInstantiateObjectsStates = new Dictionary<string, bool>();
+        protected bool _isReadyToInstantiateObjects;
+        protected bool _isReadyToInstantiatePlayers;
 
         protected override void Awake()
         {
@@ -101,6 +104,24 @@ namespace MultiplayerARPG
                     gridManager.axisMode = GridManager.EAxisMode.XY;
             }
             base.Awake();
+        }
+
+        protected virtual void Update()
+        {
+            for (int i = 0; i < _arrayGameEntityLength; ++i)
+            {
+                if (_arrayGameEntity[i].enabled)
+                    _arrayGameEntity[i].DoUpdate();
+            }
+        }
+
+        protected virtual void LateUpdate()
+        {
+            for (int i = 0; i < _arrayGameEntityLength; ++i)
+            {
+                if (_arrayGameEntity[i].enabled)
+                    _arrayGameEntity[i].DoLateUpdate();
+            }
         }
 
         protected override void FixedUpdate()
@@ -127,6 +148,29 @@ namespace MultiplayerARPG
                 // Update day-night time on both client and server. It will sync from server some time to make sure that clients time of day won't very difference
                 CurrentGameInstance.DayNightTimeUpdater.UpdateTimeOfDay(tempDeltaTime);
             }
+            for (int i = 0; i < _arrayGameEntityLength; ++i)
+            {
+                if (_arrayGameEntity[i].enabled)
+                    _arrayGameEntity[i].DoFixedUpdate();
+            }
+        }
+
+        public void RegisterGameEntity(BaseGameEntity gameEntity)
+        {
+            _hashedGameEntity.Add(gameEntity);
+            _arrayGameEntityLength = _hashedGameEntity.Count;
+            if (_hashedGameEntity.Count > _arrayGameEntity.Length)
+                System.Array.Resize(ref _arrayGameEntity, _hashedGameEntity.Count);
+            _hashedGameEntity.CopyTo(_arrayGameEntity, 0, _arrayGameEntityLength);
+        }
+
+        public void UnregisterGameEntity(BaseGameEntity gameEntity)
+        {
+            _hashedGameEntity.Remove(gameEntity);
+            _arrayGameEntityLength = _hashedGameEntity.Count;
+            if (_hashedGameEntity.Count > _arrayGameEntity.Length)
+                System.Array.Resize(ref _arrayGameEntity, _hashedGameEntity.Count);
+            _hashedGameEntity.CopyTo(_arrayGameEntity, 0, _arrayGameEntityLength);
         }
 
         protected override void RegisterMessages()
