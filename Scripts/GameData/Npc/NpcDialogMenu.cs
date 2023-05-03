@@ -1,4 +1,5 @@
 ﻿using Cysharp.Threading.Tasks;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace MultiplayerARPG
@@ -25,9 +26,15 @@ namespace MultiplayerARPG
         {
             if (dialog != null && !await dialog.IsPassMenuCondition(character))
                 return false;
+            List<UniTask<bool>> tasks = new List<UniTask<bool>>();
             foreach (NpcDialogCondition showCondition in showConditions)
             {
-                if (!await showCondition.IsPass(character))
+                tasks.Add(showCondition.IsPass(character));
+            }
+            bool[] isPasses = await UniTask.WhenAll(tasks);
+            foreach (bool isPass in isPasses)
+            {
+                if (!isPass)
                     return false;
             }
             return true;
