@@ -34,29 +34,52 @@ namespace MultiplayerARPG
         private void OnDestroy()
         {
             GameInstance.onSetPlayingCharacter -= GameInstance_onSetPlayingCharacter;
-            if (_previousEntity != null)
-            {
-                _previousEntity.onNonEquipItemsOperation -= PlayingCharacterEntity_onNonEquipItemsOperation;
-                _previousEntity.onQuestsOperation -= PlayingCharacterEntity_onQuestsOperation;
-            }
+            RemoveEvents(_previousEntity);
         }
 
         private void GameInstance_onSetPlayingCharacter(IPlayerCharacterData playingCharacterData)
         {
-            if (_previousEntity != null)
-            {
-                _previousEntity.onNonEquipItemsOperation -= PlayingCharacterEntity_onNonEquipItemsOperation;
-                _previousEntity.onQuestsOperation -= PlayingCharacterEntity_onQuestsOperation;
-            }
-
+            RemoveEvents(_previousEntity);
             BasePlayerCharacterEntity playerCharacterEntity = playingCharacterData as BasePlayerCharacterEntity;
             _previousEntity = playerCharacterEntity;
+            AddEvents(_previousEntity);
+        }
 
-            if (_previousEntity != null)
-            {
-                _previousEntity.onNonEquipItemsOperation += PlayingCharacterEntity_onNonEquipItemsOperation;
-                _previousEntity.onQuestsOperation += PlayingCharacterEntity_onQuestsOperation;
-            }
+        private void AddEvents(BasePlayerCharacterEntity PlayingCharacterEntity)
+        {
+            if (PlayingCharacterEntity == null)
+                return;
+            PlayingCharacterEntity.onLevelChange += PlayingCharacterEntity_onLevelChange;
+            PlayingCharacterEntity.onDataIdChange += PlayingCharacterEntity_onDataIdChange;
+            PlayingCharacterEntity.onFactionIdChange += PlayingCharacterEntity_onFactionIdChange;
+            PlayingCharacterEntity.onNonEquipItemsOperation += PlayingCharacterEntity_onNonEquipItemsOperation;
+            PlayingCharacterEntity.onQuestsOperation += PlayingCharacterEntity_onQuestsOperation;
+        }
+
+        private void RemoveEvents(BasePlayerCharacterEntity PlayingCharacterEntity)
+        {
+            if (PlayingCharacterEntity == null)
+                return;
+            PlayingCharacterEntity.onLevelChange -= PlayingCharacterEntity_onLevelChange;
+            PlayingCharacterEntity.onDataIdChange -= PlayingCharacterEntity_onDataIdChange;
+            PlayingCharacterEntity.onFactionIdChange -= PlayingCharacterEntity_onFactionIdChange;
+            PlayingCharacterEntity.onNonEquipItemsOperation -= PlayingCharacterEntity_onNonEquipItemsOperation;
+            PlayingCharacterEntity.onQuestsOperation -= PlayingCharacterEntity_onQuestsOperation;
+        }
+
+        private void PlayingCharacterEntity_onLevelChange(int level)
+        {
+            UpdateStatus().Forget();
+        }
+
+        private void PlayingCharacterEntity_onDataIdChange(int obj)
+        {
+            UpdateStatus().Forget();
+        }
+
+        private void PlayingCharacterEntity_onFactionIdChange(int obj)
+        {
+            UpdateStatus().Forget();
         }
 
         private void PlayingCharacterEntity_onNonEquipItemsOperation(LiteNetLibManager.LiteNetLibSyncList.Operation op, int index)
