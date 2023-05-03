@@ -49,7 +49,9 @@ namespace MultiplayerARPG
                     _respawnPendingEntitiesTimer = 0f;
                     foreach (SpawnPrefabData<T> pendingEntry in _pending)
                     {
+#if UNITY_EDITOR || DEVELOPMENT_BUILD
                         Logging.LogWarning(ToString(), $"Spawning pending entities, Prefab: {pendingEntry.prefab.name}, Amount: {pendingEntry.amount}.");
+#endif
                         for (int i = 0; i < pendingEntry.amount; ++i)
                         {
                             Spawn(pendingEntry.prefab, pendingEntry.level, 0);

@@ -11,7 +11,7 @@ namespace MultiplayerARPG
     public class GameArea : MonoBehaviour
     {
         public const float GROUND_DETECTION_DISTANCE = 100f;
-        protected static readonly RaycastHit[] findGroundRaycastHits = new RaycastHit[10];
+        protected static readonly RaycastHit[] s_findGroundRaycastHits = new RaycastHit[10];
         public Color gizmosColor = Color.magenta;
         public GameAreaType type;
         [Header("Radius Area")]
@@ -80,7 +80,7 @@ namespace MultiplayerARPG
 
         public bool FindGroundedPosition(Vector3 fromPosition, float findDistance, out Vector3 result)
         {
-            return PhysicUtils.FindGroundedPosition(fromPosition, findGroundRaycastHits, findDistance, GroundLayerMask, out result);
+            return PhysicUtils.FindGroundedPosition(fromPosition, s_findGroundRaycastHits, findDistance, GroundLayerMask, out result);
         }
 
         public virtual int GroundLayerMask { get { return -1; } }

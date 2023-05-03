@@ -79,7 +79,9 @@ namespace MultiplayerARPG
                                 level = level,
                                 amount = 1
                             });
+#if UNITY_EDITOR || DEVELOPMENT_BUILD
                             Logging.LogWarning(ToString(), $"Cannot spawn harvestable, it is collided to another entities, pending harvestable amount {_pending.Count}");
+#endif
                             return null;
                         }
                     }
@@ -105,7 +107,9 @@ namespace MultiplayerARPG
                                 level = level,
                                 amount = 1
                             });
+#if UNITY_EDITOR || DEVELOPMENT_BUILD
                             Logging.LogWarning(ToString(), $"Cannot spawn harvestable, it is collided to another entities, pending harvestable amount {_pending.Count}");
+#endif
                             return null;
                         }
                     }
@@ -126,7 +130,9 @@ namespace MultiplayerARPG
                 level = level,
                 amount = 1
             });
+#if UNITY_EDITOR || DEVELOPMENT_BUILD
             Logging.LogWarning(ToString(), $"Cannot spawn harvestable, it cannot find grounded position, pending harvestable amount {_pending.Count}");
+#endif
             return null;
         }
 

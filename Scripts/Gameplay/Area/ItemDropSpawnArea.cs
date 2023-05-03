@@ -41,7 +41,9 @@ namespace MultiplayerARPG
                 level = level,
                 amount = 1
             });
+#if UNITY_EDITOR || DEVELOPMENT_BUILD
             Logging.LogWarning(ToString(), $"Cannot spawn item drop, it cannot find grounded position, pending item drop amount {_pending.Count}");
+#endif
             return null;
         }
 

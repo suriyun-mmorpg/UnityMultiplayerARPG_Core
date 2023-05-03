@@ -72,7 +72,9 @@ namespace MultiplayerARPG
                         level = level,
                         amount = 1
                     });
+#if UNITY_EDITOR || DEVELOPMENT_BUILD
                     Logging.LogWarning(ToString(), $"Cannot spawn monster, it cannot find grounded position, pending monster amount {_pending.Count}");
+#endif
                     return null;
                 }
                 entity.Level = level;
@@ -87,7 +89,9 @@ namespace MultiplayerARPG
                 level = level,
                 amount = 1
             });
+#if UNITY_EDITOR || DEVELOPMENT_BUILD
             Logging.LogWarning(ToString(), $"Cannot spawn monster, it cannot find grounded position, pending monster amount {_pending.Count}");
+#endif
             return null;
         }
 
