@@ -17,7 +17,7 @@ namespace MultiplayerARPG
             BaseCharacter database;
             if (!GameInstance.Characters.TryGetValue(data.DataId, out database))
             {
-                Logging.LogWarning("[GetDatabase] Cannot find character database with id: " + data.DataId);
+                Logging.LogWarning($"[GetDatabase] Cannot find character database with id: {data.DataId}");
                 return null;
             }
 
@@ -29,7 +29,7 @@ namespace MultiplayerARPG
             BaseCharacterEntity entityPrefab;
             if (!GameInstance.CharacterEntities.TryGetValue(data.EntityId, out entityPrefab))
             {
-                Logging.LogWarning("[GetEntityPrefab] Cannot find character entity with id: " + data.EntityId);
+                Logging.LogWarning($"[GetEntityPrefab] Cannot find character entity with id: {data.EntityId}");
                 return null;
             }
             return entityPrefab;
@@ -40,7 +40,7 @@ namespace MultiplayerARPG
             BaseCharacterEntity entityPrefab = data.GetEntityPrefab();
             if (entityPrefab == null)
             {
-                Logging.LogWarning("[InstantiateModel] Cannot find character entity with id: " + data.EntityId);
+                Logging.LogWarning($"[InstantiateModel] Cannot find character entity with id: {data.EntityId}");
                 return null;
             }
 
@@ -809,7 +809,7 @@ namespace MultiplayerARPG
         {
             if (data is IGameEntity gameEntity && !gameEntity.Entity.IsServer)
             {
-                Logging.LogWarning("Client can't fill weapon sets");
+                Logging.LogWarning("[FillWeaponSetsIfNeeded] Client can't fill weapon sets");
                 return;
             }
             while (data.SelectableWeaponSets.Count <= equipWeaponSet)
