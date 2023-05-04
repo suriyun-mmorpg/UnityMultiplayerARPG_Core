@@ -261,6 +261,9 @@ namespace MultiplayerARPG
             MakeCaches();
             float deltaTime = Time.deltaTime;
 
+            if (IsServer && CurrentGameManager.LagCompensationManager.ShouldStoreHitBoxesTransformHistory)
+                AddHitBoxesTransformHistory(CurrentGameManager.ServerTimestamp);
+
             if (IsServer && CurrentGameInstance.DimensionType == DimensionType.Dimension3D)
             {
                 bool isGrounded = MovementState.Has(MovementState.IsGrounded);
