@@ -77,7 +77,7 @@ namespace MultiplayerARPG
         protected float _updateOnlineCharactersCountDown;
         protected float _updateTimeOfDayCountDown;
         protected float _serverSceneLoadedTime;
-        protected HashSet<BaseGameEntity> _hashedGameEntity = new HashSet<BaseGameEntity>();
+        protected HashSet<BaseGameEntity> _setOfGameEntity = new HashSet<BaseGameEntity>();
         protected BaseGameEntity[] _arrayGameEntity = new BaseGameEntity[2048];
         protected int _arrayGameEntityLength = 0;
         // Instantiate object allowing status
@@ -163,18 +163,18 @@ namespace MultiplayerARPG
 
         public void RegisterGameEntity(BaseGameEntity gameEntity)
         {
-            _hashedGameEntity.Add(gameEntity);
-            _arrayGameEntityLength = _hashedGameEntity.Count;
-            if (_hashedGameEntity.Count > _arrayGameEntity.Length)
-                System.Array.Resize(ref _arrayGameEntity, _hashedGameEntity.Count);
-            _hashedGameEntity.CopyTo(_arrayGameEntity, 0, _arrayGameEntityLength);
+            _setOfGameEntity.Add(gameEntity);
+            _arrayGameEntityLength = _setOfGameEntity.Count;
+            if (_setOfGameEntity.Count > _arrayGameEntity.Length)
+                System.Array.Resize(ref _arrayGameEntity, _setOfGameEntity.Count);
+            _setOfGameEntity.CopyTo(_arrayGameEntity, 0, _arrayGameEntityLength);
         }
 
         public void UnregisterGameEntity(BaseGameEntity gameEntity)
         {
-            _hashedGameEntity.Remove(gameEntity);
-            _arrayGameEntityLength = _hashedGameEntity.Count;
-            _hashedGameEntity.CopyTo(_arrayGameEntity, 0, _arrayGameEntityLength);
+            _setOfGameEntity.Remove(gameEntity);
+            _arrayGameEntityLength = _setOfGameEntity.Count;
+            _setOfGameEntity.CopyTo(_arrayGameEntity, 0, _arrayGameEntityLength);
         }
 
         protected override void RegisterMessages()
@@ -378,7 +378,7 @@ namespace MultiplayerARPG
                 ClientOnlineCharacterHandlers.ClearOnlineCharacters();
             CurrentMapInfo = null;
             _isReadyToInstantiatePlayers = false;
-            _hashedGameEntity.Clear();
+            _setOfGameEntity.Clear();
             _arrayGameEntityLength = 0;
             // Extensions
             this.InvokeInstanceDevExtMethods("Clean");
