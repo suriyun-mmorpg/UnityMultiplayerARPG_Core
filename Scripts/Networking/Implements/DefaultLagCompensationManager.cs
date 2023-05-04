@@ -15,9 +15,12 @@ namespace MultiplayerARPG
         private int maxHistorySize = 16;
         public int MaxHistorySize { get { return maxHistorySize; } }
 
-        private Dictionary<uint, DamageableEntity> damageableEntities = new Dictionary<uint, DamageableEntity>();
-        private List<DamageableEntity> simulatedDamageableEntities = new List<DamageableEntity>();
-        private float lastHistoryStoreTime;
+        private bool _shouldStoreHitboxesTransformHistory = false;
+        public bool ShouldStoreHitBoxesTransformHistory { get { return _shouldStoreHitboxesTransformHistory; } }
+
+        private Dictionary<uint, DamageableEntity> _damageableEntities = new Dictionary<uint, DamageableEntity>();
+        private List<DamageableEntity> _simulatedDamageableEntities = new List<DamageableEntity>();
+        private float _lastHistoryStoreTime;
 
         public bool SimulateHitBoxes(long connectionId, long targetTime, Action action)
         {
@@ -58,11 +61,11 @@ namespace MultiplayerARPG
         {
             foreach (uint subscribingObjectId in player.GetSubscribingObjectIds())
             {
-                if (damageableEntities.ContainsKey(subscribingObjectId))
+                if (_damageableEntities.ContainsKey(subscribingObjectId))
                 {
-                    damageableEntities[subscribingObjectId].RewindHitBoxes(targetTime);
-                    if (!simulatedDamageableEntities.Contains(damageableEntities[subscribingObjectId]))
-                        simulatedDamageableEntities.Add(damageableEntities[subscribingObjectId]);
+                    _damageableEntities[subscribingObjectId].RewindHitBoxes(targetTime);
+                    if (!_simulatedDamageableEntities.Contains(_damageableEntities[subscribingObjectId]))
+                        _simulatedDamageableEntities.Add(_damageableEntities[subscribingObjectId]);
                 }
             }
             return true;
@@ -70,38 +73,31 @@ namespace MultiplayerARPG
 
         public void EndSimulateHitBoxes()
         {
-            for (int i = 0; i < simulatedDamageableEntities.Count; ++i)
+            for (int i = 0; i < _simulatedDamageableEntities.Count; ++i)
             {
-                if (simulatedDamageableEntities[i] != null)
-                    simulatedDamageableEntities[i].RestoreHitBoxes();
+                if (_simulatedDamageableEntities[i] != null)
+                    _simulatedDamageableEntities[i].RestoreHitBoxes();
             }
-            simulatedDamageableEntities.Clear();
+            _simulatedDamageableEntities.Clear();
         }
 
         public void AddDamageableEntity(DamageableEntity entity)
         {
-            damageableEntities[entity.ObjectId] = entity;
+            _damageableEntities[entity.ObjectId] = entity;
         }
 
         public void RemoveDamageableEntity(DamageableEntity entity)
         {
-            damageableEntities.Remove(entity.ObjectId);
+            _damageableEntities.Remove(entity.ObjectId);
         }
 
         private void LateUpdate()
         {
             float currentTime = Time.unscaledTime;
-            if (!BaseGameNetworkManager.Singleton.IsServer)
+            _shouldStoreHitboxesTransformHistory = !(currentTime - _lastHistoryStoreTime < SnapShotInterval);
+            if (!_shouldStoreHitboxesTransformHistory)
                 return;
-            if (currentTime - lastHistoryStoreTime < SnapShotInterval)
-                return;
-            lastHistoryStoreTime = currentTime;
-            long serverTimestamp = BaseGameNetworkManager.Singleton.ServerTimestamp;
-            foreach (DamageableEntity entity in damageableEntities.Values)
-            {
-                if (entity.Identity.CountSubscribers() > 0)
-                    entity.AddHitBoxesTransformHistory(serverTimestamp);
-            }
+            _lastHistoryStoreTime = currentTime;
         }
     }
 }

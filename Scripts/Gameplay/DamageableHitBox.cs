@@ -103,10 +103,10 @@ namespace MultiplayerARPG
             }
         }
 
-        protected bool isSetup;
-        protected Vector3 defaultLocalPosition;
-        protected Quaternion defaultLocalRotation;
-        protected List<TransformHistory> histories = new List<TransformHistory>();
+        protected bool _isSetup;
+        protected Vector3 _defaultLocalPosition;
+        protected Quaternion _defaultLocalRotation;
+        protected List<TransformHistory> _histories = new List<TransformHistory>();
 
 #if UNITY_EDITOR
         [Header("Rewind Debugging")]
@@ -136,11 +136,11 @@ namespace MultiplayerARPG
 
         public virtual void Setup(byte index)
         {
-            isSetup = true;
+            _isSetup = true;
             gameObject.tag = DamageableEntity.gameObject.tag;
             gameObject.layer = DamageableEntity.gameObject.layer;
-            defaultLocalPosition = transform.localPosition;
-            defaultLocalRotation = transform.localRotation;
+            _defaultLocalPosition = transform.localPosition;
+            _defaultLocalRotation = transform.localRotation;
             Index = index;
         }
 
@@ -148,7 +148,7 @@ namespace MultiplayerARPG
         protected virtual void OnDrawGizmos()
         {
             Matrix4x4 oldGizmosMatrix = Gizmos.matrix;
-            foreach (TransformHistory history in histories)
+            foreach (TransformHistory history in _histories)
             {
                 Gizmos.color = debugHistoryColor;
                 Gizmos.DrawWireCube(history.Bounds.center, history.Bounds.size);
@@ -197,7 +197,7 @@ namespace MultiplayerARPG
 
         public TransformHistory GetTransformHistory(long currentTime, long rewindTime)
         {
-            if (histories.Count == 0)
+            if (_histories.Count == 0)
             {
                 return new TransformHistory()
                 {
@@ -209,18 +209,18 @@ namespace MultiplayerARPG
             }
             TransformHistory beforeRewind = default;
             TransformHistory afterRewind = default;
-            for (int i = 0; i < histories.Count; ++i)
+            for (int i = 0; i < _histories.Count; ++i)
             {
-                if (beforeRewind.Time > 0 && beforeRewind.Time <= rewindTime && histories[i].Time >= rewindTime)
+                if (beforeRewind.Time > 0 && beforeRewind.Time <= rewindTime && _histories[i].Time >= rewindTime)
                 {
-                    afterRewind = histories[i];
+                    afterRewind = _histories[i];
                     break;
                 }
                 else
                 {
-                    beforeRewind = histories[i];
+                    beforeRewind = _histories[i];
                 }
-                if (histories.Count - 1 == i)
+                if (_histories.Count - 1 == i)
                 {
                     // No stored history, so use current value
                     afterRewind = new TransformHistory()
@@ -253,15 +253,15 @@ namespace MultiplayerARPG
 
         public void Restore()
         {
-            transform.localPosition = defaultLocalPosition;
-            transform.localRotation = defaultLocalRotation;
+            transform.localPosition = _defaultLocalPosition;
+            transform.localRotation = _defaultLocalRotation;
         }
 
         public void AddTransformHistory(long time)
         {
-            if (histories.Count == BaseGameNetworkManager.Singleton.LagCompensationManager.MaxHistorySize)
-                histories.RemoveAt(0);
-            histories.Add(new TransformHistory()
+            if (_histories.Count == BaseGameNetworkManager.Singleton.LagCompensationManager.MaxHistorySize)
+                _histories.RemoveAt(0);
+            _histories.Add(new TransformHistory()
             {
                 Time = time,
                 Position = transform.position,

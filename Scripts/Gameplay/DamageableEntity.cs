@@ -144,6 +144,8 @@ namespace MultiplayerARPG
         {
             base.EntityUpdate();
             SetModelIsDead(this.IsDead());
+            if (IsServer && CurrentGameManager.LagCompensationManager.ShouldStoreHitBoxesTransformHistory)
+                AddHitBoxesTransformHistory(CurrentGameManager.ServerTimestamp);
         }
 
         public void AddHitBoxesTransformHistory(long time)
