@@ -36,6 +36,8 @@ namespace MultiplayerARPG
 
         public void UpdateEvent()
         {
+            if (UICharacterHotkey == null || _joystick == null)
+                return;
             _joystick.transform.localPosition = UICharacterHotkey.transform.localPosition;
             _joystick.Interactable = Interactable;
 
