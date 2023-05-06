@@ -78,7 +78,7 @@ namespace MultiplayerARPG
         protected float _updateTimeOfDayCountDown;
         protected float _serverSceneLoadedTime;
         protected HashSet<BaseGameEntity> _setOfGameEntity = new HashSet<BaseGameEntity>();
-        protected BaseGameEntity[] _arrayGameEntity = new BaseGameEntity[2048];
+        protected BaseGameEntity[] _arrayGameEntity = new BaseGameEntity[4096];
         protected int _arrayGameEntityLength = 0;
         // Instantiate object allowing status
         protected Dictionary<string, bool> _readyToInstantiateObjectsStates = new Dictionary<string, bool>();
@@ -106,34 +106,10 @@ namespace MultiplayerARPG
             base.Awake();
         }
 
-        protected virtual void Update()
+        protected override void Update()
         {
-            if (IsNetworkActive)
-            {
-                for (int i = 0; i < _arrayGameEntityLength; ++i)
-                {
-                    if (_arrayGameEntity[i].enabled)
-                        _arrayGameEntity[i].DoUpdate();
-                }
-            }
-        }
-
-        protected virtual void LateUpdate()
-        {
-            if (IsNetworkActive)
-            {
-                for (int i = 0; i < _arrayGameEntityLength; ++i)
-                {
-                    if (_arrayGameEntity[i].enabled)
-                        _arrayGameEntity[i].DoLateUpdate();
-                }
-            }
-        }
-
-        protected override void FixedUpdate()
-        {
-            base.FixedUpdate();
-            float tempDeltaTime = Time.unscaledDeltaTime;
+            base.Update();
+            float tempDeltaTime = Time.deltaTime;
             if (IsServer)
             {
                 _updateOnlineCharactersCountDown -= tempDeltaTime;
@@ -156,7 +132,19 @@ namespace MultiplayerARPG
                 for (int i = 0; i < _arrayGameEntityLength; ++i)
                 {
                     if (_arrayGameEntity[i].enabled)
-                        _arrayGameEntity[i].DoFixedUpdate();
+                        _arrayGameEntity[i].DoUpdate();
+                }
+            }
+        }
+
+        protected virtual void LateUpdate()
+        {
+            if (IsNetworkActive)
+            {
+                for (int i = 0; i < _arrayGameEntityLength; ++i)
+                {
+                    if (_arrayGameEntity[i].enabled)
+                        _arrayGameEntity[i].DoLateUpdate();
                 }
             }
         }

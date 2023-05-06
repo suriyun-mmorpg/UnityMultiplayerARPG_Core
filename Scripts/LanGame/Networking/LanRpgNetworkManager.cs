@@ -192,17 +192,21 @@ namespace MultiplayerARPG
             Profiler.EndSample();
         }
 
-        protected override void FixedUpdate()
+        protected override void Update()
         {
-            base.FixedUpdate();
-            float tempTime = Time.fixedTime;
+            base.Update();
+            float tempTime = Time.unscaledTime;
             if (tempTime - _lastSaveTime > autoSaveDuration)
             {
                 Save();
                 _lastSaveTime = tempTime;
             }
+        }
 
-            if (IsServer && _pendingSpawnPlayerCharacters.Count > 0 && _isReadyToInstantiatePlayers)
+        protected override void OnServerUpdate(GameUpdater updater)
+        {
+            base.OnServerUpdate(updater);
+            if (_pendingSpawnPlayerCharacters.Count > 0 && _isReadyToInstantiatePlayers)
             {
                 // Spawn pending player characters
                 LiteNetLibPlayer player;
