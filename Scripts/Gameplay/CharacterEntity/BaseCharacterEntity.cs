@@ -206,13 +206,13 @@ namespace MultiplayerARPG
             base.EntityStart();
             if (CurrentGameInstance.DimensionType == DimensionType.Dimension3D)
             {
-                AttackPhysicFunctions = new PhysicFunctions(128);
-                FindPhysicFunctions = new PhysicFunctions(IsOwnerClient ? 256 : 4);
+                AttackPhysicFunctions = new PhysicFunctions(64);
+                FindPhysicFunctions = new PhysicFunctions(IsOwnerClient ? 256 : 64);
             }
             else
             {
-                AttackPhysicFunctions = new PhysicFunctions2D(128);
-                FindPhysicFunctions = new PhysicFunctions2D(IsOwnerClient ? 256 : 4);
+                AttackPhysicFunctions = new PhysicFunctions2D(64);
+                FindPhysicFunctions = new PhysicFunctions2D(IsOwnerClient ? 256 : 64);
             }
             _isRecaching = true;
             _lastGrounded = false;
