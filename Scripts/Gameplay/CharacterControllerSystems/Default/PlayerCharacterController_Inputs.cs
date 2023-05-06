@@ -440,17 +440,19 @@ namespace MultiplayerARPG
             if (TryGetSelectedTargetAsAttackingEntity(out targetEntity))
                 SetTarget(targetEntity, TargetActionType.Attack, false);
 
+            int overlapMask = CurrentGameInstance.playerLayer.Mask | CurrentGameInstance.monsterLayer.Mask;
             if (wasdLockAttackTarget)
             {
                 if (!TryGetAttackingEntity(out targetEntity) || targetEntity.IsHideOrDead())
                 {
                     // Find nearest target and move to the target
                     targetEntity = PlayingCharacterEntity
-                        .FindNearestAliveCharacter<BaseCharacterEntity>(
+                        .FindNearestAliveEntity<BaseCharacterEntity>(
                         Mathf.Max(PlayingCharacterEntity.GetAttackDistance(_isLeftHandAttacking), lockAttackTargetDistance),
                         false,
                         true,
-                        false);
+                        false,
+                        overlapMask);
                 }
                 if (targetEntity != null && !targetEntity.IsHideOrDead())
                 {
@@ -470,11 +472,12 @@ namespace MultiplayerARPG
             {
                 // Find nearest target and set selected target to show character hp/mp UIs
                 SelectedEntity = PlayingCharacterEntity
-                    .FindNearestAliveCharacter<BaseCharacterEntity>(
+                    .FindNearestAliveEntity<BaseCharacterEntity>(
                     PlayingCharacterEntity.GetAttackDistance(_isLeftHandAttacking),
                     false,
                     true,
-                    false);
+                    false,
+                    overlapMask);
                 if (SelectedGameEntity != null)
                 {
                     // Look at target and attack
@@ -515,17 +518,19 @@ namespace MultiplayerARPG
 
             if (skill.IsAttack)
             {
+                int overlapMask = CurrentGameInstance.playerLayer.Mask | CurrentGameInstance.monsterLayer.Mask;
                 if (wasdLockAttackTarget)
                 {
                     if (!TryGetSelectedTargetAsAttackingEntity(out targetEntity) || targetEntity.IsHideOrDead())
                     {
                         // Try find nearby enemy if no selected target or selected taget is not enemy or target is hide or dead
                         targetEntity = PlayingCharacterEntity
-                            .FindNearestAliveCharacter<BaseCharacterEntity>(
+                            .FindNearestAliveEntity<BaseCharacterEntity>(
                             Mathf.Max(skill.GetCastDistance(PlayingCharacterEntity, skillLevel, _isLeftHandAttacking), lockAttackTargetDistance),
                             false,
                             true,
-                            false);
+                            false,
+                            overlapMask);
                     }
                     if (targetEntity != null && !targetEntity.IsHideOrDead())
                     {
@@ -545,11 +550,12 @@ namespace MultiplayerARPG
                 {
                     // Find nearest target and set selected target to show character hp/mp UIs
                     SelectedEntity = PlayingCharacterEntity
-                        .FindNearestAliveCharacter<BaseCharacterEntity>(
+                        .FindNearestAliveEntity<BaseCharacterEntity>(
                         skill.GetCastDistance(PlayingCharacterEntity, skillLevel, _isLeftHandAttacking),
                         false,
                         true,
-                        false);
+                        false,
+                        overlapMask);
                     if (SelectedGameEntity != null)
                     {
                         // Look at target and attack

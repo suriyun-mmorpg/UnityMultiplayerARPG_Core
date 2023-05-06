@@ -134,8 +134,9 @@ namespace MultiplayerARPG
 
             if (GameInstance.PlayingCharacterEntity != null)
             {
-                List<BaseCharacterEntity> allies = GameInstance.PlayingCharacterEntity.FindCharacters<BaseCharacterEntity>(allyMarkerDistance, true, true, false, false);
-                List<BaseCharacterEntity> enemies = GameInstance.PlayingCharacterEntity.FindCharacters<BaseCharacterEntity>(enemyOrNeutralMarkerDistance, true, false, true, true);
+                int overlapMask = GameInstance.Singleton.playerLayer.Mask | GameInstance.Singleton.playingLayer.Mask | GameInstance.Singleton.monsterLayer.Mask;
+                List<BaseCharacterEntity> allies = GameInstance.PlayingCharacterEntity.FindEntities<BaseCharacterEntity>(allyMarkerDistance, true, true, false, false, overlapMask);
+                List<BaseCharacterEntity> enemies = GameInstance.PlayingCharacterEntity.FindEntities<BaseCharacterEntity>(enemyOrNeutralMarkerDistance, true, false, true, true, overlapMask);
                 EntityInfo entityInfo;
                 RectTransform markerPrefab;
                 Vector3 markerRotateOffsets;

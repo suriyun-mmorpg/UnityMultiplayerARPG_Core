@@ -362,7 +362,27 @@ namespace MultiplayerARPG
                 return false;
             }
 
-            return true;
+            // If this character is not ally so it is enemy and also can receive damage
+            return !IsAlly(instigator);
+        }
+
+        public bool IsAlly(EntityInfo entityInfo)
+        {
+            if (CurrentMapInfo == null)
+                return false;
+            return CurrentMapInfo.IsAlly(this, entityInfo);
+        }
+
+        public bool IsEnemy(EntityInfo entityInfo)
+        {
+            if (CurrentMapInfo == null)
+                return false;
+            return CurrentMapInfo.IsEnemy(this, entityInfo);
+        }
+
+        public bool IsNeutral(EntityInfo instigator)
+        {
+            return !IsAlly(instigator) && !IsEnemy(instigator);
         }
 
         public virtual void PlayHitAnimation()

@@ -124,7 +124,7 @@ namespace MultiplayerARPG
         {
             if (skillUser.IsDead() || !skillUser.IsServer || skillLevel <= 0)
                 return;
-
+            int overlapMask = GameInstance.Singleton.playerLayer.Mask | GameInstance.Singleton.playingLayer.Mask | GameInstance.Singleton.monsterLayer.Mask;
             EntityInfo instigator = skillUser.GetInfo();
             List<BaseCharacterEntity> tempCharacters;
             switch (skillBuffType)
@@ -133,7 +133,7 @@ namespace MultiplayerARPG
                     skillUser.ApplyBuff(DataId, BuffType.SkillBuff, skillLevel, instigator, weapon);
                     break;
                 case SkillBuffType.BuffToNearbyAllies:
-                    tempCharacters = skillUser.FindAliveCharacters<BaseCharacterEntity>(buffDistance.GetAmount(skillLevel), true, false, false);
+                    tempCharacters = skillUser.FindAliveEntities<BaseCharacterEntity>(buffDistance.GetAmount(skillLevel), true, false, false, overlapMask);
                     foreach (BaseCharacterEntity applyBuffCharacter in tempCharacters)
                     {
                         applyBuffCharacter.ApplyBuff(DataId, BuffType.SkillBuff, skillLevel, instigator, weapon);
@@ -141,7 +141,7 @@ namespace MultiplayerARPG
                     skillUser.ApplyBuff(DataId, BuffType.SkillBuff, skillLevel, instigator, weapon);
                     break;
                 case SkillBuffType.BuffToNearbyCharacters:
-                    tempCharacters = skillUser.FindAliveCharacters<BaseCharacterEntity>(buffDistance.GetAmount(skillLevel), true, false, true);
+                    tempCharacters = skillUser.FindAliveEntities<BaseCharacterEntity>(buffDistance.GetAmount(skillLevel), true, false, true, overlapMask);
                     foreach (BaseCharacterEntity applyBuffCharacter in tempCharacters)
                     {
                         applyBuffCharacter.ApplyBuff(DataId, BuffType.SkillBuff, skillLevel, instigator, weapon);

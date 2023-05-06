@@ -47,7 +47,7 @@ namespace MultiplayerARPG
                             if (playerCharacterEntity != null)
                             {
                                 // Send messages to nearby characters
-                                List<BasePlayerCharacterEntity> receivers = playerCharacterEntity.FindCharacters<BasePlayerCharacterEntity>(GameInstance.Singleton.localChatDistance, false, true, true, true);
+                                List<BasePlayerCharacterEntity> receivers = playerCharacterEntity.FindEntities<BasePlayerCharacterEntity>(GameInstance.Singleton.localChatDistance, false, true, true, true, GameInstance.Singleton.playerLayer.Mask | GameInstance.Singleton.playingLayer.Mask);
                                 foreach (BasePlayerCharacterEntity receiver in receivers)
                                 {
                                     Manager.ServerSendPacket(receiver.ConnectionId, 0, DeliveryMethod.ReliableOrdered, GameNetworkingConsts.Chat, message);

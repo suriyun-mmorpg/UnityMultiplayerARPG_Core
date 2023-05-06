@@ -427,6 +427,13 @@ namespace MultiplayerARPG
 
         internal void DoUpdate()
         {
+            // Update identity's hide status
+            bool isHide = IsHide();
+            if (_dirtyIsHide != isHide)
+            {
+                _dirtyIsHide = isHide;
+                Identity.IsHide = _dirtyIsHide;
+            }
             Profiler.BeginSample("Entity Components - Update");
             if (UpdateEntityComponents)
             {
@@ -444,9 +451,9 @@ namespace MultiplayerARPG
 
         protected virtual void EntityUpdate()
         {
-            if (Movement != null)
+            if (!Movement.IsNull())
             {
-                bool tempEnableMovement = PassengingVehicleEntity == null;
+                bool tempEnableMovement = PassengingVehicleEntity.IsNull();
                 // Enable movement or not
                 if (Movement.Enabled != tempEnableMovement)
                 {
@@ -487,13 +494,10 @@ namespace MultiplayerARPG
             EntityLateUpdate();
             if (onLateUpdate != null)
                 onLateUpdate.Invoke();
-            // Update identity's hide status
-            bool isHide = IsHide();
-            if (_dirtyIsHide != isHide)
-            {
-                _dirtyIsHide = isHide;
-                Identity.IsHide = _dirtyIsHide;
-            }
+            if (IsOwnerClient)
+                SendClientState();
+            if (IsServer)
+                SendServerState();
         }
 
         protected virtual void EntityLateUpdate()
@@ -527,10 +531,6 @@ namespace MultiplayerARPG
             EntityFixedUpdate();
             if (onFixedUpdate != null)
                 onFixedUpdate.Invoke();
-            if (IsOwnerClient)
-                SendClientState();
-            if (IsServer)
-                SendServerState();
         }
         protected virtual void EntityFixedUpdate() { }
 

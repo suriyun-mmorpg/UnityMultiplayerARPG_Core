@@ -166,25 +166,21 @@ namespace MultiplayerARPG
             rotation = Vector3.zero;
         }
 
-        public bool IsAlly(BaseCharacterEntity character, EntityInfo targetEntityInfo)
+        public bool IsAlly(DamageableEntity entity, EntityInfo targetEntityInfo)
         {
-            if (!string.IsNullOrEmpty(targetEntityInfo.Id) && targetEntityInfo.Id.Equals(character.Id))
-                return true;
-            if (character is BasePlayerCharacterEntity)
-                return IsPlayerAlly(character as BasePlayerCharacterEntity, targetEntityInfo);
-            if (character is BaseMonsterCharacterEntity)
-                return IsMonsterAlly(character as BaseMonsterCharacterEntity, targetEntityInfo);
+            if (entity is BasePlayerCharacterEntity player)
+                return player.Id == targetEntityInfo.Id || IsPlayerAlly(player, targetEntityInfo);
+            else if (entity is BaseMonsterCharacterEntity monster)
+                return monster.Id == targetEntityInfo.Id || IsMonsterAlly(monster, targetEntityInfo);
             return false;
         }
 
-        public bool IsEnemy(BaseCharacterEntity character, EntityInfo targetEntityInfo)
+        public bool IsEnemy(DamageableEntity entity, EntityInfo targetEntityInfo)
         {
-            if (!string.IsNullOrEmpty(targetEntityInfo.Id) && targetEntityInfo.Id.Equals(character.Id))
-                return false;
-            if (character is BasePlayerCharacterEntity)
-                return IsPlayerEnemy(character as BasePlayerCharacterEntity, targetEntityInfo);
-            if (character is BaseMonsterCharacterEntity)
-                return IsMonsterEnemy(character as BaseMonsterCharacterEntity, targetEntityInfo);
+            if (entity is BasePlayerCharacterEntity player)
+                return player.Id != targetEntityInfo.Id && IsPlayerEnemy(player, targetEntityInfo);
+            else if (entity is BaseMonsterCharacterEntity monster)
+                return monster.Id != targetEntityInfo.Id && IsMonsterEnemy(monster, targetEntityInfo);
             return false;
         }
 
