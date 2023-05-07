@@ -2,6 +2,7 @@
 using LiteNetLibManager;
 using UnityEngine;
 using UnityEngine.AI;
+using UnityEngine.Profiling;
 
 namespace MultiplayerARPG
 {
@@ -193,6 +194,7 @@ namespace MultiplayerARPG
 
         public override void EntityUpdate()
         {
+            Profiler.BeginSample("NavMeshEntityMovement - Update");
             CacheNavMeshAgent.speed = Entity.GetMoveSpeed();
             float deltaTime = Time.deltaTime;
             bool isStationary = !CacheNavMeshAgent.isOnNavMesh || CacheNavMeshAgent.isStopped || CacheNavMeshAgent.remainingDistance <= CacheNavMeshAgent.stoppingDistance;
@@ -240,6 +242,7 @@ namespace MultiplayerARPG
             UpdateRotation();
             _lookRotationApplied = true;
             _currentInput = Entity.SetInputRotation(_currentInput, CacheTransform.rotation);
+            Profiler.EndSample();
         }
 
         private void UpdateRotation()

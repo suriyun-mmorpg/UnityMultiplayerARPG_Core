@@ -434,7 +434,7 @@ namespace MultiplayerARPG
                 _dirtyIsHide = isHide;
                 Identity.IsHide = _dirtyIsHide;
             }
-            Profiler.BeginSample("Entity Components - Update");
+            Profiler.BeginSample("EntityComponents - Update");
             if (UpdateEntityComponents)
             {
                 for (int i = 0; i < EntityComponents.Length; ++i)
@@ -444,9 +444,13 @@ namespace MultiplayerARPG
                 }
             }
             Profiler.EndSample();
+            Profiler.BeginSample("BaseGameEntity - EntityUpdate");
             EntityUpdate();
+            Profiler.EndSample();
+            Profiler.BeginSample("BaseGameEntity - OnUpdateInvoke");
             if (onUpdate != null)
                 onUpdate.Invoke();
+            Profiler.EndSample();
         }
 
         protected virtual void EntityUpdate()
@@ -475,7 +479,7 @@ namespace MultiplayerARPG
         internal void DoLateUpdate()
         {
             bool updateEntityComponents = UpdateEntityComponents;
-            Profiler.BeginSample("Entity Components - LateUpdate");
+            Profiler.BeginSample("EntityComponents - LateUpdate");
             if (updateEntityComponents)
             {
                 for (int i = 0; i < EntityComponents.Length; ++i)
@@ -485,19 +489,29 @@ namespace MultiplayerARPG
                 }
             }
             Profiler.EndSample();
+            Profiler.BeginSample("BaseGameEntity - OnUpdateEntityComponentsChanged");
             if (!_wasUpdateEntityComponents.HasValue || _wasUpdateEntityComponents.Value != updateEntityComponents)
             {
                 _wasUpdateEntityComponents = updateEntityComponents;
                 if (onUpdateEntityComponentsChanged != null)
                     onUpdateEntityComponentsChanged.Invoke(updateEntityComponents);
             }
+            Profiler.EndSample();
+            Profiler.BeginSample("BaseGameEntity - EntityLateUpdate");
             EntityLateUpdate();
+            Profiler.EndSample();
+            Profiler.BeginSample("BaseGameEntity - OnLateUpdateInvoke");
             if (onLateUpdate != null)
                 onLateUpdate.Invoke();
+            Profiler.EndSample();
+            Profiler.BeginSample("BaseGameEntity - SendClientState");
             if (IsOwnerClient)
                 SendClientState();
+            Profiler.EndSample();
+            Profiler.BeginSample("BaseGameEntity - SendServerState");
             if (IsServer)
                 SendServerState();
+            Profiler.EndSample();
         }
 
         protected virtual void EntityLateUpdate()
@@ -518,7 +532,7 @@ namespace MultiplayerARPG
 
         internal void DoFixedUpdate()
         {
-            Profiler.BeginSample("Entity Components - FixedUpdate");
+            Profiler.BeginSample("EntityComponents - FixedUpdate");
             if (UpdateEntityComponents)
             {
                 for (int i = 0; i < EntityComponents.Length; ++i)

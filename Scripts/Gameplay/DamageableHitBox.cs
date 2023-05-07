@@ -86,6 +86,7 @@ namespace MultiplayerARPG
         {
             get { return DamageableEntity.Identity; }
         }
+        public Transform CacheTransform { get; private set; }
         public Collider CacheCollider { get; private set; }
         public Rigidbody CacheRigidbody { get; private set; }
         public Collider2D CacheCollider2D { get; private set; }
@@ -117,6 +118,7 @@ namespace MultiplayerARPG
         private void Awake()
         {
             DamageableEntity = GetComponentInParent<DamageableEntity>();
+            CacheTransform = transform;
             CacheCollider = GetComponent<Collider>();
             if (CacheCollider)
             {
@@ -202,8 +204,8 @@ namespace MultiplayerARPG
                 return new TransformHistory()
                 {
                     Time = currentTime,
-                    Position = transform.position,
-                    Rotation = transform.rotation,
+                    Position = CacheTransform.position,
+                    Rotation = CacheTransform.rotation,
                     Bounds = Bounds,
                 };
             }
@@ -226,8 +228,8 @@ namespace MultiplayerARPG
                     afterRewind = new TransformHistory()
                     {
                         Time = currentTime,
-                        Position = transform.position,
-                        Rotation = transform.rotation,
+                        Position = CacheTransform.position,
+                        Rotation = CacheTransform.rotation,
                         Bounds = Bounds,
                     };
                 }
@@ -247,14 +249,14 @@ namespace MultiplayerARPG
         public void Rewind(long currentTime, long rewindTime)
         {
             TransformHistory transformHistory = GetTransformHistory(currentTime, rewindTime);
-            transform.position = transformHistory.Position;
-            transform.rotation = transformHistory.Rotation;
+            CacheTransform.position = transformHistory.Position;
+            CacheTransform.rotation = transformHistory.Rotation;
         }
 
         public void Restore()
         {
-            transform.localPosition = _defaultLocalPosition;
-            transform.localRotation = _defaultLocalRotation;
+            CacheTransform.localPosition = _defaultLocalPosition;
+            CacheTransform.localRotation = _defaultLocalRotation;
         }
 
         public void AddTransformHistory(long time)
@@ -264,8 +266,8 @@ namespace MultiplayerARPG
             _histories.Add(new TransformHistory()
             {
                 Time = time,
-                Position = transform.position,
-                Rotation = transform.rotation,
+                Position = CacheTransform.position,
+                Rotation = CacheTransform.rotation,
                 Bounds = Bounds,
             });
         }

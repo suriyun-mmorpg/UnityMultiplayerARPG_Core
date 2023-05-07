@@ -104,8 +104,8 @@ namespace MultiplayerARPG
 
         protected override void EntityUpdate()
         {
-            Profiler.BeginSample("BasePlayerCharacterEntity - Update");
             base.EntityUpdate();
+            Profiler.BeginSample("BasePlayerCharacterEntity - Update");
             if (this.IsDead())
             {
                 StopMove();

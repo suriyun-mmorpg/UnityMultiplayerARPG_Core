@@ -260,12 +260,17 @@ namespace MultiplayerARPG
 
         protected override void EntityUpdate()
         {
+            Profiler.BeginSample("BaseCharacterEntity - MakeCaches");
             MakeCaches();
+            Profiler.EndSample();
             float deltaTime = Time.deltaTime;
 
+            Profiler.BeginSample("BaseCharacterEntity - AddHitBoxesTransformHistory");
             if (IsServer && CurrentGameManager.LagCompensationManager.ShouldStoreHitBoxesTransformHistory)
                 AddHitBoxesTransformHistory(CurrentGameManager.ServerTimestamp);
+            Profiler.EndSample();
 
+            Profiler.BeginSample("BaseCharacterEntity - ApplyFallDamage");
             if (IsServer && CurrentGameInstance.DimensionType == DimensionType.Dimension3D)
             {
                 bool isGrounded = MovementState.Has(MovementState.IsGrounded);
@@ -283,8 +288,10 @@ namespace MultiplayerARPG
                     _lastGroundedPosition = EntityTransform.position;
                 }
             }
+            Profiler.EndSample();
 
             bool tempEnableMovement = PassengingVehicleEntity == null;
+            Profiler.BeginSample("BaseCharacterEntity - UnderDeadYChecking");
             if (RespawnGroundedCheckCountDown > 0f)
             {
                 // Character won't receive fall damage
@@ -306,6 +313,7 @@ namespace MultiplayerARPG
                     tempEnableMovement = false;
                 }
             }
+            Profiler.EndSample();
 
             if (RespawnInvincibleCountDown > 0f)
             {
@@ -313,10 +321,13 @@ namespace MultiplayerARPG
                 RespawnInvincibleCountDown -= deltaTime;
             }
 
+            Profiler.BeginSample("BaseCharacterEntity - DeadExitVehicle");
             // Clear data when character dead
             if (this.IsDead())
                 ExitVehicle();
+            Profiler.EndSample();
 
+            Profiler.BeginSample("BaseCharacterEntity - MovementEnablingUpdate");
             // Enable movement or not
             if (!Movement.IsNull() && Movement.Enabled != tempEnableMovement)
             {
@@ -325,11 +336,17 @@ namespace MultiplayerARPG
                 // Enable movement while not passenging any vehicle
                 Movement.Enabled = tempEnableMovement;
             }
+            Profiler.EndSample();
 
+            Profiler.BeginSample("BaseCharacterEntity - ModelManagerUpdate");
             // Update character model handler based on passenging vehicle
             ModelManager.UpdatePassengingVehicle(PassengingVehicleType, PassengingVehicleSeatIndex);
             // Set character model hide state
             ModelManager.SetIsHide(CharacterModelManager.HIDE_SETTER_ENTITY, IsHide());
+            Profiler.EndSample();
+
+
+            Profiler.BeginSample("BaseCharacterEntity - CharacterModelUpdate");
             // Update model animations
             // Update is dead state
             CharacterModel.SetIsDead(this.IsDead());
@@ -337,6 +354,9 @@ namespace MultiplayerARPG
             CharacterModel.SetMoveAnimationSpeedMultiplier(MoveAnimationSpeedMultiplier);
             // Update movement animation
             CharacterModel.SetMovementState(MovementState, ExtraMovementState, Direction2D, this.GetCaches().FreezeAnimation);
+            Profiler.EndSample();
+
+            Profiler.BeginSample("BaseCharacterEntity - FPSModelUpdate");
             // Update FPS model
             if (IsClient && FpsModel && FpsModel.gameObject.activeSelf)
             {
@@ -347,20 +367,25 @@ namespace MultiplayerARPG
                 // Update movement animation
                 FpsModel.SetMovementState(MovementState, ExtraMovementState, Direction2D, this.GetCaches().FreezeAnimation);
             }
+            Profiler.EndSample();
 
+            Profiler.BeginSample("BaseCharacterEntity - SetEquipWeaponModels");
             if (_countDownToSetEquipWeaponsModels > 0)
             {
                 --_countDownToSetEquipWeaponsModels;
                 if (_countDownToSetEquipWeaponsModels <= 0)
                     SetEquipWeaponsModels();
             }
+            Profiler.EndSample();
 
+            Profiler.BeginSample("BaseCharacterEntity - SetEquipItemsModels");
             if (_countDownToSetEquipItemsModels > 0)
             {
                 --_countDownToSetEquipItemsModels;
                 if (_countDownToSetEquipItemsModels <= 0)
                     SetEquipItemsModels();
             }
+            Profiler.EndSample();
         }
 
         public override void SendClientState()

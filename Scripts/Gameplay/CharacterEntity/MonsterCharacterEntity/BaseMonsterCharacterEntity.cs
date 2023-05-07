@@ -161,13 +161,13 @@ namespace MultiplayerARPG
 
         protected override void EntityUpdate()
         {
-            if (IsServer && Identity.CountSubscribers() == 0)
+            if (!UpdateEntityComponents)
             {
                 // Don't updates while there is no subscrubers
                 return;
             }
-            Profiler.BeginSample("BaseMonsterCharacterEntity - Update");
             base.EntityUpdate();
+            Profiler.BeginSample("BaseMonsterCharacterEntity - Update");
             if (IsServer)
             {
                 if (IsSummoned)
@@ -195,7 +195,7 @@ namespace MultiplayerARPG
 
         public override void SendServerState()
         {
-            if (IsServer && Identity.CountSubscribers() == 0)
+            if (!UpdateEntityComponents)
             {
                 // Don't updates while there is no subscrubers
                 return;
