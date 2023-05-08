@@ -68,14 +68,14 @@ namespace MultiplayerARPG.GameData.Model.Playables
 
         private void CacheEntity_onUpdateEntityComponentsChanged(bool updating)
         {
-            if (!updating || !IsActiveModel)
+            if (!updating)
             {
                 if (Graph.IsPlaying())
                     Graph.Stop();
             }
             else
             {
-                if (!Graph.IsPlaying())
+                if (IsActiveModel && !Graph.IsPlaying())
                     Graph.Play();
             }
         }
@@ -83,10 +83,7 @@ namespace MultiplayerARPG.GameData.Model.Playables
         public override void UpdateAnimation(float deltaTime)
         {
             if (Graph.IsValid())
-            {
-                Graph.SetTimeUpdateMode(DirectorUpdateMode.Manual);
                 Graph.Evaluate(deltaTime);
-            }
         }
 
         public override void AddingNewModel(EquipmentModel data, GameObject newModel, EquipmentContainer equipmentContainer)
@@ -114,7 +111,7 @@ namespace MultiplayerARPG.GameData.Model.Playables
         protected void CreateGraph()
         {
             Graph = PlayableGraph.Create($"{name}.PlayableCharacterModel");
-            Graph.SetTimeUpdateMode(DirectorUpdateMode.GameTime);
+            Graph.SetTimeUpdateMode(BaseGameNetworkManager.Singleton.IsNetworkActive ? DirectorUpdateMode.Manual : DirectorUpdateMode.GameTime);
             ScriptPlayable<AnimationPlayableBehaviour> playable = ScriptPlayable<AnimationPlayableBehaviour>.Create(Graph, Template, 1);
             Behaviour = playable.GetBehaviour();
             AnimationPlayableOutput output = AnimationPlayableOutput.Create(Graph, "Output", animator);
