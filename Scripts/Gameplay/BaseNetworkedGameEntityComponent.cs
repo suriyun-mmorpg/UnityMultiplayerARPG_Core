@@ -60,10 +60,6 @@ namespace MultiplayerARPG
         {
         }
 
-        public virtual void EntityFixedUpdate()
-        {
-        }
-
         public virtual void EntityOnDestroy()
         {
         }
