@@ -42,7 +42,7 @@ namespace MultiplayerARPG
         {
             get
             {
-                foreach (bool hideState in hideStates.Values)
+                foreach (bool hideState in _hideStates.Values)
                 {
                     if (hideState)
                         return true;
@@ -52,9 +52,9 @@ namespace MultiplayerARPG
         }
         public bool IsFps { get; private set; }
 
-        private readonly Dictionary<byte, bool> hideStates = new Dictionary<byte, bool>();
-        private int dirtyVehicleDataId;
-        private byte dirtySeatIndex;
+        private readonly Dictionary<byte, bool> _hideStates = new Dictionary<byte, bool>();
+        private int _dirtyVehicleDataId;
+        private byte _dirtySeatIndex;
 
         public override void EntityAwake()
         {
@@ -136,16 +136,16 @@ namespace MultiplayerARPG
         {
             if (vehicleType != null)
             {
-                if (dirtyVehicleDataId != vehicleType.DataId ||
-                    dirtySeatIndex != seatIndex)
+                if (_dirtyVehicleDataId != vehicleType.DataId ||
+                    _dirtySeatIndex != seatIndex)
                 {
-                    dirtyVehicleDataId = vehicleType.DataId;
-                    dirtySeatIndex = seatIndex;
+                    _dirtyVehicleDataId = vehicleType.DataId;
+                    _dirtySeatIndex = seatIndex;
                     VehicleCharacterModel tempData;
                     // Switch TPS model
                     if (MainTpsModel != null)
                     {
-                        if (MainTpsModel.CacheVehicleModels.TryGetValue(dirtyVehicleDataId, out tempData) &&
+                        if (MainTpsModel.CacheVehicleModels.TryGetValue(_dirtyVehicleDataId, out tempData) &&
                             seatIndex < tempData.modelsForEachSeats.Length)
                             SwitchTpsModel(tempData.modelsForEachSeats[seatIndex]);
                         else
@@ -154,7 +154,7 @@ namespace MultiplayerARPG
                     // Switch FPS Model
                     if (MainFpsModel != null)
                     {
-                        if (MainFpsModel.CacheVehicleModels.TryGetValue(dirtyVehicleDataId, out tempData) &&
+                        if (MainFpsModel.CacheVehicleModels.TryGetValue(_dirtyVehicleDataId, out tempData) &&
                             seatIndex < tempData.modelsForEachSeats.Length)
                             SwitchFpsModel(tempData.modelsForEachSeats[seatIndex]);
                         else
@@ -164,10 +164,10 @@ namespace MultiplayerARPG
                 return;
             }
 
-            if (dirtyVehicleDataId != 0)
+            if (_dirtyVehicleDataId != 0)
             {
-                dirtyVehicleDataId = 0;
-                dirtySeatIndex = 0;
+                _dirtyVehicleDataId = 0;
+                _dirtySeatIndex = 0;
                 if (MainTpsModel != null)
                     SwitchTpsModel(MainTpsModel);
                 if (MainFpsModel != null)
@@ -193,7 +193,7 @@ namespace MultiplayerARPG
 
         public void SetIsHide(byte setter, bool isHide)
         {
-            hideStates[setter] = isHide;
+            _hideStates[setter] = isHide;
             UpdateVisibleState();
         }
 
