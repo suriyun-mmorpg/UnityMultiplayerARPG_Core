@@ -111,7 +111,7 @@ namespace MultiplayerARPG.GameData.Model.Playables
         protected void CreateGraph()
         {
             Graph = PlayableGraph.Create($"{name}.PlayableCharacterModel");
-            Graph.SetTimeUpdateMode(BaseGameNetworkManager.Singleton.IsNetworkActive ? DirectorUpdateMode.Manual : DirectorUpdateMode.GameTime);
+            Graph.SetTimeUpdateMode(DirectorUpdateMode.Manual);
             ScriptPlayable<AnimationPlayableBehaviour> playable = ScriptPlayable<AnimationPlayableBehaviour>.Create(Graph, Template, 1);
             Behaviour = playable.GetBehaviour();
             AnimationPlayableOutput output = AnimationPlayableOutput.Create(Graph, "Output", animator);
