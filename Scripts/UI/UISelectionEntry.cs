@@ -1,6 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
 public abstract class UISelectionEntry<T> : UIBase, IUISelectionEntry
 {
@@ -18,14 +16,14 @@ public abstract class UISelectionEntry<T> : UIBase, IUISelectionEntry
     }
     public UISelectionManager selectionManager;
     public float updateUIRepeatRate = 0.5f;
-    protected float updateCountDown;
-    private bool isSelected;
+    protected float _updateCountDown;
+    private bool _isSelected;
     public bool IsSelected
     {
-        get { return isSelected; }
+        get { return _isSelected; }
         protected set
         {
-            isSelected = value;
+            _isSelected = value;
             if (objectSelected != null)
                 objectSelected.SetActive(value);
         }
@@ -38,7 +36,7 @@ public abstract class UISelectionEntry<T> : UIBase, IUISelectionEntry
     {
         base.Awake();
         IsSelected = false;
-        updateCountDown = 0f;
+        _updateCountDown = 0f;
     }
 
     protected virtual void OnEnable()
@@ -48,15 +46,15 @@ public abstract class UISelectionEntry<T> : UIBase, IUISelectionEntry
 
     protected virtual void OnDisable()
     {
-        updateCountDown = updateUIRepeatRate;
+        _updateCountDown = 0f;
     }
 
     protected virtual void Update()
     {
-        updateCountDown -= Time.deltaTime;
-        if (updateCountDown <= 0f)
+        _updateCountDown -= Time.deltaTime;
+        if (_updateCountDown <= 0f)
         {
-            updateCountDown = updateUIRepeatRate;
+            _updateCountDown = updateUIRepeatRate;
             UpdateUI();
             if (onUpdateUI != null)
                 onUpdateUI.Invoke();
