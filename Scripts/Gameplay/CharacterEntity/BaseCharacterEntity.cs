@@ -201,21 +201,27 @@ namespace MultiplayerARPG
             SkillAndBuffComponent = gameObject.GetOrAddComponent<CharacterSkillAndBuffComponent>();
         }
 
+        protected override void EntityAwake()
+        {
+            base.EntityAwake();
+            ForceMakeCaches();
+            _lastGrounded = false;
+            _lastGroundedPosition = EntityTransform.position;
+        }
+
         protected override void EntityStart()
         {
             base.EntityStart();
             if (CurrentGameInstance.DimensionType == DimensionType.Dimension3D)
             {
                 AttackPhysicFunctions = new PhysicFunctions(64);
-                FindPhysicFunctions = new PhysicFunctions(IsOwnerClient ? 256 : 64);
+                FindPhysicFunctions = new PhysicFunctions(IsOwnerClient ? 128 : 32);
             }
             else
             {
                 AttackPhysicFunctions = new PhysicFunctions2D(64);
-                FindPhysicFunctions = new PhysicFunctions2D(IsOwnerClient ? 256 : 64);
+                FindPhysicFunctions = new PhysicFunctions2D(IsOwnerClient ? 128 : 32);
             }
-            _lastGrounded = false;
-            _lastGroundedPosition = EntityTransform.position;
         }
 
 #if UNITY_EDITOR
