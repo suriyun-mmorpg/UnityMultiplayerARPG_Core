@@ -286,7 +286,6 @@ namespace MultiplayerARPG
         public event System.Action onDisable;
         public event System.Action onUpdate;
         public event System.Action onLateUpdate;
-        public event System.Action onFixedUpdate;
         public event System.Action onSetup;
         public event System.Action onSetupNetElements;
         public event System.Action onSetOwnerClient;
@@ -427,13 +426,6 @@ namespace MultiplayerARPG
 
         internal void DoUpdate()
         {
-            // Update identity's hide status
-            bool isHide = IsHide();
-            if (_dirtyIsHide != isHide)
-            {
-                _dirtyIsHide = isHide;
-                Identity.IsHide = _dirtyIsHide;
-            }
             Profiler.BeginSample("EntityComponents - Update");
             if (UpdateEntityComponents)
             {
@@ -451,6 +443,13 @@ namespace MultiplayerARPG
             if (onUpdate != null)
                 onUpdate.Invoke();
             Profiler.EndSample();
+            // Update identity's hide status
+            bool isHide = IsHide();
+            if (_dirtyIsHide != isHide)
+            {
+                _dirtyIsHide = isHide;
+                Identity.IsHide = _dirtyIsHide;
+            }
         }
 
         protected virtual void EntityUpdate()
@@ -504,14 +503,6 @@ namespace MultiplayerARPG
             if (onLateUpdate != null)
                 onLateUpdate.Invoke();
             Profiler.EndSample();
-            Profiler.BeginSample("BaseGameEntity - SendClientState");
-            if (IsOwnerClient)
-                SendClientState();
-            Profiler.EndSample();
-            Profiler.BeginSample("BaseGameEntity - SendServerState");
-            if (IsServer)
-                SendServerState();
-            Profiler.EndSample();
         }
 
         protected virtual void EntityLateUpdate()
@@ -529,24 +520,6 @@ namespace MultiplayerARPG
                 _isTeleporting = false;
             }
         }
-
-        internal void DoFixedUpdate()
-        {
-            Profiler.BeginSample("EntityComponents - FixedUpdate");
-            if (UpdateEntityComponents)
-            {
-                for (int i = 0; i < EntityComponents.Length; ++i)
-                {
-                    if (EntityComponents[i].Enabled)
-                        EntityComponents[i].EntityFixedUpdate();
-                }
-            }
-            Profiler.EndSample();
-            EntityFixedUpdate();
-            if (onFixedUpdate != null)
-                onFixedUpdate.Invoke();
-        }
-        protected virtual void EntityFixedUpdate() { }
 
         public virtual void SendClientState()
         {

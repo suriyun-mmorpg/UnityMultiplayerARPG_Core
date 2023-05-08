@@ -8,6 +8,7 @@ using UnityEngine.SceneManagement;
 using Cysharp.Threading.Tasks;
 using System.Collections.Generic;
 using System.Net.Sockets;
+using UnityEngine.Profiling;
 
 namespace MultiplayerARPG
 {
@@ -131,8 +132,9 @@ namespace MultiplayerARPG
                 CurrentGameInstance.DayNightTimeUpdater.UpdateTimeOfDay(tempDeltaTime);
                 for (int i = 0; i < _arrayGameEntityLength; ++i)
                 {
-                    if (_arrayGameEntity[i].enabled)
-                        _arrayGameEntity[i].DoUpdate();
+                    if (!_arrayGameEntity[i].enabled)
+                        continue;
+                    _arrayGameEntity[i].DoUpdate();
                 }
             }
         }
@@ -143,10 +145,42 @@ namespace MultiplayerARPG
             {
                 for (int i = 0; i < _arrayGameEntityLength; ++i)
                 {
-                    if (_arrayGameEntity[i].enabled)
-                        _arrayGameEntity[i].DoLateUpdate();
+                    if (!_arrayGameEntity[i].enabled)
+                        continue;
+                    _arrayGameEntity[i].DoLateUpdate();
                 }
             }
+        }
+
+        protected override void OnServerUpdate(GameUpdater updater)
+        {
+            base.OnServerUpdate(updater);
+            Profiler.BeginSample("BaseGameNetworkManager - SendServerState");
+            for (int i = 0; i < _arrayGameEntityLength; ++i)
+            {
+                if (!_arrayGameEntity[i].enabled)
+                    continue;
+                if (_arrayGameEntity[i].IsOwnerClient)
+                    _arrayGameEntity[i].SendClientState();
+                _arrayGameEntity[i].SendServerState();
+            }
+            Profiler.EndSample();
+        }
+
+        protected override void OnClientUpdate(GameUpdater updater)
+        {
+            base.OnClientUpdate(updater);
+            if (IsServer)
+                return;
+            Profiler.BeginSample("BaseGameNetworkManager - SendClientState");
+            for (int i = 0; i < _arrayGameEntityLength; ++i)
+            {
+                if (!_arrayGameEntity[i].enabled)
+                    continue;
+                if (_arrayGameEntity[i].IsOwnerClient)
+                    _arrayGameEntity[i].SendClientState();
+            }
+            Profiler.EndSample();
         }
 
         public void RegisterGameEntity(BaseGameEntity gameEntity)
