@@ -96,11 +96,14 @@ namespace MultiplayerARPG
         {
             get
             {
-                if (CacheCollider)
-                    return CacheCollider.bounds;
-                if (CacheCollider2D)
-                    return CacheCollider2D.bounds;
-                return new Bounds(transform.position, Vector3.one);
+                return new Bounds()
+                {
+                    center = CacheTransform.position + _boundsOffset,
+                    size = new Vector3(
+                        CacheTransform.lossyScale.x * _boundsSize.x,
+                        CacheTransform.lossyScale.y * _boundsSize.y,
+                        CacheTransform.lossyScale.z * _boundsSize.z),
+                };
             }
         }
 
@@ -108,6 +111,8 @@ namespace MultiplayerARPG
         protected Vector3 _defaultLocalPosition;
         protected Quaternion _defaultLocalRotation;
         protected List<TransformHistory> _histories = new List<TransformHistory>();
+        protected Vector3 _boundsOffset;
+        protected Vector3 _boundsSize;
 
 #if UNITY_EDITOR
         [Header("Rewind Debugging")]
@@ -120,16 +125,46 @@ namespace MultiplayerARPG
             DamageableEntity = GetComponentInParent<DamageableEntity>();
             CacheTransform = transform;
             CacheCollider = GetComponent<Collider>();
-            if (CacheCollider)
+            if (CacheCollider != null)
             {
+                if (CacheCollider is BoxCollider boxCollider)
+                {
+                    _boundsOffset = boxCollider.center;
+                    _boundsSize = boxCollider.size;
+                }
+                else if (CacheCollider is SphereCollider sphereCollider)
+                {
+                    _boundsOffset = sphereCollider.center;
+                    _boundsSize = sphereCollider.radius * Vector3.one * 0.5f;
+                }
+                else
+                {
+                    Logging.LogError(ToString(), "Only `BoxCollider` and `SphereCollider` can be used for damageable hit box (3D games)");
+                    return;
+                }
                 CacheRigidbody = gameObject.GetOrAddComponent<Rigidbody>();
                 CacheRigidbody.useGravity = false;
                 CacheRigidbody.isKinematic = true;
                 return;
             }
             CacheCollider2D = GetComponent<Collider2D>();
-            if (CacheCollider2D)
+            if (CacheCollider2D != null)
             {
+                if (CacheCollider2D is BoxCollider2D boxCollider2D)
+                {
+                    _boundsOffset = boxCollider2D.offset;
+                    _boundsSize = boxCollider2D.size;
+                }
+                else if (CacheCollider2D is CircleCollider2D circleCollider2D)
+                {
+                    _boundsOffset = circleCollider2D.offset;
+                    _boundsSize = circleCollider2D.radius * Vector3.one * 0.5f;
+                }
+                else
+                {
+                    Logging.LogError(ToString(), "Only `BoxCollider2D` and `CircleCollider2D` can be used for damageable hit box (2D games)");
+                    return;
+                }
                 CacheRigidbody2D = gameObject.GetOrAddComponent<Rigidbody2D>();
                 CacheRigidbody2D.gravityScale = 0;
                 CacheRigidbody2D.isKinematic = true;
