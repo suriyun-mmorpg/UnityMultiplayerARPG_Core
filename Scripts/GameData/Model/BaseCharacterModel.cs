@@ -382,15 +382,15 @@ namespace MultiplayerARPG
 
         public virtual void SetEquipWeapons(IList<EquipWeapons> selectableWeaponSets, byte equipWeaponSet, bool isWeaponsSheathed)
         {
-            this.SelectableWeaponSets = selectableWeaponSets;
-            this.EquipWeaponSet = equipWeaponSet;
-            this.IsWeaponsSheathed = isWeaponsSheathed;
+            SelectableWeaponSets = selectableWeaponSets;
+            EquipWeaponSet = equipWeaponSet;
+            IsWeaponsSheathed = isWeaponsSheathed;
             UpdateEquipmentModels();
         }
 
         public virtual void SetEquipItems(IList<CharacterItem> equipItems)
         {
-            this.EquipItems = equipItems;
+            EquipItems = equipItems;
             UpdateEquipmentModels();
         }
 
@@ -632,7 +632,7 @@ namespace MultiplayerARPG
 
         public virtual void SetBuffs(IList<CharacterBuff> buffs)
         {
-            this.Buffs = buffs;
+            Buffs = buffs;
             // Temp old keys
             _tempCachedKeys.Clear();
             _tempCachedKeys.AddRange(CacheEffects.Keys);
@@ -819,22 +819,22 @@ namespace MultiplayerARPG
 
         public void SetIsDead(bool isDead)
         {
-            this.IsDead = isDead;
+            IsDead = isDead;
         }
 
         public void SetMoveAnimationSpeedMultiplier(float moveAnimationSpeedMultiplier)
         {
-            this.MoveAnimationSpeedMultiplier = moveAnimationSpeedMultiplier;
+            MoveAnimationSpeedMultiplier = moveAnimationSpeedMultiplier;
         }
 
         public void SetMovementState(MovementState movementState, ExtraMovementState extraMovementState, Vector2 direction2D, bool isFreezeAnimation)
         {
             if (!Application.isPlaying)
                 return;
-            this.MovementState = movementState;
-            this.ExtraMovementState = extraMovementState;
-            this.Direction2D = direction2D;
-            this.IsFreezeAnimation = isFreezeAnimation;
+            MovementState = movementState;
+            ExtraMovementState = extraMovementState;
+            Direction2D = direction2D;
+            IsFreezeAnimation = isFreezeAnimation;
             PlayMoveAnimation();
         }
 
