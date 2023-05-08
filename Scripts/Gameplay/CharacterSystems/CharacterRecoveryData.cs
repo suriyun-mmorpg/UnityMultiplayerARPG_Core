@@ -45,7 +45,7 @@ namespace MultiplayerARPG
             DamageOverTimes = calculatedBuff.GetDamageOverTimes();
             foreach (KeyValuePair<DamageElement, MinMaxFloat> damageOverTime in DamageOverTimes)
             {
-                TotalDamageOverTime += damageOverTime.Key.GetDamageReducedByResistance(CharacterEntity.GetCaches().Resistances, CharacterEntity.GetCaches().Armors, damageOverTime.Value.Random(Random.Range(0, 255)));
+                TotalDamageOverTime += damageOverTime.Key.GetDamageReducedByResistance(CharacterEntity.CachedData.Resistances, CharacterEntity.CachedData.Armors, damageOverTime.Value.Random(Random.Range(0, 255)));
             }
             int tempAmount;
             // Hp recovery

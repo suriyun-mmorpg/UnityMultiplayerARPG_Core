@@ -152,13 +152,13 @@ namespace MultiplayerARPG
         public IPhysicFunctions FindPhysicFunctions { get; protected set; }
 
         public override bool IsImmune { get { return base.IsImmune || RespawnInvincibleCountDown > 0f; } set { base.IsImmune = value; } }
-        public override sealed int MaxHp { get { return this.GetCaches().MaxHp; } }
-        public int MaxMp { get { return this.GetCaches().MaxMp; } }
-        public int MaxStamina { get { return this.GetCaches().MaxStamina; } }
-        public int MaxFood { get { return this.GetCaches().MaxFood; } }
-        public int MaxWater { get { return this.GetCaches().MaxWater; } }
-        public override sealed float MoveAnimationSpeedMultiplier { get { return this.GetCaches().BaseMoveSpeed > 0f ? GetMoveSpeed(MovementState, ExtraMovementState.None) / this.GetCaches().BaseMoveSpeed : 1f; } }
-        public override sealed bool MuteFootstepSound { get { return this.GetCaches().MuteFootstepSound; } }
+        public override sealed int MaxHp { get { return CachedData.MaxHp; } }
+        public int MaxMp { get { return CachedData.MaxMp; } }
+        public int MaxStamina { get { return CachedData.MaxStamina; } }
+        public int MaxFood { get { return CachedData.MaxFood; } }
+        public int MaxWater { get { return CachedData.MaxWater; } }
+        public override sealed float MoveAnimationSpeedMultiplier { get { return CachedData.BaseMoveSpeed > 0f ? GetMoveSpeed(MovementState, ExtraMovementState.None) / CachedData.BaseMoveSpeed : 1f; } }
+        public override sealed bool MuteFootstepSound { get { return CachedData.MuteFootstepSound; } }
         public abstract int DataId { get; set; }
 
         public CharacterModelManager ModelManager { get; private set; }
@@ -214,7 +214,6 @@ namespace MultiplayerARPG
                 AttackPhysicFunctions = new PhysicFunctions2D(64);
                 FindPhysicFunctions = new PhysicFunctions2D(IsOwnerClient ? 256 : 64);
             }
-            _isRecaching = true;
             _lastGrounded = false;
             _lastGroundedPosition = EntityTransform.position;
         }
@@ -353,19 +352,19 @@ namespace MultiplayerARPG
             // Update move speed multiplier
             CharacterModel.SetMoveAnimationSpeedMultiplier(MoveAnimationSpeedMultiplier);
             // Update movement animation
-            CharacterModel.SetMovementState(MovementState, ExtraMovementState, Direction2D, this.GetCaches().FreezeAnimation);
+            CharacterModel.SetMovementState(MovementState, ExtraMovementState, Direction2D, CachedData.FreezeAnimation);
             Profiler.EndSample();
 
             Profiler.BeginSample("BaseCharacterEntity - FPSModelUpdate");
             // Update FPS model
-            if (IsClient && FpsModel && FpsModel.gameObject.activeSelf)
+            if (IsOwnerClient && FpsModel != null && FpsModel.gameObject.activeSelf)
             {
                 // Update is dead state
                 FpsModel.SetIsDead(this.IsDead());
                 // Update move speed multiplier
                 FpsModel.SetMoveAnimationSpeedMultiplier(MoveAnimationSpeedMultiplier);
                 // Update movement animation
-                FpsModel.SetMovementState(MovementState, ExtraMovementState, Direction2D, this.GetCaches().FreezeAnimation);
+                FpsModel.SetMovementState(MovementState, ExtraMovementState, Direction2D, CachedData.FreezeAnimation);
             }
             Profiler.EndSample();
 
@@ -517,7 +516,7 @@ namespace MultiplayerARPG
         {
             if (CharacterModel && CharacterModel.gameObject.activeSelf)
                 CharacterModel.PlayJumpAnimation();
-            if (IsClient && FpsModel && FpsModel.gameObject.activeSelf)
+            if (IsOwnerClient && FpsModel != null && FpsModel.gameObject.activeSelf)
                 FpsModel.PlayJumpAnimation();
         }
 
@@ -525,7 +524,7 @@ namespace MultiplayerARPG
         {
             if (CharacterModel && CharacterModel.gameObject.activeSelf)
                 CharacterModel.PlayPickupAnimation();
-            if (IsClient && FpsModel && FpsModel.gameObject.activeSelf)
+            if (IsOwnerClient && FpsModel != null && FpsModel.gameObject.activeSelf)
                 FpsModel.PlayPickupAnimation();
         }
 
@@ -533,7 +532,7 @@ namespace MultiplayerARPG
         {
             if (CharacterModel && CharacterModel.gameObject.activeSelf)
                 CharacterModel.PlayHitAnimation();
-            if (IsClient && FpsModel && FpsModel.gameObject.activeSelf)
+            if (IsOwnerClient && FpsModel != null && FpsModel.gameObject.activeSelf)
                 FpsModel.PlayHitAnimation();
         }
 
@@ -541,7 +540,7 @@ namespace MultiplayerARPG
         {
             if (CharacterModel && CharacterModel.gameObject.activeSelf)
                 CharacterModel.SetIsDead(isDead);
-            if (IsClient && FpsModel && FpsModel.gameObject.activeSelf)
+            if (IsOwnerClient && FpsModel != null && FpsModel.gameObject.activeSelf)
                 FpsModel.SetIsDead(isDead);
         }
 
@@ -911,7 +910,7 @@ namespace MultiplayerARPG
             // Calculate all damages
             damageAmounts = GameDataHelpers.CombineDamages(damageAmounts, this.GetWeaponDamages(weapon));
             // Sum damage with buffs
-            damageAmounts = GameDataHelpers.CombineDamages(damageAmounts, this.GetCaches().IncreaseDamages);
+            damageAmounts = GameDataHelpers.CombineDamages(damageAmounts, CachedData.IncreaseDamages);
 
             return damageAmounts;
         }
@@ -1117,7 +1116,7 @@ namespace MultiplayerARPG
 
         public float GetAttackSpeed()
         {
-            float atkSpeed = this.GetCaches().AtkSpeed;
+            float atkSpeed = CachedData.AtkSpeed;
             // Minimum attack speed is 0.1
             if (atkSpeed <= 0.1f)
                 atkSpeed = 0.1f;
@@ -1126,7 +1125,7 @@ namespace MultiplayerARPG
 
         protected float GetMoveSpeed(MovementState movementState, ExtraMovementState extraMovementState)
         {
-            float moveSpeed = this.GetCaches().MoveSpeed;
+            float moveSpeed = CachedData.MoveSpeed;
             float time = Time.unscaledTime;
             if (IsAttacking || time - LastAttackEndTime < CurrentGameInstance.returnMoveSpeedDelayAfterAction)
             {
@@ -1167,7 +1166,7 @@ namespace MultiplayerARPG
                 }
             }
 
-            if (this.GetCaches().IsOverweight)
+            if (CachedData.IsOverweight)
                 moveSpeed *= CurrentGameplayRule.GetOverweightMoveSpeedRate(this);
 
             return moveSpeed;
@@ -1182,7 +1181,7 @@ namespace MultiplayerARPG
         {
             if (this.IsDead())
                 return false;
-            if (this.GetCaches().DisallowMove)
+            if (CachedData.DisallowMove)
                 return false;
             return true;
         }
@@ -1191,7 +1190,7 @@ namespace MultiplayerARPG
         {
             if (!MovementState.Has(MovementState.IsGrounded) || MovementState.Has(MovementState.IsUnderWater))
                 return false;
-            if (this.GetCaches().DisallowSprint)
+            if (CachedData.DisallowSprint)
                 return false;
             return CurrentStamina > 0;
         }
@@ -1200,7 +1199,7 @@ namespace MultiplayerARPG
         {
             if (!MovementState.Has(MovementState.IsGrounded) || MovementState.Has(MovementState.IsUnderWater))
                 return false;
-            if (this.GetCaches().DisallowWalk)
+            if (CachedData.DisallowWalk)
                 return false;
             return true;
         }
@@ -1209,7 +1208,7 @@ namespace MultiplayerARPG
         {
             if (!MovementState.Has(MovementState.IsGrounded) || MovementState.Has(MovementState.IsUnderWater))
                 return false;
-            if (this.GetCaches().DisallowCrouch)
+            if (CachedData.DisallowCrouch)
                 return false;
             return true;
         }
@@ -1218,14 +1217,14 @@ namespace MultiplayerARPG
         {
             if (!MovementState.Has(MovementState.IsGrounded) || MovementState.Has(MovementState.IsUnderWater))
                 return false;
-            if (this.GetCaches().DisallowCrawl)
+            if (CachedData.DisallowCrawl)
                 return false;
             return true;
         }
 
         public override bool CanJump()
         {
-            if (this.GetCaches().DisallowJump)
+            if (CachedData.DisallowJump)
             {
                 return false;
             }
@@ -1271,7 +1270,7 @@ namespace MultiplayerARPG
 
         public override sealed bool IsHide()
         {
-            return this.GetCaches().IsHide;
+            return CachedData.IsHide;
         }
         #endregion
 
@@ -1517,14 +1516,14 @@ namespace MultiplayerARPG
         protected void SetEquipWeaponsModels()
         {
             CharacterModel.SetEquipWeapons(SelectableWeaponSets, EquipWeaponSet, IsWeaponsSheathed);
-            if (FpsModel)
+            if (IsOwnerClient && FpsModel != null)
                 FpsModel.SetEquipWeapons(SelectableWeaponSets, EquipWeaponSet, IsWeaponsSheathed);
         }
 
         protected void SetEquipItemsModels()
         {
             CharacterModel.SetEquipItems(EquipItems);
-            if (FpsModel)
+            if (IsOwnerClient && FpsModel != null)
                 FpsModel.SetEquipItems(EquipItems);
         }
         #endregion

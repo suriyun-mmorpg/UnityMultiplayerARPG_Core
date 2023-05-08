@@ -280,6 +280,7 @@ namespace MultiplayerARPG
             equipItems.onOperation += OnEquipItemsOperation;
             nonEquipItems.onOperation += OnNonEquipItemsOperation;
             summons.onOperation += OnSummonsOperation;
+            ForceMakeCaches();
         }
 
         protected override void EntityOnDestroy()

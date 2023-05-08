@@ -146,7 +146,7 @@ namespace MultiplayerARPG
 
         public void OnAttack()
         {
-            CharacterDataCache cache = Entity.GetCaches();
+            CharacterDataCache cache = Entity.CachedData;
             if (!cache.HavingChanceToRemoveBuffWhenAttack)
                 return;
             bool stillHavingChance = false;
@@ -172,7 +172,7 @@ namespace MultiplayerARPG
 
         public void OnAttacked()
         {
-            CharacterDataCache cache = Entity.GetCaches();
+            CharacterDataCache cache = Entity.CachedData;
             if (!cache.HavingChanceToRemoveBuffWhenAttacked)
                 return;
             bool stillHavingChance = false;
@@ -198,7 +198,7 @@ namespace MultiplayerARPG
 
         public void OnUseSkill()
         {
-            CharacterDataCache cache = Entity.GetCaches();
+            CharacterDataCache cache = Entity.CachedData;
             if (!cache.HavingChanceToRemoveBuffWhenUseSkill)
                 return;
             bool stillHavingChance = false;
@@ -224,7 +224,7 @@ namespace MultiplayerARPG
 
         public void OnUseItem()
         {
-            CharacterDataCache cache = Entity.GetCaches();
+            CharacterDataCache cache = Entity.CachedData;
             if (!cache.HavingChanceToRemoveBuffWhenUseItem)
                 return;
             bool stillHavingChance = false;
@@ -250,7 +250,7 @@ namespace MultiplayerARPG
 
         public void OnPickupItem()
         {
-            CharacterDataCache cache = Entity.GetCaches();
+            CharacterDataCache cache = Entity.CachedData;
             if (!cache.HavingChanceToRemoveBuffWhenPickupItem)
                 return;
             bool stillHavingChance = false;

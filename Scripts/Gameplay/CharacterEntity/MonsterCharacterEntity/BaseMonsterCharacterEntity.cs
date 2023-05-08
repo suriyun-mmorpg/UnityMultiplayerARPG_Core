@@ -211,7 +211,7 @@ namespace MultiplayerARPG
             if (Level <= 0)
                 Level = CharacterDatabase.DefaultLevel;
             ForceMakeCaches();
-            CharacterStats stats = this.GetCaches().Stats;
+            CharacterStats stats = CachedData.Stats;
             CurrentHp = (int)stats.hp;
             CurrentMp = (int)stats.mp;
             CurrentStamina = (int)stats.stamina;
@@ -466,7 +466,7 @@ namespace MultiplayerARPG
                 givenRewardCurrency = false;
 
                 ReceivedDamageRecord receivedDamageRecord = receivedDamageRecords[tempCharacterEntity];
-                float rewardRate = (float)receivedDamageRecord.totalReceivedDamage / (float)this.GetCaches().MaxHp;
+                float rewardRate = (float)receivedDamageRecord.totalReceivedDamage / (float)CachedData.MaxHp;
                 if (rewardRate > 1f)
                     rewardRate = 1f;
 
@@ -494,7 +494,7 @@ namespace MultiplayerARPG
                         // Make this player character to be able to pick up item because it made most damage
                         _looters.Add(tempPlayerCharacterEntity.Id);
                         // And also change item drop rate
-                        itemDropRate = 1f + tempPlayerCharacterEntity.GetCaches().Stats.itemDropRate;
+                        itemDropRate = 1f + tempPlayerCharacterEntity.CachedData.Stats.itemDropRate;
                     }
                     GivingRewardToGuild(tempPlayerCharacterEntity, reward, rewardRate, out float shareGuildExpRate);
                     GivingRewardToParty(tempPlayerCharacterEntity, isLastAttacker, reward, rewardRate, shareGuildExpRate, makeMostDamage, out givenRewardExp, out givenRewardCurrency);

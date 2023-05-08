@@ -35,15 +35,14 @@ namespace MultiplayerARPG
 
         public override sealed void OnSetup()
         {
-            base.OnSetup();
             queueItems.forOwnerOnly = true;
         }
 
         public override sealed void EntityUpdate()
         {
-            base.EntityUpdate();
-            if (IsServer)
-                this.UpdateQueue();
+            if (!IsServer)
+                return;
+            this.UpdateQueue();
         }
     }
 }

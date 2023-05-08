@@ -2,7 +2,7 @@
 {
     public partial class BaseCharacterEntity
     {
-        // States
+        public CharacterDataCache CachedData { get; protected set; }
         /// <summary>
         /// This variable will be TRUE when cache data have to re-cache
         /// </summary>
@@ -98,6 +98,7 @@
                 _summonsRecachingState = SyncListRecachingState.Empty;
             }
 
+            CachedData = this.GetCaches();
             _isRecaching = false;
         }
     }

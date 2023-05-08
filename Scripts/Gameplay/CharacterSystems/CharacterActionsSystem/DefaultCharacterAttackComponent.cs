@@ -201,7 +201,7 @@ namespace MultiplayerARPG
 
                     // Call on attack to extend attack functionality while attacking
                     bool overrideDefaultAttack = false;
-                    foreach (KeyValuePair<BaseSkill, int> skillLevel in Entity.GetCaches().Skills)
+                    foreach (KeyValuePair<BaseSkill, int> skillLevel in Entity.CachedData.Skills)
                     {
                         if (skillLevel.Value <= 0)
                             continue;

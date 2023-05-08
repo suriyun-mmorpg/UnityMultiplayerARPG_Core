@@ -13,28 +13,28 @@ namespace MultiplayerARPG
             // Validate Hp
             if (CurrentHp < 0)
                 CurrentHp = 0;
-            if (CurrentHp > this.GetCaches().MaxHp)
-                CurrentHp = this.GetCaches().MaxHp;
+            if (CurrentHp > CachedData.MaxHp)
+                CurrentHp = CachedData.MaxHp;
             // Validate Mp
             if (CurrentMp < 0)
                 CurrentMp = 0;
-            if (CurrentMp > this.GetCaches().MaxMp)
-                CurrentMp = this.GetCaches().MaxMp;
+            if (CurrentMp > CachedData.MaxMp)
+                CurrentMp = CachedData.MaxMp;
             // Validate Stamina
             if (CurrentStamina < 0)
                 CurrentStamina = 0;
-            if (CurrentStamina > this.GetCaches().MaxStamina)
-                CurrentStamina = this.GetCaches().MaxStamina;
+            if (CurrentStamina > CachedData.MaxStamina)
+                CurrentStamina = CachedData.MaxStamina;
             // Validate Food
             if (CurrentFood < 0)
                 CurrentFood = 0;
-            if (CurrentFood > this.GetCaches().MaxFood)
-                CurrentFood = this.GetCaches().MaxFood;
+            if (CurrentFood > CachedData.MaxFood)
+                CurrentFood = CachedData.MaxFood;
             // Validate Water
             if (CurrentWater < 0)
                 CurrentWater = 0;
-            if (CurrentWater > this.GetCaches().MaxWater)
-                CurrentWater = this.GetCaches().MaxWater;
+            if (CurrentWater > CachedData.MaxWater)
+                CurrentWater = CachedData.MaxWater;
 
             if (this.IsDead())
                 Killed(instigator);
@@ -130,7 +130,7 @@ namespace MultiplayerARPG
             float calculatingTotalDamage = 0f;
             foreach (DamageElement damageElement in damageAmounts.Keys)
             {
-                calculatingTotalDamage += damageElement.GetDamageReducedByResistance(this.GetCaches().Resistances, this.GetCaches().Armors,
+                calculatingTotalDamage += damageElement.GetDamageReducedByResistance(CachedData.Resistances, CachedData.Armors,
                     CurrentGameInstance.GameplayRule.RandomAttackDamage(fromPosition, attackerCharacter, this, damageElement, damageAmounts[damageElement], weapon, skill, skillLevel, randomSeed));
             }
 

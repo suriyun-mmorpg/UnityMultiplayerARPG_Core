@@ -68,7 +68,7 @@ namespace MultiplayerARPG
                 return false;
             if (!CanDoActions())
                 return false;
-            if (this.GetCaches().DisallowAttack)
+            if (CachedData.DisallowAttack)
                 return false;
             if (PassengingVehicleEntity != null &&
                 !PassengingVehicleSeat.canAttack)
@@ -82,7 +82,7 @@ namespace MultiplayerARPG
                 return false;
             if (!CanDoActions())
                 return false;
-            if (this.GetCaches().DisallowUseSkill)
+            if (CachedData.DisallowUseSkill)
                 return false;
             if (PassengingVehicleEntity != null &&
                 !PassengingVehicleSeat.canUseSkill)
@@ -94,7 +94,7 @@ namespace MultiplayerARPG
         {
             if (this.IsDead())
                 return false;
-            if (this.GetCaches().DisallowUseItem)
+            if (CachedData.DisallowUseItem)
                 return false;
             return true;
         }
