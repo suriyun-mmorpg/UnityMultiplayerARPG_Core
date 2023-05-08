@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Profiling;
 using UnityEngine.Serialization;
 
 namespace MultiplayerARPG
@@ -136,6 +137,7 @@ namespace MultiplayerARPG
                 return;
             }
 
+            Profiler.BeginSample("MonsterActivityComponent - Update");
             Entity.SetSmoothTurnSpeed(turnSmoothSpeed);
 
             Vector3 currentPosition = Entity.MovementTransform.position;
@@ -184,6 +186,7 @@ namespace MultiplayerARPG
                     _startedFollowEnemy = false;
                 }
             }
+            Profiler.EndSample();
         }
 
         protected virtual void UpdateEnemyFindingActivity(float deltaTime)
