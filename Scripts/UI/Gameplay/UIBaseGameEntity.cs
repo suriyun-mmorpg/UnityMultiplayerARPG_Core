@@ -25,14 +25,14 @@ namespace MultiplayerARPG
         public Visibility visibility;
         public float visibleDistance = 30f;
 
-        private Canvas cacheCanvas;
+        private Canvas _cacheCanvas;
         public Canvas CacheCanvas
         {
             get
             {
-                if (cacheCanvas == null)
-                    cacheCanvas = gameObject.GetOrAddComponent<Canvas>();
-                return cacheCanvas;
+                if (_cacheCanvas == null)
+                    _cacheCanvas = gameObject.GetOrAddComponent<Canvas>();
+                return _cacheCanvas;
             }
         }
 
