@@ -36,28 +36,36 @@ namespace MultiplayerARPG
             }
         }
 
+        private T _previousEntity;
+
         protected override void Awake()
         {
             base.Awake();
             CacheCanvas.enabled = false;
         }
 
-        protected override void Update()
+        protected virtual void OnDestroy()
         {
-            base.Update();
+            RemoveEvents(_previousEntity);
+        }
 
-            if (!CacheCanvas.enabled)
+        protected virtual void AddEvents(T entity)
+        {
+            if (entity == null)
                 return;
+            entity.SyncTitle.onChange += OnSyncTitleChanged;
+        }
 
-            string tempTitle;
-            if (uiTextTitle != null)
-            {
-                tempTitle = Data == null ? string.Empty : Data.Title;
-                uiTextTitle.SetGameObjectActive(!string.IsNullOrEmpty(tempTitle));
-                uiTextTitle.text = ZString.Format(
-                    LanguageManager.GetText(formatKeyTitle),
-                    tempTitle);
-            }
+        protected virtual void RemoveEvents(T entity)
+        {
+            if (entity == null)
+                return;
+            entity.SyncTitle.onChange -= OnSyncTitleChanged;
+        }
+
+        private void OnSyncTitleChanged(bool isInitial, string value)
+        {
+            UpdateTitle();
         }
 
         protected virtual bool ValidateToUpdateUI()
@@ -101,7 +109,24 @@ namespace MultiplayerARPG
             Profiler.EndSample();
         }
 
-        protected override void UpdateData() { }
+        protected override void UpdateData()
+        {
+            RemoveEvents(_previousEntity);
+            _previousEntity = Data;
+            AddEvents(_previousEntity);
+            UpdateTitle();
+        }
+
+        protected virtual void UpdateTitle()
+        {
+            if (uiTextTitle == null)
+                return;
+            string tempTitle = Data == null ? string.Empty : Data.Title;
+            uiTextTitle.SetGameObjectActive(!string.IsNullOrEmpty(tempTitle));
+            uiTextTitle.text = ZString.Format(
+                LanguageManager.GetText(formatKeyTitle),
+                tempTitle);
+        }
     }
 
     public class UIBaseGameEntity : UIBaseGameEntity<BaseGameEntity> { }

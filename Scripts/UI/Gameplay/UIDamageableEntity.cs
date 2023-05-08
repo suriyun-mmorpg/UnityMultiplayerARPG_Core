@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace MultiplayerARPG
 {
@@ -8,7 +9,8 @@ namespace MultiplayerARPG
 
         [Header("Options")]
         [Tooltip("This is duration before this will be invisible, if this is <= 0f it will always visible")]
-        public float visibleWhenHitDuration = 2f;
+        [FormerlySerializedAs("visibleWhenHitDuration")]
+        public float visibleDurationAfterHit = 2f;
 
         [Header("Damageable Entity - UI Elements")]
         public UIGageValue uiGageHp;
@@ -16,55 +18,29 @@ namespace MultiplayerARPG
         [Header("Damageable Entity - Options")]
         public bool hideWhileDead;
 
-        protected int currentHp;
-        protected int maxHp;
-        protected float receivedDamageTime;
-        protected T previousEntity;
+        protected float _receivedDamageTime;
 
-        protected override void OnEnable()
+        protected override void AddEvents(T entity)
         {
-            base.OnEnable();
-            receivedDamageTime = 0f;
-        }
-
-        protected override void OnDisable()
-        {
-            base.OnDisable();
-            if (previousEntity != null)
-                previousEntity.onReceivedDamage -= OnReceivedDamage;
-        }
-
-        protected override void Update()
-        {
-            base.Update();
-
-            if (!CacheCanvas.enabled)
+            if (entity == null)
                 return;
+            base.AddEvents(entity);
+            entity.onReceivedDamage += OnReceivedDamage;
+            entity.onCurrentHpChange += OnCurrentHpChange;
+        }
 
-            currentHp = 0;
-            maxHp = 0;
-            if (Data != null)
-            {
-                currentHp = Data.CurrentHp;
-                maxHp = Data.MaxHp;
-            }
-            if (uiGageHp != null)
-                uiGageHp.Update(currentHp, maxHp);
+        protected override void RemoveEvents(T entity)
+        {
+            if (entity == null)
+                return;
+            base.RemoveEvents(entity);
+            entity.onReceivedDamage -= OnReceivedDamage;
+            entity.onCurrentHpChange -= OnCurrentHpChange;
         }
 
         protected override bool ValidateToUpdateUI()
         {
             return base.ValidateToUpdateUI() && (!hideWhileDead || !Data.IsDead());
-        }
-
-        protected override void UpdateData()
-        {
-            base.UpdateData();
-            if (previousEntity != null)
-                previousEntity.onReceivedDamage -= OnReceivedDamage;
-            if (Data != null)
-                Data.onReceivedDamage += OnReceivedDamage;
-            previousEntity = Data;
         }
 
         private void OnReceivedDamage(
@@ -79,7 +55,12 @@ namespace MultiplayerARPG
             CharacterBuff buff,
             bool isDamageOverTime)
         {
-            receivedDamageTime = Time.unscaledTime;
+            _receivedDamageTime = Time.unscaledTime;
+        }
+
+        private void OnCurrentHpChange(int hp)
+        {
+            UpdateHp();
         }
 
         protected override void UpdateUI()
@@ -90,13 +71,33 @@ namespace MultiplayerARPG
                 return;
             }
 
-            if (Time.unscaledTime - receivedDamageTime < visibleWhenHitDuration || visibleWhenHitDuration <= 0f)
+            if (Time.unscaledTime - _receivedDamageTime < visibleDurationAfterHit || visibleDurationAfterHit <= 0f)
             {
                 CacheCanvas.enabled = true;
                 return;
             }
 
             base.UpdateUI();
+        }
+
+        protected override void UpdateData()
+        {
+            base.UpdateData();
+            UpdateHp();
+        }
+
+        private void UpdateHp()
+        {
+            if (uiGageHp == null)
+                return;
+            int currentHp = 0;
+            int maxHp = 0;
+            if (Data != null)
+            {
+                currentHp = Data.CurrentHp;
+                maxHp = Data.MaxHp;
+            }
+            uiGageHp.Update(currentHp, maxHp);
         }
     }
 

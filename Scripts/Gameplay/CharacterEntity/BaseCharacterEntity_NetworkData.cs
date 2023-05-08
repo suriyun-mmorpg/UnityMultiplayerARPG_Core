@@ -262,7 +262,6 @@ namespace MultiplayerARPG
             level.onChange += OnLevelChange;
             exp.onChange += OnExpChange;
             isImmune.onChange += OnIsImmuneChange;
-            currentHp.onChange += OnCurrentHpChange;
             currentMp.onChange += OnCurrentMpChange;
             currentFood.onChange += OnCurrentFoodChange;
             currentWater.onChange += OnCurrentWaterChange;
@@ -280,7 +279,6 @@ namespace MultiplayerARPG
             equipItems.onOperation += OnEquipItemsOperation;
             nonEquipItems.onOperation += OnNonEquipItemsOperation;
             summons.onOperation += OnSummonsOperation;
-            ForceMakeCaches();
         }
 
         protected override void EntityOnDestroy()
@@ -292,7 +290,6 @@ namespace MultiplayerARPG
             level.onChange -= OnLevelChange;
             exp.onChange -= OnExpChange;
             isImmune.onChange -= OnIsImmuneChange;
-            currentHp.onChange -= OnCurrentHpChange;
             currentMp.onChange -= OnCurrentMpChange;
             currentFood.onChange -= OnCurrentFoodChange;
             currentWater.onChange -= OnCurrentWaterChange;
@@ -371,17 +368,6 @@ namespace MultiplayerARPG
         {
             if (onIsImmuneChange != null)
                 onIsImmuneChange.Invoke(isImmune);
-        }
-
-        /// <summary>
-        /// This will be called when current hp changed
-        /// </summary>
-        /// <param name="isInitial"></param>
-        /// <param name="currentHp"></param>
-        private void OnCurrentHpChange(bool isInitial, int currentHp)
-        {
-            if (onCurrentHpChange != null)
-                onCurrentHpChange.Invoke(currentHp);
         }
 
         /// <summary>

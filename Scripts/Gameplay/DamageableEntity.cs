@@ -36,6 +36,7 @@ namespace MultiplayerARPG
         public UnityEvent onCriticalDamageHit = new UnityEvent();
         public UnityEvent onBlockedDamageHit = new UnityEvent();
         public UnityEvent onDamageMissed = new UnityEvent();
+        public event System.Action<int> onCurrentHpChange;
         public event ReceiveDamageDelegate onReceiveDamage;
         public event ReceivedDamageDelegate onReceivedDamage;
 
@@ -79,10 +80,28 @@ namespace MultiplayerARPG
                 CurrentGameManager.LagCompensationManager.AddDamageableEntity(this);
         }
 
+        public override void OnSetup()
+        {
+            base.OnSetup();
+            currentHp.onChange += OnCurrentHpChange;
+        }
+
         protected override void EntityOnDestroy()
         {
             base.EntityOnDestroy();
+            currentHp.onChange -= OnCurrentHpChange;
             CurrentGameManager.LagCompensationManager.RemoveDamageableEntity(this);
+        }
+
+        /// <summary>
+        /// This will be called when current hp changed
+        /// </summary>
+        /// <param name="isInitial"></param>
+        /// <param name="currentHp"></param>
+        private void OnCurrentHpChange(bool isInitial, int currentHp)
+        {
+            if (onCurrentHpChange != null)
+                onCurrentHpChange.Invoke(currentHp);
         }
 
         private DamageableHitBox[] CreateHitBoxes()
