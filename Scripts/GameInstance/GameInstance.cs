@@ -377,6 +377,9 @@ namespace MultiplayerARPG
         [Tooltip("If this is empty, it will use `Home Scene` as home scene")]
         public UnityScene homeConsoleScene = default;
 
+        [Header("Server Settings")]
+        public bool updateAnimationAtServer = true;
+
         [Header("Player Configs")]
         public int minCharacterNameLength = 2;
         public int maxCharacterNameLength = 16;

@@ -80,6 +80,15 @@ namespace MultiplayerARPG.GameData.Model.Playables
             }
         }
 
+        public override void UpdateAnimation(float deltaTime)
+        {
+            if (Graph.IsValid())
+            {
+                Graph.SetTimeUpdateMode(DirectorUpdateMode.Manual);
+                Graph.Evaluate(deltaTime);
+            }
+        }
+
         public override void AddingNewModel(EquipmentModel data, GameObject newModel, EquipmentContainer equipmentContainer)
         {
             base.AddingNewModel(data, newModel, equipmentContainer);

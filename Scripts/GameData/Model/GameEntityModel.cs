@@ -188,6 +188,8 @@ namespace MultiplayerARPG
 
         protected virtual void OnValidate() { }
 
+        public virtual void UpdateAnimation(float deltaTime) { }
+
 #if UNITY_EDITOR
         protected virtual void OnDrawGizmos()
         {

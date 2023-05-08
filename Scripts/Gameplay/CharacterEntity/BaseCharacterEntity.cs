@@ -268,7 +268,7 @@ namespace MultiplayerARPG
             Profiler.BeginSample("BaseCharacterEntity - MakeCaches");
             MakeCaches();
             Profiler.EndSample();
-            float deltaTime = Time.deltaTime;
+            float deltaTime = Time.unscaledDeltaTime;
 
             Profiler.BeginSample("BaseCharacterEntity - AddHitBoxesTransformHistory");
             if (IsServer && CurrentGameManager.LagCompensationManager.ShouldStoreHitBoxesTransformHistory)
@@ -353,12 +353,17 @@ namespace MultiplayerARPG
 
             Profiler.BeginSample("BaseCharacterEntity - CharacterModelUpdate");
             // Update model animations
-            // Update is dead state
-            CharacterModel.SetIsDead(this.IsDead());
-            // Update move speed multiplier
-            CharacterModel.SetMoveAnimationSpeedMultiplier(MoveAnimationSpeedMultiplier);
-            // Update movement animation
-            CharacterModel.SetMovementState(MovementState, ExtraMovementState, Direction2D, CachedData.FreezeAnimation);
+            if (IsClient || GameInstance.Singleton.updateAnimationAtServer)
+            {
+                // Update is dead state
+                CharacterModel.SetIsDead(this.IsDead());
+                // Update move speed multiplier
+                CharacterModel.SetMoveAnimationSpeedMultiplier(MoveAnimationSpeedMultiplier);
+                // Update movement state
+                CharacterModel.SetMovementState(MovementState, ExtraMovementState, Direction2D, CachedData.FreezeAnimation);
+                // Update animation
+                CharacterModel.UpdateAnimation(deltaTime);
+            }
             Profiler.EndSample();
 
             Profiler.BeginSample("BaseCharacterEntity - FPSModelUpdate");
@@ -369,8 +374,10 @@ namespace MultiplayerARPG
                 FpsModel.SetIsDead(this.IsDead());
                 // Update move speed multiplier
                 FpsModel.SetMoveAnimationSpeedMultiplier(MoveAnimationSpeedMultiplier);
-                // Update movement animation
+                // Update movement state
                 FpsModel.SetMovementState(MovementState, ExtraMovementState, Direction2D, CachedData.FreezeAnimation);
+                // Update animation
+                FpsModel.UpdateAnimation(deltaTime);
             }
             Profiler.EndSample();
 

@@ -161,10 +161,10 @@ namespace MultiplayerARPG
 
         protected override void EntityUpdate()
         {
-            base.EntityUpdate();
             SetModelIsDead(this.IsDead());
             if (IsServer && CurrentGameManager.LagCompensationManager.ShouldStoreHitBoxesTransformHistory)
                 AddHitBoxesTransformHistory(CurrentGameManager.ServerTimestamp);
+            base.EntityUpdate();
         }
 
         public void AddHitBoxesTransformHistory(long time)

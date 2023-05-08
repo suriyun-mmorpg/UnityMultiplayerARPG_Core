@@ -467,11 +467,16 @@ namespace MultiplayerARPG
                 }
             }
 
-            if (Model is IMoveableModel moveableModel)
+            if (Model != null && (IsClient || GameInstance.Singleton.updateAnimationAtServer))
             {
-                // Update movement animation
-                moveableModel.SetMoveAnimationSpeedMultiplier(MoveAnimationSpeedMultiplier);
-                moveableModel.SetMovementState(MovementState, ExtraMovementState, Direction2D, false);
+                if (Model is IMoveableModel moveableModel)
+                {
+                    // Update move speed multiplier
+                    moveableModel.SetMoveAnimationSpeedMultiplier(MoveAnimationSpeedMultiplier);
+                    // Update movement state
+                    moveableModel.SetMovementState(MovementState, ExtraMovementState, Direction2D, false);
+                }
+                Model.UpdateAnimation(Time.unscaledDeltaTime);
             }
         }
 
