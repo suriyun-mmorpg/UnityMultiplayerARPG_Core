@@ -13,6 +13,13 @@ namespace MultiplayerARPG
         public const float DEFAULT_TOTAL_DURATION = 2f;
         public const float DEFAULT_TRIGGER_DURATION = 1f;
         public const float DEFAULT_STATE_SETUP_DELAY = 1f;
+
+        protected struct AttackState
+        {
+            public byte SimulateSeed;
+            public bool IsLeftHand;
+        }
+
         protected readonly List<CancellationTokenSource> _attackCancellationTokenSources = new List<CancellationTokenSource>();
         public bool IsAttacking { get; protected set; }
         public float LastAttackEndTime { get; protected set; }
@@ -33,10 +40,8 @@ namespace MultiplayerARPG
         protected int _lastAttackAnimationIndex = 0;
         protected int _lastAttackDataId = 0;
         // Network data sending
-        protected bool _sendingClientAttack;
-        protected bool _sendingServerAttack;
-        protected byte _sendingSeed;
-        protected bool _sendingIsLeftHand;
+        protected AttackState? _clientState;
+        protected AttackState? _serverState;
 
         protected virtual void SetAttackActionStates(AnimActionType animActionType, int animActionDataId)
         {
@@ -368,14 +373,12 @@ namespace MultiplayerARPG
             {
                 // Get simulate seed for simulation validating
                 byte simulateSeed = (byte)Random.Range(byte.MinValue, byte.MaxValue);
-                // Set attack state
-                IsAttacking = true;
-                // Simulate attacking at client immediately
-                AttackRoutine(simulateSeed, isLeftHand).Forget();
-                // Tell server that this client attack
-                _sendingClientAttack = true;
-                _sendingSeed = simulateSeed;
-                _sendingIsLeftHand = isLeftHand;
+                // Prepare state data which will be sent to server
+                _clientState = new AttackState()
+                {
+                    SimulateSeed = simulateSeed,
+                    IsLeftHand = isLeftHand,
+                };
             }
             else if (IsOwnerClientOrOwnedByServer)
             {
@@ -386,13 +389,32 @@ namespace MultiplayerARPG
             }
         }
 
+        protected void ProceedAttackStateAtServer(byte simulateSeed, bool isLeftHand)
+        {
+#if UNITY_EDITOR || UNITY_SERVER
+            // Speed hack avoidance
+            if (Time.unscaledTime - LastAttackEndTime < -0.05f)
+                return;
+            // Prepare state data which will be sent to clients
+            _serverState = new AttackState()
+            {
+                SimulateSeed = simulateSeed,
+                IsLeftHand = isLeftHand,
+            };
+#endif
+        }
+
         public bool WriteClientAttackState(NetDataWriter writer)
         {
-            if (_sendingClientAttack)
+            if (_clientState.HasValue)
             {
-                writer.Put(_sendingSeed);
-                writer.Put(_sendingIsLeftHand);
-                _sendingClientAttack = false;
+                // Simulate attacking at client
+                AttackRoutine(_clientState.Value.SimulateSeed, _clientState.Value.IsLeftHand).Forget();
+                // Send input to server
+                writer.Put(_clientState.Value.SimulateSeed);
+                writer.Put(_clientState.Value.IsLeftHand);
+                // Clear Input
+                _clientState = null;
                 return true;
             }
             return false;
@@ -400,11 +422,15 @@ namespace MultiplayerARPG
 
         public bool WriteServerAttackState(NetDataWriter writer)
         {
-            if (_sendingServerAttack)
+            if (_serverState.HasValue)
             {
-                writer.Put(_sendingSeed);
-                writer.Put(_sendingIsLeftHand);
-                _sendingServerAttack = false;
+                // Simulate attacking at server
+                AttackRoutine(_serverState.Value.SimulateSeed, _serverState.Value.IsLeftHand).Forget();
+                // Send input to client
+                writer.Put(_serverState.Value.SimulateSeed);
+                writer.Put(_serverState.Value.IsLeftHand);
+                // Clear Input
+                _serverState = null;
                 return true;
             }
             return false;
@@ -417,30 +443,13 @@ namespace MultiplayerARPG
             ProceedAttackStateAtServer(simulateSeed, isLeftHand);
         }
 
-        protected void ProceedAttackStateAtServer(byte simulateSeed, bool isLeftHand)
-        {
-#if UNITY_EDITOR || UNITY_SERVER
-            // Speed hack avoidance
-            if (Time.unscaledTime - LastAttackEndTime < -0.05f)
-                return;
-            // Set attack state
-            IsAttacking = true;
-            // Play attack animation at server immediately
-            AttackRoutine(simulateSeed, isLeftHand).Forget();
-            // Tell clients to play animation later
-            _sendingServerAttack = true;
-            _sendingSeed = simulateSeed;
-            _sendingIsLeftHand = isLeftHand;
-#endif
-        }
-
         public void ReadServerAttackStateAtClient(NetDataReader reader)
         {
             byte simulateSeed = reader.GetByte();
             bool isLeftHand = reader.GetBool();
             if (IsOwnerClientOrOwnedByServer)
             {
-                // Don't play attack animation again (it already played in `Attack` function)
+                // Don't play attack animation again (it already done in `Attack` function)
                 return;
             }
             // Play attack animation at client

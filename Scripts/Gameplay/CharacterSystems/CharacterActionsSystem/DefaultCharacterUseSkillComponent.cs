@@ -13,6 +13,21 @@ namespace MultiplayerARPG
         public const float DEFAULT_TOTAL_DURATION = 2f;
         public const float DEFAULT_TRIGGER_DURATION = 1f;
         public const float DEFAULT_STATE_SETUP_DELAY = 1f;
+
+        protected struct UseSkillState
+        {
+            public bool IsInterrupted;
+            public byte SimulateSeed;
+            public bool UseItem;
+            public int ItemIndex;
+            public int? ItemDataId;
+            public BaseSkill Skill;
+            public int SkillLevel;
+            public bool IsLeftHand;
+            public uint TargetObjectId;
+            public AimPosition AimPosition;
+        }
+
         protected readonly List<CancellationTokenSource> _skillCancellationTokenSources = new List<CancellationTokenSource>();
         public BaseSkill UsingSkill { get; protected set; }
         public int UsingSkillLevel { get; protected set; }
@@ -33,18 +48,8 @@ namespace MultiplayerARPG
 
         protected readonly Dictionary<int, SimulatingActionTriggerHistory> _simulatingActionTriggerHistories = new Dictionary<int, SimulatingActionTriggerHistory>();
         protected readonly Dictionary<int, List<SimulateActionTriggerData>> _simlatingActionTriggerDataList = new Dictionary<int, List<SimulateActionTriggerData>>();
-        protected bool _sendingClientUseSkill;
-        protected bool _sendingClientUseSkillItem;
-        protected bool _sendingClientUseSkillInterrupted;
-        protected bool _sendingServerUseSkill;
-        protected bool _sendingServerUseSkillInterrupted;
-        protected byte _sendingSeed;
-        protected int _sendingSkillDataId;
-        protected int _sendingSkillLevel;
-        protected int _sendingItemIndex;
-        protected bool _sendingIsLeftHand;
-        protected uint _sendingTargetObjectId;
-        protected AimPosition _sendingAimPosition;
+        protected UseSkillState? _clientState;
+        protected UseSkillState? _serverState;
 
         public override void EntityUpdate()
         {
@@ -74,13 +79,19 @@ namespace MultiplayerARPG
         {
             if (!IsServer)
             {
-                _sendingClientUseSkillInterrupted = true;
+                _clientState = new UseSkillState()
+                {
+                    IsInterrupted = true,
+                };
                 return;
             }
             if (IsCastingSkillCanBeInterrupted && !IsCastingSkillInterrupted)
             {
                 IsCastingSkillInterrupted = true;
-                _sendingServerUseSkillInterrupted = true;
+                _serverState = new UseSkillState()
+                {
+                    IsInterrupted = true,
+                };
             }
         }
 
@@ -381,17 +392,16 @@ namespace MultiplayerARPG
                     return;
                 // Get simulate seed for simulation validating
                 byte simulateSeed = (byte)Random.Range(byte.MinValue, byte.MaxValue);
-                // Set use skill state
-                IsUsingSkill = true;
-                // Simulate skill using at client immediately
-                UseSkillRoutine(simulateSeed, isLeftHand, skill, skillLevel, targetObjectId, aimPosition, null).Forget();
-                // Tell server that this client use skill
-                _sendingClientUseSkill = true;
-                _sendingSeed = simulateSeed;
-                _sendingSkillDataId = dataId;
-                _sendingIsLeftHand = isLeftHand;
-                _sendingTargetObjectId = targetObjectId;
-                _sendingAimPosition = aimPosition;
+                // Prepare state data which will be sent to server
+                _clientState = new UseSkillState()
+                {
+                    SimulateSeed = simulateSeed,
+                    Skill = skill,
+                    SkillLevel = skillLevel,
+                    IsLeftHand = isLeftHand,
+                    TargetObjectId = targetObjectId,
+                    AimPosition = aimPosition,
+                };
             }
             else if (IsOwnerClientOrOwnedByServer)
             {
@@ -402,12 +412,34 @@ namespace MultiplayerARPG
             }
         }
 
+        protected void ProceedUseSkillStateAtServer(byte simulateSeed, int dataId, bool isLeftHand, uint targetObjectId, AimPosition aimPosition)
+        {
+#if UNITY_EDITOR || UNITY_SERVER
+            // Speed hack avoidance
+            if (Time.unscaledTime - LastUseSkillEndTime < -0.05f)
+                return;
+            // Validate skill
+            if (!Entity.ValidateSkillToUse(dataId, isLeftHand, targetObjectId, out BaseSkill skill, out int skillLevel, out _))
+                return;
+            // Prepare state data which will be sent to clients
+            _serverState = new UseSkillState()
+            {
+                SimulateSeed = simulateSeed,
+                Skill = skill,
+                SkillLevel = skillLevel,
+                IsLeftHand = isLeftHand,
+                TargetObjectId = targetObjectId,
+                AimPosition = aimPosition,
+            };
+#endif
+        }
+
         public void UseSkillItem(int itemIndex, bool isLeftHand, uint targetObjectId, AimPosition aimPosition)
         {
             if (!IsServer && IsOwnerClient)
             {
                 // Validate skill
-                if (!Entity.ValidateSkillItemToUse(itemIndex, isLeftHand, targetObjectId, out ISkillItem _, out BaseSkill skill, out int skillLevel, out UITextKeys gameMessage))
+                if (!Entity.ValidateSkillItemToUse(itemIndex, isLeftHand, targetObjectId, out ISkillItem skillItem, out BaseSkill skill, out int skillLevel, out UITextKeys gameMessage))
                 {
                     ClientGenericActions.ClientReceiveGameMessage(gameMessage);
                     return;
@@ -416,17 +448,19 @@ namespace MultiplayerARPG
                 Entity.LastUseItemTime = Time.unscaledTime;
                 // Get simulate seed for simulation validating
                 byte simulateSeed = (byte)Random.Range(byte.MinValue, byte.MaxValue);
-                // Set use skill state
-                IsUsingSkill = true;
-                // Simulate skill using at client immediately
-                UseSkillRoutine(simulateSeed, isLeftHand, skill, skillLevel, targetObjectId, aimPosition, Entity.NonEquipItems[itemIndex].dataId).Forget();
-                // Tell server that this client use skill
-                _sendingClientUseSkillItem = true;
-                _sendingSeed = simulateSeed;
-                _sendingItemIndex = itemIndex;
-                _sendingIsLeftHand = isLeftHand;
-                _sendingTargetObjectId = targetObjectId;
-                _sendingAimPosition = aimPosition;
+                // Prepare state data which will be sent to server
+                _clientState = new UseSkillState()
+                {
+                    SimulateSeed = simulateSeed,
+                    UseItem = true,
+                    ItemIndex = itemIndex,
+                    ItemDataId = skillItem.DataId,
+                    Skill = skill,
+                    SkillLevel = skillLevel,
+                    IsLeftHand = isLeftHand,
+                    TargetObjectId = targetObjectId,
+                    AimPosition = aimPosition,
+                };
             }
             else if (IsOwnerClientOrOwnedByServer)
             {
@@ -437,16 +471,47 @@ namespace MultiplayerARPG
             }
         }
 
+        protected void ProceedUseSkillItemStateAtServer(byte simulateSeed, int itemIndex, bool isLeftHand, uint targetObjectId, AimPosition aimPosition)
+        {
+#if UNITY_EDITOR || UNITY_SERVER
+            // Speed hack avoidance
+            if (Time.unscaledTime - LastUseSkillEndTime < -0.05f)
+                return;
+            // Validate skill item
+            if (!Entity.ValidateSkillItemToUse(itemIndex, isLeftHand, targetObjectId, out ISkillItem skillItem, out BaseSkill skill, out int skillLevel, out _))
+                return;
+            // Decrease items
+            if (!Entity.DecreaseItemsByIndex(itemIndex, 1, false))
+                return;
+            Entity.FillEmptySlots();
+            // Prepare state data which will be sent to clients
+            _serverState = new UseSkillState()
+            {
+                SimulateSeed = simulateSeed,
+                ItemDataId = skillItem.DataId,
+                Skill = skill,
+                SkillLevel = skillLevel,
+                IsLeftHand = isLeftHand,
+                TargetObjectId = targetObjectId,
+                AimPosition = aimPosition,
+            };
+#endif
+        }
+
         public bool WriteClientUseSkillState(NetDataWriter writer)
         {
-            if (_sendingClientUseSkill)
+            if (_clientState.HasValue && !_clientState.Value.IsInterrupted && !_clientState.Value.UseItem)
             {
-                writer.Put(_sendingSeed);
-                writer.PutPackedInt(_sendingSkillDataId);
-                writer.Put(_sendingIsLeftHand);
-                writer.PutPackedUInt(_sendingTargetObjectId);
-                writer.Put(_sendingAimPosition);
-                _sendingClientUseSkill = false;
+                // Simulate skill using at client
+                UseSkillRoutine(_clientState.Value.SimulateSeed, _clientState.Value.IsLeftHand, _clientState.Value.Skill, _clientState.Value.SkillLevel, _clientState.Value.TargetObjectId, _clientState.Value.AimPosition, _clientState.Value.ItemDataId).Forget();
+                // Send input to server
+                writer.Put(_clientState.Value.SimulateSeed);
+                writer.PutPackedInt(_clientState.Value.Skill.DataId);
+                writer.Put(_clientState.Value.IsLeftHand);
+                writer.PutPackedUInt(_clientState.Value.TargetObjectId);
+                writer.Put(_clientState.Value.AimPosition);
+                // Clear Input
+                _clientState = null;
                 return true;
             }
             return false;
@@ -454,15 +519,19 @@ namespace MultiplayerARPG
 
         public bool WriteServerUseSkillState(NetDataWriter writer)
         {
-            if (_sendingServerUseSkill)
+            if (_serverState.HasValue && !_serverState.Value.IsInterrupted && !_serverState.Value.UseItem)
             {
-                writer.Put(_sendingSeed);
-                writer.PutPackedInt(_sendingSkillDataId);
-                writer.PutPackedInt(_sendingSkillLevel);
-                writer.Put(_sendingIsLeftHand);
-                writer.PutPackedUInt(_sendingTargetObjectId);
-                writer.Put(_sendingAimPosition);
-                _sendingServerUseSkill = false;
+                // Simulate skill using at server
+                UseSkillRoutine(_serverState.Value.SimulateSeed, _serverState.Value.IsLeftHand, _serverState.Value.Skill, _serverState.Value.SkillLevel, _serverState.Value.TargetObjectId, _serverState.Value.AimPosition, _serverState.Value.ItemDataId).Forget();
+                // Send input to client
+                writer.Put(_serverState.Value.SimulateSeed);
+                writer.PutPackedInt(_serverState.Value.Skill.DataId);
+                writer.PutPackedInt(_serverState.Value.SkillLevel);
+                writer.Put(_serverState.Value.IsLeftHand);
+                writer.PutPackedUInt(_serverState.Value.TargetObjectId);
+                writer.Put(_serverState.Value.AimPosition);
+                // Clear Input
+                _serverState = null;
                 return true;
             }
             return false;
@@ -470,14 +539,18 @@ namespace MultiplayerARPG
 
         public bool WriteClientUseSkillItemState(NetDataWriter writer)
         {
-            if (_sendingClientUseSkillItem)
+            if (_clientState.HasValue && !_clientState.Value.IsInterrupted && _clientState.Value.UseItem)
             {
-                writer.Put(_sendingSeed);
-                writer.PutPackedInt(_sendingItemIndex);
-                writer.Put(_sendingIsLeftHand);
-                writer.PutPackedUInt(_sendingTargetObjectId);
-                writer.Put(_sendingAimPosition);
-                _sendingClientUseSkillItem = false;
+                // Simulate skill using at client
+                UseSkillRoutine(_clientState.Value.SimulateSeed, _clientState.Value.IsLeftHand, _clientState.Value.Skill, _clientState.Value.SkillLevel, _clientState.Value.TargetObjectId, _clientState.Value.AimPosition, _clientState.Value.ItemDataId).Forget();
+                // Send input to server
+                writer.Put(_clientState.Value.SimulateSeed);
+                writer.PutPackedInt(_clientState.Value.ItemIndex);
+                writer.Put(_clientState.Value.IsLeftHand);
+                writer.PutPackedUInt(_clientState.Value.TargetObjectId);
+                writer.Put(_clientState.Value.AimPosition);
+                // Clear Input
+                _clientState = null;
                 return true;
             }
             return false;
@@ -492,9 +565,9 @@ namespace MultiplayerARPG
 
         public bool WriteClientUseSkillInterruptedState(NetDataWriter writer)
         {
-            if (_sendingClientUseSkillInterrupted)
+            if (_clientState.HasValue && _clientState.Value.IsInterrupted)
             {
-                _sendingClientUseSkillInterrupted = false;
+                _clientState = null;
                 return true;
             }
             return false;
@@ -502,9 +575,9 @@ namespace MultiplayerARPG
 
         public bool WriteServerUseSkillInterruptedState(NetDataWriter writer)
         {
-            if (_sendingServerUseSkillInterrupted)
+            if (_serverState.HasValue && _serverState.Value.IsInterrupted)
             {
-                _sendingServerUseSkillInterrupted = false;
+                _serverState = null;
                 return true;
             }
             return false;
@@ -518,30 +591,6 @@ namespace MultiplayerARPG
             uint targetObjectId = reader.GetPackedUInt();
             AimPosition aimPosition = reader.Get<AimPosition>();
             ProceedUseSkillStateAtServer(simulateSeed, dataId, isLeftHand, targetObjectId, aimPosition);
-        }
-
-        protected void ProceedUseSkillStateAtServer(byte simulateSeed, int dataId, bool isLeftHand, uint targetObjectId, AimPosition aimPosition)
-        {
-#if UNITY_EDITOR || UNITY_SERVER
-            // Speed hack avoidance
-            if (Time.unscaledTime - LastUseSkillEndTime < -0.05f)
-                return;
-            // Validate skill
-            if (!Entity.ValidateSkillToUse(dataId, isLeftHand, targetObjectId, out BaseSkill skill, out int skillLevel, out _))
-                return;
-            // Set use skill state
-            IsUsingSkill = true;
-            // Play animation at server immediately
-            UseSkillRoutine(simulateSeed, isLeftHand, skill, skillLevel, targetObjectId, aimPosition, null).Forget();
-            // Tell clients to play animation later
-            _sendingServerUseSkill = true;
-            _sendingSeed = simulateSeed;
-            _sendingSkillDataId = dataId;
-            _sendingSkillLevel = skillLevel;
-            _sendingIsLeftHand = isLeftHand;
-            _sendingTargetObjectId = targetObjectId;
-            _sendingAimPosition = aimPosition;
-#endif
         }
 
         public void ReadServerUseSkillStateAtClient(NetDataReader reader)
@@ -571,34 +620,6 @@ namespace MultiplayerARPG
             uint targetObjectId = reader.GetPackedUInt();
             AimPosition aimPosition = reader.Get<AimPosition>();
             ProceedUseSkillItemStateAtServer(simulateSeed, itemIndex, isLeftHand, targetObjectId, aimPosition);
-        }
-
-        protected void ProceedUseSkillItemStateAtServer(byte simulateSeed, int itemIndex, bool isLeftHand, uint targetObjectId, AimPosition aimPosition)
-        {
-#if UNITY_EDITOR || UNITY_SERVER
-            // Speed hack avoidance
-            if (Time.unscaledTime - LastUseSkillEndTime < -0.05f)
-                return;
-            // Validate skill item
-            if (!Entity.ValidateSkillItemToUse(itemIndex, isLeftHand, targetObjectId, out ISkillItem skillItem, out BaseSkill skill, out int skillLevel, out _))
-                return;
-            // Decrease items
-            if (!Entity.DecreaseItemsByIndex(itemIndex, 1, false))
-                return;
-            Entity.FillEmptySlots();
-            // Set use skill state
-            IsUsingSkill = true;
-            // Play animation at server immediately
-            UseSkillRoutine(simulateSeed, isLeftHand, skill, skillLevel, targetObjectId, aimPosition, Entity.NonEquipItems[itemIndex].dataId).Forget();
-            // Tell clients to play animation later
-            _sendingServerUseSkill = true;
-            _sendingSeed = simulateSeed;
-            _sendingSkillDataId = skill.DataId;
-            _sendingSkillLevel = skillLevel;
-            _sendingIsLeftHand = isLeftHand;
-            _sendingTargetObjectId = targetObjectId;
-            _sendingAimPosition = aimPosition;
-#endif
         }
 
         public void ReadServerUseSkillItemStateAtClient(NetDataReader reader)

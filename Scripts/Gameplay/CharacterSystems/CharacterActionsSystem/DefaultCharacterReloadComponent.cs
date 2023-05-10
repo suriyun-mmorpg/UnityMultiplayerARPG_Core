@@ -12,6 +12,13 @@ namespace MultiplayerARPG
         public const float DEFAULT_TOTAL_DURATION = 2f;
         public const float DEFAULT_TRIGGER_DURATION = 1f;
         public const float DEFAULT_STATE_SETUP_DELAY = 1f;
+
+        protected struct ReloadState
+        {
+            public bool IsLeftHand;
+            public int ReloadingAmmoAmount;
+        }
+
         protected readonly List<CancellationTokenSource> _reloadCancellationTokenSources = new List<CancellationTokenSource>();
         public int ReloadingAmmoAmount { get; protected set; }
         public bool IsReloading { get; protected set; }
@@ -24,10 +31,9 @@ namespace MultiplayerARPG
         public float[] ReloadTriggerDurations { get { return _triggerDurations; } set { _triggerDurations = value; } }
         public AnimActionType AnimActionType { get; protected set; }
 
-        protected bool _sendingClientReload;
-        protected bool _sendingServerReload;
-        protected bool _sendingIsLeftHand;
-        protected int _sendingReloadingAmmoAmount;
+        // Network data sending
+        protected ReloadState? _clientState;
+        protected ReloadState? _serverState;
 
         protected virtual void SetReloadActionStates(AnimActionType animActionType, int reloadingAmmoAmount)
         {
@@ -222,43 +228,17 @@ namespace MultiplayerARPG
         {
             if (!IsServer && IsOwnerClient)
             {
-                _sendingClientReload = true;
-                _sendingIsLeftHand = isLeftHand;
-                ReloadRoutine(isLeftHand, 0).Forget();
+                // Prepare state data which will be sent to server
+                _clientState = new ReloadState()
+                {
+                    IsLeftHand = isLeftHand,
+                };
             }
             else if (IsOwnerClientOrOwnedByServer)
             {
+                // Reload immediately at server
                 ProceedReloadStateAtServer(isLeftHand);
             }
-        }
-
-        public bool WriteClientReloadState(NetDataWriter writer)
-        {
-            if (_sendingClientReload)
-            {
-                writer.Put(_sendingIsLeftHand);
-                _sendingClientReload = false;
-                return true;
-            }
-            return false;
-        }
-
-        public bool WriteServerReloadState(NetDataWriter writer)
-        {
-            if (_sendingServerReload)
-            {
-                writer.Put(_sendingIsLeftHand);
-                writer.PutPackedInt(_sendingReloadingAmmoAmount);
-                _sendingServerReload = false;
-                return true;
-            }
-            return false;
-        }
-
-        public void ReadClientReloadStateAtServer(NetDataReader reader)
-        {
-            bool isLeftHand = reader.GetBool();
-            ProceedReloadStateAtServer(isLeftHand);
         }
 
         private void ProceedReloadStateAtServer(bool isLeftHand)
@@ -285,15 +265,50 @@ namespace MultiplayerARPG
                 reloadingAmmoAmount = inventoryAmount;
             if (reloadingAmmoAmount <= 0)
                 return;
-            // Set reload state
-            IsReloading = true;
-            // Play animation at server immediately
-            ReloadRoutine(isLeftHand, reloadingAmmoAmount).Forget();
-            // Tell clients to play animation later
-            _sendingServerReload = true;
-            _sendingIsLeftHand = isLeftHand;
-            _sendingReloadingAmmoAmount = reloadingAmmoAmount;
+            // Prepare state data which will be sent to clients
+            _serverState = new ReloadState()
+            {
+                IsLeftHand = isLeftHand,
+                ReloadingAmmoAmount = reloadingAmmoAmount,
+            };
 #endif
+        }
+
+        public bool WriteClientReloadState(NetDataWriter writer)
+        {
+            if (_clientState.HasValue)
+            {
+                // Simulate reloading at client
+                ReloadRoutine(_clientState.Value.IsLeftHand, 0).Forget();
+                // Send input to server
+                writer.Put(_clientState.Value.IsLeftHand);
+                // Clear Input
+                _clientState = null;
+                return true;
+            }
+            return false;
+        }
+
+        public bool WriteServerReloadState(NetDataWriter writer)
+        {
+            if (_serverState.HasValue)
+            {
+                // Simulate reloading at server
+                ReloadRoutine(_serverState.Value.IsLeftHand, _serverState.Value.ReloadingAmmoAmount).Forget();
+                // Send input to client
+                writer.Put(_serverState.Value.IsLeftHand);
+                writer.PutPackedInt(_serverState.Value.ReloadingAmmoAmount);
+                // Clear Input
+                _serverState = null;
+                return true;
+            }
+            return false;
+        }
+
+        public void ReadClientReloadStateAtServer(NetDataReader reader)
+        {
+            bool isLeftHand = reader.GetBool();
+            ProceedReloadStateAtServer(isLeftHand);
         }
 
         public void ReadServerReloadStateAtClient(NetDataReader reader)
@@ -302,7 +317,7 @@ namespace MultiplayerARPG
             int reloadingAmmoAmount = reader.GetPackedInt();
             if (IsOwnerClientOrOwnedByServer)
             {
-                // Don't play reload animation again (it already played in `Reload` function)
+                // Don't play reload animation again (it already done in `Reload` function)
                 return;
             }
             // Play reload animation at client
