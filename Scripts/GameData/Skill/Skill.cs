@@ -66,7 +66,7 @@ namespace MultiplayerARPG
             }
         }
 
-        protected override void ApplySkillImplement(BaseCharacterEntity skillUser, int skillLevel, bool isLeftHand, CharacterItem weapon, int hitIndex, Dictionary<DamageElement, MinMaxFloat> damageAmounts, uint targetObjectId, AimPosition aimPosition, int randomSeed)
+        protected override void ApplySkillImplement(BaseCharacterEntity skillUser, int skillLevel, bool isLeftHand, CharacterItem weapon, int triggerIndex, Dictionary<DamageElement, MinMaxFloat> damageAmounts, uint targetObjectId, AimPosition aimPosition, int randomSeed)
         {
             // Craft item
             if (skillType == SkillType.CraftItem &&
@@ -99,12 +99,8 @@ namespace MultiplayerARPG
             }
 
             // Apply attack skill
-            if (IsAttack)
+            if (IsAttack && TryGetDamageInfo(skillUser, isLeftHand, out DamageInfo damageInfo))
             {
-                DamageInfo damageInfo = GetDamageInfo(skillUser, isLeftHand);
-                // Prepare hit reg validatation, hit reg will be made from client later
-                if (skillUser.IsServer && !skillUser.IsOwnerClient && !skillUser.IsOwnedByServer)
-                    BaseGameNetworkManager.Singleton.HitRegistrationManager.PrepareHitRegValidatation(damageInfo, randomSeed, 0, skillUser, damageAmounts, weapon, this, skillLevel);
                 // Launch damage entity to apply damage to other characters
                 damageInfo.LaunchDamageEntity(
                     skillUser,
@@ -206,18 +202,6 @@ namespace MultiplayerARPG
             skillUser.Mount(mount.MountEntity);
         }
 
-        protected DamageInfo GetDamageInfo(BaseCharacterEntity skillUser, bool isLeftHand)
-        {
-            switch (skillAttackType)
-            {
-                case SkillAttackType.Normal:
-                    return damageInfo;
-                case SkillAttackType.BasedOnWeapon:
-                    return skillUser.GetWeaponDamageInfo(ref isLeftHand);
-            }
-            return default;
-        }
-
         public override SkillType SkillType
         {
             get { return skillType; }
@@ -240,20 +224,16 @@ namespace MultiplayerARPG
 
         public override float GetCastDistance(BaseCharacterEntity skillUser, int skillLevel, bool isLeftHand)
         {
-            if (!IsAttack)
-                return buffDistance.GetAmount(skillLevel);
-            if (skillAttackType == SkillAttackType.Normal)
-                return GetDamageInfo(skillUser, isLeftHand).GetDistance();
-            return skillUser.GetAttackDistance(isLeftHand);
+            if (TryGetDamageInfo(skillUser, isLeftHand, out DamageInfo damageInfo))
+                return damageInfo.GetDistance();
+            return buffDistance.GetAmount(skillLevel);
         }
 
         public override float GetCastFov(BaseCharacterEntity skillUser, int skillLevel, bool isLeftHand)
         {
-            if (!IsAttack)
-                return 360f;
-            if (skillAttackType == SkillAttackType.Normal)
-                return GetDamageInfo(skillUser, isLeftHand).GetFov();
-            return skillUser.GetAttackFov(isLeftHand);
+            if (TryGetDamageInfo(skillUser, isLeftHand, out DamageInfo damageInfo))
+                return damageInfo.GetFov();
+            return 360f;
         }
 
         public override KeyValuePair<DamageElement, MinMaxFloat> GetBaseAttackDamageAmount(ICharacterData skillUser, int skillLevel, bool isLeftHand)
@@ -287,14 +267,14 @@ namespace MultiplayerARPG
             return increaseDamageAmountsWithBuffs;
         }
 
-        public override HarvestType GetHarvestType()
+        public override HarvestType HarvestType
         {
-            return harvestType;
+            get { return harvestType; }
         }
 
-        public override IncrementalMinMaxFloat GetHarvestDamageAmount()
+        public override IncrementalMinMaxFloat HarvestDamageAmount
         {
-            return harvestDamageAmount;
+            get { return harvestDamageAmount; }
         }
 
         protected float GetEffectivenessDamage(ICharacterData skillUser)
@@ -342,6 +322,21 @@ namespace MultiplayerARPG
             get { return skillBuffType == SkillBuffType.BuffToTarget; }
         }
 
+        public override bool TryGetDamageInfo(BaseCharacterEntity skillUser, bool isLeftHand, out DamageInfo damageInfo)
+        {
+            switch (skillAttackType)
+            {
+                case SkillAttackType.Normal:
+                    damageInfo = this.damageInfo;
+                    return true;
+                case SkillAttackType.BasedOnWeapon:
+                    damageInfo = skillUser.GetWeaponDamageInfo(ref isLeftHand);
+                    return true;
+            }
+            damageInfo = this.damageInfo;
+            return true;
+        }
+
         public override void PrepareRelatesData()
         {
             base.PrepareRelatesData();
@@ -355,8 +350,8 @@ namespace MultiplayerARPG
 
         public override Transform GetApplyTransform(BaseCharacterEntity skillUser, bool isLeftHand)
         {
-            if (IsAttack)
-                return GetDamageInfo(skillUser, isLeftHand).GetDamageTransform(skillUser, isLeftHand);
+            if (TryGetDamageInfo(skillUser, isLeftHand, out DamageInfo damageInfo))
+                return damageInfo.GetDamageTransform(skillUser, isLeftHand);
             return base.GetApplyTransform(skillUser, isLeftHand);
         }
 

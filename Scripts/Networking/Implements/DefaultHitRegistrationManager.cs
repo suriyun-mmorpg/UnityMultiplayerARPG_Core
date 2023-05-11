@@ -11,7 +11,7 @@ namespace MultiplayerARPG
         private static Dictionary<string, List<HitRegisterData>> registerHits = new Dictionary<string, List<HitRegisterData>>();
         private static Dictionary<string, HitValidateData> validateHits = new Dictionary<string, HitValidateData>();
 
-        public void PrepareHitRegValidatation(DamageInfo damageInfo, int randomSeed, byte fireSpread, BaseCharacterEntity attacker, Dictionary<DamageElement, MinMaxFloat> damageAmounts, CharacterItem weapon, BaseSkill skill, int skillLevel)
+        public void PrepareHitRegValidatation(BaseCharacterEntity attacker, int randomSeed, float[] triggerDurations, byte fireSpread, DamageInfo damageInfo, Dictionary<DamageElement, MinMaxFloat> damageAmounts, CharacterItem weapon, BaseSkill skill, int skillLevel)
         {
             // Only server can prepare hit registration
             if (attacker == null || !BaseGameNetworkManager.Singleton.IsServer)
@@ -139,6 +139,11 @@ namespace MultiplayerARPG
                 }
                 prepareHits.Clear();
             }
+        }
+
+        public int GetApplySeed(int simulateSeed, int hitIndex)
+        {
+            return unchecked(simulateSeed + (hitIndex * 16));
         }
 
         private static string MakeId(string attackerId, int randomSeed)

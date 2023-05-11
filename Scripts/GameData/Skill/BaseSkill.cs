@@ -400,17 +400,34 @@ namespace MultiplayerARPG
         public abstract Dictionary<DamageElement, MinMaxFloat> GetAttackAdditionalDamageAmounts(ICharacterData skillUser, int skillLevel);
         public virtual bool RequiredTarget { get { return false; } }
         public virtual bool IsIncreaseAttackDamageAmountsWithBuffs(ICharacterData skillUser, int skillLevel) { return false; }
-        public virtual HarvestType GetHarvestType() { return HarvestType.None; }
-        public virtual IncrementalMinMaxFloat GetHarvestDamageAmount() { return new IncrementalMinMaxFloat(); }
-        public virtual bool HasCustomAimControls() { return false; }
-        public virtual AimPosition UpdateAimControls(Vector2 aimAxes, params object[] data) { return default; }
-        public virtual void FinishAimControls(bool isCancel) { }
-        public virtual bool IsChanneledAbility() { return false; }
+        public virtual HarvestType HarvestType { get { return HarvestType.None; } }
+        public virtual IncrementalMinMaxFloat HarvestDamageAmount { get { return new IncrementalMinMaxFloat(); } }
         public virtual Buff Buff { get { return Buff.Empty; } }
         public virtual Buff Debuff { get { return Buff.Empty; } }
         public virtual SkillSummon Summon { get { return SkillSummon.Empty; } }
         public virtual SkillMount Mount { get { return SkillMount.Empty; } }
         public virtual ItemCraft ItemCraft { get { return ItemCraft.Empty; } }
+
+        #region ICustomAimController implements
+        public virtual bool HasCustomAimControls()
+        {
+            return false;
+        }
+
+        public virtual AimPosition UpdateAimControls(Vector2 aimAxes, params object[] data)
+        {
+            return default;
+        }
+
+        public virtual void FinishAimControls(bool isCancel)
+        {
+        }
+
+        public virtual bool IsChanneledAbility()
+        {
+            return false;
+        }
+        #endregion
 
         public bool IsActive
         {
@@ -477,7 +494,7 @@ namespace MultiplayerARPG
         /// <param name="skillLevel"></param>
         /// <param name="isLeftHand"></param>
         /// <param name="weapon"></param>
-        /// <param name="hitIndex"></param>
+        /// <param name="triggerIndex"></param>
         /// <param name="damageAmounts"></param>
         /// <param name="targetObjectId"></param>
         /// <param name="aimPosition"></param>
@@ -488,7 +505,7 @@ namespace MultiplayerARPG
             int skillLevel,
             bool isLeftHand,
             CharacterItem weapon,
-            int hitIndex,
+            int triggerIndex,
             Dictionary<DamageElement, MinMaxFloat> damageAmounts,
             uint targetObjectId,
             AimPosition aimPosition,
@@ -514,7 +531,7 @@ namespace MultiplayerARPG
                 skillLevel,
                 isLeftHand,
                 weapon,
-                hitIndex,
+                triggerIndex,
                 damageAmounts,
                 targetObjectId,
                 aimPosition,
@@ -552,7 +569,7 @@ namespace MultiplayerARPG
         /// <param name="skillLevel"></param>
         /// <param name="isLeftHand"></param>
         /// <param name="weapon"></param>
-        /// <param name="hitIndex"></param>
+        /// <param name="triggerIndex"></param>
         /// <param name="damageAmounts"></param>
         /// <param name="aimPosition"></param>
         /// <returns></returns>
@@ -561,7 +578,7 @@ namespace MultiplayerARPG
             int skillLevel,
             bool isLeftHand,
             CharacterItem weapon,
-            int hitIndex,
+            int triggerIndex,
             Dictionary<DamageElement, MinMaxFloat> damageAmounts,
             AimPosition aimPosition)
         {
@@ -886,6 +903,12 @@ namespace MultiplayerARPG
                     return false;
             }
             return true;
+        }
+
+        public virtual bool TryGetDamageInfo(BaseCharacterEntity skillUser, bool isLeftHand, out DamageInfo damageInfo)
+        {
+            damageInfo = default;
+            return false;
         }
 
         public virtual Transform GetApplyTransform(BaseCharacterEntity skillUser, bool isLeftHand)

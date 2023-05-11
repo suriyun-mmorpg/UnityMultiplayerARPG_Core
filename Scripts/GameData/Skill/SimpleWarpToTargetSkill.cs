@@ -6,7 +6,7 @@ namespace MultiplayerARPG
     [CreateAssetMenu(fileName = GameDataMenuConsts.SIMPLE_WARP_TO_TARGET_SKILL_FILE, menuName = GameDataMenuConsts.SIMPLE_WARP_TO_TARGET_SKILL_MENU, order = GameDataMenuConsts.SIMPLE_WARP_TO_TARGET_SKILL_ORDER)]
     public class SimpleWarpToTargetSkill : BaseAreaSkill
     {
-        protected override void ApplySkillImplement(BaseCharacterEntity skillUser, int skillLevel, bool isLeftHand, CharacterItem weapon, int hitIndex, Dictionary<DamageElement, MinMaxFloat> damageAmounts, uint targetObjectId, AimPosition aimPosition, int randomSeed)
+        protected override void ApplySkillImplement(BaseCharacterEntity skillUser, int skillLevel, bool isLeftHand, CharacterItem weapon, int triggerIndex, Dictionary<DamageElement, MinMaxFloat> damageAmounts, uint targetObjectId, AimPosition aimPosition, int randomSeed)
         {
             // Teleport to aim position
             skillUser.Teleport(aimPosition.position, skillUser.MovementTransform.rotation);

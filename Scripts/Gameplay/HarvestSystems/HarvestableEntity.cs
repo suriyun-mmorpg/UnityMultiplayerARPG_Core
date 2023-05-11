@@ -116,7 +116,7 @@ namespace MultiplayerARPG
             HarvestType skillHarvestType = HarvestType.BasedOnWeapon;
             if (skill != null && skillLevel > 0)
             {
-                skillHarvestType = skill.GetHarvestType();
+                skillHarvestType = skill.HarvestType;
             }
             // Get randomizer and random damage
             WeightedRandomizer<ItemDropForHarvestable> itemRandomizer = null;
@@ -139,7 +139,7 @@ namespace MultiplayerARPG
                         if (harvestable.CacheSkillHarvestEffectivenesses.TryGetValue(skill, out skillHarvestEffectiveness) &&
                             harvestable.CacheSkillHarvestItems.TryGetValue(skill, out itemRandomizer))
                         {
-                            calculatingTotalDamage = skill.GetHarvestDamageAmount().GetAmount(skillLevel).Random(randomSeed) * skillHarvestEffectiveness.damageEffectiveness;
+                            calculatingTotalDamage = skill.HarvestDamageAmount.GetAmount(skillLevel).Random(randomSeed) * skillHarvestEffectiveness.damageEffectiveness;
                         }
                     }
                     break;

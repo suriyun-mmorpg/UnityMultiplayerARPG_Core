@@ -30,18 +30,19 @@ namespace MultiplayerARPG
         [Category(4, "Warp Settings")]
         public bool isWarpToAimPosition;
 
-        private Dictionary<Attribute, float> cacheEffectivenessAttributes;
+        [System.NonSerialized]
+        private Dictionary<Attribute, float> _cacheEffectivenessAttributes;
         public Dictionary<Attribute, float> CacheEffectivenessAttributes
         {
             get
             {
-                if (cacheEffectivenessAttributes == null)
-                    cacheEffectivenessAttributes = GameDataHelpers.CombineDamageEffectivenessAttributes(effectivenessAttributes, new Dictionary<Attribute, float>());
-                return cacheEffectivenessAttributes;
+                if (_cacheEffectivenessAttributes == null)
+                    _cacheEffectivenessAttributes = GameDataHelpers.CombineDamageEffectivenessAttributes(effectivenessAttributes, new Dictionary<Attribute, float>());
+                return _cacheEffectivenessAttributes;
             }
         }
 
-        protected override void ApplySkillImplement(BaseCharacterEntity skillUser, int skillLevel, bool isLeftHand, CharacterItem weapon, int hitIndex, Dictionary<DamageElement, MinMaxFloat> damageAmounts, uint targetObjectId, AimPosition aimPosition, int randomSeed)
+        protected override void ApplySkillImplement(BaseCharacterEntity skillUser, int skillLevel, bool isLeftHand, CharacterItem weapon, int triggerIndex, Dictionary<DamageElement, MinMaxFloat> damageAmounts, uint targetObjectId, AimPosition aimPosition, int randomSeed)
         {
             if (BaseGameNetworkManager.Singleton.IsServer)
             {
@@ -87,14 +88,14 @@ namespace MultiplayerARPG
             return increaseDamageAmountsWithBuffs;
         }
 
-        public override HarvestType GetHarvestType()
+        public override HarvestType HarvestType
         {
-            return harvestType;
+            get { return harvestType; }
         }
 
-        public override IncrementalMinMaxFloat GetHarvestDamageAmount()
+        public override IncrementalMinMaxFloat HarvestDamageAmount
         {
-            return harvestDamageAmount;
+            get { return harvestDamageAmount; }
         }
 
         protected float GetEffectivenessDamage(ICharacterData skillUser)

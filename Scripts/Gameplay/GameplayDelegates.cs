@@ -41,7 +41,7 @@ namespace MultiplayerARPG
     public delegate void AttackRoutineDelegate(
         bool isLeftHand,
         CharacterItem weapon,
-        int hitIndex,
+        int triggerIndex,
         DamageInfo damageInfo,
         Dictionary<DamageElement, MinMaxFloat> damageAmounts,
         AimPosition aimPosition);
@@ -51,7 +51,7 @@ namespace MultiplayerARPG
         int level,
         bool isLeftHand,
         CharacterItem weapon,
-        int hitIndex,
+        int triggerIndex,
         Dictionary<DamageElement, MinMaxFloat> damageAmounts,
         uint targetObjectId,
         AimPosition aimPosition);

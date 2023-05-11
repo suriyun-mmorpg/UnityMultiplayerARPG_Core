@@ -59,13 +59,13 @@ namespace MultiplayerARPG
         public void OnAttackRoutine(
             bool isLeftHand,
             CharacterItem weapon,
-            int hitIndex,
+            int triggerIndex,
             DamageInfo damageInfo,
             Dictionary<DamageElement, MinMaxFloat> damageAmounts,
             AimPosition aimPosition)
         {
             if (onAttackRoutine != null)
-                onAttackRoutine.Invoke(isLeftHand, weapon, hitIndex, damageInfo, damageAmounts, aimPosition);
+                onAttackRoutine.Invoke(isLeftHand, weapon, triggerIndex, damageInfo, damageAmounts, aimPosition);
         }
 
         public void OnUseSkillRoutine(
@@ -73,13 +73,13 @@ namespace MultiplayerARPG
             int level,
             bool isLeftHand,
             CharacterItem weapon,
-            int hitIndex,
+            int triggerIndex,
             Dictionary<DamageElement, MinMaxFloat> damageAmounts,
             uint targetObjectId,
             AimPosition aimPosition)
         {
             if (onUseSkillRoutine != null)
-                onUseSkillRoutine.Invoke(skill, level, isLeftHand, weapon, hitIndex, damageAmounts, targetObjectId, aimPosition);
+                onUseSkillRoutine.Invoke(skill, level, isLeftHand, weapon, triggerIndex, damageAmounts, targetObjectId, aimPosition);
         }
 
         public void OnLaunchDamageEntity(
