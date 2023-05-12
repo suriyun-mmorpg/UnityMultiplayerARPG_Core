@@ -505,7 +505,7 @@ namespace MultiplayerARPG
                 // Simulate skill using at client
                 UseSkillRoutine(_clientState.Value.SimulateSeed, _clientState.Value.IsLeftHand, _clientState.Value.Skill, _clientState.Value.SkillLevel, _clientState.Value.TargetObjectId, _clientState.Value.AimPosition, _clientState.Value.ItemDataId).Forget();
                 // Send input to server
-                writer.Put(_clientState.Value.SimulateSeed);
+                writer.PutPackedInt(_clientState.Value.SimulateSeed);
                 writer.PutPackedInt(_clientState.Value.Skill.DataId);
                 writer.Put(_clientState.Value.IsLeftHand);
                 writer.PutPackedUInt(_clientState.Value.TargetObjectId);
@@ -524,7 +524,7 @@ namespace MultiplayerARPG
                 // Simulate skill using at server
                 UseSkillRoutine(_serverState.Value.SimulateSeed, _serverState.Value.IsLeftHand, _serverState.Value.Skill, _serverState.Value.SkillLevel, _serverState.Value.TargetObjectId, _serverState.Value.AimPosition, _serverState.Value.ItemDataId).Forget();
                 // Send input to client
-                writer.Put(_serverState.Value.SimulateSeed);
+                writer.PutPackedInt(_serverState.Value.SimulateSeed);
                 writer.PutPackedInt(_serverState.Value.Skill.DataId);
                 writer.PutPackedInt(_serverState.Value.SkillLevel);
                 writer.Put(_serverState.Value.IsLeftHand);
@@ -544,7 +544,7 @@ namespace MultiplayerARPG
                 // Simulate skill using at client
                 UseSkillRoutine(_clientState.Value.SimulateSeed, _clientState.Value.IsLeftHand, _clientState.Value.Skill, _clientState.Value.SkillLevel, _clientState.Value.TargetObjectId, _clientState.Value.AimPosition, _clientState.Value.ItemDataId).Forget();
                 // Send input to server
-                writer.Put(_clientState.Value.SimulateSeed);
+                writer.PutPackedInt(_clientState.Value.SimulateSeed);
                 writer.PutPackedInt(_clientState.Value.ItemIndex);
                 writer.Put(_clientState.Value.IsLeftHand);
                 writer.PutPackedUInt(_clientState.Value.TargetObjectId);
@@ -606,7 +606,7 @@ namespace MultiplayerARPG
                 // Don't play use skill animation again (it already played in `UseSkill` and `UseSkillItem` function)
                 return;
             }
-            if (!GameInstance.Skills.TryGetValue(skillDataId, out BaseSkill skill) && skillLevel > 0)
+            if (GameInstance.Skills.TryGetValue(skillDataId, out BaseSkill skill) && skillLevel > 0)
                 ClearUseSkillStates();
             Entity.AttackComponent.CancelAttack();
             UseSkillRoutine(simulateSeed, isLeftHand, skill, skillLevel, targetObjectId, aimPosition, null).Forget();
