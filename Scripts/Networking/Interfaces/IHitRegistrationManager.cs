@@ -5,10 +5,11 @@ namespace MultiplayerARPG
 {
     public interface IHitRegistrationManager
     {
-        void PrepareHitRegValidatation(BaseCharacterEntity attacker, int randomSeed, float[] triggerDurations, byte fireSpread, DamageInfo damageInfo, Dictionary<DamageElement, MinMaxFloat> damageAmounts, CharacterItem weapon, BaseSkill skill, int skillLevel);
-        void Register(BaseCharacterEntity attacker, HitRegisterMessage message);
-        void PrepareToRegister(DamageInfo damageInfo, int randomSeed, BaseCharacterEntity attacker, Vector3 damagePosition, Vector3 damageDirection, List<HitData> hitDataCollection);
+        void PrepareHitRegValidatation(BaseGameEntity attacker, int randomSeed, float[] triggerDurations, byte fireSpread, DamageInfo damageInfo, Dictionary<DamageElement, MinMaxFloat> damageAmounts, CharacterItem weapon, BaseSkill skill, int skillLevel);
+        void PrepareHitRegOrigin(BaseGameEntity attacker, int randomSeed, byte triggerIndex, byte spreadIndex, Vector3 position, Vector3 direction);
+        void PrepareToRegister(int randomSeed, byte triggerIndex, byte spreadIndex, uint objectId, byte hitBoxIndex, Vector3 hitPoint);
         void SendHitRegToServer();
-        int GetApplySeed(int randomSeed, int triggerIndex);
+        void Register(BaseGameEntity attacker, HitRegisterMessage message);
+        void ClearData();
     }
 }

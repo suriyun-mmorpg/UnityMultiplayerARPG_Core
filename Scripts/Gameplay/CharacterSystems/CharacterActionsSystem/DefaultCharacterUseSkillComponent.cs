@@ -17,7 +17,7 @@ namespace MultiplayerARPG
         protected struct UseSkillState
         {
             public bool IsInterrupted;
-            public byte SimulateSeed;
+            public int SimulateSeed;
             public bool UseItem;
             public int ItemIndex;
             public int? ItemDataId;
@@ -111,7 +111,7 @@ namespace MultiplayerARPG
             }
         }
 
-        protected async UniTaskVoid UseSkillRoutine(byte simulateSeed, bool isLeftHand, BaseSkill skill, int skillLevel, uint targetObjectId, AimPosition skillAimPosition, int? itemDataId)
+        protected async UniTaskVoid UseSkillRoutine(int simulateSeed, bool isLeftHand, BaseSkill skill, int skillLevel, uint targetObjectId, AimPosition skillAimPosition, int? itemDataId)
         {
             // Prepare cancellation
             CancellationTokenSource skillCancellationTokenSource = new CancellationTokenSource();
@@ -249,7 +249,7 @@ namespace MultiplayerARPG
                     HitRegistrationManager.PrepareHitRegValidatation(Entity, simulateSeed, _triggerDurations, 0, damageInfo, damageAmounts, weapon, skill, skillLevel);
 
                 float tempTriggerDuration;
-                for (int triggerIndex = 0; triggerIndex < _triggerDurations.Length; ++triggerIndex)
+                for (byte triggerIndex = 0; triggerIndex < _triggerDurations.Length; ++triggerIndex)
                 {
                     // Play special effects after trigger duration
                     tempTriggerDuration = _triggerDurations[triggerIndex];
@@ -278,7 +278,7 @@ namespace MultiplayerARPG
                         aimPosition = Entity.AimPosition;
 
                     // Trigger skill event
-                    Entity.OnUseSkillRoutine(skill, skillLevel, isLeftHand, weapon, triggerIndex, damageAmounts, targetObjectId, aimPosition);
+                    Entity.OnUseSkillRoutine(skill, skillLevel, isLeftHand, weapon, simulateSeed, triggerIndex, damageAmounts, targetObjectId, aimPosition);
 
                     // Apply skill buffs, summons and attack damages
                     if (IsOwnerClientOrOwnedByServer)
@@ -294,7 +294,7 @@ namespace MultiplayerARPG
                         simulateData.skillDataId = skill.DataId;
                         simulateData.skillLevel = skillLevel;
                         simulateData.aimPosition = aimPosition;
-                        RPC(AllSimulateActionTrigger, BaseGameEntity.SERVER_STATE_DATA_CHANNEL, DeliveryMethod.ReliableOrdered, simulateData);
+                        RPC(AllSimulateActionTrigger, BaseGameEntity.STATE_DATA_CHANNEL, DeliveryMethod.ReliableOrdered, simulateData);
                     }
 
                     if (remainsDuration <= 0f)
@@ -339,31 +339,34 @@ namespace MultiplayerARPG
             }
         }
 
-        protected virtual void ApplySkillUsing(BaseSkill skill, int skillLevel, bool isLeftHand, CharacterItem weapon, int simulateSeed, int triggerIndex, Dictionary<DamageElement, MinMaxFloat> damageAmounts, uint targetObjectId, AimPosition aimPosition)
+        protected virtual void ApplySkillUsing(BaseSkill skill, int skillLevel, bool isLeftHand, CharacterItem weapon, int simulateSeed, byte triggerIndex, Dictionary<DamageElement, MinMaxFloat> damageAmounts, uint targetObjectId, AimPosition aimPosition)
         {
-            int applySeed = HitRegistrationManager.GetApplySeed(simulateSeed, triggerIndex);
             skill.ApplySkill(
                 Entity,
                 skillLevel,
                 isLeftHand,
                 weapon,
+                simulateSeed,
                 triggerIndex,
                 damageAmounts,
                 targetObjectId,
                 aimPosition,
-                applySeed,
                 OnAttackOriginPrepared,
                 OnAttackHit);
         }
 
-        protected virtual void OnAttackOriginPrepared(int triggerIndex, Vector3 position, Vector3 direction, Quaternion rotation)
+        protected virtual void OnAttackOriginPrepared(int simulateSeed, byte triggerIndex, byte spreadIndex, Vector3 position, Vector3 direction, Quaternion rotation)
         {
-
+            if (!IsServer || IsOwnerClientOrOwnedByServer)
+                return;
+            HitRegistrationManager.PrepareHitRegOrigin(Entity, simulateSeed, triggerIndex, spreadIndex, position, direction);
         }
 
-        protected virtual void OnAttackHit(int triggerIndex, uint objectId, int hitboxIndex)
+        protected virtual void OnAttackHit(int simulateSeed, byte triggerIndex, byte spreadIndex, uint objectId, byte hitboxIndex, Vector3 hitPoint)
         {
-
+            if (IsServer || !IsOwnerClient)
+                return;
+            HitRegistrationManager.PrepareToRegister(simulateSeed, triggerIndex, spreadIndex, objectId, hitboxIndex, hitPoint);
         }
 
         [AllRpc]
@@ -371,7 +374,6 @@ namespace MultiplayerARPG
         {
             if (IsOwnerClientOrOwnedByServer)
                 return;
-            int applySeed = HitRegistrationManager.GetApplySeed(data.simulateSeed, data.triggerIndex);
             bool isLeftHand = data.state.HasFlag(SimulateActionTriggerState.IsLeftHand);
             BaseSkill skill = data.GetSkill();
             if (skill == null)
@@ -389,7 +391,7 @@ namespace MultiplayerARPG
                 if (!Entity.ValidateSkillToUse(dataId, isLeftHand, targetObjectId, out BaseSkill skill, out int skillLevel, out _))
                     return;
                 // Get simulate seed for simulation validating
-                byte simulateSeed = (byte)Random.Range(byte.MinValue, byte.MaxValue);
+                int simulateSeed = Random.Range(int.MinValue, int.MaxValue);
                 // Prepare state data which will be sent to server
                 _clientState = new UseSkillState()
                 {
@@ -404,13 +406,13 @@ namespace MultiplayerARPG
             else if (IsOwnerClientOrOwnedByServer)
             {
                 // Get simulate seed for simulation validating
-                byte simulateSeed = (byte)Random.Range(byte.MinValue, byte.MaxValue);
+                int simulateSeed = Random.Range(int.MinValue, int.MaxValue);
                 // Use skill immediately at server
                 ProceedUseSkillStateAtServer(simulateSeed, dataId, isLeftHand, targetObjectId, aimPosition);
             }
         }
 
-        protected void ProceedUseSkillStateAtServer(byte simulateSeed, int dataId, bool isLeftHand, uint targetObjectId, AimPosition aimPosition)
+        protected void ProceedUseSkillStateAtServer(int simulateSeed, int dataId, bool isLeftHand, uint targetObjectId, AimPosition aimPosition)
         {
 #if UNITY_EDITOR || UNITY_SERVER
             // Speed hack avoidance
@@ -445,7 +447,7 @@ namespace MultiplayerARPG
                 // Update using time
                 Entity.LastUseItemTime = Time.unscaledTime;
                 // Get simulate seed for simulation validating
-                byte simulateSeed = (byte)Random.Range(byte.MinValue, byte.MaxValue);
+                int simulateSeed = Random.Range(int.MinValue, int.MaxValue);
                 // Prepare state data which will be sent to server
                 _clientState = new UseSkillState()
                 {
@@ -463,13 +465,13 @@ namespace MultiplayerARPG
             else if (IsOwnerClientOrOwnedByServer)
             {
                 // Get simulate seed for simulation validating
-                byte simulateSeed = (byte)Random.Range(byte.MinValue, byte.MaxValue);
+                int simulateSeed = Random.Range(int.MinValue, int.MaxValue);
                 // Use skill immediately at server
                 ProceedUseSkillItemStateAtServer(simulateSeed, itemIndex, isLeftHand, targetObjectId, aimPosition);
             }
         }
 
-        protected void ProceedUseSkillItemStateAtServer(byte simulateSeed, int itemIndex, bool isLeftHand, uint targetObjectId, AimPosition aimPosition)
+        protected void ProceedUseSkillItemStateAtServer(int simulateSeed, int itemIndex, bool isLeftHand, uint targetObjectId, AimPosition aimPosition)
         {
 #if UNITY_EDITOR || UNITY_SERVER
             // Speed hack avoidance
@@ -583,7 +585,7 @@ namespace MultiplayerARPG
 
         public void ReadClientUseSkillStateAtServer(NetDataReader reader)
         {
-            byte simulateSeed = reader.GetByte();
+            int simulateSeed = reader.GetPackedInt();
             int dataId = reader.GetPackedInt();
             bool isLeftHand = reader.GetBool();
             uint targetObjectId = reader.GetPackedUInt();
@@ -593,7 +595,7 @@ namespace MultiplayerARPG
 
         public void ReadServerUseSkillStateAtClient(NetDataReader reader)
         {
-            byte simulateSeed = reader.GetByte();
+            int simulateSeed = reader.GetPackedInt();
             int skillDataId = reader.GetPackedInt();
             int skillLevel = reader.GetPackedInt();
             bool isLeftHand = reader.GetBool();
@@ -612,7 +614,7 @@ namespace MultiplayerARPG
 
         public void ReadClientUseSkillItemStateAtServer(NetDataReader reader)
         {
-            byte simulateSeed = reader.GetByte();
+            int simulateSeed = reader.GetPackedInt();
             int itemIndex = reader.GetPackedInt();
             bool isLeftHand = reader.GetBool();
             uint targetObjectId = reader.GetPackedUInt();

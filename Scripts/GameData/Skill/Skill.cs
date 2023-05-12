@@ -71,13 +71,14 @@ namespace MultiplayerARPG
             int skillLevel,
             bool isLeftHand,
             CharacterItem weapon,
-            int triggerIndex,
+            int simulateSeed,
+            byte triggerIndex,
+            byte spreadIndex,
             Dictionary<DamageElement, MinMaxFloat> damageAmounts,
             uint targetObjectId,
             AimPosition aimPosition,
-            int randomSeed,
-            System.Action<int, Vector3, Vector3, Quaternion> onAttackOriginPrepared,
-            System.Action<int, uint, int> onAttackHit)
+            DamageOriginPreparedDelegate onDamageOriginPrepared,
+            DamageHitDelegate onDamageHit)
         {
             // Craft item
             if (skillType == SkillType.CraftItem &&
@@ -117,15 +118,16 @@ namespace MultiplayerARPG
                     skillUser,
                     isLeftHand,
                     weapon,
+                    simulateSeed,
                     triggerIndex,
+                    spreadIndex,
+                    Vector3.zero,
                     damageAmounts,
                     this,
                     skillLevel,
-                    randomSeed,
                     aimPosition,
-                    Vector3.zero,
-                    onAttackOriginPrepared,
-                    onAttackHit);
+                    onDamageOriginPrepared,
+                    onDamageHit);
             }
         }
 

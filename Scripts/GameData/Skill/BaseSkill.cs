@@ -515,26 +515,26 @@ namespace MultiplayerARPG
         /// <param name="skillLevel"></param>
         /// <param name="isLeftHand"></param>
         /// <param name="weapon"></param>
+        /// <param name="simulateSeed"></param>
         /// <param name="triggerIndex"></param>
         /// <param name="damageAmounts"></param>
         /// <param name="targetObjectId"></param>
         /// <param name="aimPosition"></param>
-        /// <param name="randomSeed"></param>
-        /// <param name="onAttackOriginPrepared">Action when origin prepared. TriggerIndex(int), Position(Vector3), Direction(Vector3), Rotation(Quaternion)</param>
-        /// <param name="onAttackHit">Action when hit. TriggerIndex(int), ObjectID(uint), HitboxIndex(int)</param>
+        /// <param name="onDamageOriginPrepared">Action when origin prepared</param>
+        /// <param name="onDamageHit">Action when hit</param>
         /// <returns></returns>
         public void ApplySkill(
             BaseCharacterEntity skillUser,
             int skillLevel,
             bool isLeftHand,
             CharacterItem weapon,
-            int triggerIndex,
+            int simulateSeed,
+            byte triggerIndex,
             Dictionary<DamageElement, MinMaxFloat> damageAmounts,
             uint targetObjectId,
             AimPosition aimPosition,
-            int randomSeed,
-            System.Action<int, Vector3, Vector3, Quaternion> onAttackOriginPrepared,
-            System.Action<int, uint, int> onAttackHit)
+            DamageOriginPreparedDelegate onDamageOriginPrepared,
+            DamageHitDelegate onDamageHit)
         {
             if (skillUser == null)
                 return;
@@ -556,13 +556,14 @@ namespace MultiplayerARPG
                 skillLevel,
                 isLeftHand,
                 weapon,
+                simulateSeed,
                 triggerIndex,
+                0,
                 damageAmounts,
                 targetObjectId,
                 aimPosition,
-                randomSeed,
-                onAttackOriginPrepared,
-                onAttackHit);
+                onDamageOriginPrepared,
+                onDamageHit);
         }
 
         /// <summary>
@@ -572,26 +573,28 @@ namespace MultiplayerARPG
         /// <param name="skillLevel"></param>
         /// <param name="isLeftHand"></param>
         /// <param name="weapon"></param>
-        /// <param name="hitIndex"></param>
+        /// <param name="simulateSeed"></param>
+        /// <param name="triggerIndex"></param>
+        /// <param name="spreadIndex"></param>
         /// <param name="damageAmounts"></param>
         /// <param name="targetObjectId"></param>
         /// <param name="aimPosition"></param>
-        /// <param name="randomSeed"></param>
-        /// <param name="onAttackOriginPrepared">Action when origin prepared. TriggerIndex(int), Position(Vector3), Direction(Vector3), Rotation(Quaternion)</param>
-        /// <param name="onAttackHit">Action when hit. TriggerIndex(int), ObjectID(uint), HitboxIndex(int)</param>
+        /// <param name="onDamageOriginPrepared">Action when origin prepared</param>
+        /// <param name="onDamageHit">Action when hit</param>
         /// <returns></returns>
         protected abstract void ApplySkillImplement(
             BaseCharacterEntity skillUser,
             int skillLevel,
             bool isLeftHand,
             CharacterItem weapon,
-            int hitIndex,
+            int simulateSeed,
+            byte triggerIndex,
+            byte spreadIndex,
             Dictionary<DamageElement, MinMaxFloat> damageAmounts,
             uint targetObjectId,
             AimPosition aimPosition,
-            int randomSeed,
-            System.Action<int, Vector3, Vector3, Quaternion> onAttackOriginPrepared,
-            System.Action<int, uint, int> onAttackHit);
+            DamageOriginPreparedDelegate onDamageOriginPrepared,
+            DamageHitDelegate onDamageHit);
 
         /// <summary>
         /// Return TRUE if this will override default attack function
@@ -600,6 +603,7 @@ namespace MultiplayerARPG
         /// <param name="skillLevel"></param>
         /// <param name="isLeftHand"></param>
         /// <param name="weapon"></param>
+        /// <param name="simulateSeed"></param>
         /// <param name="triggerIndex"></param>
         /// <param name="damageAmounts"></param>
         /// <param name="aimPosition"></param>
@@ -609,7 +613,8 @@ namespace MultiplayerARPG
             int skillLevel,
             bool isLeftHand,
             CharacterItem weapon,
-            int triggerIndex,
+            int simulateSeed,
+            byte triggerIndex,
             Dictionary<DamageElement, MinMaxFloat> damageAmounts,
             AimPosition aimPosition)
         {
@@ -618,7 +623,6 @@ namespace MultiplayerARPG
 
         public virtual bool CanLevelUp(IPlayerCharacterData character, int level, out UITextKeys gameMessage, bool checkSkillPoint = true, bool checkGold = true)
         {
-            gameMessage = UITextKeys.NONE;
             if (character == null || !character.GetDatabase().CacheSkillLevels.ContainsKey(this))
             {
                 gameMessage = UITextKeys.UI_ERROR_INVALID_CHARACTER_DATA;

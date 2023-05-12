@@ -1,5 +1,7 @@
 using Cysharp.Text;
+using Cysharp.Threading.Tasks;
 using System.Collections.Generic;
+using System.Threading;
 using UnityEngine;
 
 namespace MultiplayerARPG
@@ -7,101 +9,204 @@ namespace MultiplayerARPG
     public class DefaultHitRegistrationManager : MonoBehaviour, IHitRegistrationManager
     {
         public float hitValidationBuffer = 2f;
-        private static Dictionary<int, List<HitRegisterData>> prepareHits = new Dictionary<int, List<HitRegisterData>>();
-        private static Dictionary<string, List<HitRegisterData>> registerHits = new Dictionary<string, List<HitRegisterData>>();
-        private static Dictionary<string, HitValidateData> validateHits = new Dictionary<string, HitValidateData>();
+        protected static readonly Dictionary<string, HitValidateData> s_validatingHits = new Dictionary<string, HitValidateData>();
+        protected static readonly Dictionary<int, List<HitData>> s_registeringHits = new Dictionary<int, List<HitData>>();
+        protected static readonly Dictionary<string, CancellationTokenSource> s_cancellationTokenSources = new Dictionary<string, CancellationTokenSource>();
 
-        public void PrepareHitRegValidatation(BaseCharacterEntity attacker, int randomSeed, float[] triggerDurations, byte fireSpread, DamageInfo damageInfo, Dictionary<DamageElement, MinMaxFloat> damageAmounts, CharacterItem weapon, BaseSkill skill, int skillLevel)
+        protected static async void DelayClearData(string id)
+        {
+            if (s_cancellationTokenSources.ContainsKey(id))
+                s_cancellationTokenSources[id].Cancel();
+            CancellationTokenSource cancellationTokenSource = new CancellationTokenSource();
+            try
+            {
+                s_cancellationTokenSources[id] = cancellationTokenSource;
+                await UniTask.Delay(30 * 1000, true, PlayerLoopTiming.Update, cancellationTokenSource.Token);
+                s_validatingHits.Remove(id);
+                if (s_cancellationTokenSources.ContainsKey(id))
+                    s_cancellationTokenSources.Remove(id);
+            }
+            catch (System.OperationCanceledException)
+            {
+                // Catch the cancellation
+            }
+            catch (System.Exception ex)
+            {
+                // Other errors
+                Debug.LogException(ex);
+            }
+            finally
+            {
+                cancellationTokenSource.Dispose();
+            }
+        }
+
+        public void PrepareHitRegValidatation(BaseGameEntity attacker, int randomSeed, float[] triggerDurations, byte fireSpread, DamageInfo damageInfo, Dictionary<DamageElement, MinMaxFloat> damageAmounts, CharacterItem weapon, BaseSkill skill, int skillLevel)
         {
             // Only server can prepare hit registration
             if (attacker == null || !BaseGameNetworkManager.Singleton.IsServer)
                 return;
 
-            // Don't validate damage entity based damage types
-            if (damageInfo.damageType == DamageType.Missile || damageInfo.damageType == DamageType.Throwable)
+            // Don't validate some damage types
+            if (damageInfo.damageType == DamageType.Throwable)
                 return;
 
             // Validating or not?
             if (damageInfo.damageType == DamageType.Custom && (damageInfo.customDamageInfo == null || !damageInfo.customDamageInfo.ValidatedByHitRegistrationManager()))
                 return;
 
-            string id = MakeId(attacker.Id, randomSeed);
-            validateHits[id] = new HitValidateData()
+            if (triggerDurations == null || triggerDurations.Length <= 0)
+                return;
+
+            List<HitOriginData>[] origins = new List<HitOriginData>[triggerDurations.Length];
+            for (int i = 0; i < triggerDurations.Length; ++i)
             {
+                origins[i] = new List<HitOriginData>(fireSpread + 1);
+            }
+
+            string id = MakeValidateId(attacker.ObjectId, randomSeed);
+            s_validatingHits[id] = new HitValidateData()
+            {
+                Attacker = attacker,
+                TriggerDurations = triggerDurations,
                 FireSpread = fireSpread,
-                DamageAmounts = damageAmounts,
                 DamageInfo = damageInfo,
+                DamageAmounts = damageAmounts,
                 Weapon = weapon,
                 Skill = skill,
                 SkillLevel = skillLevel,
+                Origins = origins,
             };
-            PerformValidation(attacker, id, randomSeed);
+            DelayClearData(id);
         }
 
-        public void Register(BaseCharacterEntity attacker, HitRegisterMessage message)
+        public void PrepareHitRegOrigin(BaseGameEntity attacker, int randomSeed, byte triggerIndex, byte spreadIndex, Vector3 position, Vector3 direction)
+        {
+            string id = MakeValidateId(attacker.ObjectId, randomSeed);
+            if (!s_validatingHits.ContainsKey(id))
+                return;
+
+            if (triggerIndex < 0 || triggerIndex >= s_validatingHits[id].Origins.Length)
+                return;
+
+            if (s_validatingHits[id].Origins[triggerIndex].Count >= s_validatingHits[id].FireSpread + 1)
+                return;
+
+            s_validatingHits[id].Origins[triggerIndex].Add(new HitOriginData()
+            {
+                TriggerIndex = triggerIndex,
+                Position = position,
+                Direction = direction,
+            });
+        }
+
+        public void PrepareToRegister(int randomSeed, byte triggerIndex, byte spreadIndex, uint objectId, byte hitBoxIndex, Vector3 hitPoint)
+        {
+            if (!s_registeringHits.ContainsKey(randomSeed))
+                s_registeringHits[randomSeed] = new List<HitData>();
+
+            s_registeringHits[randomSeed].Add(new HitData()
+            {
+                TriggerIndex = triggerIndex,
+                SpreadIndex = spreadIndex,
+                ObjectId = objectId,
+                HitBoxIndex = hitBoxIndex,
+                HitPoint = hitPoint,
+            });
+        }
+
+        public void SendHitRegToServer()
+        {
+            if (s_registeringHits.Count <= 0)
+                return;
+
+            foreach (KeyValuePair<int, List<HitData>> kv in s_registeringHits)
+            {
+                // Send register message to server
+                BaseGameNetworkManager.Singleton.ClientSendPacket(BaseGameEntity.STATE_DATA_CHANNEL, LiteNetLib.DeliveryMethod.ReliableOrdered, GameNetworkingConsts.HitRegistration, new HitRegisterMessage()
+                {
+                    RandomSeed = kv.Key,
+                    Hits = kv.Value,
+                });
+            }
+            s_registeringHits.Clear();
+        }
+
+        public void Register(BaseGameEntity attacker, HitRegisterMessage message)
         {
             // Only server can perform hit registration
             if (attacker == null || !BaseGameNetworkManager.Singleton.IsServer)
                 return;
 
-            string id = MakeId(attacker.Id, message.RandomSeed);
-            registerHits[id] = message.Hits;
-            PerformValidation(attacker, id, message.RandomSeed);
+            string id = MakeValidateId(attacker.ObjectId, message.RandomSeed);
+            if (!s_validatingHits.ContainsKey(id))
+                return;
+
+            PerformValidation(attacker, id, message.RandomSeed, message.Hits);
         }
 
-        private bool PerformValidation(BaseCharacterEntity attacker, string id, int randomSeed)
+        public void ClearData()
         {
-            if (attacker == null || !registerHits.ContainsKey(id) || !validateHits.ContainsKey(id))
-                return false;
+            s_validatingHits.Clear();
+            s_registeringHits.Clear();
+        }
 
-            HashSet<uint> hitObjectIds = new HashSet<uint>();
-            while (registerHits[id].Count > 0)
+        private void PerformValidation(BaseGameEntity attacker, string id, int randomSeed, List<HitData> hits)
+        {
+            if (attacker == null || !s_validatingHits.ContainsKey(id))
+                return;
+
+            HitValidateData validateData = s_validatingHits[id];
+
+            for (int i = 0; i < hits.Count; ++i)
             {
-                if (registerHits[id].Count > validateHits[id].FireSpread + 1)
+                HitData hitData = hits[i];
+                if (hitData.TriggerIndex >= validateData.Origins.Length)
                 {
-                    // Over firespread? player try to hack?, don't allow it
-                    registerHits[id].RemoveAt(0);
+                    // Invalid trigger index
                     continue;
                 }
-                hitObjectIds.Clear();
-                for (int i = 0; i < registerHits[id][0].HitDataCollection.Count; ++i)
-                {
-                    uint objectId = registerHits[id][0].HitDataCollection[i].HitObjectId;
-                    int hitBoxIndex = registerHits[id][0].HitDataCollection[i].HitBoxIndex;
-                    if (!BaseGameNetworkManager.Singleton.TryGetEntityByObjectId(objectId, out DamageableEntity damageableEntity) ||
-                        hitBoxIndex < 0 || hitBoxIndex >= damageableEntity.HitBoxes.Length)
-                    {
-                        // Can't find target or invalid hitbox
-                        continue;
-                    }
-                    if (!validateHits[id].DamageInfo.IsHitReachedMax(hitObjectIds.Count))
-                    {
-                        // Can't hit because it is reaching max amount of objects that can be hit
-                        continue;
-                    }
-                    if (hitObjectIds.Contains(objectId))
-                    {
-                        // Already hit this object, cannot be hit again
-                        continue;
-                    }
-                    hitObjectIds.Add(objectId);
-                    DamageableHitBox hitBox = damageableEntity.HitBoxes[hitBoxIndex];
-                    // Valiate hitting
-                    if (IsHit(attacker, registerHits[id][0], registerHits[id][0].HitDataCollection[i], hitBox))
-                    {
-                        // Yes, it is hit
-                        hitBox.ReceiveDamage(attacker.EntityTransform.position, attacker.GetInfo(), validateHits[id].DamageAmounts, validateHits[id].Weapon, validateHits[id].Skill, validateHits[id].SkillLevel, randomSeed);
-                    }
-                }
-                registerHits[id].RemoveAt(0);
-            }
 
-            registerHits.Remove(id);
-            validateHits.Remove(id);
-            return true;
+                if (hitData.SpreadIndex >= validateData.FireSpread + 1)
+                {
+                    // Invalid spread index
+                    continue;
+                }
+
+                uint objectId = hitData.ObjectId;
+                int hitBoxIndex = hitData.HitBoxIndex;
+                if (!BaseGameNetworkManager.Singleton.TryGetEntityByObjectId(objectId, out DamageableEntity damageableEntity) ||
+                    hitBoxIndex < 0 || hitBoxIndex >= damageableEntity.HitBoxes.Length)
+                {
+                    // Can't find target or invalid hitbox
+                    continue;
+                }
+
+                string hitId = MakeHitId(hitData.TriggerIndex, hitData.SpreadIndex);
+                if (!validateData.Hits.ContainsKey(hitId))
+                {
+                    // Add a hit collection entry if it is not existed
+                    validateData.Hits.Add(hitId, new List<HitData>());
+                }
+
+                if (!validateData.DamageInfo.IsHitReachedMax(validateData.Hits[hitId].Count))
+                {
+                    // Can't hit because it is reaching max amount of objects that can be hit
+                    continue;
+                }
+
+                DamageableHitBox hitBox = damageableEntity.HitBoxes[hitBoxIndex];
+                // Valiate hitting
+                if (IsHit(attacker, hitData, hitBox))
+                {
+                    // Yes, it is hit
+                    hitBox.ReceiveDamage(attacker.EntityTransform.position, attacker.GetInfo(), s_validatingHits[id].DamageAmounts, s_validatingHits[id].Weapon, s_validatingHits[id].Skill, s_validatingHits[id].SkillLevel, randomSeed);
+                    validateData.Hits[hitId].Add(hitData);
+                }
+            }
         }
 
-        private bool IsHit(BaseCharacterEntity attacker, HitRegisterData hitRegData, HitData hitData, DamageableHitBox hitBox)
+        private bool IsHit(BaseGameEntity attacker, HitData hitData, DamageableHitBox hitBox)
         {
             long halfRtt = attacker.Player != null ? (attacker.Player.Rtt / 2) : 0;
             long serverTime = BaseGameNetworkManager.Singleton.ServerTimestamp;
@@ -111,44 +216,14 @@ namespace MultiplayerARPG
             return isHit;
         }
 
-        public void PrepareToRegister(DamageInfo damageInfo, int randomSeed, BaseCharacterEntity attacker, Vector3 damagePosition, Vector3 damageDirection, List<HitData> hitDataCollection)
-        {
-            if (!prepareHits.ContainsKey(randomSeed))
-                prepareHits.Add(randomSeed, new List<HitRegisterData>());
-
-            prepareHits[randomSeed].Add(new HitRegisterData()
-            {
-                Position = damagePosition,
-                Direction = damageDirection,
-                HitDataCollection = hitDataCollection,
-            });
-        }
-
-        public void SendHitRegToServer()
-        {
-            if (prepareHits.Count > 0)
-            {
-                foreach (KeyValuePair<int, List<HitRegisterData>> kv in prepareHits)
-                {
-                    // Send register message to server
-                    BaseGameNetworkManager.Singleton.ClientSendPacket(BaseGameEntity.CLIENT_STATE_DATA_CHANNEL, LiteNetLib.DeliveryMethod.ReliableOrdered, GameNetworkingConsts.HitRegistration, new HitRegisterMessage()
-                    {
-                        RandomSeed = kv.Key,
-                        Hits = kv.Value,
-                    });
-                }
-                prepareHits.Clear();
-            }
-        }
-
-        public int GetApplySeed(int simulateSeed, int hitIndex)
-        {
-            return unchecked(simulateSeed + (hitIndex * 16));
-        }
-
-        private static string MakeId(string attackerId, int randomSeed)
+        private static string MakeValidateId(uint attackerId, int randomSeed)
         {
             return ZString.Concat(attackerId, "_", randomSeed);
+        }
+
+        private static string MakeHitId(byte triggerIndex, byte spreadIndex)
+        {
+            return ZString.Concat(triggerIndex, "_", spreadIndex);
         }
     }
 }

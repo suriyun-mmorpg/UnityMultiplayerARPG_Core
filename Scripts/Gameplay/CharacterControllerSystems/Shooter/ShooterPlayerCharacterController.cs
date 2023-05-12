@@ -1382,13 +1382,13 @@ namespace MultiplayerARPG
         public void OnLaunchDamageEntity(
             bool isLeftHand,
             CharacterItem weapon,
-            int triggerIndex,
+            int simulateSeed,
+            byte triggerIndex,
+            byte spreadIndex,
             Dictionary<DamageElement, MinMaxFloat> damageAmounts,
             BaseSkill skill,
             int skillLevel,
-            int randomSeed,
-            AimPosition aimPosition,
-            Vector3 stagger)
+            AimPosition aimPosition)
         {
             UpdateRecoil();
         }

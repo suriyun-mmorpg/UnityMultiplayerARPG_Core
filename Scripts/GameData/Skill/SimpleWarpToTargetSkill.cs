@@ -11,13 +11,14 @@ namespace MultiplayerARPG
             int skillLevel,
             bool isLeftHand,
             CharacterItem weapon,
-            int triggerIndex,
+            int simulateSeed,
+            byte triggerIndex,
+            byte spreadIndex,
             Dictionary<DamageElement, MinMaxFloat> damageAmounts,
             uint targetObjectId,
             AimPosition aimPosition,
-            int randomSeed,
-            System.Action<int, Vector3, Vector3, Quaternion> onAttackOriginPrepared,
-            System.Action<int, uint, int> onAttackHit)
+            DamageOriginPreparedDelegate onDamageOriginPrepared,
+            DamageHitDelegate onDamageHit)
         {
             // Teleport to aim position
             skillUser.Teleport(aimPosition.position, skillUser.MovementTransform.rotation);

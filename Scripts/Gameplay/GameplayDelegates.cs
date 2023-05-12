@@ -41,7 +41,8 @@ namespace MultiplayerARPG
     public delegate void AttackRoutineDelegate(
         bool isLeftHand,
         CharacterItem weapon,
-        int triggerIndex,
+        int simulateSeed,
+        byte triggerIndex,
         DamageInfo damageInfo,
         Dictionary<DamageElement, MinMaxFloat> damageAmounts,
         AimPosition aimPosition);
@@ -51,7 +52,8 @@ namespace MultiplayerARPG
         int level,
         bool isLeftHand,
         CharacterItem weapon,
-        int triggerIndex,
+        int simulateSeed,
+        byte triggerIndex,
         Dictionary<DamageElement, MinMaxFloat> damageAmounts,
         uint targetObjectId,
         AimPosition aimPosition);
@@ -59,13 +61,13 @@ namespace MultiplayerARPG
     public delegate void LaunchDamageEntityDelegate(
         bool isLeftHand,
         CharacterItem weapon,
-        int triggerIndex,
+        int simulateSeed,
+        byte triggerIndex,
+        byte spreadIndex,
         Dictionary<DamageElement, MinMaxFloat> damageAmounts,
         BaseSkill skill,
         int skillLevel,
-        int randomSeed,
-        AimPosition aimPosition,
-        Vector3 stagger);
+        AimPosition aimPosition);
 
     public delegate void ApplyBuffDelegate(
         int dataId,
@@ -87,4 +89,20 @@ namespace MultiplayerARPG
         RandomCharacterStats randomStats,
         ref CharacterStats stats,
         ref int appliedAmount);
+
+    public delegate void DamageOriginPreparedDelegate(
+        int simulateSeed,
+        byte triggerIndex,
+        byte spreadIndex,
+        Vector3 position,
+        Vector3 direction,
+        Quaternion rotation);
+
+    public delegate void DamageHitDelegate(
+        int simulateSeed,
+        byte triggerIndex,
+        byte spreadIndex,
+        uint objectId,
+        byte hitBoxIndex,
+        Vector3 hitPoint);
 }

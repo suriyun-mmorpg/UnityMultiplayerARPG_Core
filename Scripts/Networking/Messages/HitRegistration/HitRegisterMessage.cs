@@ -6,19 +6,19 @@ namespace MultiplayerARPG
     [System.Serializable]
     public struct HitRegisterMessage : INetSerializable
     {
-        public List<HitRegisterData> Hits { get; set; }
         public int RandomSeed { get; set; }
+        public List<HitData> Hits { get; set; }
 
         public void Serialize(NetDataWriter writer)
         {
-            writer.PutList(Hits);
             writer.PutPackedInt(RandomSeed);
+            writer.PutList(Hits);
         }
 
         public void Deserialize(NetDataReader reader)
         {
-            Hits = reader.GetList<HitRegisterData>();
             RandomSeed = reader.GetPackedInt();
+            Hits = reader.GetList<HitData>();
         }
     }
 }

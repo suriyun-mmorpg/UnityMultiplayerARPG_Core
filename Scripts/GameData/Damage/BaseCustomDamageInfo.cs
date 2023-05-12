@@ -9,15 +9,16 @@ namespace MultiplayerARPG
             BaseCharacterEntity attacker,
             bool isLeftHand,
             CharacterItem weapon,
-            int triggerIndex,
+            int simulateSeed,
+            byte triggerIndex,
+            byte spreadIndex,
+            Vector3 fireStagger,
             Dictionary<DamageElement, MinMaxFloat> damageAmounts,
             BaseSkill skill,
             int skillLevel,
-            int randomSeed,
             AimPosition aimPosition,
-            Vector3 stagger,
-            System.Action<int, Vector3, Vector3, Quaternion> onOriginPrepared,
-            System.Action<int, uint, int> onHit);
+            DamageOriginPreparedDelegate onOriginPrepared,
+            DamageHitDelegate onHit);
         public abstract Transform GetDamageTransform(BaseCharacterEntity attacker, bool isLeftHand);
         public abstract float GetDistance();
         public abstract float GetFov();

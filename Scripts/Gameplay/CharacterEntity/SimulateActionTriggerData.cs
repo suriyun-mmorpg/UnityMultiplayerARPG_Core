@@ -6,7 +6,7 @@ namespace MultiplayerARPG
     {
         public SimulateActionTriggerState state;
         public int simulateSeed;
-        public int triggerIndex;
+        public byte triggerIndex;
         public uint targetObjectId;
         public int skillDataId;
         public int skillLevel;
@@ -16,7 +16,7 @@ namespace MultiplayerARPG
         {
             writer.Put((byte)state);
             writer.PutPackedInt(simulateSeed);
-            writer.PutPackedInt(triggerIndex);
+            writer.Put(triggerIndex);
             if (state.HasFlag(SimulateActionTriggerState.IsSkill))
             {
                 writer.PutPackedUInt(targetObjectId);
@@ -30,7 +30,7 @@ namespace MultiplayerARPG
         {
             state = (SimulateActionTriggerState)reader.GetByte();
             simulateSeed = reader.GetPackedInt();
-            triggerIndex = reader.GetPackedInt();
+            triggerIndex = reader.GetByte();
             if (state.HasFlag(SimulateActionTriggerState.IsSkill))
             {
                 targetObjectId = reader.GetPackedUInt();

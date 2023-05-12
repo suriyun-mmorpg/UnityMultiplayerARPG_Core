@@ -59,13 +59,14 @@ namespace MultiplayerARPG
         public void OnAttackRoutine(
             bool isLeftHand,
             CharacterItem weapon,
-            int triggerIndex,
+            int simulateSeed,
+            byte triggerIndex,
             DamageInfo damageInfo,
             Dictionary<DamageElement, MinMaxFloat> damageAmounts,
             AimPosition aimPosition)
         {
             if (onAttackRoutine != null)
-                onAttackRoutine.Invoke(isLeftHand, weapon, triggerIndex, damageInfo, damageAmounts, aimPosition);
+                onAttackRoutine.Invoke(isLeftHand, weapon, simulateSeed, triggerIndex, damageInfo, damageAmounts, aimPosition);
         }
 
         public void OnUseSkillRoutine(
@@ -73,28 +74,29 @@ namespace MultiplayerARPG
             int level,
             bool isLeftHand,
             CharacterItem weapon,
-            int triggerIndex,
+            int simulateSeed,
+            byte triggerIndex,
             Dictionary<DamageElement, MinMaxFloat> damageAmounts,
             uint targetObjectId,
             AimPosition aimPosition)
         {
             if (onUseSkillRoutine != null)
-                onUseSkillRoutine.Invoke(skill, level, isLeftHand, weapon, triggerIndex, damageAmounts, targetObjectId, aimPosition);
+                onUseSkillRoutine.Invoke(skill, level, isLeftHand, weapon, simulateSeed, triggerIndex, damageAmounts, targetObjectId, aimPosition);
         }
 
         public void OnLaunchDamageEntity(
             bool isLeftHand,
             CharacterItem weapon,
-            int triggerIndex,
+            int simulateSeed,
+            byte triggerIndex,
+            byte spreadIndex,
             Dictionary<DamageElement, MinMaxFloat> damageAmounts,
             BaseSkill skill,
             int skillLevel,
-            int randomSeed,
-            AimPosition aimPosition,
-            Vector3 stagger)
+            AimPosition aimPosition)
         {
             if (onLaunchDamageEntity != null)
-                onLaunchDamageEntity.Invoke(isLeftHand, weapon, triggerIndex, damageAmounts, skill, skillLevel, randomSeed, aimPosition, stagger);
+                onLaunchDamageEntity.Invoke(isLeftHand, weapon, simulateSeed, triggerIndex, spreadIndex, damageAmounts, skill, skillLevel, aimPosition);
         }
     }
 }

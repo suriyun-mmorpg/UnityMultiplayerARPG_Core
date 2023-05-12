@@ -398,6 +398,8 @@ namespace MultiplayerARPG
                 ClientCharacterHandlers.ClearSubscribedPlayerCharacters();
             if (ClientOnlineCharacterHandlers != null)
                 ClientOnlineCharacterHandlers.ClearOnlineCharacters();
+            // Other components
+            HitRegistrationManager.ClearData();
             CurrentMapInfo = null;
             _isReadyToInstantiatePlayers = false;
             _setOfGameEntity.Clear();

@@ -12,8 +12,7 @@ namespace MultiplayerARPG
     public abstract class BaseGameEntity : LiteNetLibBehaviour, IGameEntity, IEntityMovement
     {
         public const float GROUND_DETECTION_DISTANCE = 10f;
-        public const byte CLIENT_STATE_DATA_CHANNEL = 3;
-        public const byte SERVER_STATE_DATA_CHANNEL = 3;
+        public const byte STATE_DATA_CHANNEL = 3;
 
         public int EntityId
         {
@@ -537,7 +536,7 @@ namespace MultiplayerARPG
                     TransportHandler.WritePacket(EntityStateMessageWriter, GameNetworkingConsts.EntityState);
                     EntityStateMessageWriter.PutPackedUInt(ObjectId);
                     EntityStateMessageWriter.Put(EntityStateDataWriter.Data, 0, EntityStateDataWriter.Length);
-                    ClientSendMessage(CLIENT_STATE_DATA_CHANNEL, shouldSendReliably ? DeliveryMethod.ReliableOrdered : DeliveryMethod.Sequenced, EntityStateMessageWriter);
+                    ClientSendMessage(STATE_DATA_CHANNEL, shouldSendReliably ? DeliveryMethod.ReliableOrdered : DeliveryMethod.Sequenced, EntityStateMessageWriter);
                 }
             }
         }
@@ -553,7 +552,7 @@ namespace MultiplayerARPG
                     TransportHandler.WritePacket(EntityStateMessageWriter, GameNetworkingConsts.EntityState);
                     EntityStateMessageWriter.PutPackedUInt(ObjectId);
                     EntityStateMessageWriter.Put(EntityStateDataWriter.Data, 0, EntityStateDataWriter.Length);
-                    ServerSendMessageToSubscribers(SERVER_STATE_DATA_CHANNEL, shouldSendReliably ? DeliveryMethod.ReliableOrdered : DeliveryMethod.Sequenced, EntityStateMessageWriter);
+                    ServerSendMessageToSubscribers(STATE_DATA_CHANNEL, shouldSendReliably ? DeliveryMethod.ReliableOrdered : DeliveryMethod.Sequenced, EntityStateMessageWriter);
                 }
             }
         }
