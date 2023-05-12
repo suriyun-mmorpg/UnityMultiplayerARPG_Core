@@ -220,7 +220,6 @@ namespace MultiplayerARPG
                         // Apply attack damages
                         if (IsOwnerClientOrOwnedByServer)
                         {
-                            ApplyAttack(isLeftHand, weapon, simulateSeed, triggerIndex, damageInfo, damageAmounts, aimPosition);
                             // Simulate action at non-owner clients
                             SimulateActionTriggerData simulateData = new SimulateActionTriggerData();
                             if (isLeftHand)
@@ -229,6 +228,7 @@ namespace MultiplayerARPG
                             simulateData.triggerIndex = triggerIndex;
                             simulateData.aimPosition = aimPosition;
                             RPC(AllSimulateActionTrigger, BaseGameEntity.STATE_DATA_CHANNEL, DeliveryMethod.ReliableOrdered, simulateData);
+                            ApplyAttack(isLeftHand, weapon, simulateSeed, triggerIndex, damageInfo, damageAmounts, aimPosition);
                         }
                     }
 

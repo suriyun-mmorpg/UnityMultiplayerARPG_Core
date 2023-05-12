@@ -283,7 +283,6 @@ namespace MultiplayerARPG
                     // Apply skill buffs, summons and attack damages
                     if (IsOwnerClientOrOwnedByServer)
                     {
-                        ApplySkillUsing(skill, skillLevel, isLeftHand, weapon, simulateSeed, triggerIndex, damageAmounts, targetObjectId, aimPosition);
                         SimulateActionTriggerData simulateData = new SimulateActionTriggerData();
                         if (isLeftHand)
                             simulateData.state |= SimulateActionTriggerState.IsLeftHand;
@@ -295,6 +294,7 @@ namespace MultiplayerARPG
                         simulateData.skillLevel = skillLevel;
                         simulateData.aimPosition = aimPosition;
                         RPC(AllSimulateActionTrigger, BaseGameEntity.STATE_DATA_CHANNEL, DeliveryMethod.ReliableOrdered, simulateData);
+                        ApplySkillUsing(skill, skillLevel, isLeftHand, weapon, simulateSeed, triggerIndex, damageAmounts, targetObjectId, aimPosition);
                     }
 
                     if (remainsDuration <= 0f)
