@@ -642,19 +642,19 @@ namespace MultiplayerARPG
             {
                 case DamageType.Melee:
                     if (hitOnlySelectedTarget)
-                        return alreadyHitCount <= 0;
+                        return alreadyHitCount > 0;
                     else
-                        return true;
+                        return false;
                 case DamageType.Missile:
                 case DamageType.Throwable:
                     // Can hit unlimited objects within attack/explode range
-                    return true;
+                    return false;
                 case DamageType.Raycast:
-                    return alreadyHitCount <= 0 || alreadyHitCount < pierceThroughEntities;
+                    return alreadyHitCount >= pierceThroughEntities;
                 case DamageType.Custom:
                     return customDamageInfo.IsHitReachedMax(alreadyHitCount);
             }
-            return false;
+            return true;
         }
     }
 
