@@ -183,25 +183,27 @@ namespace MultiplayerARPG
                 }
 
                 string hitId = MakeHitId(hitData.TriggerIndex, hitData.SpreadIndex);
-                if (!validateData.Hits.ContainsKey(hitId))
+                if (!validateData.HitsCount.TryGetValue(hitId, out int hitCount))
                 {
-                    // Add a hit collection entry if it is not existed
-                    validateData.Hits.Add(hitId, new List<HitData>());
+                    // Set hit count to 0, if it is not in collection
+                    hitCount = 0;
                 }
 
-                if (!validateData.DamageInfo.IsHitReachedMax(validateData.Hits[hitId].Count))
+                if (validateData.DamageInfo.IsHitReachedMax(hitCount))
                 {
                     // Can't hit because it is reaching max amount of objects that can be hit
                     continue;
                 }
 
+                string hitObjectId = MakeHitObjectId(hitData.TriggerIndex, hitData.SpreadIndex, hitData.ObjectId);
                 DamageableHitBox hitBox = damageableEntity.HitBoxes[hitBoxIndex];
                 // Valiate hitting
-                if (IsHit(attacker, hitData, hitBox))
+                if (!validateData.HitObjects.Contains(hitObjectId) && IsHit(attacker, hitData, hitBox))
                 {
                     // Yes, it is hit
-                    hitBox.ReceiveDamage(attacker.EntityTransform.position, attacker.GetInfo(), s_validatingHits[id].DamageAmounts, s_validatingHits[id].Weapon, s_validatingHits[id].Skill, s_validatingHits[id].SkillLevel, randomSeed);
-                    validateData.Hits[hitId].Add(hitData);
+                    hitBox.ReceiveDamage(attacker.EntityTransform.position, attacker.GetInfo(), validateData.DamageAmounts, validateData.Weapon, validateData.Skill, validateData.SkillLevel, randomSeed);
+                    validateData.HitsCount[hitId] = ++hitCount;
+                    validateData.HitObjects.Add(hitObjectId);
                 }
             }
         }
@@ -224,6 +226,11 @@ namespace MultiplayerARPG
         private static string MakeHitId(byte triggerIndex, byte spreadIndex)
         {
             return ZString.Concat(triggerIndex, "_", spreadIndex);
+        }
+
+        private static string MakeHitObjectId(byte triggerIndex, byte spreadIndex, uint objectId)
+        {
+            return ZString.Concat(triggerIndex, "_", spreadIndex, "_", objectId);
         }
     }
 }
