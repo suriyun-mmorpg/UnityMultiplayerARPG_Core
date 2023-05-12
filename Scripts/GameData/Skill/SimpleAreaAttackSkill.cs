@@ -42,7 +42,18 @@ namespace MultiplayerARPG
             }
         }
 
-        protected override void ApplySkillImplement(BaseCharacterEntity skillUser, int skillLevel, bool isLeftHand, CharacterItem weapon, int triggerIndex, Dictionary<DamageElement, MinMaxFloat> damageAmounts, uint targetObjectId, AimPosition aimPosition, int randomSeed)
+        protected override void ApplySkillImplement(
+            BaseCharacterEntity skillUser,
+            int skillLevel,
+            bool isLeftHand,
+            CharacterItem weapon,
+            int triggerIndex,
+            Dictionary<DamageElement, MinMaxFloat> damageAmounts,
+            uint targetObjectId,
+            AimPosition aimPosition,
+            int randomSeed,
+            System.Action<int, Vector3, Vector3, Quaternion> onAttackOriginPrepared,
+            System.Action<int, uint, int> onAttackHit)
         {
             if (BaseGameNetworkManager.Singleton.IsServer)
             {

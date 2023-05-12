@@ -393,13 +393,7 @@ namespace MultiplayerARPG
         public virtual bool IsAttack { get { return false; } }
         public virtual bool IsBuff { get { return false; } }
         public virtual bool IsDebuff { get { return false; } }
-        public abstract float GetCastDistance(BaseCharacterEntity skillUser, int skillLevel, bool isLeftHand);
-        public abstract float GetCastFov(BaseCharacterEntity skillUser, int skillLevel, bool isLeftHand);
-        public abstract KeyValuePair<DamageElement, MinMaxFloat> GetBaseAttackDamageAmount(ICharacterData skillUser, int skillLevel, bool isLeftHand);
-        public abstract Dictionary<DamageElement, float> GetAttackWeaponDamageInflictions(ICharacterData skillUser, int skillLevel);
-        public abstract Dictionary<DamageElement, MinMaxFloat> GetAttackAdditionalDamageAmounts(ICharacterData skillUser, int skillLevel);
         public virtual bool RequiredTarget { get { return false; } }
-        public virtual bool IsIncreaseAttackDamageAmountsWithBuffs(ICharacterData skillUser, int skillLevel) { return false; }
         public virtual HarvestType HarvestType { get { return HarvestType.None; } }
         public virtual IncrementalMinMaxFloat HarvestDamageAmount { get { return new IncrementalMinMaxFloat(); } }
         public virtual Buff Buff { get { return Buff.Empty; } }
@@ -487,6 +481,33 @@ namespace MultiplayerARPG
             return damageAmounts;
         }
 
+        public virtual bool IsIncreaseAttackDamageAmountsWithBuffs(ICharacterData skillUser, int skillLevel)
+        {
+            return false;
+        }
+
+        public virtual KeyValuePair<DamageElement, MinMaxFloat> GetBaseAttackDamageAmount(ICharacterData skillUser, int skillLevel, bool isLeftHand)
+        {
+            return default;
+        }
+
+        public virtual Dictionary<DamageElement, float> GetAttackWeaponDamageInflictions(ICharacterData skillUser, int skillLevel)
+        {
+            return default;
+        }
+
+        public virtual Dictionary<DamageElement, MinMaxFloat> GetAttackAdditionalDamageAmounts(ICharacterData skillUser, int skillLevel)
+        {
+            return default;
+        }
+
+        public abstract float GetCastDistance(BaseCharacterEntity skillUser, int skillLevel, bool isLeftHand);
+
+        public virtual float GetCastFov(BaseCharacterEntity skillUser, int skillLevel, bool isLeftHand)
+        {
+            return 360f;
+        }
+
         /// <summary>
         /// Apply skill
         /// </summary>
@@ -499,6 +520,8 @@ namespace MultiplayerARPG
         /// <param name="targetObjectId"></param>
         /// <param name="aimPosition"></param>
         /// <param name="randomSeed"></param>
+        /// <param name="onAttackOriginPrepared">Action when origin prepared. TriggerIndex(int), Position(Vector3), Direction(Vector3), Rotation(Quaternion)</param>
+        /// <param name="onAttackHit">Action when hit. TriggerIndex(int), ObjectID(uint), HitboxIndex(int)</param>
         /// <returns></returns>
         public void ApplySkill(
             BaseCharacterEntity skillUser,
@@ -509,7 +532,9 @@ namespace MultiplayerARPG
             Dictionary<DamageElement, MinMaxFloat> damageAmounts,
             uint targetObjectId,
             AimPosition aimPosition,
-            int randomSeed)
+            int randomSeed,
+            System.Action<int, Vector3, Vector3, Quaternion> onAttackOriginPrepared,
+            System.Action<int, uint, int> onAttackHit)
         {
             if (skillUser == null)
                 return;
@@ -535,7 +560,9 @@ namespace MultiplayerARPG
                 damageAmounts,
                 targetObjectId,
                 aimPosition,
-                randomSeed);
+                randomSeed,
+                onAttackOriginPrepared,
+                onAttackHit);
         }
 
         /// <summary>
@@ -550,6 +577,8 @@ namespace MultiplayerARPG
         /// <param name="targetObjectId"></param>
         /// <param name="aimPosition"></param>
         /// <param name="randomSeed"></param>
+        /// <param name="onAttackOriginPrepared">Action when origin prepared. TriggerIndex(int), Position(Vector3), Direction(Vector3), Rotation(Quaternion)</param>
+        /// <param name="onAttackHit">Action when hit. TriggerIndex(int), ObjectID(uint), HitboxIndex(int)</param>
         /// <returns></returns>
         protected abstract void ApplySkillImplement(
             BaseCharacterEntity skillUser,
@@ -560,7 +589,9 @@ namespace MultiplayerARPG
             Dictionary<DamageElement, MinMaxFloat> damageAmounts,
             uint targetObjectId,
             AimPosition aimPosition,
-            int randomSeed);
+            int randomSeed,
+            System.Action<int, Vector3, Vector3, Quaternion> onAttackOriginPrepared,
+            System.Action<int, uint, int> onAttackHit);
 
         /// <summary>
         /// Return TRUE if this will override default attack function

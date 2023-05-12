@@ -141,19 +141,18 @@ namespace MultiplayerARPG
             BaseCharacterEntity attacker,
             bool isLeftHand,
             CharacterItem weapon,
+            int triggerIndex,
             Dictionary<DamageElement, MinMaxFloat> damageAmounts,
             BaseSkill skill,
             int skillLevel,
             int randomSeed,
             AimPosition aimPosition,
             Vector3 stagger,
-            out Dictionary<uint, int> hitBoxes)
+            System.Action<int, Vector3, Vector3, Quaternion> onOriginPrepared,
+            System.Action<int, uint, int> onHit)
         {
             if (attacker == null)
-            {
-                hitBoxes = new Dictionary<uint, int>();
                 return;
-            }
 
             switch (damageType)
             {
@@ -162,65 +161,75 @@ namespace MultiplayerARPG
                         attacker,
                         isLeftHand,
                         weapon,
+                        triggerIndex,
                         damageAmounts,
                         skill,
                         skillLevel,
                         randomSeed,
                         aimPosition,
                         stagger,
-                        out hitBoxes);
+                        onOriginPrepared,
+                        onHit);
                     break;
                 case DamageType.Raycast:
                     LaunchRaycastDamage(
                         attacker,
                         isLeftHand,
                         weapon,
+                        triggerIndex,
                         damageAmounts,
                         skill,
                         skillLevel,
                         randomSeed,
                         aimPosition,
                         stagger,
-                        out hitBoxes);
+                        onOriginPrepared,
+                        onHit);
                     break;
                 case DamageType.Throwable:
                     LaunchThrowableDamage(
                         attacker,
                         isLeftHand,
                         weapon,
+                        triggerIndex,
                         damageAmounts,
                         skill,
                         skillLevel,
                         randomSeed,
                         aimPosition,
                         stagger,
-                        out hitBoxes);
+                        onOriginPrepared,
+                        onHit);
                     break;
                 case DamageType.Custom:
                     customDamageInfo.LaunchDamageEntity(
                         attacker,
                         isLeftHand,
                         weapon,
+                        triggerIndex,
                         damageAmounts,
                         skill,
                         skillLevel,
                         randomSeed,
                         aimPosition,
                         stagger,
-                        out hitBoxes);
+                        onOriginPrepared,
+                        onHit);
                     break;
                 default:
                     LaunchMeleeDamage(
                         attacker,
                         isLeftHand,
                         weapon,
+                        triggerIndex,
                         damageAmounts,
                         skill,
                         skillLevel,
                         randomSeed,
                         aimPosition,
                         stagger,
-                        out hitBoxes);
+                        onOriginPrepared,
+                        onHit);
                     break;
             }
 
@@ -228,28 +237,30 @@ namespace MultiplayerARPG
             attacker.OnLaunchDamageEntity(
                 isLeftHand,
                 weapon,
+                triggerIndex,
                 damageAmounts,
                 skill,
                 skillLevel,
                 randomSeed,
                 aimPosition,
-                stagger,
-                hitBoxes);
+                stagger);
         }
 
         private void LaunchMeleeDamage(
             BaseCharacterEntity attacker,
             bool isLeftHand,
             CharacterItem weapon,
+            int triggerIndex,
             Dictionary<DamageElement, MinMaxFloat> damageAmounts,
             BaseSkill skill,
             int skillLevel,
             int randomSeed,
             AimPosition aimPosition,
             Vector3 stagger,
-            out Dictionary<uint, int> hitBoxes)
+            System.Action<int, Vector3, Vector3, Quaternion> onOriginPrepared,
+            System.Action<int, uint, int> onHit)
         {
-            hitBoxes = new Dictionary<uint, int>();
+            HashSet<uint> hitObjects = new HashSet<uint>();
             bool isClient = attacker.IsClient;
             bool isHost = attacker.IsHost;
             bool isOwnerClient = attacker.IsOwnerClient;
@@ -263,7 +274,9 @@ namespace MultiplayerARPG
 
             // Get generic attack data
             EntityInfo instigator = attacker.GetInfo();
-            this.GetDamagePositionAndRotation(attacker, isLeftHand, aimPosition, stagger, out Vector3 damagePosition, out Vector3 damageDirection, out _);
+            this.GetDamagePositionAndRotation(attacker, isLeftHand, aimPosition, stagger, out Vector3 damagePosition, out Vector3 damageDirection, out Quaternion damageRotation);
+            if (onOriginPrepared != null)
+                onOriginPrepared.Invoke(triggerIndex, damagePosition, damageDirection, damageRotation);
 
             // Find hitting objects
             int layerMask = GameInstance.Singleton.GetDamageEntityHitLayerMask();
@@ -276,7 +289,6 @@ namespace MultiplayerARPG
             DamageableHitBox tempDamageableHitBox;
             GameObject tempGameObject;
             string tempTag;
-            int tempDamageTakenTargetIndex = 0;
             DamageableHitBox tempDamageTakenTarget = null;
             DamageableEntity tempSelectedTarget = null;
             bool hasSelectedTarget = hitOnlySelectedTarget && attacker.TryGetTargetEntity(out tempSelectedTarget);
@@ -295,12 +307,16 @@ namespace MultiplayerARPG
                 if (tempDamageableHitBox.GetObjectId() == attacker.ObjectId)
                     continue;
 
-                if (hitBoxes.ContainsKey(tempDamageableHitBox.GetObjectId()))
+                if (hitObjects.Contains(tempDamageableHitBox.GetObjectId()))
                     continue;
+
+                // Trigger hit action because it is hitting
+                if (onHit != null)
+                    onHit.Invoke(triggerIndex, tempDamageableHitBox.GetObjectId(), tempDamageableHitBox.Index);
 
                 // Add entity to table, if it found entity in the table next time it will skip. 
                 // So it won't applies damage to entity repeatly.
-                hitBoxes[tempDamageableHitBox.GetObjectId()] = tempDamageableHitBox.Index;
+                hitObjects.Add(tempDamageableHitBox.GetObjectId());
 
                 // Target won't receive damage if dead or can't receive damage from this character
                 if (tempDamageableHitBox.IsDead() || !tempDamageableHitBox.CanReceiveDamageFrom(instigator) ||
@@ -311,7 +327,6 @@ namespace MultiplayerARPG
                 {
                     // Check with selected target
                     // Set damage taken target, it will be used in-case it can't find selected target
-                    tempDamageTakenTargetIndex = i;
                     tempDamageTakenTarget = tempDamageableHitBox;
                     // The hitting entity is the selected target so break the loop to apply damage later (outside this loop)
                     if (hasSelectedTarget && tempSelectedTarget.GetObjectId() == tempDamageableHitBox.GetObjectId())
@@ -387,15 +402,16 @@ namespace MultiplayerARPG
             BaseCharacterEntity attacker,
             bool isLeftHand,
             CharacterItem weapon,
+            int triggerIndex,
             Dictionary<DamageElement, MinMaxFloat> damageAmounts,
             BaseSkill skill,
             int skillLevel,
             int randomSeed,
             AimPosition aimPosition,
             Vector3 stagger,
-            out Dictionary<uint, int> hitBoxes)
+            System.Action<int, Vector3, Vector3, Quaternion> onOriginPrepared,
+            System.Action<int, uint, int> onHit)
         {
-            hitBoxes = new Dictionary<uint, int>();
             // Spawn missile damage entity, it will move to target then apply damage when hit
             // Instantiates on both client and server (damage applies at server)
             if (missileDamageEntity == null)
@@ -403,7 +419,10 @@ namespace MultiplayerARPG
 
             // Get generic attack data
             EntityInfo instigator = attacker.GetInfo();
-            this.GetDamagePositionAndRotation(attacker, isLeftHand, aimPosition, stagger, out Vector3 damagePosition, out _, out Quaternion damageRotation);
+            this.GetDamagePositionAndRotation(attacker, isLeftHand, aimPosition, stagger, out Vector3 damagePosition, out Vector3 damageDirection, out Quaternion damageRotation);
+            if (onOriginPrepared != null)
+                onOriginPrepared.Invoke(triggerIndex, damagePosition, damageDirection, damageRotation);
+
             DamageableEntity lockingTarget;
             if (!hitOnlySelectedTarget || !attacker.TryGetTargetEntity(out lockingTarget))
                 lockingTarget = null;
@@ -418,15 +437,17 @@ namespace MultiplayerARPG
             BaseCharacterEntity attacker,
             bool isLeftHand,
             CharacterItem weapon,
+            int triggerIndex,
             Dictionary<DamageElement, MinMaxFloat> damageAmounts,
             BaseSkill skill,
             int skillLevel,
             int randomSeed,
             AimPosition aimPosition,
             Vector3 stagger,
-            out Dictionary<uint, int> hitBoxes)
+            System.Action<int, Vector3, Vector3, Quaternion> onOriginPrepared,
+            System.Action<int, uint, int> onHit)
         {
-            hitBoxes = new Dictionary<uint, int>();
+            HashSet<uint> hitObjects = new HashSet<uint>();
             bool isClient = attacker.IsClient;
             bool isHost = attacker.IsHost;
             bool isOwnerClient = attacker.IsOwnerClient;
@@ -441,6 +462,8 @@ namespace MultiplayerARPG
             // Get generic attack data
             EntityInfo instigator = attacker.GetInfo();
             this.GetDamagePositionAndRotation(attacker, isLeftHand, aimPosition, stagger, out Vector3 damagePosition, out Vector3 damageDirection, out Quaternion damageRotation);
+            if (onOriginPrepared != null)
+                onOriginPrepared.Invoke(triggerIndex, damagePosition, damageDirection, damageRotation);
 
             bool isPlayImpactEffects = isClient && impactEffects != null;
             float projectileDistance = missileDistance;
@@ -514,12 +537,16 @@ namespace MultiplayerARPG
                 if (tempDamageableHitBox.GetObjectId() == attacker.ObjectId)
                     continue;
 
-                if (hitBoxes.ContainsKey(tempDamageableHitBox.GetObjectId()))
+                if (hitObjects.Contains(tempDamageableHitBox.GetObjectId()))
                     continue;
+
+                // Trigger hit action because it is hitting
+                if (onHit != null)
+                    onHit.Invoke(triggerIndex, tempDamageableHitBox.GetObjectId(), tempDamageableHitBox.Index);
 
                 // Add entity to table, if it found entity in the table next time it will skip. 
                 // So it won't applies damage to entity repeatly.
-                hitBoxes[tempDamageableHitBox.GetObjectId()] = tempDamageableHitBox.Index;
+                hitObjects.Add(tempDamageableHitBox.GetObjectId());
 
                 // Target won't receive damage if dead or can't receive damage from this character
                 if (tempDamageableHitBox.IsDead() || !tempDamageableHitBox.CanReceiveDamageFrom(instigator))
@@ -578,21 +605,24 @@ namespace MultiplayerARPG
             BaseCharacterEntity attacker,
             bool isLeftHand,
             CharacterItem weapon,
+            int triggerIndex,
             Dictionary<DamageElement, MinMaxFloat> damageAmounts,
             BaseSkill skill,
             int skillLevel,
             int randomSeed,
             AimPosition aimPosition,
             Vector3 stagger,
-            out Dictionary<uint, int> hitBoxes)
+            System.Action<int, Vector3, Vector3, Quaternion> onOriginPrepared,
+            System.Action<int, uint, int> onHit)
         {
-            hitBoxes = new Dictionary<uint, int>();
             if (throwableDamageEntity == null)
                 return;
 
             // Get generic attack data
             EntityInfo instigator = attacker.GetInfo();
-            this.GetDamagePositionAndRotation(attacker, isLeftHand, aimPosition, stagger, out Vector3 damagePosition, out _, out Quaternion damageRotation);
+            this.GetDamagePositionAndRotation(attacker, isLeftHand, aimPosition, stagger, out Vector3 damagePosition, out Vector3 damageDirection, out Quaternion damageRotation);
+            if (onOriginPrepared != null)
+                onOriginPrepared.Invoke(triggerIndex, damagePosition, damageDirection, damageRotation);
 
             // Instantiate throwable damage entity
             // TODO: May predict and move missile ahead of time based on client's RTT

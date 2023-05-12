@@ -20,7 +20,18 @@ namespace MultiplayerARPG
         [Range(0.01f, 1f)]
         public float resurrectWaterRate = 0.1f;
 
-        protected override void ApplySkillImplement(BaseCharacterEntity skillUser, int skillLevel, bool isLeftHand, CharacterItem weapon, int triggerIndex, Dictionary<DamageElement, MinMaxFloat> damageAmounts, uint targetObjectId, AimPosition aimPosition, int randomSeed)
+        protected override void ApplySkillImplement(
+            BaseCharacterEntity skillUser,
+            int skillLevel,
+            bool isLeftHand,
+            CharacterItem weapon,
+            int triggerIndex,
+            Dictionary<DamageElement, MinMaxFloat> damageAmounts,
+            uint targetObjectId,
+            AimPosition aimPosition,
+            int randomSeed,
+            System.Action<int, Vector3, Vector3, Quaternion> onAttackOriginPrepared,
+            System.Action<int, uint, int> onAttackHit)
         {
             // Resurrect target
             BasePlayerCharacterEntity targetEntity;
@@ -37,29 +48,9 @@ namespace MultiplayerARPG
             targetEntity.ApplyBuff(DataId, BuffType.SkillBuff, skillLevel, skillUser.GetInfo(), weapon);
         }
 
-        public override Dictionary<DamageElement, MinMaxFloat> GetAttackAdditionalDamageAmounts(ICharacterData skillUser, int skillLevel)
-        {
-            return new Dictionary<DamageElement, MinMaxFloat>();
-        }
-
         public override float GetCastDistance(BaseCharacterEntity skillUser, int skillLevel, bool isLeftHand)
         {
             return buffDistance.GetAmount(skillLevel);
-        }
-
-        public override float GetCastFov(BaseCharacterEntity skillUser, int skillLevel, bool isLeftHand)
-        {
-            return 360f;
-        }
-
-        public override Dictionary<DamageElement, float> GetAttackWeaponDamageInflictions(ICharacterData skillUser, int skillLevel)
-        {
-            return new Dictionary<DamageElement, float>();
-        }
-
-        public override KeyValuePair<DamageElement, MinMaxFloat> GetBaseAttackDamageAmount(ICharacterData skillUser, int skillLevel, bool isLeftHand)
-        {
-            return new KeyValuePair<DamageElement, MinMaxFloat>();
         }
 
         public override SkillType SkillType

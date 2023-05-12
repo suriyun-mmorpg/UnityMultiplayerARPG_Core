@@ -18,7 +18,18 @@ namespace MultiplayerARPG
         [Category(4, "Warp Settings")]
         public bool isWarpToAimPosition;
 
-        protected override void ApplySkillImplement(BaseCharacterEntity skillUser, int skillLevel, bool isLeftHand, CharacterItem weapon, int triggerIndex, Dictionary<DamageElement, MinMaxFloat> damageAmounts, uint targetObjectId, AimPosition aimPosition, int randomSeed)
+        protected override void ApplySkillImplement(
+            BaseCharacterEntity skillUser,
+            int skillLevel,
+            bool isLeftHand,
+            CharacterItem weapon,
+            int triggerIndex,
+            Dictionary<DamageElement, MinMaxFloat> damageAmounts,
+            uint targetObjectId,
+            AimPosition aimPosition,
+            int randomSeed,
+            System.Action<int, Vector3, Vector3, Quaternion> onAttackOriginPrepared,
+            System.Action<int, uint, int> onAttackHit)
         {
             if (BaseGameNetworkManager.Singleton.IsServer)
             {
@@ -35,21 +46,6 @@ namespace MultiplayerARPG
             // Teleport to aim position
             if (isWarpToAimPosition)
                 skillUser.Teleport(aimPosition.position, skillUser.MovementTransform.rotation);
-        }
-
-        public override KeyValuePair<DamageElement, MinMaxFloat> GetBaseAttackDamageAmount(ICharacterData skillUser, int skillLevel, bool isLeftHand)
-        {
-            return new KeyValuePair<DamageElement, MinMaxFloat>();
-        }
-
-        public override Dictionary<DamageElement, MinMaxFloat> GetAttackAdditionalDamageAmounts(ICharacterData skillUser, int skillLevel)
-        {
-            return new Dictionary<DamageElement, MinMaxFloat>();
-        }
-
-        public override Dictionary<DamageElement, float> GetAttackWeaponDamageInflictions(ICharacterData skillUser, int skillLevel)
-        {
-            return new Dictionary<DamageElement, float>();
         }
 
         public override bool IsBuff

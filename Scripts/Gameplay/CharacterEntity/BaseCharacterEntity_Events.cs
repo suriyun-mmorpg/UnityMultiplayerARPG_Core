@@ -85,16 +85,16 @@ namespace MultiplayerARPG
         public void OnLaunchDamageEntity(
             bool isLeftHand,
             CharacterItem weapon,
+            int triggerIndex,
             Dictionary<DamageElement, MinMaxFloat> damageAmounts,
             BaseSkill skill,
             int skillLevel,
             int randomSeed,
             AimPosition aimPosition,
-            Vector3 stagger,
-            Dictionary<uint, int> hitBoxes)
+            Vector3 stagger)
         {
             if (onLaunchDamageEntity != null)
-                onLaunchDamageEntity.Invoke(isLeftHand, weapon, damageAmounts, skill, skillLevel, randomSeed, aimPosition, stagger, hitBoxes);
+                onLaunchDamageEntity.Invoke(isLeftHand, weapon, triggerIndex, damageAmounts, skill, skillLevel, randomSeed, aimPosition, stagger);
         }
     }
 }

@@ -197,34 +197,37 @@ namespace MultiplayerARPG
                             AudioManager.PlaySfxClipAtAudioSource(audioClip.audioClip, Entity.CharacterModel.GenericAudioSource, audioClip.GetRandomedVolume());
                     }
 
+                    // Get aim position by character's forward
+                    AimPosition aimPosition = Entity.AimPosition;
+
                     // Call on attack to extend attack functionality while attacking
                     bool overrideDefaultAttack = false;
                     foreach (KeyValuePair<BaseSkill, int> skillLevel in Entity.CachedData.Skills)
                     {
                         if (skillLevel.Value <= 0)
                             continue;
-                        if (skillLevel.Key.OnAttack(Entity, skillLevel.Value, isLeftHand, weapon, triggerIndex, damageAmounts, Entity.AimPosition))
+                        if (skillLevel.Key.OnAttack(Entity, skillLevel.Value, isLeftHand, weapon, triggerIndex, damageAmounts, aimPosition))
                             overrideDefaultAttack = true;
                     }
 
                     // Skip attack function when applied skills (buffs) will override default attack functionality
                     if (!overrideDefaultAttack)
                     {
+
                         // Trigger attack event
-                        Entity.OnAttackRoutine(isLeftHand, weapon, triggerIndex, damageInfo, damageAmounts, Entity.AimPosition);
+                        Entity.OnAttackRoutine(isLeftHand, weapon, triggerIndex, damageInfo, damageAmounts, aimPosition);
 
                         // Apply attack damages
                         if (IsOwnerClientOrOwnedByServer)
                         {
-                            int applySeed = HitRegistrationManager.GetApplySeed(simulateSeed, triggerIndex);
-                            ApplyAttack(isLeftHand, weapon, damageInfo, damageAmounts, Entity.AimPosition, applySeed);
+                            ApplyAttack(isLeftHand, weapon, simulateSeed, triggerIndex, damageInfo, damageAmounts, aimPosition);
                             // Simulate action at non-owner clients
                             SimulateActionTriggerData simulateData = new SimulateActionTriggerData();
                             if (isLeftHand)
                                 simulateData.state |= SimulateActionTriggerState.IsLeftHand;
                             simulateData.simulateSeed = simulateSeed;
                             simulateData.triggerIndex = triggerIndex;
-                            simulateData.aimPosition = Entity.AimPosition;
+                            simulateData.aimPosition = aimPosition;
                             RPC(AllSimulateActionTrigger, BaseGameEntity.SERVER_STATE_DATA_CHANNEL, DeliveryMethod.ReliableOrdered, simulateData);
                         }
                     }
@@ -271,7 +274,7 @@ namespace MultiplayerARPG
             ClearAttackStates();
         }
 
-        protected virtual void ApplyAttack(bool isLeftHand, CharacterItem weapon, DamageInfo damageInfo, Dictionary<DamageElement, MinMaxFloat> damageAmounts, AimPosition aimPosition, int randomSeed)
+        protected virtual void ApplyAttack(bool isLeftHand, CharacterItem weapon, int simulateSeed, int triggerIndex, DamageInfo damageInfo, Dictionary<DamageElement, MinMaxFloat> damageAmounts, AimPosition aimPosition)
         {
             if (IsServer)
             {
@@ -290,8 +293,9 @@ namespace MultiplayerARPG
                 fireStagger = weapon.GetWeaponItem().FireStagger;
             }
 
+            int applySeed = HitRegistrationManager.GetApplySeed(simulateSeed, triggerIndex);
             // Fire
-            System.Random random = new System.Random(randomSeed);
+            System.Random random = new System.Random(applySeed);
             Vector3 stagger;
             for (int i = 0; i < fireSpread + 1; ++i)
             {
@@ -302,14 +306,26 @@ namespace MultiplayerARPG
                     Entity,
                     isLeftHand,
                     weapon,
+                    triggerIndex,
                     damageAmounts,
                     null,
                     0,
-                    randomSeed,
+                    applySeed,
                     aimPosition,
                     stagger,
-                    out _);
+                    OnAttackOriginPrepared,
+                    OnAttackHit);
             }
+        }
+
+        protected virtual void OnAttackOriginPrepared(int triggerIndex, Vector3 position, Vector3 direction, Quaternion rotation)
+        {
+
+        }
+
+        protected virtual void OnAttackHit(int triggerIndex, uint objectId, int hitboxIndex)
+        {
+
         }
 
         [AllRpc]
@@ -317,12 +333,11 @@ namespace MultiplayerARPG
         {
             if (IsOwnerClientOrOwnedByServer)
                 return;
-            int applySeed = HitRegistrationManager.GetApplySeed(data.simulateSeed, data.triggerIndex);
             bool isLeftHand = data.state.HasFlag(SimulateActionTriggerState.IsLeftHand);
             CharacterItem weapon = Entity.GetAvailableWeapon(ref isLeftHand);
             DamageInfo damageInfo = Entity.GetWeaponDamageInfo(weapon.GetWeaponItem());
             Dictionary<DamageElement, MinMaxFloat> damageAmounts = Entity.GetWeaponDamagesWithBuffs(weapon);
-            ApplyAttack(isLeftHand, weapon, damageInfo, damageAmounts, data.aimPosition, applySeed);
+            ApplyAttack(isLeftHand, weapon, data.simulateSeed, data.triggerIndex, damageInfo, damageAmounts, data.aimPosition);
         }
 
         public void CancelAttack()
