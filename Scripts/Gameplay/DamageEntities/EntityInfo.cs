@@ -104,7 +104,7 @@
         public bool TryGetEntity<T>(out T entity)
             where T : class, IGameEntity
         {
-            if (BaseGameNetworkManager.Singleton.TryGetEntityByObjectId(ObjectId, out entity))
+            if (BaseGameNetworkManager.Singleton.TryGetEntityByObjectId(ObjectId, out entity) && entity.Entity is T)
                 return true;
             entity = null;
             return false;
