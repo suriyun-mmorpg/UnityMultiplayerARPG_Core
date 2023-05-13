@@ -347,7 +347,7 @@ namespace MultiplayerARPG
                 {
                     // Trigger hit action because it is hitting
                     if (onHit != null)
-                        onHit.Invoke(simulateSeed, triggerIndex, spreadIndex, tempDamageableHitBox.GetObjectId(), tempDamageableHitBox.Index, tempDamageableHitBox.transform.position);
+                        onHit.Invoke(simulateSeed, triggerIndex, spreadIndex, tempDamageableHitBox.GetObjectId(), tempDamageableHitBox.Index, tempDamageableHitBox.CacheTransform.position);
                 }
 
                 // Instantiate impact effects
@@ -370,7 +370,7 @@ namespace MultiplayerARPG
                 {
                     // Trigger hit action because it is hitting
                     if (onHit != null)
-                        onHit.Invoke(simulateSeed, triggerIndex, spreadIndex, tempDamageTakenTarget.GetObjectId(), tempDamageTakenTarget.Index, tempDamageTakenTarget.transform.position);
+                        onHit.Invoke(simulateSeed, triggerIndex, spreadIndex, tempDamageTakenTarget.GetObjectId(), tempDamageTakenTarget.Index, tempDamageTakenTarget.CacheTransform.position);
                 }
 
                 // Instantiate impact effects
@@ -427,7 +427,7 @@ namespace MultiplayerARPG
             // Instantiate missile damage entity
             float missileDistance = this.missileDistance;
             float missileSpeed = this.missileSpeed;
-            PoolSystem.GetInstance(missileDamageEntity, damagePosition, damageRotation).Setup(instigator, weapon, damageAmounts, skill, skillLevel, missileDistance, missileSpeed, lockingTarget);
+            PoolSystem.GetInstance(missileDamageEntity, damagePosition, damageRotation).Setup(instigator, weapon, simulateSeed, triggerIndex, spreadIndex, damageAmounts, skill, skillLevel, onHit, missileDistance, missileSpeed, lockingTarget);
         }
 
         private void LaunchRaycastDamage(
@@ -619,7 +619,7 @@ namespace MultiplayerARPG
             // TODO: May predict and move missile ahead of time based on client's RTT
             float throwForce = this.throwForce;
             float throwableLifeTime = this.throwableLifeTime;
-            PoolSystem.GetInstance(throwableDamageEntity, damagePosition, damageRotation).Setup(instigator, weapon, damageAmounts, skill, skillLevel, throwForce, throwableLifeTime);
+            PoolSystem.GetInstance(throwableDamageEntity, damagePosition, damageRotation).Setup(instigator, weapon, simulateSeed, triggerIndex, spreadIndex, damageAmounts, skill, skillLevel, onHit, throwForce, throwableLifeTime);
         }
 
         public void PrepareRelatesData()

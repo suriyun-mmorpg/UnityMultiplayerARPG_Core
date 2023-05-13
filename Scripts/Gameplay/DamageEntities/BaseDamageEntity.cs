@@ -7,9 +7,13 @@ namespace MultiplayerARPG
     {
         protected EntityInfo _instigator;
         protected CharacterItem _weapon;
+        protected int _simulateSeed;
+        protected byte _triggerIndex;
+        protected byte _spreadIndex;
         protected Dictionary<DamageElement, MinMaxFloat> _damageAmounts;
         protected BaseSkill _skill;
         protected int _skillLevel;
+        protected DamageHitDelegate _onHit;
 
         public GameInstance CurrentGameInstance
         {
@@ -65,28 +69,43 @@ namespace MultiplayerARPG
         /// </summary>
         /// <param name="instigator">Weapon's or skill's instigator who to spawn this to attack enemy</param>
         /// <param name="weapon">Weapon which was used to attack enemy</param>
+        /// <param name="simulateSeed">Launch random seed</param>
+        /// <param name="triggerIndex"></param>
+        /// <param name="spreadIndex"></param>
         /// <param name="damageAmounts">Calculated damage amounts</param>
         /// <param name="skill">Skill which was used to attack enemy</param>
         /// <param name="skillLevel">Level of the skill</param>
+        /// <param name="onHit">Action when hit</param>
         public virtual void Setup(
             EntityInfo instigator,
             CharacterItem weapon,
+            int simulateSeed,
+            byte triggerIndex,
+            byte spreadIndex,
             Dictionary<DamageElement, MinMaxFloat> damageAmounts,
             BaseSkill skill,
-            int skillLevel)
+            int skillLevel,
+            DamageHitDelegate onHit)
         {
             _instigator = instigator;
             _weapon = weapon;
+            _simulateSeed = simulateSeed;
+            _triggerIndex = triggerIndex;
+            _spreadIndex = spreadIndex;
             _damageAmounts = damageAmounts;
             _skill = skill;
             _skillLevel = skillLevel;
+            _onHit = onHit;
         }
 
         public virtual void ApplyDamageTo(DamageableHitBox target)
         {
-            if (!IsServer || target == null || target.IsDead() || !target.CanReceiveDamageFrom(_instigator))
+            if (target == null || target.IsDead() || !target.CanReceiveDamageFrom(_instigator))
                 return;
-            target.ReceiveDamage(CacheTransform.position, _instigator, _damageAmounts, _weapon, _skill, _skillLevel, Random.Range(0, 255));
+            if (_onHit != null)
+                _onHit.Invoke(_simulateSeed, _triggerIndex, _spreadIndex, target.GetObjectId(), target.Index, target.CacheTransform.position);
+            if (IsServer)
+                target.ReceiveDamage(CacheTransform.position, _instigator, _damageAmounts, _weapon, _skill, _skillLevel, _simulateSeed);
         }
 
         public override void InitPrefab()

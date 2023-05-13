@@ -56,14 +56,18 @@ namespace MultiplayerARPG
         public override void Setup(
             EntityInfo instigator,
             CharacterItem weapon,
+            int simulateSeed,
+            byte triggerIndex,
+            byte spreadIndex,
             Dictionary<DamageElement, MinMaxFloat> damageAmounts,
             BaseSkill skill,
             int skillLevel,
+            DamageHitDelegate onHit,
             float missileDistance,
             float missileSpeed,
             IDamageableEntity lockingTarget)
         {
-            base.Setup(instigator, weapon, damageAmounts, skill, skillLevel, missileDistance, missileSpeed, lockingTarget);
+            base.Setup(instigator, weapon, simulateSeed, triggerIndex, spreadIndex, damageAmounts, skill, skillLevel, onHit, missileDistance, missileSpeed, lockingTarget);
 
             // Initial configuration
             _initialPosition = CacheTransform.position;

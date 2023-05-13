@@ -24,9 +24,9 @@ namespace MultiplayerARPG
         public Rigidbody CacheRigidbody { get; private set; }
         public Rigidbody2D CacheRigidbody2D { get; private set; }
 
+        protected bool _isExploded;
         protected float _missileDistance;
         protected float _missileSpeed;
-        protected bool _isExploded;
         protected IDamageableEntity _lockingTarget;
         protected float _launchTime;
         protected float _missileDuration;
@@ -49,23 +49,31 @@ namespace MultiplayerARPG
         /// </summary>
         /// <param name="instigator">Weapon's or skill's instigator who to spawn this to attack enemy</param>
         /// <param name="weapon">Weapon which was used to attack enemy</param>
+        /// <param name="simulateSeed">Launch random seed</param>
+        /// <param name="triggerIndex"></param>
+        /// <param name="spreadIndex"></param>
         /// <param name="damageAmounts">Calculated damage amounts</param>
         /// <param name="skill">Skill which was used to attack enemy</param>
         /// <param name="skillLevel">Level of the skill</param>
+        /// <param name="onHit">Action when hit</param>
         /// <param name="missileDistance">Calculated missile distance</param>
         /// <param name="missileSpeed">Calculated missile speed</param>
         /// <param name="lockingTarget">Locking target, if this is empty it can hit any entities</param>
         public virtual void Setup(
             EntityInfo instigator,
             CharacterItem weapon,
+            int simulateSeed,
+            byte triggerIndex,
+            byte spreadIndex,
             Dictionary<DamageElement, MinMaxFloat> damageAmounts,
             BaseSkill skill,
             int skillLevel,
+            DamageHitDelegate onHit,
             float missileDistance,
             float missileSpeed,
             IDamageableEntity lockingTarget)
         {
-            Setup(instigator, weapon, damageAmounts, skill, skillLevel);
+            Setup(instigator, weapon, simulateSeed, triggerIndex, spreadIndex, damageAmounts, skill, skillLevel, onHit);
             _missileDistance = missileDistance;
             _missileSpeed = missileSpeed;
 

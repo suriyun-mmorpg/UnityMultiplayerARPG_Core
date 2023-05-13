@@ -35,21 +35,29 @@ namespace MultiplayerARPG
         /// </summary>
         /// <param name="instigator">Weapon's or skill's instigator who to spawn this to attack enemy</param>
         /// <param name="weapon">Weapon which was used to attack enemy</param>
+        /// <param name="simulateSeed">Launch random seed</param>
+        /// <param name="triggerIndex"></param>
+        /// <param name="spreadIndex"></param>
         /// <param name="damageAmounts">Calculated damage amounts</param>
         /// <param name="skill">Skill which was used to attack enemy</param>
         /// <param name="skillLevel">Level of the skill</param>
+        /// <param name="onHit">Action when hit</param>
         /// <param name="throwForce">Calculated throw force</param>
         /// <param name="lifetime">Calculated life time</param>
         public virtual void Setup(
             EntityInfo instigator,
             CharacterItem weapon,
+            int simulateSeed,
+            byte triggerIndex,
+            byte spreadIndex,
             Dictionary<DamageElement, MinMaxFloat> damageAmounts,
             BaseSkill skill,
             int skillLevel,
+            DamageHitDelegate onHit,
             float throwForce,
             float lifetime)
         {
-            Setup(instigator, weapon, damageAmounts, skill, skillLevel);
+            Setup(instigator, weapon, simulateSeed, triggerIndex, spreadIndex, damageAmounts, skill, skillLevel, onHit);
             _throwForce = throwForce;
             _lifetime = lifetime;
 

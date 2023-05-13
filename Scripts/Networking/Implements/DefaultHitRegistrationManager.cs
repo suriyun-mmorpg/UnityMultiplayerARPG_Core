@@ -151,7 +151,7 @@ namespace MultiplayerARPG
             s_registeringHits.Clear();
         }
 
-        private void PerformValidation(BaseGameEntity attacker, string id, int randomSeed, List<HitData> hits)
+        private void PerformValidation(BaseGameEntity attacker, string id, int simulateSeed, List<HitData> hits)
         {
             if (attacker == null || !s_validatingHits.ContainsKey(id))
                 return;
@@ -201,7 +201,7 @@ namespace MultiplayerARPG
                 if (!validateData.HitObjects.Contains(hitObjectId) && IsHit(attacker, hitData, hitBox))
                 {
                     // Yes, it is hit
-                    hitBox.ReceiveDamage(attacker.EntityTransform.position, attacker.GetInfo(), validateData.DamageAmounts, validateData.Weapon, validateData.Skill, validateData.SkillLevel, randomSeed);
+                    hitBox.ReceiveDamage(attacker.EntityTransform.position, attacker.GetInfo(), validateData.DamageAmounts, validateData.Weapon, validateData.Skill, validateData.SkillLevel, simulateSeed);
                     validateData.HitsCount[hitId] = ++hitCount;
                     validateData.HitObjects.Add(hitObjectId);
                 }
