@@ -267,17 +267,10 @@ namespace MultiplayerARPG
             DamageOriginPreparedDelegate onOriginPrepared,
             DamageHitDelegate onHit)
         {
-            HashSet<uint> hitObjects = new HashSet<uint>();
             bool isClient = attacker.IsClient;
             bool isHost = attacker.IsOwnerHost;
             bool isOwnerClient = attacker.IsOwnerClient;
             bool isOwnedByServer = attacker.IsOwnedByServer;
-
-            if (!isOwnedByServer && !isClient)
-            {
-                // Only server entities (such as monsters) and clients will launch raycast damage (clients do it for game effects playing)
-                return;
-            }
 
             // Get generic attack data
             EntityInfo instigator = attacker.GetInfo();
@@ -287,12 +280,20 @@ namespace MultiplayerARPG
             if (onOriginPrepared != null)
                 onOriginPrepared.Invoke(simulateSeed, triggerIndex, spreadIndex, damagePosition, damageDirection, damageRotation);
 
+            if (!isOwnedByServer && !isClient)
+            {
+                // Only server entities (such as monsters) and clients will launch raycast damage
+                // clients do it for game effects playing, server do it to apply damage
+                return;
+            }
+
             // Find hitting objects
             int layerMask = GameInstance.Singleton.GetDamageEntityHitLayerMask();
             int tempHitCount = attacker.AttackPhysicFunctions.OverlapObjects(damagePosition, hitDistance, layerMask, true, QueryTriggerInteraction.Collide);
             if (tempHitCount <= 0)
                 return;
 
+            HashSet<uint> hitObjects = new HashSet<uint>();
             bool isPlayImpactEffects = isClient && impactEffects != null;
             DamageableHitBox tempDamageableHitBox;
             GameObject tempGameObject;
@@ -445,17 +446,10 @@ namespace MultiplayerARPG
             DamageOriginPreparedDelegate onOriginPrepared,
             DamageHitDelegate onHit)
         {
-            HashSet<uint> hitObjects = new HashSet<uint>();
             bool isClient = attacker.IsClient;
             bool isHost = attacker.IsOwnerHost;
             bool isOwnerClient = attacker.IsOwnerClient;
             bool isOwnedByServer = attacker.IsOwnedByServer;
-
-            if (!isOwnedByServer && !isClient)
-            {
-                // Only server entities (such as monsters) and clients will launch raycast damage (clients do it for game effects playing)
-                return;
-            }
 
             // Get generic attack data
             EntityInfo instigator = attacker.GetInfo();
@@ -464,6 +458,13 @@ namespace MultiplayerARPG
             this.GetDamagePositionAndRotation(attacker, isLeftHand, aimPosition, stagger, out Vector3 damagePosition, out Vector3 damageDirection, out Quaternion damageRotation);
             if (onOriginPrepared != null)
                 onOriginPrepared.Invoke(simulateSeed, triggerIndex, spreadIndex, damagePosition, damageDirection, damageRotation);
+
+            if (!isOwnedByServer && !isClient)
+            {
+                // Only server entities (such as monsters) and clients will launch raycast damage
+                // clients do it for game effects playing, server do it to apply damage
+                return;
+            }
 
             bool isPlayImpactEffects = isClient && impactEffects != null;
             float projectileDistance = missileDistance;
@@ -481,6 +482,7 @@ namespace MultiplayerARPG
                 return;
             }
 
+            HashSet<uint> hitObjects = new HashSet<uint>();
             projectileDistance = float.MinValue;
             byte pierceThroughEntities = this.pierceThroughEntities;
             Vector3 tempHitPoint;
