@@ -108,8 +108,7 @@ namespace MultiplayerARPG
 
         protected override void ApplyReceiveDamage(HitBoxPosition position, Vector3 fromPosition, EntityInfo instigator, Dictionary<DamageElement, MinMaxFloat> damageAmounts, CharacterItem weapon, BaseSkill skill, int skillLevel, int randomSeed, out CombatAmountType combatAmountType, out int totalDamage)
         {
-            BaseCharacterEntity attackerCharacter;
-            instigator.TryGetEntity(out attackerCharacter);
+            instigator.TryGetEntity(out BaseCharacterEntity attackerCharacter);
             // Apply damages, won't apply skill damage
             float calculatingTotalDamage = 0f;
             // Harvest type is based on weapon by default
@@ -184,8 +183,7 @@ namespace MultiplayerARPG
         public override void ReceivedDamage(HitBoxPosition position, Vector3 fromPosition, EntityInfo instigator, Dictionary<DamageElement, MinMaxFloat> damageAmounts, CombatAmountType combatAmountType, int totalDamage, CharacterItem weapon, BaseSkill skill, int skillLevel, CharacterBuff buff, bool isDamageOverTime = false)
         {
             base.ReceivedDamage(position, fromPosition, instigator, damageAmounts, combatAmountType, totalDamage, weapon, skill, skillLevel, buff, isDamageOverTime);
-            BaseCharacterEntity attackerCharacter;
-            instigator.TryGetEntity(out attackerCharacter);
+            instigator.TryGetEntity(out BaseCharacterEntity attackerCharacter);
             CurrentGameInstance.GameplayRule.OnHarvestableReceivedDamage(attackerCharacter, this, combatAmountType, totalDamage, weapon, skill, skillLevel, buff, isDamageOverTime);
 
             if (combatAmountType == CombatAmountType.Miss)
