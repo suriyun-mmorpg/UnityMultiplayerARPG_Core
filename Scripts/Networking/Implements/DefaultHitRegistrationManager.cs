@@ -210,7 +210,6 @@ namespace MultiplayerARPG
                 if (!validateData.HitObjects.Contains(hitObjectId) && IsHit(attacker, hitData, hitBox))
                 {
                     // Yes, it is hit
-                    Debug.LogError("2");
                     hitBox.ReceiveDamage(attacker.EntityTransform.position, attacker.GetInfo(), validateData.DamageAmounts, validateData.Weapon, validateData.Skill, validateData.SkillLevel, simulateSeed);
                     validateData.HitsCount[hitId] = ++hitCount;
                     validateData.HitObjects.Add(hitObjectId);
