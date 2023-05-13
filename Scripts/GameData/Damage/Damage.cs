@@ -269,7 +269,7 @@ namespace MultiplayerARPG
         {
             HashSet<uint> hitObjects = new HashSet<uint>();
             bool isClient = attacker.IsClient;
-            bool isHost = attacker.IsHost;
+            bool isHost = attacker.IsOwnerHost;
             bool isOwnerClient = attacker.IsOwnerClient;
             bool isOwnedByServer = attacker.IsOwnedByServer;
 
@@ -447,7 +447,7 @@ namespace MultiplayerARPG
         {
             HashSet<uint> hitObjects = new HashSet<uint>();
             bool isClient = attacker.IsClient;
-            bool isHost = attacker.IsHost;
+            bool isHost = attacker.IsOwnerHost;
             bool isOwnerClient = attacker.IsOwnerClient;
             bool isOwnedByServer = attacker.IsOwnedByServer;
 
