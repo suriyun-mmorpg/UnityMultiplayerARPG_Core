@@ -41,14 +41,13 @@ namespace MultiplayerARPG
             }
         }
 
-        public bool HaveToRegisterByClient<T>(T damageEntity, EntityInfo attackerInfo) where T : BaseDamageEntity
+        public bool WillProceedHitRegByClient<T>(T damageEntity, EntityInfo attackerInfo) where T : BaseDamageEntity
         {
             if (damageEntity == null || !attackerInfo.TryGetEntity(out BaseGameEntity attacker))
                 return false;
-            if (!attacker.IsOwnerHost && !attacker.IsOwnedByServer)
+            if (attacker.IsOwnerHost || attacker.IsOwnedByServer)
                 return false;
-            System.Type type = typeof(T);
-            return type == typeof(MissileDamageEntity) || type == typeof(ProjectileDamageEntity);
+            return damageEntity is MissileDamageEntity;
         }
 
         public void PrepareHitRegValidatation(BaseGameEntity attacker, int randomSeed, float[] triggerDurations, byte fireSpread, DamageInfo damageInfo, Dictionary<DamageElement, MinMaxFloat> damageAmounts, CharacterItem weapon, BaseSkill skill, int skillLevel)
@@ -211,6 +210,7 @@ namespace MultiplayerARPG
                 if (!validateData.HitObjects.Contains(hitObjectId) && IsHit(attacker, hitData, hitBox))
                 {
                     // Yes, it is hit
+                    Debug.LogError("2");
                     hitBox.ReceiveDamage(attacker.EntityTransform.position, attacker.GetInfo(), validateData.DamageAmounts, validateData.Weapon, validateData.Skill, validateData.SkillLevel, simulateSeed);
                     validateData.HitsCount[hitId] = ++hitCount;
                     validateData.HitObjects.Add(hitObjectId);
