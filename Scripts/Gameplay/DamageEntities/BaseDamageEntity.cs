@@ -104,7 +104,9 @@ namespace MultiplayerARPG
                 return;
             if (_onHit != null)
                 _onHit.Invoke(_simulateSeed, _triggerIndex, _spreadIndex, target.GetObjectId(), target.Index, target.CacheTransform.position);
-            if (IsServer)
+            if (!IsServer)
+                return;
+            if (!CurrentGameManager.HitRegistrationManager.HaveToRegisterByClient(this, _instigator))
                 target.ReceiveDamage(CacheTransform.position, _instigator, _damageAmounts, _weapon, _skill, _skillLevel, _simulateSeed);
         }
 
