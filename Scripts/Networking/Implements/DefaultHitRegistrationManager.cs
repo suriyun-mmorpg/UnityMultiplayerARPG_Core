@@ -176,12 +176,13 @@ namespace MultiplayerARPG
                     continue;
                 }
 
-                if (hitData.SpreadIndex >= validateData.FireSpread + 1)
+                if (hitData.SpreadIndex >= validateData.Origins[hitData.TriggerIndex].Count)
                 {
                     // Invalid spread index
                     continue;
                 }
 
+                HitOriginData hitOriginData = validateData.Origins[hitData.TriggerIndex][hitData.SpreadIndex];
                 uint objectId = hitData.ObjectId;
                 int hitBoxIndex = hitData.HitBoxIndex;
                 if (!BaseGameNetworkManager.Singleton.TryGetEntityByObjectId(objectId, out DamageableEntity damageableEntity) ||
@@ -207,7 +208,7 @@ namespace MultiplayerARPG
                 string hitObjectId = MakeHitObjectId(hitData.TriggerIndex, hitData.SpreadIndex, hitData.ObjectId);
                 DamageableHitBox hitBox = damageableEntity.HitBoxes[hitBoxIndex];
                 // Valiate hitting
-                if (!validateData.HitObjects.Contains(hitObjectId) && IsHit(attacker, hitData, hitBox))
+                if (!validateData.HitObjects.Contains(hitObjectId) && IsHit(attacker, hitOriginData, hitData, hitBox))
                 {
                     // Yes, it is hit
                     hitBox.ReceiveDamage(attacker.EntityTransform.position, attacker.GetInfo(), validateData.DamageAmounts, validateData.Weapon, validateData.Skill, validateData.SkillLevel, simulateSeed);
@@ -217,7 +218,7 @@ namespace MultiplayerARPG
             }
         }
 
-        private bool IsHit(BaseGameEntity attacker, HitData hitData, DamageableHitBox hitBox)
+        private bool IsHit(BaseGameEntity attacker, HitOriginData hitOriginData, HitData hitData, DamageableHitBox hitBox)
         {
             long halfRtt = attacker.Player != null ? (attacker.Player.Rtt / 2) : 0;
             long serverTime = BaseGameNetworkManager.Singleton.ServerTimestamp;
