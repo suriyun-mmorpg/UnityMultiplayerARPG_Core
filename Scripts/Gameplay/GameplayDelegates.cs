@@ -3,6 +3,9 @@ using UnityEngine;
 
 namespace MultiplayerARPG
 {
+    public delegate void IsUpdateEntityComponentsDelegate(
+        bool isUpdate);
+
     public delegate void NetworkDestroyDelegate(
         byte reasons);
 

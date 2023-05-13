@@ -161,7 +161,7 @@ namespace MultiplayerARPG
 
         protected override void EntityUpdate()
         {
-            if (!UpdateEntityComponents)
+            if (!IsUpdateEntityComponents)
             {
                 // Don't updates while there is no subscrubers
                 return;
@@ -195,7 +195,7 @@ namespace MultiplayerARPG
 
         public override void SendServerState()
         {
-            if (!UpdateEntityComponents)
+            if (!IsUpdateEntityComponents)
             {
                 // Don't updates while there is no subscrubers
                 return;

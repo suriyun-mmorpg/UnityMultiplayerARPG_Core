@@ -266,7 +266,7 @@ namespace MultiplayerARPG
         }
 
         protected IGameEntityComponent[] EntityComponents { get; private set; }
-        protected virtual bool UpdateEntityComponents
+        protected virtual bool IsUpdateEntityComponents
         {
             get
             {
@@ -288,7 +288,7 @@ namespace MultiplayerARPG
         public event System.Action onSetup;
         public event System.Action onSetupNetElements;
         public event System.Action onSetOwnerClient;
-        public event System.Action<bool> onUpdateEntityComponentsChanged;
+        public event IsUpdateEntityComponentsDelegate onIsUpdateEntityComponentsChanged;
         public event NetworkDestroyDelegate onNetworkDestroy;
         #endregion
 
@@ -426,7 +426,7 @@ namespace MultiplayerARPG
         internal void DoUpdate()
         {
             Profiler.BeginSample("EntityComponents - Update");
-            if (UpdateEntityComponents)
+            if (IsUpdateEntityComponents)
             {
                 for (int i = 0; i < EntityComponents.Length; ++i)
                 {
@@ -481,9 +481,9 @@ namespace MultiplayerARPG
 
         internal void DoLateUpdate()
         {
-            bool updateEntityComponents = UpdateEntityComponents;
+            bool isUpdateEntityComponents = IsUpdateEntityComponents;
             Profiler.BeginSample("EntityComponents - LateUpdate");
-            if (updateEntityComponents)
+            if (isUpdateEntityComponents)
             {
                 for (int i = 0; i < EntityComponents.Length; ++i)
                 {
@@ -493,11 +493,11 @@ namespace MultiplayerARPG
             }
             Profiler.EndSample();
             Profiler.BeginSample("BaseGameEntity - OnUpdateEntityComponentsChanged");
-            if (!_wasUpdateEntityComponents.HasValue || _wasUpdateEntityComponents.Value != updateEntityComponents)
+            if (!_wasUpdateEntityComponents.HasValue || _wasUpdateEntityComponents.Value != isUpdateEntityComponents)
             {
-                _wasUpdateEntityComponents = updateEntityComponents;
-                if (onUpdateEntityComponentsChanged != null)
-                    onUpdateEntityComponentsChanged.Invoke(updateEntityComponents);
+                _wasUpdateEntityComponents = isUpdateEntityComponents;
+                if (onIsUpdateEntityComponentsChanged != null)
+                    onIsUpdateEntityComponentsChanged.Invoke(isUpdateEntityComponents);
             }
             Profiler.EndSample();
             Profiler.BeginSample("BaseGameEntity - EntityLateUpdate");

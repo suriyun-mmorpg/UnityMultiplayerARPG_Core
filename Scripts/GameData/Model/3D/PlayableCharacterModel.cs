@@ -63,12 +63,12 @@ namespace MultiplayerARPG.GameData.Model.Playables
         {
             if (IsActiveModel)
                 Graph.Play();
-            CacheEntity.onUpdateEntityComponentsChanged += CacheEntity_onUpdateEntityComponentsChanged;
+            CacheEntity.onIsUpdateEntityComponentsChanged += CacheEntity_onUpdateEntityComponentsChanged;
         }
 
-        private void CacheEntity_onUpdateEntityComponentsChanged(bool updating)
+        private void CacheEntity_onUpdateEntityComponentsChanged(bool isUpdate)
         {
-            if (!updating)
+            if (!isUpdate)
             {
                 if (Graph.IsPlaying())
                     Graph.Stop();
@@ -143,7 +143,7 @@ namespace MultiplayerARPG.GameData.Model.Playables
 
         private void OnDestroy()
         {
-            CacheEntity.onUpdateEntityComponentsChanged -= CacheEntity_onUpdateEntityComponentsChanged;
+            CacheEntity.onIsUpdateEntityComponentsChanged -= CacheEntity_onUpdateEntityComponentsChanged;
             DestroyGraph();
         }
 
