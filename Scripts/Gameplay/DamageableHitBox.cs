@@ -98,7 +98,7 @@ namespace MultiplayerARPG
             {
                 return new Bounds()
                 {
-                    center = CacheTransform.position + _boundsOffset,
+                    center = CacheTransform.position + (Quaternion.LookRotation(CacheTransform.forward, CacheTransform.up) * _boundsOffset),
                     size = new Vector3(
                         CacheTransform.lossyScale.x * _boundsSize.x,
                         CacheTransform.lossyScale.y * _boundsSize.y,
@@ -135,11 +135,32 @@ namespace MultiplayerARPG
                 else if (CacheCollider is SphereCollider sphereCollider)
                 {
                     _boundsOffset = sphereCollider.center;
-                    _boundsSize = sphereCollider.radius * Vector3.one * 0.5f;
+                    _boundsSize = sphereCollider.radius * Vector3.one * 2f;
+                }
+                else if (CacheCollider is CapsuleCollider capsuleCollider)
+                {
+                    _boundsOffset = capsuleCollider.center;
+                    _boundsSize = capsuleCollider.radius * Vector3.one * 2f;
+                    switch (capsuleCollider.direction)
+                    {
+                        case 0:
+                            // X
+                            _boundsSize = new Vector3(capsuleCollider.height, _boundsSize.y, _boundsSize.z);
+                            break;
+
+                        case 2:
+                            // Z
+                            _boundsSize = new Vector3(_boundsSize.x, _boundsSize.y, capsuleCollider.height);
+                            break;
+                        default:
+                            // Y
+                            _boundsSize = new Vector3(_boundsSize.x, capsuleCollider.height, _boundsSize.z);
+                            break;
+                    }
                 }
                 else
                 {
-                    Logging.LogError(ToString(), "Only `BoxCollider` and `SphereCollider` can be used for damageable hit box (3D games)");
+                    Logging.LogError(ToString(), "Only `BoxCollider`, `SphereCollider` and `CapsuleCollider` can be used for damageable hit box (3D games)");
                     return;
                 }
                 CacheRigidbody = gameObject.GetOrAddComponent<Rigidbody>();
@@ -158,11 +179,30 @@ namespace MultiplayerARPG
                 else if (CacheCollider2D is CircleCollider2D circleCollider2D)
                 {
                     _boundsOffset = circleCollider2D.offset;
-                    _boundsSize = circleCollider2D.radius * Vector3.one * 0.5f;
+                    _boundsSize = circleCollider2D.radius * Vector3.one * 2f;
+                }
+                else if (CacheCollider2D is CapsuleCollider2D capsuleCollider2D)
+                {
+                    _boundsOffset = capsuleCollider2D.offset;
+                    switch (capsuleCollider2D.direction)
+                    {
+                        case CapsuleDirection2D.Vertical:
+                            if (capsuleCollider2D.size.x >= capsuleCollider2D.size.y)
+                                _boundsSize = capsuleCollider2D.size.x * Vector3.one;
+                            else
+                                _boundsSize = new Vector3(capsuleCollider2D.size.x, capsuleCollider2D.size.y);
+                            break;
+                        case CapsuleDirection2D.Horizontal:
+                            if (capsuleCollider2D.size.y >= capsuleCollider2D.size.x)
+                                _boundsSize = capsuleCollider2D.size.y * Vector3.one;
+                            else
+                                _boundsSize = new Vector3(capsuleCollider2D.size.y, capsuleCollider2D.size.x);
+                            break;
+                    }
                 }
                 else
                 {
-                    Logging.LogError(ToString(), "Only `BoxCollider2D` and `CircleCollider2D` can be used for damageable hit box (2D games)");
+                    Logging.LogError(ToString(), "Only `BoxCollider2D`, `CircleCollider2D` and `CapsuleCollider2D` can be used for damageable hit box (2D games)");
                     return;
                 }
                 CacheRigidbody2D = gameObject.GetOrAddComponent<Rigidbody2D>();
@@ -188,7 +228,8 @@ namespace MultiplayerARPG
             foreach (TransformHistory history in _histories)
             {
                 Gizmos.color = debugHistoryColor;
-                Gizmos.DrawWireCube(history.Bounds.center, history.Bounds.size);
+                Gizmos.matrix = Matrix4x4.TRS(history.Bounds.center, history.Rotation, Vector3.one);
+                Gizmos.DrawWireCube(Vector3.zero, history.Bounds.size);
             }
             Gizmos.matrix = oldGizmosMatrix;
             Handles.Label(transform.position, name + "(HitBox)");
