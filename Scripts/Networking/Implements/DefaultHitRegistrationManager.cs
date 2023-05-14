@@ -9,9 +9,25 @@ namespace MultiplayerARPG
     public class DefaultHitRegistrationManager : MonoBehaviour, IHitRegistrationManager
     {
         public float hitValidationBuffer = 2f;
+        protected GameObject _hitBoxObject;
+        protected Transform _hitBoxTransform;
+
         protected static readonly Dictionary<string, HitValidateData> s_validatingHits = new Dictionary<string, HitValidateData>();
         protected static readonly Dictionary<int, List<HitData>> s_registeringHits = new Dictionary<int, List<HitData>>();
         protected static readonly Dictionary<string, CancellationTokenSource> s_cancellationTokenSources = new Dictionary<string, CancellationTokenSource>();
+
+        void Start()
+        {
+            _hitBoxObject = new GameObject("_testHitBox");
+            _hitBoxTransform = _hitBoxObject.transform;
+            _hitBoxTransform.parent = transform;
+        }
+
+        void OnDestroy()
+        {
+            if (_hitBoxObject != null)
+                Destroy(_hitBoxObject);
+        }
 
         protected static async void DelayClearData(string id)
         {
@@ -224,7 +240,10 @@ namespace MultiplayerARPG
             long serverTime = BaseGameNetworkManager.Singleton.ServerTimestamp;
             long targetTime = serverTime - halfRtt;
             DamageableHitBox.TransformHistory transformHistory = hitBox.GetTransformHistory(serverTime, targetTime);
-            bool isHit = Vector3.Distance(hitData.HitPoint, transformHistory.Position) <= Mathf.Max(transformHistory.Bounds.extents.x, transformHistory.Bounds.extents.y, transformHistory.Bounds.extents.z) + hitValidationBuffer;
+            _hitBoxTransform.position = transformHistory.Bounds.center;
+            _hitBoxTransform.rotation = transformHistory.Rotation;
+            Vector3 alignedHitPoint = _hitBoxTransform.InverseTransformPoint(hitData.HitPoint);
+            bool isHit = Vector3.Distance(Vector3.zero, alignedHitPoint) <= Mathf.Max(transformHistory.Bounds.extents.x, transformHistory.Bounds.extents.y, transformHistory.Bounds.extents.z) + hitValidationBuffer;
             return isHit;
         }
 
