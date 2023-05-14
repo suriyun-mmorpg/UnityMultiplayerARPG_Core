@@ -337,9 +337,6 @@ namespace MultiplayerARPG
             if (onExploded != null)
                 onExploded.Invoke();
 
-            if (!IsServer)
-                return;
-
             ExplodeApplyDamage();
         }
 
