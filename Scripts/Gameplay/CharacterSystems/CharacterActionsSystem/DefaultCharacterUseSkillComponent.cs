@@ -139,7 +139,6 @@ namespace MultiplayerARPG
                 // Update skill usage states at server only
                 if (itemDataId.HasValue)
                 {
-                    if ()
                     AddOrUpdateSkillUsage(SkillUsageType.UsableItem, itemDataId.Value, skillLevel);
                 }
                 else
