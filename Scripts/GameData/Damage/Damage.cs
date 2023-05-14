@@ -343,13 +343,9 @@ namespace MultiplayerARPG
                 if (isHost || isOwnedByServer)
                     tempDamageableHitBox.ReceiveDamage(attacker.EntityTransform.position, instigator, damageAmounts, weapon, skill, skillLevel, simulateSeed);
 
-                // It hit something, store data for hit register preparation later
-                if (!isHost && isOwnerClient)
-                {
-                    // Trigger hit action because it is hitting
-                    if (onHit != null)
-                        onHit.Invoke(simulateSeed, triggerIndex, spreadIndex, tempDamageableHitBox.GetObjectId(), tempDamageableHitBox.Index, tempDamageableHitBox.CacheTransform.position);
-                }
+                // Trigger hit action because it is hitting
+                if (onHit != null)
+                    onHit.Invoke(simulateSeed, triggerIndex, spreadIndex, tempDamageableHitBox.GetObjectId(), tempDamageableHitBox.Index, tempDamageableHitBox.CacheTransform.position);
 
                 // Instantiate impact effects
                 if (isPlayImpactEffects)
@@ -366,13 +362,9 @@ namespace MultiplayerARPG
                 if (isHost || isOwnedByServer)
                     tempDamageTakenTarget.ReceiveDamage(attacker.EntityTransform.position, instigator, damageAmounts, weapon, skill, skillLevel, simulateSeed);
 
-                // It hit something, store data for hit register preparation later
-                if (!isHost && isOwnerClient)
-                {
-                    // Trigger hit action because it is hitting
-                    if (onHit != null)
-                        onHit.Invoke(simulateSeed, triggerIndex, spreadIndex, tempDamageTakenTarget.GetObjectId(), tempDamageTakenTarget.Index, tempDamageTakenTarget.CacheTransform.position);
-                }
+                // Trigger hit action because it is hitting
+                if (onHit != null)
+                    onHit.Invoke(simulateSeed, triggerIndex, spreadIndex, tempDamageTakenTarget.GetObjectId(), tempDamageTakenTarget.Index, tempDamageTakenTarget.CacheTransform.position);
 
                 // Instantiate impact effects
                 if (isPlayImpactEffects)
@@ -553,13 +545,9 @@ namespace MultiplayerARPG
                 if (isHost || isOwnedByServer)
                     tempDamageableHitBox.ReceiveDamage(attacker.EntityTransform.position, instigator, damageAmounts, weapon, skill, skillLevel, simulateSeed);
 
-                // It hit something, store data for hit register preparation later
-                if (!isHost && isOwnerClient)
-                {
-                    // Trigger hit action because it is hitting
-                    if (onHit != null)
-                        onHit.Invoke(simulateSeed, triggerIndex, spreadIndex, tempDamageableHitBox.GetObjectId(), tempDamageableHitBox.Index, tempHitPoint);
-                }
+                // Trigger hit action because it is hitting
+                if (onHit != null)
+                    onHit.Invoke(simulateSeed, triggerIndex, spreadIndex, tempDamageableHitBox.GetObjectId(), tempDamageableHitBox.Index, tempHitPoint);
 
                 // Prepare data to instantiate impact effects
                 if (isPlayImpactEffects)
@@ -652,7 +640,7 @@ namespace MultiplayerARPG
                     // Can hit unlimited objects within attack/explode range
                     return false;
                 case DamageType.Raycast:
-                    return alreadyHitCount >= pierceThroughEntities;
+                    return alreadyHitCount > pierceThroughEntities;
                 case DamageType.Custom:
                     return customDamageInfo.IsHitReachedMax(alreadyHitCount);
             }
