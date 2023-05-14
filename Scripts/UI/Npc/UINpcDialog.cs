@@ -19,6 +19,7 @@ namespace MultiplayerARPG
         public AudioSource voiceSource;
 
         protected BaseNpcDialog _lastData;
+        protected BasePlayerCharacterEntity _previousEntity;
 
         protected override void OnEnable()
         {
@@ -28,6 +29,9 @@ namespace MultiplayerARPG
                 if (voiceSource.clip != null)
                     voiceSource.Play();
             }
+            GameInstance.onSetPlayingCharacter += GameInstance_onSetPlayingCharacter;
+            if (GameInstance.PlayingCharacterEntity != null)
+                GameInstance_onSetPlayingCharacter(GameInstance.PlayingCharacterEntity);
         }
 
         protected override void OnDisable()
@@ -38,6 +42,64 @@ namespace MultiplayerARPG
                 voiceSource.Stop();
                 voiceSource.clip = null;
             }
+            GameInstance.onSetPlayingCharacter -= GameInstance_onSetPlayingCharacter;
+            RemoveEvents(_previousEntity);
+        }
+
+        private void GameInstance_onSetPlayingCharacter(IPlayerCharacterData playingCharacterData)
+        {
+            RemoveEvents(_previousEntity);
+            BasePlayerCharacterEntity playerCharacterEntity = playingCharacterData as BasePlayerCharacterEntity;
+            _previousEntity = playerCharacterEntity;
+            AddEvents(_previousEntity);
+            ForceUpdate();
+        }
+
+        private void AddEvents(BasePlayerCharacterEntity PlayingCharacterEntity)
+        {
+            if (PlayingCharacterEntity == null)
+                return;
+            PlayingCharacterEntity.onLevelChange += PlayingCharacterEntity_onLevelChange;
+            PlayingCharacterEntity.onDataIdChange += PlayingCharacterEntity_onDataIdChange;
+            PlayingCharacterEntity.onFactionIdChange += PlayingCharacterEntity_onFactionIdChange;
+            PlayingCharacterEntity.onNonEquipItemsOperation += PlayingCharacterEntity_onNonEquipItemsOperation;
+            PlayingCharacterEntity.onQuestsOperation += PlayingCharacterEntity_onQuestsOperation;
+        }
+
+        private void RemoveEvents(BasePlayerCharacterEntity PlayingCharacterEntity)
+        {
+            if (PlayingCharacterEntity == null)
+                return;
+            PlayingCharacterEntity.onLevelChange -= PlayingCharacterEntity_onLevelChange;
+            PlayingCharacterEntity.onDataIdChange -= PlayingCharacterEntity_onDataIdChange;
+            PlayingCharacterEntity.onFactionIdChange -= PlayingCharacterEntity_onFactionIdChange;
+            PlayingCharacterEntity.onNonEquipItemsOperation -= PlayingCharacterEntity_onNonEquipItemsOperation;
+            PlayingCharacterEntity.onQuestsOperation -= PlayingCharacterEntity_onQuestsOperation;
+        }
+
+        private void PlayingCharacterEntity_onLevelChange(int level)
+        {
+            ForceUpdate();
+        }
+
+        private void PlayingCharacterEntity_onDataIdChange(int obj)
+        {
+            ForceUpdate();
+        }
+
+        private void PlayingCharacterEntity_onFactionIdChange(int obj)
+        {
+            ForceUpdate();
+        }
+
+        private void PlayingCharacterEntity_onNonEquipItemsOperation(LiteNetLibManager.LiteNetLibSyncList.Operation op, int index)
+        {
+            ForceUpdate();
+        }
+
+        private void PlayingCharacterEntity_onQuestsOperation(LiteNetLibManager.LiteNetLibSyncList.Operation op, int index)
+        {
+            ForceUpdate();
         }
 
         protected override void UpdateData()
