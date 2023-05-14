@@ -306,7 +306,7 @@ namespace MultiplayerARPG
                 }
 
                 // Decrease items
-                if (itemDataId.HasValue && Entity.DecreaseItems(itemDataId.Value, 1))
+                if (IsServer && itemDataId.HasValue && Entity.DecreaseItems(itemDataId.Value, 1))
                     Entity.FillEmptySlots();
 
                 if (remainsDuration > 0f)
