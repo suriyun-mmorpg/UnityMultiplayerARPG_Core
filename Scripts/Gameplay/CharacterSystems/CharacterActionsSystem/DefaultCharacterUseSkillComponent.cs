@@ -113,10 +113,6 @@ namespace MultiplayerARPG
 
         protected async UniTaskVoid UseSkillRoutine(int simulateSeed, bool isLeftHand, BaseSkill skill, int skillLevel, uint targetObjectId, AimPosition skillAimPosition, int? itemDataId)
         {
-            // Prepare cancellation
-            CancellationTokenSource skillCancellationTokenSource = new CancellationTokenSource();
-            _skillCancellationTokenSources.Add(skillCancellationTokenSource);
-
             // Prepare required data and get skill data
             Entity.GetUsingSkillData(
                 skill,
@@ -143,6 +139,7 @@ namespace MultiplayerARPG
                 // Update skill usage states at server only
                 if (itemDataId.HasValue)
                 {
+                    if ()
                     AddOrUpdateSkillUsage(SkillUsageType.UsableItem, itemDataId.Value, skillLevel);
                 }
                 else
@@ -179,6 +176,11 @@ namespace MultiplayerARPG
                 remainsDuration = totalDuration;
                 LastUseSkillEndTime = Time.unscaledTime + (totalDuration / animSpeedRate);
             }
+
+            // Prepare cancellation
+            CancellationTokenSource skillCancellationTokenSource = new CancellationTokenSource();
+            _skillCancellationTokenSources.Add(skillCancellationTokenSource);
+
             try
             {
                 bool tpsModelAvailable = Entity.CharacterModel != null && Entity.CharacterModel.gameObject.activeSelf;
@@ -303,6 +305,10 @@ namespace MultiplayerARPG
                         break;
                     }
                 }
+
+                // Decrease items
+                if (itemDataId.HasValue && Entity.DecreaseItems(itemDataId.Value, 1))
+                    Entity.FillEmptySlots();
 
                 if (remainsDuration > 0f)
                 {
@@ -480,10 +486,6 @@ namespace MultiplayerARPG
             // Validate skill item
             if (!Entity.ValidateSkillItemToUse(itemIndex, isLeftHand, targetObjectId, out ISkillItem skillItem, out BaseSkill skill, out int skillLevel, out _))
                 return;
-            // Decrease items
-            if (!Entity.DecreaseItemsByIndex(itemIndex, 1, false))
-                return;
-            Entity.FillEmptySlots();
             // Prepare state data which will be sent to clients
             _serverState = new UseSkillState()
             {

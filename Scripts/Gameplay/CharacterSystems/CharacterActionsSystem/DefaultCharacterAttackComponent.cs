@@ -61,10 +61,6 @@ namespace MultiplayerARPG
             float time = Time.unscaledTime;
             float deltaTime = Time.unscaledDeltaTime;
 
-            // Prepare cancellation
-            CancellationTokenSource attackCancellationTokenSource = new CancellationTokenSource();
-            _attackCancellationTokenSources.Add(attackCancellationTokenSource);
-
             // Prepare required data and get weapon data
             Entity.GetAttackingData(
                 ref isLeftHand,
@@ -128,6 +124,10 @@ namespace MultiplayerARPG
                 // Do something with buffs when attack
                 Entity.SkillAndBuffComponent.OnAttack();
             }
+
+            // Prepare cancellation
+            CancellationTokenSource attackCancellationTokenSource = new CancellationTokenSource();
+            _attackCancellationTokenSources.Add(attackCancellationTokenSource);
 
             try
             {
