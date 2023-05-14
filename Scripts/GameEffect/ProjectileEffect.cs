@@ -61,6 +61,11 @@ namespace MultiplayerARPG
         {
             this.speed = speed;
             lifeTime = distance / speed;
+            if (lifeTime <= 0f)
+            {
+                PushBack();
+                return;
+            }
             PushBack(lifeTime);
             _impactEffects = impactEffects;
             _launchOrigin = launchOrigin;
