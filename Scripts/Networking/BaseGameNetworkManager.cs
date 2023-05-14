@@ -152,7 +152,7 @@ namespace MultiplayerARPG
             }
         }
 
-        protected override void OnServerUpdate(GameUpdater updater)
+        protected override void OnServerUpdate(LogicUpdater updater)
         {
             base.OnServerUpdate(updater);
             Profiler.BeginSample("BaseGameNetworkManager - SendServerState");
@@ -167,7 +167,7 @@ namespace MultiplayerARPG
             Profiler.EndSample();
         }
 
-        protected override void OnClientUpdate(GameUpdater updater)
+        protected override void OnClientUpdate(LogicUpdater updater)
         {
             base.OnClientUpdate(updater);
             if (IsServer)

@@ -203,7 +203,7 @@ namespace MultiplayerARPG
             }
         }
 
-        protected override void OnServerUpdate(GameUpdater updater)
+        protected override void OnServerUpdate(LogicUpdater updater)
         {
             base.OnServerUpdate(updater);
             if (_pendingSpawnPlayerCharacters.Count > 0 && _isReadyToInstantiatePlayers)
