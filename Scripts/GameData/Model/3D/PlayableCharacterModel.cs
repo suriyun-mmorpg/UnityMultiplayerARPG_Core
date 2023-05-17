@@ -62,7 +62,10 @@ namespace MultiplayerARPG.GameData.Model.Playables
         protected virtual void Start()
         {
             if (IsActiveModel)
+            {
                 Graph.Play();
+                Graph.Evaluate(Time.deltaTime);
+            }
             CacheEntity.onIsUpdateEntityComponentsChanged += CacheEntity_onUpdateEntityComponentsChanged;
         }
 
