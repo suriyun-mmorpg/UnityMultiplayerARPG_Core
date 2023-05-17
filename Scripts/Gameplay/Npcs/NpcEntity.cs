@@ -171,7 +171,6 @@ namespace MultiplayerARPG
 
             foundDialogs.Add(dialog);
 
-            List<UniTask> tasks = new List<UniTask>();
             List<UniTask<bool>> menuConditionTasks = new List<UniTask<bool>>();
             switch (dialog.type)
             {
@@ -180,59 +179,60 @@ namespace MultiplayerARPG
                     {
                         if (menu.isCloseMenu)
                             continue;
-                        foundMenus.Add(menu);
-                        tasks.Add(FindQuestFromDialog(playerCharacter, questIds, menu.dialog, foundMenus, foundDialogs));
+                        List<NpcDialogMenu> currentFoundMenus = new List<NpcDialogMenu>(foundMenus)
+                        {
+                            menu,
+                        };
+                        await FindQuestFromDialog(playerCharacter, questIds, menu.dialog, currentFoundMenus, foundDialogs);
                     }
                     break;
                 case NpcDialogType.Quest:
-                    if (dialog.quest != null)
+                    if (foundMenus.Count > 0)
                     {
-
-                        if (foundMenus.Count > 0)
+                        foreach (NpcDialogMenu menu in foundMenus)
                         {
-                            foreach (NpcDialogMenu menu in foundMenus)
-                            {
-                                menuConditionTasks.Add(menu.IsPassConditions(playerCharacter));
-                            }
+                            menuConditionTasks.Add(menu.IsPassConditions(playerCharacter));
                         }
-                        bool[] menuConditionResults = await UniTask.WhenAll(menuConditionTasks);
-                        bool isPass = true;
-                        foreach (bool menuConditionResult in menuConditionResults)
-                        {
-                            if (!menuConditionResult)
-                            {
-                                isPass = false;
-                                break;
-                            }
-                        }
-                        if (isPass)
-                            questIds.Add(dialog.quest.DataId);
                     }
-                    tasks.Add(FindQuestFromDialog(playerCharacter, questIds, dialog.questAcceptedDialog, foundMenus, foundDialogs));
-                    tasks.Add(FindQuestFromDialog(playerCharacter, questIds, dialog.questDeclinedDialog, foundMenus, foundDialogs));
-                    tasks.Add(FindQuestFromDialog(playerCharacter, questIds, dialog.questAbandonedDialog, foundMenus, foundDialogs));
-                    tasks.Add(FindQuestFromDialog(playerCharacter, questIds, dialog.questCompletedDialog, foundMenus, foundDialogs));
+                    bool[] menuConditionResults = await UniTask.WhenAll(menuConditionTasks);
+                    foreach (bool menuConditionResult in menuConditionResults)
+                    {
+                        if (!menuConditionResult)
+                            return;
+                    }
+                    if (dialog.quest != null)
+                        questIds.Add(dialog.quest.DataId);
+                    await FindQuestFromDialog(playerCharacter, questIds, dialog.questAcceptedDialog, foundMenus, foundDialogs);
+                    await FindQuestFromDialog(playerCharacter, questIds, dialog.questDeclinedDialog, foundMenus, foundDialogs);
+                    await FindQuestFromDialog(playerCharacter, questIds, dialog.questAbandonedDialog, foundMenus, foundDialogs);
+                    await FindQuestFromDialog(playerCharacter, questIds, dialog.questCompletedDialog, foundMenus, foundDialogs);
                     break;
                 case NpcDialogType.CraftItem:
-                    tasks.Add(FindQuestFromDialog(playerCharacter, questIds, dialog.craftNotMeetRequirementsDialog, foundMenus, foundDialogs));
-                    tasks.Add(FindQuestFromDialog(playerCharacter, questIds, dialog.craftDoneDialog, foundMenus, foundDialogs));
-                    tasks.Add(FindQuestFromDialog(playerCharacter, questIds, dialog.craftCancelDialog, foundMenus, foundDialogs));
+                    await FindQuestFromDialog(playerCharacter, questIds, dialog.craftNotMeetRequirementsDialog, foundMenus, foundDialogs);
+                    await FindQuestFromDialog(playerCharacter, questIds, dialog.craftDoneDialog, foundMenus, foundDialogs);
+                    await FindQuestFromDialog(playerCharacter, questIds, dialog.craftCancelDialog, foundMenus, foundDialogs);
                     break;
                 case NpcDialogType.SaveRespawnPoint:
-                    tasks.Add(FindQuestFromDialog(playerCharacter, questIds, dialog.saveRespawnConfirmDialog, foundMenus, foundDialogs));
-                    tasks.Add(FindQuestFromDialog(playerCharacter, questIds, dialog.saveRespawnCancelDialog, foundMenus, foundDialogs));
+                    await FindQuestFromDialog(playerCharacter, questIds, dialog.saveRespawnConfirmDialog, foundMenus, foundDialogs);
+                    await FindQuestFromDialog(playerCharacter, questIds, dialog.saveRespawnCancelDialog, foundMenus, foundDialogs);
                     break;
                 case NpcDialogType.Warp:
-                    tasks.Add(FindQuestFromDialog(playerCharacter, questIds, dialog.warpCancelDialog, foundMenus, foundDialogs));
+                    await FindQuestFromDialog(playerCharacter, questIds, dialog.warpCancelDialog, foundMenus, foundDialogs);
                     break;
-            }
+                case NpcDialogType.RefineItem:
+                    await FindQuestFromDialog(playerCharacter, questIds, dialog.refineItemCancelDialog, foundMenus, foundDialogs);
+                    break;
+                case NpcDialogType.PlayerStorage:
+                case NpcDialogType.GuildStorage:
+                    await FindQuestFromDialog(playerCharacter, questIds, dialog.storageCancelDialog, foundMenus, foundDialogs);
+                    break;
+                case NpcDialogType.DismantleItem:
+                    await FindQuestFromDialog(playerCharacter, questIds, dialog.dismantleItemCancelDialog, foundMenus, foundDialogs);
+                    break;
+                case NpcDialogType.RepairItem:
+                    await FindQuestFromDialog(playerCharacter, questIds, dialog.repairItemCancelDialog, foundMenus, foundDialogs);
+                    break;
 
-            try
-            {
-                await UniTask.WhenAll(tasks);
-            }
-            catch
-            {
             }
         }
 
