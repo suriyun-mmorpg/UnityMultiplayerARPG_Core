@@ -239,6 +239,23 @@ namespace MultiplayerARPG
         {
             base.EntityUpdate();
             Profiler.BeginSample("BuildingEntity - Update");
+            if (IsServer && lifeTime > 0f)
+            {
+                // Reduce remains life time
+                RemainsLifeTime -= Time.deltaTime;
+                if (RemainsLifeTime < 0)
+                {
+                    // Destroy building
+                    RemainsLifeTime = 0f;
+                    Destroy();
+                }
+            }
+            Profiler.EndSample();
+        }
+
+        protected override void EntityLateUpdate()
+        {
+            base.EntityLateUpdate();
             if (IsBuildMode)
             {
                 UpdateBuildingAreaSnapping();
@@ -249,26 +266,6 @@ namespace MultiplayerARPG
                     buildingMaterial.CurrentState = canBuild ? BuildingMaterial.State.CanBuild : BuildingMaterial.State.CannotBuild;
                 }
             }
-            else
-            {
-                if (IsServer && lifeTime > 0f)
-                {
-                    // Reduce remains life time
-                    RemainsLifeTime -= Time.deltaTime;
-                    if (RemainsLifeTime < 0)
-                    {
-                        // Destroy building
-                        RemainsLifeTime = 0f;
-                        Destroy();
-                    }
-                }
-            }
-            Profiler.EndSample();
-        }
-
-        protected override void EntityLateUpdate()
-        {
-            base.EntityLateUpdate();
             // Setup parent which when it's destroying it will destroy children (chain destroy)
             if (IsServer && !parentFound)
             {
