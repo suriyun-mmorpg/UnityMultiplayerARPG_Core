@@ -18,6 +18,7 @@ namespace MultiplayerARPG
         public NpcEntity npcEntity;
         protected BasePlayerCharacterEntity _previousEntity;
         protected bool _isUpdating = false;
+        protected bool _hasPendingUpdate = false;
 
         private void Awake()
         {
@@ -93,7 +94,10 @@ namespace MultiplayerARPG
         private async UniTaskVoid UpdateStatus()
         {
             if (_isUpdating)
+            {
+                _hasPendingUpdate = true;
                 return;
+            }
             _isUpdating = true;
             // Indicator priority haveTasksDoneQuests > haveInProgressQuests > haveNewQuests
             bool isIndicatorShown = false;
@@ -113,6 +117,11 @@ namespace MultiplayerARPG
             if (haveNewQuestsIndicator != null && haveNewQuestsIndicator.activeSelf != tempVisibleState)
                 haveNewQuestsIndicator.SetActive(tempVisibleState);
             _isUpdating = false;
+            if (_hasPendingUpdate)
+            {
+                _hasPendingUpdate = false;
+                UpdateStatus().Forget();
+            }
         }
     }
 }
