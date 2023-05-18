@@ -7,6 +7,7 @@ using UnityEngine;
 
 namespace MultiplayerARPG
 {
+    [RequireComponent(typeof(CharacterActionComponentManager))]
     public class DefaultCharacterReloadComponent : BaseNetworkedGameEntityComponent<BaseCharacterEntity>, ICharacterReloadComponent
     {
         public const float DEFAULT_TOTAL_DURATION = 2f;
@@ -31,9 +32,15 @@ namespace MultiplayerARPG
         public float[] ReloadTriggerDurations { get { return _triggerDurations; } set { _triggerDurations = value; } }
         public AnimActionType AnimActionType { get; protected set; }
 
+        protected CharacterActionComponentManager _manager;
         // Network data sending
         protected ReloadState? _clientState;
         protected ReloadState? _serverState;
+
+        public override void EntityStart()
+        {
+            _manager = GetComponent<CharacterActionComponentManager>();
+        }
 
         protected virtual void SetReloadActionStates(AnimActionType animActionType, int reloadingAmmoAmount)
         {
@@ -135,7 +142,7 @@ namespace MultiplayerARPG
                         remainsDuration = DEFAULT_TOTAL_DURATION - DEFAULT_STATE_SETUP_DELAY;
                         _triggerDurations = new float[1]
                         {
-                        DEFAULT_TRIGGER_DURATION,
+                            DEFAULT_TRIGGER_DURATION,
                         };
                     }
                     else
@@ -244,6 +251,8 @@ namespace MultiplayerARPG
         private void ProceedReloadStateAtServer(bool isLeftHand)
         {
 #if UNITY_EDITOR || UNITY_SERVER
+            if (!_manager.IsAcceptNewAction())
+                return;
             // Speed hack avoidance
             if (Time.unscaledTime - LastReloadEndTime < -0.05f)
                 return;
@@ -265,6 +274,7 @@ namespace MultiplayerARPG
                 reloadingAmmoAmount = inventoryAmount;
             if (reloadingAmmoAmount <= 0)
                 return;
+            _manager.ActionAccepted();
             // Prepare state data which will be sent to clients
             _serverState = new ReloadState()
             {

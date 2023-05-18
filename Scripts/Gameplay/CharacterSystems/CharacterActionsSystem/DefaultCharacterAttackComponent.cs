@@ -8,6 +8,7 @@ using UnityEngine;
 
 namespace MultiplayerARPG
 {
+    [RequireComponent(typeof(CharacterActionComponentManager))]
     public class DefaultCharacterAttackComponent : BaseNetworkedGameEntityComponent<BaseCharacterEntity>, ICharacterAttackComponent
     {
         public const float DEFAULT_TOTAL_DURATION = 2f;
@@ -36,11 +37,17 @@ namespace MultiplayerARPG
         public bool doNotRandomAnimation;
         public float animationResetDelay = 2f;
 
+        protected CharacterActionComponentManager _manager;
         protected int _lastAttackAnimationIndex = 0;
         protected int _lastAttackDataId = 0;
         // Network data sending
         protected AttackState? _clientState;
         protected AttackState? _serverState;
+
+        public override void EntityStart()
+        {
+            _manager = GetComponent<CharacterActionComponentManager>();
+        }
 
         protected virtual void SetAttackActionStates(AnimActionType animActionType, int animActionDataId)
         {
@@ -373,9 +380,12 @@ namespace MultiplayerARPG
         protected void ProceedAttackStateAtServer(int simulateSeed, bool isLeftHand)
         {
 #if UNITY_EDITOR || UNITY_SERVER
+            if (!_manager.IsAcceptNewAction())
+                return;
             // Speed hack avoidance
             if (Time.unscaledTime - LastAttackEndTime < -0.05f)
                 return;
+            _manager.ActionAccepted();
             // Prepare state data which will be sent to clients
             _serverState = new AttackState()
             {

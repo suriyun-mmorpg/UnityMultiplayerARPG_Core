@@ -8,6 +8,7 @@ using UnityEngine;
 
 namespace MultiplayerARPG
 {
+    [RequireComponent(typeof(CharacterActionComponentManager))]
     public class DefaultCharacterUseSkillComponent : BaseNetworkedGameEntityComponent<BaseCharacterEntity>, ICharacterUseSkillComponent
     {
         public const float DEFAULT_TOTAL_DURATION = 2f;
@@ -47,8 +48,16 @@ namespace MultiplayerARPG
         public int AnimActionDataId { get; protected set; }
         public IHitRegistrationManager HitRegistrationManager { get { return BaseGameNetworkManager.Singleton.HitRegistrationManager; } }
 
+        protected CharacterActionComponentManager _manager;
+        protected float _lastAcceptedTime;
+        // Network data sending
         protected UseSkillState? _clientState;
         protected UseSkillState? _serverState;
+
+        public override void EntityStart()
+        {
+            _manager = GetComponent<CharacterActionComponentManager>();
+        }
 
         public override void EntityUpdate()
         {
@@ -169,11 +178,11 @@ namespace MultiplayerARPG
 
             // Last use skill end time
             float remainsDuration = DEFAULT_TOTAL_DURATION;
-            LastUseSkillEndTime = Time.unscaledTime + DEFAULT_TOTAL_DURATION;
+            LastUseSkillEndTime = Time.unscaledTime + CastingSkillDuration + DEFAULT_TOTAL_DURATION;
             if (totalDuration >= 0f)
             {
                 remainsDuration = totalDuration;
-                LastUseSkillEndTime = Time.unscaledTime + (totalDuration / animSpeedRate);
+                LastUseSkillEndTime = Time.unscaledTime + CastingSkillDuration + (totalDuration / animSpeedRate);
             }
 
             // Prepare cancellation
@@ -420,12 +429,15 @@ namespace MultiplayerARPG
         protected void ProceedUseSkillStateAtServer(int simulateSeed, int dataId, bool isLeftHand, uint targetObjectId, AimPosition aimPosition)
         {
 #if UNITY_EDITOR || UNITY_SERVER
+            if (!_manager.IsAcceptNewAction())
+                return;
             // Speed hack avoidance
             if (Time.unscaledTime - LastUseSkillEndTime < -0.05f)
                 return;
             // Validate skill
             if (!Entity.ValidateSkillToUse(dataId, isLeftHand, targetObjectId, out BaseSkill skill, out int skillLevel, out _))
                 return;
+            _manager.ActionAccepted();
             // Prepare state data which will be sent to clients
             _serverState = new UseSkillState()
             {
@@ -479,12 +491,15 @@ namespace MultiplayerARPG
         protected void ProceedUseSkillItemStateAtServer(int simulateSeed, int itemIndex, bool isLeftHand, uint targetObjectId, AimPosition aimPosition)
         {
 #if UNITY_EDITOR || UNITY_SERVER
+            if (!_manager.IsAcceptNewAction())
+                return;
             // Speed hack avoidance
             if (Time.unscaledTime - LastUseSkillEndTime < -0.05f)
                 return;
             // Validate skill item
             if (!Entity.ValidateSkillItemToUse(itemIndex, isLeftHand, targetObjectId, out ISkillItem skillItem, out BaseSkill skill, out int skillLevel, out _))
                 return;
+            _manager.ActionAccepted();
             // Prepare state data which will be sent to clients
             _serverState = new UseSkillState()
             {

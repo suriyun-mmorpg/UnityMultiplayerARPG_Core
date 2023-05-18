@@ -3,6 +3,7 @@ using UnityEngine;
 
 namespace MultiplayerARPG
 {
+    [RequireComponent(typeof(CharacterActionComponentManager))]
     public class DefaultCharacterChargeComponent : BaseNetworkedGameEntityComponent<BaseCharacterEntity>, ICharacterChargeComponent
     {
         public bool IsCharging { get; protected set; }
@@ -23,11 +24,17 @@ namespace MultiplayerARPG
         public float MoveSpeedRateWhileCharging { get; protected set; }
         public MovementRestriction MovementRestrictionWhileCharging { get; protected set; }
 
+        protected CharacterActionComponentManager _manager;
         protected float _chargeStartTime;
         protected float _chargeDuration;
         // Network data sending
         protected ChargeState? _clientState;
         protected ChargeState? _serverState;
+
+        public override void EntityStart()
+        {
+            _manager = GetComponent<CharacterActionComponentManager>();
+        }
 
         public virtual void ClearChargeStates()
         {
@@ -125,6 +132,9 @@ namespace MultiplayerARPG
         protected void ProceedStartChargeStateAtServer(bool isLeftHand)
         {
 #if UNITY_EDITOR || UNITY_SERVER
+            if (!_manager.IsAcceptNewAction())
+                return;
+            _manager.ActionAccepted();
             // Prepare state data which will be sent to clients
             _serverState = new ChargeState()
             {
@@ -136,6 +146,9 @@ namespace MultiplayerARPG
         protected void ProceedStopChargeStateAtServer()
         {
 #if UNITY_EDITOR || UNITY_SERVER
+            if (!_manager.IsAcceptNewAction())
+                return;
+            _manager.ActionAccepted();
             // Prepare state data which will be sent to clients
             _serverState = new ChargeState()
             {
