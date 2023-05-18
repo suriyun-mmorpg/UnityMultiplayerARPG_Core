@@ -48,7 +48,6 @@ namespace MultiplayerARPG
 
         public override void EntityAwake()
         {
-            base.EntityAwake();
             // Prepare nav mesh agent component
             CacheNavMeshAgent = gameObject.GetOrAddComponent<NavMeshAgent>();
             // Disable unused component
@@ -68,6 +67,11 @@ namespace MultiplayerARPG
             _yAngle = _targetYAngle = CacheTransform.eulerAngles.y;
             _lookRotationApplied = true;
             StopMoveFunction();
+        }
+
+        public override void EntityStart()
+        {
+            _isClientConfirmingTeleport = true;
         }
 
         public override void ComponentOnEnable()

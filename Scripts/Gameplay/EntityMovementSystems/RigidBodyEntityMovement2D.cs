@@ -67,6 +67,11 @@ namespace MultiplayerARPG
             StopMoveFunction();
         }
 
+        public override void EntityStart()
+        {
+            _isClientConfirmingTeleport = true;
+        }
+
         public override void ComponentOnEnable()
         {
             CacheRigidbody2D.constraints = RigidbodyConstraints2D.FreezeRotation;

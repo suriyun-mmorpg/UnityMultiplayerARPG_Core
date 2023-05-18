@@ -124,6 +124,7 @@ namespace MultiplayerARPG
 
         public void EntityStart()
         {
+            _isClientConfirmingTeleport = true;
             _yAngle = CacheTransform.eulerAngles.y;
             _verticalVelocity = 0;
         }
