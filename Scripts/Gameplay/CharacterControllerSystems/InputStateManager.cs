@@ -97,21 +97,21 @@ namespace MultiplayerARPG
 
         private void OnUpdate_Mouse(float deltaTime)
         {
-            if (Input.GetMouseButtonDown(mouseButton))
+            if (InputManager.GetMouseButtonDown(mouseButton))
                 IsPress = true;
-            else if (Input.GetMouseButtonUp(mouseButton))
+            else if (InputManager.GetMouseButtonUp(mouseButton))
                 IsRelease = true;
-            else if (Input.GetMouseButton(mouseButton))
+            else if (InputManager.GetMouseButton(mouseButton))
                 IsPressed = true;
         }
 
         private void OnUpdate_Key(float deltaTime)
         {
-            if (Input.GetKeyDown(keyCode))
+            if (InputManager.GetKeyDown(keyCode))
                 IsPress = true;
-            else if (Input.GetKeyUp(keyCode))
+            else if (InputManager.GetKeyUp(keyCode))
                 IsRelease = true;
-            else if (Input.GetKey(keyCode))
+            else if (InputManager.GetKey(keyCode))
                 IsPressed = true;
         }
 
