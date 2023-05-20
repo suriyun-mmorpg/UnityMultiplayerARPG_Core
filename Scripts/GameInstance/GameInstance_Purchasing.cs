@@ -1,5 +1,5 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using System.Linq;
 using Cysharp.Threading.Tasks;
 using LiteNetLibManager;
 using UnityEngine;
@@ -143,6 +143,15 @@ namespace MultiplayerARPG
             // Purchasing set-up has not succeeded. Check error for reason. Consider sharing this reason with the user.
             var errorMessage = "[" + TAG_INIT + "]: Fail. InitializationFailureReason: " + error;
             Logging.LogError(LogTag, errorMessage);
+            UISceneGlobal.Singleton.ShowMessageDialog("IAP Initialize Failed", string.Concat(error.ToString().Select(c => char.IsUpper(c) ? $" {c}" : c.ToString())).TrimStart(' '));
+        }
+
+        public void OnInitializeFailed(InitializationFailureReason error, string message)
+        {
+            // Purchasing set-up has not succeeded. Check error for reason. Consider sharing this reason with the user.
+            var errorMessage = "[" + TAG_INIT + "]: Fail. InitializationFailureReason: " + error + ", " + message;
+            Logging.LogError(LogTag, errorMessage);
+            UISceneGlobal.Singleton.ShowMessageDialog("IAP Initialize Failed", message);
         }
 
         public PurchaseProcessingResult ProcessPurchase(PurchaseEventArgs args)
