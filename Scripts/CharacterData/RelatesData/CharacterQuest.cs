@@ -25,8 +25,9 @@ namespace MultiplayerARPG
             return _cacheQuest;
         }
 
-        public bool IsAllTasksDone(IPlayerCharacterData character)
+        public bool IsAllTasksDone(IPlayerCharacterData character, out bool hasCompleteAfterTalkedTask)
         {
+            hasCompleteAfterTalkedTask = false;
             Quest quest = GetQuest();
             if (character == null || quest == null)
                 return false;
@@ -37,6 +38,8 @@ namespace MultiplayerARPG
                 GetProgress(character, i, out isComplete);
                 if (!isComplete)
                     return false;
+                if (tasks[i].taskType == QuestTaskType.TalkToNpc && tasks[i].completeAfterTalked)
+                    hasCompleteAfterTalkedTask = true;
             }
             return true;
         }

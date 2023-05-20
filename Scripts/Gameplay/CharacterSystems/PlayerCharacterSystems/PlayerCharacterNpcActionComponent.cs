@@ -106,7 +106,7 @@ namespace MultiplayerARPG
                 if (!tempCharacterQuest.CompletedTasks.Contains(tempTaskIndex))
                     tempCharacterQuest.CompletedTasks.Add(tempTaskIndex);
                 Entity.Quests[i] = tempCharacterQuest;
-                if (tempCompleteAfterTalked && tempCharacterQuest.IsAllTasksDone(Entity))
+                if (tempCompleteAfterTalked && tempCharacterQuest.IsAllTasksDone(Entity, out _))
                 {
                     if (tempQuest.selectableRewardItems != null &&
                         tempQuest.selectableRewardItems.Length > 0)

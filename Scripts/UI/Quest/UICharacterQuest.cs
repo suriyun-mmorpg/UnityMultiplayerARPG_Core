@@ -276,11 +276,11 @@ namespace MultiplayerARPG
         {
             bool isComplete = CharacterQuest.isComplete;
             bool isTracking = CharacterQuest.isTracking;
-            bool isAllTasksDone = CharacterQuest.IsAllTasksDone(GameInstance.PlayingCharacter);
+            bool isAllTasksDone = CharacterQuest.IsAllTasksDone(GameInstance.PlayingCharacter, out bool hasCompleteAfterTalkedTask);
 
             string titleFormat = isComplete ?
                 LanguageManager.GetText(formatKeyTitleComplete) :
-                (isAllTasksDone ?
+                (isAllTasksDone && !hasCompleteAfterTalkedTask ?
                     LanguageManager.GetText(formatKeyTitleTasksComplete) :
                     LanguageManager.GetText(formatKeyTitleOnGoing));
 

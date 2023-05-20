@@ -33,7 +33,7 @@ namespace MultiplayerARPG
                 if (indexOfQuest >= 0)
                 {
                     CharacterQuest characterQuest = character.Quests[indexOfQuest];
-                    questTasksCompleted = characterQuest.IsAllTasksDone(character);
+                    questTasksCompleted = characterQuest.IsAllTasksDone(character, out _);
                     questCompleted = characterQuest.isComplete;
                 }
             }

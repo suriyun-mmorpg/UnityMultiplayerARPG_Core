@@ -56,7 +56,7 @@ namespace MultiplayerARPG
                 return false;
 
             CharacterQuest characterQuest = quests[indexOfQuest];
-            if (!characterQuest.IsAllTasksDone(this))
+            if (!characterQuest.IsAllTasksDone(this, out _))
                 return false;
 
             if (characterQuest.isComplete)
