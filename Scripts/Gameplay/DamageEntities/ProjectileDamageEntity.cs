@@ -156,16 +156,19 @@ namespace MultiplayerARPG
                 for (int i = 0; i < hitCount; ++i)
                 {
                     hit = _hits3D[i];
+                    if (!hit.transform.gameObject.GetComponent<IUnHittable>().IsNull())
+                        continue;
+
                     if (useNormal)
                         _normal = hit.normal;
                     _hitPos = hit.point;
 
                     // Hit itself, no impact
-                    BaseGameEntity instigatorEntity;
-                    if (_instigator.Id != null && _instigator.TryGetEntity(out instigatorEntity) && instigatorEntity.transform.root == hit.transform.root)
+                    if (_instigator.Id != null && _instigator.TryGetEntity(out BaseGameEntity instigatorEntity) && instigatorEntity.transform.root == hit.transform.root)
                         continue;
 
                     Impact(hit.collider.transform.gameObject);
+
                     // Already hit something
                     if (_destroying)
                         return;

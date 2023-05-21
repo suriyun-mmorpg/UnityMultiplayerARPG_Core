@@ -253,6 +253,9 @@ namespace MultiplayerARPG
             if (_destroying)
                 return;
 
+            if (!other.GetComponent<IUnHittable>().IsNull())
+                return;
+
             if (FindTargetHitBox(other, out DamageableHitBox target))
             {
                 // Hit a hitbox
