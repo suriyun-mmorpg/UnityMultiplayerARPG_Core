@@ -25,9 +25,8 @@ namespace MultiplayerARPG
 
         private static async void SceneManager_sceneLoaded(Scene scene, LoadSceneMode loadMode)
         {
-            await UniTask.Delay(100);
             await UniTask.SwitchToMainThread();
-            CurrentEventSystem = Object.FindObjectOfType<EventSystem>();
+            CurrentEventSystem = FindObjectOfType<EventSystem>();
             // Create a new event system
             if (CurrentEventSystem == null)
             {
@@ -42,7 +41,7 @@ namespace MultiplayerARPG
 #if ENABLE_INPUT_SYSTEM
             StandaloneInputModule oldInputModule = CurrentEventSystem.GetComponent<StandaloneInputModule>();
             if (oldInputModule != null)
-                Object.DestroyImmediate(oldInputModule);
+                DestroyImmediate(oldInputModule);
             CurrentEventSystem.gameObject.GetOrAddComponent<InputSystemUIInputModule>();
 #endif
             CurrentEventSystem.sendNavigationEvents = false;
