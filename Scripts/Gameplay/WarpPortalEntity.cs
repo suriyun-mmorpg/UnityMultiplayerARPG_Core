@@ -23,29 +23,29 @@ namespace MultiplayerARPG
         public bool warpOverrideRotation;
         [Tooltip("This will be used if `warpOverrideRotation` is `TRUE` to change character's rotation when warp")]
         public Vector3 warpToRotation;
-        public WarpPointByCondition[] warpPointsByCondition;
+        public WarpPointByCondition[] warpPointsByCondition = new WarpPointByCondition[0];
 
         [System.NonSerialized]
-        private Dictionary<int, List<WarpPointByCondition>> cacheWarpPointsByCondition;
+        private Dictionary<int, List<WarpPointByCondition>> _cacheWarpPointsByCondition;
         public Dictionary<int, List<WarpPointByCondition>> CacheWarpPointsByCondition
         {
             get
             {
-                if (cacheWarpPointsByCondition == null)
+                if (_cacheWarpPointsByCondition == null)
                 {
-                    cacheWarpPointsByCondition = new Dictionary<int, List<WarpPointByCondition>>();
+                    _cacheWarpPointsByCondition = new Dictionary<int, List<WarpPointByCondition>>();
                     int factionDataId;
                     foreach (WarpPointByCondition warpPointByCondition in warpPointsByCondition)
                     {
                         factionDataId = 0;
                         if (warpPointByCondition.forFaction != null)
                             factionDataId = warpPointByCondition.forFaction.DataId;
-                        if (!cacheWarpPointsByCondition.ContainsKey(factionDataId))
-                            cacheWarpPointsByCondition.Add(factionDataId, new List<WarpPointByCondition>());
-                        cacheWarpPointsByCondition[factionDataId].Add(warpPointByCondition);
+                        if (!_cacheWarpPointsByCondition.ContainsKey(factionDataId))
+                            _cacheWarpPointsByCondition.Add(factionDataId, new List<WarpPointByCondition>());
+                        _cacheWarpPointsByCondition[factionDataId].Add(warpPointByCondition);
                     }
                 }
-                return cacheWarpPointsByCondition;
+                return _cacheWarpPointsByCondition;
             }
         }
 
