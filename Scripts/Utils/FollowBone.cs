@@ -11,6 +11,8 @@ namespace UtilsComponents
         public HumanBodyBones bone = HumanBodyBones.UpperChest;
         public bool followPosition = true;
         public bool followRotation = true;
+        public Vector3 positionOffsets;
+        public Vector3 rotationOffsets;
         public Animator animator;
 
         private void Awake()
@@ -25,9 +27,9 @@ namespace UtilsComponents
                 return;
             Transform tempTransform = animator.GetBoneTransform(bone);
             if (followPosition)
-                transform.position = tempTransform.position;
+                transform.position = tempTransform.position + positionOffsets;
             if (followRotation)
-                transform.rotation = tempTransform.rotation;
+                transform.eulerAngles = tempTransform.eulerAngles + rotationOffsets;
         }
 
         [ContextMenu("Force Update")]
