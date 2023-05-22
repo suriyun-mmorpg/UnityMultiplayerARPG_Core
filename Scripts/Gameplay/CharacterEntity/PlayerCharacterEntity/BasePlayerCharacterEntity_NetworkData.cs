@@ -313,6 +313,7 @@ namespace MultiplayerARPG
                     BasePlayerCharacterController controller = Instantiate(prefab);
                     controller.PlayingCharacterEntity = this;
                 }
+                // Instantiates owning character objects
                 if (CurrentGameInstance.owningCharacterObjects != null && CurrentGameInstance.owningCharacterObjects.Length > 0)
                 {
                     foreach (GameObject obj in CurrentGameInstance.owningCharacterObjects)
@@ -321,6 +322,7 @@ namespace MultiplayerARPG
                         Instantiate(obj, EntityTransform.position, EntityTransform.rotation, EntityTransform);
                     }
                 }
+                // Instantiates owning character minimap objects
                 if (CurrentGameInstance.owningCharacterMiniMapObjects != null && CurrentGameInstance.owningCharacterMiniMapObjects.Length > 0)
                 {
                     foreach (GameObject obj in CurrentGameInstance.owningCharacterMiniMapObjects)
@@ -329,6 +331,7 @@ namespace MultiplayerARPG
                         Instantiate(obj, MiniMapUiTransform.position, MiniMapUiTransform.rotation, MiniMapUiTransform);
                     }
                 }
+                // Instantiates owning character UI
                 if (CurrentGameInstance.owningCharacterUI != null)
                 {
                     InstantiateUI(CurrentGameInstance.owningCharacterUI);
@@ -336,6 +339,16 @@ namespace MultiplayerARPG
             }
             else if (IsClient)
             {
+                // Instantiates non-owning character objects
+                if (CurrentGameInstance.nonOwningCharacterObjects != null && CurrentGameInstance.nonOwningCharacterObjects.Length > 0)
+                {
+                    foreach (GameObject obj in CurrentGameInstance.nonOwningCharacterObjects)
+                    {
+                        if (obj == null) continue;
+                        Instantiate(obj, EntityTransform.position, EntityTransform.rotation, EntityTransform);
+                    }
+                }
+                // Instantiates non-owning character minimap objects
                 if (CurrentGameInstance.nonOwningCharacterMiniMapObjects != null && CurrentGameInstance.nonOwningCharacterMiniMapObjects.Length > 0)
                 {
                     foreach (GameObject obj in CurrentGameInstance.nonOwningCharacterMiniMapObjects)
@@ -344,6 +357,7 @@ namespace MultiplayerARPG
                         Instantiate(obj, MiniMapUiTransform.position, MiniMapUiTransform.rotation, MiniMapUiTransform);
                     }
                 }
+                // Instantiates non-owning character UI
                 if (CurrentGameInstance.nonOwningCharacterUI != null)
                 {
                     InstantiateUI(CurrentGameInstance.nonOwningCharacterUI);

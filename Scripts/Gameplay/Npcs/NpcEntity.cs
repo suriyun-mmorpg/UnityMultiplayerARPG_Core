@@ -115,7 +115,16 @@ namespace MultiplayerARPG
 
             if (IsClient)
             {
-                // Setup relates elements
+                // Instantiates npc objects
+                if (CurrentGameInstance.npcObjects != null && CurrentGameInstance.npcObjects.Length > 0)
+                {
+                    foreach (GameObject obj in CurrentGameInstance.npcObjects)
+                    {
+                        if (obj == null) continue;
+                        Instantiate(obj, EntityTransform.position, EntityTransform.rotation, EntityTransform);
+                    }
+                }
+                // Instantiates npc minimap objects
                 if (CurrentGameInstance.npcMiniMapObjects != null && CurrentGameInstance.npcMiniMapObjects.Length > 0)
                 {
                     foreach (GameObject obj in CurrentGameInstance.npcMiniMapObjects)
@@ -124,10 +133,10 @@ namespace MultiplayerARPG
                         Instantiate(obj, MiniMapUiTransform.position, MiniMapUiTransform.rotation, MiniMapUiTransform);
                     }
                 }
-
+                // Instantiates npc UI
                 if (CurrentGameInstance.npcUI != null)
                     InstantiateUI(CurrentGameInstance.npcUI);
-
+                // Instantiates npc quest indicator
                 if (CurrentGameInstance.npcQuestIndicator != null)
                     InstantiateQuestIndicator(CurrentGameInstance.npcQuestIndicator);
             }

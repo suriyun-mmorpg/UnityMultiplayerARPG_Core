@@ -242,7 +242,16 @@ namespace MultiplayerARPG
 
             if (IsClient)
             {
-                // Setup relates elements
+                // Instantiates monster objects
+                if (CurrentGameInstance.monsterCharacterObjects != null && CurrentGameInstance.monsterCharacterObjects.Length > 0)
+                {
+                    foreach (GameObject obj in CurrentGameInstance.monsterCharacterObjects)
+                    {
+                        if (obj == null) continue;
+                        Instantiate(obj, EntityTransform.position, EntityTransform.rotation, EntityTransform);
+                    }
+                }
+                // Instantiates monster minimap objects
                 if (CurrentGameInstance.monsterCharacterMiniMapObjects != null && CurrentGameInstance.monsterCharacterMiniMapObjects.Length > 0)
                 {
                     foreach (GameObject obj in CurrentGameInstance.monsterCharacterMiniMapObjects)
@@ -251,9 +260,11 @@ namespace MultiplayerARPG
                         Instantiate(obj, MiniMapUiTransform.position, MiniMapUiTransform.rotation, MiniMapUiTransform);
                     }
                 }
-                // UI which show monster information
+                // Instantiates monster character UI
                 if (CurrentGameInstance.monsterCharacterUI != null)
+                {
                     InstantiateUI(CurrentGameInstance.monsterCharacterUI);
+                }
             }
 
             // Initial default data

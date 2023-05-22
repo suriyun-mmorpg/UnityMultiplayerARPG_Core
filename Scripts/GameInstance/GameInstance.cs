@@ -172,10 +172,16 @@ namespace MultiplayerARPG
         public GameObject[] owningCharacterObjects = new GameObject[0];
         [Tooltip("These objects will be instantiate as owning character's children to show in minimap")]
         public GameObject[] owningCharacterMiniMapObjects = new GameObject[0];
-        [Tooltip("These objects will be instantiate as non owning character's children to show in minimap")]
+        [Tooltip("These objects will be instantiate as non-owning character's children")]
+        public GameObject[] nonOwningCharacterObjects = new GameObject[0];
+        [Tooltip("These objects will be instantiate as non-owning character's children to show in minimap")]
         public GameObject[] nonOwningCharacterMiniMapObjects = new GameObject[0];
+        [Tooltip("These objects will be instantiate as monster character's children")]
+        public GameObject[] monsterCharacterObjects = new GameObject[0];
         [Tooltip("These objects will be instantiate as monster character's children to show in minimap")]
         public GameObject[] monsterCharacterMiniMapObjects = new GameObject[0];
+        [Tooltip("These objects will be instantiate as npc's children")]
+        public GameObject[] npcObjects = new GameObject[0];
         [Tooltip("These objects will be instantiate as npc's children to show in minimap")]
         public GameObject[] npcMiniMapObjects = new GameObject[0];
         [Tooltip("This UI will be instaniate as owning character's child to show character name / HP / MP / Food / Water")]
