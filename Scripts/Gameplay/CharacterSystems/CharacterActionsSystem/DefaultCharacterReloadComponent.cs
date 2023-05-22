@@ -176,7 +176,7 @@ namespace MultiplayerARPG
                     }
 
                     // Reload / Fill ammo
-                    int triggerReloadAmmoAmount = (ReloadingAmmoAmount / _triggerDurations.Length);
+                    int triggerReloadAmmoAmount = ReloadingAmmoAmount / _triggerDurations.Length;
                     EquipWeapons equipWeapons = Entity.EquipWeapons;
                     if (IsServer && Entity.DecreaseAmmos(weaponItem.WeaponType.RequireAmmoType, triggerReloadAmmoAmount, out _))
                     {
