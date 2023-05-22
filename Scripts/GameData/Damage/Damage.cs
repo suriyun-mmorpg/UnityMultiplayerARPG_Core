@@ -274,7 +274,7 @@ namespace MultiplayerARPG
 
             // Get generic attack data
             EntityInfo instigator = attacker.GetInfo();
-            System.Random random = new System.Random(simulateSeed + (triggerIndex * spreadIndex));
+            System.Random random = new System.Random(unchecked(simulateSeed + ((triggerIndex + 1) * (spreadIndex + 1) * 16)));
             Vector3 stagger = new Vector3(GenericUtils.RandomFloat(random.Next(), -fireStagger.x, fireStagger.x), GenericUtils.RandomFloat(random.Next(), -fireStagger.y, fireStagger.y));
             this.GetDamagePositionAndRotation(attacker, isLeftHand, aimPosition, stagger, out Vector3 damagePosition, out Vector3 damageDirection, out Quaternion damageRotation);
             if (onOriginPrepared != null)
@@ -407,7 +407,7 @@ namespace MultiplayerARPG
 
             // Get generic attack data
             EntityInfo instigator = attacker.GetInfo();
-            System.Random random = new System.Random(simulateSeed + (triggerIndex * spreadIndex));
+            System.Random random = new System.Random(unchecked(simulateSeed + ((triggerIndex + 1) * (spreadIndex + 1) * 16)));
             Vector3 stagger = new Vector3(GenericUtils.RandomFloat(random.Next(), -fireStagger.x, fireStagger.x), GenericUtils.RandomFloat(random.Next(), -fireStagger.y, fireStagger.y));
             this.GetDamagePositionAndRotation(attacker, isLeftHand, aimPosition, stagger, out Vector3 damagePosition, out Vector3 damageDirection, out Quaternion damageRotation);
             if (onOriginPrepared != null)
@@ -445,7 +445,7 @@ namespace MultiplayerARPG
 
             // Get generic attack data
             EntityInfo instigator = attacker.GetInfo();
-            System.Random random = new System.Random(simulateSeed + (triggerIndex * spreadIndex));
+            System.Random random = new System.Random(unchecked(simulateSeed + ((triggerIndex + 1) * (spreadIndex + 1) * 16)));
             Vector3 stagger = new Vector3(GenericUtils.RandomFloat(random.Next(), -fireStagger.x, fireStagger.x), GenericUtils.RandomFloat(random.Next(), -fireStagger.y, fireStagger.y));
             this.GetDamagePositionAndRotation(attacker, isLeftHand, aimPosition, stagger, out Vector3 damagePosition, out Vector3 damageDirection, out Quaternion damageRotation);
             if (onOriginPrepared != null)
@@ -599,7 +599,7 @@ namespace MultiplayerARPG
 
             // Get generic attack data
             EntityInfo instigator = attacker.GetInfo();
-            System.Random random = new System.Random(simulateSeed + (triggerIndex * spreadIndex));
+            System.Random random = new System.Random(unchecked(simulateSeed + ((triggerIndex + 1) * (spreadIndex + 1) * 16)));
             Vector3 stagger = new Vector3(GenericUtils.RandomFloat(random.Next(), -fireStagger.x, fireStagger.x), GenericUtils.RandomFloat(random.Next(), -fireStagger.y, fireStagger.y));
             this.GetDamagePositionAndRotation(attacker, isLeftHand, aimPosition, stagger, out Vector3 damagePosition, out Vector3 damageDirection, out Quaternion damageRotation);
             if (onOriginPrepared != null)
