@@ -9,7 +9,7 @@ namespace MultiplayerARPG.GameData.Model.Playables
     /// <summary>
     /// NOTE: Set its name to default playable behaviour, in the future I might make it able to customize character model's playable behaviour
     /// </summary>
-    public class AnimationPlayableBehaviour : PlayableBehaviour
+    public partial class AnimationPlayableBehaviour : PlayableBehaviour
     {
         public static readonly AnimationClip EmptyClip = new AnimationClip();
         public static readonly AvatarMask EmptyMask = new AvatarMask();
