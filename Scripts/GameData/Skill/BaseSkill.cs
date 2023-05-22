@@ -545,8 +545,7 @@ namespace MultiplayerARPG
                 if (!DecreaseItems(skillUser))
                     return;
                 // Increase damage with ammo damage
-                Dictionary<DamageElement, MinMaxFloat> increaseDamages;
-                if (!DecreaseAmmos(skillUser, isLeftHand, out increaseDamages))
+                if (!DecreaseAmmos(skillUser, isLeftHand, out Dictionary<DamageElement, MinMaxFloat> increaseDamages))
                     return;
                 if (increaseDamages != null && increaseDamages.Count > 0)
                     damageAmounts = GameDataHelpers.CombineDamages(damageAmounts, increaseDamages);
