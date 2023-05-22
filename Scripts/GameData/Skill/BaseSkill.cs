@@ -544,9 +544,10 @@ namespace MultiplayerARPG
                 // Not enough items
                 if (!DecreaseItems(skillUser))
                     return;
-                // Increase damage with ammo damage
+                // Not enough ammos
                 if (!DecreaseAmmos(skillUser, isLeftHand, out Dictionary<DamageElement, MinMaxFloat> increaseDamageAmounts))
                     return;
+                // Increase damage with ammo damage
                 if (increaseDamageAmounts != null && increaseDamageAmounts.Count > 0)
                     damageAmounts = GameDataHelpers.CombineDamages(damageAmounts, increaseDamageAmounts);
             }
@@ -893,9 +894,7 @@ namespace MultiplayerARPG
 
         protected bool DecreaseItems(BaseCharacterEntity character)
         {
-            int itemDataId;
-            int amount;
-            if (HasEnoughItems(character, out itemDataId, out amount))
+            if (HasEnoughItems(character, out int itemDataId, out int amount))
             {
                 if (itemDataId == 0 || amount == 0)
                 {

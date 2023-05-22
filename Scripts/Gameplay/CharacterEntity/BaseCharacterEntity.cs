@@ -955,9 +955,9 @@ namespace MultiplayerARPG
             return validIfNoRequireAmmoType;
         }
 
-        public bool DecreaseAmmos(CharacterItem weapon, bool isLeftHand, int amount, out Dictionary<DamageElement, MinMaxFloat> increaseDamages, bool validIfNoRequireAmmoType = true)
+        public bool DecreaseAmmos(CharacterItem weapon, bool isLeftHand, int amount, out Dictionary<DamageElement, MinMaxFloat> increaseDamageAmounts, bool validIfNoRequireAmmoType = true)
         {
-            increaseDamages = null;
+            increaseDamageAmounts = null;
 
             // Avoid null data
             if (weapon == null)
@@ -969,7 +969,7 @@ namespace MultiplayerARPG
                 if (weaponItem.AmmoCapacity <= 0)
                 {
                     // Ammo capacity is 0 so reduce ammo from inventory
-                    if (this.DecreaseAmmos(weaponItem.WeaponType.RequireAmmoType, amount, out increaseDamages))
+                    if (this.DecreaseAmmos(weaponItem.WeaponType.RequireAmmoType, amount, out increaseDamageAmounts))
                     {
                         this.FillEmptySlots();
                         return true;
