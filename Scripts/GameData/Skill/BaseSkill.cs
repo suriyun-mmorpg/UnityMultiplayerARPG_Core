@@ -545,10 +545,10 @@ namespace MultiplayerARPG
                 if (!DecreaseItems(skillUser))
                     return;
                 // Increase damage with ammo damage
-                if (!DecreaseAmmos(skillUser, isLeftHand, out Dictionary<DamageElement, MinMaxFloat> increaseDamages))
+                if (!DecreaseAmmos(skillUser, isLeftHand, out Dictionary<DamageElement, MinMaxFloat> increaseDamageAmounts))
                     return;
-                if (increaseDamages != null && increaseDamages.Count > 0)
-                    damageAmounts = GameDataHelpers.CombineDamages(damageAmounts, increaseDamages);
+                if (increaseDamageAmounts != null && increaseDamageAmounts.Count > 0)
+                    damageAmounts = GameDataHelpers.CombineDamages(damageAmounts, increaseDamageAmounts);
             }
             ApplySkillImplement(
                 skillUser,
@@ -911,15 +911,15 @@ namespace MultiplayerARPG
             return false;
         }
 
-        protected bool DecreaseAmmos(BaseCharacterEntity character, bool isLeftHand, out Dictionary<DamageElement, MinMaxFloat> increaseDamages)
+        protected bool DecreaseAmmos(BaseCharacterEntity character, bool isLeftHand, out Dictionary<DamageElement, MinMaxFloat> increaseDamageAmounts)
         {
-            increaseDamages = null;
+            increaseDamageAmounts = null;
             AmmoType ammoType;
             int amount;
             switch (requireAmmoType)
             {
                 case RequireAmmoType.BasedOnWeapon:
-                    return character.DecreaseAmmos(character.GetAvailableWeapon(ref isLeftHand), isLeftHand, requireAmmoAmount, out increaseDamages, false);
+                    return character.DecreaseAmmos(character.GetAvailableWeapon(ref isLeftHand), isLeftHand, requireAmmoAmount, out increaseDamageAmounts, false);
                 case RequireAmmoType.BasedOnSkill:
                     if (HasEnoughAmmos(character, isLeftHand, out ammoType, out amount))
                     {
@@ -928,7 +928,7 @@ namespace MultiplayerARPG
                             // No required ammos, don't decrease ammos
                             return true;
                         }
-                        if (character.DecreaseAmmos(ammoType, amount, out increaseDamages))
+                        if (character.DecreaseAmmos(ammoType, amount, out increaseDamageAmounts))
                         {
                             character.FillEmptySlots();
                             return true;

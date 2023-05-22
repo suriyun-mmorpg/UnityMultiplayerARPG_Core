@@ -69,7 +69,7 @@ namespace MultiplayerARPG
         public void PrepareHitRegValidatation(BaseGameEntity attacker, int randomSeed, float[] triggerDurations, byte fireSpread, DamageInfo damageInfo, Dictionary<DamageElement, MinMaxFloat> damageAmounts, CharacterItem weapon, BaseSkill skill, int skillLevel)
         {
             // Only server can prepare hit registration
-            if (attacker == null || !BaseGameNetworkManager.Singleton.IsServer)
+            if (!BaseGameNetworkManager.Singleton.IsServer || attacker == null)
                 return;
 
             // Don't validate some damage types
@@ -103,6 +103,19 @@ namespace MultiplayerARPG
                 Origins = origins,
             };
             DelayClearData(id);
+        }
+
+        public void IncreasePreparedDamageAmounts(BaseGameEntity attacker, int randomSeed, Dictionary<DamageElement, MinMaxFloat> increaseDamageAmounts)
+        {
+            // Only server can modify damage amounts
+            if (!BaseGameNetworkManager.Singleton.IsServer || attacker == null || increaseDamageAmounts == null || increaseDamageAmounts.Count == 0)
+                return;
+
+            string id = MakeValidateId(attacker.ObjectId, randomSeed);
+            if (!s_validatingHits.ContainsKey(id))
+                return;
+
+            s_validatingHits[id].DamageAmounts = GameDataHelpers.CombineDamages(s_validatingHits[id].DamageAmounts, increaseDamageAmounts);
         }
 
         public void PrepareHitRegOrigin(BaseGameEntity attacker, int randomSeed, byte triggerIndex, byte spreadIndex, Vector3 position, Vector3 direction)
