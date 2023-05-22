@@ -1301,14 +1301,16 @@ namespace MultiplayerARPG
                 return false;
             Dictionary<int, int> decreasingItemIndexes = new Dictionary<int, int>();
             CharacterItem nonEquipItem;
+            IAmmoItem ammoItemData;
             int tempDecresingAmount;
             for (int i = data.NonEquipItems.Count - 1; i >= 0; --i)
             {
                 nonEquipItem = data.NonEquipItems[i];
-                if (nonEquipItem.GetAmmoItem() != null && nonEquipItem.GetAmmoItem().AmmoType == ammoType)
+                ammoItemData = nonEquipItem.GetAmmoItem();
+                if (ammoItemData != null && ammoItemData.AmmoType == ammoType)
                 {
                     if (increaseDamages == null)
-                        increaseDamages = nonEquipItem.GetAmmoItem().GetIncreaseDamages(nonEquipItem.level);
+                        increaseDamages = ammoItemData.GetIncreaseDamages(nonEquipItem.level);
                     if (amount - nonEquipItem.amount > 0)
                         tempDecresingAmount = nonEquipItem.amount;
                     else
