@@ -63,6 +63,8 @@ namespace MultiplayerARPG
                 case QuestTaskType.TalkToNpc:
                     string npcTitle = QuestTask.npcEntity == null ? LanguageManager.GetUnknowTitle() : QuestTask.npcEntity.Title;
                     isComplete = Progress > 0;
+                    if (QuestTask.completeAfterTalked)
+                        isComplete = false;
                     if (uiTextTaskDescription != null)
                     {
                         uiTextTaskDescription.text = ZString.Format(
