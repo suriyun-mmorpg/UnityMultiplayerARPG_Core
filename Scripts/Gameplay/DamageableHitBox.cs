@@ -20,9 +20,19 @@ namespace MultiplayerARPG
 
         [SerializeField]
         protected HitBoxPosition position;
+        public HitBoxPosition Position
+        {
+            get { return position; }
+            set { position = value; }
+        }
 
         [SerializeField]
         protected float damageRate = 1f;
+        public float DamageRate
+        {
+            get { return damageRate; }
+            set { damageRate = value; }
+        }
 
         public DamageableEntity DamageableEntity { get; private set; }
         public BaseGameEntity Entity
