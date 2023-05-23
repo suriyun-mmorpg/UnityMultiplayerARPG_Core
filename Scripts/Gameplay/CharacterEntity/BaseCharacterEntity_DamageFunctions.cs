@@ -75,8 +75,7 @@ namespace MultiplayerARPG
         {
             if (!IsServer)
                 return;
-            int rewardedExp;
-            if (!CurrentGameplayRule.RewardExp(this, reward, multiplier, rewardGivenType, out rewardedExp))
+            if (!CurrentGameplayRule.RewardExp(this, reward, multiplier, rewardGivenType, out int rewardedExp))
             {
                 GameInstance.ServerGameMessageHandlers.NotifyRewardExp(ConnectionId, rewardGivenType, rewardedExp);
                 return;
@@ -89,8 +88,7 @@ namespace MultiplayerARPG
         {
             if (!IsServer)
                 return;
-            int rewardedGold;
-            CurrentGameplayRule.RewardCurrencies(this, reward, multiplier, rewardGivenType, out rewardedGold);
+            CurrentGameplayRule.RewardCurrencies(this, reward, multiplier, rewardGivenType, out int rewardedGold);
             GameInstance.ServerGameMessageHandlers.NotifyRewardGold(ConnectionId, rewardGivenType, rewardedGold);
             if (reward.currencies != null && reward.currencies.Length > 0)
             {
@@ -114,9 +112,7 @@ namespace MultiplayerARPG
                 attackerCharacter.NotifyEnemySpotted(this);
             }
 
-            bool isCritical;
-            bool isBlocked;
-            if (!CurrentGameInstance.GameplayRule.RandomAttackHitOccurs(fromPosition, attackerCharacter, this, damageAmounts, weapon, skill, skillLevel, randomSeed, out isCritical, out isBlocked))
+            if (!CurrentGameInstance.GameplayRule.RandomAttackHitOccurs(fromPosition, attackerCharacter, this, damageAmounts, weapon, skill, skillLevel, randomSeed, out bool isCritical, out bool isBlocked))
             {
                 // Don't hit (Miss)
                 combatAmountType = CombatAmountType.Miss;

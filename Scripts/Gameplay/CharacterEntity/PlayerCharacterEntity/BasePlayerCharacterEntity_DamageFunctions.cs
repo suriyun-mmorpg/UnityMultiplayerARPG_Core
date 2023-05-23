@@ -106,7 +106,6 @@ namespace MultiplayerARPG
                     droppingItems.RemoveAt(i);
             }
 
-
             if (dropCount > 0)
             {
                 this.FillEmptySlots();
