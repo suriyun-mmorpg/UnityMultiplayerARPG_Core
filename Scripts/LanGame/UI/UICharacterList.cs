@@ -116,8 +116,7 @@ namespace MultiplayerARPG
                     if (characterModel != null)
                     {
                         _characterModelById[characterData.Id] = characterModel;
-                        characterModel.SetEquipWeapons(characterData.SelectableWeaponSets, characterData.EquipWeaponSet, false);
-                        characterModel.SetEquipItems(characterData.EquipItems);
+                        characterModel.SetEquipItems(characterData.EquipItems, characterData.SelectableWeaponSets, characterData.EquipWeaponSet, false);
                         characterModel.gameObject.SetActive(false);
                         CacheCharacterSelectionManager.Add(uiCharacter);
                     }

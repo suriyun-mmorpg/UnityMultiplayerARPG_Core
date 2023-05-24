@@ -387,8 +387,6 @@ namespace MultiplayerARPG
                         continue;
                     equipItems.Add(CharacterItem.Create(armorItem));
                 }
-                // Set model equip items
-                SelectedModel.SetEquipItems(equipItems);
                 // Prepare equip weapons
                 EquipWeapons equipWeapons = new EquipWeapons();
                 if (SelectedPlayerCharacter.RightHandEquipItem != null)
@@ -400,7 +398,8 @@ namespace MultiplayerARPG
                 {
                     equipWeapons
                 };
-                SelectedModel.SetEquipWeapons(selectableWeaponSets, 0, false);
+                // Set model equip items
+                SelectedModel.SetEquipItems(equipItems, selectableWeaponSets, 0, false);
             }
         }
 

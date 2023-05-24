@@ -410,7 +410,7 @@ namespace MultiplayerARPG
         /// <param name="equipWeaponSet"></param>
         protected virtual void OnEquipWeaponSetChange(bool isInitial, byte equipWeaponSet)
         {
-            PrepareToSetEquipWeaponsModels();
+            PrepareToSetEquipItemsModels();
             _isRecaching = true;
             if (onEquipWeaponSetChange != null)
                 onEquipWeaponSetChange.Invoke(equipWeaponSet);
@@ -423,7 +423,7 @@ namespace MultiplayerARPG
         /// <param name="isWeaponsSheathed"></param>
         protected virtual void OnIsWeaponsSheathedChange(bool isInitial, bool isWeaponsSheathed)
         {
-            PrepareToSetEquipWeaponsModels();
+            PrepareToSetEquipItemsModels();
             _isRecaching = true;
             if (onIsWeaponsSheathedChange != null)
                 onIsWeaponsSheathedChange.Invoke(isWeaponsSheathed);
@@ -471,7 +471,7 @@ namespace MultiplayerARPG
         /// <param name="index"></param>
         private void OnSelectableWeaponSetsOperation(LiteNetLibSyncList.Operation operation, int index)
         {
-            PrepareToSetEquipWeaponsModels();
+            PrepareToSetEquipItemsModels();
             _selectableWeaponSetsRecachingState = new SyncListRecachingState()
             {
                 isRecaching = true,

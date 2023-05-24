@@ -278,8 +278,7 @@ namespace MultiplayerARPG
                 SetIsDead(previousModel.IsDead);
                 SetMoveAnimationSpeedMultiplier(previousModel.MoveAnimationSpeedMultiplier);
                 SetMovementState(previousModel.MovementState, previousModel.ExtraMovementState, previousModel.Direction2D, previousModel.IsFreezeAnimation);
-                SetEquipWeapons(previousModel.SelectableWeaponSets, previousModel.EquipWeaponSet, previousModel.IsWeaponsSheathed);
-                SetEquipItems(previousModel.EquipItems);
+                SetEquipItems(previousModel.EquipItems, previousModel.SelectableWeaponSets, previousModel.EquipWeaponSet, previousModel.IsWeaponsSheathed);
                 SetBuffs(previousModel.Buffs);
                 IsActiveModel = true;
                 UpdateObjectsWhenSwitch();
@@ -290,8 +289,7 @@ namespace MultiplayerARPG
             {
                 OnSwitchingToThisModel();
                 SetDefaultAnimations();
-                SetEquipWeapons(SelectableWeaponSets, EquipWeaponSet, IsWeaponsSheathed);
-                SetEquipItems(EquipItems);
+                SetEquipItems(EquipItems, SelectableWeaponSets, EquipWeaponSet, IsWeaponsSheathed);
                 SetBuffs(Buffs);
                 IsActiveModel = true;
                 UpdateObjectsWhenSwitch();
@@ -380,17 +378,12 @@ namespace MultiplayerARPG
         }
 #endif
 
-        public virtual void SetEquipWeapons(IList<EquipWeapons> selectableWeaponSets, byte equipWeaponSet, bool isWeaponsSheathed)
+        public virtual void SetEquipItems(IList<CharacterItem> equipItems, IList<EquipWeapons> selectableWeaponSets, byte equipWeaponSet, bool isWeaponsSheathed)
         {
+            EquipItems = equipItems;
             SelectableWeaponSets = selectableWeaponSets;
             EquipWeaponSet = equipWeaponSet;
             IsWeaponsSheathed = isWeaponsSheathed;
-            UpdateEquipmentModels();
-        }
-
-        public virtual void SetEquipItems(IList<CharacterItem> equipItems)
-        {
-            EquipItems = equipItems;
             UpdateEquipmentModels();
         }
 

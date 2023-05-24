@@ -140,7 +140,6 @@ namespace MultiplayerARPG
         public float RespawnInvincibleCountDown { get; protected set; }
         public float LastUseItemTime { get; set; }
 
-        protected int _countDownToSetEquipWeaponsModels = FRAMES_BEFORE_SET_EQUIP_MODEL;
         protected int _countDownToSetEquipItemsModels = FRAMES_BEFORE_SET_EQUIP_MODEL;
         protected float _lastMountTime;
         protected float _lastActionTime;
@@ -378,15 +377,6 @@ namespace MultiplayerARPG
                 FpsModel.SetMovementState(MovementState, ExtraMovementState, Direction2D, CachedData.FreezeAnimation);
                 // Update animation
                 FpsModel.UpdateAnimation(deltaTime);
-            }
-            Profiler.EndSample();
-
-            Profiler.BeginSample("BaseCharacterEntity - SetEquipWeaponModels");
-            if (_countDownToSetEquipWeaponsModels > 0)
-            {
-                --_countDownToSetEquipWeaponsModels;
-                if (_countDownToSetEquipWeaponsModels <= 0)
-                    SetEquipWeaponsModels();
             }
             Profiler.EndSample();
 
@@ -1516,28 +1506,16 @@ namespace MultiplayerARPG
         #endregion
 
         #region Equip items models setting
-        protected void PrepareToSetEquipWeaponsModels()
-        {
-            _countDownToSetEquipWeaponsModels = FRAMES_BEFORE_SET_EQUIP_MODEL;
-        }
-
         protected void PrepareToSetEquipItemsModels()
         {
             _countDownToSetEquipItemsModels = FRAMES_BEFORE_SET_EQUIP_MODEL;
         }
 
-        protected void SetEquipWeaponsModels()
-        {
-            CharacterModel.SetEquipWeapons(SelectableWeaponSets, EquipWeaponSet, IsWeaponsSheathed);
-            if (IsOwnerClient && FpsModel != null)
-                FpsModel.SetEquipWeapons(SelectableWeaponSets, EquipWeaponSet, IsWeaponsSheathed);
-        }
-
         protected void SetEquipItemsModels()
         {
-            CharacterModel.SetEquipItems(EquipItems);
+            CharacterModel.SetEquipItems(EquipItems, SelectableWeaponSets, EquipWeaponSet, IsWeaponsSheathed);
             if (IsOwnerClient && FpsModel != null)
-                FpsModel.SetEquipItems(EquipItems);
+                FpsModel.SetEquipItems(EquipItems, SelectableWeaponSets, EquipWeaponSet, IsWeaponsSheathed);
         }
         #endregion
 
