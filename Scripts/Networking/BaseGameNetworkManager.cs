@@ -110,7 +110,7 @@ namespace MultiplayerARPG
         protected override void Update()
         {
             base.Update();
-            float tempDeltaTime = Time.deltaTime;
+            float tempDeltaTime = Time.unscaledDeltaTime;
             if (IsServer)
             {
                 _updateOnlineCharactersCountDown -= tempDeltaTime;
