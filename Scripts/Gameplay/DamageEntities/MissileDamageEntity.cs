@@ -256,14 +256,17 @@ namespace MultiplayerARPG
             if (!other.GetComponent<IUnHittable>().IsNull())
                 return;
 
-            if (FindTargetHitBox(other, out DamageableHitBox target))
+            if (FindTargetHitBox(other, true, out DamageableHitBox target))
             {
-                // Hit a hitbox
-                if (explodeDistance <= 0f && !_alreadyHitObjects.Contains(target.GetObjectId()))
+                // Hit a locking target
+                if (explodeDistance <= 0f)
                 {
-                    // If this is not going to explode, just apply damage to target
-                    _alreadyHitObjects.Add(target.GetObjectId());
-                    ApplyDamageTo(target);
+                    if (!_alreadyHitObjects.Contains(target.GetObjectId()))
+                    {
+                        // If this is not going to explode, just apply damage to target
+                        _alreadyHitObjects.Add(target.GetObjectId());
+                        ApplyDamageTo(target);
+                    }
                 }
                 else
                 {
@@ -291,7 +294,7 @@ namespace MultiplayerARPG
             }
         }
 
-        protected virtual bool FindTargetHitBox(GameObject other, out DamageableHitBox target)
+        protected virtual bool FindTargetHitBox(GameObject other, bool checkLockingTarget, out DamageableHitBox target)
         {
             target = null;
 
@@ -306,7 +309,7 @@ namespace MultiplayerARPG
                 return false;
             }
 
-            if (_lockingTarget != null && _lockingTarget.GetObjectId() != target.GetObjectId())
+            if (checkLockingTarget && _lockingTarget != null && _lockingTarget.GetObjectId() != target.GetObjectId())
             {
                 target = null;
                 return false;
@@ -315,9 +318,9 @@ namespace MultiplayerARPG
             return true;
         }
 
-        protected virtual bool FindAndApplyDamage(GameObject other, HashSet<uint> alreadyHitObjects)
+        protected virtual bool FindAndApplyDamage(GameObject other, bool checkLockingTarget, HashSet<uint> alreadyHitObjects)
         {
-            if (FindTargetHitBox(other, out DamageableHitBox target) && !_alreadyHitObjects.Contains(target.GetObjectId()))
+            if (FindTargetHitBox(other, checkLockingTarget, out DamageableHitBox target) && !_alreadyHitObjects.Contains(target.GetObjectId()))
             {
                 _alreadyHitObjects.Add(target.GetObjectId());
                 ApplyDamageTo(target);
@@ -350,7 +353,7 @@ namespace MultiplayerARPG
                 Collider2D[] colliders2D = Physics2D.OverlapCircleAll(CacheTransform.position, explodeDistance);
                 foreach (Collider2D collider in colliders2D)
                 {
-                    FindAndApplyDamage(collider.gameObject, _alreadyHitObjects);
+                    FindAndApplyDamage(collider.gameObject, false, _alreadyHitObjects);
                 }
             }
             else
@@ -358,7 +361,7 @@ namespace MultiplayerARPG
                 Collider[] colliders = Physics.OverlapSphere(CacheTransform.position, explodeDistance);
                 foreach (Collider collider in colliders)
                 {
-                    FindAndApplyDamage(collider.gameObject, _alreadyHitObjects);
+                    FindAndApplyDamage(collider.gameObject, false, _alreadyHitObjects);
                 }
             }
         }

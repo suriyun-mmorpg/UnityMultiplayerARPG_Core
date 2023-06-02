@@ -216,7 +216,7 @@ namespace MultiplayerARPG
         protected void Impact(GameObject hitted)
         {
             // Check target
-            if (FindTargetHitBox(hitted, out DamageableHitBox target))
+            if (FindTargetHitBox(hitted, true, out DamageableHitBox target))
             {
                 // Hit a hitbox
                 if (explodeDistance <= 0f && !_alreadyHitObjects.Contains(target.GetObjectId()))
