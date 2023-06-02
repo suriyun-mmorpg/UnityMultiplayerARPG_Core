@@ -80,6 +80,7 @@ namespace MultiplayerARPG
                 entity.Level = level;
                 entity.SetSpawnArea(this, prefab, level, spawnPosition);
                 entity.Teleport(spawnPosition, spawnRotation);
+                entity.InitStats();
                 BaseGameNetworkManager.Singleton.Assets.NetworkSpawn(spawnObj);
                 return entity;
             }

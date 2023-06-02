@@ -121,6 +121,7 @@ namespace MultiplayerARPG
                     spawnPosition, spawnRotation);
                 HarvestableEntity entity = spawnObj.GetComponent<HarvestableEntity>();
                 entity.SetSpawnArea(this, prefab, level, spawnPosition);
+                entity.InitStats();
                 BaseGameNetworkManager.Singleton.Assets.NetworkSpawn(spawnObj);
                 return entity;
             }

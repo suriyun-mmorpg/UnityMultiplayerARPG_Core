@@ -66,13 +66,10 @@ namespace MultiplayerARPG
             gameObject.tag = CurrentGameInstance.harvestableTag;
             gameObject.layer = CurrentGameInstance.harvestableLayer;
             isStaticHitBoxes = true;
-            _isDestroyed = false;
         }
 
-        protected virtual void InitStats()
+        public virtual void InitStats()
         {
-            if (!IsServer)
-                return;
             _isDestroyed = false;
             CurrentHp = MaxHp;
         }
@@ -214,6 +211,11 @@ namespace MultiplayerARPG
             NetworkDestroy(DestroyDelay);
         }
 
+        /// <summary>
+        /// This function will be called if this object is placed in scene networked object
+        /// </summary>
+        /// <param name="delay"></param>
+        /// <returns></returns>
         protected async UniTaskVoid RespawnRoutine(float delay)
         {
             await UniTask.Delay(Mathf.CeilToInt(delay * 1000));

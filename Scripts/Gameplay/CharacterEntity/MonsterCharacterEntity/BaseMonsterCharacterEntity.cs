@@ -156,13 +156,6 @@ namespace MultiplayerARPG
             base.EntityAwake();
             gameObject.tag = CurrentGameInstance.monsterTag;
             gameObject.layer = CurrentGameInstance.monsterLayer;
-            Identity.onGetInstance.AddListener(InitStats);
-        }
-
-        protected override void EntityOnDestroy()
-        {
-            base.EntityOnDestroy();
-            Identity.onGetInstance.RemoveListener(InitStats);
         }
 
         protected override void EntityUpdate()
@@ -209,10 +202,8 @@ namespace MultiplayerARPG
             base.SendServerState();
         }
 
-        protected void InitStats()
+        public virtual void InitStats()
         {
-            if (!IsServer)
-                return;
             _isDestroyed = false;
             if (Level <= 0)
                 Level = CharacterDatabase.DefaultLevel;
@@ -273,8 +264,6 @@ namespace MultiplayerARPG
                 }
             }
 
-            // Initial default data
-            InitStats();
             if (SpawnArea == null)
                 SpawnPosition = EntityTransform.position;
         }
@@ -681,11 +670,16 @@ namespace MultiplayerARPG
             NetworkDestroy(DestroyDelay);
         }
 
+        /// <summary>
+        /// This function will be called if this object is placed in scene networked object
+        /// </summary>
+        /// <param name="delay"></param>
+        /// <returns></returns>
         private async UniTaskVoid RespawnRoutine(float delay)
         {
             await UniTask.Delay(Mathf.CeilToInt(delay * 1000));
-            InitStats();
             Teleport(SpawnPosition, EntityTransform.rotation);
+            InitStats();
             Manager.Assets.NetworkSpawnScene(
                 Identity.ObjectId,
                 SpawnPosition,

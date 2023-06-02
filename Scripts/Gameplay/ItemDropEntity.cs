@@ -101,12 +101,12 @@ namespace MultiplayerARPG
             }
         }
 
-        private bool isModelContainerValidated = false;
+        private bool _isModelContainerValidated = false;
         public Transform ModelContainer
         {
             get
             {
-                if (!isModelContainerValidated)
+                if (!_isModelContainerValidated)
                 {
                     if (modelContainer == null || modelContainer == transform)
                     {
@@ -116,7 +116,7 @@ namespace MultiplayerARPG
                         modelContainer.transform.localRotation = Quaternion.identity;
                         modelContainer.transform.localScale = Vector3.one;
                     }
-                    isModelContainerValidated = true;
+                    _isModelContainerValidated = true;
                 }
                 return modelContainer;
             }
@@ -132,9 +132,9 @@ namespace MultiplayerARPG
         }
 
         // Private variables
-        protected bool isPickedUp;
-        protected float dropTime;
-        protected float appearDuration;
+        protected bool _isPickedUp;
+        protected float _dropTime;
+        protected float _appearDuration;
 
         public override void PrepareRelatesData()
         {
@@ -164,11 +164,19 @@ namespace MultiplayerARPG
             ModelContainer.gameObject.SetActive(false);
         }
 
-        protected virtual void InitDropItems()
+        public virtual void InitPutOnPlaceholder(CharacterItem dropItem, IEnumerable<string> looters, float appearDuration)
         {
-            if (!IsServer)
-                return;
-            isPickedUp = false;
+            _appearDuration = appearDuration;
+            DropItems = new List<CharacterItem> { dropItem };
+            Looters = new HashSet<string>(looters);
+            PutOnPlaceholder = true;
+            InitDropItems();
+        }
+
+        public virtual void InitDropItems()
+        {
+            _isPickedUp = false;
+            _dropTime = Time.unscaledTime;
             if (!PutOnPlaceholder)
             {
                 // Random drop items
@@ -206,7 +214,7 @@ namespace MultiplayerARPG
             if (PutOnPlaceholder)
             {
                 // Destroy later by duration value
-                NetworkDestroy(appearDuration);
+                NetworkDestroy(_appearDuration);
             }
         }
 
@@ -229,7 +237,6 @@ namespace MultiplayerARPG
         {
             base.OnSetup();
             itemDropData.onChange += OnItemDropDataChange;
-            InitDropItems();
         }
 
         protected override void EntityOnDestroy()
@@ -273,7 +280,7 @@ namespace MultiplayerARPG
         public bool IsAbleToLoot(BaseCharacterEntity baseCharacterEntity)
         {
             if ((Looters == null || Looters.Count == 0 || Looters.Contains(baseCharacterEntity.Id) ||
-                Time.unscaledTime - dropTime > CurrentGameInstance.itemLootLockDuration) && !isPickedUp)
+                Time.unscaledTime - _dropTime > CurrentGameInstance.itemLootLockDuration) && !_isPickedUp)
                 return true;
             return false;
         }
@@ -282,10 +289,10 @@ namespace MultiplayerARPG
         {
             if (!IsServer)
                 return;
-            if (isPickedUp)
+            if (_isPickedUp)
                 return;
             // Mark as picked up
-            isPickedUp = true;
+            _isPickedUp = true;
             // Tell clients that the item drop destroy to play animation at client
             CallAllOnItemDropDestroy();
             // Respawning later
@@ -297,14 +304,19 @@ namespace MultiplayerARPG
             NetworkDestroy(destroyDelay);
         }
 
+        /// <summary>
+        /// This function will be called if this object is placed in scene networked object
+        /// </summary>
+        /// <param name="delay"></param>
+        /// <returns></returns>
         protected async UniTaskVoid RespawnRoutine(float delay)
         {
             await UniTask.Delay(Mathf.CeilToInt(delay * 1000));
+            InitDropItems();
             Manager.Assets.NetworkSpawnScene(
                 Identity.ObjectId,
                 EntityTransform.position,
                 CurrentGameInstance.DimensionType == DimensionType.Dimension3D ? Quaternion.Euler(Vector3.up * Random.Range(0, 360)) : Quaternion.identity);
-            InitDropItems();
         }
 
         public static ItemDropEntity DropItem(BaseGameEntity dropper, RewardGivenType givenType, CharacterItem dropData, IEnumerable<string> looters)
@@ -346,14 +358,8 @@ namespace MultiplayerARPG
                 prefab.Identity.HashAssetId,
                 dropPosition, dropRotation);
             ItemDropEntity itemDropEntity = spawnObj.GetComponent<ItemDropEntity>();
-            itemDropEntity.PutOnPlaceholder = true;
             itemDropEntity.GivenType = givenType;
-            itemDropEntity.DropItems = new List<CharacterItem> { dropItem };
-            itemDropEntity.Looters = new HashSet<string>(looters);
-            itemDropEntity.isPickedUp = false;
-            itemDropEntity.dropTime = Time.unscaledTime;
-            itemDropEntity.appearDuration = appearDuration;
-            itemDropEntity.InitDropItems();
+            itemDropEntity.InitPutOnPlaceholder(dropItem, looters, appearDuration);
             BaseGameNetworkManager.Singleton.Assets.NetworkSpawn(spawnObj);
             return itemDropEntity;
         }
