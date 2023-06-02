@@ -65,7 +65,7 @@ namespace MultiplayerARPG
                 if (!entity.FindGroundedPosition(spawnPosition, GROUND_DETECTION_DISTANCE, out spawnPosition))
                 {
                     // Destroy the entity (because it can't find ground position)
-                    Destroy(entity.gameObject);
+                    BaseGameNetworkManager.Singleton.Assets.DestroyObjectInstance(spawnObj);
                     _pending.Add(new MonsterSpawnPrefabData()
                     {
                         prefab = prefab,
