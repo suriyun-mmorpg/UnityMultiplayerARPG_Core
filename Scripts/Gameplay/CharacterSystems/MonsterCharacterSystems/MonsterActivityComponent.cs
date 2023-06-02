@@ -30,7 +30,8 @@ namespace MultiplayerARPG
         [Tooltip("If this is TRUE, monster will attacks buildings")]
         public bool isAttackBuilding = false;
         [Tooltip("If this is TRUE, monster will attacks targets while its summoner still idle")]
-        public bool isAggressiveWhileSummonerIdle = false;
+        [FormerlySerializedAs("isAggressiveWhileSummonerIdle")]
+        public bool aggressiveWhileSummoned = false;
         [Tooltip("Delay before it can switch target again")]
         public float switchTargetDelay = 3;
 
@@ -440,7 +441,7 @@ namespace MultiplayerARPG
                     overlapMask |= CurrentGameInstance.buildingLayer.Mask;
                 if (isSummonedAndSummonerExisted)
                 {
-                    isAggressive = isAggressive || isAggressiveWhileSummonerIdle;
+                    isAggressive = isAggressive || aggressiveWhileSummoned;
                     // Find enemy around summoner
                     _enemies.AddRange(Entity.FindAliveEntities<DamageableEntity>(
                         Entity.Summoner.EntityTransform.position,
