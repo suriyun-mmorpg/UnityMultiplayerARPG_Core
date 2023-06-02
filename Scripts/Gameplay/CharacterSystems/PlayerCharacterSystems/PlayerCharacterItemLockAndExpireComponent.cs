@@ -10,7 +10,7 @@ namespace MultiplayerARPG
         private float _updatingTime;
         private float _deltaTime;
 
-        public override sealed void EntityUpdate()
+        public override void EntityUpdate()
         {
             if (!Entity.IsServer)
                 return;

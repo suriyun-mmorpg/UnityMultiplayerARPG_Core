@@ -58,7 +58,7 @@ namespace MultiplayerARPG
             get { return Identity.HashAssetId; }
         }
 
-        public override sealed void OnSetup()
+        public override void OnSetup()
         {
             base.OnSetup();
             queueItems.forOwnerOnly = false;

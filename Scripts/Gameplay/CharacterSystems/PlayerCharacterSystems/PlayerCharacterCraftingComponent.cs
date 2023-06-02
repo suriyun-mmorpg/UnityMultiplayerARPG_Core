@@ -33,12 +33,12 @@ namespace MultiplayerARPG
 
         public int SourceId { get { return 0; } }
 
-        public override sealed void OnSetup()
+        public override void OnSetup()
         {
             queueItems.forOwnerOnly = true;
         }
 
-        public override sealed void EntityUpdate()
+        public override void EntityUpdate()
         {
             if (!IsServer)
                 return;

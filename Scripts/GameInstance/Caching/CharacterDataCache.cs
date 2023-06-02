@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace MultiplayerARPG
 {
-    public sealed class CharacterDataCache
+    public class CharacterDataCache
     {
         public bool IsRecaching { get; private set; }
         private CharacterStats _stats;

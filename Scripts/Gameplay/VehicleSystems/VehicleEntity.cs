@@ -80,7 +80,7 @@ namespace MultiplayerARPG
         protected CalculatedBuff _cacheBuff = new CalculatedBuff();
         protected int _dirtyLevel = int.MinValue;
 
-        protected override sealed void EntityAwake()
+        protected override void EntityAwake()
         {
             base.EntityAwake();
             gameObject.tag = CurrentGameInstance.vehicleTag;
@@ -166,7 +166,7 @@ namespace MultiplayerARPG
             }
         }
 
-        public override sealed float GetMoveSpeed()
+        public override float GetMoveSpeed()
         {
             if (moveSpeedType == VehicleMoveSpeedType.FixedMovedSpeed)
                 return moveSpeed;

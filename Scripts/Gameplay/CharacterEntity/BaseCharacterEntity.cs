@@ -151,13 +151,13 @@ namespace MultiplayerARPG
         public IPhysicFunctions FindPhysicFunctions { get; protected set; }
 
         public override bool IsImmune { get { return base.IsImmune || RespawnInvincibleCountDown > 0f; } set { base.IsImmune = value; } }
-        public override sealed int MaxHp { get { return CachedData.MaxHp; } }
+        public override int MaxHp { get { return CachedData.MaxHp; } }
         public int MaxMp { get { return CachedData.MaxMp; } }
         public int MaxStamina { get { return CachedData.MaxStamina; } }
         public int MaxFood { get { return CachedData.MaxFood; } }
         public int MaxWater { get { return CachedData.MaxWater; } }
-        public override sealed float MoveAnimationSpeedMultiplier { get { return CachedData.BaseMoveSpeed > 0f ? GetMoveSpeed(MovementState, ExtraMovementState.None) / CachedData.BaseMoveSpeed : 1f; } }
-        public override sealed bool MuteFootstepSound { get { return CachedData.MuteFootstepSound; } }
+        public override float MoveAnimationSpeedMultiplier { get { return CachedData.BaseMoveSpeed > 0f ? GetMoveSpeed(MovementState, ExtraMovementState.None) / CachedData.BaseMoveSpeed : 1f; } }
+        public override bool MuteFootstepSound { get { return CachedData.MuteFootstepSound; } }
         public abstract int DataId { get; set; }
 
         public CharacterModelManager ModelManager { get; private set; }
@@ -1180,7 +1180,7 @@ namespace MultiplayerARPG
             return GetMoveSpeed(MovementState, ExtraMovementState);
         }
 
-        public override sealed bool CanMove()
+        public override bool CanMove()
         {
             if (this.IsDead())
                 return false;
@@ -1189,7 +1189,7 @@ namespace MultiplayerARPG
             return true;
         }
 
-        public override sealed bool CanSprint()
+        public override bool CanSprint()
         {
             if (!MovementState.Has(MovementState.IsGrounded) || MovementState.Has(MovementState.IsUnderWater))
                 return false;
@@ -1198,7 +1198,7 @@ namespace MultiplayerARPG
             return CurrentStamina > 0;
         }
 
-        public sealed override bool CanWalk()
+        public override bool CanWalk()
         {
             if (!MovementState.Has(MovementState.IsGrounded) || MovementState.Has(MovementState.IsUnderWater))
                 return false;
@@ -1207,7 +1207,7 @@ namespace MultiplayerARPG
             return true;
         }
 
-        public override sealed bool CanCrouch()
+        public override bool CanCrouch()
         {
             if (!MovementState.Has(MovementState.IsGrounded) || MovementState.Has(MovementState.IsUnderWater))
                 return false;
@@ -1216,7 +1216,7 @@ namespace MultiplayerARPG
             return true;
         }
 
-        public override sealed bool CanCrawl()
+        public override bool CanCrawl()
         {
             if (!MovementState.Has(MovementState.IsGrounded) || MovementState.Has(MovementState.IsUnderWater))
                 return false;
@@ -1271,7 +1271,7 @@ namespace MultiplayerARPG
             return true;
         }
 
-        public override sealed bool IsHide()
+        public override bool IsHide()
         {
             return CachedData.IsHide;
         }

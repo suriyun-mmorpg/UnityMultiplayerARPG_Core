@@ -18,7 +18,7 @@ namespace MultiplayerARPG
             _recoveryBuffs = new Dictionary<string, CharacterRecoveryData>();
         }
 
-        public override sealed void EntityUpdate()
+        public override void EntityUpdate()
         {
             if (!Entity.IsServer)
                 return;

@@ -269,7 +269,7 @@ namespace MultiplayerARPG
             }
         }
 
-        public override sealed CharacterStatsIncremental Stats
+        public override CharacterStatsIncremental Stats
         {
             get
             {
@@ -293,7 +293,7 @@ namespace MultiplayerARPG
             }
         }
 
-        public override sealed AttributeIncremental[] Attributes
+        public override AttributeIncremental[] Attributes
         {
             get
             {
@@ -327,7 +327,7 @@ namespace MultiplayerARPG
             }
         }
 
-        public override sealed ResistanceIncremental[] Resistances
+        public override ResistanceIncremental[] Resistances
         {
             get
             {
@@ -361,7 +361,7 @@ namespace MultiplayerARPG
             }
         }
 
-        public override sealed ArmorIncremental[] Armors
+        public override ArmorIncremental[] Armors
         {
             get
             {

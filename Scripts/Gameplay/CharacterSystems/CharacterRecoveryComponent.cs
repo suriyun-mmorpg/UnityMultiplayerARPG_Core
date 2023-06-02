@@ -14,7 +14,7 @@ namespace MultiplayerARPG
             _recoveryData = new CharacterRecoveryData(Entity);
         }
 
-        public override sealed void EntityUpdate()
+        public override void EntityUpdate()
         {
             if (!Entity.IsServer)
                 return;

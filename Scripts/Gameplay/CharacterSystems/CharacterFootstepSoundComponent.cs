@@ -114,7 +114,7 @@ namespace MultiplayerARPG
             return false;
         }
 
-        public override sealed void EntityUpdate()
+        public override void EntityUpdate()
         {
             audioSource.mute = !AudioManager.Singleton.sfxVolumeSetting.IsOn;
 
