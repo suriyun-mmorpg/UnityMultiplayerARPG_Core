@@ -156,7 +156,13 @@ namespace MultiplayerARPG
             base.EntityAwake();
             gameObject.tag = CurrentGameInstance.monsterTag;
             gameObject.layer = CurrentGameInstance.monsterLayer;
-            _isDestroyed = false;
+            Identity.onGetInstance.AddListener(InitStats);
+        }
+
+        protected override void EntityOnDestroy()
+        {
+            base.EntityOnDestroy();
+            Identity.onGetInstance.RemoveListener(InitStats);
         }
 
         protected override void EntityUpdate()
