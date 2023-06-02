@@ -21,6 +21,7 @@ namespace MultiplayerARPG
         public NpcDialogMenu[] menus;
         [Tooltip("Requirement for `SaveRespawnPoint` and `Warp` dialog confirmation")]
         public NpcDialogConfirmRequirement confirmRequirement;
+
         // Quest
         public Quest quest;
         [Output(backingValue = ShowBackingValue.Always, connectionType = ConnectionType.Override)]
@@ -31,8 +32,10 @@ namespace MultiplayerARPG
         public BaseNpcDialog questAbandonedDialog;
         [Output(connectionType = ConnectionType.Override)]
         public BaseNpcDialog questCompletedDialog;
+
         // Shop
         public NpcSellItem[] sellItems;
+
         // Craft Item
         public ItemCraft itemCraft;
         [Output(connectionType = ConnectionType.Override)]
@@ -43,6 +46,7 @@ namespace MultiplayerARPG
         public BaseNpcDialog craftNotMeetRequirementsDialog;
         [Output(connectionType = ConnectionType.Override)]
         public BaseNpcDialog craftCancelDialog;
+
         // Save Spawn Point
         public BaseMapInfo saveRespawnMap;
         public Vector3 saveRespawnPosition;
@@ -50,6 +54,7 @@ namespace MultiplayerARPG
         public BaseNpcDialog saveRespawnConfirmDialog;
         [Output(connectionType = ConnectionType.Override)]
         public BaseNpcDialog saveRespawnCancelDialog;
+
         // Warp
         public WarpPortalType warpPortalType;
         [Tooltip("Map which character will warp to when use the warp portal, leave this empty to warp character to other position in the same map")]
@@ -62,21 +67,26 @@ namespace MultiplayerARPG
         public Vector3 warpRotation;
         [Output(connectionType = ConnectionType.Override)]
         public BaseNpcDialog warpCancelDialog;
+
         // Refine Item
         [Output(connectionType = ConnectionType.Override)]
         public BaseNpcDialog refineItemCancelDialog;
+
         // Dismantle Item
         [Output(connectionType = ConnectionType.Override)]
         public BaseNpcDialog dismantleItemCancelDialog;
+
         // Storage
         [Output(connectionType = ConnectionType.Override)]
         public BaseNpcDialog storageCancelDialog;
+
         // Repair Item
         [Output(connectionType = ConnectionType.Override)]
         public BaseNpcDialog repairItemCancelDialog;
 
         public override void PrepareRelatesData()
         {
+            // Dialogs from menu
             if (menus != null && menus.Length > 0)
             {
                 foreach (NpcDialogMenu menu in menus)
@@ -84,6 +94,39 @@ namespace MultiplayerARPG
                     GameInstance.AddNpcDialogs(menu.dialog);
                 }
             }
+
+            // Quest action dialogs
+            GameInstance.AddNpcDialogs(questAcceptedDialog);
+            GameInstance.AddNpcDialogs(questDeclinedDialog);
+            GameInstance.AddNpcDialogs(questAbandonedDialog);
+            GameInstance.AddNpcDialogs(questCompletedDialog);
+
+            // Item craft action dialogs
+            GameInstance.AddNpcDialogs(craftDoneDialog);
+            GameInstance.AddNpcDialogs(craftItemWillOverwhelmingDialog);
+            GameInstance.AddNpcDialogs(craftNotMeetRequirementsDialog);
+            GameInstance.AddNpcDialogs(craftCancelDialog);
+
+            // Respawn point save action dialogs
+            GameInstance.AddNpcDialogs(saveRespawnConfirmDialog);
+            GameInstance.AddNpcDialogs(saveRespawnCancelDialog);
+
+            // Warp action dialogs
+            GameInstance.AddNpcDialogs(warpCancelDialog);
+
+            // Refine action dialogs
+            GameInstance.AddNpcDialogs(refineItemCancelDialog);
+
+            // Dismantle action dialogs
+            GameInstance.AddNpcDialogs(dismantleItemCancelDialog);
+
+            // Storage action dialogs
+            GameInstance.AddNpcDialogs(storageCancelDialog);
+
+            // Repair action dialogs
+            GameInstance.AddNpcDialogs(repairItemCancelDialog);
+
+            // Items
             if (sellItems != null && sellItems.Length > 0)
             {
                 foreach (NpcSellItem sellItem in sellItems)
@@ -101,6 +144,12 @@ namespace MultiplayerARPG
             GameInstance.AddItems(itemCraft.CraftingItem);
             GameInstance.AddItems(itemCraft.RequireItems);
             GameInstance.AddCurrencies(itemCraft.RequireCurrencies);
+
+            // Map infos
+            GameInstance.AddMapInfos(saveRespawnMap);
+            GameInstance.AddMapInfos(warpMap);
+
+            // Quests
             GameInstance.AddQuests(quest);
         }
 
