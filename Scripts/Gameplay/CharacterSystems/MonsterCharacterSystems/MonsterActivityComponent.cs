@@ -51,11 +51,6 @@ namespace MultiplayerARPG
         protected float _pauseCountdown;
         protected float _lastSwitchTargetTime;
 
-        public bool IsAggressiveWhileSummonerIdle()
-        {
-            return isAggressiveWhileSummonerIdle && Entity.Characteristic == MonsterCharacteristic.Aggressive && Entity.Characteristic != MonsterCharacteristic.NoHarm;
-        }
-
         public override void EntityAwake()
         {
             base.EntityAwake();
@@ -421,9 +416,13 @@ namespace MultiplayerARPG
         /// <returns></returns>
         public virtual bool FindEnemy()
         {
+            // No harm, don't find enemy
+            if (Entity.Characteristic == MonsterCharacteristic.NoHarm)
+                return false;
+
             // Aggressive monster or summoned monster will find target to attack
-            if (Entity.Characteristic != MonsterCharacteristic.Aggressive &&
-                Entity.Summoner == null)
+            bool isAggressive = Entity.Characteristic == MonsterCharacteristic.Aggressive;
+            if (!isAggressive && Entity.Summoner == null)
                 return false;
 
             if (!Entity.TryGetTargetEntity(out IDamageableEntity targetEntity) || targetEntity.Entity == Entity.Entity ||
@@ -441,13 +440,14 @@ namespace MultiplayerARPG
                     overlapMask |= CurrentGameInstance.buildingLayer.Mask;
                 if (isSummonedAndSummonerExisted)
                 {
+                    isAggressive = isAggressive || isAggressiveWhileSummonerIdle;
                     // Find enemy around summoner
                     _enemies.AddRange(Entity.FindAliveEntities<DamageableEntity>(
                         Entity.Summoner.EntityTransform.position,
                         CharacterDatabase.SummonedVisualRange,
                         false, /* Don't find an allies */
-                        true,  /* Find an enemies */
-                        true,  /* Find an neutral */
+                        isAggressive,  /* Find an enemies */
+                        isAggressive,  /* Find an neutral */
                         overlapMask));
                 }
                 else
