@@ -43,6 +43,7 @@ namespace MultiplayerARPG
                                 LanguageManager.GetText(formatKeyTaskKillMonster), monsterTitle,
                             Progress.ToString("N0"),
                             monsterKillAmount.ToString("N0"));
+                        UpdateCustomDescription(isComplete, monsterTitle, Progress, monsterKillAmount);
                     }
                     break;
                 case QuestTaskType.CollectItem:
@@ -58,6 +59,7 @@ namespace MultiplayerARPG
                                 LanguageManager.GetText(formatKeyTaskCollectItem), itemTitle,
                             Progress.ToString("N0"),
                             itemCollectAmount.ToString("N0"));
+                        UpdateCustomDescription(isComplete, itemTitle, Progress, itemCollectAmount);
                     }
                     break;
                 case QuestTaskType.TalkToNpc:
@@ -71,12 +73,30 @@ namespace MultiplayerARPG
                             isComplete ?
                                 LanguageManager.GetText(formatKeyTaskTalkToNpcComplete) :
                                 LanguageManager.GetText(formatKeyTaskTalkToNpc), npcTitle);
+                        UpdateCustomDescription(isComplete, npcTitle, Progress, 1);
                     }
                     break;
                 case QuestTaskType.Custom:
                     if (uiTextTaskDescription)
                         uiTextTaskDescription.text = QuestTask.customQuestTask.GetTaskDescription(GameInstance.PlayingCharacter, Progress);
                     break;
+            }
+        }
+
+        public void UpdateCustomDescription(bool isComplete, string objectTitle, int progress, int target)
+        {
+            if (uiTextTaskDescription == null)
+                return;
+
+            if (isComplete)
+            {
+                if (QuestTask.useCustomCompletedDescription)
+                    uiTextTaskDescription.text = ZString.Format(QuestTask.CustomCompletedDescription, objectTitle, progress.ToString("N0"), target.ToString("N0"));
+            }
+            else
+            {
+                if (QuestTask.useCustomDescription)
+                    uiTextTaskDescription.text = ZString.Format(QuestTask.CustomDescription, objectTitle, progress.ToString("N0"), target.ToString("N0"));
             }
         }
     }

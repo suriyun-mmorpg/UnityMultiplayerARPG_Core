@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace MultiplayerARPG
 {
@@ -203,13 +204,19 @@ namespace MultiplayerARPG
     public struct QuestTask
     {
         public QuestTaskType taskType;
+
+        [Header("Kill Monster Task")]
         [StringShowConditional(nameof(taskType), nameof(QuestTaskType.KillMonster))]
         public MonsterCharacterAmount monsterCharacterAmount;
+
+        [Header("Collect Item Task")]
         [StringShowConditional(nameof(taskType), nameof(QuestTaskType.CollectItem))]
         public ItemAmount itemAmount;
         [StringShowConditional(nameof(taskType), nameof(QuestTaskType.CollectItem))]
         [Tooltip("If this is `TRUE`, it will not decrease task items when quest completed")]
         public bool doNotDecreaseItemsOnQuestComplete;
+
+        [Header("Talk To NPC Task")]
         [StringShowConditional(nameof(taskType), nameof(QuestTaskType.TalkToNpc))]
         [Tooltip("Have to talk to this NPC to complete task")]
         public NpcEntity npcEntity;
@@ -219,7 +226,37 @@ namespace MultiplayerARPG
         [StringShowConditional(nameof(taskType), nameof(QuestTaskType.TalkToNpc))]
         [Tooltip("If this is `TRUE` quest will be completed immediately after talked to NPC and all tasks done")]
         public bool completeAfterTalked;
+
+        [Header("Custom Quest Task")]
         [StringShowConditional(nameof(taskType), nameof(QuestTaskType.Custom))]
         public BaseCustomQuestTask customQuestTask;
+
+        [Header("Custom Task Description")]
+        public bool useCustomDescription;
+        [BoolShowConditional(nameof(useCustomDescription), true)]
+        [FormerlySerializedAs("defaultDescriptionOverride")]
+        public string defaultDescription;
+        [BoolShowConditional(nameof(useCustomDescription), true)]
+        [FormerlySerializedAs("languageSpecificDescriptionOverrides")]
+        public LanguageData[] languageSpecificDescriptions;
+
+        [Header("Custom Task Completed Description")]
+        public bool useCustomCompletedDescription;
+        [BoolShowConditional(nameof(useCustomCompletedDescription), true)]
+        [FormerlySerializedAs("defaultCompletedDescriptionOverride")]
+        public string defaultCompletedDescription;
+        [BoolShowConditional(nameof(useCustomCompletedDescription), true)]
+        [FormerlySerializedAs("languageSpecificCompletedDescriptionOverrides")]
+        public LanguageData[] languageSpecificCompletedDescriptions;
+
+        public string CustomDescription
+        {
+            get { return Language.GetText(languageSpecificDescriptions, defaultDescription); }
+        }
+
+        public string CustomCompletedDescription
+        {
+            get { return Language.GetText(languageSpecificCompletedDescriptions, defaultCompletedDescription); }
+        }
     }
 }
