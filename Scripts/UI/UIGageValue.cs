@@ -72,8 +72,8 @@ namespace MultiplayerARPG
 
             if (sliderGage != null)
             {
-                sliderGage.maxValue = max;
-                sliderGage.value = current;
+                sliderGage.maxValue = 1f;
+                sliderGage.value = rate;
             }
         }
     }
