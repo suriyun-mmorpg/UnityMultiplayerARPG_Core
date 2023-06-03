@@ -24,6 +24,13 @@ namespace MultiplayerARPG
             return s_caches[characterData].MarkToMakeCaches();
         }
 
+        public static void RemoveCaches(this ICharacterData characterData)
+        {
+            if (characterData == null)
+                return;
+            s_caches.Remove(characterData);
+        }
+
         public static void Clear()
         {
             s_caches.Clear();
