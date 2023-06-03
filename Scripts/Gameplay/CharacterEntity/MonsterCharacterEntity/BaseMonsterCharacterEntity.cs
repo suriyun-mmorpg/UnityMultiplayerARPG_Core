@@ -263,9 +263,10 @@ namespace MultiplayerARPG
                     InstantiateUI(CurrentGameInstance.monsterCharacterUI);
                 }
             }
-
             if (SpawnArea == null)
                 SpawnPosition = EntityTransform.position;
+            if (IsServer)
+                InitStats();
         }
 
         public void SetAttackTarget(IDamageableEntity target)

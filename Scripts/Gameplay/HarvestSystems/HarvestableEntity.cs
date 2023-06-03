@@ -85,10 +85,10 @@ namespace MultiplayerARPG
         public override void OnSetup()
         {
             base.OnSetup();
-            // Initial default data
-            InitStats();
             if (SpawnArea == null)
                 SpawnPosition = EntityTransform.position;
+            if (IsServer)
+                InitStats();
         }
 
         [AllRpc]

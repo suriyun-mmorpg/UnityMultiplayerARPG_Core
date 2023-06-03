@@ -237,6 +237,8 @@ namespace MultiplayerARPG
         {
             base.OnSetup();
             itemDropData.onChange += OnItemDropDataChange;
+            if (IsServer)
+                InitDropItems();
         }
 
         protected override void EntityOnDestroy()
