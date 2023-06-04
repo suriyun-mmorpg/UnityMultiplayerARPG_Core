@@ -7,6 +7,9 @@ namespace MultiplayerARPG
     {
         public override void Setup(BaseCharacterModel characterModel, EquipmentModel data, GameObject newModel, EquipmentContainer equipmentContainer)
         {
+            if (GameInstance.Singleton.DimensionType != DimensionType.Dimension3D)
+                return;
+
             if (newModel == null)
                 return;
 
