@@ -68,6 +68,7 @@ namespace MultiplayerARPG
                         _simulatedDamageableEntities.Add(_damageableEntities[subscribingObjectId]);
                 }
             }
+            Physics.SyncTransforms();
             return true;
         }
 
@@ -79,6 +80,7 @@ namespace MultiplayerARPG
                     _simulatedDamageableEntities[i].RestoreHitBoxes();
             }
             _simulatedDamageableEntities.Clear();
+            Physics.SyncTransforms();
         }
 
         public void AddDamageableEntity(DamageableEntity entity)

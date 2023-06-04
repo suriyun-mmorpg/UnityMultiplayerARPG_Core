@@ -64,6 +64,8 @@ namespace MultiplayerARPG
         public BaseGameNetworkManagerComponent[] ManagerComponents { get; private set; }
 
         public static BaseMapInfo CurrentMapInfo { get; protected set; }
+        public bool ShouldPhysicSyncTransforms { get; set; }
+        public bool ShouldPhysicSyncTransforms2D { get; set; }
 
         // Spawn entities events
         public LiteNetLibLoadSceneEvent onSpawnEntitiesStart;
@@ -85,6 +87,7 @@ namespace MultiplayerARPG
         protected Dictionary<string, bool> _readyToInstantiateObjectsStates = new Dictionary<string, bool>();
         protected bool _isReadyToInstantiateObjects;
         protected bool _isReadyToInstantiatePlayers;
+        protected float _physicTimer;
 
         protected override void Awake()
         {
@@ -104,11 +107,17 @@ namespace MultiplayerARPG
                 else
                     gridManager.axisMode = GridManager.EAxisMode.XY;
             }
+            // Force change physic simulation mode to manual
+            Physics.autoSimulation = false;
+            Physics.autoSyncTransforms = false;
+            Physics2D.simulationMode = SimulationMode2D.Script;
+            Physics2D.autoSyncTransforms = false;
             base.Awake();
         }
 
         protected override void Update()
         {
+            // Network messages will be handled before update game entities (in base.Update())
             base.Update();
             float tempDeltaTime = Time.unscaledDeltaTime;
             if (IsServer)
@@ -126,6 +135,15 @@ namespace MultiplayerARPG
                     SendTimeOfDay();
                 }
             }
+            // Network messages were handled (in base.Update()), enity movement proceeded, it may have transform changing manually, and need to sync tranforms before update physic movement
+            if (ShouldPhysicSyncTransforms)
+                Physics.SyncTransforms();
+            ShouldPhysicSyncTransforms = false;
+            if (ShouldPhysicSyncTransforms2D)
+                Physics2D.SyncTransforms();
+            ShouldPhysicSyncTransforms2D = false;
+
+            // Update game entity, it may update entities movement
             if (IsNetworkActive)
             {
                 // Update day-night time on both client and server. It will sync from server some time to make sure that clients time of day won't very difference
@@ -136,6 +154,16 @@ namespace MultiplayerARPG
                         continue;
                     _arrayGameEntity[i].DoUpdate();
                 }
+            }
+
+            // Update physics
+            _physicTimer += tempDeltaTime;
+            float tempFixedDeltaTime = Time.fixedDeltaTime;
+            while (_physicTimer >= tempFixedDeltaTime)
+            {
+                _physicTimer -= tempFixedDeltaTime;
+                Physics.Simulate(tempFixedDeltaTime);
+                Physics2D.Simulate(tempFixedDeltaTime);
             }
         }
 

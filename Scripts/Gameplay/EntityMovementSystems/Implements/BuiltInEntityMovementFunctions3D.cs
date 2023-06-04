@@ -791,6 +791,7 @@ namespace MultiplayerARPG
                         _yAngle = _targetYAngle = yAngle;
                         RotateY();
                         CacheTransform.position = position;
+                        CurrentGameManager.ShouldPhysicSyncTransforms = true;
                     }
                     MovementState = movementState;
                     ExtraMovementState = extraMovementState;
@@ -942,6 +943,7 @@ namespace MultiplayerARPG
                     {
                         // Allow to move to the position
                         CacheTransform.position = position;
+                        CurrentGameManager.ShouldPhysicSyncTransforms = true;
                     }
                     else
                     {
@@ -949,6 +951,7 @@ namespace MultiplayerARPG
                         Vector3 dir = (newPos - oldPos).normalized;
                         newPos = oldPos + (dir * s);
                         CacheTransform.position = newPos;
+                        CurrentGameManager.ShouldPhysicSyncTransforms = true;
                         // And also adjust client's position
                         Teleport(newPos, Quaternion.Euler(0f, _yAngle, 0f));
                     }
@@ -974,6 +977,7 @@ namespace MultiplayerARPG
             _clientTargetPosition = null;
             NavPaths = null;
             CacheTransform.position = position;
+            CurrentGameManager.ShouldPhysicSyncTransforms = true;
             _yAngle = _targetYAngle = yAngle;
             RotateY();
             if (IsServer && !IsOwnedByServer)

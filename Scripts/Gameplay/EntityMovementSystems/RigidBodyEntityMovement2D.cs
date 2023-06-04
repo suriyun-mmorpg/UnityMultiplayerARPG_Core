@@ -434,6 +434,7 @@ namespace MultiplayerARPG
                     {
                         Direction2D = direction2D;
                         CacheTransform.position = position;
+                        CurrentGameManager.ShouldPhysicSyncTransforms2D = true;
                     }
                     MovementState = movementState;
                     ExtraMovementState = extraMovementState;
@@ -553,6 +554,7 @@ namespace MultiplayerARPG
                     {
                         // Allow to move to the position
                         CacheTransform.position = position;
+                        CurrentGameManager.ShouldPhysicSyncTransforms2D = true;
                     }
                     else
                     {
@@ -561,6 +563,7 @@ namespace MultiplayerARPG
                         newPos = oldPos + (dir * s);
                         newPos.y = position.y;
                         CacheTransform.position = newPos;
+                        CurrentGameManager.ShouldPhysicSyncTransforms2D = true;
                         // And also adjust client's position
                         Teleport(newPos, Quaternion.identity);
                     }
@@ -582,6 +585,7 @@ namespace MultiplayerARPG
             _clientTargetPosition = null;
             NavPaths = null;
             CacheTransform.position = position;
+            CurrentGameManager.ShouldPhysicSyncTransforms2D = true;
             if (IsServer && !IsOwnedByServer)
                 _isServerWaitingTeleportConfirm = true;
             if (!IsServer && IsOwnerClient)
