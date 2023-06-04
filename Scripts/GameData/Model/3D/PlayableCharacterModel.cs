@@ -7,15 +7,17 @@ using UnityEngine.Serialization;
 
 namespace MultiplayerARPG.GameData.Model.Playables
 {
-    public partial class PlayableCharacterModel : BaseCharacterModel, ICustomAnimationModel
+    public partial class PlayableCharacterModel : BaseCharacterModel, ICustomAnimationModel, IModelWithAnimator, IModelWithSkinnedMeshRenderer
     {
         [Header("Relates Components")]
         [Tooltip("It will find `Animator` component on automatically if this is NULL")]
         public Animator animator;
+        public Animator Animator => animator;
 
         [Header("Renderer")]
         [Tooltip("This will be used to apply bone weights when equip an equipments")]
         public SkinnedMeshRenderer skinnedMeshRenderer;
+        public SkinnedMeshRenderer SkinnedMeshRenderer => skinnedMeshRenderer;
 
         [Header("Animations")]
         [Tooltip("If `avatarMask` in action state settings is `null`, it will use this value")]
@@ -87,28 +89,6 @@ namespace MultiplayerARPG.GameData.Model.Playables
         {
             if (Graph.IsValid())
                 Graph.Evaluate(deltaTime);
-        }
-
-        public override void AddingNewModel(EquipmentModel data, GameObject newModel, EquipmentContainer equipmentContainer)
-        {
-            base.AddingNewModel(data, newModel, equipmentContainer);
-            if (data.doNotUseEntityBones)
-                return;
-            SkinnedMeshRenderer skinnedMesh = newModel.GetComponentInChildren<SkinnedMeshRenderer>();
-            if (skinnedMesh != null && skinnedMeshRenderer != null)
-            {
-                skinnedMesh.bones = skinnedMeshRenderer.bones;
-                skinnedMesh.rootBone = skinnedMeshRenderer.rootBone;
-                if (equipmentContainer.defaultModel != null)
-                {
-                    SkinnedMeshRenderer defaultSkinnedMesh = equipmentContainer.defaultModel.GetComponentInChildren<SkinnedMeshRenderer>();
-                    if (defaultSkinnedMesh != null)
-                    {
-                        skinnedMesh.bones = defaultSkinnedMesh.bones;
-                        skinnedMesh.rootBone = defaultSkinnedMesh.rootBone;
-                    }
-                }
-            }
         }
 
         protected void CreateGraph()

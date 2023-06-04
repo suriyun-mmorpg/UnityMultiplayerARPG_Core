@@ -22,7 +22,11 @@ namespace MultiplayerARPG
 
         [Header("Skinned Mesh Settings")]
         [Tooltip("Turn it on to not use bones from entities if this mesh is skinned mesh")]
-        public bool doNotUseEntityBones;
+        [FormerlySerializedAs("doNotUseEntityBones")]
+        public bool doNotSetupBones;
+        [Tooltip("Leave this empty, to use `EquipmentModelBonesSetupManager` from `GameInstance`")]
+        [BoolShowConditional(nameof(doNotSetupBones), false)]
+        public BaseEquipmentModelBonesSetupManager equipmentModelBonesSetupManager;
 
         [Header("Transform Settings")]
         public Vector3 localPosition;
@@ -49,14 +53,24 @@ namespace MultiplayerARPG
         {
             return new EquipmentModel()
             {
+                // Generic Settings
                 equipSocket = equipSocket,
+                // Prefab Settings
                 useInstantiatedObject = useInstantiatedObject,
                 meshPrefab = meshPrefab,
                 instantiatedObjectIndex = instantiatedObjectIndex,
+                priority = priority,
+                // Skinned Mesh Settings
+                doNotSetupBones = doNotSetupBones,
+                equipmentModelBonesSetupManager = equipmentModelBonesSetupManager,
+                // Transform Settings
                 localPosition = localPosition,
                 localEulerAngles = localEulerAngles,
+                doNotChangeScale = doNotChangeScale,
                 localScale = localScale,
-                priority = priority,
+                // Weapon Sheath Settings
+                useSpecificSheathEquipWeaponSet = useSpecificSheathEquipWeaponSet,
+                specificSheathEquipWeaponSet = specificSheathEquipWeaponSet,
                 // Runtime only data
                 itemDataId = itemDataId,
                 itemLevel = itemLevel,

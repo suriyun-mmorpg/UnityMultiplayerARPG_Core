@@ -152,6 +152,8 @@ namespace MultiplayerARPG
         [SerializeField]
         private BaseGMCommands gmCommands = null;
         [SerializeField]
+        private BaseEquipmentModelBonesSetupManager equipmentModelBonesSetupManager;
+        [SerializeField]
         private NetworkSetting networkSetting = null;
 
         [Header("Gameplay Objects")]
@@ -441,14 +443,19 @@ namespace MultiplayerARPG
             get { return gmCommands; }
         }
 
-        public BaseGameDatabase GameDatabase
+        public BaseEquipmentModelBonesSetupManager EquipmentModelBonesSetupManager
         {
-            get { return gameDatabase; }
+            get { return equipmentModelBonesSetupManager; }
         }
 
         public NetworkSetting NetworkSetting
         {
             get { return networkSetting; }
+        }
+
+        public BaseGameDatabase GameDatabase
+        {
+            get { return gameDatabase; }
         }
 
         public SocialSystemSetting SocialSystemSetting
@@ -637,13 +644,17 @@ namespace MultiplayerARPG
             if (gmCommands == null)
                 gmCommands = ScriptableObject.CreateInstance<DefaultGMCommands>();
 
-            // Setup game database if not existed
-            if (gameDatabase == null)
-                gameDatabase = ScriptableObject.CreateInstance<ResourcesFolderGameDatabase>();
+            // Setup equipment model bones setup manager if not existed
+            if (equipmentModelBonesSetupManager == null)
+                equipmentModelBonesSetupManager = ScriptableObject.CreateInstance<EquipmentModelBonesSetupByHumanBodyBonesManager>();
 
             // Setup network setting if not existed
             if (networkSetting == null)
                 networkSetting = ScriptableObject.CreateInstance<NetworkSetting>();
+
+            // Setup game database if not existed
+            if (gameDatabase == null)
+                gameDatabase = ScriptableObject.CreateInstance<ResourcesFolderGameDatabase>();
 
             // Setup social system setting if not existed
             if (socialSystemSetting == null)

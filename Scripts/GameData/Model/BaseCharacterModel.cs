@@ -808,7 +808,15 @@ namespace MultiplayerARPG
                 CacheLeftHandEquipmentEntity.PlayCharge();
         }
 
-        public virtual void AddingNewModel(EquipmentModel data, GameObject newModel, EquipmentContainer equipmentContainer) { }
+        public virtual void AddingNewModel(EquipmentModel data, GameObject newModel, EquipmentContainer equipmentContainer)
+        {
+            if (data.doNotSetupBones)
+                return;
+            BaseEquipmentModelBonesSetupManager equipmentModelBonesSetupManager = GameInstance.Singleton.EquipmentModelBonesSetupManager;
+            if (data.equipmentModelBonesSetupManager != null)
+                equipmentModelBonesSetupManager = data.equipmentModelBonesSetupManager;
+            equipmentModelBonesSetupManager.Setup(this, data, newModel, equipmentContainer);
+        }
 
         public void SetIsDead(bool isDead)
         {
