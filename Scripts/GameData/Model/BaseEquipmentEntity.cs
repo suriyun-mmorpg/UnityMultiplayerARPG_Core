@@ -27,12 +27,19 @@ namespace MultiplayerARPG
             }
         }
 
+        [Header("Effects")]
         [Tooltip("These game effects must placed as this children, it will be activated when launch (can place muzzle effects here)")]
         public GameEffect[] weaponLaunchEffects;
         [Tooltip("These game effects prefabs will instantiates to container when launch (can place muzzle effects here)")]
         public GameEffectPoolContainer[] poolingWeaponLaunchEffects;
         [Tooltip("This is overriding missile damage transform, if this is not empty, it will spawn missile damage entity from this transform")]
         public Transform missileDamageTransform;
+
+        [Header("Support Hand Transforms")]
+        public Transform mainHandSupportTransform;
+        public Transform offHandSupportTransform;
+
+        [Header("Events")]
         public UnityEvent onSetup = new UnityEvent();
         public UnityEvent onEnable = new UnityEvent();
         public UnityEvent onDisable = new UnityEvent();

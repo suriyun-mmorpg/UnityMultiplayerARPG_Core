@@ -9,11 +9,13 @@ namespace MultiplayerARPG
 {
     public partial class EquipmentEntity : BaseEquipmentEntity
     {
+        [Header("Refine Effects")]
         public MaterialCollection[] defaultMaterials;
         public List<EquipmentEntityEffect> effects = new List<EquipmentEntityEffect>();
-        private List<GameObject> allEffectObjects = new List<GameObject>();
-        private bool isFoundEffect;
-        private EquipmentEntityEffect usingEffect;
+
+        private List<GameObject> _allEffectObjects = new List<GameObject>();
+        private bool _isFoundEffect;
+        private EquipmentEntityEffect _usingEffect;
 
         private void Awake()
         {
@@ -27,7 +29,7 @@ namespace MultiplayerARPG
                         foreach (GameObject effectObject in effect.effectObjects)
                         {
                             effectObject.SetActive(false);
-                            allEffectObjects.Add(effectObject);
+                            _allEffectObjects.Add(effectObject);
                         }
                     }
                 }
@@ -92,41 +94,41 @@ namespace MultiplayerARPG
 
         public override void OnLevelChanged(int level)
         {
-            if (allEffectObjects != null && allEffectObjects.Count > 0)
+            if (_allEffectObjects != null && _allEffectObjects.Count > 0)
             {
-                foreach (GameObject allEffectObject in allEffectObjects)
+                foreach (GameObject allEffectObject in _allEffectObjects)
                 {
                     if (allEffectObject.activeSelf)
                         allEffectObject.SetActive(false);
                 }
             }
 
-            isFoundEffect = false;
+            _isFoundEffect = false;
             if (effects != null && effects.Count > 0)
             {
                 foreach (EquipmentEntityEffect effect in effects)
                 {
                     if (level >= effect.level)
                     {
-                        isFoundEffect = true;
-                        usingEffect = effect;
+                        _isFoundEffect = true;
+                        _usingEffect = effect;
                     }
                     else
                         break;
                 }
                 // Apply materials
-                usingEffect.equipmentMaterials.ApplyMaterials();
+                _usingEffect.equipmentMaterials.ApplyMaterials();
                 // Activate effect objects
-                if (usingEffect.effectObjects != null && usingEffect.effectObjects.Length > 0)
+                if (_usingEffect.effectObjects != null && _usingEffect.effectObjects.Length > 0)
                 {
-                    foreach (GameObject effectObject in usingEffect.effectObjects)
+                    foreach (GameObject effectObject in _usingEffect.effectObjects)
                     {
                         effectObject.SetActive(true);
                     }
                 }
             }
             // Not found effect apply default materials
-            if (!isFoundEffect)
+            if (!_isFoundEffect)
             {
                 defaultMaterials.ApplyMaterials();
             }
