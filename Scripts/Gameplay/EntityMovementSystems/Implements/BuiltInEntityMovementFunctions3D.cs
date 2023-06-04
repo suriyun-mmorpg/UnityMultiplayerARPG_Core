@@ -94,8 +94,9 @@ namespace MultiplayerARPG
         private bool _lookRotationApplied;
         private bool _acceptedJump;
         private bool _sendingJump;
-        private float _lastServerValidateTransformTime;
-        private float _lastServerValidateTransformMoveSpeed;
+        private float _lastServerValidateTime;
+        private float _lastServerValidateHorMoveSpd;
+        private float _lastServerValidateVerMoveSpd;
         private EntityMovementInput _oldInput;
         private EntityMovementInput _currentInput;
         private MovementState _tempMovementState;
@@ -366,9 +367,14 @@ namespace MultiplayerARPG
             if (!_isGrounded && !_isUnderWater)
             {
                 if (!useRootMotionForFall)
-                    _verticalVelocity = Mathf.MoveTowards(_verticalVelocity, -maxFallVelocity, gravity * deltaTime);
+                {
+                    _verticalVelocity -= gravity * deltaTime;
+                    _verticalVelocity = Mathf.Max(_verticalVelocity, -maxFallVelocity);
+                }
                 else
+                {
                     _verticalVelocity = 0f;
+                }
             }
             else
             {
@@ -885,6 +891,16 @@ namespace MultiplayerARPG
             }
         }
 
+        public float GetHorizontalMoveSpeed()
+        {
+            return Entity.GetMoveSpeed();
+        }
+
+        public float GetVericalMoveSpeed(bool falling)
+        {
+            return falling ? maxFallVelocity : CalculateJumpVerticalSpeed();
+        }
+
         public void ReadSyncTransformAtServer(NetDataReader reader)
         {
             if (IsOwnerClient)
@@ -929,17 +945,25 @@ namespace MultiplayerARPG
                 ExtraMovementState = extraMovementState;
                 if (!IsClient)
                 {
-                    // If it's server only (not a host), set position follows the client immediately
-                    float currentTime = Time.unscaledTime;
-                    float t = currentTime - _lastServerValidateTransformTime;
-                    float v = Entity.GetMoveSpeed();
-                    float s = (_lastServerValidateTransformMoveSpeed * (t + s_lagBufferUnityTime)) + (v * t); // +`lagBufferUnityTime` as high ping buffer
-                    if (s < 0.001f)
-                        s = 0.001f;
                     Vector3 oldPos = CacheTransform.position;
                     Vector3 newPos = position;
-                    float dist = Vector3.Distance(oldPos, newPos);
-                    if (dist <= s)
+                    // If it's server only (not a host), set position follows the client immediately
+                    float currentTime = Time.unscaledTime;
+                    float moveDuration = currentTime - _lastServerValidateTime;
+                    // Calculate moveable distance
+                    float horMoveSpd = GetHorizontalMoveSpeed();
+                    float horMoveableDist = (_lastServerValidateHorMoveSpd * (moveDuration + s_lagBufferUnityTime)) + (horMoveSpd * moveDuration); // +`lagBufferUnityTime` as high ping buffer
+                    if (horMoveableDist < 0.001f)
+                        horMoveableDist = 0.001f;
+                    // Calculate jump/fall distance
+                    float verMoveSpd = GetVericalMoveSpeed(oldPos.y < newPos.y);
+                    float verMoveableDist = (_lastServerValidateVerMoveSpd * (moveDuration + s_lagBufferUnityTime)) + (verMoveSpd * moveDuration); // +`lagBufferUnityTime` as high ping buffer
+                    if (verMoveableDist < 0.001f)
+                        verMoveableDist = 0.001f;
+
+                    float clientHorMoveDist = Vector3.Distance(oldPos.GetXZ(), newPos.GetXZ());
+                    float clientVerMoveDist = Mathf.Abs(newPos.y - oldPos.y);
+                    if (clientHorMoveDist <= horMoveableDist && clientVerMoveDist < verMoveableDist)
                     {
                         // Allow to move to the position
                         CacheTransform.position = position;
@@ -948,15 +972,16 @@ namespace MultiplayerARPG
                     else
                     {
                         // Client moves too fast, adjust it
-                        Vector3 dir = (newPos - oldPos).normalized;
-                        newPos = oldPos + (dir * s);
+                        Vector3 dir = (newPos.GetXZ() - oldPos.GetXZ()).normalized;
+                        newPos = oldPos + (dir * Mathf.Min(clientHorMoveDist, horMoveableDist)) + ((newPos.y > oldPos.y ? Vector3.up : Vector3.down) * Mathf.Min(clientVerMoveDist, verMoveableDist));
                         CacheTransform.position = newPos;
                         CurrentGameManager.ShouldPhysicSyncTransforms = true;
                         // And also adjust client's position
                         Teleport(newPos, Quaternion.Euler(0f, _yAngle, 0f));
                     }
-                    _lastServerValidateTransformTime = currentTime;
-                    _lastServerValidateTransformMoveSpeed = v;
+                    _lastServerValidateTime = currentTime;
+                    _lastServerValidateHorMoveSpd = horMoveSpd;
+                    _lastServerValidateVerMoveSpd = verMoveSpd;
                 }
                 else
                 {
