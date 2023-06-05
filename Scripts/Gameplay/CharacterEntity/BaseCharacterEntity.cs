@@ -1126,7 +1126,7 @@ namespace MultiplayerARPG
             return atkSpeed;
         }
 
-        protected float GetMoveSpeed(MovementState movementState, ExtraMovementState extraMovementState)
+        public override float GetMoveSpeed(MovementState movementState, ExtraMovementState extraMovementState)
         {
             float moveSpeed = CachedData.MoveSpeed;
             float time = Time.unscaledTime;
@@ -1173,11 +1173,6 @@ namespace MultiplayerARPG
                 moveSpeed *= CurrentGameplayRule.GetOverweightMoveSpeedRate(this);
 
             return moveSpeed;
-        }
-
-        public override float GetMoveSpeed()
-        {
-            return GetMoveSpeed(MovementState, ExtraMovementState);
         }
 
         public override bool CanMove()

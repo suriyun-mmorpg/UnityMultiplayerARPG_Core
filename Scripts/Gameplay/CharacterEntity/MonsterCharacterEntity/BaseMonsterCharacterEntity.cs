@@ -277,11 +277,11 @@ namespace MultiplayerARPG
             SetTargetEntity(target.Entity);
         }
 
-        public override float GetMoveSpeed()
+        public override float GetMoveSpeed(MovementState movementState, ExtraMovementState extraMovementState)
         {
             if (ExtraMovementState == ExtraMovementState.IsWalking)
                 return CharacterDatabase.WanderMoveSpeed;
-            return base.GetMoveSpeed();
+            return base.GetMoveSpeed(movementState, extraMovementState);
         }
 
         public override void ReceivingDamage(HitBoxPosition position, Vector3 fromPosition, EntityInfo instigator, Dictionary<DamageElement, MinMaxFloat> damageAmounts, CharacterItem weapon, BaseSkill skill, int skillLevel)

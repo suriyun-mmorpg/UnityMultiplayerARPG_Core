@@ -166,7 +166,7 @@ namespace MultiplayerARPG
             }
         }
 
-        public override float GetMoveSpeed()
+        public override float GetMoveSpeed(MovementState movementState, ExtraMovementState extraMovementState)
         {
             if (moveSpeedType == VehicleMoveSpeedType.FixedMovedSpeed)
                 return moveSpeed;

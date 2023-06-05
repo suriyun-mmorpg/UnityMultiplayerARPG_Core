@@ -702,9 +702,14 @@ namespace MultiplayerARPG
                 onNetworkDestroy.Invoke(reasons);
         }
 
-        public virtual float GetMoveSpeed()
+        public float GetMoveSpeed()
         {
-            return 0;
+            return GetMoveSpeed(MovementState, ExtraMovementState);
+        }
+
+        public virtual float GetMoveSpeed(MovementState movementState, ExtraMovementState extraMovementState)
+        {
+            return 0f;
         }
 
         public virtual bool CanMove()
