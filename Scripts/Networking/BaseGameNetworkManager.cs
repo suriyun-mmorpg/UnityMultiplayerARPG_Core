@@ -87,7 +87,6 @@ namespace MultiplayerARPG
         protected Dictionary<string, bool> _readyToInstantiateObjectsStates = new Dictionary<string, bool>();
         protected bool _isReadyToInstantiateObjects;
         protected bool _isReadyToInstantiatePlayers;
-        protected float _physicTimer;
 
         protected override void Awake()
         {
@@ -107,10 +106,8 @@ namespace MultiplayerARPG
                 else
                     gridManager.axisMode = GridManager.EAxisMode.XY;
             }
-            // Force change physic simulation mode to manual
-            Physics.autoSimulation = false;
+            // Force change physic auto sync transforms mode to manual
             Physics.autoSyncTransforms = false;
-            Physics2D.simulationMode = SimulationMode2D.Script;
             Physics2D.autoSyncTransforms = false;
             base.Awake();
         }
@@ -154,16 +151,6 @@ namespace MultiplayerARPG
                         continue;
                     _arrayGameEntity[i].DoUpdate();
                 }
-            }
-
-            // Update physics
-            _physicTimer += tempDeltaTime;
-            float tempFixedDeltaTime = Time.fixedDeltaTime;
-            while (_physicTimer >= tempFixedDeltaTime)
-            {
-                _physicTimer -= tempFixedDeltaTime;
-                Physics.Simulate(tempFixedDeltaTime);
-                Physics2D.Simulate(tempFixedDeltaTime);
             }
         }
 
