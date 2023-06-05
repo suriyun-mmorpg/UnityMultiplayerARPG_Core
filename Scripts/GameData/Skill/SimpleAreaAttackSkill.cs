@@ -70,7 +70,7 @@ namespace MultiplayerARPG
             }
             // Teleport to aim position
             if (isWarpToAimPosition)
-                skillUser.Teleport(aimPosition.position, skillUser.MovementTransform.rotation);
+                skillUser.Teleport(aimPosition.position, skillUser.MovementTransform.rotation, false);
         }
 
         public override KeyValuePair<DamageElement, MinMaxFloat> GetBaseAttackDamageAmount(ICharacterData skillUser, int skillLevel, bool isLeftHand)

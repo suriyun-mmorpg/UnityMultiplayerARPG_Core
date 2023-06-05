@@ -183,7 +183,7 @@ namespace MultiplayerARPG
                             currentTime - _lastTeleportToSummonerTime > TELEPORT_TO_SUMMONER_DELAY)
                         {
                             // Teleport to summoner if too far from summoner
-                            Teleport(GameInstance.Singleton.GameplayRule.GetSummonPosition(Summoner), GameInstance.Singleton.GameplayRule.GetSummonRotation(Summoner));
+                            Teleport(GameInstance.Singleton.GameplayRule.GetSummonPosition(Summoner), GameInstance.Singleton.GameplayRule.GetSummonRotation(Summoner), false);
                             _lastTeleportToSummonerTime = currentTime;
                         }
                     }
@@ -679,7 +679,7 @@ namespace MultiplayerARPG
         private async UniTaskVoid RespawnRoutine(float delay)
         {
             await UniTask.Delay(Mathf.CeilToInt(delay * 1000));
-            Teleport(SpawnPosition, EntityTransform.rotation);
+            Teleport(SpawnPosition, EntityTransform.rotation, false);
             InitStats();
             Manager.Assets.NetworkSpawnScene(
                 Identity.ObjectId,

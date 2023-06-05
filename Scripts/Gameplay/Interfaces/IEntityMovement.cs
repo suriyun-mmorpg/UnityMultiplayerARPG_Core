@@ -18,7 +18,7 @@ namespace MultiplayerARPG
         Quaternion GetLookRotation();
         void SetSmoothTurnSpeed(float speed);
         float GetSmoothTurnSpeed();
-        void Teleport(Vector3 position, Quaternion rotation);
+        void Teleport(Vector3 position, Quaternion rotation, bool stillMoveAfterTeleport);
         bool FindGroundedPosition(Vector3 fromPosition, float findDistance, out Vector3 result);
     }
 }

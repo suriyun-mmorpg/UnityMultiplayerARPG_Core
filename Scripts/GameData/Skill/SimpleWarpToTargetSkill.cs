@@ -21,7 +21,7 @@ namespace MultiplayerARPG
             DamageHitDelegate onDamageHit)
         {
             // Teleport to aim position
-            skillUser.Teleport(aimPosition.position, skillUser.MovementTransform.rotation);
+            skillUser.Teleport(aimPosition.position, skillUser.MovementTransform.rotation, false);
         }
     }
 }

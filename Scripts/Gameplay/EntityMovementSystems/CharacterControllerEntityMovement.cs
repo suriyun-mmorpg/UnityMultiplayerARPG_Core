@@ -245,9 +245,9 @@ namespace MultiplayerARPG
             return Functions.GetSmoothTurnSpeed();
         }
 
-        public void Teleport(Vector3 position, Quaternion rotation)
+        public void Teleport(Vector3 position, Quaternion rotation, bool stillMoveAfterTeleport)
         {
-            Functions.Teleport(position, rotation);
+            Functions.Teleport(position, rotation, stillMoveAfterTeleport);
         }
 
         public bool FindGroundedPosition(Vector3 fromPosition, float findDistance, out Vector3 result)

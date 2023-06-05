@@ -11,7 +11,7 @@ namespace MultiplayerARPG
     [DefaultExecutionOrder(0)]
     public abstract class BaseGameEntity : LiteNetLibBehaviour, IGameEntity, IEntityMovement
     {
-        public const float GROUND_DETECTION_DISTANCE = 10f;
+        public const float GROUND_DETECTION_DISTANCE = 100f;
         public const byte STATE_DATA_CHANNEL = 3;
 
         public int EntityId
@@ -229,6 +229,7 @@ namespace MultiplayerARPG
 
         protected bool _dirtyIsHide;
         protected bool _isTeleporting;
+        protected bool _stillMoveAfterTeleport;
         protected Vector3 _teleportingPosition;
         protected Quaternion _teleportingRotation;
 
@@ -520,7 +521,7 @@ namespace MultiplayerARPG
 
             if (_isTeleporting && ActiveMovement != null)
             {
-                Teleport(_teleportingPosition, _teleportingRotation);
+                Teleport(_teleportingPosition, _teleportingRotation, _stillMoveAfterTeleport);
                 _isTeleporting = false;
             }
         }
@@ -796,7 +797,7 @@ namespace MultiplayerARPG
             return 0f;
         }
 
-        public void Teleport(Vector3 position, Quaternion rotation)
+        public void Teleport(Vector3 position, Quaternion rotation, bool stillMoveAfterTeleport)
         {
             if (ActiveMovement == null)
             {
@@ -804,6 +805,7 @@ namespace MultiplayerARPG
                 _teleportingPosition = position;
                 _teleportingRotation = rotation;
                 _isTeleporting = true;
+                _stillMoveAfterTeleport = stillMoveAfterTeleport;
                 return;
             }
             if (FindGroundedPosition(position, GROUND_DETECTION_DISTANCE, out Vector3 groundedPosition))
@@ -814,7 +816,7 @@ namespace MultiplayerARPG
             if (IsServer)
             {
                 // Teleport to the `position`, `rotation`
-                ActiveMovement.Teleport(position, rotation);
+                ActiveMovement.Teleport(position, rotation, stillMoveAfterTeleport);
             }
             OnTeleport(position, rotation);
         }
@@ -901,7 +903,7 @@ namespace MultiplayerARPG
         public void ExitedVehicle(Vector3 exitPosition, Quaternion exitRotation)
         {
             CallAllOnExitVehicle();
-            Teleport(exitPosition, exitRotation);
+            Teleport(exitPosition, exitRotation, true);
         }
 
         public virtual void ClearPassengingVehicle()

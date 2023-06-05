@@ -9,7 +9,6 @@ namespace MultiplayerARPG
     public class RigidBodyEntityMovement2D : BaseNetworkedGameEntityComponent<BaseGameEntity>, IEntityMovementComponent
     {
         protected static readonly long s_lagBuffer = System.TimeSpan.TicksPerMillisecond * 200;
-        protected static readonly float s_lagBufferUnityTime = 0.2f;
 
         [Header("Movement Settings")]
         [Range(0.01f, 1f)]
@@ -36,8 +35,8 @@ namespace MultiplayerARPG
             get { return NavPaths != null && NavPaths.Count > 0; }
         }
 
-        protected float _lastServerValidateTransformTime;
-        protected float _lastServerValidateTransformMoveSpeed;
+        protected long _lastServerValidateTime;
+        protected float _lastServerValidateDistDiff;
         protected long _acceptedPositionTimestamp;
         protected Vector2? _clientTargetPosition;
         protected EntityMovementInput _oldInput;
@@ -48,6 +47,7 @@ namespace MultiplayerARPG
         protected Vector2 _moveDirection;
         protected float? _lagMoveSpeedRate;
         protected bool _isTeleporting;
+        protected bool _stillMoveAfterTeleport;
         protected bool _isServerWaitingTeleportConfirm;
         protected bool _isClientConfirmingTeleport;
 
@@ -169,7 +169,7 @@ namespace MultiplayerARPG
             return 0f;
         }
 
-        public void Teleport(Vector3 position, Quaternion rotation)
+        public void Teleport(Vector3 position, Quaternion rotation, bool stillMoveAfterTeleport)
         {
             if (!IsServer)
             {
@@ -177,7 +177,8 @@ namespace MultiplayerARPG
                 return;
             }
             _isTeleporting = true;
-            OnTeleport(position);
+            _stillMoveAfterTeleport = stillMoveAfterTeleport;
+            OnTeleport(position, stillMoveAfterTeleport);
         }
 
         public bool FindGroundedPosition(Vector3 fromPosition, float findDistance, out Vector3 result)
@@ -359,6 +360,7 @@ namespace MultiplayerARPG
             }
             if (movementSecure == MovementSecure.ServerAuthoritative && IsOwnerClient && !IsServer)
             {
+                _currentInput = Entity.SetInputExtraMovementState(_currentInput, _tempExtraMovementState);
                 if (_isClientConfirmingTeleport)
                 {
                     shouldSendReliably = true;
@@ -387,7 +389,10 @@ namespace MultiplayerARPG
             if (_isTeleporting)
             {
                 shouldSendReliably = true;
-                MovementState |= MovementState.IsTeleport;
+                if (_stillMoveAfterTeleport)
+                    MovementState |= MovementState.IsTeleport;
+                else
+                    MovementState = MovementState.IsTeleport;
             }
             else
             {
@@ -396,6 +401,7 @@ namespace MultiplayerARPG
             // Sync transform from server to all clients (include owner client)
             this.ServerWriteSyncTransform2D(writer);
             _isTeleporting = false;
+            _stillMoveAfterTeleport = false;
             return true;
         }
 
@@ -423,7 +429,7 @@ namespace MultiplayerARPG
             if (movementState.Has(MovementState.IsTeleport))
             {
                 // Server requested to teleport
-                OnTeleport(position);
+                OnTeleport(position, movementState != MovementState.IsTeleport);
             }
             else if (_acceptedPositionTimestamp <= timestamp)
             {
@@ -541,34 +547,37 @@ namespace MultiplayerARPG
                 ExtraMovementState = extraMovementState;
                 if (!IsClient)
                 {
-                    // If it's server only (not a host), set position follows the client immediately
-                    float currentTime = Time.unscaledTime;
-                    float t = currentTime - _lastServerValidateTransformTime;
-                    float v = Entity.GetMoveSpeed();
-                    float s = (_lastServerValidateTransformMoveSpeed * (t + s_lagBufferUnityTime)) + (v * t); // +`lagBufferUnityTime` as high ping buffer
-                    if (s < 0.001f)
-                        s = 0.001f;
-                    Vector2 oldPos = CacheTransform.position.GetXY();
-                    Vector2 newPos = position;
-                    if (Vector2.Distance(oldPos, newPos) <= s)
+                    Vector3 oldPos = CacheTransform.position;
+                    Vector3 newPos = position;
+                    long lagDeltaTime = Entity.Player.Rtt;
+                    long deltaTime = lagDeltaTime + timestamp - _lastServerValidateTime;
+                    float unityDeltaTime = (float)deltaTime * 0.001f;
+                    // Calculate moveable distance
+                    float moveSpd = Entity.GetMoveSpeed();
+                    float moveableDist = (float)moveSpd * unityDeltaTime;
+                    if (moveableDist < 0.001f)
+                        moveableDist = 0.001f;
+
+                    float clientMoveDist = Vector3.Distance(oldPos.GetXY(), newPos.GetXY());
+                    if (clientMoveDist <= 0.001f || clientMoveDist <= moveableDist + _lastServerValidateDistDiff)
                     {
                         // Allow to move to the position
-                        CacheTransform.position = position;
+                        CacheTransform.position = newPos;
                         CurrentGameManager.ShouldPhysicSyncTransforms2D = true;
+                        _lastServerValidateDistDiff = moveableDist - clientMoveDist;
                     }
                     else
                     {
                         // Client moves too fast, adjust it
-                        Vector2 dir = (newPos - oldPos).normalized;
-                        newPos = oldPos + (dir * s);
-                        newPos.y = position.y;
-                        CacheTransform.position = newPos;
-                        CurrentGameManager.ShouldPhysicSyncTransforms2D = true;
+                        Vector3 dir = (newPos.GetXY() - oldPos.GetXY()).normalized;
+                        Vector3 deltaMove = dir * Mathf.Min(clientMoveDist, moveableDist);
+                        newPos = oldPos + deltaMove;
                         // And also adjust client's position
-                        Teleport(newPos, Quaternion.identity);
+                        Teleport(newPos, Quaternion.identity, true);
+                        // Reset distance difference
+                        _lastServerValidateDistDiff = 0f;
                     }
-                    _lastServerValidateTransformTime = currentTime;
-                    _lastServerValidateTransformMoveSpeed = v;
+                    _lastServerValidateTime = timestamp;
                 }
                 else
                 {
@@ -580,10 +589,13 @@ namespace MultiplayerARPG
             }
         }
 
-        protected virtual void OnTeleport(Vector2 position)
+        protected virtual void OnTeleport(Vector2 position, bool stillMoveAfterTeleport)
         {
-            _clientTargetPosition = null;
-            NavPaths = null;
+            if (!stillMoveAfterTeleport)
+            {
+                _clientTargetPosition = null;
+                NavPaths = null;
+            }
             CacheTransform.position = position;
             CurrentGameManager.ShouldPhysicSyncTransforms2D = true;
             if (IsServer && !IsOwnedByServer)

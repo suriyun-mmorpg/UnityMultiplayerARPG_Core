@@ -43,7 +43,7 @@ namespace MultiplayerARPG
 
         public virtual void SetCurrentPosition(BasePlayerCharacterEntity playerCharacterEntity, Vector3 position)
         {
-            playerCharacterEntity.Teleport(position, Quaternion.LookRotation(-playerCharacterEntity.MovementTransform.forward));
+            playerCharacterEntity.Teleport(position, Quaternion.LookRotation(-playerCharacterEntity.MovementTransform.forward), true);
         }
 
         public void WarpCharacter(WarpPortalType warpPortalType, BasePlayerCharacterEntity playerCharacterEntity, string mapName, Vector3 position, bool overrideRotation, Vector3 rotation)
