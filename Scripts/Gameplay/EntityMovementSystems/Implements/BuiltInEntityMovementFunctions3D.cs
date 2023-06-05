@@ -110,6 +110,7 @@ namespace MultiplayerARPG
         private bool _previouslyAirborne;
         private ExtraMovementState _previouslyExtraMovementState;
         private bool _isTeleporting;
+        private bool _isAdjusting;
         private bool _isServerWaitingTeleportConfirm;
         private bool _isClientConfirmingTeleport;
 
@@ -254,7 +255,7 @@ namespace MultiplayerARPG
                 return;
             }
             _isTeleporting = true;
-            OnTeleport(position, rotation.eulerAngles.y);
+            OnTeleport(position, rotation.eulerAngles.y, true);
         }
 
         public bool FindGroundedPosition(Vector3 fromPosition, float findDistance, out Vector3 result)
@@ -745,10 +746,13 @@ namespace MultiplayerARPG
             {
                 MovementState &= ~MovementState.IsJump;
             }
-            if (_isTeleporting)
+            if (_isTeleporting || _isAdjusting)
             {
                 shouldSendReliably = true;
-                MovementState |= MovementState.IsTeleport;
+                if (_isTeleporting)
+                    MovementState = MovementState.IsTeleport;
+                else
+                    MovementState |= MovementState.IsTeleport;
             }
             else
             {
@@ -757,6 +761,7 @@ namespace MultiplayerARPG
             Entity.ServerWriteSyncTransform3D(writer);
             _sendingJump = false;
             _isTeleporting = false;
+            _isAdjusting = false;
             return true;
         }
 
@@ -784,7 +789,7 @@ namespace MultiplayerARPG
             if (movementState.Has(MovementState.IsTeleport))
             {
                 // Server requested to teleport
-                OnTeleport(position, yAngle);
+                OnTeleport(position, yAngle, movementState == MovementState.IsTeleport);
             }
             else if (_acceptedPositionTimestamp <= timestamp)
             {
@@ -793,10 +798,10 @@ namespace MultiplayerARPG
                     // Snap character to the position if character is too far from the position
                     if (movementSecure == MovementSecure.ServerAuthoritative || !IsOwnerClient)
                     {
-                        _yAngle = _targetYAngle = yAngle;
-                        RotateY();
                         CacheTransform.position = position;
                         CurrentGameManager.ShouldPhysicSyncTransforms = true;
+                        _yAngle = _targetYAngle = yAngle;
+                        RotateY();
                     }
                     MovementState = movementState;
                     ExtraMovementState = extraMovementState;
@@ -946,25 +951,28 @@ namespace MultiplayerARPG
                 {
                     Vector3 oldPos = CacheTransform.position;
                     Vector3 newPos = position;
+                    bool falling = newPos.y < oldPos.y;
                     long lagDeltaTime = Entity.Player.Rtt;
                     long deltaTime = lagDeltaTime + timestamp - _lastServerValidateTime;
+                    float unityDeltaTime = (float)deltaTime * 0.001f;
                     // Calculate moveable distance
                     float horMoveSpd = GetHorizontalMoveSpeed(movementState);
-                    float horMoveableDist = (float)horMoveSpd * (float)deltaTime * 0.001f; // +`lagBufferUnityTime` as high ping buffer
+                    float horMoveableDist = (float)horMoveSpd * unityDeltaTime;
                     if (horMoveableDist < 0.001f)
                         horMoveableDist = 0.001f;
                     // Calculate jump/fall distance
-                    float verMoveSpd = GetVericalMoveSpeed(oldPos.y < newPos.y);
-                    float verMoveableDist = (float)verMoveSpd * (float)deltaTime * 0.001f; // +`lagBufferUnityTime` as high ping buffer
+                    float verMoveSpd = GetVericalMoveSpeed(falling);
+                    float verMoveableDist = (float)verMoveSpd * unityDeltaTime;
                     if (verMoveableDist < 0.001f)
                         verMoveableDist = 0.001f;
 
                     float clientHorMoveDist = Vector3.Distance(oldPos.GetXZ(), newPos.GetXZ());
                     float clientVerMoveDist = Mathf.Abs(newPos.y - oldPos.y);
-                    if (clientHorMoveDist <= horMoveableDist + _lastServerValidateHorDiff && clientVerMoveDist <= verMoveableDist + _lastServerValidateVerDiff)
+                    if ((clientHorMoveDist <= 0.001f || clientHorMoveDist <= horMoveableDist + _lastServerValidateHorDiff) &&
+                        (clientVerMoveDist <= 0.001f || clientVerMoveDist <= verMoveableDist + _lastServerValidateVerDiff))
                     {
                         // Allow to move to the position
-                        CacheTransform.position = position;
+                        CacheTransform.position = newPos;
                         CurrentGameManager.ShouldPhysicSyncTransforms = true;
                         _lastServerValidateHorDiff = horMoveableDist - clientHorMoveDist;
                         _lastServerValidateVerDiff = verMoveableDist - clientVerMoveDist;
@@ -973,13 +981,14 @@ namespace MultiplayerARPG
                     {
                         // Client moves too fast, adjust it
                         Vector3 dir = (newPos.GetXZ() - oldPos.GetXZ()).normalized;
-                        newPos = oldPos + (dir * Mathf.Min(clientHorMoveDist, horMoveableDist)) + ((newPos.y > oldPos.y ? Vector3.up : Vector3.down) * Mathf.Min(clientVerMoveDist, verMoveableDist));
-                        CacheTransform.position = newPos;
+                        Vector3 deltaMove = (dir * Mathf.Min(clientHorMoveDist, horMoveableDist)) + ((falling ? Vector3.down : Vector3.up) * Mathf.Min(clientVerMoveDist, verMoveableDist));
+                        CacheTransform.position = oldPos + deltaMove;
                         CurrentGameManager.ShouldPhysicSyncTransforms = true;
-                        // And also adjust client's position
-                        Teleport(newPos, Quaternion.Euler(0f, _yAngle, 0f));
                         _lastServerValidateHorDiff = 0f;
                         _lastServerValidateVerDiff = 0f;
+                        // And also adjust client's position
+                        _isAdjusting = true;
+                        OnTeleport(newPos, _yAngle, false);
                     }
                     _lastServerValidateTime = timestamp;
                 }
@@ -995,12 +1004,15 @@ namespace MultiplayerARPG
                 _acceptedJump = true;
         }
 
-        private void OnTeleport(Vector3 position, float yAngle)
+        private void OnTeleport(Vector3 position, float yAngle, bool clearPaths)
         {
             _airborneElapsed = 0;
             _verticalVelocity = 0;
-            _clientTargetPosition = null;
-            NavPaths = null;
+            if (clearPaths)
+            {
+                _clientTargetPosition = null;
+                NavPaths = null;
+            }
             CacheTransform.position = position;
             CurrentGameManager.ShouldPhysicSyncTransforms = true;
             _yAngle = _targetYAngle = yAngle;
