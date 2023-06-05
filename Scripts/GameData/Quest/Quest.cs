@@ -233,19 +233,15 @@ namespace MultiplayerARPG
 
         [Header("Custom Task Description")]
         public bool useCustomDescription;
-        [BoolShowConditional(nameof(useCustomDescription), true)]
         [FormerlySerializedAs("defaultDescriptionOverride")]
         public string defaultDescription;
-        [BoolShowConditional(nameof(useCustomDescription), true)]
         [FormerlySerializedAs("languageSpecificDescriptionOverrides")]
         public LanguageData[] languageSpecificDescriptions;
 
         [Header("Custom Task Completed Description")]
         public bool useCustomCompletedDescription;
-        [BoolShowConditional(nameof(useCustomCompletedDescription), true)]
         [FormerlySerializedAs("defaultCompletedDescriptionOverride")]
         public string defaultCompletedDescription;
-        [BoolShowConditional(nameof(useCustomCompletedDescription), true)]
         [FormerlySerializedAs("languageSpecificCompletedDescriptionOverrides")]
         public LanguageData[] languageSpecificCompletedDescriptions;
 
