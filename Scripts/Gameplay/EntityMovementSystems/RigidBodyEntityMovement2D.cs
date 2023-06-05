@@ -553,7 +553,7 @@ namespace MultiplayerARPG
                     long deltaTime = lagDeltaTime + timestamp - _lastServerValidateTime;
                     float unityDeltaTime = (float)deltaTime * 0.001f;
                     // Calculate moveable distance
-                    float moveSpd = Entity.GetMoveSpeed();
+                    float moveSpd = Entity.GetMoveSpeed(MovementState, ExtraMovementState);
                     float moveableDist = (float)moveSpd * unityDeltaTime;
                     if (moveableDist < 0.001f)
                         moveableDist = 0.001f;
