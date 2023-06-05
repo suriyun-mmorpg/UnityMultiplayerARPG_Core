@@ -62,6 +62,8 @@ namespace MultiplayerARPG
 
                 for (int j = 0; j < activatingGameObjects[i].gameObjects.Length; ++j)
                 {
+                    if (activatingGameObjects[i].gameObjects[j] == null)
+                        continue;
                     activatingGameObjects[i].gameObjects[j].SetActive(activatingGameObjects[i].equipWeaponSet == GameInstance.PlayingCharacter.EquipWeaponSet);
                 }
             }
