@@ -171,7 +171,7 @@ namespace MultiplayerARPG
             if (moveSpeedType == VehicleMoveSpeedType.FixedMovedSpeed)
                 return moveSpeed;
             if (_passengers.TryGetValue(0, out BaseGameEntity driver))
-                return driver.GetMoveSpeed() * driverMoveSpeedRate;
+                return driver.GetMoveSpeed(movementState, extraMovementState) * driverMoveSpeedRate;
             return 0f;
         }
 
