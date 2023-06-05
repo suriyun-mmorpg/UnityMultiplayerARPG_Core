@@ -11,7 +11,6 @@ namespace MultiplayerARPG
     {
         private static readonly RaycastHit[] s_findGroundRaycastHits = new RaycastHit[4];
         private static readonly long s_lagBuffer = System.TimeSpan.TicksPerMillisecond * 200;
-        private static readonly float s_lagBufferUnityTime = 0.2f;
 
         [Header("Movement AI")]
         [Range(0.01f, 1f)]
@@ -94,9 +93,9 @@ namespace MultiplayerARPG
         private bool _lookRotationApplied;
         private bool _acceptedJump;
         private bool _sendingJump;
-        private float _lastServerValidateTime;
-        private float _lastServerValidateHorMoveSpd;
-        private float _lastServerValidateVerMoveSpd;
+        private long _lastServerValidateTime;
+        private float _lastServerValidateHorDiff;
+        private float _lastServerValidateVerDiff;
         private EntityMovementInput _oldInput;
         private EntityMovementInput _currentInput;
         private MovementState _tempMovementState;
@@ -891,9 +890,9 @@ namespace MultiplayerARPG
             }
         }
 
-        public float GetHorizontalMoveSpeed()
+        public float GetHorizontalMoveSpeed(MovementState movementState)
         {
-            return Entity.GetMoveSpeed();
+            return movementState.HasDirectionMovement() ? Entity.GetMoveSpeed() : 0f;
         }
 
         public float GetVericalMoveSpeed(bool falling)
@@ -947,27 +946,28 @@ namespace MultiplayerARPG
                 {
                     Vector3 oldPos = CacheTransform.position;
                     Vector3 newPos = position;
-                    // If it's server only (not a host), set position follows the client immediately
-                    float currentTime = Time.unscaledTime;
-                    float moveDuration = currentTime - _lastServerValidateTime;
+                    long lagDeltaTime = Entity.Player.Rtt;
+                    long deltaTime = lagDeltaTime + timestamp - _lastServerValidateTime;
                     // Calculate moveable distance
-                    float horMoveSpd = GetHorizontalMoveSpeed();
-                    float horMoveableDist = (_lastServerValidateHorMoveSpd * (moveDuration + s_lagBufferUnityTime)) + (horMoveSpd * moveDuration); // +`lagBufferUnityTime` as high ping buffer
+                    float horMoveSpd = GetHorizontalMoveSpeed(movementState);
+                    float horMoveableDist = (float)horMoveSpd * (float)deltaTime * 0.001f; // +`lagBufferUnityTime` as high ping buffer
                     if (horMoveableDist < 0.001f)
                         horMoveableDist = 0.001f;
                     // Calculate jump/fall distance
                     float verMoveSpd = GetVericalMoveSpeed(oldPos.y < newPos.y);
-                    float verMoveableDist = (_lastServerValidateVerMoveSpd * (moveDuration + s_lagBufferUnityTime)) + (verMoveSpd * moveDuration); // +`lagBufferUnityTime` as high ping buffer
+                    float verMoveableDist = (float)verMoveSpd * (float)deltaTime * 0.001f; // +`lagBufferUnityTime` as high ping buffer
                     if (verMoveableDist < 0.001f)
                         verMoveableDist = 0.001f;
 
                     float clientHorMoveDist = Vector3.Distance(oldPos.GetXZ(), newPos.GetXZ());
                     float clientVerMoveDist = Mathf.Abs(newPos.y - oldPos.y);
-                    if (clientHorMoveDist <= horMoveableDist && clientVerMoveDist < verMoveableDist)
+                    if (clientHorMoveDist <= horMoveableDist + _lastServerValidateHorDiff && clientVerMoveDist <= verMoveableDist + _lastServerValidateVerDiff)
                     {
                         // Allow to move to the position
                         CacheTransform.position = position;
                         CurrentGameManager.ShouldPhysicSyncTransforms = true;
+                        _lastServerValidateHorDiff = horMoveableDist - clientHorMoveDist;
+                        _lastServerValidateVerDiff = verMoveableDist - clientVerMoveDist;
                     }
                     else
                     {
@@ -978,10 +978,10 @@ namespace MultiplayerARPG
                         CurrentGameManager.ShouldPhysicSyncTransforms = true;
                         // And also adjust client's position
                         Teleport(newPos, Quaternion.Euler(0f, _yAngle, 0f));
+                        _lastServerValidateHorDiff = 0f;
+                        _lastServerValidateVerDiff = 0f;
                     }
-                    _lastServerValidateTime = currentTime;
-                    _lastServerValidateHorMoveSpd = horMoveSpd;
-                    _lastServerValidateVerMoveSpd = verMoveSpd;
+                    _lastServerValidateTime = timestamp;
                 }
                 else
                 {
