@@ -279,7 +279,7 @@ namespace MultiplayerARPG
 
         public override float GetMoveSpeed(MovementState movementState, ExtraMovementState extraMovementState)
         {
-            if (ExtraMovementState == ExtraMovementState.IsWalking)
+            if (extraMovementState == ExtraMovementState.IsWalking)
                 return CharacterDatabase.WanderMoveSpeed;
             return base.GetMoveSpeed(movementState, extraMovementState);
         }
@@ -308,8 +308,7 @@ namespace MultiplayerARPG
             if (instigator.TryGetEntity(out BaseCharacterEntity attackerCharacter))
             {
                 // If summoned by someone, summoner is attacker
-                BaseMonsterCharacterEntity monsterCharacterEntity = attackerCharacter as BaseMonsterCharacterEntity;
-                if (monsterCharacterEntity != null && monsterCharacterEntity.IsSummonedAndSummonerExisted)
+                if (attackerCharacter is BaseMonsterCharacterEntity monsterCharacterEntity && monsterCharacterEntity.IsSummonedAndSummonerExisted)
                     attackerCharacter = monsterCharacterEntity.Summoner;
 
                 // Add received damage entry
