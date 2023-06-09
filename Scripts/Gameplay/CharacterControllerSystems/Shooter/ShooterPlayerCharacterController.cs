@@ -921,7 +921,6 @@ namespace MultiplayerARPG
                     }
 
                     // Get distance between character and raycast hit point
-                    tempDistance = Vector3.Distance(EntityTransform.position, tempHitInfo.point);
                     tempGameEntity = tempHitInfo.collider.GetComponent<IGameEntity>();
 
                     if (tempGameEntity.IsNull() || tempGameEntity.IsHide() ||
@@ -932,6 +931,7 @@ namespace MultiplayerARPG
                     }
 
                     tempActivatableEntity = tempGameEntity as IBaseActivatableEntity;
+                    tempDistance = Vector3.Distance(EntityTransform.position, tempActivatableEntity.EntityTransform.position);
                     if (tempActivatableEntity != null && tempDistance <= tempActivatableEntity.GetActivatableDistance())
                     {
                         // Entity is in front of character, so this is target
@@ -1152,7 +1152,7 @@ namespace MultiplayerARPG
                 }
                 else if (_activateInput.IsHold)
                 {
-                    if (_holdActivatableEntity != null && _holdActivatableEntity.CanHoldActivate())
+                    if (CanHoldActivate(_holdActivatableEntity))
                     {
                         await Aimming();
                         HoldActivate();
@@ -1160,7 +1160,7 @@ namespace MultiplayerARPG
                 }
                 else if (_activateInput.IsRelease)
                 {
-                    if (_activatableEntity != null && _activatableEntity.CanActivate())
+                    if (CanActivate(_activatableEntity))
                     {
                         await Aimming();
                         Activate();
@@ -1189,11 +1189,9 @@ namespace MultiplayerARPG
             {
                 anyKeyPressed = true;
                 // Find for item to pick up
-                if (SelectedEntity is IPickupActivatableEntity)
+                if (SelectedEntity is IPickupActivatableEntity pickupActivatableEntity && CanPickupActivate(pickupActivatableEntity))
                 {
-                    IPickupActivatableEntity pickupActivatableEntity = SelectedEntity as IPickupActivatableEntity;
-                    if (pickupActivatableEntity != null && pickupActivatableEntity.CanPickupActivate())
-                        pickupActivatableEntity.OnPickupActivate();
+                    pickupActivatableEntity.OnPickupActivate();
                 }
             }
 
@@ -1638,13 +1636,13 @@ namespace MultiplayerARPG
 
         public virtual void HoldActivate()
         {
-            if (_holdActivatableEntity != null && _holdActivatableEntity.CanHoldActivate())
+            if (CanHoldActivate(_holdActivatableEntity))
                 _holdActivatableEntity.OnHoldActivate();
         }
 
         public virtual void Activate()
         {
-            if (_activatableEntity != null && _activatableEntity.CanActivate())
+            if (CanActivate(_activatableEntity))
                 _activatableEntity.OnActivate();
         }
 
@@ -1745,21 +1743,6 @@ namespace MultiplayerARPG
         {
             base.ConfirmBuild();
             _pauseFireInputFrames = PAUSE_FIRE_INPUT_FRAMES_AFTER_CONFIRM_BUILD;
-        }
-
-        public override bool ShouldShowActivateButtons()
-        {
-            return SelectedGameEntity is IActivatableEntity castedEntity && castedEntity.CanActivate();
-        }
-
-        public override bool ShouldShowHoldActivateButtons()
-        {
-            return SelectedGameEntity is IHoldActivatableEntity castedEntity && castedEntity.CanHoldActivate();
-        }
-
-        public override bool ShouldShowPickUpButtons()
-        {
-            return SelectedGameEntity is IPickupActivatableEntity castedEntity && castedEntity.CanPickupActivate();
         }
     }
 }
