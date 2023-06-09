@@ -67,51 +67,70 @@ namespace MultiplayerARPG
         public ExtraMovementState ExtraMovementState { get; private set; }
         public DirectionVector2 Direction2D { get { return Vector2.down; } set { } }
         public float CurrentMoveSpeed { get; private set; }
-
         public Queue<Vector3> NavPaths { get; private set; }
         public bool HasNavPaths
         {
             get { return NavPaths != null && NavPaths.Count > 0; }
         }
 
-        // Movement codes
-        private bool _isGrounded = true;
-        private bool _isUnderWater = false;
-        private float _airborneElapsed;
+        // Input codes
         private bool _isJumping;
-        private bool _applyingJumpForce;
-        private float _applyJumpForceCountDown;
+        private Vector3 _inputDirection;
+        private MovementState _tempMovementState;
+        private ExtraMovementState _tempExtraMovementState;
+
+        // Client state codes
+        private EntityMovementInput _oldInput;
+        private EntityMovementInput _currentInput;
+        private bool _sendingJump;
+
+        // State simulate codes
+        private float? _lagMoveSpeedRate;
+        private float _verticalVelocity;
+        private Vector3 _velocityBeforeAirborne;
         private Collider _waterCollider;
         private Transform _groundedTransform;
         private Vector3 _previousPlatformPosition;
-        private long _acceptedPositionTimestamp;
-        private long _acceptedJumpTimestamp;
-        private Vector3? _clientTargetPosition;
-        private float _yAngle;
-        private float _targetYAngle;
-        private float _yTurnSpeed;
-        private bool _lookRotationApplied;
-        private bool _acceptedJump;
-        private bool _sendingJump;
-        private long _lastServerValidateTime;
-        private float _lastServerValidateHorDistDiff;
-        private float _lastServerValidateVerDistDiff;
-        private EntityMovementInput _oldInput;
-        private EntityMovementInput _currentInput;
-        private MovementState _tempMovementState;
-        private ExtraMovementState _tempExtraMovementState;
-        private Vector3 _inputDirection;
-        private Vector3 _moveDirection;
-        private float _verticalVelocity;
-        private float? _lagMoveSpeedRate;
-        private Vector3 _velocityBeforeAirborne;
-        private float _pauseMovementCountDown;
+        private bool _isGrounded = true;
+        private bool _isUnderWater = false;
         private bool _previouslyGrounded;
         private bool _previouslyAirborne;
         private ExtraMovementState _previouslyExtraMovementState;
+
+        // Move simulate codes
+        private float _pauseMovementCountDown;
+        private Vector3 _moveDirection;
+
+        // Jump simulate codes
+        private float _airborneElapsed;
+        private ExtraMovementState _extraMovementStateWhenJump;
+        private bool _applyingJumpForce;
+        private float _applyJumpForceCountDown;
+
+        // Turn simulate codes
+        private bool _lookRotationApplied;
+        private float _yAngle;
+        private float _targetYAngle;
+        private float _yTurnSpeed;
+
+        // Teleport codes
         private bool _isTeleporting;
         private bool _stillMoveAfterTeleport;
+
+        // Peers accept codes
+        private bool _acceptedJump;
+        private long _acceptedPositionTimestamp;
+        private ExtraMovementState _acceptedExtraMovementStateWhenJump;
+
+        // Server simulate codes
+        private Vector3? _clientTargetPosition;
+
+        // Server validate codes
+        private float _lastServerValidateHorDistDiff;
+        private float _lastServerValidateVerDistDiff;
         private bool _isServerWaitingTeleportConfirm;
+
+        // Client confirm codes
         private bool _isClientConfirmingTeleport;
 
         public BuiltInEntityMovementFunctions3D(BaseGameEntity entity, Animator animator, IBuiltInEntityMovement3D entityMovement)
@@ -213,7 +232,7 @@ namespace MultiplayerARPG
         {
             if (!Entity.CanMove())
                 return;
-            if (CanPredictMovement())
+            if (CanPredictMovement() && !_isJumping)
             {
                 // Always apply movement to owner client (it's client prediction for server auth movement)
                 _tempExtraMovementState = extraMovementState;
@@ -295,7 +314,7 @@ namespace MultiplayerARPG
             _moveDirection = Vector3.zero;
             _isUnderWater = WaterCheck(_waterCollider);
             _isGrounded = EntityMovement.GroundCheck();
-            
+
             bool isAirborne = !_isGrounded && !_isUnderWater && _airborneElapsed >= airborneDelay;
 
             // Update airborne elasped
@@ -361,7 +380,7 @@ namespace MultiplayerARPG
                 _isJumping = false;
 
             // Prepare movement speed
-            tempEntityMoveSpeed = _applyingJumpForce ? 0f : Entity.GetMoveSpeed();
+            tempEntityMoveSpeed = _applyingJumpForce ? 0f : Entity.GetMoveSpeed(_tempMovementState, _tempExtraMovementState);
             tempMaxMoveSpeed = tempEntityMoveSpeed;
 
             // Calculate vertical velocity by gravity
@@ -387,6 +406,7 @@ namespace MultiplayerARPG
             if (_acceptedJump || (_pauseMovementCountDown <= 0f && _isGrounded && _isJumping))
             {
                 _sendingJump = true;
+                _extraMovementStateWhenJump = _tempExtraMovementState;
                 _airborneElapsed = airborneDelay;
                 Entity.PlayJumpAnimation();
                 _applyingJumpForce = true;
@@ -405,7 +425,7 @@ namespace MultiplayerARPG
 
             if (_applyingJumpForce)
             {
-                _applyJumpForceCountDown -= Time.deltaTime;
+                _applyJumpForceCountDown -= deltaTime;
                 if (_applyJumpForceCountDown <= 0f)
                 {
                     _isGrounded = false;
@@ -419,10 +439,9 @@ namespace MultiplayerARPG
             }
             // Updating horizontal movement (WASD inputs)
             if (!isAirborne)
-            {
                 _velocityBeforeAirborne = Vector3.zero;
-            }
-            if (_pauseMovementCountDown <= 0f && _moveDirection.sqrMagnitude > 0f && (!isAirborne || !doNotChangeVelocityWhileAirborne || !IsOwnerClientOrOwnedByServer))
+            // Movement updating
+            if (_pauseMovementCountDown <= 0f && _moveDirection.sqrMagnitude > 0f && (!isAirborne || !doNotChangeVelocityWhileAirborne))
             {
                 // Calculate only horizontal move direction
                 tempHorizontalMoveDirection = _moveDirection;
@@ -462,6 +481,7 @@ namespace MultiplayerARPG
                     _currentInput = Entity.SetInputIsKeyMovement(_currentInput, true);
                 }
             }
+            // Pause movement updating
             if (IsOwnerClientOrOwnedByServer)
             {
                 if (_isGrounded && _previouslyAirborne)
@@ -476,10 +496,6 @@ namespace MultiplayerARPG
                 {
                     _pauseMovementCountDown = afterCrawlingPauseMovementDuration;
                 }
-                else if (isAirborne && doNotChangeVelocityWhileAirborne)
-                {
-                    tempMoveVelocity = _velocityBeforeAirborne;
-                }
                 else
                 {
                     if (_pauseMovementCountDown > 0f)
@@ -491,6 +507,9 @@ namespace MultiplayerARPG
                     _tempMovementState ^= MovementState.Forward | MovementState.Backward | MovementState.Right | MovementState.Right;
                 }
             }
+            // Move by velocity before jump
+            if ((isAirborne || _airborneElapsed > 0f) && doNotChangeVelocityWhileAirborne)
+                tempMoveVelocity = _velocityBeforeAirborne;
             // Updating vertical movement (Fall, WASD inputs under water)
             if (_isUnderWater)
             {
@@ -549,13 +568,11 @@ namespace MultiplayerARPG
             }
             Vector3 stickGroundMotion = _isGrounded && !_isUnderWater && platformMotion.y <= 0f ? (Vector3.down * stickGroundForce) : Vector3.zero;
             EntityMovement.Move((tempMoveVelocity + platformMotion + stickGroundMotion) * deltaTime);
-
             _currentInput = Entity.SetInputRotation(_currentInput, CacheTransform.rotation);
             _isJumping = false;
             _acceptedJump = false;
             _previouslyGrounded = _isGrounded;
             _previouslyAirborne = isAirborne;
-            _previouslyExtraMovementState = _tempExtraMovementState;
         }
 
         public void UpdateRotation(float deltaTime)
@@ -581,6 +598,8 @@ namespace MultiplayerARPG
                 MovementState = _tempMovementState;
                 // Update extra movement state
                 ExtraMovementState = Entity.ValidateExtraMovementState(MovementState, _tempExtraMovementState);
+                if (_sendingJump)
+                    ExtraMovementState = _extraMovementStateWhenJump;
             }
             else
             {
@@ -588,6 +607,7 @@ namespace MultiplayerARPG
                 if (HasNavPaths && !MovementState.Has(MovementState.Forward))
                     MovementState |= MovementState.Forward;
             }
+            _previouslyExtraMovementState = ExtraMovementState;
         }
 
         private float CalculateCurrentMoveSpeed(float maxMoveSpeed, float deltaTime)
@@ -794,6 +814,10 @@ namespace MultiplayerARPG
             }
             else if (_acceptedPositionTimestamp <= timestamp)
             {
+                // Prepare time
+                long lagDeltaTime = Entity.Manager.Rtt;
+                long deltaTime = lagDeltaTime + timestamp - _acceptedPositionTimestamp;
+                float unityDeltaTime = (float)deltaTime * 0.001f;
                 if (Vector3.Distance(position, CacheTransform.position) >= snapThreshold)
                 {
                     // Snap character to the position if character is too far from the position
@@ -810,7 +834,7 @@ namespace MultiplayerARPG
                 else if (!IsOwnerClient)
                 {
                     _targetYAngle = yAngle;
-                    _yTurnSpeed = 1f / Time.fixedDeltaTime;
+                    _yTurnSpeed = 1f / unityDeltaTime;
                     if (Vector3.Distance(position.GetXZ(), CacheTransform.position.GetXZ()) > 0.01f)
                         _clientTargetPosition = position;
                     else
@@ -859,6 +883,10 @@ namespace MultiplayerARPG
             }
             if (_acceptedPositionTimestamp <= timestamp)
             {
+                // Prepare time
+                long lagDeltaTime = Entity.Player.Rtt;
+                long deltaTime = lagDeltaTime + timestamp - _acceptedPositionTimestamp;
+                float unityDeltaTime = (float)deltaTime * 0.001f;
                 _tempMovementState = movementState;
                 _tempExtraMovementState = extraMovementState;
                 _clientTargetPosition = null;
@@ -880,7 +908,7 @@ namespace MultiplayerARPG
                     if (IsClient)
                     {
                         _targetYAngle = yAngle;
-                        _yTurnSpeed = 1f / Time.fixedDeltaTime;
+                        _yTurnSpeed = 1f / unityDeltaTime;
                     }
                     else
                     {
@@ -936,28 +964,31 @@ namespace MultiplayerARPG
             }
             if (_acceptedPositionTimestamp <= timestamp)
             {
-                if (IsClient)
-                {
-                    _targetYAngle = yAngle;
-                    _yTurnSpeed = 1f / Time.fixedDeltaTime;
-                }
-                else
-                {
-                    _yAngle = _targetYAngle = yAngle;
-                    RotateY();
-                }
+                // Prepare time
+                long lagDeltaTime = Entity.Player.Rtt;
+                long deltaTime = lagDeltaTime + timestamp - _acceptedPositionTimestamp;
+                float unityDeltaTime = (float)deltaTime * 0.001f;
+                // Prepare movement state
                 MovementState = movementState;
                 ExtraMovementState = extraMovementState;
+                if (movementState.Has(MovementState.IsJump))
+                {
+                    _acceptedExtraMovementStateWhenJump = ExtraMovementState;
+                    _acceptedJump = true;
+                }
+                if (!movementState.Has(MovementState.IsGrounded) && doNotChangeVelocityWhileAirborne)
+                {
+                    // It will move by velocity before jump, so validate by extra movement state before jump
+                    extraMovementState = _acceptedExtraMovementStateWhenJump;
+                }
                 if (!IsClient)
                 {
+                    // If it is not a client, don't have to simulate movement, just set the position (but still simulate gravity)
                     Vector3 oldPos = CacheTransform.position;
                     Vector3 newPos = position;
                     bool falling = newPos.y < oldPos.y;
-                    long lagDeltaTime = Entity.Player.Rtt;
-                    long deltaTime = lagDeltaTime + timestamp - _lastServerValidateTime;
-                    float unityDeltaTime = (float)deltaTime * 0.001f;
                     // Calculate moveable distance
-                    float horMoveSpd = Entity.GetMoveSpeed(MovementState, ExtraMovementState);
+                    float horMoveSpd = Entity.GetMoveSpeed(movementState, extraMovementState);
                     float horMoveableDist = (float)horMoveSpd * unityDeltaTime;
                     if (horMoveableDist < 0.001f)
                         horMoveableDist = 0.001f;
@@ -966,7 +997,9 @@ namespace MultiplayerARPG
                     float verMoveableDist = (float)verMoveSpd * unityDeltaTime;
                     if (verMoveableDist < 0.001f)
                         verMoveableDist = 0.001f;
-
+                    // Set current move speed, in-case someone may use it for UIs
+                    CurrentMoveSpeed = horMoveSpd;
+                    // Movement validating, if it is valid, set the position follow the client, if not set position to proper one and tell client to teleport
                     float clientHorMoveDist = Vector3.Distance(oldPos.GetXZ(), newPos.GetXZ());
                     float clientVerMoveDist = Mathf.Abs(newPos.y - oldPos.y);
                     if ((clientHorMoveDist <= 0.001f || clientHorMoveDist <= horMoveableDist + _lastServerValidateHorDistDiff) &&
@@ -975,8 +1008,11 @@ namespace MultiplayerARPG
                         // Allow to move to the position
                         CacheTransform.position = newPos;
                         CurrentGameManager.ShouldPhysicSyncTransforms = true;
+                        // Update character rotation
                         _lastServerValidateHorDistDiff = horMoveableDist - clientHorMoveDist;
                         _lastServerValidateVerDistDiff = verMoveableDist - clientVerMoveDist;
+                        _yAngle = _targetYAngle = yAngle;
+                        RotateY();
                     }
                     else
                     {
@@ -990,18 +1026,18 @@ namespace MultiplayerARPG
                         _lastServerValidateHorDistDiff = 0f;
                         _lastServerValidateVerDistDiff = 0f;
                     }
-                    _lastServerValidateTime = timestamp;
                 }
                 else
                 {
-                    // It's both server and client, translate position (it's a host so don't do speed hack validation)
+                    // It's both server and client, simulate movement (it's a host so don't do speed hack validation)
                     if (Vector3.Distance(position, CacheTransform.position) > 0.01f)
                         SetMovePaths(position, false);
+                    // Simulate character turning
+                    _targetYAngle = yAngle;
+                    _yTurnSpeed = 1f / unityDeltaTime;
                 }
                 _acceptedPositionTimestamp = timestamp;
             }
-            if (movementState.Has(MovementState.IsJump))
-                _acceptedJump = true;
         }
 
         private void OnTeleport(Vector3 position, float yAngle, bool stillMoveAfterTeleport)
