@@ -83,12 +83,6 @@ namespace MultiplayerARPG
             if (triggerDurations == null || triggerDurations.Length <= 0)
                 return;
 
-            List<HitOriginData>[] origins = new List<HitOriginData>[triggerDurations.Length];
-            for (int i = 0; i < triggerDurations.Length; ++i)
-            {
-                origins[i] = new List<HitOriginData>(fireSpread + 1);
-            }
-
             string id = MakeValidateId(attacker.ObjectId, randomSeed);
             s_validatingHits[id] = new HitValidateData()
             {
@@ -100,7 +94,6 @@ namespace MultiplayerARPG
                 Weapon = weapon,
                 Skill = skill,
                 SkillLevel = skillLevel,
-                Origins = origins,
             };
             DelayClearData(id);
         }
@@ -124,18 +117,19 @@ namespace MultiplayerARPG
             if (!s_validatingHits.ContainsKey(id))
                 return;
 
-            if (triggerIndex < 0 || triggerIndex >= s_validatingHits[id].Origins.Length)
+            string hitId = MakeHitId(triggerIndex, spreadIndex);
+            if (s_validatingHits[id].Origins.ContainsKey(hitId))
                 return;
 
-            if (s_validatingHits[id].Origins[triggerIndex].Count >= s_validatingHits[id].FireSpread + 1)
-                return;
-
-            s_validatingHits[id].Origins[triggerIndex].Add(new HitOriginData()
+            s_validatingHits[id].Origins.Add(hitId, new HitOriginData()
             {
                 TriggerIndex = triggerIndex,
                 Position = position,
                 Direction = direction,
             });
+
+            if (s_validatingHits[id].Pendings.ContainsKey(hitId))
+                PerformValidation(attacker, id, randomSeed, s_validatingHits[id].Pendings[hitId]);
         }
 
         public void PrepareToRegister(int randomSeed, byte triggerIndex, byte spreadIndex, uint objectId, byte hitBoxIndex, Vector3 hitPoint)
@@ -180,7 +174,10 @@ namespace MultiplayerARPG
             if (!s_validatingHits.ContainsKey(id))
                 return;
 
-            PerformValidation(attacker, id, message.RandomSeed, message.Hits);
+            for (int i = 0; i < message.Hits.Count; ++i)
+            {
+                PerformValidation(attacker, id, message.RandomSeed, message.Hits[i]);
+            }
         }
 
         public void ClearData()
@@ -189,62 +186,60 @@ namespace MultiplayerARPG
             s_registeringHits.Clear();
         }
 
-        private void PerformValidation(BaseGameEntity attacker, string id, int simulateSeed, List<HitData> hits)
+        private bool PerformValidation(BaseGameEntity attacker, string id, int simulateSeed, HitData hitData)
         {
             if (attacker == null || !s_validatingHits.ContainsKey(id))
-                return;
+                return false;
 
             HitValidateData validateData = s_validatingHits[id];
-
-            for (int i = 0; i < hits.Count; ++i)
+            string hitId = MakeHitId(hitData.TriggerIndex, hitData.SpreadIndex);
+            if (!validateData.Origins.ContainsKey(hitId))
             {
-                HitData hitData = hits[i];
-                if (hitData.TriggerIndex >= validateData.Origins.Length)
-                {
-                    // Invalid trigger index
-                    continue;
-                }
-
-                if (hitData.SpreadIndex >= validateData.Origins[hitData.TriggerIndex].Count)
-                {
-                    // Invalid spread index
-                    continue;
-                }
-
-                HitOriginData hitOriginData = validateData.Origins[hitData.TriggerIndex][hitData.SpreadIndex];
-                uint objectId = hitData.ObjectId;
-                int hitBoxIndex = hitData.HitBoxIndex;
-                if (!BaseGameNetworkManager.Singleton.TryGetEntityByObjectId(objectId, out DamageableEntity damageableEntity) ||
-                    hitBoxIndex < 0 || hitBoxIndex >= damageableEntity.HitBoxes.Length)
-                {
-                    // Can't find target or invalid hitbox
-                    continue;
-                }
-
-                string hitId = MakeHitId(hitData.TriggerIndex, hitData.SpreadIndex);
-                if (!validateData.HitsCount.TryGetValue(hitId, out int hitCount))
-                {
-                    // Set hit count to 0, if it is not in collection
-                    hitCount = 0;
-                }
-
-                if (validateData.DamageInfo.IsHitReachedMax(hitCount))
-                {
-                    // Can't hit because it is reaching max amount of objects that can be hit
-                    continue;
-                }
-
-                string hitObjectId = MakeHitObjectId(hitData.TriggerIndex, hitData.SpreadIndex, hitData.ObjectId);
-                DamageableHitBox hitBox = damageableEntity.HitBoxes[hitBoxIndex];
-                // Valiate hitting
-                if (!validateData.HitObjects.Contains(hitObjectId) && IsHit(attacker, hitOriginData, hitData, hitBox))
-                {
-                    // Yes, it is hit
-                    hitBox.ReceiveDamage(attacker.EntityTransform.position, attacker.GetInfo(), validateData.DamageAmounts, validateData.Weapon, validateData.Skill, validateData.SkillLevel, simulateSeed);
-                    validateData.HitsCount[hitId] = ++hitCount;
-                    validateData.HitObjects.Add(hitObjectId);
-                }
+                // Invalid spread index
+                validateData.Pendings.Add(hitId, hitData);
+                return false;
             }
+            else
+            {
+                validateData.Pendings.Remove(hitId);
+            }
+
+            HitOriginData hitOriginData = validateData.Origins[hitId];
+            uint objectId = hitData.ObjectId;
+            int hitBoxIndex = hitData.HitBoxIndex;
+            if (!BaseGameNetworkManager.Singleton.TryGetEntityByObjectId(objectId, out DamageableEntity damageableEntity) ||
+                hitBoxIndex < 0 || hitBoxIndex >= damageableEntity.HitBoxes.Length)
+            {
+                // Can't find target or invalid hitbox
+                return false;
+            }
+
+            if (!validateData.HitsCount.TryGetValue(hitId, out int hitCount))
+            {
+                // Set hit count to 0, if it is not in collection
+                hitCount = 0;
+            }
+
+            if (validateData.DamageInfo.IsHitReachedMax(hitCount))
+            {
+                // Can't hit because it is reaching max amount of objects that can be hit
+                return false;
+            }
+
+            string hitObjectId = MakeHitObjectId(hitData.TriggerIndex, hitData.SpreadIndex, hitData.ObjectId);
+            DamageableHitBox hitBox = damageableEntity.HitBoxes[hitBoxIndex];
+            // Valiate hitting
+            if (validateData.HitObjects.Contains(hitObjectId) || !IsHit(attacker, hitOriginData, hitData, hitBox))
+            {
+                // Already validate or not hit
+                return false;
+            }
+
+            // Yes, it is hit
+            hitBox.ReceiveDamage(attacker.EntityTransform.position, attacker.GetInfo(), validateData.DamageAmounts, validateData.Weapon, validateData.Skill, validateData.SkillLevel, simulateSeed);
+            validateData.HitsCount[hitId] = ++hitCount;
+            validateData.HitObjects.Add(hitObjectId);
+            return true;
         }
 
         private bool IsHit(BaseGameEntity attacker, HitOriginData hitOriginData, HitData hitData, DamageableHitBox hitBox)

@@ -12,8 +12,9 @@ namespace MultiplayerARPG
         public CharacterItem Weapon { get; set; }
         public BaseSkill Skill { get; set; }
         public int SkillLevel { get; set; }
-        public List<HitOriginData>[] Origins { get; set; }
+        public Dictionary<string, HitOriginData> Origins { get; } = new Dictionary<string, HitOriginData>();
         public Dictionary<string, int> HitsCount { get; } = new Dictionary<string, int>();
         public HashSet<string> HitObjects { get; } = new HashSet<string>();
+        public Dictionary<string, HitData> Pendings { get; } = new Dictionary<string, HitData>();
     }
 }
