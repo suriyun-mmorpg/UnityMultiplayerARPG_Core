@@ -29,7 +29,6 @@ namespace MultiplayerARPG
         public DirectionVector2 Direction2D { get { return Vector2.down; } set { } }
         public float CurrentMoveSpeed { get { return CacheNavMeshAgent.isStopped ? 0f : CacheNavMeshAgent.speed; } }
 
-        protected long _lastServerValidateTime;
         protected float _lastServerValidateHorDistDiff;
         protected long _acceptedPositionTimestamp;
         protected float _yAngle;
@@ -360,6 +359,10 @@ namespace MultiplayerARPG
             }
             else if (_acceptedPositionTimestamp <= timestamp)
             {
+                // Prepare time
+                long lagDeltaTime = Entity.Manager.Rtt;
+                long deltaTime = lagDeltaTime + timestamp - _acceptedPositionTimestamp;
+                float unityDeltaTime = (float)deltaTime * 0.001f;
                 if (Vector3.Distance(position, CacheTransform.position) >= snapThreshold)
                 {
                     // Snap character to the position if character is too far from the position
@@ -374,7 +377,7 @@ namespace MultiplayerARPG
                 else if (!IsOwnerClient)
                 {
                     _targetYAngle = yAngle;
-                    _yTurnSpeed = 1f / Time.fixedDeltaTime;
+                    _yTurnSpeed = 1f / unityDeltaTime;
                     SetMovePaths(position);
                     MovementState = movementState;
                     ExtraMovementState = extraMovementState;
@@ -418,6 +421,10 @@ namespace MultiplayerARPG
             }
             if (_acceptedPositionTimestamp <= timestamp)
             {
+                // Prepare time
+                long lagDeltaTime = Entity.Player.Rtt;
+                long deltaTime = lagDeltaTime + timestamp - _acceptedPositionTimestamp;
+                float unityDeltaTime = (float)deltaTime * 0.001f;
                 _tempExtraMovementState = extraMovementState;
                 if (inputState.Has(EntityMovementInputState.PositionChanged))
                 {
@@ -428,7 +435,7 @@ namespace MultiplayerARPG
                     if (IsClient)
                     {
                         _targetYAngle = yAngle;
-                        _yTurnSpeed = 1f / Time.fixedDeltaTime;
+                        _yTurnSpeed = 1f / unityDeltaTime;
                     }
                     else
                     {
@@ -472,58 +479,53 @@ namespace MultiplayerARPG
             }
             if (_acceptedPositionTimestamp <= timestamp)
             {
-                if (IsClient)
-                {
-                    _targetYAngle = yAngle;
-                    _yTurnSpeed = 1f / Time.fixedDeltaTime;
-                }
-                else
-                {
-                    _yAngle = _targetYAngle = yAngle;
-                    UpdateRotation();
-                }
+                // Prepare time
+                long lagDeltaTime = Entity.Player.Rtt;
+                long deltaTime = lagDeltaTime + timestamp - _acceptedPositionTimestamp;
+                float unityDeltaTime = (float)deltaTime * 0.001f;
+                // Prepare movement state
                 MovementState = movementState;
                 ExtraMovementState = extraMovementState;
-                if (Vector3.Distance(position.GetXZ(), CacheTransform.position.GetXZ()) > 0.01f)
+                if (!IsClient)
                 {
-                    if (!IsClient)
+                    Vector3 oldPos = CacheTransform.position;
+                    Vector3 newPos = position;
+                    // Calculate moveable distance
+                    float horMoveSpd = Entity.GetMoveSpeed(MovementState, ExtraMovementState);
+                    float horMoveableDist = (float)horMoveSpd * unityDeltaTime;
+                    if (horMoveableDist < 0.001f)
+                        horMoveableDist = 0.001f;
+                    // Movement validating, if it is valid, set the position follow the client, if not set position to proper one and tell client to teleport
+                    float clientHorMoveDist = Vector3.Distance(oldPos.GetXZ(), newPos.GetXZ());
+                    if (clientHorMoveDist <= horMoveableDist + _lastServerValidateHorDistDiff)
                     {
-                        Vector3 oldPos = CacheTransform.position;
-                        Vector3 newPos = position;
-                        long lagDeltaTime = Entity.Player.Rtt;
-                        long deltaTime = lagDeltaTime + timestamp - _lastServerValidateTime;
-                        float unityDeltaTime = (float)deltaTime * 0.001f;
-                        // Calculate moveable distance
-                        float horMoveSpd = Entity.GetMoveSpeed(MovementState, ExtraMovementState);
-                        float horMoveableDist = (float)horMoveSpd * unityDeltaTime;
-                        if (horMoveableDist < 0.001f)
-                            horMoveableDist = 0.001f;
-
-                        float clientHorMoveDist = Vector3.Distance(oldPos.GetXZ(), newPos.GetXZ());
-                        if (clientHorMoveDist <= horMoveableDist + _lastServerValidateHorDistDiff)
-                        {
-                            // Allow to move to the position
-                            CacheNavMeshAgent.Warp(position);
-                            _lastServerValidateHorDistDiff = horMoveableDist - clientHorMoveDist;
-                        }
-                        else
-                        {
-                            // Client moves too fast, adjust it
-                            Vector3 dir = (newPos.GetXZ() - oldPos.GetXZ()).normalized;
-                            Vector3 deltaMove = dir * Mathf.Min(clientHorMoveDist, horMoveableDist);
-                            newPos = oldPos + deltaMove;
-                            // And also adjust client's position
-                            Teleport(newPos, Quaternion.Euler(0f, yAngle, 0f), true);
-                            // Reset distance difference
-                            _lastServerValidateHorDistDiff = 0f;
-                        }
-                        _lastServerValidateTime = timestamp;
+                        // Allow to move to the position
+                        CacheNavMeshAgent.Warp(position);
+                        _lastServerValidateHorDistDiff = horMoveableDist - clientHorMoveDist;
+                        // Update character rotation
+                        _yAngle = _targetYAngle = yAngle;
+                        UpdateRotation();
                     }
                     else
                     {
-                        // It's both server and client, translate position (it's a host so don't do speed hack validation)
-                        SetMovePaths(position);
+                        // Client moves too fast, adjust it
+                        Vector3 dir = (newPos.GetXZ() - oldPos.GetXZ()).normalized;
+                        Vector3 deltaMove = dir * Mathf.Min(clientHorMoveDist, horMoveableDist);
+                        newPos = oldPos + deltaMove;
+                        // And also adjust client's position
+                        Teleport(newPos, Quaternion.Euler(0f, yAngle, 0f), true);
+                        // Reset distance difference
+                        _lastServerValidateHorDistDiff = 0f;
                     }
+                }
+                else
+                {
+                    // It's both server and client, translate position (it's a host so don't do speed hack validation)
+                    if (Vector3.Distance(position, CacheTransform.position) > 0.01f)
+                        SetMovePaths(position);
+                    // Simulate character turning
+                    _targetYAngle = yAngle;
+                    _yTurnSpeed = 1f / unityDeltaTime;
                 }
                 _acceptedPositionTimestamp = timestamp;
             }

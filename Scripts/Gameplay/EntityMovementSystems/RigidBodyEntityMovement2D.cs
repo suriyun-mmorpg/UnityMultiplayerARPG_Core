@@ -35,7 +35,6 @@ namespace MultiplayerARPG
             get { return NavPaths != null && NavPaths.Count > 0; }
         }
 
-        protected long _lastServerValidateTime;
         protected float _lastServerValidateDistDiff;
         protected long _acceptedPositionTimestamp;
         protected Vector2? _clientTargetPosition;
@@ -542,6 +541,11 @@ namespace MultiplayerARPG
             }
             if (_acceptedPositionTimestamp <= timestamp)
             {
+                // Prepare time
+                long lagDeltaTime = Entity.Player.Rtt;
+                long deltaTime = lagDeltaTime + timestamp - _acceptedPositionTimestamp;
+                float unityDeltaTime = (float)deltaTime * 0.001f;
+                // Prepare movement state
                 Direction2D = direction2D;
                 MovementState = movementState;
                 ExtraMovementState = extraMovementState;
@@ -549,15 +553,12 @@ namespace MultiplayerARPG
                 {
                     Vector3 oldPos = CacheTransform.position;
                     Vector3 newPos = position;
-                    long lagDeltaTime = Entity.Player.Rtt;
-                    long deltaTime = lagDeltaTime + timestamp - _lastServerValidateTime;
-                    float unityDeltaTime = (float)deltaTime * 0.001f;
                     // Calculate moveable distance
                     float moveSpd = Entity.GetMoveSpeed(MovementState, ExtraMovementState);
                     float moveableDist = (float)moveSpd * unityDeltaTime;
                     if (moveableDist < 0.001f)
                         moveableDist = 0.001f;
-
+                    // Movement validating, if it is valid, set the position follow the client, if not set position to proper one and tell client to teleport
                     float clientMoveDist = Vector3.Distance(oldPos.GetXY(), newPos.GetXY());
                     if (clientMoveDist <= 0.001f || clientMoveDist <= moveableDist + _lastServerValidateDistDiff)
                     {
@@ -577,7 +578,6 @@ namespace MultiplayerARPG
                         // Reset distance difference
                         _lastServerValidateDistDiff = 0f;
                     }
-                    _lastServerValidateTime = timestamp;
                 }
                 else
                 {
