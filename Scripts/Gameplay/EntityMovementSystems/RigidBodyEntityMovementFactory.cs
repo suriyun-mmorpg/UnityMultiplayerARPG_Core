@@ -5,7 +5,7 @@ namespace MultiplayerARPG
 {
     public class RigidBodyEntityMovementFactory : IEntityMovementFactory
     {
-        public string Name => "Rigid Body Entity Movement";
+        public string Name => "Rigid Body Entity Movement (Obsolete)";
 
         public DimensionType DimensionType => DimensionType.Dimension3D;
 

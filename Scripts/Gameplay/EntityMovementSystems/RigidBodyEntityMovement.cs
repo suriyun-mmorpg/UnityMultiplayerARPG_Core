@@ -6,6 +6,7 @@ using UnityEngine;
 
 namespace MultiplayerARPG
 {
+    [System.Obsolete("Should use `CharacterControllerEntityMovement` instead.")]
     [RequireComponent(typeof(Rigidbody))]
     [RequireComponent(typeof(CapsuleCollider))]
     [RequireComponent(typeof(OpenCharacterController))]
