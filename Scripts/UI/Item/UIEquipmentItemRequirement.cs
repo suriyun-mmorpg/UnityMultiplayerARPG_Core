@@ -16,11 +16,16 @@ namespace MultiplayerARPG
         public UILocaleKeySetting formatKeyRequireClasses = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_REQUIRE_CLASS);
         [Tooltip("Format => {0} = {Require Classes Title}")]
         public UILocaleKeySetting formatKeyInvalidRequireClasses = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_INVALID_REQUIRE_CLASS);
+        [Tooltip("Format => {0} = {Require Factions Title}")]
+        public UILocaleKeySetting formatKeyRequireFactions = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_REQUIRE_FACTION);
+        [Tooltip("Format => {0} = {Require Factions Title}")]
+        public UILocaleKeySetting formatKeyInvalidRequireFactions = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_INVALID_REQUIRE_FACTION);
 
         [Header("UI Elements")]
         public TextWrapper uiTextRequireLevel;
         [FormerlySerializedAs("uiTextRequireClass")]
         public TextWrapper uiTextRequireClasses;
+        public TextWrapper uiTextRequireFactions;
         public UIAttributeAmounts uiRequireAttributeAmounts;
 
         protected override void UpdateData()
@@ -64,7 +69,8 @@ namespace MultiplayerARPG
                 {
                     using (Utf16ValueStringBuilder str = ZString.CreateStringBuilder(false))
                     {
-                        PlayerCharacter playingCharacterClass = GameInstance.PlayingCharacter.GetDatabase() as PlayerCharacter;
+                        if (!GameInstance.PlayerCharacters.TryGetValue(GameInstance.PlayingCharacter.DataId, out PlayerCharacter playingCharacterClass))
+                            playingCharacterClass = null;
                         bool available = false;
                         if (Data.Requirement.availableClass != null)
                         {
@@ -89,6 +95,42 @@ namespace MultiplayerARPG
                         uiTextRequireClasses.SetGameObjectActive(true);
                         uiTextRequireClasses.text = ZString.Format(
                             LanguageManager.GetText(available ? formatKeyRequireClasses : formatKeyInvalidRequireClasses),
+                            str.ToString());
+                    }
+                }
+            }
+
+            if (uiTextRequireFactions != null)
+            {
+                if (Data == null || !Data.Requirement.HasAvailableFactions())
+                {
+                    // Hide require faction label when require character is null
+                    uiTextRequireFactions.SetGameObjectActive(false);
+                }
+                else
+                {
+                    using (Utf16ValueStringBuilder str = ZString.CreateStringBuilder(false))
+                    {
+                        if (!GameInstance.Factions.TryGetValue(GameInstance.PlayingCharacter.FactionId, out Faction playingCharacterFaction))
+                            playingCharacterFaction = null;
+                        bool available = false;
+                        if (Data.Requirement.availableFactions != null &&
+                            Data.Requirement.availableFactions.Count > 0)
+                        {
+                            foreach (Faction faction in Data.Requirement.availableFactions)
+                            {
+                                if (faction == null)
+                                    continue;
+                                if (str.Length > 0)
+                                    str.Append('/');
+                                str.Append(faction.Title);
+                                if (playingCharacterFaction == faction)
+                                    available = true;
+                            }
+                        }
+                        uiTextRequireFactions.SetGameObjectActive(true);
+                        uiTextRequireFactions.text = ZString.Format(
+                            LanguageManager.GetText(available ? formatKeyRequireFactions : formatKeyInvalidRequireFactions),
                             str.ToString());
                     }
                 }

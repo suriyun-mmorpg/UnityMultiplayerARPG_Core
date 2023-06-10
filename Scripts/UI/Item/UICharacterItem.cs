@@ -683,6 +683,7 @@ namespace MultiplayerARPG
                 if (EquipmentItem == null ||
                     (EquipmentItem.Requirement.level <= 0 &&
                     !EquipmentItem.Requirement.HasAvailableClasses() &&
+                    !EquipmentItem.Requirement.HasAvailableFactions() &&
                     EquipmentItem.RequireAttributeAmounts.Count == 0))
                 {
                     uiRequirement.Hide();

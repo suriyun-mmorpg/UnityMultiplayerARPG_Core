@@ -374,10 +374,19 @@ namespace MultiplayerARPG
                 return false;
             }
 
-            if (!item.Requirement.ClassIsAvailable(character.GetDatabase() as PlayerCharacter))
+            if (character is IPlayerCharacterData playerCharacter)
             {
-                gameMessage = UITextKeys.UI_ERROR_NOT_MATCH_CHARACTER_CLASS;
-                return false;
+                if (!GameInstance.PlayerCharacters.TryGetValue(playerCharacter.DataId, out PlayerCharacter characterClass) || !item.Requirement.ClassIsAvailable(characterClass))
+                {
+                    gameMessage = UITextKeys.UI_ERROR_NOT_MATCH_CHARACTER_CLASS;
+                    return false;
+                }
+
+                if (!GameInstance.Factions.TryGetValue(playerCharacter.FactionId, out Faction faction) || !item.Requirement.FactionIsAvailable(faction))
+                {
+                    gameMessage = UITextKeys.UI_ERROR_NOT_MATCH_CHARACTER_FACTION;
+                    return false;
+                }
             }
 
             // Check is it pass attribute requirement or not
