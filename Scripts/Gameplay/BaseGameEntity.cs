@@ -712,6 +712,16 @@ namespace MultiplayerARPG
             return 0f;
         }
 
+        public float GetJumpHeight()
+        {
+            return GetJumpHeight(MovementState, ExtraMovementState);
+        }
+
+        public virtual float GetJumpHeight(MovementState movementState, ExtraMovementState extraMovementState)
+        {
+            return 0f;
+        }
+
         public virtual bool CanMove()
         {
             return false;

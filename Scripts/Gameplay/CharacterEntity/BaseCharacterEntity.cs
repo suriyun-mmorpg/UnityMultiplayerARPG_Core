@@ -1175,6 +1175,11 @@ namespace MultiplayerARPG
             return moveSpeed;
         }
 
+        public override float GetJumpHeight(MovementState movementState, ExtraMovementState extraMovementState)
+        {
+            return CachedData.JumpHeight;
+        }
+
         public override bool CanMove()
         {
             if (this.IsDead())

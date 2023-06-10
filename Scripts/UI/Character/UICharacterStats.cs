@@ -59,6 +59,12 @@ namespace MultiplayerARPG
         public UILocaleKeySetting formatKeyExpRateStats = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_EXP_RATE);
         [Tooltip("Format => {0} = {Amount * 100}")]
         public UILocaleKeySetting formatKeyItemDropRateStats = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_ITEM_DROP_RATE);
+        [Tooltip("Format => {0} = {Amount}")]
+        public UILocaleKeySetting formatKeyJumpHeightStats = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_JUMP_HEIGHT);
+        [Tooltip("Format => {0} = {Amount * 100}")]
+        public UILocaleKeySetting formatKeyHeadDamageAbsorbsStats = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_HEAD_DAMAGE_ABSORBS);
+        [Tooltip("Format => {0} = {Amount * 100}")]
+        public UILocaleKeySetting formatKeyBodyDamageAbsorbsStats = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_BODY_DAMAGE_ABSORBS);
 
         [Header("String Formats (Stats Rate)")]
         [Tooltip("Format => {0} = {Amount * 100}")]
@@ -109,6 +115,12 @@ namespace MultiplayerARPG
         public UILocaleKeySetting formatKeyExpRateRateStats = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_EXP_RATE_RATE);
         [Tooltip("Format => {0} = {Amount * 100}")]
         public UILocaleKeySetting formatKeyItemDropRateRateStats = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_ITEM_DROP_RATE_RATE);
+        [Tooltip("Format => {0} = {Amount}")]
+        public UILocaleKeySetting formatKeyJumpHeightRateStats = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_JUMP_HEIGHT_RATE);
+        [Tooltip("Format => {0} = {Amount * 100}")]
+        public UILocaleKeySetting formatKeyHeadDamageAbsorbsRateStats = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_HEAD_DAMAGE_ABSORBS_RATE);
+        [Tooltip("Format => {0} = {Amount * 100}")]
+        public UILocaleKeySetting formatKeyBodyDamageAbsorbsRateStats = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_BODY_DAMAGE_ABSORBS_RATE);
 
         [Header("UI Elements")]
         public TextWrapper uiTextStats;
@@ -136,6 +148,9 @@ namespace MultiplayerARPG
         public TextWrapper uiTextGoldRate;
         public TextWrapper uiTextExpRate;
         public TextWrapper uiTextItemDropRate;
+        public TextWrapper uiTextJumpHeight;
+        public TextWrapper uiTextHeadDamageAbsorbs;
+        public TextWrapper uiTextBodyDamageAbsorbs;
         public DisplayType displayType;
         public bool isBonus;
 
@@ -198,6 +213,9 @@ namespace MultiplayerARPG
                         goldRateStatsFormat = formatKeyGoldRateRateStats,
                         expRateStatsFormat = formatKeyExpRateRateStats,
                         itemDropRateStatsFormat = formatKeyItemDropRateRateStats,
+                        jumpHeightStatsFormat = formatKeyJumpHeightRateStats,
+                        headDamageAbsorbsStatsFormat = formatKeyHeadDamageAbsorbsRateStats,
+                        bodyDamageAbsorbsStatsFormat = formatKeyBodyDamageAbsorbsRateStats,
                         uiTextHp = uiTextHp,
                         uiTextHpRecovery = uiTextHpRecovery,
                         uiTextHpLeechRate = uiTextHpLeechRate,
@@ -222,6 +240,9 @@ namespace MultiplayerARPG
                         uiTextGoldRate = uiTextGoldRate,
                         uiTextExpRate = uiTextExpRate,
                         uiTextItemDropRate = uiTextItemDropRate,
+                        uiTextJumpHeight = uiTextJumpHeight,
+                        uiTextHeadDamageAbsorbs = uiTextHeadDamageAbsorbs,
+                        uiTextBodyDamageAbsorbs = uiTextBodyDamageAbsorbs,
                     };
                     this.InvokeInstanceDevExtMethods("SetRateStatsGenerateTextData", generateTextData);
                     statsString = generateTextData.GetText();
@@ -256,6 +277,9 @@ namespace MultiplayerARPG
                         goldRateStatsFormat = formatKeyGoldRateStats,
                         expRateStatsFormat = formatKeyExpRateStats,
                         itemDropRateStatsFormat = formatKeyItemDropRateStats,
+                        jumpHeightStatsFormat = formatKeyJumpHeightStats,
+                        headDamageAbsorbsStatsFormat = formatKeyHeadDamageAbsorbsStats,
+                        bodyDamageAbsorbsStatsFormat = formatKeyBodyDamageAbsorbsStats,
                         uiTextHp = uiTextHp,
                         uiTextHpRecovery = uiTextHpRecovery,
                         uiTextHpLeechRate = uiTextHpLeechRate,
@@ -280,6 +304,9 @@ namespace MultiplayerARPG
                         uiTextGoldRate = uiTextGoldRate,
                         uiTextExpRate = uiTextExpRate,
                         uiTextItemDropRate = uiTextItemDropRate,
+                        uiTextHeadDamageAbsorbs = uiTextHeadDamageAbsorbs,
+                        uiTextBodyDamageAbsorbs = uiTextBodyDamageAbsorbs,
+                        uiTextJumpHeight = uiTextJumpHeight,
                     };
                     this.InvokeInstanceDevExtMethods("SetStatsGenerateTextData", generateTextData);
                     statsString = generateTextData.GetText();

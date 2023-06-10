@@ -32,6 +32,9 @@ namespace MultiplayerARPG
         public string goldRateStatsFormat;
         public string expRateStatsFormat;
         public string itemDropRateStatsFormat;
+        public string jumpHeightStatsFormat;
+        public string headDamageAbsorbsStatsFormat;
+        public string bodyDamageAbsorbsStatsFormat;
         public TextWrapper uiTextHp;
         public TextWrapper uiTextHpRecovery;
         public TextWrapper uiTextHpLeechRate;
@@ -56,6 +59,9 @@ namespace MultiplayerARPG
         public TextWrapper uiTextGoldRate;
         public TextWrapper uiTextExpRate;
         public TextWrapper uiTextItemDropRate;
+        public TextWrapper uiTextJumpHeight;
+        public TextWrapper uiTextHeadDamageAbsorbs;
+        public TextWrapper uiTextBodyDamageAbsorbs;
 
         public string GetText()
         {
@@ -423,9 +429,9 @@ namespace MultiplayerARPG
 
                 // Gold Rate
                 if (isBonus)
-                    tempValue = isRate ? (data.goldRate * 100).ToBonusString("N2") : (data.goldRate * 100).ToBonusString("N0");
+                    tempValue = isRate ? (data.goldRate * 100).ToBonusString("N2") : (data.goldRate * 100).ToBonusString("N2");
                 else
-                    tempValue = isRate ? (data.goldRate * 100).ToString("N2") : (data.goldRate * 100).ToString("N0");
+                    tempValue = isRate ? (data.goldRate * 100).ToString("N2") : (data.goldRate * 100).ToString("N2");
                 statsStringPart = ZString.Format(
                     LanguageManager.GetText(goldRateStatsFormat),
                     tempValue);
@@ -440,9 +446,9 @@ namespace MultiplayerARPG
 
                 // Exp Rate
                 if (isBonus)
-                    tempValue = isRate ? (data.expRate * 100).ToBonusString("N2") : (data.expRate * 100).ToBonusString("N0");
+                    tempValue = isRate ? (data.expRate * 100).ToBonusString("N2") : (data.expRate * 100).ToBonusString("N2");
                 else
-                    tempValue = isRate ? (data.expRate * 100).ToString("N2") : (data.expRate * 100).ToString("N0");
+                    tempValue = isRate ? (data.expRate * 100).ToString("N2") : (data.expRate * 100).ToString("N2");
                 statsStringPart = ZString.Format(
                     LanguageManager.GetText(expRateStatsFormat),
                     tempValue);
@@ -455,11 +461,11 @@ namespace MultiplayerARPG
                 if (uiTextExpRate != null)
                     uiTextExpRate.text = statsStringPart;
 
-                // EtemDrop Rate
+                // Item Drop Rate
                 if (isBonus)
-                    tempValue = isRate ? (data.itemDropRate * 100).ToBonusString("N2") : (data.itemDropRate * 100).ToBonusString("N0");
+                    tempValue = isRate ? (data.itemDropRate * 100).ToBonusString("N2") : (data.itemDropRate * 100).ToBonusString("N2");
                 else
-                    tempValue = isRate ? (data.itemDropRate * 100).ToString("N2") : (data.itemDropRate * 100).ToString("N0");
+                    tempValue = isRate ? (data.itemDropRate * 100).ToString("N2") : (data.itemDropRate * 100).ToString("N2");
                 statsStringPart = ZString.Format(
                     LanguageManager.GetText(itemDropRateStatsFormat),
                     tempValue);
@@ -471,6 +477,57 @@ namespace MultiplayerARPG
                 }
                 if (uiTextItemDropRate != null)
                     uiTextItemDropRate.text = statsStringPart;
+
+                // Jump Height
+                if (isBonus)
+                    tempValue = isRate ? (data.jumpHeight * 100).ToBonusString("N2") : data.jumpHeight.ToBonusString("N2");
+                else
+                    tempValue = isRate ? (data.jumpHeight * 100).ToString("N2") : data.jumpHeight.ToString("N2");
+                statsStringPart = ZString.Format(
+                    LanguageManager.GetText(jumpHeightStatsFormat),
+                    tempValue);
+                if (data.jumpHeight != 0)
+                {
+                    if (statsString.Length > 0)
+                        statsString.Append('\n');
+                    statsString.Append(statsStringPart);
+                }
+                if (uiTextJumpHeight != null)
+                    uiTextJumpHeight.text = statsStringPart;
+
+                // Head Damage Absorbs
+                if (isBonus)
+                    tempValue = isRate ? (data.headDamageAbsorbs * 100).ToBonusString("N2") : (data.headDamageAbsorbs * 100).ToBonusString("N2");
+                else
+                    tempValue = isRate ? (data.headDamageAbsorbs * 100).ToString("N2") : (data.headDamageAbsorbs * 100).ToString("N2");
+                statsStringPart = ZString.Format(
+                    LanguageManager.GetText(headDamageAbsorbsStatsFormat),
+                    tempValue);
+                if (data.headDamageAbsorbs != 0)
+                {
+                    if (statsString.Length > 0)
+                        statsString.Append('\n');
+                    statsString.Append(statsStringPart);
+                }
+                if (uiTextHeadDamageAbsorbs != null)
+                    uiTextHeadDamageAbsorbs.text = statsStringPart;
+
+                // Body Damage Absorbs
+                if (isBonus)
+                    tempValue = isRate ? (data.bodyDamageAbsorbs * 100).ToBonusString("N2") : (data.bodyDamageAbsorbs * 100).ToBonusString("N2");
+                else
+                    tempValue = isRate ? (data.bodyDamageAbsorbs * 100).ToString("N2") : (data.bodyDamageAbsorbs * 100).ToString("N2");
+                statsStringPart = ZString.Format(
+                    LanguageManager.GetText(bodyDamageAbsorbsStatsFormat),
+                    tempValue);
+                if (data.bodyDamageAbsorbs != 0)
+                {
+                    if (statsString.Length > 0)
+                        statsString.Append('\n');
+                    statsString.Append(statsStringPart);
+                }
+                if (uiTextBodyDamageAbsorbs != null)
+                    uiTextBodyDamageAbsorbs.text = statsStringPart;
 
                 // Dev Extension
                 // How to implement it?:

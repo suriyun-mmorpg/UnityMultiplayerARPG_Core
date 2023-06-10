@@ -33,6 +33,9 @@ namespace MultiplayerARPG
         public float goldRate;
         public float expRate;
         public float itemDropRate;
+        public float jumpHeight;
+        public float headDamageAbsorbs;
+        public float bodyDamageAbsorbs;
 
         public static CharacterStats operator +(CharacterStats a, CharacterStats b)
         {
@@ -60,6 +63,9 @@ namespace MultiplayerARPG
             a.goldRate = a.goldRate + b.goldRate;
             a.expRate = a.expRate + b.expRate;
             a.itemDropRate = a.itemDropRate + b.itemDropRate;
+            a.jumpHeight = a.jumpHeight + b.jumpHeight;
+            a.headDamageAbsorbs = a.headDamageAbsorbs + b.headDamageAbsorbs;
+            a.bodyDamageAbsorbs = a.bodyDamageAbsorbs + b.bodyDamageAbsorbs;
             if (GameExtensionInstance.onAddCharacterStats != null)
                 GameExtensionInstance.onAddCharacterStats(ref a, b);
             return a;
@@ -91,6 +97,9 @@ namespace MultiplayerARPG
             a.goldRate = a.goldRate * multiplier;
             a.expRate = a.expRate * multiplier;
             a.itemDropRate = a.itemDropRate * multiplier;
+            a.jumpHeight = a.jumpHeight * multiplier;
+            a.headDamageAbsorbs = a.headDamageAbsorbs * multiplier;
+            a.bodyDamageAbsorbs = a.bodyDamageAbsorbs * multiplier;
             if (GameExtensionInstance.onMultiplyCharacterStatsWithNumber != null)
                 GameExtensionInstance.onMultiplyCharacterStatsWithNumber(ref a, multiplier);
             return a;
@@ -122,6 +131,9 @@ namespace MultiplayerARPG
             a.goldRate = a.goldRate * b.goldRate;
             a.expRate = a.expRate * b.expRate;
             a.itemDropRate = a.itemDropRate * b.itemDropRate;
+            a.jumpHeight = a.jumpHeight * b.jumpHeight;
+            a.headDamageAbsorbs = a.headDamageAbsorbs * b.headDamageAbsorbs;
+            a.bodyDamageAbsorbs = a.bodyDamageAbsorbs * b.bodyDamageAbsorbs;
             if (GameExtensionInstance.onMultiplyCharacterStats != null)
                 GameExtensionInstance.onMultiplyCharacterStats(ref a, b);
             return a;

@@ -112,6 +112,26 @@ namespace MultiplayerARPG
                 attackerCharacter.NotifyEnemySpotted(this);
             }
 
+            float decreaseRate = 0f;
+            switch (position)
+            {
+                case HitBoxPosition.Head:
+                    decreaseRate = CachedData.HeadDamageAbsorbs;
+                    break;
+                case HitBoxPosition.Body:
+                    decreaseRate = CachedData.BodyDamageAbsorbs;
+                    break;
+            }
+
+            if (decreaseRate > 0f)
+            {
+                List<DamageElement> keys = new List<DamageElement>(damageAmounts.Keys);
+                foreach (DamageElement key in keys)
+                {
+                    damageAmounts[key] = damageAmounts[key] - (damageAmounts[key] * decreaseRate);
+                }
+            }
+
             if (!CurrentGameInstance.GameplayRule.RandomAttackHitOccurs(fromPosition, attackerCharacter, this, damageAmounts, weapon, skill, skillLevel, randomSeed, out bool isCritical, out bool isBlocked))
             {
                 // Don't hit (Miss)

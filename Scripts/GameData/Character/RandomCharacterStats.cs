@@ -151,6 +151,24 @@ namespace MultiplayerARPG
         [Range(0, 1f)]
         public float itemDropRateApplyRate;
 
+        [Header("Jump Height")]
+        public float minJumpHeight;
+        public float maxJumpHeight;
+        [Range(0, 1f)]
+        public float jumpHeightApplyRate;
+
+        [Header("Head Damage Absorbs")]
+        public float minHeadDamageAbsorbs;
+        public float maxHeadDamageAbsorbs;
+        [Range(0, 1f)]
+        public float headDamageAbsorbsApplyRate;
+
+        [Header("Body Damage Absorbs")]
+        public float minBodyDamageAbsorbs;
+        public float maxBodyDamageAbsorbs;
+        [Range(0, 1f)]
+        public float bodyDamageAbsorbsApplyRate;
+
         public float GetRandomedHp(System.Random random)
         {
             return random.RandomFloat(minHp, maxHp);
@@ -271,6 +289,21 @@ namespace MultiplayerARPG
             return random.RandomFloat(minItemDropRate, maxItemDropRate);
         }
 
+        public float GetJumpHeight(System.Random random)
+        {
+            return random.RandomFloat(minJumpHeight, maxJumpHeight);
+        }
+
+        public float GetHeadDamageAbsorbs(System.Random random)
+        {
+            return random.RandomFloat(minHeadDamageAbsorbs, maxHeadDamageAbsorbs);
+        }
+
+        public float GetBodyDamageAbsorbs(System.Random random)
+        {
+            return random.RandomFloat(minBodyDamageAbsorbs, maxBodyDamageAbsorbs);
+        }
+
         public bool ApplyHp(System.Random random)
         {
             return random.NextDouble() <= hpApplyRate;
@@ -389,6 +422,21 @@ namespace MultiplayerARPG
         public bool ApplyItemDropRate(System.Random random)
         {
             return random.NextDouble() <= itemDropRateApplyRate;
+        }
+
+        public bool ApplyJumpHeight(System.Random random)
+        {
+            return random.NextDouble() <= jumpHeightApplyRate;
+        }
+
+        public bool ApplyHeadDamageAbsorbs(System.Random random)
+        {
+            return random.NextDouble() <= headDamageAbsorbsApplyRate;
+        }
+
+        public bool ApplyBodyDamageAbsorbs(System.Random random)
+        {
+            return random.NextDouble() <= bodyDamageAbsorbsApplyRate;
         }
     }
 }

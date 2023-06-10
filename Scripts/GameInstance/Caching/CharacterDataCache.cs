@@ -21,6 +21,9 @@ namespace MultiplayerARPG
         public int MaxWater => (int)_stats.water;
         public float AtkSpeed => _stats.atkSpeed;
         public float MoveSpeed => _stats.moveSpeed;
+        public float JumpHeight => _stats.jumpHeight;
+        public float HeadDamageAbsorbs => _stats.headDamageAbsorbs;
+        public float BodyDamageAbsorbs => _stats.bodyDamageAbsorbs;
         public float BaseMoveSpeed { get; private set; }
         public float TotalItemWeight { get; private set; }
         public int TotalItemSlot { get; private set; }

@@ -659,7 +659,7 @@ namespace MultiplayerARPG
         {
             // From the jump height and gravity we deduce the upwards speed 
             // for the character to reach at the apex.
-            return Mathf.Sqrt(2f * jumpHeight * gravity);
+            return Mathf.Sqrt(2f * (jumpHeight + Entity.GetJumpHeight()) * gravity);
         }
 
         public void OnTriggerEnter(Collider other)
