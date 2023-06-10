@@ -854,7 +854,6 @@ namespace MultiplayerARPG
             // Temporary variables
             DamageableHitBox tempHitBox;
             RaycastHit tempHitInfo;
-            float tempDistance;
             // Default aim position (aim to sky/space)
             _aimTargetPosition = _centerRay.origin + _centerRay.direction * (_centerOriginToCharacterDistance + attackDistance);
             // Aim to damageable hit boxes (higher priority than other entities)
