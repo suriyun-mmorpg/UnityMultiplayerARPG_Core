@@ -29,7 +29,16 @@ namespace MultiplayerARPG
                 Destroy(_hitBoxObject);
         }
 
-        protected static async void DelayClearData(string id)
+        protected static void CreateValidatingData(string id)
+        {
+            if (!s_validatingHits.ContainsKey(id))
+            {
+                s_validatingHits[id] = new HitValidateData();
+                DelayRemoveValidatingData(id);
+            }
+        }
+
+        protected static async void DelayRemoveValidatingData(string id)
         {
             if (s_cancellationTokenSources.ContainsKey(id))
                 s_cancellationTokenSources[id].Cancel();
@@ -37,7 +46,8 @@ namespace MultiplayerARPG
             try
             {
                 s_cancellationTokenSources[id] = cancellationTokenSource;
-                await UniTask.Delay(30 * 1000, true, PlayerLoopTiming.Update, cancellationTokenSource.Token);
+                // Delay 10 seconds before remove the validating data
+                await UniTask.Delay(10 * 1000, true, PlayerLoopTiming.Update, cancellationTokenSource.Token);
                 s_validatingHits.Remove(id);
                 if (s_cancellationTokenSources.ContainsKey(id))
                     s_cancellationTokenSources.Remove(id);
@@ -84,18 +94,15 @@ namespace MultiplayerARPG
                 return;
 
             string id = MakeValidateId(attacker.ObjectId, randomSeed);
-            s_validatingHits[id] = new HitValidateData()
-            {
-                Attacker = attacker,
-                TriggerDurations = triggerDurations,
-                FireSpread = fireSpread,
-                DamageInfo = damageInfo,
-                DamageAmounts = damageAmounts,
-                Weapon = weapon,
-                Skill = skill,
-                SkillLevel = skillLevel,
-            };
-            DelayClearData(id);
+            CreateValidatingData(id);
+            s_validatingHits[id].Attacker = attacker;
+            s_validatingHits[id].TriggerDurations = triggerDurations;
+            s_validatingHits[id].FireSpread = fireSpread;
+            s_validatingHits[id].DamageInfo = damageInfo;
+            s_validatingHits[id].DamageAmounts = damageAmounts;
+            s_validatingHits[id].Weapon = weapon;
+            s_validatingHits[id].Skill = skill;
+            s_validatingHits[id].SkillLevel = skillLevel;
         }
 
         public void IncreasePreparedDamageAmounts(BaseGameEntity attacker, int randomSeed, Dictionary<DamageElement, MinMaxFloat> increaseDamageAmounts)
@@ -114,8 +121,7 @@ namespace MultiplayerARPG
         public void PrepareHitRegOrigin(BaseGameEntity attacker, int randomSeed, byte triggerIndex, byte spreadIndex, Vector3 position, Vector3 direction)
         {
             string id = MakeValidateId(attacker.ObjectId, randomSeed);
-            if (!s_validatingHits.ContainsKey(id))
-                return;
+            CreateValidatingData(id);
 
             string hitId = MakeHitId(triggerIndex, spreadIndex);
             if (s_validatingHits[id].Origins.ContainsKey(hitId))
@@ -188,21 +194,19 @@ namespace MultiplayerARPG
 
         private bool PerformValidation(BaseGameEntity attacker, string id, int simulateSeed, HitData hitData)
         {
-            if (attacker == null || !s_validatingHits.ContainsKey(id))
+            if (attacker == null)
                 return false;
 
-            HitValidateData validateData = s_validatingHits[id];
             string hitId = MakeHitId(hitData.TriggerIndex, hitData.SpreadIndex);
-            if (!validateData.Origins.ContainsKey(hitId))
+            HitValidateData validateData;
+            if (!s_validatingHits.TryGetValue(id, out validateData) || !validateData.Origins.ContainsKey(hitId))
             {
                 // Invalid spread index
+                CreateValidatingData(id);
                 validateData.Pendings.Add(hitId, hitData);
                 return false;
             }
-            else
-            {
-                validateData.Pendings.Remove(hitId);
-            }
+            validateData.Pendings.Remove(hitId);
 
             HitOriginData hitOriginData = validateData.Origins[hitId];
             uint objectId = hitData.ObjectId;
