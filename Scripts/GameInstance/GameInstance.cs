@@ -144,6 +144,8 @@ namespace MultiplayerARPG
         [SerializeField]
         private DimensionType dimensionType = DimensionType.Dimension3D;
         [SerializeField]
+        private BaseStringFormatter stringFormatter = null;
+        [SerializeField]
         private BaseGameSaveSystem saveSystem = null;
         [SerializeField]
         private BaseGameplayRule gameplayRule = null;
@@ -423,6 +425,11 @@ namespace MultiplayerARPG
             get { return !noInventoryWeightLimit; }
         }
 
+        public BaseStringFormatter StringFormatter
+        {
+            get { return stringFormatter; }
+        }
+
         public BaseGameSaveSystem SaveSystem
         {
             get { return saveSystem; }
@@ -623,6 +630,10 @@ namespace MultiplayerARPG
                 defaultDamageElement = ScriptableObject.CreateInstance<DamageElement>()
                     .GenerateDefaultDamageElement(DefaultDamageHitEffects);
             }
+
+            // Setup string formatter if not existed
+            if (stringFormatter == null)
+                stringFormatter = ScriptableObject.CreateInstance<DefaultStringFormatter>();
 
             // Setup save system if not existed
             if (saveSystem == null)

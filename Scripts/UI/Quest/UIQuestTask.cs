@@ -37,10 +37,8 @@ namespace MultiplayerARPG
                     isComplete = Progress >= monsterKillAmount;
                     if (uiTextTaskDescription != null)
                     {
-                        uiTextTaskDescription.text = ZString.Format(
-                            isComplete ?
-                                LanguageManager.GetText(formatKeyTaskKillMonsterComplete) :
-                                LanguageManager.GetText(formatKeyTaskKillMonster), monsterTitle,
+                        uiTextTaskDescription.text = GameInstance.Singleton.StringFormatter.Format(
+                            isComplete ? formatKeyTaskKillMonsterComplete : formatKeyTaskKillMonster, monsterTitle,
                             Progress.ToString("N0"),
                             monsterKillAmount.ToString("N0"));
                         UpdateCustomDescription(isComplete, monsterTitle, Progress, monsterKillAmount);
@@ -53,10 +51,8 @@ namespace MultiplayerARPG
                     isComplete = Progress >= itemCollectAmount;
                     if (uiTextTaskDescription != null)
                     {
-                        uiTextTaskDescription.text = ZString.Format(
-                            isComplete ?
-                                LanguageManager.GetText(formatKeyTaskCollectItemComplete) :
-                                LanguageManager.GetText(formatKeyTaskCollectItem), itemTitle,
+                        uiTextTaskDescription.text = GameInstance.Singleton.StringFormatter.Format(
+                            isComplete ? formatKeyTaskCollectItemComplete : formatKeyTaskCollectItem, itemTitle,
                             Progress.ToString("N0"),
                             itemCollectAmount.ToString("N0"));
                         UpdateCustomDescription(isComplete, itemTitle, Progress, itemCollectAmount);
@@ -69,10 +65,8 @@ namespace MultiplayerARPG
                         isComplete = false;
                     if (uiTextTaskDescription != null)
                     {
-                        uiTextTaskDescription.text = ZString.Format(
-                            isComplete ?
-                                LanguageManager.GetText(formatKeyTaskTalkToNpcComplete) :
-                                LanguageManager.GetText(formatKeyTaskTalkToNpc), npcTitle);
+                        uiTextTaskDescription.text = GameInstance.Singleton.StringFormatter.Format(
+                            isComplete ? formatKeyTaskTalkToNpcComplete : formatKeyTaskTalkToNpc, npcTitle);
                         UpdateCustomDescription(isComplete, npcTitle, Progress, 1);
                     }
                     break;
@@ -91,12 +85,12 @@ namespace MultiplayerARPG
             if (isComplete)
             {
                 if (QuestTask.useCustomCompletedDescription)
-                    uiTextTaskDescription.text = ZString.Format(QuestTask.CustomCompletedDescription, objectTitle, progress.ToString("N0"), target.ToString("N0"));
+                    uiTextTaskDescription.text = GameInstance.Singleton.StringFormatter.Format(QuestTask.CustomCompletedDescription, objectTitle, progress.ToString("N0"), target.ToString("N0"));
             }
             else
             {
                 if (QuestTask.useCustomDescription)
-                    uiTextTaskDescription.text = ZString.Format(QuestTask.CustomDescription, objectTitle, progress.ToString("N0"), target.ToString("N0"));
+                    uiTextTaskDescription.text = GameInstance.Singleton.StringFormatter.Format(QuestTask.CustomDescription, objectTitle, progress.ToString("N0"), target.ToString("N0"));
             }
         }
     }
