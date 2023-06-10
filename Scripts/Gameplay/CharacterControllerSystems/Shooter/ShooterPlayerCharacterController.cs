@@ -931,8 +931,7 @@ namespace MultiplayerARPG
                     }
 
                     tempActivatableEntity = tempGameEntity as IBaseActivatableEntity;
-                    tempDistance = Vector3.Distance(EntityTransform.position, tempActivatableEntity.EntityTransform.position);
-                    if (tempActivatableEntity != null && tempDistance <= tempActivatableEntity.GetActivatableDistance())
+                    if (tempActivatableEntity != null && Vector3.Distance(EntityTransform.position, tempActivatableEntity.EntityTransform.position) <= tempActivatableEntity.GetActivatableDistance())
                     {
                         // Entity is in front of character, so this is target
                         SelectedEntity = tempGameEntity.Entity;
