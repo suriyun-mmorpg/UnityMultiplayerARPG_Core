@@ -175,19 +175,19 @@ namespace MultiplayerARPG
             return 0f;
         }
 
-        public override bool CanMove()
+        protected override bool CanMove_Implementation()
         {
             if (_passengers.TryGetValue(0, out BaseGameEntity driver))
                 return driver.CanMove();
             return false;
         }
 
-        public override bool CanJump()
+        protected override bool CanJump_Implementation()
         {
             return true;
         }
 
-        public override bool CanTurn()
+        protected override bool CanTurn_Implementation()
         {
             return true;
         }

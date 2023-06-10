@@ -191,7 +191,7 @@ namespace MultiplayerARPG
             CacheTransform.eulerAngles = new Vector3(0f, yAngle, 0f);
         }
 
-        public void OnJumpForceApplied()
+        public void OnJumpForceApplied(float verticalVelocity)
         {
 
         }

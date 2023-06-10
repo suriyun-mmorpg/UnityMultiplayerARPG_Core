@@ -141,10 +141,7 @@ namespace MultiplayerARPG
         public float LastUseItemTime { get; set; }
 
         protected int _countDownToSetEquipItemsModels = FRAMES_BEFORE_SET_EQUIP_MODEL;
-        protected float _lastMountTime;
         protected float _lastActionTime;
-        protected bool _lastGrounded;
-        protected Vector3 _lastGroundedPosition;
         #endregion
 
         public IPhysicFunctions AttackPhysicFunctions { get; protected set; }
@@ -503,16 +500,6 @@ namespace MultiplayerARPG
             // Movement
             if (inputState.Has(CharacterInputState.IsMoving) && Movement != null)
                 Movement.ReadServerStateAtClient(reader);
-        }
-
-        protected override void OnTeleport(Vector3 position, Quaternion rotation)
-        {
-            base.OnTeleport(position, rotation);
-            // Clear target entity when teleport
-            SetTargetEntity(null);
-            // Setup ground check data
-            _lastGrounded = true;
-            _lastGroundedPosition = position;
         }
 
         public override void PlayJumpAnimation()
@@ -1124,151 +1111,6 @@ namespace MultiplayerARPG
             if (atkSpeed <= 0.1f)
                 atkSpeed = 0.1f;
             return atkSpeed;
-        }
-
-        public override float GetMoveSpeed(MovementState movementState, ExtraMovementState extraMovementState)
-        {
-            float moveSpeed = CachedData.MoveSpeed;
-            float time = Time.unscaledTime;
-            if (IsAttacking || time - LastAttackEndTime < CurrentGameInstance.returnMoveSpeedDelayAfterAction)
-            {
-                moveSpeed *= MoveSpeedRateWhileAttacking;
-            }
-            else if (IsUsingSkill || time - LastUseSkillEndTime < CurrentGameInstance.returnMoveSpeedDelayAfterAction)
-            {
-                moveSpeed *= MoveSpeedRateWhileUsingSkill;
-            }
-            else if (IsReloading)
-            {
-                moveSpeed *= MoveSpeedRateWhileReloading;
-            }
-            else if (IsCharging)
-            {
-                moveSpeed *= MoveSpeedRateWhileCharging;
-            }
-            if (movementState.Has(MovementState.IsUnderWater))
-            {
-                moveSpeed *= CurrentGameplayRule.GetSwimMoveSpeedRate(this);
-            }
-            else
-            {
-                switch (extraMovementState)
-                {
-                    case ExtraMovementState.IsSprinting:
-                        moveSpeed *= CurrentGameplayRule.GetSprintMoveSpeedRate(this);
-                        break;
-                    case ExtraMovementState.IsWalking:
-                        moveSpeed *= CurrentGameplayRule.GetWalkMoveSpeedRate(this);
-                        break;
-                    case ExtraMovementState.IsCrouching:
-                        moveSpeed *= CurrentGameplayRule.GetCrouchMoveSpeedRate(this);
-                        break;
-                    case ExtraMovementState.IsCrawling:
-                        moveSpeed *= CurrentGameplayRule.GetCrawlMoveSpeedRate(this);
-                        break;
-                }
-            }
-
-            if (CachedData.IsOverweight)
-                moveSpeed *= CurrentGameplayRule.GetOverweightMoveSpeedRate(this);
-
-            return moveSpeed;
-        }
-
-        public override float GetJumpHeight(MovementState movementState, ExtraMovementState extraMovementState)
-        {
-            return CachedData.JumpHeight;
-        }
-
-        public override bool CanMove()
-        {
-            if (this.IsDead())
-                return false;
-            if (CachedData.DisallowMove)
-                return false;
-            return true;
-        }
-
-        public override bool CanSprint()
-        {
-            if (!MovementState.Has(MovementState.IsGrounded) || MovementState.Has(MovementState.IsUnderWater))
-                return false;
-            if (CachedData.DisallowSprint)
-                return false;
-            return CurrentStamina > 0;
-        }
-
-        public override bool CanWalk()
-        {
-            if (!MovementState.Has(MovementState.IsGrounded) || MovementState.Has(MovementState.IsUnderWater))
-                return false;
-            if (CachedData.DisallowWalk)
-                return false;
-            return true;
-        }
-
-        public override bool CanCrouch()
-        {
-            if (!MovementState.Has(MovementState.IsGrounded) || MovementState.Has(MovementState.IsUnderWater))
-                return false;
-            if (CachedData.DisallowCrouch)
-                return false;
-            return true;
-        }
-
-        public override bool CanCrawl()
-        {
-            if (!MovementState.Has(MovementState.IsGrounded) || MovementState.Has(MovementState.IsUnderWater))
-                return false;
-            if (CachedData.DisallowCrawl)
-                return false;
-            return true;
-        }
-
-        public override bool CanJump()
-        {
-            if (CachedData.DisallowJump)
-            {
-                return false;
-            }
-            if (IsAttacking && MovementRestrictionWhileAttacking.jumpRestricted)
-            {
-                return false;
-            }
-            else if (IsUsingSkill && MovementRestrictionWhileUsingSkill.jumpRestricted)
-            {
-                return false;
-            }
-            else if (IsReloading && MovementRestrictionWhileReloading.jumpRestricted)
-            {
-                return false;
-            }
-            else if (IsCharging && MovementRestrictionWhileCharging.jumpRestricted)
-            {
-                return false;
-            }
-            return true;
-        }
-
-        public override bool CanTurn()
-        {
-            if (IsAttacking && MovementRestrictionWhileAttacking.turnRestricted)
-            {
-                return false;
-            }
-            else if (IsUsingSkill && MovementRestrictionWhileUsingSkill.turnRestricted)
-            {
-                return false;
-            }
-            else if (IsReloading && MovementRestrictionWhileReloading.turnRestricted)
-            {
-                return false;
-            }
-            else if (IsCharging && MovementRestrictionWhileCharging.turnRestricted)
-            {
-                return false;
-            }
-            return true;
         }
 
         public override bool IsHide()

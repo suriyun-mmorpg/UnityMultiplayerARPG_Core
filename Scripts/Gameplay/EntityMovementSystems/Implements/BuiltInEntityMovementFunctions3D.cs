@@ -430,11 +430,13 @@ namespace MultiplayerARPG
                 {
                     _isGrounded = false;
                     _applyingJumpForce = false;
+                    float jumpForceVerticalVelocity = CalculateJumpVerticalSpeed();
                     if (!useRootMotionForJump)
                     {
-                        _verticalVelocity = CalculateJumpVerticalSpeed();
+                        _verticalVelocity = jumpForceVerticalVelocity;
                     }
-                    EntityMovement.OnJumpForceApplied();
+                    EntityMovement.OnJumpForceApplied(jumpForceVerticalVelocity);
+                    Entity.OnJumpForceApplied(jumpForceVerticalVelocity);
                 }
             }
             // Updating horizontal movement (WASD inputs)

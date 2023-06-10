@@ -7,7 +7,7 @@ namespace MultiplayerARPG
         bool GroundCheck();
         void Move(Vector3 motion);
         void RotateY(float yAngle);
-        void OnJumpForceApplied();
+        void OnJumpForceApplied(float verticalVelocity);
         Bounds GetBounds();
     }
 }

@@ -9,9 +9,8 @@ namespace MultiplayerARPG
 {
     [RequireComponent(typeof(LiteNetLibIdentity))]
     [DefaultExecutionOrder(0)]
-    public abstract class BaseGameEntity : LiteNetLibBehaviour, IGameEntity, IEntityMovement
+    public abstract partial class BaseGameEntity : LiteNetLibBehaviour, IGameEntity, IEntityMovement
     {
-        public const float GROUND_DETECTION_DISTANCE = 100f;
         public const byte STATE_DATA_CHANNEL = 3;
 
         public int EntityId
@@ -84,7 +83,7 @@ namespace MultiplayerARPG
         {
             get
             {
-                if (PassengingVehicleEntity != null)
+                if (!PassengingVehicleEntity.IsNull())
                 {
                     if (PassengingVehicleSeat.cameraTarget == VehicleSeatCameraTarget.Vehicle)
                         return PassengingVehicleEntity.Entity.CameraTargetTransform;
@@ -103,135 +102,8 @@ namespace MultiplayerARPG
             set { fpsCameraTargetTransform = value; }
         }
 
-        [Category(3, "Entity Movement")]
-        [SerializeField]
-        protected bool canSideSprint = false;
-        public bool CanSideSprint { get { return canSideSprint; } }
-
-        [SerializeField]
-        protected bool canBackwardSprint = false;
-        public bool CanBackwardSprint { get { return canBackwardSprint; } }
-
-        public IEntityMovementComponent Movement { get; private set; }
-
-        public Transform MovementTransform
-        {
-            get
-            {
-                if (PassengingVehicleEntity != null)
-                {
-                    // Track movement position by vehicle entity
-                    return PassengingVehicleEntity.Entity.EntityTransform;
-                }
-                return EntityTransform;
-            }
-        }
-
-        public byte PassengingVehicleSeatIndex { get; private set; }
-
-        private IVehicleEntity passengingVehicleEntity;
-        public IVehicleEntity PassengingVehicleEntity
-        {
-            get
-            {
-                if (passengingVehicleEntity as Object == null)
-                    passengingVehicleEntity = null;
-                return passengingVehicleEntity;
-            }
-            private set
-            {
-                passengingVehicleEntity = value;
-            }
-        }
-
-        public VehicleType PassengingVehicleType
-        {
-            get
-            {
-                if (PassengingVehicleEntity != null)
-                    return PassengingVehicleEntity.VehicleType;
-                return null;
-            }
-        }
-
-        public VehicleSeat PassengingVehicleSeat
-        {
-            get
-            {
-                if (PassengingVehicleEntity != null)
-                    return PassengingVehicleEntity.Seats[PassengingVehicleSeatIndex];
-                return VehicleSeat.Empty;
-            }
-        }
-
-        public GameEntityModel PassengingVehicleModel
-        {
-            get
-            {
-                if (PassengingVehicleEntity != null)
-                    return PassengingVehicleEntity.Entity.Model;
-                return null;
-            }
-        }
-
-        public IEntityMovementComponent ActiveMovement
-        {
-            get
-            {
-                if (PassengingVehicleEntity != null)
-                    return PassengingVehicleEntity.Entity.Movement;
-                return Movement;
-            }
-        }
-
-        public float StoppingDistance
-        {
-            get
-            {
-                return ActiveMovement == null ? 0.1f : ActiveMovement.StoppingDistance;
-            }
-        }
-        public MovementState MovementState
-        {
-            get
-            {
-                return ActiveMovement == null ? MovementState.IsGrounded : ActiveMovement.MovementState;
-            }
-        }
-        public ExtraMovementState ExtraMovementState
-        {
-            get
-            {
-                return ActiveMovement == null ? ExtraMovementState.None : ActiveMovement.ExtraMovementState;
-            }
-        }
-        public DirectionVector2 Direction2D
-        {
-            get
-            {
-                return ActiveMovement == null ? (DirectionVector2)Vector2.down : ActiveMovement.Direction2D;
-            }
-            set
-            {
-                if (ActiveMovement != null)
-                    ActiveMovement.Direction2D = value;
-            }
-        }
-        public float CurrentMoveSpeed
-        {
-            get
-            {
-                return ActiveMovement == null ? 0f : ActiveMovement.CurrentMoveSpeed;
-            }
-        }
         public virtual float MoveAnimationSpeedMultiplier { get { return 1f; } }
         public virtual bool MuteFootstepSound { get { return false; } }
-
-        protected bool _dirtyIsHide;
-        protected bool _isTeleporting;
-        protected bool _stillMoveAfterTeleport;
-        protected Vector3 _teleportingPosition;
-        protected Quaternion _teleportingRotation;
 
         public GameInstance CurrentGameInstance
         {
@@ -257,10 +129,12 @@ namespace MultiplayerARPG
         {
             get { return this; }
         }
+
         public Transform EntityTransform
         {
             get { return transform; }
         }
+
         public GameObject EntityGameObject
         {
             get { return gameObject; }
@@ -278,20 +152,13 @@ namespace MultiplayerARPG
         }
         protected NetDataWriter EntityStateMessageWriter { get; private set; } = new NetDataWriter();
         protected NetDataWriter EntityStateDataWriter { get; private set; } = new NetDataWriter();
-        private bool? _wasUpdateEntityComponents;
 
-        #region Events
-        public event System.Action onStart;
-        public event System.Action onEnable;
-        public event System.Action onDisable;
-        public event System.Action onUpdate;
-        public event System.Action onLateUpdate;
-        public event System.Action onSetup;
-        public event System.Action onSetupNetElements;
-        public event System.Action onSetOwnerClient;
-        public event IsUpdateEntityComponentsDelegate onIsUpdateEntityComponentsChanged;
-        public event NetworkDestroyDelegate onNetworkDestroy;
-        #endregion
+        protected bool _dirtyIsHide;
+        protected bool _isTeleporting;
+        protected bool _stillMoveAfterTeleport;
+        protected Vector3 _teleportingPosition;
+        protected Quaternion _teleportingRotation;
+        private bool? _wasUpdateEntityComponents;
 
         /// <summary>
         /// Override this function to initial required components
@@ -595,7 +462,12 @@ namespace MultiplayerARPG
             syncTitle.syncMode = LiteNetLibSyncField.SyncMode.ServerToClients;
         }
 
-        #region Net Functions
+        #region RPCs
+        public void CallServerEnterVehicle(uint objectId)
+        {
+            RPC(ServerEnterVehicle, objectId);
+        }
+
         [ServerRpc]
         protected void ServerEnterVehicle(uint objectId)
         {
@@ -608,6 +480,10 @@ namespace MultiplayerARPG
                     EnterVehicle(vehicleEntity, seatIndex);
             }
 #endif
+        }
+        public void CallServerEnterVehicleToSeat(uint objectId, byte seatIndex)
+        {
+            RPC(ServerEnterVehicleToSeat, objectId, seatIndex);
         }
 
         [ServerRpc]
@@ -622,6 +498,11 @@ namespace MultiplayerARPG
                     EnterVehicle(vehicleEntity, seatIndex);
             }
 #endif
+        }
+
+        public void CallServerExitVehicle()
+        {
+            RPC(ServerExitVehicle);
         }
 
         [ServerRpc]
@@ -678,23 +559,6 @@ namespace MultiplayerARPG
         }
         #endregion
 
-        #region RPC Calls
-        public void CallServerEnterVehicle(uint objectId)
-        {
-            RPC(ServerEnterVehicle, objectId);
-        }
-
-        public void CallServerEnterVehicleToSeat(uint objectId, byte seatIndex)
-        {
-            RPC(ServerEnterVehicleToSeat, objectId, seatIndex);
-        }
-
-        public void CallServerExitVehicle()
-        {
-            RPC(ServerExitVehicle);
-        }
-        #endregion
-
         public override void OnNetworkDestroy(byte reasons)
         {
             base.OnNetworkDestroy(reasons);
@@ -702,151 +566,9 @@ namespace MultiplayerARPG
                 onNetworkDestroy.Invoke(reasons);
         }
 
-        public float GetMoveSpeed()
-        {
-            return GetMoveSpeed(MovementState, ExtraMovementState);
-        }
-
-        public virtual float GetMoveSpeed(MovementState movementState, ExtraMovementState extraMovementState)
-        {
-            return 0f;
-        }
-
-        public float GetJumpHeight()
-        {
-            return GetJumpHeight(MovementState, ExtraMovementState);
-        }
-
-        public virtual float GetJumpHeight(MovementState movementState, ExtraMovementState extraMovementState)
-        {
-            return 0f;
-        }
-
-        public virtual bool CanMove()
-        {
-            return false;
-        }
-
-        public virtual bool CanSprint()
-        {
-            return false;
-        }
-
-        public virtual bool CanWalk()
-        {
-            return false;
-        }
-
-        public virtual bool CanCrouch()
-        {
-            return false;
-        }
-
-        public virtual bool CanCrawl()
-        {
-            return false;
-        }
-
-        public virtual bool CanJump()
-        {
-            return false;
-        }
-
-        public virtual bool CanTurn()
-        {
-            return false;
-        }
-
         public virtual bool IsHide()
         {
             return false;
-        }
-
-        public void StopMove()
-        {
-            if (ActiveMovement != null)
-                ActiveMovement.StopMove();
-        }
-
-        public void KeyMovement(Vector3 moveDirection, MovementState moveState)
-        {
-            if (ActiveMovement != null)
-                ActiveMovement.KeyMovement(moveDirection, moveState);
-        }
-
-        public void PointClickMovement(Vector3 position)
-        {
-            if (ActiveMovement != null)
-                ActiveMovement.PointClickMovement(position);
-        }
-
-        public void SetExtraMovementState(ExtraMovementState extraMovementState)
-        {
-            if (ActiveMovement != null)
-                ActiveMovement.SetExtraMovementState(extraMovementState);
-        }
-
-        public void SetLookRotation(Quaternion rotation)
-        {
-            if (ActiveMovement != null)
-                ActiveMovement.SetLookRotation(rotation);
-        }
-
-        public Quaternion GetLookRotation()
-        {
-            if (ActiveMovement != null)
-                return ActiveMovement.GetLookRotation();
-            return Quaternion.identity;
-        }
-
-        public void SetSmoothTurnSpeed(float speed)
-        {
-            if (ActiveMovement != null)
-                ActiveMovement.SetSmoothTurnSpeed(speed);
-        }
-
-        public float GetSmoothTurnSpeed()
-        {
-            if (ActiveMovement != null)
-                return ActiveMovement.GetSmoothTurnSpeed();
-            return 0f;
-        }
-
-        public void Teleport(Vector3 position, Quaternion rotation, bool stillMoveAfterTeleport)
-        {
-            if (ActiveMovement == null)
-            {
-                // Can't teleport properly yet, try to teleport later
-                _teleportingPosition = position;
-                _teleportingRotation = rotation;
-                _isTeleporting = true;
-                _stillMoveAfterTeleport = stillMoveAfterTeleport;
-                return;
-            }
-            if (FindGroundedPosition(position, GROUND_DETECTION_DISTANCE, out Vector3 groundedPosition))
-            {
-                // Set position to grounded position, to make it not float and fall
-                position = groundedPosition;
-            }
-            if (IsServer)
-            {
-                // Teleport to the `position`, `rotation`
-                ActiveMovement.Teleport(position, rotation, stillMoveAfterTeleport);
-            }
-            OnTeleport(position, rotation);
-        }
-
-        protected virtual void OnTeleport(Vector3 position, Quaternion rotation)
-        {
-
-        }
-
-        public bool FindGroundedPosition(Vector3 fromPosition, float findDistance, out Vector3 result)
-        {
-            result = EntityTransform.position;
-            if (ActiveMovement != null)
-                return ActiveMovement.FindGroundedPosition(fromPosition, findDistance, out result);
-            return true;
         }
 
         public virtual void PlayJumpAnimation()
@@ -865,71 +587,6 @@ namespace MultiplayerARPG
         {
             if (Model is ICustomAnimationModel customAnimationModel)
                 customAnimationModel.PlayCustomAnimation(id);
-        }
-
-        protected bool EnterVehicle(IVehicleEntity vehicle, byte seatIndex)
-        {
-            if (!IsServer || vehicle == null || !vehicle.IsSeatAvailable(seatIndex))
-                return false;
-
-            // Change object owner to driver
-            if (vehicle.IsDriver(seatIndex))
-                Manager.Assets.SetObjectOwner(vehicle.Entity.ObjectId, ConnectionId);
-
-            // Set passenger to vehicle
-            vehicle.SetPassenger(seatIndex, this);
-
-            return true;
-        }
-
-        protected void ExitVehicle()
-        {
-            if (!IsServer || PassengingVehicleEntity == null)
-                return;
-
-            bool isDriver = PassengingVehicleEntity.IsDriver(PassengingVehicleSeatIndex);
-            bool isDestroying = PassengingVehicleEntity.IsDestroyWhenExit(PassengingVehicleSeatIndex);
-
-            // Clear object owner from driver
-            if (PassengingVehicleEntity.IsDriver(PassengingVehicleSeatIndex))
-                Manager.Assets.SetObjectOwner(PassengingVehicleEntity.Entity.ObjectId, -1);
-
-            BaseGameEntity vehicleEntity = PassengingVehicleEntity.Entity;
-            if (isDestroying)
-            {
-                // Remove all entity from vehicle
-                PassengingVehicleEntity.RemoveAllPassengers();
-                // Destroy vehicle entity
-                vehicleEntity.NetworkDestroy();
-            }
-            else
-            {
-                // Remove this from vehicle
-                PassengingVehicleEntity.RemovePassenger(PassengingVehicleSeatIndex);
-                // Stop move if driver exit (if not driver continue move by driver controls)
-                if (isDriver)
-                    vehicleEntity.StopMove();
-            }
-        }
-
-        /// <summary>
-        /// This function will be called by Vehicle Entity to inform that this entity exited vehicle
-        /// </summary>
-        public void ExitedVehicle(Vector3 exitPosition, Quaternion exitRotation)
-        {
-            CallAllOnExitVehicle();
-            Teleport(exitPosition, exitRotation, true);
-        }
-
-        public virtual void ClearPassengingVehicle()
-        {
-            SetPassengingVehicle(0, null);
-        }
-
-        public virtual void SetPassengingVehicle(byte seatIndex, IVehicleEntity vehicleEntity)
-        {
-            PassengingVehicleSeatIndex = seatIndex;
-            PassengingVehicleEntity = vehicleEntity;
         }
 
         public virtual bool SetAsTargetInOneClick()

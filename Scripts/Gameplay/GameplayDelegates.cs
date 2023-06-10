@@ -108,4 +108,28 @@ namespace MultiplayerARPG
         uint objectId,
         byte hitBoxIndex,
         Vector3 hitPoint);
+
+    public delegate void CanMoveDelegate(
+        ref bool canMove);
+
+    public delegate void CanSprintDelegate(
+        ref bool canSprint);
+
+    public delegate void CanWalkDelegate(
+        ref bool canWalk);
+
+    public delegate void CanCrouchDelegate(
+        ref bool canCrouch);
+
+    public delegate void CanCrawlDelegate(
+        ref bool canCrawl);
+
+    public delegate void CanJumpDelegate(
+        ref bool canJump);
+
+    public delegate void CanTurnDelegate(
+        ref bool canTurn);
+
+    public delegate void JumpForceAppliedDelegate(
+        float verticalVelocity);
 }

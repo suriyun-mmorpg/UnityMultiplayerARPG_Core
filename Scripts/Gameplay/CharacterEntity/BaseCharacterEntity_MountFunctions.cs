@@ -5,6 +5,8 @@ namespace MultiplayerARPG
 {
     public partial class BaseCharacterEntity
     {
+        protected float _lastMountTime;
+
         public virtual void Mount(VehicleEntity mountEntityPrefab)
         {
             if (!IsServer || mountEntityPrefab == null || Time.unscaledTime - _lastMountTime < CurrentGameInstance.mountDelay)
