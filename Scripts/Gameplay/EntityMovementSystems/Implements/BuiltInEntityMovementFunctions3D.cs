@@ -1004,8 +1004,9 @@ namespace MultiplayerARPG
                     // Movement validating, if it is valid, set the position follow the client, if not set position to proper one and tell client to teleport
                     float clientHorMoveDist = Vector3.Distance(oldPos.GetXZ(), newPos.GetXZ());
                     float clientVerMoveDist = Mathf.Abs(newPos.y - oldPos.y);
-                    if ((clientHorMoveDist <= 0.001f || clientHorMoveDist <= horMoveableDist + _lastServerValidateHorDistDiff) &&
-                        (clientVerMoveDist <= 0.001f || clientVerMoveDist <= verMoveableDist + _lastServerValidateVerDistDiff))
+                    // TODO: Skip validating while root motion enabled, just for now, I will find a way to validate root motion movement later
+                    bool rootMotionEnabled = useRootMotionForMovement || useRootMotionForAirMovement || useRootMotionForJump || useRootMotionForFall || useRootMotionWhileNotMoving || useRootMotionUnderWater;
+                    if (rootMotionEnabled || ((clientHorMoveDist <= 0.001f || clientHorMoveDist <= horMoveableDist + _lastServerValidateHorDistDiff) && (clientVerMoveDist <= 0.001f || clientVerMoveDist <= verMoveableDist + _lastServerValidateVerDistDiff)))
                     {
                         // Allow to move to the position
                         CacheTransform.position = newPos;
