@@ -2,13 +2,14 @@ using UnityEngine;
 
 namespace MultiplayerARPG
 {
-    [CreateAssetMenu(fileName = GameDataMenuConsts.DEFAULT_STRING_FORMATTER_FILE, menuName = GameDataMenuConsts.DEFAULT_STRING_FORMATTER_MENU, order = GameDataMenuConsts.DEFAULT_STRING_FORMATTER_ORDER)]
-    public class DefaultStringFormatter : BaseStringFormatter
+    [CreateAssetMenu(fileName = GameDataMenuConsts.DEFAULT_MESSAGE_MANAGER_FILE, menuName = GameDataMenuConsts.DEFAULT_MESSAGE_MANAGER_MENU, order = GameDataMenuConsts.DEFAULT_MESSAGE_MANAGER_ORDER)]
+    public class DefaultMessageManager : BaseMessageManager
     {
-        public override string PreprocessFormat(string format)
+        public override string ReplaceMessageKeys(string format)
         {
             format = format.Replace("@characterName", GameInstance.PlayingCharacter != null ? GameInstance.PlayingCharacter.CharacterName : "?");
             format = format.Replace("@level", GameInstance.PlayingCharacter != null ? GameInstance.PlayingCharacter.Level.ToString("N0") : "?");
+            format = format.Replace("@characterClass", GameInstance.PlayingCharacter != null ? GameInstance.PlayingCharacter.GetDatabase().Title : "?");
             format = format.Replace("@exp", GameInstance.PlayingCharacter != null ? GameInstance.PlayingCharacter.Exp.ToString("N0") : "?");
             format = format.Replace("@nextExp", GameInstance.PlayingCharacter != null ? GameInstance.PlayingCharacter.GetNextLevelExp().ToString("N0") : "?");
             format = format.Replace("@currentHp", GameInstance.PlayingCharacter != null ? GameInstance.PlayingCharacter.CurrentHp.ToString("N0") : "?");

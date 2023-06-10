@@ -144,7 +144,7 @@ namespace MultiplayerARPG
         [SerializeField]
         private DimensionType dimensionType = DimensionType.Dimension3D;
         [SerializeField]
-        private BaseStringFormatter stringFormatter = null;
+        private BaseMessageManager messageManager = null;
         [SerializeField]
         private BaseGameSaveSystem saveSystem = null;
         [SerializeField]
@@ -425,9 +425,9 @@ namespace MultiplayerARPG
             get { return !noInventoryWeightLimit; }
         }
 
-        public BaseStringFormatter StringFormatter
+        public BaseMessageManager MessageManager
         {
-            get { return stringFormatter; }
+            get { return messageManager; }
         }
 
         public BaseGameSaveSystem SaveSystem
@@ -632,8 +632,8 @@ namespace MultiplayerARPG
             }
 
             // Setup string formatter if not existed
-            if (stringFormatter == null)
-                stringFormatter = ScriptableObject.CreateInstance<DefaultStringFormatter>();
+            if (messageManager == null)
+                messageManager = ScriptableObject.CreateInstance<DefaultMessageManager>();
 
             // Setup save system if not existed
             if (saveSystem == null)
