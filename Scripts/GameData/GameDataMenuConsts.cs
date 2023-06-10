@@ -2,6 +2,12 @@ namespace MultiplayerARPG
 {
     public partial class GameDataMenuConsts
     {
+        #region Other
+        public const string DEFAULT_STRING_FORMATTER_FILE = "Default String Formatter";
+        public const string DEFAULT_STRING_FORMATTER_MENU = "Create StringFormatter/Default String Formatter";
+        public const int DEFAULT_STRING_FORMATTER_ORDER = -7999;
+        #endregion
+
         #region Game Database
         public const string GAME_DATABASE_FILE = "Game Database";
         public const string GAME_DATABASE_MENU = "Create GameDatabase/Game Database";

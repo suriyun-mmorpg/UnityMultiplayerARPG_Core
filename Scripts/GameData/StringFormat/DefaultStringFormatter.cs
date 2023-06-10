@@ -1,5 +1,8 @@
+using UnityEngine;
+
 namespace MultiplayerARPG
 {
+    [CreateAssetMenu(fileName = GameDataMenuConsts.DEFAULT_STRING_FORMATTER_FILE, menuName = GameDataMenuConsts.DEFAULT_STRING_FORMATTER_MENU, order = GameDataMenuConsts.DEFAULT_STRING_FORMATTER_ORDER)]
     public class DefaultStringFormatter : BaseStringFormatter
     {
         public override string PreprocessFormat(string format)
