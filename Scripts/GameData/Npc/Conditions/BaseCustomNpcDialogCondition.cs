@@ -5,6 +5,6 @@ namespace MultiplayerARPG
 {
     public abstract class BaseCustomNpcDialogCondition : ScriptableObject
     {
-        public abstract UniTask<bool> IsPass(IPlayerCharacterData playerCharacterEntity);
+        public abstract UniTask<bool> IsPass(IPlayerCharacterData player);
     }
 }

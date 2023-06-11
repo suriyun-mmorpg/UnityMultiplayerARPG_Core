@@ -1,4 +1,6 @@
-﻿using LiteNetLibManager;
+﻿using Cysharp.Threading.Tasks;
+using LiteNetLibManager;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace MultiplayerARPG
@@ -7,39 +9,7 @@ namespace MultiplayerARPG
     public partial class PlayerCharacterNpcActionComponent : BaseNetworkedGameEntityComponent<BasePlayerCharacterEntity>
     {
         protected BaseNpcDialog _currentNpcDialog;
-        public BaseNpcDialog CurrentNpcDialog
-        {
-            get { return _currentNpcDialog; }
-            set
-            {
-                if (IsServer && value != null && value.EnterDialogActionsOnServer.Count > 0)
-                {
-                    bool actionFail = false;
-                    UITextKeys failMessage = UITextKeys.NONE;
-                    foreach (BaseNpcDialogAction action in value.EnterDialogActionsOnClient)
-                    {
-                        if (!action.PassCondition(Entity, out failMessage))
-                        {
-                            actionFail = true;
-                            break;
-                        }
-                    }
-                    if (!actionFail)
-                    {
-                        foreach (BaseNpcDialogAction action in value.EnterDialogActionsOnClient)
-                        {
-                            action.DoAction(Entity);
-                        }
-                    }
-                    else
-                    {
-                        GameInstance.ServerGameMessageHandlers.SendGameMessage(Entity.ConnectionId, failMessage);
-                        value = null;
-                    }
-                }
-                _currentNpcDialog = value;
-            }
-        }
+        public BaseNpcDialog CurrentNpcDialog { get => _currentNpcDialog; }
         public Quest CompletingQuest { get; set; }
         public BaseNpcDialog NpcDialogAfterSelectRewardItem { get; set; }
 
@@ -55,9 +25,23 @@ namespace MultiplayerARPG
         public event System.Action onShowNpcDismantleItem;
         public event System.Action onShowNpcRepairItem;
 
+        public async UniTask SetServerCurrentDialog(BaseNpcDialog npcDialog)
+        {
+            if (!IsServer)
+                return;
+            if (npcDialog != null && npcDialog.EnterDialogActionsOnServer.Count > 0)
+            {
+                if (await npcDialog.IsPassEnterDialogActionConditionsOnServer(Entity))
+                    await npcDialog.DoEnterDialogActionsOnServer(Entity);
+                else
+                    npcDialog = null;
+            }
+            _currentNpcDialog = npcDialog;
+        }
+
         public void ClearNpcDialogData()
         {
-            CurrentNpcDialog = null;
+            _currentNpcDialog = null;
             CompletingQuest = null;
             NpcDialogAfterSelectRewardItem = null;
         }
@@ -90,7 +74,7 @@ namespace MultiplayerARPG
         }
 
         [ServerRpc]
-        protected void ServerNpcActivate(uint objectId)
+        protected async void ServerNpcActivate(uint objectId)
         {
 #if UNITY_EDITOR || UNITY_SERVER
             if (!Entity.CanDoActions())
@@ -109,7 +93,7 @@ namespace MultiplayerARPG
             }
 
             // Show start dialog
-            CurrentNpcDialog = npcEntity.StartDialog;
+            await SetServerCurrentDialog(npcEntity.StartDialog);
 
             // Update task
             CharacterQuest tempCharacterQuest;
@@ -125,7 +109,7 @@ namespace MultiplayerARPG
                 tempQuest = tempCharacterQuest.GetQuest();
                 if (tempQuest == null || !tempQuest.HaveToTalkToNpc(Entity, npcEntity, out tempTaskIndex, out tempTalkToNpcTaskDialog, out tempCompleteAfterTalked))
                     continue;
-                CurrentNpcDialog = tempTalkToNpcTaskDialog;
+                await SetServerCurrentDialog(tempTalkToNpcTaskDialog);
                 if (!tempCharacterQuest.CompletedTasks.Contains(tempTaskIndex))
                     tempCharacterQuest.CompletedTasks.Add(tempTaskIndex);
                 Entity.Quests[i] = tempCharacterQuest;
@@ -138,13 +122,13 @@ namespace MultiplayerARPG
                         CallOwnerShowQuestRewardItemSelection(tempQuest.DataId);
                         CompletingQuest = tempQuest;
                         NpcDialogAfterSelectRewardItem = tempTalkToNpcTaskDialog;
-                        CurrentNpcDialog = null;
+                        await SetServerCurrentDialog(null);
                     }
                     else
                     {
                         // No selectable reward items, complete the quest immediately
                         if (!Entity.CompleteQuest(tempQuest.DataId, 0))
-                            CurrentNpcDialog = null;
+                            await SetServerCurrentDialog(null);
                     }
                     break;
                 }
@@ -187,7 +171,7 @@ namespace MultiplayerARPG
         }
 
         [TargetRpc]
-        protected void TargetShowNpcDialog(int npcDialogDataId)
+        protected async void TargetShowNpcDialog(int npcDialogDataId)
         {
             // Show npc dialog by dataId, if it can't find dialog, it will hide
             if (!GameInstance.NpcDialogs.TryGetValue(npcDialogDataId, out BaseNpcDialog npcDialog))
@@ -195,28 +179,10 @@ namespace MultiplayerARPG
 
             if (npcDialog != null && npcDialog.EnterDialogActionsOnClient.Count > 0)
             {
-                bool actionFail = false;
-                UITextKeys failMessage = UITextKeys.NONE;
-                foreach (BaseNpcDialogAction action in npcDialog.EnterDialogActionsOnClient)
-                {
-                    if (!action.PassCondition(Entity, out failMessage))
-                    {
-                        actionFail = true;
-                        break;
-                    }
-                }
-                if (!actionFail)
-                {
-                    foreach (BaseNpcDialogAction action in npcDialog.EnterDialogActionsOnClient)
-                    {
-                        action.DoAction(Entity);
-                    }
-                }
+                if (await npcDialog.IsPassEnterDialogActionConditionsOnClient(Entity))
+                    await npcDialog.DoEnterDialogActionsOnClient(Entity);
                 else
-                {
-                    ClientGenericActions.ClientReceiveGameMessage(failMessage);
                     npcDialog = null;
-                }
             }
 
             if (onShowNpcDialog != null)
@@ -386,7 +352,7 @@ namespace MultiplayerARPG
         }
 
         [ServerRpc]
-        protected void ServerSelectQuestRewardItem(byte index)
+        protected async void ServerSelectQuestRewardItem(byte index)
         {
 #if UNITY_EDITOR || UNITY_SERVER
             if (CompletingQuest == null)
@@ -395,7 +361,7 @@ namespace MultiplayerARPG
             if (!Entity.CompleteQuest(CompletingQuest.DataId, index))
                 return;
 
-            CurrentNpcDialog = NpcDialogAfterSelectRewardItem;
+            await SetServerCurrentDialog(NpcDialogAfterSelectRewardItem);
             if (CurrentNpcDialog != null)
             {
                 // Show Npc dialog on client

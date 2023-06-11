@@ -159,5 +159,57 @@ namespace MultiplayerARPG
         public abstract UniTask GoToNextDialog(BasePlayerCharacterEntity characterEntity, byte menuIndex);
         protected abstract void SetDialogByPort(NodePort from, NodePort to);
         public abstract bool IsShop { get; }
+
+        public async UniTask<bool> IsPassEnterDialogActionConditionsOnClient(IPlayerCharacterData player)
+        {
+            List<UniTask<bool>> tasks = new List<UniTask<bool>>();
+            foreach (BaseNpcDialogAction action in EnterDialogActionsOnClient)
+            {
+                tasks.Add(action.IsPass(player));
+            }
+            bool[] isPasses = await UniTask.WhenAll(tasks);
+            foreach (bool isPass in isPasses)
+            {
+                if (!isPass)
+                    return false;
+            }
+            return true;
+        }
+
+        public async UniTask<bool> IsPassEnterDialogActionConditionsOnServer(IPlayerCharacterData player)
+        {
+            List<UniTask<bool>> tasks = new List<UniTask<bool>>();
+            foreach (BaseNpcDialogAction action in EnterDialogActionsOnServer)
+            {
+                tasks.Add(action.IsPass(player));
+            }
+            bool[] isPasses = await UniTask.WhenAll(tasks);
+            foreach (bool isPass in isPasses)
+            {
+                if (!isPass)
+                    return false;
+            }
+            return true;
+        }
+
+        public async UniTask DoEnterDialogActionsOnClient(IPlayerCharacterData player)
+        {
+            List<UniTask> tasks = new List<UniTask>();
+            foreach (BaseNpcDialogAction action in EnterDialogActionsOnClient)
+            {
+                tasks.Add(action.DoAction(player));
+            }
+            await UniTask.WhenAll(tasks);
+        }
+
+        public async UniTask DoEnterDialogActionsOnServer(IPlayerCharacterData player)
+        {
+            List<UniTask> tasks = new List<UniTask>();
+            foreach (BaseNpcDialogAction action in EnterDialogActionsOnServer)
+            {
+                tasks.Add(action.DoAction(player));
+            }
+            await UniTask.WhenAll(tasks);
+        }
     }
 }
