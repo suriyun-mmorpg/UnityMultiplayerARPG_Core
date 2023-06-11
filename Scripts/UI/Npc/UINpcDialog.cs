@@ -109,14 +109,14 @@ namespace MultiplayerARPG
 
             if (uiTextTitle != null)
             {
-                uiTextTitle.text = GameInstance.Singleton.MessageManager.ReplaceMessageKeys(ZString.Format(
+                uiTextTitle.text = GameInstance.Singleton.MessageManager.ReplaceKeysToMessages(ZString.Format(
                     LanguageManager.GetText(formatKeyTitle),
                     Data == null ? LanguageManager.GetUnknowTitle() : Data.Title));
             }
 
             if (uiTextDescription != null)
             {
-                uiTextDescription.text = GameInstance.Singleton.MessageManager.ReplaceMessageKeys(ZString.Format(
+                uiTextDescription.text = GameInstance.Singleton.MessageManager.ReplaceKeysToMessages(ZString.Format(
                     LanguageManager.GetText(formatKeyDescription),
                     Data == null ? LanguageManager.GetUnknowDescription() : Data.Description));
             }

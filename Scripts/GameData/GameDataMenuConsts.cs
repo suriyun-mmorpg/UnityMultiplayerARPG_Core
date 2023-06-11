@@ -3,8 +3,8 @@ namespace MultiplayerARPG
     public partial class GameDataMenuConsts
     {
         #region Other
-        public const string DEFAULT_MESSAGE_MANAGER_FILE = "Default String Formatter";
-        public const string DEFAULT_MESSAGE_MANAGER_MENU = "Create StringFormatter/Default String Formatter";
+        public const string DEFAULT_MESSAGE_MANAGER_FILE = "Default Message Manager";
+        public const string DEFAULT_MESSAGE_MANAGER_MENU = "Create MessageManager/Default Message Manager";
         public const int DEFAULT_MESSAGE_MANAGER_ORDER = -7999;
         #endregion
 

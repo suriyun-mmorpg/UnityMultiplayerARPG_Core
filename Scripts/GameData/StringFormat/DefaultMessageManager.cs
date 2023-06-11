@@ -5,7 +5,7 @@ namespace MultiplayerARPG
     [CreateAssetMenu(fileName = GameDataMenuConsts.DEFAULT_MESSAGE_MANAGER_FILE, menuName = GameDataMenuConsts.DEFAULT_MESSAGE_MANAGER_MENU, order = GameDataMenuConsts.DEFAULT_MESSAGE_MANAGER_ORDER)]
     public class DefaultMessageManager : BaseMessageManager
     {
-        public override string ReplaceMessageKeys(string format)
+        public override string ReplaceKeysToMessages(string format)
         {
             format = format.Replace("@characterName", GameInstance.PlayingCharacter != null ? GameInstance.PlayingCharacter.CharacterName : "?");
             format = format.Replace("@level", GameInstance.PlayingCharacter != null ? GameInstance.PlayingCharacter.Level.ToString("N0") : "?");
