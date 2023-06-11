@@ -12,8 +12,13 @@ namespace MultiplayerARPG
             get { return _currentNpcDialog; }
             set
             {
-                if (IsServer && value != null && value.EnterDialogActionOnServer != null)
-                    value.EnterDialogActionOnServer.DoAction(Entity);
+                if (IsServer && value != null && value.EnterDialogActionsOnServer.Count > 0)
+                {
+                    foreach (BaseNpcDialogAction action in value.EnterDialogActionsOnServer)
+                    {
+                        action.DoAction(Entity);
+                    }
+                }
                 _currentNpcDialog = value;
             }
         }
@@ -170,8 +175,13 @@ namespace MultiplayerARPG
             if (!GameInstance.NpcDialogs.TryGetValue(npcDialogDataId, out BaseNpcDialog npcDialog))
                 npcDialog = null;
 
-            if (npcDialog != null && npcDialog.EnterDialogActionOnClient != null)
-                npcDialog.EnterDialogActionOnClient.DoAction(GameInstance.PlayingCharacter);
+            if (npcDialog != null && npcDialog.EnterDialogActionsOnClient.Count > 0)
+            {
+                foreach (BaseNpcDialogAction action in npcDialog.EnterDialogActionsOnClient)
+                {
+                    action.DoAction(Entity);
+                }
+            }
 
             if (onShowNpcDialog != null)
                 onShowNpcDialog.Invoke(npcDialog);

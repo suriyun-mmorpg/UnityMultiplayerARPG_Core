@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using XNode;
 using Cysharp.Threading.Tasks;
+using System.Collections.Generic;
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
@@ -15,16 +16,20 @@ namespace MultiplayerARPG
         [Tooltip("Default title")]
         public string title;
         [Tooltip("Titles by language keys")]
-        public LanguageData[] titles;
+        public LanguageData[] titles = new LanguageData[0];
         [Tooltip("Default description")]
         [TextArea]
         public string description;
         [Tooltip("Descriptions by language keys")]
-        public LanguageData[] descriptions;
+        public LanguageData[] descriptions = new LanguageData[0];
         public Sprite icon;
         public AudioClip voice;
+        [HideInInspector]
         public BaseNpcDialogAction enterDialogActionOnClient;
+        public List<BaseNpcDialogAction> enterDialogActionsOnClient = new List<BaseNpcDialogAction>();
+        [HideInInspector]
         public BaseNpcDialogAction enterDialogActionOnServer;
+        public List<BaseNpcDialogAction> enterDialogActionsOnServer = new List<BaseNpcDialogAction>();
 
         #region Generic Data
         public string Id { get { return name; } }
@@ -51,14 +56,14 @@ namespace MultiplayerARPG
             get { return voice; }
         }
 
-        public BaseNpcDialogAction EnterDialogActionOnClient
+        public List<BaseNpcDialogAction> EnterDialogActionsOnClient
         {
-            get { return enterDialogActionOnClient; }
+            get { return enterDialogActionsOnClient; }
         }
 
-        public BaseNpcDialogAction EnterDialogActionOnServer
+        public List<BaseNpcDialogAction> EnterDialogActionsOnServer
         {
-            get { return enterDialogActionOnServer; }
+            get { return enterDialogActionsOnServer; }
         }
 
         public static int MakeDataId(string id)
@@ -77,7 +82,20 @@ namespace MultiplayerARPG
 
         public virtual bool Validate()
         {
-            return false;
+            bool hasChanges = false;
+            if (enterDialogActionOnClient != null)
+            {
+                enterDialogActionsOnClient.Add(enterDialogActionOnClient);
+                enterDialogActionOnClient = null;
+                hasChanges = true;
+            }
+            if (enterDialogActionOnServer != null)
+            {
+                enterDialogActionsOnServer.Add(enterDialogActionOnServer);
+                enterDialogActionOnServer = null;
+                hasChanges = true;
+            }
+            return hasChanges;
         }
 
         public virtual void PrepareRelatesData()
