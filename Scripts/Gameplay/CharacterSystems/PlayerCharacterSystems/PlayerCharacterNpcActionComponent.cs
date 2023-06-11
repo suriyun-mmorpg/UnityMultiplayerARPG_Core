@@ -14,9 +14,27 @@ namespace MultiplayerARPG
             {
                 if (IsServer && value != null && value.EnterDialogActionsOnServer.Count > 0)
                 {
-                    foreach (BaseNpcDialogAction action in value.EnterDialogActionsOnServer)
+                    bool actionFail = false;
+                    UITextKeys failMessage = UITextKeys.NONE;
+                    foreach (BaseNpcDialogAction action in value.EnterDialogActionsOnClient)
                     {
-                        action.DoAction(Entity);
+                        if (!action.PassCondition(Entity, out failMessage))
+                        {
+                            actionFail = true;
+                            break;
+                        }
+                    }
+                    if (!actionFail)
+                    {
+                        foreach (BaseNpcDialogAction action in value.EnterDialogActionsOnClient)
+                        {
+                            action.DoAction(Entity);
+                        }
+                    }
+                    else
+                    {
+                        GameInstance.ServerGameMessageHandlers.SendGameMessage(Entity.ConnectionId, failMessage);
+                        value = null;
                     }
                 }
                 _currentNpcDialog = value;
@@ -177,9 +195,27 @@ namespace MultiplayerARPG
 
             if (npcDialog != null && npcDialog.EnterDialogActionsOnClient.Count > 0)
             {
+                bool actionFail = false;
+                UITextKeys failMessage = UITextKeys.NONE;
                 foreach (BaseNpcDialogAction action in npcDialog.EnterDialogActionsOnClient)
                 {
-                    action.DoAction(Entity);
+                    if (!action.PassCondition(Entity, out failMessage))
+                    {
+                        actionFail = true;
+                        break;
+                    }
+                }
+                if (!actionFail)
+                {
+                    foreach (BaseNpcDialogAction action in npcDialog.EnterDialogActionsOnClient)
+                    {
+                        action.DoAction(Entity);
+                    }
+                }
+                else
+                {
+                    ClientGenericActions.ClientReceiveGameMessage(failMessage);
+                    npcDialog = null;
                 }
             }
 
