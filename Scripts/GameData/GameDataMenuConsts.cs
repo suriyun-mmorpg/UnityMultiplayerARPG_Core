@@ -203,6 +203,22 @@ namespace MultiplayerARPG
         public const string NPC_DIALOG_GRAPH_MENU = "Create GameData/NpcDialog/Npc Dialog Graph";
         public const int NPC_DIALOG_GRAPH_ORDER = -5398;
 
+        public const string INCREASE_ITEM_DIALOG_ACTION_FILE = "Increase Item Dialog Action";
+        public const string INCREASE_ITEM_DIALOG_ACTION_MENU = "Create GameData/NpcDialogAction/Increase Item Dialog Action";
+        public const int INCREASE_ITEM_DIALOG_ACTION_ORDER = -5349;
+
+        public const string INCREASE_GOLD_DIALOG_ACTION_FILE = "Increase Gold Dialog Action";
+        public const string INCREASE_GOLD_DIALOG_ACTION_MENU = "Create GameData/NpcDialogAction/Increase Gold Dialog Action";
+        public const int INCREASE_GOLD_DIALOG_ACTION_ORDER = -5348;
+
+        public const string DECREASE_ITEM_DIALOG_ACTION_FILE = "Decrease Item Dialog Action";
+        public const string DECREASE_ITEM_DIALOG_ACTION_MENU = "Create GameData/NpcDialogAction/Decrease Item Dialog Action";
+        public const int DECREASE_ITEM_DIALOG_ACTION_ORDER = -5349;
+
+        public const string DECREASE_GOLD_DIALOG_ACTION_FILE = "Decrease Gold Dialog Action";
+        public const string DECREASE_GOLD_DIALOG_ACTION_MENU = "Create GameData/NpcDialogAction/Decrease Gold Dialog Action";
+        public const int DECREASE_GOLD_DIALOG_ACTION_ORDER = -5348;
+
         public const string QUEST_FILE = "Quest";
         public const string QUEST_MENU = "Create GameData/Quest";
         public const int QUEST_ORDER = -5299;

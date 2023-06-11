@@ -1,7 +1,9 @@
 using Cysharp.Threading.Tasks;
+using UnityEngine;
 
 namespace MultiplayerARPG
 {
+    [CreateAssetMenu(fileName = GameDataMenuConsts.INCREASE_ITEM_DIALOG_ACTION_FILE, menuName = GameDataMenuConsts.INCREASE_ITEM_DIALOG_ACTION_MENU, order = GameDataMenuConsts.INCREASE_ITEM_DIALOG_ACTION_ORDER)]
     public class IncreaseItemDialogAction : BaseNpcDialogAction
     {
         public ItemAmount[] itemAmounts = new ItemAmount[0];

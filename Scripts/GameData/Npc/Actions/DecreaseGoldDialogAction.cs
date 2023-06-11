@@ -1,7 +1,9 @@
 using Cysharp.Threading.Tasks;
+using UnityEngine;
 
 namespace MultiplayerARPG
 {
+    [CreateAssetMenu(fileName = GameDataMenuConsts.DECREASE_GOLD_DIALOG_ACTION_FILE, menuName = GameDataMenuConsts.DECREASE_GOLD_DIALOG_ACTION_MENU, order = GameDataMenuConsts.DECREASE_GOLD_DIALOG_ACTION_ORDER)]
     public class DecreaseGoldDialogAction : BaseNpcDialogAction
     {
         public int gold;
