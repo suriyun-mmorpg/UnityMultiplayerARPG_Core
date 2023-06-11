@@ -24,6 +24,8 @@ namespace MultiplayerARPG
         public float JumpHeight => _stats.jumpHeight;
         public float HeadDamageAbsorbs => _stats.headDamageAbsorbs;
         public float BodyDamageAbsorbs => _stats.bodyDamageAbsorbs;
+        public float FallDamageAbsorbs => _stats.fallDamageAbsorbs;
+        public float GravityRate => _stats.gravityRate;
         public float BaseMoveSpeed { get; private set; }
         public float TotalItemWeight { get; private set; }
         public int TotalItemSlot { get; private set; }

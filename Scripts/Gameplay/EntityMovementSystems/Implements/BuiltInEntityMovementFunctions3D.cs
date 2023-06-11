@@ -388,8 +388,8 @@ namespace MultiplayerARPG
             {
                 if (!useRootMotionForFall)
                 {
-                    _verticalVelocity -= gravity * deltaTime;
-                    _verticalVelocity = Mathf.Max(_verticalVelocity, -maxFallVelocity);
+                    _verticalVelocity -= CalculateGravity() * deltaTime;
+                    _verticalVelocity = Mathf.Max(_verticalVelocity, -CalculateMaxFallVelocity());
                 }
                 else
                 {
@@ -657,11 +657,21 @@ namespace MultiplayerARPG
             }
         }
 
+        private float CalculateMaxFallVelocity()
+        {
+            return maxFallVelocity * Entity.GetGravityRate();
+        }
+
+        private float CalculateGravity()
+        {
+            return gravity * Entity.GetGravityRate();
+        }
+
         private float CalculateJumpVerticalSpeed()
         {
             // From the jump height and gravity we deduce the upwards speed 
             // for the character to reach at the apex.
-            return Mathf.Sqrt(2f * (jumpHeight + Entity.GetJumpHeight()) * gravity);
+            return Mathf.Sqrt(2f * (jumpHeight + Entity.GetJumpHeight()) * CalculateGravity());
         }
 
         public void OnTriggerEnter(Collider other)
@@ -933,7 +943,7 @@ namespace MultiplayerARPG
 
         public float GetVericalMoveSpeed(bool falling)
         {
-            return falling ? maxFallVelocity : CalculateJumpVerticalSpeed();
+            return falling ? CalculateMaxFallVelocity() : CalculateJumpVerticalSpeed();
         }
 
         public void ReadSyncTransformAtServer(NetDataReader reader)

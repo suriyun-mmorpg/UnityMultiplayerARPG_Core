@@ -105,6 +105,16 @@ namespace MultiplayerARPG
             return 0f;
         }
 
+        public float GetGravityRate()
+        {
+            return GetGravityRate(MovementState, ExtraMovementState);
+        }
+
+        public virtual float GetGravityRate(MovementState movementState, ExtraMovementState extraMovementState)
+        {
+            return 1f;
+        }
+
         public bool CanMove()
         {
             bool canMove = CanMove_Implementation();

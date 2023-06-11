@@ -65,6 +65,10 @@ namespace MultiplayerARPG
         public UILocaleKeySetting formatKeyHeadDamageAbsorbsStats = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_HEAD_DAMAGE_ABSORBS);
         [Tooltip("Format => {0} = {Amount * 100}")]
         public UILocaleKeySetting formatKeyBodyDamageAbsorbsStats = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_BODY_DAMAGE_ABSORBS);
+        [Tooltip("Format => {0} = {Amount * 100}")]
+        public UILocaleKeySetting formatKeyFallDamageAbsorbsStats = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_FALL_DAMAGE_ABSORBS);
+        [Tooltip("Format => {0} = {Amount * 100}")]
+        public UILocaleKeySetting formatKeyGravityRateStats = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_GRAVITY_RATE);
 
         [Header("String Formats (Stats Rate)")]
         [Tooltip("Format => {0} = {Amount * 100}")]
@@ -121,6 +125,10 @@ namespace MultiplayerARPG
         public UILocaleKeySetting formatKeyHeadDamageAbsorbsRateStats = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_HEAD_DAMAGE_ABSORBS_RATE);
         [Tooltip("Format => {0} = {Amount * 100}")]
         public UILocaleKeySetting formatKeyBodyDamageAbsorbsRateStats = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_BODY_DAMAGE_ABSORBS_RATE);
+        [Tooltip("Format => {0} = {Amount * 100}")]
+        public UILocaleKeySetting formatKeyFallDamageAbsorbsRateStats = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_FALL_DAMAGE_ABSORBS_RATE);
+        [Tooltip("Format => {0} = {Amount * 100}")]
+        public UILocaleKeySetting formatKeyGravityRateRateStats = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_GRAVITY_RATE_RATE);
 
         [Header("UI Elements")]
         public TextWrapper uiTextStats;
@@ -151,6 +159,8 @@ namespace MultiplayerARPG
         public TextWrapper uiTextJumpHeight;
         public TextWrapper uiTextHeadDamageAbsorbs;
         public TextWrapper uiTextBodyDamageAbsorbs;
+        public TextWrapper uiTextFallDamageAbsorbs;
+        public TextWrapper uiTextGravityRate;
         public DisplayType displayType;
         public bool isBonus;
 
@@ -216,6 +226,8 @@ namespace MultiplayerARPG
                         jumpHeightStatsFormat = formatKeyJumpHeightRateStats,
                         headDamageAbsorbsStatsFormat = formatKeyHeadDamageAbsorbsRateStats,
                         bodyDamageAbsorbsStatsFormat = formatKeyBodyDamageAbsorbsRateStats,
+                        fallDamageAbsorbsStatsFormat = formatKeyFallDamageAbsorbsRateStats,
+                        gravityRateStatsFormat = formatKeyGravityRateRateStats,
                         uiTextHp = uiTextHp,
                         uiTextHpRecovery = uiTextHpRecovery,
                         uiTextHpLeechRate = uiTextHpLeechRate,
@@ -243,6 +255,8 @@ namespace MultiplayerARPG
                         uiTextJumpHeight = uiTextJumpHeight,
                         uiTextHeadDamageAbsorbs = uiTextHeadDamageAbsorbs,
                         uiTextBodyDamageAbsorbs = uiTextBodyDamageAbsorbs,
+                        uiTextFallDamageAbsorbs = uiTextFallDamageAbsorbs,
+                        uiTextGravityRate = uiTextGravityRate,
                     };
                     this.InvokeInstanceDevExtMethods("SetRateStatsGenerateTextData", generateTextData);
                     statsString = generateTextData.GetText();
@@ -280,6 +294,8 @@ namespace MultiplayerARPG
                         jumpHeightStatsFormat = formatKeyJumpHeightStats,
                         headDamageAbsorbsStatsFormat = formatKeyHeadDamageAbsorbsStats,
                         bodyDamageAbsorbsStatsFormat = formatKeyBodyDamageAbsorbsStats,
+                        fallDamageAbsorbsStatsFormat = formatKeyFallDamageAbsorbsStats,
+                        gravityRateStatsFormat = formatKeyGravityRateStats,
                         uiTextHp = uiTextHp,
                         uiTextHpRecovery = uiTextHpRecovery,
                         uiTextHpLeechRate = uiTextHpLeechRate,
@@ -304,9 +320,11 @@ namespace MultiplayerARPG
                         uiTextGoldRate = uiTextGoldRate,
                         uiTextExpRate = uiTextExpRate,
                         uiTextItemDropRate = uiTextItemDropRate,
+                        uiTextJumpHeight = uiTextJumpHeight,
                         uiTextHeadDamageAbsorbs = uiTextHeadDamageAbsorbs,
                         uiTextBodyDamageAbsorbs = uiTextBodyDamageAbsorbs,
-                        uiTextJumpHeight = uiTextJumpHeight,
+                        uiTextFallDamageAbsorbs = uiTextFallDamageAbsorbs,
+                        uiTextGravityRate = uiTextGravityRate,
                     };
                     this.InvokeInstanceDevExtMethods("SetStatsGenerateTextData", generateTextData);
                     statsString = generateTextData.GetText();

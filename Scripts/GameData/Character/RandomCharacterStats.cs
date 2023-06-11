@@ -169,6 +169,18 @@ namespace MultiplayerARPG
         [Range(0, 1f)]
         public float bodyDamageAbsorbsApplyRate;
 
+        [Header("Fall Damage Absorbs")]
+        public float minFallDamageAbsorbs;
+        public float maxFallDamageAbsorbs;
+        [Range(0, 1f)]
+        public float fallDamageAbsorbsApplyRate;
+
+        [Header("Gravity Rate")]
+        public float minGravityRate;
+        public float maxGravityRate;
+        [Range(0, 1f)]
+        public float gravityRateApplyRate;
+
         public float GetRandomedHp(System.Random random)
         {
             return random.RandomFloat(minHp, maxHp);
@@ -289,19 +301,29 @@ namespace MultiplayerARPG
             return random.RandomFloat(minItemDropRate, maxItemDropRate);
         }
 
-        public float GetJumpHeight(System.Random random)
+        public float GetRandomedJumpHeight(System.Random random)
         {
             return random.RandomFloat(minJumpHeight, maxJumpHeight);
         }
 
-        public float GetHeadDamageAbsorbs(System.Random random)
+        public float GetRandomedHeadDamageAbsorbs(System.Random random)
         {
             return random.RandomFloat(minHeadDamageAbsorbs, maxHeadDamageAbsorbs);
         }
 
-        public float GetBodyDamageAbsorbs(System.Random random)
+        public float GetRandomedBodyDamageAbsorbs(System.Random random)
         {
             return random.RandomFloat(minBodyDamageAbsorbs, maxBodyDamageAbsorbs);
+        }
+
+        public float GetRandomedFallDamageAbsorbs(System.Random random)
+        {
+            return random.RandomFloat(minFallDamageAbsorbs, maxFallDamageAbsorbs);
+        }
+
+        public float GetRandomedGravityRate(System.Random random)
+        {
+            return random.RandomFloat(minGravityRate, maxGravityRate);
         }
 
         public bool ApplyHp(System.Random random)
@@ -437,6 +459,16 @@ namespace MultiplayerARPG
         public bool ApplyBodyDamageAbsorbs(System.Random random)
         {
             return random.NextDouble() <= bodyDamageAbsorbsApplyRate;
+        }
+
+        public bool ApplyFallDamageAbsorbs(System.Random random)
+        {
+            return random.NextDouble() <= fallDamageAbsorbsApplyRate;
+        }
+
+        public bool ApplyGravityRate(System.Random random)
+        {
+            return random.NextDouble() <= gravityRateApplyRate;
         }
     }
 }

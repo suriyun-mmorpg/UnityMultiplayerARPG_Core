@@ -61,6 +61,11 @@ namespace MultiplayerARPG
             return CachedData.JumpHeight;
         }
 
+        public override float GetGravityRate(MovementState movementState, ExtraMovementState extraMovementState)
+        {
+            return 1f + CachedData.GravityRate;
+        }
+
         protected override bool CanMove_Implementation()
         {
             if (this.IsDead())

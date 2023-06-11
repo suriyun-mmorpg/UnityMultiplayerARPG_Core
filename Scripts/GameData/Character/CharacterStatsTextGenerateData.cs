@@ -35,6 +35,8 @@ namespace MultiplayerARPG
         public string jumpHeightStatsFormat;
         public string headDamageAbsorbsStatsFormat;
         public string bodyDamageAbsorbsStatsFormat;
+        public string fallDamageAbsorbsStatsFormat;
+        public string gravityRateStatsFormat;
         public TextWrapper uiTextHp;
         public TextWrapper uiTextHpRecovery;
         public TextWrapper uiTextHpLeechRate;
@@ -62,6 +64,8 @@ namespace MultiplayerARPG
         public TextWrapper uiTextJumpHeight;
         public TextWrapper uiTextHeadDamageAbsorbs;
         public TextWrapper uiTextBodyDamageAbsorbs;
+        public TextWrapper uiTextFallDamageAbsorbs;
+        public TextWrapper uiTextGravityRate;
 
         public string GetText()
         {
@@ -528,6 +532,40 @@ namespace MultiplayerARPG
                 }
                 if (uiTextBodyDamageAbsorbs != null)
                     uiTextBodyDamageAbsorbs.text = statsStringPart;
+
+                // Fall Damage Absorbs
+                if (isBonus)
+                    tempValue = isRate ? (data.fallDamageAbsorbs * 100).ToBonusString("N2") : (data.fallDamageAbsorbs * 100).ToBonusString("N2");
+                else
+                    tempValue = isRate ? (data.fallDamageAbsorbs * 100).ToString("N2") : (data.fallDamageAbsorbs * 100).ToString("N2");
+                statsStringPart = ZString.Format(
+                    LanguageManager.GetText(fallDamageAbsorbsStatsFormat),
+                    tempValue);
+                if (data.fallDamageAbsorbs != 0)
+                {
+                    if (statsString.Length > 0)
+                        statsString.Append('\n');
+                    statsString.Append(statsStringPart);
+                }
+                if (uiTextFallDamageAbsorbs != null)
+                    uiTextFallDamageAbsorbs.text = statsStringPart;
+
+                // Gravity Rate
+                if (isBonus)
+                    tempValue = isRate ? (data.gravityRate * 100).ToBonusString("N2") : (data.gravityRate * 100).ToBonusString("N2");
+                else
+                    tempValue = isRate ? (data.gravityRate * 100).ToString("N2") : (data.gravityRate * 100).ToString("N2");
+                statsStringPart = ZString.Format(
+                    LanguageManager.GetText(gravityRateStatsFormat),
+                    tempValue);
+                if (data.gravityRate != 0)
+                {
+                    if (statsString.Length > 0)
+                        statsString.Append('\n');
+                    statsString.Append(statsStringPart);
+                }
+                if (uiTextGravityRate != null)
+                    uiTextGravityRate.text = statsStringPart;
 
                 // Dev Extension
                 // How to implement it?:

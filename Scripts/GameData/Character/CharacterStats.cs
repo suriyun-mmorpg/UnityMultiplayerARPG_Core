@@ -1,5 +1,4 @@
-﻿using System.Text;
-using UnityEngine;
+﻿using UnityEngine;
 
 namespace MultiplayerARPG
 {
@@ -36,6 +35,8 @@ namespace MultiplayerARPG
         public float jumpHeight;
         public float headDamageAbsorbs;
         public float bodyDamageAbsorbs;
+        public float fallDamageAbsorbs;
+        public float gravityRate;
 
         public static CharacterStats operator +(CharacterStats a, CharacterStats b)
         {
@@ -66,6 +67,8 @@ namespace MultiplayerARPG
             a.jumpHeight = a.jumpHeight + b.jumpHeight;
             a.headDamageAbsorbs = a.headDamageAbsorbs + b.headDamageAbsorbs;
             a.bodyDamageAbsorbs = a.bodyDamageAbsorbs + b.bodyDamageAbsorbs;
+            a.fallDamageAbsorbs = a.fallDamageAbsorbs + b.fallDamageAbsorbs;
+            a.gravityRate = a.gravityRate + b.gravityRate;
             if (GameExtensionInstance.onAddCharacterStats != null)
                 GameExtensionInstance.onAddCharacterStats(ref a, b);
             return a;
@@ -100,6 +103,8 @@ namespace MultiplayerARPG
             a.jumpHeight = a.jumpHeight * multiplier;
             a.headDamageAbsorbs = a.headDamageAbsorbs * multiplier;
             a.bodyDamageAbsorbs = a.bodyDamageAbsorbs * multiplier;
+            a.fallDamageAbsorbs = a.fallDamageAbsorbs * multiplier;
+            a.gravityRate = a.gravityRate * multiplier;
             if (GameExtensionInstance.onMultiplyCharacterStatsWithNumber != null)
                 GameExtensionInstance.onMultiplyCharacterStatsWithNumber(ref a, multiplier);
             return a;
@@ -134,6 +139,8 @@ namespace MultiplayerARPG
             a.jumpHeight = a.jumpHeight * b.jumpHeight;
             a.headDamageAbsorbs = a.headDamageAbsorbs * b.headDamageAbsorbs;
             a.bodyDamageAbsorbs = a.bodyDamageAbsorbs * b.bodyDamageAbsorbs;
+            a.fallDamageAbsorbs = a.fallDamageAbsorbs * b.fallDamageAbsorbs;
+            a.gravityRate = a.gravityRate * b.gravityRate;
             if (GameExtensionInstance.onMultiplyCharacterStats != null)
                 GameExtensionInstance.onMultiplyCharacterStats(ref a, b);
             return a;

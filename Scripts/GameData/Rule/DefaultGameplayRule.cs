@@ -877,11 +877,13 @@ namespace MultiplayerARPG
             float dist = lastGroundedPosition.y - character.EntityTransform.position.y;
             if (dist < fallDamageMinDistance)
                 return;
-            int damage = Mathf.CeilToInt(character.MaxHp * (float)(dist - fallDamageMinDistance) / (float)(fallDamageMaxDistance - fallDamageMinDistance));
-            if (damage < 0)
-                damage = 0;
-            character.CurrentHp -= damage;
-            character.ReceivedDamage(HitBoxPosition.None, character.EntityTransform.position, EntityInfo.Empty, null, CombatAmountType.NormalDamage, damage, null, null, 0, null);
+            float damage = character.MaxHp * (float)(dist - fallDamageMinDistance) / (float)(fallDamageMaxDistance - fallDamageMinDistance);
+            damage = damage - (damage * character.CachedData.FallDamageAbsorbs);
+            int intDamage = Mathf.CeilToInt(damage);
+            if (intDamage < 0)
+                intDamage = 0;
+            character.CurrentHp -= intDamage;
+            character.ReceivedDamage(HitBoxPosition.None, character.EntityTransform.position, EntityInfo.Empty, null, CombatAmountType.NormalDamage, intDamage, null, null, 0, null);
             if (character.IsDead())
             {
                 // Dead by itself, so instigator is itself
