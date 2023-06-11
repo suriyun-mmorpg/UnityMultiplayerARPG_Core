@@ -376,13 +376,13 @@ namespace MultiplayerARPG
 
             if (character is IPlayerCharacterData playerCharacter)
             {
-                if (!GameInstance.PlayerCharacters.TryGetValue(playerCharacter.DataId, out PlayerCharacter characterClass) || !item.Requirement.ClassIsAvailable(characterClass))
+                if (!item.Requirement.ClassIsAvailable(playerCharacter.DataId))
                 {
                     gameMessage = UITextKeys.UI_ERROR_NOT_MATCH_CHARACTER_CLASS;
                     return false;
                 }
 
-                if (!GameInstance.Factions.TryGetValue(playerCharacter.FactionId, out Faction faction) || !item.Requirement.FactionIsAvailable(faction))
+                if (!item.Requirement.FactionIsAvailable(playerCharacter.FactionId))
                 {
                     gameMessage = UITextKeys.UI_ERROR_NOT_MATCH_CHARACTER_FACTION;
                     return false;

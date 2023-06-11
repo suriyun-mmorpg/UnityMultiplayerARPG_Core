@@ -30,17 +30,17 @@ namespace MultiplayerARPG
             return availableClass != null || (availableClasses != null && availableClasses.Count > 0);
         }
 
-        public bool ClassIsAvailable(PlayerCharacter characterClass)
+        public bool ClassIsAvailable(int dataId)
         {
             if (!HasAvailableClasses())
                 return true;
-            if (availableClass != null && availableClass == characterClass)
+            if (availableClass != null && availableClass.DataId == dataId)
                 return true;
             if (availableClasses != null && availableClasses.Count > 0)
             {
                 for (int i = 0; i < availableClasses.Count; ++i)
                 {
-                    if (availableClasses[i] != null && availableClasses[i] == characterClass)
+                    if (availableClasses[i] != null && availableClasses[i].DataId == dataId)
                         return true;
                 }
             }
@@ -52,7 +52,7 @@ namespace MultiplayerARPG
             return availableFactions != null && availableFactions.Count > 0;
         }
 
-        public bool FactionIsAvailable(Faction faction)
+        public bool FactionIsAvailable(int dataId)
         {
             if (!HasAvailableFactions())
                 return true;
@@ -60,7 +60,7 @@ namespace MultiplayerARPG
             {
                 for (int i = 0; i < availableFactions.Count; ++i)
                 {
-                    if (availableFactions[i] != null && availableFactions[i] == faction)
+                    if (availableFactions[i] != null && availableFactions[i].DataId == dataId)
                         return true;
                 }
             }
