@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using LiteNetLib.Utils;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Serialization;
 
@@ -7,7 +8,7 @@ namespace MultiplayerARPG
     [CreateAssetMenu(fileName = GameDataMenuConsts.MAP_INFO_FILE, menuName = GameDataMenuConsts.MAP_INFO_MENU, order = GameDataMenuConsts.MAP_INFO_ORDER)]
     public partial class MapInfo : BaseMapInfo
     {
-        public enum PvpMode
+        public enum PvpMode : byte
         {
             None,
             Pvp,
@@ -183,6 +184,16 @@ namespace MultiplayerARPG
                 return monsterCharacter.IsEnemy(targetEntity.Summoner);
 
             return false;
+        }
+
+        public override void Serialize(NetDataWriter writer)
+        {
+            writer.Put((byte)pvpMode);
+        }
+
+        public override void Deserialize(NetDataReader reader)
+        {
+            pvpMode = (PvpMode)reader.GetByte();
         }
     }
 }

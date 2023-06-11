@@ -1,10 +1,11 @@
-﻿using System.Collections.Generic;
+﻿using LiteNetLib.Utils;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Serialization;
 
 namespace MultiplayerARPG
 {
-    public abstract partial class BaseMapInfo : BaseGameData
+    public abstract partial class BaseMapInfo : BaseGameData, INetSerializable
     {
         #region Map Info Settings
         [Category("Map Info Settings")]
@@ -224,6 +225,24 @@ namespace MultiplayerARPG
             if (ExcludeSkill && item.IsSkill())
                 return true;
             return false;
+        }
+
+        /// <summary>
+        /// It will write map info data by `BaseGameNetworkManager` at server in `SendMapInfo`, send only data which affect client's controlling
+        /// </summary>
+        /// <param name="writer"></param>
+        public virtual void Serialize(NetDataWriter writer)
+        {
+
+        }
+
+        /// <summary>
+        /// It will read map info data by `BaseGameNetworkManager` at client
+        /// </summary>
+        /// <param name="reader"></param>
+        public virtual void Deserialize(NetDataReader reader)
+        {
+
         }
     }
 }

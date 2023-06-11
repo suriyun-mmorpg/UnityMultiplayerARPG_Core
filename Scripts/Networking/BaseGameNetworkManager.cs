@@ -601,6 +601,19 @@ namespace MultiplayerARPG
                 return;
             UpdateMapInfoMessage message = messageHandler.ReadMessage<UpdateMapInfoMessage>();
             SetMapInfo(message.mapId);
+            if (CurrentMapInfo == null)
+            {
+                Logging.LogError(LogTag, $"Cannot find map info: {message.mapId}, it will create new map info to use, it can affect players' experience.");
+                CurrentMapInfo = ScriptableObject.CreateInstance<MapInfo>();
+                CurrentMapInfo.Id = message.mapId;
+                return;
+            }
+            if (!CurrentMapInfo.GetType().FullName.Equals(message.className))
+            {
+                Logging.LogError(LogTag, $"Invalid map info expect: {message.className}, found {CurrentMapInfo.GetType().FullName}, it can affect players' experience.");
+                return;
+            }
+            CurrentMapInfo.Deserialize(messageHandler.Reader);
             this.InvokeInstanceDevExtMethods("ReadMapInfoExtra", messageHandler.Reader);
             foreach (BaseGameNetworkManagerComponent component in ManagerComponents)
             {
@@ -1012,8 +1025,12 @@ namespace MultiplayerARPG
 
         public void SetMapInfo(string mapId)
         {
-            if (GameInstance.MapInfos.ContainsKey(mapId))
-                SetMapInfo(GameInstance.MapInfos[mapId]);
+            if (!GameInstance.MapInfos.TryGetValue(mapId, out BaseMapInfo mapInfo))
+            {
+                CurrentMapInfo = null;
+                return;
+            }
+            SetMapInfo(mapInfo);
         }
 
         public void SetMapInfo(BaseMapInfo mapInfo)
@@ -1041,8 +1058,10 @@ namespace MultiplayerARPG
             ServerSendPacket(connectionId, 0, DeliveryMethod.ReliableOrdered, GameNetworkingConsts.UpdateMapInfo, new UpdateMapInfoMessage()
             {
                 mapId = CurrentMapInfo.Id,
+                className = CurrentMapInfo.GetType().FullName,
             }, (writer) =>
             {
+                CurrentMapInfo.Serialize(writer);
                 this.InvokeInstanceDevExtMethods("WriteMapInfoExtra", writer);
                 foreach (BaseGameNetworkManagerComponent component in ManagerComponents)
                 {
