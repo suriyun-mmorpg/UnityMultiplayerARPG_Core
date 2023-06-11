@@ -351,6 +351,46 @@ namespace MultiplayerARPG
                     return;
             }
 
+            if (randomStats.ApplyJumpHeight(random))
+            {
+                stats.jumpHeight = randomStats.GetRandomedJumpHeight(random);
+                appliedAmount++;
+                if (randomBonus.maxRandomStatsAmount > 0 && appliedAmount >= randomBonus.maxRandomStatsAmount)
+                    return;
+            }
+
+            if (randomStats.ApplyHeadDamageAbsorbs(random))
+            {
+                stats.headDamageAbsorbs = randomStats.GetRandomedHeadDamageAbsorbs(random);
+                appliedAmount++;
+                if (randomBonus.maxRandomStatsAmount > 0 && appliedAmount >= randomBonus.maxRandomStatsAmount)
+                    return;
+            }
+
+            if (randomStats.ApplyBodyDamageAbsorbs(random))
+            {
+                stats.bodyDamageAbsorbs = randomStats.GetRandomedBodyDamageAbsorbs(random);
+                appliedAmount++;
+                if (randomBonus.maxRandomStatsAmount > 0 && appliedAmount >= randomBonus.maxRandomStatsAmount)
+                    return;
+            }
+
+            if (randomStats.ApplyFallDamageAbsorbs(random))
+            {
+                stats.fallDamageAbsorbs = randomStats.GetRandomedFallDamageAbsorbs(random);
+                appliedAmount++;
+                if (randomBonus.maxRandomStatsAmount > 0 && appliedAmount >= randomBonus.maxRandomStatsAmount)
+                    return;
+            }
+
+            if (randomStats.ApplyGravityRate(random))
+            {
+                stats.gravityRate = randomStats.GetRandomedGravityRate(random);
+                appliedAmount++;
+                if (randomBonus.maxRandomStatsAmount > 0 && appliedAmount >= randomBonus.maxRandomStatsAmount)
+                    return;
+            }
+
             if (GameExtensionInstance.onRandomCharacterStats != null)
                 GameExtensionInstance.onRandomCharacterStats(random, randomBonus, randomStats, ref stats, ref appliedAmount);
         }
