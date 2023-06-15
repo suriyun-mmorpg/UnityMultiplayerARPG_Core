@@ -436,7 +436,7 @@ namespace MultiplayerARPG
         /// </summary>
         /// <param name="lastAttacker"></param>
         /// <returns></returns>
-        private BasePlayerCharacterEntity FindLastAttackerPlayer(EntityInfo lastAttacker)
+        protected virtual BasePlayerCharacterEntity FindLastAttackerPlayer(EntityInfo lastAttacker)
         {
             if (!lastAttacker.TryGetEntity(out BaseCharacterEntity attackerCharacter))
                 return null;
@@ -451,7 +451,7 @@ namespace MultiplayerARPG
             return attackerCharacter as BasePlayerCharacterEntity;
         }
 
-        private void GivingRewardToKillers(BasePlayerCharacterEntity lastPlayer, out float itemDropRate)
+        protected virtual void GivingRewardToKillers(BasePlayerCharacterEntity lastPlayer, out float itemDropRate)
         {
             itemDropRate = 1f;
             if (receivedDamageRecords.Count <= 0)

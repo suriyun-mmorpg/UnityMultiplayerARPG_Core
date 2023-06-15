@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace MultiplayerARPG
 {
-    public interface IHitRegistrationManager
+    public partial interface IHitRegistrationManager
     {
         bool WillProceedHitRegByClient<T>(T damageEntity, EntityInfo attackerInfo) where T : BaseDamageEntity;
         void PrepareHitRegValidatation(BaseGameEntity attacker, int randomSeed, float[] triggerDurations, byte fireSpread, DamageInfo damageInfo, Dictionary<DamageElement, MinMaxFloat> damageAmounts, CharacterItem weapon, BaseSkill skill, int skillLevel);
