@@ -436,7 +436,7 @@ namespace MultiplayerARPG
         /// </summary>
         /// <param name="lastAttacker"></param>
         /// <returns></returns>
-        private BasePlayerCharacterEntity FindLastAttackerPlayer(EntityInfo lastAttacker)
+        protected virtual BasePlayerCharacterEntity FindLastAttackerPlayer(EntityInfo lastAttacker)
         {
             if (!lastAttacker.TryGetEntity(out BaseCharacterEntity attackerCharacter))
                 return null;
@@ -451,7 +451,7 @@ namespace MultiplayerARPG
             return attackerCharacter as BasePlayerCharacterEntity;
         }
 
-        private void GivingRewardToKillers(BasePlayerCharacterEntity lastPlayer, out float itemDropRate)
+        protected virtual void GivingRewardToKillers(BasePlayerCharacterEntity lastPlayer, out float itemDropRate)
         {
             itemDropRate = 1f;
             if (receivedDamageRecords.Count <= 0)
@@ -534,7 +534,7 @@ namespace MultiplayerARPG
             }
         }
 
-        private void GivingRewardToGuild(BasePlayerCharacterEntity playerCharacterEntity, Reward reward, float rewardRate, out float shareGuildExpRate)
+        protected virtual void GivingRewardToGuild(BasePlayerCharacterEntity playerCharacterEntity, Reward reward, float rewardRate, out float shareGuildExpRate)
         {
             shareGuildExpRate = 0f;
             if (!GameInstance.ServerGuildHandlers.TryGetGuild(playerCharacterEntity.GuildId, out GuildData tempGuildData))
@@ -549,7 +549,7 @@ namespace MultiplayerARPG
             }
         }
 
-        private void GivingRewardToParty(BasePlayerCharacterEntity playerCharacterEntity, bool isLastAttacker, Reward reward, float rewardRate, float shareGuildExpRate, bool makeMostDamage, out bool givenRewardExp, out bool givenRewardCurrency)
+        protected virtual void GivingRewardToParty(BasePlayerCharacterEntity playerCharacterEntity, bool isLastAttacker, Reward reward, float rewardRate, float shareGuildExpRate, bool makeMostDamage, out bool givenRewardExp, out bool givenRewardCurrency)
         {
             givenRewardExp = false;
             givenRewardCurrency = false;

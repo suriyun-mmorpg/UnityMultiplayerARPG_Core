@@ -6,7 +6,7 @@ using UnityEngine;
 
 namespace MultiplayerARPG
 {
-    public class DefaultHitRegistrationManager : MonoBehaviour, IHitRegistrationManager
+    public partial class DefaultHitRegistrationManager : MonoBehaviour, IHitRegistrationManager
     {
         public float hitValidationBuffer = 2f;
         protected GameObject _hitBoxObject;

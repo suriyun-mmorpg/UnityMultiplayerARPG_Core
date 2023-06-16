@@ -4,7 +4,7 @@ namespace MultiplayerARPG
 {
     public partial class BasePlayerCharacterEntity
     {
-        public void OnKillMonster(BaseMonsterCharacterEntity monsterCharacterEntity)
+        public virtual void OnKillMonster(BaseMonsterCharacterEntity monsterCharacterEntity)
         {
             if (!IsServer || monsterCharacterEntity == null)
                 return;
