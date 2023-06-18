@@ -288,6 +288,7 @@ namespace MultiplayerARPG
                 // Increase damage with ammo damage
                 Entity.DecreaseAmmos(weapon, isLeftHand, 1, out Dictionary<DamageElement, MinMaxFloat> increaseDamageAmounts);
                 HitRegistrationManager.IncreasePreparedDamageAmounts(Entity, simulateSeed, increaseDamageAmounts);
+                damageAmounts = GameDataHelpers.CombineDamages(damageAmounts, increaseDamageAmounts);
             }
 
             byte fireSpread = 0;
