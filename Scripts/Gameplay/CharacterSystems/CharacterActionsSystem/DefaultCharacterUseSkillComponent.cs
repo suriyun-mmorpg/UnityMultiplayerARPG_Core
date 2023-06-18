@@ -120,7 +120,7 @@ namespace MultiplayerARPG
             }
         }
 
-        protected async UniTaskVoid UseSkillRoutine(int simulateSeed, bool isLeftHand, BaseSkill skill, int skillLevel, uint targetObjectId, AimPosition skillAimPosition, int? itemDataId)
+        protected virtual async UniTaskVoid UseSkillRoutine(int simulateSeed, bool isLeftHand, BaseSkill skill, int skillLevel, uint targetObjectId, AimPosition skillAimPosition, int? itemDataId)
         {
             // Prepare required data and get skill data
             Entity.GetUsingSkillData(
@@ -343,7 +343,7 @@ namespace MultiplayerARPG
             ClearUseSkillStates();
         }
 
-        public void CancelSkill()
+        public virtual void CancelSkill()
         {
             for (int i = _skillCancellationTokenSources.Count - 1; i >= 0; --i)
             {
@@ -397,7 +397,7 @@ namespace MultiplayerARPG
             ApplySkillUsing(skill, data.skillLevel, isLeftHand, weapon, data.simulateSeed, data.triggerIndex, damageAmounts, data.targetObjectId, data.aimPosition);
         }
 
-        public void UseSkill(int dataId, bool isLeftHand, uint targetObjectId, AimPosition aimPosition)
+        public virtual void UseSkill(int dataId, bool isLeftHand, uint targetObjectId, AimPosition aimPosition)
         {
             if (!IsServer && IsOwnerClient)
             {
@@ -426,7 +426,7 @@ namespace MultiplayerARPG
             }
         }
 
-        protected void ProceedUseSkillStateAtServer(int simulateSeed, int dataId, bool isLeftHand, uint targetObjectId, AimPosition aimPosition)
+        protected virtual void ProceedUseSkillStateAtServer(int simulateSeed, int dataId, bool isLeftHand, uint targetObjectId, AimPosition aimPosition)
         {
 #if UNITY_EDITOR || UNITY_SERVER
             if (!_manager.IsAcceptNewAction())
@@ -451,7 +451,7 @@ namespace MultiplayerARPG
 #endif
         }
 
-        public void UseSkillItem(int itemIndex, bool isLeftHand, uint targetObjectId, AimPosition aimPosition)
+        public virtual void UseSkillItem(int itemIndex, bool isLeftHand, uint targetObjectId, AimPosition aimPosition)
         {
             if (!IsServer && IsOwnerClient)
             {
@@ -488,7 +488,7 @@ namespace MultiplayerARPG
             }
         }
 
-        protected void ProceedUseSkillItemStateAtServer(int simulateSeed, int itemIndex, bool isLeftHand, uint targetObjectId, AimPosition aimPosition)
+        protected virtual void ProceedUseSkillItemStateAtServer(int simulateSeed, int itemIndex, bool isLeftHand, uint targetObjectId, AimPosition aimPosition)
         {
 #if UNITY_EDITOR || UNITY_SERVER
             if (!_manager.IsAcceptNewAction())
@@ -514,7 +514,7 @@ namespace MultiplayerARPG
 #endif
         }
 
-        public bool WriteClientUseSkillState(NetDataWriter writer)
+        public virtual bool WriteClientUseSkillState(NetDataWriter writer)
         {
             if (_clientState.HasValue && !_clientState.Value.IsInterrupted && !_clientState.Value.UseItem)
             {
@@ -533,7 +533,7 @@ namespace MultiplayerARPG
             return false;
         }
 
-        public bool WriteServerUseSkillState(NetDataWriter writer)
+        public virtual bool WriteServerUseSkillState(NetDataWriter writer)
         {
             if (_serverState.HasValue && !_serverState.Value.IsInterrupted && !_serverState.Value.UseItem)
             {
@@ -553,7 +553,7 @@ namespace MultiplayerARPG
             return false;
         }
 
-        public bool WriteClientUseSkillItemState(NetDataWriter writer)
+        public virtual bool WriteClientUseSkillItemState(NetDataWriter writer)
         {
             if (_clientState.HasValue && !_clientState.Value.IsInterrupted && _clientState.Value.UseItem)
             {
@@ -572,14 +572,14 @@ namespace MultiplayerARPG
             return false;
         }
 
-        public bool WriteServerUseSkillItemState(NetDataWriter writer)
+        public virtual bool WriteServerUseSkillItemState(NetDataWriter writer)
         {
             // It's the same behaviour with `use skill` (just play animation at clients)
             // So just send `use skill` state (see `ReadClientUseSkillItemStateAtServer` function)
             return false;
         }
 
-        public bool WriteClientUseSkillInterruptedState(NetDataWriter writer)
+        public virtual  bool WriteClientUseSkillInterruptedState(NetDataWriter writer)
         {
             if (_clientState.HasValue && _clientState.Value.IsInterrupted)
             {
@@ -589,7 +589,7 @@ namespace MultiplayerARPG
             return false;
         }
 
-        public bool WriteServerUseSkillInterruptedState(NetDataWriter writer)
+        public virtual bool WriteServerUseSkillInterruptedState(NetDataWriter writer)
         {
             if (_serverState.HasValue && _serverState.Value.IsInterrupted)
             {
@@ -599,7 +599,7 @@ namespace MultiplayerARPG
             return false;
         }
 
-        public void ReadClientUseSkillStateAtServer(NetDataReader reader)
+        public virtual void ReadClientUseSkillStateAtServer(NetDataReader reader)
         {
             int simulateSeed = reader.GetPackedInt();
             int dataId = reader.GetPackedInt();
@@ -609,7 +609,7 @@ namespace MultiplayerARPG
             ProceedUseSkillStateAtServer(simulateSeed, dataId, isLeftHand, targetObjectId, aimPosition);
         }
 
-        public void ReadServerUseSkillStateAtClient(NetDataReader reader)
+        public virtual void ReadServerUseSkillStateAtClient(NetDataReader reader)
         {
             int simulateSeed = reader.GetPackedInt();
             int skillDataId = reader.GetPackedInt();
@@ -628,7 +628,7 @@ namespace MultiplayerARPG
             UseSkillRoutine(simulateSeed, isLeftHand, skill, skillLevel, targetObjectId, aimPosition, null).Forget();
         }
 
-        public void ReadClientUseSkillItemStateAtServer(NetDataReader reader)
+        public virtual void ReadClientUseSkillItemStateAtServer(NetDataReader reader)
         {
             int simulateSeed = reader.GetPackedInt();
             int itemIndex = reader.GetPackedInt();
@@ -638,7 +638,7 @@ namespace MultiplayerARPG
             ProceedUseSkillItemStateAtServer(simulateSeed, itemIndex, isLeftHand, targetObjectId, aimPosition);
         }
 
-        public void ReadServerUseSkillItemStateAtClient(NetDataReader reader)
+        public virtual void ReadServerUseSkillItemStateAtClient(NetDataReader reader)
         {
             // See `ReadServerUseSkillStateAtClient`
         }
@@ -653,7 +653,7 @@ namespace MultiplayerARPG
             ProceedUseSkillInterruptedState();
         }
 
-        protected void ProceedUseSkillInterruptedState()
+        protected virtual void ProceedUseSkillInterruptedState()
         {
             IsCastingSkillInterrupted = true;
             IsUsingSkill = false;
