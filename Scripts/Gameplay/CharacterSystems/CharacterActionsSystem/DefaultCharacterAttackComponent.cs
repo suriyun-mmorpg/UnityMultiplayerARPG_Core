@@ -62,7 +62,7 @@ namespace MultiplayerARPG
             IsAttacking = false;
         }
 
-        protected async UniTaskVoid AttackRoutine(int simulateSeed, bool isLeftHand)
+        protected virtual async UniTaskVoid AttackRoutine(int simulateSeed, bool isLeftHand)
         {
             // Prepare time
             float time = Time.unscaledTime;
@@ -288,6 +288,7 @@ namespace MultiplayerARPG
                 // Increase damage with ammo damage
                 Entity.DecreaseAmmos(weapon, isLeftHand, 1, out Dictionary<DamageElement, MinMaxFloat> increaseDamageAmounts);
                 HitRegistrationManager.IncreasePreparedDamageAmounts(Entity, simulateSeed, increaseDamageAmounts);
+                damageAmounts = GameDataHelpers.CombineDamages(damageAmounts, increaseDamageAmounts);
             }
 
             byte fireSpread = 0;
@@ -344,7 +345,7 @@ namespace MultiplayerARPG
             ApplyAttack(isLeftHand, weapon, data.simulateSeed, data.triggerIndex, damageInfo, damageAmounts, data.aimPosition);
         }
 
-        public void CancelAttack()
+        public virtual void CancelAttack()
         {
             for (int i = _attackCancellationTokenSources.Count - 1; i >= 0; --i)
             {
@@ -354,7 +355,7 @@ namespace MultiplayerARPG
             }
         }
 
-        public void Attack(bool isLeftHand)
+        public virtual void Attack(bool isLeftHand)
         {
             if (!IsServer && IsOwnerClient)
             {
@@ -376,7 +377,7 @@ namespace MultiplayerARPG
             }
         }
 
-        protected void ProceedAttackStateAtServer(int simulateSeed, bool isLeftHand)
+        protected virtual void ProceedAttackStateAtServer(int simulateSeed, bool isLeftHand)
         {
 #if UNITY_EDITOR || UNITY_SERVER
             if (!_manager.IsAcceptNewAction())
@@ -394,7 +395,7 @@ namespace MultiplayerARPG
 #endif
         }
 
-        public bool WriteClientAttackState(NetDataWriter writer)
+        public virtual bool WriteClientAttackState(NetDataWriter writer)
         {
             if (_clientState.HasValue)
             {
@@ -410,7 +411,7 @@ namespace MultiplayerARPG
             return false;
         }
 
-        public bool WriteServerAttackState(NetDataWriter writer)
+        public virtual bool WriteServerAttackState(NetDataWriter writer)
         {
             if (_serverState.HasValue)
             {
@@ -426,14 +427,14 @@ namespace MultiplayerARPG
             return false;
         }
 
-        public void ReadClientAttackStateAtServer(NetDataReader reader)
+        public virtual void ReadClientAttackStateAtServer(NetDataReader reader)
         {
             int simulateSeed = reader.GetPackedInt();
             bool isLeftHand = reader.GetBool();
             ProceedAttackStateAtServer(simulateSeed, isLeftHand);
         }
 
-        public void ReadServerAttackStateAtClient(NetDataReader reader)
+        public virtual void ReadServerAttackStateAtClient(NetDataReader reader)
         {
             int simulateSeed = reader.GetPackedInt();
             bool isLeftHand = reader.GetBool();

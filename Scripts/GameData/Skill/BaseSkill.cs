@@ -549,9 +549,12 @@ namespace MultiplayerARPG
                     return;
                 // Increase damage with ammo damage
                 if (increaseDamageAmounts != null && increaseDamageAmounts.Count > 0)
+                {
+                    BaseGameNetworkManager.Singleton.HitRegistrationManager.IncreasePreparedDamageAmounts(skillUser, simulateSeed, increaseDamageAmounts);
                     damageAmounts = GameDataHelpers.CombineDamages(damageAmounts, increaseDamageAmounts);
-            }
-            ApplySkillImplement(
+                }
+
+                ApplySkillImplement(
                 skillUser,
                 skillLevel,
                 isLeftHand,
@@ -564,6 +567,7 @@ namespace MultiplayerARPG
                 aimPosition,
                 onDamageOriginPrepared,
                 onDamageHit);
+            }
         }
 
         /// <summary>
