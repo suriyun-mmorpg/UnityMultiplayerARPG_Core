@@ -17,7 +17,7 @@ namespace MultiplayerARPG
                 });
                 return;
             }
-            PlayerCharacterData resultPlayerCharacter = playerCharacter.CloneTo(new PlayerCharacterData(), true, false, false, false, false, true, false, false, false, false, false);
+            PlayerCharacterData resultPlayerCharacter = playerCharacter.CloneTo(new PlayerCharacterData(), true, false, false, false, false, true, false, false, false, false, false, false, false, false);
             result.InvokeSuccess(new ResponseGetOnlineCharacterDataMessage()
             {
                 character = resultPlayerCharacter,
