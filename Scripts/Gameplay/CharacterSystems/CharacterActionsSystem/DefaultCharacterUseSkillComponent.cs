@@ -105,7 +105,7 @@ namespace MultiplayerARPG
 
         protected void AddOrUpdateSkillUsage(SkillUsageType type, int dataId, int skillLevel)
         {
-            int index = Entity.IndexOfSkillUsage(dataId, type);
+            int index = Entity.IndexOfSkillUsage(type, dataId);
             if (index >= 0)
             {
                 CharacterSkillUsage newSkillUsage = Entity.SkillUsages[index];

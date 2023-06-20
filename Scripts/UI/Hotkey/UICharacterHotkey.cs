@@ -323,7 +323,7 @@ namespace MultiplayerARPG
                 UICharacterHotkeys.SetUsingHotkey(null);
             }
 
-            if (_usingSkill != null && GameInstance.PlayingCharacter.IndexOfSkillUsage(_usingSkill.DataId, SkillUsageType.Skill) >= 0)
+            if (_usingSkill != null && GameInstance.PlayingCharacter.IndexOfSkillUsage(SkillUsageType.Skill, _usingSkill.DataId) >= 0)
             {
                 // Skill this cooling down, can't use it
                 return;

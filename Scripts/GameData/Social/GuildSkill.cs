@@ -91,7 +91,7 @@ namespace MultiplayerARPG
                 return false;
             if (level <= 0)
                 return false;
-            int skillUsageIndex = character.IndexOfSkillUsage(DataId, SkillUsageType.GuildSkill);
+            int skillUsageIndex = character.IndexOfSkillUsage(SkillUsageType.GuildSkill, DataId);
             if (skillUsageIndex >= 0 && character.SkillUsages[skillUsageIndex].coolDownRemainsDuration > 0f)
                 return false;
             return true;

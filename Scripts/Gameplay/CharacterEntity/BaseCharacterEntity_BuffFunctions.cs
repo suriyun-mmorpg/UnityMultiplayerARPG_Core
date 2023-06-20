@@ -77,7 +77,7 @@ namespace MultiplayerARPG
 
             if (isExtendDuration)
             {
-                int buffIndex = this.IndexOfBuff(dataId, type);
+                int buffIndex = this.IndexOfBuff(type, dataId);
                 if (buffIndex >= 0)
                 {
                     CharacterBuff characterBuff = buffs[buffIndex];
@@ -92,7 +92,7 @@ namespace MultiplayerARPG
             {
                 if (maxStack > 1)
                 {
-                    List<int> indexesOfBuff = this.IndexesOfBuff(dataId, type);
+                    List<int> indexesOfBuff = this.IndexesOfBuff(type, dataId);
                     while (indexesOfBuff.Count + 1 > maxStack)
                     {
                         int buffIndex = indexesOfBuff[0];
@@ -104,7 +104,7 @@ namespace MultiplayerARPG
                 else
                 {
                     // `maxStack` <= 0, assume that it's = `1`
-                    int buffIndex = this.IndexOfBuff(dataId, type);
+                    int buffIndex = this.IndexOfBuff(type, dataId);
                     if (buffIndex >= 0)
                         buffs.RemoveAt(buffIndex);
                 }
@@ -124,7 +124,7 @@ namespace MultiplayerARPG
             }
 
             if (onApplyBuff != null)
-                onApplyBuff.Invoke(dataId, type, level, buffApplier);
+                onApplyBuff.Invoke(type, dataId, level, buffApplier);
         }
 
         public virtual void OnBuffHpRecovery(EntityInfo causer, int amount)

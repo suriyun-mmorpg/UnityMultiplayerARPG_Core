@@ -32,7 +32,7 @@ namespace MultiplayerARPG
                 return;
             }
 
-            if (this.IndexOfSkillUsage(dataId, SkillUsageType.GuildSkill) >= 0)
+            if (this.IndexOfSkillUsage(SkillUsageType.GuildSkill, dataId) >= 0)
             {
                 GameInstance.ServerGameMessageHandlers.SendGameMessage(ConnectionId, UITextKeys.UI_ERROR_SKILL_IS_COOLING_DOWN);
                 return;

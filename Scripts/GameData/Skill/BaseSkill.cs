@@ -813,7 +813,7 @@ namespace MultiplayerARPG
 
             if (!isItem)
             {
-                if (character.IndexOfSkillUsage(DataId, SkillUsageType.Skill) >= 0)
+                if (character.IndexOfSkillUsage(SkillUsageType.Skill, DataId) >= 0)
                 {
                     gameMessage = UITextKeys.UI_ERROR_SKILL_IS_COOLING_DOWN;
                     return false;

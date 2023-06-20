@@ -159,7 +159,7 @@ namespace MultiplayerARPG
             // Update remains duration
             if (coolDownRemainsDuration <= 0f && Character != null && Skill != null)
             {
-                int indexOfSkillUsage = Character.IndexOfSkillUsage(Skill.DataId, SkillUsageType.Skill);
+                int indexOfSkillUsage = Character.IndexOfSkillUsage(SkillUsageType.Skill, Skill.DataId);
                 if (indexOfSkillUsage >= 0)
                     coolDownRemainsDuration = Character.SkillUsages[indexOfSkillUsage].coolDownRemainsDuration;
             }
@@ -178,7 +178,7 @@ namespace MultiplayerARPG
             // Update remains duration
             if (Character != null && Skill != null)
             {
-                int indexOfSkillUsage = Character.IndexOfSkillUsage(Skill.DataId, SkillUsageType.Skill);
+                int indexOfSkillUsage = Character.IndexOfSkillUsage(SkillUsageType.Skill, Skill.DataId);
                 if (indexOfSkillUsage >= 0 && Mathf.Abs(Character.SkillUsages[indexOfSkillUsage].coolDownRemainsDuration - coolDownRemainsDuration) > 1)
                     coolDownRemainsDuration = Character.SkillUsages[indexOfSkillUsage].coolDownRemainsDuration;
             }

@@ -167,7 +167,7 @@ namespace MultiplayerARPG
                         targetEntity.ApplyBuff(DataId, BuffType.SkillBuff, skillLevel, instigator, weapon);
                     break;
                 case SkillBuffType.Toggle:
-                    int indexOfBuff = skillUser.IndexOfBuff(DataId, BuffType.SkillBuff);
+                    int indexOfBuff = skillUser.IndexOfBuff(BuffType.SkillBuff, DataId);
                     if (indexOfBuff >= 0)
                         skillUser.Buffs.RemoveAt(indexOfBuff);
                     else
@@ -199,7 +199,7 @@ namespace MultiplayerARPG
             CharacterSummon tempSummon;
             for (i = unSummonAmount; i > 0; --i)
             {
-                int summonIndex = skillUser.IndexOfSummon(DataId, SummonType.Skill);
+                int summonIndex = skillUser.IndexOfSummon(SummonType.Skill, DataId);
                 tempSummon = skillUser.Summons[summonIndex];
                 if (summonIndex >= 0)
                 {

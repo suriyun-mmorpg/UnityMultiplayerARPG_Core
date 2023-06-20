@@ -380,7 +380,7 @@ namespace MultiplayerARPG
         {
             if (coolDownRemainsDuration <= 0f && Character != null && UsableItem != null)
             {
-                int indexOfSkillUsage = Character.IndexOfSkillUsage(UsableItem.DataId, SkillUsageType.UsableItem);
+                int indexOfSkillUsage = Character.IndexOfSkillUsage(SkillUsageType.UsableItem, UsableItem.DataId);
                 if (indexOfSkillUsage >= 0)
                     coolDownRemainsDuration = Character.SkillUsages[indexOfSkillUsage].coolDownRemainsDuration;
             }

@@ -249,7 +249,7 @@ namespace MultiplayerARPG
                 if (CharacterDatabase.RandomSkill(Entity, out _queueSkill, out _queueSkillLevel) && _queueSkill != null)
                 {
                     // Cooling down
-                    if (Entity.IndexOfSkillUsage(_queueSkill.DataId, SkillUsageType.Skill) >= 0)
+                    if (Entity.IndexOfSkillUsage(SkillUsageType.Skill, _queueSkill.DataId) >= 0)
                     {
                         _queueSkill = null;
                         _queueSkillLevel = 0;
@@ -296,7 +296,7 @@ namespace MultiplayerARPG
                 if (Entity.IsPlayingActionAnimation())
                     return true;
 
-                if (_queueSkill != null && Entity.IndexOfSkillUsage(_queueSkill.DataId, SkillUsageType.Skill) < 0)
+                if (_queueSkill != null && Entity.IndexOfSkillUsage(SkillUsageType.Skill, _queueSkill.DataId) < 0)
                 {
                     // Use skill when there is queue skill or randomed skill that can be used
                     Entity.UseSkill(_queueSkill.DataId, false, 0, new AimPosition()
