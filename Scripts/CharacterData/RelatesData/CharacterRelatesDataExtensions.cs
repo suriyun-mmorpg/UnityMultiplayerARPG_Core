@@ -1,6 +1,8 @@
-﻿namespace MultiplayerARPG
+﻿using System.Collections.Generic;
+
+namespace MultiplayerARPG
 {
-    public static class CharacterRelatesDataExtensions
+    public static partial class CharacterRelatesDataExtensions
     {
         public static bool IsEmpty(this CharacterStats data)
         {
@@ -150,6 +152,16 @@
         public static bool IsEmptyLeftHandSlot(this EquipWeapons equipWeapons)
         {
             return !equipWeapons.NotEmptyLeftHandSlot();
+        }
+
+        public static int IndexOfEmptyItemSlot(this IList<CharacterItem> list)
+        {
+            for (int i = 0; i < list.Count; ++i)
+            {
+                if (list[i].IsEmptySlot())
+                    return i;
+            }
+            return -1;
         }
     }
 }
