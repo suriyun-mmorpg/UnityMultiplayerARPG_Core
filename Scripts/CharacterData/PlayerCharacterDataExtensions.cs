@@ -310,58 +310,6 @@ namespace MultiplayerARPG
             DeletePersistentCharacterData(characterData.Id);
         }
 
-        public static int IndexOfHotkey(this IPlayerCharacterData data, string hotkeyId)
-        {
-            IList<CharacterHotkey> list = data.Hotkeys;
-            CharacterHotkey tempHotkey;
-            int index = -1;
-            for (int i = 0; i < list.Count; ++i)
-            {
-                tempHotkey = list[i];
-                if (!string.IsNullOrEmpty(tempHotkey.hotkeyId) &&
-                    tempHotkey.hotkeyId.Equals(hotkeyId))
-                {
-                    index = i;
-                    break;
-                }
-            }
-            return index;
-        }
-
-        public static int IndexOfQuest(this IPlayerCharacterData data, int dataId)
-        {
-            IList<CharacterQuest> list = data.Quests;
-            CharacterQuest tempQuest;
-            int index = -1;
-            for (int i = 0; i < list.Count; ++i)
-            {
-                tempQuest = list[i];
-                if (tempQuest.dataId == dataId)
-                {
-                    index = i;
-                    break;
-                }
-            }
-            return index;
-        }
-
-        public static int IndexOfCurrency(this IPlayerCharacterData data, int dataId)
-        {
-            IList<CharacterCurrency> list = data.Currencies;
-            CharacterCurrency tempCurrency;
-            int index = -1;
-            for (int i = 0; i < list.Count; ++i)
-            {
-                tempCurrency = list[i];
-                if (tempCurrency.dataId == dataId)
-                {
-                    index = i;
-                    break;
-                }
-            }
-            return index;
-        }
-
         public static bool AddAttribute(this IPlayerCharacterData characterData, out UITextKeys gameMessage, int dataId, int amount = 1, int itemIndex = -1)
         {
             if (!GameInstance.Attributes.TryGetValue(dataId, out Attribute attribute))
