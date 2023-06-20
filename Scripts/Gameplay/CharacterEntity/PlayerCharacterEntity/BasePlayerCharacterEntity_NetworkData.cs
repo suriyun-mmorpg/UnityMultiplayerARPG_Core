@@ -50,7 +50,25 @@ namespace MultiplayerARPG
         [SerializeField]
         protected SyncListCharacterQuest quests = new SyncListCharacterQuest();
         [SerializeField]
+        private List<CharacterDataBoolean> serverBools = new List<CharacterDataBoolean>();
+        [SerializeField]
+        private List<CharacterDataInt32> serverInts = new List<CharacterDataInt32>();
+        [SerializeField]
+        private List<CharacterDataFloat32> serverFloats = new List<CharacterDataFloat32>();
+        [SerializeField]
         protected SyncListCharacterCurrency currencies = new SyncListCharacterCurrency();
+        [SerializeField]
+        protected SyncListCharacterDataBoolean privateBools = new SyncListCharacterDataBoolean();
+        [SerializeField]
+        protected SyncListCharacterDataInt32 privateInts = new SyncListCharacterDataInt32();
+        [SerializeField]
+        protected SyncListCharacterDataFloat32 privateFloats = new SyncListCharacterDataFloat32();
+        [SerializeField]
+        protected SyncListCharacterDataBoolean publicBools = new SyncListCharacterDataBoolean();
+        [SerializeField]
+        protected SyncListCharacterDataInt32 publicInts = new SyncListCharacterDataInt32();
+        [SerializeField]
+        protected SyncListCharacterDataFloat32 publicFloats = new SyncListCharacterDataFloat32();
         #endregion
 
         #region Fields/Interface/Getter/Setter implementation
@@ -176,6 +194,96 @@ namespace MultiplayerARPG
                 currencies.AddRange(value);
             }
         }
+
+        public IList<CharacterDataBoolean> ServerBools
+        {
+            get { return serverBools; }
+            set
+            {
+                serverBools.Clear();
+                serverBools.AddRange(value);
+            }
+        }
+
+        public IList<CharacterDataInt32> ServerInts
+        {
+            get { return serverInts; }
+            set
+            {
+                serverInts.Clear();
+                serverInts.AddRange(value);
+            }
+        }
+
+        public IList<CharacterDataFloat32> ServerFloats
+        {
+            get { return serverFloats; }
+            set
+            {
+                serverFloats.Clear();
+                serverFloats.AddRange(value);
+            }
+        }
+
+        public IList<CharacterDataBoolean> PrivateBools
+        {
+            get { return privateBools; }
+            set
+            {
+                privateBools.Clear();
+                privateBools.AddRange(value);
+            }
+        }
+
+        public IList<CharacterDataInt32> PrivateInts
+        {
+            get { return privateInts; }
+            set
+            {
+                privateInts.Clear();
+                privateInts.AddRange(value);
+            }
+        }
+
+        public IList<CharacterDataFloat32> PrivateFloats
+        {
+            get { return privateFloats; }
+            set
+            {
+                privateFloats.Clear();
+                privateFloats.AddRange(value);
+            }
+        }
+
+        public IList<CharacterDataBoolean> PublicBools
+        {
+            get { return publicBools; }
+            set
+            {
+                publicBools.Clear();
+                publicBools.AddRange(value);
+            }
+        }
+
+        public IList<CharacterDataInt32> PublicInts
+        {
+            get { return publicInts; }
+            set
+            {
+                publicInts.Clear();
+                publicInts.AddRange(value);
+            }
+        }
+
+        public IList<CharacterDataFloat32> PublicFloats
+        {
+            get { return publicFloats; }
+            set
+            {
+                publicFloats.Clear();
+                publicFloats.AddRange(value);
+            }
+        }
         #endregion
 
         #region Network setup functions
@@ -224,6 +332,12 @@ namespace MultiplayerARPG
             hotkeys.forOwnerOnly = true;
             quests.forOwnerOnly = true;
             currencies.forOwnerOnly = true;
+            privateBools.forOwnerOnly = true;
+            privateInts.forOwnerOnly = true;
+            privateFloats.forOwnerOnly = true;
+            publicBools.forOwnerOnly = false;
+            publicInts.forOwnerOnly = false;
+            publicFloats.forOwnerOnly = false;
         }
 
         public override void OnSetup()
