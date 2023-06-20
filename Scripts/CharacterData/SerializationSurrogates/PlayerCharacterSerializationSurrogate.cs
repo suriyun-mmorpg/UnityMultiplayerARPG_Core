@@ -53,6 +53,15 @@ namespace MultiplayerARPG
             info.AddListValue("quests", data.Quests);
             info.AddValue("equipWeapons", data.EquipWeapons);
             info.AddListValue("currencies", data.Currencies);
+            info.AddListValue("serverBools", data.ServerBools);
+            info.AddListValue("serverInts", data.ServerInts);
+            info.AddListValue("serverFloats", data.ServerFloats);
+            info.AddListValue("privateBools", data.PrivateBools);
+            info.AddListValue("privateInts", data.PrivateInts);
+            info.AddListValue("privateFloats", data.PrivateFloats);
+            info.AddListValue("publicBools", data.PublicBools);
+            info.AddListValue("publicInts", data.PublicInts);
+            info.AddListValue("publicFloats", data.PublicFloats);
             this.InvokeInstanceDevExtMethods("GetObjectData", obj, info, context);
         }
 
@@ -152,6 +161,60 @@ namespace MultiplayerARPG
             try
             {
                 data.Currencies = info.GetListValue<CharacterCurrency>("currencies");
+            }
+            catch { }
+            // TODO: Backward compatible, this will be removed in future version
+            try
+            {
+                data.ServerBools = info.GetListValue<CharacterDataBoolean>("serverBools");
+            }
+            catch { }
+            // TODO: Backward compatible, this will be removed in future version
+            try
+            {
+                data.ServerInts = info.GetListValue<CharacterDataInt32>("serverInts");
+            }
+            catch { }
+            // TODO: Backward compatible, this will be removed in future version
+            try
+            {
+                data.ServerFloats = info.GetListValue<CharacterDataFloat32>("serverFloats");
+            }
+            catch { }
+            // TODO: Backward compatible, this will be removed in future version
+            try
+            {
+                data.PrivateBools = info.GetListValue<CharacterDataBoolean>("privateBools");
+            }
+            catch { }
+            // TODO: Backward compatible, this will be removed in future version
+            try
+            {
+                data.PrivateInts = info.GetListValue<CharacterDataInt32>("privateInts");
+            }
+            catch { }
+            // TODO: Backward compatible, this will be removed in future version
+            try
+            {
+                data.PrivateFloats = info.GetListValue<CharacterDataFloat32>("privateFloats");
+            }
+            catch { }
+            // TODO: Backward compatible, this will be removed in future version
+            try
+            {
+                data.PublicBools = info.GetListValue<CharacterDataBoolean>("publicBools");
+            }
+            catch { }
+            // TODO: Backward compatible, this will be removed in future version
+            try
+            {
+                data.PublicInts = info.GetListValue<CharacterDataInt32>("publicInts");
+            }
+            catch { }
+            // TODO: Backward compatible, this will be removed in future version
+            try
+            {
+                data.PublicFloats = info.GetListValue<CharacterDataFloat32>("publicFloats");
             }
             catch { }
             data.EquipWeapons = (EquipWeapons)info.GetValue("equipWeapons", typeof(EquipWeapons));
