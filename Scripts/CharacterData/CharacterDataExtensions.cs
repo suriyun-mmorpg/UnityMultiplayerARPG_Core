@@ -1502,77 +1502,6 @@ namespace MultiplayerARPG
             return weaponItem.MovementRestrictionWhileAttacking;
         }
 
-        public static int IndexOfAttribute(this ICharacterData data, int dataId)
-        {
-            for (int i = 0; i < data.Attributes.Count; ++i)
-            {
-                if (data.Attributes[i].dataId == dataId)
-                    return i;
-            }
-            return -1;
-        }
-
-        public static int IndexOfSkill(this ICharacterData data, int dataId)
-        {
-            for (int i = 0; i < data.Skills.Count; ++i)
-            {
-                if (data.Skills[i].dataId == dataId)
-                    return i;
-            }
-            return -1;
-        }
-
-        public static int IndexOfSkillUsage(this ICharacterData data, int dataId, SkillUsageType type)
-        {
-            for (int i = 0; i < data.SkillUsages.Count; ++i)
-            {
-                if (data.SkillUsages[i].dataId == dataId && data.SkillUsages[i].type == type)
-                    return i;
-            }
-            return -1;
-        }
-
-        public static int IndexOfBuff(this ICharacterData data, int dataId, BuffType type)
-        {
-            for (int i = 0; i < data.Buffs.Count; ++i)
-            {
-                if (data.Buffs[i].dataId == dataId && data.Buffs[i].type == type)
-                    return i;
-            }
-            return -1;
-        }
-
-        public static List<int> IndexesOfBuff(this ICharacterData data, int dataId, BuffType type)
-        {
-            List<int> result = new List<int>();
-            for (int i = 0; i < data.Buffs.Count; ++i)
-            {
-                if (data.Buffs[i].dataId == dataId && data.Buffs[i].type == type)
-                    result.Add(i);
-            }
-            return result;
-        }
-
-        public static int IndexOfEquipItem(this ICharacterData data, int dataId)
-        {
-            for (int i = 0; i < data.EquipItems.Count; ++i)
-            {
-                if (data.EquipItems[i].dataId == dataId)
-                    return i;
-            }
-            return -1;
-        }
-
-        public static int IndexOfEquipItem(this ICharacterData data, string id)
-        {
-            for (int i = 0; i < data.EquipItems.Count; ++i)
-            {
-                if (!string.IsNullOrEmpty(data.EquipItems[i].id) && data.EquipItems[i].id.Equals(id))
-                    return i;
-            }
-            return -1;
-        }
-
         public static int IndexOfEquipItemByEquipPosition(this ICharacterData data, string equipPosition, byte equipSlotIndex)
         {
             if (string.IsNullOrEmpty(equipPosition))
@@ -1762,7 +1691,7 @@ namespace MultiplayerARPG
         {
             index = expectedIndex;
             if (index < 0 || index >= itemList.Count || itemList[index].NotEmptySlot())
-                index = IndexOfEmptyItemSlot(itemList);
+                index = itemList.IndexOfEmptyItemSlot();
             if (index >= 0)
             {
                 // Insert to empty slot
@@ -1779,66 +1708,6 @@ namespace MultiplayerARPG
         public static int IndexOfEmptyNonEquipItemSlot(this ICharacterData data)
         {
             return data.NonEquipItems.IndexOfEmptyItemSlot();
-        }
-
-        public static int IndexOfEmptyItemSlot(this IList<CharacterItem> list)
-        {
-            for (int i = 0; i < list.Count; ++i)
-            {
-                if (list[i].IsEmptySlot())
-                    return i;
-            }
-            return -1;
-        }
-
-        public static int IndexOfNonEquipItem(this ICharacterData data, int dataId)
-        {
-            for (int i = 0; i < data.NonEquipItems.Count; ++i)
-            {
-                if (data.NonEquipItems[i].dataId == dataId)
-                    return i;
-            }
-            return -1;
-        }
-
-        public static int IndexOfNonEquipItem(this ICharacterData data, string id)
-        {
-            for (int i = 0; i < data.NonEquipItems.Count; ++i)
-            {
-                if (!string.IsNullOrEmpty(data.NonEquipItems[i].id) && data.NonEquipItems[i].id.Equals(id))
-                    return i;
-            }
-            return -1;
-        }
-
-        public static int IndexOfSummon(this ICharacterData data, uint objectId)
-        {
-            for (int i = 0; i < data.Summons.Count; ++i)
-            {
-                if (data.Summons[i].objectId == objectId)
-                    return i;
-            }
-            return -1;
-        }
-
-        public static int IndexOfSummon(this ICharacterData data, SummonType type)
-        {
-            for (int i = 0; i < data.Summons.Count; ++i)
-            {
-                if (data.Summons[i].type == type)
-                    return i;
-            }
-            return -1;
-        }
-
-        public static int IndexOfSummon(this ICharacterData data, int dataId, SummonType type)
-        {
-            for (int i = 0; i < data.Summons.Count; ++i)
-            {
-                if (data.Summons[i].dataId == dataId && data.Summons[i].type == type)
-                    return i;
-            }
-            return -1;
         }
 
         public static int IndexOfAmmoItem(this ICharacterData data, AmmoType ammoType)
@@ -2109,7 +1978,7 @@ namespace MultiplayerARPG
                 return false;
             }
 
-            if (character.IndexOfSkillUsage(character.NonEquipItems[itemIndex].dataId, SkillUsageType.UsableItem) >= 0)
+            if (character.IndexOfSkillUsage(SkillUsageType.UsableItem, character.NonEquipItems[itemIndex].dataId) >= 0)
             {
                 gameMessage = UITextKeys.UI_ERROR_ITEM_IS_COOLING_DOWN;
                 return false;
