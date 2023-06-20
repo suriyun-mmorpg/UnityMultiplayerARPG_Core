@@ -851,8 +851,8 @@ namespace MultiplayerARPG
                         _clientTargetPosition = position;
                     else
                         _clientTargetPosition = null;
-                    MovementState = movementState;
-                    ExtraMovementState = extraMovementState;
+                    MovementState = _tempMovementState = movementState;
+                    ExtraMovementState = _tempExtraMovementState = extraMovementState;
                 }
                 _acceptedPositionTimestamp = timestamp;
             }
