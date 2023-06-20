@@ -28,9 +28,9 @@ namespace MultiplayerARPG
 
         public void Build(IEquipmentItem item, int level, int randomSeed)
         {
-            this._item = item;
-            this._level = level;
-            this._randomSeed = randomSeed;
+            _item = item;
+            _level = level;
+            _randomSeed = randomSeed;
 
             _increaseStats = CharacterStats.Empty;
             _increaseStatsRate = CharacterStats.Empty;
