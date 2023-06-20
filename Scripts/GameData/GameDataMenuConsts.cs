@@ -175,21 +175,25 @@ namespace MultiplayerARPG
         public const string EQUIPMENT_MODEL_BONES_SETUP_BY_BONE_NAMES_MANAGER_MENU = "Create GameData/Equipment Model Bones Setup Manager/Equipment Model Bones Setup By Bone Names Manager";
         public const int EQUIPMENT_MODEL_BONES_SETUP_BY_BONE_NAMES_MANAGER_ORDER = -5593;
 
+        public const string EQUIPMENT_MODEL_BONES_SETUP_BY_BONES_LIST_REPLACING_MANAGER_FILE = "Equipment Model Bones Setup By Bones List Replacing Manager";
+        public const string EQUIPMENT_MODEL_BONES_SETUP_BY_BONES_LIST_REPLACING_MANAGER_MENU = "Create GameData/Equipment Model Bones Setup Manager/Equipment Model Bones Setup By Bones List Replacing Manager";
+        public const int EQUIPMENT_MODEL_BONES_SETUP_BY_BONES_LIST_REPLACING_MANAGER_ORDER = -5592;
+
         public const string AMMO_TYPE_FILE = "Ammo Type";
         public const string AMMO_TYPE_MENU = "Create GameData/Ammo Type";
-        public const int AMMO_TYPE_ORDER = -5592;
+        public const int AMMO_TYPE_ORDER = -5591;
 
         public const string VEHICLE_TYPE_FILE = "Vehicle Type";
         public const string VEHICLE_TYPE_MENU = "Create GameData/Vehicle Type";
-        public const int VEHICLE_TYPE_ORDER = -5591;
+        public const int VEHICLE_TYPE_ORDER = -5590;
 
         public const string ITEM_CRAFT_FORMULA_FILE = "Item Craft Formula";
         public const string ITEM_CRAFT_FORMULA_MENU = "Create GameData/Item Craft Formula";
-        public const int ITEM_CRAFT_FORMULA_ORDER = -5590;
+        public const int ITEM_CRAFT_FORMULA_ORDER = -5589;
 
         public const string GACHA_FILE = "Gacha";
         public const string GACHA_MENU = "Create GameData/Gacha";
-        public const int GACHA_ORDER = -5589;
+        public const int GACHA_ORDER = -5588;
 
         public const string MAP_INFO_FILE = "Map Info";
         public const string MAP_INFO_MENU = "Create GameData/MapInfo/Map Info";
