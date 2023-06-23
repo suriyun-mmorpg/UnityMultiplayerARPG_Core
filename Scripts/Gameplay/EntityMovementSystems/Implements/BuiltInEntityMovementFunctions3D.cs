@@ -467,6 +467,8 @@ namespace MultiplayerARPG
                     // so adjust move speed by distance and time (with physic formula: v=s/t)
                     if (tempPredictSqrMagnitude >= tempSqrMagnitude && tempTargetDistance > 0f)
                         CurrentMoveSpeed *= tempTargetDistance / deltaTime / CurrentMoveSpeed;
+                    if (CurrentMoveSpeed < 0.01f || tempTargetDistance <= 0f)
+                        CurrentMoveSpeed = 0f;
                 }
                 tempMoveVelocity = tempHorizontalMoveDirection * CurrentMoveSpeed;
                 _velocityBeforeAirborne = tempMoveVelocity;
@@ -534,9 +536,8 @@ namespace MultiplayerARPG
                     // so adjust move speed by distance and time (with physic formula: v=s/t)
                     if (tempPredictSqrMagnitude >= tempSqrMagnitude && tempTargetDistance > 0f)
                         CurrentMoveSpeed *= tempTargetDistance / deltaTime / CurrentMoveSpeed;
-                    // Swim up to surface
-                    if (CurrentMoveSpeed < 0.01f)
-                        _moveDirection.y = 0f;
+                    if (CurrentMoveSpeed < 0.01f || tempTargetDistance <= 0f)
+                        CurrentMoveSpeed = 0f;
                     tempMoveVelocity.y = _moveDirection.y * CurrentMoveSpeed;
                     if (!HasNavPaths)
                         _currentInput = Entity.SetInputYPosition(_currentInput, tempPredictPosition.y);
