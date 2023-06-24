@@ -4,25 +4,25 @@ namespace MultiplayerARPG
 {
     public class PlayerCharacterBodyPartComponent : BaseGameEntityComponent<BasePlayerCharacterEntity>
     {
-        public enum EColorSetupModes
+        [System.Serializable]
+        public class ColorSetting
         {
-            ChangeMaterial,
-            ChangeMaterialColor,
+            public Material material;
+            public bool changeMaterialColor;
+            public string materialPropertyName;
+            public Color color = Color.white;
         }
 
         [System.Serializable]
-        public class ColorSetting
+        public class ColorOption
         {
             [Header("Settings for UI")]
             public string defaultTitle = string.Empty;
             public LanguageData[] languageSpecificTitles = new LanguageData[0];
 
-            [Header("Settings for `Change Material Mode`")]
-            public Material material;
-
-            [Header("Settings for `Change Material Color Mode`")]
-            public Color color = Color.white;
-            public string materialPropertyName;
+            [Header("Settings for in-game appearance")]
+            [Tooltip("Color settings for each model, its index will be the same as `models`'s index")]
+            public ColorSetting[] settings = new ColorSetting[0];
 
             public string Title
             {
@@ -31,16 +31,15 @@ namespace MultiplayerARPG
         }
 
         [System.Serializable]
-        public class ModelSetting
+        public class ModelOption
         {
             [Header("Settings for UI")]
             public string defaultTitle = string.Empty;
             public LanguageData[] languageSpecificTitles = new LanguageData[0];
 
             [Header("Settings for in-game appearance")]
-            public EquipmentModel model;
-            public EColorSetupModes colorSetupMode;
-            public ColorSetting[] colorSettings = new ColorSetting[0];
+            public EquipmentModel[] models = new EquipmentModel[0];
+            public ColorOption[] colors = new ColorOption[0];
 
             public string Title
             {
@@ -50,12 +49,12 @@ namespace MultiplayerARPG
 
         public string modelSettingId;
         public string colorSettingId;
-        public ModelSetting[] settings = new ModelSetting[0];
+        public ModelOption[] options = new ModelOption[0];
         private bool _applying;
         private int _currentModelIndex;
         private int _currentColorIndex;
-        public int MaxModelOptions { get => settings.Length; }
-        public int MaxColorOptions { get => settings[_currentModelIndex].colorSettings.Length; }
+        public int MaxModelOptions { get => options.Length; }
+        public int MaxColorOptions { get => options[_currentModelIndex].colors.Length; }
 
         public override void EntityAwake()
         {
