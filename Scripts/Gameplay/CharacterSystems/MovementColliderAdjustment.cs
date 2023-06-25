@@ -175,13 +175,13 @@ namespace MultiplayerARPG
 
         private void Apply(Settings settings)
         {
-            if (_capsuleCollider != null)
-            {
-                _capsuleCollider.center = settings.center;
-                _capsuleCollider.radius = settings.radius;
-                _capsuleCollider.height = settings.height;
-                _capsuleCollider.direction = (int)settings.direction;
-            }
+            if (_capsuleCollider == null)
+                return;
+
+            _capsuleCollider.center = settings.center;
+            _capsuleCollider.radius = settings.radius;
+            _capsuleCollider.height = settings.height;
+            _capsuleCollider.direction = (int)settings.direction;
         }
     }
 }
