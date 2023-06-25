@@ -1,5 +1,4 @@
 ﻿using UnityEngine;
-using StandardAssets.Characters.Physics;
 
 namespace MultiplayerARPG
 {
@@ -56,57 +55,19 @@ namespace MultiplayerARPG
 #endif
         };
 
-        private OpenCharacterController _openCharacterController;
         private CapsuleCollider _capsuleCollider;
         private bool _previousIsUnderWater;
         private ExtraMovementState _previousExtraMovementState;
 
         public override void EntityAwake()
         {
-            _openCharacterController = GetComponent<OpenCharacterController>();
             _capsuleCollider = GetComponent<CapsuleCollider>();
         }
 
 #if UNITY_EDITOR
         private void OnValidate()
         {
-            _openCharacterController = GetComponent<OpenCharacterController>();
             _capsuleCollider = GetComponent<CapsuleCollider>();
-            if (_openCharacterController != null)
-            {
-                Settings tempSettings;
-                bool anyDirectionNotY = false;
-                if (standSettings.direction != Direction.Y)
-                {
-                    anyDirectionNotY = true;
-                    tempSettings = standSettings;
-                    tempSettings.direction = Direction.Y;
-                    standSettings = tempSettings;
-                }
-                if (crouchSettings.direction != Direction.Y)
-                {
-                    anyDirectionNotY = true;
-                    tempSettings = crouchSettings;
-                    tempSettings.direction = Direction.Y;
-                    crouchSettings = tempSettings;
-                }
-                if (crawlSettings.direction != Direction.Y)
-                {
-                    anyDirectionNotY = true;
-                    tempSettings = crawlSettings;
-                    tempSettings.direction = Direction.Y;
-                    crawlSettings = tempSettings;
-                }
-                if (swimSettings.direction != Direction.Y)
-                {
-                    anyDirectionNotY = true;
-                    tempSettings = swimSettings;
-                    tempSettings.direction = Direction.Y;
-                    swimSettings = tempSettings;
-                }
-                if (anyDirectionNotY)
-                    Debug.LogWarning("Direction for `OpenCharacterController` can set to `Y` only");
-            }
             ApplyingSettings(ref standSettings);
             ApplyingSettings(ref crouchSettings);
             ApplyingSettings(ref crawlSettings);
@@ -185,7 +146,7 @@ namespace MultiplayerARPG
 
         public override void EntityLateUpdate()
         {
-            if (_openCharacterController == null && _capsuleCollider == null)
+            if (_capsuleCollider == null)
                 return;
 
             bool isUnderWater = Entity.MovementState.Has(MovementState.IsUnderWater);
@@ -214,11 +175,7 @@ namespace MultiplayerARPG
 
         private void Apply(Settings settings)
         {
-            if (_openCharacterController != null)
-            {
-                _openCharacterController.SetRadiusHeightAndCenter(settings.radius, settings.height, settings.center, true, true);
-            }
-            else if (_capsuleCollider != null)
+            if (_capsuleCollider != null)
             {
                 _capsuleCollider.center = settings.center;
                 _capsuleCollider.radius = settings.radius;
