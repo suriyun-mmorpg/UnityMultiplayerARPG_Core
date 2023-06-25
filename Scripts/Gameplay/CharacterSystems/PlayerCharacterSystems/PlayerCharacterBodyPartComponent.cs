@@ -5,12 +5,17 @@ namespace MultiplayerARPG
     public class PlayerCharacterBodyPartComponent : BaseGameEntityComponent<BasePlayerCharacterEntity>
     {
         [System.Serializable]
+        public class MaterialColorSetting
+        {
+            public string propertyName;
+            public Color color = Color.white;
+        }
+
+        [System.Serializable]
         public class ColorSetting
         {
             public Material material;
-            public bool changeMaterialColor;
-            public string materialPropertyName;
-            public Color color = Color.white;
+            public MaterialColorSetting[] materialSettings = new MaterialColorSetting[0];
         }
 
         [System.Serializable]
@@ -61,15 +66,10 @@ namespace MultiplayerARPG
             SetModel(0);
         }
 
-        public override void EntityUpdate()
-        {
-            if (_applying)
-            {
-                Apply();
-                _applying = false;
-            }
-        }
-
+        /// <summary>
+        /// This function should be called by server or being called in character creation only, it is not allow client to set custom data.
+        /// </summary>
+        /// <param name="index"></param>
         public void SetModel(int index)
         {
             if (index < 0 || index >= MaxModelOptions)
@@ -77,7 +77,9 @@ namespace MultiplayerARPG
             _currentModelIndex = index;
             _currentColorIndex = 0;
             _applying = true;
-            // TODO: Save to entity's `PublicInts`
+            // Save to entity's `PublicInts`
+            Entity.SetPublicInt32(modelSettingId.GenerateHashId(), _currentModelIndex);
+            Entity.SetPublicInt32(colorSettingId.GenerateHashId(), _currentColorIndex);
         }
 
         public int GetModel()
@@ -85,13 +87,24 @@ namespace MultiplayerARPG
             return _currentModelIndex;
         }
 
+        /// <summary>
+        /// This function should be called by server or being called in character creation only, it is not allow client to set custom data.
+        /// </summary>
+        /// <param name="index"></param>
         public void SetColor(int index)
         {
             if (index < 0 || index >= MaxColorOptions)
                 return;
             _currentColorIndex = index;
             _applying = true;
-            // TODO: Save to entity's `PublicInts`
+            // Save to entity's `PublicInts`
+            Entity.SetPublicInt32(modelSettingId.GenerateHashId(), _currentModelIndex);
+            Entity.SetPublicInt32(colorSettingId.GenerateHashId(), _currentColorIndex);
+        }
+
+        public int GetColor()
+        {
+            return _currentColorIndex;
         }
 
         public void Apply()
