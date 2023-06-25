@@ -3,8 +3,6 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEditor;
 using UnityEditor.SceneManagement;
-using UnityEngine.AI;
-using StandardAssets.Characters.Physics;
 using LiteNetLibManager;
 using System.Reflection;
 
@@ -174,8 +172,10 @@ namespace MultiplayerARPG
                     VehicleEntity savedEntity = savedObject.GetComponent<VehicleEntity>();
                     if (savedEntity is VehicleEntity)
                     {
-                        List<VehicleEntity> list = new List<VehicleEntity>(gameDatabase.vehicleEntities);
-                        list.Add(savedEntity as VehicleEntity);
+                        List<VehicleEntity> list = new List<VehicleEntity>(gameDatabase.vehicleEntities)
+                        {
+                            savedEntity
+                        };
                         gameDatabase.vehicleEntities = list.ToArray();
                     }
                     EditorUtility.SetDirty(gameDatabase);
