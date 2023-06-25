@@ -21,7 +21,7 @@ namespace MultiplayerARPG
         public const float RESPAWN_GROUNDED_CHECK_DURATION = 1f;
         public const float RESPAWN_INVINCIBLE_DURATION = 1f;
         public const float FIND_ENTITY_DISTANCE_BUFFER = 1f;
-        public const int FRAMES_BEFORE_SET_EQUIP_MODEL = 1;
+        public const int FRAMES_BEFORE_UPDATE_APPEARANCES = 1;
 
         protected struct SyncListRecachingState
         {
@@ -140,7 +140,7 @@ namespace MultiplayerARPG
         public float RespawnInvincibleCountDown { get; protected set; }
         public float LastUseItemTime { get; set; }
 
-        protected int _countDownToSetEquipItemsModels = FRAMES_BEFORE_SET_EQUIP_MODEL;
+        protected int _countDownToUpdateAppearances = FRAMES_BEFORE_UPDATE_APPEARANCES;
         protected float _lastActionTime;
         #endregion
 
@@ -378,10 +378,10 @@ namespace MultiplayerARPG
             Profiler.EndSample();
 
             Profiler.BeginSample("BaseCharacterEntity - SetEquipItemsModels");
-            if (_countDownToSetEquipItemsModels > 0)
+            if (_countDownToUpdateAppearances > 0)
             {
-                --_countDownToSetEquipItemsModels;
-                if (_countDownToSetEquipItemsModels <= 0)
+                --_countDownToUpdateAppearances;
+                if (_countDownToUpdateAppearances <= 0)
                     SetEquipItemsModels();
             }
             Profiler.EndSample();
@@ -1348,9 +1348,9 @@ namespace MultiplayerARPG
         #endregion
 
         #region Equip items models setting
-        protected void PrepareToSetEquipItemsModels()
+        public void MarkToUpdateAppearances()
         {
-            _countDownToSetEquipItemsModels = FRAMES_BEFORE_SET_EQUIP_MODEL;
+            _countDownToUpdateAppearances = FRAMES_BEFORE_UPDATE_APPEARANCES;
         }
 
         protected void SetEquipItemsModels()
