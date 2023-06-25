@@ -55,7 +55,6 @@ namespace MultiplayerARPG
         public string modelSettingId;
         public string colorSettingId;
         public ModelOption[] options = new ModelOption[0];
-        private bool _applying;
         private int _currentModelIndex;
         private int _currentColorIndex;
         public int MaxModelOptions { get => options.Length; }
@@ -76,10 +75,11 @@ namespace MultiplayerARPG
                 return;
             _currentModelIndex = index;
             _currentColorIndex = 0;
-            _applying = true;
             // Save to entity's `PublicInts`
             Entity.SetPublicInt32(modelSettingId.GenerateHashId(), _currentModelIndex);
             Entity.SetPublicInt32(colorSettingId.GenerateHashId(), _currentColorIndex);
+            // Update model later
+            Entity.MarkToUpdateAppearances();
         }
 
         public int GetModel()
@@ -96,10 +96,11 @@ namespace MultiplayerARPG
             if (index < 0 || index >= MaxColorOptions)
                 return;
             _currentColorIndex = index;
-            _applying = true;
             // Save to entity's `PublicInts`
             Entity.SetPublicInt32(modelSettingId.GenerateHashId(), _currentModelIndex);
             Entity.SetPublicInt32(colorSettingId.GenerateHashId(), _currentColorIndex);
+            // Update model later
+            Entity.MarkToUpdateAppearances();
         }
 
         public int GetColor()
