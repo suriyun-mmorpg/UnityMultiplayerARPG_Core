@@ -4,6 +4,6 @@ namespace MultiplayerARPG
 {
     public abstract class BaseEquipmentModelBonesSetupManager : ScriptableObject
     {
-        public abstract void Setup(BaseCharacterModel characterModel, EquipmentModel data, GameObject newModel, EquipmentContainer equipmentContainer);
+        public abstract void Setup(BaseCharacterModel characterModel, EquipmentModel equipmentModel, GameObject instantiatedObject, BaseEquipmentEntity instantiatedEntity, EquipmentContainer equipmentContainer);
     }
 }

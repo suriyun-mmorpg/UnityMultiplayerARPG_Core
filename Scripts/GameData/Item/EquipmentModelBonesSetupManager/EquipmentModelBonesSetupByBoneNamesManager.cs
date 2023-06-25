@@ -6,21 +6,21 @@ namespace MultiplayerARPG
     [CreateAssetMenu(fileName = GameDataMenuConsts.EQUIPMENT_MODEL_BONES_SETUP_BY_BONE_NAMES_MANAGER_FILE, menuName = GameDataMenuConsts.EQUIPMENT_MODEL_BONES_SETUP_BY_BONE_NAMES_MANAGER_MENU, order = GameDataMenuConsts.EQUIPMENT_MODEL_BONES_SETUP_BY_BONE_NAMES_MANAGER_ORDER)]
     public class EquipmentModelBonesSetupByBoneNamesManager : BaseEquipmentModelBonesSetupManager
     {
-        public override void Setup(BaseCharacterModel characterModel, EquipmentModel data, GameObject newModel, EquipmentContainer equipmentContainer)
+        public override void Setup(BaseCharacterModel characterModel, EquipmentModel equipmentModel, GameObject instantiatedObject, BaseEquipmentEntity instantiatedEntity, EquipmentContainer equipmentContainer)
         {
             if (GameInstance.Singleton.DimensionType != DimensionType.Dimension3D)
                 return;
 
-            if (newModel == null)
+            if (instantiatedObject == null)
                 return;
 
             if (!(characterModel is IModelWithSkinnedMeshRenderer skinnedMeshSrc))
             {
-                Debug.LogWarning($"[{nameof(EquipmentModelBonesSetupByBoneNamesManager)}] Cannot setup bones for \"{newModel}\", character model \"{characterModel}\" is not a model with skinned mesh");
+                Debug.LogWarning($"[{nameof(EquipmentModelBonesSetupByBoneNamesManager)}] Cannot setup bones for \"{instantiatedObject}\", character model \"{characterModel}\" is not a model with skinned mesh");
                 return;
             }
 
-            SkinnedMeshRenderer newSkinnedMesh = newModel.GetComponentInChildren<SkinnedMeshRenderer>();
+            SkinnedMeshRenderer newSkinnedMesh = instantiatedObject.GetComponentInChildren<SkinnedMeshRenderer>();
             if (newSkinnedMesh == null)
                 return;
 
@@ -43,7 +43,7 @@ namespace MultiplayerARPG
                 if (characterBoneMap.TryGetValue(newBone.name, out newBones[i]))
                     continue;
                 // Really cannot find the bone, show error message
-                Debug.LogWarning($"[{nameof(EquipmentModelBonesSetupByBoneNamesManager)}] {newModel} unable to find mapped bone for \"{newBone}\"");
+                Debug.LogWarning($"[{nameof(EquipmentModelBonesSetupByBoneNamesManager)}] {instantiatedObject} unable to find mapped bone for \"{newBone}\"");
             }
             newSkinnedMesh.bones = newBones;
         }

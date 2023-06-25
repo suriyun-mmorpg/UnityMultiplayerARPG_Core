@@ -5,22 +5,22 @@ namespace MultiplayerARPG
     [CreateAssetMenu(fileName = GameDataMenuConsts.EQUIPMENT_MODEL_BONES_SETUP_BY_BONES_LIST_REPLACING_MANAGER_FILE, menuName = GameDataMenuConsts.EQUIPMENT_MODEL_BONES_SETUP_BY_BONES_LIST_REPLACING_MANAGER_MENU, order = GameDataMenuConsts.EQUIPMENT_MODEL_BONES_SETUP_BY_BONES_LIST_REPLACING_MANAGER_ORDER)]
     public class EquipmentModelBonesSetupByBonesListReplacingManager : BaseEquipmentModelBonesSetupManager
     {
-        public override void Setup(BaseCharacterModel characterModel, EquipmentModel data, GameObject newModel, EquipmentContainer equipmentContainer)
+        public override void Setup(BaseCharacterModel characterModel, EquipmentModel equipmentModel, GameObject instantiatedObject, BaseEquipmentEntity instantiatedEntity, EquipmentContainer equipmentContainer)
         {
             if (GameInstance.Singleton.DimensionType != DimensionType.Dimension3D)
                 return;
 
-            if (newModel == null)
+            if (instantiatedObject == null)
                 return;
 
             if (!(characterModel is IModelWithSkinnedMeshRenderer skinnedMeshSrc))
             {
-                Debug.LogWarning($"[{nameof(EquipmentModelBonesSetupByBonesListReplacingManager)}] Cannot setup bones for \"{newModel}\", character model \"{characterModel}\" is not a model with animator");
+                Debug.LogWarning($"[{nameof(EquipmentModelBonesSetupByBonesListReplacingManager)}] Cannot setup bones for \"{instantiatedObject}\", character model \"{characterModel}\" is not a model with animator");
                 return;
             }
 
             SkinnedMeshRenderer skinnedMeshRenderer = skinnedMeshSrc.SkinnedMeshRenderer;
-            SkinnedMeshRenderer skinnedMesh = newModel.GetComponentInChildren<SkinnedMeshRenderer>();
+            SkinnedMeshRenderer skinnedMesh = instantiatedObject.GetComponentInChildren<SkinnedMeshRenderer>();
             if (skinnedMesh != null && skinnedMeshRenderer != null)
             {
                 skinnedMesh.bones = skinnedMeshRenderer.bones;

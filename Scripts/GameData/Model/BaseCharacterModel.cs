@@ -157,8 +157,7 @@ namespace MultiplayerARPG
         public bool IsFreezeAnimation { get; protected set; }
 
         // Public events
-        public System.Action<string> onEquipmentModelsInstantiated;
-        public System.Action<string> onEquipmentModelsDestroyed;
+        public UpdateEquipmentModelsDelegate onBeforeUpdateEquipmentModels;
 
         // Optimize garbage collector
         protected bool _isCacheDataInitialized = false;
@@ -392,10 +391,15 @@ namespace MultiplayerARPG
             // Prepared data
             EquipmentContainer tempContainer;
             EquipmentModel tempEquipmentModel;
+            BaseEquipmentEntity tempEquipmentEntity;
             GameObject tempEquipmentObject;
             Dictionary<string, EquipmentModel> showingModels = new Dictionary<string, EquipmentModel>();
             Dictionary<string, EquipmentModel> storingModels = new Dictionary<string, EquipmentModel>();
             HashSet<string> unequippingSockets = new HashSet<string>(EquippedModels.Keys);
+
+            // Setup appearances before equip items
+            if (onBeforeUpdateEquipmentModels != null)
+                onBeforeUpdateEquipmentModels.Invoke(this, showingModels, storingModels, unequippingSockets);
 
             // Setup equipping models from equip items
             if (EquipItems != null && EquipItems.Count > 0)
@@ -504,15 +508,15 @@ namespace MultiplayerARPG
                         else
                             tempEquipmentObject.gameObject.SetLayerRecursively(EquipmentLayer, true);
                         tempEquipmentObject.RemoveComponentsInChildren<Collider>(false);
-                        AddingNewModel(tempEquipmentModel, tempEquipmentObject, tempContainer);
                         EquippedModelObjects[equipSocket] = tempEquipmentObject;
                     }
                 }
 
                 // Setup equipment entity
+                tempEquipmentEntity = null;
                 if (tempEquipmentObject != null)
                 {
-                    BaseEquipmentEntity tempEquipmentEntity = tempEquipmentObject.GetComponent<BaseEquipmentEntity>();
+                    tempEquipmentEntity = tempEquipmentObject.GetComponent<BaseEquipmentEntity>();
                     if (tempEquipmentEntity != null)
                         tempEquipmentEntity.Setup(this, tempEquipmentModel.equipPosition, tempEquipmentModel.itemLevel);
                     if (CacheRightHandEquipmentEntity == null && GameDataConst.EQUIP_POSITION_RIGHT_HAND.Equals(tempEquipmentModel.equipPosition))
@@ -520,6 +524,9 @@ namespace MultiplayerARPG
                     if (CacheLeftHandEquipmentEntity == null && GameDataConst.EQUIP_POSITION_LEFT_HAND.Equals(tempEquipmentModel.equipPosition))
                         CacheLeftHandEquipmentEntity = tempEquipmentEntity;
                 }
+
+                tempEquipmentModel.InvokeOnInstantiated(tempEquipmentObject, tempEquipmentEntity, tempContainer);
+                OnInstantiatedEquipment(tempEquipmentModel, tempEquipmentObject, tempEquipmentEntity, tempContainer);
             }
             EquippedModels = storingModels;
         }
@@ -541,32 +548,35 @@ namespace MultiplayerARPG
             }
         }
 
-        private void SetupEquippingModels(Dictionary<string, EquipmentModel> showingModels, Dictionary<string, EquipmentModel> storingModels, HashSet<string> unequippingSockets, EquipmentModel[] equipmentModels, int itemDataId, int itemLevel, string equipPosition, bool isSheathModels = false, byte equipWeaponSet = 0)
+        public void SetupEquippingModels(Dictionary<string, EquipmentModel> showingModels, Dictionary<string, EquipmentModel> storingModels, HashSet<string> unequippingSockets, EquipmentModel[] equipmentModels, int itemDataId, int itemLevel, string equipPosition, bool isSheathModels = false, byte equipWeaponSet = 0, EquipmentModelDelegate onInstantiated = null)
         {
             if (equipmentModels == null || equipmentModels.Length == 0 || string.IsNullOrWhiteSpace(equipPosition))
                 return;
 
-            foreach (EquipmentModel model in equipmentModels)
+            EquipmentModel tempModel;
+            for (int i = 0; i < equipmentModels.Length; ++i)
             {
-                if (string.IsNullOrEmpty(model.equipSocket) || (!model.useInstantiatedObject && !model.meshPrefab))
+                tempModel = equipmentModels[i];
+
+                if (string.IsNullOrEmpty(tempModel.equipSocket) || (!tempModel.useInstantiatedObject && !tempModel.meshPrefab))
                 {
                     // Required data are empty, skip it
                     continue;
                 }
 
-                string equipSocket = model.equipSocket;
+                string equipSocket = tempModel.equipSocket;
                 if (isSheathModels)
                 {
                     // Can instantiates multiple sheath models into 1 socket, so create new collection name
                     equipSocket = ZString.Concat(equipSocket, "_SHEATH_", equipWeaponSet, "_", equipPosition);
                     // Create a new container for this sheath weapons
-                    if (!CacheEquipmentModelContainers.ContainsKey(equipSocket) && CacheEquipmentModelContainers.ContainsKey(model.equipSocket))
-                        CacheEquipmentModelContainers[equipSocket] = CacheEquipmentModelContainers[model.equipSocket];
+                    if (!CacheEquipmentModelContainers.ContainsKey(equipSocket) && CacheEquipmentModelContainers.ContainsKey(tempModel.equipSocket))
+                        CacheEquipmentModelContainers[equipSocket] = CacheEquipmentModelContainers[tempModel.equipSocket];
                 }
 
-                if (!storingModels.TryGetValue(equipSocket, out EquipmentModel storedModel) || storedModel.priority < model.priority || (storedModel.equipPosition == equipPosition && storedModel.itemLevel < itemLevel))
+                if (!storingModels.TryGetValue(equipSocket, out EquipmentModel storedModel) || storedModel.priority < tempModel.priority || (storedModel.equipPosition == equipPosition && storedModel.itemLevel < itemLevel))
                 {
-                    if (isSheathModels && model.useSpecificSheathEquipWeaponSet && model.specificSheathEquipWeaponSet != equipWeaponSet)
+                    if (isSheathModels && tempModel.useSpecificSheathEquipWeaponSet && tempModel.specificSheathEquipWeaponSet != equipWeaponSet)
                     {
                         // Don't show it because `specificSheathEquipWeaponSet` is not equals to `equipWeaponSet`
                         continue;
@@ -575,7 +585,7 @@ namespace MultiplayerARPG
                     if (EquippedModels.TryGetValue(equipSocket, out EquipmentModel equippedModel)
                         && equippedModel.itemDataId == itemDataId
                         && equippedModel.itemLevel == itemLevel
-                        && equippedModel.priority == model.priority)
+                        && equippedModel.priority == tempModel.priority)
                     {
                         // Same view data, so don't destroy and don't instantiates this model object
                         showingModels.Remove(equipSocket);
@@ -584,10 +594,12 @@ namespace MultiplayerARPG
                         continue;
                     }
 
-                    EquipmentModel clonedModel = model.Clone();
+                    EquipmentModel clonedModel = tempModel.Clone();
+                    clonedModel.indexOfModel = i;
                     clonedModel.itemDataId = itemDataId;
                     clonedModel.itemLevel = itemLevel;
                     clonedModel.equipPosition = equipPosition;
+                    clonedModel.onInstantiated = onInstantiated;
                     showingModels[equipSocket] = clonedModel;
                     storingModels[equipSocket] = clonedModel;
                     unequippingSockets.Remove(equipSocket);
@@ -808,14 +820,14 @@ namespace MultiplayerARPG
                 CacheLeftHandEquipmentEntity.PlayCharge();
         }
 
-        public virtual void AddingNewModel(EquipmentModel data, GameObject newModel, EquipmentContainer equipmentContainer)
+        public virtual void OnInstantiatedEquipment(EquipmentModel model, GameObject instantiatedObject, BaseEquipmentEntity instantiatedEntity, EquipmentContainer equipmentContainer)
         {
-            if (data.doNotSetupBones)
+            if (model.useInstantiatedObject || model.doNotSetupBones)
                 return;
             BaseEquipmentModelBonesSetupManager equipmentModelBonesSetupManager = GameInstance.Singleton.EquipmentModelBonesSetupManager;
-            if (data.equipmentModelBonesSetupManager != null)
-                equipmentModelBonesSetupManager = data.equipmentModelBonesSetupManager;
-            equipmentModelBonesSetupManager.Setup(this, data, newModel, equipmentContainer);
+            if (model.equipmentModelBonesSetupManager != null)
+                equipmentModelBonesSetupManager = model.equipmentModelBonesSetupManager;
+            equipmentModelBonesSetupManager.Setup(this, model, instantiatedObject, instantiatedEntity, equipmentContainer);
         }
 
         public void SetIsDead(bool isDead)

@@ -4,7 +4,7 @@ using UnityEngine.Serialization;
 namespace MultiplayerARPG
 {
     [System.Serializable]
-    public struct EquipmentModel
+    public class EquipmentModel
     {
         [Header("Generic Settings")]
         public string equipSocket;
@@ -29,12 +29,12 @@ namespace MultiplayerARPG
         public BaseEquipmentModelBonesSetupManager equipmentModelBonesSetupManager;
 
         [Header("Transform Settings")]
-        public Vector3 localPosition;
-        public Vector3 localEulerAngles;
+        public Vector3 localPosition = Vector3.zero;
+        public Vector3 localEulerAngles = Vector3.zero;
         [Tooltip("Turn it on to not change object scale when it is instantiated to character's hands (or other part of body)")]
         public bool doNotChangeScale;
         [BoolShowConditional(nameof(doNotChangeScale), false)]
-        public Vector3 localScale;
+        public Vector3 localScale = Vector3.one;
 
         [Header("Weapon Sheath Settings")]
         public bool useSpecificSheathEquipWeaponSet;
@@ -42,11 +42,15 @@ namespace MultiplayerARPG
 
         #region These variables will be used at runtime, do not make changes in editor
         [HideInInspector]
+        public int indexOfModel = -1;
+        [HideInInspector]
         public int itemDataId;
         [HideInInspector]
         public int itemLevel;
         [HideInInspector]
         public string equipPosition;
+        [HideInInspector]
+        public EquipmentModelDelegate onInstantiated;
         #endregion
 
         public EquipmentModel Clone()
@@ -72,10 +76,18 @@ namespace MultiplayerARPG
                 useSpecificSheathEquipWeaponSet = useSpecificSheathEquipWeaponSet,
                 specificSheathEquipWeaponSet = specificSheathEquipWeaponSet,
                 // Runtime only data
+                indexOfModel = indexOfModel,
                 itemDataId = itemDataId,
                 itemLevel = itemLevel,
                 equipPosition = equipPosition,
+                onInstantiated = onInstantiated,
             };
+        }
+
+        public void InvokeOnInstantiated(GameObject modelObject, BaseEquipmentEntity equipmentEntity, EquipmentContainer equipmentContainer)
+        {
+            if (onInstantiated != null)
+                onInstantiated.Invoke(this, modelObject, equipmentEntity, equipmentContainer);
         }
     }
 }

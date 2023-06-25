@@ -132,4 +132,16 @@ namespace MultiplayerARPG
 
     public delegate void JumpForceAppliedDelegate(
         float verticalVelocity);
+
+    public delegate void UpdateEquipmentModelsDelegate(
+        BaseCharacterModel characterModel,
+        Dictionary<string, EquipmentModel> showingModels,
+        Dictionary<string, EquipmentModel> storingModels,
+        HashSet<string> unequippingSockets);
+
+    public delegate void EquipmentModelDelegate(
+        EquipmentModel model,
+        GameObject instantiatedObject,
+        BaseEquipmentEntity instantiatedEntity,
+        EquipmentContainer equipmentContainer);
 }
