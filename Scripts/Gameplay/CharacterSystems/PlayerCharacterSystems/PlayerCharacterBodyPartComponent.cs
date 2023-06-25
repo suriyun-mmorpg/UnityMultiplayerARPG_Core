@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace MultiplayerARPG
@@ -5,29 +6,55 @@ namespace MultiplayerARPG
     public class PlayerCharacterBodyPartComponent : BaseGameEntityComponent<BasePlayerCharacterEntity>
     {
         [System.Serializable]
-        public class MaterialColorSetting
+        public class MaterialPropertySetting
         {
             public string propertyName;
             public Color color = Color.white;
         }
 
         [System.Serializable]
-        public class ColorSetting
+        public class MaterialSetting
         {
             public Material material;
-            public MaterialColorSetting[] materialSettings = new MaterialColorSetting[0];
+            public MaterialPropertySetting[] properties = new MaterialPropertySetting[0];
+        }
+
+        [System.Serializable]
+        public class ModelColorSetting
+        {
+            [Tooltip("Material Settings for each mesh's materials, its index is index of `MeshRenderer` -> `materials`")]
+            public MaterialSetting[] materialSettings = new MaterialSetting[0];
+
+            public Material[] GetMaterials()
+            {
+                Material[] result = new Material[materialSettings.Length];
+                Material tempMaterial;
+                for (int i = 0; i < materialSettings.Length; ++i)
+                {
+                    tempMaterial = new Material(materialSettings[i].material);
+                    for (int j = 0; j < materialSettings[i].properties.Length; ++j)
+                    {
+                        tempMaterial.SetColor(materialSettings[i].properties[j].propertyName, materialSettings[i].properties[j].color);
+                    }
+                    result[i] = tempMaterial;
+                }
+                return result;
+            }
         }
 
         [System.Serializable]
         public class ColorOption
         {
-            [Header("Settings for UI")]
+            [Header("Settings for UIs")]
             public string defaultTitle = string.Empty;
             public LanguageData[] languageSpecificTitles = new LanguageData[0];
+            [PreviewSprite(50)]
+            public Sprite icon;
+            public Color iconColor = Color.white;
 
-            [Header("Settings for in-game appearance")]
-            [Tooltip("Color settings for each model, its index will be the same as `models`'s index")]
-            public ColorSetting[] settings = new ColorSetting[0];
+            [Header("Settings for In-Game Appearances")]
+            [Tooltip("Color settings for each model, its index is index of `models`")]
+            public ModelColorSetting[] ModelColorSettings = new ModelColorSetting[0];
 
             public string Title
             {
@@ -38,11 +65,13 @@ namespace MultiplayerARPG
         [System.Serializable]
         public class ModelOption
         {
-            [Header("Settings for UI")]
+            [Header("Settings for UIs")]
             public string defaultTitle = string.Empty;
             public LanguageData[] languageSpecificTitles = new LanguageData[0];
+            [PreviewSprite(50)]
+            public Sprite icon;
 
-            [Header("Settings for in-game appearance")]
+            [Header("Settings for In-Game Appearances")]
             public EquipmentModel[] models = new EquipmentModel[0];
             public ColorOption[] colors = new ColorOption[0];
 
@@ -63,6 +92,16 @@ namespace MultiplayerARPG
         public override void EntityAwake()
         {
             SetModel(0);
+        }
+
+        public override void EntityStart()
+        {
+            Entity.CharacterModel.onBeforeUpdateEquipmentModels += OnBeforeUpdateEquipmentModels;
+        }
+
+        public override void EntityOnDestroy()
+        {
+            Entity.CharacterModel.onBeforeUpdateEquipmentModels -= OnBeforeUpdateEquipmentModels;
         }
 
         /// <summary>
@@ -108,9 +147,38 @@ namespace MultiplayerARPG
             return _currentColorIndex;
         }
 
-        public void Apply()
+        private void OnBeforeUpdateEquipmentModels(
+            BaseCharacterModel characterModel,
+            Dictionary<string, EquipmentModel> showingModels,
+            Dictionary<string, EquipmentModel> storingModels,
+            HashSet<string> unequippingSockets)
         {
-            // TODO: Instantiate or activate game object then change material or change material's color
+            characterModel.SetupEquippingModels(showingModels, storingModels, unequippingSockets, options[_currentModelIndex].models, CreateFakeItemDataId(), 1, CreateFakeEquipPosition(), false, 0, OnShowEquipmentModel);
+        }
+
+        private void OnShowEquipmentModel(EquipmentModel model, GameObject modelObject, BaseEquipmentEntity equipmentEntity, EquipmentContainer equipmentContainer)
+        {
+            // Get mesh's material to change color
+            if (model == null || modelObject == null)
+                return;
+
+            if (model.indexOfModel < 0 || model.indexOfModel >= options[_currentModelIndex].colors[_currentColorIndex].ModelColorSettings.Length)
+                return;
+            
+            MeshRenderer meshRenderer = modelObject.GetComponentInChildren<MeshRenderer>();
+            if (meshRenderer == null)
+                return;
+            meshRenderer.materials = options[_currentModelIndex].colors[_currentColorIndex].ModelColorSettings[model.indexOfModel].GetMaterials();
+        }
+
+        public int CreateFakeItemDataId()
+        {
+            return string.Concat("_BODY_PART_", modelSettingId, "_", _currentModelIndex, "_", _currentColorIndex).GenerateHashId();
+        }
+
+        public string CreateFakeEquipPosition()
+        {
+            return string.Concat("_BODY_PART_" , modelSettingId);
         }
     }
 }
