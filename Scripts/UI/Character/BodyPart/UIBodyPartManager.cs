@@ -1,5 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 namespace MultiplayerARPG
@@ -77,19 +75,103 @@ namespace MultiplayerARPG
 
         private UISelectionManagerShowOnSelectEventManager<PlayerCharacterBodyPartComponent.ModelOption, UIBodyPartModelOption> _modelUIEventSetupManager = new UISelectionManagerShowOnSelectEventManager<PlayerCharacterBodyPartComponent.ModelOption, UIBodyPartModelOption>();
         private UISelectionManagerShowOnSelectEventManager<PlayerCharacterBodyPartComponent.ColorOption, UIBodyPartColorOption> _colorUIEventSetupManager = new UISelectionManagerShowOnSelectEventManager<PlayerCharacterBodyPartComponent.ColorOption, UIBodyPartColorOption>();
+        private PlayerCharacterBodyPartComponent _component;
 
         private void OnEnable()
         {
             _modelUIEventSetupManager.OnEnable(ModelSelectionManager, uiSelectedModel);
             _colorUIEventSetupManager.OnEnable(ColorSelectionManager, uiSelectedColor);
+            ModelSelectionManager.eventOnSelect.RemoveListener(OnSelectModelUI);
+            ColorSelectionManager.eventOnSelect.RemoveListener(OnSelectColorUI);
+            ModelSelectionManager.eventOnSelect.AddListener(OnSelectModelUI);
+            ColorSelectionManager.eventOnSelect.AddListener(OnSelectColorUI);
         }
 
         private void OnDisable()
         {
             _modelUIEventSetupManager.OnDisable();
             _colorUIEventSetupManager.OnDisable();
+            ModelSelectionManager.eventOnSelect.RemoveListener(OnSelectModelUI);
+            ColorSelectionManager.eventOnSelect.RemoveListener(OnSelectColorUI);
         }
 
-        // TODO: Setup the list
+        private void OnSelectModelUI(UIBodyPartModelOption ui)
+        {
+            if (_component == null)
+                return;
+            _component.SetModel(ui.Index);
+        }
+
+        private void OnSelectColorUI(UIBodyPartColorOption ui)
+        {
+            if (_component == null)
+                return;
+            _component.SetColor(ui.Index);
+        }
+
+        public void SetCharacter(ICharacterData character)
+        {
+            _component = null;
+            if (!(character is BasePlayerCharacterEntity entity))
+                return;
+            PlayerCharacterBodyPartComponent[] comps = entity.gameObject.GetComponentsInChildren<PlayerCharacterBodyPartComponent>();
+            for (int i = 0; i < comps.Length; ++i)
+            {
+                if (!modelSettingId.Equals(comps[i].modelSettingId))
+                    continue;
+                _component = comps[i];
+                break;
+            }
+            SetupLists();
+        }
+
+        private void SetupLists()
+        {
+            if (_component == null || _component.MaxModelOptions <= 0)
+            {
+                if (uiModelRoot != null)
+                    uiModelRoot.SetActive(false);
+                if (uiColorRoot != null)
+                    uiColorRoot.SetActive(false);
+                return;
+            }
+
+            if (uiModelRoot != null)
+                uiModelRoot.SetActive(true);
+
+            // Setup model list
+            ModelSelectionManager.Clear();
+            ModelList.Generate(_component.ModelOptions, (index, data, ui) =>
+            {
+                UIBodyPartModelOption uiComp = ui.GetComponent<UIBodyPartModelOption>();
+                uiComp.Data = data;
+                uiComp.Index = index;
+                ModelSelectionManager.Add(uiComp);
+                if (index == 0)
+                    uiComp.OnClickSelect();
+            });
+
+            if (_component.MaxColorOptions <= 0)
+            {
+                if (uiColorRoot != null)
+                    uiColorRoot.SetActive(false);
+                return;
+            }
+
+            if (uiColorRoot != null)
+                uiColorRoot.SetActive(true);
+
+            // Setup color list
+            ColorSelectionManager.Clear();
+            ColorList.Generate(_component.ColorOptions, (index, data, ui) =>
+            {
+                UIBodyPartColorOption uiComp = ui.GetComponent<UIBodyPartColorOption>();
+                uiComp.Data = data;
+                uiComp.Index = index;
+                ColorSelectionManager.Add(uiComp);
+                if (index == 0)
+                    uiComp.OnClickSelect();
+            });
+        }
     }
 }

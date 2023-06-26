@@ -86,7 +86,9 @@ namespace MultiplayerARPG
         public ModelOption[] options = new ModelOption[0];
         private int _currentModelIndex;
         private int _currentColorIndex;
+        public IEnumerable<ModelOption> ModelOptions { get => options; }
         public int MaxModelOptions { get => options.Length; }
+        public IEnumerable<ColorOption> ColorOptions { get => options[_currentModelIndex].colors; }
         public int MaxColorOptions { get => options[_currentModelIndex].colors.Length; }
 
         public override void EntityAwake()
