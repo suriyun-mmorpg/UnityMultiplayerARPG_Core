@@ -36,6 +36,7 @@ namespace MultiplayerARPG
         public CharacterClassEvent eventOnSelectCharacterClass = new CharacterClassEvent();
         public CharacterModelEvent eventOnBeforeUpdateAnimation = new CharacterModelEvent();
         public CharacterModelEvent eventOnAfterUpdateAnimation = new CharacterModelEvent();
+        public CharacterDataEvent eventOnShowInstantiatedCharacter = new CharacterDataEvent();
 
         private Toggle firstRaceToggle;
         private Dictionary<CharacterRace, Toggle> _raceToggles;
@@ -159,6 +160,8 @@ namespace MultiplayerARPG
         public PlayerCharacter[] SelectableCharacterClasses { get { return _selectableCharacterClasses; } }
         protected PlayerCharacter _selectedPlayerCharacter;
         public PlayerCharacter SelectedPlayerCharacter { get { return _selectedPlayerCharacter; } }
+        protected PlayerCharacterData _selectedPlayerCharacterData;
+        public PlayerCharacterData SelectedPlayerCharacterData { get { return _selectedPlayerCharacterData; } }
         protected readonly HashSet<CharacterRace> SelectedRaces = new HashSet<CharacterRace>();
         protected Faction _selectedFaction;
         public Faction SelectedFaction { get { return _selectedFaction; } }
@@ -328,25 +331,28 @@ namespace MultiplayerARPG
 
         protected void OnSelectCharacter(UICharacter uiCharacter)
         {
-            OnSelectCharacter(uiCharacter.Data as IPlayerCharacterData);
-        }
-
-        protected virtual void OnSelectCharacter(IPlayerCharacterData playerCharacterData)
-        {
-            eventOnSelectCharacter.Invoke(playerCharacterData);
+            // Set data
+            _selectedPlayerCharacterData = uiCharacter.Data as PlayerCharacterData;
+            SelectedDataId = _selectedPlayerCharacterData.DataId;
+            SelectedEntityId = _selectedPlayerCharacterData.EntityId;
+            // Hide models
             characterModelContainer.SetChildrenActive(false);
-            SelectedDataId = playerCharacterData.DataId;
-            SelectedEntityId = playerCharacterData.EntityId;
-            _characterModelByEntityId.TryGetValue(playerCharacterData.EntityId, out _selectedModel);
+            // Show selected character model
+            _characterModelByEntityId.TryGetValue(SelectedEntityId, out _selectedModel);
+            if (SelectedModel != null)
+            {
+                SelectedModel.gameObject.SetActive(true);
+                eventOnShowInstantiatedCharacter.Invoke(SelectedModel.GetComponentInParent<BaseCharacterEntity>());
+            }
+            // Run event
+            eventOnSelectCharacter.Invoke(_selectedPlayerCharacterData);
+            OnSelectCharacter(_selectedPlayerCharacterData);
             // Clear character class selection
             CharacterClassSelectionManager.Clear();
             CharacterClassList.HideAll();
-            // Show selected model
-            if (SelectedModel != null)
-                SelectedModel.gameObject.SetActive(true);
             // Setup character class list
             PlayerCharacter firstData = null;
-            _playerCharacterDataByEntityId.TryGetValue(playerCharacterData.EntityId, out _selectableCharacterClasses);
+            _playerCharacterDataByEntityId.TryGetValue(SelectedEntityId, out _selectableCharacterClasses);
             CharacterClassList.Generate(_selectableCharacterClasses, (index, playerCharacter, ui) =>
             {
                 // Setup UI
@@ -366,19 +372,19 @@ namespace MultiplayerARPG
                 OnSelectCharacterClass(firstData);
         }
 
-        protected void OnSelectCharacterClass(UICharacterClass uiCharacterClass)
+        protected virtual void OnSelectCharacter(IPlayerCharacterData playerCharacterData)
         {
-            OnSelectCharacterClass(uiCharacterClass.Data);
+            // NOTE: Override this function to do something as you wish
         }
 
-        protected virtual void OnSelectCharacterClass(BaseCharacter baseCharacter)
+        protected void OnSelectCharacterClass(UICharacterClass uiCharacterClass)
         {
-            eventOnSelectCharacterClass.Invoke(baseCharacter);
-            _selectedPlayerCharacter = baseCharacter as PlayerCharacter;
+            // Set data
+            _selectedPlayerCharacter = uiCharacterClass.Data as PlayerCharacter;
             if (SelectedPlayerCharacter != null)
             {
                 // Set creating player character data
-                SelectedDataId = baseCharacter.DataId;
+                SelectedDataId = _selectedPlayerCharacter.DataId;
                 // Prepare equip items
                 List<CharacterItem> equipItems = new List<CharacterItem>();
                 foreach (BaseItem armorItem in SelectedPlayerCharacter.ArmorItems)
@@ -401,22 +407,33 @@ namespace MultiplayerARPG
                 // Set model equip items
                 SelectedModel.SetEquipItems(equipItems, selectableWeaponSets, 0, false);
             }
+            // Run event
+            eventOnSelectCharacterClass.Invoke(_selectedPlayerCharacter);
+            OnSelectCharacterClass(uiCharacterClass.Data);
+        }
+
+        protected virtual void OnSelectCharacterClass(BaseCharacter baseCharacter)
+        {
+            // NOTE: Override this function to do something as you wish
         }
 
         protected void OnSelectFaction(UIFaction uiFaction)
         {
-            OnSelectFaction(uiFaction.Data);
+            // Set data
+            _selectedFaction = uiFaction.Data;
+            if (SelectedFaction != null)
+            {
+                // Set creating player character's faction
+                SelectedFactionId = _selectedFaction.DataId;
+            }
+            // Run event
+            eventOnSelectFaction.Invoke(_selectedFaction);
+            OnSelectFaction(_selectedFaction);
         }
 
         protected virtual void OnSelectFaction(Faction faction)
         {
-            eventOnSelectFaction.Invoke(faction);
-            _selectedFaction = faction;
-            if (SelectedFaction != null)
-            {
-                // Set creating player character's faction
-                SelectedFactionId = faction.DataId;
-            }
+            // NOTE: Override this function to do something as you wish
         }
 
         protected virtual void OnRaceToggleUpdate(CharacterRace race, bool isOn)

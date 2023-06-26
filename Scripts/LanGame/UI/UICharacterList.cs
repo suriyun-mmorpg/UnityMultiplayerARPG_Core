@@ -1,5 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.UI;
@@ -20,8 +19,10 @@ namespace MultiplayerARPG
         public UnityEvent eventOnNoCharacter = new UnityEvent();
         public UnityEvent eventOnAbleToCreateCharacter = new UnityEvent();
         public UnityEvent eventOnNotAbleToCreateCharacter = new UnityEvent();
+        public CharacterDataEvent eventOnSelectCharacter = new CharacterDataEvent();
         public CharacterModelEvent eventOnBeforeUpdateAnimation = new CharacterModelEvent();
         public CharacterModelEvent eventOnAfterUpdateAnimation = new CharacterModelEvent();
+        public CharacterDataEvent eventOnShowInstantiatedCharacter = new CharacterDataEvent();
 
         private UIList _characterList;
         public UIList CharacterList
@@ -172,7 +173,20 @@ namespace MultiplayerARPG
 
         protected void OnSelectCharacter(UICharacter uiCharacter)
         {
+            // Set data
             _selectedPlayerCharacterData = uiCharacter.Data as PlayerCharacterData;
+            // Hide models
+            characterModelContainer.SetChildrenActive(false);
+            // Show selected character model
+            _characterModelById.TryGetValue(_selectedPlayerCharacterData.Id, out _selectedModel);
+            if (SelectedModel != null)
+            {
+                SelectedModel.gameObject.SetActive(true);
+                eventOnShowInstantiatedCharacter.Invoke(SelectedModel.GetComponentInParent<BaseCharacterEntity>());
+            }
+            // Run event
+            eventOnSelectCharacter.Invoke(_selectedPlayerCharacterData);
+            OnSelectCharacter(_selectedPlayerCharacterData);
             // Enable buttons because character was selected
             if (buttonStart)
                 buttonStart.gameObject.SetActive(true);
@@ -183,12 +197,6 @@ namespace MultiplayerARPG
             {
                 obj.SetActive(true);
             }
-            characterModelContainer.SetChildrenActive(false);
-            // Show selected character model
-            _characterModelById.TryGetValue(_selectedPlayerCharacterData.Id, out _selectedModel);
-            if (SelectedModel != null)
-                SelectedModel.gameObject.SetActive(true);
-            OnSelectCharacter(uiCharacter.Data as IPlayerCharacterData);
         }
 
         protected virtual void OnSelectCharacter(IPlayerCharacterData playerCharacterData)
