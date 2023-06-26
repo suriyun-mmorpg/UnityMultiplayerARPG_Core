@@ -386,7 +386,7 @@ namespace MultiplayerARPG
             UpdateEquipmentModels();
         }
 
-        private void UpdateEquipmentModels()
+        public void UpdateEquipmentModels()
         {
             // Prepared data
             EquipmentContainer tempContainer;
@@ -484,10 +484,12 @@ namespace MultiplayerARPG
                 tempEquipmentObject = null;
                 if (tempEquipmentModel.useInstantiatedObject)
                 {
-                    // Activate the instantiated object
-                    if (!tempContainer.ActivateInstantiatedObject(tempEquipmentModel.instantiatedObjectIndex))
-                        continue;
                     tempContainer.SetActiveDefaultModel(false);
+                    if (!tempContainer.ActivateInstantiatedObject(tempEquipmentModel.instantiatedObjectIndex))
+                    {
+                        tempContainer.SetActiveDefaultModel(true);
+                        continue;
+                    }
                     tempEquipmentObject = tempContainer.instantiatedObjects[tempEquipmentModel.instantiatedObjectIndex];
                 }
                 else
