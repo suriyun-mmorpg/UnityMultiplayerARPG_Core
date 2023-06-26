@@ -1,3 +1,4 @@
+using LiteNetLibManager;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -91,10 +92,10 @@ namespace MultiplayerARPG
         public IEnumerable<ColorOption> ColorOptions { get => options[_currentModelIndex].colors; }
         public int MaxColorOptions { get => options[_currentModelIndex].colors.Length; }
 
-        private void Start()
+        public override void EntityStart()
         {
             SetupEvents();
-            SetModelAndColorBySavedData();
+            ApplyModelAndColorBySavedData();
         }
 
         public override void EntityOnDestroy()
@@ -106,36 +107,58 @@ namespace MultiplayerARPG
         {
             ClearEvents();
             Entity.CharacterModel.onBeforeUpdateEquipmentModels += OnBeforeUpdateEquipmentModels;
+            Entity.onPublicIntsOperation += OnPublicIntsOperation;
         }
 
         public void ClearEvents()
         {
             Entity.CharacterModel.onBeforeUpdateEquipmentModels -= OnBeforeUpdateEquipmentModels;
+            Entity.onPublicIntsOperation -= OnPublicIntsOperation;
         }
 
-        public void SetModelAndColorBySavedData()
+        public void ApplyModelAndColorBySavedData()
         {
-            int modelIndex = Entity.PublicInts.GetValue(GetHashedModelSettingId(), 0);
-            int colorIndex = Entity.PublicInts.GetValue(GetHashedColorSettingId(), 0);
-            SetModel(modelIndex, false);
-            SetColor(colorIndex);
+            _currentModelIndex = 0;
+            _currentColorIndex = 0;
+            byte foundCount = 0;
+            int hashedModelSettingId = GetHashedModelSettingId();
+            int hashedColorSettingId = GetHashedColorSettingId();
+            for (int i = 0; i < Entity.PublicInts.Count; ++i)
+            {
+                if (Entity.PublicInts[i].hashedKey == hashedModelSettingId)
+                {
+                    _currentModelIndex = Entity.PublicInts[i].value;
+                    foundCount++;
+                }
+                if (Entity.PublicInts[i].hashedKey == hashedColorSettingId)
+                {
+                    _currentColorIndex = Entity.PublicInts[i].value;
+                    foundCount++;
+                }
+                if (foundCount == 2)
+                    break;
+            }
+            if (_currentModelIndex >= MaxModelOptions)
+                _currentModelIndex = 0;
+            if (_currentColorIndex >= MaxColorOptions)
+                _currentColorIndex = 0;
+            // Update model later
+            Entity.MarkToUpdateAppearances();
         }
 
         /// <summary>
         /// This function should be called by server or being called in character creation only, it is not allow client to set custom data.
         /// </summary>
         /// <param name="index"></param>
-        public void SetModel(int index, bool resetColor = true)
+        public void SetModel(int index)
         {
             if (index < 0 || index >= MaxModelOptions)
                 return;
             _currentModelIndex = index;
+            _currentColorIndex = 0;
+            // Save to entity's `PublicInts`
             Entity.SetPublicInt32(GetHashedModelSettingId(), _currentModelIndex);
-            if (resetColor)
-            {
-                _currentColorIndex = 0;
-                Entity.SetPublicInt32(GetHashedColorSettingId(), _currentColorIndex);
-            }
+            Entity.SetPublicInt32(GetHashedColorSettingId(), _currentColorIndex);
             // Update model later
             Entity.MarkToUpdateAppearances();
         }
@@ -173,6 +196,11 @@ namespace MultiplayerARPG
             HashSet<string> unequippingSockets)
         {
             characterModel.SetupEquippingModels(showingModels, storingModels, unequippingSockets, options[_currentModelIndex].models, CreateFakeItemDataId(), 1, CreateFakeEquipPosition(), false, 0, OnShowEquipmentModel);
+        }
+
+        private void OnPublicIntsOperation(LiteNetLibSyncList.Operation op, int index)
+        {
+            ApplyModelAndColorBySavedData();
         }
 
         private void OnShowEquipmentModel(EquipmentModel model, GameObject modelObject, BaseEquipmentEntity equipmentEntity, EquipmentContainer equipmentContainer)

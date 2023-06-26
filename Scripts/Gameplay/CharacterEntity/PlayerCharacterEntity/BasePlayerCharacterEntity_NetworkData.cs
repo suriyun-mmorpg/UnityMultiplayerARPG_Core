@@ -363,6 +363,12 @@ namespace MultiplayerARPG
             hotkeys.onOperation += OnHotkeysOperation;
             quests.onOperation += OnQuestsOperation;
             currencies.onOperation += OnCurrenciesOperation;
+            privateBools.onOperation += OnPrivateBoolsOperation;
+            privateInts.onOperation += OnPrivateIntsOperation;
+            privateFloats.onOperation += OnPrivateFloatsOperation;
+            publicBools.onOperation += OnPublicBoolsOperation;
+            publicInts.onOperation += OnPublicIntsOperation;
+            publicFloats.onOperation += OnPublicFloatsOperation;
         }
 
         protected override void EntityOnDestroy()
@@ -388,6 +394,12 @@ namespace MultiplayerARPG
             hotkeys.onOperation -= OnHotkeysOperation;
             quests.onOperation -= OnQuestsOperation;
             currencies.onOperation -= OnCurrenciesOperation;
+            privateBools.onOperation -= OnPrivateBoolsOperation;
+            privateInts.onOperation -= OnPrivateIntsOperation;
+            privateFloats.onOperation -= OnPrivateFloatsOperation;
+            publicBools.onOperation -= OnPublicBoolsOperation;
+            publicInts.onOperation -= OnPublicIntsOperation;
+            publicFloats.onOperation -= OnPublicFloatsOperation;
             // Unsubscribe this entity
             if (GameInstance.ClientCharacterHandlers != null)
                 GameInstance.ClientCharacterHandlers.UnsubscribePlayerCharacter(this);
@@ -590,6 +602,42 @@ namespace MultiplayerARPG
         {
             if (onCurrenciesOperation != null)
                 onCurrenciesOperation.Invoke(operation, index);
+        }
+
+        private void OnPrivateBoolsOperation(LiteNetLibSyncList.Operation operation, int index)
+        {
+            if (onPrivateBoolsOperation != null)
+                onPrivateBoolsOperation.Invoke(operation, index);
+        }
+
+        private void OnPrivateIntsOperation(LiteNetLibSyncList.Operation operation, int index)
+        {
+            if (onPrivateIntsOperation != null)
+                onPrivateIntsOperation.Invoke(operation, index);
+        }
+
+        private void OnPrivateFloatsOperation(LiteNetLibSyncList.Operation operation, int index)
+        {
+            if (onPrivateFloatsOperation != null)
+                onPrivateFloatsOperation.Invoke(operation, index);
+        }
+
+        private void OnPublicBoolsOperation(LiteNetLibSyncList.Operation operation, int index)
+        {
+            if (onPublicBoolsOperation != null)
+                onPublicBoolsOperation.Invoke(operation, index);
+        }
+
+        private void OnPublicIntsOperation(LiteNetLibSyncList.Operation operation, int index)
+        {
+            if (onPublicIntsOperation != null)
+                onPublicIntsOperation.Invoke(operation, index);
+        }
+
+        private void OnPublicFloatsOperation(LiteNetLibSyncList.Operation operation, int index)
+        {
+            if (onPublicFloatsOperation != null)
+                onPublicFloatsOperation.Invoke(operation, index);
         }
         #endregion
     }
