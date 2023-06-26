@@ -23,30 +23,30 @@ namespace MultiplayerARPG
         public CharacterModelEvent eventOnBeforeUpdateAnimation = new CharacterModelEvent();
         public CharacterModelEvent eventOnAfterUpdateAnimation = new CharacterModelEvent();
 
-        private UIList _cacheCharacterList;
-        public UIList CacheCharacterList
+        private UIList _characterList;
+        public UIList CharacterList
         {
             get
             {
-                if (_cacheCharacterList == null)
+                if (_characterList == null)
                 {
-                    _cacheCharacterList = gameObject.AddComponent<UIList>();
-                    _cacheCharacterList.uiPrefab = uiCharacterPrefab.gameObject;
-                    _cacheCharacterList.uiContainer = uiCharacterContainer;
+                    _characterList = gameObject.AddComponent<UIList>();
+                    _characterList.uiPrefab = uiCharacterPrefab.gameObject;
+                    _characterList.uiContainer = uiCharacterContainer;
                 }
-                return _cacheCharacterList;
+                return _characterList;
             }
         }
 
-        private UICharacterSelectionManager _cacheCharacterSelectionManager;
-        public UICharacterSelectionManager CacheCharacterSelectionManager
+        private UICharacterSelectionManager _characterSelectionManager;
+        public UICharacterSelectionManager CharacterSelectionManager
         {
             get
             {
-                if (_cacheCharacterSelectionManager == null)
-                    _cacheCharacterSelectionManager = gameObject.GetOrAddComponent<UICharacterSelectionManager>();
-                _cacheCharacterSelectionManager.selectionMode = UISelectionMode.Toggle;
-                return _cacheCharacterSelectionManager;
+                if (_characterSelectionManager == null)
+                    _characterSelectionManager = gameObject.GetOrAddComponent<UICharacterSelectionManager>();
+                _characterSelectionManager.selectionMode = UISelectionMode.Toggle;
+                return _characterSelectionManager;
             }
         }
 
@@ -59,8 +59,8 @@ namespace MultiplayerARPG
 
         protected virtual void LoadCharacters()
         {
-            CacheCharacterSelectionManager.Clear();
-            CacheCharacterList.HideAll();
+            CharacterSelectionManager.Clear();
+            CharacterList.HideAll();
             // Unenable buttons
             if (buttonStart)
                 buttonStart.gameObject.SetActive(false);
@@ -103,7 +103,7 @@ namespace MultiplayerARPG
             if (selectableCharacters.Count > 0)
             {
                 selectableCharacters.Sort(new PlayerCharacterDataLastUpdateComparer().Desc());
-                CacheCharacterList.Generate(selectableCharacters, (index, characterData, ui) =>
+                CharacterList.Generate(selectableCharacters, (index, characterData, ui) =>
                 {
                     // Cache player character to dictionary, we will use it later
                     _playerCharacterDataById[characterData.Id] = characterData;
@@ -118,7 +118,7 @@ namespace MultiplayerARPG
                         _characterModelById[characterData.Id] = characterModel;
                         characterModel.SetEquipItems(characterData.EquipItems, characterData.SelectableWeaponSets, characterData.EquipWeaponSet, false);
                         characterModel.gameObject.SetActive(false);
-                        CacheCharacterSelectionManager.Add(uiCharacter);
+                        CharacterSelectionManager.Add(uiCharacter);
                     }
                 });
             }
@@ -147,10 +147,10 @@ namespace MultiplayerARPG
                 obj.SetActive(false);
             }
             // Clear selection
-            CacheCharacterSelectionManager.eventOnSelect.RemoveListener(OnSelectCharacter);
-            CacheCharacterSelectionManager.eventOnSelect.AddListener(OnSelectCharacter);
-            CacheCharacterSelectionManager.Clear();
-            CacheCharacterList.HideAll();
+            CharacterSelectionManager.eventOnSelect.RemoveListener(OnSelectCharacter);
+            CharacterSelectionManager.eventOnSelect.AddListener(OnSelectCharacter);
+            CharacterSelectionManager.Clear();
+            CharacterList.HideAll();
             // Load characters
             LoadCharacters();
         }

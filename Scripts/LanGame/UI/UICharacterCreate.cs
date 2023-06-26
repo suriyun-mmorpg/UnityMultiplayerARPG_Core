@@ -38,116 +38,116 @@ namespace MultiplayerARPG
         public CharacterModelEvent eventOnAfterUpdateAnimation = new CharacterModelEvent();
 
         private Toggle firstRaceToggle;
-        private Dictionary<CharacterRace, Toggle> _cacheRaceToggles;
-        public Dictionary<CharacterRace, Toggle> CacheRaceToggles
+        private Dictionary<CharacterRace, Toggle> _raceToggles;
+        public Dictionary<CharacterRace, Toggle> RaceToggles
         {
             get
             {
-                if (_cacheRaceToggles == null)
+                if (_raceToggles == null)
                 {
-                    _cacheRaceToggles = new Dictionary<CharacterRace, Toggle>();
+                    _raceToggles = new Dictionary<CharacterRace, Toggle>();
                     foreach (CharacterRaceTogglePair raceToggle in raceToggles)
                     {
                         if (raceToggle.race == null || raceToggle.toggle == null)
                             continue;
-                        _cacheRaceToggles[raceToggle.race] = raceToggle.toggle;
+                        _raceToggles[raceToggle.race] = raceToggle.toggle;
                         if (firstRaceToggle == null)
                             firstRaceToggle = raceToggle.toggle;
                     }
                 }
-                return _cacheRaceToggles;
+                return _raceToggles;
             }
         }
 
-        private UIList _cacheCharacterList;
-        public UIList CacheCharacterList
+        private UIList _characterList;
+        public UIList CharacterList
         {
             get
             {
-                if (_cacheCharacterList == null)
+                if (_characterList == null)
                 {
-                    _cacheCharacterList = gameObject.AddComponent<UIList>();
+                    _characterList = gameObject.AddComponent<UIList>();
                     if (uiCharacterPrefab != null && uiCharacterContainer != null)
                     {
-                        _cacheCharacterList.uiPrefab = uiCharacterPrefab.gameObject;
-                        _cacheCharacterList.uiContainer = uiCharacterContainer;
+                        _characterList.uiPrefab = uiCharacterPrefab.gameObject;
+                        _characterList.uiContainer = uiCharacterContainer;
                     }
                 }
-                return _cacheCharacterList;
+                return _characterList;
             }
         }
 
-        private UIList _cacheCharacterClassList;
-        public UIList CacheCharacterClassList
+        private UIList _characterClassList;
+        public UIList CharacterClassList
         {
             get
             {
-                if (_cacheCharacterClassList == null)
+                if (_characterClassList == null)
                 {
-                    _cacheCharacterClassList = gameObject.AddComponent<UIList>();
+                    _characterClassList = gameObject.AddComponent<UIList>();
                     if (uiCharacterClassPrefab != null && uiCharacterClassContainer != null)
                     {
-                        _cacheCharacterClassList.uiPrefab = uiCharacterClassPrefab.gameObject;
-                        _cacheCharacterClassList.uiContainer = uiCharacterClassContainer;
+                        _characterClassList.uiPrefab = uiCharacterClassPrefab.gameObject;
+                        _characterClassList.uiContainer = uiCharacterClassContainer;
                     }
                 }
-                return _cacheCharacterClassList;
+                return _characterClassList;
             }
         }
 
-        private UIList _cacheFactionList;
-        public UIList CacheFactionList
+        private UIList _factionList;
+        public UIList FactionList
         {
             get
             {
-                if (_cacheFactionList == null)
+                if (_factionList == null)
                 {
-                    _cacheFactionList = gameObject.AddComponent<UIList>();
+                    _factionList = gameObject.AddComponent<UIList>();
                     if (uiFactionPrefab != null && uiFactionContainer != null)
                     {
-                        _cacheFactionList.uiPrefab = uiFactionPrefab.gameObject;
-                        _cacheFactionList.uiContainer = uiFactionContainer;
+                        _factionList.uiPrefab = uiFactionPrefab.gameObject;
+                        _factionList.uiContainer = uiFactionContainer;
                     }
                 }
-                return _cacheFactionList;
+                return _factionList;
             }
         }
 
-        private UICharacterSelectionManager _cacheCharacterSelectionManager;
-        public UICharacterSelectionManager CacheCharacterSelectionManager
+        private UICharacterSelectionManager _characterSelectionManager;
+        public UICharacterSelectionManager CharacterSelectionManager
         {
             get
             {
-                if (_cacheCharacterSelectionManager == null)
-                    _cacheCharacterSelectionManager = gameObject.GetOrAddComponent<UICharacterSelectionManager>();
-                _cacheCharacterSelectionManager.selectionMode = UISelectionMode.Toggle;
-                return _cacheCharacterSelectionManager;
+                if (_characterSelectionManager == null)
+                    _characterSelectionManager = gameObject.GetOrAddComponent<UICharacterSelectionManager>();
+                _characterSelectionManager.selectionMode = UISelectionMode.Toggle;
+                return _characterSelectionManager;
             }
         }
 
-        private UICharacterClassSelectionManager _cacheCharacterClassSelectionManager;
-        public UICharacterClassSelectionManager CacheCharacterClassSelectionManager
+        private UICharacterClassSelectionManager _characterClassSelectionManager;
+        public UICharacterClassSelectionManager CharacterClassSelectionManager
         {
             get
             {
-                if (_cacheCharacterClassSelectionManager == null)
-                    _cacheCharacterClassSelectionManager = gameObject.GetOrAddComponent<UICharacterClassSelectionManager>();
-                _cacheCharacterClassSelectionManager.selectionMode = UISelectionMode.Toggle;
-                return _cacheCharacterClassSelectionManager;
+                if (_characterClassSelectionManager == null)
+                    _characterClassSelectionManager = gameObject.GetOrAddComponent<UICharacterClassSelectionManager>();
+                _characterClassSelectionManager.selectionMode = UISelectionMode.Toggle;
+                return _characterClassSelectionManager;
             }
         }
 
-        private UIFactionSelectionManager _cacheFactionSelectionManager;
-        public UIFactionSelectionManager CacheFactionSelectionManager
+        private UIFactionSelectionManager _factionSelectionManager;
+        public UIFactionSelectionManager FactionSelectionManager
         {
             get
             {
-                if (_cacheFactionSelectionManager == null)
-                    _cacheFactionSelectionManager = GetComponent<UIFactionSelectionManager>();
-                if (_cacheFactionSelectionManager == null)
-                    _cacheFactionSelectionManager = gameObject.AddComponent<UIFactionSelectionManager>();
-                _cacheFactionSelectionManager.selectionMode = UISelectionMode.Toggle;
-                return _cacheFactionSelectionManager;
+                if (_factionSelectionManager == null)
+                    _factionSelectionManager = GetComponent<UIFactionSelectionManager>();
+                if (_factionSelectionManager == null)
+                    _factionSelectionManager = gameObject.AddComponent<UIFactionSelectionManager>();
+                _factionSelectionManager.selectionMode = UISelectionMode.Toggle;
+                return _factionSelectionManager;
             }
         }
 
@@ -199,7 +199,7 @@ namespace MultiplayerARPG
 
         protected virtual List<BasePlayerCharacterEntity> GetCreatableCharacters()
         {
-            if (CacheRaceToggles.Count == 0)
+            if (RaceToggles.Count == 0)
                 return GameInstance.PlayerCharacterEntities.Values.ToList();
             else
                 return GameInstance.PlayerCharacterEntities.Values.Where((o) => SelectedRaces.Contains(o.Race)).ToList();
@@ -218,11 +218,11 @@ namespace MultiplayerARPG
             // Remove all cached data
             _playerCharacterDataByEntityId.Clear();
             // Clear character selection
-            CacheCharacterSelectionManager.Clear();
-            CacheCharacterList.HideAll();
+            CharacterSelectionManager.Clear();
+            CharacterList.HideAll();
             // Show list of characters that can be created
             PlayerCharacterData firstData = null;
-            CacheCharacterList.Generate(GetCreatableCharacters(), (index, characterEntity, ui) =>
+            CharacterList.Generate(GetCreatableCharacters(), (index, characterEntity, ui) =>
             {
                 // Cache player character to dictionary, we will use it later
                 _playerCharacterDataByEntityId[characterEntity.EntityId] = characterEntity.CharacterDatabases;
@@ -240,14 +240,14 @@ namespace MultiplayerARPG
                     UICharacter uiCharacter = ui.GetComponent<UICharacter>();
                     uiCharacter.NotForOwningCharacter = true;
                     uiCharacter.Data = playerCharacterData;
-                    CacheCharacterSelectionManager.Add(uiCharacter);
+                    CharacterSelectionManager.Add(uiCharacter);
                 }
                 if (index == 0)
                     firstData = playerCharacterData;
             });
             // Select first entry
-            if (CacheCharacterSelectionManager.Count > 0)
-                CacheCharacterSelectionManager.Select(0);
+            if (CharacterSelectionManager.Count > 0)
+                CharacterSelectionManager.Select(0);
             else
                 OnSelectCharacter(firstData);
         }
@@ -255,25 +255,25 @@ namespace MultiplayerARPG
         protected virtual void LoadFactions()
         {
             // Clear faction selection
-            CacheFactionSelectionManager.Clear();
-            CacheFactionList.HideAll();
+            FactionSelectionManager.Clear();
+            FactionList.HideAll();
             // Show list of factions that can be selected
             Faction firstData = null;
-            CacheFactionList.Generate(GetSelectableFactions(), (index, faction, ui) =>
+            FactionList.Generate(GetSelectableFactions(), (index, faction, ui) =>
             {
                 // Setup UI
                 if (ui != null)
                 {
                     UIFaction uiFaction = ui.GetComponent<UIFaction>();
                     uiFaction.Data = faction;
-                    CacheFactionSelectionManager.Add(uiFaction);
+                    FactionSelectionManager.Add(uiFaction);
                 }
                 if (index == 0)
                     firstData = faction;
             });
             // Select first entry
-            if (CacheFactionSelectionManager.Count > 0)
-                CacheFactionSelectionManager.Select(0);
+            if (FactionSelectionManager.Count > 0)
+                FactionSelectionManager.Select(0);
             else
                 OnSelectFaction(firstData);
         }
@@ -283,16 +283,16 @@ namespace MultiplayerARPG
             // Setup Events
             buttonCreate.onClick.RemoveListener(OnClickCreate);
             buttonCreate.onClick.AddListener(OnClickCreate);
-            CacheCharacterSelectionManager.eventOnSelect.RemoveListener(OnSelectCharacter);
-            CacheCharacterSelectionManager.eventOnSelect.AddListener(OnSelectCharacter);
-            CacheCharacterClassSelectionManager.eventOnSelect.RemoveListener(OnSelectCharacterClass);
-            CacheCharacterClassSelectionManager.eventOnSelect.AddListener(OnSelectCharacterClass);
-            CacheFactionSelectionManager.eventOnSelect.RemoveListener(OnSelectFaction);
-            CacheFactionSelectionManager.eventOnSelect.AddListener(OnSelectFaction);
+            CharacterSelectionManager.eventOnSelect.RemoveListener(OnSelectCharacter);
+            CharacterSelectionManager.eventOnSelect.AddListener(OnSelectCharacter);
+            CharacterClassSelectionManager.eventOnSelect.RemoveListener(OnSelectCharacterClass);
+            CharacterClassSelectionManager.eventOnSelect.AddListener(OnSelectCharacterClass);
+            FactionSelectionManager.eventOnSelect.RemoveListener(OnSelectFaction);
+            FactionSelectionManager.eventOnSelect.AddListener(OnSelectFaction);
             SelectedRaces.Clear();
-            if (CacheRaceToggles.Count > 0)
+            if (RaceToggles.Count > 0)
             {
-                foreach (KeyValuePair<CharacterRace, Toggle> raceToggle in CacheRaceToggles)
+                foreach (KeyValuePair<CharacterRace, Toggle> raceToggle in RaceToggles)
                 {
                     raceToggle.Value.SetIsOnWithoutNotify(false);
                     raceToggle.Value.onValueChanged.RemoveAllListeners();
@@ -339,29 +339,29 @@ namespace MultiplayerARPG
             SelectedEntityId = playerCharacterData.EntityId;
             _characterModelByEntityId.TryGetValue(playerCharacterData.EntityId, out _selectedModel);
             // Clear character class selection
-            CacheCharacterClassSelectionManager.Clear();
-            CacheCharacterClassList.HideAll();
+            CharacterClassSelectionManager.Clear();
+            CharacterClassList.HideAll();
             // Show selected model
             if (SelectedModel != null)
                 SelectedModel.gameObject.SetActive(true);
             // Setup character class list
             PlayerCharacter firstData = null;
             _playerCharacterDataByEntityId.TryGetValue(playerCharacterData.EntityId, out _selectableCharacterClasses);
-            CacheCharacterClassList.Generate(_selectableCharacterClasses, (index, playerCharacter, ui) =>
+            CharacterClassList.Generate(_selectableCharacterClasses, (index, playerCharacter, ui) =>
             {
                 // Setup UI
                 if (ui != null)
                 {
                     UICharacterClass uiCharacterClass = ui.GetComponent<UICharacterClass>();
                     uiCharacterClass.Data = playerCharacter;
-                    CacheCharacterClassSelectionManager.Add(uiCharacterClass);
+                    CharacterClassSelectionManager.Add(uiCharacterClass);
                 }
                 if (index == 0)
                     firstData = playerCharacter;
             });
             // Select first entry
-            if (CacheCharacterClassSelectionManager.Count > 0)
-                CacheCharacterClassSelectionManager.Select(0);
+            if (CharacterClassSelectionManager.Count > 0)
+                CharacterClassSelectionManager.Select(0);
             else
                 OnSelectCharacterClass(firstData);
         }
