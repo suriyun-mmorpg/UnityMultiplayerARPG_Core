@@ -22,7 +22,7 @@ namespace MultiplayerARPG
         public CharacterDataEvent eventOnSelectCharacter = new CharacterDataEvent();
         public CharacterModelEvent eventOnBeforeUpdateAnimation = new CharacterModelEvent();
         public CharacterModelEvent eventOnAfterUpdateAnimation = new CharacterModelEvent();
-        public CharacterDataEvent eventOnShowInstantiatedCharacter = new CharacterDataEvent();
+        public CharacterModelEvent eventOnShowInstantiatedCharacter = new CharacterModelEvent();
 
         private UIList _characterList;
         public UIList CharacterList
@@ -182,7 +182,7 @@ namespace MultiplayerARPG
             if (SelectedModel != null)
             {
                 SelectedModel.gameObject.SetActive(true);
-                eventOnShowInstantiatedCharacter.Invoke(SelectedModel.GetComponentInParent<BaseCharacterEntity>());
+                eventOnShowInstantiatedCharacter.Invoke(SelectedModel);
             }
             // Run event
             eventOnSelectCharacter.Invoke(_selectedPlayerCharacterData);

@@ -91,14 +91,10 @@ namespace MultiplayerARPG
         public IEnumerable<ColorOption> ColorOptions { get => options[_currentModelIndex].colors; }
         public int MaxColorOptions { get => options[_currentModelIndex].colors.Length; }
 
-        public override void EntityAwake()
-        {
-            SetModel(0);
-        }
-
-        public override void EntityStart()
+        private void Start()
         {
             SetupEvents();
+            SetModelAndColorBySavedData();
         }
 
         public override void EntityOnDestroy()
@@ -117,19 +113,29 @@ namespace MultiplayerARPG
             Entity.CharacterModel.onBeforeUpdateEquipmentModels -= OnBeforeUpdateEquipmentModels;
         }
 
+        public void SetModelAndColorBySavedData()
+        {
+            int modelIndex = Entity.PublicInts.GetValue(GetHashedModelSettingId(), 0);
+            int colorIndex = Entity.PublicInts.GetValue(GetHashedColorSettingId(), 0);
+            SetModel(modelIndex, false);
+            SetColor(colorIndex);
+        }
+
         /// <summary>
         /// This function should be called by server or being called in character creation only, it is not allow client to set custom data.
         /// </summary>
         /// <param name="index"></param>
-        public void SetModel(int index)
+        public void SetModel(int index, bool resetColor = true)
         {
             if (index < 0 || index >= MaxModelOptions)
                 return;
             _currentModelIndex = index;
-            _currentColorIndex = 0;
-            // Save to entity's `PublicInts`
-            Entity.SetPublicInt32(modelSettingId.GenerateHashId(), _currentModelIndex);
-            Entity.SetPublicInt32(colorSettingId.GenerateHashId(), _currentColorIndex);
+            Entity.SetPublicInt32(GetHashedModelSettingId(), _currentModelIndex);
+            if (resetColor)
+            {
+                _currentColorIndex = 0;
+                Entity.SetPublicInt32(GetHashedColorSettingId(), _currentColorIndex);
+            }
             // Update model later
             Entity.MarkToUpdateAppearances();
         }
@@ -149,8 +155,8 @@ namespace MultiplayerARPG
                 return;
             _currentColorIndex = index;
             // Save to entity's `PublicInts`
-            Entity.SetPublicInt32(modelSettingId.GenerateHashId(), _currentModelIndex);
-            Entity.SetPublicInt32(colorSettingId.GenerateHashId(), _currentColorIndex);
+            Entity.SetPublicInt32(GetHashedModelSettingId(), _currentModelIndex);
+            Entity.SetPublicInt32(GetHashedColorSettingId(), _currentColorIndex);
             // Update model later
             Entity.MarkToUpdateAppearances();
         }
@@ -192,6 +198,16 @@ namespace MultiplayerARPG
         public string CreateFakeEquipPosition()
         {
             return string.Concat("_BODY_PART_" , modelSettingId);
+        }
+
+        public int GetHashedModelSettingId()
+        {
+            return modelSettingId.GenerateHashId();
+        }
+
+        public int GetHashedColorSettingId()
+        {
+            return colorSettingId.GenerateHashId();
         }
     }
 }

@@ -36,7 +36,7 @@ namespace MultiplayerARPG
         public CharacterClassEvent eventOnSelectCharacterClass = new CharacterClassEvent();
         public CharacterModelEvent eventOnBeforeUpdateAnimation = new CharacterModelEvent();
         public CharacterModelEvent eventOnAfterUpdateAnimation = new CharacterModelEvent();
-        public CharacterDataEvent eventOnShowInstantiatedCharacter = new CharacterDataEvent();
+        public CharacterModelEvent eventOnShowInstantiatedCharacter = new CharacterModelEvent();
 
         private Toggle firstRaceToggle;
         private Dictionary<CharacterRace, Toggle> _raceToggles;
@@ -168,6 +168,12 @@ namespace MultiplayerARPG
         public int SelectedEntityId { get; protected set; }
         public int SelectedDataId { get; protected set; }
         public int SelectedFactionId { get; protected set; }
+        public List<CharacterDataBoolean> PrivateBools { get; protected set; } = new List<CharacterDataBoolean>();
+        public List<CharacterDataInt32> PrivateInts { get; protected set; } = new List<CharacterDataInt32>();
+        public List<CharacterDataFloat32> PrivateFloats { get; protected set; } = new List<CharacterDataFloat32>();
+        public List<CharacterDataBoolean> PublicBools { get; protected set; } = new List<CharacterDataBoolean>();
+        public List<CharacterDataInt32> PublicInts { get; protected set; } = new List<CharacterDataInt32>();
+        public List<CharacterDataFloat32> PublicFloats { get; protected set; } = new List<CharacterDataFloat32>();
 
         protected override void Awake()
         {
@@ -335,6 +341,12 @@ namespace MultiplayerARPG
             _selectedPlayerCharacterData = uiCharacter.Data as PlayerCharacterData;
             SelectedDataId = _selectedPlayerCharacterData.DataId;
             SelectedEntityId = _selectedPlayerCharacterData.EntityId;
+            PrivateBools.Clear();
+            PrivateInts.Clear();
+            PrivateFloats.Clear();
+            PublicBools.Clear();
+            PublicInts.Clear();
+            PublicFloats.Clear();
             // Hide models
             characterModelContainer.SetChildrenActive(false);
             // Show selected character model
@@ -342,7 +354,7 @@ namespace MultiplayerARPG
             if (SelectedModel != null)
             {
                 SelectedModel.gameObject.SetActive(true);
-                eventOnShowInstantiatedCharacter.Invoke(SelectedModel.GetComponentInParent<BaseCharacterEntity>());
+                eventOnShowInstantiatedCharacter.Invoke(SelectedModel);
             }
             // Run event
             eventOnSelectCharacter.Invoke(_selectedPlayerCharacterData);
@@ -480,6 +492,12 @@ namespace MultiplayerARPG
             PlayerCharacterData characterData = new PlayerCharacterData();
             characterData.Id = GenericUtils.GetUniqueId();
             characterData.SetNewPlayerCharacterData(characterName, SelectedDataId, SelectedEntityId, SelectedFactionId);
+            characterData.PrivateBools = PrivateBools;
+            characterData.PrivateInts = PrivateInts;
+            characterData.PrivateFloats = PrivateFloats;
+            characterData.PublicBools = PublicBools;
+            characterData.PublicInts = PublicInts;
+            characterData.PublicFloats = PublicFloats;
             GameInstance.Singleton.SaveSystem.SaveCharacter(characterData);
         }
     }
