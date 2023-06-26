@@ -41,7 +41,7 @@ namespace MultiplayerARPG
                 return false;
             // Deactivate all objects
             DeactivateInstantiatedObjects();
-            if (index < 0 || instantiatedObjects.Length <= index)
+            if (index < 0 || index >= instantiatedObjects.Length)
                 return false;
             // Activate only one object
             if (instantiatedObjects[index] == null || instantiatedObjects[index].activeSelf)
