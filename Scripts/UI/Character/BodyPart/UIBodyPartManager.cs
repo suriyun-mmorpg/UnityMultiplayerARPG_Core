@@ -75,6 +75,7 @@ namespace MultiplayerARPG
 
         private UISelectionManagerShowOnSelectEventManager<PlayerCharacterBodyPartComponent.ModelOption, UIBodyPartModelOption> _modelUIEventSetupManager = new UISelectionManagerShowOnSelectEventManager<PlayerCharacterBodyPartComponent.ModelOption, UIBodyPartModelOption>();
         private UISelectionManagerShowOnSelectEventManager<PlayerCharacterBodyPartComponent.ColorOption, UIBodyPartColorOption> _colorUIEventSetupManager = new UISelectionManagerShowOnSelectEventManager<PlayerCharacterBodyPartComponent.ColorOption, UIBodyPartColorOption>();
+        private BaseCharacterModel _model;
         private PlayerCharacterBodyPartComponent _component;
 
         private void OnEnable()
@@ -100,6 +101,7 @@ namespace MultiplayerARPG
             if (_component == null)
                 return;
             _component.SetModel(ui.Index);
+            _model.UpdateEquipmentModels();
         }
 
         private void OnSelectColorUI(UIBodyPartColorOption ui)
@@ -107,6 +109,7 @@ namespace MultiplayerARPG
             if (_component == null)
                 return;
             _component.SetColor(ui.Index);
+            _model.UpdateEquipmentModels();
         }
 
         public void SetCharacter(ICharacterData character)
@@ -114,12 +117,14 @@ namespace MultiplayerARPG
             _component = null;
             if (!(character is BasePlayerCharacterEntity entity))
                 return;
+            _model = entity.CharacterModel;
             PlayerCharacterBodyPartComponent[] comps = entity.gameObject.GetComponentsInChildren<PlayerCharacterBodyPartComponent>();
             for (int i = 0; i < comps.Length; ++i)
             {
                 if (!modelSettingId.Equals(comps[i].modelSettingId))
                     continue;
                 _component = comps[i];
+                _component.SetupEvents();
                 break;
             }
             SetupLists();

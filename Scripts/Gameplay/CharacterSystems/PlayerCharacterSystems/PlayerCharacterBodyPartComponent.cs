@@ -98,10 +98,21 @@ namespace MultiplayerARPG
 
         public override void EntityStart()
         {
-            Entity.CharacterModel.onBeforeUpdateEquipmentModels += OnBeforeUpdateEquipmentModels;
+            SetupEvents();
         }
 
         public override void EntityOnDestroy()
+        {
+            ClearEvents();
+        }
+
+        public void SetupEvents()
+        {
+            ClearEvents();
+            Entity.CharacterModel.onBeforeUpdateEquipmentModels += OnBeforeUpdateEquipmentModels;
+        }
+
+        public void ClearEvents()
         {
             Entity.CharacterModel.onBeforeUpdateEquipmentModels -= OnBeforeUpdateEquipmentModels;
         }
@@ -164,7 +175,7 @@ namespace MultiplayerARPG
             if (model == null || modelObject == null)
                 return;
 
-            if (model.indexOfModel < 0 || model.indexOfModel >= options[_currentModelIndex].colors[_currentColorIndex].ModelColorSettings.Length)
+            if (model.indexOfModel < 0 || options[_currentModelIndex].colors.Length <= 0 || model.indexOfModel >= options[_currentModelIndex].colors[_currentColorIndex].ModelColorSettings.Length)
                 return;
             
             MeshRenderer meshRenderer = modelObject.GetComponentInChildren<MeshRenderer>();
