@@ -14,6 +14,7 @@ namespace MultiplayerARPG
         public TextWrapper uiTextTitle;
         public Image imageIcon;
 
+        public int HashedSettingId { get; set; }
         public int Index { get; set; }
 
         protected override void UpdateData()

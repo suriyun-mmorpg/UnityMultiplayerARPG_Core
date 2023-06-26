@@ -106,38 +106,61 @@ namespace MultiplayerARPG
         public void SetupEvents()
         {
             ClearEvents();
-            Entity.CharacterModel.onBeforeUpdateEquipmentModels += OnBeforeUpdateEquipmentModels;
+            SetupCharacterModelEvents(Entity.CharacterModel);
             Entity.onPublicIntsOperation += OnPublicIntsOperation;
         }
 
         public void ClearEvents()
         {
-            Entity.CharacterModel.onBeforeUpdateEquipmentModels -= OnBeforeUpdateEquipmentModels;
+            ClearCharacterModelEvents(Entity.CharacterModel);
             Entity.onPublicIntsOperation -= OnPublicIntsOperation;
         }
 
+        public void SetupCharacterModelEvents(BaseCharacterModel model)
+        {
+            ClearCharacterModelEvents(model);
+            model.onBeforeUpdateEquipmentModels += OnBeforeUpdateEquipmentModels;
+        }
+
+        public void ClearCharacterModelEvents(BaseCharacterModel model)
+        {
+            model.onBeforeUpdateEquipmentModels -= OnBeforeUpdateEquipmentModels;
+        }
+
         public void ApplyModelAndColorBySavedData()
+        {
+            ApplyModelAndColorBySavedData(Entity.PublicInts);
+        }
+
+        public void ApplyModelAndColorBySavedData(IList<CharacterDataInt32> publicInts)
         {
             _currentModelIndex = 0;
             _currentColorIndex = 0;
             byte foundCount = 0;
             int hashedModelSettingId = GetHashedModelSettingId();
             int hashedColorSettingId = GetHashedColorSettingId();
-            for (int i = 0; i < Entity.PublicInts.Count; ++i)
+            for (int i = 0; i < publicInts.Count; ++i)
             {
-                if (Entity.PublicInts[i].hashedKey == hashedModelSettingId)
+                if (publicInts[i].hashedKey == hashedModelSettingId)
                 {
-                    _currentModelIndex = Entity.PublicInts[i].value;
+                    _currentModelIndex = publicInts[i].value;
                     foundCount++;
                 }
-                if (Entity.PublicInts[i].hashedKey == hashedColorSettingId)
+                if (publicInts[i].hashedKey == hashedColorSettingId)
                 {
-                    _currentColorIndex = Entity.PublicInts[i].value;
+                    _currentColorIndex = publicInts[i].value;
                     foundCount++;
                 }
                 if (foundCount == 2)
                     break;
             }
+            ApplyModelAndColorBySavedData(_currentModelIndex, _currentColorIndex);
+        }
+
+        public void ApplyModelAndColorBySavedData(int modelIndex, int colorIndex)
+        {
+            _currentModelIndex = modelIndex;
+            _currentColorIndex = colorIndex;
             if (_currentModelIndex >= MaxModelOptions)
                 _currentModelIndex = 0;
             if (_currentColorIndex >= MaxColorOptions)

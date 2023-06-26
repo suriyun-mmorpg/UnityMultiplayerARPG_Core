@@ -28,6 +28,7 @@ namespace MultiplayerARPG
         public InputField inputCharacterName;
         public InputFieldWrapper uiInputCharacterName;
         public Button buttonCreate;
+        public UIBodyPartManager[] uiBodyPartManagers = new UIBodyPartManager[0];
 
         [Header("Event")]
         public UnityEvent eventOnCreateCharacter = new UnityEvent();
@@ -355,6 +356,14 @@ namespace MultiplayerARPG
             {
                 SelectedModel.gameObject.SetActive(true);
                 eventOnShowInstantiatedCharacter.Invoke(SelectedModel);
+                for (int i = 0; i < uiBodyPartManagers.Length; ++i)
+                {
+                    uiBodyPartManagers[i].ModelSelectionManager.eventOnSelect.RemoveListener(OnBodyPartModelUISelected);
+                    uiBodyPartManagers[i].ModelSelectionManager.eventOnSelect.AddListener(OnBodyPartModelUISelected);
+                    uiBodyPartManagers[i].ColorSelectionManager.eventOnSelect.RemoveListener(OnBodyPartColorUISelected);
+                    uiBodyPartManagers[i].ColorSelectionManager.eventOnSelect.AddListener(OnBodyPartColorUISelected);
+                    uiBodyPartManagers[i].SetCharacterModel(SelectedModel);
+                }
             }
             // Run event
             eventOnSelectCharacter.Invoke(_selectedPlayerCharacterData);
@@ -382,6 +391,16 @@ namespace MultiplayerARPG
                 CharacterClassSelectionManager.Select(0);
             else
                 OnSelectCharacterClass(firstData);
+        }
+
+        private void OnBodyPartModelUISelected(UIBodyPartModelOption ui)
+        {
+            PublicInts.SetValue(ui.HashedSettingId, ui.Index);
+        }
+
+        private void OnBodyPartColorUISelected(UIBodyPartColorOption ui)
+        {
+            PublicInts.SetValue(ui.HashedSettingId, ui.Index);
         }
 
         protected virtual void OnSelectCharacter(IPlayerCharacterData playerCharacterData)
