@@ -1,6 +1,4 @@
 ﻿using Cysharp.Text;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 namespace MultiplayerARPG
@@ -16,9 +14,6 @@ namespace MultiplayerARPG
         [Header("UI Elements")]
         public TextWrapper uiTextName;
         public TextWrapper uiTextLevel;
-
-        [HideInInspector]
-        public UIDiscoveryList list;
 
         protected override void UpdateData()
         {
