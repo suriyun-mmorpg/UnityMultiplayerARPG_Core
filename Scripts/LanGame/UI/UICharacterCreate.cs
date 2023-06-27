@@ -169,9 +169,6 @@ namespace MultiplayerARPG
         public int SelectedEntityId { get; protected set; }
         public int SelectedDataId { get; protected set; }
         public int SelectedFactionId { get; protected set; }
-        public List<CharacterDataBoolean> PrivateBools { get; protected set; } = new List<CharacterDataBoolean>();
-        public List<CharacterDataInt32> PrivateInts { get; protected set; } = new List<CharacterDataInt32>();
-        public List<CharacterDataFloat32> PrivateFloats { get; protected set; } = new List<CharacterDataFloat32>();
         public List<CharacterDataBoolean> PublicBools { get; protected set; } = new List<CharacterDataBoolean>();
         public List<CharacterDataInt32> PublicInts { get; protected set; } = new List<CharacterDataInt32>();
         public List<CharacterDataFloat32> PublicFloats { get; protected set; } = new List<CharacterDataFloat32>();
@@ -342,9 +339,6 @@ namespace MultiplayerARPG
             _selectedPlayerCharacterData = uiCharacter.Data as PlayerCharacterData;
             SelectedDataId = _selectedPlayerCharacterData.DataId;
             SelectedEntityId = _selectedPlayerCharacterData.EntityId;
-            PrivateBools.Clear();
-            PrivateInts.Clear();
-            PrivateFloats.Clear();
             PublicBools.Clear();
             PublicInts.Clear();
             PublicFloats.Clear();
@@ -511,9 +505,6 @@ namespace MultiplayerARPG
             PlayerCharacterData characterData = new PlayerCharacterData();
             characterData.Id = GenericUtils.GetUniqueId();
             characterData.SetNewPlayerCharacterData(characterName, SelectedDataId, SelectedEntityId, SelectedFactionId);
-            characterData.PrivateBools = PrivateBools;
-            characterData.PrivateInts = PrivateInts;
-            characterData.PrivateFloats = PrivateFloats;
             characterData.PublicBools = PublicBools;
             characterData.PublicInts = PublicInts;
             characterData.PublicFloats = PublicFloats;
