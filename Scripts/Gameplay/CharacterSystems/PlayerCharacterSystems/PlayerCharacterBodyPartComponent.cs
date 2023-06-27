@@ -7,40 +7,10 @@ namespace MultiplayerARPG
     public class PlayerCharacterBodyPartComponent : BaseGameEntityComponent<BasePlayerCharacterEntity>
     {
         [System.Serializable]
-        public class MaterialPropertySetting
-        {
-            public string propertyName;
-            public Color color = Color.white;
-        }
-
-        [System.Serializable]
-        public class MaterialSetting
-        {
-            public Material material;
-            public MaterialPropertySetting[] properties = new MaterialPropertySetting[0];
-        }
-
-        [System.Serializable]
         public class ModelColorSetting
         {
             [Tooltip("Material Settings for each mesh's materials, its index is index of `MeshRenderer` -> `materials`")]
-            public MaterialSetting[] materialSettings = new MaterialSetting[0];
-
-            public Material[] GetMaterials()
-            {
-                Material[] result = new Material[materialSettings.Length];
-                Material tempMaterial;
-                for (int i = 0; i < materialSettings.Length; ++i)
-                {
-                    tempMaterial = new Material(materialSettings[i].material);
-                    for (int j = 0; j < materialSettings[i].properties.Length; ++j)
-                    {
-                        tempMaterial.SetColor(materialSettings[i].properties[j].propertyName, materialSettings[i].properties[j].color);
-                    }
-                    result[i] = tempMaterial;
-                }
-                return result;
-            }
+            public Material[] materials = new Material[0];
         }
 
         [System.Serializable]
@@ -238,7 +208,7 @@ namespace MultiplayerARPG
             MeshRenderer meshRenderer = modelObject.GetComponentInChildren<MeshRenderer>();
             if (meshRenderer == null)
                 return;
-            meshRenderer.materials = options[_currentModelIndex].colors[_currentColorIndex].ModelColorSettings[model.indexOfModel].GetMaterials();
+            meshRenderer.materials = options[_currentModelIndex].colors[_currentColorIndex].ModelColorSettings[model.indexOfModel].materials;
         }
 
         public int CreateFakeItemDataId()
