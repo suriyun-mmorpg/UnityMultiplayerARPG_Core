@@ -181,6 +181,8 @@ namespace MultiplayerARPG
             get { return consecutivePkKills.Value; }
             set { consecutivePkKills.Value = value; }
         }
+        public int HighestPkPoint { get; set; }
+        public int HighestConsecutivePkKills { get; set; }
         public bool IsWarping
         {
             get { return isWarping.Value; }

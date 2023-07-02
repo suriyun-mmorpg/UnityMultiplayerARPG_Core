@@ -53,6 +53,8 @@ namespace MultiplayerARPG
             info.AddValue("lastPkOnTime", data.LastPkOnTime);
             info.AddValue("pkPoint", data.PkPoint);
             info.AddValue("consecutivePkKills", data.ConsecutivePkKills);
+            info.AddValue("highestPkPoint", data.HighestPkPoint);
+            info.AddValue("highestConsecutivePkKills", data.HighestConsecutivePkKills);
             info.AddListValue("hotkeys", data.Hotkeys);
             info.AddListValue("quests", data.Quests);
             info.AddValue("equipWeapons", data.EquipWeapons);
@@ -180,6 +182,18 @@ namespace MultiplayerARPG
             try
             {
                 data.ConsecutivePkKills = info.GetInt32("consecutivePkKills");
+            }
+            catch { }
+            // TODO: Backward compatible, this will be removed in future version
+            try
+            {
+                data.HighestPkPoint = info.GetInt32("highestPkPoint");
+            }
+            catch { }
+            // TODO: Backward compatible, this will be removed in future version
+            try
+            {
+                data.HighestConsecutivePkKills = info.GetInt32("highestConsecutivePkKills");
             }
             catch { }
             data.LastUpdate = info.GetInt64("lastUpdate");
