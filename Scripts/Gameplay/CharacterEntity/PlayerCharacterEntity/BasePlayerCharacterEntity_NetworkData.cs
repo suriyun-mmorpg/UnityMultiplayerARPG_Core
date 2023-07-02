@@ -44,8 +44,6 @@ namespace MultiplayerARPG
         [SerializeField]
         protected SyncFieldBool isPkOn = new SyncFieldBool();
         [SerializeField]
-        protected SyncFieldLong lastPkOnTime = new SyncFieldLong();
-        [SerializeField]
         protected SyncFieldInt pkPoint = new SyncFieldInt();
         [SerializeField]
         protected SyncFieldInt consecutivePkKills = new SyncFieldInt();
@@ -172,11 +170,7 @@ namespace MultiplayerARPG
             get { return isPkOn.Value; }
             set { isPkOn.Value = value; }
         }
-        public long LastPkOnTime
-        {
-            get { return lastPkOnTime.Value; }
-            set { lastPkOnTime.Value = value; }
-        }
+        public long LastPkOnTime { get; set; }
         public int PkPoint
         {
             get { return pkPoint.Value; }
@@ -351,8 +345,6 @@ namespace MultiplayerARPG
             lastDeadTime.syncMode = LiteNetLibSyncField.SyncMode.ServerToOwnerClient;
             isPkOn.deliveryMethod = DeliveryMethod.ReliableOrdered;
             isPkOn.syncMode = LiteNetLibSyncField.SyncMode.ServerToClients;
-            lastPkOnTime.deliveryMethod = DeliveryMethod.ReliableOrdered;
-            lastPkOnTime.syncMode = LiteNetLibSyncField.SyncMode.ServerToOwnerClient;
             pkPoint.deliveryMethod = DeliveryMethod.ReliableOrdered;
             pkPoint.syncMode = LiteNetLibSyncField.SyncMode.ServerToClients;
             consecutivePkKills.deliveryMethod = DeliveryMethod.ReliableOrdered;
