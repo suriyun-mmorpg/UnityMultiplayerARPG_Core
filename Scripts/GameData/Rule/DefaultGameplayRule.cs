@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.Serialization;
 
@@ -104,6 +105,33 @@ namespace MultiplayerARPG
         public float blockDmgRateBattlePointScore = 5;
         public float moveSpeedBattlePointScore = 10;
         public float atkSpeedBattlePointScore = 10;
+
+        [Header("PK")]
+        public int pkPointEachKills = 10;
+        public PkPunishment[] pkPunishments = new PkPunishment[0];
+
+        [System.Serializable]
+        public struct PkPunishment
+        {
+            public int minPkPoint;
+            public float expDecreasePercentMin;
+            public float expDecreasePercentMax;
+            public int goldDecreaseMin;
+            public int goldDecreaseMax;
+            public int itemDecreaseMin;
+            public int itemDecreaseMax;
+        }
+
+        private List<PkPunishment> _sortedPkPunishments;
+        public List<PkPunishment> SortedPkPunishments
+        {
+            get
+            {
+                if (_sortedPkPunishments == null)
+                    _sortedPkPunishments = pkPunishments.OrderBy(o => o.minPkPoint).ToList();
+                return _sortedPkPunishments;
+            }
+        }
 
         public override bool RandomAttackHitOccurs(Vector3 fromPosition, BaseCharacterEntity attacker, BaseCharacterEntity damageReceiver, Dictionary<DamageElement, MinMaxFloat> damageAmounts, CharacterItem weapon, BaseSkill skill, int skillLevel, int randomSeed, out bool isCritical, out bool isBlocked)
         {
@@ -289,11 +317,43 @@ namespace MultiplayerARPG
             return waterDecreasePerSeconds;
         }
 
-        public override float GetExpLostPercentageWhenDeath(BaseCharacterEntity character)
+        public override void GetPlayerDeadPunishment(BasePlayerCharacterEntity player, BaseCharacterEntity attacker, out int decreaseExp, out int decreaseGold, out int decreaseItems)
         {
-            if (character is BaseMonsterCharacterEntity)
-                return 0f;
-            return expLostPercentageWhenDeath;
+            decreaseExp = 0;
+            decreaseGold = 0;
+            decreaseItems = 0;
+            float decreaseExpPercent = 0f;
+            // PK
+            if (attacker is BasePlayerCharacterEntity attackPlayer && attackPlayer.IsPkOn && player.IsPkOn)
+            {
+                // Increse PK Point
+                attackPlayer.PkPoint = attackPlayer.PkPoint.Increase(pkPointEachKills);
+                attackPlayer.ConsecutivePkKills++;
+                if (attackPlayer.PkPoint > attackPlayer.HighestPkPoint)
+                    attackPlayer.PkPoint = attackPlayer.HighestPkPoint;
+                if (attackPlayer.ConsecutivePkKills > attackPlayer.HighestConsecutivePkKills)
+                    attackPlayer.ConsecutivePkKills = attackPlayer.HighestConsecutivePkKills;
+                // PK Punishment
+                for (int i = SortedPkPunishments.Count - 1; i >= 0; --i)
+                {
+                    if (player.PkPoint > SortedPkPunishments[i].minPkPoint)
+                    {
+                        // Decrease Gold
+                        decreaseGold += Random.Range(SortedPkPunishments[i].goldDecreaseMin, SortedPkPunishments[i].goldDecreaseMax);
+                        // Decrease Exp
+                        decreaseExpPercent += Random.Range(SortedPkPunishments[i].expDecreasePercentMin, SortedPkPunishments[i].expDecreasePercentMax);
+                        // Decrease Item
+                        decreaseItems += Random.Range(SortedPkPunishments[i].itemDecreaseMin, SortedPkPunishments[i].itemDecreaseMax);
+                        break;
+                    }
+                }
+                player.PkPoint = 0;
+                player.ConsecutivePkKills = 0;
+            }
+            decreaseExpPercent += expLostPercentageWhenDeath;
+            if (GameInstance.ServerGuildHandlers.TryGetGuild(player.GuildId, out GuildData guildData))
+                decreaseExpPercent -= decreaseExpPercent * guildData.DecreaseExpLostPercentage;
+            decreaseExp += Mathf.CeilToInt(player.GetNextLevelExp() * decreaseExpPercent * 0.01f);
         }
 
         public override float GetOverweightMoveSpeedRate(BaseGameEntity gameEntity)

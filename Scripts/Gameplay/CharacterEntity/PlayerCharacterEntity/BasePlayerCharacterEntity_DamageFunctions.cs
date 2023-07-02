@@ -1,9 +1,25 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 
 namespace MultiplayerARPG
 {
     public partial class BasePlayerCharacterEntity
     {
+        private enum ItemDropSource
+        {
+            EquipWeapons,
+            EquipItems,
+            NonEquipItems,
+        }
+
+        private struct ItemDropData
+        {
+            public ItemDropSource source;
+            public int index;
+            public bool isLeftHand;
+            public CharacterItem item;
+        }
+
         public virtual void OnKillMonster(BaseMonsterCharacterEntity monsterCharacterEntity)
         {
             if (!IsServer || monsterCharacterEntity == null)
@@ -19,21 +35,24 @@ namespace MultiplayerARPG
 
         public override void Killed(EntityInfo lastAttacker)
         {
-            // Dead time
+            // Dead Time
             LastDeadTime = System.DateTimeOffset.UtcNow.ToUnixTimeSeconds();
+            lastAttacker.TryGetEntity(out BaseCharacterEntity attackerEntity);
 
-            // Dead penalty
-            float expLostPercentage = CurrentGameInstance.GameplayRule.GetExpLostPercentageWhenDeath(this);
-            GuildData guildData;
-            if (GameInstance.ServerGuildHandlers.TryGetGuild(GuildId, out guildData))
-                expLostPercentage -= expLostPercentage * guildData.DecreaseExpLostPercentage;
-            if (expLostPercentage <= 0f)
-                expLostPercentage = 0f;
-            int exp = Exp;
-            exp -= (int)(this.GetNextLevelExp() * expLostPercentage / 100f);
-            if (exp <= 0)
-                exp = 0;
-            Exp = exp;
+            bool pkKilled = false;
+
+            // Dead Penalty
+            CurrentGameInstance.GameplayRule.GetPlayerDeadPunishment(this, attackerEntity, out int decraseExp, out int decreaseGold, out int decreaseItems);
+            // Decrease Exp
+            if (Exp > decraseExp)
+                Exp -= decraseExp;
+            else
+                Exp = 0;
+            // Decrease Gold
+            if (Gold > decreaseGold)
+                Gold -= decreaseGold;
+            else
+                Gold = 0;
 
             // Clear data
             NpcAction.ClearNpcDialogData();
@@ -51,76 +70,153 @@ namespace MultiplayerARPG
             // Add this character to make players able to get items from their own corpses immediately
             looters.Add(Id);
 
-            // Drop an items
-            List<CharacterItem> droppingItems = new List<CharacterItem>();
+            // Which kind of items will be dropped
+            bool playerDeadDropsEquipWeapons = false;
+            bool playerDeadDropsEquipItems = false;
+            bool playerDeadDropsNonEquipItems = false;
 
-            if (CurrentMapInfo.PlayerDeadDropsEquipWeapons)
+            switch (CurrentMapInfo.PlayerDeadDropsEquipWeapons)
+            {
+                case PlayerItemDropMode.AlwaysDrop:
+                    playerDeadDropsEquipWeapons = true;
+                    break;
+                case PlayerItemDropMode.PkPunishmentDrop:
+                    playerDeadDropsEquipWeapons = pkKilled;
+                    break;
+            }
+
+            switch (CurrentMapInfo.PlayerDeadDropsEquipItems)
+            {
+                case PlayerItemDropMode.AlwaysDrop:
+                    playerDeadDropsEquipItems = true;
+                    break;
+                case PlayerItemDropMode.PkPunishmentDrop:
+                    playerDeadDropsEquipItems = pkKilled;
+                    break;
+            }
+
+            switch (CurrentMapInfo.PlayerDeadDropsNonEquipItems)
+            {
+                case PlayerItemDropMode.AlwaysDrop:
+                    playerDeadDropsNonEquipItems = true;
+                    break;
+                case PlayerItemDropMode.PkPunishmentDrop:
+                    playerDeadDropsNonEquipItems = pkKilled;
+                    break;
+            }
+
+            // Drop an items
+            List<ItemDropData> droppingItems = new List<ItemDropData>();
+            if (playerDeadDropsEquipWeapons)
             {
                 for (int i = 0; i < SelectableWeaponSets.Count; ++i)
                 {
-                    EquipWeapons updatingEquipWeapons = SelectableWeaponSets[i].Clone();
-                    if (!CurrentMapInfo.ExcludeItemFromDropping(SelectableWeaponSets[i].GetRightHandItem()))
+                    if (!SelectableWeaponSets[i].IsEmptyRightHandSlot() && !CurrentMapInfo.ExcludeItemFromDropping(SelectableWeaponSets[i].GetRightHandItem()))
                     {
-                        droppingItems.Add(SelectableWeaponSets[i].rightHand);
-                        updatingEquipWeapons.rightHand = CharacterItem.Empty;
+                        droppingItems.Add(new ItemDropData()
+                        {
+                            source = ItemDropSource.EquipWeapons,
+                            index = i,
+                            isLeftHand = false,
+                            item = SelectableWeaponSets[i].rightHand,
+                        });
                     }
-                    if (!CurrentMapInfo.ExcludeItemFromDropping(SelectableWeaponSets[i].GetLeftHandItem()))
+                    if (!SelectableWeaponSets[i].IsEmptyLeftHandSlot() && !CurrentMapInfo.ExcludeItemFromDropping(SelectableWeaponSets[i].GetLeftHandItem()))
                     {
-                        droppingItems.Add(SelectableWeaponSets[i].leftHand);
-                        updatingEquipWeapons.leftHand = CharacterItem.Empty;
+                        droppingItems.Add(new ItemDropData()
+                        {
+                            source = ItemDropSource.EquipWeapons,
+                            index = i,
+                            isLeftHand = true,
+                            item = SelectableWeaponSets[i].leftHand,
+                        });
                     }
-                    SelectableWeaponSets[i] = updatingEquipWeapons;
                 }
             }
 
-            if (CurrentMapInfo.PlayerDeadDropsEquipItems)
+            if (playerDeadDropsEquipItems)
             {
                 for (int i = EquipItems.Count - 1; i >= 0; --i)
                 {
                     if (!EquipItems[i].IsEmptySlot() && !CurrentMapInfo.ExcludeItemFromDropping(EquipItems[i].GetItem()))
                     {
-                        droppingItems.Add(EquipItems[i]);
-                        EquipItems.RemoveAt(i);
+                        droppingItems.Add(new ItemDropData()
+                        {
+                            source = ItemDropSource.EquipItems,
+                            index = i,
+                            item = EquipItems[i],
+                        });
                     }
                 }
             }
 
-            if (CurrentMapInfo.PlayerDeadDropsNonEquipItems)
+            if (playerDeadDropsNonEquipItems)
             {
                 for (int i = NonEquipItems.Count - 1; i >= 0; --i)
                 {
                     if (!NonEquipItems[i].IsEmptySlot() && !CurrentMapInfo.ExcludeItemFromDropping(NonEquipItems[i].GetItem()))
                     {
-                        droppingItems.Add(NonEquipItems[i]);
-                        NonEquipItems.RemoveAt(i);
+                        droppingItems.Add(new ItemDropData()
+                        {
+                            source = ItemDropSource.NonEquipItems,
+                            index = i,
+                            item = NonEquipItems[i],
+                        });
                     }
                 }
             }
 
-            int dropCount = 0;
-            for (int i = droppingItems.Count - 1; i >= 0; --i)
+            if (droppingItems.Count > 0)
             {
-                if (droppingItems[i].NotEmptySlot())
-                    ++dropCount;
-                else
-                    droppingItems.RemoveAt(i);
-            }
-
-            if (dropCount > 0)
-            {
-                this.FillEmptySlots();
-                switch (CurrentGameInstance.playerDeadDropItemMode)
+                droppingItems.Shuffle();
+                List<ItemDropData> removingItems = new List<ItemDropData>();
+                List<CharacterItem> removingItemInstances = new List<CharacterItem>();
+                for (int i = 0; i < droppingItems.Count; ++i)
                 {
-                    case DeadDropItemMode.DropOnGround:
-                        for (int i = 0; i < droppingItems.Count; ++i)
-                        {
-                            ItemDropEntity.DropItem(this, RewardGivenType.PlayerDead, droppingItems[i], looters);
-                        }
+                    removingItems.Add(droppingItems[i]);
+                    removingItemInstances.Add(droppingItems[i].item);
+                    if (removingItems.Count >= decreaseItems)
                         break;
-                    case DeadDropItemMode.CorpseLooting:
-                        if (droppingItems.Count > 0)
-                            ItemsContainerEntity.DropItems(CurrentGameInstance.monsterCorpsePrefab, this, RewardGivenType.PlayerDead, droppingItems, looters, CurrentGameInstance.playerCorpseAppearDuration);
-                        break;
+                }
+
+                removingItems = removingItems.OrderByDescending(o => o.index).ToList();
+                for (int i = 0; i < removingItems.Count; ++i)
+                {
+                    switch (removingItems[i].source)
+                    {
+                        case ItemDropSource.EquipWeapons:
+                            EquipWeapons updatingEquipWeapons = SelectableWeaponSets[removingItems[i].index].Clone();
+                            if (removingItems[i].isLeftHand)
+                                updatingEquipWeapons.leftHand = CharacterItem.Empty;
+                            else
+                                updatingEquipWeapons.rightHand = CharacterItem.Empty;
+                            SelectableWeaponSets[removingItems[i].index] = updatingEquipWeapons;
+                            break;
+                        case ItemDropSource.EquipItems:
+                            EquipItems.RemoveAt(removingItems[i].index);
+                            break;
+                        case ItemDropSource.NonEquipItems:
+                            NonEquipItems.RemoveAt(removingItems[i].index);
+                            break;
+                    }
+                }
+
+                if (removingItemInstances.Count > 0)
+                {
+                    this.FillEmptySlots();
+                    switch (CurrentGameInstance.playerDeadDropItemMode)
+                    {
+                        case DeadDropItemMode.DropOnGround:
+                            for (int i = 0; i < removingItemInstances.Count; ++i)
+                            {
+                                ItemDropEntity.DropItem(this, RewardGivenType.PlayerDead, removingItemInstances[i], looters);
+                            }
+                            break;
+                        case DeadDropItemMode.CorpseLooting:
+                            if (removingItemInstances.Count > 0)
+                                ItemsContainerEntity.DropItems(CurrentGameInstance.monsterCorpsePrefab, this, RewardGivenType.PlayerDead, removingItemInstances, looters, CurrentGameInstance.playerCorpseAppearDuration);
+                            break;
+                    }
                 }
             }
 

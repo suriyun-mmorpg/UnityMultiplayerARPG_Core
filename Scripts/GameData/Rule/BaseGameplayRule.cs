@@ -24,7 +24,7 @@ namespace MultiplayerARPG
         public abstract float GetDecreasingStaminaPerSeconds(BaseCharacterEntity character);
         public abstract float GetDecreasingFoodPerSeconds(BaseCharacterEntity character);
         public abstract float GetDecreasingWaterPerSeconds(BaseCharacterEntity character);
-        public abstract float GetExpLostPercentageWhenDeath(BaseCharacterEntity character);
+        public abstract void GetPlayerDeadPunishment(BasePlayerCharacterEntity player, BaseCharacterEntity attacker, out int decreaseExp, out int decreaseGold, out int decreaseItems);
         public abstract float GetOverweightMoveSpeedRate(BaseGameEntity gameEntity);
         public abstract float GetSprintMoveSpeedRate(BaseGameEntity gameEntity);
         public abstract float GetWalkMoveSpeedRate(BaseGameEntity gameEntity);
