@@ -37,8 +37,8 @@ namespace MultiplayerARPG
         public abstract int GetLimitSlot(ICharacterData character, CharacterStats stats);
         public abstract bool IsHungry(BaseCharacterEntity character);
         public abstract bool IsThirsty(BaseCharacterEntity character);
-        public abstract bool RewardExp(BaseCharacterEntity character, Reward reward, float multiplier, RewardGivenType rewardGivenType, out int rewardedExp);
-        public abstract void RewardCurrencies(BaseCharacterEntity character, Reward reward, float multiplier, RewardGivenType rewardGivenType, out int rewardedGold);
+        public abstract bool RewardExp(BaseCharacterEntity character, Reward reward, float multiplier, RewardGivenType rewardGivenType, int giverLevel, int sourceLevel, out int rewardedExp);
+        public abstract void RewardCurrencies(BaseCharacterEntity character, Reward reward, float multiplier, RewardGivenType rewardGivenType, int giverLevel, int sourceLevel, out int rewardedGold);
         public abstract float GetEquipmentStatsRate(CharacterItem characterItem);
         public abstract void OnCharacterRespawn(ICharacterData character);
         public abstract void OnCharacterReceivedDamage(BaseCharacterEntity attacker, BaseCharacterEntity damageReceiver, CombatAmountType combatAmountType, int damage, CharacterItem weapon, BaseSkill skill, int skillLevel, CharacterBuff buff, bool isDamageOverTime);

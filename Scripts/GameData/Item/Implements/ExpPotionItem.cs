@@ -53,7 +53,7 @@ namespace MultiplayerARPG
             characterEntity.RewardExp(new Reward()
             {
                 exp = Exp
-            }, 1, RewardGivenType.None);
+            }, 1, RewardGivenType.None, 1, 1);
         }
 
         public bool HasCustomAimControls()

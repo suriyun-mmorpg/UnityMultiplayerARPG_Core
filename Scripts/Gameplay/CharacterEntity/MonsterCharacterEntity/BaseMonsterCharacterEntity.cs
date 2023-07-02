@@ -514,21 +514,21 @@ namespace MultiplayerARPG
                         {
                             tempMonsterCharacterEntity = tempPlayerCharacterEntity.Summons[petIndex].CacheEntity;
                             // Share exp to pet, set multiplier to 0.5, because it will be shared to player
-                            tempMonsterCharacterEntity.RewardExp(reward, (1f - shareGuildExpRate) * 0.5f * rewardRate, RewardGivenType.KillMonster);
+                            tempMonsterCharacterEntity.RewardExp(reward, (1f - shareGuildExpRate) * 0.5f * rewardRate, RewardGivenType.KillMonster, Level, Level);
                             // Set multiplier to 0.5, because it was shared to monster
-                            tempPlayerCharacterEntity.RewardExp(reward, (1f - shareGuildExpRate) * 0.5f * rewardRate, RewardGivenType.KillMonster);
+                            tempPlayerCharacterEntity.RewardExp(reward, (1f - shareGuildExpRate) * 0.5f * rewardRate, RewardGivenType.KillMonster, Level, Level);
                         }
                         else
                         {
                             // No pet, no share, so rate is 1f
-                            tempPlayerCharacterEntity.RewardExp(reward, (1f - shareGuildExpRate) * rewardRate, RewardGivenType.KillMonster);
+                            tempPlayerCharacterEntity.RewardExp(reward, (1f - shareGuildExpRate) * rewardRate, RewardGivenType.KillMonster, Level, Level);
                         }
                     }
 
                     if (!givenRewardCurrency)
                     {
                         // Will give reward when it was not given
-                        tempPlayerCharacterEntity.RewardCurrencies(reward, rewardRate, RewardGivenType.KillMonster);
+                        tempPlayerCharacterEntity.RewardCurrencies(reward, rewardRate, RewardGivenType.KillMonster, Level, Level);
                     }
                 }
             }
@@ -599,15 +599,15 @@ namespace MultiplayerARPG
                     if (monsterCharacterEntity != null)
                     {
                         // Share exp to pet, set multiplier to 0.5, because it will be shared to player
-                        monsterCharacterEntity.RewardExp(reward, (1f - shareGuildExpRate) / countNearbyPartyMembers * 0.5f * rewardRate, RewardGivenType.PartyShare);
+                        monsterCharacterEntity.RewardExp(reward, (1f - shareGuildExpRate) / countNearbyPartyMembers * 0.5f * rewardRate, RewardGivenType.PartyShare, playerCharacterEntity.Level, Level);
                     }
                     // Set multiplier to 0.5, because it was shared to monster
-                    nearbyPartyMember.RewardExp(reward, (1f - shareGuildExpRate) / countNearbyPartyMembers * 0.5f * rewardRate, RewardGivenType.PartyShare);
+                    nearbyPartyMember.RewardExp(reward, (1f - shareGuildExpRate) / countNearbyPartyMembers * 0.5f * rewardRate, RewardGivenType.PartyShare, playerCharacterEntity.Level, Level);
                 }
                 else
                 {
                     // No pet, no share, so rate is 1f
-                    nearbyPartyMember.RewardExp(reward, (1f - shareGuildExpRate) / countNearbyPartyMembers * rewardRate, playerCharacterEntity.ObjectId == nearbyPartyMember.ObjectId ? RewardGivenType.KillMonster : RewardGivenType.PartyShare);
+                    nearbyPartyMember.RewardExp(reward, (1f - shareGuildExpRate) / countNearbyPartyMembers * rewardRate, playerCharacterEntity.ObjectId == nearbyPartyMember.ObjectId ? RewardGivenType.KillMonster : RewardGivenType.PartyShare, Level, Level);
                 }
             }
             // Share Items to party members
@@ -622,7 +622,7 @@ namespace MultiplayerARPG
                     // Make other member in party able to pickup items
                     _looters.Add(nearbyPartyMember.Id);
                 }
-                nearbyPartyMember.RewardCurrencies(reward, 1f / countNearbyPartyMembers * rewardRate, playerCharacterEntity.ObjectId == nearbyPartyMember.ObjectId ? RewardGivenType.KillMonster : RewardGivenType.PartyShare);
+                nearbyPartyMember.RewardCurrencies(reward, 1f / countNearbyPartyMembers * rewardRate, playerCharacterEntity.ObjectId == nearbyPartyMember.ObjectId ? RewardGivenType.KillMonster : RewardGivenType.PartyShare, Level, Level);
             }
 
             // Shared exp has been given, so do not give it to character again
