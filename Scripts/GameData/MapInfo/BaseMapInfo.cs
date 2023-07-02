@@ -38,18 +38,18 @@ namespace MultiplayerARPG
 
         [Tooltip("When character dead, it will drop equipping weapons or not?")]
         [SerializeField]
-        private bool playerDeadDropsEquipWeapons = false;
-        public virtual bool PlayerDeadDropsEquipWeapons { get { return playerDeadDropsEquipWeapons; } }
+        private PlayerItemDropMode playerDeadDropsEquipWeapons = PlayerItemDropMode.None;
+        public virtual PlayerItemDropMode PlayerDeadDropsEquipWeapons { get { return playerDeadDropsEquipWeapons; } }
 
         [Tooltip("When character dead, it will drop equipping items or not?")]
         [SerializeField]
-        private bool playerDeadDropsEquipItems = false;
-        public virtual bool PlayerDeadDropsEquipItems { get { return playerDeadDropsEquipItems; } }
+        private PlayerItemDropMode playerDeadDropsEquipItems = PlayerItemDropMode.None;
+        public virtual PlayerItemDropMode PlayerDeadDropsEquipItems { get { return playerDeadDropsEquipItems; } }
 
         [Tooltip("When character dead, it will drop non equipping items or not?")]
         [SerializeField]
-        private bool playerDeadDropsNonEquipItems = false;
-        public virtual bool PlayerDeadDropsNonEquipItems { get { return playerDeadDropsNonEquipItems; } }
+        private PlayerItemDropMode playerDeadDropsNonEquipItems = PlayerItemDropMode.None;
+        public virtual PlayerItemDropMode PlayerDeadDropsNonEquipItems { get { return playerDeadDropsNonEquipItems; } }
         #endregion
 
         #region Item Drop Rules
