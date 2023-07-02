@@ -49,6 +49,10 @@ namespace MultiplayerARPG
             info.AddValue("titleDataId", data.TitleDataId);
             info.AddValue("lastDeadTime", data.LastDeadTime);
             info.AddValue("lastUpdate", data.LastUpdate);
+            info.AddValue("isPkOn", data.IsPkOn);
+            info.AddValue("lastPkOnTime", data.LastPkOnTime);
+            info.AddValue("pkPoint", data.PkPoint);
+            info.AddValue("consecutivePkKills", data.ConsecutivePkKills);
             info.AddListValue("hotkeys", data.Hotkeys);
             info.AddListValue("quests", data.Quests);
             info.AddValue("equipWeapons", data.EquipWeapons);
@@ -152,6 +156,30 @@ namespace MultiplayerARPG
             try
             {
                 data.LastDeadTime = info.GetInt64("lastDeadTime");
+            }
+            catch { }
+            // TODO: Backward compatible, this will be removed in future version
+            try
+            {
+                data.IsPkOn = info.GetBoolean("isPkOn");
+            }
+            catch { }
+            // TODO: Backward compatible, this will be removed in future version
+            try
+            {
+                data.LastPkOnTime = info.GetInt64("lastPkOnTime");
+            }
+            catch { }
+            // TODO: Backward compatible, this will be removed in future version
+            try
+            {
+                data.PkPoint = info.GetInt32("pkPoint");
+            }
+            catch { }
+            // TODO: Backward compatible, this will be removed in future version
+            try
+            {
+                data.ConsecutivePkKills = info.GetInt32("consecutivePkKills");
             }
             catch { }
             data.LastUpdate = info.GetInt64("lastUpdate");

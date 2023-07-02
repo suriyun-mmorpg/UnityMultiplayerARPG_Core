@@ -42,6 +42,14 @@ namespace MultiplayerARPG
         [SerializeField]
         protected SyncFieldLong unmuteTime = new SyncFieldLong();
         [SerializeField]
+        protected SyncFieldBool isPkOn = new SyncFieldBool();
+        [SerializeField]
+        protected SyncFieldLong lastPkOnTime = new SyncFieldLong();
+        [SerializeField]
+        protected SyncFieldInt pkPoint = new SyncFieldInt();
+        [SerializeField]
+        protected SyncFieldInt consecutivePkKills = new SyncFieldInt();
+        [SerializeField]
         protected SyncFieldBool isWarping = new SyncFieldBool();
 
         [Category("Sync Lists")]
@@ -159,6 +167,26 @@ namespace MultiplayerARPG
             set { unmuteTime.Value = value; }
         }
         public long LastUpdate { get; set; }
+        public bool IsPkOn
+        {
+            get { return isPkOn.Value; }
+            set { isPkOn.Value = value; }
+        }
+        public long LastPkOnTime
+        {
+            get { return lastPkOnTime.Value; }
+            set { lastPkOnTime.Value = value; }
+        }
+        public int PkPoint
+        {
+            get { return pkPoint.Value; }
+            set { pkPoint.Value = value; }
+        }
+        public int ConsecutivePkKills
+        {
+            get { return consecutivePkKills.Value; }
+            set { consecutivePkKills.Value = value; }
+        }
         public bool IsWarping
         {
             get { return isWarping.Value; }
@@ -314,13 +342,21 @@ namespace MultiplayerARPG
             respawnPosition.deliveryMethod = DeliveryMethod.ReliableOrdered;
             respawnPosition.syncMode = LiteNetLibSyncField.SyncMode.ServerToOwnerClient;
             iconDataId.deliveryMethod = DeliveryMethod.ReliableOrdered;
-            iconDataId.syncMode = LiteNetLibSyncField.SyncMode.ServerToOwnerClient;
+            iconDataId.syncMode = LiteNetLibSyncField.SyncMode.ServerToClients;
             frameDataId.deliveryMethod = DeliveryMethod.ReliableOrdered;
-            frameDataId.syncMode = LiteNetLibSyncField.SyncMode.ServerToOwnerClient;
+            frameDataId.syncMode = LiteNetLibSyncField.SyncMode.ServerToClients;
             titleDataId.deliveryMethod = DeliveryMethod.ReliableOrdered;
-            titleDataId.syncMode = LiteNetLibSyncField.SyncMode.ServerToOwnerClient;
+            titleDataId.syncMode = LiteNetLibSyncField.SyncMode.ServerToClients;
             lastDeadTime.deliveryMethod = DeliveryMethod.Sequenced;
             lastDeadTime.syncMode = LiteNetLibSyncField.SyncMode.ServerToOwnerClient;
+            isPkOn.deliveryMethod = DeliveryMethod.ReliableOrdered;
+            isPkOn.syncMode = LiteNetLibSyncField.SyncMode.ServerToClients;
+            lastPkOnTime.deliveryMethod = DeliveryMethod.ReliableOrdered;
+            lastPkOnTime.syncMode = LiteNetLibSyncField.SyncMode.ServerToOwnerClient;
+            pkPoint.deliveryMethod = DeliveryMethod.ReliableOrdered;
+            pkPoint.syncMode = LiteNetLibSyncField.SyncMode.ServerToClients;
+            consecutivePkKills.deliveryMethod = DeliveryMethod.ReliableOrdered;
+            consecutivePkKills.syncMode = LiteNetLibSyncField.SyncMode.ServerToOwnerClient;
             isWarping.deliveryMethod = DeliveryMethod.ReliableOrdered;
             isWarping.syncMode = LiteNetLibSyncField.SyncMode.ServerToOwnerClient;
             pitch.deliveryMethod = DeliveryMethod.Sequenced;
