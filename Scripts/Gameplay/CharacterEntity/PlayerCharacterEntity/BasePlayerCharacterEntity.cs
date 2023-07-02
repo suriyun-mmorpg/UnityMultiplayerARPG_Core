@@ -50,6 +50,11 @@ namespace MultiplayerARPG
             get; private set;
         }
 
+        public PlayerCharacterPkComponent Pk
+        {
+            get; private set;
+        }
+
         public int IndexOfCharacterDatabase(int dataId)
         {
             for (int i = 0; i < CharacterDatabases.Length; ++i)
@@ -99,6 +104,7 @@ namespace MultiplayerARPG
             Crafting = gameObject.GetOrAddComponent<PlayerCharacterCraftingComponent>();
             Dealing = gameObject.GetOrAddComponent<PlayerCharacterDealingComponent>();
             NpcAction = gameObject.GetOrAddComponent<PlayerCharacterNpcActionComponent>();
+            Pk = gameObject.GetOrAddComponent<PlayerCharacterPkComponent>();
             gameObject.GetOrAddComponent<PlayerCharacterItemLockAndExpireComponent>();
         }
 
