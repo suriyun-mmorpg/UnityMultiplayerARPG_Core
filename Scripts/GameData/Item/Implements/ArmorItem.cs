@@ -22,6 +22,7 @@ namespace MultiplayerARPG
         public ArmorType ArmorType
         {
             get { return armorType; }
+            set { armorType = value; }
         }
 
         public override void PrepareRelatesData()

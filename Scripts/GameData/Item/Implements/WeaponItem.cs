@@ -48,6 +48,7 @@ namespace MultiplayerARPG
         public WeaponType WeaponType
         {
             get { return weaponType; }
+            set { weaponType = value; }
         }
 
         [SerializeField]
