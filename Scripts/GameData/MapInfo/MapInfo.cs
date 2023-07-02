@@ -8,14 +8,6 @@ namespace MultiplayerARPG
     [CreateAssetMenu(fileName = GameDataMenuConsts.MAP_INFO_FILE, menuName = GameDataMenuConsts.MAP_INFO_MENU, order = GameDataMenuConsts.MAP_INFO_ORDER)]
     public partial class MapInfo : BaseMapInfo
     {
-        public enum PvpMode : byte
-        {
-            None,
-            Pvp,
-            FactionPvp,
-            GuildPvp,
-        }
-
         [Category("Map Info Settings")]
         [Tooltip("If this is `TRUE`, player can return to save point by `return` key. Else it will able to do that when dead only")]
         public bool canReturnToSavePoint;
