@@ -106,6 +106,10 @@ namespace MultiplayerARPG
         public float moveSpeedBattlePointScore = 10;
         public float atkSpeedBattlePointScore = 10;
 
+        [Header("Player Death")]
+        public int itemDecreaseOnDeadMin;
+        public int itemDecreaseOnDeadMax;
+
         [Header("PK")]
         public int minLevelToTurnPkOn = 10;
         public int pkPointEachKills = 10;
@@ -342,10 +346,13 @@ namespace MultiplayerARPG
                     }
                 }
             }
+            // Decrease Exp
             decreaseExpPercent += expLostPercentageWhenDeath;
             if (GameInstance.ServerGuildHandlers.TryGetGuild(player.GuildId, out GuildData guildData))
                 decreaseExpPercent -= decreaseExpPercent * guildData.DecreaseExpLostPercentage;
             decreaseExp += Mathf.CeilToInt(player.GetNextLevelExp() * decreaseExpPercent * 0.01f);
+            // Decrease Item
+            decreaseItems += Random.Range(itemDecreaseOnDeadMin, itemDecreaseOnDeadMax);
         }
 
         public override float GetOverweightMoveSpeedRate(BaseGameEntity gameEntity)
@@ -1047,8 +1054,8 @@ namespace MultiplayerARPG
             if (player.LastPkOnTime <= 0 || currentTime - player.LastPkOnTime > (60 * 60 * hoursBeforeTurnPkOff))
                 return true;
             long diff = currentTime - player.LastPkOnTime;
-            double diffHours = (double)diff / 60f / 60f;
-            GameInstance.ServerGameMessageHandlers.SendFormattedGameMessage(player.ConnectionId, UIFormatKeys.UI_FORMAT_PK_CAN_TURN_PK_AFTER_HOURS, diffHours.ToString("N2"));
+            double remainsHours = hoursBeforeTurnPkOff - ((double)diff / 60 / 60);
+            GameInstance.ServerGameMessageHandlers.SendFormattedGameMessage(player.ConnectionId, UIFormatKeys.UI_FORMAT_PK_CAN_TURN_PK_AFTER_HOURS, remainsHours >= 1 ? remainsHours.ToString("N0") : remainsHours.ToString("N2"));
             return false;
         }
     }
