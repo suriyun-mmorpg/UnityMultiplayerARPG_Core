@@ -230,6 +230,7 @@ namespace MultiplayerARPG
             if (ClientGameMessageHandlers != null)
             {
                 RegisterClientMessage(GameNetworkingConsts.GameMessage, ClientGameMessageHandlers.HandleGameMessage);
+                RegisterClientMessage(GameNetworkingConsts.FormattedGameMessage, ClientGameMessageHandlers.HandleFormattedGameMessage);
                 RegisterClientMessage(GameNetworkingConsts.UpdatePartyMember, ClientGameMessageHandlers.HandleUpdatePartyMember);
                 RegisterClientMessage(GameNetworkingConsts.UpdateParty, ClientGameMessageHandlers.HandleUpdateParty);
                 RegisterClientMessage(GameNetworkingConsts.UpdateGuildMember, ClientGameMessageHandlers.HandleUpdateGuildMember);
