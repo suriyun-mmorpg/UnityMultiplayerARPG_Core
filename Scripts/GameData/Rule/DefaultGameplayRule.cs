@@ -152,7 +152,7 @@ namespace MultiplayerARPG
             return damageAmount.Random(randomSeed);
         }
 
-        public override float GetHitChance(BaseCharacterEntity attacker, BaseCharacterEntity damageReceiver)
+        public virtual float GetHitChance(BaseCharacterEntity attacker, BaseCharacterEntity damageReceiver)
         {
             // Attacker stats
             CharacterStats attackerStats = attacker.GetCaches().Stats;
@@ -180,7 +180,29 @@ namespace MultiplayerARPG
             return hitChance;
         }
 
-        public override float GetCriticalChance(BaseCharacterEntity attacker, BaseCharacterEntity damageReceiver)
+        public override float GetDamageReducedByResistance(Dictionary<DamageElement, float> damageReceiverResistances, Dictionary<DamageElement, float> damageReceiverArmors, float damageAmount, DamageElement damageElement)
+        {
+            if (damageElement == null)
+                damageElement = GameInstance.Singleton.DefaultDamageElement;
+            // Reduce damage by resistance
+            float resistanceAmount;
+            if (damageReceiverResistances.TryGetValue(damageElement, out resistanceAmount))
+            {
+                if (resistanceAmount > damageElement.MaxResistanceAmount)
+                    resistanceAmount = damageElement.MaxResistanceAmount;
+                damageAmount -= damageAmount * resistanceAmount; // If resistance is minus damage will be increased
+            }
+            // Reduce damage by armor
+            float armorAmount;
+            if (damageReceiverArmors.TryGetValue(damageElement, out armorAmount))
+            {
+                // Formula: Attack * 100 / (100 + Defend)
+                damageAmount *= 100f / (100f + Mathf.Max(0f, armorAmount));
+            }
+            return damageAmount;
+        }
+
+        public virtual float GetCriticalChance(BaseCharacterEntity attacker, BaseCharacterEntity damageReceiver)
         {
             float criRate = attacker.GetCaches().Stats.criRate;
             // Minimum critical chance is 5%
@@ -197,7 +219,7 @@ namespace MultiplayerARPG
             return damage * attacker.GetCaches().Stats.criDmgRate;
         }
 
-        public override float GetBlockChance(BaseCharacterEntity attacker, BaseCharacterEntity damageReceiver)
+        public virtual float GetBlockChance(BaseCharacterEntity attacker, BaseCharacterEntity damageReceiver)
         {
             float blockRate = damageReceiver.GetCaches().Stats.blockRate;
             // Minimum block chance is 5%
@@ -219,28 +241,6 @@ namespace MultiplayerARPG
             if (blockDmgRate > 0.95f)
                 blockDmgRate = 0.95f;
             return damage - (damage * blockDmgRate);
-        }
-
-        public override float GetDamageReducedByResistance(Dictionary<DamageElement, float> damageReceiverResistances, Dictionary<DamageElement, float> damageReceiverArmors, float damageAmount, DamageElement damageElement)
-        {
-            if (damageElement == null)
-                damageElement = GameInstance.Singleton.DefaultDamageElement;
-            // Reduce damage by resistance
-            float resistanceAmount;
-            if (damageReceiverResistances.TryGetValue(damageElement, out resistanceAmount))
-            {
-                if (resistanceAmount > damageElement.MaxResistanceAmount)
-                    resistanceAmount = damageElement.MaxResistanceAmount;
-                damageAmount -= damageAmount * resistanceAmount; // If resistance is minus damage will be increased
-            }
-            // Reduce damage by armor
-            float armorAmount;
-            if (damageReceiverArmors.TryGetValue(damageElement, out armorAmount))
-            {
-                // Formula: Attack * 100 / (100 + Defend)
-                damageAmount *= 100f / (100f + Mathf.Max(0f, armorAmount));
-            }
-            return damageAmount;
         }
 
         public override int GetTotalDamage(Vector3 fromPosition, EntityInfo instigator, DamageableEntity damageReceiver, float totalDamage, CharacterItem weapon, BaseSkill skill, int skillLevel)
