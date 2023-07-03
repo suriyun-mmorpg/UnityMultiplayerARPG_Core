@@ -41,9 +41,9 @@ namespace MultiplayerARPG
 
             // PKing
             bool pkKilled = false;
-            if (IsPkOn && attackerEntity is BasePlayerCharacterEntity attackPlayer && attackPlayer.IsPkOn)
+            if (CurrentMapInfo.EnablePkRules && attackerEntity is BasePlayerCharacterEntity attackPlayer)
             {
-                // Increse PK Point
+                pkKilled = true;
                 attackPlayer.PkPoint = CurrentGameInstance.GameplayRule.GetPkPointWhenCharacterKilled(attackPlayer, this);
                 attackPlayer.ConsecutivePkKills++;
                 if (attackPlayer.PkPoint > attackPlayer.HighestPkPoint)

@@ -324,16 +324,8 @@ namespace MultiplayerARPG
             decreaseItems = 0;
             float decreaseExpPercent = 0f;
             // PK
-            if (attacker is BasePlayerCharacterEntity attackPlayer && attackPlayer.IsPkOn && player.IsPkOn)
+            if (BaseGameNetworkManager.CurrentMapInfo.EnablePkRules && attacker is BasePlayerCharacterEntity)
             {
-                // Increse PK Point
-                attackPlayer.PkPoint = attackPlayer.PkPoint.Increase(pkPointEachKills);
-                attackPlayer.ConsecutivePkKills++;
-                if (attackPlayer.PkPoint > attackPlayer.HighestPkPoint)
-                    attackPlayer.PkPoint = attackPlayer.HighestPkPoint;
-                if (attackPlayer.ConsecutivePkKills > attackPlayer.HighestConsecutivePkKills)
-                    attackPlayer.ConsecutivePkKills = attackPlayer.HighestConsecutivePkKills;
-                // PK Punishment
                 for (int i = SortedPkPunishments.Count - 1; i >= 0; --i)
                 {
                     if (player.PkPoint > SortedPkPunishments[i].minPkPoint)
@@ -347,8 +339,6 @@ namespace MultiplayerARPG
                         break;
                     }
                 }
-                player.PkPoint = 0;
-                player.ConsecutivePkKills = 0;
             }
             decreaseExpPercent += expLostPercentageWhenDeath;
             if (GameInstance.ServerGuildHandlers.TryGetGuild(player.GuildId, out GuildData guildData))

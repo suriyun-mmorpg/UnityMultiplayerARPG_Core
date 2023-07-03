@@ -22,6 +22,10 @@ namespace MultiplayerARPG
         [SerializeField]
         private Vector3 startRotation = Vector3.zero;
         public virtual Vector3 StartRotation { get { return startRotation; } }
+
+        [SerializeField]
+        private bool enablePkRules = false;
+        public virtual bool EnablePkRules { get { return enablePkRules; } }
         #endregion
 
         #region Character Death Rules

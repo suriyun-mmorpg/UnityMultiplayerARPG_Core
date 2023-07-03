@@ -76,7 +76,7 @@ namespace MultiplayerARPG
                     case PvpMode.GuildPvp:
                         return targetEntity.GuildId != 0 && targetEntity.GuildId == playerCharacter.GuildId;
                     default:
-                        return true;
+                        return !EnablePkRules || !playerCharacter.IsPkOn || !targetEntity.TryGetEntity(out BasePlayerCharacterEntity targetPlayer) || !targetPlayer.IsPkOn;
                 }
             }
 
@@ -136,7 +136,7 @@ namespace MultiplayerARPG
                     case PvpMode.GuildPvp:
                         return targetEntity.GuildId == 0 || targetEntity.GuildId != playerCharacter.GuildId;
                     default:
-                        return false;
+                        return EnablePkRules && playerCharacter.IsPkOn && targetEntity.TryGetEntity(out BasePlayerCharacterEntity targetPlayer) && targetPlayer.IsPkOn;
                 }
             }
 
