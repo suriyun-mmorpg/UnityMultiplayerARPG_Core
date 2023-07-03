@@ -44,7 +44,7 @@ namespace MultiplayerARPG
             if (CurrentMapInfo.EnablePkRules && attackerEntity is BasePlayerCharacterEntity attackPlayer)
             {
                 pkKilled = true;
-                attackPlayer.PkPoint = CurrentGameInstance.GameplayRule.GetPkPointWhenCharacterKilled(attackPlayer, this);
+                attackPlayer.PkPoint += CurrentGameInstance.GameplayRule.GetPkPointWhenCharacterKilled(attackPlayer, this);
                 attackPlayer.ConsecutivePkKills++;
                 if (attackPlayer.PkPoint > attackPlayer.HighestPkPoint)
                     attackPlayer.HighestPkPoint = attackPlayer.PkPoint;
