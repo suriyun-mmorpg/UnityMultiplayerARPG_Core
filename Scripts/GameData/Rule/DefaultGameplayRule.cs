@@ -110,16 +110,23 @@ namespace MultiplayerARPG
         public int itemDecreaseOnDeadMin;
         public int itemDecreaseOnDeadMax;
 
+        [Header("Monster Appearances")]
+        public int monsterTitleColorChangeLevel = 5;
+        public Color monsterHighLevelTitleColor = Color.red;
+        public Color monsterLowLevelTitleColor = Color.cyan;
+
         [Header("PK")]
         public int minLevelToTurnPkOn = 10;
         public int pkPointEachKills = 10;
         public int hoursBeforeTurnPkOff = 48;
-        public PkPunishment[] pkPunishments = new PkPunishment[0];
+        public PkData[] pkDatas = new PkData[0];
 
         [System.Serializable]
-        public struct PkPunishment
+        public struct PkData
         {
             public int minPkPoint;
+            public Color nameColor;
+            [Header("Dead Punishment")]
             public float expDecreasePercentMin;
             public float expDecreasePercentMax;
             public int goldDecreaseMin;
@@ -128,14 +135,14 @@ namespace MultiplayerARPG
             public int itemDecreaseMax;
         }
 
-        private List<PkPunishment> _sortedPkPunishments;
-        public List<PkPunishment> SortedPkPunishments
+        private List<PkData> _sortedPkDatas;
+        public List<PkData> SortedPkDatas
         {
             get
             {
-                if (_sortedPkPunishments == null)
-                    _sortedPkPunishments = pkPunishments.OrderBy(o => o.minPkPoint).ToList();
-                return _sortedPkPunishments;
+                if (_sortedPkDatas == null)
+                    _sortedPkDatas = pkDatas.OrderBy(o => o.minPkPoint).ToList();
+                return _sortedPkDatas;
             }
         }
 
@@ -332,16 +339,16 @@ namespace MultiplayerARPG
             // PK
             if (BaseGameNetworkManager.CurrentMapInfo.EnablePkRules && attacker is BasePlayerCharacterEntity)
             {
-                for (int i = SortedPkPunishments.Count - 1; i >= 0; --i)
+                for (int i = SortedPkDatas.Count - 1; i >= 0; --i)
                 {
-                    if (player.PkPoint > SortedPkPunishments[i].minPkPoint)
+                    if (player.PkPoint > SortedPkDatas[i].minPkPoint)
                     {
                         // Decrease Gold
-                        decreaseGold += Random.Range(SortedPkPunishments[i].goldDecreaseMin, SortedPkPunishments[i].goldDecreaseMax);
+                        decreaseGold += Random.Range(SortedPkDatas[i].goldDecreaseMin, SortedPkDatas[i].goldDecreaseMax);
                         // Decrease Exp
-                        decreaseExpPercent += Random.Range(SortedPkPunishments[i].expDecreasePercentMin, SortedPkPunishments[i].expDecreasePercentMax);
+                        decreaseExpPercent += Random.Range(SortedPkDatas[i].expDecreasePercentMin, SortedPkDatas[i].expDecreasePercentMax);
                         // Decrease Item
-                        decreaseItems += Random.Range(SortedPkPunishments[i].itemDecreaseMin, SortedPkPunishments[i].itemDecreaseMax);
+                        decreaseItems += Random.Range(SortedPkDatas[i].itemDecreaseMin, SortedPkDatas[i].itemDecreaseMax);
                         break;
                     }
                 }
@@ -1057,6 +1064,29 @@ namespace MultiplayerARPG
             double remainsHours = hoursBeforeTurnPkOff - ((double)diff / 60 / 60);
             GameInstance.ServerGameMessageHandlers.SendFormattedGameMessage(player.ConnectionId, UIFormatKeys.UI_FORMAT_PK_CAN_TURN_PK_AFTER_HOURS, remainsHours >= 1 ? remainsHours.ToString("N0") : remainsHours.ToString("N2"));
             return false;
+        }
+
+        public override Color GetEntityNameColor(BaseGameEntity entity)
+        {
+            if (entity is BasePlayerCharacterEntity player)
+            {
+                if (player.IsPkOn)
+                {
+                    for (int i = SortedPkDatas.Count - 1; i >= 0; --i)
+                    {
+                        if (player.PkPoint > SortedPkDatas[i].minPkPoint)
+                            return SortedPkDatas[i].nameColor;
+                    }
+                }
+            }
+            else if (entity is BaseCharacterEntity character && GameInstance.PlayingCharacterEntity.IsAlly(character.GetInfo()))
+            {
+                if (character.Level - GameInstance.PlayingCharacter.Level > monsterTitleColorChangeLevel)
+                    return monsterHighLevelTitleColor;
+                if (GameInstance.PlayingCharacter.Level - character.Level > monsterTitleColorChangeLevel)
+                    return monsterLowLevelTitleColor;
+            }
+            return Color.white;
         }
     }
 }

@@ -362,6 +362,13 @@ namespace MultiplayerARPG
         /// <returns></returns>
         public abstract bool CanTurnPkOff(BasePlayerCharacterEntity player);
 
+        /// <summary>
+        /// Get entity name color
+        /// </summary>
+        /// <param name="entity"></param>
+        /// <returns></returns>
+        public abstract Color GetEntityNameColor(BaseGameEntity entity);
+
         public virtual bool CurrenciesEnoughToBuyItem(IPlayerCharacterData character, NpcSellItem sellItem, int amount)
         {
             if (character.Gold < sellItem.sellPrice * amount)

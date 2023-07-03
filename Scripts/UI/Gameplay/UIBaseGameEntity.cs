@@ -126,6 +126,7 @@ namespace MultiplayerARPG
             uiTextTitle.text = ZString.Format(
                 LanguageManager.GetText(formatKeyTitle),
                 tempTitle);
+            uiTextTitle.color = GameInstance.Singleton.GameplayRule.GetEntityNameColor(Data);
         }
     }
 
