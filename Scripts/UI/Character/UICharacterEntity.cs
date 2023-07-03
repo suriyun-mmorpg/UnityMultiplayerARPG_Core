@@ -24,6 +24,7 @@ namespace MultiplayerARPG
 
         protected float _castingSkillCountDown;
         protected float _castingSkillDuration;
+        protected BasePlayerCharacterEntity _previousPlayingCharacterEntity;
 
         protected override void AddEvents(BaseCharacterEntity entity)
         {
@@ -33,6 +34,11 @@ namespace MultiplayerARPG
             entity.onLevelChange += OnLevelChange;
             entity.onCurrentMpChange += OnCurrentMpChange;
             entity.onBuffsOperation += OnBuffsOperation;
+            if (entity is BasePlayerCharacterEntity playerEntity)
+                playerEntity.onPkPointChange += OnPkPointChange;
+            GameInstance.onSetPlayingCharacter += GameInstance_onSetPlayingCharacter;
+            if (GameInstance.PlayingCharacterEntity != null)
+                GameInstance_onSetPlayingCharacter(GameInstance.PlayingCharacterEntity);
         }
 
         protected override void RemoveEvents(BaseCharacterEntity entity)
@@ -43,6 +49,9 @@ namespace MultiplayerARPG
             entity.onLevelChange -= OnLevelChange;
             entity.onCurrentMpChange -= OnCurrentMpChange;
             entity.onBuffsOperation -= OnBuffsOperation;
+            if (entity is BasePlayerCharacterEntity playerEntity)
+                playerEntity.onPkPointChange -= OnPkPointChange;
+            GameInstance.onSetPlayingCharacter -= GameInstance_onSetPlayingCharacter;
         }
 
         private void OnLevelChange(int level)
@@ -58,6 +67,31 @@ namespace MultiplayerARPG
         private void OnBuffsOperation(LiteNetLibManager.LiteNetLibSyncList.Operation op, int index)
         {
             UpdateBuffs();
+        }
+
+        private void OnPkPointChange(int pkPoint)
+        {
+            UpdateTitle();
+        }
+
+        private void GameInstance_onSetPlayingCharacter(IPlayerCharacterData playingCharacterData)
+        {
+            if (_previousPlayingCharacterEntity != null)
+            {
+                _previousPlayingCharacterEntity.onLevelChange += PlayingCharacterEntity_onLevelChange;
+            }
+            BasePlayerCharacterEntity playerCharacterEntity = playingCharacterData as BasePlayerCharacterEntity;
+            _previousPlayingCharacterEntity = playerCharacterEntity;
+            if (_previousPlayingCharacterEntity != null)
+            {
+                _previousPlayingCharacterEntity.onLevelChange -= PlayingCharacterEntity_onLevelChange;
+            }
+            UpdateTitle();
+        }
+
+        private void PlayingCharacterEntity_onLevelChange(int level)
+        {
+            UpdateTitle();
         }
 
         protected override void Update()

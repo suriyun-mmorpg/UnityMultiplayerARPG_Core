@@ -363,11 +363,11 @@ namespace MultiplayerARPG
         public abstract bool CanTurnPkOff(BasePlayerCharacterEntity player);
 
         /// <summary>
-        /// Get entity name color
+        /// Get entity name color, return `TRUE` to use color from this function
         /// </summary>
         /// <param name="entity"></param>
         /// <returns></returns>
-        public abstract Color GetEntityNameColor(BaseGameEntity entity);
+        public abstract bool GetEntityNameColor(BaseGameEntity entity, out Color color);
 
         public virtual bool CurrenciesEnoughToBuyItem(IPlayerCharacterData character, NpcSellItem sellItem, int amount)
         {

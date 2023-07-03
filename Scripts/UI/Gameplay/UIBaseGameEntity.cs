@@ -37,6 +37,7 @@ namespace MultiplayerARPG
         }
 
         private T _previousEntity;
+        private Color? _defaultTitleColor;
 
         protected override void Awake()
         {
@@ -126,7 +127,12 @@ namespace MultiplayerARPG
             uiTextTitle.text = ZString.Format(
                 LanguageManager.GetText(formatKeyTitle),
                 tempTitle);
-            uiTextTitle.color = GameInstance.Singleton.GameplayRule.GetEntityNameColor(Data);
+            if (!_defaultTitleColor.HasValue)
+                _defaultTitleColor = uiTextTitle.color;
+            if (GameInstance.Singleton.GameplayRule.GetEntityNameColor(Data, out Color titleColor))
+                uiTextTitle.color = titleColor;
+            else
+                uiTextTitle.color = _defaultTitleColor.Value;
         }
     }
 

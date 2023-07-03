@@ -106,9 +106,6 @@ namespace MultiplayerARPG
         public float moveSpeedBattlePointScore = 10;
         public float atkSpeedBattlePointScore = 10;
 
-        [Header("Player Apperances")]
-        public Color defaultTitleColor = Color.white;
-
         [Header("Player Death")]
         public int itemDecreaseOnDeadMin;
         public int itemDecreaseOnDeadMax;
@@ -1069,10 +1066,11 @@ namespace MultiplayerARPG
             return false;
         }
 
-        public override Color GetEntityNameColor(BaseGameEntity entity)
+        public override bool GetEntityNameColor(BaseGameEntity entity, out Color color)
         {
+            color = Color.white;
             if (GameInstance.PlayingCharacterEntity == null)
-                return defaultTitleColor;
+                return false;
             if (entity is BasePlayerCharacterEntity player)
             {
                 if (player.IsPkOn)
@@ -1080,18 +1078,27 @@ namespace MultiplayerARPG
                     for (int i = SortedPkDatas.Count - 1; i >= 0; --i)
                     {
                         if (player.PkPoint > SortedPkDatas[i].minPkPoint)
-                            return SortedPkDatas[i].nameColor;
+                        {
+                            color = SortedPkDatas[i].nameColor;
+                            return true;
+                        }
                     }
                 }
             }
             else if (entity is BaseCharacterEntity character && GameInstance.PlayingCharacterEntity.IsAlly(character.GetInfo()))
             {
                 if (character.Level - GameInstance.PlayingCharacter.Level > monsterTitleColorChangeLevel)
-                    return monsterHighLevelTitleColor;
+                {
+                    color = monsterHighLevelTitleColor;
+                    return true;
+                }
                 if (GameInstance.PlayingCharacter.Level - character.Level > monsterTitleColorChangeLevel)
-                    return monsterLowLevelTitleColor;
+                {
+                    color = monsterLowLevelTitleColor;
+                    return true;
+                }
             }
-            return defaultTitleColor;
+            return false;
         }
     }
 }
