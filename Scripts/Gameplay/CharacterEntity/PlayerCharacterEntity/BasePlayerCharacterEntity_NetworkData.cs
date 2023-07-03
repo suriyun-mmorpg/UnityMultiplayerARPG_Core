@@ -388,6 +388,9 @@ namespace MultiplayerARPG
             iconDataId.onChange += OnIconDataIdChange;
             frameDataId.onChange += OnFrameDataIdChange;
             titleDataId.onChange += OnTitleDataIdChange;
+            isPkOn.onChange += OnIsPkOnChange;
+            pkPoint.onChange += OnPkPointChange;
+            consecutivePkKills.onChange += OnConsecutivePkKillsChange;
             isWarping.onChange += OnIsWarpingChange;
             // On list changes events
             hotkeys.onOperation += OnHotkeysOperation;
@@ -419,6 +422,9 @@ namespace MultiplayerARPG
             iconDataId.onChange -= OnIconDataIdChange;
             frameDataId.onChange -= OnFrameDataIdChange;
             titleDataId.onChange -= OnTitleDataIdChange;
+            isPkOn.onChange -= OnIsPkOnChange;
+            pkPoint.onChange -= OnPkPointChange;
+            consecutivePkKills.onChange -= OnConsecutivePkKillsChange;
             isWarping.onChange -= OnIsWarpingChange;
             // On list changes events
             hotkeys.onOperation -= OnHotkeysOperation;
@@ -606,6 +612,24 @@ namespace MultiplayerARPG
             _isRecaching = true;
             if (onTitleDataIdChange != null)
                 onTitleDataIdChange.Invoke(guildId);
+        }
+
+        private void OnIsPkOnChange(bool isInitial, bool isPkOn)
+        {
+            if (onIsPkOnChange != null)
+                onIsPkOnChange.Invoke(isPkOn);
+        }
+
+        private void OnPkPointChange(bool isInitial, int pkPoint)
+        {
+            if (onPkPointChange != null)
+                onPkPointChange.Invoke(pkPoint);
+        }
+
+        private void OnConsecutivePkKillsChange(bool isInitial, int consecutivePkKills)
+        {
+            if (onConsecutivePkKillsChange != null)
+                onConsecutivePkKillsChange.Invoke(consecutivePkKills);
         }
 
         private void OnIsWarpingChange(bool isInitial, bool isWarping)
