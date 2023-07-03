@@ -341,7 +341,7 @@ namespace MultiplayerARPG
             {
                 for (int i = SortedPkDatas.Count - 1; i >= 0; --i)
                 {
-                    if (player.PkPoint > SortedPkDatas[i].minPkPoint)
+                    if (player.PkPoint >= SortedPkDatas[i].minPkPoint)
                     {
                         // Decrease Gold
                         decreaseGold += Random.Range(SortedPkDatas[i].goldDecreaseMin, SortedPkDatas[i].goldDecreaseMax);
@@ -1077,7 +1077,7 @@ namespace MultiplayerARPG
                 {
                     for (int i = SortedPkDatas.Count - 1; i >= 0; --i)
                     {
-                        if (player.PkPoint > SortedPkDatas[i].minPkPoint)
+                        if (player.PkPoint >= SortedPkDatas[i].minPkPoint)
                         {
                             color = SortedPkDatas[i].nameColor;
                             return true;
@@ -1085,7 +1085,7 @@ namespace MultiplayerARPG
                     }
                 }
             }
-            else if (entity is BaseCharacterEntity character && GameInstance.PlayingCharacterEntity.IsAlly(character.GetInfo()))
+            else if (entity is BaseCharacterEntity character && !GameInstance.PlayingCharacterEntity.IsAlly(character.GetInfo()))
             {
                 if (character.Level - GameInstance.PlayingCharacter.Level > monsterTitleColorChangeLevel)
                 {
