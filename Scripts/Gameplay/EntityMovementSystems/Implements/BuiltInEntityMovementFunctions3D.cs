@@ -841,8 +841,8 @@ namespace MultiplayerARPG
                         _yAngle = _targetYAngle = yAngle;
                         RotateY();
                     }
-                    MovementState = movementState;
-                    ExtraMovementState = extraMovementState;
+                    MovementState = _tempMovementState = movementState;
+                    ExtraMovementState = _tempExtraMovementState = extraMovementState;
                 }
                 else if (!IsOwnerClient)
                 {
@@ -982,8 +982,8 @@ namespace MultiplayerARPG
                 long deltaTime = lagDeltaTime + timestamp - _acceptedPositionTimestamp;
                 float unityDeltaTime = (float)deltaTime * 0.001f;
                 // Prepare movement state
-                MovementState = movementState;
-                ExtraMovementState = extraMovementState;
+                MovementState = _tempMovementState = movementState;
+                ExtraMovementState = _tempExtraMovementState = extraMovementState;
                 if (movementState.Has(MovementState.IsJump))
                 {
                     _acceptedExtraMovementStateWhenJump = ExtraMovementState;
