@@ -342,6 +342,12 @@ namespace MultiplayerARPG
         /// <returns></returns>
         public abstract float GetBattlePointFromCharacterStats(CharacterStats stats);
 
+        /// <summary>
+        /// Calculate PK point which `attacker` will receive when kill the `damageReceiver`
+        /// </summary>
+        /// <returns></returns>
+        public abstract int GetPkPointWhenCharacterKilled(BasePlayerCharacterEntity attacker, BasePlayerCharacterEntity damageReceiver);
+
         public virtual bool CurrenciesEnoughToBuyItem(IPlayerCharacterData character, NpcSellItem sellItem, int amount)
         {
             if (character.Gold < sellItem.sellPrice * amount)

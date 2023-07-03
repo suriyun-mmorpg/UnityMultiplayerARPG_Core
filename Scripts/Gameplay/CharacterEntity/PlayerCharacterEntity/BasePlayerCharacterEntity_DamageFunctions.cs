@@ -39,7 +39,20 @@ namespace MultiplayerARPG
             LastDeadTime = System.DateTimeOffset.UtcNow.ToUnixTimeSeconds();
             lastAttacker.TryGetEntity(out BaseCharacterEntity attackerEntity);
 
+            // PKing
             bool pkKilled = false;
+            if (IsPkOn && attackerEntity is BasePlayerCharacterEntity attackPlayer && attackPlayer.IsPkOn)
+            {
+                // Increse PK Point
+                attackPlayer.PkPoint = CurrentGameInstance.GameplayRule.GetPkPointWhenCharacterKilled(attackPlayer, this);
+                attackPlayer.ConsecutivePkKills++;
+                if (attackPlayer.PkPoint > attackPlayer.HighestPkPoint)
+                    attackPlayer.PkPoint = attackPlayer.HighestPkPoint;
+                if (attackPlayer.ConsecutivePkKills > attackPlayer.HighestConsecutivePkKills)
+                    attackPlayer.ConsecutivePkKills = attackPlayer.HighestConsecutivePkKills;
+                PkPoint = 0;
+                ConsecutivePkKills = 0;
+            }
 
             // Dead Penalty
             CurrentGameInstance.GameplayRule.GetPlayerDeadPunishment(this, attackerEntity, out int decraseExp, out int decreaseGold, out int decreaseItems);

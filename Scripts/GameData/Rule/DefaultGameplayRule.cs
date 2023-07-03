@@ -1038,5 +1038,10 @@ namespace MultiplayerARPG
             battlePoint += stats.atkSpeed * atkSpeedBattlePointScore;
             return battlePoint;
         }
+
+        public override int GetPkPointWhenCharacterKilled(BasePlayerCharacterEntity attacker, BasePlayerCharacterEntity damageReceiver)
+        {
+            return pkPointEachKills;
+        }
     }
 }
