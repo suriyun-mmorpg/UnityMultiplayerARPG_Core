@@ -106,6 +106,9 @@ namespace MultiplayerARPG
         public float moveSpeedBattlePointScore = 10;
         public float atkSpeedBattlePointScore = 10;
 
+        [Header("Player Apperances")]
+        public Color defaultTitleColor = Color.white;
+
         [Header("Player Death")]
         public int itemDecreaseOnDeadMin;
         public int itemDecreaseOnDeadMax;
@@ -1068,6 +1071,8 @@ namespace MultiplayerARPG
 
         public override Color GetEntityNameColor(BaseGameEntity entity)
         {
+            if (GameInstance.PlayingCharacterEntity == null)
+                return defaultTitleColor;
             if (entity is BasePlayerCharacterEntity player)
             {
                 if (player.IsPkOn)
@@ -1086,7 +1091,7 @@ namespace MultiplayerARPG
                 if (GameInstance.PlayingCharacter.Level - character.Level > monsterTitleColorChangeLevel)
                     return monsterLowLevelTitleColor;
             }
-            return Color.white;
+            return defaultTitleColor;
         }
     }
 }
