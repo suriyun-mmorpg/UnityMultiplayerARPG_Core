@@ -22,24 +22,27 @@ namespace MultiplayerARPG
         private void Start()
         {
             GameInstance.onSetPlayingCharacter += GameInstance_onSetPlayingCharacter;
-            if (GameInstance.PlayingCharacterEntity != null)
-                GameInstance_onSetPlayingCharacter(GameInstance.PlayingCharacterEntity);
+            GameInstance_onSetPlayingCharacter(GameInstance.PlayingCharacterEntity);
         }
 
         private void OnDestroy()
         {
             GameInstance.onSetPlayingCharacter -= GameInstance_onSetPlayingCharacter;
-            RemoveEvents(_previousEntity);
+            GameInstance_onSetPlayingCharacter(null);
         }
 
         private void GameInstance_onSetPlayingCharacter(IPlayerCharacterData playingCharacterData)
         {
+            RemoveEvents(_previousEntity);
             BasePlayerCharacterEntity playerCharacterEntity = playingCharacterData as BasePlayerCharacterEntity;
             _previousEntity = playerCharacterEntity;
             AddEvents(_previousEntity);
-            PlayingCharacterEntity_onIsPkOnChange(playingCharacterData.IsPkOn);
-            PlayingCharacterEntity_onPkPointChange(playingCharacterData.PkPoint);
-            PlayingCharacterEntity_onConsecutivePkKillsChange(playingCharacterData.ConsecutivePkKills);
+            if (playerCharacterEntity != null)
+            {
+                PlayingCharacterEntity_onIsPkOnChange(playingCharacterData.IsPkOn);
+                PlayingCharacterEntity_onPkPointChange(playingCharacterData.PkPoint);
+                PlayingCharacterEntity_onConsecutivePkKillsChange(playingCharacterData.ConsecutivePkKills);
+            }
         }
 
         private void AddEvents(BasePlayerCharacterEntity PlayingCharacterEntity)

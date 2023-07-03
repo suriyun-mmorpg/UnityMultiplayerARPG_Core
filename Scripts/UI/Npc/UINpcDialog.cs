@@ -30,8 +30,7 @@ namespace MultiplayerARPG
                     voiceSource.Play();
             }
             GameInstance.onSetPlayingCharacter += GameInstance_onSetPlayingCharacter;
-            if (GameInstance.PlayingCharacterEntity != null)
-                GameInstance_onSetPlayingCharacter(GameInstance.PlayingCharacterEntity);
+            GameInstance_onSetPlayingCharacter(GameInstance.PlayingCharacterEntity);
         }
 
         protected override void OnDisable()
@@ -43,7 +42,7 @@ namespace MultiplayerARPG
                 voiceSource.clip = null;
             }
             GameInstance.onSetPlayingCharacter -= GameInstance_onSetPlayingCharacter;
-            RemoveEvents(_previousEntity);
+            GameInstance_onSetPlayingCharacter(null);
         }
 
         private void GameInstance_onSetPlayingCharacter(IPlayerCharacterData playingCharacterData)
@@ -52,7 +51,8 @@ namespace MultiplayerARPG
             BasePlayerCharacterEntity playerCharacterEntity = playingCharacterData as BasePlayerCharacterEntity;
             _previousEntity = playerCharacterEntity;
             AddEvents(_previousEntity);
-            ForceUpdate();
+            if (_previousEntity != null)
+                ForceUpdate();
         }
 
         private void AddEvents(BasePlayerCharacterEntity PlayingCharacterEntity)

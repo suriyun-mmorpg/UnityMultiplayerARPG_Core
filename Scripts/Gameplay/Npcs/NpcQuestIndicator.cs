@@ -25,14 +25,13 @@ namespace MultiplayerARPG
             if (npcEntity == null)
                 npcEntity = GetComponentInParent<NpcEntity>();
             GameInstance.onSetPlayingCharacter += GameInstance_onSetPlayingCharacter;
-            if (GameInstance.PlayingCharacterEntity != null)
-                GameInstance_onSetPlayingCharacter(GameInstance.PlayingCharacterEntity);
+            GameInstance_onSetPlayingCharacter(GameInstance.PlayingCharacterEntity);
         }
 
         private void OnDestroy()
         {
             GameInstance.onSetPlayingCharacter -= GameInstance_onSetPlayingCharacter;
-            RemoveEvents(_previousEntity);
+            GameInstance_onSetPlayingCharacter(null);
         }
 
         private void GameInstance_onSetPlayingCharacter(IPlayerCharacterData playingCharacterData)
@@ -41,7 +40,8 @@ namespace MultiplayerARPG
             BasePlayerCharacterEntity playerCharacterEntity = playingCharacterData as BasePlayerCharacterEntity;
             _previousEntity = playerCharacterEntity;
             AddEvents(_previousEntity);
-            UpdateStatus().Forget();
+            if (_previousEntity != null)
+                UpdateStatus().Forget();
         }
 
         private void AddEvents(BasePlayerCharacterEntity PlayingCharacterEntity)

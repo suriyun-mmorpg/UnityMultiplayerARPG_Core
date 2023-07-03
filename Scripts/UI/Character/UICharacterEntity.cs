@@ -37,8 +37,7 @@ namespace MultiplayerARPG
             if (entity is BasePlayerCharacterEntity playerEntity)
                 playerEntity.onPkPointChange += OnPkPointChange;
             GameInstance.onSetPlayingCharacter += GameInstance_onSetPlayingCharacter;
-            if (GameInstance.PlayingCharacterEntity != null)
-                GameInstance_onSetPlayingCharacter(GameInstance.PlayingCharacterEntity);
+            GameInstance_onSetPlayingCharacter(GameInstance.PlayingCharacterEntity);
         }
 
         protected override void RemoveEvents(BaseCharacterEntity entity)
@@ -52,6 +51,7 @@ namespace MultiplayerARPG
             if (entity is BasePlayerCharacterEntity playerEntity)
                 playerEntity.onPkPointChange -= OnPkPointChange;
             GameInstance.onSetPlayingCharacter -= GameInstance_onSetPlayingCharacter;
+            GameInstance_onSetPlayingCharacter(null);
         }
 
         private void OnLevelChange(int level)
@@ -85,8 +85,8 @@ namespace MultiplayerARPG
             if (_previousPlayingCharacterEntity != null)
             {
                 _previousPlayingCharacterEntity.onLevelChange -= PlayingCharacterEntity_onLevelChange;
+                UpdateTitle();
             }
-            UpdateTitle();
         }
 
         private void PlayingCharacterEntity_onLevelChange(int level)

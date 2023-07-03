@@ -13,14 +13,14 @@ namespace MultiplayerARPG {
             if (_damageableEntity == null)
             {
                 GameInstance.onSetPlayingCharacter += GameInstance_onSetPlayingCharacter;
-                if (GameInstance.PlayingCharacterEntity != null)
-                    GameInstance_onSetPlayingCharacter(GameInstance.PlayingCharacterEntity);
+                GameInstance_onSetPlayingCharacter(GameInstance.PlayingCharacterEntity);
             }
         }
 
         private void OnDestroy()
         {
             GameInstance.onSetPlayingCharacter -= GameInstance_onSetPlayingCharacter;
+            GameInstance_onSetPlayingCharacter(null);
         }
 
         private void GameInstance_onSetPlayingCharacter(IPlayerCharacterData playingCharacterData)
