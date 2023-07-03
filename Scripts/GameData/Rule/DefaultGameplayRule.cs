@@ -107,7 +107,9 @@ namespace MultiplayerARPG
         public float atkSpeedBattlePointScore = 10;
 
         [Header("PK")]
+        public int minLevelToTurnPkOn = 10;
         public int pkPointEachKills = 10;
+        public int hoursBeforeTurnPkOff = 48;
         public PkPunishment[] pkPunishments = new PkPunishment[0];
 
         [System.Serializable]
@@ -1032,6 +1034,22 @@ namespace MultiplayerARPG
         public override int GetPkPointWhenCharacterKilled(BasePlayerCharacterEntity attacker, BasePlayerCharacterEntity damageReceiver)
         {
             return pkPointEachKills;
+        }
+
+        public override bool CanTurnPkOn(BasePlayerCharacterEntity player)
+        {
+            return player.Level >= minLevelToTurnPkOn;
+        }
+
+        public override bool CanTurnPkOff(BasePlayerCharacterEntity player)
+        {
+            long currentTime = System.DateTimeOffset.UtcNow.ToUnixTimeSeconds();
+            if (player.LastPkOnTime <= 0 || currentTime - player.LastPkOnTime > (60 * 60 * hoursBeforeTurnPkOff))
+                return true;
+            long diff = currentTime - player.LastPkOnTime;
+            double diffHours = (double)diff / 60f / 60f;
+            GameInstance.ServerGameMessageHandlers.SendFormattedGameMessage(player.ConnectionId, UIFormatKeys.UI_FORMAT_PK_CAN_TURN_PK_AFTER_HOURS, diffHours.ToString("N2"));
+            return false;
         }
     }
 }

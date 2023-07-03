@@ -348,6 +348,20 @@ namespace MultiplayerARPG
         /// <returns></returns>
         public abstract int GetPkPointWhenCharacterKilled(BasePlayerCharacterEntity attacker, BasePlayerCharacterEntity damageReceiver);
 
+        /// <summary>
+        /// Return `TRUE` if the player can turn PK mode on
+        /// </summary>
+        /// <param name="player"></param>
+        /// <returns></returns>
+        public abstract bool CanTurnPkOn(BasePlayerCharacterEntity player);
+
+        /// <summary>
+        /// Return `TRUE` if the player can turn PK mode on
+        /// </summary>
+        /// <param name="player"></param>
+        /// <returns></returns>
+        public abstract bool CanTurnPkOff(BasePlayerCharacterEntity player);
+
         public virtual bool CurrenciesEnoughToBuyItem(IPlayerCharacterData character, NpcSellItem sellItem, int amount)
         {
             if (character.Gold < sellItem.sellPrice * amount)

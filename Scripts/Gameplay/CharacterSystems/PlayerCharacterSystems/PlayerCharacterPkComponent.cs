@@ -16,6 +16,8 @@ namespace MultiplayerARPG
         {
             if (Entity.IsPkOn)
             {
+                if (!CurrentGameplayRule.CanTurnPkOff(Entity))
+                    return;
                 // Turn off
                 Entity.IsPkOn = false;
                 Entity.PkPoint = 0;
@@ -23,6 +25,8 @@ namespace MultiplayerARPG
             }
             else
             {
+                if (CurrentGameplayRule.CanTurnPkOn(Entity))
+                    return;
                 // Turn on
                 Entity.IsPkOn = true;
                 Entity.LastPkOnTime = System.DateTimeOffset.UtcNow.ToUnixTimeSeconds();
