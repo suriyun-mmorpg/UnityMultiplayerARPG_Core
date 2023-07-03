@@ -12,6 +12,12 @@ namespace MultiplayerARPG
             ClientGenericActions.ClientReceiveGameMessage(gameMessage.message);
         }
 
+        public void HandleFormattedGameMessage(MessageHandlerData messageHandler)
+        {
+            FormattedGameMessage formattedGameMessage = messageHandler.ReadMessage<FormattedGameMessage>();
+            ClientGenericActions.ClientReceiveGameMessage(formattedGameMessage.format, formattedGameMessage.args);
+        }
+
         public void HandleNotifyRewardExp(MessageHandlerData messageHandler)
         {
             ClientGenericActions.NotifyRewardExp(

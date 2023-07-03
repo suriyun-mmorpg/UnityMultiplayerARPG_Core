@@ -11,6 +11,7 @@ namespace MultiplayerARPG
         public static System.Action onClientWarp;
         public static System.Action<ChatMessage> onClientReceiveChatMessage;
         public static System.Action<UITextKeys> onClientReceiveGameMessage;
+        public static System.Action<UIFormatKeys, string[]> onClientReceiveFormattedGameMessage;
         public static System.Action<RewardGivenType, int> onNotifyRewardExp;
         public static System.Action<RewardGivenType, int> onNotifyRewardGold;
         public static System.Action<RewardGivenType, int, int> onNotifyRewardItem;
@@ -53,6 +54,12 @@ namespace MultiplayerARPG
                 return;
             if (onClientReceiveGameMessage != null)
                 onClientReceiveGameMessage.Invoke(message);
+        }
+
+        public static void ClientReceiveGameMessage(UIFormatKeys format, string[] args)
+        {
+            if (onClientReceiveFormattedGameMessage != null)
+                onClientReceiveFormattedGameMessage.Invoke(format, args);
         }
 
         public static void NotifyRewardExp(RewardGivenType givenType, int exp)

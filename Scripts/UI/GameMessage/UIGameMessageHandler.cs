@@ -40,6 +40,7 @@ namespace MultiplayerARPG
         private void OnEnable()
         {
             ClientGenericActions.onClientReceiveGameMessage += OnReceiveGameMessage;
+            ClientGenericActions.onClientReceiveFormattedGameMessage += OnReceiveFormattedGameMessage;
             ClientGenericActions.onNotifyRewardExp += OnNotifyRewardExp;
             ClientGenericActions.onNotifyRewardGold += OnNotifyRewardGold;
             ClientGenericActions.onNotifyRewardItem += OnNotifyRewardItem;
@@ -49,6 +50,7 @@ namespace MultiplayerARPG
         private void OnDisable()
         {
             ClientGenericActions.onClientReceiveGameMessage -= OnReceiveGameMessage;
+            ClientGenericActions.onClientReceiveFormattedGameMessage -= OnReceiveFormattedGameMessage;
             ClientGenericActions.onNotifyRewardExp -= OnNotifyRewardExp;
             ClientGenericActions.onNotifyRewardGold -= OnNotifyRewardGold;
             ClientGenericActions.onNotifyRewardItem -= OnNotifyRewardItem;
@@ -68,6 +70,14 @@ namespace MultiplayerARPG
             if (message.ToString().ToUpper().StartsWith("UI_ERROR"))
                 newMessage.color = errorMessageColor;
             newMessage.text = LanguageManager.GetText(message.ToString());
+        }
+
+        private void OnReceiveFormattedGameMessage(UIFormatKeys format, string[] args)
+        {
+            if (messagePrefab == null)
+                return;
+            TextWrapper newMessage = AddMessage(messagePrefab);
+            newMessage.text = string.Format(LanguageManager.GetText(format.ToString()), args);
         }
 
         private void OnNotifyRewardExp(RewardGivenType givenType, int exp)

@@ -24,6 +24,7 @@
         public const ushort NotifyRewardCurrency = 118;
         public const ushort EntityState = 119;
         public const ushort HitRegistration = 120;
+        public const ushort FormattedGameMessage = 121;
         // Networking requests/responses
         public const ushort CashShopInfo = 100;
         public const ushort CashShopBuy = 101;

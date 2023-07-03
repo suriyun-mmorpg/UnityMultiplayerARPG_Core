@@ -16,9 +16,19 @@ namespace MultiplayerARPG
 
         public void SendGameMessage(long connectionId, UITextKeys type)
         {
-            GameMessage message = new GameMessage();
-            message.message = type;
-            Manager.ServerSendPacket(connectionId, 0, DeliveryMethod.ReliableOrdered, GameNetworkingConsts.GameMessage, message);
+            Manager.ServerSendPacket(connectionId, 0, DeliveryMethod.ReliableOrdered, GameNetworkingConsts.GameMessage, new GameMessage()
+            {
+                message = type,
+            });
+        }
+
+        public void SendFormattedGameMessage(long connectionId, UIFormatKeys format, params string[] args)
+        {
+            Manager.ServerSendPacket(connectionId, 0, DeliveryMethod.ReliableOrdered, GameNetworkingConsts.FormattedGameMessage, new FormattedGameMessage()
+            {
+                format = format,
+                args = args,
+            });
         }
 
         public void NotifyRewardExp(long connectionId, RewardGivenType givenType, int exp)
