@@ -133,6 +133,10 @@ namespace MultiplayerARPG
             public int goldDecreaseMax;
             public int itemDecreaseMin;
             public int itemDecreaseMax;
+            [Range(0f, 1f)]
+            public float goldReductionRate;
+            [Range(0f, 1f)]
+            public float expReductionRate;
         }
 
         [System.NonSerialized]
@@ -343,21 +347,15 @@ namespace MultiplayerARPG
             {
                 case DeadPunishmentType.PK:
                     // PK
-                    if (attackerIsPlayer)
+                    if (attackerIsPlayer && TryGetPkData(player, out PkData pkData))
                     {
-                        for (int i = SortedPkDatas.Count - 1; i >= 0; --i)
-                        {
-                            if (player.PkPoint >= SortedPkDatas[i].minPkPoint)
-                            {
-                                // Decrease Exp
-                                decreaseExpPercent += Random.Range(SortedPkDatas[i].expDecreasePercentMin, SortedPkDatas[i].expDecreasePercentMax);
-                                // Decrease Gold
-                                decreaseGold += Random.Range(SortedPkDatas[i].goldDecreaseMin, SortedPkDatas[i].goldDecreaseMax);
-                                // Decrease Item
-                                decreaseItems += Random.Range(SortedPkDatas[i].itemDecreaseMin, SortedPkDatas[i].itemDecreaseMax);
-                                break;
-                            }
-                        }
+                        // Decrease Exp
+                        decreaseExpPercent += Random.Range(pkData.expDecreasePercentMin, pkData.expDecreasePercentMax);
+                        // Decrease Gold
+                        decreaseGold += Random.Range(pkData.goldDecreaseMin, pkData.goldDecreaseMax);
+                        // Decrease Item
+                        decreaseItems += Random.Range(pkData.itemDecreaseMin, pkData.itemDecreaseMax);
+                        // PK point
                         attackerPkPoint = pkPointEachKills;
                     }
                     break;
@@ -464,15 +462,16 @@ namespace MultiplayerARPG
             if (playerCharacter != null)
             {
                 GuildData guildData;
+                PkData pkData;
                 switch (rewardGivenType)
                 {
                     case RewardGivenType.KillMonster:
-                        exp = Mathf.CeilToInt(exp * multiplier * (ExpRate + playerCharacter.GetCaches().Stats.expRate));
+                        exp = Mathf.CeilToInt(exp * multiplier * (ExpRate - (TryGetPkData(playerCharacter, out pkData) ? pkData.expReductionRate : 0f) + playerCharacter.GetCaches().Stats.expRate));
                         if (GameInstance.ServerGuildHandlers.TryGetGuild(playerCharacter.GuildId, out guildData))
                             exp += Mathf.CeilToInt(exp * guildData.IncreaseExpGainPercentage * 0.01f);
                         break;
                     case RewardGivenType.PartyShare:
-                        exp = Mathf.CeilToInt(exp * multiplier * (ExpRate + playerCharacter.GetCaches().Stats.expRate));
+                        exp = Mathf.CeilToInt(exp * multiplier * (ExpRate - (TryGetPkData(playerCharacter, out pkData) ? pkData.expReductionRate : 0f) + playerCharacter.GetCaches().Stats.expRate));
                         if (GameInstance.ServerGuildHandlers.TryGetGuild(playerCharacter.GuildId, out guildData))
                             exp += Mathf.CeilToInt(exp * guildData.IncreaseShareExpGainPercentage * 0.01f);
                         break;
@@ -565,15 +564,16 @@ namespace MultiplayerARPG
             if (playerCharacter != null)
             {
                 GuildData guildData;
+                PkData pkData;
                 switch (rewardGivenType)
                 {
                     case RewardGivenType.KillMonster:
-                        gold = Mathf.CeilToInt(gold * multiplier * (GoldRate + playerCharacter.GetCaches().Stats.goldRate));
+                        gold = Mathf.CeilToInt(gold * multiplier * (GoldRate - (TryGetPkData(playerCharacter, out pkData) ? pkData.goldReductionRate : 0f) + playerCharacter.GetCaches().Stats.goldRate));
                         if (GameInstance.ServerGuildHandlers.TryGetGuild(playerCharacter.GuildId, out guildData))
                             gold += Mathf.CeilToInt(gold * guildData.IncreaseGoldGainPercentage * 0.01f);
                         break;
                     case RewardGivenType.PartyShare:
-                        gold = Mathf.CeilToInt(gold * multiplier * (GoldRate + playerCharacter.GetCaches().Stats.goldRate));
+                        gold = Mathf.CeilToInt(gold * multiplier * (GoldRate - (TryGetPkData(playerCharacter, out pkData) ? pkData.goldReductionRate : 0f) + playerCharacter.GetCaches().Stats.goldRate));
                         if (GameInstance.ServerGuildHandlers.TryGetGuild(playerCharacter.GuildId, out guildData))
                             gold += Mathf.CeilToInt(gold * guildData.IncreaseShareGoldGainPercentage * 0.01f);
                         break;
@@ -1082,16 +1082,9 @@ namespace MultiplayerARPG
                 return false;
             if (entity is BasePlayerCharacterEntity player)
             {
-                if (player.IsPkOn)
+                if (player.IsPkOn && TryGetPkData(player, out PkData pkData))
                 {
-                    for (int i = SortedPkDatas.Count - 1; i >= 0; --i)
-                    {
-                        if (player.PkPoint >= SortedPkDatas[i].minPkPoint)
-                        {
-                            color = SortedPkDatas[i].nameColor;
-                            return true;
-                        }
-                    }
+                    color = pkData.nameColor;
                 }
             }
             else if (entity is BaseCharacterEntity character && !GameInstance.PlayingCharacterEntity.IsAlly(character.GetInfo()))
@@ -1104,6 +1097,20 @@ namespace MultiplayerARPG
                 if (GameInstance.PlayingCharacter.Level - character.Level > monsterTitleColorChangeLevel)
                 {
                     color = monsterLowLevelTitleColor;
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        private bool TryGetPkData(BasePlayerCharacterEntity player, out PkData data)
+        {
+            data = default;
+            for (int i = SortedPkDatas.Count - 1; i >= 0; --i)
+            {
+                if (player.PkPoint >= SortedPkDatas[i].minPkPoint)
+                {
+                    data = SortedPkDatas[i];
                     return true;
                 }
             }
