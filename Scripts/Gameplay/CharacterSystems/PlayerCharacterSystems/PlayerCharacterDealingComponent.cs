@@ -51,32 +51,33 @@ namespace MultiplayerARPG
         {
             get
             {
-                if (DealingState == DealingState.None && Time.unscaledTime - DealingCharacterTime >= CurrentGameInstance.dealingRequestDuration)
+                if (DealingState == DealingState.None && Time.unscaledTime - DealingRequestTime >= CurrentGameInstance.dealingRequestDuration)
                     _dealingCharacter = null;
                 return _dealingCharacter;
             }
             set
             {
                 _dealingCharacter = value;
-                DealingCharacterTime = Time.unscaledTime;
+                DealingRequestTime = Time.unscaledTime;
             }
         }
 
         /// <summary>
         /// Action: BasePlayerCharacterEntity anotherCharacter
         /// </summary>
-        public event System.Action<BasePlayerCharacterEntity> onShowDealingRequestDialog;
+        public event System.Action<BasePlayerCharacterEntity> onRequestDealing;
         /// <summary>
         /// Action: BasePlayerCharacterEntity anotherCharacter
         /// </summary>
-        public event System.Action<BasePlayerCharacterEntity> onShowDealingDialog;
+        public event System.Action<BasePlayerCharacterEntity> onStartDealing;
         public event System.Action<DealingState> onUpdateDealingState;
         public event System.Action<DealingState> onUpdateAnotherDealingState;
         public event System.Action<int> onUpdateDealingGold;
         public event System.Action<int> onUpdateAnotherDealingGold;
         public event System.Action<DealingCharacterItems> onUpdateDealingItems;
         public event System.Action<DealingCharacterItems> onUpdateAnotherDealingItems;
-        public float DealingCharacterTime { get; private set; }
+
+        public float DealingRequestTime { get; private set; }
 
         public bool DisableDealing
         {
@@ -222,8 +223,8 @@ namespace MultiplayerARPG
             BasePlayerCharacterEntity playerCharacterEntity;
             if (!Manager.TryGetEntityByObjectId(objectId, out playerCharacterEntity))
                 return;
-            if (onShowDealingRequestDialog != null)
-                onShowDealingRequestDialog.Invoke(playerCharacterEntity);
+            if (onRequestDealing != null)
+                onRequestDealing.Invoke(playerCharacterEntity);
         }
 
         public bool CallServerAcceptDealingRequest()
@@ -288,8 +289,8 @@ namespace MultiplayerARPG
             BasePlayerCharacterEntity playerCharacterEntity;
             if (!Manager.TryGetEntityByObjectId(objectId, out playerCharacterEntity))
                 return;
-            if (onShowDealingDialog != null)
-                onShowDealingDialog.Invoke(playerCharacterEntity);
+            if (onStartDealing != null)
+                onStartDealing.Invoke(playerCharacterEntity);
         }
 
         public bool CallServerSetDealingItem(string id, int amount)
