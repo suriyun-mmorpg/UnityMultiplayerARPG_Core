@@ -67,6 +67,8 @@ namespace MultiplayerARPG
 
             if (targetEntity.Type == EntityTypes.Player)
             {
+                if (playerCharacter.Dueling.DuelingStarted && playerCharacter.Dueling.DuelingCharacter != null)
+                    return playerCharacter.Dueling.DuelingCharacter.ObjectId != targetEntity.ObjectId;
                 switch (pvpMode)
                 {
                     case PvpMode.Pvp:
@@ -127,6 +129,8 @@ namespace MultiplayerARPG
 
             if (targetEntity.Type == EntityTypes.Player)
             {
+                if (playerCharacter.Dueling.DuelingStarted && playerCharacter.Dueling.DuelingCharacter != null)
+                    return playerCharacter.Dueling.DuelingCharacter.ObjectId == targetEntity.ObjectId;
                 switch (pvpMode)
                 {
                     case PvpMode.Pvp:

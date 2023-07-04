@@ -40,6 +40,16 @@ namespace MultiplayerARPG
         private bool disableDealing = false;
         public virtual bool DisableDealing { get { return disableDealing; } }
 
+        [Tooltip("If this is `TRUE`, private store feature will be disabled, all players won't be able to deal items to each other")]
+        [SerializeField]
+        private bool disablePrivateStore = false;
+        public virtual bool DisablePrivateStore { get { return disablePrivateStore; } }
+
+        [Tooltip("If this is `TRUE`, dueling feature will be disabled, all players won't be able to deal items to each other")]
+        [SerializeField]
+        private bool disableDueling = false;
+        public virtual bool DisableDueling { get { return disableDueling; } }
+
         [Tooltip("When character dead, it will drop equipping weapons or not?")]
         [SerializeField]
         private PlayerItemDropMode playerDeadDropsEquipWeapons = PlayerItemDropMode.None;

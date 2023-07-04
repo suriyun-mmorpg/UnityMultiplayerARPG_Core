@@ -346,7 +346,6 @@ namespace MultiplayerARPG
             switch (type)
             {
                 case DeadPunishmentType.PK:
-                    // PK
                     if (attackerIsPlayer && TryGetPkData(player, out PkData pkData))
                     {
                         // Decrease Exp
@@ -359,7 +358,7 @@ namespace MultiplayerARPG
                         attackerPkPoint = pkPointEachKills;
                     }
                     break;
-                case DeadPunishmentType.Unspecified:
+                default:
                     if (!attackerIsPlayer)
                     {
                         // Decrease Exp

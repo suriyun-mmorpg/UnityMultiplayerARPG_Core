@@ -42,9 +42,16 @@ namespace MultiplayerARPG
             BasePlayerCharacterEntity attackPlayer = attackerEntity as BasePlayerCharacterEntity;
             bool attackerIsPlayer = attackerEntity != null;
 
-            // PKing
-            if (CurrentMapInfo.EnablePkRules && attackerIsPlayer)
+            // Find punishment type
+            if (Dueling.DuelingStarted)
+            {
+                deadPunishmentType = DeadPunishmentType.Duel;
+                Dueling.EndDueling(this);
+            }
+            else if (CurrentMapInfo.EnablePkRules && attackerIsPlayer)
+            {
                 deadPunishmentType = DeadPunishmentType.PK;
+            }
 
             // Dead Penalty
             CurrentGameInstance.GameplayRule.GetPlayerDeadPunishment(deadPunishmentType, this, attackerEntity, out int decraseExp, out int decreaseGold, out int decreaseItems, out int attackerPkPoint);
