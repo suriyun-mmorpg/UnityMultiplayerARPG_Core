@@ -135,6 +135,7 @@ namespace MultiplayerARPG
             public int itemDecreaseMax;
         }
 
+        [System.NonSerialized]
         private List<PkData> _sortedPkDatas;
         public List<PkData> SortedPkDatas
         {
@@ -330,36 +331,49 @@ namespace MultiplayerARPG
             return waterDecreasePerSeconds;
         }
 
-        public override void GetPlayerDeadPunishment(BasePlayerCharacterEntity player, BaseCharacterEntity attacker, out int decreaseExp, out int decreaseGold, out int decreaseItems)
+        public override void GetPlayerDeadPunishment(DeadPunishmentType type, BasePlayerCharacterEntity player, BaseCharacterEntity attacker, out int decreaseExp, out int decreaseGold, out int decreaseItems, out int attackerPkPoint)
         {
             decreaseExp = 0;
             decreaseGold = 0;
             decreaseItems = 0;
+            attackerPkPoint = 0;
             float decreaseExpPercent = 0f;
-            // PK
-            if (BaseGameNetworkManager.CurrentMapInfo.EnablePkRules && attacker is BasePlayerCharacterEntity)
+            bool attackerIsPlayer = attacker is BasePlayerCharacterEntity;
+            switch (type)
             {
-                for (int i = SortedPkDatas.Count - 1; i >= 0; --i)
-                {
-                    if (player.PkPoint >= SortedPkDatas[i].minPkPoint)
+                case DeadPunishmentType.PK:
+                    // PK
+                    if (attackerIsPlayer)
                     {
-                        // Decrease Gold
-                        decreaseGold += Random.Range(SortedPkDatas[i].goldDecreaseMin, SortedPkDatas[i].goldDecreaseMax);
-                        // Decrease Exp
-                        decreaseExpPercent += Random.Range(SortedPkDatas[i].expDecreasePercentMin, SortedPkDatas[i].expDecreasePercentMax);
-                        // Decrease Item
-                        decreaseItems += Random.Range(SortedPkDatas[i].itemDecreaseMin, SortedPkDatas[i].itemDecreaseMax);
-                        break;
+                        for (int i = SortedPkDatas.Count - 1; i >= 0; --i)
+                        {
+                            if (player.PkPoint >= SortedPkDatas[i].minPkPoint)
+                            {
+                                // Decrease Exp
+                                decreaseExpPercent += Random.Range(SortedPkDatas[i].expDecreasePercentMin, SortedPkDatas[i].expDecreasePercentMax);
+                                // Decrease Gold
+                                decreaseGold += Random.Range(SortedPkDatas[i].goldDecreaseMin, SortedPkDatas[i].goldDecreaseMax);
+                                // Decrease Item
+                                decreaseItems += Random.Range(SortedPkDatas[i].itemDecreaseMin, SortedPkDatas[i].itemDecreaseMax);
+                                break;
+                            }
+                        }
+                        attackerPkPoint = pkPointEachKills;
                     }
-                }
+                    break;
+                case DeadPunishmentType.Unspecified:
+                    if (!attackerIsPlayer)
+                    {
+                        // Decrease Exp
+                        decreaseExpPercent += expLostPercentageWhenDeath;
+                        if (GameInstance.ServerGuildHandlers.TryGetGuild(player.GuildId, out GuildData guildData))
+                            decreaseExpPercent -= decreaseExpPercent * guildData.DecreaseExpLostPercentage;
+                        // Decrease Item
+                        decreaseItems += Random.Range(itemDecreaseOnDeadMin, itemDecreaseOnDeadMax);
+                    }
+                    break;
             }
-            // Decrease Exp
-            decreaseExpPercent += expLostPercentageWhenDeath;
-            if (GameInstance.ServerGuildHandlers.TryGetGuild(player.GuildId, out GuildData guildData))
-                decreaseExpPercent -= decreaseExpPercent * guildData.DecreaseExpLostPercentage;
             decreaseExp += Mathf.CeilToInt(player.GetNextLevelExp() * decreaseExpPercent * 0.01f);
-            // Decrease Item
-            decreaseItems += Random.Range(itemDecreaseOnDeadMin, itemDecreaseOnDeadMax);
         }
 
         public override float GetOverweightMoveSpeedRate(BaseGameEntity gameEntity)
@@ -1043,11 +1057,6 @@ namespace MultiplayerARPG
             battlePoint += stats.moveSpeed * moveSpeedBattlePointScore;
             battlePoint += stats.atkSpeed * atkSpeedBattlePointScore;
             return battlePoint;
-        }
-
-        public override int GetPkPointWhenCharacterKilled(BasePlayerCharacterEntity attacker, BasePlayerCharacterEntity damageReceiver)
-        {
-            return pkPointEachKills;
         }
 
         public override bool CanTurnPkOn(BasePlayerCharacterEntity player)

@@ -35,16 +35,22 @@ namespace MultiplayerARPG
 
         public override void Killed(EntityInfo lastAttacker)
         {
-            // Dead Time
+            // Prepare data
+            DeadPunishmentType deadPunishmentType = DeadPunishmentType.Unspecified;
             LastDeadTime = System.DateTimeOffset.UtcNow.ToUnixTimeSeconds();
             lastAttacker.TryGetEntity(out BaseCharacterEntity attackerEntity);
+            BasePlayerCharacterEntity attackPlayer = attackerEntity as BasePlayerCharacterEntity;
+            bool attackerIsPlayer = attackerEntity != null;
 
             // PKing
-            bool pkKilled = false;
-            if (CurrentMapInfo.EnablePkRules && attackerEntity is BasePlayerCharacterEntity attackPlayer)
+            if (CurrentMapInfo.EnablePkRules && attackerIsPlayer)
+                deadPunishmentType = DeadPunishmentType.PK;
+
+            // Dead Penalty
+            CurrentGameInstance.GameplayRule.GetPlayerDeadPunishment(deadPunishmentType, this, attackerEntity, out int decraseExp, out int decreaseGold, out int decreaseItems, out int attackerPkPoint);
+            if (deadPunishmentType == DeadPunishmentType.PK)
             {
-                pkKilled = true;
-                attackPlayer.PkPoint += CurrentGameInstance.GameplayRule.GetPkPointWhenCharacterKilled(attackPlayer, this);
+                attackPlayer.PkPoint += attackerPkPoint;
                 attackPlayer.ConsecutivePkKills++;
                 if (attackPlayer.PkPoint > attackPlayer.HighestPkPoint)
                     attackPlayer.HighestPkPoint = attackPlayer.PkPoint;
@@ -54,13 +60,12 @@ namespace MultiplayerARPG
                 ConsecutivePkKills = 0;
             }
 
-            // Dead Penalty
-            CurrentGameInstance.GameplayRule.GetPlayerDeadPunishment(this, attackerEntity, out int decraseExp, out int decreaseGold, out int decreaseItems);
             // Decrease Exp
             if (Exp > decraseExp)
                 Exp -= decraseExp;
             else
                 Exp = 0;
+
             // Decrease Gold
             if (Gold > decreaseGold)
                 Gold -= decreaseGold;
@@ -69,6 +74,22 @@ namespace MultiplayerARPG
 
             // Clear data
             NpcAction.ClearNpcDialogData();
+
+            // Drop items
+            KilledDropItems(lastAttacker, deadPunishmentType, decreaseItems);
+
+            base.Killed(lastAttacker);
+
+#if UNITY_EDITOR || UNITY_SERVER
+            if (BaseGameNetworkManager.CurrentMapInfo.AutoRespawnWhenDead)
+                GameInstance.ServerCharacterHandlers.Respawn(0, this);
+#endif
+        }
+
+        protected void KilledDropItems(EntityInfo lastAttacker, DeadPunishmentType deadPunishmentType, int decreaseItems)
+        {
+            if (decreaseItems <= 0)
+                return;
 
             // Add killer to looters
             HashSet<string> looters = new HashSet<string>();
@@ -94,7 +115,7 @@ namespace MultiplayerARPG
                     playerDeadDropsEquipWeapons = true;
                     break;
                 case PlayerItemDropMode.PkPunishmentDrop:
-                    playerDeadDropsEquipWeapons = pkKilled;
+                    playerDeadDropsEquipWeapons = deadPunishmentType == DeadPunishmentType.PK;
                     break;
             }
 
@@ -104,7 +125,7 @@ namespace MultiplayerARPG
                     playerDeadDropsEquipItems = true;
                     break;
                 case PlayerItemDropMode.PkPunishmentDrop:
-                    playerDeadDropsEquipItems = pkKilled;
+                    playerDeadDropsEquipItems = deadPunishmentType == DeadPunishmentType.PK;
                     break;
             }
 
@@ -114,7 +135,7 @@ namespace MultiplayerARPG
                     playerDeadDropsNonEquipItems = true;
                     break;
                 case PlayerItemDropMode.PkPunishmentDrop:
-                    playerDeadDropsNonEquipItems = pkKilled;
+                    playerDeadDropsNonEquipItems = deadPunishmentType == DeadPunishmentType.PK;
                     break;
             }
 
@@ -232,13 +253,6 @@ namespace MultiplayerARPG
                     }
                 }
             }
-
-            base.Killed(lastAttacker);
-
-#if UNITY_EDITOR || UNITY_SERVER
-            if (BaseGameNetworkManager.CurrentMapInfo.AutoRespawnWhenDead)
-                GameInstance.ServerCharacterHandlers.Respawn(0, this);
-#endif
         }
     }
 }

@@ -139,12 +139,14 @@ namespace MultiplayerARPG
         /// <summary>
         /// This function will be called when player's character dying
         /// </summary>
+        /// <param name="type"></param>
         /// <param name="player"></param>
         /// <param name="attacker"></param>
         /// <param name="decreaseExp"></param>
         /// <param name="decreaseGold"></param>
         /// <param name="decreaseItems"></param>
-        public abstract void GetPlayerDeadPunishment(BasePlayerCharacterEntity player, BaseCharacterEntity attacker, out int decreaseExp, out int decreaseGold, out int decreaseItems);
+        /// <param name="attackerPkPoint"></param>
+        public abstract void GetPlayerDeadPunishment(DeadPunishmentType type, BasePlayerCharacterEntity player, BaseCharacterEntity attacker, out int decreaseExp, out int decreaseGold, out int decreaseItems, out int attackerPkPoint);
 
         /// <summary>
         /// Result from this function will be used to calculate character's move speed while characters carry too heavy items
@@ -343,12 +345,6 @@ namespace MultiplayerARPG
         public abstract float GetBattlePointFromCharacterStats(CharacterStats stats);
 
         /// <summary>
-        /// Calculate PK point which `attacker` will receive when kill the `damageReceiver`
-        /// </summary>
-        /// <returns></returns>
-        public abstract int GetPkPointWhenCharacterKilled(BasePlayerCharacterEntity attacker, BasePlayerCharacterEntity damageReceiver);
-
-        /// <summary>
         /// Return `TRUE` if the player can turn PK mode on
         /// </summary>
         /// <param name="player"></param>
@@ -366,6 +362,7 @@ namespace MultiplayerARPG
         /// Get entity name color, return `TRUE` to use color from this function
         /// </summary>
         /// <param name="entity"></param>
+        /// <param name="color"></param>
         /// <returns></returns>
         public abstract bool GetEntityNameColor(BaseGameEntity entity, out Color color);
 
