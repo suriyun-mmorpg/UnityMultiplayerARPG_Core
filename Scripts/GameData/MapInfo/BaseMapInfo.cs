@@ -247,7 +247,10 @@ namespace MultiplayerARPG
         /// <param name="writer"></param>
         public virtual void Serialize(NetDataWriter writer)
         {
-
+            writer.Put(enablePkRules);
+            writer.Put(disableDealing);
+            writer.Put(disableDueling);
+            writer.Put(disablePrivateStore);
         }
 
         /// <summary>
@@ -256,7 +259,10 @@ namespace MultiplayerARPG
         /// <param name="reader"></param>
         public virtual void Deserialize(NetDataReader reader)
         {
-
+            enablePkRules = reader.GetBool();
+            disableDealing = reader.GetBool();
+            disableDueling = reader.GetBool();
+            disablePrivateStore = reader.GetBool();
         }
     }
 }

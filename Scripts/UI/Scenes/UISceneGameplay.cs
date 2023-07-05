@@ -62,6 +62,10 @@ namespace MultiplayerARPG
         [Tooltip("If this UI was not set, it will find component in children to set when `Awake`")]
         public UIDealing uiDealing;
         [Tooltip("If this UI was not set, it will find component in children to set when `Awake`")]
+        public UIDuelingRequest uiDuelingRequest;
+        [Tooltip("If this UI was not set, it will find component in children to set when `Awake`")]
+        public UIDueling uiDueling;
+        [Tooltip("If this UI was not set, it will find component in children to set when `Awake`")]
         public UIPartyInvitation uiPartyInvitation;
         [Tooltip("If this UI was not set, it will find component in children to set when `Awake`")]
         public UIGuildInvitation uiGuildInvitation;
@@ -164,6 +168,10 @@ namespace MultiplayerARPG
                 uiDealingRequest = gameObject.GetComponentInChildren<UIDealingRequest>(true);
             if (uiDealing == null)
                 uiDealing = gameObject.GetComponentInChildren<UIDealing>(true);
+            if (uiDuelingRequest == null)
+                uiDuelingRequest = gameObject.GetComponentInChildren<UIDuelingRequest>(true);
+            if (uiDueling == null)
+                uiDueling = gameObject.GetComponentInChildren<UIDueling>(true);
             if (uiPartyInvitation == null)
                 uiPartyInvitation = gameObject.GetComponentInChildren<UIPartyInvitation>(true);
             if (uiGuildInvitation == null)
@@ -464,6 +472,24 @@ namespace MultiplayerARPG
                 return;
             uiDealing.Data = playerCharacter;
             uiDealing.Show();
+        }
+
+        public void OnShowDuelingRequest(BasePlayerCharacterEntity playerCharacter)
+        {
+            if (uiDuelingRequest == null)
+                return;
+            uiDuelingRequest.Data = playerCharacter;
+            uiDuelingRequest.Show();
+        }
+
+        public void OnShowDueling(BasePlayerCharacterEntity playerCharacter, float countDowm, float duration)
+        {
+            if (uiDueling == null)
+                return;
+            uiDueling.Data = playerCharacter;
+            uiDueling.CountDown = countDowm;
+            uiDueling.DuelingTime = duration;
+            uiDueling.Show();
         }
 
         public void OnNotifyPartyInvitation(PartyInvitationData invitation)
@@ -797,6 +823,8 @@ namespace MultiplayerARPG
             characterEntity.NpcAction.onShowNpcRepairItem += OnShowNpcRepairItem;
             characterEntity.Dealing.onRequestDealing += OnShowDealingRequest;
             characterEntity.Dealing.onStartDealing += OnShowDealing;
+            characterEntity.Dueling.onRequestDueling += OnShowDuelingRequest;
+            characterEntity.Dueling.onStartDueling += OnShowDueling;
             characterEntity.onIsWarpingChange += OnIsWarpingChange;
             characterEntity.onDead.AddListener(OnCharacterDead);
             characterEntity.onRespawn.AddListener(OnCharacterRespawn);
@@ -813,6 +841,8 @@ namespace MultiplayerARPG
             characterEntity.NpcAction.onShowNpcRepairItem -= OnShowNpcRepairItem;
             characterEntity.Dealing.onRequestDealing -= OnShowDealingRequest;
             characterEntity.Dealing.onStartDealing -= OnShowDealing;
+            characterEntity.Dueling.onRequestDueling -= OnShowDuelingRequest;
+            characterEntity.Dueling.onStartDueling -= OnShowDueling;
             characterEntity.onIsWarpingChange -= OnIsWarpingChange;
             characterEntity.onDead.RemoveListener(OnCharacterDead);
             characterEntity.onRespawn.RemoveListener(OnCharacterRespawn);

@@ -214,7 +214,16 @@ namespace MultiplayerARPG
             BasePlayerCharacterEntity playerCharacterEntity;
             if (!Manager.TryGetEntityByObjectId(objectId, out playerCharacterEntity))
                 return;
-            StartDueling(countDownDuration, duelDuration);
+            if (!IsServer)
+            {
+                // Already setup in accept request function, so don't setup again
+                DuelingCharacter = playerCharacterEntity;
+                DuelingCharacter.Dueling.DuelingCharacter = Entity;
+                DuelingCharacter.Dueling.ClearDuelingData();
+                DuelingCharacter.Dueling.StartDueling(countDownDuration, duelDuration);
+                ClearDuelingData();
+                StartDueling(countDownDuration, duelDuration);
+            }
             if (onStartDueling != null)
                 onStartDueling.Invoke(playerCharacterEntity, countDownDuration, duelDuration);
         }
@@ -243,7 +252,8 @@ namespace MultiplayerARPG
             DuelingStartTime = Time.unscaledTime;
             _countDownDuration = countDownDuration;
             _duelDuration = duelDuration;
-            InvokeRepeating(nameof(UpdateDueling), 0f, 1f);
+            if (IsServer)
+                InvokeRepeating(nameof(UpdateDueling), 0f, 1f);
         }
 
         protected void UpdateDueling()
@@ -257,6 +267,13 @@ namespace MultiplayerARPG
             if (Entity.IsInSafeArea)
             {
                 EndDueling(Entity);
+                return;
+            }
+
+            if (DuelingCharacter == null)
+            {
+                // Another character leave the game?
+                EndDueling(null);
                 return;
             }
         }

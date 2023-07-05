@@ -184,11 +184,13 @@ namespace MultiplayerARPG
 
         public override void Serialize(NetDataWriter writer)
         {
+            base.Serialize(writer);
             writer.Put((byte)pvpMode);
         }
 
         public override void Deserialize(NetDataReader reader)
         {
+            base.Deserialize(reader);
             pvpMode = (PvpMode)reader.GetByte();
         }
     }

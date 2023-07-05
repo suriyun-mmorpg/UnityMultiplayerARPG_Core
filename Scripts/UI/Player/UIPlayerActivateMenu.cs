@@ -48,6 +48,12 @@ namespace MultiplayerARPG
             Hide();
         }
 
+        public void OnClickSendDuelingRequest()
+        {
+            GameInstance.PlayingCharacterEntity.Dueling.CallServerSendDuelingRequest(Data.ObjectId);
+            Hide();
+        }
+
         public void OnClickSendPartyInvitation()
         {
             GameInstance.ClientPartyHandlers.RequestSendPartyInvitation(new RequestSendPartyInvitationMessage()
