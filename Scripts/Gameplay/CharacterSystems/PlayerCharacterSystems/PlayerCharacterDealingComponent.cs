@@ -289,6 +289,12 @@ namespace MultiplayerARPG
             BasePlayerCharacterEntity playerCharacterEntity;
             if (!Manager.TryGetEntityByObjectId(objectId, out playerCharacterEntity))
                 return;
+            if (!IsServer)
+            {
+                // Already setup in accept request function, so don't setup again
+                DealingCharacter = playerCharacterEntity;
+                DealingCharacter.Dealing.DealingCharacter = Entity;
+            }
             if (onStartDealing != null)
                 onStartDealing.Invoke(playerCharacterEntity);
         }
