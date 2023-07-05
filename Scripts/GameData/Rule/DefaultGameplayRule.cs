@@ -1086,8 +1086,8 @@ namespace MultiplayerARPG
             {
                 if (player.IsPkOn && TryGetPkData(player, out PkData pkData))
                 {
-                    Debug.LogError("Found " + pkData.nameColor);
                     color = pkData.nameColor;
+                    return true;
                 }
             }
             else if (entity is BaseCharacterEntity character && !GameInstance.PlayingCharacterEntity.IsAlly(character.GetInfo()))
