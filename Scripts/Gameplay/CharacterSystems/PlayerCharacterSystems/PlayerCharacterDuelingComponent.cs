@@ -228,20 +228,20 @@ namespace MultiplayerARPG
                 onStartDueling.Invoke(playerCharacterEntity, countDownDuration, duelDuration);
         }
 
-        public bool CallOwnerEndDueling(uint losterObjectId)
+        public bool CallOwnerEndDueling(uint loserObjectId)
         {
             if (!DuelingStarted)
                 return false;
-            RPC(TargetEndDueling, ConnectionId, losterObjectId);
+            RPC(TargetEndDueling, ConnectionId, loserObjectId);
             return true;
         }
 
         [TargetRpc]
-        protected void TargetEndDueling(uint losterObjectId)
+        protected void TargetEndDueling(uint loserObjectId)
         {
             BasePlayerCharacterEntity playerCharacterEntity;
-            if (!Manager.TryGetEntityByObjectId(losterObjectId, out playerCharacterEntity))
-                return;
+            if (!Manager.TryGetEntityByObjectId(loserObjectId, out playerCharacterEntity))
+                playerCharacterEntity = null;
             StopDueling();
             if (onEndDueling != null)
                 onEndDueling.Invoke(playerCharacterEntity);
@@ -253,7 +253,10 @@ namespace MultiplayerARPG
             _countDownDuration = countDownDuration;
             _duelDuration = duelDuration;
             if (IsServer)
+            {
+                CancelInvoke(nameof(UpdateDueling));
                 InvokeRepeating(nameof(UpdateDueling), 0f, 1f);
+            }
         }
 
         protected void UpdateDueling()
@@ -267,13 +270,6 @@ namespace MultiplayerARPG
             if (Entity.IsInSafeArea)
             {
                 EndDueling(Entity);
-                return;
-            }
-
-            if (DuelingCharacter == null)
-            {
-                // Another character leave the game?
-                EndDueling(null);
                 return;
             }
         }
@@ -290,7 +286,7 @@ namespace MultiplayerARPG
         public override void EntityOnDestroy()
         {
             // Player disconnect?
-            if (DuelingStarted)
+            if (IsServer && DuelingStarted)
                 EndDueling(Entity);
         }
     }
