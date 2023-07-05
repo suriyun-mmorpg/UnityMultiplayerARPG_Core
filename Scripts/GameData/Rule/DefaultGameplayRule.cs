@@ -354,6 +354,9 @@ namespace MultiplayerARPG
                         decreaseGold += Random.Range(pkData.goldDecreaseMin, pkData.goldDecreaseMax);
                         // Decrease Item
                         decreaseItems += Random.Range(pkData.itemDecreaseMin, pkData.itemDecreaseMax);
+                    }
+                    if (attackerIsPlayer)
+                    {
                         // PK point
                         attackerPkPoint = pkPointEachKills;
                     }
@@ -1083,6 +1086,7 @@ namespace MultiplayerARPG
             {
                 if (player.IsPkOn && TryGetPkData(player, out PkData pkData))
                 {
+                    Debug.LogError("Found " + pkData.nameColor);
                     color = pkData.nameColor;
                 }
             }
