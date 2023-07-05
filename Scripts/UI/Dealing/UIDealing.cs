@@ -92,7 +92,6 @@ namespace MultiplayerARPG
             CacheItemSelectionManager.eventOnDeselect.AddListener(OnDeselectCharacterItem);
             if (uiItemDialog != null)
                 uiItemDialog.onHide.AddListener(OnItemDialogHide);
-            UpdateData();
             if (!GameInstance.PlayingCharacterEntity) return;
             GameInstance.PlayingCharacterEntity.Dealing.onUpdateDealingState += UpdateDealingState;
             GameInstance.PlayingCharacterEntity.Dealing.onUpdateDealingGold += UpdateDealingGold;
