@@ -50,7 +50,7 @@ namespace MultiplayerARPG
             get; private set;
         }
 
-        public PlayerCharacterPrivateStoreComponent PrivateStore
+        public PlayerCharacterStoreComponent Store
         {
             get; private set;
         }
@@ -114,7 +114,7 @@ namespace MultiplayerARPG
             Crafting = gameObject.GetOrAddComponent<PlayerCharacterCraftingComponent>();
             Dealing = gameObject.GetOrAddComponent<PlayerCharacterDealingComponent>();
             Dueling = gameObject.GetOrAddComponent<PlayerCharacterDuelingComponent>();
-            PrivateStore = gameObject.GetOrAddComponent<PlayerCharacterPrivateStoreComponent>();
+            Store = gameObject.GetOrAddComponent<PlayerCharacterStoreComponent>();
             NpcAction = gameObject.GetOrAddComponent<PlayerCharacterNpcActionComponent>();
             Pk = gameObject.GetOrAddComponent<PlayerCharacterPkComponent>();
             gameObject.GetOrAddComponent<PlayerCharacterItemLockAndExpireComponent>();

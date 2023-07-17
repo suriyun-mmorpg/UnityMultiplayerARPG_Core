@@ -40,10 +40,10 @@ namespace MultiplayerARPG
         private bool disableDealing = false;
         public virtual bool DisableDealing { get { return disableDealing; } }
 
-        [Tooltip("If this is `TRUE`, private store feature will be disabled, all players won't be able to deal items to each other")]
+        [Tooltip("If this is `TRUE`, player store feature will be disabled, all players won't be able to deal items to each other")]
         [SerializeField]
-        private bool disablePrivateStore = false;
-        public virtual bool DisablePrivateStore { get { return disablePrivateStore; } }
+        private bool disablePlayerStore = false;
+        public virtual bool DisablePlayerStore { get { return disablePlayerStore; } }
 
         [Tooltip("If this is `TRUE`, dueling feature will be disabled, all players won't be able to deal items to each other")]
         [SerializeField]
@@ -250,7 +250,7 @@ namespace MultiplayerARPG
             writer.Put(enablePkRules);
             writer.Put(disableDealing);
             writer.Put(disableDueling);
-            writer.Put(disablePrivateStore);
+            writer.Put(disablePlayerStore);
         }
 
         /// <summary>
@@ -262,7 +262,7 @@ namespace MultiplayerARPG
             enablePkRules = reader.GetBool();
             disableDealing = reader.GetBool();
             disableDueling = reader.GetBool();
-            disablePrivateStore = reader.GetBool();
+            disablePlayerStore = reader.GetBool();
         }
     }
 }

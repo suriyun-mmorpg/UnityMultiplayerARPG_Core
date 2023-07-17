@@ -3,7 +3,7 @@ using LiteNetLib.Utils;
 namespace MultiplayerARPG
 {
     [System.Serializable]
-    public class PrivateStoreItem : INetSerializable
+    public class PlayerStoreItem : INetSerializable
     {
         public CharacterItem item;
         public int price;

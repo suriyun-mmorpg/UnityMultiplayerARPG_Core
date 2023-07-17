@@ -62,6 +62,10 @@ namespace MultiplayerARPG
         [Tooltip("If this UI was not set, it will find component in children to set when `Awake`")]
         public UIDealing uiDealing;
         [Tooltip("If this UI was not set, it will find component in children to set when `Awake`")]
+        public UIOpenPlayerStore uiOpenPlayerStore;
+        [Tooltip("If this UI was not set, it will find component in children to set when `Awake`")]
+        public UIPlayerStore uiPlayerStore;
+        [Tooltip("If this UI was not set, it will find component in children to set when `Awake`")]
         public UIDuelingRequest uiDuelingRequest;
         [Tooltip("If this UI was not set, it will find component in children to set when `Awake`")]
         public UIDueling uiDueling;
@@ -168,6 +172,10 @@ namespace MultiplayerARPG
                 uiDealingRequest = gameObject.GetComponentInChildren<UIDealingRequest>(true);
             if (uiDealing == null)
                 uiDealing = gameObject.GetComponentInChildren<UIDealing>(true);
+            if (uiOpenPlayerStore == null)
+                uiOpenPlayerStore = gameObject.GetComponentInChildren<UIOpenPlayerStore>(true);
+            if (uiPlayerStore == null)
+                uiPlayerStore = gameObject.GetComponentInChildren<UIPlayerStore>(true);
             if (uiDuelingRequest == null)
                 uiDuelingRequest = gameObject.GetComponentInChildren<UIDuelingRequest>(true);
             if (uiDueling == null)
@@ -675,6 +683,12 @@ namespace MultiplayerARPG
         {
             return uiDealing != null && uiDealing.IsVisible() &&
                 uiDealing.DealingState == DealingState.Dealing;
+        }
+
+        public override bool IsOpenPlayerStoreDialogVisible()
+        {
+            return uiOpenPlayerStore != null &&
+                uiOpenPlayerStore.IsVisible();
         }
 
         public override void ShowRefineItemDialog(InventoryType inventoryType, int indexOfData)

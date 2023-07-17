@@ -177,6 +177,8 @@ namespace MultiplayerARPG
         public UnityEvent onStorageDialogDisappear = new UnityEvent();
         public UnityEvent onEnterDealingState = new UnityEvent();
         public UnityEvent onExitDealingState = new UnityEvent();
+        public UnityEvent onOpenPlayerStoreDialogAppear = new UnityEvent();
+        public UnityEvent onOpenPlayerStoreDialogDisappear = new UnityEvent();
 
         [Header("Options")]
         [Tooltip("UIs in this list will use cloned item data from this UI")]
@@ -199,6 +201,7 @@ namespace MultiplayerARPG
         protected bool isEnhanceSocketItemDialogAppeared;
         protected bool isStorageDialogAppeared;
         protected bool isDealingStateEntered;
+        protected bool isOpenPlayerStoreDialogAppeared;
         protected float lockRemainsDuration;
         protected bool dirtyIsLock;
         protected float coolDownRemainsDuration;
@@ -401,6 +404,7 @@ namespace MultiplayerARPG
             UpdateEnhanceSocketUIVisibility(false);
             UpdateStorageUIVisibility(false);
             UpdateDealingState(false);
+            UpdateOpenPlayerStoreUIVisibility(false);
         }
 
         protected override void UpdateData()
@@ -1191,6 +1195,7 @@ namespace MultiplayerARPG
             UpdateEnhanceSocketUIVisibility(true);
             UpdateStorageUIVisibility(true);
             UpdateDealingState(true);
+            UpdateOpenPlayerStoreUIVisibility(true);
         }
 
         private void SetupAndShowUIComparingEquipment(int index, CharacterItem characterItem, InventoryType inventoryType, int indexOfData)
@@ -1201,11 +1206,11 @@ namespace MultiplayerARPG
             uiComparingEquipments[index].Show();
         }
 
-        private void UpdateShopUIVisibility(bool initData)
+        private void UpdateShopUIVisibility(bool isInit)
         {
             if (!IsOwningCharacter())
             {
-                if (initData || isSellItemDialogAppeared)
+                if (isInit || isSellItemDialogAppeared)
                 {
                     isSellItemDialogAppeared = false;
                     if (onNpcSellItemDialogDisappear != null)
@@ -1217,7 +1222,7 @@ namespace MultiplayerARPG
             if (GameInstance.ItemUIVisibilityManager.IsShopDialogVisible() &&
                 InventoryType == InventoryType.NonEquipItems)
             {
-                if (initData || !isSellItemDialogAppeared)
+                if (isInit || !isSellItemDialogAppeared)
                 {
                     isSellItemDialogAppeared = true;
                     if (onNpcSellItemDialogAppear != null)
@@ -1226,7 +1231,7 @@ namespace MultiplayerARPG
             }
             else
             {
-                if (initData || isSellItemDialogAppeared)
+                if (isInit || isSellItemDialogAppeared)
                 {
                     isSellItemDialogAppeared = false;
                     if (onNpcSellItemDialogDisappear != null)
@@ -1235,11 +1240,11 @@ namespace MultiplayerARPG
             }
         }
 
-        private void UpdateRefineItemUIVisibility(bool initData)
+        private void UpdateRefineItemUIVisibility(bool isInit)
         {
             if (!IsOwningCharacter())
             {
-                if (initData || isRefineItemDialogAppeared)
+                if (isInit || isRefineItemDialogAppeared)
                 {
                     isRefineItemDialogAppeared = false;
                     if (onRefineItemDialogDisappear != null)
@@ -1251,7 +1256,7 @@ namespace MultiplayerARPG
             if (GameInstance.ItemUIVisibilityManager.IsRefineItemDialogVisible() &&
                 EquipmentItem != null && InventoryType != InventoryType.StorageItems)
             {
-                if (initData || !isRefineItemDialogAppeared)
+                if (isInit || !isRefineItemDialogAppeared)
                 {
                     isRefineItemDialogAppeared = true;
                     if (onRefineItemDialogAppear != null)
@@ -1260,7 +1265,7 @@ namespace MultiplayerARPG
             }
             else
             {
-                if (initData || isRefineItemDialogAppeared)
+                if (isInit || isRefineItemDialogAppeared)
                 {
                     isRefineItemDialogAppeared = false;
                     if (onRefineItemDialogDisappear != null)
@@ -1269,11 +1274,11 @@ namespace MultiplayerARPG
             }
         }
 
-        private void UpdateDismantleItemUIVisibility(bool initData)
+        private void UpdateDismantleItemUIVisibility(bool isInit)
         {
             if (!IsOwningCharacter())
             {
-                if (initData || isDismantleItemDialogAppeared)
+                if (isInit || isDismantleItemDialogAppeared)
                 {
                     isDismantleItemDialogAppeared = false;
                     if (onDismantleItemDialogDisappear != null)
@@ -1286,7 +1291,7 @@ namespace MultiplayerARPG
                 GameInstance.Singleton.dismantleFilter.Filter(CharacterItem) &&
                 InventoryType == InventoryType.NonEquipItems)
             {
-                if (initData || !isDismantleItemDialogAppeared)
+                if (isInit || !isDismantleItemDialogAppeared)
                 {
                     isDismantleItemDialogAppeared = true;
                     if (onDismantleItemDialogAppear != null)
@@ -1295,7 +1300,7 @@ namespace MultiplayerARPG
             }
             else
             {
-                if (initData || isDismantleItemDialogAppeared)
+                if (isInit || isDismantleItemDialogAppeared)
                 {
                     isDismantleItemDialogAppeared = false;
                     if (onDismantleItemDialogDisappear != null)
@@ -1304,11 +1309,11 @@ namespace MultiplayerARPG
             }
         }
 
-        private void UpdateRepairItemUIVisibility(bool initData)
+        private void UpdateRepairItemUIVisibility(bool isInit)
         {
             if (!IsOwningCharacter())
             {
-                if (initData || isRepairItemDialogAppeared)
+                if (isInit || isRepairItemDialogAppeared)
                 {
                     isRepairItemDialogAppeared = false;
                     if (onRepairItemDialogDisappear != null)
@@ -1320,7 +1325,7 @@ namespace MultiplayerARPG
             if (GameInstance.ItemUIVisibilityManager.IsRepairItemDialogVisible() &&
                 EquipmentItem != null && InventoryType != InventoryType.StorageItems)
             {
-                if (initData || !isRepairItemDialogAppeared)
+                if (isInit || !isRepairItemDialogAppeared)
                 {
                     isRepairItemDialogAppeared = true;
                     if (onRepairItemDialogAppear != null)
@@ -1329,7 +1334,7 @@ namespace MultiplayerARPG
             }
             else
             {
-                if (initData || isRepairItemDialogAppeared)
+                if (isInit || isRepairItemDialogAppeared)
                 {
                     isRepairItemDialogAppeared = false;
                     if (onRepairItemDialogDisappear != null)
@@ -1338,11 +1343,11 @@ namespace MultiplayerARPG
             }
         }
 
-        private void UpdateEnhanceSocketUIVisibility(bool initData)
+        private void UpdateEnhanceSocketUIVisibility(bool isInit)
         {
             if (!IsOwningCharacter())
             {
-                if (initData || isEnhanceSocketItemDialogAppeared)
+                if (isInit || isEnhanceSocketItemDialogAppeared)
                 {
                     isEnhanceSocketItemDialogAppeared = false;
                     if (onEnhanceSocketItemDialogDisappear != null)
@@ -1354,7 +1359,7 @@ namespace MultiplayerARPG
             if (GameInstance.ItemUIVisibilityManager.IsEnhanceSocketItemDialogVisible() &&
                 EquipmentItem != null && InventoryType != InventoryType.StorageItems)
             {
-                if (initData || !isEnhanceSocketItemDialogAppeared)
+                if (isInit || !isEnhanceSocketItemDialogAppeared)
                 {
                     isEnhanceSocketItemDialogAppeared = true;
                     if (onEnhanceSocketItemDialogAppear != null)
@@ -1363,7 +1368,7 @@ namespace MultiplayerARPG
             }
             else
             {
-                if (initData || isEnhanceSocketItemDialogAppeared)
+                if (isInit || isEnhanceSocketItemDialogAppeared)
                 {
                     isEnhanceSocketItemDialogAppeared = false;
                     if (onEnhanceSocketItemDialogDisappear != null)
@@ -1372,11 +1377,11 @@ namespace MultiplayerARPG
             }
         }
 
-        private void UpdateStorageUIVisibility(bool initData)
+        private void UpdateStorageUIVisibility(bool isInit)
         {
             if (!IsOwningCharacter())
             {
-                if (initData || isStorageDialogAppeared)
+                if (isInit || isStorageDialogAppeared)
                 {
                     isStorageDialogAppeared = false;
                     if (onStorageDialogDisappear != null)
@@ -1388,7 +1393,7 @@ namespace MultiplayerARPG
             if (GameInstance.ItemUIVisibilityManager.IsStorageDialogVisible() &&
                 InventoryType == InventoryType.NonEquipItems)
             {
-                if (initData || !isStorageDialogAppeared)
+                if (isInit || !isStorageDialogAppeared)
                 {
                     isStorageDialogAppeared = true;
                     if (onStorageDialogAppear != null)
@@ -1397,7 +1402,7 @@ namespace MultiplayerARPG
             }
             else
             {
-                if (initData || isStorageDialogAppeared)
+                if (isInit || isStorageDialogAppeared)
                 {
                     isStorageDialogAppeared = false;
                     if (onStorageDialogDisappear != null)
@@ -1406,11 +1411,11 @@ namespace MultiplayerARPG
             }
         }
 
-        private void UpdateDealingState(bool initData)
+        private void UpdateDealingState(bool isInit)
         {
             if (!IsOwningCharacter())
             {
-                if (initData || isDealingStateEntered)
+                if (isInit || isDealingStateEntered)
                 {
                     isDealingStateEntered = false;
                     if (onExitDealingState != null)
@@ -1419,11 +1424,10 @@ namespace MultiplayerARPG
                 return;
             }
             // Check visible dealing dialog
-            if (BaseUISceneGameplay.Singleton != null &&
-                BaseUISceneGameplay.Singleton.IsDealingDialogVisibleWithDealingState() &&
+            if (GameInstance.ItemUIVisibilityManager.IsDealingDialogVisibleWithDealingState() &&
                 InventoryType == InventoryType.NonEquipItems)
             {
-                if (initData || !isDealingStateEntered)
+                if (isInit || !isDealingStateEntered)
                 {
                     isDealingStateEntered = true;
                     if (onEnterDealingState != null)
@@ -1432,11 +1436,45 @@ namespace MultiplayerARPG
             }
             else
             {
-                if (initData || isDealingStateEntered)
+                if (isInit || isDealingStateEntered)
                 {
                     isDealingStateEntered = false;
                     if (onExitDealingState != null)
                         onExitDealingState.Invoke();
+                }
+            }
+        }
+
+        private void UpdateOpenPlayerStoreUIVisibility(bool isInit)
+        {
+            if (!IsOwningCharacter())
+            {
+                if (isInit || isOpenPlayerStoreDialogAppeared)
+                {
+                    isOpenPlayerStoreDialogAppeared = false;
+                    if (onOpenPlayerStoreDialogDisappear != null)
+                        onOpenPlayerStoreDialogDisappear.Invoke();
+                }
+                return;
+            }
+            // Check visible item dialog
+            if (GameInstance.ItemUIVisibilityManager.IsOpenPlayerStoreDialogVisible() &&
+                InventoryType == InventoryType.NonEquipItems)
+            {
+                if (isInit || !isOpenPlayerStoreDialogAppeared)
+                {
+                    isOpenPlayerStoreDialogAppeared = true;
+                    if (onOpenPlayerStoreDialogAppear != null)
+                        onOpenPlayerStoreDialogAppear.Invoke();
+                }
+            }
+            else
+            {
+                if (isInit || isOpenPlayerStoreDialogAppeared)
+                {
+                    isOpenPlayerStoreDialogAppeared = false;
+                    if (onOpenPlayerStoreDialogDisappear != null)
+                        onOpenPlayerStoreDialogDisappear.Invoke();
                 }
             }
         }
@@ -1865,6 +1903,48 @@ namespace MultiplayerARPG
                 if (selectionManager != null)
                     selectionManager.DeselectSelectedUI();
             }
+        }
+        #endregion
+
+        #region Set Player Store Item Functions
+        public void OnClickPutPlayerStoreItem()
+        {
+            // Only unequipped equipment can be offered
+            if (!IsOwningCharacter() || InventoryType != InventoryType.NonEquipItems)
+                return;
+
+            if (CharacterItem.amount == 1)
+            {
+                OnPutPlayerStoreItemAmountConfirmed(1);
+            }
+            else
+            {
+                UISceneGlobal.Singleton.ShowInputDialog(LanguageManager.GetText(UITextKeys.UI_PUT_PLAYER_STORE_ITEM_AMOUNT.ToString()), LanguageManager.GetText(UITextKeys.UI_PUT_PLAYER_STORE_ITEM_AMOUNT_DESCRIPTION.ToString()), OnPutPlayerStoreItemAmountConfirmed, 1, CharacterItem.amount, CharacterItem.amount);
+            }
+        }
+
+        private void OnPutPlayerStoreItemAmountConfirmed(int amount)
+        {
+            UISceneGlobal.Singleton.ShowInputDialog(LanguageManager.GetText(UITextKeys.UI_PUT_PLAYER_STORE_ITEM_PRICE.ToString()), LanguageManager.GetText(UITextKeys.UI_PUT_PLAYER_STORE_ITEM_PRICE_DESCRIPTION.ToString()), (price) => OnPutPlayerStoreItemPriceConfirmed(amount, price), 0, int.MaxValue, 0);
+        }
+
+        private void OnPutPlayerStoreItemPriceConfirmed(int amount, int price)
+        {
+            if (selectionManager != null)
+                selectionManager.DeselectSelectedUI();
+            UIOpenPlayerStore ui = FindObjectOfType<UIOpenPlayerStore>();
+            ui.PutItem(CharacterItem.id, amount, price);
+        }
+
+        public void OnClickRemoveFromPlayerStore()
+        {
+            UIOpenPlayerStore ui = FindObjectOfType<UIOpenPlayerStore>();
+            ui.RemoveItem(IndexOfData);
+        }
+
+        public void OnClickBuyFromPlayerStore()
+        {
+            GameInstance.PlayingCharacterEntity.Store.BuyItem(IndexOfData);
         }
         #endregion
     }

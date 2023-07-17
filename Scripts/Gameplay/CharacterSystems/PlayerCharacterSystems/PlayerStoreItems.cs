@@ -3,7 +3,7 @@ using LiteNetLib.Utils;
 
 namespace MultiplayerARPG
 {
-    public class PrivateStoreItems : List<PrivateStoreItem>, INetSerializable
+    public class PlayerStoreItems : List<PlayerStoreItem>, INetSerializable
     {
         public void Serialize(NetDataWriter writer)
         {
@@ -20,7 +20,7 @@ namespace MultiplayerARPG
             int count = reader.GetPackedInt();
             for (int i = 0; i < count; ++i)
             {
-                Add(reader.Get(() => new PrivateStoreItem()));
+                Add(reader.Get(() => new PlayerStoreItem()));
             }
         }
     }

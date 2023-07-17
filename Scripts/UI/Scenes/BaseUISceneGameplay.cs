@@ -181,6 +181,7 @@ namespace MultiplayerARPG
         public abstract bool IsStorageDialogVisible();
         public abstract bool IsItemsContainerDialogVisible();
         public abstract bool IsDealingDialogVisibleWithDealingState();
+        public abstract bool IsOpenPlayerStoreDialogVisible();
         public abstract void ShowRefineItemDialog(InventoryType inventoryType, int indexOfData);
         public abstract void ShowDismantleItemDialog(InventoryType inventoryType, int indexOfData);
         public abstract void ShowRepairItemDialog(InventoryType inventoryType, int indexOfData);

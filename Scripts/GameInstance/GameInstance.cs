@@ -288,8 +288,8 @@ namespace MultiplayerARPG
         public float dealingRequestDuration = 5f;
         [Tooltip("If this is `TRUE`, dealing feature will be disabled, all players won't be able to deal items to each other")]
         public bool disableDealing = false;
-        [Tooltip("If this is `TRUE`, private store feature will be disabled, all players won't be able to deal items to each other")]
-        public bool disablePrivateStore = false;
+        [Tooltip("If this is `TRUE`, player store feature will be disabled, all players won't be able to deal items to each other")]
+        public bool disablePlayerStore = false;
         [Tooltip("If dueling request does not accepted within this duration, the request will be cancelled")]
         public float duelingRequestDuration = 5f;
         [Tooltip("Count down duration before start a dueling")]
