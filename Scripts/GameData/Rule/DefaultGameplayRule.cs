@@ -263,7 +263,7 @@ namespace MultiplayerARPG
 
         public override int GetTotalDamage(Vector3 fromPosition, EntityInfo instigator, DamageableEntity damageReceiver, float totalDamage, CharacterItem weapon, BaseSkill skill, int skillLevel)
         {
-            return Mathf.CeilToInt(totalDamage);
+            return Mathf.FloorToInt(totalDamage);
         }
 
         public override float GetRecoveryHpPerSeconds(BaseCharacterEntity character)
