@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace MultiplayerARPG
 {
-    public class UIPlayerStoreItem : UIDataForCharacter<PlayerStoreItem>
+    public class UIVendingItem : UIDataForCharacter<VendingItem>
     {
         [Header("String Formats")]
         [Tooltip("Format => {0} = {Open Price}")]
@@ -16,7 +16,7 @@ namespace MultiplayerARPG
         protected override void UpdateData()
         {
             if (uiCharacterItem != null)
-                uiCharacterItem.Setup(new UICharacterItemData(Data.item, InventoryType.PlayerStore), Character, IndexOfData);
+                uiCharacterItem.Setup(new UICharacterItemData(Data.item, InventoryType.Vending), Character, IndexOfData);
 
             if (textPrice != null)
             {

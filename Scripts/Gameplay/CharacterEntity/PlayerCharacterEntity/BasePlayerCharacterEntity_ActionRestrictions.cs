@@ -11,12 +11,12 @@ namespace MultiplayerARPG
 
         public bool IsStoreOpen
         {
-            get { return Store.Data.isOpen; }
+            get { return Vending.Data.isOpen; }
         }
 
         public override bool CanDoActions()
         {
-            return base.CanDoActions() && Dealing.DealingState == DealingState.None && !Store.Data.isOpen && !IsWarping;
+            return base.CanDoActions() && Dealing.DealingState == DealingState.None && !Vending.Data.isOpen && !IsWarping;
         }
 
         public override bool CanEquipItem()

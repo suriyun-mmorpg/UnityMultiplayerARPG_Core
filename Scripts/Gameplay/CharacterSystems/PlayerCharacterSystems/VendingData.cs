@@ -4,7 +4,7 @@ using LiteNetLibManager;
 namespace MultiplayerARPG
 {
     [System.Serializable]
-    public struct PlayerStoreData : INetSerializable
+    public struct VendingData : INetSerializable
     {
         public bool isOpen;
         public string title;
@@ -25,7 +25,7 @@ namespace MultiplayerARPG
     }
 
     [System.Serializable]
-    public class SyncFieldPlayerStoreData : LiteNetLibSyncField<PlayerStoreData>
+    public class SyncFieldVendingData : LiteNetLibSyncField<VendingData>
     {
     }
 }

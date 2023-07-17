@@ -62,9 +62,9 @@ namespace MultiplayerARPG
         [Tooltip("If this UI was not set, it will find component in children to set when `Awake`")]
         public UIDealing uiDealing;
         [Tooltip("If this UI was not set, it will find component in children to set when `Awake`")]
-        public UIOpenPlayerStore uiOpenPlayerStore;
+        public UIStartVending uiStartVending;
         [Tooltip("If this UI was not set, it will find component in children to set when `Awake`")]
-        public UIPlayerStore uiPlayerStore;
+        public UIVending uiVending;
         [Tooltip("If this UI was not set, it will find component in children to set when `Awake`")]
         public UIDuelingRequest uiDuelingRequest;
         [Tooltip("If this UI was not set, it will find component in children to set when `Awake`")]
@@ -172,10 +172,10 @@ namespace MultiplayerARPG
                 uiDealingRequest = gameObject.GetComponentInChildren<UIDealingRequest>(true);
             if (uiDealing == null)
                 uiDealing = gameObject.GetComponentInChildren<UIDealing>(true);
-            if (uiOpenPlayerStore == null)
-                uiOpenPlayerStore = gameObject.GetComponentInChildren<UIOpenPlayerStore>(true);
-            if (uiPlayerStore == null)
-                uiPlayerStore = gameObject.GetComponentInChildren<UIPlayerStore>(true);
+            if (uiStartVending == null)
+                uiStartVending = gameObject.GetComponentInChildren<UIStartVending>(true);
+            if (uiVending == null)
+                uiVending = gameObject.GetComponentInChildren<UIVending>(true);
             if (uiDuelingRequest == null)
                 uiDuelingRequest = gameObject.GetComponentInChildren<UIDuelingRequest>(true);
             if (uiDueling == null)
@@ -685,10 +685,10 @@ namespace MultiplayerARPG
                 uiDealing.DealingState == DealingState.Dealing;
         }
 
-        public override bool IsOpenPlayerStoreDialogVisible()
+        public override bool IsStartVendingDialogVisible()
         {
-            return uiOpenPlayerStore != null &&
-                uiOpenPlayerStore.IsVisible();
+            return uiStartVending != null &&
+                uiStartVending.IsVisible();
         }
 
         public override void ShowRefineItemDialog(InventoryType inventoryType, int indexOfData)

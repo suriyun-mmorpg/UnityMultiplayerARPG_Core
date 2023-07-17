@@ -2,11 +2,11 @@ using UnityEngine;
 
 namespace MultiplayerARPG
 {
-    public class UIOpenPlayerStore : UIBase
+    public class UIStartVending : UIBase
     {
         public InputFieldWrapper inputTitle;
-        public UIPlayerStoreItem uiSelectedItem;
-        public UIPlayerStoreItem uiItemPrefab;
+        public UIVendingItem uiSelectedItem;
+        public UIVendingItem uiItemPrefab;
         public Transform uiItemContainer;
 
         private UIList _itemList;
@@ -24,20 +24,20 @@ namespace MultiplayerARPG
             }
         }
 
-        private UIPlayerStoreItemSelectionManager _itemSelectionManager;
-        public UIPlayerStoreItemSelectionManager ItemSelectionManager
+        private UIVendingItemSelectionManager _itemSelectionManager;
+        public UIVendingItemSelectionManager ItemSelectionManager
         {
             get
             {
                 if (_itemSelectionManager == null)
-                    _itemSelectionManager = gameObject.GetOrAddComponent<UIPlayerStoreItemSelectionManager>();
+                    _itemSelectionManager = gameObject.GetOrAddComponent<UIVendingItemSelectionManager>();
                 _itemSelectionManager.selectionMode = UISelectionMode.Toggle;
                 return _itemSelectionManager;
             }
         }
 
-        private UISelectionManagerShowOnSelectEventManager<PlayerStoreItem, UIPlayerStoreItem> _itemListEventSetupManager = new UISelectionManagerShowOnSelectEventManager<PlayerStoreItem, UIPlayerStoreItem>();
-        private PlayerStoreOpenItems _items = new PlayerStoreOpenItems();
+        private UISelectionManagerShowOnSelectEventManager<VendingItem, UIVendingItem> _itemListEventSetupManager = new UISelectionManagerShowOnSelectEventManager<VendingItem, UIVendingItem>();
+        private StartVendingItems _items = new StartVendingItems();
 
         private void OnEnable()
         {
@@ -53,7 +53,7 @@ namespace MultiplayerARPG
 
         public void PutItem(string id, int amount, int price)
         {
-            _items.Add(new PlayerStoreOpenItem()
+            _items.Add(new StartVendingItem()
             {
                 id = id,
                 amount = amount,
@@ -79,8 +79,8 @@ namespace MultiplayerARPG
                     return;
                 CharacterItem item = GameInstance.PlayingCharacterEntity.NonEquipItems[indexOfItem].Clone(false);
                 item.amount = data.amount;
-                UIPlayerStoreItem uiComp = ui.GetComponent<UIPlayerStoreItem>();
-                uiComp.Setup(new PlayerStoreItem()
+                UIVendingItem uiComp = ui.GetComponent<UIVendingItem>();
+                uiComp.Setup(new VendingItem()
                 {
                     item = item,
                     price = data.price,
@@ -92,7 +92,7 @@ namespace MultiplayerARPG
 
         public void OnClickOpen()
         {
-            GameInstance.PlayingCharacterEntity.Store.OpenStore(inputTitle.text, _items);
+            GameInstance.PlayingCharacterEntity.Vending.StartVending(inputTitle.text, _items);
             Hide();
         }
     }

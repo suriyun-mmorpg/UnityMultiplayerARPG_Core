@@ -5,34 +5,34 @@ using UnityEngine;
 namespace MultiplayerARPG
 {
     [DisallowMultipleComponent]
-    public class PlayerCharacterStoreComponent : BaseNetworkedGameEntityComponent<BasePlayerCharacterEntity>
+    public class PlayerCharacterVendingComponent : BaseNetworkedGameEntityComponent<BasePlayerCharacterEntity>
     {
         [SerializeField]
-        protected SyncFieldPlayerStoreData data = new SyncFieldPlayerStoreData();
+        protected SyncFieldVendingData data = new SyncFieldVendingData();
 
-        public PlayerStoreData Data => data.Value;
+        public VendingData Data => data.Value;
 
-        protected PlayerCharacterStoreComponent _store;
-        protected HashSet<PlayerCharacterStoreComponent> _customers = new HashSet<PlayerCharacterStoreComponent>();
-        protected PlayerStoreItems _items = new PlayerStoreItems();
+        protected PlayerCharacterVendingComponent _store;
+        protected HashSet<PlayerCharacterVendingComponent> _customers = new HashSet<PlayerCharacterVendingComponent>();
+        protected VendingItems _items = new VendingItems();
 
-        public event System.Action<PlayerStoreItems> onUpdateItems;
+        public event System.Action<VendingItems> onUpdateItems;
 
-        public void OpenStore(string title, PlayerStoreOpenItems items)
+        public void StartVending(string title, StartVendingItems items)
         {
-            RPC(ServerOpenStore, title, items);
+            RPC(ServerStartVending, title, items);
         }
 
         [ServerRpc]
-        protected void ServerOpenStore(string title, PlayerStoreOpenItems items)
+        protected void ServerStartVending(string title, StartVendingItems items)
         {
-            data.Value = new PlayerStoreData()
+            data.Value = new VendingData()
             {
                 isOpen = true,
                 title = title,
             };
             _items.Clear();
-            foreach (PlayerStoreOpenItem item in items)
+            foreach (StartVendingItem item in items)
             {
                 if (string.IsNullOrEmpty(item.id) || item.amount <= 0 || item.price <= 0)
                     continue;
@@ -41,7 +41,7 @@ namespace MultiplayerARPG
                     continue;
                 CharacterItem storeItem = Entity.NonEquipItems[index].Clone(false);
                 storeItem.amount = item.amount;
-                _items.Add(new PlayerStoreItem()
+                _items.Add(new VendingItem()
                 {
                     item = storeItem,
                     price = item.price,
@@ -49,17 +49,17 @@ namespace MultiplayerARPG
             }
         }
 
-        public void CloseStore()
+        public void StopVending()
         {
-            RPC(ServerCloseStore);
+            RPC(ServerStopVending);
         }
 
         [ServerRpc]
-        protected void ServerCloseStore()
+        protected void ServerStopVending()
         {
-            data.Value = new PlayerStoreData();
+            data.Value = new VendingData();
             _items.Clear();
-            foreach (PlayerCharacterStoreComponent customer in _customers)
+            foreach (PlayerCharacterVendingComponent customer in _customers)
             {
                 if (customer == null)
                     continue;
@@ -78,14 +78,14 @@ namespace MultiplayerARPG
             BasePlayerCharacterEntity playerCharacterEntity;
             if (!Manager.TryGetEntityByObjectId(objectId, out playerCharacterEntity))
                 return;
-            if (!playerCharacterEntity.Store.Data.isOpen)
+            if (!playerCharacterEntity.Vending.Data.isOpen)
                 return;
             ServerUnsubscribe();
-            _store = playerCharacterEntity.Store;
+            _store = playerCharacterEntity.Vending;
             _store.AddCustomer(this);
         }
 
-        protected void AddCustomer(PlayerCharacterStoreComponent customer)
+        protected void AddCustomer(PlayerCharacterVendingComponent customer)
         {
             if (_customers.Add(customer))
                 NotifyItems(customer.ObjectId);
@@ -105,14 +105,14 @@ namespace MultiplayerARPG
             _store = null;
         }
 
-        protected void RemoveCustomer(PlayerCharacterStoreComponent customer)
+        protected void RemoveCustomer(PlayerCharacterVendingComponent customer)
         {
             _customers.Remove(customer);
         }
 
         protected void NotifyItems()
         {
-            foreach (PlayerCharacterStoreComponent comp in _customers)
+            foreach (PlayerCharacterVendingComponent comp in _customers)
             {
                 if (comp == null)
                     continue;
@@ -127,7 +127,7 @@ namespace MultiplayerARPG
         }
 
         [TargetRpc]
-        protected void TargetNotifyItems(uint objectId, PlayerStoreItems items)
+        protected void TargetNotifyItems(uint objectId, VendingItems items)
         {
             if (onUpdateItems != null)
                 onUpdateItems.Invoke(items);
@@ -144,7 +144,7 @@ namespace MultiplayerARPG
             _store.SellItem(this, index);
         }
 
-        protected void SellItem(PlayerCharacterStoreComponent buyer, int index)
+        protected void SellItem(PlayerCharacterVendingComponent buyer, int index)
         {
             if (buyer == null || index < 0 || index >= _items.Count)
             {
@@ -158,7 +158,7 @@ namespace MultiplayerARPG
             }
             _items.RemoveAt(index);
             if (_items.Count <= 0)
-                ServerCloseStore();
+                ServerStopVending();
         }
     }
 }

@@ -177,8 +177,8 @@ namespace MultiplayerARPG
         public UnityEvent onStorageDialogDisappear = new UnityEvent();
         public UnityEvent onEnterDealingState = new UnityEvent();
         public UnityEvent onExitDealingState = new UnityEvent();
-        public UnityEvent onOpenPlayerStoreDialogAppear = new UnityEvent();
-        public UnityEvent onOpenPlayerStoreDialogDisappear = new UnityEvent();
+        public UnityEvent onStartVendingDialogAppear = new UnityEvent();
+        public UnityEvent onStartVendingDialogDisappear = new UnityEvent();
 
         [Header("Options")]
         [Tooltip("UIs in this list will use cloned item data from this UI")]
@@ -201,7 +201,7 @@ namespace MultiplayerARPG
         protected bool isEnhanceSocketItemDialogAppeared;
         protected bool isStorageDialogAppeared;
         protected bool isDealingStateEntered;
-        protected bool isOpenPlayerStoreDialogAppeared;
+        protected bool isStartVendingDialogAppeared;
         protected float lockRemainsDuration;
         protected bool dirtyIsLock;
         protected float coolDownRemainsDuration;
@@ -404,7 +404,7 @@ namespace MultiplayerARPG
             UpdateEnhanceSocketUIVisibility(false);
             UpdateStorageUIVisibility(false);
             UpdateDealingState(false);
-            UpdateOpenPlayerStoreUIVisibility(false);
+            UpdateStartVendingUIVisibility(false);
         }
 
         protected override void UpdateData()
@@ -1195,7 +1195,7 @@ namespace MultiplayerARPG
             UpdateEnhanceSocketUIVisibility(true);
             UpdateStorageUIVisibility(true);
             UpdateDealingState(true);
-            UpdateOpenPlayerStoreUIVisibility(true);
+            UpdateStartVendingUIVisibility(true);
         }
 
         private void SetupAndShowUIComparingEquipment(int index, CharacterItem characterItem, InventoryType inventoryType, int indexOfData)
@@ -1445,36 +1445,36 @@ namespace MultiplayerARPG
             }
         }
 
-        private void UpdateOpenPlayerStoreUIVisibility(bool isInit)
+        private void UpdateStartVendingUIVisibility(bool isInit)
         {
             if (!IsOwningCharacter())
             {
-                if (isInit || isOpenPlayerStoreDialogAppeared)
+                if (isInit || isStartVendingDialogAppeared)
                 {
-                    isOpenPlayerStoreDialogAppeared = false;
-                    if (onOpenPlayerStoreDialogDisappear != null)
-                        onOpenPlayerStoreDialogDisappear.Invoke();
+                    isStartVendingDialogAppeared = false;
+                    if (onStartVendingDialogDisappear != null)
+                        onStartVendingDialogDisappear.Invoke();
                 }
                 return;
             }
             // Check visible item dialog
-            if (GameInstance.ItemUIVisibilityManager.IsOpenPlayerStoreDialogVisible() &&
+            if (GameInstance.ItemUIVisibilityManager.IsStartVendingDialogVisible() &&
                 InventoryType == InventoryType.NonEquipItems)
             {
-                if (isInit || !isOpenPlayerStoreDialogAppeared)
+                if (isInit || !isStartVendingDialogAppeared)
                 {
-                    isOpenPlayerStoreDialogAppeared = true;
-                    if (onOpenPlayerStoreDialogAppear != null)
-                        onOpenPlayerStoreDialogAppear.Invoke();
+                    isStartVendingDialogAppeared = true;
+                    if (onStartVendingDialogAppear != null)
+                        onStartVendingDialogAppear.Invoke();
                 }
             }
             else
             {
-                if (isInit || isOpenPlayerStoreDialogAppeared)
+                if (isInit || isStartVendingDialogAppeared)
                 {
-                    isOpenPlayerStoreDialogAppeared = false;
-                    if (onOpenPlayerStoreDialogDisappear != null)
-                        onOpenPlayerStoreDialogDisappear.Invoke();
+                    isStartVendingDialogAppeared = false;
+                    if (onStartVendingDialogDisappear != null)
+                        onStartVendingDialogDisappear.Invoke();
                 }
             }
         }
@@ -1906,8 +1906,8 @@ namespace MultiplayerARPG
         }
         #endregion
 
-        #region Set Player Store Item Functions
-        public void OnClickPutPlayerStoreItem()
+        #region Vending Functions
+        public void OnClickPutVendingItem()
         {
             // Only unequipped equipment can be offered
             if (!IsOwningCharacter() || InventoryType != InventoryType.NonEquipItems)
@@ -1915,36 +1915,36 @@ namespace MultiplayerARPG
 
             if (CharacterItem.amount == 1)
             {
-                OnPutPlayerStoreItemAmountConfirmed(1);
+                OnPutVendingItemAmountConfirmed(1);
             }
             else
             {
-                UISceneGlobal.Singleton.ShowInputDialog(LanguageManager.GetText(UITextKeys.UI_PUT_PLAYER_STORE_ITEM_AMOUNT.ToString()), LanguageManager.GetText(UITextKeys.UI_PUT_PLAYER_STORE_ITEM_AMOUNT_DESCRIPTION.ToString()), OnPutPlayerStoreItemAmountConfirmed, 1, CharacterItem.amount, CharacterItem.amount);
+                UISceneGlobal.Singleton.ShowInputDialog(LanguageManager.GetText(UITextKeys.UI_PUT_VENDING_ITEM_AMOUNT.ToString()), LanguageManager.GetText(UITextKeys.UI_PUT_VENDING_ITEM_AMOUNT_DESCRIPTION.ToString()), OnPutVendingItemAmountConfirmed, 1, CharacterItem.amount, CharacterItem.amount);
             }
         }
 
-        private void OnPutPlayerStoreItemAmountConfirmed(int amount)
+        private void OnPutVendingItemAmountConfirmed(int amount)
         {
-            UISceneGlobal.Singleton.ShowInputDialog(LanguageManager.GetText(UITextKeys.UI_PUT_PLAYER_STORE_ITEM_PRICE.ToString()), LanguageManager.GetText(UITextKeys.UI_PUT_PLAYER_STORE_ITEM_PRICE_DESCRIPTION.ToString()), (price) => OnPutPlayerStoreItemPriceConfirmed(amount, price), 0, int.MaxValue, 0);
+            UISceneGlobal.Singleton.ShowInputDialog(LanguageManager.GetText(UITextKeys.UI_PUT_VENDING_ITEM_PRICE.ToString()), LanguageManager.GetText(UITextKeys.UI_PUT_VENDING_ITEM_PRICE_DESCRIPTION.ToString()), (price) => OnPutVendingItemPriceConfirmed(amount, price), 0, int.MaxValue, 0);
         }
 
-        private void OnPutPlayerStoreItemPriceConfirmed(int amount, int price)
+        private void OnPutVendingItemPriceConfirmed(int amount, int price)
         {
             if (selectionManager != null)
                 selectionManager.DeselectSelectedUI();
-            UIOpenPlayerStore ui = FindObjectOfType<UIOpenPlayerStore>();
+            UIStartVending ui = FindObjectOfType<UIStartVending>();
             ui.PutItem(CharacterItem.id, amount, price);
         }
 
-        public void OnClickRemoveFromPlayerStore()
+        public void OnClickRemoveFromVending()
         {
-            UIOpenPlayerStore ui = FindObjectOfType<UIOpenPlayerStore>();
+            UIStartVending ui = FindObjectOfType<UIStartVending>();
             ui.RemoveItem(IndexOfData);
         }
 
-        public void OnClickBuyFromPlayerStore()
+        public void OnClickBuyFromVending()
         {
-            GameInstance.PlayingCharacterEntity.Store.BuyItem(IndexOfData);
+            GameInstance.PlayingCharacterEntity.Vending.BuyItem(IndexOfData);
         }
         #endregion
     }

@@ -9,7 +9,7 @@
         bool IsEnhanceSocketItemDialogVisible();
         bool IsStorageDialogVisible();
         bool IsDealingDialogVisibleWithDealingState();
-        bool IsOpenPlayerStoreDialogVisible();
+        bool IsStartVendingDialogVisible();
         void ShowRefineItemDialog(InventoryType inventoryType, int indexOfData);
         void ShowDismantleItemDialog(InventoryType inventoryType, int indexOfData);
         void ShowRepairItemDialog(InventoryType inventoryType, int indexOfData);

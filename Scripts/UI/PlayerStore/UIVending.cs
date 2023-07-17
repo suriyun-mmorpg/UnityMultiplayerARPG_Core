@@ -2,10 +2,10 @@ using UnityEngine;
 
 namespace MultiplayerARPG
 {
-    public class UIPlayerStore : UISelectionEntry<BasePlayerCharacterEntity>
+    public class UIVending : UISelectionEntry<BasePlayerCharacterEntity>
     {
-        public UIPlayerStoreItem uiSelectedItem;
-        public UIPlayerStoreItem uiItemPrefab;
+        public UIVendingItem uiSelectedItem;
+        public UIVendingItem uiItemPrefab;
         public Transform uiItemContainer;
 
         private UIList _itemList;
@@ -23,47 +23,47 @@ namespace MultiplayerARPG
             }
         }
 
-        private UIPlayerStoreItemSelectionManager _itemSelectionManager;
-        public UIPlayerStoreItemSelectionManager ItemSelectionManager
+        private UIVendingItemSelectionManager _itemSelectionManager;
+        public UIVendingItemSelectionManager ItemSelectionManager
         {
             get
             {
                 if (_itemSelectionManager == null)
-                    _itemSelectionManager = gameObject.GetOrAddComponent<UIPlayerStoreItemSelectionManager>();
+                    _itemSelectionManager = gameObject.GetOrAddComponent<UIVendingItemSelectionManager>();
                 _itemSelectionManager.selectionMode = UISelectionMode.Toggle;
                 return _itemSelectionManager;
             }
         }
 
-        private UISelectionManagerShowOnSelectEventManager<PlayerStoreItem, UIPlayerStoreItem> _itemListEventSetupManager = new UISelectionManagerShowOnSelectEventManager<PlayerStoreItem, UIPlayerStoreItem>();
+        private UISelectionManagerShowOnSelectEventManager<VendingItem, UIVendingItem> _itemListEventSetupManager = new UISelectionManagerShowOnSelectEventManager<VendingItem, UIVendingItem>();
 
         protected override void OnEnable()
         {
             base.OnEnable();
             _itemListEventSetupManager.OnEnable(ItemSelectionManager, uiSelectedItem);
-            GameInstance.PlayingCharacterEntity.Store.onUpdateItems += Store_onUpdateItems;
+            GameInstance.PlayingCharacterEntity.Vending.onUpdateItems += Store_onUpdateItems;
         }
 
         protected override void OnDisable()
         {
             base.OnDisable();
             _itemListEventSetupManager.OnDisable();
-            GameInstance.PlayingCharacterEntity.Store.onUpdateItems -= Store_onUpdateItems;
-            GameInstance.PlayingCharacterEntity.Store.Unsubscribe();
+            GameInstance.PlayingCharacterEntity.Vending.onUpdateItems -= Store_onUpdateItems;
+            GameInstance.PlayingCharacterEntity.Vending.Unsubscribe();
         }
 
-        private void Store_onUpdateItems(PlayerStoreItems items)
+        private void Store_onUpdateItems(VendingItems items)
         {
             UpdateItemList(items);
         }
 
-        public void UpdateItemList(PlayerStoreItems items)
+        public void UpdateItemList(VendingItems items)
         {
             ItemSelectionManager.Clear();
             ItemList.HideAll();
             ItemList.Generate(items, (index, data, ui) =>
             {
-                UIPlayerStoreItem uiComp = ui.GetComponent<UIPlayerStoreItem>();
+                UIVendingItem uiComp = ui.GetComponent<UIVendingItem>();
                 uiComp.Setup(data, Data, index);
                 if (index == 0)
                     uiComp.OnClickSelect();
@@ -74,7 +74,12 @@ namespace MultiplayerARPG
         {
             if (Data == null)
                 return;
-            GameInstance.PlayingCharacterEntity.Store.Subscribe(Data.ObjectId);
+            GameInstance.PlayingCharacterEntity.Vending.Subscribe(Data.ObjectId);
+        }
+
+        public void OnClickStop()
+        {
+            GameInstance.PlayingCharacterEntity.Vending.StopVending();
         }
     }
 }
