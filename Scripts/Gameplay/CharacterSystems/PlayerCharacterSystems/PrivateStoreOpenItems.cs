@@ -20,7 +20,7 @@ namespace MultiplayerARPG
             int count = reader.GetPackedInt();
             for (int i = 0; i < count; ++i)
             {
-                Add(reader.Get(() => new PrivateStoreOpenItem()));
+                Add(reader.Get<PrivateStoreOpenItem>());
             }
         }
     }
