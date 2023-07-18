@@ -119,12 +119,6 @@ namespace MultiplayerARPG
             _items[index] = item;
         }
 
-        public void Cancel(int index)
-        {
-            _items.RemoveAt(index);
-            UpdateItemList();
-        }
-
         public void OnClickStart()
         {
             GameInstance.PlayingCharacterEntity.Vending.StartVending(inputTitle.text, _items);

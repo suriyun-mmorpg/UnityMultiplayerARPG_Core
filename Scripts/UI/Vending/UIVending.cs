@@ -50,18 +50,26 @@ namespace MultiplayerARPG
         {
             base.OnEnable();
             _itemListEventSetupManager.OnEnable(ItemSelectionManager, uiSelectedItem);
-            GameInstance.PlayingCharacterEntity.Vending.onUpdateItems += Store_onUpdateItems;
+            GameInstance.PlayingCharacterEntity.Vending.onVendingDataChange += Vending_onVendingDataChange;
+            GameInstance.PlayingCharacterEntity.Vending.onUpdateItems += Vending_onUpdateItems;
         }
 
         protected override void OnDisable()
         {
             base.OnDisable();
             _itemListEventSetupManager.OnDisable();
-            GameInstance.PlayingCharacterEntity.Vending.onUpdateItems -= Store_onUpdateItems;
+            GameInstance.PlayingCharacterEntity.Vending.onVendingDataChange -= Vending_onVendingDataChange;
+            GameInstance.PlayingCharacterEntity.Vending.onUpdateItems -= Vending_onUpdateItems;
             GameInstance.PlayingCharacterEntity.Vending.Unsubscribe();
         }
 
-        private void Store_onUpdateItems(VendingItems items)
+        private void Vending_onVendingDataChange(VendingData data)
+        {
+            if (!data.isStarted)
+                Hide();
+        }
+
+        private void Vending_onUpdateItems(VendingItems items)
         {
             UpdateItemList(items);
         }
@@ -98,6 +106,7 @@ namespace MultiplayerARPG
         public void OnClickStop()
         {
             GameInstance.PlayingCharacterEntity.Vending.StopVending();
+            Hide();
         }
     }
 }

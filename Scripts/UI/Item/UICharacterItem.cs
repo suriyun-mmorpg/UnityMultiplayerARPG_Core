@@ -1907,7 +1907,7 @@ namespace MultiplayerARPG
         #endregion
 
         #region Vending Functions
-        public void OnClickPutVendingItem()
+        public void OnClickAddVendingItem()
         {
             // Only unequipped equipment can be offered
             if (!IsOwningCharacter() || InventoryType != InventoryType.NonEquipItems)
@@ -1931,13 +1931,13 @@ namespace MultiplayerARPG
             ui.AddItem(CharacterItem.id, amount, 0);
         }
 
-        public void OnClickRemoveFromVending()
+        public void OnClickRemoveVendingItem()
         {
             UIStartVending ui = FindObjectOfType<UIStartVending>();
             ui.RemoveItem(IndexOfData);
         }
 
-        public void OnClickBuyFromVending()
+        public void OnClickBuyVendingItem()
         {
             GameInstance.PlayingCharacterEntity.Vending.BuyItem(IndexOfData);
         }

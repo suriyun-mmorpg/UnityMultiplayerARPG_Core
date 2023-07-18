@@ -33,7 +33,7 @@ namespace MultiplayerARPG
                 inputPrice.onValueChanged.RemoveListener(OnInputPriceValueChanged);
                 inputPrice.onValueChanged.AddListener(OnInputPriceValueChanged);
                 inputPrice.contentType = InputField.ContentType.IntegerNumber;
-                inputPrice.text = Data.price.ToString();
+                inputPrice.SetTextWithoutNotify(Data.price.ToString());
             }
         }
 
@@ -59,7 +59,7 @@ namespace MultiplayerARPG
 
         public void OnClickCancel()
         {
-            uiStartVending.Cancel(IndexOfData);
+            uiStartVending.RemoveItem(IndexOfData);
         }
     }
 }
