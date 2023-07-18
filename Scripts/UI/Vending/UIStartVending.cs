@@ -44,6 +44,8 @@ namespace MultiplayerARPG
             _itemListEventSetupManager.OnEnable(ItemSelectionManager, uiSelectedItem);
             inputTitle.text = string.Empty;
             _items.Clear();
+            ItemSelectionManager.Clear();
+            ItemList.HideAll();
         }
 
         private void OnDisable()
