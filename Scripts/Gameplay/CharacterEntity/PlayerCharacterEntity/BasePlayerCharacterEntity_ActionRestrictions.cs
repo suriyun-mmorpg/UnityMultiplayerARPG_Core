@@ -9,14 +9,14 @@ namespace MultiplayerARPG
             get { return Dealing.DealingState != DealingState.None; }
         }
 
-        public bool IsStoreOpen
+        public bool IsVendingStarted
         {
-            get { return Vending.Data.isOpen; }
+            get { return Vending.Data.isStarted; }
         }
 
         public override bool CanDoActions()
         {
-            return base.CanDoActions() && Dealing.DealingState == DealingState.None && !Vending.Data.isOpen && !IsWarping;
+            return base.CanDoActions() && Dealing.DealingState == DealingState.None && !Vending.Data.isStarted && !IsWarping;
         }
 
         public override bool CanEquipItem()
@@ -168,7 +168,7 @@ namespace MultiplayerARPG
                 return false;
             if (IsDealing)
                 return false;
-            if (IsStoreOpen)
+            if (IsVendingStarted)
                 return false;
             return base.CanUseItem();
         }

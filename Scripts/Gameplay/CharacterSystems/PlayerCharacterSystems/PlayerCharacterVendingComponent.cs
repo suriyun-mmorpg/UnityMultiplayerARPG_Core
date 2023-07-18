@@ -17,6 +17,25 @@ namespace MultiplayerARPG
         protected VendingItems _items = new VendingItems();
 
         public event System.Action<VendingItems> onUpdateItems;
+        public event System.Action<VendingData> onVendingDataChange;
+
+        public override void OnSetup()
+        {
+            base.OnSetup();
+            data.onChange += OnDataChange;
+        }
+
+        public override void EntityOnDestroy()
+        {
+            base.EntityOnDestroy();
+            data.onChange -= OnDataChange;
+        }
+
+        protected void OnDataChange(bool isInitial, VendingData data)
+        {
+            if (onVendingDataChange != null)
+                onVendingDataChange.Invoke(data);
+        }
 
         public void StartVending(string title, StartVendingItems items)
         {
@@ -28,7 +47,7 @@ namespace MultiplayerARPG
         {
             data.Value = new VendingData()
             {
-                isOpen = true,
+                isStarted = true,
                 title = title,
             };
             _items.Clear();
@@ -78,7 +97,7 @@ namespace MultiplayerARPG
             BasePlayerCharacterEntity playerCharacterEntity;
             if (!Manager.TryGetEntityByObjectId(objectId, out playerCharacterEntity))
                 return;
-            if (!playerCharacterEntity.Vending.Data.isOpen)
+            if (!playerCharacterEntity.Vending.Data.isStarted)
                 return;
             ServerUnsubscribe();
             _store = playerCharacterEntity.Vending;

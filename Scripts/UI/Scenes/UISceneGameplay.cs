@@ -828,40 +828,48 @@ namespace MultiplayerARPG
                 _openedNpcDialogs.Add(npcDialog);
         }
 
-        public override void OnControllerSetup(BasePlayerCharacterEntity characterEntity)
+        public override void OnControllerSetup(BasePlayerCharacterEntity playerCharacter)
         {
-            characterEntity.NpcAction.onShowQuestRewardItemSelection += ShowQuestRewardItemSelection;
-            characterEntity.NpcAction.onShowNpcDialog += ShowNpcDialog;
-            characterEntity.NpcAction.onShowNpcRefineItem += OnShowNpcRefineItem;
-            characterEntity.NpcAction.onShowNpcDismantleItem += OnShowNpcDismantleItem;
-            characterEntity.NpcAction.onShowNpcRepairItem += OnShowNpcRepairItem;
-            characterEntity.Dealing.onRequestDealing += OnShowDealingRequest;
-            characterEntity.Dealing.onStartDealing += OnShowDealing;
-            characterEntity.Dueling.onRequestDueling += OnShowDuelingRequest;
-            characterEntity.Dueling.onStartDueling += OnShowDueling;
-            characterEntity.onIsWarpingChange += OnIsWarpingChange;
-            characterEntity.onDead.AddListener(OnCharacterDead);
-            characterEntity.onRespawn.AddListener(OnCharacterRespawn);
+            playerCharacter.NpcAction.onShowQuestRewardItemSelection += ShowQuestRewardItemSelection;
+            playerCharacter.NpcAction.onShowNpcDialog += ShowNpcDialog;
+            playerCharacter.NpcAction.onShowNpcRefineItem += OnShowNpcRefineItem;
+            playerCharacter.NpcAction.onShowNpcDismantleItem += OnShowNpcDismantleItem;
+            playerCharacter.NpcAction.onShowNpcRepairItem += OnShowNpcRepairItem;
+            playerCharacter.Dealing.onRequestDealing += OnShowDealingRequest;
+            playerCharacter.Dealing.onStartDealing += OnShowDealing;
+            playerCharacter.Dueling.onRequestDueling += OnShowDuelingRequest;
+            playerCharacter.Dueling.onStartDueling += OnShowDueling;
+            playerCharacter.onIsWarpingChange += OnIsWarpingChange;
+            playerCharacter.onDead.AddListener(OnCharacterDead);
+            playerCharacter.onRespawn.AddListener(OnCharacterRespawn);
             ClientPartyActions.onNotifyPartyInvitation += OnNotifyPartyInvitation;
             ClientGuildActions.onNotifyGuildInvitation += OnNotifyGuildInvitation;
         }
 
-        public override void OnControllerDesetup(BasePlayerCharacterEntity characterEntity)
+        public override void OnControllerDesetup(BasePlayerCharacterEntity playerCharacter)
         {
-            characterEntity.NpcAction.onShowQuestRewardItemSelection -= ShowQuestRewardItemSelection;
-            characterEntity.NpcAction.onShowNpcDialog -= ShowNpcDialog;
-            characterEntity.NpcAction.onShowNpcRefineItem -= OnShowNpcRefineItem;
-            characterEntity.NpcAction.onShowNpcDismantleItem -= OnShowNpcDismantleItem;
-            characterEntity.NpcAction.onShowNpcRepairItem -= OnShowNpcRepairItem;
-            characterEntity.Dealing.onRequestDealing -= OnShowDealingRequest;
-            characterEntity.Dealing.onStartDealing -= OnShowDealing;
-            characterEntity.Dueling.onRequestDueling -= OnShowDuelingRequest;
-            characterEntity.Dueling.onStartDueling -= OnShowDueling;
-            characterEntity.onIsWarpingChange -= OnIsWarpingChange;
-            characterEntity.onDead.RemoveListener(OnCharacterDead);
-            characterEntity.onRespawn.RemoveListener(OnCharacterRespawn);
+            playerCharacter.NpcAction.onShowQuestRewardItemSelection -= ShowQuestRewardItemSelection;
+            playerCharacter.NpcAction.onShowNpcDialog -= ShowNpcDialog;
+            playerCharacter.NpcAction.onShowNpcRefineItem -= OnShowNpcRefineItem;
+            playerCharacter.NpcAction.onShowNpcDismantleItem -= OnShowNpcDismantleItem;
+            playerCharacter.NpcAction.onShowNpcRepairItem -= OnShowNpcRepairItem;
+            playerCharacter.Dealing.onRequestDealing -= OnShowDealingRequest;
+            playerCharacter.Dealing.onStartDealing -= OnShowDealing;
+            playerCharacter.Dueling.onRequestDueling -= OnShowDuelingRequest;
+            playerCharacter.Dueling.onStartDueling -= OnShowDueling;
+            playerCharacter.onIsWarpingChange -= OnIsWarpingChange;
+            playerCharacter.onDead.RemoveListener(OnCharacterDead);
+            playerCharacter.onRespawn.RemoveListener(OnCharacterRespawn);
             ClientPartyActions.onNotifyPartyInvitation -= OnNotifyPartyInvitation;
             ClientGuildActions.onNotifyGuildInvitation -= OnNotifyGuildInvitation;
+        }
+
+        public override void ShowVending(BasePlayerCharacterEntity playerCharacter)
+        {
+            if (!playerCharacter.Vending.Data.isStarted)
+                return;
+            uiVending.Data = playerCharacter;
+            uiVending.Show();
         }
     }
 }

@@ -6,20 +6,20 @@ namespace MultiplayerARPG
     [System.Serializable]
     public struct VendingData : INetSerializable
     {
-        public bool isOpen;
+        public bool isStarted;
         public string title;
 
         public void Deserialize(NetDataReader reader)
         {
-            isOpen = reader.GetBool();
-            if (isOpen)
+            isStarted = reader.GetBool();
+            if (isStarted)
                 title = reader.GetString();
         }
 
         public void Serialize(NetDataWriter writer)
         {
-            writer.Put(isOpen);
-            if (isOpen)
+            writer.Put(isStarted);
+            if (isStarted)
                 writer.Put(title);
         }
     }

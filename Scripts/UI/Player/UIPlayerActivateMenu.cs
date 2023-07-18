@@ -12,6 +12,8 @@ namespace MultiplayerARPG
         public GameObject[] partyInviteObjects;
         [Tooltip("These objects will be activated when owning character can invite to join guild")]
         public GameObject[] guildInviteObjects;
+        [Tooltip("These objects will be activated when owning character can see vending")]
+        public GameObject[] vendingObjects;
 
         protected override void UpdateUI()
         {
@@ -30,6 +32,11 @@ namespace MultiplayerARPG
             {
                 if (obj != null)
                     obj.SetActive(Data.GuildId <= 0 && GameInstance.JoinedGuild != null && GameInstance.JoinedGuild.CanInvite(GameInstance.PlayingCharacter.Id));
+            }
+            foreach (GameObject obj in vendingObjects)
+            {
+                if (obj != null)
+                    obj.SetActive(Data.Vending.Data.isStarted);
             }
         }
 
@@ -84,6 +91,11 @@ namespace MultiplayerARPG
             if (responseCode.ShowUnhandledResponseMessageDialog(response.message))
                 return;
             Hide();
+        }
+
+        public void OnClickVending()
+        {
+            BaseUISceneGameplay.Singleton.ShowVending(Data);
         }
     }
 }
