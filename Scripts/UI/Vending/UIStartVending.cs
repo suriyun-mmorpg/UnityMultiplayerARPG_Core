@@ -123,6 +123,11 @@ namespace MultiplayerARPG
 
         public void OnClickStart()
         {
+            if (_items.Count <= 0)
+            {
+                // TODO: Show error
+                return;
+            }
             GameInstance.PlayingCharacterEntity.Vending.StartVending(inputTitle.text, _items);
             Hide();
         }

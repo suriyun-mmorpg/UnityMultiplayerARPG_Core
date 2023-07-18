@@ -45,11 +45,11 @@ namespace MultiplayerARPG
         [ServerRpc]
         protected void ServerStartVending(string title, StartVendingItems items)
         {
-            data.Value = new VendingData()
+            if (items.Count <= 0)
             {
-                isStarted = true,
-                title = title,
-            };
+                // TODO: Show error
+                return;
+            }
             _items.Clear();
             foreach (StartVendingItem item in items)
             {
@@ -66,6 +66,16 @@ namespace MultiplayerARPG
                     price = item.price,
                 });
             }
+            if (_items.Count <= 0)
+            {
+                // TODO: Show error
+                return;
+            }
+            data.Value = new VendingData()
+            {
+                isStarted = true,
+                title = title,
+            };
         }
 
         public void StopVending()
@@ -183,12 +193,17 @@ namespace MultiplayerARPG
                 GameInstance.ServerGameMessageHandlers.SendGameMessage(buyer.ConnectionId, UITextKeys.UI_ERROR_INVALID_ITEM_DATA);
                 return;
             }
-            if (!buyer.Entity.IncreaseItems(sellingItem))
+            if (buyer.Entity.IncreasingItemsWillOverwhelming(new List<CharacterItem> { sellingItem }))
             {
                 GameInstance.ServerGameMessageHandlers.SendGameMessage(buyer.ConnectionId, UITextKeys.UI_ERROR_WILL_OVERWHELMING);
                 return;
             }
-            Entity.DecreaseItemsByIndex(inventoryItemIndex, sellingItem.amount, true);
+            if (!Entity.DecreaseItemsByIndex(inventoryItemIndex, sellingItem.amount, true))
+            {
+                GameInstance.ServerGameMessageHandlers.SendGameMessage(ConnectionId, UITextKeys.UI_ERROR_NOT_ENOUGH_ITEMS);
+                return;
+            }
+            buyer.Entity.IncreaseItems(sellingItem);
             GameInstance.ServerGameMessageHandlers.NotifyRewardItem(buyer.ConnectionId, RewardGivenType.Vending, sellingItem.dataId, sellingItem.amount);
 
             buyer.Entity.Gold -= price;
