@@ -14,5 +14,6 @@
         PlayerDead,
         BuildingDrop,
         BuildingDestroyed,
+        Vending,
     }
 }
