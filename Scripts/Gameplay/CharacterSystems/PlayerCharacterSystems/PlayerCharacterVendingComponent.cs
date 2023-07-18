@@ -192,7 +192,7 @@ namespace MultiplayerARPG
             GameInstance.ServerGameMessageHandlers.NotifyRewardItem(buyer.ConnectionId, RewardGivenType.Vending, sellingItem.dataId, sellingItem.amount);
 
             buyer.Entity.Gold -= price;
-            Entity.Gold.Increase(price);
+            Entity.Gold = Entity.Gold.Increase(price);
             GameInstance.ServerGameMessageHandlers.NotifyRewardGold(ConnectionId, RewardGivenType.Vending, price);
             _items.RemoveAt(index);
             if (_items.Count <= 0)
