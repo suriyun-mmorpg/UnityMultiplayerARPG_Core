@@ -53,7 +53,7 @@ namespace MultiplayerARPG
             _items.Clear();
             foreach (StartVendingItem item in items)
             {
-                if (string.IsNullOrEmpty(item.id) || item.amount <= 0 || item.price <= 0)
+                if (string.IsNullOrEmpty(item.id) || item.amount <= 0)
                     continue;
                 int index = Entity.NonEquipItems.IndexOf(item.id);
                 if (index < 0)
@@ -107,7 +107,7 @@ namespace MultiplayerARPG
         protected void AddCustomer(PlayerCharacterVendingComponent customer)
         {
             if (_customers.Add(customer))
-                NotifyItems(customer.ObjectId);
+                NotifyItems(customer.ConnectionId);
         }
 
         public void Unsubscribe()
@@ -135,18 +135,18 @@ namespace MultiplayerARPG
             {
                 if (comp == null)
                     continue;
-                NotifyItems(comp.ObjectId);
+                NotifyItems(comp.ConnectionId);
             }
-            NotifyItems(ObjectId);
+            NotifyItems(ConnectionId);
         }
 
-        protected void NotifyItems(uint objectId)
+        protected void NotifyItems(long connectionId)
         {
-            RPC(TargetNotifyItems, objectId, _items);
+            RPC(TargetNotifyItems, connectionId, _items);
         }
 
         [TargetRpc]
-        protected void TargetNotifyItems(uint objectId, VendingItems items)
+        protected void TargetNotifyItems(VendingItems items)
         {
             if (onUpdateItems != null)
                 onUpdateItems.Invoke(items);
@@ -170,14 +170,41 @@ namespace MultiplayerARPG
                 GameInstance.ServerGameMessageHandlers.SendGameMessage(buyer.ConnectionId, UITextKeys.UI_ERROR_INVALID_ITEM_INDEX);
                 return;
             }
-            if (buyer.Entity.Gold < _items[index].price)
+            int price = _items[index].price;
+            if (buyer.Entity.Gold < price)
             {
                 GameInstance.ServerGameMessageHandlers.SendGameMessage(buyer.ConnectionId, UITextKeys.UI_ERROR_NOT_ENOUGH_GOLD);
                 return;
             }
+            CharacterItem sellingItem = _items[index].item;
+            int inventoryItemIndex = Entity.NonEquipItems.IndexOf(sellingItem.id);
+            if (inventoryItemIndex < 0)
+            {
+                GameInstance.ServerGameMessageHandlers.SendGameMessage(buyer.ConnectionId, UITextKeys.UI_ERROR_INVALID_ITEM_DATA);
+                return;
+            }
+            if (!buyer.Entity.IncreaseItems(sellingItem))
+            {
+                GameInstance.ServerGameMessageHandlers.SendGameMessage(buyer.ConnectionId, UITextKeys.UI_ERROR_WILL_OVERWHELMING);
+                return;
+            }
+            Entity.DecreaseItemsByIndex(inventoryItemIndex, sellingItem.amount, true);
+            GameInstance.ServerGameMessageHandlers.NotifyRewardItem(buyer.ConnectionId, RewardGivenType.Vending, sellingItem.dataId, sellingItem.amount);
+
+            buyer.Entity.Gold -= price;
+            Entity.Gold.Increase(price);
+            GameInstance.ServerGameMessageHandlers.NotifyRewardGold(ConnectionId, RewardGivenType.Vending, price);
             _items.RemoveAt(index);
             if (_items.Count <= 0)
+            {
+                // No item to sell anymore
                 ServerStopVending();
+            }
+            else
+            {
+                // Update items to customer
+                NotifyItems();
+            }
         }
     }
 }
