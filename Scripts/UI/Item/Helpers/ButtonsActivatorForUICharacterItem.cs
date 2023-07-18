@@ -17,8 +17,9 @@ namespace MultiplayerARPG
         public Button buttonOffer;
         public Button buttonMoveToStorage;
         public Button buttonMoveFromStorage;
-        public Button buttonPickUpFromContainer;
         public Button buttonDrop;
+        public Button buttonPickUpFromContainer;
+        public Button buttonAddVendingItem;
         private UICharacterItem ui;
 
         private void Start()
@@ -43,6 +44,8 @@ namespace MultiplayerARPG
             ui.onStorageDialogDisappear.AddListener(OnStorageDialogDisappear);
             ui.onEnterDealingState.AddListener(OnEnterDealingState);
             ui.onExitDealingState.AddListener(OnExitDealingState);
+            ui.onStartVendingDialogAppear.AddListener(OnStartVendingDialogAppear);
+            ui.onStartVendingDialogDisappear.AddListener(OnStartVendingDialogDisappear);
             // Refresh UI data to applies events
             ui.ForceUpdate();
         }
@@ -73,6 +76,8 @@ namespace MultiplayerARPG
                 buttonMoveFromStorage.gameObject.SetActive(false);
             if (buttonDrop)
                 buttonDrop.gameObject.SetActive(false);
+            if (buttonAddVendingItem)
+                buttonAddVendingItem.gameObject.SetActive(false);
             if (buttonPickUpFromContainer)
                 buttonPickUpFromContainer.gameObject.SetActive(false);
         }
@@ -233,6 +238,18 @@ namespace MultiplayerARPG
         {
             if (buttonOffer)
                 buttonOffer.gameObject.SetActive(false);
+        }
+
+        public void OnStartVendingDialogAppear()
+        {
+            if (buttonAddVendingItem)
+                buttonAddVendingItem.gameObject.SetActive(true);
+        }
+
+        public void OnStartVendingDialogDisappear()
+        {
+            if (buttonAddVendingItem)
+                buttonAddVendingItem.gameObject.SetActive(false);
         }
     }
 }
