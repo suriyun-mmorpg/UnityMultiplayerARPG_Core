@@ -122,7 +122,6 @@ namespace MultiplayerARPG
             ItemList.HideAll();
             GameInstance.PlayingCharacterEntity.Vending.Subscribe(Data.ObjectId);
 
-            Debug.LogError(Data.IsOwnerClient);
             foreach (GameObject obj in ownerObjects)
             {
                 obj.SetActive(Data.IsOwnerClient);
