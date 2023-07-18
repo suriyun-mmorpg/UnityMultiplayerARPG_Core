@@ -1925,15 +1925,10 @@ namespace MultiplayerARPG
 
         private void OnPutVendingItemAmountConfirmed(int amount)
         {
-            UISceneGlobal.Singleton.ShowInputDialog(LanguageManager.GetText(UITextKeys.UI_PUT_VENDING_ITEM_PRICE.ToString()), LanguageManager.GetText(UITextKeys.UI_PUT_VENDING_ITEM_PRICE_DESCRIPTION.ToString()), (price) => OnPutVendingItemPriceConfirmed(amount, price), 0, int.MaxValue, 0);
-        }
-
-        private void OnPutVendingItemPriceConfirmed(int amount, int price)
-        {
             if (selectionManager != null)
                 selectionManager.DeselectSelectedUI();
             UIStartVending ui = FindObjectOfType<UIStartVending>();
-            ui.PutItem(CharacterItem.id, amount, price);
+            ui.AddItem(CharacterItem.id, amount, 0);
         }
 
         public void OnClickRemoveFromVending()

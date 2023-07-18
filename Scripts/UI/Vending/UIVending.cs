@@ -1,12 +1,21 @@
+using Cysharp.Text;
 using UnityEngine;
 
 namespace MultiplayerARPG
 {
     public class UIVending : UISelectionEntry<BasePlayerCharacterEntity>
     {
+        [Header("String Formats")]
+        [Tooltip("Format => {0} = {Title}")]
+        public UILocaleKeySetting formatKeyTitle = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_SIMPLE);
+
+        [Header("UI Elements")]
+        public TextWrapper textTitle;
         public UIVendingItem uiSelectedItem;
         public UIVendingItem uiItemPrefab;
         public Transform uiItemContainer;
+        public GameObject[] ownerObjects;
+        public GameObject[] nonOwnerObjects;
 
         private UIList _itemList;
         public UIList ItemList
@@ -74,6 +83,15 @@ namespace MultiplayerARPG
         {
             if (Data == null)
                 return;
+
+            if (textTitle != null)
+            {
+                textTitle.text = ZString.Format(
+                    LanguageManager.GetText(formatKeyTitle),
+                    Data == null ? LanguageManager.GetUnknowTitle() : Data.Vending.Data.title);
+            }
+            ItemSelectionManager.Clear();
+            ItemList.HideAll();
             GameInstance.PlayingCharacterEntity.Vending.Subscribe(Data.ObjectId);
         }
 
