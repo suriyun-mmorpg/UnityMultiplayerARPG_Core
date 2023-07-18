@@ -45,22 +45,34 @@ namespace MultiplayerARPG
         }
 
         private UISelectionManagerShowOnSelectEventManager<VendingItem, UIVendingItem> _itemListEventSetupManager = new UISelectionManagerShowOnSelectEventManager<VendingItem, UIVendingItem>();
+        private BasePlayerCharacterEntity _entity;
 
         protected override void OnEnable()
         {
             base.OnEnable();
             _itemListEventSetupManager.OnEnable(ItemSelectionManager, uiSelectedItem);
-            GameInstance.PlayingCharacterEntity.Vending.onVendingDataChange += Vending_onVendingDataChange;
-            GameInstance.PlayingCharacterEntity.Vending.onUpdateItems += Vending_onUpdateItems;
         }
 
         protected override void OnDisable()
         {
             base.OnDisable();
             _itemListEventSetupManager.OnDisable();
-            GameInstance.PlayingCharacterEntity.Vending.onVendingDataChange -= Vending_onVendingDataChange;
-            GameInstance.PlayingCharacterEntity.Vending.onUpdateItems -= Vending_onUpdateItems;
+            if (_entity != null)
+            {
+                _entity.Vending.onVendingDataChange -= Vending_onVendingDataChange;
+                _entity.Vending.onUpdateItems -= Vending_onUpdateItems;
+            }
             GameInstance.PlayingCharacterEntity.Vending.Unsubscribe();
+
+            foreach (GameObject obj in ownerObjects)
+            {
+                obj.SetActive(false);
+            }
+
+            foreach (GameObject obj in nonOwnerObjects)
+            {
+                obj.SetActive(false);
+            }
         }
 
         private void Vending_onVendingDataChange(VendingData data)
@@ -89,8 +101,16 @@ namespace MultiplayerARPG
 
         protected override void UpdateData()
         {
-            if (Data == null)
+            if (_entity != null)
+            {
+                _entity.Vending.onVendingDataChange -= Vending_onVendingDataChange;
+                _entity.Vending.onUpdateItems -= Vending_onUpdateItems;
+            }
+            _entity = Data;
+            if (_entity == null)
                 return;
+            _entity.Vending.onVendingDataChange += Vending_onVendingDataChange;
+            _entity.Vending.onUpdateItems += Vending_onUpdateItems;
 
             if (textTitle != null)
             {
@@ -101,6 +121,17 @@ namespace MultiplayerARPG
             ItemSelectionManager.Clear();
             ItemList.HideAll();
             GameInstance.PlayingCharacterEntity.Vending.Subscribe(Data.ObjectId);
+
+            Debug.LogError(Data.IsOwnerClient);
+            foreach (GameObject obj in ownerObjects)
+            {
+                obj.SetActive(Data.IsOwnerClient);
+            }
+
+            foreach (GameObject obj in nonOwnerObjects)
+            {
+                obj.SetActive(!Data.IsOwnerClient);
+            }
         }
 
         public void OnClickStop()
