@@ -12,6 +12,8 @@ namespace MultiplayerARPG
     public abstract partial class BaseGameEntity : LiteNetLibBehaviour, IGameEntity, IEntityMovement
     {
         public const byte STATE_DATA_CHANNEL = 3;
+        protected static readonly NetDataWriter s_EntityStateMessageWriter = new NetDataWriter();
+        protected static readonly NetDataWriter s_EntityStateDataWriter = new NetDataWriter();
 
         public int EntityId
         {
@@ -150,8 +152,6 @@ namespace MultiplayerARPG
                 return true;
             }
         }
-        protected NetDataWriter EntityStateMessageWriter { get; private set; } = new NetDataWriter();
-        protected NetDataWriter EntityStateDataWriter { get; private set; } = new NetDataWriter();
 
         protected bool _dirtyIsHide;
         protected bool _isTeleporting;
@@ -398,13 +398,13 @@ namespace MultiplayerARPG
             if (Movement != null && Movement.Enabled)
             {
                 bool shouldSendReliably;
-                EntityStateDataWriter.Reset();
-                if (Movement.WriteClientState(EntityStateDataWriter, out shouldSendReliably))
+                s_EntityStateDataWriter.Reset();
+                if (Movement.WriteClientState(s_EntityStateDataWriter, out shouldSendReliably))
                 {
-                    TransportHandler.WritePacket(EntityStateMessageWriter, GameNetworkingConsts.EntityState);
-                    EntityStateMessageWriter.PutPackedUInt(ObjectId);
-                    EntityStateMessageWriter.Put(EntityStateDataWriter.Data, 0, EntityStateDataWriter.Length);
-                    ClientSendMessage(STATE_DATA_CHANNEL, shouldSendReliably ? DeliveryMethod.ReliableOrdered : DeliveryMethod.Sequenced, EntityStateMessageWriter);
+                    TransportHandler.WritePacket(s_EntityStateMessageWriter, GameNetworkingConsts.EntityState);
+                    s_EntityStateMessageWriter.PutPackedUInt(ObjectId);
+                    s_EntityStateMessageWriter.Put(s_EntityStateDataWriter.Data, 0, s_EntityStateDataWriter.Length);
+                    ClientSendMessage(STATE_DATA_CHANNEL, shouldSendReliably ? DeliveryMethod.ReliableOrdered : DeliveryMethod.Sequenced, s_EntityStateMessageWriter);
                 }
             }
         }
@@ -414,13 +414,13 @@ namespace MultiplayerARPG
             if (Movement != null && Movement.Enabled)
             {
                 bool shouldSendReliably;
-                EntityStateDataWriter.Reset();
-                if (Movement.WriteServerState(EntityStateDataWriter, out shouldSendReliably))
+                s_EntityStateDataWriter.Reset();
+                if (Movement.WriteServerState(s_EntityStateDataWriter, out shouldSendReliably))
                 {
-                    TransportHandler.WritePacket(EntityStateMessageWriter, GameNetworkingConsts.EntityState);
-                    EntityStateMessageWriter.PutPackedUInt(ObjectId);
-                    EntityStateMessageWriter.Put(EntityStateDataWriter.Data, 0, EntityStateDataWriter.Length);
-                    ServerSendMessageToSubscribers(STATE_DATA_CHANNEL, shouldSendReliably ? DeliveryMethod.ReliableOrdered : DeliveryMethod.Sequenced, EntityStateMessageWriter);
+                    TransportHandler.WritePacket(s_EntityStateMessageWriter, GameNetworkingConsts.EntityState);
+                    s_EntityStateMessageWriter.PutPackedUInt(ObjectId);
+                    s_EntityStateMessageWriter.Put(s_EntityStateDataWriter.Data, 0, s_EntityStateDataWriter.Length);
+                    ServerSendMessageToSubscribers(STATE_DATA_CHANNEL, shouldSendReliably ? DeliveryMethod.ReliableOrdered : DeliveryMethod.Sequenced, s_EntityStateMessageWriter);
                 }
             }
         }

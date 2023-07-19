@@ -20,6 +20,8 @@ namespace MultiplayerARPG
         public const string INSTANTIATES_OBJECTS_DELAY_STATE_KEY = "INSTANTIATES_OBJECTS_DELAY";
         public const float INSTANTIATES_OBJECTS_DELAY = 0.5f;
 
+        protected static readonly NetDataWriter s_Writer = new NetDataWriter();
+
         public static BaseGameNetworkManager Singleton { get; protected set; }
         protected GameInstance CurrentGameInstance { get { return GameInstance.Singleton; } }
         // Server Handlers
@@ -1115,39 +1117,39 @@ namespace MultiplayerARPG
         {
             if (!IsServer)
                 return;
-            NetDataWriter writer = new NetDataWriter();
-            writer.Put(new ChatMessage()
+            s_Writer.Reset();
+            s_Writer.Put(new ChatMessage()
             {
                 channel = ChatChannel.System,
                 senderName = CHAT_SYSTEM_ANNOUNCER_SENDER,
                 message = message,
                 sendByServer = true,
             });
-            HandleChatAtServer(new MessageHandlerData(GameNetworkingConsts.Chat, Server, -1, new NetDataReader(writer.Data)));
+            HandleChatAtServer(new MessageHandlerData(GameNetworkingConsts.Chat, Server, -1, new NetDataReader(s_Writer.Data)));
         }
 
         public void ServerSendLocalMessage(string sender, string message)
         {
             if (!IsServer)
                 return;
-            NetDataWriter writer = new NetDataWriter();
-            writer.Put(new ChatMessage()
+            s_Writer.Reset();
+            s_Writer.Put(new ChatMessage()
             {
                 channel = ChatChannel.Local,
                 senderName = sender,
                 message = message,
                 sendByServer = true,
             });
-            HandleChatAtServer(new MessageHandlerData(GameNetworkingConsts.Chat, Server, -1, new NetDataReader(writer.Data)));
+            HandleChatAtServer(new MessageHandlerData(GameNetworkingConsts.Chat, Server, -1, new NetDataReader(s_Writer.Data)));
         }
 
         public void KickClient(long connectionId, UITextKeys message)
         {
             if (!IsServer)
                 return;
-            NetDataWriter writer = new NetDataWriter();
-            writer.PutPackedUShort((ushort)message);
-            KickClient(connectionId, writer.Data);
+            s_Writer.Reset();
+            s_Writer.PutPackedUShort((ushort)message);
+            KickClient(connectionId, s_Writer.Data);
         }
     }
 }

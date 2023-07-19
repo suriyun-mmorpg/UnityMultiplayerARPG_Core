@@ -391,33 +391,33 @@ namespace MultiplayerARPG
         {
             bool shouldSendReliably = false;
             CharacterInputState inputState = CharacterInputState.None;
-            EntityStateDataWriter.Reset();
+            s_EntityStateDataWriter.Reset();
             // Actions (can do only 1 action)
-            if (AttackComponent.WriteClientAttackState(EntityStateDataWriter))
+            if (AttackComponent.WriteClientAttackState(s_EntityStateDataWriter))
                 inputState |= CharacterInputState.IsAttacking;
-            else if (UseSkillComponent.WriteClientUseSkillInterruptedState(EntityStateDataWriter))
+            else if (UseSkillComponent.WriteClientUseSkillInterruptedState(s_EntityStateDataWriter))
                 inputState |= CharacterInputState.IsUsingSkillInterrupted;
-            else if (UseSkillComponent.WriteClientUseSkillItemState(EntityStateDataWriter))
+            else if (UseSkillComponent.WriteClientUseSkillItemState(s_EntityStateDataWriter))
                 inputState |= CharacterInputState.IsUsingSkillItem;
-            else if (UseSkillComponent.WriteClientUseSkillState(EntityStateDataWriter))
+            else if (UseSkillComponent.WriteClientUseSkillState(s_EntityStateDataWriter))
                 inputState |= CharacterInputState.IsUsingSkill;
-            else if (ReloadComponent.WriteClientReloadState(EntityStateDataWriter))
+            else if (ReloadComponent.WriteClientReloadState(s_EntityStateDataWriter))
                 inputState |= CharacterInputState.IsReloading;
-            else if (ChargeComponent.WriteClientStopChargeState(EntityStateDataWriter))
+            else if (ChargeComponent.WriteClientStopChargeState(s_EntityStateDataWriter))
                 inputState |= CharacterInputState.IsChargeStopping;
-            else if (ChargeComponent.WriteClientStartChargeState(EntityStateDataWriter))
+            else if (ChargeComponent.WriteClientStartChargeState(s_EntityStateDataWriter))
                 inputState |= CharacterInputState.IsChargeStarting;
             // Movement
-            if (!Movement.IsNull() && Movement.Enabled && Movement.WriteClientState(EntityStateDataWriter, out shouldSendReliably))
+            if (!Movement.IsNull() && Movement.Enabled && Movement.WriteClientState(s_EntityStateDataWriter, out shouldSendReliably))
                 inputState |= CharacterInputState.IsMoving;
             // Set input state and send to clients
             if (inputState != CharacterInputState.None)
             {
-                TransportHandler.WritePacket(EntityStateMessageWriter, GameNetworkingConsts.EntityState);
-                EntityStateMessageWriter.PutPackedUInt(ObjectId);
-                EntityStateMessageWriter.PutPackedUShort((ushort)inputState);
-                EntityStateMessageWriter.Put(EntityStateDataWriter.Data, 0, EntityStateDataWriter.Length);
-                ClientSendMessage(STATE_DATA_CHANNEL, (shouldSendReliably || (ushort)inputState > 1 << 0) ? DeliveryMethod.ReliableOrdered : DeliveryMethod.Sequenced, EntityStateMessageWriter);
+                TransportHandler.WritePacket(s_EntityStateMessageWriter, GameNetworkingConsts.EntityState);
+                s_EntityStateMessageWriter.PutPackedUInt(ObjectId);
+                s_EntityStateMessageWriter.PutPackedUShort((ushort)inputState);
+                s_EntityStateMessageWriter.Put(s_EntityStateDataWriter.Data, 0, s_EntityStateDataWriter.Length);
+                ClientSendMessage(STATE_DATA_CHANNEL, (shouldSendReliably || (ushort)inputState > 1 << 0) ? DeliveryMethod.ReliableOrdered : DeliveryMethod.Sequenced, s_EntityStateMessageWriter);
             }
             CurrentGameManager.HitRegistrationManager.SendHitRegToServer();
         }
@@ -426,33 +426,33 @@ namespace MultiplayerARPG
         {
             bool shouldSendReliably = false;
             CharacterInputState inputState = CharacterInputState.None;
-            EntityStateDataWriter.Reset();
+            s_EntityStateDataWriter.Reset();
             // Actions (can do only 1 action)
-            if (AttackComponent.WriteServerAttackState(EntityStateDataWriter))
+            if (AttackComponent.WriteServerAttackState(s_EntityStateDataWriter))
                 inputState |= CharacterInputState.IsAttacking;
-            else if (UseSkillComponent.WriteServerUseSkillInterruptedState(EntityStateDataWriter))
+            else if (UseSkillComponent.WriteServerUseSkillInterruptedState(s_EntityStateDataWriter))
                 inputState |= CharacterInputState.IsUsingSkillInterrupted;
-            else if (UseSkillComponent.WriteServerUseSkillItemState(EntityStateDataWriter))
+            else if (UseSkillComponent.WriteServerUseSkillItemState(s_EntityStateDataWriter))
                 inputState |= CharacterInputState.IsUsingSkillItem;
-            else if (UseSkillComponent.WriteServerUseSkillState(EntityStateDataWriter))
+            else if (UseSkillComponent.WriteServerUseSkillState(s_EntityStateDataWriter))
                 inputState |= CharacterInputState.IsUsingSkill;
-            else if (ReloadComponent.WriteServerReloadState(EntityStateDataWriter))
+            else if (ReloadComponent.WriteServerReloadState(s_EntityStateDataWriter))
                 inputState |= CharacterInputState.IsReloading;
-            else if (ChargeComponent.WriteServerStopChargeState(EntityStateDataWriter))
+            else if (ChargeComponent.WriteServerStopChargeState(s_EntityStateDataWriter))
                 inputState |= CharacterInputState.IsChargeStopping;
-            else if (ChargeComponent.WriteServerStartChargeState(EntityStateDataWriter))
+            else if (ChargeComponent.WriteServerStartChargeState(s_EntityStateDataWriter))
                 inputState |= CharacterInputState.IsChargeStarting;
             // Movement
-            if (!Movement.IsNull() && Movement.Enabled && Movement.WriteServerState(EntityStateDataWriter, out shouldSendReliably))
+            if (!Movement.IsNull() && Movement.Enabled && Movement.WriteServerState(s_EntityStateDataWriter, out shouldSendReliably))
                 inputState |= CharacterInputState.IsMoving;
             // Set input state and send to clients
             if (inputState != CharacterInputState.None)
             {
-                TransportHandler.WritePacket(EntityStateMessageWriter, GameNetworkingConsts.EntityState);
-                EntityStateMessageWriter.PutPackedUInt(ObjectId);
-                EntityStateMessageWriter.PutPackedUShort((ushort)inputState);
-                EntityStateMessageWriter.Put(EntityStateDataWriter.Data, 0, EntityStateDataWriter.Length);
-                ServerSendMessageToSubscribers(STATE_DATA_CHANNEL, (shouldSendReliably || (ushort)inputState > 1 << 0) ? DeliveryMethod.ReliableOrdered : DeliveryMethod.Sequenced, EntityStateMessageWriter);
+                TransportHandler.WritePacket(s_EntityStateMessageWriter, GameNetworkingConsts.EntityState);
+                s_EntityStateMessageWriter.PutPackedUInt(ObjectId);
+                s_EntityStateMessageWriter.PutPackedUShort((ushort)inputState);
+                s_EntityStateMessageWriter.Put(s_EntityStateDataWriter.Data, 0, s_EntityStateDataWriter.Length);
+                ServerSendMessageToSubscribers(STATE_DATA_CHANNEL, (shouldSendReliably || (ushort)inputState > 1 << 0) ? DeliveryMethod.ReliableOrdered : DeliveryMethod.Sequenced, s_EntityStateMessageWriter);
             }
         }
 
