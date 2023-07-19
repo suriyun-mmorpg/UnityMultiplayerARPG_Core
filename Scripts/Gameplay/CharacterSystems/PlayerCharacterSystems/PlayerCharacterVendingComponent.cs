@@ -19,16 +19,33 @@ namespace MultiplayerARPG
         public event System.Action<VendingItems> onUpdateItems;
         public event System.Action<VendingData> onVendingDataChange;
 
+        public bool DisableVending
+        {
+            get
+            {
+                return Entity.IsDead() || CurrentGameInstance.disableVending || BaseGameNetworkManager.CurrentMapInfo.DisableVending;
+            }
+        }
+
         public override void OnSetup()
         {
             base.OnSetup();
             data.onChange += OnDataChange;
+            Entity.onDead.AddListener(OnDead);
         }
 
         public override void EntityOnDestroy()
         {
             base.EntityOnDestroy();
             data.onChange -= OnDataChange;
+            Entity.onDead.RemoveListener(OnDead);
+        }
+
+        protected void OnDead()
+        {
+            if (!IsServer)
+                return;
+            ServerStopVending();
         }
 
         protected void OnDataChange(bool isInitial, VendingData data)
@@ -39,12 +56,27 @@ namespace MultiplayerARPG
 
         public void StartVending(string title, StartVendingItems items)
         {
+            if (DisableVending)
+            {
+                // TODO: Show error
+                return;
+            }
+            if (items.Count <= 0)
+            {
+                // TODO: Show error
+                return;
+            }
             RPC(ServerStartVending, title, items);
         }
 
         [ServerRpc]
         protected void ServerStartVending(string title, StartVendingItems items)
         {
+            if (DisableVending)
+            {
+                // TODO: Show error
+                return;
+            }
             if (items.Count <= 0)
             {
                 // TODO: Show error
