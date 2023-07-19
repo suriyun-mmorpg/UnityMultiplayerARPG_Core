@@ -83,8 +83,27 @@ namespace MultiplayerARPG
         {
             get
             {
-                return CurrentGameInstance.disableDealing || BaseGameNetworkManager.CurrentMapInfo.DisableDealing;
+                return Entity.IsDead() || CurrentGameInstance.disableDealing || BaseGameNetworkManager.CurrentMapInfo.DisableDealing;
             }
+        }
+
+        public override void OnSetup()
+        {
+            base.OnSetup();
+            Entity.onDead.AddListener(OnDead);
+        }
+
+        public override void EntityOnDestroy()
+        {
+            base.EntityOnDestroy();
+            Entity.onDead.RemoveListener(OnDead);
+        }
+
+        protected void OnDead()
+        {
+            if (!IsServer)
+                return;
+            StopDealing();
         }
 
         public bool ExchangingDealingItemsWillOverwhelming()
