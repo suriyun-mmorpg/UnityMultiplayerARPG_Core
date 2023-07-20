@@ -39,8 +39,7 @@ namespace MultiplayerARPG
         protected float _findEnemyCountDown;
         protected float _randomedWanderCountDown;
         protected float _randomedWanderDelay;
-        protected bool _startedFollowEnemy;
-        protected float _startFollowEnemyElasped;
+        protected float _followEnemyElasped;
         protected Vector3 _lastPosition;
         protected BaseSkill _queueSkill;
         protected int _queueSkillLevel;
@@ -147,7 +146,6 @@ namespace MultiplayerARPG
                         FollowSummoner();
                     else
                         UpdateWanderDestinationRandomingActivity(deltaTime);
-                    _startedFollowEnemy = false;
                 }
             }
             else
@@ -156,30 +154,40 @@ namespace MultiplayerARPG
                 if (!_reachedSpawnPoint)
                 {
                     if (distFromSpawnPoint <= Mathf.Max(1f, randomWanderDistance))
+                    {
                         _reachedSpawnPoint = true;
+                        _followEnemyElasped = 0f;
+                        Entity.SetTargetEntity(null);
+                        ClearActionState();
+                    }
                     return;
                 }
 
                 if (Entity.IsInSafeArea)
                 {
                     UpdateMoveBackToSpawnPointActivity(deltaTime);
-                    _startedFollowEnemy = false;
                     return;
                 }
 
                 if (maxDistanceFromSpawnPoint > 0f && distFromSpawnPoint >= maxDistanceFromSpawnPoint)
                 {
                     UpdateMoveBackToSpawnPointActivity(deltaTime);
-                    _startedFollowEnemy = false;
+                    return;
+                }
+
+                if (followTargetDuration > 0f && _followEnemyElasped >= followTargetDuration)
+                {
+                    UpdateMoveBackToSpawnPointActivity(deltaTime);
                     return;
                 }
 
                 if (!UpdateAttackEnemy(deltaTime, currentPosition))
                 {
+                    // No enemy, try find it
                     _enemyExisted = false;
                     UpdateEnemyFindingActivity(deltaTime);
+                    // Random movement (if no enemy existed)
                     UpdateWanderDestinationRandomingActivity(deltaTime);
-                    _startedFollowEnemy = false;
                 }
             }
             Profiler.EndSample();
@@ -264,7 +272,9 @@ namespace MultiplayerARPG
             float attackDistance = GetAttackDistance();
             if (OverlappedEntity(targetEnemy.Entity, GetDamageTransform().position, targetPosition, attackDistance))
             {
-                _startedFollowEnemy = false;
+                // Reset follow time, because it is not following
+                _followEnemyElasped = 0f;
+                // Stop movement
                 SetWanderDestination(CacheTransform.position);
                 // Lookat target then do something when it's in range
                 Vector3 lookAtDirection = (targetPosition - currentPosition).normalized;
@@ -316,22 +326,10 @@ namespace MultiplayerARPG
             }
             else
             {
-                if (!_startedFollowEnemy)
-                {
-                    _startFollowEnemyElasped = 0f;
-                    _startedFollowEnemy = true;
-                }
-
-                // Update destination if target's position changed
+                // Counting follow time
+                _followEnemyElasped += deltaTime;
+                // Follow the enemy
                 SetDestination(targetPosition, attackDistance);
-
-                if (Entity.Summoner == null)
-                {
-                    _startFollowEnemyElasped += deltaTime;
-                    // Stop following target and move to position nearby spawn position when follow enemy too long
-                    if (_startFollowEnemyElasped >= followTargetDuration)
-                        RandomWanderDestination();
-                }
             }
             return true;
         }
