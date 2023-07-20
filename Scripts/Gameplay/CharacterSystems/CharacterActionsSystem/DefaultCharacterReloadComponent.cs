@@ -325,7 +325,7 @@ namespace MultiplayerARPG
         {
             bool isLeftHand = reader.GetBool();
             int reloadingAmmoAmount = reader.GetPackedInt();
-            if (IsOwnerClientOrOwnedByServer)
+            if (IsServer || IsOwnerClient)
             {
                 // Don't play reload animation again (it already done in `Reload` function)
                 return;

@@ -222,7 +222,7 @@ namespace MultiplayerARPG
         public void ReadServerStartChargeStateAtClient(NetDataReader reader)
         {
             bool isLeftHand = reader.GetBool();
-            if (IsOwnerClientOrOwnedByServer)
+            if (IsServer || IsOwnerClient)
             {
                 // Don't start charge again (it already done in `StartCharge` function)
                 return;
@@ -237,7 +237,7 @@ namespace MultiplayerARPG
 
         public void ReadServerStopChargeStateAtClient(NetDataReader reader)
         {
-            if (IsOwnerClientOrOwnedByServer)
+            if (IsServer || IsOwnerClient)
             {
                 // Don't stop charge again (it already done in `StopCharge` function)
                 return;

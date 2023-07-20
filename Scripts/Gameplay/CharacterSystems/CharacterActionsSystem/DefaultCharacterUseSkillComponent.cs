@@ -617,7 +617,7 @@ namespace MultiplayerARPG
             bool isLeftHand = reader.GetBool();
             uint targetObjectId = reader.GetPackedUInt();
             AimPosition aimPosition = reader.Get<AimPosition>();
-            if (IsOwnerClientOrOwnedByServer)
+            if (IsServer || IsOwnerClient)
             {
                 // Don't play use skill animation again (it already played in `UseSkill` and `UseSkillItem` function)
                 return;

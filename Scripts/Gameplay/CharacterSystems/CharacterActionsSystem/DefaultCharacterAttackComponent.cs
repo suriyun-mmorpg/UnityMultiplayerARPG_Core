@@ -438,7 +438,7 @@ namespace MultiplayerARPG
         {
             int simulateSeed = reader.GetPackedInt();
             bool isLeftHand = reader.GetBool();
-            if (IsOwnerClientOrOwnedByServer)
+            if (IsServer || IsOwnerClient)
             {
                 // Don't play attack animation again (it already done in `Attack` function)
                 return;
