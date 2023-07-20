@@ -39,6 +39,13 @@ namespace MultiplayerARPG
             return obj == null;
         }
 
+        public static bool IsNull(this IVehicleEntity obj)
+        {
+            if (obj is Object unityObj)
+                return unityObj == null;
+            return obj == null;
+        }
+
         public static bool IsNull(this IGameEntityComponent obj)
         {
             if (obj is Object unityObj)

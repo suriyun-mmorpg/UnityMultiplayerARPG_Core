@@ -486,7 +486,7 @@ namespace MultiplayerARPG
                 GameInstance.ServerGameMessageHandlers.SendGameMessage(ConnectionId, UITextKeys.UI_ERROR_INVALID_DATA);
                 return;
             }
-            if (Vector3.Distance(EntityTransform.position, vehicleEntity.Seats[seatIndex].passengingTransform.position) > CurrentGameInstance.conversationDistance)
+            if (Vector3.Distance(EntityTransform.position, vehicleEntity.EntityTransform.position) <= vehicleEntity.GetActivatableDistance())
             {
                 GameInstance.ServerGameMessageHandlers.SendGameMessage(ConnectionId, UITextKeys.UI_ERROR_CHARACTER_IS_TOO_FAR);
                 return;
