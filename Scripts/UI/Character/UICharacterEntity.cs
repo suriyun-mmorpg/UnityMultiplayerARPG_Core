@@ -20,6 +20,7 @@ namespace MultiplayerARPG
         public GameObject uiSkillCastContainer;
         public TextWrapper uiTextSkillCast;
         public Image imageSkillCastGage;
+        public Slider sliderSkillCastGage;
         public UICharacterBuffs uiCharacterBuffs;
 
         protected float _castingSkillCountDown;
@@ -116,6 +117,9 @@ namespace MultiplayerARPG
 
             if (imageSkillCastGage != null)
                 imageSkillCastGage.fillAmount = _castingSkillDuration <= 0 ? 0 : 1 - (_castingSkillCountDown / _castingSkillDuration);
+
+            if (sliderSkillCastGage != null)
+                sliderSkillCastGage.value = _castingSkillDuration <= 0 ? 0 : 1 - (_castingSkillCountDown / _castingSkillDuration);
         }
 
         protected override bool ValidateToUpdateUI()
