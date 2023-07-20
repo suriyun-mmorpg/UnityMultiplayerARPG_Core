@@ -382,7 +382,9 @@ namespace MultiplayerARPG
 
         public virtual void OnActivate()
         {
-            GameInstance.PlayingCharacterEntity.CallServerEnterVehicle(ObjectId);
+            if (!GetAvailableSeat(out byte seatIndex))
+                return;
+            GameInstance.PlayingCharacterEntity.CallServerEnterVehicle(ObjectId, seatIndex);
         }
 
         private void MakeCache()

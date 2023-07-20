@@ -463,24 +463,38 @@ namespace MultiplayerARPG
         }
 
         #region RPCs
-        public void CallServerEnterVehicle(uint objectId)
+        public void CallServerEnterVehicle(uint objectId, byte seatIndex)
         {
-            RPC(ServerEnterVehicle, objectId);
+            RPC(ServerEnterVehicle, objectId, seatIndex);
         }
 
         [ServerRpc]
-        protected void ServerEnterVehicle(uint objectId)
+        protected void ServerEnterVehicle(uint objectId, byte seatIndex)
         {
 #if UNITY_EDITOR || UNITY_SERVER
             // Call this function at server
-            if (Manager.Assets.TryGetSpawnedObject(objectId, out LiteNetLibIdentity identity))
+            if (!Manager.Assets.TryGetSpawnedObject(objectId, out LiteNetLibIdentity identity))
+                return;
+            IVehicleEntity vehicleEntity = identity.GetComponent<IVehicleEntity>();
+            if (vehicleEntity.IsNull())
             {
-                IVehicleEntity vehicleEntity = identity.GetComponent<IVehicleEntity>();
-                if (!vehicleEntity.IsNull() && vehicleEntity.GetAvailableSeat(out byte seatIndex))
-                    EnterVehicle(vehicleEntity, seatIndex);
+                GameInstance.ServerGameMessageHandlers.SendGameMessage(ConnectionId, UITextKeys.UI_ERROR_INVALID_DATA);
+                return;
             }
+            if (!vehicleEntity.IsSeatAvailable(seatIndex))
+            {
+                GameInstance.ServerGameMessageHandlers.SendGameMessage(ConnectionId, UITextKeys.UI_ERROR_INVALID_DATA);
+                return;
+            }
+            if (Vector3.Distance(EntityTransform.position, vehicleEntity.Seats[seatIndex].passengingTransform.position) > CurrentGameInstance.conversationDistance)
+            {
+                GameInstance.ServerGameMessageHandlers.SendGameMessage(ConnectionId, UITextKeys.UI_ERROR_CHARACTER_IS_TOO_FAR);
+                return;
+            }
+            EnterVehicle(vehicleEntity, seatIndex);
 #endif
         }
+
         public void CallServerEnterVehicleToSeat(uint objectId, byte seatIndex)
         {
             RPC(ServerEnterVehicleToSeat, objectId, seatIndex);
@@ -491,12 +505,15 @@ namespace MultiplayerARPG
         {
 #if UNITY_EDITOR || UNITY_SERVER
             // Call this function at server
-            if (Manager.Assets.TryGetSpawnedObject(objectId, out LiteNetLibIdentity identity))
+            if (!Manager.Assets.TryGetSpawnedObject(objectId, out LiteNetLibIdentity identity))
+                return;
+            IVehicleEntity vehicleEntity = identity.GetComponent<IVehicleEntity>();
+            if (vehicleEntity.IsNull())
             {
-                IVehicleEntity vehicleEntity = identity.GetComponent<IVehicleEntity>();
-                if (!vehicleEntity.IsNull())
-                    EnterVehicle(vehicleEntity, seatIndex);
+                GameInstance.ServerGameMessageHandlers.SendGameMessage(ConnectionId, UITextKeys.UI_ERROR_INVALID_DATA);
+                return;
             }
+            EnterVehicle(vehicleEntity, seatIndex);
 #endif
         }
 
