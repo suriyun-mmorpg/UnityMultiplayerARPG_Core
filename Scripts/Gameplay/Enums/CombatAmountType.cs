@@ -16,5 +16,8 @@
         StaminaDecrease,
         FoodDecrease,
         WaterDecrease,
+        HpLeech,
+        MpLeech,
+        StaminaLeech,
     }
 }

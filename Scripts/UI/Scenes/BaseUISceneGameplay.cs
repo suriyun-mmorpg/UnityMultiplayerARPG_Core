@@ -25,6 +25,9 @@ namespace MultiplayerARPG
         public UICombatText uiCombatTextStaminaDecrease;
         public UICombatText uiCombatTextFoodDecrease;
         public UICombatText uiCombatTextWaterDecrease;
+        public UICombatText uiCombatTextHpLeech;
+        public UICombatText uiCombatTextMpLeech;
+        public UICombatText uiCombatTextStaminaLeech;
 
         private readonly Dictionary<DamageableEntity, Queue<KeyValuePair<CombatAmountType, int>>> _spawningCombatTexts = new Dictionary<DamageableEntity, Queue<KeyValuePair<CombatAmountType, int>>>();
         private readonly Dictionary<DamageableEntity, float> _spawningCombatTextTimes = new Dictionary<DamageableEntity, float>();
@@ -122,6 +125,15 @@ namespace MultiplayerARPG
                     break;
                 case CombatAmountType.WaterDecrease:
                     SpawnCombatText(followingTransform, uiCombatTextWaterDecrease, amount);
+                    break;
+                case CombatAmountType.HpLeech:
+                    SpawnCombatText(followingTransform, uiCombatTextHpLeech, amount);
+                    break;
+                case CombatAmountType.MpLeech:
+                    SpawnCombatText(followingTransform, uiCombatTextMpLeech, amount);
+                    break;
+                case CombatAmountType.StaminaLeech:
+                    SpawnCombatText(followingTransform, uiCombatTextStaminaLeech, amount);
                     break;
             }
         }
