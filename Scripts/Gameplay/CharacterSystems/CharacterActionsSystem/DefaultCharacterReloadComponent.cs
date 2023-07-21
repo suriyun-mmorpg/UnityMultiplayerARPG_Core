@@ -56,7 +56,7 @@ namespace MultiplayerARPG
             IsReloading = false;
         }
 
-        protected async UniTaskVoid ReloadRoutine(bool isLeftHand, int reloadingAmmoAmount)
+        protected virtual async UniTaskVoid ReloadRoutine(bool isLeftHand, int reloadingAmmoAmount)
         {
             // Prepare cancellation
             CancellationTokenSource reloadCancellationTokenSource = new CancellationTokenSource();
@@ -221,7 +221,7 @@ namespace MultiplayerARPG
             ClearReloadStates();
         }
 
-        public void CancelReload()
+        public virtual void CancelReload()
         {
             for (int i = _reloadCancellationTokenSources.Count - 1; i >= 0; --i)
             {
@@ -231,7 +231,7 @@ namespace MultiplayerARPG
             }
         }
 
-        public void Reload(bool isLeftHand)
+        public virtual void Reload(bool isLeftHand)
         {
             if (!IsServer && IsOwnerClient)
             {
@@ -248,7 +248,7 @@ namespace MultiplayerARPG
             }
         }
 
-        private void ProceedReloadStateAtServer(bool isLeftHand)
+        protected virtual void ProceedReloadStateAtServer(bool isLeftHand)
         {
 #if UNITY_EDITOR || UNITY_SERVER
             if (!_manager.IsAcceptNewAction())
@@ -284,7 +284,7 @@ namespace MultiplayerARPG
 #endif
         }
 
-        public bool WriteClientReloadState(NetDataWriter writer)
+        public virtual bool WriteClientReloadState(NetDataWriter writer)
         {
             if (_clientState.HasValue)
             {
@@ -299,7 +299,7 @@ namespace MultiplayerARPG
             return false;
         }
 
-        public bool WriteServerReloadState(NetDataWriter writer)
+        public virtual bool WriteServerReloadState(NetDataWriter writer)
         {
             if (_serverState.HasValue)
             {
@@ -315,19 +315,19 @@ namespace MultiplayerARPG
             return false;
         }
 
-        public void ReadClientReloadStateAtServer(NetDataReader reader)
+        public virtual void ReadClientReloadStateAtServer(NetDataReader reader)
         {
             bool isLeftHand = reader.GetBool();
             ProceedReloadStateAtServer(isLeftHand);
         }
 
-        public void ReadServerReloadStateAtClient(NetDataReader reader)
+        public virtual void ReadServerReloadStateAtClient(NetDataReader reader)
         {
             bool isLeftHand = reader.GetBool();
             int reloadingAmmoAmount = reader.GetPackedInt();
             if (IsServer || IsOwnerClient)
             {
-                // Don't play reload animation again (it already done in `Reload` function)
+                // Don't play reloading animation again (it already done in `WriteServerReloadState` function)
                 return;
             }
             // Play reload animation at client

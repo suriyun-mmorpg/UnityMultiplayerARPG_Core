@@ -440,7 +440,7 @@ namespace MultiplayerARPG
             bool isLeftHand = reader.GetBool();
             if (IsServer || IsOwnerClient)
             {
-                // Don't play attack animation again (it already done in `Attack` function)
+                // Don't play attacking animation again (it already done in `WriteServerAttackState` function)
                 return;
             }
             // Play attack animation at client

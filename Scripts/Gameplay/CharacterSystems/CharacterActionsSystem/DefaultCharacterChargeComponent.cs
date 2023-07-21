@@ -41,7 +41,7 @@ namespace MultiplayerARPG
             IsCharging = false;
         }
 
-        protected void PlayChargeAnimation(bool isLeftHand)
+        protected virtual void PlayChargeAnimation(bool isLeftHand)
         {
             // Get weapon type data
             IWeaponItem weaponItem = Entity.GetAvailableWeapon(ref isLeftHand).GetWeaponItem();
@@ -73,7 +73,7 @@ namespace MultiplayerARPG
             _chargeDuration = weaponItem.ChargeDuration;
         }
 
-        protected void StopChargeAnimation()
+        protected virtual void StopChargeAnimation()
         {
             // Play animation
             if (Entity.CharacterModel && Entity.CharacterModel.gameObject.activeSelf)
@@ -95,7 +95,7 @@ namespace MultiplayerARPG
             IsCharging = false;
         }
 
-        public void StartCharge(bool isLeftHand)
+        public virtual void StartCharge(bool isLeftHand)
         {
             if (!IsServer && IsOwnerClient)
             {
@@ -112,7 +112,7 @@ namespace MultiplayerARPG
             }
         }
 
-        public void StopCharge()
+        public virtual void StopCharge()
         {
             if (!IsServer && IsOwnerClient)
             {
@@ -129,7 +129,7 @@ namespace MultiplayerARPG
             }
         }
 
-        protected void ProceedStartChargeStateAtServer(bool isLeftHand)
+        protected virtual void ProceedStartChargeStateAtServer(bool isLeftHand)
         {
 #if UNITY_EDITOR || UNITY_SERVER
             if (!_manager.IsAcceptNewAction())
@@ -143,7 +143,7 @@ namespace MultiplayerARPG
 #endif
         }
 
-        protected void ProceedStopChargeStateAtServer()
+        protected virtual void ProceedStopChargeStateAtServer()
         {
 #if UNITY_EDITOR || UNITY_SERVER
             if (!_manager.IsAcceptNewAction())
@@ -157,7 +157,7 @@ namespace MultiplayerARPG
 #endif
         }
 
-        public bool WriteClientStartChargeState(NetDataWriter writer)
+        public virtual bool WriteClientStartChargeState(NetDataWriter writer)
         {
             if (_clientState.HasValue && !_clientState.Value.IsStopping)
             {
@@ -172,7 +172,7 @@ namespace MultiplayerARPG
             return false;
         }
 
-        public bool WriteServerStartChargeState(NetDataWriter writer)
+        public virtual bool WriteServerStartChargeState(NetDataWriter writer)
         {
             if (_serverState.HasValue && !_serverState.Value.IsStopping)
             {
@@ -187,7 +187,7 @@ namespace MultiplayerARPG
             return false;
         }
 
-        public bool WriteClientStopChargeState(NetDataWriter writer)
+        public virtual bool WriteClientStopChargeState(NetDataWriter writer)
         {
             if (_clientState.HasValue && _clientState.Value.IsStopping)
             {
@@ -200,7 +200,7 @@ namespace MultiplayerARPG
             return false;
         }
 
-        public bool WriteServerStopChargeState(NetDataWriter writer)
+        public virtual bool WriteServerStopChargeState(NetDataWriter writer)
         {
             if (_serverState.HasValue && _serverState.Value.IsStopping)
             {
@@ -213,13 +213,13 @@ namespace MultiplayerARPG
             return false;
         }
 
-        public void ReadClientStartChargeStateAtServer(NetDataReader reader)
+        public virtual void ReadClientStartChargeStateAtServer(NetDataReader reader)
         {
             bool isLeftHand = reader.GetBool();
             ProceedStartChargeStateAtServer(isLeftHand);
         }
 
-        public void ReadServerStartChargeStateAtClient(NetDataReader reader)
+        public virtual void ReadServerStartChargeStateAtClient(NetDataReader reader)
         {
             bool isLeftHand = reader.GetBool();
             if (IsServer || IsOwnerClient)
@@ -230,12 +230,12 @@ namespace MultiplayerARPG
             PlayChargeAnimation(isLeftHand);
         }
 
-        public void ReadClientStopChargeStateAtServer(NetDataReader reader)
+        public virtual void ReadClientStopChargeStateAtServer(NetDataReader reader)
         {
             ProceedStopChargeStateAtServer();
         }
 
-        public void ReadServerStopChargeStateAtClient(NetDataReader reader)
+        public virtual void ReadServerStopChargeStateAtClient(NetDataReader reader)
         {
             if (IsServer || IsOwnerClient)
             {

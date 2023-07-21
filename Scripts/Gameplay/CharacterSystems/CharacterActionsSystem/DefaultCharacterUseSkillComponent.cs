@@ -83,7 +83,7 @@ namespace MultiplayerARPG
             IsUsingSkill = false;
         }
 
-        public void InterruptCastingSkill()
+        public virtual void InterruptCastingSkill()
         {
             if (!IsServer)
             {
@@ -103,7 +103,7 @@ namespace MultiplayerARPG
             }
         }
 
-        protected void AddOrUpdateSkillUsage(SkillUsageType type, int dataId, int skillLevel)
+        protected virtual void AddOrUpdateSkillUsage(SkillUsageType type, int dataId, int skillLevel)
         {
             int index = Entity.IndexOfSkillUsage(type, dataId);
             if (index >= 0)
@@ -579,7 +579,7 @@ namespace MultiplayerARPG
             return false;
         }
 
-        public virtual  bool WriteClientUseSkillInterruptedState(NetDataWriter writer)
+        public virtual bool WriteClientUseSkillInterruptedState(NetDataWriter writer)
         {
             if (_clientState.HasValue && _clientState.Value.IsInterrupted)
             {
