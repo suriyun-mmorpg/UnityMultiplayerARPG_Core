@@ -213,16 +213,16 @@ namespace MultiplayerARPG
         [Tooltip("Exp tree for both player character and monster character")]
         [SerializeField]
         private int[] expTree = new int[0];
-        [Tooltip("You should add game data to game database and set the game database to this. If you leave this empty, it will load game data from Resources folders")]
+        [Tooltip("You should add game data to game database and set the game database to this. If you leave this empty, it will load game data from `Resources` folders")]
         [SerializeField]
         private BaseGameDatabase gameDatabase = null;
-        [Tooltip("You can add warp portals to warp portal database or may add warp portals into the scene directly, So you can leave this empty uf you are going to add warp portals into the scene directly only")]
+        [Tooltip("You can add NPCs to NPC database or may add NPCs into the scene directly, so you can leave this empty if you are going to add NPCs into the scene directly only")]
         [SerializeField]
         private NpcDatabase npcDatabase = null;
-        [Tooltip("You can add social system settings or leave this empty to use default settings")]
+        [Tooltip("You can add warp portals to warp portal database or may add warp portals into the scene directly, So you can leave this empty if you are going to add warp portals into the scene directly only")]
         [SerializeField]
         private WarpPortalDatabase warpPortalDatabase = null;
-        [Tooltip("You can add NPCs to NPC database or may add NPCs into the scene directly, so you can leave this empty if you are going to add NPCs into the scene directly only")]
+        [Tooltip("You can add social system settings or leave this empty to use default settings")]
         [SerializeField]
         private SocialSystemSetting socialSystemSetting = null;
         [Tooltip("Default weapon item, will be used when character not equip any weapon")]
