@@ -202,9 +202,10 @@ namespace MultiplayerARPG
             CacheNavMeshAgent.speed = Entity.GetMoveSpeed();
             float deltaTime = Time.deltaTime;
             bool isStationary = !CacheNavMeshAgent.isOnNavMesh || CacheNavMeshAgent.isStopped || CacheNavMeshAgent.remainingDistance <= CacheNavMeshAgent.stoppingDistance;
-            CacheNavMeshAgent.obstacleAvoidanceType = isStationary ? obstacleAvoidanceWhileStationary : obstacleAvoidanceWhileMoving;
             if (CanPredictMovement())
             {
+                CacheNavMeshAgent.obstacleAvoidanceType = isStationary ? obstacleAvoidanceWhileStationary : obstacleAvoidanceWhileMoving;
+
                 if (_inputDirection.HasValue)
                 {
                     // Moving by WASD keys
@@ -237,6 +238,11 @@ namespace MultiplayerARPG
                     _currentInput = Entity.SetInputIsKeyMovement(_currentInput, false);
                     _currentInput = Entity.SetInputPosition(_currentInput, CacheNavMeshAgent.destination);
                 }
+            }
+            else
+            {
+                // Disable obstacle avoidance because it won't predict movement, it is just moving to destination without obstacle avoidance
+                CacheNavMeshAgent.obstacleAvoidanceType = ObstacleAvoidanceType.NoObstacleAvoidance;
             }
             // Update rotating
             if (_yTurnSpeed <= 0f)
