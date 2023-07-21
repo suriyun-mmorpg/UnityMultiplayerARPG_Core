@@ -553,8 +553,9 @@ namespace MultiplayerARPG
                     BaseGameNetworkManager.Singleton.HitRegistrationManager.IncreasePreparedDamageAmounts(skillUser, simulateSeed, increaseDamageAmounts);
                     damageAmounts = GameDataHelpers.CombineDamages(damageAmounts, increaseDamageAmounts);
                 }
+            }
 
-                ApplySkillImplement(
+            ApplySkillImplement(
                 skillUser,
                 skillLevel,
                 isLeftHand,
@@ -567,7 +568,6 @@ namespace MultiplayerARPG
                 aimPosition,
                 onDamageOriginPrepared,
                 onDamageHit);
-            }
         }
 
         /// <summary>
