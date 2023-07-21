@@ -583,6 +583,7 @@ namespace MultiplayerARPG
         {
             if (_clientState.HasValue && _clientState.Value.IsInterrupted)
             {
+                // Simulate skill interrupting at client
                 _clientState = null;
                 return true;
             }
@@ -593,6 +594,8 @@ namespace MultiplayerARPG
         {
             if (_serverState.HasValue && _serverState.Value.IsInterrupted)
             {
+                // Simulate skill interrupting at server
+                ProceedUseSkillInterruptedState();
                 _serverState = null;
                 return true;
             }
@@ -619,7 +622,7 @@ namespace MultiplayerARPG
             AimPosition aimPosition = reader.Get<AimPosition>();
             if (IsServer || IsOwnerClient)
             {
-                // Don't play use skill animation again (it already played in `UseSkill` and `UseSkillItem` function)
+                // Don't play skill using animation again (it already done in `WriteClientUseSkillItemState` and `WriteServerUseSkillState` function)
                 return;
             }
             if (GameInstance.Skills.TryGetValue(skillDataId, out BaseSkill skill) && skillLevel > 0)
@@ -645,11 +648,18 @@ namespace MultiplayerARPG
 
         public void ReadClientUseSkillInterruptedStateAtServer(NetDataReader reader)
         {
-            ProceedUseSkillInterruptedState();
+            // TODO: Verify interrupt request
+            // Broadcast interrupting to all clients
+            InterruptCastingSkill();
         }
 
         public void ReadServerUseSkillInterruptedStateAtClient(NetDataReader reader)
         {
+            if (IsServer)
+            {
+                // Don't interrupt using skill again (it already done in `WriteServerUseSkillInterruptedState` function)
+                return;
+            }
             ProceedUseSkillInterruptedState();
         }
 
