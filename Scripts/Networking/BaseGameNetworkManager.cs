@@ -603,12 +603,12 @@ namespace MultiplayerARPG
             if (IsServer)
                 return;
             UpdateMapInfoMessage message = messageHandler.ReadMessage<UpdateMapInfoMessage>();
-            SetMapInfo(message.mapId);
+            SetMapInfo(message.mapName);
             if (CurrentMapInfo == null)
             {
-                Logging.LogError(LogTag, $"Cannot find map info: {message.mapId}, it will create new map info to use, it can affect players' experience.");
+                Logging.LogError(LogTag, $"Cannot find map info: {message.mapName}, it will create new map info to use, it can affect players' experience.");
                 CurrentMapInfo = ScriptableObject.CreateInstance<MapInfo>();
-                CurrentMapInfo.Id = message.mapId;
+                CurrentMapInfo.Id = message.mapName;
                 return;
             }
             if (!CurrentMapInfo.GetType().FullName.Equals(message.className))
@@ -1026,9 +1026,9 @@ namespace MultiplayerARPG
             ServerBuildingHandlers.RemoveBuilding(id);
         }
 
-        public void SetMapInfo(string mapId)
+        public void SetMapInfo(string mapName)
         {
-            if (!GameInstance.MapInfos.TryGetValue(mapId, out BaseMapInfo mapInfo))
+            if (!GameInstance.MapInfos.TryGetValue(mapName, out BaseMapInfo mapInfo))
             {
                 CurrentMapInfo = null;
                 return;
@@ -1060,7 +1060,7 @@ namespace MultiplayerARPG
                 return;
             ServerSendPacket(connectionId, 0, DeliveryMethod.ReliableOrdered, GameNetworkingConsts.UpdateMapInfo, new UpdateMapInfoMessage()
             {
-                mapId = CurrentMapInfo.Id,
+                mapName = CurrentMapInfo.Id,
                 className = CurrentMapInfo.GetType().FullName,
             }, (writer) =>
             {
