@@ -5,7 +5,7 @@ using UnityEngine;
 using UnityEngine.Rendering;
 using UnityEngine.SceneManagement;
 using UnityEngine.Serialization;
-#if ENABLE_PURCHASING && UNITY_PURCHASING && (UNITY_IOS || UNITY_ANDROID)
+#if ENABLE_PURCHASING && (UNITY_IOS || UNITY_ANDROID)
 using UnityEngine.Purchasing;
 #endif
 
@@ -45,7 +45,7 @@ namespace MultiplayerARPG
 
     [DefaultExecutionOrder(-999)]
     [RequireComponent(typeof(EventSystemManager))]
-#if ENABLE_PURCHASING && UNITY_PURCHASING && (UNITY_IOS || UNITY_ANDROID)
+#if ENABLE_PURCHASING && (UNITY_IOS || UNITY_ANDROID)
     public partial class GameInstance : MonoBehaviour, IStoreListener
 #else
     public partial class GameInstance : MonoBehaviour

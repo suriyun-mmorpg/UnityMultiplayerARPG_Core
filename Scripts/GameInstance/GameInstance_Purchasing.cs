@@ -3,7 +3,7 @@ using System.Linq;
 using Cysharp.Threading.Tasks;
 using LiteNetLibManager;
 using UnityEngine;
-#if ENABLE_PURCHASING && UNITY_PURCHASING && (UNITY_IOS || UNITY_ANDROID)
+#if ENABLE_PURCHASING && (UNITY_IOS || UNITY_ANDROID)
 using UnityEngine.Purchasing;
 #endif
 
@@ -19,7 +19,7 @@ namespace MultiplayerARPG
         public const string TAG_INIT = "IAP_INIT";
         public const string TAG_PURCHASE = "IAP_PURCHASE";
 
-#if ENABLE_PURCHASING && UNITY_PURCHASING && (UNITY_IOS || UNITY_ANDROID)
+#if ENABLE_PURCHASING && (UNITY_IOS || UNITY_ANDROID)
         public static IStoreController StoreController { get; private set; }
         public static IExtensionProvider StoreExtensionProvider { get; private set; }
 #endif
@@ -53,7 +53,7 @@ namespace MultiplayerARPG
                 item.GenerateCashShopItems();
             }
 
-#if ENABLE_PURCHASING && UNITY_PURCHASING && (UNITY_ANDROID || UNITY_IOS)
+#if ENABLE_PURCHASING && (UNITY_ANDROID || UNITY_IOS)
             // If we have already connected to Purchasing ...
             if (IsPurchasingInitialized())
                 return;
@@ -70,7 +70,7 @@ namespace MultiplayerARPG
                     if (cashPackage == null || CashPackages.ContainsKey(cashPackage.DataId))
                         continue;
 
-#if ENABLE_PURCHASING && UNITY_PURCHASING && (UNITY_ANDROID || UNITY_IOS)
+#if ENABLE_PURCHASING && (UNITY_ANDROID || UNITY_IOS)
                     // Setup IAP package for clients
                     var productCatalogItem = cashPackage.ProductCatalogItem;
                     if (productCatalogItem == null)
@@ -95,7 +95,7 @@ namespace MultiplayerARPG
                 }
             }
 
-#if ENABLE_PURCHASING && UNITY_PURCHASING && (UNITY_ANDROID || UNITY_IOS)
+#if ENABLE_PURCHASING && (UNITY_ANDROID || UNITY_IOS)
             Logging.Log(LogTag, "[" + TAG_INIT + "]: Initializing Purchasing...");
             // Kick off the remainder of the set-up with an asynchrounous call, passing the configuration 
             // and this class' instance. Expect a response either in OnInitialized or OnInitializeFailed.
@@ -116,7 +116,7 @@ namespace MultiplayerARPG
 
         public static bool IsPurchasingInitialized()
         {
-#if ENABLE_PURCHASING && UNITY_PURCHASING && (UNITY_IOS || UNITY_ANDROID)
+#if ENABLE_PURCHASING && (UNITY_IOS || UNITY_ANDROID)
             // Only say we are initialized if both the Purchasing references are set.
             return StoreController != null && StoreExtensionProvider != null;
 #else
@@ -125,7 +125,7 @@ namespace MultiplayerARPG
         }
 
         #region IStoreListener
-#if ENABLE_PURCHASING && UNITY_PURCHASING && (UNITY_IOS || UNITY_ANDROID)
+#if ENABLE_PURCHASING && (UNITY_IOS || UNITY_ANDROID)
         public void OnInitialized(IStoreController controller, IExtensionProvider extensions)
         {
             // Purchasing has succeeded initializing. Collect our Purchasing references.
@@ -257,7 +257,7 @@ namespace MultiplayerARPG
         #region IAP Actions
         public void Purchase(string productId)
         {
-#if ENABLE_PURCHASING && UNITY_PURCHASING && (UNITY_IOS || UNITY_ANDROID)
+#if ENABLE_PURCHASING && (UNITY_IOS || UNITY_ANDROID)
             // If Purchasing has not yet been set up ...
             if (!IsPurchasingInitialized())
             {

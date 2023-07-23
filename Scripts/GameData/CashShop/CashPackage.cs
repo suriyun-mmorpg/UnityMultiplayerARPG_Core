@@ -1,6 +1,6 @@
 ﻿using LiteNetLibManager;
 using UnityEngine;
-#if ENABLE_PURCHASING && UNITY_PURCHASING && (UNITY_IOS || UNITY_ANDROID)
+#if ENABLE_PURCHASING && (UNITY_IOS || UNITY_ANDROID)
 using UnityEngine.Purchasing;
 #endif
 
@@ -25,7 +25,7 @@ namespace MultiplayerARPG
 
         public override string Id { get { return productId; } }
 
-#if ENABLE_PURCHASING && UNITY_PURCHASING && (UNITY_IOS || UNITY_ANDROID)
+#if ENABLE_PURCHASING && (UNITY_IOS || UNITY_ANDROID)
         public ProductCatalogItem ProductCatalogItem
         {
             get
@@ -63,7 +63,7 @@ namespace MultiplayerARPG
 
         public string GetTitle()
         {
-#if ENABLE_PURCHASING && UNITY_PURCHASING && (UNITY_IOS || UNITY_ANDROID)
+#if ENABLE_PURCHASING && (UNITY_IOS || UNITY_ANDROID)
             if (ProductCatalogItem == null)
                 return LanguageManager.GetUnknowTitle();
             var title = ProductCatalogItem.defaultDescription.Title;
@@ -78,7 +78,7 @@ namespace MultiplayerARPG
 
         public string GetDescription()
         {
-#if ENABLE_PURCHASING && UNITY_PURCHASING && (UNITY_IOS || UNITY_ANDROID)
+#if ENABLE_PURCHASING && (UNITY_IOS || UNITY_ANDROID)
             if (ProductCatalogItem == null)
                 return "";
             var description = ProductCatalogItem.defaultDescription.Description;
@@ -93,7 +93,7 @@ namespace MultiplayerARPG
 
         public string GetSellPrice()
         {
-#if ENABLE_PURCHASING && UNITY_PURCHASING && (UNITY_IOS || UNITY_ANDROID)
+#if ENABLE_PURCHASING && (UNITY_IOS || UNITY_ANDROID)
             if (ProductCatalogItem == null || Metadata == null)
                 return LanguageManager.GetUnknowDescription();
             return Metadata.localizedPrice.ToString("N0") + " " + Metadata.isoCurrencyCode;
