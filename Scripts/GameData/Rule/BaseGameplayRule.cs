@@ -345,6 +345,12 @@ namespace MultiplayerARPG
         public abstract float GetBattlePointFromCharacterStats(CharacterStats stats);
 
         /// <summary>
+        /// Return turn PK on warning message, have to implement this in-case that other customers may want to change PK turn on/off workflow
+        /// </summary>
+        /// <returns></returns>
+        public abstract string GetTurnPkOnWarningMessage();
+
+        /// <summary>
         /// Return `TRUE` if the player can turn PK mode on
         /// </summary>
         /// <param name="player"></param>

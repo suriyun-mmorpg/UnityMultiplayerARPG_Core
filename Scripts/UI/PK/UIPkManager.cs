@@ -90,7 +90,10 @@ namespace MultiplayerARPG
 
         public void OnClickTogglePk()
         {
-            GameInstance.PlayingCharacterEntity.Pk.TogglePkMode();
+            UISceneGlobal.Singleton.ShowMessageDialog(
+                LanguageManager.GetText(UITextKeys.UI_LABEL_WARNING.ToString()),
+                GameInstance.Singleton.GameplayRule.GetTurnPkOnWarningMessage(),
+                false, true, true, false, onClickYes: GameInstance.PlayingCharacterEntity.Pk.TogglePkMode);
         }
     }
 }

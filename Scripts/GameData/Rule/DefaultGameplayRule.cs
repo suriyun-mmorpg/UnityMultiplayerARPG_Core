@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using Cysharp.Text;
+using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.Serialization;
@@ -1062,6 +1063,11 @@ namespace MultiplayerARPG
             battlePoint += stats.moveSpeed * moveSpeedBattlePointScore;
             battlePoint += stats.atkSpeed * atkSpeedBattlePointScore;
             return battlePoint;
+        }
+
+        public override string GetTurnPkOnWarningMessage()
+        {
+            return ZString.Format(LanguageManager.GetText(UIFormatKeys.UI_FORMAT_PK_TURN_ON_WARNING.ToString()), hoursBeforeTurnPkOff);
         }
 
         public override bool CanTurnPkOn(BasePlayerCharacterEntity player)
