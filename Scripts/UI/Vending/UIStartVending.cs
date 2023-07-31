@@ -125,11 +125,19 @@ namespace MultiplayerARPG
         {
             if (_items.Count <= 0)
             {
-                // TODO: Show error
+                UISceneGlobal.Singleton.ShowMessageDialog(
+                    LanguageManager.GetText(UITextKeys.UI_LABEL_ERROR.ToString()),
+                    LanguageManager.GetText(UITextKeys.UI_ERROR_NO_START_VENDING_ITEMS.ToString()));
                 return;
             }
-            GameInstance.PlayingCharacterEntity.Vending.StartVending(inputTitle.text, _items);
-            Hide();
+            UISceneGlobal.Singleton.ShowMessageDialog(
+                LanguageManager.GetText(UITextKeys.UI_START_VENDING.ToString()),
+                LanguageManager.GetText(UITextKeys.UI_START_VENDING_DESCRIPTION.ToString()),
+                false, true, true, false, onClickYes: () =>
+                {
+                    GameInstance.PlayingCharacterEntity.Vending.StartVending(inputTitle.text, _items);
+                    Hide();
+                });
         }
     }
 }

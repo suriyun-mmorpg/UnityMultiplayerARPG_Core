@@ -87,6 +87,11 @@ namespace MultiplayerARPG
 
         public bool CallServerSendDuelingRequest(uint objectId)
         {
+            if (DisableDueling)
+            {
+                ClientGenericActions.ClientReceiveGameMessage(UITextKeys.UI_ERROR_FEATURE_IS_DISABLED);
+                return false;
+            }
             RPC(ServerSendDuelingRequest, objectId);
             return true;
         }
@@ -97,7 +102,7 @@ namespace MultiplayerARPG
 #if UNITY_EDITOR || UNITY_SERVER
             if (DisableDueling)
             {
-                // Dueling is disabled
+                GameInstance.ServerGameMessageHandlers.SendGameMessage(ConnectionId, UITextKeys.UI_ERROR_FEATURE_IS_DISABLED);
                 return;
             }
             BasePlayerCharacterEntity targetCharacterEntity;

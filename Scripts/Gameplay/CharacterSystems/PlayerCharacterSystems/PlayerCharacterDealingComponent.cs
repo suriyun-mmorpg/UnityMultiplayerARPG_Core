@@ -194,6 +194,11 @@ namespace MultiplayerARPG
 
         public bool CallServerSendDealingRequest(uint objectId)
         {
+            if (DisableDealing)
+            {
+                ClientGenericActions.ClientReceiveGameMessage(UITextKeys.UI_ERROR_FEATURE_IS_DISABLED);
+                return false;
+            }
             RPC(ServerSendDealingRequest, objectId);
             return true;
         }
@@ -204,7 +209,7 @@ namespace MultiplayerARPG
 #if UNITY_EDITOR || UNITY_SERVER
             if (DisableDealing)
             {
-                // Dealing is disabled
+                GameInstance.ServerGameMessageHandlers.SendGameMessage(ConnectionId, UITextKeys.UI_ERROR_FEATURE_IS_DISABLED);
                 return;
             }
             BasePlayerCharacterEntity targetCharacterEntity;

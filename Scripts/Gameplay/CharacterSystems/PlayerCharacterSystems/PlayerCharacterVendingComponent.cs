@@ -58,12 +58,12 @@ namespace MultiplayerARPG
         {
             if (DisableVending)
             {
-                // TODO: Show error
+                ClientGenericActions.ClientReceiveGameMessage(UITextKeys.UI_ERROR_FEATURE_IS_DISABLED);
                 return;
             }
             if (items.Count <= 0)
             {
-                // TODO: Show error
+                ClientGenericActions.ClientReceiveGameMessage(UITextKeys.UI_ERROR_NO_START_VENDING_ITEMS);
                 return;
             }
             RPC(ServerStartVending, title, items);
@@ -74,12 +74,12 @@ namespace MultiplayerARPG
         {
             if (DisableVending)
             {
-                // TODO: Show error
+                GameInstance.ServerGameMessageHandlers.SendGameMessage(ConnectionId, UITextKeys.UI_ERROR_FEATURE_IS_DISABLED);
                 return;
             }
             if (items.Count <= 0)
             {
-                // TODO: Show error
+                GameInstance.ServerGameMessageHandlers.SendGameMessage(ConnectionId, UITextKeys.UI_ERROR_NO_START_VENDING_ITEMS);
                 return;
             }
             _items.Clear();
@@ -100,7 +100,7 @@ namespace MultiplayerARPG
             }
             if (_items.Count <= 0)
             {
-                // TODO: Show error
+                GameInstance.ServerGameMessageHandlers.SendGameMessage(ConnectionId, UITextKeys.UI_ERROR_NO_START_VENDING_ITEMS);
                 return;
             }
             data.Value = new VendingData()

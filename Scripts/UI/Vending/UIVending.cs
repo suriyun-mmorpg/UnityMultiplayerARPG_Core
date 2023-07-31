@@ -135,8 +135,14 @@ namespace MultiplayerARPG
 
         public void OnClickStop()
         {
-            GameInstance.PlayingCharacterEntity.Vending.StopVending();
-            Hide();
+            UISceneGlobal.Singleton.ShowMessageDialog(
+                LanguageManager.GetText(UITextKeys.UI_STOP_VENDING.ToString()),
+                LanguageManager.GetText(UITextKeys.UI_STOP_VENDING_DESCRIPTION.ToString()),
+                false, true, true, false, onClickYes: () =>
+                {
+                    GameInstance.PlayingCharacterEntity.Vending.StopVending();
+                    Hide();
+                });
         }
     }
 }
