@@ -1,9 +1,9 @@
-﻿using UnityEngine;
+using UnityEngine;
 using UnityEngine.EventSystems;
 
 namespace MultiplayerARPG
 {
-    public partial class NonEquipDropHandler : MonoBehaviour, IDropHandler
+    public class UIStartVendingDropHandler : MonoBehaviour, IDropHandler
     {
         protected RectTransform _dropRect;
         public RectTransform DropRect
@@ -27,22 +27,14 @@ namespace MultiplayerARPG
                 return;
             // Set UI drop state
             dragHandler.IsDropped = true;
-            // Get dragged item UI. if dragging item UI is UI for character item, unequip the item
+            // If dragged item UI
             UICharacterItemDragHandler draggedItemUI = dragHandler as UICharacterItemDragHandler;
             if (draggedItemUI != null)
             {
                 switch (draggedItemUI.Location)
                 {
-                    case UICharacterItemDragHandler.SourceLocation.EquipItems:
-                        draggedItemUI.UIItem.OnClickUnEquip();
-                        break;
                     case UICharacterItemDragHandler.SourceLocation.NonEquipItems:
-                        break;
-                    case UICharacterItemDragHandler.SourceLocation.StorageItems:
-                        draggedItemUI.UIItem.OnClickMoveFromStorage();
-                        break;
-                    case UICharacterItemDragHandler.SourceLocation.Vending:
-                        draggedItemUI.UIItem.OnClickBuyVendingItem();
+                        draggedItemUI.UIItem.OnClickAddVendingItem();
                         break;
                 }
             }

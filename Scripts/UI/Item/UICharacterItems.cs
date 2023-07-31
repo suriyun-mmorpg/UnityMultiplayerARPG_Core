@@ -203,6 +203,12 @@ namespace MultiplayerARPG
                         case InventoryType.StorageItems:
                             dragHandler.SetupForStorageItems(tempUI);
                             break;
+                        case InventoryType.ItemsContainer:
+                            dragHandler.SetupForItemsContainer(tempUI);
+                            break;
+                        case InventoryType.Vending:
+                            dragHandler.SetupForVending(tempUI);
+                            break;
                         case InventoryType.Unknow:
                             dragHandler.SetupForUnknow(tempUI);
                             break;

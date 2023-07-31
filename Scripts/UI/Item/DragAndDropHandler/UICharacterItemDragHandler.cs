@@ -12,6 +12,7 @@ namespace MultiplayerARPG
             StorageItems,
             ItemsContainer,
             Hotkey,
+            Vending,
             Unknow = 254,
         }
 
@@ -22,6 +23,7 @@ namespace MultiplayerARPG
         public bool enableMoveFromStorageAction = true;
         public bool enablePickupFromContainerAction = true;
         public bool enableUnassignHotkeyAction = true;
+        public bool enableBuyVendingItem = true;
 
         public SourceLocation Location { get; protected set; }
         public UICharacterItem UIItem { get; protected set; }
@@ -48,6 +50,7 @@ namespace MultiplayerARPG
                     case SourceLocation.EquipItems:
                     case SourceLocation.StorageItems:
                     case SourceLocation.ItemsContainer:
+                    case SourceLocation.Vending:
                         return UIItem != null && UIItem.IndexOfData >= 0 && UIItem.CharacterItem.NotEmptySlot();
                     case SourceLocation.Hotkey:
                         return UIHotkey != null;
@@ -92,6 +95,12 @@ namespace MultiplayerARPG
             UIHotkey = uiCharacterHotkey;
         }
 
+        public void SetupForVending(UICharacterItem uiCharacterItem)
+        {
+            Location = SourceLocation.Vending;
+            UIItem = uiCharacterItem;
+        }
+
         public void SetupForUnknow(UICharacterItem uiCharacterItem)
         {
             Location = SourceLocation.Unknow;
@@ -120,6 +129,8 @@ namespace MultiplayerARPG
                 UIItem.OnClickPickUpFromContainer();
             if (enableUnassignHotkeyAction && Location == SourceLocation.Hotkey)
                 GameInstance.PlayingCharacterEntity.UnAssignHotkey(UIHotkey.hotkeyId);
+            if (enableBuyVendingItem && Location == SourceLocation.Vending)
+                UIItem.OnClickBuyVendingItem();
         }
     }
 }
