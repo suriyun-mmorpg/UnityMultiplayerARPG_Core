@@ -57,7 +57,7 @@ namespace MultiplayerARPG
         {
             get
             {
-                return CurrentGameInstance.disableDueling || BaseGameNetworkManager.CurrentMapInfo.DisableDueling;
+                return Entity.IsDead() || CurrentGameInstance.disableDueling || BaseGameNetworkManager.CurrentMapInfo.DisableDueling;
             }
         }
 
