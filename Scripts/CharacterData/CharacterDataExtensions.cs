@@ -1872,7 +1872,9 @@ namespace MultiplayerARPG
             foreach (StatusEffectApplying effect in statusEffects)
             {
                 if (effect.statusEffect == null) continue;
-                target.ApplyBuff(effect.statusEffect.DataId, BuffType.StatusEffect, effect.buffLevel.GetAmount(level), applier, weapon);
+                int buffLevel = effect.buffLevel.GetAmount(level);
+                target.ApplyBuff(effect.statusEffect.DataId, BuffType.StatusEffect, buffLevel, applier, weapon);
+                effect.statusEffect.OnApply(target, applier, weapon, level, buffLevel);
             }
         }
 
