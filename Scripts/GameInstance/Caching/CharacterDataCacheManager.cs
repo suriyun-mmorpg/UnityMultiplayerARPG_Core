@@ -11,8 +11,11 @@ namespace MultiplayerARPG
             if (characterData == null)
                 return null;
             if (!s_caches.ContainsKey(characterData))
-                s_caches[characterData] = new CharacterDataCache().MarkToMakeCaches().MakeCache(characterData);
-            return s_caches[characterData].MakeCache(characterData);
+            {
+                // Did not mark to mark cache yet, so mark it here before get caches
+                return s_caches[characterData] = new CharacterDataCache().MarkToMakeCaches().GetCaches(characterData);
+            }
+            return s_caches[characterData].GetCaches(characterData);
         }
 
         public static CharacterDataCache MarkToMakeCaches(this ICharacterData characterData)
@@ -20,7 +23,10 @@ namespace MultiplayerARPG
             if (characterData == null)
                 return null;
             if (!s_caches.ContainsKey(characterData))
-                return new CharacterDataCache().MarkToMakeCaches();
+            {
+                // No stored caching data yet, create a new one and store to a colelction
+                return s_caches[characterData] = new CharacterDataCache().MarkToMakeCaches();
+            }
             return s_caches[characterData].MarkToMakeCaches();
         }
 

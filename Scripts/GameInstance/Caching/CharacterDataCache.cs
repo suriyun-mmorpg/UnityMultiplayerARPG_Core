@@ -71,7 +71,7 @@ namespace MultiplayerARPG
             return this;
         }
 
-        public CharacterDataCache MakeCache(ICharacterData characterData)
+        public CharacterDataCache GetCaches(ICharacterData characterData)
         {
             // Don't make cache if not needed
             if (!IsRecaching)
