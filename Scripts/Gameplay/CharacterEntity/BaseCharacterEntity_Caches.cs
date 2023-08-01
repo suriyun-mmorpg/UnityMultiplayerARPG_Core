@@ -46,8 +46,7 @@
             if (!IsRecaching)
                 return;
 
-            // Make caches with cache manager
-            this.MarkToMakeCaches();
+            _isRecaching = false;
 
             if (_selectableWeaponSetsRecachingState.isRecaching)
             {
@@ -98,8 +97,9 @@
                 _summonsRecachingState = SyncListRecachingState.Empty;
             }
 
+            // Make caches with cache manager
+            this.MarkToMakeCaches();
             CachedData = this.GetCaches();
-            _isRecaching = false;
         }
     }
 }
