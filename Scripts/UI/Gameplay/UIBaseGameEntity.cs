@@ -1,5 +1,6 @@
 ﻿using Cysharp.Text;
 using UnityEngine;
+using UnityEngine.Events;
 using UnityEngine.Profiling;
 
 namespace MultiplayerARPG
@@ -7,6 +8,9 @@ namespace MultiplayerARPG
     public abstract class UIBaseGameEntity<T> : UISelectionEntry<T>
         where T : BaseGameEntity
     {
+        [System.Serializable]
+        public class Event : UnityEvent<T> { }
+
         public enum Visibility
         {
             VisibleWhenSelected,
@@ -20,6 +24,9 @@ namespace MultiplayerARPG
 
         [Header("Base Game Entity - UI Elements")]
         public TextWrapper uiTextTitle;
+
+        [Header("Events")]
+        public Event onSetEntity;
 
         [Header("Visible Options")]
         public Visibility visibility;
@@ -114,6 +121,7 @@ namespace MultiplayerARPG
         {
             RemoveEvents(_previousEntity);
             _previousEntity = Data;
+            onSetEntity.Invoke(Data);
             AddEvents(_previousEntity);
             UpdateTitle();
         }
