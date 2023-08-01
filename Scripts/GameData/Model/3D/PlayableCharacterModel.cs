@@ -9,6 +9,8 @@ namespace MultiplayerARPG.GameData.Model.Playables
 {
     public partial class PlayableCharacterModel : BaseCharacterModel, ICustomAnimationModel, IModelWithAnimator, IModelWithSkinnedMeshRenderer
     {
+        public const int OFFSET_FOR_CUSTOM_ANIMATION_ACTION_ID = 1000;
+
         [Header("Relates Components")]
         [Tooltip("It will find `Animator` component on automatically if this is NULL")]
         public Animator animator;
@@ -44,11 +46,12 @@ namespace MultiplayerARPG.GameData.Model.Playables
         public AnimationPlayableBehaviour Behaviour { get; protected set; }
         public float SwitchedTime { get; protected set; }
 
-        protected WeaponType equippedWeaponType = null;
-        protected Coroutine actionCoroutine = null;
-        protected bool isDoingAction = false;
-        protected EquipWeapons oldEquipWeapons = null;
-        protected System.Action onStopAction = null;
+        protected WeaponType _equippedWeaponType = null;
+        protected Coroutine _actionCoroutine = null;
+        protected bool _isDoingAction = false;
+        protected EquipWeapons _oldEquipWeapons = null;
+        protected System.Action _onStopAction = null;
+        protected int _latestCustomAnimationActionId = 0;
 
         protected override void Awake()
         {
@@ -220,15 +223,15 @@ namespace MultiplayerARPG.GameData.Model.Playables
             if (rightWeaponItem == null)
                 rightWeaponItem = leftWeaponItem;
             // Set equipped weapon type, it will be used to get animations by id
-            equippedWeaponType = null;
+            _equippedWeaponType = null;
             if (rightWeaponItem != null)
-                equippedWeaponType = rightWeaponItem.WeaponType;
+                _equippedWeaponType = rightWeaponItem.WeaponType;
             if (Behaviour != null)
                 Behaviour.SetEquipWeapons(rightWeaponItem, leftWeaponItem, newEquipWeapons.GetLeftHandShieldItem());
             // Player draw/holster animation
-            if (oldEquipWeapons == null)
-                oldEquipWeapons = newEquipWeapons;
-            if (Time.unscaledTime - SwitchedTime < 1f || !newEquipWeapons.IsDiffer(oldEquipWeapons, out bool rightIsDiffer, out bool leftIsDiffer))
+            if (_oldEquipWeapons == null)
+                _oldEquipWeapons = newEquipWeapons;
+            if (Time.unscaledTime - SwitchedTime < 1f || !newEquipWeapons.IsDiffer(_oldEquipWeapons, out bool rightIsDiffer, out bool leftIsDiffer))
             {
                 SetNewEquipWeapons(newEquipWeapons, equipItems, selectableWeaponSets, equipWeaponSet, isWeaponsSheathed);
                 return;
@@ -239,7 +242,7 @@ namespace MultiplayerARPG.GameData.Model.Playables
         private void SetNewEquipWeapons(EquipWeapons newEquipWeapons, IList<CharacterItem> equipItems, IList<EquipWeapons> selectableWeaponSets, byte equipWeaponSet, bool isWeaponsSheathed)
         {
             if (newEquipWeapons != null)
-                oldEquipWeapons = newEquipWeapons.Clone();
+                _oldEquipWeapons = newEquipWeapons.Clone();
             base.SetEquipItems(equipItems, selectableWeaponSets, equipWeaponSet, isWeaponsSheathed);
         }
 
@@ -296,8 +299,8 @@ namespace MultiplayerARPG.GameData.Model.Playables
 
         public void GetLeftHandUnsheathActionState(EquipWeapons newEquipWeapons, out ActionState actionState, out float triggeredDurationRate)
         {
-            IWeaponItem tempWeaponItem = oldEquipWeapons.GetLeftHandWeaponItem();
-            IShieldItem tempShieldItem = oldEquipWeapons.GetLeftHandShieldItem();
+            IWeaponItem tempWeaponItem = _oldEquipWeapons.GetLeftHandWeaponItem();
+            IShieldItem tempShieldItem = _oldEquipWeapons.GetLeftHandShieldItem();
             if (tempWeaponItem != null && TryGetWeaponAnimations(tempWeaponItem.WeaponType.DataId, out WeaponAnimations anims) && anims.leftHandWeaponSheathingAnimation.sheathState.clip != null)
             {
                 actionState = anims.leftHandWeaponSheathingAnimation.unsheathState;
@@ -317,21 +320,21 @@ namespace MultiplayerARPG.GameData.Model.Playables
 
         private IEnumerator PlayEquipWeaponsAnimationRoutine(EquipWeapons newEquipWeapons, bool rightIsDiffer, bool leftIsDiffer, IList<CharacterItem> equipItems, IList<EquipWeapons> selectableWeaponSets, byte equipWeaponSet, bool isWeaponsSheathed)
         {
-            isDoingAction = true;
+            _isDoingAction = true;
 
             ActionState actionState = new ActionState();
             float triggeredDurationRate = 0f;
             if (isWeaponsSheathed)
             {
-                if (oldEquipWeapons != null)
+                if (_oldEquipWeapons != null)
                 {
                     if (rightIsDiffer)
                     {
-                        GetRightHandSheathActionState(oldEquipWeapons, out actionState, out triggeredDurationRate);
+                        GetRightHandSheathActionState(_oldEquipWeapons, out actionState, out triggeredDurationRate);
                     }
                     else if (leftIsDiffer)
                     {
-                        GetLeftHandSheathActionState(oldEquipWeapons, out actionState, out triggeredDurationRate);
+                        GetLeftHandSheathActionState(_oldEquipWeapons, out actionState, out triggeredDurationRate);
                     }
                 }
             }
@@ -342,14 +345,14 @@ namespace MultiplayerARPG.GameData.Model.Playables
                     if (rightIsDiffer)
                     {
                         if (newEquipWeapons.IsEmptyRightHandSlot())
-                            GetRightHandSheathActionState(oldEquipWeapons, out actionState, out triggeredDurationRate);
+                            GetRightHandSheathActionState(_oldEquipWeapons, out actionState, out triggeredDurationRate);
                         else
                             GetRightHandUnsheathActionState(newEquipWeapons, out actionState, out triggeredDurationRate);
                     }
                     else if (leftIsDiffer)
                     {
                         if (newEquipWeapons.IsEmptyLeftHandSlot())
-                            GetLeftHandSheathActionState(oldEquipWeapons, out actionState, out triggeredDurationRate);
+                            GetLeftHandSheathActionState(_oldEquipWeapons, out actionState, out triggeredDurationRate);
                         else
                             GetLeftHandUnsheathActionState(newEquipWeapons, out actionState, out triggeredDurationRate);
                     }
@@ -369,7 +372,7 @@ namespace MultiplayerARPG.GameData.Model.Playables
                 yield return new WaitForSecondsRealtime(triggeredDelay);
 
             SetNewEquipWeapons(newEquipWeapons, equipItems, selectableWeaponSets, equipWeaponSet, isWeaponsSheathed);
-            onStopAction = null;
+            _onStopAction = null;
 
             if (animationDelay - triggeredDelay > 0f)
             {
@@ -377,7 +380,7 @@ namespace MultiplayerARPG.GameData.Model.Playables
                 yield return new WaitForSecondsRealtime(animationDelay - triggeredDelay);
             }
 
-            isDoingAction = false;
+            _isDoingAction = false;
         }
 
 
@@ -524,16 +527,16 @@ namespace MultiplayerARPG.GameData.Model.Playables
 
         private IEnumerator PlaySkillCastClipRoutine(ActionState castState, float duration)
         {
-            isDoingAction = true;
+            _isDoingAction = true;
             // Waits by skill cast duration
             yield return new WaitForSecondsRealtime(Behaviour.PlayAction(castState, 1f, duration));
-            isDoingAction = false;
+            _isDoingAction = false;
         }
 
         public override void StopSkillCastAnimation()
         {
             Behaviour.StopAction();
-            isDoingAction = false;
+            _isDoingAction = false;
         }
         #endregion
 
@@ -545,26 +548,26 @@ namespace MultiplayerARPG.GameData.Model.Playables
 
         private IEnumerator PlayActionAnimationRoutine(ActionAnimation actionAnimation, float playSpeedMultiplier)
         {
-            isDoingAction = true;
+            _isDoingAction = true;
             AudioManager.PlaySfxClipAtAudioSource(actionAnimation.GetRandomAudioClip(), GenericAudioSource);
             // Wait by animation playing duration
             yield return new WaitForSecondsRealtime(Behaviour.PlayAction(actionAnimation.state, playSpeedMultiplier));
             // Waits by current transition + extra duration before end playing animation state
             yield return new WaitForSecondsRealtime(actionAnimation.GetExtendDuration() / playSpeedMultiplier);
-            isDoingAction = false;
+            _isDoingAction = false;
         }
 
         public override void StopActionAnimation()
         {
             Behaviour.StopAction();
-            isDoingAction = false;
+            _isDoingAction = false;
         }
         #endregion
 
         #region Weapon charge animations
         public override void PlayWeaponChargeClip(int dataId, bool isLeftHand)
         {
-            isDoingAction = true;
+            _isDoingAction = true;
             WeaponAnimations weaponAnimations;
             if (TryGetWeaponAnimations(dataId, out weaponAnimations))
             {
@@ -588,7 +591,7 @@ namespace MultiplayerARPG.GameData.Model.Playables
         public override void StopWeaponChargeAnimation()
         {
             Behaviour.StopAction();
-            isDoingAction = false;
+            _isDoingAction = false;
         }
         #endregion
 
@@ -602,10 +605,10 @@ namespace MultiplayerARPG.GameData.Model.Playables
 
         public override void PlayHitAnimation()
         {
-            if (isDoingAction)
+            if (_isDoingAction)
                 return;
             WeaponAnimations weaponAnimations;
-            if (equippedWeaponType != null && TryGetWeaponAnimations(equippedWeaponType.DataId, out weaponAnimations) && weaponAnimations.hurtState.clip != null)
+            if (_equippedWeaponType != null && TryGetWeaponAnimations(_equippedWeaponType.DataId, out weaponAnimations) && weaponAnimations.hurtState.clip != null)
             {
                 Behaviour.PlayAction(weaponAnimations.hurtState, 1f);
                 return;
@@ -621,10 +624,10 @@ namespace MultiplayerARPG.GameData.Model.Playables
 
         public override void PlayPickupAnimation()
         {
-            if (isDoingAction)
+            if (_isDoingAction)
                 return;
             WeaponAnimations weaponAnimations;
-            if (equippedWeaponType != null && TryGetWeaponAnimations(equippedWeaponType.DataId, out weaponAnimations) && weaponAnimations.pickupState.clip != null)
+            if (_equippedWeaponType != null && TryGetWeaponAnimations(_equippedWeaponType.DataId, out weaponAnimations) && weaponAnimations.pickupState.clip != null)
             {
                 Behaviour.PlayAction(weaponAnimations.pickupState, 1f);
                 return;
@@ -637,10 +640,18 @@ namespace MultiplayerARPG.GameData.Model.Playables
         {
             if (id < 0 || id >= customAnimations.Length)
                 return;
-            if (isDoingAction)
+            if (_isDoingAction)
                 return;
             if (customAnimations[id].clip != null)
-                Behaviour.PlayAction(customAnimations[id], 1f);
+            {
+                _latestCustomAnimationActionId = OFFSET_FOR_CUSTOM_ANIMATION_ACTION_ID + id;
+                Behaviour.PlayAction(customAnimations[id], 1f, actionId: _latestCustomAnimationActionId);
+            }
+        }
+
+        public void StopCustomAnimation()
+        {
+            Behaviour.StopActionIfActionIdIs(_latestCustomAnimationActionId);
         }
 
         public AnimationClip GetCustomAnimationClip(int id)
@@ -656,24 +667,24 @@ namespace MultiplayerARPG.GameData.Model.Playables
         protected Coroutine StartActionCoroutine(IEnumerator routine, System.Action onStopAction = null)
         {
             StopActionCoroutine();
-            isDoingAction = true;
-            actionCoroutine = StartCoroutine(routine);
-            this.onStopAction = onStopAction;
-            return actionCoroutine;
+            _isDoingAction = true;
+            _actionCoroutine = StartCoroutine(routine);
+            this._onStopAction = onStopAction;
+            return _actionCoroutine;
         }
 
         protected void StopActionCoroutine()
         {
-            if (isDoingAction)
+            if (_isDoingAction)
             {
-                if (onStopAction != null)
-                    onStopAction.Invoke();
+                if (_onStopAction != null)
+                    _onStopAction.Invoke();
             }
-            if (actionCoroutine != null)
-                StopCoroutine(actionCoroutine);
-            actionCoroutine = null;
-            isDoingAction = false;
-            onStopAction = null;
+            if (_actionCoroutine != null)
+                StopCoroutine(_actionCoroutine);
+            _actionCoroutine = null;
+            _isDoingAction = false;
+            _onStopAction = null;
         }
     }
 }

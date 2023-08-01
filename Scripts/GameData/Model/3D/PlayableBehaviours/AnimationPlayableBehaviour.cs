@@ -404,10 +404,10 @@ namespace MultiplayerARPG.GameData.Model.Playables
                 };
             }
         }
-        private static readonly Dictionary<int, CacheData> Caches = new Dictionary<int, CacheData>();
+        private static readonly Dictionary<int, CacheData> s_caches = new Dictionary<int, CacheData>();
         private CacheData Cache
         {
-            get { return Caches[CharacterModel.Id]; }
+            get { return s_caches[CharacterModel.Id]; }
         }
 
         // Clip name variables
@@ -445,21 +445,22 @@ namespace MultiplayerARPG.GameData.Model.Playables
         public PlayableCharacterModel CharacterModel { get; private set; }
         public bool IsFreeze { get; set; }
 
-        private readonly StateUpdateData baseStateUpdateData = new StateUpdateData();
-        private readonly StateUpdateData leftHandWieldingStateUpdateData = new StateUpdateData();
-        private PlayingActionState playingActionState = PlayingActionState.None;
-        private float actionTransitionDuration = 0f;
-        private float actionClipLength = 0f;
-        private float actionPlayElapsed = 0f;
-        private float actionLayerClipSpeed = 0f;
-        private float moveAnimationSpeedMultiplier = 1f;
-        private bool readyToPlay = false;
+        private readonly StateUpdateData _baseStateUpdateData = new StateUpdateData();
+        private readonly StateUpdateData _leftHandWieldingStateUpdateData = new StateUpdateData();
+        private PlayingActionState _playingActionState = PlayingActionState.None;
+        private float _actionTransitionDuration = 0f;
+        private float _actionClipLength = 0f;
+        private float _actionPlayElapsed = 0f;
+        private float _actionLayerClipSpeed = 0f;
+        private float _moveAnimationSpeedMultiplier = 1f;
+        private int _latestActionId = 0;
+        private bool _readyToPlay = false;
 
         public void Setup(PlayableCharacterModel characterModel)
         {
             CharacterModel = characterModel;
-            if (!Caches.ContainsKey(characterModel.Id))
-                Caches[characterModel.Id] = new CacheData(characterModel);
+            if (!s_caches.ContainsKey(characterModel.Id))
+                s_caches[characterModel.Id] = new CacheData(characterModel);
         }
 
         public override void OnPlayableCreate(Playable playable)
@@ -486,7 +487,7 @@ namespace MultiplayerARPG.GameData.Model.Playables
             Graph.Connect(LeftHandWieldingLayerMixer, 0, LayerMixer, LEFT_HAND_WIELDING_LAYER);
             LayerMixer.SetInputWeight(LEFT_HAND_WIELDING_LAYER, 0);
 
-            readyToPlay = true;
+            _readyToPlay = true;
         }
 
         private string GetPlayingStateId<T>(string weaponTypeId, Dictionary<string, T> stateInfos, StateUpdateData stateUpdateData) where T : IStateInfo
@@ -548,7 +549,7 @@ namespace MultiplayerARPG.GameData.Model.Playables
                 bool movingBackward = stateUpdateData.MovementState.Has(MovementState.Backward);
                 bool movingLeft = stateUpdateData.MovementState.Has(MovementState.Left);
                 bool movingRight = stateUpdateData.MovementState.Has(MovementState.Right);
-                stateUpdateData.isMoving = (movingForward || movingBackward || movingLeft || movingRight) && moveAnimationSpeedMultiplier > 0f;
+                stateUpdateData.isMoving = (movingForward || movingBackward || movingLeft || movingRight) && _moveAnimationSpeedMultiplier > 0f;
                 if (stateUpdateData.isMoving)
                 {
                     if (movingForward)
@@ -702,7 +703,7 @@ namespace MultiplayerARPG.GameData.Model.Playables
                 LayerMixer.SetLayerMaskFromAvatarMask(layer, avatarMask);
 
                 // Set clip info 
-                stateUpdateData.clipSpeed = stateInfos[playingStateId].GetSpeed(moveAnimationSpeedMultiplier > 0f ? moveAnimationSpeedMultiplier : 1f);
+                stateUpdateData.clipSpeed = stateInfos[playingStateId].GetSpeed(_moveAnimationSpeedMultiplier > 0f ? _moveAnimationSpeedMultiplier : 1f);
                 // Set transition duration
                 stateUpdateData.transitionDuration = stateInfos[playingStateId].GetTransitionDuration();
                 if (stateUpdateData.transitionDuration <= 0f)
@@ -817,44 +818,44 @@ namespace MultiplayerARPG.GameData.Model.Playables
 
         public override void PrepareFrame(Playable playable, FrameData info)
         {
-            if (!readyToPlay)
+            if (!_readyToPlay)
                 return;
 
-            if (!Mathf.Approximately(moveAnimationSpeedMultiplier, CharacterModel.MoveAnimationSpeedMultiplier))
+            if (!Mathf.Approximately(_moveAnimationSpeedMultiplier, CharacterModel.MoveAnimationSpeedMultiplier))
             {
-                moveAnimationSpeedMultiplier = CharacterModel.MoveAnimationSpeedMultiplier;
-                baseStateUpdateData.ForcePlay = true;
-                leftHandWieldingStateUpdateData.ForcePlay = true;
+                _moveAnimationSpeedMultiplier = CharacterModel.MoveAnimationSpeedMultiplier;
+                _baseStateUpdateData.ForcePlay = true;
+                _leftHandWieldingStateUpdateData.ForcePlay = true;
             }
 
             #region Update base state and left-hand wielding
             if (!IsFreeze)
             {
-                PrepareForNewState(BaseLayerMixer, BASE_LAYER, Cache.BaseStates, baseStateUpdateData);
-                PrepareForNewState(LeftHandWieldingLayerMixer, LEFT_HAND_WIELDING_LAYER, Cache.LeftHandWieldingStates, leftHandWieldingStateUpdateData);
+                PrepareForNewState(BaseLayerMixer, BASE_LAYER, Cache.BaseStates, _baseStateUpdateData);
+                PrepareForNewState(LeftHandWieldingLayerMixer, LEFT_HAND_WIELDING_LAYER, Cache.LeftHandWieldingStates, _leftHandWieldingStateUpdateData);
             }
 
-            UpdateState(BaseLayerMixer, baseStateUpdateData, info.deltaTime, false);
-            UpdateState(LeftHandWieldingLayerMixer, leftHandWieldingStateUpdateData, info.deltaTime, true);
+            UpdateState(BaseLayerMixer, _baseStateUpdateData, info.deltaTime, false);
+            UpdateState(LeftHandWieldingLayerMixer, _leftHandWieldingStateUpdateData, info.deltaTime, true);
             #endregion
 
             #region Update action state
-            if (playingActionState == PlayingActionState.None)
+            if (_playingActionState == PlayingActionState.None)
                 return;
 
-            if (CharacterModel.IsDead && playingActionState != PlayingActionState.Stopping)
+            if (CharacterModel.IsDead && _playingActionState != PlayingActionState.Stopping)
             {
                 // Character dead, stop action animation
-                playingActionState = PlayingActionState.Stopping;
+                _playingActionState = PlayingActionState.Stopping;
             }
 
             // Update freezing state
-            ActionLayerMixer.GetInput(0).SetSpeed(IsFreeze ? 0 : actionLayerClipSpeed);
+            ActionLayerMixer.GetInput(0).SetSpeed(IsFreeze ? 0 : _actionLayerClipSpeed);
 
             // Update transition
-            float weightUpdate = info.deltaTime / actionTransitionDuration;
+            float weightUpdate = info.deltaTime / _actionTransitionDuration;
             float weight = LayerMixer.GetInputWeight(ACTION_LAYER);
-            switch (playingActionState)
+            switch (_playingActionState)
             {
                 case PlayingActionState.Playing:
                 case PlayingActionState.Looping:
@@ -871,43 +872,43 @@ namespace MultiplayerARPG.GameData.Model.Playables
             LayerMixer.SetInputWeight(ACTION_LAYER, weight);
 
             // Update playing state
-            actionPlayElapsed += info.deltaTime;
+            _actionPlayElapsed += info.deltaTime;
 
             // Stopped
             if (weight <= 0f)
             {
-                playingActionState = PlayingActionState.None;
+                _playingActionState = PlayingActionState.None;
                 if (ActionLayerMixer.IsValid())
                     ActionLayerMixer.Destroy();
                 return;
             }
 
             // Animation end, transition to idle
-            if (actionPlayElapsed >= actionClipLength && playingActionState == PlayingActionState.Playing)
+            if (_actionPlayElapsed >= _actionClipLength && _playingActionState == PlayingActionState.Playing)
             {
-                playingActionState = PlayingActionState.Stopping;
+                _playingActionState = PlayingActionState.Stopping;
             }
             #endregion
         }
 
         public void SetEquipWeapons(IWeaponItem rightHand, IWeaponItem leftHand, IShieldItem leftHandShield)
         {
-            baseStateUpdateData.WeaponTypeId = string.Empty;
+            _baseStateUpdateData.WeaponTypeId = string.Empty;
             if (rightHand != null && Cache.WeaponTypeIds.Contains(rightHand.WeaponType.Id))
-                baseStateUpdateData.WeaponTypeId = rightHand.WeaponType.Id;
+                _baseStateUpdateData.WeaponTypeId = rightHand.WeaponType.Id;
 
-            leftHandWieldingStateUpdateData.WeaponTypeId = string.Empty;
+            _leftHandWieldingStateUpdateData.WeaponTypeId = string.Empty;
             if (leftHand != null && Cache.LeftHandWeaponTypeIds.Contains(leftHand.WeaponType.Id))
-                leftHandWieldingStateUpdateData.WeaponTypeId = leftHand.WeaponType.Id;
+                _leftHandWieldingStateUpdateData.WeaponTypeId = leftHand.WeaponType.Id;
 
             if (leftHandShield != null && Cache.LeftHandWeaponTypeIds.Contains(SHILED_WEAPON_TYPE_ID))
-                leftHandWieldingStateUpdateData.WeaponTypeId = SHILED_WEAPON_TYPE_ID;
+                _leftHandWieldingStateUpdateData.WeaponTypeId = SHILED_WEAPON_TYPE_ID;
         }
 
         public void PlayJump()
         {
-            baseStateUpdateData.PlayingJumpState = PlayingJumpState.Starting;
-            leftHandWieldingStateUpdateData.PlayingJumpState = PlayingJumpState.Starting;
+            _baseStateUpdateData.PlayingJumpState = PlayingJumpState.Starting;
+            _leftHandWieldingStateUpdateData.PlayingJumpState = PlayingJumpState.Starting;
         }
 
         /// <summary>
@@ -917,9 +918,12 @@ namespace MultiplayerARPG.GameData.Model.Playables
         /// <param name="speedRate"></param>
         /// <param name="duration"></param>
         /// <param name="loop"></param>
+        /// <param name="actionId"></param>
         /// <returns></returns>
-        public float PlayAction(ActionState actionState, float speedRate, float duration = 0f, bool loop = false)
+        public float PlayAction(ActionState actionState, float speedRate, float duration = 0f, bool loop = false, int actionId = 0)
         {
+            _latestActionId = actionId;
+
             if (IsFreeze || CharacterModel.IsDead)
                 return 0f;
 
@@ -947,33 +951,39 @@ namespace MultiplayerARPG.GameData.Model.Playables
             LayerMixer.SetLayerMaskFromAvatarMask(ACTION_LAYER, avatarMask);
 
             // Set clip info
-            actionLayerClipSpeed = (actionState.animSpeedRate > 0f ? actionState.animSpeedRate : 1f) * speedRate;
+            _actionLayerClipSpeed = (actionState.animSpeedRate > 0f ? actionState.animSpeedRate : 1f) * speedRate;
             // Set transition duration
-            actionTransitionDuration = actionState.transitionDuration;
-            if (actionTransitionDuration <= 0f)
-                actionTransitionDuration = CharacterModel.transitionDuration;
-            actionTransitionDuration /= actionLayerClipSpeed;
+            _actionTransitionDuration = actionState.transitionDuration;
+            if (_actionTransitionDuration <= 0f)
+                _actionTransitionDuration = CharacterModel.transitionDuration;
+            _actionTransitionDuration /= _actionLayerClipSpeed;
             // Set clip length
             ActionLayerMixer.GetInput(0).SetTime(0f);
-            actionClipLength = (duration > 0f ? duration : clip.length) / actionLayerClipSpeed;
+            _actionClipLength = (duration > 0f ? duration : clip.length) / _actionLayerClipSpeed;
             // Set layer additive
             LayerMixer.SetLayerAdditive(ACTION_LAYER, actionState.isAdditive);
             // Reset play elapsed
-            actionPlayElapsed = 0f;
+            _actionPlayElapsed = 0f;
 
             if (loop)
-                playingActionState = PlayingActionState.Looping;
+                _playingActionState = PlayingActionState.Looping;
             else
-                playingActionState = PlayingActionState.Playing;
+                _playingActionState = PlayingActionState.Playing;
 
-            return actionClipLength;
+            return _actionClipLength;
+        }
+
+        public void StopActionIfActionIdIs(int actionId)
+        {
+            if (_latestActionId == actionId)
+                StopAction();
         }
 
         public void StopAction()
         {
-            if (playingActionState == PlayingActionState.Playing ||
-                playingActionState == PlayingActionState.Looping)
-                playingActionState = PlayingActionState.Stopping;
+            if (_playingActionState == PlayingActionState.Playing ||
+                _playingActionState == PlayingActionState.Looping)
+                _playingActionState = PlayingActionState.Stopping;
         }
     }
 }

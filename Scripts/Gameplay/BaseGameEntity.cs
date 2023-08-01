@@ -574,6 +574,17 @@ namespace MultiplayerARPG
         {
             PlayCustomAnimation(id);
         }
+
+        public void CallAllStopCustomAnimation()
+        {
+            RPC(AllStopCustomAnimation);
+        }
+
+        [AllRpc]
+        protected virtual void AllStopCustomAnimation()
+        {
+            StopCustomAnimation();
+        }
         #endregion
 
         public override void OnNetworkDestroy(byte reasons)
@@ -604,6 +615,12 @@ namespace MultiplayerARPG
         {
             if (Model is ICustomAnimationModel customAnimationModel)
                 customAnimationModel.PlayCustomAnimation(id);
+        }
+
+        public virtual void StopCustomAnimation()
+        {
+            if (Model is ICustomAnimationModel customAnimationModel)
+                customAnimationModel.StopCustomAnimation();
         }
 
         public virtual bool SetAsTargetInOneClick()
