@@ -121,17 +121,11 @@ namespace MultiplayerARPG
                 return false;
             }
 
-            if (!canApplyDamageToUser && target.GetObjectId() == _instigator.ObjectId)
-            {
-                target = null;
-                return false;
-            }
+            if (target.GetObjectId() == _instigator.ObjectId)
+                return canApplyDamageToUser;
 
-            if (!canApplyDamageToAllies && target.DamageableEntity is BaseCharacterEntity characterEntity && characterEntity.IsAlly(_instigator))
-            {
-                target = null;
-                return false;
-            }
+            if (target.DamageableEntity is BaseCharacterEntity characterEntity && characterEntity.IsAlly(_instigator))
+                return canApplyDamageToAllies;
 
             return true;
         }

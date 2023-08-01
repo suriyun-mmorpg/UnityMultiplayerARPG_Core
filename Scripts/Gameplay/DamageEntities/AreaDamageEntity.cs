@@ -95,11 +95,19 @@ namespace MultiplayerARPG
             if (target == null || target.IsDead() || target.IsImmune || target.IsInSafeArea)
                 return;
 
-            if (!canApplyDamageToUser && target.GetObjectId() == _instigator.ObjectId)
+            if (target.GetObjectId() == _instigator.ObjectId)
+            {
+                if (canApplyDamageToUser)
+                    target.ReceiveDamageWithoutConditionCheck(CacheTransform.position, _instigator, _damageAmounts, _weapon, _skill, _skillLevel, Random.Range(0, 255));
                 return;
+            }
 
-            if (!canApplyDamageToAllies && target.DamageableEntity is BaseCharacterEntity characterEntity && characterEntity.IsAlly(_instigator))
+            if (target.DamageableEntity is BaseCharacterEntity characterEntity && characterEntity.IsAlly(_instigator))
+            {
+                if (canApplyDamageToAllies)
+                    target.ReceiveDamageWithoutConditionCheck(CacheTransform.position, _instigator, _damageAmounts, _weapon, _skill, _skillLevel, Random.Range(0, 255));
                 return;
+            }
 
             target.ReceiveDamageWithoutConditionCheck(CacheTransform.position, _instigator, _damageAmounts, _weapon, _skill, _skillLevel, Random.Range(0, 255));
         }
