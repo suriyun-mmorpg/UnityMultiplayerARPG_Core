@@ -661,13 +661,13 @@ namespace MultiplayerARPG
                 return;
             // Mark as destroyed
             _isDestroyed = true;
+            // Destroy this entity
+            NetworkDestroy(DestroyDelay);
             // Respawning later
             if (SpawnArea != null)
                 SpawnArea.Spawn(SpawnPrefab, SpawnLevel, DestroyDelay + DestroyRespawnDelay);
             else if (Identity.IsSceneObject)
                 RespawnRoutine(DestroyDelay + DestroyRespawnDelay).Forget();
-            // Destroy this entity
-            NetworkDestroy(DestroyDelay);
         }
 
         /// <summary>
