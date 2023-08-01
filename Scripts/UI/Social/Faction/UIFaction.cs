@@ -41,5 +41,14 @@ namespace MultiplayerARPG
                 imageIcon.preserveAspect = true;
             }
         }
+
+        public void SetDataByDataId(int dataId)
+        {
+            Faction faction;
+            if (GameInstance.Factions.TryGetValue(dataId, out faction))
+                Data = faction;
+            else
+                Data = null;
+        }
     }
 }

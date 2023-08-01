@@ -60,6 +60,7 @@ namespace MultiplayerARPG
         public UIPlayerIcon uiPlayerIcon;
         public UIPlayerFrame uiPlayerFrame;
         public UIPlayerTitle uiPlayerTitle;
+        public UIFaction uiFaction;
 
         [Header("Options")]
         [Tooltip("If this is `TRUE` it won't update data when controlling character's data changes")]
@@ -76,13 +77,13 @@ namespace MultiplayerARPG
         public bool showDamageWithBuffs;
 
         // Improve garbage collector
-        private Dictionary<BaseSkill, int> cacheSkills;
-        private CharacterStats cacheStats;
-        private Dictionary<Attribute, float> cacheAttributes;
-        private Dictionary<DamageElement, float> cacheResistances;
-        private Dictionary<DamageElement, float> cacheArmors;
-        private Dictionary<DamageElement, MinMaxFloat> cacheDamages;
-        private Dictionary<EquipmentSet, int> cacheEquipmentSets;
+        private Dictionary<BaseSkill, int> _cacheSkills;
+        private CharacterStats _cacheStats;
+        private Dictionary<Attribute, float> _cacheAttributes;
+        private Dictionary<DamageElement, float> _cacheResistances;
+        private Dictionary<DamageElement, float> _cacheArmors;
+        private Dictionary<DamageElement, MinMaxFloat> _cacheDamages;
+        private Dictionary<EquipmentSet, int> _cacheEquipmentSets;
 
         public bool NotForOwningCharacter
         {
@@ -94,43 +95,43 @@ namespace MultiplayerARPG
             }
         }
 
-        private Dictionary<Attribute, UICharacterAttribute> cacheUICharacterAttributes;
+        private Dictionary<Attribute, UICharacterAttribute> _cacheUICharacterAttributes;
         public Dictionary<Attribute, UICharacterAttribute> CacheUICharacterAttributes
         {
             get
             {
-                if (cacheUICharacterAttributes == null)
+                if (_cacheUICharacterAttributes == null)
                 {
-                    cacheUICharacterAttributes = new Dictionary<Attribute, UICharacterAttribute>();
+                    _cacheUICharacterAttributes = new Dictionary<Attribute, UICharacterAttribute>();
                     foreach (UICharacterAttributePair uiCharacterAttribute in uiCharacterAttributes)
                     {
                         if (uiCharacterAttribute.attribute != null &&
                             uiCharacterAttribute.ui != null &&
-                            !cacheUICharacterAttributes.ContainsKey(uiCharacterAttribute.attribute))
-                            cacheUICharacterAttributes.Add(uiCharacterAttribute.attribute, uiCharacterAttribute.ui);
+                            !_cacheUICharacterAttributes.ContainsKey(uiCharacterAttribute.attribute))
+                            _cacheUICharacterAttributes.Add(uiCharacterAttribute.attribute, uiCharacterAttribute.ui);
                     }
                 }
-                return cacheUICharacterAttributes;
+                return _cacheUICharacterAttributes;
             }
         }
 
-        private Dictionary<Currency, UICharacterCurrency> cacheUICharacterCurrencies;
+        private Dictionary<Currency, UICharacterCurrency> _cacheUICharacterCurrencies;
         public Dictionary<Currency, UICharacterCurrency> CacheUICharacterCurrencies
         {
             get
             {
-                if (cacheUICharacterCurrencies == null)
+                if (_cacheUICharacterCurrencies == null)
                 {
-                    cacheUICharacterCurrencies = new Dictionary<Currency, UICharacterCurrency>();
+                    _cacheUICharacterCurrencies = new Dictionary<Currency, UICharacterCurrency>();
                     foreach (UICharacterCurrencyPair uiCharacterCurrency in uiCharacterCurrencies)
                     {
                         if (uiCharacterCurrency.currency != null &&
                             uiCharacterCurrency.ui != null &&
-                            !cacheUICharacterCurrencies.ContainsKey(uiCharacterCurrency.currency))
-                            cacheUICharacterCurrencies.Add(uiCharacterCurrency.currency, uiCharacterCurrency.ui);
+                            !_cacheUICharacterCurrencies.ContainsKey(uiCharacterCurrency.currency))
+                            _cacheUICharacterCurrencies.Add(uiCharacterCurrency.currency, uiCharacterCurrency.ui);
                     }
                 }
-                return cacheUICharacterCurrencies;
+                return _cacheUICharacterCurrencies;
             }
         }
 
@@ -393,6 +394,14 @@ namespace MultiplayerARPG
                 uiPlayerTitle.SetVisible(playerCharacter != null);
             }
 
+            // Faction
+            if (uiFaction != null)
+            {
+                if (playerCharacter != null)
+                    uiFaction.SetDataByDataId(playerCharacter.FactionId);
+                uiFaction.SetVisible(playerCharacter != null);
+            }
+
             Profiler.EndSample();
         }
 
@@ -400,20 +409,20 @@ namespace MultiplayerARPG
         {
             IPlayerCharacterData playerCharacter = Data as IPlayerCharacterData;
 
-            cacheStats = new CharacterStats();
-            cacheAttributes = new Dictionary<Attribute, float>();
-            cacheResistances = new Dictionary<DamageElement, float>();
-            cacheArmors = new Dictionary<DamageElement, float>();
-            cacheDamages = new Dictionary<DamageElement, MinMaxFloat>();
-            cacheSkills = new Dictionary<BaseSkill, int>();
-            cacheEquipmentSets = new Dictionary<EquipmentSet, int>();
-            cacheSkills = GameDataHelpers.CombineSkills(cacheSkills, Data.GetSkills(true));
-            cacheAttributes = GameDataHelpers.CombineAttributes(cacheAttributes, showAttributeWithBuffs ? Data.GetAttributes(true, true, cacheSkills) : Data.GetAttributes(true, false, null));
-            cacheResistances = GameDataHelpers.CombineResistances(cacheResistances, showResistanceWithBuffs ? Data.GetResistances(true, true, cacheAttributes, cacheSkills) : Data.GetResistances(true, false, null, null));
-            cacheArmors = GameDataHelpers.CombineArmors(cacheArmors, showArmorWithBuffs ? Data.GetArmors(true, true, cacheAttributes, cacheSkills) : Data.GetArmors(true, false, null, null));
-            cacheDamages = GameDataHelpers.CombineDamages(cacheDamages, showDamageWithBuffs ? Data.GetIncreaseDamages(true, true, cacheAttributes, cacheSkills) : Data.GetIncreaseDamages(true, false, null, null));
-            cacheStats = cacheStats + (showStatsWithBuffs ? Data.GetStats(true, true, cacheSkills) : Data.GetStats(true, false, null));
-            Data.GetEquipmentSetBonus(ref cacheStats, cacheAttributes, cacheResistances, cacheArmors, cacheDamages, cacheSkills, cacheEquipmentSets, true);
+            _cacheStats = new CharacterStats();
+            _cacheAttributes = new Dictionary<Attribute, float>();
+            _cacheResistances = new Dictionary<DamageElement, float>();
+            _cacheArmors = new Dictionary<DamageElement, float>();
+            _cacheDamages = new Dictionary<DamageElement, MinMaxFloat>();
+            _cacheSkills = new Dictionary<BaseSkill, int>();
+            _cacheEquipmentSets = new Dictionary<EquipmentSet, int>();
+            _cacheSkills = GameDataHelpers.CombineSkills(_cacheSkills, Data.GetSkills(true));
+            _cacheAttributes = GameDataHelpers.CombineAttributes(_cacheAttributes, showAttributeWithBuffs ? Data.GetAttributes(true, true, _cacheSkills) : Data.GetAttributes(true, false, null));
+            _cacheResistances = GameDataHelpers.CombineResistances(_cacheResistances, showResistanceWithBuffs ? Data.GetResistances(true, true, _cacheAttributes, _cacheSkills) : Data.GetResistances(true, false, null, null));
+            _cacheArmors = GameDataHelpers.CombineArmors(_cacheArmors, showArmorWithBuffs ? Data.GetArmors(true, true, _cacheAttributes, _cacheSkills) : Data.GetArmors(true, false, null, null));
+            _cacheDamages = GameDataHelpers.CombineDamages(_cacheDamages, showDamageWithBuffs ? Data.GetIncreaseDamages(true, true, _cacheAttributes, _cacheSkills) : Data.GetIncreaseDamages(true, false, null, null));
+            _cacheStats = _cacheStats + (showStatsWithBuffs ? Data.GetStats(true, true, _cacheSkills) : Data.GetStats(true, false, null));
+            Data.GetEquipmentSetBonus(ref _cacheStats, _cacheAttributes, _cacheResistances, _cacheArmors, _cacheDamages, _cacheSkills, _cacheEquipmentSets, true);
 
             if (uiTextWeightLimit != null)
             {
@@ -439,12 +448,12 @@ namespace MultiplayerARPG
             Dictionary<DamageElement, MinMaxFloat> leftHandDamages = null;
             if (rightHandWeapon != null)
             {
-                rightHandDamages = GameDataHelpers.CombineDamages(null, cacheDamages);
+                rightHandDamages = GameDataHelpers.CombineDamages(null, _cacheDamages);
                 rightHandDamages = GameDataHelpers.CombineDamages(rightHandDamages, rightHandItem.GetDamageAmount(Data));
             }
             if (leftHandWeapon != null)
             {
-                leftHandDamages = GameDataHelpers.CombineDamages(null, cacheDamages);
+                leftHandDamages = GameDataHelpers.CombineDamages(null, _cacheDamages);
                 leftHandDamages = GameDataHelpers.CombineDamages(leftHandDamages, leftHandItem.GetDamageAmount(Data));
             }
 
@@ -517,25 +526,25 @@ namespace MultiplayerARPG
             {
                 uiCharacterStats.displayType = UICharacterStats.DisplayType.Simple;
                 uiCharacterStats.isBonus = false;
-                uiCharacterStats.Data = cacheStats;
+                uiCharacterStats.Data = _cacheStats;
             }
 
             if (uiCharacterResistances != null)
             {
                 uiCharacterResistances.isBonus = false;
-                uiCharacterResistances.Data = cacheResistances;
+                uiCharacterResistances.Data = _cacheResistances;
             }
 
             if (uiCharacterElementalDamages != null)
             {
                 uiCharacterElementalDamages.isBonus = false;
-                uiCharacterElementalDamages.Data = cacheDamages;
+                uiCharacterElementalDamages.Data = _cacheDamages;
             }
 
             if (uiCharacterArmors != null)
             {
                 uiCharacterArmors.isBonus = false;
-                uiCharacterArmors.Data = cacheArmors;
+                uiCharacterArmors.Data = _cacheArmors;
             }
 
             if (CacheUICharacterAttributes.Count > 0 && Data != null)
@@ -548,8 +557,8 @@ namespace MultiplayerARPG
                     tempIndexOfAttribute = Data.IndexOfAttribute(attribute.DataId);
                     tempCharacterAttribute = tempIndexOfAttribute >= 0 ? Data.Attributes[tempIndexOfAttribute] : CharacterAttribute.Create(attribute, 0);
                     tempAmount = 0;
-                    if (cacheAttributes.ContainsKey(attribute))
-                        tempAmount = cacheAttributes[attribute];
+                    if (_cacheAttributes.ContainsKey(attribute))
+                        tempAmount = _cacheAttributes[attribute];
                     CacheUICharacterAttributes[attribute].Setup(new UICharacterAttributeData(tempCharacterAttribute, tempAmount), Data, tempIndexOfAttribute);
                     CacheUICharacterAttributes[attribute].Show();
                 }
