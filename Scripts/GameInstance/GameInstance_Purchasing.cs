@@ -40,7 +40,7 @@ namespace MultiplayerARPG
 
             if (cashShopDatabase != null)
             {
-                foreach (CashShopItem cashShopItem in cashShopDatabase.cashStopItems)
+                foreach (CashShopItem cashShopItem in cashShopDatabase.cashShopItems)
                 {
                     if (cashShopItem == null || CashShopItems.ContainsKey(cashShopItem.DataId))
                         continue;
