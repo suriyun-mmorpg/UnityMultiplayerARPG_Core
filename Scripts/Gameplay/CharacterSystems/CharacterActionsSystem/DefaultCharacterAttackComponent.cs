@@ -265,7 +265,7 @@ namespace MultiplayerARPG
             catch (System.OperationCanceledException)
             {
                 // Catch the cancellation
-                LastAttackEndTime = time;
+                LastAttackEndTime = Time.unscaledTime;
             }
             catch (System.Exception ex)
             {
