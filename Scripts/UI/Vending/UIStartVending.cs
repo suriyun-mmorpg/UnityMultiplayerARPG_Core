@@ -135,7 +135,7 @@ namespace MultiplayerARPG
                 LanguageManager.GetText(UITextKeys.UI_START_VENDING_DESCRIPTION.ToString()),
                 false, true, true, false, onClickYes: () =>
                 {
-                    GameInstance.PlayingCharacterEntity.Vending.StartVending(inputTitle.text, _items);
+                    GameInstance.PlayingCharacterEntity.Vending.CallServerStartVending(inputTitle.text, _items);
                     Hide();
                 });
         }

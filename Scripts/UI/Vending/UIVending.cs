@@ -62,7 +62,7 @@ namespace MultiplayerARPG
                 _entity.Vending.onVendingDataChange -= Vending_onVendingDataChange;
                 _entity.Vending.onUpdateItems -= Vending_onUpdateItems;
             }
-            GameInstance.PlayingCharacterEntity.Vending.Unsubscribe();
+            GameInstance.PlayingCharacterEntity.Vending.CallServerUnsubscribe();
 
             foreach (GameObject obj in ownerObjects)
             {
@@ -120,7 +120,7 @@ namespace MultiplayerARPG
             }
             ItemSelectionManager.Clear();
             ItemList.HideAll();
-            GameInstance.PlayingCharacterEntity.Vending.Subscribe(Data.ObjectId);
+            GameInstance.PlayingCharacterEntity.Vending.CallServerSubscribe(Data.ObjectId);
 
             foreach (GameObject obj in ownerObjects)
             {
@@ -140,7 +140,7 @@ namespace MultiplayerARPG
                 LanguageManager.GetText(UITextKeys.UI_STOP_VENDING_DESCRIPTION.ToString()),
                 false, true, true, false, onClickYes: () =>
                 {
-                    GameInstance.PlayingCharacterEntity.Vending.StopVending();
+                    GameInstance.PlayingCharacterEntity.Vending.CallServerStopVending();
                     Hide();
                 });
         }
