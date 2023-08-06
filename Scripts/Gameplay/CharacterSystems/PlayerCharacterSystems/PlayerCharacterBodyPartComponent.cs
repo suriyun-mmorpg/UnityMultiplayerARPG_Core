@@ -205,10 +205,10 @@ namespace MultiplayerARPG
             if (model.indexOfModel < 0 || options[_currentModelIndex].colors.Length <= 0 || model.indexOfModel >= options[_currentModelIndex].colors[_currentColorIndex].ModelColorSettings.Length)
                 return;
             
-            MeshRenderer meshRenderer = modelObject.GetComponentInChildren<MeshRenderer>();
-            if (meshRenderer == null)
+            Renderer renderer = modelObject.GetComponentInChildren<Renderer>();
+            if (renderer == null)
                 return;
-            meshRenderer.materials = options[_currentModelIndex].colors[_currentColorIndex].ModelColorSettings[model.indexOfModel].materials;
+            renderer.materials = options[_currentModelIndex].colors[_currentColorIndex].ModelColorSettings[model.indexOfModel].materials;
         }
 
         public int CreateFakeItemDataId()
