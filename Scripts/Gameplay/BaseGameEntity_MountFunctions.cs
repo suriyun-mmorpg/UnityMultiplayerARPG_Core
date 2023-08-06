@@ -122,17 +122,17 @@ namespace MultiplayerARPG
             RPC(ServerEnterVehicle, objectId, seatIndex);
         }
 
-        public virtual bool CanEnterVehicle(IVehicleEntity vehicleEntity, byte seatIndex, out UITextKeys errorMessage)
+        public virtual bool CanEnterVehicle(IVehicleEntity vehicleEntity, byte seatIndex, out UITextKeys gameMessage)
         {
-            errorMessage = UITextKeys.NONE;
+            gameMessage = UITextKeys.NONE;
             if (vehicleEntity.IsNull())
             {
-                errorMessage = UITextKeys.UI_ERROR_INVALID_DATA;
+                gameMessage = UITextKeys.UI_ERROR_INVALID_DATA;
                 return false;
             }
             if (!vehicleEntity.IsSeatAvailable(seatIndex))
             {
-                errorMessage = UITextKeys.UI_ERROR_SEAT_NOT_AVAILABLE;
+                gameMessage = UITextKeys.UI_ERROR_SEAT_NOT_AVAILABLE;
                 return false;
             }
             return true;

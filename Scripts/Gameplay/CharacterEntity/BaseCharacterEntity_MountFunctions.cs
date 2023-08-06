@@ -38,14 +38,14 @@ namespace MultiplayerARPG
             _isRecaching = true;
         }
 
-        public override bool CanEnterVehicle(IVehicleEntity vehicleEntity, byte seatIndex, out UITextKeys errorMessage)
+        public override bool CanEnterVehicle(IVehicleEntity vehicleEntity, byte seatIndex, out UITextKeys gameMessage)
         {
-            if (!base.CanEnterVehicle(vehicleEntity, seatIndex, out errorMessage))
+            if (!base.CanEnterVehicle(vehicleEntity, seatIndex, out gameMessage))
                 return false;
 
             if (!IsGameEntityInDistance(vehicleEntity))
             {
-                errorMessage = UITextKeys.UI_ERROR_CHARACTER_IS_TOO_FAR;
+                gameMessage = UITextKeys.UI_ERROR_CHARACTER_IS_TOO_FAR;
                 return false;
             }
 
