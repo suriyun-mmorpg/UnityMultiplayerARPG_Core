@@ -53,6 +53,18 @@ namespace MultiplayerARPG
             _itemListEventSetupManager.OnDisable();
         }
 
+        public override void Show()
+        {
+            if (GameInstance.PlayingCharacterEntity.Vending.Data.isStarted)
+            {
+                BaseUISceneGameplay.Singleton.ShowVending(GameInstance.PlayingCharacterEntity);
+                if (IsVisible())
+                    Hide();
+                return;
+            }
+            base.Show();
+        }
+
         public void AddItem(string id, int amount, int price)
         {
             int indexOfData = GameInstance.PlayingCharacterEntity.NonEquipItems.IndexOf(id);
