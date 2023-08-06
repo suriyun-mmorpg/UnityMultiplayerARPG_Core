@@ -212,8 +212,7 @@ namespace MultiplayerARPG
                 GameInstance.ServerGameMessageHandlers.SendGameMessage(ConnectionId, UITextKeys.UI_ERROR_FEATURE_IS_DISABLED);
                 return;
             }
-            BasePlayerCharacterEntity targetCharacterEntity;
-            if (!Manager.TryGetEntityByObjectId(objectId, out targetCharacterEntity))
+            if (!Manager.TryGetEntityByObjectId(objectId, out BasePlayerCharacterEntity targetCharacterEntity))
             {
                 GameInstance.ServerGameMessageHandlers.SendGameMessage(ConnectionId, UITextKeys.UI_ERROR_CHARACTER_NOT_FOUND);
                 return;
@@ -223,7 +222,7 @@ namespace MultiplayerARPG
                 GameInstance.ServerGameMessageHandlers.SendGameMessage(ConnectionId, UITextKeys.UI_ERROR_CHARACTER_IS_DEALING);
                 return;
             }
-            if (!Entity.IsGameEntityInDistance(targetCharacterEntity, CurrentGameInstance.conversationDistance))
+            if (!Entity.IsGameEntityInDistance(targetCharacterEntity))
             {
                 GameInstance.ServerGameMessageHandlers.SendGameMessage(ConnectionId, UITextKeys.UI_ERROR_CHARACTER_IS_TOO_FAR);
                 return;
@@ -267,7 +266,7 @@ namespace MultiplayerARPG
                 StopDealing();
                 return;
             }
-            if (!Entity.IsGameEntityInDistance(DealingCharacter, CurrentGameInstance.conversationDistance))
+            if (!Entity.IsGameEntityInDistance(DealingCharacter))
             {
                 GameInstance.ServerGameMessageHandlers.SendGameMessage(ConnectionId, UITextKeys.UI_ERROR_CHARACTER_IS_TOO_FAR);
                 StopDealing();

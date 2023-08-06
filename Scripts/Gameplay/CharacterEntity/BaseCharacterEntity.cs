@@ -1167,6 +1167,12 @@ namespace MultiplayerARPG
             return FindPhysicFunctions.IsGameEntityInDistance(targetEntity, EntityTransform.position, distance + FIND_ENTITY_DISTANCE_BUFFER, includeUnHittable);
         }
 
+        public bool IsGameEntityInDistance<T>(T targetEntity, bool includeUnHittable = true)
+            where T : class, IBaseActivatableEntity
+        {
+            return FindPhysicFunctions.IsGameEntityInDistance(targetEntity, EntityTransform.position, targetEntity.GetActivatableDistance() + FIND_ENTITY_DISTANCE_BUFFER, includeUnHittable);
+        }
+
         public List<T> FindGameEntitiesInDistance<T>(float distance, int overlayMask)
             where T : class, IGameEntity
         {

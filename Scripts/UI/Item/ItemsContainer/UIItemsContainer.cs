@@ -27,7 +27,7 @@ namespace MultiplayerARPG
         protected override void Update()
         {
             base.Update();
-            if (TargetEntity == null || !GameInstance.PlayingCharacterEntity.IsGameEntityInDistance(TargetEntity, GameInstance.Singleton.pickUpItemDistance))
+            if (TargetEntity == null || !GameInstance.PlayingCharacterEntity.IsGameEntityInDistance(TargetEntity))
                 Hide();
         }
 
@@ -87,7 +87,7 @@ namespace MultiplayerARPG
 
         public void UpdateData(ItemsContainerEntity targetEntity)
         {
-            if (targetEntity == null || !GameInstance.PlayingCharacterEntity.IsGameEntityInDistance(targetEntity, GameInstance.Singleton.pickUpItemDistance))
+            if (targetEntity == null || !GameInstance.PlayingCharacterEntity.IsGameEntityInDistance(targetEntity))
             {
                 TargetEntity = null;
                 return;
