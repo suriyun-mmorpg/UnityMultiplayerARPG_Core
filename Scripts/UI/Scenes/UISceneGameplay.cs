@@ -90,6 +90,8 @@ namespace MultiplayerARPG
         public UIBase uiIsWarping;
 
         [Header("Other Settings")]
+        [Tooltip("If this is `TRUE`, it will show vending UI when player character entity activated and its vending is started")]
+        public bool showVendingUiOnActivate = true;
         public List<UIToggleUI> toggleUis = new List<UIToggleUI>();
         [Tooltip("These Tags will ignore pointer over UIs detection when click or touch on screen")]
         public List<UnityTag> ignorePointerOverUITags = new List<UnityTag>();
@@ -357,6 +359,12 @@ namespace MultiplayerARPG
 
         public override void SetActivePlayerCharacter(BasePlayerCharacterEntity playerCharacter)
         {
+            if (showVendingUiOnActivate && playerCharacter.Vending.Data.isStarted)
+            {
+                ShowVending(playerCharacter);
+                return;
+            }
+
             if (uiPlayerActivateMenu == null)
                 return;
 
