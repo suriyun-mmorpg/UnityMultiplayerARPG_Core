@@ -53,9 +53,9 @@ namespace MultiplayerARPG
             if (renderer == null)
                 return;
 
-            for (int i = 0; i < renderer.rootBone.childCount; ++i)
+            foreach (Transform bone in renderer.rootBone.GetComponentsInChildren<Transform>())
             {
-                map[renderer.rootBone.GetChild(i).name] = renderer.rootBone.GetChild(i);
+                map[bone.name] = bone;
             }
         }
     }
