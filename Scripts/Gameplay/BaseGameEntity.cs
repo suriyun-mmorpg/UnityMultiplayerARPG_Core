@@ -462,86 +462,29 @@ namespace MultiplayerARPG
             syncTitle.syncMode = LiteNetLibSyncField.SyncMode.ServerToClients;
         }
 
-        #region RPCs
-        public void CallServerEnterVehicle(uint objectId, byte seatIndex)
+        public override void OnNetworkDestroy(byte reasons)
         {
-            RPC(ServerEnterVehicle, objectId, seatIndex);
+            base.OnNetworkDestroy(reasons);
+            if (onNetworkDestroy != null)
+                onNetworkDestroy.Invoke(reasons);
         }
 
-        [ServerRpc]
-        protected void ServerEnterVehicle(uint objectId, byte seatIndex)
+        public virtual bool IsHide()
         {
-#if UNITY_EDITOR || UNITY_SERVER
-            // Call this function at server
-            if (!Manager.Assets.TryGetSpawnedObject(objectId, out LiteNetLibIdentity identity))
-                return;
-            IVehicleEntity vehicleEntity = identity.GetComponent<IVehicleEntity>();
-            if (vehicleEntity.IsNull())
-            {
-                GameInstance.ServerGameMessageHandlers.SendGameMessage(ConnectionId, UITextKeys.UI_ERROR_INVALID_DATA);
-                return;
-            }
-            if (!vehicleEntity.IsSeatAvailable(seatIndex))
-            {
-                GameInstance.ServerGameMessageHandlers.SendGameMessage(ConnectionId, UITextKeys.UI_ERROR_INVALID_DATA);
-                return;
-            }
-            if (Vector3.Distance(EntityTransform.position, vehicleEntity.EntityTransform.position) <= vehicleEntity.GetActivatableDistance())
-            {
-                GameInstance.ServerGameMessageHandlers.SendGameMessage(ConnectionId, UITextKeys.UI_ERROR_CHARACTER_IS_TOO_FAR);
-                return;
-            }
-            EnterVehicle(vehicleEntity, seatIndex);
-#endif
+            return false;
         }
 
-        public void CallServerEnterVehicleToSeat(uint objectId, byte seatIndex)
+        public virtual bool SetAsTargetInOneClick()
         {
-            RPC(ServerEnterVehicleToSeat, objectId, seatIndex);
+            return false;
         }
 
-        [ServerRpc]
-        protected void ServerEnterVehicleToSeat(uint objectId, byte seatIndex)
+        public virtual bool NotBeingSelectedOnClick()
         {
-#if UNITY_EDITOR || UNITY_SERVER
-            // Call this function at server
-            if (!Manager.Assets.TryGetSpawnedObject(objectId, out LiteNetLibIdentity identity))
-                return;
-            IVehicleEntity vehicleEntity = identity.GetComponent<IVehicleEntity>();
-            if (vehicleEntity.IsNull())
-            {
-                GameInstance.ServerGameMessageHandlers.SendGameMessage(ConnectionId, UITextKeys.UI_ERROR_INVALID_DATA);
-                return;
-            }
-            EnterVehicle(vehicleEntity, seatIndex);
-#endif
+            return false;
         }
 
-        public void CallServerExitVehicle()
-        {
-            RPC(ServerExitVehicle);
-        }
-
-        [ServerRpc]
-        protected void ServerExitVehicle()
-        {
-#if UNITY_EDITOR || UNITY_SERVER
-            // Call this function at server
-            ExitVehicle();
-#endif
-        }
-
-        public void CallAllOnExitVehicle()
-        {
-            RPC(AllOnExitVehicle);
-        }
-
-        [AllRpc]
-        protected void AllOnExitVehicle()
-        {
-            ClearPassengingVehicle();
-        }
-
+        #region Animations
         public void CallAllPlayJumpAnimation()
         {
             RPC(AllPlayJumpAnimation);
@@ -585,19 +528,6 @@ namespace MultiplayerARPG
         {
             StopCustomAnimation();
         }
-        #endregion
-
-        public override void OnNetworkDestroy(byte reasons)
-        {
-            base.OnNetworkDestroy(reasons);
-            if (onNetworkDestroy != null)
-                onNetworkDestroy.Invoke(reasons);
-        }
-
-        public virtual bool IsHide()
-        {
-            return false;
-        }
 
         public virtual void PlayJumpAnimation()
         {
@@ -622,15 +552,6 @@ namespace MultiplayerARPG
             if (Model is ICustomAnimationModel customAnimationModel)
                 customAnimationModel.StopCustomAnimation();
         }
-
-        public virtual bool SetAsTargetInOneClick()
-        {
-            return false;
-        }
-
-        public virtual bool NotBeingSelectedOnClick()
-        {
-            return false;
-        }
+        #endregion
     }
 }

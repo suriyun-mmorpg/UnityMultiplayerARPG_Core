@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using LiteNetLibManager;
+using UnityEngine;
 
 namespace MultiplayerARPG
 {
@@ -115,6 +116,87 @@ namespace MultiplayerARPG
         {
             PassengingVehicleSeatIndex = seatIndex;
             PassengingVehicleEntity = vehicleEntity;
+        }
+        public void CallServerEnterVehicle(uint objectId, byte seatIndex)
+        {
+            RPC(ServerEnterVehicle, objectId, seatIndex);
+        }
+
+        public virtual bool CanEnterVehicle(IVehicleEntity vehicleEntity, byte seatIndex, out UITextKeys errorMessage)
+        {
+            errorMessage = UITextKeys.NONE;
+            if (vehicleEntity.IsNull())
+            {
+                errorMessage = UITextKeys.UI_ERROR_INVALID_DATA;
+                return false;
+            }
+            if (!vehicleEntity.IsSeatAvailable(seatIndex))
+            {
+                errorMessage = UITextKeys.UI_ERROR_SEAT_NOT_AVAILABLE;
+                return false;
+            }
+            return true;
+        }
+
+        [ServerRpc]
+        protected void ServerEnterVehicle(uint objectId, byte seatIndex)
+        {
+#if UNITY_EDITOR || UNITY_SERVER
+            if (!Manager.Assets.TryGetSpawnedObject(objectId, out LiteNetLibIdentity identity))
+                return;
+            IVehicleEntity vehicleEntity = identity.GetComponent<IVehicleEntity>();
+            if (!CanEnterVehicle(vehicleEntity, seatIndex, out UITextKeys error))
+            {
+                GameInstance.ServerGameMessageHandlers.SendGameMessage(ConnectionId, error);
+                return;
+            }
+            EnterVehicle(vehicleEntity, seatIndex);
+#endif
+        }
+
+        public void CallServerEnterVehicleToSeat(uint objectId, byte seatIndex)
+        {
+            RPC(ServerEnterVehicleToSeat, objectId, seatIndex);
+        }
+
+        [ServerRpc]
+        protected void ServerEnterVehicleToSeat(uint objectId, byte seatIndex)
+        {
+#if UNITY_EDITOR || UNITY_SERVER
+            if (!Manager.Assets.TryGetSpawnedObject(objectId, out LiteNetLibIdentity identity))
+                return;
+            IVehicleEntity vehicleEntity = identity.GetComponent<IVehicleEntity>();
+            if (vehicleEntity.IsNull())
+            {
+                GameInstance.ServerGameMessageHandlers.SendGameMessage(ConnectionId, UITextKeys.UI_ERROR_INVALID_DATA);
+                return;
+            }
+            EnterVehicle(vehicleEntity, seatIndex);
+#endif
+        }
+
+        public void CallServerExitVehicle()
+        {
+            RPC(ServerExitVehicle);
+        }
+
+        [ServerRpc]
+        protected void ServerExitVehicle()
+        {
+#if UNITY_EDITOR || UNITY_SERVER
+            ExitVehicle();
+#endif
+        }
+
+        public void CallAllOnExitVehicle()
+        {
+            RPC(AllOnExitVehicle);
+        }
+
+        [AllRpc]
+        protected void AllOnExitVehicle()
+        {
+            ClearPassengingVehicle();
         }
     }
 }
