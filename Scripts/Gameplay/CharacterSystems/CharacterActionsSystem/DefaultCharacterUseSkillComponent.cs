@@ -432,7 +432,7 @@ namespace MultiplayerARPG
             if (!_manager.IsAcceptNewAction())
                 return;
             // Speed hack avoidance
-            if (Time.unscaledTime - LastUseSkillEndTime < -0.05f)
+            if (Time.unscaledTime - LastUseSkillEndTime < -0.2f)
                 return;
             // Validate skill
             if (!Entity.ValidateSkillToUse(dataId, isLeftHand, targetObjectId, out BaseSkill skill, out int skillLevel, out _))
@@ -494,7 +494,7 @@ namespace MultiplayerARPG
             if (!_manager.IsAcceptNewAction())
                 return;
             // Speed hack avoidance
-            if (Time.unscaledTime - LastUseSkillEndTime < -0.05f)
+            if (Time.unscaledTime - LastUseSkillEndTime < -0.2f)
                 return;
             // Validate skill item
             if (!Entity.ValidateSkillItemToUse(itemIndex, isLeftHand, targetObjectId, out ISkillItem skillItem, out BaseSkill skill, out int skillLevel, out _))

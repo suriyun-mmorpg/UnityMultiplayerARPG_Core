@@ -383,7 +383,7 @@ namespace MultiplayerARPG
             if (!_manager.IsAcceptNewAction())
                 return;
             // Speed hack avoidance
-            if (Time.unscaledTime - LastAttackEndTime < -0.05f)
+            if (Time.unscaledTime - LastAttackEndTime < -0.2f)
                 return;
             _manager.ActionAccepted();
             // Prepare state data which will be sent to clients
