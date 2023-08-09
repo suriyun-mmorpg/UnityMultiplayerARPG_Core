@@ -26,14 +26,6 @@ namespace MultiplayerARPG
         [SerializeField]
         private bool enablePkRules = false;
         public virtual bool EnablePkRules { get { return enablePkRules; } }
-        #endregion
-
-        #region Character Death Rules
-        [Category("Character Death Rules")]
-        [Tooltip("When character fall to this position, character will dead")]
-        [SerializeField]
-        private float deadY = -100f;
-        public virtual float DeadY { get { return deadY; } }
 
         [Tooltip("If this is `TRUE`, dealing feature will be disabled, all players in this map won't be able to deal items to each other")]
         [SerializeField]
@@ -49,6 +41,14 @@ namespace MultiplayerARPG
         [SerializeField]
         private bool disableDueling = false;
         public virtual bool DisableDueling { get { return disableDueling; } }
+        #endregion
+
+        #region Character Death Rules
+        [Category("Character Death Rules")]
+        [Tooltip("When character fall to this position, character will dead")]
+        [SerializeField]
+        private float deadY = -100f;
+        public virtual float DeadY { get { return deadY; } }
 
         [Tooltip("When character dead, it will drop equipping weapons or not?")]
         [SerializeField]
