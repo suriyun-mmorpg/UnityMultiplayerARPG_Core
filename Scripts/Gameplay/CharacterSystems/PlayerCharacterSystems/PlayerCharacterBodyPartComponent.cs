@@ -89,9 +89,12 @@ namespace MultiplayerARPG
 
         public void ClearEvents()
         {
-            for (int i = 0; i < _models.Length; ++i)
+            if (_models != null)
             {
-                ClearCharacterModelEvents(_models[i]);
+                for (int i = 0; i < _models.Length; ++i)
+                {
+                    ClearCharacterModelEvents(_models[i]);
+                }
             }
             Entity.onPublicIntsOperation -= OnPublicIntsOperation;
         }
