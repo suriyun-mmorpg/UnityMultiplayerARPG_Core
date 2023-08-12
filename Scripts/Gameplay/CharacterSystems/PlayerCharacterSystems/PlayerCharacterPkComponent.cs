@@ -25,7 +25,7 @@ namespace MultiplayerARPG
             }
             else
             {
-                if (CurrentGameplayRule.CanTurnPkOn(Entity))
+                if (!CurrentGameplayRule.CanTurnPkOn(Entity))
                     return;
                 // Turn on
                 Entity.IsPkOn = true;
