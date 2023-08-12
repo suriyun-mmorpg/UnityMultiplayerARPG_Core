@@ -182,9 +182,15 @@ namespace MultiplayerARPG
             if (amount <= 0 || !CanDoActions() || index >= NonEquipItems.Count)
                 return;
 
-            CharacterItem nonEquipItem = nonEquipItems[index];
+            CharacterItem nonEquipItem = NonEquipItems[index];
             if (nonEquipItem.IsEmptySlot() || amount > nonEquipItem.amount)
                 return;
+
+            if (nonEquipItem.GetItem().RestractDropping)
+            {
+                GameInstance.ServerGameMessageHandlers.SendGameMessage(ConnectionId, UITextKeys.UI_ERROR_ITEM_DROPPING_RESTRICTED);
+                return;
+            }
 
             if (!this.DecreaseItemsByIndex(index, amount, false))
                 return;

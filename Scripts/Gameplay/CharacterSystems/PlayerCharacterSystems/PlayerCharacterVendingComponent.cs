@@ -90,7 +90,12 @@ namespace MultiplayerARPG
                 int index = Entity.NonEquipItems.IndexOf(item.id);
                 if (index < 0)
                     continue;
-                CharacterItem storeItem = Entity.NonEquipItems[index].Clone(false);
+                CharacterItem storeItem = Entity.NonEquipItems[index];
+                if (storeItem.IsEmptySlot())
+                    continue;
+                if (storeItem.GetItem().RestrictDealing)
+                    continue;
+                storeItem = Entity.NonEquipItems[index].Clone(false);
                 storeItem.amount = item.amount;
                 _items.Add(new VendingItem()
                 {

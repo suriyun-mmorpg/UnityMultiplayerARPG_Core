@@ -71,6 +71,20 @@ namespace MultiplayerARPG
             if (indexOfData < 0)
             {
                 // Invalid index
+                ClientGenericActions.ClientReceiveGameMessage(UITextKeys.UI_ERROR_INVALID_ITEM_INDEX);
+                return;
+            }
+            CharacterItem storeItem = GameInstance.PlayingCharacterEntity.NonEquipItems[indexOfData];
+            if (storeItem.IsEmptySlot())
+            {
+                // Invalid data
+                ClientGenericActions.ClientReceiveGameMessage(UITextKeys.UI_ERROR_INVALID_ITEM_DATA);
+                return;
+            }
+            if (storeItem.GetItem().RestrictDealing)
+            {
+                // Restricted
+                ClientGenericActions.ClientReceiveGameMessage(UITextKeys.UI_ERROR_ITEM_DEALING_RESTRICTED);
                 return;
             }
             int countItem = 0;
@@ -83,6 +97,7 @@ namespace MultiplayerARPG
             if (GameInstance.PlayingCharacterEntity.NonEquipItems[indexOfData].amount < countItem)
             {
                 // Invalid amount
+                ClientGenericActions.ClientReceiveGameMessage(UITextKeys.UI_ERROR_NOT_ENOUGH_ITEMS);
                 return;
             }
             _items.Add(new StartVendingItem()

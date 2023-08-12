@@ -342,6 +342,16 @@ namespace MultiplayerARPG
             if (indexOfNonEquipItem < 0)
                 return;
 
+            CharacterItem nonEquipItem = Entity.NonEquipItems[indexOfNonEquipItem];
+            if (nonEquipItem.IsEmptySlot())
+                return;
+
+            if (nonEquipItem.GetItem().RestrictDealing)
+            {
+                GameInstance.ServerGameMessageHandlers.SendGameMessage(ConnectionId, UITextKeys.UI_ERROR_ITEM_DEALING_RESTRICTED);
+                return;
+            }
+
             DealingCharacterItems dealingItems = DealingItems;
             for (int i = dealingItems.Count - 1; i >= 0; --i)
             {
