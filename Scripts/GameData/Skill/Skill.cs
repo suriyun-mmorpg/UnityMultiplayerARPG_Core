@@ -349,7 +349,7 @@ namespace MultiplayerARPG
                     return true;
             }
             damageInfo = this.damageInfo;
-            return true;
+            return false;
         }
 
         public override void PrepareRelatesData()
