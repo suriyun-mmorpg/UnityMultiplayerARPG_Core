@@ -41,7 +41,7 @@ namespace MultiplayerARPG
             _previousEntity = playerCharacterEntity;
             AddEvents(_previousEntity);
             if (_previousEntity != null)
-                UpdateStatus().Forget();
+                UpdateStatus();
         }
 
         private void AddEvents(BasePlayerCharacterEntity PlayingCharacterEntity)
