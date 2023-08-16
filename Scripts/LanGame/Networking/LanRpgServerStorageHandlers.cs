@@ -11,6 +11,7 @@ namespace MultiplayerARPG
         private readonly ConcurrentDictionary<StorageId, HashSet<long>> usingStorageClients = new ConcurrentDictionary<StorageId, HashSet<long>>();
         private readonly ConcurrentDictionary<long, StorageId> usingStorageIds = new ConcurrentDictionary<long, StorageId>();
         private readonly HashSet<StorageId> busyStorages = new HashSet<StorageId>();
+        private readonly HashSet<StorageId> savePendingStorages = new HashSet<StorageId>();
 
         public async UniTaskVoid OpenStorage(long connectionId, IPlayerCharacterData playerCharacter, StorageId storageId)
         {
@@ -201,6 +202,19 @@ namespace MultiplayerARPG
         public bool IsStorageBusy(StorageId storageId)
         {
             return busyStorages.Contains(storageId);
+        }
+
+        public void SetStorageSavePending(StorageId storageId, bool isSavePending)
+        {
+            if (isSavePending)
+                savePendingStorages.Add(storageId);
+            else
+                savePendingStorages.Remove(storageId);
+        }
+
+        public bool IsStorageSavePending(StorageId storageId)
+        {
+            return savePendingStorages.Contains(storageId);
         }
     }
 }

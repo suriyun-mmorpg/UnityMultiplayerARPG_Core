@@ -112,5 +112,19 @@ namespace MultiplayerARPG
         /// <param name="storageId"></param>
         /// <returns></returns>
         bool IsStorageBusy(StorageId storageId);
+
+        /// <summary>
+        /// Set storage save pending status
+        /// </summary>
+        /// <param name="storageId"></param>
+        /// <param name="isBusy"></param>
+        void SetStorageSavePending(StorageId storageId, bool isSavePending);
+
+        /// <summary>
+        /// Get storage save pending status
+        /// </summary>
+        /// <param name="storageId"></param>
+        /// <returns></returns>
+        bool IsStorageSavePending(StorageId storageId);
     }
 }
