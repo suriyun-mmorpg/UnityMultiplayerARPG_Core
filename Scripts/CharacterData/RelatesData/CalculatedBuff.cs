@@ -37,6 +37,16 @@ namespace MultiplayerARPG
             Build(buff, level);
         }
 
+        ~CalculatedBuff()
+        {
+            _cacheIncreaseAttributes.Clear();
+            _cacheIncreaseAttributesRate.Clear();
+            _cacheIncreaseResistances.Clear();
+            _cacheIncreaseArmors.Clear();
+            _cacheIncreaseDamages.Clear();
+            _cacheDamageOverTimes.Clear();
+        }
+
         public void Build(Buff buff, int level)
         {
             _buff = buff;
