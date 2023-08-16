@@ -110,53 +110,13 @@ namespace MultiplayerARPG
         {
             UpdateData();
             if (!GameInstance.PlayingCharacterEntity) return;
-            GameInstance.PlayingCharacterEntity.onEquipItemsOperation += OnEquipItemsOperation;
-            GameInstance.PlayingCharacterEntity.onEquipWeaponSetChange += OnEquipWeaponSetChange;
-            GameInstance.PlayingCharacterEntity.onSelectableWeaponSetsOperation += OnSelectableWeaponSetsOperation;
-            GameInstance.PlayingCharacterEntity.onNonEquipItemsOperation += OnNonEquipItemsOperation;
-            GameInstance.PlayingCharacterEntity.onSkillsOperation += OnSkillsOperation;
-            GameInstance.PlayingCharacterEntity.onHotkeysOperation += OnHotkeysOperation;
+            GameInstance.PlayingCharacterEntity.onRecached += UpdateData;
         }
 
         protected virtual void OnDisable()
         {
             if (!GameInstance.PlayingCharacterEntity) return;
-            GameInstance.PlayingCharacterEntity.onEquipItemsOperation -= OnEquipItemsOperation;
-            GameInstance.PlayingCharacterEntity.onEquipWeaponSetChange -= OnEquipWeaponSetChange;
-            GameInstance.PlayingCharacterEntity.onSelectableWeaponSetsOperation -= OnSelectableWeaponSetsOperation;
-            GameInstance.PlayingCharacterEntity.onNonEquipItemsOperation -= OnNonEquipItemsOperation;
-            GameInstance.PlayingCharacterEntity.onSkillsOperation -= OnSkillsOperation;
-            GameInstance.PlayingCharacterEntity.onHotkeysOperation -= OnHotkeysOperation;
-        }
-
-        private void OnEquipWeaponSetChange(byte equipWeaponSet)
-        {
-            UpdateData();
-        }
-
-        private void OnSelectableWeaponSetsOperation(LiteNetLibSyncList.Operation operation, int index)
-        {
-            UpdateData();
-        }
-
-        private void OnEquipItemsOperation(LiteNetLibSyncList.Operation operation, int index)
-        {
-            UpdateData();
-        }
-
-        private void OnNonEquipItemsOperation(LiteNetLibSyncList.Operation operation, int index)
-        {
-            UpdateData();
-        }
-
-        private void OnSkillsOperation(LiteNetLibSyncList.Operation operation, int index)
-        {
-            UpdateData();
-        }
-
-        private void OnHotkeysOperation(LiteNetLibSyncList.Operation operation, int index)
-        {
-            UpdateData();
+            GameInstance.PlayingCharacterEntity.onRecached -= UpdateData;
         }
 
         private void Update()

@@ -124,7 +124,6 @@ namespace MultiplayerARPG
 
         protected virtual void Setup(BasePlayerCharacterEntity characterEntity)
         {
-            characterEntity.ForceMakeCaches();
             if (CurrentGameInstance.UISceneGameplayPrefab != null)
                 UISceneGameplay = Instantiate(CurrentGameInstance.UISceneGameplayPrefab);
             if (UISceneGameplay != null)
