@@ -1,5 +1,4 @@
-﻿using LiteNetLibManager;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Serialization;
 
@@ -104,32 +103,13 @@ namespace MultiplayerARPG
         {
             UnregisterOwningCharacterEvents();
             if (notForOwningCharacter || !GameInstance.PlayingCharacterEntity) return;
-            GameInstance.PlayingCharacterEntity.onEquipWeaponSetChange += OnEquipWeaponSetChange;
-            GameInstance.PlayingCharacterEntity.onSelectableWeaponSetsOperation += OnSelectableWeaponSetsOperation;
-            GameInstance.PlayingCharacterEntity.onEquipItemsOperation += OnEquipItemsOperation;
+            GameInstance.PlayingCharacterEntity.onRecached += UpdateOwningCharacterData;
         }
 
         public void UnregisterOwningCharacterEvents()
         {
             if (!GameInstance.PlayingCharacterEntity) return;
-            GameInstance.PlayingCharacterEntity.onEquipWeaponSetChange -= OnEquipWeaponSetChange;
-            GameInstance.PlayingCharacterEntity.onSelectableWeaponSetsOperation -= OnSelectableWeaponSetsOperation;
-            GameInstance.PlayingCharacterEntity.onEquipItemsOperation -= OnEquipItemsOperation;
-        }
-
-        private void OnEquipWeaponSetChange(byte equipWeaponSet)
-        {
-            UpdateOwningCharacterData();
-        }
-
-        private void OnSelectableWeaponSetsOperation(LiteNetLibSyncList.Operation operation, int index)
-        {
-            UpdateOwningCharacterData();
-        }
-
-        private void OnEquipItemsOperation(LiteNetLibSyncList.Operation operation, int index)
-        {
-            UpdateOwningCharacterData();
+            GameInstance.PlayingCharacterEntity.onRecached -= UpdateOwningCharacterData;
         }
 
         public void UpdateOwningCharacterData()
