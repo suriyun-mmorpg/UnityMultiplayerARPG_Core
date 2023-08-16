@@ -100,6 +100,10 @@
             // Make caches with cache manager
             this.MarkToMakeCaches();
             CachedData = this.GetCaches();
+
+            // Invoke recached event
+            if (onRecached != null)
+                onRecached.Invoke();
         }
     }
 }
