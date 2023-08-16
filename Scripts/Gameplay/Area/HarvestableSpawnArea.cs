@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using LiteNetLibManager;
+﻿using LiteNetLibManager;
 using UnityEngine;
 #if UNITY_EDITOR
 using UnityEditor;
@@ -9,15 +8,6 @@ namespace MultiplayerARPG
 {
     public class HarvestableSpawnArea : GameSpawnArea<HarvestableEntity>
     {
-        [System.Serializable]
-        public class HarvestableSpawnPrefabData : SpawnPrefabData<HarvestableEntity> { }
-
-        public List<HarvestableSpawnPrefabData> spawningPrefabs = new List<HarvestableSpawnPrefabData>();
-        public override SpawnPrefabData<HarvestableEntity>[] SpawningPrefabs
-        {
-            get { return spawningPrefabs.ToArray(); }
-        }
-
         [Tooltip("This is deprecated, might be removed in future version, set your asset to `Asset` instead.")]
         [ReadOnlyField]
         public HarvestableEntity harvestableEntity;
@@ -55,8 +45,7 @@ namespace MultiplayerARPG
 
         protected override HarvestableEntity SpawnInternal(HarvestableEntity prefab, int level)
         {
-            Vector3 spawnPosition;
-            if (GetRandomPosition(out spawnPosition))
+            if (GetRandomPosition(out Vector3 spawnPosition))
             {
                 if (CurrentGameInstance.DimensionType == DimensionType.Dimension2D)
                 {
@@ -73,12 +62,6 @@ namespace MultiplayerARPG
                             overlap.gameObject.layer == CurrentGameInstance.harvestableLayer)
                         {
                             // Don't spawn because it will hitting other entities
-                            _pending.Add(new HarvestableSpawnPrefabData()
-                            {
-                                prefab = prefab,
-                                level = level,
-                                amount = 1
-                            });
 #if UNITY_EDITOR || DEVELOPMENT_BUILD
                             Logging.LogWarning(ToString(), $"Cannot spawn harvestable, it is collided to another entities, pending harvestable amount {_pending.Count}");
 #endif
@@ -101,12 +84,6 @@ namespace MultiplayerARPG
                             overlap.gameObject.layer == CurrentGameInstance.harvestableLayer)
                         {
                             // Don't spawn because it will hitting other entities
-                            _pending.Add(new HarvestableSpawnPrefabData()
-                            {
-                                prefab = prefab,
-                                level = level,
-                                amount = 1
-                            });
 #if UNITY_EDITOR || DEVELOPMENT_BUILD
                             Logging.LogWarning(ToString(), $"Cannot spawn harvestable, it is collided to another entities, pending harvestable amount {_pending.Count}");
 #endif
@@ -125,12 +102,6 @@ namespace MultiplayerARPG
                 BaseGameNetworkManager.Singleton.Assets.NetworkSpawn(spawnObj);
                 return entity;
             }
-            _pending.Add(new HarvestableSpawnPrefabData()
-            {
-                prefab = prefab,
-                level = level,
-                amount = 1
-            });
 #if UNITY_EDITOR || DEVELOPMENT_BUILD
             Logging.LogWarning(ToString(), $"Cannot spawn harvestable, it cannot find grounded position, pending harvestable amount {_pending.Count}");
 #endif

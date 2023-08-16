@@ -8,9 +8,10 @@ namespace MultiplayerARPG
 {
     public abstract class GameSpawnArea<T> : GameArea where T : LiteNetLibBehaviour
     {
-        public class SpawnPrefabData<TPrefab>
+        [System.Serializable]
+        public class SpawnPrefabData
         {
-            public TPrefab prefab;
+            public T prefab;
             [Min(1)]
             public int level;
             [Min(1)]
@@ -27,12 +28,11 @@ namespace MultiplayerARPG
         public int maxLevel = 1;
         [Min(1)]
         public int amount = 1;
+        public List<SpawnPrefabData> spawningPrefabs = new List<SpawnPrefabData>();
         public float respawnPendingEntitiesDelay = 5f;
 
-        public abstract SpawnPrefabData<T>[] SpawningPrefabs { get; }
-
         protected float _respawnPendingEntitiesTimer = 0f;
-        protected readonly List<SpawnPrefabData<T>> _pending = new List<SpawnPrefabData<T>>();
+        protected readonly List<SpawnPrefabData> _pending = new List<SpawnPrefabData>();
 
         protected virtual void Awake()
         {
@@ -47,7 +47,7 @@ namespace MultiplayerARPG
                 if (_respawnPendingEntitiesTimer >= respawnPendingEntitiesDelay)
                 {
                     _respawnPendingEntitiesTimer = 0f;
-                    foreach (SpawnPrefabData<T> pendingEntry in _pending)
+                    foreach (SpawnPrefabData pendingEntry in _pending)
                     {
 #if UNITY_EDITOR || DEVELOPMENT_BUILD
                         Logging.LogWarning(ToString(), $"Spawning pending entities, Prefab: {pendingEntry.prefab.name}, Amount: {pendingEntry.amount}.");
@@ -66,7 +66,7 @@ namespace MultiplayerARPG
         {
             if (prefab != null)
                 BaseGameNetworkManager.Singleton.Assets.RegisterPrefab(prefab.Identity);
-            foreach (SpawnPrefabData<T> spawningPrefab in SpawningPrefabs)
+            foreach (SpawnPrefabData spawningPrefab in spawningPrefabs)
             {
                 if (spawningPrefab.prefab != null)
                     BaseGameNetworkManager.Singleton.Assets.RegisterPrefab(spawningPrefab.prefab.Identity);
@@ -79,7 +79,7 @@ namespace MultiplayerARPG
             {
                 Spawn(prefab, Random.Range(minLevel, maxLevel + 1), 0);
             }
-            foreach (SpawnPrefabData<T> spawningPrefab in SpawningPrefabs)
+            foreach (SpawnPrefabData spawningPrefab in spawningPrefabs)
             {
                 SpawnByAmount(spawningPrefab.prefab, spawningPrefab.level, spawningPrefab.amount);
             }
@@ -101,10 +101,24 @@ namespace MultiplayerARPG
         IEnumerator SpawnRoutine(T prefab, int level, float delay)
         {
             yield return new WaitForSecondsRealtime(delay);
-            SpawnInternal(prefab, level);
+            T newEntity = SpawnInternal(prefab, level);
+            if (newEntity == null)
+            {
+                AddPending(new SpawnPrefabData()
+                {
+                    prefab = prefab,
+                    level = level,
+                    amount = 1,
+                });
+            }
         }
 
         protected abstract T SpawnInternal(T prefab, int level);
+
+        protected virtual void AddPending(SpawnPrefabData data)
+        {
+            _pending.Add(data);
+        }
 
         public virtual void CountSpawningObjects()
         {
@@ -113,8 +127,8 @@ namespace MultiplayerARPG
             foreach (GameSpawnArea<T> area in areas)
             {
                 count += area.amount;
-                List<SpawnPrefabData<T>> spawningPrefabs = new List<SpawnPrefabData<T>>(area.SpawningPrefabs);
-                foreach (SpawnPrefabData<T> spawningPrefab in spawningPrefabs)
+                List<SpawnPrefabData> spawningPrefabs = new List<SpawnPrefabData>(area.spawningPrefabs);
+                foreach (SpawnPrefabData spawningPrefab in spawningPrefabs)
                 {
                     count += spawningPrefab.amount;
                 }

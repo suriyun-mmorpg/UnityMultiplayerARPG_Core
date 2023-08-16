@@ -1,6 +1,5 @@
 ﻿using UnityEngine;
 using LiteNetLibManager;
-using System.Collections.Generic;
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
@@ -9,15 +8,6 @@ namespace MultiplayerARPG
 {
     public class MonsterSpawnArea : GameSpawnArea<BaseMonsterCharacterEntity>
     {
-        [System.Serializable]
-        public class MonsterSpawnPrefabData : SpawnPrefabData<BaseMonsterCharacterEntity> { }
-
-        public List<MonsterSpawnPrefabData> spawningPrefabs = new List<MonsterSpawnPrefabData>();
-        public override SpawnPrefabData<BaseMonsterCharacterEntity>[] SpawningPrefabs
-        {
-            get { return spawningPrefabs.ToArray(); }
-        }
-
         [Tooltip("This is deprecated, might be removed in future version, set your asset to `Asset` instead.")]
         [ReadOnlyField]
         public BaseMonsterCharacterEntity monsterCharacterEntity;
@@ -66,12 +56,6 @@ namespace MultiplayerARPG
                 {
                     // Destroy the entity (because it can't find ground position)
                     BaseGameNetworkManager.Singleton.Assets.DestroyObjectInstance(spawnObj);
-                    _pending.Add(new MonsterSpawnPrefabData()
-                    {
-                        prefab = prefab,
-                        level = level,
-                        amount = 1
-                    });
 #if UNITY_EDITOR || DEVELOPMENT_BUILD
                     Logging.LogWarning(ToString(), $"Cannot spawn monster, it cannot find grounded position, pending monster amount {_pending.Count}");
 #endif
@@ -84,12 +68,6 @@ namespace MultiplayerARPG
                 BaseGameNetworkManager.Singleton.Assets.NetworkSpawn(spawnObj);
                 return entity;
             }
-            _pending.Add(new MonsterSpawnPrefabData()
-            {
-                prefab = prefab,
-                level = level,
-                amount = 1
-            });
 #if UNITY_EDITOR || DEVELOPMENT_BUILD
             Logging.LogWarning(ToString(), $"Cannot spawn monster, it cannot find grounded position, pending monster amount {_pending.Count}");
 #endif
