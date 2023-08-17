@@ -200,9 +200,9 @@ namespace MultiplayerARPG
                 if (IsClient)
                 {
                     if (tpsModelAvailable)
-                        Entity.CharacterModel.InstantiateEffect(skill.SkillCastEffect);
+                        Entity.CharacterModel.InstantiateEffect(skill.SkillCastEffects);
                     if (fpsModelAvailable)
-                        Entity.FpsModel.InstantiateEffect(skill.SkillCastEffect);
+                        Entity.FpsModel.InstantiateEffect(skill.SkillCastEffects);
                 }
 
                 if (CastingSkillDuration > 0f)
@@ -216,6 +216,15 @@ namespace MultiplayerARPG
                         Entity.FpsModel.PlaySkillCastClip(skill.DataId, CastingSkillDuration);
                     // Wait until end of cast duration
                     await UniTask.Delay((int)(CastingSkillDuration * 1000f), true, PlayerLoopTiming.Update, skillCancellationTokenSource.Token);
+                }
+
+                // Play special effect
+                if (IsClient)
+                {
+                    if (tpsModelAvailable)
+                        Entity.CharacterModel.InstantiateEffect(skill.SkillActivateEffects);
+                    if (fpsModelAvailable)
+                        Entity.FpsModel.InstantiateEffect(skill.SkillActivateEffects);
                 }
 
                 // Play action animation
