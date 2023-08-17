@@ -14,9 +14,9 @@ namespace MultiplayerARPG
         public UILocaleKeySetting formatKeyRequireSkillPoint = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_REQUIRE_SKILL_POINT);
         [Tooltip("Format => {0} = {Current Skill Point}, {1} = {Require Skill Point}")]
         public UILocaleKeySetting formatKeyRequireSkillPointNotEnough = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_REQUIRE_SKILL_POINT_NOT_ENOUGH);
-        [Tooltip("Format => {0} = {Require Gold}")]
+        [Tooltip("Format => {0} = {Current Gold Amount}, {1} = {Target Amount}")]
         public UILocaleKeySetting formatKeyRequireGold = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_REQUIRE_GOLD);
-        [Tooltip("Format => {0} = {Current Gold}, {1} = {Require Gold}")]
+        [Tooltip("Format => {0} = {Current Gold Amount}, {1} = {Target Amount}")]
         public UILocaleKeySetting formatKeyRequireGoldNotEnough = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_REQUIRE_GOLD_NOT_ENOUGH);
 
         [Header("UI Elements")]
@@ -56,7 +56,7 @@ namespace MultiplayerARPG
                     {
                         uiTextRequireLevel.text = ZString.Format(
                             LanguageManager.GetText(formatKeyRequireLevelNotEnough),
-                            characterLevel,
+                            characterLevel.ToString("N0"),
                             requireCharacterLevel.ToString("N0"));
                     }
                 }
@@ -72,7 +72,7 @@ namespace MultiplayerARPG
                 else
                 {
                     uiTextRequireSkillPoint.SetGameObjectActive(true);
-                    float characterSkillPoint = (GameInstance.PlayingCharacter != null ? GameInstance.PlayingCharacter.SkillPoint : 0);
+                    float characterSkillPoint = GameInstance.PlayingCharacter != null ? GameInstance.PlayingCharacter.SkillPoint : 0;
                     float requireCharacterSkillPoint = skill.GetRequireCharacterSkillPoint(level);
                     if (characterSkillPoint >= requireCharacterSkillPoint)
                     {
@@ -84,7 +84,7 @@ namespace MultiplayerARPG
                     {
                         uiTextRequireSkillPoint.text = ZString.Format(
                             LanguageManager.GetText(formatKeyRequireSkillPointNotEnough),
-                            characterSkillPoint,
+                            characterSkillPoint.ToString("N0"),
                             requireCharacterSkillPoint.ToString("N0"));
                     }
                 }
@@ -100,19 +100,20 @@ namespace MultiplayerARPG
                 else
                 {
                     uiTextRequireGold.SetGameObjectActive(true);
-                    float characterGold = (GameInstance.PlayingCharacter != null ? GameInstance.PlayingCharacter.Gold : 0);
+                    float characterGold = GameInstance.PlayingCharacter != null ? GameInstance.PlayingCharacter.Gold : 0;
                     float requireCharacterGold = skill.GetRequireCharacterGold(level);
                     if (characterGold >= requireCharacterGold)
                     {
                         uiTextRequireGold.text = ZString.Format(
                             LanguageManager.GetText(formatKeyRequireGold),
+                            characterGold.ToString("N0"),
                             requireCharacterGold.ToString("N0"));
                     }
                     else
                     {
                         uiTextRequireGold.text = ZString.Format(
                             LanguageManager.GetText(formatKeyRequireGoldNotEnough),
-                            characterGold,
+                            characterGold.ToString("N0"),
                             requireCharacterGold.ToString("N0"));
                     }
                 }
