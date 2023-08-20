@@ -98,33 +98,5 @@ namespace MultiplayerARPG
         /// <param name="storageType"></param>
         /// <param name="storageOwnerId"></param>
         void NotifyStorageItemsUpdated(StorageType storageType, string storageOwnerId);
-
-        /// <summary>
-        /// Set storage busy status
-        /// </summary>
-        /// <param name="storageId"></param>
-        /// <param name="isBusy"></param>
-        void SetStorageBusy(StorageId storageId, bool isBusy);
-
-        /// <summary>
-        /// Get storage busy status
-        /// </summary>
-        /// <param name="storageId"></param>
-        /// <returns></returns>
-        bool IsStorageBusy(StorageId storageId);
-
-        /// <summary>
-        /// Set storage save pending status
-        /// </summary>
-        /// <param name="storageId"></param>
-        /// <param name="isBusy"></param>
-        void SetStorageSavePending(StorageId storageId, bool isSavePending);
-
-        /// <summary>
-        /// Get storage save pending status
-        /// </summary>
-        /// <param name="storageId"></param>
-        /// <returns></returns>
-        bool IsStorageSavePending(StorageId storageId);
     }
 }
