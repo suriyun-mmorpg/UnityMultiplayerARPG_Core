@@ -102,30 +102,44 @@ namespace MultiplayerARPG
         [SerializeField]
         [ArrayElementTitle("currency")]
         public CurrencyRandomAmount[] randomCurrencies = new CurrencyRandomAmount[0];
-        [SerializeField]
-        [ArrayElementTitle("item")]
-        private ItemDrop[] randomItems = new ItemDrop[0];
-        [SerializeField]
-        private ItemDropTable[] itemDropTables = new ItemDropTable[0];
-        [SerializeField]
-        private ItemRandomByWeightTable[] itemRandomByWeightTables = new ItemRandomByWeightTable[0];
-        [SerializeField]
-        [Tooltip("Max kind of items that will be dropped in ground")]
-        private byte maxDropItems = 5;
+        public ItemDropManager itemDropManager = new ItemDropManager();
+        public ItemDropManager ItemDropManager { get { return itemDropManager; } }
 
         #region Being deprecated
         [HideInInspector]
         [SerializeField]
+        [ArrayElementTitle("item")]
+        private ItemDrop[] randomItems = new ItemDrop[0];
+
+        [HideInInspector]
+        [SerializeField]
+        private ItemDropTable[] itemDropTables = new ItemDropTable[0];
+
+        [HideInInspector]
+        [SerializeField]
+        private ItemRandomByWeightTable[] itemRandomByWeightTables = new ItemRandomByWeightTable[0];
+
+        [HideInInspector]
+        [SerializeField]
+        [Tooltip("Max kind of items that will be dropped in ground")]
+        private byte maxDropItems = 5;
+
+        [HideInInspector]
+        [SerializeField]
         private int randomExpMin;
+
         [HideInInspector]
         [SerializeField]
         private int randomExpMax;
+
         [HideInInspector]
         [SerializeField]
         private int randomGoldMin;
+
         [HideInInspector]
         [SerializeField]
         private int randomGoldMax;
+
         [HideInInspector]
         [SerializeField]
         private ItemDropTable itemDropTable = null;
@@ -145,84 +159,6 @@ namespace MultiplayerARPG
         private IncrementalMinMaxInt? _adjustRandomExp = null;
         [System.NonSerialized]
         private IncrementalMinMaxInt? _adjustRandomGold = null;
-
-        [System.NonSerialized]
-        private List<ItemRandomByWeightTable> _cacheItemRandomByWeightTables = null;
-        public List<ItemRandomByWeightTable> CacheItemRandomByWeightTables
-        {
-            get
-            {
-                if (_cacheItemRandomByWeightTables == null)
-                {
-                    _cacheItemRandomByWeightTables = new List<ItemRandomByWeightTable>();
-                    if (itemRandomByWeightTables != null)
-                        _cacheItemRandomByWeightTables.AddRange(itemRandomByWeightTables);
-                }
-                return _cacheItemRandomByWeightTables;
-            }
-        }
-
-        [System.NonSerialized]
-        private List<ItemDrop> _certainDropItems = new List<ItemDrop>();
-        [System.NonSerialized]
-        private List<ItemDrop> _uncertainDropItems = new List<ItemDrop>();
-
-        [System.NonSerialized]
-        private List<ItemDrop> _cacheRandomItems = null;
-        public List<ItemDrop> CacheRandomItems
-        {
-            get
-            {
-                if (_cacheRandomItems == null)
-                {
-                    int i;
-                    _cacheRandomItems = new List<ItemDrop>();
-                    if (randomItems != null &&
-                        randomItems.Length > 0)
-                    {
-                        for (i = 0; i < randomItems.Length; ++i)
-                        {
-                            if (randomItems[i].item == null ||
-                                randomItems[i].maxAmount <= 0 ||
-                                randomItems[i].dropRate <= 0)
-                                continue;
-                            _cacheRandomItems.Add(randomItems[i]);
-                        }
-                    }
-                    if (itemDropTables != null &&
-                        itemDropTables.Length > 0)
-                    {
-                        foreach (ItemDropTable itemDropTable in itemDropTables)
-                        {
-                            if (itemDropTable != null &&
-                                itemDropTable.randomItems != null &&
-                                itemDropTable.randomItems.Length > 0)
-                            {
-                                for (i = 0; i < itemDropTable.randomItems.Length; ++i)
-                                {
-                                    if (itemDropTable.randomItems[i].item == null ||
-                                        itemDropTable.randomItems[i].maxAmount <= 0 ||
-                                        itemDropTable.randomItems[i].dropRate <= 0)
-                                        continue;
-                                    _cacheRandomItems.Add(itemDropTable.randomItems[i]);
-                                }
-                            }
-                        }
-                    }
-                    _cacheRandomItems.Sort((a, b) => b.dropRate.CompareTo(a.dropRate));
-                    _certainDropItems.Clear();
-                    _uncertainDropItems.Clear();
-                    for (i = 0; i < _cacheRandomItems.Count; ++i)
-                    {
-                        if (_cacheRandomItems[i].dropRate >= 1f)
-                            _certainDropItems.Add(_cacheRandomItems[i]);
-                        else
-                            _uncertainDropItems.Add(_cacheRandomItems[i]);
-                    }
-                }
-                return _cacheRandomItems;
-            }
-        }
 
         [System.NonSerialized]
         private List<CurrencyRandomAmount> _cacheRandomCurrencies = null;
@@ -489,48 +425,7 @@ namespace MultiplayerARPG
 
         public virtual void RandomItems(System.Action<BaseItem, int> onRandomItem, float rate = 1f)
         {
-            if (CacheRandomItems.Count == 0 && CacheItemRandomByWeightTables.Count <= 0)
-                return;
-            int randomDropCount = 0;
-            int i;
-            // Drop certain drop rate items
-            _certainDropItems.Shuffle();
-            for (i = 0; i < _certainDropItems.Count && randomDropCount < maxDropItems; ++i)
-            {
-                if (BaseGameNetworkManager.CurrentMapInfo.ExcludeItemFromDropping(_certainDropItems[i].item))
-                    continue;
-                if (_certainDropItems[i].minAmount <= 0)
-                    onRandomItem.Invoke(_certainDropItems[i].item, _certainDropItems[i].maxAmount);
-                else
-                    onRandomItem.Invoke(_certainDropItems[i].item, Random.Range(_certainDropItems[i].minAmount, _certainDropItems[i].maxAmount));
-                ++randomDropCount;
-            }
-            // Reached max drop items?
-            if (randomDropCount >= maxDropItems)
-                return;
-            // Drop uncertain drop rate items
-            _uncertainDropItems.Shuffle();
-            for (i = 0; i < _uncertainDropItems.Count && randomDropCount < maxDropItems; ++i)
-            {
-                if (Random.value > _uncertainDropItems[i].dropRate * rate)
-                    continue;
-                if (BaseGameNetworkManager.CurrentMapInfo.ExcludeItemFromDropping(_uncertainDropItems[i].item))
-                    continue;
-                if (_uncertainDropItems[i].minAmount <= 0)
-                    onRandomItem.Invoke(_uncertainDropItems[i].item, _uncertainDropItems[i].maxAmount);
-                else
-                    onRandomItem.Invoke(_uncertainDropItems[i].item, Random.Range(_uncertainDropItems[i].minAmount, _uncertainDropItems[i].maxAmount));
-                ++randomDropCount;
-            }
-            // Reached max drop items?
-            if (randomDropCount >= maxDropItems)
-                return;
-            // Drop items by weighted tables
-            CacheItemRandomByWeightTables.Shuffle();
-            for (i = 0; i < CacheItemRandomByWeightTables.Count && randomDropCount < maxDropItems; ++i)
-            {
-                CacheItemRandomByWeightTables[i].RandomItem(onRandomItem);
-            }
+            ItemDropManager.RandomItems(onRandomItem, rate);
         }
 
         public virtual CurrencyAmount[] RandomCurrencies()
@@ -590,14 +485,7 @@ namespace MultiplayerARPG
         {
             base.PrepareRelatesData();
             DamageInfo.PrepareRelatesData();
-            GameInstance.AddItems(CacheRandomItems);
-            if (itemRandomByWeightTables != null)
-            {
-                foreach (ItemRandomByWeightTable entry in itemRandomByWeightTables)
-                {
-                    GameInstance.AddItems(entry.randomItems);
-                }
-            }
+            ItemDropManager.PrepareRelatesData();
         }
 
         public override bool Validate()
@@ -637,14 +525,37 @@ namespace MultiplayerARPG
                 randomGoldMin = 0;
                 randomGoldMax = 0;
             }
+            if (randomItems != null)
+            {
+                hasChanges = true;
+                List<ItemDrop> list = new List<ItemDrop>(itemDropManager.randomItems);
+                list.AddRange(randomItems);
+                itemDropManager.randomItems = list.ToArray();
+                randomItems = null;
+            }
             if (itemDropTable != null)
             {
                 hasChanges = true;
-                List<ItemDropTable> tempItemDropTables = new List<ItemDropTable>();
-                tempItemDropTables.AddRange(itemDropTables);
-                tempItemDropTables.Add(itemDropTable);
-                itemDropTables = tempItemDropTables.ToArray();
+                List<ItemDropTable> list = new List<ItemDropTable>(itemDropManager.itemDropTables)
+                {
+                    itemDropTable
+                };
+                itemDropManager.itemDropTables = list.ToArray();
                 itemDropTable = null;
+            }
+            if (itemDropTables != null)
+            {
+                hasChanges = true;
+                List<ItemDropTable> list = new List<ItemDropTable>(itemDropManager.itemDropTables);
+                list.AddRange(itemDropTables);
+                itemDropManager.itemDropTables = list.ToArray();
+                itemDropTables = null;
+            }
+            if (maxDropItems > 0)
+            {
+                hasChanges = true;
+                itemDropManager.maxDropItems = maxDropItems;
+                maxDropItems = 0;
             }
             return hasChanges || base.Validate();
         }
