@@ -22,16 +22,16 @@ namespace MultiplayerARPG
         public override async UniTask PreSpawnEntities(IPlayerCharacterData hostPlayerCharacterData, IDictionary<StorageId, List<CharacterItem>> storageItems)
         {
             isReadyToSave = false;
-            BuildingEntity[] inSceneBuildings = FindObjectsByType<BuildingEntity>(FindObjectsSortMode.None);
-            Dictionary<string, BuildingEntity> inSceneBuildingDicts = new Dictionary<string, BuildingEntity>();
-            for (int i = 0; i < inSceneBuildings.Length; ++i)
-            {
-                inSceneBuildingDicts.Add(inSceneBuildings[i].Id, inSceneBuildings[i]);
-            }
             storageItems.Clear();
             if (hostPlayerCharacterData != null && !string.IsNullOrEmpty(hostPlayerCharacterData.Id))
             {
                 // Load and Spawn buildings
+                BuildingEntity[] inSceneBuildings = FindObjectsByType<BuildingEntity>(FindObjectsSortMode.None);
+                Dictionary<string, BuildingEntity> inSceneBuildingDicts = new Dictionary<string, BuildingEntity>();
+                for (int i = 0; i < inSceneBuildings.Length; ++i)
+                {
+                    inSceneBuildingDicts.Add(inSceneBuildings[i].Id, inSceneBuildings[i]);
+                }
                 worldSaveData.LoadPersistentData(hostPlayerCharacterData.Id, BaseGameNetworkManager.CurrentMapInfo.Id);
                 foreach (BuildingSaveData building in worldSaveData.buildings)
                 {
@@ -41,16 +41,23 @@ namespace MultiplayerARPG
                         {
                             inSceneBuilding.NetworkDestroy();
                             GameInstance.ServerBuildingHandlers.AddBuilding(building.Id, building);
+                            inSceneBuildingDicts.Remove(building.Id);
                             continue;
                         }
-                        building.CloneTo(inSceneBuilding);
+                        inSceneBuilding.CurrentHp = building.CurrentHp;
                         GameInstance.ServerBuildingHandlers.AddBuilding(inSceneBuilding.Id, inSceneBuilding);
-                        inSceneBuilding.CallAllOnBuildingConstruct();
+                        inSceneBuildingDicts.Remove(building.Id);
                     }
                     else
                     {
                         BaseGameNetworkManager.Singleton.CreateBuildingEntity(building, true);
                     }
+                }
+                // Setup building
+                foreach (BuildingEntity inSceneBuilding in inSceneBuildingDicts.Values)
+                {
+                    inSceneBuilding.CurrentHp = inSceneBuilding.MaxHp;
+                    GameInstance.ServerBuildingHandlers.AddBuilding(inSceneBuilding.Id, inSceneBuilding);
                 }
                 // Load storage data
                 hostStorageSaveData.LoadPersistentData(hostPlayerCharacterData.Id);
@@ -166,20 +173,7 @@ namespace MultiplayerARPG
             foreach (IBuildingSaveData buildingEntity in buildings)
             {
                 if (buildingEntity == null) continue;
-                worldSaveData.buildings.Add(new BuildingSaveData()
-                {
-                    Id = buildingEntity.Id,
-                    ParentId = buildingEntity.ParentId,
-                    EntityId = buildingEntity.EntityId,
-                    Position = buildingEntity.Position,
-                    Rotation = buildingEntity.Rotation,
-                    CurrentHp = buildingEntity.CurrentHp,
-                    IsLocked = buildingEntity.IsLocked,
-                    LockPassword = buildingEntity.LockPassword,
-                    CreatorId = buildingEntity.CreatorId,
-                    CreatorName = buildingEntity.CreatorName,
-                    ExtraData = buildingEntity.ExtraData,
-                });
+                worldSaveData.buildings.Add(buildingEntity.CloneTo(new BuildingSaveData()));
             }
             worldSaveData.SavePersistentData(hostPlayerCharacterData.Id, BaseGameNetworkManager.CurrentMapInfo.Id);
         }
