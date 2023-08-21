@@ -22,6 +22,12 @@ namespace MultiplayerARPG
         public override async UniTask PreSpawnEntities(IPlayerCharacterData hostPlayerCharacterData, IDictionary<StorageId, List<CharacterItem>> storageItems)
         {
             isReadyToSave = false;
+            BuildingEntity[] inSceneBuildings = FindObjectsByType<BuildingEntity>(FindObjectsSortMode.None);
+            Dictionary<string, BuildingEntity> inSceneBuildingDicts = new Dictionary<string, BuildingEntity>();
+            for (int i = 0; i < inSceneBuildings.Length; ++i)
+            {
+                inSceneBuildingDicts.Add(inSceneBuildings[i].Id, inSceneBuildings[i]);
+            }
             storageItems.Clear();
             if (hostPlayerCharacterData != null && !string.IsNullOrEmpty(hostPlayerCharacterData.Id))
             {
@@ -29,7 +35,22 @@ namespace MultiplayerARPG
                 worldSaveData.LoadPersistentData(hostPlayerCharacterData.Id, BaseGameNetworkManager.CurrentMapInfo.Id);
                 foreach (BuildingSaveData building in worldSaveData.buildings)
                 {
-                    BaseGameNetworkManager.Singleton.CreateBuildingEntity(building, true);
+                    if (building.IsSceneObject && inSceneBuildingDicts.TryGetValue(building.Id, out BuildingEntity inSceneBuilding))
+                    {
+                        if (building.CurrentHp <= 0)
+                        {
+                            inSceneBuilding.NetworkDestroy();
+                            GameInstance.ServerBuildingHandlers.AddBuilding(building.Id, building);
+                            continue;
+                        }
+                        building.CloneTo(inSceneBuilding);
+                        GameInstance.ServerBuildingHandlers.AddBuilding(inSceneBuilding.Id, inSceneBuilding);
+                        inSceneBuilding.CallAllOnBuildingConstruct();
+                    }
+                    else
+                    {
+                        BaseGameNetworkManager.Singleton.CreateBuildingEntity(building, true);
+                    }
                 }
                 // Load storage data
                 hostStorageSaveData.LoadPersistentData(hostPlayerCharacterData.Id);

@@ -1025,9 +1025,10 @@ namespace MultiplayerARPG
             return null;
         }
 
-        public virtual void DestroyBuildingEntity(string id)
+        public virtual void DestroyBuildingEntity(string id, bool isSceneObject)
         {
-            ServerBuildingHandlers.RemoveBuilding(id);
+            if (!isSceneObject)
+                ServerBuildingHandlers.RemoveBuilding(id);
         }
 
         public void SetMapInfo(string mapName)

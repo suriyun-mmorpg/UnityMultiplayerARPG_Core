@@ -121,7 +121,13 @@ namespace MultiplayerARPG
 
         public string Id
         {
-            get { return id; }
+            get
+            {
+                if (IsSceneObject)
+                    return ObjectId.ToString();
+                else
+                    return id;
+            }
             set { id.Value = value; }
         }
 
@@ -523,7 +529,7 @@ namespace MultiplayerARPG
                     child.Destroy();
                 }
                 children.Clear();
-                CurrentGameManager.DestroyBuildingEntity(Id);
+                CurrentGameManager.DestroyBuildingEntity(Id, IsSceneObject);
             }
         }
 
