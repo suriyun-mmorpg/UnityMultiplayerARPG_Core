@@ -28,7 +28,7 @@
         public static Storage GetStorage(this StorageId storageId, out uint objectId)
         {
             objectId = 0;
-            Storage storage = default(Storage);
+            Storage storage = default;
             switch (storageId.storageType)
             {
                 case StorageType.Player:
@@ -63,11 +63,12 @@
                         return false;
                     break;
                 case StorageType.Building:
-                    StorageEntity buildingEntity;
-                    if (!GameInstance.ServerBuildingHandlers.TryGetBuilding(storageId.storageOwnerId, out buildingEntity) ||
-                        !(buildingEntity.IsCreator(playerCharacter.Id) || buildingEntity.CanUseByEveryone))
+                    if (!GameInstance.ServerBuildingHandlers.TryGetBuilding(storageId.storageOwnerId, out StorageEntity buildingEntity) ||
+                        !(buildingEntity.IsCreator(playerCharacter.Id) || buildingEntity.CanUseByEveryone || buildingEntity.Identity.IsSceneObject))
                         return false;
                     break;
+                default:
+                    return false;
             }
             return true;
         }
