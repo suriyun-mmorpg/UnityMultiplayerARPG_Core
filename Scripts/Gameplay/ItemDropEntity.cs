@@ -4,6 +4,9 @@ using UnityEngine.Events;
 using LiteNetLibManager;
 using LiteNetLib;
 using Cysharp.Threading.Tasks;
+#if UNITY_EDITOR
+using UnityEditor;
+#endif
 
 namespace MultiplayerARPG
 {
@@ -29,54 +32,25 @@ namespace MultiplayerARPG
         protected UnityEvent onItemDropDestroy;
 
         [Category(6, "Drop Settings")]
+        public ItemDropManager itemDropManager = new ItemDropManager();
+        public ItemDropManager ItemDropManager { get { return itemDropManager; } }
+
+        #region Being deprecated
+        [HideInInspector]
+        [SerializeField]
         [Tooltip("Max kind of items that will be dropped in ground")]
-        [SerializeField]
         protected byte maxDropItems = 5;
-        [ArrayElementTitle("item")]
+
+        [HideInInspector]
         [SerializeField]
+        [ArrayElementTitle("item")]
         protected ItemDrop[] randomItems;
+
+        [HideInInspector]
         [SerializeField]
         protected ItemDropTable itemDropTable;
+        #endregion
 
-        [System.NonSerialized]
-        private List<ItemDrop> _cacheRandomItems;
-        public List<ItemDrop> CacheRandomItems
-        {
-            get
-            {
-                if (_cacheRandomItems == null)
-                {
-                    int i = 0;
-                    _cacheRandomItems = new List<ItemDrop>();
-                    if (randomItems != null &&
-                        randomItems.Length > 0)
-                    {
-                        for (i = 0; i < randomItems.Length; ++i)
-                        {
-                            if (randomItems[i].item == null ||
-                                randomItems[i].maxAmount <= 0 ||
-                                randomItems[i].dropRate <= 0)
-                                continue;
-                            _cacheRandomItems.Add(randomItems[i]);
-                        }
-                    }
-                    if (itemDropTable != null &&
-                        itemDropTable.randomItems != null &&
-                        itemDropTable.randomItems.Length > 0)
-                    {
-                        for (i = 0; i < itemDropTable.randomItems.Length; ++i)
-                        {
-                            if (itemDropTable.randomItems[i].item == null ||
-                                itemDropTable.randomItems[i].maxAmount <= 0 ||
-                                itemDropTable.randomItems[i].dropRate <= 0)
-                                continue;
-                            _cacheRandomItems.Add(itemDropTable.randomItems[i]);
-                        }
-                    }
-                }
-                return _cacheRandomItems;
-            }
-        }
         public bool PutOnPlaceholder { get; protected set; }
         public RewardGivenType GivenType { get; protected set; }
         public List<CharacterItem> DropItems { get; protected set; }
@@ -138,15 +112,49 @@ namespace MultiplayerARPG
         public override void PrepareRelatesData()
         {
             base.PrepareRelatesData();
-            // Add items from drop table
-            List<BaseItem> items = new List<BaseItem>();
-            foreach (var randomItem in CacheRandomItems)
+            ItemDropManager.PrepareRelatesData();
+        }
+
+#if UNITY_EDITOR
+        protected override void OnValidate()
+        {
+            base.OnValidate();
+            bool hasChanges = false;
+            if (MigrateItemDropData())
+                hasChanges = true;
+            if (hasChanges)
+                EditorUtility.SetDirty(this);
+        }
+#endif
+
+        private bool MigrateItemDropData()
+        {
+            bool hasChanges = false;
+            if (randomItems != null && randomItems.Length > 0)
             {
-                if (randomItem.item == null)
-                    continue;
-                items.Add(randomItem.item);
+                hasChanges = true;
+                List<ItemDrop> list = new List<ItemDrop>(itemDropManager.randomItems);
+                list.AddRange(randomItems);
+                itemDropManager.randomItems = list.ToArray();
+                randomItems = null;
             }
-            GameInstance.AddItems(items);
+            if (itemDropTable != null)
+            {
+                hasChanges = true;
+                List<ItemDropTable> list = new List<ItemDropTable>(itemDropManager.itemDropTables)
+                {
+                    itemDropTable
+                };
+                itemDropManager.itemDropTables = list.ToArray();
+                itemDropTable = null;
+            }
+            if (maxDropItems > 0)
+            {
+                hasChanges = true;
+                itemDropManager.maxDropItems = maxDropItems;
+                maxDropItems = 0;
+            }
+            return hasChanges;
         }
 
         protected override void EntityAwake()
@@ -181,22 +189,11 @@ namespace MultiplayerARPG
                 // Random drop items
                 DropItems = new List<CharacterItem>();
                 Looters = new HashSet<string>();
-                if (CacheRandomItems.Count > 0)
+                List<ItemAmount> increasingItems = new List<ItemAmount>();
+                ItemDropManager.RandomItems((item, amount) =>
                 {
-                    ItemDrop randomItem;
-                    for (int countDrops = 0; countDrops < CacheRandomItems.Count && countDrops < maxDropItems; ++countDrops)
-                    {
-                        randomItem = CacheRandomItems[Random.Range(0, CacheRandomItems.Count)];
-                        if (Random.value > randomItem.dropRate)
-                            continue;
-                        DropItems.Add(CharacterItem.Create(randomItem.item.DataId, 1, Random.Range(randomItem.minAmount <= 0 ? 1 : randomItem.minAmount, randomItem.maxAmount)));
-                    }
-                    if (DropItems.Count == 0)
-                    {
-                        randomItem = CacheRandomItems[Random.Range(0, CacheRandomItems.Count)];
-                        DropItems.Add(CharacterItem.Create(randomItem.item.DataId, 1, Random.Range(randomItem.minAmount <= 0 ? 1 : randomItem.minAmount, randomItem.maxAmount)));
-                    }
-                }
+                    DropItems.Add(CharacterItem.Create(item.DataId, 1, amount));
+                });
             }
             if (DropItems == null || DropItems.Count == 0)
             {
