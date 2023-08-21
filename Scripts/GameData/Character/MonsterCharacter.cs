@@ -525,7 +525,7 @@ namespace MultiplayerARPG
                 randomGoldMin = 0;
                 randomGoldMax = 0;
             }
-            if (randomItems != null)
+            if (randomItems != null && randomItems.Length > 0)
             {
                 hasChanges = true;
                 List<ItemDrop> list = new List<ItemDrop>(itemDropManager.randomItems);
@@ -543,13 +543,21 @@ namespace MultiplayerARPG
                 itemDropManager.itemDropTables = list.ToArray();
                 itemDropTable = null;
             }
-            if (itemDropTables != null)
+            if (itemDropTables != null && itemDropTables.Length > 0)
             {
                 hasChanges = true;
                 List<ItemDropTable> list = new List<ItemDropTable>(itemDropManager.itemDropTables);
                 list.AddRange(itemDropTables);
                 itemDropManager.itemDropTables = list.ToArray();
                 itemDropTables = null;
+            }
+            if (itemRandomByWeightTables != null && itemRandomByWeightTables.Length > 0)
+            {
+                hasChanges = true;
+                List<ItemRandomByWeightTable> list = new List<ItemRandomByWeightTable>(itemDropManager.itemRandomByWeightTables);
+                list.AddRange(itemRandomByWeightTables);
+                itemDropManager.itemRandomByWeightTables = list.ToArray();
+                itemRandomByWeightTables = null;
             }
             if (maxDropItems > 0)
             {
