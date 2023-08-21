@@ -551,6 +551,9 @@ namespace MultiplayerARPG
             GuildData tempGuild;
             foreach (BasePlayerCharacterEntity playerCharacter in ServerUserHandlers.GetPlayerCharacters())
             {
+                if (playerCharacter != null)
+                    continue;
+
                 UpdateOnlineCharacter(playerCharacter);
 
                 if (playerCharacter.PartyId > 0 && ServerPartyHandlers.TryGetParty(playerCharacter.PartyId, out tempParty))
