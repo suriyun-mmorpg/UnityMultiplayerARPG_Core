@@ -179,6 +179,12 @@ namespace MultiplayerARPG
             set { }
         }
 
+        bool IBuildingSaveData.IsSceneObject
+        {
+            get { return Identity.IsSceneObject; }
+            set { }
+        }
+
         public virtual bool Lockable { get { return false; } }
         public bool IsBuildMode { get; private set; }
         public BasePlayerCharacterEntity Builder { get; private set; }
