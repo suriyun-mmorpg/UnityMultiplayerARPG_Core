@@ -69,6 +69,7 @@ namespace MultiplayerARPG
         public bool ShouldPhysicSyncTransforms { get; set; }
         public bool ShouldPhysicSyncTransforms2D { get; set; }
 
+        public bool useUnityAutoPhysicSyncTransform = true;
         // Spawn entities events
         public LiteNetLibLoadSceneEvent onSpawnEntitiesStart;
         public LiteNetLibLoadSceneEvent onSpawnEntitiesProgress;
@@ -109,8 +110,8 @@ namespace MultiplayerARPG
                     gridManager.axisMode = GridManager.EAxisMode.XY;
             }
             // Force change physic auto sync transforms mode to manual
-            Physics.autoSyncTransforms = false;
-            Physics2D.autoSyncTransforms = false;
+            Physics.autoSyncTransforms = useUnityAutoPhysicSyncTransform;
+            Physics2D.autoSyncTransforms = useUnityAutoPhysicSyncTransform;
             base.Awake();
         }
 
@@ -135,10 +136,10 @@ namespace MultiplayerARPG
                 }
             }
             // Network messages were handled (in base.Update()), enity movement proceeded, it may have transform changing manually, and need to sync tranforms before update physic movement
-            if (ShouldPhysicSyncTransforms)
+            if (ShouldPhysicSyncTransforms && !Physics.autoSyncTransforms)
                 Physics.SyncTransforms();
             ShouldPhysicSyncTransforms = false;
-            if (ShouldPhysicSyncTransforms2D)
+            if (ShouldPhysicSyncTransforms2D && !Physics2D.autoSyncTransforms)
                 Physics2D.SyncTransforms();
             ShouldPhysicSyncTransforms2D = false;
 
