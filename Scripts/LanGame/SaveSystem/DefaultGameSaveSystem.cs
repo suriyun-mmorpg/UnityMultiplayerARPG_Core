@@ -56,7 +56,7 @@ namespace MultiplayerARPG
                 // Setup building
                 foreach (BuildingEntity inSceneBuilding in inSceneBuildingDicts.Values)
                 {
-                    inSceneBuilding.CurrentHp = inSceneBuilding.MaxHp;
+                    inSceneBuilding.InitSceneObject();
                     GameInstance.ServerBuildingHandlers.AddBuilding(inSceneBuilding.Id, inSceneBuilding);
                 }
                 // Load storage data

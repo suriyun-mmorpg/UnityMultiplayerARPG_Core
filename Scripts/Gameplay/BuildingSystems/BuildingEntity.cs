@@ -543,6 +543,11 @@ namespace MultiplayerARPG
             return CreatorId.Equals(playerCharacterId);
         }
 
+        public virtual void InitSceneObject()
+        {
+            CurrentHp = MaxHp;
+        }
+
         public override bool NotBeingSelectedOnClick()
         {
             return notBeingSelectedOnClick;
