@@ -86,11 +86,13 @@ namespace MultiplayerARPG
                     randomMax = Entity.CharacterModel.GetRightHandAttackRandomMax(animActionDataId);
                     break;
             }
-            if (time - LastAttackEndTime > animationResetDelay || _lastAttackAnimationIndex >= randomMax || _lastAttackDataId != animActionDataId)
+            if (time - LastAttackEndTime > animationResetDelay || _lastAttackDataId != animActionDataId)
                 _lastAttackAnimationIndex = 0;
             int animationIndex = _lastAttackAnimationIndex++;
             if (!doNotRandomAnimation)
-                animationIndex = Random.Range(0, randomMax);
+                animationIndex = GenericUtils.RandomInt(simulateSeed, 0, randomMax);
+            if (_lastAttackAnimationIndex >= randomMax)
+                _lastAttackAnimationIndex = 0;
             _lastAttackDataId = animActionDataId;
 
             // Prepare required data and get animation data
