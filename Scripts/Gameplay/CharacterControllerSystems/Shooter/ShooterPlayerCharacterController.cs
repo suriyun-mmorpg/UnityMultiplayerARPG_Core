@@ -5,6 +5,7 @@ using UnityEngine.Serialization;
 
 namespace MultiplayerARPG
 {
+    [DefaultExecutionOrder(int.MinValue + 1)]
     public partial class ShooterPlayerCharacterController : BasePlayerCharacterController, IShooterWeaponController, IWeaponAbilityController
     {
         public const byte PAUSE_FIRE_INPUT_FRAMES_AFTER_CONFIRM_BUILD = 3;
@@ -378,6 +379,7 @@ namespace MultiplayerARPG
         protected Vector3 _moveDirection;
         protected Vector3 _cameraForward;
         protected Vector3 _cameraRight;
+        protected Vector3 _cameraEulerAngles;
         protected float _inputV;
         protected float _inputH;
         protected Vector2 _normalizedInput;
@@ -638,6 +640,7 @@ namespace MultiplayerARPG
             _cameraRight = CacheGameplayCameraController.CameraTransform.right;
             _cameraRight.y = 0f;
             _cameraRight.Normalize();
+            _cameraEulerAngles = CacheGameplayCameraController.CameraTransform.eulerAngles;
 
             // Update look target and aim position
             if (ConstructingBuildingEntity == null)
@@ -659,7 +662,7 @@ namespace MultiplayerARPG
             }
 
             // Update aim position
-            bool isCharacterTurnForwarding = Mathf.Abs(PlayingCharacterEntity.EntityTransform.eulerAngles.y - CacheGameplayCameraController.CameraTransform.eulerAngles.y) < 15f;
+            bool isCharacterTurnForwarding = Mathf.Abs(PlayingCharacterEntity.EntityTransform.eulerAngles.y - _cameraEulerAngles.y) < 15f;
             bool isAimingToCenterOfScreen = Mode == ControllerMode.Combat || turnForwardWhileDoingAction || isCharacterTurnForwarding;
             if (isAimingToCenterOfScreen)
             {
@@ -671,7 +674,7 @@ namespace MultiplayerARPG
                 // Aim to character direction
                 Vector3 direction = PlayingCharacterEntity.EntityTransform.forward;
                 Vector3 angles = Quaternion.LookRotation(direction, Vector3.up).eulerAngles;
-                angles = new Vector3(CacheGameplayCameraController.CameraTransform.eulerAngles.x, angles.y, angles.z);
+                angles = new Vector3(_cameraEulerAngles.x, angles.y, angles.z);
                 direction = Quaternion.Euler(angles) * Vector3.forward;
                 PlayingCharacterEntity.AimPosition = PlayingCharacterEntity.GetAttackAimPositionByDirection(ref _isLeftHandAttacking, direction, false);
             }
@@ -752,7 +755,6 @@ namespace MultiplayerARPG
             PlayingCharacterEntity.KeyMovement(_moveDirection, _movementState);
             PlayingCharacterEntity.SetExtraMovementState(_extraMovementState);
             PlayingCharacterEntity.SetSmoothTurnSpeed(0f);
-            UpdateLookAtTarget();
 
             if (canSwitchViewMode && InputManager.GetButtonDown("SwitchViewMode"))
             {
@@ -784,6 +786,15 @@ namespace MultiplayerARPG
             _reloadInput.OnLateUpdate();
             _exitVehicleInput.OnLateUpdate();
             _switchEquipWeaponSetInput.OnLateUpdate();
+
+            if (ViewMode == ShooterControllerViewMode.Fps)
+            {
+                PlayingCharacterEntity.SetLookRotation(Quaternion.Euler(CacheGameplayCameraController.CameraTransform.eulerAngles.y * Vector3.up));
+            }
+            else
+            {
+                PlayingCharacterEntity.SetLookRotation(Quaternion.LookRotation(_targetLookDirection));
+            }
         }
 
         protected bool DetectExtraActive(string key, ExtraMoveActiveMode activeMode, ref bool state)
@@ -969,7 +980,7 @@ namespace MultiplayerARPG
 
         protected virtual void UpdateMovementInputs()
         {
-            float pitch = CacheGameplayCameraController.CameraTransform.eulerAngles.x;
+            float pitch = _cameraEulerAngles.x;
 
             // Update charcter pitch
             PlayingCharacterEntity.Pitch = pitch;
@@ -999,13 +1010,6 @@ namespace MultiplayerARPG
                 case ControllerMode.Combat:
                     _moveLookDirection = _cameraForward;
                     break;
-            }
-
-            if (ViewMode == ShooterControllerViewMode.Fps)
-            {
-                // Force turn to look direction
-                _moveLookDirection = _cameraForward;
-                _targetLookDirection = _cameraForward;
             }
 
             _moveDirection.Normalize();
@@ -1408,8 +1412,6 @@ namespace MultiplayerARPG
             switch (ViewMode)
             {
                 case ShooterControllerViewMode.Fps:
-                    // Just look at camera forward while character playing action animation
-                    _targetLookDirection = _cameraForward;
                     return PlayingCharacterEntity.CanDoNextAction();
                 case ShooterControllerViewMode.Tps:
                     // Just look at camera forward while character playing action animation while `turnForwardWhileDoingAction` is `true`
@@ -1436,10 +1438,6 @@ namespace MultiplayerARPG
         {
             switch (ViewMode)
             {
-                case ShooterControllerViewMode.Fps:
-                    // Just look at camera forward while character playing action animation
-                    _targetLookDirection = _cameraForward;
-                    break;
                 case ShooterControllerViewMode.Tps:
                     // Turn character look direction to move direction while moving without doing any action
                     if (_moveDirection.sqrMagnitude > 0f)
@@ -1460,12 +1458,6 @@ namespace MultiplayerARPG
                     }
                     break;
             }
-        }
-
-        protected virtual void UpdateLookAtTarget()
-        {
-            // Turn character to look direction immediately
-            PlayingCharacterEntity.SetLookRotation(Quaternion.LookRotation(_targetLookDirection));
         }
 
         public override void UseHotkey(HotkeyType type, string relateId, AimPosition aimPosition)
