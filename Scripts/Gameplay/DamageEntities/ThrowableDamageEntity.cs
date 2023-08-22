@@ -22,12 +22,40 @@ namespace MultiplayerARPG
         protected float _throwedTime;
         protected bool _destroying;
         protected readonly HashSet<uint> _alreadyHitObjects = new HashSet<uint>();
+        protected Collider[] _colliders;
+        protected Collider2D[] _colliders2D;
+        protected bool _exittedThrower;
+        protected int _awakenFrame;
+        protected bool _readyToHitWalls;
 
         protected override void Awake()
         {
             base.Awake();
+
             CacheRigidbody = GetComponent<Rigidbody>();
             CacheRigidbody2D = GetComponent<Rigidbody2D>();
+            // Set colliders to be trigger mode, before exiting thrower
+            _colliders = GetComponents<Collider>();
+            _colliders2D = GetComponents<Collider2D>();
+            _readyToHitWalls = true;
+            SetReadyToHitWalls(false);
+            _exittedThrower = false;
+            _awakenFrame = Time.frameCount;
+        }
+
+        public void SetReadyToHitWalls(bool isReady)
+        {
+            if (_readyToHitWalls == isReady)
+                return;
+            for (int i = 0; i < _colliders.Length; ++i)
+            {
+                _colliders[i].isTrigger = !isReady;
+            }
+            for (int i = 0; i < _colliders2D.Length; ++i)
+            {
+                _colliders2D[i].isTrigger = !isReady;
+            }
+            _readyToHitWalls = isReady;
         }
 
         /// <summary>
@@ -99,8 +127,17 @@ namespace MultiplayerARPG
             }
         }
 
+        public override void OnGetInstance()
+        {
+            base.OnGetInstance();
+            _awakenFrame = Time.frameCount;
+        }
+
         protected override void OnPushBack()
         {
+            _readyToHitWalls = true;
+            SetReadyToHitWalls(false);
+            _exittedThrower = false;
             if (onDestroy != null)
                 onDestroy.Invoke();
             base.OnPushBack();
@@ -176,6 +213,68 @@ namespace MultiplayerARPG
                 {
                     FindAndApplyDamage(collider.gameObject, _alreadyHitObjects);
                 }
+            }
+        }
+
+        protected virtual void OnTriggerEnter(Collider other)
+        {
+            ProceedEnteringThrower(other.transform, other.isTrigger);
+        }
+
+        protected virtual void OnTriggerEnter2D(Collider2D other)
+        {
+            ProceedEnteringThrower(other.transform, other.isTrigger);
+        }
+
+        protected virtual void OnTriggerExit(Collider other)
+        {
+            ProceedExitingThrower(other.transform);
+        }
+
+        protected virtual void OnTriggerExit2D(Collider2D other)
+        {
+            ProceedExitingThrower(other.transform);
+        }
+
+        protected virtual void ProceedEnteringThrower(Transform other, bool otherIsTrigger)
+        {
+            if (otherIsTrigger)
+                return;
+            if (_exittedThrower)
+                return;
+            if (!_instigator.TryGetEntity(out BaseGameEntity entity))
+            {
+                // No instigator (may logoff?)
+                _exittedThrower = true;
+                SetReadyToHitWalls(true);
+                return;
+            }
+            if (other.transform.root != entity.EntityTransform.root)
+            {
+                // Hit something which is not a thrower, so we can determine that this one can hit it
+                _exittedThrower = true;
+                SetReadyToHitWalls(true);
+                return;
+            }
+        }
+
+        protected virtual void ProceedExitingThrower(Transform other)
+        {
+            if (_exittedThrower)
+                return;
+            if (!_instigator.TryGetEntity(out BaseGameEntity entity))
+            {
+                // No instigator (may logoff?)
+                _exittedThrower = true;
+                SetReadyToHitWalls(true);
+                return;
+            }
+            if (other.root == entity.EntityTransform.root)
+            {
+                // Exited from thrower, ready to hit the wall
+                _exittedThrower = true;
+                SetReadyToHitWalls(true);
+                return;
             }
         }
     }
