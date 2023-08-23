@@ -52,7 +52,7 @@ namespace MultiplayerARPG
             }
         }
 
-        protected bool EnterVehicle(IVehicleEntity vehicle, byte seatIndex)
+        protected virtual bool EnterVehicle(IVehicleEntity vehicle, byte seatIndex)
         {
             if (!IsServer || vehicle.IsNull() || !vehicle.IsSeatAvailable(seatIndex))
                 return false;
@@ -67,7 +67,7 @@ namespace MultiplayerARPG
             return true;
         }
 
-        protected void ExitVehicle()
+        protected virtual void ExitVehicle()
         {
             if (!IsServer || PassengingVehicleEntity.IsNull())
                 return;
