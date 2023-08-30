@@ -21,14 +21,14 @@ namespace MultiplayerARPG
         public bool isBonus;
         public bool inactiveIfAmountZero;
 
-        private Dictionary<DamageElement, UIDamageElementTextPair> cacheTextDamages;
+        private Dictionary<DamageElement, UIDamageElementTextPair> _cacheTextDamages;
         public Dictionary<DamageElement, UIDamageElementTextPair> CacheTextDamages
         {
             get
             {
-                if (cacheTextDamages == null)
+                if (_cacheTextDamages == null)
                 {
-                    cacheTextDamages = new Dictionary<DamageElement, UIDamageElementTextPair>();
+                    _cacheTextDamages = new Dictionary<DamageElement, UIDamageElementTextPair>();
                     DamageElement tempElement;
                     foreach (UIDamageElementTextPair componentPair in textDamages)
                     {
@@ -36,10 +36,10 @@ namespace MultiplayerARPG
                             continue;
                         tempElement = componentPair.damageElement == null ? GameInstance.Singleton.DefaultDamageElement : componentPair.damageElement;
                         SetDefaultValue(componentPair);
-                        cacheTextDamages[tempElement] = componentPair;
+                        _cacheTextDamages[tempElement] = componentPair;
                     }
                 }
-                return cacheTextDamages;
+                return _cacheTextDamages;
             }
         }
 

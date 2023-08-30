@@ -30,14 +30,14 @@ namespace MultiplayerARPG
         public bool inactiveIfAmountZero;
         public bool useSimpleFormatIfAmountEnough = true;
 
-        private Dictionary<BaseItem, UIItemTextPair> cacheTextAmounts;
+        private Dictionary<BaseItem, UIItemTextPair> _cacheTextAmounts;
         public Dictionary<BaseItem, UIItemTextPair> CacheTextAmounts
         {
             get
             {
-                if (cacheTextAmounts == null)
+                if (_cacheTextAmounts == null)
                 {
-                    cacheTextAmounts = new Dictionary<BaseItem, UIItemTextPair>();
+                    _cacheTextAmounts = new Dictionary<BaseItem, UIItemTextPair>();
                     BaseItem tempData;
                     foreach (UIItemTextPair componentPair in textAmounts)
                     {
@@ -45,10 +45,10 @@ namespace MultiplayerARPG
                             continue;
                         tempData = componentPair.item;
                         SetDefaultValue(componentPair);
-                        cacheTextAmounts[tempData] = componentPair;
+                        _cacheTextAmounts[tempData] = componentPair;
                     }
                 }
-                return cacheTextAmounts;
+                return _cacheTextAmounts;
             }
         }
 

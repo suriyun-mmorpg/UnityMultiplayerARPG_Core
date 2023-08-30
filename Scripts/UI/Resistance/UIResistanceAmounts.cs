@@ -15,14 +15,14 @@ namespace MultiplayerARPG
         public UIResistanceTextPair[] textAmounts;
         public bool isBonus;
 
-        private Dictionary<DamageElement, UIResistanceTextPair> cacheTextAmounts;
+        private Dictionary<DamageElement, UIResistanceTextPair> _cacheTextAmounts;
         public Dictionary<DamageElement, UIResistanceTextPair> CacheTextAmounts
         {
             get
             {
-                if (cacheTextAmounts == null)
+                if (_cacheTextAmounts == null)
                 {
-                    cacheTextAmounts = new Dictionary<DamageElement, UIResistanceTextPair>();
+                    _cacheTextAmounts = new Dictionary<DamageElement, UIResistanceTextPair>();
                     DamageElement tempElement;
                     foreach (UIResistanceTextPair componentPair in textAmounts)
                     {
@@ -30,10 +30,10 @@ namespace MultiplayerARPG
                             continue;
                         tempElement = componentPair.damageElement == null ? GameInstance.Singleton.DefaultDamageElement : componentPair.damageElement;
                         SetDefaultValue(componentPair);
-                        cacheTextAmounts[tempElement] = componentPair;
+                        _cacheTextAmounts[tempElement] = componentPair;
                     }
                 }
-                return cacheTextAmounts;
+                return _cacheTextAmounts;
             }
         }
 

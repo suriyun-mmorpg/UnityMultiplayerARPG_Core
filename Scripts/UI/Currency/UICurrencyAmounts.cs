@@ -30,14 +30,14 @@ namespace MultiplayerARPG
         public bool inactiveIfAmountZero;
         public bool useSimpleFormatIfAmountEnough = true;
 
-        private Dictionary<Currency, UICurrencyTextPair> cacheTextAmounts;
+        private Dictionary<Currency, UICurrencyTextPair> _cacheTextAmounts;
         public Dictionary<Currency, UICurrencyTextPair> CacheTextAmounts
         {
             get
             {
-                if (cacheTextAmounts == null)
+                if (_cacheTextAmounts == null)
                 {
-                    cacheTextAmounts = new Dictionary<Currency, UICurrencyTextPair>();
+                    _cacheTextAmounts = new Dictionary<Currency, UICurrencyTextPair>();
                     Currency tempData;
                     foreach (UICurrencyTextPair componentPair in textAmounts)
                     {
@@ -45,10 +45,10 @@ namespace MultiplayerARPG
                             continue;
                         tempData = componentPair.currency;
                         SetDefaultValue(componentPair);
-                        cacheTextAmounts[tempData] = componentPair;
+                        _cacheTextAmounts[tempData] = componentPair;
                     }
                 }
-                return cacheTextAmounts;
+                return _cacheTextAmounts;
             }
         }
 
