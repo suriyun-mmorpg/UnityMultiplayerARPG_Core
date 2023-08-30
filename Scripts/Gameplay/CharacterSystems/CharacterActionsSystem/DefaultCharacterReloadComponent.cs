@@ -254,7 +254,7 @@ namespace MultiplayerARPG
             if (!_manager.IsAcceptNewAction())
                 return;
             // Speed hack avoidance
-            if (Time.unscaledTime - LastReloadEndTime < -0.05f)
+            if (Time.unscaledTime - LastReloadEndTime < -0.2f)
                 return;
             // Get weapon to reload
             CharacterItem reloadingWeapon = isLeftHand ? Entity.EquipWeapons.leftHand : Entity.EquipWeapons.rightHand;

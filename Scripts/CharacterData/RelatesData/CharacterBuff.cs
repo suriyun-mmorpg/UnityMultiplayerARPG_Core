@@ -1,6 +1,7 @@
 ﻿using Cysharp.Text;
 using LiteNetLib.Utils;
 using LiteNetLibManager;
+using Newtonsoft.Json;
 
 namespace MultiplayerARPG
 {
@@ -26,7 +27,9 @@ namespace MultiplayerARPG
         [System.NonSerialized]
         private CalculatedBuff _cacheBuff = new CalculatedBuff();
 
+        [JsonIgnore]
         public EntityInfo BuffApplier { get; private set; }
+        [JsonIgnore]
         public CharacterItem BuffApplierWeapon { get; private set; }
 
         private void MakeCache()

@@ -1,9 +1,4 @@
-﻿using LiteNetLibManager;
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-
-namespace MultiplayerARPG
+﻿namespace MultiplayerARPG
 {
     public class UIWeaponSets : UIBase
     {
@@ -13,38 +8,12 @@ namespace MultiplayerARPG
         private void OnEnable()
         {
             UpdateData(GameInstance.PlayingCharacter);
-            GameInstance.PlayingCharacterEntity.onEquipItemsOperation += OnEquipItemsOperation;
-            GameInstance.PlayingCharacterEntity.onEquipWeaponSetChange += OnEquipWeaponSetChange;
-            GameInstance.PlayingCharacterEntity.onSelectableWeaponSetsOperation += OnSelectableWeaponSetsOperation;
-            GameInstance.PlayingCharacterEntity.onNonEquipItemsOperation += OnNonEquipItemsOperation;
+            GameInstance.PlayingCharacterEntity.onRecached += UpdateOwningCharacterData;
         }
 
         private void OnDisable()
         {
-            GameInstance.PlayingCharacterEntity.onEquipItemsOperation += OnEquipItemsOperation;
-            GameInstance.PlayingCharacterEntity.onEquipWeaponSetChange += OnEquipWeaponSetChange;
-            GameInstance.PlayingCharacterEntity.onSelectableWeaponSetsOperation += OnSelectableWeaponSetsOperation;
-            GameInstance.PlayingCharacterEntity.onNonEquipItemsOperation += OnNonEquipItemsOperation;
-        }
-
-        protected void OnEquipItemsOperation(LiteNetLibSyncList.Operation operation, int index)
-        {
-            UpdateOwningCharacterData();
-        }
-
-        private void OnEquipWeaponSetChange(byte equipWeaponSet)
-        {
-            UpdateOwningCharacterData();
-        }
-
-        private void OnSelectableWeaponSetsOperation(LiteNetLibSyncList.Operation operation, int index)
-        {
-            UpdateOwningCharacterData();
-        }
-
-        protected void OnNonEquipItemsOperation(LiteNetLibSyncList.Operation operation, int index)
-        {
-            UpdateOwningCharacterData();
+            GameInstance.PlayingCharacterEntity.onRecached -= UpdateOwningCharacterData;
         }
 
         public void UpdateOwningCharacterData()

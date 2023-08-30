@@ -40,7 +40,7 @@ namespace MultiplayerARPG
             LastDeadTime = System.DateTimeOffset.UtcNow.ToUnixTimeSeconds();
             lastAttacker.TryGetEntity(out BaseCharacterEntity attackerEntity);
             BasePlayerCharacterEntity attackPlayer = attackerEntity as BasePlayerCharacterEntity;
-            bool attackerIsPlayer = attackerEntity != null;
+            bool attackerIsPlayer = attackPlayer != null;
 
             // Find punishment type
             if (Dueling.DuelingStarted)

@@ -30,7 +30,7 @@ namespace MultiplayerARPG
 
         protected virtual void UpdateImpactEffects(bool pushingBack)
         {
-            if (_impacts.Count > 0)
+            if (_impacts.Count <= 0)
                 return;
             GameEffect tempGameEffect;
             if (pushingBack)

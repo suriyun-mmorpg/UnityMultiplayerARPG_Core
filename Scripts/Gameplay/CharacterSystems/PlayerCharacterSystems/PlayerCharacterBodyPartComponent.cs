@@ -62,8 +62,11 @@ namespace MultiplayerARPG
         public IEnumerable<ColorOption> ColorOptions { get => options[_currentModelIndex].colors; }
         public int MaxColorOptions { get => options[_currentModelIndex].colors.Length; }
 
+        private BaseCharacterModel[] _models;
+
         public override void EntityStart()
         {
+            _models = GetComponentsInChildren<BaseCharacterModel>(true);
             SetupEvents();
             ApplyModelAndColorBySavedData();
         }
@@ -76,13 +79,23 @@ namespace MultiplayerARPG
         public void SetupEvents()
         {
             ClearEvents();
-            SetupCharacterModelEvents(Entity.CharacterModel);
+            for (int i = 0; i < _models.Length; ++i)
+            {
+                SetupCharacterModelEvents(_models[i]);
+            }
+            Entity.onPublicIntsOperation -= OnPublicIntsOperation;
             Entity.onPublicIntsOperation += OnPublicIntsOperation;
         }
 
         public void ClearEvents()
         {
-            ClearCharacterModelEvents(Entity.CharacterModel);
+            if (_models != null)
+            {
+                for (int i = 0; i < _models.Length; ++i)
+                {
+                    ClearCharacterModelEvents(_models[i]);
+                }
+            }
             Entity.onPublicIntsOperation -= OnPublicIntsOperation;
         }
 
@@ -204,11 +217,11 @@ namespace MultiplayerARPG
 
             if (model.indexOfModel < 0 || options[_currentModelIndex].colors.Length <= 0 || model.indexOfModel >= options[_currentModelIndex].colors[_currentColorIndex].ModelColorSettings.Length)
                 return;
-            
-            MeshRenderer meshRenderer = modelObject.GetComponentInChildren<MeshRenderer>();
-            if (meshRenderer == null)
+
+            Renderer renderer = modelObject.GetComponentInChildren<Renderer>();
+            if (renderer == null)
                 return;
-            meshRenderer.materials = options[_currentModelIndex].colors[_currentColorIndex].ModelColorSettings[model.indexOfModel].materials;
+            renderer.materials = options[_currentModelIndex].colors[_currentColorIndex].ModelColorSettings[model.indexOfModel].materials;
         }
 
         public int CreateFakeItemDataId()
@@ -218,7 +231,7 @@ namespace MultiplayerARPG
 
         public string CreateFakeEquipPosition()
         {
-            return string.Concat("_BODY_PART_" , modelSettingId);
+            return string.Concat("_BODY_PART_", modelSettingId);
         }
 
         public int GetHashedModelSettingId()

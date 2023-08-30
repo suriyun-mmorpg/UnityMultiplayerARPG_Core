@@ -2,7 +2,7 @@ namespace MultiplayerARPG
 {
     public partial class BasePlayerCharacterEntity
     {
-        public bool IsUpdatingStorage { get; set; } = false;
+        public bool IsUpdatingItems { get; set; } = false;
 
         public bool IsDealing
         {
@@ -23,7 +23,7 @@ namespace MultiplayerARPG
         {
             if (IsWarping)
                 return false;
-            if (IsUpdatingStorage)
+            if (IsUpdatingItems)
                 return false;
             if (IsDealing)
                 return false;
@@ -36,7 +36,7 @@ namespace MultiplayerARPG
         {
             if (IsWarping)
                 return false;
-            if (IsUpdatingStorage)
+            if (IsUpdatingItems)
                 return false;
             if (IsDealing)
                 return false;
@@ -49,7 +49,7 @@ namespace MultiplayerARPG
         {
             if (IsWarping)
                 return false;
-            if (IsUpdatingStorage)
+            if (IsUpdatingItems)
                 return false;
             if (IsDealing)
                 return false;
@@ -62,7 +62,7 @@ namespace MultiplayerARPG
         {
             if (IsWarping)
                 return false;
-            if (IsUpdatingStorage)
+            if (IsUpdatingItems)
                 return false;
             if (IsDealing)
                 return false;
@@ -75,7 +75,7 @@ namespace MultiplayerARPG
         {
             if (IsWarping)
                 return false;
-            if (IsUpdatingStorage)
+            if (IsUpdatingItems)
                 return false;
             if (IsDealing)
                 return false;
@@ -88,7 +88,7 @@ namespace MultiplayerARPG
         {
             if (IsWarping)
                 return false;
-            if (IsUpdatingStorage)
+            if (IsUpdatingItems)
                 return false;
             if (IsDealing)
                 return false;
@@ -101,7 +101,7 @@ namespace MultiplayerARPG
         {
             if (IsWarping)
                 return false;
-            if (IsUpdatingStorage)
+            if (IsUpdatingItems)
                 return false;
             if (IsDealing)
                 return false;
@@ -114,7 +114,7 @@ namespace MultiplayerARPG
         {
             if (IsWarping)
                 return false;
-            if (IsUpdatingStorage)
+            if (IsUpdatingItems)
                 return false;
             if (IsDealing)
                 return false;
@@ -127,7 +127,7 @@ namespace MultiplayerARPG
         {
             if (IsWarping)
                 return false;
-            if (IsUpdatingStorage)
+            if (IsUpdatingItems)
                 return false;
             if (IsDealing)
                 return false;
@@ -140,7 +140,7 @@ namespace MultiplayerARPG
         {
             if (IsWarping)
                 return false;
-            if (IsUpdatingStorage)
+            if (IsUpdatingItems)
                 return false;
             if (IsDealing)
                 return false;
@@ -153,7 +153,7 @@ namespace MultiplayerARPG
         {
             if (IsWarping)
                 return false;
-            if (IsUpdatingStorage)
+            if (IsUpdatingItems)
                 return false;
             if (IsDealing)
                 return false;

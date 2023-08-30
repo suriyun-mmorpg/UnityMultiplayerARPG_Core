@@ -69,6 +69,7 @@ namespace MultiplayerARPG
         public bool ShouldPhysicSyncTransforms { get; set; }
         public bool ShouldPhysicSyncTransforms2D { get; set; }
 
+        public bool useUnityAutoPhysicSyncTransform = true;
         // Spawn entities events
         public LiteNetLibLoadSceneEvent onSpawnEntitiesStart;
         public LiteNetLibLoadSceneEvent onSpawnEntitiesProgress;
@@ -109,8 +110,8 @@ namespace MultiplayerARPG
                     gridManager.axisMode = GridManager.EAxisMode.XY;
             }
             // Force change physic auto sync transforms mode to manual
-            Physics.autoSyncTransforms = false;
-            Physics2D.autoSyncTransforms = false;
+            Physics.autoSyncTransforms = useUnityAutoPhysicSyncTransform;
+            Physics2D.autoSyncTransforms = useUnityAutoPhysicSyncTransform;
             base.Awake();
         }
 
@@ -135,10 +136,10 @@ namespace MultiplayerARPG
                 }
             }
             // Network messages were handled (in base.Update()), enity movement proceeded, it may have transform changing manually, and need to sync tranforms before update physic movement
-            if (ShouldPhysicSyncTransforms)
+            if (ShouldPhysicSyncTransforms && !Physics.autoSyncTransforms)
                 Physics.SyncTransforms();
             ShouldPhysicSyncTransforms = false;
-            if (ShouldPhysicSyncTransforms2D)
+            if (ShouldPhysicSyncTransforms2D && !Physics2D.autoSyncTransforms)
                 Physics2D.SyncTransforms();
             ShouldPhysicSyncTransforms2D = false;
 
@@ -550,6 +551,9 @@ namespace MultiplayerARPG
             GuildData tempGuild;
             foreach (BasePlayerCharacterEntity playerCharacter in ServerUserHandlers.GetPlayerCharacters())
             {
+                if (playerCharacter == null)
+                    continue;
+
                 UpdateOnlineCharacter(playerCharacter);
 
                 if (playerCharacter.PartyId > 0 && ServerPartyHandlers.TryGetParty(playerCharacter.PartyId, out tempParty))
@@ -1021,9 +1025,10 @@ namespace MultiplayerARPG
             return null;
         }
 
-        public virtual void DestroyBuildingEntity(string id)
+        public virtual void DestroyBuildingEntity(string id, bool isSceneObject)
         {
-            ServerBuildingHandlers.RemoveBuilding(id);
+            if (!isSceneObject)
+                ServerBuildingHandlers.RemoveBuilding(id);
         }
 
         public void SetMapInfo(string mapName)

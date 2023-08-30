@@ -41,12 +41,16 @@
         /// <summary>
         /// Make caches for character stats / attributes / skills / resistances / increase damages and so on when update calls
         /// </summary>
-        protected void MakeCaches()
+        protected virtual void MakeCaches()
         {
             if (!IsRecaching)
                 return;
 
             _isRecaching = false;
+
+            // Make caches with cache manager
+            this.MarkToMakeCaches();
+            CachedData = this.GetCaches();
 
             if (_selectableWeaponSetsRecachingState.isRecaching)
             {
@@ -97,9 +101,9 @@
                 _summonsRecachingState = SyncListRecachingState.Empty;
             }
 
-            // Make caches with cache manager
-            this.MarkToMakeCaches();
-            CachedData = this.GetCaches();
+            // Invoke recached event
+            if (onRecached != null)
+                onRecached.Invoke();
         }
     }
 }

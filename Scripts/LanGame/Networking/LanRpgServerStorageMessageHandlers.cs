@@ -93,8 +93,7 @@ namespace MultiplayerARPG
             Storage storage = GameInstance.ServerStorageHandlers.GetStorage(storageId, out _);
             bool isLimitSlot = storage.slotLimit > 0;
             int slotLimit = storage.slotLimit;
-            UITextKeys gameMessage;
-            if (!playerCharacter.MoveItemFromStorage(isLimitSlot, slotLimit, storageItems, request.storageItemIndex, request.storageItemAmount, request.inventoryType, request.inventoryItemIndex, request.equipSlotIndexOrWeaponSet, out gameMessage))
+            if (!playerCharacter.MoveItemFromStorage(storageId, isLimitSlot, slotLimit, storageItems, request.storageItemIndex, request.storageItemAmount, request.inventoryType, request.inventoryItemIndex, request.equipSlotIndexOrWeaponSet, out UITextKeys gameMessage))
             {
                 result.InvokeError(new ResponseMoveItemFromStorageMessage()
                 {
@@ -139,8 +138,7 @@ namespace MultiplayerARPG
             bool isLimitSlot = storage.slotLimit > 0;
             int weightLimit = storage.weightLimit;
             int slotLimit = storage.slotLimit;
-            UITextKeys gameMessage;
-            if (!playerCharacter.MoveItemToStorage(isLimitWeight, weightLimit, isLimitSlot, slotLimit, storageItems, request.storageItemIndex, request.inventoryType, request.inventoryItemIndex, request.inventoryItemAmount, request.equipSlotIndexOrWeaponSet, out gameMessage))
+            if (!playerCharacter.MoveItemToStorage(storageId, isLimitWeight, weightLimit, isLimitSlot, slotLimit, storageItems, request.storageItemIndex, request.inventoryType, request.inventoryItemIndex, request.inventoryItemAmount, request.equipSlotIndexOrWeaponSet, out UITextKeys gameMessage))
             {
                 result.InvokeError(new ResponseMoveItemToStorageMessage()
                 {

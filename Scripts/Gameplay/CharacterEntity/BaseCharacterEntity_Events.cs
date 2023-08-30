@@ -1,6 +1,5 @@
 ﻿using LiteNetLibManager;
 using System.Collections.Generic;
-using UnityEngine;
 using UnityEngine.Events;
 
 namespace MultiplayerARPG
@@ -13,6 +12,8 @@ namespace MultiplayerARPG
         public UnityEvent onDead = new UnityEvent();
         public UnityEvent onRespawn = new UnityEvent();
         public UnityEvent onLevelUp = new UnityEvent();
+        // Caching
+        public event System.Action onRecached;
         // Sync variables
         public event System.Action<string> onIdChange;
         public event System.Action<string> onCharacterNameChange;

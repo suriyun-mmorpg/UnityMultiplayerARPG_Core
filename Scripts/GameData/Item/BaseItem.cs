@@ -35,6 +35,15 @@ namespace MultiplayerARPG
         [SerializeField]
         protected CurrencyAmount[] dismantleReturnCurrencies = new CurrencyAmount[0];
 
+        [Category(51, "Restriction Settings")]
+        [SerializeField]
+        protected bool restrictDealing;
+        [SerializeField]
+        protected bool restractDropping;
+        [SerializeField]
+        protected bool restrictSelling;
+
+
         [Category(100, "Cash Shop Generating Settings")]
         [SerializeField]
         protected CashShopItemGeneratingData[] cashShopItemGeneratingList = new CashShopItemGeneratingData[0];
@@ -82,6 +91,12 @@ namespace MultiplayerARPG
         public ItemAmount[] DismantleReturnItems { get { return dismantleReturnItems; } }
 
         public CurrencyAmount[] DismantleReturnCurrencies { get { return dismantleReturnCurrencies; } }
+
+        public bool RestrictDealing { get { return restrictDealing; } }
+
+        public bool RestractDropping { get { return restractDropping; } }
+
+        public bool RestrictSelling { get { return restrictSelling; } }
 
         public int MaxLevel
         {

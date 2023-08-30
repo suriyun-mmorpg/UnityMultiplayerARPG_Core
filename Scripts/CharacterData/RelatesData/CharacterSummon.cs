@@ -1,15 +1,11 @@
 ﻿using LiteNetLib.Utils;
 using LiteNetLibManager;
+using Newtonsoft.Json;
 
 namespace MultiplayerARPG
 {
     public partial class CharacterSummon
     {
-        public int Level { get { return CacheEntity != null ? CacheEntity.Level : level; } }
-        public int Exp { get { return CacheEntity != null ? CacheEntity.Exp : exp; } }
-        public int CurrentHp { get { return CacheEntity != null ? CacheEntity.CurrentHp : currentHp; } }
-        public int CurrentMp { get { return CacheEntity != null ? CacheEntity.CurrentMp : currentMp; } }
-
         [System.NonSerialized]
         private SummonType _dirtyType;
         [System.NonSerialized]
@@ -28,6 +24,7 @@ namespace MultiplayerARPG
 
         [System.NonSerialized]
         private BaseMonsterCharacterEntity _cacheEntity;
+        [JsonIgnore]
         public BaseMonsterCharacterEntity CacheEntity
         {
             get
@@ -37,6 +34,14 @@ namespace MultiplayerARPG
                 return _cacheEntity;
             }
         }
+        [JsonIgnore]
+        public int Level { get { return CacheEntity != null ? CacheEntity.Level : level; } }
+        [JsonIgnore]
+        public int Exp { get { return CacheEntity != null ? CacheEntity.Exp : exp; } }
+        [JsonIgnore]
+        public int CurrentHp { get { return CacheEntity != null ? CacheEntity.CurrentHp : currentHp; } }
+        [JsonIgnore]
+        public int CurrentMp { get { return CacheEntity != null ? CacheEntity.CurrentMp : currentMp; } }
 
         private void MakeCache()
         {

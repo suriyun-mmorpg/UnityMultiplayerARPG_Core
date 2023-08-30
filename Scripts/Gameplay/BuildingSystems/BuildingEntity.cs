@@ -121,7 +121,13 @@ namespace MultiplayerARPG
 
         public string Id
         {
-            get { return id; }
+            get
+            {
+                if (IsSceneObject)
+                    return ObjectId.ToString();
+                else
+                    return id;
+            }
             set { id.Value = value; }
         }
 
@@ -176,6 +182,12 @@ namespace MultiplayerARPG
         public virtual string ExtraData
         {
             get { return string.Empty; }
+            set { }
+        }
+
+        bool IBuildingSaveData.IsSceneObject
+        {
+            get { return Identity.IsSceneObject; }
             set { }
         }
 
@@ -517,7 +529,7 @@ namespace MultiplayerARPG
                     child.Destroy();
                 }
                 children.Clear();
-                CurrentGameManager.DestroyBuildingEntity(Id);
+                CurrentGameManager.DestroyBuildingEntity(Id, IsSceneObject);
             }
         }
 
@@ -529,6 +541,11 @@ namespace MultiplayerARPG
         public bool IsCreator(string playerCharacterId)
         {
             return CreatorId.Equals(playerCharacterId);
+        }
+
+        public virtual void InitSceneObject()
+        {
+            CurrentHp = MaxHp;
         }
 
         public override bool NotBeingSelectedOnClick()

@@ -37,6 +37,7 @@ namespace MultiplayerARPG
         public bool canBeInterruptedWhileCasting;
 
         [Header("Casted Effects")]
+        public GameEffect[] skillActivateEffects;
         public GameEffect[] damageHitEffects;
 
         [Category(11, "Requirement")]
@@ -250,6 +251,7 @@ namespace MultiplayerARPG
         {
             base.PrepareRelatesData();
             GameInstance.AddPoolingObjects(skillCastEffects);
+            GameInstance.AddPoolingObjects(skillActivateEffects);
             GameInstance.AddPoolingObjects(damageHitEffects);
             GameInstance.AddPoolingObjects(Buff.effects);
             GameInstance.AddPoolingObjects(Debuff.effects);
@@ -259,7 +261,7 @@ namespace MultiplayerARPG
                 MakeRequirementEachLevels();
         }
 
-        public GameEffect[] SkillCastEffect
+        public GameEffect[] SkillCastEffects
         {
             get { return skillCastEffects; }
         }
@@ -267,6 +269,11 @@ namespace MultiplayerARPG
         public float GetCastDuration(int level)
         {
             return castDuration.GetAmount(level);
+        }
+
+        public GameEffect[] SkillActivateEffects
+        {
+            get { return skillActivateEffects; }
         }
 
         public GameEffect[] DamageHitEffects

@@ -23,6 +23,7 @@ namespace MultiplayerARPG
             info.AddValue("creatorId", data.CreatorId);
             info.AddValue("creatorName", data.CreatorName);
             info.AddValue("extraData", data.ExtraData);
+            info.AddValue("isSceneObject", data.IsSceneObject);
         }
 
         public object SetObjectData(
@@ -44,6 +45,12 @@ namespace MultiplayerARPG
             data.CreatorId = info.GetString("creatorId");
             data.CreatorName = info.GetString("creatorName");
             data.ExtraData = info.GetString("extraData");
+            // TODO: Backward compatible, this will be removed in future version
+            try
+            {
+                data.IsSceneObject = info.GetBoolean("isSceneObject");
+            }
+            catch { }
             obj = data;
             return obj;
         }

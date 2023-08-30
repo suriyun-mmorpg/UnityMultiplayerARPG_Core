@@ -45,7 +45,7 @@ namespace MultiplayerARPG
         {
             if (!IsServer)
                 return;
-            ServerStopVending();
+            StopVending();
         }
 
         protected void OnDataChange(bool isInitial, VendingData data)
@@ -54,7 +54,7 @@ namespace MultiplayerARPG
                 onVendingDataChange.Invoke(data);
         }
 
-        public void StartVending(string title, StartVendingItems items)
+        public void CallServerStartVending(string title, StartVendingItems items)
         {
             if (DisableVending)
             {
@@ -90,7 +90,12 @@ namespace MultiplayerARPG
                 int index = Entity.NonEquipItems.IndexOf(item.id);
                 if (index < 0)
                     continue;
-                CharacterItem storeItem = Entity.NonEquipItems[index].Clone(false);
+                CharacterItem storeItem = Entity.NonEquipItems[index];
+                if (storeItem.IsEmptySlot())
+                    continue;
+                if (storeItem.GetItem().RestrictDealing)
+                    continue;
+                storeItem = Entity.NonEquipItems[index].Clone(false);
                 storeItem.amount = item.amount;
                 _items.Add(new VendingItem()
                 {
@@ -110,13 +115,18 @@ namespace MultiplayerARPG
             };
         }
 
-        public void StopVending()
+        public void CallServerStopVending()
         {
             RPC(ServerStopVending);
         }
 
         [ServerRpc]
         protected void ServerStopVending()
+        {
+            StopVending();
+        }
+
+        public void StopVending()
         {
             data.Value = new VendingData();
             _items.Clear();
@@ -128,7 +138,7 @@ namespace MultiplayerARPG
             _customers.Clear();
         }
 
-        public void Subscribe(uint objectId)
+        public void CallServerSubscribe(uint objectId)
         {
             RPC(ServerSubscribe, objectId);
         }
@@ -149,10 +159,10 @@ namespace MultiplayerARPG
         protected void AddCustomer(PlayerCharacterVendingComponent customer)
         {
             if (_customers.Add(customer))
-                NotifyItems(customer.ConnectionId);
+                CallTargetNotifyItems(customer.ConnectionId, _items);
         }
 
-        public void Unsubscribe()
+        public void CallServerUnsubscribe()
         {
             RPC(ServerUnsubscribe);
         }
@@ -177,14 +187,14 @@ namespace MultiplayerARPG
             {
                 if (comp == null)
                     continue;
-                NotifyItems(comp.ConnectionId);
+                CallTargetNotifyItems(comp.ConnectionId, _items);
             }
-            NotifyItems(ConnectionId);
+            CallTargetNotifyItems(ConnectionId, _items);
         }
 
-        protected void NotifyItems(long connectionId)
+        public void CallTargetNotifyItems(long connectionId, VendingItems items)
         {
-            RPC(TargetNotifyItems, connectionId, _items);
+            RPC(TargetNotifyItems, connectionId, items);
         }
 
         [TargetRpc]
@@ -194,7 +204,7 @@ namespace MultiplayerARPG
                 onUpdateItems.Invoke(items);
         }
 
-        public void BuyItem(int index)
+        public void CallServerBuyItem(int index)
         {
             RPC(ServerBuyItem, index);
         }
@@ -245,7 +255,7 @@ namespace MultiplayerARPG
             if (_items.Count <= 0)
             {
                 // No item to sell anymore
-                ServerStopVending();
+                StopVending();
             }
             else
             {

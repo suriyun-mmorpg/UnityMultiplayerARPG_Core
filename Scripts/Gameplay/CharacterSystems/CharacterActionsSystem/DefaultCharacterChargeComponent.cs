@@ -146,9 +146,6 @@ namespace MultiplayerARPG
         protected virtual void ProceedStopChargeStateAtServer()
         {
 #if UNITY_EDITOR || UNITY_SERVER
-            if (!_manager.IsAcceptNewAction())
-                return;
-            _manager.ActionAccepted();
             // Prepare state data which will be sent to clients
             _serverState = new ChargeState()
             {

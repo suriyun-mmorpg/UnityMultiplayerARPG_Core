@@ -152,76 +152,15 @@ namespace MultiplayerARPG
         {
             UnregisterOwningCharacterEvents();
             if (notForOwningCharacter || !GameInstance.PlayingCharacterEntity) return;
-            GameInstance.PlayingCharacterEntity.onDataIdChange += OnDataIdChange;
-            GameInstance.PlayingCharacterEntity.onEquipWeaponSetChange += OnEquipWeaponSetChange;
-            GameInstance.PlayingCharacterEntity.onSelectableWeaponSetsOperation += OnSelectableWeaponSetsOperation;
-            GameInstance.PlayingCharacterEntity.onAttributesOperation += OnAttributesOperation;
-            GameInstance.PlayingCharacterEntity.onSkillsOperation += OnSkillsOperation;
-            GameInstance.PlayingCharacterEntity.onSummonsOperation += OnSummonsOperation;
-            GameInstance.PlayingCharacterEntity.onBuffsOperation += OnBuffsOperation;
-            GameInstance.PlayingCharacterEntity.onEquipItemsOperation += OnEquipItemsOperation;
-            GameInstance.PlayingCharacterEntity.onNonEquipItemsOperation += OnNonEquipItemsOperation;
+            GameInstance.PlayingCharacterEntity.onRecached += UpdateOwningCharacterData;
             GameInstance.PlayingCharacterEntity.onCurrenciesOperation += OnCurrenciesOperation;
         }
 
         public void UnregisterOwningCharacterEvents()
         {
             if (!GameInstance.PlayingCharacterEntity) return;
-            GameInstance.PlayingCharacterEntity.onDataIdChange -= OnDataIdChange;
-            GameInstance.PlayingCharacterEntity.onEquipWeaponSetChange -= OnEquipWeaponSetChange;
-            GameInstance.PlayingCharacterEntity.onSelectableWeaponSetsOperation -= OnSelectableWeaponSetsOperation;
-            GameInstance.PlayingCharacterEntity.onAttributesOperation -= OnAttributesOperation;
-            GameInstance.PlayingCharacterEntity.onSkillsOperation -= OnSkillsOperation;
-            GameInstance.PlayingCharacterEntity.onSummonsOperation -= OnSummonsOperation;
-            GameInstance.PlayingCharacterEntity.onBuffsOperation -= OnBuffsOperation;
-            GameInstance.PlayingCharacterEntity.onEquipItemsOperation -= OnEquipItemsOperation;
-            GameInstance.PlayingCharacterEntity.onNonEquipItemsOperation -= OnNonEquipItemsOperation;
+            GameInstance.PlayingCharacterEntity.onRecached -= UpdateOwningCharacterData;
             GameInstance.PlayingCharacterEntity.onCurrenciesOperation -= OnCurrenciesOperation;
-        }
-
-        private void OnDataIdChange(int dataId)
-        {
-            UpdateOwningCharacterData();
-        }
-
-        private void OnEquipWeaponSetChange(byte equipWeaponSet)
-        {
-            UpdateOwningCharacterData();
-        }
-
-        private void OnSelectableWeaponSetsOperation(LiteNetLibSyncList.Operation operation, int index)
-        {
-            UpdateOwningCharacterData();
-        }
-
-        private void OnAttributesOperation(LiteNetLibSyncList.Operation operation, int index)
-        {
-            UpdateOwningCharacterData();
-        }
-
-        private void OnSkillsOperation(LiteNetLibSyncList.Operation operation, int index)
-        {
-            UpdateOwningCharacterData();
-        }
-
-        private void OnSummonsOperation(LiteNetLibSyncList.Operation operation, int index)
-        {
-            UpdateOwningCharacterData();
-        }
-
-        private void OnBuffsOperation(LiteNetLibSyncList.Operation operation, int index)
-        {
-            UpdateOwningCharacterData();
-        }
-
-        private void OnEquipItemsOperation(LiteNetLibSyncList.Operation operation, int index)
-        {
-            UpdateOwningCharacterData();
-        }
-
-        private void OnNonEquipItemsOperation(LiteNetLibSyncList.Operation operation, int index)
-        {
-            UpdateOwningCharacterData();
         }
 
         private void OnCurrenciesOperation(LiteNetLibSyncList.Operation operation, int index)

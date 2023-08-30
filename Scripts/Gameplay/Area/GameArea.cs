@@ -17,8 +17,8 @@ namespace MultiplayerARPG
         [Header("Radius Area")]
         public float randomRadius = 5f;
         [Header("Square Area")]
-        public float squareSizeX;
-        public float squareSizeZ;
+        public float squareSizeX = 10f;
+        public float squareSizeZ = 10f;
 
         protected GameInstance CurrentGameInstance { get { return GameInstance.Singleton; } }
 

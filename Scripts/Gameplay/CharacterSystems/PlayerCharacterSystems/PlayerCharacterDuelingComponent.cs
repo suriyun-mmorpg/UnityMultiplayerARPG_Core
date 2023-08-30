@@ -105,8 +105,7 @@ namespace MultiplayerARPG
                 GameInstance.ServerGameMessageHandlers.SendGameMessage(ConnectionId, UITextKeys.UI_ERROR_FEATURE_IS_DISABLED);
                 return;
             }
-            BasePlayerCharacterEntity targetCharacterEntity;
-            if (!Manager.TryGetEntityByObjectId(objectId, out targetCharacterEntity))
+            if (!Manager.TryGetEntityByObjectId(objectId, out BasePlayerCharacterEntity targetCharacterEntity))
             {
                 GameInstance.ServerGameMessageHandlers.SendGameMessage(ConnectionId, UITextKeys.UI_ERROR_CHARACTER_NOT_FOUND);
                 return;
@@ -116,7 +115,7 @@ namespace MultiplayerARPG
                 GameInstance.ServerGameMessageHandlers.SendGameMessage(ConnectionId, UITextKeys.UI_ERROR_CHARACTER_IS_DUELING);
                 return;
             }
-            if (!Entity.IsGameEntityInDistance(targetCharacterEntity, CurrentGameInstance.conversationDistance))
+            if (!Entity.IsGameEntityInDistance(targetCharacterEntity))
             {
                 GameInstance.ServerGameMessageHandlers.SendGameMessage(ConnectionId, UITextKeys.UI_ERROR_CHARACTER_IS_TOO_FAR);
                 return;
@@ -165,7 +164,7 @@ namespace MultiplayerARPG
                 StopDueling();
                 return;
             }
-            if (!Entity.IsGameEntityInDistance(DuelingCharacter, CurrentGameInstance.conversationDistance))
+            if (!Entity.IsGameEntityInDistance(DuelingCharacter))
             {
                 GameInstance.ServerGameMessageHandlers.SendGameMessage(ConnectionId, UITextKeys.UI_ERROR_CHARACTER_IS_TOO_FAR);
                 StopDueling();

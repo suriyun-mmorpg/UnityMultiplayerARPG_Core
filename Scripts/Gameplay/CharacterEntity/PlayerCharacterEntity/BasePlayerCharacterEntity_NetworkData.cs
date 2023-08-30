@@ -543,12 +543,14 @@ namespace MultiplayerARPG
 
         private void OnDataIdChange(bool isInitial, int dataId)
         {
+            _isRecaching = true;
             if (onDataIdChange != null)
                 onDataIdChange.Invoke(dataId);
         }
 
         private void OnFactionIdChange(bool isInitial, int factionId)
         {
+            _isRecaching = true;
             if (onFactionIdChange != null)
                 onFactionIdChange.Invoke(factionId);
         }
@@ -585,24 +587,28 @@ namespace MultiplayerARPG
 
         private void OnPartyIdChange(bool isInitial, int partyId)
         {
+            _isRecaching = true;
             if (onPartyIdChange != null)
                 onPartyIdChange.Invoke(partyId);
         }
 
         private void OnGuildIdChange(bool isInitial, int guildId)
         {
+            _isRecaching = true;
             if (onGuildIdChange != null)
                 onGuildIdChange.Invoke(guildId);
         }
 
         private void OnIconDataIdChange(bool isInitial, int guildId)
         {
+            _isRecaching = true;
             if (onIconDataIdChange != null)
                 onIconDataIdChange.Invoke(guildId);
         }
 
         private void OnFrameDataIdChange(bool isInitial, int guildId)
         {
+            _isRecaching = true;
             if (onFrameDataIdChange != null)
                 onFrameDataIdChange.Invoke(guildId);
         }

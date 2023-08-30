@@ -1,7 +1,4 @@
-﻿using LiteNetLibManager;
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
 namespace MultiplayerARPG
 {
@@ -31,8 +28,8 @@ namespace MultiplayerARPG
                 return null;
             }
         }
-        public int Level { get { return (CharacterItem != null ? CharacterItem.level : 1); } }
-        public int Amount { get { return (CharacterItem != null ? CharacterItem.amount : 0); } }
+        public int Level { get { return CharacterItem != null ? CharacterItem.level : 1; } }
+        public int Amount { get { return CharacterItem != null ? CharacterItem.amount : 0; } }
 
         public UICharacterItem uiCharacterItem;
         [Tooltip("These objects will be activated while item is set")]
@@ -44,40 +41,14 @@ namespace MultiplayerARPG
         {
             base.OnEnable();
             if (!GameInstance.PlayingCharacterEntity) return;
-            GameInstance.PlayingCharacterEntity.onEquipWeaponSetChange += OnEquipWeaponSetChange;
-            GameInstance.PlayingCharacterEntity.onSelectableWeaponSetsOperation += OnSelectableWeaponSetsOperation;
-            GameInstance.PlayingCharacterEntity.onEquipItemsOperation += OnEquipItemsOperation;
-            GameInstance.PlayingCharacterEntity.onNonEquipItemsOperation += OnNonEquipItemsOperation;
+            GameInstance.PlayingCharacterEntity.onRecached += OnUpdateCharacterItems;
         }
 
         protected override void OnDisable()
         {
             base.OnDisable();
             if (!GameInstance.PlayingCharacterEntity) return;
-            GameInstance.PlayingCharacterEntity.onEquipWeaponSetChange -= OnEquipWeaponSetChange;
-            GameInstance.PlayingCharacterEntity.onSelectableWeaponSetsOperation -= OnSelectableWeaponSetsOperation;
-            GameInstance.PlayingCharacterEntity.onEquipItemsOperation -= OnEquipItemsOperation;
-            GameInstance.PlayingCharacterEntity.onNonEquipItemsOperation -= OnNonEquipItemsOperation;
-        }
-
-        protected void OnEquipWeaponSetChange(byte equipWeaponSet)
-        {
-            OnUpdateCharacterItems();
-        }
-
-        protected void OnSelectableWeaponSetsOperation(LiteNetLibSyncList.Operation operation, int index)
-        {
-            OnUpdateCharacterItems();
-        }
-
-        protected void OnEquipItemsOperation(LiteNetLibSyncList.Operation operation, int index)
-        {
-            OnUpdateCharacterItems();
-        }
-
-        protected void OnNonEquipItemsOperation(LiteNetLibSyncList.Operation operation, int index)
-        {
-            OnUpdateCharacterItems();
+            GameInstance.PlayingCharacterEntity.onRecached -= OnUpdateCharacterItems;
         }
 
         protected override void Update()

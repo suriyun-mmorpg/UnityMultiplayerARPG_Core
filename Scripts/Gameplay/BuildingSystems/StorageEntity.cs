@@ -2,6 +2,7 @@
 using UnityEngine.Events;
 using LiteNetLibManager;
 using LiteNetLib;
+using System.Collections.Generic;
 
 namespace MultiplayerARPG
 {
@@ -20,6 +21,10 @@ namespace MultiplayerARPG
         protected bool canUseByEveryone = false;
         public bool CanUseByEveryone { get { return canUseByEveryone; } }
 
+        [Header("Scene Object Settings")]
+        public ItemAmount[] sceneStorageItems = new ItemAmount[0];
+        public ItemDropManager sceneStorageRandomItemManager = new ItemDropManager();
+
         [Category("Events")]
         [SerializeField]
         protected UnityEvent onInitialOpen = new UnityEvent();
@@ -35,6 +40,12 @@ namespace MultiplayerARPG
         protected SyncFieldBool isOpen = new SyncFieldBool();
 
         private bool _dirtyIsOpen;
+
+        public override void PrepareRelatesData()
+        {
+            base.PrepareRelatesData();
+            sceneStorageRandomItemManager.PrepareRelatesData();
+        }
 
         public override void OnSetup()
         {
@@ -85,6 +96,23 @@ namespace MultiplayerARPG
                     isOpen.Value = updatingIsOpen;
                 }
             }
+        }
+
+        public override void InitSceneObject()
+        {
+            base.InitSceneObject();
+            List<CharacterItem> storageItems = new List<CharacterItem>();
+            List<ItemAmount> increasingItems = new List<ItemAmount>(sceneStorageItems);
+            sceneStorageRandomItemManager.RandomItems((item, amount) =>
+            {
+                increasingItems.Add(new ItemAmount()
+                {
+                    item = item,
+                    amount = amount,
+                });
+            });
+            storageItems.IncreaseItems(increasingItems);
+            GameInstance.ServerStorageHandlers.SetStorageItems(new StorageId(StorageType.Building, Id), storageItems);
         }
 
         public override bool CanActivate()

@@ -392,21 +392,20 @@ namespace MultiplayerARPG
             bool shouldSendReliably = false;
             CharacterInputState inputState = CharacterInputState.None;
             s_EntityStateDataWriter.Reset();
-            // Actions (can do only 1 action)
+            if (ReloadComponent.WriteClientReloadState(s_EntityStateDataWriter))
+                inputState |= CharacterInputState.IsReloading;
+            if (ChargeComponent.WriteClientStopChargeState(s_EntityStateDataWriter))
+                inputState |= CharacterInputState.IsChargeStopping;
+            if (ChargeComponent.WriteClientStartChargeState(s_EntityStateDataWriter))
+                inputState |= CharacterInputState.IsChargeStarting;
             if (AttackComponent.WriteClientAttackState(s_EntityStateDataWriter))
                 inputState |= CharacterInputState.IsAttacking;
-            else if (UseSkillComponent.WriteClientUseSkillInterruptedState(s_EntityStateDataWriter))
+            if (UseSkillComponent.WriteClientUseSkillInterruptedState(s_EntityStateDataWriter))
                 inputState |= CharacterInputState.IsUsingSkillInterrupted;
-            else if (UseSkillComponent.WriteClientUseSkillItemState(s_EntityStateDataWriter))
+            if (UseSkillComponent.WriteClientUseSkillItemState(s_EntityStateDataWriter))
                 inputState |= CharacterInputState.IsUsingSkillItem;
-            else if (UseSkillComponent.WriteClientUseSkillState(s_EntityStateDataWriter))
+            if (UseSkillComponent.WriteClientUseSkillState(s_EntityStateDataWriter))
                 inputState |= CharacterInputState.IsUsingSkill;
-            else if (ReloadComponent.WriteClientReloadState(s_EntityStateDataWriter))
-                inputState |= CharacterInputState.IsReloading;
-            else if (ChargeComponent.WriteClientStopChargeState(s_EntityStateDataWriter))
-                inputState |= CharacterInputState.IsChargeStopping;
-            else if (ChargeComponent.WriteClientStartChargeState(s_EntityStateDataWriter))
-                inputState |= CharacterInputState.IsChargeStarting;
             // Movement
             if (!Movement.IsNull() && Movement.Enabled && Movement.WriteClientState(s_EntityStateDataWriter, out shouldSendReliably))
                 inputState |= CharacterInputState.IsMoving;
@@ -427,21 +426,20 @@ namespace MultiplayerARPG
             bool shouldSendReliably = false;
             CharacterInputState inputState = CharacterInputState.None;
             s_EntityStateDataWriter.Reset();
-            // Actions (can do only 1 action)
+            if (ReloadComponent.WriteServerReloadState(s_EntityStateDataWriter))
+                inputState |= CharacterInputState.IsReloading;
+            if (ChargeComponent.WriteServerStopChargeState(s_EntityStateDataWriter))
+                inputState |= CharacterInputState.IsChargeStopping;
+            if (ChargeComponent.WriteServerStartChargeState(s_EntityStateDataWriter))
+                inputState |= CharacterInputState.IsChargeStarting;
             if (AttackComponent.WriteServerAttackState(s_EntityStateDataWriter))
                 inputState |= CharacterInputState.IsAttacking;
-            else if (UseSkillComponent.WriteServerUseSkillInterruptedState(s_EntityStateDataWriter))
+            if (UseSkillComponent.WriteServerUseSkillInterruptedState(s_EntityStateDataWriter))
                 inputState |= CharacterInputState.IsUsingSkillInterrupted;
-            else if (UseSkillComponent.WriteServerUseSkillItemState(s_EntityStateDataWriter))
+            if (UseSkillComponent.WriteServerUseSkillItemState(s_EntityStateDataWriter))
                 inputState |= CharacterInputState.IsUsingSkillItem;
-            else if (UseSkillComponent.WriteServerUseSkillState(s_EntityStateDataWriter))
+            if (UseSkillComponent.WriteServerUseSkillState(s_EntityStateDataWriter))
                 inputState |= CharacterInputState.IsUsingSkill;
-            else if (ReloadComponent.WriteServerReloadState(s_EntityStateDataWriter))
-                inputState |= CharacterInputState.IsReloading;
-            else if (ChargeComponent.WriteServerStopChargeState(s_EntityStateDataWriter))
-                inputState |= CharacterInputState.IsChargeStopping;
-            else if (ChargeComponent.WriteServerStartChargeState(s_EntityStateDataWriter))
-                inputState |= CharacterInputState.IsChargeStarting;
             // Movement
             if (!Movement.IsNull() && Movement.Enabled && Movement.WriteServerState(s_EntityStateDataWriter, out shouldSendReliably))
                 inputState |= CharacterInputState.IsMoving;
@@ -466,10 +464,10 @@ namespace MultiplayerARPG
                 ChargeComponent.ReadClientStopChargeStateAtServer(reader);
             if (inputState.Has(CharacterInputState.IsChargeStarting))
                 ChargeComponent.ReadClientStartChargeStateAtServer(reader);
-            if (inputState.Has(CharacterInputState.IsUsingSkillInterrupted))
-                UseSkillComponent.ReadClientUseSkillInterruptedStateAtServer(reader);
             if (inputState.Has(CharacterInputState.IsAttacking))
                 AttackComponent.ReadClientAttackStateAtServer(reader);
+            if (inputState.Has(CharacterInputState.IsUsingSkillInterrupted))
+                UseSkillComponent.ReadClientUseSkillInterruptedStateAtServer(reader);
             if (inputState.Has(CharacterInputState.IsUsingSkillItem))
                 UseSkillComponent.ReadClientUseSkillItemStateAtServer(reader);
             if (inputState.Has(CharacterInputState.IsUsingSkill))
@@ -489,10 +487,10 @@ namespace MultiplayerARPG
                 ChargeComponent.ReadServerStopChargeStateAtClient(reader);
             if (inputState.Has(CharacterInputState.IsChargeStarting))
                 ChargeComponent.ReadServerStartChargeStateAtClient(reader);
-            if (inputState.Has(CharacterInputState.IsUsingSkillInterrupted))
-                UseSkillComponent.ReadServerUseSkillInterruptedStateAtClient(reader);
             if (inputState.Has(CharacterInputState.IsAttacking))
                 AttackComponent.ReadServerAttackStateAtClient(reader);
+            if (inputState.Has(CharacterInputState.IsUsingSkillInterrupted))
+                UseSkillComponent.ReadServerUseSkillInterruptedStateAtClient(reader);
             if (inputState.Has(CharacterInputState.IsUsingSkillItem))
                 UseSkillComponent.ReadServerUseSkillItemStateAtClient(reader);
             if (inputState.Has(CharacterInputState.IsUsingSkill))
@@ -1165,6 +1163,12 @@ namespace MultiplayerARPG
             where T : class, IGameEntity
         {
             return FindPhysicFunctions.IsGameEntityInDistance(targetEntity, EntityTransform.position, distance + FIND_ENTITY_DISTANCE_BUFFER, includeUnHittable);
+        }
+
+        public bool IsGameEntityInDistance<T>(T targetEntity, bool includeUnHittable = true)
+            where T : class, IBaseActivatableEntity
+        {
+            return FindPhysicFunctions.IsGameEntityInDistance(targetEntity, EntityTransform.position, targetEntity.GetActivatableDistance() + FIND_ENTITY_DISTANCE_BUFFER, includeUnHittable);
         }
 
         public List<T> FindGameEntitiesInDistance<T>(float distance, int overlayMask)

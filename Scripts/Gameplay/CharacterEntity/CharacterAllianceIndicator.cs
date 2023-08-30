@@ -50,33 +50,14 @@ namespace MultiplayerARPG
         {
             if (PlayingCharacterEntity == null)
                 return;
-            PlayingCharacterEntity.onPartyIdChange += PlayingCharacterEntity_onPartyIdChange;
-            PlayingCharacterEntity.onGuildIdChange += PlayingCharacterEntity_onGuildIdChange;
-            PlayingCharacterEntity.onFactionIdChange += PlayingCharacterEntity_onFactionIdChange;
+            PlayingCharacterEntity.onRecached += SetupUpdating;
         }
 
         private void RemoveEvents(BasePlayerCharacterEntity PlayingCharacterEntity)
         {
             if (PlayingCharacterEntity == null)
                 return;
-            PlayingCharacterEntity.onPartyIdChange -= PlayingCharacterEntity_onPartyIdChange;
-            PlayingCharacterEntity.onGuildIdChange -= PlayingCharacterEntity_onGuildIdChange;
-            PlayingCharacterEntity.onFactionIdChange -= PlayingCharacterEntity_onFactionIdChange;
-        }
-
-        private void PlayingCharacterEntity_onPartyIdChange(int obj)
-        {
-            SetupUpdating();
-        }
-
-        private void PlayingCharacterEntity_onGuildIdChange(int obj)
-        {
-            SetupUpdating();
-        }
-
-        private void PlayingCharacterEntity_onFactionIdChange(int obj)
-        {
-            SetupUpdating();
+            PlayingCharacterEntity.onRecached -= SetupUpdating;
         }
 
         private void SetupUpdating()

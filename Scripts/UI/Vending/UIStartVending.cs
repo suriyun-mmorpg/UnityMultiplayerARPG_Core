@@ -53,12 +53,38 @@ namespace MultiplayerARPG
             _itemListEventSetupManager.OnDisable();
         }
 
+        public override void Show()
+        {
+            if (GameInstance.PlayingCharacterEntity.Vending.Data.isStarted)
+            {
+                BaseUISceneGameplay.Singleton.ShowVending(GameInstance.PlayingCharacterEntity);
+                if (IsVisible())
+                    Hide();
+                return;
+            }
+            base.Show();
+        }
+
         public void AddItem(string id, int amount, int price)
         {
             int indexOfData = GameInstance.PlayingCharacterEntity.NonEquipItems.IndexOf(id);
             if (indexOfData < 0)
             {
                 // Invalid index
+                ClientGenericActions.ClientReceiveGameMessage(UITextKeys.UI_ERROR_INVALID_ITEM_INDEX);
+                return;
+            }
+            CharacterItem storeItem = GameInstance.PlayingCharacterEntity.NonEquipItems[indexOfData];
+            if (storeItem.IsEmptySlot())
+            {
+                // Invalid data
+                ClientGenericActions.ClientReceiveGameMessage(UITextKeys.UI_ERROR_INVALID_ITEM_DATA);
+                return;
+            }
+            if (storeItem.GetItem().RestrictDealing)
+            {
+                // Restricted
+                ClientGenericActions.ClientReceiveGameMessage(UITextKeys.UI_ERROR_ITEM_DEALING_RESTRICTED);
                 return;
             }
             int countItem = 0;
@@ -71,6 +97,7 @@ namespace MultiplayerARPG
             if (GameInstance.PlayingCharacterEntity.NonEquipItems[indexOfData].amount < countItem)
             {
                 // Invalid amount
+                ClientGenericActions.ClientReceiveGameMessage(UITextKeys.UI_ERROR_NOT_ENOUGH_ITEMS);
                 return;
             }
             _items.Add(new StartVendingItem()
@@ -135,7 +162,7 @@ namespace MultiplayerARPG
                 LanguageManager.GetText(UITextKeys.UI_START_VENDING_DESCRIPTION.ToString()),
                 false, true, true, false, onClickYes: () =>
                 {
-                    GameInstance.PlayingCharacterEntity.Vending.StartVending(inputTitle.text, _items);
+                    GameInstance.PlayingCharacterEntity.Vending.CallServerStartVending(inputTitle.text, _items);
                     Hide();
                 });
         }

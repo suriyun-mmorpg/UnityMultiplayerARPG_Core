@@ -1939,7 +1939,7 @@ namespace MultiplayerARPG
 
         public void OnClickBuyVendingItem()
         {
-            GameInstance.PlayingCharacterEntity.Vending.BuyItem(IndexOfData);
+            GameInstance.PlayingCharacterEntity.Vending.CallServerBuyItem(IndexOfData);
         }
         #endregion
     }

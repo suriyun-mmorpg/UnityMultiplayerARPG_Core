@@ -59,10 +59,7 @@ namespace MultiplayerARPG
         {
             if (PlayingCharacterEntity == null)
                 return;
-            PlayingCharacterEntity.onLevelChange += PlayingCharacterEntity_onLevelChange;
-            PlayingCharacterEntity.onDataIdChange += PlayingCharacterEntity_onDataIdChange;
-            PlayingCharacterEntity.onFactionIdChange += PlayingCharacterEntity_onFactionIdChange;
-            PlayingCharacterEntity.onNonEquipItemsOperation += PlayingCharacterEntity_onNonEquipItemsOperation;
+            PlayingCharacterEntity.onRecached += ForceUpdate;
             PlayingCharacterEntity.onQuestsOperation += PlayingCharacterEntity_onQuestsOperation;
         }
 
@@ -70,31 +67,8 @@ namespace MultiplayerARPG
         {
             if (PlayingCharacterEntity == null)
                 return;
-            PlayingCharacterEntity.onLevelChange -= PlayingCharacterEntity_onLevelChange;
-            PlayingCharacterEntity.onDataIdChange -= PlayingCharacterEntity_onDataIdChange;
-            PlayingCharacterEntity.onFactionIdChange -= PlayingCharacterEntity_onFactionIdChange;
-            PlayingCharacterEntity.onNonEquipItemsOperation -= PlayingCharacterEntity_onNonEquipItemsOperation;
+            PlayingCharacterEntity.onRecached -= ForceUpdate;
             PlayingCharacterEntity.onQuestsOperation -= PlayingCharacterEntity_onQuestsOperation;
-        }
-
-        private void PlayingCharacterEntity_onLevelChange(int level)
-        {
-            ForceUpdate();
-        }
-
-        private void PlayingCharacterEntity_onDataIdChange(int obj)
-        {
-            ForceUpdate();
-        }
-
-        private void PlayingCharacterEntity_onFactionIdChange(int obj)
-        {
-            ForceUpdate();
-        }
-
-        private void PlayingCharacterEntity_onNonEquipItemsOperation(LiteNetLibManager.LiteNetLibSyncList.Operation op, int index)
-        {
-            ForceUpdate();
         }
 
         private void PlayingCharacterEntity_onQuestsOperation(LiteNetLibManager.LiteNetLibSyncList.Operation op, int index)

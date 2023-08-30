@@ -88,46 +88,13 @@ namespace MultiplayerARPG
         {
             UnregisterOwningCharacterEvents();
             if (notForOwningCharacter || !GameInstance.PlayingCharacterEntity) return;
-            GameInstance.PlayingCharacterEntity.onDataIdChange += OnDataIdChange;
-            GameInstance.PlayingCharacterEntity.onEquipWeaponSetChange += OnEquipWeaponSetChange;
-            GameInstance.PlayingCharacterEntity.onSelectableWeaponSetsOperation += OnSelectableWeaponSetsOperation;
-            GameInstance.PlayingCharacterEntity.onEquipItemsOperation += OnEquipItemsOperation;
-            GameInstance.PlayingCharacterEntity.onSkillsOperation += OnSkillsOperation;
+            GameInstance.PlayingCharacterEntity.onRecached += UpdateOwningCharacterData;
         }
 
         public void UnregisterOwningCharacterEvents()
         {
             if (!GameInstance.PlayingCharacterEntity) return;
-            GameInstance.PlayingCharacterEntity.onDataIdChange -= OnDataIdChange;
-            GameInstance.PlayingCharacterEntity.onEquipWeaponSetChange -= OnEquipWeaponSetChange;
-            GameInstance.PlayingCharacterEntity.onSelectableWeaponSetsOperation -= OnSelectableWeaponSetsOperation;
-            GameInstance.PlayingCharacterEntity.onEquipItemsOperation -= OnEquipItemsOperation;
-            GameInstance.PlayingCharacterEntity.onSkillsOperation -= OnSkillsOperation;
-        }
-
-        private void OnDataIdChange(int dataId)
-        {
-            UpdateOwningCharacterData();
-        }
-
-        private void OnEquipWeaponSetChange(byte equipWeaponSet)
-        {
-            UpdateOwningCharacterData();
-        }
-
-        private void OnSelectableWeaponSetsOperation(LiteNetLibSyncList.Operation operation, int index)
-        {
-            UpdateOwningCharacterData();
-        }
-
-        private void OnEquipItemsOperation(LiteNetLibSyncList.Operation operation, int index)
-        {
-            UpdateOwningCharacterData();
-        }
-
-        private void OnSkillsOperation(LiteNetLibSyncList.Operation operation, int index)
-        {
-            UpdateOwningCharacterData();
+            GameInstance.PlayingCharacterEntity.onRecached -= UpdateOwningCharacterData;
         }
 
         public void UpdateOwningCharacterData()

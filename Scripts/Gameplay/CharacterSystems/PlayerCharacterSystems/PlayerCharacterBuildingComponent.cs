@@ -68,14 +68,13 @@ namespace MultiplayerARPG
             if (!Entity.CanDoActions())
                 return;
 
-            BuildingEntity buildingEntity;
-            if (!Manager.TryGetEntityByObjectId(objectId, out buildingEntity))
+            if (!Manager.TryGetEntityByObjectId(objectId, out BuildingEntity buildingEntity))
             {
                 // Can't find the entity
                 return;
             }
 
-            if (!Entity.IsGameEntityInDistance(buildingEntity, CurrentGameInstance.conversationDistance))
+            if (!Entity.IsGameEntityInDistance(buildingEntity))
             {
                 GameInstance.ServerGameMessageHandlers.SendGameMessage(ConnectionId, UITextKeys.UI_ERROR_CHARACTER_IS_TOO_FAR);
                 return;
@@ -109,14 +108,13 @@ namespace MultiplayerARPG
             if (!Entity.CanDoActions())
                 return;
 
-            StorageEntity storageEntity;
-            if (!Manager.TryGetEntityByObjectId(objectId, out storageEntity))
+            if (!Manager.TryGetEntityByObjectId(objectId, out StorageEntity storageEntity))
             {
                 // Can't find the entity
                 return;
             }
 
-            if (!Entity.IsGameEntityInDistance(storageEntity, CurrentGameInstance.conversationDistance))
+            if (!Entity.IsGameEntityInDistance(storageEntity))
             {
                 GameInstance.ServerGameMessageHandlers.SendGameMessage(ConnectionId, UITextKeys.UI_ERROR_CHARACTER_IS_TOO_FAR);
                 return;
@@ -157,14 +155,13 @@ namespace MultiplayerARPG
             if (!Entity.CanDoActions())
                 return;
 
-            DoorEntity doorEntity;
-            if (!Manager.TryGetEntityByObjectId(objectId, out doorEntity))
+            if (!Manager.TryGetEntityByObjectId(objectId, out DoorEntity doorEntity))
             {
                 // Can't find the entity
                 return;
             }
 
-            if (!Entity.IsGameEntityInDistance(doorEntity, CurrentGameInstance.conversationDistance))
+            if (!Entity.IsGameEntityInDistance(doorEntity))
             {
                 GameInstance.ServerGameMessageHandlers.SendGameMessage(ConnectionId, UITextKeys.UI_ERROR_CHARACTER_IS_TOO_FAR);
                 return;
@@ -198,14 +195,13 @@ namespace MultiplayerARPG
             if (!Entity.CanDoActions())
                 return;
 
-            DoorEntity doorEntity;
-            if (!Manager.TryGetEntityByObjectId(objectId, out doorEntity))
+            if (!Manager.TryGetEntityByObjectId(objectId, out DoorEntity doorEntity))
             {
                 // Can't find the entity
                 return;
             }
 
-            if (!Entity.IsGameEntityInDistance(doorEntity, CurrentGameInstance.conversationDistance))
+            if (!Entity.IsGameEntityInDistance(doorEntity))
             {
                 GameInstance.ServerGameMessageHandlers.SendGameMessage(ConnectionId, UITextKeys.UI_ERROR_CHARACTER_IS_TOO_FAR);
                 return;
@@ -233,14 +229,13 @@ namespace MultiplayerARPG
             if (!Entity.CanDoActions())
                 return;
 
-            CampFireEntity campfireEntity;
-            if (!Manager.TryGetEntityByObjectId(objectId, out campfireEntity))
+            if (!Manager.TryGetEntityByObjectId(objectId, out CampFireEntity campfireEntity))
             {
                 // Can't find the entity
                 return;
             }
 
-            if (!Entity.IsGameEntityInDistance(campfireEntity, CurrentGameInstance.conversationDistance))
+            if (!Entity.IsGameEntityInDistance(campfireEntity))
             {
                 GameInstance.ServerGameMessageHandlers.SendGameMessage(ConnectionId, UITextKeys.UI_ERROR_CHARACTER_IS_TOO_FAR);
                 return;
@@ -268,14 +263,13 @@ namespace MultiplayerARPG
             if (!Entity.CanDoActions())
                 return;
 
-            CampFireEntity campfireEntity;
-            if (!Manager.TryGetEntityByObjectId(objectId, out campfireEntity))
+            if (!Manager.TryGetEntityByObjectId(objectId, out CampFireEntity campfireEntity))
             {
                 // Can't find the entity
                 return;
             }
 
-            if (!Entity.IsGameEntityInDistance(campfireEntity, CurrentGameInstance.conversationDistance))
+            if (!Entity.IsGameEntityInDistance(campfireEntity))
             {
                 GameInstance.ServerGameMessageHandlers.SendGameMessage(ConnectionId, UITextKeys.UI_ERROR_CHARACTER_IS_TOO_FAR);
                 return;
@@ -298,14 +292,13 @@ namespace MultiplayerARPG
             if (!Entity.CanDoActions())
                 return;
 
-            WorkbenchEntity workbenchEntity;
-            if (!Manager.TryGetEntityByObjectId(objectId, out workbenchEntity))
+            if (!Manager.TryGetEntityByObjectId(objectId, out WorkbenchEntity workbenchEntity))
             {
                 // Can't find the entity
                 return;
             }
 
-            if (!Entity.IsGameEntityInDistance(workbenchEntity, CurrentGameInstance.conversationDistance))
+            if (!Entity.IsGameEntityInDistance(workbenchEntity))
             {
                 GameInstance.ServerGameMessageHandlers.SendGameMessage(ConnectionId, UITextKeys.UI_ERROR_CHARACTER_IS_TOO_FAR);
                 return;
@@ -333,14 +326,13 @@ namespace MultiplayerARPG
             if (!Entity.CanDoActions())
                 return;
 
-            BuildingEntity buildingEntity;
-            if (!Manager.TryGetEntityByObjectId(objectId, out buildingEntity))
+            if (!Manager.TryGetEntityByObjectId(objectId, out BuildingEntity buildingEntity))
             {
                 // Can't find the entity
                 return;
             }
 
-            if (!Entity.IsGameEntityInDistance(buildingEntity, CurrentGameInstance.conversationDistance))
+            if (!Entity.IsGameEntityInDistance(buildingEntity))
             {
                 GameInstance.ServerGameMessageHandlers.SendGameMessage(ConnectionId, UITextKeys.UI_ERROR_CHARACTER_IS_TOO_FAR);
                 return;
@@ -381,14 +373,13 @@ namespace MultiplayerARPG
             if (!Entity.CanDoActions())
                 return;
 
-            BuildingEntity buildingEntity;
-            if (!Manager.TryGetEntityByObjectId(objectId, out buildingEntity))
+            if (!Manager.TryGetEntityByObjectId(objectId, out BuildingEntity buildingEntity))
             {
                 // Can't find the entity
                 return;
             }
 
-            if (!Entity.IsGameEntityInDistance(buildingEntity, CurrentGameInstance.conversationDistance))
+            if (!Entity.IsGameEntityInDistance(buildingEntity))
             {
                 GameInstance.ServerGameMessageHandlers.SendGameMessage(ConnectionId, UITextKeys.UI_ERROR_CHARACTER_IS_TOO_FAR);
                 return;
@@ -428,14 +419,13 @@ namespace MultiplayerARPG
             if (!Entity.CanDoActions())
                 return;
 
-            BuildingEntity buildingEntity;
-            if (!Manager.TryGetEntityByObjectId(objectId, out buildingEntity))
+            if (!Manager.TryGetEntityByObjectId(objectId, out BuildingEntity buildingEntity))
             {
                 // Can't find the entity
                 return;
             }
 
-            if (!Entity.IsGameEntityInDistance(buildingEntity, CurrentGameInstance.conversationDistance))
+            if (!Entity.IsGameEntityInDistance(buildingEntity))
             {
                 GameInstance.ServerGameMessageHandlers.SendGameMessage(ConnectionId, UITextKeys.UI_ERROR_CHARACTER_IS_TOO_FAR);
                 return;

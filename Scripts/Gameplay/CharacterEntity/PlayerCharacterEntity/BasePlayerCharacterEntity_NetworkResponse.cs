@@ -77,14 +77,13 @@ namespace MultiplayerARPG
             if (!CanDoActions())
                 return;
 
-            WarpPortalEntity warpPortalEntity;
-            if (!Manager.TryGetEntityByObjectId(objectId, out warpPortalEntity))
+            if (!Manager.TryGetEntityByObjectId(objectId, out WarpPortalEntity warpPortalEntity))
             {
                 // Can't find the entity
                 return;
             }
 
-            if (!IsGameEntityInDistance(warpPortalEntity, CurrentGameInstance.conversationDistance))
+            if (!IsGameEntityInDistance(warpPortalEntity))
             {
                 GameInstance.ServerGameMessageHandlers.SendGameMessage(ConnectionId, UITextKeys.UI_ERROR_CHARACTER_IS_TOO_FAR);
                 return;

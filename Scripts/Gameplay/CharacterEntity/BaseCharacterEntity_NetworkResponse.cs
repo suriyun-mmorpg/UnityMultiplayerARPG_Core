@@ -16,14 +16,13 @@ namespace MultiplayerARPG
             if (!CanPickUpItem())
                 return;
 
-            ItemDropEntity itemDropEntity;
-            if (!Manager.TryGetEntityByObjectId(objectId, out itemDropEntity))
+            if (!Manager.TryGetEntityByObjectId(objectId, out ItemDropEntity itemDropEntity))
             {
                 // Can't find the entity
                 return;
             }
 
-            if (!IsGameEntityInDistance(itemDropEntity, CurrentGameInstance.pickUpItemDistance))
+            if (!IsGameEntityInDistance(itemDropEntity))
             {
                 GameInstance.ServerGameMessageHandlers.SendGameMessage(ConnectionId, UITextKeys.UI_ERROR_CHARACTER_IS_TOO_FAR);
                 return;
@@ -64,14 +63,13 @@ namespace MultiplayerARPG
             if (!CanPickUpItem())
                 return;
 
-            ItemsContainerEntity itemsContainerEntity;
-            if (!Manager.TryGetEntityByObjectId(objectId, out itemsContainerEntity))
+            if (!Manager.TryGetEntityByObjectId(objectId, out ItemsContainerEntity itemsContainerEntity))
             {
                 // Can't find the entity
                 return;
             }
 
-            if (!IsGameEntityInDistance(itemsContainerEntity, CurrentGameInstance.pickUpItemDistance))
+            if (!IsGameEntityInDistance(itemsContainerEntity))
             {
                 GameInstance.ServerGameMessageHandlers.SendGameMessage(ConnectionId, UITextKeys.UI_ERROR_CHARACTER_IS_TOO_FAR);
                 return;
@@ -117,14 +115,13 @@ namespace MultiplayerARPG
             if (!CanPickUpItem())
                 return;
 
-            ItemsContainerEntity itemsContainerEntity;
-            if (!Manager.TryGetEntityByObjectId(objectId, out itemsContainerEntity))
+            if (!Manager.TryGetEntityByObjectId(objectId, out ItemsContainerEntity itemsContainerEntity))
             {
                 // Can't find the entity
                 return;
             }
 
-            if (!IsGameEntityInDistance(itemsContainerEntity, CurrentGameInstance.pickUpItemDistance))
+            if (!IsGameEntityInDistance(itemsContainerEntity))
             {
                 GameInstance.ServerGameMessageHandlers.SendGameMessage(ConnectionId, UITextKeys.UI_ERROR_CHARACTER_IS_TOO_FAR);
                 return;
@@ -185,9 +182,15 @@ namespace MultiplayerARPG
             if (amount <= 0 || !CanDoActions() || index >= NonEquipItems.Count)
                 return;
 
-            CharacterItem nonEquipItem = nonEquipItems[index];
+            CharacterItem nonEquipItem = NonEquipItems[index];
             if (nonEquipItem.IsEmptySlot() || amount > nonEquipItem.amount)
                 return;
+
+            if (nonEquipItem.GetItem().RestractDropping)
+            {
+                GameInstance.ServerGameMessageHandlers.SendGameMessage(ConnectionId, UITextKeys.UI_ERROR_ITEM_DROPPING_RESTRICTED);
+                return;
+            }
 
             if (!this.DecreaseItemsByIndex(index, amount, false))
                 return;

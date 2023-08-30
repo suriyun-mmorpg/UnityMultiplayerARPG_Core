@@ -380,6 +380,7 @@ namespace MultiplayerARPG
                 _isJumping = false;
 
             // Prepare movement speed
+            _tempExtraMovementState = Entity.ValidateExtraMovementState(_tempMovementState, _tempExtraMovementState);
             tempEntityMoveSpeed = _applyingJumpForce ? 0f : Entity.GetMoveSpeed(_tempMovementState, _tempExtraMovementState);
             tempMaxMoveSpeed = tempEntityMoveSpeed;
 
@@ -508,7 +509,7 @@ namespace MultiplayerARPG
                 if (_pauseMovementCountDown > 0f)
                 {
                     // Remove movement from movestate while pausing movement
-                    _tempMovementState ^= MovementState.Forward | MovementState.Backward | MovementState.Right | MovementState.Right;
+                    _tempMovementState ^= MovementState.Forward | MovementState.Backward | MovementState.Left | MovementState.Right;
                 }
             }
             // Move by velocity before jump
