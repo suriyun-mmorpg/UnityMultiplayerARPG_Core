@@ -1,4 +1,4 @@
-﻿using LiteNetLibManager;
+using LiteNetLibManager;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Serialization;
@@ -7,6 +7,9 @@ namespace MultiplayerARPG
 {
     public partial class UICharacterQuests : UIBase
     {
+        [Header("Filter")]
+        public List<string> filterCategories = new List<string>();
+
         public GameObject listEmptyObject;
         [FormerlySerializedAs("uiQuestDialog")]
         public UICharacterQuest uiDialog;
@@ -132,7 +135,7 @@ namespace MultiplayerARPG
             CacheSelectionManager.DeselectSelectedUI();
             CacheSelectionManager.Clear();
 
-            List<CharacterQuest> filteredList = UICharacterQuestsUtils.GetFilteredList(GameInstance.PlayingCharacter.Quests, ShowOnlyTrackingQuests, ShowAllWhenNoTrackedQuests, HideCompleteQuest);
+            List<CharacterQuest> filteredList = UICharacterQuestsUtils.GetFilteredList(GameInstance.PlayingCharacter.Quests, ShowOnlyTrackingQuests, ShowAllWhenNoTrackedQuests, HideCompleteQuest, filterCategories);
             if (filteredList.Count == 0)
             {
                 if (uiDialog != null)
