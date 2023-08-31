@@ -37,11 +37,11 @@ namespace MultiplayerARPG
             for (int i = 0; i < list.Count; ++i)
             {
                 entry = list[i];
-                if (!GameInstance.Quests.ContainsKey(entry.dataId))
+                if (!GameInstance.Quests.TryGetValue(entry.dataId, out Quest quest))
                     continue;
 
                 // Filter by category
-                string questCategory = GameInstance.Quests[entry.dataId].Category.Trim().ToLower();
+                string questCategory = quest.Category.Trim().ToLower();
                 if (filterCategories.Count > 0 && !filterCategories.Contains(questCategory))
                     continue;
 
