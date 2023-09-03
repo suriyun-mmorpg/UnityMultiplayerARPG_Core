@@ -41,7 +41,8 @@ namespace MultiplayerARPG
                     continue;
 
                 // Filter by category
-                if (filterCategories.Count > 0 && (quest.Category == null || !filterCategories.Contains(quest.Category.Trim().ToLower())))
+                string category = (string.IsNullOrEmpty(quest.Category) ? string.Empty : quest.Category).Trim().ToLower();
+                if (filterCategories.Count > 0 && !filterCategories.Contains(category))
                     continue;
 
                 // Filter by tracking status
