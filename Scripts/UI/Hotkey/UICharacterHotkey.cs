@@ -15,6 +15,7 @@ namespace MultiplayerARPG
         public UICharacterHotkeyAssigner uiCharacterHotkeyAssigner;
         public UICharacterSkill uiCharacterSkill;
         public UICharacterItem uiCharacterItem;
+        public UIGuildSkill uiGuildSkill;
         public GameObject[] placeHolders;
         public KeyCode key;
         public string buttonName;
@@ -25,6 +26,8 @@ namespace MultiplayerARPG
         private IUsableItem _usingItem;
         private BaseSkill _usingSkill;
         private int _usingSkillLevel;
+        private GuildSkill _usingGuildSkill;
+        private int _usingGuildSkillLevel;
         private bool _channeledActionStarted;
 
         protected override void OnEnable()
@@ -104,6 +107,20 @@ namespace MultiplayerARPG
             }
         }
 
+        public bool GetAssignedGuildSkill(out GuildSkill guildSkill, out int guildSkillLevel)
+        {
+            guildSkill = null;
+            guildSkillLevel = 0;
+            if (Data.type == HotkeyType.GuildSkill)
+            {
+                if (GameInstance.JoinedGuild == null)
+                    return false;
+                return GameInstance.GuildSkills.TryGetValue(guildSkill.DataId, out guildSkill) &&
+                    GameInstance.JoinedGuild.TryGetSkillLevel(guildSkill.DataId, out guildSkillLevel);
+            }
+            return false;
+        }
+
         public bool GetAssignedSkill(out BaseSkill skill, out int skillLevel)
         {
             skill = null;
@@ -114,7 +131,7 @@ namespace MultiplayerARPG
                 Dictionary<BaseSkill, int> skills = GameInstance.PlayingCharacter.GetCaches().Skills;
                 int dataId = BaseGameData.MakeDataId(Data.relateId);
                 return GameInstance.Skills.TryGetValue(dataId, out skill) &&
-                    skill != null && skills.TryGetValue(skill, out skillLevel);
+                    skills.TryGetValue(skill, out skillLevel);
             }
             return false;
         }
@@ -153,11 +170,48 @@ namespace MultiplayerARPG
 
         protected override void UpdateData()
         {
-            UpdateSkillUI();
-            UpdateItemUI();
+            UpdateGuildSkillUI();
+            UpdateCharacterSkillUI();
+            UpdateCharacterItemUI();
         }
 
-        private void UpdateSkillUI()
+        private void UpdateGuildSkillUI()
+        {
+            // Find guild skill by relate Id
+            _usingGuildSkill = null;
+            _usingGuildSkillLevel = 0;
+            bool foundUsingSkill = GetAssignedGuildSkill(out _usingGuildSkill, out _usingGuildSkillLevel);
+
+            if (uiGuildSkill == null && UICharacterHotkeys != null && UICharacterHotkeys.uiGuildSkillPrefab != null)
+            {
+                uiGuildSkill = Instantiate(UICharacterHotkeys.uiGuildSkillPrefab, transform);
+                GenericUtils.SetAndStretchToParentSize(uiGuildSkill.transform as RectTransform, transform as RectTransform);
+                uiGuildSkill.transform.SetAsFirstSibling();
+            }
+
+            if (uiGuildSkill != null)
+            {
+                if (!foundUsingSkill)
+                {
+                    uiGuildSkill.Hide();
+                }
+                else
+                {
+                    // Found skill, so create new skill entry if it's not existed in learn skill list
+                    uiGuildSkill.Data = new UIGuildSkillData()
+                    {
+                        guildSkill = _usingGuildSkill,
+                        targetLevel = _usingGuildSkillLevel,
+                    };
+                    uiGuildSkill.Show();
+                    UIGuildSkillDragHandler dragHandler = uiGuildSkill.GetComponentInChildren<UIGuildSkillDragHandler>();
+                    if (dragHandler != null)
+                        dragHandler.SetupForHotkey(this);
+                }
+            }
+        }
+
+        private void UpdateCharacterSkillUI()
         {
             // Find skill by relate Id
             _usingSkill = null;
@@ -189,7 +243,7 @@ namespace MultiplayerARPG
             }
         }
 
-        private void UpdateItemUI()
+        private void UpdateCharacterItemUI()
         {
             // Find item by relate Id
             _usingItem = null;
@@ -323,6 +377,12 @@ namespace MultiplayerARPG
                 UICharacterHotkeys.SetUsingHotkey(null);
             }
 
+            if (_usingGuildSkill != null && GameInstance.PlayingCharacter.IndexOfSkillUsage(SkillUsageType.GuildSkill, _usingGuildSkill.DataId) >= 0)
+            {
+                // Guild skill this cooling down, can't use it
+                return;
+            }
+
             if (_usingSkill != null && GameInstance.PlayingCharacter.IndexOfSkillUsage(SkillUsageType.Skill, _usingSkill.DataId) >= 0)
             {
                 // Skill this cooling down, can't use it
@@ -357,17 +417,18 @@ namespace MultiplayerARPG
 
         }
 
-        public bool CanAssignCharacterItem(CharacterItem characterItem)
+        public bool CanAssignGuildSkill(GuildSkill guildSkill)
         {
-            if (UICharacterHotkeys.doNotIncludeItems)
+            if (UICharacterHotkeys.doNotIncludeGuildSkills)
                 return false;
-            if (characterItem.IsEmptySlot())
+            if (guildSkill == null)
+                return false;
+            if (GameInstance.JoinedGuild == null)
+                return false;
+            if (GameInstance.JoinedGuild.GetSkillLevel(guildSkill.DataId) <= 0)
                 return false;
             if (UICharacterHotkeys.filterCategories.Count > 0 &&
-                !UICharacterHotkeys.filterCategories.Contains(characterItem.GetItem().Category))
-                return false;
-            if (UICharacterHotkeys.filterItemTypes.Count > 0 &&
-                !UICharacterHotkeys.filterItemTypes.Contains(characterItem.GetItem().ItemType))
+                !UICharacterHotkeys.filterCategories.Contains(guildSkill.Category))
                 return false;
             return true;
         }
@@ -378,13 +439,32 @@ namespace MultiplayerARPG
                 return false;
             if (characterSkill.IsEmpty())
                 return false;
-            if (!characterSkill.GetSkill().IsAvailable(GameInstance.PlayingCharacter))
+            BaseSkill skill = characterSkill.GetSkill();
+            if (skill == null)
+                return false;
+            if (!skill.IsAvailable(GameInstance.PlayingCharacter))
                 return false;
             if (UICharacterHotkeys.filterCategories.Count > 0 &&
-                !UICharacterHotkeys.filterCategories.Contains(characterSkill.GetSkill().Category))
+                !UICharacterHotkeys.filterCategories.Contains(skill.Category))
                 return false;
             if (UICharacterHotkeys.filterSkillTypes.Count > 0 &&
-                !UICharacterHotkeys.filterSkillTypes.Contains(characterSkill.GetSkill().SkillType))
+                !UICharacterHotkeys.filterSkillTypes.Contains(skill.SkillType))
+                return false;
+            return true;
+        }
+
+        public bool CanAssignCharacterItem(CharacterItem characterItem)
+        {
+            if (UICharacterHotkeys.doNotIncludeItems)
+                return false;
+            if (characterItem.IsEmptySlot())
+                return false;
+            BaseItem item = characterItem.GetItem();
+            if (UICharacterHotkeys.filterCategories.Count > 0 &&
+                !UICharacterHotkeys.filterCategories.Contains(item.Category))
+                return false;
+            if (UICharacterHotkeys.filterItemTypes.Count > 0 &&
+                !UICharacterHotkeys.filterItemTypes.Contains(item.ItemType))
                 return false;
             return true;
         }
@@ -392,7 +472,8 @@ namespace MultiplayerARPG
         public bool IsAssigned()
         {
             // Just check visibility because it will be hidden if skill or item can't be found
-            return (uiCharacterSkill && uiCharacterSkill.IsVisible()) ||
+            return (uiGuildSkill && uiGuildSkill.IsVisible()) ||
+                (uiCharacterSkill && uiCharacterSkill.IsVisible()) ||
                 (uiCharacterItem && uiCharacterItem.IsVisible());
         }
     }

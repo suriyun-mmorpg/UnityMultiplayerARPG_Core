@@ -8,14 +8,16 @@ namespace MultiplayerARPG
     public partial class UICharacterHotkeys : UIBase
     {
         public List<string> filterCategories = new List<string>();
-        public bool doNotIncludeItems;
-        public List<ItemType> filterItemTypes = new List<ItemType>() { ItemType.Armor, ItemType.Shield, ItemType.Weapon, ItemType.Potion, ItemType.Building, ItemType.Pet, ItemType.Mount, ItemType.Skill };
         public bool doNotIncludeSkills;
         public List<SkillType> filterSkillTypes = new List<SkillType>() { SkillType.Active, SkillType.CraftItem };
+        public bool doNotIncludeItems;
+        public List<ItemType> filterItemTypes = new List<ItemType>() { ItemType.Armor, ItemType.Shield, ItemType.Weapon, ItemType.Potion, ItemType.Building, ItemType.Pet, ItemType.Mount, ItemType.Skill };
+        public bool doNotIncludeGuildSkills;
         public UICharacterHotkeyAssigner uiCharacterHotkeyAssigner;
         public UICharacterHotkeyPair[] uiCharacterHotkeys;
         public UICharacterSkill uiCharacterSkillPrefab;
         public UICharacterItem uiCharacterItemPrefab;
+        public UIGuildSkill uiGuildSkillPrefab;
 
         [Header("Mobile Touch Controls")]
         [FormerlySerializedAs("hotkeyMovementJoyStick")]

@@ -48,6 +48,13 @@ namespace MultiplayerARPG
             return true;
         }
 
+        public bool AssignSkillHotkey(string hotkeyId, CharacterSkill characterSkill)
+        {
+            // Use skil data id
+            string relateId = characterSkill.GetSkill().Id;
+            return CallServerAssignHotkey(hotkeyId, HotkeyType.Skill, relateId);
+        }
+
         public bool AssignItemHotkey(string hotkeyId, CharacterItem characterItem)
         {
             // Usable items will use item data id
@@ -58,11 +65,11 @@ namespace MultiplayerARPG
             return CallServerAssignHotkey(hotkeyId, HotkeyType.Item, relateId);
         }
 
-        public bool AssignSkillHotkey(string hotkeyId, CharacterSkill characterSkill)
+        public bool AssignGuildSkillHotkey(string hotkeyId, GuildSkill guildSkill)
         {
             // Use skil data id
-            string relateId = characterSkill.GetSkill().Id;
-            return CallServerAssignHotkey(hotkeyId, HotkeyType.Skill, relateId);
+            string relateId = guildSkill.Id;
+            return CallServerAssignHotkey(hotkeyId, HotkeyType.GuildSkill, relateId);
         }
 
         public bool UnAssignHotkey(string hotkeyId)

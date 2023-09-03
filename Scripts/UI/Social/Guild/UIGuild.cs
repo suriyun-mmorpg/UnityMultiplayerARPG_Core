@@ -55,108 +55,108 @@ namespace MultiplayerARPG
 
         public GuildData Guild { get { return GameInstance.JoinedGuild; } }
 
-        private string guildMessage;
-        private string guildMessage2;
+        private string _guildMessage;
+        private string _guildMessage2;
 
-        private UIList roleList;
+        private UIList _roleList;
         public UIList RoleList
         {
             get
             {
-                if (roleList == null)
+                if (_roleList == null)
                 {
-                    roleList = gameObject.AddComponent<UIList>();
-                    roleList.uiPrefab = uiRolePrefab.gameObject;
-                    roleList.uiContainer = uiRoleContainer;
+                    _roleList = gameObject.AddComponent<UIList>();
+                    _roleList.uiPrefab = uiRolePrefab.gameObject;
+                    _roleList.uiContainer = uiRoleContainer;
                 }
-                return roleList;
+                return _roleList;
             }
         }
 
-        private UIGuildRoleSelectionManager roleSelectionManager;
+        private UIGuildRoleSelectionManager _roleSelectionManager;
         public UIGuildRoleSelectionManager RoleSelectionManager
         {
             get
             {
-                if (roleSelectionManager == null)
-                    roleSelectionManager = gameObject.GetOrAddComponent<UIGuildRoleSelectionManager>();
-                roleSelectionManager.selectionMode = UISelectionMode.SelectSingle;
-                return roleSelectionManager;
+                if (_roleSelectionManager == null)
+                    _roleSelectionManager = gameObject.GetOrAddComponent<UIGuildRoleSelectionManager>();
+                _roleSelectionManager.selectionMode = UISelectionMode.SelectSingle;
+                return _roleSelectionManager;
             }
         }
 
-        private UIList skillList;
+        private UIList _skillList;
         public UIList SkillList
         {
             get
             {
-                if (skillList == null)
+                if (_skillList == null)
                 {
-                    skillList = gameObject.AddComponent<UIList>();
-                    skillList.uiPrefab = uiSkillPrefab.gameObject;
-                    skillList.uiContainer = uiSkillContainer;
+                    _skillList = gameObject.AddComponent<UIList>();
+                    _skillList.uiPrefab = uiSkillPrefab.gameObject;
+                    _skillList.uiContainer = uiSkillContainer;
                 }
-                return skillList;
+                return _skillList;
             }
         }
 
-        private UIGuildSkillSelectionManager skillSelectionManager;
+        private UIGuildSkillSelectionManager _skillSelectionManager;
         public UIGuildSkillSelectionManager SkillSelectionManager
         {
             get
             {
-                if (skillSelectionManager == null)
-                    skillSelectionManager = gameObject.GetOrAddComponent<UIGuildSkillSelectionManager>();
-                skillSelectionManager.selectionMode = UISelectionMode.SelectSingle;
-                return skillSelectionManager;
+                if (_skillSelectionManager == null)
+                    _skillSelectionManager = gameObject.GetOrAddComponent<UIGuildSkillSelectionManager>();
+                _skillSelectionManager.selectionMode = UISelectionMode.SelectSingle;
+                return _skillSelectionManager;
             }
         }
 
-        private UIGuildMessageUpdater guildMessageUpdater;
+        private UIGuildMessageUpdater _guildMessageUpdater;
         public UIGuildMessageUpdater GuildMessageUpdater
         {
             get
             {
-                if (guildMessageUpdater == null)
-                    guildMessageUpdater = gameObject.GetOrAddComponent<UIGuildMessageUpdater>();
-                guildMessageUpdater.inputField = inputFieldMessage;
-                return guildMessageUpdater;
+                if (_guildMessageUpdater == null)
+                    _guildMessageUpdater = gameObject.GetOrAddComponent<UIGuildMessageUpdater>();
+                _guildMessageUpdater.inputField = inputFieldMessage;
+                return _guildMessageUpdater;
             }
         }
 
-        private UIGuildMessage2Updater guildMessage2Updater;
+        private UIGuildMessage2Updater _guildMessage2Updater;
         public UIGuildMessage2Updater GuildMessage2Updater
         {
             get
             {
-                if (guildMessage2Updater == null)
-                    guildMessage2Updater = gameObject.GetOrAddComponent<UIGuildMessage2Updater>();
-                guildMessage2Updater.inputField = inputFieldMessage2;
-                return guildMessage2Updater;
+                if (_guildMessage2Updater == null)
+                    _guildMessage2Updater = gameObject.GetOrAddComponent<UIGuildMessage2Updater>();
+                _guildMessage2Updater.inputField = inputFieldMessage2;
+                return _guildMessage2Updater;
             }
         }
 
-        private UIGuildAutoAcceptRequestUpdater guildAutoAcceptRequestUpdater;
+        private UIGuildAutoAcceptRequestUpdater _guildAutoAcceptRequestUpdater;
         public UIGuildAutoAcceptRequestUpdater GuildAutoAcceptRequestUpdater
         {
             get
             {
-                if (guildAutoAcceptRequestUpdater == null)
-                    guildAutoAcceptRequestUpdater = gameObject.GetOrAddComponent<UIGuildAutoAcceptRequestUpdater>();
-                guildAutoAcceptRequestUpdater.toggle = toggleAutoAcceptRequests;
-                return guildAutoAcceptRequestUpdater;
+                if (_guildAutoAcceptRequestUpdater == null)
+                    _guildAutoAcceptRequestUpdater = gameObject.GetOrAddComponent<UIGuildAutoAcceptRequestUpdater>();
+                _guildAutoAcceptRequestUpdater.toggle = toggleAutoAcceptRequests;
+                return _guildAutoAcceptRequestUpdater;
             }
         }
 
-        private UIGuildIconUpdater guildIconUpdater;
+        private UIGuildIconUpdater _guildIconUpdater;
         public UIGuildIconUpdater GuildIconUpdater
         {
             get
             {
-                if (guildIconUpdater == null)
-                    guildIconUpdater = gameObject.GetOrAddComponent<UIGuildIconUpdater>();
-                guildIconUpdater.uiGuildIcon = uiGuildIcon;
-                return guildIconUpdater;
+                if (_guildIconUpdater == null)
+                    _guildIconUpdater = gameObject.GetOrAddComponent<UIGuildIconUpdater>();
+                _guildIconUpdater.uiGuildIcon = uiGuildIcon;
+                return _guildIconUpdater;
             }
         }
 
@@ -223,15 +223,15 @@ namespace MultiplayerARPG
                     inputFieldMessage.text = string.Empty;
             }
 
-            if (Guild != null && Guild.guildMessage != null && !Guild.guildMessage.Equals(guildMessage))
+            if (Guild != null && Guild.guildMessage != null && !Guild.guildMessage.Equals(_guildMessage))
             {
-                guildMessage = Guild.guildMessage;
+                _guildMessage = Guild.guildMessage;
 
                 if (textMessage != null)
-                    textMessage.text = ZString.Format(LanguageManager.GetText(formatKeyMessage), guildMessage);
+                    textMessage.text = ZString.Format(LanguageManager.GetText(formatKeyMessage), _guildMessage);
 
                 if (inputFieldMessage != null)
-                    inputFieldMessage.text = guildMessage;
+                    inputFieldMessage.text = _guildMessage;
             }
 
             if (Guild == null)
@@ -243,15 +243,15 @@ namespace MultiplayerARPG
                     inputFieldMessage2.text = string.Empty;
             }
 
-            if (Guild != null && Guild.guildMessage2 != null && !Guild.guildMessage2.Equals(guildMessage2))
+            if (Guild != null && Guild.guildMessage2 != null && !Guild.guildMessage2.Equals(_guildMessage2))
             {
-                guildMessage2 = Guild.guildMessage2;
+                _guildMessage2 = Guild.guildMessage2;
 
                 if (textMessage2 != null)
-                    textMessage2.text = ZString.Format(LanguageManager.GetText(formatKeyMessage2), guildMessage2);
+                    textMessage2.text = ZString.Format(LanguageManager.GetText(formatKeyMessage2), _guildMessage2);
 
                 if (inputFieldMessage2 != null)
-                    inputFieldMessage2.text = guildMessage2;
+                    inputFieldMessage2.text = _guildMessage2;
             }
 
             if (toggleAutoAcceptRequests != null)
@@ -428,6 +428,9 @@ namespace MultiplayerARPG
                 UIGuildSkill uiGuildSkill = ui.GetComponent<UIGuildSkill>();
                 uiGuildSkill.Data = new UIGuildSkillData(guildSkill, guild.GetSkillLevel(guildSkill.DataId));
                 uiGuildSkill.Show();
+                UIGuildSkillDragHandler dragHandler = uiGuildSkill.GetComponentInChildren<UIGuildSkillDragHandler>();
+                if (dragHandler != null)
+                    dragHandler.SetupForSkills(uiGuildSkill);
                 SkillSelectionManager.Add(uiGuildSkill);
                 if (selectedDataId == guildSkill.DataId)
                     uiGuildSkill.OnClickSelect();
