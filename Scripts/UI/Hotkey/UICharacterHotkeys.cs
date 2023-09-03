@@ -111,12 +111,19 @@ namespace MultiplayerARPG
             UpdateData();
             if (!GameInstance.PlayingCharacterEntity) return;
             GameInstance.PlayingCharacterEntity.onRecached += UpdateData;
+            GameInstance.PlayingCharacterEntity.onHotkeysOperation += PlayingCharacterEntity_onHotkeysOperation;
         }
 
         protected virtual void OnDisable()
         {
             if (!GameInstance.PlayingCharacterEntity) return;
             GameInstance.PlayingCharacterEntity.onRecached -= UpdateData;
+            GameInstance.PlayingCharacterEntity.onHotkeysOperation -= PlayingCharacterEntity_onHotkeysOperation;
+        }
+
+        private void PlayingCharacterEntity_onHotkeysOperation(LiteNetLibSyncList.Operation arg1, int arg2)
+        {
+            UpdateData();
         }
 
         private void Update()
