@@ -377,18 +377,18 @@ namespace MultiplayerARPG
                 UICharacterHotkeys.SetUsingHotkey(null);
             }
 
+            if (_usingSkill != null && GameInstance.PlayingCharacter.IndexOfSkillUsage(SkillUsageType.Skill, _usingSkill.DataId) >= 0)
+            {
+                // Skill this cooling down, can't use it
+                return;
+            }
+
             if (_usingGuildSkill != null && GameInstance.PlayingCharacter.IndexOfSkillUsage(SkillUsageType.GuildSkill, _usingGuildSkill.DataId) >= 0)
             {
                 // Guild skill this cooling down, can't use it
                 return;
             }
 
-            if (_usingSkill != null && GameInstance.PlayingCharacter.IndexOfSkillUsage(SkillUsageType.Skill, _usingSkill.DataId) >= 0)
-            {
-                // Skill this cooling down, can't use it
-                return;
-            }
-            
             if (HasCustomAimControls())
             {
                 UICharacterHotkeys.SetUsingHotkey(this);
