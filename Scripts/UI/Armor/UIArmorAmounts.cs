@@ -139,11 +139,9 @@ namespace MultiplayerARPG
 
         private void UpdateList()
         {
-            CacheList.HideAll();
-
             if (uiEntryPrefab == null || uiListContainer == null)
                 return;
-
+            CacheList.HideAll();
             UIArmorAmount tempUI;
             CacheList.Generate(Data, (index, data, ui) =>
             {
