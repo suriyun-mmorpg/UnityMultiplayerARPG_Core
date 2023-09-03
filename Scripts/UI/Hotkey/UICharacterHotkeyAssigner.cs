@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System.Collections.Generic;
+using UnityEngine;
 
 namespace MultiplayerARPG
 {
@@ -7,8 +8,10 @@ namespace MultiplayerARPG
         public UICharacterHotkey uiCharacterHotkey;
         public UICharacterSkill uiCharacterSkillPrefab;
         public UICharacterItem uiCharacterItemPrefab;
+        public UIGuildSkill uiGuildSkillPrefab;
         public Transform uiCharacterSkillContainer;
         public Transform uiCharacterItemContainer;
+        public Transform uiGuildSkillContainer;
         public bool autoHideIfNothingToAssign;
 
         private UIList _cacheSkillList;
@@ -43,6 +46,22 @@ namespace MultiplayerARPG
             }
         }
 
+        private UIList _cacheGuildSkillList;
+        public UIList CacheGuildSkillList
+        {
+            get
+            {
+                if (_cacheGuildSkillList == null)
+                {
+                    _cacheGuildSkillList = gameObject.AddComponent<UIList>();
+                    if (uiGuildSkillPrefab != null)
+                        _cacheGuildSkillList.uiPrefab = uiGuildSkillPrefab.gameObject;
+                    _cacheGuildSkillList.uiContainer = uiGuildSkillContainer;
+                }
+                return _cacheGuildSkillList;
+            }
+        }
+
         private UICharacterSkillSelectionManager _cacheSkillSelectionManager;
         public UICharacterSkillSelectionManager CacheSkillSelectionManager
         {
@@ -67,6 +86,18 @@ namespace MultiplayerARPG
             }
         }
 
+        private UIGuildSkillSelectionManager _cacheGuildSkillSelectionManager;
+        public UIGuildSkillSelectionManager CacheGuildSkillSelectionManager
+        {
+            get
+            {
+                if (_cacheGuildSkillSelectionManager == null)
+                    _cacheGuildSkillSelectionManager = gameObject.GetOrAddComponent<UIGuildSkillSelectionManager>();
+                _cacheGuildSkillSelectionManager.selectionMode = UISelectionMode.SelectSingle;
+                return _cacheGuildSkillSelectionManager;
+            }
+        }
+
         public void Setup(UICharacterHotkey uiCharacterHotkey)
         {
             this.uiCharacterHotkey = uiCharacterHotkey;
@@ -79,6 +110,7 @@ namespace MultiplayerARPG
             {
                 CacheSkillList.HideAll();
                 CacheItemList.HideAll();
+                CacheGuildSkillList.HideAll();
                 return;
             }
             base.Show();
@@ -88,11 +120,15 @@ namespace MultiplayerARPG
         {
             CacheSkillSelectionManager.eventOnSelect.RemoveListener(OnSelectCharacterSkill);
             CacheSkillSelectionManager.eventOnSelect.AddListener(OnSelectCharacterSkill);
+            CacheSkillList.doNotRemoveContainerChildren = true;
+
             CacheItemSelectionManager.eventOnSelect.RemoveListener(OnSelectCharacterItem);
             CacheItemSelectionManager.eventOnSelect.AddListener(OnSelectCharacterItem);
-
-            CacheSkillList.doNotRemoveContainerChildren = true;
             CacheItemList.doNotRemoveContainerChildren = true;
+
+            CacheGuildSkillSelectionManager.eventOnSelect.RemoveListener(OnSelectGuildSkill);
+            CacheGuildSkillSelectionManager.eventOnSelect.AddListener(OnSelectGuildSkill);
+            CacheGuildSkillList.doNotRemoveContainerChildren = true;
 
             int countAssignable = 0;
 
@@ -101,6 +137,7 @@ namespace MultiplayerARPG
             CharacterSkill tempCharacterSkill;
             BaseSkill tempSkill;
             int tempIndexOfSkill;
+            CacheSkillList.HideAll();
             CacheSkillList.Generate(GameInstance.PlayingCharacterEntity.GetCaches().Skills, (index, skillLevel, ui) =>
             {
                 if (!ui)
@@ -125,6 +162,7 @@ namespace MultiplayerARPG
 
             // Setup item list
             UICharacterItem tempUiCharacterItem;
+            CacheItemList.HideAll();
             CacheItemList.Generate(GameInstance.PlayingCharacterEntity.NonEquipItems, (index, characterItem, ui) =>
             {
                 if (!ui)
@@ -142,6 +180,40 @@ namespace MultiplayerARPG
                     tempUiCharacterItem.Hide();
                 }
             });
+
+            // Setup guild skill list
+            UIGuildSkill tempUiGuildSkill;
+            GuildSkill tempGuildSkill;
+            CacheGuildSkillList.HideAll();
+            if (GameInstance.JoinedGuild != null)
+            {
+                CacheGuildSkillList.Generate(GameInstance.JoinedGuild.GetSkillLevels(), (index, guildSkillLevel, ui) =>
+                {
+                    if (!ui)
+                        return;
+                    tempUiGuildSkill = ui.GetComponent<UIGuildSkill>();
+                    if (!GameInstance.GuildSkills.TryGetValue(guildSkillLevel.Key, out tempGuildSkill))
+                    {
+                        tempUiGuildSkill.Hide();
+                        return;
+                    }
+                    if (uiCharacterHotkey.CanAssignGuildSkill(tempGuildSkill))
+                    {
+                        tempUiGuildSkill.Data = new UIGuildSkillData()
+                        {
+                            guildSkill = tempGuildSkill,
+                            targetLevel = guildSkillLevel.Value,
+                        };
+                        tempUiGuildSkill.Show();
+                        CacheGuildSkillSelectionManager.Add(tempUiGuildSkill);
+                        ++countAssignable;
+                    }
+                    else
+                    {
+                        tempUiGuildSkill.Hide();
+                    }
+                });
+            }
 
             if (autoHideIfNothingToAssign && countAssignable == 0)
                 Hide();
@@ -162,6 +234,12 @@ namespace MultiplayerARPG
         protected void OnSelectCharacterItem(UICharacterItem ui)
         {
             GameInstance.PlayingCharacterEntity.AssignItemHotkey(uiCharacterHotkey.hotkeyId, ui.CharacterItem);
+            Hide();
+        }
+
+        protected void OnSelectGuildSkill(UIGuildSkill ui)
+        {
+            GameInstance.PlayingCharacterEntity.AssignGuildSkillHotkey(uiCharacterHotkey.hotkeyId, ui.GuildSkill);
             Hide();
         }
 

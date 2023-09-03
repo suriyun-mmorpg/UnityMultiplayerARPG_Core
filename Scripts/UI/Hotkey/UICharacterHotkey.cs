@@ -115,7 +115,8 @@ namespace MultiplayerARPG
             {
                 if (GameInstance.JoinedGuild == null)
                     return false;
-                return GameInstance.GuildSkills.TryGetValue(guildSkill.DataId, out guildSkill) &&
+                int dataId = BaseGameData.MakeDataId(Data.relateId);
+                return GameInstance.GuildSkills.TryGetValue(dataId, out guildSkill) &&
                     GameInstance.JoinedGuild.TryGetSkillLevel(guildSkill.DataId, out guildSkillLevel);
             }
             return false;
