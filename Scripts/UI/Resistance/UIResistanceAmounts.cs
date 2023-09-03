@@ -13,6 +13,12 @@ namespace MultiplayerARPG
         [Header("UI Elements")]
         public TextWrapper uiTextAllAmounts;
         public UIResistanceTextPair[] textAmounts;
+
+        [Header("List UI Elements")]
+        public UIResistanceAmount uiEntryPrefab;
+        public Transform uiListContainer;
+
+        [Header("Options")]
         public bool isBonus;
 
         private Dictionary<DamageElement, UIResistanceTextPair> _cacheTextAmounts;
@@ -34,6 +40,22 @@ namespace MultiplayerARPG
                     }
                 }
                 return _cacheTextAmounts;
+            }
+        }
+
+
+        private UIList _cacheList;
+        public UIList CacheList
+        {
+            get
+            {
+                if (_cacheList == null)
+                {
+                    _cacheList = gameObject.AddComponent<UIList>();
+                    _cacheList.uiPrefab = uiEntryPrefab.gameObject;
+                    _cacheList.uiContainer = uiListContainer;
+                }
+                return _cacheList;
             }
         }
 
@@ -95,6 +117,7 @@ namespace MultiplayerARPG
                     }
                 }
             }
+            UpdateList();
         }
 
         private void SetDefaultValue(UIResistanceTextPair componentPair)
@@ -106,6 +129,21 @@ namespace MultiplayerARPG
                     isBonus ? 0f.ToBonusString("N2") : 0f.ToString("N2"));
             if (componentPair.imageIcon != null)
                 componentPair.imageIcon.sprite = tempElement.Icon;
+        }
+
+        private void UpdateList()
+        {
+            CacheList.HideAll();
+
+            if (uiEntryPrefab == null || uiListContainer == null)
+                return;
+
+            UIResistanceAmount tempUI;
+            CacheList.Generate(Data, (index, data, ui) =>
+            {
+                tempUI = ui.GetComponent<UIResistanceAmount>();
+                tempUI.Data = new UIResistanceAmountData(data.Key, data.Value);
+            });
         }
     }
 }

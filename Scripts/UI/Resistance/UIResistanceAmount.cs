@@ -1,17 +1,17 @@
-﻿using Cysharp.Text;
+using Cysharp.Text;
 using UnityEngine;
 using UnityEngine.Serialization;
 
 namespace MultiplayerARPG
 {
-    public partial class UIArmorAmount : UISelectionEntry<UIArmorAmountData>
+    public partial class UIResistanceAmount : UISelectionEntry<UIResistanceAmountData>
     {
         [Header("String Formats")]
-        [Tooltip("Format => {0} = {Amount}")]
+        [Tooltip("Format => {0} = {Amount * 100}")]
         public UILocaleKeySetting formatKeyAmountOnly = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_SIMPLE);
-        [Tooltip("Format => {0} = {Armor Title}, {1} = {Amount}")]
+        [Tooltip("Format => {0} = {Resistance Title}, {1} = {Amount * 100}")]
         [FormerlySerializedAs("formatKeyAmount")]
-        public UILocaleKeySetting formatKeyTitleWithAmount = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_ARMOR_AMOUNT);
+        public UILocaleKeySetting formatKeyTitleWithAmount = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_RESISTANCE_AMOUNT);
 
         [Header("UI Elements")]
         public UIGameDataElements uiGameDataElements;
@@ -30,7 +30,7 @@ namespace MultiplayerARPG
             {
                 uiTextAmountOnly.text = ZString.Format(
                     LanguageManager.GetText(formatKeyAmountOnly),
-                    Data.amount.ToString("N0"));
+                    (Data.amount * 100).ToString("N2"));
             }
 
             if (uiTextTitleWithAmount != null)
@@ -38,7 +38,7 @@ namespace MultiplayerARPG
                 uiTextTitleWithAmount.text = ZString.Format(
                     LanguageManager.GetText(formatKeyTitleWithAmount),
                     Data.damageElement.Title,
-                    Data.amount.ToString("N0"));
+                    (Data.amount * 100).ToString("N2"));
             }
         }
     }

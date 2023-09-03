@@ -27,6 +27,10 @@ namespace MultiplayerARPG
         public TextWrapper uiTextAllAmounts;
         public UIAttributeTextPair[] textAmounts;
 
+        [Header("List UI Elements")]
+        public UICharacterAttribute uiEntryPrefab;
+        public Transform uiListContainer;
+
         [Header("Options")]
         public DisplayType displayType;
         public bool includeEquipmentsForCurrentAmounts;
@@ -55,6 +59,21 @@ namespace MultiplayerARPG
                     }
                 }
                 return _cacheTextAmounts;
+            }
+        }
+
+        private UIList _cacheList;
+        public UIList CacheList
+        {
+            get
+            {
+                if (_cacheList == null)
+                {
+                    _cacheList = gameObject.AddComponent<UIList>();
+                    _cacheList.uiPrefab = uiEntryPrefab.gameObject;
+                    _cacheList.uiContainer = uiListContainer;
+                }
+                return _cacheList;
             }
         }
 
@@ -161,6 +180,7 @@ namespace MultiplayerARPG
                     }
                 }
             }
+            UpdateList();
         }
 
         private void SetDefaultValue(UIAttributeTextPair componentPair)
@@ -200,6 +220,21 @@ namespace MultiplayerARPG
                 componentPair.imageIcon.sprite = componentPair.attribute.Icon;
             if (inactiveIfAmountZero && componentPair.root != null)
                 componentPair.root.SetActive(false);
+        }
+
+        private void UpdateList()
+        {
+            CacheList.HideAll();
+
+            if (uiEntryPrefab == null || uiListContainer == null)
+                return;
+
+            UICharacterAttribute tempUI;
+            CacheList.Generate(Data, (index, data, ui) =>
+            {
+                tempUI = ui.GetComponent<UICharacterAttribute>();
+                tempUI.Data = new UICharacterAttributeData(CharacterAttribute.Create(data.Key, Mathf.CeilToInt(data.Value)));
+            });
         }
     }
 }

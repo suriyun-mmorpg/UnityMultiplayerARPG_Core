@@ -17,6 +17,10 @@ namespace MultiplayerARPG
         public TextWrapper uiTextSumDamage;
         public UIDamageElementTextPair[] textDamages;
 
+        [Header("List UI Elements")]
+        public UIDamageElementAmount uiEntryPrefab;
+        public Transform uiListContainer;
+
         [Header("Options")]
         public bool isBonus;
         public bool inactiveIfAmountZero;
@@ -40,6 +44,22 @@ namespace MultiplayerARPG
                     }
                 }
                 return _cacheTextDamages;
+            }
+        }
+
+
+        private UIList _cacheList;
+        public UIList CacheList
+        {
+            get
+            {
+                if (_cacheList == null)
+                {
+                    _cacheList = gameObject.AddComponent<UIList>();
+                    _cacheList.uiPrefab = uiEntryPrefab.gameObject;
+                    _cacheList.uiContainer = uiListContainer;
+                }
+                return _cacheList;
             }
         }
 
@@ -130,6 +150,7 @@ namespace MultiplayerARPG
                     }
                 }
             }
+            UpdateList();
         }
 
         private void SetDefaultValue(UIDamageElementTextPair componentPair)
@@ -144,6 +165,21 @@ namespace MultiplayerARPG
                 componentPair.imageIcon.sprite = tempElement.Icon;
             if (inactiveIfAmountZero && componentPair.root != null)
                 componentPair.root.SetActive(false);
+        }
+
+        private void UpdateList()
+        {
+            CacheList.HideAll();
+
+            if (uiEntryPrefab == null || uiListContainer == null)
+                return;
+
+            UIDamageElementAmount tempUI;
+            CacheList.Generate(Data, (index, data, ui) =>
+            {
+                tempUI = ui.GetComponent<UIDamageElementAmount>();
+                tempUI.Data = new UIDamageElementAmountData(data.Key, data.Value);
+            });
         }
     }
 }

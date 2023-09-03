@@ -24,6 +24,10 @@ namespace MultiplayerARPG
         public TextWrapper uiTextAllAmounts;
         public UICurrencyTextPair[] textAmounts;
 
+        [Header("List UI Elements")]
+        public UICharacterCurrency uiEntryPrefab;
+        public Transform uiListContainer;
+
         [Header("Options")]
         public DisplayType displayType;
         public bool isBonus;
@@ -49,6 +53,22 @@ namespace MultiplayerARPG
                     }
                 }
                 return _cacheTextAmounts;
+            }
+        }
+
+
+        private UIList _cacheList;
+        public UIList CacheList
+        {
+            get
+            {
+                if (_cacheList == null)
+                {
+                    _cacheList = gameObject.AddComponent<UIList>();
+                    _cacheList.uiPrefab = uiEntryPrefab.gameObject;
+                    _cacheList.uiContainer = uiListContainer;
+                }
+                return _cacheList;
             }
         }
 
@@ -143,6 +163,7 @@ namespace MultiplayerARPG
                     }
                 }
             }
+            UpdateList();
         }
 
         private void SetDefaultValue(UICurrencyTextPair componentPair)
@@ -176,6 +197,21 @@ namespace MultiplayerARPG
                 componentPair.imageIcon.sprite = componentPair.currency.Icon;
             if (inactiveIfAmountZero && componentPair.root != null)
                 componentPair.root.SetActive(false);
+        }
+
+        private void UpdateList()
+        {
+            CacheList.HideAll();
+
+            if (uiEntryPrefab == null || uiListContainer == null)
+                return;
+
+            UICharacterCurrency tempUI;
+            CacheList.Generate(Data, (index, data, ui) =>
+            {
+                tempUI = ui.GetComponent<UICharacterCurrency>();
+                tempUI.Data = new UICharacterCurrencyData(CharacterCurrency.Create(data.Key, Mathf.CeilToInt(data.Value)));
+            });
         }
     }
 }
