@@ -20,7 +20,7 @@ namespace MultiplayerARPG
                     // Skip empty data
                     continue;
                 }
-                if (filterCategories.Count > 0 && !string.IsNullOrEmpty(kvp.Key.Category) && !filterCategories.Contains(kvp.Key.Category.Trim().ToLower()))
+                if (filterCategories.Count > 0 && (kvp.Key.Category == null || !filterCategories.Contains(kvp.Key.Category.Trim().ToLower())))
                 {
                     // Category filtering
                     continue;

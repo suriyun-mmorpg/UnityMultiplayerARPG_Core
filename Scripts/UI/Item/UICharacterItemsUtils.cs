@@ -32,7 +32,7 @@ namespace MultiplayerARPG
                     result.Add(new KeyValuePair<int, CharacterItem>(i, entry));
                     continue;
                 }
-                if (filterCategories.Count > 0 && !string.IsNullOrEmpty(tempItem.Category) && !filterCategories.Contains(tempItem.Category.Trim().ToLower()))
+                if (filterCategories.Count > 0 && (tempItem.Category == null || !filterCategories.Contains(tempItem.Category.Trim().ToLower())))
                 {
                     // Category filtering
                     continue;
