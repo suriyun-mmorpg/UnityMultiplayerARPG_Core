@@ -392,8 +392,7 @@ namespace MultiplayerARPG
 
         public bool IsAvailable(ICharacterData character)
         {
-            int skillLevel;
-            return character.GetCaches().Skills.TryGetValue(this, out skillLevel) && skillLevel > 0;
+            return character.GetCaches().Skills.TryGetValue(this, out int skillLevel) && skillLevel > 0;
         }
 
         public abstract SkillType SkillType { get; }
