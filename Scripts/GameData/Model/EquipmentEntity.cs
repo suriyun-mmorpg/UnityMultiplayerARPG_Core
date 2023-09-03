@@ -116,14 +116,17 @@ namespace MultiplayerARPG
                     else
                         break;
                 }
-                // Apply materials
-                _usingEffect.equipmentMaterials.ApplyMaterials();
-                // Activate effect objects
-                if (_usingEffect.effectObjects != null && _usingEffect.effectObjects.Length > 0)
+                if (_isFoundEffect)
                 {
-                    foreach (GameObject effectObject in _usingEffect.effectObjects)
+                    // Apply materials
+                    _usingEffect.equipmentMaterials.ApplyMaterials();
+                    // Activate effect objects
+                    if (_usingEffect.effectObjects != null && _usingEffect.effectObjects.Length > 0)
                     {
-                        effectObject.SetActive(true);
+                        foreach (GameObject effectObject in _usingEffect.effectObjects)
+                        {
+                            effectObject.SetActive(true);
+                        }
                     }
                 }
             }
