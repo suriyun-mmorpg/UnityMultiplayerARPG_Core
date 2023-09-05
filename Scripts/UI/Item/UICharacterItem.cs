@@ -379,19 +379,22 @@ namespace MultiplayerARPG
                 }
             }
         }
-        protected void UpdateUsableItemCoolDownRemainsDuration()
+
+        protected void UpdateCoolDownRemainsDuration(float diffToChangeRemainsDuration = 0f)
         {
             if (coolDownRemainsDuration <= 0f && Character != null && UsableItem != null)
             {
                 int indexOfSkillUsage = Character.IndexOfSkillUsage(SkillUsageType.UsableItem, UsableItem.DataId);
-                if (indexOfSkillUsage >= 0)
+                if (indexOfSkillUsage >= 0 && Mathf.Abs(Character.SkillUsages[indexOfSkillUsage].coolDownRemainsDuration - coolDownRemainsDuration) > diffToChangeRemainsDuration)
                     coolDownRemainsDuration = Character.SkillUsages[indexOfSkillUsage].coolDownRemainsDuration;
+                else
+                    coolDownRemainsDuration = 0f;
             }
         }
 
         protected override void UpdateUI()
         {
-            UpdateUsableItemCoolDownRemainsDuration();
+            UpdateCoolDownRemainsDuration();
             UpdateExpireTime();
 
             if (!IsOwningCharacter() || !IsVisible())
@@ -409,7 +412,7 @@ namespace MultiplayerARPG
 
         protected override void UpdateData()
         {
-            UpdateUsableItemCoolDownRemainsDuration();
+            UpdateCoolDownRemainsDuration(1f);
 
             if (Level <= 0)
             {

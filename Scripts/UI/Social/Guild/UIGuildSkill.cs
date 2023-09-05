@@ -129,15 +129,21 @@ namespace MultiplayerARPG
             }
         }
 
-        protected override void UpdateUI()
+        protected void UpdateCoolDownRemainsDuration(float diffToChangeRemainsDuration = 0f)
         {
-            // Update remains duration
             if (coolDownRemainsDuration <= 0f && GameInstance.PlayingCharacter != null && GuildSkill != null)
             {
                 int indexOfSkillUsage = GameInstance.PlayingCharacter.IndexOfSkillUsage(SkillUsageType.GuildSkill, GuildSkill.DataId);
-                if (indexOfSkillUsage >= 0)
+                if (indexOfSkillUsage >= 0 && Mathf.Abs(GameInstance.PlayingCharacter.SkillUsages[indexOfSkillUsage].coolDownRemainsDuration - coolDownRemainsDuration) > diffToChangeRemainsDuration)
                     coolDownRemainsDuration = GameInstance.PlayingCharacter.SkillUsages[indexOfSkillUsage].coolDownRemainsDuration;
+                else
+                    coolDownRemainsDuration = 0f;
             }
+        }
+
+        protected override void UpdateUI()
+        {
+            UpdateCoolDownRemainsDuration();
 
             if (GameInstance.PlayingCharacter != null && GuildSkill && Level < GuildSkill.maxLevel &&
                 GameInstance.JoinedGuild != null &&
@@ -164,13 +170,7 @@ namespace MultiplayerARPG
 
         protected override void UpdateData()
         {
-            // Update remains duration
-            if (GameInstance.PlayingCharacter != null && GuildSkill != null)
-            {
-                int indexOfSkillUsage = GameInstance.PlayingCharacter.IndexOfSkillUsage(SkillUsageType.GuildSkill, GuildSkill.DataId);
-                if (indexOfSkillUsage >= 0 && Mathf.Abs(GameInstance.PlayingCharacter.SkillUsages[indexOfSkillUsage].coolDownRemainsDuration - coolDownRemainsDuration) > 1)
-                    coolDownRemainsDuration = GameInstance.PlayingCharacter.SkillUsages[indexOfSkillUsage].coolDownRemainsDuration;
-            }
+            UpdateCoolDownRemainsDuration(1f);
 
             if (Level <= 0)
             {

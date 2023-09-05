@@ -154,15 +154,21 @@ namespace MultiplayerARPG
             }
         }
 
-        protected override void UpdateUI()
+        protected void UpdateCoolDownRemainsDuration(float diffToChangeRemainsDuration = 0f)
         {
-            // Update remains duration
             if (coolDownRemainsDuration <= 0f && Character != null && Skill != null)
             {
                 int indexOfSkillUsage = Character.IndexOfSkillUsage(SkillUsageType.Skill, Skill.DataId);
-                if (indexOfSkillUsage >= 0)
+                if (indexOfSkillUsage >= 0 && Mathf.Abs(Character.SkillUsages[indexOfSkillUsage].coolDownRemainsDuration - coolDownRemainsDuration) > diffToChangeRemainsDuration)
                     coolDownRemainsDuration = Character.SkillUsages[indexOfSkillUsage].coolDownRemainsDuration;
+                else
+                    coolDownRemainsDuration = 0f;
             }
+        }
+
+        protected override void UpdateUI()
+        {
+            UpdateCoolDownRemainsDuration(0f);
 
             IPlayerCharacterData targetPlayer = Character as IPlayerCharacterData;
             if (targetPlayer == null)
@@ -175,13 +181,7 @@ namespace MultiplayerARPG
 
         protected override void UpdateData()
         {
-            // Update remains duration
-            if (Character != null && Skill != null)
-            {
-                int indexOfSkillUsage = Character.IndexOfSkillUsage(SkillUsageType.Skill, Skill.DataId);
-                if (indexOfSkillUsage >= 0 && Mathf.Abs(Character.SkillUsages[indexOfSkillUsage].coolDownRemainsDuration - coolDownRemainsDuration) > 1)
-                    coolDownRemainsDuration = Character.SkillUsages[indexOfSkillUsage].coolDownRemainsDuration;
-            }
+            UpdateCoolDownRemainsDuration(1f);
 
             if (Level <= 0)
             {
