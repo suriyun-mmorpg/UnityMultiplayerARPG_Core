@@ -154,7 +154,10 @@ namespace MultiplayerARPG
                 uiComp.Index = index;
                 ModelSelectionManager.Add(uiComp);
                 if (index == 0)
+                {
                     uiComp.OnClickSelect();
+                    SetupColorList();
+                }
             });
         }
 
@@ -181,7 +184,10 @@ namespace MultiplayerARPG
                 uiComp.Index = index;
                 ColorSelectionManager.Add(uiComp);
                 if (index == 0)
+                {
                     uiComp.OnClickSelect();
+                    OnSelectColorUI(uiComp);
+                }
             });
         }
     }
