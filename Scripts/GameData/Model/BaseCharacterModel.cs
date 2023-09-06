@@ -359,6 +359,8 @@ namespace MultiplayerARPG
                 {
                     EquipmentContainers[i].DeactivateInstantiatedObjects();
                     EquipmentContainers[i].SetActiveDefaultModel(true);
+                    EquipmentContainers[i].DeactivateInstantiatedObjectGroups();
+                    EquipmentContainers[i].SetActiveDefaultModelGroup(true);
                 }
             }
         }
@@ -372,6 +374,8 @@ namespace MultiplayerARPG
                 {
                     EquipmentContainers[i].SetActiveDefaultModel(false);
                     EquipmentContainers[i].ActivateInstantiatedObject(EquipmentContainers[i].activatingInstantiateObjectIndex);
+                    EquipmentContainers[i].SetActiveDefaultModelGroup(false);
+                    EquipmentContainers[i].ActivateInstantiatedObjectGroup(EquipmentContainers[i].activatingInstantiateObjectIndex);
                 }
             }
         }
@@ -393,6 +397,7 @@ namespace MultiplayerARPG
             EquipmentModel tempEquipmentModel;
             BaseEquipmentEntity tempEquipmentEntity;
             GameObject tempEquipmentObject;
+            EquipmentInstantiatedObjectGroup tempEquipmentObjectGroup;
             Dictionary<string, EquipmentModel> showingModels = new Dictionary<string, EquipmentModel>();
             Dictionary<string, EquipmentModel> storingModels = new Dictionary<string, EquipmentModel>();
             HashSet<string> unequippingSockets = new HashSet<string>(EquippedModels.Keys);
@@ -470,7 +475,9 @@ namespace MultiplayerARPG
                     continue;
 
                 tempContainer.DeactivateInstantiatedObjects();
+                tempContainer.DeactivateInstantiatedObjectGroups();
                 tempContainer.SetActiveDefaultModel(true);
+                tempContainer.SetActiveDefaultModelGroup(true);
             }
 
             foreach (string equipSocket in showingModels.Keys)
@@ -482,21 +489,43 @@ namespace MultiplayerARPG
 
                 tempEquipmentModel = showingModels[equipSocket];
                 tempEquipmentObject = null;
+                tempEquipmentObjectGroup = null;
                 if (tempEquipmentModel.useInstantiatedObject)
                 {
+                    bool modelActivated = false;
+
                     tempContainer.SetActiveDefaultModel(false);
                     if (!tempContainer.ActivateInstantiatedObject(tempEquipmentModel.instantiatedObjectIndex))
                     {
                         tempContainer.SetActiveDefaultModel(true);
-                        continue;
+                        modelActivated = true;
                     }
-                    tempEquipmentObject = tempContainer.instantiatedObjects[tempEquipmentModel.instantiatedObjectIndex];
+                    else
+                    {
+                        tempEquipmentObject = tempContainer.instantiatedObjects[tempEquipmentModel.instantiatedObjectIndex];
+                    }
+
+                    tempContainer.SetActiveDefaultModelGroup(false);
+                    if (!tempContainer.ActivateInstantiatedObjectGroup(tempEquipmentModel.instantiatedObjectIndex))
+                    {
+                        tempContainer.SetActiveDefaultModelGroup(true);
+                        modelActivated = true;
+                    }
+                    else
+                    {
+                        tempEquipmentObjectGroup = tempContainer.instantiatedObjectGroups[tempEquipmentModel.instantiatedObjectIndex];
+                    }
+
+                    if (!modelActivated)
+                        continue;
                 }
                 else
                 {
                     // Instantiate model, setup transform and activate game object
                     tempContainer.DeactivateInstantiatedObjects();
+                    tempContainer.DeactivateInstantiatedObjectGroups();
                     tempContainer.SetActiveDefaultModel(false);
+                    tempContainer.SetActiveDefaultModelGroup(false);
                     if (tempContainer.transform != null)
                     {
                         tempEquipmentObject = Instantiate(tempEquipmentModel.meshPrefab, tempContainer.transform);
@@ -527,8 +556,8 @@ namespace MultiplayerARPG
                         CacheLeftHandEquipmentEntity = tempEquipmentEntity;
                 }
 
-                tempEquipmentModel.InvokeOnInstantiated(tempEquipmentObject, tempEquipmentEntity, tempContainer);
-                OnInstantiatedEquipment(tempEquipmentModel, tempEquipmentObject, tempEquipmentEntity, tempContainer);
+                tempEquipmentModel.InvokeOnInstantiated(tempEquipmentObject, tempEquipmentEntity, tempEquipmentObjectGroup, tempContainer);
+                OnInstantiatedEquipment(tempEquipmentModel, tempEquipmentObject, tempEquipmentEntity, tempEquipmentObjectGroup, tempContainer);
             }
             EquippedModels = storingModels;
         }
@@ -822,14 +851,14 @@ namespace MultiplayerARPG
                 CacheLeftHandEquipmentEntity.PlayCharge();
         }
 
-        public virtual void OnInstantiatedEquipment(EquipmentModel model, GameObject instantiatedObject, BaseEquipmentEntity instantiatedEntity, EquipmentContainer equipmentContainer)
+        public virtual void OnInstantiatedEquipment(EquipmentModel model, GameObject instantiatedObject, BaseEquipmentEntity instantiatedEntity, EquipmentInstantiatedObjectGroup instantiatedObjectGroup, EquipmentContainer equipmentContainer)
         {
             if (model.useInstantiatedObject || model.doNotSetupBones)
                 return;
             BaseEquipmentModelBonesSetupManager equipmentModelBonesSetupManager = GameInstance.Singleton.EquipmentModelBonesSetupManager;
             if (model.equipmentModelBonesSetupManager != null)
                 equipmentModelBonesSetupManager = model.equipmentModelBonesSetupManager;
-            equipmentModelBonesSetupManager.Setup(this, model, instantiatedObject, instantiatedEntity, equipmentContainer);
+            equipmentModelBonesSetupManager.Setup(this, model, instantiatedObject, instantiatedEntity, instantiatedObjectGroup, equipmentContainer);
         }
 
         public void SetIsDead(bool isDead)

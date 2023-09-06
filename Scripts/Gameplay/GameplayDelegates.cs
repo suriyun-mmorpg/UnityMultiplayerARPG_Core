@@ -143,5 +143,6 @@ namespace MultiplayerARPG
         EquipmentModel model,
         GameObject instantiatedObject,
         BaseEquipmentEntity instantiatedEntity,
+        EquipmentInstantiatedObjectGroup instantiatedObjectGroup,
         EquipmentContainer equipmentContainer);
 }

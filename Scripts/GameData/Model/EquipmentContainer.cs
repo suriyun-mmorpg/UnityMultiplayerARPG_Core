@@ -8,8 +8,15 @@ namespace MultiplayerARPG
     {
         public string equipSocket;
         public Transform transform;
+
+        [Header("Single instantiated object setting")]
         public GameObject defaultModel;
         public GameObject[] instantiatedObjects;
+
+        [Header("Multiple instantiated objects setting")]
+        public EquipmentInstantiatedObjectGroup defaultInstantiatedObjectGroup;
+        public EquipmentInstantiatedObjectGroup[] instantiatedObjectGroups;
+
 #if UNITY_EDITOR
         [Header("Testing tools")]
         [Tooltip("Index of instantiate object which you want to test activation by character model's context menu")]
@@ -21,6 +28,13 @@ namespace MultiplayerARPG
             if (defaultModel == null || defaultModel.activeSelf == isActive)
                 return;
             defaultModel.SetActive(isActive);
+        }
+
+        public void SetActiveDefaultModelGroup(bool isActive)
+        {
+            if (defaultInstantiatedObjectGroup == null)
+                return;
+            defaultInstantiatedObjectGroup.SetActive(isActive);
         }
 
         public void DeactivateInstantiatedObjects()
@@ -47,6 +61,33 @@ namespace MultiplayerARPG
             if (instantiatedObjects[index] == null || instantiatedObjects[index].activeSelf)
                 return false;
             instantiatedObjects[index].SetActive(true);
+            return true;
+        }
+
+        public void DeactivateInstantiatedObjectGroups()
+        {
+            if (instantiatedObjectGroups == null || instantiatedObjectGroups.Length == 0)
+                return;
+            // Deactivate all objects
+            foreach (EquipmentInstantiatedObjectGroup instantiatedObject in instantiatedObjectGroups)
+            {
+                if (instantiatedObject == null) continue;
+                instantiatedObject.SetActive(false);
+            }
+        }
+
+        public bool ActivateInstantiatedObjectGroup(int index)
+        {
+            if (instantiatedObjectGroups == null || instantiatedObjectGroups.Length == 0)
+                return false;
+            // Deactivate all objects
+            DeactivateInstantiatedObjectGroups();
+            if (index < 0 || index >= instantiatedObjectGroups.Length)
+                return false;
+            // Activate only one object
+            if (instantiatedObjectGroups[index] == null)
+                return false;
+            instantiatedObjectGroups[index].SetActive(true);
             return true;
         }
     }
