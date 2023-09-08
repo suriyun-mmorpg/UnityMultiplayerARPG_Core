@@ -484,59 +484,51 @@ namespace MultiplayerARPG
 
                 if (tempCharacterEntity is BasePlayerCharacterEntity tempPlayerCharacterEntity)
                 {
-                    try
+                    bool makeMostDamage = false;
+                    bool isLastAttacker = lastPlayer != null && lastPlayer.ObjectId == tempPlayerCharacterEntity.ObjectId;
+                    if (isLastAttacker)
                     {
-                        bool makeMostDamage = false;
-                        bool isLastAttacker = lastPlayer != null && lastPlayer.ObjectId == tempPlayerCharacterEntity.ObjectId;
-                        if (isLastAttacker)
-                        {
-                            // Increase kill progress
-                            tempPlayerCharacterEntity.OnKillMonster(this);
-                        }
-                        // Clear looters list when it is found new player character who make most damages
-                        if (rewardRate > tempHighRewardRate)
-                        {
-                            tempHighRewardRate = rewardRate;
-                            _looters.Clear();
-                            makeMostDamage = true;
-                            // Make this player character to be able to pick up item because it made most damage
-                            _looters.Add(tempPlayerCharacterEntity.Id);
-                            // And also change item drop rate
-                            itemDropRate = 1f + tempPlayerCharacterEntity.CachedData.Stats.itemDropRate;
-                        }
-                        GivingRewardToGuild(tempPlayerCharacterEntity, reward, rewardRate, out float shareGuildExpRate);
-                        GivingRewardToParty(tempPlayerCharacterEntity, isLastAttacker, reward, rewardRate, shareGuildExpRate, makeMostDamage, out givenRewardExp, out givenRewardCurrency);
+                        // Increase kill progress
+                        tempPlayerCharacterEntity.OnKillMonster(this);
+                    }
+                    // Clear looters list when it is found new player character who make most damages
+                    if (rewardRate > tempHighRewardRate)
+                    {
+                        tempHighRewardRate = rewardRate;
+                        _looters.Clear();
+                        makeMostDamage = true;
+                        // Make this player character to be able to pick up item because it made most damage
+                        _looters.Add(tempPlayerCharacterEntity.Id);
+                        // And also change item drop rate
+                        itemDropRate = 1f + tempPlayerCharacterEntity.CachedData.Stats.itemDropRate;
+                    }
+                    GivingRewardToGuild(tempPlayerCharacterEntity, reward, rewardRate, out float shareGuildExpRate);
+                    GivingRewardToParty(tempPlayerCharacterEntity, isLastAttacker, reward, rewardRate, shareGuildExpRate, makeMostDamage, out givenRewardExp, out givenRewardCurrency);
 
-                        // Add reward to current character in damage record list
-                        if (!givenRewardExp)
+                    // Add reward to current character in damage record list
+                    if (!givenRewardExp)
+                    {
+                        // Will give reward when it was not given
+                        int petIndex = tempPlayerCharacterEntity.IndexOfSummon(SummonType.PetItem);
+                        if (petIndex >= 0 && tempPlayerCharacterEntity.Summons[petIndex].CacheEntity != null)
                         {
-                            // Will give reward when it was not given
-                            int petIndex = tempPlayerCharacterEntity.IndexOfSummon(SummonType.PetItem);
-                            if (petIndex >= 0 && tempPlayerCharacterEntity.Summons[petIndex].CacheEntity != null)
-                            {
-                                tempMonsterCharacterEntity = tempPlayerCharacterEntity.Summons[petIndex].CacheEntity;
-                                // Share exp to pet, set multiplier to 0.5, because it will be shared to player
-                                tempMonsterCharacterEntity.RewardExp(reward, (1f - shareGuildExpRate) * 0.5f * rewardRate, RewardGivenType.KillMonster, Level, Level);
-                                // Set multiplier to 0.5, because it was shared to monster
-                                tempPlayerCharacterEntity.RewardExp(reward, (1f - shareGuildExpRate) * 0.5f * rewardRate, RewardGivenType.KillMonster, Level, Level);
-                            }
-                            else
-                            {
-                                // No pet, no share, so rate is 1f
-                                tempPlayerCharacterEntity.RewardExp(reward, (1f - shareGuildExpRate) * rewardRate, RewardGivenType.KillMonster, Level, Level);
-                            }
+                            tempMonsterCharacterEntity = tempPlayerCharacterEntity.Summons[petIndex].CacheEntity;
+                            // Share exp to pet, set multiplier to 0.5, because it will be shared to player
+                            tempMonsterCharacterEntity.RewardExp(reward, (1f - shareGuildExpRate) * 0.5f * rewardRate, RewardGivenType.KillMonster, Level, Level);
+                            // Set multiplier to 0.5, because it was shared to monster
+                            tempPlayerCharacterEntity.RewardExp(reward, (1f - shareGuildExpRate) * 0.5f * rewardRate, RewardGivenType.KillMonster, Level, Level);
                         }
-
-                        if (!givenRewardCurrency)
+                        else
                         {
-                            // Will give reward when it was not given
-                            tempPlayerCharacterEntity.RewardCurrencies(reward, rewardRate, RewardGivenType.KillMonster, Level, Level);
+                            // No pet, no share, so rate is 1f
+                            tempPlayerCharacterEntity.RewardExp(reward, (1f - shareGuildExpRate) * rewardRate, RewardGivenType.KillMonster, Level, Level);
                         }
                     }
-                    catch (System.Exception ex)
+
+                    if (!givenRewardCurrency)
                     {
-                        Logging.LogException(ex);
-                        continue;
+                        // Will give reward when it was not given
+                        tempPlayerCharacterEntity.RewardCurrencies(reward, rewardRate, RewardGivenType.KillMonster, Level, Level);
                     }
                 }
             }
@@ -545,7 +537,7 @@ namespace MultiplayerARPG
         protected virtual void GivingRewardToGuild(BasePlayerCharacterEntity playerCharacterEntity, Reward reward, float rewardRate, out float shareGuildExpRate)
         {
             shareGuildExpRate = 0f;
-            if (!GameInstance.ServerGuildHandlers.TryGetGuild(playerCharacterEntity.GuildId, out GuildData tempGuildData))
+            if (!GameInstance.ServerGuildHandlers.TryGetGuild(playerCharacterEntity.GuildId, out GuildData tempGuildData) || tempGuildData == null)
                 return;
             // Calculation amount of Exp which will be shared to guild
             shareGuildExpRate = (float)tempGuildData.ShareExpPercentage(playerCharacterEntity.Id) * 0.01f;
@@ -561,7 +553,7 @@ namespace MultiplayerARPG
         {
             givenRewardExp = false;
             givenRewardCurrency = false;
-            if (!GameInstance.ServerPartyHandlers.TryGetParty(playerCharacterEntity.PartyId, out PartyData tempPartyData))
+            if (!GameInstance.ServerPartyHandlers.TryGetParty(playerCharacterEntity.PartyId, out PartyData tempPartyData) || tempPartyData == null)
             {
                 // No joined party
                 return;
@@ -571,7 +563,7 @@ namespace MultiplayerARPG
             BasePlayerCharacterEntity nearbyPartyMember;
             foreach (string memberId in tempPartyData.GetMemberIds())
             {
-                if (!GameInstance.ServerUserHandlers.TryGetPlayerCharacterById(memberId, out nearbyPartyMember) || nearbyPartyMember.IsDead())
+                if (!GameInstance.ServerUserHandlers.TryGetPlayerCharacterById(memberId, out nearbyPartyMember) || nearbyPartyMember == null || nearbyPartyMember.IsDead())
                 {
                     // No reward for offline or dead members
                     continue;

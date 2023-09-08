@@ -556,14 +556,14 @@ namespace MultiplayerARPG
 
                 UpdateOnlineCharacter(playerCharacter);
 
-                if (playerCharacter.PartyId > 0 && ServerPartyHandlers.TryGetParty(playerCharacter.PartyId, out tempParty))
+                if (playerCharacter.PartyId > 0 && ServerPartyHandlers.TryGetParty(playerCharacter.PartyId, out tempParty) && tempParty != null)
                 {
                     tempParty.UpdateMember(playerCharacter);
                     if (!updatingPartyMembers.ContainsKey(playerCharacter.ConnectionId))
                         updatingPartyMembers.Add(playerCharacter.ConnectionId, tempParty);
                 }
 
-                if (playerCharacter.GuildId > 0 && ServerGuildHandlers.TryGetGuild(playerCharacter.GuildId, out tempGuild))
+                if (playerCharacter.GuildId > 0 && ServerGuildHandlers.TryGetGuild(playerCharacter.GuildId, out tempGuild) && tempGuild != null)
                 {
                     tempGuild.UpdateMember(playerCharacter);
                     if (!updatingGuildMembers.ContainsKey(playerCharacter.ConnectionId))
