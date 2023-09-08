@@ -26,6 +26,9 @@ namespace MultiplayerARPG
 
         public void SetGuild(int guildId, GuildData guildData)
         {
+            if (guildData == null)
+                return;
+
             if (Guilds.ContainsKey(guildId))
                 Guilds[guildId] = guildData;
             else
