@@ -54,7 +54,7 @@ namespace MultiplayerARPG
                         _cacheGuildSkill = null;
                     break;
                 case SkillUsageType.UsableItem:
-                    if (!GameInstance.Items.TryGetValue(dataId, out BaseItem item) || !_cacheUsableItem.IsUsable())
+                    if (!GameInstance.Items.TryGetValue(dataId, out BaseItem item) || !item.IsUsable())
                     {
                         _cacheUsableItem = null;
                     }

@@ -92,7 +92,7 @@ namespace MultiplayerARPG
                     }
                     break;
                 case SummonType.PetItem:
-                    if (!GameInstance.Items.TryGetValue(dataId, out BaseItem item) || !_cachePetItem.IsPet())
+                    if (!GameInstance.Items.TryGetValue(dataId, out BaseItem item) || !item.IsPet())
                     {
                         _cachePetItem = null;
                         _cachePrefab = null;
