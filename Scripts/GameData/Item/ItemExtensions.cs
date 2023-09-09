@@ -9,85 +9,85 @@ namespace MultiplayerARPG
         public static bool IsDefendEquipment<T>(this T item)
             where T : IItem
         {
-            return item.IsArmor() || item.IsShield();
+            return item != null && (item.IsArmor() || item.IsShield());
         }
 
         public static bool IsEquipment<T>(this T item)
             where T : IItem
         {
-            return item.IsDefendEquipment() || item.IsWeapon();
+            return item != null && (item.IsDefendEquipment() || item.IsWeapon());
         }
 
         public static bool IsUsable<T>(this T item)
             where T : IItem
         {
-            return item.IsPotion() || item.IsBuilding() || item.IsPet() || item.IsMount() || item.IsSkill();
+            return item != null && (item.IsPotion() || item.IsBuilding() || item.IsPet() || item.IsMount() || item.IsSkill());
         }
 
         public static bool IsJunk<T>(this T item)
             where T : IItem
         {
-            return item.ItemType == ItemType.Junk;
+            return item != null && item.ItemType == ItemType.Junk;
         }
 
         public static bool IsArmor<T>(this T item)
             where T : IItem
         {
-            return item.ItemType == ItemType.Armor;
+            return item != null && item.ItemType == ItemType.Armor;
         }
 
         public static bool IsShield<T>(this T item)
             where T : IItem
         {
-            return item.ItemType == ItemType.Shield;
+            return item != null && item.ItemType == ItemType.Shield;
         }
 
         public static bool IsWeapon<T>(this T item)
             where T : IItem
         {
-            return item.ItemType == ItemType.Weapon;
+            return item != null && item.ItemType == ItemType.Weapon;
         }
 
         public static bool IsPotion<T>(this T item)
             where T : IItem
         {
-            return item.ItemType == ItemType.Potion;
+            return item != null && item.ItemType == ItemType.Potion;
         }
 
         public static bool IsAmmo<T>(this T item)
             where T : IItem
         {
-            return item.ItemType == ItemType.Ammo;
+            return item != null && item.ItemType == ItemType.Ammo;
         }
 
         public static bool IsBuilding<T>(this T item)
             where T : IItem
         {
-            return item.ItemType == ItemType.Building;
+            return item != null && item.ItemType == ItemType.Building;
         }
 
         public static bool IsPet<T>(this T item)
             where T : IItem
         {
-            return item.ItemType == ItemType.Pet;
+            return item != null && item.ItemType == ItemType.Pet;
         }
 
         public static bool IsSocketEnhancer<T>(this T item)
             where T : IItem
         {
-            return item.ItemType == ItemType.SocketEnhancer;
+            return item != null && item.ItemType == ItemType.SocketEnhancer;
         }
 
         public static bool IsMount<T>(this T item)
             where T : IItem
         {
-            return item.ItemType == ItemType.Mount;
+            return item != null && item.ItemType == ItemType.Mount;
         }
 
         public static bool IsSkill<T>(this T item)
             where T : IItem
         {
-            return item.ItemType == ItemType.Skill;
+            return item != null && item.ItemType == ItemType.Skill;
         }
         #endregion
 
