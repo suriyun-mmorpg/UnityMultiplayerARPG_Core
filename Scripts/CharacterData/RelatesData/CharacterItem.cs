@@ -42,14 +42,17 @@ namespace MultiplayerARPG
         private ISkillItem _cacheSkillItem;
         [System.NonSerialized]
         private CalculatedItemBuff _cacheBuff = new CalculatedItemBuff();
+        [System.NonSerialized]
+        private bool _recachingBuff = false;
 
-        private void MakeCache()
+        ~CharacterItem()
         {
-            if (_dirtyDataId == dataId && _dirtyLevel == level && _dirtyRandomSeed == randomSeed)
-                return;
-            _dirtyDataId = dataId;
-            _dirtyLevel = level;
-            _dirtyRandomSeed = randomSeed;
+            ClearCachedData();
+            _cacheBuff = null;
+        }
+
+        private void ClearCachedData()
+        {
             _cacheItem = null;
             _cacheUsableItem = null;
             _cacheEquipmentItem = null;
@@ -64,36 +67,55 @@ namespace MultiplayerARPG
             _cacheSocketEnhancerItem = null;
             _cacheMountItem = null;
             _cacheSkillItem = null;
-            if (GameInstance.Items.TryGetValue(dataId, out _cacheItem) && _cacheItem != null)
-            {
-                if (_cacheItem.IsUsable())
-                    _cacheUsableItem = _cacheItem as IUsableItem;
-                if (_cacheItem.IsEquipment())
-                    _cacheEquipmentItem = _cacheItem as IEquipmentItem;
-                if (_cacheItem.IsDefendEquipment())
-                    _cacheDefendItem = _cacheItem as IDefendEquipmentItem;
-                if (_cacheItem.IsArmor())
-                    _cacheArmorItem = _cacheItem as IArmorItem;
-                if (_cacheItem.IsWeapon())
-                    _cacheWeaponItem = _cacheItem as IWeaponItem;
-                if (_cacheItem.IsShield())
-                    _cacheShieldItem = _cacheItem as IShieldItem;
-                if (_cacheItem.IsPotion())
-                    _cachePotionItem = _cacheItem as IPotionItem;
-                if (_cacheItem.IsAmmo())
-                    _cacheAmmoItem = _cacheItem as IAmmoItem;
-                if (_cacheItem.IsBuilding())
-                    _cacheBuildingItem = _cacheItem as IBuildingItem;
-                if (_cacheItem.IsPet())
-                    _cachePetItem = _cacheItem as IPetItem;
-                if (_cacheItem.IsSocketEnhancer())
-                    _cacheSocketEnhancerItem = _cacheItem as ISocketEnhancerItem;
-                if (_cacheItem.IsMount())
-                    _cacheMountItem = _cacheItem as IMountItem;
-                if (_cacheItem.IsSkill())
-                    _cacheSkillItem = _cacheItem as ISkillItem;
-            }
-            _cacheBuff.Build(_cacheEquipmentItem, level, randomSeed);
+        }
+
+        private bool IsRecaching()
+        {
+            return _dirtyDataId != dataId || _dirtyLevel != level || _dirtyRandomSeed != randomSeed;
+        }
+
+        private void MakeAsCached()
+        {
+            _dirtyDataId = dataId;
+            _dirtyLevel = level;
+            _dirtyRandomSeed = randomSeed;
+        }
+
+        private void MakeCache()
+        {
+            if (!IsRecaching())
+                return;
+            MakeAsCached();
+            ClearCachedData();
+            _recachingBuff = true;
+            if (!GameInstance.Items.TryGetValue(dataId, out _cacheItem) || _cacheItem == null)
+                return;
+            if (_cacheItem.IsUsable())
+                _cacheUsableItem = _cacheItem as IUsableItem;
+            if (_cacheItem.IsEquipment())
+                _cacheEquipmentItem = _cacheItem as IEquipmentItem;
+            if (_cacheItem.IsDefendEquipment())
+                _cacheDefendItem = _cacheItem as IDefendEquipmentItem;
+            if (_cacheItem.IsArmor())
+                _cacheArmorItem = _cacheItem as IArmorItem;
+            if (_cacheItem.IsWeapon())
+                _cacheWeaponItem = _cacheItem as IWeaponItem;
+            if (_cacheItem.IsShield())
+                _cacheShieldItem = _cacheItem as IShieldItem;
+            if (_cacheItem.IsPotion())
+                _cachePotionItem = _cacheItem as IPotionItem;
+            if (_cacheItem.IsAmmo())
+                _cacheAmmoItem = _cacheItem as IAmmoItem;
+            if (_cacheItem.IsBuilding())
+                _cacheBuildingItem = _cacheItem as IBuildingItem;
+            if (_cacheItem.IsPet())
+                _cachePetItem = _cacheItem as IPetItem;
+            if (_cacheItem.IsSocketEnhancer())
+                _cacheSocketEnhancerItem = _cacheItem as ISocketEnhancerItem;
+            if (_cacheItem.IsMount())
+                _cacheMountItem = _cacheItem as IMountItem;
+            if (_cacheItem.IsSkill())
+                _cacheSkillItem = _cacheItem as ISkillItem;
         }
 
         public BaseItem GetItem()
@@ -298,6 +320,11 @@ namespace MultiplayerARPG
         public CalculatedItemBuff GetBuff()
         {
             MakeCache();
+            if (_recachingBuff)
+            {
+                _recachingBuff = false;
+                _cacheBuff.Build(_cacheEquipmentItem, level, randomSeed);
+            }
             return _cacheBuff;
         }
 

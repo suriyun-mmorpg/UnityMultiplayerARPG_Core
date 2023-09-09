@@ -40,11 +40,17 @@ namespace MultiplayerARPG
         ~CalculatedBuff()
         {
             _cacheIncreaseAttributes.Clear();
+            _cacheIncreaseAttributes = null;
             _cacheIncreaseAttributesRate.Clear();
+            _cacheIncreaseAttributesRate = null;
             _cacheIncreaseResistances.Clear();
+            _cacheIncreaseResistances = null;
             _cacheIncreaseArmors.Clear();
+            _cacheIncreaseArmors = null;
             _cacheIncreaseDamages.Clear();
+            _cacheIncreaseDamages = null;
             _cacheDamageOverTimes.Clear();
+            _cacheDamageOverTimes = null;
         }
 
         public void Build(Buff buff, int level)

@@ -10,11 +10,32 @@ namespace MultiplayerARPG
         [System.NonSerialized]
         private Quest _cacheQuest;
 
+        ~CharacterQuest()
+        {
+            ClearCachedData();
+        }
+
+        private void ClearCachedData()
+        {
+            _cacheQuest = null;
+        }
+
+        private bool IsRecaching()
+        {
+            return _dirtyDataId != dataId;
+        }
+
+        private void MakeAsCached()
+        {
+            _dirtyDataId = dataId;
+        }
+
         private void MakeCache()
         {
-            if (_dirtyDataId == dataId)
+            if (!IsRecaching())
                 return;
-            _dirtyDataId = dataId;
+            MakeAsCached();
+            ClearCachedData();
             if (!GameInstance.Quests.TryGetValue(dataId, out _cacheQuest))
                 _cacheQuest = null;
         }

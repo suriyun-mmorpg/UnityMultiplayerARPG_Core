@@ -29,11 +29,17 @@ namespace MultiplayerARPG
         ~CalculatedItemBuff()
         {
             _cacheIncreaseAttributes.Clear();
+            _cacheIncreaseAttributes = null;
             _cacheIncreaseAttributesRate.Clear();
+            _cacheIncreaseAttributesRate = null;
             _cacheIncreaseResistances.Clear();
+            _cacheIncreaseResistances = null;
             _cacheIncreaseArmors.Clear();
+            _cacheIncreaseArmors = null;
             _cacheIncreaseDamages.Clear();
+            _cacheIncreaseDamages = null;
             _cacheIncreaseSkills.Clear();
+            _cacheIncreaseSkills = null;
         }
 
         public void Build(IEquipmentItem item, int level, int randomSeed)

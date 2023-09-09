@@ -16,11 +16,13 @@ namespace MultiplayerARPG
         [System.NonSerialized]
         private BaseSkill _cacheSkill;
         [System.NonSerialized]
-        private BaseItem _cachePetItem;
+        private IPetItem _cachePetItem;
         [System.NonSerialized]
         private BaseMonsterCharacterEntity _cachePrefab;
         [System.NonSerialized]
         private CalculatedBuff _cacheBuff = new CalculatedBuff();
+        [System.NonSerialized]
+        private bool _recachingBuff = false;
 
         [System.NonSerialized]
         private BaseMonsterCharacterEntity _cacheEntity;
@@ -43,34 +45,68 @@ namespace MultiplayerARPG
         [JsonIgnore]
         public int CurrentMp { get { return CacheEntity != null ? CacheEntity.CurrentMp : currentMp; } }
 
-        private void MakeCache()
+        ~CharacterSummon()
         {
-            if (_dirtyType == type && _dirtyDataId == dataId && _dirtyLevel == level)
-                return;
-            _dirtyType = type;
-            _dirtyDataId = dataId;
-            _dirtyLevel = level;
+            ClearCachedData();
+            _cacheBuff = null;
+            _cacheEntity = null;
+        }
+
+        private void ClearCachedData()
+        {
             _cacheSkill = null;
             _cachePetItem = null;
             _cachePrefab = null;
-            Buff tempBuff = Buff.Empty;
+        }
+
+        private bool IsRecaching()
+        {
+            return _dirtyType != type || _dirtyDataId != dataId || _dirtyLevel != level;
+        }
+
+        private void MakeAsCached()
+        {
+            _dirtyType = type;
+            _dirtyDataId = dataId;
+            _dirtyLevel = level;
+        }
+
+        private void MakeCache()
+        {
+            if (!IsRecaching())
+                return;
+            MakeAsCached();
+            ClearCachedData();
+            _recachingBuff = true;
             switch (type)
             {
                 case SummonType.Skill:
-                    if (GameInstance.Skills.TryGetValue(dataId, out _cacheSkill))
+                    if (!GameInstance.Skills.TryGetValue(dataId, out _cacheSkill))
+                    {
+                        _cacheSkill = null;
+                        _cachePrefab = null;
+                    }
+                    else
+                    {
                         _cachePrefab = _cacheSkill.Summon.MonsterEntity;
+                    }
                     break;
                 case SummonType.PetItem:
-                    if (GameInstance.Items.TryGetValue(dataId, out _cachePetItem) && _cachePetItem is IPetItem)
-                        _cachePrefab = (_cachePetItem as IPetItem).PetEntity;
+                    if (!GameInstance.Items.TryGetValue(dataId, out BaseItem item) || !_cachePetItem.IsPet())
+                    {
+                        _cachePetItem = null;
+                        _cachePrefab = null;
+                    }
+                    else
+                    {
+                        _cachePetItem = item as IPetItem;
+                        _cachePrefab = _cachePetItem.PetEntity;
+                    }
                     break;
                 case SummonType.Custom:
                     _cachePrefab = GameInstance.CustomSummonManager.GetPrefab(dataId);
                     break;
             }
-            if (_cachePrefab != null && _cachePrefab.CharacterDatabase != null)
-                tempBuff = _cachePrefab.CharacterDatabase.SummonerBuff;
-            _cacheBuff.Build(tempBuff, level);
         }
 
         public void Summon(BaseCharacterEntity summoner, int summonLevel, float duration)
@@ -135,7 +171,7 @@ namespace MultiplayerARPG
             return _cacheSkill;
         }
 
-        public BaseItem GetPetItem()
+        public IPetItem GetPetItem()
         {
             MakeCache();
             return _cachePetItem;
@@ -150,6 +186,14 @@ namespace MultiplayerARPG
         public CalculatedBuff GetBuff()
         {
             MakeCache();
+            if (_recachingBuff)
+            {
+                _recachingBuff = false;
+                Buff tempBuff = Buff.Empty;
+                if (_cachePrefab != null && _cachePrefab.CharacterDatabase != null)
+                    tempBuff = _cachePrefab.CharacterDatabase.SummonerBuff;
+                _cacheBuff.Build(tempBuff, level);
+            }
             return _cacheBuff;
         }
 

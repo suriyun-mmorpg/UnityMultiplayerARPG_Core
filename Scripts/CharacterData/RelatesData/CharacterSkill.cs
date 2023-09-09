@@ -12,12 +12,33 @@ namespace MultiplayerARPG
         [System.NonSerialized]
         private BaseSkill _cacheSkill;
 
-        private void MakeCache()
+        ~CharacterSkill()
         {
-            if (_dirtyDataId == dataId && _dirtyLevel == level)
-                return;
+            ClearCachedData();
+        }
+
+        private void ClearCachedData()
+        {
+            _cacheSkill = null;
+        }
+
+        private bool IsRecaching()
+        {
+            return _dirtyDataId != dataId || _dirtyLevel != level;
+        }
+
+        private void MakeAsCached()
+        {
             _dirtyDataId = dataId;
             _dirtyLevel = level;
+        }
+
+        private void MakeCache()
+        {
+            if (!IsRecaching())
+                return;
+            MakeAsCached();
+            ClearCachedData();
             if (!GameInstance.Skills.TryGetValue(dataId, out _cacheSkill))
                 _cacheSkill = null;
         }

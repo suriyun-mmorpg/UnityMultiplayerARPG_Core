@@ -8,12 +8,12 @@ namespace MultiplayerARPG
         public bool IsRecaching { get; private set; }
         private CharacterStats _stats;
         public CharacterStats Stats => _stats;
-        public Dictionary<Attribute, float> Attributes { get; }
-        public Dictionary<BaseSkill, int> Skills { get; }
-        public Dictionary<DamageElement, float> Resistances { get; }
-        public Dictionary<DamageElement, float> Armors { get; }
-        public Dictionary<DamageElement, MinMaxFloat> IncreaseDamages { get; }
-        public Dictionary<EquipmentSet, int> EquipmentSets { get; }
+        public Dictionary<Attribute, float> Attributes { get; private set; }
+        public Dictionary<BaseSkill, int> Skills { get; private set; }
+        public Dictionary<DamageElement, float> Resistances { get; private set; }
+        public Dictionary<DamageElement, float> Armors { get; private set; }
+        public Dictionary<DamageElement, MinMaxFloat> IncreaseDamages { get; private set; }
+        public Dictionary<EquipmentSet, int> EquipmentSets { get; private set; }
         public int MaxHp => (int)_stats.hp;
         public int MaxMp => (int)_stats.mp;
         public int MaxStamina => (int)_stats.stamina;
@@ -65,6 +65,22 @@ namespace MultiplayerARPG
             EquipmentSets = new Dictionary<EquipmentSet, int>();
         }
 
+        ~CharacterDataCache()
+        {
+            Attributes.Clear();
+            Attributes = null;
+            Resistances.Clear();
+            Resistances = null;
+            Armors.Clear();
+            Armors = null;
+            IncreaseDamages.Clear();
+            IncreaseDamages = null;
+            Skills.Clear();
+            Skills = null;
+            EquipmentSets.Clear();
+            EquipmentSets = null;
+        }
+
         public CharacterDataCache MarkToMakeCaches()
         {
             IsRecaching = true;
@@ -78,6 +94,13 @@ namespace MultiplayerARPG
                 return this;
 
             IsRecaching = false;
+            Attributes.Clear();
+            Resistances.Clear();
+            Armors.Clear();
+            IncreaseDamages.Clear();
+            Skills.Clear();
+            EquipmentSets.Clear();
+
             int oldBattlePoints = BattlePoints;
 
             characterData.GetAllStats(
