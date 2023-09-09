@@ -18,7 +18,9 @@ namespace MultiplayerARPG
         private Dictionary<Attribute, float> _cacheIncreaseAttributesRate = new Dictionary<Attribute, float>();
         private Dictionary<DamageElement, float> _cacheIncreaseResistances = new Dictionary<DamageElement, float>();
         private Dictionary<DamageElement, float> _cacheIncreaseArmors = new Dictionary<DamageElement, float>();
+        private Dictionary<DamageElement, float> _cacheIncreaseArmorsRate = new Dictionary<DamageElement, float>();
         private Dictionary<DamageElement, MinMaxFloat> _cacheIncreaseDamages = new Dictionary<DamageElement, MinMaxFloat>();
+        private Dictionary<DamageElement, MinMaxFloat> _cacheIncreaseDamagesRate = new Dictionary<DamageElement, MinMaxFloat>();
         private Dictionary<DamageElement, MinMaxFloat> _cacheDamageOverTimes = new Dictionary<DamageElement, MinMaxFloat>();
         private float _cacheRemoveBuffWhenAttackChance;
         private float _cacheRemoveBuffWhenAttackedChance;
@@ -47,8 +49,12 @@ namespace MultiplayerARPG
             _cacheIncreaseResistances = null;
             _cacheIncreaseArmors.Clear();
             _cacheIncreaseArmors = null;
+            _cacheIncreaseArmorsRate.Clear();
+            _cacheIncreaseArmorsRate = null;
             _cacheIncreaseDamages.Clear();
             _cacheIncreaseDamages = null;
+            _cacheIncreaseDamagesRate.Clear();
+            _cacheIncreaseDamagesRate = null;
             _cacheDamageOverTimes.Clear();
             _cacheDamageOverTimes = null;
         }
@@ -62,7 +68,9 @@ namespace MultiplayerARPG
             _cacheIncreaseAttributesRate.Clear();
             _cacheIncreaseResistances.Clear();
             _cacheIncreaseArmors.Clear();
+            _cacheIncreaseArmorsRate.Clear();
             _cacheIncreaseDamages.Clear();
+            _cacheIncreaseDamagesRate.Clear();
             _cacheDamageOverTimes.Clear();
 
             _cacheDuration = buff.GetDuration(level);
@@ -77,7 +85,9 @@ namespace MultiplayerARPG
             buff.GetIncreaseAttributesRate(level, _cacheIncreaseAttributesRate);
             buff.GetIncreaseResistances(level, _cacheIncreaseResistances);
             buff.GetIncreaseArmors(level, _cacheIncreaseArmors);
+            buff.GetIncreaseArmorsRate(level, _cacheIncreaseArmorsRate);
             buff.GetIncreaseDamages(level, _cacheIncreaseDamages);
+            buff.GetIncreaseDamagesRate(level, _cacheIncreaseDamagesRate);
             buff.GetDamageOverTimes(level, _cacheDamageOverTimes);
             _cacheRemoveBuffWhenAttackChance = buff.GetRemoveBuffWhenAttackChance(level);
             _cacheRemoveBuffWhenAttackedChance = buff.GetRemoveBuffWhenAttackedChance(level);
@@ -160,9 +170,19 @@ namespace MultiplayerARPG
             return _cacheIncreaseArmors;
         }
 
+        public Dictionary<DamageElement, float> GetIncreaseArmorsRate()
+        {
+            return _cacheIncreaseArmorsRate;
+        }
+
         public Dictionary<DamageElement, MinMaxFloat> GetIncreaseDamages()
         {
             return _cacheIncreaseDamages;
+        }
+
+        public Dictionary<DamageElement, MinMaxFloat> GetIncreaseDamagesRate()
+        {
+            return _cacheIncreaseDamagesRate;
         }
 
         public Dictionary<DamageElement, MinMaxFloat> GetDamageOverTimes()
