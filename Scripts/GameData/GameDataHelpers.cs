@@ -28,6 +28,21 @@ namespace MultiplayerARPG
         }
 
         /// <summary>
+        /// Multiply damage amounts dictionary
+        /// </summary>
+        /// <param name="resultDictionary"></param>
+        /// <param name="multiplyEntry"></param>
+        /// <returns></returns>
+        public static Dictionary<DamageElement, MinMaxFloat> MultiplyDamagesRate(Dictionary<DamageElement, MinMaxFloat> resultDictionary, KeyValuePair<DamageElement, MinMaxFloat> multiplyEntry)
+        {
+            if (resultDictionary == null)
+                resultDictionary = new Dictionary<DamageElement, MinMaxFloat>();
+            if (multiplyEntry.Key != null && resultDictionary.ContainsKey(multiplyEntry.Key))
+                resultDictionary[multiplyEntry.Key] *= multiplyEntry.Value;
+            return resultDictionary;
+        }
+
+        /// <summary>
         /// Combine damage infliction amounts dictionary
         /// </summary>
         /// <param name="resultDictionary"></param>
@@ -78,11 +93,8 @@ namespace MultiplayerARPG
         {
             if (resultDictionary == null)
                 resultDictionary = new Dictionary<Attribute, float>();
-            if (multiplyEntry.Key != null)
-            {
-                if (resultDictionary.ContainsKey(multiplyEntry.Key))
-                    resultDictionary[multiplyEntry.Key] *= multiplyEntry.Value;
-            }
+            if (multiplyEntry.Key != null && resultDictionary.ContainsKey(multiplyEntry.Key))
+                resultDictionary[multiplyEntry.Key] *= multiplyEntry.Value;
             return resultDictionary;
         }
 
@@ -145,6 +157,21 @@ namespace MultiplayerARPG
                 else
                     resultDictionary[newEntry.Key] += newEntry.Value;
             }
+            return resultDictionary;
+        }
+
+        /// <summary>
+        /// Multiply armors amounts dictionary
+        /// </summary>
+        /// <param name="resultDictionary"></param>
+        /// <param name="multiplyEntry"></param>
+        /// <returns></returns>
+        public static Dictionary<DamageElement, float> MultiplyArmorsRate(Dictionary<DamageElement, float> resultDictionary, KeyValuePair<DamageElement, float> multiplyEntry)
+        {
+            if (resultDictionary == null)
+                resultDictionary = new Dictionary<DamageElement, float>();
+            if (multiplyEntry.Key != null && resultDictionary.ContainsKey(multiplyEntry.Key))
+                resultDictionary[multiplyEntry.Key] *= multiplyEntry.Value;
             return resultDictionary;
         }
 
@@ -226,6 +253,37 @@ namespace MultiplayerARPG
                 {
                     CombineDamages(resultDictionary, entry);
                 }
+            }
+            return resultDictionary;
+        }
+
+        /// <summary>
+        /// Multiply damage amounts dictionary
+        /// </summary>
+        /// <param name="resultDictionary"></param>
+        /// <param name="multiplyDictionary"></param>
+        /// <returns></returns>
+        public static Dictionary<DamageElement, MinMaxFloat> MultiplyDamagesRate(Dictionary<DamageElement, MinMaxFloat> resultDictionary, Dictionary<DamageElement, MinMaxFloat> multiplyDictionary)
+        {
+            if (resultDictionary == null)
+                resultDictionary = new Dictionary<DamageElement, MinMaxFloat>();
+            if (multiplyDictionary != null && multiplyDictionary.Count > 0)
+            {
+                // Remove attributes that are not multiplying
+                List<DamageElement> availableDamages = new List<DamageElement>(resultDictionary.Keys);
+                foreach (DamageElement damage in availableDamages)
+                {
+                    if (!multiplyDictionary.ContainsKey(damage))
+                        resultDictionary.Remove(damage);
+                }
+                foreach (KeyValuePair<DamageElement, MinMaxFloat> entry in multiplyDictionary)
+                {
+                    MultiplyDamagesRate(resultDictionary, entry);
+                }
+            }
+            else
+            {
+                resultDictionary.Clear();
             }
             return resultDictionary;
         }
@@ -337,6 +395,37 @@ namespace MultiplayerARPG
                 {
                     CombineArmors(resultDictionary, entry);
                 }
+            }
+            return resultDictionary;
+        }
+
+        /// <summary>
+        /// Multiply armors amounts dictionary
+        /// </summary>
+        /// <param name="resultDictionary"></param>
+        /// <param name="multiplyDictionary"></param>
+        /// <returns></returns>
+        public static Dictionary<DamageElement, float> MultiplyArmorsRate(Dictionary<DamageElement, float> resultDictionary, Dictionary<DamageElement, float> multiplyDictionary)
+        {
+            if (resultDictionary == null)
+                resultDictionary = new Dictionary<DamageElement, float>();
+            if (multiplyDictionary != null && multiplyDictionary.Count > 0)
+            {
+                // Remove attributes that are not multiplying
+                List<DamageElement> availableArmors = new List<DamageElement>(resultDictionary.Keys);
+                foreach (DamageElement armor in availableArmors)
+                {
+                    if (!multiplyDictionary.ContainsKey(armor))
+                        resultDictionary.Remove(armor);
+                }
+                foreach (KeyValuePair<DamageElement, float> entry in multiplyDictionary)
+                {
+                    MultiplyArmorsRate(resultDictionary, entry);
+                }
+            }
+            else
+            {
+                resultDictionary.Clear();
             }
             return resultDictionary;
         }
