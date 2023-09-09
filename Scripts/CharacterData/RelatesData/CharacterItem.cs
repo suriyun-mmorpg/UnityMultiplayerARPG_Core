@@ -5,6 +5,8 @@ namespace MultiplayerARPG
 {
     public partial class CharacterItem
     {
+        public const byte CURRENT_VERSION = 1;
+
         [System.NonSerialized]
         private int _dirtyDataId;
         [System.NonSerialized]
@@ -474,6 +476,7 @@ namespace MultiplayerARPG
                     newItem.expireTime = System.DateTimeOffset.Now.ToUnixTimeSeconds() + (tempItem.ExpireDuration * 60 * 60);
                 }
             }
+            newItem.version = CURRENT_VERSION;
             return newItem;
         }
 
