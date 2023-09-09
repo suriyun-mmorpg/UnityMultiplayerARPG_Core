@@ -2,7 +2,7 @@ using System.Collections.Generic;
 
 namespace MultiplayerARPG
 {
-    public class CalculatedBuff
+    public partial class CalculatedBuff
     {
         private Buff _buff;
         private int _level;
@@ -85,6 +85,9 @@ namespace MultiplayerARPG
             _cacheRemoveBuffWhenUseItemChance = buff.GetRemoveBuffWhenUseItemChance(level);
             _cacheRemoveBuffWhenPickupItemChance = buff.GetRemoveBuffWhenPickupItemChance(level);
             _cacheMaxStack = buff.GetMaxStack(level);
+
+            if (GameExtensionInstance.onBuildCalculatedBuff != null)
+                GameExtensionInstance.onBuildCalculatedBuff(this);
         }
 
         public Buff GetBuff()

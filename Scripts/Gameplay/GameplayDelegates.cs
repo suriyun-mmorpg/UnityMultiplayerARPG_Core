@@ -145,4 +145,10 @@ namespace MultiplayerARPG
         BaseEquipmentEntity instantiatedEntity,
         EquipmentInstantiatedObjectGroup instantiatedObjectGroup,
         EquipmentContainer equipmentContainer);
+
+    public delegate void CalculatedItemBuffDelegate(
+        CalculatedItemBuff calculatedItemBuff);
+
+    public delegate void CalculatedBuffDelegate(
+        CalculatedBuff calculatedBuff);
 }

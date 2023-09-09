@@ -2,7 +2,7 @@ using System.Collections.Generic;
 
 namespace MultiplayerARPG
 {
-    public class CalculatedItemBuff
+    public partial class CalculatedItemBuff
     {
         private IEquipmentItem _item;
         private int _level;
@@ -68,6 +68,9 @@ namespace MultiplayerARPG
             item.GetIncreaseArmors(level, randomSeed, version, _cacheIncreaseArmors);
             item.GetIncreaseDamages(level, randomSeed, version, _cacheIncreaseDamages);
             item.GetIncreaseSkills(level, randomSeed, version, _cacheIncreaseSkills);
+
+            if (GameExtensionInstance.onBuildCalculatedItemBuff != null)
+                GameExtensionInstance.onBuildCalculatedItemBuff(this);
         }
 
         public IEquipmentItem GetItem()
