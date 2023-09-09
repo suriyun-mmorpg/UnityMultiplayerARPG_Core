@@ -69,10 +69,14 @@ namespace MultiplayerARPG
             {
                 if (playerCharacter.Dueling.DuelingStarted && playerCharacter.Dueling.DuelingCharacter != null)
                     return playerCharacter.Dueling.DuelingCharacter.ObjectId != targetEntity.ObjectId;
+
+                if (targetEntity.PartyId != 0 && targetEntity.PartyId == playerCharacter.PartyId)
+                    return true;
+
                 switch (pvpMode)
                 {
                     case PvpMode.Pvp:
-                        return targetEntity.PartyId != 0 && targetEntity.PartyId == playerCharacter.PartyId;
+                        return false;
                     case PvpMode.FactionPvp:
                         return targetEntity.FactionId != 0 && targetEntity.FactionId == playerCharacter.FactionId;
                     case PvpMode.GuildPvp:
@@ -131,10 +135,14 @@ namespace MultiplayerARPG
             {
                 if (playerCharacter.Dueling.DuelingStarted && playerCharacter.Dueling.DuelingCharacter != null)
                     return playerCharacter.Dueling.DuelingCharacter.ObjectId == targetEntity.ObjectId;
+
+                if (targetEntity.PartyId != 0 && targetEntity.PartyId == playerCharacter.PartyId)
+                    return false;
+
                 switch (pvpMode)
                 {
                     case PvpMode.Pvp:
-                        return targetEntity.PartyId == 0 || targetEntity.PartyId != playerCharacter.PartyId;
+                        return true;
                     case PvpMode.FactionPvp:
                         return targetEntity.FactionId == 0 || targetEntity.FactionId != playerCharacter.FactionId;
                     case PvpMode.GuildPvp:
