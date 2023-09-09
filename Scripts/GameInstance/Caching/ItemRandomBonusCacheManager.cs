@@ -1,18 +1,18 @@
-﻿using System.Collections.Generic;
+﻿using Cysharp.Text;
+using System.Collections.Generic;
 
 namespace MultiplayerARPG
 {
     public static class ItemRandomBonusCacheManager
     {
-        private static readonly Dictionary<int, Dictionary<int, ItemRandomBonusCache>> s_caches = new Dictionary<int, Dictionary<int, ItemRandomBonusCache>>();
+        private static readonly Dictionary<string, ItemRandomBonusCache> s_caches = new Dictionary<string, ItemRandomBonusCache>();
 
-        public static ItemRandomBonusCache GetCaches(this IEquipmentItem item, int randomSeed)
+        public static ItemRandomBonusCache GetCaches(this IEquipmentItem item, int randomSeed, byte version)
         {
-            if (!s_caches.ContainsKey(item.DataId))
-                s_caches.Add(item.DataId, new Dictionary<int, ItemRandomBonusCache>());
-            if (!s_caches[item.DataId].ContainsKey(randomSeed))
-                s_caches[item.DataId].Add(randomSeed, new ItemRandomBonusCache(item, randomSeed));
-            return s_caches[item.DataId][randomSeed];
+            string key = ZString.Concat(item.DataId, '_', randomSeed, '_', version);
+            if (!s_caches.ContainsKey(key))
+                s_caches.Add(key, new ItemRandomBonusCache(item, randomSeed, version));
+            return s_caches[key];
         }
     }
 }

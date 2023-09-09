@@ -89,7 +89,7 @@ namespace MultiplayerARPG
     public delegate void RandomCharacterStatsDelegate(
         System.Random random,
         ItemRandomBonus randomBonus,
-        RandomCharacterStats randomStats,
+        bool isRateStats,
         ref CharacterStats stats,
         ref int appliedAmount);
 

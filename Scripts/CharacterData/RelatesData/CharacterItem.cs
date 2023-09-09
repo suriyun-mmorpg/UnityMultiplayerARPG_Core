@@ -325,7 +325,7 @@ namespace MultiplayerARPG
             if (_recachingBuff)
             {
                 _recachingBuff = false;
-                _cacheBuff.Build(_cacheEquipmentItem, level, randomSeed);
+                _cacheBuff.Build(_cacheEquipmentItem, level, randomSeed, version);
             }
             return _cacheBuff;
         }

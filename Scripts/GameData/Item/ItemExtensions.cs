@@ -102,29 +102,29 @@ namespace MultiplayerARPG
         #endregion
 
         #region Equipment Extension
-        public static CharacterStats GetIncreaseStats<T>(this T equipmentItem, int level, int randomSeed, bool withRandomBonus = true)
+        public static CharacterStats GetIncreaseStats<T>(this T equipmentItem, int level, int randomSeed, byte version, bool withRandomBonus = true)
             where T : IEquipmentItem
         {
             if (equipmentItem == null || !equipmentItem.IsEquipment())
                 return new CharacterStats();
             CharacterStats result = equipmentItem.IncreaseStats.GetCharacterStats(level);
             if (withRandomBonus)
-                result = result + ItemRandomBonusCacheManager.GetCaches(equipmentItem, randomSeed).CharacterStats;
+                result = result + ItemRandomBonusCacheManager.GetCaches(equipmentItem, randomSeed, version).CharacterStats;
             return result;
         }
 
-        public static CharacterStats GetIncreaseStatsRate<T>(this T equipmentItem, int level, int randomSeed, bool withRandomBonus = true)
+        public static CharacterStats GetIncreaseStatsRate<T>(this T equipmentItem, int level, int randomSeed, byte version, bool withRandomBonus = true)
             where T : IEquipmentItem
         {
             if (equipmentItem == null || !equipmentItem.IsEquipment())
                 return new CharacterStats();
             CharacterStats result = equipmentItem.IncreaseStatsRate.GetCharacterStats(level);
             if (withRandomBonus)
-                result = result + ItemRandomBonusCacheManager.GetCaches(equipmentItem, randomSeed).CharacterStatsRate;
+                result = result + ItemRandomBonusCacheManager.GetCaches(equipmentItem, randomSeed, version).CharacterStatsRate;
             return result;
         }
 
-        public static Dictionary<Attribute, float> GetIncreaseAttributes<T>(this T equipmentItem, int level, int randomSeed, Dictionary<Attribute, float> result = null, bool withRandomBonus = true)
+        public static Dictionary<Attribute, float> GetIncreaseAttributes<T>(this T equipmentItem, int level, int randomSeed, byte version, Dictionary<Attribute, float> result = null, bool withRandomBonus = true)
             where T : IEquipmentItem
         {
             if (result == null)
@@ -133,12 +133,12 @@ namespace MultiplayerARPG
             {
                 result = GameDataHelpers.CombineAttributes(equipmentItem.IncreaseAttributes, result, level, 1f);
                 if (withRandomBonus && equipmentItem.RandomBonus.randomAttributeAmounts != null && equipmentItem.RandomBonus.randomAttributeAmounts.Length > 0)
-                    result = GameDataHelpers.CombineAttributes(result, ItemRandomBonusCacheManager.GetCaches(equipmentItem, randomSeed).AttributeAmounts);
+                    result = GameDataHelpers.CombineAttributes(result, ItemRandomBonusCacheManager.GetCaches(equipmentItem, randomSeed, version).AttributeAmounts);
             }
             return result;
         }
 
-        public static Dictionary<Attribute, float> GetIncreaseAttributesRate<T>(this T equipmentItem, int level, int randomSeed, Dictionary<Attribute, float> result = null, bool withRandomBonus = true)
+        public static Dictionary<Attribute, float> GetIncreaseAttributesRate<T>(this T equipmentItem, int level, int randomSeed, byte version, Dictionary<Attribute, float> result = null, bool withRandomBonus = true)
             where T : IEquipmentItem
         {
             if (result == null)
@@ -147,12 +147,12 @@ namespace MultiplayerARPG
             {
                 result = GameDataHelpers.CombineAttributes(equipmentItem.IncreaseAttributesRate, result, level, 1f);
                 if (withRandomBonus && equipmentItem.RandomBonus.randomAttributeAmountRates != null && equipmentItem.RandomBonus.randomAttributeAmountRates.Length > 0)
-                    result = GameDataHelpers.CombineAttributes(result, ItemRandomBonusCacheManager.GetCaches(equipmentItem, randomSeed).AttributeAmountRates);
+                    result = GameDataHelpers.CombineAttributes(result, ItemRandomBonusCacheManager.GetCaches(equipmentItem, randomSeed, version).AttributeAmountRates);
             }
             return result;
         }
 
-        public static Dictionary<DamageElement, float> GetIncreaseResistances<T>(this T equipmentItem, int level, int randomSeed, Dictionary<DamageElement, float> result = null, bool withRandomBonus = true)
+        public static Dictionary<DamageElement, float> GetIncreaseResistances<T>(this T equipmentItem, int level, int randomSeed, byte version, Dictionary<DamageElement, float> result = null, bool withRandomBonus = true)
             where T : IEquipmentItem
         {
             if (result == null)
@@ -161,12 +161,12 @@ namespace MultiplayerARPG
             {
                 result = GameDataHelpers.CombineResistances(equipmentItem.IncreaseResistances, result, level, 1f);
                 if (withRandomBonus && equipmentItem.RandomBonus.randomResistanceAmounts != null && equipmentItem.RandomBonus.randomResistanceAmounts.Length > 0)
-                    result = GameDataHelpers.CombineResistances(result, ItemRandomBonusCacheManager.GetCaches(equipmentItem, randomSeed).ResistanceAmounts);
+                    result = GameDataHelpers.CombineResistances(result, ItemRandomBonusCacheManager.GetCaches(equipmentItem, randomSeed, version).ResistanceAmounts);
             }
             return result;
         }
 
-        public static Dictionary<DamageElement, float> GetIncreaseArmors<T>(this T equipmentItem, int level, int randomSeed, Dictionary<DamageElement, float> result = null, bool withRandomBonus = true)
+        public static Dictionary<DamageElement, float> GetIncreaseArmors<T>(this T equipmentItem, int level, int randomSeed, byte version, Dictionary<DamageElement, float> result = null, bool withRandomBonus = true)
             where T : IEquipmentItem
         {
             if (result == null)
@@ -175,12 +175,12 @@ namespace MultiplayerARPG
             {
                 result = GameDataHelpers.CombineArmors(equipmentItem.IncreaseArmors, result, level, 1f);
                 if (withRandomBonus && equipmentItem.RandomBonus.randomArmorAmounts != null && equipmentItem.RandomBonus.randomArmorAmounts.Length > 0)
-                    result = GameDataHelpers.CombineArmors(result, ItemRandomBonusCacheManager.GetCaches(equipmentItem, randomSeed).ArmorAmounts);
+                    result = GameDataHelpers.CombineArmors(result, ItemRandomBonusCacheManager.GetCaches(equipmentItem, randomSeed, version).ArmorAmounts);
             }
             return result;
         }
 
-        public static Dictionary<DamageElement, MinMaxFloat> GetIncreaseDamages<T>(this T equipmentItem, int level, int randomSeed, Dictionary<DamageElement, MinMaxFloat> result = null, bool withRandomBonus = true)
+        public static Dictionary<DamageElement, MinMaxFloat> GetIncreaseDamages<T>(this T equipmentItem, int level, int randomSeed, byte version, Dictionary<DamageElement, MinMaxFloat> result = null, bool withRandomBonus = true)
             where T : IEquipmentItem
         {
             if (result == null)
@@ -189,12 +189,12 @@ namespace MultiplayerARPG
             {
                 result = GameDataHelpers.CombineDamages(equipmentItem.IncreaseDamages, result, level, 1f);
                 if (withRandomBonus && equipmentItem.RandomBonus.randomDamageAmounts != null && equipmentItem.RandomBonus.randomDamageAmounts.Length > 0)
-                    result = GameDataHelpers.CombineDamages(result, ItemRandomBonusCacheManager.GetCaches(equipmentItem, randomSeed).DamageAmounts);
+                    result = GameDataHelpers.CombineDamages(result, ItemRandomBonusCacheManager.GetCaches(equipmentItem, randomSeed, version).DamageAmounts);
             }
             return result;
         }
 
-        public static Dictionary<BaseSkill, int> GetIncreaseSkills<T>(this T equipmentItem, int level, int randomSeed, Dictionary<BaseSkill, int> result = null, bool withRandomBonus = true)
+        public static Dictionary<BaseSkill, int> GetIncreaseSkills<T>(this T equipmentItem, int level, int randomSeed, byte version, Dictionary<BaseSkill, int> result = null, bool withRandomBonus = true)
             where T : IEquipmentItem
         {
             if (result == null)
@@ -203,7 +203,7 @@ namespace MultiplayerARPG
             {
                 result = GameDataHelpers.CombineSkills(equipmentItem.IncreaseSkills, result, level, 1f);
                 if (withRandomBonus && equipmentItem.RandomBonus.randomSkillLevels != null && equipmentItem.RandomBonus.randomSkillLevels.Length > 0)
-                    result = GameDataHelpers.CombineSkills(result, ItemRandomBonusCacheManager.GetCaches(equipmentItem, randomSeed).SkillLevels);
+                    result = GameDataHelpers.CombineSkills(result, ItemRandomBonusCacheManager.GetCaches(equipmentItem, randomSeed, version).SkillLevels);
             }
             return result;
         }

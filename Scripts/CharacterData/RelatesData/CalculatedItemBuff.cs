@@ -21,9 +21,9 @@ namespace MultiplayerARPG
 
         }
 
-        public CalculatedItemBuff(IEquipmentItem item, int level, int randomSeed)
+        public CalculatedItemBuff(IEquipmentItem item, int level, int randomSeed, byte version)
         {
-            Build(item, level, randomSeed);
+            Build(item, level, randomSeed, version);
         }
 
         ~CalculatedItemBuff()
@@ -42,7 +42,7 @@ namespace MultiplayerARPG
             _cacheIncreaseSkills = null;
         }
 
-        public void Build(IEquipmentItem item, int level, int randomSeed)
+        public void Build(IEquipmentItem item, int level, int randomSeed, byte version)
         {
             _item = item;
             _level = level;
@@ -60,14 +60,14 @@ namespace MultiplayerARPG
             if (item == null || !item.IsEquipment())
                 return;
 
-            _cacheIncreaseStats = item.GetIncreaseStats(level, randomSeed);
-            _cacheIncreaseStatsRate = item.GetIncreaseStatsRate(level, randomSeed);
-            item.GetIncreaseAttributes(level, randomSeed, _cacheIncreaseAttributes);
-            item.GetIncreaseAttributesRate(level, randomSeed, _cacheIncreaseAttributesRate);
-            item.GetIncreaseResistances(level, randomSeed, _cacheIncreaseResistances);
-            item.GetIncreaseArmors(level, randomSeed, _cacheIncreaseArmors);
-            item.GetIncreaseDamages(level, randomSeed, _cacheIncreaseDamages);
-            item.GetIncreaseSkills(level, randomSeed, _cacheIncreaseSkills);
+            _cacheIncreaseStats = item.GetIncreaseStats(level, randomSeed, version);
+            _cacheIncreaseStatsRate = item.GetIncreaseStatsRate(level, randomSeed, version);
+            item.GetIncreaseAttributes(level, randomSeed, version, _cacheIncreaseAttributes);
+            item.GetIncreaseAttributesRate(level, randomSeed, version, _cacheIncreaseAttributesRate);
+            item.GetIncreaseResistances(level, randomSeed, version, _cacheIncreaseResistances);
+            item.GetIncreaseArmors(level, randomSeed, version, _cacheIncreaseArmors);
+            item.GetIncreaseDamages(level, randomSeed, version, _cacheIncreaseDamages);
+            item.GetIncreaseSkills(level, randomSeed, version, _cacheIncreaseSkills);
         }
 
         public IEquipmentItem GetItem()

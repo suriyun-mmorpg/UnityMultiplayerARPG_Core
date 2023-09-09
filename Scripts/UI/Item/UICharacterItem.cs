@@ -706,7 +706,7 @@ namespace MultiplayerARPG
             {
                 CharacterStats stats = new CharacterStats();
                 if (EquipmentItem != null)
-                    stats += EquipmentItem.GetIncreaseStats(Level, CharacterItem.randomSeed, withRandomBonus: !dontCalculateRandomBonus);
+                    stats += EquipmentItem.GetIncreaseStats(Level, CharacterItem.randomSeed, CharacterItem.version, withRandomBonus: !dontCalculateRandomBonus);
                 else if (SocketEnhancerItem != null)
                     stats += SocketEnhancerItem.SocketEnhanceEffect.stats;
 
@@ -728,7 +728,7 @@ namespace MultiplayerARPG
             {
                 CharacterStats statsRate = new CharacterStats();
                 if (EquipmentItem != null)
-                    statsRate += EquipmentItem.GetIncreaseStatsRate(Level, CharacterItem.randomSeed, withRandomBonus: !dontCalculateRandomBonus);
+                    statsRate += EquipmentItem.GetIncreaseStatsRate(Level, CharacterItem.randomSeed, CharacterItem.version, withRandomBonus: !dontCalculateRandomBonus);
                 else if (SocketEnhancerItem != null)
                     statsRate += SocketEnhancerItem.SocketEnhanceEffect.statsRate;
 
@@ -750,7 +750,7 @@ namespace MultiplayerARPG
             {
                 Dictionary<Attribute, float> attributes = null;
                 if (EquipmentItem != null)
-                    attributes = EquipmentItem.GetIncreaseAttributes(Level, CharacterItem.randomSeed, withRandomBonus: !dontCalculateRandomBonus);
+                    attributes = EquipmentItem.GetIncreaseAttributes(Level, CharacterItem.randomSeed, CharacterItem.version, withRandomBonus: !dontCalculateRandomBonus);
                 else if (SocketEnhancerItem != null)
                     attributes = GameDataHelpers.CombineAttributes(SocketEnhancerItem.SocketEnhanceEffect.attributes, attributes, 1f);
 
@@ -772,7 +772,7 @@ namespace MultiplayerARPG
             {
                 Dictionary<Attribute, float> attributesRate = null;
                 if (EquipmentItem != null)
-                    attributesRate = EquipmentItem.GetIncreaseAttributesRate(Level, CharacterItem.randomSeed, withRandomBonus: !dontCalculateRandomBonus);
+                    attributesRate = EquipmentItem.GetIncreaseAttributesRate(Level, CharacterItem.randomSeed, CharacterItem.version, withRandomBonus: !dontCalculateRandomBonus);
                 else if (SocketEnhancerItem != null)
                     attributesRate = GameDataHelpers.CombineAttributes(SocketEnhancerItem.SocketEnhanceEffect.attributesRate, attributesRate, 1f);
 
@@ -794,7 +794,7 @@ namespace MultiplayerARPG
             {
                 Dictionary<DamageElement, float> resistances = null;
                 if (EquipmentItem != null)
-                    resistances = EquipmentItem.GetIncreaseResistances(Level, CharacterItem.randomSeed, withRandomBonus: !dontCalculateRandomBonus);
+                    resistances = EquipmentItem.GetIncreaseResistances(Level, CharacterItem.randomSeed, CharacterItem.version, withRandomBonus: !dontCalculateRandomBonus);
                 else if (SocketEnhancerItem != null)
                     resistances = GameDataHelpers.CombineResistances(SocketEnhancerItem.SocketEnhanceEffect.resistances, resistances, 1f);
 
@@ -815,7 +815,7 @@ namespace MultiplayerARPG
             {
                 Dictionary<DamageElement, float> armors = null;
                 if (EquipmentItem != null)
-                    armors = EquipmentItem.GetIncreaseArmors(Level, CharacterItem.randomSeed, withRandomBonus: !dontCalculateRandomBonus);
+                    armors = EquipmentItem.GetIncreaseArmors(Level, CharacterItem.randomSeed, CharacterItem.version, withRandomBonus: !dontCalculateRandomBonus);
                 else if (SocketEnhancerItem != null)
                     armors = GameDataHelpers.CombineArmors(SocketEnhancerItem.SocketEnhanceEffect.armors, armors, 1f);
 
@@ -836,7 +836,7 @@ namespace MultiplayerARPG
             {
                 Dictionary<DamageElement, MinMaxFloat> damageAmounts = null;
                 if (EquipmentItem != null)
-                    damageAmounts = EquipmentItem.GetIncreaseDamages(Level, CharacterItem.randomSeed, withRandomBonus: !dontCalculateRandomBonus);
+                    damageAmounts = EquipmentItem.GetIncreaseDamages(Level, CharacterItem.randomSeed, CharacterItem.version, withRandomBonus: !dontCalculateRandomBonus);
                 else if (SocketEnhancerItem != null)
                     damageAmounts = GameDataHelpers.CombineDamages(SocketEnhancerItem.SocketEnhanceEffect.damages, damageAmounts, 1f);
 
@@ -857,7 +857,7 @@ namespace MultiplayerARPG
             {
                 Dictionary<BaseSkill, int> skillLevels = null;
                 if (EquipmentItem != null)
-                    skillLevels = EquipmentItem.GetIncreaseSkills(Level, CharacterItem.randomSeed, withRandomBonus: !dontCalculateRandomBonus);
+                    skillLevels = EquipmentItem.GetIncreaseSkills(Level, CharacterItem.randomSeed, CharacterItem.version, withRandomBonus: !dontCalculateRandomBonus);
                 else if (SocketEnhancerItem != null)
                     skillLevels = GameDataHelpers.CombineSkills(SocketEnhancerItem.SocketEnhanceEffect.skills, skillLevels, 1f);
 
