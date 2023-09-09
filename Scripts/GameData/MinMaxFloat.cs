@@ -20,6 +20,22 @@ public struct MinMaxFloat
         return result;
     }
 
+    public static MinMaxFloat operator *(MinMaxFloat a, MinMaxFloat b)
+    {
+        MinMaxFloat result = new MinMaxFloat();
+        result.min = a.min * b.min;
+        result.max = a.max * b.max;
+        return result;
+    }
+
+    public static MinMaxFloat operator /(MinMaxFloat a, MinMaxFloat b)
+    {
+        MinMaxFloat result = new MinMaxFloat();
+        result.min = a.min / b.min;
+        result.max = a.max / b.max;
+        return result;
+    }
+
     public static MinMaxFloat operator +(MinMaxFloat a, float amount)
     {
         MinMaxFloat result = new MinMaxFloat();
