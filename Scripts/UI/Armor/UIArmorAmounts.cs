@@ -6,9 +6,17 @@ namespace MultiplayerARPG
 {
     public partial class UIArmorAmounts : UISelectionEntry<Dictionary<DamageElement, float>>
     {
+        public enum DisplayType
+        {
+            Simple,
+            Rate,
+        }
+
         [Header("String Formats")]
         [Tooltip("Format => {0} = {Armor Title}, {1} = {Amount}")]
-        public UILocaleKeySetting formatKeyAmount = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_ARMOR_AMOUNT);
+        public UILocaleKeySetting formatKeySimpleAmount = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_ARMOR_AMOUNT);
+        [Tooltip("Format => {0} = {Armor Title}, {1} = {Amount * 100}")]
+        public UILocaleKeySetting formatKeyRateAmount = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_ARMOR_AMOUNT_RATE);
 
         [Header("UI Elements")]
         public TextWrapper uiTextAllAmounts;
@@ -19,6 +27,9 @@ namespace MultiplayerARPG
         public Transform uiListContainer;
 
         [Header("Options")]
+        public DisplayType displayType;
+        public string numberFormatSimple = "N0";
+        public string numberFormatRate = "N2";
         public bool isBonus;
         public bool inactiveIfAmountZero;
 
@@ -76,7 +87,7 @@ namespace MultiplayerARPG
             {
                 using (Utf16ValueStringBuilder tempAllText = ZString.CreateStringBuilder(false))
                 {
-                    DamageElement tempElement;
+                    DamageElement tempData;
                     float tempAmount;
                     string tempValue;
                     string tempAmountText;
@@ -86,17 +97,32 @@ namespace MultiplayerARPG
                         if (dataEntry.Key == null)
                             continue;
                         // Set temp data
-                        tempElement = dataEntry.Key;
+                        tempData = dataEntry.Key;
                         tempAmount = dataEntry.Value;
-                        // Set current elemental armor text
-                        if (isBonus)
-                            tempValue = tempAmount.ToBonusString("N0");
-                        else
-                            tempValue = tempAmount.ToString("N0");
-                        tempAmountText = ZString.Format(
-                            LanguageManager.GetText(formatKeyAmount),
-                            tempElement.Title,
-                            tempValue);
+                        // Use difference format by option
+                        switch (displayType)
+                        {
+                            case DisplayType.Rate:
+                                if (isBonus)
+                                    tempValue = (tempAmount * 100).ToBonusString(numberFormatRate);
+                                else
+                                    tempValue = (tempAmount * 100).ToString(numberFormatRate);
+                                tempAmountText = ZString.Format(
+                                    LanguageManager.GetText(formatKeyRateAmount),
+                                    tempData.Title,
+                                    tempValue);
+                                break;
+                            default:
+                                if (isBonus)
+                                    tempValue = tempAmount.ToBonusString(numberFormatSimple);
+                                else
+                                    tempValue = tempAmount.ToString(numberFormatSimple);
+                                tempAmountText = ZString.Format(
+                                    LanguageManager.GetText(formatKeySimpleAmount),
+                                    tempData.Title,
+                                    tempValue);
+                                break;
+                        }
                         // Append current elemental armor text
                         if (dataEntry.Value != 0)
                         {
@@ -127,10 +153,21 @@ namespace MultiplayerARPG
         private void SetDefaultValue(UIArmorTextPair componentPair)
         {
             DamageElement tempElement = componentPair.damageElement == null ? GameInstance.Singleton.DefaultDamageElement : componentPair.damageElement;
-            componentPair.uiText.text = ZString.Format(
-                    LanguageManager.GetText(formatKeyAmount),
-                    tempElement.Title,
-                    isBonus ? 0f.ToBonusString("N0") : "0");
+            switch (displayType)
+            {
+                case DisplayType.Rate:
+                    componentPair.uiText.text = ZString.Format(
+                        LanguageManager.GetText(formatKeyRateAmount),
+                        tempElement.Title,
+                        isBonus ? 0f.ToBonusString(numberFormatRate) : 0f.ToString(numberFormatRate));
+                    break;
+                case DisplayType.Simple:
+                    componentPair.uiText.text = ZString.Format(
+                        LanguageManager.GetText(formatKeySimpleAmount),
+                        tempElement.Title,
+                        isBonus ? 0f.ToBonusString(numberFormatSimple) : "0");
+                    break;
+            }
             if (componentPair.imageIcon != null)
                 componentPair.imageIcon.sprite = tempElement.Icon;
             if (inactiveIfAmountZero && componentPair.root != null)

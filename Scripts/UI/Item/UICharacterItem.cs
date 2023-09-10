@@ -105,8 +105,10 @@ namespace MultiplayerARPG
         public UIAttributeAmounts uiIncreaseAttributesRate;
         public UIResistanceAmounts uiIncreaseResistances;
         public UIArmorAmounts uiIncreaseArmors;
+        public UIArmorAmounts uiIncreaseArmorsRate;
         [FormerlySerializedAs("uiIncreaseDamageAmounts")]
         public UIDamageElementAmounts uiIncreaseDamages;
+        public UIDamageElementAmounts uiIncreaseDamagesRate;
         public UISkillLevels uiIncreaseSkillLevels;
         public UIEquipmentSet uiEquipmentSet;
         public UIEquipmentSockets uiEquipmentSockets;
@@ -826,9 +828,32 @@ namespace MultiplayerARPG
                 }
                 else
                 {
+                    uiIncreaseArmors.displayType = UIArmorAmounts.DisplayType.Simple;
                     uiIncreaseArmors.isBonus = true;
                     uiIncreaseArmors.Show();
                     uiIncreaseArmors.Data = armors;
+                }
+            }
+
+            if (uiIncreaseArmorsRate != null)
+            {
+                Dictionary<DamageElement, float> armorsRate = null;
+                if (EquipmentItem != null)
+                    armorsRate = EquipmentItem.GetIncreaseArmorsRate(Level, CharacterItem.randomSeed, CharacterItem.version, withRandomBonus: !dontCalculateRandomBonus);
+                else if (SocketEnhancerItem != null)
+                    armorsRate = GameDataHelpers.CombineArmors(SocketEnhancerItem.SocketEnhanceEffect.armorsRate, armorsRate, 1f);
+
+                if (armorsRate == null || armorsRate.Count == 0)
+                {
+                    // Hide ui if armors is empty
+                    uiIncreaseArmorsRate.Hide();
+                }
+                else
+                {
+                    uiIncreaseArmorsRate.displayType = UIArmorAmounts.DisplayType.Rate;
+                    uiIncreaseArmorsRate.isBonus = true;
+                    uiIncreaseArmorsRate.Show();
+                    uiIncreaseArmorsRate.Data = armorsRate;
                 }
             }
 
@@ -847,9 +872,32 @@ namespace MultiplayerARPG
                 }
                 else
                 {
+                    uiIncreaseDamages.displayType = UIDamageElementAmounts.DisplayType.Simple;
                     uiIncreaseDamages.isBonus = true;
                     uiIncreaseDamages.Show();
                     uiIncreaseDamages.Data = damageAmounts;
+                }
+            }
+
+            if (uiIncreaseDamagesRate != null)
+            {
+                Dictionary<DamageElement, MinMaxFloat> damageAmountsRate = null;
+                if (EquipmentItem != null)
+                    damageAmountsRate = EquipmentItem.GetIncreaseDamagesRate(Level, CharacterItem.randomSeed, CharacterItem.version, withRandomBonus: !dontCalculateRandomBonus);
+                else if (SocketEnhancerItem != null)
+                    damageAmountsRate = GameDataHelpers.CombineDamages(SocketEnhancerItem.SocketEnhanceEffect.damagesRate, damageAmountsRate, 1f);
+
+                if (damageAmountsRate == null || damageAmountsRate.Count == 0)
+                {
+                    // Hide ui if damage amounts is empty
+                    uiIncreaseDamagesRate.Hide();
+                }
+                else
+                {
+                    uiIncreaseDamages.displayType = UIDamageElementAmounts.DisplayType.Rate;
+                    uiIncreaseDamagesRate.isBonus = true;
+                    uiIncreaseDamagesRate.Show();
+                    uiIncreaseDamagesRate.Data = damageAmountsRate;
                 }
             }
 
