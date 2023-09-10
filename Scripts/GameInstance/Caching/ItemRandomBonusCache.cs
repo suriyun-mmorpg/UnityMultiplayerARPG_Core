@@ -126,7 +126,7 @@ namespace MultiplayerARPG
                 for (int i = 0; i < _randomBonus.randomDamageAmounts.Length; ++i)
                 {
                     if (!_randomBonus.randomDamageAmounts[i].Apply(random)) continue;
-                    DamageAmounts = GameDataHelpers.CombineDamages(DamageAmounts, _randomBonus.randomDamageAmounts[i].GetRandomedAmount(random).ToKeyValuePair(1f, 1f));
+                    DamageAmounts = GameDataHelpers.CombineDamages(DamageAmounts, _randomBonus.randomDamageAmounts[i].GetRandomedAmount(random).ToKeyValuePair(1f));
                     _appliedAmount++;
                     if (IsReachedMaxRandomStatsAmount())
                         return;

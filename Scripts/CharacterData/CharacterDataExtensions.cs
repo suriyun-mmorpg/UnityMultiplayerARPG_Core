@@ -782,23 +782,6 @@ namespace MultiplayerARPG
             return weaponItem.WeaponType.DamageInfo;
         }
 
-        public static KeyValuePair<DamageElement, MinMaxFloat> GetWeaponDamages(this ICharacterData data, ref bool isLeftHand)
-        {
-            if (data is BaseMonsterCharacterEntity monsterCharacterEntity)
-            {
-                isLeftHand = false;
-                return monsterCharacterEntity.CharacterDatabase.DamageAmount.ToKeyValuePair(monsterCharacterEntity.Level, 1f, 0f);
-            }
-            return data.GetAvailableWeapon(ref isLeftHand).GetDamageAmount(data);
-        }
-
-        public static KeyValuePair<DamageElement, MinMaxFloat> GetWeaponDamages(this ICharacterData data, CharacterItem weapon)
-        {
-            if (data is BaseMonsterCharacterEntity monsterCharacterEntity)
-                return monsterCharacterEntity.CharacterDatabase.DamageAmount.ToKeyValuePair(monsterCharacterEntity.Level, 1f, 0f);
-            return weapon.GetDamageAmount(data);
-        }
-
         public static float GetMoveSpeedRateWhileReloading(this ICharacterData data, IWeaponItem weaponItem)
         {
             if (data is BaseMonsterCharacterEntity)
@@ -862,7 +845,7 @@ namespace MultiplayerARPG
         {
             gameMessage = UITextKeys.NONE;
             Dictionary<Attribute, float> tempAttributeAmounts = new Dictionary<Attribute, float>();
-            data.GetBuffs(sumWithEquipments, false, true, onGetAttributes: (attributeAmounts) => tempAttributeAmounts = attributeAmounts);
+            data.GetAllStats(sumWithEquipments, false, true, onGetAttributes: attributeAmounts => tempAttributeAmounts = attributeAmounts);
             currentAttributeAmounts = tempAttributeAmounts;
             foreach (Attribute requireAttribute in requiredAttributeAmounts.Keys)
             {
@@ -880,7 +863,7 @@ namespace MultiplayerARPG
         {
             gameMessage = UITextKeys.NONE;
             Dictionary<BaseSkill, int> tempSkillLevels = new Dictionary<BaseSkill, int>();
-            data.GetBuffs(sumWithEquipments, false, true, onGetSkills: (skillLevels) => tempSkillLevels = skillLevels);
+            data.GetAllStats(sumWithEquipments, false, true, onGetSkills: skillLevels => tempSkillLevels = skillLevels);
             currentSkillLevels = tempSkillLevels;
             foreach (BaseSkill requireSkill in requiredSkillLevels.Keys)
             {
@@ -1055,43 +1038,6 @@ namespace MultiplayerARPG
                     return i;
             }
             return -1;
-        }
-
-        public static void GetAllStats(this ICharacterData data,
-            ref CharacterStats resultStats,
-            Dictionary<Attribute, float> resultAttributes,
-            Dictionary<DamageElement, float> resultResistances,
-            Dictionary<DamageElement, float> resultArmors,
-            Dictionary<DamageElement, MinMaxFloat> resultIncreaseDamages,
-            Dictionary<BaseSkill, int> resultSkills,
-            Dictionary<EquipmentSet, int> resultEquipmentSets,
-            bool combine)
-        {
-            if (!combine)
-            {
-                resultStats = new CharacterStats();
-                resultSkills.Clear();
-                resultAttributes.Clear();
-                resultResistances.Clear();
-                resultArmors.Clear();
-                resultIncreaseDamages.Clear();
-                resultEquipmentSets.Clear();
-            }
-            // Set results values
-            resultSkills = GameDataHelpers.CombineSkills(resultSkills, data.GetSkills(true));
-            resultAttributes = GameDataHelpers.CombineAttributes(resultAttributes, data.GetAttributes(true, true, resultSkills));
-            // Prepare equipment set bonus
-            data.GetEquipmentSetBonus(ref resultStats, resultAttributes, resultResistances, resultArmors, resultIncreaseDamages, resultSkills, resultEquipmentSets, true);
-            // Validate max amount
-            foreach (Attribute attribute in new List<Attribute>(resultAttributes.Keys))
-            {
-                if (attribute.maxAmount > 0 && resultAttributes[attribute] > attribute.maxAmount)
-                    resultAttributes[attribute] = attribute.maxAmount;
-            }
-            resultResistances = GameDataHelpers.CombineResistances(resultResistances, data.GetResistances(true, true, resultAttributes, resultSkills));
-            resultArmors = GameDataHelpers.CombineArmors(resultArmors, data.GetArmors(true, true, resultAttributes, resultSkills));
-            resultIncreaseDamages = GameDataHelpers.CombineDamages(resultIncreaseDamages, data.GetIncreaseDamages(true, true, resultAttributes, resultSkills));
-            resultStats = resultStats + data.GetStats(true, true, resultSkills);
         }
 
         public static void ApplyStatusEffect(this IEnumerable<StatusEffectApplying> statusEffects, int level, EntityInfo applier, CharacterItem weapon, BaseCharacterEntity target)

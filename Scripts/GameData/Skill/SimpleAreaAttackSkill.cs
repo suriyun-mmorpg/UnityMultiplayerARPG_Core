@@ -78,9 +78,11 @@ namespace MultiplayerARPG
             switch (skillAttackType)
             {
                 case SkillAttackType.Normal:
-                    return damageAmount.ToKeyValuePair(skillLevel, 1f, GetEffectivenessDamage(skillUser));
+                    return GameDataHelpers.GetDamageWithEffectiveness(CacheEffectivenessAttributes, skillUser.GetCaches().Attributes, damageAmount.ToKeyValuePair(skillLevel, 1f));
                 case SkillAttackType.BasedOnWeapon:
-                    return skillUser.GetWeaponDamages(ref isLeftHand);
+                    if (isLeftHand && skillUser.GetCaches().LeftHandWeaponDamage.HasValue)
+                        return skillUser.GetCaches().LeftHandWeaponDamage.Value;
+                    return skillUser.GetCaches().RightHandWeaponDamage.Value;
             }
             return new KeyValuePair<DamageElement, MinMaxFloat>();
         }
@@ -108,11 +110,6 @@ namespace MultiplayerARPG
         public override IncrementalMinMaxFloat HarvestDamageAmount
         {
             get { return harvestDamageAmount; }
-        }
-
-        protected float GetEffectivenessDamage(ICharacterData skillUser)
-        {
-            return GameDataHelpers.GetEffectivenessDamage(CacheEffectivenessAttributes, skillUser);
         }
 
         public override bool IsAttack

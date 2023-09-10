@@ -12,19 +12,17 @@ namespace MultiplayerARPG
         /// <param name="resultDictionary"></param>
         /// <param name="newEntry"></param>
         /// <returns></returns>
-        public static Dictionary<DamageElement, MinMaxFloat> CombineDamages(Dictionary<DamageElement, MinMaxFloat> resultDictionary, KeyValuePair<DamageElement, MinMaxFloat> newEntry, float valueRate = 1f)
+        public static Dictionary<DamageElement, MinMaxFloat> CombineDamages(Dictionary<DamageElement, MinMaxFloat> resultDictionary, KeyValuePair<DamageElement, MinMaxFloat> newEntry)
         {
             if (resultDictionary == null)
                 resultDictionary = new Dictionary<DamageElement, MinMaxFloat>();
-            if (valueRate == 0f)
-                return resultDictionary;
             DamageElement damageElement = newEntry.Key;
             if (damageElement == null)
                 damageElement = GameInstance.Singleton.DefaultDamageElement;
             if (!resultDictionary.ContainsKey(damageElement))
-                resultDictionary[damageElement] = newEntry.Value * valueRate;
+                resultDictionary[damageElement] = newEntry.Value;
             else
-                resultDictionary[damageElement] += newEntry.Value * valueRate;
+                resultDictionary[damageElement] += newEntry.Value;
             return resultDictionary;
         }
 
@@ -49,7 +47,7 @@ namespace MultiplayerARPG
         /// <param name="resultDictionary"></param>
         /// <param name="newEntry"></param>
         /// <returns></returns>
-        public static Dictionary<DamageElement, float> CombineDamageInflictions(Dictionary<DamageElement, float> resultDictionary, KeyValuePair<DamageElement, float> newEntry, float valueRate = 1f)
+        public static Dictionary<DamageElement, float> CombineDamageInflictions(Dictionary<DamageElement, float> resultDictionary, KeyValuePair<DamageElement, float> newEntry)
         {
             if (resultDictionary == null)
                 resultDictionary = new Dictionary<DamageElement, float>();
@@ -57,9 +55,9 @@ namespace MultiplayerARPG
             if (damageElement == null)
                 damageElement = GameInstance.Singleton.DefaultDamageElement;
             if (!resultDictionary.ContainsKey(damageElement))
-                resultDictionary[damageElement] = newEntry.Value * valueRate;
+                resultDictionary[damageElement] = newEntry.Value;
             else
-                resultDictionary[damageElement] += newEntry.Value * valueRate;
+                resultDictionary[damageElement] += newEntry.Value;
             return resultDictionary;
         }
 
@@ -69,18 +67,16 @@ namespace MultiplayerARPG
         /// <param name="resultDictionary"></param>
         /// <param name="newEntry"></param>
         /// <returns></returns>
-        public static Dictionary<Attribute, float> CombineAttributes(Dictionary<Attribute, float> resultDictionary, KeyValuePair<Attribute, float> newEntry, float valueRate = 1f)
+        public static Dictionary<Attribute, float> CombineAttributes(Dictionary<Attribute, float> resultDictionary, KeyValuePair<Attribute, float> newEntry)
         {
             if (resultDictionary == null)
                 resultDictionary = new Dictionary<Attribute, float>();
-            if (valueRate == 0f)
-                return resultDictionary;
             if (newEntry.Key == null)
                 return resultDictionary;
             if (!resultDictionary.ContainsKey(newEntry.Key))
-                resultDictionary[newEntry.Key] = newEntry.Value * valueRate;
+                resultDictionary[newEntry.Key] = newEntry.Value;
             else
-                resultDictionary[newEntry.Key] += newEntry.Value * valueRate;
+                resultDictionary[newEntry.Key] += newEntry.Value;
             return resultDictionary;
         }
 
@@ -145,18 +141,16 @@ namespace MultiplayerARPG
         /// <param name="resultDictionary"></param>
         /// <param name="newEntry"></param>
         /// <returns></returns>
-        public static Dictionary<DamageElement, float> CombineArmors(Dictionary<DamageElement, float> resultDictionary, KeyValuePair<DamageElement, float> newEntry, float valueRate = 1f)
+        public static Dictionary<DamageElement, float> CombineArmors(Dictionary<DamageElement, float> resultDictionary, KeyValuePair<DamageElement, float> newEntry)
         {
             if (resultDictionary == null)
                 resultDictionary = new Dictionary<DamageElement, float>();
-            if (valueRate == 0f)
-                return resultDictionary;
             if (newEntry.Key == null)
                 return resultDictionary;
             if (!resultDictionary.ContainsKey(newEntry.Key))
-                resultDictionary[newEntry.Key] = newEntry.Value * valueRate;
+                resultDictionary[newEntry.Key] = newEntry.Value;
             else
-                resultDictionary[newEntry.Key] += newEntry.Value * valueRate;
+                resultDictionary[newEntry.Key] += newEntry.Value;
             return resultDictionary;
         }
 
@@ -1045,6 +1039,15 @@ namespace MultiplayerARPG
                     damageEffectiveness += effectivenessAttributes[attribute] * characterAttributes[attribute];
             }
             return damageEffectiveness;
+        }
+
+        public static KeyValuePair<DamageElement, MinMaxFloat> GetDamageWithEffectiveness(Dictionary<Attribute, float> effectivenessAttributes, Dictionary<Attribute, float> characterAttributes, KeyValuePair<DamageElement, MinMaxFloat> pureDamage)
+        {
+            float damageEffectiveness = GetEffectivenessDamage(effectivenessAttributes, characterAttributes);
+            DamageElement damageElement = pureDamage.Key;
+            if (damageElement == null)
+                damageElement = GameInstance.Singleton.DefaultDamageElement;
+            return new KeyValuePair<DamageElement, MinMaxFloat>(damageElement, pureDamage.Value + damageEffectiveness);
         }
 
         public static CharacterStats GetStatsFromAttributes(Dictionary<Attribute, float> attributeAmounts)

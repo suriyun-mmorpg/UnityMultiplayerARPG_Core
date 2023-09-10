@@ -407,18 +407,8 @@ namespace MultiplayerARPG
                 }
             }
 
-            // Check is it pass attribute requirement or not
-            Dictionary<Attribute, float> currentAttributeAmounts = character.GetAttributes(true, false, character.GetSkills(true));
-            Dictionary<Attribute, float> requireAttributeAmounts = item.RequireAttributeAmounts;
-            foreach (KeyValuePair<Attribute, float> requireAttributeAmount in requireAttributeAmounts)
-            {
-                if (!currentAttributeAmounts.ContainsKey(requireAttributeAmount.Key) ||
-                    currentAttributeAmounts[requireAttributeAmount.Key] < requireAttributeAmount.Value)
-                {
-                    gameMessage = UITextKeys.UI_ERROR_NOT_ENOUGH_ATTRIBUTE_AMOUNTS;
-                    return false;
-                }
-            }
+            if (!character.HasEnoughAttributeAmounts(item.RequireAttributeAmounts, true, out gameMessage, out _))
+                return false;
 
             return true;
         }

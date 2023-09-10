@@ -134,7 +134,12 @@ namespace MultiplayerARPG
             // Prepare required data and get damages data
             IWeaponItem weaponItem = weapon.GetWeaponItem();
             DamageInfo damageInfo = Entity.GetWeaponDamageInfo(weaponItem);
-            Dictionary<DamageElement, MinMaxFloat> damageAmounts = Entity.GetWeaponDamagesWithBuffs(weapon);
+            Dictionary<DamageElement, MinMaxFloat> damageAmounts;
+            if (isLeftHand && Entity.GetCaches().LeftHandDamages != null)
+                damageAmounts = Entity.GetCaches().LeftHandDamages;
+            else
+                damageAmounts = Entity.GetCaches().RightHandDamages;
+
 
             // Calculate move speed rate while doing action at clients and server
             MoveSpeedRateWhileAttacking = Entity.GetMoveSpeedRateWhileAttacking(weaponItem);
@@ -371,7 +376,11 @@ namespace MultiplayerARPG
             bool isLeftHand = _simulateState.Value.IsLeftHand;
             CharacterItem weapon = Entity.GetAvailableWeapon(ref isLeftHand);
             DamageInfo damageInfo = Entity.GetWeaponDamageInfo(weapon.GetWeaponItem());
-            Dictionary<DamageElement, MinMaxFloat> damageAmounts = Entity.GetWeaponDamagesWithBuffs(weapon);
+            Dictionary<DamageElement, MinMaxFloat> damageAmounts;
+            if (isLeftHand && Entity.GetCaches().LeftHandDamages != null)
+                damageAmounts = Entity.GetCaches().LeftHandDamages;
+            else
+                damageAmounts = Entity.GetCaches().RightHandDamages;
             ApplyAttack(isLeftHand, weapon, data.simulateSeed, data.triggerIndex, damageInfo, damageAmounts, data.aimPosition);
         }
 

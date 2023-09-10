@@ -47,7 +47,12 @@ namespace MultiplayerARPG
         private WeaponType weaponType = null;
         public WeaponType WeaponType
         {
-            get { return weaponType; }
+            get
+            {
+                if (weaponType == null && GameInstance.Singleton != null)
+                    weaponType = GameInstance.Singleton.DefaultWeaponType;
+                return weaponType;
+            }
             set { weaponType = value; }
         }
 

@@ -892,17 +892,6 @@ namespace MultiplayerARPG
             animActionType = isLeftHand ? AnimActionType.AttackLeftHand : AnimActionType.AttackRightHand;
         }
 
-        public Dictionary<DamageElement, MinMaxFloat> GetWeaponDamagesWithBuffs(CharacterItem weapon)
-        {
-            Dictionary<DamageElement, MinMaxFloat> damageAmounts = new Dictionary<DamageElement, MinMaxFloat>();
-            // Calculate all damages
-            damageAmounts = GameDataHelpers.CombineDamages(damageAmounts, this.GetWeaponDamages(weapon));
-            // Sum damage with buffs
-            damageAmounts = GameDataHelpers.CombineDamages(damageAmounts, CachedData.IncreaseDamages);
-
-            return damageAmounts;
-        }
-
         public bool ValidateAmmo(CharacterItem weapon, int amount, bool validIfNoRequireAmmoType = true)
         {
             // Avoid null data

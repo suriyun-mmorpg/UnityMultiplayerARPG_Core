@@ -96,7 +96,7 @@ namespace MultiplayerARPG
                 IPlayerCharacterData character = GameInstance.PlayingCharacter;
                 Dictionary<Attribute, float> currentAttributeAmounts = new Dictionary<Attribute, float>();
                 if (character != null)
-                    currentAttributeAmounts = character.GetAttributes(includeEquipmentsForCurrentAmounts, includeBuffsForCurrentAmounts, includeSkillsForCurrentAmounts ? character.GetSkills(includeEquipmentsForCurrentAmounts) : null);
+                    character.GetAllStats(includeEquipmentsForCurrentAmounts, includeBuffsForCurrentAmounts, includeSkillsForCurrentAmounts, onGetAttributes: attributes => currentAttributeAmounts = attributes);
                 // In-loop temp data
                 using (Utf16ValueStringBuilder tempAllText = ZString.CreateStringBuilder(false))
                 {
