@@ -13,7 +13,9 @@ namespace MultiplayerARPG
         private Dictionary<Attribute, float> _cacheIncreaseAttributesRate = new Dictionary<Attribute, float>();
         private Dictionary<DamageElement, float> _cacheIncreaseResistances = new Dictionary<DamageElement, float>();
         private Dictionary<DamageElement, float> _cacheIncreaseArmors = new Dictionary<DamageElement, float>();
+        private Dictionary<DamageElement, float> _cacheIncreaseArmorsRate = new Dictionary<DamageElement, float>();
         private Dictionary<DamageElement, MinMaxFloat> _cacheIncreaseDamages = new Dictionary<DamageElement, MinMaxFloat>();
+        private Dictionary<DamageElement, MinMaxFloat> _cacheIncreaseDamagesRate = new Dictionary<DamageElement, MinMaxFloat>();
         private Dictionary<BaseSkill, int> _cacheIncreaseSkills = new Dictionary<BaseSkill, int>();
 
         public CalculatedItemBuff()
@@ -36,8 +38,12 @@ namespace MultiplayerARPG
             _cacheIncreaseResistances = null;
             _cacheIncreaseArmors.Clear();
             _cacheIncreaseArmors = null;
+            _cacheIncreaseArmorsRate.Clear();
+            _cacheIncreaseArmorsRate = null;
             _cacheIncreaseDamages.Clear();
             _cacheIncreaseDamages = null;
+            _cacheIncreaseDamagesRate.Clear();
+            _cacheIncreaseDamagesRate = null;
             _cacheIncreaseSkills.Clear();
             _cacheIncreaseSkills = null;
         }
@@ -54,7 +60,9 @@ namespace MultiplayerARPG
             _cacheIncreaseAttributesRate.Clear();
             _cacheIncreaseResistances.Clear();
             _cacheIncreaseArmors.Clear();
+            _cacheIncreaseArmorsRate.Clear();
             _cacheIncreaseDamages.Clear();
+            _cacheIncreaseDamagesRate.Clear();
             _cacheIncreaseSkills.Clear();
 
             if (item == null || !item.IsEquipment())
@@ -118,9 +126,19 @@ namespace MultiplayerARPG
             return _cacheIncreaseArmors;
         }
 
+        public Dictionary<DamageElement, float> GetIncreaseArmorsRate()
+        {
+            return _cacheIncreaseArmorsRate;
+        }
+
         public Dictionary<DamageElement, MinMaxFloat> GetIncreaseDamages()
         {
             return _cacheIncreaseDamages;
+        }
+
+        public Dictionary<DamageElement, MinMaxFloat> GetIncreaseDamagesRate()
+        {
+            return _cacheIncreaseDamagesRate;
         }
 
         public Dictionary<BaseSkill, int> GetIncreaseSkills()
