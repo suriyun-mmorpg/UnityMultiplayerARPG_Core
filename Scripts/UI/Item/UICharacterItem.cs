@@ -194,18 +194,18 @@ namespace MultiplayerARPG
         public bool dontShowComparingEquipments;
         public bool dontCalculateRandomBonus;
 
-        protected bool isSellItemDialogAppeared;
-        protected bool isRefineItemDialogAppeared;
-        protected bool isDismantleItemDialogAppeared;
-        protected bool isRepairItemDialogAppeared;
-        protected bool isEnhanceSocketItemDialogAppeared;
-        protected bool isStorageDialogAppeared;
-        protected bool isDealingStateEntered;
-        protected bool isStartVendingDialogAppeared;
-        protected float lockRemainsDuration;
-        protected bool dirtyIsLock;
-        protected float coolDownRemainsDuration;
-        protected bool dirtyIsCountDown;
+        protected bool _isSellItemDialogAppeared;
+        protected bool _isRefineItemDialogAppeared;
+        protected bool _isDismantleItemDialogAppeared;
+        protected bool _isRepairItemDialogAppeared;
+        protected bool _isEnhanceSocketItemDialogAppeared;
+        protected bool _isStorageDialogAppeared;
+        protected bool _isDealingStateEntered;
+        protected bool _isStartVendingDialogAppeared;
+        protected float _lockRemainsDuration;
+        protected bool _dirtyIsLock;
+        protected float _coolDownRemainsDuration;
+        protected bool _dirtyIsCountDown;
 
         public bool IsSetupAsEquipSlot { get; private set; }
         public string EquipPosition { get; private set; }
@@ -221,7 +221,7 @@ namespace MultiplayerARPG
         protected override void OnDisable()
         {
             base.OnDisable();
-            lockRemainsDuration = 0f;
+            _lockRemainsDuration = 0f;
             if (uiComparingEquipments != null)
             {
                 foreach (UICharacterItem uiComparingEquipment in uiComparingEquipments)
@@ -276,31 +276,31 @@ namespace MultiplayerARPG
 
         private void UpdateLockRemainsDuration(float deltaTime)
         {
-            lockRemainsDuration = CharacterItem != null ? CharacterItem.lockRemainsDuration : 0f;
+            _lockRemainsDuration = CharacterItem != null ? CharacterItem.lockRemainsDuration : 0f;
 
-            if (lockRemainsDuration > 0f)
+            if (_lockRemainsDuration > 0f)
             {
-                lockRemainsDuration -= deltaTime;
-                if (lockRemainsDuration <= 0f)
-                    lockRemainsDuration = 0f;
+                _lockRemainsDuration -= deltaTime;
+                if (_lockRemainsDuration <= 0f)
+                    _lockRemainsDuration = 0f;
             }
             else
             {
-                lockRemainsDuration = 0f;
+                _lockRemainsDuration = 0f;
             }
 
             if (uiTextLockRemainsDuration != null)
             {
-                uiTextLockRemainsDuration.SetGameObjectActive(lockRemainsDuration > 0);
+                uiTextLockRemainsDuration.SetGameObjectActive(_lockRemainsDuration > 0);
                 uiTextLockRemainsDuration.text = ZString.Format(
                     LanguageManager.GetText(formatKeyLockRemainsDuration),
-                    lockRemainsDuration.ToString("N0"));
+                    _lockRemainsDuration.ToString("N0"));
             }
 
-            bool isLock = lockRemainsDuration > 0f;
-            if (dirtyIsLock != isLock)
+            bool isLock = _lockRemainsDuration > 0f;
+            if (_dirtyIsLock != isLock)
             {
-                dirtyIsLock = isLock;
+                _dirtyIsLock = isLock;
                 if (lockObjects != null)
                 {
                     foreach (GameObject obj in lockObjects)
@@ -326,15 +326,15 @@ namespace MultiplayerARPG
 
         private void UpdateUICoolDownRemainsDuration(float coolDownDuration, float deltaTime)
         {
-            if (coolDownRemainsDuration > 0f)
+            if (_coolDownRemainsDuration > 0f)
             {
-                coolDownRemainsDuration -= deltaTime;
-                if (coolDownRemainsDuration <= 0f)
-                    coolDownRemainsDuration = 0f;
+                _coolDownRemainsDuration -= deltaTime;
+                if (_coolDownRemainsDuration <= 0f)
+                    _coolDownRemainsDuration = 0f;
             }
             else
             {
-                coolDownRemainsDuration = 0f;
+                _coolDownRemainsDuration = 0f;
             }
 
             if (uiTextCoolDownDuration != null)
@@ -347,22 +347,22 @@ namespace MultiplayerARPG
 
             if (uiTextCoolDownRemainsDuration != null)
             {
-                uiTextCoolDownRemainsDuration.SetGameObjectActive(coolDownRemainsDuration > 0);
+                uiTextCoolDownRemainsDuration.SetGameObjectActive(_coolDownRemainsDuration > 0);
                 uiTextCoolDownRemainsDuration.text = ZString.Format(
                     LanguageManager.GetText(formatKeyCoolDownRemainsDuration),
-                    coolDownRemainsDuration.ToString("N0"));
+                    _coolDownRemainsDuration.ToString("N0"));
             }
 
             if (imageCoolDownGage != null)
             {
-                imageCoolDownGage.fillAmount = coolDownDuration <= 0 ? 0 : coolDownRemainsDuration / coolDownDuration;
+                imageCoolDownGage.fillAmount = coolDownDuration <= 0 ? 0 : _coolDownRemainsDuration / coolDownDuration;
                 imageCoolDownGage.gameObject.SetActive(imageCoolDownGage.fillAmount > 0f);
             }
 
-            bool isCountDown = coolDownRemainsDuration > 0f;
-            if (dirtyIsCountDown != isCountDown)
+            bool isCountDown = _coolDownRemainsDuration > 0f;
+            if (_dirtyIsCountDown != isCountDown)
             {
-                dirtyIsCountDown = isCountDown;
+                _dirtyIsCountDown = isCountDown;
                 if (countDownObjects != null)
                 {
                     foreach (GameObject obj in countDownObjects)
@@ -382,13 +382,13 @@ namespace MultiplayerARPG
 
         protected void UpdateCoolDownRemainsDuration(float diffToChangeRemainsDuration = 0f)
         {
-            if (coolDownRemainsDuration <= 0f && Character != null && UsableItem != null)
+            if (_coolDownRemainsDuration <= 0f && Character != null && UsableItem != null)
             {
                 int indexOfSkillUsage = Character.IndexOfSkillUsage(SkillUsageType.UsableItem, UsableItem.DataId);
-                if (indexOfSkillUsage >= 0 && Mathf.Abs(Character.SkillUsages[indexOfSkillUsage].coolDownRemainsDuration - coolDownRemainsDuration) > diffToChangeRemainsDuration)
-                    coolDownRemainsDuration = Character.SkillUsages[indexOfSkillUsage].coolDownRemainsDuration;
+                if (indexOfSkillUsage >= 0 && Mathf.Abs(Character.SkillUsages[indexOfSkillUsage].coolDownRemainsDuration - _coolDownRemainsDuration) > diffToChangeRemainsDuration)
+                    _coolDownRemainsDuration = Character.SkillUsages[indexOfSkillUsage].coolDownRemainsDuration;
                 else
-                    coolDownRemainsDuration = 0f;
+                    _coolDownRemainsDuration = 0f;
             }
         }
 
@@ -979,7 +979,7 @@ namespace MultiplayerARPG
                 else
                 {
                     uiDamageAmount.Show();
-                    KeyValuePair<DamageElement, MinMaxFloat> kvPair = CharacterItem.GetDamageAmount(null);
+                    KeyValuePair<DamageElement, MinMaxFloat> kvPair = CharacterItem.GetDamageAmount();
                     uiDamageAmount.Data = new UIDamageElementAmountData(kvPair.Key, kvPair.Value);
                 }
             }
@@ -1213,9 +1213,9 @@ namespace MultiplayerARPG
         {
             if (!IsOwningCharacter())
             {
-                if (isInit || isSellItemDialogAppeared)
+                if (isInit || _isSellItemDialogAppeared)
                 {
-                    isSellItemDialogAppeared = false;
+                    _isSellItemDialogAppeared = false;
                     if (onNpcSellItemDialogDisappear != null)
                         onNpcSellItemDialogDisappear.Invoke();
                 }
@@ -1225,18 +1225,18 @@ namespace MultiplayerARPG
             if (GameInstance.ItemUIVisibilityManager.IsShopDialogVisible() &&
                 InventoryType == InventoryType.NonEquipItems)
             {
-                if (isInit || !isSellItemDialogAppeared)
+                if (isInit || !_isSellItemDialogAppeared)
                 {
-                    isSellItemDialogAppeared = true;
+                    _isSellItemDialogAppeared = true;
                     if (onNpcSellItemDialogAppear != null)
                         onNpcSellItemDialogAppear.Invoke();
                 }
             }
             else
             {
-                if (isInit || isSellItemDialogAppeared)
+                if (isInit || _isSellItemDialogAppeared)
                 {
-                    isSellItemDialogAppeared = false;
+                    _isSellItemDialogAppeared = false;
                     if (onNpcSellItemDialogDisappear != null)
                         onNpcSellItemDialogDisappear.Invoke();
                 }
@@ -1247,9 +1247,9 @@ namespace MultiplayerARPG
         {
             if (!IsOwningCharacter())
             {
-                if (isInit || isRefineItemDialogAppeared)
+                if (isInit || _isRefineItemDialogAppeared)
                 {
-                    isRefineItemDialogAppeared = false;
+                    _isRefineItemDialogAppeared = false;
                     if (onRefineItemDialogDisappear != null)
                         onRefineItemDialogDisappear.Invoke();
                 }
@@ -1259,18 +1259,18 @@ namespace MultiplayerARPG
             if (GameInstance.ItemUIVisibilityManager.IsRefineItemDialogVisible() &&
                 EquipmentItem != null && InventoryType != InventoryType.StorageItems)
             {
-                if (isInit || !isRefineItemDialogAppeared)
+                if (isInit || !_isRefineItemDialogAppeared)
                 {
-                    isRefineItemDialogAppeared = true;
+                    _isRefineItemDialogAppeared = true;
                     if (onRefineItemDialogAppear != null)
                         onRefineItemDialogAppear.Invoke();
                 }
             }
             else
             {
-                if (isInit || isRefineItemDialogAppeared)
+                if (isInit || _isRefineItemDialogAppeared)
                 {
-                    isRefineItemDialogAppeared = false;
+                    _isRefineItemDialogAppeared = false;
                     if (onRefineItemDialogDisappear != null)
                         onRefineItemDialogDisappear.Invoke();
                 }
@@ -1281,9 +1281,9 @@ namespace MultiplayerARPG
         {
             if (!IsOwningCharacter())
             {
-                if (isInit || isDismantleItemDialogAppeared)
+                if (isInit || _isDismantleItemDialogAppeared)
                 {
-                    isDismantleItemDialogAppeared = false;
+                    _isDismantleItemDialogAppeared = false;
                     if (onDismantleItemDialogDisappear != null)
                         onDismantleItemDialogDisappear.Invoke();
                 }
@@ -1294,18 +1294,18 @@ namespace MultiplayerARPG
                 GameInstance.Singleton.dismantleFilter.Filter(CharacterItem) &&
                 InventoryType == InventoryType.NonEquipItems)
             {
-                if (isInit || !isDismantleItemDialogAppeared)
+                if (isInit || !_isDismantleItemDialogAppeared)
                 {
-                    isDismantleItemDialogAppeared = true;
+                    _isDismantleItemDialogAppeared = true;
                     if (onDismantleItemDialogAppear != null)
                         onDismantleItemDialogAppear.Invoke();
                 }
             }
             else
             {
-                if (isInit || isDismantleItemDialogAppeared)
+                if (isInit || _isDismantleItemDialogAppeared)
                 {
-                    isDismantleItemDialogAppeared = false;
+                    _isDismantleItemDialogAppeared = false;
                     if (onDismantleItemDialogDisappear != null)
                         onDismantleItemDialogDisappear.Invoke();
                 }
@@ -1316,9 +1316,9 @@ namespace MultiplayerARPG
         {
             if (!IsOwningCharacter())
             {
-                if (isInit || isRepairItemDialogAppeared)
+                if (isInit || _isRepairItemDialogAppeared)
                 {
-                    isRepairItemDialogAppeared = false;
+                    _isRepairItemDialogAppeared = false;
                     if (onRepairItemDialogDisappear != null)
                         onRepairItemDialogDisappear.Invoke();
                 }
@@ -1328,18 +1328,18 @@ namespace MultiplayerARPG
             if (GameInstance.ItemUIVisibilityManager.IsRepairItemDialogVisible() &&
                 EquipmentItem != null && InventoryType != InventoryType.StorageItems)
             {
-                if (isInit || !isRepairItemDialogAppeared)
+                if (isInit || !_isRepairItemDialogAppeared)
                 {
-                    isRepairItemDialogAppeared = true;
+                    _isRepairItemDialogAppeared = true;
                     if (onRepairItemDialogAppear != null)
                         onRepairItemDialogAppear.Invoke();
                 }
             }
             else
             {
-                if (isInit || isRepairItemDialogAppeared)
+                if (isInit || _isRepairItemDialogAppeared)
                 {
-                    isRepairItemDialogAppeared = false;
+                    _isRepairItemDialogAppeared = false;
                     if (onRepairItemDialogDisappear != null)
                         onRepairItemDialogDisappear.Invoke();
                 }
@@ -1350,9 +1350,9 @@ namespace MultiplayerARPG
         {
             if (!IsOwningCharacter())
             {
-                if (isInit || isEnhanceSocketItemDialogAppeared)
+                if (isInit || _isEnhanceSocketItemDialogAppeared)
                 {
-                    isEnhanceSocketItemDialogAppeared = false;
+                    _isEnhanceSocketItemDialogAppeared = false;
                     if (onEnhanceSocketItemDialogDisappear != null)
                         onEnhanceSocketItemDialogDisappear.Invoke();
                 }
@@ -1362,18 +1362,18 @@ namespace MultiplayerARPG
             if (GameInstance.ItemUIVisibilityManager.IsEnhanceSocketItemDialogVisible() &&
                 EquipmentItem != null && InventoryType != InventoryType.StorageItems)
             {
-                if (isInit || !isEnhanceSocketItemDialogAppeared)
+                if (isInit || !_isEnhanceSocketItemDialogAppeared)
                 {
-                    isEnhanceSocketItemDialogAppeared = true;
+                    _isEnhanceSocketItemDialogAppeared = true;
                     if (onEnhanceSocketItemDialogAppear != null)
                         onEnhanceSocketItemDialogAppear.Invoke();
                 }
             }
             else
             {
-                if (isInit || isEnhanceSocketItemDialogAppeared)
+                if (isInit || _isEnhanceSocketItemDialogAppeared)
                 {
-                    isEnhanceSocketItemDialogAppeared = false;
+                    _isEnhanceSocketItemDialogAppeared = false;
                     if (onEnhanceSocketItemDialogDisappear != null)
                         onEnhanceSocketItemDialogDisappear.Invoke();
                 }
@@ -1384,9 +1384,9 @@ namespace MultiplayerARPG
         {
             if (!IsOwningCharacter())
             {
-                if (isInit || isStorageDialogAppeared)
+                if (isInit || _isStorageDialogAppeared)
                 {
-                    isStorageDialogAppeared = false;
+                    _isStorageDialogAppeared = false;
                     if (onStorageDialogDisappear != null)
                         onStorageDialogDisappear.Invoke();
                 }
@@ -1396,18 +1396,18 @@ namespace MultiplayerARPG
             if (GameInstance.ItemUIVisibilityManager.IsStorageDialogVisible() &&
                 InventoryType == InventoryType.NonEquipItems)
             {
-                if (isInit || !isStorageDialogAppeared)
+                if (isInit || !_isStorageDialogAppeared)
                 {
-                    isStorageDialogAppeared = true;
+                    _isStorageDialogAppeared = true;
                     if (onStorageDialogAppear != null)
                         onStorageDialogAppear.Invoke();
                 }
             }
             else
             {
-                if (isInit || isStorageDialogAppeared)
+                if (isInit || _isStorageDialogAppeared)
                 {
-                    isStorageDialogAppeared = false;
+                    _isStorageDialogAppeared = false;
                     if (onStorageDialogDisappear != null)
                         onStorageDialogDisappear.Invoke();
                 }
@@ -1418,9 +1418,9 @@ namespace MultiplayerARPG
         {
             if (!IsOwningCharacter())
             {
-                if (isInit || isDealingStateEntered)
+                if (isInit || _isDealingStateEntered)
                 {
-                    isDealingStateEntered = false;
+                    _isDealingStateEntered = false;
                     if (onExitDealingState != null)
                         onExitDealingState.Invoke();
                 }
@@ -1430,18 +1430,18 @@ namespace MultiplayerARPG
             if (GameInstance.ItemUIVisibilityManager.IsDealingDialogVisibleWithDealingState() &&
                 InventoryType == InventoryType.NonEquipItems)
             {
-                if (isInit || !isDealingStateEntered)
+                if (isInit || !_isDealingStateEntered)
                 {
-                    isDealingStateEntered = true;
+                    _isDealingStateEntered = true;
                     if (onEnterDealingState != null)
                         onEnterDealingState.Invoke();
                 }
             }
             else
             {
-                if (isInit || isDealingStateEntered)
+                if (isInit || _isDealingStateEntered)
                 {
-                    isDealingStateEntered = false;
+                    _isDealingStateEntered = false;
                     if (onExitDealingState != null)
                         onExitDealingState.Invoke();
                 }
@@ -1452,9 +1452,9 @@ namespace MultiplayerARPG
         {
             if (!IsOwningCharacter())
             {
-                if (isInit || isStartVendingDialogAppeared)
+                if (isInit || _isStartVendingDialogAppeared)
                 {
-                    isStartVendingDialogAppeared = false;
+                    _isStartVendingDialogAppeared = false;
                     if (onStartVendingDialogDisappear != null)
                         onStartVendingDialogDisappear.Invoke();
                 }
@@ -1464,18 +1464,18 @@ namespace MultiplayerARPG
             if (GameInstance.ItemUIVisibilityManager.IsStartVendingDialogVisible() &&
                 InventoryType == InventoryType.NonEquipItems)
             {
-                if (isInit || !isStartVendingDialogAppeared)
+                if (isInit || !_isStartVendingDialogAppeared)
                 {
-                    isStartVendingDialogAppeared = true;
+                    _isStartVendingDialogAppeared = true;
                     if (onStartVendingDialogAppear != null)
                         onStartVendingDialogAppear.Invoke();
                 }
             }
             else
             {
-                if (isInit || isStartVendingDialogAppeared)
+                if (isInit || _isStartVendingDialogAppeared)
                 {
-                    isStartVendingDialogAppeared = false;
+                    _isStartVendingDialogAppeared = false;
                     if (onStartVendingDialogDisappear != null)
                         onStartVendingDialogDisappear.Invoke();
                 }
