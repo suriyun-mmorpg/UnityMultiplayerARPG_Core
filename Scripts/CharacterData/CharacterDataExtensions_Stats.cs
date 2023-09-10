@@ -119,7 +119,7 @@ namespace MultiplayerARPG
                     break;
             }
         }
-        
+
         public static void GetBuffs(this CharacterBuff buff,
             System.Action<CharacterStats> onIncreasingStats,
             System.Action<CharacterStats> onIncreasingStatsRate,
@@ -151,6 +151,72 @@ namespace MultiplayerARPG
                 onIncreasingDamages.Invoke(buff.GetBuff().GetIncreaseDamages());
             if (onIncreasingDamagesRate != null)
                 onIncreasingDamagesRate.Invoke(buff.GetBuff().GetIncreaseDamagesRate());
+        }
+
+        public static void GetBuffs(this CharacterSummon summon,
+            System.Action<CharacterStats> onIncreasingStats,
+            System.Action<CharacterStats> onIncreasingStatsRate,
+            System.Action<Dictionary<Attribute, float>> onIncreasingAttributes,
+            System.Action<Dictionary<Attribute, float>> onIncreasingAttributesRate,
+            System.Action<Dictionary<DamageElement, float>> onIncreasingResistances,
+            System.Action<Dictionary<DamageElement, float>> onIncreasingArmors,
+            System.Action<Dictionary<DamageElement, float>> onIncreasingArmorsRate,
+            System.Action<Dictionary<DamageElement, MinMaxFloat>> onIncreasingDamages,
+            System.Action<Dictionary<DamageElement, MinMaxFloat>> onIncreasingDamagesRate)
+        {
+            if (summon.IsEmpty())
+                return;
+            if (onIncreasingStats != null)
+                onIncreasingStats.Invoke(summon.GetBuff().GetIncreaseStats());
+            if (onIncreasingStatsRate != null)
+                onIncreasingStatsRate.Invoke(summon.GetBuff().GetIncreaseStatsRate());
+            if (onIncreasingAttributes != null)
+                onIncreasingAttributes.Invoke(summon.GetBuff().GetIncreaseAttributes());
+            if (onIncreasingAttributesRate != null)
+                onIncreasingAttributesRate.Invoke(summon.GetBuff().GetIncreaseAttributesRate());
+            if (onIncreasingResistances != null)
+                onIncreasingResistances.Invoke(summon.GetBuff().GetIncreaseResistances());
+            if (onIncreasingArmors != null)
+                onIncreasingArmors.Invoke(summon.GetBuff().GetIncreaseArmors());
+            if (onIncreasingArmorsRate != null)
+                onIncreasingArmorsRate.Invoke(summon.GetBuff().GetIncreaseArmorsRate());
+            if (onIncreasingDamages != null)
+                onIncreasingDamages.Invoke(summon.GetBuff().GetIncreaseDamages());
+            if (onIncreasingDamagesRate != null)
+                onIncreasingDamagesRate.Invoke(summon.GetBuff().GetIncreaseDamagesRate());
+        }
+
+        public static void GetBuffs(this IVehicleEntity vehicleEntity,
+            System.Action<CharacterStats> onIncreasingStats,
+            System.Action<CharacterStats> onIncreasingStatsRate,
+            System.Action<Dictionary<Attribute, float>> onIncreasingAttributes,
+            System.Action<Dictionary<Attribute, float>> onIncreasingAttributesRate,
+            System.Action<Dictionary<DamageElement, float>> onIncreasingResistances,
+            System.Action<Dictionary<DamageElement, float>> onIncreasingArmors,
+            System.Action<Dictionary<DamageElement, float>> onIncreasingArmorsRate,
+            System.Action<Dictionary<DamageElement, MinMaxFloat>> onIncreasingDamages,
+            System.Action<Dictionary<DamageElement, MinMaxFloat>> onIncreasingDamagesRate)
+        {
+            if (vehicleEntity.IsNull())
+                return;
+            if (onIncreasingStats != null)
+                onIncreasingStats.Invoke(vehicleEntity.GetBuff().GetIncreaseStats());
+            if (onIncreasingStatsRate != null)
+                onIncreasingStatsRate.Invoke(vehicleEntity.GetBuff().GetIncreaseStatsRate());
+            if (onIncreasingAttributes != null)
+                onIncreasingAttributes.Invoke(vehicleEntity.GetBuff().GetIncreaseAttributes());
+            if (onIncreasingAttributesRate != null)
+                onIncreasingAttributesRate.Invoke(vehicleEntity.GetBuff().GetIncreaseAttributesRate());
+            if (onIncreasingResistances != null)
+                onIncreasingResistances.Invoke(vehicleEntity.GetBuff().GetIncreaseResistances());
+            if (onIncreasingArmors != null)
+                onIncreasingArmors.Invoke(vehicleEntity.GetBuff().GetIncreaseArmors());
+            if (onIncreasingArmorsRate != null)
+                onIncreasingArmorsRate.Invoke(vehicleEntity.GetBuff().GetIncreaseArmorsRate());
+            if (onIncreasingDamages != null)
+                onIncreasingDamages.Invoke(vehicleEntity.GetBuff().GetIncreaseDamages());
+            if (onIncreasingDamagesRate != null)
+                onIncreasingDamagesRate.Invoke(vehicleEntity.GetBuff().GetIncreaseDamagesRate());
         }
 
         public static void GetBuffs(this BaseSkill skill, int level,
@@ -359,9 +425,31 @@ namespace MultiplayerARPG
                         isCalculateDamages ? null : (damages) => GameDataHelpers.CombineDamages(resultDamages, damages),
                         isCalculateDamagesRate ? null : (damagesRate) => GameDataHelpers.CombineDamages(resultDamagesRate, damagesRate));
                 }
-                // From mount
-
                 // From summon
+                for (i = 0; i < data.Summons.Count; ++i)
+                {
+                    GetBuffs(data.Summons[i],
+                        isCalculateStats ? null : (stats) => resultStats += stats,
+                        isCalculateStatsRate ? null : (statsRate) => resultStatsRate += statsRate,
+                        isCalculateAttributes ? null : (attributes) => GameDataHelpers.CombineAttributes(resultAttributes, attributes),
+                        isCalculateAttributesRate ? null : (attributesRate) => GameDataHelpers.CombineAttributes(resultAttributesRate, attributesRate),
+                        isCalculateResistances ? null : (resistances) => GameDataHelpers.CombineResistances(resultResistances, resistances),
+                        isCalculateArmors ? null : (armors) => GameDataHelpers.CombineArmors(resultArmors, armors),
+                        isCalculateArmorsRate ? null : (armorsRate) => GameDataHelpers.CombineArmors(resultArmorsRate, armorsRate),
+                        isCalculateDamages ? null : (damages) => GameDataHelpers.CombineDamages(resultDamages, damages),
+                        isCalculateDamagesRate ? null : (damagesRate) => GameDataHelpers.CombineDamages(resultDamagesRate, damagesRate));
+                }
+                // From mount
+                GetBuffs(data.PassengingVehicleEntity,
+                    isCalculateStats ? null : (stats) => resultStats += stats,
+                    isCalculateStatsRate ? null : (statsRate) => resultStatsRate += statsRate,
+                    isCalculateAttributes ? null : (attributes) => GameDataHelpers.CombineAttributes(resultAttributes, attributes),
+                    isCalculateAttributesRate ? null : (attributesRate) => GameDataHelpers.CombineAttributes(resultAttributesRate, attributesRate),
+                    isCalculateResistances ? null : (resistances) => GameDataHelpers.CombineResistances(resultResistances, resistances),
+                    isCalculateArmors ? null : (armors) => GameDataHelpers.CombineArmors(resultArmors, armors),
+                    isCalculateArmorsRate ? null : (armorsRate) => GameDataHelpers.CombineArmors(resultArmorsRate, armorsRate),
+                    isCalculateDamages ? null : (damages) => GameDataHelpers.CombineDamages(resultDamages, damages),
+                    isCalculateDamagesRate ? null : (damagesRate) => GameDataHelpers.CombineDamages(resultDamagesRate, damagesRate));
             }
         }
     }
