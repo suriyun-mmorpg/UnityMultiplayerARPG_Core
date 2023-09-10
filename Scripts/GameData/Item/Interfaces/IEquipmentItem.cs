@@ -57,9 +57,17 @@ namespace MultiplayerARPG
         /// </summary>
         ArmorIncremental[] IncreaseArmors { get; }
         /// <summary>
+        /// Increasing armors rate stats while equipping this item
+        /// </summary>
+        ArmorIncremental[] IncreaseArmorsRate { get; }
+        /// <summary>
         /// Increasing damages stats while equipping this item
         /// </summary>
         DamageIncremental[] IncreaseDamages { get; }
+        /// <summary>
+        /// Increasing damages rate stats while equipping this item
+        /// </summary>
+        DamageIncremental[] IncreaseDamagesRate { get; }
         /// <summary>
         /// Increasing skills while equipping this item
         /// </summary>

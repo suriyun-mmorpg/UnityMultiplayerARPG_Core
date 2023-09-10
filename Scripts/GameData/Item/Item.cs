@@ -124,7 +124,11 @@ namespace MultiplayerARPG
         [ArrayElementTitle("damageElement")]
         public ArmorIncremental[] increaseArmors;
         [ArrayElementTitle("damageElement")]
+        public ArmorIncremental[] increaseArmorsRate;
+        [ArrayElementTitle("damageElement")]
         public DamageIncremental[] increaseDamages;
+        [ArrayElementTitle("damageElement")]
+        public DamageIncremental[] increaseDamagesRate;
         [ArrayElementTitle("skill")]
         [HideInInspector]
         public SkillLevel[] increaseSkillLevels;
@@ -330,9 +334,19 @@ namespace MultiplayerARPG
             get { return increaseArmors; }
         }
 
+        public ArmorIncremental[] IncreaseArmorsRate
+        {
+            get { return increaseArmorsRate; }
+        }
+
         public DamageIncremental[] IncreaseDamages
         {
             get { return increaseDamages; }
+        }
+
+        public DamageIncremental[] IncreaseDamagesRate
+        {
+            get { return increaseDamagesRate; }
         }
 
         public SkillIncremental[] IncreaseSkills
@@ -660,7 +674,9 @@ namespace MultiplayerARPG
             GameInstance.AddAttributes(increaseAttributesRate);
             GameInstance.AddDamageElements(increaseResistances);
             GameInstance.AddDamageElements(increaseArmors);
+            GameInstance.AddDamageElements(increaseArmorsRate);
             GameInstance.AddDamageElements(increaseDamages);
+            GameInstance.AddDamageElements(increaseDamagesRate);
             GameInstance.AddDamageElements(damageAmount);
             GameInstance.AddSkills(increaseSkills);
             GameInstance.AddSkills(skillLevel);

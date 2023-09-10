@@ -107,10 +107,24 @@ namespace MultiplayerARPG
         }
 
         [SerializeField]
+        private ArmorIncremental[] increaseArmorsRate = new ArmorIncremental[0];
+        public ArmorIncremental[] IncreaseArmorsRate
+        {
+            get { return increaseArmorsRate; }
+        }
+
+        [SerializeField]
         private DamageIncremental[] increaseDamages = new DamageIncremental[0];
         public DamageIncremental[] IncreaseDamages
         {
             get { return increaseDamages; }
+        }
+
+        [SerializeField]
+        private DamageIncremental[] increaseDamagesRate = new DamageIncremental[0];
+        public DamageIncremental[] IncreaseDamagesRate
+        {
+            get { return increaseDamagesRate; }
         }
 
         [HideInInspector]
@@ -190,8 +204,10 @@ namespace MultiplayerARPG
             GameInstance.AddAttributes(IncreaseAttributes);
             GameInstance.AddAttributes(IncreaseAttributesRate);
             GameInstance.AddDamageElements(IncreaseResistances);
-            GameInstance.AddDamageElements(IncreaseArmors);
-            GameInstance.AddDamageElements(IncreaseDamages);
+            GameInstance.AddDamageElements(increaseArmors);
+            GameInstance.AddDamageElements(increaseArmorsRate);
+            GameInstance.AddDamageElements(increaseDamages);
+            GameInstance.AddDamageElements(increaseDamagesRate);
             GameInstance.AddSkills(IncreaseSkills);
             GameInstance.AddStatusEffects(SelfStatusEffectsWhenAttacking);
             GameInstance.AddStatusEffects(EnemyStatusEffectsWhenAttacking);
