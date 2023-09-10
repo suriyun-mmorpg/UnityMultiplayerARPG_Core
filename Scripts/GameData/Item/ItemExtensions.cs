@@ -180,6 +180,22 @@ namespace MultiplayerARPG
             return result;
         }
 
+        public static Dictionary<DamageElement, float> GetIncreaseArmorsRate<T>(this T equipmentItem, int level, int randomSeed, byte version, Dictionary<DamageElement, float> result = null, bool withRandomBonus = true)
+            where T : IEquipmentItem
+        {
+            if (result == null)
+                result = new Dictionary<DamageElement, float>();
+            if (equipmentItem != null && equipmentItem.IsEquipment())
+            {
+                result = GameDataHelpers.CombineArmors(equipmentItem.IncreaseArmorsRate, result, level, 1f);
+                /*
+                if (withRandomBonus && equipmentItem.RandomBonus.randomArmorAmounts != null && equipmentItem.RandomBonus.randomArmorAmounts.Length > 0)
+                    result = GameDataHelpers.CombineArmorsRate(result, ItemRandomBonusCacheManager.GetCaches(equipmentItem, randomSeed, version).ArmorAmounts);
+                */
+            }
+            return result;
+        }
+
         public static Dictionary<DamageElement, MinMaxFloat> GetIncreaseDamages<T>(this T equipmentItem, int level, int randomSeed, byte version, Dictionary<DamageElement, MinMaxFloat> result = null, bool withRandomBonus = true)
             where T : IEquipmentItem
         {
@@ -190,6 +206,22 @@ namespace MultiplayerARPG
                 result = GameDataHelpers.CombineDamages(equipmentItem.IncreaseDamages, result, level, 1f);
                 if (withRandomBonus && equipmentItem.RandomBonus.randomDamageAmounts != null && equipmentItem.RandomBonus.randomDamageAmounts.Length > 0)
                     result = GameDataHelpers.CombineDamages(result, ItemRandomBonusCacheManager.GetCaches(equipmentItem, randomSeed, version).DamageAmounts);
+            }
+            return result;
+        }
+
+        public static Dictionary<DamageElement, MinMaxFloat> GetIncreaseDamagesRate<T>(this T equipmentItem, int level, int randomSeed, byte version, Dictionary<DamageElement, MinMaxFloat> result = null, bool withRandomBonus = true)
+            where T : IEquipmentItem
+        {
+            if (result == null)
+                result = new Dictionary<DamageElement, MinMaxFloat>();
+            if (equipmentItem != null && equipmentItem.IsEquipment())
+            {
+                result = GameDataHelpers.CombineDamages(equipmentItem.IncreaseDamagesRate, result, level, 1f);
+                /*
+                if (withRandomBonus && equipmentItem.RandomBonus.randomDamageAmounts != null && equipmentItem.RandomBonus.randomDamageAmounts.Length > 0)
+                    result = GameDataHelpers.CombineDamagesRate(result, ItemRandomBonusCacheManager.GetCaches(equipmentItem, randomSeed, version).DamageAmounts);
+                */
             }
             return result;
         }
