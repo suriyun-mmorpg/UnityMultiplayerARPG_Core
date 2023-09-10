@@ -255,7 +255,7 @@ namespace MultiplayerARPG
             if (!IsRightHandItemAvailable && !IsRightHandItemAvailable)
             {
                 IsRightHandItemAvailable = true;
-                RightHandItem = CharacterItem.Create(GameInstance.Singleton.DefaultWeaponItem.DataId);
+                RightHandItem = CharacterItem.CreateDefaultWeapon();
             }
 
             return this;

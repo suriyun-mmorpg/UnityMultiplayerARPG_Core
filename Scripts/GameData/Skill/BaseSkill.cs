@@ -669,13 +669,12 @@ namespace MultiplayerARPG
                 return false;
             }
 
-            // Check is it pass skill level requirement or not
-            Dictionary<BaseSkill, int> currentSkillLevels;
-            if (!character.HasEnoughSkillLevels(GetRequireSkillLevels(level), false, out gameMessage, out currentSkillLevels))
+            // Check is it pass attribute requirement or not
+            if (!character.HasEnoughAttributeAmounts(GetRequireAttributeAmounts(level), false, out gameMessage, out _))
                 return false;
 
-            // Check is it pass attribute requirement or not
-            if (!character.HasEnoughAttributeAmounts(GetRequireAttributeAmounts(level), false, false, currentSkillLevels, out gameMessage, out _))
+            // Check is it pass skill level requirement or not
+            if (!character.HasEnoughSkillLevels(GetRequireSkillLevels(level), false, out gameMessage, out _))
                 return false;
 
             // Check is it pass currency requirement or not

@@ -308,26 +308,12 @@ namespace MultiplayerARPG
             return weaponItem.WeaponType.DualWieldRestriction;
         }
 
-        public static KeyValuePair<DamageElement, MinMaxFloat> GetDamageAmount<T>(this T weaponItem, int itemLevel, float statsRate, ICharacterData character)
-            where T : IWeaponItem
-        {
-            return weaponItem.GetDamageAmount(itemLevel, statsRate, weaponItem.GetEffectivenessDamage(character));
-        }
-
-        public static KeyValuePair<DamageElement, MinMaxFloat> GetDamageAmount<T>(this T weaponItem, int itemLevel, float statsRate, float effectiveness)
+        public static KeyValuePair<DamageElement, MinMaxFloat> GetDamageAmount<T>(this T weaponItem, int itemLevel, float statsRate)
             where T : IWeaponItem
         {
             if (weaponItem == null || !weaponItem.IsWeapon())
                 return new KeyValuePair<DamageElement, MinMaxFloat>();
-            return GameDataHelpers.ToKeyValuePair(weaponItem.DamageAmount, itemLevel, statsRate, effectiveness);
-        }
-
-        public static float GetEffectivenessDamage<T>(this T weaponItem, ICharacterData character)
-            where T : IWeaponItem
-        {
-            if (weaponItem == null || !weaponItem.IsWeapon())
-                return 0f;
-            return GameDataHelpers.GetEffectivenessDamage(weaponItem.WeaponType.CacheEffectivenessAttributes, character);
+            return GameDataHelpers.ToKeyValuePair(weaponItem.DamageAmount, itemLevel, statsRate);
         }
 
         public static bool TryGetWeaponItemEquipType<T>(this T weaponItem, out WeaponItemEquipType equipType)
