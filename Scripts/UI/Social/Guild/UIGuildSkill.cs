@@ -59,28 +59,28 @@ namespace MultiplayerARPG
         public UIGuildSkill[] clones;
         public UIGuildSkill uiNextLevelSkill;
 
-        protected float coolDownRemainsDuration;
-        protected bool dirtyIsCountDown;
+        protected float _coolDownRemainsDuration;
+        protected bool _dirtyIsCountDown;
 
         protected override void OnDisable()
         {
             base.OnDisable();
-            coolDownRemainsDuration = 0f;
+            _coolDownRemainsDuration = 0f;
         }
 
         protected override void Update()
         {
             base.Update();
 
-            if (coolDownRemainsDuration > 0f)
+            if (_coolDownRemainsDuration > 0f)
             {
-                coolDownRemainsDuration -= Time.deltaTime;
-                if (coolDownRemainsDuration <= 0f)
-                    coolDownRemainsDuration = 0f;
+                _coolDownRemainsDuration -= Time.deltaTime;
+                if (_coolDownRemainsDuration <= 0f)
+                    _coolDownRemainsDuration = 0f;
             }
             else
             {
-                coolDownRemainsDuration = 0f;
+                _coolDownRemainsDuration = 0f;
             }
 
             // Update UIs
@@ -96,22 +96,22 @@ namespace MultiplayerARPG
 
             if (uiTextCoolDownRemainsDuration != null)
             {
-                uiTextCoolDownRemainsDuration.SetGameObjectActive(GuildSkill.IsActive && coolDownRemainsDuration > 0);
+                uiTextCoolDownRemainsDuration.SetGameObjectActive(GuildSkill.IsActive && _coolDownRemainsDuration > 0);
                 uiTextCoolDownRemainsDuration.text = ZString.Format(
                     LanguageManager.GetText(formatKeyCoolDownRemainsDuration),
-                    coolDownRemainsDuration.ToString("N0"));
+                    _coolDownRemainsDuration.ToString("N0"));
             }
 
             if (imageCoolDownGage != null)
             {
-                imageCoolDownGage.fillAmount = coolDownDuration <= 0 ? 0 : coolDownRemainsDuration / coolDownDuration;
+                imageCoolDownGage.fillAmount = coolDownDuration <= 0 ? 0 : _coolDownRemainsDuration / coolDownDuration;
                 imageCoolDownGage.gameObject.SetActive(imageCoolDownGage.fillAmount > 0f);
             }
 
-            bool isCountDown = coolDownRemainsDuration > 0f;
-            if (dirtyIsCountDown != isCountDown)
+            bool isCountDown = _coolDownRemainsDuration > 0f;
+            if (_dirtyIsCountDown != isCountDown)
             {
-                dirtyIsCountDown = isCountDown;
+                _dirtyIsCountDown = isCountDown;
                 if (countDownObjects != null)
                 {
                     foreach (GameObject obj in countDownObjects)
@@ -131,13 +131,13 @@ namespace MultiplayerARPG
 
         protected void UpdateCoolDownRemainsDuration(float diffToChangeRemainsDuration = 0f)
         {
-            if (coolDownRemainsDuration <= 0f && GameInstance.PlayingCharacter != null && GuildSkill != null)
+            if (_coolDownRemainsDuration <= 0f && GameInstance.PlayingCharacter != null && GuildSkill != null)
             {
                 int indexOfSkillUsage = GameInstance.PlayingCharacter.IndexOfSkillUsage(SkillUsageType.GuildSkill, GuildSkill.DataId);
-                if (indexOfSkillUsage >= 0 && Mathf.Abs(GameInstance.PlayingCharacter.SkillUsages[indexOfSkillUsage].coolDownRemainsDuration - coolDownRemainsDuration) > diffToChangeRemainsDuration)
-                    coolDownRemainsDuration = GameInstance.PlayingCharacter.SkillUsages[indexOfSkillUsage].coolDownRemainsDuration;
+                if (indexOfSkillUsage >= 0 && Mathf.Abs(GameInstance.PlayingCharacter.SkillUsages[indexOfSkillUsage].coolDownRemainsDuration - _coolDownRemainsDuration) > diffToChangeRemainsDuration)
+                    _coolDownRemainsDuration = GameInstance.PlayingCharacter.SkillUsages[indexOfSkillUsage].coolDownRemainsDuration;
                 else
-                    coolDownRemainsDuration = 0f;
+                    _coolDownRemainsDuration = 0f;
             }
         }
 
