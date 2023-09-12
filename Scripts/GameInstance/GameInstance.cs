@@ -160,6 +160,8 @@ namespace MultiplayerARPG
 
         [Header("Gameplay Objects")]
         public ItemDropEntity itemDropEntityPrefab = null;
+        public GoldDropEntity goldDropEntityPrefab = null;
+        public ExpDropEntity expDropEntityPrefab = null;
         public WarpPortalEntity warpPortalEntityPrefab = null;
         public ItemsContainerEntity playerCorpsePrefab = null;
         public ItemsContainerEntity monsterCorpsePrefab = null;

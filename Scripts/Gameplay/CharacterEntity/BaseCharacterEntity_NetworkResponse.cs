@@ -6,17 +6,17 @@ namespace MultiplayerARPG
     public partial class BaseCharacterEntity
     {
         /// <summary>
-        /// This will be called at server to order character to pickup selected item
+        /// This will be called at server to order character to pickup selected thing
         /// </summary>
         /// <param name="objectId"></param>
         [ServerRpc]
-        protected virtual void ServerPickupItem(uint objectId)
+        protected virtual void ServerPickup(uint objectId)
         {
 #if UNITY_EDITOR || UNITY_SERVER
-            if (!CanPickUpItem())
+            if (!CanPickup())
                 return;
 
-            if (!Manager.TryGetEntityByObjectId(objectId, out ItemDropEntity itemDropEntity))
+            if (!Manager.TryGetEntityByObjectId(objectId, out IPickupActivatableEntity itemDropEntity))
             {
                 // Can't find the entity
                 return;
@@ -28,25 +28,13 @@ namespace MultiplayerARPG
                 return;
             }
 
-            if (!itemDropEntity.IsAbleToLoot(this))
+            if (!itemDropEntity.ProceedPickingUpAtServer(this, out UITextKeys message))
             {
-                GameInstance.ServerGameMessageHandlers.SendGameMessage(ConnectionId, UITextKeys.UI_ERROR_NOT_ABLE_TO_LOOT);
+                GameInstance.ServerGameMessageHandlers.SendGameMessage(ConnectionId, message);
                 return;
             }
 
-            if (this.IncreasingItemsWillOverwhelming(itemDropEntity.DropItems))
-            {
-                GameInstance.ServerGameMessageHandlers.SendGameMessage(ConnectionId, UITextKeys.UI_ERROR_WILL_OVERWHELMING);
-                return;
-            }
-
-            this.IncreaseItems(itemDropEntity.DropItems, (characterItem) =>
-            {
-                GameInstance.ServerGameMessageHandlers.NotifyRewardItem(ConnectionId, itemDropEntity.GivenType, characterItem.dataId, characterItem.amount);
-            });
-            this.FillEmptySlots();
-            itemDropEntity.PickedUp();
-            // Do something with buffs when use item
+            // Do something with buffs when pickup something
             SkillAndBuffComponent.OnPickupItem();
 #endif
         }
@@ -60,7 +48,7 @@ namespace MultiplayerARPG
         protected virtual void ServerPickupItemFromContainer(uint objectId, int itemsContainerIndex, int amount)
         {
 #if UNITY_EDITOR || UNITY_SERVER
-            if (!CanPickUpItem())
+            if (!CanPickup())
                 return;
 
             if (!Manager.TryGetEntityByObjectId(objectId, out ItemsContainerEntity itemsContainerEntity))
@@ -112,7 +100,7 @@ namespace MultiplayerARPG
         protected virtual void ServerPickupAllItemsFromContainer(uint objectId)
         {
 #if UNITY_EDITOR || UNITY_SERVER
-            if (!CanPickUpItem())
+            if (!CanPickup())
                 return;
 
             if (!Manager.TryGetEntityByObjectId(objectId, out ItemsContainerEntity itemsContainerEntity))
@@ -160,12 +148,12 @@ namespace MultiplayerARPG
         protected virtual void ServerPickupNearbyItems()
         {
 #if UNITY_EDITOR || UNITY_SERVER
-            if (!CanPickUpItem())
+            if (!CanPickup())
                 return;
             List<ItemDropEntity> itemDropEntities = FindGameEntitiesInDistance<ItemDropEntity>(CurrentGameInstance.pickUpItemDistance, CurrentGameInstance.itemDropLayer.Mask);
             foreach (ItemDropEntity itemDropEntity in itemDropEntities)
             {
-                ServerPickupItem(itemDropEntity.ObjectId);
+                ServerPickup(itemDropEntity.ObjectId);
             }
 #endif
         }

@@ -1,0 +1,292 @@
+using System.Collections.Generic;
+using UnityEngine;
+using UnityEngine.Events;
+using LiteNetLibManager;
+using LiteNetLib;
+using Cysharp.Threading.Tasks;
+
+namespace MultiplayerARPG
+{
+    public abstract class BaseRewardDropEntity : BaseGameEntity, IPickupActivatableEntity
+    {
+        [System.Serializable]
+        public struct AppearanceSetting : System.IComparable<AppearanceSetting>
+        {
+            public int amount;
+            public GameObject[] activatingObjects;
+
+            public int CompareTo(AppearanceSetting other)
+            {
+                return amount.CompareTo(other.amount);
+            }
+        }
+
+        public const float GROUND_DETECTION_Y_OFFSETS = 3f;
+        private static readonly RaycastHit[] s_findGroundRaycastHits = new RaycastHit[4];
+
+        [Category("Relative GameObjects/Transforms")]
+        public List<AppearanceSetting> appearanceSettings = new List<AppearanceSetting>();
+
+        [Category(5, "Respawn Settings")]
+        [Tooltip("Delay before the entity destroyed, you may set some delay to play destroyed animation by `onItemDropDestroy` event before it's going to be destroyed from the game.")]
+        [SerializeField]
+        protected float destroyDelay = 0f;
+        [SerializeField]
+        protected float destroyRespawnDelay = 5f;
+
+        [Category(99, "Events")]
+        [SerializeField]
+        protected UnityEvent onPickedUp;
+
+        public bool PutOnPlaceholder { get; protected set; }
+        public RewardGivenType GivenType { get; protected set; }
+        public HashSet<string> Looters { get; protected set; }
+        public GameSpawnArea<BaseRewardDropEntity> SpawnArea { get; protected set; }
+        public BaseRewardDropEntity SpawnPrefab { get; protected set; }
+        public int SpawnLevel { get; protected set; }
+        public Vector3 SpawnPosition { get; protected set; }
+        public float DestroyDelay { get { return destroyDelay; } }
+        public float DestroyRespawnDelay { get { return destroyRespawnDelay; } }
+
+        public override string EntityTitle
+        {
+            get
+            {
+                return Amount.ToString("N0");
+            }
+        }
+
+        [Category("Sync Fields")]
+        [SerializeField]
+        protected SyncFieldInt amount = new SyncFieldInt();
+        public int Amount
+        {
+            get { return amount.Value; }
+            set { amount.Value = value; }
+        }
+
+        // Private variables
+        protected bool _isPickedUp;
+        protected float _dropTime;
+        protected float _appearDuration;
+        private List<GameObject> _allActivatingObjects = new List<GameObject>();
+
+        protected override void EntityAwake()
+        {
+            base.EntityAwake();
+            gameObject.tag = CurrentGameInstance.itemDropTag;
+            gameObject.layer = CurrentGameInstance.itemDropLayer;
+            if (appearanceSettings != null && appearanceSettings.Count > 0)
+            {
+                appearanceSettings.Sort();
+                foreach (AppearanceSetting setting in appearanceSettings)
+                {
+                    if (setting.activatingObjects != null && setting.activatingObjects.Length > 0)
+                    {
+                        foreach (GameObject activatingObject in setting.activatingObjects)
+                        {
+                            activatingObject.SetActive(false);
+                            _allActivatingObjects.Add(activatingObject);
+                        }
+                    }
+                }
+            }
+        }
+
+        protected override void SetupNetElements()
+        {
+            base.SetupNetElements();
+            amount.deliveryMethod = DeliveryMethod.ReliableOrdered;
+            amount.syncMode = LiteNetLibSyncField.SyncMode.ServerToClients;
+        }
+
+        public virtual void SetSpawnArea(GameSpawnArea<BaseRewardDropEntity> spawnArea, BaseRewardDropEntity spawnPrefab, int spawnLevel, Vector3 spawnPosition)
+        {
+            SpawnArea = spawnArea;
+            SpawnPrefab = spawnPrefab;
+            SpawnLevel = spawnLevel;
+            SpawnPosition = spawnPosition;
+        }
+
+        public override void OnSetup()
+        {
+            base.OnSetup();
+            amount.onChange += OnAmountChange;
+        }
+
+        protected override void EntityOnDestroy()
+        {
+            base.EntityOnDestroy();
+            amount.onChange -= OnAmountChange;
+        }
+
+        [AllRpc]
+        protected virtual void AllOnPickedUp()
+        {
+            if (onPickedUp != null)
+                onPickedUp.Invoke();
+        }
+
+        public void CallAllOnPickedUp()
+        {
+            RPC(AllOnPickedUp);
+        }
+
+        protected virtual void OnAmountChange(bool isInitial, int amount)
+        {
+            // Instantiate model at clients
+            if (!IsClient)
+                return;
+            if (_allActivatingObjects != null && _allActivatingObjects.Count > 0)
+            {
+                foreach (GameObject allEffectObject in _allActivatingObjects)
+                {
+                    if (allEffectObject.activeSelf)
+                        allEffectObject.SetActive(false);
+                }
+            }
+
+            bool isFoundSetting = false;
+            AppearanceSetting usingSetting = default;
+            if (appearanceSettings != null && appearanceSettings.Count > 0)
+            {
+                foreach (AppearanceSetting setting in appearanceSettings)
+                {
+                    if (amount >= setting.amount)
+                    {
+                        isFoundSetting = true;
+                        usingSetting = setting;
+                    }
+                    else
+                        break;
+                }
+                if (isFoundSetting)
+                {
+                    if (usingSetting.activatingObjects != null && usingSetting.activatingObjects.Length > 0)
+                    {
+                        foreach (GameObject effectObject in usingSetting.activatingObjects)
+                        {
+                            effectObject.SetActive(true);
+                        }
+                    }
+                }
+            }
+        }
+
+        public bool IsAbleToLoot(BaseCharacterEntity baseCharacterEntity)
+        {
+            if ((Looters == null || Looters.Count == 0 || Looters.Contains(baseCharacterEntity.Id) ||
+                Time.unscaledTime - _dropTime > CurrentGameInstance.itemLootLockDuration) && !_isPickedUp)
+                return true;
+            return false;
+        }
+
+        public void PickedUp()
+        {
+            if (!IsServer)
+                return;
+            if (_isPickedUp)
+                return;
+            // Mark as picked up
+            _isPickedUp = true;
+            // Tell clients that the entity is picked up
+            CallAllOnPickedUp();
+            // Respawning later
+            if (SpawnArea != null)
+                SpawnArea.Spawn(SpawnPrefab, SpawnLevel, DestroyDelay + DestroyRespawnDelay);
+            else if (Identity.IsSceneObject)
+                RespawnRoutine(DestroyDelay + DestroyRespawnDelay).Forget();
+            // Destroy this entity
+            NetworkDestroy(destroyDelay);
+        }
+
+        /// <summary>
+        /// This function will be called if this object is placed in scene networked object
+        /// </summary>
+        /// <param name="delay"></param>
+        /// <returns></returns>
+        protected async UniTaskVoid RespawnRoutine(float delay)
+        {
+            await UniTask.Delay(Mathf.CeilToInt(delay * 1000));
+            Manager.Assets.NetworkSpawnScene(
+                Identity.ObjectId,
+                EntityTransform.position,
+                CurrentGameInstance.DimensionType == DimensionType.Dimension3D ? Quaternion.Euler(Vector3.up * Random.Range(0, 360)) : Quaternion.identity);
+        }
+
+        public static BaseRewardDropEntity Drop(BaseRewardDropEntity prefab, BaseGameEntity dropper, RewardGivenType givenType, int amount, IEnumerable<string> looters, float appearDuration)
+        {
+            Vector3 dropPosition = dropper.EntityTransform.position;
+            Quaternion dropRotation = Quaternion.identity;
+            switch (GameInstance.Singleton.DimensionType)
+            {
+                case DimensionType.Dimension3D:
+                    // Random position around dropper with its height
+                    dropPosition += new Vector3(Random.Range(-1f, 1f) * GameInstance.Singleton.dropDistance, GROUND_DETECTION_Y_OFFSETS, Random.Range(-1f, 1f) * GameInstance.Singleton.dropDistance);
+                    // Random rotation
+                    dropRotation = Quaternion.Euler(Vector3.up * Random.Range(0, 360));
+                    break;
+                case DimensionType.Dimension2D:
+                    // Random position around dropper
+                    dropPosition += new Vector3(Random.Range(-1f, 1f) * GameInstance.Singleton.dropDistance, Random.Range(-1f, 1f) * GameInstance.Singleton.dropDistance);
+                    break;
+            }
+            return Drop(prefab, dropPosition, dropRotation, givenType, amount, looters, appearDuration);
+        }
+
+        public static BaseRewardDropEntity Drop(BaseRewardDropEntity prefab, Vector3 dropPosition, Quaternion dropRotation, RewardGivenType givenType, int amount, IEnumerable<string> looters, float appearDuration)
+        {
+            if (prefab == null)
+                return null;
+
+            if (GameInstance.Singleton.DimensionType == DimensionType.Dimension3D)
+            {
+                // Find drop position on ground
+                dropPosition = PhysicUtils.FindGroundedPosition(dropPosition, s_findGroundRaycastHits, GROUND_DETECTION_DISTANCE, GameInstance.Singleton.GetItemDropGroundDetectionLayerMask());
+            }
+            LiteNetLibIdentity spawnObj = BaseGameNetworkManager.Singleton.Assets.GetObjectInstance(
+                prefab.Identity.HashAssetId,
+                dropPosition, dropRotation);
+            BaseRewardDropEntity itemDropEntity = spawnObj.GetComponent<BaseRewardDropEntity>();
+            itemDropEntity.GivenType = givenType;
+            itemDropEntity.Amount = amount;
+            BaseGameNetworkManager.Singleton.Assets.NetworkSpawn(spawnObj);
+            return itemDropEntity;
+        }
+
+        public override bool SetAsTargetInOneClick()
+        {
+            return true;
+        }
+
+        public virtual float GetActivatableDistance()
+        {
+            return GameInstance.Singleton.pickUpItemDistance;
+        }
+
+        public virtual bool ShouldClearTargetAfterActivated()
+        {
+            return true;
+        }
+
+        public virtual bool CanPickupActivate()
+        {
+            return true;
+        }
+
+        public virtual void OnPickupActivate()
+        {
+            GameInstance.PlayingCharacterEntity.CallServerPickup(ObjectId);
+        }
+
+        public virtual bool ProceedPickingUpAtServer(BaseCharacterEntity characterEntity, out UITextKeys message)
+        {
+            if (!ProceedPickingUpAtServer_Implementation(characterEntity, out message))
+                return false;
+            PickedUp();
+            return true;
+        }
+
+        protected abstract bool ProceedPickingUpAtServer_Implementation(BaseCharacterEntity characterEntity, out UITextKeys message);
+    }
+}

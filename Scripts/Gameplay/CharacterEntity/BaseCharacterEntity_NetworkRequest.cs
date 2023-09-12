@@ -2,11 +2,11 @@
 {
     public partial class BaseCharacterEntity
     {
-        public bool CallServerPickupItem(uint objectId)
+        public bool CallServerPickup(uint objectId)
         {
             if (!CanDoActions())
                 return false;
-            RPC(ServerPickupItem, objectId);
+            RPC(ServerPickup, objectId);
             CallAllPlayPickupAnimation();
             return true;
         }

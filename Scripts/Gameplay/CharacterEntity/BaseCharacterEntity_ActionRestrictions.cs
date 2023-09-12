@@ -17,7 +17,7 @@ namespace MultiplayerARPG
             return true;
         }
 
-        public virtual bool CanPickUpItem()
+        public virtual bool CanPickup()
         {
             return true;
         }

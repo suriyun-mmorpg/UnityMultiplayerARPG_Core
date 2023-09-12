@@ -45,7 +45,7 @@ namespace MultiplayerARPG
             return true;
         }
 
-        public override bool CanPickUpItem()
+        public override bool CanPickup()
         {
             if (IsWarping)
                 return false;

@@ -385,7 +385,32 @@ namespace MultiplayerARPG
 
         public virtual void OnPickupActivate()
         {
-            GameInstance.PlayingCharacterEntity.CallServerPickupItem(ObjectId);
+            GameInstance.PlayingCharacterEntity.CallServerPickup(ObjectId);
+        }
+
+        public virtual bool ProceedPickingUpAtServer(BaseCharacterEntity characterEntity, out UITextKeys message)
+        {
+            if (!IsAbleToLoot(characterEntity))
+            {
+                message = UITextKeys.UI_ERROR_NOT_ABLE_TO_LOOT;
+                return false;
+            }
+
+            if (characterEntity.IncreasingItemsWillOverwhelming(DropItems))
+            {
+                message = UITextKeys.UI_ERROR_WILL_OVERWHELMING;
+                return false;
+            }
+
+            characterEntity.IncreaseItems(DropItems, (characterItem) =>
+            {
+                GameInstance.ServerGameMessageHandlers.NotifyRewardItem(ConnectionId, GivenType, characterItem.dataId, characterItem.amount);
+            });
+            characterEntity.FillEmptySlots();
+            PickedUp();
+
+            message = UITextKeys.NONE;
+            return true;
         }
     }
 }
