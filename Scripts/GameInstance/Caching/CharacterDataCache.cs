@@ -106,7 +106,6 @@ namespace MultiplayerARPG
         private void SetStats(CharacterStats stats)
         {
             _stats = stats;
-            Debug.LogError("on set " + stats.hp);
         }
 
         private void SetAttributes(Dictionary<Attribute, float> attributes)
