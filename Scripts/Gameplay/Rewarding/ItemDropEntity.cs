@@ -4,6 +4,7 @@ using UnityEngine.Events;
 using LiteNetLibManager;
 using LiteNetLib;
 using Cysharp.Threading.Tasks;
+using UnityEngine.Serialization;
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
@@ -28,8 +29,9 @@ namespace MultiplayerARPG
         protected float destroyRespawnDelay = 5f;
 
         [Category(99, "Events")]
+        [FormerlySerializedAs("onItemDropDestroy")]
         [SerializeField]
-        protected UnityEvent onItemDropDestroy;
+        protected UnityEvent onPickedUp;
 
         [Category(6, "Drop Settings")]
         public ItemDropManager itemDropManager = new ItemDropManager();
@@ -244,15 +246,15 @@ namespace MultiplayerARPG
         }
 
         [AllRpc]
-        protected virtual void AllOnItemDropDestroy()
+        protected virtual void AllOnPickedUp()
         {
-            if (onItemDropDestroy != null)
-                onItemDropDestroy.Invoke();
+            if (onPickedUp != null)
+                onPickedUp.Invoke();
         }
 
-        public void CallAllOnItemDropDestroy()
+        public void CallAllOnPickedUp()
         {
-            RPC(AllOnItemDropDestroy);
+            RPC(AllOnPickedUp);
         }
 
         protected virtual void OnItemDropDataChange(bool isInitial, ItemDropData itemDropData)
@@ -290,8 +292,8 @@ namespace MultiplayerARPG
                 return;
             // Mark as picked up
             _isPickedUp = true;
-            // Tell clients that the item drop destroy to play animation at client
-            CallAllOnItemDropDestroy();
+            // Tell clients that the entity is picked up
+            CallAllOnPickedUp();
             // Respawning later
             if (SpawnArea != null)
                 SpawnArea.Spawn(SpawnPrefab, SpawnLevel, DestroyDelay + DestroyRespawnDelay);
@@ -316,12 +318,12 @@ namespace MultiplayerARPG
                 CurrentGameInstance.DimensionType == DimensionType.Dimension3D ? Quaternion.Euler(Vector3.up * Random.Range(0, 360)) : Quaternion.identity);
         }
 
-        public static ItemDropEntity DropItem(BaseGameEntity dropper, RewardGivenType givenType, CharacterItem dropData, IEnumerable<string> looters)
+        public static ItemDropEntity Drop(BaseGameEntity dropper, RewardGivenType givenType, CharacterItem dropData, IEnumerable<string> looters)
         {
-            return DropItem(GameInstance.Singleton.itemDropEntityPrefab, dropper, givenType, dropData, looters, GameInstance.Singleton.itemAppearDuration);
+            return Drop(GameInstance.Singleton.itemDropEntityPrefab, dropper, givenType, dropData, looters, GameInstance.Singleton.itemAppearDuration);
         }
 
-        public static ItemDropEntity DropItem(ItemDropEntity prefab, BaseGameEntity dropper, RewardGivenType givenType, CharacterItem dropData, IEnumerable<string> looters, float appearDuration)
+        public static ItemDropEntity Drop(ItemDropEntity prefab, BaseGameEntity dropper, RewardGivenType givenType, CharacterItem dropData, IEnumerable<string> looters, float appearDuration)
         {
             Vector3 dropPosition = dropper.EntityTransform.position;
             Quaternion dropRotation = Quaternion.identity;
@@ -338,10 +340,10 @@ namespace MultiplayerARPG
                     dropPosition += new Vector3(Random.Range(-1f, 1f) * GameInstance.Singleton.dropDistance, Random.Range(-1f, 1f) * GameInstance.Singleton.dropDistance);
                     break;
             }
-            return DropItem(prefab, dropPosition, dropRotation, givenType, dropData, looters, appearDuration);
+            return Drop(prefab, dropPosition, dropRotation, givenType, dropData, looters, appearDuration);
         }
 
-        public static ItemDropEntity DropItem(ItemDropEntity prefab, Vector3 dropPosition, Quaternion dropRotation, RewardGivenType givenType, CharacterItem dropItem, IEnumerable<string> looters, float appearDuration)
+        public static ItemDropEntity Drop(ItemDropEntity prefab, Vector3 dropPosition, Quaternion dropRotation, RewardGivenType givenType, CharacterItem dropItem, IEnumerable<string> looters, float appearDuration)
         {
             if (prefab == null)
                 return null;

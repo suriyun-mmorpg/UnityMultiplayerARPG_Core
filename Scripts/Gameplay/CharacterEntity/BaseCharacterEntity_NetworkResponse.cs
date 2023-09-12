@@ -204,9 +204,9 @@ namespace MultiplayerARPG
                     CharacterItem dropData = nonEquipItem.Clone();
                     dropData.amount = amount;
                     if (CurrentGameInstance.canPickupItemsWhichDropsByPlayersImmediately)
-                        ItemDropEntity.DropItem(this, RewardGivenType.PlayerDrop, dropData, new string[0]);
+                        ItemDropEntity.Drop(this, RewardGivenType.PlayerDrop, dropData, new string[0]);
                     else
-                        ItemDropEntity.DropItem(this, RewardGivenType.PlayerDrop, dropData, new string[] { Id });
+                        ItemDropEntity.Drop(this, RewardGivenType.PlayerDrop, dropData, new string[] { Id });
                     break;
             }
 #endif

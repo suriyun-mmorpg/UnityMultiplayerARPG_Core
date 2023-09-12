@@ -167,7 +167,7 @@ namespace MultiplayerARPG
                 }
 
                 if (droppingToGround)
-                    ItemDropEntity.DropItem(this, RewardGivenType.Harvestable, CharacterItem.Create(itemDataId, 1, itemAmount), new string[0]);
+                    ItemDropEntity.Drop(this, RewardGivenType.Harvestable, CharacterItem.Create(itemDataId, 1, itemAmount), new string[0]);
             }
             // Apply damages
             combatAmountType = CombatAmountType.NormalDamage;

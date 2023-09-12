@@ -248,7 +248,7 @@ namespace MultiplayerARPG
                 for (int i = 0; i < droppingItems.Count; ++i)
                 {
                     // Drop item on ground
-                    ItemDropEntity.DropItem(this, RewardGivenType.BuildingDrop, droppingItems[i], new string[0]);
+                    ItemDropEntity.Drop(this, RewardGivenType.BuildingDrop, droppingItems[i], new string[0]);
                 }
             }
         }

@@ -412,7 +412,7 @@ namespace MultiplayerARPG
                 case DeadDropItemMode.DropOnGround:
                     for (int i = 0; i < _droppingItems.Count; ++i)
                     {
-                        ItemDropEntity.DropItem(this, RewardGivenType.KillMonster, _droppingItems[i], _looters);
+                        ItemDropEntity.Drop(this, RewardGivenType.KillMonster, _droppingItems[i], _looters);
                     }
                     break;
                 case DeadDropItemMode.CorpseLooting:
