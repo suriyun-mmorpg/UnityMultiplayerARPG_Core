@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 #if UNITY_EDITOR
 using UnityEditor;
@@ -14,8 +13,6 @@ namespace MultiplayerARPG
         public List<EquipmentEntityEffect> effects = new List<EquipmentEntityEffect>();
 
         private List<GameObject> _allEffectObjects = new List<GameObject>();
-        private bool _isFoundEffect;
-        private EquipmentEntityEffect _usingEffect;
 
         private void Awake()
         {
@@ -103,27 +100,28 @@ namespace MultiplayerARPG
                 }
             }
 
-            _isFoundEffect = false;
+            bool isFoundEffect = false;
+            EquipmentEntityEffect usingEffect = default;
             if (effects != null && effects.Count > 0)
             {
                 foreach (EquipmentEntityEffect effect in effects)
                 {
                     if (level >= effect.level)
                     {
-                        _isFoundEffect = true;
-                        _usingEffect = effect;
+                        isFoundEffect = true;
+                        usingEffect = effect;
                     }
                     else
                         break;
                 }
-                if (_isFoundEffect)
+                if (isFoundEffect)
                 {
                     // Apply materials
-                    _usingEffect.equipmentMaterials.ApplyMaterials();
+                    usingEffect.equipmentMaterials.ApplyMaterials();
                     // Activate effect objects
-                    if (_usingEffect.effectObjects != null && _usingEffect.effectObjects.Length > 0)
+                    if (usingEffect.effectObjects != null && usingEffect.effectObjects.Length > 0)
                     {
-                        foreach (GameObject effectObject in _usingEffect.effectObjects)
+                        foreach (GameObject effectObject in usingEffect.effectObjects)
                         {
                             effectObject.SetActive(true);
                         }
@@ -131,31 +129,10 @@ namespace MultiplayerARPG
                 }
             }
             // Not found effect apply default materials
-            if (!_isFoundEffect)
+            if (!isFoundEffect)
             {
                 defaultMaterials.ApplyMaterials();
             }
-        }
-    }
-
-    [Serializable]
-    public struct EquipmentEntityEffect : IComparable<EquipmentEntityEffect>
-    {
-        public int level;
-        [HideInInspector]
-        [Obsolete("This is deprecated, use `effectMaterials` instead.")]
-        public Material[] materials;
-        public MaterialCollection[] equipmentMaterials;
-        public GameObject[] effectObjects;
-
-        public int CompareTo(EquipmentEntityEffect other)
-        {
-            return level.CompareTo(other.level);
-        }
-
-        public void ApplyMaterials()
-        {
-            equipmentMaterials.ApplyMaterials();
         }
     }
 }
