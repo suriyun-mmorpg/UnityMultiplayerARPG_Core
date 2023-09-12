@@ -519,7 +519,7 @@ namespace MultiplayerARPG
                     GivingRewardToParty(tempPlayerCharacterEntity, isLastAttacker, reward, rewardRate, shareGuildExpRate, makeMostDamage, out givenRewardExp, out givenRewardGold, out givenRewardCurrencies);
 
                     // Add reward to current character in damage record list
-                    if (!givenRewardExp)
+                    if (CurrentGameInstance.monsterExpRewardingMode == RewardingMode.Immediately && !givenRewardExp)
                     {
                         // Will give reward when it was not given
                         int petIndex = tempPlayerCharacterEntity.IndexOfSummon(SummonType.PetItem);
@@ -538,7 +538,7 @@ namespace MultiplayerARPG
                         }
                     }
 
-                    if (!givenRewardGold)
+                    if (CurrentGameInstance.monsterGoldRewardingMode == RewardingMode.Immediately && !givenRewardGold)
                     {
                         // Will give reward when it was not given
                         tempPlayerCharacterEntity.RewardGold(reward.gold, rewardRate, RewardGivenType.KillMonster, Level, Level);
