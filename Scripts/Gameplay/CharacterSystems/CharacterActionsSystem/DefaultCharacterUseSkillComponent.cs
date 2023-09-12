@@ -102,6 +102,8 @@ namespace MultiplayerARPG
         protected virtual void SetUseSkillActionStates(AnimActionType animActionType, int animActionDataId, UseSkillState simulateState)
         {
             ClearUseSkillStates();
+            AnimActionType = animActionType;
+            AnimActionDataId = animActionDataId;
             _simulateState = simulateState;
         }
 
