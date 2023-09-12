@@ -35,6 +35,12 @@ namespace MultiplayerARPG
         CorpseLooting,
     }
 
+    public enum RewardingMode
+    {
+        Immediately,
+        DropOnGround,
+    }
+
     public enum TestInEditorMode
     {
         Standalone,
@@ -327,6 +333,10 @@ namespace MultiplayerARPG
         public float playerCorpseAppearDuration = 60f;
         [Tooltip("How monster character drop item when dying")]
         public DeadDropItemMode monsterDeadDropItemMode = DeadDropItemMode.DropOnGround;
+        [Tooltip("How monster character drop gold when dying")]
+        public RewardingMode monsterGoldRewardingMode = RewardingMode.Immediately;
+        [Tooltip("How monster character drop exp when dying")]
+        public RewardingMode monsterExpRewardingMode = RewardingMode.Immediately;
         [Tooltip("If all items does not picked up from corpse within this duration, it will be destroyed from the server")]
         public float monsterCorpseAppearDuration = 60f;
         [Tooltip("Delay before return move speed while attack or use skill to generic move speed")]

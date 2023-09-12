@@ -153,9 +153,11 @@ namespace MultiplayerARPG
             if (quest.changeCharacterFaction != null)
                 FactionId = quest.changeCharacterFaction.DataId;
             // Add exp
-            RewardExp(reward, 1f, RewardGivenType.Quest, 1, 1);
+            RewardExp(reward.exp, 1f, RewardGivenType.Quest, 1, 1);
+            // Add gold
+            RewardGold(reward.gold, 1f, RewardGivenType.Quest, 1, 1);
             // Add currency
-            RewardCurrencies(reward, 1f, RewardGivenType.Quest, 1, 1);
+            RewardCurrencies(reward.currencies, 1f, RewardGivenType.Quest, 1, 1);
             // Add stat points
             checked
             {

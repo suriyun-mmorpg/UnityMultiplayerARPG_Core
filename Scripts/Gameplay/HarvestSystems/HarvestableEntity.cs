@@ -158,7 +158,7 @@ namespace MultiplayerARPG
                         attackerCharacter.IncreaseItems(CharacterItem.Create(itemDataId, 1, itemAmount));
                         attackerCharacter.FillEmptySlots();
                     }
-                    attackerCharacter.RewardExp(new Reward() { exp = (int)(harvestable.expPerDamage * calculatingTotalDamage) }, 1, RewardGivenType.Harvestable, 1, 1);
+                    attackerCharacter.RewardExp((int)(harvestable.expPerDamage * calculatingTotalDamage), 1, RewardGivenType.Harvestable, 1, 1);
                 }
                 else
                 {

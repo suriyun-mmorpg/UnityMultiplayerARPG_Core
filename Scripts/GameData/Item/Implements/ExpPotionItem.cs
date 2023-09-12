@@ -50,10 +50,7 @@ namespace MultiplayerARPG
                 return;
             characterEntity.FillEmptySlots();
             characterEntity.ApplyBuff(DataId, BuffType.PotionBuff, characterItem.level, characterEntity.GetInfo(), null);
-            characterEntity.RewardExp(new Reward()
-            {
-                exp = Exp
-            }, 1, RewardGivenType.None, 1, 1);
+            characterEntity.RewardExp(Exp, 1, RewardGivenType.None, 1, 1);
         }
 
         public bool HasCustomAimControls()

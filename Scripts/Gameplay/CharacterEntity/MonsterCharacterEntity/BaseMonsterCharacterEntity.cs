@@ -399,8 +399,10 @@ namespace MultiplayerARPG
             // If this summoned by someone, don't give reward to killer
             if (IsSummoned)
                 return;
+
+            Reward reward = CurrentGameplayRule.MakeMonsterReward(CharacterDatabase, Level);
             // Giving gold and exp to players
-            GivingRewardToKillers(FindLastAttackerPlayer(lastAttacker), out float itemDropRate);
+            GivingRewardToKillers(FindLastAttackerPlayer(lastAttacker), reward, out float itemDropRate);
             receivedDamageRecords.Clear();
             // Clear dropping items, it will fills in `OnRandomDropItem` function
             _droppingItems.Clear();
@@ -419,6 +421,16 @@ namespace MultiplayerARPG
                     if (_droppingItems.Count > 0)
                         ItemsContainerEntity.DropItems(CurrentGameInstance.monsterCorpsePrefab, this, RewardGivenType.KillMonster, _droppingItems, _looters, CurrentGameInstance.monsterCorpseAppearDuration);
                     break;
+            }
+
+            if (!reward.NoExp() && CurrentGameInstance.monsterExpRewardingMode == RewardingMode.DropOnGround)
+            {
+                ExpDropEntity.Drop(this, 1f, RewardGivenType.KillMonster, Level, Level, reward.exp, _looters);
+            }
+
+            if (!reward.NoGold() && CurrentGameInstance.monsterGoldRewardingMode == RewardingMode.DropOnGround)
+            {
+                GoldDropEntity.Drop(this, 1f, RewardGivenType.KillMonster, Level, Level, reward.gold, _looters);
             }
 
             if (!IsSummoned)
@@ -451,16 +463,16 @@ namespace MultiplayerARPG
             return attackerCharacter as BasePlayerCharacterEntity;
         }
 
-        protected virtual void GivingRewardToKillers(BasePlayerCharacterEntity lastPlayer, out float itemDropRate)
+        protected virtual void GivingRewardToKillers(BasePlayerCharacterEntity lastPlayer, Reward reward, out float itemDropRate)
         {
             itemDropRate = 1f;
             if (receivedDamageRecords.Count <= 0)
                 return;
 
-            Reward reward = CurrentGameplayRule.MakeMonsterReward(CharacterDatabase, Level);
             BaseCharacterEntity tempCharacterEntity;
             bool givenRewardExp;
-            bool givenRewardCurrency;
+            bool givenRewardGold;
+            bool givenRewardCurrencies;
             float tempHighRewardRate = 0f;
             foreach (BaseCharacterEntity enemy in receivedDamageRecords.Keys)
             {
@@ -469,7 +481,8 @@ namespace MultiplayerARPG
 
                 tempCharacterEntity = enemy;
                 givenRewardExp = false;
-                givenRewardCurrency = false;
+                givenRewardGold = false;
+                givenRewardCurrencies = false;
 
                 ReceivedDamageRecord receivedDamageRecord = receivedDamageRecords[tempCharacterEntity];
                 float rewardRate = (float)receivedDamageRecord.totalReceivedDamage / (float)CachedData.MaxHp;
@@ -503,7 +516,7 @@ namespace MultiplayerARPG
                         itemDropRate = 1f + tempPlayerCharacterEntity.CachedData.Stats.itemDropRate;
                     }
                     GivingRewardToGuild(tempPlayerCharacterEntity, reward, rewardRate, out float shareGuildExpRate);
-                    GivingRewardToParty(tempPlayerCharacterEntity, isLastAttacker, reward, rewardRate, shareGuildExpRate, makeMostDamage, out givenRewardExp, out givenRewardCurrency);
+                    GivingRewardToParty(tempPlayerCharacterEntity, isLastAttacker, reward, rewardRate, shareGuildExpRate, makeMostDamage, out givenRewardExp, out givenRewardGold, out givenRewardCurrencies);
 
                     // Add reward to current character in damage record list
                     if (!givenRewardExp)
@@ -514,21 +527,27 @@ namespace MultiplayerARPG
                         {
                             tempMonsterCharacterEntity = tempPlayerCharacterEntity.Summons[petIndex].CacheEntity;
                             // Share exp to pet, set multiplier to 0.5, because it will be shared to player
-                            tempMonsterCharacterEntity.RewardExp(reward, (1f - shareGuildExpRate) * 0.5f * rewardRate, RewardGivenType.KillMonster, Level, Level);
+                            tempMonsterCharacterEntity.RewardExp(reward.exp, (1f - shareGuildExpRate) * 0.5f * rewardRate, RewardGivenType.KillMonster, Level, Level);
                             // Set multiplier to 0.5, because it was shared to monster
-                            tempPlayerCharacterEntity.RewardExp(reward, (1f - shareGuildExpRate) * 0.5f * rewardRate, RewardGivenType.KillMonster, Level, Level);
+                            tempPlayerCharacterEntity.RewardExp(reward.exp, (1f - shareGuildExpRate) * 0.5f * rewardRate, RewardGivenType.KillMonster, Level, Level);
                         }
                         else
                         {
                             // No pet, no share, so rate is 1f
-                            tempPlayerCharacterEntity.RewardExp(reward, (1f - shareGuildExpRate) * rewardRate, RewardGivenType.KillMonster, Level, Level);
+                            tempPlayerCharacterEntity.RewardExp(reward.exp, (1f - shareGuildExpRate) * rewardRate, RewardGivenType.KillMonster, Level, Level);
                         }
                     }
 
-                    if (!givenRewardCurrency)
+                    if (!givenRewardGold)
                     {
                         // Will give reward when it was not given
-                        tempPlayerCharacterEntity.RewardCurrencies(reward, rewardRate, RewardGivenType.KillMonster, Level, Level);
+                        tempPlayerCharacterEntity.RewardGold(reward.gold, rewardRate, RewardGivenType.KillMonster, Level, Level);
+                    }
+
+                    if (!givenRewardCurrencies)
+                    {
+                        // Will give reward when it was not given
+                        tempPlayerCharacterEntity.RewardCurrencies(reward.currencies, rewardRate, RewardGivenType.KillMonster, Level, Level);
                     }
                 }
             }
@@ -537,6 +556,8 @@ namespace MultiplayerARPG
         protected virtual void GivingRewardToGuild(BasePlayerCharacterEntity playerCharacterEntity, Reward reward, float rewardRate, out float shareGuildExpRate)
         {
             shareGuildExpRate = 0f;
+            if (CurrentGameInstance.monsterExpRewardingMode != RewardingMode.Immediately)
+                return;
             if (!GameInstance.ServerGuildHandlers.TryGetGuild(playerCharacterEntity.GuildId, out GuildData tempGuildData) || tempGuildData == null)
                 return;
             // Calculation amount of Exp which will be shared to guild
@@ -549,10 +570,11 @@ namespace MultiplayerARPG
             }
         }
 
-        protected virtual void GivingRewardToParty(BasePlayerCharacterEntity playerCharacterEntity, bool isLastAttacker, Reward reward, float rewardRate, float shareGuildExpRate, bool makeMostDamage, out bool givenRewardExp, out bool givenRewardCurrency)
+        protected virtual void GivingRewardToParty(BasePlayerCharacterEntity playerCharacterEntity, bool isLastAttacker, Reward reward, float rewardRate, float shareGuildExpRate, bool makeMostDamage, out bool givenRewardExp, out bool givenRewardGold, out bool givenRewardCurrencies)
         {
             givenRewardExp = false;
-            givenRewardCurrency = false;
+            givenRewardGold = false;
+            givenRewardCurrencies = false;
             if (!GameInstance.ServerPartyHandlers.TryGetParty(playerCharacterEntity.PartyId, out PartyData tempPartyData) || tempPartyData == null)
             {
                 // No joined party
@@ -587,51 +609,66 @@ namespace MultiplayerARPG
             float countNearbyPartyMembers;
             // Share EXP to party members
             countNearbyPartyMembers = sharingExpMembers.Count;
-            for (int i = 0; i < sharingExpMembers.Count; ++i)
+            if (CurrentGameInstance.monsterExpRewardingMode == RewardingMode.Immediately && !reward.NoExp())
             {
-                nearbyPartyMember = sharingExpMembers[i];
-                // If share exp, every party member will receive devided exp
-                // If not share exp, character who make damage will receive non-devided exp
-                int petIndex = nearbyPartyMember.IndexOfSummon(SummonType.PetItem);
-                if (petIndex >= 0)
+                for (int i = 0; i < sharingExpMembers.Count; ++i)
                 {
-                    BaseMonsterCharacterEntity monsterCharacterEntity = nearbyPartyMember.Summons[petIndex].CacheEntity;
-                    if (monsterCharacterEntity != null)
+                    nearbyPartyMember = sharingExpMembers[i];
+                    // If share exp, every party member will receive devided exp
+                    // If not share exp, character who make damage will receive non-devided exp
+                    int petIndex = nearbyPartyMember.IndexOfSummon(SummonType.PetItem);
+                    if (petIndex >= 0)
                     {
-                        // Share exp to pet, set multiplier to 0.5, because it will be shared to player
-                        monsterCharacterEntity.RewardExp(reward, (1f - shareGuildExpRate) / countNearbyPartyMembers * 0.5f * rewardRate, RewardGivenType.PartyShare, playerCharacterEntity.Level, Level);
+                        BaseMonsterCharacterEntity monsterCharacterEntity = nearbyPartyMember.Summons[petIndex].CacheEntity;
+                        if (monsterCharacterEntity != null)
+                        {
+                            // Share exp to pet, set multiplier to 0.5, because it will be shared to player
+                            monsterCharacterEntity.RewardExp(reward.exp, (1f - shareGuildExpRate) / countNearbyPartyMembers * 0.5f * rewardRate, RewardGivenType.PartyShare, playerCharacterEntity.Level, Level);
+                        }
+                        // Set multiplier to 0.5, because it was shared to monster
+                        nearbyPartyMember.RewardExp(reward.exp, (1f - shareGuildExpRate) / countNearbyPartyMembers * 0.5f * rewardRate, RewardGivenType.PartyShare, playerCharacterEntity.Level, Level);
                     }
-                    // Set multiplier to 0.5, because it was shared to monster
-                    nearbyPartyMember.RewardExp(reward, (1f - shareGuildExpRate) / countNearbyPartyMembers * 0.5f * rewardRate, RewardGivenType.PartyShare, playerCharacterEntity.Level, Level);
-                }
-                else
-                {
-                    // No pet, no share, so rate is 1f
-                    nearbyPartyMember.RewardExp(reward, (1f - shareGuildExpRate) / countNearbyPartyMembers * rewardRate, playerCharacterEntity.ObjectId == nearbyPartyMember.ObjectId ? RewardGivenType.KillMonster : RewardGivenType.PartyShare, Level, Level);
+                    else
+                    {
+                        // No pet, no share, so rate is 1f
+                        nearbyPartyMember.RewardExp(reward.exp, (1f - shareGuildExpRate) / countNearbyPartyMembers * rewardRate, playerCharacterEntity.ObjectId == nearbyPartyMember.ObjectId ? RewardGivenType.KillMonster : RewardGivenType.PartyShare, Level, Level);
+                    }
                 }
             }
             // Share Items to party members
             countNearbyPartyMembers = sharingItemMembers.Count;
-            for (int i = 0; i < sharingItemMembers.Count; ++i)
+            if ((CurrentGameInstance.monsterGoldRewardingMode == RewardingMode.Immediately && !reward.NoGold()) || reward.NoCurrencies())
             {
-                nearbyPartyMember = sharingItemMembers[i];
-                // If share item, every party member will receive devided gold
-                // If not share item, character who make damage will receive non-devided gold
-                if (makeMostDamage)
+                for (int i = 0; i < sharingItemMembers.Count; ++i)
                 {
-                    // Make other member in party able to pickup items
-                    _looters.Add(nearbyPartyMember.Id);
+                    nearbyPartyMember = sharingItemMembers[i];
+                    // If share item, every party member will receive devided gold
+                    // If not share item, character who make damage will receive non-devided gold
+                    if (makeMostDamage)
+                    {
+                        // Make other member in party able to pickup items
+                        _looters.Add(nearbyPartyMember.Id);
+                    }
+                    float multiplier = 1f / countNearbyPartyMembers * rewardRate;
+                    RewardGivenType rewardGivenType = playerCharacterEntity.ObjectId == nearbyPartyMember.ObjectId ? RewardGivenType.KillMonster : RewardGivenType.PartyShare;
+                    if (CurrentGameInstance.monsterGoldRewardingMode == RewardingMode.Immediately)
+                        nearbyPartyMember.RewardGold(reward.gold, multiplier, rewardGivenType, Level, Level);
+                    nearbyPartyMember.RewardCurrencies(reward.currencies, multiplier, rewardGivenType, Level, Level);
                 }
-                nearbyPartyMember.RewardCurrencies(reward, 1f / countNearbyPartyMembers * rewardRate, playerCharacterEntity.ObjectId == nearbyPartyMember.ObjectId ? RewardGivenType.KillMonster : RewardGivenType.PartyShare, Level, Level);
             }
 
             // Shared exp has been given, so do not give it to character again
             if (tempPartyData.shareExp)
+            {
                 givenRewardExp = true;
+            }
 
             // Shared gold has been given, so do not give it to character again
             if (tempPartyData.shareItem)
-                givenRewardCurrency = true;
+            {
+                givenRewardGold = true;
+                givenRewardCurrencies = true;
+            }
         }
 
         private bool ShouldShareExp(BasePlayerCharacterEntity attacker, BasePlayerCharacterEntity member)

@@ -238,28 +238,42 @@ namespace MultiplayerARPG
 
         /// <summary>
         /// This will be called giving reward to a character, `giverLevel` is level of giver, `sourceLevel` is level of source, for example if `rewardGivenType` is `PartyShare`, then character's level of the one who kill a monster is `9`, then `giverLevel` will = `9`, and if monster's level is `18`, `sourceLevel` will = `18`, you may change amount of EXP by `giverLevel` or `sourceLevel`
+        /// Return `TRUE` if level up
         /// </summary>
         /// <param name="character"></param>
-        /// <param name="reward"></param>
+        /// <param name="exp"></param>
         /// <param name="multiplier"></param>
         /// <param name="rewardGivenType"></param>
         /// <param name="giverLevel"></param>
         /// <param name="sourceLevel"></param>
         /// <param name="rewardedExp"></param>
         /// <returns></returns>
-        public abstract bool RewardExp(BaseCharacterEntity character, Reward reward, float multiplier, RewardGivenType rewardGivenType, int giverLevel, int sourceLevel, out int rewardedExp);
+        public abstract bool RewardExp(BaseCharacterEntity character, int exp, float multiplier, RewardGivenType rewardGivenType, int giverLevel, int sourceLevel, out int rewardedExp);
 
         /// <summary>
-        /// This will be called giving reward to a character, `giverLevel` is level of giver, `sourceLevel` is level of source, for example if `rewardGivenType` is `PartyShare`, then character's level of the one who kill a monster is `9`, then `giverLevel` will = `9`, and if monster's level is `18`, `sourceLevel` will = `18`, you may change amount of currencies by `giverLevel` or `sourceLevel`
+        /// This will be called giving reward to a character, `giverLevel` is level of giver, `sourceLevel` is level of source, for example if `rewardGivenType` is `PartyShare`, then character's level of the one who kill a monster is `9`, then `giverLevel` will = `9`, and if monster's level is `18`, `sourceLevel` will = `18`, you may change amount of EXP by `giverLevel` or `sourceLevel`
         /// </summary>
         /// <param name="character"></param>
-        /// <param name="reward"></param>
+        /// <param name="gold"></param>
         /// <param name="multiplier"></param>
         /// <param name="rewardGivenType"></param>
         /// <param name="giverLevel"></param>
         /// <param name="sourceLevel"></param>
         /// <param name="rewardedGold"></param>
-        public abstract void RewardCurrencies(BaseCharacterEntity character, Reward reward, float multiplier, RewardGivenType rewardGivenType, int giverLevel, int sourceLevel, out int rewardedGold);
+        /// <returns></returns>
+        public abstract void RewardGold(BaseCharacterEntity character, int gold, float multiplier, RewardGivenType rewardGivenType, int giverLevel, int sourceLevel, out int rewardedGold);
+
+        /// <summary>
+        /// This will be called giving reward to a character, `giverLevel` is level of giver, `sourceLevel` is level of source, for example if `rewardGivenType` is `PartyShare`, then character's level of the one who kill a monster is `9`, then `giverLevel` will = `9`, and if monster's level is `18`, `sourceLevel` will = `18`, you may change amount of currencies by `giverLevel` or `sourceLevel`
+        /// </summary>
+        /// <param name="character"></param>
+        /// <param name="currencies"></param>
+        /// <param name="multiplier"></param>
+        /// <param name="rewardGivenType"></param>
+        /// <param name="giverLevel"></param>
+        /// <param name="sourceLevel"></param>
+        /// <param name="rewardedGold"></param>
+        public abstract void RewardCurrencies(BaseCharacterEntity character, IEnumerable<CurrencyAmount> currencies, float multiplier, RewardGivenType rewardGivenType, int giverLevel, int sourceLevel);
 
         /// <summary>
         /// This will be called when calculate equipment's total stats, may use this function to change equipment's stats rate by its durability

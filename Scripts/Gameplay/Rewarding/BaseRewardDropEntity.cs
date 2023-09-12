@@ -38,8 +38,10 @@ namespace MultiplayerARPG
         [SerializeField]
         protected UnityEvent onPickedUp;
 
-        public bool PutOnPlaceholder { get; protected set; }
+        public float Multiplier { get; protected set; }
         public RewardGivenType GivenType { get; protected set; }
+        public int GiverLevel { get; protected set; }
+        public int SourceLevel { get; protected set; }
         public HashSet<string> Looters { get; protected set; }
         public GameSpawnArea<BaseRewardDropEntity> SpawnArea { get; protected set; }
         public BaseRewardDropEntity SpawnPrefab { get; protected set; }
@@ -214,7 +216,7 @@ namespace MultiplayerARPG
                 CurrentGameInstance.DimensionType == DimensionType.Dimension3D ? Quaternion.Euler(Vector3.up * Random.Range(0, 360)) : Quaternion.identity);
         }
 
-        public static BaseRewardDropEntity Drop(BaseRewardDropEntity prefab, BaseGameEntity dropper, RewardGivenType givenType, int amount, IEnumerable<string> looters, float appearDuration)
+        public static BaseRewardDropEntity Drop(BaseRewardDropEntity prefab, BaseGameEntity dropper, float multiplier, RewardGivenType rewardGivenType, int giverLevel, int sourceLevel, int amount, IEnumerable<string> looters, float appearDuration)
         {
             Vector3 dropPosition = dropper.EntityTransform.position;
             Quaternion dropRotation = Quaternion.identity;
@@ -231,10 +233,10 @@ namespace MultiplayerARPG
                     dropPosition += new Vector3(Random.Range(-1f, 1f) * GameInstance.Singleton.dropDistance, Random.Range(-1f, 1f) * GameInstance.Singleton.dropDistance);
                     break;
             }
-            return Drop(prefab, dropPosition, dropRotation, givenType, amount, looters, appearDuration);
+            return Drop(prefab, dropPosition, dropRotation, multiplier, rewardGivenType, giverLevel, sourceLevel, amount, looters, appearDuration);
         }
 
-        public static BaseRewardDropEntity Drop(BaseRewardDropEntity prefab, Vector3 dropPosition, Quaternion dropRotation, RewardGivenType givenType, int amount, IEnumerable<string> looters, float appearDuration)
+        public static BaseRewardDropEntity Drop(BaseRewardDropEntity prefab, Vector3 dropPosition, Quaternion dropRotation, float multiplier, RewardGivenType givenType, int giverLevel, int sourceLevel, int amount, IEnumerable<string> looters, float appearDuration)
         {
             if (prefab == null)
                 return null;
@@ -248,8 +250,12 @@ namespace MultiplayerARPG
                 prefab.Identity.HashAssetId,
                 dropPosition, dropRotation);
             BaseRewardDropEntity itemDropEntity = spawnObj.GetComponent<BaseRewardDropEntity>();
+            itemDropEntity.Multiplier = multiplier;
             itemDropEntity.GivenType = givenType;
+            itemDropEntity.GiverLevel = giverLevel;
+            itemDropEntity.SourceLevel = sourceLevel;
             itemDropEntity.Amount = amount;
+            itemDropEntity.Looters = new HashSet<string>(looters);
             BaseGameNetworkManager.Singleton.Assets.NetworkSpawn(spawnObj);
             return itemDropEntity;
         }
