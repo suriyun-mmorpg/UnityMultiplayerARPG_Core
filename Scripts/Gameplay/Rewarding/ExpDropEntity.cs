@@ -6,7 +6,7 @@ namespace MultiplayerARPG
     {
         public static ExpDropEntity Drop(BaseGameEntity dropper, float multiplier, RewardGivenType givenType, int giverLevel, int sourceLevel, int amount, IEnumerable<string> looters)
         {
-            return Drop(GameInstance.Singleton.goldDropEntityPrefab, dropper, multiplier, givenType, giverLevel, sourceLevel, amount, looters, GameInstance.Singleton.itemAppearDuration) as ExpDropEntity;
+            return Drop(GameInstance.Singleton.expDropEntityPrefab, dropper, multiplier, givenType, giverLevel, sourceLevel, amount, looters, GameInstance.Singleton.itemAppearDuration) as ExpDropEntity;
         }
 
         protected override bool ProceedPickingUpAtServer_Implementation(BaseCharacterEntity characterEntity, out UITextKeys message)
