@@ -83,13 +83,12 @@ namespace MultiplayerARPG
                 appearanceSettings.Sort();
                 foreach (AppearanceSetting setting in appearanceSettings)
                 {
-                    if (setting.activatingObjects != null && setting.activatingObjects.Length > 0)
+                    if (setting.activatingObjects == null || setting.activatingObjects.Length <= 0)
+                        continue;
+                    foreach (GameObject activatingObject in setting.activatingObjects)
                     {
-                        foreach (GameObject activatingObject in setting.activatingObjects)
-                        {
-                            activatingObject.SetActive(false);
-                            _allActivatingObjects.Add(activatingObject);
-                        }
+                        activatingObject.SetActive(false);
+                        _allActivatingObjects.Add(activatingObject);
                     }
                 }
             }
@@ -141,10 +140,10 @@ namespace MultiplayerARPG
                 return;
             if (_allActivatingObjects != null && _allActivatingObjects.Count > 0)
             {
-                foreach (GameObject allEffectObject in _allActivatingObjects)
+                foreach (GameObject obj in _allActivatingObjects)
                 {
-                    if (allEffectObject.activeSelf)
-                        allEffectObject.SetActive(false);
+                    if (obj.activeSelf)
+                        obj.SetActive(false);
                 }
             }
 
@@ -166,9 +165,9 @@ namespace MultiplayerARPG
                 {
                     if (usingSetting.activatingObjects != null && usingSetting.activatingObjects.Length > 0)
                     {
-                        foreach (GameObject effectObject in usingSetting.activatingObjects)
+                        foreach (GameObject obj in usingSetting.activatingObjects)
                         {
-                            effectObject.SetActive(true);
+                            obj.SetActive(true);
                         }
                     }
                 }

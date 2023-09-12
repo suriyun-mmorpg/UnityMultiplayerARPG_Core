@@ -166,8 +166,9 @@ namespace MultiplayerARPG
 
         [Header("Gameplay Objects")]
         public ItemDropEntity itemDropEntityPrefab = null;
-        public GoldDropEntity goldDropEntityPrefab = null;
         public ExpDropEntity expDropEntityPrefab = null;
+        public GoldDropEntity goldDropEntityPrefab = null;
+        public CurrencyDropEntity currencyDropEntityPrefab = null;
         public WarpPortalEntity warpPortalEntityPrefab = null;
         public ItemsContainerEntity playerCorpsePrefab = null;
         public ItemsContainerEntity monsterCorpsePrefab = null;
@@ -333,10 +334,12 @@ namespace MultiplayerARPG
         public float playerCorpseAppearDuration = 60f;
         [Tooltip("How monster character drop item when dying")]
         public DeadDropItemMode monsterDeadDropItemMode = DeadDropItemMode.DropOnGround;
-        [Tooltip("How monster character drop gold when dying")]
-        public RewardingMode monsterGoldRewardingMode = RewardingMode.Immediately;
         [Tooltip("How monster character drop exp when dying")]
         public RewardingMode monsterExpRewardingMode = RewardingMode.Immediately;
+        [Tooltip("How monster character drop gold when dying")]
+        public RewardingMode monsterGoldRewardingMode = RewardingMode.Immediately;
+        [Tooltip("How monster character drop currency when dying")]
+        public RewardingMode monsterCurrencyRewardingMode = RewardingMode.Immediately;
         [Tooltip("If all items does not picked up from corpse within this duration, it will be destroyed from the server")]
         public float monsterCorpseAppearDuration = 60f;
         [Tooltip("Delay before return move speed while attack or use skill to generic move speed")]

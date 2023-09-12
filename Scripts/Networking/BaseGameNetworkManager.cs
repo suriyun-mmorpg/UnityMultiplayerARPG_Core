@@ -691,10 +691,12 @@ namespace MultiplayerARPG
             HashSet<LiteNetLibIdentity> spawnablePrefabs = new HashSet<LiteNetLibIdentity>(Assets.spawnablePrefabs);
             if (CurrentGameInstance.itemDropEntityPrefab != null)
                 spawnablePrefabs.Add(CurrentGameInstance.itemDropEntityPrefab.Identity);
-            if (CurrentGameInstance.goldDropEntityPrefab != null)
-                spawnablePrefabs.Add(CurrentGameInstance.goldDropEntityPrefab.Identity);
             if (CurrentGameInstance.expDropEntityPrefab != null)
                 spawnablePrefabs.Add(CurrentGameInstance.expDropEntityPrefab.Identity);
+            if (CurrentGameInstance.goldDropEntityPrefab != null)
+                spawnablePrefabs.Add(CurrentGameInstance.goldDropEntityPrefab.Identity);
+            if (CurrentGameInstance.currencyDropEntityPrefab != null)
+                spawnablePrefabs.Add(CurrentGameInstance.currencyDropEntityPrefab.Identity);
             if (CurrentGameInstance.warpPortalEntityPrefab != null)
                 spawnablePrefabs.Add(CurrentGameInstance.warpPortalEntityPrefab.Identity);
             if (CurrentGameInstance.playerCorpsePrefab != null)

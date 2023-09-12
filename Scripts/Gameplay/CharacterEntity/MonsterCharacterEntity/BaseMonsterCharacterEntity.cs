@@ -433,6 +433,16 @@ namespace MultiplayerARPG
                 GoldDropEntity.Drop(this, 1f, RewardGivenType.KillMonster, Level, Level, reward.gold, _looters);
             }
 
+            if (!reward.NoCurrencies() && CurrentGameInstance.monsterCurrencyRewardingMode == RewardingMode.DropOnGround)
+            {
+                foreach (CurrencyAmount currencyAmount in reward.currencies)
+                {
+                    if (currencyAmount.currency == null || currencyAmount.amount <= 0)
+                        continue;
+                    CurrencyDropEntity.Drop(this, 1f, RewardGivenType.KillMonster, Level, Level, currencyAmount.currency, currencyAmount.amount, _looters);
+                }
+            }
+
             if (!IsSummoned)
             {
                 // If not summoned by someone, destroy and respawn it
@@ -544,7 +554,7 @@ namespace MultiplayerARPG
                         tempPlayerCharacterEntity.RewardGold(reward.gold, rewardRate, RewardGivenType.KillMonster, Level, Level);
                     }
 
-                    if (!givenRewardCurrencies)
+                    if (CurrentGameInstance.monsterCurrencyRewardingMode == RewardingMode.Immediately && !givenRewardCurrencies)
                     {
                         // Will give reward when it was not given
                         tempPlayerCharacterEntity.RewardCurrencies(reward.currencies, rewardRate, RewardGivenType.KillMonster, Level, Level);
@@ -637,7 +647,7 @@ namespace MultiplayerARPG
             }
             // Share Items to party members
             countNearbyPartyMembers = sharingItemMembers.Count;
-            if ((CurrentGameInstance.monsterGoldRewardingMode == RewardingMode.Immediately && !reward.NoGold()) || reward.NoCurrencies())
+            if ((CurrentGameInstance.monsterGoldRewardingMode == RewardingMode.Immediately && !reward.NoGold()) || (CurrentGameInstance.monsterCurrencyRewardingMode == RewardingMode.Immediately && reward.NoCurrencies()))
             {
                 for (int i = 0; i < sharingItemMembers.Count; ++i)
                 {
@@ -653,7 +663,8 @@ namespace MultiplayerARPG
                     RewardGivenType rewardGivenType = playerCharacterEntity.ObjectId == nearbyPartyMember.ObjectId ? RewardGivenType.KillMonster : RewardGivenType.PartyShare;
                     if (CurrentGameInstance.monsterGoldRewardingMode == RewardingMode.Immediately)
                         nearbyPartyMember.RewardGold(reward.gold, multiplier, rewardGivenType, Level, Level);
-                    nearbyPartyMember.RewardCurrencies(reward.currencies, multiplier, rewardGivenType, Level, Level);
+                    if (CurrentGameInstance.monsterCurrencyRewardingMode == RewardingMode.Immediately)
+                        nearbyPartyMember.RewardCurrencies(reward.currencies, multiplier, rewardGivenType, Level, Level);
                 }
             }
 
