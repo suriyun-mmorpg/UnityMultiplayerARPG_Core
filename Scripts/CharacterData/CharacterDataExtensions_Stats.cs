@@ -589,21 +589,33 @@ namespace MultiplayerARPG
             // Default weapon
             if (!foundEquippedRightHandWeapon && !foundEquippedLeftHandWeapon)
             {
-                foundEquippedRightHandWeapon = true;
-                CharacterItem fakeDefaultItem = CharacterItem.CreateDefaultWeapon();
-                rightHandWeapon = fakeDefaultItem.GetWeaponItem();
-                rightHandWeaponDamageAmount = fakeDefaultItem.GetDamageAmount();
-                GetBuffs(fakeDefaultItem,
-                    !isCalculateStats ? null : (stats) => buffStats += stats,
-                    !isCalculateStats ? null : (statsRate) => buffStatsRate += statsRate,
-                    !isCalculateAttributes ? null : (attributes) => GameDataHelpers.CombineAttributes(buffAttributes, attributes),
-                    !isCalculateAttributes ? null : (attributesRate) => GameDataHelpers.CombineAttributes(buffAttributesRate, attributesRate),
-                    !isCalculateResistances ? null : (resistances) => GameDataHelpers.CombineResistances(buffResistances, resistances),
-                    !isCalculateArmors ? null : (armors) => GameDataHelpers.CombineArmors(buffArmors, armors),
-                    !isCalculateArmors ? null : (armorsRate) => GameDataHelpers.CombineArmors(buffArmorsRate, armorsRate),
-                    !isCalculateDamages ? null : (damages) => GameDataHelpers.CombineDamages(buffDamages, damages),
-                    !isCalculateDamages ? null : (damagesRate) => GameDataHelpers.CombineDamages(buffDamagesRate, damagesRate),
-                    !isCalculateSkills ? null : (skills) => GameDataHelpers.CombineSkills(buffSkills, skills));
+                BaseCharacter database = data.GetDatabase();
+                if (database is MonsterCharacter monsterCharacter)
+                {
+                    foundEquippedRightHandWeapon = true;
+                    DamageElement damageElement = monsterCharacter.DamageAmount.damageElement;
+                    if (damageElement == null)
+                        damageElement = GameInstance.Singleton.DefaultDamageElement;
+                    rightHandWeaponDamageAmount = new KeyValuePair<DamageElement, MinMaxFloat>(damageElement, monsterCharacter.DamageAmount.amount.GetAmount(data.Level));
+                }
+                else
+                {
+                    foundEquippedRightHandWeapon = true;
+                    CharacterItem fakeDefaultItem = CharacterItem.CreateDefaultWeapon();
+                    rightHandWeapon = fakeDefaultItem.GetWeaponItem();
+                    rightHandWeaponDamageAmount = fakeDefaultItem.GetDamageAmount();
+                    GetBuffs(fakeDefaultItem,
+                        !isCalculateStats ? null : (stats) => buffStats += stats,
+                        !isCalculateStats ? null : (statsRate) => buffStatsRate += statsRate,
+                        !isCalculateAttributes ? null : (attributes) => GameDataHelpers.CombineAttributes(buffAttributes, attributes),
+                        !isCalculateAttributes ? null : (attributesRate) => GameDataHelpers.CombineAttributes(buffAttributesRate, attributesRate),
+                        !isCalculateResistances ? null : (resistances) => GameDataHelpers.CombineResistances(buffResistances, resistances),
+                        !isCalculateArmors ? null : (armors) => GameDataHelpers.CombineArmors(buffArmors, armors),
+                        !isCalculateArmors ? null : (armorsRate) => GameDataHelpers.CombineArmors(buffArmorsRate, armorsRate),
+                        !isCalculateDamages ? null : (damages) => GameDataHelpers.CombineDamages(buffDamages, damages),
+                        !isCalculateDamages ? null : (damagesRate) => GameDataHelpers.CombineDamages(buffDamagesRate, damagesRate),
+                        !isCalculateSkills ? null : (skills) => GameDataHelpers.CombineSkills(buffSkills, skills));
+                }
             }
 
             // Only items will have skill buffs
@@ -692,7 +704,8 @@ namespace MultiplayerARPG
             }
             if (isCalculateRightHandWeaponDamages && foundEquippedRightHandWeapon)
             {
-                rightHandWeaponDamageAmount = GameDataHelpers.GetDamageWithEffectiveness(rightHandWeapon.WeaponType.CacheEffectivenessAttributes, resultAttributes, rightHandWeaponDamageAmount);
+                if (rightHandWeapon != null)
+                    rightHandWeaponDamageAmount = GameDataHelpers.GetDamageWithEffectiveness(rightHandWeapon.WeaponType.CacheEffectivenessAttributes, resultAttributes, rightHandWeaponDamageAmount);
                 resultRightHandDamages = GameDataHelpers.CombineDamages(resultRightHandDamages, rightHandWeaponDamageAmount);
                 resultRightHandDamages = GameDataHelpers.CombineDamages(resultRightHandDamages, buffDamages);
                 resultRightHandDamages = GameDataHelpers.CombineDamages(resultRightHandDamages, GameDataHelpers.MultiplyDamages(new Dictionary<DamageElement, MinMaxFloat>(resultRightHandDamages), buffDamagesRate));
@@ -703,7 +716,8 @@ namespace MultiplayerARPG
             }
             if (isCalculateLeftHandWeaponDamages && foundEquippedLeftHandWeapon)
             {
-                leftHandWeaponDamageAmount = GameDataHelpers.GetDamageWithEffectiveness(leftHandWeapon.WeaponType.CacheEffectivenessAttributes, resultAttributes, leftHandWeaponDamageAmount);
+                if (leftHandWeapon != null)
+                    leftHandWeaponDamageAmount = GameDataHelpers.GetDamageWithEffectiveness(leftHandWeapon.WeaponType.CacheEffectivenessAttributes, resultAttributes, leftHandWeaponDamageAmount);
                 resultLeftHandDamages = GameDataHelpers.CombineDamages(resultLeftHandDamages, leftHandWeaponDamageAmount);
                 resultLeftHandDamages = GameDataHelpers.CombineDamages(resultLeftHandDamages, buffDamages);
                 resultLeftHandDamages = GameDataHelpers.CombineDamages(resultLeftHandDamages, GameDataHelpers.MultiplyDamages(new Dictionary<DamageElement, MinMaxFloat>(resultLeftHandDamages), buffDamagesRate));
