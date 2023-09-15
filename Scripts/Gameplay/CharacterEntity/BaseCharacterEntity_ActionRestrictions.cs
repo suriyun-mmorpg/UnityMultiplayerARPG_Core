@@ -92,7 +92,7 @@ namespace MultiplayerARPG
 
         public virtual bool CanUseItem()
         {
-            if (this.IsDead())
+            if (!CanDoActions())
                 return false;
             if (CachedData.DisallowUseItem)
                 return false;
