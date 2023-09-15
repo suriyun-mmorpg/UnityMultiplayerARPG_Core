@@ -74,7 +74,8 @@ namespace MultiplayerARPG
         {
             int simulateSeed = (int)peerTimestamp;
             bool isLeftHand = simulateState.IsLeftHand;
-            simulateState.SimulateSeed = simulateSeed;
+            if (simulateState.SimulateSeed == 0)
+                simulateState.SimulateSeed = simulateSeed;
 
             // Prepare time
             float time = Time.unscaledTime;
@@ -395,11 +396,11 @@ namespace MultiplayerARPG
             else if (IsOwnerClientOrOwnedByServer)
             {
                 // Attack immediately at server
-                ProceedAttackStateAtServer(isLeftHand);
+                ProceedAttackStateAtServer(0, isLeftHand);
             }
         }
 
-        protected virtual void ProceedAttackStateAtServer(bool isLeftHand)
+        protected virtual void ProceedAttackStateAtServer(long peerTimestamp, bool isLeftHand)
         {
 #if UNITY_EDITOR || UNITY_SERVER
             if (!_manager.IsAcceptNewAction())
@@ -411,6 +412,7 @@ namespace MultiplayerARPG
             // Prepare state data which will be sent to clients
             _serverState = new AttackState()
             {
+                SimulateSeed = (int)peerTimestamp,
                 IsLeftHand = isLeftHand,
             };
 #endif
@@ -449,7 +451,7 @@ namespace MultiplayerARPG
         public virtual void ReadClientAttackStateAtServer(long peerTimestamp, NetDataReader reader)
         {
             bool isLeftHand = reader.GetBool();
-            ProceedAttackStateAtServer(isLeftHand);
+            ProceedAttackStateAtServer(peerTimestamp, isLeftHand);
         }
 
         public virtual void ReadServerAttackStateAtClient(long peerTimestamp, NetDataReader reader)

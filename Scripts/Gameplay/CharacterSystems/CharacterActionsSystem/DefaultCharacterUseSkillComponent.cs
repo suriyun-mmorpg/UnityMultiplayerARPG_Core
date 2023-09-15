@@ -148,7 +148,8 @@ namespace MultiplayerARPG
             uint targetObjectId = simulateState.TargetObjectId;
             AimPosition skillAimPosition = simulateState.AimPosition;
             int? itemDataId = simulateState.ItemDataId;
-            simulateState.SimulateSeed = simulateSeed;
+            if (simulateState.SimulateSeed == 0)
+                simulateState.SimulateSeed = simulateSeed;
 
             // Prepare required data and get skill data
             Entity.GetUsingSkillData(
@@ -455,11 +456,11 @@ namespace MultiplayerARPG
             else if (IsOwnerClientOrOwnedByServer)
             {
                 // Use skill immediately at server
-                ProceedUseSkillStateAtServer(dataId, isLeftHand, targetObjectId, aimPosition);
+                ProceedUseSkillStateAtServer(0, dataId, isLeftHand, targetObjectId, aimPosition);
             }
         }
 
-        protected virtual void ProceedUseSkillStateAtServer(int dataId, bool isLeftHand, uint targetObjectId, AimPosition aimPosition)
+        protected virtual void ProceedUseSkillStateAtServer(long peerTimestamp, int dataId, bool isLeftHand, uint targetObjectId, AimPosition aimPosition)
         {
 #if UNITY_EDITOR || UNITY_SERVER
             if (!_manager.IsAcceptNewAction())
@@ -474,6 +475,7 @@ namespace MultiplayerARPG
             // Prepare state data which will be sent to clients
             _serverState = new UseSkillState()
             {
+                SimulateSeed = (int)peerTimestamp,
                 Skill = skill,
                 SkillLevel = skillLevel,
                 IsLeftHand = isLeftHand,
@@ -511,11 +513,11 @@ namespace MultiplayerARPG
             else if (IsOwnerClientOrOwnedByServer)
             {
                 // Use skill immediately at server
-                ProceedUseSkillItemStateAtServer(itemIndex, isLeftHand, targetObjectId, aimPosition);
+                ProceedUseSkillItemStateAtServer(0, itemIndex, isLeftHand, targetObjectId, aimPosition);
             }
         }
 
-        protected virtual void ProceedUseSkillItemStateAtServer(int itemIndex, bool isLeftHand, uint targetObjectId, AimPosition aimPosition)
+        protected virtual void ProceedUseSkillItemStateAtServer(long peerTimestamp, int itemIndex, bool isLeftHand, uint targetObjectId, AimPosition aimPosition)
         {
 #if UNITY_EDITOR || UNITY_SERVER
             if (!_manager.IsAcceptNewAction())
@@ -530,6 +532,7 @@ namespace MultiplayerARPG
             // Prepare state data which will be sent to clients
             _serverState = new UseSkillState()
             {
+                SimulateSeed = (int)peerTimestamp,
                 ItemDataId = skillItem.DataId,
                 Skill = skill,
                 SkillLevel = skillLevel,
@@ -631,7 +634,7 @@ namespace MultiplayerARPG
             int dataId = reader.GetPackedInt();
             uint targetObjectId = reader.GetPackedUInt();
             AimPosition aimPosition = reader.Get<AimPosition>();
-            ProceedUseSkillStateAtServer(dataId, isLeftHand, targetObjectId, aimPosition);
+            ProceedUseSkillStateAtServer(peerTimestamp, dataId, isLeftHand, targetObjectId, aimPosition);
         }
 
         public virtual void ReadServerUseSkillStateAtClient(long peerTimestamp, NetDataReader reader)
@@ -670,7 +673,7 @@ namespace MultiplayerARPG
             int itemIndex = reader.GetPackedInt();
             uint targetObjectId = reader.GetPackedUInt();
             AimPosition aimPosition = reader.Get<AimPosition>();
-            ProceedUseSkillItemStateAtServer(itemIndex, isLeftHand, targetObjectId, aimPosition);
+            ProceedUseSkillItemStateAtServer(peerTimestamp, itemIndex, isLeftHand, targetObjectId, aimPosition);
         }
 
         public virtual void ReadServerUseSkillItemStateAtClient(long peerTimestamp, NetDataReader reader)
