@@ -17,7 +17,7 @@ namespace MultiplayerARPG
 
         protected struct AttackState
         {
-            public long SimulateSeed;
+            public int SimulateSeed;
             public bool IsLeftHand;
         }
 
@@ -76,6 +76,8 @@ namespace MultiplayerARPG
             bool isLeftHand = simulateState.IsLeftHand;
             if (simulateState.SimulateSeed == 0)
                 simulateState.SimulateSeed = simulateSeed;
+            else
+                simulateSeed = simulateState.SimulateSeed;
 
             // Prepare time
             float time = Time.unscaledTime;

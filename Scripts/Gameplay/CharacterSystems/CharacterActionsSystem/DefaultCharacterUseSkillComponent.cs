@@ -17,7 +17,7 @@ namespace MultiplayerARPG
 
         protected struct UseSkillState
         {
-            public long SimulateSeed;
+            public int SimulateSeed;
             public bool IsInterrupted;
             public bool UseItem;
             public int ItemIndex;
@@ -150,6 +150,8 @@ namespace MultiplayerARPG
             int? itemDataId = simulateState.ItemDataId;
             if (simulateState.SimulateSeed == 0)
                 simulateState.SimulateSeed = simulateSeed;
+            else
+                simulateSeed = simulateState.SimulateSeed;
 
             // Prepare required data and get skill data
             Entity.GetUsingSkillData(
