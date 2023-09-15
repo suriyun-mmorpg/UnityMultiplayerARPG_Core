@@ -247,6 +247,8 @@ namespace MultiplayerARPG
             }
         }
 
+        public IHitRegistrationManager HitRegistrationManager { get { return BaseGameNetworkManager.Singleton.HitRegistrationManager; } }
+
         public override void PrepareRelatesData()
         {
             base.PrepareRelatesData();
@@ -553,8 +555,8 @@ namespace MultiplayerARPG
                 if (!DecreaseAmmos(skillUser, isLeftHand, out Dictionary<DamageElement, MinMaxFloat> increaseDamageAmounts))
                     return;
                 // Increase damage with ammo damage
-                if (increaseDamageAmounts != null && increaseDamageAmounts.Count > 0)
-                    damageAmounts = BaseGameNetworkManager.Singleton.HitRegistrationManager.IncreasePreparedDamageAmounts(skillUser, simulateSeed, increaseDamageAmounts);
+                if (HitRegistrationManager.IncreasePreparedDamageAmounts(skillUser, simulateSeed, increaseDamageAmounts, out Dictionary<DamageElement, MinMaxFloat> resultDamageAmounts))
+                    damageAmounts = resultDamageAmounts;
             }
 
             ApplySkillImplement(

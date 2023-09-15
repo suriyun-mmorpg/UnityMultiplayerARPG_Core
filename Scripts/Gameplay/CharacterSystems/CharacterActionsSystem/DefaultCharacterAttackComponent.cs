@@ -72,7 +72,7 @@ namespace MultiplayerARPG
 
         protected virtual async UniTaskVoid AttackRoutine(long peerTimestamp, AttackState simulateState)
         {
-            int simulateSeed = (int)peerTimestamp;
+            int simulateSeed = GetSimulateSeed(peerTimestamp);
             bool isLeftHand = simulateState.IsLeftHand;
             if (simulateState.SimulateSeed == 0)
                 simulateState.SimulateSeed = simulateSeed;
@@ -309,7 +309,8 @@ namespace MultiplayerARPG
             {
                 // Increase damage with ammo damage
                 Entity.DecreaseAmmos(weapon, isLeftHand, 1, out Dictionary<DamageElement, MinMaxFloat> increaseDamageAmounts);
-                damageAmounts = HitRegistrationManager.IncreasePreparedDamageAmounts(Entity, simulateSeed, increaseDamageAmounts);
+                if (HitRegistrationManager.IncreasePreparedDamageAmounts(Entity, simulateSeed, increaseDamageAmounts, out Dictionary<DamageElement, MinMaxFloat> resultDamageAmounts))
+                    damageAmounts = resultDamageAmounts;
             }
 
             byte fireSpread = 0;
@@ -413,7 +414,7 @@ namespace MultiplayerARPG
             // Prepare state data which will be sent to clients
             _serverState = new AttackState()
             {
-                SimulateSeed = (int)peerTimestamp,
+                SimulateSeed = GetSimulateSeed(peerTimestamp),
                 IsLeftHand = isLeftHand,
             };
 #endif
@@ -468,6 +469,11 @@ namespace MultiplayerARPG
                 IsLeftHand = isLeftHand,
             };
             AttackRoutine(peerTimestamp, simulateState).Forget();
+        }
+
+        private int GetSimulateSeed(long timestamp)
+        {
+            return (int)(timestamp % 16384);
         }
     }
 }

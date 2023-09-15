@@ -105,20 +105,22 @@ namespace MultiplayerARPG
             s_validatingHits[id].SkillLevel = skillLevel;
         }
 
-        public Dictionary<DamageElement, MinMaxFloat> IncreasePreparedDamageAmounts(BaseGameEntity attacker, int randomSeed, Dictionary<DamageElement, MinMaxFloat> increaseDamageAmounts)
+        public bool IncreasePreparedDamageAmounts(BaseGameEntity attacker, int randomSeed, Dictionary<DamageElement, MinMaxFloat> increaseDamageAmounts, out Dictionary<DamageElement, MinMaxFloat> resultDamageAmounts)
         {
+            resultDamageAmounts = null;
             // Only server can modify damage amounts
             if (!BaseGameNetworkManager.Singleton.IsServer || attacker == null)
-                return null;
+                return false;
 
             string id = MakeValidateId(attacker.ObjectId, randomSeed);
             if (!s_validatingHits.TryGetValue(id, out HitValidateData hitValidateData))
-                return null;
+                return false;
 
             if (increaseDamageAmounts != null && increaseDamageAmounts.Count > 0)
-                return hitValidateData.DamageAmounts = GameDataHelpers.CombineDamages(hitValidateData.DamageAmounts, increaseDamageAmounts);
+                hitValidateData.DamageAmounts = GameDataHelpers.CombineDamages(hitValidateData.DamageAmounts, increaseDamageAmounts);
 
-            return hitValidateData.DamageAmounts;
+            resultDamageAmounts = hitValidateData.DamageAmounts;
+            return true;
         }
 
         public void PrepareHitRegOrigin(BaseGameEntity attacker, int randomSeed, byte triggerIndex, byte spreadIndex, Vector3 position, Vector3 direction)

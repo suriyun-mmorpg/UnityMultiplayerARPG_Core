@@ -141,7 +141,7 @@ namespace MultiplayerARPG
 
         protected virtual async UniTaskVoid UseSkillRoutine(long peerTimestamp, UseSkillState simulateState)
         {
-            int simulateSeed = (int)peerTimestamp;
+            int simulateSeed = GetSimulateSeed(peerTimestamp);
             bool isLeftHand = simulateState.IsLeftHand;
             BaseSkill skill = simulateState.Skill;
             int skillLevel = simulateState.SkillLevel;
@@ -477,7 +477,7 @@ namespace MultiplayerARPG
             // Prepare state data which will be sent to clients
             _serverState = new UseSkillState()
             {
-                SimulateSeed = (int)peerTimestamp,
+                SimulateSeed = GetSimulateSeed(peerTimestamp),
                 Skill = skill,
                 SkillLevel = skillLevel,
                 IsLeftHand = isLeftHand,
@@ -534,7 +534,7 @@ namespace MultiplayerARPG
             // Prepare state data which will be sent to clients
             _serverState = new UseSkillState()
             {
-                SimulateSeed = (int)peerTimestamp,
+                SimulateSeed = GetSimulateSeed(peerTimestamp),
                 ItemDataId = skillItem.DataId,
                 Skill = skill,
                 SkillLevel = skillLevel,
@@ -726,6 +726,11 @@ namespace MultiplayerARPG
                 Entity.FpsModel.StopSkillCastAnimation();
                 Entity.FpsModel.StopWeaponChargeAnimation();
             }
+        }
+
+        private int GetSimulateSeed(long timestamp)
+        {
+            return (int)(timestamp % 16384);
         }
     }
 }
