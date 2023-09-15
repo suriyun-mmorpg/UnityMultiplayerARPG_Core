@@ -192,14 +192,14 @@ namespace MultiplayerARPG
             Profiler.EndSample();
         }
 
-        public override void SendServerState()
+        public override void SendServerState(long writeTimestamp)
         {
             if (!IsUpdateEntityComponents)
             {
                 // Don't updates while there is no subscrubers
                 return;
             }
-            base.SendServerState();
+            base.SendServerState(writeTimestamp);
         }
 
         public virtual void InitStats()

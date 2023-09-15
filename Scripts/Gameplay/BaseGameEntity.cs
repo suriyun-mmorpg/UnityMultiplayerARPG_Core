@@ -393,11 +393,10 @@ namespace MultiplayerARPG
             }
         }
 
-        public virtual void SendClientState()
+        public virtual void SendClientState(long writeTimestamp)
         {
             if (Movement != null && Movement.Enabled)
             {
-                long writeTimestamp = Manager.ServerTimestamp;
                 bool shouldSendReliably;
                 s_EntityStateDataWriter.Reset();
                 if (Movement.WriteClientState(writeTimestamp, s_EntityStateDataWriter, out shouldSendReliably))
@@ -411,11 +410,10 @@ namespace MultiplayerARPG
             }
         }
 
-        public virtual void SendServerState()
+        public virtual void SendServerState(long writeTimestamp)
         {
             if (Movement != null && Movement.Enabled)
             {
-                long writeTimestamp = Manager.ServerTimestamp;
                 bool shouldSendReliably;
                 s_EntityStateDataWriter.Reset();
                 if (Movement.WriteServerState(writeTimestamp, s_EntityStateDataWriter, out shouldSendReliably))
@@ -429,20 +427,18 @@ namespace MultiplayerARPG
             }
         }
 
-        public virtual void ReadClientStateAtServer(NetDataReader reader)
+        public virtual void ReadClientStateAtServer(long peerTimestamp, NetDataReader reader)
         {
             if (Movement != null)
             {
-                long peerTimestamp = reader.GetPackedLong();
                 Movement.ReadClientStateAtServer(peerTimestamp, reader);
             }
         }
 
-        public virtual void ReadServerStateAtClient(NetDataReader reader)
+        public virtual void ReadServerStateAtClient(long peerTimestamp, NetDataReader reader)
         {
             if (Movement != null)
             {
-                long peerTimestamp = reader.GetPackedLong();
                 Movement.ReadServerStateAtClient(peerTimestamp, reader);
             }
         }

@@ -387,9 +387,8 @@ namespace MultiplayerARPG
             Profiler.EndSample();
         }
 
-        public override void SendClientState()
+        public override void SendClientState(long writeTimestamp)
         {
-            long writeTimestamp = Manager.ServerTimestamp;
             bool shouldSendReliably = false;
             CharacterInputState inputState = CharacterInputState.None;
             s_EntityStateDataWriter.Reset();
@@ -423,9 +422,8 @@ namespace MultiplayerARPG
             CurrentGameManager.HitRegistrationManager.SendHitRegToServer();
         }
 
-        public override void SendServerState()
+        public override void SendServerState(long writeTimestamp)
         {
-            long writeTimestamp = Manager.ServerTimestamp;
             bool shouldSendReliably = false;
             CharacterInputState inputState = CharacterInputState.None;
             s_EntityStateDataWriter.Reset();
@@ -458,9 +456,8 @@ namespace MultiplayerARPG
             }
         }
 
-        public override void ReadClientStateAtServer(NetDataReader reader)
+        public override void ReadClientStateAtServer(long peerTimestamp, NetDataReader reader)
         {
-            long peerTimestamp = reader.GetPackedLong();
             CharacterInputState inputState = (CharacterInputState)reader.GetPackedUShort();
             // Actions
             if (inputState.Has(CharacterInputState.IsReloading))
@@ -482,9 +479,8 @@ namespace MultiplayerARPG
                 Movement.ReadClientStateAtServer(peerTimestamp, reader);
         }
 
-        public override void ReadServerStateAtClient(NetDataReader reader)
+        public override void ReadServerStateAtClient(long peerTimestamp, NetDataReader reader)
         {
-            long peerTimestamp = reader.GetPackedLong();
             CharacterInputState inputState = (CharacterInputState)reader.GetPackedUShort();
             // Actions
             if (inputState.Has(CharacterInputState.IsReloading))
