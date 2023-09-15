@@ -307,8 +307,7 @@ namespace MultiplayerARPG
             {
                 // Increase damage with ammo damage
                 Entity.DecreaseAmmos(weapon, isLeftHand, 1, out Dictionary<DamageElement, MinMaxFloat> increaseDamageAmounts);
-                HitRegistrationManager.IncreasePreparedDamageAmounts(Entity, simulateSeed, increaseDamageAmounts);
-                damageAmounts = GameDataHelpers.CombineDamages(damageAmounts, increaseDamageAmounts);
+                damageAmounts = HitRegistrationManager.IncreasePreparedDamageAmounts(Entity, simulateSeed, increaseDamageAmounts);
             }
 
             byte fireSpread = 0;
@@ -367,9 +366,9 @@ namespace MultiplayerARPG
             DamageInfo damageInfo = Entity.GetWeaponDamageInfo(weapon.GetWeaponItem());
             Dictionary<DamageElement, MinMaxFloat> damageAmounts;
             if (isLeftHand && Entity.GetCaches().LeftHandDamages != null)
-                damageAmounts = Entity.GetCaches().LeftHandDamages;
+                damageAmounts = new Dictionary<DamageElement, MinMaxFloat>(Entity.GetCaches().LeftHandDamages);
             else
-                damageAmounts = Entity.GetCaches().RightHandDamages;
+                damageAmounts = new Dictionary<DamageElement, MinMaxFloat>(Entity.GetCaches().RightHandDamages);
             ApplyAttack(isLeftHand, weapon, data.simulateSeed, data.triggerIndex, damageInfo, damageAmounts, data.aimPosition);
         }
 

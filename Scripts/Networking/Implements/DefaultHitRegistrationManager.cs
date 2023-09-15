@@ -105,17 +105,20 @@ namespace MultiplayerARPG
             s_validatingHits[id].SkillLevel = skillLevel;
         }
 
-        public void IncreasePreparedDamageAmounts(BaseGameEntity attacker, int randomSeed, Dictionary<DamageElement, MinMaxFloat> increaseDamageAmounts)
+        public Dictionary<DamageElement, MinMaxFloat> IncreasePreparedDamageAmounts(BaseGameEntity attacker, int randomSeed, Dictionary<DamageElement, MinMaxFloat> increaseDamageAmounts)
         {
             // Only server can modify damage amounts
-            if (!BaseGameNetworkManager.Singleton.IsServer || attacker == null || increaseDamageAmounts == null || increaseDamageAmounts.Count == 0)
-                return;
+            if (!BaseGameNetworkManager.Singleton.IsServer || attacker == null)
+                return null;
 
             string id = MakeValidateId(attacker.ObjectId, randomSeed);
-            if (!s_validatingHits.ContainsKey(id))
-                return;
+            if (!s_validatingHits.TryGetValue(id, out HitValidateData hitValidateData))
+                return null;
 
-            s_validatingHits[id].DamageAmounts = GameDataHelpers.CombineDamages(s_validatingHits[id].DamageAmounts, increaseDamageAmounts);
+            if (increaseDamageAmounts != null && increaseDamageAmounts.Count > 0)
+                return hitValidateData.DamageAmounts = GameDataHelpers.CombineDamages(hitValidateData.DamageAmounts, increaseDamageAmounts);
+
+            return hitValidateData.DamageAmounts;
         }
 
         public void PrepareHitRegOrigin(BaseGameEntity attacker, int randomSeed, byte triggerIndex, byte spreadIndex, Vector3 position, Vector3 direction)
