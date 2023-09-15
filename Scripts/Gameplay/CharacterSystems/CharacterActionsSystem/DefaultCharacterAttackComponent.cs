@@ -136,9 +136,9 @@ namespace MultiplayerARPG
             DamageInfo damageInfo = Entity.GetWeaponDamageInfo(weaponItem);
             Dictionary<DamageElement, MinMaxFloat> damageAmounts;
             if (isLeftHand && Entity.GetCaches().LeftHandDamages != null)
-                damageAmounts = Entity.GetCaches().LeftHandDamages;
+                damageAmounts = new Dictionary<DamageElement, MinMaxFloat>(Entity.GetCaches().LeftHandDamages);
             else
-                damageAmounts = Entity.GetCaches().RightHandDamages;
+                damageAmounts = new Dictionary<DamageElement, MinMaxFloat>(Entity.GetCaches().RightHandDamages);
 
 
             // Calculate move speed rate while doing action at clients and server
