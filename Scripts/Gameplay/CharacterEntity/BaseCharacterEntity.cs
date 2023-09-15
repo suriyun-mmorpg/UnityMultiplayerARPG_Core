@@ -652,6 +652,9 @@ namespace MultiplayerARPG
 
         public bool ValidateUseSkillItem(int index, bool isLeftHand, uint targetObjectId)
         {
+            if (UsingSkill)
+                return false;
+
             if (!CanUseItem())
                 return false;
 
