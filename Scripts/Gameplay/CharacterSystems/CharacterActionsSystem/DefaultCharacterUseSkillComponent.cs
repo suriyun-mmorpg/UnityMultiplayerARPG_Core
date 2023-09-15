@@ -17,8 +17,8 @@ namespace MultiplayerARPG
 
         protected struct UseSkillState
         {
+            public long SimulateSeed;
             public bool IsInterrupted;
-            public int SimulateSeed;
             public bool UseItem;
             public int ItemIndex;
             public int? ItemDataId;
@@ -70,14 +70,6 @@ namespace MultiplayerARPG
         public int AnimActionDataId { get; protected set; }
         public IHitRegistrationManager HitRegistrationManager { get { return BaseGameNetworkManager.Singleton.HitRegistrationManager; } }
 
-        [SerializeField]
-        protected SyncFieldInt nextClientSeed = new SyncFieldInt()
-        {
-            syncMode = LiteNetLibSyncField.SyncMode.ServerToClients,
-            sendInterval = 0.01f,
-            dataChannel = BaseGameEntity.STATE_DATA_CHANNEL,
-        };
-
         protected CharacterActionComponentManager _manager;
         protected float _lastAcceptedTime;
         // Network data sending
@@ -88,8 +80,6 @@ namespace MultiplayerARPG
         public override void EntityStart()
         {
             _manager = GetComponent<CharacterActionComponentManager>();
-            if (IsServer)
-                nextClientSeed.Value = Random.Range(int.MinValue, int.MaxValue);
         }
 
         public override void EntityUpdate()
@@ -149,18 +139,16 @@ namespace MultiplayerARPG
             }
         }
 
-        protected virtual async UniTaskVoid UseSkillRoutine(UseSkillState simulateState)
+        protected virtual async UniTaskVoid UseSkillRoutine(long peerTimestamp, UseSkillState simulateState)
         {
-            int simulateSeed = simulateState.SimulateSeed = nextClientSeed.Value;
+            int simulateSeed = (int)peerTimestamp;
             bool isLeftHand = simulateState.IsLeftHand;
             BaseSkill skill = simulateState.Skill;
             int skillLevel = simulateState.SkillLevel;
             uint targetObjectId = simulateState.TargetObjectId;
             AimPosition skillAimPosition = simulateState.AimPosition;
             int? itemDataId = simulateState.ItemDataId;
-
-            if (IsServer)
-                nextClientSeed.Value = Random.Range(int.MinValue, int.MaxValue);
+            simulateState.SimulateSeed = simulateSeed;
 
             // Prepare required data and get skill data
             Entity.GetUsingSkillData(
@@ -387,8 +375,6 @@ namespace MultiplayerARPG
             }
             // Clear action states at clients and server
             ClearUseSkillStates();
-            if (IsServer)
-                nextClientSeed.Value = Random.Range(int.MinValue, int.MaxValue);
         }
 
         public virtual void CancelSkill()
@@ -554,12 +540,12 @@ namespace MultiplayerARPG
 #endif
         }
 
-        public virtual bool WriteClientUseSkillState(NetDataWriter writer)
+        public virtual bool WriteClientUseSkillState(long writeTimestamp, NetDataWriter writer)
         {
             if (_clientState.HasValue && !_clientState.Value.IsInterrupted && !_clientState.Value.UseItem)
             {
                 // Simulate skill using at client
-                UseSkillRoutine(_clientState.Value).Forget();
+                UseSkillRoutine(writeTimestamp, _clientState.Value).Forget();
                 // Send input to server
                 writer.Put(_clientState.Value.IsLeftHand);
                 writer.PutPackedInt(_clientState.Value.Skill.DataId);
@@ -572,12 +558,12 @@ namespace MultiplayerARPG
             return false;
         }
 
-        public virtual bool WriteServerUseSkillState(NetDataWriter writer)
+        public virtual bool WriteServerUseSkillState(long writeTimestamp, NetDataWriter writer)
         {
             if (_serverState.HasValue && !_serverState.Value.IsInterrupted && !_serverState.Value.UseItem)
             {
                 // Simulate skill using at server
-                UseSkillRoutine(_serverState.Value).Forget();
+                UseSkillRoutine(writeTimestamp, _serverState.Value).Forget();
                 // Send input to client
                 writer.Put(_serverState.Value.IsLeftHand);
                 writer.PutPackedInt(_serverState.Value.Skill.DataId);
@@ -591,12 +577,12 @@ namespace MultiplayerARPG
             return false;
         }
 
-        public virtual bool WriteClientUseSkillItemState(NetDataWriter writer)
+        public virtual bool WriteClientUseSkillItemState(long writeTimestamp, NetDataWriter writer)
         {
             if (_clientState.HasValue && !_clientState.Value.IsInterrupted && _clientState.Value.UseItem)
             {
                 // Simulate skill using at client
-                UseSkillRoutine(_clientState.Value).Forget();
+                UseSkillRoutine(writeTimestamp, _clientState.Value).Forget();
                 // Send input to server
                 writer.Put(_clientState.Value.IsLeftHand);
                 writer.PutPackedInt(_clientState.Value.ItemIndex);
@@ -609,14 +595,14 @@ namespace MultiplayerARPG
             return false;
         }
 
-        public virtual bool WriteServerUseSkillItemState(NetDataWriter writer)
+        public virtual bool WriteServerUseSkillItemState(long writeTimestamp, NetDataWriter writer)
         {
             // It's the same behaviour with `use skill` (just play animation at clients)
             // So just send `use skill` state (see `ReadClientUseSkillItemStateAtServer` function)
             return false;
         }
 
-        public virtual bool WriteClientUseSkillInterruptedState(NetDataWriter writer)
+        public virtual bool WriteClientUseSkillInterruptedState(long writeTimestamp, NetDataWriter writer)
         {
             if (_clientState.HasValue && _clientState.Value.IsInterrupted)
             {
@@ -627,7 +613,7 @@ namespace MultiplayerARPG
             return false;
         }
 
-        public virtual bool WriteServerUseSkillInterruptedState(NetDataWriter writer)
+        public virtual bool WriteServerUseSkillInterruptedState(long writeTimestamp, NetDataWriter writer)
         {
             if (_serverState.HasValue && _serverState.Value.IsInterrupted)
             {
@@ -639,7 +625,7 @@ namespace MultiplayerARPG
             return false;
         }
 
-        public virtual void ReadClientUseSkillStateAtServer(NetDataReader reader)
+        public virtual void ReadClientUseSkillStateAtServer(long peerTimestamp, NetDataReader reader)
         {
             bool isLeftHand = reader.GetBool();
             int dataId = reader.GetPackedInt();
@@ -648,7 +634,7 @@ namespace MultiplayerARPG
             ProceedUseSkillStateAtServer(dataId, isLeftHand, targetObjectId, aimPosition);
         }
 
-        public virtual void ReadServerUseSkillStateAtClient(NetDataReader reader)
+        public virtual void ReadServerUseSkillStateAtClient(long peerTimestamp, NetDataReader reader)
         {
             bool isLeftHand = reader.GetBool();
             int skillDataId = reader.GetPackedInt();
@@ -675,10 +661,10 @@ namespace MultiplayerARPG
                 TargetObjectId = targetObjectId,
                 AimPosition = aimPosition,
             };
-            UseSkillRoutine(simulateState).Forget();
+            UseSkillRoutine(peerTimestamp, simulateState).Forget();
         }
 
-        public virtual void ReadClientUseSkillItemStateAtServer(NetDataReader reader)
+        public virtual void ReadClientUseSkillItemStateAtServer(long peerTimestamp, NetDataReader reader)
         {
             bool isLeftHand = reader.GetBool();
             int itemIndex = reader.GetPackedInt();
@@ -687,19 +673,19 @@ namespace MultiplayerARPG
             ProceedUseSkillItemStateAtServer(itemIndex, isLeftHand, targetObjectId, aimPosition);
         }
 
-        public virtual void ReadServerUseSkillItemStateAtClient(NetDataReader reader)
+        public virtual void ReadServerUseSkillItemStateAtClient(long peerTimestamp, NetDataReader reader)
         {
             // See `ReadServerUseSkillStateAtClient`
         }
 
-        public void ReadClientUseSkillInterruptedStateAtServer(NetDataReader reader)
+        public void ReadClientUseSkillInterruptedStateAtServer(long peerTimestamp, NetDataReader reader)
         {
             // TODO: Verify interrupt request
             // Broadcast interrupting to all clients
             InterruptCastingSkill();
         }
 
-        public void ReadServerUseSkillInterruptedStateAtClient(NetDataReader reader)
+        public void ReadServerUseSkillInterruptedStateAtClient(long peerTimestamp, NetDataReader reader)
         {
             if (IsServer)
             {

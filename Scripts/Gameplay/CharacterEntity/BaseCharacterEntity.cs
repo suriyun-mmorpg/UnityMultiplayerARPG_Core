@@ -389,31 +389,33 @@ namespace MultiplayerARPG
 
         public override void SendClientState()
         {
+            long writeTimestamp = Manager.ServerTimestamp;
             bool shouldSendReliably = false;
             CharacterInputState inputState = CharacterInputState.None;
             s_EntityStateDataWriter.Reset();
-            if (ReloadComponent.WriteClientReloadState(s_EntityStateDataWriter))
+            if (ReloadComponent.WriteClientReloadState(writeTimestamp, s_EntityStateDataWriter))
                 inputState |= CharacterInputState.IsReloading;
-            if (ChargeComponent.WriteClientStopChargeState(s_EntityStateDataWriter))
+            if (ChargeComponent.WriteClientStopChargeState(writeTimestamp, s_EntityStateDataWriter))
                 inputState |= CharacterInputState.IsChargeStopping;
-            if (ChargeComponent.WriteClientStartChargeState(s_EntityStateDataWriter))
+            if (ChargeComponent.WriteClientStartChargeState(writeTimestamp, s_EntityStateDataWriter))
                 inputState |= CharacterInputState.IsChargeStarting;
-            if (AttackComponent.WriteClientAttackState(s_EntityStateDataWriter))
+            if (AttackComponent.WriteClientAttackState(writeTimestamp, s_EntityStateDataWriter))
                 inputState |= CharacterInputState.IsAttacking;
-            if (UseSkillComponent.WriteClientUseSkillInterruptedState(s_EntityStateDataWriter))
+            if (UseSkillComponent.WriteClientUseSkillInterruptedState(writeTimestamp, s_EntityStateDataWriter))
                 inputState |= CharacterInputState.IsUsingSkillInterrupted;
-            if (UseSkillComponent.WriteClientUseSkillItemState(s_EntityStateDataWriter))
+            if (UseSkillComponent.WriteClientUseSkillItemState(writeTimestamp, s_EntityStateDataWriter))
                 inputState |= CharacterInputState.IsUsingSkillItem;
-            if (UseSkillComponent.WriteClientUseSkillState(s_EntityStateDataWriter))
+            if (UseSkillComponent.WriteClientUseSkillState(writeTimestamp, s_EntityStateDataWriter))
                 inputState |= CharacterInputState.IsUsingSkill;
             // Movement
-            if (!Movement.IsNull() && Movement.Enabled && Movement.WriteClientState(s_EntityStateDataWriter, out shouldSendReliably))
+            if (!Movement.IsNull() && Movement.Enabled && Movement.WriteClientState(writeTimestamp, s_EntityStateDataWriter, out shouldSendReliably))
                 inputState |= CharacterInputState.IsMoving;
             // Set input state and send to clients
             if (inputState != CharacterInputState.None)
             {
                 TransportHandler.WritePacket(s_EntityStateMessageWriter, GameNetworkingConsts.EntityState);
                 s_EntityStateMessageWriter.PutPackedUInt(ObjectId);
+                s_EntityStateMessageWriter.PutPackedLong(writeTimestamp);
                 s_EntityStateMessageWriter.PutPackedUShort((ushort)inputState);
                 s_EntityStateMessageWriter.Put(s_EntityStateDataWriter.Data, 0, s_EntityStateDataWriter.Length);
                 ClientSendMessage(STATE_DATA_CHANNEL, (shouldSendReliably || (ushort)inputState > 1 << 0) ? DeliveryMethod.ReliableOrdered : DeliveryMethod.Sequenced, s_EntityStateMessageWriter);
@@ -423,31 +425,33 @@ namespace MultiplayerARPG
 
         public override void SendServerState()
         {
+            long writeTimestamp = Manager.ServerTimestamp;
             bool shouldSendReliably = false;
             CharacterInputState inputState = CharacterInputState.None;
             s_EntityStateDataWriter.Reset();
-            if (ReloadComponent.WriteServerReloadState(s_EntityStateDataWriter))
+            if (ReloadComponent.WriteServerReloadState(writeTimestamp, s_EntityStateDataWriter))
                 inputState |= CharacterInputState.IsReloading;
-            if (ChargeComponent.WriteServerStopChargeState(s_EntityStateDataWriter))
+            if (ChargeComponent.WriteServerStopChargeState(writeTimestamp, s_EntityStateDataWriter))
                 inputState |= CharacterInputState.IsChargeStopping;
-            if (ChargeComponent.WriteServerStartChargeState(s_EntityStateDataWriter))
+            if (ChargeComponent.WriteServerStartChargeState(writeTimestamp, s_EntityStateDataWriter))
                 inputState |= CharacterInputState.IsChargeStarting;
-            if (AttackComponent.WriteServerAttackState(s_EntityStateDataWriter))
+            if (AttackComponent.WriteServerAttackState(writeTimestamp, s_EntityStateDataWriter))
                 inputState |= CharacterInputState.IsAttacking;
-            if (UseSkillComponent.WriteServerUseSkillInterruptedState(s_EntityStateDataWriter))
+            if (UseSkillComponent.WriteServerUseSkillInterruptedState(writeTimestamp, s_EntityStateDataWriter))
                 inputState |= CharacterInputState.IsUsingSkillInterrupted;
-            if (UseSkillComponent.WriteServerUseSkillItemState(s_EntityStateDataWriter))
+            if (UseSkillComponent.WriteServerUseSkillItemState(writeTimestamp, s_EntityStateDataWriter))
                 inputState |= CharacterInputState.IsUsingSkillItem;
-            if (UseSkillComponent.WriteServerUseSkillState(s_EntityStateDataWriter))
+            if (UseSkillComponent.WriteServerUseSkillState(writeTimestamp, s_EntityStateDataWriter))
                 inputState |= CharacterInputState.IsUsingSkill;
             // Movement
-            if (!Movement.IsNull() && Movement.Enabled && Movement.WriteServerState(s_EntityStateDataWriter, out shouldSendReliably))
+            if (!Movement.IsNull() && Movement.Enabled && Movement.WriteServerState(writeTimestamp, s_EntityStateDataWriter, out shouldSendReliably))
                 inputState |= CharacterInputState.IsMoving;
             // Set input state and send to clients
             if (inputState != CharacterInputState.None)
             {
                 TransportHandler.WritePacket(s_EntityStateMessageWriter, GameNetworkingConsts.EntityState);
                 s_EntityStateMessageWriter.PutPackedUInt(ObjectId);
+                s_EntityStateMessageWriter.PutPackedLong(writeTimestamp);
                 s_EntityStateMessageWriter.PutPackedUShort((ushort)inputState);
                 s_EntityStateMessageWriter.Put(s_EntityStateDataWriter.Data, 0, s_EntityStateDataWriter.Length);
                 ServerSendMessageToSubscribers(STATE_DATA_CHANNEL, (shouldSendReliably || (ushort)inputState > 1 << 0) ? DeliveryMethod.ReliableOrdered : DeliveryMethod.Sequenced, s_EntityStateMessageWriter);
@@ -456,48 +460,50 @@ namespace MultiplayerARPG
 
         public override void ReadClientStateAtServer(NetDataReader reader)
         {
+            long peerTimestamp = reader.GetPackedLong();
             CharacterInputState inputState = (CharacterInputState)reader.GetPackedUShort();
             // Actions
             if (inputState.Has(CharacterInputState.IsReloading))
-                ReloadComponent.ReadClientReloadStateAtServer(reader);
+                ReloadComponent.ReadClientReloadStateAtServer(peerTimestamp, reader);
             if (inputState.Has(CharacterInputState.IsChargeStopping))
-                ChargeComponent.ReadClientStopChargeStateAtServer(reader);
+                ChargeComponent.ReadClientStopChargeStateAtServer(peerTimestamp, reader);
             if (inputState.Has(CharacterInputState.IsChargeStarting))
-                ChargeComponent.ReadClientStartChargeStateAtServer(reader);
+                ChargeComponent.ReadClientStartChargeStateAtServer(peerTimestamp, reader);
             if (inputState.Has(CharacterInputState.IsAttacking))
-                AttackComponent.ReadClientAttackStateAtServer(reader);
+                AttackComponent.ReadClientAttackStateAtServer(peerTimestamp, reader);
             if (inputState.Has(CharacterInputState.IsUsingSkillInterrupted))
-                UseSkillComponent.ReadClientUseSkillInterruptedStateAtServer(reader);
+                UseSkillComponent.ReadClientUseSkillInterruptedStateAtServer(peerTimestamp, reader);
             if (inputState.Has(CharacterInputState.IsUsingSkillItem))
-                UseSkillComponent.ReadClientUseSkillItemStateAtServer(reader);
+                UseSkillComponent.ReadClientUseSkillItemStateAtServer(peerTimestamp, reader);
             if (inputState.Has(CharacterInputState.IsUsingSkill))
-                UseSkillComponent.ReadClientUseSkillStateAtServer(reader);
+                UseSkillComponent.ReadClientUseSkillStateAtServer(peerTimestamp, reader);
             // Movement
             if (inputState.Has(CharacterInputState.IsMoving) && Movement != null)
-                Movement.ReadClientStateAtServer(reader);
+                Movement.ReadClientStateAtServer(peerTimestamp, reader);
         }
 
         public override void ReadServerStateAtClient(NetDataReader reader)
         {
+            long peerTimestamp = reader.GetPackedLong();
             CharacterInputState inputState = (CharacterInputState)reader.GetPackedUShort();
             // Actions
             if (inputState.Has(CharacterInputState.IsReloading))
-                ReloadComponent.ReadServerReloadStateAtClient(reader);
+                ReloadComponent.ReadServerReloadStateAtClient(peerTimestamp, reader);
             if (inputState.Has(CharacterInputState.IsChargeStopping))
-                ChargeComponent.ReadServerStopChargeStateAtClient(reader);
+                ChargeComponent.ReadServerStopChargeStateAtClient(peerTimestamp, reader);
             if (inputState.Has(CharacterInputState.IsChargeStarting))
-                ChargeComponent.ReadServerStartChargeStateAtClient(reader);
+                ChargeComponent.ReadServerStartChargeStateAtClient(peerTimestamp, reader);
             if (inputState.Has(CharacterInputState.IsAttacking))
-                AttackComponent.ReadServerAttackStateAtClient(reader);
+                AttackComponent.ReadServerAttackStateAtClient(peerTimestamp, reader);
             if (inputState.Has(CharacterInputState.IsUsingSkillInterrupted))
-                UseSkillComponent.ReadServerUseSkillInterruptedStateAtClient(reader);
+                UseSkillComponent.ReadServerUseSkillInterruptedStateAtClient(peerTimestamp, reader);
             if (inputState.Has(CharacterInputState.IsUsingSkillItem))
-                UseSkillComponent.ReadServerUseSkillItemStateAtClient(reader);
+                UseSkillComponent.ReadServerUseSkillItemStateAtClient(peerTimestamp, reader);
             if (inputState.Has(CharacterInputState.IsUsingSkill))
-                UseSkillComponent.ReadServerUseSkillStateAtClient(reader);
+                UseSkillComponent.ReadServerUseSkillStateAtClient(peerTimestamp, reader);
             // Movement
             if (inputState.Has(CharacterInputState.IsMoving) && Movement != null)
-                Movement.ReadServerStateAtClient(reader);
+                Movement.ReadServerStateAtClient(peerTimestamp, reader);
         }
 
         public override void PlayJumpAnimation()

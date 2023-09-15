@@ -17,16 +17,18 @@ namespace MultiplayerARPG
         /// <summary>
         /// Return `TRUE` if it have something written
         /// </summary>
+        /// <param name="writeTimestamp"></param>
         /// <param name="writer"></param>
         /// <returns></returns>
-        bool WriteClientAttackState(NetDataWriter writer);
+        bool WriteClientAttackState(long writeTimestamp, NetDataWriter writer);
         /// <summary>
         /// Return `TRUE` if it have something written
         /// </summary>
+        /// <param name="writeTimestamp"></param>
         /// <param name="writer"></param>
         /// <returns></returns>
-        bool WriteServerAttackState(NetDataWriter writer);
-        void ReadClientAttackStateAtServer(NetDataReader reader);
-        void ReadServerAttackStateAtClient(NetDataReader reader);
+        bool WriteServerAttackState(long writeTimestamp, NetDataWriter writer);
+        void ReadClientAttackStateAtServer(long peerTimestamp, NetDataReader reader);
+        void ReadServerAttackStateAtClient(long peerTimestamp, NetDataReader reader);
     }
 }

@@ -15,30 +15,34 @@ namespace MultiplayerARPG
         /// <summary>
         /// Return `TRUE` if it have something written
         /// </summary>
+        /// <param name="writeTimestamp"></param>
         /// <param name="writer"></param>
         /// <returns></returns>
-        bool WriteClientStartChargeState(NetDataWriter writer);
+        bool WriteClientStartChargeState(long writeTimestamp, NetDataWriter writer);
         /// <summary>
         /// Return `TRUE` if it have something written
         /// </summary>
+        /// <param name="writeTimestamp"></param>
         /// <param name="writer"></param>
         /// <returns></returns>
-        bool WriteServerStartChargeState(NetDataWriter writer);
+        bool WriteServerStartChargeState(long writeTimestamp, NetDataWriter writer);
         /// <summary>
         /// Return `TRUE` if it have something written
         /// </summary>
+        /// <param name="writeTimestamp"></param>
         /// <param name="writer"></param>
         /// <returns></returns>
-        bool WriteClientStopChargeState(NetDataWriter writer);
+        bool WriteClientStopChargeState(long writeTimestamp, NetDataWriter writer);
         /// <summary>
         /// Return `TRUE` if it have something written
         /// </summary>
+        /// <param name="writeTimestamp"></param>
         /// <param name="writer"></param>
         /// <returns></returns>
-        bool WriteServerStopChargeState(NetDataWriter writer);
-        void ReadClientStartChargeStateAtServer(NetDataReader reader);
-        void ReadServerStartChargeStateAtClient(NetDataReader reader);
-        void ReadClientStopChargeStateAtServer(NetDataReader reader);
-        void ReadServerStopChargeStateAtClient(NetDataReader reader);
+        bool WriteServerStopChargeState(long writeTimestamp, NetDataWriter writer);
+        void ReadClientStartChargeStateAtServer(long peerTimestamp, NetDataReader reader);
+        void ReadServerStartChargeStateAtClient(long peerTimestamp, NetDataReader reader);
+        void ReadClientStopChargeStateAtServer(long peerTimestamp, NetDataReader reader);
+        void ReadServerStopChargeStateAtClient(long peerTimestamp, NetDataReader reader);
     }
 }

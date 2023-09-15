@@ -25,44 +25,50 @@ namespace MultiplayerARPG
         /// <summary>
         /// Return `TRUE` if it have something written
         /// </summary>
+        /// <param name="writerTimestamp"></param>
         /// <param name="writer"></param>
         /// <returns></returns>
-        bool WriteClientUseSkillState(NetDataWriter writer);
+        bool WriteClientUseSkillState(long writerTimestamp, NetDataWriter writer);
         /// <summary>
         /// Return `TRUE` if it have something written
         /// </summary>
+        /// <param name="writerTimestamp"></param>
         /// <param name="writer"></param>
         /// <returns></returns>
-        bool WriteServerUseSkillState(NetDataWriter writer);
+        bool WriteServerUseSkillState(long writerTimestamp, NetDataWriter writer);
         /// <summary>
         /// Return `TRUE` if it have something written
         /// </summary>
+        /// <param name="writerTimestamp"></param>
         /// <param name="writer"></param>
         /// <returns></returns>
-        bool WriteClientUseSkillItemState(NetDataWriter writer);
+        bool WriteClientUseSkillItemState(long writerTimestamp, NetDataWriter writer);
         /// <summary>
         /// Return `TRUE` if it have something written
         /// </summary>
+        /// <param name="writerTimestamp"></param>
         /// <param name="writer"></param>
         /// <returns></returns>
-        bool WriteServerUseSkillItemState(NetDataWriter writer);
+        bool WriteServerUseSkillItemState(long writerTimestamp, NetDataWriter writer);
         /// <summary>
         /// Return `TRUE` if it have something written
         /// </summary>
+        /// <param name="writerTimestamp"></param>
         /// <param name="writer"></param>
         /// <returns></returns>
-        bool WriteClientUseSkillInterruptedState(NetDataWriter writer);
+        bool WriteClientUseSkillInterruptedState(long writerTimestamp, NetDataWriter writer);
         /// <summary>
         /// Return `TRUE` if it have something written
         /// </summary>
+        /// <param name="writerTimestamp"></param>
         /// <param name="writer"></param>
         /// <returns></returns>
-        bool WriteServerUseSkillInterruptedState(NetDataWriter writer);
-        void ReadClientUseSkillStateAtServer(NetDataReader reader);
-        void ReadServerUseSkillStateAtClient(NetDataReader reader);
-        void ReadClientUseSkillItemStateAtServer(NetDataReader reader);
-        void ReadServerUseSkillItemStateAtClient(NetDataReader reader);
-        void ReadClientUseSkillInterruptedStateAtServer(NetDataReader reader);
-        void ReadServerUseSkillInterruptedStateAtClient(NetDataReader reader);
+        bool WriteServerUseSkillInterruptedState(long writerTimestamp, NetDataWriter writer);
+        void ReadClientUseSkillStateAtServer(long peerTimestamp, NetDataReader reader);
+        void ReadServerUseSkillStateAtClient(long peerTimestamp, NetDataReader reader);
+        void ReadClientUseSkillItemStateAtServer(long peerTimestamp, NetDataReader reader);
+        void ReadServerUseSkillItemStateAtClient(long peerTimestamp, NetDataReader reader);
+        void ReadClientUseSkillInterruptedStateAtServer(long peerTimestamp, NetDataReader reader);
+        void ReadServerUseSkillInterruptedStateAtClient(long peerTimestamp, NetDataReader reader);
     }
 }

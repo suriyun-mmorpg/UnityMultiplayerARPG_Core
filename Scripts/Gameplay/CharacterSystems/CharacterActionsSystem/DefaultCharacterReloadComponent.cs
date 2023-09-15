@@ -284,7 +284,7 @@ namespace MultiplayerARPG
 #endif
         }
 
-        public virtual bool WriteClientReloadState(NetDataWriter writer)
+        public virtual bool WriteClientReloadState(long writeTimestamp, NetDataWriter writer)
         {
             if (_clientState.HasValue)
             {
@@ -299,7 +299,7 @@ namespace MultiplayerARPG
             return false;
         }
 
-        public virtual bool WriteServerReloadState(NetDataWriter writer)
+        public virtual bool WriteServerReloadState(long writeTimestamp, NetDataWriter writer)
         {
             if (_serverState.HasValue)
             {
@@ -315,13 +315,13 @@ namespace MultiplayerARPG
             return false;
         }
 
-        public virtual void ReadClientReloadStateAtServer(NetDataReader reader)
+        public virtual void ReadClientReloadStateAtServer(long peerTimestamp, NetDataReader reader)
         {
             bool isLeftHand = reader.GetBool();
             ProceedReloadStateAtServer(isLeftHand);
         }
 
-        public virtual void ReadServerReloadStateAtClient(NetDataReader reader)
+        public virtual void ReadServerReloadStateAtClient(long peerTimestamp, NetDataReader reader)
         {
             bool isLeftHand = reader.GetBool();
             int reloadingAmmoAmount = reader.GetPackedInt();

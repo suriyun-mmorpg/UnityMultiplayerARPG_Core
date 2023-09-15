@@ -397,12 +397,14 @@ namespace MultiplayerARPG
         {
             if (Movement != null && Movement.Enabled)
             {
+                long writeTimestamp = Manager.ServerTimestamp;
                 bool shouldSendReliably;
                 s_EntityStateDataWriter.Reset();
-                if (Movement.WriteClientState(s_EntityStateDataWriter, out shouldSendReliably))
+                if (Movement.WriteClientState(writeTimestamp, s_EntityStateDataWriter, out shouldSendReliably))
                 {
                     TransportHandler.WritePacket(s_EntityStateMessageWriter, GameNetworkingConsts.EntityState);
                     s_EntityStateMessageWriter.PutPackedUInt(ObjectId);
+                    s_EntityStateMessageWriter.PutPackedLong(writeTimestamp);
                     s_EntityStateMessageWriter.Put(s_EntityStateDataWriter.Data, 0, s_EntityStateDataWriter.Length);
                     ClientSendMessage(STATE_DATA_CHANNEL, shouldSendReliably ? DeliveryMethod.ReliableOrdered : DeliveryMethod.Sequenced, s_EntityStateMessageWriter);
                 }
@@ -413,12 +415,14 @@ namespace MultiplayerARPG
         {
             if (Movement != null && Movement.Enabled)
             {
+                long writeTimestamp = Manager.ServerTimestamp;
                 bool shouldSendReliably;
                 s_EntityStateDataWriter.Reset();
-                if (Movement.WriteServerState(s_EntityStateDataWriter, out shouldSendReliably))
+                if (Movement.WriteServerState(writeTimestamp, s_EntityStateDataWriter, out shouldSendReliably))
                 {
                     TransportHandler.WritePacket(s_EntityStateMessageWriter, GameNetworkingConsts.EntityState);
                     s_EntityStateMessageWriter.PutPackedUInt(ObjectId);
+                    s_EntityStateMessageWriter.PutPackedLong(writeTimestamp);
                     s_EntityStateMessageWriter.Put(s_EntityStateDataWriter.Data, 0, s_EntityStateDataWriter.Length);
                     ServerSendMessageToSubscribers(STATE_DATA_CHANNEL, shouldSendReliably ? DeliveryMethod.ReliableOrdered : DeliveryMethod.Sequenced, s_EntityStateMessageWriter);
                 }
@@ -428,13 +432,19 @@ namespace MultiplayerARPG
         public virtual void ReadClientStateAtServer(NetDataReader reader)
         {
             if (Movement != null)
-                Movement.ReadClientStateAtServer(reader);
+            {
+                long peerTimestamp = reader.GetPackedLong();
+                Movement.ReadClientStateAtServer(peerTimestamp, reader);
+            }
         }
 
         public virtual void ReadServerStateAtClient(NetDataReader reader)
         {
             if (Movement != null)
-                Movement.ReadServerStateAtClient(reader);
+            {
+                long peerTimestamp = reader.GetPackedLong();
+                Movement.ReadServerStateAtClient(peerTimestamp, reader);
+            }
         }
 
         protected virtual void OnValidate()

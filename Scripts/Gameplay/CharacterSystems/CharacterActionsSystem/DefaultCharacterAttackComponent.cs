@@ -17,7 +17,7 @@ namespace MultiplayerARPG
 
         protected struct AttackState
         {
-            public int SimulateSeed;
+            public long SimulateSeed;
             public bool IsLeftHand;
         }
 
@@ -43,14 +43,6 @@ namespace MultiplayerARPG
         public bool doNotRandomAnimation;
         public float animationResetDelay = 2f;
 
-        [SerializeField]
-        protected SyncFieldInt nextClientSeed = new SyncFieldInt()
-        {
-            syncMode = LiteNetLibSyncField.SyncMode.ServerToClients,
-            sendInterval = 0.01f,
-            dataChannel = BaseGameEntity.STATE_DATA_CHANNEL,
-        };
-
         protected CharacterActionComponentManager _manager;
         protected int _lastAttackAnimationIndex = 0;
         protected int _lastAttackDataId = 0;
@@ -63,8 +55,6 @@ namespace MultiplayerARPG
         public override void EntityStart()
         {
             _manager = GetComponent<CharacterActionComponentManager>();
-            if (IsServer)
-                nextClientSeed.Value = Random.Range(int.MinValue, int.MaxValue);
         }
 
         protected virtual void SetAttackActionStates(AnimActionType animActionType, int animActionDataId, AttackState simulateState)
@@ -80,13 +70,11 @@ namespace MultiplayerARPG
             _simulateState = null;
         }
 
-        protected virtual async UniTaskVoid AttackRoutine(AttackState simulateState)
+        protected virtual async UniTaskVoid AttackRoutine(long peerTimestamp, AttackState simulateState)
         {
-            int simulateSeed = simulateState.SimulateSeed = nextClientSeed.Value;
+            int simulateSeed = (int)peerTimestamp;
             bool isLeftHand = simulateState.IsLeftHand;
-
-            if (IsServer)
-                nextClientSeed.Value = Random.Range(int.MinValue, int.MaxValue);
+            simulateState.SimulateSeed = simulateSeed;
 
             // Prepare time
             float time = Time.unscaledTime;
@@ -428,12 +416,12 @@ namespace MultiplayerARPG
 #endif
         }
 
-        public virtual bool WriteClientAttackState(NetDataWriter writer)
+        public virtual bool WriteClientAttackState(long writeTimestamp, NetDataWriter writer)
         {
             if (_clientState.HasValue)
             {
                 // Simulate attacking at client
-                AttackRoutine(_clientState.Value).Forget();
+                AttackRoutine(writeTimestamp, _clientState.Value).Forget();
                 // Send input to server
                 writer.Put(_clientState.Value.IsLeftHand);
                 // Clear Input
@@ -443,12 +431,12 @@ namespace MultiplayerARPG
             return false;
         }
 
-        public virtual bool WriteServerAttackState(NetDataWriter writer)
+        public virtual bool WriteServerAttackState(long writeTimestamp, NetDataWriter writer)
         {
             if (_serverState.HasValue)
             {
                 // Simulate attacking at server
-                AttackRoutine(_serverState.Value).Forget();
+                AttackRoutine(writeTimestamp, _serverState.Value).Forget();
                 // Send input to client
                 writer.Put(_serverState.Value.IsLeftHand);
                 // Clear Input
@@ -458,13 +446,13 @@ namespace MultiplayerARPG
             return false;
         }
 
-        public virtual void ReadClientAttackStateAtServer(NetDataReader reader)
+        public virtual void ReadClientAttackStateAtServer(long peerTimestamp, NetDataReader reader)
         {
             bool isLeftHand = reader.GetBool();
             ProceedAttackStateAtServer(isLeftHand);
         }
 
-        public virtual void ReadServerAttackStateAtClient(NetDataReader reader)
+        public virtual void ReadServerAttackStateAtClient(long peerTimestamp, NetDataReader reader)
         {
             bool isLeftHand = reader.GetBool();
             if (IsServer || IsOwnerClient)
@@ -476,7 +464,7 @@ namespace MultiplayerARPG
             {
                 IsLeftHand = isLeftHand,
             };
-            AttackRoutine(simulateState).Forget();
+            AttackRoutine(peerTimestamp, simulateState).Forget();
         }
     }
 }

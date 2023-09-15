@@ -342,7 +342,7 @@ namespace MultiplayerARPG
             NavPaths.Enqueue(position);
         }
 
-        public bool WriteClientState(NetDataWriter writer, out bool shouldSendReliably)
+        public bool WriteClientState(long writeTimestamp, NetDataWriter writer, out bool shouldSendReliably)
         {
             shouldSendReliably = false;
             if (movementSecure == MovementSecure.NotSecure && IsOwnerClient && !IsServer)
@@ -382,7 +382,7 @@ namespace MultiplayerARPG
             return false;
         }
 
-        public bool WriteServerState(NetDataWriter writer, out bool shouldSendReliably)
+        public bool WriteServerState(long writeTimestamp, NetDataWriter writer, out bool shouldSendReliably)
         {
             shouldSendReliably = false;
             if (_isTeleporting)
@@ -404,33 +404,33 @@ namespace MultiplayerARPG
             return true;
         }
 
-        public void ReadClientStateAtServer(NetDataReader reader)
+        public void ReadClientStateAtServer(long peerTimestamp, NetDataReader reader)
         {
             switch (movementSecure)
             {
                 case MovementSecure.NotSecure:
-                    ReadSyncTransformAtServer(reader);
+                    ReadSyncTransformAtServer(peerTimestamp, reader);
                     break;
                 case MovementSecure.ServerAuthoritative:
-                    ReadMovementInputAtServer(reader);
+                    ReadMovementInputAtServer(peerTimestamp, reader);
                     break;
             }
         }
 
-        public void ReadServerStateAtClient(NetDataReader reader)
+        public void ReadServerStateAtClient(long peerTimestamp, NetDataReader reader)
         {
             if (IsServer)
             {
                 // Don't read and apply transform, because it was done at server
                 return;
             }
-            reader.ReadSyncTransformMessage2D(out MovementState movementState, out ExtraMovementState extraMovementState, out Vector2 position, out DirectionVector2 direction2D, out long timestamp);
+            reader.ReadSyncTransformMessage2D(out MovementState movementState, out ExtraMovementState extraMovementState, out Vector2 position, out DirectionVector2 direction2D);
             if (movementState.Has(MovementState.IsTeleport))
             {
                 // Server requested to teleport
                 OnTeleport(position, movementState != MovementState.IsTeleport);
             }
-            else if (_acceptedPositionTimestamp <= timestamp)
+            else if (_acceptedPositionTimestamp <= peerTimestamp)
             {
                 if (Vector2.Distance(position, CacheTransform.position) >= snapThreshold)
                 {
@@ -451,11 +451,11 @@ namespace MultiplayerARPG
                     MovementState = movementState;
                     ExtraMovementState = extraMovementState;
                 }
-                _acceptedPositionTimestamp = timestamp;
+                _acceptedPositionTimestamp = peerTimestamp;
             }
         }
 
-        public void ReadMovementInputAtServer(NetDataReader reader)
+        public void ReadMovementInputAtServer(long peerTimestamp, NetDataReader reader)
         {
             if (IsOwnerClient)
             {
@@ -467,7 +467,7 @@ namespace MultiplayerARPG
                 // Movement handling at client, so don't read movement inputs from client (but have to read transform)
                 return;
             }
-            reader.ReadMovementInputMessage2D(out EntityMovementInputState inputState, out MovementState movementState, out ExtraMovementState extraMovementState, out Vector2 position, out DirectionVector2 direction2D, out long timestamp);
+            reader.ReadMovementInputMessage2D(out EntityMovementInputState inputState, out MovementState movementState, out ExtraMovementState extraMovementState, out Vector2 position, out DirectionVector2 direction2D);
             if (movementState.Has(MovementState.IsTeleport))
             {
                 // Teleport confirming from client
@@ -478,7 +478,7 @@ namespace MultiplayerARPG
                 // Waiting for teleport confirming
                 return;
             }
-            if (Mathf.Abs(timestamp - BaseGameNetworkManager.Singleton.ServerTimestamp) > s_lagBuffer)
+            if (Mathf.Abs(peerTimestamp - BaseGameNetworkManager.Singleton.ServerTimestamp) > s_lagBuffer)
             {
                 // Timestamp is a lot difference to server's timestamp, player might try to hack a game or packet may corrupted occurring, so skip it
                 return;
@@ -488,7 +488,7 @@ namespace MultiplayerARPG
                 // It can't move, so don't move
                 return;
             }
-            if (_acceptedPositionTimestamp <= timestamp)
+            if (_acceptedPositionTimestamp <= peerTimestamp)
             {
                 NavPaths = null;
                 _tempMovementState = movementState;
@@ -507,11 +507,11 @@ namespace MultiplayerARPG
                 Direction2D = direction2D;
                 if (inputState.Has(EntityMovementInputState.IsStopped))
                     StopMoveFunction();
-                _acceptedPositionTimestamp = timestamp;
+                _acceptedPositionTimestamp = peerTimestamp;
             }
         }
 
-        public void ReadSyncTransformAtServer(NetDataReader reader)
+        public void ReadSyncTransformAtServer(long peerTimestamp, NetDataReader reader)
         {
             if (IsOwnerClient)
             {
@@ -523,7 +523,7 @@ namespace MultiplayerARPG
                 // Movement handling at server, so don't read sync transform from client
                 return;
             }
-            reader.ReadSyncTransformMessage2D(out MovementState movementState, out ExtraMovementState extraMovementState, out Vector2 position, out DirectionVector2 direction2D, out long timestamp);
+            reader.ReadSyncTransformMessage2D(out MovementState movementState, out ExtraMovementState extraMovementState, out Vector2 position, out DirectionVector2 direction2D);
             if (movementState.Has(MovementState.IsTeleport))
             {
                 // Teleport confirming from client
@@ -534,16 +534,16 @@ namespace MultiplayerARPG
                 // Waiting for teleport confirming
                 return;
             }
-            if (Mathf.Abs(timestamp - BaseGameNetworkManager.Singleton.ServerTimestamp) > s_lagBuffer)
+            if (Mathf.Abs(peerTimestamp - BaseGameNetworkManager.Singleton.ServerTimestamp) > s_lagBuffer)
             {
                 // Timestamp is a lot difference to server's timestamp, player might try to hack a game or packet may corrupted occurring, so skip it
                 return;
             }
-            if (_acceptedPositionTimestamp <= timestamp)
+            if (_acceptedPositionTimestamp <= peerTimestamp)
             {
                 // Prepare time
                 long lagDeltaTime = Entity.Player.Rtt;
-                long deltaTime = lagDeltaTime + timestamp - _acceptedPositionTimestamp;
+                long deltaTime = lagDeltaTime + peerTimestamp - _acceptedPositionTimestamp;
                 float unityDeltaTime = (float)deltaTime * 0.001f;
                 // Prepare movement state
                 Direction2D = direction2D;
@@ -585,7 +585,7 @@ namespace MultiplayerARPG
                     if (Vector3.Distance(position, CacheTransform.position) > 0.01f)
                         SetMovePaths(position, false);
                 }
-                _acceptedPositionTimestamp = timestamp;
+                _acceptedPositionTimestamp = peerTimestamp;
             }
         }
 
