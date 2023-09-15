@@ -15,7 +15,7 @@ namespace MultiplayerARPG
             if (characterEntity is BaseMonsterCharacterEntity monsterCharacterEntity && monsterCharacterEntity.Summoner is BasePlayerCharacterEntity summonerCharacterEntity)
                 rewardingCharacter = summonerCharacterEntity;
             CurrentGameplayRule.RewardGold(rewardingCharacter, Amount, Multiplier, GivenType, GiverLevel, SourceLevel, out int rewardedGold);
-            GameInstance.ServerGameMessageHandlers.NotifyRewardGold(ConnectionId, GivenType, rewardedGold);
+            GameInstance.ServerGameMessageHandlers.NotifyRewardGold(rewardingCharacter.ConnectionId, GivenType, rewardedGold);
             message = UITextKeys.NONE;
             return true;
         }
