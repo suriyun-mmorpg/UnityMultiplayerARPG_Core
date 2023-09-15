@@ -354,8 +354,9 @@ namespace MultiplayerARPG
                 IsLeftHandItemAvailable = true;
                 LeftHandItem = characterData.EquipWeapons.leftHand;
             }
-            if (!IsRightHandItemAvailable && !IsRightHandItemAvailable)
+            if (!IsLeftHandItemAvailable && !IsRightHandItemAvailable)
             {
+                // This one might be a monster character, so create a fake weapon item data
                 IsRightHandItemAvailable = true;
                 RightHandItem = CharacterItem.CreateDefaultWeapon();
             }
