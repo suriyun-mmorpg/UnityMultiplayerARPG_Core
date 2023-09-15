@@ -634,8 +634,7 @@ namespace MultiplayerARPG
         {
             uint objectId = messageHandler.Reader.GetPackedUInt();
             long peerTimestamp = messageHandler.Reader.GetPackedLong();
-            BaseGameEntity gameEntity;
-            if (Assets.TryGetSpawnedObject(objectId, out gameEntity))
+            if (Assets.TryGetSpawnedObject(objectId, out BaseGameEntity gameEntity))
                 gameEntity.ReadServerStateAtClient(peerTimestamp, messageHandler.Reader);
         }
 
