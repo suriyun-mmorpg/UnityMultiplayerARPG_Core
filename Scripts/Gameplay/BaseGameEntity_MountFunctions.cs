@@ -127,7 +127,7 @@ namespace MultiplayerARPG
             gameMessage = UITextKeys.NONE;
             if (vehicleEntity.IsNull())
             {
-                gameMessage = UITextKeys.UI_ERROR_INVALID_DATA;
+                gameMessage = UITextKeys.UI_ERROR_INVALID_VEHICLE_ENTITY;
                 return false;
             }
             if (!vehicleEntity.IsSeatAvailable(seatIndex))
@@ -148,27 +148,6 @@ namespace MultiplayerARPG
             if (!CanEnterVehicle(vehicleEntity, seatIndex, out UITextKeys error))
             {
                 GameInstance.ServerGameMessageHandlers.SendGameMessage(ConnectionId, error);
-                return;
-            }
-            EnterVehicle(vehicleEntity, seatIndex);
-#endif
-        }
-
-        public void CallServerEnterVehicleToSeat(uint objectId, byte seatIndex)
-        {
-            RPC(ServerEnterVehicleToSeat, objectId, seatIndex);
-        }
-
-        [ServerRpc]
-        protected void ServerEnterVehicleToSeat(uint objectId, byte seatIndex)
-        {
-#if UNITY_EDITOR || UNITY_SERVER
-            if (!Manager.Assets.TryGetSpawnedObject(objectId, out LiteNetLibIdentity identity))
-                return;
-            IVehicleEntity vehicleEntity = identity.GetComponent<IVehicleEntity>();
-            if (vehicleEntity.IsNull())
-            {
-                GameInstance.ServerGameMessageHandlers.SendGameMessage(ConnectionId, UITextKeys.UI_ERROR_INVALID_DATA);
                 return;
             }
             EnterVehicle(vehicleEntity, seatIndex);
