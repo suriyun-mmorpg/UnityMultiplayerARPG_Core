@@ -59,6 +59,10 @@ namespace MultiplayerARPG
         protected float lifeTime = 0f;
 
         [SerializeField]
+        [Tooltip("Maximum number of buildings per player in a map, if it is <= 0, it's unlimit")]
+        protected int buildLimit = 0;
+
+        [SerializeField]
         [Tooltip("Items which will be dropped when building destroyed")]
         protected List<ItemAmount> droppingItems = new List<ItemAmount>();
 
@@ -89,6 +93,7 @@ namespace MultiplayerARPG
         public float BuildYRotation { get; set; }
         public override int MaxHp { get { return maxHp; } }
         public float LifeTime { get { return lifeTime; } }
+        public int BuildLimit { get { return buildLimit; } }
 
         /// <summary>
         /// Use this as reference for area to build this object while in build mode
