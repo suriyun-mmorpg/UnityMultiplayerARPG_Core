@@ -19,6 +19,7 @@ namespace MultiplayerARPG
         public static System.Action<ResponseHandlerData, AckResponseCode, ResponseRepairEquipItemsMessage> onResponseRepairEquipItems;
         public static System.Action<ResponseHandlerData, AckResponseCode, ResponseSellItemMessage> onResponseSellItem;
         public static System.Action<ResponseHandlerData, AckResponseCode, ResponseSellItemsMessage> onResponseSellItems;
+        public static System.Action<ResponseHandlerData, AckResponseCode, ResponseSortItemsMessage> onResponseSortItems;
 
         public static void ResponseSwapOrMergeItem(ResponseHandlerData requestHandler, AckResponseCode responseCode, ResponseSwapOrMergeItemMessage response)
         {
@@ -123,6 +124,13 @@ namespace MultiplayerARPG
             ClientGenericActions.ClientReceiveGameMessage(response.message);
             if (onResponseSellItems != null)
                 onResponseSellItems.Invoke(requestHandler, responseCode, response);
+        }
+
+        public static void ResponseSortItems(ResponseHandlerData requestHandler, AckResponseCode responseCode, ResponseSortItemsMessage response)
+        {
+            ClientGenericActions.ClientReceiveGameMessage(response.message);
+            if (onResponseSortItems != null)
+                onResponseSortItems.Invoke(requestHandler, responseCode, response);
         }
     }
 }

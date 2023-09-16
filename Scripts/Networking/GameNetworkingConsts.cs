@@ -112,5 +112,6 @@
         public const ushort SetIcon = 183;
         public const ushort SetFrame = 184;
         public const ushort SetTitle = 185;
+        public const ushort SortItems = 186;
     }
 }
