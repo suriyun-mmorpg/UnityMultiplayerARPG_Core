@@ -353,7 +353,7 @@ namespace MultiplayerARPG
                 }
                 if (tempItem.ExpireDuration > 0)
                 {
-                    newItem.expireTime = System.DateTimeOffset.Now.ToUnixTimeSeconds() + (tempItem.ExpireDuration * 60 * 60);
+                    newItem.expireTime = System.DateTimeOffset.UtcNow.ToUnixTimeSeconds() + (tempItem.ExpireDuration * 60 * 60);
                 }
             }
             newItem.version = CURRENT_VERSION;

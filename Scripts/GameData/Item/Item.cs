@@ -129,8 +129,9 @@ namespace MultiplayerARPG
         public DamageIncremental[] increaseDamages;
         [ArrayElementTitle("damageElement")]
         public DamageIncremental[] increaseDamagesRate;
-        [ArrayElementTitle("skill")]
+        // TODO: This is deprecated
         [HideInInspector]
+        [ArrayElementTitle("skill")]
         public SkillLevel[] increaseSkillLevels;
         public SkillIncremental[] increaseSkills;
 

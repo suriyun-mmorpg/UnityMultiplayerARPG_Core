@@ -263,7 +263,7 @@ namespace MultiplayerARPG
             {
                 if (CharacterItem != null && CharacterItem.expireTime > 0)
                 {
-                    System.DateTime dateTime = new System.DateTime(1970, 1, 1, 0, 0, 0, 0, System.DateTimeKind.Utc).AddSeconds(CharacterItem.expireTime).ToLocalTime();
+                    System.DateTime dateTime = GenericUtils.GetDateTimeBySeconds(CharacterItem.expireTime).ToLocalTime();
                     uiTextExpireTime.SetGameObjectActive(true);
                     uiTextExpireTime.text = ZString.Format(
                         LanguageManager.GetText(formatKeyExpireTime),

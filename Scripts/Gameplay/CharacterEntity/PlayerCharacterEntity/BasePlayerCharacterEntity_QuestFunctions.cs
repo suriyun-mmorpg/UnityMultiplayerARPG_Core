@@ -14,8 +14,10 @@ namespace MultiplayerARPG
 
         public virtual void ChangeQuestTracking(int questDataId, bool isTracking)
         {
+            if (!GameInstance.Quests.TryGetValue(questDataId, out _))
+                return;
             int indexOfQuest = this.IndexOfQuest(questDataId);
-            if (indexOfQuest < 0 || !GameInstance.Quests.TryGetValue(questDataId, out Quest quest))
+            if (indexOfQuest < 0)
                 return;
             CharacterQuest characterQuest = quests[indexOfQuest];
             characterQuest.isTracking = isTracking;
@@ -24,9 +26,9 @@ namespace MultiplayerARPG
 
         public virtual void AcceptQuest(int questDataId)
         {
-            int indexOfQuest = this.IndexOfQuest(questDataId);
-            if (indexOfQuest >= 0 || !GameInstance.Quests.TryGetValue(questDataId, out Quest quest))
+            if (!GameInstance.Quests.TryGetValue(questDataId, out Quest quest))
                 return;
+            int indexOfQuest = this.IndexOfQuest(questDataId);
             if (quest.abandonQuests != null && quest.abandonQuests.Length > 0)
             {
                 for (int i = 0; i < quest.abandonQuests.Length; ++i)
@@ -34,14 +36,25 @@ namespace MultiplayerARPG
                     AbandonQuest(quest.abandonQuests[i].DataId);
                 }
             }
-            CharacterQuest characterQuest = CharacterQuest.Create(quest);
-            quests.Add(characterQuest);
+            if (indexOfQuest >= 0)
+            {
+                CharacterQuest characterQuest = Quests[indexOfQuest];
+                characterQuest.isComplete = false;
+                quests[indexOfQuest] = characterQuest;
+            }
+            else
+            {
+                CharacterQuest characterQuest = CharacterQuest.Create(quest);
+                quests.Add(characterQuest);
+            }
         }
 
         public virtual void AbandonQuest(int questDataId)
         {
+            if (!GameInstance.Quests.TryGetValue(questDataId, out _))
+                return;
             int indexOfQuest = this.IndexOfQuest(questDataId);
-            if (indexOfQuest < 0 || !GameInstance.Quests.TryGetValue(questDataId, out Quest quest))
+            if (indexOfQuest < 0)
                 return;
             CharacterQuest characterQuest = quests[indexOfQuest];
             if (characterQuest.isComplete)
@@ -51,8 +64,10 @@ namespace MultiplayerARPG
 
         public virtual bool CompleteQuest(int questDataId, byte selectedRewardIndex)
         {
+            if (!GameInstance.Quests.TryGetValue(questDataId, out Quest quest))
+                return false;
             int indexOfQuest = this.IndexOfQuest(questDataId);
-            if (indexOfQuest < 0 || !GameInstance.Quests.TryGetValue(questDataId, out Quest quest))
+            if (indexOfQuest < 0)
                 return false;
 
             CharacterQuest characterQuest = quests[indexOfQuest];
@@ -116,7 +131,7 @@ namespace MultiplayerARPG
                 return false;
             }
             // Decrease task items
-            QuestTask[] tasks = quest.tasks;
+            QuestTask[] tasks = quest.GetTasks(characterQuest.randomTasksIndex);
             foreach (QuestTask task in tasks)
             {
                 switch (task.taskType)
@@ -170,10 +185,8 @@ namespace MultiplayerARPG
             }
             // Set quest state
             characterQuest.isComplete = true;
-            if (!quest.canRepeat)
-                quests[indexOfQuest] = characterQuest;
-            else
-                quests.RemoveAt(indexOfQuest);
+            characterQuest.completeTime = System.DateTimeOffset.UtcNow.ToUnixTimeSeconds();
+            quests[indexOfQuest] = characterQuest;
             return true;
         }
     }
