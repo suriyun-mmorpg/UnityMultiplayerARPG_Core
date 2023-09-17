@@ -42,9 +42,20 @@ namespace MultiplayerARPG
             get { return increaseDamages; }
         }
 
+        [SerializeField]
         [Tooltip("If this value more than 0 it will limit max amount of this attribute by this value")]
-        public int maxAmount;
-        public bool cannotReset = false;
+        private int maxAmount;
+        public int MaxAmount
+        {
+            get { return maxAmount; }
+        }
+
+        [SerializeField]
+        private bool cannotReset = false;
+        public bool CannotReset
+        {
+            get { return cannotReset; }
+        }
 
         public bool CanIncreaseAmount(IPlayerCharacterData character, int amount, out UITextKeys gameMessage, bool checkStatPoint = true)
         {
@@ -52,7 +63,7 @@ namespace MultiplayerARPG
             if (character == null)
                 return false;
 
-            if (maxAmount > 0 && amount >= maxAmount)
+            if (maxAmount > 0 && amount >= MaxAmount)
             {
                 gameMessage = UITextKeys.UI_ERROR_ATTRIBUTE_REACHED_MAX_AMOUNT;
                 return false;

@@ -370,7 +370,7 @@ namespace MultiplayerARPG
             {
                 characterAttribute = characterData.Attributes[i];
                 attribute = characterAttribute.GetAttribute();
-                if (attribute.cannotReset)
+                if (attribute.CannotReset)
                     continue;
                 countStatPoint += characterAttribute.amount;
                 characterData.Attributes.RemoveAt(i);

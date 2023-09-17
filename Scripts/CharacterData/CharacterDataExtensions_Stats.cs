@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using UnityEngine;
 
 namespace MultiplayerARPG
 {
@@ -733,12 +734,26 @@ namespace MultiplayerARPG
             {
                 resultAttributes = GameDataHelpers.CombineAttributes(resultAttributes, buffAttributes);
                 resultAttributes = GameDataHelpers.CombineAttributes(resultAttributes, GameDataHelpers.MultiplyAttributes(new Dictionary<Attribute, float>(resultAttributes), buffAttributesRate));
+                List<Attribute> keys = new List<Attribute>(resultAttributes.Keys);
+                for (i = 0; i < keys.Count; ++i)
+                {
+                    if (keys[i].MaxAmount <= 0)
+                        continue;
+                    if (resultAttributes[keys[i]] > keys[i].MaxAmount)
+                        resultAttributes[keys[i]] = keys[i].MaxAmount;
+                }
                 if (onGetAttributes != null)
                     onGetAttributes.Invoke(resultAttributes);
             }
             if (isCalculateResistances)
             {
                 resultResistances = GameDataHelpers.CombineResistances(resultResistances, buffResistances);
+                List<DamageElement> keys = new List<DamageElement>(resultResistances.Keys);
+                for (i = 0; i < keys.Count; ++i)
+                {
+                    if (resultResistances[keys[i]] > keys[i].MaxResistanceAmount)
+                        resultResistances[keys[i]] = keys[i].MaxResistanceAmount;
+                }
                 if (onGetResistances != null)
                     onGetResistances.Invoke(resultResistances);
             }
