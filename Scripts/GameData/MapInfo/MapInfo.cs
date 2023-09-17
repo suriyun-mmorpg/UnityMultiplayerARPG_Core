@@ -96,6 +96,9 @@ namespace MultiplayerARPG
                 }
                 else
                 {
+                    // If it has faction set, then check the faction between two characters
+                    if (targetEntity.FactionId != 0 && playerCharacter.FactionId == targetEntity.FactionId)
+                        return true;
                     // Monster always not player's ally
                     return false;
                 }
@@ -117,9 +120,16 @@ namespace MultiplayerARPG
 
             if (targetEntity.Type == EntityTypes.Monster)
             {
-                // If another monster has same allyId so it is ally
                 if (targetEntity.HasSummoner)
+                {
                     return monsterCharacter.IsAlly(targetEntity.Summoner);
+                }
+                else
+                {
+                    if (targetEntity.FactionId != 0 && monsterCharacter.FactionId == targetEntity.FactionId)
+                        return true;
+                }
+                // If another monster has same allyId so it is ally
                 return GameInstance.MonsterCharacters[targetEntity.DataId].AllyId == monsterCharacter.CharacterDatabase.AllyId;
             }
 
@@ -162,6 +172,9 @@ namespace MultiplayerARPG
                 }
                 else
                 {
+                    // If it has faction set, then check the faction between two characters
+                    if (targetEntity.FactionId != 0 && playerCharacter.FactionId == targetEntity.FactionId)
+                        return false;
                     // Monster always be player's enemy
                     return true;
                 }
@@ -181,7 +194,13 @@ namespace MultiplayerARPG
 
             // Attack only player by default
             if (targetEntity.Type == EntityTypes.Player)
+            {
+                // If it has faction set, then check the faction between two characters
+                if (targetEntity.FactionId != 0 && monsterCharacter.FactionId == targetEntity.FactionId)
+                    return false;
+                // Player always be monster's enemy
                 return true;
+            }
 
             // Attack monster which its summoner is enemy
             if (targetEntity.Type == EntityTypes.Monster && targetEntity.TryGetEntity(out BaseMonsterCharacterEntity targetMonster) && targetMonster.IsSummonedAndSummonerExisted)

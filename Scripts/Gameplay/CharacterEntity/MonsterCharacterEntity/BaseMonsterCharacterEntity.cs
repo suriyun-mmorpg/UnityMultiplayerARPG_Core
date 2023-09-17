@@ -24,6 +24,8 @@ namespace MultiplayerARPG
         [SerializeField]
         protected MonsterCharacteristic overrideCharacteristic;
         [SerializeField]
+        protected Faction faction;
+        [SerializeField]
         protected float destroyDelay = 2f;
         [SerializeField]
         protected float destroyRespawnDelay = 5f;
@@ -94,6 +96,12 @@ namespace MultiplayerARPG
             set { characterDatabase = value; }
         }
 
+        public Faction Faction
+        {
+            get { return faction; }
+            set { faction = value; }
+        }
+
         public bool IsOverrideCharacteristic
         {
             get { return isOverrideCharacteristic; }
@@ -114,6 +122,17 @@ namespace MultiplayerARPG
         public override int DataId
         {
             get { return CharacterDatabase.DataId; }
+            set { }
+        }
+
+        public override int FactionId
+        {
+            get
+            {
+                if (Faction == null)
+                    return 0;
+                return Faction.DataId;
+            }
             set { }
         }
 
@@ -146,7 +165,9 @@ namespace MultiplayerARPG
                 ObjectId,
                 ObjectId.ToString(),
                 DataId,
-                0, 0, 0,
+                FactionId,
+                0 /* Party ID */,
+                0 /* Guild ID */,
                 IsInSafeArea,
                 Summoner);
         }

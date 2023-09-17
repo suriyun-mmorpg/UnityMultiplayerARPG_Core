@@ -20,5 +20,20 @@ namespace MultiplayerARPG
             get { return buff; }
             set { buff = value; }
         }
+
+        [System.NonSerialized]
+        protected CalculatedBuff _cacheBuff;
+        public CalculatedBuff CacheBuff
+        {
+            get
+            {
+                if (_cacheBuff == null)
+                {
+                    _cacheBuff = new CalculatedBuff(Buff, 1);
+                    return _cacheBuff;
+                }
+                return _cacheBuff;
+            }
+        }
     }
 }

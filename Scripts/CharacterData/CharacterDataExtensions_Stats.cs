@@ -345,23 +345,56 @@ namespace MultiplayerARPG
             if (title == null)
                 return;
             if (onIncreasingStats != null)
-                onIncreasingStats.Invoke(title.Buff.GetIncreaseStats(1));
+                onIncreasingStats.Invoke(title.CacheBuff.GetIncreaseStats());
             if (onIncreasingStatsRate != null)
-                onIncreasingStatsRate.Invoke(title.Buff.GetIncreaseStatsRate(1));
+                onIncreasingStatsRate.Invoke(title.CacheBuff.GetIncreaseStatsRate());
             if (onIncreasingAttributes != null)
-                onIncreasingAttributes.Invoke(title.Buff.GetIncreaseAttributes(1));
+                onIncreasingAttributes.Invoke(title.CacheBuff.GetIncreaseAttributes());
             if (onIncreasingAttributesRate != null)
-                onIncreasingAttributesRate.Invoke(title.Buff.GetIncreaseAttributesRate(1));
+                onIncreasingAttributesRate.Invoke(title.CacheBuff.GetIncreaseAttributesRate());
             if (onIncreasingResistances != null)
-                onIncreasingResistances.Invoke(title.Buff.GetIncreaseResistances(1));
+                onIncreasingResistances.Invoke(title.CacheBuff.GetIncreaseResistances());
             if (onIncreasingArmors != null)
-                onIncreasingArmors.Invoke(title.Buff.GetIncreaseArmors(1));
+                onIncreasingArmors.Invoke(title.CacheBuff.GetIncreaseArmors());
             if (onIncreasingArmorsRate != null)
-                onIncreasingArmorsRate.Invoke(title.Buff.GetIncreaseArmorsRate(1));
+                onIncreasingArmorsRate.Invoke(title.CacheBuff.GetIncreaseArmorsRate());
             if (onIncreasingDamages != null)
-                onIncreasingDamages.Invoke(title.Buff.GetIncreaseDamages(1));
+                onIncreasingDamages.Invoke(title.CacheBuff.GetIncreaseDamages());
             if (onIncreasingDamagesRate != null)
-                onIncreasingDamagesRate.Invoke(title.Buff.GetIncreaseDamagesRate(1));
+                onIncreasingDamagesRate.Invoke(title.CacheBuff.GetIncreaseDamagesRate());
+        }
+
+        public static void GetBuffs(this Faction faction,
+            System.Action<CharacterStats> onIncreasingStats,
+            System.Action<CharacterStats> onIncreasingStatsRate,
+            System.Action<Dictionary<Attribute, float>> onIncreasingAttributes,
+            System.Action<Dictionary<Attribute, float>> onIncreasingAttributesRate,
+            System.Action<Dictionary<DamageElement, float>> onIncreasingResistances,
+            System.Action<Dictionary<DamageElement, float>> onIncreasingArmors,
+            System.Action<Dictionary<DamageElement, float>> onIncreasingArmorsRate,
+            System.Action<Dictionary<DamageElement, MinMaxFloat>> onIncreasingDamages,
+            System.Action<Dictionary<DamageElement, MinMaxFloat>> onIncreasingDamagesRate)
+        {
+            if (faction == null)
+                return;
+            if (onIncreasingStats != null)
+                onIncreasingStats.Invoke(faction.CacheBuff.GetIncreaseStats());
+            if (onIncreasingStatsRate != null)
+                onIncreasingStatsRate.Invoke(faction.CacheBuff.GetIncreaseStatsRate());
+            if (onIncreasingAttributes != null)
+                onIncreasingAttributes.Invoke(faction.CacheBuff.GetIncreaseAttributes());
+            if (onIncreasingAttributesRate != null)
+                onIncreasingAttributesRate.Invoke(faction.CacheBuff.GetIncreaseAttributesRate());
+            if (onIncreasingResistances != null)
+                onIncreasingResistances.Invoke(faction.CacheBuff.GetIncreaseResistances());
+            if (onIncreasingArmors != null)
+                onIncreasingArmors.Invoke(faction.CacheBuff.GetIncreaseArmors());
+            if (onIncreasingArmorsRate != null)
+                onIncreasingArmorsRate.Invoke(faction.CacheBuff.GetIncreaseArmorsRate());
+            if (onIncreasingDamages != null)
+                onIncreasingDamages.Invoke(faction.CacheBuff.GetIncreaseDamages());
+            if (onIncreasingDamagesRate != null)
+                onIncreasingDamagesRate.Invoke(faction.CacheBuff.GetIncreaseDamagesRate());
         }
 
         public static void GetBuffs(this BaseSkill skill, int level,
@@ -574,6 +607,20 @@ namespace MultiplayerARPG
                 if (GameInstance.PlayerTitles.TryGetValue(data.TitleDataId, out PlayerTitle title))
                 {
                     GetBuffs(title,
+                        !isCalculateStats ? null : (stats) => buffStats += stats,
+                        !isCalculateStats ? null : (statsRate) => buffStatsRate += statsRate,
+                        !isCalculateAttributes ? null : (attributes) => GameDataHelpers.CombineAttributes(buffAttributes, attributes),
+                        !isCalculateAttributes ? null : (attributesRate) => GameDataHelpers.CombineAttributes(buffAttributesRate, attributesRate),
+                        !isCalculateResistances ? null : (resistances) => GameDataHelpers.CombineResistances(buffResistances, resistances),
+                        !isCalculateArmors ? null : (armors) => GameDataHelpers.CombineArmors(buffArmors, armors),
+                        !isCalculateArmors ? null : (armorsRate) => GameDataHelpers.CombineArmors(buffArmorsRate, armorsRate),
+                        !isCalculateDamages ? null : (damages) => GameDataHelpers.CombineDamages(buffDamages, damages),
+                        !isCalculateDamages ? null : (damagesRate) => GameDataHelpers.CombineDamages(buffDamagesRate, damagesRate));
+                }
+                // From faction
+                if (GameInstance.Factions.TryGetValue(data.FactionId, out Faction faction))
+                {
+                    GetBuffs(faction,
                         !isCalculateStats ? null : (stats) => buffStats += stats,
                         !isCalculateStats ? null : (statsRate) => buffStatsRate += statsRate,
                         !isCalculateAttributes ? null : (attributes) => GameDataHelpers.CombineAttributes(buffAttributes, attributes),
