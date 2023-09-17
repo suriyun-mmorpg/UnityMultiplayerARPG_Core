@@ -423,18 +423,29 @@ namespace MultiplayerARPG
             }
         }
 
-        public bool TryGetRepairAmount(BasePlayerCharacterEntity attackPlayer, out int repairAmount, out UITextKeys errorMessage)
+        public bool CanRepairByMenu()
+        {
+            return repairDataForMenu.HasValue;
+        }
+
+        public bool TryGetRepairAmount(BasePlayerCharacterEntity repairPlayer, out int repairAmount, out UITextKeys errorMessage)
         {
             repairAmount = 0;
             errorMessage = UITextKeys.NONE;
-            bool isLeftHand = false;
-            CharacterItem weapon = attackPlayer.GetAvailableWeapon(ref isLeftHand);
-            if (weapon.IsEmptySlot() || !CacheRepairs.TryGetValue(weapon.GetItem(), out BuildingRepairData buildingRepairData))
+            if (CanRepairByMenu())
                 return false;
-            return TryGetRepairAmount(attackPlayer, buildingRepairData, out repairAmount, out errorMessage);
+            return TryGetRepairAmount(repairPlayer, repairDataForMenu.Value, out repairAmount, out errorMessage);
         }
 
-        public bool TryGetRepairAmount(BasePlayerCharacterEntity attackPlayer, BuildingRepairData buildingRepairData, out int repairAmount, out UITextKeys errorMessage)
+        public bool Repair(BasePlayerCharacterEntity repairPlayer, out UITextKeys errorMessage)
+        {
+            if (!TryGetRepairAmount(repairPlayer, out int repairAmount, out errorMessage))
+                return false;
+            CurrentHp += repairAmount;
+            return true;
+        }
+
+        public bool TryGetRepairAmount(BasePlayerCharacterEntity repairPlayer, BuildingRepairData buildingRepairData, out int repairAmount, out UITextKeys errorMessage)
         {
             repairAmount = Mathf.Min(MaxHp - CurrentHp, buildingRepairData.maxRecoveryHp);
             errorMessage = UITextKeys.NONE;
@@ -446,7 +457,7 @@ namespace MultiplayerARPG
             // Calculate repairable amount
             // Gold
             int requireGold = buildingRepairData.requireGold * repairAmount;
-            while (requireGold > attackPlayer.Gold)
+            while (requireGold > repairPlayer.Gold)
             {
                 requireGold -= buildingRepairData.requireGold;
                 repairAmount--;
@@ -465,7 +476,7 @@ namespace MultiplayerARPG
                     if (buildingRepairData.requireItems[i].item == null || buildingRepairData.requireItems[i].amount == 0)
                         continue;
                     int requireAmount = buildingRepairData.requireItems[i].amount * repairAmount;
-                    int currentAmount = attackPlayer.CountNonEquipItems(buildingRepairData.requireItems[i].item.DataId);
+                    int currentAmount = repairPlayer.CountNonEquipItems(buildingRepairData.requireItems[i].item.DataId);
                     while (requireAmount > currentAmount)
                     {
                         requireAmount -= buildingRepairData.requireItems[i].amount;
@@ -481,7 +492,7 @@ namespace MultiplayerARPG
             // Currencies
             if (buildingRepairData.requireCurrencies != null)
             {
-                Dictionary<Currency, int> playerCurrencies = attackPlayer.GetCurrencies();
+                Dictionary<Currency, int> playerCurrencies = repairPlayer.GetCurrencies();
                 for (i = 0; i < buildingRepairData.requireCurrencies.Length; ++i)
                 {
                     if (buildingRepairData.requireCurrencies[i].currency == null || buildingRepairData.requireCurrencies[i].amount == 0)
