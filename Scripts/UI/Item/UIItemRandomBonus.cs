@@ -7,12 +7,13 @@ namespace MultiplayerARPG
     public class UIItemRandomBonus : UISelectionEntry<ItemRandomBonus>
     {
         [Header("String Formats")]
-        [Tooltip("Format => {0} = {Attribute Title}, {1} = {Current Amount}, {2} = {Target Amount}")]
         public UILocaleKeySetting formatAttributeAmount = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_ATTRIBUTE_AMOUNT);
         public UILocaleKeySetting formatAttributeAmountRate = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_ATTRIBUTE_RATE);
         public UILocaleKeySetting formatResistanceAmount = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_RESISTANCE_AMOUNT);
         public UILocaleKeySetting formatArmorAmount = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_ARMOR_AMOUNT);
+        public UILocaleKeySetting formatArmorAmountRate = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_ARMOR_RATE);
         public UILocaleKeySetting formatDamageAmount = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_DAMAGE_WITH_ELEMENTAL);
+        public UILocaleKeySetting formatDamageAmountRate = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_DAMAGE_WITH_ELEMENTAL_RATE);
         public UILocaleKeySetting formatSkillLevel = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_SKILL_LEVEL);
         public string randomAmountSeparator = "~";
         public string randomMinMaxAmountSeparator = "-";
@@ -29,7 +30,9 @@ namespace MultiplayerARPG
             WriteAttributeRates(builder);
             WriteResistances(builder);
             WriteArmors(builder);
+            WriteArmorRates(builder);
             WriteDamages(builder);
+            WriteDamageRates(builder);
             WriteSkills(builder);
             if (uiTextAllRandomBonus != null)
                 uiTextAllRandomBonus.text = builder.ToString();
@@ -179,6 +182,20 @@ namespace MultiplayerARPG
             }
         }
 
+        private void WriteArmorRates(StringBuilder builder)
+        {
+            if (Data.randomArmorAmountRates == null || Data.randomArmorAmountRates.Length == 0)
+                return;
+            DamageElement tempDamageElement;
+            foreach (ArmorRandomAmount entry in Data.randomArmorAmountRates)
+            {
+                tempDamageElement = entry.damageElement;
+                if (tempDamageElement == null)
+                    tempDamageElement = GameInstance.Singleton.DefaultDamageElement;
+                WriteEntry(builder, LanguageManager.GetText(formatArmorAmountRate), entry.damageElement.Title, entry.applyRate, entry.minAmount, entry.maxAmount, numberFormat: "N0");
+            }
+        }
+
         private void WriteDamages(StringBuilder builder)
         {
             if (Data.randomDamageAmounts == null || Data.randomDamageAmounts.Length == 0)
@@ -190,6 +207,20 @@ namespace MultiplayerARPG
                 if (tempDamageElement == null)
                     tempDamageElement = GameInstance.Singleton.DefaultDamageElement;
                 WriteEntry(builder, LanguageManager.GetText(formatDamageAmount), entry.damageElement.Title, entry.applyRate, entry.minAmount, entry.maxAmount, numberFormat: "N0");
+            }
+        }
+
+        private void WriteDamageRates(StringBuilder builder)
+        {
+            if (Data.randomDamageAmountRates == null || Data.randomDamageAmountRates.Length == 0)
+                return;
+            DamageElement tempDamageElement;
+            foreach (DamageRandomAmount entry in Data.randomDamageAmountRates)
+            {
+                tempDamageElement = entry.damageElement;
+                if (tempDamageElement == null)
+                    tempDamageElement = GameInstance.Singleton.DefaultDamageElement;
+                WriteEntry(builder, LanguageManager.GetText(formatDamageAmountRate), entry.damageElement.Title, entry.applyRate, entry.minAmount, entry.maxAmount, numberFormat: "N0");
             }
         }
 

@@ -188,10 +188,8 @@ namespace MultiplayerARPG
             if (equipmentItem != null && equipmentItem.IsEquipment())
             {
                 result = GameDataHelpers.CombineArmors(equipmentItem.IncreaseArmorsRate, result, level, 1f);
-                /*
-                if (withRandomBonus && equipmentItem.RandomBonus.randomArmorAmounts != null && equipmentItem.RandomBonus.randomArmorAmounts.Length > 0)
-                    result = GameDataHelpers.CombineArmorsRate(result, ItemRandomBonusCacheManager.GetCaches(equipmentItem, randomSeed, version).ArmorAmounts);
-                */
+                if (withRandomBonus && equipmentItem.RandomBonus.randomArmorAmountRates != null && equipmentItem.RandomBonus.randomArmorAmountRates.Length > 0)
+                    result = GameDataHelpers.CombineArmors(result, ItemRandomBonusCacheManager.GetCaches(equipmentItem, randomSeed, version).ArmorAmountRates);
             }
             return result;
         }
@@ -218,10 +216,8 @@ namespace MultiplayerARPG
             if (equipmentItem != null && equipmentItem.IsEquipment())
             {
                 result = GameDataHelpers.CombineDamages(equipmentItem.IncreaseDamagesRate, result, level, 1f);
-                /*
-                if (withRandomBonus && equipmentItem.RandomBonus.randomDamageAmounts != null && equipmentItem.RandomBonus.randomDamageAmounts.Length > 0)
-                    result = GameDataHelpers.CombineDamagesRate(result, ItemRandomBonusCacheManager.GetCaches(equipmentItem, randomSeed, version).DamageAmounts);
-                */
+                if (withRandomBonus && equipmentItem.RandomBonus.randomDamageAmountRates != null && equipmentItem.RandomBonus.randomDamageAmountRates.Length > 0)
+                    result = GameDataHelpers.CombineDamages(result, ItemRandomBonusCacheManager.GetCaches(equipmentItem, randomSeed, version).DamageAmountRates);
             }
             return result;
         }

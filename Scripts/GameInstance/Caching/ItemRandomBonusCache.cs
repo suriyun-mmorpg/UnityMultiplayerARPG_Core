@@ -12,7 +12,9 @@ namespace MultiplayerARPG
         public Dictionary<Attribute, float> AttributeAmountRates { get; private set; }
         public Dictionary<DamageElement, float> ResistanceAmounts { get; private set; }
         public Dictionary<DamageElement, float> ArmorAmounts { get; private set; }
+        public Dictionary<DamageElement, float> ArmorAmountRates { get; private set; }
         public Dictionary<DamageElement, MinMaxFloat> DamageAmounts { get; private set; }
+        public Dictionary<DamageElement, MinMaxFloat> DamageAmountRates { get; private set; }
         public Dictionary<BaseSkill, int> SkillLevels { get; private set; }
         public int DataId { get; private set; }
         public int RandomSeed { get; private set; }
@@ -33,10 +35,15 @@ namespace MultiplayerARPG
             AttributeAmountRates = new Dictionary<Attribute, float>();
             ResistanceAmounts = new Dictionary<DamageElement, float>();
             ArmorAmounts = new Dictionary<DamageElement, float>();
+            ArmorAmountRates = new Dictionary<DamageElement, float>();
             DamageAmounts = new Dictionary<DamageElement, MinMaxFloat>();
+            DamageAmountRates = new Dictionary<DamageElement, MinMaxFloat>();
             SkillLevels = new Dictionary<BaseSkill, int>();
             System.Random random = new System.Random(randomSeed);
-            System.Action[] actions = new System.Action[8];
+            int size = 8;
+            if (version > 0)
+                size = 10;
+            System.Action[] actions = new System.Action[size];
             actions[0] = () => RandomAttributeAmounts(random);
             actions[1] = () => RandomAttributeAmountRates(random);
             actions[2] = () => RandomResistanceAmounts(random);
@@ -45,6 +52,11 @@ namespace MultiplayerARPG
             actions[5] = () => RandomSkillLevels(random);
             actions[6] = () => RandomCharacterStats(random, false);
             actions[7] = () => RandomCharacterStats(random, true);
+            if (version > 0)
+            {
+                actions[8] = () => RandomArmorAmountRates(random);
+                actions[9] = () => RandomDamageAmountRates(random);
+            }
             actions.Shuffle(random);
             for (int i = 0; i < actions.Length; ++i)
             {
@@ -119,6 +131,21 @@ namespace MultiplayerARPG
             }
         }
 
+        public void RandomArmorAmountRates(System.Random random)
+        {
+            if (_randomBonus.randomArmorAmountRates != null && _randomBonus.randomArmorAmountRates.Length > 0)
+            {
+                for (int i = 0; i < _randomBonus.randomArmorAmountRates.Length; ++i)
+                {
+                    if (!_randomBonus.randomArmorAmountRates[i].Apply(random)) continue;
+                    ArmorAmountRates = GameDataHelpers.CombineArmors(ArmorAmountRates, _randomBonus.randomArmorAmountRates[i].GetRandomedAmount(random).ToKeyValuePair(1f));
+                    _appliedAmount++;
+                    if (IsReachedMaxRandomStatsAmount())
+                        return;
+                }
+            }
+        }
+
         public void RandomDamageAmounts(System.Random random)
         {
             if (_randomBonus.randomDamageAmounts != null && _randomBonus.randomDamageAmounts.Length > 0)
@@ -127,6 +154,21 @@ namespace MultiplayerARPG
                 {
                     if (!_randomBonus.randomDamageAmounts[i].Apply(random)) continue;
                     DamageAmounts = GameDataHelpers.CombineDamages(DamageAmounts, _randomBonus.randomDamageAmounts[i].GetRandomedAmount(random).ToKeyValuePair(1f));
+                    _appliedAmount++;
+                    if (IsReachedMaxRandomStatsAmount())
+                        return;
+                }
+            }
+        }
+
+        public void RandomDamageAmountRates(System.Random random)
+        {
+            if (_randomBonus.randomDamageAmountRates != null && _randomBonus.randomDamageAmountRates.Length > 0)
+            {
+                for (int i = 0; i < _randomBonus.randomDamageAmountRates.Length; ++i)
+                {
+                    if (!_randomBonus.randomDamageAmountRates[i].Apply(random)) continue;
+                    DamageAmountRates = GameDataHelpers.CombineDamages(DamageAmountRates, _randomBonus.randomDamageAmountRates[i].GetRandomedAmount(random).ToKeyValuePair(1f));
                     _appliedAmount++;
                     if (IsReachedMaxRandomStatsAmount())
                         return;
