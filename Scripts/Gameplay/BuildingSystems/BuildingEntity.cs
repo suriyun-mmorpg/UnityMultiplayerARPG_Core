@@ -432,7 +432,7 @@ namespace MultiplayerARPG
         {
             repairAmount = 0;
             errorMessage = UITextKeys.NONE;
-            if (CanRepairByMenu())
+            if (!CanRepairByMenu())
                 return false;
             return TryGetRepairAmount(repairPlayer, repairDataForMenu.Value, out repairAmount, out errorMessage);
         }
