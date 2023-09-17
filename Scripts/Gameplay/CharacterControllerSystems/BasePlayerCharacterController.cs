@@ -187,6 +187,14 @@ namespace MultiplayerARPG
             TargetEntity = null;
         }
 
+        public virtual void RepairBuilding(BuildingEntity targetBuildingEntity)
+        {
+            if (targetBuildingEntity == null)
+                return;
+            PlayingCharacterEntity.Building.CallServerRepairBuilding(targetBuildingEntity.ObjectId);
+            DeselectBuilding();
+        }
+
         public virtual void DestroyBuilding(BuildingEntity targetBuildingEntity)
         {
             if (targetBuildingEntity == null)
