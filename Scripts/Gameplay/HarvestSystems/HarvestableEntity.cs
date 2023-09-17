@@ -182,11 +182,6 @@ namespace MultiplayerARPG
             base.ReceivedDamage(position, fromPosition, instigator, damageAmounts, combatAmountType, totalDamage, weapon, skill, skillLevel, buff, isDamageOverTime);
             instigator.TryGetEntity(out BaseCharacterEntity attackerCharacter);
             CurrentGameInstance.GameplayRule.OnHarvestableReceivedDamage(attackerCharacter, this, combatAmountType, totalDamage, weapon, skill, skillLevel, buff, isDamageOverTime);
-
-            if (combatAmountType == CombatAmountType.Miss)
-                return;
-
-            // Do something when entity dead
             if (this.IsDead())
                 DestroyAndRespawn();
         }

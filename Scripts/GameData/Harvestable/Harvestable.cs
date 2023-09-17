@@ -107,6 +107,7 @@ namespace MultiplayerARPG
             {
                 foreach (HarvestEffectiveness harvestEffectiveness in harvestEffectivenesses)
                 {
+                    GameInstance.AddWeaponTypes(harvestEffectiveness.weaponType);
                     GameInstance.AddItems(harvestEffectiveness.items);
                 }
             }
@@ -115,6 +116,7 @@ namespace MultiplayerARPG
                 foreach (SkillHarvestEffectiveness skillHarvestEffectiveness in skillHarvestEffectivenesses)
                 {
                     GameInstance.AddSkills(skillHarvestEffectiveness.skill);
+                    GameInstance.AddItems(skillHarvestEffectiveness.items);
                 }
             }
         }
