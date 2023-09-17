@@ -5,13 +5,6 @@ namespace MultiplayerARPG
     [System.Serializable]
     public struct BuildingRepairData
     {
-        [Category("Generic Settings")]
-        public string defaultTitle;
-        public LanguageData[] languageSpecificTitles;
-        public string Title
-        {
-            get { return Language.GetText(languageSpecificTitles, defaultTitle); }
-        }
         public bool canRepairFromMenu;
         [Tooltip("This will being used if `canRepairFromMenu` is `FALSE`, set the weapon which can be used to repair the building")]
         public BaseItem weaponItem;
