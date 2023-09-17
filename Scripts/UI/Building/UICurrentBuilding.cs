@@ -13,6 +13,7 @@ namespace MultiplayerARPG
         public GameObject[] lockedObjects;
         [Tooltip("These game objects will be activate if target building entity's `isLocked` = `FALSE`")]
         public GameObject[] unlockedObjects;
+        public Button buttonRepair;
         public Button buttonDestroy;
         public Button buttonSetPassword;
         public Button buttonLock;
@@ -57,14 +58,16 @@ namespace MultiplayerARPG
                     unlockedObject.SetActive(!buildingEntity.IsLocked);
                 }
             }
+            if (buttonRepair != null)
+                buttonRepair.interactable = buildingEntity.TryGetRepairAmount(GameInstance.PlayingCharacterEntity, out _, out _);
             if (buttonDestroy != null)
-                buttonDestroy.interactable = buildingEntity.IsCreator(Controller.PlayingCharacterEntity);
+                buttonDestroy.interactable = buildingEntity.IsCreator(GameInstance.PlayingCharacterEntity);
             if (buttonSetPassword != null)
-                buttonSetPassword.interactable = buildingEntity.Lockable && buildingEntity.IsCreator(Controller.PlayingCharacterEntity);
+                buttonSetPassword.interactable = buildingEntity.Lockable && buildingEntity.IsCreator(GameInstance.PlayingCharacterEntity);
             if (buttonLock != null)
-                buttonLock.interactable = buildingEntity.Lockable && buildingEntity.IsCreator(Controller.PlayingCharacterEntity);
+                buttonLock.interactable = buildingEntity.Lockable && buildingEntity.IsCreator(GameInstance.PlayingCharacterEntity);
             if (buttonUnlock != null)
-                buttonUnlock.interactable = buildingEntity.Lockable && buildingEntity.IsCreator(Controller.PlayingCharacterEntity);
+                buttonUnlock.interactable = buildingEntity.Lockable && buildingEntity.IsCreator(GameInstance.PlayingCharacterEntity);
             if (buttonActivate != null)
                 buttonActivate.interactable = buildingEntity.CanActivate();
         }
