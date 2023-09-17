@@ -103,7 +103,7 @@ namespace MultiplayerARPG
                     item = storeItem,
                     price = item.price,
                 });
-                if (CurrentGameInstance.limitVendingItems > 0 && _items.Count >= CurrentGameInstance.limitVendingItems)
+                if (CurrentGameInstance.vendingItemsLimit > 0 && _items.Count >= CurrentGameInstance.vendingItemsLimit)
                     break;
             }
             if (_items.Count <= 0)

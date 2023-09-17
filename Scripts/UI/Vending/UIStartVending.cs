@@ -67,8 +67,12 @@ namespace MultiplayerARPG
 
         public void AddItem(string id, int amount, int price)
         {
-            if (_items.Count + 1 > GameInstance.Singleton.limitVendingItems)
+            if (_items.Count + 1 > GameInstance.Singleton.vendingItemsLimit)
+            {
+                // Reached limit
+                ClientGenericActions.ClientReceiveGameMessage(UITextKeys.UI_ERROR_REACHED_VENDING_ITEMS_LIMIT);
                 return;
+            }
 
             int indexOfData = GameInstance.PlayingCharacterEntity.NonEquipItems.IndexOf(id);
             if (indexOfData < 0)
