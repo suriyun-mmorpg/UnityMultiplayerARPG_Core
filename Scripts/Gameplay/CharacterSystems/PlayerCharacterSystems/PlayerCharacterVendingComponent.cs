@@ -72,6 +72,7 @@ namespace MultiplayerARPG
         [ServerRpc]
         protected void ServerStartVending(string title, StartVendingItems items)
         {
+#if UNITY_EDITOR || UNITY_SERVER
             if (DisableVending)
             {
                 GameInstance.ServerGameMessageHandlers.SendGameMessage(ConnectionId, UITextKeys.UI_ERROR_FEATURE_IS_DISABLED);
@@ -102,6 +103,8 @@ namespace MultiplayerARPG
                     item = storeItem,
                     price = item.price,
                 });
+                if (CurrentGameInstance.limitVendingItems > 0 && _items.Count >= CurrentGameInstance.limitVendingItems)
+                    break;
             }
             if (_items.Count <= 0)
             {
@@ -113,6 +116,7 @@ namespace MultiplayerARPG
                 isStarted = true,
                 title = title,
             };
+#endif
         }
 
         public void CallServerStopVending()
@@ -123,7 +127,9 @@ namespace MultiplayerARPG
         [ServerRpc]
         protected void ServerStopVending()
         {
+#if UNITY_EDITOR || UNITY_SERVER
             StopVending();
+#endif
         }
 
         public void StopVending()
@@ -146,6 +152,7 @@ namespace MultiplayerARPG
         [ServerRpc]
         protected void ServerSubscribe(uint objectId)
         {
+#if UNITY_EDITOR || UNITY_SERVER
             BasePlayerCharacterEntity playerCharacterEntity;
             if (!Manager.TryGetEntityByObjectId(objectId, out playerCharacterEntity))
                 return;
@@ -154,6 +161,7 @@ namespace MultiplayerARPG
             ServerUnsubscribe();
             _store = playerCharacterEntity.Vending;
             _store.AddCustomer(this);
+#endif
         }
 
         protected void AddCustomer(PlayerCharacterVendingComponent customer)
@@ -170,10 +178,12 @@ namespace MultiplayerARPG
         [ServerRpc]
         protected void ServerUnsubscribe()
         {
+#if UNITY_EDITOR || UNITY_SERVER
             if (_store == null)
                 return;
             _store.RemoveCustomer(this);
             _store = null;
+#endif
         }
 
         protected void RemoveCustomer(PlayerCharacterVendingComponent customer)
@@ -212,7 +222,9 @@ namespace MultiplayerARPG
         [ServerRpc]
         protected void ServerBuyItem(int index)
         {
+#if UNITY_EDITOR || UNITY_SERVER
             _store.SellItem(this, index);
+#endif
         }
 
         protected void SellItem(PlayerCharacterVendingComponent buyer, int index)

@@ -297,6 +297,8 @@ namespace MultiplayerARPG
         public float dealingRequestDuration = 5f;
         [Tooltip("If this is `TRUE`, dealing feature will be disabled, all players won't be able to deal items to each other")]
         public bool disableDealing = false;
+        [Tooltip("If this is > 0, it will limit amount of vending items")]
+        public int limitVendingItems = 16;
         [Tooltip("If this is `TRUE`, vending feature will be disabled, all players won't be able to deal items to each other")]
         public bool disableVending = false;
         [Tooltip("If dueling request does not accepted within this duration, the request will be cancelled")]
