@@ -456,14 +456,14 @@ namespace MultiplayerARPG
             System.Action<Dictionary<DamageElement, MinMaxFloat>> onGetIncreasingDamagesRate = null,
             System.Action<Dictionary<BaseSkill, int>> onGetIncreasingSkill = null)
         {
-            bool isCalculateStats = onGetStats != null || onGetIncreasingStats != null || onGetIncreasingStatsRate != null;
-            bool isCalculateAttributes = onGetStats != null || onGetAttributes != null || onGetIncreasingAttributes != null || onGetIncreasingAttributesRate != null;
-            bool isCalculateResistances = onGetResistances != null || onGetIncreasingResistances != null;
-            bool isCalculateArmors = onGetArmors != null || onGetIncreasingArmors != null || onGetIncreasingArmorsRate != null;
             bool isCalculateRightHandWeaponDamages = onGetRightHandDamages != null || onGetRightHandWeaponDamage != null;
             bool isCalculateLeftHandWeaponDamages = onGetLeftHandDamages != null || onGetLeftHandWeaponDamage != null;
-            bool isCalculateDamages = onGetRightHandDamages != null || onGetLeftHandDamages != null || onGetRightHandWeaponDamage != null || onGetLeftHandWeaponDamage != null || onGetIncreasingDamages != null || onGetIncreasingDamagesRate != null;
-            bool isCalculateSkills = onGetSkills != null || onGetIncreasingSkill != null;
+            bool isCalculateDamages = isCalculateRightHandWeaponDamages || isCalculateLeftHandWeaponDamages || onGetIncreasingDamages != null || onGetIncreasingDamagesRate != null;
+            bool isCalculateStats = onGetStats != null || onGetIncreasingStats != null || onGetIncreasingStatsRate != null;
+            bool isCalculateAttributes = onGetStats != null || onGetAttributes != null || onGetIncreasingAttributes != null || onGetIncreasingAttributesRate != null || isCalculateDamages;
+            bool isCalculateResistances = onGetResistances != null || onGetIncreasingResistances != null;
+            bool isCalculateArmors = onGetArmors != null || onGetIncreasingArmors != null || onGetIncreasingArmorsRate != null;
+            bool isCalculateSkills = onGetSkills != null || onGetIncreasingSkill != null || isCalculateDamages;
 
             // Prepare result stats, by using character's base stats
             // For weapons it will be based on equipped weapons
