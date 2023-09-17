@@ -75,6 +75,44 @@ namespace MultiplayerARPG
 #endif
         }
 
+        public bool CallServerRepairBuilding(uint objectId)
+        {
+            if (!CurrentGameplayRule.CanInteractEntity(Entity, objectId))
+            {
+                ClientGenericActions.ClientReceiveGameMessage(UITextKeys.UI_ERROR_CHARACTER_IS_TOO_FAR);
+                return false;
+            }
+            RPC(ServerRepairBuilding, objectId);
+            return true;
+        }
+
+        [ServerRpc]
+        protected void ServerRepairBuilding(uint objectId)
+        {
+#if UNITY_EDITOR || UNITY_SERVER
+            if (!Entity.CanDoActions())
+                return;
+
+            if (!Manager.TryGetEntityByObjectId(objectId, out BuildingEntity buildingEntity))
+            {
+                // Can't find the entity
+                return;
+            }
+
+            if (!Entity.IsGameEntityInDistance(buildingEntity))
+            {
+                GameInstance.ServerGameMessageHandlers.SendGameMessage(ConnectionId, UITextKeys.UI_ERROR_CHARACTER_IS_TOO_FAR);
+                return;
+            }
+
+            if (!buildingEntity.Repair(Entity, out UITextKeys errorMessage))
+            {
+                GameInstance.ServerGameMessageHandlers.SendGameMessage(ConnectionId, errorMessage);
+                return;
+            }
+#endif
+        }
+        
         public bool CallServerDestroyBuilding(uint objectId)
         {
             if (!CurrentGameplayRule.CanInteractEntity(Entity, objectId))
