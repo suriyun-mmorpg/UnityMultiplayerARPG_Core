@@ -192,7 +192,7 @@ namespace MultiplayerARPG
 
             if (textSentDate != null)
             {
-                System.DateTime dateTime = new System.DateTime(1970, 1, 1, 0, 0, 0, 0, System.DateTimeKind.Utc);
+                System.DateTime dateTime = GenericUtils.GetStartDateTime();
                 if (mail != null)
                     dateTime = dateTime.AddSeconds(mail.SentTimestamp).ToLocalTime();
                 textSentDate.text = ZString.Format(
