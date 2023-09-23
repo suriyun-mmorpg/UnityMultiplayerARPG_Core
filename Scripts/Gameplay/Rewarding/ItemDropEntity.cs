@@ -404,7 +404,7 @@ namespace MultiplayerARPG
 
             characterEntity.IncreaseItems(DropItems, (characterItem) =>
             {
-                GameInstance.ServerGameMessageHandlers.NotifyRewardItem(ConnectionId, GivenType, characterItem.dataId, characterItem.amount);
+                GameInstance.ServerGameMessageHandlers.NotifyRewardItem(characterEntity.ConnectionId, GivenType, characterItem.dataId, characterItem.amount);
             });
             characterEntity.FillEmptySlots();
             PickedUp();
