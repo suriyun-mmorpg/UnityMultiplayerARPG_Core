@@ -570,6 +570,7 @@ namespace MultiplayerARPG
                 // Simulate skill using at server
                 UseSkillRoutine(writeTimestamp, _serverState.Value).Forget();
                 // Send input to client
+                writer.PutPackedInt(_serverState.Value.SimulateSeed);
                 writer.Put(_serverState.Value.IsLeftHand);
                 writer.PutPackedInt(_serverState.Value.Skill.DataId);
                 writer.PutPackedInt(_serverState.Value.SkillLevel);
@@ -641,6 +642,7 @@ namespace MultiplayerARPG
 
         public virtual void ReadServerUseSkillStateAtClient(long peerTimestamp, NetDataReader reader)
         {
+            int simulateSeed = reader.GetPackedInt();
             bool isLeftHand = reader.GetBool();
             int skillDataId = reader.GetPackedInt();
             int skillLevel = reader.GetPackedInt();
@@ -660,6 +662,7 @@ namespace MultiplayerARPG
             Entity.AttackComponent.CancelAttack();
             UseSkillState simulateState = new UseSkillState()
             {
+                SimulateSeed = simulateSeed,
                 IsLeftHand = isLeftHand,
                 Skill = skill,
                 SkillLevel = skillLevel,

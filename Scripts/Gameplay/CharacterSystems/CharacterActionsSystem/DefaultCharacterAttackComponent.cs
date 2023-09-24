@@ -442,6 +442,7 @@ namespace MultiplayerARPG
                 // Simulate attacking at server
                 AttackRoutine(writeTimestamp, _serverState.Value).Forget();
                 // Send input to client
+                writer.PutPackedInt(_serverState.Value.SimulateSeed);
                 writer.Put(_serverState.Value.IsLeftHand);
                 // Clear Input
                 _serverState = null;
@@ -458,6 +459,7 @@ namespace MultiplayerARPG
 
         public virtual void ReadServerAttackStateAtClient(long peerTimestamp, NetDataReader reader)
         {
+            int simulateSeed = reader.GetPackedInt();
             bool isLeftHand = reader.GetBool();
             if (IsServer || IsOwnerClient)
             {
@@ -466,6 +468,7 @@ namespace MultiplayerARPG
             }
             AttackState simulateState = new AttackState()
             {
+                SimulateSeed = simulateSeed,
                 IsLeftHand = isLeftHand,
             };
             AttackRoutine(peerTimestamp, simulateState).Forget();
