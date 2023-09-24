@@ -128,6 +128,7 @@ namespace MultiplayerARPG
         // Server validate codes
         private float _lastServerValidateHorDistDiff;
         private float _lastServerValidateVerDistDiff;
+        private float _lastServerHorSpdBeforeAirborne;
         private bool _isServerWaitingTeleportConfirm;
 
         // Client confirm codes
@@ -938,9 +939,12 @@ namespace MultiplayerARPG
             }
         }
 
-        public float GetHorizontalMoveSpeed()
+        public float GetHorizontalMoveSpeed(MovementState movementState, ExtraMovementState extraMovementState)
         {
-            return Entity.GetMoveSpeed();
+            if ((!movementState.Has(MovementState.IsGrounded) || movementState.Has(MovementState.IsJump)) && doNotChangeVelocityWhileAirborne)
+                return _lastServerHorSpdBeforeAirborne;
+            _lastServerHorSpdBeforeAirborne = Entity.GetMoveSpeed(movementState, extraMovementState);
+            return _lastServerHorSpdBeforeAirborne;
         }
 
         public float GetVericalMoveSpeed(bool falling)
@@ -990,11 +994,6 @@ namespace MultiplayerARPG
                     _acceptedExtraMovementStateWhenJump = ExtraMovementState;
                     _acceptedJump = true;
                 }
-                if (!movementState.Has(MovementState.IsGrounded) && doNotChangeVelocityWhileAirborne)
-                {
-                    // It will move by velocity before jump, so validate by extra movement state before jump
-                    extraMovementState = _acceptedExtraMovementStateWhenJump;
-                }
                 if (!IsClient)
                 {
                     // If it is not a client, don't have to simulate movement, just set the position (but still simulate gravity)
@@ -1002,7 +1001,7 @@ namespace MultiplayerARPG
                     Vector3 newPos = position;
                     bool falling = newPos.y < oldPos.y;
                     // Calculate moveable distance
-                    float horMoveSpd = Entity.GetMoveSpeed(movementState, extraMovementState);
+                    float horMoveSpd = GetHorizontalMoveSpeed(movementState, extraMovementState);
                     float horMoveableDist = (float)horMoveSpd * unityDeltaTime;
                     if (horMoveableDist < 0.001f)
                         horMoveableDist = 0.001f;
@@ -1017,8 +1016,8 @@ namespace MultiplayerARPG
                     float clientHorMoveDist = Vector3.Distance(oldPos.GetXZ(), newPos.GetXZ());
                     float clientVerMoveDist = Mathf.Abs(newPos.y - oldPos.y);
                     // TODO: Skip validating while root motion enabled, just for now, I will find a way to validate root motion movement later
-                    bool rootMotionEnabled = useRootMotionForMovement || useRootMotionForAirMovement || useRootMotionForJump || useRootMotionForFall || useRootMotionWhileNotMoving || useRootMotionUnderWater;
-                    if (rootMotionEnabled || ((clientHorMoveDist <= 0.001f || clientHorMoveDist <= horMoveableDist + _lastServerValidateHorDistDiff) && (clientVerMoveDist <= 0.001f || clientVerMoveDist <= verMoveableDist + _lastServerValidateVerDistDiff)))
+                    bool skipValidation = useRootMotionForMovement || useRootMotionForAirMovement || useRootMotionForJump || useRootMotionForFall || useRootMotionWhileNotMoving || useRootMotionUnderWater;
+                    if (skipValidation || ((clientHorMoveDist <= 0.001f || clientHorMoveDist <= horMoveableDist + _lastServerValidateHorDistDiff) && (clientVerMoveDist <= 0.001f || clientVerMoveDist <= verMoveableDist + _lastServerValidateVerDistDiff)))
                     {
                         // Allow to move to the position
                         CacheTransform.position = newPos;
