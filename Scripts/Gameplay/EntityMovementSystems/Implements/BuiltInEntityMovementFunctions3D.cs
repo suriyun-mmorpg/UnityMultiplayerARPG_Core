@@ -11,6 +11,7 @@ namespace MultiplayerARPG
     {
         private static readonly RaycastHit[] s_findGroundRaycastHits = new RaycastHit[4];
         private static readonly long s_lagBuffer = System.TimeSpan.TicksPerMillisecond * 200;
+        private static readonly int s_forceGroundedFramesAfterTeleport = 3;
 
         [Header("Movement AI")]
         [Range(0.01f, 1f)]
@@ -116,6 +117,7 @@ namespace MultiplayerARPG
         // Teleport codes
         private bool _isTeleporting;
         private bool _stillMoveAfterTeleport;
+        private int _lastTeleportFrame;
 
         // Peers accept codes
         private bool _acceptedJump;
@@ -597,7 +599,7 @@ namespace MultiplayerARPG
                 _tempMovementState = _moveDirection.sqrMagnitude > 0f ? _tempMovementState : MovementState.None;
                 if (_isUnderWater)
                     _tempMovementState |= MovementState.IsUnderWater;
-                if (_isGrounded || _airborneElapsed < airborneDelay)
+                if (_isGrounded || _airborneElapsed < airborneDelay || Time.frameCount - _lastTeleportFrame < s_forceGroundedFramesAfterTeleport)
                     _tempMovementState |= MovementState.IsGrounded;
                 // Update movement state
                 MovementState = _tempMovementState;
@@ -1073,6 +1075,7 @@ namespace MultiplayerARPG
                 _isServerWaitingTeleportConfirm = true;
             if (!IsServer && IsOwnerClient)
                 _isClientConfirmingTeleport = true;
+            _lastTeleportFrame = Time.frameCount;
         }
 
         public bool CanPredictMovement()
