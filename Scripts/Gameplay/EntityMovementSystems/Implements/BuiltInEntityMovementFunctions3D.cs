@@ -996,7 +996,9 @@ namespace MultiplayerARPG
                     _acceptedExtraMovementStateWhenJump = ExtraMovementState;
                     _acceptedJump = true;
                 }
-                if (!IsClient)
+                // Skip simulation because while playing root motion animation it will also move charcter by root motion at server too, can determined that it is simulated
+                bool useRootMotion = useRootMotionForMovement || useRootMotionForAirMovement || useRootMotionForJump || useRootMotionForFall || useRootMotionWhileNotMoving || useRootMotionUnderWater;
+                if (useRootMotion || !IsClient)
                 {
                     // If it is not a client, don't have to simulate movement, just set the position (but still simulate gravity)
                     Vector3 oldPos = CacheTransform.position;
@@ -1017,8 +1019,7 @@ namespace MultiplayerARPG
                     // Movement validating, if it is valid, set the position follow the client, if not set position to proper one and tell client to teleport
                     float clientHorMoveDist = Vector3.Distance(oldPos.GetXZ(), newPos.GetXZ());
                     float clientVerMoveDist = Mathf.Abs(newPos.y - oldPos.y);
-                    // TODO: Skip validating while root motion enabled, just for now, I will find a way to validate root motion movement later
-                    bool skipValidation = useRootMotionForMovement || useRootMotionForAirMovement || useRootMotionForJump || useRootMotionForFall || useRootMotionWhileNotMoving || useRootMotionUnderWater;
+                    bool skipValidation = useRootMotion;
                     if (Entity.SkipMovementValidation)
                         skipValidation = true;
                     if (skipValidation || ((clientHorMoveDist <= 0.001f || clientHorMoveDist <= horMoveableDist + _lastServerValidateHorDistDiff) && (clientVerMoveDist <= 0.001f || clientVerMoveDist <= verMoveableDist + _lastServerValidateVerDistDiff)))
