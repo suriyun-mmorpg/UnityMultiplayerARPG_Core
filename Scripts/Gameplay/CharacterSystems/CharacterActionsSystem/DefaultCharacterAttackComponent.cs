@@ -30,6 +30,8 @@ namespace MultiplayerARPG
             }
         }
         public float LastAttackEndTime { get; protected set; }
+        protected bool _skipMovementValidation;
+        public bool LastAttackSkipMovementValidation { get { return _skipMovementValidation; } set { _skipMovementValidation = value; } }
         public float MoveSpeedRateWhileAttacking { get; protected set; }
         public MovementRestriction MovementRestrictionWhileAttacking { get; protected set; }
         protected float _totalDuration;
@@ -117,7 +119,8 @@ namespace MultiplayerARPG
                 animationIndex,
                 out float animSpeedRate,
                 out _triggerDurations,
-                out _totalDuration);
+                out _totalDuration,
+                out _skipMovementValidation);
 
             // Set doing action state at clients and server
             SetAttackActionStates(animActionType, animActionDataId, simulateState);

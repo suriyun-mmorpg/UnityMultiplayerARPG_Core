@@ -56,14 +56,16 @@ namespace MultiplayerARPG
             }
         }
         public float LastUseSkillEndTime { get; protected set; }
+        protected bool _skipMovementValidation;
+        public bool LastUseSkillSkipMovementValidation { get { return _skipMovementValidation; } set { _skipMovementValidation = value; } }
         public bool IsCastingSkillCanBeInterrupted { get; protected set; }
         public bool IsCastingSkillInterrupted { get; protected set; }
         public float CastingSkillDuration { get; protected set; }
         public float CastingSkillCountDown { get; protected set; }
         public float MoveSpeedRateWhileUsingSkill { get; protected set; }
         public MovementRestriction MovementRestrictionWhileUsingSkill { get; protected set; }
-        protected float totalDuration;
-        public float UseSkillTotalDuration { get { return totalDuration; } set { totalDuration = value; } }
+        protected float _totalDuration;
+        public float UseSkillTotalDuration { get { return _totalDuration; } set { _totalDuration = value; } }
         protected float[] _triggerDurations;
         public float[] UseSkillTriggerDurations { get { return _triggerDurations; } set { _triggerDurations = value; } }
         public AnimActionType AnimActionType { get; protected set; }
@@ -169,7 +171,8 @@ namespace MultiplayerARPG
                 out int animationIndex,
                 out float animSpeedRate,
                 out _triggerDurations,
-                out totalDuration);
+                out _totalDuration,
+                out _skipMovementValidation);
 
             // Set doing action state at clients and server
             SetUseSkillActionStates(animActionType, animActionDataId, simulateState);
@@ -210,10 +213,10 @@ namespace MultiplayerARPG
             // Last use skill end time
             float remainsDuration = DEFAULT_TOTAL_DURATION;
             LastUseSkillEndTime = Time.unscaledTime + CastingSkillDuration + DEFAULT_TOTAL_DURATION;
-            if (totalDuration >= 0f)
+            if (_totalDuration >= 0f)
             {
-                remainsDuration = totalDuration;
-                LastUseSkillEndTime = Time.unscaledTime + CastingSkillDuration + (totalDuration / animSpeedRate);
+                remainsDuration = _totalDuration;
+                LastUseSkillEndTime = Time.unscaledTime + CastingSkillDuration + (_totalDuration / animSpeedRate);
             }
 
             // Prepare cancellation
@@ -267,7 +270,7 @@ namespace MultiplayerARPG
                     Entity.FpsModel.PlayActionAnimation(AnimActionType, AnimActionDataId, animationIndex, animSpeedRate);
 
                 // Try setup state data (maybe by animation clip events or state machine behaviours), if it was not set up
-                if (_triggerDurations == null || _triggerDurations.Length == 0 || totalDuration < 0f)
+                if (_triggerDurations == null || _triggerDurations.Length == 0 || _totalDuration < 0f)
                 {
                     // Wait some components to setup proper `useSkillTriggerDurations` and `useSkillTotalDuration` within `DEFAULT_STATE_SETUP_DELAY`
                     float setupDelayCountDown = DEFAULT_STATE_SETUP_DELAY;
@@ -275,7 +278,7 @@ namespace MultiplayerARPG
                     {
                         await UniTask.Yield();
                         setupDelayCountDown -= Time.unscaledDeltaTime;
-                    } while (setupDelayCountDown > 0 && (_triggerDurations == null || _triggerDurations.Length == 0 || totalDuration < 0f));
+                    } while (setupDelayCountDown > 0 && (_triggerDurations == null || _triggerDurations.Length == 0 || _totalDuration < 0f));
                     if (setupDelayCountDown <= 0f)
                     {
                         // Can't setup properly, so try to setup manually to make it still workable
@@ -288,8 +291,8 @@ namespace MultiplayerARPG
                     else
                     {
                         // Can setup, so set proper `remainsDuration` and `LastUseSkillEndTime` value
-                        remainsDuration = totalDuration;
-                        LastUseSkillEndTime = Time.unscaledTime + (totalDuration / animSpeedRate);
+                        remainsDuration = _totalDuration;
+                        LastUseSkillEndTime = Time.unscaledTime + (_totalDuration / animSpeedRate);
                     }
                 }
 

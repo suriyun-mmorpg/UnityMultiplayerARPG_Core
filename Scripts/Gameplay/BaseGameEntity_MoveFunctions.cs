@@ -85,6 +85,11 @@ namespace MultiplayerARPG
             }
         }
 
+        public virtual bool SkipMovementValidation
+        {
+            get { return false; }
+        }
+
         public float GetMoveSpeed()
         {
             return GetMoveSpeed(MovementState, ExtraMovementState);

@@ -24,6 +24,8 @@ namespace MultiplayerARPG
         public int ReloadingAmmoAmount { get; protected set; }
         public bool IsReloading { get; protected set; }
         public float LastReloadEndTime { get; protected set; }
+        protected bool _skipMovementValidation;
+        public bool LastReloadSkipMovementValidation { get { return _skipMovementValidation; } set { _skipMovementValidation = value; } }
         public float MoveSpeedRateWhileReloading { get; protected set; }
         public MovementRestriction MovementRestrictionWhileReloading { get; protected set; }
         protected float _totalDuration;
@@ -76,7 +78,8 @@ namespace MultiplayerARPG
                 0,
                 out float animSpeedRate,
                 out _triggerDurations,
-                out _totalDuration);
+                out _totalDuration,
+                out _skipMovementValidation);
 
             // Set doing action state at clients and server
             SetReloadActionStates(animActionType, reloadingAmmoAmount);

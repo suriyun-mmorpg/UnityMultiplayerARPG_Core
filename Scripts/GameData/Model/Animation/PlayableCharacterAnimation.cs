@@ -91,6 +91,8 @@ namespace MultiplayerARPG.GameData.Model.Playables
         public float extendDuration;
         [Tooltip("This will be in use with attacking/skill animations, These audio clips will be played randomly while play this animation (not loop). PS. You actually can use animation event instead :P")]
         public AudioClip[] audioClips;
+        [Tooltip("Turn this on to skip movement validation while playing this animation")]
+        public bool skipMovementValidation;
 
         public AudioClip GetRandomAudioClip()
         {

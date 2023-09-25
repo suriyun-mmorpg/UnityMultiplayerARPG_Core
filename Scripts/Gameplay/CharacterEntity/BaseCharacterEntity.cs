@@ -109,12 +109,14 @@ namespace MultiplayerARPG
         public CharacterSkillAndBuffComponent SkillAndBuffComponent { get; protected set; }
         public bool IsAttacking { get { return AttackComponent.IsAttacking; } }
         public float LastAttackEndTime { get { return AttackComponent.LastAttackEndTime; } }
+        public bool LastAttackSkipMovementValidation { get { return AttackComponent.LastAttackSkipMovementValidation; } }
         public float MoveSpeedRateWhileAttacking { get { return AttackComponent.MoveSpeedRateWhileAttacking; } }
         public MovementRestriction MovementRestrictionWhileAttacking { get { return AttackComponent.MovementRestrictionWhileAttacking; } }
         public float AttackTotalDuration { get { return AttackComponent.AttackTotalDuration; } set { AttackComponent.AttackTotalDuration = value; } }
         public float[] AttackTriggerDurations { get { return AttackComponent.AttackTriggerDurations; } set { AttackComponent.AttackTriggerDurations = value; } }
         public bool IsUsingSkill { get { return UseSkillComponent.IsUsingSkill; } }
         public float LastUseSkillEndTime { get { return UseSkillComponent.LastUseSkillEndTime; } }
+        public bool LastUseSkillSkipMovementValidation { get { return UseSkillComponent.LastUseSkillSkipMovementValidation; } }
         public float MoveSpeedRateWhileUsingSkill { get { return UseSkillComponent.MoveSpeedRateWhileUsingSkill; } }
         public MovementRestriction MovementRestrictionWhileUsingSkill { get { return UseSkillComponent.MovementRestrictionWhileUsingSkill; } }
         public float UseSkillTotalDuration { get { return UseSkillComponent.UseSkillTotalDuration; } set { UseSkillComponent.UseSkillTotalDuration = value; } }
@@ -128,6 +130,7 @@ namespace MultiplayerARPG
         public int ReloadingAmmoAmount { get { return ReloadComponent.ReloadingAmmoAmount; } }
         public bool IsReloading { get { return ReloadComponent.IsReloading; } }
         public float LastReloadEndTime { get { return ReloadComponent.LastReloadEndTime; } }
+        public bool LastReloadSkipMovementValidation { get { return ReloadComponent.LastReloadSkipMovementValidation; } }
         public float MoveSpeedRateWhileReloading { get { return ReloadComponent.MoveSpeedRateWhileReloading; } }
         public MovementRestriction MovementRestrictionWhileReloading { get { return ReloadComponent.MovementRestrictionWhileReloading; } }
         public float ReloadTotalDuration { get { return ReloadComponent.ReloadTotalDuration; } set { ReloadComponent.ReloadTotalDuration = value; } }
@@ -1089,8 +1092,7 @@ namespace MultiplayerARPG
 
         public virtual bool IsPlayingActionAnimation()
         {
-            return IsPlayingAttackOrUseSkillAnimation() ||
-                IsPlayingReloadAnimation();
+            return IsPlayingAttackOrUseSkillAnimation() || IsPlayingReloadAnimation();
         }
 
         public float GetAttackSpeed()
@@ -1278,24 +1280,26 @@ namespace MultiplayerARPG
             out int animationIndex,
             out float animSpeedRate,
             out float[] triggerDurations,
-            out float totalDuration)
+            out float totalDuration,
+            out bool skipMovementValidation)
         {
             animationIndex = 0;
             animSpeedRate = 1f;
             triggerDurations = new float[] { 0f };
             totalDuration = 0f;
+            skipMovementValidation = false;
             // Random animation
             switch (animActionType)
             {
                 case AnimActionType.AttackRightHand:
-                    CharacterModel.GetRandomRightHandAttackAnimation(skillOrWeaponTypeDataId, randomSeed, out animationIndex, out animSpeedRate, out triggerDurations, out totalDuration);
+                    CharacterModel.GetRandomRightHandAttackAnimation(skillOrWeaponTypeDataId, randomSeed, out animationIndex, out animSpeedRate, out triggerDurations, out totalDuration, out skipMovementValidation);
                     break;
                 case AnimActionType.AttackLeftHand:
-                    CharacterModel.GetRandomLeftHandAttackAnimation(skillOrWeaponTypeDataId, randomSeed, out animationIndex, out animSpeedRate, out triggerDurations, out totalDuration);
+                    CharacterModel.GetRandomLeftHandAttackAnimation(skillOrWeaponTypeDataId, randomSeed, out animationIndex, out animSpeedRate, out triggerDurations, out totalDuration, out skipMovementValidation);
                     break;
                 case AnimActionType.SkillRightHand:
                 case AnimActionType.SkillLeftHand:
-                    CharacterModel.GetSkillActivateAnimation(skillOrWeaponTypeDataId, out animSpeedRate, out triggerDurations, out totalDuration);
+                    CharacterModel.GetSkillActivateAnimation(skillOrWeaponTypeDataId, out animSpeedRate, out triggerDurations, out totalDuration, out skipMovementValidation);
                     break;
             }
         }
@@ -1306,29 +1310,31 @@ namespace MultiplayerARPG
             int animationIndex,
             out float animSpeedRate,
             out float[] triggerDurations,
-            out float totalDuration)
+            out float totalDuration,
+            out bool skipMovementValidation)
         {
             animSpeedRate = 1f;
             triggerDurations = new float[] { 0f };
             totalDuration = 0f;
+            skipMovementValidation = false;
             // Random animation
             switch (animActionType)
             {
                 case AnimActionType.AttackRightHand:
-                    CharacterModel.GetRightHandAttackAnimation(skillOrWeaponTypeDataId, animationIndex, out animSpeedRate, out triggerDurations, out totalDuration);
+                    CharacterModel.GetRightHandAttackAnimation(skillOrWeaponTypeDataId, animationIndex, out animSpeedRate, out triggerDurations, out totalDuration, out skipMovementValidation);
                     break;
                 case AnimActionType.AttackLeftHand:
-                    CharacterModel.GetLeftHandAttackAnimation(skillOrWeaponTypeDataId, animationIndex, out animSpeedRate, out triggerDurations, out totalDuration);
+                    CharacterModel.GetLeftHandAttackAnimation(skillOrWeaponTypeDataId, animationIndex, out animSpeedRate, out triggerDurations, out totalDuration, out skipMovementValidation);
                     break;
                 case AnimActionType.SkillRightHand:
                 case AnimActionType.SkillLeftHand:
-                    CharacterModel.GetSkillActivateAnimation(skillOrWeaponTypeDataId, out animSpeedRate, out triggerDurations, out totalDuration);
+                    CharacterModel.GetSkillActivateAnimation(skillOrWeaponTypeDataId, out animSpeedRate, out triggerDurations, out totalDuration, out skipMovementValidation);
                     break;
                 case AnimActionType.ReloadRightHand:
-                    CharacterModel.GetRightHandReloadAnimation(skillOrWeaponTypeDataId, out animSpeedRate, out triggerDurations, out totalDuration);
+                    CharacterModel.GetRightHandReloadAnimation(skillOrWeaponTypeDataId, out animSpeedRate, out triggerDurations, out totalDuration, out skipMovementValidation);
                     break;
                 case AnimActionType.ReloadLeftHand:
-                    CharacterModel.GetLeftHandReloadAnimation(skillOrWeaponTypeDataId, out animSpeedRate, out triggerDurations, out totalDuration);
+                    CharacterModel.GetLeftHandReloadAnimation(skillOrWeaponTypeDataId, out animSpeedRate, out triggerDurations, out totalDuration, out skipMovementValidation);
                     break;
             }
         }
