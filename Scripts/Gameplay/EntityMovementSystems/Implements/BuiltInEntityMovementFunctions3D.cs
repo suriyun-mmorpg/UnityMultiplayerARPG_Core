@@ -150,11 +150,13 @@ namespace MultiplayerARPG
             _isClientConfirmingTeleport = true;
             _yAngle = CacheTransform.eulerAngles.y;
             _verticalVelocity = 0;
+            _lastTeleportFrame = Time.frameCount;
         }
 
         public void ComponentEnabled()
         {
             _verticalVelocity = 0;
+            _lastTeleportFrame = Time.frameCount;
         }
 
         public void OnSetOwnerClient(bool isOwnerClient)
