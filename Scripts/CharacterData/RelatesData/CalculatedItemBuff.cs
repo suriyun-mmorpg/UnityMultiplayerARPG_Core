@@ -7,6 +7,7 @@ namespace MultiplayerARPG
         private IEquipmentItem _item;
         private int _level;
         private int _randomSeed;
+        private byte _version;
         private CharacterStats _cacheIncreaseStats = CharacterStats.Empty;
         private CharacterStats _cacheIncreaseStatsRate = CharacterStats.Empty;
         private Dictionary<Attribute, float> _cacheIncreaseAttributes = new Dictionary<Attribute, float>();
@@ -17,6 +18,7 @@ namespace MultiplayerARPG
         private Dictionary<DamageElement, MinMaxFloat> _cacheIncreaseDamages = new Dictionary<DamageElement, MinMaxFloat>();
         private Dictionary<DamageElement, MinMaxFloat> _cacheIncreaseDamagesRate = new Dictionary<DamageElement, MinMaxFloat>();
         private Dictionary<BaseSkill, int> _cacheIncreaseSkills = new Dictionary<BaseSkill, int>();
+        private CalculatedItemRandomBonus _cacheRandomBonus = new CalculatedItemRandomBonus();
 
         public CalculatedItemBuff()
         {
@@ -48,12 +50,8 @@ namespace MultiplayerARPG
             _cacheIncreaseSkills = null;
         }
 
-        public void Build(IEquipmentItem item, int level, int randomSeed, byte version)
+        public void Clear()
         {
-            _item = item;
-            _level = level;
-            _randomSeed = randomSeed;
-
             _cacheIncreaseStats = CharacterStats.Empty;
             _cacheIncreaseStatsRate = CharacterStats.Empty;
             _cacheIncreaseAttributes.Clear();
@@ -64,18 +62,32 @@ namespace MultiplayerARPG
             _cacheIncreaseDamages.Clear();
             _cacheIncreaseDamagesRate.Clear();
             _cacheIncreaseSkills.Clear();
+        }
+
+        public void Build(IEquipmentItem item, int level, int randomSeed, byte version)
+        {
+            _item = item;
+            _level = level;
+            _randomSeed = randomSeed;
+            _version = version;
+
+            Clear();
 
             if (item == null || !item.IsEquipment())
                 return;
 
-            _cacheIncreaseStats = item.GetIncreaseStats(level, randomSeed, version);
-            _cacheIncreaseStatsRate = item.GetIncreaseStatsRate(level, randomSeed, version);
-            item.GetIncreaseAttributes(level, randomSeed, version, _cacheIncreaseAttributes);
-            item.GetIncreaseAttributesRate(level, randomSeed, version, _cacheIncreaseAttributesRate);
-            item.GetIncreaseResistances(level, randomSeed, version, _cacheIncreaseResistances);
-            item.GetIncreaseArmors(level, randomSeed, version, _cacheIncreaseArmors);
-            item.GetIncreaseDamages(level, randomSeed, version, _cacheIncreaseDamages);
-            item.GetIncreaseSkills(level, randomSeed, version, _cacheIncreaseSkills);
+            _cacheRandomBonus.Build(item, randomSeed, version);
+
+            _cacheIncreaseStats = item.GetIncreaseStats(_level) + _cacheRandomBonus.GetIncreaseStats();
+            _cacheIncreaseStatsRate = item.GetIncreaseStatsRate(_level) + _cacheRandomBonus.GetIncreaseStatsRate();
+            _cacheIncreaseAttributes = GameDataHelpers.CombineAttributes(item.GetIncreaseAttributes(_level, _cacheIncreaseAttributes), _cacheRandomBonus.GetIncreaseAttributes());
+            _cacheIncreaseAttributesRate = GameDataHelpers.CombineAttributes(item.GetIncreaseAttributesRate(_level, _cacheIncreaseAttributesRate), _cacheRandomBonus.GetIncreaseAttributesRate());
+            _cacheIncreaseResistances = GameDataHelpers.CombineResistances(item.GetIncreaseResistances(_level, _cacheIncreaseResistances), _cacheRandomBonus.GetIncreaseResistances());
+            _cacheIncreaseArmors = GameDataHelpers.CombineArmors(item.GetIncreaseArmors(_level, _cacheIncreaseArmors), _cacheRandomBonus.GetIncreaseArmors());
+            _cacheIncreaseArmorsRate = GameDataHelpers.CombineArmors(item.GetIncreaseArmorsRate(_level, _cacheIncreaseArmorsRate), _cacheRandomBonus.GetIncreaseArmorsRate());
+            _cacheIncreaseDamages = GameDataHelpers.CombineDamages(item.GetIncreaseDamages(_level, _cacheIncreaseDamages), _cacheRandomBonus.GetIncreaseDamages());
+            _cacheIncreaseDamagesRate = GameDataHelpers.CombineDamages(item.GetIncreaseDamagesRate(_level, _cacheIncreaseDamagesRate), _cacheRandomBonus.GetIncreaseDamagesRate());
+            _cacheIncreaseSkills = GameDataHelpers.CombineSkills(item.GetIncreaseSkills(_level, _cacheIncreaseSkills), _cacheRandomBonus.GetIncreaseSkills());
 
             if (GameExtensionInstance.onBuildCalculatedItemBuff != null)
                 GameExtensionInstance.onBuildCalculatedItemBuff(this);

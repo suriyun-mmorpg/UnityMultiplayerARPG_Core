@@ -208,6 +208,7 @@ namespace MultiplayerARPG
         protected bool _dirtyIsLock;
         protected float _coolDownRemainsDuration;
         protected bool _dirtyIsCountDown;
+        protected CalculatedItemRandomBonus _randomBonus = null;
 
         public bool IsSetupAsEquipSlot { get; private set; }
         public string EquipPosition { get; private set; }
@@ -218,6 +219,13 @@ namespace MultiplayerARPG
             IsSetupAsEquipSlot = true;
             EquipPosition = equipPosition;
             EquipSlotIndex = equipSlotIndex;
+        }
+
+        protected CalculatedItemRandomBonus GetRandomBonus()
+        {
+            if (EquipmentItem != null && !dontCalculateRandomBonus && _randomBonus == null)
+                _randomBonus = new CalculatedItemRandomBonus(EquipmentItem, CharacterItem.randomSeed, CharacterItem.version);
+            return _randomBonus;
         }
 
         protected override void OnDisable()
@@ -414,6 +422,7 @@ namespace MultiplayerARPG
 
         protected override void UpdateData()
         {
+            _randomBonus = null;
             UpdateCoolDownRemainsDuration(1f);
 
             if (Level <= 0)
@@ -708,9 +717,17 @@ namespace MultiplayerARPG
             {
                 CharacterStats stats = new CharacterStats();
                 if (EquipmentItem != null)
-                    stats += EquipmentItem.GetIncreaseStats(Level, CharacterItem.randomSeed, CharacterItem.version, withRandomBonus: !dontCalculateRandomBonus);
+                {
+                    stats += EquipmentItem.GetIncreaseStats(Level);
+                    if (!dontCalculateRandomBonus)
+                    {
+                        stats += GetRandomBonus().GetIncreaseStats();
+                    }
+                }
                 else if (SocketEnhancerItem != null)
+                {
                     stats += SocketEnhancerItem.SocketEnhanceEffect.stats;
+                }
 
                 if (stats.IsEmpty())
                 {
@@ -730,9 +747,17 @@ namespace MultiplayerARPG
             {
                 CharacterStats statsRate = new CharacterStats();
                 if (EquipmentItem != null)
-                    statsRate += EquipmentItem.GetIncreaseStatsRate(Level, CharacterItem.randomSeed, CharacterItem.version, withRandomBonus: !dontCalculateRandomBonus);
+                {
+                    statsRate += EquipmentItem.GetIncreaseStatsRate(Level);
+                    if (!dontCalculateRandomBonus)
+                    {
+                        statsRate += GetRandomBonus().GetIncreaseStatsRate();
+                    }
+                }
                 else if (SocketEnhancerItem != null)
+                {
                     statsRate += SocketEnhancerItem.SocketEnhanceEffect.statsRate;
+                }
 
                 if (statsRate.IsEmpty())
                 {
@@ -752,9 +777,17 @@ namespace MultiplayerARPG
             {
                 Dictionary<Attribute, float> attributes = null;
                 if (EquipmentItem != null)
-                    attributes = EquipmentItem.GetIncreaseAttributes(Level, CharacterItem.randomSeed, CharacterItem.version, withRandomBonus: !dontCalculateRandomBonus);
+                {
+                    attributes = EquipmentItem.GetIncreaseAttributes(Level);
+                    if (!dontCalculateRandomBonus)
+                    {
+                        attributes = GameDataHelpers.CombineAttributes(attributes, GetRandomBonus().GetIncreaseAttributes());
+                    }
+                }
                 else if (SocketEnhancerItem != null)
+                {
                     attributes = GameDataHelpers.CombineAttributes(SocketEnhancerItem.SocketEnhanceEffect.attributes, attributes, 1f);
+                }
 
                 if (attributes == null || attributes.Count == 0)
                 {
@@ -774,9 +807,17 @@ namespace MultiplayerARPG
             {
                 Dictionary<Attribute, float> attributesRate = null;
                 if (EquipmentItem != null)
-                    attributesRate = EquipmentItem.GetIncreaseAttributesRate(Level, CharacterItem.randomSeed, CharacterItem.version, withRandomBonus: !dontCalculateRandomBonus);
+                {
+                    attributesRate = EquipmentItem.GetIncreaseAttributesRate(Level);
+                    if (!dontCalculateRandomBonus)
+                    {
+                        attributesRate = GameDataHelpers.CombineAttributes(attributesRate, GetRandomBonus().GetIncreaseAttributesRate());
+                    }
+                }
                 else if (SocketEnhancerItem != null)
+                {
                     attributesRate = GameDataHelpers.CombineAttributes(SocketEnhancerItem.SocketEnhanceEffect.attributesRate, attributesRate, 1f);
+                }
 
                 if (attributesRate == null || attributesRate.Count == 0)
                 {
@@ -796,9 +837,17 @@ namespace MultiplayerARPG
             {
                 Dictionary<DamageElement, float> resistances = null;
                 if (EquipmentItem != null)
-                    resistances = EquipmentItem.GetIncreaseResistances(Level, CharacterItem.randomSeed, CharacterItem.version, withRandomBonus: !dontCalculateRandomBonus);
+                {
+                    resistances = EquipmentItem.GetIncreaseResistances(Level);
+                    if (!dontCalculateRandomBonus)
+                    {
+                        resistances = GameDataHelpers.CombineResistances(resistances, GetRandomBonus().GetIncreaseResistances());
+                    }
+                }
                 else if (SocketEnhancerItem != null)
+                {
                     resistances = GameDataHelpers.CombineResistances(SocketEnhancerItem.SocketEnhanceEffect.resistances, resistances, 1f);
+                }
 
                 if (resistances == null || resistances.Count == 0)
                 {
@@ -817,9 +866,17 @@ namespace MultiplayerARPG
             {
                 Dictionary<DamageElement, float> armors = null;
                 if (EquipmentItem != null)
-                    armors = EquipmentItem.GetIncreaseArmors(Level, CharacterItem.randomSeed, CharacterItem.version, withRandomBonus: !dontCalculateRandomBonus);
+                {
+                    armors = EquipmentItem.GetIncreaseArmors(Level);
+                    if (!dontCalculateRandomBonus)
+                    {
+                        armors = GameDataHelpers.CombineArmors(armors, GetRandomBonus().GetIncreaseArmors());
+                    }
+                }
                 else if (SocketEnhancerItem != null)
+                {
                     armors = GameDataHelpers.CombineArmors(SocketEnhancerItem.SocketEnhanceEffect.armors, armors, 1f);
+                }
 
                 if (armors == null || armors.Count == 0)
                 {
@@ -839,9 +896,17 @@ namespace MultiplayerARPG
             {
                 Dictionary<DamageElement, float> armorsRate = null;
                 if (EquipmentItem != null)
-                    armorsRate = EquipmentItem.GetIncreaseArmorsRate(Level, CharacterItem.randomSeed, CharacterItem.version, withRandomBonus: !dontCalculateRandomBonus);
+                {
+                    armorsRate = EquipmentItem.GetIncreaseArmorsRate(Level);
+                    if (!dontCalculateRandomBonus)
+                    {
+                        armorsRate = GameDataHelpers.CombineArmors(armorsRate, GetRandomBonus().GetIncreaseArmorsRate());
+                    }
+                }
                 else if (SocketEnhancerItem != null)
+                {
                     armorsRate = GameDataHelpers.CombineArmors(SocketEnhancerItem.SocketEnhanceEffect.armorsRate, armorsRate, 1f);
+                }
 
                 if (armorsRate == null || armorsRate.Count == 0)
                 {
@@ -861,9 +926,17 @@ namespace MultiplayerARPG
             {
                 Dictionary<DamageElement, MinMaxFloat> damageAmounts = null;
                 if (EquipmentItem != null)
-                    damageAmounts = EquipmentItem.GetIncreaseDamages(Level, CharacterItem.randomSeed, CharacterItem.version, withRandomBonus: !dontCalculateRandomBonus);
+                {
+                    damageAmounts = EquipmentItem.GetIncreaseDamages(Level);
+                    if (!dontCalculateRandomBonus)
+                    {
+                        damageAmounts = GameDataHelpers.CombineDamages(damageAmounts, GetRandomBonus().GetIncreaseDamages());
+                    }
+                }
                 else if (SocketEnhancerItem != null)
+                {
                     damageAmounts = GameDataHelpers.CombineDamages(SocketEnhancerItem.SocketEnhanceEffect.damages, damageAmounts, 1f);
+                }
 
                 if (damageAmounts == null || damageAmounts.Count == 0)
                 {
@@ -883,9 +956,17 @@ namespace MultiplayerARPG
             {
                 Dictionary<DamageElement, MinMaxFloat> damageAmountsRate = null;
                 if (EquipmentItem != null)
-                    damageAmountsRate = EquipmentItem.GetIncreaseDamagesRate(Level, CharacterItem.randomSeed, CharacterItem.version, withRandomBonus: !dontCalculateRandomBonus);
+                {
+                    damageAmountsRate = EquipmentItem.GetIncreaseDamagesRate(Level);
+                    if (!dontCalculateRandomBonus)
+                    {
+                        damageAmountsRate = GameDataHelpers.CombineDamages(damageAmountsRate, GetRandomBonus().GetIncreaseDamagesRate());
+                    }
+                }
                 else if (SocketEnhancerItem != null)
+                {
                     damageAmountsRate = GameDataHelpers.CombineDamages(SocketEnhancerItem.SocketEnhanceEffect.damagesRate, damageAmountsRate, 1f);
+                }
 
                 if (damageAmountsRate == null || damageAmountsRate.Count == 0)
                 {
@@ -905,9 +986,17 @@ namespace MultiplayerARPG
             {
                 Dictionary<BaseSkill, int> skillLevels = null;
                 if (EquipmentItem != null)
-                    skillLevels = EquipmentItem.GetIncreaseSkills(Level, CharacterItem.randomSeed, CharacterItem.version, withRandomBonus: !dontCalculateRandomBonus);
+                {
+                    skillLevels = EquipmentItem.GetIncreaseSkills(Level);
+                    if (!dontCalculateRandomBonus)
+                    {
+                        skillLevels = GameDataHelpers.CombineSkills(skillLevels, GetRandomBonus().GetIncreaseSkills());
+                    }
+                }
                 else if (SocketEnhancerItem != null)
+                {
                     skillLevels = GameDataHelpers.CombineSkills(SocketEnhancerItem.SocketEnhanceEffect.skills, skillLevels, 1f);
+                }
 
                 if (skillLevels == null || skillLevels.Count == 0)
                 {
