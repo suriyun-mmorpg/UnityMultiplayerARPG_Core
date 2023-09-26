@@ -90,7 +90,6 @@ namespace MultiplayerARPG
         {
             if (input == null)
                 input = entity.InitInput();
-            input.IsStopped = false;
             input.Rotation = rotation;
             return input;
         }
@@ -99,7 +98,6 @@ namespace MultiplayerARPG
         {
             if (input == null)
                 input = entity.InitInput();
-            input.IsStopped = false;
             input.Direction2D = direction2D;
             return input;
         }
