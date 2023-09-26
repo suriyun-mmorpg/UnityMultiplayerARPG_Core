@@ -31,6 +31,11 @@ namespace MultiplayerARPG
         public float underWaterThreshold = 0.75f;
         public bool autoSwimToSurface;
 
+        [Header("Ground checking")]
+        public float groundCheckYOffsets = 0.1f;
+        public float forceUngroundAfterJumpDuration = 0.1f;
+        public Color groundCheckGizmosColor = Color.blue;
+
         [Header("Root Motion Settings")]
         public bool useRootMotionForMovement;
         public bool useRootMotionForAirMovement;
@@ -53,6 +58,8 @@ namespace MultiplayerARPG
         public float CurrentMoveSpeed { get { return Functions.CurrentMoveSpeed; } }
         public Queue<Vector3> NavPaths { get { return Functions.NavPaths; } }
         public bool HasNavPaths { get { return Functions.HasNavPaths; } }
+
+        protected float _forceUngroundCountdown = 0f;
 
         public override void EntityAwake()
         {
@@ -150,6 +157,8 @@ namespace MultiplayerARPG
             float deltaTime = Time.deltaTime;
             Functions.UpdateMovement(deltaTime);
             Functions.AfterMovementUpdate(deltaTime);
+            if (_forceUngroundCountdown > 0f)
+                _forceUngroundCountdown -= deltaTime;
         }
 
         public override void EntityLateUpdate()
@@ -160,15 +169,34 @@ namespace MultiplayerARPG
 
         public bool GroundCheck()
         {
+            if (_forceUngroundCountdown > 0f)
+                return false;
             if (CacheCharacterController.isGrounded)
-            {
-                // Is grounded
                 return true;
-            }
-            // set sphere position, with offset
-            Vector3 spherePosition = new Vector3(CacheTransform.position.x, CacheTransform.position.y + (CacheCharacterController.radius * CacheTransform.localScale.y), CacheTransform.position.z);
-            return Physics.CheckSphere(spherePosition, CacheCharacterController.radius * Mathf.Max(CacheTransform.localScale.x, CacheTransform.localScale.z), GameInstance.Singleton.GetGameEntityGroundDetectionLayerMask(), QueryTriggerInteraction.Ignore);
+            float radius = GetGroundCheckRadius();
+            return Physics.CheckSphere(GetGroundCheckCenter(radius), radius, GameInstance.Singleton.GetGameEntityGroundDetectionLayerMask(), QueryTriggerInteraction.Ignore);
         }
+
+        private Vector3 GetGroundCheckCenter(float radius)
+        {
+            return new Vector3(CacheTransform.position.x, CacheTransform.position.y + radius - groundCheckYOffsets, CacheTransform.position.z);
+        }
+
+        private float GetGroundCheckRadius()
+        {
+            return CacheCharacterController.radius * Mathf.Max(Mathf.Max(CacheTransform.lossyScale.x, CacheTransform.lossyScale.y), CacheTransform.lossyScale.z);
+        }
+
+#if UNITY_EDITOR
+        private void OnDrawGizmos()
+        {
+            Color prevColor = Gizmos.color;
+            Gizmos.color = groundCheckGizmosColor;
+            float radius = GetGroundCheckRadius();
+            Gizmos.DrawWireSphere(GetGroundCheckCenter(radius), radius);
+            Gizmos.color = prevColor;
+        }
+#endif
 
         public Bounds GetBounds()
         {
@@ -187,7 +215,7 @@ namespace MultiplayerARPG
 
         public void OnJumpForceApplied(float verticalVelocity)
         {
-
+            _forceUngroundCountdown = forceUngroundAfterJumpDuration;
         }
 
         public bool WriteClientState(long writeTimestamp, NetDataWriter writer, out bool shouldSendReliably)
