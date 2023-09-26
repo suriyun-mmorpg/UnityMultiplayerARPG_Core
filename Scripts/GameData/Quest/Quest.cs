@@ -142,6 +142,7 @@ namespace MultiplayerARPG
                     }
                 };
                 randomTasks = tempQuestTasks.ToArray();
+                tasks = null;
                 hasChanges = true;
             }
             return hasChanges || base.Validate();
