@@ -1033,7 +1033,7 @@ namespace MultiplayerARPG
                 }
                 // Skip simulation because while playing root motion animation it will also move charcter by root motion at server too, can determined that it is simulated
                 bool useRootMotion = useRootMotionForMovement || useRootMotionForAirMovement || useRootMotionForJump || useRootMotionForFall || useRootMotionWhileNotMoving || useRootMotionUnderWater;
-                if (useRootMotion || !IsClient)
+                if (!IsClient)
                 {
                     // If it is not a client, don't have to simulate movement, just set the position (but still simulate gravity)
                     Vector3 oldPos = CacheTransform.position;
