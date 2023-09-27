@@ -915,7 +915,7 @@ namespace MultiplayerARPG
                     if (!UseRootMotion() || movementState.HasDirectionMovement())
                     {
                         _simulatingKeyMovement = inputState.Has(EntityMovementInputState.IsKeyMovement);
-                        SetMovePaths(position, _simulatingKeyMovement);
+                        SetMovePaths(position, !_simulatingKeyMovement);
                     }
                 }
                 if (inputState.Has(EntityMovementInputState.RotationChanged))
