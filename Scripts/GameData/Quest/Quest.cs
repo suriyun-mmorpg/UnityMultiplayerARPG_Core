@@ -151,13 +151,19 @@ namespace MultiplayerARPG
         public override void PrepareRelatesData()
         {
             base.PrepareRelatesData();
-            if (tasks != null && tasks.Length > 0)
+            if (randomTasks != null && randomTasks.Length > 0)
             {
-                foreach (QuestTask task in tasks)
+                foreach (QuestTasks tasks in randomTasks)
                 {
-                    GameInstance.AddCharacters(task.monsterCharacterAmount.monster);
-                    GameInstance.AddItems(task.itemAmount.item);
-                    GameInstance.AddNpcDialogs(task.talkToNpcDialog);
+                    if (tasks.tasks == null || tasks.tasks.Length == 0)
+                        continue;
+
+                    foreach (QuestTask task in tasks.tasks)
+                    {
+                        GameInstance.AddCharacters(task.monsterCharacterAmount.monster);
+                        GameInstance.AddItems(task.itemAmount.item);
+                        GameInstance.AddNpcDialogs(task.talkToNpcDialog);
+                    }
                 }
             }
             GameInstance.AddQuests(abandonQuests);
@@ -170,8 +176,9 @@ namespace MultiplayerARPG
             GameInstance.AddQuests(requirement.completedQuests);
         }
 
-        public bool HaveToTalkToNpc(IPlayerCharacterData character, NpcEntity npcEntity, out int taskIndex, out BaseNpcDialog dialog, out bool completeAfterTalked)
+        public bool HaveToTalkToNpc(IPlayerCharacterData character, NpcEntity npcEntity, int randomTasksIndex, out int taskIndex, out BaseNpcDialog dialog, out bool completeAfterTalked)
         {
+            QuestTask[] tasks = GetTasks(randomTasksIndex);
             taskIndex = -1;
             dialog = null;
             completeAfterTalked = false;
@@ -182,8 +189,9 @@ namespace MultiplayerARPG
                 return false;
             for (int i = 0; i < tasks.Length; ++i)
             {
-                if (tasks[i].taskType != QuestTaskType.TalkToNpc ||
-                    tasks[i].npcEntity == null)
+                if (tasks[i].taskType != QuestTaskType.TalkToNpc)
+                    continue;
+                if (tasks[i].npcEntity == null)
                     continue;
                 if (tasks[i].npcEntity.EntityId == npcEntity.EntityId)
                 {
