@@ -36,17 +36,11 @@ namespace MultiplayerARPG
                     AbandonQuest(quest.abandonQuests[i].DataId);
                 }
             }
+            CharacterQuest characterQuest = CharacterQuest.Create(quest);
             if (indexOfQuest >= 0)
-            {
-                CharacterQuest characterQuest = Quests[indexOfQuest];
-                characterQuest.isComplete = false;
                 quests[indexOfQuest] = characterQuest;
-            }
             else
-            {
-                CharacterQuest characterQuest = CharacterQuest.Create(quest);
                 quests.Add(characterQuest);
-            }
         }
 
         public virtual void AbandonQuest(int questDataId)
