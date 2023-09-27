@@ -131,7 +131,7 @@ namespace MultiplayerARPG
             if (movementSecure == MovementSecure.ServerAuthoritative)
             {
                 // Send movement input to server, then server will apply movement and sync transform to clients
-                Entity.SetInputStop(_currentInput);
+                _currentInput = Entity.SetInputStop(_currentInput);
             }
             StopMoveFunction();
         }
