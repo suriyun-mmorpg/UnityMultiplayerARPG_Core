@@ -208,7 +208,7 @@ namespace MultiplayerARPG
             {
                 // Invalid spread index
                 CreateValidatingData(id);
-                validateData.Pendings.Add(hitId, hitData);
+                validateData.Pendings[hitId] = hitData;
                 return false;
             }
             validateData.Pendings.Remove(hitId);
