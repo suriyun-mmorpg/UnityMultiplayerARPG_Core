@@ -9,6 +9,8 @@ namespace MultiplayerARPG
     public class RigidBodyEntityMovement2D : BaseNetworkedGameEntityComponent<BaseGameEntity>, IEntityMovementComponent
     {
         protected static readonly long s_lagBuffer = System.TimeSpan.TicksPerMillisecond * 200;
+        private static readonly float s_minDistanceToSimulateMovement = 0.01f;
+        private static readonly float s_timestampToUnityTimeMultiplier = 0.001f;
 
         [Header("Movement Settings")]
         [Range(0.01f, 1f)]
@@ -35,19 +37,34 @@ namespace MultiplayerARPG
             get { return NavPaths != null && NavPaths.Count > 0; }
         }
 
-        protected float _lastServerValidateDistDiff;
-        protected long _acceptedPositionTimestamp;
-        protected Vector2? _clientTargetPosition;
-        protected EntityMovementInput _oldInput;
-        protected EntityMovementInput _currentInput;
+        // Input codes
+        protected Vector2 _inputDirection;
         protected MovementState _tempMovementState;
         protected ExtraMovementState _tempExtraMovementState;
-        protected Vector2 _inputDirection;
-        protected Vector2 _moveDirection;
-        protected float? _lagMoveSpeedRate;
+
+        // Move simulate codes
+        private Vector2 _moveDirection;
+
+        // Teleport codes
         protected bool _isTeleporting;
         protected bool _stillMoveAfterTeleport;
+
+        // Client state codes
+        protected EntityMovementInput _oldInput;
+        protected EntityMovementInput _currentInput;
+
+        // State simulate codes
+        protected float? _lagMoveSpeedRate;
+        private bool _simulatingKeyMovement = false;
+
+        // Peers accept codes
+        protected long _acceptedPositionTimestamp;
+
+        // Server validate codes
+        protected float _lastServerValidateDistDiff;
         protected bool _isServerWaitingTeleportConfirm;
+
+        // Client confirm codes
         protected bool _isClientConfirmingTeleport;
 
         public override void EntityAwake()
@@ -83,8 +100,6 @@ namespace MultiplayerARPG
 
         public override void OnSetOwnerClient(bool isOwnerClient)
         {
-            base.OnSetOwnerClient(isOwnerClient);
-            _clientTargetPosition = null;
             NavPaths = null;
         }
 
@@ -232,9 +247,9 @@ namespace MultiplayerARPG
                 tempTargetPosition = NavPaths.Peek();
                 _moveDirection = (tempTargetPosition - tempCurrentPosition).normalized;
                 tempTargetDistance = Vector2.Distance(tempTargetPosition, tempCurrentPosition);
-                if (!_tempMovementState.Has(MovementState.Forward))
-                    _tempMovementState |= MovementState.Forward;
-                if (tempTargetDistance < StoppingDistance)
+                float stoppingDistance = _simulatingKeyMovement ? s_minDistanceToSimulateMovement : StoppingDistance;
+                bool shouldStop = tempTargetDistance < stoppingDistance;
+                if (shouldStop)
                 {
                     NavPaths.Dequeue();
                     if (!HasNavPaths)
@@ -242,23 +257,18 @@ namespace MultiplayerARPG
                         StopMoveFunction();
                         _moveDirection = Vector2.zero;
                     }
+                    else
+                    {
+                        if (!_tempMovementState.Has(MovementState.Forward))
+                            _tempMovementState |= MovementState.Forward;
+                    }
                 }
                 else
                 {
+                    if (!_tempMovementState.Has(MovementState.Forward))
+                        _tempMovementState |= MovementState.Forward;
                     // Turn character to destination
                     Direction2D = _moveDirection;
-                }
-            }
-            else if (_clientTargetPosition.HasValue)
-            {
-                tempTargetPosition = _clientTargetPosition.Value;
-                _moveDirection = (tempTargetPosition - tempCurrentPosition).normalized;
-                tempTargetDistance = Vector2.Distance(tempTargetPosition, tempCurrentPosition);
-                if (tempTargetDistance < 0.001f)
-                {
-                    _clientTargetPosition = null;
-                    StopMoveFunction();
-                    _moveDirection = Vector2.zero;
                 }
             }
             else if (_inputDirection.sqrMagnitude > 0f)
@@ -269,6 +279,7 @@ namespace MultiplayerARPG
             else
             {
                 tempTargetPosition = tempCurrentPosition;
+                StopMove();
             }
 
             if (!Entity.CanMove())
@@ -290,7 +301,7 @@ namespace MultiplayerARPG
                 tempSqrMagnitude = (tempTargetPosition - tempCurrentPosition).sqrMagnitude;
                 tempPredictPosition = tempCurrentPosition + (_moveDirection * CurrentMoveSpeed * deltaTime);
                 tempPredictSqrMagnitude = (tempPredictPosition - tempCurrentPosition).sqrMagnitude;
-                if (HasNavPaths || _clientTargetPosition.HasValue)
+                if (HasNavPaths)
                 {
                     // Check `tempSqrMagnitude` against the `tempPredictSqrMagnitude`
                     // if `tempPredictSqrMagnitude` is greater than `tempSqrMagnitude`,
@@ -321,7 +332,7 @@ namespace MultiplayerARPG
             // Adjust speed by rtt
             if (!IsServer && IsOwnerClient && movementSecure == MovementSecure.ServerAuthoritative)
             {
-                float rtt = 0.001f * Entity.Manager.Rtt;
+                float rtt = s_timestampToUnityTimeMultiplier * Entity.Manager.Rtt;
                 float acc = 1f / rtt * deltaTime * 0.5f;
                 if (!_lagMoveSpeedRate.HasValue)
                     _lagMoveSpeedRate = 0f;
@@ -447,7 +458,11 @@ namespace MultiplayerARPG
                 else if (!IsOwnerClient)
                 {
                     Direction2D = direction2D;
-                    _clientTargetPosition = position;
+                    _simulatingKeyMovement = true;
+                    if (Vector2.Distance(position, CacheTransform.position.GetXY()) > s_minDistanceToSimulateMovement)
+                        SetMovePaths(position, false);
+                    else
+                        NavPaths = null;
                     MovementState = movementState;
                     ExtraMovementState = extraMovementState;
                 }
@@ -495,14 +510,8 @@ namespace MultiplayerARPG
                 _tempExtraMovementState = extraMovementState;
                 if (inputState.Has(EntityMovementInputState.PositionChanged))
                 {
-                    if (inputState.Has(EntityMovementInputState.IsKeyMovement))
-                    {
-                        _clientTargetPosition = position;
-                    }
-                    else
-                    {
-                        SetMovePaths(position, true);
-                    }
+                    _simulatingKeyMovement = inputState.Has(EntityMovementInputState.IsKeyMovement);
+                    SetMovePaths(position, !_simulatingKeyMovement);
                 }
                 Direction2D = direction2D;
                 if (inputState.Has(EntityMovementInputState.IsStopped))
@@ -544,7 +553,7 @@ namespace MultiplayerARPG
                 // Prepare time
                 long lagDeltaTime = Entity.Player.Rtt;
                 long deltaTime = lagDeltaTime + peerTimestamp - _acceptedPositionTimestamp;
-                float unityDeltaTime = (float)deltaTime * 0.001f;
+                float unityDeltaTime = (float)deltaTime * s_timestampToUnityTimeMultiplier;
                 // Prepare movement state
                 Direction2D = direction2D;
                 MovementState = movementState;
@@ -592,10 +601,7 @@ namespace MultiplayerARPG
         protected virtual void OnTeleport(Vector2 position, bool stillMoveAfterTeleport)
         {
             if (!stillMoveAfterTeleport)
-            {
-                _clientTargetPosition = null;
                 NavPaths = null;
-            }
             CacheTransform.position = position;
             CurrentGameManager.ShouldPhysicSyncTransforms2D = true;
             if (IsServer && !IsOwnedByServer)
