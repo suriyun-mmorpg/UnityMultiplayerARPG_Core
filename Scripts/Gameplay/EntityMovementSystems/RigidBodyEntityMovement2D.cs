@@ -43,7 +43,7 @@ namespace MultiplayerARPG
         protected ExtraMovementState _tempExtraMovementState;
 
         // Move simulate codes
-        private Vector2 _moveDirection;
+        protected Vector2 _moveDirection;
 
         // Teleport codes
         protected bool _isTeleporting;
@@ -55,7 +55,7 @@ namespace MultiplayerARPG
 
         // State simulate codes
         protected float? _lagMoveSpeedRate;
-        private bool _simulatingKeyMovement = false;
+        protected bool _simulatingKeyMovement = false;
 
         // Peers accept codes
         protected long _acceptedPositionTimestamp;
