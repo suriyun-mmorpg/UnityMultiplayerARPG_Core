@@ -9,8 +9,8 @@ namespace MultiplayerARPG
     public class RigidBodyEntityMovement2D : BaseNetworkedGameEntityComponent<BaseGameEntity>, IEntityMovementComponent
     {
         protected static readonly long s_lagBuffer = System.TimeSpan.TicksPerMillisecond * 200;
-        private static readonly float s_minDistanceToSimulateMovement = 0.01f;
-        private static readonly float s_timestampToUnityTimeMultiplier = 0.001f;
+        protected static readonly float s_minDistanceToSimulateMovement = 0.01f;
+        protected static readonly float s_timestampToUnityTimeMultiplier = 0.001f;
 
         [Header("Movement Settings")]
         [Range(0.01f, 1f)]
