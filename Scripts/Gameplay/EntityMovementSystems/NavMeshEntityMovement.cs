@@ -10,6 +10,8 @@ namespace MultiplayerARPG
     public class NavMeshEntityMovement : BaseNetworkedGameEntityComponent<BaseGameEntity>, IEntityMovementComponent
     {
         protected static readonly long s_lagBuffer = System.TimeSpan.TicksPerMillisecond * 200;
+        protected static readonly float s_timestampToUnityTimeMultiplier = 0.001f;
+        protected static readonly float minMagnitudeToDetermineMoving = 0.01f;
 
         [Header("Movement Settings")]
         public ObstacleAvoidanceType obstacleAvoidanceWhileMoving = ObstacleAvoidanceType.MedQualityObstacleAvoidance;
@@ -29,20 +31,38 @@ namespace MultiplayerARPG
         public DirectionVector2 Direction2D { get { return Vector2.down; } set { } }
         public float CurrentMoveSpeed { get { return CacheNavMeshAgent.isStopped ? 0f : CacheNavMeshAgent.speed; } }
 
-        protected float _lastServerValidateHorDistDiff;
-        protected long _acceptedPositionTimestamp;
+        // Input codes
+        protected Vector3? _inputDirection;
+        protected ExtraMovementState _tempExtraMovementState;
+        protected bool _moveByDestination;
+
+        // Client state codes
+        protected EntityMovementInput _oldInput;
+        protected EntityMovementInput _currentInput;
+
+        // State simulate codes
+        private float? _lagMoveSpeedRate;
+
+        // Turn simulate codes
+        protected bool _lookRotationApplied;
         protected float _yAngle;
         protected float _targetYAngle;
         protected float _yTurnSpeed;
-        protected bool _lookRotationApplied;
-        protected EntityMovementInput _oldInput;
-        protected EntityMovementInput _currentInput;
-        protected ExtraMovementState _tempExtraMovementState;
-        protected Vector3? _inputDirection;
-        protected bool _moveByDestination;
+
+        // Teleport codes
         protected bool _isTeleporting;
         protected bool _stillMoveAfterTeleport;
+
+        // Peers accept codes
+        protected long _acceptedPositionTimestamp;
+        private MovementState _acceptedMovementStateBeforeStopped;
+        private ExtraMovementState _acceptedExtraMovementStateBeforeStopped;
+
+        // Server validate codes
+        protected float _lastServerValidateHorDistDiff;
         protected bool _isServerWaitingTeleportConfirm;
+
+        // Client confirm codes
         protected bool _isClientConfirmingTeleport;
 
         public override void EntityAwake()
@@ -218,9 +238,9 @@ namespace MultiplayerARPG
                 else
                 {
                     // Moving by clicked position
-                    MovementState = (CacheNavMeshAgent.velocity.sqrMagnitude > 0f ? MovementState.Forward : MovementState.None) | MovementState.IsGrounded;
+                    MovementState = (CacheNavMeshAgent.velocity.magnitude > minMagnitudeToDetermineMoving ? MovementState.Forward : MovementState.None) | MovementState.IsGrounded;
                     // Turn character to destination
-                    if (_lookRotationApplied && Entity.CanTurn() && CacheNavMeshAgent.velocity.sqrMagnitude > 0f)
+                    if (_lookRotationApplied && Entity.CanTurn() && CacheNavMeshAgent.velocity.magnitude > minMagnitudeToDetermineMoving)
                         _targetYAngle = Quaternion.LookRotation(CacheNavMeshAgent.velocity.normalized).eulerAngles.y;
                 }
                 // Update extra movement state
@@ -243,6 +263,16 @@ namespace MultiplayerARPG
             {
                 // Disable obstacle avoidance because it won't predict movement, it is just moving to destination without obstacle avoidance
                 CacheNavMeshAgent.obstacleAvoidanceType = ObstacleAvoidanceType.NoObstacleAvoidance;
+                if (CacheNavMeshAgent.velocity.magnitude > minMagnitudeToDetermineMoving)
+                {
+                    MovementState = _acceptedMovementStateBeforeStopped;
+                    ExtraMovementState = _acceptedExtraMovementStateBeforeStopped;
+                }
+                else
+                {
+                    MovementState = MovementState.IsGrounded;
+                    ExtraMovementState = ExtraMovementState.None;
+                }
             }
             // Update rotating
             if (_yTurnSpeed <= 0f)
@@ -368,7 +398,7 @@ namespace MultiplayerARPG
                 // Prepare time
                 long lagDeltaTime = Entity.Manager.Rtt;
                 long deltaTime = lagDeltaTime + peerTimestamp - _acceptedPositionTimestamp;
-                float unityDeltaTime = (float)deltaTime * 0.001f;
+                float unityDeltaTime = (float)deltaTime * s_timestampToUnityTimeMultiplier;
                 if (Vector3.Distance(position, CacheTransform.position) >= snapThreshold)
                 {
                     // Snap character to the position if character is too far from the position
@@ -377,16 +407,17 @@ namespace MultiplayerARPG
                         CacheTransform.eulerAngles = new Vector3(0, yAngle, 0);
                         CacheNavMeshAgent.Warp(position);
                     }
-                    MovementState = movementState;
-                    ExtraMovementState = extraMovementState;
                 }
                 else if (!IsOwnerClient)
                 {
                     _targetYAngle = yAngle;
                     _yTurnSpeed = 1f / unityDeltaTime;
                     SetMovePaths(position);
-                    MovementState = movementState;
-                    ExtraMovementState = extraMovementState;
+                }
+                if (movementState.HasDirectionMovement())
+                {
+                    _acceptedMovementStateBeforeStopped = movementState;
+                    _acceptedExtraMovementStateBeforeStopped = extraMovementState;
                 }
                 _acceptedPositionTimestamp = peerTimestamp;
             }
@@ -430,7 +461,7 @@ namespace MultiplayerARPG
                 // Prepare time
                 long lagDeltaTime = Entity.Player.Rtt;
                 long deltaTime = lagDeltaTime + peerTimestamp - _acceptedPositionTimestamp;
-                float unityDeltaTime = (float)deltaTime * 0.001f;
+                float unityDeltaTime = (float)deltaTime * s_timestampToUnityTimeMultiplier;
                 _tempExtraMovementState = extraMovementState;
                 if (inputState.Has(EntityMovementInputState.PositionChanged))
                 {
@@ -488,7 +519,7 @@ namespace MultiplayerARPG
                 // Prepare time
                 long lagDeltaTime = Entity.Player.Rtt;
                 long deltaTime = lagDeltaTime + peerTimestamp - _acceptedPositionTimestamp;
-                float unityDeltaTime = (float)deltaTime * 0.001f;
+                float unityDeltaTime = (float)deltaTime * s_timestampToUnityTimeMultiplier;
                 // Prepare movement state
                 MovementState = movementState;
                 ExtraMovementState = extraMovementState;
