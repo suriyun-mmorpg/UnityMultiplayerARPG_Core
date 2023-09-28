@@ -847,14 +847,14 @@ namespace MultiplayerARPG
                     {
                         CacheTransform.position = position;
                         CurrentGameManager.ShouldPhysicSyncTransforms = true;
-                        RemoteTurnSimulation(yAngle, unityDeltaTime);
+                        RemoteTurnSimulation(true, yAngle, unityDeltaTime);
                     }
                     MovementState = _tempMovementState = movementState;
                     ExtraMovementState = _tempExtraMovementState = extraMovementState;
                 }
                 else if (!IsOwnerClient)
                 {
-                    RemoteTurnSimulation(yAngle, unityDeltaTime);
+                    RemoteTurnSimulation(true, yAngle, unityDeltaTime);
                     _simulatingKeyMovement = true;
                     if (Vector3.Distance(position.GetXZ(), CacheTransform.position.GetXZ()) > s_minDistanceToSimulateMovement)
                         SetMovePaths(position, false);
@@ -910,17 +910,15 @@ namespace MultiplayerARPG
                 float unityDeltaTime = (float)deltaTime * s_timestampToUnityTimeMultiplier;
                 _tempMovementState = movementState;
                 _tempExtraMovementState = extraMovementState;
+                _simulatingKeyMovement = inputState.Has(EntityMovementInputState.IsKeyMovement);
                 if (inputState.Has(EntityMovementInputState.PositionChanged))
                 {
                     if (!UseRootMotion() || movementState.HasDirectionMovement())
-                    {
-                        _simulatingKeyMovement = inputState.Has(EntityMovementInputState.IsKeyMovement);
                         SetMovePaths(position, !_simulatingKeyMovement);
-                    }
                 }
                 if (inputState.Has(EntityMovementInputState.RotationChanged))
                 {
-                    RemoteTurnSimulation(yAngle, unityDeltaTime);
+                    RemoteTurnSimulation(_simulatingKeyMovement, yAngle, unityDeltaTime);
                 }
                 if (movementState.Has(MovementState.IsJump))
                 {
@@ -1022,7 +1020,7 @@ namespace MultiplayerARPG
                         // Update character rotation
                         _lastServerValidateHorDistDiff = horMoveableDist - clientHorMoveDist;
                         _lastServerValidateVerDistDiff = verMoveableDist - clientVerMoveDist;
-                        RemoteTurnSimulation(yAngle, unityDeltaTime);
+                        RemoteTurnSimulation(true, yAngle, unityDeltaTime);
                     }
                     else
                     {
@@ -1040,12 +1038,12 @@ namespace MultiplayerARPG
                 else
                 {
                     // It's both server and client, simulate movement (it's a host so don't do speed hack validation)
-                    if (Vector3.Distance(position, CacheTransform.position) > 0.01f)
+                    if (Vector3.Distance(position, CacheTransform.position) > s_minDistanceToSimulateMovement)
                     {
                         _simulatingKeyMovement = true;
                         SetMovePaths(position, false);
                     }
-                    RemoteTurnSimulation(yAngle, unityDeltaTime);
+                    RemoteTurnSimulation(true, yAngle, unityDeltaTime);
                 }
                 _acceptedPositionTimestamp = peerTimestamp;
             }
@@ -1079,18 +1077,27 @@ namespace MultiplayerARPG
             return useRootMotionForMovement || useRootMotionForAirMovement || useRootMotionForJump || useRootMotionForFall || useRootMotionWhileNotMoving || useRootMotionUnderWater;
         }
 
-        public void RemoteTurnSimulation(float yAngle, float deltaTime)
+        public void RemoteTurnSimulation(bool isKeyMovement, float yAngle, float deltaTime)
         {
             if (UseRootMotion())
             {
-                // Turn later after moved
-                _remoteTargetYAngle = yAngle;
+                if (isKeyMovement)
+                {
+                    // Turn to target immediately
+                    _yAngle = _targetYAngle = yAngle;
+                    RotateY();
+                }
+                else
+                {
+                    // Turn later after moved
+                    _remoteTargetYAngle = yAngle;
+                }
                 return;
             }
 
             if (!IsClient)
             {
-                // Turn to target immeditately
+                // Turn to target immediately
                 _yAngle = _targetYAngle = yAngle;
                 RotateY();
                 return;
