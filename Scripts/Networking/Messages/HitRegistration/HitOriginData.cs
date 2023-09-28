@@ -4,6 +4,7 @@ namespace MultiplayerARPG
 {
     public struct HitOriginData
     {
+        public long LaunchTimestamp { get; set; }
         public byte TriggerIndex { get; set; }
         public byte SpreadIndex { get; set; }
         public Vector3 Position { get; set; }

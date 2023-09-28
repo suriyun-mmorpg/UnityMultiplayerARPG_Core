@@ -134,7 +134,9 @@ namespace MultiplayerARPG
 
             s_validatingHits[id].Origins.Add(hitId, new HitOriginData()
             {
+                LaunchTimestamp = BaseGameNetworkManager.Singleton.Timestamp,
                 TriggerIndex = triggerIndex,
+                SpreadIndex = spreadIndex,
                 Position = position,
                 Direction = direction,
             });
@@ -203,17 +205,16 @@ namespace MultiplayerARPG
                 return false;
 
             string hitId = MakeHitId(hitData.TriggerIndex, hitData.SpreadIndex);
-            HitValidateData validateData;
-            if (!s_validatingHits.TryGetValue(id, out validateData) || !validateData.Origins.ContainsKey(hitId))
+            if (!s_validatingHits.TryGetValue(id, out HitValidateData hitValidateData) || !hitValidateData.Origins.ContainsKey(hitId))
             {
                 // Invalid spread index
                 CreateValidatingData(id);
-                validateData.Pendings[hitId] = hitData;
+                hitValidateData.Pendings[hitId] = hitData;
                 return false;
             }
-            validateData.Pendings.Remove(hitId);
+            hitValidateData.Pendings.Remove(hitId);
 
-            HitOriginData hitOriginData = validateData.Origins[hitId];
+            HitOriginData hitOriginData = hitValidateData.Origins[hitId];
             uint objectId = hitData.ObjectId;
             int hitBoxIndex = hitData.HitBoxIndex;
             if (!BaseGameNetworkManager.Singleton.TryGetEntityByObjectId(objectId, out DamageableEntity damageableEntity) ||
@@ -223,44 +224,55 @@ namespace MultiplayerARPG
                 return false;
             }
 
-            if (!validateData.HitsCount.TryGetValue(hitId, out int hitCount))
+            string hitObjectId = MakeHitObjectId(hitData.TriggerIndex, hitData.SpreadIndex, hitData.ObjectId);
+            if (hitValidateData.HitObjects.Contains(hitObjectId))
+            {
+                // Already hit
+                return false;
+            }
+
+            DamageableHitBox hitBox = damageableEntity.HitBoxes[hitBoxIndex];
+            long timestamp = BaseGameNetworkManager.Singleton.Timestamp;
+            if (!hitValidateData.DamageInfo.IsHitValid(hitValidateData, hitData, hitBox, hitId, hitObjectId, timestamp))
+            {
+                // Not valid
+                return false;
+            }
+
+            if (!IsHit(attacker, hitValidateData, hitOriginData, hitData, hitBox, timestamp))
+            {
+                // Not hit
+                return false;
+            }
+
+            if (!hitValidateData.HitsCount.TryGetValue(hitId, out int hitCount))
             {
                 // Set hit count to 0, if it is not in collection
                 hitCount = 0;
             }
 
-            if (validateData.DamageInfo.IsHitReachedMax(hitCount))
-            {
-                // Can't hit because it is reaching max amount of objects that can be hit
-                return false;
-            }
-
-            string hitObjectId = MakeHitObjectId(hitData.TriggerIndex, hitData.SpreadIndex, hitData.ObjectId);
-            DamageableHitBox hitBox = damageableEntity.HitBoxes[hitBoxIndex];
-            // Valiate hitting
-            if (validateData.HitObjects.Contains(hitObjectId) || !IsHit(attacker, hitOriginData, hitData, hitBox))
-            {
-                // Already validate or not hit
-                return false;
-            }
-
             // Yes, it is hit
-            hitBox.ReceiveDamage(attacker.EntityTransform.position, attacker.GetInfo(), validateData.DamageAmounts, validateData.Weapon, validateData.Skill, validateData.SkillLevel, simulateSeed);
-            validateData.HitsCount[hitId] = ++hitCount;
-            validateData.HitObjects.Add(hitObjectId);
+            hitBox.ReceiveDamage(attacker.EntityTransform.position, attacker.GetInfo(), hitValidateData.DamageAmounts, hitValidateData.Weapon, hitValidateData.Skill, hitValidateData.SkillLevel, simulateSeed);
+            hitValidateData.HitsCount[hitId] = ++hitCount;
+            hitValidateData.HitObjects.Add(hitObjectId);
             return true;
         }
 
-        private bool IsHit(BaseGameEntity attacker, HitOriginData hitOriginData, HitData hitData, DamageableHitBox hitBox)
+        private bool IsHit(BaseGameEntity attacker, HitValidateData hitValidateData, HitOriginData hitOriginData, HitData hitData, DamageableHitBox hitBox, long timestamp)
         {
             long halfRtt = attacker.Player != null ? (attacker.Player.Rtt / 2) : 0;
-            long serverTime = BaseGameNetworkManager.Singleton.ServerTimestamp;
-            long targetTime = serverTime - halfRtt;
-            DamageableHitBox.TransformHistory transformHistory = hitBox.GetTransformHistory(serverTime, targetTime);
+            long targetTime = timestamp - halfRtt;
+            DamageableHitBox.TransformHistory transformHistory = hitBox.GetTransformHistory(timestamp, targetTime);
             _hitBoxTransform.position = transformHistory.Bounds.center;
             _hitBoxTransform.rotation = transformHistory.Rotation;
             Vector3 alignedHitPoint = _hitBoxTransform.InverseTransformPoint(hitData.HitPoint);
-            bool isHit = Vector3.Distance(Vector3.zero, alignedHitPoint) <= Mathf.Max(transformHistory.Bounds.extents.x, transformHistory.Bounds.extents.y, transformHistory.Bounds.extents.z) + hitValidationBuffer;
+            float maxExtents = Mathf.Max(transformHistory.Bounds.extents.x, transformHistory.Bounds.extents.y, transformHistory.Bounds.extents.z);
+            bool isHit = Vector3.Distance(Vector3.zero, alignedHitPoint) <= maxExtents + hitValidationBuffer;
+            if (Vector3.Distance(hitOriginData.Position, hitData.HitPoint) > maxExtents + hitValidateData.DamageInfo.GetDistance())
+            {
+                // Too far, it should not hit
+                return false;
+            }
             return isHit;
         }
 
