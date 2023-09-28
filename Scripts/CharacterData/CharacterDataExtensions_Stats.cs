@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using UnityEngine;
 
 namespace MultiplayerARPG
 {
@@ -461,10 +460,10 @@ namespace MultiplayerARPG
             bool isCalculateLeftHandWeaponDamages = onGetLeftHandDamages != null || onGetLeftHandWeaponDamage != null;
             bool isCalculateDamages = isCalculateRightHandWeaponDamages || isCalculateLeftHandWeaponDamages || onGetIncreasingDamages != null || onGetIncreasingDamagesRate != null;
             bool isCalculateStats = onGetStats != null || onGetIncreasingStats != null || onGetIncreasingStatsRate != null;
-            bool isCalculateAttributes = onGetStats != null || onGetAttributes != null || onGetIncreasingAttributes != null || onGetIncreasingAttributesRate != null || isCalculateDamages;
             bool isCalculateResistances = onGetResistances != null || onGetIncreasingResistances != null;
             bool isCalculateArmors = onGetArmors != null || onGetIncreasingArmors != null || onGetIncreasingArmorsRate != null;
             bool isCalculateSkills = onGetSkills != null || onGetIncreasingSkill != null || isCalculateDamages;
+            bool isCalculateAttributes = onGetAttributes != null || onGetIncreasingAttributes != null || onGetIncreasingAttributesRate != null || isCalculateDamages || isCalculateStats || isCalculateResistances || isCalculateArmors;
 
             // Prepare result stats, by using character's base stats
             // For weapons it will be based on equipped weapons
