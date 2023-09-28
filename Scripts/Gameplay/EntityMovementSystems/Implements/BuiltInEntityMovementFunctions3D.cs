@@ -349,13 +349,13 @@ namespace MultiplayerARPG
                     }
                     else
                     {
-                        if (!_tempMovementState.Has(MovementState.Forward))
+                        if (!_simulatingKeyMovement && !_tempMovementState.Has(MovementState.Forward))
                             _tempMovementState |= MovementState.Forward;
                     }
                 }
                 else
                 {
-                    if (!_tempMovementState.Has(MovementState.Forward))
+                    if (!_simulatingKeyMovement && !_tempMovementState.Has(MovementState.Forward))
                         _tempMovementState |= MovementState.Forward;
                 }
             }
