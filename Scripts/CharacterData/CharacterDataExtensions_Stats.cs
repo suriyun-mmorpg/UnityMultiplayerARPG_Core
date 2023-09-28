@@ -747,6 +747,7 @@ namespace MultiplayerARPG
             }
             if (isCalculateResistances)
             {
+                resultResistances = GameDataHelpers.CombineResistances(resultResistances, resultAttributes.GetIncreaseResistances());
                 resultResistances = GameDataHelpers.CombineResistances(resultResistances, buffResistances);
                 List<DamageElement> keys = new List<DamageElement>(resultResistances.Keys);
                 for (i = 0; i < keys.Count; ++i)
@@ -759,6 +760,7 @@ namespace MultiplayerARPG
             }
             if (isCalculateArmors)
             {
+                resultArmors = GameDataHelpers.CombineArmors(resultArmors, resultAttributes.GetIncreaseArmors());
                 resultArmors = GameDataHelpers.CombineArmors(resultArmors, buffArmors);
                 resultArmors = GameDataHelpers.CombineArmors(resultArmors, GameDataHelpers.MultiplyArmors(new Dictionary<DamageElement, float>(resultArmors), buffArmorsRate));
                 if (onGetArmors != null)
@@ -769,6 +771,7 @@ namespace MultiplayerARPG
                 if (rightHandWeapon != null)
                     rightHandWeaponDamageAmount = GameDataHelpers.GetDamageWithEffectiveness(rightHandWeapon.WeaponType.CacheEffectivenessAttributes, resultAttributes, rightHandWeaponDamageAmount);
                 resultRightHandDamages = GameDataHelpers.CombineDamages(resultRightHandDamages, rightHandWeaponDamageAmount);
+                resultRightHandDamages = GameDataHelpers.CombineDamages(resultRightHandDamages, resultAttributes.GetIncreaseDamages());
                 resultRightHandDamages = GameDataHelpers.CombineDamages(resultRightHandDamages, buffDamages);
                 resultRightHandDamages = GameDataHelpers.CombineDamages(resultRightHandDamages, GameDataHelpers.MultiplyDamages(new Dictionary<DamageElement, MinMaxFloat>(resultRightHandDamages), buffDamagesRate));
                 if (onGetRightHandDamages != null)
@@ -781,6 +784,7 @@ namespace MultiplayerARPG
                 if (leftHandWeapon != null)
                     leftHandWeaponDamageAmount = GameDataHelpers.GetDamageWithEffectiveness(leftHandWeapon.WeaponType.CacheEffectivenessAttributes, resultAttributes, leftHandWeaponDamageAmount);
                 resultLeftHandDamages = GameDataHelpers.CombineDamages(resultLeftHandDamages, leftHandWeaponDamageAmount);
+                resultLeftHandDamages = GameDataHelpers.CombineDamages(resultLeftHandDamages, resultAttributes.GetIncreaseDamages());
                 resultLeftHandDamages = GameDataHelpers.CombineDamages(resultLeftHandDamages, buffDamages);
                 resultLeftHandDamages = GameDataHelpers.CombineDamages(resultLeftHandDamages, GameDataHelpers.MultiplyDamages(new Dictionary<DamageElement, MinMaxFloat>(resultLeftHandDamages), buffDamagesRate));
                 if (onGetLeftHandDamages != null)
@@ -790,7 +794,7 @@ namespace MultiplayerARPG
             }
             if (isCalculateStats)
             {
-                resultStats += GameDataHelpers.GetStatsFromAttributes(resultAttributes);
+                resultStats += resultAttributes.GetStats();
                 resultStats += buffStats;
                 //resultStats *= buffStatsRate;
                 if (onGetStats != null)

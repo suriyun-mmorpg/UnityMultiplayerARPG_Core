@@ -1048,19 +1048,6 @@ namespace MultiplayerARPG
             return new KeyValuePair<DamageElement, MinMaxFloat>(damageElement, pureDamage.Value + damageEffectiveness);
         }
 
-        public static CharacterStats GetStatsFromAttributes(Dictionary<Attribute, float> attributeAmounts)
-        {
-            CharacterStats stats = new CharacterStats();
-            if (attributeAmounts == null || attributeAmounts.Count <= 0)
-                return stats;
-            foreach (Attribute attribute in attributeAmounts.Keys)
-            {
-                if (attribute == null) continue;
-                stats += attribute.StatsIncreaseEachLevel * attributeAmounts[attribute];
-            }
-            return stats;
-        }
-
         public static MinMaxFloat GetSumDamages(Dictionary<DamageElement, MinMaxFloat> damages)
         {
             MinMaxFloat totalDamageAmount = new MinMaxFloat()
