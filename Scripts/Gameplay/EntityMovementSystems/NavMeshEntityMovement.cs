@@ -10,8 +10,9 @@ namespace MultiplayerARPG
     public class NavMeshEntityMovement : BaseNetworkedGameEntityComponent<BaseGameEntity>, IEntityMovementComponent
     {
         protected static readonly long s_lagBuffer = System.TimeSpan.TicksPerMillisecond * 200;
+        protected static readonly float s_minMagnitudeToDetermineMoving = 0.01f;
+        protected static readonly float s_minDistanceToSimulateMovement = 0.01f;
         protected static readonly float s_timestampToUnityTimeMultiplier = 0.001f;
-        protected static readonly float minMagnitudeToDetermineMoving = 0.01f;
 
         [Header("Movement Settings")]
         public ObstacleAvoidanceType obstacleAvoidanceWhileMoving = ObstacleAvoidanceType.MedQualityObstacleAvoidance;
@@ -238,9 +239,9 @@ namespace MultiplayerARPG
                 else
                 {
                     // Moving by clicked position
-                    MovementState = (CacheNavMeshAgent.velocity.magnitude > minMagnitudeToDetermineMoving ? MovementState.Forward : MovementState.None) | MovementState.IsGrounded;
+                    MovementState = (CacheNavMeshAgent.velocity.magnitude > s_minMagnitudeToDetermineMoving ? MovementState.Forward : MovementState.None) | MovementState.IsGrounded;
                     // Turn character to destination
-                    if (_lookRotationApplied && Entity.CanTurn() && CacheNavMeshAgent.velocity.magnitude > minMagnitudeToDetermineMoving)
+                    if (_lookRotationApplied && Entity.CanTurn() && CacheNavMeshAgent.velocity.magnitude > s_minMagnitudeToDetermineMoving)
                         _targetYAngle = Quaternion.LookRotation(CacheNavMeshAgent.velocity.normalized).eulerAngles.y;
                 }
                 // Update extra movement state
@@ -263,7 +264,7 @@ namespace MultiplayerARPG
             {
                 // Disable obstacle avoidance because it won't predict movement, it is just moving to destination without obstacle avoidance
                 CacheNavMeshAgent.obstacleAvoidanceType = ObstacleAvoidanceType.NoObstacleAvoidance;
-                if (CacheNavMeshAgent.velocity.magnitude > minMagnitudeToDetermineMoving)
+                if (CacheNavMeshAgent.velocity.magnitude > s_minMagnitudeToDetermineMoving)
                 {
                     MovementState = _acceptedMovementStateBeforeStopped;
                     ExtraMovementState = _acceptedExtraMovementStateBeforeStopped;
@@ -558,7 +559,7 @@ namespace MultiplayerARPG
                 else
                 {
                     // It's both server and client, translate position (it's a host so don't do speed hack validation)
-                    if (Vector3.Distance(position, CacheTransform.position) > 0.01f)
+                    if (Vector3.Distance(position, CacheTransform.position) > s_minDistanceToSimulateMovement)
                         SetMovePaths(position);
                     // Simulate character turning
                     _targetYAngle = yAngle;

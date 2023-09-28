@@ -591,7 +591,7 @@ namespace MultiplayerARPG
                 else
                 {
                     // It's both server and client, translate position (it's a host so don't do speed hack validation)
-                    if (Vector3.Distance(position, CacheTransform.position) > 0.01f)
+                    if (Vector3.Distance(position, CacheTransform.position) > s_minDistanceToSimulateMovement)
                         SetMovePaths(position, false);
                 }
                 _acceptedPositionTimestamp = peerTimestamp;
