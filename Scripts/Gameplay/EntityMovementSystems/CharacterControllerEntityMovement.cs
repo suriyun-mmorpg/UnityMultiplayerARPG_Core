@@ -47,8 +47,32 @@ namespace MultiplayerARPG
         [Header("Networking Settings")]
         public float snapThreshold = 5.0f;
 
-        public Animator CacheAnimator { get; private set; }
-        public CharacterController CacheCharacterController { get; private set; }
+        protected Animator _cacheAnimator;
+        public Animator CacheAnimator
+        {
+            get
+            {
+#if UNITY_EDITOR
+                if (!Application.isPlaying && _cacheAnimator == null)
+                    _cacheAnimator = GetComponent<Animator>();
+#endif
+                return _cacheAnimator;
+            }
+            private set => _cacheAnimator = value;
+        }
+        protected CharacterController _cacheCharacterController;
+        public CharacterController CacheCharacterController
+        {
+            get
+            {
+#if UNITY_EDITOR
+                if (!Application.isPlaying && _cacheCharacterController == null)
+                    _cacheCharacterController = GetComponent<CharacterController>();
+#endif
+                return _cacheCharacterController;
+            }
+            private set => _cacheCharacterController = value;
+        }
         public BuiltInEntityMovementFunctions3D Functions { get; private set; }
 
         public float StoppingDistance { get { return Functions.StoppingDistance; } }
