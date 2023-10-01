@@ -174,7 +174,7 @@ namespace MultiplayerARPG
             if (nonEquipItem.IsEmptySlot() || amount > nonEquipItem.amount)
                 return;
 
-            if (nonEquipItem.GetItem().RestractDropping)
+            if (nonEquipItem.GetItem().RestrictDropping)
             {
                 GameInstance.ServerGameMessageHandlers.SendGameMessage(ConnectionId, UITextKeys.UI_ERROR_ITEM_DROPPING_RESTRICTED);
                 return;
