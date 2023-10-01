@@ -40,6 +40,7 @@ namespace MultiplayerARPG
         public bool increaseDamageAmountsWithBuffs;
         public bool isDebuff;
         public Buff debuff;
+        public StatusEffectApplying[] attackStatusEffects;
         public HarvestType harvestType;
         public IncrementalMinMaxFloat harvestDamageAmount;
 
@@ -225,6 +226,12 @@ namespace MultiplayerARPG
             skillUser.Mount(mount.MountEntity);
         }
 
+        public override void OnSkillAttackHit(int skillLevel, EntityInfo instigator, CharacterItem weapon, BaseCharacterEntity target)
+        {
+            base.OnSkillAttackHit(skillLevel, instigator, weapon, target);
+            attackStatusEffects.ApplyStatusEffect(skillLevel, instigator, weapon, target);
+        }
+
         public override SkillType SkillType
         {
             get { return skillType; }
@@ -367,6 +374,7 @@ namespace MultiplayerARPG
             GameInstance.AddItems(itemCraft.CraftingItem);
             GameInstance.AddItems(itemCraft.RequireItems);
             GameInstance.AddCurrencies(itemCraft.RequireCurrencies);
+            GameInstance.AddStatusEffects(attackStatusEffects);
             damageInfo.PrepareRelatesData();
         }
 

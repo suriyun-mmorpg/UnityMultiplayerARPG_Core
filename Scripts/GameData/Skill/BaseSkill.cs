@@ -607,7 +607,7 @@ namespace MultiplayerARPG
         /// <summary>
         /// Return TRUE if this will override default attack function
         /// </summary>
-        /// <param name="skillUser"></param>
+        /// <param name="attacker"></param>
         /// <param name="skillLevel"></param>
         /// <param name="isLeftHand"></param>
         /// <param name="weapon"></param>
@@ -617,7 +617,7 @@ namespace MultiplayerARPG
         /// <param name="aimPosition"></param>
         /// <returns></returns>
         public virtual bool OnAttack(
-            BaseCharacterEntity skillUser,
+            BaseCharacterEntity attacker,
             int skillLevel,
             bool isLeftHand,
             CharacterItem weapon,
@@ -627,6 +627,19 @@ namespace MultiplayerARPG
             AimPosition aimPosition)
         {
             return false;
+        }
+
+        /// <summary>
+        /// This will be called when skill attack hit `target`, do something such as apply debuff to `target` here
+        /// </summary>
+        /// <param name="skillLevel"></param>
+        /// <param name="instigator"></param>
+        /// <param name="weapon"></param>
+        /// <param name="target"></param>
+        public virtual void OnSkillAttackHit(int skillLevel, EntityInfo instigator, CharacterItem weapon, BaseCharacterEntity target)
+        {
+            if (IsDebuff)
+                target.ApplyBuff(DataId, BuffType.SkillDebuff, skillLevel, instigator, weapon);
         }
 
         public virtual bool CanLevelUp(IPlayerCharacterData character, int level, out UITextKeys gameMessage, bool checkSkillPoint = true, bool checkGold = true)

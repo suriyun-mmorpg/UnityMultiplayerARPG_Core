@@ -202,9 +202,9 @@ namespace MultiplayerARPG
             {
                 // Do something with buffs when attacked
                 SkillAndBuffComponent.OnAttacked();
-                // Apply debuff if character is not dead
-                if (buff == null && skill != null && skill.IsDebuff)
-                    ApplyBuff(skill.DataId, BuffType.SkillDebuff, skillLevel, instigator, weapon);
+                // Do something when skill hit target
+                if (skill != null && buff == null)
+                    skill.OnSkillAttackHit(instigator, this, skillLevel, weapon);
             }
         }
     }
