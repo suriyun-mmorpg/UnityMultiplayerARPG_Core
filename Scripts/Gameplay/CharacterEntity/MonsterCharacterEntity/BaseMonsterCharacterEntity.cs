@@ -715,10 +715,13 @@ namespace MultiplayerARPG
 
         private void OnRandomDropItem(BaseItem item, int amount)
         {
-            // Drop item to the ground
-            if (amount > item.MaxStack)
-                amount = item.MaxStack;
-            _droppingItems.Add(CharacterItem.Create(item, 1, amount));
+            int maxStack = item.MaxStack;
+            while (amount > 0)
+            {
+                int stackSize = Mathf.Min(maxStack ,amount);
+                _droppingItems.Add(CharacterItem.Create(item, 1, stackSize));
+                amount -= stackSize;
+            }
         }
 
         public virtual void DestroyAndRespawn()
