@@ -9,7 +9,6 @@ namespace MultiplayerARPG
         private CharacterStats _stats;
         public CharacterStats Stats => _stats;
         public Dictionary<Attribute, float> Attributes { get; private set; }
-        public Dictionary<BaseSkill, int> Skills { get; private set; }
         public Dictionary<DamageElement, float> Resistances { get; private set; }
         public Dictionary<DamageElement, float> Armors { get; private set; }
         public Dictionary<DamageElement, MinMaxFloat> RightHandDamages { get; private set; }
@@ -18,6 +17,8 @@ namespace MultiplayerARPG
         public KeyValuePair<DamageElement, MinMaxFloat>? LeftHandWeaponDamage { get; private set; }
         public Dictionary<DamageElement, MinMaxFloat> IncreaseDamages { get; private set; }
         public Dictionary<DamageElement, MinMaxFloat> IncreaseDamagesRate { get; private set; }
+        public Dictionary<BaseSkill, int> Skills { get; private set; }
+        public Dictionary<StatusEffect, float> StatusEffectResistances { get; private set; }
         public Dictionary<EquipmentSet, int> EquipmentSets { get; private set; }
         public int MaxHp => (int)_stats.hp;
         public int MaxMp => (int)_stats.mp;
@@ -70,6 +71,7 @@ namespace MultiplayerARPG
             IncreaseDamages = new Dictionary<DamageElement, MinMaxFloat>();
             IncreaseDamagesRate = new Dictionary<DamageElement, MinMaxFloat>();
             Skills = new Dictionary<BaseSkill, int>();
+            StatusEffectResistances = new Dictionary<StatusEffect, float>();
             EquipmentSets = new Dictionary<EquipmentSet, int>();
         }
 
@@ -93,6 +95,8 @@ namespace MultiplayerARPG
             IncreaseDamagesRate = null;
             Skills.Clear();
             Skills = null;
+            StatusEffectResistances.Clear();
+            StatusEffectResistances = null;
             EquipmentSets.Clear();
             EquipmentSets = null;
         }
@@ -168,6 +172,12 @@ namespace MultiplayerARPG
             Skills = skills;
         }
 
+        private void SetStatusEffectResistances(Dictionary<StatusEffect, float> statusEffectResistances)
+        {
+            StatusEffectResistances = null;
+            StatusEffectResistances = statusEffectResistances;
+        }
+
         private void SetEquipmentSets(Dictionary<EquipmentSet, int> equipmentSets)
         {
             EquipmentSets = null;
@@ -189,6 +199,7 @@ namespace MultiplayerARPG
             IncreaseDamages.Clear();
             IncreaseDamagesRate.Clear();
             Skills.Clear();
+            StatusEffectResistances.Clear();
             EquipmentSets.Clear();
 
             int oldBattlePoints = BattlePoints;
@@ -203,6 +214,7 @@ namespace MultiplayerARPG
                 SetLeftHandDamages,
                 SetLeftHandWeaponDamage,
                 SetSkills,
+                SetStatusEffectResistances,
                 SetEquipmentSets,
                 onGetIncreasingDamages: SetIncreaseDamages,
                 onGetIncreasingDamagesRate: SetIncreaseDamagesRate);
@@ -412,21 +424,6 @@ namespace MultiplayerARPG
             return 0f;
         }
 
-        public int GetSkill(string nameId)
-        {
-            return GetSkill(nameId.GenerateHashId());
-        }
-
-        public int GetSkill(int dataId)
-        {
-            BaseSkill data;
-            int result;
-            if (GameInstance.Skills.TryGetValue(dataId, out data) &&
-                Skills.TryGetValue(data, out result))
-                return result;
-            return 0;
-        }
-
         public float GetResistance(string nameId)
         {
             return GetResistance(nameId.GenerateHashId());
@@ -485,6 +482,36 @@ namespace MultiplayerARPG
                 LeftHandDamages.TryGetValue(data, out result))
                 return result;
             return default;
+        }
+
+        public int GetSkill(string nameId)
+        {
+            return GetSkill(nameId.GenerateHashId());
+        }
+
+        public int GetSkill(int dataId)
+        {
+            BaseSkill data;
+            int result;
+            if (GameInstance.Skills.TryGetValue(dataId, out data) &&
+                Skills.TryGetValue(data, out result))
+                return result;
+            return 0;
+        }
+
+        public float GetStatusEffectResistance(string nameId)
+        {
+            return GetStatusEffectResistance(nameId.GenerateHashId());
+        }
+
+        public float GetStatusEffectResistance(int dataId)
+        {
+            StatusEffect data;
+            float result;
+            if (GameInstance.StatusEffects.TryGetValue(dataId, out data) &&
+                StatusEffectResistances.TryGetValue(data, out result))
+                return result;
+            return 0f;
         }
 
         public int GetEquipmentSet(string nameId)

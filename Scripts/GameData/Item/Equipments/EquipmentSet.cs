@@ -24,6 +24,7 @@ namespace MultiplayerARPG
                     GameInstance.AddDamageElements(effect.armors);
                     GameInstance.AddDamageElements(effect.damages);
                     GameInstance.AddSkills(effect.skills);
+                    GameInstance.AddStatusEffects(effect.statusEffectResistances);
                 }
             }
         }

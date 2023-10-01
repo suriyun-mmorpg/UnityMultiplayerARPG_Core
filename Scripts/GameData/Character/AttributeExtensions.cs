@@ -99,5 +99,25 @@ namespace MultiplayerARPG
                 result = GameDataHelpers.CombineDamages(attribute.IncreaseDamages, result, Mathf.CeilToInt(amount), 1f);
             return result;
         }
+
+        public static Dictionary<StatusEffect, float> GetIncreaseStatusEffectResistances(this Dictionary<Attribute, float> entries)
+        {
+            Dictionary<StatusEffect, float> result = new Dictionary<StatusEffect, float>();
+            if (entries == null || entries.Count == 0)
+                return result;
+            foreach (KeyValuePair<Attribute, float> entry in entries)
+            {
+                result = GameDataHelpers.CombineStatusEffectResistances(result, entry.Key.GetIncreaseStatusEffectResistances(entry.Value));
+            }
+            return result;
+        }
+
+        public static Dictionary<StatusEffect, float> GetIncreaseStatusEffectResistances(this Attribute attribute, float amount)
+        {
+            Dictionary<StatusEffect, float> result = new Dictionary<StatusEffect, float>();
+            if (attribute != null)
+                result = GameDataHelpers.CombineStatusEffectResistances(attribute.IncreaseStatusEffectResistances, result, Mathf.CeilToInt(amount), 1f);
+            return result;
+        }
     }
 }

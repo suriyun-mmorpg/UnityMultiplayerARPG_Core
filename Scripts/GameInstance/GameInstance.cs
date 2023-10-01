@@ -1393,6 +1393,36 @@ namespace MultiplayerARPG
             }
         }
 
+        public static void AddStatusEffects(params StatusEffectResistanceAmount[] statusEffects)
+        {
+            AddStatusEffects((IEnumerable<StatusEffectResistanceAmount>)statusEffects);
+        }
+
+        public static void AddStatusEffects(IEnumerable<StatusEffectResistanceAmount> statusEffects)
+        {
+            if (statusEffects == null)
+                return;
+            foreach (StatusEffectResistanceAmount statusEffect in statusEffects)
+            {
+                AddStatusEffects(statusEffect.statusEffect);
+            }
+        }
+
+        public static void AddStatusEffects(params StatusEffectResistanceIncremental[] statusEffects)
+        {
+            AddStatusEffects((IEnumerable<StatusEffectResistanceIncremental>)statusEffects);
+        }
+
+        public static void AddStatusEffects(IEnumerable<StatusEffectResistanceIncremental> statusEffects)
+        {
+            if (statusEffects == null)
+                return;
+            foreach (StatusEffectResistanceIncremental statusEffect in statusEffects)
+            {
+                AddStatusEffects(statusEffect.statusEffect);
+            }
+        }
+
         public static void AddStatusEffects(params StatusEffect[] statusEffects)
         {
             AddStatusEffects((IEnumerable<StatusEffect>)statusEffects);

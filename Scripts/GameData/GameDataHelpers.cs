@@ -187,6 +187,25 @@ namespace MultiplayerARPG
         }
 
         /// <summary>
+        /// Combine status effect resistance amounts dictionary
+        /// </summary>
+        /// <param name="resultDictionary"></param>
+        /// <param name="newEntry"></param>
+        /// <returns></returns>
+        public static Dictionary<StatusEffect, float> CombineStatusEffectResistances(Dictionary<StatusEffect, float> resultDictionary, KeyValuePair<StatusEffect, float> newEntry)
+        {
+            if (resultDictionary == null)
+                resultDictionary = new Dictionary<StatusEffect, float>();
+            if (newEntry.Key == null)
+                return resultDictionary;
+            if (!resultDictionary.ContainsKey(newEntry.Key))
+                resultDictionary[newEntry.Key] = newEntry.Value;
+            else
+                resultDictionary[newEntry.Key] += newEntry.Value;
+            return resultDictionary;
+        }
+
+        /// <summary>
         /// Combine item amounts dictionary
         /// </summary>
         /// <param name="resultDictionary"></param>
@@ -434,6 +453,25 @@ namespace MultiplayerARPG
         }
 
         /// <summary>
+        /// Combine status effect resistance amounts dictionary
+        /// </summary>
+        /// <param name="resultDictionary"></param>
+        /// <param name="newEntry"></param>
+        /// <returns></returns>
+        public static Dictionary<StatusEffect, float> CombineStatusEffectResistances(Dictionary<StatusEffect, float> resultDictionary, Dictionary<StatusEffect, float> combineDictionary)
+        {
+            if (resultDictionary == null)
+                resultDictionary = new Dictionary<StatusEffect, float>();
+            if (combineDictionary == null || combineDictionary.Count <= 0)
+                return resultDictionary;
+            foreach (KeyValuePair<StatusEffect, float> entry in combineDictionary)
+            {
+                CombineStatusEffectResistances(resultDictionary, entry);
+            }
+            return resultDictionary;
+        }
+
+        /// <summary>
         /// Combine item amounts dictionary
         /// </summary>
         /// <param name="resultDictionary"></param>
@@ -639,6 +677,33 @@ namespace MultiplayerARPG
             if (source.skill == null)
                 return new KeyValuePair<BaseSkill, int>();
             return new KeyValuePair<BaseSkill, int>(source.skill, source.level);
+        }
+
+        /// <summary>
+        /// Make status effect resistance - amount key-value pair
+        /// </summary>
+        /// <param name="source"></param>
+        /// <param name="rate"></param>
+        /// <returns></returns>
+        public static KeyValuePair<StatusEffect, float> ToKeyValuePair(this StatusEffectResistanceAmount source, float rate)
+        {
+            if (source.statusEffect == null)
+                return new KeyValuePair<StatusEffect, float>();
+            return new KeyValuePair<StatusEffect, float>(source.statusEffect, source.amount * rate);
+        }
+
+        /// <summary>
+        /// Make status effect resistance - amount key-value pair
+        /// </summary>
+        /// <param name="source"></param>
+        /// <param name="level"></param>
+        /// <param name="rate"></param>
+        /// <returns></returns>
+        public static KeyValuePair<StatusEffect, float> ToKeyValuePair(this StatusEffectResistanceIncremental source, int level, float rate)
+        {
+            if (source.statusEffect == null)
+                return new KeyValuePair<StatusEffect, float>();
+            return new KeyValuePair<StatusEffect, float>(source.statusEffect, source.amount.GetAmount(level) * rate);
         }
 
         /// <summary>
@@ -870,7 +935,6 @@ namespace MultiplayerARPG
             return resultDictionary;
         }
 
-
         /// <summary>
         /// Combine armor amounts dictionary
         /// </summary>
@@ -978,6 +1042,51 @@ namespace MultiplayerARPG
             {
                 pair = ToKeyValuePair(sourceMonsterSkill);
                 resultDictionary = CombineSkills(resultDictionary, pair);
+            }
+            return resultDictionary;
+        }
+
+        /// <summary>
+        /// Combine status effect resistance amounts dictionary
+        /// </summary>
+        /// <param name="sourceAmounts"></param>
+        /// <param name="resultDictionary"></param>
+        /// <param name="rate"></param>
+        /// <returns></returns>
+        public static Dictionary<StatusEffect, float> CombineStatusEffectResistances(IEnumerable<StatusEffectResistanceAmount> sourceAmounts, Dictionary<StatusEffect, float> resultDictionary, float rate)
+        {
+            if (resultDictionary == null)
+                resultDictionary = new Dictionary<StatusEffect, float>();
+            if (sourceAmounts == null)
+                return resultDictionary;
+            KeyValuePair<StatusEffect, float> pair;
+            foreach (StatusEffectResistanceAmount sourceAmount in sourceAmounts)
+            {
+                pair = ToKeyValuePair(sourceAmount, rate);
+                resultDictionary = CombineStatusEffectResistances(resultDictionary, pair);
+            }
+            return resultDictionary;
+        }
+
+        /// <summary>
+        /// Combine status effect resistance amounts dictionary
+        /// </summary>
+        /// <param name="sourceIncrementals"></param>
+        /// <param name="resultDictionary"></param>
+        /// <param name="level"></param>
+        /// <param name="rate"></param>
+        /// <returns></returns>
+        public static Dictionary<StatusEffect, float> CombineStatusEffectResistances(IEnumerable<StatusEffectResistanceIncremental> sourceIncrementals, Dictionary<StatusEffect, float> resultDictionary, int level, float rate)
+        {
+            if (resultDictionary == null)
+                resultDictionary = new Dictionary<StatusEffect, float>();
+            if (sourceIncrementals == null)
+                return resultDictionary;
+            KeyValuePair<StatusEffect, float> pair;
+            foreach (StatusEffectResistanceIncremental sourceIncremental in sourceIncrementals)
+            {
+                pair = ToKeyValuePair(sourceIncremental, level, rate);
+                resultDictionary = CombineStatusEffectResistances(resultDictionary, pair);
             }
             return resultDictionary;
         }

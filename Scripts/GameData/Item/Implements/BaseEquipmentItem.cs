@@ -138,6 +138,13 @@ namespace MultiplayerARPG
         }
 
         [SerializeField]
+        private StatusEffectResistanceIncremental[] increaseStatusEffectResistances = new StatusEffectResistanceIncremental[0];
+        public StatusEffectResistanceIncremental[] IncreaseStatusEffectResistances
+        {
+            get { return increaseStatusEffectResistances; }
+        }
+
+        [SerializeField]
         private StatusEffectApplying[] selfStatusEffectsWhenAttacking = new StatusEffectApplying[0];
         public StatusEffectApplying[] SelfStatusEffectsWhenAttacking
         {
@@ -209,6 +216,7 @@ namespace MultiplayerARPG
             GameInstance.AddDamageElements(increaseDamages);
             GameInstance.AddDamageElements(increaseDamagesRate);
             GameInstance.AddSkills(IncreaseSkills);
+            GameInstance.AddStatusEffects(IncreaseStatusEffectResistances);
             GameInstance.AddStatusEffects(SelfStatusEffectsWhenAttacking);
             GameInstance.AddStatusEffects(EnemyStatusEffectsWhenAttacking);
             GameInstance.AddStatusEffects(SelfStatusEffectsWhenAttacked);

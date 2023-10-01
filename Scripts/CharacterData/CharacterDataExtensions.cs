@@ -1047,6 +1047,12 @@ namespace MultiplayerARPG
             foreach (StatusEffectApplying effect in statusEffects)
             {
                 if (effect.statusEffect == null) continue;
+                float resistances = target.GetCaches().GetStatusEffectResistance(effect.statusEffect.DataId);
+                if (resistances > 0 && Random.value > resistances)
+                {
+                    // Resisted, no status effect being applied
+                    continue;
+                }
                 int buffLevel = effect.buffLevel.GetAmount(level);
                 target.ApplyBuff(effect.statusEffect.DataId, BuffType.StatusEffect, buffLevel, applier, weapon);
                 effect.statusEffect.OnApply(target, applier, weapon, level, buffLevel);

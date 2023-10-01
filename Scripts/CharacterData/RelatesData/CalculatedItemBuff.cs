@@ -18,6 +18,7 @@ namespace MultiplayerARPG
         private Dictionary<DamageElement, MinMaxFloat> _cacheIncreaseDamages = new Dictionary<DamageElement, MinMaxFloat>();
         private Dictionary<DamageElement, MinMaxFloat> _cacheIncreaseDamagesRate = new Dictionary<DamageElement, MinMaxFloat>();
         private Dictionary<BaseSkill, int> _cacheIncreaseSkills = new Dictionary<BaseSkill, int>();
+        private Dictionary<StatusEffect, float> _cacheIncreaseStatusEffectResistances = new Dictionary<StatusEffect, float>();
         private CalculatedItemRandomBonus _cacheRandomBonus = new CalculatedItemRandomBonus();
 
         public CalculatedItemBuff()
@@ -48,6 +49,8 @@ namespace MultiplayerARPG
             _cacheIncreaseDamagesRate = null;
             _cacheIncreaseSkills.Clear();
             _cacheIncreaseSkills = null;
+            _cacheIncreaseStatusEffectResistances.Clear();
+            _cacheIncreaseStatusEffectResistances = null;
         }
 
         public void Clear()
@@ -62,6 +65,7 @@ namespace MultiplayerARPG
             _cacheIncreaseDamages.Clear();
             _cacheIncreaseDamagesRate.Clear();
             _cacheIncreaseSkills.Clear();
+            _cacheIncreaseStatusEffectResistances.Clear();
         }
 
         public void Build(IEquipmentItem item, int level, int randomSeed, byte version)
@@ -88,6 +92,8 @@ namespace MultiplayerARPG
             _cacheIncreaseDamages = GameDataHelpers.CombineDamages(item.GetIncreaseDamages(_level, _cacheIncreaseDamages), _cacheRandomBonus.GetIncreaseDamages());
             _cacheIncreaseDamagesRate = GameDataHelpers.CombineDamages(item.GetIncreaseDamagesRate(_level, _cacheIncreaseDamagesRate), _cacheRandomBonus.GetIncreaseDamagesRate());
             _cacheIncreaseSkills = GameDataHelpers.CombineSkills(item.GetIncreaseSkills(_level, _cacheIncreaseSkills), _cacheRandomBonus.GetIncreaseSkills());
+            // TODO: Implement random bonus for increase status effect resistances
+            _cacheIncreaseStatusEffectResistances = item.GetIncreaseStatusEffectResistances(_level, _cacheIncreaseStatusEffectResistances);
 
             if (GameExtensionInstance.onBuildCalculatedItemBuff != null)
                 GameExtensionInstance.onBuildCalculatedItemBuff(this);
@@ -156,6 +162,11 @@ namespace MultiplayerARPG
         public Dictionary<BaseSkill, int> GetIncreaseSkills()
         {
             return _cacheIncreaseSkills;
+        }
+
+        public Dictionary<StatusEffect, float> GetIncreaseStatusEffectResistances()
+        {
+            return _cacheIncreaseStatusEffectResistances;
         }
     }
 }

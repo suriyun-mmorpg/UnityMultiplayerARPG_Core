@@ -198,6 +198,16 @@ namespace MultiplayerARPG
             return result;
         }
 
+        public static Dictionary<StatusEffect, float> GetIncreaseStatusEffectResistances<T>(this T equipmentItem, int level, Dictionary<StatusEffect, float> result = null)
+            where T : IEquipmentItem
+        {
+            if (result == null)
+                result = new Dictionary<StatusEffect, float>();
+            if (equipmentItem != null && equipmentItem.IsEquipment())
+                result = GameDataHelpers.CombineStatusEffectResistances(equipmentItem.IncreaseStatusEffectResistances, result, level, 1f);
+            return result;
+        }
+
         public static void ApplySelfStatusEffectsWhenAttacking<T>(this T equipmentItem, int level, EntityInfo applier, CharacterItem weapon, BaseCharacterEntity target)
             where T : IEquipmentItem
         {

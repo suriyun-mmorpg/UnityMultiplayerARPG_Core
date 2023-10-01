@@ -43,6 +43,13 @@ namespace MultiplayerARPG
         }
 
         [SerializeField]
+        private StatusEffectResistanceIncremental[] increaseStatusEffectResistances = new StatusEffectResistanceIncremental[0];
+        public StatusEffectResistanceIncremental[] IncreaseStatusEffectResistances
+        {
+            get { return increaseStatusEffectResistances; }
+        }
+
+        [SerializeField]
         [Tooltip("If this value more than 0 it will limit max amount of this attribute by this value")]
         private int maxAmount;
         public int MaxAmount

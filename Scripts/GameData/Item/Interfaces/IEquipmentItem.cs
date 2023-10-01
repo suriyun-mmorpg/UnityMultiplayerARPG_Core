@@ -73,6 +73,10 @@ namespace MultiplayerARPG
         /// </summary>
         SkillIncremental[] IncreaseSkills { get; }
         /// <summary>
+        /// Increasing status effect resistances while equipping this item
+        /// </summary>
+        StatusEffectResistanceIncremental[] IncreaseStatusEffectResistances { get; }
+        /// <summary>
         /// Status effects that can be applied to the attacker when attacking
         /// </summary>
         StatusEffectApplying[] SelfStatusEffectsWhenAttacking { get; }

@@ -134,6 +134,8 @@ namespace MultiplayerARPG
         [ArrayElementTitle("skill")]
         public SkillLevel[] increaseSkillLevels;
         public SkillIncremental[] increaseSkills;
+        [ArrayElementTitle("statusEffect")]
+        private StatusEffectResistanceIncremental[] increaseStatusEffectResistances;
 
         [Category(2, "Ammo Settings")]
         public AmmoType ammoType;
@@ -353,6 +355,11 @@ namespace MultiplayerARPG
         public SkillIncremental[] IncreaseSkills
         {
             get { return increaseSkills; }
+        }
+
+        public StatusEffectResistanceIncremental[] IncreaseStatusEffectResistances
+        {
+            get { return increaseStatusEffectResistances; }
         }
 
         public StatusEffectApplying[] SelfStatusEffectsWhenAttacking
@@ -681,6 +688,7 @@ namespace MultiplayerARPG
             GameInstance.AddDamageElements(damageAmount);
             GameInstance.AddSkills(increaseSkills);
             GameInstance.AddSkills(skillLevel);
+            GameInstance.AddStatusEffects(increaseStatusEffectResistances);
             GameInstance.AddStatusEffects(selfStatusEffectsWhenAttacking);
             GameInstance.AddStatusEffects(enemyStatusEffectsWhenAttacking);
             GameInstance.AddStatusEffects(selfStatusEffectsWhenAttacked);
