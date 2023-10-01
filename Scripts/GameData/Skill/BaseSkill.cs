@@ -38,7 +38,6 @@ namespace MultiplayerARPG
 
         [Header("Casted Effects")]
         public GameEffect[] skillActivateEffects;
-        public GameEffect[] damageHitEffects;
 
         [Category(11, "Requirement")]
         [Header("Requirements to Levelup (Tools)")]
@@ -254,7 +253,6 @@ namespace MultiplayerARPG
             base.PrepareRelatesData();
             GameInstance.AddPoolingObjects(skillCastEffects);
             GameInstance.AddPoolingObjects(skillActivateEffects);
-            GameInstance.AddPoolingObjects(damageHitEffects);
             GameInstance.AddPoolingObjects(Buff.effects);
             GameInstance.AddPoolingObjects(Debuff.effects);
             Buff.PrepareRelatesData();
@@ -278,9 +276,9 @@ namespace MultiplayerARPG
             get { return skillActivateEffects; }
         }
 
-        public GameEffect[] DamageHitEffects
+        public virtual GameEffect[] DamageHitEffects
         {
-            get { return damageHitEffects; }
+            get { return null; }
         }
 
         public int GetConsumeHp(int level)

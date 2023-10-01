@@ -27,6 +27,7 @@ namespace MultiplayerARPG
         public StatusEffectApplying[] attackStatusEffects;
         public HarvestType harvestType;
         public IncrementalMinMaxFloat harvestDamageAmount;
+        public GameEffect[] damageHitEffects;
 
         [Category(4, "Warp Settings")]
         public bool isWarpToAimPosition;
@@ -40,6 +41,14 @@ namespace MultiplayerARPG
                 if (_cacheEffectivenessAttributes == null)
                     _cacheEffectivenessAttributes = GameDataHelpers.CombineDamageEffectivenessAttributes(effectivenessAttributes, new Dictionary<Attribute, float>());
                 return _cacheEffectivenessAttributes;
+            }
+        }
+
+        public override GameEffect[] DamageHitEffects
+        {
+            get
+            {
+                return damageHitEffects;
             }
         }
 
