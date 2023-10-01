@@ -204,7 +204,7 @@ namespace MultiplayerARPG
                 SkillAndBuffComponent.OnAttacked();
                 // Do something when skill hit target
                 if (skill != null && buff == null)
-                    skill.OnSkillAttackHit(instigator, this, skillLevel, weapon);
+                    skill.OnSkillAttackHit(skillLevel, instigator, weapon, this);
             }
         }
     }
