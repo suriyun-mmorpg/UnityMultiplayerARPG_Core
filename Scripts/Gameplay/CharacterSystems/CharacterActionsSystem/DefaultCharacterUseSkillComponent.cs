@@ -334,18 +334,25 @@ namespace MultiplayerARPG
                     Entity.OnUseSkillRoutine(skill, skillLevel, isLeftHand, weapon, simulateSeed, triggerIndex, damageAmounts, targetObjectId, aimPosition);
 
                     // Apply skill buffs, summons and attack damages
-                    if (IsOwnerClientOrOwnedByServer)
+                    if (IsOwnerClient)
                     {
-                        // Simulate action at non-owner clients
-                        SimulateActionTriggerData simulateData = new SimulateActionTriggerData()
+                        RPC(CmdSimulateActionTrigger, BaseGameEntity.STATE_DATA_CHANNEL, DeliveryMethod.ReliableOrdered, new SimulateActionTriggerData()
                         {
                             simulateSeed = simulateSeed,
                             triggerIndex = triggerIndex,
                             aimPosition = aimPosition,
-                        };
-                        RPC(AllSimulateActionTrigger, BaseGameEntity.STATE_DATA_CHANNEL, DeliveryMethod.ReliableOrdered, simulateData);
-                        ApplySkillUsing(skill, skillLevel, isLeftHand, weapon, simulateSeed, triggerIndex, damageAmounts, targetObjectId, aimPosition);
+                        });
                     }
+                    else if (IsOwnedByServer)
+                    {
+                        RPC(RpcSimulateActionTrigger, BaseGameEntity.STATE_DATA_CHANNEL, DeliveryMethod.ReliableOrdered, new SimulateActionTriggerData()
+                        {
+                            simulateSeed = simulateSeed,
+                            triggerIndex = triggerIndex,
+                            aimPosition = aimPosition,
+                        });
+                    }
+                    ApplySkillUsing(skill, skillLevel, isLeftHand, weapon, simulateSeed, triggerIndex, damageAmounts, targetObjectId, aimPosition);
 
                     if (remainsDuration <= 0f)
                     {
@@ -423,8 +430,14 @@ namespace MultiplayerARPG
             HitRegistrationManager.PrepareToRegister(simulateSeed, triggerIndex, spreadIndex, objectId, hitboxIndex, hitPoint);
         }
 
+        [ServerRpc]
+        protected void CmdSimulateActionTrigger(SimulateActionTriggerData data)
+        {
+            RPC(RpcSimulateActionTrigger, BaseGameEntity.STATE_DATA_CHANNEL, DeliveryMethod.ReliableOrdered, data);
+        }
+
         [AllRpc]
-        protected void AllSimulateActionTrigger(SimulateActionTriggerData data)
+        protected void RpcSimulateActionTrigger(SimulateActionTriggerData data)
         {
             if (IsOwnerClientOrOwnedByServer)
                 return;

@@ -250,18 +250,25 @@ namespace MultiplayerARPG
                         Entity.OnAttackRoutine(isLeftHand, weapon, simulateSeed, triggerIndex, damageInfo, damageAmounts, aimPosition);
 
                         // Apply attack damages
-                        if (IsOwnerClientOrOwnedByServer)
+                        if (IsOwnerClient)
                         {
-                            // Simulate action at non-owner clients
-                            SimulateActionTriggerData simulateData = new SimulateActionTriggerData()
+                            RPC(CmdSimulateActionTrigger, BaseGameEntity.STATE_DATA_CHANNEL, DeliveryMethod.ReliableOrdered, new SimulateActionTriggerData()
                             {
                                 simulateSeed = simulateSeed,
                                 triggerIndex = triggerIndex,
                                 aimPosition = aimPosition,
-                            };
-                            RPC(AllSimulateActionTrigger, BaseGameEntity.STATE_DATA_CHANNEL, DeliveryMethod.ReliableOrdered, simulateData);
-                            ApplyAttack(isLeftHand, weapon, simulateSeed, triggerIndex, damageInfo, damageAmounts, aimPosition);
+                            });
                         }
+                        else if (IsOwnedByServer)
+                        {
+                            RPC(RpcSimulateActionTrigger, BaseGameEntity.STATE_DATA_CHANNEL, DeliveryMethod.ReliableOrdered, new SimulateActionTriggerData()
+                            {
+                                simulateSeed = simulateSeed,
+                                triggerIndex = triggerIndex,
+                                aimPosition = aimPosition,
+                            });
+                        }
+                        ApplyAttack(isLeftHand, weapon, simulateSeed, triggerIndex, damageInfo, damageAmounts, aimPosition);
                     }
 
                     if (remainsDuration <= 0f)
@@ -308,10 +315,12 @@ namespace MultiplayerARPG
 
         protected virtual void ApplyAttack(bool isLeftHand, CharacterItem weapon, int simulateSeed, byte triggerIndex, DamageInfo damageInfo, Dictionary<DamageElement, MinMaxFloat> damageAmounts, AimPosition aimPosition)
         {
-            if (IsServer)
+            if (Entity.IsServer)
             {
+                // Not enough ammos
+                if (!Entity.DecreaseAmmos(weapon, isLeftHand, 1, out Dictionary<DamageElement, MinMaxFloat> increaseDamageAmounts))
+                    return;
                 // Increase damage with ammo damage
-                Entity.DecreaseAmmos(weapon, isLeftHand, 1, out Dictionary<DamageElement, MinMaxFloat> increaseDamageAmounts);
                 if (HitRegistrationManager.IncreasePreparedDamageAmounts(Entity, simulateSeed, increaseDamageAmounts, out Dictionary<DamageElement, MinMaxFloat> resultDamageAmounts))
                     damageAmounts = resultDamageAmounts;
             }
@@ -358,8 +367,14 @@ namespace MultiplayerARPG
             HitRegistrationManager.PrepareToRegister(simulateSeed, triggerIndex, spreadIndex, objectId, hitboxIndex, hitPoint);
         }
 
+        [ServerRpc]
+        protected void CmdSimulateActionTrigger(SimulateActionTriggerData data)
+        {
+            RPC(RpcSimulateActionTrigger, BaseGameEntity.STATE_DATA_CHANNEL, DeliveryMethod.ReliableOrdered, data);
+        }
+
         [AllRpc]
-        protected void AllSimulateActionTrigger(SimulateActionTriggerData data)
+        protected void RpcSimulateActionTrigger(SimulateActionTriggerData data)
         {
             if (IsOwnerClientOrOwnedByServer)
                 return;
