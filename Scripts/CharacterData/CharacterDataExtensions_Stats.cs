@@ -852,7 +852,7 @@ namespace MultiplayerARPG
             {
                 resultStats += resultAttributes.GetStats();
                 resultStats += buffStats;
-                resultStats *= buffStatsRate;
+                resultStats += buffStats * buffStatsRate;
                 if (onGetStats != null)
                     onGetStats.Invoke(resultStats);
             }
