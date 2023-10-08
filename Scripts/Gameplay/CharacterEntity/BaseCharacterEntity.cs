@@ -422,7 +422,6 @@ namespace MultiplayerARPG
                 s_EntityStateMessageWriter.Put(s_EntityStateDataWriter.Data, 0, s_EntityStateDataWriter.Length);
                 ClientSendMessage(STATE_DATA_CHANNEL, (shouldSendReliably || (ushort)inputState > 1 << 0) ? DeliveryMethod.ReliableOrdered : DeliveryMethod.Sequenced, s_EntityStateMessageWriter);
             }
-            CurrentGameManager.HitRegistrationManager.SendHitRegToServer();
         }
 
         public override void SendServerState(long writeTimestamp)
@@ -922,6 +921,18 @@ namespace MultiplayerARPG
             }
 
             return validIfNoRequireAmmoType;
+        }
+
+        public Dictionary<DamageElement, MinMaxFloat> GetIncreaseDamagesByAmmo(CharacterItem weapon)
+        {
+            // Avoid null data
+            if (weapon == null)
+                return null;
+
+            IWeaponItem weaponItem = weapon.GetWeaponItem();
+            if (weaponItem.AmmoCapacity > 0 || weaponItem.WeaponType.RequireAmmoType == null)
+                return null;
+            return this.GetIncreaseDamagesByAmmo(weaponItem.WeaponType.RequireAmmoType);
         }
 
         public bool DecreaseAmmos(CharacterItem weapon, bool isLeftHand, int amount, out Dictionary<DamageElement, MinMaxFloat> increaseDamageAmounts, bool validIfNoRequireAmmoType = true)

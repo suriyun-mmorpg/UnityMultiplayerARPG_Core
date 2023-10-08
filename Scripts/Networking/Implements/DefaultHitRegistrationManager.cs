@@ -1,5 +1,6 @@
 using Cysharp.Text;
 using Cysharp.Threading.Tasks;
+using LiteNetLibManager;
 using System.Collections.Generic;
 using System.Threading;
 using UnityEngine;
@@ -69,8 +70,8 @@ namespace MultiplayerARPG
                 cancellationTokenSource.Dispose();
             }
         }
-        
-        public void PrepareHitRegValidation(BaseGameEntity attacker, int randomSeed, float[] triggerDurations, byte fireSpread, DamageInfo damageInfo, Dictionary<DamageElement, MinMaxFloat> damageAmounts, CharacterItem weapon, BaseSkill skill, int skillLevel)
+
+        public void PrepareHitRegValidation(BaseGameEntity attacker, int simulateSeed, float[] triggerDurations, byte fireSpread, DamageInfo damageInfo, Dictionary<DamageElement, MinMaxFloat> damageAmounts, CharacterItem weapon, BaseSkill skill, int skillLevel)
         {
             // Only server can prepare hit registration
             if (!BaseGameNetworkManager.Singleton.IsServer || attacker == null)
@@ -79,34 +80,54 @@ namespace MultiplayerARPG
             if (triggerDurations == null || triggerDurations.Length <= 0)
                 return;
 
-            string id = MakeValidateId(attacker.ObjectId, randomSeed);
-            CreateValidatingData(id);
-            s_validatingHits[id].Attacker = attacker;
-            s_validatingHits[id].TriggerDurations = triggerDurations;
-            s_validatingHits[id].FireSpread = fireSpread;
-            s_validatingHits[id].DamageInfo = damageInfo;
-            s_validatingHits[id].DamageAmounts = damageAmounts;
-            s_validatingHits[id].Weapon = weapon;
-            s_validatingHits[id].Skill = skill;
-            s_validatingHits[id].SkillLevel = skillLevel;
+            string id = MakeValidateId(attacker.ObjectId, simulateSeed);
+            if (s_validatingHits.ContainsKey(id))
+            {
+                Logging.LogError($"Cannot prepare validation data, there is already has prepared validation data");
+                return;
+            }
+
+            s_validatingHits[id] = new HitValidateData()
+            {
+                Attacker = attacker,
+                TriggerDurations = triggerDurations,
+                FireSpread = fireSpread,
+                DamageInfo = damageInfo,
+                BaseDamageAmounts = damageAmounts,
+                Weapon = weapon,
+                Skill = skill,
+                SkillLevel = skillLevel,
+            };
         }
 
-        public void ConfirmHitRegValidation(BaseGameEntity attacker, int randomSeed, byte triggerIndex, Dictionary<DamageElement, MinMaxFloat> increaseDamageAmounts)
+        public void ConfirmHitRegValidation(BaseGameEntity attacker, int simulateSeed, byte triggerIndex, Dictionary<DamageElement, MinMaxFloat> increaseDamageAmounts)
         {
-            resultDamageAmounts = null;
-            // Only server can modify damage amounts
+            // Only server can confirm hit registration
             if (!BaseGameNetworkManager.Singleton.IsServer || attacker == null)
-                return false;
+                return;
 
-            string id = MakeValidateId(attacker.ObjectId, randomSeed);
+            string id = MakeValidateId(attacker.ObjectId, simulateSeed);
             if (!s_validatingHits.TryGetValue(id, out HitValidateData hitValidateData))
-                return false;
+            {
+                Logging.LogError($"Cannot confirm validation data, there is no prepared validation data");
+                return;
+            }
 
+            // Make sure it won't increase damage to the wrong collction
+            Dictionary<DamageElement, MinMaxFloat> confirmedDamageAmounts = hitValidateData.BaseDamageAmounts == null ? new Dictionary<DamageElement, MinMaxFloat>() : new Dictionary<DamageElement, MinMaxFloat>(hitValidateData.BaseDamageAmounts);
+            // Increase damage amounts
             if (increaseDamageAmounts != null && increaseDamageAmounts.Count > 0)
-                hitValidateData.DamageAmounts = GameDataHelpers.CombineDamages(hitValidateData.DamageAmounts, increaseDamageAmounts);
+                confirmedDamageAmounts = GameDataHelpers.CombineDamages(confirmedDamageAmounts, increaseDamageAmounts);
+            hitValidateData.ConfirmedDamageAmounts[triggerIndex] = confirmedDamageAmounts;
 
-            resultDamageAmounts = hitValidateData.DamageAmounts;
-            return true;
+            if (hitValidateData.Pendings.TryGetValue(triggerIndex, out List<HitRegisterData> hits))
+            {
+                for (int i = 0; i < hits.Count; ++i)
+                {
+                    PerformValidation(attacker, hits[i]);
+                }
+                hitValidateData.Pendings.Remove(triggerIndex);
+            }
         }
 
         public void PrepareHitRegData(HitRegisterData hitRegisterData)
@@ -120,32 +141,34 @@ namespace MultiplayerARPG
             if (attacker == null || !BaseGameNetworkManager.Singleton.IsServer)
                 return;
 
-            string id = MakeValidateId(attacker.ObjectId, message.RandomSeed);
-            if (!s_validatingHits.ContainsKey(id))
-                return;
-
             for (int i = 0; i < message.Hits.Count; ++i)
             {
-                PerformValidation(attacker, id, message.RandomSeed, message.Hits[i]);
+                PerformValidation(attacker, message.Hits[i]);
             }
         }
 
-        private bool PerformValidation(BaseGameEntity attacker, string id, int simulateSeed, HitRegisterData hitData)
+        private bool PerformValidation(BaseGameEntity attacker, HitRegisterData hitData)
         {
             if (attacker == null)
                 return false;
 
-            string hitId = MakeHitRegId(hitData.TriggerIndex, hitData.SpreadIndex);
-            if (!s_validatingHits.TryGetValue(id, out HitValidateData hitValidateData) || !hitValidateData.Origins.ContainsKey(hitId))
+            string id = MakeValidateId(attacker.ObjectId, hitData.SimulateSeed);
+            if (!s_validatingHits.TryGetValue(id, out HitValidateData hitValidateData))
             {
-                // Invalid spread index
-                CreateValidatingData(id);
-                hitValidateData.Pendings[hitId] = hitData;
+                // No validating data
+                Logging.LogError($"Cannot perform validation, there is no prepared validation data");
                 return false;
             }
-            hitValidateData.Pendings.Remove(hitId);
 
-            HitOriginData hitOriginData = hitValidateData.Origins[hitId];
+            if (!hitValidateData.ConfirmedDamageAmounts.ContainsKey(hitData.TriggerIndex))
+            {
+                // No confirmed validating data
+                if (!hitValidateData.Pendings.ContainsKey(hitData.TriggerIndex))
+                    hitValidateData.Pendings[hitData.TriggerIndex] = new List<HitRegisterData>();
+                hitValidateData.Pendings[hitData.TriggerIndex].Add(hitData);
+                return false;
+            }
+
             uint objectId = hitData.HitObjectId;
             int hitBoxIndex = hitData.HitBoxIndex;
             if (!BaseGameNetworkManager.Singleton.TryGetEntityByObjectId(objectId, out DamageableEntity damageableEntity) ||
@@ -163,34 +186,35 @@ namespace MultiplayerARPG
             }
 
             DamageableHitBox hitBox = damageableEntity.HitBoxes[hitBoxIndex];
-            long timestamp = BaseGameNetworkManager.Singleton.Timestamp;
-            if (!hitValidateData.DamageInfo.IsHitValid(hitValidateData, hitData, hitBox, hitId, hitObjectId, timestamp))
+            if (!hitValidateData.DamageInfo.IsHitValid(hitValidateData, hitData, hitBox))
             {
                 // Not valid
                 return false;
             }
 
-            if (!IsHit(attacker, hitValidateData, hitOriginData, hitData, hitBox, timestamp))
+            if (!IsHit(attacker, hitValidateData, hitData, hitBox))
             {
                 // Not hit
                 return false;
             }
 
+            string hitId = MakeHitRegId(hitData.TriggerIndex, hitData.SpreadIndex);
             if (!hitValidateData.HitsCount.TryGetValue(hitId, out int hitCount))
             {
                 // Set hit count to 0, if it is not in collection
                 hitCount = 0;
             }
+            hitValidateData.HitsCount[hitId] = ++hitCount;
 
             // Yes, it is hit
-            hitBox.ReceiveDamage(attacker.EntityTransform.position, attacker.GetInfo(), hitValidateData.DamageAmounts, hitValidateData.Weapon, hitValidateData.Skill, hitValidateData.SkillLevel, simulateSeed);
-            hitValidateData.HitsCount[hitId] = ++hitCount;
+            hitBox.ReceiveDamage(attacker.EntityTransform.position, attacker.GetInfo(), hitValidateData.BaseDamageAmounts, hitValidateData.Weapon, hitValidateData.Skill, hitValidateData.SkillLevel, hitData.SimulateSeed);
             hitValidateData.HitObjects.Add(hitObjectId);
             return true;
         }
 
-        private bool IsHit(BaseGameEntity attacker, HitValidateData hitValidateData, HitRegisterData hitData, DamageableHitBox hitBox, long timestamp)
+        private bool IsHit(BaseGameEntity attacker, HitValidateData hitValidateData, HitRegisterData hitData, DamageableHitBox hitBox)
         {
+            long timestamp = BaseGameNetworkManager.Singleton.Timestamp;
             long halfRtt = attacker.Player != null ? (attacker.Player.Rtt / 2) : 0;
             long targetTime = timestamp - halfRtt;
             DamageableHitBox.TransformHistory transformHistory = hitBox.GetTransformHistory(timestamp, targetTime);
@@ -207,9 +231,9 @@ namespace MultiplayerARPG
             return isHit;
         }
 
-        private static string MakeValidateId(uint attackerId, int randomSeed)
+        private static string MakeValidateId(uint attackerId, int simulateSeed)
         {
-            return ZString.Concat(attackerId, "_", randomSeed);
+            return ZString.Concat(attackerId, "_", simulateSeed);
         }
 
         private static string MakeHitRegId(byte triggerIndex, byte spreadIndex)

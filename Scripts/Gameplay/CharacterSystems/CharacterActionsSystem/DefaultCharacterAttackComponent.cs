@@ -245,30 +245,45 @@ namespace MultiplayerARPG
                     // Skip attack function when applied skills (buffs) will override default attack functionality
                     if (!overrideDefaultAttack)
                     {
-
                         // Trigger attack event
                         Entity.OnAttackRoutine(isLeftHand, weapon, simulateSeed, triggerIndex, damageInfo, damageAmounts, aimPosition);
 
                         // Apply attack damages
                         if (IsOwnerClient)
                         {
+                            Dictionary<DamageElement, MinMaxFloat> increaseDamageAmounts;
+                            if (!IsServer)
+                                increaseDamageAmounts = Entity.GetIncreaseDamagesByAmmo(weapon);
+                            else if (!Entity.DecreaseAmmos(weapon, isLeftHand, 1, out increaseDamageAmounts))
+                                break;
                             RPC(CmdSimulateActionTrigger, BaseGameEntity.STATE_DATA_CHANNEL, DeliveryMethod.ReliableOrdered, new SimulateActionTriggerData()
                             {
                                 simulateSeed = simulateSeed,
                                 triggerIndex = triggerIndex,
                                 aimPosition = aimPosition,
                             });
+                            ApplyAttack(isLeftHand, weapon, simulateSeed, triggerIndex, damageInfo, damageAmounts, increaseDamageAmounts, aimPosition);
                         }
                         else if (IsOwnedByServer)
                         {
+                            // Not enough ammos?
+                            if (!Entity.DecreaseAmmos(weapon, isLeftHand, 1, out Dictionary<DamageElement, MinMaxFloat> increaseDamageAmounts))
+                                break;
                             RPC(RpcSimulateActionTrigger, BaseGameEntity.STATE_DATA_CHANNEL, DeliveryMethod.ReliableOrdered, new SimulateActionTriggerData()
                             {
                                 simulateSeed = simulateSeed,
                                 triggerIndex = triggerIndex,
                                 aimPosition = aimPosition,
                             });
+                            ApplyAttack(isLeftHand, weapon, simulateSeed, triggerIndex, damageInfo, damageAmounts, increaseDamageAmounts, aimPosition);
                         }
-                        ApplyAttack(isLeftHand, weapon, simulateSeed, triggerIndex, damageInfo, damageAmounts, aimPosition);
+                        else if (IsServer)
+                        {
+                            // Not enough ammos?
+                            if (!Entity.DecreaseAmmos(weapon, isLeftHand, 1, out Dictionary<DamageElement, MinMaxFloat> increaseDamageAmounts))
+                                break;
+                            HitRegistrationManager.ConfirmHitRegValidation(Entity, simulateSeed, triggerIndex, increaseDamageAmounts);
+                        }
                     }
 
                     if (remainsDuration <= 0f)
@@ -313,18 +328,8 @@ namespace MultiplayerARPG
             ClearAttackStates();
         }
 
-        protected virtual void ApplyAttack(bool isLeftHand, CharacterItem weapon, int simulateSeed, byte triggerIndex, DamageInfo damageInfo, Dictionary<DamageElement, MinMaxFloat> damageAmounts, AimPosition aimPosition)
+        protected virtual void ApplyAttack(bool isLeftHand, CharacterItem weapon, int simulateSeed, byte triggerIndex, DamageInfo damageInfo, Dictionary<DamageElement, MinMaxFloat> damageAmounts, Dictionary<DamageElement, MinMaxFloat> increaseDamageAmounts, AimPosition aimPosition)
         {
-            if (Entity.IsServer)
-            {
-                // Not enough ammos
-                if (!Entity.DecreaseAmmos(weapon, isLeftHand, 1, out Dictionary<DamageElement, MinMaxFloat> increaseDamageAmounts))
-                    return;
-                // Increase damage with ammo damage
-                if (HitRegistrationManager.ConfirmHitRegValidation(Entity, simulateSeed, increaseDamageAmounts, out Dictionary<DamageElement, MinMaxFloat> resultDamageAmounts))
-                    damageAmounts = resultDamageAmounts;
-            }
-
             byte fireSpread = 0;
             Vector3 fireStagger = Vector3.zero;
             if (weapon != null && weapon.GetWeaponItem() != null)
@@ -333,6 +338,12 @@ namespace MultiplayerARPG
                 fireSpread = weapon.GetWeaponItem().FireSpread;
                 fireStagger = weapon.GetWeaponItem().FireStagger;
             }
+
+            // Make sure it won't increase damage to the wrong collction
+            damageAmounts = damageAmounts == null ? new Dictionary<DamageElement, MinMaxFloat>() : new Dictionary<DamageElement, MinMaxFloat>(damageAmounts);
+            // Increase damage amounts
+            if (increaseDamageAmounts != null && increaseDamageAmounts.Count > 0)
+                damageAmounts = GameDataHelpers.CombineDamages(damageAmounts, increaseDamageAmounts);
 
             for (byte spreadIndex = 0; spreadIndex < fireSpread + 1; ++spreadIndex)
             {
@@ -374,7 +385,8 @@ namespace MultiplayerARPG
                 damageAmounts = new Dictionary<DamageElement, MinMaxFloat>(Entity.GetCaches().LeftHandDamages);
             else
                 damageAmounts = new Dictionary<DamageElement, MinMaxFloat>(Entity.GetCaches().RightHandDamages);
-            ApplyAttack(isLeftHand, weapon, data.simulateSeed, data.triggerIndex, damageInfo, damageAmounts, data.aimPosition);
+            Dictionary<DamageElement, MinMaxFloat> increaseDamageAmounts = Entity.GetIncreaseDamagesByAmmo(weapon);
+            ApplyAttack(isLeftHand, weapon, data.simulateSeed, data.triggerIndex, damageInfo, damageAmounts, increaseDamageAmounts, data.aimPosition);
         }
 
         public virtual void CancelAttack()

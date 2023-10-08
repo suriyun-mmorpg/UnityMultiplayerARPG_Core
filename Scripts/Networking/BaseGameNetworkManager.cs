@@ -179,8 +179,6 @@ namespace MultiplayerARPG
             {
                 if (!_arrayGameEntity[i].enabled)
                     continue;
-                if (_arrayGameEntity[i].IsOwnerClient)
-                    _arrayGameEntity[i].SendClientState(timestamp);
                 _arrayGameEntity[i].SendServerState(timestamp);
             }
             Profiler.EndSample();
@@ -198,7 +196,10 @@ namespace MultiplayerARPG
                 if (!_arrayGameEntity[i].enabled)
                     continue;
                 if (_arrayGameEntity[i].IsOwnerClient)
+                {
                     _arrayGameEntity[i].SendClientState(timestamp);
+                    SendHitRegistration();
+                }
             }
             Profiler.EndSample();
         }

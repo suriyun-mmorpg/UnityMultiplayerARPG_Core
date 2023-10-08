@@ -336,23 +336,39 @@ namespace MultiplayerARPG
                     // Apply skill buffs, summons and attack damages
                     if (IsOwnerClient)
                     {
+                        Dictionary<DamageElement, MinMaxFloat> increaseDamageAmounts;
+                        if (!IsServer)
+                            increaseDamageAmounts = skill.GetIncreaseDamageByResources(Entity, weapon);
+                        else if (!skill.DecreaseResources(Entity, weapon, isLeftHand, out increaseDamageAmounts))
+                            break;
                         RPC(CmdSimulateActionTrigger, BaseGameEntity.STATE_DATA_CHANNEL, DeliveryMethod.ReliableOrdered, new SimulateActionTriggerData()
                         {
                             simulateSeed = simulateSeed,
                             triggerIndex = triggerIndex,
                             aimPosition = aimPosition,
                         });
+                        ApplySkillUsing(skill, skillLevel, isLeftHand, weapon, simulateSeed, triggerIndex, damageAmounts, increaseDamageAmounts, targetObjectId, aimPosition);
                     }
                     else if (IsOwnedByServer)
                     {
+                        // Not enough resources?
+                        if (!skill.DecreaseResources(Entity, weapon, isLeftHand, out Dictionary<DamageElement, MinMaxFloat> increaseDamageAmounts))
+                            break;
                         RPC(RpcSimulateActionTrigger, BaseGameEntity.STATE_DATA_CHANNEL, DeliveryMethod.ReliableOrdered, new SimulateActionTriggerData()
                         {
                             simulateSeed = simulateSeed,
                             triggerIndex = triggerIndex,
                             aimPosition = aimPosition,
                         });
+                        ApplySkillUsing(skill, skillLevel, isLeftHand, weapon, simulateSeed, triggerIndex, damageAmounts, increaseDamageAmounts, targetObjectId, aimPosition);
                     }
-                    ApplySkillUsing(skill, skillLevel, isLeftHand, weapon, simulateSeed, triggerIndex, damageAmounts, targetObjectId, aimPosition);
+                    else if (IsServer)
+                    {
+                        // Not enough resources?
+                        if (!skill.DecreaseResources(Entity, weapon, isLeftHand, out Dictionary<DamageElement, MinMaxFloat> increaseDamageAmounts))
+                            break;
+                        HitRegistrationManager.ConfirmHitRegValidation(Entity, simulateSeed, triggerIndex, increaseDamageAmounts);
+                    }
 
                     if (remainsDuration <= 0f)
                     {
@@ -400,8 +416,14 @@ namespace MultiplayerARPG
             }
         }
 
-        protected virtual void ApplySkillUsing(BaseSkill skill, int skillLevel, bool isLeftHand, CharacterItem weapon, int simulateSeed, byte triggerIndex, Dictionary<DamageElement, MinMaxFloat> damageAmounts, uint targetObjectId, AimPosition aimPosition)
+        protected virtual void ApplySkillUsing(BaseSkill skill, int skillLevel, bool isLeftHand, CharacterItem weapon, int simulateSeed, byte triggerIndex, Dictionary<DamageElement, MinMaxFloat> damageAmounts, Dictionary<DamageElement, MinMaxFloat> increaseDamageAmounts, uint targetObjectId, AimPosition aimPosition)
         {
+            // Make sure it won't increase damage to the wrong collction
+            damageAmounts = damageAmounts == null ? new Dictionary<DamageElement, MinMaxFloat>() : new Dictionary<DamageElement, MinMaxFloat>(damageAmounts);
+            // Increase damage amounts
+            if (increaseDamageAmounts != null && increaseDamageAmounts.Count > 0)
+                damageAmounts = GameDataHelpers.CombineDamages(damageAmounts, increaseDamageAmounts);
+
             skill.ApplySkill(
                 Entity,
                 skillLevel,
@@ -435,7 +457,8 @@ namespace MultiplayerARPG
             uint targetObjectId = _simulateState.Value.TargetObjectId;
             CharacterItem weapon = Entity.GetAvailableWeapon(ref isLeftHand);
             Dictionary<DamageElement, MinMaxFloat> damageAmounts = skill.GetAttackDamages(Entity, skillLevel, isLeftHand);
-            ApplySkillUsing(skill, skillLevel, isLeftHand, weapon, data.simulateSeed, data.triggerIndex, damageAmounts, targetObjectId, data.aimPosition);
+            Dictionary<DamageElement, MinMaxFloat> increaseDamageAmounts = skill.GetIncreaseDamageByResources(Entity, weapon);
+            ApplySkillUsing(skill, skillLevel, isLeftHand, weapon, data.simulateSeed, data.triggerIndex, damageAmounts, increaseDamageAmounts, targetObjectId, data.aimPosition);
         }
 
         public virtual void UseSkill(int dataId, bool isLeftHand, uint targetObjectId, AimPosition aimPosition)

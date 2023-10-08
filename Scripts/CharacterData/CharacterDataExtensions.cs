@@ -632,26 +632,40 @@ namespace MultiplayerARPG
         #endregion
 
         #region Ammo Functions
-        public static bool DecreaseAmmos(this ICharacterData data, AmmoType ammoType, int amount, out Dictionary<DamageElement, MinMaxFloat> increaseDamages, out Dictionary<CharacterItem, int> decreaseItems)
+        public static Dictionary<DamageElement, MinMaxFloat> GetIncreaseDamagesByAmmo(this ICharacterData data, AmmoType ammoType)
         {
-            increaseDamages = null;
+            CharacterItem tempNonEquipItem;
+            IAmmoItem tempAmmoItemData;
+            for (int i = 0; i < data.NonEquipItems.Count; ++i)
+            {
+                tempNonEquipItem = data.NonEquipItems[i];
+                tempAmmoItemData = tempNonEquipItem.GetAmmoItem();
+                if (tempAmmoItemData != null && tempAmmoItemData.AmmoType == ammoType)
+                    return tempAmmoItemData.GetIncreaseDamages(tempNonEquipItem.level);
+            }
+            return null;
+        }
+
+        public static bool DecreaseAmmos(this ICharacterData data, AmmoType ammoType, int amount, out Dictionary<DamageElement, MinMaxFloat> increaseDamageAmounts, out Dictionary<CharacterItem, int> decreaseItems)
+        {
+            increaseDamageAmounts = null;
             decreaseItems = new Dictionary<CharacterItem, int>();
             if (ammoType == null || amount <= 0)
                 return false;
             Dictionary<int, int> decreasingItemIndexes = new Dictionary<int, int>();
-            CharacterItem nonEquipItem;
-            IAmmoItem ammoItemData;
+            CharacterItem tempNonEquipItem;
+            IAmmoItem tempAmmoItemData;
             int tempDecresingAmount;
-            for (int i = data.NonEquipItems.Count - 1; i >= 0; --i)
+            for (int i = 0; i < data.NonEquipItems.Count; ++i)
             {
-                nonEquipItem = data.NonEquipItems[i];
-                ammoItemData = nonEquipItem.GetAmmoItem();
-                if (ammoItemData != null && ammoItemData.AmmoType == ammoType)
+                tempNonEquipItem = data.NonEquipItems[i];
+                tempAmmoItemData = tempNonEquipItem.GetAmmoItem();
+                if (tempAmmoItemData != null && tempAmmoItemData.AmmoType == ammoType)
                 {
-                    if (increaseDamages == null)
-                        increaseDamages = ammoItemData.GetIncreaseDamages(nonEquipItem.level);
-                    if (amount - nonEquipItem.amount > 0)
-                        tempDecresingAmount = nonEquipItem.amount;
+                    if (increaseDamageAmounts == null)
+                        increaseDamageAmounts = tempAmmoItemData.GetIncreaseDamages(tempNonEquipItem.level);
+                    if (amount - tempNonEquipItem.amount > 0)
+                        tempDecresingAmount = tempNonEquipItem.amount;
                     else
                         tempDecresingAmount = amount;
                     amount -= tempDecresingAmount;
