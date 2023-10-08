@@ -53,9 +53,9 @@ namespace MultiplayerARPG
             return 10f;
         }
 
-        public override bool IsHitValid(HitValidateData hitValidateData, HitData hitData, DamageableHitBox hitBox, string hitId, string hitObjectId, long hitTimestamp)
+        public override bool IsHitValid(HitValidateData hitValidateData, HitRegisterData hitData, DamageableHitBox hitBox)
         {
-            if (!hitValidateData.HitsCount.TryGetValue(hitId, out int hitCount))
+            if (!hitValidateData.HitsCount.TryGetValue(hitData.GetHitId(), out int hitCount))
             {
                 // Set hit count to 0, if it is not in collection
                 hitCount = 0;
@@ -65,7 +65,7 @@ namespace MultiplayerARPG
             return true;
         }
 
-        public override void LaunchDamageEntity(BaseCharacterEntity attacker, bool isLeftHand, CharacterItem weapon, int simulateSeed, byte triggerIndex, byte spreadIndex, Vector3 fireStagger, Dictionary<DamageElement, MinMaxFloat> damageAmounts, BaseSkill skill, int skillLevel, AimPosition aimPosition, DamageOriginPreparedDelegate onOriginPrepared, DamageHitDelegate onHit)
+        public override void LaunchDamageEntity(BaseCharacterEntity attacker, bool isLeftHand, CharacterItem weapon, int simulateSeed, byte triggerIndex, byte spreadIndex, Vector3 fireStagger, Dictionary<DamageElement, MinMaxFloat> damageAmounts, BaseSkill skill, int skillLevel, AimPosition aimPosition)
         {
             bool isClient = attacker.IsClient;
             bool isHost = attacker.IsOwnerHost;
@@ -77,8 +77,16 @@ namespace MultiplayerARPG
             System.Random random = new System.Random(unchecked(simulateSeed + ((triggerIndex + 1) * (spreadIndex + 1) * 16)));
             Vector3 stagger = new Vector3(GenericUtils.RandomFloat(random.Next(), -fireStagger.x, fireStagger.x), GenericUtils.RandomFloat(random.Next(), -fireStagger.y, fireStagger.y));
             this.GetDamagePositionAndRotation(attacker, isLeftHand, aimPosition, stagger, out Vector3 damagePosition, out Vector3 damageDirection, out Quaternion damageRotation);
-            if (onOriginPrepared != null)
-                onOriginPrepared.Invoke(simulateSeed, triggerIndex, spreadIndex, damagePosition, damageDirection, damageRotation);
+            // Prepare hit reg data
+            HitRegisterData hitRegData = new HitRegisterData()
+            {
+                SimulateSeed = simulateSeed,
+                TriggerIndex = triggerIndex,
+                SpreadIndex = spreadIndex,
+                LaunchTimestamp = BaseGameNetworkManager.Singleton.Timestamp,
+                Origin = damagePosition,
+                Direction = damageDirection,
+            };
 
             if (!isOwnedByServer && !isClient)
             {
@@ -174,9 +182,12 @@ namespace MultiplayerARPG
                 if (isHost || isOwnedByServer)
                     tempDamageableHitBox.ReceiveDamage(attacker.EntityTransform.position, instigator, damageAmounts, weapon, skill, skillLevel, simulateSeed);
 
-                // Trigger hit action because it is hitting
-                if (onHit != null)
-                    onHit.Invoke(simulateSeed, triggerIndex, spreadIndex, tempDamageableHitBox.GetObjectId(), tempDamageableHitBox.Index, tempHitPoint);
+                // Prepare hit reg because it is hitting
+                hitRegData.HitTimestamp = BaseGameNetworkManager.Singleton.Timestamp;
+                hitRegData.HitObjectId = tempDamageableHitBox.GetObjectId();
+                hitRegData.HitBoxIndex = tempDamageableHitBox.Index;
+                hitRegData.Destination = tempHitPoint;
+                BaseGameNetworkManager.Singleton.HitRegistrationManager.PrepareHitRegData(hitRegData);
 
                 // Prepare data to instantiate impact effects
                 if (isPlayImpactEffects)

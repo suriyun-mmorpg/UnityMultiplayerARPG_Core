@@ -205,7 +205,7 @@ namespace MultiplayerARPG
 
                 // Prepare hit register validation, it will be used later when receive attack start/end events from clients
                 if (IsServer && !IsOwnerClientOrOwnedByServer)
-                    HitRegistrationManager.PrepareHitRegValidatation(Entity, simulateSeed, _triggerDurations, weaponItem.FireSpread, damageInfo, damageAmounts, weapon, null, 0);
+                    HitRegistrationManager.PrepareHitRegValidation(Entity, simulateSeed, _triggerDurations, weaponItem.FireSpread, damageInfo, damageAmounts, weapon, null, 0);
 
                 float tempTriggerDuration;
                 for (byte triggerIndex = 0; triggerIndex < _triggerDurations.Length; ++triggerIndex)
@@ -321,7 +321,7 @@ namespace MultiplayerARPG
                 if (!Entity.DecreaseAmmos(weapon, isLeftHand, 1, out Dictionary<DamageElement, MinMaxFloat> increaseDamageAmounts))
                     return;
                 // Increase damage with ammo damage
-                if (HitRegistrationManager.IncreasePreparedDamageAmounts(Entity, simulateSeed, increaseDamageAmounts, out Dictionary<DamageElement, MinMaxFloat> resultDamageAmounts))
+                if (HitRegistrationManager.ConfirmHitRegValidation(Entity, simulateSeed, increaseDamageAmounts, out Dictionary<DamageElement, MinMaxFloat> resultDamageAmounts))
                     damageAmounts = resultDamageAmounts;
             }
 
@@ -347,24 +347,8 @@ namespace MultiplayerARPG
                     damageAmounts,
                     null,
                     0,
-                    aimPosition,
-                    OnAttackOriginPrepared,
-                    OnAttackHit);
+                    aimPosition);
             }
-        }
-
-        protected virtual void OnAttackOriginPrepared(int simulateSeed, byte triggerIndex, byte spreadIndex, Vector3 position, Vector3 direction, Quaternion rotation)
-        {
-            if (!IsServer || IsOwnerClientOrOwnedByServer)
-                return;
-            HitRegistrationManager.PrepareHitRegOrigin(Entity, simulateSeed, triggerIndex, spreadIndex, position, direction);
-        }
-
-        protected virtual void OnAttackHit(int simulateSeed, byte triggerIndex, byte spreadIndex, uint objectId, byte hitboxIndex, Vector3 hitPoint)
-        {
-            if (IsServer || !IsOwnerClient)
-                return;
-            HitRegistrationManager.PrepareToRegister(simulateSeed, triggerIndex, spreadIndex, objectId, hitboxIndex, hitPoint);
         }
 
         [ServerRpc]

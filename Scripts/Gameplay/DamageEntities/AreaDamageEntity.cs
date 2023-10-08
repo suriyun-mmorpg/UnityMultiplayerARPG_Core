@@ -50,7 +50,7 @@ namespace MultiplayerARPG
         /// <param name="damageAmounts">Calculated damage amounts</param>
         /// <param name="skill">Skill which was used to attack enemy</param>
         /// <param name="skillLevel">Level of the skill</param>
-        /// <param name="onHit">Action when hit</param>
+        /// <param name="hitRegisterData"></param>
         /// <param name="areaDuration"></param>
         /// <param name="applyDuration"></param>
         public virtual void Setup(
@@ -62,11 +62,11 @@ namespace MultiplayerARPG
             Dictionary<DamageElement, MinMaxFloat> damageAmounts,
             BaseSkill skill,
             int skillLevel,
-            DamageHitDelegate onHit,
+            HitRegisterData hitRegisterData,
             float areaDuration,
             float applyDuration)
         {
-            Setup(instigator, weapon, simulateSeed, triggerIndex, spreadIndex, damageAmounts, skill, skillLevel, onHit);
+            Setup(instigator, weapon, simulateSeed, triggerIndex, spreadIndex, damageAmounts, skill, skillLevel, hitRegisterData);
             PushBack(areaDuration);
             _applyDuration = applyDuration;
             _lastAppliedTime = Time.unscaledTime;

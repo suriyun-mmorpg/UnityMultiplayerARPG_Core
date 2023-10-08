@@ -525,8 +525,6 @@ namespace MultiplayerARPG
         /// <param name="damageAmounts"></param>
         /// <param name="targetObjectId"></param>
         /// <param name="aimPosition"></param>
-        /// <param name="onDamageOriginPrepared">Action when origin prepared</param>
-        /// <param name="onDamageHit">Action when hit</param>
         /// <returns></returns>
         public void ApplySkill(
             BaseCharacterEntity skillUser,
@@ -537,9 +535,7 @@ namespace MultiplayerARPG
             byte triggerIndex,
             Dictionary<DamageElement, MinMaxFloat> damageAmounts,
             uint targetObjectId,
-            AimPosition aimPosition,
-            DamageOriginPreparedDelegate onDamageOriginPrepared,
-            DamageHitDelegate onDamageHit)
+            AimPosition aimPosition)
         {
             if (skillUser == null)
                 return;
@@ -553,7 +549,7 @@ namespace MultiplayerARPG
                 if (!DecreaseAmmos(skillUser, isLeftHand, out Dictionary<DamageElement, MinMaxFloat> increaseDamageAmounts))
                     return;
                 // Increase damage with ammo damage
-                if (HitRegistrationManager.IncreasePreparedDamageAmounts(skillUser, simulateSeed, increaseDamageAmounts, out Dictionary<DamageElement, MinMaxFloat> resultDamageAmounts))
+                if (HitRegistrationManager.ConfirmHitRegValidation(skillUser, simulateSeed, increaseDamageAmounts, out Dictionary<DamageElement, MinMaxFloat> resultDamageAmounts))
                     damageAmounts = resultDamageAmounts;
             }
 
@@ -567,9 +563,7 @@ namespace MultiplayerARPG
                 0,
                 damageAmounts,
                 targetObjectId,
-                aimPosition,
-                onDamageOriginPrepared,
-                onDamageHit);
+                aimPosition);
         }
 
         /// <summary>
@@ -585,8 +579,6 @@ namespace MultiplayerARPG
         /// <param name="damageAmounts"></param>
         /// <param name="targetObjectId"></param>
         /// <param name="aimPosition"></param>
-        /// <param name="onDamageOriginPrepared">Action when origin prepared</param>
-        /// <param name="onDamageHit">Action when hit</param>
         /// <returns></returns>
         protected abstract void ApplySkillImplement(
             BaseCharacterEntity skillUser,
@@ -598,9 +590,7 @@ namespace MultiplayerARPG
             byte spreadIndex,
             Dictionary<DamageElement, MinMaxFloat> damageAmounts,
             uint targetObjectId,
-            AimPosition aimPosition,
-            DamageOriginPreparedDelegate onDamageOriginPrepared,
-            DamageHitDelegate onDamageHit);
+            AimPosition aimPosition);
 
         /// <summary>
         /// Return TRUE if this will override default attack function

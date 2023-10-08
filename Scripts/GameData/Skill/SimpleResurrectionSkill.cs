@@ -30,15 +30,13 @@ namespace MultiplayerARPG
             byte spreadIndex,
             Dictionary<DamageElement, MinMaxFloat> damageAmounts,
             uint targetObjectId,
-            AimPosition aimPosition,
-            DamageOriginPreparedDelegate onDamageOriginPrepared,
-            DamageHitDelegate onDamageHit)
+            AimPosition aimPosition)
         {
             // Resurrect target
             BasePlayerCharacterEntity targetEntity;
             if (!skillUser.CurrentGameManager.TryGetEntityByObjectId(targetObjectId, out targetEntity) || !targetEntity.IsDead())
                 return;
-            
+
             targetEntity.CurrentHp = Mathf.CeilToInt(targetEntity.GetCaches().MaxHp * resurrectHpRate);
             targetEntity.CurrentMp = Mathf.CeilToInt(targetEntity.GetCaches().MaxMp * resurrectMpRate);
             targetEntity.CurrentStamina = Mathf.CeilToInt(targetEntity.GetCaches().MaxStamina * resurrectStaminaRate);
@@ -78,7 +76,7 @@ namespace MultiplayerARPG
         {
             if (!base.CanUse(character, level, isLeftHand, targetObjectId, out gameMessage, isItem))
                 return false;
-            
+
             BasePlayerCharacterEntity targetEntity;
             if (!character.CurrentGameManager.TryGetEntityByObjectId(targetObjectId, out targetEntity) || !targetEntity.IsDead())
                 return false;

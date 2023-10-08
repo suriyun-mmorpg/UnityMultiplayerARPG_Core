@@ -687,6 +687,19 @@ namespace MultiplayerARPG
                 HitRegistrationManager.Register(gameEntity, messageHandler.Reader.Get<HitRegisterMessage>());
         }
 
+        public void SendHitRegistration()
+        {
+            if (HitRegistrationManager.CountHitRegDataList() <= 0)
+                return;
+
+            ClientSendPacket(BaseGameEntity.STATE_DATA_CHANNEL, LiteNetLib.DeliveryMethod.ReliableOrdered, GameNetworkingConsts.HitRegistration, new HitRegisterMessage()
+            {
+                Hits = HitRegistrationManager.GetHitRegDataList(),
+            });
+
+            HitRegistrationManager.ClearHitRegData();
+        }
+
         public virtual void InitPrefabs()
         {
             Assets.offlineScene.SceneName = CurrentGameInstance.HomeSceneName;
