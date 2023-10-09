@@ -1,24 +1,21 @@
 using Cysharp.Text;
-using Cysharp.Threading.Tasks;
 using LiteNetLibManager;
 using System.Collections.Generic;
-using System.Threading;
 using UnityEngine;
 
 namespace MultiplayerARPG
 {
     public partial class DefaultHitRegistrationManager : MonoBehaviour, IHitRegistrationManager
     {
-        public const int DELAY_TO_REMOVE_VALIDATING_DATA = 10 * 1000;
+        public const int MAX_VALIDATE_QUEUE_SIZE = 16;
 
         public float hitValidationBuffer = 2f;
         protected GameObject _hitBoxObject;
         protected Transform _hitBoxTransform;
 
         protected static readonly Dictionary<string, HitValidateData> s_validatingHits = new Dictionary<string, HitValidateData>();
+        protected static readonly Dictionary<uint, Queue<string>> s_removingQueues = new Dictionary<uint, Queue<string>>();
         protected static readonly List<HitRegisterData> s_registeringHits = new List<HitRegisterData>();
-        protected static readonly Dictionary<string, CancellationTokenSource> s_removeValidatingCancellationTokenSources = new Dictionary<string, CancellationTokenSource>();
-        protected static readonly Dictionary<string, CancellationTokenSource> s_removePreparingCancellationTokenSources = new Dictionary<string, CancellationTokenSource>();
 
         void Start()
         {
@@ -33,42 +30,16 @@ namespace MultiplayerARPG
                 Destroy(_hitBoxObject);
         }
 
-        protected static void CreateValidatingData(string id)
+        private void AppendValidatingData(uint objectId, string id, HitValidateData hitValidateData)
         {
-            if (!s_validatingHits.ContainsKey(id))
+            if (!s_removingQueues.ContainsKey(objectId))
+                s_removingQueues[objectId] = new Queue<string>();
+            while (s_removingQueues[objectId].Count >= MAX_VALIDATE_QUEUE_SIZE)
             {
-                s_validatingHits[id] = new HitValidateData();
-                DelayRemoveValidatingData(id);
+                s_validatingHits.Remove(s_removingQueues[objectId].Dequeue());
             }
-        }
-
-        protected static async void DelayRemoveValidatingData(string id)
-        {
-            if (s_removeValidatingCancellationTokenSources.ContainsKey(id))
-                s_removeValidatingCancellationTokenSources[id].Cancel();
-            CancellationTokenSource cancellationTokenSource = new CancellationTokenSource();
-            try
-            {
-                s_removeValidatingCancellationTokenSources[id] = cancellationTokenSource;
-                // Delay x seconds before remove the validating data
-                await UniTask.Delay(DELAY_TO_REMOVE_VALIDATING_DATA, true, PlayerLoopTiming.Update, cancellationTokenSource.Token);
-                s_validatingHits.Remove(id);
-                if (s_removeValidatingCancellationTokenSources.ContainsKey(id))
-                    s_removeValidatingCancellationTokenSources.Remove(id);
-            }
-            catch (System.OperationCanceledException)
-            {
-                // Catch the cancellation
-            }
-            catch (System.Exception ex)
-            {
-                // Other errors
-                Debug.LogException(ex);
-            }
-            finally
-            {
-                cancellationTokenSource.Dispose();
-            }
+            s_removingQueues[objectId].Enqueue(id);
+            s_validatingHits[id] = hitValidateData;
         }
 
         public void PrepareHitRegValidation(BaseGameEntity attacker, int simulateSeed, float[] triggerDurations, byte fireSpread, DamageInfo damageInfo, Dictionary<DamageElement, MinMaxFloat> damageAmounts, CharacterItem weapon, BaseSkill skill, int skillLevel)
@@ -81,23 +52,31 @@ namespace MultiplayerARPG
                 return;
 
             string id = MakeValidateId(attacker.ObjectId, simulateSeed);
-            if (s_validatingHits.ContainsKey(id))
+            bool appending = false;
+            if (!s_validatingHits.TryGetValue(id, out HitValidateData hitValidateData))
             {
-                Logging.LogError($"Cannot prepare validation data, there is already has prepared validation data");
-                return;
+                hitValidateData = new HitValidateData();
+                appending = true;
             }
 
-            s_validatingHits[id] = new HitValidateData()
+            hitValidateData.Attacker = attacker;
+            hitValidateData.TriggerDurations = triggerDurations;
+            hitValidateData.FireSpread = fireSpread;
+            hitValidateData.DamageInfo = damageInfo;
+            hitValidateData.BaseDamageAmounts = damageAmounts;
+            hitValidateData.Weapon = weapon;
+            hitValidateData.Skill = skill;
+            hitValidateData.SkillLevel = skillLevel;
+            if (!appending)
             {
-                Attacker = attacker,
-                TriggerDurations = triggerDurations,
-                FireSpread = fireSpread,
-                DamageInfo = damageInfo,
-                BaseDamageAmounts = damageAmounts,
-                Weapon = weapon,
-                Skill = skill,
-                SkillLevel = skillLevel,
-            };
+                // Just update the data
+                s_validatingHits[id] = hitValidateData;
+            }
+            else
+            {
+                // Addpend new data
+                AppendValidatingData(attacker.ObjectId, id, hitValidateData);
+            }
         }
 
         public void ConfirmHitRegValidation(BaseGameEntity attacker, int simulateSeed, byte triggerIndex, Dictionary<DamageElement, MinMaxFloat> increaseDamageAmounts)
@@ -156,7 +135,11 @@ namespace MultiplayerARPG
             if (!s_validatingHits.TryGetValue(id, out HitValidateData hitValidateData))
             {
                 // No validating data
-                Logging.LogError($"Cannot perform validation, there is no prepared validation data");
+                hitValidateData = new HitValidateData();
+                if (!hitValidateData.Pendings.ContainsKey(hitData.TriggerIndex))
+                    hitValidateData.Pendings[hitData.TriggerIndex] = new List<HitRegisterData>();
+                hitValidateData.Pendings[hitData.TriggerIndex].Add(hitData);
+                AppendValidatingData(attacker.ObjectId, id, hitValidateData);
                 return false;
             }
 
@@ -264,6 +247,7 @@ namespace MultiplayerARPG
         public void ClearData()
         {
             s_validatingHits.Clear();
+            s_removingQueues.Clear();
             s_registeringHits.Clear();
         }
     }
