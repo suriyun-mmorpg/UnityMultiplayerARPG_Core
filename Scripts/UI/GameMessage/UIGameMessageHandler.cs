@@ -22,10 +22,10 @@ namespace MultiplayerARPG
         public Transform messageContainer;
         public float visibleDuration;
 
-        private UITextKeys _lastMessage;
-        private float _lastMessagedTime;
+        protected UITextKeys _lastMessage;
+        protected float _lastMessagedTime;
 
-        private void Awake()
+        protected virtual void Awake()
         {
             if (!rewardExpPrefab)
                 rewardExpPrefab = messagePrefab;
@@ -37,7 +37,7 @@ namespace MultiplayerARPG
                 rewardCurrencyPrefab = messagePrefab;
         }
 
-        private void OnEnable()
+        protected virtual void OnEnable()
         {
             ClientGenericActions.onClientReceiveGameMessage += OnReceiveGameMessage;
             ClientGenericActions.onClientReceiveFormattedGameMessage += OnReceiveFormattedGameMessage;
@@ -47,7 +47,7 @@ namespace MultiplayerARPG
             ClientGenericActions.onNotifyRewardCurrency += OnNotifyRewardCurrency;
         }
 
-        private void OnDisable()
+        protected virtual void OnDisable()
         {
             ClientGenericActions.onClientReceiveGameMessage -= OnReceiveGameMessage;
             ClientGenericActions.onClientReceiveFormattedGameMessage -= OnReceiveFormattedGameMessage;
