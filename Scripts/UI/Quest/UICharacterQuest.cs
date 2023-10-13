@@ -84,75 +84,75 @@ namespace MultiplayerARPG
         public GameObject questIsNotTrackingObject;
         public List<GameObject> questIsNotTrackingObjects = new List<GameObject>();
 
-        private UIList cacheRewardItemList;
+        private UIList _cacheRewardItemList;
         public UIList CacheRewardItemList
         {
             get
             {
-                if (cacheRewardItemList == null)
+                if (_cacheRewardItemList == null)
                 {
-                    cacheRewardItemList = gameObject.AddComponent<UIList>();
-                    cacheRewardItemList.uiPrefab = uiRewardItemPrefab.gameObject;
-                    cacheRewardItemList.uiContainer = uiRewardItemContainer;
+                    _cacheRewardItemList = gameObject.AddComponent<UIList>();
+                    _cacheRewardItemList.uiPrefab = uiRewardItemPrefab.gameObject;
+                    _cacheRewardItemList.uiContainer = uiRewardItemContainer;
                 }
-                return cacheRewardItemList;
+                return _cacheRewardItemList;
             }
         }
 
-        private UIList cacheSelectableRewardItemList;
+        private UIList _cacheSelectableRewardItemList;
         public UIList CacheSelectableRewardItemList
         {
             get
             {
-                if (cacheSelectableRewardItemList == null)
+                if (_cacheSelectableRewardItemList == null)
                 {
-                    cacheSelectableRewardItemList = gameObject.AddComponent<UIList>();
-                    cacheSelectableRewardItemList.uiPrefab = uiRewardItemPrefab.gameObject;
-                    cacheSelectableRewardItemList.uiContainer = uiSelectableRewardItemContainer;
+                    _cacheSelectableRewardItemList = gameObject.AddComponent<UIList>();
+                    _cacheSelectableRewardItemList.uiPrefab = uiRewardItemPrefab.gameObject;
+                    _cacheSelectableRewardItemList.uiContainer = uiSelectableRewardItemContainer;
                 }
-                return cacheSelectableRewardItemList;
+                return _cacheSelectableRewardItemList;
             }
         }
 
-        private UIList cacheRandomRewardItemList;
+        private UIList _cacheRandomRewardItemList;
         public UIList CacheRandomRewardItemList
         {
             get
             {
-                if (cacheRandomRewardItemList == null)
+                if (_cacheRandomRewardItemList == null)
                 {
-                    cacheRandomRewardItemList = gameObject.AddComponent<UIList>();
-                    cacheRandomRewardItemList.uiPrefab = uiRewardItemPrefab.gameObject;
-                    cacheRandomRewardItemList.uiContainer = uiRandomRewardItemContainer;
+                    _cacheRandomRewardItemList = gameObject.AddComponent<UIList>();
+                    _cacheRandomRewardItemList.uiPrefab = uiRewardItemPrefab.gameObject;
+                    _cacheRandomRewardItemList.uiContainer = uiRandomRewardItemContainer;
                 }
-                return cacheRandomRewardItemList;
+                return _cacheRandomRewardItemList;
             }
         }
 
-        private UICharacterItemSelectionManager cacheRewardItemSelectionManager;
+        private UICharacterItemSelectionManager _cacheRewardItemSelectionManager;
         public UICharacterItemSelectionManager CacheRewardItemSelectionManager
         {
             get
             {
-                if (cacheRewardItemSelectionManager == null)
-                    cacheRewardItemSelectionManager = gameObject.GetOrAddComponent<UICharacterItemSelectionManager>();
-                cacheRewardItemSelectionManager.selectionMode = UISelectionMode.SelectSingle;
-                return cacheRewardItemSelectionManager;
+                if (_cacheRewardItemSelectionManager == null)
+                    _cacheRewardItemSelectionManager = gameObject.GetOrAddComponent<UICharacterItemSelectionManager>();
+                _cacheRewardItemSelectionManager.selectionMode = UISelectionMode.SelectSingle;
+                return _cacheRewardItemSelectionManager;
             }
         }
 
-        private UIList cacheQuestTaskList;
+        private UIList _cacheQuestTaskList;
         public UIList CacheQuestTaskList
         {
             get
             {
-                if (cacheQuestTaskList == null)
+                if (_cacheQuestTaskList == null)
                 {
-                    cacheQuestTaskList = gameObject.AddComponent<UIList>();
-                    cacheQuestTaskList.uiPrefab = uiQuestTaskPrefab.gameObject;
-                    cacheQuestTaskList.uiContainer = uiQuestTaskContainer;
+                    _cacheQuestTaskList = gameObject.AddComponent<UIList>();
+                    _cacheQuestTaskList.uiPrefab = uiQuestTaskPrefab.gameObject;
+                    _cacheQuestTaskList.uiContainer = uiQuestTaskContainer;
                 }
-                return cacheQuestTaskList;
+                return _cacheQuestTaskList;
             }
         }
 
@@ -261,7 +261,7 @@ namespace MultiplayerARPG
             if (quest != null && showQuestTaskList)
             {
                 UIQuestTask tempUiQuestTask;
-                CacheQuestTaskList.Generate(quest.tasks, (index, task, ui) =>
+                CacheQuestTaskList.Generate(quest.GetTasks(Data.randomTasksIndex), (index, task, ui) =>
                 {
                     tempUiQuestTask = ui.GetComponent<UIQuestTask>();
                     bool isComplete = false;
@@ -388,7 +388,7 @@ namespace MultiplayerARPG
 
             // Quest tasks
             if (uiQuestTaskRoot != null)
-                uiQuestTaskRoot.SetActive(showQuestTaskList && Quest.tasks.Length > 0);
+                uiQuestTaskRoot.SetActive(showQuestTaskList && Quest.GetTasks(Data.randomTasksIndex).Length > 0);
 
             // Quest status
             foreach (GameObject obj in questOnGoingStatusObjects)

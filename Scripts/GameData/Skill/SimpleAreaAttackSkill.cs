@@ -24,8 +24,10 @@ namespace MultiplayerARPG
         public bool increaseDamageAmountsWithBuffs;
         public bool isDebuff;
         public Buff debuff;
+        public StatusEffectApplying[] attackStatusEffects;
         public HarvestType harvestType;
         public IncrementalMinMaxFloat harvestDamageAmount;
+        public GameEffect[] damageHitEffects;
 
         [Category(4, "Warp Settings")]
         public bool isWarpToAimPosition;
@@ -39,6 +41,14 @@ namespace MultiplayerARPG
                 if (_cacheEffectivenessAttributes == null)
                     _cacheEffectivenessAttributes = GameDataHelpers.CombineDamageEffectivenessAttributes(effectivenessAttributes, new Dictionary<Attribute, float>());
                 return _cacheEffectivenessAttributes;
+            }
+        }
+
+        public override GameEffect[] DamageHitEffects
+        {
+            get
+            {
+                return damageHitEffects;
             }
         }
 
@@ -78,9 +88,11 @@ namespace MultiplayerARPG
             switch (skillAttackType)
             {
                 case SkillAttackType.Normal:
-                    return damageAmount.ToKeyValuePair(skillLevel, 1f, GetEffectivenessDamage(skillUser));
+                    return GameDataHelpers.GetDamageWithEffectiveness(CacheEffectivenessAttributes, skillUser.GetCaches().Attributes, damageAmount.ToKeyValuePair(skillLevel, 1f));
                 case SkillAttackType.BasedOnWeapon:
-                    return skillUser.GetWeaponDamages(ref isLeftHand);
+                    if (isLeftHand && skillUser.GetCaches().LeftHandWeaponDamage.HasValue)
+                        return skillUser.GetCaches().LeftHandWeaponDamage.Value;
+                    return skillUser.GetCaches().RightHandWeaponDamage.Value;
             }
             return new KeyValuePair<DamageElement, MinMaxFloat>();
         }
@@ -110,11 +122,6 @@ namespace MultiplayerARPG
             get { return harvestDamageAmount; }
         }
 
-        protected float GetEffectivenessDamage(ICharacterData skillUser)
-        {
-            return GameDataHelpers.GetEffectivenessDamage(CacheEffectivenessAttributes, skillUser);
-        }
-
         public override bool IsAttack
         {
             get { return true; }
@@ -138,8 +145,15 @@ namespace MultiplayerARPG
         public override void PrepareRelatesData()
         {
             base.PrepareRelatesData();
+            GameInstance.AddStatusEffects(attackStatusEffects);
             areaDamageEntity.InitPrefab();
             GameInstance.AddOtherNetworkObjects(areaDamageEntity.Identity);
+        }
+
+        public override void OnSkillAttackHit(int skillLevel, EntityInfo instigator, CharacterItem weapon, BaseCharacterEntity target)
+        {
+            base.OnSkillAttackHit(skillLevel, instigator, weapon, target);
+            attackStatusEffects.ApplyStatusEffect(skillLevel, instigator, weapon, target);
         }
     }
 }

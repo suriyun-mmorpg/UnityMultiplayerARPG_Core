@@ -450,7 +450,7 @@ namespace MultiplayerARPG
             return waterDecreasePerSeconds > 0 && character.CurrentWater < thirstyWhenWaterLowerThan;
         }
 
-        public override bool RewardExp(BaseCharacterEntity character, Reward reward, float multiplier, RewardGivenType rewardGivenType, int giverLevel, int sourceLevel, out int rewardedExp)
+        public override bool RewardExp(BaseCharacterEntity character, int exp, float multiplier, RewardGivenType rewardGivenType, int giverLevel, int sourceLevel, out int rewardedExp)
         {
             rewardedExp = 0;
             if (character is BaseMonsterCharacterEntity monsterCharacterEntity && monsterCharacterEntity.SummonType != SummonType.PetItem)
@@ -460,7 +460,6 @@ namespace MultiplayerARPG
             }
 
             bool isLevelUp = false;
-            int exp = reward.exp;
             BasePlayerCharacterEntity playerCharacter = character as BasePlayerCharacterEntity;
             if (playerCharacter != null)
             {
@@ -553,7 +552,7 @@ namespace MultiplayerARPG
             return isLevelUp;
         }
 
-        public override void RewardCurrencies(BaseCharacterEntity character, Reward reward, float multiplier, RewardGivenType rewardGivenType, int giverLevel, int sourceLevel, out int rewardedGold)
+        public override void RewardGold(BaseCharacterEntity character, int gold, float multiplier, RewardGivenType rewardGivenType, int giverLevel, int sourceLevel, out int rewardedGold)
         {
             rewardedGold = 0;
             if (character is BaseMonsterCharacterEntity)
@@ -562,7 +561,6 @@ namespace MultiplayerARPG
                 return;
             }
 
-            int gold = reward.gold;
             BasePlayerCharacterEntity playerCharacter = character as BasePlayerCharacterEntity;
             if (playerCharacter != null)
             {
@@ -583,9 +581,21 @@ namespace MultiplayerARPG
                 }
 
                 playerCharacter.Gold = playerCharacter.Gold.Increase(gold);
-                playerCharacter.IncreaseCurrencies(reward.currencies, multiplier);
                 rewardedGold = gold;
             }
+        }
+
+        public override void RewardCurrencies(BaseCharacterEntity character, IEnumerable<CurrencyAmount> currencies, float multiplier, RewardGivenType rewardGivenType, int giverLevel, int sourceLevel)
+        {
+            if (character is BaseMonsterCharacterEntity)
+            {
+                // Don't give reward currencies to monsters
+                return;
+            }
+
+            BasePlayerCharacterEntity playerCharacter = character as BasePlayerCharacterEntity;
+            if (playerCharacter != null)
+                playerCharacter.IncreaseCurrencies(currencies, multiplier);
         }
 
         public override float GetEquipmentStatsRate(CharacterItem characterItem)

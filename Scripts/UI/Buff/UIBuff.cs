@@ -36,7 +36,9 @@ namespace MultiplayerARPG
         public UIAttributeAmounts uiBuffAttributesRate;
         public UIResistanceAmounts uiBuffResistances;
         public UIArmorAmounts uiBuffArmors;
+        public UIArmorAmounts uiBuffArmorsRate;
         public UIDamageElementAmounts uiBuffDamages;
+        public UIDamageElementAmounts uiBuffDamagesRate;
         public UIDamageElementAmounts uiDamageOverTimes;
         [Tooltip("This will activate if buff's disallow move is `TRUE`, developer may set text or icon here")]
         public GameObject disallowMoveObject;
@@ -197,9 +199,25 @@ namespace MultiplayerARPG
                 }
                 else
                 {
+                    uiBuffArmors.displayType = UIArmorAmounts.DisplayType.Simple;
                     uiBuffArmors.isBonus = true;
                     uiBuffArmors.Show();
                     uiBuffArmors.Data = GameDataHelpers.CombineArmors(Buff.increaseArmors, new Dictionary<DamageElement, float>(), Level, 1f);
+                }
+            }
+
+            if (uiBuffArmorsRate != null)
+            {
+                if (Buff.increaseArmorsRate == null || Buff.increaseArmorsRate.Length == 0)
+                {
+                    uiBuffArmorsRate.Hide();
+                }
+                else
+                {
+                    uiBuffArmorsRate.displayType = UIArmorAmounts.DisplayType.Rate;
+                    uiBuffArmorsRate.isBonus = true;
+                    uiBuffArmorsRate.Show();
+                    uiBuffArmorsRate.Data = GameDataHelpers.CombineArmors(Buff.increaseArmorsRate, new Dictionary<DamageElement, float>(), Level, 1f);
                 }
             }
 
@@ -211,9 +229,25 @@ namespace MultiplayerARPG
                 }
                 else
                 {
+                    uiBuffDamages.displayType = UIDamageElementAmounts.DisplayType.Simple;
                     uiBuffDamages.isBonus = true;
                     uiBuffDamages.Show();
                     uiBuffDamages.Data = GameDataHelpers.CombineDamages(Buff.increaseDamages, new Dictionary<DamageElement, MinMaxFloat>(), Level, 1f);
+                }
+            }
+
+            if (uiBuffDamagesRate != null)
+            {
+                if (Buff.increaseDamagesRate == null || Buff.increaseDamagesRate.Length == 0)
+                {
+                    uiBuffDamagesRate.Hide();
+                }
+                else
+                {
+                    uiBuffDamagesRate.displayType = UIDamageElementAmounts.DisplayType.Rate;
+                    uiBuffDamagesRate.isBonus = true;
+                    uiBuffDamagesRate.Show();
+                    uiBuffDamagesRate.Data = GameDataHelpers.CombineDamages(Buff.increaseDamagesRate, new Dictionary<DamageElement, MinMaxFloat>(), Level, 1f);
                 }
             }
 

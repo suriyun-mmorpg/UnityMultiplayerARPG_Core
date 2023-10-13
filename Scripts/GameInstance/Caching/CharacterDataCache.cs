@@ -8,12 +8,18 @@ namespace MultiplayerARPG
         public bool IsRecaching { get; private set; }
         private CharacterStats _stats;
         public CharacterStats Stats => _stats;
-        public Dictionary<Attribute, float> Attributes { get; }
-        public Dictionary<BaseSkill, int> Skills { get; }
-        public Dictionary<DamageElement, float> Resistances { get; }
-        public Dictionary<DamageElement, float> Armors { get; }
-        public Dictionary<DamageElement, MinMaxFloat> IncreaseDamages { get; }
-        public Dictionary<EquipmentSet, int> EquipmentSets { get; }
+        public Dictionary<Attribute, float> Attributes { get; private set; }
+        public Dictionary<DamageElement, float> Resistances { get; private set; }
+        public Dictionary<DamageElement, float> Armors { get; private set; }
+        public Dictionary<DamageElement, MinMaxFloat> RightHandDamages { get; private set; }
+        public KeyValuePair<DamageElement, MinMaxFloat>? RightHandWeaponDamage { get; private set; }
+        public Dictionary<DamageElement, MinMaxFloat> LeftHandDamages { get; private set; }
+        public KeyValuePair<DamageElement, MinMaxFloat>? LeftHandWeaponDamage { get; private set; }
+        public Dictionary<DamageElement, MinMaxFloat> IncreaseDamages { get; private set; }
+        public Dictionary<DamageElement, MinMaxFloat> IncreaseDamagesRate { get; private set; }
+        public Dictionary<BaseSkill, int> Skills { get; private set; }
+        public Dictionary<StatusEffect, float> StatusEffectResistances { get; private set; }
+        public Dictionary<EquipmentSet, int> EquipmentSets { get; private set; }
         public int MaxHp => (int)_stats.hp;
         public int MaxMp => (int)_stats.mp;
         public int MaxStamina => (int)_stats.stamina;
@@ -60,15 +66,122 @@ namespace MultiplayerARPG
             Attributes = new Dictionary<Attribute, float>();
             Resistances = new Dictionary<DamageElement, float>();
             Armors = new Dictionary<DamageElement, float>();
+            RightHandDamages = new Dictionary<DamageElement, MinMaxFloat>();
+            LeftHandDamages = new Dictionary<DamageElement, MinMaxFloat>();
             IncreaseDamages = new Dictionary<DamageElement, MinMaxFloat>();
+            IncreaseDamagesRate = new Dictionary<DamageElement, MinMaxFloat>();
             Skills = new Dictionary<BaseSkill, int>();
+            StatusEffectResistances = new Dictionary<StatusEffect, float>();
             EquipmentSets = new Dictionary<EquipmentSet, int>();
+        }
+
+        ~CharacterDataCache()
+        {
+            Attributes.Clear();
+            Attributes = null;
+            Resistances.Clear();
+            Resistances = null;
+            Armors.Clear();
+            Armors = null;
+            RightHandDamages.Clear();
+            RightHandDamages = null;
+            RightHandWeaponDamage = null;
+            LeftHandDamages.Clear();
+            LeftHandDamages = null;
+            LeftHandWeaponDamage = null;
+            IncreaseDamages.Clear();
+            IncreaseDamages = null;
+            IncreaseDamagesRate.Clear();
+            IncreaseDamagesRate = null;
+            Skills.Clear();
+            Skills = null;
+            StatusEffectResistances.Clear();
+            StatusEffectResistances = null;
+            EquipmentSets.Clear();
+            EquipmentSets = null;
         }
 
         public CharacterDataCache MarkToMakeCaches()
         {
             IsRecaching = true;
             return this;
+        }
+
+        private void SetStats(CharacterStats stats)
+        {
+            _stats = stats;
+        }
+
+        private void SetAttributes(Dictionary<Attribute, float> attributes)
+        {
+            Attributes = null;
+            Attributes = attributes;
+        }
+
+        private void SetResistances(Dictionary<DamageElement, float> resistances)
+        {
+            Resistances = null;
+            Resistances = resistances;
+        }
+
+        private void SetArmors(Dictionary<DamageElement, float> armors)
+        {
+            Armors = null;
+            Armors = armors;
+        }
+
+        private void SetRightHandDamages(Dictionary<DamageElement, MinMaxFloat> rightHandDamages)
+        {
+            RightHandDamages = null;
+            RightHandDamages = rightHandDamages;
+        }
+
+        private void SetRightHandWeaponDamage(KeyValuePair<DamageElement, MinMaxFloat> rightHandDamage)
+        {
+            RightHandWeaponDamage = null;
+            RightHandWeaponDamage = rightHandDamage;
+        }
+
+        private void SetLeftHandDamages(Dictionary<DamageElement, MinMaxFloat> leftHandDamages)
+        {
+            LeftHandDamages = null;
+            LeftHandDamages = leftHandDamages;
+        }
+
+        private void SetLeftHandWeaponDamage(KeyValuePair<DamageElement, MinMaxFloat> leftHandDamage)
+        {
+            LeftHandWeaponDamage = null;
+            LeftHandWeaponDamage = leftHandDamage;
+        }
+
+        private void SetIncreaseDamages(Dictionary<DamageElement, MinMaxFloat> increaseDamages)
+        {
+            IncreaseDamages = null;
+            IncreaseDamages = increaseDamages;
+        }
+
+        private void SetIncreaseDamagesRate(Dictionary<DamageElement, MinMaxFloat> increaseDamagesRate)
+        {
+            IncreaseDamagesRate = null;
+            IncreaseDamagesRate = increaseDamagesRate;
+        }
+
+        private void SetSkills(Dictionary<BaseSkill, int> skills)
+        {
+            Skills = null;
+            Skills = skills;
+        }
+
+        private void SetStatusEffectResistances(Dictionary<StatusEffect, float> statusEffectResistances)
+        {
+            StatusEffectResistances = null;
+            StatusEffectResistances = statusEffectResistances;
+        }
+
+        private void SetEquipmentSets(Dictionary<EquipmentSet, int> equipmentSets)
+        {
+            EquipmentSets = null;
+            EquipmentSets = equipmentSets;
         }
 
         public CharacterDataCache GetCaches(ICharacterData characterData)
@@ -78,17 +191,33 @@ namespace MultiplayerARPG
                 return this;
 
             IsRecaching = false;
+            Attributes.Clear();
+            Resistances.Clear();
+            Armors.Clear();
+            RightHandDamages.Clear();
+            LeftHandDamages.Clear();
+            IncreaseDamages.Clear();
+            IncreaseDamagesRate.Clear();
+            Skills.Clear();
+            StatusEffectResistances.Clear();
+            EquipmentSets.Clear();
+
             int oldBattlePoints = BattlePoints;
 
-            characterData.GetAllStats(
-                ref _stats,
-                Attributes,
-                Resistances,
-                Armors,
-                IncreaseDamages,
-                Skills,
-                EquipmentSets,
-                false);
+            characterData.GetAllStats(true, true, true,
+                SetStats,
+                SetAttributes,
+                SetResistances,
+                SetArmors,
+                SetRightHandDamages,
+                SetRightHandWeaponDamage,
+                SetLeftHandDamages,
+                SetLeftHandWeaponDamage,
+                SetSkills,
+                SetStatusEffectResistances,
+                SetEquipmentSets,
+                onGetIncreasingDamages: SetIncreaseDamages,
+                onGetIncreasingDamagesRate: SetIncreaseDamagesRate);
 
             if (characterData.GetDatabase() != null)
                 BaseMoveSpeed = characterData.GetDatabase().Stats.baseStats.moveSpeed;
@@ -186,11 +315,19 @@ namespace MultiplayerARPG
                 tempTotalBattlePoint += tempDamageElement.ArmorBattlePointScore * amount;
             }
 
-            foreach (DamageElement tempDamageElement in IncreaseDamages.Keys)
+            foreach (DamageElement tempDamageElement in RightHandDamages.Keys)
             {
                 if (tempDamageElement == null)
                     continue;
-                MinMaxFloat amount = IncreaseDamages[tempDamageElement];
+                MinMaxFloat amount = RightHandDamages[tempDamageElement];
+                tempTotalBattlePoint += tempDamageElement.DamageBattlePointScore * (amount.min + amount.max) * 0.5f;
+            }
+
+            foreach (DamageElement tempDamageElement in LeftHandDamages.Keys)
+            {
+                if (tempDamageElement == null)
+                    continue;
+                MinMaxFloat amount = LeftHandDamages[tempDamageElement];
                 tempTotalBattlePoint += tempDamageElement.DamageBattlePointScore * (amount.min + amount.max) * 0.5f;
             }
 
@@ -229,10 +366,11 @@ namespace MultiplayerARPG
                 IsLeftHandItemAvailable = true;
                 LeftHandItem = characterData.EquipWeapons.leftHand;
             }
-            if (!IsRightHandItemAvailable && !IsRightHandItemAvailable)
+            if (!IsLeftHandItemAvailable && !IsRightHandItemAvailable)
             {
+                // This one might be a monster character, so create a fake weapon item data
                 IsRightHandItemAvailable = true;
-                RightHandItem = CharacterItem.Create(GameInstance.Singleton.DefaultWeaponItem.DataId);
+                RightHandItem = CharacterItem.CreateDefaultWeapon();
             }
 
             return this;
@@ -286,21 +424,6 @@ namespace MultiplayerARPG
             return 0f;
         }
 
-        public int GetSkill(string nameId)
-        {
-            return GetSkill(nameId.GenerateHashId());
-        }
-
-        public int GetSkill(int dataId)
-        {
-            BaseSkill data;
-            int result;
-            if (GameInstance.Skills.TryGetValue(dataId, out data) &&
-                Skills.TryGetValue(data, out result))
-                return result;
-            return 0;
-        }
-
         public float GetResistance(string nameId)
         {
             return GetResistance(nameId.GenerateHashId());
@@ -331,19 +454,64 @@ namespace MultiplayerARPG
             return 0f;
         }
 
-        public MinMaxFloat GetIncreaseDamage(string nameId)
+        public MinMaxFloat GetRightHandDamages(string nameId)
         {
-            return GetIncreaseDamage(nameId.GenerateHashId());
+            return GetRightHandDamages(nameId.GenerateHashId());
         }
 
-        public MinMaxFloat GetIncreaseDamage(int dataId)
+        public MinMaxFloat GetRightHandDamages(int dataId)
         {
             DamageElement data;
             MinMaxFloat result;
             if (GameInstance.DamageElements.TryGetValue(dataId, out data) &&
-                IncreaseDamages.TryGetValue(data, out result))
+                RightHandDamages.TryGetValue(data, out result))
                 return result;
-            return default(MinMaxFloat);
+            return default;
+        }
+
+        public MinMaxFloat GetLeftHandDamages(string nameId)
+        {
+            return GetLeftHandDamages(nameId.GenerateHashId());
+        }
+
+        public MinMaxFloat GetLeftHandDamages(int dataId)
+        {
+            DamageElement data;
+            MinMaxFloat result;
+            if (GameInstance.DamageElements.TryGetValue(dataId, out data) &&
+                LeftHandDamages.TryGetValue(data, out result))
+                return result;
+            return default;
+        }
+
+        public int GetSkill(string nameId)
+        {
+            return GetSkill(nameId.GenerateHashId());
+        }
+
+        public int GetSkill(int dataId)
+        {
+            BaseSkill data;
+            int result;
+            if (GameInstance.Skills.TryGetValue(dataId, out data) &&
+                Skills.TryGetValue(data, out result))
+                return result;
+            return 0;
+        }
+
+        public float GetStatusEffectResistance(string nameId)
+        {
+            return GetStatusEffectResistance(nameId.GenerateHashId());
+        }
+
+        public float GetStatusEffectResistance(int dataId)
+        {
+            StatusEffect data;
+            float result;
+            if (GameInstance.StatusEffects.TryGetValue(dataId, out data) &&
+                StatusEffectResistances.TryGetValue(data, out result))
+                return result;
+            return 0f;
         }
 
         public int GetEquipmentSet(string nameId)

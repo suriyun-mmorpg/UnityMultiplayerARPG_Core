@@ -73,11 +73,32 @@ namespace MultiplayerARPG
             return GameDataHelpers.CombineArmors(buff.increaseArmors, result, level, 1f);
         }
 
+        public static Dictionary<DamageElement, float> GetIncreaseArmorsRate(this Buff buff, int level, Dictionary<DamageElement, float> result = null)
+        {
+            if (result == null)
+                result = new Dictionary<DamageElement, float>();
+            return GameDataHelpers.CombineArmors(buff.increaseArmorsRate, result, level, 1f);
+        }
+
         public static Dictionary<DamageElement, MinMaxFloat> GetIncreaseDamages(this Buff buff, int level, Dictionary<DamageElement, MinMaxFloat> result = null)
         {
             if (result == null)
                 result = new Dictionary<DamageElement, MinMaxFloat>();
             return GameDataHelpers.CombineDamages(buff.increaseDamages, result, level, 1f);
+        }
+
+        public static Dictionary<DamageElement, MinMaxFloat> GetIncreaseDamagesRate(this Buff buff, int level, Dictionary<DamageElement, MinMaxFloat> result = null)
+        {
+            if (result == null)
+                result = new Dictionary<DamageElement, MinMaxFloat>();
+            return GameDataHelpers.CombineDamages(buff.increaseDamagesRate, result, level, 1f);
+        }
+
+        public static Dictionary<StatusEffect, float> GetIncreaseStatusEffectResistances(this Buff buff, int level, Dictionary<StatusEffect, float> result = null)
+        {
+            if (result == null)
+                result = new Dictionary<StatusEffect, float>();
+            return GameDataHelpers.CombineStatusEffectResistances(buff.increaseStatusEffectResistances, result, level, 1f);
         }
 
         public static Dictionary<DamageElement, MinMaxFloat> GetDamageOverTimes(this Buff buff, int level, Dictionary<DamageElement, MinMaxFloat> result = null)

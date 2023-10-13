@@ -1,5 +1,6 @@
 ﻿using Cysharp.Threading.Tasks;
 using LiteNetLibManager;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace MultiplayerARPG
@@ -509,6 +510,27 @@ namespace MultiplayerARPG
             {
                 message = gameMessage,
             });
+        }
+
+        public async UniTaskVoid HandleRequestSortItems(RequestHandlerData requestHandler, RequestSortItemsMessage request, RequestProceedResultDelegate<ResponseSortItemsMessage> result)
+        {
+            await UniTask.Yield();
+            if (!GameInstance.ServerUserHandlers.TryGetPlayerCharacter(requestHandler.ConnectionId, out IPlayerCharacterData playerCharacter))
+            {
+                result.InvokeError(new ResponseSortItemsMessage()
+                {
+                    message = UITextKeys.UI_ERROR_NOT_LOGGED_IN,
+                });
+                return;
+            }
+
+            BasePlayerCharacterEntity playerCharacterEntity = playerCharacter as BasePlayerCharacterEntity;
+            List<CharacterItem> nonEquipItems = new List<CharacterItem>(playerCharacterEntity.NonEquipItems);
+            nonEquipItems.Sort(new CharacterItemSort());
+            if (!request.asc)
+                nonEquipItems.Reverse();
+            playerCharacterEntity.NonEquipItems = nonEquipItems;
+            result.InvokeSuccess(new ResponseSortItemsMessage());
         }
     }
 }

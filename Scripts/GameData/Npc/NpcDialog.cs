@@ -165,7 +165,7 @@ namespace MultiplayerARPG
 
         public override async UniTaskVoid RenderUI(UINpcDialog uiNpcDialog)
         {
-            BasePlayerCharacterEntity owningCharacter = GameInstance.PlayingCharacterEntity;
+            BasePlayerCharacterEntity playingCharacter = GameInstance.PlayingCharacterEntity;
             BaseItem craftingItem = null;
 
             if (uiNpcDialog.uiSellItemRoot != null)
@@ -191,7 +191,7 @@ namespace MultiplayerARPG
                     for (int i = 0; i < menus.Length; ++i)
                     {
                         NpcDialogMenu menu = menus[i];
-                        if (await menu.IsPassConditions(owningCharacter))
+                        if (await menu.IsPassConditions(playingCharacter))
                         {
                             UINpcDialogMenuAction menuAction = new UINpcDialogMenuAction();
                             menuAction.title = menu.Title;
@@ -230,14 +230,22 @@ namespace MultiplayerARPG
                             completeMenuAction.menuIndex = QUEST_COMPLETE_MENU_INDEX;
 
                             CharacterQuest characterQuest;
-                            int index = owningCharacter.IndexOfQuest(quest.DataId);
+                            int index = playingCharacter.IndexOfQuest(quest.DataId);
                             if (index >= 0)
                             {
-                                characterQuest = owningCharacter.Quests[index];
-                                if (!characterQuest.IsAllTasksDoneAndIsCompletingTarget(owningCharacter, owningCharacter.GetTargetEntity() as NpcEntity))
-                                    menuActions.Add(abandonMenuAction);
-                                else
-                                    menuActions.Add(completeMenuAction);
+                                characterQuest = playingCharacter.Quests[index];
+                                if (!characterQuest.isComplete)
+                                {
+                                    if (!characterQuest.IsAllTasksDoneAndIsCompletingTarget(playingCharacter, playingCharacter.GetTargetEntity() as NpcEntity))
+                                        menuActions.Add(abandonMenuAction);
+                                    else
+                                        menuActions.Add(completeMenuAction);
+                                }
+                                else if (playingCharacter.Quests[index].GetQuest().CanReceiveQuest(playingCharacter))
+                                {
+                                    menuActions.Add(acceptMenuAction);
+                                    menuActions.Add(declineMenuAction);
+                                }
                             }
                             else
                             {
@@ -245,7 +253,7 @@ namespace MultiplayerARPG
                                 menuActions.Add(acceptMenuAction);
                                 menuActions.Add(declineMenuAction);
                             }
-                            uiNpcDialog.uiCharacterQuest.Setup(characterQuest, owningCharacter, index);
+                            uiNpcDialog.uiCharacterQuest.Setup(characterQuest, playingCharacter, index);
                         }
                         uiNpcDialog.uiCharacterQuest.Show();
                     }

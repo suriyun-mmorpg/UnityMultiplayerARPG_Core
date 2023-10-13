@@ -158,7 +158,7 @@ namespace MultiplayerARPG
                         attackerCharacter.IncreaseItems(CharacterItem.Create(itemDataId, 1, itemAmount));
                         attackerCharacter.FillEmptySlots();
                     }
-                    attackerCharacter.RewardExp(new Reward() { exp = (int)(harvestable.expPerDamage * calculatingTotalDamage) }, 1, RewardGivenType.Harvestable, 1, 1);
+                    attackerCharacter.RewardExp((int)(harvestable.expPerDamage * calculatingTotalDamage), 1, RewardGivenType.Harvestable, 1, 1);
                 }
                 else
                 {
@@ -167,7 +167,7 @@ namespace MultiplayerARPG
                 }
 
                 if (droppingToGround)
-                    ItemDropEntity.DropItem(this, RewardGivenType.Harvestable, CharacterItem.Create(itemDataId, 1, itemAmount), new string[0]);
+                    ItemDropEntity.Drop(this, RewardGivenType.Harvestable, CharacterItem.Create(itemDataId, 1, itemAmount), new string[0]);
             }
             // Apply damages
             combatAmountType = CombatAmountType.NormalDamage;
@@ -182,11 +182,6 @@ namespace MultiplayerARPG
             base.ReceivedDamage(position, fromPosition, instigator, damageAmounts, combatAmountType, totalDamage, weapon, skill, skillLevel, buff, isDamageOverTime);
             instigator.TryGetEntity(out BaseCharacterEntity attackerCharacter);
             CurrentGameInstance.GameplayRule.OnHarvestableReceivedDamage(attackerCharacter, this, combatAmountType, totalDamage, weapon, skill, skillLevel, buff, isDamageOverTime);
-
-            if (combatAmountType == CombatAmountType.Miss)
-                return;
-
-            // Do something when entity dead
             if (this.IsDead())
                 DestroyAndRespawn();
         }

@@ -26,46 +26,70 @@ namespace MultiplayerARPG
         private StatusEffect _cacheStatusEffect;
         [System.NonSerialized]
         private CalculatedBuff _cacheBuff = new CalculatedBuff();
+        [System.NonSerialized]
+        private bool _recachingBuff = false;
 
         [JsonIgnore]
         public EntityInfo BuffApplier { get; private set; }
         [JsonIgnore]
         public CharacterItem BuffApplierWeapon { get; private set; }
 
-        private void MakeCache()
+        ~CharacterBuff()
         {
-            if (_dirtyDataId == dataId && _dirtyType == type && _dirtyLevel == level)
-                return;
-            _dirtyType = type;
-            _dirtyDataId = dataId;
-            _dirtyLevel = level;
-            _cacheKey = ZString.Concat(type, "_", dataId);
+            ClearCachedData();
+            _cacheBuff = null;
+            BuffApplierWeapon = null;
+        }
+
+        private void ClearCachedData()
+        {
+            _cacheKey = null;
             _cacheSkill = null;
             _cacheItem = null;
             _cacheGuildSkill = null;
             _cacheStatusEffect = null;
-            Buff tempBuff = Buff.Empty;
+        }
+
+        private bool IsRecaching()
+        {
+            return _dirtyDataId != dataId || _dirtyType != type || _dirtyLevel != level;
+        }
+
+        private void MakeAsCached()
+        {
+            _dirtyType = type;
+            _dirtyDataId = dataId;
+            _dirtyLevel = level;
+        }
+
+        private void MakeCache()
+        {
+            if (!IsRecaching())
+                return;
+            MakeAsCached();
+            ClearCachedData();
+            _recachingBuff = true;
+            _cacheKey = ZString.Concat(type, "_", dataId);
             switch (type)
             {
                 case BuffType.SkillBuff:
                 case BuffType.SkillDebuff:
-                    if (GameInstance.Skills.TryGetValue(dataId, out _cacheSkill) && _cacheSkill != null)
-                        tempBuff = type == BuffType.SkillBuff ? _cacheSkill.Buff : _cacheSkill.Debuff;
+                    if (!GameInstance.Skills.TryGetValue(dataId, out _cacheSkill))
+                        _cacheSkill = null;
                     break;
                 case BuffType.PotionBuff:
-                    if (GameInstance.Items.TryGetValue(dataId, out _cacheItem) && _cacheItem != null && _cacheItem.IsPotion())
-                        tempBuff = (_cacheItem as IPotionItem).Buff;
+                    if (!GameInstance.Items.TryGetValue(dataId, out _cacheItem))
+                        _cacheItem = null;
                     break;
                 case BuffType.GuildSkillBuff:
-                    if (GameInstance.GuildSkills.TryGetValue(dataId, out _cacheGuildSkill) && _cacheGuildSkill != null)
-                        tempBuff = _cacheGuildSkill.Buff;
+                    if (!GameInstance.GuildSkills.TryGetValue(dataId, out _cacheGuildSkill))
+                        _cacheGuildSkill = null;
                     break;
                 case BuffType.StatusEffect:
-                    if (GameInstance.StatusEffects.TryGetValue(dataId, out _cacheStatusEffect) && _cacheStatusEffect != null)
-                        tempBuff = _cacheStatusEffect.Buff;
+                    if (!GameInstance.StatusEffects.TryGetValue(dataId, out _cacheStatusEffect))
+                        _cacheStatusEffect = null;
                     break;
             }
-            _cacheBuff.Build(tempBuff, level);
         }
 
         public BaseSkill GetSkill()
@@ -95,6 +119,32 @@ namespace MultiplayerARPG
         public CalculatedBuff GetBuff()
         {
             MakeCache();
+            if (_recachingBuff)
+            {
+                _recachingBuff = false;
+                Buff tempBuff = Buff.Empty;
+                switch (type)
+                {
+                    case BuffType.SkillBuff:
+                    case BuffType.SkillDebuff:
+                        if (_cacheSkill != null)
+                            tempBuff = type == BuffType.SkillBuff ? _cacheSkill.Buff : _cacheSkill.Debuff;
+                        break;
+                    case BuffType.PotionBuff:
+                        if (_cacheItem != null && _cacheItem.IsPotion())
+                            tempBuff = (_cacheItem as IPotionItem).Buff;
+                        break;
+                    case BuffType.GuildSkillBuff:
+                        if (_cacheGuildSkill != null)
+                            tempBuff = _cacheGuildSkill.Buff;
+                        break;
+                    case BuffType.StatusEffect:
+                        if (_cacheStatusEffect != null)
+                            tempBuff = _cacheStatusEffect.Buff;
+                        break;
+                }
+                _cacheBuff.Build(tempBuff, level);
+            }
             return _cacheBuff;
         }
 

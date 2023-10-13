@@ -57,13 +57,25 @@ namespace MultiplayerARPG
         /// </summary>
         ArmorIncremental[] IncreaseArmors { get; }
         /// <summary>
+        /// Increasing armors rate stats while equipping this item
+        /// </summary>
+        ArmorIncremental[] IncreaseArmorsRate { get; }
+        /// <summary>
         /// Increasing damages stats while equipping this item
         /// </summary>
         DamageIncremental[] IncreaseDamages { get; }
         /// <summary>
+        /// Increasing damages rate stats while equipping this item
+        /// </summary>
+        DamageIncremental[] IncreaseDamagesRate { get; }
+        /// <summary>
         /// Increasing skills while equipping this item
         /// </summary>
         SkillIncremental[] IncreaseSkills { get; }
+        /// <summary>
+        /// Increasing status effect resistances while equipping this item
+        /// </summary>
+        StatusEffectResistanceIncremental[] IncreaseStatusEffectResistances { get; }
         /// <summary>
         /// Status effects that can be applied to the attacker when attacking
         /// </summary>

@@ -24,27 +24,9 @@ namespace MultiplayerARPG
                     GameInstance.AddDamageElements(effect.armors);
                     GameInstance.AddDamageElements(effect.damages);
                     GameInstance.AddSkills(effect.skills);
+                    GameInstance.AddStatusEffects(effect.statusEffectResistances);
                 }
             }
         }
-    }
-
-    [System.Serializable]
-    public struct EquipmentBonus
-    {
-        public CharacterStats stats;
-        public CharacterStats statsRate;
-        [ArrayElementTitle("attribute")]
-        public AttributeAmount[] attributes;
-        [ArrayElementTitle("attribute")]
-        public AttributeAmount[] attributesRate;
-        [ArrayElementTitle("damageElement")]
-        public ResistanceAmount[] resistances;
-        [ArrayElementTitle("damageElement")]
-        public ArmorAmount[] armors;
-        [ArrayElementTitle("damageElement")]
-        public DamageAmount[] damages;
-        [ArrayElementTitle("skill")]
-        public SkillLevel[] skills;
     }
 }

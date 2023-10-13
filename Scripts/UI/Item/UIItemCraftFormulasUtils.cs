@@ -22,13 +22,14 @@ namespace MultiplayerARPG
                     // Skip empty data
                     continue;
                 }
-                if (filterCategories.Count == 0 || (string.IsNullOrEmpty(entry.Category) && string.IsNullOrEmpty(entry.ItemCraft.CraftingItem.Category)) ||
-                    (!string.IsNullOrEmpty(entry.Category) && filterCategories.Contains(entry.Category.Trim().ToLower())) ||
-                    (!string.IsNullOrEmpty(entry.ItemCraft.CraftingItem.Category)) && filterCategories.Contains(entry.ItemCraft.CraftingItem.Category.Trim().ToLower()))
+                string formulaCategory = (string.IsNullOrEmpty(entry.Category) ? string.Empty : entry.Category).Trim().ToLower();
+                string itemCraftCategory = (string.IsNullOrEmpty(entry.ItemCraft.CraftingItem.Category) ? string.Empty : entry.ItemCraft.CraftingItem.Category).Trim().ToLower();
+                if (filterCategories.Count > 0 && !filterCategories.Contains(formulaCategory) && !filterCategories.Contains(itemCraftCategory))
                 {
                     // Category filtering
-                    result.Add(entry);
+                    continue;
                 }
+                result.Add(entry);
             }
             return result;
         }

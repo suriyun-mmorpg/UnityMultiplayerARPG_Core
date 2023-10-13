@@ -24,20 +24,24 @@ namespace MultiplayerARPG
         public TextWrapper uiTextAllAmounts;
         public UIItemTextPair[] textAmounts;
 
+        [Header("List UI Elements")]
+        public UICharacterItem uiEntryPrefab;
+        public Transform uiListContainer;
+
         [Header("Options")]
         public DisplayType displayType;
         public bool isBonus;
         public bool inactiveIfAmountZero;
         public bool useSimpleFormatIfAmountEnough = true;
 
-        private Dictionary<BaseItem, UIItemTextPair> cacheTextAmounts;
+        private Dictionary<BaseItem, UIItemTextPair> _cacheTextAmounts;
         public Dictionary<BaseItem, UIItemTextPair> CacheTextAmounts
         {
             get
             {
-                if (cacheTextAmounts == null)
+                if (_cacheTextAmounts == null)
                 {
-                    cacheTextAmounts = new Dictionary<BaseItem, UIItemTextPair>();
+                    _cacheTextAmounts = new Dictionary<BaseItem, UIItemTextPair>();
                     BaseItem tempData;
                     foreach (UIItemTextPair componentPair in textAmounts)
                     {
@@ -45,10 +49,26 @@ namespace MultiplayerARPG
                             continue;
                         tempData = componentPair.item;
                         SetDefaultValue(componentPair);
-                        cacheTextAmounts[tempData] = componentPair;
+                        _cacheTextAmounts[tempData] = componentPair;
                     }
                 }
-                return cacheTextAmounts;
+                return _cacheTextAmounts;
+            }
+        }
+
+
+        private UIList _cacheList;
+        public UIList CacheList
+        {
+            get
+            {
+                if (_cacheList == null)
+                {
+                    _cacheList = gameObject.AddComponent<UIList>();
+                    _cacheList.uiPrefab = uiEntryPrefab.gameObject;
+                    _cacheList.uiContainer = uiListContainer;
+                }
+                return _cacheList;
             }
         }
 
@@ -139,6 +159,7 @@ namespace MultiplayerARPG
                     }
                 }
             }
+            UpdateList();
         }
 
         private void SetDefaultValue(UIItemTextPair componentPair)
@@ -172,6 +193,19 @@ namespace MultiplayerARPG
                 componentPair.imageIcon.sprite = componentPair.item.Icon;
             if (inactiveIfAmountZero && componentPair.root != null)
                 componentPair.root.SetActive(false);
+        }
+
+        private void UpdateList()
+        {
+            if (uiEntryPrefab == null || uiListContainer == null)
+                return;
+            CacheList.HideAll();
+            UICharacterItem tempUI;
+            CacheList.Generate(Data, (index, data, ui) =>
+            {
+                tempUI = ui.GetComponent<UICharacterItem>();
+                tempUI.Data = new UICharacterItemData(CharacterItem.Create(data.Key, 1, data.Value), InventoryType.Unknow);
+            });
         }
     }
 }

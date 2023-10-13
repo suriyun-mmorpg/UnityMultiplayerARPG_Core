@@ -233,7 +233,7 @@ namespace MultiplayerARPG
             characterData.CloneTo(savingData);
             if (string.IsNullOrEmpty(savingData.Id))
                 return;
-            savingData.LastUpdate = System.DateTimeOffset.Now.ToUnixTimeSeconds();
+            savingData.LastUpdate = System.DateTimeOffset.UtcNow.ToUnixTimeSeconds();
             BinaryFormatter binaryFormatter = new BinaryFormatter();
             SurrogateSelector surrogateSelector = new SurrogateSelector();
             surrogateSelector.AddAllUnitySurrogate();
@@ -370,7 +370,7 @@ namespace MultiplayerARPG
             {
                 characterAttribute = characterData.Attributes[i];
                 attribute = characterAttribute.GetAttribute();
-                if (attribute.cannotReset)
+                if (attribute.CannotReset)
                     continue;
                 countStatPoint += characterAttribute.amount;
                 characterData.Attributes.RemoveAt(i);

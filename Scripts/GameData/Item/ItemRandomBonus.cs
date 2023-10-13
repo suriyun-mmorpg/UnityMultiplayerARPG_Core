@@ -13,7 +13,9 @@ namespace MultiplayerARPG
         public AttributeRandomAmount[] randomAttributeAmountRates;
         public ResistanceRandomAmount[] randomResistanceAmounts;
         public ArmorRandomAmount[] randomArmorAmounts;
+        public ArmorRandomAmount[] randomArmorAmountRates;
         public DamageRandomAmount[] randomDamageAmounts;
+        public DamageRandomAmount[] randomDamageAmountRates;
         public SkillRandomLevel[] randomSkillLevels;
 
         public void PrepareRelatesData()
@@ -22,7 +24,9 @@ namespace MultiplayerARPG
             GameInstance.AddAttributes(randomAttributeAmountRates);
             GameInstance.AddDamageElements(randomResistanceAmounts);
             GameInstance.AddDamageElements(randomArmorAmounts);
+            GameInstance.AddDamageElements(randomArmorAmountRates);
             GameInstance.AddDamageElements(randomDamageAmounts);
+            GameInstance.AddDamageElements(randomDamageAmountRates);
             GameInstance.AddSkills(randomSkillLevels);
         }
     }

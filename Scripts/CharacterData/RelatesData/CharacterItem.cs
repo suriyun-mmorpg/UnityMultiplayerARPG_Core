@@ -5,6 +5,8 @@ namespace MultiplayerARPG
 {
     public partial class CharacterItem
     {
+        public const byte CURRENT_VERSION = 1;
+
         [System.NonSerialized]
         private int _dirtyDataId;
         [System.NonSerialized]
@@ -42,14 +44,17 @@ namespace MultiplayerARPG
         private ISkillItem _cacheSkillItem;
         [System.NonSerialized]
         private CalculatedItemBuff _cacheBuff = new CalculatedItemBuff();
+        [System.NonSerialized]
+        private bool _recachingBuff = false;
 
-        private void MakeCache()
+        ~CharacterItem()
         {
-            if (_dirtyDataId == dataId && _dirtyLevel == level && _dirtyRandomSeed == randomSeed)
-                return;
-            _dirtyDataId = dataId;
-            _dirtyLevel = level;
-            _dirtyRandomSeed = randomSeed;
+            ClearCachedData();
+            _cacheBuff = null;
+        }
+
+        private void ClearCachedData()
+        {
             _cacheItem = null;
             _cacheUsableItem = null;
             _cacheEquipmentItem = null;
@@ -64,36 +69,55 @@ namespace MultiplayerARPG
             _cacheSocketEnhancerItem = null;
             _cacheMountItem = null;
             _cacheSkillItem = null;
-            if (GameInstance.Items.TryGetValue(dataId, out _cacheItem) && _cacheItem != null)
-            {
-                if (_cacheItem.IsUsable())
-                    _cacheUsableItem = _cacheItem as IUsableItem;
-                if (_cacheItem.IsEquipment())
-                    _cacheEquipmentItem = _cacheItem as IEquipmentItem;
-                if (_cacheItem.IsDefendEquipment())
-                    _cacheDefendItem = _cacheItem as IDefendEquipmentItem;
-                if (_cacheItem.IsArmor())
-                    _cacheArmorItem = _cacheItem as IArmorItem;
-                if (_cacheItem.IsWeapon())
-                    _cacheWeaponItem = _cacheItem as IWeaponItem;
-                if (_cacheItem.IsShield())
-                    _cacheShieldItem = _cacheItem as IShieldItem;
-                if (_cacheItem.IsPotion())
-                    _cachePotionItem = _cacheItem as IPotionItem;
-                if (_cacheItem.IsAmmo())
-                    _cacheAmmoItem = _cacheItem as IAmmoItem;
-                if (_cacheItem.IsBuilding())
-                    _cacheBuildingItem = _cacheItem as IBuildingItem;
-                if (_cacheItem.IsPet())
-                    _cachePetItem = _cacheItem as IPetItem;
-                if (_cacheItem.IsSocketEnhancer())
-                    _cacheSocketEnhancerItem = _cacheItem as ISocketEnhancerItem;
-                if (_cacheItem.IsMount())
-                    _cacheMountItem = _cacheItem as IMountItem;
-                if (_cacheItem.IsSkill())
-                    _cacheSkillItem = _cacheItem as ISkillItem;
-            }
-            _cacheBuff.Build(_cacheEquipmentItem, level, randomSeed);
+        }
+
+        private bool IsRecaching()
+        {
+            return _dirtyDataId != dataId || _dirtyLevel != level || _dirtyRandomSeed != randomSeed;
+        }
+
+        private void MakeAsCached()
+        {
+            _dirtyDataId = dataId;
+            _dirtyLevel = level;
+            _dirtyRandomSeed = randomSeed;
+        }
+
+        private void MakeCache()
+        {
+            if (!IsRecaching())
+                return;
+            MakeAsCached();
+            ClearCachedData();
+            _recachingBuff = true;
+            if (!GameInstance.Items.TryGetValue(dataId, out _cacheItem) || _cacheItem == null)
+                return;
+            if (_cacheItem.IsUsable())
+                _cacheUsableItem = _cacheItem as IUsableItem;
+            if (_cacheItem.IsEquipment())
+                _cacheEquipmentItem = _cacheItem as IEquipmentItem;
+            if (_cacheItem.IsDefendEquipment())
+                _cacheDefendItem = _cacheItem as IDefendEquipmentItem;
+            if (_cacheItem.IsArmor())
+                _cacheArmorItem = _cacheItem as IArmorItem;
+            if (_cacheItem.IsWeapon())
+                _cacheWeaponItem = _cacheItem as IWeaponItem;
+            if (_cacheItem.IsShield())
+                _cacheShieldItem = _cacheItem as IShieldItem;
+            if (_cacheItem.IsPotion())
+                _cachePotionItem = _cacheItem as IPotionItem;
+            if (_cacheItem.IsAmmo())
+                _cacheAmmoItem = _cacheItem as IAmmoItem;
+            if (_cacheItem.IsBuilding())
+                _cacheBuildingItem = _cacheItem as IBuildingItem;
+            if (_cacheItem.IsPet())
+                _cachePetItem = _cacheItem as IPetItem;
+            if (_cacheItem.IsSocketEnhancer())
+                _cacheSocketEnhancerItem = _cacheItem as ISocketEnhancerItem;
+            if (_cacheItem.IsMount())
+                _cacheMountItem = _cacheItem as IMountItem;
+            if (_cacheItem.IsSkill())
+                _cacheSkillItem = _cacheItem as ISkillItem;
         }
 
         public BaseItem GetItem()
@@ -267,27 +291,19 @@ namespace MultiplayerARPG
             return item.GetArmorAmount(level, GetEquipmentStatsRate());
         }
 
-        public KeyValuePair<DamageElement, MinMaxFloat> GetDamageAmount(ICharacterData characterData)
+        public KeyValuePair<DamageElement, MinMaxFloat> GetDamageAmount()
         {
             IWeaponItem item = GetWeaponItem();
             if (item == null)
                 return new KeyValuePair<DamageElement, MinMaxFloat>();
-            return item.GetDamageAmount(level, GetEquipmentStatsRate(), characterData);
-        }
-
-        public KeyValuePair<DamageElement, MinMaxFloat> GetPureDamageAmount()
-        {
-            IWeaponItem item = GetWeaponItem();
-            if (item == null)
-                return new KeyValuePair<DamageElement, MinMaxFloat>();
-            return item.GetDamageAmount(level, GetEquipmentStatsRate(), 1f);
+            return item.GetDamageAmount(level, GetEquipmentStatsRate());
         }
 
         public float GetWeaponDamageBattlePoints()
         {
             if (GetWeaponItem() == null)
                 return 0f;
-            KeyValuePair<DamageElement, MinMaxFloat> kv = GetPureDamageAmount();
+            KeyValuePair<DamageElement, MinMaxFloat> kv = GetDamageAmount();
             DamageElement tempDamageElement = kv.Key;
             if (tempDamageElement == null)
                 tempDamageElement = GameInstance.Singleton.DefaultDamageElement;
@@ -298,119 +314,12 @@ namespace MultiplayerARPG
         public CalculatedItemBuff GetBuff()
         {
             MakeCache();
+            if (_recachingBuff)
+            {
+                _recachingBuff = false;
+                _cacheBuff.Build(_cacheEquipmentItem, level, randomSeed, version);
+            }
             return _cacheBuff;
-        }
-
-        public CharacterStats GetSocketsIncreaseStats()
-        {
-            if (GetEquipmentItem() == null || Sockets.Count == 0)
-                return CharacterStats.Empty;
-            CharacterStats result = new CharacterStats();
-            BaseItem tempEnhancer;
-            foreach (int socketId in Sockets)
-            {
-                if (GameInstance.Items.TryGetValue(socketId, out tempEnhancer))
-                    result += (tempEnhancer as ISocketEnhancerItem).SocketEnhanceEffect.stats;
-            }
-            return result;
-        }
-
-        public CharacterStats GetSocketsIncreaseStatsRate()
-        {
-            if (GetEquipmentItem() == null || Sockets.Count == 0)
-                return CharacterStats.Empty;
-            CharacterStats result = new CharacterStats();
-            BaseItem tempEnhancer;
-            foreach (int socketId in Sockets)
-            {
-                if (GameInstance.Items.TryGetValue(socketId, out tempEnhancer))
-                    result += (tempEnhancer as ISocketEnhancerItem).SocketEnhanceEffect.statsRate;
-            }
-            return result;
-        }
-
-        public Dictionary<Attribute, float> GetSocketsIncreaseAttributes()
-        {
-            if (GetEquipmentItem() == null || Sockets.Count == 0)
-                return null;
-            Dictionary<Attribute, float> result = new Dictionary<Attribute, float>();
-            BaseItem tempEnhancer;
-            foreach (int socketId in Sockets)
-            {
-                if (GameInstance.Items.TryGetValue(socketId, out tempEnhancer))
-                    result = GameDataHelpers.CombineAttributes((tempEnhancer as ISocketEnhancerItem).SocketEnhanceEffect.attributes, result, 1f);
-            }
-            return result;
-        }
-
-        public Dictionary<Attribute, float> GetSocketsIncreaseAttributesRate()
-        {
-            if (GetEquipmentItem() == null || Sockets.Count == 0)
-                return null;
-            Dictionary<Attribute, float> result = new Dictionary<Attribute, float>();
-            BaseItem tempEnhancer;
-            foreach (int socketId in Sockets)
-            {
-                if (GameInstance.Items.TryGetValue(socketId, out tempEnhancer))
-                    result = GameDataHelpers.CombineAttributes((tempEnhancer as ISocketEnhancerItem).SocketEnhanceEffect.attributesRate, result, 1f);
-            }
-            return result;
-        }
-
-        public Dictionary<DamageElement, float> GetSocketsIncreaseResistances()
-        {
-            if (GetEquipmentItem() == null || Sockets.Count == 0)
-                return null;
-            Dictionary<DamageElement, float> result = new Dictionary<DamageElement, float>();
-            BaseItem tempEnhancer;
-            foreach (int socketId in Sockets)
-            {
-                if (GameInstance.Items.TryGetValue(socketId, out tempEnhancer))
-                    result = GameDataHelpers.CombineResistances((tempEnhancer as ISocketEnhancerItem).SocketEnhanceEffect.resistances, result, 1f);
-            }
-            return result;
-        }
-
-        public Dictionary<DamageElement, float> GetSocketsIncreaseArmors()
-        {
-            if (GetEquipmentItem() == null || Sockets.Count == 0)
-                return null;
-            Dictionary<DamageElement, float> result = new Dictionary<DamageElement, float>();
-            BaseItem tempEnhancer;
-            foreach (int socketId in Sockets)
-            {
-                if (GameInstance.Items.TryGetValue(socketId, out tempEnhancer))
-                    result = GameDataHelpers.CombineArmors((tempEnhancer as ISocketEnhancerItem).SocketEnhanceEffect.armors, result, 1f);
-            }
-            return result;
-        }
-
-        public Dictionary<DamageElement, MinMaxFloat> GetSocketsIncreaseDamages()
-        {
-            if (GetEquipmentItem() == null || Sockets.Count == 0)
-                return null;
-            Dictionary<DamageElement, MinMaxFloat> result = new Dictionary<DamageElement, MinMaxFloat>();
-            BaseItem tempEnhancer;
-            foreach (int socketId in Sockets)
-            {
-                if (GameInstance.Items.TryGetValue(socketId, out tempEnhancer))
-                    result = GameDataHelpers.CombineDamages((tempEnhancer as ISocketEnhancerItem).SocketEnhanceEffect.damages, result, 1f);
-            }
-            return result;
-        }
-
-        public Dictionary<BaseSkill, int> GetSocketsIncreaseSkills()
-        {
-            if (GetEquipmentItem() == null || Sockets.Count == 0)
-                return null;
-            Dictionary<BaseSkill, int> result = new Dictionary<BaseSkill, int>();
-            BaseItem tempEnhancer;
-            foreach (int socketId in Sockets)
-            {
-                if (GameInstance.Items.TryGetValue(socketId, out tempEnhancer))
-                    result = GameDataHelpers.CombineSkills((tempEnhancer as ISocketEnhancerItem).SocketEnhanceEffect.skills, result, 1f);
-            }
-            return result;
         }
 
         public static CharacterItem Create(BaseItem item, int level = 1, int amount = 1, int? randomSeed = null)
@@ -444,15 +353,21 @@ namespace MultiplayerARPG
                 }
                 if (tempItem.ExpireDuration > 0)
                 {
-                    newItem.expireTime = System.DateTimeOffset.Now.ToUnixTimeSeconds() + (tempItem.ExpireDuration * 60 * 60);
+                    newItem.expireTime = System.DateTimeOffset.UtcNow.ToUnixTimeSeconds() + (tempItem.ExpireDuration * 60 * 60);
                 }
             }
+            newItem.version = CURRENT_VERSION;
             return newItem;
         }
 
         public static CharacterItem CreateEmptySlot()
         {
             return Create(0, 1, 0);
+        }
+
+        public static CharacterItem CreateDefaultWeapon()
+        {
+            return Create(GameInstance.Singleton.DefaultWeaponItem.DataId, 1, 1, 0);
         }
     }
 

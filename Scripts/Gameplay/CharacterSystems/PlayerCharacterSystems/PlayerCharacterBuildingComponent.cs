@@ -18,17 +18,43 @@ namespace MultiplayerARPG
         protected void ServerConstructBuilding(int itemIndex, Vector3 position, Vector3 rotation, uint parentObjectId)
         {
 #if UNITY_EDITOR || UNITY_SERVER
-            if (!Entity.CanDoActions() || itemIndex >= Entity.NonEquipItems.Count)
+            if (!Entity.CanDoActions())
             {
+                // Not allow to do it
                 return;
             }
 
-            BuildingEntity buildingEntity;
-            CharacterItem nonEquipItem = Entity.NonEquipItems[itemIndex];
-            if (nonEquipItem.IsEmptySlot() || nonEquipItem.GetBuildingItem() == null || nonEquipItem.GetBuildingItem().BuildingEntity == null ||
-                !GameInstance.BuildingEntities.TryGetValue(nonEquipItem.GetBuildingItem().BuildingEntity.EntityId, out buildingEntity) ||
-                !Entity.DecreaseItemsByIndex(itemIndex, 1, false))
+            if (itemIndex >= Entity.NonEquipItems.Count)
             {
+                // Invalid data index
+                return;
+            }
+
+            CharacterItem nonEquipItem = Entity.NonEquipItems[itemIndex];
+            if (nonEquipItem.IsEmptySlot() || nonEquipItem.GetBuildingItem() == null || nonEquipItem.GetBuildingItem().BuildingEntity == null)
+            {
+                // Invalid data
+                GameInstance.ServerGameMessageHandlers.SendGameMessage(ConnectionId, UITextKeys.UI_ERROR_INVALID_BUILDING_DATA);
+                return;
+            }
+
+            if (!GameInstance.BuildingEntities.TryGetValue(nonEquipItem.GetBuildingItem().BuildingEntity.EntityId, out BuildingEntity buildingEntity))
+            {
+                // Invalid entity
+                GameInstance.ServerGameMessageHandlers.SendGameMessage(ConnectionId, UITextKeys.UI_ERROR_INVALID_BUILDING_ENTITY);
+                return;
+            }
+
+            if (buildingEntity.BuildLimit > 0 && GameInstance.ServerBuildingHandlers.CountPlayerBuildings(Entity.Id, buildingEntity.EntityId) >= buildingEntity.BuildLimit)
+            {
+                // Reached limit amount
+                GameInstance.ServerGameMessageHandlers.SendGameMessage(ConnectionId, UITextKeys.UI_ERROR_REACHED_BUILD_LIMIT);
+                return;
+            }
+
+            if (!Entity.DecreaseItemsByIndex(itemIndex, 1, false))
+            {
+                // Not enough items?
                 return;
             }
 
@@ -36,8 +62,7 @@ namespace MultiplayerARPG
             BuildingSaveData buildingSaveData = new BuildingSaveData();
             buildingSaveData.Id = GenericUtils.GetUniqueId();
             buildingSaveData.ParentId = string.Empty;
-            BuildingEntity parentBuildingEntity;
-            if (Manager.TryGetEntityByObjectId(parentObjectId, out parentBuildingEntity))
+            if (Manager.TryGetEntityByObjectId(parentObjectId, out BuildingEntity parentBuildingEntity))
                 buildingSaveData.ParentId = parentBuildingEntity.Id;
             buildingSaveData.EntityId = buildingEntity.EntityId;
             buildingSaveData.CurrentHp = buildingEntity.MaxHp;
@@ -50,6 +75,44 @@ namespace MultiplayerARPG
 #endif
         }
 
+        public bool CallServerRepairBuilding(uint objectId)
+        {
+            if (!CurrentGameplayRule.CanInteractEntity(Entity, objectId))
+            {
+                ClientGenericActions.ClientReceiveGameMessage(UITextKeys.UI_ERROR_CHARACTER_IS_TOO_FAR);
+                return false;
+            }
+            RPC(ServerRepairBuilding, objectId);
+            return true;
+        }
+
+        [ServerRpc]
+        protected void ServerRepairBuilding(uint objectId)
+        {
+#if UNITY_EDITOR || UNITY_SERVER
+            if (!Entity.CanDoActions())
+                return;
+
+            if (!Manager.TryGetEntityByObjectId(objectId, out BuildingEntity buildingEntity))
+            {
+                // Can't find the entity
+                return;
+            }
+
+            if (!Entity.IsGameEntityInDistance(buildingEntity))
+            {
+                GameInstance.ServerGameMessageHandlers.SendGameMessage(ConnectionId, UITextKeys.UI_ERROR_CHARACTER_IS_TOO_FAR);
+                return;
+            }
+
+            if (!buildingEntity.Repair(Entity, out UITextKeys errorMessage))
+            {
+                GameInstance.ServerGameMessageHandlers.SendGameMessage(ConnectionId, errorMessage);
+                return;
+            }
+#endif
+        }
+        
         public bool CallServerDestroyBuilding(uint objectId)
         {
             if (!CurrentGameplayRule.CanInteractEntity(Entity, objectId))

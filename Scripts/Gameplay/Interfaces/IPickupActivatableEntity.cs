@@ -11,5 +11,10 @@ namespace MultiplayerARPG
         /// Put anything you want to do when interact the object.
         /// </summary>
         void OnPickupActivate();
+        /// <summary>
+        /// This function will be call at server to do something when picking up
+        /// For example, add item to inventory, return `FALSE` if character cannot do it
+        /// </summary>
+        bool ProceedPickingUpAtServer(BaseCharacterEntity characterEntity, out UITextKeys message);
     }
 }

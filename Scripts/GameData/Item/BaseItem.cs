@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace MultiplayerARPG
 {
@@ -39,7 +40,8 @@ namespace MultiplayerARPG
         [SerializeField]
         protected bool restrictDealing;
         [SerializeField]
-        protected bool restractDropping;
+        [FormerlySerializedAs("restractDropping")]
+        protected bool restrictDropping;
         [SerializeField]
         protected bool restrictSelling;
 
@@ -94,7 +96,7 @@ namespace MultiplayerARPG
 
         public bool RestrictDealing { get { return restrictDealing; } }
 
-        public bool RestractDropping { get { return restractDropping; } }
+        public bool RestrictDropping { get { return restrictDropping; } }
 
         public bool RestrictSelling { get { return restrictSelling; } }
 

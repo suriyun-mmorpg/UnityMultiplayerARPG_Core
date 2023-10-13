@@ -1,23 +1,42 @@
 ﻿using Cysharp.Text;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace MultiplayerARPG
 {
     public partial class UIArmorAmount : UISelectionEntry<UIArmorAmountData>
     {
         [Header("String Formats")]
+        [Tooltip("Format => {0} = {Amount}")]
+        public UILocaleKeySetting formatKeyAmountOnly = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_SIMPLE);
         [Tooltip("Format => {0} = {Armor Title}, {1} = {Amount}")]
-        public UILocaleKeySetting formatKeyAmount = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_ARMOR_AMOUNT);
+        [FormerlySerializedAs("formatKeyAmount")]
+        public UILocaleKeySetting formatKeyTitleWithAmount = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_ARMOR_AMOUNT);
 
         [Header("UI Elements")]
-        public TextWrapper uiTextAmount;
+        public UIGameDataElements uiGameDataElements;
+        public TextWrapper uiTextAmountOnly;
+        [FormerlySerializedAs("uiTextAmount")]
+        public TextWrapper uiTextTitleWithAmount;
 
         protected override void UpdateData()
         {
-            if (uiTextAmount != null)
+            if (uiGameDataElements != null)
             {
-                uiTextAmount.text = ZString.Format(
-                    LanguageManager.GetText(formatKeyAmount),
+                uiGameDataElements.Update(Data.damageElement);
+            }
+
+            if (uiTextAmountOnly != null)
+            {
+                uiTextAmountOnly.text = ZString.Format(
+                    LanguageManager.GetText(formatKeyAmountOnly),
+                    Data.amount.ToString("N0"));
+            }
+
+            if (uiTextTitleWithAmount != null)
+            {
+                uiTextTitleWithAmount.text = ZString.Format(
+                    LanguageManager.GetText(formatKeyTitleWithAmount),
                     Data.damageElement.Title,
                     Data.amount.ToString("N0"));
             }

@@ -869,12 +869,16 @@ namespace MultiplayerARPG
                     if (onAfterUseItemHotkey != null)
                         onAfterUseItemHotkey.Invoke(relateId, aimPosition);
                     break;
+                case HotkeyType.GuildSkill:
+                    UseGuildSkill(relateId);
+                    break;
             }
         }
 
         protected void UseSkill(string id, AimPosition aimPosition)
         {
-            if (!GameInstance.Skills.TryGetValue(BaseGameData.MakeDataId(id), out BaseSkill skill) || skill == null ||
+            int dataId = BaseGameData.MakeDataId(id);
+            if (!GameInstance.Skills.TryGetValue(dataId, out BaseSkill skill) || skill == null ||
                 !PlayingCharacterEntity.GetCaches().Skills.TryGetValue(skill, out int skillLevel))
                 return;
             SetQueueUsingSkill(aimPosition, skill, skillLevel);
@@ -939,6 +943,14 @@ namespace MultiplayerARPG
             {
                 PlayingCharacterEntity.CallServerUseItem(itemIndex);
             }
+        }
+
+        protected void UseGuildSkill(string id)
+        {
+            if (GameInstance.JoinedGuild == null)
+                return;
+            int dataId = BaseGameData.MakeDataId(id);
+            PlayingCharacterEntity.CallServerUseGuildSkill(dataId);
         }
     }
 }

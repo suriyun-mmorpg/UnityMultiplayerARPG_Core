@@ -154,7 +154,7 @@ namespace MultiplayerARPG
 #endif
         }
 
-        public virtual bool WriteClientStartChargeState(NetDataWriter writer)
+        public virtual bool WriteClientStartChargeState(long writeTimestamp, NetDataWriter writer)
         {
             if (_clientState.HasValue && !_clientState.Value.IsStopping)
             {
@@ -169,7 +169,7 @@ namespace MultiplayerARPG
             return false;
         }
 
-        public virtual bool WriteServerStartChargeState(NetDataWriter writer)
+        public virtual bool WriteServerStartChargeState(long writeTimestamp, NetDataWriter writer)
         {
             if (_serverState.HasValue && !_serverState.Value.IsStopping)
             {
@@ -184,7 +184,7 @@ namespace MultiplayerARPG
             return false;
         }
 
-        public virtual bool WriteClientStopChargeState(NetDataWriter writer)
+        public virtual bool WriteClientStopChargeState(long writeTimestamp, NetDataWriter writer)
         {
             if (_clientState.HasValue && _clientState.Value.IsStopping)
             {
@@ -197,7 +197,7 @@ namespace MultiplayerARPG
             return false;
         }
 
-        public virtual bool WriteServerStopChargeState(NetDataWriter writer)
+        public virtual bool WriteServerStopChargeState(long writeTimestamp, NetDataWriter writer)
         {
             if (_serverState.HasValue && _serverState.Value.IsStopping)
             {
@@ -210,13 +210,13 @@ namespace MultiplayerARPG
             return false;
         }
 
-        public virtual void ReadClientStartChargeStateAtServer(NetDataReader reader)
+        public virtual void ReadClientStartChargeStateAtServer(long peerTimestamp, NetDataReader reader)
         {
             bool isLeftHand = reader.GetBool();
             ProceedStartChargeStateAtServer(isLeftHand);
         }
 
-        public virtual void ReadServerStartChargeStateAtClient(NetDataReader reader)
+        public virtual void ReadServerStartChargeStateAtClient(long peerTimestamp, NetDataReader reader)
         {
             bool isLeftHand = reader.GetBool();
             if (IsServer || IsOwnerClient)
@@ -227,12 +227,12 @@ namespace MultiplayerARPG
             PlayChargeAnimation(isLeftHand);
         }
 
-        public virtual void ReadClientStopChargeStateAtServer(NetDataReader reader)
+        public virtual void ReadClientStopChargeStateAtServer(long peerTimestamp, NetDataReader reader)
         {
             ProceedStopChargeStateAtServer();
         }
 
-        public virtual void ReadServerStopChargeStateAtClient(NetDataReader reader)
+        public virtual void ReadServerStopChargeStateAtClient(long peerTimestamp, NetDataReader reader)
         {
             if (IsServer || IsOwnerClient)
             {

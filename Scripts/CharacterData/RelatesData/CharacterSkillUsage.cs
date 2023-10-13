@@ -15,25 +15,53 @@ namespace MultiplayerARPG
         [System.NonSerialized]
         private IUsableItem _cacheUsableItem;
 
-        private void MakeCache()
+        ~CharacterSkillUsage()
         {
-            if (_dirtyDataId == dataId)
-                return;
-            _dirtyDataId = dataId;
+            ClearCachedData();
+        }
+
+        private void ClearCachedData()
+        {
             _cacheSkill = null;
             _cacheGuildSkill = null;
             _cacheUsableItem = null;
+        }
+
+        private bool IsRecaching()
+        {
+            return _dirtyDataId != dataId;
+        }
+
+        private void MakeAsCached()
+        {
+            _dirtyDataId = dataId;
+        }
+
+        private void MakeCache()
+        {
+            if (!IsRecaching())
+                return;
+            MakeAsCached();
+            ClearCachedData();
             switch (type)
             {
                 case SkillUsageType.Skill:
-                    GameInstance.Skills.TryGetValue(dataId, out _cacheSkill);
+                    if (!GameInstance.Skills.TryGetValue(dataId, out _cacheSkill))
+                        _cacheSkill = null;
                     break;
                 case SkillUsageType.GuildSkill:
-                    GameInstance.GuildSkills.TryGetValue(dataId, out _cacheGuildSkill);
+                    if (!GameInstance.GuildSkills.TryGetValue(dataId, out _cacheGuildSkill))
+                        _cacheGuildSkill = null;
                     break;
                 case SkillUsageType.UsableItem:
-                    if (GameInstance.Items.TryGetValue(dataId, out BaseItem item))
+                    if (!GameInstance.Items.TryGetValue(dataId, out BaseItem item) || !item.IsUsable())
+                    {
+                        _cacheUsableItem = null;
+                    }
+                    else
+                    {
                         _cacheUsableItem = item as IUsableItem;
+                    }
                     break;
             }
         }

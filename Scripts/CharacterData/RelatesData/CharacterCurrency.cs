@@ -6,14 +6,36 @@ namespace MultiplayerARPG
     {
         [System.NonSerialized]
         private int _dirtyDataId;
+
         [System.NonSerialized]
         private Currency _cacheCurrency;
 
+        ~CharacterCurrency()
+        {
+            ClearCachedData();
+        }
+
+        private void ClearCachedData()
+        {
+            _cacheCurrency = null;
+        }
+
+        private bool IsRecaching()
+        {
+            return _dirtyDataId != dataId;
+        }
+
+        private void MakeAsCached()
+        {
+            _dirtyDataId = dataId;
+        }
+
         private void MakeCache()
         {
-            if (_dirtyDataId == dataId)
+            if (!IsRecaching())
                 return;
-            _dirtyDataId = dataId;
+            MakeAsCached();
+            ClearCachedData();
             if (!GameInstance.Currencies.TryGetValue(dataId, out _cacheCurrency))
                 _cacheCurrency = null;
         }

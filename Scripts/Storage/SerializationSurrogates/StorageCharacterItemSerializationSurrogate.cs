@@ -24,6 +24,7 @@ namespace MultiplayerARPG
             info.AddValue("randomSeed", data.characterItem.randomSeed);
             info.AddValue("ammo", data.characterItem.ammo);
             info.AddValue("sockets", data.characterItem.sockets);
+            info.AddValue("version", data.characterItem.version);
         }
 
         public object SetObjectData(
@@ -61,6 +62,11 @@ namespace MultiplayerARPG
             try
             {
                 characterItem.randomSeed = info.GetInt32("randomSeed");
+            }
+            catch { }
+            try
+            {
+                characterItem.version = info.GetByte("version");
             }
             catch { }
             if (string.IsNullOrEmpty(characterItem.id))

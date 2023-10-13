@@ -260,10 +260,13 @@ namespace MultiplayerARPG
 
         public virtual void ReceiveDamageWithoutConditionCheck(Vector3 fromPosition, EntityInfo instigator, Dictionary<DamageElement, MinMaxFloat> damageAmounts, CharacterItem weapon, BaseSkill skill, int skillLevel, int randomSeed)
         {
-            List<DamageElement> keys = new List<DamageElement>(damageAmounts.Keys);
-            foreach (DamageElement key in keys)
+            if (damageAmounts != null)
             {
-                damageAmounts[key] = damageAmounts[key] * damageRate;
+                List<DamageElement> keys = new List<DamageElement>(damageAmounts.Keys);
+                foreach (DamageElement key in keys)
+                {
+                    damageAmounts[key] = damageAmounts[key] * damageRate;
+                }
             }
             DamageableEntity.ApplyDamage(position, fromPosition, instigator, damageAmounts, weapon, skill, skillLevel, randomSeed);
         }

@@ -7,6 +7,16 @@ namespace MultiplayerARPG
         protected bool _lastGrounded;
         protected Vector3 _lastGroundedPosition;
 
+        public override bool SkipMovementValidation
+        {
+            get
+            {
+                return (IsAttacking && LastAttackSkipMovementValidation) ||
+                    (IsUsingSkill && LastUseSkillSkipMovementValidation) ||
+                    (IsReloading && LastReloadSkipMovementValidation);
+            }
+        }
+
         public override float GetMoveSpeed(MovementState movementState, ExtraMovementState extraMovementState)
         {
             float moveSpeed = CachedData.MoveSpeed;

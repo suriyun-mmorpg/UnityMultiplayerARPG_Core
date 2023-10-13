@@ -26,6 +26,9 @@ namespace MultiplayerARPG
 
         public void SetParty(int partyId, PartyData partyData)
         {
+            if (partyData == null)
+                return;
+
             if (Parties.ContainsKey(partyId))
                 Parties[partyId] = partyData;
             else

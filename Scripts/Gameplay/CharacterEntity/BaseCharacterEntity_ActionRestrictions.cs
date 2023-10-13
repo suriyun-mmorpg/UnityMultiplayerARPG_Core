@@ -17,7 +17,7 @@ namespace MultiplayerARPG
             return true;
         }
 
-        public virtual bool CanPickUpItem()
+        public virtual bool CanPickup()
         {
             return true;
         }
@@ -83,6 +83,22 @@ namespace MultiplayerARPG
             if (!CanDoActions())
                 return false;
             if (CachedData.DisallowUseSkill)
+                return false;
+            if (PassengingVehicleEntity != null &&
+                !PassengingVehicleSeat.canUseSkill)
+                return false;
+            return true;
+        }
+
+        public virtual bool CanUseSkillItem()
+        {
+            if (IsWeaponsSheathed)
+                return false;
+            if (!CanDoActions())
+                return false;
+            if (CachedData.DisallowUseSkill)
+                return false;
+            if (CachedData.DisallowUseItem)
                 return false;
             if (PassengingVehicleEntity != null &&
                 !PassengingVehicleSeat.canUseSkill)

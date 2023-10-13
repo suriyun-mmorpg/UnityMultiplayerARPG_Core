@@ -9,8 +9,15 @@ namespace MultiplayerARPG
 {
     public class EquipmentContainerSetter : MonoBehaviour
     {
+
+        [Header("Single instantiated object setting")]
         public GameObject defaultModel;
         public GameObject[] instantiatedObjects;
+
+        [Header("Multiple instantiated objects setting")]
+        public EquipmentInstantiatedObjectGroup defaultInstantiatedObjectGroup;
+        public EquipmentInstantiatedObjectGroup[] instantiatedObjectGroups;
+
 #if UNITY_EDITOR
         [Header("Set Default Model Tool")]
         public int childIndex;
@@ -45,6 +52,7 @@ namespace MultiplayerARPG
                     equipmentContainer.transform = transform;
                     equipmentContainer.defaultModel = defaultModel;
                     equipmentContainer.instantiatedObjects = instantiatedObjects;
+                    equipmentContainer.instantiatedObjectGroups = instantiatedObjectGroups;
                     equipmentContainers[i] = equipmentContainer;
                     break;
                 }
@@ -57,6 +65,7 @@ namespace MultiplayerARPG
                 newEquipmentContainer.transform = transform;
                 newEquipmentContainer.defaultModel = defaultModel;
                 newEquipmentContainer.instantiatedObjects = instantiatedObjects;
+                newEquipmentContainer.instantiatedObjectGroups = instantiatedObjectGroups;
                 equipmentContainers.Add(newEquipmentContainer);
             }
             if (hasChanges)

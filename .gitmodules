@@ -31,10 +31,10 @@
 [submodule "GraphicSettings"]
 	path = GraphicSettings
 	url = https://github.com/insthync/unity-graphic-settings.git
-[submodule "SharedData"]
-	path = SharedData
-	url = https://github.com/insthync/UnityMultiplayerARPG_SharedData.git
-	branch = litenetlib
 [submodule "UnityRestClient"]
 	path = UnityRestClient
 	url = https://github.com/insthync/unity-rest-client.git
+[submodule "SharedData"]
+	path = SharedData
+	url = ../UnityMultiplayerARPG_SharedData.git
+	branch = litenetlib

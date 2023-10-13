@@ -84,28 +84,28 @@ namespace MultiplayerARPG
         public UICharacterSkill[] clones;
         public UICharacterSkill uiNextLevelSkill;
 
-        protected float coolDownRemainsDuration;
-        protected bool dirtyIsCountDown;
+        protected float _coolDownRemainsDuration;
+        protected bool _dirtyIsCountDown;
 
         protected override void OnDisable()
         {
             base.OnDisable();
-            coolDownRemainsDuration = 0f;
+            _coolDownRemainsDuration = 0f;
         }
 
         protected override void Update()
         {
             base.Update();
 
-            if (coolDownRemainsDuration > 0f)
+            if (_coolDownRemainsDuration > 0f)
             {
-                coolDownRemainsDuration -= Time.deltaTime;
-                if (coolDownRemainsDuration <= 0f)
-                    coolDownRemainsDuration = 0f;
+                _coolDownRemainsDuration -= Time.deltaTime;
+                if (_coolDownRemainsDuration <= 0f)
+                    _coolDownRemainsDuration = 0f;
             }
             else
             {
-                coolDownRemainsDuration = 0f;
+                _coolDownRemainsDuration = 0f;
             }
 
             // Update UIs
@@ -121,22 +121,22 @@ namespace MultiplayerARPG
 
             if (uiTextCoolDownRemainsDuration != null)
             {
-                uiTextCoolDownRemainsDuration.SetGameObjectActive(Skill.IsActive && coolDownRemainsDuration > 0);
+                uiTextCoolDownRemainsDuration.SetGameObjectActive(Skill.IsActive && _coolDownRemainsDuration > 0);
                 uiTextCoolDownRemainsDuration.text = ZString.Format(
                     LanguageManager.GetText(formatKeyCoolDownRemainsDuration),
-                    coolDownRemainsDuration.ToString("N0"));
+                    _coolDownRemainsDuration.ToString("N0"));
             }
 
             if (imageCoolDownGage != null)
             {
-                imageCoolDownGage.fillAmount = coolDownDuration <= 0 ? 0 : coolDownRemainsDuration / coolDownDuration;
+                imageCoolDownGage.fillAmount = coolDownDuration <= 0 ? 0 : _coolDownRemainsDuration / coolDownDuration;
                 imageCoolDownGage.gameObject.SetActive(imageCoolDownGage.fillAmount > 0f);
             }
 
-            bool isCountDown = coolDownRemainsDuration > 0f;
-            if (dirtyIsCountDown != isCountDown)
+            bool isCountDown = _coolDownRemainsDuration > 0f;
+            if (_dirtyIsCountDown != isCountDown)
             {
-                dirtyIsCountDown = isCountDown;
+                _dirtyIsCountDown = isCountDown;
                 if (countDownObjects != null)
                 {
                     foreach (GameObject obj in countDownObjects)
@@ -154,15 +154,21 @@ namespace MultiplayerARPG
             }
         }
 
-        protected override void UpdateUI()
+        protected void UpdateCoolDownRemainsDuration(float diffToChangeRemainsDuration = 0f)
         {
-            // Update remains duration
-            if (coolDownRemainsDuration <= 0f && Character != null && Skill != null)
+            if (_coolDownRemainsDuration <= 0f && Character != null && Skill != null)
             {
                 int indexOfSkillUsage = Character.IndexOfSkillUsage(SkillUsageType.Skill, Skill.DataId);
-                if (indexOfSkillUsage >= 0)
-                    coolDownRemainsDuration = Character.SkillUsages[indexOfSkillUsage].coolDownRemainsDuration;
+                if (indexOfSkillUsage >= 0 && Mathf.Abs(Character.SkillUsages[indexOfSkillUsage].coolDownRemainsDuration - _coolDownRemainsDuration) > diffToChangeRemainsDuration)
+                    _coolDownRemainsDuration = Character.SkillUsages[indexOfSkillUsage].coolDownRemainsDuration;
+                else
+                    _coolDownRemainsDuration = 0f;
             }
+        }
+
+        protected override void UpdateUI()
+        {
+            UpdateCoolDownRemainsDuration(0f);
 
             IPlayerCharacterData targetPlayer = Character as IPlayerCharacterData;
             if (targetPlayer == null)
@@ -175,13 +181,7 @@ namespace MultiplayerARPG
 
         protected override void UpdateData()
         {
-            // Update remains duration
-            if (Character != null && Skill != null)
-            {
-                int indexOfSkillUsage = Character.IndexOfSkillUsage(SkillUsageType.Skill, Skill.DataId);
-                if (indexOfSkillUsage >= 0 && Mathf.Abs(Character.SkillUsages[indexOfSkillUsage].coolDownRemainsDuration - coolDownRemainsDuration) > 1)
-                    coolDownRemainsDuration = Character.SkillUsages[indexOfSkillUsage].coolDownRemainsDuration;
-            }
+            UpdateCoolDownRemainsDuration(1f);
 
             if (Level <= 0)
             {

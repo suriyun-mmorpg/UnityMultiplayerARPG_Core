@@ -109,12 +109,14 @@ namespace MultiplayerARPG
         public CharacterSkillAndBuffComponent SkillAndBuffComponent { get; protected set; }
         public bool IsAttacking { get { return AttackComponent.IsAttacking; } }
         public float LastAttackEndTime { get { return AttackComponent.LastAttackEndTime; } }
+        public bool LastAttackSkipMovementValidation { get { return AttackComponent.LastAttackSkipMovementValidation; } }
         public float MoveSpeedRateWhileAttacking { get { return AttackComponent.MoveSpeedRateWhileAttacking; } }
         public MovementRestriction MovementRestrictionWhileAttacking { get { return AttackComponent.MovementRestrictionWhileAttacking; } }
         public float AttackTotalDuration { get { return AttackComponent.AttackTotalDuration; } set { AttackComponent.AttackTotalDuration = value; } }
         public float[] AttackTriggerDurations { get { return AttackComponent.AttackTriggerDurations; } set { AttackComponent.AttackTriggerDurations = value; } }
         public bool IsUsingSkill { get { return UseSkillComponent.IsUsingSkill; } }
         public float LastUseSkillEndTime { get { return UseSkillComponent.LastUseSkillEndTime; } }
+        public bool LastUseSkillSkipMovementValidation { get { return UseSkillComponent.LastUseSkillSkipMovementValidation; } }
         public float MoveSpeedRateWhileUsingSkill { get { return UseSkillComponent.MoveSpeedRateWhileUsingSkill; } }
         public MovementRestriction MovementRestrictionWhileUsingSkill { get { return UseSkillComponent.MovementRestrictionWhileUsingSkill; } }
         public float UseSkillTotalDuration { get { return UseSkillComponent.UseSkillTotalDuration; } set { UseSkillComponent.UseSkillTotalDuration = value; } }
@@ -128,6 +130,7 @@ namespace MultiplayerARPG
         public int ReloadingAmmoAmount { get { return ReloadComponent.ReloadingAmmoAmount; } }
         public bool IsReloading { get { return ReloadComponent.IsReloading; } }
         public float LastReloadEndTime { get { return ReloadComponent.LastReloadEndTime; } }
+        public bool LastReloadSkipMovementValidation { get { return ReloadComponent.LastReloadSkipMovementValidation; } }
         public float MoveSpeedRateWhileReloading { get { return ReloadComponent.MoveSpeedRateWhileReloading; } }
         public MovementRestriction MovementRestrictionWhileReloading { get { return ReloadComponent.MovementRestrictionWhileReloading; } }
         public float ReloadTotalDuration { get { return ReloadComponent.ReloadTotalDuration; } set { ReloadComponent.ReloadTotalDuration = value; } }
@@ -387,33 +390,34 @@ namespace MultiplayerARPG
             Profiler.EndSample();
         }
 
-        public override void SendClientState()
+        public override void SendClientState(long writeTimestamp)
         {
             bool shouldSendReliably = false;
             CharacterInputState inputState = CharacterInputState.None;
             s_EntityStateDataWriter.Reset();
-            if (ReloadComponent.WriteClientReloadState(s_EntityStateDataWriter))
+            if (ReloadComponent.WriteClientReloadState(writeTimestamp, s_EntityStateDataWriter))
                 inputState |= CharacterInputState.IsReloading;
-            if (ChargeComponent.WriteClientStopChargeState(s_EntityStateDataWriter))
+            if (ChargeComponent.WriteClientStopChargeState(writeTimestamp, s_EntityStateDataWriter))
                 inputState |= CharacterInputState.IsChargeStopping;
-            if (ChargeComponent.WriteClientStartChargeState(s_EntityStateDataWriter))
+            if (ChargeComponent.WriteClientStartChargeState(writeTimestamp, s_EntityStateDataWriter))
                 inputState |= CharacterInputState.IsChargeStarting;
-            if (AttackComponent.WriteClientAttackState(s_EntityStateDataWriter))
+            if (AttackComponent.WriteClientAttackState(writeTimestamp, s_EntityStateDataWriter))
                 inputState |= CharacterInputState.IsAttacking;
-            if (UseSkillComponent.WriteClientUseSkillInterruptedState(s_EntityStateDataWriter))
+            if (UseSkillComponent.WriteClientUseSkillInterruptedState(writeTimestamp, s_EntityStateDataWriter))
                 inputState |= CharacterInputState.IsUsingSkillInterrupted;
-            if (UseSkillComponent.WriteClientUseSkillItemState(s_EntityStateDataWriter))
+            if (UseSkillComponent.WriteClientUseSkillItemState(writeTimestamp, s_EntityStateDataWriter))
                 inputState |= CharacterInputState.IsUsingSkillItem;
-            if (UseSkillComponent.WriteClientUseSkillState(s_EntityStateDataWriter))
+            if (UseSkillComponent.WriteClientUseSkillState(writeTimestamp, s_EntityStateDataWriter))
                 inputState |= CharacterInputState.IsUsingSkill;
             // Movement
-            if (!Movement.IsNull() && Movement.Enabled && Movement.WriteClientState(s_EntityStateDataWriter, out shouldSendReliably))
+            if (!Movement.IsNull() && Movement.Enabled && Movement.WriteClientState(writeTimestamp, s_EntityStateDataWriter, out shouldSendReliably))
                 inputState |= CharacterInputState.IsMoving;
             // Set input state and send to clients
             if (inputState != CharacterInputState.None)
             {
                 TransportHandler.WritePacket(s_EntityStateMessageWriter, GameNetworkingConsts.EntityState);
                 s_EntityStateMessageWriter.PutPackedUInt(ObjectId);
+                s_EntityStateMessageWriter.PutPackedLong(writeTimestamp);
                 s_EntityStateMessageWriter.PutPackedUShort((ushort)inputState);
                 s_EntityStateMessageWriter.Put(s_EntityStateDataWriter.Data, 0, s_EntityStateDataWriter.Length);
                 ClientSendMessage(STATE_DATA_CHANNEL, (shouldSendReliably || (ushort)inputState > 1 << 0) ? DeliveryMethod.ReliableOrdered : DeliveryMethod.Sequenced, s_EntityStateMessageWriter);
@@ -421,83 +425,84 @@ namespace MultiplayerARPG
             CurrentGameManager.HitRegistrationManager.SendHitRegToServer();
         }
 
-        public override void SendServerState()
+        public override void SendServerState(long writeTimestamp)
         {
             bool shouldSendReliably = false;
             CharacterInputState inputState = CharacterInputState.None;
             s_EntityStateDataWriter.Reset();
-            if (ReloadComponent.WriteServerReloadState(s_EntityStateDataWriter))
+            if (ReloadComponent.WriteServerReloadState(writeTimestamp, s_EntityStateDataWriter))
                 inputState |= CharacterInputState.IsReloading;
-            if (ChargeComponent.WriteServerStopChargeState(s_EntityStateDataWriter))
+            if (ChargeComponent.WriteServerStopChargeState(writeTimestamp, s_EntityStateDataWriter))
                 inputState |= CharacterInputState.IsChargeStopping;
-            if (ChargeComponent.WriteServerStartChargeState(s_EntityStateDataWriter))
+            if (ChargeComponent.WriteServerStartChargeState(writeTimestamp, s_EntityStateDataWriter))
                 inputState |= CharacterInputState.IsChargeStarting;
-            if (AttackComponent.WriteServerAttackState(s_EntityStateDataWriter))
+            if (AttackComponent.WriteServerAttackState(writeTimestamp, s_EntityStateDataWriter))
                 inputState |= CharacterInputState.IsAttacking;
-            if (UseSkillComponent.WriteServerUseSkillInterruptedState(s_EntityStateDataWriter))
+            if (UseSkillComponent.WriteServerUseSkillInterruptedState(writeTimestamp, s_EntityStateDataWriter))
                 inputState |= CharacterInputState.IsUsingSkillInterrupted;
-            if (UseSkillComponent.WriteServerUseSkillItemState(s_EntityStateDataWriter))
+            if (UseSkillComponent.WriteServerUseSkillItemState(writeTimestamp, s_EntityStateDataWriter))
                 inputState |= CharacterInputState.IsUsingSkillItem;
-            if (UseSkillComponent.WriteServerUseSkillState(s_EntityStateDataWriter))
+            if (UseSkillComponent.WriteServerUseSkillState(writeTimestamp, s_EntityStateDataWriter))
                 inputState |= CharacterInputState.IsUsingSkill;
             // Movement
-            if (!Movement.IsNull() && Movement.Enabled && Movement.WriteServerState(s_EntityStateDataWriter, out shouldSendReliably))
+            if (!Movement.IsNull() && Movement.Enabled && Movement.WriteServerState(writeTimestamp, s_EntityStateDataWriter, out shouldSendReliably))
                 inputState |= CharacterInputState.IsMoving;
             // Set input state and send to clients
             if (inputState != CharacterInputState.None)
             {
                 TransportHandler.WritePacket(s_EntityStateMessageWriter, GameNetworkingConsts.EntityState);
                 s_EntityStateMessageWriter.PutPackedUInt(ObjectId);
+                s_EntityStateMessageWriter.PutPackedLong(writeTimestamp);
                 s_EntityStateMessageWriter.PutPackedUShort((ushort)inputState);
                 s_EntityStateMessageWriter.Put(s_EntityStateDataWriter.Data, 0, s_EntityStateDataWriter.Length);
                 ServerSendMessageToSubscribers(STATE_DATA_CHANNEL, (shouldSendReliably || (ushort)inputState > 1 << 0) ? DeliveryMethod.ReliableOrdered : DeliveryMethod.Sequenced, s_EntityStateMessageWriter);
             }
         }
 
-        public override void ReadClientStateAtServer(NetDataReader reader)
+        public override void ReadClientStateAtServer(long peerTimestamp, NetDataReader reader)
         {
             CharacterInputState inputState = (CharacterInputState)reader.GetPackedUShort();
             // Actions
             if (inputState.Has(CharacterInputState.IsReloading))
-                ReloadComponent.ReadClientReloadStateAtServer(reader);
+                ReloadComponent.ReadClientReloadStateAtServer(peerTimestamp, reader);
             if (inputState.Has(CharacterInputState.IsChargeStopping))
-                ChargeComponent.ReadClientStopChargeStateAtServer(reader);
+                ChargeComponent.ReadClientStopChargeStateAtServer(peerTimestamp, reader);
             if (inputState.Has(CharacterInputState.IsChargeStarting))
-                ChargeComponent.ReadClientStartChargeStateAtServer(reader);
+                ChargeComponent.ReadClientStartChargeStateAtServer(peerTimestamp, reader);
             if (inputState.Has(CharacterInputState.IsAttacking))
-                AttackComponent.ReadClientAttackStateAtServer(reader);
+                AttackComponent.ReadClientAttackStateAtServer(peerTimestamp, reader);
             if (inputState.Has(CharacterInputState.IsUsingSkillInterrupted))
-                UseSkillComponent.ReadClientUseSkillInterruptedStateAtServer(reader);
+                UseSkillComponent.ReadClientUseSkillInterruptedStateAtServer(peerTimestamp, reader);
             if (inputState.Has(CharacterInputState.IsUsingSkillItem))
-                UseSkillComponent.ReadClientUseSkillItemStateAtServer(reader);
+                UseSkillComponent.ReadClientUseSkillItemStateAtServer(peerTimestamp, reader);
             if (inputState.Has(CharacterInputState.IsUsingSkill))
-                UseSkillComponent.ReadClientUseSkillStateAtServer(reader);
+                UseSkillComponent.ReadClientUseSkillStateAtServer(peerTimestamp, reader);
             // Movement
             if (inputState.Has(CharacterInputState.IsMoving) && Movement != null)
-                Movement.ReadClientStateAtServer(reader);
+                Movement.ReadClientStateAtServer(peerTimestamp, reader);
         }
 
-        public override void ReadServerStateAtClient(NetDataReader reader)
+        public override void ReadServerStateAtClient(long peerTimestamp, NetDataReader reader)
         {
             CharacterInputState inputState = (CharacterInputState)reader.GetPackedUShort();
             // Actions
             if (inputState.Has(CharacterInputState.IsReloading))
-                ReloadComponent.ReadServerReloadStateAtClient(reader);
+                ReloadComponent.ReadServerReloadStateAtClient(peerTimestamp, reader);
             if (inputState.Has(CharacterInputState.IsChargeStopping))
-                ChargeComponent.ReadServerStopChargeStateAtClient(reader);
+                ChargeComponent.ReadServerStopChargeStateAtClient(peerTimestamp, reader);
             if (inputState.Has(CharacterInputState.IsChargeStarting))
-                ChargeComponent.ReadServerStartChargeStateAtClient(reader);
+                ChargeComponent.ReadServerStartChargeStateAtClient(peerTimestamp, reader);
             if (inputState.Has(CharacterInputState.IsAttacking))
-                AttackComponent.ReadServerAttackStateAtClient(reader);
+                AttackComponent.ReadServerAttackStateAtClient(peerTimestamp, reader);
             if (inputState.Has(CharacterInputState.IsUsingSkillInterrupted))
-                UseSkillComponent.ReadServerUseSkillInterruptedStateAtClient(reader);
+                UseSkillComponent.ReadServerUseSkillInterruptedStateAtClient(peerTimestamp, reader);
             if (inputState.Has(CharacterInputState.IsUsingSkillItem))
-                UseSkillComponent.ReadServerUseSkillItemStateAtClient(reader);
+                UseSkillComponent.ReadServerUseSkillItemStateAtClient(peerTimestamp, reader);
             if (inputState.Has(CharacterInputState.IsUsingSkill))
-                UseSkillComponent.ReadServerUseSkillStateAtClient(reader);
+                UseSkillComponent.ReadServerUseSkillStateAtClient(peerTimestamp, reader);
             // Movement
             if (inputState.Has(CharacterInputState.IsMoving) && Movement != null)
-                Movement.ReadServerStateAtClient(reader);
+                Movement.ReadServerStateAtClient(peerTimestamp, reader);
         }
 
         public override void PlayJumpAnimation()
@@ -652,7 +657,7 @@ namespace MultiplayerARPG
 
         public bool ValidateUseSkillItem(int index, bool isLeftHand, uint targetObjectId)
         {
-            if (!CanUseItem())
+            if (!CanUseSkillItem())
                 return false;
 
             if (!UpdateLastActionTime())
@@ -892,17 +897,6 @@ namespace MultiplayerARPG
             animActionType = isLeftHand ? AnimActionType.AttackLeftHand : AnimActionType.AttackRightHand;
         }
 
-        public Dictionary<DamageElement, MinMaxFloat> GetWeaponDamagesWithBuffs(CharacterItem weapon)
-        {
-            Dictionary<DamageElement, MinMaxFloat> damageAmounts = new Dictionary<DamageElement, MinMaxFloat>();
-            // Calculate all damages
-            damageAmounts = GameDataHelpers.CombineDamages(damageAmounts, this.GetWeaponDamages(weapon));
-            // Sum damage with buffs
-            damageAmounts = GameDataHelpers.CombineDamages(damageAmounts, CachedData.IncreaseDamages);
-
-            return damageAmounts;
-        }
-
         public bool ValidateAmmo(CharacterItem weapon, int amount, bool validIfNoRequireAmmoType = true)
         {
             // Avoid null data
@@ -1098,8 +1092,7 @@ namespace MultiplayerARPG
 
         public virtual bool IsPlayingActionAnimation()
         {
-            return IsPlayingAttackOrUseSkillAnimation() ||
-                IsPlayingReloadAnimation();
+            return IsPlayingAttackOrUseSkillAnimation() || IsPlayingReloadAnimation();
         }
 
         public float GetAttackSpeed()
@@ -1287,24 +1280,26 @@ namespace MultiplayerARPG
             out int animationIndex,
             out float animSpeedRate,
             out float[] triggerDurations,
-            out float totalDuration)
+            out float totalDuration,
+            out bool skipMovementValidation)
         {
             animationIndex = 0;
             animSpeedRate = 1f;
             triggerDurations = new float[] { 0f };
             totalDuration = 0f;
+            skipMovementValidation = false;
             // Random animation
             switch (animActionType)
             {
                 case AnimActionType.AttackRightHand:
-                    CharacterModel.GetRandomRightHandAttackAnimation(skillOrWeaponTypeDataId, randomSeed, out animationIndex, out animSpeedRate, out triggerDurations, out totalDuration);
+                    CharacterModel.GetRandomRightHandAttackAnimation(skillOrWeaponTypeDataId, randomSeed, out animationIndex, out animSpeedRate, out triggerDurations, out totalDuration, out skipMovementValidation);
                     break;
                 case AnimActionType.AttackLeftHand:
-                    CharacterModel.GetRandomLeftHandAttackAnimation(skillOrWeaponTypeDataId, randomSeed, out animationIndex, out animSpeedRate, out triggerDurations, out totalDuration);
+                    CharacterModel.GetRandomLeftHandAttackAnimation(skillOrWeaponTypeDataId, randomSeed, out animationIndex, out animSpeedRate, out triggerDurations, out totalDuration, out skipMovementValidation);
                     break;
                 case AnimActionType.SkillRightHand:
                 case AnimActionType.SkillLeftHand:
-                    CharacterModel.GetSkillActivateAnimation(skillOrWeaponTypeDataId, out animSpeedRate, out triggerDurations, out totalDuration);
+                    CharacterModel.GetSkillActivateAnimation(skillOrWeaponTypeDataId, out animSpeedRate, out triggerDurations, out totalDuration, out skipMovementValidation);
                     break;
             }
         }
@@ -1315,29 +1310,31 @@ namespace MultiplayerARPG
             int animationIndex,
             out float animSpeedRate,
             out float[] triggerDurations,
-            out float totalDuration)
+            out float totalDuration,
+            out bool skipMovementValidation)
         {
             animSpeedRate = 1f;
             triggerDurations = new float[] { 0f };
             totalDuration = 0f;
+            skipMovementValidation = false;
             // Random animation
             switch (animActionType)
             {
                 case AnimActionType.AttackRightHand:
-                    CharacterModel.GetRightHandAttackAnimation(skillOrWeaponTypeDataId, animationIndex, out animSpeedRate, out triggerDurations, out totalDuration);
+                    CharacterModel.GetRightHandAttackAnimation(skillOrWeaponTypeDataId, animationIndex, out animSpeedRate, out triggerDurations, out totalDuration, out skipMovementValidation);
                     break;
                 case AnimActionType.AttackLeftHand:
-                    CharacterModel.GetLeftHandAttackAnimation(skillOrWeaponTypeDataId, animationIndex, out animSpeedRate, out triggerDurations, out totalDuration);
+                    CharacterModel.GetLeftHandAttackAnimation(skillOrWeaponTypeDataId, animationIndex, out animSpeedRate, out triggerDurations, out totalDuration, out skipMovementValidation);
                     break;
                 case AnimActionType.SkillRightHand:
                 case AnimActionType.SkillLeftHand:
-                    CharacterModel.GetSkillActivateAnimation(skillOrWeaponTypeDataId, out animSpeedRate, out triggerDurations, out totalDuration);
+                    CharacterModel.GetSkillActivateAnimation(skillOrWeaponTypeDataId, out animSpeedRate, out triggerDurations, out totalDuration, out skipMovementValidation);
                     break;
                 case AnimActionType.ReloadRightHand:
-                    CharacterModel.GetRightHandReloadAnimation(skillOrWeaponTypeDataId, out animSpeedRate, out triggerDurations, out totalDuration);
+                    CharacterModel.GetRightHandReloadAnimation(skillOrWeaponTypeDataId, out animSpeedRate, out triggerDurations, out totalDuration, out skipMovementValidation);
                     break;
                 case AnimActionType.ReloadLeftHand:
-                    CharacterModel.GetLeftHandReloadAnimation(skillOrWeaponTypeDataId, out animSpeedRate, out triggerDurations, out totalDuration);
+                    CharacterModel.GetLeftHandReloadAnimation(skillOrWeaponTypeDataId, out animSpeedRate, out triggerDurations, out totalDuration, out skipMovementValidation);
                     break;
             }
         }

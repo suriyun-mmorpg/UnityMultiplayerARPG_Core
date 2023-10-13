@@ -9,18 +9,26 @@ namespace MultiplayerARPG
         [SerializeField]
         private CharacterStatsIncremental stats;
         public virtual CharacterStatsIncremental Stats { get { return stats; } set { stats = value; } }
+
         [SerializeField]
         [ArrayElementTitle("attribute")]
         private AttributeIncremental[] attributes;
         public virtual AttributeIncremental[] Attributes { get { return attributes; } set { attributes = value; } }
+
         [SerializeField]
         [ArrayElementTitle("damageElement")]
         private ResistanceIncremental[] resistances;
         public virtual ResistanceIncremental[] Resistances { get { return resistances; } set { resistances = value; } }
+
         [SerializeField]
         [ArrayElementTitle("damageElement")]
         private ArmorIncremental[] armors;
         public virtual ArmorIncremental[] Armors { get { return armors; } set { armors = value; } }
+
+        [SerializeField]
+        [ArrayElementTitle("statusEffect")]
+        private StatusEffectResistanceIncremental[] statusEffectResistances;
+        public virtual StatusEffectResistanceIncremental[] StatusEffectResistances { get { return statusEffectResistances; } set { statusEffectResistances = value; } }
 
         public abstract Dictionary<BaseSkill, int> CacheSkillLevels { get; }
 
@@ -44,12 +52,18 @@ namespace MultiplayerARPG
             return GameDataHelpers.CombineArmors(Armors, new Dictionary<DamageElement, float>(), level, 1f);
         }
 
+        public Dictionary<StatusEffect, float> GetCharacterStatusEffectResistances(int level)
+        {
+            return GameDataHelpers.CombineStatusEffectResistances(StatusEffectResistances, new Dictionary<StatusEffect, float>(), level, 1f);
+        }
+
         public override void PrepareRelatesData()
         {
             base.PrepareRelatesData();
             GameInstance.AddAttributes(Attributes);
             GameInstance.AddDamageElements(Resistances);
             GameInstance.AddDamageElements(Armors);
+            GameInstance.AddStatusEffects(StatusEffectResistances);
             GameInstance.AddSkills(CacheSkillLevels.Keys);
         }
     }

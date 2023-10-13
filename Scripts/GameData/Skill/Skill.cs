@@ -40,8 +40,10 @@ namespace MultiplayerARPG
         public bool increaseDamageAmountsWithBuffs;
         public bool isDebuff;
         public Buff debuff;
+        public StatusEffectApplying[] attackStatusEffects;
         public HarvestType harvestType;
         public IncrementalMinMaxFloat harvestDamageAmount;
+        public GameEffect[] damageHitEffects;
 
         [Category(4, "Buff")]
         public SkillBuffType skillBuffType;
@@ -63,6 +65,14 @@ namespace MultiplayerARPG
                 if (_cacheEffectivenessAttributes == null)
                     _cacheEffectivenessAttributes = GameDataHelpers.CombineDamageEffectivenessAttributes(effectivenessAttributes, new Dictionary<Attribute, float>());
                 return _cacheEffectivenessAttributes;
+            }
+        }
+
+        public override GameEffect[] DamageHitEffects
+        {
+            get
+            {
+                return damageHitEffects;
             }
         }
 
@@ -225,6 +235,12 @@ namespace MultiplayerARPG
             skillUser.Mount(mount.MountEntity);
         }
 
+        public override void OnSkillAttackHit(int skillLevel, EntityInfo instigator, CharacterItem weapon, BaseCharacterEntity target)
+        {
+            base.OnSkillAttackHit(skillLevel, instigator, weapon, target);
+            attackStatusEffects.ApplyStatusEffect(skillLevel, instigator, weapon, target);
+        }
+
         public override SkillType SkillType
         {
             get { return skillType; }
@@ -264,9 +280,11 @@ namespace MultiplayerARPG
             switch (skillAttackType)
             {
                 case SkillAttackType.Normal:
-                    return damageAmount.ToKeyValuePair(skillLevel, 1f, GetEffectivenessDamage(skillUser));
+                    return GameDataHelpers.GetDamageWithEffectiveness(CacheEffectivenessAttributes, skillUser.GetCaches().Attributes, damageAmount.ToKeyValuePair(skillLevel, 1f));
                 case SkillAttackType.BasedOnWeapon:
-                    return skillUser.GetWeaponDamages(ref isLeftHand);
+                    if (isLeftHand && skillUser.GetCaches().LeftHandWeaponDamage.HasValue)
+                        return skillUser.GetCaches().LeftHandWeaponDamage.Value;
+                    return skillUser.GetCaches().RightHandWeaponDamage.Value;
             }
             return new KeyValuePair<DamageElement, MinMaxFloat>();
         }
@@ -298,11 +316,6 @@ namespace MultiplayerARPG
         public override IncrementalMinMaxFloat HarvestDamageAmount
         {
             get { return harvestDamageAmount; }
-        }
-
-        protected float GetEffectivenessDamage(ICharacterData skillUser)
-        {
-            return GameDataHelpers.GetEffectivenessDamage(CacheEffectivenessAttributes, skillUser);
         }
 
         public override Buff Buff
@@ -370,6 +383,7 @@ namespace MultiplayerARPG
             GameInstance.AddItems(itemCraft.CraftingItem);
             GameInstance.AddItems(itemCraft.RequireItems);
             GameInstance.AddCurrencies(itemCraft.RequireCurrencies);
+            GameInstance.AddStatusEffects(attackStatusEffects);
             damageInfo.PrepareRelatesData();
         }
 

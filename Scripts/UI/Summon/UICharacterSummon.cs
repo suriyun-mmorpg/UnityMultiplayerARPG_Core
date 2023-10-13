@@ -90,7 +90,7 @@ namespace MultiplayerARPG
                     break;
                 case SummonType.PetItem:
                     onTypeIsPet.Invoke();
-                    tempSummonData = Data.GetPetItem();
+                    tempSummonData = Data.GetPetItem() as BaseItem;
                     break;
             }
 

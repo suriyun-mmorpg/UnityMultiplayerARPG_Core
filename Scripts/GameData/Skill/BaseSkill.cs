@@ -38,7 +38,6 @@ namespace MultiplayerARPG
 
         [Header("Casted Effects")]
         public GameEffect[] skillActivateEffects;
-        public GameEffect[] damageHitEffects;
 
         [Category(11, "Requirement")]
         [Header("Requirements to Levelup (Tools)")]
@@ -247,12 +246,13 @@ namespace MultiplayerARPG
             }
         }
 
+        public IHitRegistrationManager HitRegistrationManager { get { return BaseGameNetworkManager.Singleton.HitRegistrationManager; } }
+
         public override void PrepareRelatesData()
         {
             base.PrepareRelatesData();
             GameInstance.AddPoolingObjects(skillCastEffects);
             GameInstance.AddPoolingObjects(skillActivateEffects);
-            GameInstance.AddPoolingObjects(damageHitEffects);
             GameInstance.AddPoolingObjects(Buff.effects);
             GameInstance.AddPoolingObjects(Debuff.effects);
             Buff.PrepareRelatesData();
@@ -276,9 +276,9 @@ namespace MultiplayerARPG
             get { return skillActivateEffects; }
         }
 
-        public GameEffect[] DamageHitEffects
+        public virtual GameEffect[] DamageHitEffects
         {
-            get { return damageHitEffects; }
+            get { return null; }
         }
 
         public int GetConsumeHp(int level)
@@ -392,8 +392,7 @@ namespace MultiplayerARPG
 
         public bool IsAvailable(ICharacterData character)
         {
-            int skillLevel;
-            return character.GetCaches().Skills.TryGetValue(this, out skillLevel) && skillLevel > 0;
+            return character.GetCaches().Skills.TryGetValue(this, out int skillLevel) && skillLevel > 0;
         }
 
         public abstract SkillType SkillType { get; }
@@ -453,36 +452,35 @@ namespace MultiplayerARPG
                 return damageAmounts;
 
             // Base attack damage amount will sum with other variables later
-            damageAmounts = GameDataHelpers.CombineDamages(
-                damageAmounts,
-                GetBaseAttackDamageAmount(skillUser, skillLevel, isLeftHand));
+            damageAmounts = GameDataHelpers.CombineDamages(damageAmounts, GetBaseAttackDamageAmount(skillUser, skillLevel, isLeftHand));
 
             // Sum damage with weapon damage inflictions
             Dictionary<DamageElement, float> damageInflictions = GetAttackWeaponDamageInflictions(skillUser, skillLevel);
             if (damageInflictions != null && damageInflictions.Count > 0)
             {
                 // Prepare weapon damage amount
-                KeyValuePair<DamageElement, MinMaxFloat> weaponDamageAmount = skillUser.GetWeaponDamages(ref isLeftHand);
+                KeyValuePair<DamageElement, MinMaxFloat> weaponDamageAmount;
+                if (isLeftHand && skillUser.GetCaches().LeftHandWeaponDamage.HasValue)
+                    weaponDamageAmount = skillUser.GetCaches().LeftHandWeaponDamage.Value;
+                else
+                    weaponDamageAmount = skillUser.GetCaches().RightHandWeaponDamage.Value;
+
                 foreach (DamageElement element in damageInflictions.Keys)
                 {
-                    if (element == null) continue;
-                    damageAmounts = GameDataHelpers.CombineDamages(
-                        damageAmounts,
-                        new KeyValuePair<DamageElement, MinMaxFloat>(element, weaponDamageAmount.Value * damageInflictions[element]));
+                    if (element == null)
+                        continue;
+                    damageAmounts = GameDataHelpers.CombineDamages(damageAmounts, new KeyValuePair<DamageElement, MinMaxFloat>(element, weaponDamageAmount.Value * damageInflictions[element]));
                 }
             }
 
             // Sum damage with additional damage amounts
-            damageAmounts = GameDataHelpers.CombineDamages(
-                damageAmounts,
-                GetAttackAdditionalDamageAmounts(skillUser, skillLevel));
+            damageAmounts = GameDataHelpers.CombineDamages(damageAmounts, GetAttackAdditionalDamageAmounts(skillUser, skillLevel));
 
             // Sum damage with buffs
             if (IsIncreaseAttackDamageAmountsWithBuffs(skillUser, skillLevel))
             {
-                damageAmounts = GameDataHelpers.CombineDamages(
-                    damageAmounts,
-                    skillUser.GetCaches().IncreaseDamages);
+                damageAmounts = GameDataHelpers.CombineDamages(damageAmounts, skillUser.GetCaches().IncreaseDamages);
+                damageAmounts = GameDataHelpers.CombineDamages(damageAmounts, GameDataHelpers.MultiplyDamages(new Dictionary<DamageElement, MinMaxFloat>(damageAmounts), skillUser.GetCaches().IncreaseDamagesRate));
             }
 
             return damageAmounts;
@@ -555,11 +553,8 @@ namespace MultiplayerARPG
                 if (!DecreaseAmmos(skillUser, isLeftHand, out Dictionary<DamageElement, MinMaxFloat> increaseDamageAmounts))
                     return;
                 // Increase damage with ammo damage
-                if (increaseDamageAmounts != null && increaseDamageAmounts.Count > 0)
-                {
-                    BaseGameNetworkManager.Singleton.HitRegistrationManager.IncreasePreparedDamageAmounts(skillUser, simulateSeed, increaseDamageAmounts);
-                    damageAmounts = GameDataHelpers.CombineDamages(damageAmounts, increaseDamageAmounts);
-                }
+                if (HitRegistrationManager.IncreasePreparedDamageAmounts(skillUser, simulateSeed, increaseDamageAmounts, out Dictionary<DamageElement, MinMaxFloat> resultDamageAmounts))
+                    damageAmounts = resultDamageAmounts;
             }
 
             ApplySkillImplement(
@@ -610,7 +605,7 @@ namespace MultiplayerARPG
         /// <summary>
         /// Return TRUE if this will override default attack function
         /// </summary>
-        /// <param name="skillUser"></param>
+        /// <param name="attacker"></param>
         /// <param name="skillLevel"></param>
         /// <param name="isLeftHand"></param>
         /// <param name="weapon"></param>
@@ -620,7 +615,7 @@ namespace MultiplayerARPG
         /// <param name="aimPosition"></param>
         /// <returns></returns>
         public virtual bool OnAttack(
-            BaseCharacterEntity skillUser,
+            BaseCharacterEntity attacker,
             int skillLevel,
             bool isLeftHand,
             CharacterItem weapon,
@@ -630,6 +625,19 @@ namespace MultiplayerARPG
             AimPosition aimPosition)
         {
             return false;
+        }
+
+        /// <summary>
+        /// This will be called when skill attack hit `target`, do something such as apply debuff to `target` here
+        /// </summary>
+        /// <param name="skillLevel"></param>
+        /// <param name="instigator"></param>
+        /// <param name="weapon"></param>
+        /// <param name="target"></param>
+        public virtual void OnSkillAttackHit(int skillLevel, EntityInfo instigator, CharacterItem weapon, BaseCharacterEntity target)
+        {
+            if (IsDebuff)
+                target.ApplyBuff(DataId, BuffType.SkillDebuff, skillLevel, instigator, weapon);
         }
 
         public virtual bool CanLevelUp(IPlayerCharacterData character, int level, out UITextKeys gameMessage, bool checkSkillPoint = true, bool checkGold = true)
@@ -670,13 +678,12 @@ namespace MultiplayerARPG
                 return false;
             }
 
-            // Check is it pass skill level requirement or not
-            Dictionary<BaseSkill, int> currentSkillLevels;
-            if (!character.HasEnoughSkillLevels(GetRequireSkillLevels(level), false, out gameMessage, out currentSkillLevels))
+            // Check is it pass attribute requirement or not
+            if (!character.HasEnoughAttributeAmounts(GetRequireAttributeAmounts(level), false, out gameMessage, out _))
                 return false;
 
-            // Check is it pass attribute requirement or not
-            if (!character.HasEnoughAttributeAmounts(GetRequireAttributeAmounts(level), false, false, currentSkillLevels, out gameMessage, out _))
+            // Check is it pass skill level requirement or not
+            if (!character.HasEnoughSkillLevels(GetRequireSkillLevels(level), false, out gameMessage, out _))
                 return false;
 
             // Check is it pass currency requirement or not

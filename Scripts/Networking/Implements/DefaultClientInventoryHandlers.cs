@@ -86,5 +86,10 @@ namespace MultiplayerARPG
         {
             return Manager.ClientSendRequest(GameNetworkingConsts.SellItems, data, responseDelegate: callback);
         }
+
+        public bool RequestSortItems(RequestSortItemsMessage data, ResponseDelegate<ResponseSortItemsMessage> callback)
+        {
+            return Manager.ClientSendRequest(GameNetworkingConsts.SortItems, data, responseDelegate: callback);
+        }
     }
 }

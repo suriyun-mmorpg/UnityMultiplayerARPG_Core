@@ -35,6 +35,12 @@ namespace MultiplayerARPG
         CorpseLooting,
     }
 
+    public enum RewardingMode
+    {
+        Immediately,
+        DropOnGround,
+    }
+
     public enum TestInEditorMode
     {
         Standalone,
@@ -160,6 +166,9 @@ namespace MultiplayerARPG
 
         [Header("Gameplay Objects")]
         public ItemDropEntity itemDropEntityPrefab = null;
+        public ExpDropEntity expDropEntityPrefab = null;
+        public GoldDropEntity goldDropEntityPrefab = null;
+        public CurrencyDropEntity currencyDropEntityPrefab = null;
         public WarpPortalEntity warpPortalEntityPrefab = null;
         public ItemsContainerEntity playerCorpsePrefab = null;
         public ItemsContainerEntity monsterCorpsePrefab = null;
@@ -288,6 +297,8 @@ namespace MultiplayerARPG
         public float dealingRequestDuration = 5f;
         [Tooltip("If this is `TRUE`, dealing feature will be disabled, all players won't be able to deal items to each other")]
         public bool disableDealing = false;
+        [Tooltip("If this is > 0, it will limit amount of vending items")]
+        public int vendingItemsLimit = 16;
         [Tooltip("If this is `TRUE`, vending feature will be disabled, all players won't be able to deal items to each other")]
         public bool disableVending = false;
         [Tooltip("If dueling request does not accepted within this duration, the request will be cancelled")]
@@ -325,6 +336,12 @@ namespace MultiplayerARPG
         public float playerCorpseAppearDuration = 60f;
         [Tooltip("How monster character drop item when dying")]
         public DeadDropItemMode monsterDeadDropItemMode = DeadDropItemMode.DropOnGround;
+        [Tooltip("How monster character drop exp when dying")]
+        public RewardingMode monsterExpRewardingMode = RewardingMode.Immediately;
+        [Tooltip("How monster character drop gold when dying")]
+        public RewardingMode monsterGoldRewardingMode = RewardingMode.Immediately;
+        [Tooltip("How monster character drop currency when dying")]
+        public RewardingMode monsterCurrencyRewardingMode = RewardingMode.Immediately;
         [Tooltip("If all items does not picked up from corpse within this duration, it will be destroyed from the server")]
         public float monsterCorpseAppearDuration = 60f;
         [Tooltip("Delay before return move speed while attack or use skill to generic move speed")]
@@ -1371,6 +1388,36 @@ namespace MultiplayerARPG
             if (statusEffects == null)
                 return;
             foreach (StatusEffectApplying statusEffect in statusEffects)
+            {
+                AddStatusEffects(statusEffect.statusEffect);
+            }
+        }
+
+        public static void AddStatusEffects(params StatusEffectResistanceAmount[] statusEffects)
+        {
+            AddStatusEffects((IEnumerable<StatusEffectResistanceAmount>)statusEffects);
+        }
+
+        public static void AddStatusEffects(IEnumerable<StatusEffectResistanceAmount> statusEffects)
+        {
+            if (statusEffects == null)
+                return;
+            foreach (StatusEffectResistanceAmount statusEffect in statusEffects)
+            {
+                AddStatusEffects(statusEffect.statusEffect);
+            }
+        }
+
+        public static void AddStatusEffects(params StatusEffectResistanceIncremental[] statusEffects)
+        {
+            AddStatusEffects((IEnumerable<StatusEffectResistanceIncremental>)statusEffects);
+        }
+
+        public static void AddStatusEffects(IEnumerable<StatusEffectResistanceIncremental> statusEffects)
+        {
+            if (statusEffects == null)
+                return;
+            foreach (StatusEffectResistanceIncremental statusEffect in statusEffects)
             {
                 AddStatusEffects(statusEffect.statusEffect);
             }

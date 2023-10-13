@@ -7,10 +7,18 @@ namespace MultiplayerARPG
     public class PlayerCharacterBodyPartComponent : BaseGameEntityComponent<BasePlayerCharacterEntity>
     {
         [System.Serializable]
+        public class MaterialGroup
+        {
+            [Tooltip("Material Settings for each mesh's materials, its index is index of `MeshRenderer` -> `materials`")]
+            public Material[] materials = new Material[0];
+        }
+
+        [System.Serializable]
         public class ModelColorSetting
         {
             [Tooltip("Material Settings for each mesh's materials, its index is index of `MeshRenderer` -> `materials`")]
             public Material[] materials = new Material[0];
+            public MaterialGroup[] materialGroups = new MaterialGroup[0];
         }
 
         [System.Serializable]
@@ -209,19 +217,38 @@ namespace MultiplayerARPG
             ApplyModelAndColorBySavedData();
         }
 
-        private void OnShowEquipmentModel(EquipmentModel model, GameObject modelObject, BaseEquipmentEntity equipmentEntity, EquipmentContainer equipmentContainer)
+        private void OnShowEquipmentModel(EquipmentModel model, GameObject modelObject, BaseEquipmentEntity equipmentEntity, EquipmentInstantiatedObjectGroup instantiatedObjectGroup, EquipmentContainer equipmentContainer)
         {
             // Get mesh's material to change color
-            if (model == null || modelObject == null)
+            if (model == null)
                 return;
 
             if (model.indexOfModel < 0 || options[_currentModelIndex].colors.Length <= 0 || model.indexOfModel >= options[_currentModelIndex].colors[_currentColorIndex].ModelColorSettings.Length)
                 return;
 
+            ModelColorSetting modelColorSetting = options[_currentModelIndex].colors[_currentColorIndex].ModelColorSettings[model.indexOfModel];
+
+            if (modelObject != null && modelColorSetting.materials.Length > 0)
+            {
+                SetMaterial(modelObject, modelColorSetting.materials);
+            }
+
+            if (instantiatedObjectGroup != null && modelColorSetting.materialGroups.Length > 0)
+            {
+                for (int i = 0; i < instantiatedObjectGroup.instantiatedObjects.Length; ++i)
+                {
+                    if (i >= modelColorSetting.materialGroups.Length)
+                        break;
+                    SetMaterial(instantiatedObjectGroup.instantiatedObjects[i], modelColorSetting.materialGroups[i].materials);
+                }
+            }
+        }
+
+        private void SetMaterial(GameObject modelObject, Material[] materials)
+        {
             Renderer renderer = modelObject.GetComponentInChildren<Renderer>();
-            if (renderer == null)
-                return;
-            renderer.materials = options[_currentModelIndex].colors[_currentColorIndex].ModelColorSettings[model.indexOfModel].materials;
+            if (renderer != null)
+                renderer.materials = materials;
         }
 
         public int CreateFakeItemDataId()

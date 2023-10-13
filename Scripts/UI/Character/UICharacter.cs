@@ -3,6 +3,7 @@ using Cysharp.Text;
 using LiteNetLibManager;
 using UnityEngine;
 using UnityEngine.Profiling;
+using UnityEngine.Serialization;
 
 namespace MultiplayerARPG
 {
@@ -46,16 +47,16 @@ namespace MultiplayerARPG
         public TextWrapper uiTextGold;
         public TextWrapper uiTextWeightLimit;
         public TextWrapper uiTextSlotLimit;
-        public TextWrapper uiTextWeaponDamages;
+        [FormerlySerializedAs("uiTextWeaponDamages")]
+        public TextWrapper uiTextAllDamages;
         public UIDamageElementAmounts uiRightHandDamages;
         public UIDamageElementAmounts uiLeftHandDamages;
         public UICharacterStats uiCharacterStats;
         public UICharacterBuffs uiCharacterBuffs;
         public UIResistanceAmounts uiCharacterResistances;
-        public UIDamageElementAmounts uiCharacterElementalDamages;
         public UIArmorAmounts uiCharacterArmors;
-        public UICharacterAttributePair[] uiCharacterAttributes;
-        public UICharacterCurrencyPair[] uiCharacterCurrencies;
+        public UICharacterAttributePair[] uiCharacterAttributes = new UICharacterAttributePair[0];
+        public UICharacterCurrencyPair[] uiCharacterCurrencies = new UICharacterCurrencyPair[0];
         public UICharacterClass uiCharacterClass;
         public UIPlayerIcon uiPlayerIcon;
         public UIPlayerFrame uiPlayerFrame;
@@ -77,13 +78,12 @@ namespace MultiplayerARPG
         public bool showDamageWithBuffs;
 
         // Improve garbage collector
-        private Dictionary<BaseSkill, int> _cacheSkills;
         private CharacterStats _cacheStats;
         private Dictionary<Attribute, float> _cacheAttributes;
         private Dictionary<DamageElement, float> _cacheResistances;
         private Dictionary<DamageElement, float> _cacheArmors;
-        private Dictionary<DamageElement, MinMaxFloat> _cacheDamages;
-        private Dictionary<EquipmentSet, int> _cacheEquipmentSets;
+        private Dictionary<DamageElement, MinMaxFloat> _cacheRightHandDamages;
+        private Dictionary<DamageElement, MinMaxFloat> _cacheLeftHandDamages;
 
         public bool NotForOwningCharacter
         {
@@ -349,19 +349,17 @@ namespace MultiplayerARPG
             IPlayerCharacterData playerCharacter = Data as IPlayerCharacterData;
 
             _cacheStats = new CharacterStats();
-            _cacheAttributes = new Dictionary<Attribute, float>();
-            _cacheResistances = new Dictionary<DamageElement, float>();
-            _cacheArmors = new Dictionary<DamageElement, float>();
-            _cacheDamages = new Dictionary<DamageElement, MinMaxFloat>();
-            _cacheSkills = new Dictionary<BaseSkill, int>();
-            _cacheEquipmentSets = new Dictionary<EquipmentSet, int>();
-            _cacheSkills = GameDataHelpers.CombineSkills(_cacheSkills, Data.GetSkills(true));
-            _cacheAttributes = GameDataHelpers.CombineAttributes(_cacheAttributes, showAttributeWithBuffs ? Data.GetAttributes(true, true, _cacheSkills) : Data.GetAttributes(true, false, null));
-            _cacheResistances = GameDataHelpers.CombineResistances(_cacheResistances, showResistanceWithBuffs ? Data.GetResistances(true, true, _cacheAttributes, _cacheSkills) : Data.GetResistances(true, false, null, null));
-            _cacheArmors = GameDataHelpers.CombineArmors(_cacheArmors, showArmorWithBuffs ? Data.GetArmors(true, true, _cacheAttributes, _cacheSkills) : Data.GetArmors(true, false, null, null));
-            _cacheDamages = GameDataHelpers.CombineDamages(_cacheDamages, showDamageWithBuffs ? Data.GetIncreaseDamages(true, true, _cacheAttributes, _cacheSkills) : Data.GetIncreaseDamages(true, false, null, null));
-            _cacheStats = _cacheStats + (showStatsWithBuffs ? Data.GetStats(true, true, _cacheSkills) : Data.GetStats(true, false, null));
-            Data.GetEquipmentSetBonus(ref _cacheStats, _cacheAttributes, _cacheResistances, _cacheArmors, _cacheDamages, _cacheSkills, _cacheEquipmentSets, true);
+            _cacheAttributes = null;
+            _cacheResistances = null;
+            _cacheArmors = null;
+            _cacheRightHandDamages = null;
+            _cacheLeftHandDamages = null;
+
+            Data.GetAllStats(true, showStatsWithBuffs, true, onGetStats: stats => _cacheStats = stats);
+            Data.GetAllStats(true, showAttributeWithBuffs, true, onGetAttributes: stats => _cacheAttributes = stats);
+            Data.GetAllStats(true, showResistanceWithBuffs, true, onGetResistances: stats => _cacheResistances = stats);
+            Data.GetAllStats(true, showArmorWithBuffs, true, onGetArmors: stats => _cacheArmors = stats);
+            Data.GetAllStats(true, showDamageWithBuffs, true, onGetRightHandDamages: stats => _cacheRightHandDamages = stats, onGetLeftHandDamages: stats => _cacheLeftHandDamages = stats);
 
             if (uiTextWeightLimit != null)
             {
@@ -379,30 +377,13 @@ namespace MultiplayerARPG
                     Data.GetCaches().LimitItemSlot.ToString("N0"));
             }
 
-            CharacterItem rightHandItem = Data.EquipWeapons.rightHand;
-            CharacterItem leftHandItem = Data.EquipWeapons.leftHand;
-            IWeaponItem rightHandWeapon = rightHandItem.GetWeaponItem();
-            IWeaponItem leftHandWeapon = leftHandItem.GetWeaponItem();
-            Dictionary<DamageElement, MinMaxFloat> rightHandDamages = null;
-            Dictionary<DamageElement, MinMaxFloat> leftHandDamages = null;
-            if (rightHandWeapon != null)
-            {
-                rightHandDamages = GameDataHelpers.CombineDamages(null, _cacheDamages);
-                rightHandDamages = GameDataHelpers.CombineDamages(rightHandDamages, rightHandItem.GetDamageAmount(Data));
-            }
-            if (leftHandWeapon != null)
-            {
-                leftHandDamages = GameDataHelpers.CombineDamages(null, _cacheDamages);
-                leftHandDamages = GameDataHelpers.CombineDamages(leftHandDamages, leftHandItem.GetDamageAmount(Data));
-            }
-
-            if (uiTextWeaponDamages != null)
+            if (uiTextAllDamages != null)
             {
                 using (Utf16ValueStringBuilder textDamages = ZString.CreateStringBuilder(false))
                 {
-                    if (rightHandWeapon != null)
+                    if (_cacheRightHandDamages != null)
                     {
-                        MinMaxFloat sumDamages = GameDataHelpers.GetSumDamages(rightHandDamages);
+                        MinMaxFloat sumDamages = GameDataHelpers.GetSumDamages(_cacheRightHandDamages);
                         if (textDamages.Length > 0)
                             textDamages.Append('\n');
                         textDamages.AppendFormat(
@@ -410,9 +391,9 @@ namespace MultiplayerARPG
                             sumDamages.min.ToString("N0"),
                             sumDamages.max.ToString("N0"));
                     }
-                    if (leftHandWeapon != null)
+                    if (_cacheLeftHandDamages != null)
                     {
-                        MinMaxFloat sumDamages = GameDataHelpers.GetSumDamages(leftHandDamages);
+                        MinMaxFloat sumDamages = GameDataHelpers.GetSumDamages(_cacheLeftHandDamages);
                         if (textDamages.Length > 0)
                             textDamages.Append('\n');
                         textDamages.AppendFormat(
@@ -420,22 +401,13 @@ namespace MultiplayerARPG
                             sumDamages.min.ToString("N0"),
                             sumDamages.max.ToString("N0"));
                     }
-                    if (rightHandWeapon == null && leftHandWeapon == null)
-                    {
-                        IWeaponItem defaultWeaponItem = GameInstance.Singleton.DefaultWeaponItem;
-                        KeyValuePair<DamageElement, MinMaxFloat> damageAmount = defaultWeaponItem.GetDamageAmount(1, 1f, Data);
-                        textDamages.AppendFormat(
-                            LanguageManager.GetText(formatKeyWeaponDamage),
-                            damageAmount.Value.min.ToString("N0"),
-                            damageAmount.Value.max.ToString("N0"));
-                    }
-                    uiTextWeaponDamages.text = textDamages.ToString();
+                    uiTextAllDamages.text = textDamages.ToString();
                 }
             }
 
             if (uiRightHandDamages != null)
             {
-                if (rightHandWeapon == null)
+                if (_cacheRightHandDamages == null)
                 {
                     uiRightHandDamages.Hide();
                 }
@@ -443,13 +415,13 @@ namespace MultiplayerARPG
                 {
                     uiRightHandDamages.isBonus = false;
                     uiRightHandDamages.Show();
-                    uiRightHandDamages.Data = rightHandDamages;
+                    uiRightHandDamages.Data = _cacheRightHandDamages;
                 }
             }
 
             if (uiLeftHandDamages != null)
             {
-                if (leftHandWeapon == null)
+                if (_cacheLeftHandDamages == null)
                 {
                     uiLeftHandDamages.Hide();
                 }
@@ -457,7 +429,7 @@ namespace MultiplayerARPG
                 {
                     uiLeftHandDamages.isBonus = false;
                     uiLeftHandDamages.Show();
-                    uiLeftHandDamages.Data = leftHandDamages;
+                    uiLeftHandDamages.Data = _cacheLeftHandDamages;
                 }
             }
 
@@ -472,12 +444,6 @@ namespace MultiplayerARPG
             {
                 uiCharacterResistances.isBonus = false;
                 uiCharacterResistances.Data = _cacheResistances;
-            }
-
-            if (uiCharacterElementalDamages != null)
-            {
-                uiCharacterElementalDamages.isBonus = false;
-                uiCharacterElementalDamages.Data = _cacheDamages;
             }
 
             if (uiCharacterArmors != null)

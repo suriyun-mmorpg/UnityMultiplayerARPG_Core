@@ -24,6 +24,8 @@ namespace MultiplayerARPG
         public int ReloadingAmmoAmount { get; protected set; }
         public bool IsReloading { get; protected set; }
         public float LastReloadEndTime { get; protected set; }
+        protected bool _skipMovementValidation;
+        public bool LastReloadSkipMovementValidation { get { return _skipMovementValidation; } set { _skipMovementValidation = value; } }
         public float MoveSpeedRateWhileReloading { get; protected set; }
         public MovementRestriction MovementRestrictionWhileReloading { get; protected set; }
         protected float _totalDuration;
@@ -76,7 +78,8 @@ namespace MultiplayerARPG
                 0,
                 out float animSpeedRate,
                 out _triggerDurations,
-                out _totalDuration);
+                out _totalDuration,
+                out _skipMovementValidation);
 
             // Set doing action state at clients and server
             SetReloadActionStates(animActionType, reloadingAmmoAmount);
@@ -284,7 +287,7 @@ namespace MultiplayerARPG
 #endif
         }
 
-        public virtual bool WriteClientReloadState(NetDataWriter writer)
+        public virtual bool WriteClientReloadState(long writeTimestamp, NetDataWriter writer)
         {
             if (_clientState.HasValue)
             {
@@ -299,7 +302,7 @@ namespace MultiplayerARPG
             return false;
         }
 
-        public virtual bool WriteServerReloadState(NetDataWriter writer)
+        public virtual bool WriteServerReloadState(long writeTimestamp, NetDataWriter writer)
         {
             if (_serverState.HasValue)
             {
@@ -315,13 +318,13 @@ namespace MultiplayerARPG
             return false;
         }
 
-        public virtual void ReadClientReloadStateAtServer(NetDataReader reader)
+        public virtual void ReadClientReloadStateAtServer(long peerTimestamp, NetDataReader reader)
         {
             bool isLeftHand = reader.GetBool();
             ProceedReloadStateAtServer(isLeftHand);
         }
 
-        public virtual void ReadServerReloadStateAtClient(NetDataReader reader)
+        public virtual void ReadServerReloadStateAtClient(long peerTimestamp, NetDataReader reader)
         {
             bool isLeftHand = reader.GetBool();
             int reloadingAmmoAmount = reader.GetPackedInt();

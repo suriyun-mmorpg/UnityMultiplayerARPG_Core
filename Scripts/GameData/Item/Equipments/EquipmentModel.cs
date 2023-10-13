@@ -84,10 +84,10 @@ namespace MultiplayerARPG
             };
         }
 
-        public void InvokeOnInstantiated(GameObject modelObject, BaseEquipmentEntity equipmentEntity, EquipmentContainer equipmentContainer)
+        public void InvokeOnInstantiated(GameObject modelObject, BaseEquipmentEntity equipmentEntity, EquipmentInstantiatedObjectGroup instantiatedObjectGroup, EquipmentContainer equipmentContainer)
         {
             if (onInstantiated != null)
-                onInstantiated.Invoke(this, modelObject, equipmentEntity, equipmentContainer);
+                onInstantiated.Invoke(this, modelObject, equipmentEntity, instantiatedObjectGroup, equipmentContainer);
         }
     }
 }

@@ -4,9 +4,10 @@ namespace MultiplayerARPG
 {
     public static partial class NetworkBehaviourExtensions
     {
-        public static bool TryGetEntityByObjectId<T>(this LiteNetLibGameManager manager, uint objectId, out T result) where T : class
+        public static bool TryGetEntityByObjectId<T>(this LiteNetLibGameManager manager, uint objectId, out T result)
         {
-            result = null;
+            result = default;
+
             LiteNetLibIdentity identity;
             if (!manager.Assets.TryGetSpawnedObject(objectId, out identity))
                 return false;

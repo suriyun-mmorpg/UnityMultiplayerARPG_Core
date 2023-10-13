@@ -124,11 +124,18 @@ namespace MultiplayerARPG
         [ArrayElementTitle("damageElement")]
         public ArmorIncremental[] increaseArmors;
         [ArrayElementTitle("damageElement")]
+        public ArmorIncremental[] increaseArmorsRate;
+        [ArrayElementTitle("damageElement")]
         public DamageIncremental[] increaseDamages;
-        [ArrayElementTitle("skill")]
+        [ArrayElementTitle("damageElement")]
+        public DamageIncremental[] increaseDamagesRate;
+        // TODO: This is deprecated
         [HideInInspector]
+        [ArrayElementTitle("skill")]
         public SkillLevel[] increaseSkillLevels;
         public SkillIncremental[] increaseSkills;
+        [ArrayElementTitle("statusEffect")]
+        private StatusEffectResistanceIncremental[] increaseStatusEffectResistances;
 
         [Category(2, "Ammo Settings")]
         public AmmoType ammoType;
@@ -330,14 +337,29 @@ namespace MultiplayerARPG
             get { return increaseArmors; }
         }
 
+        public ArmorIncremental[] IncreaseArmorsRate
+        {
+            get { return increaseArmorsRate; }
+        }
+
         public DamageIncremental[] IncreaseDamages
         {
             get { return increaseDamages; }
         }
 
+        public DamageIncremental[] IncreaseDamagesRate
+        {
+            get { return increaseDamagesRate; }
+        }
+
         public SkillIncremental[] IncreaseSkills
         {
             get { return increaseSkills; }
+        }
+
+        public StatusEffectResistanceIncremental[] IncreaseStatusEffectResistances
+        {
+            get { return increaseStatusEffectResistances; }
         }
 
         public StatusEffectApplying[] SelfStatusEffectsWhenAttacking
@@ -660,10 +682,13 @@ namespace MultiplayerARPG
             GameInstance.AddAttributes(increaseAttributesRate);
             GameInstance.AddDamageElements(increaseResistances);
             GameInstance.AddDamageElements(increaseArmors);
+            GameInstance.AddDamageElements(increaseArmorsRate);
             GameInstance.AddDamageElements(increaseDamages);
+            GameInstance.AddDamageElements(increaseDamagesRate);
             GameInstance.AddDamageElements(damageAmount);
             GameInstance.AddSkills(increaseSkills);
             GameInstance.AddSkills(skillLevel);
+            GameInstance.AddStatusEffects(increaseStatusEffectResistances);
             GameInstance.AddStatusEffects(selfStatusEffectsWhenAttacking);
             GameInstance.AddStatusEffects(enemyStatusEffectsWhenAttacking);
             GameInstance.AddStatusEffects(selfStatusEffectsWhenAttacked);

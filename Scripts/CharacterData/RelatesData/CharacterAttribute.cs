@@ -6,14 +6,36 @@ namespace MultiplayerARPG
     {
         [System.NonSerialized]
         private int _dirtyDataId;
+
         [System.NonSerialized]
         private Attribute _cacheAttribute;
 
+        ~CharacterAttribute()
+        {
+            ClearCachedData();
+        }
+
+        private void ClearCachedData()
+        {
+            _cacheAttribute = null;
+        }
+
+        private bool IsRecaching()
+        {
+            return _dirtyDataId != dataId;
+        }
+
+        private void MakeAsCached()
+        {
+            _dirtyDataId = dataId;
+        }
+
         private void MakeCache()
         {
-            if (_dirtyDataId == dataId)
+            if (!IsRecaching())
                 return;
-            _dirtyDataId = dataId;
+            MakeAsCached();
+            ClearCachedData();
             if (!GameInstance.Attributes.TryGetValue(dataId, out _cacheAttribute))
                 _cacheAttribute = null;
         }

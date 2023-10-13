@@ -27,8 +27,14 @@ namespace MultiplayerARPG
         public TextWrapper uiTextAllAmounts;
         public UIAttributeTextPair[] textAmounts;
 
+        [Header("List UI Elements")]
+        public UICharacterAttribute uiEntryPrefab;
+        public Transform uiListContainer;
+
         [Header("Options")]
         public DisplayType displayType;
+        public string numberFormatSimple = "N0";
+        public string numberFormatRate = "N2";
         public bool includeEquipmentsForCurrentAmounts;
         public bool includeBuffsForCurrentAmounts;
         public bool includeSkillsForCurrentAmounts;
@@ -36,14 +42,14 @@ namespace MultiplayerARPG
         public bool inactiveIfAmountZero;
         public bool useSimpleFormatIfAmountEnough = true;
 
-        private Dictionary<Attribute, UIAttributeTextPair> cacheTextAmounts;
+        private Dictionary<Attribute, UIAttributeTextPair> _cacheTextAmounts;
         public Dictionary<Attribute, UIAttributeTextPair> CacheTextAmounts
         {
             get
             {
-                if (cacheTextAmounts == null)
+                if (_cacheTextAmounts == null)
                 {
-                    cacheTextAmounts = new Dictionary<Attribute, UIAttributeTextPair>();
+                    _cacheTextAmounts = new Dictionary<Attribute, UIAttributeTextPair>();
                     Attribute tempData;
                     foreach (UIAttributeTextPair componentPair in textAmounts)
                     {
@@ -51,10 +57,25 @@ namespace MultiplayerARPG
                             continue;
                         tempData = componentPair.attribute;
                         SetDefaultValue(componentPair);
-                        cacheTextAmounts[tempData] = componentPair;
+                        _cacheTextAmounts[tempData] = componentPair;
                     }
                 }
-                return cacheTextAmounts;
+                return _cacheTextAmounts;
+            }
+        }
+
+        private UIList _cacheList;
+        public UIList CacheList
+        {
+            get
+            {
+                if (_cacheList == null)
+                {
+                    _cacheList = gameObject.AddComponent<UIList>();
+                    _cacheList.uiPrefab = uiEntryPrefab.gameObject;
+                    _cacheList.uiContainer = uiListContainer;
+                }
+                return _cacheList;
             }
         }
 
@@ -77,7 +98,7 @@ namespace MultiplayerARPG
                 IPlayerCharacterData character = GameInstance.PlayingCharacter;
                 Dictionary<Attribute, float> currentAttributeAmounts = new Dictionary<Attribute, float>();
                 if (character != null)
-                    currentAttributeAmounts = character.GetAttributes(includeEquipmentsForCurrentAmounts, includeBuffsForCurrentAmounts, includeSkillsForCurrentAmounts ? character.GetSkills(includeEquipmentsForCurrentAmounts) : null);
+                    character.GetAllStats(includeEquipmentsForCurrentAmounts, includeBuffsForCurrentAmounts, includeSkillsForCurrentAmounts, onGetAttributes: attributes => currentAttributeAmounts = attributes);
                 // In-loop temp data
                 using (Utf16ValueStringBuilder tempAllText = ZString.CreateStringBuilder(false))
                 {
@@ -106,9 +127,9 @@ namespace MultiplayerARPG
                             case DisplayType.Rate:
                                 // This will show only target amount, so current character attribute amount will not be shown
                                 if (isBonus)
-                                    tempTargetValue = (tempTargetAmount * 100).ToBonusString("N2");
+                                    tempTargetValue = (tempTargetAmount * 100).ToBonusString(numberFormatRate);
                                 else
-                                    tempTargetValue = (tempTargetAmount * 100).ToString("N2");
+                                    tempTargetValue = (tempTargetAmount * 100).ToString(numberFormatRate);
                                 tempAmountText = ZString.Format(
                                     LanguageManager.GetText(formatKeyRateAmount),
                                     tempData.Title,
@@ -118,8 +139,8 @@ namespace MultiplayerARPG
                                 // This will show both current character attribute amount and target amount
                                 tempAmountEnough = tempCurrentAmount >= tempTargetAmount;
                                 tempFormat = LanguageManager.GetText(tempAmountEnough ? formatKeyAmount : formatKeyAmountNotEnough);
-                                tempCurrentValue = tempCurrentAmount.ToString("N0");
-                                tempTargetValue = tempTargetAmount.ToString("N0");
+                                tempCurrentValue = tempCurrentAmount.ToString(numberFormatSimple);
+                                tempTargetValue = tempTargetAmount.ToString(numberFormatSimple);
                                 if (useSimpleFormatIfAmountEnough && tempAmountEnough)
                                     tempAmountText = ZString.Format(LanguageManager.GetText(formatKeySimpleAmount), tempData.Title, tempTargetValue);
                                 else
@@ -128,9 +149,9 @@ namespace MultiplayerARPG
                             default:
                                 // This will show only target amount, so current character attribute amount will not be shown
                                 if (isBonus)
-                                    tempTargetValue = tempTargetAmount.ToBonusString("N0");
+                                    tempTargetValue = tempTargetAmount.ToBonusString(numberFormatSimple);
                                 else
-                                    tempTargetValue = tempTargetAmount.ToString("N0");
+                                    tempTargetValue = tempTargetAmount.ToString(numberFormatSimple);
                                 tempAmountText = ZString.Format(
                                     LanguageManager.GetText(formatKeySimpleAmount),
                                     tempData.Title,
@@ -161,6 +182,7 @@ namespace MultiplayerARPG
                     }
                 }
             }
+            UpdateList();
         }
 
         private void SetDefaultValue(UIAttributeTextPair componentPair)
@@ -171,7 +193,7 @@ namespace MultiplayerARPG
                     componentPair.uiText.text = ZString.Format(
                         LanguageManager.GetText(formatKeyRateAmount),
                         componentPair.attribute.Title,
-                        isBonus ? 0f.ToBonusString("N2") : 0f.ToString("N2"));
+                        isBonus ? 0f.ToBonusString(numberFormatRate) : 0f.ToString(numberFormatRate));
                     break;
                 case DisplayType.Requirement:
                     if (useSimpleFormatIfAmountEnough)
@@ -193,13 +215,26 @@ namespace MultiplayerARPG
                     componentPair.uiText.text = ZString.Format(
                         LanguageManager.GetText(formatKeySimpleAmount),
                         componentPair.attribute.Title,
-                        isBonus ? 0f.ToBonusString("N0") : "0");
+                        isBonus ? 0f.ToBonusString(numberFormatSimple) : "0");
                     break;
             }
             if (componentPair.imageIcon != null)
                 componentPair.imageIcon.sprite = componentPair.attribute.Icon;
             if (inactiveIfAmountZero && componentPair.root != null)
                 componentPair.root.SetActive(false);
+        }
+
+        private void UpdateList()
+        {
+            if (uiEntryPrefab == null || uiListContainer == null)
+                return;
+            CacheList.HideAll();
+            UICharacterAttribute tempUI;
+            CacheList.Generate(Data, (index, data, ui) =>
+            {
+                tempUI = ui.GetComponent<UICharacterAttribute>();
+                tempUI.Data = new UICharacterAttributeData(CharacterAttribute.Create(data.Key, Mathf.CeilToInt(data.Value)));
+            });
         }
     }
 }

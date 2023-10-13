@@ -359,6 +359,8 @@ namespace MultiplayerARPG
                 {
                     EquipmentContainers[i].DeactivateInstantiatedObjects();
                     EquipmentContainers[i].SetActiveDefaultModel(true);
+                    EquipmentContainers[i].DeactivateInstantiatedObjectGroups();
+                    EquipmentContainers[i].SetActiveDefaultModelGroup(true);
                 }
             }
         }
@@ -372,6 +374,8 @@ namespace MultiplayerARPG
                 {
                     EquipmentContainers[i].SetActiveDefaultModel(false);
                     EquipmentContainers[i].ActivateInstantiatedObject(EquipmentContainers[i].activatingInstantiateObjectIndex);
+                    EquipmentContainers[i].SetActiveDefaultModelGroup(false);
+                    EquipmentContainers[i].ActivateInstantiatedObjectGroup(EquipmentContainers[i].activatingInstantiateObjectIndex);
                 }
             }
         }
@@ -393,6 +397,7 @@ namespace MultiplayerARPG
             EquipmentModel tempEquipmentModel;
             BaseEquipmentEntity tempEquipmentEntity;
             GameObject tempEquipmentObject;
+            EquipmentInstantiatedObjectGroup tempEquipmentObjectGroup;
             Dictionary<string, EquipmentModel> showingModels = new Dictionary<string, EquipmentModel>();
             Dictionary<string, EquipmentModel> storingModels = new Dictionary<string, EquipmentModel>();
             HashSet<string> unequippingSockets = new HashSet<string>(EquippedModels.Keys);
@@ -470,7 +475,9 @@ namespace MultiplayerARPG
                     continue;
 
                 tempContainer.DeactivateInstantiatedObjects();
+                tempContainer.DeactivateInstantiatedObjectGroups();
                 tempContainer.SetActiveDefaultModel(true);
+                tempContainer.SetActiveDefaultModelGroup(true);
             }
 
             foreach (string equipSocket in showingModels.Keys)
@@ -482,21 +489,43 @@ namespace MultiplayerARPG
 
                 tempEquipmentModel = showingModels[equipSocket];
                 tempEquipmentObject = null;
+                tempEquipmentObjectGroup = null;
                 if (tempEquipmentModel.useInstantiatedObject)
                 {
+                    bool modelActivated = false;
+
                     tempContainer.SetActiveDefaultModel(false);
                     if (!tempContainer.ActivateInstantiatedObject(tempEquipmentModel.instantiatedObjectIndex))
                     {
                         tempContainer.SetActiveDefaultModel(true);
-                        continue;
+                        modelActivated = true;
                     }
-                    tempEquipmentObject = tempContainer.instantiatedObjects[tempEquipmentModel.instantiatedObjectIndex];
+                    else
+                    {
+                        tempEquipmentObject = tempContainer.instantiatedObjects[tempEquipmentModel.instantiatedObjectIndex];
+                    }
+
+                    tempContainer.SetActiveDefaultModelGroup(false);
+                    if (!tempContainer.ActivateInstantiatedObjectGroup(tempEquipmentModel.instantiatedObjectIndex))
+                    {
+                        tempContainer.SetActiveDefaultModelGroup(true);
+                        modelActivated = true;
+                    }
+                    else
+                    {
+                        tempEquipmentObjectGroup = tempContainer.instantiatedObjectGroups[tempEquipmentModel.instantiatedObjectIndex];
+                    }
+
+                    if (!modelActivated)
+                        continue;
                 }
                 else
                 {
                     // Instantiate model, setup transform and activate game object
                     tempContainer.DeactivateInstantiatedObjects();
+                    tempContainer.DeactivateInstantiatedObjectGroups();
                     tempContainer.SetActiveDefaultModel(false);
+                    tempContainer.SetActiveDefaultModelGroup(false);
                     if (tempContainer.transform != null)
                     {
                         tempEquipmentObject = Instantiate(tempEquipmentModel.meshPrefab, tempContainer.transform);
@@ -527,8 +556,8 @@ namespace MultiplayerARPG
                         CacheLeftHandEquipmentEntity = tempEquipmentEntity;
                 }
 
-                tempEquipmentModel.InvokeOnInstantiated(tempEquipmentObject, tempEquipmentEntity, tempContainer);
-                OnInstantiatedEquipment(tempEquipmentModel, tempEquipmentObject, tempEquipmentEntity, tempContainer);
+                tempEquipmentModel.InvokeOnInstantiated(tempEquipmentObject, tempEquipmentEntity, tempEquipmentObjectGroup, tempContainer);
+                OnInstantiatedEquipment(tempEquipmentModel, tempEquipmentObject, tempEquipmentEntity, tempEquipmentObjectGroup, tempContainer);
             }
             EquippedModels = storingModels;
         }
@@ -718,9 +747,10 @@ namespace MultiplayerARPG
             out int animationIndex,
             out float animSpeedRate,
             out float[] triggerDurations,
-            out float totalDuration)
+            out float totalDuration,
+            out bool skipMovementValidation)
         {
-            return GetRandomRightHandAttackAnimation(weaponType.DataId, randomSeed, out animationIndex, out animSpeedRate, out triggerDurations, out totalDuration);
+            return GetRandomRightHandAttackAnimation(weaponType.DataId, randomSeed, out animationIndex, out animSpeedRate, out triggerDurations, out totalDuration, out skipMovementValidation);
         }
 
         public bool GetRandomLeftHandAttackAnimation(
@@ -729,36 +759,40 @@ namespace MultiplayerARPG
             out int animationIndex,
             out float animSpeedRate,
             out float[] triggerDurations,
-            out float totalDuration)
+            out float totalDuration,
+            out bool skipMovementValidation)
         {
-            return GetRandomLeftHandAttackAnimation(weaponType.DataId, randomSeed, out animationIndex, out animSpeedRate, out triggerDurations, out totalDuration);
+            return GetRandomLeftHandAttackAnimation(weaponType.DataId, randomSeed, out animationIndex, out animSpeedRate, out triggerDurations, out totalDuration, out skipMovementValidation);
         }
 
         public bool GetSkillActivateAnimation(
             BaseSkill skill,
             out float animSpeedRate,
             out float[] triggerDurations,
-            out float totalDuration)
+            out float totalDuration,
+            out bool skipMovementValidation)
         {
-            return GetSkillActivateAnimation(skill.DataId, out animSpeedRate, out triggerDurations, out totalDuration);
+            return GetSkillActivateAnimation(skill.DataId, out animSpeedRate, out triggerDurations, out totalDuration, out skipMovementValidation);
         }
 
         public bool GetRightHandReloadAnimation(
             WeaponType weaponType,
             out float animSpeedRate,
             out float[] triggerDurations,
-            out float totalDuration)
+            out float totalDuration,
+            out bool skipMovementValidation)
         {
-            return GetRightHandReloadAnimation(weaponType.DataId, out animSpeedRate, out triggerDurations, out totalDuration);
+            return GetRightHandReloadAnimation(weaponType.DataId, out animSpeedRate, out triggerDurations, out totalDuration, out skipMovementValidation);
         }
 
         public bool GetLeftHandReloadAnimation(
             WeaponType weaponType,
             out float animSpeedRate,
             out float[] triggerDurations,
-            out float totalDuration)
+            out float totalDuration,
+            out bool skipMovementValidation)
         {
-            return GetLeftHandReloadAnimation(weaponType.DataId, out animSpeedRate, out triggerDurations, out totalDuration);
+            return GetLeftHandReloadAnimation(weaponType.DataId, out animSpeedRate, out triggerDurations, out totalDuration, out skipMovementValidation);
         }
 
         public SkillActivateAnimationType UseSkillActivateAnimationType(BaseSkill skill)
@@ -822,14 +856,14 @@ namespace MultiplayerARPG
                 CacheLeftHandEquipmentEntity.PlayCharge();
         }
 
-        public virtual void OnInstantiatedEquipment(EquipmentModel model, GameObject instantiatedObject, BaseEquipmentEntity instantiatedEntity, EquipmentContainer equipmentContainer)
+        public virtual void OnInstantiatedEquipment(EquipmentModel model, GameObject instantiatedObject, BaseEquipmentEntity instantiatedEntity, EquipmentInstantiatedObjectGroup instantiatedObjectGroup, EquipmentContainer equipmentContainer)
         {
             if (model.useInstantiatedObject || model.doNotSetupBones)
                 return;
             BaseEquipmentModelBonesSetupManager equipmentModelBonesSetupManager = GameInstance.Singleton.EquipmentModelBonesSetupManager;
             if (model.equipmentModelBonesSetupManager != null)
                 equipmentModelBonesSetupManager = model.equipmentModelBonesSetupManager;
-            equipmentModelBonesSetupManager.Setup(this, model, instantiatedObject, instantiatedEntity, equipmentContainer);
+            equipmentModelBonesSetupManager.Setup(this, model, instantiatedObject, instantiatedEntity, instantiatedObjectGroup, equipmentContainer);
         }
 
         public void SetIsDead(bool isDead)
@@ -903,7 +937,7 @@ namespace MultiplayerARPG
         /// <param name="triggerDurations"></param>
         /// <param name="totalDuration"></param>
         /// <returns></returns>
-        public abstract bool GetRandomRightHandAttackAnimation(int dataId, int randomSeed, out int animationIndex, out float animSpeedRate, out float[] triggerDurations, out float totalDuration);
+        public abstract bool GetRandomRightHandAttackAnimation(int dataId, int randomSeed, out int animationIndex, out float animSpeedRate, out float[] triggerDurations, out float totalDuration, out bool skipMovementValidating);
         /// <summary>
         /// Get random left-hand attack animation, if `triggerDurations`'s length is 0/`totalDuration` <= 0, it will wait other methods to use as `triggerDurations`/`totalDuration` (such as animtion clip event, state machine behaviour).
         /// </summary>
@@ -914,7 +948,7 @@ namespace MultiplayerARPG
         /// <param name="triggerDurations"></param>
         /// <param name="totalDuration"></param>
         /// <returns></returns>
-        public abstract bool GetRandomLeftHandAttackAnimation(int dataId, int randomSeed, out int animationIndex, out float animSpeedRate, out float[] triggerDurations, out float totalDuration);
+        public abstract bool GetRandomLeftHandAttackAnimation(int dataId, int randomSeed, out int animationIndex, out float animSpeedRate, out float[] triggerDurations, out float totalDuration, out bool skipMovementValidating);
         /// <summary>
         /// Get right-hand attack animation, if `triggerDurations`'s length is 0/`totalDuration` <= 0, it will wait other methods to use as `triggerDurations`/`totalDuration` (such as animtion clip event, state machine behaviour).
         /// </summary>
@@ -924,7 +958,7 @@ namespace MultiplayerARPG
         /// <param name="triggerDurations"></param>
         /// <param name="totalDuration"></param>
         /// <returns></returns>
-        public abstract bool GetRightHandAttackAnimation(int dataId, int animationIndex, out float animSpeedRate, out float[] triggerDurations, out float totalDuration);
+        public abstract bool GetRightHandAttackAnimation(int dataId, int animationIndex, out float animSpeedRate, out float[] triggerDurations, out float totalDuration, out bool skipMovementValidating);
         /// <summary>
         /// Get left-hand attack animation, if `triggerDurations`'s length is 0/`totalDuration` <= 0, it will wait other methods to use as `triggerDurations`/`totalDuration` (such as animtion clip event, state machine behaviour).
         /// </summary>
@@ -934,7 +968,7 @@ namespace MultiplayerARPG
         /// <param name="triggerDurations"></param>
         /// <param name="totalDuration"></param>
         /// <returns></returns>
-        public abstract bool GetLeftHandAttackAnimation(int dataId, int animationIndex, out float animSpeedRate, out float[] triggerDurations, out float totalDuration);
+        public abstract bool GetLeftHandAttackAnimation(int dataId, int animationIndex, out float animSpeedRate, out float[] triggerDurations, out float totalDuration, out bool skipMovementValidating);
         /// <summary>
         /// Get skill activate animation, if `triggerDurations`'s length is 0/`totalDuration` <= 0, it will wait other methods to use as `triggerDurations`/`totalDuration` (such as animtion clip event, state machine behaviour).
         /// </summary>
@@ -943,7 +977,7 @@ namespace MultiplayerARPG
         /// <param name="triggerDurations"></param>
         /// <param name="totalDuration"></param>
         /// <returns></returns>
-        public abstract bool GetSkillActivateAnimation(int dataId, out float animSpeedRate, out float[] triggerDurations, out float totalDuration);
+        public abstract bool GetSkillActivateAnimation(int dataId, out float animSpeedRate, out float[] triggerDurations, out float totalDuration, out bool skipMovementValidating);
         /// <summary>
         /// Get right-hand reload animation, if `triggerDurations`'s length is 0/`totalDuration` <= 0, it will wait other methods to use as `triggerDurations`/`totalDuration` (such as animtion clip event, state machine behaviour).
         /// </summary>
@@ -952,7 +986,7 @@ namespace MultiplayerARPG
         /// <param name="triggerDurations"></param>
         /// <param name="totalDuration"></param>
         /// <returns></returns>
-        public abstract bool GetRightHandReloadAnimation(int dataId, out float animSpeedRate, out float[] triggerDurations, out float totalDuration);
+        public abstract bool GetRightHandReloadAnimation(int dataId, out float animSpeedRate, out float[] triggerDurations, out float totalDuration, out bool skipMovementValidating);
         /// <summary>
         /// Get left-hand reload animation, if `triggerDurations`'s length is 0/`totalDuration` <= 0, it will wait other methods to use as `triggerDurations`/`totalDuration` (such as animtion clip event, state machine behaviour).
         /// </summary>
@@ -961,7 +995,7 @@ namespace MultiplayerARPG
         /// <param name="triggerDurations"></param>
         /// <param name="totalDuration"></param>
         /// <returns></returns>
-        public abstract bool GetLeftHandReloadAnimation(int dataId, out float animSpeedRate, out float[] triggerDurations, out float totalDuration);
+        public abstract bool GetLeftHandReloadAnimation(int dataId, out float animSpeedRate, out float[] triggerDurations, out float totalDuration, out bool skipMovementValidating);
         public abstract SkillActivateAnimationType GetSkillActivateAnimationType(int dataId);
     }
 }

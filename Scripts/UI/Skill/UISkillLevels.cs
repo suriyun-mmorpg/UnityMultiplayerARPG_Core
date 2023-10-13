@@ -31,14 +31,14 @@ namespace MultiplayerARPG
         public bool inactiveIfLevelZero;
         public bool useSimpleFormatIfLevelEnough = true;
 
-        private Dictionary<BaseSkill, UISkillTextPair> cacheTextLevels;
+        private Dictionary<BaseSkill, UISkillTextPair> _cacheTextLevels;
         public Dictionary<BaseSkill, UISkillTextPair> CacheTextLevels
         {
             get
             {
-                if (cacheTextLevels == null)
+                if (_cacheTextLevels == null)
                 {
-                    cacheTextLevels = new Dictionary<BaseSkill, UISkillTextPair>();
+                    _cacheTextLevels = new Dictionary<BaseSkill, UISkillTextPair>();
                     BaseSkill tempData;
                     foreach (UISkillTextPair componentPair in textLevels)
                     {
@@ -46,10 +46,10 @@ namespace MultiplayerARPG
                             continue;
                         tempData = componentPair.skill;
                         SetDefaultValue(componentPair);
-                        cacheTextLevels[tempData] = componentPair;
+                        _cacheTextLevels[tempData] = componentPair;
                     }
                 }
-                return cacheTextLevels;
+                return _cacheTextLevels;
             }
         }
 
@@ -72,7 +72,8 @@ namespace MultiplayerARPG
                 IPlayerCharacterData character = GameInstance.PlayingCharacter;
                 Dictionary<BaseSkill, int> currentSkillLevels = new Dictionary<BaseSkill, int>();
                 if (character != null)
-                    currentSkillLevels = character.GetSkills(includeEquipmentsForCurrentLevels);
+                    character.GetAllStats(includeEquipmentsForCurrentLevels, false, false, onGetSkills: skills => currentSkillLevels = skills);
+
                 // In-loop temp data
                 using (Utf16ValueStringBuilder tempAllText = ZString.CreateStringBuilder(false))
                 {

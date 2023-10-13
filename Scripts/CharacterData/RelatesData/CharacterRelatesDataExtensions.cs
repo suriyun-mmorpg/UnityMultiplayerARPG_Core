@@ -29,14 +29,14 @@ namespace MultiplayerARPG
             return data == null || data.Equals(CharacterItem.Empty);
         }
 
-        public static bool NotEmptySlot(this CharacterItem data)
-        {
-            return !data.IsEmpty() && data.GetItem() != null && data.amount > 0;
-        }
-
         public static bool IsEmptySlot(this CharacterItem data)
         {
-            return !data.NotEmptySlot();
+            return data.IsEmpty() || data.GetItem() == null || data.amount <= 0;
+        }
+
+        public static bool NotEmptySlot(this CharacterItem data)
+        {
+            return !data.IsEmptySlot();
         }
 
         public static bool IsEmpty(this CharacterQuest data)
@@ -134,24 +134,24 @@ namespace MultiplayerARPG
             return equipWeapons.leftHand.GetItem();
         }
 
-        public static bool NotEmptyRightHandSlot(this EquipWeapons equipWeapons)
-        {
-            return equipWeapons != null && equipWeapons.rightHand.NotEmptySlot();
-        }
-
-        public static bool NotEmptyLeftHandSlot(this EquipWeapons equipWeapons)
-        {
-            return equipWeapons != null && equipWeapons.leftHand.NotEmptySlot();
-        }
-
         public static bool IsEmptyRightHandSlot(this EquipWeapons equipWeapons)
         {
-            return !equipWeapons.NotEmptyRightHandSlot();
+            return equipWeapons == null || equipWeapons.rightHand.IsEmptySlot();
         }
 
         public static bool IsEmptyLeftHandSlot(this EquipWeapons equipWeapons)
         {
-            return !equipWeapons.NotEmptyLeftHandSlot();
+            return equipWeapons == null || equipWeapons.leftHand.IsEmptySlot();
+        }
+
+        public static bool NotEmptyRightHandSlot(this EquipWeapons equipWeapons)
+        {
+            return !equipWeapons.IsEmptyRightHandSlot();
+        }
+
+        public static bool NotEmptyLeftHandSlot(this EquipWeapons equipWeapons)
+        {
+            return !equipWeapons.IsEmptyLeftHandSlot();
         }
 
         public static int IndexOfEmptyItemSlot(this IList<CharacterItem> list)

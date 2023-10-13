@@ -34,30 +34,30 @@ namespace MultiplayerARPG
             }
         }
 
-        private UIList cacheList;
+        private UIList _cacheList;
         public UIList CacheList
         {
             get
             {
-                if (cacheList == null)
+                if (_cacheList == null)
                 {
-                    cacheList = gameObject.AddComponent<UIList>();
-                    cacheList.uiPrefab = uiPrefab.gameObject;
-                    cacheList.uiContainer = uiContainer;
+                    _cacheList = gameObject.AddComponent<UIList>();
+                    _cacheList.uiPrefab = uiPrefab.gameObject;
+                    _cacheList.uiContainer = uiContainer;
                 }
-                return cacheList;
+                return _cacheList;
             }
         }
 
-        private UICharacterSkillSelectionManager cacheSelectionManager;
+        private UICharacterSkillSelectionManager _cacheSelectionManager;
         public UICharacterSkillSelectionManager CacheSelectionManager
         {
             get
             {
-                if (cacheSelectionManager == null)
-                    cacheSelectionManager = gameObject.GetOrAddComponent<UICharacterSkillSelectionManager>();
-                cacheSelectionManager.selectionMode = UISelectionMode.SelectSingle;
-                return cacheSelectionManager;
+                if (_cacheSelectionManager == null)
+                    _cacheSelectionManager = gameObject.GetOrAddComponent<UICharacterSkillSelectionManager>();
+                _cacheSelectionManager.selectionMode = UISelectionMode.SelectSingle;
+                return _cacheSelectionManager;
             }
         }
 
@@ -133,7 +133,9 @@ namespace MultiplayerARPG
             Character = character;
             LoadedList.Clear();
             if (Character != null && Character.GetDatabase() != null)
-                LoadedList = GameDataHelpers.CombineSkills(LoadedList, Character.GetSkills(true));
+            {
+                Character.GetAllStats(true, false, true, onGetSkills: skills => LoadedList = skills);
+            }
             GenerateList();
         }
 

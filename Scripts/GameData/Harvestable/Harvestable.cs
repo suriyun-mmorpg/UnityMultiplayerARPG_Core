@@ -7,10 +7,10 @@ namespace MultiplayerARPG
     public partial class Harvestable : BaseGameData
     {
         [Category("Harvestable Settings")]
-        public HarvestEffectiveness[] harvestEffectivenesses;
-        public SkillHarvestEffectiveness[] skillHarvestEffectivenesses;
+        public HarvestEffectiveness[] harvestEffectivenesses = new HarvestEffectiveness[0];
+        public SkillHarvestEffectiveness[] skillHarvestEffectivenesses = new SkillHarvestEffectiveness[0];
         [Tooltip("Ex. if this is 10 when damage to harvestable entity = 2, character will receives 20 exp")]
-        public int expPerDamage;
+        public int expPerDamage = 0;
 
         [System.NonSerialized]
         private Dictionary<WeaponType, HarvestEffectiveness> _cacheHarvestEffectivenesses;
@@ -107,6 +107,7 @@ namespace MultiplayerARPG
             {
                 foreach (HarvestEffectiveness harvestEffectiveness in harvestEffectivenesses)
                 {
+                    GameInstance.AddWeaponTypes(harvestEffectiveness.weaponType);
                     GameInstance.AddItems(harvestEffectiveness.items);
                 }
             }
@@ -115,30 +116,9 @@ namespace MultiplayerARPG
                 foreach (SkillHarvestEffectiveness skillHarvestEffectiveness in skillHarvestEffectivenesses)
                 {
                     GameInstance.AddSkills(skillHarvestEffectiveness.skill);
+                    GameInstance.AddItems(skillHarvestEffectiveness.items);
                 }
             }
         }
-    }
-
-    [System.Serializable]
-    public struct HarvestEffectiveness
-    {
-        public WeaponType weaponType;
-        [Tooltip("This will multiply with harvest damage amount")]
-        [Range(0.1f, 5f)]
-        public float damageEffectiveness;
-        [ArrayElementTitle("item")]
-        public ItemDropForHarvestable[] items;
-    }
-
-    [System.Serializable]
-    public struct SkillHarvestEffectiveness
-    {
-        public BaseSkill skill;
-        [Tooltip("This will multiply with harvest damage amount")]
-        [Range(0.1f, 5f)]
-        public float damageEffectiveness;
-        [ArrayElementTitle("item")]
-        public ItemDropForHarvestable[] items;
     }
 }

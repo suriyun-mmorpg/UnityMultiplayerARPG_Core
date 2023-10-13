@@ -71,11 +71,11 @@ namespace MultiplayerARPG
             CallAllOnRespawn();
         }
 
-        public void RewardExp(Reward reward, float multiplier, RewardGivenType rewardGivenType, int giverLevel, int sourceLevel)
+        public void RewardExp(int exp, float multiplier, RewardGivenType rewardGivenType, int giverLevel, int sourceLevel)
         {
-            if (!IsServer)
+            if (!IsServer || exp <= 0)
                 return;
-            if (!CurrentGameplayRule.RewardExp(this, reward, multiplier, rewardGivenType, giverLevel, sourceLevel, out int rewardedExp))
+            if (!CurrentGameplayRule.RewardExp(this, exp, multiplier, rewardGivenType, giverLevel, sourceLevel, out int rewardedExp))
             {
                 GameInstance.ServerGameMessageHandlers.NotifyRewardExp(ConnectionId, rewardGivenType, rewardedExp);
                 return;
@@ -84,20 +84,24 @@ namespace MultiplayerARPG
             CallAllOnLevelUp();
         }
 
-        public void RewardCurrencies(Reward reward, float multiplier, RewardGivenType rewardGivenType, int giverLevel, int sourceLevel)
+        public void RewardGold(int gold, float multiplier, RewardGivenType rewardGivenType, int giverLevel, int sourceLevel)
         {
-            if (!IsServer)
+            if (!IsServer || gold <= 0)
                 return;
-            CurrentGameplayRule.RewardCurrencies(this, reward, multiplier, rewardGivenType, giverLevel, sourceLevel, out int rewardedGold);
+            CurrentGameplayRule.RewardGold(this, gold, multiplier, rewardGivenType, giverLevel, sourceLevel, out int rewardedGold);
             GameInstance.ServerGameMessageHandlers.NotifyRewardGold(ConnectionId, rewardGivenType, rewardedGold);
-            if (reward.currencies != null && reward.currencies.Length > 0)
+        }
+
+        public void RewardCurrencies(IEnumerable<CurrencyAmount> currencies, float multiplier, RewardGivenType rewardGivenType, int giverLevel, int sourceLevel)
+        {
+            if (!IsServer || currencies == null)
+                return;
+            CurrentGameplayRule.RewardCurrencies(this, currencies, multiplier, rewardGivenType, giverLevel, sourceLevel);
+            foreach (CurrencyAmount currency in currencies)
             {
-                foreach (CurrencyAmount currency in reward.currencies)
-                {
-                    if (currency.currency == null || currency.amount == 0)
-                        continue;
-                    GameInstance.ServerGameMessageHandlers.NotifyRewardCurrency(ConnectionId, rewardGivenType, currency.currency.DataId, currency.amount);
-                }
+                if (currency.currency == null || currency.amount <= 0)
+                    continue;
+                GameInstance.ServerGameMessageHandlers.NotifyRewardCurrency(ConnectionId, rewardGivenType, currency.currency.DataId, currency.amount);
             }
         }
 
@@ -198,9 +202,9 @@ namespace MultiplayerARPG
             {
                 // Do something with buffs when attacked
                 SkillAndBuffComponent.OnAttacked();
-                // Apply debuff if character is not dead
-                if (buff == null && skill != null && skill.IsDebuff)
-                    ApplyBuff(skill.DataId, BuffType.SkillDebuff, skillLevel, instigator, weapon);
+                // Do something when skill hit target
+                if (skill != null && buff == null)
+                    skill.OnSkillAttackHit(skillLevel, instigator, weapon, this);
             }
         }
     }

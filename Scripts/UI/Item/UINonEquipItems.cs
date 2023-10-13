@@ -35,5 +35,10 @@ namespace MultiplayerARPG
             inventoryType = InventoryType.NonEquipItems;
             UpdateData(character, character.NonEquipItems);
         }
+
+        public void OnClickSort()
+        {
+            GameInstance.ClientInventoryHandlers.RequestSortItems(new RequestSortItemsMessage(), ClientInventoryActions.ResponseSortItems);
+        }
     }
 }

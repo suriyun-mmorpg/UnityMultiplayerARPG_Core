@@ -107,10 +107,24 @@ namespace MultiplayerARPG
         }
 
         [SerializeField]
+        private ArmorIncremental[] increaseArmorsRate = new ArmorIncremental[0];
+        public ArmorIncremental[] IncreaseArmorsRate
+        {
+            get { return increaseArmorsRate; }
+        }
+
+        [SerializeField]
         private DamageIncremental[] increaseDamages = new DamageIncremental[0];
         public DamageIncremental[] IncreaseDamages
         {
             get { return increaseDamages; }
+        }
+
+        [SerializeField]
+        private DamageIncremental[] increaseDamagesRate = new DamageIncremental[0];
+        public DamageIncremental[] IncreaseDamagesRate
+        {
+            get { return increaseDamagesRate; }
         }
 
         [HideInInspector]
@@ -121,6 +135,13 @@ namespace MultiplayerARPG
         public SkillIncremental[] IncreaseSkills
         {
             get { return increaseSkills; }
+        }
+
+        [SerializeField]
+        private StatusEffectResistanceIncremental[] increaseStatusEffectResistances = new StatusEffectResistanceIncremental[0];
+        public StatusEffectResistanceIncremental[] IncreaseStatusEffectResistances
+        {
+            get { return increaseStatusEffectResistances; }
         }
 
         [SerializeField]
@@ -190,9 +211,12 @@ namespace MultiplayerARPG
             GameInstance.AddAttributes(IncreaseAttributes);
             GameInstance.AddAttributes(IncreaseAttributesRate);
             GameInstance.AddDamageElements(IncreaseResistances);
-            GameInstance.AddDamageElements(IncreaseArmors);
-            GameInstance.AddDamageElements(IncreaseDamages);
+            GameInstance.AddDamageElements(increaseArmors);
+            GameInstance.AddDamageElements(increaseArmorsRate);
+            GameInstance.AddDamageElements(increaseDamages);
+            GameInstance.AddDamageElements(increaseDamagesRate);
             GameInstance.AddSkills(IncreaseSkills);
+            GameInstance.AddStatusEffects(IncreaseStatusEffectResistances);
             GameInstance.AddStatusEffects(SelfStatusEffectsWhenAttacking);
             GameInstance.AddStatusEffects(EnemyStatusEffectsWhenAttacking);
             GameInstance.AddStatusEffects(SelfStatusEffectsWhenAttacked);

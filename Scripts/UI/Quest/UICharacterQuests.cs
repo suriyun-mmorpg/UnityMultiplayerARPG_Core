@@ -1,4 +1,4 @@
-﻿using LiteNetLibManager;
+using LiteNetLibManager;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Serialization;
@@ -7,6 +7,9 @@ namespace MultiplayerARPG
 {
     public partial class UICharacterQuests : UIBase
     {
+        [Header("Filter")]
+        public List<string> filterCategories = new List<string>();
+
         public GameObject listEmptyObject;
         [FormerlySerializedAs("uiQuestDialog")]
         public UICharacterQuest uiDialog;
@@ -60,30 +63,30 @@ namespace MultiplayerARPG
             }
         }
 
-        private UIList cacheList;
+        private UIList _cacheList;
         public UIList CacheList
         {
             get
             {
-                if (cacheList == null)
+                if (_cacheList == null)
                 {
-                    cacheList = gameObject.AddComponent<UIList>();
-                    cacheList.uiPrefab = uiPrefab.gameObject;
-                    cacheList.uiContainer = uiContainer;
+                    _cacheList = gameObject.AddComponent<UIList>();
+                    _cacheList.uiPrefab = uiPrefab.gameObject;
+                    _cacheList.uiContainer = uiContainer;
                 }
-                return cacheList;
+                return _cacheList;
             }
         }
 
-        private UICharacterQuestSelectionManager cacheSelectionManager;
+        private UICharacterQuestSelectionManager _cacheSelectionManager;
         public UICharacterQuestSelectionManager CacheSelectionManager
         {
             get
             {
-                if (cacheSelectionManager == null)
-                    cacheSelectionManager = gameObject.GetOrAddComponent<UICharacterQuestSelectionManager>();
-                cacheSelectionManager.selectionMode = UISelectionMode.Toggle;
-                return cacheSelectionManager;
+                if (_cacheSelectionManager == null)
+                    _cacheSelectionManager = gameObject.GetOrAddComponent<UICharacterQuestSelectionManager>();
+                _cacheSelectionManager.selectionMode = UISelectionMode.Toggle;
+                return _cacheSelectionManager;
             }
         }
 
@@ -132,7 +135,7 @@ namespace MultiplayerARPG
             CacheSelectionManager.DeselectSelectedUI();
             CacheSelectionManager.Clear();
 
-            List<CharacterQuest> filteredList = UICharacterQuestsUtils.GetFilteredList(GameInstance.PlayingCharacter.Quests, ShowOnlyTrackingQuests, ShowAllWhenNoTrackedQuests, HideCompleteQuest);
+            List<CharacterQuest> filteredList = UICharacterQuestsUtils.GetFilteredList(GameInstance.PlayingCharacter.Quests, ShowOnlyTrackingQuests, ShowAllWhenNoTrackedQuests, HideCompleteQuest, filterCategories);
             if (filteredList.Count == 0)
             {
                 if (uiDialog != null)

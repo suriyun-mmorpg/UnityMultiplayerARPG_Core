@@ -59,8 +59,16 @@ namespace MultiplayerARPG
         protected float lifeTime = 0f;
 
         [SerializeField]
+        [Tooltip("Maximum number of buildings per player in a map, if it is <= 0, it's unlimit")]
+        protected int buildLimit = 0;
+
+        [SerializeField]
         [Tooltip("Items which will be dropped when building destroyed")]
         protected List<ItemAmount> droppingItems = new List<ItemAmount>();
+
+        [SerializeField]
+        [Tooltip("List of repair data")]
+        protected List<BuildingRepairData> repairs = new List<BuildingRepairData>();
 
         [SerializeField]
         [Tooltip("Delay before the entity destroyed, you may set some delay to play destroyed animation by `onBuildingDestroy` event before it's going to be destroyed from the game.")]
@@ -89,6 +97,7 @@ namespace MultiplayerARPG
         public float BuildYRotation { get; set; }
         public override int MaxHp { get { return maxHp; } }
         public float LifeTime { get { return lifeTime; } }
+        public int BuildLimit { get { return buildLimit; } }
 
         /// <summary>
         /// Use this as reference for area to build this object while in build mode
@@ -194,6 +203,39 @@ namespace MultiplayerARPG
         public virtual bool Lockable { get { return false; } }
         public bool IsBuildMode { get; private set; }
         public BasePlayerCharacterEntity Builder { get; private set; }
+
+        private BuildingRepairData? repairDataForMenu;
+        private Dictionary<BaseItem, BuildingRepairData> _cacheRepairs;
+        public Dictionary<BaseItem, BuildingRepairData> CacheRepairs
+        {
+            get
+            {
+                if (_cacheRepairs == null)
+                {
+                    _cacheRepairs = new Dictionary<BaseItem, BuildingRepairData>();
+                    if (repairs != null && repairs.Count > 0)
+                    {
+                        for (int i = 0; i < repairs.Count; ++i)
+                        {
+                            if (repairs[i].canRepairFromMenu && !repairDataForMenu.HasValue)
+                            {
+                                repairDataForMenu = repairs[i];
+                                continue;
+                            }
+                            BaseItem weaponItem = repairs[i].weaponItem;
+                            if (weaponItem == null)
+                                weaponItem = CurrentGameInstance.DefaultWeaponItem as BaseItem;
+                            if (!weaponItem.IsWeapon())
+                                continue;
+                            if (_cacheRepairs.ContainsKey(weaponItem))
+                                continue;
+                            _cacheRepairs[weaponItem] = repairs[i];
+                        }
+                    }
+                }
+                return _cacheRepairs;
+            }
+        }
 
         protected readonly HashSet<GameObject> triggerObjects = new HashSet<GameObject>();
         protected readonly HashSet<BuildingEntity> children = new HashSet<BuildingEntity>();
@@ -381,8 +423,124 @@ namespace MultiplayerARPG
             }
         }
 
+        public bool CanRepairByMenu()
+        {
+            return repairDataForMenu.HasValue;
+        }
+
+        public bool TryGetRepairAmount(BasePlayerCharacterEntity repairPlayer, out int repairAmount, out UITextKeys errorMessage)
+        {
+            repairAmount = 0;
+            errorMessage = UITextKeys.NONE;
+            if (!CanRepairByMenu())
+                return false;
+            return TryGetRepairAmount(repairPlayer, repairDataForMenu.Value, out repairAmount, out errorMessage);
+        }
+
+        public bool Repair(BasePlayerCharacterEntity repairPlayer, out UITextKeys errorMessage)
+        {
+            if (!TryGetRepairAmount(repairPlayer, out int repairAmount, out errorMessage))
+                return false;
+            CurrentHp += repairAmount;
+            return true;
+        }
+
+        public bool TryGetRepairAmount(BasePlayerCharacterEntity repairPlayer, BuildingRepairData buildingRepairData, out int repairAmount, out UITextKeys errorMessage)
+        {
+            repairAmount = Mathf.Min(MaxHp - CurrentHp, buildingRepairData.maxRecoveryHp);
+            errorMessage = UITextKeys.NONE;
+            if (repairAmount <= 0)
+            {
+                // No repairing
+                return false;
+            }
+            // Calculate repairable amount
+            // Gold
+            int requireGold = buildingRepairData.requireGold * repairAmount;
+            while (requireGold > repairPlayer.Gold)
+            {
+                requireGold -= buildingRepairData.requireGold;
+                repairAmount--;
+                if (repairAmount <= 0)
+                {
+                    errorMessage = UITextKeys.UI_ERROR_NOT_ENOUGH_GOLD;
+                    return false;
+                }
+            }
+            // Items
+            int i;
+            if (buildingRepairData.requireItems != null)
+            {
+                for (i = 0; i < buildingRepairData.requireItems.Length; ++i)
+                {
+                    if (buildingRepairData.requireItems[i].item == null || buildingRepairData.requireItems[i].amount == 0)
+                        continue;
+                    int requireAmount = buildingRepairData.requireItems[i].amount * repairAmount;
+                    int currentAmount = repairPlayer.CountNonEquipItems(buildingRepairData.requireItems[i].item.DataId);
+                    while (requireAmount > currentAmount)
+                    {
+                        requireAmount -= buildingRepairData.requireItems[i].amount;
+                        repairAmount--;
+                        if (repairAmount <= 0)
+                        {
+                            errorMessage = UITextKeys.UI_ERROR_NOT_ENOUGH_ITEMS;
+                            return false;
+                        }
+                    }
+                }
+            }
+            // Currencies
+            if (buildingRepairData.requireCurrencies != null)
+            {
+                Dictionary<Currency, int> playerCurrencies = repairPlayer.GetCurrencies();
+                for (i = 0; i < buildingRepairData.requireCurrencies.Length; ++i)
+                {
+                    if (buildingRepairData.requireCurrencies[i].currency == null || buildingRepairData.requireCurrencies[i].amount == 0)
+                        continue;
+                    if (!playerCurrencies.TryGetValue(buildingRepairData.requireCurrencies[i].currency, out int currentAmount))
+                    {
+                        repairAmount = 0;
+                        errorMessage = UITextKeys.UI_ERROR_NOT_ENOUGH_CURRENCY_AMOUNTS;
+                        return false;
+                    }
+                    int requireAmount = buildingRepairData.requireCurrencies[i].amount * repairAmount;
+                    while (requireAmount > currentAmount)
+                    {
+                        requireAmount -= buildingRepairData.requireCurrencies[i].amount;
+                        repairAmount--;
+                        if (repairAmount <= 0)
+                        {
+                            errorMessage = UITextKeys.UI_ERROR_NOT_ENOUGH_CURRENCY_AMOUNTS;
+                            return false;
+                        }
+                    }
+                }
+            }
+            return true;
+        }
+
         protected override void ApplyReceiveDamage(HitBoxPosition position, Vector3 fromPosition, EntityInfo instigator, Dictionary<DamageElement, MinMaxFloat> damageAmounts, CharacterItem weapon, BaseSkill skill, int skillLevel, int randomSeed, out CombatAmountType combatAmountType, out int totalDamage)
         {
+            // Repairing
+            if (instigator.TryGetEntity(out BasePlayerCharacterEntity attackPlayer) && !weapon.IsEmptySlot() && CacheRepairs.TryGetValue(weapon.GetItem(), out BuildingRepairData buildingRepairData))
+            {
+                combatAmountType = CombatAmountType.HpRecovery;
+                totalDamage = 0;
+                if (!TryGetRepairAmount(attackPlayer, buildingRepairData, out int repairAmount, out UITextKeys errorMessage))
+                {
+                    // Can't repair
+                    GameInstance.ServerGameMessageHandlers.SendGameMessage(attackPlayer.ConnectionId, errorMessage);
+                    return;
+                }
+                // Decrease currency
+                attackPlayer.Gold -= buildingRepairData.requireGold * repairAmount;
+                attackPlayer.DecreaseItems(buildingRepairData.requireItems, repairAmount);
+                attackPlayer.DecreaseCurrencies(buildingRepairData.requireCurrencies, repairAmount);
+                totalDamage = repairAmount;
+                CurrentHp += totalDamage;
+                return;
+            }
+
             // Calculate damages
             float calculatingTotalDamage = 0f;
             foreach (DamageElement damageElement in damageAmounts.Keys)
@@ -400,11 +558,6 @@ namespace MultiplayerARPG
         public override void ReceivedDamage(HitBoxPosition position, Vector3 fromPosition, EntityInfo instigator, Dictionary<DamageElement, MinMaxFloat> damageAmounts, CombatAmountType combatAmountType, int totalDamage, CharacterItem weapon, BaseSkill skill, int skillLevel, CharacterBuff buff, bool isDamageOverTime = false)
         {
             base.ReceivedDamage(position, fromPosition, instigator, damageAmounts, combatAmountType, totalDamage, weapon, skill, skillLevel, buff, isDamageOverTime);
-
-            if (combatAmountType == CombatAmountType.Miss)
-                return;
-
-            // Do something when entity dead
             if (this.IsDead())
                 Destroy();
         }
@@ -426,7 +579,7 @@ namespace MultiplayerARPG
                 {
                     if (droppingItem.item == null || droppingItem.amount == 0)
                         continue;
-                    ItemDropEntity.DropItem(this, RewardGivenType.BuildingDestroyed, CharacterItem.Create(droppingItem.item, 1, droppingItem.amount), new string[0]);
+                    ItemDropEntity.Drop(this, RewardGivenType.BuildingDestroyed, CharacterItem.Create(droppingItem.item, 1, droppingItem.amount), new string[0]);
                 }
             }
             // Destroy this entity

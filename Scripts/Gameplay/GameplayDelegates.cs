@@ -89,7 +89,7 @@ namespace MultiplayerARPG
     public delegate void RandomCharacterStatsDelegate(
         System.Random random,
         ItemRandomBonus randomBonus,
-        RandomCharacterStats randomStats,
+        bool isRateStats,
         ref CharacterStats stats,
         ref int appliedAmount);
 
@@ -143,5 +143,12 @@ namespace MultiplayerARPG
         EquipmentModel model,
         GameObject instantiatedObject,
         BaseEquipmentEntity instantiatedEntity,
+        EquipmentInstantiatedObjectGroup instantiatedObjectGroup,
         EquipmentContainer equipmentContainer);
+
+    public delegate void CalculatedItemBuffDelegate(
+        CalculatedItemBuff calculatedItemBuff);
+
+    public delegate void CalculatedBuffDelegate(
+        CalculatedBuff calculatedBuff);
 }
