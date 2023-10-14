@@ -678,7 +678,7 @@ namespace MultiplayerARPG
                 if (AdjustFloatValue(baseAmount, amountIncreaseEachLevel, out adjustedValue, 1f))
                 {
                     hasChanges = true;
-                    incrementalAmount.amountIncreaseEachLevel = amountIncreaseEachLevel;
+                    incrementalAmount.amountIncreaseEachLevel = adjustedValue;
                     setting.amount = incrementalAmount;
                     Attributes[i] = setting;
                     Debug.LogWarning($"Invalid {setting.attribute} attribute's increase each level setting for {this} adjusted to {adjustedValue}");
@@ -705,7 +705,7 @@ namespace MultiplayerARPG
                 if (AdjustFloatValue(baseAmount, amountIncreaseEachLevel, out adjustedValue, 1f))
                 {
                     hasChanges = true;
-                    incrementalAmount.amountIncreaseEachLevel = amountIncreaseEachLevel;
+                    incrementalAmount.amountIncreaseEachLevel = adjustedValue;
                     setting.amount = incrementalAmount;
                     Resistances[i] = setting;
                     Debug.LogWarning($"Invalid {setting.damageElement} resistance's increase each level setting for {this} adjusted to {adjustedValue}");
@@ -732,7 +732,7 @@ namespace MultiplayerARPG
                 if (AdjustFloatValue(baseAmount, amountIncreaseEachLevel, out adjustedValue, 1f))
                 {
                     hasChanges = true;
-                    incrementalAmount.amountIncreaseEachLevel = amountIncreaseEachLevel;
+                    incrementalAmount.amountIncreaseEachLevel = adjustedValue;
                     setting.amount = incrementalAmount;
                     Armors[i] = setting;
                     Debug.LogWarning($"Invalid {setting.damageElement} armor's increase each level setting for {this} adjusted to {adjustedValue}");
@@ -817,7 +817,16 @@ namespace MultiplayerARPG
             float adjustedValue = baseAmount - (amountIncreaseEachLevel * (defaultLevel - 1));
             if (adjustedValue < minValue)
             {
-                adjustedAmountIncreaseEachLevel = baseAmount * (defaultLevel - 1);
+                adjustedAmountIncreaseEachLevel = baseAmount / (defaultLevel - 1);
+                // Cut to 3 decimal
+                adjustedAmountIncreaseEachLevel *= 1000f;
+                adjustedAmountIncreaseEachLevel = Mathf.FloorToInt(adjustedAmountIncreaseEachLevel);
+                adjustedAmountIncreaseEachLevel /= 1000f;
+                if (adjustedAmountIncreaseEachLevel > 0.001f)
+                {
+                    // Some buffer
+                    adjustedAmountIncreaseEachLevel -= 0.001f;
+                }
                 return true;
             }
             return false;
