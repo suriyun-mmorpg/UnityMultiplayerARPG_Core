@@ -8,7 +8,7 @@ using LiteNetLib.Utils;
 namespace MultiplayerARPG
 {
     [RequireComponent(typeof(LiteNetLibIdentity))]
-    [DefaultExecutionOrder(0)]
+    [DefaultExecutionOrder(DefaultExecutionOrders.BASE_GAME_ENTITY)]
     public abstract partial class BaseGameEntity : LiteNetLibBehaviour, IGameEntity, IEntityMovement
     {
         public const byte STATE_DATA_CHANNEL = 3;

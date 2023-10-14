@@ -5,7 +5,7 @@ using UnityEngine.Serialization;
 
 namespace MultiplayerARPG
 {
-    [DefaultExecutionOrder(int.MinValue + 1)]
+    [DefaultExecutionOrder(DefaultExecutionOrders.PLAYER_CHARACTER_CONTROLLER)]
     public partial class ShooterPlayerCharacterController : BasePlayerCharacterController, IShooterWeaponController, IWeaponAbilityController
     {
         public const byte PAUSE_FIRE_INPUT_FRAMES_AFTER_CONFIRM_BUILD = 3;

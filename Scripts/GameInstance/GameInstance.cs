@@ -49,7 +49,7 @@ namespace MultiplayerARPG
         Console,
     }
 
-    [DefaultExecutionOrder(-999)]
+    [DefaultExecutionOrder(DefaultExecutionOrders.GAME_INSTANCE)]
     [RequireComponent(typeof(EventSystemManager))]
 #if ENABLE_PURCHASING && (UNITY_IOS || UNITY_ANDROID)
     public partial class GameInstance : MonoBehaviour, IStoreListener
