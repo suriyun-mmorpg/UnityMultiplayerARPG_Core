@@ -1,0 +1,59 @@
+﻿using Cysharp.Text;
+using LiteNetLib.Utils;
+using UnityEngine;
+
+namespace MultiplayerARPG
+{
+    [System.Serializable]
+    public struct HitRegisterData : INetSerializable
+    {
+        public int SimulateSeed { get; set; }
+        public byte TriggerIndex { get; set; }
+        public byte SpreadIndex { get; set; }
+        public long LaunchTimestamp { get; set; }
+        public Vector3 Origin { get; set; }
+        public DirectionVector3 Direction { get; set; }
+        public long HitTimestamp { get; set; }
+        public uint HitObjectId { get; set; }
+        public byte HitBoxIndex { get; set; }
+        public Vector3 Destination { get; set; }
+
+        public void Serialize(NetDataWriter writer)
+        {
+            writer.PutPackedInt(SimulateSeed);
+            writer.Put(TriggerIndex);
+            writer.Put(SpreadIndex);
+            writer.PutPackedLong(LaunchTimestamp);
+            writer.PutVector3(Origin);
+            writer.Put(Direction);
+            writer.PutPackedLong(HitTimestamp);
+            writer.PutPackedUInt(HitObjectId);
+            writer.Put(HitBoxIndex);
+            writer.PutVector3(Destination);
+        }
+
+        public void Deserialize(NetDataReader reader)
+        {
+            SimulateSeed = reader.GetPackedInt();
+            TriggerIndex = reader.GetByte();
+            SpreadIndex = reader.GetByte();
+            LaunchTimestamp = reader.GetPackedLong();
+            Origin = reader.GetVector3();
+            Direction = reader.Get<DirectionVector3>();
+            HitTimestamp = reader.GetPackedLong();
+            HitObjectId = reader.GetPackedUInt();
+            HitBoxIndex = reader.GetByte();
+            Destination = reader.GetVector3();
+        }
+
+        public string GetHitId()
+        {
+            return ZString.Concat(TriggerIndex, "_", SpreadIndex);
+        }
+
+        public string GetHitObjectId()
+        {
+            return ZString.Concat(TriggerIndex, "_", SpreadIndex, "_", HitObjectId);
+        }
+    }
+}

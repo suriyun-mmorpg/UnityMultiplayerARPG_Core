@@ -69,7 +69,7 @@ namespace MultiplayerARPG
         /// <param name="damageAmounts">Calculated damage amounts</param>
         /// <param name="skill">Skill which was used to attack enemy</param>
         /// <param name="skillLevel">Level of the skill</param>
-        /// <param name="onHit">Action when hit</param>
+        /// <param name="hitRegisterData"></param>
         /// <param name="throwForce">Calculated throw force</param>
         /// <param name="lifetime">Calculated life time</param>
         public virtual void Setup(
@@ -81,11 +81,11 @@ namespace MultiplayerARPG
             Dictionary<DamageElement, MinMaxFloat> damageAmounts,
             BaseSkill skill,
             int skillLevel,
-            DamageHitDelegate onHit,
+            HitRegisterData hitRegisterData,
             float throwForce,
             float lifetime)
         {
-            Setup(instigator, weapon, simulateSeed, triggerIndex, spreadIndex, damageAmounts, skill, skillLevel, onHit);
+            Setup(instigator, weapon, simulateSeed, triggerIndex, spreadIndex, damageAmounts, skill, skillLevel, hitRegisterData);
             _throwForce = throwForce;
             _lifetime = lifetime;
 

@@ -86,9 +86,7 @@ namespace MultiplayerARPG
             byte spreadIndex,
             Dictionary<DamageElement, MinMaxFloat> damageAmounts,
             uint targetObjectId,
-            AimPosition aimPosition,
-            DamageOriginPreparedDelegate onDamageOriginPrepared,
-            DamageHitDelegate onDamageHit)
+            AimPosition aimPosition)
         {
             // Craft item
             if (skillType == SkillType.CraftItem &&
@@ -135,9 +133,7 @@ namespace MultiplayerARPG
                     damageAmounts,
                     this,
                     skillLevel,
-                    aimPosition,
-                    onDamageOriginPrepared,
-                    onDamageHit);
+                    aimPosition);
             }
         }
 

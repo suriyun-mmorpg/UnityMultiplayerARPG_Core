@@ -62,12 +62,21 @@ namespace MultiplayerARPG
             byte spreadIndex,
             Dictionary<DamageElement, MinMaxFloat> damageAmounts,
             uint targetObjectId,
-            AimPosition aimPosition,
-            DamageOriginPreparedDelegate onDamageOriginPrepared,
-            DamageHitDelegate onDamageHit)
+            AimPosition aimPosition)
         {
             if (BaseGameNetworkManager.Singleton.IsServer)
             {
+                // Prepare hit reg data
+                HitRegisterData hitRegData = new HitRegisterData()
+                {
+                    SimulateSeed = simulateSeed,
+                    TriggerIndex = triggerIndex,
+                    SpreadIndex = spreadIndex,
+                    LaunchTimestamp = BaseGameNetworkManager.Singleton.Timestamp,
+                    Origin = aimPosition.position,
+                    Direction = aimPosition.direction,
+                };
+
                 // Spawn area entity
                 // Aim position type always is `Position`
                 LiteNetLibIdentity spawnObj = BaseGameNetworkManager.Singleton.Assets.GetObjectInstance(
@@ -75,7 +84,7 @@ namespace MultiplayerARPG
                     aimPosition.position,
                     GameInstance.Singleton.GameplayRule.GetSummonRotation(skillUser));
                 AreaDamageEntity entity = spawnObj.GetComponent<AreaDamageEntity>();
-                entity.Setup(skillUser.GetInfo(), weapon, simulateSeed, triggerIndex, spreadIndex, damageAmounts, this, skillLevel, onDamageHit, areaDuration.GetAmount(skillLevel), applyDuration.GetAmount(skillLevel));
+                entity.Setup(skillUser.GetInfo(), weapon, simulateSeed, triggerIndex, spreadIndex, damageAmounts, this, skillLevel, hitRegData, areaDuration.GetAmount(skillLevel), applyDuration.GetAmount(skillLevel));
                 BaseGameNetworkManager.Singleton.Assets.NetworkSpawn(spawnObj);
             }
             // Teleport to aim position

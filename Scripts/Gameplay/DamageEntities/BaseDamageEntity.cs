@@ -13,7 +13,7 @@ namespace MultiplayerARPG
         protected Dictionary<DamageElement, MinMaxFloat> _damageAmounts;
         protected BaseSkill _skill;
         protected int _skillLevel;
-        protected DamageHitDelegate _onHit;
+        protected HitRegisterData _hitRegisterData;
 
         public GameInstance CurrentGameInstance
         {
@@ -75,7 +75,7 @@ namespace MultiplayerARPG
         /// <param name="damageAmounts">Calculated damage amounts</param>
         /// <param name="skill">Skill which was used to attack enemy</param>
         /// <param name="skillLevel">Level of the skill</param>
-        /// <param name="onHit">Action when hit</param>
+        /// <param name="hitRegisterData">Action when hit</param>
         public virtual void Setup(
             EntityInfo instigator,
             CharacterItem weapon,
@@ -85,7 +85,7 @@ namespace MultiplayerARPG
             Dictionary<DamageElement, MinMaxFloat> damageAmounts,
             BaseSkill skill,
             int skillLevel,
-            DamageHitDelegate onHit)
+            HitRegisterData hitRegisterData)
         {
             _instigator = instigator;
             _weapon = weapon;
@@ -95,19 +95,32 @@ namespace MultiplayerARPG
             _damageAmounts = damageAmounts;
             _skill = skill;
             _skillLevel = skillLevel;
-            _onHit = onHit;
+            _hitRegisterData = hitRegisterData;
         }
 
         public virtual void ApplyDamageTo(DamageableHitBox target)
         {
             if (target == null || target.IsDead() || !target.CanReceiveDamageFrom(_instigator))
                 return;
-            if (_onHit != null)
-                _onHit.Invoke(_simulateSeed, _triggerIndex, _spreadIndex, target.GetObjectId(), target.Index, target.CacheTransform.position);
-            if (!IsServer)
-                return;
-            if (!CurrentGameManager.HitRegistrationManager.WillProceedHitRegByClient(this, _instigator))
+            bool willProceedHitRegByClient = false;
+            bool isOwnerClient = false;
+            if (_instigator.TryGetEntity(out BaseGameEntity entity))
+            {
+                isOwnerClient = entity.IsOwnerClient;
+                willProceedHitRegByClient = !entity.IsOwnedByServer && !entity.IsOwnerHost;
+            }
+            if (IsServer && !willProceedHitRegByClient)
+            {
                 target.ReceiveDamage(CacheTransform.position, _instigator, _damageAmounts, _weapon, _skill, _skillLevel, _simulateSeed);
+            }
+            if (isOwnerClient && willProceedHitRegByClient)
+            {
+                _hitRegisterData.HitTimestamp = CurrentGameManager.Timestamp;
+                _hitRegisterData.HitObjectId = target.GetObjectId();
+                _hitRegisterData.HitBoxIndex = target.Index;
+                _hitRegisterData.Destination = target.CacheTransform.position;
+                CurrentGameManager.HitRegistrationManager.PrepareHitRegData(_hitRegisterData);
+            }
         }
 
         public override void InitPrefab()

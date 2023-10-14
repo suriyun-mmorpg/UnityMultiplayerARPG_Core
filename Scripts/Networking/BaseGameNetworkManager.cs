@@ -179,8 +179,6 @@ namespace MultiplayerARPG
             {
                 if (!_arrayGameEntity[i].enabled)
                     continue;
-                if (_arrayGameEntity[i].IsOwnerClient)
-                    _arrayGameEntity[i].SendClientState(timestamp);
                 _arrayGameEntity[i].SendServerState(timestamp);
             }
             Profiler.EndSample();
@@ -198,7 +196,10 @@ namespace MultiplayerARPG
                 if (!_arrayGameEntity[i].enabled)
                     continue;
                 if (_arrayGameEntity[i].IsOwnerClient)
+                {
                     _arrayGameEntity[i].SendClientState(timestamp);
+                    SendHitRegistration();
+                }
             }
             Profiler.EndSample();
         }
@@ -685,6 +686,19 @@ namespace MultiplayerARPG
         {
             if (ServerUserHandlers.TryGetPlayerCharacter(messageHandler.ConnectionId, out BasePlayerCharacterEntity gameEntity))
                 HitRegistrationManager.Register(gameEntity, messageHandler.Reader.Get<HitRegisterMessage>());
+        }
+
+        public void SendHitRegistration()
+        {
+            if (HitRegistrationManager.CountHitRegDataList() <= 0)
+                return;
+
+            ClientSendPacket(BaseGameEntity.STATE_DATA_CHANNEL, LiteNetLib.DeliveryMethod.ReliableOrdered, GameNetworkingConsts.HitRegistration, new HitRegisterMessage()
+            {
+                Hits = HitRegistrationManager.GetHitRegDataList(),
+            });
+
+            HitRegistrationManager.ClearHitRegData();
         }
 
         public virtual void InitPrefabs()

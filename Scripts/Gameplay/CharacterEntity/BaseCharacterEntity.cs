@@ -422,7 +422,6 @@ namespace MultiplayerARPG
                 s_EntityStateMessageWriter.Put(s_EntityStateDataWriter.Data, 0, s_EntityStateDataWriter.Length);
                 ClientSendMessage(STATE_DATA_CHANNEL, (shouldSendReliably || (ushort)inputState > 1 << 0) ? DeliveryMethod.ReliableOrdered : DeliveryMethod.Sequenced, s_EntityStateMessageWriter);
             }
-            CurrentGameManager.HitRegistrationManager.SendHitRegToServer();
         }
 
         public override void SendServerState(long writeTimestamp)
@@ -924,6 +923,19 @@ namespace MultiplayerARPG
             return validIfNoRequireAmmoType;
         }
 
+        public Dictionary<DamageElement, MinMaxFloat> GetIncreaseDamagesByAmmo(CharacterItem weapon)
+        {
+            // Avoid null data
+            if (weapon == null)
+                return null;
+
+            IWeaponItem weaponItem = weapon.GetWeaponItem();
+            if (weaponItem.AmmoCapacity > 0 || weaponItem.WeaponType.RequireAmmoType == null)
+                return null;
+
+            return this.GetIncreaseDamagesByAmmo(weaponItem.WeaponType.RequireAmmoType);
+        }
+
         public bool DecreaseAmmos(CharacterItem weapon, bool isLeftHand, int amount, out Dictionary<DamageElement, MinMaxFloat> increaseDamageAmounts, bool validIfNoRequireAmmoType = true)
         {
             increaseDamageAmounts = null;
@@ -933,38 +945,37 @@ namespace MultiplayerARPG
                 return validIfNoRequireAmmoType;
 
             IWeaponItem weaponItem = weapon.GetWeaponItem();
-            if (weaponItem.WeaponType.RequireAmmoType != null)
+            if (weaponItem.WeaponType.RequireAmmoType == null)
+                return validIfNoRequireAmmoType;
+
+            if (weaponItem.AmmoCapacity <= 0)
             {
-                if (weaponItem.AmmoCapacity <= 0)
+                // Ammo capacity is 0 so reduce ammo from inventory
+                if (this.DecreaseAmmos(weaponItem.WeaponType.RequireAmmoType, amount, out increaseDamageAmounts))
                 {
-                    // Ammo capacity is 0 so reduce ammo from inventory
-                    if (this.DecreaseAmmos(weaponItem.WeaponType.RequireAmmoType, amount, out increaseDamageAmounts))
-                    {
-                        this.FillEmptySlots();
-                        return true;
-                    }
-                    // Not enough ammo
-                    return false;
+                    this.FillEmptySlots();
+                    return true;
                 }
-                else
-                {
-                    // Ammo capacity >= `amount` reduce loaded ammo
-                    if (weapon.ammo >= amount)
-                    {
-                        weapon.ammo -= amount;
-                        EquipWeapons equipWeapons = EquipWeapons;
-                        if (isLeftHand)
-                            equipWeapons.leftHand = weapon;
-                        else
-                            equipWeapons.rightHand = weapon;
-                        EquipWeapons = equipWeapons;
-                        return true;
-                    }
-                    // Not enough ammo
-                    return false;
-                }
+                // Not enough ammo
+                return false;
             }
-            return validIfNoRequireAmmoType;
+            else
+            {
+                // Ammo capacity >= `amount` reduce loaded ammo
+                if (weapon.ammo >= amount)
+                {
+                    weapon.ammo -= amount;
+                    EquipWeapons equipWeapons = EquipWeapons;
+                    if (isLeftHand)
+                        equipWeapons.leftHand = weapon;
+                    else
+                        equipWeapons.rightHand = weapon;
+                    EquipWeapons = equipWeapons;
+                    return true;
+                }
+                // Not enough ammo
+                return false;
+            }
         }
 
         public virtual void GetUsingSkillData(

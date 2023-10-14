@@ -51,22 +51,22 @@ namespace MultiplayerARPG
             return 10f;
         }
 
-        public override bool IsHitValid(HitValidateData hitValidateData, HitData hitData, DamageableHitBox hitBox, string hitId, string hitObjectId, long hitTimestamp)
+        public override bool IsHitValid(HitValidateData hitValidateData, HitRegisterData hitData, DamageableHitBox hitBox)
         {
-            float dist = Vector3.Distance(hitValidateData.Origins[hitId].Position, hitData.HitPoint);
+            float dist = Vector3.Distance(hitData.Origin, hitData.Destination);
             float maxExtents = Mathf.Max(hitBox.Bounds.extents.x, hitBox.Bounds.extents.y, hitBox.Bounds.extents.z);
             // Too far
             if (dist > missileDistance + maxExtents)
                 return false;
             
-            float duration = (float)(hitTimestamp - hitValidateData.Origins[hitId].LaunchTimestamp) * 0.001f;
+            float duration = (float)(hitData.HitTimestamp - hitData.LaunchTimestamp) * 0.001f;
             // Take too short time to hit
             if (Mathf.Abs((dist / duration) / missileSpeed) < 0.8f)
                 return false;
             return true;
         }
 
-        public override void LaunchDamageEntity(BaseCharacterEntity attacker, bool isLeftHand, CharacterItem weapon, int simulateSeed, byte triggerIndex, byte spreadIndex, Vector3 fireStagger, Dictionary<DamageElement, MinMaxFloat> damageAmounts, BaseSkill skill, int skillLevel, AimPosition aimPosition, DamageOriginPreparedDelegate onOriginPrepared, DamageHitDelegate onHit)
+        public override void LaunchDamageEntity(BaseCharacterEntity attacker, bool isLeftHand, CharacterItem weapon, int simulateSeed, byte triggerIndex, byte spreadIndex, Vector3 fireStagger, Dictionary<DamageElement, MinMaxFloat> damageAmounts, BaseSkill skill, int skillLevel, AimPosition aimPosition)
         {
             // Spawn missile damage entity, it will move to target then apply damage when hit
             // Instantiates on both client and server (damage applies at server)
@@ -78,8 +78,16 @@ namespace MultiplayerARPG
             System.Random random = new System.Random(unchecked(simulateSeed + ((triggerIndex + 1) * (spreadIndex + 1) * 16)));
             Vector3 stagger = new Vector3(GenericUtils.RandomFloat(random.Next(), -fireStagger.x, fireStagger.x), GenericUtils.RandomFloat(random.Next(), -fireStagger.y, fireStagger.y));
             this.GetDamagePositionAndRotation(attacker, isLeftHand, aimPosition, stagger, out Vector3 damagePosition, out Vector3 damageDirection, out Quaternion damageRotation);
-            if (onOriginPrepared != null)
-                onOriginPrepared.Invoke(simulateSeed, triggerIndex, spreadIndex, damagePosition, damageDirection, damageRotation);
+            // Prepare hit reg data
+            HitRegisterData hitRegData = new HitRegisterData()
+            {
+                SimulateSeed = simulateSeed,
+                TriggerIndex = triggerIndex,
+                SpreadIndex = spreadIndex,
+                LaunchTimestamp = BaseGameNetworkManager.Singleton.Timestamp,
+                Origin = damagePosition,
+                Direction = damageDirection,
+            };
 
             DamageableEntity lockingTarget;
             if (!hitOnlySelectedTarget || !attacker.TryGetTargetEntity(out lockingTarget))
@@ -88,7 +96,7 @@ namespace MultiplayerARPG
             // Instantiate missile damage entity
             float missileDistance = this.missileDistance;
             float missileSpeed = this.missileSpeed;
-            PoolSystem.GetInstance(missileDamageEntity, damagePosition, damageRotation).Setup(instigator, weapon, simulateSeed, triggerIndex, spreadIndex, damageAmounts, skill, skillLevel, onHit, missileDistance, missileSpeed, lockingTarget);
+            PoolSystem.GetInstance(missileDamageEntity, damagePosition, damageRotation).Setup(instigator, weapon, simulateSeed, triggerIndex, spreadIndex, damageAmounts, skill, skillLevel, hitRegData, missileDistance, missileSpeed, lockingTarget);
         }
     }
 }

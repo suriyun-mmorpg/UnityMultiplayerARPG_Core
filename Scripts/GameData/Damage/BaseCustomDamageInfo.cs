@@ -16,22 +16,15 @@ namespace MultiplayerARPG
             Dictionary<DamageElement, MinMaxFloat> damageAmounts,
             BaseSkill skill,
             int skillLevel,
-            AimPosition aimPosition,
-            DamageOriginPreparedDelegate onOriginPrepared,
-            DamageHitDelegate onHit);
+            AimPosition aimPosition);
         public abstract Transform GetDamageTransform(BaseCharacterEntity attacker, bool isLeftHand);
         public abstract float GetDistance();
         public abstract float GetFov();
-        public abstract bool IsHitValid(HitValidateData hitValidateData, HitData hitData, DamageableHitBox hitBox, string hitId, string hitObjectId, long hitTimestamp);
+        public abstract bool IsHitValid(HitValidateData hitValidateData, HitRegisterData hitData, DamageableHitBox hitBox);
 
         public virtual void PrepareRelatesData()
         {
 
-        }
-
-        public virtual bool ValidatedByHitRegistrationManager()
-        {
-            return false;
         }
     }
 }

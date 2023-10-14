@@ -19,8 +19,6 @@ namespace MultiplayerARPG
         /// <param name="skill">Which skill?</param>
         /// <param name="skillLevel">Which skill level?</param>
         /// <param name="aimPosition">Aim position</param>
-        /// <param name="onOriginPrepared">Action when origin prepared/param>
-        /// <param name="onHit">Action when hit</param>
         void LaunchDamageEntity(
             BaseCharacterEntity attacker,
             bool isLeftHand,
@@ -32,11 +30,10 @@ namespace MultiplayerARPG
             Dictionary<DamageElement, MinMaxFloat> damageAmounts,
             BaseSkill skill,
             int skillLevel,
-            AimPosition aimPosition,
-            DamageOriginPreparedDelegate onOriginPrepared,
-            DamageHitDelegate onHit);
+            AimPosition aimPosition);
         Transform GetDamageTransform(BaseCharacterEntity attacker, bool isLeftHand);
         float GetDistance();
         float GetFov();
+        bool IsHitValid(HitValidateData hitValidateData, HitRegisterData hitData, DamageableHitBox hitBox);
     }
 }

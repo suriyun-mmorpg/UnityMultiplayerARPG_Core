@@ -513,6 +513,32 @@ namespace MultiplayerARPG
             return 360f;
         }
 
+        public virtual Dictionary<DamageElement, MinMaxFloat> GetIncreaseDamageByResources(
+            BaseCharacterEntity skillUser,
+            CharacterItem weapon)
+        {
+            return skillUser.GetIncreaseDamagesByAmmo(weapon);
+        }
+
+        public virtual bool DecreaseResources(
+            BaseCharacterEntity skillUser,
+            CharacterItem weapon,
+            bool isLeftHand,
+            out Dictionary<DamageElement, MinMaxFloat> increaseDamageAmounts)
+        {
+            increaseDamageAmounts = null;
+            if (skillUser is BasePlayerCharacterEntity)
+            {
+                // Not enough items
+                if (!DecreaseItems(skillUser))
+                    return false;
+                // Not enough ammos
+                if (!DecreaseAmmos(skillUser, isLeftHand, out increaseDamageAmounts))
+                    return false;
+            }
+            return true;
+        }
+
         /// <summary>
         /// Apply skill
         /// </summary>
@@ -525,8 +551,6 @@ namespace MultiplayerARPG
         /// <param name="damageAmounts"></param>
         /// <param name="targetObjectId"></param>
         /// <param name="aimPosition"></param>
-        /// <param name="onDamageOriginPrepared">Action when origin prepared</param>
-        /// <param name="onDamageHit">Action when hit</param>
         /// <returns></returns>
         public void ApplySkill(
             BaseCharacterEntity skillUser,
@@ -537,25 +561,10 @@ namespace MultiplayerARPG
             byte triggerIndex,
             Dictionary<DamageElement, MinMaxFloat> damageAmounts,
             uint targetObjectId,
-            AimPosition aimPosition,
-            DamageOriginPreparedDelegate onDamageOriginPrepared,
-            DamageHitDelegate onDamageHit)
+            AimPosition aimPosition)
         {
             if (skillUser == null)
                 return;
-            // Decrease player character entity's items
-            if (skillUser.IsServer && skillUser is BasePlayerCharacterEntity)
-            {
-                // Not enough items
-                if (!DecreaseItems(skillUser))
-                    return;
-                // Not enough ammos
-                if (!DecreaseAmmos(skillUser, isLeftHand, out Dictionary<DamageElement, MinMaxFloat> increaseDamageAmounts))
-                    return;
-                // Increase damage with ammo damage
-                if (HitRegistrationManager.IncreasePreparedDamageAmounts(skillUser, simulateSeed, increaseDamageAmounts, out Dictionary<DamageElement, MinMaxFloat> resultDamageAmounts))
-                    damageAmounts = resultDamageAmounts;
-            }
 
             ApplySkillImplement(
                 skillUser,
@@ -567,9 +576,7 @@ namespace MultiplayerARPG
                 0,
                 damageAmounts,
                 targetObjectId,
-                aimPosition,
-                onDamageOriginPrepared,
-                onDamageHit);
+                aimPosition);
         }
 
         /// <summary>
@@ -585,8 +592,6 @@ namespace MultiplayerARPG
         /// <param name="damageAmounts"></param>
         /// <param name="targetObjectId"></param>
         /// <param name="aimPosition"></param>
-        /// <param name="onDamageOriginPrepared">Action when origin prepared</param>
-        /// <param name="onDamageHit">Action when hit</param>
         /// <returns></returns>
         protected abstract void ApplySkillImplement(
             BaseCharacterEntity skillUser,
@@ -598,9 +603,7 @@ namespace MultiplayerARPG
             byte spreadIndex,
             Dictionary<DamageElement, MinMaxFloat> damageAmounts,
             uint targetObjectId,
-            AimPosition aimPosition,
-            DamageOriginPreparedDelegate onDamageOriginPrepared,
-            DamageHitDelegate onDamageHit);
+            AimPosition aimPosition);
 
         /// <summary>
         /// Return TRUE if this will override default attack function

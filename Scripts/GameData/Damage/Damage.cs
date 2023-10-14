@@ -139,9 +139,7 @@ namespace MultiplayerARPG
             Dictionary<DamageElement, MinMaxFloat> damageAmounts,
             BaseSkill skill,
             int skillLevel,
-            AimPosition aimPosition,
-            DamageOriginPreparedDelegate onOriginPrepared,
-            DamageHitDelegate onHit)
+            AimPosition aimPosition)
         {
             if (attacker == null)
                 return;
@@ -157,9 +155,7 @@ namespace MultiplayerARPG
                 damageAmounts,
                 skill,
                 skillLevel,
-                aimPosition,
-                onOriginPrepared,
-                onHit);
+                aimPosition);
 
             // Trigger attacker's on launch damage entity event
             attacker.OnLaunchDamageEntity(
@@ -179,9 +175,9 @@ namespace MultiplayerARPG
             GetDamageInfo().PrepareRelatesData();
         }
 
-        public bool IsHitValid(HitValidateData hitValidateData, HitData hitData, DamageableHitBox hitBox, string hitId, string hitObjectId, long hitTimestamp)
+        public bool IsHitValid(HitValidateData hitValidateData, HitRegisterData hitData, DamageableHitBox hitBox)
         {
-            return GetDamageInfo().IsHitValid(hitValidateData, hitData, hitBox, hitId, hitObjectId, hitTimestamp);
+            return GetDamageInfo().IsHitValid(hitValidateData, hitData, hitBox);
         }
     }
 
