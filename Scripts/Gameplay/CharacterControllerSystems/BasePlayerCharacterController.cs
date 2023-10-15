@@ -155,7 +155,7 @@ namespace MultiplayerARPG
                 uint parentObjectId = 0;
                 if (ConstructingBuildingEntity.BuildingArea != null)
                     parentObjectId = ConstructingBuildingEntity.BuildingArea.GetEntityObjectId();
-                PlayingCharacterEntity.Building.CallServerConstructBuilding(_buildingItemIndex, ConstructingBuildingEntity.EntityTransform.position, ConstructingBuildingEntity.EntityTransform.eulerAngles, parentObjectId);
+                PlayingCharacterEntity.Building.CallCmdConstructBuilding(_buildingItemIndex, ConstructingBuildingEntity.EntityTransform.position, ConstructingBuildingEntity.EntityTransform.eulerAngles, parentObjectId);
             }
             DestroyConstructingBuilding();
         }
@@ -191,7 +191,7 @@ namespace MultiplayerARPG
         {
             if (targetBuildingEntity == null)
                 return;
-            PlayingCharacterEntity.Building.CallServerRepairBuilding(targetBuildingEntity.ObjectId);
+            PlayingCharacterEntity.Building.CallCmdRepairBuilding(targetBuildingEntity.ObjectId);
             DeselectBuilding();
         }
 
@@ -199,7 +199,7 @@ namespace MultiplayerARPG
         {
             if (targetBuildingEntity == null)
                 return;
-            PlayingCharacterEntity.Building.CallServerDestroyBuilding(targetBuildingEntity.ObjectId);
+            PlayingCharacterEntity.Building.CallCmdDestroyBuilding(targetBuildingEntity.ObjectId);
             DeselectBuilding();
         }
 
@@ -213,7 +213,7 @@ namespace MultiplayerARPG
                 LanguageManager.GetText(UITextKeys.UI_SET_BUILDING_PASSWORD_DESCRIPTION.ToString()),
                 (password) =>
                 {
-                    PlayingCharacterEntity.Building.CallServerSetBuildingPassword(objectId, password);
+                    PlayingCharacterEntity.Building.CallCmdSetBuildingPassword(objectId, password);
                 }, string.Empty, targetBuildingEntity.PasswordContentType, targetBuildingEntity.PasswordLength,
                 LanguageManager.GetText(UITextKeys.UI_SET_BUILDING_PASSWORD.ToString()));
             DeselectBuilding();
@@ -223,7 +223,7 @@ namespace MultiplayerARPG
         {
             if (targetBuildingEntity == null)
                 return;
-            PlayingCharacterEntity.Building.CallServerLockBuilding(targetBuildingEntity.ObjectId);
+            PlayingCharacterEntity.Building.CallCmdLockBuilding(targetBuildingEntity.ObjectId);
             DeselectBuilding();
         }
 
@@ -231,7 +231,7 @@ namespace MultiplayerARPG
         {
             if (targetBuildingEntity == null)
                 return;
-            PlayingCharacterEntity.Building.CallServerUnlockBuilding(targetBuildingEntity.ObjectId);
+            PlayingCharacterEntity.Building.CallCmdUnlockBuilding(targetBuildingEntity.ObjectId);
             DeselectBuilding();
         }
 

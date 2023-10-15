@@ -192,19 +192,19 @@ namespace MultiplayerARPG
             DealingCharacter = null;
         }
 
-        public bool CallServerSendDealingRequest(uint objectId)
+        public bool CallCmdSendDealingRequest(uint objectId)
         {
             if (DisableDealing)
             {
                 ClientGenericActions.ClientReceiveGameMessage(UITextKeys.UI_ERROR_FEATURE_IS_DISABLED);
                 return false;
             }
-            RPC(ServerSendDealingRequest, objectId);
+            RPC(CmdSendDealingRequest, objectId);
             return true;
         }
 
         [ServerRpc]
-        protected void ServerSendDealingRequest(uint objectId)
+        protected void CmdSendDealingRequest(uint objectId)
         {
 #if UNITY_EDITOR || UNITY_SERVER
             if (DisableDealing)
@@ -250,14 +250,14 @@ namespace MultiplayerARPG
                 onRequestDealing.Invoke(playerCharacterEntity);
         }
 
-        public bool CallServerAcceptDealingRequest()
+        public bool CallCmdAcceptDealingRequest()
         {
-            RPC(ServerAcceptDealingRequest);
+            RPC(CmdAcceptDealingRequest);
             return true;
         }
 
         [ServerRpc]
-        protected void ServerAcceptDealingRequest()
+        protected void CmdAcceptDealingRequest()
         {
 #if UNITY_EDITOR || UNITY_SERVER
             if (DealingCharacter == null)
@@ -283,14 +283,14 @@ namespace MultiplayerARPG
 #endif
         }
 
-        public bool CallServerDeclineDealingRequest()
+        public bool CallCmdDeclineDealingRequest()
         {
-            RPC(ServerDeclineDealingRequest);
+            RPC(CmdDeclineDealingRequest);
             return true;
         }
 
         [ServerRpc]
-        protected void ServerDeclineDealingRequest()
+        protected void CmdDeclineDealingRequest()
         {
 #if UNITY_EDITOR || UNITY_SERVER
             if (DealingCharacter != null)
@@ -322,14 +322,14 @@ namespace MultiplayerARPG
                 onStartDealing.Invoke(playerCharacterEntity);
         }
 
-        public bool CallServerSetDealingItem(string id, int amount)
+        public bool CallCmdSetDealingItem(string id, int amount)
         {
-            RPC(ServerSetDealingItem, id, amount);
+            RPC(CmdSetDealingItem, id, amount);
             return true;
         }
 
         [ServerRpc]
-        protected void ServerSetDealingItem(string id, int amount)
+        protected void CmdSetDealingItem(string id, int amount)
         {
 #if UNITY_EDITOR || UNITY_SERVER
             if (DealingState != DealingState.Dealing)
@@ -369,14 +369,14 @@ namespace MultiplayerARPG
 #endif
         }
 
-        public bool CallServerSetDealingGold(int dealingGold)
+        public bool CallCmdSetDealingGold(int dealingGold)
         {
-            RPC(ServerSetDealingGold, dealingGold);
+            RPC(CmdSetDealingGold, dealingGold);
             return true;
         }
 
         [ServerRpc]
-        protected void ServerSetDealingGold(int gold)
+        protected void CmdSetDealingGold(int gold)
         {
 #if UNITY_EDITOR || UNITY_SERVER
             if (DealingState != DealingState.Dealing)
@@ -392,14 +392,14 @@ namespace MultiplayerARPG
 #endif
         }
 
-        public bool CallServerLockDealing()
+        public bool CallCmdLockDealing()
         {
-            RPC(ServerLockDealing);
+            RPC(CmdLockDealing);
             return true;
         }
 
         [ServerRpc]
-        protected void ServerLockDealing()
+        protected void CmdLockDealing()
         {
 #if UNITY_EDITOR || UNITY_SERVER
             if (DealingState != DealingState.Dealing)
@@ -411,14 +411,14 @@ namespace MultiplayerARPG
 #endif
         }
 
-        public bool CallServerConfirmDealing()
+        public bool CallCmdConfirmDealing()
         {
-            RPC(ServerConfirmDealing);
+            RPC(CmdConfirmDealing);
             return true;
         }
 
         [ServerRpc]
-        protected void ServerConfirmDealing()
+        protected void CmdConfirmDealing()
         {
 #if UNITY_EDITOR || UNITY_SERVER
             if (DealingState != DealingState.LockDealing || !(DealingCharacter.Dealing.DealingState == DealingState.LockDealing || DealingCharacter.Dealing.DealingState == DealingState.ConfirmDealing))
@@ -449,14 +449,14 @@ namespace MultiplayerARPG
 #endif
         }
 
-        public bool CallServerCancelDealing()
+        public bool CallCmdCancelDealing()
         {
-            RPC(ServerCancelDealing);
+            RPC(CmdCancelDealing);
             return true;
         }
 
         [ServerRpc]
-        protected void ServerCancelDealing()
+        protected void CmdCancelDealing()
         {
 #if UNITY_EDITOR || UNITY_SERVER
             if (DealingCharacter != null && DealingCharacter.Dealing.DealingState != DealingState.None)

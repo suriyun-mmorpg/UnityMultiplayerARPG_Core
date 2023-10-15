@@ -146,7 +146,7 @@ namespace MultiplayerARPG
                 if (_exitVehicleInput.IsPress)
                 {
                     // Exit vehicle
-                    PlayingCharacterEntity.CallServerExitVehicle();
+                    PlayingCharacterEntity.CallCmdExitVehicle();
                 }
                 if (_switchEquipWeaponSetInput.IsPress)
                 {

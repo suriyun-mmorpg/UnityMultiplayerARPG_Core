@@ -51,13 +51,13 @@ namespace MultiplayerARPG
 
         public void OnClickSendDealingRequest()
         {
-            GameInstance.PlayingCharacterEntity.Dealing.CallServerSendDealingRequest(Data.ObjectId);
+            GameInstance.PlayingCharacterEntity.Dealing.CallCmdSendDealingRequest(Data.ObjectId);
             Hide();
         }
 
         public void OnClickSendDuelingRequest()
         {
-            GameInstance.PlayingCharacterEntity.Dueling.CallServerSendDuelingRequest(Data.ObjectId);
+            GameInstance.PlayingCharacterEntity.Dueling.CallCmdSendDuelingRequest(Data.ObjectId);
             Hide();
         }
 

@@ -30,7 +30,7 @@ namespace MultiplayerARPG
         {
             if (!ValidateRequestUseItem(index))
                 return false;
-            RPC(ServerUseItem, index);
+            RPC(CmdUseItem, index);
             return true;
         }
 
@@ -38,13 +38,13 @@ namespace MultiplayerARPG
         {
             if (this.IsDead())
                 return false;
-            RPC(ServerUseGuildSkill, dataId);
+            RPC(CmdUseGuildSkill, dataId);
             return true;
         }
 
         public bool CallServerAssignHotkey(string hotkeyId, HotkeyType type, string id)
         {
-            RPC(ServerAssignHotkey, hotkeyId, type, id);
+            RPC(CmdAssignHotkey, hotkeyId, type, id);
             return true;
         }
 
@@ -81,7 +81,7 @@ namespace MultiplayerARPG
         {
             if (!CanDoActions())
                 return false;
-            RPC(ServerEnterWarp, objectId);
+            RPC(CmdEnterWarp, objectId);
             return true;
         }
 
@@ -89,7 +89,7 @@ namespace MultiplayerARPG
         {
             if (!CurrentGameplayRule.CanInteractEntity(this, sourceObjectId))
                 return false;
-            RPC(ServerAppendCraftingQueueItem, sourceObjectId, dataId, amount);
+            RPC(CmdAppendCraftingQueueItem, sourceObjectId, dataId, amount);
             return true;
         }
 
@@ -97,7 +97,7 @@ namespace MultiplayerARPG
         {
             if (!CurrentGameplayRule.CanInteractEntity(this, sourceObjectId))
                 return false;
-            RPC(ServerChangeCraftingQueueItem, sourceObjectId, indexOfData, amount);
+            RPC(CmdChangeCraftingQueueItem, sourceObjectId, indexOfData, amount);
             return true;
         }
 
@@ -105,13 +105,13 @@ namespace MultiplayerARPG
         {
             if (!CurrentGameplayRule.CanInteractEntity(this, sourceObjectId))
                 return false;
-            RPC(ServerCancelCraftingQueueItem, sourceObjectId, indexOfData);
+            RPC(CmdCancelCraftingQueueItem, sourceObjectId, indexOfData);
             return true;
         }
 
         public bool CallServerChangeQuestTracking(int questDataId, bool isTracking)
         {
-            RPC(ServerChangeQuestTracking, questDataId, isTracking);
+            RPC(CmdChangeQuestTracking, questDataId, isTracking);
             return true;
         }
     }

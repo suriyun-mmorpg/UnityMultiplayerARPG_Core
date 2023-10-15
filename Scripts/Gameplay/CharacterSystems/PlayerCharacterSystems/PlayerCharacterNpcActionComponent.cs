@@ -64,16 +64,16 @@ namespace MultiplayerARPG
         }
 
         #region Networking Functions
-        public bool CallServerNpcActivate(uint objectId)
+        public bool CallCmdNpcActivate(uint objectId)
         {
             if (Entity.IsDead())
                 return false;
-            RPC(ServerNpcActivate, objectId);
+            RPC(CmdNpcActivate, objectId);
             return true;
         }
 
         [ServerRpc]
-        protected async void ServerNpcActivate(uint objectId)
+        protected async void CmdNpcActivate(uint objectId)
         {
 #if UNITY_EDITOR || UNITY_SERVER
             if (!Entity.CanDoActions())
@@ -248,16 +248,16 @@ namespace MultiplayerARPG
                 onShowNpcRepairItem.Invoke();
         }
 
-        public bool CallServerSelectNpcDialogMenu(byte menuIndex)
+        public bool CallCmdSelectNpcDialogMenu(byte menuIndex)
         {
             if (Entity.IsDead())
                 return false;
-            RPC(ServerSelectNpcDialogMenu, menuIndex);
+            RPC(CmdSelectNpcDialogMenu, menuIndex);
             return true;
         }
 
         [ServerRpc]
-        protected async void ServerSelectNpcDialogMenu(byte menuIndex)
+        protected async void CmdSelectNpcDialogMenu(byte menuIndex)
         {
 #if UNITY_EDITOR || UNITY_SERVER
             if (CurrentNpcDialog == null)
@@ -277,14 +277,14 @@ namespace MultiplayerARPG
 #endif
         }
 
-        public bool CallServerHideNpcDialog()
+        public bool CallCmdHideNpcDialog()
         {
-            RPC(ServerHideNpcDialog);
+            RPC(CmdHideNpcDialog);
             return true;
         }
 
         [ServerRpc]
-        protected void ServerHideNpcDialog()
+        protected void CmdHideNpcDialog()
         {
 #if UNITY_EDITOR || UNITY_SERVER
             ClearNpcDialogData();
@@ -292,16 +292,16 @@ namespace MultiplayerARPG
 #endif
         }
 
-        public bool CallServerBuyNpcItem(int itemIndex, int amount)
+        public bool CallCmdBuyNpcItem(int itemIndex, int amount)
         {
             if (amount <= 0 || Entity.IsDead())
                 return false;
-            RPC(ServerBuyNpcItem, itemIndex, amount);
+            RPC(CmdBuyNpcItem, itemIndex, amount);
             return true;
         }
 
         [ServerRpc]
-        protected void ServerBuyNpcItem(int index, int amount)
+        protected void CmdBuyNpcItem(int index, int amount)
         {
 #if UNITY_EDITOR || UNITY_SERVER
             if (amount <= 0 || Entity.IsDead())
@@ -342,16 +342,16 @@ namespace MultiplayerARPG
 #endif
         }
 
-        public bool CallServerSelectQuestRewardItem(byte itemIndex)
+        public bool CallCmdSelectQuestRewardItem(byte itemIndex)
         {
             if (Entity.IsDead())
                 return false;
-            RPC(ServerSelectQuestRewardItem, itemIndex);
+            RPC(CmdSelectQuestRewardItem, itemIndex);
             return true;
         }
 
         [ServerRpc]
-        protected async void ServerSelectQuestRewardItem(byte index)
+        protected async void CmdSelectQuestRewardItem(byte index)
         {
 #if UNITY_EDITOR || UNITY_SERVER
             if (CompletingQuest == null)

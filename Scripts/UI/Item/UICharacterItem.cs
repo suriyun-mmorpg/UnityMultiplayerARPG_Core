@@ -1770,7 +1770,7 @@ namespace MultiplayerARPG
         {
             if (selectionManager != null)
                 selectionManager.DeselectSelectedUI();
-            GameInstance.PlayingCharacterEntity.Dealing.CallServerSetDealingItem(CharacterItem.id, amount);
+            GameInstance.PlayingCharacterEntity.Dealing.CallCmdSetDealingItem(CharacterItem.id, amount);
         }
         #endregion
 
@@ -2079,7 +2079,7 @@ namespace MultiplayerARPG
 
         public void OnClickBuyVendingItem()
         {
-            GameInstance.PlayingCharacterEntity.Vending.CallServerBuyItem(IndexOfData);
+            GameInstance.PlayingCharacterEntity.Vending.CallCmdBuyItem(IndexOfData);
         }
         #endregion
     }

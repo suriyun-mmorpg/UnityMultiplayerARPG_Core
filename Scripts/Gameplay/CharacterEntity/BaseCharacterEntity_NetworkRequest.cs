@@ -6,7 +6,7 @@
         {
             if (!CanDoActions())
                 return false;
-            RPC(ServerPickup, objectId);
+            RPC(CmdPickup, objectId);
             CallAllPlayPickupAnimation();
             return true;
         }
@@ -15,7 +15,7 @@
         {
             if (!CanDoActions())
                 return false;
-            RPC(ServerPickupItemFromContainer, objectId, itemsContainerIndex, amount);
+            RPC(CmdPickupItemFromContainer, objectId, itemsContainerIndex, amount);
             CallAllPlayPickupAnimation();
             return true;
         }
@@ -24,7 +24,7 @@
         {
             if (!CanDoActions())
                 return false;
-            RPC(ServerPickupAllItemsFromContainer, objectId);
+            RPC(CmdPickupAllItemsFromContainer, objectId);
             CallAllPlayPickupAnimation();
             return true;
         }
@@ -33,7 +33,7 @@
         {
             if (!CanDoActions())
                 return false;
-            RPC(ServerPickupNearbyItems);
+            RPC(CmdPickupNearbyItems);
             CallAllPlayPickupAnimation();
             return true;
         }
@@ -42,7 +42,7 @@
         {
             if (amount <= 0 || !CanDoActions() || nonEquipIndex >= NonEquipItems.Count)
                 return false;
-            RPC(ServerDropItem, nonEquipIndex, amount);
+            RPC(CmdDropItem, nonEquipIndex, amount);
             return true;
         }
 
@@ -66,7 +66,7 @@
 
         public bool CallServerUnSummon(uint objectId)
         {
-            RPC(ServerUnSummon, objectId);
+            RPC(CmdUnSummon, objectId);
             return true;
         }
     }

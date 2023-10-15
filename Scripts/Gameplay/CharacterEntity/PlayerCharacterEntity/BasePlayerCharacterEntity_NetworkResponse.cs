@@ -5,7 +5,7 @@ namespace MultiplayerARPG
     public partial class BasePlayerCharacterEntity
     {
         [ServerRpc]
-        protected void ServerUseGuildSkill(int dataId)
+        protected void CmdUseGuildSkill(int dataId)
         {
 #if UNITY_EDITOR || UNITY_SERVER
             if (this.IsDead())
@@ -55,7 +55,7 @@ namespace MultiplayerARPG
         }
 
         [ServerRpc]
-        protected void ServerAssignHotkey(string hotkeyId, HotkeyType type, string relateId)
+        protected void CmdAssignHotkey(string hotkeyId, HotkeyType type, string relateId)
         {
 #if UNITY_EDITOR || UNITY_SERVER
             CharacterHotkey characterHotkey = new CharacterHotkey();
@@ -71,7 +71,7 @@ namespace MultiplayerARPG
         }
 
         [ServerRpc]
-        protected void ServerEnterWarp(uint objectId)
+        protected void CmdEnterWarp(uint objectId)
         {
 #if UNITY_EDITOR || UNITY_SERVER
             if (!CanDoActions())
@@ -94,7 +94,7 @@ namespace MultiplayerARPG
         }
 
         [ServerRpc]
-        protected void ServerAppendCraftingQueueItem(uint sourceObjectId, int dataId, int amount)
+        protected void CmdAppendCraftingQueueItem(uint sourceObjectId, int dataId, int amount)
         {
             UITextKeys errorMessage;
             if (sourceObjectId == ObjectId)
@@ -110,7 +110,7 @@ namespace MultiplayerARPG
         }
 
         [ServerRpc]
-        protected void ServerChangeCraftingQueueItem(uint sourceObjectId, int indexOfData, int amount)
+        protected void CmdChangeCraftingQueueItem(uint sourceObjectId, int indexOfData, int amount)
         {
             if (sourceObjectId == ObjectId)
             {
@@ -123,7 +123,7 @@ namespace MultiplayerARPG
         }
 
         [ServerRpc]
-        protected void ServerCancelCraftingQueueItem(uint sourceObjectId, int indexOfData)
+        protected void CmdCancelCraftingQueueItem(uint sourceObjectId, int indexOfData)
         {
             if (sourceObjectId == ObjectId)
             {

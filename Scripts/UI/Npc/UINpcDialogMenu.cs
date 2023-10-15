@@ -34,7 +34,7 @@ namespace MultiplayerARPG
 
         public void OnClickMenu()
         {
-            GameInstance.PlayingCharacterEntity.NpcAction.CallServerSelectNpcDialogMenu((byte)Data.menuIndex);
+            GameInstance.PlayingCharacterEntity.NpcAction.CallCmdSelectNpcDialogMenu((byte)Data.menuIndex);
         }
     }
 }
