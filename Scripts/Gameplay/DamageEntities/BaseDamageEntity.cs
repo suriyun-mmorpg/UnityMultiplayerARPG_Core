@@ -119,7 +119,7 @@ namespace MultiplayerARPG
                 _hitRegisterData.HitObjectId = target.GetObjectId();
                 _hitRegisterData.HitBoxIndex = target.Index;
                 _hitRegisterData.Destination = target.CacheTransform.position;
-                CurrentGameManager.HitRegistrationManager.PrepareHitRegData(_hitRegisterData);
+                entity.CallCmdPerformHitRegValidation(_hitRegisterData);
             }
         }
 

@@ -6,7 +6,8 @@ namespace MultiplayerARPG
 
         // Game Entity
         public const int BASE_GAME_ENTITY = 0;
-        public const int GAME_ENTITY_MODEL = 100;
+        public const int CHARACTER_MODEL_MANAGER = 100;
+        public const int GAME_ENTITY_MODEL = 101;
 
         // Controller
         public const int PLAYER_CHARACTER_CONTROLLER = -1;

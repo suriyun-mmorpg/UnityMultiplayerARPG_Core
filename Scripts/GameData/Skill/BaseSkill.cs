@@ -959,6 +959,13 @@ namespace MultiplayerARPG
             return true;
         }
 
+        public DamageInfo GetDamageInfo(BaseCharacterEntity skillUser, bool isLeftHand)
+        {
+            if (TryGetDamageInfo(skillUser, isLeftHand, out DamageInfo damageInfo))
+                return damageInfo;
+            return default;
+        }
+
         public virtual bool TryGetDamageInfo(BaseCharacterEntity skillUser, bool isLeftHand, out DamageInfo damageInfo)
         {
             damageInfo = default;
@@ -967,7 +974,7 @@ namespace MultiplayerARPG
 
         public virtual Transform GetApplyTransform(BaseCharacterEntity skillUser, bool isLeftHand)
         {
-            return skillUser.MovementTransform;
+            return skillUser.MeleeDamageTransform;
         }
 
         public void MakeRequirementEachLevels()

@@ -132,11 +132,14 @@ namespace MultiplayerARPG
                     tempDamageableHitBox.ReceiveDamage(attacker.EntityTransform.position, instigator, damageAmounts, weapon, skill, skillLevel, simulateSeed);
 
                 // Prepare hit reg because it is hitting
-                hitRegData.HitTimestamp = BaseGameNetworkManager.Singleton.Timestamp;
-                hitRegData.HitObjectId = tempDamageableHitBox.GetObjectId();
-                hitRegData.HitBoxIndex = tempDamageableHitBox.Index;
-                hitRegData.Destination = tempDamageableHitBox.CacheTransform.position;
-                BaseGameNetworkManager.Singleton.HitRegistrationManager.PrepareHitRegData(hitRegData);
+                if (isOwnerClient)
+                {
+                    hitRegData.HitTimestamp = BaseGameNetworkManager.Singleton.Timestamp;
+                    hitRegData.HitObjectId = tempDamageableHitBox.GetObjectId();
+                    hitRegData.HitBoxIndex = tempDamageableHitBox.Index;
+                    hitRegData.Destination = tempDamageableHitBox.CacheTransform.position;
+                    attacker.CallCmdPerformHitRegValidation(hitRegData);
+                }
 
                 // Instantiate impact effects
                 if (isPlayImpactEffects)
@@ -154,11 +157,14 @@ namespace MultiplayerARPG
                     tempDamageTakenTarget.ReceiveDamage(attacker.EntityTransform.position, instigator, damageAmounts, weapon, skill, skillLevel, simulateSeed);
 
                 // Prepare hit reg because it is hitting
-                hitRegData.HitTimestamp = BaseGameNetworkManager.Singleton.Timestamp;
-                hitRegData.HitObjectId = tempDamageTakenTarget.GetObjectId();
-                hitRegData.HitBoxIndex = tempDamageTakenTarget.Index;
-                hitRegData.Destination = tempDamageTakenTarget.CacheTransform.position;
-                BaseGameNetworkManager.Singleton.HitRegistrationManager.PrepareHitRegData(hitRegData);
+                if (isOwnerClient)
+                {
+                    hitRegData.HitTimestamp = BaseGameNetworkManager.Singleton.Timestamp;
+                    hitRegData.HitObjectId = tempDamageTakenTarget.GetObjectId();
+                    hitRegData.HitBoxIndex = tempDamageTakenTarget.Index;
+                    hitRegData.Destination = tempDamageTakenTarget.CacheTransform.position;
+                    attacker.CallCmdPerformHitRegValidation(hitRegData);
+                }
 
                 // Instantiate impact effects
                 if (isPlayImpactEffects)

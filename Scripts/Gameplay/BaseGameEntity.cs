@@ -559,5 +559,16 @@ namespace MultiplayerARPG
                 customAnimationModel.StopCustomAnimation();
         }
         #endregion
+
+        public virtual void CallCmdPerformHitRegValidation(HitRegisterData hitData)
+        {
+            RPC(CmdPerformHitRegValidation, hitData);
+        }
+
+        [ServerRpc]
+        protected virtual void CmdPerformHitRegValidation(HitRegisterData hitData)
+        {
+            CurrentGameManager.HitRegistrationManager.PerformValidation(this, hitData);
+        }
     }
 }

@@ -1,5 +1,4 @@
 ﻿using Cysharp.Threading.Tasks;
-using LiteNetLib.Utils;
 using LiteNetLibManager;
 using System.Collections.Generic;
 using System.Threading;
@@ -13,12 +12,6 @@ namespace MultiplayerARPG
         public const float DEFAULT_TOTAL_DURATION = 2f;
         public const float DEFAULT_TRIGGER_DURATION = 1f;
         public const float DEFAULT_STATE_SETUP_DELAY = 1f;
-
-        protected struct ReloadState
-        {
-            public bool IsLeftHand;
-            public int ReloadingAmmoAmount;
-        }
 
         protected readonly List<CancellationTokenSource> _reloadCancellationTokenSources = new List<CancellationTokenSource>();
         public int ReloadingAmmoAmount { get; protected set; }
@@ -35,9 +28,6 @@ namespace MultiplayerARPG
         public AnimActionType AnimActionType { get; protected set; }
 
         protected CharacterActionComponentManager _manager;
-        // Network data sending
-        protected ReloadState? _clientState;
-        protected ReloadState? _serverState;
 
         public override void EntityStart()
         {
@@ -238,20 +228,22 @@ namespace MultiplayerARPG
         {
             if (!IsServer && IsOwnerClient)
             {
-                // Prepare state data which will be sent to server
-                _clientState = new ReloadState()
-                {
-                    IsLeftHand = isLeftHand,
-                };
+                RPC(CmdReload, isLeftHand);
             }
             else if (IsOwnerClientOrOwnedByServer)
             {
                 // Reload immediately at server
-                ProceedReloadStateAtServer(isLeftHand);
+                ProceedCmdReload(isLeftHand);
             }
         }
 
-        protected virtual void ProceedReloadStateAtServer(bool isLeftHand)
+        [ServerRpc]
+        protected void CmdReload(bool isLeftHand)
+        {
+            ProceedCmdReload(isLeftHand);
+        }
+
+        protected void ProceedCmdReload(bool isLeftHand)
         {
 #if UNITY_EDITOR || UNITY_SERVER
             if (!_manager.IsAcceptNewAction())
@@ -278,62 +270,19 @@ namespace MultiplayerARPG
             if (reloadingAmmoAmount <= 0)
                 return;
             _manager.ActionAccepted();
-            // Prepare state data which will be sent to clients
-            _serverState = new ReloadState()
-            {
-                IsLeftHand = isLeftHand,
-                ReloadingAmmoAmount = reloadingAmmoAmount,
-            };
+            ReloadRoutine(isLeftHand, reloadingAmmoAmount).Forget();
+            RPC(RpcReload, isLeftHand, reloadingAmmoAmount);
 #endif
         }
 
-        public virtual bool WriteClientReloadState(long writeTimestamp, NetDataWriter writer)
+        [AllRpc]
+        protected void RpcReload(bool isLeftHand, int reloadingAmmoAmount)
         {
-            if (_clientState.HasValue)
-            {
-                // Simulate reloading at client
-                ReloadRoutine(_clientState.Value.IsLeftHand, 0).Forget();
-                // Send input to server
-                writer.Put(_clientState.Value.IsLeftHand);
-                // Clear Input
-                _clientState = null;
-                return true;
-            }
-            return false;
-        }
-
-        public virtual bool WriteServerReloadState(long writeTimestamp, NetDataWriter writer)
-        {
-            if (_serverState.HasValue)
-            {
-                // Simulate reloading at server
-                ReloadRoutine(_serverState.Value.IsLeftHand, _serverState.Value.ReloadingAmmoAmount).Forget();
-                // Send input to client
-                writer.Put(_serverState.Value.IsLeftHand);
-                writer.PutPackedInt(_serverState.Value.ReloadingAmmoAmount);
-                // Clear Input
-                _serverState = null;
-                return true;
-            }
-            return false;
-        }
-
-        public virtual void ReadClientReloadStateAtServer(long peerTimestamp, NetDataReader reader)
-        {
-            bool isLeftHand = reader.GetBool();
-            ProceedReloadStateAtServer(isLeftHand);
-        }
-
-        public virtual void ReadServerReloadStateAtClient(long peerTimestamp, NetDataReader reader)
-        {
-            bool isLeftHand = reader.GetBool();
-            int reloadingAmmoAmount = reader.GetPackedInt();
             if (IsServer || IsOwnerClient)
             {
-                // Don't play reloading animation again (it already done in `WriteServerReloadState` function)
+                // Don't play reloading animation again
                 return;
             }
-            // Play reload animation at client
             ReloadRoutine(isLeftHand, reloadingAmmoAmount).Forget();
         }
     }
