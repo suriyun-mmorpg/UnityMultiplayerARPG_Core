@@ -1082,7 +1082,12 @@ namespace MultiplayerARPG
 
         public override bool CanTurnPkOn(BasePlayerCharacterEntity player)
         {
-            return player.Level >= minLevelToTurnPkOn;
+            if (player.Level < minLevelToTurnPkOn)
+            {
+                GameInstance.ServerGameMessageHandlers.SendGameMessage(player.ConnectionId, UITextKeys.UI_ERROR_NOT_ENOUGH_LEVEL);
+                return false;
+            }
+            return true;
         }
 
         public override bool CanTurnPkOff(BasePlayerCharacterEntity player)
