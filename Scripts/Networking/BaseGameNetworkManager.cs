@@ -196,10 +196,7 @@ namespace MultiplayerARPG
                 if (!_arrayGameEntity[i].enabled)
                     continue;
                 if (_arrayGameEntity[i].IsOwnerClient)
-                {
                     _arrayGameEntity[i].SendClientState(timestamp);
-                    SendHitRegistration();
-                }
             }
             Profiler.EndSample();
         }
@@ -254,7 +251,6 @@ namespace MultiplayerARPG
             // Server messages
             RegisterServerMessage(GameNetworkingConsts.Chat, HandleChatAtServer);
             RegisterServerMessage(GameNetworkingConsts.EntityState, HandleClientEntityStateAtServer);
-            RegisterServerMessage(GameNetworkingConsts.HitRegistration, HandleHitRegistrationAtServer);
             if (ServerCharacterHandlers != null)
             {
                 RegisterServerMessage(GameNetworkingConsts.NotifyOnlineCharacter, ServerCharacterHandlers.HandleRequestOnlineCharacter);
@@ -680,25 +676,6 @@ namespace MultiplayerARPG
             long peerTimestamp = messageHandler.Reader.GetPackedLong();
             if (Assets.TryGetSpawnedObject(objectId, out BaseGameEntity gameEntity) && gameEntity.Identity.ConnectionId == messageHandler.ConnectionId)
                 gameEntity.ReadClientStateAtServer(peerTimestamp, messageHandler.Reader);
-        }
-
-        protected void HandleHitRegistrationAtServer(MessageHandlerData messageHandler)
-        {
-            if (ServerUserHandlers.TryGetPlayerCharacter(messageHandler.ConnectionId, out BasePlayerCharacterEntity gameEntity))
-                HitRegistrationManager.Register(gameEntity, messageHandler.Reader.Get<HitRegisterMessage>());
-        }
-
-        public void SendHitRegistration()
-        {
-            if (HitRegistrationManager.CountHitRegDataList() <= 0)
-                return;
-
-            ClientSendPacket(BaseGameEntity.STATE_DATA_CHANNEL, LiteNetLib.DeliveryMethod.ReliableOrdered, GameNetworkingConsts.HitRegistration, new HitRegisterMessage()
-            {
-                Hits = HitRegistrationManager.GetHitRegDataList(),
-            });
-
-            HitRegistrationManager.ClearHitRegData();
         }
 
         public virtual void InitPrefabs()

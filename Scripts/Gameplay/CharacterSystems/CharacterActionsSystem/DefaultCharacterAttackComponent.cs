@@ -1,6 +1,5 @@
 ﻿using Cysharp.Threading.Tasks;
 using LiteNetLib;
-using LiteNetLib.Utils;
 using LiteNetLibManager;
 using System.Collections.Generic;
 using System.Threading;
@@ -48,9 +47,7 @@ namespace MultiplayerARPG
         protected CharacterActionComponentManager _manager;
         protected int _lastAttackAnimationIndex = 0;
         protected int _lastAttackDataId = 0;
-        protected Dictionary<int, AttackState> _simulatingStates = new Dictionary<int, AttackState>();
         // Network data sending
-        protected int _clientNextSeed;
         protected AttackState? _simulateState;
 
         public override void EntityStart()
@@ -64,7 +61,6 @@ namespace MultiplayerARPG
             AnimActionType = animActionType;
             AnimActionDataId = animActionDataId;
             _simulateState = simulateState;
-            _simulatingStates.Add(simulateState.SimulateSeed, simulateState);
         }
 
         public virtual void ClearAttackStates()
@@ -204,8 +200,7 @@ namespace MultiplayerARPG
                 }
 
                 // Prepare hit register validation, it will be used later when receive attack start/end events from clients
-                if (IsServer && !IsOwnerClientOrOwnedByServer)
-                    HitRegistrationManager.PrepareHitRegValidation(Entity, simulateSeed, _triggerDurations, weaponItem.FireSpread, damageInfo, damageAmounts, weapon, null, 0);
+                HitRegistrationManager.PrepareHitRegValidation(Entity, simulateSeed, _triggerDurations, weaponItem.FireSpread, damageInfo, damageAmounts, isLeftHand, weapon, null, 0);
 
                 float tempTriggerDuration;
                 for (byte triggerIndex = 0; triggerIndex < _triggerDurations.Length; ++triggerIndex)
@@ -229,6 +224,7 @@ namespace MultiplayerARPG
                             AudioManager.PlaySfxClipAtAudioSource(audioClip.audioClip, Entity.CharacterModel.GenericAudioSource, audioClip.GetRandomedVolume());
                     }
 
+                    await UniTask.Yield();
                     // Get aim position by character's forward
                     AimPosition aimPosition = Entity.AimPosition;
 
@@ -249,24 +245,8 @@ namespace MultiplayerARPG
                         Entity.OnAttackRoutine(isLeftHand, weapon, simulateSeed, triggerIndex, damageInfo, damageAmounts, aimPosition);
 
                         // Apply attack damages
-                        if (IsOwnerClient)
+                        if ((IsServer && IsOwnerClient) || IsOwnedByServer)
                         {
-                            Dictionary<DamageElement, MinMaxFloat> increaseDamageAmounts;
-                            if (!IsServer)
-                                increaseDamageAmounts = Entity.GetIncreaseDamagesByAmmo(weapon);
-                            else if (!Entity.DecreaseAmmos(weapon, isLeftHand, 1, out increaseDamageAmounts))
-                                break;
-                            RPC(CmdSimulateActionTrigger, BaseGameEntity.STATE_DATA_CHANNEL, DeliveryMethod.ReliableOrdered, new SimulateActionTriggerData()
-                            {
-                                simulateSeed = simulateSeed,
-                                triggerIndex = triggerIndex,
-                                aimPosition = aimPosition,
-                            });
-                            ApplyAttack(isLeftHand, weapon, simulateSeed, triggerIndex, damageInfo, damageAmounts, increaseDamageAmounts, aimPosition);
-                        }
-                        else if (IsOwnedByServer)
-                        {
-                            // Not enough ammos?
                             if (!Entity.DecreaseAmmos(weapon, isLeftHand, 1, out Dictionary<DamageElement, MinMaxFloat> increaseDamageAmounts))
                                 break;
                             RPC(RpcSimulateActionTrigger, BaseGameEntity.STATE_DATA_CHANNEL, DeliveryMethod.ReliableOrdered, new SimulateActionTriggerData()
@@ -277,12 +257,16 @@ namespace MultiplayerARPG
                             });
                             ApplyAttack(isLeftHand, weapon, simulateSeed, triggerIndex, damageInfo, damageAmounts, increaseDamageAmounts, aimPosition);
                         }
-                        else if (IsServer)
+                        else if (IsOwnerClient)
                         {
-                            // Not enough ammos?
-                            if (!Entity.DecreaseAmmos(weapon, isLeftHand, 1, out Dictionary<DamageElement, MinMaxFloat> increaseDamageAmounts))
-                                break;
-                            HitRegistrationManager.ConfirmHitRegValidation(Entity, simulateSeed, triggerIndex, increaseDamageAmounts);
+                            Dictionary<DamageElement, MinMaxFloat> increaseDamageAmounts = Entity.GetIncreaseDamagesByAmmo(weapon);
+                            RPC(CmdSimulateActionTrigger, BaseGameEntity.STATE_DATA_CHANNEL, DeliveryMethod.ReliableOrdered, new SimulateActionTriggerData()
+                            {
+                                simulateSeed = simulateSeed,
+                                triggerIndex = triggerIndex,
+                                aimPosition = aimPosition,
+                            });
+                            ApplyAttack(isLeftHand, weapon, simulateSeed, triggerIndex, damageInfo, damageAmounts, increaseDamageAmounts, aimPosition);
                         }
                     }
 
@@ -324,8 +308,36 @@ namespace MultiplayerARPG
                 attackCancellationTokenSource.Dispose();
                 _attackCancellationTokenSources.Remove(attackCancellationTokenSource);
             }
+            await UniTask.Yield();
             // Clear action states at clients and server
             ClearAttackStates();
+        }
+
+        [ServerRpc]
+        protected void CmdSimulateActionTrigger(SimulateActionTriggerData data)
+        {
+            HitValidateData validateData = HitRegistrationManager.GetHitValidateData(Entity, data.simulateSeed);
+            if (validateData == null)
+                return;
+            if (!Entity.DecreaseAmmos(validateData.Weapon, validateData.IsLeftHand, 1, out Dictionary<DamageElement, MinMaxFloat> increaseDamageAmounts))
+                return;
+            HitRegistrationManager.ConfirmHitRegValidation(Entity, data.simulateSeed, data.triggerIndex, increaseDamageAmounts);
+            RPC(RpcSimulateActionTrigger, BaseGameEntity.STATE_DATA_CHANNEL, DeliveryMethod.ReliableOrdered, data);
+            ApplyAttack(validateData.IsLeftHand, validateData.Weapon, data.simulateSeed, data.triggerIndex, validateData.DamageInfo, validateData.BaseDamageAmounts, increaseDamageAmounts, data.aimPosition);
+        }
+
+        [AllRpc]
+        protected void RpcSimulateActionTrigger(SimulateActionTriggerData data)
+        {
+            if (IsServer)
+                return;
+            if (IsOwnerClientOrOwnedByServer)
+                return;
+            HitValidateData validateData = HitRegistrationManager.GetHitValidateData(Entity, data.simulateSeed);
+            if (validateData == null)
+                return;
+            Dictionary<DamageElement, MinMaxFloat> increaseDamageAmounts = Entity.GetIncreaseDamagesByAmmo(validateData.Weapon);
+            ApplyAttack(validateData.IsLeftHand, validateData.Weapon, data.simulateSeed, data.triggerIndex, validateData.DamageInfo, validateData.BaseDamageAmounts, increaseDamageAmounts, data.aimPosition);
         }
 
         protected virtual void ApplyAttack(bool isLeftHand, CharacterItem weapon, int simulateSeed, byte triggerIndex, DamageInfo damageInfo, Dictionary<DamageElement, MinMaxFloat> damageAmounts, Dictionary<DamageElement, MinMaxFloat> increaseDamageAmounts, AimPosition aimPosition)
@@ -360,35 +372,6 @@ namespace MultiplayerARPG
                     0,
                     aimPosition);
             }
-
-            _simulatingStates.Remove(simulateSeed);
-        }
-
-        [ServerRpc]
-        protected void CmdSimulateActionTrigger(SimulateActionTriggerData data)
-        {
-            RPC(RpcSimulateActionTrigger, BaseGameEntity.STATE_DATA_CHANNEL, DeliveryMethod.ReliableOrdered, data);
-        }
-
-        [AllRpc]
-        protected void RpcSimulateActionTrigger(SimulateActionTriggerData data)
-        {
-            if (IsOwnerClientOrOwnedByServer)
-                return;
-            if (!_simulateState.HasValue)
-                return;
-            if (data.simulateSeed != _simulateState.Value.SimulateSeed)
-                return;
-            bool isLeftHand = _simulateState.Value.IsLeftHand;
-            CharacterItem weapon = Entity.GetAvailableWeapon(ref isLeftHand);
-            DamageInfo damageInfo = Entity.GetWeaponDamageInfo(weapon.GetWeaponItem());
-            Dictionary<DamageElement, MinMaxFloat> damageAmounts;
-            if (isLeftHand && Entity.GetCaches().LeftHandDamages != null)
-                damageAmounts = new Dictionary<DamageElement, MinMaxFloat>(Entity.GetCaches().LeftHandDamages);
-            else
-                damageAmounts = new Dictionary<DamageElement, MinMaxFloat>(Entity.GetCaches().RightHandDamages);
-            Dictionary<DamageElement, MinMaxFloat> increaseDamageAmounts = IsServer ? null : Entity.GetIncreaseDamagesByAmmo(weapon);
-            ApplyAttack(isLeftHand, weapon, data.simulateSeed, data.triggerIndex, damageInfo, damageAmounts, increaseDamageAmounts, data.aimPosition);
         }
 
         public virtual void CancelAttack()
@@ -403,14 +386,15 @@ namespace MultiplayerARPG
 
         public virtual void Attack(bool isLeftHand)
         {
+            long timestamp = Manager.Timestamp;
             if (!IsServer && IsOwnerClient)
             {
-                ProceedAttack(Manager.Timestamp, isLeftHand);
-                RPC(CmdAttack, Manager.Timestamp, isLeftHand);
+                ProceedAttack(timestamp, isLeftHand);
+                RPC(CmdAttack, timestamp, isLeftHand);
             }
             else if (IsOwnerClientOrOwnedByServer)
             {
-                PreceedCmdAttack(Manager.Timestamp, isLeftHand);
+                PreceedCmdAttack(timestamp, isLeftHand);
             }
         }
 
