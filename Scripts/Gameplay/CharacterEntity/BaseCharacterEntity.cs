@@ -393,7 +393,7 @@ namespace MultiplayerARPG
         public override void SendClientState(long writeTimestamp)
         {
             s_EntityStateDataWriter.Reset();
-            if (!Movement.IsNull() && Movement.Enabled && Movement.WriteServerState(writeTimestamp, s_EntityStateDataWriter, out bool shouldSendReliably))
+            if (!Movement.IsNull() && Movement.Enabled && Movement.WriteClientState(writeTimestamp, s_EntityStateDataWriter, out bool shouldSendReliably))
             {
                 TransportHandler.WritePacket(s_EntityStateMessageWriter, GameNetworkingConsts.EntityState);
                 s_EntityStateMessageWriter.PutPackedUInt(ObjectId);
@@ -418,13 +418,13 @@ namespace MultiplayerARPG
 
         public override void ReadClientStateAtServer(long peerTimestamp, NetDataReader reader)
         {
-            if (!Movement.IsNull() && Movement.Enabled)
+            if (Movement != null)
                 Movement.ReadClientStateAtServer(peerTimestamp, reader);
         }
 
         public override void ReadServerStateAtClient(long peerTimestamp, NetDataReader reader)
         {
-            if (!Movement.IsNull() && Movement.Enabled)
+            if (Movement != null)
                 Movement.ReadServerStateAtClient(peerTimestamp, reader);
         }
 
