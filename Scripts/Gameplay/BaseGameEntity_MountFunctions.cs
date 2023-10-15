@@ -103,7 +103,7 @@ namespace MultiplayerARPG
         /// </summary>
         public void ExitedVehicle(Vector3 exitPosition, Quaternion exitRotation)
         {
-            CallAllOnExitVehicle();
+            CallRpcOnExitVehicle();
             Teleport(exitPosition, exitRotation, true);
         }
 
@@ -167,13 +167,13 @@ namespace MultiplayerARPG
 #endif
         }
 
-        public void CallAllOnExitVehicle()
+        public void CallRpcOnExitVehicle()
         {
-            RPC(AllOnExitVehicle);
+            RPC(RpcOnExitVehicle);
         }
 
         [AllRpc]
-        protected void AllOnExitVehicle()
+        protected void RpcOnExitVehicle()
         {
             ClearPassengingVehicle();
         }

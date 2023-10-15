@@ -7,7 +7,7 @@
             if (!CanDoActions())
                 return false;
             RPC(CmdPickup, objectId);
-            CallAllPlayPickupAnimation();
+            CallRpcPlayPickupAnimation();
             return true;
         }
 
@@ -16,7 +16,7 @@
             if (!CanDoActions())
                 return false;
             RPC(CmdPickupItemFromContainer, objectId, itemsContainerIndex, amount);
-            CallAllPlayPickupAnimation();
+            CallRpcPlayPickupAnimation();
             return true;
         }
 
@@ -25,7 +25,7 @@
             if (!CanDoActions())
                 return false;
             RPC(CmdPickupAllItemsFromContainer, objectId);
-            CallAllPlayPickupAnimation();
+            CallRpcPlayPickupAnimation();
             return true;
         }
 
@@ -34,7 +34,7 @@
             if (!CanDoActions())
                 return false;
             RPC(CmdPickupNearbyItems);
-            CallAllPlayPickupAnimation();
+            CallRpcPlayPickupAnimation();
             return true;
         }
 
@@ -46,21 +46,21 @@
             return true;
         }
 
-        public bool CallAllOnDead()
+        public bool CallRpcOnDead()
         {
-            RPC(AllOnDead);
+            RPC(RpcOnDead);
             return true;
         }
 
-        public bool CallAllOnRespawn()
+        public bool CallRpcOnRespawn()
         {
-            RPC(AllOnRespawn);
+            RPC(RpcOnRespawn);
             return true;
         }
 
-        public bool CallAllOnLevelUp()
+        public bool CallRpcOnLevelUp()
         {
-            RPC(AllOnLevelUp);
+            RPC(RpcOnLevelUp);
             return true;
         }
 

@@ -279,16 +279,16 @@ namespace MultiplayerARPG
             return false;
         }
 
+        public void CallRpcOnVehicleDestroy()
+        {
+            RPC(RpcOnVehicleDestroy);
+        }
+
         [AllRpc]
-        private void AllOnVehicleDestroy()
+        private void RpcOnVehicleDestroy()
         {
             if (onVehicleDestroy != null)
                 onVehicleDestroy.Invoke();
-        }
-
-        public void CallAllOnVehicleDestroy()
-        {
-            RPC(AllOnVehicleDestroy);
         }
 
         protected override void ApplyReceiveDamage(HitBoxPosition position, Vector3 fromPosition, EntityInfo instigator, Dictionary<DamageElement, MinMaxFloat> damageAmounts, CharacterItem weapon, BaseSkill skill, int skillLevel, int randomSeed, out CombatAmountType combatAmountType, out int totalDamage)
@@ -336,7 +336,7 @@ namespace MultiplayerARPG
             // Kick passengers
             RemoveAllPassengers();
             // Tell clients that the vehicle destroy to play animation at client
-            CallAllOnVehicleDestroy();
+            CallRpcOnVehicleDestroy();
             // Respawning later
             if (Identity.IsSceneObject)
                 Manager.StartCoroutine(RespawnRoutine());

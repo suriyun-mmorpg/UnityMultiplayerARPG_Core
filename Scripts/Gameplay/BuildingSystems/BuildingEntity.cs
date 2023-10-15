@@ -349,28 +349,28 @@ namespace MultiplayerARPG
             parentId.onChange -= OnParentIdChange;
         }
 
+        public void CallRpcOnBuildingDestroy()
+        {
+            RPC(RpcOnBuildingDestroy);
+        }
+
         [AllRpc]
-        private void AllOnBuildingDestroy()
+        private void RpcOnBuildingDestroy()
         {
             if (onBuildingDestroy != null)
                 onBuildingDestroy.Invoke();
         }
 
+        public void CallRpcOnBuildingConstruct()
+        {
+            RPC(RpcOnBuildingConstruct);
+        }
+
         [AllRpc]
-        private void AllOnBuildingConstruct()
+        private void RpcOnBuildingConstruct()
         {
             if (onBuildingConstruct != null)
                 onBuildingConstruct.Invoke();
-        }
-
-        public void CallAllOnBuildingDestroy()
-        {
-            RPC(AllOnBuildingDestroy);
-        }
-
-        public void CallAllOnBuildingConstruct()
-        {
-            RPC(AllOnBuildingConstruct);
         }
 
         private void OnParentIdChange(bool isInitial, string parentId)
@@ -571,7 +571,7 @@ namespace MultiplayerARPG
                 return;
             isDestroyed = true;
             // Tell clients that the building destroy to play animation at client
-            CallAllOnBuildingDestroy();
+            CallRpcOnBuildingDestroy();
             // Drop items
             if (droppingItems != null && droppingItems.Count > 0)
             {

@@ -202,7 +202,7 @@ namespace MultiplayerARPG
         /// <param name="hitEffectsSourceDataId"></param>
         /// <param name="amount"></param>
         [AllRpc]
-        protected void AllAppendCombatText(CombatAmountType combatAmountType, HitEffectsSourceType hitEffectsSourceType, int hitEffectsSourceDataId, int amount)
+        protected void RpcAppendCombatText(CombatAmountType combatAmountType, HitEffectsSourceType hitEffectsSourceType, int hitEffectsSourceDataId, int amount)
         {
             switch (combatAmountType)
             {
@@ -258,9 +258,9 @@ namespace MultiplayerARPG
             }
         }
 
-        public void CallAllAppendCombatText(CombatAmountType combatAmountType, HitEffectsSourceType hitEffectsSourceType, int hitEffectsSourceDataId, int amount)
+        public void CallRpcAppendCombatText(CombatAmountType combatAmountType, HitEffectsSourceType hitEffectsSourceType, int hitEffectsSourceDataId, int amount)
         {
-            RPC(AllAppendCombatText, 0, DeliveryMethod.Unreliable, combatAmountType, hitEffectsSourceType, hitEffectsSourceDataId, amount);
+            RPC(RpcAppendCombatText, 0, DeliveryMethod.Unreliable, combatAmountType, hitEffectsSourceType, hitEffectsSourceDataId, amount);
         }
 
         /// <summary>
@@ -355,7 +355,7 @@ namespace MultiplayerARPG
                         break;
                 }
             }
-            CallAllAppendCombatText(combatAmountType, hitEffectsSourceType, hitEffectsSourceDataId, totalDamage);
+            CallRpcAppendCombatText(combatAmountType, hitEffectsSourceType, hitEffectsSourceDataId, totalDamage);
             instigator.TryGetEntity(out BaseGameEntity attacker);
             if (onReceivedDamage != null)
                 onReceivedDamage.Invoke(position, fromPosition, attacker, combatAmountType, totalDamage, weapon, skill, skillLevel, buff, isDamageOverTime);

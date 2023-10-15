@@ -3,6 +3,7 @@ using Cysharp.Text;
 using LiteNetLibManager;
 using UnityEngine;
 using UnityEngine.Events;
+using UnityEngine.Serialization;
 
 namespace MultiplayerARPG
 {
@@ -20,8 +21,9 @@ namespace MultiplayerARPG
         protected UILocaleKeySetting formatKeyCorpseTitle = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_CORPSE_TITLE);
 
         [Category("Events")]
+        [FormerlySerializedAs("onItemsContainerDestroy")]
         [SerializeField]
-        protected UnityEvent onItemsContainerDestroy;
+        protected UnityEvent onPickedUp;
 
         protected SyncFieldString _dropperTitle = new SyncFieldString();
         public SyncFieldString DropperTitle
@@ -75,16 +77,16 @@ namespace MultiplayerARPG
             NetworkDestroy(_appearDuration);
         }
 
-        [AllRpc]
-        protected virtual void AllOnItemsContainerDestroy()
+        public void CallRpcOnPickedUp()
         {
-            if (onItemsContainerDestroy != null)
-                onItemsContainerDestroy.Invoke();
+            RPC(RpcOnPickedUp);
         }
 
-        public void CallAllOnItemDropDestroy()
+        [AllRpc]
+        protected virtual void RpcOnPickedUp()
         {
-            RPC(AllOnItemsContainerDestroy);
+            if (onPickedUp != null)
+                onPickedUp.Invoke();
         }
 
         public virtual bool IsAbleToLoot(BaseCharacterEntity baseCharacterEntity)
@@ -109,7 +111,7 @@ namespace MultiplayerARPG
             // Mark as destroyed
             _isDestroyed = true;
             // Tell clients that the item drop destroy to play animation at client
-            CallAllOnItemDropDestroy();
+            CallRpcOnPickedUp();
             // Destroy this entity
             NetworkDestroy(destroyDelay);
         }

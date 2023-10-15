@@ -201,7 +201,7 @@ namespace MultiplayerARPG
         }
 
         [AllRpc]
-        protected virtual void AllOnDead()
+        protected virtual void RpcOnDead()
         {
             if (IsOwnerClient)
             {
@@ -215,7 +215,7 @@ namespace MultiplayerARPG
         }
 
         [AllRpc]
-        protected virtual void AllOnRespawn()
+        protected virtual void RpcOnRespawn()
         {
             if (IsOwnerClient)
                 ClearActionStates();
@@ -224,7 +224,7 @@ namespace MultiplayerARPG
         }
 
         [AllRpc]
-        protected virtual void AllOnLevelUp()
+        protected virtual void RpcOnLevelUp()
         {
             CharacterModel.InstantiateEffect(CurrentGameInstance.LevelUpEffect);
             if (onLevelUp != null)

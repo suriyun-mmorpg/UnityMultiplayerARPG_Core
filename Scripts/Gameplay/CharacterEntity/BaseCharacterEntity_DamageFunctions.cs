@@ -57,7 +57,7 @@ namespace MultiplayerARPG
             {
                 skillUsages.Clear();
             }
-            CallAllOnDead();
+            CallRpcOnDead();
         }
 
         public virtual void OnRespawn()
@@ -68,7 +68,7 @@ namespace MultiplayerARPG
             _lastGroundedPosition = EntityTransform.position;
             RespawnGroundedCheckCountDown = RESPAWN_GROUNDED_CHECK_DURATION;
             RespawnInvincibleCountDown = RESPAWN_INVINCIBLE_DURATION;
-            CallAllOnRespawn();
+            CallRpcOnRespawn();
         }
 
         public void RewardExp(int exp, float multiplier, RewardGivenType rewardGivenType, int giverLevel, int sourceLevel)
@@ -81,7 +81,7 @@ namespace MultiplayerARPG
                 return;
             }
             GameInstance.ServerGameMessageHandlers.NotifyRewardExp(ConnectionId, rewardGivenType, rewardedExp);
-            CallAllOnLevelUp();
+            CallRpcOnLevelUp();
         }
 
         public void RewardGold(int gold, float multiplier, RewardGivenType rewardGivenType, int giverLevel, int sourceLevel)

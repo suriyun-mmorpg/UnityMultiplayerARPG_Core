@@ -132,7 +132,7 @@ namespace MultiplayerARPG
             if (amount < 0)
                 amount = 0;
             CurrentHp += amount;
-            CallAllAppendCombatText(CombatAmountType.HpRecovery, HitEffectsSourceType.None, 0, amount);
+            CallRpcAppendCombatText(CombatAmountType.HpRecovery, HitEffectsSourceType.None, 0, amount);
             if (onBuffHpRecovery != null)
                 onBuffHpRecovery.Invoke(causer, amount);
         }
@@ -142,7 +142,7 @@ namespace MultiplayerARPG
             if (amount < 0)
                 amount = 0;
             CurrentHp -= amount;
-            CallAllAppendCombatText(CombatAmountType.HpDecrease, HitEffectsSourceType.None, 0, amount);
+            CallRpcAppendCombatText(CombatAmountType.HpDecrease, HitEffectsSourceType.None, 0, amount);
             if (onBuffHpDecrease != null)
                 onBuffHpDecrease.Invoke(causer, amount);
         }
@@ -152,7 +152,7 @@ namespace MultiplayerARPG
             if (amount < 0)
                 amount = 0;
             CurrentMp += amount;
-            CallAllAppendCombatText(CombatAmountType.MpRecovery, HitEffectsSourceType.None, 0, amount);
+            CallRpcAppendCombatText(CombatAmountType.MpRecovery, HitEffectsSourceType.None, 0, amount);
             if (onBuffMpRecovery != null)
                 onBuffMpRecovery.Invoke(causer, amount);
         }
@@ -162,7 +162,7 @@ namespace MultiplayerARPG
             if (amount < 0)
                 amount = 0;
             CurrentMp -= amount;
-            CallAllAppendCombatText(CombatAmountType.MpDecrease, HitEffectsSourceType.None, 0, amount);
+            CallRpcAppendCombatText(CombatAmountType.MpDecrease, HitEffectsSourceType.None, 0, amount);
             if (onBuffMpDecrease != null)
                 onBuffMpDecrease.Invoke(causer, amount);
         }
@@ -172,7 +172,7 @@ namespace MultiplayerARPG
             if (amount < 0)
                 amount = 0;
             CurrentStamina += amount;
-            CallAllAppendCombatText(CombatAmountType.StaminaRecovery, HitEffectsSourceType.None, 0, amount);
+            CallRpcAppendCombatText(CombatAmountType.StaminaRecovery, HitEffectsSourceType.None, 0, amount);
             if (onBuffStaminaRecovery != null)
                 onBuffStaminaRecovery.Invoke(causer, amount);
         }
@@ -182,7 +182,7 @@ namespace MultiplayerARPG
             if (amount < 0)
                 amount = 0;
             CurrentStamina -= amount;
-            CallAllAppendCombatText(CombatAmountType.StaminaDecrease, HitEffectsSourceType.None, 0, amount);
+            CallRpcAppendCombatText(CombatAmountType.StaminaDecrease, HitEffectsSourceType.None, 0, amount);
             if (onBuffStaminaDecrease != null)
                 onBuffStaminaDecrease.Invoke(causer, amount);
         }
@@ -192,7 +192,7 @@ namespace MultiplayerARPG
             if (amount < 0)
                 amount = 0;
             CurrentFood += amount;
-            CallAllAppendCombatText(CombatAmountType.FoodRecovery, HitEffectsSourceType.None, 0, amount);
+            CallRpcAppendCombatText(CombatAmountType.FoodRecovery, HitEffectsSourceType.None, 0, amount);
             if (onBuffFoodRecovery != null)
                 onBuffFoodRecovery.Invoke(causer, amount);
         }
@@ -202,7 +202,7 @@ namespace MultiplayerARPG
             if (amount < 0)
                 amount = 0;
             CurrentFood -= amount;
-            CallAllAppendCombatText(CombatAmountType.FoodDecrease, HitEffectsSourceType.None, 0, amount);
+            CallRpcAppendCombatText(CombatAmountType.FoodDecrease, HitEffectsSourceType.None, 0, amount);
             if (onBuffFoodDecrease != null)
                 onBuffFoodDecrease.Invoke(causer, amount);
         }
@@ -212,7 +212,7 @@ namespace MultiplayerARPG
             if (amount < 0)
                 amount = 0;
             CurrentWater += amount;
-            CallAllAppendCombatText(CombatAmountType.WaterRecovery, HitEffectsSourceType.None, 0, amount);
+            CallRpcAppendCombatText(CombatAmountType.WaterRecovery, HitEffectsSourceType.None, 0, amount);
             if (onBuffWaterRecovery != null)
                 onBuffWaterRecovery.Invoke(causer, amount);
         }
@@ -222,7 +222,7 @@ namespace MultiplayerARPG
             if (amount < 0)
                 amount = 0;
             CurrentWater -= amount;
-            CallAllAppendCombatText(CombatAmountType.WaterDecrease, HitEffectsSourceType.None, 0, amount);
+            CallRpcAppendCombatText(CombatAmountType.WaterDecrease, HitEffectsSourceType.None, 0, amount);
             if (onBuffWaterDecrease != null)
                 onBuffWaterDecrease.Invoke(causer, amount);
         }
