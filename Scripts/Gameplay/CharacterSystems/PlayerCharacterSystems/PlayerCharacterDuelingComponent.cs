@@ -85,19 +85,19 @@ namespace MultiplayerARPG
             DuelingCharacter = null;
         }
 
-        public bool CallServerSendDuelingRequest(uint objectId)
+        public bool CallCmdSendDuelingRequest(uint objectId)
         {
             if (DisableDueling)
             {
                 ClientGenericActions.ClientReceiveGameMessage(UITextKeys.UI_ERROR_FEATURE_IS_DISABLED);
                 return false;
             }
-            RPC(ServerSendDuelingRequest, objectId);
+            RPC(CmdSendDuelingRequest, objectId);
             return true;
         }
 
         [ServerRpc]
-        protected void ServerSendDuelingRequest(uint objectId)
+        protected void CmdSendDuelingRequest(uint objectId)
         {
 #if UNITY_EDITOR || UNITY_SERVER
             if (DisableDueling)
@@ -148,14 +148,14 @@ namespace MultiplayerARPG
                 onRequestDueling.Invoke(playerCharacterEntity);
         }
 
-        public bool CallServerAcceptDuelingRequest()
+        public bool CallCmdAcceptDuelingRequest()
         {
-            RPC(ServerAcceptDuelingRequest);
+            RPC(CmdAcceptDuelingRequest);
             return true;
         }
 
         [ServerRpc]
-        protected void ServerAcceptDuelingRequest()
+        protected void CmdAcceptDuelingRequest()
         {
 #if UNITY_EDITOR || UNITY_SERVER
             if (DuelingCharacter == null)
@@ -189,14 +189,14 @@ namespace MultiplayerARPG
 #endif
         }
 
-        public bool CallServerDeclineDuelingRequest()
+        public bool CallCmdDeclineDuelingRequest()
         {
-            RPC(ServerDeclineDuelingRequest);
+            RPC(CmdDeclineDuelingRequest);
             return true;
         }
 
         [ServerRpc]
-        protected void ServerDeclineDuelingRequest()
+        protected void CmdDeclineDuelingRequest()
         {
 #if UNITY_EDITOR || UNITY_SERVER
             if (DuelingCharacter != null)

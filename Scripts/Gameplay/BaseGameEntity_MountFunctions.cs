@@ -103,7 +103,7 @@ namespace MultiplayerARPG
         /// </summary>
         public void ExitedVehicle(Vector3 exitPosition, Quaternion exitRotation)
         {
-            CallAllOnExitVehicle();
+            CallRpcOnExitVehicle();
             Teleport(exitPosition, exitRotation, true);
         }
 
@@ -117,9 +117,9 @@ namespace MultiplayerARPG
             PassengingVehicleSeatIndex = seatIndex;
             PassengingVehicleEntity = vehicleEntity;
         }
-        public void CallServerEnterVehicle(uint objectId, byte seatIndex)
+        public void CallCmdEnterVehicle(uint objectId, byte seatIndex)
         {
-            RPC(ServerEnterVehicle, objectId, seatIndex);
+            RPC(CmdEnterVehicle, objectId, seatIndex);
         }
 
         public virtual bool CanEnterVehicle(IVehicleEntity vehicleEntity, byte seatIndex, out UITextKeys gameMessage)
@@ -139,7 +139,7 @@ namespace MultiplayerARPG
         }
 
         [ServerRpc]
-        protected void ServerEnterVehicle(uint objectId, byte seatIndex)
+        protected void CmdEnterVehicle(uint objectId, byte seatIndex)
         {
 #if UNITY_EDITOR || UNITY_SERVER
             if (!Manager.Assets.TryGetSpawnedObject(objectId, out LiteNetLibIdentity identity))
@@ -154,26 +154,26 @@ namespace MultiplayerARPG
 #endif
         }
 
-        public void CallServerExitVehicle()
+        public void CallCmdExitVehicle()
         {
-            RPC(ServerExitVehicle);
+            RPC(CmdExitVehicle);
         }
 
         [ServerRpc]
-        protected void ServerExitVehicle()
+        protected void CmdExitVehicle()
         {
 #if UNITY_EDITOR || UNITY_SERVER
             ExitVehicle();
 #endif
         }
 
-        public void CallAllOnExitVehicle()
+        public void CallRpcOnExitVehicle()
         {
-            RPC(AllOnExitVehicle);
+            RPC(RpcOnExitVehicle);
         }
 
         [AllRpc]
-        protected void AllOnExitVehicle()
+        protected void RpcOnExitVehicle()
         {
             ClearPassengingVehicle();
         }

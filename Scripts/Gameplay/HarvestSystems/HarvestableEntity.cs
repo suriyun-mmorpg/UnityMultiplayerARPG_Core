@@ -91,16 +91,16 @@ namespace MultiplayerARPG
                 InitStats();
         }
 
+        public void CallRpcOnHarvestableDestroy()
+        {
+            RPC(RpcOnHarvestableDestroy);
+        }
+
         [AllRpc]
-        protected virtual void AllOnHarvestableDestroy()
+        protected virtual void RpcOnHarvestableDestroy()
         {
             if (onHarvestableDestroy != null)
                 onHarvestableDestroy.Invoke();
-        }
-
-        public void CallAllOnHarvestableDestroy()
-        {
-            RPC(AllOnHarvestableDestroy);
         }
 
         protected override void ApplyReceiveDamage(HitBoxPosition position, Vector3 fromPosition, EntityInfo instigator, Dictionary<DamageElement, MinMaxFloat> damageAmounts, CharacterItem weapon, BaseSkill skill, int skillLevel, int randomSeed, out CombatAmountType combatAmountType, out int totalDamage)
@@ -196,7 +196,7 @@ namespace MultiplayerARPG
             // Mark as destroyed
             _isDestroyed = true;
             // Tell clients that the harvestable destroy to play animation at client
-            CallAllOnHarvestableDestroy();
+            CallRpcOnHarvestableDestroy();
             // Respawning later
             if (SpawnArea != null)
                 SpawnArea.Spawn(SpawnPrefab, SpawnLevel, DestroyDelay + DestroyRespawnDelay);

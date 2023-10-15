@@ -66,7 +66,7 @@ namespace MultiplayerARPG
 
             if (item.MaxStack == 1)
             {
-                GameInstance.PlayingCharacterEntity.NpcAction.CallServerBuyNpcItem(indexOfData, 1);
+                GameInstance.PlayingCharacterEntity.NpcAction.CallCmdBuyNpcItem(indexOfData, 1);
             }
             else
             {
@@ -82,7 +82,7 @@ namespace MultiplayerARPG
 
         private void OnBuyAmountConfirmed(int amount)
         {
-            GameInstance.PlayingCharacterEntity.NpcAction.CallServerBuyNpcItem(indexOfData, amount);
+            GameInstance.PlayingCharacterEntity.NpcAction.CallCmdBuyNpcItem(indexOfData, amount);
         }
     }
 }

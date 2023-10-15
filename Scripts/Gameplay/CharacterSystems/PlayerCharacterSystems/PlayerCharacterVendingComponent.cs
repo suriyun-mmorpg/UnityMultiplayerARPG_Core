@@ -54,7 +54,7 @@ namespace MultiplayerARPG
                 onVendingDataChange.Invoke(data);
         }
 
-        public void CallServerStartVending(string title, StartVendingItems items)
+        public void CallCmdStartVending(string title, StartVendingItems items)
         {
             if (DisableVending)
             {
@@ -66,11 +66,11 @@ namespace MultiplayerARPG
                 ClientGenericActions.ClientReceiveGameMessage(UITextKeys.UI_ERROR_NO_START_VENDING_ITEMS);
                 return;
             }
-            RPC(ServerStartVending, title, items);
+            RPC(CmdStartVending, title, items);
         }
 
         [ServerRpc]
-        protected void ServerStartVending(string title, StartVendingItems items)
+        protected void CmdStartVending(string title, StartVendingItems items)
         {
 #if UNITY_EDITOR || UNITY_SERVER
             if (DisableVending)
@@ -119,13 +119,13 @@ namespace MultiplayerARPG
 #endif
         }
 
-        public void CallServerStopVending()
+        public void CallCmdStopVending()
         {
-            RPC(ServerStopVending);
+            RPC(CmdStopVending);
         }
 
         [ServerRpc]
-        protected void ServerStopVending()
+        protected void CmdStopVending()
         {
 #if UNITY_EDITOR || UNITY_SERVER
             StopVending();
@@ -144,13 +144,13 @@ namespace MultiplayerARPG
             _customers.Clear();
         }
 
-        public void CallServerSubscribe(uint objectId)
+        public void CallCmdSubscribe(uint objectId)
         {
-            RPC(ServerSubscribe, objectId);
+            RPC(CmdSubscribe, objectId);
         }
 
         [ServerRpc]
-        protected void ServerSubscribe(uint objectId)
+        protected void CmdSubscribe(uint objectId)
         {
 #if UNITY_EDITOR || UNITY_SERVER
             BasePlayerCharacterEntity playerCharacterEntity;
@@ -158,7 +158,7 @@ namespace MultiplayerARPG
                 return;
             if (!playerCharacterEntity.Vending.Data.isStarted)
                 return;
-            ServerUnsubscribe();
+            CmdUnsubscribe();
             _store = playerCharacterEntity.Vending;
             _store.AddCustomer(this);
 #endif
@@ -167,16 +167,16 @@ namespace MultiplayerARPG
         protected void AddCustomer(PlayerCharacterVendingComponent customer)
         {
             if (_customers.Add(customer))
-                CallTargetNotifyItems(customer.ConnectionId, _items);
+                CallTargetRpcNotifyItems(customer.ConnectionId, _items);
         }
 
-        public void CallServerUnsubscribe()
+        public void CallCmdUnsubscribe()
         {
-            RPC(ServerUnsubscribe);
+            RPC(CmdUnsubscribe);
         }
 
         [ServerRpc]
-        protected void ServerUnsubscribe()
+        protected void CmdUnsubscribe()
         {
 #if UNITY_EDITOR || UNITY_SERVER
             if (_store == null)
@@ -197,30 +197,30 @@ namespace MultiplayerARPG
             {
                 if (comp == null)
                     continue;
-                CallTargetNotifyItems(comp.ConnectionId, _items);
+                CallTargetRpcNotifyItems(comp.ConnectionId, _items);
             }
-            CallTargetNotifyItems(ConnectionId, _items);
+            CallTargetRpcNotifyItems(ConnectionId, _items);
         }
 
-        public void CallTargetNotifyItems(long connectionId, VendingItems items)
+        public void CallTargetRpcNotifyItems(long connectionId, VendingItems items)
         {
-            RPC(TargetNotifyItems, connectionId, items);
+            RPC(TargetRpcNotifyItems, connectionId, items);
         }
 
         [TargetRpc]
-        protected void TargetNotifyItems(VendingItems items)
+        protected void TargetRpcNotifyItems(VendingItems items)
         {
             if (onUpdateItems != null)
                 onUpdateItems.Invoke(items);
         }
 
-        public void CallServerBuyItem(int index)
+        public void CallCmdBuyItem(int index)
         {
-            RPC(ServerBuyItem, index);
+            RPC(CmdBuyItem, index);
         }
 
         [ServerRpc]
-        protected void ServerBuyItem(int index)
+        protected void CmdBuyItem(int index)
         {
 #if UNITY_EDITOR || UNITY_SERVER
             _store.SellItem(this, index);

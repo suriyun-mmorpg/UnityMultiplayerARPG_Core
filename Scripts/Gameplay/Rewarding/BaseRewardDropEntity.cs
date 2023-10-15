@@ -121,16 +121,16 @@ namespace MultiplayerARPG
             amount.onChange -= OnAmountChange;
         }
 
+        public void CallRpcOnPickedUp()
+        {
+            RPC(RpcOnPickedUp);
+        }
+
         [AllRpc]
-        protected virtual void AllOnPickedUp()
+        protected virtual void RpcOnPickedUp()
         {
             if (onPickedUp != null)
                 onPickedUp.Invoke();
-        }
-
-        public void CallAllOnPickedUp()
-        {
-            RPC(AllOnPickedUp);
         }
 
         protected virtual void OnAmountChange(bool isInitial, int amount)
@@ -191,7 +191,7 @@ namespace MultiplayerARPG
             // Mark as picked up
             _isPickedUp = true;
             // Tell clients that the entity is picked up
-            CallAllOnPickedUp();
+            CallRpcOnPickedUp();
             // Respawning later
             if (SpawnArea != null)
                 SpawnArea.Spawn(SpawnPrefab, SpawnLevel, DestroyDelay + DestroyRespawnDelay);
@@ -281,7 +281,7 @@ namespace MultiplayerARPG
 
         public virtual void OnPickupActivate()
         {
-            GameInstance.PlayingCharacterEntity.CallServerPickup(ObjectId);
+            GameInstance.PlayingCharacterEntity.CallCmdPickup(ObjectId);
         }
 
         public virtual bool ProceedPickingUpAtServer(BaseCharacterEntity characterEntity, out UITextKeys message)

@@ -1020,7 +1020,7 @@ namespace MultiplayerARPG
                 buildingEntity.ExtraData = saveData.ExtraData;
                 Assets.NetworkSpawn(spawnObj);
                 ServerBuildingHandlers.AddBuilding(buildingEntity.Id, buildingEntity);
-                buildingEntity.CallAllOnBuildingConstruct();
+                buildingEntity.CallRpcOnBuildingConstruct();
                 return buildingEntity;
             }
             return null;

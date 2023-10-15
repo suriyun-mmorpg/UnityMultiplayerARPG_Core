@@ -178,7 +178,7 @@ namespace MultiplayerARPG
 
         public virtual void OnActivate()
         {
-            GameInstance.PlayingCharacterEntity.CallServerEnterWarp(ObjectId);
+            GameInstance.PlayingCharacterEntity.CallCmdEnterWarp(ObjectId);
         }
     }
 }

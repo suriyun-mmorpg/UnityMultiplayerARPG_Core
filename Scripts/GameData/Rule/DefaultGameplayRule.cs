@@ -642,7 +642,7 @@ namespace MultiplayerARPG
                     {
                         attacker.CurrentHp += leechAmount;
                         attacker.CurrentHp = Mathf.Clamp(attacker.CurrentHp, 0, attacker.MaxHp);
-                        attacker.CallAllAppendCombatText(CombatAmountType.HpLeech, HitEffectsSourceType.None, 0, leechAmount);
+                        attacker.CallRpcAppendCombatText(CombatAmountType.HpLeech, HitEffectsSourceType.None, 0, leechAmount);
                     }
                     // Mp Leeching
                     leechAmount = Mathf.CeilToInt(damage * stats.mpLeechRate);
@@ -650,7 +650,7 @@ namespace MultiplayerARPG
                     {
                         attacker.CurrentMp += leechAmount;
                         attacker.CurrentMp = Mathf.Clamp(attacker.CurrentMp, 0, attacker.MaxMp);
-                        attacker.CallAllAppendCombatText(CombatAmountType.MpLeech, HitEffectsSourceType.None, 0, leechAmount);
+                        attacker.CallRpcAppendCombatText(CombatAmountType.MpLeech, HitEffectsSourceType.None, 0, leechAmount);
                         damageReceiver.CurrentMp -= leechAmount;
                         damageReceiver.CurrentMp = Mathf.Clamp(damageReceiver.CurrentMp, 0, damageReceiver.MaxMp);
                     }
@@ -660,7 +660,7 @@ namespace MultiplayerARPG
                     {
                         attacker.CurrentStamina += leechAmount;
                         attacker.CurrentStamina = Mathf.Clamp(attacker.CurrentStamina, 0, attacker.MaxStamina);
-                        attacker.CallAllAppendCombatText(CombatAmountType.StaminaLeech, HitEffectsSourceType.None, 0, leechAmount);
+                        attacker.CallRpcAppendCombatText(CombatAmountType.StaminaLeech, HitEffectsSourceType.None, 0, leechAmount);
                         damageReceiver.CurrentStamina -= leechAmount;
                         damageReceiver.CurrentStamina = Mathf.Clamp(damageReceiver.CurrentStamina, 0, damageReceiver.MaxStamina);
                     }

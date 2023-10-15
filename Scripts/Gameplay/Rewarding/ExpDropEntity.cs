@@ -22,7 +22,7 @@ namespace MultiplayerARPG
                 return true;
             }
             GameInstance.ServerGameMessageHandlers.NotifyRewardExp(rewardingCharacter.ConnectionId, GivenType, rewardedExp);
-            rewardingCharacter.CallAllOnLevelUp();
+            rewardingCharacter.CallRpcOnLevelUp();
             message = UITextKeys.NONE;
             return true;
         }

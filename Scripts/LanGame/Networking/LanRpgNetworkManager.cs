@@ -305,7 +305,7 @@ namespace MultiplayerARPG
             // Notify clients that this character is spawn or dead
             if (!playerCharacterEntity.IsDead())
             {
-                playerCharacterEntity.CallAllOnRespawn();
+                playerCharacterEntity.CallRpcOnRespawn();
                 // Summon saved mount entity
                 if (GameInstance.VehicleEntities.ContainsKey(playerCharacterData.MountDataId))
                     playerCharacterEntity.Mount(GameInstance.VehicleEntities[playerCharacterData.MountDataId]);
@@ -328,7 +328,7 @@ namespace MultiplayerARPG
             }
             else
             {
-                playerCharacterEntity.CallAllOnDead();
+                playerCharacterEntity.CallRpcOnDead();
             }
 
             // Register player, will use registered player to send chat / player messages

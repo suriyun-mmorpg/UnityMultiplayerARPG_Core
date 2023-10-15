@@ -2,71 +2,71 @@
 {
     public partial class BaseCharacterEntity
     {
-        public bool CallServerPickup(uint objectId)
+        public bool CallCmdPickup(uint objectId)
         {
             if (!CanDoActions())
                 return false;
-            RPC(ServerPickup, objectId);
-            CallAllPlayPickupAnimation();
+            RPC(CmdPickup, objectId);
+            CallRpcPlayPickupAnimation();
             return true;
         }
 
-        public bool CallServerPickupItemFromContainer(uint objectId, int itemsContainerIndex, int amount)
+        public bool CallCmdPickupItemFromContainer(uint objectId, int itemsContainerIndex, int amount)
         {
             if (!CanDoActions())
                 return false;
-            RPC(ServerPickupItemFromContainer, objectId, itemsContainerIndex, amount);
-            CallAllPlayPickupAnimation();
+            RPC(CmdPickupItemFromContainer, objectId, itemsContainerIndex, amount);
+            CallRpcPlayPickupAnimation();
             return true;
         }
 
-        public bool CallServerPickupAllItemsFromContainer(uint objectId)
+        public bool CallCmdPickupAllItemsFromContainer(uint objectId)
         {
             if (!CanDoActions())
                 return false;
-            RPC(ServerPickupAllItemsFromContainer, objectId);
-            CallAllPlayPickupAnimation();
+            RPC(CmdPickupAllItemsFromContainer, objectId);
+            CallRpcPlayPickupAnimation();
             return true;
         }
 
-        public bool CallServerPickupNearbyItems()
+        public bool CallCmdPickupNearbyItems()
         {
             if (!CanDoActions())
                 return false;
-            RPC(ServerPickupNearbyItems);
-            CallAllPlayPickupAnimation();
+            RPC(CmdPickupNearbyItems);
+            CallRpcPlayPickupAnimation();
             return true;
         }
 
-        public bool CallServerDropItem(int nonEquipIndex, int amount)
+        public bool CallCmdDropItem(int nonEquipIndex, int amount)
         {
             if (amount <= 0 || !CanDoActions() || nonEquipIndex >= NonEquipItems.Count)
                 return false;
-            RPC(ServerDropItem, nonEquipIndex, amount);
+            RPC(CmdDropItem, nonEquipIndex, amount);
             return true;
         }
 
-        public bool CallAllOnDead()
+        public bool CallRpcOnDead()
         {
-            RPC(AllOnDead);
+            RPC(RpcOnDead);
             return true;
         }
 
-        public bool CallAllOnRespawn()
+        public bool CallRpcOnRespawn()
         {
-            RPC(AllOnRespawn);
+            RPC(RpcOnRespawn);
             return true;
         }
 
-        public bool CallAllOnLevelUp()
+        public bool CallRpcOnLevelUp()
         {
-            RPC(AllOnLevelUp);
+            RPC(RpcOnLevelUp);
             return true;
         }
 
-        public bool CallServerUnSummon(uint objectId)
+        public bool CallCmdUnSummon(uint objectId)
         {
-            RPC(ServerUnSummon, objectId);
+            RPC(CmdUnSummon, objectId);
             return true;
         }
     }

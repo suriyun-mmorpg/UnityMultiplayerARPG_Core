@@ -8,11 +8,11 @@ namespace MultiplayerARPG
     {
         public void TogglePkMode()
         {
-            RPC(ServerTogglePkMode);
+            RPC(CmdTogglePkMode);
         }
 
         [ServerRpc]
-        protected void ServerTogglePkMode()
+        protected void CmdTogglePkMode()
         {
             if (Entity.IsPkOn)
             {

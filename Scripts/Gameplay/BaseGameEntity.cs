@@ -491,46 +491,46 @@ namespace MultiplayerARPG
         }
 
         #region Animations
-        public void CallAllPlayJumpAnimation()
+        public void CallRpcPlayJumpAnimation()
         {
-            RPC(AllPlayJumpAnimation);
+            RPC(RpcPlayJumpAnimation);
         }
 
         [AllRpc]
-        protected void AllPlayJumpAnimation()
+        protected void RpcPlayJumpAnimation()
         {
             PlayJumpAnimation();
         }
 
-        public void CallAllPlayPickupAnimation()
+        public void CallRpcPlayPickupAnimation()
         {
-            RPC(AllPlayPickupAnimation);
+            RPC(RpcPlayPickupAnimation);
         }
 
         [AllRpc]
-        protected void AllPlayPickupAnimation()
+        protected void RpcPlayPickupAnimation()
         {
             PlayPickupAnimation();
         }
 
-        public void CallAllPlayCustomAnimation(int id)
+        public void CallRpcPlayCustomAnimation(int id)
         {
-            RPC(AllPlayCustomAnimation, id);
+            RPC(RpcPlayCustomAnimation, id);
         }
 
         [AllRpc]
-        protected virtual void AllPlayCustomAnimation(int id)
+        protected virtual void RpcPlayCustomAnimation(int id)
         {
             PlayCustomAnimation(id);
         }
 
-        public void CallAllStopCustomAnimation()
+        public void CallRpcStopCustomAnimation()
         {
-            RPC(AllStopCustomAnimation);
+            RPC(RpcStopCustomAnimation);
         }
 
         [AllRpc]
-        protected virtual void AllStopCustomAnimation()
+        protected virtual void RpcStopCustomAnimation()
         {
             StopCustomAnimation();
         }

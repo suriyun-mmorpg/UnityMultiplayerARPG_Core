@@ -7,7 +7,7 @@ namespace MultiplayerARPG
     public partial class BasePlayerCharacterEntity
     {
         [ServerRpc]
-        protected void ServerChangeQuestTracking(int questDataId, bool isTracking)
+        protected void CmdChangeQuestTracking(int questDataId, bool isTracking)
         {
             ChangeQuestTracking(questDataId, isTracking);
         }

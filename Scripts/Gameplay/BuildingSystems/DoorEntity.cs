@@ -78,12 +78,12 @@ namespace MultiplayerARPG
         {
             if (IsOpen)
             {
-                GameInstance.PlayingCharacterEntity.Building.CallServerCloseDoor(ObjectId);
+                GameInstance.PlayingCharacterEntity.Building.CallCmdCloseDoor(ObjectId);
                 return;
             }
             if (!Lockable || !IsLocked)
             {
-                GameInstance.PlayingCharacterEntity.Building.CallServerOpenDoor(ObjectId, string.Empty);
+                GameInstance.PlayingCharacterEntity.Building.CallCmdOpenDoor(ObjectId, string.Empty);
             }
             else
             {
@@ -92,7 +92,7 @@ namespace MultiplayerARPG
                     LanguageManager.GetText(UITextKeys.UI_ENTER_BUILDING_PASSWORD_DESCRIPTION.ToString()),
                     (password) =>
                     {
-                        GameInstance.PlayingCharacterEntity.Building.CallServerOpenDoor(ObjectId, password);
+                        GameInstance.PlayingCharacterEntity.Building.CallCmdOpenDoor(ObjectId, password);
                     }, string.Empty, PasswordContentType, PasswordLength, 
                     LanguageManager.GetText(UITextKeys.UI_ENTER_BUILDING_PASSWORD.ToString()));
             }

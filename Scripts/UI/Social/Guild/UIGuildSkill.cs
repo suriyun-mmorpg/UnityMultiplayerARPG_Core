@@ -331,7 +331,7 @@ namespace MultiplayerARPG
         {
             if (GameInstance.JoinedGuild == null)
                 return;
-            GameInstance.PlayingCharacterEntity.CallServerUseGuildSkill(GuildSkill.DataId);
+            GameInstance.PlayingCharacterEntity.CallCmdUseGuildSkill(GuildSkill.DataId);
         }
     }
 }

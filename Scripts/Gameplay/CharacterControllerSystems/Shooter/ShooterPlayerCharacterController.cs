@@ -1208,7 +1208,7 @@ namespace MultiplayerARPG
             {
                 anyKeyPressed = true;
                 // Exit vehicle
-                PlayingCharacterEntity.CallServerExitVehicle();
+                PlayingCharacterEntity.CallCmdExitVehicle();
             }
 
             if (_switchEquipWeaponSetInput.IsPress)
@@ -1560,7 +1560,7 @@ namespace MultiplayerARPG
             }
             else if (item.IsUsable())
             {
-                PlayingCharacterEntity.CallServerUseItem(itemIndex);
+                PlayingCharacterEntity.CallCmdUseItem(itemIndex);
             }
         }
 
@@ -1569,7 +1569,7 @@ namespace MultiplayerARPG
             if (GameInstance.JoinedGuild == null)
                 return;
             int dataId = BaseGameData.MakeDataId(id);
-            PlayingCharacterEntity.CallServerUseGuildSkill(dataId);
+            PlayingCharacterEntity.CallCmdUseGuildSkill(dataId);
         }
 
         public virtual void Attack(ref bool isLeftHand)

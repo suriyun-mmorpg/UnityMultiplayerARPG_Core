@@ -10,7 +10,7 @@ namespace MultiplayerARPG
         /// </summary>
         /// <param name="itemIndex"></param>
         [ServerRpc]
-        protected void ServerUseItem(int itemIndex)
+        protected void CmdUseItem(int itemIndex)
         {
 #if UNITY_EDITOR || UNITY_SERVER
             if (!CanUseItem())
