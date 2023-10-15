@@ -167,7 +167,7 @@ namespace MultiplayerARPG
         protected void AddCustomer(PlayerCharacterVendingComponent customer)
         {
             if (_customers.Add(customer))
-                CallTargetNotifyItems(customer.ConnectionId, _items);
+                CallTargetRpcNotifyItems(customer.ConnectionId, _items);
         }
 
         public void CallCmdUnsubscribe()
@@ -197,18 +197,18 @@ namespace MultiplayerARPG
             {
                 if (comp == null)
                     continue;
-                CallTargetNotifyItems(comp.ConnectionId, _items);
+                CallTargetRpcNotifyItems(comp.ConnectionId, _items);
             }
-            CallTargetNotifyItems(ConnectionId, _items);
+            CallTargetRpcNotifyItems(ConnectionId, _items);
         }
 
-        public void CallTargetNotifyItems(long connectionId, VendingItems items)
+        public void CallTargetRpcNotifyItems(long connectionId, VendingItems items)
         {
-            RPC(TargetNotifyItems, connectionId, items);
+            RPC(TargetRpcNotifyItems, connectionId, items);
         }
 
         [TargetRpc]
-        protected void TargetNotifyItems(VendingItems items)
+        protected void TargetRpcNotifyItems(VendingItems items)
         {
             if (onUpdateItems != null)
                 onUpdateItems.Invoke(items);

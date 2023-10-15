@@ -142,12 +142,12 @@ namespace MultiplayerARPG
         {
             if (Entity.IsDead())
                 return false;
-            RPC(TargetShowQuestRewardItemSelection, ConnectionId, questDataId);
+            RPC(TargetRpcShowQuestRewardItemSelection, ConnectionId, questDataId);
             return true;
         }
 
         [TargetRpc]
-        protected void TargetShowQuestRewardItemSelection(int questDataId)
+        protected void TargetRpcShowQuestRewardItemSelection(int questDataId)
         {
             // Hide npc dialog
             if (onShowNpcDialog != null)
@@ -165,12 +165,12 @@ namespace MultiplayerARPG
         {
             if (Entity.IsDead())
                 return false;
-            RPC(TargetShowNpcDialog, ConnectionId, npcDialogDataId);
+            RPC(TargetRpcShowNpcDialog, ConnectionId, npcDialogDataId);
             return true;
         }
 
         [TargetRpc]
-        protected async void TargetShowNpcDialog(int npcDialogDataId)
+        protected async void TargetRpcShowNpcDialog(int npcDialogDataId)
         {
             // Show npc dialog by dataId, if it can't find dialog, it will hide
             if (!GameInstance.NpcDialogs.TryGetValue(npcDialogDataId, out BaseNpcDialog npcDialog))
@@ -192,12 +192,12 @@ namespace MultiplayerARPG
         {
             if (Entity.IsDead())
                 return false;
-            RPC(TargetShowNpcRefineItem, ConnectionId);
+            RPC(TargetRpcShowNpcRefineItem, ConnectionId);
             return true;
         }
 
         [TargetRpc]
-        protected void TargetShowNpcRefineItem()
+        protected void TargetRpcShowNpcRefineItem()
         {
             // Hide npc dialog
             if (onShowNpcDialog != null)
@@ -212,12 +212,12 @@ namespace MultiplayerARPG
         {
             if (Entity.IsDead())
                 return false;
-            RPC(TargetShowNpcDismantleItem, ConnectionId);
+            RPC(TargetRpcShowNpcDismantleItem, ConnectionId);
             return true;
         }
 
         [TargetRpc]
-        protected void TargetShowNpcDismantleItem()
+        protected void TargetRpcShowNpcDismantleItem()
         {
             // Hide npc dialog
             if (onShowNpcDialog != null)
@@ -232,12 +232,12 @@ namespace MultiplayerARPG
         {
             if (Entity.IsDead())
                 return false;
-            RPC(TargetShowNpcRepairItem, ConnectionId);
+            RPC(TargetRpcShowNpcRepairItem, ConnectionId);
             return true;
         }
 
         [TargetRpc]
-        protected void TargetShowNpcRepairItem()
+        protected void TargetRpcShowNpcRepairItem()
         {
             // Hide npc dialog
             if (onShowNpcDialog != null)
