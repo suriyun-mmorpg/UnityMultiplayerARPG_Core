@@ -74,6 +74,7 @@ namespace MultiplayerARPG
 
         protected CharacterActionComponentManager _manager;
         protected float _lastAcceptedTime;
+        protected Dictionary<int, UseSkillState> _simulatingStates = new Dictionary<int, UseSkillState>();
         // Network data sending
         protected UseSkillState? _clientState;
         protected UseSkillState? _serverState;
@@ -97,6 +98,7 @@ namespace MultiplayerARPG
             AnimActionType = animActionType;
             AnimActionDataId = animActionDataId;
             _simulateState = simulateState;
+            _simulatingStates.Add(simulateState.SimulateSeed, simulateState);
         }
 
         public virtual void ClearUseSkillStates()
@@ -298,7 +300,7 @@ namespace MultiplayerARPG
 
 
                 // Prepare hit register validation, it will be used later when receive attack start/end events from clients
-                if (IsServer && !IsOwnerClientOrOwnedByServer && skill.IsAttack && skill.TryGetDamageInfo(Entity, isLeftHand, out DamageInfo damageInfo))
+                if (IsServer && !IsOwnerClientOrOwnedByServer && skill.TryGetDamageInfo(Entity, isLeftHand, out DamageInfo damageInfo))
                     HitRegistrationManager.PrepareHitRegValidation(Entity, simulateSeed, _triggerDurations, 0, damageInfo, damageAmounts, weapon, skill, skillLevel);
 
                 float tempTriggerDuration;
@@ -434,6 +436,8 @@ namespace MultiplayerARPG
                 damageAmounts,
                 targetObjectId,
                 aimPosition);
+
+            _simulatingStates.Remove(simulateSeed);
         }
 
         [ServerRpc]
@@ -447,18 +451,17 @@ namespace MultiplayerARPG
         {
             if (IsOwnerClientOrOwnedByServer)
                 return;
-            if (!_simulateState.HasValue)
+            if (!_simulatingStates.TryGetValue(data.simulateSeed, out UseSkillState simulateState))
                 return;
-            if (data.simulateSeed != _simulateState.Value.SimulateSeed)
-                return;
-            bool isLeftHand = _simulateState.Value.IsLeftHand;
-            BaseSkill skill = _simulateState.Value.Skill;
-            int skillLevel = _simulateState.Value.SkillLevel;
-            uint targetObjectId = _simulateState.Value.TargetObjectId;
+            bool isLeftHand = simulateState.IsLeftHand;
+            BaseSkill skill = simulateState.Skill;
+            int skillLevel = simulateState.SkillLevel;
+            uint targetObjectId = simulateState.TargetObjectId;
             CharacterItem weapon = Entity.GetAvailableWeapon(ref isLeftHand);
             Dictionary<DamageElement, MinMaxFloat> damageAmounts = skill.GetAttackDamages(Entity, skillLevel, isLeftHand);
-            Dictionary<DamageElement, MinMaxFloat> increaseDamageAmounts = skill.GetIncreaseDamageByResources(Entity, weapon);
+            Dictionary<DamageElement, MinMaxFloat> increaseDamageAmounts = IsServer ? null : skill.GetIncreaseDamageByResources(Entity, weapon);
             ApplySkillUsing(skill, skillLevel, isLeftHand, weapon, data.simulateSeed, data.triggerIndex, damageAmounts, increaseDamageAmounts, targetObjectId, data.aimPosition);
+            _simulatingStates.Remove(data.simulateSeed);
         }
 
         public virtual void UseSkill(int dataId, bool isLeftHand, uint targetObjectId, AimPosition aimPosition)

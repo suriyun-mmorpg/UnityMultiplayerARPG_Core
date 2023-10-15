@@ -48,10 +48,9 @@ namespace MultiplayerARPG
         protected CharacterActionComponentManager _manager;
         protected int _lastAttackAnimationIndex = 0;
         protected int _lastAttackDataId = 0;
+        protected Dictionary<int, AttackState> _simulatingStates = new Dictionary<int, AttackState>();
         // Network data sending
         protected int _clientNextSeed;
-        protected AttackState? _clientState;
-        protected AttackState? _serverState;
         protected AttackState? _simulateState;
 
         public override void EntityStart()
@@ -65,6 +64,7 @@ namespace MultiplayerARPG
             AnimActionType = animActionType;
             AnimActionDataId = animActionDataId;
             _simulateState = simulateState;
+            _simulatingStates.Add(simulateState.SimulateSeed, simulateState);
         }
 
         public virtual void ClearAttackStates()
@@ -360,6 +360,8 @@ namespace MultiplayerARPG
                     0,
                     aimPosition);
             }
+
+            _simulatingStates.Remove(simulateSeed);
         }
 
         [ServerRpc]
@@ -385,7 +387,7 @@ namespace MultiplayerARPG
                 damageAmounts = new Dictionary<DamageElement, MinMaxFloat>(Entity.GetCaches().LeftHandDamages);
             else
                 damageAmounts = new Dictionary<DamageElement, MinMaxFloat>(Entity.GetCaches().RightHandDamages);
-            Dictionary<DamageElement, MinMaxFloat> increaseDamageAmounts = Entity.GetIncreaseDamagesByAmmo(weapon);
+            Dictionary<DamageElement, MinMaxFloat> increaseDamageAmounts = IsServer ? null : Entity.GetIncreaseDamagesByAmmo(weapon);
             ApplyAttack(isLeftHand, weapon, data.simulateSeed, data.triggerIndex, damageInfo, damageAmounts, increaseDamageAmounts, data.aimPosition);
         }
 
@@ -403,86 +405,49 @@ namespace MultiplayerARPG
         {
             if (!IsServer && IsOwnerClient)
             {
-                // Prepare state data which will be sent to server
-                _clientState = new AttackState()
-                {
-                    IsLeftHand = isLeftHand,
-                };
+                ProceedAttack(Manager.Timestamp, isLeftHand);
+                RPC(CmdAttack, Manager.Timestamp, isLeftHand);
             }
             else if (IsOwnerClientOrOwnedByServer)
             {
-                // Attack immediately at server
-                ProceedAttackStateAtServer(0, isLeftHand);
+                PreceedCmdAttack(Manager.Timestamp, isLeftHand);
             }
         }
 
-        protected virtual void ProceedAttackStateAtServer(long peerTimestamp, bool isLeftHand)
+        [ServerRpc]
+        protected void CmdAttack(long peerTimestamp, bool isLeftHand)
         {
-#if UNITY_EDITOR || UNITY_SERVER
+            PreceedCmdAttack(peerTimestamp, isLeftHand);
+        }
+
+        protected void PreceedCmdAttack(long peerTimestamp, bool isLeftHand)
+        {
             if (!_manager.IsAcceptNewAction())
                 return;
             // Speed hack avoidance
             if (Time.unscaledTime - LastAttackEndTime < -0.2f)
                 return;
             _manager.ActionAccepted();
-            // Prepare state data which will be sent to clients
-            _serverState = new AttackState()
-            {
-                SimulateSeed = GetSimulateSeed(peerTimestamp),
-                IsLeftHand = isLeftHand,
-            };
-#endif
+            ProceedAttack(peerTimestamp, isLeftHand);
+            RPC(RpcAttack, peerTimestamp, isLeftHand);
         }
 
-        public virtual bool WriteClientAttackState(long writeTimestamp, NetDataWriter writer)
+        [AllRpc]
+        protected void RpcAttack(long peerTimestamp, bool isLeftHand)
         {
-            if (_clientState.HasValue)
-            {
-                // Simulate attacking at client
-                AttackRoutine(writeTimestamp, _clientState.Value).Forget();
-                // Send input to server
-                writer.Put(_clientState.Value.IsLeftHand);
-                // Clear Input
-                _clientState = null;
-                return true;
-            }
-            return false;
-        }
-
-        public virtual bool WriteServerAttackState(long writeTimestamp, NetDataWriter writer)
-        {
-            if (_serverState.HasValue)
-            {
-                // Simulate attacking at server
-                AttackRoutine(writeTimestamp, _serverState.Value).Forget();
-                // Send input to client
-                writer.PutPackedInt(_serverState.Value.SimulateSeed);
-                writer.Put(_serverState.Value.IsLeftHand);
-                // Clear Input
-                _serverState = null;
-                return true;
-            }
-            return false;
-        }
-
-        public virtual void ReadClientAttackStateAtServer(long peerTimestamp, NetDataReader reader)
-        {
-            bool isLeftHand = reader.GetBool();
-            ProceedAttackStateAtServer(peerTimestamp, isLeftHand);
-        }
-
-        public virtual void ReadServerAttackStateAtClient(long peerTimestamp, NetDataReader reader)
-        {
-            int simulateSeed = reader.GetPackedInt();
-            bool isLeftHand = reader.GetBool();
             if (IsServer || IsOwnerClient)
             {
-                // Don't play attacking animation again (it already done in `WriteServerAttackState` function)
+                // Don't play attacking animation again
                 return;
             }
+            ProceedAttack(peerTimestamp, isLeftHand);
+        }
+
+        protected void ProceedAttack(long peerTimestamp, bool isLeftHand)
+        {
             AttackState simulateState = new AttackState()
             {
-                SimulateSeed = simulateSeed,
+                SimulateSeed = GetSimulateSeed(peerTimestamp),
                 IsLeftHand = isLeftHand,
             };
             AttackRoutine(peerTimestamp, simulateState).Forget();
