@@ -26,7 +26,7 @@ namespace MultiplayerARPG
             return true;
         }
 
-        public bool CallServerUseItem(int index)
+        public bool CallCmdUseItem(int index)
         {
             if (!ValidateRequestUseItem(index))
                 return false;
@@ -34,7 +34,7 @@ namespace MultiplayerARPG
             return true;
         }
 
-        public bool CallServerUseGuildSkill(int dataId)
+        public bool CallCmdUseGuildSkill(int dataId)
         {
             if (this.IsDead())
                 return false;
@@ -42,7 +42,7 @@ namespace MultiplayerARPG
             return true;
         }
 
-        public bool CallServerAssignHotkey(string hotkeyId, HotkeyType type, string id)
+        public bool CallCmdAssignHotkey(string hotkeyId, HotkeyType type, string id)
         {
             RPC(CmdAssignHotkey, hotkeyId, type, id);
             return true;
@@ -52,7 +52,7 @@ namespace MultiplayerARPG
         {
             // Use skil data id
             string relateId = characterSkill.GetSkill().Id;
-            return CallServerAssignHotkey(hotkeyId, HotkeyType.Skill, relateId);
+            return CallCmdAssignHotkey(hotkeyId, HotkeyType.Skill, relateId);
         }
 
         public bool AssignItemHotkey(string hotkeyId, CharacterItem characterItem)
@@ -62,22 +62,22 @@ namespace MultiplayerARPG
             // For an equipments, it will use item unique id
             if (characterItem.GetEquipmentItem() != null)
                 relateId = characterItem.id;
-            return CallServerAssignHotkey(hotkeyId, HotkeyType.Item, relateId);
+            return CallCmdAssignHotkey(hotkeyId, HotkeyType.Item, relateId);
         }
 
         public bool AssignGuildSkillHotkey(string hotkeyId, GuildSkill guildSkill)
         {
             // Use skil data id
             string relateId = guildSkill.Id;
-            return CallServerAssignHotkey(hotkeyId, HotkeyType.GuildSkill, relateId);
+            return CallCmdAssignHotkey(hotkeyId, HotkeyType.GuildSkill, relateId);
         }
 
         public bool UnAssignHotkey(string hotkeyId)
         {
-            return CallServerAssignHotkey(hotkeyId, HotkeyType.None, string.Empty);
+            return CallCmdAssignHotkey(hotkeyId, HotkeyType.None, string.Empty);
         }
 
-        public bool CallServerEnterWarp(uint objectId)
+        public bool CallCmdEnterWarp(uint objectId)
         {
             if (!CanDoActions())
                 return false;
@@ -85,7 +85,7 @@ namespace MultiplayerARPG
             return true;
         }
 
-        public bool CallServerAppendCraftingQueueItem(uint sourceObjectId, int dataId, int amount)
+        public bool CallCmdAppendCraftingQueueItem(uint sourceObjectId, int dataId, int amount)
         {
             if (!CurrentGameplayRule.CanInteractEntity(this, sourceObjectId))
                 return false;
@@ -93,7 +93,7 @@ namespace MultiplayerARPG
             return true;
         }
 
-        public bool CallServerChangeCraftingQueueItem(uint sourceObjectId, int indexOfData, int amount)
+        public bool CallCmdChangeCraftingQueueItem(uint sourceObjectId, int indexOfData, int amount)
         {
             if (!CurrentGameplayRule.CanInteractEntity(this, sourceObjectId))
                 return false;
@@ -101,7 +101,7 @@ namespace MultiplayerARPG
             return true;
         }
 
-        public bool CallServerCancelCraftingQueueItem(uint sourceObjectId, int indexOfData)
+        public bool CallCmdCancelCraftingQueueItem(uint sourceObjectId, int indexOfData)
         {
             if (!CurrentGameplayRule.CanInteractEntity(this, sourceObjectId))
                 return false;
@@ -109,7 +109,7 @@ namespace MultiplayerARPG
             return true;
         }
 
-        public bool CallServerChangeQuestTracking(int questDataId, bool isTracking)
+        public bool CallCmdChangeQuestTracking(int questDataId, bool isTracking)
         {
             RPC(CmdChangeQuestTracking, questDataId, isTracking);
             return true;

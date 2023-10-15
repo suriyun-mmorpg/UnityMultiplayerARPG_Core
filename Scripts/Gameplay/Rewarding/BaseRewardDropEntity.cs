@@ -281,7 +281,7 @@ namespace MultiplayerARPG
 
         public virtual void OnPickupActivate()
         {
-            GameInstance.PlayingCharacterEntity.CallServerPickup(ObjectId);
+            GameInstance.PlayingCharacterEntity.CallCmdPickup(ObjectId);
         }
 
         public virtual bool ProceedPickingUpAtServer(BaseCharacterEntity characterEntity, out UITextKeys message)

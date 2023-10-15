@@ -2,7 +2,7 @@
 {
     public partial class BaseCharacterEntity
     {
-        public bool CallServerPickup(uint objectId)
+        public bool CallCmdPickup(uint objectId)
         {
             if (!CanDoActions())
                 return false;
@@ -11,7 +11,7 @@
             return true;
         }
 
-        public bool CallServerPickupItemFromContainer(uint objectId, int itemsContainerIndex, int amount)
+        public bool CallCmdPickupItemFromContainer(uint objectId, int itemsContainerIndex, int amount)
         {
             if (!CanDoActions())
                 return false;
@@ -20,7 +20,7 @@
             return true;
         }
 
-        public bool CallServerPickupAllItemsFromContainer(uint objectId)
+        public bool CallCmdPickupAllItemsFromContainer(uint objectId)
         {
             if (!CanDoActions())
                 return false;
@@ -29,7 +29,7 @@
             return true;
         }
 
-        public bool CallServerPickupNearbyItems()
+        public bool CallCmdPickupNearbyItems()
         {
             if (!CanDoActions())
                 return false;
@@ -38,7 +38,7 @@
             return true;
         }
 
-        public bool CallServerDropItem(int nonEquipIndex, int amount)
+        public bool CallCmdDropItem(int nonEquipIndex, int amount)
         {
             if (amount <= 0 || !CanDoActions() || nonEquipIndex >= NonEquipItems.Count)
                 return false;
@@ -64,7 +64,7 @@
             return true;
         }
 
-        public bool CallServerUnSummon(uint objectId)
+        public bool CallCmdUnSummon(uint objectId)
         {
             RPC(CmdUnSummon, objectId);
             return true;

@@ -1714,7 +1714,7 @@ namespace MultiplayerARPG
         {
             if (selectionManager != null)
                 selectionManager.DeselectSelectedUI();
-            GameInstance.PlayingCharacterEntity.CallServerDropItem(IndexOfData, amount);
+            GameInstance.PlayingCharacterEntity.CallCmdDropItem(IndexOfData, amount);
         }
         #endregion
 
@@ -1886,7 +1886,7 @@ namespace MultiplayerARPG
         {
             if (selectionManager != null)
                 selectionManager.DeselectSelectedUI();
-            GameInstance.PlayingCharacterEntity.CallServerPickupItemFromContainer(GameInstance.ItemsContainerUIVisibilityManager.ItemsContainerEntity.ObjectId, IndexOfData, amount);
+            GameInstance.PlayingCharacterEntity.CallCmdPickupItemFromContainer(GameInstance.ItemsContainerUIVisibilityManager.ItemsContainerEntity.ObjectId, IndexOfData, amount);
         }
         #endregion
 
