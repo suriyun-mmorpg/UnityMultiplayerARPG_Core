@@ -294,13 +294,10 @@ namespace MultiplayerARPG
         internal void DoUpdate()
         {
             Profiler.BeginSample("EntityComponents - Update");
-            if (IsUpdateEntityComponents)
+            for (int i = 0; i < EntityComponents.Length; ++i)
             {
-                for (int i = 0; i < EntityComponents.Length; ++i)
-                {
-                    if (EntityComponents[i].Enabled)
-                        EntityComponents[i].EntityUpdate();
-                }
+                if (EntityComponents[i].Enabled && (IsUpdateEntityComponents || EntityComponents[i].AlwaysUpdate))
+                    EntityComponents[i].EntityUpdate();
             }
             Profiler.EndSample();
             Profiler.BeginSample("BaseGameEntity - EntityUpdate");
@@ -351,13 +348,10 @@ namespace MultiplayerARPG
         {
             bool isUpdateEntityComponents = IsUpdateEntityComponents;
             Profiler.BeginSample("EntityComponents - LateUpdate");
-            if (isUpdateEntityComponents)
+            for (int i = 0; i < EntityComponents.Length; ++i)
             {
-                for (int i = 0; i < EntityComponents.Length; ++i)
-                {
-                    if (EntityComponents[i].Enabled)
-                        EntityComponents[i].EntityLateUpdate();
-                }
+                if (EntityComponents[i].Enabled && (IsUpdateEntityComponents || EntityComponents[i].AlwaysUpdate))
+                    EntityComponents[i].EntityLateUpdate();
             }
             Profiler.EndSample();
             Profiler.BeginSample("BaseGameEntity - OnUpdateEntityComponentsChanged");

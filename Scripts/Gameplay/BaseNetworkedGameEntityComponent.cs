@@ -44,6 +44,8 @@ namespace MultiplayerARPG
             }
         }
 
+        public bool AlwaysUpdate { get; protected set; }
+
         public virtual void EntityAwake()
         {
         }

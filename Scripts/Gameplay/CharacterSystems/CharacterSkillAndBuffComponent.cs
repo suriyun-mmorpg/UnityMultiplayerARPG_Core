@@ -13,6 +13,12 @@ namespace MultiplayerARPG
         private float _deltaTime;
         private Dictionary<string, CharacterRecoveryData> _recoveryBuffs;
 
+        public override void EntityAwake()
+        {
+            base.EntityAwake();
+            AlwaysUpdate = true;
+        }
+
         public override void EntityStart()
         {
             _recoveryBuffs = new Dictionary<string, CharacterRecoveryData>();
