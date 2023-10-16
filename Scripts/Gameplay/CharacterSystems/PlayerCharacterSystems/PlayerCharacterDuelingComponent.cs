@@ -22,21 +22,30 @@ namespace MultiplayerARPG
             }
         }
 
+        public uint DuelingCharacterObjectId { get; private set; }
         private BasePlayerCharacterEntity _duelingCharacter;
         public BasePlayerCharacterEntity DuelingCharacter
         {
             get
             {
                 if (!DuelingStarted && Time.unscaledTime - DuelingRequestTime >= CurrentGameInstance.duelingRequestDuration)
+                {
                     _duelingCharacter = null;
+                    DuelingCharacterObjectId = 0;
+                }
                 return _duelingCharacter;
             }
             set
             {
                 _duelingCharacter = value;
+                if (_duelingCharacter == null)
+                    DuelingCharacterObjectId = 0;
+                else
+                    DuelingCharacterObjectId = _duelingCharacter.ObjectId;
                 DuelingRequestTime = Time.unscaledTime;
             }
         }
+
 
         /// <summary>
         /// Action: BasePlayerCharacterEntity anotherCharacter
@@ -63,6 +72,19 @@ namespace MultiplayerARPG
 
         protected float _countDownDuration;
         protected float _duelDuration;
+
+        public override void EntityUpdate()
+        {
+            if (!IsOwnerClient)
+                return;
+            if (DuelingStarted && !DuelingTimeOut && DuelingCharacterObjectId > 0 && _duelingCharacter == null && Manager.TryGetEntityByObjectId(DuelingCharacterObjectId, out _duelingCharacter))
+            {
+                _duelingCharacter.Dueling.DuelingCharacter = Entity;
+                _duelingCharacter.Dueling.DuelingStartTime = DuelingStartTime;
+                _duelingCharacter.Dueling._countDownDuration = _countDownDuration;
+                _duelingCharacter.Dueling._duelDuration = _duelDuration;
+            }
+        }
 
         public void ClearDuelingData()
         {
