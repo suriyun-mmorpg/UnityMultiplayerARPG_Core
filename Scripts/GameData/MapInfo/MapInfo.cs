@@ -67,8 +67,8 @@ namespace MultiplayerARPG
 
             if (targetEntity.Type == EntityTypes.Player)
             {
-                if (playerCharacter.Dueling.DuelingStarted && playerCharacter.Dueling.DuelingCharacter != null)
-                    return playerCharacter.Dueling.DuelingCharacter.ObjectId != targetEntity.ObjectId;
+                if (playerCharacter.Dueling.DuelingStarted && playerCharacter.Dueling.DuelingCharacterObjectId > 0)
+                    return playerCharacter.Dueling.DuelingCharacterObjectId != targetEntity.ObjectId;
 
                 if (targetEntity.PartyId != 0 && targetEntity.PartyId == playerCharacter.PartyId)
                     return true;
@@ -143,8 +143,8 @@ namespace MultiplayerARPG
 
             if (targetEntity.Type == EntityTypes.Player)
             {
-                if (playerCharacter.Dueling.DuelingStarted && playerCharacter.Dueling.DuelingCharacter != null)
-                    return playerCharacter.Dueling.DuelingCharacter.ObjectId == targetEntity.ObjectId;
+                if (playerCharacter.Dueling.DuelingStarted && playerCharacter.Dueling.DuelingCharacterObjectId > 0)
+                    return playerCharacter.Dueling.DuelingCharacterObjectId == targetEntity.ObjectId;
 
                 if (targetEntity.PartyId != 0 && targetEntity.PartyId == playerCharacter.PartyId)
                     return false;
