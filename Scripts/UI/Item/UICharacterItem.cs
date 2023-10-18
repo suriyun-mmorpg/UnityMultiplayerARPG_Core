@@ -149,6 +149,9 @@ namespace MultiplayerARPG
 
         [Header("Skill - UI Elements")]
         public TextWrapper uiTextSkill;
+        public UICharacterSkill uiSkill;
+
+        [Header("Cooldown")]
         public TextWrapper uiTextCoolDownDuration;
         public TextWrapper uiTextCoolDownRemainsDuration;
         public Image imageCoolDownGage;
@@ -1217,6 +1220,19 @@ namespace MultiplayerARPG
                 {
                     uiPotionBuff.Show();
                     uiPotionBuff.Data = new UIBuffData(PotionItem.Buff, Level);
+                }
+            }
+
+            if (uiSkill != null)
+            {
+                if (SkillItem == null || SkillItem.UsingSkill == null)
+                {
+                    uiSkill.Hide();
+                }
+                else
+                {
+                    uiSkill.Setup(new UICharacterSkillData(SkillItem.UsingSkill, SkillItem.UsingSkillLevel), Character, -1);
+                    uiSkill.Show();
                 }
             }
 
