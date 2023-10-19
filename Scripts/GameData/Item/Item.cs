@@ -8,7 +8,7 @@ namespace MultiplayerARPG
     public partial class Item : BaseItem,
         IAmmoItem, IArmorItem, IShieldItem, IWeaponItem,
         IPotionItem, IBuildingItem, IPetItem, IMountItem, ISkillItem,
-        ISocketEnhancerItem
+        ISocketEnhancerItem, IItemWithAttributeData
     {
         public enum LegacyItemType : byte
         {
@@ -623,6 +623,26 @@ namespace MultiplayerARPG
             {
                 if (itemType == LegacyItemType.Skill || itemType == LegacyItemType.SkillLearn)
                     return skillLevel.level;
+                return 0;
+            }
+        }
+
+        public Attribute AttributeData
+        {
+            get
+            {
+                if (itemType == LegacyItemType.AttributeIncrease)
+                    return attributeAmount.attribute;
+                return null;
+            }
+        }
+
+        public float AttributeAmount
+        {
+            get
+            {
+                if (itemType == LegacyItemType.AttributeIncrease)
+                    return attributeAmount.amount;
                 return 0;
             }
         }

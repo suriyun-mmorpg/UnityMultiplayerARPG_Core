@@ -26,6 +26,7 @@ namespace MultiplayerARPG
         public IItemWithMonsterCharacterEntity ItemWithMonsterEntity { get { return CharacterItem != null && CharacterItem.NotEmptySlot() ? CharacterItem.GetItem() as IItemWithMonsterCharacterEntity : null; } }
         public IItemWithVehicleEntity ItemWithVehicleEntity { get { return CharacterItem != null && CharacterItem.NotEmptySlot() ? CharacterItem.GetItem() as IItemWithVehicleEntity : null; } }
         public IItemWithSkillData ItemWithSkillData { get { return CharacterItem != null && CharacterItem.NotEmptySlot() ? CharacterItem.GetItem() as IItemWithSkillData : null; } }
+        public IItemWithAttributeData ItemWithAttributeData { get { return CharacterItem != null && CharacterItem.NotEmptySlot() ? CharacterItem.GetItem() as IItemWithAttributeData : null; } }
 
         [Header("String Formats")]
         [Tooltip("Format => {0} = {Title}")]
@@ -60,6 +61,8 @@ namespace MultiplayerARPG
         public UILocaleKeySetting formatKeyMount = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_ITEM_MOUNT);
         [Tooltip("Format => {0} = {Skill Title}")]
         public UILocaleKeySetting formatKeySkill = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_ITEM_SKILL);
+        [Tooltip("Format => {0} = {Attribute Title}")]
+        public UILocaleKeySetting formatKeyAttribute = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_ITEM_ATTRIBUTE);
         [Tooltip("Format => {0} = {Cooldown Duration}")]
         public UILocaleKeySetting formatKeyCoolDownDuration = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_SKILL_COOLDOWN_DURATION);
         [Tooltip("Format => {0} = {Cooldown Remains Duration}")]
@@ -153,6 +156,10 @@ namespace MultiplayerARPG
         [Header("Item with Skill - UI Elements")]
         public TextWrapper uiTextSkill;
         public UICharacterSkill uiSkill;
+
+        [Header("Item with Attribute - UI Elements")]
+        public TextWrapper uiTextAttribute;
+        public UICharacterAttribute uiAttribute;
 
         [Header("Cooldown")]
         public TextWrapper uiTextCoolDownDuration;
@@ -1252,6 +1259,35 @@ namespace MultiplayerARPG
                         LanguageManager.GetText(formatKeySkill),
                         ItemWithSkillData.SkillData.Title,
                         ItemWithSkillData.SkillLevel);
+                }
+            }
+
+            if (uiAttribute != null)
+            {
+                if (ItemWithAttributeData == null || ItemWithAttributeData.AttributeData == null)
+                {
+                    uiAttribute.Hide();
+                }
+                else
+                {
+                    uiAttribute.Setup(new UICharacterAttributeData(ItemWithAttributeData.AttributeData, ItemWithAttributeData.AttributeAmount), Character, -1);
+                    uiAttribute.Show();
+                }
+            }
+
+            if (uiTextAttribute != null)
+            {
+                if (ItemWithAttributeData == null || ItemWithAttributeData.AttributeData == null)
+                {
+                    uiTextAttribute.SetGameObjectActive(false);
+                }
+                else
+                {
+                    uiTextAttribute.SetGameObjectActive(true);
+                    uiTextAttribute.text = ZString.Format(
+                        LanguageManager.GetText(formatKeyAttribute),
+                        ItemWithAttributeData.AttributeData.Title,
+                        ItemWithAttributeData.AttributeAmount);
                 }
             }
 
