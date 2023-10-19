@@ -1,10 +1,6 @@
 ﻿namespace MultiplayerARPG
 {
-    public partial interface IMountItem : IUsableItem
+    public partial interface IMountItem : IUsableItem, IItemWithVehicleEntity
     {
-        /// <summary>
-        /// Which vehicle entity which will be rided when use this item
-        /// </summary>
-        VehicleEntity MountEntity { get; }
     }
 }

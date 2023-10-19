@@ -18,14 +18,14 @@ namespace MultiplayerARPG
         [Category(3, "Skill Settings")]
         [SerializeField]
         private BaseSkill usingSkill = null;
-        public BaseSkill UsingSkill
+        public BaseSkill SkillData
         {
             get { return usingSkill; }
         }
 
         [SerializeField]
         private int usingSkillLevel = 0;
-        public int UsingSkillLevel
+        public int SkillLevel
         {
             get { return usingSkillLevel; }
         }
@@ -44,28 +44,28 @@ namespace MultiplayerARPG
 
         public bool HasCustomAimControls()
         {
-            return UsingSkill.HasCustomAimControls();
+            return SkillData.HasCustomAimControls();
         }
 
         public AimPosition UpdateAimControls(Vector2 aimAxes, params object[] data)
         {
-            return UsingSkill.UpdateAimControls(aimAxes, UsingSkillLevel);
+            return SkillData.UpdateAimControls(aimAxes, SkillLevel);
         }
 
         public void FinishAimControls(bool isCancel)
         {
-            UsingSkill.FinishAimControls(isCancel);
+            SkillData.FinishAimControls(isCancel);
         }
 
         public bool IsChanneledAbility()
         {
-            return UsingSkill.IsChanneledAbility();
+            return SkillData.IsChanneledAbility();
         }
 
         public override void PrepareRelatesData()
         {
             base.PrepareRelatesData();
-            GameInstance.AddSkills(UsingSkill);
+            GameInstance.AddSkills(SkillData);
         }
     }
 }

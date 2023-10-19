@@ -567,34 +567,64 @@ namespace MultiplayerARPG
         #endregion
 
         #region Implement IPotionItem, IBuildingItem, IPetItem, IMountItem, ISkillItem
-        public Buff Buff
+        public Buff? BuffData
         {
-            get { return buff; }
+            get
+            {
+                if (itemType == LegacyItemType.Potion)
+                    return buff;
+                return null;
+            }
         }
 
         public BuildingEntity BuildingEntity
         {
-            get { return buildingEntity; }
+            get
+            {
+                if (itemType == LegacyItemType.Building)
+                    return buildingEntity;
+                return null;
+            }
         }
 
-        public BaseMonsterCharacterEntity PetEntity
+        public BaseMonsterCharacterEntity MonsterCharacterEntity
         {
-            get { return petEntity; }
+            get
+            {
+                if (itemType == LegacyItemType.Pet)
+                    return petEntity;
+                return null;
+            }
         }
 
-        public VehicleEntity MountEntity
+        public VehicleEntity VehicleEntity
         {
-            get { return mountEntity; }
+            get
+            {
+                if (itemType == LegacyItemType.Mount)
+                    return mountEntity;
+                return null;
+            }
         }
 
-        public BaseSkill UsingSkill
+        public BaseSkill SkillData
         {
-            get { return skillLevel.skill; }
+            get
+            {
+                if (itemType == LegacyItemType.Skill || itemType == LegacyItemType.SkillLearn)
+                    return skillLevel.skill;
+                return null;
+            }
         }
 
-        public int UsingSkillLevel
+        public int SkillLevel
         {
-            get { return skillLevel.level; }
+            get
+            {
+                if (itemType == LegacyItemType.Skill || itemType == LegacyItemType.SkillLearn)
+                    return skillLevel.level;
+                return 0;
+            }
         }
         #endregion
 
@@ -791,7 +821,7 @@ namespace MultiplayerARPG
             if (!character.CanUseItem() || level <= 0)
                 return;
 
-            character.Mount(MountEntity);
+            character.Mount(VehicleEntity);
         }
 
         protected void UseItemAttributeIncrease(BasePlayerCharacterEntity character, int itemIndex)
@@ -814,11 +844,11 @@ namespace MultiplayerARPG
 
         protected void UseItemSkillLearn(BasePlayerCharacterEntity character, int itemIndex)
         {
-            if (!character.CanUseItem() || UsingSkill == null)
+            if (!character.CanUseItem() || SkillData == null)
                 return;
 
             UITextKeys gameMessage;
-            if (!character.AddSkill(out gameMessage, UsingSkill.DataId, UsingSkillLevel, itemIndex))
+            if (!character.AddSkill(out gameMessage, SkillData.DataId, SkillLevel, itemIndex))
                 GameInstance.ServerGameMessageHandlers.SendGameMessage(character.ConnectionId, gameMessage);
         }
 
@@ -861,7 +891,7 @@ namespace MultiplayerARPG
                 case LegacyItemType.Mount:
                     return default;
                 case LegacyItemType.Skill:
-                    return UsingSkill.UpdateAimControls(aimAxes, UsingSkillLevel);
+                    return SkillData.UpdateAimControls(aimAxes, SkillLevel);
             }
             return default;
         }

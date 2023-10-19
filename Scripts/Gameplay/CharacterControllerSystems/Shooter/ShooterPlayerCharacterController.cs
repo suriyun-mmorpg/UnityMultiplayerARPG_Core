@@ -1541,7 +1541,7 @@ namespace MultiplayerARPG
             }
             else if (item.IsSkill())
             {
-                SetQueueUsingSkill(aimPosition, (item as ISkillItem).UsingSkill, (item as ISkillItem).UsingSkillLevel, itemIndex);
+                SetQueueUsingSkill(aimPosition, (item as ISkillItem).SkillData, (item as ISkillItem).SkillLevel, itemIndex);
             }
             else if (item.IsBuilding())
             {

@@ -537,7 +537,7 @@ namespace MultiplayerARPG
             }
             if (!GameInstance.Items.TryGetValue(itemDataId, out BaseItem item) || !(item is ISkillItem skillItem))
                 return;
-            ProceedUseSkillItem(peerTimestamp, skillItem, skillItem.UsingSkill, skillItem.UsingSkillLevel, isLeftHand, targetObjectId, aimPosition);
+            ProceedUseSkillItem(peerTimestamp, skillItem, skillItem.SkillData, skillItem.SkillLevel, isLeftHand, targetObjectId, aimPosition);
         }
 
         protected void ProceedUseSkillItem(long peerTimestamp, ISkillItem skillItem, BaseSkill skill, int skillLevel, bool isLeftHand, uint targetObjectId, AimPosition aimPosition)

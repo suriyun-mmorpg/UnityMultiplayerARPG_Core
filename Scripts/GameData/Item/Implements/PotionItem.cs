@@ -18,7 +18,7 @@ namespace MultiplayerARPG
         [Category(3, "Potion Settings")]
         [SerializeField]
         private Buff buff = Buff.Empty;
-        public Buff Buff
+        public Buff? BuffData
         {
             get { return buff; }
         }
@@ -68,7 +68,7 @@ namespace MultiplayerARPG
         public override void PrepareRelatesData()
         {
             base.PrepareRelatesData();
-            Buff.PrepareRelatesData();
+            BuffData.Value.PrepareRelatesData();
         }
     }
 }

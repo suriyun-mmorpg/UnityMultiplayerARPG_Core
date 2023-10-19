@@ -1140,13 +1140,13 @@ namespace MultiplayerARPG
             }
 
             skillItem = usableItem as ISkillItem;
-            if (skillItem == null || skillItem.UsingSkill == null ||
-                !skillItem.UsingSkill.CanUse(character, skillItem.UsingSkillLevel, isLeftHand, targetObjectId, out gameMessage, true))
+            if (skillItem == null || skillItem.SkillData == null ||
+                !skillItem.SkillData.CanUse(character, skillItem.SkillLevel, isLeftHand, targetObjectId, out gameMessage, true))
             {
                 return false;
             }
-            skill = skillItem.UsingSkill;
-            skillLevel = skillItem.UsingSkillLevel;
+            skill = skillItem.SkillData;
+            skillLevel = skillItem.SkillLevel;
 
             return true;
         }

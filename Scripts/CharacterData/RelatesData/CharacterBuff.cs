@@ -132,7 +132,7 @@ namespace MultiplayerARPG
                         break;
                     case BuffType.PotionBuff:
                         if (_cacheItem != null && _cacheItem.IsPotion())
-                            tempBuff = (_cacheItem as IPotionItem).Buff;
+                            tempBuff = (_cacheItem as IPotionItem).BuffData.Value;
                         break;
                     case BuffType.GuildSkillBuff:
                         if (_cacheGuildSkill != null)

@@ -18,7 +18,7 @@ namespace MultiplayerARPG
         [Category(3, "Mount Settings")]
         [SerializeField]
         private VehicleEntity mountEntity = null;
-        public VehicleEntity MountEntity
+        public VehicleEntity VehicleEntity
         {
             get { return mountEntity; }
         }
@@ -35,7 +35,7 @@ namespace MultiplayerARPG
             if (!characterEntity.CanUseItem() || characterItem.level <= 0)
                 return;
 
-            characterEntity.Mount(MountEntity);
+            characterEntity.Mount(VehicleEntity);
         }
 
         public bool HasCustomAimControls()
@@ -61,7 +61,7 @@ namespace MultiplayerARPG
         public override void PrepareRelatesData()
         {
             base.PrepareRelatesData();
-            GameInstance.AddVehicleEntities(MountEntity);
+            GameInstance.AddVehicleEntities(VehicleEntity);
         }
     }
 }

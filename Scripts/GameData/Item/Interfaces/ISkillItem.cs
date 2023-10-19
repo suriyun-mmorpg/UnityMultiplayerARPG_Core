@@ -1,14 +1,6 @@
 ﻿namespace MultiplayerARPG
 {
-    public partial interface ISkillItem : IUsableItem
+    public partial interface ISkillItem : IUsableItem, IItemWithSkillData
     {
-        /// <summary>
-        /// Skill which will be activated when use this item
-        /// </summary>
-        BaseSkill UsingSkill { get; }
-        /// <summary>
-        /// Activating skill's level
-        /// </summary>
-        int UsingSkillLevel { get; }
     }
 }

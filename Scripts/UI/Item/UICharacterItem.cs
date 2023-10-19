@@ -1,9 +1,9 @@
-﻿using System.Collections.Generic;
-using Cysharp.Text;
+﻿using Cysharp.Text;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
-using UnityEngine.UI;
 using UnityEngine.Serialization;
+using UnityEngine.UI;
 
 namespace MultiplayerARPG
 {
@@ -19,13 +19,13 @@ namespace MultiplayerARPG
         public IShieldItem ShieldItem { get { return CharacterItem != null && CharacterItem.NotEmptySlot() ? CharacterItem.GetShieldItem() : null; } }
         public IDefendEquipmentItem DefendItem { get { return CharacterItem != null && CharacterItem.NotEmptySlot() ? CharacterItem.GetDefendItem() : null; } }
         public IWeaponItem WeaponItem { get { return CharacterItem != null && CharacterItem.NotEmptySlot() ? CharacterItem.GetWeaponItem() : null; } }
-        public IPotionItem PotionItem { get { return CharacterItem != null && CharacterItem.NotEmptySlot() ? CharacterItem.GetPotionItem() : null; } }
         public IAmmoItem AmmoItem { get { return CharacterItem != null && CharacterItem.NotEmptySlot() ? CharacterItem.GetAmmoItem() : null; } }
-        public IBuildingItem BuildingItem { get { return CharacterItem != null && CharacterItem.NotEmptySlot() ? CharacterItem.GetBuildingItem() : null; } }
-        public IPetItem PetItem { get { return CharacterItem != null && CharacterItem.NotEmptySlot() ? CharacterItem.GetPetItem() : null; } }
         public ISocketEnhancerItem SocketEnhancerItem { get { return CharacterItem != null && CharacterItem.NotEmptySlot() ? CharacterItem.GetSocketEnhancerItem() : null; } }
-        public IMountItem MountItem { get { return CharacterItem != null && CharacterItem.NotEmptySlot() ? CharacterItem.GetMountItem() : null; } }
-        public ISkillItem SkillItem { get { return CharacterItem != null && CharacterItem.NotEmptySlot() ? CharacterItem.GetSkillItem() : null; } }
+        public IItemWithBuffData ItemWithBuffData { get { return CharacterItem != null && CharacterItem.NotEmptySlot() ? CharacterItem.GetItem() as IItemWithBuffData : null; } }
+        public IItemWithBuildingEntity ItemWithBuildingEntity { get { return CharacterItem != null && CharacterItem.NotEmptySlot() ? CharacterItem.GetItem() as IItemWithBuildingEntity : null; } }
+        public IItemWithMonsterCharacterEntity ItemWithMonsterEntity { get { return CharacterItem != null && CharacterItem.NotEmptySlot() ? CharacterItem.GetItem() as IItemWithMonsterCharacterEntity : null; } }
+        public IItemWithVehicleEntity ItemWithVehicleEntity { get { return CharacterItem != null && CharacterItem.NotEmptySlot() ? CharacterItem.GetItem() as IItemWithVehicleEntity : null; } }
+        public IItemWithSkillData ItemWithSkillData { get { return CharacterItem != null && CharacterItem.NotEmptySlot() ? CharacterItem.GetItem() as IItemWithSkillData : null; } }
 
         [Header("String Formats")]
         [Tooltip("Format => {0} = {Title}")]
@@ -138,16 +138,19 @@ namespace MultiplayerARPG
         [Header("Building - UI Elements")]
         public TextWrapper uiTextBuilding;
 
-        [Header("Pet - UI Elements")]
-        public TextWrapper uiTextPet;
+        [Header("Item with Monster/Pet - UI Elements")]
+        [FormerlySerializedAs("uiTextPet")]
+        public TextWrapper uiTextMonster;
 
-        [Header("Mount - UI Elements")]
-        public TextWrapper uiTextMount;
+        [Header("Item with Vehicle/Mount - UI Elements")]
+        [FormerlySerializedAs("uiTextMount")]
+        public TextWrapper uiTextVehicle;
 
-        [Header("Potion - UI Elements")]
-        public UIBuff uiPotionBuff;
+        [Header("Item with Buff/Potion Buff - UI Elements")]
+        [FormerlySerializedAs("uiPotionBuff")]
+        public UIBuff uiBuff;
 
-        [Header("Skill - UI Elements")]
+        [Header("Item with Skill - UI Elements")]
         public TextWrapper uiTextSkill;
         public UICharacterSkill uiSkill;
 
@@ -499,7 +502,7 @@ namespace MultiplayerARPG
 
             if (uiTextLevel != null)
             {
-                uiTextLevel.SetGameObjectActive(EquipmentItem != null || PetItem != null);
+                uiTextLevel.SetGameObjectActive(EquipmentItem != null || ItemWithMonsterEntity != null);
                 if (EquipmentItem != null)
                 {
                     if (showLevelAsDefault)
@@ -515,7 +518,7 @@ namespace MultiplayerARPG
                             (Level - 1).ToString("N0"));
                     }
                 }
-                else if (PetItem != null)
+                else if (ItemWithMonsterEntity != null)
                 {
                     uiTextLevel.text = ZString.Format(
                         LanguageManager.GetText(formatKeyLevel),
@@ -1124,7 +1127,7 @@ namespace MultiplayerARPG
                 }
             }
 
-            if (PetItem != null && PetItem.PetEntity != null)
+            if (ItemWithMonsterEntity != null && ItemWithMonsterEntity.MonsterCharacterEntity != null)
             {
                 int[] expTree = GameInstance.Singleton.ExpTree;
                 int currentExp = 0;
@@ -1167,7 +1170,7 @@ namespace MultiplayerARPG
 
             if (uiTextBuilding != null)
             {
-                if (BuildingItem == null || BuildingItem.BuildingEntity == null)
+                if (ItemWithBuildingEntity == null || ItemWithBuildingEntity.BuildingEntity == null)
                 {
                     uiTextBuilding.SetGameObjectActive(false);
                 }
@@ -1176,69 +1179,69 @@ namespace MultiplayerARPG
                     uiTextBuilding.SetGameObjectActive(true);
                     uiTextBuilding.text = ZString.Format(
                         LanguageManager.GetText(formatKeyBuilding),
-                        BuildingItem.BuildingEntity.Title);
+                        ItemWithBuildingEntity.BuildingEntity.Title);
                 }
             }
 
-            if (uiTextPet != null)
+            if (uiTextMonster != null)
             {
-                if (PetItem == null || PetItem.PetEntity == null)
+                if (ItemWithMonsterEntity == null || ItemWithMonsterEntity.MonsterCharacterEntity == null)
                 {
-                    uiTextPet.SetGameObjectActive(false);
+                    uiTextMonster.SetGameObjectActive(false);
                 }
                 else
                 {
-                    uiTextPet.SetGameObjectActive(true);
-                    uiTextPet.text = ZString.Format(
+                    uiTextMonster.SetGameObjectActive(true);
+                    uiTextMonster.text = ZString.Format(
                         LanguageManager.GetText(formatKeyPet),
-                        PetItem.PetEntity.Title);
+                        ItemWithMonsterEntity.MonsterCharacterEntity.Title);
                 }
             }
 
-            if (uiTextMount != null)
+            if (uiTextVehicle != null)
             {
-                if (MountItem == null || MountItem.MountEntity == null)
+                if (ItemWithVehicleEntity == null || ItemWithVehicleEntity.VehicleEntity == null)
                 {
-                    uiTextMount.SetGameObjectActive(false);
+                    uiTextVehicle.SetGameObjectActive(false);
                 }
                 else
                 {
-                    uiTextMount.SetGameObjectActive(true);
-                    uiTextMount.text = ZString.Format(
+                    uiTextVehicle.SetGameObjectActive(true);
+                    uiTextVehicle.text = ZString.Format(
                         LanguageManager.GetText(formatKeyMount),
-                        MountItem.MountEntity.Title);
+                        ItemWithVehicleEntity.VehicleEntity.Title);
                 }
             }
 
-            if (uiPotionBuff != null)
+            if (uiBuff != null)
             {
-                if (PotionItem == null)
+                if (ItemWithBuffData == null || !ItemWithBuffData.BuffData.HasValue)
                 {
-                    uiPotionBuff.Hide();
+                    uiBuff.Hide();
                 }
                 else
                 {
-                    uiPotionBuff.Show();
-                    uiPotionBuff.Data = new UIBuffData(PotionItem.Buff, Level);
+                    uiBuff.Show();
+                    uiBuff.Data = new UIBuffData(ItemWithBuffData.BuffData.Value, Level);
                 }
             }
 
             if (uiSkill != null)
             {
-                if (SkillItem == null || SkillItem.UsingSkill == null)
+                if (ItemWithSkillData == null || ItemWithSkillData.SkillData == null)
                 {
                     uiSkill.Hide();
                 }
                 else
                 {
-                    uiSkill.Setup(new UICharacterSkillData(SkillItem.UsingSkill, SkillItem.UsingSkillLevel), Character, -1);
+                    uiSkill.Setup(new UICharacterSkillData(ItemWithSkillData.SkillData, ItemWithSkillData.SkillLevel), Character, -1);
                     uiSkill.Show();
                 }
             }
 
             if (uiTextSkill != null)
             {
-                if (SkillItem == null || SkillItem.UsingSkill == null)
+                if (ItemWithSkillData == null || ItemWithSkillData.SkillData == null)
                 {
                     uiTextSkill.SetGameObjectActive(false);
                 }
@@ -1247,8 +1250,8 @@ namespace MultiplayerARPG
                     uiTextSkill.SetGameObjectActive(true);
                     uiTextSkill.text = ZString.Format(
                         LanguageManager.GetText(formatKeySkill),
-                        SkillItem.UsingSkill.Title,
-                        SkillItem.UsingSkillLevel);
+                        ItemWithSkillData.SkillData.Title,
+                        ItemWithSkillData.SkillLevel);
                 }
             }
 
