@@ -189,6 +189,7 @@ namespace MultiplayerARPG
         {
             float deltaTime = Time.deltaTime;
             Functions.UpdateRotation(deltaTime);
+            Functions.FixSwimUpPosition(deltaTime);
         }
 
         public bool GroundCheck()

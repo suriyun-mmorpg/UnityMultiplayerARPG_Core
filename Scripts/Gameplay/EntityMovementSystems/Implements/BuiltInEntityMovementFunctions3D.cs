@@ -617,6 +617,19 @@ namespace MultiplayerARPG
             _previouslyExtraMovementState = ExtraMovementState;
         }
 
+        public void FixSwimUpPosition(float deltaTime)
+        {
+            if (!CanPredictMovement())
+                return;
+
+            if (_isUnderWater)
+            {
+                Vector3 tempTargetPosition = Vector3.up * (_waterCollider.bounds.max.y - (EntityMovement.GetBounds().size.y * underWaterThreshold));
+                if (CacheTransform.position.y > tempTargetPosition.y)
+                    CacheTransform.position = new Vector3(CacheTransform.position.x, tempTargetPosition.y, CacheTransform.position.z);
+            }
+        }
+
         private float CalculateCurrentMoveSpeed(float maxMoveSpeed, float deltaTime)
         {
             // Adjust speed by rtt
