@@ -8,7 +8,7 @@ namespace MultiplayerARPG
 
         public BasePlayerCharacterController Controller { get; protected set; }
         public GameInstance CurrentGameInstance { get { return GameInstance.Singleton; } }
-        public Transform EntityTransform { get { return Controller.EntityTransform; } }
+        public Transform EntityTransform { get { return GameInstance.PlayingCharacterEntity.EntityTransform; } }
         public BuildingEntity ConstructingBuildingEntity { get { return Controller.ConstructingBuildingEntity; } }
 
         [Header("Building Settings")]
@@ -25,7 +25,7 @@ namespace MultiplayerARPG
         [SerializeField]
         protected float buildRotateSpeed = 200f;
         [SerializeField]
-        protected float consoleBuildDistanceRate = 0.5f;
+        protected float consoleDistanceRate = 0.75f;
 
         protected IGameplayCameraController _gameplayCameraController;
         protected IPhysicFunctions _physicFunctions;
@@ -131,7 +131,7 @@ namespace MultiplayerARPG
         {
             if (UIBlockController.IsBlockController())
                 return;
-            Vector3 raycastPosition = EntityTransform.position + (EntityTransform.forward * ConstructingBuildingEntity.BuildDistance * consoleBuildDistanceRate);
+            Vector3 raycastPosition = EntityTransform.position + (EntityTransform.forward * ConstructingBuildingEntity.BuildDistance * consoleDistanceRate);
             if (CurrentGameInstance.DimensionType == DimensionType.Dimension3D)
                 raycastPosition += Vector3.up;
             LoopSetBuildingArea(_physicFunctions.RaycastDown(raycastPosition, CurrentGameInstance.GetBuildLayerMask(), 100f, QueryTriggerInteraction.Collide));
