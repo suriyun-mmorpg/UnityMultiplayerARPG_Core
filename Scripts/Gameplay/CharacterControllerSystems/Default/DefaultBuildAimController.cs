@@ -24,6 +24,8 @@ namespace MultiplayerARPG
         protected float buildRotateAngle = 45f;
         [SerializeField]
         protected float buildRotateSpeed = 200f;
+        [SerializeField]
+        protected float consoleBuildDistanceRate = 0.5f;
 
         protected IGameplayCameraController _gameplayCameraController;
         protected IPhysicFunctions _physicFunctions;
@@ -34,9 +36,9 @@ namespace MultiplayerARPG
             Controller = GetComponent<BasePlayerCharacterController>();
             _gameplayCameraController = GetComponent<IGameplayCameraController>();
             if (CurrentGameInstance.DimensionType == DimensionType.Dimension3D)
-                _physicFunctions = new PhysicFunctions(512);
+                _physicFunctions = new PhysicFunctions(128);
             else
-                _physicFunctions = new PhysicFunctions2D(512);
+                _physicFunctions = new PhysicFunctions2D(128);
         }
 
         public virtual void SetData(
@@ -100,8 +102,10 @@ namespace MultiplayerARPG
             }
             ConstructingBuildingEntity.Rotation = buildingAngles;
             // Find position to place building
-            if (InputManager.UseMobileInput())
+            if (GameInstance.UseMobileInput())
                 FindAndSetBuildingAreaByAxes(aimAxes);
+            else if (GameInstance.UseConsoleInput())
+                FindAndSetBuildingAreaByForwardAxes();
             else
                 FindAndSetBuildingAreaByMousePosition();
             return AimPosition.CreatePosition(ConstructingBuildingEntity.Position);
@@ -118,6 +122,16 @@ namespace MultiplayerARPG
             if (UIBlockController.IsBlockController())
                 return;
             Vector3 raycastPosition = EntityTransform.position + (GameplayUtils.GetDirectionByAxes(_gameplayCameraController.CameraTransform, aimAxes.x, aimAxes.y) * ConstructingBuildingEntity.BuildDistance);
+            if (CurrentGameInstance.DimensionType == DimensionType.Dimension3D)
+                raycastPosition += Vector3.up;
+            LoopSetBuildingArea(_physicFunctions.RaycastDown(raycastPosition, CurrentGameInstance.GetBuildLayerMask(), 100f, QueryTriggerInteraction.Collide));
+        }
+
+        public void FindAndSetBuildingAreaByForwardAxes()
+        {
+            if (UIBlockController.IsBlockController())
+                return;
+            Vector3 raycastPosition = EntityTransform.position + (EntityTransform.forward * ConstructingBuildingEntity.BuildDistance * consoleBuildDistanceRate);
             if (CurrentGameInstance.DimensionType == DimensionType.Dimension3D)
                 raycastPosition += Vector3.up;
             LoopSetBuildingArea(_physicFunctions.RaycastDown(raycastPosition, CurrentGameInstance.GetBuildLayerMask(), 100f, QueryTriggerInteraction.Collide));

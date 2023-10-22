@@ -597,7 +597,7 @@ namespace MultiplayerARPG
             bool isBlockController = UISceneGameplay.IsBlockController();
 
             // Lock cursor when not show UIs
-            if (GameInstance.Singleton.IsMobileTestInEditor() || Application.isMobilePlatform)
+            if (GameInstance.IsMobileTestInEditor() || Application.isMobilePlatform)
             {
                 // Control camera by touch-screen
                 Cursor.lockState = CursorLockMode.None;
@@ -986,7 +986,7 @@ namespace MultiplayerARPG
             PlayingCharacterEntity.Pitch = pitch;
 
             // If mobile platforms, don't receive input raw to make it smooth
-            bool raw = !GameInstance.Singleton.IsMobileTestInEditor() && !Application.isMobilePlatform && !GameInstance.Singleton.IsConsoleTestInEditor() && !Application.isConsolePlatform;
+            bool raw = !GameInstance.IsMobileTestInEditor() && !Application.isMobilePlatform && !GameInstance.IsConsoleTestInEditor() && !Application.isConsolePlatform;
             _moveDirection = Vector3.zero;
             _inputV = InputManager.GetAxis("Vertical", raw);
             _inputH = InputManager.GetAxis("Horizontal", raw);

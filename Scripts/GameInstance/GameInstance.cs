@@ -763,14 +763,24 @@ namespace MultiplayerARPG
             GameEntityModel.GeneratingId = 0;
         }
 
-        public bool IsMobileTestInEditor()
+        public static bool UseMobileInput()
         {
-            return (testInEditorMode == TestInEditorMode.Mobile || testInEditorMode == TestInEditorMode.MobileWithKeyInputs) && Application.isEditor;
+            return Application.isMobilePlatform || IsMobileTestInEditor();
         }
 
-        public bool IsConsoleTestInEditor()
+        public static bool UseConsoleInput()
         {
-            return testInEditorMode == TestInEditorMode.Console && Application.isEditor;
+            return Application.isConsolePlatform || IsConsoleTestInEditor();
+        }
+
+        public static bool IsMobileTestInEditor()
+        {
+            return (Singleton.testInEditorMode == TestInEditorMode.Mobile || Singleton.testInEditorMode == TestInEditorMode.MobileWithKeyInputs) && Application.isEditor;
+        }
+
+        public static bool IsConsoleTestInEditor()
+        {
+            return Singleton.testInEditorMode == TestInEditorMode.Console && Application.isEditor;
         }
 
         public void LoadedGameData()

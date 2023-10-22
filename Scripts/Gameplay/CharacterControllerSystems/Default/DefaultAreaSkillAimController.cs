@@ -7,7 +7,6 @@ namespace MultiplayerARPG
         public const float GROUND_DETECTION_DISTANCE = 30f;
         private readonly RaycastHit[] findGroundRaycastHits = new RaycastHit[32];
         public bool IsAiming { get { return Time.frameCount - _lastUpdateFrame <= 1; } }
-        public bool IsMobile { get { return InputManager.UseMobileInput(); } }
 
         private int _lastUpdateFrame;
         private bool _beginDragged;
@@ -24,7 +23,7 @@ namespace MultiplayerARPG
                 _targetObject = Instantiate(skill.targetObjectPrefab);
                 _targetObject.SetActive(true);
             }
-            if (IsMobile)
+            if (GameInstance.UseMobileInput() || GameInstance.UseConsoleInput())
                 return UpdateAimControls_Mobile(aimAxes, skill, skillLevel);
             return UpdateAimControls_PC(InputManager.MousePosition(), skill, skillLevel);
         }

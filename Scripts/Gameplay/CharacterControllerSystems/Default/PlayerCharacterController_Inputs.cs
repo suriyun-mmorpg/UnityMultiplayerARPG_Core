@@ -35,12 +35,12 @@ namespace MultiplayerARPG
             bool isFocusInputField = GenericUtils.IsFocusInputField();
             bool isPointerOverUIObject = UISceneGameplay.IsPointerOverUIObject();
             bool isBlockController = UISceneGameplay.IsBlockController();
-            if (Application.isMobilePlatform || GameInstance.Singleton.IsMobileTestInEditor())
+            if (Application.isMobilePlatform || GameInstance.IsMobileTestInEditor())
             {
                 if (uiNotBlockForMobile)
                     isBlockController = false;
             }
-            else if (Application.isConsolePlatform || GameInstance.Singleton.IsConsoleTestInEditor())
+            else if (Application.isConsolePlatform || GameInstance.IsConsoleTestInEditor())
             {
                 if (uiNotBlockForConsole)
                     isBlockController = false;
@@ -401,7 +401,7 @@ namespace MultiplayerARPG
                 return;
 
             // If mobile platforms, don't receive input raw to make it smooth
-            bool raw = !GameInstance.Singleton.IsMobileTestInEditor() && !Application.isMobilePlatform && !GameInstance.Singleton.IsConsoleTestInEditor() && !Application.isConsolePlatform;
+            bool raw = !GameInstance.IsMobileTestInEditor() && !Application.isMobilePlatform && !GameInstance.IsConsoleTestInEditor() && !Application.isConsolePlatform;
             Vector3 moveDirection = GetMoveDirection(InputManager.GetAxis("Horizontal", raw), InputManager.GetAxis("Vertical", raw));
             moveDirection.Normalize();
 
