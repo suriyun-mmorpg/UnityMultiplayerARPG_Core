@@ -7,7 +7,7 @@ namespace MultiplayerARPG
         public const float GROUND_DETECTION_DISTANCE = 30f;
         private readonly RaycastHit[] findGroundRaycastHits = new RaycastHit[32];
         public bool IsAiming { get { return Time.frameCount - _lastUpdateFrame <= 1; } }
-        public Transform EntityTransform { get { return EntityTransform; } }
+        public Transform EntityTransform { get { return GameInstance.PlayingCharacterEntity.EntityTransform; } }
 
         [SerializeField]
         protected float consoleDistanceRate = 0.75f;
