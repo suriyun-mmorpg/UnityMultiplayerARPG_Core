@@ -546,7 +546,12 @@ namespace MultiplayerARPG
                     if (tempPredictSqrMagnitude >= tempSqrMagnitude && tempTargetDistance > 0f)
                         CurrentMoveSpeed *= tempTargetDistance / deltaTime / CurrentMoveSpeed;
                     if (CurrentMoveSpeed < 0.01f || tempTargetDistance <= 0f)
+                    {
                         CurrentMoveSpeed = 0f;
+                        // Force set move direction y to 0 to prevent swim move animation playing
+                        if (autoSwimToSurface)
+                            _moveDirection.y = 0f;
+                    }
                     tempMoveVelocity.y = _moveDirection.y * CurrentMoveSpeed;
                     if (!HasNavPaths)
                         _currentInput = Entity.SetInputYPosition(_currentInput, tempPredictPosition.y);
