@@ -688,7 +688,7 @@ namespace MultiplayerARPG
                     Item == null ? 0f.ToString("N2") : Item.Weight.ToString("N2"));
             }
 
-            if (uiRequirementEquipment != null)
+            if (uiRequirement != null)
             {
                 if (EquipmentItem == null ||
                     (EquipmentItem.Requirement.level <= 0 &&
@@ -696,12 +696,12 @@ namespace MultiplayerARPG
                     !EquipmentItem.Requirement.HasAvailableFactions() &&
                     EquipmentItem.RequireAttributeAmounts.Count == 0))
                 {
-                    uiRequirementEquipment.Hide();
+                    uiRequirement.Hide();
                 }
                 else
                 {
-                    uiRequirementEquipment.Show();
-                    uiRequirementEquipment.Data = EquipmentItem;
+                    uiRequirement.Show();
+                    uiRequirement.Data = EquipmentItem;
                 }
             }
 
