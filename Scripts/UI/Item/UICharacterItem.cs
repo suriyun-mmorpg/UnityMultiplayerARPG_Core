@@ -98,6 +98,7 @@ namespace MultiplayerARPG
 
         [Header("Equipment - UI Elements")]
         public UIEquipmentItemRequirement uiRequirement;
+        public UIUsableItemRequirement uiRequirementUsable;
         [FormerlySerializedAs("uiStats")]
         public UICharacterStats uiIncreaseStats;
         public UICharacterStats uiIncreaseStatsRate;
@@ -687,7 +688,7 @@ namespace MultiplayerARPG
                     Item == null ? 0f.ToString("N2") : Item.Weight.ToString("N2"));
             }
 
-            if (uiRequirement != null)
+            if (uiRequirementEquipment != null)
             {
                 if (EquipmentItem == null ||
                     (EquipmentItem.Requirement.level <= 0 &&
@@ -695,12 +696,29 @@ namespace MultiplayerARPG
                     !EquipmentItem.Requirement.HasAvailableFactions() &&
                     EquipmentItem.RequireAttributeAmounts.Count == 0))
                 {
-                    uiRequirement.Hide();
+                    uiRequirementEquipment.Hide();
                 }
                 else
                 {
-                    uiRequirement.Show();
-                    uiRequirement.Data = EquipmentItem;
+                    uiRequirementEquipment.Show();
+                    uiRequirementEquipment.Data = EquipmentItem;
+                }
+            }
+
+            if (uiRequirementUsable != null)
+            {
+                if (UsableItem == null ||
+                    (UsableItem.Requirement.level <= 0 &&
+                    !UsableItem.Requirement.HasAvailableClasses() &&
+                    !UsableItem.Requirement.HasAvailableFactions() &&
+                    UsableItem.RequireAttributeAmounts.Count == 0))
+                {
+                    uiRequirementUsable.Hide();
+                }
+                else
+                {
+                    uiRequirementUsable.Show();
+                    uiRequirementUsable.Data = UsableItem;
                 }
             }
 

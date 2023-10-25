@@ -15,6 +15,26 @@ namespace MultiplayerARPG
             get { return ItemType.Skill; }
         }
 
+        [Category(2, "Requirements")]
+        [SerializeField]
+        private EquipmentRequirement requirement = default;
+        public EquipmentRequirement Requirement
+        {
+            get { return requirement; }
+        }
+
+        [System.NonSerialized]
+        private Dictionary<Attribute, float> _cacheRequireAttributeAmounts = null;
+        public Dictionary<Attribute, float> RequireAttributeAmounts
+        {
+            get
+            {
+                if (_cacheRequireAttributeAmounts == null)
+                    _cacheRequireAttributeAmounts = GameDataHelpers.CombineAttributes(requirement.attributeAmounts, new Dictionary<Attribute, float>(), 1f);
+                return _cacheRequireAttributeAmounts;
+            }
+        }
+
         [Category(3, "Skill Settings")]
         [SerializeField]
         private BaseSkill usingSkill = null;

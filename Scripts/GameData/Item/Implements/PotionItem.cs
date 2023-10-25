@@ -15,6 +15,26 @@ namespace MultiplayerARPG
             get { return ItemType.Potion; }
         }
 
+        [Category(2, "Requirements")]
+        [SerializeField]
+        private EquipmentRequirement requirement = default;
+        public EquipmentRequirement Requirement
+        {
+            get { return requirement; }
+        }
+
+        [System.NonSerialized]
+        private Dictionary<Attribute, float> _cacheRequireAttributeAmounts = null;
+        public Dictionary<Attribute, float> RequireAttributeAmounts
+        {
+            get
+            {
+                if (_cacheRequireAttributeAmounts == null)
+                    _cacheRequireAttributeAmounts = GameDataHelpers.CombineAttributes(requirement.attributeAmounts, new Dictionary<Attribute, float>(), 1f);
+                return _cacheRequireAttributeAmounts;
+            }
+        }
+
         [Category(3, "Potion Settings")]
         [SerializeField]
         private Buff buff = Buff.Empty;
@@ -39,6 +59,25 @@ namespace MultiplayerARPG
 
         public void UseItem(BaseCharacterEntity characterEntity, int itemIndex, CharacterItem characterItem)
         {
+            UITextKeys gameMessage;
+            if (characterEntity.Level < Requirement.level)
+            {
+                gameMessage = UITextKeys.UI_ERROR_NOT_ENOUGH_LEVEL;
+                GameInstance.ServerGameMessageHandlers.SendGameMessage(characterEntity.ConnectionId, gameMessage);
+                return;
+            }
+            if (!Requirement.ClassIsAvailable(characterEntity.DataId))
+            {
+                gameMessage = UITextKeys.UI_ERROR_NOT_MATCH_CHARACTER_CLASS;
+                GameInstance.ServerGameMessageHandlers.SendGameMessage(characterEntity.ConnectionId, gameMessage);
+                return;
+            }
+            if (!characterEntity.HasEnoughAttributeAmounts(RequireAttributeAmounts, true, out gameMessage, out _))
+            {
+                gameMessage = UITextKeys.UI_ERROR_NOT_ENOUGH_ATTRIBUTE_AMOUNTS;
+                GameInstance.ServerGameMessageHandlers.SendGameMessage(characterEntity.ConnectionId, gameMessage);
+                return;
+            }
             if (!characterEntity.CanUseItem() || characterItem.level <= 0 || !characterEntity.DecreaseItemsByIndex(itemIndex, 1, false))
                 return;
             characterEntity.FillEmptySlots();
