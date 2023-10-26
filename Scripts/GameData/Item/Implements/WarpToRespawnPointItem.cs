@@ -63,25 +63,6 @@ namespace MultiplayerARPG
 
         public void UseItem(BaseCharacterEntity characterEntity, int itemIndex, CharacterItem characterItem)
         {
-            UITextKeys gameMessage;
-            if (characterEntity.Level < Requirement.level)
-            {
-                gameMessage = UITextKeys.UI_ERROR_NOT_ENOUGH_LEVEL;
-                GameInstance.ServerGameMessageHandlers.SendGameMessage(characterEntity.ConnectionId, gameMessage);
-                return;
-            }
-            if (!Requirement.ClassIsAvailable(characterEntity.DataId))
-            {
-                gameMessage = UITextKeys.UI_ERROR_NOT_MATCH_CHARACTER_CLASS;
-                GameInstance.ServerGameMessageHandlers.SendGameMessage(characterEntity.ConnectionId, gameMessage);
-                return;
-            }
-            if (!characterEntity.HasEnoughAttributeAmounts(RequireAttributeAmounts, true, out gameMessage, out _))
-            {
-                gameMessage = UITextKeys.UI_ERROR_NOT_ENOUGH_ATTRIBUTE_AMOUNTS;
-                GameInstance.ServerGameMessageHandlers.SendGameMessage(characterEntity.ConnectionId, gameMessage);
-                return;
-            }
             BasePlayerCharacterEntity playerCharacterEntity = characterEntity as BasePlayerCharacterEntity;
             if (playerCharacterEntity == null || !characterEntity.CanUseItem() || characterItem.level <= 0 || !characterEntity.DecreaseItemsByIndex(itemIndex, 1, false))
                 return;
