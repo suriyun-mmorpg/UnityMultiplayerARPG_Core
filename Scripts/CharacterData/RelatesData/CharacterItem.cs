@@ -249,7 +249,7 @@ namespace MultiplayerARPG
         {
             IWeaponItem item = GetWeaponItem();
             if (item != null)
-                return character.CountAmmos(item.WeaponType.RequireAmmoType) > 0;
+                return character.CountAmmos(item.WeaponType.AmmoType) > 0;
             return false;
         }
 

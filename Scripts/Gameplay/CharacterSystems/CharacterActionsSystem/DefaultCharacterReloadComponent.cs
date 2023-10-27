@@ -171,15 +171,43 @@ namespace MultiplayerARPG
                     // Reload / Fill ammo
                     int triggerReloadAmmoAmount = ReloadingAmmoAmount / _triggerDurations.Length;
                     EquipWeapons equipWeapons = Entity.EquipWeapons;
-                    if (IsServer && Entity.DecreaseAmmos(weaponItem.WeaponType.RequireAmmoType, triggerReloadAmmoAmount, out _))
+                    bool hasAmmoType = weaponItem.WeaponType.AmmoType != null;
+                    bool hasAmmoItems = weaponItem.AmmoItems != null && weaponItem.AmmoItems.Length > 0;
+                    if (IsServer)
                     {
-                        Entity.FillEmptySlots();
-                        weapon.ammo += triggerReloadAmmoAmount;
-                        if (isLeftHand)
-                            equipWeapons.leftHand = weapon;
-                        else
-                            equipWeapons.rightHand = weapon;
-                        Entity.EquipWeapons = equipWeapons;
+                        if (hasAmmoType)
+                        {
+                            if (Entity.DecreaseAmmos(weaponItem.WeaponType.AmmoType, triggerReloadAmmoAmount, out _))
+                            {
+                                Entity.FillEmptySlots();
+                                weapon.ammo += triggerReloadAmmoAmount;
+                                if (isLeftHand)
+                                    equipWeapons.leftHand = weapon;
+                                else
+                                    equipWeapons.rightHand = weapon;
+                                Entity.EquipWeapons = equipWeapons;
+                            }
+                        }
+                        else if (hasAmmoItems)
+                        {
+                            for (int indexOfAmmoItem = 0; indexOfAmmoItem < weaponItem.AmmoItems.Length; ++indexOfAmmoItem)
+                            {
+                                int countCurrentReloadAmmo = Entity.CountNonEquipItems(weaponItem.AmmoItems[indexOfAmmoItem].DataId);
+                                if (countCurrentReloadAmmo >= triggerReloadAmmoAmount)
+                                    countCurrentReloadAmmo = triggerReloadAmmoAmount;
+                                if (Entity.DecreaseItems(weaponItem.AmmoItems[indexOfAmmoItem].DataId, countCurrentReloadAmmo))
+                                {
+                                    Entity.FillEmptySlots();
+                                    weapon.ammo += countCurrentReloadAmmo;
+                                    if (isLeftHand)
+                                        equipWeapons.leftHand = weapon;
+                                    else
+                                        equipWeapons.rightHand = weapon;
+                                    Entity.EquipWeapons = equipWeapons;
+                                    break;
+                                }
+                            }
+                        }
                     }
 
                     if (remainsDuration <= 0f)
@@ -256,19 +284,38 @@ namespace MultiplayerARPG
             if (reloadingWeapon.IsEmptySlot())
                 return;
             IWeaponItem reloadingWeaponItem = reloadingWeapon.GetWeaponItem();
-            if (reloadingWeaponItem == null ||
-                reloadingWeaponItem.WeaponType == null ||
-                reloadingWeaponItem.WeaponType.RequireAmmoType == null ||
-                reloadingWeaponItem.AmmoCapacity <= 0 ||
-                reloadingWeapon.ammo >= reloadingWeaponItem.AmmoCapacity)
+            if (reloadingWeaponItem == null || reloadingWeaponItem.AmmoCapacity <= 0 || reloadingWeapon.ammo >= reloadingWeaponItem.AmmoCapacity)
+                return;
+            bool hasAmmoType = reloadingWeaponItem.WeaponType.AmmoType != null;
+            bool hasAmmoItems = reloadingWeaponItem.AmmoItems != null && reloadingWeaponItem.AmmoItems.Length > 0;
+            if (!hasAmmoType && !hasAmmoItems)
                 return;
             // Prepare reload data
             int reloadingAmmoAmount = reloadingWeaponItem.AmmoCapacity - reloadingWeapon.ammo;
-            int inventoryAmount = Entity.CountAmmos(reloadingWeaponItem.WeaponType.RequireAmmoType);
+            int inventoryAmount = 0;
+            if (hasAmmoType)
+            {
+                inventoryAmount = Entity.CountAmmos(reloadingWeaponItem.WeaponType.AmmoType);
+            }
+            else if (hasAmmoItems)
+            {
+                for (int indexOfAmmoItem = 0; indexOfAmmoItem < reloadingWeaponItem.AmmoItems.Length; ++indexOfAmmoItem)
+                {
+                    inventoryAmount += Entity.CountNonEquipItems(reloadingWeaponItem.AmmoItems[indexOfAmmoItem].DataId);
+                    if (inventoryAmount >= reloadingAmmoAmount)
+                    {
+                        inventoryAmount = reloadingAmmoAmount;
+                        break;
+                    }
+                }
+            }
+
             if (inventoryAmount < reloadingAmmoAmount)
                 reloadingAmmoAmount = inventoryAmount;
+
             if (reloadingAmmoAmount <= 0)
                 return;
+
             _manager.ActionAccepted();
             ReloadRoutine(isLeftHand, reloadingAmmoAmount).Forget();
             RPC(RpcReload, isLeftHand, reloadingAmmoAmount);

@@ -127,6 +127,13 @@ namespace MultiplayerARPG
         }
 
         [SerializeField]
+        private BaseItem[] ammoItems;
+        public BaseItem[] AmmoItems
+        {
+            get { return ammoItems; }
+        }
+
+        [SerializeField]
         private int ammoCapacity = 0;
         public int AmmoCapacity
         {

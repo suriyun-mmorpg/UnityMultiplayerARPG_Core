@@ -827,21 +827,30 @@ namespace MultiplayerARPG
                 return validIfNoRequireAmmoType;
 
             IWeaponItem weaponItem = weapon.GetWeaponItem();
-            if (weaponItem.WeaponType.RequireAmmoType != null)
+            bool hasAmmoType = weaponItem.WeaponType.AmmoType != null;
+            bool hasAmmoItems = weaponItem.AmmoItems != null && weaponItem.AmmoItems.Length > 0;
+            if (weaponItem.AmmoCapacity > 0 && (hasAmmoType || hasAmmoItems))
             {
-                if (weaponItem.AmmoCapacity <= 0)
+                // Ammo capacity more than 0 reduce loaded ammo
+                if (weapon.ammo < amount)
+                    return false;
+            }
+            else if (weaponItem.AmmoCapacity <= 0 && hasAmmoType)
+            {
+                // Ammo capacity is 0 so reduce ammo from inventory
+                if (this.CountAmmos(weaponItem.WeaponType.AmmoType) >= amount)
+                    return true;
+                return false;
+            }
+            else if (weaponItem.AmmoCapacity <= 0 && hasAmmoItems)
+            {
+                // Ammo capacity is 0 so reduce ammo from inventory
+                for (int i = 0; i < weaponItem.AmmoItems.Length; ++i)
                 {
-                    // Ammo capacity is 0 so reduce ammo from inventory
-                    if (this.CountAmmos(weaponItem.WeaponType.RequireAmmoType) < amount)
-                        return false;
+                    if (this.CountNonEquipItems(weaponItem.AmmoItems[i].DataId) >= amount)
+                        return true;
                 }
-                else
-                {
-                    // Ammo capacity more than 0 reduce loaded ammo
-                    if (weapon.ammo < amount)
-                        return false;
-                }
-                return true;
+                return false;
             }
 
             return validIfNoRequireAmmoType;
@@ -869,21 +878,9 @@ namespace MultiplayerARPG
                 return validIfNoRequireAmmoType;
 
             IWeaponItem weaponItem = weapon.GetWeaponItem();
-            if (weaponItem.WeaponType.RequireAmmoType == null)
-                return validIfNoRequireAmmoType;
-
-            if (weaponItem.AmmoCapacity <= 0)
-            {
-                // Ammo capacity is 0 so reduce ammo from inventory
-                if (this.DecreaseAmmos(weaponItem.WeaponType.RequireAmmoType, amount, out increaseDamageAmounts))
-                {
-                    this.FillEmptySlots();
-                    return true;
-                }
-                // Not enough ammo
-                return false;
-            }
-            else
+            bool hasAmmoType = weaponItem.WeaponType.AmmoType != null;
+            bool hasAmmoItems = weaponItem.AmmoItems != null && weaponItem.AmmoItems.Length > 0;
+            if (weaponItem.AmmoCapacity > 0 && (hasAmmoType || hasAmmoItems))
             {
                 // Ammo capacity >= `amount` reduce loaded ammo
                 if (weapon.ammo >= amount)
@@ -900,6 +897,33 @@ namespace MultiplayerARPG
                 // Not enough ammo
                 return false;
             }
+            else if (weaponItem.AmmoCapacity <= 0 && hasAmmoType)
+            {
+                // Ammo capacity is 0 so reduce ammo from inventory
+                if (this.DecreaseAmmos(weaponItem.WeaponType.AmmoType, amount, out increaseDamages))
+                {
+                    this.FillEmptySlots();
+                    return true;
+                }
+                // Not enough ammo
+                return false;
+            }
+            else if (weaponItem.AmmoCapacity <= 0 && hasAmmoItems)
+            {
+                // Ammo capacity is 0 so reduce ammo from inventory
+                for (int i = 0; i < weaponItem.AmmoItems.Length; ++i)
+                {
+                    if (this.DecreaseItems(weaponItem.AmmoItems[i].DataId, amount))
+                    {
+                        this.FillEmptySlots();
+                        return true;
+                    }
+                }
+                // Not enough ammo
+                return false;
+            }
+
+            return validIfNoRequireAmmoType;
         }
 
         public virtual void GetUsingSkillData(

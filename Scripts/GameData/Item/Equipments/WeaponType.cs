@@ -1,6 +1,7 @@
 ﻿using Newtonsoft.Json;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace MultiplayerARPG
 {
@@ -37,9 +38,10 @@ namespace MultiplayerARPG
 
         [Category("Ammo Settings")]
         [Tooltip("Require Ammo, Leave it to null when it is not required")]
+        [FormerlySerializedAs("requireAmmoType")]
         [SerializeField]
-        private AmmoType requireAmmoType = null;
-        public AmmoType RequireAmmoType { get { return requireAmmoType; } }
+        private AmmoType ammoType = null;
+        public AmmoType AmmoType { get { return ammoType; } }
 
         [System.NonSerialized]
         private Dictionary<Attribute, float> _cacheEffectivenessAttributes;
@@ -63,7 +65,7 @@ namespace MultiplayerARPG
         public override void PrepareRelatesData()
         {
             base.PrepareRelatesData();
-            GameInstance.AddAmmoTypes(RequireAmmoType);
+            GameInstance.AddAmmoTypes(AmmoType);
         }
     }
 }
