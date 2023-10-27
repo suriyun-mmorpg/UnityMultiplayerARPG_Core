@@ -52,7 +52,7 @@ namespace MultiplayerARPG
         /// <summary>
         /// Weapon ability such as zoom, change how to fire, change launch clip. (For now, it has only zoom)
         /// </summary>
-        BaseWeaponAbility WeaponAbility { get; }
+        BaseWeaponAbility[] WeaponAbilities { get; }
         /// <summary>
         /// Crosshair setting
         /// </summary>

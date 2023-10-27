@@ -79,6 +79,7 @@ namespace MultiplayerARPG
         [Tooltip("For macine gun may set this to 30 as magazine capacity, if this is 0 it will not need to have ammo loaded to shoot but still need ammo in inventory")]
         public int ammoCapacity;
         public BaseWeaponAbility weaponAbility;
+        public BaseWeaponAbility[] weaponAbilities = new BaseWeaponAbility[0];
         public CrosshairSetting crosshairSetting = new CrosshairSetting()
         {
             expandPerFrameWhileMoving = 3f,
@@ -490,9 +491,9 @@ namespace MultiplayerARPG
             get { return ammoCapacity; }
         }
 
-        public BaseWeaponAbility WeaponAbility
+        public BaseWeaponAbility[] WeaponAbilities
         {
-            get { return weaponAbility; }
+            get { return weaponAbilities; }
         }
 
         public CrosshairSetting CrosshairSetting
@@ -658,6 +659,14 @@ namespace MultiplayerARPG
         public override bool Validate()
         {
             bool hasChanges = false;
+            if (weaponAbility != null && (weaponAbilities == null || weaponAbilities.Length == 0))
+            {
+                weaponAbilities = new List<BaseWeaponAbility>()
+                {
+                    weaponAbility,
+                }.ToArray();
+                hasChanges = true;
+            }
             if (MigrateAudioClips(ref launchClip, ref launchClipSettings))
                 hasChanges = true;
             if (MigrateAudioClips(ref reloadClip, ref reloadClipSettings))

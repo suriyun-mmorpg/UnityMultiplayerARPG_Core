@@ -25,8 +25,6 @@ namespace MultiplayerARPG
         [System.NonSerialized]
         private ShooterControllerViewMode? _preActivateViewMode;
 
-        public override bool ShouldDeactivateWhenReload { get { return true; } }
-
         public float CameraRotationSpeedScale
         {
             get { return CameraRotationSpeedScaleSetting.GetCameraRotationSpeedScaleByKey(cameraRotationSpeedScaleSaveKey, cameraRotationSpeedScaleWhileZooming); }
