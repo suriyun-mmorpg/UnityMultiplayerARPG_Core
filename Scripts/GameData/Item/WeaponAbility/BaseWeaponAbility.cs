@@ -2,7 +2,7 @@
 
 namespace MultiplayerARPG
 {
-    public abstract class BaseWeaponAbility : ScriptableObject
+    public abstract class BaseWeaponAbility : BaseGameData
     {
         protected BasePlayerCharacterController controller;
         protected CharacterItem weapon;
