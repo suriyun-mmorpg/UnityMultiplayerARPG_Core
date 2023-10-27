@@ -23,6 +23,9 @@ namespace MultiplayerARPG
         public RectTransform playingCharacterMarker;
         public Vector3 playingCharacterRotateOffsets = Vector3.zero;
         [Tooltip("Marker's anchor min, max and pivot must be 0.5")]
+        public RectTransform followingCameraMarker;
+        public Vector3 followingCameraRotateOffsets = Vector3.zero;
+        [Tooltip("Marker's anchor min, max and pivot must be 0.5")]
         public RectTransform allyMemberMarkerPrefab;
         public Vector3 allyMemberRotateOffsets = Vector3.zero;
         [Tooltip("Marker's anchor min, max and pivot must be 0.5")]
@@ -93,11 +96,22 @@ namespace MultiplayerARPG
                 }
                 UpdateEntitiesMarkersPosition(sizeRate);
 
+                if (followingCameraMarker != null)
+                {
+                    IGameplayCameraController gameplayCamera = BasePlayerCharacterController.Singleton.GetComponent<IGameplayCameraController>();
+                    followingCameraMarker.SetAsLastSibling();
+                    if (gameplayCamera != null)
+                        SetMarkerPositionAndRotation(followingCameraMarker, playingCharacterTransform.position, gameplayCamera.CameraTransform.eulerAngles, sizeRate, followingCameraRotateOffsets);
+                    else
+                        SetMarkerPositionAndRotation(followingCameraMarker, playingCharacterTransform, sizeRate, followingCameraRotateOffsets);
+                }
+
                 if (playingCharacterMarker != null)
                 {
                     playingCharacterMarker.SetAsLastSibling();
                     SetMarkerPositionAndRotation(playingCharacterMarker, playingCharacterTransform, sizeRate, playingCharacterRotateOffsets);
                 }
+
                 if (mode == Mode.Default)
                 {
                     imageMinimap.transform.localPosition = Vector2.zero;
@@ -202,21 +216,26 @@ namespace MultiplayerARPG
             });
         }
 
-        private void SetMarkerPositionAndRotation(RectTransform makerTransform, Transform entityTransform, float sizeRate, Vector3 markerRotateOffsets)
+        private void SetMarkerPositionAndRotation(RectTransform markerTransform, Transform entityTransform, float sizeRate, Vector3 markerRotateOffsets)
+        {
+            SetMarkerPositionAndRotation(markerTransform, entityTransform.position, entityTransform.eulerAngles, sizeRate, markerRotateOffsets);
+        }
+
+        private void SetMarkerPositionAndRotation(RectTransform markerTransform, Vector3 position, Vector3 eulerAngles, float sizeRate, Vector3 markerRotateOffsets)
         {
             switch (GameInstance.Singleton.DimensionType)
             {
                 case DimensionType.Dimension2D:
-                    makerTransform.localPosition = new Vector2(
-                                                (_currentMapInfo.MinimapPosition.x - entityTransform.position.x) * sizeRate,
-                                                (_currentMapInfo.MinimapPosition.y - entityTransform.position.y) * sizeRate);
-                    makerTransform.localEulerAngles = Vector3.zero;
+                    markerTransform.localPosition = imageMinimap.transform.localPosition + new Vector3(
+                        (_currentMapInfo.MinimapPosition.x - position.x) * sizeRate,
+                        (_currentMapInfo.MinimapPosition.y - position.y) * sizeRate);
+                    markerTransform.localEulerAngles = Vector3.zero;
                     break;
                 default:
-                    makerTransform.localPosition = new Vector2(
-                                                (_currentMapInfo.MinimapPosition.x - entityTransform.position.x) * sizeRate,
-                                                (_currentMapInfo.MinimapPosition.z - entityTransform.position.z) * sizeRate);
-                    makerTransform.localEulerAngles = markerRotateOffsets + (Vector3.back * entityTransform.eulerAngles.y);
+                    markerTransform.localPosition = imageMinimap.transform.localPosition + new Vector3(
+                        (_currentMapInfo.MinimapPosition.x - position.x) * sizeRate,
+                        (_currentMapInfo.MinimapPosition.z - position.z) * sizeRate);
+                    markerTransform.localEulerAngles = markerRotateOffsets + (Vector3.back * eulerAngles.y);
                     break;
             }
         }
