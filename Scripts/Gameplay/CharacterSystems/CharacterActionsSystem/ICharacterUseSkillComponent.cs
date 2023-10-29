@@ -1,6 +1,4 @@
-﻿using LiteNetLib.Utils;
-
-namespace MultiplayerARPG
+﻿namespace MultiplayerARPG
 {
     public interface ICharacterUseSkillComponent
     {
