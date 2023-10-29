@@ -12,7 +12,7 @@ namespace MultiplayerARPG
         /// <param name="resultDictionary"></param>
         /// <param name="newEntry"></param>
         /// <returns></returns>
-        public static Dictionary<DamageElement, MinMaxFloat> CombineDamages(Dictionary<DamageElement, MinMaxFloat> resultDictionary, KeyValuePair<DamageElement, MinMaxFloat> newEntry)
+        public static Dictionary<DamageElement, MinMaxFloat> CombineDamages(Dictionary<DamageElement, MinMaxFloat> resultDictionary, KeyValuePair<DamageElement, MinMaxFloat> newEntry, float rate = 1f)
         {
             if (resultDictionary == null)
                 resultDictionary = new Dictionary<DamageElement, MinMaxFloat>();
@@ -20,9 +20,9 @@ namespace MultiplayerARPG
             if (damageElement == null)
                 damageElement = GameInstance.Singleton.DefaultDamageElement;
             if (!resultDictionary.ContainsKey(damageElement))
-                resultDictionary[damageElement] = newEntry.Value;
+                resultDictionary[damageElement] = newEntry.Value * rate;
             else
-                resultDictionary[damageElement] += newEntry.Value;
+                resultDictionary[damageElement] += newEntry.Value * rate;
             return resultDictionary;
         }
 
@@ -250,8 +250,9 @@ namespace MultiplayerARPG
         /// </summary>
         /// <param name="resultDictionary"></param>
         /// <param name="combineDictionary"></param>
+        /// <param name="rate"></param>
         /// <returns></returns>
-        public static Dictionary<DamageElement, MinMaxFloat> CombineDamages(Dictionary<DamageElement, MinMaxFloat> resultDictionary, Dictionary<DamageElement, MinMaxFloat> combineDictionary)
+        public static Dictionary<DamageElement, MinMaxFloat> CombineDamages(Dictionary<DamageElement, MinMaxFloat> resultDictionary, Dictionary<DamageElement, MinMaxFloat> combineDictionary, float rate = 1f)
         {
             if (resultDictionary == null)
                 resultDictionary = new Dictionary<DamageElement, MinMaxFloat>();
@@ -259,7 +260,7 @@ namespace MultiplayerARPG
                 return resultDictionary;
             foreach (KeyValuePair<DamageElement, MinMaxFloat> entry in combineDictionary)
             {
-                CombineDamages(resultDictionary, entry);
+                CombineDamages(resultDictionary, entry, rate);
             }
             return resultDictionary;
         }

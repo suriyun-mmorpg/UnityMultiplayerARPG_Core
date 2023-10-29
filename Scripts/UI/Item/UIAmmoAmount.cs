@@ -1,5 +1,4 @@
-﻿using LiteNetLibManager;
-using UnityEngine;
+﻿using UnityEngine;
 
 namespace MultiplayerARPG
 {
@@ -57,7 +56,7 @@ namespace MultiplayerARPG
             int currentAmmo = characterItem.ammo;
             int reserveAmmo = 0;
             if (GameInstance.PlayingCharacterEntity && isActive)
-                reserveAmmo = GameInstance.PlayingCharacterEntity.CountAmmos(weaponItem.WeaponType.AmmoType);
+                reserveAmmo = GameInstance.PlayingCharacterEntity.CountAllAmmos(weaponItem.WeaponType.AmmoType);
 
             if (textCurrentAmmo != null)
             {

@@ -838,7 +838,7 @@ namespace MultiplayerARPG
             else if (weaponItem.AmmoCapacity <= 0 && hasAmmoType)
             {
                 // Ammo capacity is 0 so reduce ammo from inventory
-                if (this.CountAmmos(weaponItem.WeaponType.AmmoType) >= amount)
+                if (this.CountAmmos(weaponItem.WeaponType.AmmoType, out _) >= amount)
                     return true;
                 return false;
             }
@@ -863,15 +863,24 @@ namespace MultiplayerARPG
                 return null;
 
             IWeaponItem weaponItem = weapon.GetWeaponItem();
-            if (weaponItem.AmmoCapacity > 0 || weaponItem.WeaponType.RequireAmmoType == null)
-                return null;
+            bool hasAmmoType = weaponItem.WeaponType.AmmoType != null;
+            bool hasAmmoItems = weaponItem.AmmoItems != null && weaponItem.AmmoItems.Length > 0;
+            if (weaponItem.AmmoCapacity > 0 && (hasAmmoType || hasAmmoItems))
+            {
+                if (GameInstance.Items.TryGetValue(weapon.ammoDataId, out BaseItem tempItemData) && tempItemData is IAmmoItem tempAmmoItem)
+                    return tempAmmoItem.GetIncreaseDamages();
+            }
+            else if (weaponItem.AmmoCapacity <= 0 && (hasAmmoType || hasAmmoItems))
+            {
+                return this.GetIncreaseDamagesByAmmo(weaponItem.WeaponType.AmmoType);
+            }
 
-            return this.GetIncreaseDamagesByAmmo(weaponItem.WeaponType.RequireAmmoType);
+            return null;
         }
 
-        public bool DecreaseAmmos(CharacterItem weapon, bool isLeftHand, int amount, out Dictionary<DamageElement, MinMaxFloat> increaseDamageAmounts, bool validIfNoRequireAmmoType = true)
+        public bool DecreaseAmmos(CharacterItem weapon, bool isLeftHand, int amount, out Dictionary<DamageElement, MinMaxFloat> increaseDamages, bool validIfNoRequireAmmoType = true)
         {
-            increaseDamageAmounts = null;
+            increaseDamages = null;
 
             // Avoid null data
             if (weapon == null)
@@ -885,6 +894,8 @@ namespace MultiplayerARPG
                 // Ammo capacity >= `amount` reduce loaded ammo
                 if (weapon.ammo >= amount)
                 {
+                    if (GameInstance.Items.TryGetValue(weapon.ammoDataId, out BaseItem tempItemData) && tempItemData is IAmmoItem tempAmmoItem)
+                        increaseDamages = tempAmmoItem.GetIncreaseDamages();
                     weapon.ammo -= amount;
                     EquipWeapons equipWeapons = EquipWeapons;
                     if (isLeftHand)
@@ -911,11 +922,19 @@ namespace MultiplayerARPG
             else if (weaponItem.AmmoCapacity <= 0 && hasAmmoItems)
             {
                 // Ammo capacity is 0 so reduce ammo from inventory
+                BaseItem tempItemData;
+                int tempAmmoDataId;
                 for (int i = 0; i < weaponItem.AmmoItems.Length; ++i)
                 {
-                    if (this.DecreaseItems(weaponItem.AmmoItems[i].DataId, amount))
+                    tempItemData = weaponItem.AmmoItems[i];
+                    if (tempItemData == null)
+                        continue;
+                    tempAmmoDataId = tempItemData.DataId;
+                    if (this.DecreaseItems(tempAmmoDataId, amount))
                     {
                         this.FillEmptySlots();
+                        if (tempItemData is IAmmoItem tempAmmoItem)
+                            increaseDamages = tempAmmoItem.GetIncreaseDamages();
                         return true;
                     }
                 }

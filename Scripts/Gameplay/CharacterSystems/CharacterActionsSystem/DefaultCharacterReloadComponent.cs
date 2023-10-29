@@ -14,6 +14,7 @@ namespace MultiplayerARPG
         public const float DEFAULT_STATE_SETUP_DELAY = 1f;
 
         protected readonly List<CancellationTokenSource> _reloadCancellationTokenSources = new List<CancellationTokenSource>();
+        public int ReloadingAmmoDataId { get; protected set; }
         public int ReloadingAmmoAmount { get; protected set; }
         public bool IsReloading { get; protected set; }
         public float LastReloadEndTime { get; protected set; }
@@ -34,10 +35,11 @@ namespace MultiplayerARPG
             _manager = GetComponent<CharacterActionComponentManager>();
         }
 
-        protected virtual void SetReloadActionStates(AnimActionType animActionType, int reloadingAmmoAmount)
+        protected virtual void SetReloadActionStates(AnimActionType animActionType, int reloadingAmmoDataId, int reloadingAmmoAmount)
         {
             ClearReloadStates();
             AnimActionType = animActionType;
+            ReloadingAmmoDataId = reloadingAmmoDataId;
             ReloadingAmmoAmount = reloadingAmmoAmount;
             IsReloading = true;
         }
@@ -48,7 +50,7 @@ namespace MultiplayerARPG
             IsReloading = false;
         }
 
-        protected virtual async UniTaskVoid ReloadRoutine(bool isLeftHand, int reloadingAmmoAmount)
+        protected virtual async UniTaskVoid ReloadRoutine(bool isLeftHand, int reloadingAmmoDataId, int reloadingAmmoAmount)
         {
             // Prepare cancellation
             CancellationTokenSource reloadCancellationTokenSource = new CancellationTokenSource();
@@ -72,7 +74,7 @@ namespace MultiplayerARPG
                 out _skipMovementValidation);
 
             // Set doing action state at clients and server
-            SetReloadActionStates(animActionType, reloadingAmmoAmount);
+            SetReloadActionStates(animActionType, reloadingAmmoDataId, reloadingAmmoAmount);
 
             // Prepare requires data and get damages data
             IWeaponItem weaponItem = weapon.GetWeaponItem();
@@ -146,6 +148,7 @@ namespace MultiplayerARPG
                     }
                 }
 
+                bool reloaded = false;
                 float tempTriggerDuration;
                 for (int i = 0; i < _triggerDurations.Length; ++i)
                 {
@@ -169,43 +172,27 @@ namespace MultiplayerARPG
                     }
 
                     // Reload / Fill ammo
-                    int triggerReloadAmmoAmount = ReloadingAmmoAmount / _triggerDurations.Length;
-                    EquipWeapons equipWeapons = Entity.EquipWeapons;
-                    bool hasAmmoType = weaponItem.WeaponType.AmmoType != null;
-                    bool hasAmmoItems = weaponItem.AmmoItems != null && weaponItem.AmmoItems.Length > 0;
-                    if (IsServer)
+                    if (!reloaded)
                     {
-                        if (hasAmmoType)
+                        reloaded = true;
+                        EquipWeapons equipWeapons = Entity.EquipWeapons;
+                        if (IsServer)
                         {
-                            if (Entity.DecreaseAmmos(weaponItem.WeaponType.AmmoType, triggerReloadAmmoAmount, out _))
+                            if (Entity.DecreaseItems(reloadingAmmoDataId, reloadingAmmoAmount))
                             {
+                                if (weapon.ammo > 0 && weapon.ammoDataId != reloadingAmmoDataId)
+                                {
+                                    Entity.IncreaseItems(CharacterItem.Create(reloadingAmmoDataId, 1, weapon.ammo));
+                                    weapon.ammo = 0;
+                                }
                                 Entity.FillEmptySlots();
-                                weapon.ammo += triggerReloadAmmoAmount;
+                                weapon.ammoDataId = reloadingAmmoDataId;
+                                weapon.ammo += reloadingAmmoAmount;
                                 if (isLeftHand)
                                     equipWeapons.leftHand = weapon;
                                 else
                                     equipWeapons.rightHand = weapon;
                                 Entity.EquipWeapons = equipWeapons;
-                            }
-                        }
-                        else if (hasAmmoItems)
-                        {
-                            for (int indexOfAmmoItem = 0; indexOfAmmoItem < weaponItem.AmmoItems.Length; ++indexOfAmmoItem)
-                            {
-                                int countCurrentReloadAmmo = Entity.CountNonEquipItems(weaponItem.AmmoItems[indexOfAmmoItem].DataId);
-                                if (countCurrentReloadAmmo >= triggerReloadAmmoAmount)
-                                    countCurrentReloadAmmo = triggerReloadAmmoAmount;
-                                if (Entity.DecreaseItems(weaponItem.AmmoItems[indexOfAmmoItem].DataId, countCurrentReloadAmmo))
-                                {
-                                    Entity.FillEmptySlots();
-                                    weapon.ammo += countCurrentReloadAmmo;
-                                    if (isLeftHand)
-                                        equipWeapons.leftHand = weapon;
-                                    else
-                                        equipWeapons.rightHand = weapon;
-                                    Entity.EquipWeapons = equipWeapons;
-                                    break;
-                                }
                             }
                         }
                     }
@@ -291,46 +278,50 @@ namespace MultiplayerARPG
             if (!hasAmmoType && !hasAmmoItems)
                 return;
             // Prepare reload data
-            int reloadingAmmoAmount = reloadingWeaponItem.AmmoCapacity - reloadingWeapon.ammo;
+            int reloadingAmmoDataId = 0;
             int inventoryAmount = 0;
             if (hasAmmoType)
             {
-                inventoryAmount = Entity.CountAmmos(reloadingWeaponItem.WeaponType.AmmoType);
+                inventoryAmount = Entity.CountAmmos(reloadingWeaponItem.WeaponType.AmmoType, out reloadingAmmoDataId);
             }
             else if (hasAmmoItems)
             {
                 for (int indexOfAmmoItem = 0; indexOfAmmoItem < reloadingWeaponItem.AmmoItems.Length; ++indexOfAmmoItem)
                 {
-                    inventoryAmount += Entity.CountNonEquipItems(reloadingWeaponItem.AmmoItems[indexOfAmmoItem].DataId);
-                    if (inventoryAmount >= reloadingAmmoAmount)
+                    int tempAmmoDataId = reloadingWeaponItem.AmmoItems[indexOfAmmoItem].DataId;
+                    int tempAmmoAmount = Entity.CountNonEquipItems(tempAmmoDataId);
+                    if (tempAmmoAmount > 0)
                     {
-                        inventoryAmount = reloadingAmmoAmount;
+                        reloadingAmmoDataId = tempAmmoDataId;
+                        inventoryAmount = tempAmmoAmount;
                         break;
                     }
                 }
             }
-
+            int reloadingAmmoAmount = 0;
+            if (reloadingWeapon.ammoDataId != 0 && reloadingWeapon.ammoDataId == reloadingAmmoDataId)
+                reloadingAmmoAmount = reloadingWeaponItem.AmmoCapacity - reloadingWeapon.ammo;
+            else
+                reloadingAmmoAmount = reloadingWeaponItem.AmmoCapacity;
             if (inventoryAmount < reloadingAmmoAmount)
                 reloadingAmmoAmount = inventoryAmount;
-
             if (reloadingAmmoAmount <= 0)
                 return;
-
             _manager.ActionAccepted();
-            ReloadRoutine(isLeftHand, reloadingAmmoAmount).Forget();
-            RPC(RpcReload, isLeftHand, reloadingAmmoAmount);
+            ReloadRoutine(isLeftHand, reloadingAmmoDataId, reloadingAmmoAmount).Forget();
+            RPC(RpcReload, isLeftHand, reloadingAmmoDataId, reloadingAmmoAmount);
 #endif
         }
 
         [AllRpc]
-        protected void RpcReload(bool isLeftHand, int reloadingAmmoAmount)
+        protected void RpcReload(bool isLeftHand, int reloadingAmmoDataId, int reloadingAmmoAmount)
         {
             if (IsServer || IsOwnerClient)
             {
                 // Don't play reloading animation again
                 return;
             }
-            ReloadRoutine(isLeftHand, reloadingAmmoAmount).Forget();
+            ReloadRoutine(isLeftHand, reloadingAmmoDataId, reloadingAmmoAmount).Forget();
         }
     }
 }

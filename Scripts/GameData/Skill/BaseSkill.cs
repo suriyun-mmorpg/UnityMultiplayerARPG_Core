@@ -901,7 +901,7 @@ namespace MultiplayerARPG
                         return true;
                     foreach (AmmoTypeAmount requireAmmo in requireAmmos)
                     {
-                        if (character.CountAmmos(requireAmmo.ammoType) >= requireAmmo.amount)
+                        if (character.CountAllAmmos(requireAmmo.ammoType) >= requireAmmo.amount)
                         {
                             ammoType = requireAmmo.ammoType;
                             amount = requireAmmo.amount;

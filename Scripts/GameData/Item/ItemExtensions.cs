@@ -92,11 +92,11 @@ namespace MultiplayerARPG
         #endregion
 
         #region Ammo Extension
-        public static Dictionary<DamageElement, MinMaxFloat> GetIncreaseDamages(this IAmmoItem ammoItem, int level)
+        public static Dictionary<DamageElement, MinMaxFloat> GetIncreaseDamages(this IAmmoItem ammoItem)
         {
             Dictionary<DamageElement, MinMaxFloat> result = new Dictionary<DamageElement, MinMaxFloat>();
             if (ammoItem != null && ammoItem.IsAmmo())
-                result = GameDataHelpers.CombineDamages(ammoItem.IncreaseDamages, result, level, 1f);
+                result = GameDataHelpers.CombineDamages(ammoItem.IncreaseDamages, result, 1, 1f);
             return result;
         }
         #endregion

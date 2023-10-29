@@ -641,46 +641,63 @@ namespace MultiplayerARPG
                 tempNonEquipItem = data.NonEquipItems[i];
                 tempAmmoItemData = tempNonEquipItem.GetAmmoItem();
                 if (tempAmmoItemData != null && tempAmmoItemData.AmmoType == ammoType)
-                    return tempAmmoItemData.GetIncreaseDamages(tempNonEquipItem.level);
+                    return tempAmmoItemData.GetIncreaseDamages();
             }
             return null;
         }
 
         public static bool DecreaseAmmos(this ICharacterData data, AmmoType ammoType, int amount, out Dictionary<DamageElement, MinMaxFloat> increaseDamageAmounts, out Dictionary<CharacterItem, int> decreaseItems)
         {
-            increaseDamageAmounts = null;
+            increaseDamageAmounts = new Dictionary<DamageElement, MinMaxFloat>();
             decreaseItems = new Dictionary<CharacterItem, int>();
             if (ammoType == null || amount <= 0)
                 return false;
-            Dictionary<int, int> decreasingItemIndexes = new Dictionary<int, int>();
+            Dictionary<int, Dictionary<DamageElement, MinMaxFloat>> calculatingDamageAmounts = new Dictionary<int, Dictionary<DamageElement, MinMaxFloat>>();
+            List<int> decreasingItemIndexes = new List<int>();
+            List<int> decreasingItemAmounts = new List<int>();
             CharacterItem tempNonEquipItem;
             IAmmoItem tempAmmoItemData;
             int tempDecresingAmount;
-            for (int i = 0; i < data.NonEquipItems.Count; ++i)
+            int i;
+            for (i = 0; i < data.NonEquipItems.Count; ++i)
             {
                 tempNonEquipItem = data.NonEquipItems[i];
                 tempAmmoItemData = tempNonEquipItem.GetAmmoItem();
-                if (tempAmmoItemData != null && tempAmmoItemData.AmmoType == ammoType)
+                if (tempAmmoItemData == null)
+                    continue;
+
+                if (ammoType == tempAmmoItemData.AmmoType)
                 {
-                    if (increaseDamageAmounts == null)
-                        increaseDamageAmounts = tempAmmoItemData.GetIncreaseDamages(tempNonEquipItem.level);
                     if (amount - tempNonEquipItem.amount > 0)
                         tempDecresingAmount = tempNonEquipItem.amount;
                     else
                         tempDecresingAmount = amount;
+                    if (tempDecresingAmount > 0 && !calculatingDamageAmounts.ContainsKey(tempAmmoItemData.DataId))
+                        calculatingDamageAmounts.Add(tempAmmoItemData.DataId, tempAmmoItemData.GetIncreaseDamages());
                     amount -= tempDecresingAmount;
-                    decreasingItemIndexes[i] = tempDecresingAmount;
+                    decreasingItemIndexes.Add(i);
+                    decreasingItemAmounts.Add(tempDecresingAmount);
                 }
+
                 if (amount == 0)
                     break;
             }
+
             if (amount > 0)
                 return false;
-            foreach (KeyValuePair<int, int> decreasingItem in decreasingItemIndexes)
+
+            float entryRate = 1f / calculatingDamageAmounts.Count;
+            foreach (Dictionary<DamageElement, MinMaxFloat> damageAmounts in calculatingDamageAmounts.Values)
             {
-                decreaseItems.Add(data.NonEquipItems[decreasingItem.Key], decreasingItem.Value);
-                DecreaseItemsByIndex(data, decreasingItem.Key, decreasingItem.Value, true);
+                increaseDamageAmounts = GameDataHelpers.CombineDamages(increaseDamageAmounts, damageAmounts, entryRate);
             }
+
+            for (i = decreasingItemIndexes.Count - 1; i >= 0; --i)
+            {
+                decreaseItems.Add(data.NonEquipItems[decreasingItemIndexes[i]], decreasingItemAmounts[i]);
+                DecreaseItemsByIndex(data, decreasingItemIndexes[i], decreasingItemAmounts[i], true);
+            }
+
             return true;
         }
 
@@ -756,19 +773,57 @@ namespace MultiplayerARPG
             return count;
         }
 
-        public static int CountAmmos(this ICharacterData data, AmmoType ammoType)
+        public static int CountAmmos(this ICharacterData data, AmmoType ammoType, out int dataId)
+        {
+            dataId = 0;
+            if (ammoType == null)
+                return 0;
+            int count = 0;
+            if (data != null && data.NonEquipItems.Count > 0)
+            {
+                CharacterItem tempNonEquipItem;
+                IAmmoItem tempAmmoItemData;
+                int i;
+                for (i = 0; i < data.NonEquipItems.Count; ++i)
+                {
+                    tempNonEquipItem = data.NonEquipItems[i];
+                    tempAmmoItemData = tempNonEquipItem.GetAmmoItem();
+                    if (tempAmmoItemData == null)
+                        continue;
+                    if (tempAmmoItemData.AmmoType == null)
+                        continue;
+                    if (dataId != 0 && dataId != tempAmmoItemData.DataId)
+                        continue;
+                    if (ammoType == tempAmmoItemData.AmmoType)
+                    {
+                        dataId = tempAmmoItemData.DataId;
+                        count += tempNonEquipItem.amount;
+                    }
+                }
+            }
+            return count;
+        }
+
+        public static int CountAllAmmos(this ICharacterData data, AmmoType ammoType)
         {
             if (ammoType == null)
                 return 0;
             int count = 0;
             if (data != null && data.NonEquipItems.Count > 0)
             {
-                IAmmoItem ammoItem;
-                foreach (CharacterItem nonEquipItem in data.NonEquipItems)
+                CharacterItem tempNonEquipItem;
+                IAmmoItem tempAmmoItemData;
+                int i;
+                for (i = 0; i < data.NonEquipItems.Count; ++i)
                 {
-                    ammoItem = nonEquipItem.GetAmmoItem();
-                    if (ammoItem != null && ammoType == ammoItem.AmmoType)
-                        count += nonEquipItem.amount;
+                    tempNonEquipItem = data.NonEquipItems[i];
+                    tempAmmoItemData = tempNonEquipItem.GetAmmoItem();
+                    if (tempAmmoItemData == null)
+                        continue;
+                    if (tempAmmoItemData.AmmoType == null)
+                        continue;
+                    if (ammoType == tempAmmoItemData.AmmoType)
+                        count += tempNonEquipItem.amount;
                 }
             }
             return count;
