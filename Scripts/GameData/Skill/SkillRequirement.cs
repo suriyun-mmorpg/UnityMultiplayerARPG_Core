@@ -1,7 +1,7 @@
 ﻿namespace MultiplayerARPG
 {
     [System.Serializable]
-    public struct SkillRequirement
+    public partial class SkillRequirement
     {
         public bool disallow;
         public IncrementalInt characterLevel;
