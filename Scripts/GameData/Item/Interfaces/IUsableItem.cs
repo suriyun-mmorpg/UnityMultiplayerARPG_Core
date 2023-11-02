@@ -2,7 +2,7 @@
 
 namespace MultiplayerARPG
 {
-    public partial interface IUsableItem : IItem, ICustomAimController, IRequirement
+    public partial interface IUsableItem : IItem, ICustomAimController, IItemWithRequirement
     {
         /// <summary>
         /// Cooldown duration before it is able to use again

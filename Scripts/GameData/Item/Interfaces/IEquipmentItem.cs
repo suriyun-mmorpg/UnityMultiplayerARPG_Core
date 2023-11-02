@@ -2,7 +2,7 @@
 
 namespace MultiplayerARPG
 {
-    public partial interface IEquipmentItem : IItem, IRequirement
+    public partial interface IEquipmentItem : IItem, IItemWithRequirement
     {
         /// <summary>
         /// Equipment set, if character equipping the same set of items, it can increase extra stats to character

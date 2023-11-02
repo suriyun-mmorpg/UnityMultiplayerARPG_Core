@@ -2,7 +2,7 @@ using System.Collections.Generic;
 
 namespace MultiplayerARPG
 {
-    public partial interface IRequirement
+    public partial interface IItemWithRequirement
     {
         ItemRequirement Requirement { get; }
         /// <summary>
