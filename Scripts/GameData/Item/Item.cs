@@ -42,9 +42,10 @@ namespace MultiplayerARPG
         public EquipmentModel[] sheathModels;
         public EquipmentModel[] offHandSheathModels;
 
-        [Category(2, "Equipment Settings")]
+        [Category(2, "Item Requirement Settings")]
+        public ItemRequirement requirement;
+        [Category(3, "Equipment Settings")]
         [Header("Generic Equipment Settings")]
-        public EquipmentRequirement requirement;
         public EquipmentSet equipmentSet;
         [Tooltip("Equipment durability, If this set to 0 it will not broken")]
         [Range(0f, 1000f)]
@@ -113,7 +114,7 @@ namespace MultiplayerARPG
         public float chargeDuration;
         public bool destroyImmediatelyAfterFired;
 
-        [Category(3, "Buff/Bonus Settings")]
+        [Category(4, "Buff/Bonus Settings")]
         public Buff buff;
         public CharacterStatsIncremental increaseStats;
         public CharacterStatsIncremental increaseStatsRate;
@@ -267,7 +268,7 @@ namespace MultiplayerARPG
         #endregion
 
         #region Implement IEquipmentItem
-        public EquipmentRequirement Requirement
+        public ItemRequirement Requirement
         {
             get { return requirement; }
         }

@@ -4,7 +4,7 @@ namespace MultiplayerARPG
 {
     public partial interface IRequirement
     {
-        EquipmentRequirement Requirement { get; }
+        ItemRequirement Requirement { get; }
         /// <summary>
         /// Cached required attribute amounts to equip the item
         /// </summary>
